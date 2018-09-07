@@ -18,8 +18,9 @@ namespace FCSAlienChief.Items
         // This is the original fabricator prefab.
         private static readonly GameObject OriginalFabricator = Resources.Load<GameObject>("Submarine/Build/Fabricator");
 
-        private string _classId;
+        private static string _classId;
         private List<IAlienChiefItem> _alienChiefItems;
+
 
         #region Alien Chief fabricator
 
@@ -32,14 +33,14 @@ namespace FCSAlienChief.Items
         /// <summary>
         /// This name will be used as ID for the decorations fabricator TechType and its associated CraftTree.Type.
         /// </summary>
-        public static string AlienChiefFabId = "AlienChiefFabricator";
+        public static string AlienChiefFabId;
+
 
 
         public CustomFabricator(List<IAlienChiefItem> alienChiefItems, string classId, TechType techType = TechType.None) : base(classId, $"{classId}Prefab", techType)
         {
             _alienChiefItems = alienChiefItems;
             AlienChiefFabId = classId;
-
         }
 
 
@@ -90,27 +91,110 @@ namespace FCSAlienChief.Items
 
         private static void CreateCustomTree(List<IAlienChiefItem> alienChiefItems)
         {
-            
-            var root = CraftTreeHandler.CreateCustomCraftTreeAndType(AlienChiefFabId, out CraftTree.Type craftType);
-            
 
-            
-            var foodTab = root.AddTabNode("FCSAlienChiefFood", "FCS Alien Food", new Atlas.Sprite(ImageUtils.LoadTextureFromFile($"./QMods/{Information.ModName}/Assets/Default.png")));
+            var root = CraftTreeHandler.CreateCustomCraftTreeAndType(AlienChiefFabId, out CraftTree.Type craftType);
+            ModCraftTreeTab itemTab = null;
+
 
             AlienChiefTreeType = craftType;
 
-
+            Log.Info($"Attemping to add {_classId} to nodes");
             foreach (var alienChiefItem in alienChiefItems)
             {
-                foodTab.AddCraftingNode(alienChiefItem.TechType_I);
+
+                if (alienChiefItem.ClassID_I.EndsWith("R"))
+                {
+                    Log.Info($"Added {_classId} to nodes");
+                    AddTabNodes(ref root, ref itemTab, alienChiefItem, "Resources", "FCSResourcesTab");
+                }
+                else if (alienChiefItem.ClassID_I.EndsWith("C"))
+                {
+                    AddTabNodes(ref root, ref itemTab, alienChiefItem, "Condiments", "CondimentsTab");
+                }
+                else if (alienChiefItem.ClassID_I.EndsWith("F"))
+                {
+                    AddTabNodes(ref root, ref itemTab, alienChiefItem, "Foods", "Default");
+                }
+                else if (alienChiefItem.ClassID_I.EndsWith("D"))
+                {
+                    AddTabNodes(ref root, ref itemTab, alienChiefItem, "Drinks", "DrinkTab");
+                }
+
+
+
             }
-            
-            
+
+            #region Omit
+            //switch (_category)
+            //{
+            //    case "Food":
+            //        var foodTab = root.AddTabNode("FCSAlienChiefFood", "FCS Alien Food", new Atlas.Sprite(ImageUtils.LoadTextureFromFile($"./QMods/{Information.ModName}/Assets/Default.png")));
+
+            //        AlienChiefTreeType = craftType;
+
+            //        foreach (var alienChiefItem in alienChiefItems)
+            //        {
+            //            foodTab.AddCraftingNode(alienChiefItem.TechType_I);
+            //        }
+            //        break;
+
+            //    case "Drinks":
+
+            //        var drinksTab = root.AddTabNode("FCSAlienChiefDrinks", "FCS Alien Drinks", new Atlas.Sprite(ImageUtils.LoadTextureFromFile($"./QMods/{Information.ModName}/Assets/DrinkTab.png")));
+
+            //        AlienChiefTreeType = craftType;
+
+            //        foreach (var alienChiefItem in alienChiefItems)
+            //        {
+            //            drinksTab.AddCraftingNode(alienChiefItem.TechType_I);
+            //        }
+            //        break;
+
+            //    case "Resources":
+
+            //        var resourcesTab = root.AddTabNode("FCSAlienChiefResources", "FCS Alien Resources", new Atlas.Sprite(ImageUtils.LoadTextureFromFile($"./QMods/{Information.ModName}/Assets/FCSResourcesTab.png")));
+
+            //        AlienChiefTreeType = craftType;
+
+            //        foreach (var alienChiefItem in alienChiefItems)
+            //        {
+            //            resourcesTab.AddCraftingNode(alienChiefItem.TechType_I);
+            //        }
+            //        break;
+
+            //    case "Condiments":
+
+            //        var condimentsTab = root.AddTabNode("FCSAlienChiefCondiments", "FCS Alien Condiments", new Atlas.Sprite(ImageUtils.LoadTextureFromFile($"./QMods/{Information.ModName}/Assets/CondimentsTab.png")));
+
+            //        AlienChiefTreeType = craftType;
+
+            //        foreach (var alienChiefItem in alienChiefItems)
+            //        {
+            //            condimentsTab.AddCraftingNode(alienChiefItem.TechType_I);
+            //        }
+            //        break;
+            //} 
+            #endregion
         }
 
         #endregion
 
+        private static void AddTabNodes(ref ModCraftTreeRoot root, ref ModCraftTreeTab itemTab, IAlienChiefItem alienChiefItem, string category, string icon)
+        {
 
+            if (root.GetNode($"FCSAlienChief{category}") == null)
+            {
+                Log.Info($"FCSAlienChief{category} is null creating tab");
+                itemTab = root.AddTabNode($"FCSAlienChief{category}", $"FCS Alien {category}", new Atlas.Sprite(ImageUtils.LoadTextureFromFile($"./QMods/{Information.ModName}/Assets/{icon}.png")));
+                itemTab?.AddCraftingNode(alienChiefItem.TechType_I);
+                Log.Info($"FCSAlienChief{category} node tab Created");
+            }
+            else
+            {
+                Log.Info($"FCSAlienChief{category} is not null creating creating node tab");
+                itemTab?.AddCraftingNode(alienChiefItem.TechType_I);
+            }
+        }
 
         public override GameObject GetGameObject()
         {

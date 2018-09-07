@@ -69,6 +69,7 @@
     <Compile Include="Helpers\ItemHelpers.cs" />
     <Compile Include="Items\CustomFabricator.cs" />
     <Compile Include="Items\FoodItem.cs" />
+    <Compile Include="Items\ResourceItem.cs" />
     <Compile Include="LoadItems.cs" />
     <Compile Include="Logging\Log.cs" />
     <Compile Include="Logging\Reporters.cs" />

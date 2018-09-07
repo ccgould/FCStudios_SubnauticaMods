@@ -28,12 +28,104 @@ namespace FCSAlienChief
         public static readonly List<IAlienChiefItem> ObjItems = new List<IAlienChiefItem>();
 
         /// <summary>
+        /// A list of linked Items
+        /// </summary>
+        public static List<string> LinkedItems  = new List<string>();
+
+        /// <summary>
         /// Execute to start the creation process to load the items into the game
         /// </summary>
         public static void Patch()
         {
             // Create Json Objects from Config file in mod folder
             var jsonObject = JsonOperator.CreateJsonObject();
+
+            foreach (var curResources in jsonObject.Resources.Inventory)
+            {
+                // make a variable for the ref;
+                var resources = curResources;
+
+                if (!resources.Enabled)
+                {
+                    return;
+                }
+
+                if (curResources.LinkedItems != null)
+                {
+                    Log.Info($"{_name} has {curResources.LinkedItems.Count} linkedItems");
+                    foreach (var linkedItem in curResources.LinkedItems)
+                    {
+                        LinkedItems.Add(linkedItem);
+                    }
+                }
+
+
+                // Lets make sure that the object has a name and the Size is correct
+                VerifyObjectData(ref resources);
+
+                // Make a new FoodItem
+                var resourcePrefab = new ResourceItem(
+                    resources.ItemName,
+                    resources.Name,
+                    resources.ToolTip,
+                    resources.Icon,
+                    resources.CraftingAmount,
+                    Ingredientss,
+                    LinkedItems
+                );
+
+                resourcePrefab.RegisterItem();
+
+                // Add item to list
+                ObjItems.Add(resourcePrefab);
+
+                Ingredientss.Clear();
+                LinkedItems.Clear();
+            }
+
+            foreach (var curCondiment in jsonObject.Condiments.Inventory)
+            {
+                // make a variable for the ref;
+                var condiment = curCondiment;
+
+                if (!condiment.Enabled)
+                {   
+                    return;
+                }
+
+                if (curCondiment.LinkedItems != null)
+                {
+                    Log.Info($"{_name} has {curCondiment.LinkedItems.Count} linkedItems");
+                    foreach (var linkedItem in curCondiment.LinkedItems)
+                    {
+                        LinkedItems.Add(linkedItem);
+                    } 
+                }
+
+                // Lets make sure that the object has a name and the Size is correct
+                VerifyObjectData(ref condiment);
+
+                // Make a new FoodItem
+                var condimentsPrefab = new FoodItem(
+                    condiment.ItemName,
+                    condiment.Name,
+                    condiment.ToolTip,
+                    condiment.Icon,
+                    condiment.Values.Food,
+                    condiment.Values.Water,
+                    condiment.CraftingAmount,
+                    Ingredientss,
+                    LinkedItems
+                );
+
+                condimentsPrefab.RegisterItem();
+
+                // Add item to list
+                ObjItems.Add(condimentsPrefab);
+
+                Ingredientss.Clear();
+                LinkedItems.Clear();
+            }
 
             foreach (var curFood in jsonObject.Foods.Inventory)
             {
@@ -43,6 +135,15 @@ namespace FCSAlienChief
                 if (!foods.Enabled)
                 {
                     return;
+                }
+
+                if (curFood.LinkedItems != null)
+                {
+                    Log.Info($"{_name} has {curFood.LinkedItems.Count} linkedItems");
+                    foreach (var linkedItem in curFood.LinkedItems)
+                    {
+                        LinkedItems.Add(linkedItem);
+                    } 
                 }
 
                 // Lets make sure that the object has a name and the Size is correct
@@ -57,16 +158,61 @@ namespace FCSAlienChief
                     foods.Values.Food,
                     foods.Values.Water,
                     foods.CraftingAmount,
-                    Ingredientss
+                    Ingredientss,
+                    LinkedItems
                 );
 
                 foodPrefab.RegisterItem();
 
                 // Add item to list
                 ObjItems.Add(foodPrefab);
-                
+
                 Ingredientss.Clear();
-                //LinkedItems.Clear();
+                LinkedItems.Clear();
+            }
+
+            foreach (var curDrink in jsonObject.Drinks.Inventory)
+            {
+                // make a variable for the ref;
+                var drinks = curDrink;
+
+                if (!drinks.Enabled)
+                {
+                    return;
+                }
+
+                if (curDrink.LinkedItems != null)
+                {
+                    Log.Info($"{_name} has {curDrink.LinkedItems.Count} linkedItems");
+                    foreach (var linkedItem in curDrink.LinkedItems)
+                    {
+                        LinkedItems.Add(linkedItem);
+                    } 
+                }
+
+                // Lets make sure that the object has a name and the Size is correct
+                VerifyObjectData(ref drinks);
+
+                // Make a new FoodItem
+                var drinksPrefab = new FoodItem(
+                    drinks.ItemName,
+                    drinks.Name,
+                    drinks.ToolTip,
+                    drinks.Icon,
+                    drinks.Values.Food,
+                    drinks.Values.Water,
+                    drinks.CraftingAmount,
+                    Ingredientss,
+                    LinkedItems
+                );
+
+                drinksPrefab.RegisterItem();
+
+                // Add item to list
+                ObjItems.Add(drinksPrefab);
+
+                Ingredientss.Clear();
+                LinkedItems.Clear();
             }
 
             CustomFabricator customFabricator = new CustomFabricator(ObjItems, "AlienChiefFabricator");
@@ -101,7 +247,8 @@ namespace FCSAlienChief
             CheckItemSize(ref sizeX, ref sizeY);
             inventory.Size.X = sizeX;
             inventory.Size.Y = sizeY;
-
+         
+            Log.Info($"Checking {_name} ingredients");
             // Check Ingredients
             foreach (var ingredient in inventory.Ingredients)
             {
@@ -111,14 +258,23 @@ namespace FCSAlienChief
                 var ingredientAmount = ingredient.Amount;
                 #endregion
 
+                Log.Info($"Checking ingrdient {ingredient.Item} ");
                 // Check the current ingredient from the list.
                 CheckIngredients(ref ingredientItem, ref ingredientAmount);
 
                 // if the ingredient item has changed replace it else don't
-                if (ingredient.Item != ingredientItem) { ingredient.Item = ingredientItem; }
+                if (ingredient.Item != ingredientItem)
+                {
+                    ingredient.Item = ingredientItem;
+                    Log.Info($"{_name} ingredient {ingredient.Item} Item changed to {ingredientItem}");
+                }
 
                 // if the ingredient amount has changed replace it else don't
-                if (ingredient.Amount != ingredientAmount) { ingredient.Amount = ingredientAmount; }
+                if (ingredient.Amount != ingredientAmount)
+                {
+                    ingredient.Amount = ingredientAmount;
+                    Log.Info($"{_name} ingredient {ingredient.Amount} amount changed to {ingredientAmount}");
+                }
             }
         }
 
@@ -183,16 +339,17 @@ namespace FCSAlienChief
                     Log.Info($"Trying to get custom TechType: {item}");
                     if (TechTypeHandler.TryGetModdedTechType(item, out TechType customTechType))
                     {
+                        Log.Info($"Add {_name} ingrdient {customTechType}");
                         Ingredientss.Add(new Ingredient(customTechType, amount));
                     }
                     else
                     {
+                       
                         item = $"Ingredient {item} invalid (Old value: {item})";
                         Log.Warning(_name, $"Ingredient{item} must be a TechType");
                         Log.Info(_name, $"Ingredient{item} was set to a dummy value and disabled");
                         amount = 0;
                     }
-
                 }
                 else
                 {

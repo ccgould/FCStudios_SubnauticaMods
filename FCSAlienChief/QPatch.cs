@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Logger = Utilites.Logger.Logger;
 
 namespace FCSAlienChief
 {
@@ -11,6 +12,8 @@ namespace FCSAlienChief
 
         public static void Patch()
         {
+            //Clear log file
+            Logger.ClearCustomLog();
             Log.Info("Initializing FCSAlienChief");
             try
             {

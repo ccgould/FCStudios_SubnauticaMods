@@ -11,11 +11,13 @@ using UnityEngine;
 
 namespace FCSAlienChief.Items
 {
-    public class FoodItem : AlienChiefItem
+    /// <summary>
+    /// A class that creates a Resource item and registers it on the register method
+    /// </summary>
+    public class ResourceItem : AlienChiefItem
     {
-        private string _assetName;
-        private int _foodValue;
-        private int _waterValue;
+        private readonly string _assetName;
+
 
         #region Constructor
 
@@ -23,16 +25,9 @@ namespace FCSAlienChief.Items
         /// Default Constructor 
         /// <summary>Feeds the abstract class</summary>
         /// </summary>
-        public FoodItem(string ID, string friendlyName, string description, string itemIcon, int foodValue, int waterValue, int craftAmount, List<Ingredient> ingredients, List<string> linkedItems) : base(ID, $"{ID}Prefab")
+        public ResourceItem(string ID, string friendlyName, string description, string itemIcon, int craftAmount, List<Ingredient> ingredients, List<string> linkedItems) : base(ID, $"{ID}Prefab")
         {
-            #region Global Values
-            //Setting Global Values
-            _foodValue = foodValue;
-            _waterValue = waterValue;
-            #endregion
-
             ClassID_I = ID;
-            
 
             //Asset Name
             _assetName = $"{itemIcon}_obj";
@@ -59,6 +54,9 @@ namespace FCSAlienChief.Items
         }
         #endregion
 
+        /// <summary>
+        /// Registers an Item for the game
+        /// </summary>
         public override void RegisterItem()
         {
             if (this.IsRegistered == false)
@@ -92,16 +90,6 @@ namespace FCSAlienChief.Items
                 pickupable.isPickupable = true;
                 pickupable.randomizeRotationWhenDropped = true;
 
-                // We can eat this item
-                var eatable = this.GameObject.AddComponent<Eatable>();
-                eatable.foodValue = _foodValue;
-                eatable.waterValue = _waterValue;
-                eatable.stomachVolume = 15;
-                eatable.decomposes = false;
-                eatable.despawns = false;
-                eatable.allowOverfill = false;
-                eatable.kDecayRate = 0;
-                eatable.despawnDelay = 0;
 
                 // Make the object drop slowly in water
                 var wf = GameObject.AddComponent<WorldForces>();
@@ -117,6 +105,10 @@ namespace FCSAlienChief.Items
             }
         }
 
+        /// <summary>
+        /// The GameObject of this PreFab
+        /// </summary>
+        /// <returns></returns>
         public override GameObject GetGameObject()
         {
             GameObject prefab = GameObject.Instantiate(this.GameObject);
