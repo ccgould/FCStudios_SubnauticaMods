@@ -51,7 +51,7 @@ namespace FCSAlienChief.Helpers
                 }
                 else
                 {
-                    linkedItems.Add(_customTechType);
+                    linkedItems.Add((TechType)Enum.Parse(typeof(TechType), linkedItem));
                 }
             }
 
