@@ -5,7 +5,8 @@ using System.Text;
 
 namespace FCSAlienChief
 {
-    public class Class1
+    public static class Reporters
     {
+        public static  bool IsRegistered { get; set; }
     }
 }
