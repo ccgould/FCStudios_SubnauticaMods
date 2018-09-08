@@ -76,7 +76,7 @@ namespace FCSAlienChief.Items
                 {
                     new Ingredient(TechType.Titanium, 1),
                     new Ingredient(TechType.ComputerChip, 1),
-                    new Ingredient(TechType.Diamond, 1),
+                    new Ingredient(TechType.JeweledDiskPiece, 1),
                     new Ingredient(TechType.Magnetite, 1)
                 }
             };
@@ -123,58 +123,6 @@ namespace FCSAlienChief.Items
 
 
             }
-
-            #region Omit
-            //switch (_category)
-            //{
-            //    case "Food":
-            //        var foodTab = root.AddTabNode("FCSAlienChiefFood", "FCS Alien Food", new Atlas.Sprite(ImageUtils.LoadTextureFromFile($"./QMods/{Information.ModName}/Assets/Default.png")));
-
-            //        AlienChiefTreeType = craftType;
-
-            //        foreach (var alienChiefItem in alienChiefItems)
-            //        {
-            //            foodTab.AddCraftingNode(alienChiefItem.TechType_I);
-            //        }
-            //        break;
-
-            //    case "Drinks":
-
-            //        var drinksTab = root.AddTabNode("FCSAlienChiefDrinks", "FCS Alien Drinks", new Atlas.Sprite(ImageUtils.LoadTextureFromFile($"./QMods/{Information.ModName}/Assets/DrinkTab.png")));
-
-            //        AlienChiefTreeType = craftType;
-
-            //        foreach (var alienChiefItem in alienChiefItems)
-            //        {
-            //            drinksTab.AddCraftingNode(alienChiefItem.TechType_I);
-            //        }
-            //        break;
-
-            //    case "Resources":
-
-            //        var resourcesTab = root.AddTabNode("FCSAlienChiefResources", "FCS Alien Resources", new Atlas.Sprite(ImageUtils.LoadTextureFromFile($"./QMods/{Information.ModName}/Assets/FCSResourcesTab.png")));
-
-            //        AlienChiefTreeType = craftType;
-
-            //        foreach (var alienChiefItem in alienChiefItems)
-            //        {
-            //            resourcesTab.AddCraftingNode(alienChiefItem.TechType_I);
-            //        }
-            //        break;
-
-            //    case "Condiments":
-
-            //        var condimentsTab = root.AddTabNode("FCSAlienChiefCondiments", "FCS Alien Condiments", new Atlas.Sprite(ImageUtils.LoadTextureFromFile($"./QMods/{Information.ModName}/Assets/CondimentsTab.png")));
-
-            //        AlienChiefTreeType = craftType;
-
-            //        foreach (var alienChiefItem in alienChiefItems)
-            //        {
-            //            condimentsTab.AddCraftingNode(alienChiefItem.TechType_I);
-            //        }
-            //        break;
-            //} 
-            #endregion
         }
 
         #endregion

@@ -353,7 +353,6 @@ namespace FCSAlienChief
                 }
                 else
                 {
-                    // if the Item isnt custom just add it TODO remove if not needed
                     Ingredientss.Add(new Ingredient((TechType)Enum.Parse(typeof(TechType), item), amount));
                 }
             }

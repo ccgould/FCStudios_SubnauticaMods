@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.28010.2003
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCSAlienChief", "FCSAlienChief\FCSAlienChief.csproj", "{495386A4-8D68-4139-A06B-86782C9AD2C6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCSTerminal", "FCSTerminal\FCSTerminal.csproj", "{038FF26A-90EC-4A46-94A3-2270AAB2506F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{495386A4-8D68-4139-A06B-86782C9AD2C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{495386A4-8D68-4139-A06B-86782C9AD2C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{495386A4-8D68-4139-A06B-86782C9AD2C6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{038FF26A-90EC-4A46-94A3-2270AAB2506F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{038FF26A-90EC-4A46-94A3-2270AAB2506F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{038FF26A-90EC-4A46-94A3-2270AAB2506F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{038FF26A-90EC-4A46-94A3-2270AAB2506F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
