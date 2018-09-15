@@ -127,7 +127,14 @@ namespace FCSTerminal.Items
 
         public override GameObject GetGameObject()
         {
+            
             var prefab = GameObject.Instantiate(GameObject);
+
+            var container = GameObject;
+            Log.Info($"Location {container.transform.localPosition}");
+            container.SetActive(true);
+
+
             return prefab;
         }
     }

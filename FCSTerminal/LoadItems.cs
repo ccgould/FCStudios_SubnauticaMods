@@ -19,8 +19,12 @@ namespace FCSTerminal
             //var canDeconstructPrefix = typeof(ConstructableFixer).GetMethod("CanDeconstruct_Prefix", BindingFlags.Public | BindingFlags.Static);
             //HarmonyInstance.Patch(canDeconstructMethod, new HarmonyMethod(canDeconstructPrefix), null);
 
-            ServerRack01 serverRack01 = new ServerRack01();
-            serverRack01.RegisterItem();
+            //ServerRack01 serverRack01 = new ServerRack01();
+            //serverRack01.RegisterItem();
+
+            TestBuildable testBuildable = new TestBuildable("TestObject", "Test Object", "This is a test object");
+            testBuildable.Main();
+            testBuildable.Patch();
         }
     }
 }

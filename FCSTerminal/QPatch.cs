@@ -23,7 +23,7 @@ namespace FCSTerminal
                 Log.e(e);
                 Log.Debug("Error in QPatch");
             }
-            Log.Info("FCSAlienChief initializ" + (!_success ? "ation failed." : "ed successfully."));
+            Log.Info("FCSTerminal initializ" + (!_success ? "ation failed." : "ed successfully."));
         }
     }
 }

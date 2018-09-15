@@ -11,6 +11,7 @@ namespace FCSTerminal.Helpers
         /// <summary>
         /// The AssetBundle for the modd
         /// </summary>
+        //public static AssetBundle Asset = AssetBundle.LoadFromFile($"{Environment.CurrentDirectory}/QMods/FCSTerminal/decorationassets.assets");
         public static AssetBundle Asset = AssetBundle.LoadFromFile($"{Environment.CurrentDirectory}/QMods/FCSTerminal/fcs_terminal-mod");
     }
 }

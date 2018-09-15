@@ -1,4 +1,5 @@
 ﻿using System;
+using FCSTerminal.Logging;
 using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
 using UnityEngine;
@@ -30,7 +31,7 @@ namespace FCSTerminal.Models
         public string ResourcePath { get; set; }
 
          // The item root GameObject
-        public GameObject GameObject { get; set; }
+        public GameObject GameObject { get; set; } 
 
         // The item TechType
         public TechType TechType_I { get; set; }
@@ -46,7 +47,7 @@ namespace FCSTerminal.Models
 
         public virtual void RegisterItem()
         {
-            
+            Log.Info("fgdgfgdfgdfg");
         }
 
         #endregion

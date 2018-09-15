@@ -67,6 +67,7 @@
     <Compile Include="Helpers\Utilities.cs" />
     <Compile Include="Items\ResourceItem.cs" />
     <Compile Include="Items\ServerRack01.cs" />
+    <Compile Include="Items\TestBuildable.cs" />
     <Compile Include="LoadItems.cs" />
     <Compile Include="Logging\Log.cs" />
     <Compile Include="Logging\Reporters.cs" />
