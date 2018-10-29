@@ -62,12 +62,18 @@
   <ItemGroup>
     <Compile Include="Configuration\Cfg.cs" />
     <Compile Include="Configuration\Information.cs" />
+    <Compile Include="Controllers\TerminalController.cs" />
+    <Compile Include="Controllers\ServerRackController.cs" />
+    <Compile Include="Fixers\ConstructableFixer.cs" />
+    <Compile Include="Fixers\StorageContainerFixer.cs" />
     <Compile Include="Helpers\AssetHelper.cs" />
+    <Compile Include="Helpers\ImageUtils.cs" />
     <Compile Include="Helpers\ItemHelpers.cs" />
+    <Compile Include="Helpers\StorageContainerHelper.cs" />
     <Compile Include="Helpers\Utilities.cs" />
-    <Compile Include="Items\ResourceItem.cs" />
-    <Compile Include="Items\ServerRack01.cs" />
-    <Compile Include="Items\TestBuildable.cs" />
+    <Compile Include="Interfaces\TerminalPrefabShared.cs" />
+    <Compile Include="Items\FCSTerminalItem.cs" />
+    <Compile Include="Items\ServerRack.cs" />
     <Compile Include="LoadItems.cs" />
     <Compile Include="Logging\Log.cs" />
     <Compile Include="Logging\Reporters.cs" />
@@ -76,5 +82,6 @@
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

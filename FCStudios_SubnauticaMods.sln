@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCSAlienChief", "FCSAlienCh
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCSTerminal", "FCSTerminal\FCSTerminal.csproj", "{038FF26A-90EC-4A46-94A3-2270AAB2506F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCSAutoBackUp", "FCSAutoBackUp\FCSAutoBackUp.csproj", "{CACCD6D7-8E16-4DE6-9874-397EC99714DF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{038FF26A-90EC-4A46-94A3-2270AAB2506F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{038FF26A-90EC-4A46-94A3-2270AAB2506F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{038FF26A-90EC-4A46-94A3-2270AAB2506F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CACCD6D7-8E16-4DE6-9874-397EC99714DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CACCD6D7-8E16-4DE6-9874-397EC99714DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CACCD6D7-8E16-4DE6-9874-397EC99714DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CACCD6D7-8E16-4DE6-9874-397EC99714DF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

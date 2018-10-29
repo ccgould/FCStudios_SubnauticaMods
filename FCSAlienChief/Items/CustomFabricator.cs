@@ -16,7 +16,7 @@ namespace FCSAlienChief.Items
     public class CustomFabricator : ModPrefab
     {
         // This is the original fabricator prefab.
-        private static readonly GameObject OriginalFabricator = Resources.Load<GameObject>("Submarine/Build/Fabricator");
+        private static readonly GameObject OriginalFabricator = Resources.Load<GameObject>("Submarine/Build/Workbench");
 
         private static string _classId;
         private List<IAlienChiefItem> _alienChiefItems;
@@ -60,7 +60,7 @@ namespace FCSAlienChief.Items
             Log.Info("Registering alienchief fabricator...");
             // Create a new TechType for the fabricator
             TechType = TechTypeHandler.AddTechType(AlienChiefFabId, "Alien Chief Fabricator",
-                "An Alien Chief Fabricator", AssetHelper.Asset.LoadAsset<Sprite>("fabricator_icon_orange"));
+                "An Alien Chief Fabricator", AssetHelper.Asset.LoadAsset<Sprite>("workbench_icon"));
 
             Log.Info("Adding new TechType to the buildables...");
             // Add new TechType to the buildables (Interior Module group)
@@ -161,7 +161,7 @@ namespace FCSAlienChief.Items
             techTag.type = TechType;
 
             // Associate craft tree to the fabricator
-            var fabricator = prefab.GetComponent<Fabricator>();
+            var fabricator = prefab.GetComponent<Workbench>();
             fabricator.craftTree = AlienChiefTreeType;
 
             var ghost = fabricator.GetComponent<GhostCrafter>();
@@ -176,13 +176,14 @@ namespace FCSAlienChief.Items
             constructible.allowedInSub = true;
             constructible.allowedOutside = false;
             constructible.allowedOnCeiling = false;
-            constructible.allowedOnGround = false;
+            constructible.allowedOnGround = true;
             constructible.allowedOnConstructables = false;
             constructible.controlModelState = true;
+            constructible.allowedOnWall = false;
             constructible.techType = TechType;
 
             // Set the custom texture
-            Texture2D coloredTexture = AssetHelper.Asset.LoadAsset<Texture2D>("submarine_fabricator_orange");
+            Texture2D coloredTexture = AssetHelper.Asset.LoadAsset<Texture2D>("FCSWorkbench");
             SkinnedMeshRenderer skinnedMeshRenderer = prefab.GetComponentInChildren<SkinnedMeshRenderer>();
             skinnedMeshRenderer.material.mainTexture = coloredTexture;
 
