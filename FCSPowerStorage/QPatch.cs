@@ -1,7 +1,8 @@
-﻿using System;
-using Logger = Utilites.Logger.Logger;
+﻿using FCSTerminal.Logging;
+using System;
+using Utilites.Logger;
 
-namespace FCSAlienChief
+namespace FCSPowerStorage
 {
     public class QPatch
     {
@@ -11,7 +12,7 @@ namespace FCSAlienChief
         {
             //Clear log file
             Logger.ClearCustomLog();
-            Log.Info("Initializing FCSAlienChief");
+            Log.Info("Initializing FCS Power Storage");
             try
             {
                 LoadItems.Patch();
@@ -22,7 +23,7 @@ namespace FCSAlienChief
                 Log.e(e);
                 Log.Debug("Error in QPatch");
             }
-            Log.Info("FCSAlienChief initializ" + (!_success ? "ation failed." : "ed successfully."));
+            Log.Info("FCS Power Storage initializ" + (!_success ? "ation failed." : "ed successfully."));
         }
     }
 }

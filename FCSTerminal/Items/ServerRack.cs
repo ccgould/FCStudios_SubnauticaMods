@@ -1,10 +1,10 @@
 ﻿using FCSTerminal.Controllers;
 using FCSTerminal.Helpers;
+using FCSTerminal.Interfaces;
 using FCSTerminal.Logging;
 using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
 using System.Collections.Generic;
-using FCSTerminal.Interfaces;
 using UnityEngine;
 
 namespace FCSTerminal.Items
@@ -12,8 +12,8 @@ namespace FCSTerminal.Items
     public class ServerRack : Buildable
     {
         private GameObject _storageContainer = null;
-        public  GameObject ServerRackPrefab;
-        private string ResourcePath;
+        public GameObject ServerRackPrefab;
+        private readonly string ResourcePath;
 
 
         public ServerRack(string classId, string friendlyName, string description) : base(classId, friendlyName, description)
@@ -30,7 +30,7 @@ namespace FCSTerminal.Items
 
             ServerRackPrefab.name = ClassID;
 
-            // Add contructable
+            // Add constructible
             var constructable = ServerRackPrefab.AddComponent<Constructable>();
             constructable.allowedOnWall = false;
             constructable.allowedOnGround = true;
@@ -41,10 +41,8 @@ namespace FCSTerminal.Items
             constructable.model = ServerRackPrefab.FindChild("model");
             constructable.techType = TechType;
 
-            
-
-            // Add model controler
-            var serverRackController = this.ServerRackPrefab.AddComponent<ServerRackController>();
+            // Add model controller
+            var serverRackController = ServerRackPrefab.AddComponent<ServerRackController>();
 
             // Update large world entity
             LargeWorldEntity lwe = ServerRackPrefab.AddComponent<LargeWorldEntity>();
@@ -85,7 +83,7 @@ namespace FCSTerminal.Items
             container.transform.localScale = new Vector3(0.0001f, 0.0001f, 0.0001f);
             container.transform.localEulerAngles = new Vector3(0.0f, 0.0f, 0.0f);
             container.SetActive(true);
-            
+
 
             // Update colliders
             GameObject builderTrigger = container.FindChild("Builder Trigger");

@@ -1,21 +1,19 @@
-﻿using FCSAlienChief.Model;
-using System;
-using System.Collections.Generic;
-using FCSAlienChief.Data;
+﻿using FCSAlienChief.Data;
 using FCSAlienChief.Helpers;
-using SMLHelper.Patchers;
+using FCSAlienChief.Model;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace FCSAlienChief.Items
 {
     public class FoodItem : AlienChiefItem
     {
-        private string _assetName;
-        private int _foodValue;
-        private int _waterValue;
+        private readonly string _assetName;
+        private readonly int _foodValue;
+        private readonly int _waterValue;
 
         #region Constructor
 
@@ -32,7 +30,7 @@ namespace FCSAlienChief.Items
             #endregion
 
             ClassID_I = ID;
-            
+
 
             //Asset Name
             _assetName = $"{itemIcon}_obj";
@@ -44,7 +42,7 @@ namespace FCSAlienChief.Items
             this.GameObject = AssetHelper.Asset.LoadAsset<GameObject>(_assetName);
 
             // Set the resource path for the item
-            this.ResourcePath = AlienChiefItem.DefaultResourcePath + this.ClassID;
+            this.ResourcePath = DefaultResourcePath + ClassID;
 
             //Create a new TechType
             this.TechType = TechTypeHandler.AddTechType(ClassID, friendlyName, description, ImageUtils.LoadSpriteFromFile($"./QMods/{Information.ModName}/Assets/{itemIcon}.png"));

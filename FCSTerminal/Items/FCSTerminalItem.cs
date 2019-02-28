@@ -1,11 +1,9 @@
-﻿using FCSTerminal.Logging;
+﻿using FCSTerminal.Configuration;
+using FCSTerminal.Interfaces;
+using FCSTerminal.Logging;
 using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using FCSTerminal.Configuration;
-using FCSTerminal.Controllers;
-using FCSTerminal.Interfaces;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -29,7 +27,7 @@ namespace FCSTerminal
         /// <param name="description">The tooltip for the item</param>
         public FCSTerminalItem(string classId, string friendlyName, string description) : base(classId, friendlyName, description)
         {
-            
+
         }
 
         /// <summary>
@@ -42,7 +40,7 @@ namespace FCSTerminal
             _storageContainer = Resources.Load<GameObject>("Submarine/Build/Locker");
             _pictureFrameGameObject = Resources.Load<GameObject>("Submarine/Build/PictureFrame");
 
-            
+
             background.gameObject.SetActive(true);
             background.sprite = Helpers.ImageUtils.LoadSprite($"./ QMods /{ Information.ModName}/ Assets / screen.png");
 
@@ -50,6 +48,7 @@ namespace FCSTerminal
 
             var pictureFrame = _pictureFrameGameObject.GetComponent<PictureFrame>();
             MonoBehaviour.DestroyImmediate(pictureFrame);
+
 
 
             var _techType = _pictureFrameGameObject.GetComponent<TechType>();
@@ -64,7 +63,7 @@ namespace FCSTerminal
             prefab.name = this.ClassID;
 
             var canvas = TerminalPrefabShared.CreateCanvas(prefab.transform);
-            
+
 
             return prefab;
 

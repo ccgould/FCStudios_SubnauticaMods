@@ -11,6 +11,7 @@ using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 
+
 namespace FCSAlienChief.Items
 {
     public class CustomFabricator : ModPrefab
@@ -144,6 +145,8 @@ namespace FCSAlienChief.Items
             }
         }
 
+        
+
         public override GameObject GetGameObject()
         {
             // Instanciate fabricator
@@ -186,6 +189,8 @@ namespace FCSAlienChief.Items
             Texture2D coloredTexture = AssetHelper.Asset.LoadAsset<Texture2D>("FCSWorkbench");
             SkinnedMeshRenderer skinnedMeshRenderer = prefab.GetComponentInChildren<SkinnedMeshRenderer>();
             skinnedMeshRenderer.material.mainTexture = coloredTexture;
+
+            
 
             return prefab;
         }

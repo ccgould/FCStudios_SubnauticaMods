@@ -1,21 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SMLHelper.V2.Assets;
+﻿using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
+using System;
 using UnityEngine;
 
 namespace FCSAlienChief.Model
 {
-    public interface IAlienChiefItem 
+    public interface IAlienChiefItem
     {
         // Property signatures
         string ClassID_I { get; set; }
         TechType TechType_I { get; set; }
 
         #region Public Methods
-        void RegisterItem(); 
+        void RegisterItem();
         #endregion
     }
 
@@ -32,7 +29,7 @@ namespace FCSAlienChief.Model
         // The item resource path
         public string ResourcePath { get; set; }
 
-         // The item root GameObject
+        // The item root GameObject
         public GameObject GameObject { get; set; }
 
         // The item TechType
@@ -56,7 +53,7 @@ namespace FCSAlienChief.Model
 
         protected AlienChiefItem(string classId, string prefabFileName, TechType techType = TechType.None) : base(classId, prefabFileName, techType)
         {
-            
+
         }
     }
 }

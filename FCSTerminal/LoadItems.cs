@@ -22,9 +22,9 @@ namespace FCSTerminal
             serverRack.Main();
             serverRack.Patch();
 
-            FCSTerminalItem FCSTerminal = new FCSTerminalItem("FCSTerminal", "FCS Terminal Screen", "This is the terminal for the FCS Terminal Mod");
-            FCSTerminal.Register();
-            FCSTerminal.Patch();
+            //FCSTerminalItem FCSTerminal = new FCSTerminalItem("FCSTerminal", "FCS Terminal Screen", "This is the terminal for the FCS Terminal Mod");
+            //FCSTerminal.Register();
+            //FCSTerminal.Patch();
 
             // Fix cargo crates items-containers
             var onProtoDeserializeObjectTreeMethod = typeof(StorageContainer).GetMethod("OnProtoDeserializeObjectTree", BindingFlags.Public | BindingFlags.Instance);
