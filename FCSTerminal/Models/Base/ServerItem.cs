@@ -1,26 +1,12 @@
-﻿using System;
-using FCSTerminal.Logging;
-using SMLHelper.V2.Assets;
+﻿using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
+using System;
 using UnityEngine;
 
-namespace FCSTerminal.Models
+namespace FCSTerminal.Models.Base
 {
-    public interface IFCSTerminalItem 
+    public abstract class ServerItem : ModPrefab
     {
-        // Property signatures
-        string ClassID_I { get; set; }
-        TechType TechType_I { get; set; }
-
-        #region Public Methods
-        void RegisterItem(); 
-        #endregion
-    }
-
-    public abstract class FCSTerminalItem : ModPrefab, IFCSTerminalItem
-    {
-
-
         // This is used as the default path when we add a new resource to the game
         public const string DefaultResourcePath = "WorldEntities/Environment/Wrecks/";
 
@@ -30,8 +16,8 @@ namespace FCSTerminal.Models
         // The item resource path
         public string ResourcePath { get; set; }
 
-         // The item root GameObject
-        public GameObject GameObject { get; set; } 
+        // The item root GameObject
+        public GameObject GameObject { get; set; }
 
         // The item TechType
         public TechType TechType_I { get; set; }
@@ -47,14 +33,14 @@ namespace FCSTerminal.Models
 
         public virtual void RegisterItem()
         {
-            Log.Info("fgdgfgdfgdfg");
+            throw new NotImplementedException();
         }
 
         #endregion
 
-        protected FCSTerminalItem(string classId, string prefabFileName, TechType techType = TechType.None) : base(classId, prefabFileName, techType)
+        protected ServerItem(string classId, string prefabFileName, TechType techType = TechType.None) : base(classId, prefabFileName, techType)
         {
-            
+
         }
     }
 }

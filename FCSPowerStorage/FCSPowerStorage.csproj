@@ -71,9 +71,7 @@
     <Compile Include="Configuration\BatteryConfiguration.cs" />
     <Compile Include="Helpers\ColorChanger.cs" />
     <Compile Include="Helpers\Extensions.cs" />
-    <Compile Include="Helpers\ImageUtils.cs" />
     <Compile Include="Helpers\ItemHelpers.cs" />
-    <Compile Include="Helpers\StorageContainerHelper.cs" />
     <Compile Include="Helpers\Utilities.cs" />
     <Compile Include="LoadItems.cs" />
     <Compile Include="Logging\Log.cs" />
@@ -89,8 +87,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\Enums\FCSPowerStates.cs" />
     <Compile Include="Utilities\Enums\PowerToggleStates.cs" />
-    <Compile Include="Utilities\Extensions\AnimationExtentions.cs" />
-    <Compile Include="Utilities\Extensions\MaterialExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FCSSubnauticaCore\FCSSubnauticaCore.csproj">

@@ -2,7 +2,7 @@
 
 namespace FCSPowerStorage.Helpers
 {
-
+    //TODO Change to Path.combine
 
     internal static class FilesHelper
     {

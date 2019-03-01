@@ -1,8 +1,10 @@
-﻿
-using System.Reflection;
-using FCSTerminal.Fixers;
-using FCSTerminal.Items;
+﻿using FCSSubnauticaCore.Exceptions;
+using FCSTerminal.Configuration;
+using FCSTerminal.Helpers;
+using FCSTerminal.Models.GameObjects;
+using FCSTerminal.Models.Prefabs;
 using Harmony;
+using UnityEngine;
 
 namespace FCSTerminal
 {
@@ -11,34 +13,88 @@ namespace FCSTerminal
         // Harmony stuff
         internal static HarmonyInstance HarmonyInstance = null;
 
+        /// <summary>
+        /// The prefab for the FCS Server Rack
+        /// </summary>
+        public static GameObject FcsServerRackPrefab { get; set; }
+
+        /// <summary>
+        /// The server prefab
+        /// </summary>
+        public static GameObject ServerPrefab { get; set; }
+
+
+        public static ServerPrefab SERVER_PREFAB_OBJECT { get; set; }
+
+        public static FCSServerRack SERVER_RACK_PREFAB_OBJECT { get; set; }
+
+
+        /// <summary>
+        /// Patches the new objects into the game
+        /// </summary>
         public static void Patch()
         {
-
-
             // 1) INITIALIZE HARMONY
             HarmonyInstance = HarmonyInstance.Create("com.FCStudios.FCSTerminal");
 
-            ServerRack serverRack = new ServerRack("ServerRack", "FCS Server Rack", "This is a server rack for the FCS Terminal Mod");
-            serverRack.Main();
-            serverRack.Patch();
+            // == Get the Prefabs == //
+            if (GetPrefabs())
+            {
 
-            //FCSTerminalItem FCSTerminal = new FCSTerminalItem("FCSTerminal", "FCS Terminal Screen", "This is the terminal for the FCS Terminal Mod");
-            //FCSTerminal.Register();
-            //FCSTerminal.Patch();
-
-            // Fix cargo crates items-containers
-            var onProtoDeserializeObjectTreeMethod = typeof(StorageContainer).GetMethod("OnProtoDeserializeObjectTree", BindingFlags.Public | BindingFlags.Instance);
-            var onProtoDeserializeObjectTreePostfix = typeof(StorageContainerFixer).GetMethod("OnProtoDeserializeObjectTree_Postfix", BindingFlags.Public | BindingFlags.Static);
-            HarmonyInstance.Patch(onProtoDeserializeObjectTreeMethod, null, new HarmonyMethod(onProtoDeserializeObjectTreePostfix));
-            // Failsafe on lockers and cargo crates deconstruction
-            var canDeconstructMethod = typeof(Constructable).GetMethod("CanDeconstruct", BindingFlags.Public | BindingFlags.Instance);
-            var canDeconstructPrefix = typeof(ConstructableFixer).GetMethod("CanDeconstruct_Prefix", BindingFlags.Public | BindingFlags.Static);
-            HarmonyInstance.Patch(canDeconstructMethod, new HarmonyMethod(canDeconstructPrefix), null);
-
-            //ServerRack01 serverRack01 = new ServerRack01();
-            //serverRack01.RegisterItem();
+                // === Create the Server == //
+                var server = new ServerPrefab(Information.ModServerName, Information.ModServerFriendly, Information.ModServerDescription);
+                server.RegisterItem();
+                server.Patch();
+                SERVER_PREFAB_OBJECT = server;
 
 
+                // === Create the Server Rack == //
+                var serverRack = new FCSServerRack(Information.ModRackName, Information.ModRackFriendly, Information.ModRackDescription);
+                serverRack.Register();
+                serverRack.Patch();
+                SERVER_RACK_PREFAB_OBJECT = serverRack;
+
+            }
+            else
+            {
+                throw new PatchTerminatedException("Error loading finding a prefab");
+            }
+
+        }
+
+
+
+        /// <summary>
+        /// Loads the prefabs from the asset bundle
+        /// </summary>
+        /// <returns></returns>
+        private static bool GetPrefabs()
+        {
+            //Log.Info(Information.);
+
+            //Log.Info(Path.Combine(Path.Combine(Environment.CurrentDirectory, "QMods"), Path.Combine("FCSPowerStorage", "fcspowerstorage-mod")));
+
+            // == Get the server rack prefab == //
+            var fcsPowerStoragePrefab = AssetHelper.Asset.LoadAsset<GameObject>("Server_Rack");
+            if (fcsPowerStoragePrefab != null)
+            {
+                FcsServerRackPrefab = fcsPowerStoragePrefab;
+            }
+            else
+            {
+                return false;
+            }
+
+            var serverPrab = AssetHelper.Asset.LoadAsset<GameObject>("Server");
+            if (serverPrab != null)
+            {
+                ServerPrefab = serverPrab;
+            }
+            else
+            {
+                return false;
+            }
+            return true;
         }
     }
 }

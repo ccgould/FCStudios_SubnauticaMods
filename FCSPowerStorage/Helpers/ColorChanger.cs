@@ -160,7 +160,7 @@ namespace FCSPowerStorage.Helpers
         {
             List<object> textures = new List<object>(AssetHelper.Asset.LoadAllAssets(typeof(object)));
 
-            Log.Info("FindTexture2D");
+            //Log.Info("FindTexture2D");
 
             for (int i = 0; i < textures.Count; i++)
             {

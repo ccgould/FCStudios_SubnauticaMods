@@ -10,6 +10,9 @@ using UnityEngine;
 
 namespace FCSPowerStorage.Model
 {
+    /// <summary>
+    /// A Class that defines a CustomBattery for the FCS Power Storage Mod
+    /// </summary>
     public class CustomBattery : Buildable
     {
         #region Private Members 
@@ -19,12 +22,10 @@ namespace FCSPowerStorage.Model
         /// </summary>
         private readonly string _fcsBatteryId;
         private Constructable _constructable;
-        public GameObject FCSPowerStoragePrefab;
 
         #endregion
 
         #region Constructor
-
         /// <summary>
         /// Default constructor for the CustomBatteryClass
         /// </summary>
@@ -41,20 +42,23 @@ namespace FCSPowerStorage.Model
 
             Information.ASSETSFOLDER = Path.Combine("QMods", AssetsFolder);
         }
+        #endregion
 
+        #region Public Properties
+
+        public GameObject FCSPowerStoragePrefab { get; set; }
 
         #endregion
 
         #region Public Methods
-
+        /// <summary>
+        /// Registers the power storage
+        /// </summary>
         public void RegisterFCSPowerStorage()
         {
             Log.Info("Loading Prefab");
 
             FCSPowerStoragePrefab = AssetHelper.Asset.LoadAsset<GameObject>("Power_Storage");
-
-
-            Log.Info("Update large world entity");
 
             Log.Info("Set GameObject Tag");
 
@@ -63,11 +67,9 @@ namespace FCSPowerStorage.Model
 
             Log.Info("Set GameObject Bounds");
 
-            // Add constructable bounds
+            // Add constructible bounds
             FCSPowerStoragePrefab.AddComponent<ConstructableBounds>().bounds = new OrientedBounds(new Vector3(-0.1f, -0.1f, 0f), new Quaternion(0, 0, 0, 0), new Vector3(0.9f, 0.5f, 0f));
 
-            //var collider = ServerRackPrefab.AddComponent<BoxCollider>();
-            //collider.size = new Vector3(0.02f, 0.06f, 0.02f);
 
             Log.Info("Destroy GameObject Rigid body");
 
@@ -82,7 +84,6 @@ namespace FCSPowerStorage.Model
         public override GameObject GetGameObject()
         {
             Log.Info("Making GameObject");
-
             Log.Info("Instantiate GameObject");
 
             GameObject prefab = GameObject.Instantiate(FCSPowerStoragePrefab);
@@ -139,7 +140,6 @@ namespace FCSPowerStorage.Model
 
             prefab.GetOrAddComponent<CustomBatteryController>();
 
-
             Log.Info("Made GameObject");
 
             return prefab;
@@ -170,9 +170,9 @@ namespace FCSPowerStorage.Model
             return customFabRecipe;
         }
 
-        public override TechGroup GroupForPDA { get; } = TechGroup.Miscellaneous;
+        public override TechGroup GroupForPDA { get; } = TechGroup.InteriorPieces;
 
-        public override TechCategory CategoryForPDA { get; } = TechCategory.Misc;
+        public override TechCategory CategoryForPDA { get; } = TechCategory.InteriorPiece;
 
         public override string HandOverText { get; } = "Click to open";
 

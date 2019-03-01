@@ -5,6 +5,7 @@ using FCSPowerStorage.Utilities.Enums;
 using FCSSubnauticaCore.Extensions;
 using FCSTerminal.Logging;
 using Oculus.Newtonsoft.Json;
+using System;
 using System.Collections;
 using System.Globalization;
 using System.IO;
@@ -13,9 +14,20 @@ using UnityEngine.UI;
 
 namespace FCSPowerStorage.Model
 {
-
+    /// <summary>
+    /// The controller for the custom battery
+    /// </summary>
     public class CustomBatteryController : MonoBehaviour, IPowerInterface, IProtoEventListener, IConstructable
     {
+        #region Constructor
+        /// <summary>
+        /// Default Constructor 
+        /// </summary>
+        public CustomBatteryController()
+        {
+            MainBodyColor = new Color(0.99609375f, 0.99609375f, 0.99609375f);
+        }
+        #endregion
 
         #region Private Members
 
@@ -31,11 +43,16 @@ namespace FCSPowerStorage.Model
         /// </summary>
         /// 
         public FMOD_StudioEventEmitter SoundCharge;
-
-        private bool _isEnabled;
-
         public float Charge { get; private set; }
         public bool IsBeingDeleted { get; set; }
+        public bool HasBreakerTripped { get; set; }
+        public float StoredPower { get; set; }
+        public PowerToggleStates ChargeMode { get; private set; }
+        public Color MainBodyColor { get; set; }
+        #endregion
+
+        #region Private Members
+        private bool _isEnabled;
         private float _battery_Status_1_Bar;
         private string _battery_Status_1_Percentage;
         private float _battery_Status_2_Bar;
@@ -49,11 +66,6 @@ namespace FCSPowerStorage.Model
         private float _battery_Status_6_Bar;
         private string _battery_Status_6_Percentage;
         private FCSPowerStates _previousPowerState = FCSPowerStates.Buffer;
-        public bool HasBreakerTripped { get; set; }
-        public float StoredPower { get; set; }
-        public PowerToggleStates ChargeMode { get; private set; }
-        public Color MainBodyColor { get; set; }
-
         #endregion
 
         #region Unity Methods
@@ -81,6 +93,7 @@ namespace FCSPowerStorage.Model
 
         #endregion
 
+        #region Private Methods
         private void Initialize()
         {
 
@@ -95,7 +108,6 @@ namespace FCSPowerStorage.Model
                 Recharge();
             }
 
-            //Log.Info("UpdatePowerRelay");
             var relay = PowerSource.FindRelay(transform);
             if (relay != null && relay != _connectedRelay)
             {
@@ -129,15 +141,14 @@ namespace FCSPowerStorage.Model
                 bool charging = false;
                 PowerRelay relay = PowerSource.FindRelay(transform);
 
-                //Log.Info(relay.name);
                 if (relay != null)
                 {
-                    if (Charge < Information.BatteryConfiguration.Capacity)
+                    if (Charge < BatteryConfiguration.Capacity)
                     {
                         ++num1;
-                        float num2 = DayNightCycle.main.deltaTime * Information.BatteryConfiguration.ChargeSpeed * Information.BatteryConfiguration.Capacity;
-                        if (Charge + num2 > Information.BatteryConfiguration.Capacity)
-                            num2 = Information.BatteryConfiguration.Capacity - Charge;
+                        float num2 = DayNightCycle.main.deltaTime * BatteryConfiguration.ChargeSpeed * BatteryConfiguration.Capacity;
+                        if (Charge + num2 > BatteryConfiguration.Capacity)
+                            num2 = BatteryConfiguration.Capacity - Charge;
                         amount += num2;
                     }
 
@@ -156,10 +167,10 @@ namespace FCSPowerStorage.Model
                         charging = true;
                         float num2 = amountConsumed / num1;
 
-                        if (Charge < (double)Information.BatteryConfiguration.Capacity)
+                        if (Charge < (double)BatteryConfiguration.Capacity)
                         {
                             float num3 = num2;
-                            float num4 = Information.BatteryConfiguration.Capacity - Charge;
+                            float num4 = BatteryConfiguration.Capacity - Charge;
                             if (num3 > (double)num4)
                                 num3 = num4;
                             Charge += num3;
@@ -167,7 +178,7 @@ namespace FCSPowerStorage.Model
 
                     }
 
-                    ToggleChargeSound(charging);
+                    //ToggleChargeSound(charging);
                 }
             }
             else
@@ -182,12 +193,12 @@ namespace FCSPowerStorage.Model
                 //Log.Info(relay.name);
                 if (relay != null)
                 {
-                    if (StoredPower < Information.BatteryConfiguration.Capacity)
+                    if (StoredPower < BatteryConfiguration.Capacity)
                     {
                         ++num1;
-                        float num2 = DayNightCycle.main.deltaTime * Information.BatteryConfiguration.ChargeSpeed * Information.BatteryConfiguration.Capacity;
-                        if (StoredPower + num2 > Information.BatteryConfiguration.Capacity)
-                            num2 = Information.BatteryConfiguration.Capacity - Charge;
+                        float num2 = DayNightCycle.main.deltaTime * BatteryConfiguration.ChargeSpeed * BatteryConfiguration.Capacity;
+                        if (StoredPower + num2 > BatteryConfiguration.Capacity)
+                            num2 = BatteryConfiguration.Capacity - Charge;
                         amount += num2;
                     }
 
@@ -206,10 +217,10 @@ namespace FCSPowerStorage.Model
                         charging = true;
                         float num2 = amountConsumed / num1;
 
-                        if (StoredPower < (double)Information.BatteryConfiguration.Capacity)
+                        if (StoredPower < (double)BatteryConfiguration.Capacity)
                         {
                             float num3 = num2;
-                            float num4 = Information.BatteryConfiguration.Capacity - StoredPower;
+                            float num4 = BatteryConfiguration.Capacity - StoredPower;
                             if (num3 > (double)num4)
                                 num3 = num4;
                             StoredPower += num3;
@@ -244,15 +255,6 @@ namespace FCSPowerStorage.Model
             }
         }
 
-        public float GetPower()
-        {
-            //Log.Info($"Getting Power - {Charge}");
-            UpdatePowerState();
-            return Charge;
-        }
-
-        //TODO Prevent this from constantly running color change
-        //HasDied may be removed delete UpdatePowerState as well
         private void UpdatePowerState()
         {
             if (Charge < 1 && _previousPowerState != FCSPowerStates.Unpowered)
@@ -267,9 +269,90 @@ namespace FCSPowerStorage.Model
             }
         }
 
+        private void OnDestroy()
+        {
+            if (!(_connectedRelay != null))
+                return;
+            Log.Info("RemoveInboundPower");
+            _connectedRelay.RemoveInboundPower(this);
+        }
+
+        private void TurnDisplayOn()
+        {
+            try
+            {
+                if (IsBeingDeleted) return;
+
+                if (fcsPowerStorageDisplay != null)
+                {
+                    TurnDisplayOff();
+                }
+
+                fcsPowerStorageDisplay = gameObject.AddComponent<FCSPowerStorageDisplay>();
+                fcsPowerStorageDisplay.Setup(this);
+                fcsPowerStorageDisplay.BatteryStatus1Bar.GetComponent<Image>().fillAmount = _battery_Status_1_Bar;
+                fcsPowerStorageDisplay.BatteryStatus2Bar.GetComponent<Image>().fillAmount = _battery_Status_2_Bar;
+                fcsPowerStorageDisplay.BatteryStatus3Bar.GetComponent<Image>().fillAmount = _battery_Status_3_Bar;
+                fcsPowerStorageDisplay.BatteryStatus4Bar.GetComponent<Image>().fillAmount = _battery_Status_4_Bar;
+                fcsPowerStorageDisplay.BatteryStatus5Bar.GetComponent<Image>().fillAmount = _battery_Status_5_Bar;
+                fcsPowerStorageDisplay.BatteryStatus6Bar.GetComponent<Image>().fillAmount = _battery_Status_6_Bar;
+                fcsPowerStorageDisplay.BatteryStatus1Percentage.GetComponent<Text>().text = _battery_Status_1_Percentage.ToString(CultureInfo.InvariantCulture);
+                fcsPowerStorageDisplay.BatteryStatus2Percentage.GetComponent<Text>().text = _battery_Status_2_Percentage.ToString(CultureInfo.InvariantCulture);
+                fcsPowerStorageDisplay.BatteryStatus3Percentage.GetComponent<Text>().text = _battery_Status_3_Percentage.ToString(CultureInfo.InvariantCulture);
+                fcsPowerStorageDisplay.BatteryStatus4Percentage.GetComponent<Text>().text = _battery_Status_4_Percentage.ToString(CultureInfo.InvariantCulture);
+                fcsPowerStorageDisplay.BatteryStatus5Percentage.GetComponent<Text>().text = _battery_Status_5_Percentage.ToString(CultureInfo.InvariantCulture);
+                fcsPowerStorageDisplay.BatteryStatus6Percentage.GetComponent<Text>().text = _battery_Status_6_Percentage.ToString(CultureInfo.InvariantCulture);
+            }
+            catch (Exception e)
+            {
+                Log.Error($"Error in TurnDisplayOn Method: {e.Message} || {e.InnerException} || {e.Source}");
+            }
+        }
+
+        private void TurnDisplayOff()
+        {
+            if (IsBeingDeleted) return;
+
+            if (fcsPowerStorageDisplay != null)
+            {
+                fcsPowerStorageDisplay.TurnDisplayOff();
+                Destroy(fcsPowerStorageDisplay);
+                fcsPowerStorageDisplay = null;
+            }
+        }
+
+        private IEnumerator Startup()
+        {
+            if (IsBeingDeleted) yield break;
+            yield return new WaitForEndOfFrame();
+            if (IsBeingDeleted) yield break;
+
+            seaBase = gameObject?.transform?.parent?.gameObject;
+            if (seaBase == null)
+            {
+                ErrorMessage.AddMessage("[FCS Power Storage] ERROR: Can not work out what base it was placed inside.");
+                Log.Error("ERROR: Can not work out what base it was placed inside.");
+                yield break;
+            }
+
+            TurnDisplayOn();
+        }
+        #endregion
+
+        #region Inherited Public Methods
+        public float GetPower()
+        {
+            UpdatePowerState();
+            if (Charge < 0.1)
+            {
+                Charge = 0.0f;
+            }
+            return Charge;
+        }
+
         public float GetMaxPower()
         {
-            return Information.BatteryConfiguration.Capacity;
+            return BatteryConfiguration.Capacity;
         }
 
         public bool ModifyPower(float amount, out float modified)
@@ -282,8 +365,8 @@ namespace FCSPowerStorage.Model
             bool result;
             if (amount >= 0f)
             {
-                result = (amount <= Information.BatteryConfiguration.Capacity - Charge);
-                modified = Mathf.Min(amount, Information.BatteryConfiguration.Capacity - Charge);
+                result = (amount <= BatteryConfiguration.Capacity - Charge);
+                modified = Mathf.Min(amount, BatteryConfiguration.Capacity - Charge);
                 Charge += modified;
             }
             else
@@ -421,15 +504,6 @@ namespace FCSPowerStorage.Model
             return true;
         }
 
-        private void OnDestroy()
-        {
-            Log.Info("OnDestroy");
-            if (!(_connectedRelay != null))
-                return;
-            Log.Info("RemoveInboundPower");
-            _connectedRelay.RemoveInboundPower(this);
-        }
-
         public void OnConstructedChanged(bool constructed)
         {
             Log.Info($"Constructed - {constructed}");
@@ -457,56 +531,14 @@ namespace FCSPowerStorage.Model
             }
 
         }
+        #endregion
 
-        private void TurnDisplayOn()
-        {
-            if (IsBeingDeleted) return;
+        #region Public Methods
 
-            if (fcsPowerStorageDisplay != null)
-            {
-                TurnDisplayOff();
-            }
-
-            fcsPowerStorageDisplay = gameObject.AddComponent<FCSPowerStorageDisplay>();
-            fcsPowerStorageDisplay.Setup(this);
-            fcsPowerStorageDisplay.BatteryStatus1Bar.GetComponent<Image>().fillAmount = _battery_Status_1_Bar;
-            fcsPowerStorageDisplay.BatteryStatus2Bar.GetComponent<Image>().fillAmount = _battery_Status_2_Bar;
-            fcsPowerStorageDisplay.BatteryStatus3Bar.GetComponent<Image>().fillAmount = _battery_Status_3_Bar;
-            fcsPowerStorageDisplay.BatteryStatus4Bar.GetComponent<Image>().fillAmount = _battery_Status_4_Bar;
-            fcsPowerStorageDisplay.BatteryStatus5Bar.GetComponent<Image>().fillAmount = _battery_Status_5_Bar;
-            fcsPowerStorageDisplay.BatteryStatus6Bar.GetComponent<Image>().fillAmount = _battery_Status_6_Bar;
-            fcsPowerStorageDisplay.BatteryStatus1Percentage.GetComponent<Text>().text = _battery_Status_1_Percentage.ToString(CultureInfo.InvariantCulture);
-            fcsPowerStorageDisplay.BatteryStatus2Percentage.GetComponent<Text>().text = _battery_Status_2_Percentage.ToString(CultureInfo.InvariantCulture);
-            fcsPowerStorageDisplay.BatteryStatus3Percentage.GetComponent<Text>().text = _battery_Status_3_Percentage.ToString(CultureInfo.InvariantCulture);
-            fcsPowerStorageDisplay.BatteryStatus4Percentage.GetComponent<Text>().text = _battery_Status_4_Percentage.ToString(CultureInfo.InvariantCulture);
-            fcsPowerStorageDisplay.BatteryStatus5Percentage.GetComponent<Text>().text = _battery_Status_5_Percentage.ToString(CultureInfo.InvariantCulture);
-            fcsPowerStorageDisplay.BatteryStatus6Percentage.GetComponent<Text>().text = _battery_Status_6_Percentage.ToString(CultureInfo.InvariantCulture);
-        }
-
-        private void TurnDisplayOff()
-        {
-            if (IsBeingDeleted) return;
-
-            if (fcsPowerStorageDisplay != null)
-            {
-                fcsPowerStorageDisplay.TurnDisplayOff();
-                Destroy(fcsPowerStorageDisplay);
-                fcsPowerStorageDisplay = null;
-            }
-        }
-
-        public void PowerOffBattery()
-        {
-            HasBreakerTripped = true;
-            Recharge();
-
-            if (ChargeMode == PowerToggleStates.TrickleMode)
-            {
-                StoredPower = Charge;
-                Charge = 0.0f;
-            }
-        }
-
+        /// <summary>
+        /// Places the battery on charge mode
+        /// </summary>
+        /// <param name="chargeState"></param>
         public void ActivateChargeState(PowerToggleStates chargeState)
         {
             if (chargeState == PowerToggleStates.ChargeMode)
@@ -525,6 +557,24 @@ namespace FCSPowerStorage.Model
 
         }
 
+        /// <summary>
+        /// Turns off the battery
+        /// </summary>
+        public void PowerOffBattery()
+        {
+            HasBreakerTripped = true;
+            Recharge();
+
+            if (ChargeMode == PowerToggleStates.TrickleMode)
+            {
+                StoredPower = Charge;
+                Charge = 0.0f;
+            }
+        }
+
+        /// <summary>
+        /// Turns the battery on
+        /// </summary>
         public void PowerOnBattery()
         {
             if (ChargeMode == PowerToggleStates.TrickleMode)
@@ -535,22 +585,7 @@ namespace FCSPowerStorage.Model
             }
         }
 
-        private IEnumerator Startup()
-        {
-            if (IsBeingDeleted) yield break;
-            yield return new WaitForEndOfFrame();
-            if (IsBeingDeleted) yield break;
-
-            seaBase = gameObject?.transform?.parent?.gameObject;
-            if (seaBase == null)
-            {
-                ErrorMessage.AddMessage("[ResourceMonitor] ERROR: Can not work out what base it was placed inside.");
-                Log.Error("ERROR: Can not work out what base it was placed inside.");
-                yield break;
-            }
-
-            TurnDisplayOn();
-        }
+        #endregion
 
     }
 }

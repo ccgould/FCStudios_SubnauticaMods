@@ -62,31 +62,33 @@
   <ItemGroup>
     <Compile Include="Configuration\Cfg.cs" />
     <Compile Include="Configuration\Information.cs" />
-    <Compile Include="Controllers\TerminalController.cs" />
-    <Compile Include="Controllers\ServerRackController.cs" />
-    <Compile Include="Fixers\ConstructableFixer.cs" />
-    <Compile Include="Fixers\StorageContainerFixer.cs" />
     <Compile Include="Helpers\AssetHelper.cs" />
     <Compile Include="Helpers\ImageUtils.cs" />
-    <Compile Include="Helpers\ItemHelpers.cs" />
-    <Compile Include="Helpers\StorageContainerHelper.cs" />
+    <Compile Include="Helpers\SlotHelper.cs" />
     <Compile Include="Helpers\Utilities.cs" />
-    <Compile Include="Interfaces\TerminalPrefabShared.cs" />
-    <Compile Include="Items\FCSTerminalItem.cs" />
-    <Compile Include="Items\ServerRack.cs" />
     <Compile Include="LoadItems.cs" />
     <Compile Include="Logging\Log.cs" />
     <Compile Include="Logging\Reporters.cs" />
-    <Compile Include="Models\Container.cs" />
-    <Compile Include="Models\FCSTerminalItem.cs" />
+    <Compile Include="Models\Base\ServerItem.cs" />
+    <Compile Include="Models\Controllers\FCSServerRackController.cs" />
+    <Compile Include="Models\GameObjects\FCSServerRack.cs" />
+    <Compile Include="Models\Prefabs\ServerPrefab.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FCSPowerStorage\FCSPowerStorage.csproj">
-      <Project>{32A3F9B5-9089-4478-B706-952B706F08DA}</Project>
-      <Name>FCSPowerStorage</Name>
+    <ProjectReference Include="..\FCSSubnauticaCore\FCSSubnauticaCore.csproj">
+      <Project>{DB1AA323-F65B-4BE3-94A3-D199CCD6C43A}</Project>
+      <Name>FCSSubnauticaCore</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Controllers\" />
+    <Folder Include="Interfaces\" />
+    <Folder Include="Items\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy "$(ProjectDir)bin\$(Configuration)\FCSTerminal.dll" "F:\Program Files\Epic Games\Subnautica\QMods\FCSTerminal\" /Y /I</PostBuildEvent>
+  </PropertyGroup>
 </Project>

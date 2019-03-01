@@ -4,15 +4,23 @@ using UnityEngine.EventSystems;
 
 namespace FCSPowerStorage.Model.Components
 {
+    /// <summary>
+    /// This class handles operations for the color picker
+    /// </summary>
     public class ColorItemButton : OnScreenButton, IPointerEnterHandler, IPointerClickHandler, IPointerExitHandler
     {
+        #region Public Properties
+        /// <summary>
+        /// The color value for the color picker button. This is used to change the color of the button and for the base color
+        /// </summary>
         public Color Color { get; set; }
+        #endregion
 
+        #region Overrides
         public override void OnPointerEnter(PointerEventData eventData)
         {
             base.OnPointerEnter(eventData);
 
-            //transform.gameObject.FindChild("Hover").SetActive(true);
             transform.gameObject.FindChild("Hover").SetActive(true);
         }
 
@@ -26,10 +34,8 @@ namespace FCSPowerStorage.Model.Components
         public override void OnPointerClick(PointerEventData eventData)
         {
             base.OnPointerClick(eventData);
-            //Log.Info(transform.parent.parent.parent.parent.name);
-            //Log.Info(transform.parent.gameObject.FindChild("/Power_Storage").name);
             ColorChanger.ChangeBodyColor(transform.parent.parent.parent.parent.parent.gameObject, FcsPowerStorageDisplay, Color);
-
         }
+        #endregion
     }
 }

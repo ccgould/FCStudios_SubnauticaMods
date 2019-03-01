@@ -12,6 +12,7 @@ namespace FCSPowerStorage
         {
             //Clear log file
             Logger.ClearCustomLog();
+
             Log.Info("Initializing FCS Power Storage");
             try
             {

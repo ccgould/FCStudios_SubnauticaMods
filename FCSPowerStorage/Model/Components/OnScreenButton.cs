@@ -4,7 +4,7 @@ using UnityEngine.EventSystems;
 namespace FCSPowerStorage.Model.Components
 {
     /**
-     * Component that buttons on the resource monitor will inherit from. Handles working on whether something is hovered via IsHovered as well as interaction text.
+     * Component that buttons on the power storage ui will inherit from. Handles working on whether something is hovered via IsHovered as well as interaction text.
      */
     public abstract class OnScreenButton : MonoBehaviour
     {

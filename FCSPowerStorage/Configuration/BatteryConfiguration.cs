@@ -1,18 +1,19 @@
-﻿using System;
-
-namespace FCSPowerStorage.Configuration
+﻿namespace FCSPowerStorage.Configuration
 {
-    [Serializable]
-    public class BatteryConfiguration
+
+    /// <summary>
+    /// Class that stores custom properties from the configuration file
+    /// </summary>
+    public static class BatteryConfiguration
     {
         /// <summary>
         /// The maximum charge of the battery
         /// </summary>
-        public float Capacity { get; set; } = 2000;
+        public static float Capacity { get; set; } = 2000;
 
         /// <summary>
         /// The charge speed of this battery
         /// </summary>
-        public float ChargeSpeed { get; set; } = 0.005f;
+        public static float ChargeSpeed { get; set; } = 0.005f;
     }
 }

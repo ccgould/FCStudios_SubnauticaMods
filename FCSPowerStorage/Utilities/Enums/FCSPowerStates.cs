@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace FCSPowerStorage.Utilities.Enums
+﻿namespace FCSPowerStorage.Utilities.Enums
 {
+    /// <summary>
+    /// The power states for the FCS Power Storage
+    /// </summary>
     public enum FCSPowerStates
     {
         Powered,

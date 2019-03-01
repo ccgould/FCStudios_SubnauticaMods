@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using UnityEngine;
 
 namespace FCSTerminal.Helpers
@@ -12,6 +13,6 @@ namespace FCSTerminal.Helpers
         /// The AssetBundle for the modd
         /// </summary>
         //public static AssetBundle Asset = AssetBundle.LoadFromFile($"{Environment.CurrentDirectory}/QMods/FCSTerminal/decorationassets.assets");
-        public static AssetBundle Asset = AssetBundle.LoadFromFile($"{Environment.CurrentDirectory}/QMods/FCSTerminal/fcs_terminal-mod");
+        public static AssetBundle Asset = AssetBundle.LoadFromFile(Path.Combine(Path.Combine(Environment.CurrentDirectory, "QMods"), Path.Combine("FCSTerminal", "fcsterminalbundle")));
     }
 }

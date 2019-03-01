@@ -1,5 +1,8 @@
 ﻿namespace FCSPowerStorage.Utilities.Enums
 {
+    /// <summary>
+    /// The toggle states for the FCS Power Storage
+    /// </summary>
     public enum PowerToggleStates
     {
         /// <summary>
