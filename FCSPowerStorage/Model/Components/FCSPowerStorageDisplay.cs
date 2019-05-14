@@ -1,14 +1,15 @@
-﻿using FCSPowerStorage.Configuration;
+﻿using FCSCommon.Objects;
+using FCSPowerStorage.Configuration;
 using FCSPowerStorage.Helpers;
+using FCSPowerStorage.Logging;
 using FCSPowerStorage.Utilities.Enums;
-using FCSSubnauticaCore.Objects;
-using FCSTerminal.Logging;
 using Oculus.Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -86,6 +87,15 @@ namespace FCSPowerStorage.Model.Components
         private GameObject COLOR_ITEM_PREFAB;
         private GameObject _pageCounter;
         private float _timeSinceLastInteraction;
+        private GameObject _bootingLBL;
+        private GameObject _trickleModeLbl;
+        private GameObject _chargeModeLBL;
+        private GameObject _colorPickerLBL;
+        private GameObject _batteryMonitorLBL;
+        private Transform _batteryStatus1Label;
+        private GameObject _settingsLBL;
+        private GameObject _storageModeLBL;
+
         #endregion
 
         #region Public Methods
@@ -96,6 +106,7 @@ namespace FCSPowerStorage.Model.Components
         /// <param name="cBcController"></param>
         public void Setup(CustomBatteryController cBcController)
         {
+
             COLOR_ITEM_PREFAB = AssetHelper.Asset.LoadAsset<GameObject>("ColorItem");
             if (cBcController.IsBeingDeleted) return;
             CustomBatteryController = cBcController;
@@ -105,6 +116,8 @@ namespace FCSPowerStorage.Model.Components
                 TurnDisplayOff();
                 return;
             }
+
+            UpdateLanguageStrings();
 
             UpdateChargeMode();
 
@@ -127,11 +140,11 @@ namespace FCSPowerStorage.Model.Components
 
             if (CustomBatteryController.ChargeMode == PowerToggleStates.TrickleMode)
             {
-                _batteryMonitorAmountLBL.GetComponent<Text>().text = $"({Convert.ToInt32(CustomBatteryController.Charge)}/{BatteryConfiguration.Capacity})";
+                _batteryMonitorAmountLBL.GetComponent<Text>().text = $"({Convert.ToInt32(CustomBatteryController.Charge)}/{LoadItems.BatteryConfiguration.Capacity})";
             }
             else
             {
-                _batteryMonitorAmountLBL.GetComponent<Text>().text = $"({Convert.ToInt32(CustomBatteryController.StoredPower)}/{BatteryConfiguration.Capacity})";
+                _batteryMonitorAmountLBL.GetComponent<Text>().text = $"({Convert.ToInt32(CustomBatteryController.StoredPower)}/{LoadItems.BatteryConfiguration.Capacity})";
             }
 
             // === Update Battery Amount == //
@@ -313,11 +326,13 @@ namespace FCSPowerStorage.Model.Components
             {
                 ChargeModeCheckBox.SetActive(true);
                 TrickleModeCheckBox.SetActive(false);
+                CustomBatteryController.ChargeMode = PowerToggleStates.ChargeMode;
             }
             else if (CustomBatteryController.ChargeMode == PowerToggleStates.TrickleMode)
             {
                 ChargeModeCheckBox.SetActive(false);
                 TrickleModeCheckBox.SetActive(true);
+                CustomBatteryController.ChargeMode = PowerToggleStates.TrickleMode;
             }
 
         }
@@ -337,13 +352,6 @@ namespace FCSPowerStorage.Model.Components
         {
             if (!CustomBatteryController.HasBreakerTripped)
             {
-                //Get the current total percentage
-                const float seg = 333.3333333333333f;
-                const float seg2 = seg * 2;
-                const float seg3 = seg * 3;
-                const float seg4 = seg * 4;
-                const float seg5 = seg * 5;
-                const float seg6 = seg * 6;
                 int valueWhole;
                 float value;
 
@@ -361,41 +369,16 @@ namespace FCSPowerStorage.Model.Components
 
 
                 // == Battery 1 == //s
-                if (value >= 0 && valueWhole <= seg)
+                if (value >= 0)
                 {
-                    SetPercentage(BatteryStatus1Percentage, BatteryStatus1Bar, value, seg, 0);
-                }
-                // == Battery 2 == //
-                else if (value >= seg && valueWhole <= seg2)
-                {
-                    SetPercentage(BatteryStatus2Percentage, BatteryStatus2Bar, value, seg2, seg);
-                }
-                // == Battery 3 == //
-                else if (value >= seg2 && valueWhole <= seg3)
-                {
-                    SetPercentage(BatteryStatus3Percentage, BatteryStatus3Bar, value, seg3, seg2);
-                }
-                // == Battery 4 == //
-                else if (value >= seg3 && valueWhole <= seg4)
-                {
-                    SetPercentage(BatteryStatus4Percentage, BatteryStatus4Bar, value, seg4, seg3);
-                }
-                // == Battery 5 == //
-                else if (value >= seg4 && valueWhole <= seg5)
-                {
-                    SetPercentage(BatteryStatus5Percentage, BatteryStatus5Bar, value, seg5, seg4);
-                }
-                // == Battery 6 == //
-                else if (value >= seg5 && valueWhole <= 2000)
-                {
-                    SetPercentage(BatteryStatus6Percentage, BatteryStatus6Bar, value, seg6, seg5);
+                    SetPercentage(BatteryStatus1Percentage, BatteryStatus1Bar, valueWhole, LoadItems.BatteryConfiguration.Capacity);
                 }
             }
         }
 
-        private void SetPercentage(Transform percentTrans, Transform percentBar, float value, float max, float min)
+        private void SetPercentage(Transform percentTrans, Transform percentBar, float value, float max)
         {
-            var percent = ((value - min) * 100) / (max - min);
+            var percent = (value / max) * 100;
 
             var text = percentTrans.GetComponent<Text>();
             text.text = $"{Convert.ToInt32(percent)}%";
@@ -406,7 +389,6 @@ namespace FCSPowerStorage.Model.Components
 
         private bool FindAllComponents()
         {
-
             #region Canvas
 
             CanvasGameObject = gameObject.GetComponentInChildren<Canvas>()?.gameObject;
@@ -487,6 +469,17 @@ namespace FCSPowerStorage.Model.Components
 
             #endregion
 
+            var versionLbl = _welcomeScreen.FindChild("Logo_Intro").FindChild("Version_Text")?.gameObject;
+
+            if (versionLbl == null)
+            {
+                Log.Info("Cannot find Version_Text Game Object");
+            }
+
+            string assemblyVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+
+            versionLbl.GetComponent<Text>().text = $"V{assemblyVersion}";
+
             #region Settings Screen
 
             _settingsScreen = screenHolder.FindChild("SettingsPage")?.gameObject;
@@ -507,16 +500,9 @@ namespace FCSPowerStorage.Model.Components
             }
             #endregion
 
-            #region Battery Monitor Label
-            _batteryMonitorAmountLBL = _batteryMonitorPage.FindChild("Battery_Monitor_Amount_LBL")?.gameObject;
-            if (_batteryMonitorAmountLBL == null)
-            {
-                Log.Error("Screen: Battery_Monitor_Amount_LBL not found.");
-                return false;
-            }
-            #endregion
-
             #region Gauges
+
+            // == Leaving the foreach just in case of possibility of adding back the other progress bars
             foreach (Transform progessBar in _batteryMonitorPage.FindChild("Grid").transform)
             {
                 if (progessBar == null)
@@ -530,26 +516,7 @@ namespace FCSPowerStorage.Model.Components
                     case "Battery_Status_1":
                         BatteryStatus1Bar = progessBar.Find("ProgressBar");
                         BatteryStatus1Percentage = progessBar.Find("Percentage");
-                        break;
-                    case "Battery_Status_2":
-                        BatteryStatus2Bar = progessBar.Find("ProgressBar");
-                        BatteryStatus2Percentage = progessBar.Find("Percentage");
-                        break;
-                    case "Battery_Status_3":
-                        BatteryStatus3Bar = progessBar.Find("ProgressBar");
-                        BatteryStatus3Percentage = progessBar.Find("Percentage");
-                        break;
-                    case "Battery_Status_4":
-                        BatteryStatus4Bar = progessBar.Find("ProgressBar");
-                        BatteryStatus4Percentage = progessBar.Find("Percentage");
-                        break;
-                    case "Battery_Status_5":
-                        BatteryStatus5Bar = progessBar.Find("ProgressBar");
-                        BatteryStatus5Percentage = progessBar.Find("Percentage");
-                        break;
-                    case "Battery_Status_6":
-                        BatteryStatus6Bar = progessBar.Find("ProgressBar");
-                        BatteryStatus6Percentage = progessBar.Find("Percentage");
+                        _batteryStatus1Label = progessBar.Find("Battery_Name_LBL");
                         break;
                 }
             }
@@ -573,6 +540,38 @@ namespace FCSPowerStorage.Model.Components
             }
             #endregion
 
+            // == Battery MonitorPage Elements
+
+            #region Battery Monitor Power Amount Label
+            _batteryMonitorAmountLBL = _batteryMonitorPage.FindChild("Battery_Monitor_Amount_LBL")?.gameObject;
+            if (_batteryMonitorAmountLBL == null)
+            {
+                Log.Error("Screen: Battery_Monitor_Amount_LBL not found.");
+                return false;
+            }
+            #endregion
+
+            #region Battery Monitor Label
+            _batteryMonitorLBL = _batteryMonitorPage.FindChild("Battery_Monitor_LBL")?.gameObject;
+            if (_batteryMonitorLBL == null)
+            {
+                Log.Error("Screen: Battery_Monitor_LBL not found.");
+                return false;
+            }
+            #endregion
+            // == Boot Page Elements == //
+
+            #region Booting LBL
+
+            _bootingLBL = _bootingPage.FindChild("Booting_TXT")?.gameObject;
+            if (_bootingLBL == null)
+            {
+                Log.Error("Screen: _bootingLBL  not found.");
+                return false;
+            }
+
+            #endregion
+
             // == Settings Page Elements == //
             #region Color Picker
             _colorPicker = _settingsScreen.FindChild("Color_Picker")?.gameObject;
@@ -581,6 +580,44 @@ namespace FCSPowerStorage.Model.Components
                 Log.Error("Screen: _color_Picker not found.");
                 return false;
             }
+
+            InterfaceButton colorPickerBTN = _colorPicker.AddComponent<InterfaceButton>();
+            colorPickerBTN.FcsPowerStorageDisplay = this;
+            colorPickerBTN.IsToggle = true;
+            colorPickerBTN.ToggleBtnName = "Color_Picker";
+            #endregion
+
+            #region Color Picker LBL
+
+            _colorPickerLBL = _colorPicker.FindChild("Label")?.gameObject;
+            if (_colorPickerLBL == null)
+            {
+                Log.Error("Screen: Color Picker Label not found.");
+                return false;
+            }
+
+            #endregion
+
+            #region Settings LBL
+
+            _settingsLBL = _settingsScreen.FindChild("Setting_LBL")?.gameObject;
+            if (_settingsLBL == null)
+            {
+                Log.Error("Screen: Settings Page Label not found.");
+                return false;
+            }
+
+            #endregion
+
+            #region Storage Mode LBL
+
+            _storageModeLBL = _settingsScreen.FindChild("Storage_Mode_LBL")?.gameObject;
+            if (_storageModeLBL == null)
+            {
+                Log.Error("Screen: Storage Mode Label not found.");
+                return false;
+            }
+
             #endregion
 
             #region Trickle Mode BTN
@@ -600,6 +637,15 @@ namespace FCSPowerStorage.Model.Components
             if (TrickleModeCheckBox == null)
             {
                 Log.Error("Screen: Trickle_Mode =>Checkmark not found.");
+                return false;
+            }
+            #endregion
+
+            #region Trickle Mode LBL
+            _trickleModeLbl = TrickleModeBTN.FindChild("Label")?.gameObject;
+            if (_trickleModeLbl == null)
+            {
+                Log.Error("Screen: TrickleModeLabel not found.");
                 return false;
             }
             #endregion
@@ -626,13 +672,16 @@ namespace FCSPowerStorage.Model.Components
             }
             #endregion
 
-            // == Color Picker Elements == //
-            #region Color Picker Button
-            InterfaceButton colorPickerBTN = _colorPicker.AddComponent<InterfaceButton>();
-            colorPickerBTN.FcsPowerStorageDisplay = this;
-            colorPickerBTN.IsToggle = true;
-            colorPickerBTN.ToggleBtnName = "Color_Picker";
+            #region Charge Mode LBL
+            _chargeModeLBL = ChargeModeBTN.FindChild("Label")?.gameObject;
+            if (_chargeModeLBL == null)
+            {
+                Log.Error("Screen: Charge Mode LBL not found.");
+                return false;
+            }
             #endregion
+
+            // == Color Picker Elements == //
 
             #region Color Picker Page
             _colorPickerPage = screenHolder.FindChild("ColorPickerPage")?.gameObject;
@@ -729,8 +778,22 @@ namespace FCSPowerStorage.Model.Components
 
             #endregion
 
-
             return true;
+        }
+
+        /// <summary>
+        /// This handles the languages for the string on the display
+        /// </summary>
+        private void UpdateLanguageStrings()
+        {
+            _bootingLBL.GetComponent<Text>().text = LoadItems.ModStrings.Booting;
+            _trickleModeLbl.GetComponent<Text>().text = LoadItems.ModStrings.TrickleMode;
+            _chargeModeLBL.GetComponent<Text>().text = LoadItems.ModStrings.ChargeMode;
+            _colorPickerLBL.GetComponent<Text>().text = LoadItems.ModStrings.ColorPicker;
+            _batteryMonitorLBL.GetComponent<Text>().text = LoadItems.ModStrings.BatteryMeters;
+            _settingsLBL.GetComponent<Text>().text = LoadItems.ModStrings.Settings;
+            _storageModeLBL.GetComponent<Text>().text = LoadItems.ModStrings.StorageMode;
+            _batteryStatus1Label.GetComponent<Text>().text = $"{LoadItems.ModStrings.Battery}";
         }
 
         private void CalculateNewMaxPages()

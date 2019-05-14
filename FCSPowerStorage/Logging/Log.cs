@@ -4,7 +4,7 @@ using Utilites.Logger;
 using Logger = Utilites.Logger.Logger;
 using LogType = Utilites.Logger.LogType;
 
-namespace FCSTerminal.Logging
+namespace FCSPowerStorage.Logging
 {
     public enum Status
     {

@@ -1,5 +1,5 @@
-﻿using System;
-using FCSTerminal.Logging;
+﻿using FCSTerminal.Logging;
+using System;
 using Logger = Utilites.Logger.Logger;
 
 namespace FCSTerminal

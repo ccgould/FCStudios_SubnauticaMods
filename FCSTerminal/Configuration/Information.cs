@@ -26,7 +26,7 @@ namespace FCSTerminal.Configuration
         /// </summary>
         public static string ASSETSFOLDER { get; set; }
 
-        public static string MODFOLDER { get; } = Path.Combine(Environment.CurrentDirectory, "QMods");
+        public static string QMODFOLDER { get; } = Path.Combine(Environment.CurrentDirectory, "QMods");
 
         /// <summary>
         /// This is the text on hover for the server rack

@@ -1,11 +1,11 @@
-﻿using FCSSubnauticaCore.Extensions;
-using FCSTerminal.Configuration;
+﻿using FCSTerminal.Configuration;
 using FCSTerminal.Logging;
 using FCSTerminal.Models.Controllers;
 using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
 using System.Collections.Generic;
 using System.IO;
+using FCSCommon.Extensions;
 using UnityEngine;
 
 namespace FCSTerminal.Models.GameObjects
@@ -156,7 +156,7 @@ namespace FCSTerminal.Models.GameObjects
         // == Overridden properties == //
         public override TechGroup GroupForPDA { get; } = TechGroup.Miscellaneous;
         public override TechCategory CategoryForPDA { get; } = TechCategory.Misc;
-        public override string AssetsFolder { get; } = Path.Combine("FCS_Terminal", "Assets");
+        public override string AssetsFolder { get; } = Path.Combine(Information.ModName, "Assets");
         public override string IconFileName { get; } = "Default.png";
         public override string HandOverText { get; } = "FCS Server Rack";
         // == Overridden properties == //

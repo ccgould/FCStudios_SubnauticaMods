@@ -61,8 +61,6 @@ namespace FCSAlienChief.Items
         {
             if (this.IsRegistered == false)
             {
-
-
                 // Set tech tag
                 var techTag = this.GameObject.AddComponent<TechTag>();
                 techTag.type = this.TechType;
@@ -95,7 +93,7 @@ namespace FCSAlienChief.Items
                 eatable.foodValue = _foodValue;
                 eatable.waterValue = _waterValue;
                 eatable.stomachVolume = 15;
-                eatable.decomposes = false;
+                eatable.decomposes = true;
                 eatable.despawns = false;
                 eatable.allowOverfill = false;
                 eatable.kDecayRate = 0;

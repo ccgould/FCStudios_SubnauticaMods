@@ -1,8 +1,8 @@
-﻿using FCSSubnauticaCore.Extensions;
-using FCSTerminal.Logging;
+﻿using FCSTerminal.Logging;
 using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
 using System.Collections.Generic;
+using FCSCommon.Extensions;
 using UnityEngine;
 
 namespace FCSTerminal.Models.Prefabs

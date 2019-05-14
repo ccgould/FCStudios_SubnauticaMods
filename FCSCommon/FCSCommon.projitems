@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>dbc34043-0f09-42ef-beb9-f59cbc6df16f</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>FCSCommon</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Components\BeaconController.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Components\CommonItemsContainer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Components\DamagedMaterialController.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Components\InternalBatteryController.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controllers\AIDeepBatteryController.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controllers\AIDeepDrillerSolarController.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Exceptions\PatchTerminatedException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\ColorExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\FloatExtenstions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\GameObjectExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\GenericExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\MaterialExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\StringExtentions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\TechTypeExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Generics\CustomProp.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\AssetHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\MaterialHelpers.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\WorldHelpers.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\Abstract\AIDisplay.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\Abstract\ModStrings.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Objects\Colors.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Objects\ColorVec4.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Objects\EatableEntities.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Objects\Modules\DeepDrillerModule.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Objects\SerializableColor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Objects\StorageConfig.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Objects\TargetRotation.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utilities\Enums\FCSPowerStates.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utilities\Enums\PowerToggleStates.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utilities\Language\LanguageSystem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utilities\ModSaver.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utilities\ModUtils.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utilities\QuickLogger.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Exceptions\" />
+  </ItemGroup>
+</Project>

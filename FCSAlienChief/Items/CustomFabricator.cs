@@ -1,14 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Reflection;
-using FCSAlienChief.Data;
-using FCSAlienChief.Helpers;
+﻿using FCSAlienChief.Data;
 using FCSAlienChief.Model;
-using SMLHelper;
-using SMLHelper.Patchers;
 using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
+using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 
 
@@ -19,9 +16,9 @@ namespace FCSAlienChief.Items
         // This is the original fabricator prefab.
         private static readonly GameObject OriginalFabricator = Resources.Load<GameObject>("Submarine/Build/Workbench");
 
-        private static string _classId;
-        private List<IAlienChiefItem> _alienChiefItems;
+        private static readonly string _classId;
 
+        private readonly List<IAlienChiefItem> _alienChiefItems;
 
         #region Alien Chief fabricator
 
@@ -30,20 +27,16 @@ namespace FCSAlienChief.Items
         /// </summary>
         public static CraftTree.Type AlienChiefTreeType { get; private set; }
 
-
         /// <summary>
         /// This name will be used as ID for the decorations fabricator TechType and its associated CraftTree.Type.
         /// </summary>
         public static string AlienChiefFabId;
-
-
 
         public CustomFabricator(List<IAlienChiefItem> alienChiefItems, string classId, TechType techType = TechType.None) : base(classId, $"{classId}Prefab", techType)
         {
             _alienChiefItems = alienChiefItems;
             AlienChiefFabId = classId;
         }
-
 
         /// <summary>
         /// Registers the AlienChief Fabricator
@@ -52,11 +45,11 @@ namespace FCSAlienChief.Items
         /// 
         public void RegisterAlienChiefFabricator()
         {
-            
+
             Log.Info("Creating alienchief craft tree...");
 
 
-            CreateCustomTree( _alienChiefItems);
+            CreateCustomTree(_alienChiefItems);
 
             Log.Info("Registering alienchief fabricator...");
             // Create a new TechType for the fabricator
@@ -120,9 +113,6 @@ namespace FCSAlienChief.Items
                 {
                     AddTabNodes(ref root, ref itemTab, alienChiefItem, "Drinks", "DrinkTab");
                 }
-
-
-
             }
         }
 
@@ -145,11 +135,9 @@ namespace FCSAlienChief.Items
             }
         }
 
-        
-
         public override GameObject GetGameObject()
         {
-            // Instanciate fabricator
+            // Instantiate fabricator
             GameObject prefab = GameObject.Instantiate(OriginalFabricator);
 
             prefab.name = AlienChiefFabId;
@@ -189,8 +177,6 @@ namespace FCSAlienChief.Items
             Texture2D coloredTexture = AssetHelper.Asset.LoadAsset<Texture2D>("FCSWorkbench");
             SkinnedMeshRenderer skinnedMeshRenderer = prefab.GetComponentInChildren<SkinnedMeshRenderer>();
             skinnedMeshRenderer.material.mainTexture = coloredTexture;
-
-            
 
             return prefab;
         }

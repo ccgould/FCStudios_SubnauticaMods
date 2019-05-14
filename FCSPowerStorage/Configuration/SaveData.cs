@@ -1,6 +1,6 @@
 ﻿using FCSPowerStorage.Utilities.Enums;
-using FCSSubnauticaCore.Objects;
 using System;
+using FCSCommon.Objects;
 
 namespace FCSPowerStorage.Configuration
 {

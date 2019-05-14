@@ -1,4 +1,4 @@
-﻿using FCSTerminal.Logging;
+﻿using FCSPowerStorage.Logging;
 using System;
 using Utilites.Logger;
 

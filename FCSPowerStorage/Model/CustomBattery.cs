@@ -1,10 +1,11 @@
 ﻿using FCSPowerStorage.Configuration;
 using FCSPowerStorage.Helpers;
-using FCSTerminal.Logging;
+using FCSPowerStorage.Logging;
 using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 
 
@@ -32,7 +33,7 @@ namespace FCSPowerStorage.Model
         /// <param name="classId">The ID for the battery</param>
         /// <param name="prefabFileName">The name of the Prefab</param>
         /// <param name="techType">The TechType of the prefab</param>
-        public CustomBattery(string classId, string prefabFileName) : base(classId, prefabFileName, Information.PowerStorageDef)
+        public CustomBattery(string classId, string prefabFileName) : base(classId, prefabFileName, LoadItems.ModStrings.Description)
         {
             _fcsBatteryId = classId;
 
@@ -63,6 +64,7 @@ namespace FCSPowerStorage.Model
             Log.Info("Set GameObject Tag");
 
             var techTag = FCSPowerStoragePrefab.AddComponent<TechTag>();
+
             techTag.type = TechType;
 
             Log.Info("Set GameObject Bounds");
@@ -153,26 +155,23 @@ namespace FCSPowerStorage.Model
         {
             Log.Info("Creating FCS Battery Storage recipe...");
             // Create and associate recipe to the new TechType
+
+            
+
             var customFabRecipe = new TechData()
             {
                 craftAmount = 1,
-                Ingredients = new List<Ingredient>()
-                {
-                    new Ingredient(TechType.HydrochloricAcid, 6),
-                    new Ingredient(TechType.Titanium, 7),
-                    new Ingredient(TechType.Battery, 1),
-                    new Ingredient(TechType.WiringKit, 1),
-                    new Ingredient(TechType.Quartz, 1),
-
-                }
+                Ingredients = LoadItems.BatteryConfiguration.ConvertToIngredients().ToList()
             };
             Log.Info("Created Ingredients for FCS Power Storage");
             return customFabRecipe;
         }
 
-        public override TechGroup GroupForPDA { get; } = TechGroup.InteriorPieces;
+        
 
-        public override TechCategory CategoryForPDA { get; } = TechCategory.InteriorPiece;
+        public override TechGroup GroupForPDA { get; } = TechGroup.InteriorModules;
+
+        public override TechCategory CategoryForPDA { get; } = TechCategory.InteriorModule;
 
         public override string HandOverText { get; } = "Click to open";
 

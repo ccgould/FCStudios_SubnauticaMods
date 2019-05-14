@@ -14,5 +14,10 @@
         /// Allows the battery to charge only
         /// </summary>
         ChargeMode,
+
+        /// <summary>
+        /// Default State on load
+        /// </summary>
+        None,
     }
 }

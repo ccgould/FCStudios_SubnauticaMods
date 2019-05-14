@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 
 namespace FCSAlienChief.Data
@@ -12,7 +9,7 @@ namespace FCSAlienChief.Data
     public static class AssetHelper
     {
         /// <summary>
-        /// The AssetBundle for the modd
+        /// The AssetBundle for the mod
         /// </summary>
         public static AssetBundle Asset = AssetBundle.LoadFromFile($"{Environment.CurrentDirectory}/QMods/FCSAlienChief/fcsalienchief-mod");
     }

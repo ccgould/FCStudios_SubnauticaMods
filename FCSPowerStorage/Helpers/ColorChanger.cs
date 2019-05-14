@@ -1,6 +1,6 @@
-﻿using FCSPowerStorage.Model.Components;
+﻿using FCSPowerStorage.Logging;
+using FCSPowerStorage.Model.Components;
 using FCSPowerStorage.Utilities.Enums;
-using FCSTerminal.Logging;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -14,10 +14,11 @@ namespace FCSPowerStorage.Helpers
         //public static Material SystemLights { get; set; }
 
         public static Material BatteriesAndDetails { get; set; }
-
+        public static Color CurrentColor { get; set; }
         public static Color Blue = new Color(0, 0.921875f, 0.9453125f);
         public static Color Red = new Color(1, 0, 0);
-        //private static Vector4 _systemLightsColor = Blue;
+        public static Color Orange = new Color(0.99609375f, 0.62890625f, 0.01953125f);
+
 
         public static void ChangeBodyColor(GameObject powerStorage, FCSPowerStorageDisplay display, Color newColor)
         {
@@ -33,97 +34,30 @@ namespace FCSPowerStorage.Helpers
 
             MeshRenderer batteriesAndDetailsRender = powerStorage.FindChild("model").FindChild("BatteriesAndDetails").GetComponent<MeshRenderer>();
 
-            //MeshRenderer systemLightsRender = powerStorage.FindChild("model").FindChild("SystemLights").GetComponent<MeshRenderer>();
-
-            //GameObject batteryIndicators = powerStorage.FindChild("model").FindChild("BatteryLights");
-
             // == Materials == //
             var mainBaseBody = mainBaseBodyRenderer.materials[0];
             BatteriesAndDetails = batteriesAndDetailsRender.materials[0];
-            //SystemLights = systemLightsRender.materials[0];
 
             // == Set Public Materials == //
 
-            Log.Info("MAIN BASE BODY");
+            // Log.Info("MAIN BASE BODY");
 
             // == MAIN BASE BODY == //
             mainBaseBody.shader = shader;
-            //mainBaseBody.EnableKeyword("MARMO_SPECMAP");
             mainBaseBody.EnableKeyword("_METALLICGLOSSMAP");
             mainBaseBody.SetFloat("_Fresnel", 0f);
             mainBaseBody.SetColor("_Color", mainBodyColor);
             BatteriesAndDetails.SetFloat("_Glossiness", 0.5f);
             mainBaseBody.SetTexture("_MetallicGlossMap", FindTexture2D("Power_Storage_StorageBaseColor_MetallicSmoothness"));
-            //mainBaseBody.SetColor("_SpecColor", Color.white);
-            //mainBaseBody.SetFloat("_SpecInt", 1f);
-            //mainBaseBody.SetFloat("_Shininess", 0.104f);
 
 
             // == BATTERIES AND DETAILS == //
             BatteriesAndDetails.shader = shader;
-            //batteriesAndDetails.EnableKeyword("MARMO_SPECMAP");
             BatteriesAndDetails.EnableKeyword("_METALLICGLOSSMAP");
             BatteriesAndDetails.SetFloat("_Fresnel", 0f);
             BatteriesAndDetails.SetColor("_Color", new Color(0.0f, 0.0f, 0.0f));
             BatteriesAndDetails.SetFloat("_Glossiness", 1f);
             BatteriesAndDetails.SetTexture("_MetallicGlossMap", FindTexture2D("Power_Storage_Details_MetallicSmoothness"));
-            //batteriesAndDetails.SetColor("_SpecColor", Color.white);
-            //batteriesAndDetails.SetFloat("_SpecInt", 1f);
-            //batteriesAndDetails.SetFloat("_Shininess", 0.1f);
-
-            //Log.Info("BATTERIES AND DETAILS");
-
-            //// == SYSTEM LIGHTS == //
-            //SystemLights.shader = shader;
-            //SystemLights.EnableKeyword("MARMO_SPECMAP");
-            //SystemLights.EnableKeyword("_ZWRITE_ON");
-            //SystemLights.EnableKeyword("MARMO_EMISSION");
-            //SystemLights.EnableKeyword("_EMISSION");
-            //SystemLights.SetFloat("_EmissionLM", 0f);
-            //SystemLights.SetVector("_EmissionColor", _systemLightsColor);
-            //SystemLights.SetColor("_Illum", _systemLightsColor);
-            //SystemLights.SetVector("_Illum_ST", new Vector4(1.0f, 1.0f, 0.0f, 0.0f));
-            //SystemLights.SetFloat("_EnableGlow", 1);
-            //SystemLights.SetColor("_GlowColor", _systemLightsColor);
-            //SystemLights.SetFloat("_GlowStrength", 1f);
-            //SystemLights.SetColor("_Color", _systemLightsColor);
-            //SystemLights.SetColor("_SpecColor", Color.white);
-
-
-
-
-            //batteriesAndDetails.PrintAllMarmosetUBERShaderProperties();
-
-            //batteriesAndDetails.EnableKeyword("MARMO_SPECMAP");
-            //batteriesAndDetails.SetTexture("_MetallicGlossMap", FindTexture2D("Power_Storage_Details_Metallic"));
-
-
-
-            Log.Info("BATTERY IND.");
-
-            // == BATTERY IND. == //
-            //foreach (Transform curindicator in batteryIndicators.transform)
-            //{
-            //    Log.Info(curindicator.ToString());
-            //    var indicator = curindicator.GetComponent<MeshRenderer>().material;
-            //    indicator.shader = shader;
-            //    indicator.EnableKeyword("_EMISSION");
-            //    indicator.EnableKeyword("MARMO_EMISSION");
-            //    indicator.EnableKeyword("MARMO_SPECMAP");
-            //    indicator.SetColor("_Color", new Color(0, 0.921875f, 0.9453125f));
-            //    indicator.SetColor("_SpecColor", Color.white);
-            //    indicator.SetFloat("_EmissionLM", 0f);
-            //    indicator.SetVector("_EmissionColor", Vector4.zero);
-            //    indicator.SetColor("_GlowColor", new Color(0, 0.921875f, 0.9453125f));
-            //    indicator.SetFloat("_GlowStrength", 0.1f);
-            //    indicator.SetFloat("_EnableGlow", 1.3f);
-            //}
-
-            //batteryIndicator_Top_L.SetFloat("_EmissionLM", 0f);
-            //batteryIndicator_Top_L.SetVector("_EmissionColor", new Color(66, 217, 219, 255));
-            //batteryIndicator_Top_L.SetFloat("_EnableGlow", 1.3f);
-
-
         }
 
         public static void ChangeSystemColor(GameObject powerStorage, Color systemLightsColor)
@@ -183,17 +117,22 @@ namespace FCSPowerStorage.Helpers
                 case FCSPowerStates.Powered:
                     //_systemLightsColor = Blue;
                     ChangeSystemColor(powerStorage, Blue);
+                    CurrentColor = Blue;
                     break;
                 case FCSPowerStates.Unpowered:
                     //_systemLightsColor = Red;
                     ChangeSystemColor(powerStorage, Red);
+                    CurrentColor = Red;
+                    break;
+                case FCSPowerStates.Buffer:
+                    //_systemLightsColor = Red;
+                    ChangeSystemColor(powerStorage, Orange);
+                    CurrentColor = Orange;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(powerState), powerState, null);
 
             }
         }
-
-
     }
 }

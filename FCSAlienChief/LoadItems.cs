@@ -30,7 +30,7 @@ namespace FCSAlienChief
         /// <summary>
         /// A list of linked Items
         /// </summary>
-        public static List<string> LinkedItems  = new List<string>();
+        public static List<string> LinkedItems = new List<string>();
 
         /// <summary>
         /// Execute to start the creation process to load the items into the game
@@ -89,7 +89,7 @@ namespace FCSAlienChief
                 var condiment = curCondiment;
 
                 if (!condiment.Enabled)
-                {   
+                {
                     return;
                 }
 
@@ -99,7 +99,7 @@ namespace FCSAlienChief
                     foreach (var linkedItem in curCondiment.LinkedItems)
                     {
                         LinkedItems.Add(linkedItem);
-                    } 
+                    }
                 }
 
                 // Lets make sure that the object has a name and the Size is correct
@@ -143,7 +143,7 @@ namespace FCSAlienChief
                     foreach (var linkedItem in curFood.LinkedItems)
                     {
                         LinkedItems.Add(linkedItem);
-                    } 
+                    }
                 }
 
                 // Lets make sure that the object has a name and the Size is correct
@@ -187,7 +187,7 @@ namespace FCSAlienChief
                     foreach (var linkedItem in curDrink.LinkedItems)
                     {
                         LinkedItems.Add(linkedItem);
-                    } 
+                    }
                 }
 
                 // Lets make sure that the object has a name and the Size is correct
@@ -219,7 +219,6 @@ namespace FCSAlienChief
             customFabricator.RegisterAlienChiefFabricator();
         }
 
-
         #region Item Verification Methods
         /// <summary>
         /// Verifies the current Object in the list and replaces data if incorrect
@@ -247,7 +246,7 @@ namespace FCSAlienChief
             CheckItemSize(ref sizeX, ref sizeY);
             inventory.Size.X = sizeX;
             inventory.Size.Y = sizeY;
-         
+
             Log.Info($"Checking {_name} ingredients");
             // Check Ingredients
             foreach (var ingredient in inventory.Ingredients)
@@ -344,7 +343,7 @@ namespace FCSAlienChief
                     }
                     else
                     {
-                       
+
                         item = $"Ingredient {item} invalid (Old value: {item})";
                         Log.Warning(_name, $"Ingredient{item} must be a TechType");
                         Log.Info(_name, $"Ingredient{item} was set to a dummy value and disabled");

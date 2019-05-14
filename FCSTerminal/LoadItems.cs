@@ -1,4 +1,4 @@
-﻿using FCSSubnauticaCore.Exceptions;
+﻿using FCSCommon.Exceptions;
 using FCSTerminal.Configuration;
 using FCSTerminal.Helpers;
 using FCSTerminal.Models.GameObjects;
@@ -61,8 +61,6 @@ namespace FCSTerminal
             }
 
         }
-
-
 
         /// <summary>
         /// Loads the prefabs from the asset bundle

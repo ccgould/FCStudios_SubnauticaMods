@@ -1,5 +1,5 @@
-﻿using FCSPowerStorage.Utilities.Enums;
-using FCSTerminal.Logging;
+﻿using FCSPowerStorage.Logging;
+using FCSPowerStorage.Utilities.Enums;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -60,7 +60,6 @@ namespace FCSPowerStorage.Model.Components
         #region Private Methods
         private IEnumerator ChangeCurrentPage()
         {
-            Log.Info("ChangeCurrentPage");
             FcsPowerStorageDisplay.ResetAnimation();
 
             yield return new WaitForEndOfFrame();
@@ -92,8 +91,7 @@ namespace FCSPowerStorage.Model.Components
 
                 if (!FcsPowerStorageDisplay.CustomBatteryController.HasBreakerTripped)
                 {
-                    Log.Info("System powering down up");
-
+                    Log.Info("System powering down down");
                     FcsPowerStorageDisplay.Animator.SetBool("Reboot", true);
                     FcsPowerStorageDisplay.Animator.SetBool("PowerOff", true);
                     FcsPowerStorageDisplay.EnterPowerOffScreen();
@@ -106,9 +104,7 @@ namespace FCSPowerStorage.Model.Components
                     FcsPowerStorageDisplay.ResetNavigationBar();
                     FcsPowerStorageDisplay.CustomBatteryController.PowerOnBattery();
                     FcsPowerStorageDisplay.Animator.SetBool("ColorPageTrans", false);
-                    Log.Info(FcsPowerStorageDisplay.Animator.GetBool("ColorPageTrans").ToString());
                     FcsPowerStorageDisplay.Animator.SetBool("PowerOff", false);
-                    Log.Info(FcsPowerStorageDisplay.Animator.GetBool("PowerOff").ToString());
 
                     FcsPowerStorageDisplay.Animator.SetBool("PowerOn", true);
                     FcsPowerStorageDisplay.Animator.SetBool("Reboot", true);
@@ -147,7 +143,6 @@ namespace FCSPowerStorage.Model.Components
                     GetComponent<Image>().color = HOVER_COLOR;
                 }
             }
-
         }
 
         public override void OnPointerExit(PointerEventData eventData)

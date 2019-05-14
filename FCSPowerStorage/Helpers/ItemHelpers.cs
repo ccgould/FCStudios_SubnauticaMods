@@ -1,8 +1,8 @@
-﻿using FCSTerminal.Logging;
-using SMLHelper.V2.Crafting;
+﻿using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
 using System;
 using System.Collections.Generic;
+using FCSPowerStorage.Logging;
 
 namespace FCSPowerStorage.Helpers
 {
