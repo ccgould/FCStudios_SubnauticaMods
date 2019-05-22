@@ -67,20 +67,17 @@ namespace FCSAlterraShipping.Mono
 
         private void PendTransfer()
         {
-            //_target.Package = _items;
-
-            QuickLogger.Debug("Pend");
-
             if (Mathf.CeilToInt(_currentTime) == 0)
             {
                 _done = true;
 
                 QuickLogger.Debug($"Done: {_done}");
-                var h = _items.ToList();
+
+                var listOfItems = _items.ToList();
 
                 for (int i = 0; i < _items.count; i++)
                 {
-                    ItemsToRemove.Add(h[i].item);
+                    ItemsToRemove.Add(listOfItems[i].item);
                 }
 
                 foreach (Pickupable pickupable in ItemsToRemove)

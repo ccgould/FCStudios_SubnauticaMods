@@ -95,6 +95,11 @@ namespace FCSAlterraShipping.Mono
 
         }
 
+        public bool HasItems()
+        {
+            return _container.HasItems();
+        }
+
         public void OpenStorage()
         {
             _container.OpenStorage();

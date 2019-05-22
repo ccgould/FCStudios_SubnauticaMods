@@ -39,6 +39,11 @@ namespace FCSAlterraShipping.Models
 
         public int NumberOfItems => _container.count;
 
+        public bool HasItems()
+        {
+            return _container.count > 0;
+        }
+
         internal AlterraShippingContainer(AlterraShippingTarget target)
         {
             _isContstructed = () => target.IsConstructed;

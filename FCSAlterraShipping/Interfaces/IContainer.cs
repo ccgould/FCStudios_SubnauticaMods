@@ -4,6 +4,7 @@
     {
         bool IsFull(TechType techType);
         int NumberOfItems { get; }
+        bool HasItems();
         void OpenStorage();
         ItemsContainer GetContainer();
         void ClearContainer();

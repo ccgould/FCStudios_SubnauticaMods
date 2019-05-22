@@ -132,6 +132,13 @@ namespace FCSAlterraShipping.Display
             switch (btnName)
             {
                 case "SentPackages":
+
+                    if (!_mono.HasItems())
+                    {
+                        QuickLogger.Info($"There are no items to ship canceling shipment", true);
+                        return;
+                    }
+
                     _animatorController.SetIntHash(_pageHash, 2);
                     _animatorController.SetFloatHash(_doorState, false);
                     break;
