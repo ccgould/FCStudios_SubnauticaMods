@@ -35,6 +35,8 @@ namespace FCSAlterraShipping.Display
         private int _maxPage = 1;
         private List<AlterraShippingTarget> _container;
         private Text _timeLeftTXT;
+        private ShippingContainerStates _containerMode;
+        private Text _shippingLBL;
         private const int ITEMS_PER_PAGE = 7;
         private const int MaxContainerSpaces = AlterraShippingContainer.MaxContainerSlots;
         private const float DelayedStartTime = 0.5f;
@@ -93,7 +95,7 @@ namespace FCSAlterraShipping.Display
             }
 
             if (_mono != null) _mono.OnReceivingTransfer += OnReceivingTransfer;
-            if (_mono != null) _mono.GetTransferHandler().OnTimerChanged += OnTimerChanged;
+            if (_mono != null) _mono.OnTimerChanged += OnTimerChanged;
             if (_mono != null) _mono.OnItemSent += OnItemSent;
             _initialized = true;
 
@@ -105,13 +107,18 @@ namespace FCSAlterraShipping.Display
         private void OnReceivingTransfer()
         {
             ShippingScreen();
+            _message.text = GetLanguage(DisplayLanguagePatching.ReceivingKey);
+            _shippingLBL.text = GetLanguage(DisplayLanguagePatching.ReceivingKey);
             _animatorController.SetFloatHash(_doorState, false);
         }
 
         private void OnItemSent()
         {
             BootScreen();
+            _containerMode = ShippingContainerStates.Waiting;
+            _message.text = GetLanguage(DisplayLanguagePatching.WaitingKey);
             _animatorController.SetFloatHash(_doorState, true);
+            _shippingLBL.text = GetLanguage(DisplayLanguagePatching.ShippingKey);
         }
 
         private void OnTimerChanged(string obj)
@@ -160,7 +167,7 @@ namespace FCSAlterraShipping.Display
                         QuickLogger.Debug($"Target Inventory doesn't have enough free slots or is receiving a shipment", true);
                         return;
                     }
-
+                    _message.text = GetLanguage(DisplayLanguagePatching.ShippingKey);
                     ShippingScreen();
                     _mono.TransferItems(target);
                     break;
@@ -170,8 +177,6 @@ namespace FCSAlterraShipping.Display
         #endregion
 
         #region Private Methods
-
-
 
         private bool FindAllComponents()
         {
@@ -363,14 +368,14 @@ namespace FCSAlterraShipping.Display
             #endregion
 
             #region Shipping Text
-            var shippingLBL = page3.FindChild("Shipping_LBL").GetComponent<Text>();
-            if (shippingLBL == null)
+            _shippingLBL = page3.FindChild("Shipping_LBL").GetComponent<Text>();
+            if (_shippingLBL == null)
             {
                 QuickLogger.Error("Shipping_LBL Text not found.");
                 return false;
             }
 
-            shippingLBL.text = GetLanguage(DisplayLanguagePatching.ShippingKey);
+            _shippingLBL.text = GetLanguage(DisplayLanguagePatching.ShippingKey);
             #endregion
 
             #region Time Left Text

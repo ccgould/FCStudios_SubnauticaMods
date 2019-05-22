@@ -24,6 +24,7 @@ namespace FCSAlterraShipping.Mono
         public bool IsReceivingTransfer { get; set; }
         public Action OnReceivingTransfer;
         public Action OnItemSent;
+        public Action<string> OnTimerChanged;
         public bool IsFull(TechType techType)
         {
             return _container.IsFull(techType);

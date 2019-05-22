@@ -12,6 +12,8 @@ namespace FCSAlterraShipping.Display.Patching
         public const string ShippingKey = "Shipping";
         public const string TimeLeftKey = "TimeLeft";
         public const string SendPackageKey = "SendPackage";
+        public const string ReceivingKey = "Receiving";
+        public const string WaitingKey = "Waiting";
 
         internal static void AdditionPatching()
         {
@@ -20,8 +22,10 @@ namespace FCSAlterraShipping.Display.Patching
             LanguageHandler.SetLanguageLine(NextPageKey, "Next Page");
             LanguageHandler.SetLanguageLine(PrevPageKey, "Previous Page");
             LanguageHandler.SetLanguageLine(StorageKey, "STORAGE");
+            LanguageHandler.SetLanguageLine(WaitingKey, "WAITING");
             LanguageHandler.SetLanguageLine(SendPackageKey, "Send Package");
             LanguageHandler.SetLanguageLine(ShippingKey, "SHIPPING");
+            LanguageHandler.SetLanguageLine(ReceivingKey, "RECEIVING");
             LanguageHandler.SetLanguageLine(TimeLeftKey, "Time Left:");
         }
     }

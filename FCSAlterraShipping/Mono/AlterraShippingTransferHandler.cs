@@ -1,6 +1,5 @@
 ﻿using FCSCommon.Converters;
 using FCSCommon.Utilities;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -15,7 +14,6 @@ namespace FCSAlterraShipping.Mono
         private ItemsContainer _items;
         private float _currentTime;
         private const float WaitTime = 20f;
-        public Action<string> OnTimerChanged;
         private AlterraShippingTarget _mono;
         private bool _done;
         List<Pickupable> ItemsToRemove = new List<Pickupable>();
@@ -105,7 +103,8 @@ namespace FCSAlterraShipping.Mono
             }
 
             QuickLogger.Debug($"Current Time: {_currentTime}");
-            OnTimerChanged?.Invoke(TimeConverters.SecondsToHMS(_currentTime));
+            _target.OnTimerChanged?.Invoke(TimeConverters.SecondsToHMS(_currentTime));
+            _mono.OnTimerChanged?.Invoke(TimeConverters.SecondsToHMS(_currentTime));
         }
 
         //TODO Remove if not needed

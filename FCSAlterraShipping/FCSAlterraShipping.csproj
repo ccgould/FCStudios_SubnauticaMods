@@ -71,6 +71,7 @@
     <Compile Include="Display\PaginatorButton.cs" />
     <Compile Include="Display\Patching\DisplayLanguagePatching.cs" />
     <Compile Include="Enums\InterfaceButtonMode.cs" />
+    <Compile Include="Enums\ShippingContainerStates.cs" />
     <Compile Include="Interfaces\IContainer.cs" />
     <Compile Include="Models\AlterraShippingContainer.cs" />
     <Compile Include="Models\ShippingTargetManager.cs" />
