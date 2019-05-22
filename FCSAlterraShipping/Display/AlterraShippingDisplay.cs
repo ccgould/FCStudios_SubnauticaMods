@@ -118,7 +118,6 @@ namespace FCSAlterraShipping.Display
             _containerMode = ShippingContainerStates.Waiting;
             _message.text = GetLanguage(DisplayLanguagePatching.WaitingKey);
             _animatorController.SetFloatHash(_doorState, true);
-            _shippingLBL.text = GetLanguage(DisplayLanguagePatching.ShippingKey);
         }
 
         private void OnTimerChanged(string obj)

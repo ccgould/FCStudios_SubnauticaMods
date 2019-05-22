@@ -16,7 +16,7 @@ namespace FCSAlterraShipping.Mono
         private const float WaitTime = 20f;
         private AlterraShippingTarget _mono;
         private bool _done;
-        List<Pickupable> ItemsToRemove = new List<Pickupable>();
+        private readonly List<Pickupable> _itemsToRemove = new List<Pickupable>();
 
 
         private void Awake()
@@ -75,10 +75,10 @@ namespace FCSAlterraShipping.Mono
 
                 for (int i = 0; i < _items.count; i++)
                 {
-                    ItemsToRemove.Add(listOfItems[i].item);
+                    _itemsToRemove.Add(listOfItems[i].item);
                 }
 
-                foreach (Pickupable pickupable in ItemsToRemove)
+                foreach (Pickupable pickupable in _itemsToRemove)
                 {
                     _mono.RemoveItem(pickupable);
                     _target.AddItem(new InventoryItem(pickupable));
@@ -86,7 +86,7 @@ namespace FCSAlterraShipping.Mono
 
                 ErrorMessage.AddMessage($"{_target.Name} shipment has arrived!");
 
-                ItemsToRemove.Clear();
+                _itemsToRemove.Clear();
                 _target.Recieved = true;
                 _currentTime = WaitTime;
                 _mono.OnItemSent?.Invoke();

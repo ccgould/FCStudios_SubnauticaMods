@@ -95,7 +95,9 @@ namespace FCSAlterraShipping.Buildable
 
             prefab.GetOrAddComponent<AlterraShippingAnimator>();
 
-
+            //Add the prefabIdentifier
+            PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
+            prefabID.ClassId = this.ClassID;
 
             return prefab;
         }
