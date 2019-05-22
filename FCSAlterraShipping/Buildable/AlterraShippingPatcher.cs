@@ -108,7 +108,13 @@ namespace FCSAlterraShipping.Buildable
             {
                 Ingredients =
                 {
-                    new Ingredient(TechType.Titanium, 1)
+                    new Ingredient(TechType.TitaniumIngot, 1),
+                    new Ingredient(TechType.ComputerChip, 1),
+                    new Ingredient(TechType.AdvancedWiringKit, 1),
+                    new Ingredient(TechType.VehicleStorageModule, 1),
+                    new Ingredient(TechType.CopperWire, 1),
+                    new Ingredient(TechType.Beacon, 1),
+                    new Ingredient(TechType.Glass, 2),
                 }
             };
         }
