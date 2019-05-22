@@ -25,7 +25,7 @@ namespace FCSCommon.Helpers
                 throw new ArgumentException($"{result} is empty");
             }
 
-            return AssetBundle.LoadFromFile(Path.Combine(Path.Combine(Environment.CurrentDirectory, "QMods"), Path.Combine(modName, modBundleName)));
+            return AssetBundle.LoadFromFile(Path.Combine(Path.Combine(Environment.CurrentDirectory, "QMods"), Path.Combine(modName, Path.Combine("Assets", modBundleName))));
         }
 
         public static AssetBundle Asset(string bundleLocation)
@@ -34,7 +34,7 @@ namespace FCSCommon.Helpers
             {
                 throw new ArgumentException("No bundle location was provided");
             }
-            
+
             var myLoadedAssetBundle = AssetBundle.LoadFromFile(bundleLocation);
 
             if (myLoadedAssetBundle == null)

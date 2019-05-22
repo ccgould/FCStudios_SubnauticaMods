@@ -460,7 +460,6 @@ namespace FCS_Alterra_Refrigeration_Solutions.Models.Components
 
             uGUI_Icon icon = itemDisplay.transform.Find("ItemImage").gameObject.AddComponent<uGUI_Icon>();
             icon.sprite = SpriteManager.Get(type);
-
         }
 
         private void UpdatePaginator()
