@@ -82,6 +82,7 @@ namespace FCSAlterraShipping.Buildable
             MaterialHelpers.ApplyMetallicShader("AlterraShipping", "AlterraShipping_Metallic", prefab, _assetBundle, 0.2f);
             MaterialHelpers.ApplyNormalShader("AlterraShipping", "AlterraShipping_Norm", prefab, _assetBundle);
             #endregion
+
         }
     }
 }

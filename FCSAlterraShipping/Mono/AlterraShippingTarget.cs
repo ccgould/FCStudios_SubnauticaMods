@@ -34,7 +34,7 @@ namespace FCSAlterraShipping.Mono
         private bool _hasBreakerTripped;
         private readonly string SaveDirectory = Path.Combine(SaveUtils.GetCurrentSaveDataDir(), "AlterraShipping");
         private PrefabIdentifier _prefabID;
-        private bool _pdaClosed;
+        private bool _pdaState;
         public ShippingContainerStates ContainerMode { get; set; }
         private string SaveFile => Path.Combine(SaveDirectory, _prefabID.Id + ".json");
         public bool IsFull(TechType techType)
@@ -100,7 +100,7 @@ namespace FCSAlterraShipping.Mono
 
         private void OnPdaClose()
         {
-            _pdaClosed = true;
+            _pdaState = false;
         }
 
         public int PageHash { get; private set; }
@@ -146,7 +146,7 @@ namespace FCSAlterraShipping.Mono
         public void OpenStorage()
         {
             _container.OpenStorage();
-            _pdaClosed = false;
+            _pdaState = true;
         }
 
         public ItemsContainer GetContainer()
@@ -193,16 +193,15 @@ namespace FCSAlterraShipping.Mono
 
             if (_cargoContainerModel != null) _cargoContainerModel.SetActive(_container.NumberOfItems != 0);
 
-            if (IsContainerOpen && _container.NumberOfItems == 0 && _pdaClosed)
+            if (IsContainerOpen && _container.NumberOfItems == 0 && !_pdaState)
             {
                 AnimatorController.SetBoolHash(DoorStateHash, false);
             }
+        }
 
-
-            //if (_container.NumberOfItems == 0)
-            //{
-            //    AnimatorController.SetBoolHash(DoorStateHash, false);
-            //}
+        internal bool GetPDAState()
+        {
+            return _pdaState;
         }
 
         public string GetPrefabIdentifier()

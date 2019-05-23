@@ -34,6 +34,7 @@ namespace FCSAlterraShipping.Display
         private List<AlterraShippingTarget> _container;
         private Text _timeLeftTXT;
         private Text _shippingLabel;
+        private bool _sender;
         private const int ITEMS_PER_PAGE = 7;
         private const int MaxContainerSpaces = AlterraShippingContainer.MaxContainerSlots;
         private const float DelayedStartTime = 0.5f;
@@ -125,8 +126,10 @@ namespace FCSAlterraShipping.Display
                 case "CancelBTN":
                     _animatorController.SetIntHash(_mono.PageHash, 1);
                     break;
+
                 case "ShippingContainer":
                     QuickLogger.Debug($"Clicked {(additionalObject as AlterraShippingTarget)?.GetInstanceID()}");
+
                     var target = additionalObject as AlterraShippingTarget;
 
                     if (target.IsReceivingTransfer || !target.CanFit())
@@ -135,6 +138,7 @@ namespace FCSAlterraShipping.Display
                         return;
                     }
 
+                    _sender = true;
                     _mono.ContainerMode = ShippingContainerStates.Shipping;
                     ShippingScreen();
                     _mono.TransferItems(target);
@@ -475,7 +479,8 @@ namespace FCSAlterraShipping.Display
         private void OnItemSent()
         {
             BootScreen();
-            _mono.ContainerMode = ShippingContainerStates.PickUpAvaliable;
+
+            _mono.ContainerMode = _sender ? ShippingContainerStates.Waiting : ShippingContainerStates.PickUpAvaliable;
 
             if (_mono.HasItems())
             {
@@ -499,6 +504,11 @@ namespace FCSAlterraShipping.Display
                     _message.text = GetLanguage(DisplayLanguagePatching.WaitingKey);
                     break;
                 case ShippingContainerStates.PickUpAvaliable:
+
+                    if (_mono.NumberOfItems == 0)
+                    {
+                        _mono.ContainerMode = ShippingContainerStates.Waiting;
+                    }
                     _message.text = GetLanguage(DisplayLanguagePatching.PickUpAvailable);
                     break;
             }
@@ -563,7 +573,6 @@ namespace FCSAlterraShipping.Display
         #endregion
 
         #region IEnumerators
-
         private IEnumerator PowerOnDisplayEnu()
         {
             yield return new WaitForEndOfFrame();
@@ -590,6 +599,5 @@ namespace FCSAlterraShipping.Display
         }
 
         #endregion
-
     }
 }

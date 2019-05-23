@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using FCSCommon.Utilities;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace FCSCommon.Helpers
@@ -251,6 +253,50 @@ namespace FCSCommon.Helpers
 
                         material.SetFloat("_Glossiness", glossiness);
 
+                    }
+                }
+            }
+        }
+
+        public static void ApplyColorMaskShader(string materialName, string normalMap, string metalicmap, string maskmap, GameObject gameObject, AssetBundle assetBundle, float glossiness)
+        {
+            Shader[] assets = assetBundle.LoadAllAssets<Shader>();
+
+            Shader customColorShader = assets.FirstOrDefault(shader => shader.name.Equals("Custom/ColorMask"));
+
+            if (customColorShader == null)
+            {
+                QuickLogger.Error("Custom Shader: Null");
+            }
+            else
+            {
+                QuickLogger.Debug("Custom Shader: Found");
+                Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>();
+
+                foreach (Renderer renderer in renderers)
+                {
+                    foreach (Material material in renderer.materials)
+                    {
+                        if (material.name.StartsWith(materialName))
+                        {
+                            material.shader = customColorShader;
+
+                            material.EnableKeyword("_NORMALMAP");
+
+                            material.EnableKeyword("_METALLICGLOSSMAP");
+
+                            material.SetTexture("_Normal", FindTexture2D(normalMap, assetBundle));
+
+                            material.SetTexture("_MaskTex", FindTexture2D(maskmap, assetBundle));
+
+                            material.SetColor("_Color1", Color.green);
+                            material.SetColor("_Color2", Color.white);
+                            material.SetColor("_Color3", Color.white);
+
+                            material.SetTexture("_Metallic", MaterialHelpers.FindTexture2D(metalicmap, assetBundle));
+
+                            material.SetFloat("_Glossiness", glossiness);
+                        }
                     }
                 }
             }
