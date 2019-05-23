@@ -1,5 +1,7 @@
-﻿using FCSCommon.Converters;
+﻿using FCSAlterraShipping.Models;
+using FCSCommon.Converters;
 using FCSCommon.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -9,16 +11,45 @@ namespace FCSAlterraShipping.Mono
     internal class AlterraShippingTransferHandler : MonoBehaviour
     {
         private Constructable _buildable;
-        private bool _transferItem;
         private AlterraShippingTarget _target;
         private ItemsContainer _items;
         private float _currentTime;
-        private const float WaitTime = 20f;
+        private const float WaitTime = 120f;
         private AlterraShippingTarget _mono;
         private bool _done;
         private readonly List<Pickupable> _itemsToRemove = new List<Pickupable>();
 
 
+        internal float GetCurrentTime()
+        {
+            return _currentTime;
+        }
+
+        internal void SetCurrentTime(float time)
+        {
+            _currentTime = time;
+        }
+
+        internal string GetCurrentTarget()
+        {
+            if (_target == null) return String.Empty;
+            return _target.GetPrefabIdentifier();
+        }
+
+        internal void SetCurrentTarget(string target)
+        {
+            _target = FindTarget(target);
+        }
+
+        internal void SetMono(AlterraShippingTarget mono)
+        {
+            _mono = mono;
+        }
+
+        internal void SetCurrentItems(ItemsContainer items)
+        {
+            _items = items;
+        }
         private void Awake()
         {
             if (_buildable == null)
@@ -36,8 +67,14 @@ namespace FCSAlterraShipping.Mono
                 QuickLogger.Debug($"Not Built");
                 return;
             }
+
+            //QuickLogger.Debug($"T: {_target}, I: {_items}, D: {_done}", true);
+
             if (_target == null || _items == null || _done) return;
+
             PendTransfer();
+
+
         }
 
         internal void SendItems(ItemsContainer items, AlterraShippingTarget target)
@@ -102,23 +139,25 @@ namespace FCSAlterraShipping.Mono
                 _currentTime = Mathf.Clamp(_currentTime - 1 * DayNightCycle.main.deltaTime, 0, WaitTime);
             }
 
-            QuickLogger.Debug($"Current Time: {_currentTime}");
-            _target.OnTimerChanged?.Invoke(TimeConverters.SecondsToHMS(_currentTime));
+            if (_target != null) _target.OnTimerChanged?.Invoke(TimeConverters.SecondsToHMS(_currentTime));
             _mono.OnTimerChanged?.Invoke(TimeConverters.SecondsToHMS(_currentTime));
         }
 
         //TODO Remove if not needed
-        private AlterraShippingTarget FindTarget(AlterraShippingTarget currentTarget)
+        private AlterraShippingTarget FindTarget(string currentTarget)
         {
-            AlterraShippingTarget[] submarines = FindObjectsOfType<AlterraShippingTarget>();
+            if (currentTarget == String.Empty) return null;
 
-            foreach (var target in submarines)
+            foreach (var target in ShippingTargetManager.GlobalShippingTargets)
             {
-                if (target.ID == currentTarget.ID)
+                QuickLogger.Debug($"Target: {target.GetInstanceID()} located");
+                if (target.GetPrefabIdentifier() == currentTarget)
                 {
                     return target;
                 }
             }
+
+            QuickLogger.Debug("No Target Found!", true);
 
             return null;
         }

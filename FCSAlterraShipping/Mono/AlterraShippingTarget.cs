@@ -1,4 +1,5 @@
 ﻿using FCSAlterraShipping.Display;
+using FCSAlterraShipping.Enums;
 using FCSAlterraShipping.Interfaces;
 using FCSAlterraShipping.Models;
 using FCSCommon.Extensions;
@@ -33,6 +34,7 @@ namespace FCSAlterraShipping.Mono
         private bool _hasBreakerTripped;
         private readonly string SaveDirectory = Path.Combine(SaveUtils.GetCurrentSaveDataDir(), "AlterraShipping");
         private PrefabIdentifier _prefabID;
+        public ShippingContainerStates ContainerMode { get; set; }
         private string SaveFile => Path.Combine(SaveDirectory, _prefabID.Id + ".json");
         public bool IsFull(TechType techType)
         {
@@ -89,9 +91,11 @@ namespace FCSAlterraShipping.Mono
             }
 
             DoorStateHash = UnityEngine.Animator.StringToHash("DoorState");
-
+            PageHash = UnityEngine.Animator.StringToHash("Page");
             InvokeRepeating("CargoContainer", 1, 0.5f);
         }
+
+        public int PageHash { get; private set; }
 
         public int DoorStateHash { get; private set; }
 
@@ -186,6 +190,11 @@ namespace FCSAlterraShipping.Mono
             }
         }
 
+        public string GetPrefabIdentifier()
+        {
+            return _prefabID.Id;
+        }
+
         public void AddToManager(SubRoot subRoot, ShippingTargetManager managers = null)
         {
             Manager = managers ?? ShippingTargetManager.FindManager(subRoot);
@@ -232,7 +241,11 @@ namespace FCSAlterraShipping.Mono
             var saveData = new SaveData
             {
                 HasBreakerTripped = _hasBreakerTripped,
-
+                TimeLeft = _transferHandler.GetCurrentTime(),
+                Target = _transferHandler.GetCurrentTarget(),
+                CurrentPage = AnimatorController.GetIntHash(PageHash),
+                CurrentDoorState = AnimatorController.GetBoolHash(DoorStateHash),
+                ContainertMode = ContainerMode
             };
 
             //int amount = 1;
@@ -262,8 +275,6 @@ namespace FCSAlterraShipping.Mono
                 //LoadData
                 var savedData = JsonConvert.DeserializeObject<SaveData>(savedDataJson);
 
-                _hasBreakerTripped = savedData.HasBreakerTripped;
-
                 foreach (KeyValuePair<TechType, int> containerItem in savedData.ContainerItems)
                 {
                     for (int i = 0; i < containerItem.Value; i++)
@@ -279,19 +290,17 @@ namespace FCSAlterraShipping.Mono
                         _container.AddItem(item);
                     }
                 }
-                //// Set the TechType value on the TechTag
-                //obj.GetOrAddComponent<TechTag>().type = savedData.ItemID;
+
+                ContainerMode = savedData.ContainertMode;
+                _hasBreakerTripped = savedData.HasBreakerTripped;
+                _transferHandler.SetMono(this);
+                _transferHandler.SetCurrentTime(savedData.TimeLeft);
+                _transferHandler.SetCurrentTarget(savedData.Target);
+                _transferHandler.SetCurrentItems(_container.GetContainer());
 
 
-                //// Set the ClassId
-                //obj.GetComponent<PrefabIdentifier>().ClassId = LoadItems.AllowedFilters[savedData.ItemID].ClassID;
-
-
-                //Pickupable pickupable = obj.GetComponent<Pickupable>().Pickup(false);
-
-
-
-                //_itemContainer.AddItem(pickupable);
+                AnimatorController.SetBoolHash(DoorStateHash, savedData.CurrentDoorState);
+                AnimatorController.SetIntHash(PageHash, savedData.CurrentPage);
             }
         }
     }

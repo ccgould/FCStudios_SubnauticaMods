@@ -41,6 +41,12 @@ namespace FCSAlterraShipping.Display
         /// <param name="value">Float to set</param>
         public void SetBoolHash(int stateHash, bool value)
         {
+            if (Animator == null)
+            {
+                QuickLogger.Error("Animator is null on load");
+                this.Animator = this.transform.GetComponent<Animator>();
+            }
+
             this.Animator.SetBool(stateHash, value);
         }
 
@@ -54,5 +60,15 @@ namespace FCSAlterraShipping.Display
             this.Animator.SetInteger(stateHash, value);
         }
         #endregion
+
+        public int GetIntHash(int hash)
+        {
+            return this.Animator.GetInteger(hash);
+        }
+
+        public bool GetBoolHash(int hash)
+        {
+            return this.Animator.GetBool(hash);
+        }
     }
 }
