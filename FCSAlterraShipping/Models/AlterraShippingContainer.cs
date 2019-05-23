@@ -17,6 +17,7 @@ namespace FCSAlterraShipping.Models
         private const int ContainerHeight = 6;
         private const int ContainerWidth = 5;
         internal const int MaxContainerSlots = ContainerHeight * ContainerWidth;
+        public Action OnPDAClose { get; set; }
 
         public bool CanFit()
         {
@@ -115,7 +116,12 @@ namespace FCSAlterraShipping.Models
             Player main = Player.main;
             PDA pda = main.GetPDA();
             Inventory.main.SetUsedStorage(_container, false);
-            pda.Open(PDATab.Inventory, null, null, 4f);
+            pda.Open(PDATab.Inventory, null, new PDA.OnClose(OnPDACloseMethod), 4f);
+        }
+
+        private void OnPDACloseMethod(PDA pda)
+        {
+            OnPDAClose?.Invoke();
         }
 
         public ItemsContainer GetContainer()

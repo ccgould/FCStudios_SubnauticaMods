@@ -1,4 +1,6 @@
-﻿namespace FCSAlterraShipping.Interfaces
+﻿using System;
+
+namespace FCSAlterraShipping.Interfaces
 {
     interface IContainer
     {
@@ -12,6 +14,6 @@
         void RemoveItem(Pickupable item);
         void RemoveItem(TechType item);
         bool CanFit();
-
+        Action OnPDAClose { get; set; }
     }
 }

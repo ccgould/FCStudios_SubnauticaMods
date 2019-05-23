@@ -475,8 +475,7 @@ namespace FCSAlterraShipping.Display
         private void OnItemSent()
         {
             BootScreen();
-            _mono.ContainerMode = ShippingContainerStates.Waiting;
-            _message.text = GetLanguage(DisplayLanguagePatching.WaitingKey);
+            _mono.ContainerMode = ShippingContainerStates.PickUpAvaliable;
 
             if (_mono.HasItems())
             {
@@ -498,6 +497,9 @@ namespace FCSAlterraShipping.Display
                     break;
                 case ShippingContainerStates.Waiting:
                     _message.text = GetLanguage(DisplayLanguagePatching.WaitingKey);
+                    break;
+                case ShippingContainerStates.PickUpAvaliable:
+                    _message.text = GetLanguage(DisplayLanguagePatching.PickUpAvailable);
                     break;
             }
         }

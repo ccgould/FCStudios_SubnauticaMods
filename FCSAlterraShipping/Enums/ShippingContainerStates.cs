@@ -6,6 +6,7 @@
         Shipping,
         Receiving,
         Waiting,
-        ShutDown
+        ShutDown,
+        PickUpAvaliable
     }
 }

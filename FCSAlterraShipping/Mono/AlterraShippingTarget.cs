@@ -34,6 +34,7 @@ namespace FCSAlterraShipping.Mono
         private bool _hasBreakerTripped;
         private readonly string SaveDirectory = Path.Combine(SaveUtils.GetCurrentSaveDataDir(), "AlterraShipping");
         private PrefabIdentifier _prefabID;
+        private bool _pdaClosed;
         public ShippingContainerStates ContainerMode { get; set; }
         private string SaveFile => Path.Combine(SaveDirectory, _prefabID.Id + ".json");
         public bool IsFull(TechType techType)
@@ -41,6 +42,7 @@ namespace FCSAlterraShipping.Mono
             return _container.IsFull(techType);
         }
 
+        private bool IsContainerOpen => AnimatorController.GetBoolHash(DoorStateHash);
         public int NumberOfItems
         {
             get => _container.NumberOfItems;
@@ -82,6 +84,7 @@ namespace FCSAlterraShipping.Mono
                 QuickLogger.Error("Cargo Container Model is null");
             }
             _container = new AlterraShippingContainer(this);
+            _container.OnPDAClose += OnPdaClose;
 
             AnimatorController = this.transform.GetComponent<AlterraShippingAnimator>();
 
@@ -93,6 +96,11 @@ namespace FCSAlterraShipping.Mono
             DoorStateHash = UnityEngine.Animator.StringToHash("DoorState");
             PageHash = UnityEngine.Animator.StringToHash("Page");
             InvokeRepeating("CargoContainer", 1, 0.5f);
+        }
+
+        private void OnPdaClose()
+        {
+            _pdaClosed = true;
         }
 
         public int PageHash { get; private set; }
@@ -138,6 +146,7 @@ namespace FCSAlterraShipping.Mono
         public void OpenStorage()
         {
             _container.OpenStorage();
+            _pdaClosed = false;
         }
 
         public ItemsContainer GetContainer()
@@ -184,10 +193,16 @@ namespace FCSAlterraShipping.Mono
 
             if (_cargoContainerModel != null) _cargoContainerModel.SetActive(_container.NumberOfItems != 0);
 
-            if (_container.NumberOfItems == 0)
+            if (IsContainerOpen && _container.NumberOfItems == 0 && _pdaClosed)
             {
                 AnimatorController.SetBoolHash(DoorStateHash, false);
             }
+
+
+            //if (_container.NumberOfItems == 0)
+            //{
+            //    AnimatorController.SetBoolHash(DoorStateHash, false);
+            //}
         }
 
         public string GetPrefabIdentifier()
@@ -232,6 +247,8 @@ namespace FCSAlterraShipping.Mono
         {
             return _container.CanFit();
         }
+
+        public Action OnPDAClose { get; set; }
 
         public void OnProtoSerializeObjectTree(ProtobufSerializer serializer)
         {
