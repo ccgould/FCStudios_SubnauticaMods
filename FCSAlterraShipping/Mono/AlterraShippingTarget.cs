@@ -245,7 +245,8 @@ namespace FCSAlterraShipping.Mono
                 Target = _transferHandler.GetCurrentTarget(),
                 CurrentPage = AnimatorController.GetIntHash(PageHash),
                 CurrentDoorState = AnimatorController.GetBoolHash(DoorStateHash),
-                ContainertMode = ContainerMode
+                ContainertMode = ContainerMode,
+                ContainerName = Name
             };
 
             //int amount = 1;
@@ -291,6 +292,7 @@ namespace FCSAlterraShipping.Mono
                     }
                 }
 
+                Name = savedData.ContainerName;
                 ContainerMode = savedData.ContainertMode;
                 _hasBreakerTripped = savedData.HasBreakerTripped;
                 _transferHandler.SetMono(this);
@@ -301,6 +303,8 @@ namespace FCSAlterraShipping.Mono
 
                 AnimatorController.SetBoolHash(DoorStateHash, savedData.CurrentDoorState);
                 AnimatorController.SetIntHash(PageHash, savedData.CurrentPage);
+
+                Manager.UpdateGlobalTargets();
             }
         }
     }

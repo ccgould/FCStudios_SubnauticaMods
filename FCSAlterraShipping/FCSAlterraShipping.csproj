@@ -78,6 +78,7 @@
     <Compile Include="Models\ShippingTargetManager.cs" />
     <Compile Include="Mono\AlterraShippingTarget.cs" />
     <Compile Include="Mono\AlterraShippingTransferHandler.cs" />
+    <Compile Include="Mono\AlterraShippingNameController.cs" />
     <Compile Include="Patchers\AlterraShippingTarget_Patcher.cs" />
     <Compile Include="Patchers\SubRoot_Patches.cs" />
     <Compile Include="QPatch.cs" />

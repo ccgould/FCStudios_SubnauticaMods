@@ -13,5 +13,6 @@ namespace FCSAlterraShipping.Models
         public int CurrentPage { get; set; }
         public bool CurrentDoorState { get; set; }
         public ShippingContainerStates ContainertMode { get; set; }
+        public string ContainerName { get; set; }
     }
 }
