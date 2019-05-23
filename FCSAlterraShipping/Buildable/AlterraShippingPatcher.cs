@@ -91,9 +91,9 @@ namespace FCSAlterraShipping.Buildable
 
             prefab.GetOrAddComponent<AlterraShippingTransferHandler>();
 
-            prefab.GetOrAddComponent<AlterraShippingTarget>();
-
             prefab.GetOrAddComponent<AlterraShippingAnimator>();
+
+            prefab.GetOrAddComponent<AlterraShippingTarget>();
 
             //Add the prefabIdentifier
             PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();

@@ -30,7 +30,6 @@ namespace FCSAlterraShipping.Display
         private Text _messagePag2;
         private Text _pageTopNumber;
         private Text _pageBottomNumber;
-        internal int _doorState;
         private int _currentPage = 1;
         private int _maxPage = 1;
         private List<AlterraShippingTarget> _container;
@@ -56,7 +55,6 @@ namespace FCSAlterraShipping.Display
         private void Awake()
         {
             _pageHash = UnityEngine.Animator.StringToHash("Page");
-            _doorState = UnityEngine.Animator.StringToHash("DoorState");
             ShippingTargetManager.GlobalChanged += GlobalChanged;
         }
 
@@ -73,13 +71,6 @@ namespace FCSAlterraShipping.Display
                 return;
             }
 
-            _animatorController = this.transform.GetComponent<AlterraShippingAnimator>();
-
-            if (_animatorController == null)
-            {
-                QuickLogger.Error("Animator component not found on the GameObject.");
-            }
-
             _mono = this.transform.GetComponent<AlterraShippingTarget>();
 
             if (_mono == null)
@@ -93,6 +84,8 @@ namespace FCSAlterraShipping.Display
                 QuickLogger.Error($"Transfer Handler is returning null.");
                 return;
             }
+
+            _animatorController = _mono.AnimatorController;
 
             if (_mono != null) _mono.OnReceivingTransfer += OnReceivingTransfer;
             if (_mono != null) _mono.OnTimerChanged += OnTimerChanged;
@@ -109,7 +102,7 @@ namespace FCSAlterraShipping.Display
             ShippingScreen();
             _message.text = GetLanguage(DisplayLanguagePatching.ReceivingKey);
             _shippingLBL.text = GetLanguage(DisplayLanguagePatching.ReceivingKey);
-            _animatorController.SetFloatHash(_doorState, false);
+            _animatorController.SetBoolHash(_mono.DoorStateHash, false);
         }
 
         private void OnItemSent()
@@ -117,7 +110,7 @@ namespace FCSAlterraShipping.Display
             BootScreen();
             _containerMode = ShippingContainerStates.Waiting;
             _message.text = GetLanguage(DisplayLanguagePatching.WaitingKey);
-            _animatorController.SetFloatHash(_doorState, true);
+            _animatorController.SetBoolHash(_mono.DoorStateHash, true);
         }
 
         private void OnTimerChanged(string obj)
@@ -146,12 +139,12 @@ namespace FCSAlterraShipping.Display
                     }
 
                     _animatorController.SetIntHash(_pageHash, 2);
-                    _animatorController.SetFloatHash(_doorState, false);
+                    _animatorController.SetBoolHash(_mono.DoorStateHash, false);
                     break;
 
                 case "OpenContainer":
                     _mono.OpenStorage();
-                    _animatorController.SetFloatHash(_doorState, true);
+                    _animatorController.SetBoolHash(_mono.DoorStateHash, true);
                     break;
 
                 case "CancelBTN":
@@ -166,6 +159,7 @@ namespace FCSAlterraShipping.Display
                         QuickLogger.Debug($"Target Inventory doesn't have enough free slots or is receiving a shipment", true);
                         return;
                     }
+                    _shippingLBL.text = GetLanguage(DisplayLanguagePatching.ShippingKey);
                     _message.text = GetLanguage(DisplayLanguagePatching.ShippingKey);
                     ShippingScreen();
                     _mono.TransferItems(target);
