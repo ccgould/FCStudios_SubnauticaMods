@@ -15,6 +15,7 @@ namespace FCSAlterraShipping.Display.Patching
         public const string ReceivingKey = "Receiving";
         public const string WaitingKey = "Waiting";
         public const string PickUpAvailable = "PickUpAvailable";
+        public const string MainKey = "Main";
 
         internal static void AdditionPatching()
         {
@@ -29,6 +30,7 @@ namespace FCSAlterraShipping.Display.Patching
             LanguageHandler.SetLanguageLine(ReceivingKey, "RECEIVING");
             LanguageHandler.SetLanguageLine(TimeLeftKey, "Time Left:");
             LanguageHandler.SetLanguageLine(PickUpAvailable, "PickUp Available");
+            LanguageHandler.SetLanguageLine(MainKey, "MAIN");
         }
     }
 }

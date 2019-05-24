@@ -1,10 +1,15 @@
-﻿using FCSCommon.Utilities;
+﻿using FCSAlterraShipping.Models;
+using FCSAlterraShipping.Mono;
+using FCSCommon.Utilities;
 using UnityEngine;
 
 namespace FCSAlterraShipping.Display
 {
     internal class AlterraShippingAnimator : MonoBehaviour
     {
+        private AudioHandler _audioHandler;
+        private AlterraShippingTarget _mono;
+
         private void Start()
         {
             this.Animator = this.transform.GetComponent<Animator>();
@@ -19,6 +24,8 @@ namespace FCSAlterraShipping.Display
                 QuickLogger.Debug("Animator was disabled and now has been enabled");
                 this.Animator.enabled = true;
             }
+
+            _audioHandler = new AudioHandler(transform);
         }
 
         public Animator Animator { get; set; }
@@ -29,7 +36,7 @@ namespace FCSAlterraShipping.Display
         /// </summary>
         /// <param name="stateHash">The hash of the parameter</param>
         /// <param name="value">Float to set</param>
-        public void SetFloatHash(int stateHash, float value)
+        internal void SetFloatHash(int stateHash, float value)
         {
             this.Animator.SetFloat(stateHash, value);
         }
@@ -39,7 +46,7 @@ namespace FCSAlterraShipping.Display
         /// </summary>
         /// <param name="stateHash">The hash of the parameter</param>
         /// <param name="value">Float to set</param>
-        public void SetBoolHash(int stateHash, bool value)
+        internal void SetBoolHash(int stateHash, bool value)
         {
             if (Animator == null)
             {
@@ -55,20 +62,40 @@ namespace FCSAlterraShipping.Display
         /// </summary>
         /// <param name="stateHash">The hash of the parameter</param>
         /// <param name="value">Float to set</param>
-        public void SetIntHash(int stateHash, int value)
+        internal void SetIntHash(int stateHash, int value)
         {
             this.Animator.SetInteger(stateHash, value);
         }
-        #endregion
 
-        public int GetIntHash(int hash)
+        internal int GetIntHash(int hash)
         {
             return this.Animator.GetInteger(hash);
         }
 
-        public bool GetBoolHash(int hash)
+        internal bool GetBoolHash(int hash)
         {
             return this.Animator.GetBool(hash);
         }
+
+        internal void OpenDoors()
+        {
+            if (GetBoolHash(_mono.DoorStateHash)) return;
+            SetBoolHash(_mono.DoorStateHash, true);
+            _audioHandler.PlaySound(true);
+        }
+
+        internal void CloseDoors()
+        {
+            if (GetBoolHash(_mono.DoorStateHash) == false) return;
+            SetBoolHash(_mono.DoorStateHash, false);
+            _audioHandler.PlaySound(false);
+        }
+
+        internal void Initialize(AlterraShippingTarget mono)
+        {
+            _mono = mono;
+        }
+        #endregion
+
     }
 }

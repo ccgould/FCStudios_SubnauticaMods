@@ -86,15 +86,17 @@ namespace FCSAlterraShipping.Mono
             _container = new AlterraShippingContainer(this);
             _container.OnPDAClose += OnPdaClose;
 
-            AnimatorController = this.transform.GetComponent<AlterraShippingAnimator>();
+            DoorStateHash = UnityEngine.Animator.StringToHash("DoorState");
+            PageHash = UnityEngine.Animator.StringToHash("Page");
 
+            AnimatorController = this.transform.GetComponent<AlterraShippingAnimator>();
+            AnimatorController.Initialize(this);
             if (AnimatorController == null)
             {
                 QuickLogger.Error("Animator component not found on the GameObject.");
             }
 
-            DoorStateHash = UnityEngine.Animator.StringToHash("DoorState");
-            PageHash = UnityEngine.Animator.StringToHash("Page");
+
             InvokeRepeating("CargoContainer", 1, 0.5f);
         }
 
@@ -195,7 +197,7 @@ namespace FCSAlterraShipping.Mono
 
             if (IsContainerOpen && _container.NumberOfItems == 0 && !_pdaState)
             {
-                AnimatorController.SetBoolHash(DoorStateHash, false);
+                AnimatorController.CloseDoors();
             }
         }
 

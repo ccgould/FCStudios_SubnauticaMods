@@ -74,6 +74,7 @@
     <Compile Include="Enums\ShippingContainerStates.cs" />
     <Compile Include="Interfaces\IContainer.cs" />
     <Compile Include="Models\AlterraShippingContainer.cs" />
+    <Compile Include="Models\AudioHandler.cs" />
     <Compile Include="Models\SaveData.cs" />
     <Compile Include="Models\ShippingTargetManager.cs" />
     <Compile Include="Mono\AlterraShippingTarget.cs" />

@@ -35,6 +35,7 @@ namespace FCSAlterraShipping.Display
         private Text _timeLeftTXT;
         private Text _shippingLabel;
         private bool _sender;
+        private Text _pageName;
         private const int ITEMS_PER_PAGE = 7;
         private const int MaxContainerSpaces = AlterraShippingContainer.MaxContainerSlots;
         private const float DelayedStartTime = 0.5f;
@@ -114,22 +115,19 @@ namespace FCSAlterraShipping.Display
                         return;
                     }
 
-                    _animatorController.SetIntHash(_mono.PageHash, 2);
-                    _animatorController.SetBoolHash(_mono.DoorStateHash, false);
+                    TargetScreen();
                     break;
 
                 case "OpenContainer":
                     _mono.OpenStorage();
-                    _animatorController.SetBoolHash(_mono.DoorStateHash, true);
+                    _animatorController.OpenDoors();
                     break;
 
                 case "CancelBTN":
-                    _animatorController.SetIntHash(_mono.PageHash, 1);
+                    MainScreen();
                     break;
 
                 case "ShippingContainer":
-                    QuickLogger.Debug($"Clicked {(additionalObject as AlterraShippingTarget)?.GetInstanceID()}");
-
                     var target = additionalObject as AlterraShippingTarget;
 
                     if (target.IsReceivingTransfer || !target.CanFit())
@@ -138,10 +136,7 @@ namespace FCSAlterraShipping.Display
                         return;
                     }
 
-                    _sender = true;
-                    _mono.ContainerMode = ShippingContainerStates.Shipping;
-                    ShippingScreen();
-                    _mono.TransferItems(target);
+                    ShippingScreen(target);
                     break;
             }
         }
@@ -214,6 +209,25 @@ namespace FCSAlterraShipping.Display
             if (top == null)
             {
                 QuickLogger.Error("Top not found.");
+                return false;
+            }
+            #endregion
+
+            #region Overlay
+            var overlay = _canvasGameObject.FindChild("Overlay")?.gameObject;
+            if (overlay == null)
+            {
+                QuickLogger.Error("Overlay not found.");
+                return false;
+            }
+            #endregion
+
+            #region Page_Name
+
+            _pageName = overlay.FindChild("Page_Name").GetComponent<Text>();
+            if (_pageName == null)
+            {
+                QuickLogger.Error("Page_Name not found.");
                 return false;
             }
             #endregion
@@ -451,14 +465,19 @@ namespace FCSAlterraShipping.Display
             StartCoroutine(BootScreenEnu());
         }
 
-        private void ShippingScreen()
+        private void ShippingScreen(AlterraShippingTarget target)
         {
-            StartCoroutine(ShippingScreenEnu());
+            StartCoroutine(ShippingScreenEnu(target));
         }
 
-        private void PowerOnDisplay()
+        private void MainScreen()
         {
-            StartCoroutine(PowerOnDisplayEnu());
+            StartCoroutine(MainScreenEnu());
+        }
+
+        private void TargetScreen()
+        {
+            StartCoroutine(TargetScreenEnu());
         }
 
         private void CheckCurrentPage()
@@ -471,9 +490,9 @@ namespace FCSAlterraShipping.Display
 
         private void OnReceivingTransfer()
         {
-            ShippingScreen();
+            ShippingScreen(null);
             _mono.ContainerMode = ShippingContainerStates.Receiving;
-            _animatorController.SetBoolHash(_mono.DoorStateHash, false);
+            _animatorController.CloseDoors();
         }
 
         private void OnItemSent()
@@ -484,7 +503,7 @@ namespace FCSAlterraShipping.Display
 
             if (_mono.HasItems())
             {
-                _animatorController.SetBoolHash(_mono.DoorStateHash, true);
+                _animatorController.OpenDoors();
             }
         }
 
@@ -573,16 +592,32 @@ namespace FCSAlterraShipping.Display
         #endregion
 
         #region IEnumerators
-        private IEnumerator PowerOnDisplayEnu()
+        private IEnumerator MainScreenEnu()
         {
             yield return new WaitForEndOfFrame();
+            _animatorController.SetIntHash(_mono.PageHash, 1);
+            _pageName.text = GetLanguage(DisplayLanguagePatching.MainKey);
             _animatorController.SetIntHash(_mono.PageHash, Main);
+
+            if (_mono.HasItems())
+            {
+                _animatorController.OpenDoors();
+            }
         }
 
-        private IEnumerator ShippingScreenEnu()
+        private IEnumerator ShippingScreenEnu(AlterraShippingTarget target)
         {
             yield return new WaitForEndOfFrame();
+
+            if (_animatorController.GetIntHash(_mono.PageHash) == Shipping) yield break;
+
             _animatorController.SetIntHash(_mono.PageHash, Shipping);
+
+            if (target == null) yield break;
+            _sender = true;
+            _mono.ContainerMode = ShippingContainerStates.Shipping;
+            _mono.TransferItems(target);
+
         }
 
         private IEnumerator BootScreenEnu()
@@ -591,13 +626,21 @@ namespace FCSAlterraShipping.Display
 
             if (ShowBootScreen)
             {
+                _pageName.text = GetLanguage(DisplayLanguagePatching.MainKey);
                 _animatorController.SetIntHash(_mono.PageHash, Main);
                 yield return new WaitForSeconds(BootTime);
             }
 
-            PowerOnDisplay();
+            MainScreen();
         }
 
+        private IEnumerator TargetScreenEnu()
+        {
+            yield return new WaitForEndOfFrame();
+            _pageName.text = GetLanguage(DisplayLanguagePatching.ShippingKey);
+            _animatorController.CloseDoors();
+            _animatorController.SetIntHash(_mono.PageHash, BaseSelect);
+        }
         #endregion
     }
 }

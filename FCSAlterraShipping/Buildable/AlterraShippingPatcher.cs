@@ -19,8 +19,8 @@ namespace FCSAlterraShipping.Buildable
 
         #region Public Properties
         public override string AssetsFolder { get; } = $"FCSAlterraShipping/Assets";
-        public override TechGroup GroupForPDA { get; } = TechGroup.BasePieces;
-        public override TechCategory CategoryForPDA { get; } = TechCategory.BasePiece;
+        public override TechGroup GroupForPDA { get; } = TechGroup.InteriorModules;
+        public override TechCategory CategoryForPDA { get; } = TechCategory.InteriorModule;
         #endregion
 
         public static void PatchSMLHelper()
@@ -112,9 +112,8 @@ namespace FCSAlterraShipping.Buildable
                     new Ingredient(TechType.ComputerChip, 1),
                     new Ingredient(TechType.AdvancedWiringKit, 1),
                     new Ingredient(TechType.VehicleStorageModule, 1),
-                    new Ingredient(TechType.CopperWire, 1),
                     new Ingredient(TechType.Beacon, 1),
-                    new Ingredient(TechType.Glass, 2),
+                    new Ingredient(TechType.Glass, 1)
                 }
             };
         }
