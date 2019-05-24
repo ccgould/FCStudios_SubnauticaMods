@@ -18,8 +18,6 @@ namespace FCSAlterraShipping.Display
     {
         #region Private Members
         private GameObject _canvasGameObject;
-        private GameObject _powerOffPage;
-        private GameObject _operationPage;
         private bool _coroutineStarted;
         private AlterraShippingTarget _mono;
         private AlterraShippingAnimator _animatorController;
@@ -545,7 +543,6 @@ namespace FCSAlterraShipping.Display
 
         private void LoadShippingDisplay(AlterraShippingTarget storageItemName)
         {
-            //TODO Re-enable this on release or after needed 
             if (storageItemName.GetInstanceID() == _mono.GetInstanceID()) return;
 
             QuickLogger.Debug("Load Shipping Display");

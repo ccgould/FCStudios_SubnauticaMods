@@ -143,7 +143,6 @@ namespace FCSAlterraShipping.Mono
             _mono.OnTimerChanged?.Invoke(TimeConverters.SecondsToHMS(_currentTime));
         }
 
-        //TODO Remove if not needed
         private AlterraShippingTarget FindTarget(string currentTarget)
         {
             if (currentTarget == String.Empty) return null;

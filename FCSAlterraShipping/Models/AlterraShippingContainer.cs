@@ -87,7 +87,6 @@ namespace FCSAlterraShipping.Models
             return true;
         }
 
-        //TODO Fix This
         public void AddItem(InventoryItem item)
         {
             QuickLogger.Debug($"Adding {item.item.GetTechName()}");

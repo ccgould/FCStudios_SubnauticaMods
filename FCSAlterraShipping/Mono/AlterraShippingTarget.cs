@@ -53,9 +53,13 @@ namespace FCSAlterraShipping.Mono
 
         #endregion
 
+        //TODO clean and organize code fix awake and turn public into internal.
+
         private void Awake()
         {
             ID = gameObject.GetInstanceID();
+
+            Name = $"Shipping Box {ShippingTargetManager.GlobalShippingTargets.Count}";
 
             _prefabID = GetComponentInParent<PrefabIdentifier>();
 
@@ -68,8 +72,6 @@ namespace FCSAlterraShipping.Mono
             {
                 _transferHandler = GetComponentInParent<AlterraShippingTransferHandler>();
             }
-
-            Name = $"Shipping Box {ShippingTargetManager.GlobalShippingTargets.Count}";
 
             if (_transferHandler == null)
             {
@@ -91,11 +93,11 @@ namespace FCSAlterraShipping.Mono
 
             AnimatorController = this.transform.GetComponent<AlterraShippingAnimator>();
             AnimatorController.Initialize(this);
+
             if (AnimatorController == null)
             {
                 QuickLogger.Error("Animator component not found on the GameObject.");
             }
-
 
             InvokeRepeating("CargoContainer", 1, 0.5f);
         }
@@ -108,11 +110,6 @@ namespace FCSAlterraShipping.Mono
         public int PageHash { get; private set; }
 
         public int DoorStateHash { get; private set; }
-
-        private void Update()
-        {
-
-        }
 
         private void OnDestroy()
         {
