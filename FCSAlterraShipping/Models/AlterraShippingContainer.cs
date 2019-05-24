@@ -14,8 +14,8 @@ namespace FCSAlterraShipping.Models
         private readonly ChildObjectIdentifier _containerRoot = null;
         private ItemsContainer _container = null;
         private AlterraShippingTarget _target;
-        private const int ContainerHeight = 6;
-        private const int ContainerWidth = 5;
+        private const int ContainerHeight = 10;
+        private const int ContainerWidth = 8;
         internal const int MaxContainerSlots = ContainerHeight * ContainerWidth;
         public Action OnPDAClose { get; set; }
 

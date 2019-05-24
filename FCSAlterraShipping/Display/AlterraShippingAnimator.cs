@@ -7,9 +7,12 @@ namespace FCSAlterraShipping.Display
 {
     internal class AlterraShippingAnimator : MonoBehaviour
     {
+        #region Private Methods
         private AudioHandler _audioHandler;
         private AlterraShippingTarget _mono;
+        #endregion
 
+        #region Unity Methods   
         private void Start()
         {
             this.Animator = this.transform.GetComponent<Animator>();
@@ -27,8 +30,11 @@ namespace FCSAlterraShipping.Display
 
             _audioHandler = new AudioHandler(transform);
         }
+        #endregion
 
+        #region Public Methods
         public Animator Animator { get; set; }
+        #endregion
 
         #region Internal Methods
         /// <summary>
