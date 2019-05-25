@@ -16,10 +16,15 @@ namespace FCSAlterraShipping.Display.Patching
         public const string WaitingKey = "Waiting";
         public const string PickUpAvailable = "PickUpAvailable";
         public const string MainKey = "Main";
+        public const string ColorBackKey = "Back";
+        public const string BasePageDescriptionKey = "BaseDescription";
+        public const string ColorPageDescriptionKey = "ColorDescription";
+        public const string ColorPickerKey = "ColorPicker";
 
         internal static void AdditionPatching()
         {
             LanguageHandler.SetLanguageLine(CancelKey, "< Cancel Transfer");
+            LanguageHandler.SetLanguageLine(ColorBackKey, "< Back");
             LanguageHandler.SetLanguageLine(OpenStorageKey, "Open Storage");
             LanguageHandler.SetLanguageLine(NextPageKey, "Next Page");
             LanguageHandler.SetLanguageLine(PrevPageKey, "Previous Page");
@@ -30,7 +35,10 @@ namespace FCSAlterraShipping.Display.Patching
             LanguageHandler.SetLanguageLine(ReceivingKey, "RECEIVING");
             LanguageHandler.SetLanguageLine(TimeLeftKey, "Time Left:");
             LanguageHandler.SetLanguageLine(PickUpAvailable, "PickUp Available");
+            LanguageHandler.SetLanguageLine(ColorPickerKey, "Color Picker");
             LanguageHandler.SetLanguageLine(MainKey, "MAIN");
+            LanguageHandler.SetLanguageLine(BasePageDescriptionKey, "Please choose a destination for your items from the list.");
+            LanguageHandler.SetLanguageLine(ColorPageDescriptionKey, "Please choose a color.");
         }
     }
 }

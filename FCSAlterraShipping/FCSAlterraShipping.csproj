@@ -65,6 +65,7 @@
     <Compile Include="Buildable\AlterraShippingModelPrefab.cs" />
     <Compile Include="Buildable\AlterraShippingPatcher.cs" />
     <Compile Include="Display\AlterraShippingAnimator.cs" />
+    <Compile Include="Display\ColorItemButton.cs" />
     <Compile Include="Display\InterfaceButton.cs" />
     <Compile Include="Display\AlterraShippingDisplay.cs" />
     <Compile Include="Display\OnScreenButton.cs" />
@@ -75,6 +76,7 @@
     <Compile Include="Interfaces\IContainer.cs" />
     <Compile Include="Models\AlterraShippingContainer.cs" />
     <Compile Include="Models\AudioHandler.cs" />
+    <Compile Include="Models\ColorHandler.cs" />
     <Compile Include="Models\SaveData.cs" />
     <Compile Include="Models\ShippingTargetManager.cs" />
     <Compile Include="Mono\AlterraShippingTarget.cs" />

@@ -113,6 +113,21 @@ namespace FCSCommon.Helpers
             }
         }
 
+        public static void ChangeMaterialColor(string materialName, GameObject gameObject, Color color)
+        {
+            Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>();
+            foreach (Renderer renderer in renderers)
+            {
+                foreach (Material material in renderer.materials)
+                {
+                    if (material.name.StartsWith(materialName))
+                    {
+                        material.SetColor("_Color", color);
+                    }
+                }
+            }
+        }
+
         /// <summary>
         /// Applies the properties for the MarmosetUBER shader that has a metallic texture.
         /// </summary>

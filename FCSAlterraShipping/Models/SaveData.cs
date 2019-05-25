@@ -1,4 +1,5 @@
 ﻿using FCSAlterraShipping.Enums;
+using FCSCommon.Objects;
 using System.Collections.Generic;
 
 namespace FCSAlterraShipping.Models
@@ -14,5 +15,6 @@ namespace FCSAlterraShipping.Models
         public bool CurrentDoorState { get; set; }
         public ShippingContainerStates ContainertMode { get; set; }
         public string ContainerName { get; set; }
+        public ColorVec4 BodyColor { get; set; }
     }
 }

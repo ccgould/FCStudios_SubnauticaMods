@@ -80,6 +80,7 @@ namespace FCSAlterraShipping.Display
 
         internal bool GetBoolHash(int hash)
         {
+            if (Animator == null) return false;
             return this.Animator.GetBool(hash);
         }
 

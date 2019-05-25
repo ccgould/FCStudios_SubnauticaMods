@@ -10,6 +10,8 @@ namespace FCSAlterraShipping.Buildable
         private AssetBundle _assetBundle;
         private GameObject _Prefab;
         public static GameObject ItemPrefab { get; private set; }
+        public static GameObject ColorItemPrefab { get; set; }
+
         public bool GetPrefabs()
         {
             QuickLogger.Debug("GetPrefabs");
@@ -23,7 +25,9 @@ namespace FCSAlterraShipping.Buildable
             }
 
             _assetBundle = assetBundle;
+
             QuickLogger.Debug($"AssetBundle Set");
+
             //We have found the asset bundle and now we are going to continue by looking for the model.
             GameObject prefab = assetBundle.LoadAsset<GameObject>("AlterraShippingMod");
 
@@ -58,6 +62,21 @@ namespace FCSAlterraShipping.Buildable
                 return false;
             }
 
+            var colorItemPrefab = assetBundle.LoadAsset<GameObject>("ColorItem");
+
+            //If the prefab isn't null lets add the shader to the materials
+            if (colorItemPrefab != null)
+            {
+                ColorItemPrefab = colorItemPrefab;
+
+                QuickLogger.Debug($"{this.FriendlyName} Color Item Prefab Found!");
+            }
+            else
+            {
+                QuickLogger.Error($"{this.FriendlyName} Color Item Prefab Not Found!");
+                return false;
+            }
+
             return true;
         }
 
@@ -78,9 +97,15 @@ namespace FCSAlterraShipping.Buildable
             MaterialHelpers.ApplyNormalShader("FCS_SUBMods_GlobalDecals", "FCS_SUBMods_GlobalDecals_Norm", prefab, _assetBundle);
             #endregion
 
-            #region AlterraShipping
-            MaterialHelpers.ApplyMetallicShader("AlterraShipping", "AlterraShipping_Metallic", prefab, _assetBundle, 0.2f);
-            MaterialHelpers.ApplyNormalShader("AlterraShipping", "AlterraShipping_Norm", prefab, _assetBundle);
+            #region AlterraShipping_BaseDecal
+            MaterialHelpers.ApplyAlphaShader("AlterraShipping_BaseDecal", prefab);
+            MaterialHelpers.ApplyNormalShader("AlterraShipping_BaseDecal", "AlterraShipping_Norm", prefab, _assetBundle);
+            MaterialHelpers.ApplyMetallicShader("AlterraShipping_BaseDecal", "AlterraShipping_Metallic", prefab, _assetBundle, 0.2f);
+            #endregion
+
+            #region AlterraShipping_BaseColor
+            MaterialHelpers.ApplyMetallicShader("AlterraShipping_BaseColor", "AlterraShipping_Metallic", prefab, _assetBundle, 0.2f);
+            MaterialHelpers.ApplyNormalShader("AlterraShipping_BaseColor", "AlterraShipping_Norm", prefab, _assetBundle);
             #endregion
 
         }

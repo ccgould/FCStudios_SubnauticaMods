@@ -35,6 +35,7 @@ namespace FCSAlterraShipping.Mono
         private readonly string SaveDirectory = Path.Combine(SaveUtils.GetCurrentSaveDataDir(), "AlterraShipping");
         private PrefabIdentifier _prefabID;
         private bool _pdaState;
+        private Color _currentBodyColor = Color.white;
         public ShippingContainerStates ContainerMode { get; set; }
         private string SaveFile => Path.Combine(SaveDirectory, _prefabID.Id + ".json");
         public bool IsFull(TechType techType)
@@ -261,7 +262,8 @@ namespace FCSAlterraShipping.Mono
                 CurrentPage = AnimatorController.GetIntHash(PageHash),
                 CurrentDoorState = AnimatorController.GetBoolHash(DoorStateHash),
                 ContainertMode = ContainerMode,
-                ContainerName = Name
+                ContainerName = Name,
+                BodyColor = _currentBodyColor.ColorToVector4()
             };
 
             //int amount = 1;
@@ -314,13 +316,19 @@ namespace FCSAlterraShipping.Mono
                 _transferHandler.SetCurrentTime(savedData.TimeLeft);
                 _transferHandler.SetCurrentTarget(savedData.Target);
                 _transferHandler.SetCurrentItems(_container.GetContainer());
+                _currentBodyColor = savedData.BodyColor.Vector4ToColor();
 
-
+                ColorHandler.ChangeBodyColor("AlterraShipping_BaseColor", _currentBodyColor, gameObject);
                 AnimatorController.SetBoolHash(DoorStateHash, savedData.CurrentDoorState);
                 AnimatorController.SetIntHash(PageHash, savedData.CurrentPage);
 
                 Manager.UpdateGlobalTargets();
             }
+        }
+
+        public void SetCurrentBodyColor(Color color)
+        {
+            _currentBodyColor = color;
         }
     }
 }
