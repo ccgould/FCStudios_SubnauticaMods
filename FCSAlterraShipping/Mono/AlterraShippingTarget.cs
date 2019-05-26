@@ -33,11 +33,12 @@ namespace FCSAlterraShipping.Mono
         private GameObject _cargoContainerModel;
         private bool _hasBreakerTripped;
         private readonly string SaveDirectory = Path.Combine(SaveUtils.GetCurrentSaveDataDir(), "AlterraShipping");
+        private string SaveFile => Path.Combine(SaveDirectory, _prefabID.Id + ".json");
         private PrefabIdentifier _prefabID;
         private bool _pdaState;
         private Color _currentBodyColor = Color.white;
         public ShippingContainerStates ContainerMode { get; set; }
-        private string SaveFile => Path.Combine(SaveDirectory, _prefabID.Id + ".json");
+
         public bool IsFull(TechType techType)
         {
             return _container.IsFull(techType);

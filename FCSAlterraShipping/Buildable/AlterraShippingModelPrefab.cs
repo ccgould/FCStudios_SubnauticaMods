@@ -108,6 +108,12 @@ namespace FCSAlterraShipping.Buildable
             MaterialHelpers.ApplyNormalShader("AlterraShipping_BaseColor", "AlterraShipping_Norm", prefab, _assetBundle);
             #endregion
 
+            #region AlterraShipping_BaseColor
+            //MaterialHelpers.ApplySpecShader("Starship_cargo", "Starship_cargo_spec", prefab, 0.2f, _assetBundle);
+            MaterialHelpers.ApplyNormalShader("Starship_cargo", "Starship_cargo_normal", prefab, _assetBundle);
+            MaterialHelpers.ApplyAlphaShader("Starship_cargo", prefab);
+            #endregion
+
         }
     }
 }

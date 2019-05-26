@@ -87,8 +87,6 @@ namespace FCSAlterraShipping.Buildable
             constructable.techType = this.TechType;
             constructable.model = consoleModel;
 
-            CreateDisplayedContainer(prefab);
-
             prefab.GetOrAddComponent<AlterraShippingTransferHandler>();
 
             prefab.GetOrAddComponent<AlterraShippingAnimator>();
@@ -138,8 +136,7 @@ namespace FCSAlterraShipping.Buildable
                 var cargoBoxModel = GameObject.Instantiate<GameObject>(cargoBox);
 
                 GameObjectHelpers.DestroyComponent(cargoBoxModel);
-
-                cargoBoxModel.transform.SetParent(container.transform);
+                cargoBoxModel.transform.SetParent(container.transform, false);
                 cargoBoxModel.transform.localPosition = new Vector3(0f, -0.3f, 0f);
                 cargoBoxModel.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
                 cargoBoxModel.transform.Rotate(new Vector3(0, 90, 0));

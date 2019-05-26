@@ -77,7 +77,6 @@ namespace FCSCommon.Helpers
                         material.shader = shader;
                         //material.EnableKeyword("_EMISSION");
                         material.EnableKeyword("MARMO_EMISSION");
-
                         material.SetVector("_EmissionColor", emissionColor * emissionMuli);
                         material.SetTexture("_Illum", FindTexture2D(textureName, assetBundle));
                         material.SetVector("_Illum_ST", new Vector4(1.0f, 1.0f, 0.0f, 0.0f));

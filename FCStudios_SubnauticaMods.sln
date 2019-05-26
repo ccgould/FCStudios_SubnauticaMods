@@ -9,17 +9,17 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCSPowerStorage", "FCSPower
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCSAlterraIndustrialSolutions", "FCSAlterraIndustrialSolutions\FCSAlterraIndustrialSolutions.csproj", "{48DD3ADD-AB90-45A0-966B-178396DC1C74}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCSTechWorkBench", "FCSTechWorkBench\FCSTechWorkBench.csproj", "{F6C71D59-136C-4589-9B3C-B796C0BAE7F2}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCSAlterraShipping", "FCSAlterraShipping\FCSAlterraShipping.csproj", "{8ADCD8FA-1EB3-4DF7-A44D-F689322AAC03}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCS_AIJetStreamT242", "FCS_AIJetStreamT242\FCS_AIJetStreamT242.csproj", "{A6D5F567-127A-4EE3-9959-8C228B040290}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		FCSCommon\FCSCommon.projitems*{32a3f9b5-9089-4478-b706-952b706f08da}*SharedItemsImports = 4
 		FCSCommon\FCSCommon.projitems*{48dd3add-ab90-45a0-966b-178396dc1c74}*SharedItemsImports = 4
 		FCSCommon\FCSCommon.projitems*{8adcd8fa-1eb3-4df7-a44d-f689322aac03}*SharedItemsImports = 4
+		FCSCommon\FCSCommon.projitems*{a6d5f567-127a-4ee3-9959-8c228b040290}*SharedItemsImports = 4
 		FCSCommon\FCSCommon.projitems*{dbc34043-0f09-42ef-beb9-f59cbc6df16f}*SharedItemsImports = 13
-		FCSCommon\FCSCommon.projitems*{f6c71d59-136c-4589-9b3c-b796c0bae7f2}*SharedItemsImports = 4
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -34,14 +34,14 @@ Global
 		{48DD3ADD-AB90-45A0-966B-178396DC1C74}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{48DD3ADD-AB90-45A0-966B-178396DC1C74}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{48DD3ADD-AB90-45A0-966B-178396DC1C74}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F6C71D59-136C-4589-9B3C-B796C0BAE7F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F6C71D59-136C-4589-9B3C-B796C0BAE7F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F6C71D59-136C-4589-9B3C-B796C0BAE7F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F6C71D59-136C-4589-9B3C-B796C0BAE7F2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8ADCD8FA-1EB3-4DF7-A44D-F689322AAC03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8ADCD8FA-1EB3-4DF7-A44D-F689322AAC03}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8ADCD8FA-1EB3-4DF7-A44D-F689322AAC03}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8ADCD8FA-1EB3-4DF7-A44D-F689322AAC03}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A6D5F567-127A-4EE3-9959-8C228B040290}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A6D5F567-127A-4EE3-9959-8C228B040290}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A6D5F567-127A-4EE3-9959-8C228B040290}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A6D5F567-127A-4EE3-9959-8C228B040290}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

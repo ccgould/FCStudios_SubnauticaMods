@@ -16,6 +16,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Controllers\AIDeepBatteryController.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controllers\AIDeepDrillerSolarController.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\TimeConverters.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Enums\InterfaceButtonMode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exceptions\PatchTerminatedException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\ColorExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\FloatExtenstions.cs" />
@@ -27,12 +28,14 @@
     <Compile Include="$(MSBuildThisFileDirectory)Generics\CustomProp.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\AssetHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\GameObjectHelpers.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\LanguageHelpers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\MaterialHelpers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\WorldHelpers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Abstract\AIDisplay.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Abstract\ModStrings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\Colors.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\ColorVec4.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Objects\CustomLiveMixinData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\EatableEntities.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\Modules\DeepDrillerModule.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\SerializableColor.cs" />

@@ -95,7 +95,6 @@
     <Compile Include="Models\Controllers\MarineMoniterDisplay.cs" />
     <Compile Include="Models\Controllers\MarineMonitorController.cs" />
     <Compile Include="Models\Enums\DrillState.cs" />
-    <Compile Include="Models\Enums\InterfaceButtonMode.cs" />
     <Compile Include="Models\Abstract\AIDisplay.cs" />
     <Compile Include="Models\Enums\PowerState.cs" />
     <Compile Include="Models\Enums\ShaftStates.cs" />

@@ -1,4 +1,4 @@
-﻿namespace FCSAlterraIndustrialSolutions.Models.Enums
+﻿namespace FCSCommon.Enums
 {
     public enum InterfaceButtonMode
     {

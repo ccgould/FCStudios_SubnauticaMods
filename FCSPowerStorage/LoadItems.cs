@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using FCSCommon.Utilities.Language;
+﻿using FCSCommon.Utilities.Language;
 using FCSPowerStorage.Configuration;
 using FCSPowerStorage.Logging;
 using FCSPowerStorage.Model;
 using Harmony;
 using Oculus.Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
@@ -89,14 +89,14 @@ namespace FCSPowerStorage
 
                 var powerStorageIDs = GetTurbineIds(powerStorage);
 
-                Log.Info($"turbineIDs Count: {powerStorageIDs.Count()}");
+                Log.Info($"powerStorageIDs Count: {powerStorageIDs.Count()}");
 
                 var savesFolderFiles = GetSaveFiles(Information.ModName).ToList();
 
                 Log.Info($"savesFolderFiles Count: {savesFolderFiles.Count()}");
 
                 savesFolderFiles.RemoveAll(c => powerStorageIDs.ToList().Exists(n => c.Contains(n)));
- 
+
 
                 foreach (var file in savesFolderFiles)
                 {

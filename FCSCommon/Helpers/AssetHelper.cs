@@ -33,6 +33,11 @@ namespace FCSCommon.Helpers
             return Path.Combine(Path.Combine(Environment.CurrentDirectory, "QMods"), Path.Combine(modName, "Assets"));
         }
 
+        public static string GetConfigFolder(string modName)
+        {
+            return Path.Combine(Path.Combine(Environment.CurrentDirectory, "QMods"), Path.Combine(modName, "Configuration"));
+        }
+
         public static AssetBundle Asset(string bundleLocation)
         {
             if (string.IsNullOrEmpty(bundleLocation))

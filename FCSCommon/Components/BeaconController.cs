@@ -5,7 +5,13 @@ namespace FCSCommon.Components
 {
     public class BeaconController : MonoBehaviour
     {
+        private int _beaconStateHash;
         public Animator Animator { get; set; }
+
+        private void Awake()
+        {
+            _beaconStateHash = UnityEngine.Animator.StringToHash("BeaconState");
+        }
 
         public void ShowBeacon()
         {
@@ -19,12 +25,9 @@ namespace FCSCommon.Components
 
         private IEnumerator HideBeaconCoroutine()
         {
-            Animator.enabled = true;
-
             yield return new WaitForEndOfFrame();
 
-            Animator.SetBool("BeaconOn", false);
-            Animator.SetBool("BeaconOff", true);
+            Animator.SetBool(_beaconStateHash, false);
 
             yield return new WaitForEndOfFrame();
 
@@ -34,8 +37,7 @@ namespace FCSCommon.Components
         {
             yield return new WaitForEndOfFrame();
 
-            Animator.SetBool("BeaconOff", false);
-            Animator.SetBool("BeaconOn", true);
+            Animator.SetBool(_beaconStateHash, true);
 
             yield return new WaitForEndOfFrame();
         }
