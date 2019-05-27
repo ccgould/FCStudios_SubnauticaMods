@@ -1,4 +1,4 @@
-﻿using FCSPowerStorage.Logging;
+﻿using FCSCommon.Utilities;
 using FCSPowerStorage.Utilities.Enums;
 using System.Collections;
 using UnityEngine;
@@ -60,13 +60,14 @@ namespace FCSPowerStorage.Model.Components
         #region Private Methods
         private IEnumerator ChangeCurrentPage()
         {
+            QuickLogger.Debug($"Clicked {ChangePage.name}");
             FcsPowerStorageDisplay.ResetAnimation();
 
             yield return new WaitForEndOfFrame();
             if (FcsPowerStorageDisplay.CustomBatteryController.IsBeingDeleted) yield break;
             if (ChangePage.name.Equals("BatteryMonitorPage"))
             {
-                Log.Info($"Clicked {ChangePage.name}");
+
                 FcsPowerStorageDisplay.Animator.SetBool("SettingsPageTrans", false);
                 FcsPowerStorageDisplay.Animator.SetBool("BatteryMonitorTrans", true);
 
@@ -75,23 +76,17 @@ namespace FCSPowerStorage.Model.Components
             }
             else if (ChangePage.name.Equals("SettingsPage"))
             {
-
-                Log.Info($"Clicked {ChangePage.name}");
-
                 FcsPowerStorageDisplay.Animator.SetBool("ColorPageTrans", false);
                 FcsPowerStorageDisplay.Animator.SetBool("SettingsPageTrans", true);
-
 
                 if (FcsPowerStorageDisplay.CustomBatteryController.IsBeingDeleted) yield break;
                 yield return new WaitForSeconds(FcsPowerStorageDisplay.SETTINGS_PAGE_ANIMATION_TIME);
             }
             else if (ChangePage.name.Equals("PowerOffPage"))
             {
-                Log.Info($"Clicked {ChangePage.name}");
-
                 if (!FcsPowerStorageDisplay.CustomBatteryController.HasBreakerTripped)
                 {
-                    Log.Info("System powering down down");
+                    QuickLogger.Debug("System powering down down");
                     FcsPowerStorageDisplay.Animator.SetBool("Reboot", true);
                     FcsPowerStorageDisplay.Animator.SetBool("PowerOff", true);
                     FcsPowerStorageDisplay.EnterPowerOffScreen();
@@ -99,7 +94,7 @@ namespace FCSPowerStorage.Model.Components
                 }
                 else
                 {
-                    Log.Info("System booting up");
+                    QuickLogger.Debug("System booting up");
                     FcsPowerStorageDisplay.CustomBatteryController.HasBreakerTripped = false;
                     FcsPowerStorageDisplay.ResetNavigationBar();
                     FcsPowerStorageDisplay.CustomBatteryController.PowerOnBattery();

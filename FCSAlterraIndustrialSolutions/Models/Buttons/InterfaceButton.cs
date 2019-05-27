@@ -1,5 +1,5 @@
 ﻿using FCSAlterraIndustrialSolutions.Logging;
-using FCSAlterraIndustrialSolutions.Models.Enums;
+using FCSCommon.Enums;
 using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -33,7 +33,7 @@ namespace FCSAlterraIndustrialSolutions.Models.Buttons
         #endregion
 
         #region Public Methods
-        
+
         public void Start()
         {
             if (GetComponent<Image>() != null)
@@ -44,7 +44,7 @@ namespace FCSAlterraIndustrialSolutions.Models.Buttons
                 }
                 else
                 {
-                    GetComponent<Image>().color = new Color(1,1,1,0);
+                    GetComponent<Image>().color = new Color(1, 1, 1, 0);
 
                 }
             }

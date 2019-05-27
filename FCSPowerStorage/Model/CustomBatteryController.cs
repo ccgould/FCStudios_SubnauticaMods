@@ -1,7 +1,7 @@
 ﻿using FCSCommon.Extensions;
+using FCSCommon.Utilities;
 using FCSPowerStorage.Configuration;
 using FCSPowerStorage.Helpers;
-using FCSPowerStorage.Logging;
 using FCSPowerStorage.Model.Components;
 using FCSPowerStorage.Utilities.Enums;
 using Oculus.Newtonsoft.Json;
@@ -96,12 +96,6 @@ namespace FCSPowerStorage.Model
             {
                 Initialize();
             }
-
-            if (!_initialized || !constructable._constructed)
-            {
-                //Log.Info("Not Constructed");
-            }
-
         }
 
         #endregion
@@ -203,7 +197,6 @@ namespace FCSPowerStorage.Model
                     bool charging = false;
                     PowerRelay relay = PowerSource.FindRelay(transform);
 
-                    //Log.Info(relay.name);
                     if (relay != null)
                     {
                         if (StoredPower < LoadItems.BatteryConfiguration.Capacity)
@@ -255,14 +248,14 @@ namespace FCSPowerStorage.Model
             var startingOrPlaying = SoundCharge.GetIsStartingOrPlaying();
             if (charging)
             {
-                Log.Info("Charging Battery");
+                QuickLogger.Debug("Charging Battery");
                 if (startingOrPlaying)
                     return;
                 SoundCharge.StartEvent();
             }
             else
             {
-                Log.Info("Not Charging Battery");
+                QuickLogger.Debug("Not Charging Battery");
 
                 if (!startingOrPlaying)
                     return;
@@ -306,7 +299,7 @@ namespace FCSPowerStorage.Model
             CancelInvoke("UpdatePowerRelay");
             if (!(_connectedRelay != null))
                 return;
-            Log.Info("RemoveInboundPower");
+            QuickLogger.Debug("RemoveInboundPower");
             _connectedRelay.RemoveInboundPower(this);
         }
 
@@ -338,7 +331,7 @@ namespace FCSPowerStorage.Model
             }
             catch (Exception e)
             {
-                Log.Error($"Error in TurnDisplayOn Method: {e.Message} || {e.InnerException} || {e.Source}");
+                QuickLogger.Error($"Error in TurnDisplayOn Method: {e.Message} || {e.InnerException} || {e.Source}");
             }
         }
 
@@ -364,7 +357,7 @@ namespace FCSPowerStorage.Model
             if (seaBase == null)
             {
                 ErrorMessage.AddMessage("[FCS Power Storage] ERROR: Can not work out what base it was placed inside.");
-                Log.Error("ERROR: Can not work out what base it was placed inside.");
+                QuickLogger.Error("ERROR: Can not work out what base it was placed inside.");
                 yield break;
             }
 
@@ -390,7 +383,6 @@ namespace FCSPowerStorage.Model
 
         public bool ModifyPower(float amount, out float modified)
         {
-            //Log.Info("In Modify");
             modified = 0f;
 
             var battery = this;
@@ -436,14 +428,14 @@ namespace FCSPowerStorage.Model
 
         public void OnProtoSerialize(ProtobufSerializer serializer)
         {
-            Log.Info($"Get FCSPowerStorageDisplay");
+            QuickLogger.Debug($"Get FCSPowerStorageDisplay");
 
             var activeDisplay = GetComponentInParent<FCSPowerStorageDisplay>();
 
-            Log.Info($"Found FCSPowerStorageDisplay");
+            QuickLogger.Debug($"Found FCSPowerStorageDisplay");
             SaveData saveData = null;
 
-            Log.Info($"Create Save Data");
+            QuickLogger.Debug($"Create Save Data");
 
 
             saveData = new SaveData
@@ -467,12 +459,12 @@ namespace FCSPowerStorage.Model
                 BodyColor = MainBodyColor.ColorToVector4()
             };
 
-            Log.Info($"Save Data Created");
+            QuickLogger.Debug($"Save Data Created");
 
             var id = GetComponentInParent<PrefabIdentifier>();
             if (id != null)
             {
-                Log.Info($"Loading FCS Power Storage {id.Id}");
+                QuickLogger.Debug($"Loading FCS Power Storage {id.Id}");
 
                 string saveFolder = FilesHelper.GetSaveFolderPath();
                 if (!Directory.Exists(saveFolder))
@@ -484,7 +476,7 @@ namespace FCSPowerStorage.Model
             }
             else
             {
-                Log.Error("PrefabIdentifier is null");
+                QuickLogger.Error("PrefabIdentifier is null");
             }
         }
 
@@ -493,7 +485,7 @@ namespace FCSPowerStorage.Model
             var id = GetComponentInParent<PrefabIdentifier>();
             if (id != null)
             {
-                Log.Info($"Loading FCS Power Storage {id.Id}");
+                QuickLogger.Debug($"Loading FCS Power Storage {id.Id}");
 
                 string filePath = Path.Combine(FilesHelper.GetSaveFolderPath(), "fcspowerstorage_" + id.Id + ".json");
                 if (File.Exists(filePath))
@@ -520,27 +512,26 @@ namespace FCSPowerStorage.Model
                     StoredPower = savedData.StoredPower;
                     ChargeMode = savedData.ChargeMode;
                     MainBodyColor = savedData.BodyColor.Vector4ToColor();
-                    Log.Info($"// =========================================================== {gameObject.name} =============================//");
+                    QuickLogger.Debug($"// =========================================================== {gameObject.name} =============================//");
                     ColorChanger.ApplyMaterials(gameObject, MainBodyColor);
                 }
             }
             else
             {
-                Log.Error("PrefabIdentifier is null");
+                QuickLogger.Error("PrefabIdentifier is null");
             }
 
         }
 
         public bool CanDeconstruct(out string reason)
         {
-            //Log.Info("Can Destruct");
             reason = "";
             return true;
         }
 
         public void OnConstructedChanged(bool constructed)
         {
-            Log.Info($"Constructed - {constructed}");
+            QuickLogger.Debug($"Constructed - {constructed}");
 
             if (IsBeingDeleted) return;
 
@@ -578,7 +569,7 @@ namespace FCSPowerStorage.Model
 
             if (chargeState == PowerToggleStates.ChargeMode && _previousToggleState != chargeState)
             {
-                Log.Info("Activating Charge Mode");
+                QuickLogger.Debug("Activating Charge Mode");
                 //_previousToggleState = chargeState;
                 ChargeMode = chargeState;
                 StoredPower = Charge;
@@ -587,7 +578,7 @@ namespace FCSPowerStorage.Model
 
             if (chargeState == PowerToggleStates.TrickleMode && _previousToggleState != chargeState)
             {
-                Log.Info("Activating Trickle Mode");
+                QuickLogger.Debug("Activating Trickle Mode");
                 //_previousToggleState = chargeState;
                 ChargeMode = chargeState;
                 Charge = StoredPower;

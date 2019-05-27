@@ -1,4 +1,4 @@
-﻿using FCSPowerStorage.Logging;
+﻿using FCSCommon.Utilities;
 using System;
 using Utilites.Logger;
 
@@ -13,18 +13,21 @@ namespace FCSPowerStorage
             //Clear log file
             Logger.ClearCustomLog();
 
-            Log.Info("Initializing FCS Power Storage");
+            QuickLogger.Debug("Initializing FCS Power Storage");
             try
             {
+#if DEBUG
+            QuickLogger.DebugLogsEnabled = true;
+            QuickLogger.Debug("Debug logs enabled");
+#endif
                 LoadItems.Patch();
             }
             catch (Exception e)
             {
                 _success = false;
-                Log.e(e);
-                Log.Debug("Error in QPatch");
+                QuickLogger.Error("Error in QPatch");
             }
-            Log.Info("FCS Power Storage initializ" + (!_success ? "ation failed." : "ed successfully."));
+            QuickLogger.Debug("FCS Power Storage initializ" + (!_success ? "ation failed." : "ed successfully."));
         }
     }
 }

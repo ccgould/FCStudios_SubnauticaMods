@@ -91,8 +91,6 @@
     <Compile Include="Helpers\ItemHelpers.cs" />
     <Compile Include="Helpers\Utilities.cs" />
     <Compile Include="LoadItems.cs" />
-    <Compile Include="Logging\Log.cs" />
-    <Compile Include="Logging\Reporters.cs" />
     <Compile Include="Model\Components\ColorItemButton.cs" />
     <Compile Include="Model\Components\FCSPowerStorageDisplay.cs" />
     <Compile Include="Model\Components\InterfaceButton.cs" />

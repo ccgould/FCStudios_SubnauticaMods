@@ -1,7 +1,7 @@
 ﻿using FCSCommon.Objects;
+using FCSCommon.Utilities;
 using FCSPowerStorage.Configuration;
 using FCSPowerStorage.Helpers;
-using FCSPowerStorage.Logging;
 using FCSPowerStorage.Utilities.Enums;
 using Oculus.Newtonsoft.Json;
 using System;
@@ -273,7 +273,6 @@ namespace FCSPowerStorage.Model.Components
         /// <param name="screen"></param>
         public void ResetScreen(string screen)
         {
-            Log.Info("In Reset Screen");
             _welcomeScreen.SetActive(false);
             _batteryMonitorPage.SetActive(false);
             _settingsScreen.SetActive(false);
@@ -395,7 +394,7 @@ namespace FCSPowerStorage.Model.Components
 
             if (CanvasGameObject == null)
             {
-                Log.Error("Canvas not found.");
+                QuickLogger.Error("Canvas not found.");
                 return false;
             }
 
@@ -407,7 +406,7 @@ namespace FCSPowerStorage.Model.Components
             NavigationDock = CanvasGameObject.transform.Find("Navigation_Dock")?.gameObject;
             if (NavigationDock == null)
             {
-                Log.Error("Dock: Navigation_Dock not found.");
+                QuickLogger.Error("Dock: Navigation_Dock not found.");
                 return false;
             }
             #endregion
@@ -418,7 +417,7 @@ namespace FCSPowerStorage.Model.Components
             _background = CanvasGameObject.transform.Find("Background")?.gameObject;
             if (_background == null)
             {
-                Log.Error("Screen: Background not found.");
+                QuickLogger.Error("Screen: Background not found.");
                 return false;
             }
             #endregion
@@ -429,7 +428,7 @@ namespace FCSPowerStorage.Model.Components
 
             if (Animator == null)
             {
-                Log.Error("Animator not found.");
+                QuickLogger.Error("Animator not found.");
                 return false;
             }
 
@@ -441,7 +440,7 @@ namespace FCSPowerStorage.Model.Components
 
             if (screenHolder == null)
             {
-                Log.Error("Screen Holder GameObject not found.");
+                QuickLogger.Error("Screen Holder GameObject not found.");
                 return false;
             }
 
@@ -451,7 +450,7 @@ namespace FCSPowerStorage.Model.Components
             _blackout = CanvasGameObject.transform.Find("BlackOut")?.gameObject;
             if (_blackout == null)
             {
-                Log.Error("Screen: BlackOut not found.");
+                QuickLogger.Error("Screen: BlackOut not found.");
                 return false;
             }
             #endregion
@@ -463,7 +462,7 @@ namespace FCSPowerStorage.Model.Components
             _welcomeScreen = screenHolder.FindChild("WelcomePage")?.gameObject;
             if (_welcomeScreen == null)
             {
-                Log.Error("Screen: WelcomeScreen not found.");
+                QuickLogger.Error("Screen: WelcomeScreen not found.");
                 return false;
             }
 
@@ -473,7 +472,7 @@ namespace FCSPowerStorage.Model.Components
 
             if (versionLbl == null)
             {
-                Log.Info("Cannot find Version_Text Game Object");
+                QuickLogger.Error("Cannot find Version_Text Game Object");
             }
 
             string assemblyVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
@@ -485,7 +484,7 @@ namespace FCSPowerStorage.Model.Components
             _settingsScreen = screenHolder.FindChild("SettingsPage")?.gameObject;
             if (_settingsScreen == null)
             {
-                Log.Error("Screen: SettingsPage not found.");
+                QuickLogger.Error("Screen: SettingsPage not found.");
                 return false;
             }
 
@@ -495,7 +494,7 @@ namespace FCSPowerStorage.Model.Components
             _batteryMonitorPage = screenHolder.FindChild("BatteryMonitorPage")?.gameObject;
             if (_batteryMonitorPage == null)
             {
-                Log.Error("Screen: BatteryMonitorPage not found.");
+                QuickLogger.Error("Screen: BatteryMonitorPage not found.");
                 return false;
             }
             #endregion
@@ -507,7 +506,7 @@ namespace FCSPowerStorage.Model.Components
             {
                 if (progessBar == null)
                 {
-                    Log.Error($"Screen: A Progress bar was not found.");
+                    QuickLogger.Error($"Screen: A Progress bar was not found.");
                     return false;
                 }
 
@@ -526,7 +525,7 @@ namespace FCSPowerStorage.Model.Components
             _powerOffPage = screenHolder.FindChild("PowerOffPage")?.gameObject;
             if (_powerOffPage == null)
             {
-                Log.Error("Screen: PowerOffPage not found.");
+                QuickLogger.Error("Screen: PowerOffPage not found.");
                 return false;
             }
             #endregion
@@ -535,7 +534,7 @@ namespace FCSPowerStorage.Model.Components
             _bootingPage = screenHolder.FindChild("BootingPage")?.gameObject;
             if (_bootingPage == null)
             {
-                Log.Error("Screen: BootingPage not found.");
+                QuickLogger.Error("Screen: BootingPage not found.");
                 return false;
             }
             #endregion
@@ -546,7 +545,7 @@ namespace FCSPowerStorage.Model.Components
             _batteryMonitorAmountLBL = _batteryMonitorPage.FindChild("Battery_Monitor_Amount_LBL")?.gameObject;
             if (_batteryMonitorAmountLBL == null)
             {
-                Log.Error("Screen: Battery_Monitor_Amount_LBL not found.");
+                QuickLogger.Error("Screen: Battery_Monitor_Amount_LBL not found.");
                 return false;
             }
             #endregion
@@ -555,7 +554,7 @@ namespace FCSPowerStorage.Model.Components
             _batteryMonitorLBL = _batteryMonitorPage.FindChild("Battery_Monitor_LBL")?.gameObject;
             if (_batteryMonitorLBL == null)
             {
-                Log.Error("Screen: Battery_Monitor_LBL not found.");
+                QuickLogger.Error("Screen: Battery_Monitor_LBL not found.");
                 return false;
             }
             #endregion
@@ -566,7 +565,7 @@ namespace FCSPowerStorage.Model.Components
             _bootingLBL = _bootingPage.FindChild("Booting_TXT")?.gameObject;
             if (_bootingLBL == null)
             {
-                Log.Error("Screen: _bootingLBL  not found.");
+                QuickLogger.Error("Screen: _bootingLBL  not found.");
                 return false;
             }
 
@@ -577,7 +576,7 @@ namespace FCSPowerStorage.Model.Components
             _colorPicker = _settingsScreen.FindChild("Color_Picker")?.gameObject;
             if (_colorPicker == null)
             {
-                Log.Error("Screen: _color_Picker not found.");
+                QuickLogger.Error("Screen: _color_Picker not found.");
                 return false;
             }
 
@@ -592,7 +591,7 @@ namespace FCSPowerStorage.Model.Components
             _colorPickerLBL = _colorPicker.FindChild("Label")?.gameObject;
             if (_colorPickerLBL == null)
             {
-                Log.Error("Screen: Color Picker Label not found.");
+                QuickLogger.Error("Screen: Color Picker Label not found.");
                 return false;
             }
 
@@ -603,7 +602,7 @@ namespace FCSPowerStorage.Model.Components
             _settingsLBL = _settingsScreen.FindChild("Setting_LBL")?.gameObject;
             if (_settingsLBL == null)
             {
-                Log.Error("Screen: Settings Page Label not found.");
+                QuickLogger.Error("Screen: Settings Page Label not found.");
                 return false;
             }
 
@@ -614,7 +613,7 @@ namespace FCSPowerStorage.Model.Components
             _storageModeLBL = _settingsScreen.FindChild("Storage_Mode_LBL")?.gameObject;
             if (_storageModeLBL == null)
             {
-                Log.Error("Screen: Storage Mode Label not found.");
+                QuickLogger.Error("Screen: Storage Mode Label not found.");
                 return false;
             }
 
@@ -624,7 +623,7 @@ namespace FCSPowerStorage.Model.Components
             TrickleModeBTN = _settingsScreen.FindChild("Trickle_Mode")?.gameObject;
             if (TrickleModeBTN == null)
             {
-                Log.Error("Screen: Trickle_Mode not found.");
+                QuickLogger.Error("Screen: Trickle_Mode not found.");
                 return false;
             }
 
@@ -636,7 +635,7 @@ namespace FCSPowerStorage.Model.Components
             TrickleModeCheckBox = TrickleModeBTN.FindChild("Background").FindChild("Checkmark")?.gameObject;
             if (TrickleModeCheckBox == null)
             {
-                Log.Error("Screen: Trickle_Mode =>Checkmark not found.");
+                QuickLogger.Error("Screen: Trickle_Mode =>Checkmark not found.");
                 return false;
             }
             #endregion
@@ -645,7 +644,7 @@ namespace FCSPowerStorage.Model.Components
             _trickleModeLbl = TrickleModeBTN.FindChild("Label")?.gameObject;
             if (_trickleModeLbl == null)
             {
-                Log.Error("Screen: TrickleModeLabel not found.");
+                QuickLogger.Error("Screen: TrickleModeLabel not found.");
                 return false;
             }
             #endregion
@@ -654,7 +653,7 @@ namespace FCSPowerStorage.Model.Components
             ChargeModeBTN = _settingsScreen.FindChild("Charge_Mode")?.gameObject;
             if (ChargeModeBTN == null)
             {
-                Log.Error("Screen: Charge_Mode not found.");
+                QuickLogger.Error("Screen: Charge_Mode not found.");
                 return false;
             }
 
@@ -667,7 +666,7 @@ namespace FCSPowerStorage.Model.Components
             ChargeModeCheckBox = ChargeModeBTN.FindChild("Background").FindChild("Checkmark")?.gameObject;
             if (ChargeModeCheckBox == null)
             {
-                Log.Error("Screen: Charge_Mode =>Checkmark not found.");
+                QuickLogger.Error("Screen: Charge_Mode =>Checkmark not found.");
                 return false;
             }
             #endregion
@@ -676,7 +675,7 @@ namespace FCSPowerStorage.Model.Components
             _chargeModeLBL = ChargeModeBTN.FindChild("Label")?.gameObject;
             if (_chargeModeLBL == null)
             {
-                Log.Error("Screen: Charge Mode LBL not found.");
+                QuickLogger.Error("Screen: Charge Mode LBL not found.");
                 return false;
             }
             #endregion
@@ -687,7 +686,7 @@ namespace FCSPowerStorage.Model.Components
             _colorPickerPage = screenHolder.FindChild("ColorPickerPage")?.gameObject;
             if (_colorPickerPage == null)
             {
-                Log.Error("Screen: ColorPicker not found.");
+                QuickLogger.Error("Screen: ColorPicker not found.");
                 return false;
             }
             #endregion
@@ -696,7 +695,7 @@ namespace FCSPowerStorage.Model.Components
             _previousPageGameObject = _colorPickerPage.FindChild("Back_Arrow_BTN")?.gameObject;
             if (_previousPageGameObject == null)
             {
-                Log.Error("Screen: Back_Arrow_BTN not found.");
+                QuickLogger.Error("Screen: Back_Arrow_BTN not found.");
                 return false;
             }
 
@@ -709,7 +708,7 @@ namespace FCSPowerStorage.Model.Components
             _nextPageGameObject = _colorPickerPage.FindChild("Forward_Arrow_BTN")?.gameObject;
             if (_nextPageGameObject == null)
             {
-                Log.Error("Screen: Forward_Arrow_BTN not found.");
+                QuickLogger.Error("Screen: Forward_Arrow_BTN not found.");
                 return false;
             }
 
@@ -722,14 +721,14 @@ namespace FCSPowerStorage.Model.Components
             _pageCounter = _colorPickerPage.FindChild("Page_Number")?.gameObject;
             if (_pageCounter == null)
             {
-                Log.Error("Screen: Page_Number not found.");
+                QuickLogger.Error("Screen: Page_Number not found.");
                 return false;
             }
 
             _pageCounterText = _pageCounter.GetComponent<Text>();
             if (_pageCounterText == null)
             {
-                Log.Error("Screen: _pageCounterText not found.");
+                QuickLogger.Error("Screen: _pageCounterText not found.");
                 return false;
             }
             #endregion
@@ -741,7 +740,7 @@ namespace FCSPowerStorage.Model.Components
             _settingButton = NavigationDock.transform.Find("Settings_BTN")?.gameObject;
             if (_settingButton == null)
             {
-                Log.Error("Dock: Settings_BTN not found.");
+                QuickLogger.Error("Dock: Settings_BTN not found.");
                 return false;
             }
 
@@ -755,7 +754,7 @@ namespace FCSPowerStorage.Model.Components
             _homeButton = NavigationDock.transform.Find("Home_BTN")?.gameObject;
             if (_homeButton == null)
             {
-                Log.Error("Dock: Home_BTN not found.");
+                QuickLogger.Error("Dock: Home_BTN not found.");
                 return false;
             }
 
@@ -768,7 +767,7 @@ namespace FCSPowerStorage.Model.Components
             _powerButton = NavigationDock.transform.Find("Power_BTN")?.gameObject;
             if (_powerButton == null)
             {
-                Log.Error("Dock: Power_BTN not found.");
+                QuickLogger.Error("Dock: Power_BTN not found.");
                 return false;
             }
 
@@ -821,12 +820,6 @@ namespace FCSPowerStorage.Model.Components
             int startingPosition = (_currentPage - 1) * ITEMS_PER_PAGE;
             int endingPosition = startingPosition + ITEMS_PER_PAGE;
 
-            //====================================================================//
-            //Log.Info($"//=================== StartPosition | {startingPosition} ============================== //");
-            //Log.Info($"//=================== StartPosition | {endingPosition} ============================== //");
-            //Log.Info($"//=================== SerializedColors Count| {_serializedColors.Count} ============================== //");
-            //====================================================================//
-
             if (endingPosition > _serializedColors.Count)
             {
                 endingPosition = _serializedColors.Count;
@@ -873,8 +866,6 @@ namespace FCSPowerStorage.Model.Components
 
         private void EnterIdleScreen()
         {
-            Log.Info($"EnterIdleScreen");
-
             _isIdle = true;
             _settingsScreen.SetActive(false);
             ResetIdleTimer();
@@ -885,7 +876,6 @@ namespace FCSPowerStorage.Model.Components
 
         private void ExitIdleScreen()
         {
-            Log.Info($"ExitIdleScreen");
             _settingsScreen.SetActive(false);
 
 
@@ -900,7 +890,7 @@ namespace FCSPowerStorage.Model.Components
         private void CalculateNewIdleTime()
         {
             _idlePeriodLength = IDLE_TIME + Random.Range(IDLE_TIME_RANDOMNESS_LOW_BOUND, IDLE_TIME_RANDOMNESS_HIGH_BOUND);
-            Log.Info($"CalculateNewIdleTime:  Idle Period Length{_idlePeriodLength}");
+            QuickLogger.Debug($"CalculateNewIdleTime:  Idle Period Length{_idlePeriodLength}");
         }
 
         internal void ResetIdleTimer()

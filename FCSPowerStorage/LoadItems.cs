@@ -1,6 +1,6 @@
-﻿using FCSCommon.Utilities.Language;
+﻿using FCSCommon.Utilities;
+using FCSCommon.Utilities.Language;
 using FCSPowerStorage.Configuration;
-using FCSPowerStorage.Logging;
 using FCSPowerStorage.Model;
 using Harmony;
 using Oculus.Newtonsoft.Json;
@@ -34,7 +34,7 @@ namespace FCSPowerStorage
             //LoadData
             BatteryConfiguration = JsonConvert.DeserializeObject<BatteryConfiguration>(configJson);
 
-            Log.Info(BatteryConfiguration.ValidateData().ToString());
+            QuickLogger.Debug(BatteryConfiguration.ValidateData().ToString());
 
 
             LoadLanguage();
@@ -64,7 +64,7 @@ namespace FCSPowerStorage
             {
                 ModStrings = new ModStrings();
                 ModStrings.LoadDefault();
-                Log.Error($"Language {currentLang} not found in the languages.json");
+                QuickLogger.Error($"Language {currentLang} not found in the languages.json");
             }
         }
 
@@ -89,11 +89,11 @@ namespace FCSPowerStorage
 
                 var powerStorageIDs = GetTurbineIds(powerStorage);
 
-                Log.Info($"powerStorageIDs Count: {powerStorageIDs.Count()}");
+                QuickLogger.Debug($"powerStorageIDs Count: {powerStorageIDs.Count()}");
 
                 var savesFolderFiles = GetSaveFiles(Information.ModName).ToList();
 
-                Log.Info($"savesFolderFiles Count: {savesFolderFiles.Count()}");
+                QuickLogger.Debug($"savesFolderFiles Count: {savesFolderFiles.Count()}");
 
                 savesFolderFiles.RemoveAll(c => powerStorageIDs.ToList().Exists(n => c.Contains(n)));
 

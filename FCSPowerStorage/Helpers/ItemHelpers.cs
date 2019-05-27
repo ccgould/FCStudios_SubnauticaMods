@@ -1,8 +1,8 @@
-﻿using SMLHelper.V2.Crafting;
+﻿using FCSCommon.Utilities;
+using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
 using System;
 using System.Collections.Generic;
-using FCSPowerStorage.Logging;
 
 namespace FCSPowerStorage.Helpers
 {
@@ -44,8 +44,8 @@ namespace FCSPowerStorage.Helpers
                     }
                     else
                     {
-                        Log.Warning(linkedItem, $"{linkedItem} must be a TechType");
-                        Log.Info(linkedItem, $"{linkedItem} was set to a dummy value and disabled");
+                        QuickLogger.Warning($"{linkedItem} must be a TechType");
+                        QuickLogger.Error($"{linkedItem} was set to a dummy value and disabled");
                     }
                 }
                 else

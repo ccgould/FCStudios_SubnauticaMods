@@ -1,5 +1,5 @@
 ﻿using FCSCommon.Extensions;
-using FCSPowerStorage.Logging;
+using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
 using System;
 using System.Collections.Generic;
@@ -41,7 +41,7 @@ namespace FCSPowerStorage.Configuration
 
                 if (ingredient.Amount <= 0)
                 {
-                    Log.Error($"Battery Configuration Error: Valid ingredient amount cannot be less than or equal to 0 applying 1 as default");
+                    QuickLogger.Error($"Battery Configuration Error: Valid ingredient amount cannot be less than or equal to 0 applying 1 as default");
                     ingredient.Amount = 1;
                 }
             }

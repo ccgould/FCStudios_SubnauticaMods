@@ -1,4 +1,4 @@
-﻿using FCSPowerStorage.Logging;
+﻿using FCSCommon.Utilities;
 using FCSPowerStorage.Model.Components;
 using FCSPowerStorage.Utilities.Enums;
 using System;
@@ -40,8 +40,6 @@ namespace FCSPowerStorage.Helpers
 
             // == Set Public Materials == //
 
-            // Log.Info("MAIN BASE BODY");
-
             // == MAIN BASE BODY == //
             mainBaseBody.shader = shader;
             mainBaseBody.EnableKeyword("_METALLICGLOSSMAP");
@@ -70,9 +68,6 @@ namespace FCSPowerStorage.Helpers
             // == Materials == //
             var systemLights = systemLightsRender.materials[0];
 
-
-            Log.Info($"SYSTEM LIGHTS Changed to {systemLightsColor}");
-
             // == SYSTEM LIGHTS == //
             systemLights.shader = shader;
             systemLights.EnableKeyword("MARMO_SPECMAP");
@@ -94,15 +89,13 @@ namespace FCSPowerStorage.Helpers
         {
             List<object> textures = new List<object>(AssetHelper.Asset.LoadAllAssets(typeof(object)));
 
-            //Log.Info("FindTexture2D");
-
             for (int i = 0; i < textures.Count; i++)
             {
                 if (textures[i] is Texture2D)
                     if (((Texture2D)textures[i]).name.Equals(textureName))
                     {
-                        Log.Info($"Found : {textureName} in Asset Bundle");
-                        Log.Info(((Texture2D)textures[i]).NullOrID());
+                        QuickLogger.Debug($"Found : {textureName} in Asset Bundle");
+                        QuickLogger.Debug(((Texture2D)textures[i]).NullOrID());
                         return ((Texture2D)textures[i]);
                     }
             }
