@@ -1,4 +1,5 @@
 ﻿using FCS_AIMarineTurbine.Buildable;
+using FCSCommon.Helpers;
 using FCSCommon.Objects;
 using FCSCommon.Utilities;
 using System;
@@ -16,6 +17,8 @@ namespace FCS_AIMarineTurbine.Mono
         private float _passedTime = 0f;
         private AIJetStreamT242Controller _mono;
         private double _damageTimeInSeconds = 2520;
+        private GameObject _damage;
+        private bool _shaderApplied;
         public Action OnDamaged { get; set; }
         public Action OnRepaired { get; set; }
 
@@ -107,21 +110,19 @@ namespace FCS_AIMarineTurbine.Mono
         {
             try
             {
-                if (GetHealth() >= 100f && !IsDamagedFlag)
+                if (GetHealth() >= 1f && !IsDamagedFlag)
                 {
-                    QuickLogger.Debug("Turbine Repaired");
+                    QuickLogger.Debug("Turbine Repaired", true);
                     OnRepaired?.Invoke();
-                    //TODO Update Damage
-                    //StartCoroutine(UpdateDamageMaterial());
+                    UpdateDamageState();
                     IsDamagedFlag = true;
                 }
 
                 if (GetHealth() <= 0f && IsDamagedFlag)
                 {
-                    QuickLogger.Debug("Turbine Damaged");
+                    QuickLogger.Debug("Turbine Damaged", true);
                     OnDamaged?.Invoke();
-                    //TODO Update Damage
-                    //StartCoroutine(UpdateDamageMaterial());
+                    UpdateDamageState();
                     IsDamagedFlag = false;
                 }
             }
@@ -129,6 +130,39 @@ namespace FCS_AIMarineTurbine.Mono
             {
                 QuickLogger.Error(e.Message);
             }
+        }
+
+        private void UpdateDamageState()
+        {
+            if (IsDamagedFlag)
+            {
+                _damage.SetActive(true);
+                MaterialHelpers.ApplyEmissionShader("SystemLights_BaseColor", "SystemLights_OffMode_Emissive", gameObject, QPatch.Bundle, new Color(0.08235294f, 1f, 1f));
+                if (!_shaderApplied)
+                {
+                    ApplyDamageShader();
+                }
+            }
+            else
+            {
+                _damage.SetActive(false);
+                MaterialHelpers.ApplyEmissionShader("SystemLights_BaseColor", "SystemLights_OnMode_Emissive", gameObject, QPatch.Bundle, new Color(01f, 0.09803922f, 0.09803922f));
+
+            }
+        }
+
+        private void ApplyDamageShader()
+        {
+            #region FCS_SUBMods_GlobalDecals
+            MaterialHelpers.ApplyAlphaShader("FCS_SUBMods_GlobalDecals", _damage);
+            MaterialHelpers.ApplyEmissionShader("FCS_SUBMods_GlobalDecals", "FCS_SUBMods_GlobalDecals_Emissive", _damage, QPatch.Bundle, Color.white);
+            MaterialHelpers.ApplyNormalShader("FCS_SUBMods_GlobalDecals", "FCS_SUBMods_GlobalDecals_Norm", _damage, QPatch.Bundle);
+            #endregion
+
+            #region FCS_MarineTurbine_Tex
+            MaterialHelpers.ApplyMetallicShader("FCS_MarineTurbine_Tex", "JetStreamT242_MarineTurbineMat_MetallicSmoothness", _damage, QPatch.Bundle, 0.2f);
+            #endregion
+            _shaderApplied = true;
         }
 
         private void ResetTimer()
@@ -144,6 +178,11 @@ namespace FCS_AIMarineTurbine.Mono
         public void SetPassedTime(float savedDataPassedTime)
         {
             _passedTime = savedDataPassedTime;
+        }
+
+        public void SetDamageModel(GameObject damage)
+        {
+            _damage = damage;
         }
     }
 }

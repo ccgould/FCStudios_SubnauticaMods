@@ -46,6 +46,7 @@ namespace FCS_AIMarineTurbine.Mono
         private Quaternion _targetRotation;
         private GameObject _turbine;
         private float _currentSpeed;
+        private GameObject _damage;
 
         #endregion
 
@@ -68,7 +69,7 @@ namespace FCS_AIMarineTurbine.Mono
                 AISolutionsData.Instance.OnRotationChanged += AiSolutionsDataOnOnRotationChanged;
                 HealthManager = gameObject.GetComponent<AIJetStreamT242HealthManager>();
                 HealthManager.Initialize(this);
-
+                HealthManager.SetDamageModel(_damage);
                 PowerManager = gameObject.GetComponentInParent<AIJetStreamT242PowerManager>();
                 PowerManager.Initialize(this);
 
@@ -174,6 +175,15 @@ namespace FCS_AIMarineTurbine.Mono
                 return false;
             }
 
+            _damage = transform.Find("model").Find("static_parts").Find("MarineTurbineDamage")?.gameObject;
+
+            if (_damage == null)
+            {
+                QuickLogger.Error($"Damage not found");
+                _initialized = false;
+                return false;
+            }
+
             return true;
         }
 
@@ -274,7 +284,7 @@ namespace FCS_AIMarineTurbine.Mono
                     _isEnabled = true;
                     RotateToMag();
                     SetCurrentRotation();
-                    QuickLogger.Debug($"Turbine Contructed Rotation Set {_rotor.transform.rotation.ToString()} ", true);
+                    QuickLogger.Debug($"Turbine Constructed Rotation Set {_rotor.transform.rotation.ToString()} ", true);
 
                     var display = gameObject.GetOrAddComponent<AIJetStreamT242Display>();
                     display.Setup(this);
@@ -289,11 +299,13 @@ namespace FCS_AIMarineTurbine.Mono
 
         private void SetCurrentRotation()
         {
-            _rotor.transform.rotation = _targetRotation;
+            _rotor.transform.rotation = AISolutionsData.StartingRotation;
         }
 
         private void RotateToMag()
         {
+            if (_rotor == null) return;
+
             _rotor.transform.rotation = Quaternion.Euler(0, -Input.compass.magneticHeading, 0);
         }
 

@@ -6,8 +6,13 @@ using UnityEngine;
 
 namespace FCS_AIMarineTurbine.Model
 {
-    internal class AISolutionsData
+    internal sealed class AISolutionsData
     {
+        private AISolutionsData()
+        {
+
+        }
+
         internal class BiomeItem
         {
             /// <summary>
@@ -38,7 +43,6 @@ namespace FCS_AIMarineTurbine.Model
 
         private static void Update()
         {
-            QuickLogger.Debug("IN");
             if (DayNightCycle.main == null) return;
 
             _passedTime += DayNightCycle.main.deltaTime;

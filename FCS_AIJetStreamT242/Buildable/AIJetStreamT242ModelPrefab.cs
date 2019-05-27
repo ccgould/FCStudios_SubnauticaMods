@@ -52,7 +52,7 @@ namespace FCS_AIMarineTurbine.Buildable
             MaterialHelpers.ApplyNormalShader("FCS_SUBMods_GlobalDecals", "FCS_SUBMods_GlobalDecals_Norm", prefab, QPatch.Bundle);
             #endregion
 
-            #region SystemLights_BaseColor
+            #region FCS_MarineTurbine_Tex
             //MaterialHelpers.ApplyEmissionShader("FCS_MarineTurbine_Tex_DefaultState", "JetStreamT242_MarineTurbineMat_Emission", prefab, _assetBundle, new Color(0.08235294f, 1f, 1f));
             MaterialHelpers.ApplyMetallicShader("FCS_MarineTurbine_Tex", "JetStreamT242_MarineTurbineMat_MetallicSmoothness", prefab, QPatch.Bundle, 0.2f);
             #endregion
