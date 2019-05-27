@@ -115,4 +115,39 @@ namespace FCS_AIMarineTurbine.Patches
             }
         }
     }
+
+    [HarmonyPatch(typeof(uGUI_DepthCompass))]
+    [HarmonyPatch("LateUpdate")]
+    internal class uGUI_DepthCompassLateUpdate_Patcher
+    {
+        private static Action onLateUpdate;
+
+        [HarmonyPostfix]
+        public static void Postfix(uGUI_DepthCompass __instance)
+        {
+            onLateUpdate?.Invoke();
+        }
+
+        public static bool AddEventHandlerIfMissing(Action newHandler)
+        {
+            if (onLateUpdate == null)
+            {
+                onLateUpdate += newHandler;
+                return true;
+            }
+            else
+            {
+                foreach (Action action in onLateUpdate.GetInvocationList())
+                {
+                    if (action == newHandler)
+                    {
+                        return false;
+                    }
+                }
+
+                onLateUpdate += newHandler;
+                return true;
+            }
+        }
+    }
 }

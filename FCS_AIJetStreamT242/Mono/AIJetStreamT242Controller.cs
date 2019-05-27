@@ -65,7 +65,7 @@ namespace FCS_AIMarineTurbine.Mono
                     var data = BiomeManager.GetBiomeData(currentBiome);
                 }
 
-                AISolutionsData.OnRotationChanged += AiSolutionsDataOnOnRotationChanged;
+                AISolutionsData.Instance.OnRotationChanged += AiSolutionsDataOnOnRotationChanged;
                 HealthManager = gameObject.GetComponent<AIJetStreamT242HealthManager>();
                 HealthManager.Initialize(this);
 
@@ -107,8 +107,6 @@ namespace FCS_AIMarineTurbine.Mono
                 HealthManager.IsSafeToContinue = true;
 
                 SystemHandler();
-
-                AISolutionsData.UpdateTime();
             }
             else
             {
@@ -133,6 +131,10 @@ namespace FCS_AIMarineTurbine.Mono
 
         public void ChangeMotorSpeed(float speed)
         {
+            if (_seaBase == null) return;
+
+            if (!_seaBase.name.StartsWith("Base", StringComparison.OrdinalIgnoreCase)) return;
+
             // increase or decrease the current speed depending on the value of increasing
             _currentSpeed = Mathf.Clamp(_currentSpeed + DayNightCycle.main.deltaTime * IncreaseRate * (Increasing ? 1 : -1), 0, speed);
             _turbine.transform.Rotate(Vector3.up, _currentSpeed * DayNightCycle.main.deltaTime);
@@ -177,7 +179,13 @@ namespace FCS_AIMarineTurbine.Mono
 
         private void RotateRotor()
         {
+            if (_seaBase == null) return;
+
+            if (!_seaBase.name.StartsWith("Base", StringComparison.OrdinalIgnoreCase)) return;
+
             _rotor.transform.rotation = Quaternion.Lerp(_rotor.transform.rotation, _targetRotation, 1 * DayNightCycle.main.deltaTime);
+
+            //QuickLogger.Info($"R:{_rotor.transform.rotation} || T:{_targetRotation} || ID {_prefabID.Id}", true);
         }
 
         private void AiSolutionsDataOnOnRotationChanged(Quaternion axis)
@@ -202,7 +210,7 @@ namespace FCS_AIMarineTurbine.Mono
 
         private void Unsubscribe()
         {
-            AISolutionsData.OnRotationChanged -= AiSolutionsDataOnOnRotationChanged;
+            AISolutionsData.Instance.OnRotationChanged -= AiSolutionsDataOnOnRotationChanged;
         }
 
         private void SystemHandler()
@@ -265,8 +273,7 @@ namespace FCS_AIMarineTurbine.Mono
                     _currentBiome = BiomeManager.GetBiome();
                     _isEnabled = true;
                     RotateToMag();
-                    RotateRotor();
-
+                    SetCurrentRotation();
                     QuickLogger.Debug($"Turbine Contructed Rotation Set {_rotor.transform.rotation.ToString()} ", true);
 
                     var display = gameObject.GetOrAddComponent<AIJetStreamT242Display>();
@@ -278,6 +285,11 @@ namespace FCS_AIMarineTurbine.Mono
                     QuickLogger.Debug("ERROR: Can not work out what base it was placed inside.");
                 }
             }
+        }
+
+        private void SetCurrentRotation()
+        {
+            _rotor.transform.rotation = _targetRotation;
         }
 
         private void RotateToMag()

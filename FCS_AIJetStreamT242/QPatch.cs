@@ -26,7 +26,7 @@ namespace FCS_AIMarineTurbine
             {
                 LoadAssetBundle();
                 //Set Rotation
-                AISolutionsData.ChangeRotation();
+                AISolutionsData.PatchHelper();
                 AIJetStreamT242Patcher.PatchSMLHelper();
                 AIMarineMonitorPatcher.PatchSMLHelper();
 
