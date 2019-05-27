@@ -1,4 +1,5 @@
-﻿using FCS_AIJetStreamT242.Buildable;
+﻿using FCS_AIMarineTurbine.Buildable;
+using FCS_AIMarineTurbine.Mono;
 using FCSCommon.Utilities;
 using System;
 using UnityEngine;
@@ -28,7 +29,7 @@ namespace FCS_AIJetStreamT242.Mono
 
         private void Start()
         {
-            _capacity = AIJetStreamT242Buildable.JetStreamT242Config.MaxCapacity;
+            _capacity = AIJetStreamT242Patcher.JetStreamT242Config.MaxCapacity;
             InvokeRepeating("UpdatePowerRelay", 0, 1);
         }
         private void Update()
@@ -86,7 +87,7 @@ namespace FCS_AIJetStreamT242.Mono
 
                 var energyPerSec = _mono.GetCurrentSpeed() * decPercentage;
 
-                _charge = Mathf.Clamp(_charge + energyPerSec * DayNightCycle.main.deltaTime, 0, AIJetStreamT242Buildable.JetStreamT242Config.MaxCapacity);
+                _charge = Mathf.Clamp(_charge + energyPerSec * DayNightCycle.main.deltaTime, 0, AIJetStreamT242Patcher.JetStreamT242Config.MaxCapacity);
             }
         }
 
@@ -106,7 +107,7 @@ namespace FCS_AIJetStreamT242.Mono
 
         internal void RepairBattery()
         {
-            _capacity = AIJetStreamT242Buildable.JetStreamT242Config.MaxCapacity;
+            _capacity = AIJetStreamT242Patcher.JetStreamT242Config.MaxCapacity;
             _isBatteryDestroyed = false;
         }
 
@@ -152,8 +153,8 @@ namespace FCS_AIJetStreamT242.Mono
             bool result;
             if (amount >= 0f)
             {
-                result = (amount <= AIJetStreamT242Buildable.JetStreamT242Config.MaxCapacity - _charge);
-                modified = Mathf.Min(amount, AIJetStreamT242Buildable.JetStreamT242Config.MaxCapacity - _charge);
+                result = (amount <= AIJetStreamT242Patcher.JetStreamT242Config.MaxCapacity - _charge);
+                modified = Mathf.Min(amount, AIJetStreamT242Patcher.JetStreamT242Config.MaxCapacity - _charge);
                 _charge += Mathf.Round(modified);
             }
             else

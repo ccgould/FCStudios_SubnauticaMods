@@ -1,9 +1,9 @@
 ﻿using FCSCommon.Utilities;
 using SMLHelper.V2.Handlers;
 
-namespace FCS_AIJetStreamT242.Buildable
+namespace FCS_AIMarineTurbine.Buildable
 {
-    internal partial class AIJetStreamT242Buildable
+    internal partial class AIJetStreamT242Patcher
     {
         #region Public Properties
 

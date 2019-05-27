@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace FCS_AIJetStreamT242.Display
+namespace FCS_AIMarineTurbine.Display
 {
     /// <summary>
     /// This class is a component for all interface buttons except the color picker and the paginator.

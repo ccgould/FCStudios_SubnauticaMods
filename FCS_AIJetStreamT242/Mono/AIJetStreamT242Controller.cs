@@ -1,5 +1,7 @@
-﻿using FCS_AIJetStreamT242.Display;
-using FCS_AIJetStreamT242.Model;
+﻿using FCS_AIJetStreamT242.Mono;
+using FCS_AIMarineTurbine.Display;
+using FCS_AIMarineTurbine.Model;
+using FCSCommon.Components;
 using FCSCommon.Extensions;
 using FCSCommon.Objects;
 using FCSCommon.Utilities;
@@ -9,19 +11,20 @@ using System;
 using System.IO;
 using UnityEngine;
 
-namespace FCS_AIJetStreamT242.Mono
+namespace FCS_AIMarineTurbine.Mono
 {
     [RequireComponent(typeof(WeldablePoint))]
     internal class AIJetStreamT242Controller : MonoBehaviour, IConstructable, IProtoEventListener
     {
         #region Public Properties
         public bool IsBeingDeleted { get; set; }
-        public bool IsBeingPinged { get; set; }
         public float IncreaseRate { get; set; } = 2f;
         public bool Increasing { get; set; } = true;
         public AIJetStreamT242PowerManager PowerManager { get; private set; }
         public AIJetStreamT242HealthManager HealthManager { get; private set; }
         public AIJetStreamT242AnimationManager AnimationManager { get; private set; }
+        public BeaconController BeaconManager { get; private set; }
+
         #endregion
 
         #region Private Members
@@ -37,7 +40,7 @@ namespace FCS_AIJetStreamT242.Mono
         public float MinSpeed = 90f;
         public float Multiplier = 0.161f;
         private PrefabIdentifier _prefabID;
-        private readonly string SaveDirectory = Path.Combine(SaveUtils.GetCurrentSaveDataDir(), "AIJetStreamT242");
+        private readonly string SaveDirectory = Path.Combine(SaveUtils.GetCurrentSaveDataDir(), "AIMarineTurbine");
         private string SaveFile => Path.Combine(SaveDirectory, _prefabID.Id + ".json");
 
         private Quaternion _targetRotation;
@@ -51,6 +54,8 @@ namespace FCS_AIJetStreamT242.Mono
         {
             if (FindComponents())
             {
+                QuickLogger.Debug($"Turbine Components Found", true);
+
                 _prefabID = GetComponentInParent<PrefabIdentifier>();
 
                 var currentBiome = BiomeManager.GetBiome();
@@ -68,6 +73,9 @@ namespace FCS_AIJetStreamT242.Mono
                 PowerManager.Initialize(this);
 
                 AnimationManager = gameObject.GetComponentInParent<AIJetStreamT242AnimationManager>();
+
+                BeaconManager = gameObject.GetComponentInParent<BeaconController>();
+
                 if (PowerManager == null)
                 {
                     QuickLogger.Error("Power manager component not found!");
@@ -84,6 +92,7 @@ namespace FCS_AIJetStreamT242.Mono
             }
 
             if (!_initialized) return;
+
             PowerManager.OnKillBattery += Unsubscribe;
         }
 
@@ -126,12 +135,17 @@ namespace FCS_AIJetStreamT242.Mono
         {
             // increase or decrease the current speed depending on the value of increasing
             _currentSpeed = Mathf.Clamp(_currentSpeed + DayNightCycle.main.deltaTime * IncreaseRate * (Increasing ? 1 : -1), 0, speed);
-            _turbine.transform.Rotate(Vector3.forward, _currentSpeed * DayNightCycle.main.deltaTime);
+            _turbine.transform.Rotate(Vector3.up, _currentSpeed * DayNightCycle.main.deltaTime);
         }
 
         public int GetSpeed()
         {
             return Convert.ToInt32(_currentSpeed * _rpmPerDeg);
+        }
+
+        internal string GetPrefabID()
+        {
+            return _prefabID.Id;
         }
 
         #endregion
@@ -140,16 +154,16 @@ namespace FCS_AIJetStreamT242.Mono
 
         private bool FindComponents()
         {
-            _turbine = transform.Find("model").Find("Rotor").Find("Turbine_BladesWheel")?.gameObject;
+            _turbine = transform.Find("model").Find("anim_parts").Find("Rotor").Find("Turbine_BladeWheel")?.gameObject;
 
             if (_turbine == null)
             {
-                QuickLogger.Error($"Turbine_BladesWheel not found");
+                QuickLogger.Error($"Turbine_BladeWheel not found");
                 _initialized = false;
                 return false;
             }
 
-            _rotor = transform.Find("model").Find("Rotor")?.gameObject;
+            _rotor = transform.Find("model").Find("anim_parts").Find("Rotor")?.gameObject;
 
             if (_rotor == null)
             {
@@ -250,8 +264,11 @@ namespace FCS_AIJetStreamT242.Mono
                 {
                     _currentBiome = BiomeManager.GetBiome();
                     _isEnabled = true;
-                    _rotor.transform.rotation = Quaternion.Euler(0, -Input.compass.magneticHeading, 0);
-                    _rotor.transform.rotation = AISolutionsData.StartingRotation;
+                    RotateToMag();
+                    RotateRotor();
+
+                    QuickLogger.Debug($"Turbine Contructed Rotation Set {_rotor.transform.rotation.ToString()} ", true);
+
                     var display = gameObject.GetOrAddComponent<AIJetStreamT242Display>();
                     display.Setup(this);
                 }
@@ -262,6 +279,12 @@ namespace FCS_AIJetStreamT242.Mono
                 }
             }
         }
+
+        private void RotateToMag()
+        {
+            _rotor.transform.rotation = Quaternion.Euler(0, -Input.compass.magneticHeading, 0);
+        }
+
         #endregion
 
         #region IProtoEventListener
@@ -314,8 +337,9 @@ namespace FCS_AIJetStreamT242.Mono
                     HealthManager.SetHealth(savedData.Health);
                     PowerManager.SetCharge(savedData.Charge);
                     _currentSpeed = savedData.CurrentSpeed;
-                    _turbine.transform.Rotate(Vector3.forward, savedData.DegPerSec);
+                    //RotateTurbine(savedData.DegPerSec);
                     _targetRotation = savedData.TurbineRot.TargetRotationToQuaternion();
+                    QuickLogger.Debug($"Target Rotation Set {_targetRotation}", true);
                     _currentBiome = savedData.Biome;
                     HealthManager.SetPassedTime(savedData.PassedTime);
                     AISolutionsData.StartingRotation = _targetRotation;
@@ -327,7 +351,6 @@ namespace FCS_AIJetStreamT242.Mono
             }
             QuickLogger.Debug("// ****************************** Loaded Data *********************************** //");
         }
-
         #endregion
     }
 }

@@ -1,7 +1,7 @@
-﻿using FCS_AIJetStreamT242.Model;
+﻿using FCS_AIMarineTurbine.Model;
 using System.Collections.Generic;
 
-namespace FCS_AIJetStreamT242.Configuration
+namespace FCS_AIMarineTurbine.Configuration
 {
     internal class JetStreamT242Config
     {

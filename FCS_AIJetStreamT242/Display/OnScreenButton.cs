@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace FCS_AIJetStreamT242.Display
+namespace FCS_AIMarineTurbine.Display
 {
     /// <summary>
     /// Component that buttons on the power storage ui will inherit from. Handles working on whether something is hovered via IsHovered as well as interaction text. 

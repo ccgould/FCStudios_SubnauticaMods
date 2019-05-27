@@ -1,6 +1,6 @@
-﻿using FCS_AIJetStreamT242.Buildable;
-using FCS_AIJetStreamT242.Display.Patching;
-using FCS_AIJetStreamT242.Mono;
+﻿using FCS_AIMarineTurbine.Buildable;
+using FCS_AIMarineTurbine.Display.Patching;
+using FCS_AIMarineTurbine.Mono;
 using FCSCommon.Enums;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
@@ -9,7 +9,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace FCS_AIJetStreamT242.Display
+namespace FCS_AIMarineTurbine.Display
 {
     public class AIJetStreamT242Display : AIDisplay
     {
@@ -297,13 +297,13 @@ namespace FCS_AIJetStreamT242.Display
                 _healthPercentage.GetComponent<Text>().text = $"{_mono.HealthManager.GetHealth()}%";
 
                 int powerPercent;
-                if (_mono.PowerManager.GetCharge() <= 0.0f || AIJetStreamT242Buildable.JetStreamT242Config.MaxCapacity <= 0.0f)
+                if (_mono.PowerManager.GetCharge() <= 0.0f || AIJetStreamT242Patcher.JetStreamT242Config.MaxCapacity <= 0.0f)
                 {
                     powerPercent = 0;
                 }
                 else
                 {
-                    powerPercent = Convert.ToInt32((_mono.PowerManager.GetCharge() / AIJetStreamT242Buildable.JetStreamT242Config.MaxCapacity) * 100);
+                    powerPercent = Convert.ToInt32((_mono.PowerManager.GetCharge() / AIJetStreamT242Patcher.JetStreamT242Config.MaxCapacity) * 100);
                 }
 
                 _powerSlider.GetComponent<Slider>().value = powerPercent / 100f;

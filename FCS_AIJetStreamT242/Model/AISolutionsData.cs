@@ -1,10 +1,10 @@
-﻿using FCS_AIJetStreamT242.Buildable;
+﻿using FCS_AIMarineTurbine.Buildable;
 using FCSCommon.Utilities;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace FCS_AIJetStreamT242.Model
+namespace FCS_AIMarineTurbine.Model
 {
     internal static partial class AISolutionsData
     {
@@ -23,6 +23,7 @@ namespace FCS_AIJetStreamT242.Model
         }
 
         public static Quaternion StartingRotation { get; set; }
+
         private static float _passedTime;
 
         public static event Action<Quaternion> OnRotationChanged;
@@ -52,7 +53,7 @@ namespace FCS_AIJetStreamT242.Model
         {
             if (DayNightCycle.main == null) return;
             _passedTime += DayNightCycle.main.deltaTime;
-            if (_passedTime >= AIJetStreamT242Buildable.JetStreamT242Config.RotationCycleInSec)
+            if (_passedTime >= AIJetStreamT242Patcher.JetStreamT242Config.RotationCycleInSec)
             {
                 QuickLogger.Debug($"ChangeRotation");
                 ChangeRotation();

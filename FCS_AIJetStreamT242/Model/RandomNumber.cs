@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Security.Cryptography;
 
-namespace FCS_AIJetStreamT242.Model
+namespace FCS_AIMarineTurbine
 {
     public static class RandomNumber
     {

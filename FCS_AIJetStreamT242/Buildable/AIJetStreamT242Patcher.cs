@@ -1,5 +1,7 @@
-﻿using FCS_AIJetStreamT242.Configuration;
-using FCS_AIJetStreamT242.Mono;
+﻿using FCS_AIJetStreamT242.Mono;
+using FCS_AIMarineTurbine.Configuration;
+using FCS_AIMarineTurbine.Display.Patching;
+using FCS_AIMarineTurbine.Mono;
 using FCSCommon.Components;
 using FCSCommon.Extensions;
 using FCSCommon.Helpers;
@@ -8,18 +10,19 @@ using Oculus.Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using UnityEngine;
 
-namespace FCS_AIJetStreamT242.Buildable
+namespace FCS_AIMarineTurbine.Buildable
 {
     using SMLHelper.V2.Assets;
     using SMLHelper.V2.Crafting;
-    using UnityEngine;
-    internal partial class AIJetStreamT242Buildable : Buildable
+
+    internal partial class AIJetStreamT242Patcher : Buildable
     {
-        private static readonly AIJetStreamT242Buildable Singleton = new AIJetStreamT242Buildable();
+        private static readonly AIJetStreamT242Patcher Singleton = new AIJetStreamT242Patcher();
         public override TechGroup GroupForPDA { get; } = TechGroup.ExteriorModules;
         public override TechCategory CategoryForPDA { get; } = TechCategory.ExteriorModule;
-        public override string AssetsFolder { get; } = $"FCSAIJetStreamT242/Assets";
+        public override string AssetsFolder { get; } = $"FCSAIMarineTurbine/Assets";
         public static void PatchSMLHelper()
         {
             if (!Singleton.GetPrefabs())
@@ -29,16 +32,17 @@ namespace FCS_AIJetStreamT242.Buildable
 
             Singleton.Patch();
 
-            string savedDataJson = File.ReadAllText(Path.Combine(AssetHelper.GetConfigFolder($"FCS{Singleton.ClassID}"), $"{Singleton.ClassID}.json")).Trim();
+            string savedDataJson = File.ReadAllText(Path.Combine(AssetHelper.GetConfigFolder($"FCSAIMarineTurbine"), $"{Singleton.ClassID}.json")).Trim();
             JetStreamT242Config = JsonConvert.DeserializeObject<JetStreamT242Config>(savedDataJson);
             QuickLogger.Debug($"Biome Speeds Count {JetStreamT242Config.BiomeSpeeds.Count}");
         }
         public static JetStreamT242Config JetStreamT242Config { get; set; }
 
-        public AIJetStreamT242Buildable() : base("AIJetStreamT242",
+        public AIJetStreamT242Patcher() : base("AIJetStreamT242",
             "AI JetStreamT242",
             "The Jet Stream T242 provides power by using the water current. The faster the turbine spins the more power output.")
         {
+            OnFinishedPatching += DisplayLanguagePatching.AdditionPatching;
         }
 
         public override GameObject GetGameObject()

@@ -2,7 +2,7 @@
 using FCSCommon.Utilities;
 using UnityEngine;
 
-namespace FCS_AIJetStreamT242.Mono
+namespace FCS_AIMarineTurbine.Mono
 {
     internal class AIJetStreamT242AnimationManager : MonoBehaviour
     {

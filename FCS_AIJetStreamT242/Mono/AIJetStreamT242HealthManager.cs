@@ -1,10 +1,10 @@
-﻿using FCS_AIJetStreamT242.Buildable;
+﻿using FCS_AIMarineTurbine.Buildable;
 using FCSCommon.Objects;
 using FCSCommon.Utilities;
 using System;
 using UnityEngine;
 
-namespace FCS_AIJetStreamT242.Mono
+namespace FCS_AIMarineTurbine.Mono
 {
     internal class AIJetStreamT242HealthManager : MonoBehaviour
     {
@@ -96,7 +96,7 @@ namespace FCS_AIJetStreamT242.Mono
 
         public void ApplyDamage()
         {
-            if (LiveMixin.health > 0 && AIJetStreamT242Buildable.JetStreamT242Config.EnableWear)
+            if (LiveMixin.health > 0 && AIJetStreamT242Patcher.JetStreamT242Config.EnableWear)
             {
                 LiveMixin.health = Mathf.Clamp(LiveMixin.maxHealth - HealthMultiplyer, 0f, 100f);
             }

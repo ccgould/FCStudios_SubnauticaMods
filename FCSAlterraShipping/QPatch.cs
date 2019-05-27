@@ -20,7 +20,6 @@ namespace FCSAlterraShipping
 
             try
             {
-
                 AlterraShippingBuildable.PatchSMLHelper();
 
                 var harmony = HarmonyInstance.Create("com.alterrashipping.fcstudios");

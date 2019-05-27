@@ -1,14 +1,14 @@
-﻿using FCS_AIJetStreamT242.Buildable;
+﻿using FCS_AIMarineTurbine.Buildable;
 using FCSCommon.Utilities;
 using System;
 
-namespace FCS_AIJetStreamT242.Model
+namespace FCS_AIMarineTurbine.Model
 {
     internal static class BiomeManager
     {
         internal static AISolutionsData.BiomeItem GetBiomeData(string biome)
         {
-            return AIJetStreamT242Buildable.JetStreamT242Config.BiomeSpeeds.GetOrDefault(biome.ToLower(), new AISolutionsData.BiomeItem { Speed = 90 });
+            return AIJetStreamT242Patcher.JetStreamT242Config.BiomeSpeeds.GetOrDefault(biome.ToLower(), new AISolutionsData.BiomeItem { Speed = 90 });
         }
         internal static string GetBiome()
         {
@@ -37,7 +37,7 @@ namespace FCS_AIJetStreamT242.Model
 
             var result = string.Empty;
 
-            foreach (var biomeItem in AIJetStreamT242Buildable.JetStreamT242Config.BiomeSpeeds)
+            foreach (var biomeItem in AIJetStreamT242Patcher.JetStreamT242Config.BiomeSpeeds)
             {
                 QuickLogger.Debug($"Checking for {biome} || Current biome in iteration = {biomeItem.Key}");
 

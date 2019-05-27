@@ -1,6 +1,6 @@
 ﻿using FCSCommon.Objects;
 
-namespace FCS_AIJetStreamT242.Model
+namespace FCS_AIMarineTurbine.Model
 {
     public class SaveData
     {

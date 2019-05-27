@@ -6,6 +6,8 @@ namespace FCSCommon.Components
     public class BeaconController : MonoBehaviour
     {
         private int _beaconStateHash;
+
+        public bool IsBeingPinged => Animator.GetBool(_beaconStateHash);
         public Animator Animator { get; set; }
 
         private void Awake()
