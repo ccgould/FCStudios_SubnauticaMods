@@ -56,7 +56,6 @@ namespace FCSAlterraShipping.Display
         {
             if (Animator == null)
             {
-                QuickLogger.Error("Animator is null on load");
                 this.Animator = this.transform.GetComponent<Animator>();
             }
 
@@ -70,17 +69,37 @@ namespace FCSAlterraShipping.Display
         /// <param name="value">Float to set</param>
         internal void SetIntHash(int stateHash, int value)
         {
+            if (Animator == null)
+            {
+                this.Animator = this.transform.GetComponent<Animator>();
+            }
+
+            if (Animator == null) return;
+
             this.Animator.SetInteger(stateHash, value);
         }
 
         internal int GetIntHash(int hash)
         {
+            if (Animator == null)
+            {
+                this.Animator = this.transform.GetComponent<Animator>();
+            }
+
+            if (Animator == null) return 0;
+
             return this.Animator.GetInteger(hash);
         }
 
         internal bool GetBoolHash(int hash)
         {
+            if (Animator == null)
+            {
+                this.Animator = this.transform.GetComponent<Animator>();
+            }
+
             if (Animator == null) return false;
+
             return this.Animator.GetBool(hash);
         }
 

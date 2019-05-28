@@ -13,7 +13,7 @@ namespace FCSPowerStorage
             //Clear log file
             Logger.ClearCustomLog();
 
-            QuickLogger.Debug("Initializing FCS Power Storage");
+            QuickLogger.Info("Initializing FCS Power Storage");
             try
             {
 #if DEBUG
@@ -27,7 +27,7 @@ namespace FCSPowerStorage
                 _success = false;
                 QuickLogger.Error("Error in QPatch");
             }
-            QuickLogger.Debug("FCS Power Storage initializ" + (!_success ? "ation failed." : "ed successfully."));
+            QuickLogger.Info("FCS Power Storage initializ" + (!_success ? "ation failed." : "ed successfully."));
         }
     }
 }
