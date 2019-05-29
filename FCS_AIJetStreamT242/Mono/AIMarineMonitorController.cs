@@ -116,11 +116,9 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers
         {
             if (obj != null)
             {
-                QuickLogger.Debug("Removed Sub");
                 Turbines.Remove(obj.GetPrefabID());
-                QuickLogger.Debug("Removed Turbine");
-
                 _aiMarineMonitorDisplay.ItemModified<string>(null);
+                QuickLogger.Debug("Removed Turbine");
             }
         }
 

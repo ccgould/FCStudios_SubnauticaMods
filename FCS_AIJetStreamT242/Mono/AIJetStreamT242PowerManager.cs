@@ -195,16 +195,16 @@ namespace FCS_AIJetStreamT242.Mono
             _charge = savedDataCharge;
         }
 
-        internal void TriggerPowerOff()
+        private void TriggerPowerOff()
         {
             _hasBreakerTripped = true;
-            OnBreakerReset?.Invoke();
+            OnBreakerTripped?.Invoke();
         }
 
-        public void TriggerPowerOn()
+        private void TriggerPowerOn()
         {
             _hasBreakerTripped = false;
-            OnBreakerTripped?.Invoke();
+            OnBreakerReset?.Invoke();
         }
 
         public void Initialize(AIJetStreamT242Controller mono)
@@ -225,6 +225,18 @@ namespace FCS_AIJetStreamT242.Mono
         internal bool IsBatteryDestroyed()
         {
             return _isBatteryDestroyed;
+        }
+
+        internal void TogglePower()
+        {
+            if (GetHasBreakerTripped())
+            {
+                TriggerPowerOn();
+            }
+            else if (GetHasBreakerTripped() == false)
+            {
+                TriggerPowerOff();
+            }
         }
     }
 }

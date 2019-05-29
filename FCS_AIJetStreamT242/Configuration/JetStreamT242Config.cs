@@ -10,9 +10,9 @@ namespace FCS_AIMarineTurbine.Configuration
         [DoNotSerialize]
         public static bool Debug = false;
 
-        public int RotationCycleInSec { get; set; } = 20;
+        public int RotationCycleInSec { get; set; } = 1200;
 
-        public float MaxCapacity { get; set; } = 200;
+        public float MaxCapacity { get; set; } = 300;
 
         public bool EnableWear { get; set; } = true;
 

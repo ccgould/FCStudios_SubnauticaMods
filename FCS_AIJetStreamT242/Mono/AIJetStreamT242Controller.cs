@@ -198,7 +198,6 @@ namespace FCS_AIMarineTurbine.Mono
 
             _rotor.transform.rotation = Quaternion.Lerp(_rotor.transform.rotation, _targetRotation, 1 * DayNightCycle.main.deltaTime);
 
-            //QuickLogger.Info($"R:{_rotor.transform.rotation} || T:{_targetRotation} || ID {_prefabID.Id}", true);
         }
 
         private void AiSolutionsDataOnOnRotationChanged(Quaternion axis)

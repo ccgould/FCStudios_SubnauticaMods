@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("FCS_AIJetStreamT242")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Alterra Industrial Marine Turbine")]
+[assembly: AssemblyDescription("An all new mod from Field Creators Studios that allows you to generate power from using water current in Subnautica.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("FCS_AIJetStreamT242")]
-[assembly: AssemblyCopyright("Copyright ©  2019")]
+[assembly: AssemblyCompany("Field Creators Studios")]
+[assembly: AssemblyProduct("Alterra Industrial Marine Turbine")]
+[assembly: AssemblyCopyright("Copyright ©  Field Creators Studios 2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

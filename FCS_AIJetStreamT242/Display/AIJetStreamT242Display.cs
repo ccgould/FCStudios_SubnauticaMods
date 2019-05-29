@@ -54,6 +54,18 @@ namespace FCS_AIMarineTurbine.Display
             _screenStateHash = UnityEngine.Animator.StringToHash("ScreenState");
         }
 
+        private void OnBreakerTripped()
+        {
+            QuickLogger.Debug("IN OnBreakerTripped", true);
+            StartCoroutine(PowerOff());
+        }
+
+        private void OnBreakerReset()
+        {
+            QuickLogger.Debug("IN OnBreakerReset", true);
+            StartCoroutine(PowerOn());
+        }
+
         private void Update()
         {
             UpdateValues();
@@ -61,7 +73,7 @@ namespace FCS_AIMarineTurbine.Display
 
         #endregion
 
-        #region Public Methods
+        #region Internal Methods
         internal void Setup(AIJetStreamT242Controller jetStreamController)
         {
             if (jetStreamController.IsBeingDeleted) return;
@@ -74,6 +86,10 @@ namespace FCS_AIMarineTurbine.Display
                 TurnDisplayOff();
                 return;
             }
+
+            _mono.PowerManager.OnBreakerReset += OnBreakerReset;
+            _mono.PowerManager.OnBreakerTripped += OnBreakerTripped;
+
 
             UpdateLanaguage();
 
@@ -90,7 +106,7 @@ namespace FCS_AIMarineTurbine.Display
             }
         }
 
-        public void TurnDisplayOff()
+        internal void TurnDisplayOff()
         {
             StartCoroutine(ShutDown());
         }
@@ -335,12 +351,12 @@ namespace FCS_AIMarineTurbine.Display
             switch (btnName)
             {
                 case "PPBtn":
-                    _mono.PowerManager.TriggerPowerOn();
+                    _mono.PowerManager.TogglePower();
                     StartCoroutine(PowerOn());
                     break;
 
                 case "HPPBtn":
-                    _mono.PowerManager.TriggerPowerOff();
+                    _mono.PowerManager.TogglePower();
                     StartCoroutine(PowerOff());
                     break;
 
@@ -352,7 +368,7 @@ namespace FCS_AIMarineTurbine.Display
             yield return new WaitForEndOfFrame();
             if (_mono.IsBeingDeleted) yield break;
 
-            QuickLogger.Info($"Powering Off");
+            QuickLogger.Debug($"Powering Off");
             _mono.AnimationManager.SetFloatHash(_screenStateHash, _powerOff);
 
             if (_mono.IsBeingDeleted) yield break;
@@ -375,7 +391,7 @@ namespace FCS_AIMarineTurbine.Display
 
             //ResetAnimation();
 
-            QuickLogger.Info($"Powering On");
+            QuickLogger.Debug($"Powering On");
             StartCoroutine(CompleteSetup());
         }
 
@@ -385,7 +401,7 @@ namespace FCS_AIMarineTurbine.Display
             if (_mono.IsBeingDeleted) yield break;
 
 
-            QuickLogger.Info($"Shutting Down");
+            QuickLogger.Debug($"Shutting Down");
             _mono.AnimationManager.SetFloatHash(_screenStateHash, _powerOff);
 
             if (_mono.IsBeingDeleted) yield break;
@@ -398,13 +414,13 @@ namespace FCS_AIMarineTurbine.Display
 
         public override IEnumerator CompleteSetup()
         {
-            QuickLogger.Info("InComplete Setup");
+            QuickLogger.Debug("InComplete Setup");
             if (!_mono.PowerManager.GetHasBreakerTripped())
             {
                 yield return new WaitForEndOfFrame();
                 if (_mono.IsBeingDeleted) yield break;
 
-                QuickLogger.Info($"Starting Home Screen");
+                QuickLogger.Debug($"Starting Home Screen");
 
                 _mono.AnimationManager.SetFloatHash(_screenStateHash, _powerOn);
 
@@ -421,7 +437,7 @@ namespace FCS_AIMarineTurbine.Display
             foreach (var parameter in _mono.AnimationManager.GetParameters())
             {
                 _mono.AnimationManager.SetBoolHash(parameter.GetHashCode(), false);
-                QuickLogger.Info($"Animator Parameter {parameter.name} was reset to false");
+                QuickLogger.Debug($"Animator Parameter {parameter.name} was reset to false");
             }
         }
     }

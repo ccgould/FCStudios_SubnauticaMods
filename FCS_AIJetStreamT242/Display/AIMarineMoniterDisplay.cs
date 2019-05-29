@@ -395,15 +395,7 @@ namespace FCS_AIMarineTurbine.Display
             switch (btnName)
             {
                 case "PowerBTN":
-                    if (!turbineItem.Turbine.PowerManager.GetHasBreakerTripped())
-                    {
-                        turbineItem.Turbine.PowerManager.TriggerPowerOff();
-                    }
-                    else
-                    {
-                        turbineItem.Turbine.PowerManager.TriggerPowerOn();
-                    }
-
+                    turbineItem.Turbine.PowerManager.TogglePower();
                     break;
 
                 case "PingBTN":
@@ -422,7 +414,7 @@ namespace FCS_AIMarineTurbine.Display
 
         public override void ItemModified<T>(T item)
         {
-            DrawPage(CurrentPage);
+            DrawPage(1);
         }
 
 

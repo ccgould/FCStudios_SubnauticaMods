@@ -147,8 +147,6 @@ namespace FCS_AIMarineTurbine.Display
 
             #endregion
 
-            QuickLogger.Debug("Damage Label Reached");
-
             #region Ping BTN
 
             _pingBTN = gameObject.FindChild("PingBTN")?.gameObject;
@@ -176,7 +174,6 @@ namespace FCS_AIMarineTurbine.Display
             pingBTN.IncreaseButtonBy = 0.013282f;
             pingBTN.Tag = this;
             #endregion
-            //QuickLogger.Debug("PingBTN Reached");
 
             #region Power BTN
 
@@ -207,7 +204,6 @@ namespace FCS_AIMarineTurbine.Display
             powerBTN.Tag = this;
 
             #endregion
-            QuickLogger.Debug("PowerBTN Reached");
 
             return true;
         }
