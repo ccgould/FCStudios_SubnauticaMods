@@ -157,6 +157,9 @@ namespace FCS_AIMarineTurbine.Mono
 
         private bool FindComponents()
         {
+            QuickLogger.Debug("********************************************** In FindComponents **********************************************");
+
+
             _turbine = transform.Find("model").Find("anim_parts").Find("Rotor").Find("Turbine_BladeWheel")?.gameObject;
 
             if (_turbine == null)
@@ -299,6 +302,8 @@ namespace FCS_AIMarineTurbine.Mono
 
         private void SetCurrentRotation()
         {
+            QuickLogger.Debug("********************************************** In SetCurrentLocation **********************************************");
+            if (_rotor == null) return;
             _rotor.transform.rotation = AISolutionsData.StartingRotation;
         }
 
@@ -348,7 +353,7 @@ namespace FCS_AIMarineTurbine.Mono
 
             if (_prefabID != null)
             {
-                QuickLogger.Debug($"Loading JetStream {_prefabID.Id}");
+                QuickLogger.Info($"Loading JetStream {_prefabID.Id}");
 
                 if (File.Exists(SaveFile))
                 {

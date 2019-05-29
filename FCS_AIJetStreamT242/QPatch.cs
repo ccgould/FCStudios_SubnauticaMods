@@ -27,8 +27,9 @@ namespace FCS_AIMarineTurbine
                 LoadAssetBundle();
                 //Set Rotation
                 AISolutionsData.PatchHelper();
-                AIJetStreamT242Patcher.PatchSMLHelper();
-                AIMarineMonitorPatcher.PatchSMLHelper();
+                AIJetStreamT242Buildable.PatchSMLHelper();
+                AIMarineMonitorBuildable.PatchSMLHelper();
+                AIWindSurferBuildable.PatchSMLHelper();
 
                 var harmony = HarmonyInstance.Create("com.aijetstreamt242.fcstudios");
                 harmony.PatchAll(Assembly.GetExecutingAssembly());

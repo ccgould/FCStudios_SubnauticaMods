@@ -1,6 +1,6 @@
 ﻿using FCSAlterraIndustrialSolutions.Logging;
 using FCSAlterraIndustrialSolutions.Models.Controllers;
-using FCSAlterraIndustrialSolutions.Models.Enums;
+using FCSCommon.Enums;
 using UnityEngine;
 using UnityEngine.UI;
 

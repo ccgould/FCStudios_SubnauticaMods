@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{A6D5F567-127A-4EE3-9959-8C228B040290}</ProjectGuid>
+    <ProjectGuid>{B260A268-5873-4147-953C-1EF67A65CB4E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FCS_AIMarineTurbine</RootNamespace>
-    <AssemblyName>FCS_AIMarineTurbine</AssemblyName>
+    <RootNamespace>FCStudioDebugger</RootNamespace>
+    <AssemblyName>FCStudioDebugger</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -61,42 +61,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Buildable\AIJetStreamT242ModelPrefab.cs" />
-    <Compile Include="Buildable\AIJetStreamT242Patcher.cs" />
-    <Compile Include="Buildable\AIJetStreamT242AuxPatcher.cs" />
-    <Compile Include="Buildable\AIMarineMonitorPatcher.cs" />
-    <Compile Include="Buildable\AIMarineMonitorModelPrefab.cs" />
-    <Compile Include="Buildable\AIWindSurferModelPrefab.cs" />
-    <Compile Include="Buildable\AIWindSurferPatcher.cs" />
-    <Compile Include="Configuration\JetStreamT242Config.cs" />
-    <Compile Include="Display\InterfaceButton.cs" />
-    <Compile Include="Display\AIJetStreamT242Display.cs" />
-    <Compile Include="Display\AIMarineMoniterDisplay.cs" />
-    <Compile Include="Display\OnScreenButton.cs" />
-    <Compile Include="Display\PaginatorButton.cs" />
-    <Compile Include="Display\Patching\DisplayLanguagePatching.cs" />
-    <Compile Include="Display\TurbineItem.cs" />
-    <Compile Include="Model\AISolutionsData.cs" />
-    <Compile Include="Model\BiomeManager.cs" />
-    <Compile Include="Model\RandomNumber.cs" />
-    <Compile Include="Model\SaveData.cs" />
-    <Compile Include="Mono\AIJetStreamT242AnimationManager.cs" />
-    <Compile Include="Mono\AIJetStreamT242Controller.cs" />
-    <Compile Include="Mono\AIJetStreamT242HealthManager.cs" />
-    <Compile Include="Mono\AIJetStreamT242PowerManager.cs" />
-    <Compile Include="Mono\AIMarineMonitorController.cs" />
-    <Compile Include="Mono\AIWindSuferController.cs" />
-    <Compile Include="Mono\LadderController.cs" />
-    <Compile Include="Patches\AIMarineTurbine_Patcher.cs" />
+    <Compile Include="Debug\DebugMenu.cs" />
+    <Compile Include="Debug\Patches\OpenDebugMenu.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Tree\" />
   </ItemGroup>
   <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy "$(ProjectDir)bin\$(Configuration)\FCS_AIMarineTurbine.dll" "F:\Program Files\Epic Games\Subnautica\QMods\FCSAIMarineTurbine\" /Y /I</PostBuildEvent>
+    <PostBuildEvent>xcopy "$(ProjectDir)bin\$(Configuration)\FCStudioDebugger.dll" "F:\Program Files\Epic Games\Subnautica\QMods\FCStudioDebugger\" /Y /I</PostBuildEvent>
   </PropertyGroup>
 </Project>

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace FCS_AIMarineTurbine.Buildable
 {
-    internal partial class AIJetStreamT242Patcher
+    internal partial class AIJetStreamT242Buildable
     {
         private GameObject _Prefab;
 

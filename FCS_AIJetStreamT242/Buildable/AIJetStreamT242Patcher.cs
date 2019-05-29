@@ -17,9 +17,9 @@ namespace FCS_AIMarineTurbine.Buildable
     using SMLHelper.V2.Assets;
     using SMLHelper.V2.Crafting;
 
-    internal partial class AIJetStreamT242Patcher : Buildable
+    internal partial class AIJetStreamT242Buildable : Buildable
     {
-        private static readonly AIJetStreamT242Patcher Singleton = new AIJetStreamT242Patcher();
+        private static readonly AIJetStreamT242Buildable Singleton = new AIJetStreamT242Buildable();
         public override TechGroup GroupForPDA { get; } = TechGroup.ExteriorModules;
         public override TechCategory CategoryForPDA { get; } = TechCategory.ExteriorModule;
         public override string AssetsFolder { get; } = $"FCSAIMarineTurbine/Assets";
@@ -38,7 +38,7 @@ namespace FCS_AIMarineTurbine.Buildable
         }
         public static JetStreamT242Config JetStreamT242Config { get; set; }
 
-        public AIJetStreamT242Patcher() : base("AIJetStreamT242",
+        public AIJetStreamT242Buildable() : base("AIJetStreamT242",
             "AI JetStreamT242",
             "The Jet Stream T242 provides power by using the water current. The faster the turbine spins the more power output.")
         {

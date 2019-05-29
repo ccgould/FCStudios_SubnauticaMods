@@ -11,9 +11,9 @@ namespace FCS_AIMarineTurbine.Buildable
     using SMLHelper.V2.Assets;
     using SMLHelper.V2.Crafting;
 
-    internal partial class AIMarineMonitorPatcher : Buildable
+    internal partial class AIMarineMonitorBuildable : Buildable
     {
-        private static readonly AIMarineMonitorPatcher Singleton = new AIMarineMonitorPatcher();
+        private static readonly AIMarineMonitorBuildable Singleton = new AIMarineMonitorBuildable();
         public override TechGroup GroupForPDA { get; } = TechGroup.InteriorModules;
         public override TechCategory CategoryForPDA { get; } = TechCategory.InteriorModule;
         public override string AssetsFolder { get; } = $"FCSAIMarineTurbine/Assets";
@@ -28,7 +28,7 @@ namespace FCS_AIMarineTurbine.Buildable
         }
         //public static JetStreamT242Config JetStreamT242Config { get; set; }
 
-        public AIMarineMonitorPatcher() : base("AIMarineMonitor",
+        public AIMarineMonitorBuildable() : base("AIMarineMonitor",
             "AI Marine Monitor",
             "Why go outside and get wet? Get your turbine status and control your turbine from inside!")
         {

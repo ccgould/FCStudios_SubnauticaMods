@@ -13,12 +13,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCSAlterraShipping", "FCSAl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCS_AIMarineTurbine", "FCS_AIJetStreamT242\FCS_AIMarineTurbine.csproj", "{A6D5F567-127A-4EE3-9959-8C228B040290}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCStudioDebugger", "FCStudioDebugger\FCStudioDebugger.csproj", "{B260A268-5873-4147-953C-1EF67A65CB4E}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		FCSCommon\FCSCommon.projitems*{32a3f9b5-9089-4478-b706-952b706f08da}*SharedItemsImports = 4
 		FCSCommon\FCSCommon.projitems*{48dd3add-ab90-45a0-966b-178396dc1c74}*SharedItemsImports = 4
 		FCSCommon\FCSCommon.projitems*{8adcd8fa-1eb3-4df7-a44d-f689322aac03}*SharedItemsImports = 4
 		FCSCommon\FCSCommon.projitems*{a6d5f567-127a-4ee3-9959-8c228b040290}*SharedItemsImports = 4
+		FCSCommon\FCSCommon.projitems*{b260a268-5873-4147-953c-1ef67a65cb4e}*SharedItemsImports = 4
 		FCSCommon\FCSCommon.projitems*{dbc34043-0f09-42ef-beb9-f59cbc6df16f}*SharedItemsImports = 13
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -42,6 +45,10 @@ Global
 		{A6D5F567-127A-4EE3-9959-8C228B040290}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A6D5F567-127A-4EE3-9959-8C228B040290}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A6D5F567-127A-4EE3-9959-8C228B040290}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B260A268-5873-4147-953C-1EF67A65CB4E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B260A268-5873-4147-953C-1EF67A65CB4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B260A268-5873-4147-953C-1EF67A65CB4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B260A268-5873-4147-953C-1EF67A65CB4E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

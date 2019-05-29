@@ -297,13 +297,13 @@ namespace FCS_AIMarineTurbine.Display
                 _healthPercentage.GetComponent<Text>().text = $"{_mono.HealthManager.GetHealth()}%";
 
                 int powerPercent;
-                if (_mono.PowerManager.GetCharge() <= 0.0f || AIJetStreamT242Patcher.JetStreamT242Config.MaxCapacity <= 0.0f)
+                if (_mono.PowerManager.GetCharge() <= 0.0f || AIJetStreamT242Buildable.JetStreamT242Config.MaxCapacity <= 0.0f)
                 {
                     powerPercent = 0;
                 }
                 else
                 {
-                    powerPercent = Convert.ToInt32((_mono.PowerManager.GetCharge() / AIJetStreamT242Patcher.JetStreamT242Config.MaxCapacity) * 100);
+                    powerPercent = Convert.ToInt32((_mono.PowerManager.GetCharge() / AIJetStreamT242Buildable.JetStreamT242Config.MaxCapacity) * 100);
                 }
 
                 _powerSlider.GetComponent<Slider>().value = powerPercent / 100f;

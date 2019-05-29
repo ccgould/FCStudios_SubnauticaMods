@@ -3,7 +3,7 @@ using SMLHelper.V2.Handlers;
 
 namespace FCS_AIMarineTurbine.Buildable
 {
-    internal partial class AIJetStreamT242Patcher
+    internal partial class AIJetStreamT242Buildable
     {
         #region Public Properties
 

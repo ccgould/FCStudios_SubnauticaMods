@@ -47,7 +47,7 @@ namespace FCS_AIMarineTurbine.Model
 
             _passedTime += DayNightCycle.main.deltaTime;
 
-            if (_passedTime >= AIJetStreamT242Patcher.JetStreamT242Config.RotationCycleInSec)
+            if (_passedTime >= AIJetStreamT242Buildable.JetStreamT242Config.RotationCycleInSec)
             {
                 QuickLogger.Debug($"ChangeRotation");
                 ChangeRotation();

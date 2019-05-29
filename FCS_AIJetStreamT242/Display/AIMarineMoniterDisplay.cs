@@ -119,7 +119,7 @@ namespace FCS_AIMarineTurbine.Display
         {
             QuickLogger.Debug("Load Monitor Display");
 
-            GameObject itemDisplay = Instantiate(AIMarineMonitorPatcher.TurbineItemPrefab);
+            GameObject itemDisplay = Instantiate(AIMarineMonitorBuildable.TurbineItemPrefab);
             QuickLogger.Debug("TurbineItemPrefab instantiated");
 
             itemDisplay.transform.SetParent(_itemsGrid.transform, false);

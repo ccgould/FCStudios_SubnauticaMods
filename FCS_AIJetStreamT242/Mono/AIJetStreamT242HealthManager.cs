@@ -33,7 +33,6 @@ namespace FCS_AIMarineTurbine.Mono
             {
                 if (LiveMixin.data == null)
                 {
-                    QuickLogger.Error($"LiveMixing Data  is null!");
                     QuickLogger.Debug($"Creating Data");
                     LiveMixin.data = CustomLiveMixinData.Get();
                     QuickLogger.Debug($"Created Data");
@@ -99,7 +98,7 @@ namespace FCS_AIMarineTurbine.Mono
 
         public void ApplyDamage()
         {
-            if (LiveMixin.health > 0 && AIJetStreamT242Patcher.JetStreamT242Config.EnableWear)
+            if (LiveMixin.health > 0 && AIJetStreamT242Buildable.JetStreamT242Config.EnableWear)
             {
                 LiveMixin.health = Mathf.Clamp(LiveMixin.maxHealth - HealthMultiplyer, 0f, 100f);
             }
