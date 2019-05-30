@@ -59,11 +59,11 @@ namespace ARS_SeaBreezeFCS32.Buildables
                 // Add constructible
                 var constructable = prefab.GetOrAddComponent<Constructable>();
                 constructable.allowedOnWall = false;
-                constructable.allowedOnGround = true;
+                constructable.allowedOnGround = false;
                 constructable.allowedInSub = true;
                 constructable.allowedInBase = true;
                 constructable.allowedOnCeiling = false;
-                constructable.allowedOutside = true;
+                constructable.allowedOutside = false;
                 constructable.model = prefab.FindChild("model");
                 constructable.techType = TechType;
 
