@@ -14,7 +14,6 @@ namespace ARS_SeaBreezeFCS32.Mono
         public int NumberOfItems { get; set; }
         internal bool IsConstructed => _buildable != null && _buildable.constructed;
 
-
         private void Update()
         {
 
@@ -37,14 +36,14 @@ namespace ARS_SeaBreezeFCS32.Mono
             }
         }
 
-        public void OpenStorage()
-        {
-            _fridgeContainer.OpenStorage();
-        }
-
         private void Start()
         {
 
+        }
+
+        public void OpenStorage()
+        {
+            _fridgeContainer.OpenStorage();
         }
 
         private bool FindComponents()

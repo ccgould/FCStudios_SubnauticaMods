@@ -65,6 +65,7 @@
     <Compile Include="Buildables\ARSSeaBreezeFCS32Patcher.cs" />
     <Compile Include="Buildables\ARSSSeaBreezeFCS32AuxPAtcher.cs" />
     <Compile Include="Interfaces\IFridgeContainer.cs" />
+    <Compile Include="Model\ARSolutionsSeabreezeConfiguration.cs" />
     <Compile Include="Model\ARSolutionsSeaBreezeContainer.cs" />
     <Compile Include="Model\ARSolutionsSeaBreezeFilterContainer.cs" />
     <Compile Include="Mono\ARSolutionsSeaBreezeController.cs" />

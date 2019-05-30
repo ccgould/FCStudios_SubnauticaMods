@@ -1,8 +1,8 @@
 ﻿using ARS_SeaBreezeFCS32.Buildables;
 using ARS_SeaBreezeFCS32.Interfaces;
 using ARS_SeaBreezeFCS32.Mono;
+using FCSCommon.Objects;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Assets;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -26,9 +26,11 @@ namespace ARS_SeaBreezeFCS32.Model
 
         private Func<bool> isContstructed;
 
-        internal static Dictionary<TechType, ModPrefab> StorageItems { get; set; } = new Dictionary<TechType, ModPrefab>();
+        private static List<EatableEntities> _fridgeItems =
+            new List<EatableEntities>();
 
-        public ARSolutionsSeaBreezeContainer(ARSolutionsSeaBreezeController mono)
+        #region Constructor
+        internal ARSolutionsSeaBreezeContainer(ARSolutionsSeaBreezeController mono)
         {
             isContstructed = () => { return mono.IsConstructed; };
 
@@ -50,10 +52,57 @@ namespace ARS_SeaBreezeFCS32.Model
                 _fridgeContainer.isAllowedToAdd += IsAllowedToAdd;
                 _fridgeContainer.isAllowedToRemove += IsAllowedToRemove;
 
+                _fridgeContainer.onAddItem += OnAddItemEvent;
+                _fridgeContainer.onRemoveItem += OnRemoveItemEvent;
+
                 _fridgeContainer.onAddItem += mono.OnAddItemEvent;
                 _fridgeContainer.onRemoveItem += mono.OnRemoveItemEvent;
             }
         }
+
+        private void OnRemoveItemEvent(InventoryItem item)
+        {
+            var eatable = item.item.GetComponent<Eatable>();
+
+            QuickLogger.Debug($"Item Name: {eatable.name}", true);
+
+            foreach (EatableEntities eatableEntity in _fridgeItems)
+            {
+                if (eatableEntity.Name == eatable.name && eatableEntity.FoodValue == eatable.GetFoodValue() &&
+                    eatableEntity.WaterValue == eatable.GetWaterValue())
+                {
+                    QuickLogger.Debug($"Match Found", true);
+                    _fridgeItems.Remove(eatableEntity);
+                }
+            }
+
+            QuickLogger.Debug($"Fridge Item Count: {_fridgeItems.Count}", true);
+        }
+
+        private void OnAddItemEvent(InventoryItem item)
+        {
+            var eatable = item.item.GetComponent<Eatable>();
+
+            if (eatable.decomposes)
+            {
+
+            }
+
+            QuickLogger.Debug($"Item Name: {eatable.name}", true);
+
+
+
+            _fridgeItems.Add(new EatableEntities
+            {
+                FoodValue = eatable.GetFoodValue(),
+                WaterValue = eatable.GetWaterValue(),
+                Name = eatable.name
+            });
+
+            QuickLogger.Debug($"Fridge Item Count: {_fridgeItems.Count}", true);
+        }
+
+        #endregion
 
         private bool IsAllowedToRemove(Pickupable pickupable, bool verbose)
         {
@@ -69,12 +118,7 @@ namespace ARS_SeaBreezeFCS32.Model
 
                 QuickLogger.Debug(techType.ToString());
 
-                foreach (var contain in StorageItems)
-                {
-                    QuickLogger.Debug(contain.ToString());
-                }
-
-                if (StorageItems.ContainsKey(techType))
+                if (ARSolutionsSeabreezeConfiguration.EatableEntities.ContainsKey(techType))
                     flag = true;
             }
 
@@ -96,6 +140,11 @@ namespace ARS_SeaBreezeFCS32.Model
             PDA pda = main.GetPDA();
             Inventory.main.SetUsedStorage(_fridgeContainer, false);
             pda.Open(PDATab.Inventory, null, null, 4f);
+        }
+
+        internal List<EatableEntities> GetFridgeItems()
+        {
+            return _fridgeItems;
         }
     }
 }

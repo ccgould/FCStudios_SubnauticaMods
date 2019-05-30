@@ -3,7 +3,9 @@
     internal interface IFridgeContainer
     {
         bool IsFull { get; }
+
         int NumberOfItems { get; set; }
+
         void OpenStorage();
     }
 }

@@ -2,7 +2,6 @@
 using ARS_SeaBreezeFCS32.Mono;
 using FCSCommon.Utilities;
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace ARS_SeaBreezeFCS32.Model
@@ -19,7 +18,7 @@ namespace ARS_SeaBreezeFCS32.Model
 
         private const int ContainerHeight = 1;
 
-        public Dictionary<TechType, int> AllowedFilters { get; set; } = new Dictionary<TechType, int>();
+
 
         public ARSolutionsSeaBreezeFilterContainer(ARSolutionsSeaBreezeController mono)
         {
@@ -62,12 +61,12 @@ namespace ARS_SeaBreezeFCS32.Model
 
                 QuickLogger.Debug(techType.ToString());
 
-                foreach (var contain in AllowedFilters)
+                foreach (var contain in ARSolutionsSeabreezeConfiguration.AllowedFilters)
                 {
                     QuickLogger.Debug(contain.ToString());
                 }
 
-                if (AllowedFilters.ContainsKey(techType))
+                if (ARSolutionsSeabreezeConfiguration.AllowedFilters.ContainsKey(techType))
                     flag = true;
             }
 
