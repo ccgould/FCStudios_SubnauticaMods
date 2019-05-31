@@ -69,6 +69,7 @@
     <Compile Include="Buildable\AIWindSurferModelPrefab.cs" />
     <Compile Include="Buildable\AIWindSurferPatcher.cs" />
     <Compile Include="Configuration\JetStreamT242Config.cs" />
+    <Compile Include="Configuration\SaveData.cs" />
     <Compile Include="Display\InterfaceButton.cs" />
     <Compile Include="Display\AIJetStreamT242Display.cs" />
     <Compile Include="Display\AIMarineMoniterDisplay.cs" />

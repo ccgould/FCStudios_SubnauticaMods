@@ -339,6 +339,11 @@ namespace FCS_AIMarineTurbine.Display
         }
         #endregion
 
+        public override void ClearPage()
+        {
+            throw new NotImplementedException();
+        }
+
         public override void ChangePageBy(int amountToChangePageBy)
         {
             throw new NotImplementedException();
@@ -432,13 +437,9 @@ namespace FCS_AIMarineTurbine.Display
             }
         }
 
-        private void ResetAnimation()
+        public override void DrawPage(int page)
         {
-            foreach (var parameter in _mono.AnimationManager.GetParameters())
-            {
-                _mono.AnimationManager.SetBoolHash(parameter.GetHashCode(), false);
-                QuickLogger.Debug($"Animator Parameter {parameter.name} was reset to false");
-            }
+            throw new NotImplementedException();
         }
     }
 }

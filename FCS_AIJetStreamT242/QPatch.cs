@@ -20,14 +20,13 @@ namespace FCS_AIMarineTurbine
 #if DEBUG
             QuickLogger.DebugLogsEnabled = true;
             QuickLogger.Debug("Debug logs enabled");
-            //TODO remove on releasa
+            //TODO remove on release
             AIWindSurferBuildable.PatchSMLHelper(); 
 #endif
 
             try
             {
                 LoadAssetBundle();
-                //Set Rotation
                 AISolutionsData.PatchHelper();
                 AIJetStreamT242Buildable.PatchSMLHelper();
                 AIMarineMonitorBuildable.PatchSMLHelper();

@@ -14,13 +14,18 @@ namespace FCSCommon.Helpers
 
         public int MaxPage = 1;
 
+        public abstract void ClearPage();
+
         public int ITEMS_PER_PAGE;
 
         /// <summary>
         /// Changes page by a certain amount
         /// </summary>
         /// <param name="amountToChangePageBy"></param>
-        public abstract void ChangePageBy(int amountToChangePageBy);
+        public virtual void ChangePageBy(int amountToChangePageBy)
+        {
+            DrawPage(CurrentPage + amountToChangePageBy);
+        }
 
         public abstract void OnButtonClick(string btnName, object tag);
 
@@ -51,5 +56,8 @@ namespace FCSCommon.Helpers
 
         public abstract IEnumerator CompleteSetup();
 
+        public abstract void DrawPage(int page);
+
+        public virtual void UpdatePaginator() { }
     }
 }

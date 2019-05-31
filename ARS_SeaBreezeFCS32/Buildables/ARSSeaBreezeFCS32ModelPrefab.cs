@@ -6,27 +6,24 @@ namespace ARS_SeaBreezeFCS32.Buildables
 {
     internal partial class ARSSeaBreezeFCS32Buildable
     {
-        private AssetBundle _assetBundle;
         private GameObject _Prefab;
+        public static GameObject ItemPrefab { get; set; }
 
         public bool GetPrefabs()
         {
             QuickLogger.Debug("GetPrefabs");
-            AssetBundle assetBundle = AssetHelper.Asset("FCS_ARSSeaBreeze", "arsseabreezefcs32modbundle");
 
             //If the result is null return false.
-            if (assetBundle == null)
+            if (QPatch.Bundle == null)
             {
                 QuickLogger.Error($"AssetBundle is Null!");
                 return false;
             }
 
-            _assetBundle = assetBundle;
-
             QuickLogger.Debug($"AssetBundle Set");
 
             //We have found the asset bundle and now we are going to continue by looking for the model.
-            GameObject prefab = assetBundle.LoadAsset<GameObject>("SeaBreezeFCS32");
+            GameObject prefab = QPatch.Bundle.LoadAsset<GameObject>("SeaBreezeFCS32");
 
             //If the prefab isn't null lets add the shader to the materials
             if (prefab != null)
@@ -44,6 +41,21 @@ namespace ARS_SeaBreezeFCS32.Buildables
                 return false;
             }
 
+            GameObject itemPrefab = QPatch.Bundle.LoadAsset<GameObject>("ARSItem");
+
+            if (itemPrefab != null)
+            {
+                ItemPrefab = itemPrefab;
+
+                QuickLogger.Debug($"{this.FriendlyName} ItemPrefab Found!");
+            }
+            else
+            {
+                QuickLogger.Error($"{this.FriendlyName} ItemPrefab Not Found!");
+                return false;
+            }
+
+
             return true;
         }
 
@@ -54,14 +66,14 @@ namespace ARS_SeaBreezeFCS32.Buildables
         private void ApplyShaders(GameObject prefab)
         {
             #region SystemLights_BaseColor
-            MaterialHelpers.ApplyEmissionShader("SystemLights_BaseColor", "SystemLights_OnMode_Emissive", prefab, _assetBundle, new Color(0.08235294f, 1f, 1f));
-            MaterialHelpers.ApplyNormalShader("SystemLights_BaseColor", "SystemLights_Norm", prefab, _assetBundle);
+            MaterialHelpers.ApplyEmissionShader("SystemLights_BaseColor", "SystemLights_OnMode_Emissive", prefab, QPatch.Bundle, new Color(0.08235294f, 1f, 1f));
+            MaterialHelpers.ApplyNormalShader("SystemLights_BaseColor", "SystemLights_Norm", prefab, QPatch.Bundle);
             MaterialHelpers.ApplyAlphaShader("SystemLights_BaseColor", prefab);
             #endregion
 
             #region FCS_SUBMods_GlobalDecals
             MaterialHelpers.ApplyAlphaShader("FCS_SUBMods_GlobalDecals", prefab);
-            MaterialHelpers.ApplyNormalShader("FCS_SUBMods_GlobalDecals", "FCS_SUBMods_GlobalDecals_Norm", prefab, _assetBundle);
+            MaterialHelpers.ApplyNormalShader("FCS_SUBMods_GlobalDecals", "FCS_SUBMods_GlobalDecals_Norm", prefab, QPatch.Bundle);
             #endregion
 
         }

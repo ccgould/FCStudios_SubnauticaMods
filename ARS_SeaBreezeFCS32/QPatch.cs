@@ -23,8 +23,7 @@ namespace ARS_SeaBreezeFCS32
 
             try
             {
-                //TODO Remove if not needed
-                //LoadAssetBundle();
+                LoadAssetBundle();
 
                 ARSSeaBreezeFCS32Buildable.PatchHelper();
 
@@ -43,7 +42,7 @@ namespace ARS_SeaBreezeFCS32
         private static void LoadAssetBundle()
         {
             QuickLogger.Debug("GetPrefabs");
-            AssetBundle assetBundle = AssetHelper.Asset($"FCSAIMarineTurbine", "aimarineturbinemodbundle");
+            AssetBundle assetBundle = AssetHelper.Asset("FCS_ARSSeaBreeze", "arsseabreezefcs32modbundle");
 
             //If the result is null return false.
             if (assetBundle == null)

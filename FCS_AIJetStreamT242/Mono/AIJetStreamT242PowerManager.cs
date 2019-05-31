@@ -30,7 +30,7 @@ namespace FCS_AIJetStreamT242.Mono
         private void Start()
         {
             _capacity = AIJetStreamT242Buildable.JetStreamT242Config.MaxCapacity;
-            InvokeRepeating("UpdatePowerRelay", 0, 1);
+            //InvokeRepeating("UpdatePowerRelay", 0, 1);
         }
         private void Update()
         {

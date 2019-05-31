@@ -85,16 +85,6 @@ namespace FCS_AIMarineTurbine.Display
             }
         }
 
-        private void ClearPage()
-        {
-            for (int i = 0; i < _itemsGrid.transform.childCount; i++)
-            {
-                var item = _itemsGrid.transform.GetChild(i).gameObject;
-                //QuickLogger.Debug($"Removed Item : {item.name} from screen");
-                Destroy(item);
-            }
-        }
-
         private void UpdatePaginator()
         {
             CalculateNewMaxPages();
@@ -321,7 +311,7 @@ namespace FCS_AIMarineTurbine.Display
             StartCoroutine(CompleteSetup());
         }
 
-        public void DrawPage(int page)
+        public override void DrawPage(int page)
         {
             CurrentPage = page;
 
@@ -488,6 +478,15 @@ namespace FCS_AIMarineTurbine.Display
 
         }
 
+        public override void ClearPage()
+        {
+            for (int i = 0; i < _itemsGrid.transform.childCount; i++)
+            {
+                var item = _itemsGrid.transform.GetChild(i).gameObject;
+                //QuickLogger.Debug($"Removed Item : {item.name} from screen");
+                Destroy(item);
+            }
+        }
         #endregion
     }
 }

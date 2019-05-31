@@ -69,7 +69,10 @@ namespace ARS_SeaBreezeFCS32.Buildables
 
                 prefab.GetOrAddComponent<PrefabIdentifier>().ClassId = this.ClassID;
 
-                var controller = prefab.GetOrAddComponent<ARSolutionsSeaBreezeController>();
+                //prefab.GetOrAddComponent<ARSolutionsSeaBreezePowerManager>();
+                prefab.GetOrAddComponent<ARSolutionsSeaBreezeAnimationManager>();
+                prefab.GetOrAddComponent<ARSolutionsSeaBreezeController>();
+
             }
             catch (Exception e)
             {

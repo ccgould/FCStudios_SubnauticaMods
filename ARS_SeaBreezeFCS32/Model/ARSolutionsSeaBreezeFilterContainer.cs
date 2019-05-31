@@ -18,7 +18,9 @@ namespace ARS_SeaBreezeFCS32.Model
 
         private const int ContainerHeight = 1;
 
+        public Action OnPDAClosedAction { get; set; }
 
+        public Action OnPDAOpenedAction { get; set; }
 
         public ARSolutionsSeaBreezeFilterContainer(ARSolutionsSeaBreezeController mono)
         {
@@ -75,6 +77,25 @@ namespace ARS_SeaBreezeFCS32.Model
             if (!flag && verbose)
                 ErrorMessage.AddMessage("Alterra Refrigeration Short/Long Filters allowed only");
             return flag;
+        }
+
+        public void OpenStorage()
+        {
+            QuickLogger.Debug($"Filter Button Clicked", true);
+
+            if (!isContstructed.Invoke())
+                return;
+
+            Player main = Player.main;
+            PDA pda = main.GetPDA();
+            Inventory.main.SetUsedStorage(_filterContainer, false);
+            pda.Open(PDATab.Inventory, null, OnPDAClose, 4f);
+            OnPDAOpenedAction?.Invoke();
+        }
+
+        private void OnPDAClose(PDA pda)
+        {
+            OnPDAClosedAction?.Invoke();
         }
     }
 }
