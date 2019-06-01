@@ -68,8 +68,6 @@ namespace ARS_SeaBreezeFCS32.Buildables
                 constructable.techType = TechType;
 
                 prefab.GetOrAddComponent<PrefabIdentifier>().ClassId = this.ClassID;
-
-                //prefab.GetOrAddComponent<ARSolutionsSeaBreezePowerManager>();
                 prefab.GetOrAddComponent<ARSolutionsSeaBreezeAnimationManager>();
                 prefab.GetOrAddComponent<ARSolutionsSeaBreezeController>();
 

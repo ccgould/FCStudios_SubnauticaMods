@@ -2,12 +2,11 @@
 using FCSCommon.Utilities;
 using UnityEngine;
 
-namespace ARS_SeaBreezeFCS32.Buildables
+namespace FCSTechWorkBench.Mono
 {
-    internal partial class ARSSeaBreezeFCS32Buildable
+    public partial class FCSTechWorkBenchBuildable
     {
         private GameObject _Prefab;
-        public static GameObject ItemPrefab { get; set; }
 
         public bool GetPrefabs()
         {
@@ -41,25 +40,8 @@ namespace ARS_SeaBreezeFCS32.Buildables
                 return false;
             }
 
-            GameObject itemPrefab = QPatch.Bundle.LoadAsset<GameObject>("ARSItem");
-
-            if (itemPrefab != null)
-            {
-                ItemPrefab = itemPrefab;
-
-                QuickLogger.Debug($"{this.FriendlyName} ItemPrefab Found!");
-            }
-            else
-            {
-                QuickLogger.Error($"{this.FriendlyName} ItemPrefab Not Found!");
-                return false;
-            }
-
-
             return true;
         }
-
-
 
         /// <summary>
         /// Applies the shader to the materials of the reactor
@@ -68,14 +50,14 @@ namespace ARS_SeaBreezeFCS32.Buildables
         private void ApplyShaders(GameObject prefab)
         {
             #region SystemLights_BaseColor
-            MaterialHelpers.ApplyEmissionShader("SystemLights_BaseColor", "SystemLights_OnMode_Emissive", prefab, QPatch.GlobalBundle, new Color(0.08235294f, 1f, 1f));
-            MaterialHelpers.ApplyNormalShader("SystemLights_BaseColor", "SystemLights_Norm", prefab, QPatch.GlobalBundle);
+            MaterialHelpers.ApplyEmissionShader("SystemLights_BaseColor", "SystemLights_OnMode_Emissive", prefab, QPatch.Bundle, new Color(0.08235294f, 1f, 1f));
+            MaterialHelpers.ApplyNormalShader("SystemLights_BaseColor", "SystemLights_Norm", prefab, QPatch.Bundle);
             MaterialHelpers.ApplyAlphaShader("SystemLights_BaseColor", prefab);
             #endregion
 
             #region FCS_SUBMods_GlobalDecals
             MaterialHelpers.ApplyAlphaShader("FCS_SUBMods_GlobalDecals", prefab);
-            MaterialHelpers.ApplyNormalShader("FCS_SUBMods_GlobalDecals", "FCS_SUBMods_GlobalDecals_Norm", prefab, QPatch.GlobalBundle);
+            MaterialHelpers.ApplyNormalShader("FCS_SUBMods_GlobalDecals", "FCS_SUBMods_GlobalDecals_Norm", prefab, QPatch.Bundle);
             #endregion
 
         }

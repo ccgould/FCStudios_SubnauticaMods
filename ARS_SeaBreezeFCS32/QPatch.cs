@@ -11,7 +11,7 @@ namespace ARS_SeaBreezeFCS32
 {
     public static class QPatch
     {
-        public static AssetBundle Bundle { get; private set; }
+        //public static AssetBundle Bundle { get; private set; }
         public static void Patch()
         {
             QuickLogger.Info("Started patching. Version: " + QuickLogger.GetAssemblyVersion());
@@ -24,6 +24,8 @@ namespace ARS_SeaBreezeFCS32
             try
             {
                 LoadAssetBundle();
+
+                GlobalBundle = FCSTechWorkBench.QPatch.Bundle;
 
                 ARSSeaBreezeFCS32Buildable.PatchHelper();
 
@@ -53,6 +55,10 @@ namespace ARS_SeaBreezeFCS32
 
             Bundle = assetBundle;
         }
+
+        public static AssetBundle Bundle { get; set; }
+
+        public static AssetBundle GlobalBundle { get; set; }
     }
 }
 

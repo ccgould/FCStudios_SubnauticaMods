@@ -5,8 +5,17 @@ namespace ARS_SeaBreezeFCS32.Mono
 {
     internal class ARSolutionsSeaBreezeAnimationManager : MonoBehaviour
     {
+        #region Private Members
         private int _driveStateHash;
+        #endregion
+
+        #region Public Properties
+
         public Animator Animator { get; private set; }
+
+        #endregion
+
+        #region Unity Methods
         private void Awake()
         {
             Animator = GetComponentInParent<Animator>();
@@ -14,6 +23,9 @@ namespace ARS_SeaBreezeFCS32.Mono
             _driveStateHash = UnityEngine.Animator.StringToHash("DriveState");
         }
 
+        #endregion
+
+        #region Internal Methods
         internal void ToggleDriveState()
         {
             var state = Animator.GetBool(_driveStateHash);
@@ -54,10 +66,6 @@ namespace ARS_SeaBreezeFCS32.Mono
             QuickLogger.Debug($"Set Hash {value}", true);
             this.Animator.SetFloat(stateHash, value);
         }
-
-        public AnimatorControllerParameter[] GetParameters()
-        {
-            return Animator.parameters;
-        }
+        #endregion
     }
 }

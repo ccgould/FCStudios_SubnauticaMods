@@ -1,5 +1,6 @@
 ﻿using FCSCommon.Utilities;
 using System;
+using System.Collections;
 using UnityEngine;
 
 namespace ARS_SeaBreezeFCS32.Mono
@@ -9,60 +10,58 @@ namespace ARS_SeaBreezeFCS32.Mono
         private bool _hasBreakerTripped;
         public Action OnBreakerTripped { get; set; }
         public Action OnBreakerReset { get; set; }
-        private float EnergyConsumptionPerSecond = 0f;
-        private float AvailablePower => this.ConnectedRelay.GetPower();
 
-        private PowerRelay _powerRelay;
+        private float EnergyConsumptionPerSecond = 0.2f;
+        private float AvailablePower => _connectedRelay.GetPower();
 
         private ARSolutionsSeaBreezeController _mono;
 
+        public bool NotAllowToOperate => !_mono.IsConstructed || _mono.PowerManager.GetHasBreakerTripped() || _connectedRelay == null;
+
         private PowerRelay _connectedRelay;
-
-        private PowerRelay ConnectedRelay
-        {
-            get
-            {
-                while (_connectedRelay == null)
-                    UpdatePowerRelay();
-
-                return _connectedRelay;
-            }
-        }
 
 
         #region Unity Methods
-
-        private void Awake()
-        {
-            UpdatePowerRelay();
-        }
-
-        private void Start()
-        {
-            UpdatePowerRelay();
-        }
-
         private void Update()
         {
+            if (this.NotAllowToOperate)
+                return;
+
             float energyToConsume = EnergyConsumptionPerSecond * DayNightCycle.main.deltaTime;
             bool requiresEnergy = GameModeUtils.RequiresPower();
             bool hasPowerToConsume = !requiresEnergy || (this.AvailablePower >= energyToConsume);
+
+            if (!hasPowerToConsume)
+                return;
+
             if (requiresEnergy)
-                this.ConnectedRelay.ConsumeEnergy(energyToConsume, out float amountConsumed);
+                _connectedRelay.ConsumeEnergy(energyToConsume, out float amountConsumed);
         }
         #endregion
 
-        private void UpdatePowerRelay()
+        private IEnumerator UpdatePowerRelay()
         {
-            PowerRelay relay = PowerSource.FindRelay(this.transform);
-            if (relay != null && relay != _connectedRelay)
+            QuickLogger.Debug("In UpdatePowerRelay found at last!");
+
+            var i = 1;
+
+            while (_connectedRelay == null)
             {
-                _connectedRelay = relay;
-                QuickLogger.Debug("PowerRelay found at last!");
-            }
-            else
-            {
-                _connectedRelay = null;
+                QuickLogger.Debug($"Checking For Relay... Attempt {i}");
+
+                PowerRelay relay = PowerSource.FindRelay(this.transform);
+                if (relay != null && relay != _connectedRelay)
+                {
+                    _connectedRelay = relay;
+                    QuickLogger.Debug("PowerRelay found at last!");
+                }
+                else
+                {
+                    _connectedRelay = null;
+                }
+
+                i++;
+                yield return new WaitForSeconds(0.5f);
             }
         }
 
@@ -78,9 +77,10 @@ namespace ARS_SeaBreezeFCS32.Mono
             OnBreakerReset?.Invoke();
         }
 
-        public void Initialize(ARSolutionsSeaBreezeController mono)
+        internal void Initialize(ARSolutionsSeaBreezeController mono)
         {
             _mono = mono;
+            StartCoroutine(UpdatePowerRelay());
         }
 
         internal bool GetHasBreakerTripped()

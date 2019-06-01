@@ -16,10 +16,8 @@ namespace ARS_SeaBreezeFCS32.Mono
 
         internal void OnInterfaceButton(bool value)
         {
-
             _onInterfaceButton = value;
         }
-
 
         public void OnHandHover(GUIHand hand)
         {

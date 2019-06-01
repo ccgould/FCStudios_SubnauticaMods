@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{4963C014-F97E-4124-B3C7-9F7BB790E1BF}</ProjectGuid>
+    <ProjectGuid>{B947909C-4983-4749-93AC-73EA69F6DCE8}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ARS_SeaBreezeFCS32</RootNamespace>
-    <AssemblyName>ARS_SeaBreezeFCS32</AssemblyName>
+    <RootNamespace>FCSTechWorkBench</RootNamespace>
+    <AssemblyName>FCSTechWorkBench</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -56,39 +56,24 @@
     <Reference Include="UnityEngine">
       <HintPath>F:\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\UnityEngine.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.UI">
-      <HintPath>F:\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\UnityEngine.UI.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Buildables\ARSSeaBreezeFCS32ModelPrefab.cs" />
-    <Compile Include="Buildables\ARSSeaBreezeFCS32Patcher.cs" />
-    <Compile Include="Buildables\ARSSSeaBreezeFCS32AuxPAtcher.cs" />
-    <Compile Include="Display\InterfaceButton.cs" />
-    <Compile Include="Display\ItemButton.cs" />
-    <Compile Include="Display\OnScreenButton.cs" />
-    <Compile Include="Display\PaginatorButton.cs" />
-    <Compile Include="Interfaces\IFridgeContainer.cs" />
-    <Compile Include="Model\ARSolutionsSeabreezeConfiguration.cs" />
-    <Compile Include="Model\ARSolutionsSeaBreezeContainer.cs" />
-    <Compile Include="Model\ARSolutionsSeaBreezeFilterContainer.cs" />
-    <Compile Include="Model\SaveData.cs" />
-    <Compile Include="Mono\ARSolutionsSeaBreezeAnimationManager.cs" />
-    <Compile Include="Mono\ARSolutionsSeaBreezeController.cs" />
-    <Compile Include="Mono\ARSolutionsSeaBreezeDisplay.cs" />
-    <Compile Include="Mono\ARSolutionsSeaBreezePlayerInteraction.cs" />
-    <Compile Include="Mono\ARSolutionsSeaBreezePowerManager.cs" />
+    <Compile Include="Abstract Classes\FCSTechWorkBenchItem.cs" />
+    <Compile Include="Interfaces\IFCSTechWorkBenchItem.cs" />
+    <Compile Include="Mono\FCSTechWorkBenchModelPrefab.cs" />
+    <Compile Include="Mono\Filter.cs" />
+    <Compile Include="Mono\FCSTechWorkBenchPatcher.cs" />
+    <Compile Include="Mono\ShortTermFilterModelPrefab.cs" />
+    <Compile Include="Mono\LongTermFilterModelPrefab.cs" />
+    <Compile Include="Mono\ShortTermFilterPatcher.cs" />
+    <Compile Include="Mono\LongTermFilterPatcher.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\FCSWorkBench\FCSTechWorkBench.csproj">
-      <Project>{b947909c-4983-4749-93ac-73ea69f6dce8}</Project>
-      <Name>FCSTechWorkBench</Name>
-    </ProjectReference>
-  </ItemGroup>
+  <ItemGroup />
+  <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy "$(ProjectDir)bin\$(Configuration)\ARS_SeaBreezeFCS32.dll" "F:\Program Files\Epic Games\Subnautica\QMods\FCS_ARSSeaBreeze\" /Y /I</PostBuildEvent>
+    <PostBuildEvent>xcopy "$(ProjectDir)bin\$(Configuration)\FCSTechWorkBench.dll" "F:\Program Files\Epic Games\Subnautica\QMods\FCSTechWorkBench\" /Y /I</PostBuildEvent>
   </PropertyGroup>
 </Project>

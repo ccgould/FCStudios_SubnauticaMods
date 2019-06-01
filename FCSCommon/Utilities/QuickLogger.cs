@@ -6,9 +6,9 @@
 
     //Created by PrimeSonic GitHub repo: https://github.com/PrimeSonic/PrimeSonicSubnauticaMods
 
-    internal static class QuickLogger
+    public static class QuickLogger
     {
-        internal static bool DebugLogsEnabled = false;
+        public static bool DebugLogsEnabled = false;
 
         public static void Info(string msg, bool showOnScreen = false)
         {

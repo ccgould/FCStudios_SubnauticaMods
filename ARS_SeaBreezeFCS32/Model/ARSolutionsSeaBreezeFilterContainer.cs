@@ -1,6 +1,7 @@
 ﻿using ARS_SeaBreezeFCS32.Buildables;
 using ARS_SeaBreezeFCS32.Mono;
 using FCSCommon.Utilities;
+using FCSTechWorkBench.Mono;
 using System;
 using UnityEngine;
 
@@ -59,16 +60,7 @@ namespace ARS_SeaBreezeFCS32.Model
             bool flag = false;
             if (pickupable != null)
             {
-                TechType techType = pickupable.GetTechType();
-
-                QuickLogger.Debug(techType.ToString());
-
-                foreach (var contain in ARSolutionsSeabreezeConfiguration.AllowedFilters)
-                {
-                    QuickLogger.Debug(contain.ToString());
-                }
-
-                if (ARSolutionsSeabreezeConfiguration.AllowedFilters.ContainsKey(techType))
+                if (pickupable.gameObject.GetComponent<Filter>() != null)
                     flag = true;
             }
 

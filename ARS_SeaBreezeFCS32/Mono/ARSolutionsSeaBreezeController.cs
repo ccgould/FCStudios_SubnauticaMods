@@ -1,5 +1,6 @@
 ﻿using ARS_SeaBreezeFCS32.Interfaces;
 using ARS_SeaBreezeFCS32.Model;
+using FCSCommon.Extensions;
 using FCSCommon.Objects;
 using FCSCommon.Utilities;
 using Oculus.Newtonsoft.Json;
@@ -57,8 +58,12 @@ namespace ARS_SeaBreezeFCS32.Mono
                 _buildable = GetComponentInParent<Constructable>();
             }
 
-            PowerManager = GetComponentInParent<ARSolutionsSeaBreezePowerManager>();
-            if (PowerManager == null)
+            PowerManager = gameObject.GetOrAddComponent<ARSolutionsSeaBreezePowerManager>();
+            if (PowerManager != null)
+            {
+                PowerManager.Initialize(this);
+            }
+            else
             {
                 QuickLogger.Error("Power Manager Component was not found");
             }

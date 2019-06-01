@@ -15,20 +15,20 @@ namespace ARS_SeaBreezeFCS32.Mono
 {
     internal class ARSolutionsSeaBreezeDisplay : AIDisplay
     {
+        #region Private Members
         private ARSolutionsSeaBreezeController _mono;
-        private int _amount;
         private List<EatableEntities> _container;
         private GameObject _canvasGameObject;
         private GameObject _model;
         private GameObject _homeScreen;
-        private GameObject _filterBTN;
+        private GameObject _filterBtn;
         private GameObject _itemsGrid;
-        private GameObject _homeScreenPowerBTN;
-        private GameObject _paginator;
+        private GameObject _homeScreenPowerBtn;
+        private GameObject _pagination;
         private GameObject _background;
         private GameObject _blackOut;
         private GameObject _poweredOffScreen;
-        private GameObject _poweredScreenPowerBTN;
+        private GameObject _poweredScreenPowerBtn;
         private GameObject _previousPageGameObject;
         private GameObject _nextPageGameObject;
         private GameObject _pageCounter;
@@ -36,9 +36,10 @@ namespace ARS_SeaBreezeFCS32.Mono
         private int _pageStateHash;
         private readonly float BOOTING_ANIMATION_TIME = 6f;
         private readonly float WELCOME_SCREEN_TIME = 2f;
-        private Dictionary<TechType, int> TrackedItems = new Dictionary<TechType, int>();
+        private readonly Dictionary<TechType, int> TrackedItems = new Dictionary<TechType, int>();
+        #endregion
 
-
+        #region Internal Methods    
         internal void Setup(ARSolutionsSeaBreezeController mono)
         {
             _mono = mono;
@@ -58,7 +59,9 @@ namespace ARS_SeaBreezeFCS32.Mono
 
             DrawPage(1);
         }
+        #endregion
 
+        #region Public Methods
         public override void ClearPage()
         {
             for (int i = 0; i < _itemsGrid.transform.childCount; i++)
@@ -87,8 +90,6 @@ namespace ARS_SeaBreezeFCS32.Mono
 
                 case "FilterBtn":
                     _mono.OpenFilterContainer();
-                    break;
-                default:
                     break;
             }
         }
@@ -137,9 +138,9 @@ namespace ARS_SeaBreezeFCS32.Mono
             #endregion
 
             #region Home Screen Timer
-            _filterBTN = _homeScreen.transform.Find("FilterTimer_LBL")?.gameObject;
+            _filterBtn = _homeScreen.transform.Find("FilterTimer_LBL")?.gameObject;
 
-            if (_filterBTN == null)
+            if (_filterBtn == null)
             {
                 QuickLogger.Error("Screen: Filter label not found.");
                 return false;
@@ -147,16 +148,16 @@ namespace ARS_SeaBreezeFCS32.Mono
             #endregion
 
             #region Home Screen Power BTN
-            _homeScreenPowerBTN = _homeScreen.transform.Find("Power_BTN")?.gameObject;
+            _homeScreenPowerBtn = _homeScreen.transform.Find("Power_BTN")?.gameObject;
 
-            if (_homeScreenPowerBTN == null)
+            if (_homeScreenPowerBtn == null)
             {
                 QuickLogger.Error("Screen: Powered Off Screen Button not found.");
                 return false;
             }
 
 
-            var homeScreenPowerBTN = _homeScreenPowerBTN.AddComponent<InterfaceButton>();
+            var homeScreenPowerBTN = _homeScreenPowerBtn.AddComponent<InterfaceButton>();
             homeScreenPowerBTN.OnButtonClick = OnButtonClick;
             homeScreenPowerBTN.ButtonMode = InterfaceButtonMode.Background;
             homeScreenPowerBTN.BtnName = "HPPBtn";
@@ -164,8 +165,8 @@ namespace ARS_SeaBreezeFCS32.Mono
             #endregion
 
             #region Paginator
-            _paginator = _homeScreen.FindChild("Paginator")?.gameObject;
-            if (_paginator == null)
+            _pagination = _homeScreen.FindChild("Paginator")?.gameObject;
+            if (_pagination == null)
             {
                 QuickLogger.Error("Screen: Paginator not found.");
                 return false;
@@ -173,15 +174,15 @@ namespace ARS_SeaBreezeFCS32.Mono
             #endregion
 
             #region Filter
-            _filterBTN = _homeScreen.transform.Find("Filter_BTN")?.gameObject;
+            _filterBtn = _homeScreen.transform.Find("Filter_BTN")?.gameObject;
 
-            if (_filterBTN == null)
+            if (_filterBtn == null)
             {
                 QuickLogger.Error("Screen: Filter Button not found.");
                 return false;
             }
 
-            var filterrBTN = _filterBTN.AddComponent<InterfaceButton>();
+            var filterrBTN = _filterBtn.AddComponent<InterfaceButton>();
             filterrBTN.OnButtonClick = OnButtonClick;
             filterrBTN.ButtonMode = InterfaceButtonMode.Background;
             filterrBTN.BtnName = "FilterBtn";
@@ -226,14 +227,14 @@ namespace ARS_SeaBreezeFCS32.Mono
             #endregion
 
             #region Power BTN
-            _poweredScreenPowerBTN = _poweredOffScreen.transform.Find("Power_BTN")?.gameObject;
-            if (_poweredScreenPowerBTN == null)
+            _poweredScreenPowerBtn = _poweredOffScreen.transform.Find("Power_BTN")?.gameObject;
+            if (_poweredScreenPowerBtn == null)
             {
                 QuickLogger.Error("Screen: Powered Off Screen Button not found.");
                 return false;
             }
 
-            var poweredOffScreenBTN = _poweredScreenPowerBTN.AddComponent<InterfaceButton>();
+            var poweredOffScreenBTN = _poweredScreenPowerBtn.AddComponent<InterfaceButton>();
             poweredOffScreenBTN.OnButtonClick = OnButtonClick;
             poweredOffScreenBTN.BtnName = "PPBtn";
             poweredOffScreenBTN.ButtonMode = InterfaceButtonMode.Background;
@@ -241,7 +242,7 @@ namespace ARS_SeaBreezeFCS32.Mono
             #endregion
 
             #region Prev Page BTN
-            _previousPageGameObject = _paginator.FindChild("PreviousPage")?.gameObject;
+            _previousPageGameObject = _pagination.FindChild("PreviousPage")?.gameObject;
             if (_previousPageGameObject == null)
             {
                 QuickLogger.Error("Screen: PreviousPage not found.");
@@ -255,7 +256,7 @@ namespace ARS_SeaBreezeFCS32.Mono
             #endregion
 
             #region Next Page BTN
-            _nextPageGameObject = _paginator.FindChild("NextPage")?.gameObject;
+            _nextPageGameObject = _pagination.FindChild("NextPage")?.gameObject;
             if (_nextPageGameObject == null)
             {
                 QuickLogger.Error("Screen: NextPage not found.");
@@ -269,7 +270,7 @@ namespace ARS_SeaBreezeFCS32.Mono
             #endregion
 
             #region Color Picker Page Counter
-            _pageCounter = _paginator.FindChild("PageNumber")?.gameObject;
+            _pageCounter = _pagination.FindChild("PageNumber")?.gameObject;
             if (_pageCounter == null)
             {
                 QuickLogger.Error("Screen: PageNumber not found.");
@@ -283,39 +284,8 @@ namespace ARS_SeaBreezeFCS32.Mono
                 return false;
             }
             #endregion
+
             return true;
-        }
-
-        public override IEnumerator PowerOff()
-        {
-            yield return new WaitForEndOfFrame();
-            _mono.AnimationManager.SetFloatHash(_pageStateHash, 4);
-            yield return new WaitForEndOfFrame();
-        }
-
-        public override IEnumerator PowerOn()
-        {
-            QuickLogger.Debug("In Power On", true);
-            yield return new WaitForEndOfFrame();
-            _mono.AnimationManager.SetIntHash(_pageStateHash, 1);
-            yield return new WaitForSeconds(BOOTING_ANIMATION_TIME);
-            _mono.AnimationManager.SetIntHash(_pageStateHash, 2);
-            yield return new WaitForSeconds(WELCOME_SCREEN_TIME);
-            _mono.AnimationManager.SetIntHash(_pageStateHash, 3);
-            yield return new WaitForEndOfFrame();
-            QuickLogger.Debug("In Power On Done", true);
-        }
-
-        public override IEnumerator ShutDown()
-        {
-            yield return new WaitForEndOfFrame();
-            _mono.AnimationManager.SetFloatHash(_pageStateHash, 0);
-            yield return new WaitForEndOfFrame();
-        }
-
-        public override IEnumerator CompleteSetup()
-        {
-            throw new NotImplementedException();
         }
 
         public override void DrawPage(int page)
@@ -375,25 +345,6 @@ namespace ARS_SeaBreezeFCS32.Mono
             UpdatePaginator();
         }
 
-        private bool CheckIfItemExist(TechType techType)
-        {
-            foreach (Transform child in _itemsGrid.transform)
-            {
-                var itemButton = child.GetComponent<ItemButton>();
-
-                if (itemButton == null) continue;
-
-                if (itemButton.Type == techType)
-                {
-                    QuickLogger.Debug("Item Found", true);
-                    itemButton.Amount = _mono.GetTechTypeAmount(techType);
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
         public override void UpdatePaginator()
         {
             base.UpdatePaginator();
@@ -404,7 +355,43 @@ namespace ARS_SeaBreezeFCS32.Mono
             _previousPageGameObject.SetActive(CurrentPage != 1);
             _nextPageGameObject.SetActive(CurrentPage != MaxPage);
         }
+        #endregion
 
+        #region IEnumerators    
+        public override IEnumerator PowerOff()
+        {
+            yield return new WaitForEndOfFrame();
+            _mono.AnimationManager.SetFloatHash(_pageStateHash, 4);
+            yield return new WaitForEndOfFrame();
+        }
+
+        public override IEnumerator PowerOn()
+        {
+            QuickLogger.Debug("In Power On", true);
+            yield return new WaitForEndOfFrame();
+            _mono.AnimationManager.SetIntHash(_pageStateHash, 1);
+            yield return new WaitForSeconds(BOOTING_ANIMATION_TIME);
+            _mono.AnimationManager.SetIntHash(_pageStateHash, 2);
+            yield return new WaitForSeconds(WELCOME_SCREEN_TIME);
+            _mono.AnimationManager.SetIntHash(_pageStateHash, 3);
+            yield return new WaitForEndOfFrame();
+            QuickLogger.Debug("In Power On Done", true);
+        }
+
+        public override IEnumerator ShutDown()
+        {
+            yield return new WaitForEndOfFrame();
+            _mono.AnimationManager.SetFloatHash(_pageStateHash, 0);
+            yield return new WaitForEndOfFrame();
+        }
+
+        public override IEnumerator CompleteSetup()
+        {
+            throw new NotImplementedException();
+        }
+        #endregion
+
+        #region Private Methods
         private void CalculateNewMaxPages()
         {
             MaxPage = Mathf.CeilToInt((_mono.NumberOfItems - 1) / ITEMS_PER_PAGE) + 1;
@@ -430,6 +417,6 @@ namespace ARS_SeaBreezeFCS32.Mono
             uGUI_Icon icon = itemDisplay.transform.Find("ItemImage").gameObject.AddComponent<uGUI_Icon>();
             icon.sprite = SpriteManager.Get(type);
         }
-
+        #endregion
     }
 }
