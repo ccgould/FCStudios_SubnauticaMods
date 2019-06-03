@@ -21,7 +21,7 @@ namespace FCS_AIMarineTurbine
             QuickLogger.DebugLogsEnabled = true;
             QuickLogger.Debug("Debug logs enabled");
             //TODO remove on release
-            AIWindSurferBuildable.PatchSMLHelper(); 
+            //AIWindSurferBuildable.PatchSMLHelper(); 
 #endif
 
             try

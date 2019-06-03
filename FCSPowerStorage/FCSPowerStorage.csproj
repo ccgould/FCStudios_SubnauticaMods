@@ -103,6 +103,12 @@
     <Compile Include="Utilities\Enums\FCSPowerStates.cs" />
     <Compile Include="Utilities\Enums\PowerToggleStates.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FCSWorkBench\FCSTechWorkBench.csproj">
+      <Project>{B947909C-4983-4749-93AC-73EA69F6DCE8}</Project>
+      <Name>FCSTechWorkBench</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

@@ -1,10 +1,12 @@
 ﻿using ARS_SeaBreezeFCS32.Interfaces;
 using ARS_SeaBreezeFCS32.Model;
+using FCSCommon.Enums;
 using FCSCommon.Extensions;
 using FCSCommon.Objects;
 using FCSCommon.Utilities;
 using Oculus.Newtonsoft.Json;
 using SMLHelper.V2.Utility;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -46,6 +48,10 @@ namespace ARS_SeaBreezeFCS32.Mono
         #region internal Properties
         internal ARSolutionsSeaBreezePowerManager PowerManager { get; private set; }
         internal ARSolutionsSeaBreezeAnimationManager AnimationManager { get; private set; }
+
+        internal Action OnMonoUpdate;
+        private FilterState _prevFilterState;
+
         #endregion
 
         #region Unity Methods
@@ -86,6 +92,13 @@ namespace ARS_SeaBreezeFCS32.Mono
             }
 
         }
+
+        private void Update()
+        {
+            OnMonoUpdate?.Invoke();
+            UpdateFridgeCooler();
+        }
+
         #endregion
 
         #region Public Methods  
@@ -155,6 +168,27 @@ namespace ARS_SeaBreezeFCS32.Mono
             AnimationManager.ToggleDriveState();
         }
 
+        private void UpdateFridgeCooler()
+        {
+
+            if (_filterContainer == null) return;
+
+            //QuickLogger.Debug($"GetFilterState {_filterContainer.GetFilterState()} || IsPowerAvaliable {PowerManager.IsPowerAvaliable} || GetOpenState {_fridgeContainer.GetOpenState()}", true);
+
+            //if (_prevFilterState == _filterContainer.GetFilterState()) return;
+
+            if (!_filterContainer.GetOpenState() && PowerManager.GetIsPowerAvailable() &&
+                _filterContainer.GetFilterState() == FilterState.Filtering)
+            {
+                _fridgeContainer.CoolItems();
+                _prevFilterState = _filterContainer.GetFilterState();
+                return;
+            }
+
+            _fridgeContainer.DecayItems();
+            _prevFilterState = _filterContainer.GetFilterState();
+        }
+
         private void OnPdaClosedAction()
         {
             AnimationManager.ToggleDriveState();
@@ -206,5 +240,11 @@ namespace ARS_SeaBreezeFCS32.Mono
             QuickLogger.Debug("// ****************************** Loaded Data *********************************** //");
         }
         #endregion
+
+        public void UpdateDisplayTimer(string filterRemainingTime)
+        {
+            if (_display == null) return;
+            _display.UpdateTimer(filterRemainingTime);
+        }
     }
 }

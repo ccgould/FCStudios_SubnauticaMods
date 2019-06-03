@@ -116,7 +116,9 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers
         {
             if (obj != null)
             {
+                QuickLogger.Debug("OBJ Not NULL", true);
                 Turbines.Remove(obj.GetPrefabID());
+                QuickLogger.Debug("Past Turbine", true);
                 _aiMarineMonitorDisplay.ItemModified<string>(null);
                 QuickLogger.Debug("Removed Turbine");
             }

@@ -20,6 +20,7 @@ namespace ARS_SeaBreezeFCS32.Mono
 
         private PowerRelay _connectedRelay;
 
+        private bool IsPowerAvailable => AvailablePower > 0 || !_hasBreakerTripped;
 
         #region Unity Methods
         private void Update()
@@ -103,6 +104,11 @@ namespace ARS_SeaBreezeFCS32.Mono
             {
                 TriggerPowerOff();
             }
+        }
+
+        public bool GetIsPowerAvailable()
+        {
+            return _connectedRelay != null && IsPowerAvailable;
         }
     }
 }

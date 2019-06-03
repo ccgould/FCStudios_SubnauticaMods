@@ -1,4 +1,5 @@
 ﻿using FCSCommon.Converters;
+using FCSCommon.Enums;
 using FCSCommon.Utilities;
 using System;
 using UnityEngine;
@@ -10,24 +11,22 @@ namespace FCSTechWorkBench.Mono
         public string CurrentTime { get; set; }
     }
 
-    public class Filter : MonoBehaviour
+    public abstract class Filter : MonoBehaviour
     {
         /// <summary>
         /// The remaining time in seconds
         /// </summary>
-        public string RemainingTime { get; private set; }
+        public virtual string RemainingTime { get; protected set; } = TimeConverters.SecondsToHMS(0);
+
+        public abstract FilterTypes FilterType { get; set; }
+        protected virtual bool DoOnce { get; set; }
 
         /// <summary>
         /// The max time for the count down
         /// </summary>
-        public float MaxTime { get; set; }
+        public virtual float MaxTime { get; protected set; }
 
-        /// <summary>
-        /// The Name of the Filter
-        /// </summary>
-        public string FilterName { get; set; } = "Filter";
-
-        public bool IsExpired { get; set; } = false;
+        public bool IsExpired { get; set; }
 
         /// <summary>
         /// Event that is triggered when the timer ends
@@ -44,59 +43,27 @@ namespace FCSTechWorkBench.Mono
         /// </summary>
         public EventHandler<FilterArgs> TimerTick;
 
-        private bool canCount = true;
+        private bool _filterIsDead;
 
-        private bool _doOnce;
+        public virtual FilterState FilterState { get; private set; }
 
-        private bool _runTimer;
-
-        private void Awake()
+        public virtual void UpdateFilterState()
         {
-            QuickLogger.Debug($"//  ==========  {transform.name}  ========== //");
-            MaxTime = transform.name.Equals("ShortTermFilter(Clone)") ? 2400f : 36000f;
-            FilterName = transform.name;
+            FilterState = _filterIsDead ? FilterState.Dirty : FilterState.Filtering;
         }
+
+        internal virtual bool RunTimer { get; set; }
+
+        public abstract float GetMaxTime();
 
         /// <summary>
         /// Starts the timer
         /// </summary>
-        public void StartTimer()
-        {
-            _runTimer = true;
-        }
 
-        /// <summary>
-        /// Resets the filter's timer
-        /// </summary>
-        public void Reset()
-        {
-            //_timer = MaxTime;
-            canCount = true;
-            _doOnce = false;
-        }
+        public abstract void StartTimer();
+        public abstract void StopTimer();
 
-        public void UpdateTimer()
-        {
-
-            if (!_runTimer) return;
-
-            if (MaxTime >= 0.0f && canCount)
-            {
-                MaxTime -= DayNightCycle.main.deltaTime;
-                RemainingTime = TimeConverters.SecondsToHMS(MaxTime);
-
-                OnTimerTick(RemainingTime);
-            }
-            else if (MaxTime <= 0.0f && !_doOnce)
-            {
-                canCount = false;
-                _doOnce = true;
-                RemainingTime = TimeConverters.SecondsToHMS(0);
-                MaxTime = 0.0f;
-                OnTimerTick(RemainingTime);
-                OnTimerEnd();
-            }
-        }
+        public abstract void Initialize();
 
         protected virtual void OnTimerStart()
         {
@@ -111,7 +78,46 @@ namespace FCSTechWorkBench.Mono
 
         protected virtual void OnTimerTick(string args)
         {
+            QuickLogger.Debug("Timer Tick");
+
             TimerTick?.Invoke(this, new FilterArgs { CurrentTime = args });
+        }
+
+        public abstract string GetRemainingTime();
+        public virtual void UpdateTimer()
+        {
+            if (!RunTimer) return;
+
+            UpdateFilterState();
+
+            if (MaxTime > 0f)
+            {
+                MaxTime -= DayNightCycle.main.deltaTime;
+                RemainingTime = TimeConverters.SecondsToHMS(MaxTime);
+                _filterIsDead = false;
+            }
+            else if (MaxTime <= 0f && !DoOnce)
+            {
+                DoOnce = true;
+                RemainingTime = TimeConverters.SecondsToHMS(0);
+                MaxTime = 0f;
+                _filterIsDead = true;
+            }
+        }
+        protected virtual void SetMaxTime()
+        {
+            switch (FilterType)
+            {
+                case FilterTypes.LongTermFilter:
+                    MaxTime = 20f;
+                    break;
+                case FilterTypes.ShortTermFilter:
+                    MaxTime = 2400f;
+                    break;
+                default:
+                    MaxTime = 0f;
+                    break;
+            }
         }
     }
 }

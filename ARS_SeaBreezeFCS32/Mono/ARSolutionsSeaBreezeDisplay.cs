@@ -138,9 +138,9 @@ namespace ARS_SeaBreezeFCS32.Mono
             #endregion
 
             #region Home Screen Timer
-            _filterBtn = _homeScreen.transform.Find("FilterTimer_LBL")?.gameObject;
+            _filterLBL = _homeScreen.transform.Find("FilterTimer_LBL").GetComponent<Text>();
 
-            if (_filterBtn == null)
+            if (_filterLBL == null)
             {
                 QuickLogger.Error("Screen: Filter label not found.");
                 return false;
@@ -288,6 +288,8 @@ namespace ARS_SeaBreezeFCS32.Mono
             return true;
         }
 
+        public Text _filterLBL { get; set; }
+
         public override void DrawPage(int page)
         {
             CurrentPage = page;
@@ -418,5 +420,10 @@ namespace ARS_SeaBreezeFCS32.Mono
             icon.sprite = SpriteManager.Get(type);
         }
         #endregion
+
+        internal void UpdateTimer(string time)
+        {
+            _filterLBL.text = $"Filter Change in: {time}";
+        }
     }
 }

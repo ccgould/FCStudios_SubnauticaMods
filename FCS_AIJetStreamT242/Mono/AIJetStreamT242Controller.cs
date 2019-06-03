@@ -47,6 +47,8 @@ namespace FCS_AIMarineTurbine.Mono
         private GameObject _turbine;
         private float _currentSpeed;
         private GameObject _damage;
+        private AIJetStreamT242Display _display;
+        private bool _passedDeserialized;
 
         #endregion
 
@@ -120,17 +122,17 @@ namespace FCS_AIMarineTurbine.Mono
 
         #region Public Methods
 
-        public float GetCurrentSpeed()
+        internal float GetCurrentSpeed()
         {
             return _currentSpeed;
         }
 
-        public float GetDepth()
+        internal float GetDepth()
         {
             return gameObject == null ? 0f : Ocean.main.GetDepthOf(gameObject);
         }
 
-        public void ChangeMotorSpeed(float speed)
+        internal void ChangeMotorSpeed(float speed)
         {
             if (_seaBase == null) return;
 
@@ -141,14 +143,25 @@ namespace FCS_AIMarineTurbine.Mono
             _turbine.transform.Rotate(Vector3.up, _currentSpeed * DayNightCycle.main.deltaTime);
         }
 
-        public int GetSpeed()
+        internal int GetSpeed()
         {
             return Convert.ToInt32(_currentSpeed * _rpmPerDeg);
         }
 
         internal string GetPrefabID()
         {
+            if (_prefabID == null)
+            {
+                QuickLogger.Error("Prefab ID was null", true);
+                return String.Empty;
+            }
+
             return _prefabID.Id;
+        }
+
+        internal bool PastedDeserialize()
+        {
+            return _passedDeserialized;
         }
 
         #endregion
@@ -288,8 +301,8 @@ namespace FCS_AIMarineTurbine.Mono
                     SetCurrentRotation();
                     QuickLogger.Debug($"Turbine Constructed Rotation Set {_rotor.transform.rotation.ToString()} ", true);
 
-                    var display = gameObject.GetOrAddComponent<AIJetStreamT242Display>();
-                    display.Setup(this);
+                    _display = gameObject.GetOrAddComponent<AIJetStreamT242Display>();
+                    _display.Setup(this);
                 }
                 else
                 {
@@ -333,7 +346,8 @@ namespace FCS_AIMarineTurbine.Mono
                 DegPerSec = BiomeManager.GetBiomeData(_currentBiome).Speed,
                 Biome = _currentBiome,
                 CurrentSpeed = _currentSpeed,
-                PassedTime = HealthManager.GetPassedTime()
+                PassedTime = HealthManager.GetPassedTime(),
+                //ScreenState = ScreenState
             };
 
             var output = JsonConvert.SerializeObject(saveData, Formatting.Indented);
@@ -371,7 +385,13 @@ namespace FCS_AIMarineTurbine.Mono
                     _currentBiome = savedData.Biome;
                     HealthManager.SetPassedTime(savedData.PassedTime);
                     AISolutionsData.StartingRotation = _targetRotation;
+                    if (_display != null)
+                    {
+                        _display.SetCurrentPage();
+                    }
                 }
+
+                _passedDeserialized = true;
             }
             else
             {
@@ -379,6 +399,9 @@ namespace FCS_AIMarineTurbine.Mono
             }
             QuickLogger.Debug("// ****************************** Loaded Data *********************************** //");
         }
+
+        public int ScreenState { get; set; }
+
         #endregion
     }
 }

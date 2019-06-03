@@ -25,6 +25,9 @@ namespace ARS_SeaBreezeFCS32.Model
         private ChildObjectIdentifier _containerRoot = null;
 
         private Func<bool> isContstructed;
+        private bool _fridgeCooling;
+        private bool _isFridgeOpen = false;
+        private bool _isCooling;
 
         public List<EatableEntities> FridgeItems { get; } = new List<EatableEntities>();
 
@@ -63,34 +66,89 @@ namespace ARS_SeaBreezeFCS32.Model
 
         private void OnRemoveItemEvent(InventoryItem item)
         {
-            var eatable = item.item.GetComponent<Eatable>();
-            var prefabId = item.item.GetComponent<PrefabIdentifier>().Id;
+            if (item == null) return;
 
-            foreach (EatableEntities eatableEntity in FridgeItems)
+            if (_fridgeCooling)
             {
-                if (eatableEntity.PrefabID == prefabId)
+                var eatable = item.item.GetComponent<Eatable>();
+                var prefabId = item.item.GetComponent<PrefabIdentifier>().Id;
+
+                foreach (EatableEntities eatableEntity in FridgeItems)
                 {
-                    eatable.timeDecayStart = DayNightCycle.main.timePassedAsFloat;
-                    eatable.foodValue = eatableEntity.FoodValue;
-                    eatable.waterValue = eatableEntity.WaterValue;
-                    eatable.decomposes = eatableEntity.Decomposes;
-                    eatable.kDecayRate = eatableEntity.kDecayRate;
+                    if (eatableEntity.PrefabID == prefabId)
+                    {
+                        eatable.timeDecayStart = DayNightCycle.main.timePassedAsFloat;
+                        eatable.foodValue = eatableEntity.FoodValue;
+                        eatable.waterValue = eatableEntity.WaterValue;
+                        eatable.decomposes = eatableEntity.Decomposes;
+                        eatable.kDecayRate = eatableEntity.kDecayRate;
 
 
-                    QuickLogger.Debug($"Match Found", true);
-                    FridgeItems.Remove(eatableEntity);
-                    QuickLogger.Debug($"Match Removed", true);
-                    break;
+                        QuickLogger.Debug($"Match Found", true);
+                        FridgeItems.Remove(eatableEntity);
+                        QuickLogger.Debug($"Match Removed", true);
+                        break;
+                    }
                 }
             }
 
             QuickLogger.Debug($"Fridge Item Count: {FridgeItems.Count}", true);
         }
 
+        internal void DecayItems()
+        {
+            if (!_isCooling) return;
+
+            foreach (InventoryItem inventoryItem in _fridgeContainer)
+            {
+                var prefabId = inventoryItem.item.gameObject.GetComponent<PrefabIdentifier>().Id;
+                var eatable = inventoryItem.item.gameObject.GetComponent<Eatable>();
+
+                foreach (EatableEntities eatableEntity in FridgeItems)
+                {
+
+                    if (eatableEntity.PrefabID == prefabId)
+                    {
+                        eatable.timeDecayStart = DayNightCycle.main.timePassedAsFloat;
+                        eatable.decomposes = eatableEntity.Decomposes;
+                        eatable.kDecayRate = eatableEntity.kDecayRate;
+                        break;
+                    }
+                }
+            }
+
+            _isCooling = false;
+
+            QuickLogger.Debug($"Decaying", true);
+        }
+
+        internal void CoolItems()
+        {
+            if (_isCooling) return;
+
+            FridgeItems.Clear();
+
+            foreach (InventoryItem inventoryItem in _fridgeContainer)
+            {
+                CoolItem(inventoryItem);
+            }
+
+            _isCooling = true;
+
+            QuickLogger.Debug($"Cooling", true);
+        }
+
         private void OnAddItemEvent(InventoryItem item)
         {
             if (item == null) return;
 
+            CoolItem(item);
+
+            QuickLogger.Debug($"Fridge Item Count: {FridgeItems.Count}", true);
+        }
+
+        private void CoolItem(InventoryItem item)
+        {
             var eatable = item.item.GetComponent<Eatable>();
             var prefabId = item.item.GetComponent<PrefabIdentifier>().Id;
 
@@ -120,8 +178,6 @@ namespace ARS_SeaBreezeFCS32.Model
             eatable.timeDecayStart = DayNightCycle.main.timePassedAsFloat;
             eatable.foodValue = f;
             eatable.waterValue = w;
-
-            QuickLogger.Debug($"Fridge Item Count: {FridgeItems.Count}", true);
         }
 
         private bool IsAllowedToRemove(Pickupable pickupable, bool verbose)
@@ -159,7 +215,13 @@ namespace ARS_SeaBreezeFCS32.Model
             Player main = Player.main;
             PDA pda = main.GetPDA();
             Inventory.main.SetUsedStorage(_fridgeContainer, false);
-            pda.Open(PDATab.Inventory, null, null, 4f);
+            pda.Open(PDATab.Inventory, null, OnFridgeClose, 4f);
+            _isFridgeOpen = true;
+        }
+
+        private void OnFridgeClose(PDA pda)
+        {
+            _isFridgeOpen = false;
         }
 
         public int GetTechTypeAmount(TechType techType)
@@ -194,5 +256,9 @@ namespace ARS_SeaBreezeFCS32.Model
         }
 
 
+        public bool GetOpenState()
+        {
+            return _isFridgeOpen;
+        }
     }
 }

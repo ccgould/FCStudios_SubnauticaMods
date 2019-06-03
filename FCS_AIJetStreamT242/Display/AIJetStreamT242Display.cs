@@ -95,15 +95,9 @@ namespace FCS_AIMarineTurbine.Display
 
             _foundComponents = true;
 
-            if (_mono.PowerManager.GetHasBreakerTripped())
-            {
-                StartCoroutine(PowerOff());
-            }
-            else
-            {
-                StartCoroutine(CompleteSetup());
+            QuickLogger.Debug($"Has Breaker Tripped: {_mono.PowerManager.GetHasBreakerTripped()}", true);
 
-            }
+            StartCoroutine(_mono.PowerManager.GetHasBreakerTripped() ? PowerOff() : CompleteSetup());
         }
 
         internal void TurnDisplayOff()
@@ -373,7 +367,7 @@ namespace FCS_AIMarineTurbine.Display
             yield return new WaitForEndOfFrame();
             if (_mono.IsBeingDeleted) yield break;
 
-            QuickLogger.Debug($"Powering Off");
+            QuickLogger.Debug($"Powering Off", true);
             _mono.AnimationManager.SetFloatHash(_screenStateHash, _powerOff);
 
             if (_mono.IsBeingDeleted) yield break;
@@ -396,7 +390,7 @@ namespace FCS_AIMarineTurbine.Display
 
             //ResetAnimation();
 
-            QuickLogger.Debug($"Powering On");
+            QuickLogger.Debug($"Powering On", true);
             StartCoroutine(CompleteSetup());
         }
 
@@ -409,9 +403,9 @@ namespace FCS_AIMarineTurbine.Display
             QuickLogger.Debug($"Shutting Down");
             _mono.AnimationManager.SetFloatHash(_screenStateHash, _powerOff);
 
-            if (_mono.IsBeingDeleted) yield break;
-            yield return new WaitForSeconds(RESET_TIMER);
-            if (_mono.IsBeingDeleted) yield break;
+            //if (_mono.IsBeingDeleted) yield break;
+            //yield return new WaitForSeconds(RESET_TIMER);
+            //if (_mono.IsBeingDeleted) yield break;
 
             //ResetAnimation();
 
@@ -429,9 +423,9 @@ namespace FCS_AIMarineTurbine.Display
 
                 _mono.AnimationManager.SetFloatHash(_screenStateHash, _powerOn);
 
-                if (_mono.IsBeingDeleted) yield break;
-                yield return new WaitForSeconds(RESET_TIMER);
-                if (_mono.IsBeingDeleted) yield break;
+                //if (_mono.IsBeingDeleted) yield break;
+                //yield return new WaitForSeconds(RESET_TIMER);
+                //if (_mono.IsBeingDeleted) yield break;
 
                 //ResetAnimation();
             }
@@ -440,6 +434,14 @@ namespace FCS_AIMarineTurbine.Display
         public override void DrawPage(int page)
         {
             throw new NotImplementedException();
+        }
+
+        public void SetCurrentPage()
+        {
+            QuickLogger.Debug($"Has Breaker Tripped Set Screen: {_mono.PowerManager.GetHasBreakerTripped()}", true);
+
+            StartCoroutine(_mono.PowerManager.GetHasBreakerTripped() ? PowerOff() : CompleteSetup());
+            //_mono.AnimationManager.SetFloatHash(_screenStateHash, savedDataScreenState);
         }
     }
 }

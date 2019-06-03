@@ -1,4 +1,6 @@
-﻿using FCSCommon.Utilities;
+﻿using FCSCommon.Components;
+using FCSCommon.Enums;
+using FCSCommon.Utilities;
 using FCSTechWorkBench.Abstract_Classes;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
@@ -17,6 +19,9 @@ namespace FCSTechWorkBench.Mono
         {
             GameObject prefab = GameObject.Instantiate<GameObject>(this._prefab);
             prefab.name = this.PrefabFileName;
+
+            var filter = prefab.AddComponent<WorkBenchFilter>();
+            filter.FilterType = FilterTypes.LongTermFilter;
             return prefab;
         }
 
@@ -45,7 +50,7 @@ namespace FCSTechWorkBench.Mono
                 if (this.IsRegistered == false)
                 {
                     //Create a new TechType
-                    this.TechType = TechTypeHandler.AddTechType(ClassID, "Long Term Filter", "Filter", new Atlas.Sprite(QPatch.Bundle.LoadAsset<Texture2D>($"AlterraLogo.png")));
+                    this.TechType = TechTypeHandler.AddTechType(ClassID, PrefabFileName, "Filter", new Atlas.Sprite(QPatch.Bundle.LoadAsset<Texture2D>($"AlterraLogo.png")));
 
                     CraftDataHandler.SetTechData(TechType, GetBlueprintRecipe());
 
@@ -60,7 +65,7 @@ namespace FCSTechWorkBench.Mono
                     // Make the object drop slowly in water
                     var wf = _prefab.AddComponent<WorldForces>();
                     wf.underwaterGravity = 0;
-                    wf.underwaterDrag = 1f;
+                    wf.underwaterDrag = 20f;
                     wf.enabled = true;
 
                     // Add fabricating animation
@@ -91,8 +96,6 @@ namespace FCSTechWorkBench.Mono
                     PrefabIdentifier prefabID = _prefab.AddComponent<PrefabIdentifier>();
                     prefabID.ClassId = this.ClassID;
 
-                    _prefab.AddComponent<Filter>();
-
                     var techTag = this._prefab.AddComponent<TechTag>();
                     techTag.type = this.TechType;
 
@@ -106,5 +109,6 @@ namespace FCSTechWorkBench.Mono
                 QuickLogger.Error("Failed to get the LongTermPrefab");
             }
         }
+
     }
 }

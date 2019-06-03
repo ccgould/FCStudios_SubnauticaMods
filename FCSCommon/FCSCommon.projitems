@@ -13,9 +13,12 @@
     <Compile Include="$(MSBuildThisFileDirectory)Components\CommonItemsContainer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Components\DamagedMaterialController.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Components\InternalBatteryController.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Components\WorkBenchFilter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controllers\AIDeepBatteryController.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controllers\AIDeepDrillerSolarController.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\TimeConverters.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Enums\FilterState.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Enums\FilterTypes.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enums\InterfaceButtonMode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exceptions\PatchTerminatedException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\ColorExtensions.cs" />

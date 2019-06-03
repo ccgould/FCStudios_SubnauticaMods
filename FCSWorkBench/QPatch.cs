@@ -22,34 +22,13 @@ namespace FCSTechWorkBench
 
             try
             {
-
                 GetPrefabs();
 
                 var longTermFilter = new LongTermFilterBuildable();
                 longTermFilter.Register();
 
-                if (longTermFilter.ClassID != null)
-                {
-                    QuickLogger.Debug($"ClassID is {longTermFilter.ClassID}");
-                }
-
-                if (longTermFilter.ClassID_I != null)
-                {
-                    QuickLogger.Debug($"ClassID_I is {longTermFilter.ClassID_I}");
-                }
-
                 var shortTermFilter = new ShortTermFilterBuildable();
                 shortTermFilter.Register();
-
-                if (shortTermFilter.ClassID != null)
-                {
-                    QuickLogger.Debug($"ClassID is {shortTermFilter.ClassID}");
-                }
-
-                if (shortTermFilter.ClassID_I != null)
-                {
-                    QuickLogger.Debug($"ClassID_I is {shortTermFilter.ClassID_I}");
-                }
 
                 FCSTechWorkBenchBuildable.ItemsList.Add(shortTermFilter);
                 FCSTechWorkBenchBuildable.ItemsList.Add(longTermFilter);

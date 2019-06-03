@@ -20,13 +20,8 @@ namespace FCSTechWorkBench.Mono
 
         internal static void PatchHelper()
         {
-
-
             CreateCustomTree();
-
             Singleton.Patch();
-
-
         }
 
         private static void CreateCustomTree()
@@ -34,17 +29,9 @@ namespace FCSTechWorkBench.Mono
             var root = CraftTreeHandler.CreateCustomCraftTreeAndType("FCSTechWorkBench", out CraftTree.Type craftType);
             ModCraftTreeTab itemTab = null;
 
-
             Singleton.AlienChiefTreeType = craftType;
 
             QuickLogger.Debug($"Attempting to add {Singleton.ClassID} to nodes");
-
-            QuickLogger.Debug($"List Count {ItemsList.Count}");
-
-            QuickLogger.Debug($"Item ClassID_I {ItemsList[0].FriendlyName_I}");
-
-            QuickLogger.Debug($"Item ClassID_I {ItemsList[0].ClassID_I}");
-
 
             foreach (var item in ItemsList)
             {
@@ -101,7 +88,7 @@ namespace FCSTechWorkBench.Mono
             constructible.techType = TechType;
 
             // Set the custom texture
-            Texture2D coloredTexture = QPatch.Bundle.LoadAsset<Texture2D>("FCSTechWorkBench");
+            Texture2D coloredTexture = QPatch.Bundle.LoadAsset<Texture2D>("FCSWorkbench");
             SkinnedMeshRenderer skinnedMeshRenderer = prefab.GetComponentInChildren<SkinnedMeshRenderer>();
             skinnedMeshRenderer.material.mainTexture = coloredTexture;
             return prefab;
@@ -111,20 +98,19 @@ namespace FCSTechWorkBench.Mono
         private static void AddTabNodes(ref ModCraftTreeRoot root, ref ModCraftTreeTab itemTab, IFCSTechWorkBenchItem fcsTechWorkBenchItem, string category, string icon)
         {
 
-            if (root.GetNode($"FCSTechWorkBench{category}") == null)
+            if (root.GetNode($"{category}") == null)
             {
-                QuickLogger.Debug($"FCSTechWorkBench{category} is null creating tab");
-                itemTab = root.AddTabNode($"FCSTechWorkBench{category}", $"FCS Work Bench {category}", new Atlas.Sprite(QPatch.Bundle.LoadAsset<Texture2D>($"{icon}.png")));
+                QuickLogger.Debug($"{category} is null creating tab");
+                itemTab = root.AddTabNode($"{category}", $"FCS Work Bench {category}", new Atlas.Sprite(QPatch.Bundle.LoadAsset<Texture2D>($"{icon}.png")));
                 itemTab?.AddCraftingNode(fcsTechWorkBenchItem.TechTypeID);
-                QuickLogger.Debug($"FCSTechWorkBench{category} node tab Created");
+                QuickLogger.Debug($"{category} node tab Created");
             }
             else
             {
-                QuickLogger.Debug($"FCSTechWorkBench{category} is not null creating node tab");
+                QuickLogger.Debug($"{category} is not null creating node tab");
                 itemTab?.AddCraftingNode(fcsTechWorkBenchItem.TechTypeID);
             }
         }
-
 
         /// <summary>
         /// This is the CraftTree.Type for the AlienChief fabricator.

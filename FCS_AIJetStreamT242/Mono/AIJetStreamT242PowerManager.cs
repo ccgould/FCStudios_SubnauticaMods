@@ -2,6 +2,7 @@
 using FCS_AIMarineTurbine.Mono;
 using FCSCommon.Utilities;
 using System;
+using System.Collections;
 using UnityEngine;
 
 namespace FCS_AIJetStreamT242.Mono
@@ -16,7 +17,7 @@ namespace FCS_AIJetStreamT242.Mono
         public Action OnKillBattery { get; set; }
         public Action OnBreakerTripped { get; set; }
         public Action OnBreakerReset { get; set; }
-        private float _charge;
+        private float _charge = 300;
         public float MaxPowerPerMin { get; set; } = 100;
 
         private float _capacity;
@@ -30,53 +31,83 @@ namespace FCS_AIJetStreamT242.Mono
         private void Start()
         {
             _capacity = AIJetStreamT242Buildable.JetStreamT242Config.MaxCapacity;
+            StartCoroutine(UpdatePowerRelay());
             //InvokeRepeating("UpdatePowerRelay", 0, 1);
         }
         private void Update()
         {
             //TODO See if needed
             //if (!IsSafeToContinue) return;
-            UpdatePowerRelay();
+            //UpdatePowerRelay();
             ProducePower();
         }
         #endregion
 
-        private void UpdatePowerRelay()
+        private IEnumerator UpdatePowerRelay()
         {
-            try
-            {
-                var relay = PowerSource.FindRelay(transform);
+            QuickLogger.Debug("In UpdatePowerRelay");
 
+            var i = 1;
+
+            while (_powerRelay == null)
+            {
+                QuickLogger.Debug($"Checking For Relay... Attempt {i}");
+
+                PowerRelay relay = PowerSource.FindRelay(this.transform);
                 if (relay != null && relay != _powerRelay)
                 {
-                    if (_powerRelay != null)
-                    {
-                        _powerRelay.RemoveInboundPower(this);
-                    }
                     _powerRelay = relay;
                     _powerRelay.AddInboundPower(this);
-                    CancelInvoke("UpdatePowerRelay");
+                    QuickLogger.Debug("PowerRelay found at last!");
                 }
                 else
                 {
                     _powerRelay = null;
                 }
 
-                if (_powerRelay != null)
-                {
-                    _powerRelay.RemoveInboundPower(this);
-                    _powerRelay.AddInboundPower(this);
-                    CancelInvoke("UpdatePowerRelay");
-                }
-            }
-            catch (Exception e)
-            {
-                QuickLogger.Error(e.Message);
+                i++;
+                yield return new WaitForSeconds(0.5f);
             }
         }
 
+
+        //private void UpdatePowerRelay()
+        //{
+        //    try
+        //    {
+        //        var relay = PowerSource.FindRelay(transform);
+
+        //        if (relay != null && relay != _powerRelay)
+        //        {
+        //            if (_powerRelay != null)
+        //            {
+        //                _powerRelay.RemoveInboundPower(this);
+        //            }
+        //            _powerRelay = relay;
+        //            _powerRelay.AddInboundPower(this);
+        //            CancelInvoke("UpdatePowerRelay");
+        //        }
+        //        else
+        //        {
+        //            _powerRelay = null;
+        //        }
+
+        //        if (_powerRelay != null)
+        //        {
+        //            _powerRelay.RemoveInboundPower(this);
+        //            _powerRelay.AddInboundPower(this);
+        //            CancelInvoke("UpdatePowerRelay");
+        //        }
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        QuickLogger.Error(e.Message);
+        //    }
+        //}
+
         private void ProducePower()
         {
+
             if (_hasBreakerTripped)
             {
                 _charge = 0.0f;
@@ -88,7 +119,11 @@ namespace FCS_AIJetStreamT242.Mono
                 var energyPerSec = _mono.GetCurrentSpeed() * decPercentage;
 
                 _charge = Mathf.Clamp(_charge + energyPerSec * DayNightCycle.main.deltaTime, 0, AIJetStreamT242Buildable.JetStreamT242Config.MaxCapacity);
+                QuickLogger.Debug($"DP {decPercentage} || EPS {energyPerSec} || MC { AIJetStreamT242Buildable.JetStreamT242Config.MaxCapacity} || Charge {_charge} || DT {DayNightCycle.main.deltaTime}");
             }
+
+            QuickLogger.Debug($"HBT {_hasBreakerTripped} || MPPM {MaxPowerPerMin} || MS {_mono.MaxSpeed} || GCS {_mono.GetCurrentSpeed()}");
+
         }
 
         internal void KillBattery()

@@ -326,14 +326,10 @@ namespace FCS_AIMarineTurbine.Display
 
             int startingPosition = (CurrentPage - 1) * ITEMS_PER_PAGE;
             int endingPosition = startingPosition + ITEMS_PER_PAGE;
+
+            QuickLogger.Debug("About to get Controller Turbines");
+
             _container = _mono.Turbines;
-
-            //====================================================================//
-            //QuickLogger.Debug($"//=================== StartPosition | {startingPosition} ============================== //");
-            //QuickLogger.Debug($"//=================== EndPosition | {endingPosition} ============================== //");
-            //QuickLogger.Debug($"//=================== Turbines Count| {_container.Count} ============================== //");
-            //====================================================================//
-
 
             QuickLogger.Debug("Get Controller Turbines");
 
@@ -404,6 +400,7 @@ namespace FCS_AIMarineTurbine.Display
 
         public override void ItemModified<T>(T item)
         {
+            QuickLogger.Debug("In ItemModified");
             DrawPage(1);
         }
 
