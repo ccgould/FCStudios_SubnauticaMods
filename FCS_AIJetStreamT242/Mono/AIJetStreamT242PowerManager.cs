@@ -13,13 +13,12 @@ namespace FCS_AIJetStreamT242.Mono
     internal class AIJetStreamT242PowerManager : MonoBehaviour, IPowerInterface
     {
         private bool _hasBreakerTripped;
-        public bool IsSafeToContinue { get; set; }
-        public Action OnKillBattery { get; set; }
-        public Action OnBreakerTripped { get; set; }
-        public Action OnBreakerReset { get; set; }
-        private float _charge = 300;
+        internal bool IsSafeToContinue { get; set; }
+        internal Action OnKillBattery { get; set; }
+        internal Action OnBreakerTripped { get; set; }
+        internal Action OnBreakerReset { get; set; }
+        private float _charge;
         public float MaxPowerPerMin { get; set; } = 100;
-
         private float _capacity;
         private PowerRelay _powerRelay;
         private bool _isBatteryDestroyed;
@@ -32,13 +31,10 @@ namespace FCS_AIJetStreamT242.Mono
         {
             _capacity = AIJetStreamT242Buildable.JetStreamT242Config.MaxCapacity;
             StartCoroutine(UpdatePowerRelay());
-            //InvokeRepeating("UpdatePowerRelay", 0, 1);
         }
+
         private void Update()
         {
-            //TODO See if needed
-            //if (!IsSafeToContinue) return;
-            //UpdatePowerRelay();
             ProducePower();
         }
         #endregion
@@ -58,7 +54,7 @@ namespace FCS_AIJetStreamT242.Mono
                 {
                     _powerRelay = relay;
                     _powerRelay.AddInboundPower(this);
-                    QuickLogger.Debug("PowerRelay found at last!");
+                    QuickLogger.Debug("PowerRelay found");
                 }
                 else
                 {
@@ -107,23 +103,16 @@ namespace FCS_AIJetStreamT242.Mono
 
         private void ProducePower()
         {
-
-            if (_hasBreakerTripped)
-            {
-                _charge = 0.0f;
-            }
-            else
+            if (!_hasBreakerTripped)
             {
                 var decPercentage = (MaxPowerPerMin / _mono.MaxSpeed) / 60;
 
                 var energyPerSec = _mono.GetCurrentSpeed() * decPercentage;
 
                 _charge = Mathf.Clamp(_charge + energyPerSec * DayNightCycle.main.deltaTime, 0, AIJetStreamT242Buildable.JetStreamT242Config.MaxCapacity);
-                QuickLogger.Debug($"DP {decPercentage} || EPS {energyPerSec} || MC { AIJetStreamT242Buildable.JetStreamT242Config.MaxCapacity} || Charge {_charge} || DT {DayNightCycle.main.deltaTime}");
+                //QuickLogger.Debug($"DP {decPercentage} || EPS {energyPerSec} || MC { AIJetStreamT242Buildable.JetStreamT242Config.MaxCapacity} || Charge {_charge} || DT {DayNightCycle.main.deltaTime}");
+                //QuickLogger.Debug($"HBT {_hasBreakerTripped} || MPPM {MaxPowerPerMin} || MS {_mono.MaxSpeed} || GCS {_mono.GetCurrentSpeed()}");
             }
-
-            QuickLogger.Debug($"HBT {_hasBreakerTripped} || MPPM {MaxPowerPerMin} || MS {_mono.MaxSpeed} || GCS {_mono.GetCurrentSpeed()}");
-
         }
 
         internal void KillBattery()
