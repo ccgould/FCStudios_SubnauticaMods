@@ -23,6 +23,7 @@ namespace FCS_AIJetStreamT242.Mono
         private PowerRelay _powerRelay;
         private bool _isBatteryDestroyed;
         private AIJetStreamT242Controller _mono;
+        private float _timeCurrDeltaTime;
 
 
         #region Unity Methods
@@ -31,6 +32,8 @@ namespace FCS_AIJetStreamT242.Mono
         {
             _capacity = AIJetStreamT242Buildable.JetStreamT242Config.MaxCapacity;
             StartCoroutine(UpdatePowerRelay());
+
+            //InvokeRepeating("ProducePower", 1, 1);
         }
 
         private void Update()
@@ -103,16 +106,20 @@ namespace FCS_AIJetStreamT242.Mono
 
         private void ProducePower()
         {
-            if (!_hasBreakerTripped)
-            {
-                var decPercentage = (MaxPowerPerMin / _mono.MaxSpeed) / 60;
+            if (_hasBreakerTripped) return;
 
-                var energyPerSec = _mono.GetCurrentSpeed() * decPercentage;
+            var decPercentage = (MaxPowerPerMin / _mono.MaxSpeed) / 60;
 
-                _charge = Mathf.Clamp(_charge + energyPerSec * DayNightCycle.main.deltaTime, 0, AIJetStreamT242Buildable.JetStreamT242Config.MaxCapacity);
-                //QuickLogger.Debug($"DP {decPercentage} || EPS {energyPerSec} || MC { AIJetStreamT242Buildable.JetStreamT242Config.MaxCapacity} || Charge {_charge} || DT {DayNightCycle.main.deltaTime}");
-                //QuickLogger.Debug($"HBT {_hasBreakerTripped} || MPPM {MaxPowerPerMin} || MS {_mono.MaxSpeed} || GCS {_mono.GetCurrentSpeed()}");
-            }
+            var energyPerSec = _mono.GetCurrentSpeed() * decPercentage;
+
+            _timeCurrDeltaTime += DayNightCycle.main.deltaTime;
+
+            if (!(_timeCurrDeltaTime >= 1)) return;
+            _charge = Mathf.Clamp(_charge + energyPerSec, 0, AIJetStreamT242Buildable.JetStreamT242Config.MaxCapacity);
+            _timeCurrDeltaTime -= (int)_timeCurrDeltaTime;
+
+            //QuickLogger.Debug($"DP {decPercentage} || EPS {energyPerSec} || MC { AIJetStreamT242Buildable.JetStreamT242Config.MaxCapacity} || Charge {_charge} || DT {DayNightCycle.main.deltaTime}");
+            //QuickLogger.Debug($"HBT {_hasBreakerTripped} || MPPM {MaxPowerPerMin} || MS {_mono.MaxSpeed} || GCS {_mono.GetCurrentSpeed()}");
         }
 
         internal void KillBattery()
@@ -214,7 +221,7 @@ namespace FCS_AIJetStreamT242.Mono
             return _charge;
         }
 
-        public void SetCharge(float savedDataCharge)
+        internal void SetCharge(float savedDataCharge)
         {
             _charge = savedDataCharge;
         }
@@ -231,7 +238,7 @@ namespace FCS_AIJetStreamT242.Mono
             OnBreakerReset?.Invoke();
         }
 
-        public void Initialize(AIJetStreamT242Controller mono)
+        internal void Initialize(AIJetStreamT242Controller mono)
         {
             _mono = mono;
         }
