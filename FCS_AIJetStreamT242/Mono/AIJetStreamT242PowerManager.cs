@@ -24,6 +24,7 @@ namespace FCS_AIJetStreamT242.Mono
         private bool _isBatteryDestroyed;
         private AIJetStreamT242Controller _mono;
         private float _timeCurrDeltaTime;
+        private float _storedPower;
 
 
         #region Unity Methods
@@ -32,8 +33,6 @@ namespace FCS_AIJetStreamT242.Mono
         {
             _capacity = AIJetStreamT242Buildable.JetStreamT242Config.MaxCapacity;
             StartCoroutine(UpdatePowerRelay());
-
-            //InvokeRepeating("ProducePower", 1, 1);
         }
 
         private void Update()
@@ -228,11 +227,15 @@ namespace FCS_AIJetStreamT242.Mono
         private void TriggerPowerOff()
         {
             _hasBreakerTripped = true;
+            _storedPower = _charge;
+            _charge = 0.0f;
             OnBreakerTripped?.Invoke();
         }
 
         private void TriggerPowerOn()
         {
+            _charge = _storedPower;
+            _storedPower = 0.0f;
             _hasBreakerTripped = false;
             OnBreakerReset?.Invoke();
         }
@@ -267,6 +270,16 @@ namespace FCS_AIJetStreamT242.Mono
             {
                 TriggerPowerOff();
             }
+        }
+
+        internal float GetStoredPower()
+        {
+            return _storedPower;
+        }
+
+        internal void SetStoredPower(float value)
+        {
+            _storedPower = value;
         }
     }
 }

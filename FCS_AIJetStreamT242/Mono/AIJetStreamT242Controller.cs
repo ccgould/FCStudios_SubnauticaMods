@@ -159,11 +159,6 @@ namespace FCS_AIMarineTurbine.Mono
             return _prefabID.Id;
         }
 
-        internal bool PastedDeserialize()
-        {
-            return _passedDeserialized;
-        }
-
         #endregion
 
         #region Private Methods
@@ -314,9 +309,10 @@ namespace FCS_AIMarineTurbine.Mono
 
         private void SetCurrentRotation()
         {
-            QuickLogger.Debug("********************************************** In SetCurrentLocation **********************************************");
+            QuickLogger.Debug("********************************************** In Set Current Rotation **********************************************");
             if (_rotor == null) return;
             _rotor.transform.rotation = AISolutionsData.StartingRotation;
+            QuickLogger.Debug("********************************************** In Set Current Rotation **********************************************");
         }
 
         private void RotateToMag()
@@ -332,7 +328,7 @@ namespace FCS_AIMarineTurbine.Mono
 
         public void OnProtoSerialize(ProtobufSerializer serializer)
         {
-            QuickLogger.Debug($"Saving {_prefabID.Id} Data");
+            QuickLogger.Info($"Saving {_prefabID.Id} Data");
 
             if (!Directory.Exists(SaveDirectory))
                 Directory.CreateDirectory(SaveDirectory);
@@ -347,13 +343,13 @@ namespace FCS_AIMarineTurbine.Mono
                 Biome = _currentBiome,
                 CurrentSpeed = _currentSpeed,
                 PassedTime = HealthManager.GetPassedTime(),
-                //ScreenState = ScreenState
+                StoredPower = PowerManager.GetStoredPower()
             };
 
             var output = JsonConvert.SerializeObject(saveData, Formatting.Indented);
             File.WriteAllText(SaveFile, output);
 
-            QuickLogger.Debug($"Saved {_prefabID.Id} Data");
+            QuickLogger.Info($"Saved {_prefabID.Id} Data");
 
 
             //TODO Replace this
@@ -385,6 +381,7 @@ namespace FCS_AIMarineTurbine.Mono
                     _currentBiome = savedData.Biome;
                     HealthManager.SetPassedTime(savedData.PassedTime);
                     AISolutionsData.StartingRotation = _targetRotation;
+                    PowerManager.SetStoredPower(savedData.StoredPower);
                     if (_display != null)
                     {
                         _display.SetCurrentPage();

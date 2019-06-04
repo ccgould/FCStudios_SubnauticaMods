@@ -19,7 +19,9 @@ namespace FCS_AIMarineTurbine.Model
         public float CurrentSpeed { get; set; }
 
         public float PassedTime { get; set; }
-        // public int ScreenState { get; set; }
+
+        public float StoredPower { get; set; }
+
     }
 
 

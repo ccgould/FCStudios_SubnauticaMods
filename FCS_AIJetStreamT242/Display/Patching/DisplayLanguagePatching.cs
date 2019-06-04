@@ -35,9 +35,9 @@ namespace FCS_AIMarineTurbine.Display.Patching
             LanguageHandler.SetLanguageLine(OnKey, "ON");
             LanguageHandler.SetLanguageLine(WorkingKey, "Working");
             LanguageHandler.SetLanguageLine(DamagedKey, "DAMAGED");
-            LanguageHandler.SetLanguageLine(DamagedLegendKey, "Damaged\n0% => 49%");
-            LanguageHandler.SetLanguageLine(HealthyLegendKey, "Healthy\n51 % => 100%");
-            LanguageHandler.SetLanguageLine(MidlyDamagedLegendKey, "Midly Damaged\n20% => 5");
+            LanguageHandler.SetLanguageLine(DamagedLegendKey, "Damaged\n0% => 29%");
+            LanguageHandler.SetLanguageLine(HealthyLegendKey, "Healthy\n60 % => 100%");
+            LanguageHandler.SetLanguageLine(MidlyDamagedLegendKey, "Midly Damaged\n30% => 59");
             LanguageHandler.SetLanguageLine(OnKey, "ON");
             LanguageHandler.SetLanguageLine(LegendKey, "Legend");
             LanguageHandler.SetLanguageLine(PoweredOffKey, "Powered Off");
