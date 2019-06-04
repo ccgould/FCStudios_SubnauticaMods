@@ -115,11 +115,10 @@ namespace FCS_AIJetStreamT242.Mono
             _timeCurrDeltaTime += DayNightCycle.main.deltaTime;
 
             if (!(_timeCurrDeltaTime >= 1)) return;
-            _charge = Mathf.Clamp(_charge + energyPerSec, 0, AIJetStreamT242Buildable.JetStreamT242Config.MaxCapacity);
-            _timeCurrDeltaTime -= (int)_timeCurrDeltaTime;
 
-            //QuickLogger.Debug($"DP {decPercentage} || EPS {energyPerSec} || MC { AIJetStreamT242Buildable.JetStreamT242Config.MaxCapacity} || Charge {_charge} || DT {DayNightCycle.main.deltaTime}");
-            //QuickLogger.Debug($"HBT {_hasBreakerTripped} || MPPM {MaxPowerPerMin} || MS {_mono.MaxSpeed} || GCS {_mono.GetCurrentSpeed()}");
+            _charge = Mathf.Clamp(_charge + energyPerSec, 0, AIJetStreamT242Buildable.JetStreamT242Config.MaxCapacity);
+
+            _timeCurrDeltaTime -= (int)_timeCurrDeltaTime;
         }
 
         internal void KillBattery()

@@ -30,15 +30,6 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers
 
         #region Unity Methods
 
-        private void Awake()
-        {
-            //Lets get all the turbines at this base
-            //InvokeRepeating("GetTurbines", 0, 1);
-
-            //Get the SeaBase
-            //_seabase = gameObject.GetComponentInParent<SubRoot>();
-        }
-
         private void Update()
         {
 
@@ -197,5 +188,11 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers
             }
         }
         #endregion
+
+        private void OnDestroy()
+        {
+            AIMarineTurbine_Patcher.RemoveEventHandler(AlertedNewTurbinePlaced);
+            JetStreamDestroy_Patcher.RemoveEventHandler(AlertedNewTurbineDestroyed);
+        }
     }
 }

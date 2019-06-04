@@ -8,7 +8,7 @@ namespace FCS_AIMarineTurbine.Model
     {
         internal static AISolutionsData.BiomeItem GetBiomeData(string biome)
         {
-            return AIJetStreamT242Buildable.JetStreamT242Config.BiomeSpeeds.GetOrDefault(biome.ToLower(), new AISolutionsData.BiomeItem { Speed = 90 });
+            return AIJetStreamT242Buildable.JetStreamT242Config.BiomeSpeeds.GetOrDefault(biome.ToLower(), new AISolutionsData.BiomeItem { Speed = 0 });
         }
         internal static string GetBiome()
         {

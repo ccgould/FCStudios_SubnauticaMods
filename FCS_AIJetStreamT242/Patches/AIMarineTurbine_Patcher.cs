@@ -40,6 +40,17 @@ namespace FCS_AIMarineTurbine.Patches
                 return true;
             }
         }
+
+        public static bool RemoveEventHandler(Action<AIJetStreamT242Controller> newHandler)
+        {
+            if (onJetStreamAdded != null)
+            {
+                onJetStreamAdded -= newHandler;
+                return true;
+            }
+
+            return false;
+        }
     }
 
     [HarmonyPatch(typeof(AIJetStreamT242Controller))]
@@ -78,6 +89,19 @@ namespace FCS_AIMarineTurbine.Patches
                 return true;
             }
         }
+
+
+        public static bool RemoveEventHandler(Action<AIJetStreamT242Controller> newHandler)
+        {
+            if (onJetStreamDestroyed != null)
+            {
+                onJetStreamDestroyed -= newHandler;
+                return true;
+            }
+
+            return false;
+        }
+
     }
 
 
