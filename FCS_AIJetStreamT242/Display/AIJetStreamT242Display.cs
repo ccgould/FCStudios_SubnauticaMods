@@ -298,9 +298,23 @@ namespace FCS_AIMarineTurbine.Display
         {
             if (_foundComponents)
             {
-                _depthValue.text = $"{Math.Round(_mono.GetDepth())}m";
 
-                _turbineSpeedValue.text = $"{_mono.GetSpeed()}rpm";
+
+                _depth.GetComponent<Text>().text =
+                    LanguageHelpers.GetLanguage(DisplayLanguagePatching.DepthKey) + ": " + $"<color=#00ffffff>" + Math.Round(_mono.GetDepth())
+                    + "m" + "</color>";
+
+                _turbineSpeed.GetComponent<Text>().text =
+                    LanguageHelpers.GetLanguage(DisplayLanguagePatching.SpeedKey) + ": " + $"<color=#00ffffff>" + _mono.GetSpeed()
+                    + LanguageHelpers.GetLanguage(DisplayLanguagePatching.RPMKey) + "</color>";
+
+
+
+                //_depthValue.text = $"{Math.Round(_mono.GetDepth())}m";
+                //_turbineSpeedValue.text = $"{_mono.GetSpeed()}{LanguageHelpers.GetLanguage(DisplayLanguagePatching.RPMKey)}";
+
+                //Speed: < color =#00ffffff>200 rpm</color>
+
 
                 _healthSlider.GetComponent<Slider>().value = _mono.HealthManager.GetHealth() / 100f;
 
@@ -326,10 +340,8 @@ namespace FCS_AIMarineTurbine.Display
 
         private void UpdateLanaguage()
         {
-            _depth.GetComponent<Text>().text = LanguageHelpers.GetLanguage(DisplayLanguagePatching.DepthKey);
             _healthSlider.FindChild("Heath_LBL").GetComponent<Text>().text = LanguageHelpers.GetLanguage(DisplayLanguagePatching.HealthKey);
             _powerSlider.FindChild("Power_LBL").GetComponent<Text>().text = LanguageHelpers.GetLanguage(DisplayLanguagePatching.PowerKey);
-            _turbineSpeed.GetComponent<Text>().text = LanguageHelpers.GetLanguage(DisplayLanguagePatching.SpeedKey);
         }
         #endregion
 

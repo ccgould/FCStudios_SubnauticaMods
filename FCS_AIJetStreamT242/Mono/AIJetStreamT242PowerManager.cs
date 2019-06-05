@@ -33,6 +33,7 @@ namespace FCS_AIJetStreamT242.Mono
         {
             _capacity = AIJetStreamT242Buildable.JetStreamT242Config.MaxCapacity;
             StartCoroutine(UpdatePowerRelay());
+            //InvokeRepeating();
         }
 
         private void Update()
@@ -105,7 +106,7 @@ namespace FCS_AIJetStreamT242.Mono
 
         private void ProducePower()
         {
-            if (_hasBreakerTripped) return;
+            if (_hasBreakerTripped || _mono.HealthManager.IsDamageApplied()) return;
 
             var decPercentage = (MaxPowerPerMin / _mono.MaxSpeed) / 60;
 

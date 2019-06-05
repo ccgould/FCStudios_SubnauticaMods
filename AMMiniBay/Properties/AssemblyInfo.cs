@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Alterra Industrial Marine Turbine")]
-[assembly: AssemblyDescription("An all new mod from Field Creators Studios that allows you to generate power from using water current in Subnautica.")]
+[assembly: AssemblyTitle("AMMiniBay")]
+[assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Field Creators Studios")]
-[assembly: AssemblyProduct("Alterra Industrial Marine Turbine")]
-[assembly: AssemblyCopyright("Copyright ©  Field Creators Studios 2019")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("AMMiniBay")]
+[assembly: AssemblyCopyright("Copyright ©  2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("a6d5f567-127a-4ee3-9959-8c228b040290")]
+[assembly: Guid("ffa8c60f-f2d5-461c-bbd2-17e35a013fdf")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("2.0.0.0")]
-[assembly: AssemblyFileVersion("2.0.0.0")]
+[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyFileVersion("1.0.0.0")]

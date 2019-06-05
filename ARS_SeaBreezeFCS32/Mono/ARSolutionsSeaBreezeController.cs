@@ -68,6 +68,8 @@ namespace ARS_SeaBreezeFCS32.Mono
             if (PowerManager != null)
             {
                 PowerManager.Initialize(this);
+                PowerManager.OnPowerOutage += OnPowerOutage;
+                PowerManager.OnPowerResume += OnPowerResume;
             }
             else
             {
@@ -91,12 +93,25 @@ namespace ARS_SeaBreezeFCS32.Mono
                 QuickLogger.Error("Animation Manager Component was not found");
             }
 
+            InvokeRepeating("UpdateFridgeCooler", 1, 1);
+
+        }
+
+        private void OnPowerResume()
+        {
+            QuickLogger.Debug("In OnPowerResume", true);
+            UpdateFridgeCooler();
+        }
+
+        private void OnPowerOutage()
+        {
+            QuickLogger.Debug("In OnPowerOutage", true);
+            UpdateFridgeCooler();
         }
 
         private void Update()
         {
             OnMonoUpdate?.Invoke();
-            UpdateFridgeCooler();
         }
 
         #endregion
@@ -175,7 +190,7 @@ namespace ARS_SeaBreezeFCS32.Mono
 
             //QuickLogger.Debug($"GetFilterState {_filterContainer.GetFilterState()} || IsPowerAvaliable {PowerManager.IsPowerAvaliable} || GetOpenState {_fridgeContainer.GetOpenState()}", true);
 
-            //if (_prevFilterState == _filterContainer.GetFilterState()) return;
+            if (_prevFilterState == _filterContainer.GetFilterState()) return;
 
             if (!_filterContainer.GetOpenState() && PowerManager.GetIsPowerAvailable() &&
                 _filterContainer.GetFilterState() == FilterState.Filtering)

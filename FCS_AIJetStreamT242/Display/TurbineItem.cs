@@ -23,6 +23,8 @@ namespace FCS_AIMarineTurbine.Display
         private GameObject _damaged;
         private Text _powerBTNText;
         private Text _pingBTNText;
+        private Text _damagedText;
+
         #endregion
 
         #region Public Members
@@ -133,6 +135,7 @@ namespace FCS_AIMarineTurbine.Display
                 return false;
             }
 
+
             #endregion
 
             #region Damaged Label
@@ -142,6 +145,18 @@ namespace FCS_AIMarineTurbine.Display
             if (_damagedLbl == null)
             {
                 QuickLogger.Error("Damaged Label not found.");
+                return false;
+            }
+
+            #endregion
+
+            #region Damaged Label
+
+            _damagedText = _damagedLbl.GetComponent<Text>();
+
+            if (_damagedLbl == null)
+            {
+                QuickLogger.Error("Damaged Text not found.");
                 return false;
             }
 
@@ -212,7 +227,7 @@ namespace FCS_AIMarineTurbine.Display
         {
             _depthText.text = $"{Mathf.Round(Turbine.GetDepth())}M";
 
-            _speedText.text = $"{Turbine.GetSpeed()}rpm";
+            _speedText.text = $"{Turbine.GetSpeed()}{LanguageHelpers.GetLanguage(DisplayLanguagePatching.RPMKey)}";
 
             UpdateData();
         }
@@ -222,7 +237,9 @@ namespace FCS_AIMarineTurbine.Display
             _damaged.SetActive(Turbine.HealthManager.GetHealth() <= 0);
             _health.SetActive(Turbine.HealthManager.GetHealth() > 0);
 
+
             _healthText.text = $"{LanguageHelpers.GetLanguage(DisplayLanguagePatching.HealthKey)} - {Turbine.HealthManager.GetHealth()}%";
+            _damagedText.text = LanguageHelpers.GetLanguage(DisplayLanguagePatching.DamagedKey);
 
 
             if (Turbine.HealthManager.GetHealth() <= 100 && Turbine.HealthManager.GetHealth() > 50)

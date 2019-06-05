@@ -4,6 +4,7 @@ namespace FCS_AIMarineTurbine.Display.Patching
 {
     internal static class DisplayLanguagePatching
     {
+        public const string RPMKey = "RPM";
         public const string DepthKey = "Depth";
         public const string SpeedKey = "Speed";
         public const string PowerKey = "Power";
@@ -20,8 +21,6 @@ namespace FCS_AIMarineTurbine.Display.Patching
         public const string PingingKey = "Pinging";
         public const string LegendKey = "Legend";
         public const string StatusOverviewKey = "StatusOverview";
-        //public const string DescriptionKey = "Description";
-
 
         internal static void AdditionPatching()
         {
@@ -37,12 +36,12 @@ namespace FCS_AIMarineTurbine.Display.Patching
             LanguageHandler.SetLanguageLine(DamagedKey, "DAMAGED");
             LanguageHandler.SetLanguageLine(DamagedLegendKey, "Damaged\n0% => 29%");
             LanguageHandler.SetLanguageLine(HealthyLegendKey, "Healthy\n60 % => 100%");
-            LanguageHandler.SetLanguageLine(MidlyDamagedLegendKey, "Midly Damaged\n30% => 59");
+            LanguageHandler.SetLanguageLine(MidlyDamagedLegendKey, "Mildly Damaged\n30% => 59%");
             LanguageHandler.SetLanguageLine(OnKey, "ON");
+            LanguageHandler.SetLanguageLine(RPMKey, "rpm");
             LanguageHandler.SetLanguageLine(LegendKey, "Legend");
             LanguageHandler.SetLanguageLine(PoweredOffKey, "Powered Off");
             LanguageHandler.SetLanguageLine(StatusOverviewKey, "Status Overview");
-            //LanguageHandler.SetLanguageLine(DescriptionKey, "The Jet Stream T242 provides power by using the water current. The faster the turbine spins the more power output.");
         }
     }
 }

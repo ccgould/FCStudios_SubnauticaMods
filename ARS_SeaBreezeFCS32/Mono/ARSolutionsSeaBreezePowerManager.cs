@@ -14,13 +14,18 @@ namespace ARS_SeaBreezeFCS32.Mono
         private float EnergyConsumptionPerSecond = 0.2f;
         private float AvailablePower => _connectedRelay.GetPower();
 
+        public Action OnPowerOutage { get; set; }
+        public Action OnPowerResume { get; set; }
+
         private ARSolutionsSeaBreezeController _mono;
 
         public bool NotAllowToOperate => !_mono.IsConstructed || _mono.PowerManager.GetHasBreakerTripped() || _connectedRelay == null;
 
         private PowerRelay _connectedRelay;
+        private float _energyToConsume;
+        private bool _prevPowerState;
 
-        private bool IsPowerAvailable => AvailablePower > 0 || !_hasBreakerTripped;
+        private bool IsPowerAvailable => AvailablePower > _energyToConsume || !_hasBreakerTripped;
 
         #region Unity Methods
         private void Update()
@@ -28,15 +33,26 @@ namespace ARS_SeaBreezeFCS32.Mono
             if (this.NotAllowToOperate)
                 return;
 
-            float energyToConsume = EnergyConsumptionPerSecond * DayNightCycle.main.deltaTime;
+            _energyToConsume = EnergyConsumptionPerSecond * DayNightCycle.main.deltaTime;
             bool requiresEnergy = GameModeUtils.RequiresPower();
-            bool hasPowerToConsume = !requiresEnergy || (this.AvailablePower >= energyToConsume);
+            bool hasPowerToConsume = !requiresEnergy || (this.AvailablePower >= _energyToConsume);
+
+            if (hasPowerToConsume && !_prevPowerState)
+            {
+                OnPowerResume?.Invoke();
+                _prevPowerState = true;
+            }
+            else if (!hasPowerToConsume && _prevPowerState)
+            {
+                OnPowerOutage?.Invoke();
+                _prevPowerState = false;
+            }
 
             if (!hasPowerToConsume)
                 return;
 
             if (requiresEnergy)
-                _connectedRelay.ConsumeEnergy(energyToConsume, out float amountConsumed);
+                _connectedRelay.ConsumeEnergy(_energyToConsume, out float amountConsumed);
         }
         #endregion
 

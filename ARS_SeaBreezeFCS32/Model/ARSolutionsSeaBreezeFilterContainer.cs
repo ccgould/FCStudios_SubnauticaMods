@@ -107,6 +107,7 @@ namespace ARS_SeaBreezeFCS32.Model
 
         private void OnRemoveItemEvent(InventoryItem item)
         {
+            if (_filter == null) return;
             _filter.StopTimer();
             _filter = null;
         }

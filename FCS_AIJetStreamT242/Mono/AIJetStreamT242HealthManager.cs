@@ -76,7 +76,7 @@ namespace FCS_AIMarineTurbine.Mono
 
         public bool IsDamageApplied()
         {
-            if (LiveMixin == null) return false;
+            if (LiveMixin == null) return true;
 
             return LiveMixin.health <= 0;
         }
@@ -105,7 +105,7 @@ namespace FCS_AIMarineTurbine.Mono
             ResetTimer();
         }
 
-        private void HealthChecks()
+        private void HealthChecks() // In and InvokeRepeating
         {
             try
             {
