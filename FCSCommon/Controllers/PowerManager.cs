@@ -1,34 +1,38 @@
-﻿using FCSCommon.Utilities;
+﻿using FCSCommon.Models.Abstract;
+using FCSCommon.Utilities;
 using System;
 using System.Collections;
 using UnityEngine;
 
-namespace ARS_SeaBreezeFCS32.Mono
+namespace FCSCommon.Controllers
 {
-    internal class ARSolutionsSeaBreezePowerManager : MonoBehaviour
+    public abstract class PowerManager : MonoBehaviour
     {
-        private bool _hasBreakerTripped;
-        public Action OnBreakerTripped { get; set; }
-        public Action OnBreakerReset { get; set; }
-
-        private float EnergyConsumptionPerSecond = 0.2f;
-        private float AvailablePower => _connectedRelay.GetPower();
-
         public Action OnPowerOutage { get; set; }
+
         public Action OnPowerResume { get; set; }
 
-        private ARSolutionsSeaBreezeController _mono;
+        public abstract float EnergyConsumptionPerSecond { get; set; }
+
+        private float AvailablePower => _connectedRelay.GetPower();
+
+        private PowerRelay _connectedRelay;
+
+        private FCSController _mono;
+
+        private bool _prevPowerState;
+
+        private bool _hasBreakerTripped;
+
+        private float _energyToConsume;
+
+        public Action OnBreakerReset { get; set; }
 
         public bool NotAllowToOperate => !_mono.IsConstructed || GetHasBreakerTripped() || _connectedRelay == null;
 
-        private PowerRelay _connectedRelay;
-        private float _energyToConsume;
-        private bool _prevPowerState;
+        public Action OnBreakerTripped { get; set; }
 
-        private bool IsPowerAvailable => AvailablePower > _energyToConsume || !_hasBreakerTripped;
-
-        #region Unity Methods
-        private void Update()
+        public virtual void Update()
         {
             if (this.NotAllowToOperate)
                 return;
@@ -54,7 +58,6 @@ namespace ARS_SeaBreezeFCS32.Mono
             if (requiresEnergy)
                 _connectedRelay.ConsumeEnergy(_energyToConsume, out float amountConsumed);
         }
-        #endregion
 
         private IEnumerator UpdatePowerRelay()
         {
@@ -82,35 +85,36 @@ namespace ARS_SeaBreezeFCS32.Mono
             }
         }
 
-        private void TriggerPowerOff()
-        {
-            _hasBreakerTripped = true;
-            OnBreakerTripped?.Invoke();
-        }
-
-        private void TriggerPowerOn()
-        {
-            _hasBreakerTripped = false;
-            OnBreakerReset?.Invoke();
-        }
-
-        internal void Initialize(ARSolutionsSeaBreezeController mono)
+        public virtual void Initialize(FCSController mono)
         {
             _mono = mono;
             StartCoroutine(UpdatePowerRelay());
         }
 
-        internal bool GetHasBreakerTripped()
+        public virtual void TriggerPowerOff()
+        {
+            _hasBreakerTripped = true;
+            OnBreakerTripped?.Invoke();
+        }
+        public virtual void TriggerPowerOn()
+        {
+            _hasBreakerTripped = false;
+            OnBreakerReset?.Invoke();
+        }
+
+        private bool IsPowerAvailable => AvailablePower > _energyToConsume || !_hasBreakerTripped;
+
+        public virtual bool GetHasBreakerTripped()
         {
             return _hasBreakerTripped;
         }
 
-        internal void SetHasBreakerTripped(bool value)
+        public virtual void SetHasBreakerTripped(bool value)
         {
             _hasBreakerTripped = value;
         }
 
-        internal void TogglePower()
+        public virtual void TogglePower()
         {
             if (GetHasBreakerTripped())
             {
@@ -122,9 +126,10 @@ namespace ARS_SeaBreezeFCS32.Mono
             }
         }
 
-        public bool GetIsPowerAvailable()
+        public virtual bool GetIsPowerAvailable()
         {
             return _connectedRelay != null && IsPowerAvailable;
         }
+
     }
 }

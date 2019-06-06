@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ARS_SeaBreezeFCS32", "ARS_S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCSTechWorkBench", "FCSWorkBench\FCSTechWorkBench.csproj", "{B947909C-4983-4749-93AC-73EA69F6DCE8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AMMiniMedBay", "AMMiniMedBay\AMMiniMedBay.csproj", "{FFA8C60F-F2D5-461C-BBD2-17E35A013FDF}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		FCSCommon\FCSCommon.projitems*{32a3f9b5-9089-4478-b706-952b706f08da}*SharedItemsImports = 4
@@ -27,6 +29,7 @@ Global
 		FCSCommon\FCSCommon.projitems*{b260a268-5873-4147-953c-1ef67a65cb4e}*SharedItemsImports = 4
 		FCSCommon\FCSCommon.projitems*{b947909c-4983-4749-93ac-73ea69f6dce8}*SharedItemsImports = 4
 		FCSCommon\FCSCommon.projitems*{dbc34043-0f09-42ef-beb9-f59cbc6df16f}*SharedItemsImports = 13
+		FCSCommon\FCSCommon.projitems*{ffa8c60f-f2d5-461c-bbd2-17e35a013fdf}*SharedItemsImports = 4
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,6 +64,10 @@ Global
 		{B947909C-4983-4749-93AC-73EA69F6DCE8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B947909C-4983-4749-93AC-73EA69F6DCE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B947909C-4983-4749-93AC-73EA69F6DCE8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FFA8C60F-F2D5-461C-BBD2-17E35A013FDF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FFA8C60F-F2D5-461C-BBD2-17E35A013FDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FFA8C60F-F2D5-461C-BBD2-17E35A013FDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FFA8C60F-F2D5-461C-BBD2-17E35A013FDF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -73,11 +73,6 @@ namespace FCS_AIMarineTurbine.Mono
                 HealthManager.Initialize(this);
                 HealthManager.SetDamageModel(_damage);
                 PowerManager = gameObject.GetComponentInParent<AIJetStreamT242PowerManager>();
-                PowerManager.Initialize(this);
-
-                AnimationManager = gameObject.GetComponentInParent<AIJetStreamT242AnimationManager>();
-
-                BeaconManager = gameObject.GetComponentInParent<BeaconController>();
 
                 if (PowerManager == null)
                 {
@@ -85,6 +80,14 @@ namespace FCS_AIMarineTurbine.Mono
                     _initialized = false;
                     return;
                 }
+
+                PowerManager.Initialize(this);
+
+                AnimationManager = gameObject.GetComponentInParent<AIJetStreamT242AnimationManager>();
+
+                BeaconManager = gameObject.GetComponentInParent<BeaconController>();
+
+
 
                 //_currentBiome = BiomeManager.GetBiome();
             }

@@ -16,6 +16,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Components\WorkBenchFilter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controllers\AIDeepBatteryController.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controllers\AIDeepDrillerSolarController.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controllers\PowerManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\TimeConverters.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enums\FilterState.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enums\FilterTypes.cs" />
@@ -35,6 +36,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\MaterialHelpers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\WorldHelpers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Abstract\AIDisplay.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\Abstract\FCSController.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Abstract\ModStrings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\Colors.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\ColorVec4.cs" />
