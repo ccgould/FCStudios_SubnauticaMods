@@ -15,7 +15,7 @@ namespace AMMiniMedBay.Models
         private readonly Func<bool> _isConstructed;
         private readonly FCSController _mono;
         private float _timeSpawnMedKit = -1f;
-        private const float MedKitSpawnInterval = 600f;
+        private const float MedKitSpawnInterval = 20f; //600f;
         public bool startWithMedKit;
         private const int ContainerWidth = 2;
         private const int ContainerHeight = 2;
@@ -98,7 +98,6 @@ namespace AMMiniMedBay.Models
             if (item != null)
             {
                 QuickLogger.Debug("New Health Pack Generated Added!", true);
-                //TODO Add amount of packaged available
             }
         }
 

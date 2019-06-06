@@ -9,12 +9,12 @@ namespace AMMiniMedBay.Buildable
         private GameObject _Prefab;
 
         private static AssetBundle _assetBundle;
-        public static GameObject ItemPrefab { get; set; }
+        public static GameObject ColorItemPrefab { get; set; }
 
         private bool GetPrefabs()
         {
             QuickLogger.Debug("GetPrefabs");
-            AssetBundle assetBundle = AssetHelper.Asset(ClassID, "amminimedbaymodbundle");
+            AssetBundle assetBundle = AssetHelper.Asset("FCS_AMMiniMedBay", "amminimedbaymodbundle");
 
             //If the result is null return false.
             if (assetBundle == null)
@@ -47,8 +47,6 @@ namespace AMMiniMedBay.Buildable
             }
             return true;
         }
-
-
 
         /// <summary>
         /// Applies the shader to the materials of the reactor
