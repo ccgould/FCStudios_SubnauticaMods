@@ -21,6 +21,7 @@ namespace AMMiniMedBay.Mono
         private HealingStatus _healingStatus;
         private bool _isHealing;
         private AMMiniMedBayDisplay _display;
+        private NitrogenLevel _nitrogenLevel;
         public override Action OnMonoUpdate { get; set; }
 
         internal AMMiniMedBayAudioManager AudioHandler { get; set; }
@@ -35,10 +36,23 @@ namespace AMMiniMedBay.Mono
 
         internal void HealPlayer()
         {
+            if (!PowerManager.GetIsPowerAvailable()) return;
+            RemoveNitrogen();
             var remainder = Player.main.liveMixin.maxHealth - Player.main.liveMixin.health;
             _healthPartial = remainder / _processTime;
             PowerManager.SetHasBreakerTripped(false);
             UpdateIsHealing(true);
+        }
+
+        private void RemoveNitrogen()
+        {
+            if (_nitrogenLevel.GetNitrogenEnabled())
+            {
+                if (_nitrogenLevel.safeNitrogenDepth <= 100f)
+                    _nitrogenLevel.safeNitrogenDepth = 0f;
+                else
+                    _nitrogenLevel.safeNitrogenDepth -= 100f;
+            }
         }
 
         private void UpdateIsHealing(bool value)
@@ -59,11 +73,12 @@ namespace AMMiniMedBay.Mono
         {
             OnMonoUpdate?.Invoke();
 
-            QuickLogger.Debug($"isHealing {_isHealing}");
-
             if (!_isHealing) return;
 
+            _healingStatus = HealingStatus.Healing;
+
             QuickLogger.Debug("Healing Player", true);
+
             _timeCurrDeltaTime += DayNightCycle.main.deltaTime;
 
             QuickLogger.Debug($"Delta Time: {_timeCurrDeltaTime}");
@@ -79,7 +94,7 @@ namespace AMMiniMedBay.Mono
             if (!Player.main.liveMixin.IsFullHealth())
             {
                 QuickLogger.Debug("Added Health", true);
-                _healingStatus = HealingStatus.Healing;
+
                 Player.main.liveMixin.health = Mathf.Clamp(playerHealth + _healthPartial, 0, playerMaxHealth);
                 QuickLogger.Debug($"Player Health = {playerHealth}", true);
             }
@@ -125,6 +140,9 @@ namespace AMMiniMedBay.Mono
             AudioHandler = new AMMiniMedBayAudioManager(gameObject.GetComponent<FMOD_CustomLoopingEmitter>());
 
             Container = new AMMiniMedBayContainer(this);
+
+            if (Player.main.gameObject.GetComponent<NitrogenLevel>() != null)
+                _nitrogenLevel = Player.main.gameObject.GetComponent<NitrogenLevel>();
         }
 
         public override void OnAddItemEvent(InventoryItem item)
@@ -139,7 +157,7 @@ namespace AMMiniMedBay.Mono
 
         private void OnPowerResume()
         {
-            QuickLogger.Debug("In OnPowerResume", true);
+            QuickLogger.Debug($"In OnPowerResume {_healingStatus}", true);
             UpdateIsHealing(_healingStatus == HealingStatus.Healing);
         }
 

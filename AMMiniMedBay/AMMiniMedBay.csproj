@@ -75,6 +75,7 @@
     <Compile Include="Mono\AMMiniMedBayAnimationManager.cs" />
     <Compile Include="Mono\AMMiniMedBayAudioManager.cs" />
     <Compile Include="Mono\AMMiniMedBayController.cs" />
+    <Compile Include="Mono\StorageHandTarget.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

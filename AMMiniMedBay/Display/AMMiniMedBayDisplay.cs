@@ -20,6 +20,7 @@ namespace AMMiniMedBay.Display
     internal class AMMiniMedBayDisplay : MonoBehaviour
     {
         #region Private Members
+
         private GameObject _canvasGameObject;
         private bool _coroutineStarted;
         private bool _initialized;
@@ -115,6 +116,20 @@ namespace AMMiniMedBay.Display
                 QuickLogger.Error("Canvas not found.");
                 return false;
             }
+            #endregion
+
+            #region HandTarget
+
+            var storage = gameObject.FindChild("model").FindChild("Target");
+
+            if (storage == null)
+            {
+                QuickLogger.Error("Storage not found.");
+                return false;
+            }
+
+            var contianer = storage.AddComponent<StorageHandTarget>();
+            contianer.Initialize(_mono);
             #endregion
 
             #region MainPage
