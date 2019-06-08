@@ -25,22 +25,24 @@ namespace AMMiniMedBay.Display
         private bool _coroutineStarted;
         private bool _initialized;
         private Text _timeLeftTXT;
-        private GameObject _colorPickerPage;
         private const float DelayedStartTime = 0.5f;
         private const float RepeatingUpdateInterval = 1f;
         private const int Main = 1;
-        private const int ColorPicker = 4;
+        private const int NonPower = 2;
+        private const int ColorPicker = 3;
         private const int BlackOut = 0;
         private List<SerializableColor> _serializedColors;
-        private int COLORS_PER_PAGE = 48;
+        private int COLORS_PER_PAGE = 72;
         private int _maxColorPage = 1;
         private int _currentColorPage = 1;
-        private Text _colorPageBottomNumber;
-        private Text _colorPageTopNumber;
+        private Text _colorPageNumber;
         private GameObject _colorPageContainer;
         private AMMiniMedBayController _mono;
         private AMMiniMedBayAnimationManager _animatorController;
         private GameObject _healButton;
+        private Text _storageTxt;
+        private int _currentPage;
+        private Text _healthPercentage;
 
         #endregion
 
@@ -69,6 +71,9 @@ namespace AMMiniMedBay.Display
                 return;
             }
 
+            _mono.PowerManager.OnPowerOutage += OnPowerOutage;
+            _mono.PowerManager.OnPowerResume += OnPowerResume;
+
             _serializedColors = JsonConvert.DeserializeObject<List<SerializableColor>>(
                 File.ReadAllText(Path.Combine(AssetHelper.GetAssetFolder("FCS_AMMiniMedBay"), "colors.json")));
 
@@ -81,7 +86,19 @@ namespace AMMiniMedBay.Display
 
             DrawColorPage(1);
 
+
             _initialized = true;
+        }
+
+        private void OnPowerResume()
+        {
+            StartCoroutine(RestorePageEnu());
+
+        }
+
+        private void OnPowerOutage()
+        {
+            StartCoroutine(NoPowerScreenEnu());
         }
 
         #endregion
@@ -93,7 +110,19 @@ namespace AMMiniMedBay.Display
             switch (btnName)
             {
                 case "HealBTN":
+                    _currentPage = _mono.AnimationManager.GetIntHash(_mono.PageHash);
                     _mono.HealPlayer();
+                    break;
+                case "HomeBTN":
+                    StartCoroutine(BootScreenEnu());
+                    break;
+                case "CPBTN":
+                    StartCoroutine(ColorPickerScreenEnu());
+                    break;
+                case "StorageBTN":
+                    if (Player.main == null) return;
+                    QuickLogger.Debug($"Clicked on Storage Container", true);
+                    _mono.Container.OpenStorage();
                     break;
             }
         }
@@ -118,9 +147,23 @@ namespace AMMiniMedBay.Display
             }
             #endregion
 
+            //#region HandTarget
+
+            //var storage = gameObject.FindChild("Storage_Target");
+
+            //if (storage == null)
+            //{
+            //    QuickLogger.Error("Storage not found.");
+            //    return false;
+            //}
+
+            //var container = storage.AddComponent<StorageHandTarget>();
+            //container.Initialize(_mono);
+            //#endregion
+
             #region HandTarget
 
-            var storage = gameObject.FindChild("model").FindChild("Target");
+            var storage = _canvasGameObject.FindChild("HandTarget");
 
             if (storage == null)
             {
@@ -128,9 +171,15 @@ namespace AMMiniMedBay.Display
                 return false;
             }
 
-            var contianer = storage.AddComponent<StorageHandTarget>();
-            contianer.Initialize(_mono);
+
+            var storageTarget = storage.AddComponent<InterfaceButton>();
+            storageTarget.BtnName = "StorageBTN";
+            storageTarget.ButtonMode = InterfaceButtonMode.None;
+            storageTarget.OnButtonClick = OnButtonClick;
+            storageTarget.TextLineOne = GetLanguage(AMMiniMedBayBuildable.OpenStorageKey);
+
             #endregion
+
 
             #region MainPage
 
@@ -143,13 +192,35 @@ namespace AMMiniMedBay.Display
             }
             #endregion
 
-            #region StoragePage
+            #region Color Picker Page
 
-            var storagePage = _canvasGameObject.FindChild("Storage")?.gameObject;
+            var colorPickerPage = _canvasGameObject.FindChild("ColorPicker")?.gameObject;
 
-            if (storagePage == null)
+            if (colorPickerPage == null)
             {
-                QuickLogger.Error("Storage Page not found.");
+                QuickLogger.Error("Color Picker Page not found.");
+                return false;
+            }
+            #endregion
+
+            #region Power Page
+
+            var powerPage = _canvasGameObject.FindChild("NoPower")?.gameObject;
+
+            if (powerPage == null)
+            {
+                QuickLogger.Error("Power Page not found.");
+                return false;
+            }
+            #endregion
+
+            #region Storage Text
+
+            _storageTxt = _canvasGameObject.FindChild("StorageTXT").GetComponent<Text>();
+
+            if (_storageTxt == null)
+            {
+                QuickLogger.Error("Storage Text not found.");
                 return false;
             }
             #endregion
@@ -161,12 +232,150 @@ namespace AMMiniMedBay.Display
             if (_healButton == null)
             {
                 QuickLogger.Error("Heal button not found.");
+                return false;
             }
 
             var healBtn = _healButton.AddComponent<InterfaceButton>();
             healBtn.BtnName = "HealBTN";
             healBtn.ButtonMode = InterfaceButtonMode.Background;
             healBtn.OnButtonClick = OnButtonClick;
+            #endregion
+
+            #region Home Button
+
+            var homeButton = colorPickerPage.FindChild("Image")?.gameObject;
+
+            if (homeButton == null)
+            {
+                QuickLogger.Error("Home Button Not Found not found.");
+                return false;
+            }
+
+            var homeBtn = homeButton.AddComponent<InterfaceButton>();
+            homeBtn.BtnName = "HomeBTN";
+            homeBtn.ButtonMode = InterfaceButtonMode.Background;
+            homeBtn.OnButtonClick = OnButtonClick;
+            #endregion
+
+            #region Color Picker Button
+
+            var cPButton = mainPage.FindChild("Paint_Spray")?.gameObject;
+
+            if (cPButton == null)
+            {
+                QuickLogger.Error("Color Picker Button not found.");
+                return false;
+            }
+
+            var cpBtn = cPButton.AddComponent<InterfaceButton>();
+            cpBtn.BtnName = "CPBTN";
+            cpBtn.ButtonMode = InterfaceButtonMode.Background;
+            cpBtn.OnButtonClick = OnButtonClick;
+            #endregion
+
+            #region L Nav
+
+            var lNavButton = colorPickerPage.FindChild("L_Nav")?.gameObject;
+
+            if (lNavButton == null)
+            {
+                QuickLogger.Error("LNav button not found.");
+                return false;
+            }
+
+            var lNavBtn = lNavButton.AddComponent<PaginatorButton>();
+            lNavBtn.AmountToChangePageBy = -1;
+            lNavBtn.ChangePageBy = ChangeColorPageBy;
+            lNavBtn.HoverTextLineOne = GetLanguage(AMMiniMedBayBuildable.OnHoverLPaginatorKey);
+            #endregion
+
+            #region R Nav
+
+            var rNavButton = colorPickerPage.FindChild("R_Nav")?.gameObject;
+
+            if (rNavButton == null)
+            {
+                QuickLogger.Error("RNav button not found.");
+                return false;
+            }
+
+            var rNavBtn = rNavButton.AddComponent<PaginatorButton>();
+            rNavBtn.AmountToChangePageBy = 1;
+            rNavBtn.ChangePageBy = ChangeColorPageBy;
+            rNavBtn.HoverTextLineOne = GetLanguage(AMMiniMedBayBuildable.OnHoverRPaginatorKey);
+            #endregion
+
+            #region Page Number
+
+            _colorPageNumber = colorPickerPage.FindChild("Text").GetComponent<Text>();
+            if (_colorPageNumber == null)
+            {
+                QuickLogger.Error("Page Number not found");
+                return false;
+            }
+            #endregion
+
+            #region Color Container
+
+            _colorPageContainer = colorPickerPage.FindChild("Grid")?.gameObject;
+            if (_colorPageContainer == null)
+            {
+                QuickLogger.Error("Color Grid not found");
+                return false;
+            }
+            #endregion
+
+            #region Health Staus Text
+
+            var health_LBL = mainPage.FindChild("Health_LBL").GetComponent<Text>();
+
+            if (health_LBL == null)
+            {
+                QuickLogger.Error("Health Status label not found.");
+                return false;
+            }
+
+            health_LBL.text = GetLanguage(AMMiniMedBayBuildable.HealthStatusLBLKey);
+            #endregion
+
+            #region Health Text
+
+            _healthPercentage = mainPage.FindChild("PlayerHealthTXT").GetComponent<Text>();
+
+            if (_healthPercentage == null)
+            {
+                QuickLogger.Error("Player Health TXT label not found.");
+                return false;
+            }
+
+            #endregion
+
+            #region No Power Text
+
+            var noPowerText = powerPage.FindChild("NoPowerTxt").GetComponent<Text>();
+
+            if (noPowerText == null)
+            {
+                QuickLogger.Error("No Power TXT label not found.");
+                return false;
+            }
+
+            noPowerText.text = GetLanguage(AMMiniMedBayBuildable.NoPowerKey);
+
+            #endregion
+
+            #region No Power Message 
+
+            var noPowerMessageText = powerPage.FindChild("MessageTXT").GetComponent<Text>();
+
+            if (noPowerMessageText == null)
+            {
+                QuickLogger.Error("No Power Message TXT label not found.");
+                return false;
+            }
+
+            noPowerMessageText.text = GetLanguage(AMMiniMedBayBuildable.NoPowerMessage);
+
             #endregion
 
             return true;
@@ -272,8 +481,7 @@ namespace AMMiniMedBay.Display
         private void UpdateColorPaginator()
         {
             CalculateNewMaxColorPages();
-            _colorPageTopNumber.text = _currentColorPage.ToString();
-            _colorPageBottomNumber.text = _maxColorPage.ToString();
+            _colorPageNumber.text = $"{_currentColorPage.ToString()} | {_maxColorPage}";
         }
 
         private void ClearColorPage()
@@ -310,6 +518,30 @@ namespace AMMiniMedBay.Display
             yield return new WaitForEndOfFrame();
             _animatorController.SetIntHash(_mono.PageHash, ColorPicker);
         }
+
+        private IEnumerator NoPowerScreenEnu()
+        {
+            yield return new WaitForEndOfFrame();
+            _currentPage = _mono.AnimationManager.GetIntHash(_mono.PageHash);
+            _animatorController.SetIntHash(_mono.PageHash, NonPower);
+        }
+        private IEnumerator RestorePageEnu()
+        {
+            yield return new WaitForEndOfFrame();
+            _animatorController.SetIntHash(_mono.PageHash, _currentPage);
+        }
+
         #endregion
+
+        internal void ChangeStorageAmount(int value)
+        {
+            _storageTxt.text = value.ToString();
+            QuickLogger.Debug($"Storage Number {value}", true);
+        }
+
+        internal void UpdatePlayerHealthPercent(int value)
+        {
+            _healthPercentage.text = $"{value}%";
+        }
     }
 }

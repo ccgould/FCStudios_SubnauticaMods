@@ -72,9 +72,11 @@
     <Compile Include="Enumerators\HealingStatus.cs" />
     <Compile Include="Models\AMMiniMedBayContainer.cs" />
     <Compile Include="Models\AMMiniMedBayPowerManager.cs" />
+    <Compile Include="Models\SaveData.cs" />
     <Compile Include="Mono\AMMiniMedBayAnimationManager.cs" />
     <Compile Include="Mono\AMMiniMedBayAudioManager.cs" />
     <Compile Include="Mono\AMMiniMedBayController.cs" />
+    <Compile Include="Mono\AMMiniMedBayTrigger.cs" />
     <Compile Include="Mono\StorageHandTarget.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

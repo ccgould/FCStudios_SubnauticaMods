@@ -4,19 +4,24 @@ using AMMiniMedBay.Models;
 using FCSCommon.Extensions;
 using FCSCommon.Models.Abstract;
 using FCSCommon.Utilities;
+using Oculus.Newtonsoft.Json;
+using SMLHelper.V2.Utility;
 using System;
+using System.IO;
 using UnityEngine;
 
 namespace AMMiniMedBay.Mono
 {
-    internal class AMMiniMedBayController : FCSController, IConstructable
+    internal class AMMiniMedBayController : FCSController, IConstructable, IProtoTreeEventListener
     {
         private GameObject _scanner;
         private bool _initialized;
         private float _processTime = 3.0f;
         private Constructable _buildable;
         private float _timeCurrDeltaTime;
-
+        private PrefabIdentifier _prefabId;
+        private readonly string _saveDirectory = Path.Combine(SaveUtils.GetCurrentSaveDataDir(), "AMMiniMedBay");
+        private string SaveFile => Path.Combine(_saveDirectory, _prefabId.Id + ".json");
         private float _healthPartial;
         private HealingStatus _healingStatus;
         private bool _isHealing;
@@ -37,6 +42,7 @@ namespace AMMiniMedBay.Mono
         internal void HealPlayer()
         {
             if (!PowerManager.GetIsPowerAvailable()) return;
+            Player.main.playerController.SetEnabled(false);
             RemoveNitrogen();
             var remainder = Player.main.liveMixin.maxHealth - Player.main.liveMixin.health;
             _healthPartial = remainder / _processTime;
@@ -71,6 +77,8 @@ namespace AMMiniMedBay.Mono
 
         private void Update()
         {
+            _display.UpdatePlayerHealthPercent(IsPlayerInTrigger ? Mathf.CeilToInt(Player.main.liveMixin.health) : 0);
+
             OnMonoUpdate?.Invoke();
 
             if (!_isHealing) return;
@@ -100,16 +108,23 @@ namespace AMMiniMedBay.Mono
             }
             else
             {
+                Player.main.playerController.SetEnabled(true);
                 QuickLogger.Debug("Resetting", true);
                 _healingStatus = HealingStatus.Idle;
                 UpdateIsHealing(false);
                 PowerManager.SetHasBreakerTripped(true);
             }
-
         }
 
         private void Awake()
         {
+            _prefabId = GetComponentInParent<PrefabIdentifier>();
+
+            if (_prefabId == null)
+            {
+                QuickLogger.Error("Prefab Identifier Component was not found");
+            }
+
             if (_buildable == null)
             {
                 _buildable = GetComponentInParent<Constructable>();
@@ -122,6 +137,25 @@ namespace AMMiniMedBay.Mono
             }
 
             PowerManager = gameObject.GetOrAddComponent<AMMiniMedBayPowerManager>();
+
+            PlayerTrigger = gameObject.FindChild("model").FindChild("Trigger").GetOrAddComponent<AMMiniMedBayTrigger>();
+
+            if (PlayerTrigger != null)
+            {
+                PlayerTrigger.OnPlayerStay += OnPlayerStay;
+                PlayerTrigger.OnPlayerExit += OnPlayerExit;
+            }
+            else
+            {
+                QuickLogger.Error("Player Trigger Component was not found");
+            }
+
+            AnimationManager = gameObject.GetOrAddComponent<AMMiniMedBayAnimationManager>();
+
+            if (AnimationManager == null)
+            {
+                QuickLogger.Error("Animation Controller Not Found!");
+            }
 
             if (PowerManager != null)
             {
@@ -137,6 +171,8 @@ namespace AMMiniMedBay.Mono
                 QuickLogger.Error("Power Manager Component was not found");
             }
 
+            PageHash = UnityEngine.Animator.StringToHash("state");
+
             AudioHandler = new AMMiniMedBayAudioManager(gameObject.GetComponent<FMOD_CustomLoopingEmitter>());
 
             Container = new AMMiniMedBayContainer(this);
@@ -144,6 +180,20 @@ namespace AMMiniMedBay.Mono
             if (Player.main.gameObject.GetComponent<NitrogenLevel>() != null)
                 _nitrogenLevel = Player.main.gameObject.GetComponent<NitrogenLevel>();
         }
+
+        private void OnPlayerExit()
+        {
+            IsPlayerInTrigger = false;
+        }
+
+        private void OnPlayerStay()
+        {
+            IsPlayerInTrigger = true;
+        }
+
+        public bool IsPlayerInTrigger { get; set; }
+
+        public AMMiniMedBayTrigger PlayerTrigger { get; set; }
 
         public override void OnAddItemEvent(InventoryItem item)
         {
@@ -202,6 +252,53 @@ namespace AMMiniMedBay.Mono
                     _display.Setup(this);
                 }
             }
+        }
+
+        internal void UpdateKitAmount(int containerSlotsFilled)
+        {
+            _display.ChangeStorageAmount(containerSlotsFilled);
+        }
+
+        public void OnProtoSerializeObjectTree(ProtobufSerializer serializer)
+        {
+            QuickLogger.Debug($"Saving {_prefabId.Id} Data");
+
+            if (!Directory.Exists(_saveDirectory))
+                Directory.CreateDirectory(_saveDirectory);
+
+            var saveData = new SaveData
+            {
+                SCA = Container.NumberOfCubes
+            };
+
+            var output = JsonConvert.SerializeObject(saveData, Formatting.Indented);
+            File.WriteAllText(SaveFile, output);
+
+            QuickLogger.Debug($"Saved {_prefabId.Id} Data");
+        }
+
+        public void OnProtoDeserializeObjectTree(ProtobufSerializer serializer)
+        {
+            QuickLogger.Debug("// ****************************** Load Data *********************************** //");
+
+            if (_prefabId != null)
+            {
+                QuickLogger.Info($"Loading AM Mini MedBay {_prefabId.Id}");
+
+                if (File.Exists(SaveFile))
+                {
+                    string savedDataJson = File.ReadAllText(SaveFile).Trim();
+
+                    //LoadData
+                    var savedData = JsonConvert.DeserializeObject<SaveData>(savedDataJson);
+                    Container.NumberOfCubes = savedData.SCA;
+                }
+            }
+            else
+            {
+                QuickLogger.Error("PrefabIdentifier is null");
+            }
+            QuickLogger.Debug("// ****************************** Loaded Data *********************************** //");
         }
     }
 }

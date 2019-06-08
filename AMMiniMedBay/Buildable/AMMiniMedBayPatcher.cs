@@ -20,6 +20,7 @@ namespace AMMiniMedBay.Buildable
 
         public AMMiniMedBayBuildable() : base("AMMiniMedBay", "Alterra Medical MiniMedBay", "Alterra is here with all your medial needs.")
         {
+            OnFinishedPatching += AdditionalPatching;
         }
 
         public static void PatchHelper()
@@ -43,11 +44,16 @@ namespace AMMiniMedBay.Buildable
                 var meshRenderers = prefab.GetComponentsInChildren<MeshRenderer>();
 
                 //========== Allows the building animation and material colors ==========// 
-
+                Shader shader = Shader.Find("MarmosetUBER");
                 Renderer[] renderers = prefab.GetComponentsInChildren<Renderer>();
                 SkyApplier skyApplier = prefab.GetOrAddComponent<SkyApplier>();
                 skyApplier.renderers = renderers;
                 skyApplier.anchorSky = Skies.Auto;
+
+                foreach (Renderer renderer in renderers)
+                {
+                    renderer.material.shader = shader;
+                }
 
                 //========== Allows the building animation and material colors ==========// 
 
@@ -85,7 +91,7 @@ namespace AMMiniMedBay.Buildable
                 Ingredients = new List<Ingredient>()
                 {
                     new Ingredient(TechType.ComputerChip, 1),
-                    new Ingredient(TechType.FiberMesh, 1),
+                    new Ingredient(TechType.FiberMesh, 3),
                     new Ingredient(TechType.Titanium, 2),
                     new Ingredient(TechType.WiringKit, 1),
                     new Ingredient(TechType.Glass, 1),

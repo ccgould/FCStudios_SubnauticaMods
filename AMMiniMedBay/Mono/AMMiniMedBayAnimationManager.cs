@@ -5,7 +5,6 @@ namespace AMMiniMedBay.Mono
 {
     internal class AMMiniMedBayAnimationManager : MonoBehaviour
     {
-
         #region Private Members
         private AMMiniMedBayController _mono;
         #endregion

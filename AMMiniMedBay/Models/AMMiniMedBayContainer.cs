@@ -19,6 +19,8 @@ namespace AMMiniMedBay.Models
 
         //TODO Change to 600f
         private const float MedKitSpawnInterval = 10f; //600f;
+
+        //TODO Figure how to remove this
         public bool startWithMedKit;
         private const int ContainerWidth = 2;
         private const int ContainerHeight = 2;
@@ -128,6 +130,7 @@ namespace AMMiniMedBay.Models
         }
         private void OnRemoveItemEvent(InventoryItem item)
         {
+            _mono.UpdateKitAmount(ContainerSlotsFilled);
             QuickLogger.Debug("Resetting Time", true);
             _timeSpawnMedKit = DayNightCycle.main.timePassedAsFloat + MedKitSpawnInterval;
         }
@@ -136,6 +139,7 @@ namespace AMMiniMedBay.Models
         {
             if (item != null)
             {
+                _mono.UpdateKitAmount(ContainerSlotsFilled);
                 QuickLogger.Debug("New Health Pack Generated Added!", true);
             }
         }

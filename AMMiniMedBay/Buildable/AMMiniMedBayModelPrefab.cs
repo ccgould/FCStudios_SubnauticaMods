@@ -45,6 +45,23 @@ namespace AMMiniMedBay.Buildable
                 QuickLogger.Error($"{this.FriendlyName} Prefab Not Found!");
                 return false;
             }
+
+            //We have found the asset bundle and now we are going to continue by looking for the model.
+            var colorItemPrefab = assetBundle.LoadAsset<GameObject>("ColorItem");
+
+            //If the prefab isn't null lets add the shader to the materials
+            if (colorItemPrefab != null)
+            {
+                ColorItemPrefab = colorItemPrefab;
+
+                QuickLogger.Debug($"{this.FriendlyName} Color Item Found!");
+            }
+            else
+            {
+                QuickLogger.Error($"{this.FriendlyName} Color Item Not Found!");
+                return false;
+            }
+
             return true;
         }
 
