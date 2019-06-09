@@ -62,6 +62,7 @@ namespace AMMiniMedBay.Buildable
                 constructable.allowedOutside = false;
                 constructable.model = prefab.FindChild("model");
                 constructable.techType = TechType;
+                constructable.rotationEnabled = true;
 
                 prefab.GetOrAddComponent<PrefabIdentifier>().ClassId = this.ClassID;
                 prefab.AddComponent<FMOD_CustomLoopingEmitter>();
