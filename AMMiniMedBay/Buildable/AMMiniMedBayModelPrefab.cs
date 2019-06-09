@@ -82,6 +82,16 @@ namespace AMMiniMedBay.Buildable
             MaterialHelpers.ApplyNormalShader("FCS_SUBMods_GlobalDecals", "FCS_SUBMods_GlobalDecals_Norm", prefab, _assetBundle);
             #endregion
 
+            #region FCS_SUBMods_GlobalDecals_2
+            MaterialHelpers.ApplyAlphaShader("FCS_SUBMods_GlobalDecals_2", prefab);
+            MaterialHelpers.ApplyNormalShader("FCS_SUBMods_GlobalDecals_2_Norm", "FCS_SUBMods_GlobalDecals_Norm", prefab, _assetBundle);
+            #endregion
+
+            #region AMMiniMedBay_BaseColor
+            MaterialHelpers.ApplySpecShader("AMMiniMedBay_BaseColor", "AMMiniMedBay_Spec", prefab, 1, 0.5f, _assetBundle);
+            MaterialHelpers.ApplyNormalShader("AMMiniMedBay_BaseColor", "AMMiniMedBay_Norm", prefab, _assetBundle);
+            #endregion
+
         }
     }
 }

@@ -41,7 +41,7 @@ namespace AMMiniMedBay.Display
         private AMMiniMedBayAnimationManager _animatorController;
         private GameObject _healButton;
         private Text _storageTxt;
-        private int _currentPage;
+        private int _currentPage = 1;
         private Text _healthPercentage;
 
         #endregion
@@ -86,18 +86,23 @@ namespace AMMiniMedBay.Display
 
             DrawColorPage(1);
 
-
             _initialized = true;
         }
 
         private void OnPowerResume()
         {
             StartCoroutine(RestorePageEnu());
-
         }
 
         private void OnPowerOutage()
         {
+            var screen = _mono.AnimationManager.GetIntHash(_mono.PageHash);
+
+            if (screen != NonPower)
+            {
+                _currentPage = screen;
+            }
+
             StartCoroutine(NoPowerScreenEnu());
         }
 
@@ -123,6 +128,12 @@ namespace AMMiniMedBay.Display
                     if (Player.main == null) return;
                     QuickLogger.Debug($"Clicked on Storage Container", true);
                     _mono.Container.OpenStorage();
+                    break;
+                case "ColorItem":
+                    var color = (Color)additionalObject;
+                    MaterialHelpers.ChangeMaterialColor("AMMiniMedBay_BaseColor", _mono.gameObject, color);
+                    QuickLogger.Debug($"{_mono.gameObject.name} Color Changed to {color.ToString()}");
+                    _mono.SetCurrentBodyColor(color);
                     break;
             }
         }
@@ -522,12 +533,12 @@ namespace AMMiniMedBay.Display
         private IEnumerator NoPowerScreenEnu()
         {
             yield return new WaitForEndOfFrame();
-            _currentPage = _mono.AnimationManager.GetIntHash(_mono.PageHash);
             _animatorController.SetIntHash(_mono.PageHash, NonPower);
         }
         private IEnumerator RestorePageEnu()
         {
             yield return new WaitForEndOfFrame();
+            QuickLogger.Debug($"Prev Page = {_currentPage}");
             _animatorController.SetIntHash(_mono.PageHash, _currentPage);
         }
 
@@ -542,6 +553,15 @@ namespace AMMiniMedBay.Display
         internal void UpdatePlayerHealthPercent(int value)
         {
             _healthPercentage.text = $"{value}%";
+        }
+
+        internal void Destroy()
+        {
+            if (_mono != null)
+            {
+                _mono.PowerManager.OnPowerOutage -= OnPowerOutage;
+                _mono.PowerManager.OnPowerResume -= OnPowerResume;
+            }
         }
     }
 }

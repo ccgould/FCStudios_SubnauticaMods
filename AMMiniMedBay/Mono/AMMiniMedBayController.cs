@@ -1,7 +1,9 @@
-﻿using AMMiniMedBay.Display;
+﻿using AMMiniMedBay.Buildable;
+using AMMiniMedBay.Display;
 using AMMiniMedBay.Enumerators;
 using AMMiniMedBay.Models;
 using FCSCommon.Extensions;
+using FCSCommon.Helpers;
 using FCSCommon.Models.Abstract;
 using FCSCommon.Utilities;
 using Oculus.Newtonsoft.Json;
@@ -27,6 +29,7 @@ namespace AMMiniMedBay.Mono
         private bool _isHealing;
         private AMMiniMedBayDisplay _display;
         private NitrogenLevel _nitrogenLevel;
+        private Color _currentBodyColor;
         public override Action OnMonoUpdate { get; set; }
 
         internal AMMiniMedBayAudioManager AudioHandler { get; set; }
@@ -41,9 +44,19 @@ namespace AMMiniMedBay.Mono
 
         internal void HealPlayer()
         {
+            if (!IsPlayerInTrigger)
+            {
+                QuickLogger.Info(LanguageHelpers.GetLanguage(AMMiniMedBayBuildable.NotInPositionMessageKey), true);
+                return;
+            }
+
             if (!PowerManager.GetIsPowerAvailable()) return;
-            Player.main.playerController.SetEnabled(false);
+
             RemoveNitrogen();
+
+            if (Player.main.liveMixin.IsFullHealth()) return;
+
+            Player.main.playerController.SetEnabled(false);
             var remainder = Player.main.liveMixin.maxHealth - Player.main.liveMixin.health;
             _healthPartial = remainder / _processTime;
             PowerManager.SetHasBreakerTripped(false);
@@ -77,7 +90,10 @@ namespace AMMiniMedBay.Mono
 
         private void Update()
         {
-            _display.UpdatePlayerHealthPercent(IsPlayerInTrigger ? Mathf.CeilToInt(Player.main.liveMixin.health) : 0);
+            if (_display != null)
+            {
+                _display.UpdatePlayerHealthPercent(IsPlayerInTrigger ? Mathf.CeilToInt(Player.main.liveMixin.health) : 0);
+            }
 
             OnMonoUpdate?.Invoke();
 
@@ -108,12 +124,17 @@ namespace AMMiniMedBay.Mono
             }
             else
             {
-                Player.main.playerController.SetEnabled(true);
-                QuickLogger.Debug("Resetting", true);
-                _healingStatus = HealingStatus.Idle;
-                UpdateIsHealing(false);
-                PowerManager.SetHasBreakerTripped(true);
+                ResetMachine();
             }
+        }
+
+        private void ResetMachine()
+        {
+            Player.main.playerController.SetEnabled(true);
+            QuickLogger.Debug("Resetting", true);
+            _healingStatus = HealingStatus.Idle;
+            UpdateIsHealing(false);
+            PowerManager.SetHasBreakerTripped(true);
         }
 
         private void Awake()
@@ -208,13 +229,12 @@ namespace AMMiniMedBay.Mono
         private void OnPowerResume()
         {
             QuickLogger.Debug($"In OnPowerResume {_healingStatus}", true);
-            UpdateIsHealing(_healingStatus == HealingStatus.Healing);
+            //UpdateIsHealing(_healingStatus == HealingStatus.Healing);
         }
 
         private void OnPowerOutage()
         {
-            QuickLogger.Debug("In OnPowerOutage", true);
-            UpdateIsHealing(false);
+            ResetMachine();
         }
 
         private bool FindAllComponents()
@@ -236,7 +256,7 @@ namespace AMMiniMedBay.Mono
 
         public bool CanDeconstruct(out string reason)
         {
-            reason = !Container.GetIsEmpty() ? "Please empty MedKit Container" : string.Empty;
+            reason = !Container.GetIsEmpty() ? LanguageHelpers.GetLanguage(AMMiniMedBayBuildable.ContainerNotEmptyMessageKey) : string.Empty;
             return Container.GetIsEmpty();
         }
 
@@ -268,7 +288,9 @@ namespace AMMiniMedBay.Mono
 
             var saveData = new SaveData
             {
-                SCA = Container.NumberOfCubes
+                SCA = Container.NumberOfCubes,
+                TTS = Container.GetTimeToSpawn(),
+                BodyColor = _currentBodyColor.ColorToVector4()
             };
 
             var output = JsonConvert.SerializeObject(saveData, Formatting.Indented);
@@ -292,6 +314,9 @@ namespace AMMiniMedBay.Mono
                     //LoadData
                     var savedData = JsonConvert.DeserializeObject<SaveData>(savedDataJson);
                     Container.NumberOfCubes = savedData.SCA;
+                    Container.SetTimeToSpawn(savedData.TTS);
+                    _currentBodyColor = savedData.BodyColor.Vector4ToColor();
+                    MaterialHelpers.ChangeMaterialColor("AMMiniMedBay_BaseColor", gameObject, _currentBodyColor);
                 }
             }
             else
@@ -299,6 +324,38 @@ namespace AMMiniMedBay.Mono
                 QuickLogger.Error("PrefabIdentifier is null");
             }
             QuickLogger.Debug("// ****************************** Loaded Data *********************************** //");
+        }
+
+        public void SetCurrentBodyColor(Color color)
+        {
+            _currentBodyColor = color;
+        }
+
+        private void OnDestroy()
+        {
+            if (_display != null)
+            {
+                _display.Destroy();
+            }
+
+            if (Container != null)
+            {
+                Container.Destroy();
+                Container.medBayContainer.onAddItem -= OnAddItemEvent;
+                Container.medBayContainer.onRemoveItem -= OnRemoveItemEvent;
+            }
+
+            if (PlayerTrigger != null)
+            {
+                PlayerTrigger.OnPlayerStay -= OnPlayerStay;
+                PlayerTrigger.OnPlayerExit -= OnPlayerExit;
+            }
+
+            if (PowerManager != null)
+            {
+                PowerManager.OnPowerOutage -= OnPowerOutage;
+                PowerManager.OnPowerResume -= OnPowerResume;
+            }
         }
     }
 }

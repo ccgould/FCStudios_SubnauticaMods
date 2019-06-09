@@ -18,6 +18,7 @@ namespace AMMiniMedBay.Mono
             if (Player.main == null) return;
             QuickLogger.Debug($"Clicked on Storage Container", true);
             _mono.Container.OpenStorage();
+
         }
 
         public void Initialize(AMMiniMedBayController mono)

@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("AMMiniBay")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Alterra Medical Mini MedBay")]
+[assembly: AssemblyDescription("A medical mod bay that heals you, generates packages and decompresses you")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("AMMiniBay")]
-[assembly: AssemblyCopyright("Copyright ©  2019")]
+[assembly: AssemblyCompany("Field Creators Studios")]
+[assembly: AssemblyProduct("Alterra Medical Mini MedBay")]
+[assembly: AssemblyCopyright("Copyright ©Field Creators Studios 2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

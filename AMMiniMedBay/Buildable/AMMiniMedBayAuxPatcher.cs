@@ -9,6 +9,8 @@ namespace AMMiniMedBay.Buildable
         public const string NoPowerMessage = "NoPowerMessage";
         public const string ColorPageTextKey = "OnColorPageBTNHover";
         public const string OpenStorageKey = "OpenStorage";
+        public const string NotInPositionMessageKey = "NotInPositionMessage";
+
         private const string StorageLabelKey = "AMMiniMedBayStorage";
 
         public const string HealKey = "Heal";
@@ -33,6 +35,7 @@ namespace AMMiniMedBay.Buildable
 
         public static TechType TechTypeID { get; private set; }
 
+        public const string ContainerNotEmptyMessageKey = "ContainerNotEmpty";
 
 
         private void AdditionalPatching()
@@ -45,10 +48,13 @@ namespace AMMiniMedBay.Buildable
             LanguageHandler.SetLanguageLine(OnHoverUnpoweredKey, "Insufficient power");
             LanguageHandler.SetLanguageLine(HealKey, "Heal");
             LanguageHandler.SetLanguageLine(HealthStatusLBLKey, "Health Status");
-            LanguageHandler.SetLanguageLine(NoPowerKey, "NO POWER");
+            LanguageHandler.SetLanguageLine(NoPowerKey, "NOT ENOUGH POWER");
             LanguageHandler.SetLanguageLine(OpenStorageKey, "Open MedBay Storage.");
-            LanguageHandler.SetLanguageLine(NoPowerMessage, "Due to power loss this device is nonoperational");
+            LanguageHandler.SetLanguageLine(NoPowerMessage, "Due to power loss this device is inoperable");
+            LanguageHandler.SetLanguageLine(NotInPositionMessageKey, "You are not standing in the correct place. Please go to the (Stand Here) position.");
             LanguageHandler.SetLanguageLine(ColorPageTextKey, "Color Page");
+            LanguageHandler.SetLanguageLine(ContainerNotEmptyMessageKey, "MedKit container is not empty.");
+
         }
     }
 }

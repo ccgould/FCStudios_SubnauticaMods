@@ -21,7 +21,6 @@ namespace AMMiniMedBay.Display
         public string BtnName { get; set; }
         public Color HOVER_COLOR { get; set; } = new Color(0.07f, 0.38f, 0.7f, 1f);
         public Color STARTING_COLOR { get; set; } = Color.white;
-        public InterfaceButtonMode ButtonMode { get; set; } = InterfaceButtonMode.Background;
         public Text TextComponent { get; set; }
         public int SmallFont { get; set; } = 140;
         public int LargeFont { get; set; } = 180;
@@ -95,9 +94,8 @@ namespace AMMiniMedBay.Display
                     {
                         this.gameObject.transform.localScale = this.gameObject.transform.localScale;
                     }
+
                     break;
-                default:
-                    throw new ArgumentOutOfRangeException();
             }
 
         }

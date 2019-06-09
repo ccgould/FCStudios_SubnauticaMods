@@ -18,7 +18,7 @@ namespace AMMiniMedBay.Mono
 
         private void OnTriggerStay(Collider other)
         {
-            QuickLogger.Debug("In OnTriggerStay");
+            //QuickLogger.Debug("In OnTriggerStay");
             OnPlayerStay?.Invoke();
         }
 

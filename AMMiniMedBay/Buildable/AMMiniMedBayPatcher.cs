@@ -16,7 +16,7 @@ namespace AMMiniMedBay.Buildable
         private static readonly AMMiniMedBayBuildable Singleton = new AMMiniMedBayBuildable();
         public override TechGroup GroupForPDA { get; } = TechGroup.InteriorModules;
         public override TechCategory CategoryForPDA { get; } = TechCategory.InteriorModule;
-        public override string AssetsFolder { get; } = $"FCS_ARSSeaBreeze/Assets";
+        public override string AssetsFolder { get; } = $"FCS_AMMiniMedBay/Assets";
 
         public AMMiniMedBayBuildable() : base("AMMiniMedBay", "Alterra Medical MiniMedBay", "Alterra is here with all your medial needs.")
         {
@@ -49,11 +49,6 @@ namespace AMMiniMedBay.Buildable
                 SkyApplier skyApplier = prefab.GetOrAddComponent<SkyApplier>();
                 skyApplier.renderers = renderers;
                 skyApplier.anchorSky = Skies.Auto;
-
-                foreach (Renderer renderer in renderers)
-                {
-                    renderer.material.shader = shader;
-                }
 
                 //========== Allows the building animation and material colors ==========// 
 
@@ -95,6 +90,7 @@ namespace AMMiniMedBay.Buildable
                     new Ingredient(TechType.Titanium, 2),
                     new Ingredient(TechType.WiringKit, 1),
                     new Ingredient(TechType.Glass, 1),
+                    new Ingredient(TechType.PowerCell, 1),
                 }
             };
             QuickLogger.Debug($"Created Ingredients");

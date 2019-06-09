@@ -5,6 +5,7 @@
     /// </summary>
     public enum FCSPowerStates
     {
+        None,
         Powered,
         Unpowered,
         Buffer

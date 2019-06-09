@@ -9,7 +9,7 @@ namespace AMMiniMedBay.Models
 {
     internal class AMMiniMedBayContainer
     {
-        private readonly ItemsContainer _medBayContainer;
+        internal readonly ItemsContainer medBayContainer;
 
         private readonly ChildObjectIdentifier _containerRoot;
         private readonly GameObject _medKit = CraftData.GetPrefabForTechType(TechType.FirstAidKit);
@@ -18,7 +18,7 @@ namespace AMMiniMedBay.Models
         private float _timeSpawnMedKit = -1f;
 
         //TODO Change to 600f
-        private const float MedKitSpawnInterval = 10f; //600f;
+        private const float MedKitSpawnInterval = 600f; //600f;
 
         //TODO Figure how to remove this
         public bool startWithMedKit;
@@ -26,46 +26,46 @@ namespace AMMiniMedBay.Models
         private const int ContainerHeight = 2;
         public int NumberOfCubes
         {
-            get => _medBayContainer.count;
+            get => medBayContainer.count;
             set
             {
                 if (value < 0 || value > MaxContainerSlots)
                     return;
 
-                if (value < _medBayContainer.count)
+                if (value < medBayContainer.count)
                 {
                     do
                     {
                         RemoveSingleKit();
-                    } while (value < _medBayContainer.count);
+                    } while (value < medBayContainer.count);
                 }
-                else if (value > _medBayContainer.count)
+                else if (value > medBayContainer.count)
                 {
                     do
                     {
                         SpawnKit();
-                    } while (value > _medBayContainer.count);
+                    } while (value > medBayContainer.count);
                 }
             }
         }
 
         private void RemoveSingleKit()
         {
-            IList<InventoryItem> kit = _medBayContainer.GetItems(TechType.PrecursorIonCrystal);
-            _medBayContainer.RemoveItem(kit[0].item);
+            IList<InventoryItem> kit = medBayContainer.GetItems(TechType.PrecursorIonCrystal);
+            medBayContainer.RemoveItem(kit[0].item);
         }
 
         private void SpawnKit()
         {
             var medKit = GameObject.Instantiate(_medKit);
             var newInventoryItem = new InventoryItem(medKit.GetComponent<Pickupable>().Pickup(false));
-            _medBayContainer.UnsafeAdd(newInventoryItem);
+            medBayContainer.UnsafeAdd(newInventoryItem);
             _timeSpawnMedKit = DayNightCycle.main.timePassedAsFloat + MedKitSpawnInterval;
         }
 
         private int MaxContainerSlots => ContainerHeight * ContainerWidth;
-        private int ContainerSlotsFilled => _medBayContainer.count;
-        public bool IsContainerFull => _medBayContainer.count == MaxContainerSlots || !_medBayContainer.HasRoomFor(1, 1);
+        private int ContainerSlotsFilled => medBayContainer.count;
+        public bool IsContainerFull => medBayContainer.count == MaxContainerSlots || !medBayContainer.HasRoomFor(1, 1);
 
         public Action OnTimerEnd { get; set; }
 
@@ -88,21 +88,21 @@ namespace AMMiniMedBay.Models
                 _mono = mono;
             }
 
-            if (_medBayContainer == null)
+            if (medBayContainer == null)
             {
                 QuickLogger.Debug("Initializing Filter Container");
 
-                _medBayContainer = new ItemsContainer(ContainerWidth, ContainerHeight, _containerRoot.transform,
+                medBayContainer = new ItemsContainer(ContainerWidth, ContainerHeight, _containerRoot.transform,
                     AMMiniMedBayBuildable.StorageLabel(), null);
 
-                _medBayContainer.isAllowedToAdd += IsAllowedToAdd;
-                _medBayContainer.isAllowedToRemove += IsAllowedToRemove;
+                medBayContainer.isAllowedToAdd += IsAllowedToAdd;
+                medBayContainer.isAllowedToRemove += IsAllowedToRemove;
 
-                _medBayContainer.onAddItem += mono.OnAddItemEvent;
-                _medBayContainer.onRemoveItem += mono.OnRemoveItemEvent;
+                medBayContainer.onAddItem += mono.OnAddItemEvent;
+                medBayContainer.onRemoveItem += mono.OnRemoveItemEvent;
 
-                _medBayContainer.onAddItem += OnAddItemEvent;
-                _medBayContainer.onRemoveItem += OnRemoveItemEvent;
+                medBayContainer.onAddItem += OnAddItemEvent;
+                medBayContainer.onRemoveItem += OnRemoveItemEvent;
             }
 
             _mono.OnMonoUpdate += OnMonoUpdate;
@@ -173,7 +173,7 @@ namespace AMMiniMedBay.Models
 
             Player main = Player.main;
             PDA pda = main.GetPDA();
-            Inventory.main.SetUsedStorage(_medBayContainer, false);
+            Inventory.main.SetUsedStorage(medBayContainer, false);
             pda.Open(PDATab.Inventory, null, OnPDAClose, 4f);
             OnPDAOpenedAction?.Invoke();
         }
@@ -185,7 +185,26 @@ namespace AMMiniMedBay.Models
 
         public bool GetIsEmpty()
         {
-            return _medBayContainer.count == 0;
+            return medBayContainer.count == 0;
         }
+
+        internal float GetTimeToSpawn()
+        {
+            return _timeSpawnMedKit;
+        }
+
+        internal void SetTimeToSpawn(float value)
+        {
+            _timeSpawnMedKit = value;
+        }
+
+        internal void Destroy()
+        {
+            medBayContainer.isAllowedToAdd -= IsAllowedToAdd;
+            medBayContainer.isAllowedToRemove -= IsAllowedToRemove;
+            medBayContainer.onAddItem += OnAddItemEvent;
+            medBayContainer.onRemoveItem += OnRemoveItemEvent;
+        }
+
     }
 }

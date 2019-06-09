@@ -1,5 +1,6 @@
 ﻿using FCSCommon.Models.Abstract;
 using FCSCommon.Utilities;
+using FCSCommon.Utilities.Enums;
 using System;
 using System.Collections;
 using UnityEngine;
@@ -20,7 +21,7 @@ namespace FCSCommon.Controllers
 
         private FCSController _mono;
 
-        private bool _prevPowerState;
+        private FCSPowerStates _prevPowerState;
 
         private bool _hasBreakerTripped;
 
@@ -31,26 +32,31 @@ namespace FCSCommon.Controllers
         public bool NotAllowToOperate => !_mono.IsConstructed || GetHasBreakerTripped() || _connectedRelay == null;
 
         public Action OnBreakerTripped { get; set; }
+        private bool IsPowerAvailable => AvailablePower > _energyToConsume || !_hasBreakerTripped;
+        private bool IsEnoughPowerAvailable => AvailablePower > _energyToConsume;
 
         public virtual void Update()
         {
-            if (this.NotAllowToOperate)
-                return;
-
             _energyToConsume = EnergyConsumptionPerSecond * DayNightCycle.main.deltaTime;
             bool requiresEnergy = GameModeUtils.RequiresPower();
             bool hasPowerToConsume = !requiresEnergy || (this.AvailablePower >= _energyToConsume);
 
-            if (hasPowerToConsume && !_prevPowerState)
+
+            if (hasPowerToConsume && _prevPowerState != FCSPowerStates.Powered)
             {
                 OnPowerResume?.Invoke();
-                _prevPowerState = true;
+                _prevPowerState = FCSPowerStates.Powered;
             }
-            else if (!hasPowerToConsume && _prevPowerState)
+            else if (!hasPowerToConsume && _prevPowerState != FCSPowerStates.Unpowered)
             {
                 OnPowerOutage?.Invoke();
-                _prevPowerState = false;
+                _prevPowerState = FCSPowerStates.Unpowered;
             }
+
+
+
+            if (this.NotAllowToOperate)
+                return;
 
             if (!hasPowerToConsume)
                 return;
@@ -89,6 +95,13 @@ namespace FCSCommon.Controllers
         {
             _mono = mono;
             StartCoroutine(UpdatePowerRelay());
+
+            InvokeRepeating("UpdatePowerState", 1, 1);
+        }
+
+        private void UpdatePowerState()
+        {
+
         }
 
         public virtual void TriggerPowerOff()
@@ -101,8 +114,6 @@ namespace FCSCommon.Controllers
             _hasBreakerTripped = false;
             OnBreakerReset?.Invoke();
         }
-
-        private bool IsPowerAvailable => AvailablePower > _energyToConsume || !_hasBreakerTripped;
 
         public virtual bool GetHasBreakerTripped()
         {
