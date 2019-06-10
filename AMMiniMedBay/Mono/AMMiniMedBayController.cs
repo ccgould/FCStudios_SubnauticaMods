@@ -29,7 +29,8 @@ namespace AMMiniMedBay.Mono
         private bool _isHealing;
         private AMMiniMedBayDisplay _display;
         private NitrogenLevel _nitrogenLevel;
-        private Color _currentBodyColor;
+        private Color _currentBodyColor = new Color(0.796875f, 0.796875f, 0.796875f, 0.99609375f);
+        private float _nitrogenPartial;
         public override Action OnMonoUpdate { get; set; }
 
         internal AMMiniMedBayAudioManager AudioHandler { get; set; }
@@ -50,9 +51,12 @@ namespace AMMiniMedBay.Mono
                 return;
             }
 
-            if (!PowerManager.GetIsPowerAvailable()) return;
+            if (_nitrogenLevel.GetNitrogenEnabled())
+            {
+                _nitrogenPartial = _nitrogenLevel.safeNitrogenDepth / _processTime;
+            }
 
-            RemoveNitrogen();
+            if (!PowerManager.GetIsPowerAvailable()) return;
 
             if (Player.main.liveMixin.IsFullHealth()) return;
 
@@ -62,18 +66,6 @@ namespace AMMiniMedBay.Mono
             PowerManager.SetHasBreakerTripped(false);
             UpdateIsHealing(true);
         }
-
-        private void RemoveNitrogen()
-        {
-            if (_nitrogenLevel.GetNitrogenEnabled())
-            {
-                if (_nitrogenLevel.safeNitrogenDepth <= 100f)
-                    _nitrogenLevel.safeNitrogenDepth = 0f;
-                else
-                    _nitrogenLevel.safeNitrogenDepth -= 100f;
-            }
-        }
-
         private void UpdateIsHealing(bool value)
         {
             _isHealing = value;
@@ -114,6 +106,10 @@ namespace AMMiniMedBay.Mono
 
             var playerHealth = Player.main.liveMixin.health;
             var playerMaxHealth = Player.main.liveMixin.maxHealth;
+
+            _nitrogenLevel.safeNitrogenDepth =
+                Mathf.Clamp(_nitrogenLevel.safeNitrogenDepth -= _nitrogenPartial, 0, float.MaxValue);
+
 
             if (!Player.main.liveMixin.IsFullHealth())
             {
@@ -199,8 +195,29 @@ namespace AMMiniMedBay.Mono
             Container = new AMMiniMedBayContainer(this);
 
             if (Player.main.gameObject.GetComponent<NitrogenLevel>() != null)
+            {
                 _nitrogenLevel = Player.main.gameObject.GetComponent<NitrogenLevel>();
+
+                InvokeRepeating("UpdateNitrogenDisplay", 1, 0.5f);
+            }
         }
+
+        private void UpdateNitrogenDisplay()
+        {
+            if (_nitrogenLevel.GetNitrogenEnabled())
+            {
+                if (IsPlayerInTrigger)
+                {
+                    _display.UpdatePlayerNitrogen(_nitrogenLevel.safeNitrogenDepth);
+                }
+                else
+                {
+                    _display.HidePlayerNitrogen();
+                }
+            }
+        }
+
+
 
         private void OnPlayerExit()
         {

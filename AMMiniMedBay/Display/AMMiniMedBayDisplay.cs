@@ -43,6 +43,7 @@ namespace AMMiniMedBay.Display
         private Text _storageTxt;
         private int _currentPage = 1;
         private Text _healthPercentage;
+        private GameObject _n2Status;
 
         #endregion
 
@@ -157,20 +158,6 @@ namespace AMMiniMedBay.Display
                 return false;
             }
             #endregion
-
-            //#region HandTarget
-
-            //var storage = gameObject.FindChild("Storage_Target");
-
-            //if (storage == null)
-            //{
-            //    QuickLogger.Error("Storage not found.");
-            //    return false;
-            //}
-
-            //var container = storage.AddComponent<StorageHandTarget>();
-            //container.Initialize(_mono);
-            //#endregion
 
             #region HandTarget
 
@@ -347,6 +334,18 @@ namespace AMMiniMedBay.Display
             }
 
             health_LBL.text = GetLanguage(AMMiniMedBayBuildable.HealthStatusLBLKey);
+            #endregion
+
+            #region N2 Status Text
+
+            _n2Status = mainPage.FindChild("N2TXT")?.gameObject;
+
+            if (_n2Status == null)
+            {
+                QuickLogger.Error("N2 Status label not found.");
+                return false;
+            }
+
             #endregion
 
             #region Health Text
@@ -561,6 +560,26 @@ namespace AMMiniMedBay.Display
             {
                 _mono.PowerManager.OnPowerOutage -= OnPowerOutage;
                 _mono.PowerManager.OnPowerResume -= OnPowerResume;
+            }
+        }
+
+        public void UpdatePlayerNitrogen(float depth)
+        {
+            if (!_n2Status.activeSelf)
+            {
+                QuickLogger.Debug("Show Nitrogen Display", true);
+                _n2Status.SetActive(true);
+            }
+
+            _n2Status.GetComponent<Text>().text = $"<size=96><B>N</B></size><size=  24>2</size><size= 96> {Mathf.CeilToInt(depth)} </size>";
+        }
+
+        public void HidePlayerNitrogen()
+        {
+            if (_n2Status.activeSelf)
+            {
+                QuickLogger.Debug("Hide Nitrogen Display", true);
+                _n2Status.SetActive(false);
             }
         }
     }

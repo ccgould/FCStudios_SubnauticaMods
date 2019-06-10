@@ -18,7 +18,7 @@ namespace AMMiniMedBay.Models
         private float _timeSpawnMedKit = -1f;
 
         //TODO Change to 600f
-        private const float MedKitSpawnInterval = 600f; //600f;
+        private const float MedKitSpawnInterval = 600f;
 
         //TODO Figure how to remove this
         public bool startWithMedKit;
