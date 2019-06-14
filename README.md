@@ -19,6 +19,8 @@ Here is a Chart of all the mods and the place to download on NexusMods.
 | CyclopsNuclearReactor |The nuclear reactor the Cyclops always deserved! Power up your Cyclops today in whole new ways! Enhance with upgrades to maximize energy output.   <ul><li>A collaberation between FCStudios and [PrimeSonic](https://www.nexusmods.com/subnautica/users/1733280)| [#241](https://www.nexusmods.com/subnautica/mods/241)
 | Alterra Shipping|This mod allows you to ship items from one base to another by selecting another shipping unit at another base.| [#247](https://www.nexusmods.com/subnautica/mods/247)
 |AI Marine Turbine|An all new mod from Field Creators Studios that allows you to generate power from using water current in Subnautica.|[#249](https://www.nexusmods.com/subnautica/mods/249)
+|AM Mini MedBay|Alterra technologies new Mini MedBay heals you within 3 seconds of pressing the heal button. Also, we generate 4 free med packs for your convenience.|[#261](https://www.nexusmods.com/subnautica/mods/261)
+
 
 # Mods in Collaboration/Not Included in repo
 
@@ -27,3 +29,4 @@ Here is a Chart of all the mods and the place to download on NexusMods.
 |--|--|--|
 | CyclopsNuclearReactor  | The nuclear reactor the Cyclops always deserved! Power up your Cyclops today in whole new ways! Enhance with upgrades to maximize energy output.   <ul><li>A collaberation between FCStudios and [PrimeSonic](https://www.nexusmods.com/subnautica/users/1733280) | [#241](https://www.nexusmods.com/subnautica/mods/241) |
 | IonCubeGenerator|Make your own ion cubes right at home!<ul><li>A collaberation between FCStudios and [PrimeSonic](https://www.nexusmods.com/subnautica/users/1733280) |[#242](https://www.nexusmods.com/subnautica/mods/242)
+
