@@ -114,7 +114,7 @@ namespace AMMiniMedBay.Mono
             if (!Player.main.liveMixin.IsFullHealth())
             {
                 QuickLogger.Debug("Added Health", true);
-
+                PowerManager.ConsumePower(PowerManager.EnergyConsumptionPerSecond);
                 Player.main.liveMixin.health = Mathf.Clamp(playerHealth + _healthPartial, 0, playerMaxHealth);
                 QuickLogger.Debug($"Player Health = {playerHealth}", true);
             }
@@ -204,6 +204,8 @@ namespace AMMiniMedBay.Mono
 
         private void UpdateNitrogenDisplay()
         {
+            if (_nitrogenLevel == null || _display == null) return;
+
             if (_nitrogenLevel.GetNitrogenEnabled())
             {
                 if (IsPlayerInTrigger)

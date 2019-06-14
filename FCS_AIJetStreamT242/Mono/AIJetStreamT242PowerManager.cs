@@ -118,7 +118,9 @@ namespace FCS_AIJetStreamT242.Mono
 
             _charge = Mathf.Clamp(_charge + energyPerSec, 0, AIJetStreamT242Buildable.JetStreamT242Config.MaxCapacity);
 
-            _timeCurrDeltaTime -= (int)_timeCurrDeltaTime;
+            _timeCurrDeltaTime = 0;
+
+            //QuickLogger.Debug($"{energyPerSec.ToString()} || {_timeCurrDeltaTime}");
         }
 
         internal void KillBattery()

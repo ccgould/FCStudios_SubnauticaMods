@@ -7,7 +7,7 @@ namespace FCSAlterraShipping.Display.Patching
         public const string StorageKey = "Storage";
         public const string PrevPageKey = "PrevPage";
         public const string NextPageKey = "NextPage";
-        public const string OpenStorageKey = "OpenStorage";
+        public const string OpenShippingContainerKey = "OpenShippingContainer";
         public const string CancelKey = "CancelTransfer";
         public const string ShippingKey = "Shipping";
         public const string TimeLeftKey = "TimeLeft";
@@ -25,7 +25,7 @@ namespace FCSAlterraShipping.Display.Patching
         {
             LanguageHandler.SetLanguageLine(CancelKey, "< Cancel Transfer");
             LanguageHandler.SetLanguageLine(ColorBackKey, "< Back");
-            LanguageHandler.SetLanguageLine(OpenStorageKey, "Open Storage");
+            LanguageHandler.SetLanguageLine(OpenShippingContainerKey, "Open Shipping Container");
             LanguageHandler.SetLanguageLine(NextPageKey, "Next Page");
             LanguageHandler.SetLanguageLine(PrevPageKey, "Previous Page");
             LanguageHandler.SetLanguageLine(StorageKey, "STORAGE");

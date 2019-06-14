@@ -81,8 +81,8 @@ namespace AMMiniMedBay.Models
 
             if (_containerRoot == null)
             {
-                QuickLogger.Debug("Initializing Filter StorageRoot");
-                var storageRoot = new GameObject("FilterStorageRoot");
+                QuickLogger.Debug("Initializing AMMiniMedBay StorageRoot");
+                var storageRoot = new GameObject("AMMiniMedBayStorageRoot");
                 storageRoot.transform.SetParent(mono.transform, false);
                 _containerRoot = storageRoot.AddComponent<ChildObjectIdentifier>();
                 _mono = mono;
@@ -90,7 +90,7 @@ namespace AMMiniMedBay.Models
 
             if (medBayContainer == null)
             {
-                QuickLogger.Debug("Initializing Filter Container");
+                QuickLogger.Debug("Initializing AMMiniMedBay Container");
 
                 medBayContainer = new ItemsContainer(ContainerWidth, ContainerHeight, _containerRoot.transform,
                     AMMiniMedBayBuildable.StorageLabel(), null);
@@ -123,11 +123,17 @@ namespace AMMiniMedBay.Models
 
             DayNightCycle main = DayNightCycle.main;
 
+            float a = _timeSpawnMedKit - MedKitSpawnInterval;
+            Progress = Mathf.InverseLerp(a, a + MedKitSpawnInterval, DayNightCycle.main.timePassedAsFloat);
+
             if (main.timePassed > _timeSpawnMedKit)
             {
                 NumberOfCubes++;
             }
         }
+
+        internal float Progress { get; set; }
+
         private void OnRemoveItemEvent(InventoryItem item)
         {
             _mono.UpdateKitAmount(ContainerSlotsFilled);

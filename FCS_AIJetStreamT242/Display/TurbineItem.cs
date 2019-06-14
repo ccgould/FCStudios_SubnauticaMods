@@ -237,16 +237,15 @@ namespace FCS_AIMarineTurbine.Display
             _damaged.SetActive(Turbine.HealthManager.GetHealth() <= 0);
             _health.SetActive(Turbine.HealthManager.GetHealth() > 0);
 
-
             _healthText.text = $"{LanguageHelpers.GetLanguage(DisplayLanguagePatching.HealthKey)} - {Turbine.HealthManager.GetHealth()}%";
-            _damagedText.text = LanguageHelpers.GetLanguage(DisplayLanguagePatching.DamagedKey);
+            _damagedText.text = LanguageHelpers.GetLanguage(DisplayLanguagePatching.FailedKey);
 
 
             if (Turbine.HealthManager.GetHealth() <= 100 && Turbine.HealthManager.GetHealth() > 50)
             {
                 _healthText.color = new Color(0f, 0.99609375f, 0.25390625f);
             }
-            else if (Turbine.HealthManager.GetHealth() <= 50 && Turbine.HealthManager.GetHealth() > 25)
+            else if (Turbine.HealthManager.GetHealth() <= 50 && Turbine.HealthManager.GetHealth() > 0)
             {
                 _healthText.color = new Color(0.99609375f, 0.765625f, 0f);
             }

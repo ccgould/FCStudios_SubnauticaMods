@@ -18,7 +18,7 @@ namespace AMMiniMedBay.Buildable
         public override TechCategory CategoryForPDA { get; } = TechCategory.InteriorModule;
         public override string AssetsFolder { get; } = $"FCS_AMMiniMedBay/Assets";
 
-        public AMMiniMedBayBuildable() : base("AMMiniMedBay", "Alterra Medical MiniMedBay", "Alterra is here with all your medial needs.")
+        public AMMiniMedBayBuildable() : base("AMMiniMedBay", "Alterra Medical MiniMedBay", "Alterra is here with all your medical needs.")
         {
             OnFinishedPatching += AdditionalPatching;
         }

@@ -8,12 +8,14 @@ namespace AMMiniMedBay.Buildable
         public const string NoPowerKey = "NoPower";
         public const string NoPowerMessage = "NoPowerMessage";
         public const string ColorPageTextKey = "OnColorPageBTNHover";
-        public const string OpenStorageKey = "OpenStorage";
+        public const string OpenStorageKey = "OpenMiniMedBayStorage";
         public const string NotInPositionMessageKey = "NotInPositionMessage";
+        public const string HomeKey = "Home";
 
         private const string StorageLabelKey = "AMMiniMedBayStorage";
 
-        public const string HealKey = "Heal";
+        public const string HealKey = "Heal_AMMB";
+        public const string ColorPickerKey = "ColorPicker_AMMB";
 
         public static string StorageLabel()
         {
@@ -47,6 +49,8 @@ namespace AMMiniMedBay.Buildable
             LanguageHandler.SetLanguageLine(OnHoverRPaginatorKey, "Next Page");
             LanguageHandler.SetLanguageLine(OnHoverUnpoweredKey, "Insufficient power");
             LanguageHandler.SetLanguageLine(HealKey, "Heal");
+            LanguageHandler.SetLanguageLine(ColorPickerKey, "Color Picker");
+            LanguageHandler.SetLanguageLine(HomeKey, "Home");
             LanguageHandler.SetLanguageLine(HealthStatusLBLKey, "Health Status");
             LanguageHandler.SetLanguageLine(NoPowerKey, "NOT ENOUGH POWER");
             LanguageHandler.SetLanguageLine(OpenStorageKey, "Open MedBay Storage.");

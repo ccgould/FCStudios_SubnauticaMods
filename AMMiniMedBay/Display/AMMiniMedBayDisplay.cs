@@ -175,9 +175,8 @@ namespace AMMiniMedBay.Display
             storageTarget.ButtonMode = InterfaceButtonMode.None;
             storageTarget.OnButtonClick = OnButtonClick;
             storageTarget.TextLineOne = GetLanguage(AMMiniMedBayBuildable.OpenStorageKey);
-
+            storageTarget.Container = _mono.Container;
             #endregion
-
 
             #region MainPage
 
@@ -237,6 +236,7 @@ namespace AMMiniMedBay.Display
             healBtn.BtnName = "HealBTN";
             healBtn.ButtonMode = InterfaceButtonMode.Background;
             healBtn.OnButtonClick = OnButtonClick;
+            healBtn.TextLineOne = GetLanguage(AMMiniMedBayBuildable.HealKey);
             #endregion
 
             #region Home Button
@@ -253,6 +253,7 @@ namespace AMMiniMedBay.Display
             homeBtn.BtnName = "HomeBTN";
             homeBtn.ButtonMode = InterfaceButtonMode.Background;
             homeBtn.OnButtonClick = OnButtonClick;
+            homeBtn.TextLineOne = GetLanguage(AMMiniMedBayBuildable.HomeKey);
             #endregion
 
             #region Color Picker Button
@@ -269,6 +270,7 @@ namespace AMMiniMedBay.Display
             cpBtn.BtnName = "CPBTN";
             cpBtn.ButtonMode = InterfaceButtonMode.Background;
             cpBtn.OnButtonClick = OnButtonClick;
+            cpBtn.TextLineOne = GetLanguage(AMMiniMedBayBuildable.ColorPickerKey);
             #endregion
 
             #region L Nav

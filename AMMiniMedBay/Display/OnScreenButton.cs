@@ -1,4 +1,5 @@
-﻿using FCSCommon.Enums;
+﻿using AMMiniMedBay.Models;
+using FCSCommon.Enums;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -13,7 +14,10 @@ namespace AMMiniMedBay.Display
         protected bool IsHovered { get; set; }
         public string TextLineOne { get; set; }
         public string TextLineTwo { get; set; }
+
         private bool isHoveredOutOfRange;
+
+        public AMMiniMedBayContainer Container { get; set; }
         public InterfaceButtonMode ButtonMode { get; set; } = InterfaceButtonMode.Background;
         public virtual void OnDisable()
         {
@@ -28,11 +32,26 @@ namespace AMMiniMedBay.Display
             if (this.IsHovered && inInteractionRange)
             {
                 HandReticle main = HandReticle.main;
-                main.SetInteractTextRaw(this.TextLineOne, this.TextLineTwo);
+
                 if (ButtonMode == InterfaceButtonMode.None)
                 {
-                    main.SetIcon(HandReticle.IconType.Hand, 1f);
-
+                    if (Container != null)
+                    {
+                        if (Container.IsContainerFull)
+                        {
+                            main.SetIcon(HandReticle.IconType.Hand, 1f);
+                            main.SetInteractTextRaw(this.TextLineOne, this.TextLineTwo);
+                        }
+                        else
+                        {
+                            main.SetProgress(Container.Progress);
+                            main.SetIcon(HandReticle.IconType.Progress, 1f);
+                        }
+                    }
+                }
+                else
+                {
+                    main.SetInteractTextRaw(this.TextLineOne, this.TextLineTwo);
                 }
             }
 

@@ -12,18 +12,22 @@ namespace AMMiniMedBay.Mono
 
         private void OnTriggerEnter(Collider other)
         {
+            if (other.gameObject.GetComponent<Player>() == null) return;
             QuickLogger.Debug("In OnTriggerEnter");
             OnPlayerEnter?.Invoke();
         }
 
         private void OnTriggerStay(Collider other)
         {
-            //QuickLogger.Debug("In OnTriggerStay");
+            if (other.gameObject.GetComponent<Player>() == null) return;
+            QuickLogger.Debug($"In OnTriggerStay {other.gameObject.name}", true);
             OnPlayerStay?.Invoke();
         }
 
         private void OnTriggerExit(Collider other)
         {
+            if (other.gameObject.GetComponent<Player>() == null) return;
+
             QuickLogger.Debug("In OnTriggerExit");
             OnPlayerExit?.Invoke();
         }

@@ -49,7 +49,7 @@ namespace FCS_AIMarineTurbine.Display
 
             _menuFrame.FindChild("HealthyContainer").FindChild("Status").GetComponent<Text>().text = LanguageHelpers.GetLanguage(DisplayLanguagePatching.WorkingKey);
 
-            _menuFrame.FindChild("DamagedContainer").FindChild("Status").GetComponent<Text>().text = LanguageHelpers.GetLanguage(DisplayLanguagePatching.DamagedKey);
+            _menuFrame.FindChild("DamagedContainer").FindChild("Status").GetComponent<Text>().text = LanguageHelpers.GetLanguage(DisplayLanguagePatching.FailedKey);
 
             _menuFrame.FindChild("PoweredOffContainer").FindChild("Status").GetComponent<Text>().text = LanguageHelpers.GetLanguage(DisplayLanguagePatching.PoweredOffKey);
 
@@ -57,16 +57,16 @@ namespace FCS_AIMarineTurbine.Display
 
             _menuFrame.FindChild("MidlyDamaged_Legend").FindChild("Status").GetComponent<Text>().text = LanguageHelpers.GetLanguage(DisplayLanguagePatching.MidlyDamagedLegendKey);
 
-            _menuFrame.FindChild("Damaged_Legend").FindChild("Status").GetComponent<Text>().text = LanguageHelpers.GetLanguage(DisplayLanguagePatching.DamagedLegendKey);
+            _menuFrame.FindChild("Damaged_Legend").FindChild("Status").GetComponent<Text>().text = LanguageHelpers.GetLanguage(DisplayLanguagePatching.FailedLegendKey);
         }
 
         private void UpdateMenu()
         {
             var working =
-                _mono.Turbines.Where(x => x.Value.HealthManager.GetHealth() <= 100 && x.Value.HealthManager.GetHealth() > 20).ToList();
+                _mono.Turbines.Where(x => x.Value.HealthManager.GetHealth() <= 100 && x.Value.HealthManager.GetHealth() > 0).ToList();
 
             var damaged =
-                _mono.Turbines.Where(x => x.Value.HealthManager.GetHealth() <= 20).ToList();
+                _mono.Turbines.Where(x => x.Value.HealthManager.GetHealth() <= 0).ToList();
 
             var poweredOff =
                 _mono.Turbines.Where(x => x.Value.PowerManager.GetHasBreakerTripped()).ToList();

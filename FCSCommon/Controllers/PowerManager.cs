@@ -25,22 +25,23 @@ namespace FCSCommon.Controllers
 
         private bool _hasBreakerTripped;
 
-        private float _energyToConsume;
+        //private float _energyToConsume;
 
         public Action OnBreakerReset { get; set; }
 
-        public bool NotAllowToOperate => !_mono.IsConstructed || GetHasBreakerTripped() || _connectedRelay == null;
+        //public bool NotAllowToOperate => !_mono.IsConstructed || GetHasBreakerTripped() || _connectedRelay == null;
 
         public Action OnBreakerTripped { get; set; }
-        private bool IsPowerAvailable => AvailablePower > _energyToConsume || !_hasBreakerTripped;
-        private bool IsEnoughPowerAvailable => AvailablePower > _energyToConsume;
+        private bool IsPowerAvailable => AvailablePower > EnergyConsumptionPerSecond || !_hasBreakerTripped;
+        private bool IsEnoughPowerAvailable => AvailablePower > EnergyConsumptionPerSecond;
 
         public virtual void Update()
         {
-            _energyToConsume = EnergyConsumptionPerSecond * DayNightCycle.main.deltaTime;
-            bool requiresEnergy = GameModeUtils.RequiresPower();
-            bool hasPowerToConsume = !requiresEnergy || (this.AvailablePower >= _energyToConsume);
+            if (_connectedRelay == null) return;
 
+            //_energyToConsume = EnergyConsumptionPerSecond * DayNightCycle.main.deltaTime;
+            bool requiresEnergy = GameModeUtils.RequiresPower();
+            bool hasPowerToConsume = !requiresEnergy || (this.AvailablePower >= EnergyConsumptionPerSecond);
 
             if (hasPowerToConsume && _prevPowerState != FCSPowerStates.Powered)
             {
@@ -53,16 +54,14 @@ namespace FCSCommon.Controllers
                 _prevPowerState = FCSPowerStates.Unpowered;
             }
 
+            //if (this.NotAllowToOperate)
+            //    return;
 
+            //if (!hasPowerToConsume)
+            //    return;
 
-            if (this.NotAllowToOperate)
-                return;
-
-            if (!hasPowerToConsume)
-                return;
-
-            if (requiresEnergy)
-                _connectedRelay.ConsumeEnergy(_energyToConsume, out float amountConsumed);
+            //if (requiresEnergy)
+            //    _connectedRelay.ConsumeEnergy(_energyToConsume, out float amountConsumed);
         }
 
         private IEnumerator UpdatePowerRelay()
@@ -140,6 +139,12 @@ namespace FCSCommon.Controllers
         public virtual bool GetIsPowerAvailable()
         {
             return _connectedRelay != null && IsPowerAvailable;
+        }
+
+        public virtual void ConsumePower(float amount)
+        {
+            _connectedRelay.ConsumeEnergy(amount, out float amountConsumed);
+            QuickLogger.Debug(amountConsumed.ToString());
         }
 
     }

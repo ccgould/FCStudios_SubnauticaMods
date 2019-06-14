@@ -219,9 +219,10 @@ namespace FCSAlterraShipping.Display
 
             ClearPage();
 
-            foreach (var storageItem in _container)
+
+            for (int i = startingPosition; i < endingPosition; i++)
             {
-                LoadShippingDisplay(storageItem);
+                LoadShippingDisplay(_container[i]);
             }
 
             UpdatePaginator();
@@ -358,7 +359,7 @@ namespace FCSAlterraShipping.Display
             openContainer_BTN.OnButtonClick = OnButtonClick;
             openContainer_BTN.BtnName = "OpenContainer";
             openContainer_BTN.ButtonMode = InterfaceButtonMode.Background;
-            openContainer_BTN.TextLineOne = GetLanguage(DisplayLanguagePatching.OpenStorageKey);
+            openContainer_BTN.TextLineOne = GetLanguage(DisplayLanguagePatching.OpenShippingContainerKey);
             openContainer_BTN.Tag = this;
             #endregion
 
@@ -434,7 +435,6 @@ namespace FCSAlterraShipping.Display
             colorNext_BTN.ChangePageBy = ChangeColorPageBy;
             colorNext_BTN.AmountToChangePageBy = 1;
             #endregion
-
 
             #region Cancel Button Text
             var cancelBtntxt = page2.FindChild("Cancel_BTN").GetComponent<Text>();

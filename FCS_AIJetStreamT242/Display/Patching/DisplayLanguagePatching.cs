@@ -12,10 +12,10 @@ namespace FCS_AIMarineTurbine.Display.Patching
         public const string OffKey = "Off";
         public const string OnKey = "On";
         public const string WorkingKey = "Working";
-        public const string DamagedKey = "Damaged";
+        public const string FailedKey = "Failed";
         public const string HealthyLegendKey = "HealthyLegend";
         public const string MidlyDamagedLegendKey = "MidlyDamagedLegend";
-        public const string DamagedLegendKey = "DamagedLegend";
+        public const string FailedLegendKey = "WornLegend";
         public const string PingKey = "Ping";
         public const string PoweredOffKey = "PoweredOff";
         public const string PingingKey = "Pinging";
@@ -33,10 +33,10 @@ namespace FCS_AIMarineTurbine.Display.Patching
             LanguageHandler.SetLanguageLine(PingingKey, "PINGING");
             LanguageHandler.SetLanguageLine(OnKey, "ON");
             LanguageHandler.SetLanguageLine(WorkingKey, "Working");
-            LanguageHandler.SetLanguageLine(DamagedKey, "DAMAGED");
-            LanguageHandler.SetLanguageLine(DamagedLegendKey, "Damaged\n0% => 29%");
+            LanguageHandler.SetLanguageLine(FailedKey, "Failed");
+            LanguageHandler.SetLanguageLine(FailedLegendKey, "Failed\n0%");
             LanguageHandler.SetLanguageLine(HealthyLegendKey, "Healthy\n60 % => 100%");
-            LanguageHandler.SetLanguageLine(MidlyDamagedLegendKey, "Mildly Damaged\n30% => 59%");
+            LanguageHandler.SetLanguageLine(MidlyDamagedLegendKey, "Worn\n1% => 59%");
             LanguageHandler.SetLanguageLine(OnKey, "ON");
             LanguageHandler.SetLanguageLine(RPMKey, "rpm");
             LanguageHandler.SetLanguageLine(LegendKey, "Legend");
