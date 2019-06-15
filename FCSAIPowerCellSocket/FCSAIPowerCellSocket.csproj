@@ -64,12 +64,20 @@
     <Compile Include="Buildables\AIPowerCellSocketPatcher.cs" />
     <Compile Include="Buildables\AIPowerCellSocketAuxPatcher.cs" />
     <Compile Include="Buildables\AIPowerCellSocketPrefab.cs" />
-    <Compile Include="Model\AIPowerCellSocketPowerManager.cs" />
+    <Compile Include="Model\SaveData.cs" />
+    <Compile Include="Model\ScreenBattery.cs" />
+    <Compile Include="Mono\AIPowerCellSocketDisplay.cs" />
+    <Compile Include="Mono\AIPowerCellSocketPowerManager.cs" />
+    <Compile Include="Model\PowercellData.cs" />
+    <Compile Include="Mono\AIPowercellContainterPlayerInteraction.cs" />
+    <Compile Include="Mono\AIPowerCellSocketAnimator.cs" />
     <Compile Include="Mono\AIPowerCellSocketController.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Display\" />
+  </ItemGroup>
   <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

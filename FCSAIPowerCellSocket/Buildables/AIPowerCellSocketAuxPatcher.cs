@@ -1,4 +1,5 @@
 ﻿using FCSCommon.Utilities;
+using SMLHelper.V2.Handlers;
 
 namespace FCSAIPowerCellSocket.Buildables
 {
@@ -16,10 +17,14 @@ namespace FCSAIPowerCellSocket.Buildables
             QuickLogger.Debug("Additional Properties");
             BuildableName = this.FriendlyName;
             TechTypeID = this.TechType;
-            //LanguageHandler.SetLanguageLine(OverLimitKey, "You can't place more than one unit in a habitat.");
+            LanguageHandler.SetLanguageLine(PowercellContainterKey, "AI Powercell Socket Slots");
         }
 
-        //private const string OverLimitKey = "OverLimitMessage";
+        private const string PowercellContainterKey = "PowercellContainter";
 
+        public static string PowercellContainterLabel()
+        {
+            return Language.main.Get(PowercellContainterKey);
+        }
     }
 }
