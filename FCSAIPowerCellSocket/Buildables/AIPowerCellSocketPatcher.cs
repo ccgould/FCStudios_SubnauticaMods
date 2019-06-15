@@ -69,9 +69,9 @@ namespace FCSAIPowerCellSocket.Buildables
             {
                 Ingredients =
                 {
-                    new Ingredient(TechType.TitaniumIngot, 1),
-                    new Ingredient(TechType.ComputerChip, 1),
-                    new Ingredient(TechType.WiringKit, 1),
+                    new Ingredient(TechType.Titanium, 3),
+                    new Ingredient(TechType.AdvancedWiringKit, 1),
+                    new Ingredient(TechType.Battery, 1),
                     new Ingredient(TechType.Glass, 1)
                 }
             };

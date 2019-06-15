@@ -75,9 +75,7 @@
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Display\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

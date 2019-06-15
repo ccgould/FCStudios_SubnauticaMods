@@ -1,4 +1,5 @@
-﻿using FCSAIPowerCellSocket.Model;
+﻿using FCSAIPowerCellSocket.Buildables;
+using FCSAIPowerCellSocket.Model;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using System;
@@ -63,6 +64,19 @@ namespace FCSAIPowerCellSocket.Mono
                 QuickLogger.Error("Main cannot be found");
                 return false;
             }
+            #endregion
+
+            #region Status_LBL
+            var statuslbl = main.FindChild("Status_LBL")?.gameObject.GetComponent<Text>();
+
+            if (statuslbl == null)
+            {
+                QuickLogger.Error("Status_LBL cannot be found");
+                return false;
+            }
+
+            statuslbl.text = LanguageHelpers.GetLanguage(AIPowerCellSocketBuildable.StatusKey);
+
             #endregion
 
             #region Slot1
