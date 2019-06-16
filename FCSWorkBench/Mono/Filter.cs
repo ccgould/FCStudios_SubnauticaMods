@@ -109,7 +109,7 @@ namespace FCSTechWorkBench.Mono
             switch (FilterType)
             {
                 case FilterTypes.LongTermFilter:
-                    MaxTime = 20f;
+                    MaxTime = 36000f;
                     break;
                 case FilterTypes.ShortTermFilter:
                     MaxTime = 2400f;
