@@ -1,4 +1,6 @@
-﻿using FCSCommon.Utilities;
+﻿using FCSCommon.Components;
+using FCSCommon.Enums;
+using FCSCommon.Utilities;
 using FCSTechWorkBench.Abstract_Classes;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
@@ -18,9 +20,8 @@ namespace FCSTechWorkBench.Mono
             GameObject prefab = GameObject.Instantiate<GameObject>(this._prefab);
             prefab.name = this.PrefabFileName;
 
-            //var filter = prefab.AddComponent<Filter>();
-            //filter.FilterName = ClassID;
-            //filter.FilterType = FilterTypes.ShortTermFilter;
+            var filter = prefab.AddComponent<WorkBenchFilter>();
+            filter.FilterType = FilterTypes.ShortTermFilter;
 
             return prefab;
         }

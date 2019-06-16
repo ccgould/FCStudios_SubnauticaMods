@@ -63,6 +63,7 @@
     <Compile Include="Mono\FCSTechWorkBenchModelPrefab.cs" />
     <Compile Include="Mono\Filter.cs" />
     <Compile Include="Mono\FCSTechWorkBenchPatcher.cs" />
+    <Compile Include="Mono\ShortTermFilterController.cs" />
     <Compile Include="Mono\LongTermFilterController.cs" />
     <Compile Include="Mono\ShortTermFilterModelPrefab.cs" />
     <Compile Include="Mono\LongTermFilterModelPrefab.cs" />

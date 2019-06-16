@@ -141,7 +141,19 @@ namespace ARS_SeaBreezeFCS32.Model
                     }
                     else if (item.item.GetTechType() == _shortTermFilterTechType)
                     {
+                        var prefabId = item.item.gameObject.GetComponent<PrefabIdentifier>().Id;
+                        QuickLogger.Debug($"Initializing {prefabId} in OnAddEvent", true);
 
+                        if (filter == null)
+                        {
+                            _filter = go.AddComponent<ShortTermFilterController>();
+                            _filter.FilterType = FilterTypes.ShortTermFilter;
+                            _filter.Initialize();
+                        }
+                        else
+                        {
+                            _filter = filter;
+                        }
                     }
                 }
 

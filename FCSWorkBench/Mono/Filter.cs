@@ -114,6 +114,9 @@ namespace FCSTechWorkBench.Mono
                 case FilterTypes.ShortTermFilter:
                     MaxTime = 2400f;
                     break;
+                case FilterTypes.None:
+                    MaxTime = 0f;
+                    break;
                 default:
                     MaxTime = 0f;
                     break;
