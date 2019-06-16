@@ -213,7 +213,7 @@ namespace ARS_SeaBreezeFCS32.Model
 
         public FilterState GetFilterState()
         {
-            if (_filter == null) return FilterState.Dirty;
+            if (_filter == null) return FilterState.None;
             return _filter.FilterState;
         }
 

@@ -192,6 +192,8 @@ namespace ARS_SeaBreezeFCS32.Mono
 
             if (_prevFilterState == _filterContainer.GetFilterState()) return;
 
+            QuickLogger.Debug("In ");
+
             if (!_filterContainer.GetOpenState() && PowerManager.GetIsPowerAvailable() &&
                 _filterContainer.GetFilterState() == FilterState.Filtering)
             {

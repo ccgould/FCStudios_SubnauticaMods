@@ -65,7 +65,6 @@
     <Compile Include="Buildables\AIPowerCellSocketAuxPatcher.cs" />
     <Compile Include="Buildables\AIPowerCellSocketPrefab.cs" />
     <Compile Include="Model\SaveData.cs" />
-    <Compile Include="Model\ScreenBattery.cs" />
     <Compile Include="Mono\AIPowerCellSocketDisplay.cs" />
     <Compile Include="Mono\AIPowerCellSocketPowerManager.cs" />
     <Compile Include="Model\PowercellData.cs" />

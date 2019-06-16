@@ -2,6 +2,7 @@
 {
     public enum FilterState
     {
+        None,
         Filtering,
         Dirty
     }
