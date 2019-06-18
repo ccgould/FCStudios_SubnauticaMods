@@ -2,7 +2,7 @@
 
 namespace ARS_SeaBreezeFCS32.Mono
 {
-    internal partial class ARSolutionsSeaBreezeController : HandTarget, IHandTarget
+    public partial class ARSolutionsSeaBreezeController : HandTarget, IHandTarget
     {
         private bool _onInterfaceButton;
 
@@ -10,7 +10,7 @@ namespace ARS_SeaBreezeFCS32.Mono
         {
             if (_onInterfaceButton) return;
             if (Player.main == null) return;
-            QuickLogger.Debug($"Clicked on Seabreeze {_prefabId}", true);
+            QuickLogger.Debug($"Clicked on Seabreeze {PrefabId}", true);
             OpenStorage();
         }
 
@@ -23,7 +23,7 @@ namespace ARS_SeaBreezeFCS32.Mono
         {
             if (_onInterfaceButton) return;
             HandReticle main = HandReticle.main;
-            main.SetInteractText("Climb Ladder");
+            main.SetInteractText("Open Seabreeze");
             main.SetIcon(HandReticle.IconType.Hand, 1f);
         }
     }

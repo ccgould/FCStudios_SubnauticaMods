@@ -9,8 +9,11 @@ using UnityEngine;
 
 namespace FCSTechWorkBench.Mono
 {
-    internal partial class ShortTermFilterBuildable : FCSTechWorkBenchItem
+    public partial class ShortTermFilterBuildable : FCSTechWorkBenchItem
     {
+        private TechGroup GroupForPDA = TechGroup.Resources;
+        private TechCategory CategoryForPDA = TechCategory.Electronics;
+
         public ShortTermFilterBuildable() : base("ShortTermFilter_ARS", "Short Term Filter")
         {
         }
@@ -51,6 +54,9 @@ namespace FCSTechWorkBench.Mono
                     this.TechType = TechTypeHandler.AddTechType(ClassID, PrefabFileName, "Filter", new Atlas.Sprite(QPatch.Bundle.LoadAsset<Texture2D>($"AlterraLogo.png")));
 
                     CraftDataHandler.SetTechData(TechType, GetBlueprintRecipe());
+
+
+                    CraftDataHandler.AddToGroup(this.GroupForPDA, this.CategoryForPDA, this.TechType);
 
                     ClassID_I = this.ClassID;
 

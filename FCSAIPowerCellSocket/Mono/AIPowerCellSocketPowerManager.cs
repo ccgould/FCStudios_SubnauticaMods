@@ -259,7 +259,7 @@ namespace FCSAIPowerCellSocket.Mono
             _batteryContainer.onRemoveItem -= BatteryContainerOnOnRemoveItem;
         }
 
-        public void LoadPowercellItems(IEnumerable<PowercellData> savedDataPowercellDatas)
+        internal void LoadPowercellItems(IEnumerable<PowercellData> savedDataPowercellDatas)
         {
             foreach (PowercellData powercellData in savedDataPowercellDatas)
             {
@@ -278,7 +278,7 @@ namespace FCSAIPowerCellSocket.Mono
             }
         }
 
-        public IEnumerable<PowercellData> GetSaveData()
+        internal IEnumerable<PowercellData> GetSaveData()
         {
             foreach (PowercellData powercellData in PowercellTracker)
             {

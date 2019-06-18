@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace FCSTechWorkBench.Mono
 {
-    internal partial class ShortTermFilterBuildable
+    public partial class ShortTermFilterBuildable
     {
         private GameObject _prefab;
 

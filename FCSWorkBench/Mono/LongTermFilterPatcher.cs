@@ -9,10 +9,14 @@ using UnityEngine;
 
 namespace FCSTechWorkBench.Mono
 {
-    internal partial class LongTermFilterBuildable : FCSTechWorkBenchItem
+    public partial class LongTermFilterBuildable : FCSTechWorkBenchItem
     {
+        private TechGroup GroupForPDA = TechGroup.Resources;
+        private TechCategory CategoryForPDA = TechCategory.Electronics;
+
         public LongTermFilterBuildable() : base("LongTermFilter_ARS", "Long Term Filter")
         {
+
         }
 
         public override GameObject GetGameObject()
@@ -52,7 +56,10 @@ namespace FCSTechWorkBench.Mono
                     //Create a new TechType
                     this.TechType = TechTypeHandler.AddTechType(ClassID, PrefabFileName, "Filter", new Atlas.Sprite(QPatch.Bundle.LoadAsset<Texture2D>($"AlterraLogo.png")));
 
+
                     CraftDataHandler.SetTechData(TechType, GetBlueprintRecipe());
+
+                    CraftDataHandler.AddToGroup(this.GroupForPDA, this.CategoryForPDA, this.TechType);
 
                     ClassID_I = this.ClassID;
 

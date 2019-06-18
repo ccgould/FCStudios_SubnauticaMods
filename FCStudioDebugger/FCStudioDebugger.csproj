@@ -66,7 +66,16 @@
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />
+  <ItemGroup>
+    <ProjectReference Include="..\ARS_SeaBreezeFCS32\ARS_SeaBreezeFCS32.csproj">
+      <Project>{4963c014-f97e-4124-b3c7-9f7bb790e1bf}</Project>
+      <Name>ARS_SeaBreezeFCS32</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FCSWorkBench\FCSTechWorkBench.csproj">
+      <Project>{b947909c-4983-4749-93ac-73ea69f6dce8}</Project>
+      <Name>FCSTechWorkBench</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>xcopy "$(ProjectDir)bin\$(Configuration)\FCStudioDebugger.dll" "F:\Program Files\Epic Games\Subnautica\QMods\FCStudioDebugger\" /Y /I</PostBuildEvent>

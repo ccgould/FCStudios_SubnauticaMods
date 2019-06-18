@@ -12,13 +12,14 @@ using System.IO;
 
 namespace ARS_SeaBreezeFCS32.Mono
 {
-    internal partial class ARSolutionsSeaBreezeController : IFridgeContainer, IProtoTreeEventListener, IConstructable
+    public partial class ARSolutionsSeaBreezeController : IFridgeContainer, IProtoTreeEventListener, IConstructable
     {
         #region Private Members
         private Constructable _buildable;
-        private PrefabIdentifier _prefabId;
+        public PrefabIdentifier PrefabId { get; private set; }
+
         private readonly string _saveDirectory = Path.Combine(SaveUtils.GetCurrentSaveDataDir(), "ARSSeaBreezeFCS32");
-        private string SaveFile => Path.Combine(_saveDirectory, _prefabId.Id + ".json");
+        private string SaveFile => Path.Combine(_saveDirectory, PrefabId.Id + ".json");
         private ARSolutionsSeaBreezeContainer _fridgeContainer;
         private ARSolutionsSeaBreezeFilterContainer _filterContainer;
         private bool _deconstructionAllowed = true;
@@ -76,8 +77,8 @@ namespace ARS_SeaBreezeFCS32.Mono
                 QuickLogger.Error("Power Manager Component was not found");
             }
 
-            _prefabId = GetComponentInParent<PrefabIdentifier>();
-            if (_prefabId == null)
+            PrefabId = GetComponentInParent<PrefabIdentifier>();
+            if (PrefabId == null)
             {
                 QuickLogger.Error("Prefab Identifier Component was not found");
             }
@@ -99,7 +100,7 @@ namespace ARS_SeaBreezeFCS32.Mono
 
         private void OnPowerResume()
         {
-            QuickLogger.Debug("In OnPowerResume", true);
+            //QuickLogger.Debug("In OnPowerResume", true);
             UpdateFridgeCooler();
         }
 
@@ -215,7 +216,7 @@ namespace ARS_SeaBreezeFCS32.Mono
         #region IPhotoTreeEventListener
         public void OnProtoSerializeObjectTree(ProtobufSerializer serializer)
         {
-            QuickLogger.Debug($"Saving {_prefabId.Id} Data");
+            QuickLogger.Debug($"Saving {PrefabId.Id} Data");
 
             if (!Directory.Exists(_saveDirectory))
                 Directory.CreateDirectory(_saveDirectory);
@@ -223,23 +224,26 @@ namespace ARS_SeaBreezeFCS32.Mono
             var saveData = new SaveData
             {
                 //HasBreakerTripped = PowerManager.GetHasBreakerTripped(),
-                FridgeContainer = _fridgeContainer.GetFridgeItems()
-
+                FridgeContainer = _fridgeContainer.GetSaveData(),
+                FilterState = _filterContainer.GetFilterState(),
+                FilterType = _filterContainer.GetFilterType(),
+                RemaingTime = _filterContainer.GetFilterTime(),
+                FilterTechType = _filterContainer.GetFilterTechType()
             };
 
             var output = JsonConvert.SerializeObject(saveData, Formatting.Indented);
             File.WriteAllText(SaveFile, output);
 
-            QuickLogger.Debug($"Saved {_prefabId.Id} Data");
+            QuickLogger.Debug($"Saved {PrefabId.Id} Data");
         }
 
         public void OnProtoDeserializeObjectTree(ProtobufSerializer serializer)
         {
             QuickLogger.Debug("// ****************************** Load Data *********************************** //");
 
-            if (_prefabId != null)
+            if (PrefabId != null)
             {
-                QuickLogger.Info($"Loading SeaBreezeFCS32 {_prefabId.Id}");
+                QuickLogger.Info($"Loading SeaBreezeFCS32 {PrefabId.Id}");
 
                 if (File.Exists(SaveFile))
                 {
@@ -248,6 +252,7 @@ namespace ARS_SeaBreezeFCS32.Mono
                     //LoadData
                     var savedData = JsonConvert.DeserializeObject<SaveData>(savedDataJson);
                     _fridgeContainer.LoadFoodItems(savedData.FridgeContainer);
+                    _filterContainer.LoadFilter(savedData);
                 }
             }
             else

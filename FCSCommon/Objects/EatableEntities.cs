@@ -1,4 +1,7 @@
-﻿namespace FCSCommon.Objects
+﻿using FCSCommon.Utilities;
+using Oculus.Newtonsoft.Json;
+
+namespace FCSCommon.Objects
 {
     /// <summary>
     /// Defines the Eatable object 
@@ -15,7 +18,33 @@
 
         public float FoodValue { get; set; }
 
-        public float kDecayRate { get; set; }
-        public bool Decomposes { get; set; }
+        public float KDecayRate { get; set; }
+
+        public bool Decomposes => Food.decomposes;
+
+        [JsonIgnore]
+        public Eatable Food { get; set; }
+
+        public void Initialize(Pickupable food)
+        {
+            if (food != null)
+            {
+                TechType = food.GetTechType();
+                PrefabID = food.GetComponent<PrefabIdentifier>().Id;
+                Food = food.GetComponent<Eatable>();
+                Name = food.name;
+                KDecayRate = Food.kDecayRate;
+            }
+            else
+            {
+                QuickLogger.Error($"Food was null. Could not create {nameof(EatableEntities)}");
+            }
+        }
+
+        public void SaveData()
+        {
+            WaterValue = Food.GetWaterValue();
+            FoodValue = Food.GetFoodValue();
+        }
     }
 }

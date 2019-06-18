@@ -1,7 +1,10 @@
 ﻿using FCSCommon.Converters;
 using FCSCommon.Enums;
 using FCSCommon.Utilities;
+using FCSTechWorkBench.Models;
+using SMLHelper.V2.Utility;
 using System;
+using System.IO;
 using UnityEngine;
 
 namespace FCSTechWorkBench.Mono
@@ -13,6 +16,11 @@ namespace FCSTechWorkBench.Mono
 
     public abstract class Filter : MonoBehaviour
     {
+        public abstract PrefabIdentifier PrefabId { get; set; }
+
+        protected readonly string _saveDirectory = Path.Combine(SaveUtils.GetCurrentSaveDataDir(), Mod.ModName);
+        protected string SaveFile => Path.Combine(_saveDirectory, PrefabId.Id + ".json");
+
         /// <summary>
         /// The remaining time in seconds
         /// </summary>
@@ -24,7 +32,7 @@ namespace FCSTechWorkBench.Mono
         /// <summary>
         /// The max time for the count down
         /// </summary>
-        public virtual float MaxTime { get; protected set; }
+        public virtual float MaxTime { get; set; }
 
         public bool IsExpired { get; set; }
 
@@ -45,7 +53,9 @@ namespace FCSTechWorkBench.Mono
 
         private bool _filterIsDead;
 
-        public virtual FilterState FilterState { get; private set; }
+        protected virtual bool FromSave { get; set; }
+
+        public virtual FilterState FilterState { get; set; }
 
         public virtual void UpdateFilterState()
         {
@@ -63,7 +73,7 @@ namespace FCSTechWorkBench.Mono
         public abstract void StartTimer();
         public abstract void StopTimer();
 
-        public abstract void Initialize();
+        public abstract void Initialize(bool fromSave = false);
 
         protected virtual void OnTimerStart()
         {
@@ -106,6 +116,9 @@ namespace FCSTechWorkBench.Mono
         }
         protected virtual void SetMaxTime()
         {
+
+            if (FromSave) return;
+
             switch (FilterType)
             {
                 case FilterTypes.LongTermFilter:
@@ -121,6 +134,11 @@ namespace FCSTechWorkBench.Mono
                     MaxTime = 0f;
                     break;
             }
+        }
+
+        public virtual void SetRemainingTime()
+        {
+            RemainingTime = TimeConverters.SecondsToHMS(MaxTime);
         }
     }
 }

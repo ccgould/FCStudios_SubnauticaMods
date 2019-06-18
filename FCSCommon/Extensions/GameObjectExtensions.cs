@@ -1,9 +1,9 @@
-﻿using System;
+﻿using FCSCommon.Objects;
+using Oculus.Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using FCSCommon.Objects;
-using Oculus.Newtonsoft.Json;
 using UnityEngine;
 
 namespace FCSCommon.Extensions
@@ -49,7 +49,7 @@ namespace FCSCommon.Extensions
                         Name = eatable.name,
                         FoodValue = eatable.foodValue,
                         WaterValue = eatable.waterValue,
-                        kDecayRate = eatable.kDecayRate
+                        KDecayRate = eatable.kDecayRate
                     });
                 }
             }
@@ -63,7 +63,7 @@ namespace FCSCommon.Extensions
             if (string.IsNullOrEmpty(itemLocation)) return "No location";
 
             StringBuilder sb = new StringBuilder();
-            
+
             GameObject OriginalFabricator = Resources.Load<GameObject>(itemLocation);
 
             GameObject prefab = GameObject.Instantiate(OriginalFabricator);
