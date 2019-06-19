@@ -52,7 +52,7 @@ namespace FCSTechWorkBench.Mono
             var saveData = new FilterSaveData
             {
                 FilterType = FilterType,
-                RemaingTime = MaxTime,
+                RemainingTime = MaxTime,
                 FilterState = FilterState
             };
 
@@ -77,7 +77,7 @@ namespace FCSTechWorkBench.Mono
                     //LoadData
                     var savedData = JsonConvert.DeserializeObject<FilterSaveData>(savedDataJson);
                     FilterType = savedData.FilterType;
-                    MaxTime = savedData.RemaingTime;
+                    MaxTime = savedData.RemainingTime;
                     FilterState = savedData.FilterState;
                 }
             }

@@ -51,7 +51,7 @@ namespace FCSTechWorkBench.Mono
                 if (this.IsRegistered == false)
                 {
                     //Create a new TechType
-                    this.TechType = TechTypeHandler.AddTechType(ClassID, PrefabFileName, "Filter", new Atlas.Sprite(QPatch.Bundle.LoadAsset<Texture2D>($"AlterraLogo.png")));
+                    this.TechType = TechTypeHandler.AddTechType(ClassID, PrefabFileName, "Short Term Filter gives you one day of SeaBreeze filtration on Planet 4546B", new Atlas.Sprite(QPatch.Bundle.LoadAsset<Texture2D>($"AlterraLogo.png")));
 
                     CraftDataHandler.SetTechData(TechType, GetBlueprintRecipe());
 

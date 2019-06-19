@@ -71,6 +71,7 @@ namespace FCSTechWorkBench.Mono
         /// </summary>
 
         public abstract void StartTimer();
+
         public abstract void StopTimer();
 
         public abstract void Initialize(bool fromSave = false);
@@ -94,6 +95,7 @@ namespace FCSTechWorkBench.Mono
         }
 
         public abstract string GetRemainingTime();
+
         public virtual void UpdateTimer()
         {
             if (!RunTimer) return;
@@ -114,6 +116,7 @@ namespace FCSTechWorkBench.Mono
                 _filterIsDead = true;
             }
         }
+
         protected virtual void SetMaxTime()
         {
 

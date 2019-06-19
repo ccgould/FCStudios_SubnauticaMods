@@ -6,6 +6,7 @@ namespace ARS_SeaBreezeFCS32.Model
 {
     internal class SaveData
     {
+        public string FilterID;
         public float RemaingTime { get; set; }
 
         public FilterTypes FilterType { get; set; }

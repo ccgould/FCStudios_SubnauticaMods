@@ -221,6 +221,8 @@ namespace ARS_SeaBreezeFCS32.Mono
             if (!Directory.Exists(_saveDirectory))
                 Directory.CreateDirectory(_saveDirectory);
 
+            FilterManager.SaveFilters();
+
             var saveData = new SaveData
             {
                 //HasBreakerTripped = PowerManager.GetHasBreakerTripped(),
@@ -228,7 +230,8 @@ namespace ARS_SeaBreezeFCS32.Mono
                 FilterState = _filterContainer.GetFilterState(),
                 FilterType = _filterContainer.GetFilterType(),
                 RemaingTime = _filterContainer.GetFilterTime(),
-                FilterTechType = _filterContainer.GetFilterTechType()
+                FilterTechType = _filterContainer.GetFilterTechType(),
+                FilterID = _filterContainer.GetFilterPrebID()
             };
 
             var output = JsonConvert.SerializeObject(saveData, Formatting.Indented);
@@ -240,6 +243,8 @@ namespace ARS_SeaBreezeFCS32.Mono
         public void OnProtoDeserializeObjectTree(ProtobufSerializer serializer)
         {
             QuickLogger.Debug("// ****************************** Load Data *********************************** //");
+
+            FilterManager.LoadSave();
 
             if (PrefabId != null)
             {

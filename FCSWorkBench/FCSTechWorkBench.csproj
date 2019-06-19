@@ -60,7 +60,6 @@
   <ItemGroup>
     <Compile Include="Abstract Classes\FCSTechWorkBenchItem.cs" />
     <Compile Include="Interfaces\IFCSTechWorkBenchItem.cs" />
-    <Compile Include="Models\FilterManager.cs" />
     <Compile Include="Models\FilterSaveData.cs" />
     <Compile Include="Models\Mod.cs" />
     <Compile Include="Mono\FCSTechWorkBenchModelPrefab.cs" />

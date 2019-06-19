@@ -26,6 +26,7 @@ namespace ARS_SeaBreezeFCS32.Model
         private readonly TechType _shortTermFilterTechType;
         private bool _isFilterDriveOpen;
         private TechType _filterTechType;
+        private FilterTypes _loadedFilterType;
         private const int ContainerWidth = 1;
 
         private const int ContainerHeight = 1;
@@ -110,6 +111,7 @@ namespace ARS_SeaBreezeFCS32.Model
         {
             if (_filter == null) return;
             _filter.StopTimer();
+            FilterManager.SaveFilters();
             _filter = null;
         }
 
@@ -124,11 +126,21 @@ namespace ARS_SeaBreezeFCS32.Model
 
                 if (_longTermFilterFound || _shortTermFilterFound)
                 {
+                    var prefabId = go.GetComponent<PrefabIdentifier>().Id;
+
+                    //Lets see if the filter is already in the Global List
+                    var globalFilter = FilterManager.GetFilterData(prefabId);
+
+                    if (globalFilter != null && _filter == null)
+                    {
+                        QuickLogger.Debug("Global Data Found");
+                        _filter = globalFilter.CreateNewFilterFromGlobal(go, globalFilter);
+                        _filter.StartTimer();
+                        return;
+                    }
+
                     if (item.item.GetTechType() == _longTermFilterTechType)
                     {
-                        var prefabId = item.item.gameObject.GetComponent<PrefabIdentifier>().Id;
-                        QuickLogger.Debug($"Initializing {prefabId} in OnAddEvent", true);
-
                         if (filter == null)
                         {
                             _filter = go.AddComponent<LongTermFilterController>();
@@ -143,9 +155,6 @@ namespace ARS_SeaBreezeFCS32.Model
                     }
                     else if (item.item.GetTechType() == _shortTermFilterTechType)
                     {
-                        var prefabId = item.item.gameObject.GetComponent<PrefabIdentifier>().Id;
-                        QuickLogger.Debug($"Initializing {prefabId} in OnAddEvent", true);
-
                         if (filter == null)
                         {
                             _filter = go.AddComponent<ShortTermFilterController>();
@@ -158,6 +167,8 @@ namespace ARS_SeaBreezeFCS32.Model
 
                         _filterTechType = _shortTermFilterTechType;
                     }
+
+                    FilterManager.AddFilter(_filter);
                 }
 
                 QuickLogger.Debug($"Filter Type: {_filter.FilterType} || Filter Max Time {_filter.GetMaxTime()} || Filter Time Remaining {_filter.GetRemainingTime()}", true);
@@ -255,34 +266,34 @@ namespace ARS_SeaBreezeFCS32.Model
             if (save.FilterType == FilterTypes.None) return;
 
             var go = GameObject.Instantiate(CraftData.GetPrefabForTechType(save.FilterTechType));
+            _loadedFilterType = save.FilterType;
+            //bool flag = false;
 
-            bool flag = false;
+            //switch (save.FilterType)
+            //{
+            //    case FilterTypes.LongTermFilter:
+            //        _filter = go.AddComponent<LongTermFilterController>();
+            //        flag = true;
+            //        break;
+            //    case FilterTypes.ShortTermFilter:
+            //        _filter = go.AddComponent<ShortTermFilterController>();
+            //        flag = true;
+            //        break;
+            //    case FilterTypes.None:
+            //        _filter = null;
+            //        flag = false;
+            //        break;
+            //}
 
-            switch (save.FilterType)
-            {
-                case FilterTypes.LongTermFilter:
-                    _filter = go.AddComponent<LongTermFilterController>();
-                    flag = true;
-                    break;
-                case FilterTypes.ShortTermFilter:
-                    _filter = go.AddComponent<ShortTermFilterController>();
-                    flag = true;
-                    break;
-                case FilterTypes.None:
-                    _filter = null;
-                    flag = false;
-                    break;
-            }
-
-            if (!flag) return;
-            _filter.MaxTime = save.RemaingTime;
-            QuickLogger.Debug($"// ============================== FMT{_filter.MaxTime} || SMT{save.RemaingTime} ============================== //");
-            _filter.FilterState = save.FilterState;
-            _filter.Initialize(true);
-            //_filter.SetRemainingTime();
-            _filter.StartTimer();
-
-            var newInventoryItem = new InventoryItem(_filter.GetComponent<Pickupable>().Pickup(false));
+            //if (!flag) return;
+            //_filter.MaxTime = save.RemaingTime;
+            //QuickLogger.Debug($"// ============================== FMT{_filter.MaxTime} || SMT{save.RemaingTime} ============================== //");
+            //_filter.FilterState = save.FilterState;
+            //_filter.Initialize(true);
+            ////_filter.SetRemainingTime();
+            //_filter.StartTimer();
+            go.GetComponent<PrefabIdentifier>().Id = save.FilterID;
+            var newInventoryItem = new InventoryItem(go.GetComponent<Pickupable>().Pickup(false));
             _filterContainer.UnsafeAdd(newInventoryItem);
         }
 

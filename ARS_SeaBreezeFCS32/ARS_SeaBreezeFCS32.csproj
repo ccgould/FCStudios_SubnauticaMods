@@ -72,6 +72,7 @@
     <Compile Include="Model\ARSolutionsSeabreezeConfiguration.cs" />
     <Compile Include="Model\ARSolutionsSeaBreezeContainer.cs" />
     <Compile Include="Model\ARSolutionsSeaBreezeFilterContainer.cs" />
+    <Compile Include="Model\FilterManager.cs" />
     <Compile Include="Model\SaveData.cs" />
     <Compile Include="Mono\ARSolutionsSeaBreezeAnimationManager.cs" />
     <Compile Include="Mono\ARSolutionsSeaBreezeController.cs" />
