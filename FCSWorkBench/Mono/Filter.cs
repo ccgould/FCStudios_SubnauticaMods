@@ -98,9 +98,9 @@ namespace FCSTechWorkBench.Mono
 
         public virtual void UpdateTimer()
         {
-            if (!RunTimer) return;
-
             UpdateFilterState();
+
+            if (!RunTimer) return;
 
             if (MaxTime > 0f)
             {

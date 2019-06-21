@@ -10,7 +10,7 @@ namespace FCSAIPowerCellSocket.Mono
 {
     internal partial class AIPowerCellSocketController : IConstructable, IProtoTreeEventListener
     {
-
+        public bool IsConstructed => _buildable != null && _buildable.constructed;
         public AIPowerCellSocketPowerManager PowerManager { get; set; }
         public AIPowerCellSocketDisplay Display { get; private set; }
         public AIPowerCellSocketAnimator AnimationManager { get; set; }
@@ -18,11 +18,18 @@ namespace FCSAIPowerCellSocket.Mono
         private PrefabIdentifier _prefabId;
 
         private readonly string _saveDirectory = Path.Combine(SaveUtils.GetCurrentSaveDataDir(), "AIPowerCellSocket");
+
+        private Constructable _buildable;
         private string SaveFile => Path.Combine(_saveDirectory, _prefabId.Id + ".json");
 
         private void Awake()
         {
             _prefabId = GetComponentInParent<PrefabIdentifier>();
+
+            if (_buildable == null)
+            {
+                _buildable = GetComponentInParent<Constructable>();
+            }
 
             PowerManager = gameObject.GetComponent<AIPowerCellSocketPowerManager>();
             PowerManager.Initialize(this);

@@ -1,4 +1,5 @@
-﻿using FCSCommon.Utilities;
+﻿using ARS_SeaBreezeFCS32.Helpers;
+using FCSCommon.Utilities;
 using FCSTechWorkBench.Models;
 using FCSTechWorkBench.Mono;
 using Oculus.Newtonsoft.Json;
@@ -40,7 +41,8 @@ namespace ARS_SeaBreezeFCS32.Model
                 PrefabID = filter.PrefabId.Id,
                 FilterState = filter.FilterState,
                 FilterType = filter.FilterType,
-                RemainingTime = filter.MaxTime
+                RemainingTime = filter.MaxTime,
+                TechType = TechTypeHelper.Find(filter.FilterType)
             };
 
             item.Initialize(filter);

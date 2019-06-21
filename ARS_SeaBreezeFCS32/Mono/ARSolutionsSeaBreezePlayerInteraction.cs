@@ -8,14 +8,14 @@ namespace ARS_SeaBreezeFCS32.Mono
 
         public void OnHandClick(GUIHand hand)
         {
-            if (_onInterfaceButton) return;
-            if (Player.main == null) return;
+            if (_onInterfaceButton || Player.main == null || !IsConstructed) return;
             QuickLogger.Debug($"Clicked on Seabreeze {PrefabId}", true);
             OpenStorage();
         }
 
         internal void OnInterfaceButton(bool value)
         {
+            QuickLogger.Debug($"OnInterfaceButton: {value}", true);
             _onInterfaceButton = value;
         }
 
@@ -25,6 +25,11 @@ namespace ARS_SeaBreezeFCS32.Mono
             HandReticle main = HandReticle.main;
             main.SetInteractText("Open Seabreeze");
             main.SetIcon(HandReticle.IconType.Hand, 1f);
+        }
+
+        internal void ResetOnInterceButton()
+        {
+            _onInterfaceButton = false;
         }
     }
 }

@@ -19,13 +19,13 @@ namespace ARS_SeaBreezeFCS32.Mono
 
         private ARSolutionsSeaBreezeController _mono;
 
-        public bool NotAllowToOperate => !_mono.IsConstructed || GetHasBreakerTripped() || _connectedRelay == null;
+        public bool NotAllowToOperate => !_mono.IsConstructed || _connectedRelay == null;
 
         private PowerRelay _connectedRelay;
         private float _energyToConsume;
         private bool _prevPowerState;
 
-        private bool IsPowerAvailable => AvailablePower > _energyToConsume || !_hasBreakerTripped;
+        private bool IsPowerAvailable => AvailablePower > _energyToConsume;
 
         #region Unity Methods
         private void Update()
@@ -36,6 +36,8 @@ namespace ARS_SeaBreezeFCS32.Mono
             _energyToConsume = EnergyConsumptionPerSecond * DayNightCycle.main.deltaTime;
             bool requiresEnergy = GameModeUtils.RequiresPower();
             bool hasPowerToConsume = !requiresEnergy || (this.AvailablePower >= _energyToConsume);
+
+            //QuickLogger.Debug($"HasPowerToConsume {hasPowerToConsume} || AVP {AvailablePower}|| PrevPowerState {_prevPowerState}");
 
             if (hasPowerToConsume && !_prevPowerState)
             {
@@ -51,7 +53,7 @@ namespace ARS_SeaBreezeFCS32.Mono
             if (!hasPowerToConsume)
                 return;
 
-            if (requiresEnergy)
+            if (requiresEnergy && !GetHasBreakerTripped())
                 _connectedRelay.ConsumeEnergy(_energyToConsume, out float amountConsumed);
         }
         #endregion
@@ -120,6 +122,8 @@ namespace ARS_SeaBreezeFCS32.Mono
             {
                 TriggerPowerOff();
             }
+
+            QuickLogger.Debug($"HasBreakerTripped: {_hasBreakerTripped}", true);
         }
 
         public bool GetIsPowerAvailable()

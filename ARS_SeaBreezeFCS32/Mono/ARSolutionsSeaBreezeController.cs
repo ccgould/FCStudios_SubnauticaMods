@@ -94,20 +94,19 @@ namespace ARS_SeaBreezeFCS32.Mono
                 QuickLogger.Error("Animation Manager Component was not found");
             }
 
-            InvokeRepeating("UpdateFridgeCooler", 1, 1);
-
+            InvokeRepeating("UpdateFridgeCooler", 1, 0.5f);
         }
 
         private void OnPowerResume()
         {
             //QuickLogger.Debug("In OnPowerResume", true);
-            UpdateFridgeCooler();
+            //UpdateFridgeCooler();
         }
 
         private void OnPowerOutage()
         {
-            QuickLogger.Debug("In OnPowerOutage", true);
-            UpdateFridgeCooler();
+            //QuickLogger.Debug("In OnPowerOutage", true);
+            //UpdateFridgeCooler();
         }
 
         private void Update()
@@ -115,6 +114,14 @@ namespace ARS_SeaBreezeFCS32.Mono
             OnMonoUpdate?.Invoke();
         }
 
+        #endregion
+
+        #region Internal Methods
+        internal void UpdateDisplayTimer(string filterRemainingTime)
+        {
+            if (_display == null) return;
+            _display.UpdateTimer(filterRemainingTime);
+        }
         #endregion
 
         #region Public Methods  
@@ -132,13 +139,11 @@ namespace ARS_SeaBreezeFCS32.Mono
             if (constructed)
             {
                 QuickLogger.Debug("Constructed", true);
-
                 if (_display == null)
                 {
                     _display = gameObject.AddComponent<ARSolutionsSeaBreezeDisplay>();
                     _display.Setup(this);
                 }
-
             }
         }
 
@@ -184,27 +189,24 @@ namespace ARS_SeaBreezeFCS32.Mono
             AnimationManager.ToggleDriveState();
         }
 
-        private void UpdateFridgeCooler()
+        internal void UpdateFridgeCooler()
         {
-
             if (_filterContainer == null) return;
 
-            //QuickLogger.Debug($"GetFilterState {_filterContainer.GetFilterState()} || IsPowerAvaliable {PowerManager.IsPowerAvaliable} || GetOpenState {_fridgeContainer.GetOpenState()}", true);
+            QuickLogger.Debug($"GOS {_filterContainer.GetOpenState()} || GIPA {PowerManager.GetIsPowerAvailable()} || GFS {_filterContainer.GetFilterState().ToString()}");
 
-            if (_prevFilterState == _filterContainer.GetFilterState()) return;
-
-            QuickLogger.Debug("In ");
-
-            if (!_filterContainer.GetOpenState() && PowerManager.GetIsPowerAvailable() &&
-                _filterContainer.GetFilterState() == FilterState.Filtering)
+            if (!_filterContainer.GetOpenState() &&
+                PowerManager.GetIsPowerAvailable() &&
+                _filterContainer.GetFilterState() == FilterState.Filtering &&
+                !PowerManager.GetHasBreakerTripped())
             {
                 _fridgeContainer.CoolItems();
-                _prevFilterState = _filterContainer.GetFilterState();
+                _filterContainer.StartTimer();
                 return;
             }
 
             _fridgeContainer.DecayItems();
-            _prevFilterState = _filterContainer.GetFilterState();
+            _filterContainer.StopTimer();
         }
 
         private void OnPdaClosedAction()
@@ -225,7 +227,7 @@ namespace ARS_SeaBreezeFCS32.Mono
 
             var saveData = new SaveData
             {
-                //HasBreakerTripped = PowerManager.GetHasBreakerTripped(),
+                HasBreakerTripped = PowerManager.GetHasBreakerTripped(),
                 FridgeContainer = _fridgeContainer.GetSaveData(),
                 FilterState = _filterContainer.GetFilterState(),
                 FilterType = _filterContainer.GetFilterType(),
@@ -250,14 +252,16 @@ namespace ARS_SeaBreezeFCS32.Mono
             {
                 QuickLogger.Info($"Loading SeaBreezeFCS32 {PrefabId.Id}");
 
+                SaveData savedData = null;
                 if (File.Exists(SaveFile))
                 {
                     string savedDataJson = File.ReadAllText(SaveFile).Trim();
 
                     //LoadData
-                    var savedData = JsonConvert.DeserializeObject<SaveData>(savedDataJson);
+                    savedData = JsonConvert.DeserializeObject<SaveData>(savedDataJson);
                     _fridgeContainer.LoadFoodItems(savedData.FridgeContainer);
                     _filterContainer.LoadFilter(savedData);
+                    PowerManager.SetHasBreakerTripped(savedData.HasBreakerTripped);
                 }
             }
             else
@@ -267,11 +271,5 @@ namespace ARS_SeaBreezeFCS32.Mono
             QuickLogger.Debug("// ****************************** Loaded Data *********************************** //");
         }
         #endregion
-
-        public void UpdateDisplayTimer(string filterRemainingTime)
-        {
-            if (_display == null) return;
-            _display.UpdateTimer(filterRemainingTime);
-        }
     }
 }

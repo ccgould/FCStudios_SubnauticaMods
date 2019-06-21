@@ -22,7 +22,6 @@ namespace ARS_SeaBreezeFCS32.Mono
             Animator.enabled = true;
             _driveStateHash = UnityEngine.Animator.StringToHash("DriveState");
         }
-
         #endregion
 
         #region Internal Methods
@@ -67,5 +66,10 @@ namespace ARS_SeaBreezeFCS32.Mono
             this.Animator.SetFloat(stateHash, value);
         }
         #endregion
+
+        public int GetIntHash(int stateHash)
+        {
+            return Animator.GetInteger(stateHash);
+        }
     }
 }

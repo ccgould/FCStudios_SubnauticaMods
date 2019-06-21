@@ -36,6 +36,8 @@ namespace FCSTechWorkBench.Models
         /// </summary>
         [JsonIgnore] public Filter Filter { get; set; }
 
+        public TechType TechType { get; set; }
+
         /// <summary>
         /// Iniializes the class by using the filter to fill in the properties
         /// </summary>
@@ -94,7 +96,7 @@ namespace FCSTechWorkBench.Models
                     var lFilter = go.AddComponent<LongTermFilterController>();
                     lFilter.Initialize(true);
                     lFilter.FilterType = filterSave.FilterType;
-                    lFilter.PrefabId.Id = filterSave.PrefabID;
+                    //lFilter.PrefabId.Id = filterSave.PrefabID;
                     lFilter.FilterState = filterSave.FilterState;
                     lFilter.MaxTime = filterSave.RemainingTime;
                     Filter = lFilter;
@@ -105,7 +107,7 @@ namespace FCSTechWorkBench.Models
                     var sFilter = go.AddComponent<ShortTermFilterController>();
                     sFilter.Initialize(true);
                     sFilter.FilterType = filterSave.FilterType;
-                    sFilter.PrefabId.Id = filterSave.PrefabID;
+                    //sFilter.PrefabId.Id = filterSave.PrefabID;
                     sFilter.FilterState = filterSave.FilterState;
                     sFilter.MaxTime = filterSave.RemainingTime;
                     Filter = sFilter;

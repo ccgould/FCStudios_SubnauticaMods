@@ -26,9 +26,9 @@ namespace ARS_SeaBreezeFCS32.Model
         private readonly TechType _shortTermFilterTechType;
         private bool _isFilterDriveOpen;
         private TechType _filterTechType;
-        private FilterTypes _loadedFilterType;
+        private string _idFromSave;
+        private bool _fromSave;
         private const int ContainerWidth = 1;
-
         private const int ContainerHeight = 1;
 
         public Action OnTimerEnd { get; set; }
@@ -111,7 +111,7 @@ namespace ARS_SeaBreezeFCS32.Model
         {
             if (_filter == null) return;
             _filter.StopTimer();
-            FilterManager.SaveFilters();
+            //FilterManager.SaveFilters();
             _filter = null;
         }
 
@@ -128,13 +128,16 @@ namespace ARS_SeaBreezeFCS32.Model
                 {
                     var prefabId = go.GetComponent<PrefabIdentifier>().Id;
 
-                    //Lets see if the filter is already in the Global List
-                    var globalFilter = FilterManager.GetFilterData(prefabId);
+
+                    var globalFilter = FilterManager.GetFilterData(_fromSave ? _idFromSave : prefabId);
+
+                    QuickLogger.Debug(globalFilter?.PrefabID, true);
 
                     if (globalFilter != null && _filter == null)
                     {
                         QuickLogger.Debug("Global Data Found");
                         _filter = globalFilter.CreateNewFilterFromGlobal(go, globalFilter);
+                        _filterTechType = globalFilter.TechType;
                         _filter.StartTimer();
                         return;
                     }
@@ -169,20 +172,16 @@ namespace ARS_SeaBreezeFCS32.Model
                     }
 
                     FilterManager.AddFilter(_filter);
+
+                    if (_fromSave && globalFilter != null)
+                    {
+                        _fromSave = false;
+                        FilterManager.RemoveFilter(globalFilter.Filter);
+                    }
                 }
 
                 QuickLogger.Debug($"Filter Type: {_filter.FilterType} || Filter Max Time {_filter.GetMaxTime()} || Filter Time Remaining {_filter.GetRemainingTime()}", true);
             }
-        }
-
-        private void TimerEnd()
-        {
-            OnTimerEnd?.Invoke();
-        }
-
-        private void TimerTick(string obj)
-        {
-            OnTimerUpdate?.Invoke(obj);
         }
 
         private bool IsAllowedToRemove(Pickupable pickupable, bool verbose)
@@ -209,8 +208,6 @@ namespace ARS_SeaBreezeFCS32.Model
 
         public void OpenStorage()
         {
-            //QuickLogger.Debug($"Filter Button Clicked", true);
-
             if (!_isContstructed.Invoke())
                 return;
 
@@ -266,33 +263,12 @@ namespace ARS_SeaBreezeFCS32.Model
             if (save.FilterType == FilterTypes.None) return;
 
             var go = GameObject.Instantiate(CraftData.GetPrefabForTechType(save.FilterTechType));
-            _loadedFilterType = save.FilterType;
-            //bool flag = false;
 
-            //switch (save.FilterType)
-            //{
-            //    case FilterTypes.LongTermFilter:
-            //        _filter = go.AddComponent<LongTermFilterController>();
-            //        flag = true;
-            //        break;
-            //    case FilterTypes.ShortTermFilter:
-            //        _filter = go.AddComponent<ShortTermFilterController>();
-            //        flag = true;
-            //        break;
-            //    case FilterTypes.None:
-            //        _filter = null;
-            //        flag = false;
-            //        break;
-            //}
+            QuickLogger.Debug($"// ================ {save.FilterTechType.ToString()} ============================= //");
 
-            //if (!flag) return;
-            //_filter.MaxTime = save.RemaingTime;
-            //QuickLogger.Debug($"// ============================== FMT{_filter.MaxTime} || SMT{save.RemaingTime} ============================== //");
-            //_filter.FilterState = save.FilterState;
-            //_filter.Initialize(true);
-            ////_filter.SetRemainingTime();
-            //_filter.StartTimer();
-            go.GetComponent<PrefabIdentifier>().Id = save.FilterID;
+            _idFromSave = save.FilterID;
+            _fromSave = true;
+
             var newInventoryItem = new InventoryItem(go.GetComponent<Pickupable>().Pickup(false));
             _filterContainer.UnsafeAdd(newInventoryItem);
         }
@@ -307,6 +283,20 @@ namespace ARS_SeaBreezeFCS32.Model
         {
             if (_filter == null) return TechType.None;
             return _filterTechType;
+        }
+
+        internal void StartTimer()
+        {
+            if (_filter == null) return;
+            _filter.StartTimer();
+            QuickLogger.Debug("Timer Started", true);
+        }
+
+        internal void StopTimer()
+        {
+            if (_filter == null) return;
+            _filter.StopTimer();
+            QuickLogger.Debug("Timer Stopped", true);
         }
     }
 }

@@ -4,7 +4,6 @@ using FCSCommon.Enums;
 using FCSCommon.Helpers;
 using FCSCommon.Objects;
 using FCSCommon.Utilities;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,6 +36,8 @@ namespace ARS_SeaBreezeFCS32.Mono
         private readonly float BOOTING_ANIMATION_TIME = 6f;
         private readonly float WELCOME_SCREEN_TIME = 2f;
         private readonly Dictionary<TechType, int> TrackedItems = new Dictionary<TechType, int>();
+        private bool _completeSetup;
+
         #endregion
 
         #region Internal Methods    
@@ -47,6 +48,7 @@ namespace ARS_SeaBreezeFCS32.Mono
             if (FindAllComponents() == false)
             {
                 QuickLogger.Error("// ============== Error getting all Components ============== //");
+                QuickLogger.Debug("Turning off display from find components", true);
                 PowerOffDisplay();
                 return;
             }
@@ -55,9 +57,38 @@ namespace ARS_SeaBreezeFCS32.Mono
 
             _pageStateHash = UnityEngine.Animator.StringToHash("PageState");
 
-            StartCoroutine(PowerOn());
+            _mono.PowerManager.OnPowerOutage += OnPowerOutage;
+            _mono.PowerManager.OnPowerResume += OnPowerResume;
+
+            StartCoroutine(CompleteSetup());
 
             DrawPage(1);
+
+            InvokeRepeating("UpdateScreenState", 1, 0.5f);
+        }
+
+        private void OnPowerResume()
+        {
+            QuickLogger.Debug("Power Restored", true);
+            if (_mono.PowerManager.GetHasBreakerTripped()) return;
+            StartCoroutine(CompleteSetup());
+        }
+
+        private void OnPowerOutage()
+        {
+            QuickLogger.Debug("Power Outage", true);
+            ShutDownDisplay();
+        }
+
+        private void UpdateScreenState()
+        {
+            if (!_mono.PowerManager.GetHasBreakerTripped() || !_mono.PowerManager.GetIsPowerAvailable()) return;
+            PowerOffDisplay();
+        }
+
+        internal void UpdateTimer(string time)
+        {
+            _filterLBL.text = $"Filter Change in: {time}";
         }
         #endregion
 
@@ -80,12 +111,16 @@ namespace ARS_SeaBreezeFCS32.Mono
             {
                 case "PPBtn":
                     _mono.PowerManager.TogglePower();
-                    StartCoroutine(PowerOn());
+                    //_mono.UpdateFridgeCooler();
+                    _mono.ResetOnInterceButton();
+                    StartCoroutine(CompleteSetup());
                     break;
 
                 case "HPPBtn":
                     _mono.PowerManager.TogglePower();
-                    StartCoroutine(PowerOff());
+                    // _mono.UpdateFridgeCooler();
+                    _mono.ResetOnInterceButton();
+                    PowerOffDisplay();
                     break;
 
                 case "FilterBtn":
@@ -363,33 +398,32 @@ namespace ARS_SeaBreezeFCS32.Mono
         public override IEnumerator PowerOff()
         {
             yield return new WaitForEndOfFrame();
-            _mono.AnimationManager.SetFloatHash(_pageStateHash, 4);
+            _mono.AnimationManager.SetIntHash(_pageStateHash, 3);
             yield return new WaitForEndOfFrame();
         }
 
         public override IEnumerator PowerOn()
         {
-            QuickLogger.Debug("In Power On", true);
+            // QuickLogger.Debug("In Power On", true);
             yield return new WaitForEndOfFrame();
-            _mono.AnimationManager.SetIntHash(_pageStateHash, 1);
-            yield return new WaitForSeconds(BOOTING_ANIMATION_TIME);
             _mono.AnimationManager.SetIntHash(_pageStateHash, 2);
-            yield return new WaitForSeconds(WELCOME_SCREEN_TIME);
-            _mono.AnimationManager.SetIntHash(_pageStateHash, 3);
             yield return new WaitForEndOfFrame();
-            QuickLogger.Debug("In Power On Done", true);
         }
 
         public override IEnumerator ShutDown()
         {
+            //QuickLogger.Debug("In Shut Down", true);
             yield return new WaitForEndOfFrame();
-            _mono.AnimationManager.SetFloatHash(_pageStateHash, 0);
+            _mono.AnimationManager.SetIntHash(_pageStateHash, 0);
             yield return new WaitForEndOfFrame();
         }
 
         public override IEnumerator CompleteSetup()
         {
-            throw new NotImplementedException();
+            QuickLogger.Debug("In Complete Setup", true);
+            yield return new WaitForEndOfFrame();
+            _mono.AnimationManager.SetIntHash(_pageStateHash, 1);
+            _completeSetup = true;
         }
         #endregion
 
@@ -420,10 +454,5 @@ namespace ARS_SeaBreezeFCS32.Mono
             icon.sprite = SpriteManager.Get(type);
         }
         #endregion
-
-        internal void UpdateTimer(string time)
-        {
-            _filterLBL.text = $"Filter Change in: {time}";
-        }
     }
 }

@@ -7,7 +7,7 @@ namespace FCSAIPowerCellSocket.Mono
     {
         public void OnHandClick(GUIHand hand)
         {
-            if (Player.main == null) return;
+            if (Player.main == null || !IsConstructed) return;
             OpenStorage();
         }
 

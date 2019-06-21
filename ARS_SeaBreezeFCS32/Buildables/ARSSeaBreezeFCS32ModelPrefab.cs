@@ -78,6 +78,8 @@ namespace ARS_SeaBreezeFCS32.Buildables
             MaterialHelpers.ApplyNormalShader("FCS_SUBMods_GlobalDecals", "FCS_SUBMods_GlobalDecals_Norm", prefab, QPatch.GlobalBundle);
             #endregion
 
+            MaterialHelpers.ApplyNormalShader("SeaBreezeFCS32_BaseColor", "SeaBreezeFCS32_Norm", prefab, QPatch.GlobalBundle);
+
         }
     }
 }

@@ -18,12 +18,14 @@ namespace FCSTechWorkBench.Mono
 
         public override void StartTimer()
         {
+            if (RunTimer) return;
             RunTimer = true;
             QuickLogger.Debug($"RunTimer was Set to {RunTimer}", true);
         }
 
         public override void StopTimer()
         {
+            if (!RunTimer) return;
             RunTimer = false;
             QuickLogger.Debug($"Runtimer was Set to {RunTimer}", true);
         }

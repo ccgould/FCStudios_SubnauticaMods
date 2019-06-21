@@ -1,16 +1,10 @@
 ﻿using FCSCommon.Objects;
-using SMLHelper.V2.Assets;
 using System.Collections.Generic;
 
 namespace ARS_SeaBreezeFCS32.Model
 {
     internal static class ARSolutionsSeabreezeConfiguration
     {
-        public static Dictionary<TechType, ModPrefab> AllowedFilters { get; set; } = new Dictionary<TechType, ModPrefab>
-        {
-
-        };
-
         internal static Dictionary<TechType, EatableEntities> EatableEntities { get; set; } = new Dictionary<TechType, EatableEntities>
         {
             {

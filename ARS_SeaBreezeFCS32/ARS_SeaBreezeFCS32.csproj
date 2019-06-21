@@ -68,6 +68,8 @@
     <Compile Include="Display\ItemButton.cs" />
     <Compile Include="Display\OnScreenButton.cs" />
     <Compile Include="Display\PaginatorButton.cs" />
+    <Compile Include="Enum\FridgeCoolingState.cs" />
+    <Compile Include="Helpers\TechTypeHelper.cs" />
     <Compile Include="Interfaces\IFridgeContainer.cs" />
     <Compile Include="Model\ARSolutionsSeabreezeConfiguration.cs" />
     <Compile Include="Model\ARSolutionsSeaBreezeContainer.cs" />
