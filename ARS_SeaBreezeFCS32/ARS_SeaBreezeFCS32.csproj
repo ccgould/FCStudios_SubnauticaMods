@@ -81,6 +81,7 @@
     <Compile Include="Mono\ARSolutionsSeaBreezeDisplay.cs" />
     <Compile Include="Mono\ARSolutionsSeaBreezePlayerInteraction.cs" />
     <Compile Include="Mono\ARSolutionsSeaBreezePowerManager.cs" />
+    <Compile Include="Patches\uGUI_Patches.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

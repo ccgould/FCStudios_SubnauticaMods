@@ -7,6 +7,7 @@ using SMLHelper.V2.Utility;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using UnityEngine;
 
 namespace ARS_SeaBreezeFCS32.Model
 {
@@ -21,6 +22,10 @@ namespace ARS_SeaBreezeFCS32.Model
         private static string SaveFile => Path.Combine(SaveDirectory, "FilterGlobal.json");
 
         private static List<FilterSaveData> _globalFilters = new List<FilterSaveData>();
+        private static Dictionary<InventoryItem, uGUI_ItemIcon> _slotMapping;
+        private const float TextDelayInterval = 1.4f;
+        private static float textDelay = TextDelayInterval;
+
 
         /// <summary>
         /// Adds a new filter to the global list for tracking
@@ -106,6 +111,60 @@ namespace ARS_SeaBreezeFCS32.Model
             _globalFilters = JsonConvert.DeserializeObject<List<FilterSaveData>>(savedDataJson);
 
             QuickLogger.Debug($"Global Filters Count: {_globalFilters.Count}");
+        }
+
+        internal static void ConnectToContainer(Dictionary<InventoryItem, uGUI_ItemIcon> lookup)
+        {
+            _slotMapping = lookup;
+
+            //RodsContainer.onAddItem += OnAddItemLate;
+
+            foreach (KeyValuePair<InventoryItem, uGUI_ItemIcon> pair in lookup)
+            {
+                InventoryItem item = pair.Key;
+                uGUI_ItemIcon icon = pair.Value;
+
+                AddDisplayText(item, icon);
+            }
+
+            UpdateDisplayText(true);
+        }
+
+        private static void UpdateDisplayText(bool force)
+        {
+            if (!force)
+            {
+                if (Time.time < textDelay)
+                    return; // Slow down the text update
+
+                textDelay = Time.time + TextDelayInterval;
+            }
+
+            for (int i = 0; i < _globalFilters.Count; i++)
+            {
+                var item = _globalFilters[i];
+
+                if (item == null)
+                {
+                    QuickLogger.Error("Global Filter Item Returned null");
+                    return;
+                }
+
+                var wFilter = item.WFilter;
+                if (wFilter == null)
+                    continue;
+                QuickLogger.Debug($"Updating Icon {item.FilterType}", true);
+                wFilter.InfoDisplay.text = item.Filter.FilterState.ToString();
+                wFilter.InfoDisplay.color = Color.yellow;
+            }
+        }
+
+        private static void AddDisplayText(InventoryItem item, uGUI_ItemIcon icon)
+        {
+            FilterSaveData slotData = _globalFilters.Find(rod => rod.Pickupable == item.item);
+
+            if (slotData != null)
+                slotData.WFilter.AddDisplayText(icon);
         }
     }
 }

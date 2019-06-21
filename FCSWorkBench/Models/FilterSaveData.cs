@@ -1,4 +1,5 @@
-﻿using FCSCommon.Enums;
+﻿using FCSCommon.Components;
+using FCSCommon.Enums;
 using FCSCommon.Utilities;
 using FCSTechWorkBench.Mono;
 using Oculus.Newtonsoft.Json;
@@ -35,7 +36,8 @@ namespace FCSTechWorkBench.Models
         /// The Filter Object
         /// </summary>
         [JsonIgnore] public Filter Filter { get; set; }
-
+        [JsonIgnore] public WorkBenchFilter WFilter { get; set; }
+        [JsonIgnore] public Pickupable Pickupable { get; set; }
         public TechType TechType { get; set; }
 
         /// <summary>
@@ -86,6 +88,10 @@ namespace FCSTechWorkBench.Models
                 QuickLogger.Error("GameObject is null");
                 return null;
             }
+
+            WFilter = go.GetComponent<WorkBenchFilter>();
+
+            Pickupable = go.GetComponent<Pickupable>();
 
             switch (filterSave.FilterType)
             {
