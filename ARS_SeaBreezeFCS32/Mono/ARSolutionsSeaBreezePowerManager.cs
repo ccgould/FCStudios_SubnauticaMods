@@ -130,5 +130,10 @@ namespace ARS_SeaBreezeFCS32.Mono
         {
             return _connectedRelay != null && IsPowerAvailable;
         }
+
+        private void OnDestroy()
+        {
+
+        }
     }
 }

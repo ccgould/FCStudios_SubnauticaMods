@@ -24,14 +24,10 @@ namespace FCSTechWorkBench
             {
                 GetPrefabs();
 
-                var longTermFilter = new LongTermFilterBuildable();
-                longTermFilter.Register();
+                var freon = new FreonBuildable();
+                freon.Register();
 
-                var shortTermFilter = new ShortTermFilterBuildable();
-                shortTermFilter.Register();
-
-                FCSTechWorkBenchBuildable.ItemsList.Add(shortTermFilter);
-                FCSTechWorkBenchBuildable.ItemsList.Add(longTermFilter);
+                FCSTechWorkBenchBuildable.ItemsList.Add(freon);
 
                 FCSTechWorkBenchBuildable.PatchHelper();
 

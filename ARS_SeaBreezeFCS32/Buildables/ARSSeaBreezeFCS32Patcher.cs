@@ -17,8 +17,9 @@ namespace ARS_SeaBreezeFCS32.Buildables
         public override TechCategory CategoryForPDA { get; } = TechCategory.InteriorModule;
         public override string AssetsFolder { get; } = $"FCS_ARSSeaBreeze/Assets";
 
-        public ARSSeaBreezeFCS32Buildable() : base("ARSSeaBreezeFCS32", "ARS Sea Breeze FCS32", " To be filles")
+        public ARSSeaBreezeFCS32Buildable() : base("ARSSeaBreezeFCS32", "ARS Sea Breeze FCS32", "Alterra Refrigeration Sea Breeze will keep your items fresh longer!")
         {
+            OnFinishedPatching += AdditionalPatching;
         }
 
         public static void PatchHelper()

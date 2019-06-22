@@ -1,20 +1,20 @@
-﻿using FCSCommon.Components;
-using FCSCommon.Enums;
-using FCSCommon.Utilities;
+﻿using FCSCommon.Utilities;
 using FCSTechWorkBench.Abstract_Classes;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
+using SMLHelper.V2.Utility;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace FCSTechWorkBench.Mono
 {
-    public partial class LongTermFilterBuildable : FCSTechWorkBenchItem
+    public partial class FreonBuildable : FCSTechWorkBenchItem
     {
         private TechGroup GroupForPDA = TechGroup.Resources;
-        private TechCategory CategoryForPDA = TechCategory.Electronics;
+        private TechCategory CategoryForPDA = TechCategory.AdvancedMaterials;
 
-        public LongTermFilterBuildable() : base("LongTermFilter_ARS", "Long Term Filter")
+
+        public FreonBuildable() : base("Freon_ARS", "Freon")
         {
 
         }
@@ -24,8 +24,7 @@ namespace FCSTechWorkBench.Mono
             GameObject prefab = GameObject.Instantiate<GameObject>(this._prefab);
             prefab.name = this.PrefabFileName;
 
-            var filter = prefab.AddComponent<WorkBenchFilter>();
-            filter.FilterType = FilterTypes.LongTermFilter;
+            var filter = prefab.AddComponent<Freon>();
             return prefab;
         }
 
@@ -37,11 +36,9 @@ namespace FCSTechWorkBench.Mono
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(TechType.FiberMesh, 1),
-                    new Ingredient(TechType.Bleach, 1),
-                    new Ingredient(TechType.Silicone, 1),
-                    new Ingredient(TechType.Aerogel, 1),
-                    new Ingredient(TechType.Gold, 1),
+                    new Ingredient(TechType.GasPod, 1),
+                    new Ingredient(TechType.AcidMushroom, 1),
+                    new Ingredient(TechType.Titanium, 1),
                 }
             };
             return customFabRecipe;
@@ -53,14 +50,16 @@ namespace FCSTechWorkBench.Mono
             {
                 if (this.IsRegistered == false)
                 {
+
+                    ClassID_I = this.ClassID;
+
                     //Create a new TechType
-                    this.TechType = TechTypeHandler.AddTechType(ClassID, PrefabFileName, "Long Term Filter gives you two weeks of SeaBreeze filtration on Planet 4546B.", new Atlas.Sprite(QPatch.Bundle.LoadAsset<Texture2D>($"AlterraLogo.png")));
+                    this.TechType = TechTypeHandler.AddTechType(ClassID, PrefabFileName, "Freon gives you two weeks of SeaBreeze cooling on Planet 4546B.", new Atlas.Sprite(ImageUtils.LoadTextureFromFile($"./QMods/FCSTechWorkBench/Assets/{ClassID}.png")));
 
                     CraftDataHandler.SetTechData(TechType, GetBlueprintRecipe());
 
                     CraftDataHandler.AddToGroup(this.GroupForPDA, this.CategoryForPDA, this.TechType);
 
-                    ClassID_I = this.ClassID;
 
                     QuickLogger.Debug($"Class Id = {ClassID_I}");
 

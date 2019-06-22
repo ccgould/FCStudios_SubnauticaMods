@@ -183,6 +183,10 @@ namespace ARS_SeaBreezeFCS32.Model
                 TechType.JellyPlant,
                 new EatableEntities{WaterValue = 4f, FoodValue = 5f, KDecayRate = 0f}
             },
+            {
+                TechType.CookedSpinefish,
+                new EatableEntities{WaterValue = 3f, FoodValue = 23f, KDecayRate = 0.015f}
+            },
 
         };
     }

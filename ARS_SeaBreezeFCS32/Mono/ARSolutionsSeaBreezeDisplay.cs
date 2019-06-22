@@ -88,7 +88,7 @@ namespace ARS_SeaBreezeFCS32.Mono
 
         internal void UpdateTimer(string time)
         {
-            _filterLBL.text = $"Filter Change in: {time}";
+            _filterLBL.text = $"{LanguageHelpers.GetLanguage(ARSSeaBreezeFCS32Buildable.TimeLeftMessageKey)}: {time}";
         }
         #endregion
 
@@ -221,7 +221,7 @@ namespace ARS_SeaBreezeFCS32.Mono
             filterrBTN.OnButtonClick = OnButtonClick;
             filterrBTN.ButtonMode = InterfaceButtonMode.Background;
             filterrBTN.BtnName = "FilterBtn";
-            filterrBTN.TextLineOne = "Open Filter Drive";
+            filterrBTN.TextLineOne = LanguageHelpers.GetLanguage(ARSSeaBreezeFCS32Buildable.OnFreonBTNHoverKey);
             filterrBTN.OnInterfaceButton = _mono.OnInterfaceButton;
             #endregion
 

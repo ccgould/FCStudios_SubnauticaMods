@@ -64,17 +64,12 @@
   <ItemGroup>
     <Compile Include="Abstract Classes\FCSTechWorkBenchItem.cs" />
     <Compile Include="Interfaces\IFCSTechWorkBenchItem.cs" />
-    <Compile Include="Models\FilterSaveData.cs" />
     <Compile Include="Models\Mod.cs" />
     <Compile Include="Mono\FCSTechWorkBenchModelPrefab.cs" />
-    <Compile Include="Mono\Filter.cs" />
+    <Compile Include="Mono\Freon.cs" />
     <Compile Include="Mono\FCSTechWorkBenchPatcher.cs" />
-    <Compile Include="Mono\ShortTermFilterController.cs" />
-    <Compile Include="Mono\LongTermFilterController.cs" />
-    <Compile Include="Mono\ShortTermFilterModelPrefab.cs" />
-    <Compile Include="Mono\LongTermFilterModelPrefab.cs" />
-    <Compile Include="Mono\ShortTermFilterPatcher.cs" />
-    <Compile Include="Mono\LongTermFilterPatcher.cs" />
+    <Compile Include="Mono\FreonModelPrefab.cs" />
+    <Compile Include="Mono\FreonPatcher.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -1,19 +1,13 @@
-﻿using FCSCommon.Enums;
-using FCSCommon.Objects;
+﻿using FCSCommon.Objects;
 using System.Collections.Generic;
 
 namespace ARS_SeaBreezeFCS32.Model
 {
     internal class SaveData
     {
-        public string FilterID;
-        public float RemaingTime { get; set; }
+        public float RemainingTime { get; set; }
 
-        public FilterTypes FilterType { get; set; }
-
-        public FilterState FilterState { get; set; }
-
-        public TechType FilterTechType { get; set; }
+        public int FreonCount { get; set; }
 
         public IEnumerable<EatableEntities> FridgeContainer { get; set; }
 

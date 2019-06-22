@@ -1,4 +1,6 @@
-﻿using FCSCommon.Utilities;
+﻿using ARS_SeaBreezeFCS32.Buildables;
+using FCSCommon.Helpers;
+using FCSCommon.Utilities;
 
 namespace ARS_SeaBreezeFCS32.Mono
 {
@@ -23,7 +25,7 @@ namespace ARS_SeaBreezeFCS32.Mono
         {
             if (_onInterfaceButton) return;
             HandReticle main = HandReticle.main;
-            main.SetInteractText("Open Seabreeze");
+            main.SetInteractText(LanguageHelpers.GetLanguage(ARSSeaBreezeFCS32Buildable.OnSeabreezeHoverkey));
             main.SetIcon(HandReticle.IconType.Hand, 1f);
         }
 

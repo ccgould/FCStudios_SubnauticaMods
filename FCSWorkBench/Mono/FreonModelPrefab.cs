@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace FCSTechWorkBench.Mono
 {
-    public partial class ShortTermFilterBuildable
+    public partial class FreonBuildable
     {
         private GameObject _prefab;
 
@@ -13,7 +13,7 @@ namespace FCSTechWorkBench.Mono
             QuickLogger.Debug($"AssetBundle Set");
 
             //We have found the asset bundle and now we are going to continue by looking for the model.
-            _prefab = QPatch.Bundle.LoadAsset<GameObject>("ShortTerm_Filter");
+            _prefab = QPatch.Bundle.LoadAsset<GameObject>("Freon_Bottle");
 
             //If the prefab isn't null lets add the shader to the materials
             if (_prefab != null)
@@ -49,6 +49,10 @@ namespace FCSTechWorkBench.Mono
             MaterialHelpers.ApplyAlphaShader("FCS_SUBMods_GlobalDecals", prefab);
             MaterialHelpers.ApplyNormalShader("FCS_SUBMods_GlobalDecals", "FCS_SUBMods_GlobalDecals_Norm", prefab, QPatch.Bundle);
             #endregion
+
+            MaterialHelpers.ApplyNormalShader("Freon_Bottle", "Freon_Freon_Bottle_Normal", prefab, QPatch.Bundle);
+            MaterialHelpers.ApplySpecShader("Freon_Bottle", "Freon_Freon_Bottle_Specular", prefab, 1f, 4f, QPatch.Bundle);
+
         }
 
     }

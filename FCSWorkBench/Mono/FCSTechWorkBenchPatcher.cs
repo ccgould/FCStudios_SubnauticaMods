@@ -4,6 +4,7 @@ using FCSTechWorkBench.Interfaces;
 using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
+using SMLHelper.V2.Utility;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
@@ -47,7 +48,7 @@ namespace FCSTechWorkBench.Mono
                 if (item.ClassID_I.EndsWith("_ARS"))
                 {
                     QuickLogger.Debug($"Added {item.ClassID_I} to nodes");
-                    AddTabNodes(ref root, ref itemTab, item, "ARSolutions", "AlterraLogo");
+                    AddTabNodes(ref root, ref itemTab, item, "ARSolutions", "ARSIcon");
                 }
             }
         }
@@ -101,7 +102,7 @@ namespace FCSTechWorkBench.Mono
             if (root.GetNode($"{category}") == null)
             {
                 QuickLogger.Debug($"{category} is null creating tab");
-                itemTab = root.AddTabNode($"{category}", $"FCS Work Bench {category}", new Atlas.Sprite(QPatch.Bundle.LoadAsset<Texture2D>($"{icon}.png")));
+                itemTab = root.AddTabNode($"{category}", $"FCS Work Bench {category}", new Atlas.Sprite(ImageUtils.LoadTextureFromFile($"./QMods/FCSTechWorkBench/Assets/{icon}.png")));
                 itemTab?.AddCraftingNode(fcsTechWorkBenchItem.TechTypeID);
                 QuickLogger.Debug($"{category} node tab Created");
             }

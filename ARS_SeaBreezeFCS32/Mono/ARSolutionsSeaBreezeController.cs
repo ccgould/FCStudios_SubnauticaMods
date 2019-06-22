@@ -1,14 +1,14 @@
 ﻿using ARS_SeaBreezeFCS32.Interfaces;
 using ARS_SeaBreezeFCS32.Model;
-using FCSCommon.Enums;
+using FCSCommon.Converters;
 using FCSCommon.Extensions;
 using FCSCommon.Objects;
 using FCSCommon.Utilities;
 using Oculus.Newtonsoft.Json;
 using SMLHelper.V2.Utility;
-using System;
 using System.Collections.Generic;
 using System.IO;
+using UnityEngine;
 
 namespace ARS_SeaBreezeFCS32.Mono
 {
@@ -21,9 +21,11 @@ namespace ARS_SeaBreezeFCS32.Mono
         private readonly string _saveDirectory = Path.Combine(SaveUtils.GetCurrentSaveDataDir(), "ARSSeaBreezeFCS32");
         private string SaveFile => Path.Combine(_saveDirectory, PrefabId.Id + ".json");
         private ARSolutionsSeaBreezeContainer _fridgeContainer;
-        private ARSolutionsSeaBreezeFilterContainer _filterContainer;
+        private ARSolutionsSeaBreezeFreonContainer _freonContainer;
         private bool _deconstructionAllowed = true;
         private ARSolutionsSeaBreezeDisplay _display;
+        private float _maxTime;
+        private float currentTime;
         #endregion
 
         #region Public Properties
@@ -50,8 +52,10 @@ namespace ARS_SeaBreezeFCS32.Mono
         internal ARSolutionsSeaBreezePowerManager PowerManager { get; private set; }
         internal ARSolutionsSeaBreezeAnimationManager AnimationManager { get; private set; }
 
-        internal Action OnMonoUpdate;
-        private FilterState _prevFilterState;
+        private string _currentTimeHMS { get; set; }
+        internal bool CoolantIsDone => currentTime <= 0;
+        private bool _runTimer;
+        private bool _doOnce;
 
         #endregion
 
@@ -84,9 +88,9 @@ namespace ARS_SeaBreezeFCS32.Mono
             }
 
             _fridgeContainer = new ARSolutionsSeaBreezeContainer(this);
-            _filterContainer = new ARSolutionsSeaBreezeFilterContainer(this);
-            _filterContainer.OnPDAClosedAction += OnPdaClosedAction;
-            _filterContainer.OnPDAOpenedAction += OnPdaOpenedAction;
+            _freonContainer = new ARSolutionsSeaBreezeFreonContainer(this);
+            _freonContainer.OnPDAClosedAction += OnPdaClosedAction;
+            _freonContainer.OnPDAOpenedAction += OnPdaOpenedAction;
 
             AnimationManager = GetComponentInParent<ARSolutionsSeaBreezeAnimationManager>();
             if (AnimationManager == null)
@@ -96,24 +100,28 @@ namespace ARS_SeaBreezeFCS32.Mono
 
             InvokeRepeating("UpdateFridgeCooler", 1, 0.5f);
         }
-
-        private void OnPowerResume()
-        {
-            //QuickLogger.Debug("In OnPowerResume", true);
-            //UpdateFridgeCooler();
-        }
-
-        private void OnPowerOutage()
-        {
-            //QuickLogger.Debug("In OnPowerOutage", true);
-            //UpdateFridgeCooler();
-        }
-
         private void Update()
         {
-            OnMonoUpdate?.Invoke();
+            if (!Mathf.Approximately(currentTime, 0))
+            {
+                UpdateTimer();
+                UpdateDisplayTimer(_currentTimeHMS);
+            }
+            else
+            {
+                if (_freonContainer.CheckIfFreonAvailable()) return;
+                QuickLogger.Debug("Setting timer to zero", true);
+                UpdateDisplayTimer(TimeConverters.SecondsToHMS(0));
+            }
         }
 
+        private void OnDestroy()
+        {
+            PowerManager.OnPowerOutage -= OnPowerOutage;
+            PowerManager.OnPowerResume -= OnPowerResume;
+            _freonContainer.OnPDAClosedAction -= OnPdaClosedAction;
+            _freonContainer.OnPDAOpenedAction -= OnPdaOpenedAction;
+        }
         #endregion
 
         #region Internal Methods
@@ -122,6 +130,34 @@ namespace ARS_SeaBreezeFCS32.Mono
             if (_display == null) return;
             _display.UpdateTimer(filterRemainingTime);
         }
+
+        internal void StartTimer()
+        {
+            _runTimer = true;
+        }
+
+        internal void StopTimer()
+        {
+            _runTimer = false;
+        }
+
+        internal void ResetTime()
+        {
+            currentTime = _maxTime;
+        }
+
+        internal void SetMaxTime(float time)
+        {
+            _maxTime = time;
+        }
+
+        internal void InitializeTimer(float freonTime)
+        {
+            SetMaxTime(freonTime);
+            ResetTime();
+            StartTimer();
+        }
+
         #endregion
 
         #region Public Methods  
@@ -170,7 +206,7 @@ namespace ARS_SeaBreezeFCS32.Mono
         /// </summary>
         public void OpenFilterContainer()
         {
-            _filterContainer.OpenStorage();
+            _freonContainer.OpenStorage();
         }
 
         /// <summary>
@@ -186,32 +222,61 @@ namespace ARS_SeaBreezeFCS32.Mono
         #region Private Methods
         private void OnPdaOpenedAction()
         {
-            AnimationManager.ToggleDriveState();
+            //Disabled because filters where removed from the mod
+            //AnimationManager.ToggleDriveState();
         }
 
         internal void UpdateFridgeCooler()
         {
-            if (_filterContainer == null) return;
+            if (_freonContainer == null) return;
 
-            QuickLogger.Debug($"GOS {_filterContainer.GetOpenState()} || GIPA {PowerManager.GetIsPowerAvailable()} || GFS {_filterContainer.GetFilterState().ToString()}");
+            //QuickLogger.Debug($"GOS {_freonContainer.GetOpenState()} || GIPA {PowerManager.GetIsPowerAvailable()} || CID {CoolantIsDone}");
 
-            if (!_filterContainer.GetOpenState() &&
-                PowerManager.GetIsPowerAvailable() &&
-                _filterContainer.GetFilterState() == FilterState.Filtering &&
-                !PowerManager.GetHasBreakerTripped())
+            if (!_freonContainer.GetOpenState() && PowerManager.GetIsPowerAvailable() &&
+                !PowerManager.GetHasBreakerTripped() && !CoolantIsDone)
             {
                 _fridgeContainer.CoolItems();
-                _filterContainer.StartTimer();
+                StartTimer();
                 return;
             }
 
             _fridgeContainer.DecayItems();
-            _filterContainer.StopTimer();
+            StopTimer();
         }
 
         private void OnPdaClosedAction()
         {
-            AnimationManager.ToggleDriveState();
+            //Disabled because filters where removed from the mod
+            //AnimationManager.ToggleDriveState();
+        }
+
+        private void OnPowerResume()
+        {
+            //QuickLogger.Debug("In OnPowerResume", true);
+            //UpdateFridgeCooler();
+        }
+
+        private void OnPowerOutage()
+        {
+            //QuickLogger.Debug("In OnPowerOutage", true);
+            //UpdateFridgeCooler();
+        }
+
+        private void UpdateTimer()
+        {
+            if (!_runTimer) return;
+
+            if (currentTime > 0f)
+            {
+                currentTime -= DayNightCycle.main.deltaTime;
+                _currentTimeHMS = TimeConverters.SecondsToHMS(currentTime);
+            }
+            else if (currentTime <= 0f && !_doOnce)
+            {
+                _doOnce = true;
+                _currentTimeHMS = TimeConverters.SecondsToHMS(0);
+                currentTime = 0f;
+            }
         }
         #endregion
 
@@ -223,17 +288,12 @@ namespace ARS_SeaBreezeFCS32.Mono
             if (!Directory.Exists(_saveDirectory))
                 Directory.CreateDirectory(_saveDirectory);
 
-            FilterManager.SaveFilters();
-
             var saveData = new SaveData
             {
                 HasBreakerTripped = PowerManager.GetHasBreakerTripped(),
                 FridgeContainer = _fridgeContainer.GetSaveData(),
-                FilterState = _filterContainer.GetFilterState(),
-                FilterType = _filterContainer.GetFilterType(),
-                RemaingTime = _filterContainer.GetFilterTime(),
-                FilterTechType = _filterContainer.GetFilterTechType(),
-                FilterID = _filterContainer.GetFilterPrebID()
+                FreonCount = _freonContainer.GetFreonCount(),
+                RemainingTime = currentTime
             };
 
             var output = JsonConvert.SerializeObject(saveData, Formatting.Indented);
@@ -245,8 +305,6 @@ namespace ARS_SeaBreezeFCS32.Mono
         public void OnProtoDeserializeObjectTree(ProtobufSerializer serializer)
         {
             QuickLogger.Debug("// ****************************** Load Data *********************************** //");
-
-            FilterManager.LoadSave();
 
             if (PrefabId != null)
             {
@@ -260,8 +318,9 @@ namespace ARS_SeaBreezeFCS32.Mono
                     //LoadData
                     savedData = JsonConvert.DeserializeObject<SaveData>(savedDataJson);
                     _fridgeContainer.LoadFoodItems(savedData.FridgeContainer);
-                    _filterContainer.LoadFilter(savedData);
+                    currentTime = savedData.RemainingTime;
                     PowerManager.SetHasBreakerTripped(savedData.HasBreakerTripped);
+                    _freonContainer.LoadFreon(savedData);
                 }
             }
             else
