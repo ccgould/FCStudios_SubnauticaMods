@@ -1,13 +1,13 @@
 ﻿using FCSCommon.Utilities;
+using FCSCommon.Utilities.Enums;
 using FCSPowerStorage.Model.Components;
-using FCSPowerStorage.Utilities.Enums;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace FCSPowerStorage.Helpers
 {
-    public static class ColorChanger
+    internal static class ColorChanger
     {
         //public static Color MainBodyColor { get; set; } = new Color(0.8359375f, 0.8359375f, 0.8359375f);
 

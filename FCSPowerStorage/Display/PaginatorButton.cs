@@ -1,21 +1,27 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace FCSPowerStorage.Model.Components
+namespace FCSPowerStorage.Display
 {
-    public class PaginatorButton : OnScreenButton, IPointerEnterHandler, IPointerClickHandler, IPointerExitHandler
+    internal class PaginatorButton : OnScreenButton, IPointerEnterHandler, IPointerClickHandler, IPointerExitHandler
     {
 
         private static readonly Color HOVER_COLOR = new Color(0.07f, 0.38f, 0.7f, 1f);
         private static Color STARTING_COLOR = Color.white;
         public int AmountToChangePageBy { get; set; } = 1;
         private Image image;
+        public string HoverTextLineOne { get; set; }
+        public string HoverTextLineTwo { get; set; }
+        public Action<int> ChangePageBy;
 
         public void Start()
         {
             image = GetComponent<Image>();
             STARTING_COLOR = image.color;
+            TextLineOne = HoverTextLineOne;
+            TextLineTwo = HoverTextLineTwo;
         }
 
         public void OnEnable()
@@ -55,7 +61,7 @@ namespace FCSPowerStorage.Model.Components
             base.OnPointerClick(eventData);
             if (IsHovered)
             {
-                FcsPowerStorageDisplay.ChangePageBy(AmountToChangePageBy);
+                ChangePageBy?.Invoke(AmountToChangePageBy);
             }
         }
     }

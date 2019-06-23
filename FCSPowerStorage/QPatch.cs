@@ -1,4 +1,5 @@
 ﻿using FCSCommon.Utilities;
+using FCSPowerStorage.Buildables;
 using System;
 using Utilites.Logger;
 
@@ -20,7 +21,7 @@ namespace FCSPowerStorage
             QuickLogger.DebugLogsEnabled = true;
             QuickLogger.Debug("Debug logs enabled");
 #endif
-                LoadItems.Patch();
+                FCSPowerStorageBuildable.PatchHelper();
             }
             catch (Exception e)
             {

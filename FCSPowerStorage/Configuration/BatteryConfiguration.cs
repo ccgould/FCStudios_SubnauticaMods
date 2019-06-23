@@ -27,7 +27,6 @@ namespace FCSPowerStorage.Configuration
         /// </summary>
         public List<IngredientItem> Ingredients { get; set; } = new List<IngredientItem>();
 
-
         public bool ValidateData()
         {
             foreach (var ingredient in Ingredients)

@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace FCSPowerStorage
 {
-    public class LoadItems : MonoBehaviour
+    public class LoadData : MonoBehaviour
     {
         // Harmony stuff
         internal static HarmonyInstance HarmonyInstance = null;

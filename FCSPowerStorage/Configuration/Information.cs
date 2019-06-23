@@ -25,6 +25,7 @@ namespace FCSPowerStorage.Configuration
 
         public static string LANGUAGEDIRECTORY => GetLanguagePath();
 
+        public const string PrefrabName = "Power_Storage";
         private static string GetQModsPath()
         {
             return Path.Combine(Environment.CurrentDirectory, "QMods");

@@ -1,19 +1,23 @@
-﻿using FCSPowerStorage.Helpers;
+﻿using FCSCommon.Utilities;
+using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace FCSPowerStorage.Model.Components
+namespace FCSPowerStorage.Display
 {
     /// <summary>
     /// This class handles operations for the color picker
     /// </summary>
-    public class ColorItemButton : OnScreenButton, IPointerEnterHandler, IPointerClickHandler, IPointerExitHandler
+    internal class ColorItemButton : OnScreenButton, IPointerEnterHandler, IPointerClickHandler, IPointerExitHandler
     {
         #region Public Properties
         /// <summary>
         /// The color value for the color picker button. This is used to change the color of the button and for the base color
         /// </summary>
         public Color Color { get; set; }
+        public string BtnName { get; set; }
+
+        public Action<string, object> OnButtonClick;
         #endregion
 
         #region Overrides
@@ -26,7 +30,9 @@ namespace FCSPowerStorage.Model.Components
 
         public override void OnPointerExit(PointerEventData eventData)
         {
+
             base.OnPointerExit(eventData);
+
             transform.gameObject.FindChild("Hover").SetActive(false);
 
         }
@@ -34,7 +40,12 @@ namespace FCSPowerStorage.Model.Components
         public override void OnPointerClick(PointerEventData eventData)
         {
             base.OnPointerClick(eventData);
-            ColorChanger.ChangeBodyColor(transform.parent.parent.parent.parent.parent.gameObject, FcsPowerStorageDisplay, Color);
+
+            if (this.IsHovered)
+            {
+                QuickLogger.Debug($"Clicked Button: {this.BtnName}", true);
+                OnButtonClick?.Invoke(this.BtnName, Color);
+            }
         }
         #endregion
     }

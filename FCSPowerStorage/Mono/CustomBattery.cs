@@ -32,7 +32,7 @@ namespace FCSPowerStorage.Model
         /// <param name="classId">The ID for the battery</param>
         /// <param name="prefabFileName">The name of the Prefab</param>
         /// <param name="techType">The TechType of the prefab</param>
-        public CustomBattery(string classId, string prefabFileName) : base(classId, prefabFileName, LoadItems.ModStrings.Description)
+        public CustomBattery(string classId, string prefabFileName) : base(classId, prefabFileName, LoadData.ModStrings.Description)
         {
             _fcsBatteryId = classId;
 
@@ -160,7 +160,7 @@ namespace FCSPowerStorage.Model
             var customFabRecipe = new TechData()
             {
                 craftAmount = 1,
-                Ingredients = LoadItems.BatteryConfiguration.ConvertToIngredients().ToList()
+                Ingredients = LoadData.BatteryConfiguration.ConvertToIngredients().ToList()
             };
             QuickLogger.Debug("Created Ingredients for FCS Power Storage");
             return customFabRecipe;
