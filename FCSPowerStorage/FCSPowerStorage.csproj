@@ -86,27 +86,23 @@
     <Compile Include="Configuration\IngredientItem.cs" />
     <Compile Include="Configuration\ModStrings.cs" />
     <Compile Include="Configuration\SaveData.cs" />
-    <Compile Include="Helpers\AssetHelper.cs" />
     <Compile Include="Configuration\BatteryConfiguration.cs" />
-    <Compile Include="Helpers\ColorChanger.cs" />
     <Compile Include="Helpers\Extensions.cs" />
     <Compile Include="Helpers\ItemHelpers.cs" />
-    <Compile Include="Helpers\Utilities.cs" />
     <Compile Include="LoadData.cs" />
     <Compile Include="Display\ColorItemButton.cs" />
     <Compile Include="Managers\FCSPowerManager.cs" />
     <Compile Include="Managers\FCSPowerStorageAnimationManager.cs" />
+    <Compile Include="Managers\SystemLightManager.cs" />
     <Compile Include="Models\PowercellModel.cs" />
     <Compile Include="Mono\FCSPowerStorageDisplay.cs" />
     <Compile Include="Display\InterfaceButton.cs" />
     <Compile Include="Display\OnScreenButton.cs" />
     <Compile Include="Display\PaginatorButton.cs" />
-    <Compile Include="Mono\CustomBattery.cs" />
     <Compile Include="Mono\CustomBatteryController.cs" />
     <Compile Include="Buildables\FCSPowerStoragePatcher.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Utilities\Enums\PowerToggleStates.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />

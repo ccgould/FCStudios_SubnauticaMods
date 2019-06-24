@@ -28,6 +28,11 @@ namespace FCSCommon.Helpers
             return AssetBundle.LoadFromFile(Path.Combine(Path.Combine(Environment.CurrentDirectory, "QMods"), Path.Combine(modName, Path.Combine("Assets", modBundleName))));
         }
 
+        public static string GetModDirectory(string modName)
+        {
+            return Path.Combine(Path.Combine(Environment.CurrentDirectory, "QMods"), modName);
+        }
+
         public static string GetAssetFolder(string modName)
         {
             return Path.Combine(Path.Combine(Environment.CurrentDirectory, "QMods"), Path.Combine(modName, "Assets"));

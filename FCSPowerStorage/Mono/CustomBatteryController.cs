@@ -1,13 +1,11 @@
 ﻿using FCSCommon.Extensions;
+using FCSCommon.Helpers;
 using FCSCommon.Utilities;
-using FCSCommon.Utilities.Enums;
 using FCSPowerStorage.Configuration;
-using FCSPowerStorage.Helpers;
 using FCSPowerStorage.Managers;
 using FCSPowerStorage.Model.Components;
 using Oculus.Newtonsoft.Json;
-using System;
-using System.Collections;
+using SMLHelper.V2.Utility;
 using System.IO;
 using UnityEngine;
 
@@ -19,208 +17,95 @@ namespace FCSPowerStorage.Model
     internal class CustomBatteryController : MonoBehaviour, IProtoEventListener, IConstructable
     {
         #region Private Members
-        //TODO Remove
-        public GameObject seaBase { get; private set; }
-        private FCSPowerStorageDisplay fcsPowerStorageDisplay;
+        private PrefabIdentifier _prefabId;
+        private readonly string _saveDirectory = Path.Combine(SaveUtils.GetCurrentSaveDataDir(), "FCSPowerStorage");
+        private string SaveFile => Path.Combine(_saveDirectory, _prefabId.Id + ".json");
+
         #endregion
 
-        #region Public Properties
-        public bool IsBeingDeleted { get; set; }
-        public PowerToggleStates ChargeMode { get; set; }
-
-        public Color MainBodyColor { get; set; }
-        public string ID { get; set; }
-        public FCSPowerManager PowerManager { get; set; }
+        #region Internal Properties
+        internal bool IsBeingDeleted { get; set; }
+        internal FCSPowerManager PowerManager { get; set; }
+        internal int StateHash { get; private set; }
+        internal int ToggleHash { get; private set; }
         #endregion
 
         #region Private Members
         private bool _isEnabled;
         private Constructable _buildable;
-
         #endregion
 
         #region Unity Methods
 
         private void Awake()
         {
-            MainBodyColor = new Color(0.99609375f, 0.99609375f, 0.99609375f);
-            ID = GetComponentInParent<PrefabIdentifier>().Id;
-            _buildable = GetComponentInParent<Constructable>();
-
-            PowerManager = GetComponentInParent<FCSPowerManager>();
-
-            if (PowerManager == null)
-            {
-                QuickLogger.Error("Power Manager was not found.");
-            }
-            else
-            {
-                PowerManager.Initialize(this);
-            }
-
-            AnimationManager = GetComponentInParent<FCSPowerStorageAnimationManager>();
-
-            if (PowerManager == null)
-            {
-                QuickLogger.Error("Animation Manager was not found.");
-            }
-            else
-            {
-                PowerManager.Initialize(this);
-            }
+            ToggleHash = Animator.StringToHash("ToggleState");
+            StateHash = Animator.StringToHash("state");
+            SystemLightManager.Initialize(gameObject);
         }
 
         public FCSPowerStorageAnimationManager AnimationManager { get; set; }
         internal readonly int BatteryCount = 6;
+        private FCSPowerStorageDisplay _display;
+        private bool _initialized;
+        private Color _currentBodyColor;
 
-        #endregion
-
-        #region Private Methods
-
-        //private void UpdatePowerState()
-        //{
-
-        //    // If in charge mode and we are online turn the lights orange
-        //    if (HasBreakerTripped && ColorChanger.CurrentColor != ColorChanger.Red)
-        //    {
-        //        ColorChanger.ConfigureSystemLights(FCSPowerStates.Unpowered, transform.gameObject);
-        //        return;
-        //    }
-
-        //    if (Charge >= 1 && ChargeMode == PowerToggleStates.ChargeMode && ColorChanger.CurrentColor != ColorChanger.Orange && !HasBreakerTripped)
-        //    {
-        //        ColorChanger.ConfigureSystemLights(FCSPowerStates.Buffer, transform.gameObject);
-        //    }
-        //    // If in charge mode and we are online turn the lights orange
-        //    else if (Charge < 1 && ChargeMode == PowerToggleStates.ChargeMode && ColorChanger.CurrentColor != ColorChanger.Orange && !HasBreakerTripped)
-        //    {
-        //        ColorChanger.ConfigureSystemLights(FCSPowerStates.Buffer, transform.gameObject);
-        //    }
-        //    else if (Charge < 1 && _previousPowerState != FCSPowerStates.Unpowered)
-        //    {
-        //        _previousPowerState = FCSPowerStates.Unpowered;
-        //        ColorChanger.ConfigureSystemLights(FCSPowerStates.Unpowered, transform.gameObject);
-        //    }
-        //    else if (Charge >= 1 && _previousPowerState != FCSPowerStates.Powered)
-        //    {
-        //        _previousPowerState = FCSPowerStates.Powered;
-        //        ColorChanger.ConfigureSystemLights(FCSPowerStates.Powered, transform.gameObject);
-        //    }
-        //}
-
-        private void TurnDisplayOn()
-        {
-            try
-            {
-                if (IsBeingDeleted) return;
-
-                if (fcsPowerStorageDisplay != null)
-                {
-                    TurnDisplayOff();
-                }
-
-                fcsPowerStorageDisplay = gameObject.AddComponent<FCSPowerStorageDisplay>();
-                fcsPowerStorageDisplay.Setup(this);
-            }
-            catch (Exception e)
-            {
-                QuickLogger.Error($"Error in TurnDisplayOn Method: {e.Message} || {e.InnerException} || {e.Source}");
-            }
-        }
-
-        private void TurnDisplayOff()
-        {
-            if (IsBeingDeleted) return;
-
-            if (fcsPowerStorageDisplay != null)
-            {
-                fcsPowerStorageDisplay.TurnDisplayOff();
-                Destroy(fcsPowerStorageDisplay);
-                fcsPowerStorageDisplay = null;
-            }
-        }
-
-        private IEnumerator Startup()
-        {
-            if (IsBeingDeleted) yield break;
-            yield return new WaitForEndOfFrame();
-            if (IsBeingDeleted) yield break;
-
-            seaBase = gameObject?.transform?.parent?.gameObject;
-            if (seaBase == null)
-            {
-                ErrorMessage.AddMessage("[FCS Power Storage] ERROR: Can not work out what base it was placed inside.");
-                QuickLogger.Error("ERROR: Can not work out what base it was placed inside.");
-                yield break;
-            }
-
-            TurnDisplayOn();
-        }
         #endregion
 
         #region Inherited Public Methods
 
         public void OnProtoSerialize(ProtobufSerializer serializer)
         {
-            QuickLogger.Debug($"Get FCSPowerStorageDisplay");
+            QuickLogger.Debug($"Saving {_prefabId.Id} Data");
 
-            var activeDisplay = GetComponentInParent<FCSPowerStorageDisplay>();
+            if (!Directory.Exists(_saveDirectory))
+                Directory.CreateDirectory(_saveDirectory);
 
-            QuickLogger.Debug($"Found FCSPowerStorageDisplay");
-            SaveData saveData = null;
-
-            QuickLogger.Debug($"Create Save Data");
-
-            saveData = new SaveData
+            var saveData = new SaveData
             {
-                BodyColor = MainBodyColor.ColorToVector4()
+                BodyColor = _currentBodyColor.ColorToVector4(),
+                Batteries = PowerManager.Save(),
+                PowerState = PowerManager.GetPowerState(),
+                ChargeMode = PowerManager.GetChargeMode(),
+                ToggleMode = AnimationManager.GetIntHash(ToggleHash)
             };
 
-            QuickLogger.Debug($"Save Data Created");
-
-            var id = GetComponentInParent<PrefabIdentifier>();
-            if (id != null)
-            {
-                QuickLogger.Debug($"Loading FCS Power Storage {id.Id}");
-
-                string saveFolder = FilesHelper.GetSaveFolderPath();
-                if (!Directory.Exists(saveFolder))
-                    Directory.CreateDirectory(saveFolder);
-                //saveData
-                string output = JsonConvert.SerializeObject(saveData, Formatting.Indented);
-                File.WriteAllText(Path.Combine(saveFolder, "fcspowerstorage_" + id.Id + ".json"), output);
-                LoadData.CleanOldSaveData();
-            }
-            else
-            {
-                QuickLogger.Error("PrefabIdentifier is null");
-            }
+            var output = JsonConvert.SerializeObject(saveData, Formatting.Indented);
+            File.WriteAllText(SaveFile, output);
+            //LoadData.CleanOldSaveData();
+            QuickLogger.Debug($"Saved {_prefabId.Id} Data");
         }
 
         public void OnProtoDeserialize(ProtobufSerializer serializer)
         {
-            var id = GetComponentInParent<PrefabIdentifier>();
-            if (id != null)
-            {
-                QuickLogger.Debug($"Loading FCS Power Storage {id.Id}");
+            QuickLogger.Debug("// ****************************** Load Data *********************************** //");
 
-                string filePath = Path.Combine(FilesHelper.GetSaveFolderPath(), "fcspowerstorage_" + id.Id + ".json");
-                if (File.Exists(filePath))
+            if (_prefabId != null)
+            {
+                QuickLogger.Info($"Loading FCSPowerStorage {_prefabId.Id}");
+
+                if (File.Exists(SaveFile))
                 {
-                    string savedDataJson = File.ReadAllText(filePath).Trim();
+                    string savedDataJson = File.ReadAllText(SaveFile).Trim();
 
                     //LoadData
                     var savedData = JsonConvert.DeserializeObject<SaveData>(savedDataJson);
-                    MainBodyColor = savedData.BodyColor.Vector4ToColor();
-                    QuickLogger.Debug($"// =========================================================== {gameObject.name} =============================//");
-                    ColorChanger.ApplyMaterials(gameObject, MainBodyColor);
+                    SetCurrentBodyColor(savedData.BodyColor.Vector4ToColor());
+                    PowerManager.SetPowerState(savedData.PowerState);
+                    PowerManager.SetChargeMode(savedData.ChargeMode);
+                    PowerManager.LoadSave(savedData.Batteries);
+                    AnimationManager.SetIntHash(ToggleHash, savedData.ToggleMode);
+                }
+                else
+                {
+                    QuickLogger.Info($"No save file for {_prefabId.Id}");
                 }
             }
             else
             {
                 QuickLogger.Error("PrefabIdentifier is null");
             }
-
+            QuickLogger.Debug("// ****************************** Loaded Data *********************************** //");
         }
 
         public bool CanDeconstruct(out string reason)
@@ -237,54 +122,54 @@ namespace FCSPowerStorage.Model
 
             if (constructed)
             {
-                if (_isEnabled == false)
+                if (!_initialized)
                 {
-                    _isEnabled = true;
-                    StartCoroutine(Startup());
+                    Initialize();
                 }
-                else
-                {
-                    TurnDisplayOn();
-                }
+
+            }
+        }
+
+        private void Initialize()
+        {
+            SetCurrentBodyColor(new Color(0.99609375f, 0.99609375f, 0.99609375f));
+            _prefabId = GetComponentInParent<PrefabIdentifier>();
+            _buildable = GetComponentInParent<Constructable>();
+
+            PowerManager = gameObject.GetOrAddComponent<FCSPowerManager>();
+
+            if (PowerManager == null)
+            {
+                QuickLogger.Error("Power Manager was not found.");
             }
             else
             {
-                if (_isEnabled)
-                {
-                    TurnDisplayOff();
-                }
+                PowerManager.Initialize(this);
             }
 
+            AnimationManager = gameObject.GetOrAddComponent<FCSPowerStorageAnimationManager>();
+
+            if (AnimationManager == null)
+            {
+                QuickLogger.Error("Animation Manager was not found.");
+            }
+            else
+            {
+                AnimationManager.Initialize(this);
+            }
+
+            _display = gameObject.AddComponent<FCSPowerStorageDisplay>();
+            _display.Setup(this);
         }
+
         #endregion
 
-        #region Public Methods
-
-        /// <summary>
-        /// Turns off the battery
-        /// </summary>
-        internal void PowerOffBattery()
+        #region Internal Methods
+        internal void SetCurrentBodyColor(Color color)
         {
-            ColorChanger.ConfigureSystemLights(FCSPowerStates.Unpowered, transform.gameObject);
-
-            PowerManager.SetBreakerTrip(true);
-
-            PowerManager.StorePower();
+            _currentBodyColor = color;
+            MaterialHelpers.ChangeBodyColor("Power_Storage_StorageBaseColor_Albedo", color, gameObject);
         }
-
-        /// <summary>
-        /// Turns the battery on
-        /// </summary>
-        internal void PowerOnBattery()
-        {
-            if (ChargeMode == PowerToggleStates.ChargeMode)
-            {
-                ColorChanger.ConfigureSystemLights(FCSPowerStates.Buffer, transform.gameObject);
-            }
-
-            PowerManager.SetBreakerTrip(false);
-        }
-
         #endregion
 
     }

@@ -219,8 +219,6 @@ namespace AMMiniMedBay.Mono
             }
         }
 
-
-
         private void OnPlayerExit()
         {
             IsPlayerInTrigger = false;

@@ -1,7 +1,6 @@
 ﻿using FCSCommon.Utilities;
 using FCSPowerStorage.Configuration;
 using FCSPowerStorage.Helpers;
-using FCSPowerStorage.Managers;
 using FCSPowerStorage.Model;
 using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
@@ -18,7 +17,7 @@ namespace FCSPowerStorage.Buildables
         public override TechCategory CategoryForPDA { get; } = TechCategory.InteriorModule;
 
         private static readonly FCSPowerStorageBuildable Singleton = new FCSPowerStorageBuildable();
-        public FCSPowerStorageBuildable() : base(Information.ModName, "FCS Power Storage", LoadData.ModStrings.Description)
+        public FCSPowerStorageBuildable() : base(Information.ModName, "FCS Power Storage", Information.ModDescription)
         {
             OnFinishedPatching += AdditionalPatching;
         }
@@ -79,8 +78,6 @@ namespace FCSPowerStorage.Buildables
 
             QuickLogger.Debug("Add GameObject CustomBatteryController");
 
-            prefab.GetOrAddComponent<FCSPowerStorageAnimationManager>();
-
             prefab.GetOrAddComponent<CustomBatteryController>();
 
             QuickLogger.Debug("Made GameObject");
@@ -101,7 +98,5 @@ namespace FCSPowerStorage.Buildables
             QuickLogger.Debug("Created Ingredients for FCS Power Storage");
             return customFabRecipe;
         }
-
-
     }
 }

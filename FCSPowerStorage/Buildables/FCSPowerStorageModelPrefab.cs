@@ -8,7 +8,7 @@ namespace FCSPowerStorage.Buildables
     internal partial class FCSPowerStorageBuildable
     {
         private GameObject _prefab;
-        private AssetBundle _assetBundle;
+        internal static AssetBundle AssetBundle;
         public static GameObject ColorItemPefab { get; set; }
 
         public bool GetPrefabs()
@@ -23,7 +23,7 @@ namespace FCSPowerStorage.Buildables
                 return false;
             }
 
-            _assetBundle = assetBundle;
+            AssetBundle = assetBundle;
 
             QuickLogger.Debug($"AssetBundle Set");
 
@@ -84,7 +84,8 @@ namespace FCSPowerStorage.Buildables
             //MaterialHelpers.ApplyNormalShader("FCS_SUBMods_GlobalDecals", "FCS_SUBMods_GlobalDecals_Norm", prefab, _assetBundle);
             #endregion
 
-            MaterialHelpers.ApplyNormalShader("SeaBreezeFCS32_BaseColor", "SeaBreezeFCS32_Norm", prefab, _assetBundle);
+            MaterialHelpers.ApplySpecShader("Power_Storage_StorageBaseColor_Albedo", "Power_Storage_StorageBaseColor_MetallicSmoothness", prefab, 1, 8, AssetBundle);
+            MaterialHelpers.ApplySpecShader("Power_Storage_Details_Albedo", "Power_Storage_Details_MetallicSmoothness", prefab, 1, 6, AssetBundle);
 
         }
     }

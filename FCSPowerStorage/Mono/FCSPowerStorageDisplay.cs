@@ -28,13 +28,14 @@ namespace FCSPowerStorage.Model.Components
         private CustomBatteryController _mono;
         private List<SerializableColor> _serializedColors;
         private GameObject _batteryGrid;
-        private GameObject _batteryMonitorAmountLBL;
+        private Text _batteryMonitorAmountLbl;
         private GameObject _previousPageGameObject;
         private GameObject _nextPageGameObject;
         private GameObject _pageCounter;
         private Text _pageCounterText;
         private GameObject _colorPicker;
-        private int _stateHash;
+
+
 
         public override void ClearPage()
         {
@@ -48,7 +49,37 @@ namespace FCSPowerStorage.Model.Components
         {
             switch (btnName)
             {
+                case "HomeBTN":
+                    _mono.AnimationManager.SetIntHash(_mono.StateHash, 1);
+                    break;
 
+                case "SettingsBTN":
+                    _mono.AnimationManager.SetIntHash(_mono.StateHash, 2);
+                    break;
+
+                case "PowerBTN":
+                    var currentState = _mono.AnimationManager.GetIntHash(_mono.StateHash);
+                    _mono.PowerManager.SetPowerState(currentState == 4 ? FCSPowerStates.Powered : FCSPowerStates.Unpowered);
+                    break;
+
+                case "ColorPickerBTN":
+                    _mono.AnimationManager.SetIntHash(_mono.StateHash, 3);
+                    break;
+
+                case "TrickleModeBTN":
+                    _mono.PowerManager.SetChargeMode(PowerToggleStates.TrickleMode);
+                    _mono.AnimationManager.SetIntHash(_mono.ToggleHash, 1);
+                    break;
+
+                case "ChargeModeBTN":
+                    _mono.PowerManager.SetChargeMode(PowerToggleStates.ChargeMode);
+                    _mono.AnimationManager.SetIntHash(_mono.ToggleHash, 2);
+                    break;
+
+                case "ColorItem":
+                    var color = (Color)tag;
+                    _mono.SetCurrentBodyColor(color);
+                    break;
             }
         }
 
@@ -141,12 +172,7 @@ namespace FCSPowerStorage.Model.Components
                 return false;
             }
 
-            for (int i = 0; i < batteryMonitorPage.transform.childCount; i++)
-            {
-                var powercell = _mono.PowerManager.GetPowerCell(i);
-                powercell.SetMeter(batteryMonitorPage.transform.GetChild(i).gameObject);
-            }
-
+            QuickLogger.Info("Finding Meters");
             #endregion
 
             #region Battery Grid
@@ -155,6 +181,17 @@ namespace FCSPowerStorage.Model.Components
             {
                 QuickLogger.Error("Screen: BatteryMonitorPage not found.");
                 return false;
+            }
+
+            QuickLogger.Debug($"Meter Count {_batteryGrid.transform.childCount}");
+
+
+            for (int i = 0; i < _mono.BatteryCount; i++)
+            {
+                QuickLogger.Info($"Meter {i}");
+                var powercell = _mono.PowerManager.GetPowerCell(i);
+                QuickLogger.Debug($"Battery {powercell.GetName()}");
+                powercell.SetMeter(_batteryGrid.transform.GetChild(i).gameObject);
             }
             #endregion
 
@@ -176,11 +213,25 @@ namespace FCSPowerStorage.Model.Components
             }
             #endregion
 
+            // == Powered off Elements
+            #region PoweredOff LBL
+
+            var poweredOffLbl = powerOffPage.FindChild("Powered_Off_LBL").GetComponent<Text>();
+            if (poweredOffLbl == null)
+            {
+                QuickLogger.Error("Screen: Powered_Off_LBL  not found.");
+                return false;
+            }
+            poweredOffLbl.text = LanguageHelpers.GetLanguage(FCSPowerStorageBuildable.PoweredOffKey);
+
+            #endregion
+
+
             // == Battery MonitorPage Elements
 
             #region Battery Monitor Power Amount Label
-            _batteryMonitorAmountLBL = batteryMonitorPage.FindChild("Battery_Monitor_Amount_LBL")?.gameObject;
-            if (_batteryMonitorAmountLBL == null)
+            _batteryMonitorAmountLbl = batteryMonitorPage.FindChild("Battery_Monitor_Amount_LBL").GetComponent<Text>();
+            if (_batteryMonitorAmountLbl == null)
             {
                 QuickLogger.Error("Screen: Battery_Monitor_Amount_LBL not found.");
                 return false;
@@ -188,23 +239,27 @@ namespace FCSPowerStorage.Model.Components
             #endregion
 
             #region Battery Monitor Label
-            var batteryMonitorLbl = batteryMonitorPage.FindChild("Battery_Monitor_LBL")?.gameObject;
+
+            var batteryMonitorLbl = batteryMonitorPage.FindChild("Battery_Monitor_LBL").GetComponent<Text>();
             if (batteryMonitorLbl == null)
             {
                 QuickLogger.Error("Screen: Battery_Monitor_LBL not found.");
                 return false;
             }
+            batteryMonitorLbl.text = LanguageHelpers.GetLanguage(FCSPowerStorageBuildable.BatteryMetersKey);
+
             #endregion
             // == Boot Page Elements == //
 
             #region Booting LBL
 
-            var bootingLbl = bootingPage.FindChild("Booting_TXT")?.gameObject;
+            var bootingLbl = bootingPage.FindChild("Booting_TXT").GetComponent<Text>();
             if (bootingLbl == null)
             {
                 QuickLogger.Error("Screen: _bootingLBL  not found.");
                 return false;
             }
+            bootingLbl.text = LanguageHelpers.GetLanguage(FCSPowerStorageBuildable.BootingKey);
 
             #endregion
 
@@ -225,34 +280,37 @@ namespace FCSPowerStorage.Model.Components
 
             #region Color Picker LBL
 
-            var colorPickerLbl = colorPicker.FindChild("Label")?.gameObject;
+            var colorPickerLbl = colorPicker.FindChild("Label").GetComponent<Text>();
             if (colorPickerLbl == null)
             {
                 QuickLogger.Error("Screen: Color Picker Label not found.");
                 return false;
             }
+            colorPickerLbl.text = LanguageHelpers.GetLanguage(FCSPowerStorageBuildable.ColorPickerKey);
 
             #endregion
 
             #region Settings LBL
 
-            var settingsLbl = settingsScreen.FindChild("Setting_LBL")?.gameObject;
+            var settingsLbl = settingsScreen.FindChild("Setting_LBL").GetComponent<Text>();
             if (settingsLbl == null)
             {
                 QuickLogger.Error("Screen: Settings Page Label not found.");
                 return false;
             }
+            settingsLbl.text = LanguageHelpers.GetLanguage(FCSPowerStorageBuildable.SettingsKey);
 
             #endregion
 
-            #region Storage Mode LBL
+            #region Unit Mode LBL
 
-            var storageModeLbl = settingsScreen.FindChild("Storage_Mode_LBL")?.gameObject;
+            var storageModeLbl = settingsScreen.FindChild("Storage_Mode_LBL").GetComponent<Text>();
             if (storageModeLbl == null)
             {
                 QuickLogger.Error("Screen: Storage Mode Label not found.");
                 return false;
             }
+            storageModeLbl.text = LanguageHelpers.GetLanguage(FCSPowerStorageBuildable.UnitModeKey);
 
             #endregion
 
@@ -277,13 +335,15 @@ namespace FCSPowerStorage.Model.Components
             }
             #endregion
 
-            #region Trickle Mode LBL
-            var trickleModeLbl = trickleModeBtn.FindChild("Label")?.gameObject;
+            #region Discharge Mode LBL
+            var trickleModeLbl = trickleModeBtn.FindChild("Label").GetComponent<Text>();
             if (trickleModeLbl == null)
             {
                 QuickLogger.Error("Screen: TrickleModeLabel not found.");
                 return false;
             }
+            trickleModeLbl.text = LanguageHelpers.GetLanguage(FCSPowerStorageBuildable.DischargeKey);
+
             #endregion
 
             #region Charge Mode BTN
@@ -309,12 +369,15 @@ namespace FCSPowerStorage.Model.Components
             #endregion
 
             #region Charge Mode LBL
-            var chargeModeLbl = chargeModeBtn.FindChild("Label")?.gameObject;
+
+            var chargeModeLbl = chargeModeBtn.FindChild("Label").GetComponent<Text>();
             if (chargeModeLbl == null)
             {
                 QuickLogger.Error("Screen: Charge Mode LBL not found.");
                 return false;
             }
+            chargeModeLbl.text = LanguageHelpers.GetLanguage(FCSPowerStorageBuildable.ChargeKey);
+
             #endregion
 
             // == Color Picker Elements == //
@@ -357,7 +420,7 @@ namespace FCSPowerStorage.Model.Components
             }
 
             var nextPageBTN = _nextPageGameObject.AddComponent<PaginatorButton>();
-            prevPageBTN.ChangePageBy = ChangePageBy;
+            nextPageBTN.ChangePageBy = ChangePageBy;
             nextPageBTN.AmountToChangePageBy = 1;
             #endregion
 
@@ -376,7 +439,6 @@ namespace FCSPowerStorage.Model.Components
                 return false;
             }
             #endregion
-
 
             // == Navigation Dock Elements == //
 
@@ -430,21 +492,21 @@ namespace FCSPowerStorage.Model.Components
         public override IEnumerator PowerOff()
         {
             yield return new WaitForEndOfFrame();
-            _mono.AnimationManager.SetIntHash(_stateHash, 4);
+            _mono.AnimationManager.SetIntHash(_mono.StateHash, 4);
             yield return new WaitForEndOfFrame();
         }
 
         public override IEnumerator PowerOn()
         {
             yield return new WaitForEndOfFrame();
-            _mono.AnimationManager.SetIntHash(_stateHash, 1);
+            _mono.AnimationManager.SetIntHash(_mono.StateHash, 1);
             yield return new WaitForEndOfFrame();
         }
 
         public override IEnumerator ShutDown()
         {
             yield return new WaitForEndOfFrame();
-            _mono.AnimationManager.SetIntHash(_stateHash, 0);
+            _mono.AnimationManager.SetIntHash(_mono.StateHash, 0);
             yield return new WaitForEndOfFrame();
         }
 
@@ -504,6 +566,7 @@ namespace FCSPowerStorage.Model.Components
                 CurrentPage = MaxPage;
             }
         }
+
         private void LoadColorPicker(SerializableColor color)
         {
             GameObject itemDisplay = Instantiate(FCSPowerStorageBuildable.ColorItemPefab);
@@ -520,31 +583,38 @@ namespace FCSPowerStorage.Model.Components
         {
             _mono = mono;
 
-            _stateHash = Animator.StringToHash("state");
-
             if (FindAllComponents() == false)
             {
                 ShutDownDisplay();
                 return;
             }
 
-            var colors = File.ReadAllText(Path.Combine(Information.ASSETSFOLDER, "colors.json"));
+            var colors = File.ReadAllText(Path.Combine(Information.GetAssetPath(), "colors.json"));
             _serializedColors = JsonConvert.DeserializeObject<List<SerializableColor>>(colors);
 
-            InvokeRepeating("UpdateBatteryMonitor", 1, 1);
+            InvokeRepeating("UpdateBatteryMonitor", 1, 0.1f);
+            InvokeRepeating("UpdatePowerInfo", 1, 0.1f);
+
+            ITEMS_PER_PAGE = 28;
+
+            DrawPage(1);
 
             StartCoroutine(CompleteSetup());
 
         }
 
+        private void UpdatePowerInfo()
+        {
+            _batteryMonitorAmountLbl.text = $"{Mathf.CeilToInt(_mono.PowerManager.GetPowerSum())}/{LoadData.BatteryConfiguration.Capacity}";
+        }
+
         private void UpdateBatteryMonitor()
         {
-            if (_mono.PowerManager.PowerState != FCSPowerStates.Unpowered)
+            if (_mono.PowerManager.GetPowerState() == FCSPowerStates.Unpowered) return;
+
+            for (int i = 0; i < _mono.BatteryCount; i++)
             {
-                for (int i = 0; i < _mono.BatteryCount; i++)
-                {
-                    _mono.PowerManager.GetPowerCell(i).UpdateBatteryMeter();
-                }
+                _mono.PowerManager.GetPowerCell(i).UpdateBatteryMeter();
             }
         }
     }

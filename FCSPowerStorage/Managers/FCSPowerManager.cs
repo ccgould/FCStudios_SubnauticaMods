@@ -1,6 +1,6 @@
-﻿using FCSCommon.Utilities;
+﻿using FCSCommon.Enums;
+using FCSCommon.Utilities;
 using FCSCommon.Utilities.Enums;
-using FCSPowerStorage.Configuration;
 using FCSPowerStorage.Model;
 using FCSPowerStorage.Models;
 using System.Collections;
@@ -15,9 +15,13 @@ namespace FCSPowerStorage.Managers
         private float _charge;
         private PowerRelay _connectedRelay;
         private CustomBatteryController _mono;
-        internal FCSPowerStates PowerState;
-        private bool _hasBreakerTripped;
+        private FCSPowerStates _powerState;
         private FCSPowerStates _previousPowerState;
+        private readonly int _savedBattery = -1;
+        private PowercellModel _battery;
+        private PowerToggleStates _chargeMode;
+        private float _passedTime;
+
 
         internal void Initialize(CustomBatteryController mono)
         {
@@ -26,14 +30,20 @@ namespace FCSPowerStorage.Managers
             StartCoroutine(UpdatePowerRelay());
 
             // Create four batteries
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < _mono.BatteryCount; i++)
             {
                 PowercellModel powercell = new PowercellModel();
                 powercell.SetSlot(i);
+                powercell.SetName(string.Empty); //Let it create its own name
                 _powerCells.Add(powercell);
             }
 
-            InvokeRepeating("Recharge", 0, 1);
+            if (_savedBattery == -1)
+            {
+                _battery = _powerCells[0];
+            }
+
+            //InvokeRepeating("Recharge", 0, 1);
         }
 
         private void OnDestroy()
@@ -46,117 +56,80 @@ namespace FCSPowerStorage.Managers
             _connectedRelay.RemoveInboundPower(this);
         }
 
-        //TODO Modify Recharging
+        private void Update()
+        {
+            Recharge();
+            CheckIfUnpowered();
+        }
+
+        private void CheckIfUnpowered()
+        {
+            if (_powerState == FCSPowerStates.Unpowered)
+            {
+                _mono.AnimationManager.SetIntHash(_mono.StateHash, 4);
+            }
+        }
+
         private void Recharge()
         {
-            if (!_hasBreakerTripped)
+            if (DayNightCycle.main == null) return;
+
+            _passedTime += DayNightCycle.main.deltaTime;
+
+            if (_powerState != FCSPowerStates.Unpowered && _chargeMode == PowerToggleStates.ChargeMode && _passedTime >= 2f)
             {
-                if (ChargeMode == PowerToggleStates.TrickleMode)
+                float num2 = 0f;
+                _passedTime = num2;
+
+                float num3 = DayNightCycle.main.deltaTime * LoadData.BatteryConfiguration.ChargeSpeed * LoadData.BatteryConfiguration.Capacity;
+                if (_charge + num3 > LoadData.BatteryConfiguration.Capacity)
                 {
-                    int num1 = 0;
-                    bool flag = false;
-                    float amount = 0.0f;
-                    bool charging = false;
-                    PowerRelay relay = PowerSource.FindRelay(transform);
-
-                    if (relay != null)
-                    {
-                        if (_charge < LoadData.BatteryConfiguration.Capacity)
-                        {
-                            ++num1;
-                            float num2 = DayNightCycle.main.deltaTime * LoadData.BatteryConfiguration.ChargeSpeed *
-                                         LoadData.BatteryConfiguration.Capacity;
-                            if (_charge + num2 > LoadData.BatteryConfiguration.Capacity)
-                                num2 = LoadData.BatteryConfiguration.Capacity - _charge;
-                            amount += num2;
-                        }
-
-                        UWE.Utils.Assert(amount >= 0.0, "Charger must request positive amounts", this);
-                        float amountConsumed = 0.0f;
-                        if (amount > 0.0 && relay.GetPower() > amount)
-                        {
-                            flag = true;
-                            relay.ConsumeEnergy(amount, out amountConsumed);
-                        }
-
-
-                        UWE.Utils.Assert(amountConsumed >= 0.0, "Charger must result in positive amounts", this);
-                        if (amountConsumed > 0.0)
-                        {
-                            charging = true;
-                            float num2 = amountConsumed / num1;
-
-                            if (_charge < (double)LoadData.BatteryConfiguration.Capacity)
-                            {
-                                float num3 = num2;
-                                float num4 = LoadData.BatteryConfiguration.Capacity - _charge;
-                                if (num3 > (double)num4)
-                                    num3 = num4;
-                                ChargeBatteries(num3);
-                            }
-                        }
-                    }
+                    num3 = LoadData.BatteryConfiguration.Capacity - _charge;
                 }
-                else
+                num2 += num3;
+
+                float num4 = 0f;
+
+                if (num2 > 0f && _connectedRelay.GetPower() > num2)
                 {
+                    _connectedRelay.ConsumeEnergy(num2, out num4);
+                }
 
-                    int num1 = 0;
-                    bool flag = false;
-                    float amount = 0.0f;
-                    bool charging = false;
-                    PowerRelay relay = PowerSource.FindRelay(transform);
-
-                    if (relay != null)
-                    {
-                        if (StoredPower < LoadData.BatteryConfiguration.Capacity)
-                        {
-                            ++num1;
-                            float num2 = DayNightCycle.main.deltaTime * LoadData.BatteryConfiguration.ChargeSpeed *
-                                         LoadData.BatteryConfiguration.Capacity;
-                            if (StoredPower + num2 > LoadData.BatteryConfiguration.Capacity)
-                                num2 = LoadData.BatteryConfiguration.Capacity - _charge;
-                            amount += num2;
-                        }
-
-                        UWE.Utils.Assert(amount >= 0.0, "Charger must request positive amounts", this);
-                        float amountConsumed = 0.0f;
-                        if (amount > 0.0 && relay.GetPower() > amount)
-                        {
-                            flag = true;
-                            relay.ConsumeEnergy(amount, out amountConsumed);
-                        }
-
-
-                        UWE.Utils.Assert(amountConsumed >= 0.0, "Charger must result in positive amounts", this);
-                        if (amountConsumed > 0.0)
-                        {
-                            charging = true;
-                            float num2 = amountConsumed / num1;
-
-                            if (StoredPower < (double)LoadData.BatteryConfiguration.Capacity)
-                            {
-                                float num3 = num2;
-                                float num4 = LoadData.BatteryConfiguration.Capacity - StoredPower;
-                                if (num3 > (double)num4)
-                                    num3 = num4;
-                                StoredPower += num3;
-                            }
-
-                        }
-                    }
+                if (num4 > 0f)
+                {
+                    ChargeBatteries(num4);
                 }
             }
         }
 
         internal void ConsumePower(float amount)
         {
-            foreach (PowercellModel powerCell in _powerCells)
+            if (_battery == null)
             {
-                if (powerCell.GetPower() >= amount)
-                {
-                    powerCell.Consume(amount);
-                    break;
-                }
+                QuickLogger.Error("Battery is null cannot consume power!");
+                return;
+            }
+
+            var slot = _battery.GetSlot();
+
+            var power = _battery.GetPower();
+
+            if (!Mathf.Approximately(power, 0) && power >= amount)
+            {
+                _battery.Consume(amount);
+                return;
+            }
+
+            //try next battery
+            if (slot - 1 < 0) return; // we are using the firs battery no need to check
+            var powercell = _powerCells[slot - 1];
+
+            power = powercell.GetPowerValue();
+
+            if (!Mathf.Approximately(power, 0) && power >= amount)
+            {
+                _battery = powercell;
+                _battery.Consume(amount);
             }
         }
 
@@ -165,6 +138,12 @@ namespace FCSPowerStorage.Managers
             foreach (PowercellModel powerCell in _powerCells)
             {
                 if (powerCell.GetIsFull()) continue;
+
+                if (_battery != null && _battery != powerCell)
+                {
+                    _battery = powerCell;
+                }
+
                 powerCell.Charge(amount);
                 break;
             }
@@ -174,9 +153,14 @@ namespace FCSPowerStorage.Managers
         /// Loads the save data into the power manager
         /// </summary>
         /// <param name="save"></param>
-        internal void LoadSave(SaveData save)
+        internal void LoadSave(List<PowercellModel> save)
         {
-            //TODO edit save to work with this new model
+            for (int i = 0; i < _mono.BatteryCount; i++)
+            {
+                var power = save[i].Power;
+                QuickLogger.Debug($"Loading Power From Save : {power}");
+                _powerCells[i].SetPower(power);
+            }
         }
 
         /// <summary>
@@ -214,6 +198,7 @@ namespace FCSPowerStorage.Managers
                 if (relay != null && relay != _connectedRelay)
                 {
                     _connectedRelay = relay;
+                    _connectedRelay.AddInboundPower(this);
                     QuickLogger.Debug("PowerRelay found at last!");
                 }
                 else
@@ -231,15 +216,24 @@ namespace FCSPowerStorage.Managers
         {
             _charge = 0f;
 
-            if (_mono.ChargeMode == PowerToggleStates.ChargeMode &&
-                PowerState == FCSPowerStates.Unpowered) return _charge;
+            if (_chargeMode == PowerToggleStates.ChargeMode ||
+                _powerState == FCSPowerStates.Unpowered) return 0f;
+
+            _charge = GetPowerSum();
+
+            return _charge;
+        }
+
+        internal float GetPowerSum()
+        {
+            float sum = 0;
 
             foreach (var powerCell in _powerCells)
             {
-                _charge += powerCell.GetPower();
+                sum += powerCell.GetPower();
             }
 
-            return _charge;
+            return Mathf.Clamp(sum, 0, LoadData.BatteryConfiguration.Capacity);
         }
 
         public float GetMaxPower()
@@ -249,36 +243,38 @@ namespace FCSPowerStorage.Managers
 
         public bool ModifyPower(float amount, out float modified)
         {
+
+            bool result = false;
             modified = 0f;
 
-            bool result;
-            if (amount >= 0f)
+            if (_powerState != FCSPowerStates.Unpowered && _chargeMode == PowerToggleStates.TrickleMode)
             {
-                result = (amount <= LoadData.BatteryConfiguration.Capacity - _charge);
-                modified = Mathf.Min(amount, LoadData.BatteryConfiguration.Capacity - _charge);
-                ChargeBatteries(modified);
-            }
-            else
-            {
-                result = (_charge >= -amount);
-                if (GameModeUtils.RequiresPower())
+                if (amount >= 0f)
                 {
-                    if (ChargeMode == PowerToggleStates.TrickleMode)
-                    {
-                        modified = -Mathf.Min(-amount, _charge);
-                        ConsumePower(modified);
-                    }
+                    result = (amount <= LoadData.BatteryConfiguration.Capacity - _charge);
+                    modified = Mathf.Min(amount, LoadData.BatteryConfiguration.Capacity - _charge);
+                    ChargeBatteries(modified);
                 }
                 else
                 {
-                    modified = amount;
+                    result = (_charge >= -amount);
+                    if (GameModeUtils.RequiresPower())
+                    {
+                        if (_chargeMode == PowerToggleStates.TrickleMode)
+                        {
+                            modified = -Mathf.Min(-amount, _charge);
+                            ConsumePower(modified);
+                        }
+                    }
+                    else
+                    {
+                        modified = amount;
+                    }
                 }
             }
 
             return result;
         }
-
-        public PowerToggleStates ChargeMode { get; set; }
 
         public bool HasInboundPower(IPowerInterface powerInterface)
         {
@@ -291,7 +287,6 @@ namespace FCSPowerStorage.Managers
         }
         #endregion
 
-        //TODO Change name is needed
         public void StorePower()
         {
             _charge = 0.0f;
@@ -301,29 +296,68 @@ namespace FCSPowerStorage.Managers
         /// Sets the breaker state.
         /// </summary>
         /// <param name="hasTripped"></param>
-        internal void SetBreakerTrip(bool hasTripped)
-        {
-            //Lets get the current powerstate if not unpowered
-            if (PowerState != FCSPowerStates.Unpowered)
-            {
-                _previousPowerState = PowerState;
-            }
-
-            // Trip the breaker
-            _hasBreakerTripped = hasTripped;
-
-            //Set the power state;
-            PowerState = hasTripped ? FCSPowerStates.Unpowered : _previousPowerState;
-        }
 
         internal PowercellModel GetPowerCell(int slot)
         {
             return _powerCells[slot];
         }
 
-        internal bool GetBreakerTrip()
+        public float GetCharge()
         {
-            return _hasBreakerTripped;
+            return _charge;
+        }
+
+        internal List<PowercellModel> Save()
+        {
+            return _powerCells;
+        }
+
+        internal void SetChargeMode(PowerToggleStates savedDataChargeMode)
+        {
+            _chargeMode = savedDataChargeMode;
+
+            if (_powerState == FCSPowerStates.Unpowered) return;
+
+            switch (savedDataChargeMode)
+            {
+                case PowerToggleStates.TrickleMode:
+                    SystemLightManager.ChangeSystemLights(SystemLightState.Default);
+                    break;
+                case PowerToggleStates.ChargeMode:
+                    SystemLightManager.ChangeSystemLights(SystemLightState.Warning);
+                    break;
+            }
+        }
+
+        internal PowerToggleStates GetChargeMode()
+        {
+            return _chargeMode;
+        }
+
+        internal void SetPowerState(FCSPowerStates state)
+        {
+            QuickLogger.Debug($"Current State: {state}", true);
+
+            switch (state)
+            {
+                //Reset The systemLight
+                case FCSPowerStates.Powered:
+                    _mono.AnimationManager.SetIntHash(_mono.StateHash, 1);
+                    SystemLightManager.RestoreStoredState();
+                    break;
+
+                case FCSPowerStates.Unpowered:
+                    SystemLightManager.StoreCurrentState();
+                    SystemLightManager.ChangeSystemLights(SystemLightState.Unpowered);
+                    break;
+            }
+
+            _powerState = state;
+        }
+
+        internal FCSPowerStates GetPowerState()
+        {
+            return _powerState;
         }
     }
 }

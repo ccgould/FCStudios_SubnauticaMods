@@ -14,7 +14,7 @@ namespace FCSPowerStorage.Managers
         #region Unity Methods   
         private void Start()
         {
-            this.Animator = this.transform.GetComponent<Animator>();
+            this.Animator = this.transform.GetComponentInChildren<Animator>();
 
             if (this.Animator == null)
             {

@@ -318,5 +318,15 @@ namespace FCSCommon.Helpers
             }
         }
 
+        /// <summary>
+        /// Change the color of the body of the gameobject
+        /// </summary>
+        /// <param name="matNameColor">The material to change</param>
+        /// <param name="color">The color to change to</param>
+        /// <param name="gameObject">The game object to apply the change too.</param>
+        public static void ChangeBodyColor(string matNameColor, Color color, GameObject gameObject)
+        {
+            MaterialHelpers.ChangeMaterialColor(matNameColor, gameObject, color);
+        }
     }
 }

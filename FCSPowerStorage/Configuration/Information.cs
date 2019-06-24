@@ -1,4 +1,4 @@
-﻿using FCSPowerStorage.Helpers;
+﻿using FCSCommon.Helpers;
 using System;
 using System.IO;
 
@@ -11,19 +11,14 @@ namespace FCSPowerStorage.Configuration
         /// </summary>
         public static string ModName => "FCSPowerStorage";
 
-        /// <summary>
-        /// The definition of the FCS Power Storage
-        /// </summary>
-        //public static string PowerStorageDef => "This is a wall mounted battery storage for base backup power.";
-
-        /// <summary>
-        /// The assets folder
-        /// </summary>
-        public static string ASSETSFOLDER { get; set; }
-
         public static string MODFOLDERLOCATION => GetModPath();
 
         public static string LANGUAGEDIRECTORY => GetLanguagePath();
+
+        /// <summary>
+        /// The definition of the FCS Power Storage
+        /// </summary>
+        public static string ModDescription = "This is a wall mounted battery storage for base backup power.";
 
         public const string PrefrabName = "Power_Storage";
         private static string GetQModsPath()
@@ -38,7 +33,7 @@ namespace FCSPowerStorage.Configuration
 
         public static string GetAssetPath()
         {
-            return Path.Combine(GetModPath(), "Assests");
+            return Path.Combine(GetModPath(), "Assets");
         }
 
         private static string GetModInfoPath()
@@ -54,7 +49,7 @@ namespace FCSPowerStorage.Configuration
 
         public static string GetSaveFileDirectory()
         {
-            return FilesHelper.GetSaveFolderPath();
+            return AssetHelper.GetModDirectory(ModName);
         }
     }
 }

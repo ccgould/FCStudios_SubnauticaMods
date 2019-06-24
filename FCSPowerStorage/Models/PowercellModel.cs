@@ -11,13 +11,13 @@ namespace FCSPowerStorage.Models
     /// </summary>
     internal class PowercellModel
     {
-        private float _power;
+        public float Power { get; set; }
         private string _name;
         private int _slot;
-        private readonly float _capacity = LoadData.BatteryConfiguration.Capacity / 4;
+        private readonly float _capacity = LoadData.BatteryConfiguration.Capacity / 6;
         private Image _batteryStatus1Bar;
         private Text _batteryStatus1Percentage;
-        private bool IsFull => _power <= _capacity;
+        private bool IsFull => Power >= _capacity;
         private GameObject _meterDisplay;
 
         /// <summary>
@@ -26,7 +26,7 @@ namespace FCSPowerStorage.Models
         /// <param name="amount"></param>
         internal void SetPower(float amount)
         {
-            _power = amount;
+            Power = amount;
         }
 
         /// <summary>
@@ -35,6 +35,11 @@ namespace FCSPowerStorage.Models
         /// <param name="name"></param>
         internal void SetName(string name)
         {
+            if (name == string.Empty)
+            {
+                _name = CreateID();
+                return;
+            }
             _name = name;
         }
 
@@ -53,7 +58,7 @@ namespace FCSPowerStorage.Models
         /// <returns></returns>
         internal float GetPower()
         {
-            return _power;
+            return Power;
         }
 
         /// <summary>
@@ -74,13 +79,18 @@ namespace FCSPowerStorage.Models
             return _slot;
         }
 
+        internal float GetPowerValue()
+        {
+            return Power;
+        }
+
         /// <summary>
         /// Get the current Percentage of the battery
         /// </summary>
         /// <returns></returns>
         internal float GetPercentage()
         {
-            return _power / _capacity;
+            return Power / _capacity;
         }
 
         /// <summary>
@@ -90,7 +100,14 @@ namespace FCSPowerStorage.Models
         internal void Consume(float amount)
         {
             // I am adding because the amount will be negative
-            _power = Mathf.Clamp(_power + amount, 0, _capacity);
+            if (Power < 1)
+            {
+                Drain();
+                return;
+            }
+
+            Power = Mathf.Clamp(Power + amount, 0, _capacity);
+            //QuickLogger.Debug($"Consume {GetName()}: Power Value {_power} || Capacity {_capacity} || Amount {amount}");
         }
 
         /// <summary>
@@ -99,7 +116,8 @@ namespace FCSPowerStorage.Models
         /// <param name="amount"></param>
         internal void Charge(float amount)
         {
-            _power = Mathf.Clamp(_power + amount, 0, _capacity);
+            Power = Mathf.Clamp(Power + amount, 0, _capacity);
+            //QuickLogger.Debug($"Charge {GetName()}: Power Value {_power} || Capacity {_capacity} || Amount {amount}");
         }
 
         /// <summary>
@@ -107,7 +125,7 @@ namespace FCSPowerStorage.Models
         /// </summary>
         internal void Drain()
         {
-            _power = 0f;
+            Power = 0f;
         }
 
         /// <summary>
@@ -116,13 +134,36 @@ namespace FCSPowerStorage.Models
         /// <param name="meter"></param>
         internal void SetMeter(GameObject meter)
         {
+            QuickLogger.Debug("Setting Meters");
             _meterDisplay = meter;
 
             if (meter != null)
             {
-                _batteryStatus1Bar = meter.FindChild("ProgressBar").GetComponent<Image>();
-                _batteryStatus1Percentage = meter.FindChild("Percentage").GetComponent<Text>();
-                meter.FindChild("Battery_Name_LBL").GetComponent<Text>().text = CreateID();
+                _batteryStatus1Bar = meter.FindChild("ProgressBar")?.GetComponent<Image>();
+
+                if (_batteryStatus1Bar == null)
+                {
+                    QuickLogger.Error("Battery Status Bar is null");
+                    return;
+                }
+
+                _batteryStatus1Percentage = meter.FindChild("Percentage")?.GetComponent<Text>();
+
+                if (_batteryStatus1Percentage == null)
+                {
+                    QuickLogger.Error("Battery Status Percentage is null");
+                    return;
+                }
+
+                var name = meter.FindChild("Battery_Name_LBL").GetComponent<Text>();
+
+                if (name == null)
+                {
+                    QuickLogger.Error("Battery Name is null");
+                    return;
+                }
+
+                name.text = _name;
             }
             else
             {
@@ -162,7 +203,7 @@ namespace FCSPowerStorage.Models
         /// <returns></returns>
         private string CreateID()
         {
-            return $"{LanguageHelpers.GetLanguage(FCSPowerStorageBuildable.BatteryKey)} {_slot}";
+            return $"{LanguageHelpers.GetLanguage(FCSPowerStorageBuildable.BatteryKey)} {_slot + 1}";
         }
     }
 }

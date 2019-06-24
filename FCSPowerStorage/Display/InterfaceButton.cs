@@ -60,8 +60,6 @@ namespace FCSPowerStorage.Display
                         this.gameObject.transform.localScale = this.gameObject.transform.localScale;
                     }
                     break;
-                default:
-                    throw new ArgumentOutOfRangeException();
             }
         }
         #endregion
@@ -96,8 +94,6 @@ namespace FCSPowerStorage.Display
                         this.gameObject.transform.localScale = this.gameObject.transform.localScale;
                     }
                     break;
-                default:
-                    throw new ArgumentOutOfRangeException();
             }
 
         }

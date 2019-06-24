@@ -21,12 +21,13 @@ namespace FCSPowerStorage
             QuickLogger.DebugLogsEnabled = true;
             QuickLogger.Debug("Debug logs enabled");
 #endif
+                LoadData.Patch();
                 FCSPowerStorageBuildable.PatchHelper();
             }
             catch (Exception e)
             {
                 _success = false;
-                QuickLogger.Error("Error in QPatch");
+                QuickLogger.Error($"Error in QPatch {e.Message}");
             }
             QuickLogger.Info("FCS Power Storage initializ" + (!_success ? "ation failed." : "ed successfully."));
         }
