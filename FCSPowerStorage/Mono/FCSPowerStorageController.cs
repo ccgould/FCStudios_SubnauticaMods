@@ -3,22 +3,20 @@ using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using FCSPowerStorage.Configuration;
 using FCSPowerStorage.Managers;
-using FCSPowerStorage.Model.Components;
 using Oculus.Newtonsoft.Json;
-using SMLHelper.V2.Utility;
 using System.IO;
 using UnityEngine;
 
-namespace FCSPowerStorage.Model
+namespace FCSPowerStorage.Mono
 {
     /// <summary>
     /// The controller for the custom battery
     /// </summary>
-    internal class CustomBatteryController : MonoBehaviour, IProtoEventListener, IConstructable
+    internal class FCSPowerStorageController : MonoBehaviour, IProtoEventListener, IConstructable
     {
         #region Private Members
         private PrefabIdentifier _prefabId;
-        private readonly string _saveDirectory = Path.Combine(SaveUtils.GetCurrentSaveDataDir(), "FCSPowerStorage");
+        private readonly string _saveDirectory = Information.GetSaveFileDirectory();
         private string SaveFile => Path.Combine(_saveDirectory, _prefabId.Id + ".json");
 
         #endregion
@@ -76,7 +74,7 @@ namespace FCSPowerStorage.Model
 
             var output = JsonConvert.SerializeObject(saveData, Formatting.Indented);
             File.WriteAllText(SaveFile, output);
-            //LoadData.CleanOldSaveData();
+            LoadData.CleanOldSaveData();
             QuickLogger.Debug($"Saved {_prefabId.Id} Data");
         }
 
@@ -136,6 +134,11 @@ namespace FCSPowerStorage.Model
                 }
 
             }
+        }
+
+        internal string GetPrefabID()
+        {
+            return _prefabId.Id;
         }
 
         private void Initialize()

@@ -83,6 +83,7 @@
     <Compile Include="Buildables\FCSPowerStorageModelPrefab.cs" />
     <Compile Include="Configuration\Cfg.cs" />
     <Compile Include="Configuration\Information.cs" />
+    <Compile Include="Configuration\InGameOptions.cs" />
     <Compile Include="Configuration\IngredientItem.cs" />
     <Compile Include="Configuration\ModStrings.cs" />
     <Compile Include="Configuration\SaveData.cs" />
@@ -99,7 +100,7 @@
     <Compile Include="Display\InterfaceButton.cs" />
     <Compile Include="Display\OnScreenButton.cs" />
     <Compile Include="Display\PaginatorButton.cs" />
-    <Compile Include="Mono\CustomBatteryController.cs" />
+    <Compile Include="Mono\FCSPowerStorageController.cs" />
     <Compile Include="Buildables\FCSPowerStoragePatcher.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

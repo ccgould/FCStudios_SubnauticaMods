@@ -15,7 +15,7 @@ using System.Reflection;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace FCSPowerStorage.Model.Components
+namespace FCSPowerStorage.Mono
 {
     /**
 * Component that contains the controller to the view. Majority of the view is set up already on the prefab inside of the unity editor.
@@ -25,7 +25,7 @@ namespace FCSPowerStorage.Model.Components
 */
     internal class FCSPowerStorageDisplay : AIDisplay
     {
-        private CustomBatteryController _mono;
+        private FCSPowerStorageController _mono;
         private List<SerializableColor> _serializedColors;
         private GameObject _batteryGrid;
         private Text _batteryMonitorAmountLbl;
@@ -34,8 +34,6 @@ namespace FCSPowerStorage.Model.Components
         private GameObject _pageCounter;
         private Text _pageCounterText;
         private GameObject _colorPicker;
-
-
 
         public override void ClearPage()
         {
@@ -67,10 +65,20 @@ namespace FCSPowerStorage.Model.Components
                     break;
 
                 case "TrickleModeBTN":
+                    if (_mono.PowerManager.GetAutoActivate())
+                    {
+                        QuickLogger.Info(LanguageHelpers.GetLanguage(FCSPowerStorageBuildable.AutoDischargeEnabledMessageKey), true);
+                        break;
+                    }
                     _mono.PowerManager.SetChargeMode(PowerToggleStates.TrickleMode);
                     break;
 
                 case "ChargeModeBTN":
+                    if (_mono.PowerManager.GetAutoActivate())
+                    {
+                        QuickLogger.Info(LanguageHelpers.GetLanguage(FCSPowerStorageBuildable.AutoDischargeEnabledMessageKey), true);
+                        break;
+                    }
                     _mono.PowerManager.SetChargeMode(PowerToggleStates.ChargeMode);
                     break;
                 case "AutoActivateBTN":
@@ -583,7 +591,7 @@ namespace FCSPowerStorage.Model.Components
             itemButton.Color = color.ToColor();
         }
 
-        internal void Setup(CustomBatteryController mono)
+        internal void Setup(FCSPowerStorageController mono)
         {
             _mono = mono;
 

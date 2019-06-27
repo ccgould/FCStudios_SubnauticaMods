@@ -1,5 +1,7 @@
 ﻿using FCSCommon.Utilities;
 using FCSPowerStorage.Buildables;
+using FCSPowerStorage.Configuration;
+using SMLHelper.V2.Handlers;
 using System;
 using Utilites.Logger;
 
@@ -18,10 +20,12 @@ namespace FCSPowerStorage
             try
             {
 #if DEBUG
-            QuickLogger.DebugLogsEnabled = true;
-            QuickLogger.Debug("Debug logs enabled");
+                QuickLogger.DebugLogsEnabled = true;
+                QuickLogger.Debug("Debug logs enabled");
 #endif
+
                 LoadData.Patch();
+                OptionsPanelHandler.RegisterModOptions(new InGameOptions());
                 FCSPowerStorageBuildable.PatchHelper();
             }
             catch (Exception e)

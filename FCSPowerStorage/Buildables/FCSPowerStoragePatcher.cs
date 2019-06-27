@@ -1,7 +1,7 @@
 ﻿using FCSCommon.Utilities;
 using FCSPowerStorage.Configuration;
 using FCSPowerStorage.Helpers;
-using FCSPowerStorage.Model;
+using FCSPowerStorage.Mono;
 using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
 using System.IO;
@@ -78,7 +78,7 @@ namespace FCSPowerStorage.Buildables
 
             QuickLogger.Debug("Add GameObject CustomBatteryController");
 
-            prefab.GetOrAddComponent<CustomBatteryController>();
+            prefab.GetOrAddComponent<FCSPowerStorageController>();
 
             QuickLogger.Debug("Made GameObject");
 

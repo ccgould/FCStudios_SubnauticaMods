@@ -1,5 +1,5 @@
 ﻿using FCSCommon.Utilities;
-using FCSPowerStorage.Model;
+using FCSPowerStorage.Mono;
 using UnityEngine;
 
 namespace FCSPowerStorage.Managers
@@ -8,7 +8,7 @@ namespace FCSPowerStorage.Managers
     {
         #region Private Methods
         //private AudioHandler _audioHandler;
-        private CustomBatteryController _mono;
+        private FCSPowerStorageController _mono;
         #endregion
 
         #region Unity Methods   
@@ -116,7 +116,7 @@ namespace FCSPowerStorage.Managers
         //    _audioHandler.PlaySound(false);
         //}
 
-        internal void Initialize(CustomBatteryController mono)
+        internal void Initialize(FCSPowerStorageController mono)
         {
             _mono = mono;
         }

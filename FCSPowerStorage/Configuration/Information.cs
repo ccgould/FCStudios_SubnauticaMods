@@ -1,4 +1,4 @@
-﻿using FCSCommon.Helpers;
+﻿using SMLHelper.V2.Utility;
 using System;
 using System.IO;
 
@@ -49,7 +49,12 @@ namespace FCSPowerStorage.Configuration
 
         public static string GetSaveFileDirectory()
         {
-            return AssetHelper.GetModDirectory(ModName);
+            return Path.Combine(SaveUtils.GetCurrentSaveDataDir(), ModName);
+        }
+
+        public static string ConfigurationFile()
+        {
+            return Path.Combine(MODFOLDERLOCATION, "config.json");
         }
     }
 }

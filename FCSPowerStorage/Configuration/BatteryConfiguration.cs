@@ -1,8 +1,10 @@
 ﻿using FCSCommon.Extensions;
 using FCSCommon.Utilities;
+using Oculus.Newtonsoft.Json;
 using SMLHelper.V2.Crafting;
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace FCSPowerStorage.Configuration
 {
@@ -10,7 +12,7 @@ namespace FCSPowerStorage.Configuration
     /// <summary>
     /// Class that stores custom properties from the configuration file
     /// </summary>
-    public class BatteryConfiguration
+    internal class BatteryConfiguration
     {
         /// <summary>
         /// The maximum charge of the battery
@@ -25,17 +27,25 @@ namespace FCSPowerStorage.Configuration
         /// <summary>
         /// Enables/Disables the ability for the
         /// </summary>
-        public bool DisableOnMinEnergyRequired { get; set; }
+        public bool BaseDrainProtection { get; set; }
+
+        public int BaseDrainProtectionMultiplier { get; set; } = 1;
 
         /// <summary>
         /// Minimum amount of power required for charging
         /// </summary>
-        public int MinEnergyRequired { get; set; } = 10;
+        public int BaseDrainProtectionGoal { get; set; } = 10;
+
+
+        /// <summary>
+        /// Amount to activate multiplier
+        /// </summary>
+        public int AutoActivateMultiplier { get; set; } = 1;
 
         /// <summary>
         /// Amount to activate the power storage in case of low power
         /// </summary>
-        public int AutoActivateAt { get; set; } = 1;
+        public int AutoActivateAt { get; set; } = 10;
 
         /// <summary>
         /// A list of custom ingredients for the use in the BluePrint
@@ -69,6 +79,12 @@ namespace FCSPowerStorage.Configuration
             {
                 yield return new Ingredient(ingredient.Item.ToTechType(), ingredient.Amount);
             }
+        }
+
+        internal void SaveConfiguration()
+        {
+            var output = JsonConvert.SerializeObject(this, Formatting.Indented);
+            File.WriteAllText(Information.ConfigurationFile(), output);
         }
     }
 }

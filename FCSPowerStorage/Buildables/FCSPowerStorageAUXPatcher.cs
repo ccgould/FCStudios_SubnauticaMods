@@ -7,8 +7,10 @@ namespace FCSPowerStorage.Buildables
         #region Prefab Global Properties
         public static string BuildableName { get; private set; }
         public static TechType TechTypeID { get; private set; }
-        #endregion
 
+
+        #endregion
+        public const string AutoDischargeEnabledMessageKey = "PS_AutoDischargeMessage";
         public const string BatteryKey = "PS_MeterBatteryTxt";
         public const string BatteryMetersKey = "PS_BatterMeters";
         public const string SettingsKey = "PS_Settings";
@@ -31,6 +33,7 @@ namespace FCSPowerStorage.Buildables
         {
             LanguageHandler.SetLanguageLine(BatteryKey, "BATTERY");
             LanguageHandler.SetLanguageLine(PoweredOffKey, "POWERED OFF");
+            LanguageHandler.SetLanguageLine(AutoDischargeEnabledMessageKey, "Disable Auto Discharge to use this feature.");
             LanguageHandler.SetLanguageLine(StoragePercentageKey, "Storage Percentage");
             LanguageHandler.SetLanguageLine(ColorPickerKey, "COLOR PICKER");
             LanguageHandler.SetLanguageLine(SystemSettingsLBLKey, "System Settings:");

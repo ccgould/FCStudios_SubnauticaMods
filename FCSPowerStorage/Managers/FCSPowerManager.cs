@@ -2,8 +2,8 @@
 using FCSCommon.Utilities;
 using FCSCommon.Utilities.Enums;
 using FCSPowerStorage.Configuration;
-using FCSPowerStorage.Model;
 using FCSPowerStorage.Models;
+using FCSPowerStorage.Mono;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -15,7 +15,7 @@ namespace FCSPowerStorage.Managers
         private readonly List<PowercellModel> _powerCells = new List<PowercellModel>(4);
         private float _charge;
         private PowerRelay _connectedRelay;
-        private CustomBatteryController _mono;
+        private FCSPowerStorageController _mono;
         private FCSPowerStates _powerState;
         private readonly int _savedBattery = -1;
         private PowercellModel _battery;
@@ -23,7 +23,7 @@ namespace FCSPowerStorage.Managers
         private float _passedTime;
         private bool _autoActivate;
 
-        internal void Initialize(CustomBatteryController mono)
+        internal void Initialize(FCSPowerStorageController mono)
         {
             _mono = mono;
 
@@ -67,16 +67,20 @@ namespace FCSPowerStorage.Managers
         {
             if (_autoActivate && _powerState != FCSPowerStates.Unpowered)
             {
-                if (GetBasePower() <= LoadData.BatteryConfiguration.AutoActivateAt && _chargeMode == PowerToggleStates.ChargeMode)
+                if (GetBasePower() <= LoadData.BatteryConfiguration.AutoActivateAt &&
+                    _chargeMode == PowerToggleStates.ChargeMode &&
+                    _chargeMode != PowerToggleStates.TrickleMode)
                 {
                     QuickLogger.Info("Auto Activating Power Storage", true);
                     SetChargeMode(PowerToggleStates.TrickleMode);
                 }
 
                 var basePower = GetBasePower() - Mathf.RoundToInt(GetPowerSum());
-                var chargeModeActivationTarget = LoadData.BatteryConfiguration.AutoActivateAt + 10;
+                var chargeModeActivationTarget = LoadData.BatteryConfiguration.AutoActivateAt;
 
-                if (basePower > chargeModeActivationTarget && _powerState != FCSPowerStates.Unpowered)
+                if (basePower > chargeModeActivationTarget &&
+                    _powerState != FCSPowerStates.Unpowered &&
+                    _chargeMode != PowerToggleStates.ChargeMode)
                 {
                     QuickLogger.Info("Auto Charge Power Storage", true);
                     SetChargeMode(PowerToggleStates.ChargeMode);
@@ -96,9 +100,9 @@ namespace FCSPowerStorage.Managers
         {
             if (DayNightCycle.main == null) return;
 
-            if (LoadData.BatteryConfiguration.DisableOnMinEnergyRequired)
+            if (LoadData.BatteryConfiguration.BaseDrainProtection)
             {
-                if (GetBasePower() <= LoadData.BatteryConfiguration.MinEnergyRequired)
+                if (GetBasePower() <= LoadData.BatteryConfiguration.BaseDrainProtectionGoal)
                     return;
             }
 
@@ -132,18 +136,7 @@ namespace FCSPowerStorage.Managers
 
         private int GetBasePower()
         {
-            SubRoot currentSub = Player.main.currentSub;
-
-            if (currentSub != null)
-            {
-                PowerRelay component = currentSub.GetComponent<PowerRelay>();
-                if (component != null)
-                {
-                    return Mathf.RoundToInt(component.GetPower());
-                }
-            }
-
-            return 0;
+            return _connectedRelay != null ? Mathf.RoundToInt(_connectedRelay.GetPower()) : 0;
         }
 
         internal void ConsumePower(float amount)
