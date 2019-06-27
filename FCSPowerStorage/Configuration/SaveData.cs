@@ -14,5 +14,7 @@ namespace FCSPowerStorage.Configuration
         public List<PowercellModel> Batteries { get; set; }
         public int ToggleMode { get; set; }
         public FCSPowerStates PowerState { get; set; }
+        public bool AutoActivate { get; set; }
+
     }
 }

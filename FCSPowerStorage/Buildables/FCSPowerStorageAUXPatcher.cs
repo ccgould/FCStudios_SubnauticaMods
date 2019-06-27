@@ -15,7 +15,7 @@ namespace FCSPowerStorage.Buildables
         public const string ChargeKey = "PS_Charge";
         public const string BootingKey = "PS_Booting";
         public const string DischargeKey = "PS_Discharge";
-        public const string UnitModeKey = "PS_UnitMode";
+        public const string SystemSettingsLBLKey = "PS_SystemSettingsLBL";
         public const string ColorPickerKey = "PS_ColorPicker";
         public const string StoragePercentageKey = "PS_StoragePercentage";
         public const string PoweredOffKey = "PS_PoweredOff";
@@ -24,18 +24,18 @@ namespace FCSPowerStorage.Buildables
         {
             BuildableName = this.FriendlyName;
             TechTypeID = this.TechType;
-            PatchLangauges();
+            PatchLanguages();
         }
 
-        private void PatchLangauges()
+        private void PatchLanguages()
         {
             LanguageHandler.SetLanguageLine(BatteryKey, "BATTERY");
             LanguageHandler.SetLanguageLine(PoweredOffKey, "POWERED OFF");
             LanguageHandler.SetLanguageLine(StoragePercentageKey, "Storage Percentage");
             LanguageHandler.SetLanguageLine(ColorPickerKey, "COLOR PICKER");
-            LanguageHandler.SetLanguageLine(UnitModeKey, "Unit Mode");
-            LanguageHandler.SetLanguageLine(DischargeKey, "DISCHARGE");
-            LanguageHandler.SetLanguageLine(ChargeKey, "CHARGE");
+            LanguageHandler.SetLanguageLine(SystemSettingsLBLKey, "System Settings:");
+            LanguageHandler.SetLanguageLine(DischargeKey, "DISCHARGE MODE");
+            LanguageHandler.SetLanguageLine(ChargeKey, "CHARGE MODE");
             LanguageHandler.SetLanguageLine(BootingKey, "BOOTING");
             LanguageHandler.SetLanguageLine(SettingsKey, "SETTINGS");
             LanguageHandler.SetLanguageLine(BatteryMetersKey, "BATTERY METERS");

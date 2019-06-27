@@ -1,6 +1,7 @@
 ﻿using FCSCommon.Enums;
 using FCSCommon.Utilities;
 using FCSCommon.Utilities.Enums;
+using FCSPowerStorage.Configuration;
 using FCSPowerStorage.Model;
 using FCSPowerStorage.Models;
 using System.Collections;
@@ -11,17 +12,16 @@ namespace FCSPowerStorage.Managers
 {
     internal class FCSPowerManager : MonoBehaviour, IPowerInterface
     {
-        private List<PowercellModel> _powerCells = new List<PowercellModel>(4);
+        private readonly List<PowercellModel> _powerCells = new List<PowercellModel>(4);
         private float _charge;
         private PowerRelay _connectedRelay;
         private CustomBatteryController _mono;
         private FCSPowerStates _powerState;
-        private FCSPowerStates _previousPowerState;
         private readonly int _savedBattery = -1;
         private PowercellModel _battery;
         private PowerToggleStates _chargeMode;
         private float _passedTime;
-
+        private bool _autoActivate;
 
         internal void Initialize(CustomBatteryController mono)
         {
@@ -60,6 +60,28 @@ namespace FCSPowerStorage.Managers
         {
             Recharge();
             CheckIfUnpowered();
+            AutoSystem();
+        }
+
+        private void AutoSystem()
+        {
+            if (_autoActivate && _powerState != FCSPowerStates.Unpowered)
+            {
+                if (GetBasePower() <= LoadData.BatteryConfiguration.AutoActivateAt && _chargeMode == PowerToggleStates.ChargeMode)
+                {
+                    QuickLogger.Info("Auto Activating Power Storage", true);
+                    SetChargeMode(PowerToggleStates.TrickleMode);
+                }
+
+                var basePower = GetBasePower() - Mathf.RoundToInt(GetPowerSum());
+                var chargeModeActivationTarget = LoadData.BatteryConfiguration.AutoActivateAt + 10;
+
+                if (basePower > chargeModeActivationTarget && _powerState != FCSPowerStates.Unpowered)
+                {
+                    QuickLogger.Info("Auto Charge Power Storage", true);
+                    SetChargeMode(PowerToggleStates.ChargeMode);
+                }
+            }
         }
 
         private void CheckIfUnpowered()
@@ -73,6 +95,12 @@ namespace FCSPowerStorage.Managers
         private void Recharge()
         {
             if (DayNightCycle.main == null) return;
+
+            if (LoadData.BatteryConfiguration.DisableOnMinEnergyRequired)
+            {
+                if (GetBasePower() <= LoadData.BatteryConfiguration.MinEnergyRequired)
+                    return;
+            }
 
             _passedTime += DayNightCycle.main.deltaTime;
 
@@ -100,6 +128,22 @@ namespace FCSPowerStorage.Managers
                     ChargeBatteries(num4);
                 }
             }
+        }
+
+        private int GetBasePower()
+        {
+            SubRoot currentSub = Player.main.currentSub;
+
+            if (currentSub != null)
+            {
+                PowerRelay component = currentSub.GetComponent<PowerRelay>();
+                if (component != null)
+                {
+                    return Mathf.RoundToInt(component.GetPower());
+                }
+            }
+
+            return 0;
         }
 
         internal void ConsumePower(float amount)
@@ -153,14 +197,16 @@ namespace FCSPowerStorage.Managers
         /// Loads the save data into the power manager
         /// </summary>
         /// <param name="save"></param>
-        internal void LoadSave(List<PowercellModel> save)
+        internal void LoadSave(SaveData save)
         {
             for (int i = 0; i < _mono.BatteryCount; i++)
             {
-                var power = save[i].Power;
+                var power = save.Batteries[i].Power;
                 QuickLogger.Debug($"Loading Power From Save : {power}");
                 _powerCells[i].SetPower(power);
             }
+
+            _autoActivate = save.AutoActivate;
         }
 
         /// <summary>
@@ -292,11 +338,6 @@ namespace FCSPowerStorage.Managers
             _charge = 0.0f;
         }
 
-        /// <summary>
-        /// Sets the breaker state.
-        /// </summary>
-        /// <param name="hasTripped"></param>
-
         internal PowercellModel GetPowerCell(int slot)
         {
             return _powerCells[slot];
@@ -322,9 +363,11 @@ namespace FCSPowerStorage.Managers
             {
                 case PowerToggleStates.TrickleMode:
                     SystemLightManager.ChangeSystemLights(SystemLightState.Default);
+                    _mono.AnimationManager.SetBoolHash(_mono.ToggleHash, false);
                     break;
                 case PowerToggleStates.ChargeMode:
                     SystemLightManager.ChangeSystemLights(SystemLightState.Warning);
+                    _mono.AnimationManager.SetBoolHash(_mono.ToggleHash, true);
                     break;
             }
         }
@@ -358,6 +401,18 @@ namespace FCSPowerStorage.Managers
         internal FCSPowerStates GetPowerState()
         {
             return _powerState;
+        }
+
+        public bool GetAutoActivate()
+        {
+            return _autoActivate;
+        }
+
+        public void SetAutoActivate(bool value)
+        {
+            _autoActivate = value;
+            _mono.AnimationManager.SetBoolHash(_mono.AutoActiveHash, value);
+            QuickLogger.Debug($"Auto Activate: {_autoActivate}", true);
         }
     }
 }

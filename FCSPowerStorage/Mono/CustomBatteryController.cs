@@ -28,6 +28,7 @@ namespace FCSPowerStorage.Model
         internal FCSPowerManager PowerManager { get; set; }
         internal int StateHash { get; private set; }
         internal int ToggleHash { get; private set; }
+        internal int AutoActiveHash { get; set; }
         #endregion
 
         #region Private Members
@@ -41,10 +42,12 @@ namespace FCSPowerStorage.Model
         {
             ToggleHash = Animator.StringToHash("ToggleState");
             StateHash = Animator.StringToHash("state");
+            AutoActiveHash = Animator.StringToHash("AutoActivateState");
             SystemLightManager.Initialize(gameObject);
         }
 
         public FCSPowerStorageAnimationManager AnimationManager { get; set; }
+
         internal readonly int BatteryCount = 6;
         private FCSPowerStorageDisplay _display;
         private bool _initialized;
@@ -67,7 +70,8 @@ namespace FCSPowerStorage.Model
                 Batteries = PowerManager.Save(),
                 PowerState = PowerManager.GetPowerState(),
                 ChargeMode = PowerManager.GetChargeMode(),
-                ToggleMode = AnimationManager.GetIntHash(ToggleHash)
+                ToggleMode = AnimationManager.GetIntHash(ToggleHash),
+                AutoActivate = PowerManager.GetAutoActivate()
             };
 
             var output = JsonConvert.SerializeObject(saveData, Formatting.Indented);
@@ -89,11 +93,15 @@ namespace FCSPowerStorage.Model
                     string savedDataJson = File.ReadAllText(SaveFile).Trim();
 
                     //LoadData
-                    var savedData = JsonConvert.DeserializeObject<SaveData>(savedDataJson);
+                    var savedData = JsonConvert.DeserializeObject<SaveData>(savedDataJson, new JsonSerializerSettings
+                    {
+                        MissingMemberHandling = MissingMemberHandling.Ignore
+                    });
                     SetCurrentBodyColor(savedData.BodyColor.Vector4ToColor());
                     PowerManager.SetPowerState(savedData.PowerState);
                     PowerManager.SetChargeMode(savedData.ChargeMode);
-                    PowerManager.LoadSave(savedData.Batteries);
+                    PowerManager.LoadSave(savedData);
+                    PowerManager.SetAutoActivate(savedData.AutoActivate);
                     AnimationManager.SetIntHash(ToggleHash, savedData.ToggleMode);
                 }
                 else

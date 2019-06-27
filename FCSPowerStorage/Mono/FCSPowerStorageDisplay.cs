@@ -68,12 +68,14 @@ namespace FCSPowerStorage.Model.Components
 
                 case "TrickleModeBTN":
                     _mono.PowerManager.SetChargeMode(PowerToggleStates.TrickleMode);
-                    _mono.AnimationManager.SetIntHash(_mono.ToggleHash, 1);
                     break;
 
                 case "ChargeModeBTN":
                     _mono.PowerManager.SetChargeMode(PowerToggleStates.ChargeMode);
-                    _mono.AnimationManager.SetIntHash(_mono.ToggleHash, 2);
+                    break;
+                case "AutoActivateBTN":
+                    bool value = !_mono.PowerManager.GetAutoActivate();
+                    _mono.PowerManager.SetAutoActivate(value);
                     break;
 
                 case "ColorItem":
@@ -249,6 +251,37 @@ namespace FCSPowerStorage.Model.Components
             batteryMonitorLbl.text = LanguageHelpers.GetLanguage(FCSPowerStorageBuildable.BatteryMetersKey);
 
             #endregion
+
+            #region Trickle Mode BTN
+            var trickleModeBtn = batteryMonitorPage.FindChild("Trickle_Mode")?.gameObject;
+            if (trickleModeBtn == null)
+            {
+                QuickLogger.Error("Screen: Trickle_Mode not found.");
+                return false;
+            }
+
+            InterfaceButton trickleBTN = trickleModeBtn.AddComponent<InterfaceButton>();
+            trickleBTN.OnButtonClick += OnButtonClick;
+            trickleBTN.ButtonMode = InterfaceButtonMode.None;
+            trickleBTN.BtnName = "TrickleModeBTN";
+
+            #endregion
+
+            #region Charge Mode BTN
+            var chargeModeBtn = batteryMonitorPage.FindChild("Charge_Mode")?.gameObject;
+            if (chargeModeBtn == null)
+            {
+                QuickLogger.Error("Screen: Charge_Mode not found.");
+                return false;
+            }
+
+            InterfaceButton chargeBTN = chargeModeBtn.AddComponent<InterfaceButton>();
+            chargeBTN.ButtonMode = InterfaceButtonMode.None;
+            chargeBTN.OnButtonClick += OnButtonClick;
+            chargeBTN.BtnName = "ChargeModeBTN";
+            #endregion
+
+
             // == Boot Page Elements == //
 
             #region Booting LBL
@@ -302,37 +335,30 @@ namespace FCSPowerStorage.Model.Components
 
             #endregion
 
-            #region Unit Mode LBL
+            #region System Settings LBL
 
-            var storageModeLbl = settingsScreen.FindChild("Storage_Mode_LBL").GetComponent<Text>();
+            var storageModeLbl = settingsScreen.FindChild("System_Settings_LBL").GetComponent<Text>();
             if (storageModeLbl == null)
             {
                 QuickLogger.Error("Screen: Storage Mode Label not found.");
                 return false;
             }
-            storageModeLbl.text = LanguageHelpers.GetLanguage(FCSPowerStorageBuildable.UnitModeKey);
+            storageModeLbl.text = LanguageHelpers.GetLanguage(FCSPowerStorageBuildable.SystemSettingsLBLKey);
 
             #endregion
 
-            #region Trickle Mode BTN
-            var trickleModeBtn = settingsScreen.FindChild("Trickle_Mode")?.gameObject;
-            if (trickleModeBtn == null)
+            #region Auto Activate BTN
+            var autoActivateBtn = settingsScreen.FindChild("Auto_Activate")?.gameObject;
+            if (autoActivateBtn == null)
             {
-                QuickLogger.Error("Screen: Trickle_Mode not found.");
+                QuickLogger.Error("Screen: Auto_Activate not found.");
                 return false;
             }
 
-            InterfaceButton trickleBTN = trickleModeBtn.AddComponent<InterfaceButton>();
-            trickleBTN.OnButtonClick += OnButtonClick;
-            trickleBTN.ButtonMode = InterfaceButtonMode.None;
-            trickleBTN.BtnName = "TrickleModeBTN";
-
-            var trickleModeCheckBox = trickleModeBtn.FindChild("Background").FindChild("Checkmark")?.gameObject;
-            if (trickleModeCheckBox == null)
-            {
-                QuickLogger.Error("Screen: Trickle_Mode =>Checkmark not found.");
-                return false;
-            }
+            InterfaceButton autoABTN = autoActivateBtn.AddComponent<InterfaceButton>();
+            autoABTN.ButtonMode = InterfaceButtonMode.None;
+            autoABTN.OnButtonClick += OnButtonClick;
+            autoABTN.BtnName = "AutoActivateBTN";
             #endregion
 
             #region Discharge Mode LBL
@@ -344,28 +370,6 @@ namespace FCSPowerStorage.Model.Components
             }
             trickleModeLbl.text = LanguageHelpers.GetLanguage(FCSPowerStorageBuildable.DischargeKey);
 
-            #endregion
-
-            #region Charge Mode BTN
-            var chargeModeBtn = settingsScreen.FindChild("Charge_Mode")?.gameObject;
-            if (chargeModeBtn == null)
-            {
-                QuickLogger.Error("Screen: Charge_Mode not found.");
-                return false;
-            }
-
-            InterfaceButton chargeBTN = chargeModeBtn.AddComponent<InterfaceButton>();
-            chargeBTN.ButtonMode = InterfaceButtonMode.None;
-            chargeBTN.OnButtonClick += OnButtonClick;
-            chargeBTN.BtnName = "ChargeModeBTN";
-
-
-            var chargeModeCheckBox = chargeModeBtn.FindChild("Background").FindChild("Checkmark")?.gameObject;
-            if (chargeModeCheckBox == null)
-            {
-                QuickLogger.Error("Screen: Charge_Mode =>Checkmark not found.");
-                return false;
-            }
             #endregion
 
             #region Charge Mode LBL
@@ -605,7 +609,7 @@ namespace FCSPowerStorage.Model.Components
 
         private void UpdatePowerInfo()
         {
-            _batteryMonitorAmountLbl.text = $"{Mathf.CeilToInt(_mono.PowerManager.GetPowerSum())}/{LoadData.BatteryConfiguration.Capacity}";
+            _batteryMonitorAmountLbl.text = $"{Mathf.RoundToInt(_mono.PowerManager.GetPowerSum())}/{LoadData.BatteryConfiguration.Capacity}";
         }
 
         private void UpdateBatteryMonitor()

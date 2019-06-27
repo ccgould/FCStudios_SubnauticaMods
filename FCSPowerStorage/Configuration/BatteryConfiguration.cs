@@ -23,6 +23,21 @@ namespace FCSPowerStorage.Configuration
         public float ChargeSpeed { get; set; } = 0.005f;
 
         /// <summary>
+        /// Enables/Disables the ability for the
+        /// </summary>
+        public bool DisableOnMinEnergyRequired { get; set; }
+
+        /// <summary>
+        /// Minimum amount of power required for charging
+        /// </summary>
+        public int MinEnergyRequired { get; set; } = 10;
+
+        /// <summary>
+        /// Amount to activate the power storage in case of low power
+        /// </summary>
+        public int AutoActivateAt { get; set; } = 1;
+
+        /// <summary>
         /// A list of custom ingredients for the use in the BluePrint
         /// </summary>
         public List<IngredientItem> Ingredients { get; set; } = new List<IngredientItem>();
