@@ -83,7 +83,6 @@
     <Compile Include="Buildables\FCSPowerStorageModelPrefab.cs" />
     <Compile Include="Configuration\Cfg.cs" />
     <Compile Include="Configuration\Information.cs" />
-    <Compile Include="Configuration\InGameOptions.cs" />
     <Compile Include="Configuration\IngredientItem.cs" />
     <Compile Include="Configuration\ModStrings.cs" />
     <Compile Include="Configuration\SaveData.cs" />
@@ -96,6 +95,7 @@
     <Compile Include="Managers\FCSPowerStorageAnimationManager.cs" />
     <Compile Include="Managers\SystemLightManager.cs" />
     <Compile Include="Models\PowercellModel.cs" />
+    <Compile Include="Managers\FCSTextBoxController.cs" />
     <Compile Include="Mono\FCSPowerStorageDisplay.cs" />
     <Compile Include="Display\InterfaceButton.cs" />
     <Compile Include="Display\OnScreenButton.cs" />

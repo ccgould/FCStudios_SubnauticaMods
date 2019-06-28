@@ -23,10 +23,14 @@ namespace FCSPowerStorage.Mono
 
         #region Internal Properties
         internal bool IsBeingDeleted { get; set; }
-        internal FCSPowerManager PowerManager { get; set; }
+        internal FCSPowerManager PowerManager { get; private set; }
+        internal FCSPowerStorageAnimationManager AnimationManager { get; private set; }
+        internal SystemLightManager SystemLightManager { get; private set; }
+        internal FCSPowerStorageDisplay Display { get; private set; }
         internal int StateHash { get; private set; }
         internal int ToggleHash { get; private set; }
         internal int AutoActiveHash { get; set; }
+        internal int BaseDrainHash { get; set; }
         #endregion
 
         #region Private Members
@@ -41,13 +45,13 @@ namespace FCSPowerStorage.Mono
             ToggleHash = Animator.StringToHash("ToggleState");
             StateHash = Animator.StringToHash("state");
             AutoActiveHash = Animator.StringToHash("AutoActivateState");
-            SystemLightManager.Initialize(gameObject);
+            BaseDrainHash = Animator.StringToHash("BaseDrain");
         }
 
-        public FCSPowerStorageAnimationManager AnimationManager { get; set; }
+
 
         internal readonly int BatteryCount = 6;
-        private FCSPowerStorageDisplay _display;
+
         private bool _initialized;
         private Color _currentBodyColor;
 
@@ -101,6 +105,7 @@ namespace FCSPowerStorage.Mono
                     PowerManager.LoadSave(savedData);
                     PowerManager.SetAutoActivate(savedData.AutoActivate);
                     AnimationManager.SetIntHash(ToggleHash, savedData.ToggleMode);
+                    AnimationManager.SetBoolHash(BaseDrainHash, LoadData.BatteryConfiguration.BaseDrainProtection);
                 }
                 else
                 {
@@ -147,6 +152,9 @@ namespace FCSPowerStorage.Mono
             _prefabId = GetComponentInParent<PrefabIdentifier>();
             _buildable = GetComponentInParent<Constructable>();
 
+            SystemLightManager = gameObject.GetOrAddComponent<SystemLightManager>();
+            SystemLightManager.Initialize(gameObject);
+
             PowerManager = gameObject.GetOrAddComponent<FCSPowerManager>();
 
             if (PowerManager == null)
@@ -169,8 +177,8 @@ namespace FCSPowerStorage.Mono
                 AnimationManager.Initialize(this);
             }
 
-            _display = gameObject.AddComponent<FCSPowerStorageDisplay>();
-            _display.Setup(this);
+            Display = gameObject.AddComponent<FCSPowerStorageDisplay>();
+            Display.Setup(this);
         }
 
         #endregion
@@ -180,6 +188,12 @@ namespace FCSPowerStorage.Mono
         {
             _currentBodyColor = color;
             MaterialHelpers.ChangeBodyColor("Power_Storage_StorageBaseColor_Albedo", color, gameObject);
+        }
+
+        internal void ActivateBaseDrain()
+        {
+            AnimationManager.SetBoolHash(BaseDrainHash, LoadData.BatteryConfiguration.BaseDrainProtection);
+            LoadData.BatteryConfiguration.SaveConfiguration();
         }
         #endregion
 

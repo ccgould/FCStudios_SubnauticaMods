@@ -29,7 +29,7 @@ namespace FCSPowerStorage.Configuration
         /// </summary>
         public bool BaseDrainProtection { get; set; }
 
-        public int BaseDrainProtectionMultiplier { get; set; } = 1;
+        //public int BaseDrainProtectionMultiplier { get; set; } = 1;
 
         /// <summary>
         /// Minimum amount of power required for charging
@@ -40,7 +40,17 @@ namespace FCSPowerStorage.Configuration
         /// <summary>
         /// Amount to activate multiplier
         /// </summary>
-        public int AutoActivateMultiplier { get; set; } = 1;
+        //public int AutoActivateMultiplier { get; set; } = 1;
+
+        /// <summary>
+        /// Amount to activate slider
+        /// </summary>
+        //public int AutoActivateSlider { get; set; } = 1;
+
+        /// <summary>
+        /// Amount to baase protection slider
+        /// </summary>
+        //public int BaseDrainProtectionSlider { get; set; } = 1;
 
         /// <summary>
         /// Amount to activate the power storage in case of low power
@@ -51,6 +61,7 @@ namespace FCSPowerStorage.Configuration
         /// A list of custom ingredients for the use in the BluePrint
         /// </summary>
         public List<IngredientItem> Ingredients { get; set; } = new List<IngredientItem>();
+
 
         public bool ValidateData()
         {
@@ -85,6 +96,25 @@ namespace FCSPowerStorage.Configuration
         {
             var output = JsonConvert.SerializeObject(this, Formatting.Indented);
             File.WriteAllText(Information.ConfigurationFile(), output);
+        }
+
+        internal int GetBasePowerProtection()
+        {
+            return BaseDrainProtectionGoal;
+        }
+
+        internal int GetAutoActivate()
+        {
+            return AutoActivateAt;
+        }
+        internal void SetBasePowerProtection(int value)
+        {
+            BaseDrainProtectionGoal = value;
+        }
+
+        internal void SetAutoActivate(int value)
+        {
+            AutoActivateAt = value;
         }
     }
 }

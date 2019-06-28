@@ -1,4 +1,5 @@
-﻿using FCSCommon.Enums;
+﻿using FCSAlterraShipping.Mono;
+using FCSCommon.Enums;
 using FCSCommon.Helpers;
 using FCSCommon.Objects;
 using FCSCommon.Utilities;
@@ -7,6 +8,7 @@ using FCSPowerStorage.Buildables;
 using FCSPowerStorage.Configuration;
 using FCSPowerStorage.Display;
 using Oculus.Newtonsoft.Json;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -34,6 +36,8 @@ namespace FCSPowerStorage.Mono
         private GameObject _pageCounter;
         private Text _pageCounterText;
         private GameObject _colorPicker;
+        private Text _autoActivateTextB;
+        private Text _baseDrainLimitTextB;
 
         public override void ClearPage()
         {
@@ -86,11 +90,36 @@ namespace FCSPowerStorage.Mono
                     _mono.PowerManager.SetAutoActivate(value);
                     break;
 
+                case "BaseDrainBTN":
+                    UpdateActivateBaseDrain();
+                    break;
+
                 case "ColorItem":
                     var color = (Color)tag;
                     _mono.SetCurrentBodyColor(color);
                     break;
             }
+        }
+
+
+        internal void UpdateActivateBaseDrain()
+        {
+            QuickLogger.Debug("Updating Activate Base Drain", true);
+
+            var powerStorage = FindObjectsOfType<FCSPowerStorageController>();
+
+            LoadData.BatteryConfiguration.BaseDrainProtection ^= true;
+
+            foreach (FCSPowerStorageController controller in powerStorage)
+            {
+                controller.ActivateBaseDrain();
+            }
+        }
+
+        internal void UpdateTextBoxes()
+        {
+            _autoActivateTextB.text = LoadData.BatteryConfiguration.AutoActivateAt.ToString();
+            _baseDrainLimitTextB.text = LoadData.BatteryConfiguration.BaseDrainProtectionGoal.ToString();
         }
 
         public override void ItemModified<T>(T item)
@@ -355,8 +384,17 @@ namespace FCSPowerStorage.Mono
 
             #endregion
 
+            #region Grid
+            var grid = settingsScreen.FindChild("Grid")?.gameObject;
+            if (grid == null)
+            {
+                QuickLogger.Error("Screen: Grid not found.");
+                return false;
+            }
+            #endregion
+
             #region Auto Activate BTN
-            var autoActivateBtn = settingsScreen.FindChild("Auto_Activate")?.gameObject;
+            var autoActivateBtn = grid.FindChild("Auto_Activate")?.gameObject;
             if (autoActivateBtn == null)
             {
                 QuickLogger.Error("Screen: Auto_Activate not found.");
@@ -367,7 +405,85 @@ namespace FCSPowerStorage.Mono
             autoABTN.ButtonMode = InterfaceButtonMode.None;
             autoABTN.OnButtonClick += OnButtonClick;
             autoABTN.BtnName = "AutoActivateBTN";
+
             #endregion
+
+            #region Auto Activate Limit 
+            var autoActivateLimitBtn = grid.FindChild("Auto_Activate_Limit")?.gameObject;
+            if (autoActivateLimitBtn == null)
+            {
+                QuickLogger.Error("Screen: Auto_Activate_Limit not found.");
+                return false;
+            }
+
+            var autoActivateLimitTextBox = autoActivateLimitBtn.FindChild("Background").FindChild("Text")?.gameObject;
+
+            if (autoActivateLimitTextBox == null)
+            {
+                QuickLogger.Error("Screen:btnName Text not found.");
+                return false;
+            }
+
+            _autoActivateTextB = autoActivateLimitTextBox.GetComponent<Text>();
+            _autoActivateTextB.text = LoadData.BatteryConfiguration.AutoActivateAt.ToString();
+
+            var autoActivateResult = CreateSystemButton(autoActivateLimitTextBox,
+                "Used to change unit to discharge mode at set limit.", "Change auto activate limit",
+                LoadData.BatteryConfiguration.GetAutoActivate, LoadData.BatteryConfiguration.SetAutoActivate);
+
+            if (!autoActivateResult)
+            {
+                return false;
+            }
+
+            #endregion
+
+            #region Base Drain Protection BTN
+            var baseDrainProtectionBtn = grid.FindChild("Base_Drain_Protection")?.gameObject;
+            if (baseDrainProtectionBtn == null)
+            {
+                QuickLogger.Error("Screen: Base_Drain_Protection not found.");
+                return false;
+            }
+
+            InterfaceButton bDPBTN = baseDrainProtectionBtn.AddComponent<InterfaceButton>();
+            bDPBTN.ButtonMode = InterfaceButtonMode.None;
+            bDPBTN.OnButtonClick += OnButtonClick;
+            bDPBTN.BtnName = "BaseDrainBTN";
+            #endregion
+
+            #region Base Drain Limit 
+            var baseDrainlimitBtn = grid.FindChild("Base_Drain_Limit")?.gameObject;
+
+            if (baseDrainlimitBtn == null)
+            {
+                QuickLogger.Error("Screen: Base_Drain_Limit not found.");
+                return false;
+            }
+
+            var baseDrainlimitTextBox = baseDrainlimitBtn.FindChild("Background").FindChild("Text")?.gameObject;
+
+            if (baseDrainlimitTextBox == null)
+            {
+                QuickLogger.Error("Screen:baseDrainlimitTextBox Text not found.");
+                return false;
+            }
+
+            _baseDrainLimitTextB = baseDrainlimitTextBox.GetComponent<Text>();
+            _baseDrainLimitTextB.text = LoadData.BatteryConfiguration.BaseDrainProtectionGoal.ToString();
+
+            var baseDrainResult = CreateSystemButton(baseDrainlimitTextBox,
+                "Used to stop power stage from changing at the specified power unit", "Change base drain protection limit",
+                LoadData.BatteryConfiguration.GetBasePowerProtection, LoadData.BatteryConfiguration.SetBasePowerProtection);
+
+            if (!baseDrainResult)
+            {
+                return false;
+            }
+            #endregion
+
+
+            //TODO Add langugae for btns
 
             #region Discharge Mode LBL
             var trickleModeLbl = trickleModeBtn.FindChild("Label").GetComponent<Text>();
@@ -499,6 +615,29 @@ namespace FCSPowerStorage.Mono
             #endregion
 
             return true;
+        }
+
+        private bool CreateSystemButton(GameObject go, string desc, string onhover, Func<int> getValue, Action<int> setValue)
+        {
+
+            var textBoxController = go.AddComponent<FCSTextBoxController>();
+            textBoxController.OnLabelChanged += OnLabelChanged;
+            FCSTextBoxController.Create(desc, onhover, go, getValue, setValue);
+
+            return true;
+        }
+
+
+        private void OnLabelChanged()
+        {
+            LoadData.BatteryConfiguration.SaveConfiguration();
+
+            var powerStorage = FindObjectsOfType<FCSPowerStorageController>();
+
+            foreach (FCSPowerStorageController controller in powerStorage)
+            {
+                controller.Display.UpdateTextBoxes();
+            }
         }
 
         public override IEnumerator PowerOff()

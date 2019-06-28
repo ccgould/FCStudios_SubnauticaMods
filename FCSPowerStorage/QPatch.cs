@@ -1,7 +1,5 @@
 ﻿using FCSCommon.Utilities;
 using FCSPowerStorage.Buildables;
-using FCSPowerStorage.Configuration;
-using SMLHelper.V2.Handlers;
 using System;
 using Utilites.Logger;
 
@@ -25,7 +23,7 @@ namespace FCSPowerStorage
 #endif
 
                 LoadData.Patch();
-                OptionsPanelHandler.RegisterModOptions(new InGameOptions());
+                //OptionsPanelHandler.RegisterModOptions(new InGameOptions());
                 FCSPowerStorageBuildable.PatchHelper();
             }
             catch (Exception e)

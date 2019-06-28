@@ -12,7 +12,8 @@ namespace FCSPowerStorage.Configuration
         private const string DisableOnMinEnergyRequiredID = "DisableOnMinEnergyRequired";
         private const string AutoActivateAtID = "AutoActivateAt";
 
-        public InGameOptions() : base("Power Storage (Numbers are multiplied by 10 eg. 1 = 10)")
+
+        public InGameOptions() : base("Power Storage (Numbers are multiplied by the multipliers)")
         {
             ToggleChanged += OnToggleChanged;
             SliderChanged += OnSliderChanged;
@@ -27,21 +28,23 @@ namespace FCSPowerStorage.Configuration
                     break;
 
                 case MinEnergyID:
+                    LoadData.BatteryConfiguration.BaseDrainProtectionSlider = e.IntegerValue;
                     UpdateGoals(MinEnergyID, e.IntegerValue);
                     break;
 
                 case AutoActivateAtID:
+                    LoadData.BatteryConfiguration.AutoActivateSlider = e.IntegerValue;
                     UpdateGoals(AutoActivateAtID, e.IntegerValue);
                     break;
 
                 case BaseDrainProtectionMulID:
                     LoadData.BatteryConfiguration.BaseDrainProtectionMultiplier = e.IntegerValue;
-                    UpdateGoals(MinEnergyID, e.IntegerValue);
+                    UpdateGoals(BaseDrainProtectionMulID, e.IntegerValue);
                     break;
 
                 case AutoActivateMulID:
                     LoadData.BatteryConfiguration.AutoActivateMultiplier = e.IntegerValue;
-                    UpdateGoals(AutoActivateAtID, e.IntegerValue);
+                    UpdateGoals(AutoActivateMulID, e.IntegerValue);
                     break;
             }
 
@@ -59,6 +62,14 @@ namespace FCSPowerStorage.Configuration
                 case AutoActivateAtID:
                     LoadData.BatteryConfiguration.AutoActivateAt = value * LoadData.BatteryConfiguration.AutoActivateMultiplier;
                     break;
+
+                case BaseDrainProtectionMulID:
+                    LoadData.BatteryConfiguration.BaseDrainProtectionGoal = LoadData.BatteryConfiguration.BaseDrainProtectionSlider * value;
+                    break;
+
+                case AutoActivateMulID:
+                    LoadData.BatteryConfiguration.AutoActivateAt = LoadData.BatteryConfiguration.AutoActivateSlider * value;
+                    break;
             }
         }
 
@@ -74,10 +85,12 @@ namespace FCSPowerStorage.Configuration
         {
             //AddSliderOption(CapacityID, "Power Storage Capacity", 1f, 1000f, LoadData.BatteryConfiguration.Capacity / 10); //Disabled because of slider limitations
             AddToggleOption(DisableOnMinEnergyRequiredID, "Enable Base Drain Protection.", LoadData.BatteryConfiguration.BaseDrainProtection);
+
             AddSliderOption(BaseDrainProtectionMulID, "Base Drain Protection Goal Multiplier", 1f, 100f, LoadData.BatteryConfiguration.BaseDrainProtectionMultiplier);
-            AddSliderOption(MinEnergyID, "Base Drain Protection Goal.", 1f, 10f, Mathf.Round(Mathf.Round(LoadData.BatteryConfiguration.BaseDrainProtectionGoal) / Mathf.Round(LoadData.BatteryConfiguration.BaseDrainProtectionMultiplier)));
+            AddSliderOption(MinEnergyID, "Base Drain Protection Goal.", 1f, 100f, Mathf.Round(Mathf.Round(LoadData.BatteryConfiguration.BaseDrainProtectionSlider) / Mathf.Round(LoadData.BatteryConfiguration.BaseDrainProtectionMultiplier)));
+
             AddSliderOption(AutoActivateMulID, "Auto Activate Multiplier", 1f, 100f, LoadData.BatteryConfiguration.AutoActivateMultiplier);
-            AddSliderOption(AutoActivateAtID, "Auto Activate Discharge At..", 1f, 10f, Mathf.Round(Mathf.Round(LoadData.BatteryConfiguration.AutoActivateAt) / Mathf.Round(LoadData.BatteryConfiguration.AutoActivateMultiplier)));
+            AddSliderOption(AutoActivateAtID, "Auto Activate Discharge At..", 1f, 100f, Mathf.Round(Mathf.Round(LoadData.BatteryConfiguration.AutoActivateSlider) / Mathf.Round(LoadData.BatteryConfiguration.AutoActivateMultiplier)));
 
         }
     }

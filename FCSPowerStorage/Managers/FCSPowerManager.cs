@@ -71,7 +71,7 @@ namespace FCSPowerStorage.Managers
                     _chargeMode == PowerToggleStates.ChargeMode &&
                     _chargeMode != PowerToggleStates.TrickleMode)
                 {
-                    QuickLogger.Info("Auto Activating Power Storage", true);
+                    QuickLogger.Debug("Auto Activating Power Storage", true);
                     SetChargeMode(PowerToggleStates.TrickleMode);
                 }
 
@@ -82,7 +82,7 @@ namespace FCSPowerStorage.Managers
                     _powerState != FCSPowerStates.Unpowered &&
                     _chargeMode != PowerToggleStates.ChargeMode)
                 {
-                    QuickLogger.Info("Auto Charge Power Storage", true);
+                    QuickLogger.Debug("Auto Charge Power Storage", true);
                     SetChargeMode(PowerToggleStates.ChargeMode);
                 }
             }
@@ -355,11 +355,11 @@ namespace FCSPowerStorage.Managers
             switch (savedDataChargeMode)
             {
                 case PowerToggleStates.TrickleMode:
-                    SystemLightManager.ChangeSystemLights(SystemLightState.Default);
+                    _mono.SystemLightManager.ChangeSystemLights(SystemLightState.Default);
                     _mono.AnimationManager.SetBoolHash(_mono.ToggleHash, false);
                     break;
                 case PowerToggleStates.ChargeMode:
-                    SystemLightManager.ChangeSystemLights(SystemLightState.Warning);
+                    _mono.SystemLightManager.ChangeSystemLights(SystemLightState.Warning);
                     _mono.AnimationManager.SetBoolHash(_mono.ToggleHash, true);
                     break;
             }
@@ -379,12 +379,12 @@ namespace FCSPowerStorage.Managers
                 //Reset The systemLight
                 case FCSPowerStates.Powered:
                     _mono.AnimationManager.SetIntHash(_mono.StateHash, 1);
-                    SystemLightManager.RestoreStoredState();
+                    _mono.SystemLightManager.RestoreStoredState();
                     break;
 
                 case FCSPowerStates.Unpowered:
-                    SystemLightManager.StoreCurrentState();
-                    SystemLightManager.ChangeSystemLights(SystemLightState.Unpowered);
+                    _mono.SystemLightManager.StoreCurrentState();
+                    _mono.SystemLightManager.ChangeSystemLights(SystemLightState.Unpowered);
                     break;
             }
 
