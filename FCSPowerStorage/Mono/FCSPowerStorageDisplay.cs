@@ -85,6 +85,7 @@ namespace FCSPowerStorage.Mono
                     }
                     _mono.PowerManager.SetChargeMode(PowerToggleStates.ChargeMode);
                     break;
+
                 case "AutoActivateBTN":
                     bool value = !_mono.PowerManager.GetAutoActivate();
                     _mono.PowerManager.SetAutoActivate(value);
@@ -94,13 +95,16 @@ namespace FCSPowerStorage.Mono
                     UpdateActivateBaseDrain();
                     break;
 
+                case "SyncBTN":
+                    _mono.SyncAll();
+                    break;
+
                 case "ColorItem":
                     var color = (Color)tag;
                     _mono.SetCurrentBodyColor(color);
                     break;
             }
         }
-
 
         internal void UpdateActivateBaseDrain()
         {
@@ -380,7 +384,7 @@ namespace FCSPowerStorage.Mono
                 QuickLogger.Error("Screen: Storage Mode Label not found.");
                 return false;
             }
-            storageModeLbl.text = LanguageHelpers.GetLanguage(FCSPowerStorageBuildable.SystemSettingsLBLKey);
+            storageModeLbl.text = LanguageHelpers.GetLanguage(FCSPowerStorageBuildable.SystemSettingsLblKey);
 
             #endregion
 
@@ -401,10 +405,45 @@ namespace FCSPowerStorage.Mono
                 return false;
             }
 
+            var autoActivateTxt = autoActivateBtn.FindChild("Label").GetComponent<Text>();
+
+            if (autoActivateTxt == null)
+            {
+                QuickLogger.Error("Screen: Auto_Activate text not found.");
+                return false;
+            }
+
+            autoActivateTxt.text = LanguageHelpers.GetLanguage(FCSPowerStorageBuildable.AutoActivateKey);
+
             InterfaceButton autoABTN = autoActivateBtn.AddComponent<InterfaceButton>();
             autoABTN.ButtonMode = InterfaceButtonMode.None;
             autoABTN.OnButtonClick += OnButtonClick;
             autoABTN.BtnName = "AutoActivateBTN";
+
+            #endregion
+
+            #region Sync BTN
+            var syncBtn = grid.FindChild("Sync")?.gameObject;
+            if (syncBtn == null)
+            {
+                QuickLogger.Error("Screen: Sync not found.");
+                return false;
+            }
+
+            var syncAllBtnTxt = syncBtn.FindChild("Label").GetComponent<Text>();
+
+            if (syncAllBtnTxt == null)
+            {
+                QuickLogger.Error("Screen: Sync All text not found.");
+                return false;
+            }
+
+            syncAllBtnTxt.text = LanguageHelpers.GetLanguage(FCSPowerStorageBuildable.SyncAllKey);
+
+            InterfaceButton syncBTN = syncBtn.AddComponent<InterfaceButton>();
+            syncBTN.ButtonMode = InterfaceButtonMode.None;
+            syncBTN.OnButtonClick += OnButtonClick;
+            syncBTN.BtnName = "SyncBTN";
 
             #endregion
 
@@ -415,6 +454,16 @@ namespace FCSPowerStorage.Mono
                 QuickLogger.Error("Screen: Auto_Activate_Limit not found.");
                 return false;
             }
+
+            var autoActivateLimitTxt = autoActivateLimitBtn.FindChild("Label").GetComponent<Text>();
+
+            if (autoActivateLimitTxt == null)
+            {
+                QuickLogger.Error("Screen: Auto_Activate_limit text not found.");
+                return false;
+            }
+
+            autoActivateLimitTxt.text = LanguageHelpers.GetLanguage(FCSPowerStorageBuildable.AutoActivateAtKey);
 
             var autoActivateLimitTextBox = autoActivateLimitBtn.FindChild("Background").FindChild("Text")?.gameObject;
 
@@ -428,7 +477,7 @@ namespace FCSPowerStorage.Mono
             _autoActivateTextB.text = LoadData.BatteryConfiguration.AutoActivateAt.ToString();
 
             var autoActivateResult = CreateSystemButton(autoActivateLimitTextBox,
-                "Used to change unit to discharge mode at set limit.", "Change auto activate limit",
+                LanguageHelpers.GetLanguage(FCSPowerStorageBuildable.AutoActivateDescKey), LanguageHelpers.GetLanguage(FCSPowerStorageBuildable.AutoActivateOnHoverKey),
                 LoadData.BatteryConfiguration.GetAutoActivate, LoadData.BatteryConfiguration.SetAutoActivate);
 
             if (!autoActivateResult)
@@ -446,6 +495,16 @@ namespace FCSPowerStorage.Mono
                 return false;
             }
 
+            var baseDrianProtectionTxt = baseDrainProtectionBtn.FindChild("Label").GetComponent<Text>();
+
+            if (baseDrianProtectionTxt == null)
+            {
+                QuickLogger.Error("Screen: Base_Drain_protection text not found.");
+                return false;
+            }
+
+            baseDrianProtectionTxt.text = LanguageHelpers.GetLanguage(FCSPowerStorageBuildable.BaseDrainProtectionKey);
+
             InterfaceButton bDPBTN = baseDrainProtectionBtn.AddComponent<InterfaceButton>();
             bDPBTN.ButtonMode = InterfaceButtonMode.None;
             bDPBTN.OnButtonClick += OnButtonClick;
@@ -461,6 +520,16 @@ namespace FCSPowerStorage.Mono
                 return false;
             }
 
+            var baseDrianLimitTxt = baseDrainlimitBtn.FindChild("Label").GetComponent<Text>();
+
+            if (baseDrianLimitTxt == null)
+            {
+                QuickLogger.Error("Screen: Base_Drain_Limit  text not found.");
+                return false;
+            }
+
+            baseDrianLimitTxt.text = LanguageHelpers.GetLanguage(FCSPowerStorageBuildable.BaseDrainLimitKey);
+
             var baseDrainlimitTextBox = baseDrainlimitBtn.FindChild("Background").FindChild("Text")?.gameObject;
 
             if (baseDrainlimitTextBox == null)
@@ -473,7 +542,7 @@ namespace FCSPowerStorage.Mono
             _baseDrainLimitTextB.text = LoadData.BatteryConfiguration.BaseDrainProtectionGoal.ToString();
 
             var baseDrainResult = CreateSystemButton(baseDrainlimitTextBox,
-                "Used to stop power stage from changing at the specified power unit", "Change base drain protection limit",
+                LanguageHelpers.GetLanguage(FCSPowerStorageBuildable.BaseDrainLimitDescKey), LanguageHelpers.GetLanguage(FCSPowerStorageBuildable.BaseDrainLimitOnHoverKey),
                 LoadData.BatteryConfiguration.GetBasePowerProtection, LoadData.BatteryConfiguration.SetBasePowerProtection);
 
             if (!baseDrainResult)
@@ -626,7 +695,6 @@ namespace FCSPowerStorage.Mono
 
             return true;
         }
-
 
         private void OnLabelChanged()
         {

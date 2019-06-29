@@ -44,7 +44,6 @@ namespace FCSAlterraShipping.Buildable
         {
             SubRoot currentSub = Player.main.currentSub;
 
-
             if (currentSub != null)
             {
                 QuickLogger.Debug($"Current Sub = {currentSub.GetInstanceID()}", true);

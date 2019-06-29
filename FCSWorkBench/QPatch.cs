@@ -1,6 +1,7 @@
 ﻿using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using FCSTechWorkBench.Mono;
+using FCSTechWorkBench.Mono.PowerStorage;
 using Harmony;
 using System;
 using System.IO;
@@ -27,7 +28,11 @@ namespace FCSTechWorkBench
                 var freon = new FreonBuildable();
                 freon.Register();
 
+                var psKit = new PowerStorageKitBuildable();
+                psKit.Register();
+
                 FCSTechWorkBenchBuildable.ItemsList.Add(freon);
+                FCSTechWorkBenchBuildable.ItemsList.Add(psKit);
 
                 FCSTechWorkBenchBuildable.PatchHelper();
 
@@ -58,8 +63,25 @@ namespace FCSTechWorkBench
 
             Bundle = assetBundle;
 
+
+            //We have found the asset bundle and now we are going to continue by looking for the model.
+            Kit = Bundle.LoadAsset<GameObject>("KIT");
+
+            //If the prefab isn't null lets add the shader to the materials
+            if (Kit != null)
+            {
+                QuickLogger.Debug($"Kit Prefab Found!");
+            }
+            else
+            {
+                QuickLogger.Error($"Kit Prefab Not Found!");
+                return false;
+            }
+
             return true;
         }
+
+        public static GameObject Kit { get; set; }
 
         public static AssetBundle Bundle { get; set; }
     }

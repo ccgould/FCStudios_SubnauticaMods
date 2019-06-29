@@ -70,6 +70,8 @@
     <Compile Include="Mono\FCSTechWorkBenchPatcher.cs" />
     <Compile Include="Mono\FreonModelPrefab.cs" />
     <Compile Include="Mono\FreonPatcher.cs" />
+    <Compile Include="Mono\PowerStorage\PowerStorageKitModelPrefab.cs" />
+    <Compile Include="Mono\PowerStorage\PowerStorageKitPatcher.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

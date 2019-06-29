@@ -91,6 +91,7 @@
     <Compile Include="Helpers\ItemHelpers.cs" />
     <Compile Include="LoadData.cs" />
     <Compile Include="Display\ColorItemButton.cs" />
+    <Compile Include="Managers\BaseManager.cs" />
     <Compile Include="Managers\FCSPowerManager.cs" />
     <Compile Include="Managers\FCSPowerStorageAnimationManager.cs" />
     <Compile Include="Managers\SystemLightManager.cs" />
@@ -102,6 +103,7 @@
     <Compile Include="Display\PaginatorButton.cs" />
     <Compile Include="Mono\FCSPowerStorageController.cs" />
     <Compile Include="Buildables\FCSPowerStoragePatcher.cs" />
+    <Compile Include="Patchers\SubRoot_Patches.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

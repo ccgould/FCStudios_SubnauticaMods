@@ -38,7 +38,6 @@ namespace FCSPowerStorage.Buildables
 
             //========== Allows the building animation and material colors ==========// 
 
-
             Renderer[] renderers = prefab.GetComponentsInChildren<Renderer>();
             SkyApplier skyApplier = prefab.GetOrAddComponent<SkyApplier>();
             skyApplier.renderers = renderers;

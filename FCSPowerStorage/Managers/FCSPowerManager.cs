@@ -60,32 +60,6 @@ namespace FCSPowerStorage.Managers
         {
             Recharge();
             CheckIfUnpowered();
-            AutoSystem();
-        }
-
-        private void AutoSystem()
-        {
-            if (_autoActivate && _powerState != FCSPowerStates.Unpowered)
-            {
-                if (GetBasePower() <= LoadData.BatteryConfiguration.AutoActivateAt &&
-                    _chargeMode == PowerToggleStates.ChargeMode &&
-                    _chargeMode != PowerToggleStates.TrickleMode)
-                {
-                    QuickLogger.Debug("Auto Activating Power Storage", true);
-                    SetChargeMode(PowerToggleStates.TrickleMode);
-                }
-
-                var basePower = GetBasePower() - Mathf.RoundToInt(GetPowerSum());
-                var chargeModeActivationTarget = LoadData.BatteryConfiguration.AutoActivateAt;
-
-                if (basePower > chargeModeActivationTarget &&
-                    _powerState != FCSPowerStates.Unpowered &&
-                    _chargeMode != PowerToggleStates.ChargeMode)
-                {
-                    QuickLogger.Debug("Auto Charge Power Storage", true);
-                    SetChargeMode(PowerToggleStates.ChargeMode);
-                }
-            }
         }
 
         private void CheckIfUnpowered()
@@ -134,7 +108,7 @@ namespace FCSPowerStorage.Managers
             }
         }
 
-        private int GetBasePower()
+        internal int GetBasePower()
         {
             return _connectedRelay != null ? Mathf.RoundToInt(_connectedRelay.GetPower()) : 0;
         }
@@ -192,14 +166,16 @@ namespace FCSPowerStorage.Managers
         /// <param name="save"></param>
         internal void LoadSave(SaveData save)
         {
+            SetPowerState(save.PowerState);
+            SetChargeMode(save.ChargeMode);
+            SetAutoActivate(save.AutoActivate);
+
             for (int i = 0; i < _mono.BatteryCount; i++)
             {
                 var power = save.Batteries[i].Power;
                 QuickLogger.Debug($"Loading Power From Save : {power}");
                 _powerCells[i].SetPower(power);
             }
-
-            _autoActivate = save.AutoActivate;
         }
 
         /// <summary>
@@ -348,6 +324,7 @@ namespace FCSPowerStorage.Managers
 
         internal void SetChargeMode(PowerToggleStates savedDataChargeMode)
         {
+            QuickLogger.Debug($"Toggle State {savedDataChargeMode}");
             _chargeMode = savedDataChargeMode;
 
             if (_powerState == FCSPowerStates.Unpowered) return;
@@ -404,8 +381,24 @@ namespace FCSPowerStorage.Managers
         public void SetAutoActivate(bool value)
         {
             _autoActivate = value;
+
+            if (value)
+            {
+                if (_chargeMode == PowerToggleStates.TrickleMode)
+                {
+                    SetChargeMode(PowerToggleStates.ChargeMode);
+                }
+
+                _mono.AddToManager();
+            }
+            else
+            {
+                BaseManager.RemovePowerStorage(_mono);
+            }
+
             _mono.AnimationManager.SetBoolHash(_mono.AutoActiveHash, value);
             QuickLogger.Debug($"Auto Activate: {_autoActivate}", true);
         }
+
     }
 }

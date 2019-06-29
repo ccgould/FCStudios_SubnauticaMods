@@ -12,13 +12,14 @@ namespace FCSPowerStorage.Mono
     /// <summary>
     /// The controller for the custom battery
     /// </summary>
-    internal class FCSPowerStorageController : MonoBehaviour, IProtoEventListener, IConstructable
+    internal class FCSPowerStorageController : MonoBehaviour, IProtoTreeEventListener, IConstructable
     {
         #region Private Members
         private PrefabIdentifier _prefabId;
         private readonly string _saveDirectory = Information.GetSaveFileDirectory();
         private string SaveFile => Path.Combine(_saveDirectory, _prefabId.Id + ".json");
-
+        private bool _initialized;
+        private Color _currentBodyColor;
         #endregion
 
         #region Internal Properties
@@ -31,6 +32,10 @@ namespace FCSPowerStorage.Mono
         internal int ToggleHash { get; private set; }
         internal int AutoActiveHash { get; set; }
         internal int BaseDrainHash { get; set; }
+        public SubRoot SubRoot { get; private set; }
+        public BaseManager Manager { get; private set; }
+        internal bool IsConstructed => _buildable != null && _buildable.constructed;
+        internal readonly int BatteryCount = 6;
         #endregion
 
         #region Private Members
@@ -48,76 +53,15 @@ namespace FCSPowerStorage.Mono
             BaseDrainHash = Animator.StringToHash("BaseDrain");
         }
 
-
-
-        internal readonly int BatteryCount = 6;
-
-        private bool _initialized;
-        private Color _currentBodyColor;
+        private void OnDestroy()
+        {
+            BaseManager.RemovePowerStorage(this);
+            BaseManager.RemoveBasePowerStorage(this);
+        }
 
         #endregion
 
         #region Inherited Public Methods
-
-        public void OnProtoSerialize(ProtobufSerializer serializer)
-        {
-            QuickLogger.Debug($"Saving {_prefabId.Id} Data");
-
-            if (!Directory.Exists(_saveDirectory))
-                Directory.CreateDirectory(_saveDirectory);
-
-            var saveData = new SaveData
-            {
-                BodyColor = _currentBodyColor.ColorToVector4(),
-                Batteries = PowerManager.Save(),
-                PowerState = PowerManager.GetPowerState(),
-                ChargeMode = PowerManager.GetChargeMode(),
-                ToggleMode = AnimationManager.GetIntHash(ToggleHash),
-                AutoActivate = PowerManager.GetAutoActivate()
-            };
-
-            var output = JsonConvert.SerializeObject(saveData, Formatting.Indented);
-            File.WriteAllText(SaveFile, output);
-            LoadData.CleanOldSaveData();
-            QuickLogger.Debug($"Saved {_prefabId.Id} Data");
-        }
-
-        public void OnProtoDeserialize(ProtobufSerializer serializer)
-        {
-            QuickLogger.Debug("// ****************************** Load Data *********************************** //");
-
-            if (_prefabId != null)
-            {
-                QuickLogger.Info($"Loading FCSPowerStorage {_prefabId.Id}");
-
-                if (File.Exists(SaveFile))
-                {
-                    string savedDataJson = File.ReadAllText(SaveFile).Trim();
-
-                    //LoadData
-                    var savedData = JsonConvert.DeserializeObject<SaveData>(savedDataJson, new JsonSerializerSettings
-                    {
-                        MissingMemberHandling = MissingMemberHandling.Ignore
-                    });
-                    SetCurrentBodyColor(savedData.BodyColor.Vector4ToColor());
-                    PowerManager.SetPowerState(savedData.PowerState);
-                    PowerManager.SetChargeMode(savedData.ChargeMode);
-                    PowerManager.LoadSave(savedData);
-                    PowerManager.SetAutoActivate(savedData.AutoActivate);
-                    AnimationManager.SetIntHash(ToggleHash, savedData.ToggleMode);
-                    AnimationManager.SetBoolHash(BaseDrainHash, LoadData.BatteryConfiguration.BaseDrainProtection);
-                }
-                else
-                {
-                    QuickLogger.Info($"No save file for {_prefabId.Id}");
-                }
-            }
-            else
-            {
-                QuickLogger.Error("PrefabIdentifier is null");
-            }
-            QuickLogger.Debug("// ****************************** Loaded Data *********************************** //");
-        }
 
         public bool CanDeconstruct(out string reason)
         {
@@ -136,8 +80,8 @@ namespace FCSPowerStorage.Mono
                 if (!_initialized)
                 {
                     Initialize();
+                    AddToBaseManager();
                 }
-
             }
         }
 
@@ -175,6 +119,7 @@ namespace FCSPowerStorage.Mono
             else
             {
                 AnimationManager.Initialize(this);
+                AnimationManager.SetBoolHash(BaseDrainHash, LoadData.BatteryConfiguration.BaseDrainProtection);
             }
 
             Display = gameObject.AddComponent<FCSPowerStorageDisplay>();
@@ -197,5 +142,91 @@ namespace FCSPowerStorage.Mono
         }
         #endregion
 
+        internal void AddToManager(BaseManager managers = null)
+        {
+            if (SubRoot == null)
+            {
+                SubRoot = GetComponentInParent<SubRoot>();
+            }
+            Manager = managers ?? BaseManager.FindManager(SubRoot);
+            Manager.AddPowerStorage(this);
+
+            QuickLogger.Debug("Power Storage has been connected", true);
+        }
+
+        internal void AddToBaseManager(BaseManager managers = null)
+        {
+            if (SubRoot == null)
+            {
+                SubRoot = GetComponentInParent<SubRoot>();
+            }
+
+            Manager = managers ?? BaseManager.FindManager(SubRoot);
+            Manager.AddBasePowerStorage(this);
+
+            QuickLogger.Debug($"Power Storage has been connected to base list Count {Manager.BasePowerStorageUnits.Count}", true);
+        }
+
+        public void SyncAll()
+        {
+            Manager.SyncUnits(PowerManager.GetPowerState(), PowerManager.GetChargeMode(), PowerManager.GetAutoActivate());
+        }
+
+        public void OnProtoSerializeObjectTree(ProtobufSerializer serializer)
+        {
+            QuickLogger.Debug($"Saving {_prefabId.Id} Data");
+
+            if (!Directory.Exists(_saveDirectory))
+                Directory.CreateDirectory(_saveDirectory);
+
+            var saveData = new SaveData
+            {
+                BodyColor = _currentBodyColor.ColorToVector4(),
+                Batteries = PowerManager.Save(),
+                PowerState = PowerManager.GetPowerState(),
+                ChargeMode = PowerManager.GetChargeMode(),
+                ToggleMode = AnimationManager.GetBoolHash(ToggleHash),
+                AutoActivate = PowerManager.GetAutoActivate()
+            };
+
+            var output = JsonConvert.SerializeObject(saveData, Formatting.Indented);
+            File.WriteAllText(SaveFile, output);
+            LoadData.CleanOldSaveData();
+            QuickLogger.Debug($"Saved {_prefabId.Id} Data");
+        }
+
+        public void OnProtoDeserializeObjectTree(ProtobufSerializer serializer)
+        {
+            QuickLogger.Debug("// ****************************** Load Data *********************************** //");
+
+            if (_prefabId != null)
+            {
+                QuickLogger.Info($"Loading FCSPowerStorage {_prefabId.Id}");
+
+                if (File.Exists(SaveFile))
+                {
+                    string savedDataJson = File.ReadAllText(SaveFile).Trim();
+
+                    //LoadData
+                    var savedData = JsonConvert.DeserializeObject<SaveData>(savedDataJson, new JsonSerializerSettings
+                    {
+                        MissingMemberHandling = MissingMemberHandling.Ignore
+                    });
+
+                    SetCurrentBodyColor(savedData.BodyColor.Vector4ToColor());
+                    PowerManager.LoadSave(savedData);
+                    AddToBaseManager();
+                }
+                else
+                {
+                    QuickLogger.Info($"No save file for {_prefabId.Id}");
+                }
+            }
+            else
+            {
+                QuickLogger.Error("PrefabIdentifier is null");
+            }
+            QuickLogger.Debug("// ****************************** Loaded Data *********************************** //");
+        }
     }
 }

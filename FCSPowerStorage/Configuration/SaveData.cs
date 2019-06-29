@@ -12,7 +12,7 @@ namespace FCSPowerStorage.Configuration
         public PowerToggleStates ChargeMode { get; set; }
         public ColorVec4 BodyColor { get; set; }
         public List<PowercellModel> Batteries { get; set; }
-        public int ToggleMode { get; set; }
+        public bool ToggleMode { get; set; }
         public FCSPowerStates PowerState { get; set; }
         public bool AutoActivate { get; set; }
 

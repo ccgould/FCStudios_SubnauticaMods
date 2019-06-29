@@ -50,6 +50,12 @@ namespace FCSTechWorkBench.Mono
                     QuickLogger.Debug($"Added {item.ClassID_I} to nodes");
                     AddTabNodes(ref root, ref itemTab, item, "ARSolutions", "ARSIcon");
                 }
+
+                if (item.ClassID_I.EndsWith("_PS"))
+                {
+                    QuickLogger.Debug($"Added {item.ClassID_I} to nodes");
+                    AddTabNodes(ref root, ref itemTab, item, "PowerStorage", "PSIcon");
+                }
             }
         }
 
