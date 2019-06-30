@@ -1,4 +1,7 @@
-﻿using System;
+﻿using FCSCommon.Helpers;
+using FCSCommon.Utilities;
+using FCSPowerStorage.Buildables;
+using System;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -30,7 +33,7 @@ namespace FCSAlterraShipping.Mono
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            uGUI.main.userInput.RequestString(_description, "Submit", GetAmount(), 25, new uGUI_UserInput.UserInputCallback(SetLabel));
+            uGUI.main.userInput.RequestString(_description, LanguageHelpers.GetLanguage(FCSPowerStorageBuildable.SubmitKey), GetAmount(), 25, new uGUI_UserInput.UserInputCallback(SetLabel));
         }
 
         private string GetAmount()
@@ -40,6 +43,7 @@ namespace FCSAlterraShipping.Mono
 
         internal void SetLabel(string newLabel)
         {
+            QuickLogger.Debug("Setting Label", true);
             var str = GetNumbers(newLabel);
             int result = int.Parse(str);
             _setMethod?.Invoke(result);

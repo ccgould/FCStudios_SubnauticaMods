@@ -27,7 +27,7 @@ namespace FCSPowerStorage.Managers
 
         public static BaseManager FindManager(SubRoot subRoot)
         {
-            if (!subRoot.isBase || subRoot.isCyclops) return null;
+            //if (!subRoot.isBase || subRoot.isCyclops) return null;
 
             QuickLogger.Debug($"Processing SubRoot = {subRoot.GetInstanceID()}");
 
@@ -163,6 +163,7 @@ namespace FCSPowerStorage.Managers
         {
             foreach (FCSPowerStorageController controller in BasePowerStorageUnits)
             {
+                if (controller.PowerManager.GetPowerState() == FCSPowerStates.Unpowered) continue;
                 controller.PowerManager.SetAutoActivate(auto);
                 controller.PowerManager.SetChargeMode(toggleState);
                 controller.PowerManager.SetPowerState(powerState);

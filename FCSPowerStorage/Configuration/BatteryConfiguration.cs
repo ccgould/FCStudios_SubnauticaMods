@@ -1,5 +1,7 @@
 ﻿using FCSCommon.Extensions;
+using FCSCommon.Helpers;
 using FCSCommon.Utilities;
+using FCSPowerStorage.Buildables;
 using Oculus.Newtonsoft.Json;
 using SMLHelper.V2.Crafting;
 using System;
@@ -29,28 +31,10 @@ namespace FCSPowerStorage.Configuration
         /// </summary>
         public bool BaseDrainProtection { get; set; }
 
-        //public int BaseDrainProtectionMultiplier { get; set; } = 1;
-
         /// <summary>
         /// Minimum amount of power required for charging
         /// </summary>
         public int BaseDrainProtectionGoal { get; set; } = 10;
-
-
-        /// <summary>
-        /// Amount to activate multiplier
-        /// </summary>
-        //public int AutoActivateMultiplier { get; set; } = 1;
-
-        /// <summary>
-        /// Amount to activate slider
-        /// </summary>
-        //public int AutoActivateSlider { get; set; } = 1;
-
-        /// <summary>
-        /// Amount to baase protection slider
-        /// </summary>
-        //public int BaseDrainProtectionSlider { get; set; } = 1;
 
         /// <summary>
         /// Amount to activate the power storage in case of low power
@@ -107,6 +91,7 @@ namespace FCSPowerStorage.Configuration
         {
             return AutoActivateAt;
         }
+
         internal void SetBasePowerProtection(int value)
         {
             BaseDrainProtectionGoal = value;
@@ -114,7 +99,16 @@ namespace FCSPowerStorage.Configuration
 
         internal void SetAutoActivate(int value)
         {
-            AutoActivateAt = value;
+            if (value > BaseDrainProtectionGoal)
+            {
+                AutoActivateAt = BaseDrainProtectionGoal;
+                ErrorMessage.AddMessage(LanguageHelpers.GetLanguage(FCSPowerStorageBuildable.AutoActivationOverLimitMessageKey) + " " + BaseDrainProtectionGoal);
+            }
+            else
+            {
+                AutoActivateAt = value;
+            }
+
         }
     }
 }

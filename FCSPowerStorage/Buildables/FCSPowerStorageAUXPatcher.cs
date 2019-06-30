@@ -7,7 +7,10 @@ namespace FCSPowerStorage.Buildables
         #region Prefab Global Properties
         public static string BuildableName { get; private set; }
         public static TechType TechTypeID { get; private set; }
+        public static string AutoActivationOverLimitMessageKey = "AutoActivationOverLimitMessage";
+
         #endregion
+
         public const string AutoDischargeEnabledMessageKey = "PS_AutoDischargeMessage";
         public const string BatteryKey = "PS_MeterBatteryTxt";
         public const string BatteryMetersKey = "PS_BatterMeters";
@@ -27,6 +30,7 @@ namespace FCSPowerStorage.Buildables
         public const string AutoActivateOnHoverKey = "AutoActivateOnHover";
         public const string BaseDrainLimitOnHoverKey = "PS_BaseDrainLimitOnHover";
         public const string BaseDrainLimitDescKey = "PS_BaseDrainLimitDesc";
+        public const string SubmitKey = "PS_Submit";
 
         private void AdditionalPatching()
         {
@@ -37,6 +41,8 @@ namespace FCSPowerStorage.Buildables
 
         private void PatchLanguages()
         {
+            LanguageHandler.SetLanguageLine(SubmitKey, "Submit");
+            LanguageHandler.SetLanguageLine(AutoActivationOverLimitMessageKey, "Auto Activate cant be higher than Base Drain Protection and was set to");
             LanguageHandler.SetLanguageLine(AutoActivateOnHoverKey, "Change auto activate limit");
             LanguageHandler.SetLanguageLine(AutoActivateDescKey, "Activate discharge mode at the specified base power amount");
             LanguageHandler.SetLanguageLine(BaseDrainLimitOnHoverKey, "Change base drain protection limit");
