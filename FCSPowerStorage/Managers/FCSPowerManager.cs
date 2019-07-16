@@ -42,8 +42,6 @@ namespace FCSPowerStorage.Managers
             {
                 _battery = _powerCells[0];
             }
-
-            //InvokeRepeating("Recharge", 0, 1);
         }
 
         private void OnDestroy()

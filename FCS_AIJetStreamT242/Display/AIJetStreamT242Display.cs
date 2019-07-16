@@ -91,7 +91,7 @@ namespace FCS_AIMarineTurbine.Display
             _mono.PowerManager.OnBreakerTripped += OnBreakerTripped;
 
 
-            UpdateLanaguage();
+            UpdateLanguage();
 
             _foundComponents = true;
 
@@ -338,7 +338,7 @@ namespace FCS_AIMarineTurbine.Display
 
         }
 
-        private void UpdateLanaguage()
+        private void UpdateLanguage()
         {
             _healthSlider.FindChild("Heath_LBL").GetComponent<Text>().text = LanguageHelpers.GetLanguage(DisplayLanguagePatching.HealthKey);
             _powerSlider.FindChild("Power_LBL").GetComponent<Text>().text = LanguageHelpers.GetLanguage(DisplayLanguagePatching.PowerKey);

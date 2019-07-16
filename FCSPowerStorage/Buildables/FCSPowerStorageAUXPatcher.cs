@@ -7,7 +7,7 @@ namespace FCSPowerStorage.Buildables
         #region Prefab Global Properties
         public static string BuildableName { get; private set; }
         public static TechType TechTypeID { get; private set; }
-        public static string AutoActivationOverLimitMessageKey = "AutoActivationOverLimitMessage";
+
 
         #endregion
 
@@ -26,11 +26,14 @@ namespace FCSPowerStorage.Buildables
         public const string BaseDrainProtectionKey = "PS_BaseDrainProtection";
         public const string BaseDrainLimitKey = "PS_BaseDrainLimit";
         public const string SyncAllKey = "PS_SyncAll";
-        public static string AutoActivateDescKey = "AutoActivateDesc";
+        public const string AutoActivateDescKey = "AutoActivateDesc";
         public const string AutoActivateOnHoverKey = "AutoActivateOnHover";
         public const string BaseDrainLimitOnHoverKey = "PS_BaseDrainLimitOnHover";
         public const string BaseDrainLimitDescKey = "PS_BaseDrainLimitDesc";
         public const string SubmitKey = "PS_Submit";
+        public const string AutoActivationOverLimitMessageKey = "AutoActivationOverLimitMessage";
+        public const string BaseDrainLimitUnderMessageKey = "PS_AutoActivationOverLimitMessage";
+
 
         private void AdditionalPatching()
         {
@@ -42,7 +45,8 @@ namespace FCSPowerStorage.Buildables
         private void PatchLanguages()
         {
             LanguageHandler.SetLanguageLine(SubmitKey, "Submit");
-            LanguageHandler.SetLanguageLine(AutoActivationOverLimitMessageKey, "Auto Activate cant be higher than Base Drain Protection and was set to");
+            LanguageHandler.SetLanguageLine(AutoActivationOverLimitMessageKey, "Auto Activate cant be higher than Base Drain Protection. Base Drain Protection was reset to");
+            LanguageHandler.SetLanguageLine(BaseDrainLimitUnderMessageKey, "Base Drain Limit cant be lower than Auto Activate Limit. Auto Activate Limit was reset to");
             LanguageHandler.SetLanguageLine(AutoActivateOnHoverKey, "Change auto activate limit");
             LanguageHandler.SetLanguageLine(AutoActivateDescKey, "Activate discharge mode at the specified base power amount");
             LanguageHandler.SetLanguageLine(BaseDrainLimitOnHoverKey, "Change base drain protection limit");

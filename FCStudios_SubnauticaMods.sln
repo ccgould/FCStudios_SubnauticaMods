@@ -25,8 +25,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCSAIPowerCellSocket", "FCS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCStudioDebugGUI", "FCStudioDebugGUI\FCStudioDebugGUI.csproj", "{9E420E78-5549-4DA9-95A3-36473921D7AB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCSTesting", "FCSTesting\FCSTesting.csproj", "{20E443F4-3B38-48F3-BBF2-7CBBF4090BEB}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		FCSCommon\FCSCommon.projitems*{20e443f4-3b38-48f3-bbf2-7cbbf4090beb}*SharedItemsImports = 4
 		FCSCommon\FCSCommon.projitems*{32a3f9b5-9089-4478-b706-952b706f08da}*SharedItemsImports = 4
 		FCSCommon\FCSCommon.projitems*{8adcd8fa-1eb3-4df7-a44d-f689322aac03}*SharedItemsImports = 4
 		FCSCommon\FCSCommon.projitems*{a6d5f567-127a-4ee3-9959-8c228b040290}*SharedItemsImports = 4
@@ -80,6 +83,10 @@ Global
 		{9E420E78-5549-4DA9-95A3-36473921D7AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9E420E78-5549-4DA9-95A3-36473921D7AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9E420E78-5549-4DA9-95A3-36473921D7AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20E443F4-3B38-48F3-BBF2-7CBBF4090BEB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20E443F4-3B38-48F3-BBF2-7CBBF4090BEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20E443F4-3B38-48F3-BBF2-7CBBF4090BEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20E443F4-3B38-48F3-BBF2-7CBBF4090BEB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

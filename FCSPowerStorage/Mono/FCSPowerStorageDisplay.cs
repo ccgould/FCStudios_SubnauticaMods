@@ -478,7 +478,7 @@ namespace FCSPowerStorage.Mono
 
             var autoActivateResult = CreateSystemButton(autoActivateLimitTextBox,
                 LanguageHelpers.GetLanguage(FCSPowerStorageBuildable.AutoActivateDescKey), LanguageHelpers.GetLanguage(FCSPowerStorageBuildable.AutoActivateOnHoverKey),
-                LoadData.BatteryConfiguration.GetAutoActivate, LoadData.BatteryConfiguration.SetAutoActivate);
+                LoadData.BatteryConfiguration.GetAutoActivate, _mono.ValidateAutoConfigUnits);
 
             if (!autoActivateResult)
             {
@@ -543,7 +543,7 @@ namespace FCSPowerStorage.Mono
 
             var baseDrainResult = CreateSystemButton(baseDrainlimitTextBox,
                 LanguageHelpers.GetLanguage(FCSPowerStorageBuildable.BaseDrainLimitDescKey), LanguageHelpers.GetLanguage(FCSPowerStorageBuildable.BaseDrainLimitOnHoverKey),
-                LoadData.BatteryConfiguration.GetBasePowerProtection, LoadData.BatteryConfiguration.SetBasePowerProtection);
+                LoadData.BatteryConfiguration.GetBasePowerProtection, _mono.ValidateBaseProtectionUnits);
 
             if (!baseDrainResult)
             {

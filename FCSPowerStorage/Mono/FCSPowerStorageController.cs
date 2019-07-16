@@ -1,6 +1,7 @@
 ﻿using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
+using FCSPowerStorage.Buildables;
 using FCSPowerStorage.Configuration;
 using FCSPowerStorage.Managers;
 using Oculus.Newtonsoft.Json;
@@ -152,6 +153,31 @@ namespace FCSPowerStorage.Mono
             Manager.AddPowerStorage(this);
 
             QuickLogger.Debug("Power Storage has been connected", true);
+        }
+
+        internal void ValidateAutoConfigUnits(int value)
+        {
+            var config = LoadData.BatteryConfiguration;
+
+            if (value > config.BaseDrainProtectionGoal)
+            {
+                config.BaseDrainProtectionGoal = value;
+                ErrorMessage.AddMessage(LanguageHelpers.GetLanguage(FCSPowerStorageBuildable.AutoActivationOverLimitMessageKey) + " " + value);
+            }
+
+            config.SetAutoActivate(value);
+        }
+
+        internal void ValidateBaseProtectionUnits(int value)
+        {
+            var config = LoadData.BatteryConfiguration;
+            if (value < config.AutoActivateAt)
+            {
+                config.AutoActivateAt = value;
+                ErrorMessage.AddMessage(LanguageHelpers.GetLanguage(FCSPowerStorageBuildable.BaseDrainLimitUnderMessageKey) + " " + value);
+            }
+
+            config.BaseDrainProtectionGoal = value;
         }
 
         internal void AddToBaseManager(BaseManager managers = null)

@@ -22,9 +22,19 @@ namespace FCSTechWorkBench.Mono.PowerStorage
         public override GameObject GetGameObject()
         {
             GameObject prefab = GameObject.Instantiate<GameObject>(this._prefab);
+
             prefab.name = this.PrefabFileName;
 
-            var filter = prefab.AddComponent<Freon>();
+            if (!FindAllComponents(prefab))
+            {
+                QuickLogger.Error("Failed to get all components");
+                return null;
+            }
+
+            prefab.AddComponent<PowerStorageKitController>();
+
+            _label.text = FriendlyName_I;
+
             return prefab;
         }
 
@@ -44,6 +54,7 @@ namespace FCSTechWorkBench.Mono.PowerStorage
                     new Ingredient(TechType.Salt, 6),
                 }
             };
+
             return customFabRecipe;
         }
 
@@ -53,7 +64,6 @@ namespace FCSTechWorkBench.Mono.PowerStorage
             {
                 if (this.IsRegistered == false)
                 {
-
                     ClassID_I = this.ClassID;
 
                     //Create a new TechType
@@ -62,7 +72,6 @@ namespace FCSTechWorkBench.Mono.PowerStorage
                     CraftDataHandler.SetTechData(TechType, GetBlueprintRecipe());
 
                     CraftDataHandler.AddToGroup(this.GroupForPDA, this.CategoryForPDA, this.TechType);
-
 
                     QuickLogger.Debug($"Class Id = {ClassID_I}");
 
@@ -73,7 +82,7 @@ namespace FCSTechWorkBench.Mono.PowerStorage
                     // Make the object drop slowly in water
                     var wf = _prefab.AddComponent<WorldForces>();
                     wf.underwaterGravity = 0;
-                    wf.underwaterDrag = 20f;
+                    wf.underwaterDrag = 10f;
                     wf.enabled = true;
 
                     // Add fabricating animation
@@ -84,10 +93,14 @@ namespace FCSTechWorkBench.Mono.PowerStorage
                     fabricatingA.eulerOffset = new Vector3(0f, 0f, 0f);
                     fabricatingA.scaleFactor = 1.0f;
 
-                    // Set proper shaders (for crafting animation)
-                    Shader marmosetUber = Shader.Find("MarmosetUBER");
+                    PrefabIdentifier prefabID = _prefab.AddComponent<PrefabIdentifier>();
+
+                    prefabID.ClassId = this.ClassID;
+
+                    //// Set proper shaders (for crafting animation)
+                    //Shader marmosetUber = Shader.Find("MarmosetUBER");
                     var renderer = _prefab.GetComponentInChildren<Renderer>();
-                    renderer.material.shader = marmosetUber;
+                    //renderer.material.shader = marmosetUber;
 
                     // Update sky applier
                     var applier = _prefab.GetComponent<SkyApplier>();
@@ -101,8 +114,31 @@ namespace FCSTechWorkBench.Mono.PowerStorage
                     pickupable.isPickupable = true;
                     pickupable.randomizeRotationWhenDropped = true;
 
-                    PrefabIdentifier prefabID = _prefab.AddComponent<PrefabIdentifier>();
-                    prefabID.ClassId = this.ClassID;
+                    // Set collider
+                    var collider = _prefab.GetComponent<BoxCollider>();
+
+                    var placeTool = this._prefab.AddComponent<PlaceTool>();
+                    placeTool.allowedInBase = true;
+                    placeTool.allowedOnBase = false;
+                    placeTool.allowedOnCeiling = false;
+                    placeTool.allowedOnConstructable = true;
+                    placeTool.allowedOnGround = true;
+                    placeTool.allowedOnRigidBody = true;
+                    placeTool.allowedOnWalls = false;
+                    placeTool.allowedOutside = false;
+                    placeTool.rotationEnabled = true;
+                    placeTool.enabled = true;
+                    placeTool.hasAnimations = false;
+                    placeTool.hasBashAnimation = false;
+                    placeTool.hasFirstUseAnimation = false;
+                    placeTool.mainCollider = collider;
+                    placeTool.pickupable = pickupable;
+                    placeTool.drawTime = 0.5f;
+                    placeTool.dropTime = 1;
+                    placeTool.holsterTime = 0.35f;
+
+                    // Add the new TechType to Hand Equipment type.
+                    CraftDataHandler.SetEquipmentType(TechType, EquipmentType.Hand);
 
                     var techTag = this._prefab.AddComponent<TechTag>();
                     techTag.type = this.TechType;
@@ -117,6 +153,5 @@ namespace FCSTechWorkBench.Mono.PowerStorage
                 QuickLogger.Error("Failed to get the Kit Prefab");
             }
         }
-
     }
 }

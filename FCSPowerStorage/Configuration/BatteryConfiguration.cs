@@ -1,7 +1,5 @@
 ﻿using FCSCommon.Extensions;
-using FCSCommon.Helpers;
 using FCSCommon.Utilities;
-using FCSPowerStorage.Buildables;
 using Oculus.Newtonsoft.Json;
 using SMLHelper.V2.Crafting;
 using System;
@@ -99,16 +97,7 @@ namespace FCSPowerStorage.Configuration
 
         internal void SetAutoActivate(int value)
         {
-            if (value > BaseDrainProtectionGoal)
-            {
-                AutoActivateAt = BaseDrainProtectionGoal;
-                ErrorMessage.AddMessage(LanguageHelpers.GetLanguage(FCSPowerStorageBuildable.AutoActivationOverLimitMessageKey) + " " + BaseDrainProtectionGoal);
-            }
-            else
-            {
-                AutoActivateAt = value;
-            }
-
+            AutoActivateAt = value;
         }
     }
 }

@@ -65,16 +65,16 @@ namespace FCSTechWorkBench
 
 
             //We have found the asset bundle and now we are going to continue by looking for the model.
-            Kit = Bundle.LoadAsset<GameObject>("KIT");
+            Kit = Bundle.LoadAsset<GameObject>("UnitContainerKit");
 
             //If the prefab isn't null lets add the shader to the materials
             if (Kit != null)
             {
-                QuickLogger.Debug($"Kit Prefab Found!");
+                QuickLogger.Debug($"UnitContainerKit Prefab Found!");
             }
             else
             {
-                QuickLogger.Error($"Kit Prefab Not Found!");
+                QuickLogger.Error($"UnitContainerKit Prefab Not Found!");
                 return false;
             }
 

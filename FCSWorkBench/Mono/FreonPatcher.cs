@@ -98,6 +98,32 @@ namespace FCSTechWorkBench.Mono
                     pickupable.isPickupable = true;
                     pickupable.randomizeRotationWhenDropped = true;
 
+                    // Set collider
+                    var collider = _prefab.GetComponent<BoxCollider>();
+
+                    var placeTool = this._prefab.AddComponent<PlaceTool>();
+                    placeTool.allowedInBase = true;
+                    placeTool.allowedOnBase = false;
+                    placeTool.allowedOnCeiling = false;
+                    placeTool.allowedOnConstructable = true;
+                    placeTool.allowedOnGround = true;
+                    placeTool.allowedOnRigidBody = true;
+                    placeTool.allowedOnWalls = false;
+                    placeTool.allowedOutside = false;
+                    placeTool.rotationEnabled = true;
+                    placeTool.enabled = true;
+                    placeTool.hasAnimations = false;
+                    placeTool.hasBashAnimation = false;
+                    placeTool.hasFirstUseAnimation = false;
+                    placeTool.mainCollider = collider;
+                    placeTool.pickupable = pickupable;
+                    placeTool.drawTime = 0.5f;
+                    placeTool.dropTime = 1;
+                    placeTool.holsterTime = 0.35f;
+
+                    // Add the new TechType to Hand Equipment type.
+                    CraftDataHandler.SetEquipmentType(TechType, EquipmentType.Hand);
+
                     PrefabIdentifier prefabID = _prefab.AddComponent<PrefabIdentifier>();
                     prefabID.ClassId = this.ClassID;
 
