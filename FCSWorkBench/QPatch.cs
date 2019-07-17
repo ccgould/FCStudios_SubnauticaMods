@@ -1,13 +1,12 @@
 ﻿using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using FCSTechFabricator.Mono;
+using FCSTechFabricator.Mono.PowerStorage;
 using Harmony;
 using System;
 using System.IO;
 using System.Reflection;
 using UnityEngine;
-using FreonBuildable = FCSTechFabricator.Mono.FreonBuildable;
-using PowerStorageKitBuildable = FCSTechFabricator.Mono.PowerStorage.PowerStorageKitBuildable;
 
 namespace FCSTechFabricator
 {
@@ -37,7 +36,7 @@ namespace FCSTechFabricator
 
                 FCSTechFabricatorBuildable.PatchHelper();
 
-                var harmony = HarmonyInstance.Create("com.fcstechworkbench.fcstudios");
+                var harmony = HarmonyInstance.Create("com.fcstechfabricator.fcstudios");
 
                 harmony.PatchAll(Assembly.GetExecutingAssembly());
 
