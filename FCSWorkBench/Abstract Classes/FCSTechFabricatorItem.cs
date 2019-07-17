@@ -1,13 +1,13 @@
-﻿using FCSTechWorkBench.Interfaces;
+﻿using FCSTechFabricator.Interfaces;
 using SMLHelper.V2.Assets;
 using System;
 using UnityEngine;
 
-namespace FCSTechWorkBench.Abstract_Classes
+namespace FCSTechFabricator.Abstract_Classes
 {
-    public abstract class FCSTechWorkBenchItem : ModPrefab, IFCSTechWorkBenchItem
+    public abstract class FCSTechFabricatorItem : ModPrefab, IFCSTechFabricatorItem
     {
-        protected FCSTechWorkBenchItem(string classId, string prefabFileName, TechType techType = TechType.None) : base(classId, prefabFileName, techType)
+        protected FCSTechFabricatorItem(string classId, string prefabFileName, TechType techType = TechType.None) : base(classId, prefabFileName, techType)
         {
         }
 

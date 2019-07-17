@@ -3,7 +3,7 @@ using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace FCSTechWorkBench.Mono.PowerStorage
+namespace FCSTechFabricator.Mono.PowerStorage
 {
     public partial class PowerStorageKitBuildable
     {

@@ -7,8 +7,8 @@
     <ProjectGuid>{B947909C-4983-4749-93AC-73EA69F6DCE8}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FCSTechWorkBench</RootNamespace>
-    <AssemblyName>FCSTechWorkBench</AssemblyName>
+    <RootNamespace>FCSTechFabricator</RootNamespace>
+    <AssemblyName>FCSTechFabricator</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -62,8 +62,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Abstract Classes\FCSTechWorkBenchItem.cs" />
-    <Compile Include="Interfaces\IFCSTechWorkBenchItem.cs" />
+    <Compile Include="Abstract Classes\FCSTechFabricatorItem.cs" />
+    <Compile Include="Interfaces\IFCSTechFabricatorItem.cs" />
     <Compile Include="Models\Mod.cs" />
     <Compile Include="Mono\FCSTechWorkBenchModelPrefab.cs" />
     <Compile Include="Mono\Freon.cs" />
@@ -80,6 +80,6 @@
   <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy "$(ProjectDir)bin\$(Configuration)\FCSTechWorkBench.dll" "F:\Program Files\Epic Games\Subnautica\QMods\FCSTechWorkBench\" /Y /I</PostBuildEvent>
+    <PostBuildEvent>xcopy "$(ProjectDir)bin\$(Configuration)\FCSTechFabricator.dll" "F:\Program Files\Epic Games\Subnautica\QMods\FCSTechFabricator\" /Y /I</PostBuildEvent>
   </PropertyGroup>
 </Project>

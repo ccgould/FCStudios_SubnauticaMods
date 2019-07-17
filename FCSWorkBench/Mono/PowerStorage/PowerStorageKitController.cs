@@ -1,7 +1,7 @@
 ﻿using FCSCommon.Helpers;
 using UnityEngine;
 
-namespace FCSTechWorkBench.Mono.PowerStorage
+namespace FCSTechFabricator.Mono.PowerStorage
 {
     public class PowerStorageKitController : MonoBehaviour
     {

@@ -2,9 +2,9 @@
 using FCSCommon.Utilities;
 using UnityEngine;
 
-namespace FCSTechWorkBench.Mono
+namespace FCSTechFabricator.Mono
 {
-    public partial class FCSTechWorkBenchBuildable
+    public partial class FCSTechFabricatorBuildable //TODO remove if not needed
     {
         private GameObject _prefab;
 

@@ -25,7 +25,7 @@ namespace ARS_SeaBreezeFCS32
             {
                 LoadAssetBundle();
 
-                GlobalBundle = FCSTechWorkBench.QPatch.Bundle;
+                GlobalBundle = FCSTechFabricator.QPatch.Bundle;
 
                 ARSSeaBreezeFCS32Buildable.PatchHelper();
 

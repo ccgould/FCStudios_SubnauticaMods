@@ -1,14 +1,14 @@
 ﻿using FCSCommon.Utilities;
-using FCSTechWorkBench.Abstract_Classes;
+using FCSTechFabricator.Abstract_Classes;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace FCSTechWorkBench.Mono
+namespace FCSTechFabricator.Mono
 {
-    public partial class FreonBuildable : FCSTechWorkBenchItem
+    public partial class FreonBuildable : FCSTechFabricatorItem
     {
         private TechGroup GroupForPDA = TechGroup.Resources;
         private TechCategory CategoryForPDA = TechCategory.AdvancedMaterials;
@@ -54,7 +54,7 @@ namespace FCSTechWorkBench.Mono
                     ClassID_I = this.ClassID;
 
                     //Create a new TechType
-                    this.TechType = TechTypeHandler.AddTechType(ClassID, PrefabFileName, "Freon gives you two weeks of SeaBreeze cooling on Planet 4546B.", new Atlas.Sprite(ImageUtils.LoadTextureFromFile($"./QMods/FCSTechWorkBench/Assets/{ClassID}.png")));
+                    this.TechType = TechTypeHandler.AddTechType(ClassID, PrefabFileName, "Freon gives you two weeks of SeaBreeze cooling on Planet 4546B.", new Atlas.Sprite(ImageUtils.LoadTextureFromFile($"./QMods/FCSTechFabricator/Assets/{ClassID}.png")));
 
                     CraftDataHandler.SetTechData(TechType, GetBlueprintRecipe());
 

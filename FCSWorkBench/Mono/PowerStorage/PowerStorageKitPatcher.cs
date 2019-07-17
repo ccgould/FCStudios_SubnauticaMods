@@ -1,14 +1,14 @@
 ﻿using FCSCommon.Utilities;
-using FCSTechWorkBench.Abstract_Classes;
+using FCSTechFabricator.Abstract_Classes;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace FCSTechWorkBench.Mono.PowerStorage
+namespace FCSTechFabricator.Mono.PowerStorage
 {
-    public partial class PowerStorageKitBuildable : FCSTechWorkBenchItem
+    public partial class PowerStorageKitBuildable : FCSTechFabricatorItem
     {
         private TechGroup GroupForPDA = TechGroup.Resources;
         private TechCategory CategoryForPDA = TechCategory.AdvancedMaterials;
@@ -67,7 +67,7 @@ namespace FCSTechWorkBench.Mono.PowerStorage
                     ClassID_I = this.ClassID;
 
                     //Create a new TechType
-                    this.TechType = TechTypeHandler.AddTechType(ClassID, PrefabFileName, "A kit that allows you to build one Power Storage Unit", new Atlas.Sprite(ImageUtils.LoadTextureFromFile($"./QMods/FCSTechWorkBench/Assets/{ClassID}.png")));
+                    this.TechType = TechTypeHandler.AddTechType(ClassID, PrefabFileName, "A kit that allows you to build one Power Storage Unit", new Atlas.Sprite(ImageUtils.LoadTextureFromFile($"./QMods/FCSTechFabricator/Assets/{ClassID}.png")));
 
                     CraftDataHandler.SetTechData(TechType, GetBlueprintRecipe());
 

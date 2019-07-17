@@ -2,7 +2,7 @@
 using FCSCommon.Utilities;
 using UnityEngine;
 
-namespace FCSTechWorkBench.Mono
+namespace FCSTechFabricator.Mono
 {
     public partial class FreonBuildable
     {

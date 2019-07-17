@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace FCSTechWorkBench.Mono
+namespace FCSTechFabricator.Mono
 {
     public class Freon : MonoBehaviour
     {

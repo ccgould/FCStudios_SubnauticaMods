@@ -1,7 +1,7 @@
-﻿namespace FCSTechWorkBench.Models
+﻿namespace FCSTechFabricator.Models
 {
     internal static class Mod
     {
-        internal static string ModName => "FCSTechWorkBench";
+        internal static string ModName => "FCSTechFabricator";
     }
 }

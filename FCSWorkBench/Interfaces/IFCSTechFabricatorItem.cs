@@ -1,6 +1,6 @@
-﻿namespace FCSTechWorkBench.Interfaces
+﻿namespace FCSTechFabricator.Interfaces
 {
-    internal interface IFCSTechWorkBenchItem
+    internal interface IFCSTechFabricatorItem
     {
         TechType TechTypeID { get; set; }
         string ClassID_I { get; set; }

@@ -1,6 +1,7 @@
 ﻿using FCSCommon.Utilities;
-using FCSTechWorkBench.Abstract_Classes;
-using FCSTechWorkBench.Interfaces;
+using FCSTechFabricator.Abstract_Classes;
+using FCSTechFabricator.Interfaces;
+using FCSTechFabricator.Models;
 using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
@@ -9,13 +10,13 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 
-namespace FCSTechWorkBench.Mono
+namespace FCSTechFabricator.Mono
 {
-    public partial class FCSTechWorkBenchBuildable : Buildable
+    public partial class FCSTechFabricatorBuildable : Buildable
     {
-        public static readonly FCSTechWorkBenchBuildable Singleton = new FCSTechWorkBenchBuildable();
+        public static readonly FCSTechFabricatorBuildable Singleton = new FCSTechFabricatorBuildable();
 
-        public FCSTechWorkBenchBuildable() : base("FCSTechWorkBench", "FCS Tech WorkBench", "The place for all your FCStudios mod needs")
+        public FCSTechFabricatorBuildable() : base(Mod.ModName, "FCS Tech Fabricator", "The place for all your FCStudios mod needs")
         {
         }
 
@@ -27,10 +28,10 @@ namespace FCSTechWorkBench.Mono
 
         private static void CreateCustomTree()
         {
-            var root = CraftTreeHandler.CreateCustomCraftTreeAndType("FCSTechWorkBench", out CraftTree.Type craftType);
+            var root = CraftTreeHandler.CreateCustomCraftTreeAndType("FCSTechFabricator", out CraftTree.Type craftType);
             ModCraftTreeTab itemTab = null;
 
-            Singleton.AlienChiefTreeType = craftType;
+            Singleton.TechFabricatorCraftTreeType = craftType;
 
             QuickLogger.Debug($"Attempting to add {Singleton.ClassID} to nodes");
 
@@ -73,8 +74,8 @@ namespace FCSTechWorkBench.Mono
             techTag.type = TechType;
 
             // Associate craft tree to the fabricator
-            var fabricator = prefab.GetComponent<Workbench>();
-            fabricator.craftTree = AlienChiefTreeType;
+            var fabricator = prefab.GetComponent<Fabricator>();
+            fabricator.craftTree = TechFabricatorCraftTreeType;
 
             var ghost = fabricator.GetComponent<GhostCrafter>();
             var powerRelay = new PowerRelay();
@@ -88,51 +89,51 @@ namespace FCSTechWorkBench.Mono
             constructible.allowedInSub = true;
             constructible.allowedOutside = false;
             constructible.allowedOnCeiling = false;
-            constructible.allowedOnGround = true;
+            constructible.allowedOnGround = false;
             constructible.allowedOnConstructables = false;
             constructible.controlModelState = true;
-            constructible.allowedOnWall = false;
+            constructible.allowedOnWall = true;
             constructible.techType = TechType;
 
             // Set the custom texture
-            Texture2D coloredTexture = QPatch.Bundle.LoadAsset<Texture2D>("FCSWorkbench");
+            Texture2D coloredTexture = QPatch.Bundle.LoadAsset<Texture2D>("FCSTechFabricator");
             SkinnedMeshRenderer skinnedMeshRenderer = prefab.GetComponentInChildren<SkinnedMeshRenderer>();
             skinnedMeshRenderer.material.mainTexture = coloredTexture;
             return prefab;
 
         }
 
-        private static void AddTabNodes(ref ModCraftTreeRoot root, ref ModCraftTreeTab itemTab, IFCSTechWorkBenchItem fcsTechWorkBenchItem, string category, string icon)
+        private static void AddTabNodes(ref ModCraftTreeRoot root, ref ModCraftTreeTab itemTab, IFCSTechFabricatorItem fcsTechFabricator, string category, string icon)
         {
 
             if (root.GetNode($"{category}") == null)
             {
                 QuickLogger.Debug($"{category} is null creating tab");
-                itemTab = root.AddTabNode($"{category}", $"FCS Work Bench {category}", new Atlas.Sprite(ImageUtils.LoadTextureFromFile($"./QMods/FCSTechWorkBench/Assets/{icon}.png")));
-                itemTab?.AddCraftingNode(fcsTechWorkBenchItem.TechTypeID);
+                itemTab = root.AddTabNode($"{category}", $"FCS Tech Fabricator {category}", new Atlas.Sprite(ImageUtils.LoadTextureFromFile($"./QMods/FCSTechFabricator/Assets/{icon}.png")));
+                itemTab?.AddCraftingNode(fcsTechFabricator.TechTypeID);
                 QuickLogger.Debug($"{category} node tab Created");
             }
             else
             {
                 QuickLogger.Debug($"{category} is not null creating node tab");
-                itemTab?.AddCraftingNode(fcsTechWorkBenchItem.TechTypeID);
+                itemTab?.AddCraftingNode(fcsTechFabricator.TechTypeID);
             }
         }
 
         /// <summary>
-        /// This is the CraftTree.Type for the AlienChief fabricator.
-        /// </summary>
-        public CraftTree.Type AlienChiefTreeType { get; private set; }
+        /// This is the CraftTree.Type for the FCS Tech Fabricator.
+        /// </summary> 
+        public CraftTree.Type TechFabricatorCraftTreeType { get; private set; }
 
-        private static readonly GameObject OriginalFabricator = Resources.Load<GameObject>("Submarine/Build/Workbench");
+        private static readonly GameObject OriginalFabricator = Resources.Load<GameObject>("Submarine/Build/Fabricator");
 
-        internal static List<FCSTechWorkBenchItem> ItemsList = new List<FCSTechWorkBenchItem>();
+        internal static List<FCSTechFabricatorItem> ItemsList = new List<FCSTechFabricatorItem>();
 
         public override TechGroup GroupForPDA { get; } = TechGroup.InteriorModules;
 
         public override TechCategory CategoryForPDA { get; } = TechCategory.InteriorModule;
 
-        public override string AssetsFolder { get; } = "FCSTechWorkBench/Assets";
+        public override string AssetsFolder { get; } = "FCSTechFabricator/Assets";
         protected override TechData GetBlueprintRecipe()
         {
             var customFabRecipe = new TechData()

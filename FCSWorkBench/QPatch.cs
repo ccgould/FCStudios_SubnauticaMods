@@ -1,14 +1,15 @@
 ﻿using FCSCommon.Helpers;
 using FCSCommon.Utilities;
-using FCSTechWorkBench.Mono;
-using FCSTechWorkBench.Mono.PowerStorage;
+using FCSTechFabricator.Mono;
 using Harmony;
 using System;
 using System.IO;
 using System.Reflection;
 using UnityEngine;
+using FreonBuildable = FCSTechFabricator.Mono.FreonBuildable;
+using PowerStorageKitBuildable = FCSTechFabricator.Mono.PowerStorage.PowerStorageKitBuildable;
 
-namespace FCSTechWorkBench
+namespace FCSTechFabricator
 {
     public class QPatch
     {
@@ -31,10 +32,10 @@ namespace FCSTechWorkBench
                 var psKit = new PowerStorageKitBuildable();
                 psKit.Register();
 
-                FCSTechWorkBenchBuildable.ItemsList.Add(freon);
-                FCSTechWorkBenchBuildable.ItemsList.Add(psKit);
+                FCSTechFabricatorBuildable.ItemsList.Add(freon);
+                FCSTechFabricatorBuildable.ItemsList.Add(psKit);
 
-                FCSTechWorkBenchBuildable.PatchHelper();
+                FCSTechFabricatorBuildable.PatchHelper();
 
                 var harmony = HarmonyInstance.Create("com.fcstechworkbench.fcstudios");
 
@@ -52,7 +53,7 @@ namespace FCSTechWorkBench
         {
             QuickLogger.Debug("GetPrefabs");
 
-            AssetBundle assetBundle = AssetHelper.Asset("FCSTechWorkBench", "fcstechworkbenchmodbundle");
+            AssetBundle assetBundle = AssetHelper.Asset("FCSTechFabricator", "fcstechfabricatormodbundle");
 
             //If the result is null return false.
             if (assetBundle == null)
