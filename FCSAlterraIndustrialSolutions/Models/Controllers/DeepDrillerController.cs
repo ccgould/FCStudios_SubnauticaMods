@@ -65,8 +65,6 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers
         private DrillState _drillState = DrillState.Idle;
         private PowerState _powerState;
 
-
-
         #endregion
 
         #region Public Properties
@@ -114,7 +112,7 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers
 
             _powerSystem = gameObject.AddComponent<PowerController>();
             _powerSystem.CreateBattery(100, 2000);
-
+            
             _damageMaterialController = gameObject.GetComponent<DamagedMaterialController>();
 
 

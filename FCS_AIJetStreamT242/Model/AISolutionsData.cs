@@ -29,7 +29,7 @@ namespace FCS_AIMarineTurbine.Model
             uGUI_DepthCompassLateUpdate_Patcher.AddEventHandlerIfMissing(Update);
         }
 
-        public static AISolutionsData Instance
+        internal static AISolutionsData Instance
         {
             get
             {
@@ -55,7 +55,7 @@ namespace FCS_AIMarineTurbine.Model
             }
         }
 
-        public static Quaternion StartingRotation { get; set; }
+        internal static Quaternion StartingRotation { get; set; }
 
         private static float _passedTime;
 

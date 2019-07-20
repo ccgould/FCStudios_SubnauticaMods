@@ -39,6 +39,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)Models\Abstract\AIDisplay.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Abstract\FCSController.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Abstract\ModStrings.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\HealthController.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\PowerController.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\Colors.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\ColorVec4.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\CustomLiveMixinData.cs" />

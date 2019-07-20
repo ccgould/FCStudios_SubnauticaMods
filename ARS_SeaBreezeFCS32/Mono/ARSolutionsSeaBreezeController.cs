@@ -110,7 +110,7 @@ namespace ARS_SeaBreezeFCS32.Mono
             else
             {
                 if (_freonContainer.CheckIfFreonAvailable()) return;
-                QuickLogger.Debug("Setting timer to zero", true);
+                //QuickLogger.Debug("Setting timer to zero", true);
                 UpdateDisplayTimer(TimeConverters.SecondsToHMS(0));
             }
         }
