@@ -1,6 +1,7 @@
 ﻿using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
+using FCSCommon.Utilities.Enums;
 using FCSPowerStorage.Buildables;
 using FCSPowerStorage.Configuration;
 using FCSPowerStorage.Managers;
@@ -17,13 +18,15 @@ namespace FCSPowerStorage.Mono
     {
         #region Private Members
         private PrefabIdentifier _prefabId;
-        private readonly string _saveDirectory = Information.GetSaveFileDirectory();
-        private string SaveFile => Path.Combine(_saveDirectory, _prefabId.Id + ".json");
         private bool _initialized;
         private Color _currentBodyColor;
+        private int _baseDrainProtectionGoal = 20;
+        private int _autoActivateAt = 10;
         #endregion
 
         #region Internal Properties
+        internal string SaveDirectory => Information.GetSaveFileDirectory();
+        internal string SaveFile => Path.Combine(SaveDirectory, _prefabId.Id + ".json");
         internal bool IsBeingDeleted { get; set; }
         internal FCSPowerManager PowerManager { get; private set; }
         internal FCSPowerStorageAnimationManager AnimationManager { get; private set; }
@@ -42,6 +45,9 @@ namespace FCSPowerStorage.Mono
         #region Private Members
         private bool _isEnabled;
         private Constructable _buildable;
+        private bool _baseDrainProtection;
+        private bool _autoActivate;
+
         #endregion
 
         #region Unity Methods
@@ -80,22 +86,37 @@ namespace FCSPowerStorage.Mono
             {
                 if (!_initialized)
                 {
-                    Initialize();
                     AddToBaseManager();
+                    Initialize();
                 }
             }
         }
 
-        internal string GetPrefabID()
+        private PrefabIdentifier GetPrefabID()
         {
+            return GetComponentInParent<PrefabIdentifier>();
+        }
+
+        internal string GetPrefabIDString()
+        {
+            if (_prefabId == null)
+            {
+                _prefabId = GetPrefabID();
+            }
+
             return _prefabId.Id;
         }
 
         private void Initialize()
         {
             SetCurrentBodyColor(new Color(0.99609375f, 0.99609375f, 0.99609375f));
-            _prefabId = GetComponentInParent<PrefabIdentifier>();
+
             _buildable = GetComponentInParent<Constructable>();
+
+            if (_prefabId == null)
+            {
+                _prefabId = GetPrefabID();
+            }
 
             SystemLightManager = gameObject.GetOrAddComponent<SystemLightManager>();
             SystemLightManager.Initialize(gameObject);
@@ -120,11 +141,20 @@ namespace FCSPowerStorage.Mono
             else
             {
                 AnimationManager.Initialize(this);
-                AnimationManager.SetBoolHash(BaseDrainHash, LoadData.BatteryConfiguration.BaseDrainProtection);
+
+                if (Manager == null)
+                {
+                    QuickLogger.Error("Manager is null cannot set Base Drain Protection!");
+                }
+                else
+                {
+                    AnimationManager.SetBoolHash(BaseDrainHash, GetBaseDrainProtection());
+                }
             }
 
             Display = gameObject.AddComponent<FCSPowerStorageDisplay>();
             Display.Setup(this);
+            _initialized = true;
         }
 
         #endregion
@@ -134,12 +164,6 @@ namespace FCSPowerStorage.Mono
         {
             _currentBodyColor = color;
             MaterialHelpers.ChangeBodyColor("Power_Storage_StorageBaseColor_Albedo", color, gameObject);
-        }
-
-        internal void ActivateBaseDrain()
-        {
-            AnimationManager.SetBoolHash(BaseDrainHash, LoadData.BatteryConfiguration.BaseDrainProtection);
-            LoadData.BatteryConfiguration.SaveConfiguration();
         }
         #endregion
 
@@ -157,27 +181,24 @@ namespace FCSPowerStorage.Mono
 
         internal void ValidateAutoConfigUnits(int value)
         {
-            var config = LoadData.BatteryConfiguration;
-
-            if (value > config.BaseDrainProtectionGoal)
+            if (value > _baseDrainProtectionGoal)
             {
-                config.BaseDrainProtectionGoal = value;
+                _baseDrainProtectionGoal = value;
                 ErrorMessage.AddMessage(LanguageHelpers.GetLanguage(FCSPowerStorageBuildable.AutoActivationOverLimitMessageKey) + " " + value);
             }
 
-            config.SetAutoActivate(value);
+            SetAutoActivateAt(value);
         }
 
         internal void ValidateBaseProtectionUnits(int value)
         {
-            var config = LoadData.BatteryConfiguration;
-            if (value < config.AutoActivateAt)
+            if (value < _autoActivateAt)
             {
-                config.AutoActivateAt = value;
+                _autoActivateAt = value;
                 ErrorMessage.AddMessage(LanguageHelpers.GetLanguage(FCSPowerStorageBuildable.BaseDrainLimitUnderMessageKey) + " " + value);
             }
 
-            config.BaseDrainProtectionGoal = value;
+            _baseDrainProtectionGoal = value;
         }
 
         internal void AddToBaseManager(BaseManager managers = null)
@@ -189,21 +210,77 @@ namespace FCSPowerStorage.Mono
 
             Manager = managers ?? BaseManager.FindManager(SubRoot);
             Manager.AddBasePowerStorage(this);
-
-            QuickLogger.Debug($"Power Storage has been connected to base list Count {Manager.BasePowerStorageUnits.Count}", true);
         }
 
-        public void SyncAll()
+        internal void SyncAll()
         {
-            Manager.SyncUnits(PowerManager.GetPowerState(), PowerManager.GetChargeMode(), PowerManager.GetAutoActivate());
+            Manager.SyncUnits(PowerManager.GetPowerState(), PowerManager.GetChargeMode(), GetAutoActivate(), GetBaseDrainProtection());
+        }
+
+        internal int GetBasePowerProtectionGoal()
+        {
+            return _baseDrainProtectionGoal;
+        }
+
+        public bool GetBaseDrainProtection()
+        {
+            return _baseDrainProtection;
+        }
+
+        internal int GetAutoActivateAt()
+        {
+            return _autoActivateAt;
+        }
+
+        internal bool GetAutoActivate()
+        {
+            return _autoActivate;
+        }
+
+        internal void SetBasePowerProtectionGoal(int value)
+        {
+            _baseDrainProtectionGoal = value;
+        }
+
+        internal void SetBaseDrainProtection(bool value)
+        {
+            _baseDrainProtection = value;
+            AnimationManager.SetBoolHash(BaseDrainHash, GetBaseDrainProtection());
+        }
+
+        internal void SetAutoActivateAt(int value)
+        {
+            _autoActivateAt = value;
+        }
+
+        internal void SetAutoActivate(bool value)
+        {
+            _autoActivate = value;
+
+            if (value)
+            {
+                if (PowerManager.GetChargeMode() == PowerToggleStates.TrickleMode)
+                {
+                    PowerManager.SetChargeMode(PowerToggleStates.ChargeMode);
+                }
+
+                AddToManager();
+            }
+            else
+            {
+                BaseManager.RemovePowerStorage(this);
+            }
+
+            AnimationManager.SetBoolHash(AutoActiveHash, value);
+            QuickLogger.Debug($"Auto Activate: {GetAutoActivate()}", true);
         }
 
         public void OnProtoSerializeObjectTree(ProtobufSerializer serializer)
         {
             QuickLogger.Debug($"Saving {_prefabId.Id} Data");
 
-            if (!Directory.Exists(_saveDirectory))
-                Directory.CreateDirectory(_saveDirectory);
+            if (!Directory.Exists(SaveDirectory))
+                Directory.CreateDirectory(SaveDirectory);
 
             var saveData = new SaveData
             {
@@ -212,12 +289,16 @@ namespace FCSPowerStorage.Mono
                 PowerState = PowerManager.GetPowerState(),
                 ChargeMode = PowerManager.GetChargeMode(),
                 ToggleMode = AnimationManager.GetBoolHash(ToggleHash),
-                AutoActivate = PowerManager.GetAutoActivate()
+                AutoActivate = GetAutoActivate(),
+                BaseDrainProtection = GetBaseDrainProtection(),
+                BaseDrainProtectionGoal = GetBasePowerProtectionGoal(),
+                AutoActivateAt = GetAutoActivateAt()
             };
 
             var output = JsonConvert.SerializeObject(saveData, Formatting.Indented);
             File.WriteAllText(SaveFile, output);
             LoadData.CleanOldSaveData();
+            BaseManager.SaveBases();
             QuickLogger.Debug($"Saved {_prefabId.Id} Data");
         }
 
@@ -242,6 +323,15 @@ namespace FCSPowerStorage.Mono
                     SetCurrentBodyColor(savedData.BodyColor.Vector4ToColor());
                     PowerManager.LoadSave(savedData);
                     AddToBaseManager();
+                    SetAutoActivateAt(savedData.AutoActivateAt);
+                    SetBaseDrainProtection(savedData.BaseDrainProtection);
+                    SetBasePowerProtectionGoal(savedData.BaseDrainProtectionGoal);
+                    SetAutoActivate(savedData.AutoActivate);
+
+                    if (Display != null)
+                    {
+                        Display.UpdateTextBoxes(GetAutoActivateAt(), GetBasePowerProtectionGoal());
+                    }
                 }
                 else
                 {

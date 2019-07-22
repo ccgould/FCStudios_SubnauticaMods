@@ -21,7 +21,6 @@ namespace FCSPowerStorage.Managers
         private PowercellModel _battery;
         private PowerToggleStates _chargeMode;
         private float _passedTime;
-        private bool _autoActivate;
 
         internal void Initialize(FCSPowerStorageController mono)
         {
@@ -70,11 +69,11 @@ namespace FCSPowerStorage.Managers
 
         private void Recharge()
         {
-            if (DayNightCycle.main == null) return;
+            if (DayNightCycle.main == null || _mono.Manager == null) return;
 
-            if (LoadData.BatteryConfiguration.BaseDrainProtection)
+            if (_mono.GetBaseDrainProtection())
             {
-                if (GetBasePower() <= LoadData.BatteryConfiguration.BaseDrainProtectionGoal)
+                if (GetBasePower() <= _mono.GetBasePowerProtectionGoal())
                     return;
             }
 
@@ -166,7 +165,7 @@ namespace FCSPowerStorage.Managers
         {
             SetPowerState(save.PowerState);
             SetChargeMode(save.ChargeMode);
-            SetAutoActivate(save.AutoActivate);
+            _mono.SetAutoActivate(save.AutoActivate);
 
             for (int i = 0; i < _mono.BatteryCount; i++)
             {
@@ -369,33 +368,6 @@ namespace FCSPowerStorage.Managers
         internal FCSPowerStates GetPowerState()
         {
             return _powerState;
-        }
-
-        public bool GetAutoActivate()
-        {
-            return _autoActivate;
-        }
-
-        public void SetAutoActivate(bool value)
-        {
-            _autoActivate = value;
-
-            if (value)
-            {
-                if (_chargeMode == PowerToggleStates.TrickleMode)
-                {
-                    SetChargeMode(PowerToggleStates.ChargeMode);
-                }
-
-                _mono.AddToManager();
-            }
-            else
-            {
-                BaseManager.RemovePowerStorage(_mono);
-            }
-
-            _mono.AnimationManager.SetBoolHash(_mono.AutoActiveHash, value);
-            QuickLogger.Debug($"Auto Activate: {_autoActivate}", true);
         }
 
     }

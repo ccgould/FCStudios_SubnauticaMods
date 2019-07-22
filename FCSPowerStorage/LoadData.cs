@@ -38,7 +38,7 @@ namespace FCSPowerStorage
         {
             foreach (FCSPowerStorageController customBatteryController in units)
             {
-                yield return customBatteryController.GetPrefabID();
+                yield return customBatteryController.GetPrefabIDString();
             }
         }
 
@@ -67,6 +67,8 @@ namespace FCSPowerStorage
 
                 foreach (var file in savesFolderFiles)
                 {
+                    if (Path.GetFileName(file).StartsWith("Base")) continue;
+
                     File.Delete(file);
                 }
             }

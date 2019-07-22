@@ -69,7 +69,7 @@ namespace FCSPowerStorage.Mono
                     break;
 
                 case "TrickleModeBTN":
-                    if (_mono.PowerManager.GetAutoActivate())
+                    if (_mono.GetAutoActivate())
                     {
                         QuickLogger.Info(LanguageHelpers.GetLanguage(FCSPowerStorageBuildable.AutoDischargeEnabledMessageKey), true);
                         break;
@@ -78,7 +78,7 @@ namespace FCSPowerStorage.Mono
                     break;
 
                 case "ChargeModeBTN":
-                    if (_mono.PowerManager.GetAutoActivate())
+                    if (_mono.GetAutoActivate())
                     {
                         QuickLogger.Info(LanguageHelpers.GetLanguage(FCSPowerStorageBuildable.AutoDischargeEnabledMessageKey), true);
                         break;
@@ -87,8 +87,7 @@ namespace FCSPowerStorage.Mono
                     break;
 
                 case "AutoActivateBTN":
-                    bool value = !_mono.PowerManager.GetAutoActivate();
-                    _mono.PowerManager.SetAutoActivate(value);
+                    _mono.SetAutoActivate(!_mono.GetAutoActivate());
                     break;
 
                 case "BaseDrainBTN":
@@ -110,20 +109,18 @@ namespace FCSPowerStorage.Mono
         {
             QuickLogger.Debug("Updating Activate Base Drain", true);
 
-            var powerStorage = FindObjectsOfType<FCSPowerStorageController>();
+            var value = !_mono.GetBaseDrainProtection();
 
-            LoadData.BatteryConfiguration.BaseDrainProtection ^= true;
+            _mono.Manager.UpdateBaseDrain(value);
 
-            foreach (FCSPowerStorageController controller in powerStorage)
-            {
-                controller.ActivateBaseDrain();
-            }
         }
 
-        internal void UpdateTextBoxes()
+        internal void UpdateTextBoxes(int autoActivateValue, int baseDrainValue)
         {
-            _autoActivateTextB.text = LoadData.BatteryConfiguration.AutoActivateAt.ToString();
-            _baseDrainLimitTextB.text = LoadData.BatteryConfiguration.BaseDrainProtectionGoal.ToString();
+            _autoActivateTextB.text = autoActivateValue.ToString();
+            _mono.SetAutoActivateAt(autoActivateValue);
+            _baseDrainLimitTextB.text = baseDrainValue.ToString();
+            _mono.SetBasePowerProtectionGoal(baseDrainValue);
         }
 
         public override void ItemModified<T>(T item)
@@ -474,11 +471,11 @@ namespace FCSPowerStorage.Mono
             }
 
             _autoActivateTextB = autoActivateLimitTextBox.GetComponent<Text>();
-            _autoActivateTextB.text = LoadData.BatteryConfiguration.AutoActivateAt.ToString();
+            _autoActivateTextB.text = _mono.GetAutoActivateAt().ToString();
 
             var autoActivateResult = CreateSystemButton(autoActivateLimitTextBox,
                 LanguageHelpers.GetLanguage(FCSPowerStorageBuildable.AutoActivateDescKey), LanguageHelpers.GetLanguage(FCSPowerStorageBuildable.AutoActivateOnHoverKey),
-                LoadData.BatteryConfiguration.GetAutoActivate, _mono.ValidateAutoConfigUnits);
+                _mono.GetAutoActivateAt, _mono.ValidateAutoConfigUnits);
 
             if (!autoActivateResult)
             {
@@ -539,11 +536,11 @@ namespace FCSPowerStorage.Mono
             }
 
             _baseDrainLimitTextB = baseDrainlimitTextBox.GetComponent<Text>();
-            _baseDrainLimitTextB.text = LoadData.BatteryConfiguration.BaseDrainProtectionGoal.ToString();
+            _baseDrainLimitTextB.text = _mono.GetBasePowerProtectionGoal().ToString();
 
             var baseDrainResult = CreateSystemButton(baseDrainlimitTextBox,
                 LanguageHelpers.GetLanguage(FCSPowerStorageBuildable.BaseDrainLimitDescKey), LanguageHelpers.GetLanguage(FCSPowerStorageBuildable.BaseDrainLimitOnHoverKey),
-                LoadData.BatteryConfiguration.GetBasePowerProtection, _mono.ValidateBaseProtectionUnits);
+                _mono.GetBasePowerProtectionGoal, _mono.ValidateBaseProtectionUnits);
 
             if (!baseDrainResult)
             {
@@ -698,14 +695,7 @@ namespace FCSPowerStorage.Mono
 
         private void OnLabelChanged()
         {
-            LoadData.BatteryConfiguration.SaveConfiguration();
-
-            var powerStorage = FindObjectsOfType<FCSPowerStorageController>();
-
-            foreach (FCSPowerStorageController controller in powerStorage)
-            {
-                controller.Display.UpdateTextBoxes();
-            }
+            _mono.Manager.UpdateTextBoxes(_mono.GetAutoActivateAt(), _mono.GetBasePowerProtectionGoal());
         }
 
         public override IEnumerator PowerOff()

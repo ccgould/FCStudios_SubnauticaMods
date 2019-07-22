@@ -81,6 +81,7 @@
   <ItemGroup>
     <Compile Include="Buildables\FCSPowerStorageAUXPatcher.cs" />
     <Compile Include="Buildables\FCSPowerStorageModelPrefab.cs" />
+    <Compile Include="Configuration\BaseSaveData.cs" />
     <Compile Include="Configuration\Cfg.cs" />
     <Compile Include="Configuration\Information.cs" />
     <Compile Include="Configuration\IngredientItem.cs" />

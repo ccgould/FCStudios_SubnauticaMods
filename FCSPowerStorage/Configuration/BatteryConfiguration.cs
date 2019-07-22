@@ -1,10 +1,8 @@
 ﻿using FCSCommon.Extensions;
 using FCSCommon.Utilities;
-using Oculus.Newtonsoft.Json;
 using SMLHelper.V2.Crafting;
 using System;
 using System.Collections.Generic;
-using System.IO;
 
 namespace FCSPowerStorage.Configuration
 {
@@ -25,25 +23,9 @@ namespace FCSPowerStorage.Configuration
         public float ChargeSpeed { get; set; } = 0.005f;
 
         /// <summary>
-        /// Enables/Disables the ability for the
-        /// </summary>
-        public bool BaseDrainProtection { get; set; }
-
-        /// <summary>
-        /// Minimum amount of power required for charging
-        /// </summary>
-        public int BaseDrainProtectionGoal { get; set; } = 10;
-
-        /// <summary>
-        /// Amount to activate the power storage in case of low power
-        /// </summary>
-        public int AutoActivateAt { get; set; } = 10;
-
-        /// <summary>
         /// A list of custom ingredients for the use in the BluePrint
         /// </summary>
         public List<IngredientItem> Ingredients { get; set; } = new List<IngredientItem>();
-
 
         public bool ValidateData()
         {
@@ -72,32 +54,6 @@ namespace FCSPowerStorage.Configuration
             {
                 yield return new Ingredient(ingredient.Item.ToTechType(), ingredient.Amount);
             }
-        }
-
-        internal void SaveConfiguration()
-        {
-            var output = JsonConvert.SerializeObject(this, Formatting.Indented);
-            File.WriteAllText(Information.ConfigurationFile(), output);
-        }
-
-        internal int GetBasePowerProtection()
-        {
-            return BaseDrainProtectionGoal;
-        }
-
-        internal int GetAutoActivate()
-        {
-            return AutoActivateAt;
-        }
-
-        internal void SetBasePowerProtection(int value)
-        {
-            BaseDrainProtectionGoal = value;
-        }
-
-        internal void SetAutoActivate(int value)
-        {
-            AutoActivateAt = value;
         }
     }
 }
