@@ -4,6 +4,7 @@
     {
         None,
         Solar,
-        Battery
+        Battery,
+        Focus
     }
 }

@@ -43,8 +43,9 @@ namespace FCS_DeepDriller.Buildable
             jsonSerializerSettings.MissingMemberHandling = MissingMemberHandling.Ignore;
 
             DeepDrillConfig = JsonConvert.DeserializeObject<DeepDrillerCfg>(savedDataJson, jsonSerializerSettings);
+            DeepDrillConfig.Convert();
 
-            QuickLogger.Debug($"Biome Ores Count {DeepDrillConfig.BiomeOres.Count}");
+            QuickLogger.Debug($"Biome Ores Count {DeepDrillConfig.BiomeOresTechType.Count}");
 
         }
 

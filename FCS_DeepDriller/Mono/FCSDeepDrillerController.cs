@@ -1,5 +1,6 @@
 ﻿using FCS_DeepDriller.Configuration;
 using FCS_DeepDriller.Enumerators;
+using FCS_DeepDriller.Helpers;
 using FCS_DeepDriller.Managers;
 using FCS_DeepDriller.Mono.Handlers;
 using FCSAlterraIndustrialSolutions.Models.Controllers.Logic;
@@ -43,10 +44,14 @@ namespace FCS_DeepDriller.Mono
 
             if (_saveData == null)
             {
-                _saveData = new DeepDrillerSaveDataEntry() { Id = id };
+                _saveData = new DeepDrillerSaveDataEntry();
             }
 
             _saveData.Id = id;
+            _saveData.PowerState = PowerManager.GetPowerState();
+            _saveData.Modules = DeepDrillerModuleContainer.GetCurrentModules();
+            _saveData.Items = DeepDrillerContainer.GetItems();
+            _saveData.Health = _healthSystem.GetHealth();
             saveDataList.Entries.Add(_saveData);
         }
 
@@ -78,12 +83,38 @@ namespace FCS_DeepDriller.Mono
                 DisplayHandler.Setup(this);
             }
         }
+        #endregion
+
+        #region IProtoEventListener
+        public void OnProtoSerialize(ProtobufSerializer serializer)
+        {
+            if (!Mod.IsSaving())
+            {
+                QuickLogger.Info("Saving Drills");
+                Mod.SaveDeepDriller();
+            }
+        }
+
+        public void OnProtoDeserialize(ProtobufSerializer serializer)
+        {
+            var prefabIdentifier = GetComponent<PrefabIdentifier>();
+            var id = prefabIdentifier?.Id ?? string.Empty;
+            var data = Mod.GetDeepDrillerSaveData(id);
+
+            PowerManager.SetPowerState(data.PowerState);
+            DeepDrillerModuleContainer.SetModules(data.Modules);
+            DeepDrillerContainer.LoadItems(data.Items);
+            _healthSystem.SetHealth(data.Health);
+        }
+        #endregion
 
         private void Initialize()
         {
             ExtendStateHash = Animator.StringToHash("Extend");
 
             ShaftStateHash = Animator.StringToHash("ShaftState");
+
+            TechTypeHelpers.Initialize();
 
             _prefabId = GetComponentInParent<PrefabIdentifier>();
 
@@ -125,7 +156,6 @@ namespace FCS_DeepDriller.Mono
             PowerManager.Initialize(this);
             PowerManager.OnPowerUpdate += OnPowerUpdate;
 
-
             AnimationHandler = gameObject.AddComponent<FCSDeepDrillerAnimationHandler>();
             AnimationHandler.Initialize(this);
 
@@ -138,28 +168,7 @@ namespace FCS_DeepDriller.Mono
         }
 
         public FCSDeepDrillerDisplay DisplayHandler { get; private set; }
-
-        #endregion
-
-        #region IProtoEventListener
-        public void OnProtoSerialize(ProtobufSerializer serializer)
-        {
-            if (!Mod.IsSaving())
-            {
-                QuickLogger.Info("Saving Drills");
-                Mod.SaveDeepDriller();
-            }
-        }
-
-        public void OnProtoDeserialize(ProtobufSerializer serializer)
-        {
-            var prefabIdentifier = GetComponent<PrefabIdentifier>();
-            var id = prefabIdentifier?.Id ?? string.Empty;
-            var data = Mod.GetDeepDrillerSaveData(id);
-        }
-        #endregion
-
-        private void OreGeneratorOnAddCreated(string type)
+        private void OreGeneratorOnAddCreated(TechType type)
         {
             QuickLogger.Debug($"In OreGeneratorOnOnAddCreated {type}");
             DeepDrillerContainer.AddItem(type.ToPickupable());
@@ -182,14 +191,22 @@ namespace FCS_DeepDriller.Mono
             PowerManager.SetPowerState(FCSPowerStates.Powered);
         }
 
-        internal void RemoveAttachment()
+        internal void RemoveAttachment(DeepDrillModules module)
         {
-            PowerManager.SetModule(DeepDrillModules.None);
+            if (module != DeepDrillModules.Focus)
+            {
+                PowerManager.SetModule(DeepDrillModules.None);
+            }
+            else
+            {
+                _oreGenerator.RemoveFocus();
+            }
         }
 
         internal void AddAttachment(DeepDrillModules module)
         {
             PowerManager.SetModule(module);
+            _oreGenerator.SetModule(module);
         }
 
         internal bool IsModuleRemovable()

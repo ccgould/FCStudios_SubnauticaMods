@@ -1,19 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using SMLHelper.V2.Handlers;
+﻿using UnityEngine;
 
 namespace FCSCommon.Extensions
 {
     public static class TechTypeExtensions
     {
-        ///// <summary>
-        ///// Checks and returns techType form another mod usint SMLHelper
-        ///// </summary>
-        ///// <param name="techType"></param>
-        //public static bool FindExternalTechType(this string techType)
-        //{
-        //    var aIDeepDrillerBattery = TechTypeHandler.TryGetModdedTechType("AIDeepDrillerBattery", out TechType AIDeepDrillerBattery);
-        //}
+        public static Pickupable ToPickupable(this TechType techtype)
+        {
+            var go = GameObject.Instantiate(CraftData.GetPrefabForTechType(techtype));
+            return go.GetComponent<Pickupable>().Pickup(false);
+        }
     }
 }

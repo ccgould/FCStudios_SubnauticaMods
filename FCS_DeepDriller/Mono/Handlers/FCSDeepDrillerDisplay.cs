@@ -56,7 +56,9 @@ namespace FCS_DeepDriller.Mono.Handlers
                         case FCSPowerStates.None:
                             _mono.PowerOnDrill();
                             break;
-
+                        case FCSPowerStates.Tripped:
+                            _mono.PowerOnDrill();
+                            break;
                         case FCSPowerStates.Unpowered:
                             _mono.PowerOnDrill();
                             break;

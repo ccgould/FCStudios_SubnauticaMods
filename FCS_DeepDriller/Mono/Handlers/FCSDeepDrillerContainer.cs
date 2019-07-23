@@ -12,28 +12,13 @@ namespace FCS_DeepDriller.Mono.Handlers
         private ItemsContainer _container;
         private ChildObjectIdentifier _containerRoot;
         private Func<bool> _isConstructed;
-        private int MaxContainerSlots => ContainerHeight * ContainerWidth;
+        private int MaxContainerSlots => _containerHeight * _containerWidth;
         private int ContainerSlotsFilled => _container.count;
         internal bool IsContainerFull => _container.count == MaxContainerSlots || !_container.HasRoomFor(1, 1);
-        private const int ContainerWidth = 8;
-        private const int ContainerHeight = 10;
+        private readonly int _containerWidth = FCSDeepDrillerBuildable.DeepDrillConfig.StorageSize.Width;
+        private readonly int _containerHeight = FCSDeepDrillerBuildable.DeepDrillConfig.StorageSize.Height;
+        private Dictionary<TechType, int> ContainerItemsTracker = new Dictionary<TechType, int>();
 
-        private readonly List<TechType> _allowedResources = new List<TechType> {
-            TechType.Copper,
-            TechType.Gold,
-            TechType.Lead,
-            TechType.Lithium,
-            TechType.Magnetite,
-            TechType.Nickel,
-            TechType.Silver,
-            TechType.Titanium,
-            TechType.AluminumOxide,
-            TechType.Diamond,
-            TechType.Kyanite,
-            TechType.Quartz,
-            TechType.UraniniteCrystal,
-            TechType.Sulphur
-        };
 
         internal void Setup(FCSDeepDrillerController mono)
         {
@@ -53,7 +38,7 @@ namespace FCS_DeepDriller.Mono.Handlers
             {
                 QuickLogger.Debug("Initializing Deep Driller Container");
 
-                _container = new ItemsContainer(ContainerWidth, ContainerHeight, _containerRoot.transform,
+                _container = new ItemsContainer(_containerWidth, _containerHeight, _containerRoot.transform,
                     FCSDeepDrillerBuildable.StorageContainerLabel(), null);
 
                 _container.isAllowedToAdd += IsAllowedToAdd;
@@ -72,25 +57,38 @@ namespace FCS_DeepDriller.Mono.Handlers
         private void OnRemoveItemEvent(InventoryItem item)
         {
             //TODO if full reset system to generate ore
+            var techType = item.item.GetTechType();
+
+            if (!ContainerItemsTracker.ContainsKey(techType)) return;
+
+            if (ContainerItemsTracker[techType] == 1)
+            {
+                ContainerItemsTracker.Remove(techType);
+            }
+            else
+            {
+                ContainerItemsTracker[techType] = ContainerItemsTracker[techType] - 1;
+            }
         }
 
         private bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
         {
-            bool flag = false;
-            if (pickupable != null)
-            {
-                TechType techType = pickupable.GetTechType();
-                if (_allowedResources.Contains(techType))
-                    flag = true;
-            }
-            if (!flag && verbose)
-                QuickLogger.Info(FCSDeepDrillerBuildable.ItemNotAllowed(), true);
-
-            return flag;
+            return false;
         }
 
         internal void AddItem(Pickupable pickupable)
         {
+            var techType = pickupable.GetTechType();
+
+            if (ContainerItemsTracker.ContainsKey(techType))
+            {
+                ContainerItemsTracker[techType] = ContainerItemsTracker[techType] + 1;
+            }
+            else
+            {
+                ContainerItemsTracker.Add(techType, 1);
+            }
+
             _container.UnsafeAdd(new InventoryItem(pickupable));
         }
 
@@ -104,6 +102,27 @@ namespace FCS_DeepDriller.Mono.Handlers
             var pda = Player.main.GetPDA();
             Inventory.main.SetUsedStorage(_container);
             pda.Open(PDATab.Inventory, _mono.transform, null, 10f);
+        }
+
+        public void LoadItems(IEnumerable<KeyValuePair<TechType, int>> savedDataFridgeContainer)
+        {
+            foreach (KeyValuePair<TechType, int> item in savedDataFridgeContainer)
+            {
+                for (var i = 0; i < item.Value; i++)
+                {
+                    GameObject go = CraftData.GetPrefabForTechType(item.Key);
+                    var pickupable = go.GetComponent<Pickupable>();
+                    AddItem(pickupable);
+                }
+            }
+        }
+
+        internal IEnumerable<KeyValuePair<TechType, int>> GetItems()
+        {
+            foreach (var eatableEntity in ContainerItemsTracker)
+            {
+                yield return eatableEntity;
+            }
         }
     }
 }

@@ -1,24 +1,26 @@
-﻿using FCS_DeepDriller.Enumerators;
+﻿using FCSCommon.Objects;
+using FCSCommon.Utilities.Enums;
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace FCS_DeepDriller.Configuration
 {
     [Serializable]
     public class DeepDrillerSaveDataEntry
     {
-        public Vector3 DrillBitPosition { get; set; }
+        public Vec3 DrillBitPosition { get; set; }
 
-        public DeepDrillModules Module { get; set; }
+        public List<SlotData> Modules { get; set; }
 
         public float PowerAmount { get; set; }
-
-        public bool HasBreakerTripped { get; set; }
 
         public float Health { get; set; }
 
         public string Id { get; set; }
+
+        public FCSPowerStates PowerState { get; set; }
+
+        public IEnumerable<KeyValuePair<TechType, int>> Items { get; set; }
     }
 
     [Serializable]

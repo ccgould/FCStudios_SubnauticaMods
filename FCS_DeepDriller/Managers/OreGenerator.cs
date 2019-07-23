@@ -1,4 +1,5 @@
-﻿using FCSCommon.Utilities;
+﻿using FCS_DeepDriller.Enumerators;
+using FCSCommon.Utilities;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -21,9 +22,9 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers.Logic
         private bool _allowTick;
 
         public string OreGenerated { get; set; }
-        public List<string> AllowedOres { get; set; }
+        public List<TechType> AllowedOres { get; set; }
 
-        public event Action<string> OnAddCreated;
+        public event Action<TechType> OnAddCreated;
         public event Action<int> TimeOnUpdate;
 
         private Random _random;
@@ -31,6 +32,8 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers.Logic
         private int _minTime;
         private int _maxTime;
         private float _passedTime;
+        private TechType _focus;
+        private bool _isFocused;
 
         #endregion
 
@@ -78,35 +81,59 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers.Logic
 
         private void GenerateOre()
         {
-            QuickLogger.Info("1");
-            _random2.Next(AllowedOres.Count);
+            TechType item = TechType.None;
 
-            QuickLogger.Info("2");
-            if (AllowedOres?.Count == 0) return;
-
-            QuickLogger.Info("3");
-            var index = _random2.Next(AllowedOres.Count);
-
-            QuickLogger.Info("4");
-            var item = AllowedOres[index];
-
-            QuickLogger.Info($"5 {item}");
+            if (!_isFocused)
+            {
+                _random2.Next(AllowedOres.Count);
+                if (AllowedOres?.Count == 0) return;
+                var index = _random2.Next(AllowedOres.Count);
+                item = AllowedOres[index];
+            }
+            else
+            {
+                item = _focus;
+            }
 
             OnAddCreated?.Invoke(item);
-
-            QuickLogger.Info("6");
             randomTime = _random.Next(_minTime, _maxTime);
             QuickLogger.Debug($"New Time Goal: {randomTime}");
-            QuickLogger.Info("7");
             _passedTime = 0;
-
-            QuickLogger.Info("8");
-
         }
 
         internal void SetAllowTick(bool value)
         {
             _allowTick = value;
         }
+
+        public void RemoveFocus()
+        {
+            _focus = TechType.None;
+            _isFocused = false;
+        }
+
+        public void SetModule(DeepDrillModules module)
+        {
+            if (module == DeepDrillModules.Focus)
+            {
+                //TODO Get focus material from selection
+                _focus = TechType.Silver;
+                _isFocused = true;
+            }
+        }
+
+        internal void SetFocus(TechType techType)
+        {
+            _focus = techType;
+        }
+
+        internal TechType GetFocus() => _focus;
+
+        internal void SetIsFocused(bool value)
+        {
+            _isFocused = value;
+        }
+
+        internal bool GetIsFocused() => _isFocused;
     }
 }

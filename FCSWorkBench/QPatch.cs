@@ -36,8 +36,16 @@ namespace FCSTechFabricator
                 var ddBatteryModule = new BatteryAttachmentBuildable();
                 ddBatteryModule.Register();
 
+                var ddSolarModule = new SolarAttachmentBuildable();
+                ddSolarModule.Register();
+
+                var ddFocusModule = new FocusAttachmentBuildable();
+                ddFocusModule.Register();
+
                 FCSTechFabricatorBuildable.ItemsList.Add(freon);
                 FCSTechFabricatorBuildable.ItemsList.Add(psKit);
+                FCSTechFabricatorBuildable.ItemsList.Add(ddFocusModule);
+                FCSTechFabricatorBuildable.ItemsList.Add(ddSolarModule);
                 FCSTechFabricatorBuildable.ItemsList.Add(ddBatteryModule);
 
                 FCSTechFabricatorBuildable.PatchHelper();

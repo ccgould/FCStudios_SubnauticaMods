@@ -25,7 +25,7 @@ namespace FCS_DeepDriller.Mono.Handlers
         }
 
         private float _charge;
-        private float _capacity = 1000f;
+        private float _capacity;
         private float _passedTime;
         private bool _produceSolarPower;
         private float _maxDepth = 200f;
@@ -41,10 +41,10 @@ namespace FCS_DeepDriller.Mono.Handlers
                 {
                     HasPower = false;
                     SetPowerState(FCSPowerStates.Unpowered);
+                    QuickLogger.Debug($"Power Conditions Not Met: PS{_powerState} || M {_module} || C {_charge}");
                 }
 
                 _produceSolarPower = false;
-                QuickLogger.Debug($"Power Conditions Not Met: PS{_powerState} || M {_module} || C {_charge}");
 
                 return;
             }
@@ -121,6 +121,7 @@ namespace FCS_DeepDriller.Mono.Handlers
             {
                 case DeepDrillModules.None:
                     _capacity = 0;
+                    _charge = 0;
                     break;
                 case DeepDrillModules.Solar:
                     _capacity = FCSDeepDrillerBuildable.DeepDrillConfig.SolarCapacity;
@@ -128,6 +129,7 @@ namespace FCS_DeepDriller.Mono.Handlers
                     break;
                 case DeepDrillModules.Battery:
                     _charge = 1000f;
+                    _capacity = 1000f;
                     break;
             }
         }

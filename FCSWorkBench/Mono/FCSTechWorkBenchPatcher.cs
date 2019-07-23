@@ -61,7 +61,7 @@ namespace FCSTechFabricator.Mono
                 if (item.ClassID_I.EndsWith("_DD"))
                 {
                     QuickLogger.Debug($"Added {item.ClassID_I} to nodes");
-                    AddTabNodes(ref root, ref itemTab, item, "DeepDriller", "PSIcon");
+                    AddTabNodes(ref root, ref itemTab, item, "DeepDriller", "DDIcon");
                 }
             }
         }

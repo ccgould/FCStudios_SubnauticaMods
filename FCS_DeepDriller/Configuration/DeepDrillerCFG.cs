@@ -1,4 +1,6 @@
-﻿using FCSCommon.Objects;
+﻿using FCSCommon.Extensions;
+using FCSCommon.Objects;
+using Oculus.Newtonsoft.Json;
 using System.Collections.Generic;
 
 namespace FCS_DeepDriller.Configuration
@@ -15,7 +17,26 @@ namespace FCS_DeepDriller.Configuration
         public bool EnableWear { get; set; } = true;
         public float SolarCapacity { get; set; } = 3000;
 
-        public Dictionary<string, List<string>> BiomeOres = new Dictionary<string, List<string>>();
+        public Dictionary<string, List<string>> BiomeOres { get; set; } = new Dictionary<string, List<string>>();
+
+        [JsonIgnore] internal Dictionary<string, List<TechType>> BiomeOresTechType { get; set; } = new Dictionary<string, List<TechType>>();
+
         #endregion
+        internal void Convert()
+        {
+            foreach (KeyValuePair<string, List<string>> biomeOre in BiomeOres)
+            {
+                var types = new List<TechType>();
+
+                foreach (string sTechType in biomeOre.Value)
+                {
+                    types.Add(sTechType.ToTechType());
+                }
+
+                BiomeOresTechType.Add(biomeOre.Key, types);
+            }
+
+            BiomeOres = null;
+        }
     }
 }

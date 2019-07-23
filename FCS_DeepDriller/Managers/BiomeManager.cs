@@ -7,9 +7,9 @@ namespace FCS_DeepDriller.Managers
 {
     internal static class BiomeManager
     {
-        internal static List<string> GetBiomeData(string biome)
+        internal static List<TechType> GetBiomeData(string biome)
         {
-            foreach (var biomeOre in FCSDeepDrillerBuildable.DeepDrillConfig.BiomeOres)
+            foreach (var biomeOre in FCSDeepDrillerBuildable.DeepDrillConfig.BiomeOresTechType)
             {
                 if (biomeOre.Key == biome.ToLower())
                 {
@@ -49,7 +49,7 @@ namespace FCS_DeepDriller.Managers
             var result = string.Empty;
             QuickLogger.Info("// ============================= IN FindMatchingBiome ============================= //");
 
-            foreach (var biomeItem in FCSDeepDrillerBuildable.DeepDrillConfig.BiomeOres)
+            foreach (var biomeItem in FCSDeepDrillerBuildable.DeepDrillConfig.BiomeOresTechType)
             {
                 QuickLogger.Info($"Checking for {biome} || Current biome in iteration = {biomeItem.Key}");
 

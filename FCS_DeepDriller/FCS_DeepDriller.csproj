@@ -67,9 +67,11 @@
     <Compile Include="Configuration\DeepDrillerCFG.cs" />
     <Compile Include="Configuration\DeepDrillerSaveData.cs" />
     <Compile Include="Configuration\Mod.cs" />
+    <Compile Include="Configuration\SlotData.cs" />
     <Compile Include="Display\InterfaceButton.cs" />
     <Compile Include="Display\OnScreenButton.cs" />
     <Compile Include="Enumerators\DeepDrillModules.cs" />
+    <Compile Include="Helpers\TechTypeHelpers.cs" />
     <Compile Include="Managers\BiomeManager.cs" />
     <Compile Include="Managers\OreGenerator.cs" />
     <Compile Include="Mono\FCSDeepDrillerController.cs" />

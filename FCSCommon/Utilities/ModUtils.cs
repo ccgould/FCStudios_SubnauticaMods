@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Oculus.Newtonsoft.Json;
+using System;
 using System.Collections;
 using System.IO;
 using UnityEngine;
-using Oculus.Newtonsoft.Json;
 
 namespace FCSCommon.Utilities
 {
@@ -16,9 +16,14 @@ namespace FCSCommon.Utilities
         {
             if (newSaveData != null)
             {
-                var saveDataJson = JsonConvert.SerializeObject(newSaveData);
-                
-                File.WriteAllText(Path.Combine(saveDirectory,fileName), saveDataJson);
+                var saveDataJson = JsonConvert.SerializeObject(newSaveData, Formatting.Indented);
+
+                if (!Directory.Exists(saveDirectory))
+                {
+                    Directory.CreateDirectory(saveDirectory);
+                }
+
+                File.WriteAllText(Path.Combine(saveDirectory, fileName), saveDataJson);
 
                 onSaveComplete?.Invoke();
             }

@@ -62,7 +62,10 @@ namespace FCS_DeepDriller.Configuration
 
         public static DeepDrillerSaveDataEntry GetDeepDrillerSaveData(string id)
         {
+            LoadDeepDrillerData();
+
             var saveData = GetDeepDrillerSaveData();
+
             foreach (var entry in saveData.Entries)
             {
                 if (entry.Id == id)
@@ -70,6 +73,7 @@ namespace FCS_DeepDriller.Configuration
                     return entry;
                 }
             }
+
             return new DeepDrillerSaveDataEntry() { Id = id };
         }
         #endregion
