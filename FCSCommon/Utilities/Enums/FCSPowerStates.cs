@@ -8,6 +8,6 @@
         None,
         Powered,
         Unpowered,
-        Buffer
+        Tripped
     }
 }

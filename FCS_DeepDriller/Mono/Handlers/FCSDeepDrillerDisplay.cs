@@ -3,15 +3,19 @@ using FCS_DeepDriller.Display;
 using FCSCommon.Enums;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
+using FCSCommon.Utilities.Enums;
 using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace FCS_DeepDriller.Mono.Handlers
 {
     internal class FCSDeepDrillerDisplay : AIDisplay
     {
         private FCSDeepDrillerController _mono;
+        private bool _initialized = true;
+
 
         internal void Setup(FCSDeepDrillerController mono)
         {
@@ -20,6 +24,7 @@ namespace FCS_DeepDriller.Mono.Handlers
             if (!FindAllComponents())
             {
                 QuickLogger.Error("Unable to find all components");
+                _initialized = false;
             }
         }
 
@@ -30,7 +35,40 @@ namespace FCS_DeepDriller.Mono.Handlers
 
         public override void OnButtonClick(string btnName, object tag)
         {
-            throw new NotImplementedException();
+            if (!_initialized)
+            {
+                QuickLogger.Error("Deep Driller failed to initialize. All button events are disabled.");
+                return;
+            }
+
+            switch (btnName)
+            {
+                case "Open_BTN":
+                    _mono.DeepDrillerContainer.OpenStorage();
+                    break;
+
+                case "PowerBTN":
+                    switch (_mono.PowerManager.GetPowerState())
+                    {
+                        case FCSPowerStates.Powered:
+                            _mono.PowerOffDrill();
+                            break;
+                        case FCSPowerStates.None:
+                            _mono.PowerOnDrill();
+                            break;
+
+                        case FCSPowerStates.Unpowered:
+                            _mono.PowerOnDrill();
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+                    break;
+
+                case "Module_Door":
+                    _mono.DeepDrillerModuleContainer.OpenModulesDoor();
+                    break;
+            }
         }
 
         public override void ItemModified<T>(T item)
@@ -69,12 +107,11 @@ namespace FCS_DeepDriller.Mono.Handlers
             powerBtn.BtnName = "PowerBTN";
             powerBtn.ButtonMode = InterfaceButtonMode.Background;
             powerBtn.TextLineOne = $"Toggle {Mod.ModFriendlyName} Power";
-            powerBtn.Tag = this;
             #endregion
 
             #region Open Storage Button
 
-            var openStorageBTN = canvasGameObject.FindChild("Open_BTN")?.gameObject;
+            var openStorageBTN = canvasGameObject.FindChild("Open_BTN").FindChild("OPEN_LBL")?.gameObject;
 
             if (openStorageBTN == null)
             {
@@ -85,15 +122,15 @@ namespace FCS_DeepDriller.Mono.Handlers
             var openStorageBtn = openStorageBTN.AddComponent<InterfaceButton>();
             openStorageBtn.OnButtonClick = OnButtonClick;
             openStorageBtn.BtnName = "Open_BTN";
-            openStorageBtn.ButtonMode = InterfaceButtonMode.Background;
+            openStorageBtn.ButtonMode = InterfaceButtonMode.TextColor;
+            openStorageBtn.TextComponent = openStorageBtn.GetComponent<Text>();
             openStorageBtn.TextLineOne = $"Open {Mod.ModFriendlyName} Storage";
-            openStorageBtn.Tag = this;
 
             #endregion
 
             #region Open Modules Button
 
-            var openModuleDoor = canvasGameObject.FindChild("moduleDoor")?.gameObject;
+            var openModuleDoor = canvasGameObject.FindChild("Module_BTN").FindChild("OPEN_LBL")?.gameObject;
 
             if (openModuleDoor == null)
             {
@@ -104,23 +141,22 @@ namespace FCS_DeepDriller.Mono.Handlers
             var moduleDoor = openModuleDoor.AddComponent<InterfaceButton>();
             moduleDoor.OnButtonClick = OnButtonClick;
             moduleDoor.BtnName = "Module_Door";
-            moduleDoor.ButtonMode = InterfaceButtonMode.Background;
-            moduleDoor.TextLineOne = $"Open {Mod.ModFriendlyName} Modulars";
-            moduleDoor.Tag = this;
-
+            moduleDoor.ButtonMode = InterfaceButtonMode.TextColor;
+            moduleDoor.TextComponent = openModuleDoor.GetComponent<Text>();
+            moduleDoor.TextLineOne = $"Open {Mod.ModFriendlyName} Modular";
             #endregion
 
-            #region Battery
+            //#region Battery
 
-            _batteryMeter = _canvasGameObject.FindChild("Battery")?.gameObject;
+            //_batteryMeter = _canvasGameObject.FindChild("Battery")?.gameObject;
 
-            if (_batteryMeter == null)
-            {
-                QuickLogger.Error("Open Storage Button not found.");
-                return false;
-            }
+            //if (_batteryMeter == null)
+            //{
+            //    QuickLogger.Error("Open Storage Button not found.");
+            //    return false;
+            //}
 
-            #endregion
+            //#endregion
 
 
             return true;

@@ -6,7 +6,7 @@ using SMLHelper.V2.Utility;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace FCSTechFabricator.Mono
+namespace FCSTechFabricator.Mono.SeaBreeze
 {
     public partial class FreonBuildable : FCSTechFabricatorItem
     {

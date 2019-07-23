@@ -2,7 +2,7 @@
 using ARS_SeaBreezeFCS32.Mono;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
-using FCSTechFabricator.Mono;
+using FCSTechFabricator.Mono.SeaBreeze;
 using SMLHelper.V2.Handlers;
 using System;
 using UnityEngine;

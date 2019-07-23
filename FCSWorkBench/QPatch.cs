@@ -1,7 +1,9 @@
 ﻿using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using FCSTechFabricator.Mono;
+using FCSTechFabricator.Mono.DeepDriller;
 using FCSTechFabricator.Mono.PowerStorage;
+using FCSTechFabricator.Mono.SeaBreeze;
 using Harmony;
 using System;
 using System.IO;
@@ -31,8 +33,12 @@ namespace FCSTechFabricator
                 var psKit = new PowerStorageKitBuildable();
                 psKit.Register();
 
+                var ddBatteryModule = new BatteryAttachmentBuildable();
+                ddBatteryModule.Register();
+
                 FCSTechFabricatorBuildable.ItemsList.Add(freon);
                 FCSTechFabricatorBuildable.ItemsList.Add(psKit);
+                FCSTechFabricatorBuildable.ItemsList.Add(ddBatteryModule);
 
                 FCSTechFabricatorBuildable.PatchHelper();
 

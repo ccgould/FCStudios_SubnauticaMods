@@ -28,7 +28,7 @@ namespace FCSCommon.Helpers
                 }
             }
 
-            QuickLogger.Error($"Couldn't Find Texture: {textureName}");
+            //QuickLogger.Error($"Couldn't Find Texture: {textureName}");
 
             return null;
         }

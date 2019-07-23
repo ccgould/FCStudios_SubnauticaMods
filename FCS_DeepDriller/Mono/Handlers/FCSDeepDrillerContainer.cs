@@ -15,8 +15,8 @@ namespace FCS_DeepDriller.Mono.Handlers
         private int MaxContainerSlots => ContainerHeight * ContainerWidth;
         private int ContainerSlotsFilled => _container.count;
         internal bool IsContainerFull => _container.count == MaxContainerSlots || !_container.HasRoomFor(1, 1);
-        private const int ContainerWidth = 2;
-        private const int ContainerHeight = 2;
+        private const int ContainerWidth = 8;
+        private const int ContainerHeight = 10;
 
         private readonly List<TechType> _allowedResources = new List<TechType> {
             TechType.Copper,
@@ -43,16 +43,15 @@ namespace FCS_DeepDriller.Mono.Handlers
 
             if (_containerRoot == null)
             {
-                QuickLogger.Debug("Initializing AMMiniMedBay StorageRoot");
-                var storageRoot = new GameObject("AMMiniMedBayStorageRoot");
+                QuickLogger.Debug("Initializing Deep Driller StorageRoot");
+                var storageRoot = new GameObject("DeepDrillerStorageRoot");
                 storageRoot.transform.SetParent(mono.transform, false);
                 _containerRoot = storageRoot.AddComponent<ChildObjectIdentifier>();
-                _mono = mono;
             }
 
             if (_container == null)
             {
-                QuickLogger.Debug("Initializing AMMiniMedBay Container");
+                QuickLogger.Debug("Initializing Deep Driller Container");
 
                 _container = new ItemsContainer(ContainerWidth, ContainerHeight, _containerRoot.transform,
                     FCSDeepDrillerBuildable.StorageContainerLabel(), null);
@@ -97,9 +96,14 @@ namespace FCS_DeepDriller.Mono.Handlers
 
         public void OpenStorage()
         {
+            if (_container == null)
+            {
+                QuickLogger.Debug("The container returned null", true);
+                return;
+            }
             var pda = Player.main.GetPDA();
             Inventory.main.SetUsedStorage(_container);
-            pda.Open(PDATab.Inventory, gameObject.transform, null, 10f);
+            pda.Open(PDATab.Inventory, _mono.transform, null, 10f);
         }
     }
 }

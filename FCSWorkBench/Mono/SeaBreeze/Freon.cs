@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace FCSTechFabricator.Mono
+namespace FCSTechFabricator.Mono.SeaBreeze
 {
     public class Freon : MonoBehaviour
     {

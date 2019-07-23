@@ -16,17 +16,15 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers.Logic
 
         private float randomTime;
 
-        public float TimeRemaining { get; set; }
+        private float TimeRemaining;
 
-        public bool AllowTick { get; set; }
-
-
+        private bool _allowTick;
 
         public string OreGenerated { get; set; }
         public List<string> AllowedOres { get; set; }
 
         public event Action<string> OnAddCreated;
-        public event Action<int> TimeOnupdate;
+        public event Action<int> TimeOnUpdate;
 
         private Random _random;
         private Random _random2;
@@ -36,25 +34,33 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers.Logic
 
         #endregion
 
+        /// <summary>
+        /// Sets up the ore generator
+        /// </summary>
+        /// <param name="minTime">The minimum amount of time to generate</param>
+        /// <param name="maxTime">The maximum amount of time to generate</param>
         public void Start(int minTime, int maxTime)
         {
             _minTime = minTime;
-            _maxTime = maxTime;
+            _maxTime = maxTime + 1; // Added one so the random can chose the maximum number if not wit wont chose the maximum
             _random = new Random();
             _random2 = new Random();
-            randomTime = _random.Next(minTime, maxTime);
+            randomTime = _random.Next(_minTime, _maxTime);
+            QuickLogger.Debug($"New Time Goal: {randomTime}");
+
         }
 
         private void Update()
         {
-            if (AllowTick)
+            //QuickLogger.Debug($"AllowTick = {_allowTick} || PassedTime = {_passedTime} || AllowedOres = {AllowedOres?.Count}");
+
+            if (_allowTick)
             {
                 if (_minTime <= 0 || _maxTime <= 0)
                 {
                     QuickLogger.Error($"{nameof(OreGenerator)}: MaxTime or MinTime is lower than or equal to 0");
                     return;
                 }
-
 
                 _passedTime += DayNightCycle.main.deltaTime;
 
@@ -65,8 +71,8 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers.Logic
 
                 var timeLeft = _maxTime - (_passedTime * 0.016667);
 
-                TimeOnupdate?.Invoke(Convert.ToInt32(timeLeft));
-                //Log.Info($"AllowTick = {AllowTick} || PassedTime = {_passedTime} || AllowedOres = {AllowedOres?.Count}");
+                TimeOnUpdate?.Invoke(Convert.ToInt32(timeLeft));
+
             }
         }
 
@@ -90,12 +96,17 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers.Logic
 
             QuickLogger.Info("6");
             randomTime = _random.Next(_minTime, _maxTime);
-
+            QuickLogger.Debug($"New Time Goal: {randomTime}");
             QuickLogger.Info("7");
             _passedTime = 0;
 
             QuickLogger.Info("8");
 
+        }
+
+        internal void SetAllowTick(bool value)
+        {
+            _allowTick = value;
         }
     }
 }

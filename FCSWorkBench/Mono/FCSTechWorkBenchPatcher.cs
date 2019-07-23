@@ -57,6 +57,12 @@ namespace FCSTechFabricator.Mono
                     QuickLogger.Debug($"Added {item.ClassID_I} to nodes");
                     AddTabNodes(ref root, ref itemTab, item, "PowerStorage", "PSIcon");
                 }
+
+                if (item.ClassID_I.EndsWith("_DD"))
+                {
+                    QuickLogger.Debug($"Added {item.ClassID_I} to nodes");
+                    AddTabNodes(ref root, ref itemTab, item, "DeepDriller", "PSIcon");
+                }
             }
         }
 

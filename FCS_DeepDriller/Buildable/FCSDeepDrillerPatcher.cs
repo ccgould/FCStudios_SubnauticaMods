@@ -38,7 +38,12 @@ namespace FCS_DeepDriller.Buildable
 
 
             string savedDataJson = File.ReadAllText(Path.Combine(AssetHelper.GetConfigFolder(Mod.ModName), $"{Singleton.ClassID}.json")).Trim();
-            DeepDrillConfig = JsonConvert.DeserializeObject<DeepDrillerCfg>(savedDataJson);
+
+            var jsonSerializerSettings = new JsonSerializerSettings();
+            jsonSerializerSettings.MissingMemberHandling = MissingMemberHandling.Ignore;
+
+            DeepDrillConfig = JsonConvert.DeserializeObject<DeepDrillerCfg>(savedDataJson, jsonSerializerSettings);
+
             QuickLogger.Debug($"Biome Ores Count {DeepDrillConfig.BiomeOres.Count}");
 
         }
@@ -74,7 +79,9 @@ namespace FCS_DeepDriller.Buildable
                 constructable.techType = TechType;
                 constructable.rotationEnabled = true;
 
-
+                // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
+                var lwe = prefab.AddComponent<LargeWorldEntity>();
+                lwe.cellLevel = LargeWorldEntity.CellLevel.Far;
 
                 prefab.GetOrAddComponent<PrefabIdentifier>().ClassId = this.ClassID;
                 prefab.AddComponent<FMOD_CustomLoopingEmitter>();

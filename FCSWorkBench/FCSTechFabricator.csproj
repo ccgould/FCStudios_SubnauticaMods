@@ -65,11 +65,14 @@
     <Compile Include="Abstract Classes\FCSTechFabricatorItem.cs" />
     <Compile Include="Interfaces\IFCSTechFabricatorItem.cs" />
     <Compile Include="Models\Mod.cs" />
+    <Compile Include="Mono\DeepDriller\BatteryAttachmentModelPrefab.cs" />
+    <Compile Include="Mono\DeepDriller\BatteryAttachmentPatcher.cs" />
+    <Compile Include="Mono\FCSTechFabricatorTag.cs" />
     <Compile Include="Mono\FCSTechWorkBenchModelPrefab.cs" />
-    <Compile Include="Mono\Freon.cs" />
+    <Compile Include="Mono\SeaBreeze\Freon.cs" />
     <Compile Include="Mono\FCSTechWorkBenchPatcher.cs" />
-    <Compile Include="Mono\FreonModelPrefab.cs" />
-    <Compile Include="Mono\FreonPatcher.cs" />
+    <Compile Include="Mono\SeaBreeze\FreonModelPrefab.cs" />
+    <Compile Include="Mono\SeaBreeze\FreonPatcher.cs" />
     <Compile Include="Mono\PowerStorage\PowerStorageKitController.cs" />
     <Compile Include="Mono\PowerStorage\PowerStorageKitModelPrefab.cs" />
     <Compile Include="Mono\PowerStorage\PowerStorageKitPatcher.cs" />

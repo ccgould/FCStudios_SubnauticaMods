@@ -74,9 +74,11 @@
     <Compile Include="Managers\OreGenerator.cs" />
     <Compile Include="Mono\FCSDeepDrillerController.cs" />
     <Compile Include="Managers\AnimationManager.cs" />
+    <Compile Include="Mono\Handlers\FCSDeepDrillerAnimationHandler.cs" />
     <Compile Include="Mono\Handlers\FCSDeepDrillerContainer.cs" />
     <Compile Include="Mono\Handlers\FCSDeepDrillerDisplay.cs" />
     <Compile Include="Mono\Handlers\FCSDeepDrillerModuleContainer.cs" />
+    <Compile Include="Mono\Handlers\FCSDeepDrillerPowerHandler.cs" />
     <Compile Include="Mono\Handlers\PlayerInteraction.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

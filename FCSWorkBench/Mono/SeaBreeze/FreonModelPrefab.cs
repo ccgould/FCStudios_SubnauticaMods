@@ -2,7 +2,7 @@
 using FCSCommon.Utilities;
 using UnityEngine;
 
-namespace FCSTechFabricator.Mono
+namespace FCSTechFabricator.Mono.SeaBreeze
 {
     public partial class FreonBuildable
     {

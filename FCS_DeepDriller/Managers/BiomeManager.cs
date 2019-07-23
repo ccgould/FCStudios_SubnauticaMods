@@ -1,15 +1,23 @@
 ﻿using FCS_DeepDriller.Buildable;
 using FCSCommon.Utilities;
 using System;
+using System.Collections.Generic;
 
 namespace FCS_DeepDriller.Managers
 {
     internal static class BiomeManager
     {
-        //internal static AISolutionsData.BiomeItem GetBiomeData(string biome)
-        //{
-        //    return AIJetStreamT242Buildable.JetStreamT242Config.BiomeSpeeds.GetOrDefault(biome.ToLower(), new AISolutionsData.BiomeItem { Speed = 0 });
-        //}
+        internal static List<string> GetBiomeData(string biome)
+        {
+            foreach (var biomeOre in FCSDeepDrillerBuildable.DeepDrillConfig.BiomeOres)
+            {
+                if (biomeOre.Key == biome.ToLower())
+                {
+                    return biomeOre.Value;
+                }
+            }
+            return null;
+        }
 
         internal static string GetBiome()
         {
@@ -32,6 +40,7 @@ namespace FCS_DeepDriller.Managers
 
             return biome;
         }
+
         private static string FindMatchingBiome(string biome)
         {
 
