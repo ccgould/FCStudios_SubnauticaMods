@@ -86,6 +86,9 @@ namespace FCS_DeepDriller.Mono
         #endregion
 
         #region IProtoEventListener
+
+        //TODO Set _OreGen new methods on save
+
         public void OnProtoSerialize(ProtobufSerializer serializer)
         {
             if (!Mod.IsSaving())
@@ -134,7 +137,7 @@ namespace FCS_DeepDriller.Mono
             _healthSystem = gameObject.AddComponent<HealthController>();
 
             _oreGenerator = gameObject.AddComponent<OreGenerator>();
-            _oreGenerator.Start(1, 2);// TODO replace with 5,8
+            _oreGenerator.Initialize(1, 2);// TODO replace with 5,8
             _oreGenerator.OnAddCreated += OreGeneratorOnAddCreated;
             _oreGenerator.AllowedOres = BiomeManager.GetBiomeData(_currentBiome);
 

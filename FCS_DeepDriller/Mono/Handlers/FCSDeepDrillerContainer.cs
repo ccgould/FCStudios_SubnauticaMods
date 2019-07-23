@@ -1,4 +1,5 @@
 ﻿using FCS_DeepDriller.Buildable;
+using FCSCommon.Extensions;
 using FCSCommon.Utilities;
 using System;
 using System.Collections.Generic;
@@ -78,6 +79,7 @@ namespace FCS_DeepDriller.Mono.Handlers
 
         internal void AddItem(Pickupable pickupable)
         {
+
             var techType = pickupable.GetTechType();
 
             if (ContainerItemsTracker.ContainsKey(techType))
@@ -89,6 +91,7 @@ namespace FCS_DeepDriller.Mono.Handlers
                 ContainerItemsTracker.Add(techType, 1);
             }
 
+            QuickLogger.Debug($"Adding TechType to container: {techType}");
             _container.UnsafeAdd(new InventoryItem(pickupable));
         }
 
@@ -110,9 +113,7 @@ namespace FCS_DeepDriller.Mono.Handlers
             {
                 for (var i = 0; i < item.Value; i++)
                 {
-                    GameObject go = CraftData.GetPrefabForTechType(item.Key);
-                    var pickupable = go.GetComponent<Pickupable>();
-                    AddItem(pickupable);
+                    AddItem(item.Key.ToPickupable());
                 }
             }
         }

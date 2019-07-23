@@ -23,7 +23,7 @@ namespace FCS_DeepDriller.Helpers
                 _batteryModuleTechType = batteryModuleTechType;
             }
 
-            var solarPanelFound = TechTypeHandler.TryGetModdedTechType("SolarPanelAttachment_DD", out TechType solarPanelTechType);
+            var solarPanelFound = TechTypeHandler.TryGetModdedTechType("SolarAttachment_DD", out TechType solarPanelTechType);
 
             if (!solarPanelFound)
             {

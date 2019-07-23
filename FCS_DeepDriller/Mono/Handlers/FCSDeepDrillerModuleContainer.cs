@@ -2,6 +2,7 @@
 using FCS_DeepDriller.Configuration;
 using FCS_DeepDriller.Enumerators;
 using FCS_DeepDriller.Helpers;
+using FCSCommon.Extensions;
 using FCSCommon.Utilities;
 using FCSTechFabricator.Mono;
 using System;
@@ -67,8 +68,6 @@ namespace FCS_DeepDriller.Mono.Handlers
         {
             QuickLogger.Debug($"ModuleContainerOnAddItem Item Name {item.item.name}");
 
-            QuickLogger.Debug($"GTP {item.item.GetTechType()} || BTP {TechTypeHelpers.BatteryAttachmentTechType()}");
-
             if (item.item.GetTechType() == TechTypeHelpers.BatteryAttachmentTechType())
             {
                 _mono.AddAttachment(DeepDrillModules.Battery);
@@ -81,7 +80,7 @@ namespace FCS_DeepDriller.Mono.Handlers
 
             if (item.item.GetTechType() == TechTypeHelpers.FocusAttachmentTechType())
             {
-                _mono.AddAttachment(DeepDrillModules.Solar);
+                _mono.AddAttachment(DeepDrillModules.Focus);
             }
         }
 
@@ -126,8 +125,8 @@ namespace FCS_DeepDriller.Mono.Handlers
             foreach (SlotData module in modules)
             {
                 if (module.Module == TechType.None) continue;
-                var item = CraftData.GetPrefabForTechType(module.Module);
-                _equipment.AddItem(module.Slot, new InventoryItem(item.GetComponent<Pickupable>()));
+
+                _equipment.AddItem(module.Slot, new InventoryItem(module.Module.ToPickupable()));
             }
         }
     }

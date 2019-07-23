@@ -13,20 +13,10 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers.Logic
     /// </summary>
     public class OreGenerator : MonoBehaviour
     {
-        #region Public Properties
+        #region private Properties
 
-        private float randomTime;
-
-        private float TimeRemaining;
-
+        private float _randomTime;
         private bool _allowTick;
-
-        public string OreGenerated { get; set; }
-        public List<TechType> AllowedOres { get; set; }
-
-        public event Action<TechType> OnAddCreated;
-        public event Action<int> TimeOnUpdate;
-
         private Random _random;
         private Random _random2;
         private int _minTime;
@@ -37,25 +27,31 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers.Logic
 
         #endregion
 
+        #region Internal Properties
+        internal List<TechType> AllowedOres { get; set; }
+        internal event Action<TechType> OnAddCreated;
+        internal event Action<int> TimeOnUpdate;
+        #endregion
+
         /// <summary>
         /// Sets up the ore generator
         /// </summary>
         /// <param name="minTime">The minimum amount of time to generate</param>
         /// <param name="maxTime">The maximum amount of time to generate</param>
-        public void Start(int minTime, int maxTime)
+        public void Initialize(int minTime, int maxTime)
         {
             _minTime = minTime;
             _maxTime = maxTime + 1; // Added one so the random can chose the maximum number if not wit wont chose the maximum
             _random = new Random();
             _random2 = new Random();
-            randomTime = _random.Next(_minTime, _maxTime);
-            QuickLogger.Debug($"New Time Goal: {randomTime}");
+            _randomTime = _random.Next(_minTime, _maxTime);
+            QuickLogger.Debug($"New Time Goal: {_randomTime}");
 
         }
 
         private void Update()
         {
-            //QuickLogger.Debug($"AllowTick = {_allowTick} || PassedTime = {_passedTime} || AllowedOres = {AllowedOres?.Count}");
+            QuickLogger.Debug($"AllowTick = {_allowTick} || PassedTime = {_passedTime} || AllowedOres = {AllowedOres?.Count}");
 
             if (_allowTick)
             {
@@ -67,12 +63,12 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers.Logic
 
                 _passedTime += DayNightCycle.main.deltaTime;
 
-                if (_passedTime >= randomTime / 0.016667)
+                if (_passedTime >= _randomTime / 0.016667)
                 {
                     GenerateOre();
                 }
 
-                var timeLeft = _maxTime - (_passedTime * 0.016667);
+                var timeLeft = _randomTime - (_passedTime * 0.016667);
 
                 TimeOnUpdate?.Invoke(Convert.ToInt32(timeLeft));
 
@@ -81,23 +77,26 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers.Logic
 
         private void GenerateOre()
         {
-            TechType item = TechType.None;
+            TechType item;
 
             if (!_isFocused)
             {
+                if (AllowedOres == null || AllowedOres.Count == 0) return;
+
                 _random2.Next(AllowedOres.Count);
-                if (AllowedOres?.Count == 0) return;
                 var index = _random2.Next(AllowedOres.Count);
                 item = AllowedOres[index];
+
             }
             else
             {
                 item = _focus;
+                QuickLogger.Debug($"Spawning focus item {_focus}");
             }
 
             OnAddCreated?.Invoke(item);
-            randomTime = _random.Next(_minTime, _maxTime);
-            QuickLogger.Debug($"New Time Goal: {randomTime}");
+            _randomTime = _random.Next(_minTime, _maxTime);
+            QuickLogger.Debug($"New Time Goal: {_randomTime}");
             _passedTime = 0;
         }
 
@@ -119,6 +118,7 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers.Logic
                 //TODO Get focus material from selection
                 _focus = TechType.Silver;
                 _isFocused = true;
+                QuickLogger.Debug($"Setting focus item {_focus}");
             }
         }
 

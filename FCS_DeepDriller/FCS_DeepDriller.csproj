@@ -65,6 +65,7 @@
     <Compile Include="Buildable\FCSDeepDrillerModelPrefab.cs" />
     <Compile Include="Buildable\FCSDeepDrillerPatcher.cs" />
     <Compile Include="Configuration\DeepDrillerCFG.cs" />
+    <Compile Include="Configuration\DeepDrillerPowerData.cs" />
     <Compile Include="Configuration\DeepDrillerSaveData.cs" />
     <Compile Include="Configuration\Mod.cs" />
     <Compile Include="Configuration\SlotData.cs" />
