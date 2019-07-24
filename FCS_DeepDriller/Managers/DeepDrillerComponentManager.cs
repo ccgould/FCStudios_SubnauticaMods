@@ -15,10 +15,12 @@ namespace FCS_DeepDriller.Managers
         private static GameObject _batteryModule;
         private static GameObject _solarPanelModule;
         private static GameObject _gameObject;
+        private static FCSDeepDrillerController _mono;
 
         internal static bool FindAllComponents(FCSDeepDrillerController mono)
         {
             //Modules
+            _mono = mono;
             _gameObject = mono.gameObject;
 
             var model = _gameObject.FindChild("model")?.gameObject;
@@ -37,6 +39,7 @@ namespace FCS_DeepDriller.Managers
             }
 
             _batteryModule = modules.FindChild("battery_module")?.gameObject;
+
 
             if (_batteryModule == null)
             {
@@ -112,11 +115,15 @@ namespace FCS_DeepDriller.Managers
             _batteryModule.SetActive(false);
             _solarPanelModule.SetActive(false);
         }
+
         public static void ShowAllAttachments()
         {
             _batteryModule.SetActive(true);
+            var batteryController = _batteryModule.AddComponent<FCSDeepDrillerBatteryController>();
+            batteryController.Setup(_mono);
             _solarPanelModule.SetActive(true);
         }
+
         public static void Setup()
         {
             ShowAllAttachments();

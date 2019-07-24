@@ -6,10 +6,8 @@ using UnityEngine;
 
 namespace FCS_DeepDriller.Mono
 {
-    internal class FCSDeepDrillerBatteryController : MonoBehaviour
+    internal class FCSDeepDrillerBatteryController : HandTarget, IHandTarget
     {
-
-
         internal static readonly string[] SlotIDs = new string[4]
         {
             "PowerCellCharger1",
@@ -39,7 +37,7 @@ namespace FCS_DeepDriller.Mono
             equipmentRoot.AddComponent<ChildObjectIdentifier>();
             equipmentRoot.SetActive(false);
 
-            _equipment = new Equipment(mono.gameObject, equipmentRoot.transform);
+            _equipment = new Equipment(gameObject, equipmentRoot.transform);
             _equipment.SetLabel(FCSDeepDrillerBuildable.BEquipmentContainerLabel());
             _equipment.isAllowedToAdd = IsAllowedToAdd;
             _equipment.isAllowedToRemove = IsAllowedToRemove;
@@ -49,8 +47,6 @@ namespace FCS_DeepDriller.Mono
             _equipment.AddSlot(SlotIDs[1]);
             _equipment.AddSlot(SlotIDs[2]);
             _equipment.AddSlot(SlotIDs[3]);
-
-
         }
 
         private bool IsAllowedToRemove(Pickupable pickupable, bool verbose)
@@ -111,6 +107,23 @@ namespace FCS_DeepDriller.Mono
                 case "PowerCellCharger4":
                     DeepDrillerComponentManager.GetBatteryCellModel(4).SetActive(true);
                     break;
+            }
+        }
+
+        public void OnHandHover(GUIHand hand)
+        {
+            HandReticle main = HandReticle.main;
+            main.SetInteractText(FCSDeepDrillerBuildable.OnBatteryHoverText());
+            main.SetIcon(HandReticle.IconType.Hand, 1f);
+        }
+
+        public void OnHandClick(GUIHand hand)
+        {
+            PDA pda = Player.main.GetPDA();
+            if (!pda.isInUse)
+            {
+                Inventory.main.SetUsedStorage(_equipment, false);
+                pda.Open(PDATab.Inventory, gameObject.transform, null, 4f);
             }
         }
     }
