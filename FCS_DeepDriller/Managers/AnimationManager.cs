@@ -2,5 +2,6 @@
 {
     internal class AnimationManager
     {
+
     }
 }

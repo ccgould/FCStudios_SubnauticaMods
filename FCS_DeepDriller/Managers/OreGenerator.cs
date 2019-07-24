@@ -41,20 +41,19 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers.Logic
         public void Initialize(int minTime, int maxTime)
         {
             _minTime = minTime;
-            _maxTime = maxTime + 1; // Added one so the random can chose the maximum number if not wit wont chose the maximum
+            _maxTime = maxTime + 1; // Added one so the random can chose the maximum number if not with wont chose the maximum
             _random = new Random();
             _random2 = new Random();
             _randomTime = _random.Next(_minTime, _maxTime);
             QuickLogger.Debug($"New Time Goal: {_randomTime}");
-
         }
 
         private void Update()
         {
-            QuickLogger.Debug($"AllowTick = {_allowTick} || PassedTime = {_passedTime} || AllowedOres = {AllowedOres?.Count}");
-
             if (_allowTick)
             {
+                QuickLogger.Debug($"PassedTime = {_passedTime} || AllowedOres = {AllowedOres?.Count}");
+
                 if (_minTime <= 0 || _maxTime <= 0)
                 {
                     QuickLogger.Error($"{nameof(OreGenerator)}: MaxTime or MinTime is lower than or equal to 0");

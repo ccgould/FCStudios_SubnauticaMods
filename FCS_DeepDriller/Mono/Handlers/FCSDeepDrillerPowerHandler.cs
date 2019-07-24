@@ -42,11 +42,22 @@ namespace FCS_DeepDriller.Mono.Handlers
 
         private void Update()
         {
+            var hasPowerModule = _mono.DeepDrillerModuleContainer.HasPowerModule(out var module);
+
+            QuickLogger.Debug($"Has Power Module {hasPowerModule}");
+
             if (!_mono.IsConstructed) return;
+
+            if (module == DeepDrillModules.Solar)
+            {
+                _produceSolarPower = true;
+            }
+
+            _module = module;
 
             ProduceSolarPower();
 
-            if (_powerState != FCSPowerStates.Powered || _module == DeepDrillModules.None || _powerBank.GetCharge(_module) < FCSDeepDrillerBuildable.DeepDrillConfig.PowerDraw)
+            if (_powerState != FCSPowerStates.Powered || _powerBank.GetCharge(_module) < FCSDeepDrillerBuildable.DeepDrillConfig.PowerDraw || !hasPowerModule)
             {
                 if (_hasPower)
                 {
@@ -63,7 +74,6 @@ namespace FCS_DeepDriller.Mono.Handlers
 
             if (_passedTime >= 1)
             {
-
                 _powerBank.RemovePower(_module);
                 _passedTime = 0.0f;
 
@@ -81,7 +91,7 @@ namespace FCS_DeepDriller.Mono.Handlers
         {
             if (!_produceSolarPower) return;
             _powerBank.SetSolarCharge(Mathf.Clamp(_powerBank.GetCharge(_module) + GetRechargeScalar() * DayNightCycle.main.deltaTime * 0.50f * 5f, 0f, _powerBank.GetCapacity(_module)));
-            QuickLogger.Debug($"Current Charge: {_powerBank.Solar.Battery.charge} || Current Capacity: {_powerBank.Solar.Battery.capacity}");
+            QuickLogger.Debug($"Current Solar Charge: {_powerBank.Solar.Battery.charge} || Current Solar Capacity: {_powerBank.Solar.Battery.capacity}");
         }
 
         private float GetRechargeScalar()
@@ -119,27 +129,6 @@ namespace FCS_DeepDriller.Mono.Handlers
         internal void SetPowerState(FCSPowerStates state)
         {
             _powerState = state;
-        }
-
-        internal void SetModule(DeepDrillModules module)
-        {
-            _module = module;
-
-            QuickLogger.Debug($"Setting Power State to {module}");
-
-            switch (module)
-            {
-                case DeepDrillModules.None:
-                    _powerBank.SetSolarCharge(0);
-                    break;
-
-                case DeepDrillModules.Solar:
-                    _produceSolarPower = true;
-                    break;
-
-                case DeepDrillModules.Battery:
-                    break;
-            }
         }
 
         internal void SetPower(DeepDrillerPowerData data)

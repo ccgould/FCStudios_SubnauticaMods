@@ -79,6 +79,7 @@ namespace FCS_DeepDriller.Mono
                     Initialize();
                 }
 
+
                 DisplayHandler = gameObject.AddComponent<FCSDeepDrillerDisplay>();
                 DisplayHandler.Setup(this);
             }
@@ -100,6 +101,7 @@ namespace FCS_DeepDriller.Mono
 
         public void OnProtoDeserialize(ProtobufSerializer serializer)
         {
+            QuickLogger.Debug("In OnProtoDeserialize");
             var prefabIdentifier = GetComponent<PrefabIdentifier>();
             var id = prefabIdentifier?.Id ?? string.Empty;
             var data = Mod.GetDeepDrillerSaveData(id);
@@ -113,6 +115,14 @@ namespace FCS_DeepDriller.Mono
 
         private void Initialize()
         {
+            if (!DeepDrillerComponentManager.FindAllComponents(this))
+            {
+                QuickLogger.Error("Couldn't find all components");
+                return;
+            }
+
+            DeepDrillerComponentManager.Setup();
+
             ExtendStateHash = Animator.StringToHash("Extend");
 
             ShaftStateHash = Animator.StringToHash("ShaftState");
@@ -196,11 +206,7 @@ namespace FCS_DeepDriller.Mono
 
         internal void RemoveAttachment(DeepDrillModules module)
         {
-            if (module != DeepDrillModules.Focus)
-            {
-                PowerManager.SetModule(DeepDrillModules.None);
-            }
-            else
+            if (module == DeepDrillModules.Focus)
             {
                 _oreGenerator.RemoveFocus();
             }
@@ -208,8 +214,8 @@ namespace FCS_DeepDriller.Mono
 
         internal void AddAttachment(DeepDrillModules module)
         {
-            PowerManager.SetModule(module);
             _oreGenerator.SetModule(module);
+            DeepDrillerComponentManager.ShowAttachment(module);
         }
 
         internal bool IsModuleRemovable()

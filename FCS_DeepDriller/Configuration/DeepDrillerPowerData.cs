@@ -13,6 +13,7 @@ namespace FCS_DeepDriller.Configuration
         public PowerUnitData BatterySlot2 { get; set; }
         public PowerUnitData BatterySlot3 { get; set; }
         public PowerUnitData BatterySlot4 { get; set; }
+        public int ActiveSlot { get; set; }
 
         internal float GetCharge(DeepDrillModules module)
         {
@@ -40,6 +41,12 @@ namespace FCS_DeepDriller.Configuration
             switch (module)
             {
                 case DeepDrillModules.Battery:
+
+                    switch (ActiveSlot)
+                    {
+
+                    }
+
                     BatterySlot1.Battery.charge = 0;
                     BatterySlot2.Battery.charge = 0;
                     BatterySlot3.Battery.charge = 0;

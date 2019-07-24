@@ -74,7 +74,9 @@
     <Compile Include="Enumerators\DeepDrillModules.cs" />
     <Compile Include="Helpers\TechTypeHelpers.cs" />
     <Compile Include="Managers\BiomeManager.cs" />
+    <Compile Include="Managers\DeepDrillerComponentManager.cs" />
     <Compile Include="Managers\OreGenerator.cs" />
+    <Compile Include="Mono\FCSDeepDrillerBatteryController.cs" />
     <Compile Include="Mono\FCSDeepDrillerController.cs" />
     <Compile Include="Managers\AnimationManager.cs" />
     <Compile Include="Mono\Handlers\FCSDeepDrillerAnimationHandler.cs" />

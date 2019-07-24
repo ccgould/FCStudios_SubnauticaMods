@@ -2,6 +2,7 @@
 using FCS_DeepDriller.Configuration;
 using FCS_DeepDriller.Enumerators;
 using FCS_DeepDriller.Helpers;
+using FCS_DeepDriller.Managers;
 using FCSCommon.Extensions;
 using FCSCommon.Utilities;
 using FCSTechFabricator.Mono;
@@ -84,6 +85,36 @@ namespace FCS_DeepDriller.Mono.Handlers
             }
         }
 
+        internal bool HasPowerModule(out DeepDrillModules module)
+        {
+            bool result = false;
+
+            for (int i = 0; i < SlotIDs.Length; i++)
+            {
+                if (_equipment.GetTechTypeInSlot(SlotIDs[i]) == TechTypeHelpers.BatteryAttachmentTechType())
+                {
+                    module = DeepDrillModules.Battery;
+                    result = true;
+                    break;
+                }
+
+                if (_equipment.GetTechTypeInSlot(SlotIDs[i]) == TechTypeHelpers.SolarAttachmentTechType())
+                {
+                    module = DeepDrillModules.Solar;
+                    result = true;
+                    break;
+                }
+            }
+
+            if (!result)
+            {
+                DeepDrillerComponentManager.HideAllAttachments();
+            }
+
+            module = DeepDrillModules.None;
+            return result;
+        }
+
         private bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
         {
             if (pickupable.gameObject.GetComponent<FCSTechFabricatorTag>() != null)
@@ -91,7 +122,7 @@ namespace FCS_DeepDriller.Mono.Handlers
                 return true;
             }
 
-            QuickLogger.Message("Only FCS Deep Driller Attachments allowed!", true);
+            QuickLogger.Message(FCSDeepDrillerBuildable.DDAttachmentsOnly(), true);
             return false;
         }
 

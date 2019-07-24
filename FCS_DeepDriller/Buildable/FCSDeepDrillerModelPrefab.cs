@@ -53,7 +53,7 @@ namespace FCS_DeepDriller.Buildable
         /// Applies the shader to the materials of the reactor
         /// </summary>
         /// <param name="prefab">The prefab to apply shaders.</param>
-        private void ApplyShaders(GameObject prefab)
+        internal static void ApplyShaders(GameObject prefab)
         {
             #region AMMiniMedBay_BaseColor
             MaterialHelpers.ApplyAlphaShader("DeepDriller_BaseColor_BaseColor", prefab);
