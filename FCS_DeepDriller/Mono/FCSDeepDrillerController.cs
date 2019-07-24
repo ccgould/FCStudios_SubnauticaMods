@@ -118,7 +118,10 @@ namespace FCS_DeepDriller.Mono
 
         private void Initialize()
         {
-            if (!DeepDrillerComponentManager.FindAllComponents(this))
+            _batteryAttachment = new BatteryAttachment();
+            _batteryAttachment.GetGameObject(this);
+
+            if (!DeepDrillerComponentManager.FindAllComponents(this, _batteryAttachment.GetBatteryAttachment()))
             {
                 QuickLogger.Error("Couldn't find all components");
                 //return; //TODO Reactivate
@@ -126,8 +129,6 @@ namespace FCS_DeepDriller.Mono
 
             DeepDrillerComponentManager.Setup();
 
-            _batteryAttachment = new BatteryAttachment();
-            _batteryAttachment.GetGameObject(this);
 
             ExtendStateHash = Animator.StringToHash("Extend");
 

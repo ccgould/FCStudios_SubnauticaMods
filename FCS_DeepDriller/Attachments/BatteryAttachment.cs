@@ -1,6 +1,6 @@
 ﻿using FCS_DeepDriller.Buildable;
-using FCS_DeepDriller.Managers;
 using FCS_DeepDriller.Mono;
+using FCSCommon.Utilities;
 using UnityEngine;
 
 namespace FCS_DeepDriller.Attachments
@@ -11,7 +11,13 @@ namespace FCS_DeepDriller.Attachments
 
         internal void GetGameObject(FCSDeepDrillerController mono)
         {
-            var mount = DeepDrillerComponentManager.MountingTarget;
+            var mount = mono.gameObject.FindChild("Mount_Point")?.gameObject;
+
+            if (mount == null)
+            {
+                QuickLogger.Error("Couldnt find GameObject Mount_Point");
+                return;
+            }
 
             _batteryModule = GameObject.Instantiate(FCSDeepDrillerBuildable.BatteryModule, mount.transform.position, mount.transform.rotation);
 
@@ -26,6 +32,11 @@ namespace FCS_DeepDriller.Attachments
         internal void ObjectVisibility(bool visible)
         {
             _batteryModule.SetActive(visible);
+        }
+
+        internal GameObject GetBatteryAttachment()
+        {
+            return _batteryModule;
         }
     }
 }

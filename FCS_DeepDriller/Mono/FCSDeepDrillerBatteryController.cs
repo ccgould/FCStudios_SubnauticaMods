@@ -29,7 +29,6 @@ namespace FCS_DeepDriller.Mono
 
             _isConstructed = () => mono.IsConstructed;
 
-            var mount = DeepDrillerComponentManager.MountingTarget;
             var equipmentRoot = new GameObject("BEquipmentRoot");
             equipmentRoot.transform.SetParent(gameObject.transform, false);
             equipmentRoot.AddComponent<ChildObjectIdentifier>();
@@ -54,34 +53,6 @@ namespace FCS_DeepDriller.Mono
         {
             _equipment.AddSlots(EquipmentConfiguration.SlotIDs);
             QuickLogger.Debug($"Added slots");
-
-
-            //var powercells = Equipment.slotMapping.Where(x => x.Value == EquipmentType.PowerCellCharger).ToArray();
-
-            //var count = powercells.Count();
-
-            //if (count >= 4)
-            //{
-            //    QuickLogger.Debug($"More slots have been found than normal");
-            //    for (int i = 0; i < count; i++)
-            //    {
-            //        QuickLogger.Debug($"Found slot {powercells[i].Key}");
-            //    }
-
-            //    _equipment.AddSlot(powercells[2].Key);
-            //    _equipment.AddSlot(powercells[4].Key);
-            //}
-            //else
-            //{
-            //    int id = 2;
-
-            //    for (int i = 0; i < 2; i++)
-            //    {
-            //        Equipment.slotMapping.Add($"PowerCellCharger{++id}", EquipmentType.PowerCellCharger);
-            //        _equipment.AddSlot($"PowerCellCharger{id}");
-            //        QuickLogger.Debug($"Added slot PowerCellCharger{id}");
-            //    }
-            //}
         }
 
         private bool IsAllowedToRemove(Pickupable pickupable, bool verbose)
