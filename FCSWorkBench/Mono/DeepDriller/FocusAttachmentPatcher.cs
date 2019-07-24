@@ -23,8 +23,6 @@ namespace FCSTechFabricator.Mono.DeepDriller
         {
             GameObject prefab = GameObject.Instantiate<GameObject>(this._prefab);
             prefab.name = this.PrefabFileName;
-
-            //var filter = prefab.AddComponent<Freon>();
             return prefab;
         }
 

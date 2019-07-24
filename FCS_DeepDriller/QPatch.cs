@@ -1,4 +1,5 @@
 ﻿using FCS_DeepDriller.Buildable;
+using FCS_DeepDriller.Patchers;
 using FCSCommon.Utilities;
 using Harmony;
 using System;
@@ -25,6 +26,16 @@ namespace FCS_DeepDriller
                 FCSDeepDrillerBuildable.PatchHelper();
 
                 var harmony = HarmonyInstance.Create("com.fcsdeepdriller.fcstudios");
+
+                harmony.Patch(typeof(Equipment).GetMethod("GetSlotType"),
+                    new HarmonyMethod(typeof(Equipment_GetSlotType_Patch), "Prefix"), null);
+
+                harmony.Patch(typeof(uGUI_Equipment).GetMethod("Awake",
+                        BindingFlags.NonPublic |
+                        BindingFlags.Instance |
+                        BindingFlags.SetField),
+                    new HarmonyMethod(typeof(uGUI_Equipment_Awake_Patch), "Prefix"),
+                    new HarmonyMethod(typeof(uGUI_Equipment_Awake_Patch), "Postfix"));
 
                 harmony.PatchAll(Assembly.GetExecutingAssembly());
 

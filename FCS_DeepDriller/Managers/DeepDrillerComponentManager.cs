@@ -16,6 +16,9 @@ namespace FCS_DeepDriller.Managers
         private static GameObject _solarPanelModule;
         private static GameObject _gameObject;
         private static FCSDeepDrillerController _mono;
+        private static bool _flag = true;
+
+        public static GameObject MountingTarget { get; private set; }
 
         internal static bool FindAllComponents(FCSDeepDrillerController mono)
         {
@@ -23,10 +26,19 @@ namespace FCS_DeepDriller.Managers
             _mono = mono;
             _gameObject = mono.gameObject;
 
+            MountingTarget = _gameObject.FindChild("Mount_Point")?.gameObject;
+            if (MountingTarget == null)
+            {
+                QuickLogger.Error("Couldnt find GameObject Mount_Point");
+                _flag = false;
+                return false;
+            }
+
             var model = _gameObject.FindChild("model")?.gameObject;
             if (model == null)
             {
                 QuickLogger.Error("Couldnt find GameObject Model");
+                _flag = false;
                 return false;
             }
 
@@ -35,6 +47,7 @@ namespace FCS_DeepDriller.Managers
             if (modules == null)
             {
                 QuickLogger.Error("Couldnt find GameObject modules");
+                _flag = false;
                 return false;
             }
 
@@ -44,6 +57,7 @@ namespace FCS_DeepDriller.Managers
             if (_batteryModule == null)
             {
                 QuickLogger.Error("Couldnt find GameObject battery_module");
+                _flag = false;
                 return false;
             }
 
@@ -51,6 +65,7 @@ namespace FCS_DeepDriller.Managers
             if (batCells == null)
             {
                 QuickLogger.Error("Couldnt find GameObject Bat_Cells");
+                _flag = false;
                 return false;
             }
 
@@ -65,11 +80,14 @@ namespace FCS_DeepDriller.Managers
             if (_solarPanelModule == null)
             {
                 QuickLogger.Error("Couldnt find GameObject solar_panel_module");
+                _flag = false;
                 return false;
             }
 
             return true;
         }
+
+
 
         internal static GameObject GetBatteryCellModel(int slot)
         {
@@ -96,6 +114,7 @@ namespace FCS_DeepDriller.Managers
 
         internal static void ShowAttachment(DeepDrillModules module)
         {
+            if (!_flag) return;
             switch (module)
             {
                 case DeepDrillModules.Solar:
@@ -112,15 +131,17 @@ namespace FCS_DeepDriller.Managers
 
         public static void HideAllAttachments()
         {
+            if (!_flag) return;
+
             _batteryModule.SetActive(false);
             _solarPanelModule.SetActive(false);
         }
 
         public static void ShowAllAttachments()
         {
+            if (!_flag) return;
+
             _batteryModule.SetActive(true);
-            var batteryController = _batteryModule.AddComponent<FCSDeepDrillerBatteryController>();
-            batteryController.Setup(_mono);
             _solarPanelModule.SetActive(true);
         }
 
@@ -134,6 +155,8 @@ namespace FCS_DeepDriller.Managers
 
         private static void HideAllBatteries()
         {
+            if (!_flag) return;
+
             _batteryCell1.SetActive(false);
             _batteryCell2.SetActive(false);
             _batteryCell3.SetActive(false);

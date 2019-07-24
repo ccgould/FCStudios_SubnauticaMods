@@ -61,17 +61,21 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attachments\BatteryAttachment.cs" />
     <Compile Include="Buildable\FCSDeepDrillerAuxPatcher.cs" />
     <Compile Include="Buildable\FCSDeepDrillerModelPrefab.cs" />
     <Compile Include="Buildable\FCSDeepDrillerPatcher.cs" />
     <Compile Include="Configuration\DeepDrillerCFG.cs" />
     <Compile Include="Configuration\DeepDrillerPowerData.cs" />
     <Compile Include="Configuration\DeepDrillerSaveData.cs" />
+    <Compile Include="Configuration\EquipmentConfiguration.cs" />
     <Compile Include="Configuration\Mod.cs" />
     <Compile Include="Configuration\SlotData.cs" />
     <Compile Include="Display\InterfaceButton.cs" />
     <Compile Include="Display\OnScreenButton.cs" />
     <Compile Include="Enumerators\DeepDrillModules.cs" />
+    <Compile Include="Extenstion\Extenstions.cs" />
+    <Compile Include="Helpers\Initialize_uGUI.cs" />
     <Compile Include="Helpers\TechTypeHelpers.cs" />
     <Compile Include="Managers\BiomeManager.cs" />
     <Compile Include="Managers\DeepDrillerComponentManager.cs" />
@@ -85,6 +89,7 @@
     <Compile Include="Mono\Handlers\FCSDeepDrillerModuleContainer.cs" />
     <Compile Include="Mono\Handlers\FCSDeepDrillerPowerHandler.cs" />
     <Compile Include="Mono\Handlers\PlayerInteraction.cs" />
+    <Compile Include="Patchers\EquipmentPatchers.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

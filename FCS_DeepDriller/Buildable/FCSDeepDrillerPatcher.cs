@@ -84,9 +84,9 @@ namespace FCS_DeepDriller.Buildable
                 var lwe = prefab.AddComponent<LargeWorldEntity>();
                 lwe.cellLevel = LargeWorldEntity.CellLevel.Far;
 
-                prefab.GetOrAddComponent<PrefabIdentifier>().ClassId = this.ClassID;
+                prefab.AddComponent<PrefabIdentifier>().ClassId = this.ClassID;
                 prefab.AddComponent<FMOD_CustomLoopingEmitter>();
-                prefab.GetOrAddComponent<FCSDeepDrillerController>();
+                prefab.AddComponent<FCSDeepDrillerController>();
 
             }
             catch (Exception e)

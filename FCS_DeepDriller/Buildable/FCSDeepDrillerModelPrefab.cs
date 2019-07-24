@@ -10,6 +10,8 @@ namespace FCS_DeepDriller.Buildable
         private GameObject _prefab;
 
         private static AssetBundle _assetBundle;
+        internal static GameObject BatteryModule { get; private set; }
+
         private bool GetPrefabs()
         {
             QuickLogger.Debug("GetPrefabs");
@@ -25,6 +27,25 @@ namespace FCS_DeepDriller.Buildable
             _assetBundle = assetBundle;
 
             QuickLogger.Debug($"AssetBundle Set");
+
+            //We have found the asset bundle and now we are going to continue by looking for the model.
+            GameObject batteryModule = assetBundle.LoadAsset<GameObject>("Battery_Module_Attachment");
+
+            //If the prefab isn't null lets add the shader to the materials
+            if (batteryModule != null)
+            {
+                BatteryModule = batteryModule;
+
+                //Lets apply the material shader
+                ApplyShaders(batteryModule);
+
+                QuickLogger.Debug($"Battery Module Prefab Found!");
+            }
+            else
+            {
+                QuickLogger.Error($"Battery Module  Prefab Not Found!");
+                return false;
+            }
 
             //We have found the asset bundle and now we are going to continue by looking for the model.
             GameObject prefab = assetBundle.LoadAsset<GameObject>("AlterraDeepDriller");
@@ -46,8 +67,11 @@ namespace FCS_DeepDriller.Buildable
                 QuickLogger.Error($"{this.FriendlyName} Prefab Not Found!");
                 return false;
             }
+
             return true;
         }
+
+
 
         /// <summary>
         /// Applies the shader to the materials of the reactor

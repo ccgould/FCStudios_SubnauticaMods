@@ -1,4 +1,5 @@
-﻿using FCS_DeepDriller.Configuration;
+﻿using FCS_DeepDriller.Attachments;
+using FCS_DeepDriller.Configuration;
 using FCS_DeepDriller.Enumerators;
 using FCS_DeepDriller.Helpers;
 using FCS_DeepDriller.Managers;
@@ -26,6 +27,7 @@ namespace FCS_DeepDriller.Mono
         private Constructable _buildable;
         private PrefabIdentifier _prefabId;
         private bool _initialized;
+        private BatteryAttachment _batteryAttachment;
 
         internal bool IsBeingDeleted { get; set; }
         internal FCSDeepDrillerAnimationHandler AnimationHandler { get; private set; }
@@ -111,6 +113,7 @@ namespace FCS_DeepDriller.Mono
             DeepDrillerContainer.LoadItems(data.Items);
             _healthSystem.SetHealth(data.Health);
         }
+
         #endregion
 
         private void Initialize()
@@ -118,10 +121,13 @@ namespace FCS_DeepDriller.Mono
             if (!DeepDrillerComponentManager.FindAllComponents(this))
             {
                 QuickLogger.Error("Couldn't find all components");
-                return;
+                //return; //TODO Reactivate
             }
 
             DeepDrillerComponentManager.Setup();
+
+            _batteryAttachment = new BatteryAttachment();
+            _batteryAttachment.GetGameObject(this);
 
             ExtendStateHash = Animator.StringToHash("Extend");
 
@@ -206,6 +212,8 @@ namespace FCS_DeepDriller.Mono
 
         internal void RemoveAttachment(DeepDrillModules module)
         {
+            _batteryAttachment.ObjectVisibility(false);
+
             if (module == DeepDrillModules.Focus)
             {
                 _oreGenerator.RemoveFocus();
@@ -214,6 +222,8 @@ namespace FCS_DeepDriller.Mono
 
         internal void AddAttachment(DeepDrillModules module)
         {
+            _batteryAttachment.ObjectVisibility(true);
+
             _oreGenerator.SetModule(module);
             DeepDrillerComponentManager.ShowAttachment(module);
         }

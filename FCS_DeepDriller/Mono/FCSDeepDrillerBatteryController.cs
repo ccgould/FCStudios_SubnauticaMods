@@ -1,20 +1,17 @@
 ﻿using FCS_DeepDriller.Buildable;
+using FCS_DeepDriller.Configuration;
 using FCS_DeepDriller.Managers;
+using FCSCommon.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace FCS_DeepDriller.Mono
 {
     internal class FCSDeepDrillerBatteryController : HandTarget, IHandTarget
     {
-        internal static readonly string[] SlotIDs = new string[4]
-        {
-            "PowerCellCharger1",
-            "PowerCellCharger2",
-            "PowerCellCharger3",
-            "PowerCellCharger4",
-        };
+
 
         private FCSDeepDrillerController _mono;
         private Func<bool> _isConstructed;
@@ -32,8 +29,9 @@ namespace FCS_DeepDriller.Mono
 
             _isConstructed = () => mono.IsConstructed;
 
+            var mount = DeepDrillerComponentManager.MountingTarget;
             var equipmentRoot = new GameObject("BEquipmentRoot");
-            equipmentRoot.transform.SetParent(_mono.transform, false);
+            equipmentRoot.transform.SetParent(gameObject.transform, false);
             equipmentRoot.AddComponent<ChildObjectIdentifier>();
             equipmentRoot.SetActive(false);
 
@@ -43,10 +41,47 @@ namespace FCS_DeepDriller.Mono
             _equipment.isAllowedToRemove = IsAllowedToRemove;
             _equipment.onEquip += OnEquipmentAdded;
             _equipment.onUnequip += OnEquipmentRemoved;
-            _equipment.AddSlot(SlotIDs[0]);
-            _equipment.AddSlot(SlotIDs[1]);
-            _equipment.AddSlot(SlotIDs[2]);
-            _equipment.AddSlot(SlotIDs[3]);
+
+            AddMoreSlots();
+
+            if (_equipment == null)
+            {
+                QuickLogger.Error("Equipment is null on creation");
+            }
+        }
+
+        internal void AddMoreSlots()
+        {
+            _equipment.AddSlots(EquipmentConfiguration.SlotIDs);
+            QuickLogger.Debug($"Added slots");
+
+
+            //var powercells = Equipment.slotMapping.Where(x => x.Value == EquipmentType.PowerCellCharger).ToArray();
+
+            //var count = powercells.Count();
+
+            //if (count >= 4)
+            //{
+            //    QuickLogger.Debug($"More slots have been found than normal");
+            //    for (int i = 0; i < count; i++)
+            //    {
+            //        QuickLogger.Debug($"Found slot {powercells[i].Key}");
+            //    }
+
+            //    _equipment.AddSlot(powercells[2].Key);
+            //    _equipment.AddSlot(powercells[4].Key);
+            //}
+            //else
+            //{
+            //    int id = 2;
+
+            //    for (int i = 0; i < 2; i++)
+            //    {
+            //        Equipment.slotMapping.Add($"PowerCellCharger{++id}", EquipmentType.PowerCellCharger);
+            //        _equipment.AddSlot($"PowerCellCharger{id}");
+            //        QuickLogger.Debug($"Added slot PowerCellCharger{id}");
+            //    }
+            //}
         }
 
         private bool IsAllowedToRemove(Pickupable pickupable, bool verbose)
@@ -74,40 +109,26 @@ namespace FCS_DeepDriller.Mono
         {
             //TODO Update battery info
 
-            switch (slot)
-            {
-                case "PowerCellCharger1":
-                    DeepDrillerComponentManager.GetBatteryCellModel(1).SetActive(false);
-                    break;
-                case "PowerCellCharger2":
-                    DeepDrillerComponentManager.GetBatteryCellModel(2).SetActive(false);
-                    break;
-                case "PowerCellCharger3":
-                    DeepDrillerComponentManager.GetBatteryCellModel(3).SetActive(false);
-                    break;
-                case "PowerCellCharger4":
-                    DeepDrillerComponentManager.GetBatteryCellModel(4).SetActive(false);
-                    break;
-            }
+            if (slot == EquipmentConfiguration.SlotIDs[0])
+                DeepDrillerComponentManager.GetBatteryCellModel(1).SetActive(false);
+            else if (slot == EquipmentConfiguration.SlotIDs[1])
+                DeepDrillerComponentManager.GetBatteryCellModel(2).SetActive(false);
+            else if (slot == EquipmentConfiguration.SlotIDs[2])
+                DeepDrillerComponentManager.GetBatteryCellModel(3).SetActive(false);
+            else if (slot == EquipmentConfiguration.SlotIDs[3])
+                DeepDrillerComponentManager.GetBatteryCellModel(4).SetActive(false);
         }
 
         private void OnEquipmentAdded(string slot, InventoryItem item)
         {
-            switch (slot)
-            {
-                case "PowerCellCharger1":
-                    DeepDrillerComponentManager.GetBatteryCellModel(1).SetActive(true);
-                    break;
-                case "PowerCellCharger2":
-                    DeepDrillerComponentManager.GetBatteryCellModel(2).SetActive(true);
-                    break;
-                case "PowerCellCharger3":
-                    DeepDrillerComponentManager.GetBatteryCellModel(3).SetActive(true);
-                    break;
-                case "PowerCellCharger4":
-                    DeepDrillerComponentManager.GetBatteryCellModel(4).SetActive(true);
-                    break;
-            }
+            if (slot == EquipmentConfiguration.SlotIDs[0])
+                DeepDrillerComponentManager.GetBatteryCellModel(1).SetActive(true);
+            else if (slot == EquipmentConfiguration.SlotIDs[1])
+                DeepDrillerComponentManager.GetBatteryCellModel(2).SetActive(true);
+            else if (slot == EquipmentConfiguration.SlotIDs[2])
+                DeepDrillerComponentManager.GetBatteryCellModel(3).SetActive(true);
+            else if (slot == EquipmentConfiguration.SlotIDs[3])
+                DeepDrillerComponentManager.GetBatteryCellModel(4).SetActive(true);
         }
 
         public void OnHandHover(GUIHand hand)
@@ -122,8 +143,22 @@ namespace FCS_DeepDriller.Mono
             PDA pda = Player.main.GetPDA();
             if (!pda.isInUse)
             {
+                if (_equipment == null)
+                {
+                    QuickLogger.Debug("Equipment is null", true);
+                }
+
                 Inventory.main.SetUsedStorage(_equipment, false);
                 pda.Open(PDATab.Inventory, gameObject.transform, null, 4f);
+            }
+
+
+
+            var f = Equipment.slotMapping.Where(x => x.Value == EquipmentType.PowerCellCharger);
+
+            foreach (var VARIABLE in f)
+            {
+                QuickLogger.Debug($"Found slot {VARIABLE}");
             }
         }
     }
