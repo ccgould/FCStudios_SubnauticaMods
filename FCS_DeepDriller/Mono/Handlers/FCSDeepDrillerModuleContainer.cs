@@ -17,12 +17,15 @@ namespace FCS_DeepDriller.Mono.Handlers
         private FCSDeepDrillerController _mono;
         private Func<bool> _isConstructed;
         private Equipment _equipment;
+        private bool _powerModuleAttached;
+
 
         internal static readonly string[] SlotIDs = new string[2]
         {
             "PowerCellCharger1",
             "PowerCellCharger2",
         };
+
 
         internal void Setup(FCSDeepDrillerController mono)
         {
@@ -62,6 +65,15 @@ namespace FCS_DeepDriller.Mono.Handlers
 
         private void OnEquipmentRemoved(string slot, InventoryItem item)
         {
+            if (item.item.GetTechType() == TechTypeHelpers.BatteryAttachmentTechType())
+            {
+                _powerModuleAttached = false;
+            }
+            else if (item.item.GetTechType() == TechTypeHelpers.SolarAttachmentTechType())
+            {
+                _powerModuleAttached = false;
+            }
+
             _mono.RemoveAttachment(TechTypeHelpers.GetDeepModule(item.item.GetTechType()));
         }
 
@@ -72,19 +84,20 @@ namespace FCS_DeepDriller.Mono.Handlers
             if (item.item.GetTechType() == TechTypeHelpers.BatteryAttachmentTechType())
             {
                 _mono.AddAttachment(DeepDrillModules.Battery);
+                _powerModuleAttached = true;
             }
-
-            if (item.item.GetTechType() == TechTypeHelpers.SolarAttachmentTechType())
+            else if (item.item.GetTechType() == TechTypeHelpers.SolarAttachmentTechType())
             {
                 _mono.AddAttachment(DeepDrillModules.Solar);
+                _powerModuleAttached = true;
             }
-
-            if (item.item.GetTechType() == TechTypeHelpers.FocusAttachmentTechType())
+            else if (item.item.GetTechType() == TechTypeHelpers.FocusAttachmentTechType())
             {
                 _mono.AddAttachment(DeepDrillModules.Focus);
             }
         }
 
+        internal bool IsPowerModuleAttached() => _powerModuleAttached;
         internal bool HasPowerModule(out DeepDrillModules module)
         {
             bool result = false;
@@ -118,6 +131,23 @@ namespace FCS_DeepDriller.Mono.Handlers
         {
             if (pickupable.gameObject.GetComponent<FCSTechFabricatorTag>() != null)
             {
+                if (pickupable.GetTechType() == TechTypeHelpers.BatteryAttachmentTechType())
+                {
+                    if (_powerModuleAttached)
+                    {
+                        QuickLogger.Message(FCSDeepDrillerBuildable.OnePowerAttachmentAllowed(), true);
+                        return false;
+                    }
+                }
+                else if (pickupable.GetTechType() == TechTypeHelpers.SolarAttachmentTechType())
+                {
+                    if (_powerModuleAttached)
+                    {
+                        QuickLogger.Message(FCSDeepDrillerBuildable.OnePowerAttachmentAllowed(), true);
+                        return false;
+                    }
+                }
+
                 return true;
             }
 

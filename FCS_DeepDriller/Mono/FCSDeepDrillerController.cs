@@ -127,10 +127,13 @@ namespace FCS_DeepDriller.Mono
             var solarAttachment = new SolarAttachment();
             solarAttachment.GetGameObject(this);
 
-            if (!DeepDrillerComponentManager.FindAllComponents(this, solarAttachment.GetSolarAttachment(), batteryAttachment.GetBatteryAttachment()))
+            var focusAttachment = new FocusAttachment();
+            focusAttachment.GetGameObject(this);
+
+            if (!DeepDrillerComponentManager.FindAllComponents(this, solarAttachment.GetSolarAttachment(), batteryAttachment.GetBatteryAttachment(), focusAttachment.GetFocusAttachment()))
             {
                 QuickLogger.Error("Couldn't find all components");
-                //return; //TODO Reactivate
+                return;
             }
 
             DeepDrillerComponentManager.Setup();
@@ -233,12 +236,17 @@ namespace FCS_DeepDriller.Mono
             {
                 _oreGenerator.RemoveFocus();
             }
+            DeepDrillerComponentManager.HideAttachment(module);
         }
 
         internal void AddAttachment(DeepDrillModules module)
         {
-            _oreGenerator.SetModule(module);
+            if (module == DeepDrillModules.Focus)
+            {
+                _oreGenerator.AddFocus();
+            }
             DeepDrillerComponentManager.ShowAttachment(module);
+
         }
 
         internal bool IsModuleRemovable()

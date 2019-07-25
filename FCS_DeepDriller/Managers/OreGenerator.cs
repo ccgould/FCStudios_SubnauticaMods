@@ -1,5 +1,4 @@
-﻿using FCS_DeepDriller.Enumerators;
-using FCSCommon.Utilities;
+﻿using FCSCommon.Utilities;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -52,7 +51,7 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers.Logic
         {
             if (_allowTick)
             {
-                QuickLogger.Debug($"PassedTime = {_passedTime} || AllowedOres = {AllowedOres?.Count}");
+                //QuickLogger.Debug($"PassedTime = {_passedTime} || AllowedOres = {AllowedOres?.Count}");
 
                 if (_minTime <= 0 || _maxTime <= 0)
                 {
@@ -93,7 +92,11 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers.Logic
                 QuickLogger.Debug($"Spawning focus item {_focus}");
             }
 
-            OnAddCreated?.Invoke(item);
+            if (_focus != TechType.None)
+            {
+                OnAddCreated?.Invoke(item);
+            }
+
             _randomTime = _random.Next(_minTime, _maxTime);
             QuickLogger.Debug($"New Time Goal: {_randomTime}");
             _passedTime = 0;
@@ -108,17 +111,7 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers.Logic
         {
             _focus = TechType.None;
             _isFocused = false;
-        }
-
-        public void SetModule(DeepDrillModules module)
-        {
-            if (module == DeepDrillModules.Focus)
-            {
-                //TODO Get focus material from selection
-                _focus = TechType.Silver;
-                _isFocused = true;
-                QuickLogger.Debug($"Setting focus item {_focus}");
-            }
+            QuickLogger.Debug($"Focus has been removed!", true);
         }
 
         internal void SetFocus(TechType techType)
@@ -134,5 +127,11 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers.Logic
         }
 
         internal bool GetIsFocused() => _isFocused;
+
+        public void AddFocus()
+        {
+            _isFocused = true;
+            QuickLogger.Debug($"Setting focus item {_focus}", true);
+        }
     }
 }

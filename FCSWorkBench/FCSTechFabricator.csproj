@@ -65,9 +65,7 @@
     <Compile Include="Abstract Classes\FCSTechFabricatorItem.cs" />
     <Compile Include="Interfaces\IFCSTechFabricatorItem.cs" />
     <Compile Include="Models\Mod.cs" />
-    <Compile Include="Mono\DeepDriller\FocusAttachmentModelPrefab.cs" />
-    <Compile Include="Mono\DeepDriller\SolarAttachmentModelPrefab.cs" />
-    <Compile Include="Mono\DeepDriller\BatteryAttachmentModelPrefab.cs" />
+    <Compile Include="Models\Shaders.cs" />
     <Compile Include="Mono\DeepDriller\FocusAttachmentPatcher.cs" />
     <Compile Include="Mono\DeepDriller\SolarAttachmentPatcher.cs" />
     <Compile Include="Mono\DeepDriller\BatteryAttachmentPatcher.cs" />

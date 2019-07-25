@@ -16,14 +16,15 @@ namespace FCS_DeepDriller.Managers
         private static GameObject _solarPanelModule;
         private static GameObject _gameObject;
         private static FCSDeepDrillerController _mono;
-        private static GameObject _mount;
+        private static GameObject _focusModule;
 
-        internal static bool FindAllComponents(FCSDeepDrillerController mono, GameObject solar, GameObject battery)
+
+        internal static bool FindAllComponents(FCSDeepDrillerController mono, GameObject solar, GameObject battery, GameObject focus)
         {
             //Modules
             _mono = mono;
             _gameObject = mono.gameObject;
-
+            _focusModule = focus;
             _solarPanelModule = solar;
 
             var model = _gameObject.FindChild("model")?.gameObject;
@@ -76,13 +77,19 @@ namespace FCS_DeepDriller.Managers
             return go;
         }
 
-        internal static GameObject GetMount(FCSDeepDrillerController mono)
+        internal static GameObject GetMount(FCSDeepDrillerController mono, DeepDrillerMountSpot screen)
         {
-            if (_mount == null)
+            switch (screen)
             {
-                _mount = mono.gameObject.FindChild("Mount_Point")?.gameObject;
+                case DeepDrillerMountSpot.PowerSupply:
+                    return mono.gameObject.FindChild("Mount_Point")?.gameObject;
+
+                case DeepDrillerMountSpot.Screen:
+                    return mono.gameObject.FindChild("Screen_Mount_Point")?.gameObject;
+
+                default:
+                    return null;
             }
-            return _mount;
         }
 
 
@@ -91,34 +98,45 @@ namespace FCS_DeepDriller.Managers
             switch (module)
             {
                 case DeepDrillModules.Solar:
-                    _batteryModule.SetActive(false);
                     _solarPanelModule.SetActive(true);
                     break;
 
                 case DeepDrillModules.Battery:
                     _batteryModule.SetActive(true);
-                    _solarPanelModule.SetActive(false);
+                    break;
+
+                case DeepDrillModules.Focus:
+                    _focusModule.SetActive(true);
                     break;
             }
         }
 
-        public static void HideAllPowerAttachments()
+        internal static void HideAllPowerAttachments()
         {
             _batteryModule.SetActive(false);
             _solarPanelModule.SetActive(false);
         }
 
-        public static void ShowAllAttachments()
+        internal static void HideAllAttachments()
+        {
+            _batteryModule.SetActive(false);
+            _solarPanelModule.SetActive(false);
+            _focusModule.SetActive(false);
+        }
+
+        internal static void ShowAllAttachments()
         {
             _batteryModule.SetActive(true);
             _solarPanelModule.SetActive(true);
+            _focusModule.SetActive(true);
+
         }
 
         public static void Setup()
         {
             ShowAllAttachments();
             FCSDeepDrillerBuildable.ApplyShaders(_gameObject);
-            HideAllPowerAttachments();
+            HideAllAttachments();
             HideAllBatteries();
         }
 
@@ -128,6 +146,24 @@ namespace FCS_DeepDriller.Managers
             _batteryCell2.SetActive(false);
             _batteryCell3.SetActive(false);
             _batteryCell4.SetActive(false);
+        }
+
+        public static void HideAttachment(DeepDrillModules module)
+        {
+            switch (module)
+            {
+                case DeepDrillModules.Solar:
+                    _solarPanelModule.SetActive(false);
+                    break;
+
+                case DeepDrillModules.Battery:
+                    _batteryModule.SetActive(false);
+                    break;
+
+                case DeepDrillModules.Focus:
+                    _focusModule.SetActive(false);
+                    break;
+            }
         }
     }
 }

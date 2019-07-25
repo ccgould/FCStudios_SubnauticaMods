@@ -44,7 +44,7 @@ namespace FCS_DeepDriller.Mono.Handlers
         {
             var hasPowerModule = _mono.DeepDrillerModuleContainer.HasPowerModule(out var module);
 
-            QuickLogger.Debug($"Has Power Module {hasPowerModule} || Mount is {module}");
+            //QuickLogger.Debug($"Has Power Module {hasPowerModule} || Mount is {module}");
 
             if (!_mono.IsConstructed) return;
 

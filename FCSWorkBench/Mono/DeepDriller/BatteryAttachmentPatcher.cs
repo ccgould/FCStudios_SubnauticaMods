@@ -12,6 +12,7 @@ namespace FCSTechFabricator.Mono.DeepDriller
     {
         private TechGroup GroupForPDA = TechGroup.Resources;
         private TechCategory CategoryForPDA = TechCategory.AdvancedMaterials;
+        private GameObject _prefab;
 
 
         public BatteryAttachmentBuildable() : base("BatteryAttachment_DD", "Battery Attachment")
@@ -45,8 +46,10 @@ namespace FCSTechFabricator.Mono.DeepDriller
 
         public override void Register()
         {
-            if (GetPrefabs())
+            if (QPatch.BatteryModule != null)
             {
+                _prefab = QPatch.BatteryModule;
+
                 if (this.IsRegistered == false)
                 {
 

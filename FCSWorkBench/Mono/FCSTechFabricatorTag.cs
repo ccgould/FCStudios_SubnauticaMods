@@ -4,5 +4,6 @@ namespace FCSTechFabricator.Mono
 {
     public class FCSTechFabricatorTag : MonoBehaviour
     {
+
     }
 }

@@ -61,6 +61,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attachments\FocusAttachment.cs" />
     <Compile Include="Attachments\SolarAttachment.cs" />
     <Compile Include="Attachments\BatteryAttachment.cs" />
     <Compile Include="Buildable\FCSDeepDrillerAuxPatcher.cs" />
@@ -74,6 +75,7 @@
     <Compile Include="Configuration\SlotData.cs" />
     <Compile Include="Display\InterfaceButton.cs" />
     <Compile Include="Display\OnScreenButton.cs" />
+    <Compile Include="Enumerators\DeepDrillerMountSpot.cs" />
     <Compile Include="Enumerators\DeepDrillModules.cs" />
     <Compile Include="Extenstion\Extenstions.cs" />
     <Compile Include="Helpers\Initialize_uGUI.cs" />
@@ -84,6 +86,7 @@
     <Compile Include="Mono\FCSDeepDrillerBatteryController.cs" />
     <Compile Include="Mono\FCSDeepDrillerController.cs" />
     <Compile Include="Managers\AnimationManager.cs" />
+    <Compile Include="Mono\FCSDeepDrillerFocusController.cs" />
     <Compile Include="Mono\Handlers\FCSDeepDrillerAnimationHandler.cs" />
     <Compile Include="Mono\Handlers\FCSDeepDrillerContainer.cs" />
     <Compile Include="Mono\Handlers\FCSDeepDrillerDisplay.cs" />

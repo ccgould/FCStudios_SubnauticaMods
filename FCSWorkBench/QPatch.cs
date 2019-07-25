@@ -1,5 +1,7 @@
-﻿using FCSCommon.Helpers;
+﻿using FCSCommon.Exceptions;
+using FCSCommon.Helpers;
 using FCSCommon.Utilities;
+using FCSTechFabricator.Models;
 using FCSTechFabricator.Mono;
 using FCSTechFabricator.Mono.DeepDriller;
 using FCSTechFabricator.Mono.PowerStorage;
@@ -25,36 +27,43 @@ namespace FCSTechFabricator
 
             try
             {
-                GetPrefabs();
+                if (GetPrefabs())
+                {
+                    var freon = new FreonBuildable();
+                    freon.Register();
 
-                var freon = new FreonBuildable();
-                freon.Register();
+                    var psKit = new PowerStorageKitBuildable();
+                    psKit.Register();
 
-                var psKit = new PowerStorageKitBuildable();
-                psKit.Register();
+                    var ddBatteryModule = new BatteryAttachmentBuildable();
+                    ddBatteryModule.Register();
 
-                var ddBatteryModule = new BatteryAttachmentBuildable();
-                ddBatteryModule.Register();
+                    var ddSolarModule = new SolarAttachmentBuildable();
+                    ddSolarModule.Register();
 
-                var ddSolarModule = new SolarAttachmentBuildable();
-                ddSolarModule.Register();
+                    var ddFocusModule = new FocusAttachmentBuildable();
+                    ddFocusModule.Register();
 
-                var ddFocusModule = new FocusAttachmentBuildable();
-                ddFocusModule.Register();
+                    FCSTechFabricatorBuildable.ItemsList.Add(freon);
+                    FCSTechFabricatorBuildable.ItemsList.Add(psKit);
+                    FCSTechFabricatorBuildable.ItemsList.Add(ddFocusModule);
+                    FCSTechFabricatorBuildable.ItemsList.Add(ddSolarModule);
+                    FCSTechFabricatorBuildable.ItemsList.Add(ddBatteryModule);
 
-                FCSTechFabricatorBuildable.ItemsList.Add(freon);
-                FCSTechFabricatorBuildable.ItemsList.Add(psKit);
-                FCSTechFabricatorBuildable.ItemsList.Add(ddFocusModule);
-                FCSTechFabricatorBuildable.ItemsList.Add(ddSolarModule);
-                FCSTechFabricatorBuildable.ItemsList.Add(ddBatteryModule);
+                    FCSTechFabricatorBuildable.PatchHelper();
 
-                FCSTechFabricatorBuildable.PatchHelper();
+                    var harmony = HarmonyInstance.Create("com.fcstechfabricator.fcstudios");
 
-                var harmony = HarmonyInstance.Create("com.fcstechfabricator.fcstudios");
+                    harmony.PatchAll(Assembly.GetExecutingAssembly());
 
-                harmony.PatchAll(Assembly.GetExecutingAssembly());
+                    QuickLogger.Info("Finished patching");
+                }
+                else
+                {
+                    throw new PatchTerminatedException();
+                }
 
-                QuickLogger.Info("Finished patching");
+
             }
             catch (Exception ex)
             {
@@ -92,11 +101,73 @@ namespace FCSTechFabricator
                 return false;
             }
 
+
+            //We have found the asset bundle and now we are going to continue by looking for the model.
+            GameObject batteryModule = Bundle.LoadAsset<GameObject>("Battery_Attachment");
+
+            //If the prefab isn't null lets add the shader to the materials
+            if (batteryModule != null)
+            {
+                Shaders.ApplyDeepDriller(batteryModule);
+
+                BatteryModule = batteryModule;
+
+                QuickLogger.Debug($"Battery Module Prefab Found!");
+            }
+            else
+            {
+                QuickLogger.Error($"Battery Module  Prefab Not Found!");
+                return false;
+            }
+
+            //We have found the asset bundle and now we are going to continue by looking for the model.
+            GameObject solarModule = Bundle.LoadAsset<GameObject>("Solar_Panel_Attachment");
+
+            //If the prefab isn't null lets add the shader to the materials
+            if (solarModule != null)
+            {
+                Shaders.ApplyDeepDriller(solarModule);
+
+                SolarModule = solarModule;
+
+                QuickLogger.Debug($"Solar Module Prefab Found!");
+            }
+            else
+            {
+                QuickLogger.Error($"Solar Module  Prefab Not Found!");
+                return false;
+            }
+
+            //We have found the asset bundle and now we are going to continue by looking for the model.
+            GameObject focusModule = Bundle.LoadAsset<GameObject>("Scanner_Screen_Attachment");
+
+            //If the prefab isn't null lets add the shader to the materials
+            if (focusModule != null)
+            {
+                Shaders.ApplyDeepDriller(focusModule);
+
+                FocusModule = focusModule;
+
+                QuickLogger.Debug($"Focus Module Prefab Found!");
+            }
+            else
+            {
+                QuickLogger.Error($"Solar Module  Prefab Not Found!");
+                return false;
+            }
+
             return true;
         }
 
-        public static GameObject Kit { get; set; }
+        public static GameObject BatteryModule { get; set; }
 
-        public static AssetBundle Bundle { get; set; }
+        public static GameObject FocusModule { get; private set; }
+
+        public static GameObject SolarModule { get; private set; }
+
+        public static GameObject Kit { get; private set; }
+
+        public static AssetBundle Bundle { get; private set; }
+
     }
 }
