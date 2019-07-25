@@ -52,7 +52,7 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers.Logic
         {
             if (_allowTick)
             {
-                //QuickLogger.Debug($"PassedTime = {_passedTime} || AllowedOres = {AllowedOres?.Count}");
+                QuickLogger.Debug($"PassedTime = {_passedTime} || AllowedOres = {AllowedOres?.Count}");
 
                 if (_minTime <= 0 || _maxTime <= 0)
                 {

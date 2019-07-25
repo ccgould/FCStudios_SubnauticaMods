@@ -61,6 +61,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attachments\SolarAttachment.cs" />
     <Compile Include="Attachments\BatteryAttachment.cs" />
     <Compile Include="Buildable\FCSDeepDrillerAuxPatcher.cs" />
     <Compile Include="Buildable\FCSDeepDrillerModelPrefab.cs" />
@@ -88,6 +89,7 @@
     <Compile Include="Mono\Handlers\FCSDeepDrillerDisplay.cs" />
     <Compile Include="Mono\Handlers\FCSDeepDrillerModuleContainer.cs" />
     <Compile Include="Mono\Handlers\FCSDeepDrillerPowerHandler.cs" />
+    <Compile Include="Mono\Handlers\FCSDeepDrillerSolarController.cs" />
     <Compile Include="Mono\Handlers\PlayerInteraction.cs" />
     <Compile Include="Patchers\EquipmentPatchers.cs" />
     <Compile Include="QPatch.cs" />

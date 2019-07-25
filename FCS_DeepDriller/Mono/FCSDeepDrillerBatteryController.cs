@@ -16,6 +16,9 @@ namespace FCS_DeepDriller.Mono
         private FCSDeepDrillerController _mono;
         private Func<bool> _isConstructed;
         private Equipment _equipment;
+        internal Action<Pickupable> OnBatteryAdded;
+        internal Action<Pickupable> OnBatteryRemoved;
+
 
         internal HashSet<TechType> CompatibleTech = new HashSet<TechType>()
         {
@@ -78,8 +81,6 @@ namespace FCS_DeepDriller.Mono
 
         private void OnEquipmentRemoved(string slot, InventoryItem item)
         {
-            //TODO Update battery info
-
             if (slot == EquipmentConfiguration.SlotIDs[0])
                 DeepDrillerComponentManager.GetBatteryCellModel(1).SetActive(false);
             else if (slot == EquipmentConfiguration.SlotIDs[1])
@@ -88,6 +89,8 @@ namespace FCS_DeepDriller.Mono
                 DeepDrillerComponentManager.GetBatteryCellModel(3).SetActive(false);
             else if (slot == EquipmentConfiguration.SlotIDs[3])
                 DeepDrillerComponentManager.GetBatteryCellModel(4).SetActive(false);
+
+            OnBatteryRemoved?.Invoke(item.item);
         }
 
         private void OnEquipmentAdded(string slot, InventoryItem item)
@@ -100,6 +103,8 @@ namespace FCS_DeepDriller.Mono
                 DeepDrillerComponentManager.GetBatteryCellModel(3).SetActive(true);
             else if (slot == EquipmentConfiguration.SlotIDs[3])
                 DeepDrillerComponentManager.GetBatteryCellModel(4).SetActive(true);
+
+            OnBatteryAdded?.Invoke(item.item);
         }
 
         public void OnHandHover(GUIHand hand)

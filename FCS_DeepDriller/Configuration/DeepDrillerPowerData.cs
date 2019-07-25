@@ -2,6 +2,8 @@
 using FCS_DeepDriller.Enumerators;
 using FCSCommon.Utilities;
 using Oculus.Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace FCS_DeepDriller.Configuration
@@ -9,10 +11,9 @@ namespace FCS_DeepDriller.Configuration
     internal class DeepDrillerPowerData
     {
         public PowerUnitData Solar { get; set; } = new PowerUnitData();
-        public PowerUnitData BatterySlot1 { get; set; }
-        public PowerUnitData BatterySlot2 { get; set; }
-        public PowerUnitData BatterySlot3 { get; set; }
-        public PowerUnitData BatterySlot4 { get; set; }
+
+        public List<PowerUnitData> Batteries { get; set; } = new List<PowerUnitData>(4);
+
         public int ActiveSlot { get; set; }
 
         internal float GetCharge(DeepDrillModules module)
@@ -20,7 +21,15 @@ namespace FCS_DeepDriller.Configuration
             switch (module)
             {
                 case DeepDrillModules.Battery:
-                    return BatterySlot1.Battery.charge + BatterySlot2.Battery.charge + BatterySlot3.Battery.charge + BatterySlot4.Battery.charge;
+
+                    float count = 0;
+
+                    for (int i = 0; i < Batteries.Count; i++)
+                    {
+                        count += Batteries[i].Battery.charge;
+                    }
+
+                    return count;
                 case DeepDrillModules.Solar:
                     return Solar.Battery.charge;
                 default:
@@ -33,7 +42,7 @@ namespace FCS_DeepDriller.Configuration
             Solar.Battery.charge = charge;
         }
 
-        internal void RemovePower(DeepDrillModules module)
+        internal void ConsumePower(DeepDrillModules module)
         {
             var powerDraw = FCSDeepDrillerBuildable.DeepDrillConfig.PowerDraw;
             var charge = Mathf.Clamp(GetCharge(module) - powerDraw, 0, GetCapacity(module));
@@ -42,15 +51,16 @@ namespace FCS_DeepDriller.Configuration
             {
                 case DeepDrillModules.Battery:
 
-                    switch (ActiveSlot)
+                    foreach (var powerUnitData in Batteries)
                     {
-
+                        if (powerUnitData.Battery.charge >= powerDraw)
+                        {
+                            powerUnitData.Battery.charge = Mathf.Clamp(powerUnitData.Battery.charge - powerDraw, 0,
+                                powerUnitData.Battery.capacity);
+                            break;
+                        }
                     }
 
-                    BatterySlot1.Battery.charge = 0;
-                    BatterySlot2.Battery.charge = 0;
-                    BatterySlot3.Battery.charge = 0;
-                    BatterySlot4.Battery.charge = 0;
                     break;
 
                 case DeepDrillModules.Solar:
@@ -66,10 +76,10 @@ namespace FCS_DeepDriller.Configuration
             switch (module)
             {
                 case DeepDrillModules.Battery:
-                    BatterySlot1.Battery.charge = 0;
-                    BatterySlot2.Battery.charge = 0;
-                    BatterySlot3.Battery.charge = 0;
-                    BatterySlot4.Battery.charge = 0;
+                    for (int i = 0; i < Batteries.Count; i++)
+                    {
+                        Batteries[i].Battery.charge = 0;
+                    }
                     break;
 
                 case DeepDrillModules.Solar:
@@ -81,10 +91,20 @@ namespace FCS_DeepDriller.Configuration
         internal float GetCapacity(DeepDrillModules module)
         {
             QuickLogger.Debug($"Module: {module}");
+
             switch (module)
             {
                 case DeepDrillModules.Battery:
-                    return BatterySlot1.Battery.capacity + BatterySlot2.Battery.capacity + BatterySlot3.Battery.capacity + BatterySlot4.Battery.capacity;
+
+                    float count = 0;
+
+                    for (int i = 0; i < Batteries.Count; i++)
+                    {
+                        count += Batteries[i].Battery.capacity;
+                    }
+
+                    return count;
+
                 case DeepDrillModules.Solar:
                     return Solar.Battery.capacity;
                 default:
@@ -121,6 +141,22 @@ namespace FCS_DeepDriller.Configuration
                 Charge = Battery.charge;
                 Capacity = Battery.capacity;
             }
+        }
+
+        public void AddBattery(Pickupable battery)
+        {
+            var newBattery = new PowerUnitData();
+            newBattery.Initialize(battery);
+            Batteries.Add(newBattery);
+        }
+
+        public void RemoveBattery(Pickupable battery)
+        {
+            var id = battery.GetComponent<PrefabIdentifier>().Id;
+
+            var powercellData = Batteries.Single(x => x.PrefabID == id);
+
+            Batteries.Remove(powercellData);
         }
     }
 }

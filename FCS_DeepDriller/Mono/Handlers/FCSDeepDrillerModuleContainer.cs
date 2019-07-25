@@ -88,6 +88,7 @@ namespace FCS_DeepDriller.Mono.Handlers
         internal bool HasPowerModule(out DeepDrillModules module)
         {
             bool result = false;
+            module = DeepDrillModules.None;
 
             for (int i = 0; i < SlotIDs.Length; i++)
             {
@@ -108,10 +109,8 @@ namespace FCS_DeepDriller.Mono.Handlers
 
             if (!result)
             {
-                DeepDrillerComponentManager.HideAllAttachments();
+                DeepDrillerComponentManager.HideAllPowerAttachments();
             }
-
-            module = DeepDrillModules.None;
             return result;
         }
 

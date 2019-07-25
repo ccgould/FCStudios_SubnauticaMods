@@ -44,14 +44,11 @@ namespace FCS_DeepDriller.Mono.Handlers
         {
             var hasPowerModule = _mono.DeepDrillerModuleContainer.HasPowerModule(out var module);
 
-            //QuickLogger.Debug($"Has Power Module {hasPowerModule}");
+            QuickLogger.Debug($"Has Power Module {hasPowerModule} || Mount is {module}");
 
             if (!_mono.IsConstructed) return;
 
-            if (module == DeepDrillModules.Solar)
-            {
-                _produceSolarPower = true;
-            }
+            _produceSolarPower = module == DeepDrillModules.Solar;
 
             _module = module;
 
@@ -74,7 +71,7 @@ namespace FCS_DeepDriller.Mono.Handlers
 
             if (_passedTime >= 1)
             {
-                _powerBank.RemovePower(_module);
+                _powerBank.ConsumePower(_module);
                 _passedTime = 0.0f;
 
                 if (!_hasPower)
@@ -131,6 +128,22 @@ namespace FCS_DeepDriller.Mono.Handlers
             _powerState = state;
         }
 
+        internal void AddBattery(Pickupable battery)
+        {
+            _powerBank.AddBattery(battery);
+        }
+        internal void RemoveBattery(Pickupable battery)
+        {
+            _powerBank.RemoveBattery(battery);
+        }
+
+        internal void Battery(Pickupable battery)
+        {
+            var newBattery = new DeepDrillerPowerData.PowerUnitData();
+            newBattery.Initialize(battery);
+            _powerBank.Batteries.Add(newBattery);
+        }
+
         internal void SetPower(DeepDrillerPowerData data)
         {
             switch (_module)
@@ -152,6 +165,11 @@ namespace FCS_DeepDriller.Mono.Handlers
         {
             return _hasPower;
 
+        }
+
+        public string GetSolarPowerData()
+        {
+            return $"Solar panel (sun: {Mathf.RoundToInt(GetRechargeScalar() * 100f)}% charge {Mathf.RoundToInt(_powerBank.Solar.Battery.charge)}/{Mathf.RoundToInt(_powerBank.Solar.Battery.capacity)}";
         }
     }
 }

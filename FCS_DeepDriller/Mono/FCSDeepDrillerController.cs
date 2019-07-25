@@ -27,7 +27,7 @@ namespace FCS_DeepDriller.Mono
         private Constructable _buildable;
         private PrefabIdentifier _prefabId;
         private bool _initialized;
-        private BatteryAttachment _batteryAttachment;
+
 
         internal bool IsBeingDeleted { get; set; }
         internal FCSDeepDrillerAnimationHandler AnimationHandler { get; private set; }
@@ -118,10 +118,16 @@ namespace FCS_DeepDriller.Mono
 
         private void Initialize()
         {
-            _batteryAttachment = new BatteryAttachment();
-            _batteryAttachment.GetGameObject(this);
 
-            if (!DeepDrillerComponentManager.FindAllComponents(this, _batteryAttachment.GetBatteryAttachment()))
+            var batteryAttachment = new BatteryAttachment();
+            batteryAttachment.GetGameObject(this);
+            batteryAttachment.GetController().OnBatteryAdded += OnBatteryAdded;
+            batteryAttachment.GetController().OnBatteryRemoved += OnBatteryRemoved;
+
+            var solarAttachment = new SolarAttachment();
+            solarAttachment.GetGameObject(this);
+
+            if (!DeepDrillerComponentManager.FindAllComponents(this, solarAttachment.GetSolarAttachment(), batteryAttachment.GetBatteryAttachment()))
             {
                 QuickLogger.Error("Couldn't find all components");
                 //return; //TODO Reactivate
@@ -182,6 +188,16 @@ namespace FCS_DeepDriller.Mono
             _initialized = true;
         }
 
+        private void OnBatteryRemoved(Pickupable obj)
+        {
+            PowerManager.RemoveBattery(obj);
+        }
+
+        private void OnBatteryAdded(Pickupable obj)
+        {
+            PowerManager.AddBattery(obj);
+        }
+
         private void OnPowerUpdate(bool value)
         {
             _oreGenerator.SetAllowTick(value);
@@ -213,8 +229,6 @@ namespace FCS_DeepDriller.Mono
 
         internal void RemoveAttachment(DeepDrillModules module)
         {
-            _batteryAttachment.ObjectVisibility(false);
-
             if (module == DeepDrillModules.Focus)
             {
                 _oreGenerator.RemoveFocus();
@@ -223,8 +237,6 @@ namespace FCS_DeepDriller.Mono
 
         internal void AddAttachment(DeepDrillModules module)
         {
-            _batteryAttachment.ObjectVisibility(true);
-
             _oreGenerator.SetModule(module);
             DeepDrillerComponentManager.ShowAttachment(module);
         }

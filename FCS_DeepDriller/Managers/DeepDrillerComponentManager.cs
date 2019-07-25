@@ -16,12 +16,15 @@ namespace FCS_DeepDriller.Managers
         private static GameObject _solarPanelModule;
         private static GameObject _gameObject;
         private static FCSDeepDrillerController _mono;
+        private static GameObject _mount;
 
-        internal static bool FindAllComponents(FCSDeepDrillerController mono, GameObject battery)
+        internal static bool FindAllComponents(FCSDeepDrillerController mono, GameObject solar, GameObject battery)
         {
             //Modules
             _mono = mono;
             _gameObject = mono.gameObject;
+
+            _solarPanelModule = solar;
 
             var model = _gameObject.FindChild("model")?.gameObject;
             if (model == null)
@@ -31,21 +34,8 @@ namespace FCS_DeepDriller.Managers
             }
 
             #region Batteries
-            //var modules = model.FindChild("modules")?.gameObject;
-            //if (modules == null)
-            //{
-            //    QuickLogger.Error("Couldnt find GameObject modules");
-            //    _flag = false;
-            //    return false;
-            //}
 
             _batteryModule = battery;
-
-            if (_batteryModule == null)
-            {
-                QuickLogger.Error("Couldnt find GameObject battery_module");
-                return false;
-            }
 
             var batCells = battery.FindChild("Bat_Cells")?.gameObject;
             if (batCells == null)
@@ -59,15 +49,6 @@ namespace FCS_DeepDriller.Managers
             _batteryCell3 = batCells.FindChild("BatteryCell_3")?.gameObject;
             _batteryCell4 = batCells.FindChild("BatteryCell_4")?.gameObject;
             #endregion
-
-            //_solarPanelModule = modules.FindChild("solar_panel_module")?.gameObject;
-
-            //if (_solarPanelModule == null)
-            //{
-            //    QuickLogger.Error("Couldnt find GameObject solar_panel_module");
-            //    _flag = false;
-            //    return false;
-            //}
 
             return true;
         }
@@ -95,39 +76,49 @@ namespace FCS_DeepDriller.Managers
             return go;
         }
 
+        internal static GameObject GetMount(FCSDeepDrillerController mono)
+        {
+            if (_mount == null)
+            {
+                _mount = mono.gameObject.FindChild("Mount_Point")?.gameObject;
+            }
+            return _mount;
+        }
+
+
         internal static void ShowAttachment(DeepDrillModules module)
         {
             switch (module)
             {
                 case DeepDrillModules.Solar:
                     _batteryModule.SetActive(false);
-                    //_solarPanelModule.SetActive(true);
+                    _solarPanelModule.SetActive(true);
                     break;
 
                 case DeepDrillModules.Battery:
                     _batteryModule.SetActive(true);
-                    //_solarPanelModule.SetActive(false);
+                    _solarPanelModule.SetActive(false);
                     break;
             }
         }
 
-        public static void HideAllAttachments()
+        public static void HideAllPowerAttachments()
         {
             _batteryModule.SetActive(false);
-            // _solarPanelModule.SetActive(false);
+            _solarPanelModule.SetActive(false);
         }
 
         public static void ShowAllAttachments()
         {
             _batteryModule.SetActive(true);
-            //_solarPanelModule.SetActive(true);
+            _solarPanelModule.SetActive(true);
         }
 
         public static void Setup()
         {
             ShowAllAttachments();
             FCSDeepDrillerBuildable.ApplyShaders(_gameObject);
-            HideAllAttachments();
+            HideAllPowerAttachments();
             HideAllBatteries();
         }
 
