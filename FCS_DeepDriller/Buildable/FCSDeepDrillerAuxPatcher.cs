@@ -12,8 +12,7 @@ namespace FCS_DeepDriller.Buildable
         private const string OnlyPowercellsAllowedKey = "DD_OnlyPowercellsAllowed";
         private const string OnBatteryHoverTextKey = "DD_OnBatteryHoverText";
         private const string OPAllowedKey = "DD_OPAllowed";
-
-
+        private const string BatteryAttachmentHasBatteriesKey = "DD_BatteryAttachmentHasBatteries";
         internal static string StorageContainerLabel()
         {
             return Language.main.Get(StorageLabelKey);
@@ -41,6 +40,7 @@ namespace FCS_DeepDriller.Buildable
         {
             return Language.main.Get(BEquipmentLabelKey);
         }
+
         internal static string OnlyPowercellsAllowed()
         {
             return Language.main.Get(OnlyPowercellsAllowedKey);
@@ -54,7 +54,10 @@ namespace FCS_DeepDriller.Buildable
         {
             return Language.main.Get(OPAllowedKey);
         }
-
+        internal static string BatteryAttachmentHasBatteries()
+        {
+            return Language.main.Get(BatteryAttachmentHasBatteriesKey);
+        }
         private void AdditionalPatching()
         {
             BuildableName = this.FriendlyName;
@@ -62,12 +65,13 @@ namespace FCS_DeepDriller.Buildable
 
             LanguageHandler.SetLanguageLine(OnlyPowercellsAllowedKey, "Only powercells are allowed.");
             LanguageHandler.SetLanguageLine(DDAttachmentsOnlyKey, "Only FCS Deep Driller Attachments allowed at a time!");
-            LanguageHandler.SetLanguageLine(StorageLabelKey, "FCS Deep Driller Receptacle");
+            LanguageHandler.SetLanguageLine(StorageLabelKey, "FCS Deep Driller Receptacle.");
             LanguageHandler.SetLanguageLine(ItemNotAllowedKey, "Cannot place this item in here.");
-            LanguageHandler.SetLanguageLine(EquipmentLabelKey, "FCS Deep Driller Attachments");
-            LanguageHandler.SetLanguageLine(BEquipmentLabelKey, "FCS Deep Driller Batteries");
-            LanguageHandler.SetLanguageLine(OnBatteryHoverTextKey, "Open Battery Attachment");
-            LanguageHandler.SetLanguageLine(OPAllowedKey, "Only One Power Attachment Allowed");
+            LanguageHandler.SetLanguageLine(EquipmentLabelKey, "FCS Deep Driller Attachments.");
+            LanguageHandler.SetLanguageLine(BEquipmentLabelKey, "FCS Deep Driller Battery Attachment Receptacle.");
+            LanguageHandler.SetLanguageLine(OnBatteryHoverTextKey, "Open Battery Attachment.");
+            LanguageHandler.SetLanguageLine(OPAllowedKey, "Only One Power Attachment Allowed.");
+            LanguageHandler.SetLanguageLine(BatteryAttachmentHasBatteriesKey, "Battery attachment has batteries cannot remove!");
         }
     }
 }

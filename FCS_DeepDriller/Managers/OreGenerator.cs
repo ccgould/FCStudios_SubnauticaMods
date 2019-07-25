@@ -1,4 +1,5 @@
 ﻿using FCSCommon.Utilities;
+using FCSCommon.Utilities.Enums;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -51,7 +52,7 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers.Logic
         {
             if (_allowTick)
             {
-                //QuickLogger.Debug($"PassedTime = {_passedTime} || AllowedOres = {AllowedOres?.Count}");
+                QuickLogger.Debug($"PassedTime = {_passedTime} || AllowedOres = {AllowedOres?.Count}");
 
                 if (_minTime <= 0 || _maxTime <= 0)
                 {
@@ -84,27 +85,38 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers.Logic
                 _random2.Next(AllowedOres.Count);
                 var index = _random2.Next(AllowedOres.Count);
                 item = AllowedOres[index];
-
+                OnAddCreated?.Invoke(item);
             }
             else
             {
+
                 item = _focus;
+
+                if (_focus != TechType.None)
+                {
+                    OnAddCreated?.Invoke(item);
+                }
+
                 QuickLogger.Debug($"Spawning focus item {_focus}");
             }
 
-            if (_focus != TechType.None)
-            {
-                OnAddCreated?.Invoke(item);
-            }
+
 
             _randomTime = _random.Next(_minTime, _maxTime);
             QuickLogger.Debug($"New Time Goal: {_randomTime}");
             _passedTime = 0;
         }
 
-        internal void SetAllowTick(bool value)
+        internal void SetAllowTick(FCSPowerStates value)
         {
-            _allowTick = value;
+            if (value == FCSPowerStates.Powered)
+            {
+                _allowTick = true;
+            }
+            else if (value != FCSPowerStates.Powered)
+            {
+                _allowTick = false;
+            }
         }
 
         public void RemoveFocus()

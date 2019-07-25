@@ -11,8 +11,6 @@ namespace FCS_DeepDriller.Mono
 {
     internal class FCSDeepDrillerBatteryController : HandTarget, IHandTarget
     {
-
-
         private FCSDeepDrillerController _mono;
         private Func<bool> _isConstructed;
         private Equipment _equipment;
@@ -136,6 +134,20 @@ namespace FCS_DeepDriller.Mono
             {
                 QuickLogger.Debug($"Found slot {VARIABLE}");
             }
+        }
+
+        public bool HasBatteries()
+        {
+            for (int i = 0; i < EquipmentConfiguration.SlotIDs.Length; i++)
+            {
+                QuickLogger.Debug($" Checking battery {i + 1}");
+                if (DeepDrillerComponentManager.GetBatteryCellModel(i + 1).activeSelf)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

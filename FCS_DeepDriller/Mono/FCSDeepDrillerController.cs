@@ -38,6 +38,7 @@ namespace FCS_DeepDriller.Mono
         internal FCSDeepDrillerPowerHandler PowerManager { get; private set; }
         internal int ExtendStateHash { get; private set; }
         internal int ShaftStateHash { get; private set; }
+        public BatteryAttachment BatteryController { get; private set; }
 
         internal void Save(DeepDrillerSaveData saveDataList)
         {
@@ -124,6 +125,8 @@ namespace FCS_DeepDriller.Mono
             batteryAttachment.GetController().OnBatteryAdded += OnBatteryAdded;
             batteryAttachment.GetController().OnBatteryRemoved += OnBatteryRemoved;
 
+            BatteryController = batteryAttachment;
+
             var solarAttachment = new SolarAttachment();
             solarAttachment.GetGameObject(this);
 
@@ -191,6 +194,7 @@ namespace FCS_DeepDriller.Mono
             _initialized = true;
         }
 
+
         private void OnBatteryRemoved(Pickupable obj)
         {
             PowerManager.RemoveBattery(obj);
@@ -201,7 +205,7 @@ namespace FCS_DeepDriller.Mono
             PowerManager.AddBattery(obj);
         }
 
-        private void OnPowerUpdate(bool value)
+        private void OnPowerUpdate(FCSPowerStates value)
         {
             _oreGenerator.SetAllowTick(value);
         }
@@ -215,8 +219,11 @@ namespace FCS_DeepDriller.Mono
 
         internal void PowerOffDrill()
         {
-            AnimationHandler.SetBoolHash(ExtendStateHash, false);
-            PowerManager.SetPowerState(FCSPowerStates.Tripped);
+            if (PowerManager.GetPowerState() != FCSPowerStates.Tripped)
+            {
+                AnimationHandler.SetBoolHash(ExtendStateHash, false);
+                PowerManager.SetPowerState(FCSPowerStates.Tripped);
+            }
         }
 
         internal void StopDrill()
@@ -226,8 +233,11 @@ namespace FCS_DeepDriller.Mono
 
         internal void PowerOnDrill()
         {
-            AnimationHandler.SetBoolHash(ExtendStateHash, true);
-            PowerManager.SetPowerState(FCSPowerStates.Powered);
+            if (PowerManager.GetPowerState() != FCSPowerStates.Powered)
+            {
+                AnimationHandler.SetBoolHash(ExtendStateHash, true);
+                PowerManager.SetPowerState(FCSPowerStates.Powered);
+            }
         }
 
         internal void RemoveAttachment(DeepDrillModules module)
@@ -247,12 +257,6 @@ namespace FCS_DeepDriller.Mono
             }
             DeepDrillerComponentManager.ShowAttachment(module);
 
-        }
-
-        internal bool IsModuleRemovable()
-        {
-            //TODO Set the Condition for this to work
-            return true;
         }
     }
 }
