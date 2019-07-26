@@ -110,7 +110,8 @@ namespace FCS_DeepDriller.Buildable
                     new Ingredient(TechType.TitaniumIngot, 1),
                     new Ingredient(TechType.Diamond, 2),
                     new Ingredient(TechType.AdvancedWiringKit, 1),
-                    new Ingredient(TechType.Glass, 1)
+                    new Ingredient(TechType.Glass, 1),
+                    new Ingredient(TechType.Battery, 1)
                 }
             };
             QuickLogger.Debug($"Created Ingredients");

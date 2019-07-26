@@ -72,6 +72,7 @@
     <Compile Include="Configuration\DeepDrillerSaveData.cs" />
     <Compile Include="Configuration\EquipmentConfiguration.cs" />
     <Compile Include="Configuration\Mod.cs" />
+    <Compile Include="Configuration\PowerUnitData.cs" />
     <Compile Include="Configuration\SlotData.cs" />
     <Compile Include="Display\InterfaceButton.cs" />
     <Compile Include="Display\OnScreenButton.cs" />
@@ -86,10 +87,10 @@
     <Compile Include="Mono\FCSDeepDrillerBatteryController.cs" />
     <Compile Include="Mono\FCSDeepDrillerController.cs" />
     <Compile Include="Managers\AnimationManager.cs" />
-    <Compile Include="Mono\FCSDeepDrillerFocusController.cs" />
     <Compile Include="Mono\Handlers\FCSDeepDrillerAnimationHandler.cs" />
     <Compile Include="Mono\Handlers\FCSDeepDrillerContainer.cs" />
     <Compile Include="Mono\Handlers\FCSDeepDrillerDisplay.cs" />
+    <Compile Include="Mono\Handlers\FCSDeepDrillerFocusDisplay.cs" />
     <Compile Include="Mono\Handlers\FCSDeepDrillerModuleContainer.cs" />
     <Compile Include="Mono\Handlers\FCSDeepDrillerPowerHandler.cs" />
     <Compile Include="Mono\Handlers\FCSDeepDrillerSolarController.cs" />

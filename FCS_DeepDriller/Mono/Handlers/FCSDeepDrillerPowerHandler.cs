@@ -10,12 +10,6 @@ namespace FCS_DeepDriller.Mono.Handlers
 {
     internal class FCSDeepDrillerPowerHandler : MonoBehaviour
     {
-
-        private FCSDeepDrillerController _mono;
-        private DeepDrillModules _module;
-
-        private FCSPowerStates _powerState;
-
         private FCSPowerStates PowerState
         {
             get => _powerState;
@@ -25,8 +19,9 @@ namespace FCS_DeepDriller.Mono.Handlers
                 OnPowerUpdate?.Invoke(value);
             }
         }
-
-
+        private FCSPowerStates _powerState;
+        private FCSDeepDrillerController _mono;
+        private DeepDrillModules _module;
         private float _passedTime;
         private bool _produceSolarPower;
         private float _maxDepth = 200f;
@@ -35,30 +30,27 @@ namespace FCS_DeepDriller.Mono.Handlers
 
         internal Action<FCSPowerStates> OnPowerUpdate;
 
-        private void Awake()
-        {
-            var prefab = GameObject.Instantiate(CraftData.GetPrefabForTechType(TechType.PrecursorIonPowerCell));
-            var battery = prefab.gameObject.GetComponent<Battery>();
-            battery._charge = 0f;
-            battery._capacity = FCSDeepDrillerBuildable.DeepDrillConfig.SolarCapacity;
-            _powerBank.Solar.Initialize(prefab.gameObject.GetComponent<Pickupable>().Pickup(false));
-            PowerState = FCSPowerStates.Tripped;
-        }
-
         private void Update()
         {
             if (!_mono.IsConstructed) return;
 
-            //var hasPowerModule = _mono.DeepDrillerModuleContainer.HasPowerModule(out var module);
-
-            //QuickLogger.Debug($"Has Power Module {hasPowerModule} || Mount is {module}");
+            if (GetPowerState() == FCSPowerStates.Powered && !_mono.AnimationHandler.GetBoolHash(_mono.ExtendStateHash))
+            {
+                StartCoroutine(_mono.DropLegs());
+            }
 
             QuickLogger.Debug($"Power Mode: {PowerState}");
+            QuickLogger.Debug($"Power Avaliable: {_powerBank.GetCharge(_module)}");
 
             if (_mono.DeepDrillerModuleContainer.HasSolarModule())
             {
                 _produceSolarPower = true;
                 ProduceSolarPower();
+            }
+
+            foreach (var powercellData in _powerBank.Batteries)
+            {
+                _mono.DisplayHandler.UpdateVisuals(powercellData);
             }
 
             _module = _mono.DeepDrillerModuleContainer.GetPowerModule();
@@ -74,24 +66,7 @@ namespace FCS_DeepDriller.Mono.Handlers
                 PowerState = FCSPowerStates.Unpowered;
             }
 
-            //if (_powerState == FCSPowerStates.Tripped || _powerState == FCSPowerStates.Unpowered || _powerBank.GetCharge(_module) < FCSDeepDrillerBuildable.DeepDrillConfig.PowerDraw || !hasPowerModule)
-            //{
-            //    if (_hasPower)
-            //    {
-            //        HasPower = false;
-            //        QuickLogger.Debug($"Power Conditions Not Met: PS{_powerState} || M {_module} || C {_powerBank.GetCharge(_module)}");
-            //    }
-
-            //    return;
-            //}
-
-            //if (!_hasPower && _powerBank.GetCharge(_module) > FCSDeepDrillerBuildable.DeepDrillConfig.PowerDraw)
-            //{
-            //    HasPower = true;
-            //    SetPowerState(FCSPowerStates.Powered);
-            //}
-
-            if (DayNightCycle.main == null) return;
+            if (DayNightCycle.main == null || PowerState == FCSPowerStates.Unpowered) return;
 
             _passedTime += DayNightCycle.main.deltaTime;
 
@@ -136,6 +111,13 @@ namespace FCS_DeepDriller.Mono.Handlers
             _depthCurve.AddKey(0f, 0f);
             _depthCurve.AddKey(0.4245796f, 0.5001081f);
             _depthCurve.AddKey(1f, 1f);
+
+            var prefab = GameObject.Instantiate(CraftData.GetPrefabForTechType(TechType.PrecursorIonPowerCell));
+            var battery = prefab.gameObject.GetComponent<Battery>();
+            battery._charge = 0f;
+            battery._capacity = FCSDeepDrillerBuildable.DeepDrillConfig.SolarCapacity;
+            _powerBank.Solar.Initialize(prefab.gameObject.GetComponent<Pickupable>().Pickup(false));
+            PowerState = FCSPowerStates.Tripped;
         }
 
         internal FCSPowerStates GetPowerState()
@@ -148,9 +130,9 @@ namespace FCS_DeepDriller.Mono.Handlers
             PowerState = state;
         }
 
-        internal void AddBattery(Pickupable battery)
+        internal void AddBattery(Pickupable battery, string slot)
         {
-            _powerBank.AddBattery(battery);
+            _powerBank.AddBattery(battery, slot);
         }
 
         internal void RemoveBattery(Pickupable battery)
@@ -160,21 +142,15 @@ namespace FCS_DeepDriller.Mono.Handlers
 
         internal void Battery(Pickupable battery)
         {
-            var newBattery = new DeepDrillerPowerData.PowerUnitData();
+            var newBattery = new PowerUnitData();
             newBattery.Initialize(battery);
             _powerBank.Batteries.Add(newBattery);
         }
 
-        internal void SetPower(DeepDrillerPowerData data)
+        internal void LoadData(DeepDrillerSaveDataEntry data)
         {
-            switch (_module)
-            {
-                case DeepDrillModules.Battery:
-                    break;
-                case DeepDrillModules.Solar:
-                    _powerBank.SetSolarCharge(data.Solar.Charge);
-                    break;
-            }
+            _powerBank.Solar = data.PowerData.Solar;
+            PowerState = data.PowerState;
         }
 
         internal float GetCharge()
@@ -185,6 +161,12 @@ namespace FCS_DeepDriller.Mono.Handlers
         public string GetSolarPowerData()
         {
             return $"Solar panel (sun: {Mathf.RoundToInt(GetRechargeScalar() * 100f)}% charge {Mathf.RoundToInt(_powerBank.Solar.Battery.charge)}/{Mathf.RoundToInt(_powerBank.Solar.Battery.capacity)}";
+        }
+
+        internal DeepDrillerPowerData SaveData()
+        {
+            _powerBank.SaveData();
+            return _powerBank;
         }
     }
 }

@@ -45,6 +45,12 @@ namespace FCSPowerStorage.Managers
 
         private void OnDestroy()
         {
+            foreach (var powerCell in _powerCells)
+            {
+                powerCell.Drain();
+            }
+
+            _powerCells.Clear();
             CancelInvoke("Recharge");
             StopCoroutine(UpdatePowerRelay());
             if (!(_connectedRelay != null))

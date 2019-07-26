@@ -24,7 +24,7 @@ namespace FCS_DeepDriller.Managers
             //Modules
             _mono = mono;
             _gameObject = mono.gameObject;
-            _focusModule = focus;
+            //_focusModule = focus;
             _solarPanelModule = solar;
 
             var model = _gameObject.FindChild("model")?.gameObject;
@@ -33,6 +33,17 @@ namespace FCS_DeepDriller.Managers
                 QuickLogger.Error("Couldnt find GameObject Model");
                 return false;
             }
+
+            _focusModule = model.FindChild("Scanner_Screen_Attachment")?.gameObject;
+            if (_focusModule == null)
+            {
+                QuickLogger.Error("Couldnt find GameObject Scanner_Screen_Attachment");
+                return false;
+            }
+
+
+
+            _focusModule.SetActive(false);
 
             #region Batteries
 

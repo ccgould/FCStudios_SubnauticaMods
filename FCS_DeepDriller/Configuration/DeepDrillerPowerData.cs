@@ -1,20 +1,18 @@
 ﻿using FCS_DeepDriller.Buildable;
 using FCS_DeepDriller.Enumerators;
 using FCSCommon.Utilities;
-using Oculus.Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 namespace FCS_DeepDriller.Configuration
 {
-    internal class DeepDrillerPowerData
+    public class DeepDrillerPowerData
     {
         public PowerUnitData Solar { get; set; } = new PowerUnitData();
 
         public List<PowerUnitData> Batteries { get; set; } = new List<PowerUnitData>(4);
 
-        public int ActiveSlot { get; set; }
 
         internal float GetCharge(DeepDrillModules module)
         {
@@ -45,7 +43,7 @@ namespace FCS_DeepDriller.Configuration
         internal void ConsumePower(DeepDrillModules module)
         {
             var powerDraw = FCSDeepDrillerBuildable.DeepDrillConfig.PowerDraw;
-            var charge = Mathf.Clamp(GetCharge(module) - powerDraw, 0, GetCapacity(module));
+            //var charge = Mathf.Clamp(GetCharge(module) - powerDraw, 0, GetCapacity(module));
 
             switch (module)
             {
@@ -55,8 +53,9 @@ namespace FCS_DeepDriller.Configuration
                     {
                         if (powerUnitData.Battery.charge >= powerDraw)
                         {
-                            powerUnitData.Battery.charge = Mathf.Clamp(powerUnitData.Battery.charge - powerDraw, 0,
-                                powerUnitData.Battery.capacity);
+                            ModifyCharge(-Mathf.Abs(powerDraw), powerUnitData);
+                            //powerUnitData.Battery.charge = Mathf.Clamp(powerUnitData.Battery.charge - powerDraw, 0,
+                            //    powerUnitData.Battery.capacity);
                             break;
                         }
                     }
@@ -64,9 +63,36 @@ namespace FCS_DeepDriller.Configuration
                     break;
 
                 case DeepDrillModules.Solar:
-                    Solar.Battery.charge = charge;
+                    ModifyCharge(-Mathf.Abs(powerDraw), Solar);
+                    //Solar.Battery.charge = charge;
                     break;
             }
+        }
+
+        public float ModifyCharge(float amount, PowerUnitData unit)
+        {
+            float num = 0f;
+
+            if (unit.Battery != null)
+            {
+                if (amount >= 0f)
+                {
+                    num = Mathf.Min(amount, unit.Battery.capacity - unit.Battery.charge);
+                    unit.Battery.charge += num;
+                }
+                else
+                {
+                    num = -Mathf.Min(-amount, unit.Battery.charge);
+                    unit.Battery.charge += num;
+                }
+            }
+
+            if (unit.Battery.charge < 1)
+            {
+                unit.Battery.charge = 0f;
+            }
+
+            return num;
         }
 
         internal void DestroyPower(DeepDrillModules module)
@@ -112,41 +138,10 @@ namespace FCS_DeepDriller.Configuration
             }
         }
 
-        internal class PowerUnitData
-        {
-            public TechType TechType { get; set; }
-            public float Charge { get; set; }
-            public string PrefabID { get; set; }
-            public float Capacity { get; set; }
-
-            [JsonIgnore]
-            public IBattery Battery { get; set; }
-
-            internal void Initialize(Pickupable battery)
-            {
-                if (battery != null)
-                {
-                    TechType = battery.GetTechType();
-                    PrefabID = battery.GetComponent<PrefabIdentifier>().Id;
-                    Battery = battery.GetComponent<IBattery>();
-                }
-                else
-                {
-                    QuickLogger.Error("Battery was null. Could not create PowercellData");
-                }
-            }
-
-            internal void SaveData()
-            {
-                Charge = Battery.charge;
-                Capacity = Battery.capacity;
-            }
-        }
-
-        public void AddBattery(Pickupable battery)
+        public void AddBattery(Pickupable battery, string slot)
         {
             var newBattery = new PowerUnitData();
-            newBattery.Initialize(battery);
+            newBattery.Initialize(battery, slot);
             Batteries.Add(newBattery);
         }
 
@@ -157,6 +152,16 @@ namespace FCS_DeepDriller.Configuration
             var powercellData = Batteries.Single(x => x.PrefabID == id);
 
             Batteries.Remove(powercellData);
+        }
+
+        internal void SaveData()
+        {
+            foreach (PowerUnitData battery in Batteries)
+            {
+                battery.SaveData();
+            }
+
+            Solar.SaveData();
         }
     }
 }

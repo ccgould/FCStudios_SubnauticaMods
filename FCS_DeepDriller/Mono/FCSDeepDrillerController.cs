@@ -11,6 +11,7 @@ using FCSCommon.Models.Components;
 using FCSCommon.Objects;
 using FCSCommon.Utilities;
 using FCSCommon.Utilities.Enums;
+using System.Collections;
 using UnityEngine;
 
 namespace FCS_DeepDriller.Mono
@@ -27,6 +28,7 @@ namespace FCS_DeepDriller.Mono
         private Constructable _buildable;
         private PrefabIdentifier _prefabId;
         private bool _initialized;
+        private BatteryAttachment _batteryAttachment;
 
 
         internal bool IsBeingDeleted { get; set; }
@@ -38,7 +40,7 @@ namespace FCS_DeepDriller.Mono
         internal FCSDeepDrillerPowerHandler PowerManager { get; private set; }
         internal int ExtendStateHash { get; private set; }
         internal int ShaftStateHash { get; private set; }
-        public BatteryAttachment BatteryController { get; private set; }
+        internal BatteryAttachment BatteryController { get; private set; }
 
         internal void Save(DeepDrillerSaveData saveDataList)
         {
@@ -55,6 +57,7 @@ namespace FCS_DeepDriller.Mono
             _saveData.Modules = DeepDrillerModuleContainer.GetCurrentModules();
             _saveData.Items = DeepDrillerContainer.GetItems();
             _saveData.Health = _healthSystem.GetHealth();
+            _saveData.PowerData = PowerManager.SaveData();
             saveDataList.Entries.Add(_saveData);
         }
 
@@ -109,10 +112,16 @@ namespace FCS_DeepDriller.Mono
             var id = prefabIdentifier?.Id ?? string.Empty;
             var data = Mod.GetDeepDrillerSaveData(id);
 
-            PowerManager.SetPowerState(data.PowerState);
             DeepDrillerModuleContainer.SetModules(data.Modules);
             DeepDrillerContainer.LoadItems(data.Items);
             _healthSystem.SetHealth(data.Health);
+            PowerManager.LoadData(data);
+            _batteryAttachment.GetController().LoadData(data.PowerData);
+        }
+
+        private void UpdateLegState(bool value)
+        {
+            AnimationHandler.SetBoolHash(ExtendStateHash, value);
         }
 
         #endregion
@@ -120,20 +129,20 @@ namespace FCS_DeepDriller.Mono
         private void Initialize()
         {
 
-            var batteryAttachment = new BatteryAttachment();
-            batteryAttachment.GetGameObject(this);
-            batteryAttachment.GetController().OnBatteryAdded += OnBatteryAdded;
-            batteryAttachment.GetController().OnBatteryRemoved += OnBatteryRemoved;
+            _batteryAttachment = new BatteryAttachment();
+            _batteryAttachment.GetGameObject(this);
+            _batteryAttachment.GetController().OnBatteryAdded += OnBatteryAdded;
+            _batteryAttachment.GetController().OnBatteryRemoved += OnBatteryRemoved;
 
-            BatteryController = batteryAttachment;
+            BatteryController = _batteryAttachment;
 
             var solarAttachment = new SolarAttachment();
             solarAttachment.GetGameObject(this);
 
-            var focusAttachment = new FocusAttachment();
-            focusAttachment.GetGameObject(this);
+            //var focusAttachment = new FocusAttachment();
+            //focusAttachment.GetGameObject(this);
 
-            if (!DeepDrillerComponentManager.FindAllComponents(this, solarAttachment.GetSolarAttachment(), batteryAttachment.GetBatteryAttachment(), focusAttachment.GetFocusAttachment()))
+            if (!DeepDrillerComponentManager.FindAllComponents(this, solarAttachment.GetSolarAttachment(), _batteryAttachment.GetBatteryAttachment(), null))
             {
                 QuickLogger.Error("Couldn't find all components");
                 return;
@@ -146,6 +155,7 @@ namespace FCS_DeepDriller.Mono
 
             ShaftStateHash = Animator.StringToHash("ShaftState");
 
+            ScreenStateHash = Animator.StringToHash("ScreenState");
             TechTypeHelpers.Initialize();
 
             _prefabId = GetComponentInParent<PrefabIdentifier>();
@@ -194,15 +204,16 @@ namespace FCS_DeepDriller.Mono
             _initialized = true;
         }
 
+        public int ScreenStateHash { get; set; }
 
         private void OnBatteryRemoved(Pickupable obj)
         {
             PowerManager.RemoveBattery(obj);
         }
 
-        private void OnBatteryAdded(Pickupable obj)
+        private void OnBatteryAdded(Pickupable obj, string slot)
         {
-            PowerManager.AddBattery(obj);
+            PowerManager.AddBattery(obj, slot);
         }
 
         private void OnPowerUpdate(FCSPowerStates value)
@@ -221,8 +232,9 @@ namespace FCS_DeepDriller.Mono
         {
             if (PowerManager.GetPowerState() != FCSPowerStates.Tripped)
             {
-                AnimationHandler.SetBoolHash(ExtendStateHash, false);
+                UpdateLegState(false);
                 PowerManager.SetPowerState(FCSPowerStates.Tripped);
+                AnimationHandler.SetBoolHash(ScreenStateHash, false);
             }
         }
 
@@ -233,10 +245,21 @@ namespace FCS_DeepDriller.Mono
 
         internal void PowerOnDrill()
         {
-            if (PowerManager.GetPowerState() != FCSPowerStates.Powered)
+            UpdateLegState(true);
+            PowerManager.SetPowerState(FCSPowerStates.Powered);
+            AnimationHandler.SetBoolHash(ScreenStateHash, true);
+        }
+
+        internal IEnumerator DropLegs()
+        {
+            QuickLogger.Debug("Attempting to Extend legs");
+
+            int i = 1;
+            while (!AnimationHandler.GetBoolHash(ExtendStateHash))
             {
-                AnimationHandler.SetBoolHash(ExtendStateHash, true);
-                PowerManager.SetPowerState(FCSPowerStates.Powered);
+                PowerOnDrill();
+                QuickLogger.Debug($"Attempting to extend legs attempt ({i++})");
+                yield return null;
             }
         }
 

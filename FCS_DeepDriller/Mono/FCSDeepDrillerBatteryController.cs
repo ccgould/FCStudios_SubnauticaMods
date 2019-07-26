@@ -14,7 +14,7 @@ namespace FCS_DeepDriller.Mono
         private FCSDeepDrillerController _mono;
         private Func<bool> _isConstructed;
         private Equipment _equipment;
-        internal Action<Pickupable> OnBatteryAdded;
+        internal Action<Pickupable, string> OnBatteryAdded;
         internal Action<Pickupable> OnBatteryRemoved;
 
 
@@ -80,14 +80,23 @@ namespace FCS_DeepDriller.Mono
         private void OnEquipmentRemoved(string slot, InventoryItem item)
         {
             if (slot == EquipmentConfiguration.SlotIDs[0])
+            {
                 DeepDrillerComponentManager.GetBatteryCellModel(1).SetActive(false);
+            }
             else if (slot == EquipmentConfiguration.SlotIDs[1])
+            {
                 DeepDrillerComponentManager.GetBatteryCellModel(2).SetActive(false);
+            }
             else if (slot == EquipmentConfiguration.SlotIDs[2])
+            {
                 DeepDrillerComponentManager.GetBatteryCellModel(3).SetActive(false);
+            }
             else if (slot == EquipmentConfiguration.SlotIDs[3])
+            {
                 DeepDrillerComponentManager.GetBatteryCellModel(4).SetActive(false);
+            }
 
+            _mono.DisplayHandler.EmptyBatteryVisual(slot);
             OnBatteryRemoved?.Invoke(item.item);
         }
 
@@ -102,7 +111,7 @@ namespace FCS_DeepDriller.Mono
             else if (slot == EquipmentConfiguration.SlotIDs[3])
                 DeepDrillerComponentManager.GetBatteryCellModel(4).SetActive(true);
 
-            OnBatteryAdded?.Invoke(item.item);
+            OnBatteryAdded?.Invoke(item.item, slot);
         }
 
         public void OnHandHover(GUIHand hand)
@@ -148,6 +157,25 @@ namespace FCS_DeepDriller.Mono
             }
 
             return false;
+        }
+
+        internal void LoadData(DeepDrillerPowerData data)
+        {
+            foreach (PowerUnitData powercellData in data.Batteries)
+            {
+                QuickLogger.Debug($"Adding entity {powercellData.TechType}");
+
+                var prefab = GameObject.Instantiate(CraftData.GetPrefabForTechType(powercellData.TechType));
+                prefab.gameObject.GetComponent<PrefabIdentifier>().Id = powercellData.PrefabID;
+
+                var battery = prefab.gameObject.GetComponent<Battery>();
+                battery._charge = powercellData.Charge;
+
+                var item = new InventoryItem(prefab.gameObject.GetComponent<Pickupable>().Pickup(false));
+
+                _equipment.AddItem(powercellData.Slot, item);
+                QuickLogger.Debug($"Load Item {item.item.name} to slot {powercellData.Slot}");
+            }
         }
     }
 }

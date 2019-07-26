@@ -16,6 +16,20 @@ namespace FCS_DeepDriller.Mono.Handlers
         private FCSDeepDrillerController _mono;
         private bool _initialized = true;
 
+        public Color colorEmpty = new Color(1f, 0f, 0f, 1f);
+
+        public Color colorHalf = new Color(1f, 1f, 0f, 1f);
+
+        public Color colorFull = new Color(0f, 1f, 0f, 1f);
+        private Text _s1Percent;
+        private Image _s1Fill;
+        private Text _s2Percent;
+        private Image _s2Fill;
+        private Text _s3Percent;
+        private Image _s3Fill;
+        private Text _s4Percent;
+        private Image _s4Fill;
+
 
         internal void Setup(FCSDeepDrillerController mono)
         {
@@ -148,17 +162,67 @@ namespace FCS_DeepDriller.Mono.Handlers
             moduleDoor.TextLineOne = $"Open {Mod.ModFriendlyName} Modular";
             #endregion
 
-            //#region Battery
+            var main = gameObject.FindChild("model").FindChild("Scanner_Screen_Attachment").FindChild("Canvas").FindChild("Home");
 
-            //_batteryMeter = _canvasGameObject.FindChild("Battery")?.gameObject;
+            #region Slot1
+            var slot1 = main.FindChild("Battery_1")?.gameObject;
+            if (slot1 == null)
+            {
+                QuickLogger.Error("Battery_1 cannot be found");
+                return false;
+            }
 
-            //if (_batteryMeter == null)
-            //{
-            //    QuickLogger.Error("Open Storage Button not found.");
-            //    return false;
-            //}
+            _s1Percent = slot1.FindChild("percentage").GetComponent<Text>();
+            _s1Percent.text = Language.main.Get("ChargerSlotEmpty");
+            _s1Fill = slot1.FindChild("Fill").GetComponent<Image>();
+            _s1Fill.color = colorEmpty;
+            _s1Fill.fillAmount = 0f;
+            #endregion
 
-            //#endregion
+            #region Slot2
+            var slot2 = main.FindChild("Battery_2")?.gameObject;
+            if (slot2 == null)
+            {
+                QuickLogger.Error("Battery_2 cannot be found");
+                return false;
+            }
+
+            _s2Percent = slot2.FindChild("percentage").GetComponent<Text>();
+            _s2Percent.text = Language.main.Get("ChargerSlotEmpty");
+            _s2Fill = slot2.FindChild("Fill").GetComponent<Image>();
+            _s2Fill.color = colorEmpty;
+            _s2Fill.fillAmount = 0f;
+            #endregion
+
+            #region Slot3
+            var slot3 = main.FindChild("Battery_3")?.gameObject;
+            if (slot3 == null)
+            {
+                QuickLogger.Error("Battery_3 cannot be found");
+                return false;
+            }
+
+            _s3Percent = slot3.FindChild("percentage").GetComponent<Text>();
+            _s3Percent.text = Language.main.Get("ChargerSlotEmpty");
+            _s3Fill = slot3.FindChild("Fill").GetComponent<Image>();
+            _s3Fill.color = colorEmpty;
+            _s3Fill.fillAmount = 0f;
+            #endregion
+
+            #region Slot4
+            var slot4 = main.FindChild("Battery_4")?.gameObject;
+            if (slot4 == null)
+            {
+                QuickLogger.Error("Battery_4 cannot be found");
+                return false;
+            }
+
+            _s4Percent = slot4.FindChild("percentage").GetComponent<Text>();
+            _s4Percent.text = Language.main.Get("ChargerSlotEmpty");
+            _s4Fill = slot4.FindChild("Fill").GetComponent<Image>();
+            _s4Fill.color = colorEmpty;
+            _s4Fill.fillAmount = 0f;
+            #endregion
 
 
             return true;
@@ -187,6 +251,97 @@ namespace FCS_DeepDriller.Mono.Handlers
         public override void DrawPage(int page)
         {
             throw new NotImplementedException();
+        }
+
+        public void UpdateVisuals(PowerUnitData data)
+        {
+            Text text = null;
+            Image bar = null;
+
+            var charge = data.Battery.charge < 1 ? 0f : data.Battery.charge;
+
+            float percent = charge / data.Battery.capacity;
+
+            QuickLogger.Debug($"P: {percent} | S: {data.Slot} | BDC {data.Battery.charge}");
+
+            if (data.Slot == EquipmentConfiguration.SlotIDs[0])
+            {
+                text = _s1Percent;
+                bar = _s1Fill;
+            }
+            else if (data.Slot == EquipmentConfiguration.SlotIDs[1])
+            {
+                text = _s2Percent;
+                bar = _s2Fill;
+            }
+            else if (data.Slot == EquipmentConfiguration.SlotIDs[2])
+            {
+                text = _s3Percent;
+                bar = _s3Fill;
+            }
+            else if (data.Slot == EquipmentConfiguration.SlotIDs[3])
+            {
+                text = _s4Percent;
+                bar = _s4Fill;
+            }
+
+            if (text != null)
+            {
+                text.text = ((data.Battery.charge < 0f) ? Language.main.Get("ChargerSlotEmpty") : $"{Mathf.CeilToInt(percent * 100)}%");
+            }
+
+            if (bar != null)
+            {
+                if (data.Battery.charge >= 0f)
+                {
+                    Color value = (percent >= 0.5f) ? Color.Lerp(this.colorHalf, this.colorFull, 2f * percent - 1f) : Color.Lerp(this.colorEmpty, this.colorHalf, 2f * percent);
+                    bar.color = value;
+                    bar.fillAmount = percent;
+                }
+                else
+                {
+                    bar.color = colorEmpty;
+                    bar.fillAmount = 0f;
+                }
+            }
+        }
+
+        internal void EmptyBatteryVisual(string slot)
+        {
+            Text text = null;
+            Image bar = null;
+
+            if (slot == EquipmentConfiguration.SlotIDs[0])
+            {
+                text = _s1Percent;
+                bar = _s1Fill;
+            }
+            else if (slot == EquipmentConfiguration.SlotIDs[1])
+            {
+                text = _s2Percent;
+                bar = _s2Fill;
+            }
+            else if (slot == EquipmentConfiguration.SlotIDs[2])
+            {
+                text = _s3Percent;
+                bar = _s3Fill;
+            }
+            else if (slot == EquipmentConfiguration.SlotIDs[3])
+            {
+                text = _s4Percent;
+                bar = _s4Fill;
+            }
+
+            if (text != null)
+            {
+                text.text = Language.main.Get("ChargerSlotEmpty");
+            }
+
+            if (bar != null)
+            {
+                bar.color = colorEmpty;
+                bar.fillAmount = 0f;
+            }
         }
     }
 }

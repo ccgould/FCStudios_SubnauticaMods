@@ -2,6 +2,7 @@
 using FCS_DeepDriller.Enumerators;
 using FCS_DeepDriller.Managers;
 using FCS_DeepDriller.Mono;
+using FCS_DeepDriller.Mono.Handlers;
 using UnityEngine;
 
 namespace FCS_DeepDriller.Attachments
@@ -12,20 +13,20 @@ namespace FCS_DeepDriller.Attachments
 
         internal void GetGameObject(FCSDeepDrillerController mono)
         {
-
             var mount = DeepDrillerComponentManager.GetMount(mono, DeepDrillerMountSpot.Screen);
-
 
             _focusModule = GameObject.Instantiate(FCSDeepDrillerBuildable.FocusModule, mount.transform.position, mount.transform.rotation);
 
             var rb = _focusModule.GetComponent<Rigidbody>();
-            var pickupable = _focusModule.GetComponent<Pickupable>();
 
             DestroyObject(rb);
-            DestroyObject(pickupable);
 
-            var focusController = _focusModule.AddComponent<FCSDeepDrillerFocusController>();
-            focusController.Setup(mono);
+            var focusDisplayController = _focusModule.AddComponent<FCSDeepDrillerFocusDisplay>();
+            focusDisplayController.Setup(mono);
+
+            // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
+            var lwe = _focusModule.AddComponent<LargeWorldEntity>();
+            lwe.cellLevel = LargeWorldEntity.CellLevel.Far;
 
             _focusModule.SetActive(false);
 
@@ -40,6 +41,11 @@ namespace FCS_DeepDriller.Attachments
         internal GameObject GetFocusAttachment()
         {
             return _focusModule;
+        }
+
+        private void OnDestroy()
+        {
+            Destroy(_focusModule);
         }
     }
 }

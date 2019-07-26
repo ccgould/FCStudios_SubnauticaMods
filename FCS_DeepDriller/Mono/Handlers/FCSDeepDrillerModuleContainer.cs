@@ -195,7 +195,7 @@ namespace FCS_DeepDriller.Mono.Handlers
             {
                 if (module.Module == TechType.None) continue;
 
-                _equipment.AddItem(module.Slot, new InventoryItem(module.Module.ToPickupable()));
+                _equipment.AddItem(module.Slot, new InventoryItem(module.Module.ToPickupable().Pickup(false)));
             }
         }
 

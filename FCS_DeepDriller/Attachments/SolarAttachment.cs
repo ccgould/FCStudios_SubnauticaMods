@@ -23,9 +23,8 @@ namespace FCS_DeepDriller.Attachments
             _solarModule = GameObject.Instantiate(FCSDeepDrillerBuildable.SolarModule, position, mount.transform.rotation);
 
             var rb = _solarModule.GetComponent<Rigidbody>();
-            var pickupable = _solarModule.GetComponent<Pickupable>();
+
             DestroyObject(rb);
-            DestroyObject(pickupable);
 
             var solarController = _solarModule.AddComponent<FCSDeepDrillerSolarController>();
             solarController.Setup(mono);
@@ -43,6 +42,11 @@ namespace FCS_DeepDriller.Attachments
         internal GameObject GetSolarAttachment()
         {
             return _solarModule;
+        }
+
+        private void OnDestroy()
+        {
+            Destroy(_solarModule);
         }
     }
 }

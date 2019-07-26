@@ -19,10 +19,7 @@ namespace FCS_DeepDriller.Attachments
 
             var rb = _batteryModule.GetComponent<Rigidbody>();
 
-            var pickupable = _batteryModule.GetComponent<Pickupable>();
-
             DestroyObject(rb);
-            DestroyObject(pickupable);
 
             _batteryController = _batteryModule.AddComponent<FCSDeepDrillerBatteryController>();
             _batteryController.Setup(mono);
@@ -45,6 +42,11 @@ namespace FCS_DeepDriller.Attachments
         internal FCSDeepDrillerBatteryController GetController()
         {
             return _batteryController;
+        }
+
+        private void OnDestroy()
+        {
+            Destroy(_batteryModule);
         }
     }
 }

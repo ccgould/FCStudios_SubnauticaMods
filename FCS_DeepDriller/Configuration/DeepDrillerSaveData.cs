@@ -21,6 +21,8 @@ namespace FCS_DeepDriller.Configuration
         public FCSPowerStates PowerState { get; set; }
 
         public IEnumerable<KeyValuePair<TechType, int>> Items { get; set; }
+
+        public DeepDrillerPowerData PowerData { get; set; }
     }
 
     [Serializable]

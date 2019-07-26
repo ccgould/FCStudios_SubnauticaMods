@@ -12,7 +12,7 @@ namespace FCSTechFabricator.Mono.DeepDriller
     {
         private TechGroup GroupForPDA = TechGroup.Resources;
         private TechCategory CategoryForPDA = TechCategory.AdvancedMaterials;
-        private GameObject _prefab;
+
 
 
         public SolarAttachmentBuildable() : base("SolarAttachment_DD", "Solar Attachment")
@@ -22,8 +22,48 @@ namespace FCSTechFabricator.Mono.DeepDriller
 
         public override GameObject GetGameObject()
         {
-            GameObject prefab = GameObject.Instantiate<GameObject>(this._prefab);
+            GameObject prefab = GameObject.Instantiate<GameObject>(QPatch.SolarModule);
             prefab.name = this.PrefabFileName;
+
+            // Make the object drop slowly in water
+            var wf = prefab.AddComponent<WorldForces>();
+            wf.underwaterGravity = 0;
+            wf.underwaterDrag = 20f;
+            wf.enabled = true;
+
+            // Add fabricating animation
+            var fabricatingA = prefab.AddComponent<VFXFabricating>();
+            fabricatingA.localMinY = -0.1f;
+            fabricatingA.localMaxY = 0.6f;
+            fabricatingA.posOffset = new Vector3(0f, 0f, 0f);
+            fabricatingA.eulerOffset = new Vector3(0f, 0f, 0f);
+            fabricatingA.scaleFactor = 1.0f;
+
+            // Set proper shaders (for crafting animation)
+            Shader marmosetUber = Shader.Find("MarmosetUBER");
+            var renderer = prefab.GetComponentInChildren<Renderer>();
+            renderer.material.shader = marmosetUber;
+
+            // Update sky applier
+            var applier = prefab.GetComponent<SkyApplier>();
+            if (applier == null)
+                applier = prefab.AddComponent<SkyApplier>();
+            applier.renderers = new Renderer[] { renderer };
+            applier.anchorSky = Skies.Auto;
+
+            // We can pick this item
+            var pickupable = prefab.AddComponent<Pickupable>();
+            pickupable.isPickupable = true;
+            pickupable.randomizeRotationWhenDropped = true;
+
+            PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
+            prefabID.ClassId = this.ClassID;
+
+            var techTag = prefab.AddComponent<TechTag>();
+            techTag.type = TechType;
+
+            prefab.AddComponent<FCSTechFabricatorTag>();
+
             return prefab;
         }
 
@@ -48,8 +88,6 @@ namespace FCSTechFabricator.Mono.DeepDriller
         {
             if (QPatch.SolarModule)
             {
-                _prefab = QPatch.SolarModule;
-
                 if (this.IsRegistered == false)
                 {
 
@@ -62,54 +100,14 @@ namespace FCSTechFabricator.Mono.DeepDriller
 
                     CraftDataHandler.AddToGroup(this.GroupForPDA, this.CategoryForPDA, this.TechType);
 
-
                     QuickLogger.Debug($"Class Id = {ClassID_I}");
 
                     FriendlyName_I = this.PrefabFileName;
 
                     TechTypeID = TechType;
 
-                    // Make the object drop slowly in water
-                    var wf = _prefab.AddComponent<WorldForces>();
-                    wf.underwaterGravity = 0;
-                    wf.underwaterDrag = 20f;
-                    wf.enabled = true;
-
-                    // Add fabricating animation
-                    var fabricatingA = _prefab.AddComponent<VFXFabricating>();
-                    fabricatingA.localMinY = -0.1f;
-                    fabricatingA.localMaxY = 0.6f;
-                    fabricatingA.posOffset = new Vector3(0f, 0f, 0f);
-                    fabricatingA.eulerOffset = new Vector3(0f, 0f, 0f);
-                    fabricatingA.scaleFactor = 1.0f;
-
-                    // Set proper shaders (for crafting animation)
-                    Shader marmosetUber = Shader.Find("MarmosetUBER");
-                    var renderer = _prefab.GetComponentInChildren<Renderer>();
-                    renderer.material.shader = marmosetUber;
-
-                    // Update sky applier
-                    var applier = _prefab.GetComponent<SkyApplier>();
-                    if (applier == null)
-                        applier = _prefab.AddComponent<SkyApplier>();
-                    applier.renderers = new Renderer[] { renderer };
-                    applier.anchorSky = Skies.Auto;
-
-                    // We can pick this item
-                    var pickupable = _prefab.AddComponent<Pickupable>();
-                    pickupable.isPickupable = true;
-                    pickupable.randomizeRotationWhenDropped = true;
-
                     // Add the new TechType to Hand Equipment type.
                     CraftDataHandler.SetEquipmentType(TechType, EquipmentType.PowerCellCharger);
-
-                    PrefabIdentifier prefabID = _prefab.AddComponent<PrefabIdentifier>();
-                    prefabID.ClassId = this.ClassID;
-
-                    var techTag = this._prefab.AddComponent<TechTag>();
-                    techTag.type = this.TechType;
-
-                    _prefab.AddComponent<FCSTechFabricatorTag>();
 
                     PrefabHandler.RegisterPrefab(this);
 
