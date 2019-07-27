@@ -1,4 +1,5 @@
-﻿using FCS_DeepDriller.Configuration;
+﻿using FCS_DeepDriller.Buildable;
+using FCS_DeepDriller.Configuration;
 using FCS_DeepDriller.Display;
 using FCSCommon.Enums;
 using FCSCommon.Helpers;
@@ -6,6 +7,8 @@ using FCSCommon.Utilities;
 using FCSCommon.Utilities.Enums;
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -29,6 +32,10 @@ namespace FCS_DeepDriller.Mono.Handlers
         private Image _s3Fill;
         private Text _s4Percent;
         private Image _s4Fill;
+        private GameObject _grid;
+        private Text _pageNumber;
+        private List<InterfaceButton> OreButtons = new List<InterfaceButton>();
+        private Text _focusBtnText;
 
 
         internal void Setup(FCSDeepDrillerController mono)
@@ -40,11 +47,16 @@ namespace FCS_DeepDriller.Mono.Handlers
                 QuickLogger.Error("Unable to find all components");
                 _initialized = false;
             }
+            ITEMS_PER_PAGE = 5;
+            DrawPage(1);
         }
 
         public override void ClearPage()
         {
-            throw new NotImplementedException();
+            for (int i = 0; i < _grid.transform.childCount; i++)
+            {
+                Destroy(_grid.transform.GetChild(i).gameObject);
+            }
         }
 
         public override void OnButtonClick(string btnName, object tag)
@@ -84,12 +96,43 @@ namespace FCS_DeepDriller.Mono.Handlers
                 case "Module_Door":
                     _mono.DeepDrillerModuleContainer.OpenModulesDoor();
                     break;
+                case "ListItem":
+                    _mono.SetOreFocus((TechType)tag);
+                    UpdateListItems((TechType)tag);
+                    break;
+                case "Focus":
+                    _mono.ToggleFocus();
+                    UpdateFocusStates();
+                    break;
+            }
+        }
+
+        private void UpdateFocusStates()
+        {
+            if (_mono.GetFocusedState())
+            {
+                _focusBtnText.text = FCSDeepDrillerBuildable.Focusing();
+
+            }
+            else
+            {
+                _focusBtnText.text = FCSDeepDrillerBuildable.Focus();
+                RemoveFocusOnItems();
+            }
+        }
+
+        private void RemoveFocusOnItems()
+        {
+            foreach (InterfaceButton interfaceButton in OreButtons)
+            {
+                interfaceButton.RemoveFocus();
             }
         }
 
         public override void ItemModified<T>(T item)
         {
-            throw new NotImplementedException();
+            QuickLogger.Debug("In ItemModified");
+            DrawPage(1);
         }
 
         public override bool FindAllComponents()
@@ -162,7 +205,7 @@ namespace FCS_DeepDriller.Mono.Handlers
             moduleDoor.TextLineOne = $"Open {Mod.ModFriendlyName} Modular";
             #endregion
 
-            var main = gameObject.FindChild("model").FindChild("Scanner_Screen_Attachment").FindChild("Canvas").FindChild("Home");
+            var main = gameObject.FindChild("model").FindChild("Scanner_Screen_Attachment").FindChild("Canvas").FindChild("Home")?.gameObject;
 
             #region Slot1
             var slot1 = main.FindChild("Battery_1")?.gameObject;
@@ -224,7 +267,66 @@ namespace FCS_DeepDriller.Mono.Handlers
             _s4Fill.fillAmount = 0f;
             #endregion
 
+            _grid = main.FindChild("Grid")?.gameObject;
 
+            if (_grid == null)
+            {
+                QuickLogger.Error("Could not find the grid");
+                return false;
+            }
+
+            var previousPageGameObject = main.FindChild("Arrow_Up")?.gameObject;
+
+            if (previousPageGameObject == null)
+            {
+                QuickLogger.Error("Could not find the Arrow_Up");
+                return false;
+
+            }
+
+            var prevPageBTN = previousPageGameObject.AddComponent<PaginatorButton>();
+            prevPageBTN.OnChangePageBy = ChangePageBy;
+            prevPageBTN.AmountToChangePageBy = -1;
+            prevPageBTN.HoverTextLineTwo = FCSDeepDrillerBuildable.PrevPage();
+
+
+            var nextPageGameObject = main.FindChild("Arrow_Down")?.gameObject;
+
+            if (nextPageGameObject == null)
+            {
+                QuickLogger.Error("Could not find the Arrow_Down");
+                return false;
+
+            }
+
+            var nextPageBTN = nextPageGameObject.AddComponent<PaginatorButton>();
+            nextPageBTN.OnChangePageBy = ChangePageBy;
+            nextPageBTN.AmountToChangePageBy = 1;
+            nextPageBTN.HoverTextLineTwo = FCSDeepDrillerBuildable.NextPage();
+
+            _pageNumber = main.FindChild("Paginator").GetComponent<Text>();
+
+            if (_pageNumber == null)
+            {
+                QuickLogger.Error("Could not find the Paginator");
+                return false;
+            }
+
+            var focusBtn = main.FindChild("Button")?.gameObject;
+
+            if (focusBtn == null)
+            {
+                QuickLogger.Error("Could not find the Button");
+                return false;
+            }
+
+            var focusBTN = focusBtn.AddComponent<InterfaceButton>();
+            focusBTN.BtnName = "Focus";
+            focusBTN.OnButtonClick = OnButtonClick;
+            focusBTN.ButtonMode = InterfaceButtonMode.TextColor;
+            focusBTN.TextComponent = focusBtn.FindChild("Text").GetComponent<Text>();
+
+            _focusBtnText = focusBtn.gameObject.GetComponentInChildren<Text>();
             return true;
         }
 
@@ -250,10 +352,85 @@ namespace FCS_DeepDriller.Mono.Handlers
 
         public override void DrawPage(int page)
         {
-            throw new NotImplementedException();
+            CurrentPage = page;
+
+            if (CurrentPage <= 0)
+            {
+                CurrentPage = 1;
+            }
+            else if (CurrentPage > MaxPage)
+            {
+                CurrentPage = MaxPage;
+            }
+
+            int startingPosition = (CurrentPage - 1) * ITEMS_PER_PAGE;
+            int endingPosition = startingPosition + ITEMS_PER_PAGE;
+
+
+            if (endingPosition > _mono.GetBiomeData().Count)
+            {
+                endingPosition = _mono.GetBiomeData().Count;
+            }
+
+            ClearPage();
+
+            OreButtons.Clear();
+
+            for (int i = startingPosition; i < endingPosition; i++)
+            {
+                var techType = _mono.GetBiomeData().ElementAt(i);
+                LoadDisplay(techType);
+            }
+
+            UpdatePaginator();
+
+            UpdateListItems(_mono.GetFocusedOre());
         }
 
-        public void UpdateVisuals(PowerUnitData data)
+        private void LoadDisplay(TechType techType)
+        {
+            GameObject itemDisplay = Instantiate(FCSDeepDrillerBuildable.ItemPrefab);
+            itemDisplay.transform.SetParent(_grid.transform, false);
+
+            var itemButton = itemDisplay.AddComponent<InterfaceButton>();
+            itemButton.OnButtonClick = OnButtonClick;
+            itemButton.BtnName = "ListItem";
+            itemButton.Tag = techType;
+            itemButton.ButtonMode = InterfaceButtonMode.HoverImage;
+            itemButton.HoverItemName = "MouseOver";
+
+            var icon = itemDisplay.gameObject.FindChild("Icon")?.gameObject;
+            var text = itemDisplay.GetComponentInChildren<Text>();
+            text.text = techType.ToString();
+
+            if (icon == null)
+            {
+                QuickLogger.Error("Cannot find gameobject Icon");
+                return;
+            }
+
+            var uiIcon = icon.AddComponent<uGUI_Icon>();
+            uiIcon.sprite = SpriteManager.Get(techType);
+
+            OreButtons.Add(itemButton);
+        }
+
+        public override void UpdatePaginator()
+        {
+            CalculateNewMaxPages();
+            _pageNumber.text = $"{CurrentPage.ToString()} | {MaxPage}";
+        }
+
+        private void CalculateNewMaxPages()
+        {
+            MaxPage = Mathf.CeilToInt((_mono.GetBiomeData().Count - 1) / ITEMS_PER_PAGE) + 1;
+            if (CurrentPage > MaxPage)
+            {
+                CurrentPage = MaxPage;
+            }
+        }
+
+        internal void UpdateVisuals(PowerUnitData data)
         {
             Text text = null;
             Image bar = null;
@@ -342,6 +519,24 @@ namespace FCS_DeepDriller.Mono.Handlers
                 bar.color = colorEmpty;
                 bar.fillAmount = 0f;
             }
+        }
+
+        internal void UpdateListItems(TechType techType)
+        {
+            foreach (InterfaceButton button in OreButtons)
+            {
+                if ((TechType)button.Tag == techType)
+                {
+                    button.Focus();
+                    QuickLogger.Debug($"Match found for TechType {techType}", true);
+                }
+                else
+                {
+                    button.RemoveFocus();
+                }
+            }
+
+            UpdateFocusStates();
         }
     }
 }

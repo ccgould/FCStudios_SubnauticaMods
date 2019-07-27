@@ -3,13 +3,13 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace FCS_AIMarineTurbine.Display
+namespace FCS_DeepDriller.Display
 {
     internal class PaginatorButton : OnScreenButton, IPointerEnterHandler, IPointerClickHandler, IPointerExitHandler
     {
 
-        internal Color HOVER_COLOR = new Color(0.07f, 0.38f, 0.7f, 1f);
-        internal Color STARTING_COLOR = Color.white;
+        private static readonly Color HOVER_COLOR = new Color(0.07f, 0.38f, 0.7f, 1f);
+        private static Color STARTING_COLOR = Color.white;
         public int AmountToChangePageBy { get; set; } = 1;
         private Image image;
         public string HoverTextLineOne { get; set; }

@@ -1,5 +1,6 @@
 ﻿using FCSCommon.Utilities;
 using Oculus.Newtonsoft.Json;
+using UnityEngine;
 
 namespace FCS_DeepDriller.Configuration
 {
@@ -29,8 +30,29 @@ namespace FCS_DeepDriller.Configuration
             }
         }
 
+        internal void InitializeSolar(float charge, float capacity)
+        {
+            var go = new GameObject("DD_SolarBattery");
+            var solarB = go.AddComponent<Battery>();
+
+            solarB._capacity = capacity;
+            solarB._charge = charge;
+
+            Battery = solarB.GetComponent<IBattery>();
+
+            QuickLogger.Debug("Created Solar Battery for Deep Driller");
+        }
+
         internal void SaveData()
         {
+            if (Battery == null)
+            {
+                QuickLogger.Error("Battery was null on save");
+                Charge = 0f;
+                Capacity = 0f;
+                return;
+            }
+
             Charge = Battery.charge;
             Capacity = Battery.capacity;
         }

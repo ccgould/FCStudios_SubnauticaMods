@@ -13,6 +13,16 @@ namespace FCS_DeepDriller.Buildable
         private const string OnBatteryHoverTextKey = "DD_OnBatteryHoverText";
         private const string OPAllowedKey = "DD_OPAllowed";
         private const string BatteryAttachmentHasBatteriesKey = "DD_BatteryAttachmentHasBatteries";
+        private const string NextPageKey = "DD_NextPage";
+        private const string PrevPageKey = "DD_PrevPage";
+        private const string FocusingKey = "DD_Focusing";
+        private const string FocusKey = "DD_Focus";
+
+        internal static string BuildableName { get; private set; }
+
+        internal static TechType TechTypeID { get; private set; }
+
+
         internal static string StorageContainerLabel()
         {
             return Language.main.Get(StorageLabelKey);
@@ -32,10 +42,6 @@ namespace FCS_DeepDriller.Buildable
             return Language.main.Get(EquipmentLabelKey);
         }
 
-        internal static string BuildableName { get; private set; }
-
-        internal static TechType TechTypeID { get; private set; }
-
         internal static string BEquipmentContainerLabel()
         {
             return Language.main.Get(BEquipmentLabelKey);
@@ -45,6 +51,7 @@ namespace FCS_DeepDriller.Buildable
         {
             return Language.main.Get(OnlyPowercellsAllowedKey);
         }
+
         internal static string OnBatteryHoverText()
         {
             return Language.main.Get(OnBatteryHoverTextKey);
@@ -54,10 +61,32 @@ namespace FCS_DeepDriller.Buildable
         {
             return Language.main.Get(OPAllowedKey);
         }
+
         internal static string BatteryAttachmentHasBatteries()
         {
             return Language.main.Get(BatteryAttachmentHasBatteriesKey);
         }
+
+        internal static string PrevPage()
+        {
+            return Language.main.Get(PrevPageKey);
+        }
+
+        internal static string NextPage()
+        {
+            return Language.main.Get(NextPageKey);
+        }
+
+        internal static string Focusing()
+        {
+            return Language.main.Get(FocusingKey);
+        }
+
+        internal static string Focus()
+        {
+            return Language.main.Get(FocusKey);
+        }
+
         private void AdditionalPatching()
         {
             BuildableName = this.FriendlyName;
@@ -72,6 +101,10 @@ namespace FCS_DeepDriller.Buildable
             LanguageHandler.SetLanguageLine(OnBatteryHoverTextKey, "Open Battery Attachment.");
             LanguageHandler.SetLanguageLine(OPAllowedKey, "Only One Power Attachment Allowed.");
             LanguageHandler.SetLanguageLine(BatteryAttachmentHasBatteriesKey, "Battery attachment has batteries cannot remove!");
+            LanguageHandler.SetLanguageLine(NextPageKey, "Next Page");
+            LanguageHandler.SetLanguageLine(PrevPageKey, "Previous Page");
+            LanguageHandler.SetLanguageLine(FocusKey, "FOCUS");
+            LanguageHandler.SetLanguageLine(FocusingKey, "FOCUSING");
         }
     }
 }

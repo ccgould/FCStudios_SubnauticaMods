@@ -14,6 +14,8 @@ namespace FCS_DeepDriller.Buildable
         public static GameObject FocusModule { get; set; }
 
         public static GameObject SolarModule { get; set; }
+        public static GameObject ItemPrefab { get; set; }
+
         private bool GetPrefabs()
         {
             QuickLogger.Debug("GetPrefabs");
@@ -49,6 +51,23 @@ namespace FCS_DeepDriller.Buildable
                 return false;
             }
 
+            //We have found the asset bundle and now we are going to continue by looking for the model.
+            GameObject listItem = assetBundle.LoadAsset<GameObject>("ListButton");
+
+            //If the prefab isn't null lets add the shader to the materials
+            if (listItem != null)
+            {
+                ItemPrefab = listItem;
+
+                QuickLogger.Debug("List item Prefab Found!");
+            }
+            else
+            {
+                QuickLogger.Error("List item Prefab Not Found!");
+                return false;
+            }
+
+
             BatteryModule = FCSTechFabricator.QPatch.BatteryModule;
             SolarModule = FCSTechFabricator.QPatch.SolarModule;
             FocusModule = FCSTechFabricator.QPatch.FocusModule;
@@ -67,8 +86,10 @@ namespace FCS_DeepDriller.Buildable
             MaterialHelpers.ApplyAlphaShader("DeepDriller_BaseColor_BaseColor", prefab);
             MaterialHelpers.ApplySpecShader("DeepDriller_BaseColor_BaseColor", "DeepDriller_Spec", prefab, 1, 0.5f, QPatch.GlobalBundle);
             MaterialHelpers.ApplyNormalShader("DeepDriller_BaseColor_BaseColor", "DeepDriller_Norm", prefab, QPatch.GlobalBundle);
-            MaterialHelpers.ApplyEmissionShader("DeepDriller_BaseColor_BaseColor", "DeepDriller_Emissive", prefab, QPatch.GlobalBundle, new Color(0.08235294f, 1f, 1f));
+            MaterialHelpers.ApplyEmissionShader("DeepDriller_BaseColor_BaseColor", "DeepDriller_Emissive_On", prefab, QPatch.GlobalBundle, new Color(0.08235294f, 1f, 1f));
             MaterialHelpers.ApplyEmissionShader("DeepDriller_DigState", "DeepDriller_DigStateEmissive", prefab, QPatch.GlobalBundle, new Color(0.08235294f, 1f, 1f));
+            MaterialHelpers.ApplyEmissionShader("Lava_Rock", "lava_rock_emission", prefab, QPatch.GlobalBundle, Color.white);
+            MaterialHelpers.ApplyNormalShader("Lava_Rock", "lava_rock_01_normal", prefab, QPatch.GlobalBundle);
             #endregion
         }
     }

@@ -39,8 +39,8 @@ namespace FCS_DeepDriller.Mono.Handlers
                 StartCoroutine(_mono.DropLegs());
             }
 
-            QuickLogger.Debug($"Power Mode: {PowerState}");
-            QuickLogger.Debug($"Power Avaliable: {_powerBank.GetCharge(_module)}");
+            //QuickLogger.Debug($"Power Mode: {PowerState}");
+            //QuickLogger.Debug($"Power Avaliable: {_powerBank.GetCharge(_module)}");
 
             if (_mono.DeepDrillerModuleContainer.HasSolarModule())
             {
@@ -112,11 +112,7 @@ namespace FCS_DeepDriller.Mono.Handlers
             _depthCurve.AddKey(0.4245796f, 0.5001081f);
             _depthCurve.AddKey(1f, 1f);
 
-            var prefab = GameObject.Instantiate(CraftData.GetPrefabForTechType(TechType.PrecursorIonPowerCell));
-            var battery = prefab.gameObject.GetComponent<Battery>();
-            battery._charge = 0f;
-            battery._capacity = FCSDeepDrillerBuildable.DeepDrillConfig.SolarCapacity;
-            _powerBank.Solar.Initialize(prefab.gameObject.GetComponent<Pickupable>().Pickup(false));
+            _powerBank.Solar.InitializeSolar(0, 3000);
             PowerState = FCSPowerStates.Tripped;
         }
 

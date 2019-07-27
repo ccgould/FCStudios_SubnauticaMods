@@ -17,6 +17,8 @@ namespace FCS_DeepDriller.Managers
         private static GameObject _gameObject;
         private static FCSDeepDrillerController _mono;
         private static GameObject _focusModule;
+        private static GameObject _digState;
+        private static GameObject _hardLava;
 
 
         internal static bool FindAllComponents(FCSDeepDrillerController mono, GameObject solar, GameObject battery, GameObject focus)
@@ -62,6 +64,16 @@ namespace FCS_DeepDriller.Managers
             _batteryCell4 = batCells.FindChild("BatteryCell_4")?.gameObject;
             #endregion
 
+            var lavaGroup = _gameObject.FindChild("model").FindChild("extra_models")?.gameObject;
+
+            if (lavaGroup == null)
+            {
+                QuickLogger.Debug("Couldn't find extra_models");
+            }
+
+            _digState = lavaGroup.FindChild("DigState")?.gameObject;
+            _hardLava = lavaGroup.FindChild("HardLava")?.gameObject;
+
             return true;
         }
 
@@ -103,6 +115,10 @@ namespace FCS_DeepDriller.Managers
             }
         }
 
+        internal static bool IsLavaHot()
+        {
+            return _digState.activeSelf;
+        }
 
         internal static void ShowAttachment(DeepDrillModules module)
         {

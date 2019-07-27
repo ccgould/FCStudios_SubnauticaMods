@@ -6,6 +6,7 @@
         TextScale,
         TextColor,
         Background,
-        BackgroundScale
+        BackgroundScale,
+        HoverImage
     }
 }

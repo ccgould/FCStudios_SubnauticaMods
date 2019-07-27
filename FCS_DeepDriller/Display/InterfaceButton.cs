@@ -1,4 +1,5 @@
-﻿using FCSCommon.Enums;
+﻿using FCS_DeepDriller.Enumerators;
+using FCSCommon.Enums;
 using FCSCommon.Utilities;
 using System;
 using UnityEngine;
@@ -26,8 +27,11 @@ namespace FCS_DeepDriller.Display
         public int LargeFont { get; set; } = 180;
         public object Tag { get; set; }
         public float IncreaseButtonBy { get; set; }
+        public string HoverItemName { get; set; } = "Hover";
 
         public Action<string, object> OnButtonClick;
+        private bool _inFocus;
+        internal FCSDeepDrillerButtonType ButtonType;
 
         #endregion
 
@@ -58,6 +62,9 @@ namespace FCS_DeepDriller.Display
                     {
                         this.gameObject.transform.localScale = this.gameObject.transform.localScale;
                     }
+                    break;
+                case InterfaceButtonMode.HoverImage:
+                    transform.gameObject.FindChild(HoverItemName).SetActive(false);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -94,15 +101,16 @@ namespace FCS_DeepDriller.Display
                     {
                         this.gameObject.transform.localScale = this.gameObject.transform.localScale;
                     }
-
                     break;
             }
-
         }
 
         public override void OnPointerEnter(PointerEventData eventData)
         {
             base.OnPointerEnter(eventData);
+
+            if (_inFocus) return;
+
             if (this.IsHovered)
             {
                 switch (this.ButtonMode)
@@ -126,6 +134,9 @@ namespace FCS_DeepDriller.Display
                                 new Vector3(this.IncreaseButtonBy, this.IncreaseButtonBy, this.IncreaseButtonBy);
                         }
                         break;
+                    case InterfaceButtonMode.HoverImage:
+                        transform.gameObject.FindChild(HoverItemName).SetActive(true);
+                        break;
                 }
             }
         }
@@ -133,6 +144,8 @@ namespace FCS_DeepDriller.Display
         public override void OnPointerExit(PointerEventData eventData)
         {
             base.OnPointerExit(eventData);
+
+            if (_inFocus) return;
 
             switch (this.ButtonMode)
             {
@@ -155,6 +168,9 @@ namespace FCS_DeepDriller.Display
                             new Vector3(this.IncreaseButtonBy, this.IncreaseButtonBy, this.IncreaseButtonBy);
                     }
                     break;
+                case InterfaceButtonMode.HoverImage:
+                    transform.gameObject.FindChild(HoverItemName).SetActive(false);
+                    break;
             }
         }
 
@@ -164,11 +180,27 @@ namespace FCS_DeepDriller.Display
 
             if (this.IsHovered)
             {
+                //if (ButtonType == FCSDeepDrillerButtonType.ListItem)
+                //{
+                //    Focus();
+                //}
+
                 QuickLogger.Debug($"Clicked Button: {this.BtnName}", true);
                 OnButtonClick?.Invoke(this.BtnName, this.Tag);
             }
         }
         #endregion
 
+        public void RemoveFocus()
+        {
+            _inFocus = false;
+            transform.gameObject.FindChild(HoverItemName).SetActive(false);
+        }
+
+        internal void Focus()
+        {
+            _inFocus = true;
+            transform.gameObject.FindChild(HoverItemName).SetActive(true);
+        }
     }
 }

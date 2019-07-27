@@ -159,9 +159,11 @@ namespace FCS_DeepDriller.Configuration
             foreach (PowerUnitData battery in Batteries)
             {
                 battery.SaveData();
+                QuickLogger.Debug($"Saved battery in slot ({battery.Slot})");
             }
 
             Solar.SaveData();
+            QuickLogger.Debug($"Saved solar panel");
         }
     }
 }

@@ -248,6 +248,8 @@ namespace FCS_AIMarineTurbine.Display
             var prevPageBTN = _previousPageGameObject.AddComponent<PaginatorButton>();
             prevPageBTN.OnChangePageBy = ChangePageBy;
             prevPageBTN.AmountToChangePageBy = -1;
+            prevPageBTN.STARTING_COLOR = new Color(188, 188, 188);
+            prevPageBTN.HOVER_COLOR = Color.white;
             #endregion
 
             #region Next Page BTN
@@ -261,6 +263,8 @@ namespace FCS_AIMarineTurbine.Display
             var nextPageBTN = _nextPageGameObject.AddComponent<PaginatorButton>();
             nextPageBTN.OnChangePageBy = ChangePageBy;
             nextPageBTN.AmountToChangePageBy = 1;
+            nextPageBTN.STARTING_COLOR = new Color(188, 188, 188);
+            nextPageBTN.HOVER_COLOR = Color.white;
             #endregion
 
             #region Items Grid

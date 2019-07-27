@@ -23,6 +23,8 @@ namespace FCS_DeepDriller.Configuration
         public IEnumerable<KeyValuePair<TechType, int>> Items { get; set; }
 
         public DeepDrillerPowerData PowerData { get; set; }
+        public TechType FocusOre { get; set; }
+        public bool IsFocused { get; set; }
     }
 
     [Serializable]

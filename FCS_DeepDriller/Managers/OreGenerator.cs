@@ -52,7 +52,7 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers.Logic
         {
             if (_allowTick)
             {
-                QuickLogger.Debug($"PassedTime = {_passedTime} || AllowedOres = {AllowedOres?.Count}");
+                // QuickLogger.Debug($"PassedTime = {_passedTime} || AllowedOres = {AllowedOres?.Count}");
 
                 if (_minTime <= 0 || _maxTime <= 0)
                 {
@@ -129,21 +129,18 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers.Logic
         internal void SetFocus(TechType techType)
         {
             _focus = techType;
+            QuickLogger.Debug($"Focus set to {_focus}");
         }
 
         internal TechType GetFocus() => _focus;
 
-        internal void SetIsFocused(bool value)
-        {
-            _isFocused = value;
-        }
-
         internal bool GetIsFocused() => _isFocused;
 
-        public void AddFocus()
+        public void ToggleFocus()
         {
-            _isFocused = true;
-            QuickLogger.Debug($"Setting focus item {_focus}", true);
+            _isFocused ^= true;
+
+            QuickLogger.Debug(_isFocused ? $"Setting focus item {_focus}" : $"Disabling focus.", true);
         }
     }
 }
