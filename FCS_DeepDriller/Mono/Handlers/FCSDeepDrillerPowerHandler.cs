@@ -34,11 +34,6 @@ namespace FCS_DeepDriller.Mono.Handlers
         {
             if (!_mono.IsConstructed || !_initialized) return;
 
-            if (GetPowerState() == FCSPowerStates.Powered && !_mono.AnimationHandler.GetBoolHash(_mono.ExtendStateHash))
-            {
-                StartCoroutine(_mono.DropLegs());
-            }
-
             //QuickLogger.Debug($"Power Mode: {PowerState}");
             //QuickLogger.Debug($"Power Avaliable: {_powerBank.GetCharge(_module)}");
 
@@ -161,7 +156,10 @@ namespace FCS_DeepDriller.Mono.Handlers
         {
             return $"Solar panel (sun: {Mathf.RoundToInt(GetRechargeScalar() * 100f)}% charge {Mathf.RoundToInt(_powerBank.Solar.Battery.charge)}/{Mathf.RoundToInt(_powerBank.Solar.Battery.capacity)}";
         }
-
+        internal PowerUnitData GetSolarPowerUnitData()
+        {
+            return _powerBank.Solar;
+        }
         internal DeepDrillerPowerData SaveData()
         {
             _powerBank.SaveData();

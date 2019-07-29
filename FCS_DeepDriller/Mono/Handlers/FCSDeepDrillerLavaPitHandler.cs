@@ -1,7 +1,9 @@
 ﻿using FCSCommon.Utilities;
 using FCSCommon.Utilities.Enums;
+using System;
 using System.Collections;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace FCS_DeepDriller.Mono.Handlers
 {
@@ -20,6 +22,7 @@ namespace FCS_DeepDriller.Mono.Handlers
         private const bool CooledLava = false;
         private const bool HotLava = true;
         private const int LavaRaiseWaitInSec = 11;
+        internal Action<bool> OnLavaRaised;
         internal void Initialize(FCSDeepDrillerController mono)
         {
             _mono = mono;
@@ -97,6 +100,12 @@ namespace FCS_DeepDriller.Mono.Handlers
             QuickLogger.Debug("Raising lava");
             _mono.AnimationHandler.SetBoolHash(_lavaState, true);
             _lavaRaised = true;
+            OnLavaRaised?.Invoke(_lavaRaised);
+        }
+
+        public bool IsLavaActive()
+        {
+            return _lavaRaised;
         }
     }
 }

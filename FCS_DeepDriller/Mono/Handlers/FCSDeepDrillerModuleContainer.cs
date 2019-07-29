@@ -191,7 +191,7 @@ namespace FCS_DeepDriller.Mono.Handlers
             }
         }
 
-        public bool HasSolarModule()
+        internal bool HasSolarModule()
         {
             bool result = false;
 
@@ -205,7 +205,28 @@ namespace FCS_DeepDriller.Mono.Handlers
             return result;
         }
 
-        public DeepDrillModules GetPowerModule()
+        internal bool IsEmpty()
+        {
+            bool result = true;
+
+            for (int i = 0; i < EquipmentConfiguration.SlotIDs.Length; i++)
+            {
+                var slot = EquipmentConfiguration.SlotIDs[i];
+
+                if (!slot.StartsWith("HDD")) continue;
+
+                var techType = _equipment.GetTechTypeInSlot(slot);
+
+                if (techType != TechType.None)
+                {
+                    result = false;
+                }
+            }
+
+            return result;
+        }
+
+        internal DeepDrillModules GetPowerModule()
         {
             var module = DeepDrillModules.None;
 

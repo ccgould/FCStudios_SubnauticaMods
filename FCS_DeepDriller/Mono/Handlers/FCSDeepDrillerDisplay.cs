@@ -34,6 +34,7 @@ namespace FCS_DeepDriller.Mono.Handlers
         private List<InterfaceButton> OreButtons = new List<InterfaceButton>();
         private Text _focusBtnText;
         private Text _healthPercentage;
+        private Text _solarValue;
 
         internal void Setup(FCSDeepDrillerController mono)
         {
@@ -48,11 +49,26 @@ namespace FCS_DeepDriller.Mono.Handlers
             DrawPage(1);
             QuickLogger.Debug("Display has been set.");
             InvokeRepeating("UpdateBatteryStatus", 1, 0.5f);
+            InvokeRepeating(nameof(UpdateScreenState), 1.0f, 0.5f);
+        }
+
+        private void UpdateScreenState()
+        {
+            _mono.AnimationHandler.SetBoolHash(_mono.ScreenStateHash, _mono.PowerManager.IsPowerAvailable());
         }
 
         private void UpdateBatteryStatus()
         {
             _healthPercentage.text = $"{_mono.HealthManager.GetHealth()}%";
+
+            if (_mono.DeepDrillerModuleContainer.HasSolarModule())
+            {
+                _solarValue.text = $"{Mathf.RoundToInt(_mono.PowerManager.GetSolarPowerUnitData().Battery.charge)}";
+            }
+            else
+            {
+                _solarValue.text = Language.main.Get("ChargerSlotEmpty");
+            }
         }
 
         public override void ClearPage()
@@ -332,6 +348,8 @@ namespace FCS_DeepDriller.Mono.Handlers
             _focusBtnText = focusBtn.gameObject.GetComponentInChildren<Text>();
 
             _healthPercentage = main.FindChild("Health_LBL").GetComponent<Text>();
+
+            _solarValue = main.FindChild("Solar_LBL").GetComponent<Text>();
             return true;
         }
 

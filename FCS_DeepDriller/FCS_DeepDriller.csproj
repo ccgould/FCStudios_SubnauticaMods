@@ -87,6 +87,7 @@
     <Compile Include="Managers\BiomeManager.cs" />
     <Compile Include="Managers\DeepDrillerComponentManager.cs" />
     <Compile Include="Managers\OreGenerator.cs" />
+    <Compile Include="Managers\VFXManager.cs" />
     <Compile Include="Mono\FCSDeepDrillerBatteryController.cs" />
     <Compile Include="Mono\FCSDeepDrillerController.cs" />
     <Compile Include="Managers\AnimationManager.cs" />

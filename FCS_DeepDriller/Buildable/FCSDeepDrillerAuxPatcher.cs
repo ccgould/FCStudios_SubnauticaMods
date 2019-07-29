@@ -17,6 +17,7 @@ namespace FCS_DeepDriller.Buildable
         private const string PrevPageKey = "DD_PrevPage";
         private const string FocusingKey = "DD_Focusing";
         private const string FocusKey = "DD_Focus";
+        private const string RemoveAllModulesKey = "DD_RemoveAllAttachments";
 
         internal static string BuildableName { get; private set; }
 
@@ -105,6 +106,13 @@ namespace FCS_DeepDriller.Buildable
             LanguageHandler.SetLanguageLine(PrevPageKey, "Previous Page");
             LanguageHandler.SetLanguageLine(FocusKey, "FOCUS");
             LanguageHandler.SetLanguageLine(FocusingKey, "FOCUSING");
+            LanguageHandler.SetLanguageLine(RemoveAllModulesKey, "Please Remove all attachments from the container.");
+        }
+
+        public static string RemoveAllItems()
+        {
+            return Language.main.Get(RemoveAllModulesKey);
+
         }
     }
 }

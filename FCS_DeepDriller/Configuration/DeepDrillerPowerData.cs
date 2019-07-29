@@ -1,17 +1,18 @@
 ﻿using FCS_DeepDriller.Buildable;
 using FCS_DeepDriller.Enumerators;
 using FCSCommon.Utilities;
+using Oculus.Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 namespace FCS_DeepDriller.Configuration
 {
-    public class DeepDrillerPowerData
+    internal class DeepDrillerPowerData
     {
-        internal PowerUnitData Solar { get; set; } = new PowerUnitData();
+        [JsonProperty] internal PowerUnitData Solar { get; set; } = new PowerUnitData();
 
-        internal List<PowerUnitData> Batteries { get; set; } = new List<PowerUnitData>(4);
+        [JsonProperty] internal List<PowerUnitData> Batteries { get; set; } = new List<PowerUnitData>(4);
 
         internal float GetCharge(DeepDrillModules module)
         {

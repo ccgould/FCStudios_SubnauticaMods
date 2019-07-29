@@ -4,16 +4,14 @@ using UnityEngine;
 
 namespace FCS_DeepDriller.Configuration
 {
-    public class PowerUnitData
+    internal class PowerUnitData
     {
-        public TechType TechType { get; set; }
-        public float Charge { get; set; }
-        public string PrefabID { get; set; }
-        public float Capacity { get; set; }
-        public string Slot { get; set; }
-
-        [JsonIgnore]
-        public IBattery Battery { get; set; }
+        [JsonProperty] internal TechType TechType { get; set; }
+        [JsonProperty] internal float Charge { get; set; }
+        [JsonProperty] internal string PrefabID { get; set; }
+        [JsonProperty] internal float Capacity { get; set; }
+        [JsonProperty] internal string Slot { get; set; }
+        [JsonIgnore] internal IBattery Battery { get; set; }
 
         internal void Initialize(Pickupable battery, string slot = "none")
         {

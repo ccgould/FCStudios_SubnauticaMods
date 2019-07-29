@@ -1,4 +1,5 @@
-﻿using FCSCommon.Utilities;
+﻿using FCS_DeepDriller.Mono;
+using FCSCommon.Utilities;
 using FCSCommon.Utilities.Enums;
 using System;
 using System.Collections.Generic;
@@ -11,67 +12,51 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers.Logic
     /// <summary>
     /// This component handles ore generation after a certain amount of time based off the allowed TechTypes
     /// </summary>
-    public class OreGenerator : MonoBehaviour
+    internal class OreGenerator : MonoBehaviour
     {
         #region private Properties
-
-        private float _randomTime;
         private bool _allowTick;
-        private Random _random;
         private Random _random2;
-        private int _minTime;
-        private int _maxTime;
         private float _passedTime;
         private TechType _focus;
         private bool _isFocused;
-
+        private float _secondPerItem;
+        private FCSDeepDrillerController _mono;
+        private const float DayNight = 1200f;
+        private const int OresPerDay = 30;
         #endregion
 
         #region Internal Properties
         internal List<TechType> AllowedOres { get; set; }
         internal event Action<TechType> OnAddCreated;
-        internal event Action<int> TimeOnUpdate;
         #endregion
 
         /// <summary>
         /// Sets up the ore generator
         /// </summary>
-        /// <param name="minTime">The minimum amount of time to generate</param>
-        /// <param name="maxTime">The maximum amount of time to generate</param>
-        public void Initialize(int minTime, int maxTime)
+        internal void Initialize(FCSDeepDrillerController mono)
         {
-            _minTime = minTime;
-            _maxTime = maxTime + 1; // Added one so the random can chose the maximum number if not with wont chose the maximum
-            _random = new Random();
+            _mono = mono;
             _random2 = new Random();
-            _randomTime = _random.Next(_minTime, _maxTime);
-            QuickLogger.Debug($"New Time Goal: {_randomTime}");
+            _secondPerItem = DayNight / OresPerDay;
         }
 
         private void Update()
         {
-            QuickLogger.Debug($"PassedTime = {_passedTime} || AllowedOres = {AllowedOres.Count} || IsFocused {_isFocused} || Focus {_focus} || Allow Tick {_allowTick}");
+            //QuickLogger.Debug($"PassedTime = {_passedTime} ||SecPerItem {_secondPerItem} || AllowedOres = {AllowedOres.Count} " +
+            //$"|| IsFocused {_isFocused} || Focus {_focus} || Allow Tick {_allowTick}");
+
+            SetAllowTick();
+
 
             if (_allowTick)
             {
-
-                if (_minTime <= 0 || _maxTime <= 0)
-                {
-                    QuickLogger.Error($"{nameof(OreGenerator)}: MaxTime or MinTime is lower than or equal to 0");
-                    return;
-                }
-
                 _passedTime += DayNightCycle.main.deltaTime;
 
-                if (_passedTime >= _randomTime / 0.016667)
+                if (_passedTime >= _secondPerItem)
                 {
                     GenerateOre();
                 }
-
-                var timeLeft = _randomTime - (_passedTime * 0.016667);
-
-                TimeOnUpdate?.Invoke(Convert.ToInt32(timeLeft));
-
             }
         }
 
@@ -87,7 +72,7 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers.Logic
                 var index = _random2.Next(AllowedOres.Count);
                 item = AllowedOres[index];
                 OnAddCreated?.Invoke(item);
-                QuickLogger.Debug($"Spawning focus item {item}", true);
+                QuickLogger.Debug($"Spawning item {item}", true);
 
             }
             else
@@ -102,24 +87,22 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers.Logic
                 QuickLogger.Debug($"Spawning focus item {_focus}", true);
             }
 
-            _randomTime = _random.Next(_minTime, _maxTime);
-            QuickLogger.Debug($"New Time Goal: {_randomTime}");
             _passedTime = 0;
         }
 
-        internal void SetAllowTick(FCSPowerStates value)
+        internal void SetAllowTick()
         {
-            if (value == FCSPowerStates.Powered)
+            if (_mono.PowerManager.GetPowerState() == FCSPowerStates.Powered && !_mono.DeepDrillerContainer.IsContainerFull)
             {
                 _allowTick = true;
             }
-            else if (value != FCSPowerStates.Powered)
+            else
             {
                 _allowTick = false;
             }
         }
 
-        public void RemoveFocus()
+        internal void RemoveFocus()
         {
             _focus = TechType.None;
             _isFocused = false;
@@ -136,7 +119,7 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers.Logic
 
         internal bool GetIsFocused() => _isFocused;
 
-        public void ToggleFocus()
+        internal void ToggleFocus()
         {
             _isFocused ^= true;
 

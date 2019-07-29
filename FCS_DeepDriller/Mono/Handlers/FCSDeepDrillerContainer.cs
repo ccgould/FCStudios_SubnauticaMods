@@ -18,7 +18,7 @@ namespace FCS_DeepDriller.Mono.Handlers
         internal bool IsContainerFull => _container.count == MaxContainerSlots || !_container.HasRoomFor(1, 1);
         private readonly int _containerWidth = FCSDeepDrillerBuildable.DeepDrillConfig.StorageSize.Width;
         private readonly int _containerHeight = FCSDeepDrillerBuildable.DeepDrillConfig.StorageSize.Height;
-        private Dictionary<TechType, int> ContainerItemsTracker = new Dictionary<TechType, int>();
+        private readonly Dictionary<TechType, int> _containerItemsTracker = new Dictionary<TechType, int>();
 
 
         internal void Setup(FCSDeepDrillerController mono)
@@ -60,15 +60,15 @@ namespace FCS_DeepDriller.Mono.Handlers
             //TODO if full reset system to generate ore
             var techType = item.item.GetTechType();
 
-            if (!ContainerItemsTracker.ContainsKey(techType)) return;
+            if (!_containerItemsTracker.ContainsKey(techType)) return;
 
-            if (ContainerItemsTracker[techType] == 1)
+            if (_containerItemsTracker[techType] == 1)
             {
-                ContainerItemsTracker.Remove(techType);
+                _containerItemsTracker.Remove(techType);
             }
             else
             {
-                ContainerItemsTracker[techType] = ContainerItemsTracker[techType] - 1;
+                _containerItemsTracker[techType] = _containerItemsTracker[techType] - 1;
             }
         }
 
@@ -82,13 +82,13 @@ namespace FCS_DeepDriller.Mono.Handlers
 
             var techType = pickupable.GetTechType();
 
-            if (ContainerItemsTracker.ContainsKey(techType))
+            if (_containerItemsTracker.ContainsKey(techType))
             {
-                ContainerItemsTracker[techType] = ContainerItemsTracker[techType] + 1;
+                _containerItemsTracker[techType] = _containerItemsTracker[techType] + 1;
             }
             else
             {
-                ContainerItemsTracker.Add(techType, 1);
+                _containerItemsTracker.Add(techType, 1);
             }
 
             QuickLogger.Debug($"Adding TechType to container: {techType}");
@@ -120,10 +120,15 @@ namespace FCS_DeepDriller.Mono.Handlers
 
         internal IEnumerable<KeyValuePair<TechType, int>> GetItems()
         {
-            foreach (var eatableEntity in ContainerItemsTracker)
+            foreach (var eatableEntity in _containerItemsTracker)
             {
                 yield return eatableEntity;
             }
+        }
+
+        internal bool IsEmpty()
+        {
+            return _container.count <= 0;
         }
     }
 }

@@ -1,36 +1,32 @@
-﻿using FCSCommon.Objects;
-using FCSCommon.Utilities.Enums;
+﻿using FCSCommon.Utilities.Enums;
+using Oculus.Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 
 namespace FCS_DeepDriller.Configuration
 {
     [Serializable]
-    public class DeepDrillerSaveDataEntry
+    internal class DeepDrillerSaveDataEntry
     {
-        public Vec3 DrillBitPosition { get; set; }
+        [JsonProperty] internal List<SlotData> Modules { get; set; }
 
-        public List<SlotData> Modules { get; set; }
+        [JsonProperty] internal float Health { get; set; }
 
-        public float PowerAmount { get; set; }
+        [JsonProperty] internal string Id { get; set; }
 
-        public float Health { get; set; }
+        [JsonProperty] internal FCSPowerStates PowerState { get; set; }
 
-        public string Id { get; set; }
+        [JsonProperty] internal IEnumerable<KeyValuePair<TechType, int>> Items { get; set; }
 
-        public FCSPowerStates PowerState { get; set; }
-
-        public IEnumerable<KeyValuePair<TechType, int>> Items { get; set; }
-
-        public DeepDrillerPowerData PowerData { get; set; }
+        [JsonProperty] internal DeepDrillerPowerData PowerData { get; set; }
         public TechType FocusOre { get; set; }
         public bool IsFocused { get; set; }
         public string Biome { get; set; }
     }
 
     [Serializable]
-    public class DeepDrillerSaveData
+    internal class DeepDrillerSaveData
     {
-        public List<DeepDrillerSaveDataEntry> Entries = new List<DeepDrillerSaveDataEntry>();
+        [JsonProperty] internal List<DeepDrillerSaveDataEntry> Entries = new List<DeepDrillerSaveDataEntry>();
     }
 }
