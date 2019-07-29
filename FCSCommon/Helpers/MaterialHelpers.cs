@@ -328,5 +328,20 @@ namespace FCSCommon.Helpers
         {
             MaterialHelpers.ChangeMaterialColor(matNameColor, gameObject, color);
         }
+
+        public static void ReplaceEmissionTexture(string materialName, string replacementTexture, GameObject gameObject, AssetBundle assetBundle)
+        {
+            Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>();
+            foreach (Renderer renderer in renderers)
+            {
+                foreach (Material material in renderer.materials)
+                {
+                    if (material.name.StartsWith(materialName))
+                    {
+                        material.SetTexture("_Illum", FindTexture2D(replacementTexture, assetBundle));
+                    }
+                }
+            }
+        }
     }
 }

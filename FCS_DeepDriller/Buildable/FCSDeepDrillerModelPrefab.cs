@@ -10,10 +10,13 @@ namespace FCS_DeepDriller.Buildable
         private GameObject _prefab;
 
         private static AssetBundle _assetBundle;
+
         internal static GameObject BatteryModule { get; private set; }
+
         public static GameObject FocusModule { get; set; }
 
         public static GameObject SolarModule { get; set; }
+
         public static GameObject ItemPrefab { get; set; }
 
         private bool GetPrefabs()
@@ -74,7 +77,6 @@ namespace FCS_DeepDriller.Buildable
 
             return true;
         }
-
 
         /// <summary>
         /// Applies the shader to the materials of the reactor

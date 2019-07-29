@@ -19,6 +19,10 @@ namespace FCS_DeepDriller.Attachments
 
             var rb = _batteryModule.GetComponent<Rigidbody>();
 
+            // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
+            var lwe = _batteryModule.AddComponent<LargeWorldEntity>();
+            lwe.cellLevel = LargeWorldEntity.CellLevel.Global;
+
             DestroyObject(rb);
 
             _batteryController = _batteryModule.AddComponent<FCSDeepDrillerBatteryController>();

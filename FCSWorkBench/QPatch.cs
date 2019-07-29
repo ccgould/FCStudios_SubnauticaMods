@@ -4,6 +4,7 @@ using FCSCommon.Utilities;
 using FCSTechFabricator.Models;
 using FCSTechFabricator.Mono;
 using FCSTechFabricator.Mono.DeepDriller;
+using FCSTechFabricator.Mono.MarineTurbine;
 using FCSTechFabricator.Mono.PowerStorage;
 using FCSTechFabricator.Mono.SeaBreeze;
 using Harmony;
@@ -35,8 +36,19 @@ namespace FCSTechFabricator
                     var psKit = new PowerStorageKitBuildable();
                     psKit.Register();
 
+                    var ddKit = new DeepDrillerKitBuildable();
+                    ddKit.Register();
+                    ModTechTypes.DeepStorageKit = ddKit.TechType;
+
                     var ddBatteryModule = new BatteryAttachmentBuildable();
                     ddBatteryModule.Register();
+
+                    var jsKit = new JetStreamKitBuildable();
+                    jsKit.Register();
+                    ModTechTypes.JetStreamKit = jsKit.TechType;
+
+                    QuickLogger.Debug(ModTechTypes.JetStreamKit.ToString());
+
 
                     var ddSolarModule = new SolarAttachmentBuildable();
                     ddSolarModule.Register();
@@ -45,10 +57,13 @@ namespace FCSTechFabricator
                     ddFocusModule.Register();
 
                     FCSTechFabricatorBuildable.ItemsList.Add(freon);
+                    FCSTechFabricatorBuildable.ItemsList.Add(jsKit);
                     FCSTechFabricatorBuildable.ItemsList.Add(psKit);
                     FCSTechFabricatorBuildable.ItemsList.Add(ddFocusModule);
                     FCSTechFabricatorBuildable.ItemsList.Add(ddSolarModule);
                     FCSTechFabricatorBuildable.ItemsList.Add(ddBatteryModule);
+                    FCSTechFabricatorBuildable.ItemsList.Add(ddKit);
+
 
                     FCSTechFabricatorBuildable.PatchHelper();
 

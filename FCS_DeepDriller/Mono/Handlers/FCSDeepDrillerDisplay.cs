@@ -18,12 +18,9 @@ namespace FCS_DeepDriller.Mono.Handlers
     {
         private FCSDeepDrillerController _mono;
         private bool _initialized = true;
-
-        public Color colorEmpty = new Color(1f, 0f, 0f, 1f);
-
-        public Color colorHalf = new Color(1f, 1f, 0f, 1f);
-
-        public Color colorFull = new Color(0f, 1f, 0f, 1f);
+        private Color colorEmpty = new Color(1f, 0f, 0f, 1f);
+        private Color colorHalf = new Color(1f, 1f, 0f, 1f);
+        private Color colorFull = new Color(0f, 1f, 0f, 1f);
         private Text _s1Percent;
         private Image _s1Fill;
         private Text _s2Percent;
@@ -36,7 +33,7 @@ namespace FCS_DeepDriller.Mono.Handlers
         private Text _pageNumber;
         private List<InterfaceButton> OreButtons = new List<InterfaceButton>();
         private Text _focusBtnText;
-
+        private Text _healthPercentage;
 
         internal void Setup(FCSDeepDrillerController mono)
         {
@@ -49,6 +46,13 @@ namespace FCS_DeepDriller.Mono.Handlers
             }
             ITEMS_PER_PAGE = 5;
             DrawPage(1);
+            QuickLogger.Debug("Display has been set.");
+            InvokeRepeating("UpdateBatteryStatus", 1, 0.5f);
+        }
+
+        private void UpdateBatteryStatus()
+        {
+            _healthPercentage.text = $"{_mono.HealthManager.GetHealth()}%";
         }
 
         public override void ClearPage()
@@ -101,7 +105,7 @@ namespace FCS_DeepDriller.Mono.Handlers
                     UpdateListItems((TechType)tag);
                     break;
                 case "Focus":
-                    _mono.ToggleFocus();
+                    _mono.OreGenerator.ToggleFocus();
                     UpdateFocusStates();
                     break;
             }
@@ -112,12 +116,11 @@ namespace FCS_DeepDriller.Mono.Handlers
             if (_mono.GetFocusedState())
             {
                 _focusBtnText.text = FCSDeepDrillerBuildable.Focusing();
-
             }
             else
             {
                 _focusBtnText.text = FCSDeepDrillerBuildable.Focus();
-                RemoveFocusOnItems();
+                //RemoveFocusOnItems();
             }
         }
 
@@ -327,6 +330,8 @@ namespace FCS_DeepDriller.Mono.Handlers
             focusBTN.TextComponent = focusBtn.FindChild("Text").GetComponent<Text>();
 
             _focusBtnText = focusBtn.gameObject.GetComponentInChildren<Text>();
+
+            _healthPercentage = main.FindChild("Health_LBL").GetComponent<Text>();
             return true;
         }
 
@@ -439,7 +444,7 @@ namespace FCS_DeepDriller.Mono.Handlers
 
             float percent = charge / data.Battery.capacity;
 
-            QuickLogger.Debug($"P: {percent} | S: {data.Slot} | BDC {data.Battery.charge}");
+            //QuickLogger.Debug($"P: {percent} | S: {data.Slot} | BDC {data.Battery.charge}");
 
             if (data.Slot == EquipmentConfiguration.SlotIDs[0])
             {

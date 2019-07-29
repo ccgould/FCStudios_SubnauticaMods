@@ -17,5 +17,17 @@ namespace FCSTechFabricator.Models
             MaterialHelpers.ApplyNormalShader("Lava_Rock", "lava_rock_01_normal", prefab, QPatch.Bundle);
             #endregion
         }
+
+        /// <summary>
+        /// Applies the shader to the materials of the reactor
+        /// </summary>
+        /// <param name="prefab">The prefab to apply shaders.</param>
+        internal static void ApplyKitShaders(GameObject prefab)
+        {
+            MaterialHelpers.ApplyEmissionShader("UnitContainerKit_BaseColor", "UnitContainerKit_Emissive", prefab, QPatch.Bundle, new Color(0.08235294f, 1f, 1f));
+            MaterialHelpers.ApplyAlphaShader("UnitContainerKit_BaseColor", prefab);
+            MaterialHelpers.ApplyNormalShader("UnitContainerKit_BaseColor", "UnitContainerKit_Norm", prefab, QPatch.Bundle);
+            MaterialHelpers.ApplySpecShader("UnitContainerKit_BaseColor", "UnitContainerKit_Spec", prefab, 1f, 6f, QPatch.Bundle);
+        }
     }
 }

@@ -6,7 +6,7 @@ namespace FCSCommon.Objects
     {
         private static LiveMixinData _instance;
 
-        internal static LiveMixinData Get()
+        public static LiveMixinData Get()
         {
             if (_instance != null)
             {

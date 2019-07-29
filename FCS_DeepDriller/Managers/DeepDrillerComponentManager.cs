@@ -43,8 +43,6 @@ namespace FCS_DeepDriller.Managers
                 return false;
             }
 
-
-
             _focusModule.SetActive(false);
 
             #region Batteries

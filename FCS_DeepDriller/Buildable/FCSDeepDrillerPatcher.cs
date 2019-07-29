@@ -3,6 +3,7 @@ using FCS_DeepDriller.Mono;
 using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
+using FCSTechFabricator.Models;
 using Oculus.Newtonsoft.Json;
 using SMLHelper.V2.Crafting;
 using System.Collections.Generic;
@@ -17,8 +18,11 @@ namespace FCS_DeepDriller.Buildable
     internal partial class FCSDeepDrillerBuildable : Buildable
     {
         private static readonly FCSDeepDrillerBuildable Singleton = new FCSDeepDrillerBuildable();
-        public override TechGroup GroupForPDA { get; } = TechGroup.InteriorModules;
-        public override TechCategory CategoryForPDA { get; } = TechCategory.InteriorModule;
+        public override TechGroup GroupForPDA { get; } = TechGroup.ExteriorModules;
+        public override TechCategory CategoryForPDA { get; } = TechCategory.ExteriorModule;
+
+        public override TechType RequiredForUnlock { get; } = TechType.ExosuitDrillArmModule;
+
         public override string AssetsFolder { get; } = $"FCS_DeepDriller/Assets";
         public static DeepDrillerCfg DeepDrillConfig { get; internal set; }
 
@@ -82,7 +86,11 @@ namespace FCS_DeepDriller.Buildable
 
                 // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
                 var lwe = prefab.AddComponent<LargeWorldEntity>();
-                lwe.cellLevel = LargeWorldEntity.CellLevel.Far;
+                lwe.cellLevel = LargeWorldEntity.CellLevel.Global;
+
+                //var beacon = prefab.AddComponent<Beacon>();
+
+                //beacon.label = "DeepDriller";
 
                 prefab.AddComponent<PrefabIdentifier>().ClassId = this.ClassID;
                 prefab.AddComponent<FMOD_CustomLoopingEmitter>();
@@ -106,12 +114,7 @@ namespace FCS_DeepDriller.Buildable
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    //TODO Change to KIT
-                    new Ingredient(TechType.TitaniumIngot, 1),
-                    new Ingredient(TechType.Diamond, 2),
-                    new Ingredient(TechType.AdvancedWiringKit, 1),
-                    new Ingredient(TechType.Glass, 1),
-                    new Ingredient(TechType.Battery, 1)
+                    new Ingredient(ModTechTypes.DeepStorageKit, 1)
                 }
             };
             QuickLogger.Debug($"Created Ingredients");

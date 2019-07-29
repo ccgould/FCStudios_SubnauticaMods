@@ -1,10 +1,12 @@
 ﻿using FCSCommon.Utilities;
 using FCSTechFabricator.Abstract_Classes;
+using FCSTechFabricator.Models;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace FCSTechFabricator.Mono.DeepDriller
 {
@@ -12,21 +14,36 @@ namespace FCSTechFabricator.Mono.DeepDriller
     {
         private TechGroup GroupForPDA = TechGroup.Resources;
         private TechCategory CategoryForPDA = TechCategory.AdvancedMaterials;
+        private GameObject _prefab;
+        private Text _label;
 
-        public BatteryAttachmentBuildable() : base("BatteryAttachment_DD", "Battery Attachment")
+
+        public BatteryAttachmentBuildable() : base("BatteryAttachment_DD", "Deep Driller Battery Attachment")
         {
 
         }
 
         public override GameObject GetGameObject()
         {
-            GameObject prefab = GameObject.Instantiate<GameObject>(QPatch.BatteryModule);
+            GameObject prefab = GameObject.Instantiate<GameObject>(this._prefab);
+
             prefab.name = this.PrefabFileName;
+
+            if (!FindAllComponents(prefab))
+            {
+                QuickLogger.Error("Failed to get all components");
+                return null;
+            }
+
+            var model = prefab.GetComponentInChildren<Canvas>().gameObject;
+            model.FindChild("Screen").SetActive(true);
+
+            _label.text = FriendlyName_I;
 
             // Make the object drop slowly in water
             var wf = prefab.AddComponent<WorldForces>();
             wf.underwaterGravity = 0;
-            wf.underwaterDrag = 20f;
+            wf.underwaterDrag = 10f;
             wf.enabled = true;
 
             // Add fabricating animation
@@ -37,10 +54,14 @@ namespace FCSTechFabricator.Mono.DeepDriller
             fabricatingA.eulerOffset = new Vector3(0f, 0f, 0f);
             fabricatingA.scaleFactor = 1.0f;
 
-            // Set proper shaders (for crafting animation)
-            Shader marmosetUber = Shader.Find("MarmosetUBER");
+            PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
+
+            prefabID.ClassId = this.ClassID;
+
+            //// Set proper shaders (for crafting animation)
+            //Shader marmosetUber = Shader.Find("MarmosetUBER");
             var renderer = prefab.GetComponentInChildren<Renderer>();
-            renderer.material.shader = marmosetUber;
+            //renderer.material.shader = marmosetUber;
 
             // Update sky applier
             var applier = prefab.GetComponent<SkyApplier>();
@@ -54,13 +75,34 @@ namespace FCSTechFabricator.Mono.DeepDriller
             pickupable.isPickupable = true;
             pickupable.randomizeRotationWhenDropped = true;
 
-            PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
-            prefabID.ClassId = this.ClassID;
+            // Set collider
+            var collider = prefab.GetComponent<BoxCollider>();
+
+            var placeTool = prefab.AddComponent<PlaceTool>();
+            placeTool.allowedInBase = true;
+            placeTool.allowedOnBase = false;
+            placeTool.allowedOnCeiling = false;
+            placeTool.allowedOnConstructable = true;
+            placeTool.allowedOnGround = true;
+            placeTool.allowedOnRigidBody = true;
+            placeTool.allowedOnWalls = false;
+            placeTool.allowedOutside = false;
+            placeTool.rotationEnabled = true;
+            placeTool.enabled = true;
+            placeTool.hasAnimations = false;
+            placeTool.hasBashAnimation = false;
+            placeTool.hasFirstUseAnimation = false;
+            placeTool.mainCollider = collider;
+            placeTool.pickupable = pickupable;
+            placeTool.drawTime = 0.5f;
+            placeTool.dropTime = 1;
+            placeTool.holsterTime = 0.35f;
 
             var techTag = prefab.AddComponent<TechTag>();
             techTag.type = this.TechType;
 
             prefab.AddComponent<FCSTechFabricatorTag>();
+
             return prefab;
         }
 
@@ -78,31 +120,33 @@ namespace FCSTechFabricator.Mono.DeepDriller
                     new Ingredient(TechType.Titanium, 1),
                 }
             };
+
             return customFabRecipe;
         }
 
         public override void Register()
         {
-            if (QPatch.BatteryModule != null)
+            if (GetPrefabs())
             {
                 if (this.IsRegistered == false)
                 {
+                    ClassID_I = this.ClassID;
+
                     //Create a new TechType
                     this.TechType = TechTypeHandler.AddTechType(ClassID, PrefabFileName, "This specially made attachment allows you to run your deep driller off battery power", new Atlas.Sprite(ImageUtils.LoadTextureFromFile($"./QMods/FCSTechFabricator/Assets/{ClassID}.png")));
-
-                    FriendlyName_I = this.PrefabFileName;
-
-                    TechTypeID = TechType;
-
-                    ClassID_I = this.ClassID;
-                    QuickLogger.Debug($"Class Id = {ClassID_I}");
 
                     CraftDataHandler.SetTechData(TechType, GetBlueprintRecipe());
 
                     CraftDataHandler.AddToGroup(this.GroupForPDA, this.CategoryForPDA, this.TechType);
 
+                    QuickLogger.Debug($"Class Id = {ClassID_I}");
+
+                    FriendlyName_I = this.PrefabFileName;
+
+                    TechTypeID = TechType;
+
                     // Add the new TechType to Hand Equipment type.
-                    CraftDataHandler.SetEquipmentType(TechType, EquipmentType.PowerCellCharger);
+                    CraftDataHandler.SetEquipmentType(TechType, EquipmentType.Hand);
 
                     PrefabHandler.RegisterPrefab(this);
 
@@ -111,9 +155,38 @@ namespace FCSTechFabricator.Mono.DeepDriller
             }
             else
             {
-                QuickLogger.Error("Failed to get the BatteryModulePrefab");
+                QuickLogger.Error("Failed to get the Kit Prefab");
             }
         }
 
+        public bool GetPrefabs()
+        {
+            QuickLogger.Debug($"AssetBundle Set");
+
+            //We have found the asset bundle and now we are going to continue by looking for the model.
+            _prefab = QPatch.Kit;
+
+            //If the prefab isn't null lets add the shader to the materials
+            if (_prefab != null)
+            {
+                //Lets apply the material shader
+                Shaders.ApplyKitShaders(_prefab);
+            }
+
+            return true;
+        }
+
+        private bool FindAllComponents(GameObject prefab)
+        {
+            var canvasObject = prefab.GetComponentInChildren<Canvas>().gameObject;
+            if (canvasObject == null)
+            {
+                QuickLogger.Error("Could not find the canvas");
+                return false;
+            }
+
+            _label = canvasObject.FindChild("Screen").FindChild("Label").GetComponent<Text>();
+            return true;
+        }
     }
 }

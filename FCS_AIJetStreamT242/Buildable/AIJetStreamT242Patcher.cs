@@ -3,10 +3,11 @@ using FCS_AIMarineTurbine.Configuration;
 using FCS_AIMarineTurbine.Display.Patching;
 using FCS_AIMarineTurbine.Mono;
 using FCSCommon.Components;
-using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
+using FCSTechFabricator.Models;
 using Oculus.Newtonsoft.Json;
+using SMLHelper.V2.Handlers;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -63,7 +64,7 @@ namespace FCS_AIMarineTurbine.Buildable
 
                 var model = prefab.FindChild("model");
 
-                SkyApplier skyApplier = prefab.GetOrAddComponent<SkyApplier>();
+                SkyApplier skyApplier = prefab.AddComponent<SkyApplier>();
                 skyApplier.renderers = model.GetComponentsInChildren<MeshRenderer>();
                 skyApplier.anchorSky = Skies.Auto;
 
@@ -72,7 +73,7 @@ namespace FCS_AIMarineTurbine.Buildable
                 QuickLogger.Debug("Adding Constructible");
 
                 // Add constructible
-                var constructable = prefab.GetOrAddComponent<Constructable>();
+                var constructable = prefab.AddComponent<Constructable>();
                 constructable.allowedOnWall = false;
                 constructable.allowedOnGround = true;
                 constructable.allowedInSub = false;
@@ -90,15 +91,15 @@ namespace FCS_AIMarineTurbine.Buildable
                 PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
                 prefabID.ClassId = this.ClassID;
 
-                prefab.GetOrAddComponent<BeaconController>();
+                prefab.AddComponent<BeaconController>();
 
-                prefab.GetOrAddComponent<AIJetStreamT242PowerManager>();
+                prefab.AddComponent<AIJetStreamT242PowerManager>();
 
-                prefab.GetOrAddComponent<AIJetStreamT242HealthManager>();
+                prefab.AddComponent<AIJetStreamT242HealthManager>();
 
-                prefab.GetOrAddComponent<AIJetStreamT242AnimationManager>();
+                prefab.AddComponent<AIJetStreamT242AnimationManager>();
 
-                prefab.GetOrAddComponent<AIJetStreamT242Controller>();
+                prefab.AddComponent<AIJetStreamT242Controller>();
 
             }
             catch (Exception e)
@@ -111,6 +112,14 @@ namespace FCS_AIMarineTurbine.Buildable
 
         protected override TechData GetBlueprintRecipe()
         {
+            bool otherModIsInstalled = TechTypeHandler.TryGetModdedTechType("JetStreamT242Kit_MT", out TechType JetStreamT242Kit_MT);
+
+            if (!otherModIsInstalled)
+            {
+                QuickLogger.Error("Couldn't find Marine Turbines Kit Tech Type");
+                return null;
+            }
+
             QuickLogger.Debug($"Creating recipe...");
             // Create and associate recipe to the new TechType
             var customFabRecipe = new TechData()
@@ -118,15 +127,11 @@ namespace FCS_AIMarineTurbine.Buildable
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(TechType.TitaniumIngot, 1),
-                    new Ingredient(TechType.CopperWire, 1),
-                    new Ingredient(TechType.ComputerChip, 1),
-                    new Ingredient(TechType.AdvancedWiringKit, 1),
-                    new Ingredient(TechType.Glass, 1),
-                    new Ingredient(TechType.FiberMesh, 2),
-                    new Ingredient(TechType.Lubricant, 2),
+                    new Ingredient(JetStreamT242Kit_MT, 1)
                 }
             };
+
+            QuickLogger.Debug(ModTechTypes.JetStreamKit.ToString());
             QuickLogger.Debug($"Created Ingredients");
             return customFabRecipe;
         }

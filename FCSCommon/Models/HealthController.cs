@@ -1,5 +1,6 @@
 ﻿using FCSCommon.Objects;
 using FCSCommon.Utilities;
+using System;
 using UnityEngine;
 
 namespace FCSCommon.Models.Components
@@ -8,13 +9,15 @@ namespace FCSCommon.Models.Components
     public class HealthController : MonoBehaviour
     {
         public LiveMixin LiveMixin { get; set; }
+        public Action OnDamaged { get; set; }
+        public Action OnRepaired { get; set; }
 
         /// <summary>
         /// This is the first thing to set before using this controller.
         /// If no live mixing data in supplied it will use the default live mixing data in <see cref="CustomLiveMixinData.Get"/>
         /// </summary>
         /// <param name="liveMixinData"></param>
-        public void Startup(LiveMixin liveMixin, LiveMixinData liveMixinData)
+        public void Initialize(LiveMixin liveMixin, LiveMixinData liveMixinData)
         {
             if (liveMixin == null)
             {
@@ -36,8 +39,32 @@ namespace FCSCommon.Models.Components
                 LiveMixin.data = liveMixinData;
             }
 
-
+            //InvokeRepeating("HealthChecks", 0, 1);
         }
+
+        public void HealthChecks() // In and InvokeRepeating
+        {
+            try
+            {
+                if (GetHealth() >= 1f && IsDamagedFlag)
+                {
+                    IsDamagedFlag = false;
+                    OnRepaired?.Invoke();
+                }
+
+                if (GetHealth() <= 0f && !IsDamagedFlag)
+                {
+                    IsDamagedFlag = true;
+                    OnDamaged?.Invoke();
+                }
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error(e.Message);
+            }
+        }
+
+        public bool IsDamagedFlag { get; set; }
 
         public float GetHealth()
         {

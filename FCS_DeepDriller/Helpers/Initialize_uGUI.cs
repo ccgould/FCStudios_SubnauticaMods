@@ -78,24 +78,38 @@ namespace FCS_DeepDriller.Helpers
                         {
                             int.TryParse(item.Key.Substring(18), out int slotNum);
 
-                            if (slotNum == 1)
+                            switch (slotNum)
                             {
-                                item.Value.rectTransform.anchoredPosition = slotPos[3];
-                            }
-                            else if (slotNum == 2)
-                            {
-                                item.Value.rectTransform.anchoredPosition = slotPos[5];
-                            }
-                            else if (slotNum == 3)
-                            {
-                                item.Value.rectTransform.anchoredPosition = slotPos[9];
-                            }
-                            else if (slotNum == 4)
-                            {
-                                item.Value.rectTransform.anchoredPosition = slotPos[11];
+                                case 1:
+                                    item.Value.rectTransform.anchoredPosition = slotPos[3];
+                                    break;
+                                case 2:
+                                    item.Value.rectTransform.anchoredPosition = slotPos[5];
+                                    break;
+                                case 3:
+                                    item.Value.rectTransform.anchoredPosition = slotPos[9];
+                                    break;
+                                case 4:
+                                    item.Value.rectTransform.anchoredPosition = slotPos[11];
+                                    break;
                             }
 
                             //item.Value.rectTransform.anchoredPosition = slotPos[slotNum - 1];
+                        }
+
+                        if (item.Value.name.StartsWith("HDD"))
+                        {
+                            int.TryParse(item.Key.Substring(17), out int slotNum);
+
+                            switch (slotNum)
+                            {
+                                case 1:
+                                    item.Value.rectTransform.anchoredPosition = slotPos[5];
+                                    break;
+                                case 2:
+                                    item.Value.rectTransform.anchoredPosition = slotPos[8];
+                                    break;
+                            }
                         }
                     }
                     catch

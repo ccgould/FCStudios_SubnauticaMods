@@ -9,10 +9,17 @@ namespace FCS_DeepDriller.Managers
     {
         internal static List<TechType> GetBiomeData(string biome)
         {
+            QuickLogger.Debug("Finding Biome Data.");
+
             foreach (var biomeOre in FCSDeepDrillerBuildable.DeepDrillConfig.BiomeOresTechType)
             {
+                QuickLogger.Debug($"Comparing {biomeOre.Key}");
+                QuickLogger.Debug($" To {biome.ToLower()}");
+
                 if (biomeOre.Key == biome.ToLower())
                 {
+                    QuickLogger.Debug("Found Biome Data.");
+
                     return biomeOre.Value;
                 }
             }
@@ -31,7 +38,7 @@ namespace FCS_DeepDriller.Managers
             if (string.IsNullOrEmpty(match))
             {
                 QuickLogger.Debug($"Biome {curBiome} not found! Setting biome to none");
-                biome = "none";
+                biome = NoneString;
             }
             else
             {
@@ -40,6 +47,8 @@ namespace FCS_DeepDriller.Managers
 
             return biome;
         }
+
+        internal static string NoneString { get; } = "none";
 
         private static string FindMatchingBiome(string biome)
         {

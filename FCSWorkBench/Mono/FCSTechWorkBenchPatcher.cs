@@ -63,6 +63,12 @@ namespace FCSTechFabricator.Mono
                     QuickLogger.Debug($"Added {item.ClassID_I} to nodes");
                     AddTabNodes(ref root, ref itemTab, item, "DeepDriller", "DDIcon");
                 }
+
+                if (item.ClassID_I.EndsWith("_MT"))
+                {
+                    QuickLogger.Debug($"Added {item.ClassID_I} to nodes");
+                    AddTabNodes(ref root, ref itemTab, item, "Marine Turbine", "MTIcon");
+                }
             }
         }
 

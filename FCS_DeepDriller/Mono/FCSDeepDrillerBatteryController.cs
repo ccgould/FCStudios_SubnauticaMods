@@ -52,8 +52,13 @@ namespace FCS_DeepDriller.Mono
 
         internal void AddMoreSlots()
         {
-            _equipment.AddSlots(EquipmentConfiguration.SlotIDs);
-            QuickLogger.Debug($"Added slots");
+            foreach (var slotID in EquipmentConfiguration.SlotIDs)
+            {
+                if (!slotID.StartsWith("DD")) continue;
+                _equipment.AddSlot(slotID);
+                QuickLogger.Debug($"Added slot {slotID}");
+            }
+
         }
 
         private bool IsAllowedToRemove(Pickupable pickupable, bool verbose)
@@ -150,9 +155,12 @@ namespace FCS_DeepDriller.Mono
             for (int i = 0; i < EquipmentConfiguration.SlotIDs.Length; i++)
             {
                 QuickLogger.Debug($" Checking battery {i + 1}");
-                if (DeepDrillerComponentManager.GetBatteryCellModel(i + 1).activeSelf)
+                if (DeepDrillerComponentManager.GetBatteryCellModel(i + 1) != null)
                 {
-                    return true;
+                    if (DeepDrillerComponentManager.GetBatteryCellModel(i + 1).activeSelf)
+                    {
+                        return true;
+                    }
                 }
             }
 

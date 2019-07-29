@@ -1,5 +1,6 @@
 ﻿using FCSCommon.Extensions;
 using FCSCommon.Objects;
+using FCSCommon.Utilities;
 using Oculus.Newtonsoft.Json;
 using System.Collections.Generic;
 
@@ -32,7 +33,7 @@ namespace FCS_DeepDriller.Configuration
                 {
                     types.Add(sTechType.ToTechType());
                 }
-
+                QuickLogger.Debug($"Added {biomeOre.Key} to BiomeOresTechType");
                 BiomeOresTechType.Add(biomeOre.Key, types);
             }
 

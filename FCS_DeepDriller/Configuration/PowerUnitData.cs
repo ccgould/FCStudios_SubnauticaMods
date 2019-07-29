@@ -34,11 +34,16 @@ namespace FCS_DeepDriller.Configuration
         {
             var go = new GameObject("DD_SolarBattery");
             var solarB = go.AddComponent<Battery>();
-
+            go.AddComponent<PrefabIdentifier>();
             solarB._capacity = capacity;
             solarB._charge = charge;
 
             Battery = solarB.GetComponent<IBattery>();
+
+            if (Battery == null)
+            {
+                QuickLogger.Error("Solar Battery is null");
+            }
 
             QuickLogger.Debug("Created Solar Battery for Deep Driller");
         }

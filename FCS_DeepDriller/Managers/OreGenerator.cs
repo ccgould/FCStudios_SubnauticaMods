@@ -50,9 +50,10 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers.Logic
 
         private void Update()
         {
+            QuickLogger.Debug($"PassedTime = {_passedTime} || AllowedOres = {AllowedOres.Count} || IsFocused {_isFocused} || Focus {_focus} || Allow Tick {_allowTick}");
+
             if (_allowTick)
             {
-                // QuickLogger.Debug($"PassedTime = {_passedTime} || AllowedOres = {AllowedOres?.Count}");
 
                 if (_minTime <= 0 || _maxTime <= 0)
                 {
@@ -86,10 +87,11 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers.Logic
                 var index = _random2.Next(AllowedOres.Count);
                 item = AllowedOres[index];
                 OnAddCreated?.Invoke(item);
+                QuickLogger.Debug($"Spawning focus item {item}", true);
+
             }
             else
             {
-
                 item = _focus;
 
                 if (_focus != TechType.None)
@@ -97,10 +99,8 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers.Logic
                     OnAddCreated?.Invoke(item);
                 }
 
-                QuickLogger.Debug($"Spawning focus item {_focus}");
+                QuickLogger.Debug($"Spawning focus item {_focus}", true);
             }
-
-
 
             _randomTime = _random.Next(_minTime, _maxTime);
             QuickLogger.Debug($"New Time Goal: {_randomTime}");
@@ -141,6 +141,11 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers.Logic
             _isFocused ^= true;
 
             QuickLogger.Debug(_isFocused ? $"Setting focus item {_focus}" : $"Disabling focus.", true);
+        }
+
+        internal void SetIsFocus(bool dataIsFocused)
+        {
+            _isFocused = dataIsFocused;
         }
     }
 }

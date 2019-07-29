@@ -9,10 +9,9 @@ namespace FCS_DeepDriller.Configuration
 {
     public class DeepDrillerPowerData
     {
-        public PowerUnitData Solar { get; set; } = new PowerUnitData();
+        internal PowerUnitData Solar { get; set; } = new PowerUnitData();
 
-        public List<PowerUnitData> Batteries { get; set; } = new List<PowerUnitData>(4);
-
+        internal List<PowerUnitData> Batteries { get; set; } = new List<PowerUnitData>(4);
 
         internal float GetCharge(DeepDrillModules module)
         {
@@ -37,6 +36,18 @@ namespace FCS_DeepDriller.Configuration
 
         internal void SetSolarCharge(float charge)
         {
+            if (Solar == null)
+            {
+                QuickLogger.Error("Solar is null");
+                return;
+            }
+
+            if (Solar.Battery == null)
+            {
+                QuickLogger.Error("Solar Battery  is null");
+                return;
+            }
+
             Solar.Battery.charge = charge;
         }
 
@@ -97,8 +108,6 @@ namespace FCS_DeepDriller.Configuration
 
         internal void DestroyPower(DeepDrillModules module)
         {
-            var powerDraw = FCSDeepDrillerBuildable.DeepDrillConfig.PowerDraw;
-
             switch (module)
             {
                 case DeepDrillModules.Battery:
@@ -116,7 +125,7 @@ namespace FCS_DeepDriller.Configuration
 
         internal float GetCapacity(DeepDrillModules module)
         {
-            QuickLogger.Debug($"Module: {module}");
+            //QuickLogger.Debug($"Module: {module}");
 
             switch (module)
             {

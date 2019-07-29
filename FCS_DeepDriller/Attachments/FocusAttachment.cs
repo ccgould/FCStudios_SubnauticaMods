@@ -26,7 +26,7 @@ namespace FCS_DeepDriller.Attachments
 
             // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
             var lwe = _focusModule.AddComponent<LargeWorldEntity>();
-            lwe.cellLevel = LargeWorldEntity.CellLevel.Far;
+            lwe.cellLevel = LargeWorldEntity.CellLevel.Global;
 
             _focusModule.SetActive(false);
 

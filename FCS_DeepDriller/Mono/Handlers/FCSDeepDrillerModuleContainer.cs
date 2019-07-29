@@ -19,14 +19,6 @@ namespace FCS_DeepDriller.Mono.Handlers
         private Equipment _equipment;
         private bool _powerModuleAttached;
 
-
-        internal static readonly string[] SlotIDs = new string[2]
-        {
-            "PowerCellCharger1",
-            "PowerCellCharger2",
-        };
-
-
         internal void Setup(FCSDeepDrillerController mono)
         {
             _mono = mono;
@@ -45,8 +37,8 @@ namespace FCS_DeepDriller.Mono.Handlers
             _equipment.compatibleSlotDelegate = CompatibleSlotDelegate;
             _equipment.onEquip += OnEquipmentAdded;
             _equipment.onUnequip += OnEquipmentRemoved;
-            _equipment.AddSlot(SlotIDs[0]);
-            _equipment.AddSlot(SlotIDs[1]);
+            _equipment.AddSlot(EquipmentConfiguration.SlotIDs[4]);
+            _equipment.AddSlot(EquipmentConfiguration.SlotIDs[5]);
         }
 
         private bool IsAllowedToRemove(Pickupable pickupable, bool verbose)
@@ -112,16 +104,16 @@ namespace FCS_DeepDriller.Mono.Handlers
             bool result = false;
             module = DeepDrillModules.None;
 
-            for (int i = 0; i < SlotIDs.Length; i++)
+            for (int i = 0; i < EquipmentConfiguration.SlotIDs.Length; i++)
             {
-                if (_equipment.GetTechTypeInSlot(SlotIDs[i]) == TechTypeHelpers.BatteryAttachmentTechType())
+                if (_equipment.GetTechTypeInSlot(EquipmentConfiguration.SlotIDs[i]) == TechTypeHelpers.BatteryAttachmentTechType())
                 {
                     module = DeepDrillModules.Battery;
                     result = true;
                     break;
                 }
 
-                if (_equipment.GetTechTypeInSlot(SlotIDs[i]) == TechTypeHelpers.SolarAttachmentTechType())
+                if (_equipment.GetTechTypeInSlot(EquipmentConfiguration.SlotIDs[i]) == TechTypeHelpers.SolarAttachmentTechType())
                 {
                     module = DeepDrillModules.Solar;
                     result = true;
@@ -179,12 +171,12 @@ namespace FCS_DeepDriller.Mono.Handlers
         {
             var data = new List<SlotData>();
 
-            var slot1 = _equipment.GetTechTypeInSlot(SlotIDs[0]);
-            var slot2 = _equipment.GetTechTypeInSlot(SlotIDs[1]);
+            var slot1 = _equipment.GetTechTypeInSlot(EquipmentConfiguration.SlotIDs[4]);
+            var slot2 = _equipment.GetTechTypeInSlot(EquipmentConfiguration.SlotIDs[5]);
 
-            data.Add(new SlotData { Module = slot1, Slot = SlotIDs[0] });
+            data.Add(new SlotData { Module = slot1, Slot = EquipmentConfiguration.SlotIDs[4] });
 
-            data.Add(new SlotData { Module = slot2, Slot = SlotIDs[1] });
+            data.Add(new SlotData { Module = slot2, Slot = EquipmentConfiguration.SlotIDs[5] });
 
             return data;
         }
@@ -203,9 +195,9 @@ namespace FCS_DeepDriller.Mono.Handlers
         {
             bool result = false;
 
-            for (int i = 0; i < SlotIDs.Length; i++)
+            for (int i = 0; i < EquipmentConfiguration.SlotIDs.Length; i++)
             {
-                if (_equipment.GetTechTypeInSlot(SlotIDs[i]) != TechTypeHelpers.SolarAttachmentTechType()) continue;
+                if (_equipment.GetTechTypeInSlot(EquipmentConfiguration.SlotIDs[i]) != TechTypeHelpers.SolarAttachmentTechType()) continue;
                 result = true;
                 break;
             }
@@ -217,15 +209,15 @@ namespace FCS_DeepDriller.Mono.Handlers
         {
             var module = DeepDrillModules.None;
 
-            for (int i = 0; i < SlotIDs.Length; i++)
+            for (int i = 0; i < EquipmentConfiguration.SlotIDs.Length; i++)
             {
-                if (_equipment.GetTechTypeInSlot(SlotIDs[i]) == TechTypeHelpers.BatteryAttachmentTechType())
+                if (_equipment.GetTechTypeInSlot(EquipmentConfiguration.SlotIDs[i]) == TechTypeHelpers.BatteryAttachmentTechType())
                 {
                     module = DeepDrillModules.Battery;
                     break;
                 }
 
-                if (_equipment.GetTechTypeInSlot(SlotIDs[i]) == TechTypeHelpers.SolarAttachmentTechType())
+                if (_equipment.GetTechTypeInSlot(EquipmentConfiguration.SlotIDs[i]) == TechTypeHelpers.SolarAttachmentTechType())
                 {
                     module = DeepDrillModules.Solar;
                     break;

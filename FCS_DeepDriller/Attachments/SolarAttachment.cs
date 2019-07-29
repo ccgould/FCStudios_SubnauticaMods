@@ -24,6 +24,10 @@ namespace FCS_DeepDriller.Attachments
 
             var rb = _solarModule.GetComponent<Rigidbody>();
 
+            // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
+            var lwe = _solarModule.AddComponent<LargeWorldEntity>();
+            lwe.cellLevel = LargeWorldEntity.CellLevel.Global;
+
             DestroyObject(rb);
 
             var solarController = _solarModule.AddComponent<FCSDeepDrillerSolarController>();

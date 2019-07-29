@@ -8,9 +8,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace FCSTechFabricator.Mono.PowerStorage
+namespace FCSTechFabricator.Mono.MarineTurbine
 {
-    public partial class SolarAttachmentBuildable : FCSTechFabricatorItem
+    public class JetStreamKitBuildable : FCSTechFabricatorItem
     {
         private TechGroup GroupForPDA = TechGroup.Resources;
         private TechCategory CategoryForPDA = TechCategory.AdvancedMaterials;
@@ -18,7 +18,7 @@ namespace FCSTechFabricator.Mono.PowerStorage
         private Text _label;
 
 
-        public SolarAttachmentBuildable() : base("SolarAttachment_DD", "Deep Driller Solar Attachment")
+        public JetStreamKitBuildable() : base("JetStreamT242Kit_MT", "Jet Stream T242 Kit")
         {
 
         }
@@ -101,8 +101,6 @@ namespace FCSTechFabricator.Mono.PowerStorage
             var techTag = prefab.AddComponent<TechTag>();
             techTag.type = this.TechType;
 
-            prefab.AddComponent<FCSTechFabricatorTag>();
-
             return prefab;
         }
 
@@ -114,10 +112,13 @@ namespace FCSTechFabricator.Mono.PowerStorage
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(TechType.Copper, 1),
-                    new Ingredient(TechType.Glass, 2),
-                    new Ingredient(TechType.WiringKit, 1),
-                    new Ingredient(TechType.Titanium, 1),
+                    new Ingredient(TechType.TitaniumIngot, 1),
+                    new Ingredient(TechType.CopperWire, 1),
+                    new Ingredient(TechType.ComputerChip, 1),
+                    new Ingredient(TechType.AdvancedWiringKit, 1),
+                    new Ingredient(TechType.Glass, 1),
+                    new Ingredient(TechType.FiberMesh, 2),
+                    new Ingredient(TechType.Lubricant, 2),
                 }
             };
 
@@ -133,7 +134,7 @@ namespace FCSTechFabricator.Mono.PowerStorage
                     ClassID_I = this.ClassID;
 
                     //Create a new TechType
-                    this.TechType = TechTypeHandler.AddTechType(ClassID, PrefabFileName, "This specially made attachment allows you to run your deep driller off solar power.", new Atlas.Sprite(ImageUtils.LoadTextureFromFile($"./QMods/FCSTechFabricator/Assets/{ClassID}.png")));
+                    this.TechType = TechTypeHandler.AddTechType(ClassID, PrefabFileName, "A kit that allows you to build one Jet Stream T242 Unit", new Atlas.Sprite(ImageUtils.LoadTextureFromFile($"./QMods/FCSTechFabricator/Assets/Kit_FCS.png")));
 
                     CraftDataHandler.SetTechData(TechType, GetBlueprintRecipe());
 

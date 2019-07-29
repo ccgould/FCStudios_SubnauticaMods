@@ -95,7 +95,12 @@
   <ItemGroup>
     <Folder Include="Tree\" />
   </ItemGroup>
-  <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />
+  <ItemGroup>
+    <ProjectReference Include="..\FCSWorkBench\FCSTechFabricator.csproj">
+      <Project>{b947909c-4983-4749-93ac-73ea69f6dce8}</Project>
+      <Name>FCSTechFabricator</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>xcopy "$(ProjectDir)bin\$(Configuration)\FCS_AIMarineTurbine.dll" "F:\Program Files\Epic Games\Subnautica\QMods\FCSAIMarineTurbine\" /Y /I</PostBuildEvent>
