@@ -54,7 +54,7 @@ namespace FCSTechFabricator.Mono.SeaBreeze
                     ClassID_I = this.ClassID;
 
                     //Create a new TechType
-                    this.TechType = TechTypeHandler.AddTechType(ClassID, PrefabFileName, "Freon gives you two weeks of SeaBreeze cooling on Planet 4546B.", new Atlas.Sprite(ImageUtils.LoadTextureFromFile($"./QMods/FCSTechFabricator/Assets/{ClassID}.png")));
+                    this.TechType = TechTypeHandler.AddTechType(ClassID, PrefabFileName, "Freon gives you four weeks of SeaBreeze cooling on Planet 4546B.", new Atlas.Sprite(ImageUtils.LoadTextureFromFile($"./QMods/FCSTechFabricator/Assets/{ClassID}.png")));
 
                     CraftDataHandler.SetTechData(TechType, GetBlueprintRecipe());
 

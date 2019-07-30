@@ -222,8 +222,7 @@ namespace FCS_DeepDriller.Mono
 
             BitDamageState = Animator.StringToHash("BitDamageState");
 
-
-            TechTypeHelpers.Initialize();
+            TechTypeHelper.Initialize();
 
             _prefabId = GetComponentInParent<PrefabIdentifier>();
 
@@ -288,7 +287,7 @@ namespace FCS_DeepDriller.Mono
 
         private void OnLavaRaised(bool value)
         {
-            VFXManagerHandler.UpdateVFX();
+            //VFXManagerHandler.UpdateVFX();
         }
 
         private void OnDamaged()

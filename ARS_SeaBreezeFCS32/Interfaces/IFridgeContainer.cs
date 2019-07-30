@@ -11,6 +11,8 @@ namespace ARS_SeaBreezeFCS32.Interfaces
 
         List<EatableEntities> FridgeItems { get; }
 
+        Dictionary<TechType, int> TrackedItems { get; }
+
         void OpenStorage();
 
         int GetTechTypeAmount(TechType techType);

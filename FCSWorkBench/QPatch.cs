@@ -30,40 +30,7 @@ namespace FCSTechFabricator
             {
                 if (GetPrefabs())
                 {
-                    var freon = new FreonBuildable();
-                    freon.Register();
-
-                    var psKit = new PowerStorageKitBuildable();
-                    psKit.Register();
-
-                    var ddKit = new DeepDrillerKitBuildable();
-                    ddKit.Register();
-                    ModTechTypes.DeepStorageKit = ddKit.TechType;
-
-                    var ddBatteryModule = new BatteryAttachmentBuildable();
-                    ddBatteryModule.Register();
-
-                    var jsKit = new JetStreamKitBuildable();
-                    jsKit.Register();
-                    ModTechTypes.JetStreamKit = jsKit.TechType;
-
-                    QuickLogger.Debug(ModTechTypes.JetStreamKit.ToString());
-
-
-                    var ddSolarModule = new SolarAttachmentBuildable();
-                    ddSolarModule.Register();
-
-                    var ddFocusModule = new FocusAttachmentBuildable();
-                    ddFocusModule.Register();
-
-                    FCSTechFabricatorBuildable.ItemsList.Add(freon);
-                    FCSTechFabricatorBuildable.ItemsList.Add(jsKit);
-                    FCSTechFabricatorBuildable.ItemsList.Add(psKit);
-                    FCSTechFabricatorBuildable.ItemsList.Add(ddFocusModule);
-                    FCSTechFabricatorBuildable.ItemsList.Add(ddSolarModule);
-                    FCSTechFabricatorBuildable.ItemsList.Add(ddBatteryModule);
-                    FCSTechFabricatorBuildable.ItemsList.Add(ddKit);
-
+                    RegisterItems();
 
                     FCSTechFabricatorBuildable.PatchHelper();
 
@@ -84,6 +51,41 @@ namespace FCSTechFabricator
             {
                 QuickLogger.Error(ex);
             }
+        }
+
+        private static void RegisterItems()
+        {
+            var freon = new FreonBuildable();
+            freon.Register();
+            FCSTechFabricatorBuildable.ItemsList.Add(freon);
+
+            var psKit = new PowerStorageKitBuildable();
+            psKit.Register();
+            FCSTechFabricatorBuildable.ItemsList.Add(psKit);
+
+            var ddKit = new DeepDrillerKitBuildable();
+            ddKit.Register();
+            FCSTechFabricatorBuildable.ItemsList.Add(ddKit);
+
+            var ddBatteryModule = new BatteryAttachmentBuildable();
+            ddBatteryModule.Register();
+            FCSTechFabricatorBuildable.ItemsList.Add(ddBatteryModule);
+
+            var jsKit = new JetStreamKitBuildable();
+            jsKit.Register();
+            FCSTechFabricatorBuildable.ItemsList.Add(jsKit);
+
+            var ddSolarModule = new SolarAttachmentBuildable();
+            ddSolarModule.Register();
+            FCSTechFabricatorBuildable.ItemsList.Add(ddSolarModule);
+
+            var ddFocusModule = new FocusAttachmentBuildable();
+            ddFocusModule.Register();
+            FCSTechFabricatorBuildable.ItemsList.Add(ddFocusModule);
+
+            var sbKit = new SeaBreezeKitBuildable();
+            sbKit.Register();
+            FCSTechFabricatorBuildable.ItemsList.Add(sbKit);
         }
 
         public static bool GetPrefabs()

@@ -42,6 +42,9 @@ namespace ARS_SeaBreezeFCS32.Mono
         /// Items in the fridge
         /// </summary>
         public List<EatableEntities> FridgeItems => _fridgeContainer?.FridgeItems;
+
+        public Dictionary<TechType, int> TrackedItems => _fridgeContainer?.TrackedItems;
+
         /// <summary>
         /// If the gameobject is costructed
         /// </summary>

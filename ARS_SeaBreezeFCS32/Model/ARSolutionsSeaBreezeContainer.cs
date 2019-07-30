@@ -14,19 +14,15 @@ namespace ARS_SeaBreezeFCS32.Model
     {
         public bool IsFull { get; }
         public int NumberOfItems => FridgeItems.Count;
-
         private const int ContainerWidth = 6;
-
         private const int ContainerHeight = 8;
-
         private readonly ItemsContainer _fridgeContainer = null;
-
         private readonly ChildObjectIdentifier _containerRoot = null;
-
+        public Dictionary<TechType, int> TrackedItems { get; } = new Dictionary<TechType, int>();
         private readonly Func<bool> _isConstructed;
         private bool _isFridgeOpen = false;
         private FridgeCoolingState _coolingState;
-        private const float Rate = 5.0f;
+        private const float Rate = 11.0f;
 
         public List<EatableEntities> FridgeItems { get; } = new List<EatableEntities>();
 
@@ -65,11 +61,38 @@ namespace ARS_SeaBreezeFCS32.Model
 
         private void OnAddItemEvent(InventoryItem item)
         {
+            var techType = item.item.GetTechType();
+
+            if (TrackedItems.ContainsKey(techType))
+            {
+                TrackedItems[techType] = TrackedItems[techType] + 1;
+            }
+            else
+            {
+                TrackedItems.Add(techType, 1);
+            }
+
             CoolItem(item);
             QuickLogger.Debug($"Fridge Item Count: {FridgeItems.Count}", true);
         }
         private void OnRemoveItemEvent(InventoryItem item)
         {
+            var techType = item.item.GetTechType();
+
+            //Remove completely if 1
+
+            if (TrackedItems.ContainsKey(techType))
+            {
+                if (TrackedItems[techType] != 1)
+                {
+                    TrackedItems[techType] = TrackedItems[techType] - 1;
+                }
+                else
+                {
+                    TrackedItems.Remove(techType);
+                }
+            }
+
             var eat = item.item.GetComponent<Eatable>();
 
             var prefabId = item.item.GetComponent<PrefabIdentifier>().Id;

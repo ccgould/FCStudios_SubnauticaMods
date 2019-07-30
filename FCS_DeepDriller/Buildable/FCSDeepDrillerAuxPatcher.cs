@@ -106,7 +106,7 @@ namespace FCS_DeepDriller.Buildable
             LanguageHandler.SetLanguageLine(PrevPageKey, "Previous Page");
             LanguageHandler.SetLanguageLine(FocusKey, "FOCUS");
             LanguageHandler.SetLanguageLine(FocusingKey, "FOCUSING");
-            LanguageHandler.SetLanguageLine(RemoveAllModulesKey, "Please Remove all attachments from the container.");
+            LanguageHandler.SetLanguageLine(RemoveAllModulesKey, "Please Remove all items from the driller.");
         }
 
         public static string RemoveAllItems()

@@ -4,7 +4,7 @@ using SMLHelper.V2.Handlers;
 
 namespace FCS_DeepDriller.Helpers
 {
-    internal static class TechTypeHelpers
+    internal static class TechTypeHelper
     {
         private static TechType _batteryModuleTechType;
         private static TechType _solarPanelTechType;

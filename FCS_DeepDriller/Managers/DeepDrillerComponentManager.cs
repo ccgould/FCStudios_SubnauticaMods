@@ -20,7 +20,6 @@ namespace FCS_DeepDriller.Managers
         private static GameObject _digState;
         private static GameObject _hardLava;
 
-
         internal static bool FindAllComponents(FCSDeepDrillerController mono, GameObject solar, GameObject battery, GameObject focus)
         {
             //Modules
@@ -32,14 +31,14 @@ namespace FCS_DeepDriller.Managers
             var model = _gameObject.FindChild("model")?.gameObject;
             if (model == null)
             {
-                QuickLogger.Error("Couldnt find GameObject Model");
+                QuickLogger.Error("Couldn't find GameObject Model");
                 return false;
             }
 
             _focusModule = model.FindChild("Scanner_Screen_Attachment")?.gameObject;
             if (_focusModule == null)
             {
-                QuickLogger.Error("Couldnt find GameObject Scanner_Screen_Attachment");
+                QuickLogger.Error("Couldn't find GameObject Scanner_Screen_Attachment");
                 return false;
             }
 

@@ -2,10 +2,8 @@
 using ARS_SeaBreezeFCS32.Display;
 using FCSCommon.Enums;
 using FCSCommon.Helpers;
-using FCSCommon.Objects;
 using FCSCommon.Utilities;
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,7 +14,7 @@ namespace ARS_SeaBreezeFCS32.Mono
     {
         #region Private Members
         private ARSolutionsSeaBreezeController _mono;
-        private List<EatableEntities> _container;
+        //private List<EatableEntities> _container;
         private GameObject _canvasGameObject;
         private GameObject _model;
         private GameObject _homeScreen;
@@ -35,7 +33,6 @@ namespace ARS_SeaBreezeFCS32.Mono
         private int _pageStateHash;
         private readonly float BOOTING_ANIMATION_TIME = 6f;
         private readonly float WELCOME_SCREEN_TIME = 2f;
-        private readonly Dictionary<TechType, int> TrackedItems = new Dictionary<TechType, int>();
         private bool _completeSetup;
 
         #endregion
@@ -100,7 +97,6 @@ namespace ARS_SeaBreezeFCS32.Mono
                 var item = _itemsGrid.transform.GetChild(i).gameObject;
                 Destroy(item);
             }
-            TrackedItems.Clear();
         }
 
         public override void OnButtonClick(string btnName, object tag)
@@ -343,12 +339,12 @@ namespace ARS_SeaBreezeFCS32.Mono
 
             QuickLogger.Debug($"startingPosition: {startingPosition} || endingPosition : {endingPosition}", true);
             QuickLogger.Debug($"Number Of Items: {_mono.NumberOfItems}");
-            _container = _mono.FridgeItems;
+            var container = _mono.TrackedItems;
 
 
-            if (endingPosition > _container.Count)
+            if (endingPosition > container.Count)
             {
-                endingPosition = _container.Count;
+                endingPosition = container.Count;
             }
 
             QuickLogger.Debug($"startingPosition: {startingPosition} || endingPosition : {endingPosition}", true);
@@ -359,24 +355,14 @@ namespace ARS_SeaBreezeFCS32.Mono
 
             for (int i = startingPosition; i < endingPosition; i++)
             {
-                var element = _container.ElementAt(i);
-                var techType = element.TechType;
+                var element = container.ElementAt(i);
+                var techType = element.Key;
 
                 QuickLogger.Debug($"Element: {element} || TechType : {techType}");
 
-                if (TrackedItems.ContainsKey(techType))
-                {
-                    TrackedItems[techType] = TrackedItems[techType] + 1;
-                }
-                else
-                {
-                    TrackedItems.Add(techType, 1);
-                }
-            }
+                LoadFridgeDisplay(element.Key, element.Value);
 
-            foreach (var storageItem in TrackedItems)
-            {
-                LoadFridgeDisplay(storageItem.Key, storageItem.Value);
+                //Tracked items was here
             }
 
             UpdatePaginator();
@@ -389,8 +375,8 @@ namespace ARS_SeaBreezeFCS32.Mono
             CalculateNewMaxPages();
             _pageCounter.SetActive(_mono.NumberOfItems != 0);
             _pageCounterText.text = $"{CurrentPage} / {MaxPage}";
-            _previousPageGameObject.SetActive(CurrentPage != 1);
-            _nextPageGameObject.SetActive(CurrentPage != MaxPage);
+            _previousPageGameObject.SetActive(true); //CurrentPage != 1
+            _nextPageGameObject.SetActive(true); //CurrentPage != MaxPage
         }
         #endregion
 
@@ -430,7 +416,7 @@ namespace ARS_SeaBreezeFCS32.Mono
         #region Private Methods
         private void CalculateNewMaxPages()
         {
-            MaxPage = Mathf.CeilToInt((_mono.NumberOfItems - 1) / ITEMS_PER_PAGE) + 1;
+            MaxPage = Mathf.CeilToInt((_mono.TrackedItems.Count - 1) / ITEMS_PER_PAGE) + 1;
             if (CurrentPage > MaxPage)
             {
                 CurrentPage = MaxPage;

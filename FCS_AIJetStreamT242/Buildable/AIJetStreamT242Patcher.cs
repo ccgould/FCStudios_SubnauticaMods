@@ -7,7 +7,6 @@ using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using FCSTechFabricator.Models;
 using Oculus.Newtonsoft.Json;
-using SMLHelper.V2.Handlers;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -112,14 +111,6 @@ namespace FCS_AIMarineTurbine.Buildable
 
         protected override TechData GetBlueprintRecipe()
         {
-            bool otherModIsInstalled = TechTypeHandler.TryGetModdedTechType("JetStreamT242Kit_MT", out TechType JetStreamT242Kit_MT);
-
-            if (!otherModIsInstalled)
-            {
-                QuickLogger.Error("Couldn't find Marine Turbines Kit Tech Type");
-                return null;
-            }
-
             QuickLogger.Debug($"Creating recipe...");
             // Create and associate recipe to the new TechType
             var customFabRecipe = new TechData()
@@ -127,7 +118,7 @@ namespace FCS_AIMarineTurbine.Buildable
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(JetStreamT242Kit_MT, 1)
+                    new Ingredient(TechTypeHelpers.GetTechType("JetStreamT242Kit_MT"), 1)
                 }
             };
 

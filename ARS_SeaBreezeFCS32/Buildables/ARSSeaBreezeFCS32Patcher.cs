@@ -1,5 +1,6 @@
 ﻿using ARS_SeaBreezeFCS32.Mono;
 using FCSCommon.Extensions;
+using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
@@ -90,12 +91,7 @@ namespace ARS_SeaBreezeFCS32.Buildables
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(TechType.ComputerChip, 1),
-                    new Ingredient(TechType.CopperWire, 2),
-                    new Ingredient(TechType.Titanium, 3),
-                    new Ingredient(TechType.AdvancedWiringKit, 1),
-                    new Ingredient(TechType.Glass, 1),
-                    new Ingredient(TechType.Magnetite, 1)
+                    new Ingredient(TechTypeHelpers.GetTechType("SeaBreezeKit_SB"),1)
                 }
             };
             QuickLogger.Debug($"Created Ingredients");

@@ -79,6 +79,7 @@
     <Compile Include="Mono\SeaBreeze\FreonModelPrefab.cs" />
     <Compile Include="Mono\SeaBreeze\FreonPatcher.cs" />
     <Compile Include="Mono\PowerStorage\PowerStorageKitPatcher.cs" />
+    <Compile Include="Mono\SeaBreeze\SeaBreezeKitPatcher.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

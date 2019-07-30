@@ -35,6 +35,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\GameObjectHelpers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\LanguageHelpers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\MaterialHelpers.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\TechTypeHelpers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\WorldHelpers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Abstract\AIDisplay.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Abstract\FCSController.cs" />
