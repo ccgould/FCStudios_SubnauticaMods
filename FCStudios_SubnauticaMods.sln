@@ -29,17 +29,21 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCSTechFabricator", "FCSWor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCS_DeepDriller", "FCS_DeepDriller\FCS_DeepDriller.csproj", "{61D8BA15-EE91-4245-BFC1-70064ADD23E0}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Alterra Industrial", "Alterra Industrial", "{BB083365-CF95-4763-BF65-8338CA68196D}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Alterra Industrial Solutions", "Alterra Industrial Solutions", "{BB083365-CF95-4763-BF65-8338CA68196D}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Alterra Shipping", "Alterra Shipping", "{AD76B8B7-4004-4D73-AFFA-41EE1F6DB241}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Alterra Shipping Solutions", "Alterra Shipping Solutions", "{AD76B8B7-4004-4D73-AFFA-41EE1F6DB241}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Alterra Medical", "Alterra Medical", "{E2AD5E97-7843-49E2-A9B3-3CD79E463FA0}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Alterra Medical Solutions", "Alterra Medical Solutions", "{E2AD5E97-7843-49E2-A9B3-3CD79E463FA0}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{6E36DA48-6498-4C58-8BF6-85923E5F6460}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Alterra Refrigeration", "Alterra Refrigeration", "{F921AD09-63FB-40E2-9442-3103617543F3}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Alterra Refrigeration Solutions", "Alterra Refrigeration Solutions", "{F921AD09-63FB-40E2-9442-3103617543F3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Master", "Solution Master", "{EF09DBF9-7AA5-4782-B27B-7C67D1FF8B68}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Alterra Storage Solutions", "Alterra Storage Solutions", "{3FD179AD-5C6F-4627-B5BB-D6B6CD72E1FF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExStorageDepot", "ExStorageDepot\ExStorageDepot.csproj", "{49B14137-1EC0-40FB-8AEF-E5C13D7CDFB9}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -104,6 +108,10 @@ Global
 		{61D8BA15-EE91-4245-BFC1-70064ADD23E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{61D8BA15-EE91-4245-BFC1-70064ADD23E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{61D8BA15-EE91-4245-BFC1-70064ADD23E0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{49B14137-1EC0-40FB-8AEF-E5C13D7CDFB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{49B14137-1EC0-40FB-8AEF-E5C13D7CDFB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{49B14137-1EC0-40FB-8AEF-E5C13D7CDFB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{49B14137-1EC0-40FB-8AEF-E5C13D7CDFB9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -121,6 +129,7 @@ Global
 		{20E443F4-3B38-48F3-BBF2-7CBBF4090BEB} = {6E36DA48-6498-4C58-8BF6-85923E5F6460}
 		{B947909C-4983-4749-93AC-73EA69F6DCE8} = {6E36DA48-6498-4C58-8BF6-85923E5F6460}
 		{61D8BA15-EE91-4245-BFC1-70064ADD23E0} = {BB083365-CF95-4763-BF65-8338CA68196D}
+		{49B14137-1EC0-40FB-8AEF-E5C13D7CDFB9} = {3FD179AD-5C6F-4627-B5BB-D6B6CD72E1FF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {73E25955-B56F-4639-89F3-4CE5F3EBD59D}
