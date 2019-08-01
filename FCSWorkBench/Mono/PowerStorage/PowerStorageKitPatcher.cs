@@ -1,4 +1,4 @@
-﻿using FCSCommon.Utilities;
+using FCSCommon.Utilities;
 using FCSTechFabricator.Abstract_Classes;
 using FCSTechFabricator.Models;
 using SMLHelper.V2.Crafting;
@@ -112,12 +112,12 @@ namespace FCSTechFabricator.Mono.PowerStorage
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(TechType.Battery, 1),
-                    new Ingredient(TechType.AcidMushroom, 6),
-                    new Ingredient(TechType.Titanium, 7),
-                    new Ingredient(TechType.WiringKit, 1),
-                    new Ingredient(TechType.Quartz, 1),
-                    new Ingredient(TechType.Salt, 6),
+                    new Ingredient(TechType.MapRoomHUDChip, 1),
+                    new Ingredient(TechType.Titanium, 2),
+                    new Ingredient(TechType.AdvancedWiringKit, 1),
+                    new Ingredient(TechType.ExosuitDrillArmModule, 1),
+                    new Ingredient(TechType.Lubricant, 2),
+                    new Ingredient(TechType.VehicleStorageModule, 1),
                 }
             };
 
