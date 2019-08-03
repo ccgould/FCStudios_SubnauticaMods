@@ -243,7 +243,7 @@ namespace FCSAIPowerCellSocket.Mono
             throw new NotImplementedException();
         }
 
-        public override void ItemModified<T>(T item)
+        public override void ItemModified(TechType item, int newAmount)
         {
             throw new NotImplementedException();
         }

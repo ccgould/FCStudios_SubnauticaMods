@@ -7,6 +7,9 @@ using FCSTechFabricator.Mono.DeepDriller;
 using FCSTechFabricator.Mono.MarineTurbine;
 using FCSTechFabricator.Mono.PowerStorage;
 using FCSTechFabricator.Mono.SeaBreeze;
+//using FCSTechFabricator.Mono.MarineTurbine;
+//using FCSTechFabricator.Mono.PowerStorage;
+//using FCSTechFabricator.Mono.SeaBreeze;
 using Harmony;
 using System;
 using System.IO;
@@ -30,9 +33,9 @@ namespace FCSTechFabricator
             {
                 if (GetPrefabs())
                 {
-                    RegisterItems();
-
                     FCSTechFabricatorBuildable.PatchHelper();
+                    RegisterItems();
+                    QuickLogger.Debug(FCSTechFabricatorBuildable.TechFabricatorCraftTreeType.ToString());
 
                     var harmony = HarmonyInstance.Create("com.fcstechfabricator.fcstudios");
 
@@ -45,7 +48,6 @@ namespace FCSTechFabricator
                     throw new PatchTerminatedException();
                 }
 
-
             }
             catch (Exception ex)
             {
@@ -56,36 +58,50 @@ namespace FCSTechFabricator
         private static void RegisterItems()
         {
             var freon = new FreonBuildable();
-            freon.Register();
-            FCSTechFabricatorBuildable.ItemsList.Add(freon);
+            freon.Patch();
+            FCSTechFabricatorBuildable.AddTechType(freon.TechType, freon.StepsToFabricatorTab);
+            QuickLogger.Debug($"Patched {freon.FriendlyName}");
 
             var psKit = new PowerStorageKitBuildable();
-            psKit.Register();
-            FCSTechFabricatorBuildable.ItemsList.Add(psKit);
+            psKit.Patch();
+            FCSTechFabricatorBuildable.AddTechType(psKit.TechType, psKit.StepsToFabricatorTab);
+            QuickLogger.Debug($"Patched {psKit.FriendlyName}");
+
 
             var ddKit = new DeepDrillerKitBuildable();
-            ddKit.Register();
-            FCSTechFabricatorBuildable.ItemsList.Add(ddKit);
+            ddKit.Patch();
+            FCSTechFabricatorBuildable.AddTechType(ddKit.TechType, ddKit.StepsToFabricatorTab);
+            QuickLogger.Debug($"Patched {ddKit.FriendlyName}");
 
             var ddBatteryModule = new BatteryAttachmentBuildable();
-            ddBatteryModule.Register();
-            FCSTechFabricatorBuildable.ItemsList.Add(ddBatteryModule);
+            ddBatteryModule.Patch();
+            FCSTechFabricatorBuildable.AddTechType(ddBatteryModule.TechType, ddBatteryModule.StepsToFabricatorTab);
+            QuickLogger.Debug($"Patched {ddBatteryModule.FriendlyName}");
+
 
             var jsKit = new JetStreamKitBuildable();
-            jsKit.Register();
-            FCSTechFabricatorBuildable.ItemsList.Add(jsKit);
+            jsKit.Patch();
+            FCSTechFabricatorBuildable.AddTechType(jsKit.TechType, jsKit.StepsToFabricatorTab);
+            QuickLogger.Debug($"Patched {jsKit.FriendlyName}");
+
 
             var ddSolarModule = new SolarAttachmentBuildable();
-            ddSolarModule.Register();
-            FCSTechFabricatorBuildable.ItemsList.Add(ddSolarModule);
+            ddSolarModule.Patch();
+            FCSTechFabricatorBuildable.AddTechType(ddSolarModule.TechType, ddSolarModule.StepsToFabricatorTab);
+            QuickLogger.Debug($"Patched {ddSolarModule.FriendlyName}");
+
 
             var ddFocusModule = new FocusAttachmentBuildable();
-            ddFocusModule.Register();
-            FCSTechFabricatorBuildable.ItemsList.Add(ddFocusModule);
+            ddFocusModule.Patch();
+            FCSTechFabricatorBuildable.AddTechType(ddFocusModule.TechType, ddFocusModule.StepsToFabricatorTab);
+            QuickLogger.Debug($"Patched {ddFocusModule.FriendlyName}");
+
 
             var sbKit = new SeaBreezeKitBuildable();
-            sbKit.Register();
-            FCSTechFabricatorBuildable.ItemsList.Add(sbKit);
+            sbKit.Patch();
+            FCSTechFabricatorBuildable.AddTechType(sbKit.TechType, sbKit.StepsToFabricatorTab);
+            QuickLogger.Debug($"Patched {sbKit.FriendlyName}");
+
         }
 
         public static bool GetPrefabs()

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace FCSCommon.Objects
+﻿namespace FCSCommon.Objects
 {
     public class StorageConfig
     {

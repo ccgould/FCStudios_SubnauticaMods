@@ -110,7 +110,7 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers
                 QuickLogger.Debug("OBJ Not NULL", true);
                 Turbines.Remove(obj.GetPrefabID());
                 QuickLogger.Debug("Past Turbine", true);
-                _aiMarineMonitorDisplay.ItemModified<string>(null);
+                _aiMarineMonitorDisplay.ItemModified(TechType.None);
                 QuickLogger.Debug("Removed Turbine");
             }
         }
@@ -146,7 +146,7 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers
             if (newSeaBase != null && newSeaBase == _seaBase)
             {
                 Turbines.Add(obj.GetPrefabID(), obj);
-                _aiMarineMonitorDisplay.ItemModified<string>(null);
+                _aiMarineMonitorDisplay.ItemModified(TechType.None);
             }
         }
 

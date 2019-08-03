@@ -1,5 +1,4 @@
 ﻿using FCSCommon.Utilities;
-using FCSTechFabricator.Abstract_Classes;
 using FCSTechFabricator.Interfaces;
 using FCSTechFabricator.Models;
 using SMLHelper.V2.Assets;
@@ -16,6 +15,24 @@ namespace FCSTechFabricator.Mono
     {
         public static readonly FCSTechFabricatorBuildable Singleton = new FCSTechFabricatorBuildable();
 
+        private static readonly Dictionary<string, string> AlterraDivisions = new Dictionary<string, string>()
+        {
+            {"Alterra Industrial Solutions","AIS"},
+            {"Alterra Medical Solutions","AMS"},
+            {"Alterra Refrigeration Solutions","ARS"},
+            {"Alterra Shipping Solutions","ASS"},
+            {"Alterra Storage Solutions","ASTS"}
+        };
+
+        internal static readonly Dictionary<string, ModKey> FCSMods = new Dictionary<string, ModKey>()
+        {
+            {"Marine Turbines",new ModKey{Key = "MT",ParentKey = "AIS"}},
+            {"Deep Driller",new ModKey{Key = "DD",ParentKey = "AIS"}},
+            {"Power Storage",new ModKey{Key = "PS",ParentKey = "AIS"}},
+            {"SeaBreeze",new ModKey{Key = "SB",ParentKey = "ARS"}},
+        };
+
+
         public FCSTechFabricatorBuildable() : base(Mod.ModName, "FCS Tech Fabricator", "The place for all your FCStudios mod needs")
         {
         }
@@ -28,48 +45,74 @@ namespace FCSTechFabricator.Mono
 
         private static void CreateCustomTree()
         {
-            var root = CraftTreeHandler.CreateCustomCraftTreeAndType("FCSTechFabricator", out CraftTree.Type craftType);
+            _root = CraftTreeHandler.CreateCustomCraftTreeAndType("FCSTechFabricator", out CraftTree.Type craftType);
             ModCraftTreeTab itemTab = null;
 
-            Singleton.TechFabricatorCraftTreeType = craftType;
+            TechFabricatorCraftTreeType = craftType;
 
             QuickLogger.Debug($"Attempting to add {Singleton.ClassID} to nodes");
 
-            foreach (var item in ItemsList)
+            foreach (var division in AlterraDivisions)
             {
-
-                if (string.IsNullOrEmpty(item.ClassID_I))
+                if (_root.GetNode($"{division.Value}") == null)
                 {
-                    QuickLogger.Debug("Item ClassID_I was null");
-                    return;
-                }
+                    QuickLogger.Debug($"{division.Key} is null creating tab");
+                    itemTab = _root.AddTabNode($"{division.Value}", $"{division.Key}", new Atlas.Sprite(ImageUtils.LoadTextureFromFile($"./QMods/FCSTechFabricator/Assets/{division.Value}Icon.png")));
+                    QuickLogger.Debug($"{division.Key} node tab Created");
 
-                QuickLogger.Debug("In foreach");
-
-                if (item.ClassID_I.EndsWith("_ARS"))
-                {
-                    QuickLogger.Debug($"Added {item.ClassID_I} to nodes");
-                    AddTabNodes(ref root, ref itemTab, item, "ARSolutions", "ARSIcon");
-                }
-
-                if (item.ClassID_I.EndsWith("_PS"))
-                {
-                    QuickLogger.Debug($"Added {item.ClassID_I} to nodes");
-                    AddTabNodes(ref root, ref itemTab, item, "PowerStorage", "PSIcon");
-                }
-
-                if (item.ClassID_I.EndsWith("_DD"))
-                {
-                    QuickLogger.Debug($"Added {item.ClassID_I} to nodes");
-                    AddTabNodes(ref root, ref itemTab, item, "DeepDriller", "DDIcon");
-                }
-
-                if (item.ClassID_I.EndsWith("_MT"))
-                {
-                    QuickLogger.Debug($"Added {item.ClassID_I} to nodes");
-                    AddTabNodes(ref root, ref itemTab, item, "Marine Turbine", "MTIcon");
+                    foreach (var fcsMod in FCSMods)
+                    {
+                        if (fcsMod.Value.ParentKey == division.Value)
+                        {
+                            var icon = new Atlas.Sprite(ImageUtils.LoadTextureFromFile($"./QMods/FCSTechFabricator/Assets/{fcsMod.Value.Key}Icon.png"));
+                            itemTab.AddTabNode(fcsMod.Value.Key, fcsMod.Key, icon);
+                            QuickLogger.Debug($"Child node {fcsMod.Key} tab Created");
+                        }
+                    }
                 }
             }
+
+            foreach (var childNode in _root.ChildNodes)
+            {
+                QuickLogger.Debug(childNode.Name);
+            }
+
+
+            //foreach (var item in ItemsList)
+            //{
+
+            //    if (string.IsNullOrEmpty(item.ClassID_I))
+            //    {
+            //        QuickLogger.Debug("Item ClassID_I was null");
+            //        return;
+            //    }
+
+            //    QuickLogger.Debug("In foreach");
+
+            //    if (item.ClassID_I.EndsWith("_ARS"))
+            //    {
+            //        QuickLogger.Debug($"Added {item.ClassID_I} to nodes");
+            //        AddTabNodes(ref root, ref itemTab, item, "ARSolutions", "ARSIcon");
+            //    }
+
+            //    if (item.ClassID_I.EndsWith("_PS"))
+            //    {
+            //        QuickLogger.Debug($"Added {item.ClassID_I} to nodes");
+            //        AddTabNodes(ref root, ref itemTab, item, "PowerStorage", "PSIcon");
+            //    }
+
+            //    if (item.ClassID_I.EndsWith("_DD"))
+            //    {
+            //        QuickLogger.Debug($"Added {item.ClassID_I} to nodes");
+            //        AddTabNodes(ref root, ref itemTab, item, "DeepDriller", "DDIcon");
+            //    }
+
+            //    if (item.ClassID_I.EndsWith("_MT"))
+            //    {
+            //        QuickLogger.Debug($"Added {item.ClassID_I} to nodes");
+            //        AddTabNodes(ref root, ref itemTab, item, "Marine Turbine", "MTIcon");
+            //    }
+            //}
         }
 
         public override GameObject GetGameObject()
@@ -135,11 +178,12 @@ namespace FCSTechFabricator.Mono
         /// <summary>
         /// This is the CraftTree.Type for the FCS Tech Fabricator.
         /// </summary> 
-        public CraftTree.Type TechFabricatorCraftTreeType { get; private set; }
+        public static CraftTree.Type TechFabricatorCraftTreeType { get; private set; }
 
         private static readonly GameObject OriginalFabricator = Resources.Load<GameObject>("Submarine/Build/Fabricator");
+        private static ModCraftTreeRoot _root;
 
-        internal static List<FCSTechFabricatorItem> ItemsList = new List<FCSTechFabricatorItem>();
+        //internal static List<FCSTechFabricatorItem> ItemsList = new List<FCSTechFabricatorItem>();
 
         public override TechGroup GroupForPDA { get; } = TechGroup.InteriorModules;
 
@@ -163,6 +207,26 @@ namespace FCSTechFabricator.Mono
             return customFabRecipe;
         }
 
+        public static void AddTechType(TechType techType, string[] steps)
+        {
+            QuickLogger.Debug($"Attempting to add TechType {techType} to {steps[0]}");
 
+            if (_root != null)
+            {
+                var tab = _root.GetTabNode(steps);
+                if (tab.GetCraftingNode(techType) == null)
+                {
+                    tab.AddCraftingNode(techType);
+                    QuickLogger.Debug($"Added TechType {techType} to {steps[0]}");
+                }
+            }
+        }
     }
+
+    internal class ModKey
+    {
+        public string Key { get; set; }
+        public string ParentKey { get; set; }
+    }
+
 }

@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace FCSTechFabricator.Abstract_Classes
 {
-    public abstract class FCSTechFabricatorItem : ModPrefab, IFCSTechFabricatorItem
+    public abstract class FCSTechFabricatorItem : Craftable, IFCSTechFabricatorItem
     {
         protected FCSTechFabricatorItem(string classId, string prefabFileName, TechType techType = TechType.None) : base(classId, prefabFileName, techType)
         {

@@ -402,7 +402,7 @@ namespace FCS_AIMarineTurbine.Display
             }
         }
 
-        public override void ItemModified<T>(T item)
+        public override void ItemModified(TechType techType, int newAmount = 0)
         {
             QuickLogger.Debug("In ItemModified");
             DrawPage(1);

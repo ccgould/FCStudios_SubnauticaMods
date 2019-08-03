@@ -190,13 +190,13 @@ namespace ARS_SeaBreezeFCS32.Mono
         {
             if (_buildable == null) return;
             _deconstructionAllowed = false;
-            _display.ItemModified<string>(null);
+            _display.ItemModified(TechType.None);
         }
 
         public void OnRemoveItemEvent(InventoryItem item)
         {
             _deconstructionAllowed = _fridgeContainer.NumberOfItems == 0;
-            _display.ItemModified<string>(null);
+            _display.ItemModified(TechType.None);
         }
 
         public int GetTechTypeAmount(TechType techType)

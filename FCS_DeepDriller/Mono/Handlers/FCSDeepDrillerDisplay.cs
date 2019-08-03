@@ -54,7 +54,7 @@ namespace FCS_DeepDriller.Mono.Handlers
 
         private void UpdateScreenState()
         {
-            _mono.AnimationHandler.SetBoolHash(_mono.ScreenStateHash, _mono.PowerManager.IsPowerAvailable());
+            _mono.AnimationHandler.SetBoolHash(_mono.ScreenStateHash, _mono.PowerManager.IsPowerAvailable() && _mono.PowerManager.GetPowerState() == FCSPowerStates.Powered);
         }
 
         private void UpdateBatteryStatus()
@@ -148,7 +148,7 @@ namespace FCS_DeepDriller.Mono.Handlers
             }
         }
 
-        public override void ItemModified<T>(T item)
+        public override void ItemModified(TechType item, int newAmount = 0)
         {
             QuickLogger.Debug("In ItemModified");
             DrawPage(1);

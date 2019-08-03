@@ -6,21 +6,21 @@ using UnityEngine;
 
 namespace FCS_DeepDriller.Managers
 {
-    internal static class DeepDrillerComponentManager
+    internal class DeepDrillerComponentManager
     {
-        private static GameObject _batteryCell1;
-        private static GameObject _batteryCell2;
-        private static GameObject _batteryCell3;
-        private static GameObject _batteryCell4;
-        private static GameObject _batteryModule;
-        private static GameObject _solarPanelModule;
-        private static GameObject _gameObject;
-        private static FCSDeepDrillerController _mono;
-        private static GameObject _focusModule;
-        private static GameObject _digState;
-        private static GameObject _hardLava;
+        private GameObject _batteryCell1;
+        private GameObject _batteryCell2;
+        private GameObject _batteryCell3;
+        private GameObject _batteryCell4;
+        private GameObject _batteryModule;
+        private GameObject _solarPanelModule;
+        private GameObject _gameObject;
+        private FCSDeepDrillerController _mono;
+        private GameObject _focusModule;
+        private GameObject _digState;
+        private GameObject _hardLava;
 
-        internal static bool FindAllComponents(FCSDeepDrillerController mono, GameObject solar, GameObject battery, GameObject focus)
+        internal bool FindAllComponents(FCSDeepDrillerController mono, GameObject solar, GameObject battery, GameObject focus)
         {
             //Modules
             _mono = mono;
@@ -74,7 +74,7 @@ namespace FCS_DeepDriller.Managers
             return true;
         }
 
-        internal static GameObject GetBatteryCellModel(int slot)
+        internal GameObject GetBatteryCellModel(int slot)
         {
             GameObject go = null;
 
@@ -97,7 +97,7 @@ namespace FCS_DeepDriller.Managers
             return go;
         }
 
-        internal static GameObject GetMount(FCSDeepDrillerController mono, DeepDrillerMountSpot screen)
+        internal GameObject GetMount(FCSDeepDrillerController mono, DeepDrillerMountSpot screen)
         {
             switch (screen)
             {
@@ -112,12 +112,12 @@ namespace FCS_DeepDriller.Managers
             }
         }
 
-        internal static bool IsLavaHot()
+        internal bool IsLavaHot()
         {
             return _digState.activeSelf;
         }
 
-        internal static void ShowAttachment(DeepDrillModules module)
+        internal void ShowAttachment(DeepDrillModules module)
         {
             switch (module)
             {
@@ -135,20 +135,20 @@ namespace FCS_DeepDriller.Managers
             }
         }
 
-        internal static void HideAllPowerAttachments()
+        internal void HideAllPowerAttachments()
         {
             _batteryModule.SetActive(false);
             _solarPanelModule.SetActive(false);
         }
 
-        internal static void HideAllAttachments()
+        internal void HideAllAttachments()
         {
             _batteryModule.SetActive(false);
             _solarPanelModule.SetActive(false);
             _focusModule.SetActive(false);
         }
 
-        internal static void ShowAllAttachments()
+        internal void ShowAllAttachments()
         {
             _batteryModule.SetActive(true);
             _solarPanelModule.SetActive(true);
@@ -156,7 +156,7 @@ namespace FCS_DeepDriller.Managers
 
         }
 
-        public static void Setup()
+        internal void Setup()
         {
             ShowAllAttachments();
             FCSDeepDrillerBuildable.ApplyShaders(_gameObject);
@@ -164,7 +164,7 @@ namespace FCS_DeepDriller.Managers
             HideAllBatteries();
         }
 
-        private static void HideAllBatteries()
+        internal void HideAllBatteries()
         {
             _batteryCell1.SetActive(false);
             _batteryCell2.SetActive(false);
@@ -172,7 +172,7 @@ namespace FCS_DeepDriller.Managers
             _batteryCell4.SetActive(false);
         }
 
-        public static void HideAttachment(DeepDrillModules module)
+        internal void HideAttachment(DeepDrillModules module)
         {
             switch (module)
             {

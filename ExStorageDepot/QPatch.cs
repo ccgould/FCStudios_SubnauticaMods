@@ -22,7 +22,6 @@ namespace ExStorageDepot
                 ExStorageDepotBuildable.PatchHelper();
 
                 var harmony = HarmonyInstance.Create("com.exstoragedepot.fcstudios");
-
                 harmony.PatchAll(Assembly.GetExecutingAssembly());
 
                 QuickLogger.Info("Finished patching");

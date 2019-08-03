@@ -1,6 +1,5 @@
 ﻿using FCS_DeepDriller.Buildable;
 using FCS_DeepDriller.Enumerators;
-using FCS_DeepDriller.Managers;
 using FCS_DeepDriller.Mono;
 using UnityEngine;
 
@@ -13,7 +12,7 @@ namespace FCS_DeepDriller.Attachments
 
         internal void GetGameObject(FCSDeepDrillerController mono)
         {
-            var mount = DeepDrillerComponentManager.GetMount(mono, DeepDrillerMountSpot.PowerSupply);
+            var mount = mono.ComponentManager.GetMount(mono, DeepDrillerMountSpot.PowerSupply);
 
             _batteryModule = GameObject.Instantiate(FCSDeepDrillerBuildable.BatteryModule, mount.transform.position, mount.transform.rotation);
 

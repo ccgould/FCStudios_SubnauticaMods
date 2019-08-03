@@ -1,26 +1,41 @@
 ﻿using FCSCommon.Utilities;
-using FCSTechFabricator.Abstract_Classes;
 using FCSTechFabricator.Models;
+using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
-using SMLHelper.V2.Utility;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace FCSTechFabricator.Mono.SeaBreeze
 {
-    public partial class SeaBreezeKitBuildable : FCSTechFabricatorItem
+    public class SeaBreezeKitBuildable : Craftable
     {
-        private TechGroup GroupForPDA = TechGroup.Resources;
-        private TechCategory CategoryForPDA = TechCategory.AdvancedMaterials;
         private GameObject _prefab;
         private Text _label;
+        public override string AssetsFolder { get; } = "FCSTechFabricator/Assets";
+        public override string IconFileName { get; } = "Kit_FCS.png";
+        public override TechGroup GroupForPDA { get; } = TechGroup.Resources;
+        public override TechCategory CategoryForPDA { get; } = TechCategory.AdvancedMaterials;
+        public override string[] StepsToFabricatorTab { get; } = new[] { "ARS", "SB" };
+        internal static TechType TechTypeID { get; private set; }
+        public override CraftTree.Type FabricatorType { get; } = FCSTechFabricatorBuildable.TechFabricatorCraftTreeType;
 
 
-        public SeaBreezeKitBuildable() : base("SeaBreezeKit_SB", "Sea Breeze Kit")
+        public SeaBreezeKitBuildable() : base("SeaBreezeKit_SB", "Sea Breeze Kit", "A kit that allows you to build one Power Storage Unit")
         {
+            if (!GetPrefabs())
+            {
+                QuickLogger.Error("Failed to retrieve all prefabs");
+            }
 
+            OnFinishedPatching = () =>
+            {
+                TechTypeID = this.TechType;
+
+                //Add the new TechType Hand Equipment type
+                CraftDataHandler.SetEquipmentType(TechType, EquipmentType.Hand);
+            };
         }
 
         public override GameObject GetGameObject()
@@ -38,7 +53,7 @@ namespace FCSTechFabricator.Mono.SeaBreeze
             var model = prefab.GetComponentInChildren<Canvas>().gameObject;
             model.FindChild("Screen").SetActive(true);
 
-            _label.text = FriendlyName_I;
+            _label.text = FriendlyName;
 
             // Make the object drop slowly in water
             var wf = prefab.AddComponent<WorldForces>();
@@ -101,11 +116,14 @@ namespace FCSTechFabricator.Mono.SeaBreeze
             var techTag = prefab.AddComponent<TechTag>();
             techTag.type = this.TechType;
 
+            prefab.AddComponent<FCSTechFabricatorTag>();
+
             return prefab;
         }
 
-        private TechData GetBlueprintRecipe()
+        protected override TechData GetBlueprintRecipe()
         {
+
             // Create and associate recipe to the new TechType
             var customFabRecipe = new TechData()
             {
@@ -122,41 +140,6 @@ namespace FCSTechFabricator.Mono.SeaBreeze
             };
 
             return customFabRecipe;
-        }
-
-        public override void Register()
-        {
-            if (GetPrefabs())
-            {
-                if (this.IsRegistered == false)
-                {
-                    ClassID_I = this.ClassID;
-
-                    //Create a new TechType
-                    this.TechType = TechTypeHandler.AddTechType(ClassID, PrefabFileName, "A kit that allows you to build one Power Storage Unit", new Atlas.Sprite(ImageUtils.LoadTextureFromFile($"./QMods/FCSTechFabricator/Assets/Kit_FCS.png")));
-
-                    CraftDataHandler.SetTechData(TechType, GetBlueprintRecipe());
-
-                    CraftDataHandler.AddToGroup(this.GroupForPDA, this.CategoryForPDA, this.TechType);
-
-                    QuickLogger.Debug($"Class Id = {ClassID_I}");
-
-                    FriendlyName_I = this.PrefabFileName;
-
-                    TechTypeID = TechType;
-
-                    // Add the new TechType to Hand Equipment type.
-                    CraftDataHandler.SetEquipmentType(TechType, EquipmentType.Hand);
-
-                    PrefabHandler.RegisterPrefab(this);
-
-                    this.IsRegistered = true;
-                }
-            }
-            else
-            {
-                QuickLogger.Error("Failed to get the Kit Prefab");
-            }
         }
 
         public bool GetPrefabs()

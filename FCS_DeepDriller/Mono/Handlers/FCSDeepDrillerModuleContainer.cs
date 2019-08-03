@@ -2,7 +2,6 @@
 using FCS_DeepDriller.Configuration;
 using FCS_DeepDriller.Enumerators;
 using FCS_DeepDriller.Helpers;
-using FCS_DeepDriller.Managers;
 using FCSCommon.Extensions;
 using FCSCommon.Utilities;
 using FCSTechFabricator.Mono;
@@ -123,7 +122,7 @@ namespace FCS_DeepDriller.Mono.Handlers
 
             if (!result)
             {
-                DeepDrillerComponentManager.HideAllPowerAttachments();
+                _mono.ComponentManager.HideAllPowerAttachments();
             }
             return result;
         }

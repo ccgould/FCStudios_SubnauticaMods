@@ -123,7 +123,7 @@ namespace FCSPowerStorage.Mono
             _mono.SetBasePowerProtectionGoal(baseDrainValue);
         }
 
-        public override void ItemModified<T>(T item)
+        public override void ItemModified(TechType item, int newAmount)
         {
             throw new System.NotImplementedException();
         }

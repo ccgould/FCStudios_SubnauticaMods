@@ -6,6 +6,6 @@ namespace ExStorageDepot.Model
     {
         [JsonProperty] internal float Charge { get; set; }
         [JsonProperty] internal float Capacity { get; set; }
-
+        [JsonProperty] internal TechType TechType { get; set; }
     }
 }

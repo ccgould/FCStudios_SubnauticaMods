@@ -109,7 +109,7 @@ namespace FCS_AIMarineTurbine.Display
 
         #region Private Methods
 
-        public override void ItemModified<T>(T item)
+        public override void ItemModified(TechType item, int newAmount)
         {
             throw new NotImplementedException();
         }

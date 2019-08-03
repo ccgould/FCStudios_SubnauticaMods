@@ -125,7 +125,7 @@ namespace ARS_SeaBreezeFCS32.Mono
             }
         }
 
-        public override void ItemModified<T>(T item)
+        public override void ItemModified(TechType item1, int newAmount = 0)
         {
             DrawPage(1);
         }
@@ -417,6 +417,7 @@ namespace ARS_SeaBreezeFCS32.Mono
         private void CalculateNewMaxPages()
         {
             MaxPage = Mathf.CeilToInt((_mono.TrackedItems.Count - 1) / ITEMS_PER_PAGE) + 1;
+            QuickLogger.Debug($"Seabreeze TrackedItems {_mono.TrackedItems.Count}, Items Per Page {ITEMS_PER_PAGE}, Max Page {MaxPage}", true);
             if (CurrentPage > MaxPage)
             {
                 CurrentPage = MaxPage;

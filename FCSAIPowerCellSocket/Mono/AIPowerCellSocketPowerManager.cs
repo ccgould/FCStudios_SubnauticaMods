@@ -108,7 +108,6 @@ namespace FCSAIPowerCellSocket.Mono
                 ErrorMessage.AddMessage("Only powercells are allowed.");
             }
 
-
             return flag;
         }
 

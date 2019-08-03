@@ -29,7 +29,7 @@ namespace FCSCommon.Helpers
 
         public abstract void OnButtonClick(string btnName, object tag);
 
-        public abstract void ItemModified<T>(T item);
+        public abstract void ItemModified(TechType item, int newAmount = 0);
 
         public abstract bool FindAllComponents();
 

@@ -1,29 +1,47 @@
-﻿using ExStorageDepot.Mono.Managers;
+﻿using ExStorageDepot.Configuration;
+using ExStorageDepot.Enumerators;
+using ExStorageDepot.Mono.Managers;
+using FCSCommon.Utilities;
 using UnityEngine;
 
 namespace ExStorageDepot.Mono
 {
     internal class ExStorageDepotController : MonoBehaviour, IProtoEventListener, IConstructable
     {
+        internal ExStorageDepotDisplayManager Display { get; private set; }
+        private ExStorageDepotSaveDataEntry _saveData;
+        private bool _initialized;
+        internal ExStorageDepotNameManager NameController { get; private set; }
+        internal ExStorageDepotAnimationManager AnimationManager { get; private set; }
+        internal ExStorageDepotStorageManager Storage { get; private set; }
+        public BulkMultipliers BulkMultiplier { get; set; }
+
         #region Unity Methods
         private void Start()
         {
-            AnimationManager = gameObject.AddComponent<ExStorageDepotAnimationManager>();
 
         }
+
         #endregion
 
         public void OnProtoSerialize(ProtobufSerializer serializer)
         {
-
+            if (!Mod.IsSaving())
+            {
+                QuickLogger.Info("Saving Ex Storage Depot");
+                Mod.SaveExStorageDepot();
+            }
         }
 
         public void OnProtoDeserialize(ProtobufSerializer serializer)
         {
-
+            QuickLogger.Debug("In OnProtoDeserialize");
+            var prefabIdentifier = GetComponent<PrefabIdentifier>();
+            var id = prefabIdentifier?.Id ?? string.Empty;
+            var data = Mod.GetExStorageDepotSaveData(id);
+            NameController.SetCurrentName(data.UnitName);
         }
 
-        internal ExStorageDepotAnimationManager AnimationManager { get; set; }
         public bool CanDeconstruct(out string reason)
         {
             reason = string.Empty;
@@ -34,9 +52,45 @@ namespace ExStorageDepot.Mono
         {
             if (constructed)
             {
-                var display = gameObject.AddComponent<ExStorageDepotDisplayManager>();
-                display.Initialize(this);
+                if (!_initialized)
+                {
+                    Initialize();
+                }
             }
+        }
+
+        private void Initialize()
+        {
+            if (NameController == null)
+            {
+                NameController = new ExStorageDepotNameManager();
+                NameController.Initialize(this);
+            }
+
+            AnimationManager = gameObject.AddComponent<ExStorageDepotAnimationManager>();
+            Storage = gameObject.AddComponent<ExStorageDepotStorageManager>();
+            Storage.Initialize(this);
+
+            if (Display == null)
+            {
+                Display = gameObject.AddComponent<ExStorageDepotDisplayManager>();
+                Display.Initialize(this);
+            }
+            _initialized = true;
+        }
+
+        public void Save(ExStorageDepotSaveData saveDataList)
+        {
+            var prefabIdentifier = GetComponent<PrefabIdentifier>();
+            var id = prefabIdentifier.Id;
+
+            if (_saveData == null)
+            {
+                _saveData = new ExStorageDepotSaveDataEntry();
+            }
+            _saveData.Id = id;
+            _saveData.UnitName = NameController.GetCurrentName();
+            saveDataList.Entries.Add(_saveData);
         }
     }
 }

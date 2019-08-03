@@ -1,4 +1,5 @@
-﻿using FCS_DeepDriller.Configuration;
+﻿using FCS_DeepDriller.Buildable;
+using FCS_DeepDriller.Configuration;
 using FCS_DeepDriller.Enumerators;
 using FCSCommon.Utilities.Enums;
 using System;
@@ -108,7 +109,7 @@ namespace FCS_DeepDriller.Mono.Handlers
             _depthCurve.AddKey(0.4245796f, 0.5001081f);
             _depthCurve.AddKey(1f, 1f);
 
-            _powerBank.Solar.InitializeSolar(0, 3000);
+            _powerBank.Solar.InitializeSolar(0, FCSDeepDrillerBuildable.DeepDrillConfig.SolarCapacity);
             PowerState = FCSPowerStates.Tripped;
 
             _initialized = true;

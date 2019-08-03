@@ -3,7 +3,6 @@ using FCS_DeepDriller.Mono;
 using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
-using FCSTechFabricator.Models;
 using Oculus.Newtonsoft.Json;
 using SMLHelper.V2.Crafting;
 using System.Collections.Generic;
@@ -114,7 +113,7 @@ namespace FCS_DeepDriller.Buildable
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(ModTechTypes.DeepStorageKit, 1)
+                    new Ingredient(TechTypeHelpers.GetTechType("DeepDrillerKit_DD"), 1)
                 }
             };
             QuickLogger.Debug($"Created Ingredients");

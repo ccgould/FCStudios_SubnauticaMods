@@ -1,6 +1,6 @@
 ﻿using FCS_DeepDriller.Buildable;
 using FCS_DeepDriller.Configuration;
-using FCS_DeepDriller.Managers;
+using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using System;
 using System.Collections.Generic;
@@ -17,7 +17,9 @@ namespace FCS_DeepDriller.Mono
         internal Action<Pickupable, string> OnBatteryAdded;
         internal Action<Pickupable> OnBatteryRemoved;
 
-
+        /// <summary>
+        /// All batteries allowed in this mod. Modded batteries are added in setup
+        /// </summary>
         internal HashSet<TechType> CompatibleTech = new HashSet<TechType>()
         {
             TechType.PowerCell,
@@ -48,6 +50,22 @@ namespace FCS_DeepDriller.Mono
             {
                 QuickLogger.Error("Equipment is null on creation");
             }
+
+            var deepPowerCell = TechTypeHelpers.GetTechType("DeepPowerCell");
+
+            if (deepPowerCell != TechType.None)
+            {
+                CompatibleTech.Add(deepPowerCell);
+                QuickLogger.Debug($"Added {deepPowerCell}  TechType to compatible tech ");
+            }
+
+            var enzymepowercell = TechTypeHelpers.GetTechType("EnzymePowerCell");
+
+            if (enzymepowercell != TechType.None)
+            {
+                CompatibleTech.Add(enzymepowercell);
+                QuickLogger.Debug($"Added {enzymepowercell}  TechType to compatible tech ");
+            }
         }
 
         internal void AddMoreSlots()
@@ -58,7 +76,6 @@ namespace FCS_DeepDriller.Mono
                 _equipment.AddSlot(slotID);
                 QuickLogger.Debug($"Added slot {slotID}");
             }
-
         }
 
         private bool IsAllowedToRemove(Pickupable pickupable, bool verbose)
@@ -86,19 +103,19 @@ namespace FCS_DeepDriller.Mono
         {
             if (slot == EquipmentConfiguration.SlotIDs[0])
             {
-                DeepDrillerComponentManager.GetBatteryCellModel(1).SetActive(false);
+                _mono.ComponentManager.GetBatteryCellModel(1).SetActive(false);
             }
             else if (slot == EquipmentConfiguration.SlotIDs[1])
             {
-                DeepDrillerComponentManager.GetBatteryCellModel(2).SetActive(false);
+                _mono.ComponentManager.GetBatteryCellModel(2).SetActive(false);
             }
             else if (slot == EquipmentConfiguration.SlotIDs[2])
             {
-                DeepDrillerComponentManager.GetBatteryCellModel(3).SetActive(false);
+                _mono.ComponentManager.GetBatteryCellModel(3).SetActive(false);
             }
             else if (slot == EquipmentConfiguration.SlotIDs[3])
             {
-                DeepDrillerComponentManager.GetBatteryCellModel(4).SetActive(false);
+                _mono.ComponentManager.GetBatteryCellModel(4).SetActive(false);
             }
 
             _mono.DisplayHandler.EmptyBatteryVisual(slot);
@@ -108,13 +125,13 @@ namespace FCS_DeepDriller.Mono
         private void OnEquipmentAdded(string slot, InventoryItem item)
         {
             if (slot == EquipmentConfiguration.SlotIDs[0])
-                DeepDrillerComponentManager.GetBatteryCellModel(1).SetActive(true);
+                _mono.ComponentManager.GetBatteryCellModel(1).SetActive(true);
             else if (slot == EquipmentConfiguration.SlotIDs[1])
-                DeepDrillerComponentManager.GetBatteryCellModel(2).SetActive(true);
+                _mono.ComponentManager.GetBatteryCellModel(2).SetActive(true);
             else if (slot == EquipmentConfiguration.SlotIDs[2])
-                DeepDrillerComponentManager.GetBatteryCellModel(3).SetActive(true);
+                _mono.ComponentManager.GetBatteryCellModel(3).SetActive(true);
             else if (slot == EquipmentConfiguration.SlotIDs[3])
-                DeepDrillerComponentManager.GetBatteryCellModel(4).SetActive(true);
+                _mono.ComponentManager.GetBatteryCellModel(4).SetActive(true);
 
             OnBatteryAdded?.Invoke(item.item, slot);
         }
@@ -155,9 +172,9 @@ namespace FCS_DeepDriller.Mono
             for (int i = 0; i < EquipmentConfiguration.SlotIDs.Length; i++)
             {
                 QuickLogger.Debug($" Checking battery {i + 1}");
-                if (DeepDrillerComponentManager.GetBatteryCellModel(i + 1) != null)
+                if (_mono.ComponentManager.GetBatteryCellModel(i + 1) != null)
                 {
-                    if (DeepDrillerComponentManager.GetBatteryCellModel(i + 1).activeSelf)
+                    if (_mono.ComponentManager.GetBatteryCellModel(i + 1).activeSelf)
                     {
                         return true;
                     }

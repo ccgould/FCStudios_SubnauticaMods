@@ -62,6 +62,7 @@ namespace FCS_DeepDriller.Mono
         internal BatteryAttachment BatteryController { get; private set; }
         internal OreGenerator OreGenerator { get; private set; }
         internal VFXManager VFXManagerHandler { get; private set; }
+        public DeepDrillerComponentManager ComponentManager { get; private set; }
 
         #endregion
 
@@ -194,6 +195,9 @@ namespace FCS_DeepDriller.Mono
 
         private void Initialize()
         {
+
+            ComponentManager = new DeepDrillerComponentManager();
+
             _batteryAttachment = new BatteryAttachment();
             _batteryAttachment.GetGameObject(this);
             _batteryAttachment.GetController().OnBatteryAdded += OnBatteryAdded;
@@ -204,13 +208,13 @@ namespace FCS_DeepDriller.Mono
             var solarAttachment = new SolarAttachment();
             solarAttachment.GetGameObject(this);
 
-            if (!DeepDrillerComponentManager.FindAllComponents(this, solarAttachment.GetSolarAttachment(), _batteryAttachment.GetBatteryAttachment(), null))
+            if (!ComponentManager.FindAllComponents(this, solarAttachment.GetSolarAttachment(), _batteryAttachment.GetBatteryAttachment(), null))
             {
                 QuickLogger.Error("Couldn't find all components");
                 return;
             }
 
-            DeepDrillerComponentManager.Setup();
+            ComponentManager.Setup();
 
             ExtendStateHash = Animator.StringToHash("Extend");
 
@@ -387,7 +391,6 @@ namespace FCS_DeepDriller.Mono
             if (PowerManager.GetPowerState() == FCSPowerStates.Tripped) return;
             UpdateLegState(false);
             PowerManager.SetPowerState(FCSPowerStates.Tripped);
-            AnimationHandler.SetBoolHash(ScreenStateHash, false);
         }
 
         internal void PowerOnDrill()
@@ -423,7 +426,7 @@ namespace FCS_DeepDriller.Mono
                 PowerManager.RemoveSolar();
             }
 
-            DeepDrillerComponentManager.HideAttachment(module);
+            ComponentManager.HideAttachment(module);
         }
 
         internal List<TechType> GetBiomeData()
@@ -440,7 +443,7 @@ namespace FCS_DeepDriller.Mono
 
         internal void AddAttachment(DeepDrillModules module)
         {
-            DeepDrillerComponentManager.ShowAttachment(module);
+            ComponentManager.ShowAttachment(module);
         }
 
         internal void SetOreFocus(TechType techType)

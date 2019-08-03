@@ -64,13 +64,25 @@
     <Compile Include="Buildable\ExStorageDepotAuxPatcher.cs" />
     <Compile Include="Buildable\ExStorageDepotModelPrefab.cs" />
     <Compile Include="Buildable\ExStorageDepotPatcher.cs" />
+    <Compile Include="Configuration\ExStorageDepotSaveDataEntry.cs" />
+    <Compile Include="Configuration\ExStorageDepotSaveData.cs" />
+    <Compile Include="Configuration\Mod.cs" />
+    <Compile Include="Display\ColorItemButton.cs" />
+    <Compile Include="Display\InterfaceButton.cs" />
+    <Compile Include="Display\ItemButton.cs" />
+    <Compile Include="Display\OnScreenButton.cs" />
+    <Compile Include="Display\PaginatorButton.cs" />
+    <Compile Include="Enumerators\BulkMultipliers.cs" />
+    <Compile Include="Enumerators\ItemType.cs" />
     <Compile Include="Model\BatteryData.cs" />
     <Compile Include="Model\FoodData.cs" />
     <Compile Include="Model\ItemData.cs" />
     <Compile Include="Mono\ExStorageDepotController.cs" />
     <Compile Include="Mono\Managers\ExStorageDepotAnimationManager.cs" />
     <Compile Include="Mono\Managers\ExStorageDepotDisplayManager.cs" />
+    <Compile Include="Mono\Managers\ExStorageDepotNameManager.cs" />
     <Compile Include="Mono\Managers\ExStorageDepotStorageManager.cs" />
+    <Compile Include="Patches\OnProtoDeserializeObjectTree_Patcher.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

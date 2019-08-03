@@ -9,14 +9,10 @@ namespace FCS_DeepDriller.Configuration
     public class DeepDrillerCfg
     {
         #region Public declarations
-        public static bool _debug = false;
-
-        public StorageConfig StorageSize { get; set; } = new StorageConfig { Height = 10, Width = 8 };
+        public StorageConfig StorageSize { get; set; } = new StorageConfig { Height = 8, Width = 6 };
 
         public float PowerDraw { get; set; } = 0.1f;
-
-        public bool EnableWear { get; set; } = true;
-        public float SolarCapacity { get; set; } = 3000;
+        public float SolarCapacity { get; set; } = 125;
 
         public Dictionary<string, List<string>> BiomeOres { get; set; } = new Dictionary<string, List<string>>();
 

@@ -23,7 +23,7 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers.Logic
         private float _secondPerItem;
         private FCSDeepDrillerController _mono;
         private const float DayNight = 1200f;
-        private const int OresPerDay = 30;
+        private const int OresPerDay = 15;
         #endregion
 
         #region Internal Properties

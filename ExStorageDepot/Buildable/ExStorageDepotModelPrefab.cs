@@ -46,21 +46,21 @@ namespace ExStorageDepot.Buildable
                 return false;
             }
 
-            ////We have found the asset bundle and now we are going to continue by looking for the model.
-            //GameObject listItem = assetBundle.LoadAsset<GameObject>("ListButton");
+            //We have found the asset bundle and now we are going to continue by looking for the model.
+            GameObject listItem = assetBundle.LoadAsset<GameObject>("ItemSlot");
 
-            ////If the prefab isn't null lets add the shader to the materials
-            //if (listItem != null)
-            //{
-            //    ItemPrefab = listItem;
+            //If the prefab isn't null lets add the shader to the materials
+            if (listItem != null)
+            {
+                ItemPrefab = listItem;
 
-            //    QuickLogger.Debug("List item Prefab Found!");
-            //}
-            //else
-            //{
-            //    QuickLogger.Error("List item Prefab Not Found!");
-            //    return false;
-            //}
+                QuickLogger.Debug("List item Prefab Found!");
+            }
+            else
+            {
+                QuickLogger.Error("List item Prefab Not Found!");
+                return false;
+            }
 
             return true;
         }
@@ -71,12 +71,19 @@ namespace ExStorageDepot.Buildable
         /// <param name="prefab">The prefab to apply shaders.</param>
         internal static void ApplyShaders(GameObject prefab)
         {
-            #region AMMiniMedBay_BaseColor
+            #region ExStorageDepotUnit_BaseColor
             MaterialHelpers.ApplyAlphaShader("ExStorageDepotUnit_BaseColor", prefab);
             MaterialHelpers.ApplySpecShader("ExStorageDepotUnit_BaseColor", "ExStorageDepotUnit_Spec", prefab, 1, 0.5f, _assetBundle);
             MaterialHelpers.ApplyNormalShader("ExStorageDepotUnit_BaseColor", "ExStorageDepotUnit_Norm", prefab, _assetBundle);
             MaterialHelpers.ApplyEmissionShader("ExStorageDepotUnit_BaseColor", "DeepDriller_Emissive_On", prefab, _assetBundle, new Color(0.08235294f, 1f, 1f));
             #endregion
+
+            #region StarShipCargo
+            MaterialHelpers.ApplyAlphaShader("Starship_cargo", prefab);
+            MaterialHelpers.ApplySpecShader("Starship_cargo", "Starship_cargo_spec", prefab, 1, 0.5f, _assetBundle);
+            MaterialHelpers.ApplyNormalShader("Starship_cargo", "Starship_cargo_normal", prefab, _assetBundle);
+            #endregion
         }
+
     }
 }

@@ -1,25 +1,42 @@
 ﻿using FCSCommon.Utilities;
-using FCSTechFabricator.Abstract_Classes;
 using FCSTechFabricator.Models;
+using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
-using SMLHelper.V2.Utility;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace FCSTechFabricator.Mono.DeepDriller
 {
-    public partial class BatteryAttachmentBuildable : FCSTechFabricatorItem
+    public partial class BatteryAttachmentBuildable : Craftable
     {
-        private TechGroup GroupForPDA = TechGroup.Resources;
-        private TechCategory CategoryForPDA = TechCategory.AdvancedMaterials;
         private GameObject _prefab;
+
         private Text _label;
 
+        internal static TechType TechTypeID { get; private set; }
 
-        public BatteryAttachmentBuildable() : base("BatteryAttachment_DD", "Deep Driller Battery Attachment")
+        public override CraftTree.Type FabricatorType { get; } =
+            FCSTechFabricatorBuildable.TechFabricatorCraftTreeType;
+
+        public override string[] StepsToFabricatorTab { get; } = new[] { "AIS", "DD" };
+
+        public override string AssetsFolder { get; } = "FCSTechFabricator/Assets";
+
+        public BatteryAttachmentBuildable() : base("BatteryAttachment_DD", "Deep Driller Battery Attachment", "This specially made attachment allows you to run your deep driller off battery power")
         {
+            if (!GetPrefabs())
+            {
+                QuickLogger.Error("Failed to retrieve all prefabs");
+            }
+
+            OnFinishedPatching = () =>
+            {
+                TechTypeID = this.TechType;
+                //Add the new TechType Hand Equipment type
+                CraftDataHandler.SetEquipmentType(TechType, EquipmentType.Hand);
+            };
 
         }
 
@@ -38,7 +55,7 @@ namespace FCSTechFabricator.Mono.DeepDriller
             var model = prefab.GetComponentInChildren<Canvas>().gameObject;
             model.FindChild("Screen").SetActive(true);
 
-            _label.text = FriendlyName_I;
+            _label.text = FriendlyName;
 
             // Make the object drop slowly in water
             var wf = prefab.AddComponent<WorldForces>();
@@ -106,7 +123,7 @@ namespace FCSTechFabricator.Mono.DeepDriller
             return prefab;
         }
 
-        private TechData GetBlueprintRecipe()
+        protected override TechData GetBlueprintRecipe()
         {
             // Create and associate recipe to the new TechType
             var customFabRecipe = new TechData()
@@ -115,7 +132,6 @@ namespace FCSTechFabricator.Mono.DeepDriller
                 Ingredients = new List<Ingredient>()
                 {
                     new Ingredient(TechType.Copper, 1),
-                    new Ingredient(TechType.AcidMushroom, 2),
                     new Ingredient(TechType.Silicone, 1),
                     new Ingredient(TechType.Titanium, 1),
                 }
@@ -124,40 +140,8 @@ namespace FCSTechFabricator.Mono.DeepDriller
             return customFabRecipe;
         }
 
-        public override void Register()
-        {
-            if (GetPrefabs())
-            {
-                if (this.IsRegistered == false)
-                {
-                    ClassID_I = this.ClassID;
-
-                    //Create a new TechType
-                    this.TechType = TechTypeHandler.AddTechType(ClassID, PrefabFileName, "This specially made attachment allows you to run your deep driller off battery power", new Atlas.Sprite(ImageUtils.LoadTextureFromFile($"./QMods/FCSTechFabricator/Assets/{ClassID}.png")));
-
-                    CraftDataHandler.SetTechData(TechType, GetBlueprintRecipe());
-
-                    CraftDataHandler.AddToGroup(this.GroupForPDA, this.CategoryForPDA, this.TechType);
-
-                    QuickLogger.Debug($"Class Id = {ClassID_I}");
-
-                    FriendlyName_I = this.PrefabFileName;
-
-                    TechTypeID = TechType;
-
-                    // Add the new TechType to Hand Equipment type.
-                    CraftDataHandler.SetEquipmentType(TechType, EquipmentType.Hand);
-
-                    PrefabHandler.RegisterPrefab(this);
-
-                    this.IsRegistered = true;
-                }
-            }
-            else
-            {
-                QuickLogger.Error("Failed to get the Kit Prefab");
-            }
-        }
+        public override TechGroup GroupForPDA { get; } = TechGroup.Resources;
+        public override TechCategory CategoryForPDA { get; } = TechCategory.AdvancedMaterials;
 
         public bool GetPrefabs()
         {
@@ -188,5 +172,6 @@ namespace FCSTechFabricator.Mono.DeepDriller
             _label = canvasObject.FindChild("Screen").FindChild("Label").GetComponent<Text>();
             return true;
         }
+
     }
 }

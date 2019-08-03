@@ -22,11 +22,11 @@ namespace FCSTechFabricator.Mono.SeaBreeze
                 //Lets apply the material shader
                 ApplyShaders(_prefab);
 
-                QuickLogger.Debug($"{this.FriendlyName_I} Prefab Found!");
+                QuickLogger.Debug($"{FriendlyName} Prefab Found!");
             }
             else
             {
-                QuickLogger.Error($"{this.FriendlyName_I} Prefab Not Found!");
+                QuickLogger.Error($"{FriendlyName} Prefab Not Found!");
                 return false;
             }
 

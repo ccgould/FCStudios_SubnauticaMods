@@ -37,7 +37,7 @@ namespace FCS_DeepDriller
                     new HarmonyMethod(typeof(uGUI_Equipment_Awake_Patch), "Prefix"),
                     new HarmonyMethod(typeof(uGUI_Equipment_Awake_Patch), "Postfix"));
 
-                harmony.PatchAll(Assembly.GetExecutingAssembly());
+                //harmony.PatchAll(Assembly.GetExecutingAssembly());
 
                 QuickLogger.Info("Finished patching");
             }
