@@ -2,8 +2,9 @@
 {
     internal enum ItemType
     {
+        Pickupable,
         Battery,
-        Playertool,
+        Fuel,
         Food
     }
 }

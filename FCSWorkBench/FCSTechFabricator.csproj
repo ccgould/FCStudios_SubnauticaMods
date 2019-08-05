@@ -70,6 +70,7 @@
     <Compile Include="Mono\DeepDriller\BatteryAttachmentPatcher.cs" />
     <Compile Include="Mono\DeepDriller\FocusAttachmentPatcher.cs" />
     <Compile Include="Mono\DeepDriller\SolarAttachmentPatcher.cs" />
+    <Compile Include="Mono\Ex-Storage\ExStorageKit.cs" />
     <Compile Include="Mono\FCSTechFabricatorTag.cs" />
     <Compile Include="Mono\FCSTechWorkBenchModelPrefab.cs" />
     <Compile Include="Mono\FCSTechWorkBenchPatcher.cs" />

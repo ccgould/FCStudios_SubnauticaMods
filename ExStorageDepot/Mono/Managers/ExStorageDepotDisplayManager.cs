@@ -20,6 +20,7 @@ namespace ExStorageDepot.Mono.Managers
         private GameObject _grid;
         private Text _pageCounter;
         private Text _plier;
+        private Text _itemCount;
         private readonly Dictionary<TechType, GameObject> _trackedResourcesDisplayElements = new Dictionary<TechType, GameObject>();
         internal void Initialize(ExStorageDepotController mono)
         {
@@ -334,8 +335,13 @@ namespace ExStorageDepot.Mono.Managers
             }
 
 
+            _itemCount = home.FindChild("StorageAmount").GetComponent<Text>();
 
-
+            if (_pageCounter == null)
+            {
+                QuickLogger.Error("Couldn't find the Text on StorageAmount in Home");
+                return false;
+            }
 
             return true;
         }
@@ -397,12 +403,11 @@ namespace ExStorageDepot.Mono.Managers
             for (int i = startingPosition; i < endingPosition; i++)
             {
                 var element = container.ElementAt(i);
-                var techType = element.Key;
+                var techType = element.TechType;
 
                 QuickLogger.Debug($"Element: {element} || TechType : {techType}");
-
-                LoadDisplay(element.Key, element.Value);
-
+                if (_trackedResourcesDisplayElements.ContainsKey(techType)) continue;
+                LoadDisplay(element.TechType, _mono.Storage.GetItemCount(element.TechType));
                 //Tracked items was here
             }
 
@@ -444,13 +449,18 @@ namespace ExStorageDepot.Mono.Managers
         {
             QuickLogger.Debug($"Seabreeze TrackedItems {_mono.Storage.TrackedItems.Count}, Items Per Page {ITEMS_PER_PAGE}, Max Page {MaxPage}", true);
 
-            MaxPage = Mathf.CeilToInt((_mono.Storage.TrackedItems.Count - 1) / ITEMS_PER_PAGE) + 1;
+            MaxPage = Mathf.CeilToInt((_trackedResourcesDisplayElements.Count - 1) / ITEMS_PER_PAGE) + 1;
 
 
             if (CurrentPage > MaxPage)
             {
                 CurrentPage = MaxPage;
             }
+        }
+
+        internal void SetItemCount(int count, int maxCount)
+        {
+            _itemCount.text = $"Item Count: {count}/{maxCount}";
         }
     }
 }

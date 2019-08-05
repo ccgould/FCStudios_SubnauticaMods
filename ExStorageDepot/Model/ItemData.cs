@@ -12,6 +12,7 @@ namespace ExStorageDepot.Model
         [JsonProperty] internal String PrefabId { get; set; }
         [JsonProperty] internal BatteryData BatteryData { get; set; }
         [JsonProperty] internal FoodData FoodData { get; set; }
+        [JsonProperty] internal FuelData FuelData { get; set; }
         [JsonProperty] internal ItemType Type { get; set; }
         internal InventoryItem InventoryItem { get; set; }
 
@@ -23,17 +24,14 @@ namespace ExStorageDepot.Model
                 PrefabId = InventoryItem.item.gameObject.GetComponent<PrefabIdentifier>()?.Id;
                 var battery = InventoryItem.item.gameObject.GetComponent<Battery>();
                 var food = InventoryItem.item.gameObject.GetComponent<Eatable>();
-                var playerTool = InventoryItem.item.gameObject.GetComponent<EnergyMixin>();
+                var fuel = InventoryItem.item.gameObject.GetComponent<FireExtinguisher>();
 
-                if (playerTool != null)
+                if (fuel != null)
                 {
-                    var techTag = playerTool.GetBattery().gameObject.GetComponent<TechTag>();
-                    var toolBattery = playerTool.GetBattery().gameObject.GetComponent<Battery>();
-                    BatteryData = new BatteryData { Capacity = toolBattery._capacity, Charge = toolBattery._charge, TechType = techTag.type };
-                    QuickLogger.Debug($"Saved player tool {InventoryItem.item.GetTechType()} with battery {techTag.type}");
-                    Type = ItemType.Playertool;
+                    FuelData = new FuelData { Fuel = fuel.fuel };
+                    QuickLogger.Debug($"Saved {TechType} fire extinguisher");
+                    Type = ItemType.Fuel;
                     return;
-
                 }
 
                 if (battery != null)
@@ -49,7 +47,6 @@ namespace ExStorageDepot.Model
                     FoodData = new FoodData { FoodValue = food.foodValue, WaterValue = food.waterValue };
                     QuickLogger.Debug($"Saved {TechType} Food");
                     Type = ItemType.Food;
-                    return;
                 }
             }
             else

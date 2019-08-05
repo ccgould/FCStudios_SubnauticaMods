@@ -16,14 +16,6 @@ namespace ExStorageDepot.Mono
         internal ExStorageDepotStorageManager Storage { get; private set; }
         public BulkMultipliers BulkMultiplier { get; set; }
 
-        #region Unity Methods
-        private void Start()
-        {
-
-        }
-
-        #endregion
-
         public void OnProtoSerialize(ProtobufSerializer serializer)
         {
             if (!Mod.IsSaving())
@@ -40,6 +32,7 @@ namespace ExStorageDepot.Mono
             var id = prefabIdentifier?.Id ?? string.Empty;
             var data = Mod.GetExStorageDepotSaveData(id);
             NameController.SetCurrentName(data.UnitName);
+            Storage.LoadFromSave(data.StorageItems);
         }
 
         public bool CanDeconstruct(out string reason)
@@ -90,6 +83,8 @@ namespace ExStorageDepot.Mono
             }
             _saveData.Id = id;
             _saveData.UnitName = NameController.GetCurrentName();
+            _saveData.StorageItems = Storage.TrackedItems;
+
             saveDataList.Entries.Add(_saveData);
         }
     }

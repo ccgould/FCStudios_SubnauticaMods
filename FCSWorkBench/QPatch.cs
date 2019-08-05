@@ -102,6 +102,11 @@ namespace FCSTechFabricator
             FCSTechFabricatorBuildable.AddTechType(sbKit.TechType, sbKit.StepsToFabricatorTab);
             QuickLogger.Debug($"Patched {sbKit.FriendlyName}");
 
+            var exKit = new ExStorageKitBuildable();
+            exKit.Patch();
+            FCSTechFabricatorBuildable.AddTechType(exKit.TechType, exKit.StepsToFabricatorTab);
+            QuickLogger.Debug($"Patched {exKit.FriendlyName}");
+
         }
 
         public static bool GetPrefabs()

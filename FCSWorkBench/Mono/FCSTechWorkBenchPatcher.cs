@@ -30,6 +30,7 @@ namespace FCSTechFabricator.Mono
             {"Deep Driller",new ModKey{Key = "DD",ParentKey = "AIS"}},
             {"Power Storage",new ModKey{Key = "PS",ParentKey = "AIS"}},
             {"SeaBreeze",new ModKey{Key = "SB",ParentKey = "ARS"}},
+            {"Ex-Storage",new ModKey{Key = "ES",ParentKey = "ASTS"}},
         };
 
 
