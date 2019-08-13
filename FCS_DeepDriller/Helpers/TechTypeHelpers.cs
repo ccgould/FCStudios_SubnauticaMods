@@ -9,6 +9,9 @@ namespace FCS_DeepDriller.Helpers
         private static TechType _batteryModuleTechType;
         private static TechType _solarPanelTechType;
         private static TechType _focusTechType;
+        private static TechType _drillerMK1TechType;
+        private static TechType _drillerMK2TechType;
+        private static TechType _drillerMK3TechType;
 
         internal static void Initialize()
         {
@@ -44,6 +47,31 @@ namespace FCS_DeepDriller.Helpers
             {
                 _focusTechType = focusTechType;
             }
+
+            for (int i = 1; i < 4; i++)
+            {
+                var mkFound = TechTypeHandler.TryGetModdedTechType($"DrillerMK{i}_DD", out TechType techType);
+
+                if (!mkFound)
+                {
+                    QuickLogger.Error($"Deep Driller MK{i} TechType not found");
+                }
+                else
+                {
+                    switch (i)
+                    {
+                        case 1:
+                            _drillerMK1TechType = techType;
+                            break;
+                        case 2:
+                            _drillerMK2TechType = techType;
+                            break;
+                        case 3:
+                            _drillerMK3TechType = techType;
+                            break;
+                    }
+                }
+            }
         }
 
         internal static DeepDrillModules GetDeepModule(TechType techType)
@@ -71,5 +99,8 @@ namespace FCS_DeepDriller.Helpers
         internal static TechType BatteryAttachmentTechType() => _batteryModuleTechType;
         internal static TechType SolarAttachmentTechType() => _solarPanelTechType;
         internal static TechType FocusAttachmentTechType() => _focusTechType;
+        internal static TechType DrillerMK1TechType() => _drillerMK1TechType;
+        internal static TechType DrillerMK2TechType() => _drillerMK2TechType;
+        internal static TechType DrillerMK3TechType() => _drillerMK3TechType;
     }
 }

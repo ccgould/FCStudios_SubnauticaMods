@@ -1,4 +1,5 @@
-﻿using ExStorageDepot.Model;
+﻿using ExStorageDepot.Enumerators;
+using ExStorageDepot.Model;
 using Oculus.Newtonsoft.Json;
 using System.Collections.Generic;
 
@@ -8,6 +9,7 @@ namespace ExStorageDepot.Configuration
     {
         [JsonProperty] internal string Id { get; set; }
         [JsonProperty] internal string UnitName { get; set; }
+        [JsonProperty] internal BulkMultipliers Multiplier { get; set; }
         [JsonProperty] internal List<ItemData> StorageItems { get; set; }
     }
 }

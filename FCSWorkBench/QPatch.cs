@@ -107,6 +107,21 @@ namespace FCSTechFabricator
             FCSTechFabricatorBuildable.AddTechType(exKit.TechType, exKit.StepsToFabricatorTab);
             QuickLogger.Debug($"Patched {exKit.FriendlyName}");
 
+            var ddMk1 = new DrillerMK1Craftable();
+            ddMk1.Patch();
+            FCSTechFabricatorBuildable.AddTechType(ddMk1.TechType, ddMk1.StepsToFabricatorTab);
+            QuickLogger.Debug($"Patched {ddMk1.FriendlyName}");
+
+            var ddMk2 = new DrillerMK2Craftable();
+            ddMk2.Patch();
+            FCSTechFabricatorBuildable.AddTechType(ddMk2.TechType, ddMk2.StepsToFabricatorTab);
+            QuickLogger.Debug($"Patched {ddMk2.FriendlyName}");
+
+            var ddMk3 = new DrillerMK3Craftable();
+            ddMk3.Patch();
+            FCSTechFabricatorBuildable.AddTechType(ddMk3.TechType, ddMk3.StepsToFabricatorTab);
+            QuickLogger.Debug($"Patched {ddMk3.FriendlyName}");
+
         }
 
         public static bool GetPrefabs()

@@ -111,6 +111,18 @@ namespace FCS_DeepDriller.Helpers
                                     break;
                             }
                         }
+
+                        if (item.Value.name.StartsWith("CDD"))
+                        {
+                            int.TryParse(item.Key.Substring(17), out int slotNum);
+
+                            switch (slotNum)
+                            {
+                                case 1:
+                                    item.Value.rectTransform.anchoredPosition = slotPos[11];
+                                    break;
+                            }
+                        }
                     }
                     catch
                     {

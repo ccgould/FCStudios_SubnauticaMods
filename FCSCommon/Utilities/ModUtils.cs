@@ -32,7 +32,9 @@ namespace FCSCommon.Utilities
         public static void LoadSaveData<TSaveData>(string fileName, string saveDirectory, Action<TSaveData> onSuccess) where TSaveData : new()
         {
             var save = File.ReadAllText(Path.Combine(saveDirectory, fileName));
-            var json = JsonConvert.DeserializeObject<TSaveData>(save);
+            var jsonSerializerSettings = new JsonSerializerSettings();
+            jsonSerializerSettings.MissingMemberHandling = MissingMemberHandling.Ignore;
+            var json = JsonConvert.DeserializeObject<TSaveData>(save, jsonSerializerSettings);
             onSuccess?.Invoke(json);
         }
 

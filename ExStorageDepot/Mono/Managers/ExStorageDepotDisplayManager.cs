@@ -141,7 +141,7 @@ namespace ExStorageDepot.Mono.Managers
             }
         }
 
-        private void UpdateMultiplier()
+        internal void UpdateMultiplier()
         {
             switch (_mono.BulkMultiplier)
             {
@@ -174,10 +174,15 @@ namespace ExStorageDepot.Mono.Managers
 
         public override void ItemModified(TechType type, int newAmount = 0)
         {
-            if (newAmount > 0 && _trackedResourcesDisplayElements.ContainsKey(type))
+            QuickLogger.Debug($"New Amount = {newAmount}");
+
+            if (_trackedResourcesDisplayElements.ContainsKey(type))
             {
-                _trackedResourcesDisplayElements[type].GetComponentInChildren<Text>().text = newAmount.ToString();
-                return;
+                if (newAmount > 0)
+                {
+                    _trackedResourcesDisplayElements[type].GetComponentInChildren<Text>().text = newAmount.ToString();
+                    return;
+                }
             }
 
             DrawPage(CurrentPage);
@@ -370,7 +375,14 @@ namespace ExStorageDepot.Mono.Managers
 
         public override void DrawPage(int page)
         {
+            QuickLogger.Debug($"Drawing Current Page = {page}", true);
+
             CurrentPage = page;
+
+            //if (_trackedResourcesDisplayElements.Count <= 0)
+            //{
+            //    CurrentPage -= 1;
+            //}
 
             if (CurrentPage <= 0)
             {
@@ -381,13 +393,15 @@ namespace ExStorageDepot.Mono.Managers
                 CurrentPage = MaxPage;
             }
 
+            UpdatePaginator();
+
             int startingPosition = (CurrentPage - 1) * ITEMS_PER_PAGE;
             int endingPosition = startingPosition + ITEMS_PER_PAGE;
 
             //QuickLogger.Debug($"startingPosition: {startingPosition} || endingPosition : {endingPosition}", true);
             //QuickLogger.Debug($"Number Of Items: {_mono.Storage.GetItemsCount()}");
-            var container = _mono.Storage.TrackedItems;
 
+            var container = _mono.Storage.ItemsDictionary;
 
             if (endingPosition > container.Count)
             {
@@ -403,15 +417,13 @@ namespace ExStorageDepot.Mono.Managers
             for (int i = startingPosition; i < endingPosition; i++)
             {
                 var element = container.ElementAt(i);
-                var techType = element.TechType;
+                var techType = element;
 
-                QuickLogger.Debug($"Element: {element} || TechType : {techType}");
-                if (_trackedResourcesDisplayElements.ContainsKey(techType)) continue;
-                LoadDisplay(element.TechType, _mono.Storage.GetItemCount(element.TechType));
+                QuickLogger.Debug($"Element: {element} || TechType : {techType} || SPosition {startingPosition} || EPosition {endingPosition} || CPosition {i} || Container_Count {container.Count}");
+                //if (_trackedResourcesDisplayElements.ContainsKey(techType)) continue;
+                LoadDisplay(element.Key, element.Value);
                 //Tracked items was here
             }
-
-            UpdatePaginator();
         }
 
         private void LoadDisplay(TechType elementTechType, int techTypeCount)
@@ -447,10 +459,9 @@ namespace ExStorageDepot.Mono.Managers
 
         private void CalculateNewMaxPages()
         {
-            QuickLogger.Debug($"Seabreeze TrackedItems {_mono.Storage.TrackedItems.Count}, Items Per Page {ITEMS_PER_PAGE}, Max Page {MaxPage}", true);
+            QuickLogger.Debug($"Ex-Storage TrackedItems {_mono.Storage.ItemsDictionary.Count}, Items Per Page {ITEMS_PER_PAGE}, Max Page {MaxPage}", true);
 
-            MaxPage = Mathf.CeilToInt((_trackedResourcesDisplayElements.Count - 1) / ITEMS_PER_PAGE) + 1;
-
+            MaxPage = Mathf.CeilToInt((_mono.Storage.ItemsDictionary.Count - 1) / ITEMS_PER_PAGE) + 1;
 
             if (CurrentPage > MaxPage)
             {

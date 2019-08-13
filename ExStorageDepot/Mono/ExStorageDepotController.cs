@@ -14,7 +14,7 @@ namespace ExStorageDepot.Mono
         internal ExStorageDepotNameManager NameController { get; private set; }
         internal ExStorageDepotAnimationManager AnimationManager { get; private set; }
         internal ExStorageDepotStorageManager Storage { get; private set; }
-        public BulkMultipliers BulkMultiplier { get; set; }
+        internal BulkMultipliers BulkMultiplier { get; set; }
 
         public void OnProtoSerialize(ProtobufSerializer serializer)
         {
@@ -33,12 +33,23 @@ namespace ExStorageDepot.Mono
             var data = Mod.GetExStorageDepotSaveData(id);
             NameController.SetCurrentName(data.UnitName);
             Storage.LoadFromSave(data.StorageItems);
+            BulkMultiplier = data.Multiplier;
+            Display.UpdateMultiplier();
         }
 
         public bool CanDeconstruct(out string reason)
         {
             reason = string.Empty;
-            return true;
+
+            if (Storage.IsEmpty)
+            {
+                return true;
+            }
+            else
+            {
+                reason = "Please empty the Ex-Storage";
+                return false;
+            }
         }
 
         public void OnConstructedChanged(bool constructed)
@@ -72,7 +83,7 @@ namespace ExStorageDepot.Mono
             _initialized = true;
         }
 
-        public void Save(ExStorageDepotSaveData saveDataList)
+        internal void Save(ExStorageDepotSaveData saveDataList)
         {
             var prefabIdentifier = GetComponent<PrefabIdentifier>();
             var id = prefabIdentifier.Id;
@@ -83,8 +94,8 @@ namespace ExStorageDepot.Mono
             }
             _saveData.Id = id;
             _saveData.UnitName = NameController.GetCurrentName();
-            _saveData.StorageItems = Storage.TrackedItems;
-
+            _saveData.StorageItems = Storage.GetTrackedItems();
+            _saveData.Multiplier = BulkMultiplier;
             saveDataList.Entries.Add(_saveData);
         }
     }

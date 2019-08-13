@@ -23,7 +23,7 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers.Logic
         private float _secondPerItem;
         private FCSDeepDrillerController _mono;
         private const float DayNight = 1200f;
-        private const int OresPerDay = 15;
+        private int _oresPerDay = 12;
         #endregion
 
         #region Internal Properties
@@ -38,7 +38,7 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers.Logic
         {
             _mono = mono;
             _random2 = new Random();
-            _secondPerItem = DayNight / OresPerDay;
+            _secondPerItem = DayNight / _oresPerDay;
         }
 
         private void Update()
@@ -129,6 +129,13 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers.Logic
         internal void SetIsFocus(bool dataIsFocused)
         {
             _isFocused = dataIsFocused;
+        }
+
+        internal void SetOresPerDay(int amount)
+        {
+            _oresPerDay = amount;
+            _secondPerItem = DayNight / _oresPerDay;
+            QuickLogger.Info($"Deep Driller is now configured to drill {_oresPerDay} ores per day.", true);
         }
     }
 }

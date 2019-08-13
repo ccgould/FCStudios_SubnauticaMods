@@ -12,12 +12,14 @@ namespace ExStorageDepot.Mono.Managers
 {
     internal class ExStorageDepotStorageManager : MonoBehaviour
     {
-        public List<ItemData> TrackedItems { get; private set; } = new List<ItemData>();
+        private readonly List<ItemData> _trackedItems = new List<ItemData>();
+        internal Dictionary<TechType, int> ItemsDictionary { get; } = new Dictionary<TechType, int>();
+        public bool IsEmpty => _trackedItems != null && _trackedItems.Count <= 0;
         internal Action<TechType> OnAddItem;
         internal Action<TechType> OnRemoveItem;
         private ChildObjectIdentifier _containerRoot;
         private ExStorageDepotController _mono;
-        private int _multiplier;
+        private int _multiplier = 1;
         private const int DumpContainerWidth = 8;
         private const int DumpContainerHeight = 10;
         private ItemsContainer _dumpContainer;
@@ -66,7 +68,7 @@ namespace ExStorageDepot.Mono.Managers
 
             QuickLogger.Debug("Item is not a Player Tool", true);
 
-            if (TrackedItems.Count >= MaxItems)
+            if (_trackedItems.Count >= MaxItems)
             {
                 QuickLogger.Info("Ex-Storage is full", true);
                 return false;
@@ -77,7 +79,7 @@ namespace ExStorageDepot.Mono.Managers
 
         public void SetMultiplier(int value)
         {
-            _multiplier = value;
+            _multiplier = value == 0 ? 1 : value;
         }
 
         public void OpenStorage()
@@ -101,23 +103,47 @@ namespace ExStorageDepot.Mono.Managers
         {
             QuickLogger.Debug($"Attempting to take item {techType}", true);
 
-            var item = TrackedItems.FirstOrDefault(x => x.TechType == techType);
+            var amountToRemove = 1 * _multiplier;
 
-            if (item == null)
+            for (int i = 0; i < amountToRemove; i++)
             {
-                QuickLogger.Error("Item Returned null", true);
-                return;
-            }
 
-            Pickupable pickup = InventoryHelpers.ConvertToPickupable(item);
+                var item = _trackedItems.FirstOrDefault(x => x.TechType == techType);
 
-            if (Inventory.main.Pickup(pickup))
-            {
-                CrafterLogic.NotifyCraftEnd(Player.main.gameObject, techType);
+                if (item == null)
+                {
+                    QuickLogger.Error("Item Returned null", true);
+                    return;
+                }
 
-                TrackedItems.Remove(item);
+                Pickupable pickup = InventoryHelpers.ConvertToPickupable(item);
 
-                _mono.Display.ItemModified(techType, GetItemCount(techType));
+                QuickLogger.Debug($"Attempting to take ({amountToRemove}) {item.TechType}", true);
+
+                if (ItemsDictionary.ContainsKey(item.TechType))
+                {
+                    if (Inventory.main.Pickup(pickup))
+                    {
+                        CrafterLogic.NotifyCraftEnd(Player.main.gameObject, techType);
+                        _trackedItems.Remove(item);
+
+                        // Moved here to prevent display item premature removal
+                        if (ItemsDictionary[item.TechType] > 1)
+                        {
+                            ItemsDictionary[item.TechType] -= 1;
+                        }
+                        else
+                        {
+                            ItemsDictionary.Remove(item.TechType);
+                        }
+
+                        _mono.Display.ItemModified(techType, GetItemCount(techType));
+                    }
+                }
+                else
+                {
+                    break;
+                }
             }
         }
 
@@ -125,25 +151,38 @@ namespace ExStorageDepot.Mono.Managers
         {
             foreach (InventoryItem inventoryItem in _dumpContainer)
             {
-                var techType = inventoryItem.item.GetTechType();
-
-                if (TrackedItems.Count < MaxItems)
+                if (_trackedItems.Count < MaxItems)
                 {
-                    TrackedItems.Add(InventoryHelpers.CovertToItemData(inventoryItem, true));
-                    _mono.Display.ItemModified(techType, GetItemCount(techType));
+                    AddItem(InventoryHelpers.CovertToItemData(inventoryItem, true));
                 }
             }
         }
 
+        private void AddItem(ItemData itemData)
+        {
+            _trackedItems.Add(itemData);
+
+            if (ItemsDictionary.ContainsKey(itemData.TechType))
+            {
+                ItemsDictionary[itemData.TechType] += 1;
+            }
+            else
+            {
+                ItemsDictionary.Add(itemData.TechType, 1);
+            }
+
+            _mono.Display.ItemModified(itemData.TechType, GetItemCount(itemData.TechType));
+        }
+
         internal int GetItemCount(TechType techType)
         {
-            var items = TrackedItems.Where(x => x.TechType == techType);
+            var items = _trackedItems.Where(x => x.TechType == techType);
             return items.Count();
         }
 
         internal int GetTotalCount()
         {
-            return TrackedItems.Count;
+            return _trackedItems.Count;
         }
 
         public void LoadFromSave(List<ItemData> storageItems)
@@ -152,12 +191,14 @@ namespace ExStorageDepot.Mono.Managers
             {
                 foreach (ItemData itemData in storageItems)
                 {
-                    TrackedItems.Add(itemData);
-                    _mono.Display.ItemModified(itemData.TechType, GetItemCount(itemData.TechType));
+                    AddItem(itemData);
                 }
-
-                TrackedItems = storageItems;
             }
+        }
+
+        public List<ItemData> GetTrackedItems()
+        {
+            return _trackedItems;
         }
     }
 }

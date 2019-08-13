@@ -18,6 +18,7 @@ namespace FCS_DeepDriller.Buildable
         private const string FocusingKey = "DD_Focusing";
         private const string FocusKey = "DD_Focus";
         private const string RemoveAllModulesKey = "DD_RemoveAllAttachments";
+        private const string OneUpgradeAllowedKey = "DD_OneUpgradeAllowed";
 
         internal static string BuildableName { get; private set; }
 
@@ -101,6 +102,7 @@ namespace FCS_DeepDriller.Buildable
             LanguageHandler.SetLanguageLine(BEquipmentLabelKey, "FCS Deep Driller Battery Attachment Receptacle.");
             LanguageHandler.SetLanguageLine(OnBatteryHoverTextKey, "Open Battery Attachment.");
             LanguageHandler.SetLanguageLine(OPAllowedKey, "Only One Power Attachment Allowed.");
+            LanguageHandler.SetLanguageLine(OneUpgradeAllowedKey, "Only One Upgrade Allowed.");
             LanguageHandler.SetLanguageLine(BatteryAttachmentHasBatteriesKey, "Battery attachment has batteries cannot remove!");
             LanguageHandler.SetLanguageLine(NextPageKey, "Next Page");
             LanguageHandler.SetLanguageLine(PrevPageKey, "Previous Page");
@@ -113,6 +115,11 @@ namespace FCS_DeepDriller.Buildable
         {
             return Language.main.Get(RemoveAllModulesKey);
 
+        }
+
+        public static string OneUpgradeAllowed()
+        {
+            return Language.main.Get(OneUpgradeAllowedKey);
         }
     }
 }

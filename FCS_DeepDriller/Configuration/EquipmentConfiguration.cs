@@ -4,7 +4,7 @@ namespace FCS_DeepDriller.Configuration
 {
     internal static class EquipmentConfiguration
     {
-        internal static readonly string[] SlotIDs = new string[6]
+        internal static readonly string[] SlotIDs = new string[7]
         {
             "DDPowerCellCharger1",
             "DDPowerCellCharger2",
@@ -12,6 +12,7 @@ namespace FCS_DeepDriller.Configuration
             "DDPowerCellCharger4",
             "HDDAttachmentSlot1",
             "HDDAttachmentSlot2",
+            "CDDAttachmentSlot1",
         };
 
         private static bool _addingSlots;
@@ -31,6 +32,12 @@ namespace FCS_DeepDriller.Configuration
                     if (slotID.StartsWith("HDD"))
                     {
                         Equipment.slotMapping.Add(slotID, EquipmentType.Hand);
+                        QuickLogger.Debug($"Adding slot {slotID}");
+                    }
+
+                    if (slotID.StartsWith("CDD"))
+                    {
+                        Equipment.slotMapping.Add(slotID, EquipmentType.CyclopsModule);
                         QuickLogger.Debug($"Adding slot {slotID}");
                     }
                 }

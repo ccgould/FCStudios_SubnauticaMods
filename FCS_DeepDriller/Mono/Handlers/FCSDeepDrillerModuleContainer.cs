@@ -17,6 +17,7 @@ namespace FCS_DeepDriller.Mono.Handlers
         private Func<bool> _isConstructed;
         private Equipment _equipment;
         private bool _powerModuleAttached;
+        private bool _upgradeAttached;
 
         internal void Setup(FCSDeepDrillerController mono)
         {
@@ -38,6 +39,7 @@ namespace FCS_DeepDriller.Mono.Handlers
             _equipment.onUnequip += OnEquipmentRemoved;
             _equipment.AddSlot(EquipmentConfiguration.SlotIDs[4]);
             _equipment.AddSlot(EquipmentConfiguration.SlotIDs[5]);
+            _equipment.AddSlot(EquipmentConfiguration.SlotIDs[6]);
         }
 
         private bool IsAllowedToRemove(Pickupable pickupable, bool verbose)
@@ -73,6 +75,13 @@ namespace FCS_DeepDriller.Mono.Handlers
             {
                 _powerModuleAttached = false;
             }
+            else if (item.item.GetTechType() == TechTypeHelper.DrillerMK1TechType()
+                     || item.item.GetTechType() == TechTypeHelper.DrillerMK2TechType()
+                     || item.item.GetTechType() == TechTypeHelper.DrillerMK3TechType())
+            {
+                _mono.OreGenerator.SetOresPerDay(12);
+                _upgradeAttached = false;
+            }
 
             _mono.RemoveAttachment(TechTypeHelper.GetDeepModule(item.item.GetTechType()));
         }
@@ -95,9 +104,25 @@ namespace FCS_DeepDriller.Mono.Handlers
             {
                 _mono.AddAttachment(DeepDrillModules.Focus);
             }
+            else if (item.item.GetTechType() == TechTypeHelper.DrillerMK1TechType())
+            {
+                _mono.OreGenerator.SetOresPerDay(15);
+                _upgradeAttached = true;
+            }
+            else if (item.item.GetTechType() == TechTypeHelper.DrillerMK2TechType())
+            {
+                _mono.OreGenerator.SetOresPerDay(22);
+                _upgradeAttached = true;
+            }
+            else if (item.item.GetTechType() == TechTypeHelper.DrillerMK3TechType())
+            {
+                _mono.OreGenerator.SetOresPerDay(30);
+                _upgradeAttached = true;
+            }
         }
 
         internal bool IsPowerModuleAttached() => _powerModuleAttached;
+
         internal bool HasPowerModule(out DeepDrillModules module)
         {
             bool result = false;
@@ -131,7 +156,7 @@ namespace FCS_DeepDriller.Mono.Handlers
         {
             if (pickupable.gameObject.GetComponent<FCSTechFabricatorTag>() != null)
             {
-                if (pickupable.GetTechType() == TechTypeHelper.BatteryAttachmentTechType())
+                if (pickupable.GetTechType() == TechTypeHelper.BatteryAttachmentTechType() || pickupable.GetTechType() == TechTypeHelper.SolarAttachmentTechType())
                 {
                     if (_powerModuleAttached)
                     {
@@ -139,11 +164,13 @@ namespace FCS_DeepDriller.Mono.Handlers
                         return false;
                     }
                 }
-                else if (pickupable.GetTechType() == TechTypeHelper.SolarAttachmentTechType())
+                else if (pickupable.GetTechType() == TechTypeHelper.DrillerMK1TechType()
+                         || pickupable.GetTechType() == TechTypeHelper.DrillerMK2TechType()
+                         || pickupable.GetTechType() == TechTypeHelper.DrillerMK3TechType())
                 {
-                    if (_powerModuleAttached)
+                    if (_upgradeAttached)
                     {
-                        QuickLogger.Message(FCSDeepDrillerBuildable.OnePowerAttachmentAllowed(), true);
+                        QuickLogger.Message(FCSDeepDrillerBuildable.OneUpgradeAllowed(), true);
                         return false;
                     }
                 }
@@ -172,10 +199,13 @@ namespace FCS_DeepDriller.Mono.Handlers
 
             var slot1 = _equipment.GetTechTypeInSlot(EquipmentConfiguration.SlotIDs[4]);
             var slot2 = _equipment.GetTechTypeInSlot(EquipmentConfiguration.SlotIDs[5]);
+            var slot3 = _equipment.GetTechTypeInSlot(EquipmentConfiguration.SlotIDs[6]);
 
             data.Add(new SlotData { Module = slot1, Slot = EquipmentConfiguration.SlotIDs[4] });
 
             data.Add(new SlotData { Module = slot2, Slot = EquipmentConfiguration.SlotIDs[5] });
+
+            data.Add(new SlotData { Module = slot3, Slot = EquipmentConfiguration.SlotIDs[6] });
 
             return data;
         }
