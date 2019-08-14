@@ -49,7 +49,9 @@ namespace FCSTechFabricator.Mono.DeepDriller
                 Ingredients = new List<Ingredient>()
                 {
                     new Ingredient(TechTypeHelpers.GetTechType("DrillerMK1_DD"), 1),
-                    new Ingredient(TechType.Diamond, 1),
+                    new Ingredient(TechType.Diamond, 4),
+                    new Ingredient(TechType.Titanium, 4),
+                    new Ingredient(TechType.AluminumOxide, 1),
                 }
             };
 

@@ -128,7 +128,7 @@ namespace FCS_DeepDriller.Mono
             _saveData.PowerData = PowerManager.SaveData();
             _saveData.FocusOre = OreGenerator.GetFocus();
             _saveData.IsFocused = OreGenerator.GetIsFocused();
-            _saveData.Biome = BiomeManager.GetBiome();
+            _saveData.Biome = _currentBiome;
             saveDataList.Entries.Add(_saveData);
         }
         public void OnProtoSerialize(ProtobufSerializer serializer)

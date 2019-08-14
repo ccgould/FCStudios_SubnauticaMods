@@ -47,9 +47,9 @@ namespace FCSTechFabricator.Mono.DeepDriller
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(TechType.Lithium, 1),
+                    new Ingredient(TechType.Lithium, 2),
                     new Ingredient(TechType.Diamond, 1),
-                    new Ingredient(TechType.Titanium, 1),
+                    new Ingredient(TechType.Titanium, 3),
                 }
             };
 

@@ -100,6 +100,8 @@
     <Compile Include="Mono\Handlers\FCSDeepDrillerPowerHandler.cs" />
     <Compile Include="Mono\Handlers\FCSDeepDrillerSolarController.cs" />
     <Compile Include="Mono\Handlers\PlayerInteraction.cs" />
+    <Compile Include="Ores\Craftables\Glass.cs" />
+    <Compile Include="Ores\SandOrePatcher.cs" />
     <Compile Include="Patchers\EquipmentPatchers.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

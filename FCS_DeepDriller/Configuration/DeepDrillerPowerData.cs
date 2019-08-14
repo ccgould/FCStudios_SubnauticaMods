@@ -37,6 +37,8 @@ namespace FCS_DeepDriller.Configuration
 
         internal void SetSolarCharge(float charge)
         {
+            QuickLogger.Debug($"Setting Solar Charge to:  {charge}", true);
+
             if (Solar == null)
             {
                 QuickLogger.Error("Solar is null");

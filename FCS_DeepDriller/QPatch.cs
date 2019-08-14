@@ -1,4 +1,5 @@
 ﻿using FCS_DeepDriller.Buildable;
+using FCS_DeepDriller.Ores;
 using FCS_DeepDriller.Patchers;
 using FCSCommon.Utilities;
 using Harmony;
@@ -24,6 +25,8 @@ namespace FCS_DeepDriller
                 GlobalBundle = FCSTechFabricator.QPatch.Bundle;
 
                 FCSDeepDrillerBuildable.PatchHelper();
+
+                SandSpawnable.PatchHelper();
 
                 var harmony = HarmonyInstance.Create("com.fcsdeepdriller.fcstudios");
 

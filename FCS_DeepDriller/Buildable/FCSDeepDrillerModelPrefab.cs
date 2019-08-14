@@ -19,6 +19,8 @@ namespace FCS_DeepDriller.Buildable
 
         public static GameObject ItemPrefab { get; set; }
 
+        internal static GameObject SandPrefab { get; set; }
+
         private bool GetPrefabs()
         {
             QuickLogger.Debug("GetPrefabs");
@@ -70,10 +72,37 @@ namespace FCS_DeepDriller.Buildable
                 return false;
             }
 
+            //if (!GetOres())
+            //{
+            //    return false;
+            //}
 
             BatteryModule = FCSTechFabricator.QPatch.BatteryModule;
             SolarModule = FCSTechFabricator.QPatch.SolarModule;
             FocusModule = FCSTechFabricator.QPatch.FocusModule;
+
+            return true;
+        }
+
+        private bool GetOres()
+        {
+            GameObject sand = _assetBundle.LoadAsset<GameObject>("Sand");
+
+            //If the prefab isn't null lets add the shader to the materials
+            if (sand != null)
+            {
+                SandPrefab = sand;
+
+                //Lets apply the material shader
+                ApplyShaders(SandPrefab);
+
+                QuickLogger.Debug($"Sand Prefab Found!");
+            }
+            else
+            {
+                QuickLogger.Error($"Sand Prefab Not Found!");
+                return false;
+            }
 
             return true;
         }

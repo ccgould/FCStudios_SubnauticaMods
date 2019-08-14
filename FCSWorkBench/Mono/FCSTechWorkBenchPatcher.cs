@@ -77,43 +77,6 @@ namespace FCSTechFabricator.Mono
             {
                 QuickLogger.Debug(childNode.Name);
             }
-
-
-            //foreach (var item in ItemsList)
-            //{
-
-            //    if (string.IsNullOrEmpty(item.ClassID_I))
-            //    {
-            //        QuickLogger.Debug("Item ClassID_I was null");
-            //        return;
-            //    }
-
-            //    QuickLogger.Debug("In foreach");
-
-            //    if (item.ClassID_I.EndsWith("_ARS"))
-            //    {
-            //        QuickLogger.Debug($"Added {item.ClassID_I} to nodes");
-            //        AddTabNodes(ref root, ref itemTab, item, "ARSolutions", "ARSIcon");
-            //    }
-
-            //    if (item.ClassID_I.EndsWith("_PS"))
-            //    {
-            //        QuickLogger.Debug($"Added {item.ClassID_I} to nodes");
-            //        AddTabNodes(ref root, ref itemTab, item, "PowerStorage", "PSIcon");
-            //    }
-
-            //    if (item.ClassID_I.EndsWith("_DD"))
-            //    {
-            //        QuickLogger.Debug($"Added {item.ClassID_I} to nodes");
-            //        AddTabNodes(ref root, ref itemTab, item, "DeepDriller", "DDIcon");
-            //    }
-
-            //    if (item.ClassID_I.EndsWith("_MT"))
-            //    {
-            //        QuickLogger.Debug($"Added {item.ClassID_I} to nodes");
-            //        AddTabNodes(ref root, ref itemTab, item, "Marine Turbine", "MTIcon");
-            //    }
-            //}
         }
 
         public override GameObject GetGameObject()
