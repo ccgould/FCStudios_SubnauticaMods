@@ -47,11 +47,6 @@ namespace FCSTechFabricator.Mono.SeaBreeze
                 return null;
             }
 
-            var model = prefab.GetComponentInChildren<Canvas>().gameObject;
-            model.FindChild("Screen").SetActive(true);
-
-            _label.text = FriendlyName;
-
             // Make the object drop slowly in water
             var wf = prefab.AddComponent<WorldForces>();
             wf.underwaterGravity = 0;
@@ -112,6 +107,8 @@ namespace FCSTechFabricator.Mono.SeaBreeze
 
             var techTag = prefab.AddComponent<TechTag>();
             techTag.type = this.TechType;
+
+            prefab.AddComponent<Freon>();
 
             prefab.AddComponent<FCSTechFabricatorTag>();
 

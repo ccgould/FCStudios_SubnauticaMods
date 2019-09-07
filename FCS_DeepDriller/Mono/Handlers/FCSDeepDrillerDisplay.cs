@@ -1,4 +1,8 @@
-﻿using FCS_DeepDriller.Buildable;
+﻿#if USE_ExStorageDepot
+using ExStorageDepot.Mono;
+#endif
+
+using FCS_DeepDriller.Buildable;
 using FCS_DeepDriller.Configuration;
 using FCS_DeepDriller.Display;
 using FCSCommon.Enums;
@@ -12,8 +16,12 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
+
 namespace FCS_DeepDriller.Mono.Handlers
 {
+    //TODO Create a method that handles selecting the ExStorage
+
+
     internal class FCSDeepDrillerDisplay : AIDisplay
     {
         private FCSDeepDrillerController _mono;
@@ -35,6 +43,10 @@ namespace FCS_DeepDriller.Mono.Handlers
         private Text _focusBtnText;
         private Text _healthPercentage;
         private Text _solarValue;
+#if USE_ExStorageDepot
+        private ExStorageDepotController _selectedExStorage;
+#endif
+        private InterfaceButton _button;
 
         internal void Setup(FCSDeepDrillerController mono)
         {
@@ -50,6 +62,7 @@ namespace FCS_DeepDriller.Mono.Handlers
             QuickLogger.Debug("Display has been set.");
             InvokeRepeating("UpdateBatteryStatus", 1, 0.5f);
             InvokeRepeating(nameof(UpdateScreenState), 1.0f, 0.5f);
+            InvokeRepeating(nameof(UpdateButton), 1, 1);
         }
 
         private void UpdateScreenState()
@@ -113,6 +126,10 @@ namespace FCS_DeepDriller.Mono.Handlers
                     }
                     break;
 
+                case "ExStorage":
+                    SetExStorage();
+                    break;
+
                 case "Module_Door":
                     _mono.DeepDrillerModuleContainer.OpenModulesDoor();
                     break;
@@ -125,6 +142,13 @@ namespace FCS_DeepDriller.Mono.Handlers
                     UpdateFocusStates();
                     break;
             }
+        }
+
+        private void SetExStorage()
+        {
+#if USE_ExStorageDepot
+            _mono.ExStorageDepotController = _selectedExStorage;
+#endif
         }
 
         private void UpdateFocusStates()
@@ -428,7 +452,7 @@ namespace FCS_DeepDriller.Mono.Handlers
 
             if (icon == null)
             {
-                QuickLogger.Error("Cannot find gameobject Icon");
+                QuickLogger.Error("Cannot find gameObject Icon");
                 return;
             }
 
@@ -546,20 +570,60 @@ namespace FCS_DeepDriller.Mono.Handlers
 
         internal void UpdateListItems(TechType techType)
         {
-            foreach (InterfaceButton button in OreButtons)
-            {
-                if ((TechType)button.Tag == techType)
+
+            QuickLogger.Debug($"In Update List: Target = {techType} || OreButtons {OreButtons?.Count}");
+
+            if (OreButtons != null)
+                foreach (InterfaceButton button in OreButtons)
                 {
-                    button.Focus();
-                    QuickLogger.Debug($"Match found for TechType {techType}", true);
+                    if ((TechType)button.Tag == techType)
+                    {
+                        button.Focus();
+                        _button = button;
+                        QuickLogger.Debug($"Match found for TechType {techType}", true);
+                    }
+                    else
+                    {
+                        button.RemoveFocus();
+                    }
                 }
-                else
-                {
-                    button.RemoveFocus();
-                }
-            }
 
             UpdateFocusStates();
+        }
+
+        //private IEnumerator UpdateButton(InterfaceButton button)
+        //{
+
+        //    while (button.transform.gameObject.FindChild(button.HoverItemName).activeInHierarchy)
+        //    {
+        //        QuickLogger.Debug(("activeInHierarchy is true"));
+        //        //QuickLogger.Debug($"Selecting Button {button.BtnName}");
+        //        //button.Focus();
+        //        yield return null;
+        //    }
+
+        //    //while (_mono.OreGenerator.GetIsFocused())
+        //    //{
+        //    //    QuickLogger.Debug($"Selecting Button {button.BtnName}");
+        //    //    button.Focus();
+        //    //    yield return null;
+        //    //}
+        //}
+
+        private void UpdateButton()
+        {
+            if (_button != null)
+            {
+                QuickLogger.Debug(($"activeInHierarchy is {_button.transform.gameObject.FindChild(_button.HoverItemName).activeInHierarchy}"));
+                if (!_button.transform.gameObject.FindChild(_button.HoverItemName).activeInHierarchy)
+                {
+                    _button.transform.gameObject.FindChild(_button.HoverItemName).SetActive(true);
+                }
+            }
+            else
+            {
+                QuickLogger.Debug("Button is null");
+            }
         }
     }
 }

@@ -17,6 +17,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+#if USE_ExStorageDepot
+using ExStorageDepot.Mono;
+#endif
+
 namespace FCS_DeepDriller.Mono
 {
     [RequireComponent(typeof(WeldablePoint))]
@@ -42,6 +46,12 @@ namespace FCS_DeepDriller.Mono
         private bool _initialized;
         private BatteryAttachment _batteryAttachment;
         private List<TechType> _bioData = new List<TechType>();
+        private bool _sendToExStorage;
+        private const float DayNight = 1200f;
+        private int _damagePerDay = 10;
+        private float _damagePerSecond;
+        private float _passedTime;
+
         #endregion
 
         #region Internal Properties
@@ -64,16 +74,44 @@ namespace FCS_DeepDriller.Mono
         internal VFXManager VFXManagerHandler { get; private set; }
         public DeepDrillerComponentManager ComponentManager { get; private set; }
 
+#if USE_ExStorageDepot
+        internal ExStorageDepotController ExStorageDepotController { get; set; }
+#endif
+
         #endregion
 
         #region Unity Methods
         private void Update()
         {
+            UpdateHealthSystem();
+        }
+
+        private void UpdateHealthSystem()
+        {
+            _passedTime += DayNightCycle.main.deltaTime;
+
             if (HealthManager != null)
             {
+                if (PowerManager?.GetPowerState() != FCSPowerStates.Powered)
+                {
+                    QuickLogger.Debug("Not Damaging Unit");
+                    ResetPassedTime();
+                    return;
+                }
+
+                QuickLogger.Debug($"Passed Time: {_passedTime}");
+
+                if (_passedTime >= _damagePerSecond)
+                {
+                    QuickLogger.Debug("Damaging Unit");
+                    HealthManager.ApplyDamage(1);
+                    ResetPassedTime();
+                }
+
                 HealthManager.HealthChecks();
             }
         }
+
         #endregion
 
         #region IConstructable
@@ -131,6 +169,12 @@ namespace FCS_DeepDriller.Mono
             _saveData.Biome = _currentBiome;
             saveDataList.Entries.Add(_saveData);
         }
+
+        internal void ExportStorage()
+        {
+            _sendToExStorage = true;
+        }
+
         public void OnProtoSerialize(ProtobufSerializer serializer)
         {
             if (!Mod.IsSaving())
@@ -150,6 +194,7 @@ namespace FCS_DeepDriller.Mono
             CurrentBiome = data.Biome;
             OreGenerator.AllowedOres = GetBiomeData();
             OreGenerator.SetFocus(data.FocusOre);
+            DisplayHandler.UpdateListItems(data.FocusOre);
             DeepDrillerModuleContainer.SetModules(data.Modules);
             DeepDrillerContainer.LoadItems(data.Items);
             HealthManager.SetHealth(data.Health);
@@ -162,25 +207,9 @@ namespace FCS_DeepDriller.Mono
 
             _batteryAttachment.GetController().LoadData(data.PowerData);
 
-            QuickLogger.Debug("Updating ListItems");
-
-            StartCoroutine(ForceSelection());
-
             if (PowerManager.GetPowerState() == FCSPowerStates.Powered && !AnimationHandler.GetBoolHash(ExtendStateHash))
             {
                 StartCoroutine(DropLegs());
-            }
-
-        }
-
-        private IEnumerator ForceSelection()
-        {
-            int i = 0;
-            while (i < 5)
-            {
-                DisplayHandler.UpdateListItems(GetFocusedOre());
-                i++;
-                yield return null;
             }
         }
 
@@ -193,11 +222,16 @@ namespace FCS_DeepDriller.Mono
 
         #region Private Methods
 
+        private void ResetPassedTime()
+        {
+            _passedTime = 0;
+        }
+
         private void Initialize()
         {
 
             ComponentManager = new DeepDrillerComponentManager();
-
+            _damagePerSecond = DayNight / _damagePerDay;
             _batteryAttachment = new BatteryAttachment();
             _batteryAttachment.GetGameObject(this);
             _batteryAttachment.GetController().OnBatteryAdded += OnBatteryAdded;
@@ -305,6 +339,7 @@ namespace FCS_DeepDriller.Mono
         {
             AnimationHandler.SetBoolHash(BitDamageState, false);
             UpdateSystemLights(PowerManager.GetPowerState());
+            ResetPassedTime();
         }
 
         private void OnBatteryRemoved(Pickupable obj)
@@ -367,7 +402,15 @@ namespace FCS_DeepDriller.Mono
         private void OreGeneratorOnAddCreated(TechType type)
         {
             QuickLogger.Debug($"In OreGeneratorOnOnAddCreated {type}");
-            DeepDrillerContainer.AddItem(type.ToPickupable());
+
+            if (_sendToExStorage)
+            {
+                DeepDrillerContainer.SendToExStorage(type.ToInventoryItem());
+            }
+            else
+            {
+                DeepDrillerContainer.AddItem(type.ToPickupable());
+            }
         }
 
         private void UpdateCurrentBiome()
@@ -379,6 +422,7 @@ namespace FCS_DeepDriller.Mono
         private void ConnectDisplay()
         {
             if (DisplayHandler != null) return;
+            QuickLogger.Debug($"Creating Display");
             DisplayHandler = gameObject.AddComponent<FCSDeepDrillerDisplay>();
             DisplayHandler.Setup(this);
         }
@@ -399,6 +443,11 @@ namespace FCS_DeepDriller.Mono
 
             UpdateLegState(true);
             PowerManager.SetPowerState(FCSPowerStates.Powered);
+
+            if (DisplayHandler != null)
+            {
+                DisplayHandler.UpdateListItems(GetFocusedOre());
+            }
         }
 
         internal IEnumerator DropLegs()

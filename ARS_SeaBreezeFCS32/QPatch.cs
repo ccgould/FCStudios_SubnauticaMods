@@ -14,6 +14,8 @@ namespace ARS_SeaBreezeFCS32
         //public static AssetBundle Bundle { get; private set; }
         public static void Patch()
         {
+            Console.WriteLine("This is a test");
+
             QuickLogger.Info("Started patching. Version: " + QuickLogger.GetAssemblyVersion());
 
 #if DEBUG

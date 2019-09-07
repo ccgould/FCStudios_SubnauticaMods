@@ -184,7 +184,6 @@ namespace FCSCommon.Helpers
                         material.SetFloat("_Shininess", shininess);
                         material.SetTexture("_SpecTex", FindTexture2D(textureName, assetBundle));
                         material.SetFloat("_Fresnel", 0f);
-
                         material.SetVector("_SpecTex_ST", new Vector4(1.0f, 1.0f, 0.0f, 0.0f));
                     }
                 }
@@ -231,10 +230,17 @@ namespace FCSCommon.Helpers
                 {
                     if (material.name.StartsWith(materialName))
                     {
+
                         material.shader = shader;
-                        material.SetFloat("_Mode", 3f);
-                        material.EnableKeyword("_METALLICGLOSSMAP");
-                        material.SetFloat("_Glossiness", glossiness);
+                        material.EnableKeyword("MARMO_SPECMAP");
+                        material.EnableKeyword("MARMO_SIMPLE_GLASS");
+                        material.EnableKeyword("WBOIT");
+                        material.EnableKeyword("_ALPHAPREMULTIPLY_ON");
+                        //material.SetColor("_SpecColor", new Color(0.796875f, 0.796875f, 0.796875f, 0.796875f));
+                        //material.SetFloat("_SpecInt", 8f);
+                        //material.SetFloat("_Shininess", 0.5f);
+                        //material.SetVector("_SpecTex_ST", new Vector4(1.0f, 1.0f, 0.0f, 0.0f));
+
                     }
                 }
             }

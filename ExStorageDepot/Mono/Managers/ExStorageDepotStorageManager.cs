@@ -14,6 +14,27 @@ namespace ExStorageDepot.Mono.Managers
     {
         private readonly List<ItemData> _trackedItems = new List<ItemData>();
         internal Dictionary<TechType, int> ItemsDictionary { get; } = new Dictionary<TechType, int>();
+        internal List<TechType> BannedTechTypes = new List<TechType>
+        {
+            TechType.RabbitrayEggUndiscovered,
+            TechType.JellyrayEggUndiscovered,
+            TechType.StalkerEggUndiscovered,
+            TechType.ReefbackEggUndiscovered,
+            TechType.JumperEggUndiscovered,
+            TechType.BonesharkEggUndiscovered,
+            TechType.GasopodEggUndiscovered,
+            TechType.MesmerEggUndiscovered,
+            TechType.SandsharkEggUndiscovered,
+            TechType.ShockerEggUndiscovered,
+            TechType.CrashEggUndiscovered,
+            TechType.CrabsquidEggUndiscovered,
+            TechType.CutefishEggUndiscovered,
+            TechType.LavaLizardEggUndiscovered,
+            TechType.CrabsnakeEggUndiscovered,
+            TechType.SpadefishEggUndiscovered,
+
+        };
+
         public bool IsEmpty => _trackedItems != null && _trackedItems.Count <= 0;
         internal Action<TechType> OnAddItem;
         internal Action<TechType> OnRemoveItem;
@@ -23,7 +44,8 @@ namespace ExStorageDepot.Mono.Managers
         private const int DumpContainerWidth = 8;
         private const int DumpContainerHeight = 10;
         private ItemsContainer _dumpContainer;
-        private const int MaxItems = 150;
+        private const int MaxItems = 160;
+        private int ItemTotalCount => _trackedItems.Count + _dumpContainer.count;
 
         internal void Initialize(ExStorageDepotController mono)
         {
@@ -60,21 +82,41 @@ namespace ExStorageDepot.Mono.Managers
 
         private bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
         {
+            var food = pickupable.GetComponent<Eatable>();
+
+            if (food != null && food.decomposes && pickupable.GetTechType() != TechType.CreepvinePiece)
+            {
+                QuickLogger.Info(ExStorageDepotBuildable.FoodNotAllowed(), true);
+                return false;
+            }
+
             if (pickupable.gameObject?.GetComponent<EnergyMixin>() != null)
             {
-                QuickLogger.Info("Ex-Storage cannot store PlayerTools at this time.", true);
+                QuickLogger.Info(ExStorageDepotBuildable.NoPlayerTools(), true);
                 return false;
             }
 
-            QuickLogger.Debug("Item is not a Player Tool", true);
-
-            if (_trackedItems.Count >= MaxItems)
+            if (BannedTechTypes.Contains(pickupable.GetTechType()))
             {
-                QuickLogger.Info("Ex-Storage is full", true);
+                QuickLogger.Info(ExStorageDepotBuildable.NoUndiscorveredEggsMessage(), true);
                 return false;
             }
+
+            var containerTotal = ItemTotalCount + 1;
+
+            if (_trackedItems.Count >= MaxItems || containerTotal > MaxItems)
+            {
+                QuickLogger.Info(ExStorageDepotBuildable.NoMoreSpace(), true);
+                return false;
+            }
+
 
             return true;
+        }
+
+        internal bool CanHoldItem(int amount)
+        {
+            return _trackedItems.Count + amount <= MaxItems;
         }
 
         public void SetMultiplier(int value)
@@ -99,7 +141,7 @@ namespace ExStorageDepot.Mono.Managers
             StoreItems();
         }
 
-        public void AttemptToTakeItem(TechType techType)
+        internal void AttemptToTakeItem(TechType techType)
         {
             QuickLogger.Debug($"Attempting to take item {techType}", true);
 
@@ -110,15 +152,18 @@ namespace ExStorageDepot.Mono.Managers
 
                 var item = _trackedItems.FirstOrDefault(x => x.TechType == techType);
 
-                if (item == null)
-                {
-                    QuickLogger.Error("Item Returned null", true);
-                    return;
-                }
+                if (item == null) return;
 
                 Pickupable pickup = InventoryHelpers.ConvertToPickupable(item);
 
-                QuickLogger.Debug($"Attempting to take ({amountToRemove}) {item.TechType}", true);
+                if (pickup == null)
+                {
+                    QuickLogger.Error($"Attempting to get prefab failed canceling attempt to take item.");
+                    return;
+                }
+
+
+                QuickLogger.Debug($"Attempting to take ({amountToRemove}) {item.TechType}");
 
                 if (ItemsDictionary.ContainsKey(item.TechType))
                 {
@@ -185,7 +230,7 @@ namespace ExStorageDepot.Mono.Managers
             return _trackedItems.Count;
         }
 
-        public void LoadFromSave(List<ItemData> storageItems)
+        internal void LoadFromSave(List<ItemData> storageItems)
         {
             if (storageItems != null)
             {
@@ -196,9 +241,14 @@ namespace ExStorageDepot.Mono.Managers
             }
         }
 
-        public List<ItemData> GetTrackedItems()
+        internal List<ItemData> GetTrackedItems()
         {
             return _trackedItems;
+        }
+
+        internal void ForceAddItem(InventoryItem item)
+        {
+            AddItem(InventoryHelpers.CovertToItemData(item, true));
         }
     }
 }

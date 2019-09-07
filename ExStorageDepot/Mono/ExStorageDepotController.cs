@@ -1,12 +1,14 @@
-﻿using ExStorageDepot.Configuration;
+﻿using ExStorageDepot.Buildable;
+using ExStorageDepot.Configuration;
 using ExStorageDepot.Enumerators;
 using ExStorageDepot.Mono.Managers;
 using FCSCommon.Utilities;
+using System;
 using UnityEngine;
 
 namespace ExStorageDepot.Mono
 {
-    internal class ExStorageDepotController : MonoBehaviour, IProtoEventListener, IConstructable
+    public class ExStorageDepotController : MonoBehaviour, IProtoEventListener, IConstructable
     {
         internal ExStorageDepotDisplayManager Display { get; private set; }
         private ExStorageDepotSaveDataEntry _saveData;
@@ -41,15 +43,22 @@ namespace ExStorageDepot.Mono
         {
             reason = string.Empty;
 
-            if (Storage.IsEmpty)
+            if (Storage == null || Storage.IsEmpty) return true;
+            reason = "Please empty the Ex-Storage";
+            return false;
+        }
+
+        public bool AddToStorage(InventoryItem item, out string reason)
+        {
+            if (Storage.CanHoldItem(1))
             {
+                reason = String.Empty;
+                Storage.ForceAddItem(item);
                 return true;
             }
-            else
-            {
-                reason = "Please empty the Ex-Storage";
-                return false;
-            }
+
+            reason = ExStorageDepotBuildable.ContainerFullMessage();
+            return false;
         }
 
         public void OnConstructedChanged(bool constructed)

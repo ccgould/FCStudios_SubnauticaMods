@@ -44,7 +44,7 @@ namespace ExStorageDepot.Model
 
                 if (InventoryItem.item.gameObject.GetComponent<Eatable>() != null)
                 {
-                    FoodData = new FoodData { FoodValue = food.foodValue, WaterValue = food.waterValue };
+                    FoodData = new FoodData { FoodValue = food.GetFoodValue(), WaterValue = food.GetWaterValue() };
                     QuickLogger.Debug($"Saved {TechType} Food");
                     Type = ItemType.Food;
                 }

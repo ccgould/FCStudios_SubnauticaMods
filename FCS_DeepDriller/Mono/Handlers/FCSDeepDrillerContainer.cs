@@ -5,6 +5,9 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+#if USE_ExStorageDepot
+#endif
+
 namespace FCS_DeepDriller.Mono.Handlers
 {
     internal class FCSDeepDrillerContainer : MonoBehaviour
@@ -41,7 +44,7 @@ namespace FCS_DeepDriller.Mono.Handlers
 
                 _container = new ItemsContainer(_containerWidth, _containerHeight, _containerRoot.transform,
                     FCSDeepDrillerBuildable.StorageContainerLabel(), null);
-
+                _container.Resize(_containerWidth, _containerHeight);
                 _container.isAllowedToAdd += IsAllowedToAdd;
                 _container.onRemoveItem += OnRemoveItemEvent;
 
@@ -79,7 +82,6 @@ namespace FCS_DeepDriller.Mono.Handlers
 
         internal void AddItem(Pickupable pickupable)
         {
-
             var techType = pickupable.GetTechType();
 
             if (_containerItemsTracker.ContainsKey(techType))
@@ -129,6 +131,27 @@ namespace FCS_DeepDriller.Mono.Handlers
         internal bool IsEmpty()
         {
             return _container.count <= 0;
+        }
+
+        public void SendToExStorage(InventoryItem inventoryItem)
+        {
+#if USE_ExStorageDepot
+            foreach (InventoryItem item in _container)
+            {
+                //var successfulFlag = ExStorageDepotController.AddtoStorage(item, out var reason);
+
+                //_mono.ExportStorage.Add
+
+                //if (successfulFlag)
+                //{
+
+                //}
+                //else
+                //{
+                //    QuickLogger.Info(reason);
+                //}
+            }
+#endif
         }
     }
 }

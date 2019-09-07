@@ -9,5 +9,12 @@ namespace FCSCommon.Extensions
             var go = GameObject.Instantiate(CraftData.GetPrefabForTechType(techtype));
             return go.GetComponent<Pickupable>().Pickup(false);
         }
+
+        public static InventoryItem ToInventoryItem(this TechType techType)
+        {
+            var go = GameObject.Instantiate(CraftData.GetPrefabForTechType(techType));
+            var pickupable = go.GetComponent<Pickupable>().Pickup(false);
+            return new InventoryItem(pickupable);
+        }
     }
 }

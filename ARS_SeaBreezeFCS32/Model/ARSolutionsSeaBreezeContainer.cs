@@ -235,8 +235,11 @@ namespace ARS_SeaBreezeFCS32.Model
 
                 QuickLogger.Debug(techType.ToString());
 
-                if (ARSolutionsSeabreezeConfiguration.EatableEntities.ContainsKey(techType))
+                if (pickupable.GetComponent<Eatable>() != null)
                     flag = true;
+
+                //if (ARSolutionsSeabreezeConfiguration.EatableEntities.ContainsKey(techType))
+                //    flag = true;
             }
 
             QuickLogger.Debug($"Adding Item {flag} || {verbose}");

@@ -19,6 +19,7 @@ namespace ExStorageDepot.Buildable
         public override TechGroup GroupForPDA { get; } = TechGroup.ExteriorModules;
         public override TechCategory CategoryForPDA { get; } = TechCategory.ExteriorModule;
 
+
         public override TechType RequiredForUnlock { get; } = TechType.PowerCell;
 
         public override string AssetsFolder { get; } = $"ExStorageDepot/Assets";
@@ -69,10 +70,11 @@ namespace ExStorageDepot.Buildable
                 constructable.model = prefab.FindChild("model");
                 constructable.techType = TechType;
                 constructable.rotationEnabled = true;
+                constructable.allowedOnConstructables = Player.main.GetDepth() > 1;
 
                 // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
                 var lwe = prefab.AddComponent<LargeWorldEntity>();
-                lwe.cellLevel = LargeWorldEntity.CellLevel.Near;
+                lwe.cellLevel = LargeWorldEntity.CellLevel.Global;
 
                 //var beacon = prefab.AddComponent<Beacon>();
 

@@ -29,6 +29,7 @@ namespace FCS_DeepDriller.Configuration
 
                     return count;
                 case DeepDrillModules.Solar:
+                    //QuickLogger.Debug($"In Get Charge: Solar =  {Solar.Battery.charge}");
                     return Solar.Battery.charge;
                 default:
                     return 0;
@@ -37,7 +38,7 @@ namespace FCS_DeepDriller.Configuration
 
         internal void SetSolarCharge(float charge)
         {
-            QuickLogger.Debug($"Setting Solar Charge to:  {charge}", true);
+            //QuickLogger.Debug("Setting Solar Charge");
 
             if (Solar == null)
             {
@@ -50,8 +51,9 @@ namespace FCS_DeepDriller.Configuration
                 QuickLogger.Error("Solar Battery  is null");
                 return;
             }
-
-            Solar.Battery.charge = charge;
+            //QuickLogger.Debug($"Current Charge = {Solar.Battery.charge}");
+            Solar.Battery.charge += charge; // replace += with = if it doesn't work
+            //QuickLogger.Debug($"Solar Charge was set to {Solar.Battery.charge} from {charge}");
         }
 
         internal void ConsumePower(DeepDrillModules module)

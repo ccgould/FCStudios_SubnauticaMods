@@ -1,5 +1,4 @@
-﻿using FCS_DeepDriller.Enumerators;
-using FCSCommon.Enums;
+﻿using FCSCommon.Enums;
 using FCSCommon.Utilities;
 using System;
 using UnityEngine;
@@ -31,7 +30,6 @@ namespace FCS_DeepDriller.Display
 
         public Action<string, object> OnButtonClick;
         private bool _inFocus;
-        internal FCSDeepDrillerButtonType ButtonType;
 
         #endregion
 

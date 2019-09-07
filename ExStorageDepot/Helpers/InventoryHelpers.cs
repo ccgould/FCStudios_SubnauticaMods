@@ -22,28 +22,35 @@ namespace ExStorageDepot.Helpers
 
         internal static Pickupable ConvertToPickupable(ItemData itemData)
         {
-
-
             QuickLogger.Debug("ConvertToPickupable", true);
-
 
             if (itemData == null)
             {
                 QuickLogger.Debug("Item Data is null", true);
+                return null;
             }
 
             QuickLogger.Debug("1", true);
 
+            var gameObject = CraftData.GetPrefabForTechType(itemData.TechType);
 
-            var go = GameObject.Instantiate(CraftData.GetPrefabForTechType(itemData.TechType));
+            if (gameObject == null)
+            {
+
+                QuickLogger.Error($"Couldn't get the prefab for the tech-type {itemData.TechType}");
+                return null;
+            }
+
+            var go = GameObject.Instantiate(gameObject);
+
             QuickLogger.Debug("2", true);
 
             if (go == null)
             {
-                QuickLogger.Debug("GameObject is null in ConverToPickupable", true);
+                QuickLogger.Debug("GameObject is null in convert to pickupable", true);
                 QuickLogger.Debug($"TechType = {itemData.Type}", true);
-
             }
+
             QuickLogger.Debug("3", true);
 
             switch (itemData.Type)
@@ -52,7 +59,6 @@ namespace ExStorageDepot.Helpers
                     QuickLogger.Debug("4", true);
                     go.GetComponent<Battery>()._charge = itemData.BatteryData.Charge;
                     QuickLogger.Debug("5", true);
-
                     break;
 
                 case ItemType.Food:
@@ -63,16 +69,15 @@ namespace ExStorageDepot.Helpers
                     QuickLogger.Debug("5.2", true);
                     eatable.waterValue = itemData.FoodData.WaterValue;
                     QuickLogger.Debug("6", true);
-
                     break;
 
                 case ItemType.Fuel:
                     QuickLogger.Debug("7", true);
                     go.GetComponent<FireExtinguisher>().fuel = itemData.FuelData.Fuel;
                     QuickLogger.Debug("8", true);
-
                     break;
             }
+
             return go.GetComponent<Pickupable>();
         }
     }

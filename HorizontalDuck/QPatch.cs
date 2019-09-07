@@ -1,10 +1,8 @@
-﻿using ExStorageDepot.Buildable;
-using FCSCommon.Utilities;
+﻿using FCSCommon.Utilities;
+using HorizontalDuck.Buildables;
 using System;
 
-
-
-namespace ExStorageDepot
+namespace HorizontalDuck
 {
     public static class QPatch
     {
@@ -17,14 +15,9 @@ namespace ExStorageDepot
             QuickLogger.Debug("Debug logs enabled");
 #endif
 
-            if (true)
-            {
-
-            }
-
             try
             {
-                ExStorageDepotBuildable.PatchHelper();
+                HorizontalDuckBuildable.PatchHelper();
 
                 //var harmony = HarmonyInstance.Create("com.exstoragedepot.fcstudios");
                 //harmony.PatchAll(Assembly.GetExecutingAssembly());

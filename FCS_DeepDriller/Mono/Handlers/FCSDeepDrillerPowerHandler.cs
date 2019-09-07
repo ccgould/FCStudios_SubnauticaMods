@@ -30,13 +30,12 @@ namespace FCS_DeepDriller.Mono.Handlers
         internal Action<FCSPowerStates> OnPowerUpdate;
         private bool _initialized;
 
-
         private void Update()
         {
             if (!_mono.IsConstructed || !_initialized) return;
 
             //QuickLogger.Debug($"Power Mode: {PowerState}");
-            //QuickLogger.Debug($"Power Avaliable: {_powerBank.GetCharge(_module)}");
+            //QuickLogger.Debug($"Power Available: {_powerBank.GetCharge(_module)}");
 
             if (_mono.DeepDrillerModuleContainer.HasSolarModule())
             {
@@ -79,7 +78,7 @@ namespace FCS_DeepDriller.Mono.Handlers
         private void ProduceSolarPower()
         {
             if (!_produceSolarPower || _powerBank == null) return;
-            _powerBank.SetSolarCharge(Mathf.Clamp(_powerBank.GetCharge(_module) + GetRechargeScalar() * DayNightCycle.main.deltaTime * 0.50f * 5f, 0f, _powerBank.GetCapacity(_module)));
+            _powerBank.SetSolarCharge(Mathf.Clamp(GetRechargeScalar() * DayNightCycle.main.deltaTime * 0.50f * 5f, 0f, _powerBank.GetCapacity(_module)));
             //QuickLogger.Debug($"Current Solar Charge: {_powerBank.Solar.Battery.charge} || Current Solar Capacity: {_powerBank.Solar.Battery.capacity}");
         }
 
@@ -91,7 +90,6 @@ namespace FCS_DeepDriller.Mono.Handlers
         private float GetDepthScalar()
         {
             float time = Mathf.Clamp01((_maxDepth - Ocean.main.GetDepthOf(base.gameObject)) / _maxDepth);
-
             return _depthCurve.Evaluate(time);
         }
 

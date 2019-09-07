@@ -19,7 +19,9 @@ namespace FCS_DeepDriller
             QuickLogger.DebugLogsEnabled = true;
             QuickLogger.Debug("Debug logs enabled");
 #endif
-
+#if USE_ExStorageDepot
+            QuickLogger.Info("Ex-Storage Version");
+#endif
             try
             {
                 GlobalBundle = FCSTechFabricator.QPatch.Bundle;
