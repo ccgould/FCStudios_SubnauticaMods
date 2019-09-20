@@ -1,3 +1,4 @@
+
 ﻿
 <p align="center">
   <img width="100" height="100" src="https://i.imgur.com/DHjcUQS.png">
@@ -21,6 +22,11 @@ Here is a Chart of all the mods and the place to download on NexusMods.
 |AI Marine Turbine|An all new mod from Field Creators Studios that allows you to generate power from using water current in Subnautica.|[#249](https://www.nexusmods.com/subnautica/mods/249)
 |AM Mini MedBay|Alterra technologies new Mini MedBay heals you within 3 seconds of pressing the heal button. Also, we generate 4 free med packs for your convenience.|[#261](https://www.nexusmods.com/subnautica/mods/261)
 |AI Powercell Socket|A subnautica mod that allows you to power your base using powercells.|[#264](https://www.nexusmods.com/subnautica/mods/264)
+|FCS Tech fabricator|The tech fabricator is a fabricator that allows you to build Kits and other necessary items for the FCS Mods.|[#313](https://www.nexusmods.com/subnautica/mods/313)
+|Alterra Storage Solutions Ex-Storage Depot|A mod that allows you to store items outside in a large storage unit.|[#320](https://www.nexusmods.com/subnautica/mods/320)
+|Alterra Industrial Deep Driller|A mod the allows you to drill for resources in different biomes.|[#319](https://www.nexusmods.com/subnautica/mods/319)
+|Alterra Refrigeration Solutions SeaBreeze|A refrigeration mod that freezes food and prevents decay while in the fridge.|[#318](https://www.nexusmods.com/subnautica/mods/318)
+
 
 # Mods in Collaboration/Not Included in repo
 
