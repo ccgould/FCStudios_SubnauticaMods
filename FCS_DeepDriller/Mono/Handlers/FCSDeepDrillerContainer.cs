@@ -99,6 +99,9 @@ namespace FCS_DeepDriller.Mono.Handlers
 
         public void OpenStorage()
         {
+            if (_mono.IsInvalidPlacement()) return;
+
+
             if (_container == null)
             {
                 QuickLogger.Debug("The container returned null", true);

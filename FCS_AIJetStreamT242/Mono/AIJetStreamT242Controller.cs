@@ -14,7 +14,7 @@ using UnityEngine;
 namespace FCS_AIMarineTurbine.Mono
 {
     [RequireComponent(typeof(WeldablePoint))]
-    internal class AIJetStreamT242Controller : MonoBehaviour, IConstructable, IProtoEventListener
+    internal class AIJetStreamT242Controller : HandTarget, IHandTarget, IConstructable, IProtoEventListener
     {
         #region Public Properties
         public bool IsBeingDeleted { get; set; }
@@ -25,30 +25,25 @@ namespace FCS_AIMarineTurbine.Mono
         public AIJetStreamT242AnimationManager AnimationManager { get; private set; }
         public BeaconController BeaconManager { get; private set; }
 
+        public bool _initialized { get; private set; } = true;
         #endregion
 
         #region Private Members
-
-        public bool _initialized { get; private set; } = true;
         private GameObject _seaBase;
-        private bool _isEnabled;
         private float _rpmPerDeg = 0.16667f;
         private bool _constructed;
         private GameObject _rotor;
         private string _currentBiome;
-        public float MaxSpeed => 300f;
-        public float MinSpeed = 90f;
-        public float Multiplier = 0.161f;
+        public float MaxSpeed;
         private PrefabIdentifier _prefabID;
         private readonly string SaveDirectory = Path.Combine(SaveUtils.GetCurrentSaveDataDir(), "AIMarineTurbine");
         private string SaveFile => Path.Combine(SaveDirectory, _prefabID.Id + ".json");
-
         private Quaternion _targetRotation;
         private GameObject _turbine;
         private float _currentSpeed;
         private GameObject _damage;
         private AIJetStreamT242Display _display;
-        private bool _passedDeserialized;
+
 
         #endregion
 
@@ -87,8 +82,6 @@ namespace FCS_AIMarineTurbine.Mono
 
                 BeaconManager = gameObject.GetComponentInParent<BeaconController>();
 
-
-
                 //_currentBiome = BiomeManager.GetBiome();
             }
             else
@@ -110,7 +103,7 @@ namespace FCS_AIMarineTurbine.Mono
             {
                 PowerManager.IsSafeToContinue = true;
 
-                HealthManager.IsSafeToContinue = true;
+                //HealthManager.IsSafeToContinue = true;
 
                 SystemHandler();
             }
@@ -118,7 +111,7 @@ namespace FCS_AIMarineTurbine.Mono
             {
                 PowerManager.IsSafeToContinue = false;
 
-                HealthManager.IsSafeToContinue = false;
+                //HealthManager.IsSafeToContinue = false;
             }
         }
         #endregion
@@ -141,7 +134,7 @@ namespace FCS_AIMarineTurbine.Mono
 
             if (!_seaBase.name.StartsWith("Base", StringComparison.OrdinalIgnoreCase)) return;
 
-            // increase or decrease the current speed depending on the value of increasing
+            //increase or decrease the current speed depending on the value of increasing
             _currentSpeed = Mathf.Clamp(_currentSpeed + DayNightCycle.main.deltaTime * IncreaseRate * (Increasing ? 1 : -1), 0, speed);
             _turbine.transform.Rotate(Vector3.up, _currentSpeed * DayNightCycle.main.deltaTime);
         }
@@ -238,6 +231,12 @@ namespace FCS_AIMarineTurbine.Mono
 
         private void SystemHandler()
         {
+            if (MaxSpeed <= 0)
+            {
+                MaxSpeed = BiomeManager.GetBiomeData(_currentBiome).Speed;
+            }
+
+
             /*
              * Handles starting and stopping the turbine and its rotor based off conditions
              */
@@ -247,7 +246,7 @@ namespace FCS_AIMarineTurbine.Mono
                 {
                     if (!string.IsNullOrEmpty(_currentBiome))
                     {
-                        ChangeMotorSpeed(BiomeManager.GetBiomeData(_currentBiome).Speed);
+                        ChangeMotorSpeed(MaxSpeed);
                     }
                     StopMotor();
                 }
@@ -255,12 +254,17 @@ namespace FCS_AIMarineTurbine.Mono
                 {
                     if (!string.IsNullOrEmpty(_currentBiome))
                     {
-                        ChangeMotorSpeed(BiomeManager.GetBiomeData(_currentBiome).Speed);
+                        ChangeMotorSpeed(MaxSpeed);
                     }
                     StartMotor();
                     RotateRotor();
                 }
             }
+        }
+
+        private string GetSolarPowerData()
+        {
+            return $"Output per second {Mathf.Round(PowerManager.GetEnergyPerSecond() * 10) / 10}";
         }
 
         #endregion
@@ -294,7 +298,6 @@ namespace FCS_AIMarineTurbine.Mono
                 if (_seaBase != null)
                 {
                     _currentBiome = BiomeManager.GetBiome();
-                    _isEnabled = true;
                     RotateToMag();
                     SetCurrentRotation();
                     QuickLogger.Debug($"Turbine Constructed Rotation Set {_rotor.transform.rotation.ToString()} ", true);
@@ -390,8 +393,6 @@ namespace FCS_AIMarineTurbine.Mono
                         _display.SetCurrentPage();
                     }
                 }
-
-                _passedDeserialized = true;
             }
             else
             {
@@ -403,5 +404,15 @@ namespace FCS_AIMarineTurbine.Mono
         public int ScreenState { get; set; }
 
         #endregion
+
+        public void OnHandHover(GUIHand hand)
+        {
+            HandReticle.main.SetInteractText(GetSolarPowerData(), false);
+            HandReticle.main.SetIcon(HandReticle.IconType.Default);
+        }
+
+        public void OnHandClick(GUIHand hand)
+        {
+        }
     }
 }

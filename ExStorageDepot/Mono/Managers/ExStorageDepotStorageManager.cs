@@ -67,8 +67,6 @@ namespace ExStorageDepot.Mono.Managers
                 _dumpContainer = new ItemsContainer(DumpContainerWidth, DumpContainerHeight, _containerRoot.transform,
                     ExStorageDepotBuildable.DumpContainerLabel(), null);
                 _dumpContainer.isAllowedToAdd += IsAllowedToAdd;
-                //_dumpContainer.onAddItem += OnDumpAddItemEvent;
-                //_dumpContainer.onRemoveItem += OnDumpRemoveItemEvent;
             }
 
             InvokeRepeating("UpdateStorageDisplayCount", 1, 0.5f);

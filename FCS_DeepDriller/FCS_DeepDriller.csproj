@@ -96,6 +96,7 @@
     <Compile Include="Mono\Handlers\FCSDeepDrillerContainer.cs" />
     <Compile Include="Mono\Handlers\FCSDeepDrillerDisplay.cs" />
     <Compile Include="Mono\Handlers\FCSDeepDrillerFocusDisplay.cs" />
+    <Compile Include="Mono\Handlers\FCSDeepDrillerHealthHandler.cs" />
     <Compile Include="Mono\Handlers\FCSDeepDrillerLavaPitHandler.cs" />
     <Compile Include="Mono\Handlers\FCSDeepDrillerModuleContainer.cs" />
     <Compile Include="Mono\Handlers\FCSDeepDrillerPowerHandler.cs" />

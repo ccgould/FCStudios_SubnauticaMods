@@ -7,8 +7,8 @@
         public void OnHandHover(GUIHand hand)
         {
             HandReticle main = HandReticle.main;
-            main.SetInteractText(_mono.PowerManager.GetSolarPowerData());
-            main.SetIcon(HandReticle.IconType.Hand, 1f);
+            main.SetIcon(HandReticle.IconType.Default);
+            main.SetInteractText(_mono.PowerManager.GetSolarPowerData(), false, HandReticle.Hand.None);
         }
 
         public void OnHandClick(GUIHand hand)

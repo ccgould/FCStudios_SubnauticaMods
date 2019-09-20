@@ -20,9 +20,6 @@ namespace FCSPowerStorage.Managers
         internal readonly List<FCSPowerStorageController> BasePowerStorageUnits = new List<FCSPowerStorageController>();
         public readonly SubRoot Habitat;
 
-
-
-
         /// <summary>
         /// Saves all the bases settings
         /// </summary>
@@ -54,7 +51,7 @@ namespace FCSPowerStorage.Managers
         public static BaseManager FindManager(SubRoot subRoot)
         {
 
-            if (!subRoot.isBase || subRoot.isCyclops) return null;
+            //if (!subRoot.isBase) return null; //Disabled to allow Cyclops Operation
 
             QuickLogger.Debug($"Processing SubRoot = {subRoot.GetInstanceID()} || Name {subRoot.GetSubName()}");
 

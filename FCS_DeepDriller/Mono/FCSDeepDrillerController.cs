@@ -8,8 +8,6 @@ using FCS_DeepDriller.Mono.Handlers;
 using FCSAlterraIndustrialSolutions.Models.Controllers.Logic;
 using FCSCommon.Extensions;
 using FCSCommon.Helpers;
-using FCSCommon.Models.Components;
-using FCSCommon.Objects;
 using FCSCommon.Utilities;
 using FCSCommon.Utilities.Enums;
 using System;
@@ -35,10 +33,6 @@ namespace FCS_DeepDriller.Mono
             set
             {
                 _currentBiome = value;
-                if (value != BiomeManager.NoneString && !string.IsNullOrEmpty(value))
-                {
-                    ConnectDisplay();
-                }
             }
         }
         private Constructable _buildable;
@@ -51,6 +45,8 @@ namespace FCS_DeepDriller.Mono
         private int _damagePerDay = 10;
         private float _damagePerSecond;
         private float _passedTime;
+        private bool _invalidPlacement;
+        private bool _isBiomeKnown = true;
 
         #endregion
 
@@ -63,7 +59,7 @@ namespace FCS_DeepDriller.Mono
         internal bool IsConstructed { get; private set; }  //=> _buildable != null && _buildable.constructed;
         internal FCSDeepDrillerPowerHandler PowerManager { get; private set; }
         internal FCSDeepDrillerDisplay DisplayHandler { get; private set; }
-        internal HealthController HealthManager { get; private set; }
+        internal FCSDeepDrillerHealthHandler HealthManager { get; private set; }
         internal int ExtendStateHash { get; private set; }
         internal int ShaftStateHash { get; private set; }
         internal int BitSpinState { get; private set; }
@@ -80,44 +76,15 @@ namespace FCS_DeepDriller.Mono
 
         #endregion
 
-        #region Unity Methods
-        private void Update()
-        {
-            UpdateHealthSystem();
-        }
-
-        private void UpdateHealthSystem()
-        {
-            _passedTime += DayNightCycle.main.deltaTime;
-
-            if (HealthManager != null)
-            {
-                if (PowerManager?.GetPowerState() != FCSPowerStates.Powered)
-                {
-                    QuickLogger.Debug("Not Damaging Unit");
-                    ResetPassedTime();
-                    return;
-                }
-
-                QuickLogger.Debug($"Passed Time: {_passedTime}");
-
-                if (_passedTime >= _damagePerSecond)
-                {
-                    QuickLogger.Debug("Damaging Unit");
-                    HealthManager.ApplyDamage(1);
-                    ResetPassedTime();
-                }
-
-                HealthManager.HealthChecks();
-            }
-        }
-
-        #endregion
-
         #region IConstructable
         public bool CanDeconstruct(out string reason)
         {
             reason = string.Empty;
+
+            if (_initialized == false)
+            {
+                return true;
+            }
 
             if (DeepDrillerModuleContainer.IsEmpty() && DeepDrillerContainer.IsEmpty())
             {
@@ -133,6 +100,18 @@ namespace FCS_DeepDriller.Mono
             QuickLogger.Info("In Constructed Changed");
 
             IsConstructed = constructed;
+
+            var seaBase = gameObject?.transform?.parent?.gameObject;
+
+            if (seaBase != null)
+            {
+                QuickLogger.Debug($"Base Name: {seaBase.name}", true);
+                if (seaBase.name.StartsWith("Base", StringComparison.OrdinalIgnoreCase))
+                {
+                    QuickLogger.Debug("Is a base");
+                    _invalidPlacement = true;
+                }
+            }
 
             if (IsBeingDeleted) return;
 
@@ -193,11 +172,13 @@ namespace FCS_DeepDriller.Mono
 
             CurrentBiome = data.Biome;
             OreGenerator.AllowedOres = GetBiomeData();
+            ConnectDisplay();
             OreGenerator.SetFocus(data.FocusOre);
             DisplayHandler.UpdateListItems(data.FocusOre);
             DeepDrillerModuleContainer.SetModules(data.Modules);
             DeepDrillerContainer.LoadItems(data.Items);
             HealthManager.SetHealth(data.Health);
+            QuickLogger.Debug($"=============================================== Set Health {HealthManager.GetHealth()}=============================");
             PowerManager.LoadData(data);
 
             if (data.IsFocused)
@@ -229,6 +210,15 @@ namespace FCS_DeepDriller.Mono
 
         private void Initialize()
         {
+            UpdateCurrentBiome();
+
+            if (CurrentBiome == BiomeManager.NoneString || string.IsNullOrEmpty(CurrentBiome))
+            {
+                QuickLogger.Info($"Biome was not found in data base. Biome {CurrentBiome}");
+                _isBiomeKnown = false;
+            }
+
+            QuickLogger.Debug($"Initializing");
 
             ComponentManager = new DeepDrillerComponentManager();
             _damagePerSecond = DayNight / _damagePerDay;
@@ -274,28 +264,26 @@ namespace FCS_DeepDriller.Mono
                 _buildable = GetComponentInParent<Constructable>();
             }
 
-            var uniqueLiveMixingData = new CustomLiveMixinData.UniqueLiveMixinData();
-            var liveMixinData = uniqueLiveMixingData.Create(100, true, true, true);
+            PowerManager = gameObject.AddComponent<FCSDeepDrillerPowerHandler>();
+            PowerManager.Initialize(this);
+            PowerManager.OnPowerUpdate += OnPowerUpdate;
 
-            HealthManager = gameObject.AddComponent<HealthController>();
+            HealthManager = gameObject.AddComponent<FCSDeepDrillerHealthHandler>();
+            HealthManager.Initialize(this);
+            HealthManager.SetHealth(100);
+            HealthManager.OnDamaged += OnDamaged;
+            HealthManager.OnRepaired += OnRepaired;
+            QuickLogger.Debug($"=============================================== Made Health {HealthManager.GetHealth()}=============================");
 
             OreGenerator = gameObject.AddComponent<OreGenerator>();
             OreGenerator.Initialize(this);
             OreGenerator.OnAddCreated += OreGeneratorOnAddCreated;
 
-            UpdateCurrentBiome();
-
-            if (CurrentBiome != BiomeManager.NoneString && !string.IsNullOrEmpty(CurrentBiome))
+            if (_isBiomeKnown)
             {
                 OreGenerator.AllowedOres = GetBiomeData();
+                ConnectDisplay();
             }
-
-            var liveMixin = gameObject.AddComponent<LiveMixin>();
-
-            HealthManager.Initialize(liveMixin, liveMixinData);
-            HealthManager.FullHealth();
-            HealthManager.OnDamaged += OnDamaged;
-            HealthManager.OnRepaired += OnRepaired;
 
             DeepDrillerContainer = new FCSDeepDrillerContainer();
             DeepDrillerContainer.Setup(this);
@@ -305,10 +293,6 @@ namespace FCS_DeepDriller.Mono
 
             //VFXManagerHandler = gameObject.AddComponent<VFXManager>();
             //VFXManagerHandler.Initialize(this);
-
-            PowerManager = gameObject.AddComponent<FCSDeepDrillerPowerHandler>();
-            PowerManager.Initialize(this);
-            PowerManager.OnPowerUpdate += OnPowerUpdate;
 
             AnimationHandler = gameObject.AddComponent<FCSDeepDrillerAnimationHandler>();
             AnimationHandler.Initialize(this);
@@ -321,6 +305,8 @@ namespace FCS_DeepDriller.Mono
             UpdateSystemLights(PowerManager.GetPowerState());
 
             _initialized = true;
+
+            QuickLogger.Debug($"Initializing Completed");
         }
 
         private void OnLavaRaised(bool value)
@@ -340,6 +326,7 @@ namespace FCS_DeepDriller.Mono
             AnimationHandler.SetBoolHash(BitDamageState, false);
             UpdateSystemLights(PowerManager.GetPowerState());
             ResetPassedTime();
+            StartCoroutine(DropLegs());
         }
 
         private void OnBatteryRemoved(Pickupable obj)
@@ -363,16 +350,16 @@ namespace FCS_DeepDriller.Mono
         {
             QuickLogger.Debug($"Changing System Lights", true);
 
-            if (HealthManager.IsDamagedFlag)
+            if (HealthManager.IsDamagedFlag())
             {
                 MaterialHelpers.ReplaceEmissionTexture("DeepDriller_BaseColor_BaseColor", "DeepDriller_Emissive_Error", gameObject, QPatch.GlobalBundle);
                 return;
             }
 
-            if (value == FCSPowerStates.Powered && !HealthManager.IsDamagedFlag)
+            if (value == FCSPowerStates.Powered && !HealthManager.IsDamagedFlag())
                 MaterialHelpers.ReplaceEmissionTexture("DeepDriller_BaseColor_BaseColor", "DeepDriller_Emissive_On",
                     gameObject, QPatch.GlobalBundle);
-            else if (value == FCSPowerStates.Unpowered || value == FCSPowerStates.Tripped && !HealthManager.IsDamagedFlag)
+            else if (value == FCSPowerStates.Unpowered || value == FCSPowerStates.Tripped && !HealthManager.IsDamagedFlag())
                 MaterialHelpers.ReplaceEmissionTexture("DeepDriller_BaseColor_BaseColor", "DeepDriller_Emissive_Off",
                     gameObject, QPatch.GlobalBundle);
         }
@@ -437,9 +424,20 @@ namespace FCS_DeepDriller.Mono
             PowerManager.SetPowerState(FCSPowerStates.Tripped);
         }
 
+        internal bool IsInvalidPlacement()
+        {
+            return _invalidPlacement;
+        }
+
         internal void PowerOnDrill()
         {
-            if (HealthManager.IsDamagedFlag || !PowerManager.IsPowerAvailable()) return;
+            if (_invalidPlacement) return;
+
+            if (HealthManager.IsDamagedFlag() || !PowerManager.IsPowerAvailable())
+            {
+                QuickLogger.Debug($"IsDamaged = {HealthManager.IsDamagedFlag()} || IsPowerAvaliable = {PowerManager.IsPowerAvailable()}", true);
+                return;
+            }
 
             UpdateLegState(true);
             PowerManager.SetPowerState(FCSPowerStates.Powered);
@@ -480,6 +478,7 @@ namespace FCS_DeepDriller.Mono
 
         internal List<TechType> GetBiomeData()
         {
+
             if (_bioData.Count == 0)
             {
                 _bioData = BiomeManager.GetBiomeData(CurrentBiome);
@@ -508,6 +507,11 @@ namespace FCS_DeepDriller.Mono
         internal TechType GetFocusedOre()
         {
             return OreGenerator.GetFocus();
+        }
+
+        internal bool IsBiomeKnown()
+        {
+            return _isBiomeKnown;
         }
         #endregion
     }

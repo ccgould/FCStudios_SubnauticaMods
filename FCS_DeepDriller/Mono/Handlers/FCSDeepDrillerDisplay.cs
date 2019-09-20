@@ -58,9 +58,11 @@ namespace FCS_DeepDriller.Mono.Handlers
                 _initialized = false;
             }
             ITEMS_PER_PAGE = 5;
+
             DrawPage(1);
             QuickLogger.Debug("Display has been set.");
-            InvokeRepeating("UpdateBatteryStatus", 1, 0.5f);
+            InvokeRepeating(nameof(UpdateHealthStatus), 1, 0.5f);
+            InvokeRepeating(nameof(UpdateBatteryStatus), 1, 0.5f);
             InvokeRepeating(nameof(UpdateScreenState), 1.0f, 0.5f);
             InvokeRepeating(nameof(UpdateButton), 1, 1);
         }
@@ -70,10 +72,13 @@ namespace FCS_DeepDriller.Mono.Handlers
             _mono.AnimationHandler.SetBoolHash(_mono.ScreenStateHash, _mono.PowerManager.IsPowerAvailable() && _mono.PowerManager.GetPowerState() == FCSPowerStates.Powered);
         }
 
+        private void UpdateHealthStatus()
+        {
+            _healthPercentage.text = $"{Mathf.RoundToInt(_mono.HealthManager.GetHealth())}%";
+        }
+
         private void UpdateBatteryStatus()
         {
-            _healthPercentage.text = $"{_mono.HealthManager.GetHealth()}%";
-
             if (_mono.DeepDrillerModuleContainer.HasSolarModule())
             {
                 _solarValue.text = $"{Mathf.RoundToInt(_mono.PowerManager.GetSolarPowerUnitData().Battery.charge)}";

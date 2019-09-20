@@ -17,7 +17,7 @@ namespace FCSCommon.Models.Components
         /// If no live mixing data in supplied it will use the default live mixing data in <see cref="CustomLiveMixinData.Get"/>
         /// </summary>
         /// <param name="liveMixinData"></param>
-        public void Initialize(LiveMixin liveMixin, LiveMixinData liveMixinData)
+        public void Initialize(LiveMixin liveMixin, LiveMixinData liveMixinData = null)
         {
             if (liveMixin == null)
             {
@@ -38,8 +38,6 @@ namespace FCSCommon.Models.Components
             {
                 LiveMixin.data = liveMixinData;
             }
-
-            //InvokeRepeating("HealthChecks", 0, 1);
         }
 
         public void HealthChecks() // In and InvokeRepeating
@@ -73,11 +71,13 @@ namespace FCSCommon.Models.Components
 
         public void SetHealth(float health)
         {
-            LiveMixin.health = Mathf.Clamp(health, 0, LiveMixin.maxHealth);
+            LiveMixin.health = Mathf.Clamp(health, 0f, LiveMixin.maxHealth);
+            QuickLogger.Debug($"Health set to {LiveMixin.health }", true);
         }
 
         public void ApplyDamage(float amount)
         {
+            if (GetHealth() <= 0) return;
             LiveMixin.health = Mathf.Clamp(LiveMixin.health - amount, 0, LiveMixin.maxHealth);
         }
 

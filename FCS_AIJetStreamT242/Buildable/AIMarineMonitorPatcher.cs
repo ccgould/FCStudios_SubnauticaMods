@@ -1,5 +1,6 @@
 ﻿using FCSAlterraIndustrialSolutions.Models.Controllers;
 using FCSCommon.Extensions;
+using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using System;
 using System.Collections.Generic;
@@ -101,10 +102,7 @@ namespace FCS_AIMarineTurbine.Buildable
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(TechType.WiringKit, 1),
-                    new Ingredient(TechType.ComputerChip, 1),
-                    new Ingredient(TechType.Battery, 1),
-                    new Ingredient(TechType.Glass, 1)
+                    new Ingredient(TechTypeHelpers.GetTechType("MarineMonitorKit_MT"), 1)
                 }
             };
             QuickLogger.Debug($"Created Ingredients");

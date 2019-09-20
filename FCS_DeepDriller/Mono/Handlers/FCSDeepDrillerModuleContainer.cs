@@ -184,6 +184,9 @@ namespace FCS_DeepDriller.Mono.Handlers
 
         internal void OpenModulesDoor()
         {
+
+            if (_mono.IsInvalidPlacement()) return;
+
             QuickLogger.Debug("Modules Door Opened", true);
             PDA pda = Player.main.GetPDA();
             if (!pda.isInUse)

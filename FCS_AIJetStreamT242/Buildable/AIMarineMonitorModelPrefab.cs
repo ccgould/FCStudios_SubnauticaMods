@@ -13,7 +13,7 @@ namespace FCS_AIMarineTurbine.Buildable
             QuickLogger.Debug("GetPrefabs");
 
             //We have found the asset bundle and now we are going to continue by looking for the model.
-            GameObject prefab = QPatch.Bundle.LoadAsset<GameObject>("MarineTurbinesMonitor");
+            GameObject prefab = QPatch.Bundle.LoadAsset<GameObject>("MarineTurbinesMonitor");//MarineTurbinesMonitor //AlterraTurbines_Monitor
 
             //If the prefab isn't null lets add the shader to the materials
             if (prefab != null)

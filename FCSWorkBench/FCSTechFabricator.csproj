@@ -77,6 +77,7 @@
     <Compile Include="Mono\FCSTechFabricatorTag.cs" />
     <Compile Include="Mono\FCSTechWorkBenchModelPrefab.cs" />
     <Compile Include="Mono\FCSTechWorkBenchPatcher.cs" />
+    <Compile Include="Mono\MarineTurbine\MarineMonitorKitPatcher.cs" />
     <Compile Include="Mono\MarineTurbine\JetStreamKitPatcher.cs" />
     <Compile Include="Mono\PowerStorage\PowerStorageKitPatcher.cs" />
     <Compile Include="Mono\SeaBreeze\Freon.cs" />

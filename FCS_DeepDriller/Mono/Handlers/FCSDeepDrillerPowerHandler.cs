@@ -153,7 +153,7 @@ namespace FCS_DeepDriller.Mono.Handlers
 
         internal string GetSolarPowerData()
         {
-            return $"Solar panel (sun: {Mathf.RoundToInt(GetRechargeScalar() * 100f)}% charge {Mathf.RoundToInt(_powerBank.Solar.Battery.charge)}/{Mathf.RoundToInt(_powerBank.Solar.Battery.capacity)}";
+            return $"Solar panel (sun: {Mathf.RoundToInt(GetRechargeScalar() * 100f)}% charge {Mathf.RoundToInt(_powerBank.Solar.Battery.charge)}/{Mathf.RoundToInt(_powerBank.Solar.Battery.capacity)})";
         }
         internal PowerUnitData GetSolarPowerUnitData()
         {
@@ -177,7 +177,7 @@ namespace FCS_DeepDriller.Mono.Handlers
                 return false;
             }
 
-            if (_mono.HealthManager.IsDamagedFlag)
+            if (_mono.HealthManager.IsDamagedFlag())
             {
                 return false;
             }

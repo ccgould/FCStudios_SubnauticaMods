@@ -59,8 +59,6 @@ namespace FCS_AIMarineTurbine.Buildable
                 var transmitter = GameObject.Instantiate(CraftData.GetPrefabForTechType(TechType.PowerTransmitter));
 
 
-
-
                 // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
                 var lwe = prefab.AddComponent<LargeWorldEntity>();
                 lwe.cellLevel = LargeWorldEntity.CellLevel.Far;
@@ -70,6 +68,13 @@ namespace FCS_AIMarineTurbine.Buildable
                 SkyApplier skyApplier = prefab.AddComponent<SkyApplier>();
                 skyApplier.renderers = model.GetComponentsInChildren<MeshRenderer>();
                 skyApplier.anchorSky = Skies.Auto;
+
+                //Shader shader = Shader.Find("MarmosetUBER");
+                //Renderer[] renderers = prefab.GetComponentsInChildren<Renderer>();
+                //foreach (Renderer renderer in renderers)
+                //{
+                //    renderer.material.shader = shader;
+                //}
 
                 //========== Allows the building animation and material colors ==========// 
 
@@ -93,6 +98,8 @@ namespace FCS_AIMarineTurbine.Buildable
 
                 PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
                 prefabID.ClassId = this.ClassID;
+
+                prefab.AddComponent<TechTag>().type = TechType;
 
                 prefab.AddComponent<BeaconController>();
 

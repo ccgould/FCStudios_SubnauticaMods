@@ -56,11 +56,11 @@ namespace FCS_DeepDriller.Managers
             if (string.IsNullOrEmpty(biome)) return String.Empty;
 
             var result = string.Empty;
-            QuickLogger.Info("// ============================= IN FindMatchingBiome ============================= //");
+            QuickLogger.Debug("// ============================= IN FindMatchingBiome ============================= //");
 
             foreach (var biomeItem in FCSDeepDrillerBuildable.DeepDrillConfig.BiomeOresTechType)
             {
-                QuickLogger.Info($"Checking for {biome} || Current biome in iteration = {biomeItem.Key}");
+                QuickLogger.Debug($"Checking for {biome} || Current biome in iteration = {biomeItem.Key}");
 
                 if (biome.StartsWith(biomeItem.Key))
                 {
@@ -70,7 +70,7 @@ namespace FCS_DeepDriller.Managers
                 }
             }
 
-            QuickLogger.Info("// ============================= IN FindMatchingBiome ============================= //");
+            QuickLogger.Debug("// ============================= IN FindMatchingBiome ============================= //");
 
             return result;
         }

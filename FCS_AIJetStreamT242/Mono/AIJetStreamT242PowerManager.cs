@@ -25,6 +25,7 @@ namespace FCS_AIJetStreamT242.Mono
         private AIJetStreamT242Controller _mono;
         private float _timeCurrDeltaTime;
         private float _storedPower;
+        private float _energyPerSec;
 
 
         #region Unity Methods
@@ -69,58 +70,21 @@ namespace FCS_AIJetStreamT242.Mono
             }
         }
 
-
-        //private void UpdatePowerRelay()
-        //{
-        //    try
-        //    {
-        //        var relay = PowerSource.FindRelay(transform);
-
-        //        if (relay != null && relay != _powerRelay)
-        //        {
-        //            if (_powerRelay != null)
-        //            {
-        //                _powerRelay.RemoveInboundPower(this);
-        //            }
-        //            _powerRelay = relay;
-        //            _powerRelay.AddInboundPower(this);
-        //            CancelInvoke("UpdatePowerRelay");
-        //        }
-        //        else
-        //        {
-        //            _powerRelay = null;
-        //        }
-
-        //        if (_powerRelay != null)
-        //        {
-        //            _powerRelay.RemoveInboundPower(this);
-        //            _powerRelay.AddInboundPower(this);
-        //            CancelInvoke("UpdatePowerRelay");
-        //        }
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        QuickLogger.Error(e.Message);
-        //    }
-        //}
-
         private void ProducePower()
         {
-            if (_hasBreakerTripped || _mono.HealthManager.IsDamageApplied()) return;
-
             var decPercentage = (MaxPowerPerMin / _mono.MaxSpeed) / 60;
 
-            var energyPerSec = _mono.GetCurrentSpeed() * decPercentage;
+            _energyPerSec = _mono.GetCurrentSpeed() * decPercentage;
+
+            if (_hasBreakerTripped || _mono.HealthManager.IsDamageApplied()) return;
 
             _timeCurrDeltaTime += DayNightCycle.main.deltaTime;
 
             if (!(_timeCurrDeltaTime >= 1)) return;
 
-            _charge = Mathf.Clamp(_charge + energyPerSec, 0, AIJetStreamT242Buildable.JetStreamT242Config.MaxCapacity);
+            _charge = Mathf.Clamp(_charge + _energyPerSec, 0, AIJetStreamT242Buildable.JetStreamT242Config.MaxCapacity);
 
             _timeCurrDeltaTime = 0;
-
-            //QuickLogger.Debug($"{energyPerSec.ToString()} || {_timeCurrDeltaTime}");
         }
 
         internal void KillBattery()
@@ -217,6 +181,10 @@ namespace FCS_AIJetStreamT242.Mono
         }
         #endregion
 
+        internal float GetEnergyPerSecond()
+        {
+            return _energyPerSec;
+        }
         internal float GetCharge()
         {
             return _charge;

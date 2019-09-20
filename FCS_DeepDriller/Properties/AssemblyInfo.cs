@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("FCS_DeepDriller")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Alterra Industrial Solutions Deep Driller")]
+[assembly: AssemblyDescription("Deep driller is a mod that drills resources from the ground in Subnautica.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("FCS_DeepDriller")]
-[assembly: AssemblyCopyright("Copyright ©  2019")]
+[assembly: AssemblyCompany("Field Creators Studios")]
+[assembly: AssemblyProduct("Alterra Industrial Solutions Deep Driller")]
+[assembly: AssemblyCopyright("Copyright Field Creators Studios©  2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

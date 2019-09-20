@@ -90,7 +90,7 @@ namespace FCS_DeepDriller.Buildable
                 //var beacon = prefab.AddComponent<Beacon>();
 
                 //beacon.label = "DeepDriller";
-
+                //prefab.AddComponent<LiveMixin>();
                 prefab.AddComponent<PrefabIdentifier>().ClassId = this.ClassID;
                 prefab.AddComponent<FMOD_CustomLoopingEmitter>();
                 prefab.AddComponent<FCSDeepDrillerController>();

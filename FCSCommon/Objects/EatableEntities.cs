@@ -20,7 +20,7 @@ namespace FCSCommon.Objects
 
         public float KDecayRate { get; set; }
 
-        public bool Decomposes => Food.decomposes;
+        public bool Decomposes { get; set; }
 
         [JsonIgnore]
         public Eatable Food { get; set; }
@@ -34,6 +34,7 @@ namespace FCSCommon.Objects
                 Food = food.GetComponent<Eatable>();
                 Name = food.name;
                 KDecayRate = Food.kDecayRate;
+                Decomposes = Food.decomposes;
             }
             else
             {

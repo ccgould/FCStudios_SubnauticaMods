@@ -19,7 +19,6 @@ namespace ExStorageDepot.Buildable
         public override TechGroup GroupForPDA { get; } = TechGroup.ExteriorModules;
         public override TechCategory CategoryForPDA { get; } = TechCategory.ExteriorModule;
 
-
         public override TechType RequiredForUnlock { get; } = TechType.PowerCell;
 
         public override string AssetsFolder { get; } = $"ExStorageDepot/Assets";

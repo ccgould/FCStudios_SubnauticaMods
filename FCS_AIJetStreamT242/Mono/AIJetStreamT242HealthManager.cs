@@ -11,12 +11,12 @@ namespace FCS_AIMarineTurbine.Mono
     {
         public LiveMixin LiveMixin { get; set; } = new LiveMixin();
         public bool IsDamagedFlag { get; set; } = true;
-        public bool IsSafeToContinue { get; set; }
-        public int HealthMultiplyer { get; set; } = 10;
 
-        private float _passedTime = 0f;
-        private AIJetStreamT242Controller _mono;
-        private double _damageTimeInSeconds = 2520;
+        public int HealthMultiplyer { get; set; } = 1;
+        private const float DayNight = 1200f;
+        private int _damagePerDay = 10;
+        private float _damagePerSecond;
+        private float _passedTime;
         private GameObject _damage;
         private bool _shaderApplied;
         public Action OnDamaged { get; set; }
@@ -27,7 +27,53 @@ namespace FCS_AIMarineTurbine.Mono
 
         private void Awake()
         {
+
+        }
+
+        private void Update()
+        {
+            //TODO Check if will cause problem
+            //if (!IsSafeToContinue) return;
+
+            UpdateHealthSystem();
+        }
+        #endregion
+
+        private void UpdateHealthSystem()
+        {
+            _passedTime += DayNightCycle.main.deltaTime;
+
+            QuickLogger.Debug($"Passed Time: {_passedTime} || Damage Per Sec {_damagePerSecond}");
+
+            if (_passedTime >= _damagePerSecond)
+            {
+                QuickLogger.Debug("Damaging Unit");
+                ApplyDamage();
+            }
+        }
+
+        public bool IsDamageApplied()
+        {
+            if (LiveMixin == null) return true;
+
+            return LiveMixin.health <= 0;
+        }
+
+        internal float GetHealth()
+        {
+            return LiveMixin.health;
+        }
+
+        internal void SetHealth(float health)
+        {
+            LiveMixin.health = health;
+        }
+
+        internal void Initialize(AIJetStreamT242Controller mono)
+        {
             LiveMixin = GetComponentInParent<LiveMixin>();
+
+            _damagePerSecond = DayNight / _damagePerDay;
 
             if (LiveMixin != null)
             {
@@ -50,59 +96,13 @@ namespace FCS_AIMarineTurbine.Mono
             }
         }
 
-        private void Update()
-        {
-            //TODO Check if will cause problem
-            if (!IsSafeToContinue) return;
-
-            _passedTime += DayNightCycle.main.deltaTime;
-
-            if (_passedTime >= _damageTimeInSeconds)
-            {
-                ApplyDamage();
-            }
-
-            if (LiveMixin.health <= 0 && !_mono.PowerManager.IsBatteryDestroyed())
-            {
-                _mono.PowerManager.DestroyBattery();
-            }
-            else if (LiveMixin.health > 0 && _mono.PowerManager.IsBatteryDestroyed())
-            {
-                _mono.PowerManager.RepairBattery();
-            }
-
-        }
-        #endregion
-
-        public bool IsDamageApplied()
-        {
-            if (LiveMixin == null) return true;
-
-            return LiveMixin.health <= 0;
-        }
-
-        internal float GetHealth()
-        {
-            return LiveMixin.health;
-        }
-
-        internal void SetHealth(float health)
-        {
-            LiveMixin.health = health;
-        }
-
-        internal void Initialize(AIJetStreamT242Controller mono)
-        {
-            _mono = mono;
-        }
-
         public void ApplyDamage()
         {
             if (LiveMixin.health > 0 && AIJetStreamT242Buildable.JetStreamT242Config.EnableWear)
             {
-                LiveMixin.health = Mathf.Clamp(LiveMixin.maxHealth - HealthMultiplyer, 0f, 100f);
+                LiveMixin.health = Mathf.Clamp(LiveMixin.health - HealthMultiplyer, 0f, 100f);
+                ResetTimer();
             }
-            ResetTimer();
         }
 
         private void HealthChecks() // In and InvokeRepeating

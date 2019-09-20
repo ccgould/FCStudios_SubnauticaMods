@@ -10,10 +10,7 @@ namespace FCSPowerStorage.Patchers
         [HarmonyPostfix]
         public static void Postfix(ref SubRoot __instance)
         {
-            if (!__instance.isCyclops)
-            {
-                var manager = BaseManager.FindManager(__instance);
-            }
+            var manager = BaseManager.FindManager(__instance);
         }
     }
 }

@@ -84,6 +84,11 @@ namespace FCSTechFabricator
             FCSTechFabricatorBuildable.AddTechType(jsKit.TechType, jsKit.StepsToFabricatorTab);
             QuickLogger.Debug($"Patched {jsKit.FriendlyName}");
 
+            var mmKit = new MarineMonitorKitBuildable();
+            mmKit.Patch();
+            FCSTechFabricatorBuildable.AddTechType(mmKit.TechType, mmKit.StepsToFabricatorTab);
+            QuickLogger.Debug($"Patched {mmKit.FriendlyName}");
+
 
             var ddSolarModule = new SolarAttachmentBuildable();
             ddSolarModule.Patch();

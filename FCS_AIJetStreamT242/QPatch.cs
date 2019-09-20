@@ -39,7 +39,7 @@ namespace FCS_AIMarineTurbine
             }
             catch (Exception ex)
             {
-                QuickLogger.Error(ex);
+                QuickLogger.Error(ex.Message);
             }
         }
 
