@@ -100,7 +100,7 @@ namespace FCS_DeepDriller.Mono.Handlers
             }
         }
 
-        public void ApplyDamage()
+        internal void ApplyDamage()
         {
             if (_liveMixin.health > 0)
             {
@@ -140,7 +140,7 @@ namespace FCS_DeepDriller.Mono.Handlers
             return _passedTime;
         }
 
-        public void SetPassedTime(float savedDataPassedTime)
+        internal void SetPassedTime(float savedDataPassedTime)
         {
             _passedTime = savedDataPassedTime;
         }

@@ -109,6 +109,8 @@ namespace ARS_SeaBreezeFCS32.Model
 
                 if (match != null)
                 {
+                    QuickLogger.Debug($"Match Found", true);
+
                     eatable.kDecayRate = match.KDecayRate;
                     eatable.timeDecayStart = DayNightCycle.main.timePassedAsFloat;
                     eatable.foodValue = f;
@@ -161,9 +163,15 @@ namespace ARS_SeaBreezeFCS32.Model
                 foreach (EatableEntities eatableEntity in FridgeItems)
                 {
                     if (eatableEntity.PrefabID != prefabId) continue;
+                    QuickLogger.Debug($"Match before: F:{eatable.foodValue} || W:{eatable.waterValue} || DR:{eatable.kDecayRate} || TDS:{eatable.timeDecayStart} || D:{eatable.decomposes}", true);
+                    eatable.timeDecayStart = DayNightCycle.main.timePassedAsFloat;
                     eatable.kDecayRate = eatableEntity.KDecayRate;
                     eatable.decomposes = eatableEntity.Decomposes;
-                    QuickLogger.Debug($"Decaying {inventoryItem.item.name}|| Decompose: {eatable.decomposes} || DRate: {eatable.kDecayRate}", true);
+                    QuickLogger.Debug($"SavedF:{eatableEntity.FoodValue} || SavedW:{eatableEntity.WaterValue}", true);
+                    eatable.foodValue = eatableEntity.FoodValue;
+                    eatable.waterValue = eatableEntity.WaterValue;
+                    QuickLogger.Debug($"Match after: F:{eatable.foodValue} || W:{eatable.waterValue} || DR:{eatable.kDecayRate} || TDS:{eatable.timeDecayStart} || D:{eatable.decomposes}", true);
+                    //QuickLogger.Debug($"Decaying {inventoryItem.item.name}|| Decompose: {eatable.decomposes} || DRate: {eatable.kDecayRate}", true);
                     break;
                 }
             }
@@ -180,17 +188,19 @@ namespace ARS_SeaBreezeFCS32.Model
             foreach (InventoryItem inventoryItem in _fridgeContainer)
             {
                 var eatable = inventoryItem.item.GetComponent<Eatable>();
-                var f = eatable.GetFoodValue();
-                var w = eatable.GetWaterValue();
+
+                var curF = eatable.GetFoodValue();
+                var curW = eatable.GetWaterValue();
+
                 var prefabId = inventoryItem.item.gameObject.GetComponent<PrefabIdentifier>().Id;
 
                 if (FindMatch(prefabId).Decomposes)
                 {
-                    eatable.kDecayRate = FindMatch(prefabId).KDecayRate; // Rate;
-                    eatable.timeDecayStart = DayNightCycle.main.timePassedAsFloat;
-                    eatable.foodValue = f;
-                    eatable.waterValue = w;
                     eatable.decomposes = false;
+                    eatable.timeDecayStart = DayNightCycle.main.timePassedAsFloat;
+                    //Add set the food and water so it doesnt reset
+                    eatable.foodValue = curF;
+                    eatable.waterValue = curW;
                 }
 
                 QuickLogger.Debug($"Cooling {inventoryItem.item.name}|| Decompose: {eatable.decomposes} || DRate: {eatable.kDecayRate}", true);
@@ -201,9 +211,10 @@ namespace ARS_SeaBreezeFCS32.Model
         private void CoolItem(InventoryItem item)
         {
             var eatable = item.item.GetComponent<Eatable>();
+            var curF = eatable.GetFoodValue();
+            var curW = eatable.GetWaterValue();
             var prefabId = item.item.GetComponent<PrefabIdentifier>().Id;
-            var f = eatable.GetFoodValue();
-            var w = eatable.GetWaterValue();
+
             QuickLogger.Debug($"F {eatable.foodValue} || W {eatable.waterValue} || KD {eatable.kDecayRate} || D {eatable.decomposes}", true);
 
             //Store Data about the item
@@ -213,11 +224,10 @@ namespace ARS_SeaBreezeFCS32.Model
 
             if (FindMatch(prefabId).Decomposes && _coolingState == FridgeCoolingState.Cooling)
             {
-                eatable.kDecayRate = FindMatch(prefabId).KDecayRate; // Rate;
-                eatable.timeDecayStart = DayNightCycle.main.timePassedAsFloat;
-                eatable.foodValue = f;
-                eatable.waterValue = w;
                 eatable.decomposes = false;
+                eatable.timeDecayStart = DayNightCycle.main.timePassedAsFloat;
+                eatable.foodValue = curF;
+                eatable.waterValue = curW;
                 QuickLogger.Debug($"Cooling", true);
             }
 

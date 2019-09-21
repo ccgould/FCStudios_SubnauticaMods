@@ -61,6 +61,19 @@ namespace ExStorageDepot.Mono
             return false;
         }
 
+        public InventoryItem GetInventoryItem(TechType item)
+        {
+            if (Storage != null)
+            {
+                if (Storage.DoesItemExist(item))
+                {
+                    return Storage.ForceRemoveItem(item);
+                }
+            }
+
+            return null;
+        }
+
         public void OnConstructedChanged(bool constructed)
         {
             if (constructed)

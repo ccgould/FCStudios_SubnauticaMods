@@ -248,5 +248,17 @@ namespace ExStorageDepot.Mono.Managers
         {
             AddItem(InventoryHelpers.CovertToItemData(item, true));
         }
+
+        internal bool DoesItemExist(TechType item)
+        {
+            var result = _trackedItems.SingleOrDefault(x => x.TechType == item);
+
+            return result != null;
+        }
+
+        public InventoryItem ForceRemoveItem(TechType item)
+        {
+            return _trackedItems.SingleOrDefault(x => x.TechType == item)?.InventoryItem;
+        }
     }
 }

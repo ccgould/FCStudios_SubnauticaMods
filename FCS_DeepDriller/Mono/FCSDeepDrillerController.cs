@@ -222,6 +222,7 @@ namespace FCS_DeepDriller.Mono
 
             ComponentManager = new DeepDrillerComponentManager();
             _damagePerSecond = DayNight / _damagePerDay;
+
             _batteryAttachment = new BatteryAttachment();
             _batteryAttachment.GetGameObject(this);
             _batteryAttachment.GetController().OnBatteryAdded += OnBatteryAdded;
@@ -300,7 +301,6 @@ namespace FCS_DeepDriller.Mono
             LavaPitHandler = gameObject.AddComponent<FCSDeepDrillerLavaPitHandler>();
             LavaPitHandler.Initialize(this);
             LavaPitHandler.OnLavaRaised += OnLavaRaised;
-
 
             UpdateSystemLights(PowerManager.GetPowerState());
 

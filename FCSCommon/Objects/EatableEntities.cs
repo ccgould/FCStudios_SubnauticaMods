@@ -33,6 +33,8 @@ namespace FCSCommon.Objects
                 PrefabID = food.GetComponent<PrefabIdentifier>().Id;
                 Food = food.GetComponent<Eatable>();
                 Name = food.name;
+                WaterValue = Food.GetWaterValue();
+                FoodValue = Food.GetFoodValue();
                 KDecayRate = Food.kDecayRate;
                 Decomposes = Food.decomposes;
             }
