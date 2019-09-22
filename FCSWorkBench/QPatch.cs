@@ -1,16 +1,16 @@
 ﻿using FCSCommon.Exceptions;
+using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
+using FCSTechFabricator.Configuration;
 using FCSTechFabricator.Models;
 using FCSTechFabricator.Mono;
 using FCSTechFabricator.Mono.DeepDriller;
 using FCSTechFabricator.Mono.MarineTurbine;
 using FCSTechFabricator.Mono.PowerStorage;
 using FCSTechFabricator.Mono.SeaBreeze;
-//using FCSTechFabricator.Mono.MarineTurbine;
-//using FCSTechFabricator.Mono.PowerStorage;
-//using FCSTechFabricator.Mono.SeaBreeze;
 using Harmony;
+using Oculus.Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Reflection;
@@ -20,6 +20,8 @@ namespace FCSTechFabricator
 {
     public class QPatch
     {
+        internal static Configuration.Configuration Configuration { get; set; }
+
         public static void Patch()
         {
             QuickLogger.Info("Started patching. Version: " + QuickLogger.GetAssemblyVersion());
@@ -31,6 +33,15 @@ namespace FCSTechFabricator
 
             try
             {
+
+                // == Load Configuration == //
+                string configJson = File.ReadAllText(Information.ConfigurationFile().Trim());
+
+                //LoadData
+                Configuration = JsonConvert.DeserializeObject<Configuration.Configuration>(configJson);
+
+
+
                 if (GetPrefabs())
                 {
                     FCSTechFabricatorBuildable.PatchHelper();
@@ -152,6 +163,7 @@ namespace FCSTechFabricator
             if (Kit != null)
             {
                 QuickLogger.Debug($"UnitContainerKit Prefab Found!");
+                RegisterKit();
             }
             else
             {
@@ -215,6 +227,73 @@ namespace FCSTechFabricator
             }
 
             return true;
+        }
+
+        private static void RegisterKit()
+        {
+            var model = Kit.GetComponentInChildren<Canvas>().gameObject;
+            model.FindChild("Screen").SetActive(true);
+
+            var rb = Kit.AddComponent<Rigidbody>();
+            rb.isKinematic = true;
+
+            // Set collider
+            var collider = Kit.GetComponent<BoxCollider>();
+            collider.enabled = false;
+
+            // Make the object drop slowly in water
+            var wf = Kit.GetOrAddComponent<WorldForces>();
+            wf.underwaterGravity = 0;
+            wf.underwaterDrag = 10f;
+            wf.enabled = true;
+
+            // Add fabricating animation
+            var fabricatingA = Kit.GetOrAddComponent<VFXFabricating>();
+            fabricatingA.localMinY = -0.1f;
+            fabricatingA.localMaxY = 0.6f;
+            fabricatingA.posOffset = new Vector3(0f, 0f, 0f);
+            fabricatingA.eulerOffset = new Vector3(0f, 0f, 0f);
+            fabricatingA.scaleFactor = 1.0f;
+
+            //// Set proper shaders (for crafting animation)
+            //Shader marmosetUber = Shader.Find("MarmosetUBER");
+            var renderer = Kit.GetComponentInChildren<Renderer>();
+            //renderer.material.shader = marmosetUber;
+
+            // Update sky applier
+            var applier = Kit.GetOrAddComponent<SkyApplier>();
+            applier.renderers = new Renderer[] { renderer };
+            applier.anchorSky = Skies.Auto;
+
+            // We can pick this item
+            var pickupable = Kit.GetOrAddComponent<Pickupable>();
+            pickupable.isPickupable = true;
+            pickupable.randomizeRotationWhenDropped = true;
+
+            var placeTool = Kit.GetOrAddComponent<PlaceTool>();
+            placeTool.allowedInBase = true;
+            placeTool.allowedOnBase = false;
+            placeTool.allowedOnCeiling = false;
+            placeTool.allowedOnConstructable = true;
+            placeTool.allowedOnGround = true;
+            placeTool.allowedOnRigidBody = true;
+            placeTool.allowedOnWalls = false;
+            placeTool.allowedOutside = false;
+            placeTool.rotationEnabled = true;
+            placeTool.enabled = true;
+            placeTool.hasAnimations = false;
+            placeTool.hasBashAnimation = false;
+            placeTool.hasFirstUseAnimation = false;
+            placeTool.mainCollider = collider;
+            placeTool.pickupable = pickupable;
+            placeTool.drawTime = 0.5f;
+            placeTool.dropTime = 1;
+            placeTool.holsterTime = 0.35f;
+
+            Kit.AddComponent<FCSTechFabricatorTag>();
+
+            //Lets apply the material shader
+            Shaders.ApplyKitShaders(Kit);
         }
 
         public static GameObject BatteryModule { get; set; }

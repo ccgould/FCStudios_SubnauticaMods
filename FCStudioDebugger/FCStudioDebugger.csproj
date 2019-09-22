@@ -63,6 +63,7 @@
   <ItemGroup>
     <Compile Include="Debug\DebugMenu.cs" />
     <Compile Include="Debug\Patches\OpenDebugMenu.cs" />
+    <Compile Include="Patchers\Fabricator_Patches.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

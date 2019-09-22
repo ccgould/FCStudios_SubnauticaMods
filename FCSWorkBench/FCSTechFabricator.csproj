@@ -62,7 +62,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configuration\Configuration.cs" />
+    <Compile Include="Configuration\Information.cs" />
+    <Compile Include="Helpers\IngredientHelper.cs" />
     <Compile Include="Interfaces\IFCSTechFabricatorItem.cs" />
+    <Compile Include="Models\IngredientItem.cs" />
     <Compile Include="Models\Mod.cs" />
     <Compile Include="Models\Shaders.cs" />
     <Compile Include="Models\ModTechTypes.cs" />

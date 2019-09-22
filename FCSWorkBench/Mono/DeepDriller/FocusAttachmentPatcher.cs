@@ -1,4 +1,5 @@
-﻿using FCSCommon.Utilities;
+﻿using FCSCommon.Extensions;
+using FCSCommon.Utilities;
 using FCSTechFabricator.Models;
 using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
@@ -39,7 +40,7 @@ namespace FCSTechFabricator.Mono.DeepDriller
 
         public override GameObject GetGameObject()
         {
-            GameObject prefab = GameObject.Instantiate<GameObject>(this._prefab);
+            GameObject prefab = GameObject.Instantiate<GameObject>(QPatch.Kit);
 
             prefab.name = this.PrefabFileName;
 
@@ -49,73 +50,14 @@ namespace FCSTechFabricator.Mono.DeepDriller
                 return null;
             }
 
-            var model = prefab.GetComponentInChildren<Canvas>().gameObject;
-            model.FindChild("Screen").SetActive(true);
-
             _label.text = FriendlyName;
 
-            // Make the object drop slowly in water
-            var wf = prefab.AddComponent<WorldForces>();
-            wf.underwaterGravity = 0;
-            wf.underwaterDrag = 10f;
-            wf.enabled = true;
-
-            // Add fabricating animation
-            var fabricatingA = prefab.AddComponent<VFXFabricating>();
-            fabricatingA.localMinY = -0.1f;
-            fabricatingA.localMaxY = 0.6f;
-            fabricatingA.posOffset = new Vector3(0f, 0f, 0f);
-            fabricatingA.eulerOffset = new Vector3(0f, 0f, 0f);
-            fabricatingA.scaleFactor = 1.0f;
-
-            PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
+            PrefabIdentifier prefabID = prefab.GetOrAddComponent<PrefabIdentifier>();
 
             prefabID.ClassId = this.ClassID;
 
-            //// Set proper shaders (for crafting animation)
-            //Shader marmosetUber = Shader.Find("MarmosetUBER");
-            var renderer = prefab.GetComponentInChildren<Renderer>();
-            //renderer.material.shader = marmosetUber;
-
-            // Update sky applier
-            var applier = prefab.GetComponent<SkyApplier>();
-            if (applier == null)
-                applier = prefab.AddComponent<SkyApplier>();
-            applier.renderers = new Renderer[] { renderer };
-            applier.anchorSky = Skies.Auto;
-
-            // We can pick this item
-            var pickupable = prefab.AddComponent<Pickupable>();
-            pickupable.isPickupable = true;
-            pickupable.randomizeRotationWhenDropped = true;
-
-            // Set collider
-            var collider = prefab.GetComponent<BoxCollider>();
-
-            var placeTool = prefab.AddComponent<PlaceTool>();
-            placeTool.allowedInBase = true;
-            placeTool.allowedOnBase = false;
-            placeTool.allowedOnCeiling = false;
-            placeTool.allowedOnConstructable = true;
-            placeTool.allowedOnGround = true;
-            placeTool.allowedOnRigidBody = true;
-            placeTool.allowedOnWalls = false;
-            placeTool.allowedOutside = false;
-            placeTool.rotationEnabled = true;
-            placeTool.enabled = true;
-            placeTool.hasAnimations = false;
-            placeTool.hasBashAnimation = false;
-            placeTool.hasFirstUseAnimation = false;
-            placeTool.mainCollider = collider;
-            placeTool.pickupable = pickupable;
-            placeTool.drawTime = 0.5f;
-            placeTool.dropTime = 1;
-            placeTool.holsterTime = 0.35f;
-
-            var techTag = prefab.AddComponent<TechTag>();
-            techTag.type = this.TechType;
-
-            prefab.AddComponent<FCSTechFabricatorTag>();
+            var techTag = prefab.GetOrAddComponent<TechTag>();
+            techTag.type = TechType;
 
             return prefab;
         }
