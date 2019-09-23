@@ -5,8 +5,6 @@ using FCSTechFabricator.Models;
 using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -67,33 +65,7 @@ namespace FCSTechFabricator.Mono.DeepDriller
 
         protected override TechData GetBlueprintRecipe()
         {
-            var inventoryItem = QPatch.Configuration.GetData(ClassID);
-            TechData customFabRecipe = null;
-
-            if (IngredientHelper.ValidateData(inventoryItem))
-            {
-                // Create and associate recipe to the new TechType
-                customFabRecipe = new TechData()
-                {
-                    craftAmount = 1,
-                    Ingredients = IngredientHelper.ConvertToIngredients(inventoryItem).ToList()
-                };
-            }
-            else
-            {
-                // Create and associate recipe to the new TechType
-                customFabRecipe = new TechData()
-                {
-                    craftAmount = 1,
-                    Ingredients = new List<Ingredient>()
-                    {
-                        new Ingredient(TechType.Titanium, 1)
-                    }
-                };
-            }
-
-
-            return customFabRecipe;
+            return IngredientHelper.GetCustomRecipe(ClassID);
         }
 
         public bool GetPrefabs()
@@ -125,16 +97,5 @@ namespace FCSTechFabricator.Mono.DeepDriller
             _label = canvasObject.FindChild("Screen").FindChild("Label").GetComponent<Text>();
             return true;
         }
-
-
-        //new List<Ingredient>()
-        //{
-        //    new Ingredient(TechType.MapRoomHUDChip, 1),
-        //    new Ingredient(TechType.Titanium, 2),
-        //    new Ingredient(TechType.AdvancedWiringKit, 1),
-        //    new Ingredient(TechType.ExosuitDrillArmModule, 1),
-        //    new Ingredient(TechType.Lubricant, 2),
-        //    new Ingredient(TechType.VehicleStorageModule, 1),
-        //}
     }
 }

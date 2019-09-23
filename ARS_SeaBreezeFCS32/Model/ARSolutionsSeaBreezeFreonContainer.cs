@@ -56,9 +56,6 @@ namespace ARS_SeaBreezeFCS32.Model
                 _freonContainer.isAllowedToAdd += IsAllowedToAdd;
                 _freonContainer.isAllowedToRemove += IsAllowedToRemove;
 
-                _freonContainer.onAddItem += mono.OnAddItemEvent;
-                _freonContainer.onRemoveItem += mono.OnRemoveItemEvent;
-
                 _freonContainer.onAddItem += OnAddItemEvent;
                 _freonContainer.onRemoveItem += OnRemoveItemEvent;
             }

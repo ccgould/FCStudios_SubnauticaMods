@@ -4,6 +4,7 @@ using FCSTechFabricator.Models;
 using SMLHelper.V2.Crafting;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace FCSTechFabricator.Helpers
 {
@@ -42,6 +43,40 @@ namespace FCSTechFabricator.Helpers
             {
                 yield return new Ingredient(ingredient.Item.ToTechType(), ingredient.Amount);
             }
+        }
+
+        internal static TechData DefaultBlueprint()
+        {
+            return new TechData()
+            {
+                craftAmount = 1,
+                Ingredients = new List<Ingredient>()
+                {
+                    new Ingredient(TechType.Titanium, 1)
+                }
+            };
+        }
+
+        internal static TechData GetCustomRecipe(string ClassID)
+        {
+            var inventoryItem = QPatch.Configuration.GetData(ClassID);
+            TechData customFabRecipe = null;
+
+            if (ValidateData(inventoryItem))
+            {
+                // Create and associate recipe to the new TechType
+                customFabRecipe = new TechData()
+                {
+                    craftAmount = 1,
+                    Ingredients = ConvertToIngredients(inventoryItem).ToList()
+                };
+            }
+            else
+            {
+                customFabRecipe = DefaultBlueprint();
+            }
+
+            return customFabRecipe;
         }
     }
 }

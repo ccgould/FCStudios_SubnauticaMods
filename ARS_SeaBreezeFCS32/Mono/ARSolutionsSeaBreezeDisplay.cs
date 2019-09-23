@@ -54,8 +54,8 @@ namespace ARS_SeaBreezeFCS32.Mono
 
             _pageStateHash = UnityEngine.Animator.StringToHash("PageState");
 
-            _mono.PowerManager.OnPowerOutage += OnPowerOutage;
-            _mono.PowerManager.OnPowerResume += OnPowerResume;
+            //_mono.PowerManager.OnPowerOutage += OnPowerOutage;
+            //_mono.PowerManager.OnPowerResume += OnPowerResume;
 
             StartCoroutine(CompleteSetup());
 
@@ -66,9 +66,9 @@ namespace ARS_SeaBreezeFCS32.Mono
 
         private void OnPowerResume()
         {
-            QuickLogger.Debug("Power Restored", true);
-            if (_mono.PowerManager.GetHasBreakerTripped()) return;
-            StartCoroutine(CompleteSetup());
+            //QuickLogger.Debug("Power Restored", true);
+            //if (_mono.PowerManager.GetHasBreakerTripped()) return;
+            //StartCoroutine(CompleteSetup());
         }
 
         private void OnPowerOutage()
@@ -79,8 +79,8 @@ namespace ARS_SeaBreezeFCS32.Mono
 
         private void UpdateScreenState()
         {
-            if (!_mono.PowerManager.GetHasBreakerTripped() || !_mono.PowerManager.GetIsPowerAvailable()) return;
-            PowerOffDisplay();
+            //if (!_mono.PowerManager.GetHasBreakerTripped() || !_mono.PowerManager.GetIsPowerAvailable()) return;
+            //PowerOffDisplay();
         }
 
         internal void UpdateTimer(string time)
@@ -106,17 +106,17 @@ namespace ARS_SeaBreezeFCS32.Mono
             switch (btnName)
             {
                 case "PPBtn":
-                    _mono.PowerManager.TogglePower();
+                    //_mono.PowerManager.TogglePower();
                     //_mono.UpdateFridgeCooler();
-                    _mono.ResetOnInterceButton();
-                    StartCoroutine(CompleteSetup());
+                    //_mono.ResetOnInterceButton();
+                    //StartCoroutine(CompleteSetup());
                     break;
 
                 case "HPPBtn":
-                    _mono.PowerManager.TogglePower();
+                    //_mono.PowerManager.TogglePower();
                     // _mono.UpdateFridgeCooler();
-                    _mono.ResetOnInterceButton();
-                    PowerOffDisplay();
+                    //_mono.ResetOnInterceButton();
+                    //PowerOffDisplay();
                     break;
 
                 case "FilterBtn":
@@ -170,7 +170,7 @@ namespace ARS_SeaBreezeFCS32.Mono
 
             #region Home Screen Timer
             _filterLBL = _homeScreen.transform.Find("FilterTimer_LBL").GetComponent<Text>();
-
+            _homeScreen.transform.Find("FilterTimer_LBL")?.gameObject.SetActive(false);
             if (_filterLBL == null)
             {
                 QuickLogger.Error("Screen: Filter label not found.");
@@ -180,7 +180,7 @@ namespace ARS_SeaBreezeFCS32.Mono
 
             #region Home Screen Power BTN
             _homeScreenPowerBtn = _homeScreen.transform.Find("Power_BTN")?.gameObject;
-
+            _homeScreenPowerBtn.SetActive(false);
             if (_homeScreenPowerBtn == null)
             {
                 QuickLogger.Error("Screen: Powered Off Screen Button not found.");
@@ -206,7 +206,7 @@ namespace ARS_SeaBreezeFCS32.Mono
 
             #region Filter
             _filterBtn = _homeScreen.transform.Find("Filter_BTN")?.gameObject;
-
+            _filterBtn.SetActive(false);
             if (_filterBtn == null)
             {
                 QuickLogger.Error("Screen: Filter Button not found.");
@@ -436,9 +436,13 @@ namespace ARS_SeaBreezeFCS32.Mono
             ItemButton itemButton = itemDisplay.AddComponent<ItemButton>();
             itemButton.Type = type;
             itemButton.Amount = amount;
+            itemButton.OnButtonClick = _mono.AttemptToTakeItem;
+            itemButton.OnInterfaceButton = _mono.OnInterfaceButton;
 
             uGUI_Icon icon = itemDisplay.transform.Find("ItemImage").gameObject.AddComponent<uGUI_Icon>();
             icon.sprite = SpriteManager.Get(type);
+
+            CalculateNewMaxPages();
         }
         #endregion
     }

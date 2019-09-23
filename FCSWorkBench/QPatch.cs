@@ -33,13 +33,11 @@ namespace FCSTechFabricator
 
             try
             {
-
                 // == Load Configuration == //
                 string configJson = File.ReadAllText(Information.ConfigurationFile().Trim());
 
                 //LoadData
                 Configuration = JsonConvert.DeserializeObject<Configuration.Configuration>(configJson);
-
 
 
                 if (GetPrefabs())
@@ -58,7 +56,6 @@ namespace FCSTechFabricator
                 {
                     throw new PatchTerminatedException();
                 }
-
             }
             catch (Exception ex)
             {

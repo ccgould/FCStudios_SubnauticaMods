@@ -75,7 +75,7 @@ namespace FCSPowerStorage.Managers
 
         private void Recharge()
         {
-            if (DayNightCycle.main == null || _mono.Manager == null) return;
+            if (DayNightCycle.main == null || _mono.Manager == null || GetPowerSum() >= GetMaxPower()) return;
 
             if (_mono.GetBaseDrainProtection())
             {

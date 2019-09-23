@@ -9,12 +9,13 @@ namespace ARS_SeaBreezeFCS32.Interfaces
 
         int NumberOfItems { get; }
 
+        void OpenStorage();
+
+        void AttemptToTakeItem(TechType techType);
+
         List<EatableEntities> FridgeItems { get; }
 
         Dictionary<TechType, int> TrackedItems { get; }
-
-        void OpenStorage();
-
         int GetTechTypeAmount(TechType techType);
     }
 }

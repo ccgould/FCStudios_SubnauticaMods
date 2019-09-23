@@ -1,10 +1,10 @@
 ﻿using FCSCommon.Extensions;
 using FCSCommon.Utilities;
+using FCSTechFabricator.Helpers;
 using FCSTechFabricator.Models;
 using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -65,23 +65,7 @@ namespace FCSTechFabricator.Mono.PowerStorage
 
         protected override TechData GetBlueprintRecipe()
         {
-
-            // Create and associate recipe to the new TechType
-            var customFabRecipe = new TechData()
-            {
-                craftAmount = 1,
-                Ingredients = new List<Ingredient>()
-                {
-                    new Ingredient(TechType.Battery, 1),
-                    new Ingredient(TechType.AcidMushroom, 6),
-                    new Ingredient(TechType.Titanium, 7),
-                    new Ingredient(TechType.WiringKit, 1),
-                    new Ingredient(TechType.Quartz, 1),
-                    new Ingredient(TechType.Salt, 6),
-                }
-            };
-
-            return customFabRecipe;
+            return IngredientHelper.GetCustomRecipe(ClassID);
         }
 
         public bool GetPrefabs()

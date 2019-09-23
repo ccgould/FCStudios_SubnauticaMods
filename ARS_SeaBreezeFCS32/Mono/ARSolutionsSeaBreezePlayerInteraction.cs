@@ -12,7 +12,7 @@ namespace ARS_SeaBreezeFCS32.Mono
         {
             if (_onInterfaceButton || Player.main == null || !IsConstructed) return;
             QuickLogger.Debug($"Clicked on Seabreeze {PrefabId}", true);
-            OpenStorage();
+            _fridgeContainer.OpenStorage();
         }
 
         internal void OnInterfaceButton(bool value)

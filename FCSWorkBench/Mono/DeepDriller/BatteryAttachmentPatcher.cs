@@ -1,9 +1,9 @@
 ﻿using FCSCommon.Extensions;
 using FCSCommon.Utilities;
+using FCSTechFabricator.Helpers;
 using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -60,19 +60,7 @@ namespace FCSTechFabricator.Mono.DeepDriller
 
         protected override TechData GetBlueprintRecipe()
         {
-            // Create and associate recipe to the new TechType
-            var customFabRecipe = new TechData()
-            {
-                craftAmount = 1,
-                Ingredients = new List<Ingredient>()
-                {
-                    new Ingredient(TechType.Copper, 1),
-                    new Ingredient(TechType.Silicone, 1),
-                    new Ingredient(TechType.Titanium, 1),
-                }
-            };
-
-            return customFabRecipe;
+            return IngredientHelper.GetCustomRecipe(ClassID);
         }
 
         public override TechGroup GroupForPDA { get; } = TechGroup.Resources;

@@ -33,13 +33,13 @@ namespace ARS_SeaBreezeFCS32.Buildables
             BuildableName = this.FriendlyName;
             TechTypeID = this.TechType;
 
-            LanguageHandler.SetLanguageLine(TimeLeftMessageKey, "Freon Refill In");
-            LanguageHandler.SetLanguageLine(OnFreonBTNHoverKey, "Add Freon");
-            LanguageHandler.SetLanguageLine(AddedFreonMessageKey, "Added Freon to SeaBreeze");
-            LanguageHandler.SetLanguageLine(OnSeabreezeHoverkey, "Open SeaBreeze");
+            //LanguageHandler.SetLanguageLine(TimeLeftMessageKey, "Freon Refill In");
+            //LanguageHandler.SetLanguageLine(OnFreonBTNHoverKey, "Add Freon");
+            //LanguageHandler.SetLanguageLine(AddedFreonMessageKey, "Added Freon to SeaBreeze");
+            //LanguageHandler.SetLanguageLine(CannotRefillMessageKey, "Cannot refill freon hasn't ran out.");
+            LanguageHandler.SetLanguageLine(OnSeabreezeHoverkey, "Add to SeaBreeze");
             LanguageHandler.SetLanguageLine(StorageLabelKey, "SeaBreeze Receptacle");
             LanguageHandler.SetLanguageLine(OnHoverUnpoweredKey, "Insufficient power");
-            LanguageHandler.SetLanguageLine(CannotRefillMessageKey, "Cannot refill freon hasn't ran out.");
             LanguageHandler.SetLanguageLine(FcsWorkBenchErrorMessageKey, "FCS Tech Workbench Mod not found please install.");
         }
     }
