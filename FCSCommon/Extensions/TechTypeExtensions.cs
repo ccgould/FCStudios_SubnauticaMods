@@ -4,17 +4,30 @@ namespace FCSCommon.Extensions
 {
     public static class TechTypeExtensions
     {
-        public static Pickupable ToPickupable(this TechType techtype)
+        public static Pickupable ToPickupable(this TechType techType)
         {
-            var go = GameObject.Instantiate(CraftData.GetPrefabForTechType(techtype));
-            return go.GetComponent<Pickupable>().Pickup(false);
+            Pickupable pickupable = null;
+            var prefab = CraftData.GetPrefabForTechType(techType);
+            if (prefab != null)
+            {
+                var go = GameObject.Instantiate(prefab);
+                pickupable = go.GetComponent<Pickupable>().Pickup(false);
+            }
+
+            return pickupable;
         }
 
         public static InventoryItem ToInventoryItem(this TechType techType)
         {
-            var go = GameObject.Instantiate(CraftData.GetPrefabForTechType(techType));
-            var pickupable = go.GetComponent<Pickupable>().Pickup(false);
-            return new InventoryItem(pickupable);
+            InventoryItem item = null;
+            var prefab = CraftData.GetPrefabForTechType(techType);
+            if (prefab != null)
+            {
+                var go = GameObject.Instantiate(prefab);
+                var pickupable = go.GetComponent<Pickupable>().Pickup(false);
+                item = new InventoryItem(pickupable);
+            }
+            return item;
         }
     }
 }

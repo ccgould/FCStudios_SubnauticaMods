@@ -118,7 +118,9 @@ namespace FCS_DeepDriller.Mono.Handlers
             {
                 for (var i = 0; i < item.Value; i++)
                 {
-                    AddItem(item.Key.ToPickupable());
+                    var ore = item.Key.ToPickupable();
+                    if (ore == null) continue;
+                    AddItem(ore);
                 }
             }
         }

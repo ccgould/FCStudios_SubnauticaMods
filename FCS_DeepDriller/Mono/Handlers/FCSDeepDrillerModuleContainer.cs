@@ -218,8 +218,9 @@ namespace FCS_DeepDriller.Mono.Handlers
             foreach (SlotData module in modules)
             {
                 if (module.Module == TechType.None) continue;
-
-                _equipment.AddItem(module.Slot, new InventoryItem(module.Module.ToPickupable().Pickup(false)));
+                var attachment = module.Module.ToPickupable();
+                if (attachment == null) continue;
+                _equipment.AddItem(module.Slot, new InventoryItem(attachment.Pickup(false)));
             }
         }
 
