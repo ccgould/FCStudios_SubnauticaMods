@@ -74,6 +74,7 @@
     <Compile Include="Display\PaginatorButton.cs" />
     <Compile Include="Enumerators\BulkMultipliers.cs" />
     <Compile Include="Enumerators\ItemType.cs" />
+    <Compile Include="Enumerators\RemovalType.cs" />
     <Compile Include="Helpers\InventoryHelpers.cs" />
     <Compile Include="Model\BatteryData.cs" />
     <Compile Include="Model\FoodData.cs" />
@@ -84,6 +85,7 @@
     <Compile Include="Mono\Managers\ExStorageDepotDisplayManager.cs" />
     <Compile Include="Mono\Managers\ExStorageDepotNameManager.cs" />
     <Compile Include="Mono\Managers\ExStorageDepotStorageManager.cs" />
+    <Compile Include="Patchers\OnProtoDeserializeObjectTree_Patcher.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

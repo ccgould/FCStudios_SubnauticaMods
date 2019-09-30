@@ -173,6 +173,7 @@ namespace FCSPowerStorage.Mono
             {
                 SubRoot = GetComponentInParent<SubRoot>();
             }
+
             Manager = managers ?? BaseManager.FindManager(SubRoot);
             Manager.AddPowerStorage(this);
 

@@ -48,7 +48,40 @@ namespace ExStorageDepot.Buildable
 
             try
             {
+                GameObject originalPrefab = Resources.Load<GameObject>("Submarine/Build/Locker");
+                var container = GameObject.Instantiate(originalPrefab);
                 prefab = GameObject.Instantiate(_prefab);
+
+
+                // Update container renderers
+                GameObject cargoCrateModel = container.FindChild("model");
+                Renderer[] cargoCrateRenderers = cargoCrateModel.GetComponentsInChildren<Renderer>();
+                container.transform.parent = prefab.transform;
+                foreach (Renderer rend in cargoCrateRenderers)
+                {
+                    rend.enabled = false;
+                }
+                container.transform.localPosition = new Vector3(0.0f, 0.0f, 0.0f);
+                container.transform.localScale = new Vector3(0.0001f, 0.0001f, 0.0001f);
+                container.transform.localEulerAngles = new Vector3(0.0f, 0.0f, 0.0f);
+                container.SetActive(true);
+
+                // Update colliders
+                GameObject builderTrigger = container.FindChild("Builder Trigger");
+                GameObject collider = container.FindChild("Collider");
+                BoxCollider builderCollider = builderTrigger.GetComponent<BoxCollider>();
+                builderCollider.isTrigger = false;
+                builderCollider.enabled = false;
+                BoxCollider objectCollider = collider.GetComponent<BoxCollider>();
+                objectCollider.isTrigger = false;
+                objectCollider.enabled = false;
+
+                // Delete constructable bounds
+                ConstructableBounds cb = container.GetComponent<ConstructableBounds>();
+                GameObject.DestroyImmediate(cb);
+
+
+
                 //========== Allows the building animation and material colors ==========// 
                 Shader shader = Shader.Find("MarmosetUBER");
                 Renderer[] renderers = prefab.GetComponentsInChildren<Renderer>();

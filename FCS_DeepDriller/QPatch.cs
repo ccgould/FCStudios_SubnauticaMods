@@ -4,6 +4,7 @@ using FCS_DeepDriller.Patchers;
 using FCSCommon.Utilities;
 using Harmony;
 using System;
+using System.IO;
 using System.Reflection;
 using UnityEngine;
 
@@ -25,6 +26,12 @@ namespace FCS_DeepDriller
             try
             {
                 GlobalBundle = FCSTechFabricator.QPatch.Bundle;
+
+                if (GlobalBundle == null)
+                {
+                    QuickLogger.Error("Global Bundle has returned null stopping patching");
+                    throw new FileNotFoundException("Bundle failed to load");
+                }
 
                 FCSDeepDrillerBuildable.PatchHelper();
 

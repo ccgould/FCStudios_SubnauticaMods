@@ -164,7 +164,6 @@ namespace FCS_DeepDriller.Mono.Handlers
             _powerBank.SaveData();
             return _powerBank;
         }
-
         internal bool IsPowerAvailable()
         {
             if (!_mono.DeepDrillerModuleContainer.IsPowerModuleAttached())
@@ -184,7 +183,6 @@ namespace FCS_DeepDriller.Mono.Handlers
 
             return true;
         }
-
         internal void RemoveSolar()
         {
             _powerBank.DestroyPower(DeepDrillModules.Solar);

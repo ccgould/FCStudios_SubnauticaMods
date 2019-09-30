@@ -83,39 +83,44 @@ namespace ARS_SeaBreezeFCS32.Model
                 var eatable = go.GetComponent<Eatable>();
                 var pickup = go.GetComponent<Pickupable>();
 
-                foreach (EatableEntities eatableEntity in FridgeItems)
+                eatable.foodValue = match.FoodValue;
+                eatable.waterValue = match.WaterValue;
+
+                if (Inventory.main.Pickup(pickup))
                 {
-                    if (eatableEntity.PrefabID != match.PrefabID) continue;
-                    eatable.foodValue = eatableEntity.FoodValue;
-                    eatable.waterValue = eatableEntity.WaterValue;
+                    QuickLogger.Debug($"Removed Match Before || Fridge Count {FridgeItems.Count}");
+                    FridgeItems.Remove(match);
+                    QuickLogger.Debug($"Removed Match || Fridge Count {FridgeItems.Count}");
 
-                    if (Inventory.main.Pickup(pickup))
+                    CrafterLogic.NotifyCraftEnd(Player.main.gameObject, techType);
+
+                    if (TrackedItems.ContainsKey(techType))
                     {
-                        QuickLogger.Debug($"Removed Match Before || Fridge Count {FridgeItems.Count}");
-                        FridgeItems.Remove(eatableEntity);
-                        QuickLogger.Debug($"Removed Match || Fridge Count {FridgeItems.Count}");
-
-                        CrafterLogic.NotifyCraftEnd(Player.main.gameObject, techType);
-
-                        if (TrackedItems.ContainsKey(techType))
+                        if (TrackedItems[techType] != 1)
                         {
-                            if (TrackedItems[techType] != 1)
-                            {
-                                TrackedItems[techType] = TrackedItems[techType] - 1;
-                            }
-                            else
-                            {
-                                TrackedItems.Remove(techType);
-                            }
+                            TrackedItems[techType] = TrackedItems[techType] - 1;
                         }
-
-                        _mono.SetDeconstructionAllowed(NumberOfItems == 0);
-
-                        _mono.Display.ItemModified(TechType.None);
+                        else
+                        {
+                            TrackedItems.Remove(techType);
+                        }
                     }
 
-                    break;
+                    _mono.SetDeconstructionAllowed(NumberOfItems == 0);
+
+                    _mono.Display.ItemModified(TechType.None);
                 }
+
+
+                //foreach (EatableEntities eatableEntity in FridgeItems)
+                //{
+                //    if (eatableEntity.TechType != match.TechType) continue;
+
+
+
+
+                //    break;
+                //}
             }
         }
 
@@ -175,7 +180,6 @@ namespace ARS_SeaBreezeFCS32.Model
         {
             foreach (EatableEntities eatableEntity in FridgeItems)
             {
-                eatableEntity.SaveData();
                 yield return eatableEntity;
             }
         }

@@ -15,15 +15,18 @@ namespace FCSCommon.Helpers
         /// <returns></returns>
         public static Texture2D FindTexture2D(string textureName, AssetBundle assetBundle)
         {
-            var objects = new List<object>(assetBundle.LoadAllAssets(typeof(object)));
-
-            for (int i = 0; i < objects.Count; i++)
+            if (assetBundle != null)
             {
-                if (objects[i] is Texture2D)
+                var objects = new List<object>(assetBundle.LoadAllAssets(typeof(object)));
+
+                for (int i = 0; i < objects.Count; i++)
                 {
-                    if (((Texture2D)objects[i]).name.Equals(textureName))
+                    if (objects[i] is Texture2D)
                     {
-                        return ((Texture2D)objects[i]);
+                        if (((Texture2D)objects[i]).name.Equals(textureName))
+                        {
+                            return ((Texture2D)objects[i]);
+                        }
                     }
                 }
             }
@@ -182,7 +185,13 @@ namespace FCSCommon.Helpers
                         material.SetColor("_SpecColor", new Color(0.796875f, 0.796875f, 0.796875f, 0.796875f));
                         material.SetFloat("_SpecInt", specInt);
                         material.SetFloat("_Shininess", shininess);
-                        material.SetTexture("_SpecTex", FindTexture2D(textureName, assetBundle));
+
+                        var texture = FindTexture2D(textureName, assetBundle);
+                        if (texture != null)
+                        {
+                            material.SetTexture("_SpecTex", texture);
+                        }
+
                         material.SetFloat("_Fresnel", 0f);
                         material.SetVector("_SpecTex_ST", new Vector4(1.0f, 1.0f, 0.0f, 0.0f));
                     }

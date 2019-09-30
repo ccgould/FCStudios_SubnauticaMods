@@ -23,7 +23,7 @@ namespace FCSTechFabricator.Mono.SeaBreeze
         public override CraftTree.Type FabricatorType { get; } = FCSTechFabricatorBuildable.TechFabricatorCraftTreeType;
 
 
-        public SeaBreezeKitBuildable() : base("SeaBreezeKit_SB", "Sea Breeze Kit", "A kit that allows you to build one Power Storage Unit")
+        public SeaBreezeKitBuildable() : base("SeaBreezeKit_SB", "Sea Breeze Kit", "A kit that allows you to build one Seabreeze refrigerator.")
         {
             if (!GetPrefabs())
             {

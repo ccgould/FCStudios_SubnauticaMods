@@ -38,6 +38,7 @@ namespace ARS_SeaBreezeFCS32.Display
             if (IsHovered && type != TechType.None)
             {
                 OnButtonClick?.Invoke(type);
+                OnInterfaceButton?.Invoke(false);
             }
         }
 

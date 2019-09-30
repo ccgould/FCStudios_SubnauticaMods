@@ -49,6 +49,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Misc Mods", "Misc Mods", "{
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HorizontalDuck", "HorizontalDuck\HorizontalDuck.csproj", "{C801C28B-81CB-451F-94B4-251835D2B92A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCS_Subnautica_Modding_Editor", "FCS_Subnautica_Modding_Editor\FCS_Subnautica_Modding_Editor.csproj", "{E20FD0E3-6E76-4E24-A93B-83DA07DEFEF8}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		FCSCommon\FCSCommon.projitems*{20e443f4-3b38-48f3-bbf2-7cbbf4090beb}*SharedItemsImports = 4
@@ -121,6 +123,10 @@ Global
 		{C801C28B-81CB-451F-94B4-251835D2B92A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C801C28B-81CB-451F-94B4-251835D2B92A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C801C28B-81CB-451F-94B4-251835D2B92A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E20FD0E3-6E76-4E24-A93B-83DA07DEFEF8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E20FD0E3-6E76-4E24-A93B-83DA07DEFEF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E20FD0E3-6E76-4E24-A93B-83DA07DEFEF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E20FD0E3-6E76-4E24-A93B-83DA07DEFEF8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -140,6 +146,7 @@ Global
 		{61D8BA15-EE91-4245-BFC1-70064ADD23E0} = {BB083365-CF95-4763-BF65-8338CA68196D}
 		{49B14137-1EC0-40FB-8AEF-E5C13D7CDFB9} = {3FD179AD-5C6F-4627-B5BB-D6B6CD72E1FF}
 		{C801C28B-81CB-451F-94B4-251835D2B92A} = {0B894656-1BA7-4F41-9311-D1C8D4F0D4CF}
+		{E20FD0E3-6E76-4E24-A93B-83DA07DEFEF8} = {6E36DA48-6498-4C58-8BF6-85923E5F6460}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {73E25955-B56F-4639-89F3-4CE5F3EBD59D}

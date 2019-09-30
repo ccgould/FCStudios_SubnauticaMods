@@ -23,7 +23,7 @@ namespace FCStudioDebugger
                 harmony.PatchAll(Assembly.GetExecutingAssembly());
 
                 GetGlassShader();
-
+                GetOxygenTankCapacity();
                 QuickLogger.Info("Finished patching");
 
             }
@@ -75,6 +75,13 @@ namespace FCStudioDebugger
                     }
                 }
             }
+        }
+
+        private static void GetOxygenTankCapacity()
+        {
+            var tank = GameObject.Instantiate(CraftData.GetPrefabForTechType(TechType.HighCapacityTank));
+            var oxygen = tank.GetComponentInChildren<Oxygen>()?.oxygenCapacity;
+            QuickLogger.Info($"Oxygen Capacity: {oxygen}");
         }
     }
 }

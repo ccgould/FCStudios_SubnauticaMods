@@ -17,6 +17,7 @@ namespace FCS_DeepDriller.Mono.Handlers
         private float _damagePerSecond;
         private float _passedTime;
         private FCSDeepDrillerController _mono;
+        private float _prevHealth;
         public Action OnDamaged { get; set; }
         public Action OnRepaired { get; set; }
 
@@ -79,7 +80,6 @@ namespace FCS_DeepDriller.Mono.Handlers
         {
             _mono = mono;
             _liveMixin = mono.gameObject.AddComponent<LiveMixin>();
-
             _damagePerSecond = DayNight / _damagePerDay;
 
             if (_liveMixin != null)
@@ -112,16 +112,18 @@ namespace FCS_DeepDriller.Mono.Handlers
         {
             try
             {
-                if (GetHealth() >= 1f && !IsDamagedFlag())
+                if (GetHealth() >= 1f && !IsDamagedFlag() && !Mathf.Approximately(_prevHealth, GetHealth()))
                 {
                     QuickLogger.Debug("Drill Repaired", true);
                     OnRepaired?.Invoke();
+                    _prevHealth = GetHealth();
                 }
 
-                if (GetHealth() <= 0f && IsDamagedFlag())
+                if (GetHealth() <= 0f && IsDamagedFlag() && !Mathf.Approximately(_prevHealth, GetHealth()))
                 {
                     QuickLogger.Debug("Drill Damaged", true);
                     OnDamaged?.Invoke();
+                    _prevHealth = GetHealth();
                 }
             }
             catch (Exception e)

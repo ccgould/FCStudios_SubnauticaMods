@@ -316,6 +316,7 @@ namespace FCS_DeepDriller.Mono
 
         private void OnDamaged()
         {
+            QuickLogger.Debug("OnDamaged", true);
             AnimationHandler.SetBoolHash(BitDamageState, true);
             AnimationHandler.SetIntHash(ShaftStateHash, 2);
             UpdateSystemLights(PowerManager.GetPowerState());
@@ -323,6 +324,7 @@ namespace FCS_DeepDriller.Mono
 
         private void OnRepaired()
         {
+            QuickLogger.Debug("OnRepaired", true);
             AnimationHandler.SetBoolHash(BitDamageState, false);
             UpdateSystemLights(PowerManager.GetPowerState());
             ResetPassedTime();
@@ -355,13 +357,13 @@ namespace FCS_DeepDriller.Mono
                 MaterialHelpers.ReplaceEmissionTexture("DeepDriller_BaseColor_BaseColor", "DeepDriller_Emissive_Error", gameObject, QPatch.GlobalBundle);
                 return;
             }
-
-            if (value == FCSPowerStates.Powered && !HealthManager.IsDamagedFlag())
-                MaterialHelpers.ReplaceEmissionTexture("DeepDriller_BaseColor_BaseColor", "DeepDriller_Emissive_On",
-                    gameObject, QPatch.GlobalBundle);
-            else if (value == FCSPowerStates.Unpowered || value == FCSPowerStates.Tripped && !HealthManager.IsDamagedFlag())
+            if (value == FCSPowerStates.Unpowered || value == FCSPowerStates.Tripped && !HealthManager.IsDamagedFlag())
                 MaterialHelpers.ReplaceEmissionTexture("DeepDriller_BaseColor_BaseColor", "DeepDriller_Emissive_Off",
                     gameObject, QPatch.GlobalBundle);
+            else if (value == FCSPowerStates.Powered && !HealthManager.IsDamagedFlag())
+                MaterialHelpers.ReplaceEmissionTexture("DeepDriller_BaseColor_BaseColor", "DeepDriller_Emissive_On",
+                    gameObject, QPatch.GlobalBundle);
+
         }
 
         private void UpdateDrillShaftSate(FCSPowerStates value)
