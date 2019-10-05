@@ -211,7 +211,7 @@ namespace ARS_SeaBreezeFCS32.Model
         #endregion
 
         #region Condition Checking
-        private bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
+        internal bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
         {
             bool flag = false;
             if (pickupable != null)
@@ -227,9 +227,14 @@ namespace ARS_SeaBreezeFCS32.Model
             QuickLogger.Debug($"Adding Item {flag} || {verbose}");
 
             if (!flag && verbose)
-                ErrorMessage.AddMessage("[Alterra Refrigeration] Food items allowed only.");
+                QuickLogger.Error(ARSSeaBreezeFCS32Buildable.ItemNotAllowed());
             return flag;
         }
         #endregion
+
+        internal void AddItemFromExternal(InventoryItem item)
+        {
+            AddItem(item);
+        }
     }
 }

@@ -8,7 +8,7 @@ using SMLHelper.V2.Handlers;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace FCSTechFabricator.Mono.DeepDriller
+namespace FCSTechFabricator.Mono
 {
     public partial class ExStorageKitBuildable : Craftable
     {

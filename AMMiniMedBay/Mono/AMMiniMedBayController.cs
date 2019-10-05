@@ -305,7 +305,7 @@ namespace AMMiniMedBay.Mono
 
             var saveData = new SaveData
             {
-                SCA = Container.NumberOfCubes,
+                SCA = Container.NumberOfFirstAids,
                 TTS = Container.GetTimeToSpawn(),
                 BodyColor = _currentBodyColor.ColorToVector4()
             };
@@ -330,7 +330,7 @@ namespace AMMiniMedBay.Mono
 
                     //LoadData
                     var savedData = JsonConvert.DeserializeObject<SaveData>(savedDataJson);
-                    Container.NumberOfCubes = savedData.SCA;
+                    Container.NumberOfFirstAids = savedData.SCA;
                     Container.SetTimeToSpawn(savedData.TTS);
                     _currentBodyColor = savedData.BodyColor.Vector4ToColor();
                     MaterialHelpers.ChangeMaterialColor("AMMiniMedBay_BaseColor", gameObject, _currentBodyColor);

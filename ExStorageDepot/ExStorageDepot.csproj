@@ -64,6 +64,7 @@
     <Compile Include="Buildable\ExStorageDepotAuxPatcher.cs" />
     <Compile Include="Buildable\ExStorageDepotModelPrefab.cs" />
     <Compile Include="Buildable\ExStorageDepotPatcher.cs" />
+    <Compile Include="Configuration\Configuration.cs" />
     <Compile Include="Configuration\ExStorageDepotSaveDataEntry.cs" />
     <Compile Include="Configuration\ExStorageDepotSaveData.cs" />
     <Compile Include="Configuration\Mod.cs" />

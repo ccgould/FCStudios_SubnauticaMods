@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{17C65A8B-851E-4B42-B946-EC63FF3165E9}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>AE.SeaCooker</RootNamespace>
+    <AssemblyName>SeaCooker</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="0Harmony-1.2.0.1">
+      <HintPath>F:\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\0Harmony-1.2.0.1.dll</HintPath>
+    </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>F:\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Assembly-CSharp-firstpass">
+      <HintPath>F:\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>F:\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="SMLHelper">
+      <HintPath>F:\Program Files\Epic Games\Subnautica\QMods\Modding Helper\SMLHelper.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="UnityEngine">
+      <HintPath>F:\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>F:\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\UnityEngine.UI.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Buildable\SeaCookerAuxPatcher.cs" />
+    <Compile Include="Buildable\SeaCookerModelPrefab.cs" />
+    <Compile Include="Buildable\SeaCookerPatcher.cs" />
+    <Compile Include="Configuration\Configuration.cs" />
+    <Compile Include="Configuration\InterfaceHelpers.cs" />
+    <Compile Include="Configuration\Mod.cs" />
+    <Compile Include="Configuration\SaveDataEntry.cs" />
+    <Compile Include="Display\ColorItemButton.cs" />
+    <Compile Include="Display\CustomToggle.cs" />
+    <Compile Include="Display\InterfaceButton.cs" />
+    <Compile Include="Display\OnScreenButton.cs" />
+    <Compile Include="Display\PaginatorButton.cs" />
+    <Compile Include="Enumerators\FuelType.cs" />
+    <Compile Include="Extenstion\Extenstions.cs" />
+    <Compile Include="Helpers\ColorPageHelper.cs" />
+    <Compile Include="Helpers\Initialize_uGUI.cs" />
+    <Compile Include="Helpers\TechTypeHelpers.cs" />
+    <Compile Include="Managers\AnimationManager.cs" />
+    <Compile Include="Managers\ColorManager.cs" />
+    <Compile Include="Managers\FoodManager.cs" />
+    <Compile Include="Managers\PlayerInteraction.cs" />
+    <Compile Include="Managers\SCDisplayManager.cs" />
+    <Compile Include="Managers\GasManager.cs" />
+    <Compile Include="Managers\PowerManager.cs" />
+    <Compile Include="Managers\SCStorageManager.cs" />
+    <Compile Include="Mono\SeaCookerController.cs" />
+    <Compile Include="Patchers\EquipmentPatchers.cs" />
+    <Compile Include="QPatch.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FCSWorkBench\FCSTechFabricator.csproj">
+      <Project>{b947909c-4983-4749-93ac-73ea69f6dce8}</Project>
+      <Name>FCSTechFabricator</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy "$(ProjectDir)bin\$(Configuration)\SeaCooker.dll" "F:\Program Files\Epic Games\Subnautica\QMods\FCS_AESeaCooker\" /Y /I</PostBuildEvent>
+  </PropertyGroup>
+</Project>

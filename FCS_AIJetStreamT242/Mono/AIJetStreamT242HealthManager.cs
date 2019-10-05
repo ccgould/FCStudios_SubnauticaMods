@@ -43,7 +43,7 @@ namespace FCS_AIMarineTurbine.Mono
         {
             _passedTime += DayNightCycle.main.deltaTime;
 
-            QuickLogger.Debug($"Passed Time: {_passedTime} || Damage Per Sec {_damagePerSecond}");
+            //QuickLogger.Debug($"Passed Time: {_passedTime} || Damage Per Sec {_damagePerSecond}");
 
             if (_passedTime >= _damagePerSecond)
             {

@@ -6,15 +6,18 @@ using FCSTechFabricator.Configuration;
 using FCSTechFabricator.Models;
 using FCSTechFabricator.Mono;
 using FCSTechFabricator.Mono.DeepDriller;
+using FCSTechFabricator.Mono.DeepDriller.Materials;
 using FCSTechFabricator.Mono.MarineTurbine;
 using FCSTechFabricator.Mono.PowerStorage;
 using FCSTechFabricator.Mono.SeaBreeze;
+using FCSTechFabricator.Mono.SeaCooker;
 using Harmony;
 using Oculus.Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Reflection;
 using UnityEngine;
+
 
 namespace FCSTechFabricator
 {
@@ -65,6 +68,11 @@ namespace FCSTechFabricator
 
         private static void RegisterItems()
         {
+            var sandGlass = new SaNDGlass();
+            sandGlass.Patch();
+            FCSTechFabricatorBuildable.AddTechType(sandGlass.TechType, sandGlass.StepsToFabricatorTab);
+            QuickLogger.Debug($"Patched {sandGlass.FriendlyName}");
+
             var freon = new FreonBuildable();
             freon.Patch();
             FCSTechFabricatorBuildable.AddTechType(freon.TechType, freon.StepsToFabricatorTab);
@@ -80,6 +88,11 @@ namespace FCSTechFabricator
             ddKit.Patch();
             FCSTechFabricatorBuildable.AddTechType(ddKit.TechType, ddKit.StepsToFabricatorTab);
             QuickLogger.Debug($"Patched {ddKit.FriendlyName}");
+
+            var scKit = new SeaCookerBuildable();
+            scKit.Patch();
+            FCSTechFabricatorBuildable.AddTechType(scKit.TechType, scKit.StepsToFabricatorTab);
+            QuickLogger.Debug($"Patched {scKit.FriendlyName}");
 
             var ddBatteryModule = new BatteryAttachmentBuildable();
             ddBatteryModule.Patch();
@@ -134,6 +147,16 @@ namespace FCSTechFabricator
             ddMk3.Patch();
             FCSTechFabricatorBuildable.AddTechType(ddMk3.TechType, ddMk3.StepsToFabricatorTab);
             QuickLogger.Debug($"Patched {ddMk3.FriendlyName}");
+
+            var scGtank = new SeaGasTankCraftable();
+            scGtank.Patch();
+            FCSTechFabricatorBuildable.AddTechType(scGtank.TechType, scGtank.StepsToFabricatorTab);
+            QuickLogger.Debug($"Patched {scGtank.FriendlyName}");
+
+            var scAGtank = new SeaAlienGasTankCraftable();
+            scAGtank.Patch();
+            FCSTechFabricatorBuildable.AddTechType(scAGtank.TechType, scAGtank.StepsToFabricatorTab);
+            QuickLogger.Debug($"Patched {scAGtank.FriendlyName}");
 
         }
 
@@ -223,8 +246,48 @@ namespace FCSTechFabricator
                 return false;
             }
 
+            //We have found the asset bundle and now we are going to continue by looking for the model.
+            GameObject seaGasTank = Bundle.LoadAsset<GameObject>("SeaGasTank");
+
+            //If the prefab isn't null lets add the shader to the materials
+            if (seaGasTank != null)
+            {
+                Shaders.ApplySeaTank(seaGasTank);
+
+                SeaGasTank = seaGasTank;
+
+                QuickLogger.Debug($"Sea Gas Tank Prefab Found!");
+            }
+            else
+            {
+                QuickLogger.Error($"Sea Gas Tank  Prefab Not Found!");
+                return false;
+            }
+
+            //We have found the asset bundle and now we are going to continue by looking for the model.
+            GameObject seaAlienGasTank = Bundle.LoadAsset<GameObject>("SeaAlienGasTank");
+
+            //If the prefab isn't null lets add the shader to the materials
+            if (seaAlienGasTank != null)
+            {
+                Shaders.ApplySeaTank(seaAlienGasTank);
+
+                SeaAlienGasTank = seaAlienGasTank;
+
+                QuickLogger.Debug($"Sea Alien Gas Tank Prefab Found!");
+            }
+            else
+            {
+                QuickLogger.Error($"Sea Alien Gas Tank  Prefab Not Found!");
+                return false;
+            }
+
             return true;
         }
+
+        public static GameObject SeaAlienGasTank { get; private set; }
+
+        public static GameObject SeaGasTank { get; private set; }
 
         private static void RegisterKit()
         {

@@ -29,5 +29,15 @@ namespace FCSTechFabricator.Models
             MaterialHelpers.ApplyNormalShader("UnitContainerKit_BaseColor", "UnitContainerKit_Norm", prefab, QPatch.Bundle);
             MaterialHelpers.ApplySpecShader("UnitContainerKit_BaseColor", "UnitContainerKit_Spec", prefab, 1f, 6f, QPatch.Bundle);
         }
+
+        public static void ApplySeaTank(GameObject prefab)
+        {
+            #region SystemLights_BaseColor
+            MaterialHelpers.ApplyEmissionShader("SeaCooker_BaseColor", "SeaCooker_Emissive", prefab, QPatch.Bundle, new Color(0.08235294f, 1f, 1f));
+            MaterialHelpers.ApplyNormalShader("SeaCooker_BaseColor", "SeaCooker_Normal", prefab, QPatch.Bundle);
+            MaterialHelpers.ApplySpecShader("SeaCooker_BaseColor", "SeaCooker_Spec", prefab, 1, 6f, QPatch.Bundle);
+            MaterialHelpers.ApplyAlphaShader("SeaCooker_BaseColor", prefab);
+            #endregion
+        }
     }
 }

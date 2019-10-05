@@ -1,4 +1,5 @@
-﻿using ExStorageDepot.Mono;
+﻿using ExStorageDepot.Configuration;
+using ExStorageDepot.Mono;
 using FCSCommon.Helpers;
 
 namespace ExStorageDepot.Buildable
@@ -23,11 +24,8 @@ namespace ExStorageDepot.Buildable
 
         public override string AssetsFolder { get; } = $"ExStorageDepot/Assets";
 
-        internal const string ModName = "ExStorageDepot";
-        internal const string ModFriendly = "Ex-Storage Depot";
-        internal const string BundleName = "exstoragedepotunitmodbundle";
-        internal const string ModDesc = "Alterra Storage Solutions Ex-Storage Depot allows you to store a large amount of items outside your base.";
-        public ExStorageDepotBuildable() : base(ModName, ModFriendly, ModDesc)
+
+        public ExStorageDepotBuildable() : base(Mod.ModName, Mod.ModFriendly, Mod.ModDesc)
         {
             OnFinishedPatching += AdditionalPatching;
         }

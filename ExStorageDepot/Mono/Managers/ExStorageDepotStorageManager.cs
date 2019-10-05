@@ -2,9 +2,9 @@
 using ExStorageDepot.Enumerators;
 using ExStorageDepot.Helpers;
 using ExStorageDepot.Model;
-using FCSCommon.Extensions;
 using FCSCommon.Utilities;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -46,10 +46,10 @@ namespace ExStorageDepot.Mono.Managers
         private const int DumpContainerWidth = 8;
         private const int DumpContainerHeight = 10;
         private ItemsContainer _dumpContainer;
-        private const int MaxItems = 200;
+        private readonly int _maxItems = QPatch.Configuration.Config.MaxStorage;
         private StorageContainer _container;
-        private int _containerWidth = 5;
-        private int _containerHeight = 30;
+        private int _containerWidth = 1;
+        private readonly int _containerHeight = QPatch.Configuration.Config.MaxStorage;
         private RemovalType _removalType;
         private int ItemTotalCount => _trackedItems.Count + _dumpContainer.count;
 
@@ -94,6 +94,7 @@ namespace ExStorageDepot.Mono.Managers
         private void ContainerOnRemoveItem(InventoryItem item)
         {
             QuickLogger.Debug($"Item Removed {item.item.name}");
+            QuickLogger.Debug($"Removal Type {_removalType}");
 
             if (_removalType != RemovalType.Click)
             {
@@ -104,13 +105,13 @@ namespace ExStorageDepot.Mono.Managers
 
         private void ContainerOnAddItem(InventoryItem item)
         {
-            QuickLogger.Debug($"Item Added {item.item.name}");
+            //QuickLogger.Debug($"Item Added {item.item.name}");
         }
 
         private void UpdateStorageDisplayCount()
         {
             if (_mono.Display == null) return;
-            _mono.Display.SetItemCount(GetTotalCount(), MaxItems);
+            _mono.Display.SetItemCount(GetTotalCount(), _maxItems);
         }
 
         private bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
@@ -137,7 +138,7 @@ namespace ExStorageDepot.Mono.Managers
 
             var containerTotal = ItemTotalCount + 1;
 
-            if (_trackedItems.Count >= MaxItems || containerTotal > MaxItems)
+            if (_trackedItems.Count >= _maxItems || containerTotal > _maxItems)
             {
                 QuickLogger.Info(ExStorageDepotBuildable.NoMoreSpace(), true);
                 return false;
@@ -149,7 +150,7 @@ namespace ExStorageDepot.Mono.Managers
 
         internal bool CanHoldItem(int amount)
         {
-            return _trackedItems.Count + amount <= MaxItems;
+            return _trackedItems.Count + amount <= _maxItems;
         }
 
         public void SetMultiplier(int value)
@@ -171,17 +172,18 @@ namespace ExStorageDepot.Mono.Managers
         private void OnPDACloseMethod(PDA pda)
         {
             _mono.AnimationManager.ToggleDriveState();
-            StoreItems();
+            StartCoroutine(StoreItems());
         }
 
         internal void AttemptToTakeItem(TechType techType, RemovalType removeType = RemovalType.Click)
         {
-            var item = _trackedItems.FirstOrDefault(x => x.TechType == techType);
-
-            if (item == null) return;
-
             if (removeType == RemovalType.Craft)
             {
+                var item = _trackedItems.FirstOrDefault(x => x.TechType == techType);
+                if (item == null) return;
+
+                _removalType = RemovalType.Craft;
+
                 if (ItemsDictionary.ContainsKey(item.TechType))
                 {
                     RemoveStoredItem(item, removeType);
@@ -189,13 +191,14 @@ namespace ExStorageDepot.Mono.Managers
                 }
             }
 
-
             QuickLogger.Debug($"Attempting to take item {techType}", true);
 
             var amountToRemove = 1 * _multiplier;
 
             for (int i = 0; i < amountToRemove; i++)
             {
+                var item = _trackedItems.FirstOrDefault(x => x.TechType == techType);
+                if (item == null) return;
                 Pickupable pickup = InventoryHelpers.ConvertToPickupable(item);
 
                 if (pickup == null)
@@ -238,23 +241,30 @@ namespace ExStorageDepot.Mono.Managers
 
             if (removeType == RemovalType.Click)
             {
-                _container.container.RemoveItem(item.TechType);
                 _removalType = RemovalType.Click;
+                _container.container.RemoveItem(item.TechType);
+                _removalType = RemovalType.None;
             }
 
             _mono.Display.ItemModified(item.TechType, GetItemCount(item.TechType));
         }
 
-        private void StoreItems()
+        private IEnumerator StoreItems()
         {
-            for (int i = 0; i < _dumpContainer.count; i++)
+            QuickLogger.Debug($"Store Items Dump Count: {_dumpContainer.count}");
+            var amount = _dumpContainer.count;
+
+            for (int i = amount - 1; i > -1; i--)
             {
-                if (_trackedItems.Count < MaxItems)
+                QuickLogger.Debug($"Number of iteration: {i}");
+                if (_trackedItems.Count < _maxItems)
                 {
-                    AddItem(InventoryHelpers.CovertToItemData(_dumpContainer.ElementAt(i), false));
-                    _container.container.AddItem(_dumpContainer.ElementAt(i).item);
+                    AddItem(InventoryHelpers.CovertToItemData(_dumpContainer.ElementAt(i), true));
                 }
             }
+            QuickLogger.Debug($"Items Container Count: {_container.container.count}");
+
+            yield return null;
         }
 
         private void AddItem(ItemData itemData)
@@ -270,6 +280,10 @@ namespace ExStorageDepot.Mono.Managers
                 ItemsDictionary.Add(itemData.TechType, 1);
             }
 
+            var go = GameObject.Instantiate(CraftData.GetPrefabForTechType(itemData.TechType));
+            var newInventoryItem = new InventoryItem(go.GetComponent<Pickupable>().Pickup(false));
+            newInventoryItem.SetGhostDims(1, 1);
+            _container.container.UnsafeAdd(newInventoryItem);
             _mono.Display.ItemModified(itemData.TechType, GetItemCount(itemData.TechType));
         }
 
@@ -291,7 +305,6 @@ namespace ExStorageDepot.Mono.Managers
                 foreach (ItemData itemData in storageItems)
                 {
                     AddItem(itemData);
-                    _container.container.AddItem(itemData.TechType.ToPickupable());
                 }
             }
         }
@@ -316,6 +329,17 @@ namespace ExStorageDepot.Mono.Managers
         public InventoryItem ForceRemoveItem(TechType item)
         {
             return _trackedItems.SingleOrDefault(x => x.TechType == item)?.InventoryItem;
+        }
+
+        private void OnDestroy()
+        {
+            if (_container != null)
+            {
+                QuickLogger.Debug($"Clearing Container");
+                _container.container.Clear();
+            }
+
+            StopCoroutine(StoreItems());
         }
     }
 }

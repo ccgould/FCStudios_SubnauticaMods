@@ -25,6 +25,16 @@ namespace FCSCommon.Objects
 
         public void Initialize(Pickupable food)
         {
+            Create(food);
+        }
+
+        public void Initialize(Pickupable food, bool destroy)
+        {
+            Create(food, destroy);
+        }
+
+        private void Create(Pickupable food, bool destroy = true)
+        {
             if (food != null)
             {
                 TechType = food.GetTechType();
@@ -36,7 +46,10 @@ namespace FCSCommon.Objects
                 KDecayRate = Food.kDecayRate;
                 Decomposes = Food.decomposes;
 
-                GameObject.Destroy(food);
+                if (destroy)
+                {
+                    GameObject.Destroy(food);
+                }
             }
             else
             {

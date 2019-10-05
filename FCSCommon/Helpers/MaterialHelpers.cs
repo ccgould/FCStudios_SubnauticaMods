@@ -72,7 +72,7 @@ namespace FCSCommon.Helpers
         {
             //Use this to do the Emission
             var shader = Shader.Find("MarmosetUBER");
-            Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>();
+            Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>(true);
             foreach (Renderer renderer in renderers)
             {
                 foreach (Material material in renderer.materials)
@@ -100,7 +100,7 @@ namespace FCSCommon.Helpers
         public static void ApplyNormalShader(string materialName, string textureName, GameObject gameObject, AssetBundle assetBundle)
         {
             var shader = Shader.Find("MarmosetUBER");
-            Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>();
+            Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>(true);
             foreach (Renderer renderer in renderers)
             {
                 foreach (Material material in renderer.materials)
@@ -119,7 +119,7 @@ namespace FCSCommon.Helpers
 
         public static void ChangeMaterialColor(string materialName, GameObject gameObject, Color color)
         {
-            Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>();
+            Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>(true);
             foreach (Renderer renderer in renderers)
             {
                 foreach (Material material in renderer.materials)
@@ -143,7 +143,7 @@ namespace FCSCommon.Helpers
         public static void ApplyMetallicShader(string materialName, string textureName, GameObject gameObject, AssetBundle assetBundle, float glossiness)
         {
             var shader = Shader.Find("MarmosetUBER");
-            Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>();
+            Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>(true);
             foreach (Renderer renderer in renderers)
             {
                 foreach (Material material in renderer.materials)
@@ -171,7 +171,7 @@ namespace FCSCommon.Helpers
         public static void ApplySpecShader(string materialName, string textureName, GameObject gameObject, float specInt, float shininess, AssetBundle assetBundle)
         {
             var shader = Shader.Find("MarmosetUBER");
-            Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>();
+            Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>(true);
             foreach (Renderer renderer in renderers)
             {
                 foreach (Material material in renderer.materials)
@@ -207,7 +207,7 @@ namespace FCSCommon.Helpers
         public static void ApplyAlphaShader(string materialName, GameObject gameObject)
         {
             var shader = Shader.Find("MarmosetUBER");
-            Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>();
+            Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>(true);
             foreach (Renderer renderer in renderers)
             {
                 foreach (Material material in renderer.materials)
@@ -232,7 +232,7 @@ namespace FCSCommon.Helpers
         public static void ApplyGlassShaderTemplate(string materialName, GameObject gameObject, float glossiness)
         {
             var shader = Shader.Find("Standard");
-            Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>();
+            Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>(true);
             foreach (Renderer renderer in renderers)
             {
                 foreach (Material material in renderer.materials)
@@ -259,7 +259,7 @@ namespace FCSCommon.Helpers
         {
             var shader = Shader.Find("UWE/Marmoset/IonCrystal");
 
-            Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>();
+            Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>(true);
 
             foreach (Renderer renderer in renderers)
             {
@@ -302,7 +302,7 @@ namespace FCSCommon.Helpers
             else
             {
                 QuickLogger.Debug("Custom Shader: Found");
-                Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>();
+                Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>(true);
 
                 foreach (Renderer renderer in renderers)
                 {
@@ -346,7 +346,7 @@ namespace FCSCommon.Helpers
 
         public static void ReplaceEmissionTexture(string materialName, string replacementTexture, GameObject gameObject, AssetBundle assetBundle)
         {
-            Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>();
+            Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>(true);
             foreach (Renderer renderer in renderers)
             {
                 foreach (Material material in renderer.materials)

@@ -1,29 +1,31 @@
 ﻿using ExStorageDepot.Buildable;
+using ExStorageDepot.Configuration;
 using FCSCommon.Utilities;
+using Oculus.Newtonsoft.Json;
 using System;
-
+using System.IO;
+using System.Reflection;
 
 
 namespace ExStorageDepot
 {
     public static class QPatch
     {
+        internal static Configuration.Configuration Configuration { get; private set; }
+
         public static void Patch()
         {
-            QuickLogger.Info("Started patching. Version: " + QuickLogger.GetAssemblyVersion());
+            QuickLogger.Info("Started patching. Version: " + QuickLogger.GetAssemblyVersion(Assembly.GetExecutingAssembly()));
 
 #if DEBUG
             QuickLogger.DebugLogsEnabled = true;
             QuickLogger.Debug("Debug logs enabled");
 #endif
 
-            if (true)
-            {
-
-            }
-
             try
             {
+                LoadConfiguration();
+
                 ExStorageDepotBuildable.PatchHelper();
 
                 //var harmony = HarmonyInstance.Create("com.exstoragedepot.fcstudios");
@@ -35,6 +37,18 @@ namespace ExStorageDepot
             {
                 QuickLogger.Error(ex);
             }
+        }
+
+        private static void LoadConfiguration()
+        {
+            // == Load Configuration == //
+            string configJson = File.ReadAllText(Mod.ConfigurationFile().Trim());
+
+            JsonSerializerSettings settings = new JsonSerializerSettings();
+            settings.MissingMemberHandling = MissingMemberHandling.Ignore;
+
+            //LoadData
+            Configuration = JsonConvert.DeserializeObject<Configuration.Configuration>(configJson, settings);
         }
     }
 }

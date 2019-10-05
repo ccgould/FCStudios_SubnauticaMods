@@ -95,12 +95,12 @@ namespace ARS_SeaBreezeFCS32.Model
                     }
                     else
                     {
-                        ErrorMessage.AddMessage(LanguageHelpers.GetLanguage(ARSSeaBreezeFCS32Buildable.CannotRefillMessageKey));
+                        ErrorMessage.AddMessage(ARSSeaBreezeFCS32Buildable.CannotRefillMessage());
                     }
                 }
                 else
                 {
-                    ErrorMessage.AddMessage(LanguageHelpers.GetLanguage(ARSSeaBreezeFCS32Buildable.FcsWorkBenchErrorMessageKey));
+                    ErrorMessage.AddMessage(ARSSeaBreezeFCS32Buildable.FcsWorkBenchErrorMessage());
                 }
             }
         }
@@ -179,7 +179,7 @@ namespace ARS_SeaBreezeFCS32.Model
             }
             else
             {
-                ErrorMessage.AddMessage(LanguageHelpers.GetLanguage(ARSSeaBreezeFCS32Buildable.FcsWorkBenchErrorMessageKey));
+                ErrorMessage.AddMessage(ARSSeaBreezeFCS32Buildable.FcsWorkBenchErrorMessage());
             }
         }
 

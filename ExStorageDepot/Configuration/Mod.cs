@@ -1,5 +1,4 @@
-﻿using ExStorageDepot.Buildable;
-using ExStorageDepot.Mono;
+﻿using ExStorageDepot.Mono;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Utility;
 using System;
@@ -15,10 +14,14 @@ namespace ExStorageDepot.Configuration
         private static ExStorageDepotSaveData _exStorageDepotSaveData;
         internal static event Action<ExStorageDepotSaveData> OnExStorageDepotLoaded;
         internal const string SaveDataFilename = "ExStorageDepotSaveData.json";
-
+        internal const string ModName = "ExStorageDepot";
+        internal const string ModFriendly = "Ex-Storage Depot";
+        internal const string BundleName = "exstoragedepotunitmodbundle";
+        internal const string ModDesc = "Alterra Storage Solutions Ex-Storage Depot allows you to store a large amount of items outside your base.";
+        internal static string MODFOLDERLOCATION => GetModPath();
         public static string GetSaveFileDirectory()
         {
-            return Path.Combine(SaveUtils.GetCurrentSaveDataDir(), ExStorageDepotBuildable.ModName);
+            return Path.Combine(SaveUtils.GetCurrentSaveDataDir(), ModName);
         }
 
         public static void OnSaveComplete()
@@ -39,6 +42,20 @@ namespace ExStorageDepot.Configuration
         public static bool IsSaving()
         {
             return _saveObject != null;
+        }
+
+        internal static string ConfigurationFile()
+        {
+            return Path.Combine(MODFOLDERLOCATION, "mod.json");
+        }
+
+        private static string GetModPath()
+        {
+            return Path.Combine(GetQModsPath(), ModName);
+        }
+        private static string GetQModsPath()
+        {
+            return Path.Combine(Environment.CurrentDirectory, "QMods");
         }
 
         #region ExStorageDepot

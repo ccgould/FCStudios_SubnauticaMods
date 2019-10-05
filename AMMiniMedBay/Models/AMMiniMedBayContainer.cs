@@ -24,7 +24,7 @@ namespace AMMiniMedBay.Models
         public bool startWithMedKit;
         private const int ContainerWidth = 2;
         private const int ContainerHeight = 2;
-        public int NumberOfCubes
+        public int NumberOfFirstAids
         {
             get => medBayContainer.count;
             set
@@ -128,7 +128,7 @@ namespace AMMiniMedBay.Models
 
             if (main.timePassed > _timeSpawnMedKit)
             {
-                NumberOfCubes++;
+                NumberOfFirstAids++;
             }
         }
 

@@ -76,6 +76,7 @@
     <Compile Include="Mono\DeepDriller\DeepDrillerKitPatcher.cs" />
     <Compile Include="Mono\DeepDriller\BatteryAttachmentPatcher.cs" />
     <Compile Include="Mono\DeepDriller\FocusAttachmentPatcher.cs" />
+    <Compile Include="Mono\DeepDriller\Materials\SaNDGlass.cs" />
     <Compile Include="Mono\DeepDriller\SolarAttachmentPatcher.cs" />
     <Compile Include="Mono\Ex-Storage\ExStorageKit.cs" />
     <Compile Include="Mono\FCSTechFabricatorTag.cs" />
@@ -88,11 +89,15 @@
     <Compile Include="Mono\SeaBreeze\FreonModelPrefab.cs" />
     <Compile Include="Mono\SeaBreeze\FreonPatcher.cs" />
     <Compile Include="Mono\SeaBreeze\SeaBreezeKitPatcher.cs" />
+    <Compile Include="Mono\SeaCooker\SeaAlienGasTankPatcher.cs" />
+    <Compile Include="Mono\SeaCooker\SeaGasTankPatcher.cs" />
+    <Compile Include="Mono\SeaCooker\SeaCookerKit.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Abstract Classes\" />
+    <Folder Include="Mono\Materials\" />
   </ItemGroup>
   <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

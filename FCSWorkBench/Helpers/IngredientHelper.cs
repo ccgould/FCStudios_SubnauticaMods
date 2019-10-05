@@ -8,9 +8,9 @@ using System.Linq;
 
 namespace FCSTechFabricator.Helpers
 {
-    internal static class IngredientHelper
+    public static class IngredientHelper
     {
-        internal static bool ValidateData(List<IngredientItem> ingredients)
+        public static bool ValidateData(List<IngredientItem> ingredients)
         {
             if (ingredients == null)
             {
@@ -37,7 +37,7 @@ namespace FCSTechFabricator.Helpers
             return true;
         }
 
-        internal static IEnumerable<Ingredient> ConvertToIngredients(List<IngredientItem> ingredients)
+        public static IEnumerable<Ingredient> ConvertToIngredients(List<IngredientItem> ingredients)
         {
             foreach (var ingredient in ingredients)
             {
@@ -45,7 +45,7 @@ namespace FCSTechFabricator.Helpers
             }
         }
 
-        internal static TechData DefaultBlueprint()
+        public static TechData DefaultBlueprint()
         {
             return new TechData()
             {
@@ -57,7 +57,7 @@ namespace FCSTechFabricator.Helpers
             };
         }
 
-        internal static TechData GetCustomRecipe(string ClassID)
+        public static TechData GetCustomRecipe(string ClassID)
         {
             var inventoryItem = QPatch.Configuration.GetData(ClassID);
             TechData customFabRecipe = null;

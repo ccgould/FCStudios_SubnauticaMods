@@ -21,7 +21,8 @@ namespace FCSTechFabricator.Mono
             {"Alterra Medical Solutions","AMS"},
             {"Alterra Refrigeration Solutions","ARS"},
             {"Alterra Shipping Solutions","ASS"},
-            {"Alterra Storage Solutions","ASTS"}
+            {"Alterra Storage Solutions","ASTS"},
+            {"Alterra Electric","AE"}
         };
 
         internal static readonly Dictionary<string, ModKey> FCSMods = new Dictionary<string, ModKey>()
@@ -31,6 +32,7 @@ namespace FCSTechFabricator.Mono
             {"Power Storage",new ModKey{Key = "PS",ParentKey = "AIS"}},
             {"SeaBreeze",new ModKey{Key = "SB",ParentKey = "ARS"}},
             {"Ex-Storage",new ModKey{Key = "ES",ParentKey = "ASTS"}},
+            {"Sea Cooker",new ModKey{Key = "SC",ParentKey = "AE"}},
         };
 
 

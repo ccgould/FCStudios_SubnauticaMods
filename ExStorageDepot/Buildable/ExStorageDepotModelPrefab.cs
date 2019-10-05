@@ -1,4 +1,5 @@
-﻿using FCSCommon.Helpers;
+﻿using ExStorageDepot.Configuration;
+using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
 
@@ -14,7 +15,7 @@ namespace ExStorageDepot.Buildable
         private bool GetPrefabs()
         {
             QuickLogger.Debug("GetPrefabs");
-            AssetBundle assetBundle = AssetHelper.Asset(ModName, BundleName);
+            AssetBundle assetBundle = AssetHelper.Asset(Mod.ModName, Mod.BundleName);
 
             //If the result is null return false.
             if (assetBundle == null)

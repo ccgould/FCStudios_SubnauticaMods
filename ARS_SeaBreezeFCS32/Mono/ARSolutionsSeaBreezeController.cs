@@ -1,4 +1,5 @@
-﻿using ARS_SeaBreezeFCS32.Interfaces;
+﻿using ARS_SeaBreezeFCS32.Buildables;
+using ARS_SeaBreezeFCS32.Interfaces;
 using ARS_SeaBreezeFCS32.Model;
 using FCSCommon.Converters;
 using FCSCommon.Objects;
@@ -205,6 +206,30 @@ namespace ARS_SeaBreezeFCS32.Mono
         public void OpenFilterContainer()
         {
             _freonContainer.OpenStorage();
+        }
+
+        public bool AddItemToFridge(InventoryItem item, out string reason)
+        {
+            reason = string.Empty;
+            if (_fridgeContainer != null)
+            {
+                if (!_fridgeContainer.IsFull)
+                {
+                    if (!_fridgeContainer.IsAllowedToAdd(item.item, true))
+                    {
+                        reason = ARSSeaBreezeFCS32Buildable.ItemNotAllowed();
+                        return false;
+                    }
+                    _fridgeContainer.AddItemFromExternal(item);
+                }
+                else
+                {
+                    reason = ARSSeaBreezeFCS32Buildable.SeaBreezeFull();
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         #endregion

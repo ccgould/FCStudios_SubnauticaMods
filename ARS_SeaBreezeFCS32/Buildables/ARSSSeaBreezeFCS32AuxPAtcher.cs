@@ -5,8 +5,10 @@ namespace ARS_SeaBreezeFCS32.Buildables
     internal partial class ARSSeaBreezeFCS32Buildable
     {
         private const string StorageLabelKey = "SeaBreezeStorage";
-        internal const string FcsWorkBenchErrorMessageKey = "FCSWorkBenechErrorMessage";
-        internal const string CannotRefillMessageKey = "CannotRefillMessage";
+        private const string FcsWorkBenchErrorMessageKey = "FCSWorkBenechErrorMessage";
+        private const string CannotRefillMessageKey = "CannotRefillMessage";
+        private const string SeaBreezeFullKey = "SeaBreezeFull";
+        private const string ItemNotAllowedKey = "ItemNotAllowed";
         public static string StorageLabel()
         {
             return Language.main.Get(StorageLabelKey);
@@ -41,6 +43,28 @@ namespace ARS_SeaBreezeFCS32.Buildables
             LanguageHandler.SetLanguageLine(StorageLabelKey, "SeaBreeze Receptacle");
             LanguageHandler.SetLanguageLine(OnHoverUnpoweredKey, "Insufficient power");
             LanguageHandler.SetLanguageLine(FcsWorkBenchErrorMessageKey, "FCS Tech Workbench Mod not found please install.");
+            LanguageHandler.SetLanguageLine(SeaBreezeFullKey, "SeaBreeze is full and cannot add anymore items.");
+            LanguageHandler.SetLanguageLine(ItemNotAllowedKey, "Food items allowed only.");
+        }
+
+        public static string SeaBreezeFull()
+        {
+            return Language.main.Get(SeaBreezeFullKey);
+        }
+
+        public static string ItemNotAllowed()
+        {
+            return Language.main.Get(ItemNotAllowedKey);
+        }
+
+        public static string CannotRefillMessage()
+        {
+            return Language.main.Get(CannotRefillMessageKey);
+        }
+
+        public static string FcsWorkBenchErrorMessage()
+        {
+            return Language.main.Get(FcsWorkBenchErrorMessageKey);
         }
     }
 }
