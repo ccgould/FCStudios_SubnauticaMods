@@ -8,6 +8,7 @@ using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -29,6 +30,7 @@ namespace AE.SeaCooker.Managers
         private Text _fuelPercentage;
         private ColorPageHelper _colorPage;
         private Text _paginator;
+        private CustomToggle _cusToggle;
 
 
         public override void OnButtonClick(string btnName, object tag)
@@ -271,11 +273,11 @@ namespace AE.SeaCooker.Managers
                 return false;
             }
 
-            var cusToggle = toggle.AddComponent<CustomToggle>();
-            cusToggle.BtnName = "seaBreezeToggle";
-            cusToggle.ButtonMode = InterfaceButtonMode.Background;
-            cusToggle.OnButtonClick = OnButtonClick;
-            cusToggle.Tag = cusToggle;
+            _cusToggle = toggle.AddComponent<CustomToggle>();
+            _cusToggle.BtnName = "seaBreezeToggle";
+            _cusToggle.ButtonMode = InterfaceButtonMode.Background;
+            _cusToggle.OnButtonClick = OnButtonClick;
+            _cusToggle.Tag = _cusToggle;
 
 
             return true;
@@ -300,7 +302,7 @@ namespace AE.SeaCooker.Managers
             _showProcess = Animator.StringToHash("ShowProcess");
             _isOnHomePage = Animator.StringToHash("IsOnHomePage");
 
-            _mono.FoodManager.OnFoodCooked += OnFoodCooked;
+            _mono.FoodManager.OnFoodCookedAll += OnFoodCooked;
             _mono.FoodManager.OnCookingStart += OnCookingStart;
             _mono.GasManager.OnGasUpdate += OnGasRemoved;
 
@@ -330,6 +332,12 @@ namespace AE.SeaCooker.Managers
 
         private void OnGasRemoved()
         {
+            QuickLogger.Debug($"Updating Gas {_mono.GasManager.GetTankPercentage()}");
+            UpdateFuelPercentage();
+        }
+
+        internal void UpdateFuelPercentage()
+        {
             _fuelPercentage.text = $"{SeaCookerBuildable.TankPercentage()}: ({_mono.GasManager.GetTankPercentage()}%)";
         }
 
@@ -337,7 +345,7 @@ namespace AE.SeaCooker.Managers
         {
             QuickLogger.Debug("Starting Processing Animation", true);
 
-            ToggleProcessDisplay();
+            //ToggleProcessDisplay();
             _mono.UpdateIsRunning();
             uGUI_Icon fromIcon = _fromImage.gameObject.GetComponent<uGUI_Icon>();
             fromIcon.sprite = SpriteManager.Get(raw);
@@ -348,7 +356,7 @@ namespace AE.SeaCooker.Managers
             UpdateCookingButton();
         }
 
-        private void OnFoodCooked(TechType raw, TechType cooked)
+        private void OnFoodCooked(TechType raw, List<TechType> techTypes)
         {
             UpdateCookingButton();
         }
@@ -405,6 +413,11 @@ namespace AE.SeaCooker.Managers
         internal void ResetProgressBar()
         {
             _percentage.fillAmount = 0f;
+        }
+
+        internal void SetSendToSeaBreeze(bool value)
+        {
+            _cusToggle.SetToggleState(value);
         }
     }
 }

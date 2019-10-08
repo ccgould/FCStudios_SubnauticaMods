@@ -1,6 +1,7 @@
 ﻿using FCSCommon.Enums;
 using FCSCommon.Utilities;
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -30,6 +31,11 @@ namespace AE.SeaCooker.Display
         #endregion
 
         private void Awake()
+        {
+            FindToggle();
+        }
+
+        private void FindToggle()
         {
             var background = gameObject.FindChild("Background");
 
@@ -177,7 +183,23 @@ namespace AE.SeaCooker.Display
 
         internal void SetToggleState(bool isChecked)
         {
+            if (_checkMark == null)
+            {
+                FindToggle();
+            }
+            _checkMark?.SetActive(isChecked);
+            QuickLogger.Debug($"SeaCooker Check Box Set To: {_checkMark.activeSelf}", true);
+        }
+
+        private IEnumerator AttemptToSetToggle(bool isChecked)
+        {
+            while (_checkMark == null)
+            {
+                QuickLogger.Debug($"Attempting to set toggle.", true);
+                yield return null;
+            }
             _checkMark.SetActive(isChecked);
+            QuickLogger.Debug($"SeaCooker Check Box Set To: {_checkMark.activeSelf}", true);
         }
 
         internal void ChangeText(string message)

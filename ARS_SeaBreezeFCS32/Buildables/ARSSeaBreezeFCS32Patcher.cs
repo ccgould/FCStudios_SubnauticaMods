@@ -1,4 +1,5 @@
-﻿using ARS_SeaBreezeFCS32.Mono;
+﻿using ARS_SeaBreezeFCS32.Configuration;
+using ARS_SeaBreezeFCS32.Mono;
 using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
@@ -18,7 +19,7 @@ namespace ARS_SeaBreezeFCS32.Buildables
         public override TechCategory CategoryForPDA { get; } = TechCategory.InteriorModule;
         public override string AssetsFolder { get; } = $"FCS_ARSSeaBreeze/Assets";
 
-        public ARSSeaBreezeFCS32Buildable() : base("ARSSeaBreezeFCS32", "ARS Sea Breeze FCS32", "Alterra Refrigeration Sea Breeze will keep your items fresh longer!")
+        public ARSSeaBreezeFCS32Buildable() : base(Mod.ClassID, Mod.FriendlyName, Mod.Description)
         {
             OnFinishedPatching += AdditionalPatching;
         }

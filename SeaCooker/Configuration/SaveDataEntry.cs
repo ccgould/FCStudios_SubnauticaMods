@@ -14,6 +14,9 @@ namespace AE.SeaCooker.Configuration
         [JsonProperty] internal FuelType TankType;
         [JsonProperty] internal ColorVec4 BodyColor;
         [JsonProperty] internal bool ExportToSeaBreeze;
+        [JsonProperty] internal bool IsCooking;
+        [JsonProperty] internal float PassedTime;
+        [JsonProperty] internal float TargetTime;
         [JsonProperty] internal IEnumerable<EatableEntities> Input;
         [JsonProperty] internal IEnumerable<EatableEntities> Export;
     }

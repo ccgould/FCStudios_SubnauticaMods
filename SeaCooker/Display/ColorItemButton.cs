@@ -46,6 +46,10 @@ namespace AE.SeaCooker.Display
                 QuickLogger.Debug($"Clicked Button: {this.BtnName}", true);
                 OnButtonClick?.Invoke(this.BtnName, Color);
             }
+            else
+            {
+                QuickLogger.Debug("Button Not Hovered", true);
+            }
         }
         #endregion
     }

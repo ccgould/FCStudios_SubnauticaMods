@@ -66,10 +66,6 @@ namespace AE.SeaCooker.Display
 
         protected bool InInteractionRange()
         {
-            if (Disabled)
-            {
-                return false;
-            }
             return Mathf.Abs(Vector3.Distance(this.gameObject.transform.position, Player.main.transform.position)) <= 2.5;
         }
     }

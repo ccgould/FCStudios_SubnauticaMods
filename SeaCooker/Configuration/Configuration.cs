@@ -74,6 +74,8 @@ namespace AE.SeaCooker.Configuration
         public float CookTime { get; set; }
         public float EnergyPerSec { get; set; }
         public float UsagePerItem { get; set; }
+        public int StorageWidth { get; set; }
+        public int StorageHeight { get; set; }
     }
 
     public class ModConfiguration

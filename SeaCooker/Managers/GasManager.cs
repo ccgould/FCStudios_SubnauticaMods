@@ -41,6 +41,7 @@ namespace AE.SeaCooker.Managers
 
         private void OnEquipmentRemoved(string slot, InventoryItem item)
         {
+            QuickLogger.Debug("Removing Current Fuel");
             CurrentFuel = FuelType.None;
         }
 
@@ -98,6 +99,8 @@ namespace AE.SeaCooker.Managers
 
         public void AddFuel(FuelType value)
         {
+            QuickLogger.Debug("Adding Fuel");
+
             switch (value)
             {
                 case FuelType.Gas:
@@ -131,7 +134,6 @@ namespace AE.SeaCooker.Managers
                 _currentFuel = value;
                 UpdateTank(value);
                 _fuelInserted = value != FuelType.None;
-
                 switch (value)
                 {
                     case FuelType.None:
@@ -156,13 +158,9 @@ namespace AE.SeaCooker.Managers
             return _fuelInserted;
         }
 
-        internal float TankPercentage()
-        {
-            return _fuelLevel / _fuelCapacity;
-        }
-
         internal void RemoveGas(float amount)
         {
+
             _fuelLevel = Mathf.Clamp(_fuelLevel - amount, 0, _fuelCapacity);
 
             if (_fuelLevel <= 0)
@@ -171,17 +169,21 @@ namespace AE.SeaCooker.Managers
                 {
                     QuickLogger.Debug("Clearing Fuel Slot");
                     _equipment.ClearItems();
-                    _currentFuel = FuelType.None;
+                    CurrentFuel = FuelType.None;
                     _mono.AnimationManager.SetIntHash(_tank, NoTank);
                 }
             }
+
+            QuickLogger.Debug($"Removing Gas {amount} || Fuel Level {_fuelLevel} || Fuel Capacity {_fuelCapacity}");
 
             OnGasUpdate?.Invoke();
         }
 
         internal void SetTankLevel(float amount)
         {
-            _fuelCapacity = Mathf.Clamp(amount, 0, _fuelCapacity);
+            QuickLogger.Debug($"Setting Tank: {amount}");
+            _fuelLevel = Mathf.Clamp(amount, 0, _fuelCapacity);
+            _mono.DisplayManager.UpdateFuelPercentage();
         }
 
         internal float GetTankLevel()
@@ -213,9 +215,9 @@ namespace AE.SeaCooker.Managers
             }
         }
 
-        internal void SetEquipment()
+        internal void SetEquipment(FuelType tank)
         {
-            var techType = TechTypeHelpers.GetTechType(_currentFuel);
+            var techType = TechTypeHelpers.GetTechType(tank);
 
             if (techType == TechType.None) return;
 

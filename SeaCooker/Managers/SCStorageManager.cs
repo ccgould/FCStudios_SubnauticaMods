@@ -1,5 +1,6 @@
 ﻿using AE.SeaCooker.Buildable;
 using AE.SeaCooker.Mono;
+using ARS_SeaBreezeFCS32.Mono;
 using FCSCommon.Objects;
 using FCSCommon.Utilities;
 using System;
@@ -14,12 +15,13 @@ namespace AE.SeaCooker.Managers
         private SeaCookerController _mono;
         private ItemsContainer _container;
         private ItemsContainer _exportContainer;
-        private const int ContainerWidth = 6;
-        private const int ContainerHeight = 8;
+        private readonly int _containerWidth = QPatch.Configuration.Config.StorageWidth;
+        private readonly int _containerHeight = QPatch.Configuration.Config.StorageHeight;
         private Func<bool> _isConstructed;
         private ChildObjectIdentifier _containerRoot = null;
-        private bool _exportToSeabreeze;
+        private bool _exportToSeaBreeze = true;
         private ChildObjectIdentifier _exportContainerRoot = null;
+        private bool _lockInputContainer;
 
         public void Initialize(SeaCookerController mono)
         {
@@ -41,7 +43,7 @@ namespace AE.SeaCooker.Managers
             {
                 QuickLogger.Debug("Initializing Container");
 
-                _container = new ItemsContainer(ContainerWidth, ContainerHeight, _containerRoot.transform,
+                _container = new ItemsContainer(_containerWidth, _containerHeight, _containerRoot.transform,
                     SeaCookerBuildable.StorageLabel(), null);
 
                 _container.isAllowedToAdd += IsAllowedToAddContainer;
@@ -51,13 +53,20 @@ namespace AE.SeaCooker.Managers
             {
                 QuickLogger.Debug("Initializing Export Container");
 
-                _exportContainer = new ItemsContainer(ContainerWidth, ContainerHeight, _exportContainerRoot.transform,
+                _exportContainer = new ItemsContainer(_containerWidth, _containerHeight, _exportContainerRoot.transform,
                     SeaCookerBuildable.ExportStorageLabel(), null);
                 _exportContainer.isAllowedToAdd += IsAllowedToAddExport;
 
             }
 
-            _mono.FoodManager.OnFoodCooked += OnFoodCooked;
+            _mono.FoodManager.OnFoodCookedAll += OnFoodCookedAll;
+            _mono.FoodManager.OnCookingStart += OnCookingStart;
+        }
+
+        private void OnCookingStart(TechType arg1, TechType arg2)
+        {
+            _lockInputContainer = true;
+            _mono.AudioManager.PlayMachineAudio();
         }
 
         private bool IsAllowedToAddExport(Pickupable pickupable, bool verbose)
@@ -87,6 +96,7 @@ namespace AE.SeaCooker.Managers
                 QuickLogger.Error(SeaCookerBuildable.ItemNotAllowed());
             return flag;
         }
+
         public void OpenInputStorage()
         {
             OpenStorage(_container);
@@ -101,37 +111,88 @@ namespace AE.SeaCooker.Managers
                 QuickLogger.Info(SeaCookerBuildable.NoFoodToCook(), true);
                 return;
             }
-            var food = _container.FirstOrDefault();
 
-            if (food == null)
-            {
-                QuickLogger.Debug("Food is null", true);
-                return;
-            }
+            #region Disabled because of cooking all food
+            //var food = _container.FirstOrDefault();
 
-            _mono.FoodManager.CookFood(food);
+            //if (food == null)
+            //{
+            //    QuickLogger.Debug("Food is null", true);
+            //    return;
+            //} 
+            #endregion
+
+            _mono.FoodManager.CookAllFood(_container);
         }
 
-        private void OnFoodCooked(TechType oldTechType, TechType newTechType)
+        private void OnFoodCookedAll(TechType oldTechType, List<TechType> cookedTechTypes)
         {
-            QuickLogger.Debug($"Food {oldTechType} has been cooked", true);
+            _mono.AudioManager.StopMachineAudio();
 
-            _container.RemoveItem(oldTechType);
-
-            var newFood = GameObject.Instantiate(CraftData.GetPrefabForTechType(newTechType));
-
-            var item = new InventoryItem(newFood.GetComponent<Pickupable>().Pickup(false));
-
-            _exportContainer.UnsafeAdd(item);
-
-            if (_container.count > 0)
+            foreach (TechType type in cookedTechTypes)
             {
-                CookStoredFood();
-                return;
+                var newFood = GameObject.Instantiate(CraftData.GetPrefabForTechType(type));
+
+                var item = new InventoryItem(newFood.GetComponent<Pickupable>().Pickup(false));
+
+                _exportContainer.UnsafeAdd(item);
+
+                QuickLogger.Debug($"Food {oldTechType} has been cooked", true);
             }
+
+            if (_exportToSeaBreeze)
+            {
+                SendToSeaBreeze();
+            }
+
+            _container.Clear();
+            _lockInputContainer = false;
+
+            //if (_container.count > 0)
+            //{
+            //    CookStoredFood();
+            //    return;
+            //}
 
             _mono.DisplayManager.ToggleProcessDisplay(false);
             _mono.UpdateIsRunning(false);
+        }
+
+        private void SendToSeaBreeze()
+        {
+            QuickLogger.Debug($"Sending to SeaBreeze: Available {_mono.SeaBreezes.Count}", true);
+
+            foreach (KeyValuePair<string, ARSolutionsSeaBreezeController> breezeController in _mono.SeaBreezes)
+            {
+                QuickLogger.Debug($"Current SeaBreeze: {breezeController.Value.PrefabId.Id}", true);
+
+                if (_exportContainer.count <= 0) break;
+
+                if (breezeController.Value.CanBeStored(_exportContainer.count))
+                {
+                    QuickLogger.Debug($"SeaBreeze {breezeController.Value.PrefabId.Id}: Has all {_exportContainer.count} Available.", true);
+
+                    for (int i = _exportContainer.count - 1; i > -1; i--)
+                    {
+                        var item = _exportContainer.FirstOrDefault();
+                        var result = breezeController.Value.AddItemToFridge(item, out string reason);
+                        _exportContainer.RemoveItem(item?.item);
+                        QuickLogger.Debug($"SeaBreeze {breezeController.Value.PrefabId.Id}: Operation successful {result}", true);
+                    }
+
+                    break;
+                }
+
+                if (breezeController.Value.FreeSpace > 0)
+                {
+                    for (int i = breezeController.Value.FreeSpace - 1; i > -1; i--)
+                    {
+                        var item = _exportContainer.FirstOrDefault();
+                        var result = breezeController.Value.AddItemToFridge(item, out string reason);
+                        _exportContainer.RemoveItem(item?.item);
+                    }
+                }
+            }
         }
 
         internal bool HasItemsToCook()
@@ -146,6 +207,11 @@ namespace AE.SeaCooker.Managers
 
         private void OpenStorage(ItemsContainer container)
         {
+            if (_lockInputContainer)
+            {
+                QuickLogger.Info(SeaCookerBuildable.CookingCantOpen(), true);
+                return;
+            }
             Player main = Player.main;
             PDA pda = main.GetPDA();
             Inventory.main.SetUsedStorage(container, false);
@@ -210,17 +276,32 @@ namespace AE.SeaCooker.Managers
 
         internal void SetExportToSeabreeze(bool value)
         {
-            _exportToSeabreeze = value;
+            _exportToSeaBreeze = value;
+            _mono.DisplayManager.SetSendToSeaBreeze(value);
         }
 
         internal bool GetExportToSeabreeze()
         {
-            return _exportToSeabreeze;
+            return _exportToSeaBreeze;
         }
 
         internal bool CanDeconstruct()
         {
             return _exportContainer.count <= 0 && _container.count <= 0;
+        }
+
+        internal bool HasRoomForAll()
+        {
+            List<Vector2int> items = _container.Select(item => new Vector2int(item.width, item.height)).ToList();
+            if (_exportContainer.HasRoomFor(items)) return true;
+            QuickLogger.Info(SeaCookerBuildable.NoEnoughRoom(), true);
+            return false;
+
+        }
+
+        internal ItemsContainer GetContainer()
+        {
+            return _container;
         }
     }
 }

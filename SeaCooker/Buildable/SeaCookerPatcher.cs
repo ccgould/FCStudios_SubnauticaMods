@@ -1,6 +1,7 @@
 ﻿using AE.SeaCooker.Configuration;
 using AE.SeaCooker.Managers;
 using AE.SeaCooker.Mono;
+using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
 using System.Collections.Generic;
@@ -50,9 +51,7 @@ namespace AE.SeaCooker.Buildable
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(TechType.Titanium, 1)
-
-                    //new Ingredient(TechTypeHelpers.GetTechType("SeaCookerKit_SC"), 1)
+                    new Ingredient(TechTypeHelpers.GetTechType("SeaCookerBuildableKit_SC"), 1)
                 }
             };
             return customFabRecipe;
@@ -115,7 +114,8 @@ namespace AE.SeaCooker.Buildable
 
                 _prefab.AddComponent<AnimationManager>();
                 _prefab.AddComponent<TechTag>().type = Singleton.TechType;
-                _prefab.AddComponent<PlayerInteraction>();
+                //_prefab.AddComponent<PlayerInteraction>();
+                _prefab.AddComponent<FMOD_CustomLoopingEmitter>();
                 _prefab.AddComponent<SeaCookerController>();
             }
         }

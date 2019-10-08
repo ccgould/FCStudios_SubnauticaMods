@@ -64,6 +64,8 @@
     <Compile Include="Buildables\ARSSeaBreezeFCS32ModelPrefab.cs" />
     <Compile Include="Buildables\ARSSeaBreezeFCS32Patcher.cs" />
     <Compile Include="Buildables\ARSSSeaBreezeFCS32AuxPatcher.cs" />
+    <Compile Include="Configuration\Configuration.cs" />
+    <Compile Include="Configuration\Mod.cs" />
     <Compile Include="Display\InterfaceButton.cs" />
     <Compile Include="Display\ItemButton.cs" />
     <Compile Include="Display\OnScreenButton.cs" />

@@ -27,7 +27,11 @@ namespace AE.SeaCooker.Buildable
             LanguageHandler.SetLanguageLine(NoFuelKey, "No fuel available.");
             LanguageHandler.SetLanguageLine(StartKey, "START");
             LanguageHandler.SetLanguageLine(TankPercentageKey, "Tank Percentage");
-            LanguageHandler.SetLanguageLine(TankPercentageKey, "One or both of the container are not empty. ");
+            LanguageHandler.SetLanguageLine(UnitNotEmptyKey, "One or both of the container are not empty.");
+            LanguageHandler.SetLanguageLine(NoEnoughRoomKey, "There isn't enough room in the export container.");
+            LanguageHandler.SetLanguageLine(CookingCantOpenKey, "Cannot open container while cooking.");
+
+
         }
 
 
@@ -41,6 +45,9 @@ namespace AE.SeaCooker.Buildable
         private const string StartKey = "SC_Start";
         private const string TankPercentageKey = "SC_TankPercentage";
         private const string UnitNotEmptyKey = "SC_UnitNotEmpty";
+        private const string NoEnoughRoomKey = "SC_NoEnoughRoom";
+        private const string CookingCantOpenKey = "SC_CookingCantOpen";
+
 
 
         public static string OnHover()
@@ -101,6 +108,16 @@ namespace AE.SeaCooker.Buildable
         public static string UnityNotEmpty()
         {
             return Language.main.Get(UnitNotEmptyKey);
+        }
+
+        public static string NoEnoughRoom()
+        {
+            return Language.main.Get(NoEnoughRoomKey);
+        }
+
+        public static string CookingCantOpen()
+        {
+            return Language.main.Get(CookingCantOpenKey);
         }
     }
 }

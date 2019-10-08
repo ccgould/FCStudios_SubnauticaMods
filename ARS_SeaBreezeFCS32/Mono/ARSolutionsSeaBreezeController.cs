@@ -39,6 +39,8 @@ namespace ARS_SeaBreezeFCS32.Mono
         /// </summary>
         public int NumberOfItems => _fridgeContainer.NumberOfItems;
 
+        public int FreeSpace => QPatch.Configuration.Config.StorageLimit - NumberOfItems;
+
         public void OpenStorage() => _fridgeContainer.OpenStorage();
         public void AttemptToTakeItem(TechType techType) => _fridgeContainer.AttemptToTakeItem(techType);
 
@@ -208,6 +210,11 @@ namespace ARS_SeaBreezeFCS32.Mono
             _freonContainer.OpenStorage();
         }
 
+        public string GetPrefabID()
+        {
+            return PrefabId.Id;
+        }
+
         public bool AddItemToFridge(InventoryItem item, out string reason)
         {
             reason = string.Empty;
@@ -230,6 +237,16 @@ namespace ARS_SeaBreezeFCS32.Mono
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Check to see if the amount if items <see cref="int"/> can be stored in the SeaBreeze Unit.
+        /// </summary>
+        /// <param name="amount">The amount of items to check against the container</param>
+        /// <returns></returns>
+        public bool CanBeStored(int amount)
+        {
+            return _fridgeContainer != null && _fridgeContainer.HasRoomFor(amount);
         }
 
         #endregion

@@ -1,23 +1,29 @@
 ﻿
+using AE.SeaCooker.Configuration;
 using AE.SeaCooker.Enumerators;
 using AE.SeaCooker.Mono;
 using FCSCommon.Utilities;
 using FCSCommon.Utilities.Enums;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace AE.SeaCooker.Managers
 {
     internal class FoodManager : MonoBehaviour
     {
+        internal Action<TechType, List<TechType>> OnFoodCookedAll;
         internal Action<TechType, TechType> OnFoodCooked;
         internal Action<TechType, TechType> OnCookingStart;
-        private bool _startCookingProcess;
         private float _passedTime;
         private TechType _rawTechType;
         private SeaCookerController _mono;
-        private bool _killCooking;
+        private float _targetTime;
+        private bool _isCooking;
+        private Coroutine _cookall;
+        private bool _fromSave;
+        private bool _continue;
 
         internal void Initialize(SeaCookerController mono)
         {
@@ -40,7 +46,6 @@ namespace AE.SeaCooker.Managers
             }
 
             _rawTechType = item.item.GetTechType();
-            _startCookingProcess = true;
             StartCoroutine(Cook());
             QuickLogger.Debug($"Cooking food {_rawTechType}", true);
         }
@@ -48,24 +53,23 @@ namespace AE.SeaCooker.Managers
         internal void KillCooking()
         {
             QuickLogger.Debug("Kill Cooking");
-            _killCooking = true;
-            StopCoroutine(Cook());
+            StopCoroutine(_cookall);
+            StopCoroutine(nameof(Cook));
             _mono.UpdateIsRunning(false);
             _mono.DisplayManager.ToggleProcessDisplay(false);
-            Reset();
             _mono.DisplayManager.ResetProgressBar();
+            Reset();
         }
 
         private IEnumerator Cook()
         {
             OnCookingStart?.Invoke(_rawTechType, GetCookedFood(_rawTechType));
-            yield return new WaitForSeconds(QPatch.Configuration.Config.CookTime);
-            QuickLogger.Debug($"StartProcess : {_startCookingProcess}", true);
+            _isCooking = true;
 
-            if (_killCooking)
+            for (float timer = QPatch.Configuration.Config.CookTime; timer >= 0; timer -= DayNightCycle.main.deltaTime)
             {
-                _killCooking = false;
-                yield break;
+
+                yield return null;
             }
 
             OnFoodCooked?.Invoke(_rawTechType, GetCookedFood(_rawTechType));
@@ -73,10 +77,49 @@ namespace AE.SeaCooker.Managers
             QuickLogger.Debug($"Cooked food {_rawTechType}", true);
         }
 
+        private IEnumerator CookAll(ItemsContainer container)
+        {
+            var list = new List<TechType>();
+            _isCooking = true;
+            _targetTime = QPatch.Configuration.Config.CookTime * container.count;
+
+            if (!_fromSave)
+            {
+                _mono.GasManager.RemoveGas(QPatch.Configuration.Config.UsagePerItem);
+            }
+
+            OnCookingStart?.Invoke(_rawTechType, GetCookedFood(_rawTechType));
+
+            //for (float timer = _targetTime; timer >= 0; timer -= DayNightCycle.main.deltaTime)
+            //{
+            //    yield return null;
+            //}
+
+            while (!_continue)
+            {
+                yield return null;
+            }
+
+            QuickLogger.Debug("Transferring Cooked Items", true);
+
+            foreach (InventoryItem item in container)
+            {
+                _rawTechType = item.item.GetTechType();
+                list.Add(GetCookedFood(_rawTechType));
+                QuickLogger.Debug($"Cooked food {_rawTechType}", true);
+            }
+
+            Reset();
+
+            OnFoodCookedAll?.Invoke(_rawTechType, list);
+        }
+
         private void Reset()
         {
-            _startCookingProcess = false;
+            _isCooking = false;
             _passedTime = 0;
+            _fromSave = false;
+            _continue = false;
         }
 
         private TechType GetCookedFood(TechType techType)
@@ -134,22 +177,57 @@ namespace AE.SeaCooker.Managers
 
         private void Timer()
         {
-            if (!_startCookingProcess) return;
+            if (!_isCooking) return;
 
             _passedTime += DayNightCycle.main.deltaTime;
 
-            var percent = _passedTime / QPatch.Configuration.Config.CookTime;
+            var percent = _passedTime / _targetTime;
 
             _mono.DisplayManager.UpdatePercentage(percent);
 
-            if (!(_passedTime >= QPatch.Configuration.Config.CookTime)) return;
+            if (!(_passedTime >= _targetTime)) return;
 
-            Reset();
+            _continue = true;
         }
 
         internal bool IsCooking()
         {
-            return _startCookingProcess;
+            return _isCooking;
+        }
+
+        internal void CookAllFood(ItemsContainer container)
+        {
+            QuickLogger.Debug($"Get Powered State {_mono.PowerManager.GetPowerState()} || Current Fuel {_mono.GasManager.CurrentFuel} || Has Room for All {_mono.StorageManager.HasRoomForAll()}");
+
+            if (_mono.PowerManager.GetPowerState() == FCSPowerStates.Unpowered
+                || _mono.GasManager.CurrentFuel == FuelType.None
+                || !_mono.StorageManager.HasRoomForAll())
+            {
+                KillCooking();
+                return;
+            }
+
+            _cookall = StartCoroutine(CookAll(container));
+            QuickLogger.Debug("Cooking All Food", true);
+        }
+
+        internal void LoadRunningState(SaveDataEntry data)
+        {
+            if (!data.IsCooking) return;
+
+            _passedTime = data.PassedTime;
+            _fromSave = true;
+            CookAllFood(_mono.StorageManager.GetContainer());
+
+            //_targetTime = data.TargetTime;
+            //_isCooking = data.IsCooking;
+        }
+
+        internal void SaveRunningState(SaveDataEntry data)
+        {
+            data.PassedTime = _passedTime;
+            data.TargetTime = _targetTime;
+            data.IsCooking = _isCooking;
         }
     }
 }

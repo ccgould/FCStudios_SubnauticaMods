@@ -1,7 +1,9 @@
 ﻿using ARS_SeaBreezeFCS32.Buildables;
+using ARS_SeaBreezeFCS32.Configuration;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using Harmony;
+using Oculus.Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Reflection;
@@ -15,6 +17,14 @@ namespace ARS_SeaBreezeFCS32
         public static void Patch()
         {
             Console.WriteLine("This is a test");
+
+            // == Load Configuration == //
+            string configJson = File.ReadAllText(Mod.ConfigurationFile().Trim());
+
+            JsonSerializerSettings settings = new JsonSerializerSettings();
+            settings.MissingMemberHandling = MissingMemberHandling.Ignore;
+
+            Configuration = JsonConvert.DeserializeObject<ModConfiguration>(configJson, settings);
 
             QuickLogger.Info("Started patching. Version: " + QuickLogger.GetAssemblyVersion());
 
@@ -46,7 +56,7 @@ namespace ARS_SeaBreezeFCS32
         private static void LoadAssetBundle()
         {
             QuickLogger.Debug("GetPrefabs");
-            AssetBundle assetBundle = AssetHelper.Asset("FCS_ARSSeaBreeze", "arsseabreezefcs32modbundle");
+            AssetBundle assetBundle = AssetHelper.Asset(Mod.ModName, Mod.BundleName);
 
             //If the result is null return false.
             if (assetBundle == null)
@@ -61,6 +71,7 @@ namespace ARS_SeaBreezeFCS32
         public static AssetBundle Bundle { get; set; }
 
         public static AssetBundle GlobalBundle { get; set; }
+        public static ModConfiguration Configuration { get; private set; }
     }
 }
 

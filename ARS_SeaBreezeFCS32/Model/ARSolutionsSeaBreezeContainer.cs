@@ -17,8 +17,8 @@ namespace ARS_SeaBreezeFCS32.Model
         private const int ContainerWidth = 6;
         private const int ContainerHeight = 8;
         private readonly ChildObjectIdentifier _containerRoot = null;
+        public bool IsFull => NumberOfItems >= QPatch.Configuration.Config.StorageLimit;
 
-        public bool IsFull { get; }
         public int NumberOfItems => FridgeItems.Count;
         public void AttemptToTakeItem(TechType techType)
         {
@@ -235,6 +235,11 @@ namespace ARS_SeaBreezeFCS32.Model
         internal void AddItemFromExternal(InventoryItem item)
         {
             AddItem(item);
+        }
+
+        internal bool HasRoomFor(int amount)
+        {
+            return NumberOfItems + amount <= QPatch.Configuration.Config.StorageLimit;
         }
     }
 }

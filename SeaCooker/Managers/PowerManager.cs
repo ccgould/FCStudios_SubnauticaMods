@@ -106,12 +106,17 @@ namespace AE.SeaCooker.Managers
             return Mathf.Round(EnergyConsumptionPerSecond * 60) / 10f;
         }
 
+        internal PowerRelay CurrentRelay()
+        {
+            return _connectedRelay;
+        }
         private void UpdatePowerRelay()
         {
             PowerRelay relay = PowerSource.FindRelay(_mono.transform);
             if (relay != null && relay != _connectedRelay)
             {
                 _connectedRelay = relay;
+
                 QuickLogger.Debug("PowerRelay found at last!");
             }
             else
