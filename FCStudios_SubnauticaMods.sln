@@ -57,6 +57,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FabCraft", "FabCraft\FabCra
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeaCooker", "SeaCooker\SeaCooker.csproj", "{17C65A8B-851E-4B42-B946-EC63FF3165E9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiniFountainFilter", "MiniFountainFilter\MiniFountainFilter.csproj", "{3E004A5F-6506-40FF-B4A4-6F2E330E07F5}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		FCSCommon\FCSCommon.projitems*{20e443f4-3b38-48f3-bbf2-7cbbf4090beb}*SharedItemsImports = 4
@@ -141,6 +143,10 @@ Global
 		{17C65A8B-851E-4B42-B946-EC63FF3165E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{17C65A8B-851E-4B42-B946-EC63FF3165E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{17C65A8B-851E-4B42-B946-EC63FF3165E9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E004A5F-6506-40FF-B4A4-6F2E330E07F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E004A5F-6506-40FF-B4A4-6F2E330E07F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E004A5F-6506-40FF-B4A4-6F2E330E07F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E004A5F-6506-40FF-B4A4-6F2E330E07F5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -163,6 +169,7 @@ Global
 		{E20FD0E3-6E76-4E24-A93B-83DA07DEFEF8} = {6E36DA48-6498-4C58-8BF6-85923E5F6460}
 		{3B9555C0-92BA-4604-82FB-D08B2F4A48CB} = {AA6F6314-8329-4CB3-BD62-2D210717D94B}
 		{17C65A8B-851E-4B42-B946-EC63FF3165E9} = {AA6F6314-8329-4CB3-BD62-2D210717D94B}
+		{3E004A5F-6506-40FF-B4A4-6F2E330E07F5} = {AA6F6314-8329-4CB3-BD62-2D210717D94B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {73E25955-B56F-4639-89F3-4CE5F3EBD59D}

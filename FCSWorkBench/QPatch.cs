@@ -8,6 +8,7 @@ using FCSTechFabricator.Mono;
 using FCSTechFabricator.Mono.DeepDriller;
 using FCSTechFabricator.Mono.DeepDriller.Materials;
 using FCSTechFabricator.Mono.MarineTurbine;
+using FCSTechFabricator.Mono.MiniFountainFilter;
 using FCSTechFabricator.Mono.PowerStorage;
 using FCSTechFabricator.Mono.SeaBreeze;
 using FCSTechFabricator.Mono.SeaCooker;
@@ -128,6 +129,11 @@ namespace FCSTechFabricator
             FCSTechFabricatorBuildable.AddTechType(sbKit.TechType, sbKit.StepsToFabricatorTab);
             QuickLogger.Debug($"Patched {sbKit.FriendlyName}");
 
+            var mffKit = new MiniFountainFilterCraftable();
+            mffKit.Patch();
+            FCSTechFabricatorBuildable.AddTechType(mffKit.TechType, mffKit.StepsToFabricatorTab);
+            QuickLogger.Debug($"Patched {mffKit.FriendlyName}");
+
             var exKit = new ExStorageKitBuildable();
             exKit.Patch();
             FCSTechFabricatorBuildable.AddTechType(exKit.TechType, exKit.StepsToFabricatorTab);
@@ -175,6 +181,19 @@ namespace FCSTechFabricator
 
             Bundle = assetBundle;
 
+            //We have found the asset bundle and now we are going to continue by looking for the model.
+            ColorItem = Bundle.LoadAsset<GameObject>("ColorItem");
+
+            //If the prefab isn't null lets add the shader to the materials
+            if (ColorItem != null)
+            {
+                QuickLogger.Debug($"ColorItem Prefab Found!");
+            }
+            else
+            {
+                QuickLogger.Error($"UnitContainerKit Prefab Not Found!");
+                return false;
+            }
 
             //We have found the asset bundle and now we are going to continue by looking for the model.
             Kit = Bundle.LoadAsset<GameObject>("UnitContainerKit");
@@ -284,6 +303,8 @@ namespace FCSTechFabricator
 
             return true;
         }
+
+        public static GameObject ColorItem { get; set; }
 
         public static GameObject SeaAlienGasTank { get; private set; }
 

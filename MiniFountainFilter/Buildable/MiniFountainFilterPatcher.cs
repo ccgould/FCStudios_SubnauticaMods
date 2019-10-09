@@ -1,23 +1,23 @@
-﻿using AE.SeaCooker.Configuration;
-using AE.SeaCooker.Managers;
-using AE.SeaCooker.Mono;
+﻿using AE.MiniFountainFilter.Configuration;
+using AE.MiniFountainFilter.Managers;
+using AE.MiniFountainFilter.Mono;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-namespace AE.SeaCooker.Buildable
+namespace AE.MiniFountainFilter.Buildable
 {
     using SMLHelper.V2.Assets;
-    using System;
-    internal partial class SeaCookerBuildable : Buildable
+    internal partial class MiniFountainFilterBuildable : Buildable
     {
-        private static readonly SeaCookerBuildable Singleton = new SeaCookerBuildable();
+        private static readonly MiniFountainFilterBuildable Singleton = new MiniFountainFilterBuildable();
 
         //FCSAESeaCooker
-        public SeaCookerBuildable() : base(Mod.ClassID, Mod.FriendlyName, Mod.Description)
+        public MiniFountainFilterBuildable() : base(Mod.ClassID, Mod.FriendlyName, Mod.Description)
         {
             OnFinishedPatching += AdditionalPatching;
         }
@@ -51,7 +51,7 @@ namespace AE.SeaCooker.Buildable
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(TechTypeHelpers.GetTechType("SeaCookerBuildableKit_SC"), 1)
+                    new Ingredient(TechTypeHelpers.GetTechType("MiniFountainFilterKit_MFF"), 1)
                 }
             };
             return customFabRecipe;
@@ -60,7 +60,7 @@ namespace AE.SeaCooker.Buildable
         public override TechGroup GroupForPDA { get; } = TechGroup.InteriorModules;
         public override TechCategory CategoryForPDA { get; } = TechCategory.InteriorModule;
 
-        internal static void PatchSMLHelper()
+        public static void PatchSMLHelper()
         {
             if (!Singleton.GetPrefabs())
             {
@@ -86,13 +86,6 @@ namespace AE.SeaCooker.Buildable
                 skyApplier.renderers = model.GetComponentsInChildren<MeshRenderer>();
                 skyApplier.anchorSky = Skies.Auto;
 
-                //Shader shader = Shader.Find("MarmosetUBER");
-                //Renderer[] renderers = _prefab.GetComponentsInChildren<Renderer>();
-                //foreach (Renderer renderer in renderers)
-                //{
-                //    renderer.material.shader = shader;
-                //}
-
                 //========== Allows the building animation and material colors ==========// 
 
                 QuickLogger.Debug("Adding Constructible");
@@ -114,9 +107,9 @@ namespace AE.SeaCooker.Buildable
 
                 _prefab.AddComponent<AnimationManager>();
                 _prefab.AddComponent<TechTag>().type = Singleton.TechType;
-                //_prefab.AddComponent<PlayerInteraction>();
+                _prefab.AddComponent<PlayerInteraction>();
                 _prefab.AddComponent<FMOD_CustomLoopingEmitter>();
-                _prefab.AddComponent<SeaCookerController>();
+                _prefab.AddComponent<MiniFountainFilterController>();
             }
         }
     }

@@ -58,7 +58,7 @@ namespace AE.SeaCooker.Mono
             }
 
             _habitat = gameObject?.transform?.parent?.gameObject;
-            GetTurbines();
+            GetSeaBreezes();
             //AnimationManager.SetBoolHash(IsRunningHash, true);
         }
 
@@ -245,7 +245,7 @@ namespace AE.SeaCooker.Mono
         /// <summary>
         /// Gets all the turbines in the base
         /// </summary>
-        private void GetTurbines()
+        private void GetSeaBreezes()
         {
             //Clear the list
             SeaBreezes.Clear();

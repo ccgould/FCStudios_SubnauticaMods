@@ -217,9 +217,14 @@ namespace ExStorageDepot.Mono.Managers
 
                         RemoveStoredItem(item, removeType);
                     }
+                    else
+                    {
+                        GameObject.Destroy(pickup); // If anything break with the retrieval system remove this
+                    }
                 }
                 else
                 {
+                    GameObject.Destroy(pickup); // If anything break with the retrieval system remove this
                     break;
                 }
             }
