@@ -67,13 +67,13 @@ namespace AE.MiniFountainFilter.Managers
             {
                 RemoveWater(playerWaterRequest);
                 manager.AddWaterToPlayer(Mathf.Abs(playerWaterRequest));
-                QuickLogger.Debug($"Tank Level: {TankLevel} || Tank Level {playerWaterRequest}", true);
+                QuickLogger.Debug($"Tank Level: {TankLevel} || Player Water Request {playerWaterRequest}", true);
 
                 return;
             }
 
             var playerO2RequestRemainder = Mathf.Min(TankLevel, playerWaterRequest);
-            RemoveWater(TankLevel - playerO2RequestRemainder);
+            RemoveWater(playerO2RequestRemainder);
             manager.AddWaterToPlayer(Mathf.Abs(playerO2RequestRemainder));
             QuickLogger.Debug($"Tank Level: {TankLevel} || Player Request Remainder {playerO2RequestRemainder}", true);
         }
