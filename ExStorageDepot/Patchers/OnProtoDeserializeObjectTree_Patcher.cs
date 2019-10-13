@@ -18,11 +18,12 @@ namespace ExStorageDepot.Patchers
             QuickLogger.Debug("OnProtoDeserializeObjectTree()");
             PrefabIdentifier pid = __instance.gameObject.GetComponent<PrefabIdentifier>();
 
-            //QuickLogger.Debug($"PID {pid.Id} || Parent {__instance.gameObject.transform.parent} || PGO {__instance.gameObject.transform.parent.gameObject.name}");
 
             if (pid != null && __instance.gameObject.transform.parent != null &&
                 __instance.gameObject.transform.parent.gameObject != null)
             {
+                QuickLogger.Debug($"PID {pid?.Id} || Parent {__instance?.gameObject.transform.parent} || PGO {__instance.gameObject.transform.parent.gameObject.name}");
+
                 GameObject parentGO = __instance.gameObject.transform.parent.gameObject;
                 PrefabIdentifier pid2 = parentGO.GetComponent<PrefabIdentifier>();
 

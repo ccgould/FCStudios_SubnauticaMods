@@ -75,6 +75,7 @@
     <Compile Include="Display\PaginatorButton.cs" />
     <Compile Include="Enumerators\BulkMultipliers.cs" />
     <Compile Include="Enumerators\ItemType.cs" />
+    <Compile Include="Enumerators\OperationMode.cs" />
     <Compile Include="Enumerators\RemovalType.cs" />
     <Compile Include="Helpers\InventoryHelpers.cs" />
     <Compile Include="Model\BatteryData.cs" />

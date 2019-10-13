@@ -116,7 +116,7 @@ namespace ExStorageDepot.Mono
             }
             _saveData.Id = id;
             _saveData.UnitName = NameController.GetCurrentName();
-            _saveData.StorageItems = Storage.GetTrackedItems();
+            //_saveData.StorageItems = Storage.GetTrackedItems();
             _saveData.Multiplier = BulkMultiplier;
             saveDataList.Entries.Add(_saveData);
         }

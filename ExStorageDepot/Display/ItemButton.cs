@@ -1,5 +1,4 @@
-﻿using ExStorageDepot.Enumerators;
-using FCSCommon.Utilities;
+﻿using FCSCommon.Utilities;
 using System;
 using UnityEngine.EventSystems;
 
@@ -9,7 +8,7 @@ namespace ExStorageDepot.Display
     {
         private TechType type = TechType.None;
         public int Amount { set; get; }
-        public Action<TechType, RemovalType> OnButtonClick;
+        public Action<TechType> OnButtonClick;
         public TechType Type
         {
             set
@@ -27,7 +26,7 @@ namespace ExStorageDepot.Display
             QuickLogger.Debug($"Clicked on ItemButton", true);
             if (IsHovered && type != TechType.None)
             {
-                OnButtonClick?.Invoke(type, RemovalType.Click);
+                OnButtonClick?.Invoke(type);
             }
         }
     }

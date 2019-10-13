@@ -1,6 +1,5 @@
 ﻿using ExStorageDepot.Buildable;
 using ExStorageDepot.Enumerators;
-using ExStorageDepot.Helpers;
 using ExStorageDepot.Model;
 using FCSCommon.Utilities;
 using System;
@@ -14,8 +13,9 @@ namespace ExStorageDepot.Mono.Managers
 {
     internal class ExStorageDepotStorageManager : MonoBehaviour
     {
-        private readonly List<ItemData> _trackedItems = new List<ItemData>();
+        //private readonly List<ItemData> _trackedItems = new List<ItemData>();
         internal Dictionary<TechType, int> ItemsDictionary { get; } = new Dictionary<TechType, int>();
+
         internal List<TechType> BannedTechTypes = new List<TechType>
         {
             TechType.RabbitrayEggUndiscovered,
@@ -37,7 +37,7 @@ namespace ExStorageDepot.Mono.Managers
 
         };
 
-        public bool IsEmpty => _trackedItems != null && _trackedItems.Count <= 0;
+        public bool IsEmpty => _container != null && _container.container.count <= 0;
         internal Action<TechType> OnAddItem;
         internal Action<TechType> OnRemoveItem;
         private ChildObjectIdentifier _containerRoot;
@@ -51,7 +51,7 @@ namespace ExStorageDepot.Mono.Managers
         private int _containerWidth = 1;
         private readonly int _containerHeight = QPatch.Configuration.Config.MaxStorage;
         private RemovalType _removalType;
-        private int ItemTotalCount => _trackedItems.Count + _dumpContainer.count;
+        private int ItemTotalCount => _container.container.count + _dumpContainer.count;
 
         internal void Initialize(ExStorageDepotController mono)
         {
@@ -91,21 +91,11 @@ namespace ExStorageDepot.Mono.Managers
             InvokeRepeating("UpdateStorageDisplayCount", 1, 0.5f);
         }
 
-        private void ContainerOnRemoveItem(InventoryItem item)
-        {
-            QuickLogger.Debug($"Item Removed {item.item.name}");
-            QuickLogger.Debug($"Removal Type {_removalType}");
-
-            if (_removalType != RemovalType.Click)
-            {
-                AttemptToTakeItem(item.item.GetTechType(), RemovalType.Craft);
-                _removalType = RemovalType.None;
-            }
-        }
-
         private void ContainerOnAddItem(InventoryItem item)
         {
-            //QuickLogger.Debug($"Item Added {item.item.name}");
+            QuickLogger.Debug($"Item Added {item.item.name}");
+
+            UpdateScreen(item.item.GetTechType());
         }
 
         private void UpdateStorageDisplayCount()
@@ -116,29 +106,29 @@ namespace ExStorageDepot.Mono.Managers
 
         private bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
         {
-            var food = pickupable.GetComponent<Eatable>();
+            //var food = pickupable.GetComponent<Eatable>();
 
-            if (food != null && food.decomposes && pickupable.GetTechType() != TechType.CreepvinePiece)
-            {
-                QuickLogger.Info(ExStorageDepotBuildable.FoodNotAllowed(), true);
-                return false;
-            }
+            //if (food != null && food.decomposes && pickupable.GetTechType() != TechType.CreepvinePiece)
+            //{
+            //    QuickLogger.Info(ExStorageDepotBuildable.FoodNotAllowed(), true);
+            //    return false;
+            //}
 
-            if (pickupable.gameObject?.GetComponent<EnergyMixin>() != null)
-            {
-                QuickLogger.Info(ExStorageDepotBuildable.NoPlayerTools(), true);
-                return false;
-            }
+            //if (pickupable.gameObject?.GetComponent<EnergyMixin>() != null)
+            //{
+            //    QuickLogger.Info(ExStorageDepotBuildable.NoPlayerTools(), true);
+            //    return false;
+            //}
 
-            if (BannedTechTypes.Contains(pickupable.GetTechType()))
-            {
-                QuickLogger.Info(ExStorageDepotBuildable.NoUndiscorveredEggsMessage(), true);
-                return false;
-            }
+            //if (BannedTechTypes.Contains(pickupable.GetTechType()))
+            //{
+            //    QuickLogger.Info(ExStorageDepotBuildable.NoUndiscorveredEggsMessage(), true);
+            //    return false;
+            //}
 
             var containerTotal = ItemTotalCount + 1;
 
-            if (_trackedItems.Count >= _maxItems || containerTotal > _maxItems)
+            if (_container.container.count >= _maxItems || containerTotal > _maxItems)
             {
                 QuickLogger.Info(ExStorageDepotBuildable.NoMoreSpace(), true);
                 return false;
@@ -148,133 +138,67 @@ namespace ExStorageDepot.Mono.Managers
             return true;
         }
 
-        internal bool CanHoldItem(int amount)
-        {
-            return _trackedItems.Count + amount <= _maxItems;
-        }
-
-        public void SetMultiplier(int value)
-        {
-            _multiplier = value == 0 ? 1 : value;
-        }
-
-        public void OpenStorage()
-        {
-            QuickLogger.Debug($"Dump Button Clicked", true);
-
-            Player main = Player.main;
-            PDA pda = main.GetPDA();
-            Inventory.main.SetUsedStorage(_dumpContainer, false);
-            pda.Open(PDATab.Inventory, null, new PDA.OnClose(OnPDACloseMethod), 4f);
-            _mono.AnimationManager.ToggleDriveState();
-        }
-
         private void OnPDACloseMethod(PDA pda)
         {
             _mono.AnimationManager.ToggleDriveState();
             StartCoroutine(StoreItems());
         }
 
-        internal void AttemptToTakeItem(TechType techType, RemovalType removeType = RemovalType.Click)
-        {
-            if (removeType == RemovalType.Craft)
-            {
-                var item = _trackedItems.FirstOrDefault(x => x.TechType == techType);
-                if (item == null) return;
-
-                _removalType = RemovalType.Craft;
-
-                if (ItemsDictionary.ContainsKey(item.TechType))
-                {
-                    RemoveStoredItem(item, removeType);
-                    return;
-                }
-            }
-
-            QuickLogger.Debug($"Attempting to take item {techType}", true);
-
-            var amountToRemove = 1 * _multiplier;
-
-            for (int i = 0; i < amountToRemove; i++)
-            {
-                var item = _trackedItems.FirstOrDefault(x => x.TechType == techType);
-                if (item == null) return;
-                Pickupable pickup = InventoryHelpers.ConvertToPickupable(item);
-
-                if (pickup == null)
-                {
-                    QuickLogger.Error($"Attempting to get prefab failed canceling attempt to take item.");
-                    return;
-                }
-
-                QuickLogger.Debug($"Attempting to take ({amountToRemove}) {techType}");
-
-                if (ItemsDictionary.ContainsKey(techType))
-                {
-                    if (Inventory.main.Pickup(pickup))
-                    {
-                        CrafterLogic.NotifyCraftEnd(Player.main.gameObject, techType);
-
-                        RemoveStoredItem(item, removeType);
-                    }
-                    else
-                    {
-                        GameObject.Destroy(pickup); // If anything break with the retrieval system remove this
-                    }
-                }
-                else
-                {
-                    GameObject.Destroy(pickup); // If anything break with the retrieval system remove this
-                    break;
-                }
-            }
-        }
-
-        private void RemoveStoredItem(ItemData item, RemovalType removeType)
-        {
-            _trackedItems.Remove(item);
-
-            // Moved here to prevent display item premature removal
-            if (ItemsDictionary[item.TechType] > 1)
-            {
-                ItemsDictionary[item.TechType] -= 1;
-            }
-            else
-            {
-                ItemsDictionary.Remove(item.TechType);
-            }
-
-            if (removeType == RemovalType.Click)
-            {
-                _removalType = RemovalType.Click;
-                _container.container.RemoveItem(item.TechType);
-                _removalType = RemovalType.None;
-            }
-
-            _mono.Display.ItemModified(item.TechType, GetItemCount(item.TechType));
-        }
-
         private IEnumerator StoreItems()
         {
             QuickLogger.Debug($"Store Items Dump Count: {_dumpContainer.count}");
+
             var amount = _dumpContainer.count;
 
             for (int i = amount - 1; i > -1; i--)
             {
                 QuickLogger.Debug($"Number of iteration: {i}");
-                if (_trackedItems.Count < _maxItems)
+                if (_container.container.count < _maxItems)
                 {
-                    AddItem(InventoryHelpers.CovertToItemData(_dumpContainer.ElementAt(i), true));
+                    AddItem(_dumpContainer.ElementAt(i));
                 }
             }
+
             QuickLogger.Debug($"Items Container Count: {_container.container.count}");
 
             yield return null;
         }
 
+        private void AddItem(InventoryItem item)
+        {
+            if (_container.container.count < _maxItems)
+            {
+                item.SetGhostDims(1, 1);
+                _container.container.UnsafeAdd(item);
+                _dumpContainer.RemoveItem(item.item);
+            }
+        }
+
+
+        private void UpdateScreen(TechType techType, OperationMode mode = OperationMode.Addition)
+        {
+            switch (mode)
+            {
+                case OperationMode.Addition when ItemsDictionary.ContainsKey(techType):
+                    ItemsDictionary[techType] += 1;
+                    break;
+                case OperationMode.Addition:
+                    ItemsDictionary.Add(techType, 1);
+                    break;
+                case OperationMode.Removal when ItemsDictionary.ContainsKey(techType):
+                    ItemsDictionary[techType] -= 1;
+                    break;
+                case OperationMode.Removal:
+                    ItemsDictionary.Remove(techType);
+                    break;
+            }
+
+            _mono.Display.ItemModified(techType, GetItemCount(techType));
+        }
+
         private void AddItem(ItemData itemData)
         {
-            _trackedItems.Add(itemData);
+            //_trackedItems.Add(itemData);
 
             if (ItemsDictionary.ContainsKey(itemData.TechType))
             {
@@ -285,22 +209,29 @@ namespace ExStorageDepot.Mono.Managers
                 ItemsDictionary.Add(itemData.TechType, 1);
             }
 
-            var go = GameObject.Instantiate(CraftData.GetPrefabForTechType(itemData.TechType));
-            var newInventoryItem = new InventoryItem(go.GetComponent<Pickupable>().Pickup(false));
-            newInventoryItem.SetGhostDims(1, 1);
-            _container.container.UnsafeAdd(newInventoryItem);
-            _mono.Display.ItemModified(itemData.TechType, GetItemCount(itemData.TechType));
+
+            var prefab = CraftData.GetPrefabForTechType(itemData.TechType, false);
+
+
+            if (prefab != null)
+            {
+                var go = GameObject.Instantiate(prefab);
+                var newInventoryItem = new InventoryItem(go.GetComponent<Pickupable>().Pickup(false));
+                newInventoryItem.SetGhostDims(1, 1);
+                _container.container.UnsafeAdd(newInventoryItem);
+                _mono.Display.ItemModified(itemData.TechType, GetItemCount(itemData.TechType));
+            }
         }
 
         internal int GetItemCount(TechType techType)
         {
-            var items = _trackedItems.Where(x => x.TechType == techType);
+            var items = _container.container.Where(x => x.item.GetTechType() == techType);
             return items.Count();
         }
 
         internal int GetTotalCount()
         {
-            return _trackedItems.Count;
+            return _container.container.count;
         }
 
         internal void LoadFromSave(List<ItemData> storageItems)
@@ -309,40 +240,118 @@ namespace ExStorageDepot.Mono.Managers
             {
                 foreach (ItemData itemData in storageItems)
                 {
+                    QuickLogger.Debug($"Load from Save {itemData.TechType}");
                     AddItem(itemData);
                 }
             }
         }
 
-        internal List<ItemData> GetTrackedItems()
-        {
-            return _trackedItems;
-        }
+        //internal List<ItemData> GetTrackedItems()
+        //{
+        //    return _trackedItems;
+        //}
 
         internal void ForceAddItem(InventoryItem item)
         {
-            AddItem(InventoryHelpers.CovertToItemData(item, true));
+            AddItem(item);
         }
 
         internal bool DoesItemExist(TechType item)
         {
-            var result = _trackedItems.SingleOrDefault(x => x.TechType == item);
+            var result = _container.container.SingleOrDefault(x => x.item.GetTechType() == item);
 
             return result != null;
         }
 
-        public InventoryItem ForceRemoveItem(TechType item)
+        internal InventoryItem ForceRemoveItem(TechType item)
         {
-            return _trackedItems.SingleOrDefault(x => x.TechType == item)?.InventoryItem;
+            return _container.container.SingleOrDefault(x => x.item.GetTechType() == item);
         }
+
+        internal bool CanHoldItem(int amount)
+        {
+            return _container.container.count + amount <= _maxItems;
+        }
+
+        internal void SetMultiplier(int value)
+        {
+            _multiplier = value == 0 ? 1 : value;
+        }
+
+        internal void OpenStorage()
+        {
+            QuickLogger.Debug($"Dump Button Clicked", true);
+
+            Player main = Player.main;
+            PDA pda = main.GetPDA();
+            Inventory.main.SetUsedStorage(_dumpContainer, false);
+            pda.Open(PDATab.Inventory, null, new PDA.OnClose(OnPDACloseMethod), 4f);
+            _mono.AnimationManager.ToggleDriveState();
+        }
+
+        internal void AttemptToTakeItem(TechType techType)
+        {
+            var amount = _container.container.GetCount(techType);
+
+            QuickLogger.Debug($"Container returned {amount} item/s for TechType {techType}");
+
+
+            if (amount > 0)
+            {
+                QuickLogger.Debug($"Attempting to take {_multiplier} item/s");
+
+                for (int i = 0; i < _multiplier; i++)
+                {
+                    Pickupable pickup = _container.container.RemoveItem(techType);
+
+                    if (pickup == null)
+                    {
+                        QuickLogger.Debug($"There are 0 {techType} in the container while using first or default Current Amount of {techType} is: {_container.container.GetCount(techType)}", true);
+                        return;
+                    }
+
+                    if (Inventory.main.Pickup(pickup))
+                    {
+                        CrafterLogic.NotifyCraftEnd(Player.main.gameObject, techType);
+                    }
+                }
+            }
+            else
+            {
+                QuickLogger.Debug($"There are 0 {techType} in the container.", true);
+            }
+        }
+
+        private void ContainerOnRemoveItem(InventoryItem item)
+        {
+            var techType = item.item.GetTechType();
+            QuickLogger.Debug($"Recently {techType} was removed from the container");
+
+            int i = 0;
+
+            foreach (InventoryItem inventoryItem in _container.container)
+            {
+                QuickLogger.Debug($"Inventory Item {inventoryItem.item.GetTechType()} index {i}");
+                i++;
+            }
+
+            if (_container.container.GetCount(techType) <= 0)
+            {
+                ItemsDictionary.Remove(techType);
+            }
+
+            UpdateScreen(techType, OperationMode.Removal);
+
+        }
+
 
         private void OnDestroy()
         {
-            if (_container != null)
-            {
-                QuickLogger.Debug($"Clearing Container");
-                _container.container.Clear();
-            }
+            //if (_container != null)
+            //{
+            //    QuickLogger.Debug($"Clearing Container");
+            //    _container.container.Clear();
+            //}
 
             StopCoroutine(StoreItems());
         }

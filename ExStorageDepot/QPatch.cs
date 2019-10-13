@@ -1,6 +1,7 @@
 ﻿using ExStorageDepot.Buildable;
 using ExStorageDepot.Configuration;
 using FCSCommon.Utilities;
+using Harmony;
 using Oculus.Newtonsoft.Json;
 using System;
 using System.IO;
@@ -28,8 +29,8 @@ namespace ExStorageDepot
 
                 ExStorageDepotBuildable.PatchHelper();
 
-                //var harmony = HarmonyInstance.Create("com.exstoragedepot.fcstudios");
-                //harmony.PatchAll(Assembly.GetExecutingAssembly());
+                var harmony = HarmonyInstance.Create("com.exstoragedepot.fcstudios");
+                harmony.PatchAll(Assembly.GetExecutingAssembly());
 
                 QuickLogger.Info("Finished patching");
             }
