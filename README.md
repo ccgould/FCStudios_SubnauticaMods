@@ -1,4 +1,5 @@
 
+
 ﻿
 <p align="center">
   <img width="100" height="100" src="https://i.imgur.com/DHjcUQS.png">
@@ -26,6 +27,8 @@ Here is a Chart of all the mods and the place to download on NexusMods.
 |Alterra Storage Solutions Ex-Storage Depot|A mod that allows you to store items outside in a large storage unit.|[#320](https://www.nexusmods.com/subnautica/mods/320)
 |Alterra Industrial Deep Driller|A mod the allows you to drill for resources in different biomes.|[#319](https://www.nexusmods.com/subnautica/mods/319)
 |Alterra Refrigeration Solutions SeaBreeze|A refrigeration mod that freezes food and prevents decay while in the fridge.|[#318](https://www.nexusmods.com/subnautica/mods/318)
+|Alterra Electrical Mini Fountain Filter|This mod is a smaller version of the water filtration machine that builds on the wall and allows you to drink water directly from it.|[#335](https://www.nexusmods.com/subnautica/mods/335)
+|Alterra Electrical Sea Cooker|This mod is a smaller version of the water filtration machine that builds on the wall and allows you to drink water directly from it.|[#336](https://www.nexusmods.com/subnautica/mods/336)
 
 
 # Mods in Collaboration/Not Included in repo
@@ -35,3 +38,4 @@ Here is a Chart of all the mods and the place to download on NexusMods.
 |--|--|--|
 | CyclopsNuclearReactor  | The nuclear reactor the Cyclops always deserved! Power up your Cyclops today in whole new ways! Enhance with upgrades to maximize energy output.   <ul><li>A collaberation between FCStudios and [PrimeSonic](https://www.nexusmods.com/subnautica/users/1733280) | [#241](https://www.nexusmods.com/subnautica/mods/241) |
 | IonCubeGenerator|Make your own ion cubes right at home!<ul><li>A collaberation between FCStudios and [PrimeSonic](https://www.nexusmods.com/subnautica/users/1733280) |[#242](https://www.nexusmods.com/subnautica/mods/242)
+
