@@ -40,7 +40,7 @@ namespace AE.MiniFountainFilter.Managers
         internal void AddWater(float amount)
         {
             if (TankLevel >= _tankCapacity) return;
-            TankLevel = Mathf.Clamp(TankLevel + amount, 0, _tankCapacity);
+            TankLevel = Mathf.Clamp(TankLevel + (amount * DayNightCycle.main.deltaTime), 0, _tankCapacity);
             OnTankUpdate?.Invoke();
         }
 
@@ -68,7 +68,6 @@ namespace AE.MiniFountainFilter.Managers
                 RemoveWater(playerWaterRequest);
                 manager.AddWaterToPlayer(Mathf.Abs(playerWaterRequest));
                 QuickLogger.Debug($"Tank Level: {TankLevel} || Player Water Request {playerWaterRequest}", true);
-
                 return;
             }
 
@@ -105,6 +104,11 @@ namespace AE.MiniFountainFilter.Managers
             {
                 AddWater(QPatch.Configuration.Config.WaterPerSecond);
             }
+        }
+
+        internal bool HasEnoughWater(float amount)
+        {
+            return _tankLevel >= amount;
         }
     }
 }

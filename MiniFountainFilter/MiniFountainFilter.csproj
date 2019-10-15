@@ -79,7 +79,6 @@
     <Compile Include="Managers\ColorManager.cs" />
     <Compile Include="Managers\MFFDisplayManager.cs" />
     <Compile Include="Managers\MFFStorageManager.cs" />
-    <Compile Include="Managers\PlayerInteraction.cs" />
     <Compile Include="Managers\PlayerManager.cs" />
     <Compile Include="Managers\PowerManager.cs" />
     <Compile Include="Managers\TankManager.cs" />

@@ -10,21 +10,18 @@ namespace AE.MiniFountainFilter.Managers
 {
     internal class MFFStorageManager
     {
-        public bool startWithMedKit;
         private MiniFountainFilterController _mono;
         private Func<bool> _isConstructed;
         private ChildObjectIdentifier _containerRoot;
         private ItemsContainer _container;
         private readonly int _containerWidth = QPatch.Configuration.Config.StorageWidth;
         private readonly int _containerHeight = QPatch.Configuration.Config.StorageHeight;
-        private static TechType _bottleTechType = QPatch.BottleTechType; //QPatch.Configuration.Config.BottleTechType.ToTechType();
+        private static TechType _bottleTechType = QPatch.BottleTechType;
         private Vector2int _bottleSize;
         private readonly GameObject _bottle = CraftData.GetPrefabForTechType(_bottleTechType);
         private int MaxContainerSlots => _containerHeight * _containerWidth;
-        private const float SpawnInterval = 840f;
-        private float _timeSpawnBottle = -1f;
-        private float _progress;
         private float _bottleWaterContent;
+        private float _passedTime;
 
         internal int NumberOfBottles
         {
@@ -99,34 +96,34 @@ namespace AE.MiniFountainFilter.Managers
                 MiniFountainFilterBuildable.StorageLabel(), null);
 
             _container.isAllowedToAdd += IsAllowedToAddContainer;
-
-            _mono.OnMonoUpdate += OnMonoUpdate;
-
-            DayNightCycle main = DayNightCycle.main;
-
-            if (_timeSpawnBottle < 0.0 && main)
-            {
-                _timeSpawnBottle = (float)(main.timePassed + (!startWithMedKit ? SpawnInterval : 0.0));
-            }
+            _container.onRemoveItem += ContainerOnRemoveItem;
         }
 
-        private void OnMonoUpdate()
+        internal void AttemptSpawnBottle()
         {
             if (!_mono.GetIsOperational() || !QPatch.Configuration.Config.AutoGenerateMode) return;
 
-            if (IsFull()) return;
+            if (IsFull() || !_mono.TankManager.HasEnoughWater(_bottleWaterContent)) return;
+            
 
             DayNightCycle main = DayNightCycle.main;
 
-            float a = _timeSpawnBottle - SpawnInterval;
-            _progress = Mathf.InverseLerp(a, a + SpawnInterval, DayNightCycle.main.timePassedAsFloat);
+            _passedTime += DayNightCycle.main.deltaTime;
 
-            if (main.timePassed > _timeSpawnBottle)
+            if(_passedTime >= 2f)
             {
+                _mono.TankManager.RemoveWater(_bottleWaterContent);
                 NumberOfBottles++;
+                _passedTime = 0;
             }
         }
 
+
+        private void ContainerOnRemoveItem(InventoryItem item)
+        {
+            OnWaterRemoved?.Invoke();
+        }
+        
         private bool IsAllowedToAddContainer(Pickupable pickupable, bool verbose)
         {
             return false;
@@ -164,7 +161,7 @@ namespace AE.MiniFountainFilter.Managers
 
         private void RemoveSingleBottle()
         {
-            IList<InventoryItem> bottle = _container.GetItems(TechType.PrecursorIonCrystal);
+            IList<InventoryItem> bottle = _container.GetItems(_bottleTechType);
             _container.RemoveItem(bottle[0].item);
             OnWaterRemoved?.Invoke();
         }
@@ -174,7 +171,6 @@ namespace AE.MiniFountainFilter.Managers
             var bottle = GameObject.Instantiate(_bottle);
             var newInventoryItem = new InventoryItem(bottle.GetComponent<Pickupable>().Pickup(false));
             _container.UnsafeAdd(newInventoryItem);
-            _timeSpawnBottle = DayNightCycle.main.timePassedAsFloat + SpawnInterval;
             OnWaterAdded?.Invoke();
         }
 
@@ -195,22 +191,7 @@ namespace AE.MiniFountainFilter.Managers
                 }
             }
         }
-
-        internal float GetTimeToSpawn()
-        {
-            return _timeSpawnBottle;
-        }
-
-        internal void SetTimeToSpawn(float value)
-        {
-            _timeSpawnBottle = value;
-        }
-
-        internal float GetProgress()
-        {
-            return _progress;
-        }
-
+        
         public float ContainerPercentage()
         {
             return (float)_container.count / MaxContainerSlots;

@@ -12,7 +12,6 @@ namespace AE.MiniFountainFilter.Configuration
         [JsonProperty] internal int ContainerAmount { get; set; }
         [JsonProperty] internal float TankLevel { get; set; }
         [JsonProperty] internal ColorVec4 BodyColor { get; set; }
-        [JsonProperty] internal float TimeToSpawn { get; set; }
         [JsonProperty] internal bool IsInSub { get; set; }
     }
 

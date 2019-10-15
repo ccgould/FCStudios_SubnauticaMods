@@ -230,8 +230,6 @@ namespace AE.MiniFountainFilter.Managers
             //var versionLbl = version.GetComponent<Text>();
             //versionLbl.text = $"{MiniFountainFilterBuildable.Version()}: {QPatch.Version}";
 
-
-
             return true;
         }
 
@@ -285,8 +283,6 @@ namespace AE.MiniFountainFilter.Managers
             _colorPage.ColorPageNumber = _paginator;
             _colorPage.Initialize();
             StartCoroutine(CompleteSetup());
-
-            InvokeRepeating(nameof(UpdateScreen), 0, 0.5f);
         }
 
         private void OnTankUpdate()
@@ -314,16 +310,7 @@ namespace AE.MiniFountainFilter.Managers
             _button2Progress.fillAmount = _mono.StorageManager.ContainerPercentage();
             _button2ProgressNumber.text = $"{_mono.StorageManager.NumberOfBottles} {MiniFountainFilterBuildable.Bottles()}";
         }
-
-        private void UpdateScreen()
-        {
-            //_oxPreloaderBar.fillAmount = _mono.OxygenManager.GetO2LevelPercentage();
-            //_oxPreloaderLBL.text = $"{Mathf.RoundToInt(_mono.OxygenManager.GetO2LevelPercentageFull())}%";
-            //_healthPreloaderBar.fillAmount = _mono.HealthManager.GetHealthPercentage();
-            //_healthPreloaderlbl.text = $"{Mathf.RoundToInt(_mono.HealthManager.GetHealthPercentageFull())}%";
-            //_powerUsage.text = $"{OxStationBuildable.PowerUsage()}: <color=#ff0000ff>{_mono.PowerManager.GetPowerUsage()}</color> {OxStationBuildable.PerMinute()}.";
-        }
-
+        
         public override void DrawPage(int page)
         {
             throw new NotImplementedException();

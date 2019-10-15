@@ -14,7 +14,6 @@ namespace AE.MiniFountainFilter.Mono
     internal class MiniFountainFilterController : MonoBehaviour, IConstructable, IProtoEventListener
     {
         private bool _initialized;
-        //private GameObject _habitat;
         private SaveDataEntry _saveData;
         private int _isRunning;
         private bool _isOperational;
@@ -34,9 +33,9 @@ namespace AE.MiniFountainFilter.Mono
         {
             OnMonoUpdate?.Invoke();
             PowerManager?.ConsumePower();
+            StorageManager?.AttemptSpawnBottle();
             UpdateSystem();
         }
-
         private void Initialize()
         {
             _isRunning = Animator.StringToHash("IsRunning");
@@ -88,14 +87,11 @@ namespace AE.MiniFountainFilter.Mono
                 DisplayManager.Setup(this);
             }
 
-            var interaction = gameObject.GetComponent<PlayerInteraction>();
-            interaction.Initialize(this);
-
             _initialized = true;
 
             QuickLogger.Debug($"Initialized");
         }
-
+        
         private IEnumerator UpdatePowerState()
         {
             while (true)
@@ -163,7 +159,6 @@ namespace AE.MiniFountainFilter.Mono
             TankManager.SetTankLevel(data.TankLevel);
             ColorManager.SetCurrentBodyColor(data.BodyColor.Vector4ToColor());
             StorageManager.LoadContainer(data.ContainerAmount);
-            StorageManager.SetTimeToSpawn(data.TimeToSpawn);
             _isInSub = data.IsInSub;
             QuickLogger.Info($"Loaded {Mod.FriendlyName}");
         }
@@ -181,7 +176,6 @@ namespace AE.MiniFountainFilter.Mono
             _saveData.BodyColor = ColorManager.GetColor().ColorToVector4();
             _saveData.TankLevel = TankManager.GetTankLevel();
             _saveData.ContainerAmount = StorageManager.NumberOfBottles;
-            _saveData.TimeToSpawn = StorageManager.GetTimeToSpawn();
             _saveData.IsInSub = _isInSub;
             saveData.Entries.Add(_saveData);
         }

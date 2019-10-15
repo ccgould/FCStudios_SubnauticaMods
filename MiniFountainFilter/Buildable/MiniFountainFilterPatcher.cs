@@ -107,7 +107,6 @@ namespace AE.MiniFountainFilter.Buildable
 
                 _prefab.AddComponent<AnimationManager>();
                 _prefab.AddComponent<TechTag>().type = Singleton.TechType;
-                _prefab.AddComponent<PlayerInteraction>();
                 _prefab.AddComponent<FMOD_CustomLoopingEmitter>();
                 _prefab.AddComponent<MiniFountainFilterController>();
             }
