@@ -34,6 +34,8 @@ namespace ARS_SeaBreezeFCS32.Mono
         private readonly float BOOTING_ANIMATION_TIME = 6f;
         private readonly float WELCOME_SCREEN_TIME = 2f;
         private bool _completeSetup;
+        private Text _itemCounter_LBL;
+        private Text _seaBreeze_LBL;
 
         #endregion
 
@@ -62,6 +64,21 @@ namespace ARS_SeaBreezeFCS32.Mono
             DrawPage(1);
 
             InvokeRepeating("UpdateScreenState", 1, 0.5f);
+
+            mono.OnContainerUpdate += OnContainerUpdate;
+
+            mono.NameController.OnLabelChanged += OnLabelChanged;
+        }
+
+        internal void OnLabelChanged(string value)
+        {
+            QuickLogger.Debug($"Label set to {value}", true);
+            _seaBreeze_LBL.text = value;
+        }
+
+        internal void OnContainerUpdate(int containerCurrent, int containerMax)
+        {
+            _itemCounter_LBL.text = $"{containerCurrent}/{containerMax} {ARSSeaBreezeFCS32Buildable.Items()}";
         }
 
         private void OnPowerResume()
@@ -122,6 +139,10 @@ namespace ARS_SeaBreezeFCS32.Mono
                 case "FilterBtn":
                     _mono.OpenFilterContainer();
                     break;
+
+                case "RenameBTN":
+                    _mono.NameController.Show();
+                    break;
             }
         }
 
@@ -177,6 +198,46 @@ namespace ARS_SeaBreezeFCS32.Mono
                 return false;
             }
             #endregion
+
+            #region StorageAmount
+
+            _itemCounter_LBL = _homeScreen.transform.Find("ItemCounter_LBL").GetComponent<Text>();
+            if (_itemCounter_LBL == null)
+            {
+                QuickLogger.Error("Screen: Item Counter label not found.");
+                return false;
+            }
+            #endregion
+
+            #region Unit Name
+
+            _seaBreeze_LBL = _homeScreen.transform.Find("SeaBreeze_LBL").GetComponent<Text>();
+            if (_seaBreeze_LBL == null)
+            {
+                QuickLogger.Error("Screen: Seabreeze label not found.");
+                return false;
+            }
+            #endregion
+
+
+            var renameBTN = _homeScreen.FindChild("Rename")?.gameObject;
+
+            if (renameBTN == null)
+            {
+                QuickLogger.Error("Couldn't find the gameObject Rename_Button");
+                return false;
+            }
+
+            var renameBtn = renameBTN.AddComponent<InterfaceButton>();
+            renameBtn.BtnName = "RenameBTN";
+            renameBtn.OnButtonClick = OnButtonClick;
+            renameBtn.ButtonMode = InterfaceButtonMode.Background;
+            renameBtn.HOVER_COLOR = Color.gray;
+            renameBtn.OnInterfaceButton = _mono.OnInterfaceButton;
+            renameBtn.TextLineOne = ARSSeaBreezeFCS32Buildable.RenameButton();
+
+
+
 
             #region Home Screen Power BTN
             _homeScreenPowerBtn = _homeScreen.transform.Find("Power_BTN")?.gameObject;

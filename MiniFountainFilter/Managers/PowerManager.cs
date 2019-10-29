@@ -68,7 +68,7 @@ namespace AE.MiniFountainFilter.Managers
 
         internal void ConsumePower()
         {
-            if (PowerState == FCSPowerStates.Unpowered) return;
+            if (PowerState == FCSPowerStates.Unpowered || _mono.TankManager.IsFull()) return;
 
             _energyToConsume = EnergyConsumptionPerSecond * DayNightCycle.main.deltaTime;
             bool requiresEnergy = GameModeUtils.RequiresPower();

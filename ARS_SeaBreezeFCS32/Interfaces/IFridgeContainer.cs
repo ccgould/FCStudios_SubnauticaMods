@@ -1,4 +1,5 @@
 ﻿using FCSCommon.Objects;
+using System;
 using System.Collections.Generic;
 
 namespace ARS_SeaBreezeFCS32.Interfaces
@@ -17,5 +18,7 @@ namespace ARS_SeaBreezeFCS32.Interfaces
 
         Dictionary<TechType, int> TrackedItems { get; }
         int GetTechTypeAmount(TechType techType);
+
+        Action<int, int> OnContainerUpdate { get; set; }
     }
 }

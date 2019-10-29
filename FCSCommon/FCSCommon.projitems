@@ -9,6 +9,7 @@
     <Import_RootNamespace>FCSCommon</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Abstract\Refrigerator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Components\BeaconController.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Components\CommonItemsContainer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Components\DamagedMaterialController.cs" />
@@ -33,14 +34,18 @@
     <Compile Include="$(MSBuildThisFileDirectory)Generics\CustomProp.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\AssetHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\GameObjectHelpers.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\GridHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\LanguageHelpers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\MaterialHelpers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\TechTypeHelpers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\WorldHelpers.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IRefrigerator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IRenameNameTarget.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Abstract\AIDisplay.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Abstract\FCSController.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Abstract\ModStrings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\HealthController.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\NameController.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\PowerController.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\Colors.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\Vec3.cs" />

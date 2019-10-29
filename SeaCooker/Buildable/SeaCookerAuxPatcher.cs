@@ -30,8 +30,10 @@ namespace AE.SeaCooker.Buildable
             LanguageHandler.SetLanguageLine(UnitNotEmptyKey, "One or both of the container are not empty.");
             LanguageHandler.SetLanguageLine(NoEnoughRoomKey, "There isn't enough room in the export container.");
             LanguageHandler.SetLanguageLine(CookingCantOpenKey, "Cannot open container while cooking.");
-
-
+            LanguageHandler.SetLanguageLine(SettingsPageKey, "Settings Page");
+            LanguageHandler.SetLanguageLine(GoToSettingsPageKey, "Go to settings page.");
+            LanguageHandler.SetLanguageLine(GoToHomePageKey, "Go to home page.");
+            LanguageHandler.SetLanguageLine(SettingsKey, "Settings");
         }
 
 
@@ -47,6 +49,10 @@ namespace AE.SeaCooker.Buildable
         private const string UnitNotEmptyKey = "SC_UnitNotEmpty";
         private const string NoEnoughRoomKey = "SC_NoEnoughRoom";
         private const string CookingCantOpenKey = "SC_CookingCantOpen";
+        private const string SettingsPageKey = "SC_SettingsPage";
+        private const string GoToSettingsPageKey = "SC_GoToSettingsPage";
+        private const string GoToHomePageKey = "SC_GoToHomePage";
+        private const string SettingsKey = "SC_Settings";
 
 
 
@@ -118,6 +124,26 @@ namespace AE.SeaCooker.Buildable
         public static string CookingCantOpen()
         {
             return Language.main.Get(CookingCantOpenKey);
+        }
+
+        public static string SettingsPage()
+        {
+            return Language.main.Get(SettingsPageKey);
+        }
+
+        public static string Settings()
+        {
+            return Language.main.Get(SettingsPageKey);
+        }
+
+        public static string GoToSettingsPage()
+        {
+            return Language.main.Get(GoToSettingsPageKey);
+        }
+
+        public static string GoToHomePage()
+        {
+            return Language.main.Get(GoToHomePageKey);
         }
     }
 }

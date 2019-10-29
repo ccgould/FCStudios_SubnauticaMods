@@ -1,0 +1,69 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+
+    <Color x:Key="DarkGreen">#61892F</Color>
+    <SolidColorBrush x:Key="DarkGreenBrush" Color="{StaticResource DarkGreen}"/>
+
+    <Color x:Key="LightGreen">#86C232</Color>
+    <SolidColorBrush x:Key="LightGreenBrush" Color="{StaticResource LightGreen}"/>
+
+    <Color x:Key="DarkGray">#222629</Color>
+    <SolidColorBrush x:Key="DarkGrayBrush" Color="{StaticResource DarkGray}"/>
+
+    <Color x:Key="DarkGray1">#292d30</Color>
+    <SolidColorBrush x:Key="DarkGray1Brush" Color="{StaticResource DarkGray}"/>
+
+    <Color x:Key="MediumGray">#474B4F</Color>
+    <SolidColorBrush x:Key="MediumGrayBrush" Color="{StaticResource MediumGray}"/>
+
+    <Color x:Key="LightGray">#6b6E70</Color>
+    <SolidColorBrush x:Key="LightGrayBrush" Color="{StaticResource LightGray}"/>
+
+    <Color x:Key="OuterBackground">#333333</Color>
+    <SolidColorBrush x:Key="OuterBackgroundBrush" Color="{StaticResource OuterBackground}"/>
+
+    <Color x:Key="ForgroundWhite">#ffffff</Color>
+    <SolidColorBrush x:Key="ForgroundWhiteBrush" Color="{StaticResource ForgroundWhite}"/>
+
+    <Color x:Key="FireBrick">#b22222</Color>
+    <SolidColorBrush x:Key="FireBrickBrush" Color="{StaticResource FireBrick}"/>
+
+    <Color x:Key="ForgroundLightBlue">#29abe2</Color>
+    <SolidColorBrush x:Key="ForgroundLightBlueBrush" Color="{StaticResource ForgroundLightBlue}"/>
+
+    <Color x:Key="SideButtonHighlight">#636363</Color>
+    <SolidColorBrush x:Key="SideButtonHighlightBrush" Color="{StaticResource SideButtonHighlight}"/>
+
+    <Color x:Key="SideButtonBackground">#0A0A0A</Color>
+    <SolidColorBrush x:Key="SideButtonBackgroundBrush" Color="{StaticResource SideButtonBackground}"/>
+
+    <Color x:Key="SideButtonDarkBlue">#25262a</Color>
+    <SolidColorBrush x:Key="SideButtonDarkBlueBrush" Color="{StaticResource SideButtonDarkBlue}"/>
+
+    <Color x:Key="ForgroundBlack">#000000</Color>
+    <SolidColorBrush x:Key="ForgroundBlackBrush" Color="{StaticResource ForgroundBlack}"/>
+
+    <Color x:Key="PageBackground">#252526</Color>
+    <SolidColorBrush x:Key="PageBackgroundBrush" Color="{StaticResource PageBackground}"/>
+
+    <Color x:Key="HightLightBlue">#007ACC</Color>
+    <SolidColorBrush x:Key="HightLightBlueBrush" Color="{StaticResource HightLightBlue}"/>
+
+    <Color x:Key="VSDarkBlack">#252526</Color>
+    <SolidColorBrush x:Key="VSDarkBlackBrush" Color="{StaticResource VSDarkBlack}"/>
+
+    <Color x:Key="VSLightBlack">#2D2D30</Color>
+    <SolidColorBrush x:Key="VSLightBlackBrush" Color="{StaticResource VSLightBlack}"/>
+
+    <Color x:Key="VSLighterBlack">#3E3E42</Color>
+    <SolidColorBrush x:Key="VSLighterBlackBrush" Color="{StaticResource VSLighterBlack}"/>
+
+    <Color x:Key="ForgroundRecentText">#cbcbcb</Color>
+    <SolidColorBrush x:Key="ForgroundRecentTextBrush" Color="{StaticResource ForgroundRecentText}"/>
+
+    <Color x:Key="RecentListPathColor">#545454</Color>
+    <SolidColorBrush x:Key="RecentListPathColorBrush" Color="{StaticResource RecentListPathColor}"/>
+
+
+</ResourceDictionary>

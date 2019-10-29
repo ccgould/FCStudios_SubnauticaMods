@@ -12,5 +12,7 @@ namespace ARS_SeaBreezeFCS32.Model
         public IEnumerable<EatableEntities> FridgeContainer { get; set; }
 
         public bool HasBreakerTripped { get; set; }
+
+        public string UnitName { get; set; }
     }
 }

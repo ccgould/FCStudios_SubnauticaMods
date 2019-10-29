@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Field Creators Studios")]
 [assembly: AssemblyProduct("FCSPowerStorage")]
-[assembly: AssemblyCopyright("Copyright ©  2019")]
+[assembly: AssemblyCopyright("Copyright © FCStudios 2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -35,3 +35,5 @@ using System.Runtime.InteropServices;
 //[assembly: AssemblyFileVersion("1.1.0.0")]
 
 [assembly: AssemblyInformationalVersion("1.0.3")]
+[assembly: AssemblyFileVersion("2.0.1")]
+

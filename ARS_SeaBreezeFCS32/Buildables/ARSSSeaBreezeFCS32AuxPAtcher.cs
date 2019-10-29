@@ -1,4 +1,5 @@
-﻿using SMLHelper.V2.Handlers;
+﻿using ARS_SeaBreezeFCS32.Configuration;
+using SMLHelper.V2.Handlers;
 
 namespace ARS_SeaBreezeFCS32.Buildables
 {
@@ -23,12 +24,17 @@ namespace ARS_SeaBreezeFCS32.Buildables
 
         public static string BuildableName { get; private set; }
         public static TechType TechTypeID { get; private set; }
+
         public const string TimeLeftMessageKey = "TimeLeftMessage";
 
         public static string AddedFreonMessageKey = "AddedFreonMessage";
 
         internal const string OnSeabreezeHoverkey = "OnSeabreezeHover";
+
         internal const string OnFreonBTNHoverKey = "OnFreonButtonHover";
+
+        internal const string ItemKey = "SB_Items";
+        internal const string EditUnitNameKey = "SB_EditName";
 
         private void AdditionalPatching()
         {
@@ -45,6 +51,8 @@ namespace ARS_SeaBreezeFCS32.Buildables
             LanguageHandler.SetLanguageLine(FcsWorkBenchErrorMessageKey, "FCS Tech Workbench Mod not found please install.");
             LanguageHandler.SetLanguageLine(SeaBreezeFullKey, "SeaBreeze is full and cannot add anymore items.");
             LanguageHandler.SetLanguageLine(ItemNotAllowedKey, "Food items allowed only.");
+            LanguageHandler.SetLanguageLine(ItemKey, "Item/s");
+            LanguageHandler.SetLanguageLine(EditUnitNameKey, $"Edit {Mod.FriendlyName} Name");
         }
 
         public static string SeaBreezeFull()
@@ -65,6 +73,21 @@ namespace ARS_SeaBreezeFCS32.Buildables
         public static string FcsWorkBenchErrorMessage()
         {
             return Language.main.Get(FcsWorkBenchErrorMessageKey);
+        }
+
+        public static string Items()
+        {
+            return Language.main.Get(ItemKey);
+        }
+
+        public static string Submit()
+        {
+            return Language.main.Get("Submit");
+        }
+
+        public static string RenameButton()
+        {
+            return Language.main.Get(EditUnitNameKey);
         }
     }
 }

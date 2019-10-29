@@ -198,20 +198,7 @@ namespace ExStorageDepot.Mono.Managers
 
         private void AddItem(ItemData itemData)
         {
-            //_trackedItems.Add(itemData);
-
-            if (ItemsDictionary.ContainsKey(itemData.TechType))
-            {
-                ItemsDictionary[itemData.TechType] += 1;
-            }
-            else
-            {
-                ItemsDictionary.Add(itemData.TechType, 1);
-            }
-
-
             var prefab = CraftData.GetPrefabForTechType(itemData.TechType, false);
-
 
             if (prefab != null)
             {
@@ -219,7 +206,6 @@ namespace ExStorageDepot.Mono.Managers
                 var newInventoryItem = new InventoryItem(go.GetComponent<Pickupable>().Pickup(false));
                 newInventoryItem.SetGhostDims(1, 1);
                 _container.container.UnsafeAdd(newInventoryItem);
-                _mono.Display.ItemModified(itemData.TechType, GetItemCount(itemData.TechType));
             }
         }
 
@@ -236,14 +222,14 @@ namespace ExStorageDepot.Mono.Managers
 
         internal void LoadFromSave(List<ItemData> storageItems)
         {
-            if (storageItems != null)
-            {
-                foreach (ItemData itemData in storageItems)
-                {
-                    QuickLogger.Debug($"Load from Save {itemData.TechType}");
-                    AddItem(itemData);
-                }
-            }
+            //if (storageItems != null)
+            //{
+            //    foreach (ItemData itemData in storageItems)
+            //    {
+            //        QuickLogger.Debug($"Load from Save {itemData.TechType}");
+            //        AddItem(itemData);
+            //    }
+            //}
         }
 
         //internal List<ItemData> GetTrackedItems()
@@ -327,14 +313,6 @@ namespace ExStorageDepot.Mono.Managers
             var techType = item.item.GetTechType();
             QuickLogger.Debug($"Recently {techType} was removed from the container");
 
-            int i = 0;
-
-            foreach (InventoryItem inventoryItem in _container.container)
-            {
-                QuickLogger.Debug($"Inventory Item {inventoryItem.item.GetTechType()} index {i}");
-                i++;
-            }
-
             if (_container.container.GetCount(techType) <= 0)
             {
                 ItemsDictionary.Remove(techType);
@@ -343,8 +321,6 @@ namespace ExStorageDepot.Mono.Managers
             UpdateScreen(techType, OperationMode.Removal);
 
         }
-
-
         private void OnDestroy()
         {
             //if (_container != null)

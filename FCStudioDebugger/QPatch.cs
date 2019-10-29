@@ -23,7 +23,6 @@ namespace FCStudioDebugger
                 harmony.PatchAll(Assembly.GetExecutingAssembly());
 
                 GetGlassShader();
-                GetOxygenTankCapacity();
                 QuickLogger.Info("Finished patching");
 
             }
@@ -35,9 +34,11 @@ namespace FCStudioDebugger
 
         private static void GetGlassShader()
         {
-            //var ResourcePath = "Submarine/Build/WaterPark";
+            var ResourcePath = "WorldEntities/Doodads/Debris/Wrecks/Decoration/biodome_lab_containers_open_01";
 
-            var gameObject = CraftData.GetPrefabForTechType(TechType.DepletedReactorRod);
+            //var gameObject = CraftData.GetPrefabForTechType(TechType.DepletedReactorRod);
+            
+            var gameObject = Resources.Load<GameObject>(ResourcePath);
 
             if (gameObject == null)
             {
@@ -45,9 +46,9 @@ namespace FCStudioDebugger
                 return;
             }
 
-            var renderer = gameObject.GetComponentsInChildren<Renderer>();
+            var renderer = gameObject.GetComponentsInChildren<Renderer>(true);
             //renderer.material.shader = marmosetUber;
-
+            
             if (renderer == null)
             {
                 QuickLogger.Error($"Render is null canceling operation");
@@ -60,28 +61,30 @@ namespace FCStudioDebugger
             foreach (var render in renderer)
             {
                 QuickLogger.Info($"Material Name = {render.material.name}");
+
+                QuickLogger.Info($"Material Shader Name = {render.material.shader.name}");
+
+                var keywords = render.material.shaderKeywords;
+
+
+                foreach (Material material in render.materials)
+                {
+                    QuickLogger.Info($"Main Texture: {material?.mainTexture}");
+                }
+
+
+                //render.material.DisableKeyword("MARMO_SIMPLE_GLASS");
+
+                foreach (string keyword in keywords)
+                {
+                    QuickLogger.Info($"Shader Keyword {keyword}");
+                }
+
                 if (render.material.name.StartsWith("depleted_nuclear_reactor_rod_glass"))
                 {
-                    QuickLogger.Info($"Material Shader Name = {render.material}");
-
-                    var keywords = render.material.shaderKeywords;
-
-
-                    render.material.DisableKeyword("MARMO_SIMPLE_GLASS");
-
-                    foreach (string keyword in keywords)
-                    {
-                        QuickLogger.Info($"Shader Keyword {keyword}");
-                    }
+                    
                 }
             }
-        }
-
-        private static void GetOxygenTankCapacity()
-        {
-            var tank = GameObject.Instantiate(CraftData.GetPrefabForTechType(TechType.HighCapacityTank));
-            var oxygen = tank.GetComponentInChildren<Oxygen>()?.oxygenCapacity;
-            QuickLogger.Info($"Oxygen Capacity: {oxygen}");
         }
     }
 }

@@ -7,14 +7,13 @@ namespace AE.SeaCooker.Display
 {
     internal class PaginatorButton : OnScreenButton, IPointerEnterHandler, IPointerClickHandler, IPointerExitHandler
     {
-        internal Color HOVER_COLOR = new Color(0.07f, 0.38f, 0.7f, 1f);
-        internal Color STARTING_COLOR = Color.white;
+        public Color HOVER_COLOR = new Color(0.07f, 0.38f, 0.7f, 1f);
+        public Color STARTING_COLOR = Color.white;
         public int AmountToChangePageBy { get; set; } = 1;
         private Image image;
         public string HoverTextLineOne { get; set; }
         public string HoverTextLineTwo { get; set; }
-
-        public Action<int> OnChangePageBy { get; set; }
+        public Action<int> ChangePageBy;
 
         public void Start()
         {
@@ -61,7 +60,7 @@ namespace AE.SeaCooker.Display
             base.OnPointerClick(eventData);
             if (IsHovered)
             {
-                OnChangePageBy?.Invoke(AmountToChangePageBy);
+                ChangePageBy?.Invoke(AmountToChangePageBy);
             }
         }
     }

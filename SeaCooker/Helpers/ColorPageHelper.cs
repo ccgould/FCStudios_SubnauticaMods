@@ -19,8 +19,7 @@ namespace AE.SeaCooker.Helpers
 
         private int _maxColorPage = 1;
         private int _currentColorPage;
-
-
+        
         internal void Initialize()
         {
             DrawColorPage(1);

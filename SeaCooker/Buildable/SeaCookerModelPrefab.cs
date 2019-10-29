@@ -8,7 +8,9 @@ namespace AE.SeaCooker.Buildable
     internal partial class SeaCookerBuildable
     {
         private static GameObject _prefab;
-        internal static GameObject ColorItemPrefab { get; set; }
+        internal static GameObject ColorItemPrefab => FCSTechFabricator.QPatch.ColorItem;
+        internal static GameObject SeaBreezeItemPrefab { get; set; }
+
         public static string BodyMaterial => "SeaCooker_MainBaseColor";
 
         public bool GetPrefabs()
@@ -37,18 +39,18 @@ namespace AE.SeaCooker.Buildable
                 return false;
             }
 
-            GameObject color = assetBundle.LoadAsset<GameObject>("ColorItem");
+            GameObject seaBreezeItem = assetBundle.LoadAsset<GameObject>("SC_SeaBreezeItem");
 
             //If the prefab isn't null lets add the shader to the materials
-            if (color != null)
+            if (seaBreezeItem != null)
             {
-                ColorItemPrefab = color;
+                SeaBreezeItemPrefab = seaBreezeItem;
 
-                QuickLogger.Debug($"ColorItem Prefab Found!");
+                QuickLogger.Debug($"SC_SeaBreezeItem Prefab Found!");
             }
             else
             {
-                QuickLogger.Error($"{this.FriendlyName} Prefab Not Found!");
+                QuickLogger.Error($"SC_SeaBreezeItem Prefab Not Found!");
                 return false;
             }
 

@@ -6,7 +6,6 @@ using FCSTechFabricator.Configuration;
 using FCSTechFabricator.Models;
 using FCSTechFabricator.Mono;
 using FCSTechFabricator.Mono.DeepDriller;
-using FCSTechFabricator.Mono.DeepDriller.Materials;
 using FCSTechFabricator.Mono.MarineTurbine;
 using FCSTechFabricator.Mono.MiniFountainFilter;
 using FCSTechFabricator.Mono.PowerStorage;
@@ -17,6 +16,7 @@ using Oculus.Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Reflection;
+using FCSCommon.Models;
 using UnityEngine;
 
 
@@ -28,6 +28,7 @@ namespace FCSTechFabricator
 
         public static void Patch()
         {
+            
             QuickLogger.Info("Started patching. Version: " + QuickLogger.GetAssemblyVersion());
 
 #if DEBUG
@@ -69,10 +70,10 @@ namespace FCSTechFabricator
 
         private static void RegisterItems()
         {
-            var sandGlass = new SaNDGlass();
-            sandGlass.Patch();
-            FCSTechFabricatorBuildable.AddTechType(sandGlass.TechType, sandGlass.StepsToFabricatorTab);
-            QuickLogger.Debug($"Patched {sandGlass.FriendlyName}");
+            //var sandGlass = new SaNDGlass();
+            //sandGlass.Patch();
+            //FCSTechFabricatorBuildable.AddTechType(sandGlass.TechType, sandGlass.StepsToFabricatorTab);
+            //QuickLogger.Debug($"Patched {sandGlass.FriendlyName}");
 
             var freon = new FreonBuildable();
             freon.Patch();
@@ -170,6 +171,7 @@ namespace FCSTechFabricator
         {
             QuickLogger.Debug("GetPrefabs");
 
+            #region Asset Bundle
             AssetBundle assetBundle = AssetHelper.Asset("FCSTechFabricator", "fcstechfabricatormodbundle");
 
             //If the result is null return false.
@@ -180,7 +182,9 @@ namespace FCSTechFabricator
             }
 
             Bundle = assetBundle;
-
+            #endregion
+            
+            #region Color Item
             //We have found the asset bundle and now we are going to continue by looking for the model.
             ColorItem = Bundle.LoadAsset<GameObject>("ColorItem");
 
@@ -194,7 +198,9 @@ namespace FCSTechFabricator
                 QuickLogger.Error($"UnitContainerKit Prefab Not Found!");
                 return false;
             }
+            #endregion
 
+            #region Kit
             //We have found the asset bundle and now we are going to continue by looking for the model.
             Kit = Bundle.LoadAsset<GameObject>("UnitContainerKit");
 
@@ -209,8 +215,9 @@ namespace FCSTechFabricator
                 QuickLogger.Error($"UnitContainerKit Prefab Not Found!");
                 return false;
             }
-
-
+            #endregion
+            
+            #region Battery Module
             //We have found the asset bundle and now we are going to continue by looking for the model.
             GameObject batteryModule = Bundle.LoadAsset<GameObject>("Battery_Attachment");
 
@@ -228,7 +235,9 @@ namespace FCSTechFabricator
                 QuickLogger.Error($"Battery Module  Prefab Not Found!");
                 return false;
             }
+            #endregion
 
+            #region Solar Module
             //We have found the asset bundle and now we are going to continue by looking for the model.
             GameObject solarModule = Bundle.LoadAsset<GameObject>("Solar_Panel_Attachment");
 
@@ -246,7 +255,9 @@ namespace FCSTechFabricator
                 QuickLogger.Error($"Solar Module  Prefab Not Found!");
                 return false;
             }
+            #endregion
 
+            #region Focus Module
             //We have found the asset bundle and now we are going to continue by looking for the model.
             GameObject focusModule = Bundle.LoadAsset<GameObject>("Scanner_Screen_Attachment");
 
@@ -264,7 +275,9 @@ namespace FCSTechFabricator
                 QuickLogger.Error($"Solar Module  Prefab Not Found!");
                 return false;
             }
+            #endregion
 
+            #region SeaGas Tank
             //We have found the asset bundle and now we are going to continue by looking for the model.
             GameObject seaGasTank = Bundle.LoadAsset<GameObject>("SeaGasTank");
 
@@ -282,7 +295,9 @@ namespace FCSTechFabricator
                 QuickLogger.Error($"Sea Gas Tank  Prefab Not Found!");
                 return false;
             }
+            #endregion
 
+            #region SeaAlien Tank
             //We have found the asset bundle and now we are going to continue by looking for the model.
             GameObject seaAlienGasTank = Bundle.LoadAsset<GameObject>("SeaAlienGasTank");
 
@@ -299,7 +314,8 @@ namespace FCSTechFabricator
             {
                 QuickLogger.Error($"Sea Alien Gas Tank  Prefab Not Found!");
                 return false;
-            }
+            } 
+            #endregion
 
             return true;
         }

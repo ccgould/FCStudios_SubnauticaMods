@@ -9,6 +9,7 @@ using FCSCommon.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -19,11 +20,11 @@ namespace AE.SeaCooker.Managers
         private SeaCookerController _mono;
 
         private int _showProcess;
-        private int _isOnHomePage;
+        private int _page;
         private Color _startColor = new Color(0.16796875f, 0.16796875f, 0.16796875f);
         private Color _hoverColor = new Color(0.07f, 0.38f, 0.7f, 1f);
         private InterfaceButton _startButton;
-        private GameObject _grid;
+        private GameObject _colorGrid;
         private GameObject _fromImage;
         private GameObject _toImage;
         private Image _percentage;
@@ -31,6 +32,8 @@ namespace AE.SeaCooker.Managers
         private ColorPageHelper _colorPage;
         private Text _paginator;
         private CustomToggle _cusToggle;
+        private GridHelper _seaBreezeGrid;
+        private CustomToggle _autoToggle;
 
 
         public override void OnButtonClick(string btnName, object tag)
@@ -52,12 +55,16 @@ namespace AE.SeaCooker.Managers
                     UpdateCookingButton();
 
                     break;
-                case "colorPickerBTN":
-                    UpdateColorPage();
-                    break;
                 case "homeBTN":
-                    UpdateColorPage();
+                    UpdatePage(1);
                     break;
+                case "settingsBTN":
+                    UpdatePage(2);
+                    break;
+                case "colorPickerBTN":
+                    UpdatePage(3);
+                    break;
+
                 case "openInputBTN":
                     _mono.StorageManager.OpenInputStorage();
                     break;
@@ -72,12 +79,22 @@ namespace AE.SeaCooker.Managers
                     _mono.StorageManager.SetExportToSeabreeze(item.CheckState());
                     QuickLogger.Debug($"Toggle State: {item.CheckState()}", true);
                     break;
+                case "autoToggle":
+                    var autoItem = (CustomToggle)tag;
+                    //TODO Adjust Class To support
+                    //_mono.StorageManager.SetExportToSeabreeze(autoItem.CheckState());
+                    QuickLogger.Debug($"Toggle State: {autoItem.CheckState()}", true);
+                    break;
                 case "ColorItem":
                     var color = (Color)tag;
                     QuickLogger.Debug($"{_mono.gameObject.name} Color Changed to {color.ToString()}", true);
                     _mono.ColorManager.SetCurrentBodyColor(color);
                     break;
-
+                case "SeaBreezeItem":
+                    var seaBreeze = (Color)tag;
+                    // QuickLogger.Debug($"{_mono.gameObject.name} Color Changed to {color.ToString()}", true);
+                    _mono.ColorManager.SetCurrentBodyColor(seaBreeze);
+                    break;
             }
         }
 
@@ -86,9 +103,9 @@ namespace AE.SeaCooker.Managers
             _startButton.ChangeText(_mono.FoodManager.IsCooking() ? SeaCookerBuildable.Cancel() : SeaCookerBuildable.Start());
         }
 
-        private void UpdateColorPage()
+        private void UpdatePage(int page)
         {
-            _mono.AnimationManager.SetBoolHash(_isOnHomePage, !_mono.AnimationManager.GetBoolHash(_isOnHomePage));
+            _mono.AnimationManager.SetIntHash(_page, page);
         }
 
         public override bool FindAllComponents()
@@ -114,6 +131,17 @@ namespace AE.SeaCooker.Managers
             }
             #endregion
 
+            #region Settings
+
+            var settings = canvasGameObject.FindChild("Settings")?.gameObject;
+
+            if (settings == null)
+            {
+                QuickLogger.Error("Unable to find Settings GameObject");
+                return false;
+            }
+            #endregion
+
             #region ColorPicker
 
             var colorPicker = canvasGameObject.FindChild("ColorPicker")?.gameObject;
@@ -125,6 +153,7 @@ namespace AE.SeaCooker.Managers
             }
             #endregion
 
+            #region Doors
             var doorsResult = InterfaceHelpers.FindGameObject(canvasGameObject, "Doors", out var doorsOutput);
 
             if (!doorsResult)
@@ -133,9 +162,11 @@ namespace AE.SeaCooker.Managers
             }
 
             var doors = doorsOutput;
+            #endregion
 
+            #region Start Button
             var startButtonResult = InterfaceHelpers.CreateButton(home, "Button", "startBTN", InterfaceButtonMode.Background,
-                _startColor, _hoverColor, OnButtonClick, out var startButton);
+        _startColor, _hoverColor, OnButtonClick, out var startButton);
             startButton.TextLineOne = "Start Cooking";
 
             if (!startButtonResult)
@@ -143,18 +174,33 @@ namespace AE.SeaCooker.Managers
                 return false;
             }
             _startButton = startButton;
+            #endregion
 
-            var colorPickerResult = InterfaceHelpers.CreateButton(home, "Paint_BTN", "colorPickerBTN", InterfaceButtonMode.Background,
-                OnButtonClick, out var colorPickerButton);
+            #region Color Picker
+            var colorPickerResult = InterfaceHelpers.CreateButton(settings, "Paint_BTN", "colorPickerBTN", InterfaceButtonMode.Background,
+        OnButtonClick, out var colorPickerButton);
             colorPickerButton.TextLineOne = "Color Picker Page";
 
             if (!colorPickerResult)
             {
                 return false;
             }
+            #endregion
 
+            #region Settings BTN
+            var settingsResult = InterfaceHelpers.CreateButton(home, "Settings", "settingsBTN", InterfaceButtonMode.Background,
+                OnButtonClick, out var settingsButton);
+            settingsButton.TextLineOne = SeaCookerBuildable.GoToSettingsPage();
+
+            if (!settingsResult)
+            {
+                return false;
+            }
+            #endregion
+
+            #region Fuel Tank BTN
             var fuelTankResult = InterfaceHelpers.CreateButton(home, "Tank_BTN", "fuelTankBTN", InterfaceButtonMode.Background,
-                OnButtonClick, out var fuelTankButton);
+        OnButtonClick, out var fuelTankButton);
             fuelTankButton.TextLineOne = "Open Fuel Tank";
 
             if (!fuelTankResult)
@@ -162,32 +208,55 @@ namespace AE.SeaCooker.Managers
                 return false;
             }
 
-            var homeBTN = InterfaceHelpers.CreateButton(colorPicker, "Home_BTN", "homeBTN", InterfaceButtonMode.TextColor,
-                OnButtonClick, out var homeButton);
-            homeButton.TextLineOne = "Home Page";
+            #endregion
+
+            #region Settings Page Home BTN
+            var homeBTN = InterfaceHelpers.CreateButton(settings, "Home_BTN", "homeBTN", InterfaceButtonMode.Background,
+        OnButtonClick, out var homeButton);
+            homeButton.TextLineOne = $"{SeaCookerBuildable.GoToHomePage()}" ;
+
             if (!homeBTN)
             {
                 return false;
             }
+            #endregion
 
+            #region Settings Color BTN
+            var settingsCResult = InterfaceHelpers.CreateButton(colorPicker, "Home_BTN", "settingsBTN", InterfaceButtonMode.TextColor,
+                OnButtonClick, out var settings_C_BTN);
+            settings_C_BTN.ChangeText($"< {SeaCookerBuildable.SettingsPage()}");
+            settings_C_BTN.TextLineOne = $"{SeaCookerBuildable.GoToSettingsPage()}";
+
+            if (!settingsCResult)
+            {
+                QuickLogger.Error($"Can't find settingsBTN");
+                return false;
+            }
+            #endregion
+
+            #region Open Input BTN
             var openInputBTN = InterfaceHelpers.CreateButton(doors, "Open_Input", "openInputBTN", InterfaceButtonMode.TextColor,
-                OnButtonClick, out var openInputButton);
+        OnButtonClick, out var openInputButton);
             openInputButton.TextLineOne = "Open Input Container";
 
             if (!openInputBTN)
             {
                 return false;
             }
+            #endregion
 
+            #region Open Export BTN
             var openExportBTN = InterfaceHelpers.CreateButton(doors, "Open_Export", "openExportBTN", InterfaceButtonMode.TextColor,
-                OnButtonClick, out var openExportButton);
+        OnButtonClick, out var openExportButton);
             openExportButton.TextLineOne = "Open Export Container";
 
             if (!openExportBTN)
             {
                 return false;
             }
+            #endregion
 
+            #region Next BTN
             var nextBTN = InterfaceHelpers.CreatePaginator(colorPicker, "NextPage", 1, _colorPage.ChangeColorPageBy, out var nextButton);
             nextButton.TextLineOne = "Next Page";
 
@@ -195,7 +264,9 @@ namespace AE.SeaCooker.Managers
             {
                 return false;
             }
+            #endregion
 
+            #region Prev BTN
             var prevBTN = InterfaceHelpers.CreatePaginator(colorPicker, "PrevPage", -1, _colorPage.ChangeColorPageBy, out var prevButton);
             prevButton.TextLineOne = "Previous Page";
 
@@ -203,24 +274,79 @@ namespace AE.SeaCooker.Managers
             {
                 return false;
             }
+            #endregion
 
-            var gridResult = InterfaceHelpers.FindGameObject(colorPicker, "Grid", out var grid);
+            #region Color Grid
+            var colorGridResult = InterfaceHelpers.FindGameObject(colorPicker, "Grid", out var colorGrid);
 
-            if (!gridResult)
+            if (!colorGridResult)
             {
                 return false;
             }
-            _grid = grid;
+            _colorGrid = colorGrid;
+            #endregion
 
-            var fromImage = InterfaceHelpers.FindGameObject(home, "from_Image", out var from_Image);
+            #region Paginator
+            var numKeyResult = InterfaceHelpers.FindGameObject(settings, "numKey", out var numKey);
 
-            if (!fromImage)
+            if (!numKeyResult)
             {
                 return false;
             }
-            _fromImage = from_Image;
-            uGUI_Icon fromIcon = _fromImage.gameObject.AddComponent<uGUI_Icon>();
+            #endregion
+            
+            #region SeaBreeze Grid
+            var seaBreezeGridResult = InterfaceHelpers.FindGameObject(settings, "Grid", out var seaBreezeGrid);
 
+            if (!seaBreezeGridResult)
+            {
+                return false;
+            }
+
+            _seaBreezeGrid.Initialize(SeaCookerBuildable.SeaBreezeItemPrefab,seaBreezeGrid,numKey, 4,OnButtonClick );
+            _seaBreezeGrid.OnLoadDisplay += OnLoadDisplay;
+            #endregion
+
+            #region Prev Button
+            var prevSBTN = settings.FindChild("prev_BTN")?.gameObject;
+            if (prevSBTN == null)
+            {
+                QuickLogger.Error("Settings Prev_BTN not found.");
+                return false;
+            }
+
+            PaginatorButton prev_S_BTN = prevSBTN.AddComponent<PaginatorButton>();
+            //prev_S_BTN.TextLineOne = GetLanguage(DisplayLanguagePatching.PrevPageKey);
+            prev_S_BTN.ChangePageBy = _seaBreezeGrid.ChangePageBy;
+            prev_S_BTN.AmountToChangePageBy = -1;
+            #endregion
+
+            #region Next Button
+            var nextSBTN = settings.FindChild("next_BTN")?.gameObject;
+            if (nextSBTN == null)
+            {
+                QuickLogger.Error("Setting Next_BTN not found.");
+                return false;
+            }
+
+            PaginatorButton next_S_BTN = nextSBTN.AddComponent<PaginatorButton>();
+            //next_S_BTN.TextLineOne = GetLanguage(DisplayLanguagePatching.NextPageKey);
+            next_S_BTN.ChangePageBy = _seaBreezeGrid.ChangePageBy;
+            next_S_BTN.AmountToChangePageBy = 1;
+            #endregion
+            
+            #region From Image OMIT
+            //var fromImage = InterfaceHelpers.FindGameObject(home, "from_Image", out var from_Image);
+
+            //if (!fromImage)
+            //{
+            //    return false;
+            //}
+            //_fromImage = from_Image;
+            //uGUI_Icon fromIcon = _fromImage.gameObject.AddComponent<uGUI_Icon>(); 
+            #endregion
+
+            #region To Image OMIT
             var toImage = InterfaceHelpers.FindGameObject(home, "to_Image", out var to_Image);
 
             if (!toImage)
@@ -229,7 +355,9 @@ namespace AE.SeaCooker.Managers
             }
             _toImage = to_Image;
             uGUI_Icon toIcon = _toImage.gameObject.AddComponent<uGUI_Icon>();
+            #endregion
 
+            #region Percentage Bar
             var percentageResult = InterfaceHelpers.FindGameObject(home, "Preloader_Bar", out var percentage);
 
             if (!percentageResult)
@@ -237,7 +365,9 @@ namespace AE.SeaCooker.Managers
                 return false;
             }
             _percentage = percentage.GetComponent<Image>();
+            #endregion
 
+            #region Fuel Percentage
             var fuelResult = InterfaceHelpers.FindGameObject(home, "FuelPercentage", out var fuelPercentage);
 
             if (!fuelResult)
@@ -246,8 +376,9 @@ namespace AE.SeaCooker.Managers
             }
             _fuelPercentage = fuelPercentage.GetComponent<Text>();
             _fuelPercentage.text = $"{SeaCookerBuildable.TankPercentage()}: (0%)";
+            #endregion
 
-
+            #region Version
             var versionResult = InterfaceHelpers.FindGameObject(canvasGameObject, "Version", out var version);
 
             if (!versionResult)
@@ -256,7 +387,9 @@ namespace AE.SeaCooker.Managers
             }
             var versionLbl = version.GetComponent<Text>();
             versionLbl.text = $"{SeaCookerBuildable.Version()}: {QPatch.Version}";
+            #endregion
 
+            #region Paginator
             var paginatorResult = InterfaceHelpers.FindGameObject(colorPicker, "Paginator", out var paginator);
 
             if (!paginatorResult)
@@ -264,12 +397,14 @@ namespace AE.SeaCooker.Managers
                 return false;
             }
             _paginator = paginator.GetComponent<Text>();
+            #endregion
 
-
-            var toggleResult = InterfaceHelpers.FindGameObject(home, "Toggle", out var toggle);
+            #region Seabreeze Toggle
+            var toggleResult = InterfaceHelpers.FindGameObject(settings, "Toggle_SB_Export", out var toggle);
 
             if (!toggleResult)
             {
+                QuickLogger.Error($"Cannot find Toggle_SB_Export on GameObject");
                 return false;
             }
 
@@ -278,14 +413,57 @@ namespace AE.SeaCooker.Managers
             _cusToggle.ButtonMode = InterfaceButtonMode.Background;
             _cusToggle.OnButtonClick = OnButtonClick;
             _cusToggle.Tag = _cusToggle;
+            #endregion
 
+            #region Auto Toggle
+            var autoResult = InterfaceHelpers.FindGameObject(settings, "Auto_Toggle", out var autoToggle);
+
+            if (!autoResult)
+            {
+                QuickLogger.Error($"Cannot find Auto_Toggle on GameObject");
+                return false;
+            }
+
+            _autoToggle = autoToggle.AddComponent<CustomToggle>();
+            _autoToggle.BtnName = "autoToggle";
+            _autoToggle.ButtonMode = InterfaceButtonMode.Background;
+            _autoToggle.OnButtonClick = OnButtonClick;
+            _autoToggle.Tag = _autoToggle;
+            #endregion
 
             return true;
         }
 
+        private void OnLoadDisplay(GameObject itemPrefab, GameObject itemsGrid)
+        {
+            QuickLogger.Debug("Loading SeaBreeze Display");
+
+            for (int i = _seaBreezeGrid.StartingPosition; i < _seaBreezeGrid.EndingPosition; i++)
+            {
+                var name = _mono.SeaBreezes.Keys.ElementAt(i);
+                var seaBreeze = _mono.SeaBreezes.Values.ElementAt(i);
+
+                GameObject itemDisplay = Instantiate(itemPrefab);
+
+                itemDisplay.transform.SetParent(itemsGrid.transform, false);
+                var text = itemDisplay.transform.Find("Text").GetComponent<Text>();
+                text.text = name;
+
+                var itemButton = itemDisplay.AddComponent<InterfaceButton>();
+                itemButton.ButtonMode = InterfaceButtonMode.TextColor;
+                itemButton.Tag = seaBreeze;
+                itemButton.TextComponent = text;
+                itemButton.OnButtonClick += OnButtonClick;
+                itemButton.BtnName = "SeaBreeze";
+
+                QuickLogger.Debug($"Added SeaBreeze {name}");
+
+            }
+        }
+
         public override IEnumerator PowerOn()
         {
-            _mono.AnimationManager.SetBoolHash(_isOnHomePage, true);
+            _mono.AnimationManager.SetIntHash(_page, 1);
             yield return null;
         }
 
@@ -300,13 +478,14 @@ namespace AE.SeaCooker.Managers
             _mono = mono;
 
             _showProcess = Animator.StringToHash("ShowProcess");
-            _isOnHomePage = Animator.StringToHash("IsOnHomePage");
-
+            _page = Animator.StringToHash("Page");
+            
             _mono.FoodManager.OnFoodCookedAll += OnFoodCooked;
             _mono.FoodManager.OnCookingStart += OnCookingStart;
             _mono.GasManager.OnGasUpdate += OnGasRemoved;
 
             _colorPage = gameObject.AddComponent<ColorPageHelper>();
+            _seaBreezeGrid = gameObject.AddComponent<GridHelper>();
 
             if (FindAllComponents())
             {
@@ -317,14 +496,16 @@ namespace AE.SeaCooker.Managers
                 QuickLogger.Error("// ============== Error getting all Components ============== //");
                 return;
             }
-
+            
             _colorPage.OnButtonClick = OnButtonClick;
             _colorPage.SerializedColors = Mod.SerializedColors();
             _colorPage.ColorsPerPage = 42;
             _colorPage.ColorItemPrefab = SeaCookerBuildable.ColorItemPrefab;
-            _colorPage.ColorPageContainer = _grid;
+            _colorPage.ColorPageContainer = _colorGrid;
             _colorPage.ColorPageNumber = _paginator;
             _colorPage.Initialize();
+
+
             StartCoroutine(CompleteSetup());
 
             InvokeRepeating(nameof(UpdateScreen), 0, 0.5f);
@@ -338,6 +519,7 @@ namespace AE.SeaCooker.Managers
 
         internal void UpdateFuelPercentage()
         {
+            if (_fuelPercentage == null) return;
             _fuelPercentage.text = $"{SeaCookerBuildable.TankPercentage()}: ({_mono.GasManager.GetTankPercentage()}%)";
         }
 
@@ -418,6 +600,13 @@ namespace AE.SeaCooker.Managers
         internal void SetSendToSeaBreeze(bool value)
         {
             _cusToggle.SetToggleState(value);
+        }
+
+        internal void UpdateSeaBreezes()
+        {
+            if (_seaBreezeGrid == null) return;
+
+            _seaBreezeGrid.DrawPage(_seaBreezeGrid.GetCurrentPage());
         }
     }
 }

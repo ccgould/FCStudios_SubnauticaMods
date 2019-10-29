@@ -110,5 +110,10 @@ namespace AE.MiniFountainFilter.Managers
         {
             return _tankLevel >= amount;
         }
+
+        internal bool IsFull()
+        {
+            return _tankLevel >= _tankCapacity;
+        }
     }
 }

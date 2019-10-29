@@ -1,0 +1,213 @@
+﻿<Window x:Class="FCSModdingUtility.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:FCSModdingUtility"
+        xmlns:fa5="http://schemas.fontawesome.com/icons/"
+        mc:Ignorable="d"
+        WindowStyle="None"
+        WindowStartupLocation="CenterScreen"
+        Title="{Binding Source={x:Static local:DI.ViewModelSettings}, Path=WindowTitle}" 
+        Deactivated="AppWindow_Deactivated"
+        Activated="AppWindow_Activated"
+        MinWidth="{Binding WindowMinimumWidth}"
+        MinHeight="{Binding WindowMinimumHeight}">
+
+    <Window.Resources>
+        <Style TargetType="{x:Type local:MainWindow}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Window}">
+                        <!-- Outer border with the drop shadow margin -->
+                        <Border Padding="{Binding OuterMarginSize, FallbackValue=0}" BorderBrush="{StaticResource ForgroundBlackBrush}" BorderThickness="{Binding FlatBorderThickness}">
+
+                            <!-- Main window outline -->
+                            <Grid>
+
+                                <!-- Outer dragging border -->
+                                <Border BorderThickness="{Binding BeingMoved, Converter={local:BooleanToBorderThicknessConverter}}"
+                                        Panel.ZIndex="2"
+                                        CornerRadius="{Binding WindowCornerRadius, FallbackValue=0}"
+                                        BorderBrush="{StaticResource HightLightBlueBrush}" />
+
+                                <!-- Opacity mask for corners on grid -->
+                                <Border x:Name="Container"
+                                        Background="{StaticResource OuterBackgroundBrush}"
+                                        CornerRadius="{Binding WindowCornerRadius, FallbackValue=0}" />
+
+                                <!-- Window border and drop shadow -->
+                                <Border CornerRadius="{Binding WindowCornerRadius, FallbackValue=0}"
+                                    Background="{StaticResource OuterBackgroundBrush}">
+                                    <Border.Effect>
+                                        <DropShadowEffect ShadowDepth="0.5" Opacity="0.2" />
+                                    </Border.Effect>
+                                </Border>
+
+                                <!-- The main window content -->
+                                <Grid>
+
+                                    <!-- Corner clipping -->
+                                    <Grid.OpacityMask>
+                                        <VisualBrush Visual="{Binding ElementName=Container}" />
+                                    </Grid.OpacityMask>
+
+                                    <Grid.RowDefinitions>
+
+                                        <!-- Title Bar -->
+                                        <RowDefinition Height="{Binding TitleHeightGridLength, FallbackValue=30}" />
+
+                                        <!-- Window Content -->
+                                        <RowDefinition Height="*" />
+
+                                    </Grid.RowDefinitions>
+
+
+                                    <!-- Title Bar -->
+                                    <Grid Grid.Column="0" Panel.ZIndex="1">
+
+                                        <Grid.ColumnDefinitions>
+                                            <!-- Icon * Not in use right now-->
+                                            <ColumnDefinition Width="Auto" />
+
+                                            <!-- Windows Menu -->
+                                            <ColumnDefinition Width="Auto" />
+
+                                            <!-- Title -->
+                                            <ColumnDefinition Width="*" />
+                                            <!-- Windows Button -->
+                                            <ColumnDefinition Width="Auto" />
+
+                                        </Grid.ColumnDefinitions>
+
+                                        <!-- Icon -->
+
+                                        <Button Style="{StaticResource SystemIconButton}" Command="{Binding MenuCommand}">
+                                            <Image Source="/Images/Logo/logo-small.png" />
+                                        </Button>
+
+                                        <!-- Title -->
+                                        <Viewbox Grid.Column="0" Grid.ColumnSpan="4" Margin="1">
+                                            <TextBlock Style="{StaticResource HeaderText}"  Text="{Binding Title, FallbackValue=C4D Resource File Editor, RelativeSource={RelativeSource TemplatedParent}}"/>
+                                        </Viewbox>
+
+                                        <!-- Window Buttons -->
+                                        <Viewbox Grid.Column="3">
+                                            <StackPanel  Orientation="Horizontal">
+                                                <Button Command="{Binding MinimizeCommand}" Style="{StaticResource WindowControlButton}" Content="_" />
+                                                <Button Command="{Binding MaximizeCommand}" Style="{StaticResource WindowControlButton}" Content="[ ]" />
+                                                <Button Command="{Binding CloseCommand}" Style="{StaticResource WindowsCloseButton}" Content="X" />
+                                            </StackPanel>
+                                        </Viewbox>
+
+
+                                        <!--Main Menu Bar-->
+                                        <Menu Grid.Column="1" Foreground="{StaticResource LightGrayBrush}" Background="Transparent" WindowChrome.IsHitTestVisibleInChrome="True" VerticalAlignment="Center" HorizontalAlignment="Left" Width="100" Margin="3 0 0 0">
+                                            <MenuItem Header="File">
+                                                <MenuItem Header="_New" Command="New"/>
+                                                <MenuItem Header="_Open" Command="Open"/>
+                                                <MenuItem Header="_Save" Command="Save"/>
+                                                <Separator/>
+                                                <MenuItem Header="_Exit" Command="Close"/>
+                                            </MenuItem>
+                                            <MenuItem Header="_Help">
+                                                <MenuItem Header="_Help Documents"/>
+                                                <MenuItem Header="_About"/>
+                                                <Separator/>
+                                                <!--<MenuItem Header="_Check For Updates" Click="CheckForUpdates_OnClick" Name="mnuCheckForUpdates"/>-->
+                                            </MenuItem>
+                                        </Menu>
+
+                                    </Grid>
+
+                                    <!-- Page Content -->
+
+                                    <Border Grid.Row="1" Padding="{Binding InnerContentPadding}" ClipToBounds="True">
+                                        <ContentPresenter Content="{TemplateBinding Content}" />
+                                    </Border>
+
+                                </Grid>
+
+                            </Grid>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <!--<Window.CommandBindings>
+        <CommandBinding Command="ApplicationCommands.New" Executed="NewCommandBinding_Executed" CanExecute="NewCommandBinding_CanExecute"/>
+        <CommandBinding Command="ApplicationCommands.Open" Executed="OpenCommandBinding_Executed" CanExecute="OpenCommandBinding_CanExecute"/>
+        <CommandBinding Command="ApplicationCommands.Save" Executed="SaveCommandBinding_Executed" CanExecute="SaveCommandBinding_CanExecute"/>
+        <CommandBinding Command="ApplicationCommands.Close" Executed="CloseCommandBinding_Executed" CanExecute="CloseCommandBinding_CanExecute"/>
+    </Window.CommandBindings>-->
+
+    <WindowChrome.WindowChrome>
+        <WindowChrome
+            ResizeBorderThickness="{Binding ResizeBorderThickness}"
+            CaptionHeight="{Binding TitleHeight}"
+            CornerRadius="0"
+            GlassFrameThickness="0"
+            />
+    </WindowChrome.WindowChrome>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="40"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Column="0">
+            <!--<Button FontSize="20" Margin="0 0 0 20" VerticalContentAlignment="Bottom" Cursor="Hand" ToolTip="Edit Settings" Padding="0" fa5:Awesome.Content="Solid_Cog" Style="{StaticResource TextButton}"/>-->
+        </Grid>
+
+        <Grid Grid.Row="0" Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <local:PageHost Grid.Row="0"
+                CurrentPage="{Binding ApplicationViewModel.CurrentPage, Source={x:Static local:ViewModelLocator.Instance}}"
+                CurrentPageViewModel="{Binding ApplicationViewModel.CurrentPageViewModel, Source={x:Static local:ViewModelLocator.Instance}}"/>
+        </Grid>
+
+        <Grid Grid.Column="0" Grid.Row="1" ColumnSpan="2"  Background="{Binding Source={x:Static local:DI.ViewModelApplication}, Path=StatusBarColor}" Height="22">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+
+            <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+
+                <fa5:ImageAwesome Icon="{Binding Source={x:Static local:DI.ViewModelApplication}, Path=StatusBarIcon}" 
+                                 Margin="10 0 0 0" 
+                                 Foreground="{StaticResource ForgroundWhiteBrush}"
+                                 Height="15" 
+                                 Spin="{Binding Source={x:Static local:DI.ViewModelApplication}, Path=SpinAnimation}" 
+                                 />
+
+                <TextBlock Text="{Binding Source={x:Static local:DI.ViewModelApplication}, Path=StatusBarStatus}" 
+                           Margin="10 0 0 0" 
+                           Foreground="{StaticResource ForgroundWhiteBrush}"/>
+
+            </StackPanel>
+
+            <TextBlock Grid.Column="1"
+                       TextTrimming="WordEllipsis"
+                       VerticalAlignment="Center" 
+                       Foreground="{StaticResource ForgroundWhiteBrush}" 
+                       Margin="10 0 0 0" 
+                       Text="{Binding Source={x:Static local:DI.ViewModelApplication}, Path=StatusBarMessage}"/>
+
+        </Grid>
+
+    </Grid>
+</Window>

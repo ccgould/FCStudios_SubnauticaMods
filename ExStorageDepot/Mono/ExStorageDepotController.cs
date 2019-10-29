@@ -20,6 +20,8 @@ namespace ExStorageDepot.Mono
 
         public void OnProtoSerialize(ProtobufSerializer serializer)
         {
+            if (!_initialized) return;
+
             if (!Mod.IsSaving())
             {
                 QuickLogger.Info("Saving Ex Storage Depot");

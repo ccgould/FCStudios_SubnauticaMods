@@ -207,18 +207,20 @@ namespace AE.SeaCooker.Mono
         {
             if (obj != null)
             {
+                QuickLogger.Debug("OBJ Not NULL", true);
                 StartCoroutine(TrackNewSeabreezeCoroutine(obj));
+
             }
         }
 
         private void AlertedSeaBreezeDestroyed(ARSolutionsSeaBreezeController obj)
         {
-            if (obj != null)
-            {
-                QuickLogger.Debug("OBJ Not NULL", true);
-                SeaBreezes.Remove(obj.GetPrefabID());
-                QuickLogger.Debug("Removed Seabreeze");
-            }
+            if (obj == null || obj.PrefabId == null) return;
+
+            QuickLogger.Debug("OBJ Not NULL", true);
+            SeaBreezes.Remove(obj.GetPrefabID());
+            QuickLogger.Debug("Removed Seabreeze");
+
         }
 
         private IEnumerator TrackNewSeabreezeCoroutine(ARSolutionsSeaBreezeController obj)
@@ -232,7 +234,10 @@ namespace AE.SeaCooker.Mono
 
             if (newSeaBase != null && newSeaBase == _habitat)
             {
+                QuickLogger.Debug("Adding Seabreeze");
                 SeaBreezes.Add(obj.GetPrefabID(), obj);
+                DisplayManager.UpdateSeaBreezes();
+                QuickLogger.Debug("Added Seabreeze");
             }
         }
 

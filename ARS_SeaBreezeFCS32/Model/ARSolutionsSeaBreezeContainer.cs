@@ -17,6 +17,7 @@ namespace ARS_SeaBreezeFCS32.Model
         private const int ContainerWidth = 6;
         private const int ContainerHeight = 8;
         private readonly ChildObjectIdentifier _containerRoot = null;
+        public Action<int, int> OnContainerUpdate { get; set; }
         public bool IsFull => NumberOfItems >= QPatch.Configuration.Config.StorageLimit;
 
         public int NumberOfItems => FridgeItems.Count;
@@ -31,7 +32,7 @@ namespace ARS_SeaBreezeFCS32.Model
         public ARSolutionsSeaBreezeContainer(ARSolutionsSeaBreezeController mono)
         {
             _mono = mono;
-            _isConstructed = () => { return mono.IsConstructed; };
+            _isConstructed = () => mono.IsConstructed;
 
             if (_containerRoot == null)
             {
@@ -58,6 +59,8 @@ namespace ARS_SeaBreezeFCS32.Model
             throw new System.NotImplementedException();
         }
 
+
+
         #region Container Methods
 
         private void AddItem(InventoryItem item)
@@ -69,6 +72,7 @@ namespace ARS_SeaBreezeFCS32.Model
                 _mono.SetDeconstructionAllowed(false);
                 _mono.Display.ItemModified(TechType.None);
             }
+            OnContainerUpdate?.Invoke(NumberOfItems, QPatch.Configuration.Config.StorageLimit);
 
             QuickLogger.Debug($"Fridge Item Count: {FridgeItems.Count}", true);
         }
@@ -111,16 +115,7 @@ namespace ARS_SeaBreezeFCS32.Model
                     _mono.Display.ItemModified(TechType.None);
                 }
 
-
-                //foreach (EatableEntities eatableEntity in FridgeItems)
-                //{
-                //    if (eatableEntity.TechType != match.TechType) continue;
-
-
-
-
-                //    break;
-                //}
+                OnContainerUpdate?.Invoke(NumberOfItems, QPatch.Configuration.Config.StorageLimit);
             }
         }
 

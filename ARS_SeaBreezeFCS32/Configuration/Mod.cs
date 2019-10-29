@@ -1,10 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using ARS_SeaBreezeFCS32.Mono;
+using FCSCommon.Utilities;
+using UnityEngine;
 
 namespace ARS_SeaBreezeFCS32.Configuration
 {
     internal static class Mod
     {
+        private static int seabreezeCount;
+
         #region Internal Properties
         internal static string ModName => "FCS_ARSSeaBreeze";
         internal static string BundleName => "arsseabreezefcs32modbundle";
@@ -20,6 +26,12 @@ namespace ARS_SeaBreezeFCS32.Configuration
         internal static string ConfigurationFile()
         {
             return Path.Combine(MODFOLDERLOCATION, "mod.json");
+        }
+
+        internal static string GetNewSeabreezeName()
+        {
+            QuickLogger.Debug($"Get Seabreeze New Name");
+            return $"{FriendlyName} {seabreezeCount++}";
         }
         #endregion
 

@@ -24,7 +24,6 @@ namespace ExStorageDepot.Buildable
 
         public override string AssetsFolder { get; } = $"ExStorageDepot/Assets";
 
-
         public ExStorageDepotBuildable() : base(Mod.ModName, Mod.ModFriendly, Mod.ModDesc)
         {
             OnFinishedPatching += AdditionalPatching;

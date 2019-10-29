@@ -19,6 +19,7 @@ namespace FCS_AIMarineTurbine.Mono
         private float _passedTime;
         private GameObject _damage;
         private bool _shaderApplied;
+        private AIJetStreamT242Controller _mono;
         public Action OnDamaged { get; set; }
         public Action OnRepaired { get; set; }
 
@@ -41,9 +42,11 @@ namespace FCS_AIMarineTurbine.Mono
 
         private void UpdateHealthSystem()
         {
+            if (_mono.PowerManager.GetHasBreakerTripped()) return;
+
             _passedTime += DayNightCycle.main.deltaTime;
 
-            //QuickLogger.Debug($"Passed Time: {_passedTime} || Damage Per Sec {_damagePerSecond}");
+            QuickLogger.Debug($"Passed Time: {_passedTime} || Damage Per Sec {_damagePerSecond}");
 
             if (_passedTime >= _damagePerSecond)
             {
@@ -71,6 +74,8 @@ namespace FCS_AIMarineTurbine.Mono
 
         internal void Initialize(AIJetStreamT242Controller mono)
         {
+            _mono = mono;
+
             LiveMixin = GetComponentInParent<LiveMixin>();
 
             _damagePerSecond = DayNight / _damagePerDay;

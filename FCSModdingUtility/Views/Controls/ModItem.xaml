@@ -1,0 +1,129 @@
+﻿<UserControl x:Class="FCSModdingUtility.ModItem"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:FCSModdingUtility"
+             xmlns:fa5="http://schemas.fontawesome.com/icons/"
+             Background="Transparent"
+             mc:Ignorable="d"
+             d:DesignHeight="450" d:DesignWidth="300" MinHeight="450" MinWidth="300" MaxWidth="300" MaxHeight="450">
+
+    <Border x:Name="Container"  CornerRadius="0" Background="{StaticResource DarkGrayBrush}" Cursor="Hand">
+
+        <!-- Click Command -->
+        <Border.InputBindings>
+            <MouseBinding 
+                MouseAction="LeftClick" 
+                Command="{Binding OpenObjectEditorCommand}"/>
+        </Border.InputBindings>
+
+        <Grid>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="20"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="20"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="20"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="20"/>
+            </Grid.RowDefinitions>
+
+            <!--Icon/Name Container-->
+            <StackPanel Grid.ColumnSpan="2" Grid.Column="1" Grid.Row="1">
+                <Grid>
+                    <!-- Icon -->
+                    <Ellipse Fill="{StaticResource HightLightBlueBrush}" Height="150" Width="150" Margin="0 0 0 40" />
+                    <Image Width="120" Height="120"   Margin="0 0 0 40" Source="{Binding IconImageValue}"/>
+                </Grid>
+
+                <!-- Name -->
+                <TextBlock Margin="0 0 0 10" FontWeight="Bold" TextAlignment="Center" Text="{Binding DisplayName}" Foreground="{StaticResource HightLightBlueBrush}" FontSize="18" TextTrimming="CharacterEllipsis"/>
+            </StackPanel>
+
+            <!-- Values Value -->
+            <StackPanel Orientation="Vertical" Grid.Column="1" Grid.Row="2">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Enabled:"/>
+                    <TextBlock Text="{Binding Enable}" Margin=" 10 0 0 0"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Author:"/>
+                    <TextBlock Text="{Binding Author}" TextTrimming="CharacterEllipsis" Margin=" 10 0 0 0" Width="211"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Version:"/>
+                    <TextBlock Text="{Binding Version}" Margin=" 10 0 0 0"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="DLL Version:"/>
+                    <TextBlock Text="{Binding DLLVersion}" Margin=" 10 0 0 0"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="FCS TechFabricator Dependent:"/>
+                    <TextBlock Text="True" Margin=" 10 0 0 0"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Dependency Count:"/>
+                    <TextBlock Text="{Binding DependenciesCount}" Margin=" 10 0 0 0"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Version Dependency Count:"/>
+                    <TextBlock Text="{Binding VersionDependenciesCount}" Margin=" 10 0 0 0"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Has Issues:"/>
+                    <TextBlock Text="Yes" Margin=" 10 0 0 0"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="File Size:"/>
+                    <TextBlock Text="{Binding ModSize}" Margin=" 10 0 0 0"/>
+                </StackPanel>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="3" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <StackPanel.Resources>
+                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource StandardButton}">
+                        <Setter Property="Margin" Value="5,0,5,0"/>
+                    </Style>
+                </StackPanel.Resources>
+                <Button Content="Fix Issues" Width="80" Visibility="Visible" Command="{Binding FixBTNCommand}"/>
+                <Button Content="Package" Width="80"/>
+                <Button Content="Store" Width="80" Background="Firebrick"/>
+            </StackPanel>
+        </Grid>
+
+        <Border.Triggers>
+            <EventTrigger RoutedEvent="Mouse.MouseEnter">
+                <BeginStoryboard>
+                    <Storyboard>
+                        <ColorAnimation To="{StaticResource DarkGray1}"  Duration="0:0:0.1" Storyboard.TargetProperty="Background.Color" Storyboard.TargetName="Container"/>
+                    </Storyboard>
+                </BeginStoryboard>
+            </EventTrigger>
+
+            <EventTrigger RoutedEvent="Mouse.MouseLeave">
+                <BeginStoryboard>
+                    <Storyboard>
+                        <ColorAnimation To="{StaticResource DarkGray}"  Duration="0:0:0.1" Storyboard.TargetProperty="Background.Color" Storyboard.TargetName="Container"/>
+                    </Storyboard>
+                </BeginStoryboard>
+            </EventTrigger>
+        </Border.Triggers>
+
+
+    </Border>
+</UserControl>

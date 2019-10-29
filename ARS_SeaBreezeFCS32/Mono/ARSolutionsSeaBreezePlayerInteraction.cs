@@ -4,7 +4,7 @@ using FCSCommon.Utilities;
 
 namespace ARS_SeaBreezeFCS32.Mono
 {
-    public partial class ARSolutionsSeaBreezeController : HandTarget, IHandTarget
+    public partial class ARSolutionsSeaBreezeController : IHandTarget
     {
         private bool _onInterfaceButton;
 

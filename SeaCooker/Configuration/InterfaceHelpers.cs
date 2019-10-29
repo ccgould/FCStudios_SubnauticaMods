@@ -55,7 +55,7 @@ namespace AE.SeaCooker.Configuration
             }
 
             var button = go.AddComponent<PaginatorButton>();
-            button.OnChangePageBy = ChangePageBy;
+            button.ChangePageBy = ChangePageBy;
             button.AmountToChangePageBy = amountToChangeBy;
             button.STARTING_COLOR = startColor;
             button.HOVER_COLOR = hoverColor;
