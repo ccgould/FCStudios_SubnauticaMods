@@ -221,6 +221,11 @@ namespace FCSModdingUtility
         {
             SetStatus(ApplicationStatusTypes.Ready, "");
         }
+
+        public void DefaultError(string message)
+        {
+            SetStatus(ApplicationStatusTypes.Error, message, StatusBarColors.Error);
+        }
         #endregion
     }
 }

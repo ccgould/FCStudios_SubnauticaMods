@@ -22,8 +22,8 @@ namespace FCSModdingUtility
                     return new Home(viewModel as HomeViewModel);
                 //case ApplicationPage.NewProject:
                 //    return new NewProjectPage(viewModel as NewProjectViewModel);
-                //case ApplicationPage.EditorPage:
-                //    return new EditorPage(viewModel as EditorPageViewModel);
+                case ApplicationPage.EditorPage:
+                    return new EditorPage(viewModel as EditorPageViewModel);
                 default:
                     Debugger.Break();
                     return null;
@@ -42,8 +42,8 @@ namespace FCSModdingUtility
                 return ApplicationPage.StartPage;
             //if (page is NewProjectPage)
             //    return ApplicationPage.NewProject;
-            //if (page is EditorPage)
-            //    return ApplicationPage.EditorPage;
+            if (page is EditorPage)
+                return ApplicationPage.EditorPage;
             // Alert developer of issue
             Debugger.Break();
             return default(ApplicationPage);

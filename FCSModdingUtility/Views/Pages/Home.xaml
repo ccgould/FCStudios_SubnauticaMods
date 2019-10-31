@@ -18,7 +18,7 @@
         <Button Grid.Row="0" Content="Refresh" Command="{Binding RefreshBTNCommand}"/>
 
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-            <ItemsControl ItemsSource="{Binding NewItemModels}" >
+            <ItemsControl ItemsSource="{Binding NewItemModels}" HorizontalAlignment="Center">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <WrapPanel Orientation="Horizontal"/>

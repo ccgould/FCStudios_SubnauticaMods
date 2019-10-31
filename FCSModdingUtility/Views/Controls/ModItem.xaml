@@ -15,7 +15,7 @@
         <Border.InputBindings>
             <MouseBinding 
                 MouseAction="LeftClick" 
-                Command="{Binding OpenObjectEditorCommand}"/>
+                Command="{Binding ModBTNCommand}"/>
         </Border.InputBindings>
 
         <Grid>
@@ -70,7 +70,7 @@
 
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="FCS TechFabricator Dependent:"/>
-                    <TextBlock Text="True" Margin=" 10 0 0 0"/>
+                    <TextBlock Text="{Binding TechFabDependancy}" Margin=" 10 0 0 0"/>
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal">
@@ -101,7 +101,7 @@
                     </Style>
                 </StackPanel.Resources>
                 <Button Content="Fix Issues" Width="80" Visibility="Visible" Command="{Binding FixBTNCommand}"/>
-                <Button Content="Package" Width="80"/>
+                <Button Content="Package" Width="80" Command="{Binding PackageBTNCommand}"/>
                 <Button Content="Store" Width="80" Background="Firebrick"/>
             </StackPanel>
         </Grid>
