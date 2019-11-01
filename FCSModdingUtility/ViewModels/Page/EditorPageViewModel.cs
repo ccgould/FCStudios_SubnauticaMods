@@ -28,9 +28,8 @@ namespace FCSModdingUtility
             ((DataGridCollectionView)grid.ItemsSource).Refresh();
 
             //grid.CurrentItem = grid.Items[0];
+            ModItemViewModel.UpdateElement();
 
-            ModItemViewModel.SaveCurrentFileStructure();
-            ModItemViewModel.SaveModConfig();
             ViewModelApplication.GoToPage(ApplicationPage.StartPage);
         }
 

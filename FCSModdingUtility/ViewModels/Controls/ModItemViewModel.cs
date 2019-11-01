@@ -80,7 +80,7 @@ namespace FCSModdingUtility
             {
                 _dependancies = value;
                 DependenciesCount = value.Count;
-                TechFabDependancy = IsDependantOnTechFab();
+                SetDependentOnTechFab();
             }
         }
 
@@ -95,7 +95,7 @@ namespace FCSModdingUtility
             {
                 _versionDependencies = value;
                 VersionDependenciesCount = value.Count;
-                TechFabDependancy = IsDependantOnTechFab();
+                SetDependentOnTechFab();
             }
         }
 
@@ -222,19 +222,26 @@ namespace FCSModdingUtility
             ViewModelApplication.GoToPage(ApplicationPage.EditorPage, vm);
         }
 
-        private bool IsDependantOnTechFab()
+        internal void SetDependentOnTechFab()
         {
-            if (TechFabDependancy) return true;
+            if (TechFabDependancy) return;
 
-            if (Dependencies == null) return false;
+            if (Dependencies == null)
+            {
+                TechFabDependancy = false;
+                return;
+            }
 
-            if (Dependencies.Contains("FCSTechFabricator")) return true;
-            
-            if (VersionDependencies == null) return false;
+            if (VersionDependencies == null)
+            {
+                TechFabDependancy = false;
+                return;
+            }
 
-            if (VersionDependencies.ContainsKey("FCSTechFabricator")) return true;
-
-            return false;
+            if (VersionDependencies.ContainsKey("FCSTechFabricator") || Dependencies.Contains("FCSTechFabricator"))
+            {
+                TechFabDependancy = true;
+            }
         }
 
         private string GetModSize()
@@ -408,6 +415,13 @@ namespace FCSModdingUtility
         }
 
         #endregion
+
+        internal void UpdateElement()
+        {
+            SetDependentOnTechFab();
+            SaveCurrentFileStructure();
+            SaveModConfig();
+        }
     }
 
     internal static class Serialize
