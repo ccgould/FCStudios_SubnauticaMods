@@ -395,20 +395,27 @@ namespace FCSTechFabricator.Helpers
                 QuickLogger.Debug($"Patched {moduleCraftable.FriendlyName}");
             }
 
-            var freon = new FreonBuildable();
-            freon.Patch();
-            FCSTechFabricatorBuildable.AddTechType(freon.TechType, freon.StepsToFabricatorTab);
-            QuickLogger.Debug($"Patched {freon.FriendlyName}");
+            if (!TechTypeHandler.ModdedTechTypeExists(Configuration.SeaBreezeClassID))
+            {
+                var freon = new FreonBuildable();
+                freon.Patch();
+                FCSTechFabricatorBuildable.AddTechType(freon.TechType, freon.StepsToFabricatorTab);
+                QuickLogger.Debug($"Patched {freon.FriendlyName}");
+            }
 
-            var scGtank = new SeaGasTankCraftable();
-            scGtank.Patch();
-            FCSTechFabricatorBuildable.AddTechType(scGtank.TechType, scGtank.StepsToFabricatorTab);
-            QuickLogger.Debug($"Patched {scGtank.FriendlyName}");
+            if (!TechTypeHandler.ModdedTechTypeExists(Configuration.SeaCookerClassID))
+            {
+                var scGtank = new SeaGasTankCraftable();
+                scGtank.Patch();
+                FCSTechFabricatorBuildable.AddTechType(scGtank.TechType, scGtank.StepsToFabricatorTab);
+                QuickLogger.Debug($"Patched {scGtank.FriendlyName}");
 
-            var scAGtank = new SeaAlienGasTankCraftable();
-            scAGtank.Patch();
-            FCSTechFabricatorBuildable.AddTechType(scAGtank.TechType, scAGtank.StepsToFabricatorTab);
-            QuickLogger.Debug($"Patched {scAGtank.FriendlyName}");
+                var scAGtank = new SeaAlienGasTankCraftable();
+                scAGtank.Patch();
+                FCSTechFabricatorBuildable.AddTechType(scAGtank.TechType, scAGtank.StepsToFabricatorTab);
+                QuickLogger.Debug($"Patched {scAGtank.FriendlyName}");
+            }
+
         }
 
         private static List<FCSKitEntry> CreateModules()
