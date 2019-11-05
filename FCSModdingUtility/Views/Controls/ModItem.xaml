@@ -5,11 +5,12 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:FCSModdingUtility"
              xmlns:fa5="http://schemas.fontawesome.com/icons/"
+             xmlns:xcad="http://schemas.xceed.com/wpf/xaml/avalondock"
              Background="Transparent"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="300" MinHeight="450" MinWidth="300" MaxWidth="300" MaxHeight="450">
 
-    <Border x:Name="Container"  CornerRadius="0" Background="{StaticResource DarkGrayBrush}" Cursor="Hand">
+    <Border x:Name="Container"  CornerRadius="0" Background="{StaticResource DarkGrayBrush}" Cursor="Hand" ToolTip="Go to edit mod page.">
 
         <!-- Click Command -->
         <Border.InputBindings>
@@ -19,6 +20,9 @@
         </Border.InputBindings>
 
         <Grid>
+            <Grid.Resources>
+                <local:BooleanToVisiblityConverter x:Key="Converter" />
+            </Grid.Resources>
 
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="20"/>
@@ -40,6 +44,22 @@
                     <!-- Icon -->
                     <Ellipse Fill="{StaticResource HightLightBlueBrush}" Height="150" Width="150" Margin="0 0 0 40" />
                     <Image Width="120" Height="120"   Margin="0 0 0 40" Source="{Binding IconImageValue}"/>
+                    <Image Width="30" Height="30"   Margin="185,10,65,150" Source="{Binding WarningIconValue}" Visibility="{Binding HasIssues, Converter={StaticResource Converter}}" ToolTip="{Binding IssueToolTip}"/>
+                    <Button Height="40" Width="40" ToolTip="Edit Photo" Margin="162,108,68,32" Command="{Binding ChangePhotoBTNCommand}">
+                        <Button.Template>
+                            <ControlTemplate>
+                                <Image Source="{Binding PhotoImageValue}"/>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+                    <Button Height="40" Width="40" ToolTip="Open mod folder." Margin="74,113,166,37" Command="{Binding OpenModFolderBTNCommand}">
+                        <Button.Template>
+                            <ControlTemplate>
+                                <Image Source="../../Images/System/folder-open.png"/>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+                    <!--<Image  Margin="163,115,76,34"  />-->
                 </Grid>
 
                 <!-- Name -->
@@ -85,7 +105,7 @@
 
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="Has Issues:"/>
-                    <TextBlock Text="Yes" Margin=" 10 0 0 0"/>
+                    <TextBlock Text="{Binding HasIssues}" Margin=" 10 0 0 0"/>
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal">
@@ -100,9 +120,9 @@
                         <Setter Property="Margin" Value="5,0,5,0"/>
                     </Style>
                 </StackPanel.Resources>
-                <Button Content="Fix Issues" Width="80" Visibility="Visible" Command="{Binding FixBTNCommand}"/>
-                <Button Content="Package" Width="80" Command="{Binding PackageBTNCommand}"/>
-                <Button Content="Store" Width="80" Background="Firebrick"/>
+                <Button Content="Fix Issues" Background="Firebrick"  Width="80" Visibility="{Binding HasIssues, Converter={StaticResource Converter}}" Command="{Binding FixBTNCommand}" ToolTip="Open the issues page."/>
+                <Button Content="Package" Width="80" Background="Green" Command="{Binding PackageBTNCommand}" ToolTip="Package mod into a zip for distribution."/>
+                <Button Content="Store" Width="80" ToolTip="Store mod in a predefined location outside the QMods folder."/>
             </StackPanel>
         </Grid>
 
@@ -123,7 +143,5 @@
                 </BeginStoryboard>
             </EventTrigger>
         </Border.Triggers>
-
-
     </Border>
 </UserControl>

@@ -8,8 +8,11 @@ using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
+using FCSModdingUtility.Models;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Newtonsoft.Json;
 using static FCSModdingUtility.DI;
@@ -22,9 +25,9 @@ namespace FCSModdingUtility
         private string _id;
         private List<string> _dependancies;
         private Dictionary<string, string> _versionDependencies;
-        private string _location;
         private string _modFolder;
         private string _fileStructureSave;
+        private string _iconPath;
 
         #endregion
 
@@ -127,7 +130,7 @@ namespace FCSModdingUtility
         [Category("Mod Properties")]
         [Description(DialogStrings.Enable)]
         [JsonProperty("Enable")]
-        public bool Enable { get; set; } 
+        public bool Enable { get; set; }
         #endregion
 
         #region Public JSON Ignored Properties
@@ -139,19 +142,19 @@ namespace FCSModdingUtility
         public object IconImageValue { get; set; }
 
         [JsonIgnore]
-        public string Location
-        {
-            get => _location;
-            set
-            {
-                _location = value;
-                _modFolder = Path.GetDirectoryName(value);
-                _fileStructureSave = Path.Combine(_modFolder, "FCSModdingUtilitySave.fcs");
-                ModSize = GetModSize();
-                DLLVersion = GetVersionNumber();
-                IconImageValue = GetIconLocation();
-            }
-        }
+        public object PhotoImageValue { get; set; }
+
+        [JsonIgnore]
+        public object WarningIconValue { get; set; }
+
+        [JsonIgnore]
+        public string Location { get; set; }
+
+        [JsonIgnore]
+        public List<IssueReport> IssueReports { get; set; } = new List<IssueReport>();
+
+        [JsonIgnore]
+        public string Parent { get; set; }
 
         [JsonIgnore]
         public bool TechFabDependancy { get; set; }
@@ -164,9 +167,42 @@ namespace FCSModdingUtility
 
         [JsonIgnore]
         public int DependenciesCount { get; set; }
+
+        [JsonIgnore]
+        public bool HasIssues { get; set; }
+
+        [JsonIgnore]
+        public string IssueToolTip => GetToolTipIssues();
+
         #endregion
 
         #region Private Methods
+
+        private string GetToolTipIssues()
+        {
+            var sb = new StringBuilder();
+
+            foreach (IssueReport report in IssueReports)
+            {
+                sb.Append($"{report.ToStringFull()}");
+                sb.Append(Environment.NewLine);
+            }
+
+            return sb.ToString();
+        }
+
+        private void UpdateData()
+        {
+            _modFolder = Path.GetDirectoryName(Location);
+            _fileStructureSave = Path.Combine(_modFolder, "FCSModdingUtilitySave.fcs");
+            ModSize = GetModSize();
+            DLLVersion = GetVersionNumber();
+            Parent = Path.GetDirectoryName(Location);
+            IconImageValue = GetIconLocation();
+            WarningIconValue = GetWarningIconLocation();
+            PhotoImageValue = GetPhotoIconLocation();
+        }
+
         private BitmapImage doGetImageSourceFromResource(string psAssemblyName, string psResourceName)
         {
             BitmapImage logo = new BitmapImage();
@@ -179,14 +215,76 @@ namespace FCSModdingUtility
         {
             var unknown = doGetImageSourceFromResource(Assembly.GetExecutingAssembly().GetName().Name, "unknown.png");
 
-            if (_location == null || Id == null) return unknown;
-
+            if (Location == null || Id == null) return unknown;
+            
             var image = Path.Combine(_modFolder, "Assets", $"{Id}.png");
 
             if (!File.Exists(image)) return unknown;
 
-            return image;
+            _iconPath = image;
+
+            return CacheImage(image);
         }
+
+        private BitmapImage CacheImage(string path)
+        {
+            if (path != null)
+            {
+                //create new stream and create bitmap frame
+                BitmapImage bitmapImage = new BitmapImage();
+                bitmapImage.BeginInit();
+                bitmapImage.StreamSource = new FileStream(path, FileMode.Open, FileAccess.Read);
+                //bitmapImage.DecodePixelWidth = (int)_decodePixelWidth;
+                //bitmapImage.DecodePixelHeight = (int)_decodePixelHeight;
+                //load the image now so we can immediately dispose of the stream
+                bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                bitmapImage.EndInit();
+
+                //clean up the stream to avoid file access exceptions when attempting to delete images
+                bitmapImage.StreamSource.Dispose();
+
+                return bitmapImage;
+            }
+
+            return null;
+        }
+
+
+        private object GetWarningIconLocation()
+        {
+            return new BitmapImage(new Uri($"pack://application:,,,/Images/System/problem.png")); ;
+        }
+
+        private object GetPhotoIconLocation()
+        {
+            return new BitmapImage(new Uri($"pack://application:,,,/Images/System/edit.png")); ;
+        }
+
+        public void CheckForIssues()
+        {
+            UpdateData();
+
+            IssueReports.Clear();
+
+            if (!ApplicationHelpers.VersionCompare(Version, DLLVersion, DisplayName, out string message))
+            {
+                IssueReports.Add(new IssueReport { IssueReportType = IssueReportType.VersionMissMatch, DLLVersion = DLLVersion});
+            }
+
+            if (!Enable)
+            {
+                IssueReports.Add(new IssueReport { IssueReportType = IssueReportType.ModDisabled });
+            }
+
+            UpdateHasIssues();
+            //TODO Use HomeViewModel to look for the dependencies
+        }
+
+        private void UpdateHasIssues()
+        {
+            HasIssues = IssueReports.Count > 0;
+        }
+
         #endregion
     }
 
@@ -196,30 +294,120 @@ namespace FCSModdingUtility
         [JsonIgnore] public ICommand FixBTNCommand { get; set; }
         [JsonIgnore] public ICommand PackageBTNCommand { get; set; }
         [JsonIgnore] public ICommand ModBTNCommand { get; set; }
+        [JsonIgnore] public ICommand ChangePhotoBTNCommand { get; set; }
+        [JsonIgnore] public ICommand OpenModFolderBTNCommand { get; set; }
+
         #endregion
 
         #region Public Methods
 
         public static ModItemViewModel FromJson(string json) => JsonConvert.DeserializeObject<ModItemViewModel>(json);
-        
+
         [JsonIgnore]
-        public ObservableCollection<FileStructure> FileStructure { get; set; } = new ObservableCollection<FileStructure>();
+        public ObservableCollection<DirectoryItemViewModel> FileStructure { get; set; } = new ObservableCollection<DirectoryItemViewModel>();
         public ModItemViewModel()
         {
             FixBTNCommand = new RelayCommand(FixBTNCommandMethod);
             PackageBTNCommand = new RelayCommand(PackageBTNCommandMethod);
             ModBTNCommand = new RelayCommand(ModBTNCommandMethod);
-        } 
+            ChangePhotoBTNCommand = new RelayCommand(ChangePhotoBTNCommandMethod);
+            OpenModFolderBTNCommand = new RelayCommand(OpenModFolderBTNCommandMethod);
+        }
+        
         #endregion
 
         #region Private Methods
+
+        private void ChangePhotoBTNCommandMethod()
+        {
+            if (string.IsNullOrEmpty(_iconPath))
+            {
+                using (CommonOpenFileDialog ofd = new CommonOpenFileDialog())
+                {
+                    //ofd.DefaultFileName = !string.IsNullOrEmpty(_iconPath) ? Path.GetFileName(_iconPath) : $"CLASS_NAME.png";
+                    ofd.Filters.Add(new CommonFileDialogFilter("PNG Image", "*.png"));
+                    if (ofd.ShowDialog() != CommonFileDialogResult.Ok) return;
+
+                    //TODO Add Message dialog to let them know to chose a file that has already been renamed correctly
+                    var iconName = Path.GetFileNameWithoutExtension(_iconPath);
+                    ApplicationHelpers.ReplaceModIcon(iconName, _modFolder, ofd.FileName);
+                    IconImageValue = CacheImage(_iconPath);
+                }
+            }
+            else
+            {
+                using (CommonOpenFileDialog ofd = new CommonOpenFileDialog())
+                {
+                    //ofd.DefaultFileName = !string.IsNullOrEmpty(_iconPath) ? Path.GetFileName(_iconPath) : $"CLASS_NAME.png";
+                    ofd.Filters.Add(new CommonFileDialogFilter("PNG Image", "*.png"));
+                    if (ofd.ShowDialog() == CommonFileDialogResult.Ok)
+                    {
+                        ApplicationHelpers.ReplaceModIcon(Path.GetFileNameWithoutExtension(_iconPath), _modFolder, ofd.FileName);
+                        IconImageValue = CacheImage(_iconPath);
+                    }
+                }
+            }
+        }
+
+        private void OpenModFolderBTNCommandMethod()
+        {
+            try
+            {
+                // opens the folder in explorer
+                Process.Start(_modFolder);
+            }
+            catch (Exception e)
+            {
+                ViewModelApplication.DefaultError(e.Message);
+            }
+        }
+
         private void ModBTNCommandMethod()
         {
-            LoadFileStructure();
+            UpdateTreeView();
 
             var vm = new EditorPageViewModel(this);
             //vm.OnSaveAction += OnSave;
             ViewModelApplication.GoToPage(ApplicationPage.EditorPage, vm);
+        }
+
+        /// <summary>
+        /// Updates the treeview for the directory structure
+        /// </summary>
+        public void UpdateTreeView()
+        {
+            var children = DirectoryStructure.GetLogicalDrives();
+
+            // //Create the view models from the data
+            var child = Directory.GetDirectories(Parent);
+            FileStructure = new ObservableCollection<DirectoryItemViewModel>(
+                children.Select(drive => new DirectoryItemViewModel(drive.FullPath, DirectoryItemType.Drive, drive.ChildCount)));
+
+            FileStructure = new ObservableCollection<DirectoryItemViewModel>
+            {
+                new DirectoryItemViewModel(Parent, DirectoryItemType.Folder, child.Length)
+            };
+
+            // Expand the root tree node
+            FileStructure[0].IsExpanded = true;
+
+            if (File.Exists(_fileStructureSave))
+            {
+                var json = File.ReadAllText(_fileStructureSave);
+                var save = JsonConvert.DeserializeObject<ObservableCollection<DirectoryItemViewModel>>(json);
+
+                FileStructure = save;
+            }
+
+            FileStructure[0].Visibility = Visibility.Collapsed;
+            FileStructure[0].IsChecked = true;
+            FileStructure[0].IsRoot = true;
+
+            foreach (DirectoryItemViewModel child1 in FileStructure[0].Children)
+            {
+                if (child1 == null) continue;
+                child1.IsInRoot = true;
+            }
         }
 
         internal void SetDependentOnTechFab()
@@ -246,7 +434,7 @@ namespace FCSModdingUtility
 
         private string GetModSize()
         {
-            if (string.IsNullOrEmpty(_location)) return "N/A";
+            if (string.IsNullOrEmpty(Location)) return "N/A";
 
             DirectoryInfo di = new DirectoryInfo(_modFolder);
             var dirSize = di.EnumerateFiles("*", SearchOption.AllDirectories).Sum(fi => fi.Length);
@@ -259,12 +447,12 @@ namespace FCSModdingUtility
             var dllLocation = GetDLLLocation();
             if (string.IsNullOrEmpty(dllLocation)) return "N/A";
             var versionInfo = FileVersionInfo.GetVersionInfo(dllLocation);
-            return versionInfo.ProductVersion; // Will typically return "1.0.0" in your case
+            return ApplicationHelpers.VersionToSematic(versionInfo.ProductVersion); // Will typically return "1.0.0" in your case
         }
 
         private string GetDLLLocation()
         {
-            if (string.IsNullOrEmpty(_location)) return string.Empty;
+            if (string.IsNullOrEmpty(Location)) return string.Empty;
             string[] files = Directory.GetFiles(_modFolder, "*.dll");
 
             foreach (string file in files)
@@ -280,14 +468,40 @@ namespace FCSModdingUtility
 
         private void FixBTNCommandMethod()
         {
-            //SaveModConfig(export);
+            //TODO Go to the Fix Page.
+            for (int i = 0; i < IssueReports.Count; i++)
+            {
+                switch (IssueReports[0].IssueReportType)
+                {
+                    case IssueReportType.VersionMissMatch:
+                        Version = IssueReports[0].DLLVersion;
+                        SaveModConfig();
+                        IssueReports.Remove(IssueReports[0]);
+                        break;
+                    case IssueReportType.MissingDependancy:
+                        break;
+                    case IssueReportType.ModDisabled:
+                        Enable = true;
+                        IssueReports.Remove(IssueReports[0]);
+                        SaveModConfig();
+                        break;
+                    case IssueReportType.Unknown:
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+                UpdateHasIssues();
+            }
+            
+            CheckForIssues();
+
         }
 
         internal void SaveModConfig()
         {
             try
             {
-                File.WriteAllText(_location, this.ToJson());
+                File.WriteAllText(Location, this.ToJson());
             }
             catch (Exception)
             {
@@ -299,12 +513,11 @@ namespace FCSModdingUtility
         private void PackageBTNCommandMethod()
         {
             string result = Path.Combine(Path.GetTempPath(), Path.GetFileName(_modFolder));
+            bool completed = true;
 
             try
             {
-                
-
-                LoadFileStructure();
+                UpdateTreeView();
 
                 using (CommonSaveFileDialog sfd = new CommonSaveFileDialog())
                 {
@@ -315,36 +528,25 @@ namespace FCSModdingUtility
 
                     if (sfd.ShowDialog() == CommonFileDialogResult.Ok)
                     {
+
                         ViewModelApplication.SetStatus(ApplicationStatusTypes.Running, "Zipping", StatusBarColors.Warning);
 
-
                         ApplicationHelpers.SafeDeleteFile(sfd.FileName);
+                        ApplicationHelpers.SafeDeleteDirectory(result);
 
                         Directory.CreateDirectory(result);
 
-                        foreach (FileStructure fileStructure in FileStructure)
+                        foreach (DirectoryItemViewModel fileStructure in FileStructure)
                         {
-                            if (fileStructure.IsDirectory && fileStructure.Include)
-                            {
-                                Directory.CreateDirectory(Path.Combine(result, fileStructure.GetFileName()));
-                            }
+                            completed = ProcessCreatingDirectories(fileStructure, result);
                         }
-
-
-                        foreach (FileStructure fileStructure in FileStructure)
-                        {
-                            if (!fileStructure.Include || fileStructure.IsDirectory) continue;
-
-                            var destFile = Path.Combine(result, fileStructure.IsInRoot(Path.GetFileName(_modFolder)) ? string.Empty : fileStructure.GetDirectoryName(), fileStructure.GetFileName());
-
-                            File.Copy(fileStructure.FileName, destFile);
-
-                        }
-                        
-                        //Directory.Move();
 
                         ZipFile.CreateFromDirectory(result, sfd.FileName, CompressionLevel.Optimal, true);
-                        ViewModelApplication.SetStatus(ApplicationStatusTypes.Ready,"Zipping Completed.");
+
+                        if (completed)
+                        {
+                            ViewModelApplication.SetStatus(ApplicationStatusTypes.Ready, "Zipping Completed.");
+                        }
 
                         ApplicationHelpers.SafeDeleteDirectory(result);
                     }
@@ -358,8 +560,6 @@ namespace FCSModdingUtility
                         }
                     }
                 }
-
-
             }
             catch (Exception e)
             {
@@ -368,44 +568,38 @@ namespace FCSModdingUtility
             }
         }
 
-        private void DeleteFile()
+        private bool ProcessCreatingDirectories(DirectoryItemViewModel fileStructure, string result)
         {
-
-        }
-
-        private void LoadFileStructure()
-        {
-            FileStructure.Clear();
-
-            string[] files = Directory.GetFiles(_modFolder,"*",SearchOption.AllDirectories);
-            string[] dirs = Directory.GetDirectories(_modFolder,"*", SearchOption.AllDirectories);
-
-            foreach (string file in files)
+            try
             {
-                FileStructure.Add(new FileStructure{FileName = file,Include = Path.GetExtension(file).Contains(".fcs") ? false : true, Parent = Path.GetDirectoryName(file)});
-            }
-
-            foreach (string dir in dirs)
-            {
-                FileStructure.Add(new FileStructure { FileName = dir, Include = true, Parent = Path.GetDirectoryName(dir), IsDirectory = true});
-            }
-
-            //LoadPrevSettings
-            if (File.Exists(_fileStructureSave))
-            {
-                var json = File.ReadAllText(_fileStructureSave);
-                var save = JsonConvert.DeserializeObject<List<FileStructure>>(json);
-                
-                foreach (FileStructure saveStructure in save)
+                foreach (DirectoryItemViewModel child in fileStructure.Children)
                 {
-                    foreach (FileStructure structure in FileStructure)
+                    if (child.Type == DirectoryItemType.Drive || child.Type == DirectoryItemType.Folder)
                     {
-                        if (!structure.FileName.Equals(saveStructure.FileName)) continue;
-                        structure.Include = saveStructure.Include;
-                        break;
+                        Directory.CreateDirectory(Path.Combine(result, child.Name));
+
+                        if (child.HasItems)
+                        {
+                            ProcessCreatingDirectories(child, result);
+                        }
+                    }
+                    else
+                    {
+                        if (child.Type != DirectoryItemType.File) continue;
+
+                        var destFile = Path.Combine(result, child.IsInRoot ? string.Empty : child.GetDirectoryName(), child.Name);
+
+                        File.Copy(child.FullPath, destFile);
                     }
                 }
             }
+            catch (Exception e)
+            {
+                ViewModelApplication.DefaultError(e.Message);
+                return false;
+            }
+
+            return true;
         }
 
         internal void SaveCurrentFileStructure()
@@ -418,9 +612,24 @@ namespace FCSModdingUtility
 
         internal void UpdateElement()
         {
+            CheckForIssues();
+            UpdateDependencyData();
             SetDependentOnTechFab();
             SaveCurrentFileStructure();
             SaveModConfig();
+        }
+
+        internal void UpdateDependencyData()
+        {
+            if (Dependencies != null)
+            {
+                DependenciesCount = Dependencies.Count;
+            }
+
+            if (VersionDependencies != null)
+            {
+                VersionDependenciesCount = VersionDependencies.Count;
+            }
         }
     }
 
@@ -437,61 +646,5 @@ namespace FCSModdingUtility
             MissingMemberHandling = MissingMemberHandling.Ignore,
             NullValueHandling = NullValueHandling.Ignore
         };
-    }
-
-    public class FileStructure : INotifyPropertyChanged
-    {
-        public string Parent { get; set; }
-        public string FileName { get; set; }
-        private bool _include;
-
-        public bool Include
-        {
-            get => _include;
-            set
-            {
-                _include = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public bool IsDirectory { get; set; }
-        
-        public override string ToString()
-        {
-            return Parent;
-        }
-
-        internal string GetFileName()
-        {
-            return Path.GetFileName(FileName);
-        }
-
-        public string GetFileExtention()
-        {
-            if (!IsDirectory)
-            {
-                return Path.GetExtension(FileName);
-            }
-
-            return String.Empty;
-        }
-
-        internal string GetDirectoryName()
-        {
-            return Path.GetFileName(Parent);
-        }
-
-        internal bool IsInRoot(string root)
-        {
-            return Path.GetFileName(Parent).Equals(root);
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
     }
 }

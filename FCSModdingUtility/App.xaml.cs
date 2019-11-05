@@ -15,12 +15,12 @@ namespace FCSModdingUtility
     /// </summary>
     public partial class App : Application
     {
-        protected override async void OnStartup(StartupEventArgs e)
+        protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
 
             // Setup the main application 
-            await ApplicationSetupAsync();
+            ApplicationSetupAsync();
 
             //Logger.LogDebugSource("Application starting...");
             //var mess = new MessageBoxDialogViewModel { Message = "Dd", Title = "ffd", OkText = "OK" };
@@ -32,7 +32,7 @@ namespace FCSModdingUtility
         /// <summary>
         /// Configures our application ready for use
         /// </summary>
-        private async Task ApplicationSetupAsync()
+        private void ApplicationSetupAsync()
         {
             //TODO load settings
             // Setup the DNA Framework

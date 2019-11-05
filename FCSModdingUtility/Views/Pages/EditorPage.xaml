@@ -92,33 +92,40 @@
                 </Style>
             </StackPanel.Resources>
 
-            <Button Content="Collapse all" Click="btnCollapseAllGroups_ButtonClick"/>
-            <Button Content="Expand all" Click="btnExpandAllGroups_ButtonClick"/>
-            <Button Content="De-select Invalid Files" Command="{Binding InvalidFilesFilterBTNCommand}" CommandParameter="{Binding ElementName=DataGrid}"  Width="150"/>
+            <Button Content="Collapse all" Command="{Binding CollapseTreeviewBTNCommand}" CommandParameter="{Binding ElementName=TreeView}"/>
+            <Button Content="Expand all" Command="{Binding ExpandTreeviewBTNCommand}" CommandParameter="{Binding ElementName=TreeView}"/>
+            <Button Content="De-select Invalid Files" Command="{Binding InvalidFilesFilterBTNCommand}" CommandParameter="{Binding ElementName=TreeView}"  Width="150"/>
+            <Button Content="Refresh" Command="{Binding RefreshBTNCommand}"  Width="150"/>
         </StackPanel>
 
-        <xcdg:DataGridControl x:Name="DataGrid" CellEditorDisplayConditions="MouseOverCell" ItemsSource="{Binding Source={StaticResource cvsOrders}}"  AllowDrag="True" Grid.Row="5" Grid.Column="1">
-            <xcdg:DataGridControl.View>
-                <xcdg:TableflowView FixedColumnCount="2" />
-            </xcdg:DataGridControl.View>
+        <TreeView x:Name="TreeView" ItemsSource="{Binding ModItemViewModel.FileStructure}" Background="Transparent" Grid.Row="5" Grid.Column="1">
+            <TreeView.ItemContainerStyle>
+                <Style TargetType="{x:Type TreeViewItem}">
+                    <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+                    <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+                    <Setter Property="local:TreeItemCheck.Command"
+                                Value="{Binding OpenFileCommand}"/>
+                    <!--<Setter Property="commandBehaviors:MouseDoubleClick.Command"
+                                Value="{Binding OpenFileCommand}"/>
+                    <Setter Property="commandBehaviors:MouseDoubleClick.CommandParameter"
+                                Value="{Binding}"/>-->
+                    <EventSetter Event="PreviewMouseRightButtonDown"
+                                     Handler="OnPreviewMouseRightButtonDown" />
+                </Style>
+            </TreeView.ItemContainerStyle>
 
-            <xcdg:DataGridControl.Columns>
-                <xcdg:Column FieldName="Include"
-                             Title="Include"
-                             Width="100"
-                             IsMainColumn="True">
-                </xcdg:Column>
-
-                <xcdg:Column FieldName="Parent"
-                             Title="Parent"
-                             Width="100"/>
-
-                <xcdg:Column FieldName="FileName"
-                             Title="FileName"
-                             Width="*"/>
-
-            </xcdg:DataGridControl.Columns>
-        </xcdg:DataGridControl>
+            <TreeView.ItemTemplate>
+                <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox IsChecked="{Binding IsChecked}" VerticalAlignment="Center" Visibility="{Binding Visibility}"/>
+                        <Image Width="20" Margin="3" 
+                                   Source="{Binding ImageName,
+                                        Converter={x:Static local:HeaderToImageConverter.Instance}}" />
+                        <TextBlock  Foreground="{StaticResource ForgroundWhiteBrush}" Text="{Binding Name}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </HierarchicalDataTemplate>
+            </TreeView.ItemTemplate>
+        </TreeView>
 
     </Grid>
 </local:BasePage>

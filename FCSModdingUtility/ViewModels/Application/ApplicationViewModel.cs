@@ -227,5 +227,10 @@ namespace FCSModdingUtility
             SetStatus(ApplicationStatusTypes.Error, message, StatusBarColors.Error);
         }
         #endregion
+
+        public void DefaultWarning(string message)
+        {
+            SetStatus(ApplicationStatusTypes.Warning, message, StatusBarColors.Warning);
+        }
     }
 }

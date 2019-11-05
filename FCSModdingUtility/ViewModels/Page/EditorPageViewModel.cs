@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
+using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using Xceed.Wpf.DataGrid;
@@ -15,6 +17,10 @@ namespace FCSModdingUtility
         public ModItemViewModel ModItemViewModel { get; set; }
         public ICommand BackBTNCommand { get; set; }
         public ICommand InvalidFilesFilterBTNCommand { get; set; }
+        public ICommand CollapseTreeviewBTNCommand { get; set; }
+        public ICommand ExpandTreeviewBTNCommand { get; set; }
+        public ICommand RefreshBTNCommand { get; set; }
+
         private readonly string[] _allowedExtention = {".json", ".png", ".dll", ".txt",""};
 
         public EditorPageViewModel()
@@ -24,10 +30,6 @@ namespace FCSModdingUtility
 
         private void BackBTNCommandMethod(object o)
         {
-            var grid = (DataGridControl) o;
-            ((DataGridCollectionView)grid.ItemsSource).Refresh();
-
-            //grid.CurrentItem = grid.Items[0];
             ModItemViewModel.UpdateElement();
 
             ViewModelApplication.GoToPage(ApplicationPage.StartPage);
@@ -38,73 +40,134 @@ namespace FCSModdingUtility
             ModItemViewModel = vm;
             BackBTNCommand = new RelayParameterizedCommand(BackBTNCommandMethod);
             InvalidFilesFilterBTNCommand = new RelayParameterizedCommand(InvalidFilesFilterBTNCommandMethod);
+            CollapseTreeviewBTNCommand = new RelayParameterizedCommand(CollapseTreeviewCommandMethod);
+            ExpandTreeviewBTNCommand = new RelayParameterizedCommand(ExpandTreeviewCommandMethod);
+            RefreshBTNCommand = new RelayCommand(RefreshCommandMethod);
         }
 
-        private void InvalidFilesFilterBTNCommandMethod(object obj)
+        private void InvalidFilesFilterBTNCommandMethod(object o)
         {
-            DataGrid = (DataGridControl) obj;
-            CollapseOrExpandAll();
+            var treeview = (TreeView)o;
+            foreach (DirectoryItemViewModel item in treeview.Items)
+                DisableInvalid(item);
         }
 
-        public DataGridControl DataGrid { get; set; }
-
-        private void CollapseOrExpandAll(CollectionViewGroup inputGroup = null)
+        private void DisableInvalid(DirectoryItemViewModel vm)
         {
-            IList<Object> groupSubGroups = null;
-
-            // If top level then inputGroup will be null
-            if (inputGroup == null)
+            foreach (DirectoryItemViewModel item in vm.Children)
             {
-                if (DataGrid.Items.Groups != null)
-                    groupSubGroups = DataGrid.Items.Groups;
-            }
-            else
-            {
-                groupSubGroups = inputGroup.GetItems();
-            }
+                if (item == null || item.Type != DirectoryItemType.File) continue;
 
-            if (groupSubGroups != null)
-            {
+                if(_allowedExtention.Contains(item.GetFileExtention())) continue;
+                item.IsChecked = false;
 
-                foreach (CollectionViewGroup group in groupSubGroups)
-                {
-                    if(group.Items.Count < 0) continue;
-
-                    if (group.Items[0].GetType() == typeof(FileStructure))
-                    {
-                        ProcessGroup(group);
-                    }
-                    else
-                    {
-                        foreach (CollectionViewGroup group1 in group.Items)
-                        {
-                            ProcessGroup(group1);
-                        }
-                    }
-                    
-                    //// Expand/Collapse current group
-                    //if (bCollapseGroup)
-                    //    DataGrid.CollapseGroup(group);
-                    //else
-                    //    DataGrid.ExpandGroup(group);
-
-                    // Recursive Call for SubGroups
-                    if (!group.IsBottomLevel)
-                        CollapseOrExpandAll(group);
-                }
+                if (item.HasItems)
+                    CollapseTreeviewItems(item);
             }
         }
 
-        private void ProcessGroup(CollectionViewGroup group)
+        private void RefreshCommandMethod()
         {
-            foreach (FileStructure fileStructure in group.Items)
+            ModItemViewModel.UpdateTreeView();
+        }
+
+        private void CollapseTreeviewCommandMethod(object o)
+        {
+            var treeview = (TreeView) o;
+            foreach (DirectoryItemViewModel item in treeview.Items)
+                CollapseTreeviewItems(item);
+
+            #region Oint
+            //IList<Object> groupSubGroups = null;
+
+            //If top level then inputGroup will be null
+            //if (inputGroup == null)
+            //{
+            //    if (DataGrid.Items.Groups != null)
+            //        groupSubGroups = DataGrid.Items.Groups;
+            //}
+            //else
+            //{
+            //    groupSubGroups = inputGroup.GetItems();
+            //}
+
+            //if (groupSubGroups != null)
+            //{
+
+            //    foreach (CollectionViewGroup group in groupSubGroups)
+            //    {
+            //        if (group.Items.Count < 0) continue;
+
+            //        if (group.Items[0].GetType() == typeof(DirectoryItemViewModel))
+            //        {
+            //            ProcessGroup(group);
+            //        }
+            //        else
+            //        {
+            //            foreach (CollectionViewGroup group1 in group.Items)
+            //            {
+            //                ProcessGroup(group1);
+            //            }
+            //        }
+
+            //        Expand / Collapse current group
+            //        if (bCollapseGroup)
+            //            DataGrid.CollapseGroup(group);
+            //        else
+            //            DataGrid.ExpandGroup(group);
+
+            //        Recursive Call for SubGroups
+            //        if (!group.IsBottomLevel)
+            //                CollapseOrExpandAll(group);
+            //    }
+            //} 
+            #endregion
+        }
+
+        private void ExpandTreeviewCommandMethod(object o)
+        {
+            var treeview = (TreeView)o;
+                        foreach (DirectoryItemViewModel item in treeview.Items)
+                            ExpandTreeviewItems(item);
+        }
+
+        private void CollapseTreeviewItems(DirectoryItemViewModel vm)
+        {
+            if (!vm.IsRoot)
             {
-                var ext = fileStructure.GetFileExtention();
-                if (!_allowedExtention.Contains(ext))
-                {
-                    fileStructure.Include = false;
-                }
+                vm.IsExpanded = false;
+            }
+
+            foreach (DirectoryItemViewModel item in vm.Children)
+            {
+                if(item == null) continue;
+
+                item.IsExpanded = false;
+
+                if (item.HasItems)
+                    CollapseTreeviewItems(item);
             }
         }
+
+        private void ExpandTreeviewItems(DirectoryItemViewModel vm = null)
+        {
+            if (!vm.IsRoot)
+            {
+                vm.IsExpanded = true;
+            }
+
+
+            foreach (DirectoryItemViewModel item in vm.Children)
+            {
+                if (item == null) continue;
+
+                item.IsExpanded = true;
+
+                if (item.HasItems)
+                    ExpandTreeviewItems(item);
+            }
+        }
+
+        public ObservableCollection<DirectoryItemViewModel> Items { get; set; }
     }
 }

@@ -9,6 +9,5 @@
         Warning,
         Error,
         Unknown
-
     }
 }
