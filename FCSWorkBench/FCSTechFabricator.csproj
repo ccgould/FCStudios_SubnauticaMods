@@ -62,8 +62,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Abstract Classes\TechFabCraftable.cs" />
+    <Compile Include="Abstract Classes\TechFabModule.cs" />
     <Compile Include="Configuration\Configuration.cs" />
     <Compile Include="Configuration\Information.cs" />
+    <Compile Include="Craftables\ModuleCraftable.cs" />
+    <Compile Include="Helpers\PatchHelpers.cs" />
+    <Compile Include="Models\FCSKitEntry.cs" />
     <Compile Include="Helpers\IngredientHelper.cs" />
     <Compile Include="Interfaces\IFCSTechFabricatorItem.cs" />
     <Compile Include="Models\IngredientItem.cs" />
@@ -82,12 +87,12 @@
     <Compile Include="Mono\FCSTechFabricatorTag.cs" />
     <Compile Include="Mono\FCSTechWorkBenchModelPrefab.cs" />
     <Compile Include="Mono\FCSTechWorkBenchPatcher.cs" />
+    <Compile Include="Craftables\KitCraftable.cs" />
     <Compile Include="Mono\MarineTurbine\MarineMonitorKitPatcher.cs" />
     <Compile Include="Mono\MarineTurbine\JetStreamKitPatcher.cs" />
     <Compile Include="Mono\MiniFountainFilter\MiniFountainFilterPatcher.cs" />
     <Compile Include="Mono\PowerStorage\PowerStorageKitPatcher.cs" />
     <Compile Include="Mono\SeaBreeze\Freon.cs" />
-    <Compile Include="Mono\SeaBreeze\FreonModelPrefab.cs" />
     <Compile Include="Mono\SeaBreeze\FreonPatcher.cs" />
     <Compile Include="Mono\SeaBreeze\SeaBreezeKitPatcher.cs" />
     <Compile Include="Mono\SeaCooker\SeaAlienGasTankPatcher.cs" />
@@ -97,7 +102,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Abstract Classes\" />
     <Folder Include="Mono\Materials\" />
   </ItemGroup>
   <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />

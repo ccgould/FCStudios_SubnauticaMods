@@ -3,10 +3,20 @@ using Oculus.Newtonsoft.Json;
 using Oculus.Newtonsoft.Json.Serialization;
 using System.Collections.Generic;
 
-namespace FCSTechFabricator.Configuration
+namespace FCSTechFabricator
 {
-    internal class Configuration
+    public class Configuration
     {
+        public static string MiniFountainFilterClassID=> "MiniFountainFilter";
+        public static string ExStorageClassID=> "ExStorageDepot";
+        public static string SeaBreezeClassID=> "ARSSeaBreezeFCS32";
+        public static string AIMarineMonitorClassID=> "AIMarineMonitor";
+        public static string AIJetStreamT242ClassID => "AIJetStreamT242";
+        public static string PowerStorageKitClassID => "FCSPowerStorage";
+        public static string DeepDrillerClassID => "FCS_DeepDriller";
+        public static string SeaCookerClassID => "SeaCooker";
+
+
         [JsonProperty] internal List<ConfigItem> Blueprints { get; set; } = new List<ConfigItem>();
 
         public List<IngredientItem> GetData(string classId)

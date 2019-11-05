@@ -7,30 +7,22 @@ using UnityEngine;
 
 namespace FCSTechFabricator.Mono.SeaCooker
 {
-    public partial class SeaAlienGasTankCraftable : Craftable
+    internal class SeaAlienGasTankCraftable : TechFabCraftable
     {
-        internal static TechType TechTypeID { get; private set; }
-
-        public override CraftTree.Type FabricatorType { get; } =
-            FCSTechFabricatorBuildable.TechFabricatorCraftTreeType;
+        public override TechType TechTypeID { get; set; }
 
         public override string[] StepsToFabricatorTab { get; } = new[] { "AE", "SC" };
 
         public override string AssetsFolder { get; } = "FCSTechFabricator/Assets";
 
-        public SeaAlienGasTankCraftable() : base("SeaAlienGasTank_SC", "Sea Alien Gas Tank", "This tank allows you too cook food in the Sea Cooker using Alien Feces.")
+        public SeaAlienGasTankCraftable() : base("SeaAlienGasTank_SC", "Sea Alien Gas Tank", "This tank allows you too cook food in the Sea Cooker using Alien Feces.", false, EquipmentType.Tank)
         {
-            OnFinishedPatching = () =>
-            {
-                TechTypeID = this.TechType;
-                //Add the new TechType Hand Equipment type
-                CraftDataHandler.SetEquipmentType(TechType, EquipmentType.Tank);
-            };
+
         }
 
         public override GameObject GetGameObject()
         {
-            GameObject prefab = GameObject.Instantiate(QPatch.SeaAlienGasTank);
+            GameObject prefab = GameObject.Instantiate(QPatch.SeaGasTank);
 
             prefab.name = this.PrefabFileName;
 
@@ -70,6 +62,7 @@ namespace FCSTechFabricator.Mono.SeaCooker
             pickupable.isPickupable = true;
             pickupable.randomizeRotationWhenDropped = true;
 
+
             PrefabIdentifier prefabID = prefab.GetOrAddComponent<PrefabIdentifier>();
 
             prefabID.ClassId = this.ClassID;
@@ -86,6 +79,8 @@ namespace FCSTechFabricator.Mono.SeaCooker
         {
             return IngredientHelper.GetCustomRecipe(ClassID);
         }
+
+        public override GameObject OriginalPrefab { get; set; }
 
         public override TechGroup GroupForPDA { get; } = TechGroup.Resources;
         public override TechCategory CategoryForPDA { get; } = TechCategory.AdvancedMaterials;

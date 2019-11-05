@@ -1,30 +1,31 @@
-﻿using FCSCommon.Extensions;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using FCSCommon.Utilities;
 using FCSTechFabricator.Helpers;
-using FCSTechFabricator.Models;
-using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
-using SMLHelper.V2.Handlers;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace FCSTechFabricator.Mono.DeepDriller
+namespace FCSTechFabricator.Mono
 {
-    internal class DeepDrillerKitBuildable : TechFabCraftable
+    internal class KitCraftable : TechFabCraftable
     {
         private Text _label;
 
         public override GameObject OriginalPrefab { get; set; } = QPatch.Kit;
-        public override string IconFileName { get; } = "Kit_FCS.png";
+        public override string IconFileName { get;}
         public override TechGroup GroupForPDA { get; } = TechGroup.Resources;
         public override TechCategory CategoryForPDA { get; } = TechCategory.AdvancedMaterials;
-        public override string[] StepsToFabricatorTab { get; } = { "AIS", "DD" };
+        public override string[] StepsToFabricatorTab { get; }
         public override TechType TechTypeID { get; set; }
 
-        public DeepDrillerKitBuildable() :
-            base("DeepDrillerKit_DD", "Deep Driller Kit", "This kit allows you to make one Deep Driller unit")
+        public KitCraftable(string classId, string friendlyName, string description, string icon, string[] stepsToFabricatorTab) : 
+            base(classId, friendlyName, description)
         {
-
+            StepsToFabricatorTab = stepsToFabricatorTab;
+            IconFileName = string.IsNullOrEmpty(icon) ? "Kit_FCS.png" : icon;
         }
 
         public override void GetGameObjectExt(GameObject instantiatedPrefab)

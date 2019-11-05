@@ -50,7 +50,6 @@ namespace FCSTechFabricator.Mono
         private static void CreateCustomTree()
         {
             _root = CraftTreeHandler.CreateCustomCraftTreeAndType("FCSTechFabricator", out CraftTree.Type craftType);
-            ModCraftTreeTab itemTab = null;
 
             TechFabricatorCraftTreeType = craftType;
 
@@ -61,7 +60,7 @@ namespace FCSTechFabricator.Mono
                 if (_root.GetNode($"{division.Value}") == null)
                 {
                     QuickLogger.Debug($"{division.Key} is null creating tab");
-                    itemTab = _root.AddTabNode($"{division.Value}", $"{division.Key}", new Atlas.Sprite(ImageUtils.LoadTextureFromFile($"./QMods/FCSTechFabricator/Assets/{division.Value}Icon.png")));
+                    var itemTab = _root.AddTabNode($"{division.Value}", $"{division.Key}", new Atlas.Sprite(ImageUtils.LoadTextureFromFile($"./QMods/FCSTechFabricator/Assets/{division.Value}Icon.png")));
                     QuickLogger.Debug($"{division.Key} node tab Created");
 
                     foreach (var fcsMod in FCSMods)
@@ -125,23 +124,6 @@ namespace FCSTechFabricator.Mono
 
         }
 
-        private static void AddTabNodes(ref ModCraftTreeRoot root, ref ModCraftTreeTab itemTab, IFCSTechFabricatorItem fcsTechFabricator, string category, string icon)
-        {
-
-            if (root.GetNode($"{category}") == null)
-            {
-                QuickLogger.Debug($"{category} is null creating tab");
-                itemTab = root.AddTabNode($"{category}", $"FCS Tech Fabricator {category}", new Atlas.Sprite(ImageUtils.LoadTextureFromFile($"./QMods/FCSTechFabricator/Assets/{icon}.png")));
-                itemTab?.AddCraftingNode(fcsTechFabricator.TechTypeID);
-                QuickLogger.Debug($"{category} node tab Created");
-            }
-            else
-            {
-                QuickLogger.Debug($"{category} is not null creating node tab");
-                itemTab?.AddCraftingNode(fcsTechFabricator.TechTypeID);
-            }
-        }
-
         /// <summary>
         /// This is the CraftTree.Type for the FCS Tech Fabricator.
         /// </summary> 
@@ -174,7 +156,7 @@ namespace FCSTechFabricator.Mono
             return customFabRecipe;
         }
 
-        public static void AddTechType(TechType techType, string[] steps)
+        internal static void AddTechType(TechType techType, string[] steps)
         {
             QuickLogger.Debug($"Attempting to add TechType {techType} to {steps[0]}");
 
@@ -183,6 +165,7 @@ namespace FCSTechFabricator.Mono
                 var tab = _root.GetTabNode(steps);
                 if (tab.GetCraftingNode(techType) == null)
                 {
+                    //tab.AddModdedCraftingNode("Freon_ARS");
                     tab.AddCraftingNode(techType);
                     QuickLogger.Debug($"Added TechType {techType} to {steps[0]}");
                 }

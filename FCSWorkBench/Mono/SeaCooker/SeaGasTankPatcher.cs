@@ -7,25 +7,17 @@ using UnityEngine;
 
 namespace FCSTechFabricator.Mono.SeaCooker
 {
-    public partial class SeaGasTankCraftable : Craftable
+    internal  class SeaGasTankCraftable : TechFabCraftable
     {
-        internal static TechType TechTypeID { get; private set; }
-
-        public override CraftTree.Type FabricatorType { get; } =
-            FCSTechFabricatorBuildable.TechFabricatorCraftTreeType;
+        public override TechType TechTypeID { get; set; }
 
         public override string[] StepsToFabricatorTab { get; } = new[] { "AE", "SC" };
 
         public override string AssetsFolder { get; } = "FCSTechFabricator/Assets";
 
-        public SeaGasTankCraftable() : base("SeaGasTank_SC", "Sea Gas Tank", "This tank allows you too cook food in the Sea Cooker using Gaspod gas.")
+        public SeaGasTankCraftable() : base("SeaGasTank_SC", "Sea Gas Tank", "This tank allows you too cook food in the Sea Cooker using Gaspod gas.",false,EquipmentType.Tank)
         {
-            OnFinishedPatching = () =>
-            {
-                TechTypeID = this.TechType;
-                //Add the new TechType Hand Equipment type
-                CraftDataHandler.SetEquipmentType(TechType, EquipmentType.Tank);
-            };
+            
         }
 
         public override GameObject GetGameObject()
@@ -37,8 +29,7 @@ namespace FCSTechFabricator.Mono.SeaCooker
             // Set collider
             var collider = prefab.GetComponent<BoxCollider>();
             collider.enabled = false;
-
-
+            
             var rb = prefab.AddComponent<Rigidbody>();
             rb.isKinematic = true;
 
@@ -88,6 +79,8 @@ namespace FCSTechFabricator.Mono.SeaCooker
         {
             return IngredientHelper.GetCustomRecipe(ClassID);
         }
+
+        public override GameObject OriginalPrefab { get; set; }
 
         public override TechGroup GroupForPDA { get; } = TechGroup.Resources;
         public override TechCategory CategoryForPDA { get; } = TechCategory.AdvancedMaterials;

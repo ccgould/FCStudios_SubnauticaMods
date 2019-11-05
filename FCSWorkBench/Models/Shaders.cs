@@ -30,7 +30,7 @@ namespace FCSTechFabricator.Models
             MaterialHelpers.ApplySpecShader("UnitContainerKit_BaseColor", "UnitContainerKit_Spec", prefab, 1f, 6f, QPatch.Bundle);
         }
 
-        public static void ApplySeaTank(GameObject prefab)
+        internal static void ApplySeaTankShaders(GameObject prefab)
         {
             #region SystemLights_BaseColor
             MaterialHelpers.ApplyEmissionShader("SeaCooker_BaseColor", "SeaCooker_Emissive", prefab, QPatch.Bundle, new Color(0.08235294f, 1f, 1f));
@@ -38,6 +38,23 @@ namespace FCSTechFabricator.Models
             MaterialHelpers.ApplySpecShader("SeaCooker_BaseColor", "SeaCooker_Spec", prefab, 1, 6f, QPatch.Bundle);
             MaterialHelpers.ApplyAlphaShader("SeaCooker_BaseColor", prefab);
             #endregion
+        }
+
+        internal static void ApplyFreonShaders(GameObject prefab)
+        {
+            #region SystemLights_BaseColor
+            MaterialHelpers.ApplyEmissionShader("SystemLights_BaseColor", "SystemLights_OnMode_Emissive", prefab, QPatch.Bundle, new Color(0.08235294f, 1f, 1f));
+            MaterialHelpers.ApplyNormalShader("SystemLights_BaseColor", "SystemLights_Norm", prefab, QPatch.Bundle);
+            MaterialHelpers.ApplyAlphaShader("SystemLights_BaseColor", prefab);
+            #endregion
+
+            #region FCS_SUBMods_GlobalDecals
+            MaterialHelpers.ApplyAlphaShader("FCS_SUBMods_GlobalDecals", prefab);
+            MaterialHelpers.ApplyNormalShader("FCS_SUBMods_GlobalDecals", "FCS_SUBMods_GlobalDecals_Norm", prefab, QPatch.Bundle);
+            #endregion
+
+            MaterialHelpers.ApplyNormalShader("Freon_Bottle", "Freon_Freon_Bottle_Normal", prefab, QPatch.Bundle);
+            MaterialHelpers.ApplySpecShader("Freon_Bottle", "Freon_Freon_Bottle_Specular", prefab, 1f, 4f, QPatch.Bundle);
         }
     }
 }

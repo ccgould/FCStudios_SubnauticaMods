@@ -2,7 +2,7 @@
 using System;
 using System.IO;
 
-namespace FCSTechFabricator.Configuration
+namespace FCSTechFabricator
 {
     public static class Information
     {

@@ -59,7 +59,7 @@ namespace FCSTechFabricator.Helpers
 
         public static TechData GetCustomRecipe(string ClassID)
         {
-            var inventoryItem = QPatch.Configuration.GetData(ClassID);
+            var inventoryItem = QPatch.ModConfiguration.GetData(ClassID);
             TechData customFabRecipe = null;
 
             if (ValidateData(inventoryItem))
