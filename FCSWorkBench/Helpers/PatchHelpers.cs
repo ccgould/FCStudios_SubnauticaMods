@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
@@ -17,106 +14,6 @@ namespace FCSTechFabricator.Helpers
 {
     internal static class PatchHelpers
     {
-        internal static List<FCSKitEntry> CreateKits()
-        {
-            var list = new List<FCSKitEntry>
-            {
-                new FCSKitEntry
-                {
-                    ClassID = "PowerStorageKit_PS",
-                    FriendlyName = "Power Storage Kit",
-                    Description = "A kit that allows you to build one Power Storage Unit",
-                    FabricatorSteps = new[]{ "AIS", "PS" },
-                    ModParent = Configuration.PowerStorageKitClassID
-                },
-                new FCSKitEntry
-                {
-                    ClassID = "DeepDrillerKit_DD",
-                    FriendlyName = "Deep Driller Kit",
-                    Description = "This kit allows you to make one Deep Driller unit",
-                    FabricatorSteps = new[]{ "AIS", "DD" },
-                    ModParent = Configuration.DeepDrillerClassID
-                },
-                new FCSKitEntry
-                {
-                    ClassID = "SeaCookerBuildableKit_SC",
-                    FriendlyName = "Sea Cooker Unit Kit",
-                    Description = "This kit allows you to make one Sea Cooker unit",
-                    FabricatorSteps = new[]{ "AE", "SC" },
-                    ModParent = Configuration.SeaCookerClassID
-                },
-                new FCSKitEntry
-                {
-                    ClassID = "JetStreamT242Kit_MT",
-                    FriendlyName = "Jet Stream T242 Kit",
-                    Description = "A kit that allows you to build one Jet Stream T242 Unit",
-                    FabricatorSteps = new[]{ "AIS", "MT" },
-                    ModParent = Configuration.AIJetStreamT242ClassID
-                },
-                new FCSKitEntry
-                {
-                    ClassID = "MarineMonitorKit_MT",
-                    FriendlyName = "Marine Monitor Kit",
-                    Description = "A kit that allows you to build one Marine Monitor",
-                    FabricatorSteps = new[]{ "AIS", "MT" },
-                    ModParent = Configuration.AIMarineMonitorClassID
-                },
-                new FCSKitEntry
-                {
-                    ClassID = "MiniFountainFilterKit_MFF",
-                    FriendlyName = "Mini Fountain Filter Unit Kit",
-                    Description = "This kit allows you to make one Mini Fountain Filter unit",
-                    FabricatorSteps = new[]{ "AE", "MFF" },
-                    ModParent = Configuration.MiniFountainFilterClassID
-                },
-                new FCSKitEntry
-                {
-                    ClassID = "ExStorageKit_ASTS",
-                    FriendlyName = "Ex-Storage Unit Kit",
-                    Description = "This kit allows you to make one ex-storage unit",
-                    FabricatorSteps = new[]{ "ASTS", "ES" },
-                    ModParent = Configuration.ExStorageClassID
-                },
-                new FCSKitEntry
-                {
-                    ClassID = "SeaBreezeKit_SB",
-                    FriendlyName = "Sea Breeze Kit",
-                    Description = "A kit that allows you to build one Seabreeze refrigerator.",
-                    FabricatorSteps = new[]{ "ARS", "SB" },
-                    ModParent = Configuration.SeaBreezeClassID
-                },
-                new FCSKitEntry
-                {
-                    ClassID = "BatteryAttachment_DD",
-                    FriendlyName = "Deep Driller Battery Attachment",
-                    Description = "This specially made attachment allows you to run your deep driller off battery power",
-                    FabricatorSteps = new[]{ "AIS", "DD" },
-                    ModParent = Configuration.DeepDrillerClassID,
-                    Icon="BatteryAttachment_DD.png"
-                },
-                new FCSKitEntry
-                {
-                    ClassID = "SolarAttachment_DD",
-                    FriendlyName = "Deep Driller Solar Attachment",
-                    Description = "This specially made attachment allows you to run your deep driller off solar power.",
-                    FabricatorSteps = new[]{ "AIS", "DD" },
-                    ModParent = Configuration.DeepDrillerClassID,
-                    Icon="SolarAttachment_DD.png"
-                },
-                new FCSKitEntry
-                {
-                    ClassID = "FocusAttachment_DD",
-                    FriendlyName = "Deep Driller Focus Attachment",
-                    Description = "This specially made attachment allows you to scan for one specific ore.",
-                    FabricatorSteps = new[]{ "AIS", "DD" },
-                    ModParent = Configuration.DeepDrillerClassID,
-                    Icon="FocusAttachment_DD.png"
-                },
-            };
-
-            return list;
-        }
-
         internal static void RegisterKit()
         {
             var model = QPatch.Kit.GetComponentInChildren<Canvas>().gameObject;
@@ -395,7 +292,7 @@ namespace FCSTechFabricator.Helpers
                 QuickLogger.Debug($"Patched {moduleCraftable.FriendlyName}");
             }
 
-            if (!TechTypeHandler.ModdedTechTypeExists(Configuration.SeaBreezeClassID))
+            if (TechTypeHandler.ModdedTechTypeExists(Configuration.SeaBreezeClassID))
             {
                 var freon = new FreonBuildable();
                 freon.Patch();
@@ -403,7 +300,7 @@ namespace FCSTechFabricator.Helpers
                 QuickLogger.Debug($"Patched {freon.FriendlyName}");
             }
 
-            if (!TechTypeHandler.ModdedTechTypeExists(Configuration.SeaCookerClassID))
+            if (TechTypeHandler.ModdedTechTypeExists(Configuration.SeaCookerClassID))
             {
                 var scGtank = new SeaGasTankCraftable();
                 scGtank.Patch();
@@ -416,6 +313,105 @@ namespace FCSTechFabricator.Helpers
                 QuickLogger.Debug($"Patched {scAGtank.FriendlyName}");
             }
 
+        }
+        private static List<FCSKitEntry> CreateKits()
+        {
+            var list = new List<FCSKitEntry>
+            {
+                new FCSKitEntry
+                {
+                    ClassID = "PowerStorageKit_PS",
+                    FriendlyName = "Power Storage Kit",
+                    Description = "A kit that allows you to build one Power Storage Unit",
+                    FabricatorSteps = new[]{ "AIS", "PS" },
+                    ModParent = Configuration.PowerStorageKitClassID
+                },
+                new FCSKitEntry
+                {
+                    ClassID = "DeepDrillerKit_DD",
+                    FriendlyName = "Deep Driller Kit",
+                    Description = "This kit allows you to make one Deep Driller unit",
+                    FabricatorSteps = new[]{ "AIS", "DD" },
+                    ModParent = Configuration.DeepDrillerClassID
+                },
+                new FCSKitEntry
+                {
+                    ClassID = "SeaCookerBuildableKit_SC",
+                    FriendlyName = "Sea Cooker Unit Kit",
+                    Description = "This kit allows you to make one Sea Cooker unit",
+                    FabricatorSteps = new[]{ "AE", "SC" },
+                    ModParent = Configuration.SeaCookerClassID
+                },
+                new FCSKitEntry
+                {
+                    ClassID = "JetStreamT242Kit_MT",
+                    FriendlyName = "Jet Stream T242 Kit",
+                    Description = "A kit that allows you to build one Jet Stream T242 Unit",
+                    FabricatorSteps = new[]{ "AIS", "MT" },
+                    ModParent = Configuration.AIJetStreamT242ClassID
+                },
+                new FCSKitEntry
+                {
+                    ClassID = "MarineMonitorKit_MT",
+                    FriendlyName = "Marine Monitor Kit",
+                    Description = "A kit that allows you to build one Marine Monitor",
+                    FabricatorSteps = new[]{ "AIS", "MT" },
+                    ModParent = Configuration.AIMarineMonitorClassID
+                },
+                new FCSKitEntry
+                {
+                    ClassID = "MiniFountainFilterKit_MFF",
+                    FriendlyName = "Mini Fountain Filter Unit Kit",
+                    Description = "This kit allows you to make one Mini Fountain Filter unit",
+                    FabricatorSteps = new[]{ "AE", "MFF" },
+                    ModParent = Configuration.MiniFountainFilterClassID
+                },
+                new FCSKitEntry
+                {
+                    ClassID = "ExStorageKit_ASTS",
+                    FriendlyName = "Ex-Storage Unit Kit",
+                    Description = "This kit allows you to make one ex-storage unit",
+                    FabricatorSteps = new[]{ "ASTS", "ES" },
+                    ModParent = Configuration.ExStorageClassID
+                },
+                new FCSKitEntry
+                {
+                    ClassID = "SeaBreezeKit_SB",
+                    FriendlyName = "Sea Breeze Kit",
+                    Description = "A kit that allows you to build one Seabreeze refrigerator.",
+                    FabricatorSteps = new[]{ "ARS", "SB" },
+                    ModParent = Configuration.SeaBreezeClassID
+                },
+                new FCSKitEntry
+                {
+                    ClassID = "BatteryAttachment_DD",
+                    FriendlyName = "Deep Driller Battery Attachment",
+                    Description = "This specially made attachment allows you to run your deep driller off battery power",
+                    FabricatorSteps = new[]{ "AIS", "DD" },
+                    ModParent = Configuration.DeepDrillerClassID,
+                    Icon="BatteryAttachment_DD.png"
+                },
+                new FCSKitEntry
+                {
+                    ClassID = "SolarAttachment_DD",
+                    FriendlyName = "Deep Driller Solar Attachment",
+                    Description = "This specially made attachment allows you to run your deep driller off solar power.",
+                    FabricatorSteps = new[]{ "AIS", "DD" },
+                    ModParent = Configuration.DeepDrillerClassID,
+                    Icon="SolarAttachment_DD.png"
+                },
+                new FCSKitEntry
+                {
+                    ClassID = "FocusAttachment_DD",
+                    FriendlyName = "Deep Driller Focus Attachment",
+                    Description = "This specially made attachment allows you to scan for one specific ore.",
+                    FabricatorSteps = new[]{ "AIS", "DD" },
+                    ModParent = Configuration.DeepDrillerClassID,
+                    Icon="FocusAttachment_DD.png"
+                },
+            };
+
+            return list;
         }
 
         private static List<FCSKitEntry> CreateModules()
