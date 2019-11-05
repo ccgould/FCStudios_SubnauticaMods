@@ -76,13 +76,10 @@
     <Compile Include="Models\Shaders.cs" />
     <Compile Include="Models\ModTechTypes.cs" />
     <Compile Include="Mono\DeepDriller\Materials\SaNDGlass.cs" />
-    <Compile Include="Mono\Ex-Storage\ExStorageKit.cs" />
     <Compile Include="Mono\FCSTechFabricatorTag.cs" />
     <Compile Include="Mono\FCSTechWorkBenchModelPrefab.cs" />
     <Compile Include="Mono\FCSTechWorkBenchPatcher.cs" />
     <Compile Include="Craftables\KitCraftable.cs" />
-    <Compile Include="Mono\MarineTurbine\MarineMonitorKitPatcher.cs" />
-    <Compile Include="Mono\MarineTurbine\JetStreamKitPatcher.cs" />
     <Compile Include="Mono\MiniFountainFilter\MiniFountainFilterPatcher.cs" />
     <Compile Include="Mono\PowerStorage\PowerStorageKitPatcher.cs" />
     <Compile Include="Mono\SeaBreeze\Freon.cs" />
