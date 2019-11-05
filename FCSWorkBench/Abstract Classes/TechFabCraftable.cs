@@ -10,9 +10,11 @@ namespace FCSTechFabricator
     {
         protected TechFabCraftable(string classId, string friendlyName, string description, bool isPlaceable = true, EquipmentType equipmentType = EquipmentType.Hand, TechType requiredForUnlock = TechType.None) : base(classId, friendlyName, description)
         {
-            
+            OnStartedPatching = Register;
+
             OnFinishedPatching = () =>
             {
+
                 TechTypeID = this.TechType;
               
                 if (isPlaceable)

@@ -14,7 +14,6 @@ namespace FCSTechFabricator
     public class QPatch
     {
         #region Public Properties
-
         public static GameObject ColorItem { get; internal set; }
 
         public static GameObject SeaAlienGasTank { get; internal set; }
@@ -35,13 +34,14 @@ namespace FCSTechFabricator
 
         #region Internal Properties
         internal static Configuration ModConfiguration { get; set; }
+
         #endregion
 
         #region Public Methods
         public static void Patch()
         {
-
-            QuickLogger.Info("Started patching. Version: " + QuickLogger.GetAssemblyVersion());
+            var assembly = Assembly.GetExecutingAssembly();
+            QuickLogger.Info("Started patching. Version: " + QuickLogger.GetAssemblyVersion(assembly));
 
 #if DEBUG
             QuickLogger.DebugLogsEnabled = true;

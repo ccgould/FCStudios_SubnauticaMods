@@ -16,10 +16,10 @@ namespace FCSTechFabricator.Mono.SeaBreeze
         public FreonBuildable() : 
             base("Freon_ARS", "Freon", "Freon gives you four weeks of SeaBreeze cooling on Planet 4546B.")
         {
-            Register();
+            
         }
 
-        private void Register()
+        public override void Register()
         {
             var rigidbody = OriginalPrefab.AddComponent<Rigidbody>();
 
@@ -40,9 +40,9 @@ namespace FCSTechFabricator.Mono.SeaBreeze
 
 
             //// Set proper shaders (for crafting animation)
-            //Shader marmosetUber = Shader.Find("MarmosetUBER");
+            Shader marmosetUber = Shader.Find("MarmosetUBER");
             var renderer = OriginalPrefab.GetComponentInChildren<Renderer>();
-            //renderer.material.shader = marmosetUber;
+            renderer.material.shader = marmosetUber;
 
             // Update sky applier
             var applier = OriginalPrefab.GetComponent<SkyApplier>();

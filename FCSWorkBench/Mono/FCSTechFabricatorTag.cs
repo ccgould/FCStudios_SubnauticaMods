@@ -5,9 +5,12 @@ namespace FCSTechFabricator.Mono
 {
     public class FCSTechFabricatorTag : MonoBehaviour
     {
+        private Coroutine _enableBoxcollider;
+
         private void Start()
         {
-            StartCoroutine(EnableBoxCollider());
+            //Start a coroutine to wait for player to leave the cyclops to apply the box collider
+            _enableBoxcollider =  StartCoroutine(EnableBoxCollider());
         }
 
         private IEnumerator EnableBoxCollider()
@@ -22,6 +25,13 @@ namespace FCSTechFabricator.Mono
             {
                 bc.enabled = true;
             }
+        }
+
+        private void OnDestroy()
+        {
+            //Stop the coroutine if not null
+            if (_enableBoxcollider == null) return;
+            StopCoroutine(_enableBoxcollider);
         }
     }
 }
