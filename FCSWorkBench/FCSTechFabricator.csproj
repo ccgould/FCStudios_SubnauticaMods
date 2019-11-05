@@ -75,14 +75,7 @@
     <Compile Include="Models\Mod.cs" />
     <Compile Include="Models\Shaders.cs" />
     <Compile Include="Models\ModTechTypes.cs" />
-    <Compile Include="Mono\DeepDriller\DrillerMK2Patcher.cs" />
-    <Compile Include="Mono\DeepDriller\DrillerMK3Patcher.cs" />
-    <Compile Include="Mono\DeepDriller\DrillerMK1Patcher.cs" />
-    <Compile Include="Mono\DeepDriller\DeepDrillerKitPatcher.cs" />
-    <Compile Include="Mono\DeepDriller\BatteryAttachmentPatcher.cs" />
-    <Compile Include="Mono\DeepDriller\FocusAttachmentPatcher.cs" />
     <Compile Include="Mono\DeepDriller\Materials\SaNDGlass.cs" />
-    <Compile Include="Mono\DeepDriller\SolarAttachmentPatcher.cs" />
     <Compile Include="Mono\Ex-Storage\ExStorageKit.cs" />
     <Compile Include="Mono\FCSTechFabricatorTag.cs" />
     <Compile Include="Mono\FCSTechWorkBenchModelPrefab.cs" />

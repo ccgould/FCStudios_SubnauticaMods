@@ -83,6 +83,7 @@ namespace FCSTechFabricator.Mono.SeaCooker
         public override GameObject OriginalPrefab { get; set; }
 
         public override TechGroup GroupForPDA { get; } = TechGroup.Resources;
+
         public override TechCategory CategoryForPDA { get; } = TechCategory.AdvancedMaterials;
     }
 }
