@@ -8,7 +8,6 @@ using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using FCSTechFabricator.Models;
 using FCSTechFabricator.Mono;
-using FCSTechFabricator.Mono.DeepDriller;
 using FCSTechFabricator.Mono.SeaBreeze;
 using FCSTechFabricator.Mono.SeaCooker;
 using SMLHelper.V2.Handlers;
