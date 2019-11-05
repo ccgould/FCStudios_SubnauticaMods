@@ -30,7 +30,7 @@ namespace AE.SeaCooker.Configuration
         internal static string MODFOLDERLOCATION => GetModPath();
         internal static string FriendlyName => "SeaCooker";
         internal static string Description => "A automatic food cooker for all your cooking needs";
-        internal static string ClassID => "SeaCooker";
+        internal static string ClassID => FCSTechFabricator.Configuration.SeaCookerClassID;
 
         internal static event Action<SaveData> OnDataLoaded;
         #endregion

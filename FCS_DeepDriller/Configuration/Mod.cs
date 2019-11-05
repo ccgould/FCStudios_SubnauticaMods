@@ -10,7 +10,7 @@ namespace FCS_DeepDriller.Configuration
 {
     internal static class Mod
     {
-        internal static string ModName => "FCS_DeepDriller";
+        internal static string ModName => FCSTechFabricator.Configuration.DeepDrillerClassID;
         internal static string ModFriendlyName => "FCS Deep Driller";
         internal static string ModDecription => "Let's dig down to the deep down deep dark!";
         internal const string SaveDataFilename = "DeepDrillerSaveData.json";

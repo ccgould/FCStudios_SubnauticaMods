@@ -29,7 +29,7 @@ namespace FCS_AIMarineTurbine.Buildable
         }
         //public static JetStreamT242Config JetStreamT242Config { get; set; }
 
-        public AIMarineMonitorBuildable() : base("AIMarineMonitor",
+        public AIMarineMonitorBuildable() : base(FCSTechFabricator.Configuration.AIMarineMonitorClassID,
             "AI Marine Monitor",
             "Why go outside and get wet? Get your turbine status and control your turbine from inside!")
         {
@@ -89,7 +89,7 @@ namespace FCS_AIMarineTurbine.Buildable
             {
                 QuickLogger.Error(e.Message);
             }
-
+            
             return prefab;
         }
 

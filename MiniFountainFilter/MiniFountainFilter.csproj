@@ -44,8 +44,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>F:\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="SMLHelper">
-      <HintPath>F:\System Folders\Documents\GitHub\Modding-Advent-Calendar\Dependencies\SMLHelper.dll</HintPath>
+    <Reference Include="SMLHelper, Version=2.2.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>F:\Program Files\Epic Games\Subnautica\QMods\Modding Helper\SMLHelper.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

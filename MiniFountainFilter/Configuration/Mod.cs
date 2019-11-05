@@ -27,7 +27,7 @@ namespace AE.MiniFountainFilter.Configuration
         internal static string MODFOLDERLOCATION => GetModPath();
         internal static string FriendlyName => "Mini Fountain Filter";
         internal static string Description => "A smaller water filtration system for your base or cyclops.";
-        internal static string ClassID => "MiniFountainFilter";
+        internal static string ClassID => FCSTechFabricator.Configuration.MiniFountainFilterClassID;
 
         internal static event Action<SaveData> OnDataLoaded;
         #endregion

@@ -18,7 +18,7 @@ namespace ARS_SeaBreezeFCS32.Configuration
         internal static string MODFOLDERLOCATION => GetModPath();
         internal static string FriendlyName => "ARS Sea Breeze FCS32";
         internal static string Description => "Alterra Refrigeration Sea Breeze will keep your items fresh longer!";
-        internal static string ClassID => "ARSSeaBreezeFCS32";
+        internal static string ClassID => FCSTechFabricator.Configuration.SeaBreezeClassID;
 
         #endregion
 

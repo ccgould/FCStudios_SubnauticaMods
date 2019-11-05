@@ -38,7 +38,7 @@ namespace FCS_AIMarineTurbine.Buildable
         }
         public static JetStreamT242Config JetStreamT242Config { get; set; }
 
-        public AIJetStreamT242Buildable() : base("AIJetStreamT242",
+        public AIJetStreamT242Buildable() : base(FCSTechFabricator.Configuration.AIJetStreamT242ClassID,
             "AI JetStreamT242",
             "The Jet Stream T242 provides power by using the water current. The faster the turbine spins the more power output.")
         {

@@ -14,7 +14,7 @@ namespace ExStorageDepot.Configuration
         private static ExStorageDepotSaveData _exStorageDepotSaveData;
         internal static event Action<ExStorageDepotSaveData> OnExStorageDepotLoaded;
         internal const string SaveDataFilename = "ExStorageDepotSaveData.json";
-        internal const string ModName = "ExStorageDepot";
+        internal static readonly string ModName = FCSTechFabricator.Configuration.ExStorageClassID;
         internal const string ModFriendly = "Ex-Storage Depot";
         internal const string BundleName = "exstoragedepotunitmodbundle";
         internal const string ModDesc = "Alterra Storage Solutions Ex-Storage Depot allows you to store a large amount of items outside your base.";
