@@ -14,5 +14,13 @@ namespace FCSCommon.Helpers
                     Destroy(list[i]);
             }
         }
+
+        public static int GetObjectCount<T>() where T : MonoBehaviour
+        {
+            var length = GameObject.FindObjectsOfType<T>()?.Length;
+            if (length != null)
+                return (int) length;
+            return 0;
+        }
     }
 }
