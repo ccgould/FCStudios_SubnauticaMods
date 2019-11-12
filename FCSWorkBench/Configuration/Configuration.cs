@@ -15,7 +15,7 @@ namespace FCSTechFabricator
         public static string PowerStorageKitClassID => "FCSPowerStorage";
         public static string DeepDrillerClassID => "FCS_DeepDriller";
         public static string SeaCookerClassID => "SeaCooker";
-
+        public static string MiniMedBayClassID => "SeaCooker";
 
         [JsonProperty] internal List<ConfigItem> Blueprints { get; set; } = new List<ConfigItem>();
 

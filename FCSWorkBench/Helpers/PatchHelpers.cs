@@ -8,6 +8,7 @@ using FCSTechFabricator.Mono;
 using FCSTechFabricator.Mono.SeaBreeze;
 using FCSTechFabricator.Mono.SeaCooker;
 using SMLHelper.V2.Handlers;
+using SMLHelper.V2.Utility;
 using UnityEngine;
 
 namespace FCSTechFabricator.Helpers
@@ -159,8 +160,8 @@ namespace FCSTechFabricator.Helpers
                 new FCSKitEntry
                 {
                     ClassID = "BatteryAttachment_DD",
-                    FriendlyName = "Deep Driller Battery Attachment",
-                    Description = "This specially made attachment allows you to run your deep driller off battery power",
+                    FriendlyName = "Deep Driller Powercell Attachment",
+                    Description = "This specially made attachment allows you to run your deep driller off powercell power",
                     FabricatorSteps = new[]{ "AIS", "DD" },
                     ModParent = Configuration.DeepDrillerClassID,
                     Icon="BatteryAttachment_DD.png"
@@ -183,9 +184,23 @@ namespace FCSTechFabricator.Helpers
                     ModParent = Configuration.DeepDrillerClassID,
                     Icon="FocusAttachment_DD.png"
                 },
+                new FCSKitEntry
+                {
+                    ClassID = "AMMiniMedBay",
+                    FriendlyName = "Alterra Medical MiniMedBay Kit",
+                    Description = "This kit allows you to make one MiniMedBay unit",
+                    FabricatorSteps = new[]{ "AMS", "MMB" },
+                    ModParent = Configuration.MiniMedBayClassID,
+                    Icon="AMMiniMedBay.png"
+                },
             };
 
             return list;
+        }
+
+        private static void CreateModEntry()
+        {
+            FCSTechFabricatorBuildable.AddMod(ModDivisions.AlterraMedicalSolutions.Key,ModDivisions.AlterraMedicalSolutions.ParentKey,"Mini MedBay","MMB");
         }
 
         private static List<FCSKitEntry> CreateModules()
@@ -411,6 +426,8 @@ namespace FCSTechFabricator.Helpers
 
             QuickLogger.Debug("Registering Items.");
 
+            CreateModEntry();
+
             foreach (FCSKitEntry kit in CreateKits())
             {
                 if (!TechTypeHandler.ModdedTechTypeExists(kit.ModParent)) continue;
@@ -459,7 +476,6 @@ namespace FCSTechFabricator.Helpers
                 FCSTechFabricatorBuildable.AddTechType(scAGtank.TechType, scAGtank.StepsToFabricatorTab);
                 QuickLogger.Debug($"Patched {scAGtank.FriendlyName}");
             }
-
         }
     }
 }

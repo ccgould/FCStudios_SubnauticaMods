@@ -3,6 +3,7 @@ using FCSTechFabricator.Helpers;
 using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
+using SMLHelper.V2.Utility;
 using UnityEngine;
 
 namespace FCSTechFabricator.Mono.SeaCooker

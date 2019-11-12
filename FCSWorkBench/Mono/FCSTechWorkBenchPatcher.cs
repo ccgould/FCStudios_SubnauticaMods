@@ -33,9 +33,23 @@ namespace FCSTechFabricator.Mono
             {"SeaBreeze",new ModKey{Key = "SB",ParentKey = "ARS"}},
             {"Ex-Storage",new ModKey{Key = "ES",ParentKey = "ASTS"}},
             {"Sea Cooker",new ModKey{Key = "SC",ParentKey = "AE"}},
-            {"Mini Fountain Filter",new ModKey{Key = "MFF",ParentKey = "AE"}},
+            {"Mini Fountain Filter",new ModKey{Key = "MFF",ParentKey = "AE"}}
         };
 
+
+        internal static void AddMod(string divisionName, string divisionKey, string ModName, string ModKey)
+        {
+            if (!AlterraDivisions.ContainsKey(divisionName))
+            {
+                AlterraDivisions.Add(divisionName,divisionKey);
+            }
+
+            if (!FCSMods.ContainsKey(ModName))
+            {
+                FCSMods.Add(ModName,new ModKey{Key = ModKey, ParentKey = divisionKey});
+            }
+
+        }
 
         public FCSTechFabricatorBuildable() : base(Mod.ModName, "FCS Tech Fabricator", "The place for all your FCStudios mod needs")
         {
