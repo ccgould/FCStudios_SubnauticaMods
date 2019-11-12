@@ -7,7 +7,9 @@ using FCSCommon.Utilities;
 using FCSTechFabricator.Mono;
 using System;
 using System.Collections.Generic;
+using Steamworks;
 using UnityEngine;
+using UWE;
 
 namespace FCS_DeepDriller.Mono.Handlers
 {
@@ -41,6 +43,8 @@ namespace FCS_DeepDriller.Mono.Handlers
             _equipment.AddSlot(EquipmentConfiguration.SlotIDs[5]);
             _equipment.AddSlot(EquipmentConfiguration.SlotIDs[6]);
         }
+
+
 
         private bool IsAllowedToRemove(Pickupable pickupable, bool verbose)
         {
@@ -184,7 +188,6 @@ namespace FCS_DeepDriller.Mono.Handlers
 
         internal void OpenModulesDoor()
         {
-
             if (_mono.IsInvalidPlacement()) return;
 
             QuickLogger.Debug("Modules Door Opened", true);

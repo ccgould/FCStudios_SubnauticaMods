@@ -7,6 +7,7 @@ using Oculus.Newtonsoft.Json;
 using SMLHelper.V2.Crafting;
 using System.Collections.Generic;
 using System.IO;
+using SMLHelper.V2.Utility;
 using UnityEngine;
 
 namespace FCS_DeepDriller.Buildable
@@ -19,7 +20,7 @@ namespace FCS_DeepDriller.Buildable
         private static readonly FCSDeepDrillerBuildable Singleton = new FCSDeepDrillerBuildable();
         public override TechGroup GroupForPDA { get; } = TechGroup.ExteriorModules;
         public override TechCategory CategoryForPDA { get; } = TechCategory.ExteriorModule;
-
+        public override string IconFileName => "FCSDeepDriller.png";
         public override TechType RequiredForUnlock { get; } = TechType.ExosuitDrillArmModule;
 
         public override string AssetsFolder { get; } = $"FCS_DeepDriller/Assets";

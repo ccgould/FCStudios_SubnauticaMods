@@ -93,8 +93,7 @@ namespace FCS_DeepDriller.Mono
         }
 
         #endregion
-
-
+        
         #region IConstructable
         public bool CanDeconstruct(out string reason)
         {
@@ -331,7 +330,7 @@ namespace FCS_DeepDriller.Mono
             UpdateSystemLights(PowerManager.GetPowerState());
 
             _initialized = true;
-
+            
             QuickLogger.Debug($"Initializing Completed");
         }
 

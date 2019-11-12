@@ -22,6 +22,8 @@ namespace FCS_DeepDriller.Configuration
 
         internal static event Action<DeepDrillerSaveData> OnDeepDrillerDataLoaded;
 
+        internal static bool isPDARefreshed { get; set; }
+
         #region Deep Driller
         public static void SaveDeepDriller()
         {

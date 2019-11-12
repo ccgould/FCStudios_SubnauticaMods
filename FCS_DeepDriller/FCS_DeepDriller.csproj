@@ -128,8 +128,8 @@
     <Compile Include="Mono\Handlers\PlayerInteraction.cs" />
     <Compile Include="Ores\Craftables\Glass.cs" />
     <Compile Include="Ores\SandOrePatcher.cs" />
-    <Compile Include="Patchers\Builder_CheckAsSubModule_Patch.cs" />
     <Compile Include="Patchers\EquipmentPatchers.cs" />
+    <Compile Include="Patchers\PlayerPatchers.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

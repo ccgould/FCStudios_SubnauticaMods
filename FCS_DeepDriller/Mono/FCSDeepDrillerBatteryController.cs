@@ -16,16 +16,7 @@ namespace FCS_DeepDriller.Mono
         private Equipment _equipment;
         internal Action<Pickupable, string> OnBatteryAdded;
         internal Action<Pickupable> OnBatteryRemoved;
-
-        /// <summary>
-        /// All batteries allowed in this mod. Modded batteries are added in setup
-        /// </summary>
-        internal HashSet<TechType> CompatibleTech = new HashSet<TechType>()
-        {
-            TechType.PowerCell,
-            TechType.PrecursorIonPowerCell
-        };
-
+        
         internal void Setup(FCSDeepDrillerController mono)
         {
             _mono = mono;
@@ -50,22 +41,6 @@ namespace FCS_DeepDriller.Mono
             {
                 QuickLogger.Error("Equipment is null on creation");
             }
-
-            var deepPowerCell = TechTypeHelpers.GetTechType("DeepPowerCell");
-
-            if (deepPowerCell != TechType.None)
-            {
-                CompatibleTech.Add(deepPowerCell);
-                QuickLogger.Debug($"Added {deepPowerCell}  TechType to compatible tech ");
-            }
-
-            var enzymepowercell = TechTypeHelpers.GetTechType("EnzymePowerCell");
-
-            if (enzymepowercell != TechType.None)
-            {
-                CompatibleTech.Add(enzymepowercell);
-                QuickLogger.Debug($"Added {enzymepowercell}  TechType to compatible tech ");
-            }
         }
 
         internal void AddMoreSlots()
@@ -87,7 +62,11 @@ namespace FCS_DeepDriller.Mono
         {
             bool flag = false;
 
-            if (pickupable != null && CompatibleTech.Contains(pickupable.GetTechType()))
+            var techType = pickupable.GetTechType();
+            var equipType = CraftData.GetEquipmentType(techType);
+
+
+            if (equipType == EquipmentType.PowerCellCharger)
             {
                 flag = true;
             }

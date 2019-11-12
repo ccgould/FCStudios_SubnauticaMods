@@ -14,7 +14,8 @@ namespace FCS_DeepDriller
     {
         public static void Patch()
         {
-            QuickLogger.Info("Started patching. Version: " + QuickLogger.GetAssemblyVersion());
+            var assembly = Assembly.GetExecutingAssembly();
+            QuickLogger.Info("Started patching. Version: " + QuickLogger.GetAssemblyVersion(assembly));
 
 #if DEBUG
             QuickLogger.DebugLogsEnabled = true;
@@ -39,17 +40,19 @@ namespace FCS_DeepDriller
 
                 var harmony = HarmonyInstance.Create("com.fcsdeepdriller.fcstudios");
 
-                harmony.Patch(typeof(Equipment).GetMethod("GetSlotType"),
-                    new HarmonyMethod(typeof(Equipment_GetSlotType_Patch), "Prefix"), null);
+                //harmony.Patch(typeof(Equipment).GetMethod("GetSlotType"),
+                //    new HarmonyMethod(typeof(Equipment_GetSlotType_Patch), "Prefix"), null);
 
-                harmony.Patch(typeof(uGUI_Equipment).GetMethod("Awake",
-                        BindingFlags.NonPublic |
-                        BindingFlags.Instance |
-                        BindingFlags.SetField),
-                    new HarmonyMethod(typeof(uGUI_Equipment_Awake_Patch), "Prefix"),
-                    new HarmonyMethod(typeof(uGUI_Equipment_Awake_Patch), "Postfix"));
+                //harmony.Patch(typeof(Player).GetMethod("Awake"),null,new HarmonyMethod(typeof(Player_Patch), "Postfix"));
 
-                //harmony.PatchAll(Assembly.GetExecutingAssembly());
+                //harmony.Patch(typeof(uGUI_Equipment).GetMethod("Awake",
+                //        BindingFlags.NonPublic |
+                //        BindingFlags.Instance |
+                //        BindingFlags.SetField),
+                //    new HarmonyMethod(typeof(uGUI_Equipment_Awake_Patch), "Prefix"),
+                //    new HarmonyMethod(typeof(uGUI_Equipment_Awake_Patch), "Postfix"));
+
+                harmony.PatchAll(Assembly.GetExecutingAssembly());
 
                 QuickLogger.Info("Finished patching");
             }

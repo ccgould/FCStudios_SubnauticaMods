@@ -45,5 +45,19 @@ namespace FCS_DeepDriller.Configuration
                 _addingSlots = true;
             }
         }
+
+        internal static void RefreshPDA()
+        {
+            if (Player.main == null)
+            {
+                QuickLogger.Debug("Player was null when trying to refresh PDA");
+                return;
+            }
+
+            PDA pdaMain = Player.main.GetPDA();
+            pdaMain.Open(PDATab.None, null, null, -1f);
+            pdaMain.Close();
+            QuickLogger.Debug("Deep Driller refreshed PDA.");
+        }
     }
 }

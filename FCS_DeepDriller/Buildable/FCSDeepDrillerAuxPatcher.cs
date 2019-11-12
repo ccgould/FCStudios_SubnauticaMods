@@ -99,11 +99,11 @@ namespace FCS_DeepDriller.Buildable
             LanguageHandler.SetLanguageLine(StorageLabelKey, "FCS Deep Driller Receptacle.");
             LanguageHandler.SetLanguageLine(ItemNotAllowedKey, "Cannot place this item in here.");
             LanguageHandler.SetLanguageLine(EquipmentLabelKey, "FCS Deep Driller Attachments.");
-            LanguageHandler.SetLanguageLine(BEquipmentLabelKey, "FCS Deep Driller Battery Attachment Receptacle.");
-            LanguageHandler.SetLanguageLine(OnBatteryHoverTextKey, "Open Battery Attachment.");
+            LanguageHandler.SetLanguageLine(BEquipmentLabelKey, "FCS Deep Driller Powercell Attachment Receptacle.");
+            LanguageHandler.SetLanguageLine(OnBatteryHoverTextKey, "Open Powercell Attachment.");
             LanguageHandler.SetLanguageLine(OPAllowedKey, "Only One Power Attachment Allowed.");
             LanguageHandler.SetLanguageLine(OneUpgradeAllowedKey, "Only One Upgrade Allowed.");
-            LanguageHandler.SetLanguageLine(BatteryAttachmentHasBatteriesKey, "Battery attachment has batteries cannot remove!");
+            LanguageHandler.SetLanguageLine(BatteryAttachmentHasBatteriesKey, "Battery attachment has powercells cannot remove!");
             LanguageHandler.SetLanguageLine(NextPageKey, "Next Page");
             LanguageHandler.SetLanguageLine(PrevPageKey, "Previous Page");
             LanguageHandler.SetLanguageLine(FocusKey, "FOCUS");
