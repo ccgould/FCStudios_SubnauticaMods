@@ -619,15 +619,11 @@ namespace FCS_DeepDriller.Mono.Handlers
         {
             if (_button != null)
             {
-                QuickLogger.Debug(($"activeInHierarchy is {_button.transform.gameObject.FindChild(_button.HoverItemName).activeInHierarchy}"));
+                
                 if (!_button.transform.gameObject.FindChild(_button.HoverItemName).activeInHierarchy)
                 {
                     _button.transform.gameObject.FindChild(_button.HoverItemName).SetActive(true);
                 }
-            }
-            else
-            {
-                QuickLogger.Debug("Button is null");
             }
         }
     }

@@ -13,7 +13,7 @@ namespace FCSTechFabricator
     internal class ModuleCraftable : TechFabCraftable
     {
         public ModuleCraftable(string classId, string friendlyName, string description, string icon, bool isPlaceable = true, 
-            EquipmentType equipmentType = EquipmentType.None, TechType requiredForUnlock = TechType.None) :
+            EquipmentType equipmentType = EquipmentType.CyclopsModule, TechType requiredForUnlock = TechType.None) :
             base(classId, friendlyName, description, isPlaceable, equipmentType, requiredForUnlock)
         {
             IconFileName = string.IsNullOrEmpty(icon) ? $"{classId}.png" : icon;

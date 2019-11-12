@@ -23,6 +23,26 @@ namespace FCS_DeepDriller.Mono.Handlers
         private const bool HotLava = true;
         private const int LavaRaiseWaitInSec = 11;
         internal Action<bool> OnLavaRaised;
+        private bool _runStartUpOnEnableRaiseLava;
+        private bool _runStartUpOnEnableHeatLava;
+
+
+        private void OnEnable()
+        {
+            if (_runStartUpOnEnableHeatLava)
+            {
+                StartCoroutine(HeatLava());
+                _runStartUpOnEnableHeatLava = false;
+            }
+
+            if (_runStartUpOnEnableRaiseLava)
+            {
+                StartCoroutine(RaiseLava());
+                _runStartUpOnEnableRaiseLava = false;
+            }
+
+        }
+
         internal void Initialize(FCSDeepDrillerController mono)
         {
             _mono = mono;
@@ -37,10 +57,27 @@ namespace FCS_DeepDriller.Mono.Handlers
 
             if (powerState == FCSPowerStates.Powered && _prevState != FCSPowerStates.Powered)
             {
-                StartCoroutine(HeatLava());
 
+                if (isActiveAndEnabled)
+                {
+                    StartCoroutine(HeatLava());
+                }
+                else
+                {
+                    _runStartUpOnEnableHeatLava = true;
+                }
+                
                 if (_lavaRaised) return;
-                StartCoroutine(RaiseLava());
+
+                if (isActiveAndEnabled)
+                {
+                    StartCoroutine(RaiseLava());
+                }
+                else
+                {
+                    _runStartUpOnEnableRaiseLava = true;
+                }
+                
                 _prevState = FCSPowerStates.Powered;
                 _wasActive = false;
             }

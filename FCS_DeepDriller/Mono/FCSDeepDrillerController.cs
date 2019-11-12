@@ -83,6 +83,7 @@ namespace FCS_DeepDriller.Mono
         {
             {
                 if (IsBeingDeleted == true) return;
+                
                 if (_runStartUpOnEnable)
                 {
                     StartCoroutine(DropLegs());
@@ -353,7 +354,15 @@ namespace FCS_DeepDriller.Mono
             AnimationHandler.SetBoolHash(BitDamageState, false);
             UpdateSystemLights(PowerManager.GetPowerState());
             ResetPassedTime();
-            StartCoroutine(DropLegs());
+
+            if (isActiveAndEnabled)
+            {
+                StartCoroutine(DropLegs());
+            }
+            else
+            {
+                _runStartUpOnEnable = true;
+            }
         }
 
         private void OnBatteryRemoved(Pickupable obj)
