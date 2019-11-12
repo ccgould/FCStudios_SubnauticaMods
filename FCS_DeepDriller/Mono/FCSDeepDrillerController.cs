@@ -47,6 +47,7 @@ namespace FCS_DeepDriller.Mono
         private float _passedTime;
         private bool _invalidPlacement;
         private bool _isBiomeKnown = true;
+        private bool _runStartUpOnEnable;
 
         #endregion
 
@@ -75,6 +76,23 @@ namespace FCS_DeepDriller.Mono
 #endif
 
         #endregion
+
+        #region Unity Methods
+
+        private void OnEnable()
+        {
+            {
+                if (IsBeingDeleted == true) return;
+                if (_runStartUpOnEnable)
+                {
+                    StartCoroutine(DropLegs());
+                    _runStartUpOnEnable = false;
+                }
+            }
+        }
+
+        #endregion
+
 
         #region IConstructable
         public bool CanDeconstruct(out string reason)
@@ -166,7 +184,7 @@ namespace FCS_DeepDriller.Mono
         public void OnProtoDeserialize(ProtobufSerializer serializer)
         {
             QuickLogger.Debug("In OnProtoDeserialize");
-            var prefabIdentifier = GetComponent<PrefabIdentifier>();
+            var prefabIdentifier = GetComponentInParent<PrefabIdentifier>() ?? GetComponent<PrefabIdentifier>();
             var id = prefabIdentifier?.Id ?? string.Empty;
             var data = Mod.GetDeepDrillerSaveData(id);
 
@@ -190,7 +208,14 @@ namespace FCS_DeepDriller.Mono
 
             if (PowerManager.GetPowerState() == FCSPowerStates.Powered && !AnimationHandler.GetBoolHash(ExtendStateHash))
             {
-                StartCoroutine(DropLegs());
+                if (isActiveAndEnabled)
+                {
+                    StartCoroutine(DropLegs());
+                }
+                else
+                {
+                    _runStartUpOnEnable = true;
+                }
             }
         }
 
@@ -232,7 +257,7 @@ namespace FCS_DeepDriller.Mono
 
             var solarAttachment = new SolarAttachment();
             solarAttachment.GetGameObject(this);
-
+            
             if (!ComponentManager.FindAllComponents(this, solarAttachment.GetSolarAttachment(), _batteryAttachment.GetBatteryAttachment(), null))
             {
                 QuickLogger.Error("Couldn't find all components");
@@ -253,8 +278,8 @@ namespace FCS_DeepDriller.Mono
 
             TechTypeHelper.Initialize();
 
-            _prefabId = GetComponentInParent<PrefabIdentifier>();
-
+            _prefabId = GetComponentInParent<PrefabIdentifier>() ?? GetComponent<PrefabIdentifier>();
+            
             if (_prefabId == null)
             {
                 QuickLogger.Error("Prefab Identifier Component was not found");

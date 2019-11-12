@@ -46,14 +46,14 @@ namespace FCS_DeepDriller.Mono.Handlers
 
             if (_mono.PowerManager?.GetPowerState() != FCSPowerStates.Powered)
             {
-                QuickLogger.Debug("Not Damaging Unit");
+                //QuickLogger.Debug("Not Damaging Unit");
                 ResetPassedTime();
                 return;
             }
 
             if (_passedTime >= _damagePerSecond)
             {
-                QuickLogger.Debug("Damaging Unit");
+                //QuickLogger.Debug("Damaging Unit");
                 ApplyDamage();
                 ResetPassedTime();
             }
