@@ -13,12 +13,6 @@ namespace FCSAIPowerCellSocket.Mono
         private PowerRelay _connectedRelay;
         private AIPowerCellSocketController _mono;
 
-        internal HashSet<TechType> CompatibleTech = new HashSet<TechType>()
-        {
-            TechType.PowerCell,
-            TechType.PrecursorIonPowerCell
-        };
-
         internal List<PowercellData> PowercellTracker = new List<PowercellData>(4);
         private ChildObjectIdentifier _containerRoot;
         private ItemsContainer _batteryContainer;
@@ -99,13 +93,17 @@ namespace FCSAIPowerCellSocket.Mono
         {
             bool flag = false;
 
-            if (pickupable != null && CompatibleTech.Contains(pickupable.GetTechType()))
+            var techType = pickupable.GetTechType();
+            var equipType = CraftData.GetEquipmentType(techType);
+
+
+            if (equipType == EquipmentType.PowerCellCharger)
             {
                 flag = true;
             }
             else
             {
-                ErrorMessage.AddMessage("Only powercells are allowed.");
+                QuickLogger.Message(AIPowerCellSocketBuildable.OnlyPowercellsAllowed(),true);
             }
 
             return flag;

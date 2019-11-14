@@ -3,6 +3,9 @@ using FCSCommon.Extensions;
 using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
 using System.IO;
+using FCSAIPowerCellSocket.Configuration;
+using FCSCommon.Helpers;
+using SMLHelper.V2.Utility;
 using UnityEngine;
 
 namespace FCSAIPowerCellSocket.Buildables
@@ -10,10 +13,12 @@ namespace FCSAIPowerCellSocket.Buildables
     internal partial class AIPowerCellSocketBuildable : Buildable
     {
         private static readonly AIPowerCellSocketBuildable Singleton = new AIPowerCellSocketBuildable();
-        public override string AssetsFolder { get; } = $"FCSAIPowerCellSocket/Assets";
+
+        public override string IconFileName => "FCSAIPowerCellSocket.png";
+        public override string AssetsFolder => Mod.GetAssetPath();
         public override TechGroup GroupForPDA { get; } = TechGroup.InteriorModules;
         public override TechCategory CategoryForPDA { get; } = TechCategory.InteriorModule;
-        public AIPowerCellSocketBuildable() : base("AIPowerCellSocket", "Alterra Industrial Powercell Socket", "Alterra Industrial wall mounted powercell socket for emergency power")
+        public AIPowerCellSocketBuildable() : base(Mod.ClassID, Mod.ModFriendlyName, Mod.ModDescription)
         {
             OnFinishedPatching += AdditionalPatching;
         }
@@ -65,14 +70,12 @@ namespace FCSAIPowerCellSocket.Buildables
 
         protected override TechData GetBlueprintRecipe()
         {
+            
             return new TechData
             {
                 Ingredients =
                 {
-                    new Ingredient(TechType.Titanium, 3),
-                    new Ingredient(TechType.AdvancedWiringKit, 1),
-                    new Ingredient(TechType.Battery, 1),
-                    new Ingredient(TechType.Glass, 1)
+                    new Ingredient(TechTypeHelpers.GetTechType("PowerCellSocket_AIS"), 1)
                 }
             };
         }

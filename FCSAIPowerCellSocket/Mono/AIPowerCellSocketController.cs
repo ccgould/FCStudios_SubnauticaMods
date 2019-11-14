@@ -5,10 +5,12 @@ using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
 using System;
 using System.IO;
+using FCSAIPowerCellSocket.Configuration;
+using UnityEngine;
 
 namespace FCSAIPowerCellSocket.Mono
 {
-    internal partial class AIPowerCellSocketController : IConstructable, IProtoTreeEventListener
+    internal partial class AIPowerCellSocketController : IConstructable, IProtoEventListener
     {
         public bool IsConstructed => _buildable != null && _buildable.constructed;
         public AIPowerCellSocketPowerManager PowerManager { get; set; }
@@ -17,45 +19,78 @@ namespace FCSAIPowerCellSocket.Mono
 
         private PrefabIdentifier _prefabId;
 
-        private readonly string _saveDirectory = Path.Combine(SaveUtils.GetCurrentSaveDataDir(), "AIPowerCellSocket");
+        //private readonly string _saveDirectory = Path.Combine(SaveUtils.GetCurrentSaveDataDir(), "AIPowerCellSocket");
 
         private Constructable _buildable;
-        private string SaveFile => Path.Combine(_saveDirectory, _prefabId.Id + ".json");
+        private bool _runStartUpOnEnable;
+        private SaveDataEntry _data;
+        //private SaveDataEntry _oldSavedData;
+        private bool _initialized;
 
-        private void Awake()
+       // private string SaveFile => Path.Combine(_saveDirectory, _prefabId?.Id + ".json");
+
+        private void OnEnable()
         {
-            _prefabId = GetComponentInParent<PrefabIdentifier>();
+            if (!_runStartUpOnEnable) return;
+
+            if (!_initialized)
+            {
+                Initialize();
+            }
+
+            if (Display != null)
+            {
+                Display.Setup(this);
+                _runStartUpOnEnable = false;
+            }
+
+            if (_data == null)
+                ReadySaveData();
+
+            if (_data != null)
+            {
+                PowerManager.LoadPowercellItems(_data.PowercellDatas);
+            }
+
+            //if (_oldSavedData == null)
+            //{
+            //    PowerManager.LoadPowercellItems(_data.PowercellDatas);
+            //}
+            //else
+            //{
+            //    PowerManager.LoadPowercellItems(_oldSavedData.PowercellDatas);
+            //    QuickLogger.Debug("Load Items");
+            //    UpdateSlots();
+            //    File.Delete(SaveFile);
+            //}
+        }
+        
+        private void Initialize()
+        {
+            _prefabId = GetComponentInParent<PrefabIdentifier>() ?? GetComponent<PrefabIdentifier>();
 
             if (_buildable == null)
             {
-                _buildable = GetComponentInParent<Constructable>();
+                _buildable = GetComponentInParent<Constructable>() ?? GetComponentInParent<Constructable>();
             }
 
-            PowerManager = gameObject.GetComponent<AIPowerCellSocketPowerManager>();
+            if(PowerManager == null)
+                PowerManager = gameObject.GetComponent<AIPowerCellSocketPowerManager>();
+            
             PowerManager.Initialize(this);
 
-            AnimationManager = gameObject.GetComponent<AIPowerCellSocketAnimator>();
+            if(AnimationManager == null)
+                AnimationManager = gameObject.GetComponent<AIPowerCellSocketAnimator>();
+    
             if (AnimationManager == null)
             {
                 QuickLogger.Error("Animation Manager not found!");
             }
 
-            bool deepPowerCell = TechTypeHandler.TryGetModdedTechType("DeepPowerCell", out TechType deepPowerCellType);
+            if (Display == null)
+                Display = gameObject.AddComponent<AIPowerCellSocketDisplay>();
 
-            if (deepPowerCell)
-            {
-                PowerManager.CompatibleTech.Add(deepPowerCellType);
-                QuickLogger.Debug($"Added {deepPowerCellType}  TechType to compatible tech ");
-            }
-
-            bool enzymepowercell = TechTypeHandler.TryGetModdedTechType("EnzymePowerCell", out TechType enzymepowercellType);
-
-            if (enzymepowercell)
-            {
-                PowerManager.CompatibleTech.Add(enzymepowercellType);
-                QuickLogger.Debug($"Added {enzymepowercellType}  TechType to compatible tech ");
-            }
-
+            _initialized = true;
         }
 
         internal void UpdateSlots()
@@ -85,6 +120,25 @@ namespace FCSAIPowerCellSocket.Mono
             PowerManager.OpenSlots();
         }
 
+        private void ReadySaveData()
+        {
+            _prefabId = GetComponentInParent<PrefabIdentifier>() ?? GetComponent<PrefabIdentifier>();
+            var id = _prefabId.Id ?? string.Empty;
+            _data = Mod.GetSaveData(id);
+        }
+
+        internal void Save(SaveData saveDataList)
+        {
+            var prefabIdentifier = GetComponent<PrefabIdentifier>() ?? GetComponentInParent<PrefabIdentifier>();
+            var id = prefabIdentifier.Id;
+            var saveData = new SaveDataEntry();
+
+            saveData.Id = id;
+            saveData.PowercellDatas = PowerManager.GetSaveData();
+            
+            saveDataList.Entries.Add(saveData);
+        }
+
         public bool CanDeconstruct(out string reason)
         {
             reason = String.Empty;
@@ -98,59 +152,56 @@ namespace FCSAIPowerCellSocket.Mono
         {
             if (constructed)
             {
-                if (Display == null)
+                if (isActiveAndEnabled)
                 {
-                    Display = gameObject.AddComponent<AIPowerCellSocketDisplay>();
-                    Display.Setup(this);
+                    if (!_initialized)
+                    {
+                        Initialize();
+                    }
+
+                    if (Display != null)
+                    {
+                        Display.Setup(this);
+                        _runStartUpOnEnable = false;
+                    }
+                }
+                else
+                {
+                    _runStartUpOnEnable = true;
                 }
             }
         }
 
         #region IPhotoTreeEventListener
-        public void OnProtoSerializeObjectTree(ProtobufSerializer serializer)
+        public void OnProtoSerialize(ProtobufSerializer serializer)
         {
-            QuickLogger.Debug($"Saving {_prefabId.Id} Data");
-
-            if (!Directory.Exists(_saveDirectory))
-                Directory.CreateDirectory(_saveDirectory);
-
-            var saveData = new SaveData
-            {
-                PowercellDatas = PowerManager.GetSaveData()
-            };
-
-            var output = JsonConvert.SerializeObject(saveData, Formatting.Indented);
-            File.WriteAllText(SaveFile, output);
-
-            QuickLogger.Debug($"Saved {_prefabId.Id} Data");
+            if (Mod.IsSaving()) return;
+            QuickLogger.Info("Saving PowerCell Socket");
+            Mod.SaveMod();
         }
 
-        public void OnProtoDeserializeObjectTree(ProtobufSerializer serializer)
+        public void OnProtoDeserialize(ProtobufSerializer serializer)
         {
             QuickLogger.Debug("// ****************************** Load Data *********************************** //");
 
-            if (_prefabId != null)
+            if (_data == null)
             {
-                QuickLogger.Info($"Loading  {_prefabId.Id}");
-
-                if (File.Exists(SaveFile))
-                {
-                    string savedDataJson = File.ReadAllText(SaveFile).Trim();
-
-                    //LoadData
-                    QuickLogger.Debug("Loading Data");
-                    var savedData = JsonConvert.DeserializeObject<SaveData>(savedDataJson);
-                    QuickLogger.Debug("Loaded Data");
-
-                    PowerManager.LoadPowercellItems(savedData.PowercellDatas);
-                    QuickLogger.Debug("Load Items");
-                    UpdateSlots();
-                }
+                ReadySaveData();
             }
-            else
-            {
-                QuickLogger.Error("PrefabIdentifier is null");
-            }
+
+            QuickLogger.Info($"Loading  {_prefabId.Id}");
+
+            //if (File.Exists(SaveFile)) //Load old Save Data and delete
+            //{
+            //    QuickLogger.Debug("Loading old save.");
+            //    string savedDataJson = File.ReadAllText(SaveFile).Trim();
+
+            //    //LoadData
+            //    QuickLogger.Debug("Loading Data");
+            //    _oldSavedData = JsonConvert.DeserializeObject<SaveDataEntry>(savedDataJson);
+            //    QuickLogger.Debug("Loaded Data");
+            //}
+
             QuickLogger.Debug("// ****************************** Loaded Data *********************************** //");
         }
         #endregion
