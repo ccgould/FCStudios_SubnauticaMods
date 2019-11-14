@@ -17,14 +17,12 @@ namespace AMMiniMedBay.Models
         private readonly AMMiniMedBayController _mono;
         private float _timeSpawnMedKit = -1f;
 
-        //TODO Change to 600f
         private const float MedKitSpawnInterval = 600f;
 
-        //TODO Figure how to remove this
-        public bool startWithMedKit;
+        internal bool startWithMedKit;
         private const int ContainerWidth = 2;
         private const int ContainerHeight = 2;
-        public int NumberOfFirstAids
+        internal int NumberOfFirstAids
         {
             get => medBayContainer.count;
             set
@@ -65,17 +63,13 @@ namespace AMMiniMedBay.Models
 
         private int MaxContainerSlots => ContainerHeight * ContainerWidth;
         private int ContainerSlotsFilled => medBayContainer.count;
-        public bool IsContainerFull => medBayContainer.count == MaxContainerSlots || !medBayContainer.HasRoomFor(1, 1);
+        internal bool IsContainerFull => medBayContainer.count == MaxContainerSlots || !medBayContainer.HasRoomFor(1, 1);
+        
+        internal Action OnPDAClosedAction { get; set; }
 
-        public Action OnTimerEnd { get; set; }
+        internal Action OnPDAOpenedAction { get; set; }
 
-        public Action<string> OnTimerUpdate { get; set; }
-
-        public Action OnPDAClosedAction { get; set; }
-
-        public Action OnPDAOpenedAction { get; set; }
-
-        public AMMiniMedBayContainer(AMMiniMedBayController mono)
+        internal AMMiniMedBayContainer(AMMiniMedBayController mono)
         {
             _isConstructed = () => { return mono.IsConstructed; };
 
@@ -149,19 +143,7 @@ namespace AMMiniMedBay.Models
                 QuickLogger.Debug("New Health Pack Generated Added!", true);
             }
         }
-
-        //TODO Remove if not needed
-        private void TimerEnd()
-        {
-            OnTimerEnd?.Invoke();
-        }
-
-        //TODO Remove if not needed
-        private void TimerTick(string obj)
-        {
-            OnTimerUpdate?.Invoke(obj);
-        }
-
+        
         private bool IsAllowedToRemove(Pickupable pickupable, bool verbose)
         {
             return true;
@@ -211,6 +193,5 @@ namespace AMMiniMedBay.Models
             medBayContainer.onAddItem += OnAddItemEvent;
             medBayContainer.onRemoveItem += OnRemoveItemEvent;
         }
-
     }
 }

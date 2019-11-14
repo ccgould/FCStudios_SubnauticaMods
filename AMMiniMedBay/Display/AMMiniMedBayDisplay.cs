@@ -9,6 +9,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using AMMiniMedBay.Configuration;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -24,7 +25,6 @@ namespace AMMiniMedBay.Display
         private GameObject _canvasGameObject;
         private bool _coroutineStarted;
         private bool _initialized;
-        private Text _timeLeftTXT;
         private const float DelayedStartTime = 0.5f;
         private const float RepeatingUpdateInterval = 1f;
         private const int Main = 1;
@@ -62,7 +62,7 @@ namespace AMMiniMedBay.Display
         internal void Setup(AMMiniMedBayController mono)
         {
             if (!_coroutineStarted)
-                base.InvokeRepeating(nameof(UpdateDisplay), DelayedStartTime * 3f, RepeatingUpdateInterval);
+                InvokeRepeating(nameof(UpdateDisplay), DelayedStartTime * 3f, RepeatingUpdateInterval);
             _mono = mono;
             _animatorController = mono.AnimationManager;
 
@@ -76,7 +76,7 @@ namespace AMMiniMedBay.Display
             _mono.PowerManager.OnPowerResume += OnPowerResume;
 
             _serializedColors = JsonConvert.DeserializeObject<List<SerializableColor>>(
-                File.ReadAllText(Path.Combine(AssetHelper.GetAssetFolder("FCS_AMMiniMedBay"), "colors.json")));
+                File.ReadAllText(Path.Combine(AssetHelper.GetAssetFolder(Mod.ModFolderName), "colors.json")));
 
             if (_serializedColors.Count < 1)
             {
@@ -458,9 +458,7 @@ namespace AMMiniMedBay.Display
 
             int startingPosition = (_currentColorPage - 1) * COLORS_PER_PAGE;
             int endingPosition = startingPosition + COLORS_PER_PAGE;
-
-            //QuickLogger.Debug($"_currentColorPage: {_currentColorPage} || startingPosition: {startingPosition} || endingPosition: {endingPosition} || COLORS_PER_PAGE {COLORS_PER_PAGE}", true);
-
+            
             if (endingPosition > _serializedColors.Count)
             {
                 endingPosition = _serializedColors.Count;
@@ -470,7 +468,6 @@ namespace AMMiniMedBay.Display
 
             for (int i = startingPosition; i < endingPosition; i++)
             {
-                //QuickLogger.Debug($"Found: {_serializedColors.Count} colors || Element:{i}", true);
                 var colorID = _serializedColors.ElementAt(i);
                 LoadColorPicker(colorID);
             }
@@ -553,6 +550,7 @@ namespace AMMiniMedBay.Display
 
         internal void UpdatePlayerHealthPercent(int value)
         {
+            if(_healthPercentage == null) return;
             _healthPercentage.text = $"{value}%";
         }
 

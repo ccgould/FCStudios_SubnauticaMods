@@ -4,6 +4,9 @@ using FCSCommon.Utilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using AMMiniMedBay.Configuration;
+using FCSCommon.Helpers;
+using SMLHelper.V2.Utility;
 
 namespace AMMiniMedBay.Buildable
 {
@@ -16,9 +19,9 @@ namespace AMMiniMedBay.Buildable
         private static readonly AMMiniMedBayBuildable Singleton = new AMMiniMedBayBuildable();
         public override TechGroup GroupForPDA { get; } = TechGroup.InteriorModules;
         public override TechCategory CategoryForPDA { get; } = TechCategory.InteriorModule;
-        public override string AssetsFolder { get; } = $"FCS_AMMiniMedBay/Assets";
+        public override string AssetsFolder { get; } = $"{Mod.ModFolderName}/Assets";
 
-        public AMMiniMedBayBuildable() : base("AMMiniMedBay", "Alterra Medical MiniMedBay", "Alterra is here with all your medical needs.")
+        public AMMiniMedBayBuildable() : base(Mod.ClassID, Mod.ModFriendlyName, Mod.ModDescription)
         {
             OnFinishedPatching += AdditionalPatching;
         }
@@ -86,12 +89,7 @@ namespace AMMiniMedBay.Buildable
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(TechType.ComputerChip, 1),
-                    new Ingredient(TechType.FiberMesh, 3),
-                    new Ingredient(TechType.Titanium, 2),
-                    new Ingredient(TechType.WiringKit, 1),
-                    new Ingredient(TechType.Glass, 1),
-                    new Ingredient(TechType.PowerCell, 1),
+                    new Ingredient(TechTypeHelpers.GetTechType("AMMiniMedBayKit_AMS"), 1)
                 }
             };
             QuickLogger.Debug($"Created Ingredients");

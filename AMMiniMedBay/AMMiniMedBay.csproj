@@ -56,14 +56,34 @@
     <Reference Include="UnityEngine">
       <HintPath>F:\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\UnityEngine.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.AnimationModule">
+      <HintPath>F:\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\UnityEngine.AnimationModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AssetBundleModule">
+      <HintPath>F:\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\UnityEngine.AssetBundleModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>F:\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.PhysicsModule">
+      <HintPath>F:\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.TextRenderingModule">
+      <HintPath>F:\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>F:\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\UnityEngine.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UIModule">
+      <HintPath>F:\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\UnityEngine.UIModule.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Buildable\AMMiniMedBayAuxPatcher.cs" />
     <Compile Include="Buildable\AMMiniMedBayPatcher.cs" />
     <Compile Include="Buildable\AMMiniMedBayModelPrefab.cs" />
+    <Compile Include="Configuration\SaveData.cs" />
+    <Compile Include="Configuration\Mod.cs" />
     <Compile Include="Display\AMMiniMedBayDisplay.cs" />
     <Compile Include="Display\ColorItemButton.cs" />
     <Compile Include="Display\InterfaceButton.cs" />
@@ -72,7 +92,6 @@
     <Compile Include="Enumerators\HealingStatus.cs" />
     <Compile Include="Models\AMMiniMedBayContainer.cs" />
     <Compile Include="Models\AMMiniMedBayPowerManager.cs" />
-    <Compile Include="Models\SaveData.cs" />
     <Compile Include="Mono\AMMiniMedBayAnimationManager.cs" />
     <Compile Include="Mono\AMMiniMedBayAudioManager.cs" />
     <Compile Include="Mono\AMMiniMedBayController.cs" />
@@ -81,10 +100,15 @@
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FCSWorkBench\FCSTechFabricator.csproj">
+      <Project>{b947909c-4983-4749-93ac-73ea69f6dce8}</Project>
+      <Name>FCSTechFabricator</Name>
+    </ProjectReference>
+  </ItemGroup>
   <ItemGroup />
-  <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy "$(ProjectDir)bin\$(Configuration)\AMMiniMedBay.dll" "F:\Program Files\Epic Games\Subnautica\QMods\FCS_AMMiniMedBay\" /Y /I</PostBuildEvent>
+    <PostBuildEvent>xcopy "$(ProjectDir)bin\$(Configuration)\AMMiniMedBay.dll" "F:\Program Files\Epic Games\Subnautica\QMods\FCS_MiniMedBay\" /Y /I</PostBuildEvent>
   </PropertyGroup>
 </Project>

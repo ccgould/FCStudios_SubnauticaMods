@@ -10,11 +10,13 @@ using Oculus.Newtonsoft.Json;
 using SMLHelper.V2.Utility;
 using System;
 using System.IO;
+using AMMiniMedBay.Configuration;
+using FCS_DeepDriller.Configuration;
 using UnityEngine;
 
 namespace AMMiniMedBay.Mono
 {
-    internal class AMMiniMedBayController : FCSController, IConstructable, IProtoTreeEventListener
+    internal class AMMiniMedBayController : FCSController, IConstructable, IProtoEventListener
     {
         private GameObject _scanner;
         private bool _initialized;
@@ -22,8 +24,6 @@ namespace AMMiniMedBay.Mono
         private Constructable _buildable;
         private float _timeCurrDeltaTime;
         private PrefabIdentifier _prefabId;
-        private readonly string _saveDirectory = Path.Combine(SaveUtils.GetCurrentSaveDataDir(), "AMMiniMedBay");
-        private string SaveFile => Path.Combine(_saveDirectory, _prefabId.Id + ".json");
         private float _healthPartial;
         private HealingStatus _healingStatus;
         private bool _isHealing;
@@ -31,17 +31,20 @@ namespace AMMiniMedBay.Mono
         private NitrogenLevel _nitrogenLevel;
         private Color _currentBodyColor = new Color(0.796875f, 0.796875f, 0.796875f, 0.99609375f);
         private float _nitrogenPartial;
+        private bool _runStartUpOnEnable;
+        private SaveDataEntry _data;
+
         public override Action OnMonoUpdate { get; set; }
-
-        internal AMMiniMedBayAudioManager AudioHandler { get; set; }
-
-        public AMMiniMedBayContainer Container { get; private set; }
 
         public override bool IsConstructed => _buildable != null && _buildable.constructed;
 
-        public AMMiniMedBayPowerManager PowerManager { get; set; }
-        public int PageHash { get; set; }
-        public AMMiniMedBayAnimationManager AnimationManager { get; set; }
+        internal AMMiniMedBayAudioManager AudioHandler { get; set; }
+
+        internal AMMiniMedBayContainer Container { get; private set; }
+
+        internal AMMiniMedBayPowerManager PowerManager { get; set; }
+        internal int PageHash { get; set; }
+        internal AMMiniMedBayAnimationManager AnimationManager { get; set; }
 
         internal void HealPlayer()
         {
@@ -66,6 +69,7 @@ namespace AMMiniMedBay.Mono
             PowerManager.SetHasBreakerTripped(false);
             UpdateIsHealing(true);
         }
+        
         private void UpdateIsHealing(bool value)
         {
             _isHealing = value;
@@ -78,6 +82,45 @@ namespace AMMiniMedBay.Mono
             {
                 AudioHandler.StopScanAudio();
             }
+        }
+
+        private void OnEnable()
+        {
+            QuickLogger.Debug("OnEnable Activated");
+
+            if (_runStartUpOnEnable)
+            {
+                if (!_initialized)
+                {
+                    Initialize();
+                }
+
+                if (_display != null)
+                {
+                    _display.Setup(this);
+                    _runStartUpOnEnable = false;
+                }
+
+                if (_data == null)
+                    ReadySaveData();
+
+                if (_data != null)
+                {
+                    QuickLogger.Debug("Add Kits From Load");
+                    Container.NumberOfFirstAids = _data.SCA;
+
+                    QuickLogger.Debug("Set Time To Spawn");
+                    Container.SetTimeToSpawn(_data.TTS);
+                }
+            }
+        }
+
+        private void ReadySaveData()
+        {
+            QuickLogger.Debug("In OnProtoDeserialize");
+            var prefabIdentifier = GetComponentInParent<PrefabIdentifier>() ?? GetComponent<PrefabIdentifier>();
+            var id = prefabIdentifier?.Id ?? string.Empty;
+            _data = Mod.GetSaveData(id);
         }
 
         private void Update()
@@ -133,7 +176,7 @@ namespace AMMiniMedBay.Mono
             PowerManager.SetHasBreakerTripped(true);
         }
 
-        private void Awake()
+        private void Initialize()
         {
             _prefabId = GetComponentInParent<PrefabIdentifier>();
 
@@ -144,7 +187,7 @@ namespace AMMiniMedBay.Mono
 
             if (_buildable == null)
             {
-                _buildable = GetComponentInParent<Constructable>();
+                _buildable = GetComponentInParent<Constructable>() ?? GetComponent<Constructable>();
             }
 
             if (!FindAllComponents())
@@ -153,9 +196,16 @@ namespace AMMiniMedBay.Mono
                 throw new MissingComponentException("Failed to find all components");
             }
 
-            PowerManager = gameObject.GetOrAddComponent<AMMiniMedBayPowerManager>();
+            if (PowerManager == null)
+            {
+                PowerManager = gameObject.GetOrAddComponent<AMMiniMedBayPowerManager>();
+            }
 
-            PlayerTrigger = gameObject.FindChild("model").FindChild("Trigger").GetOrAddComponent<AMMiniMedBayTrigger>();
+            if (PlayerTrigger == null)
+            {
+                PlayerTrigger = gameObject.FindChild("model").FindChild("Trigger").GetOrAddComponent<AMMiniMedBayTrigger>();
+            }
+            
 
             if (PlayerTrigger != null)
             {
@@ -167,13 +217,11 @@ namespace AMMiniMedBay.Mono
                 QuickLogger.Error("Player Trigger Component was not found");
             }
 
-            AnimationManager = gameObject.GetOrAddComponent<AMMiniMedBayAnimationManager>();
-
             if (AnimationManager == null)
             {
-                QuickLogger.Error("Animation Controller Not Found!");
+                AnimationManager = gameObject.GetOrAddComponent<AMMiniMedBayAnimationManager>();
             }
-
+            
             if (PowerManager != null)
             {
                 PowerManager.Initialize(this);
@@ -190,16 +238,29 @@ namespace AMMiniMedBay.Mono
 
             PageHash = UnityEngine.Animator.StringToHash("state");
 
-            AudioHandler = new AMMiniMedBayAudioManager(gameObject.GetComponent<FMOD_CustomLoopingEmitter>());
+            if (AudioHandler == null)
+            {
+                AudioHandler = new AMMiniMedBayAudioManager(gameObject.GetComponent<FMOD_CustomLoopingEmitter>());
+            }
 
-            Container = new AMMiniMedBayContainer(this);
+            if (Container == null)
+            {
+                Container = new AMMiniMedBayContainer(this);
+            }
 
+            if (_display == null)
+            {
+                _display = gameObject.AddComponent<AMMiniMedBayDisplay>();
+            }
+            
             if (Player.main.gameObject.GetComponent<NitrogenLevel>() != null)
             {
                 _nitrogenLevel = Player.main.gameObject.GetComponent<NitrogenLevel>();
 
-                InvokeRepeating("UpdateNitrogenDisplay", 1, 0.5f);
+                InvokeRepeating(nameof(UpdateNitrogenDisplay), 1, 0.5f);
             }
+
+            _initialized = true;
         }
 
         private void UpdateNitrogenDisplay()
@@ -229,9 +290,9 @@ namespace AMMiniMedBay.Mono
             IsPlayerInTrigger = true;
         }
 
-        public bool IsPlayerInTrigger { get; set; }
+        internal bool IsPlayerInTrigger { get; set; }
 
-        public AMMiniMedBayTrigger PlayerTrigger { get; set; }
+        internal AMMiniMedBayTrigger PlayerTrigger { get; set; }
 
         public override void OnAddItemEvent(InventoryItem item)
         {
@@ -267,7 +328,6 @@ namespace AMMiniMedBay.Mono
                 return false;
             }
 
-            _initialized = true;
             return true;
         }
 
@@ -279,14 +339,28 @@ namespace AMMiniMedBay.Mono
 
         public void OnConstructedChanged(bool constructed)
         {
+            QuickLogger.Debug("OnConstructedChanged Activated");
+
             if (constructed)
             {
                 QuickLogger.Debug("Constructed", true);
 
-                if (_display == null)
+                if (isActiveAndEnabled)
                 {
-                    _display = gameObject.AddComponent<AMMiniMedBayDisplay>();
-                    _display.Setup(this);
+                    if (!_initialized)
+                    {
+                        Initialize();
+                    }
+
+                    if (_display != null)
+                    {
+                        _display.Setup(this);
+                        _runStartUpOnEnable = false;
+                    }
+                }
+                else
+                {
+                    _runStartUpOnEnable = true;
                 }
             }
         }
@@ -296,54 +370,43 @@ namespace AMMiniMedBay.Mono
             _display.ChangeStorageAmount(containerSlotsFilled);
         }
 
-        public void OnProtoSerializeObjectTree(ProtobufSerializer serializer)
+        public void OnProtoDeserialize(ProtobufSerializer serializer)
         {
-            QuickLogger.Debug($"Saving {_prefabId.Id} Data");
-
-            if (!Directory.Exists(_saveDirectory))
-                Directory.CreateDirectory(_saveDirectory);
-
-            var saveData = new SaveData
-            {
-                SCA = Container.NumberOfFirstAids,
-                TTS = Container.GetTimeToSpawn(),
-                BodyColor = _currentBodyColor.ColorToVector4()
-            };
-
-            var output = JsonConvert.SerializeObject(saveData, Formatting.Indented);
-            File.WriteAllText(SaveFile, output);
-
-            QuickLogger.Debug($"Saved {_prefabId.Id} Data");
-        }
-
-        public void OnProtoDeserializeObjectTree(ProtobufSerializer serializer)
-        {
+            QuickLogger.Debug("OnProtoDeserialize Activated");
             QuickLogger.Debug("// ****************************** Load Data *********************************** //");
 
-            if (_prefabId != null)
+            if (_data == null)
             {
-                QuickLogger.Info($"Loading AM Mini MedBay {_prefabId.Id}");
-
-                if (File.Exists(SaveFile))
-                {
-                    string savedDataJson = File.ReadAllText(SaveFile).Trim();
-
-                    //LoadData
-                    var savedData = JsonConvert.DeserializeObject<SaveData>(savedDataJson);
-                    Container.NumberOfFirstAids = savedData.SCA;
-                    Container.SetTimeToSpawn(savedData.TTS);
-                    _currentBodyColor = savedData.BodyColor.Vector4ToColor();
-                    MaterialHelpers.ChangeMaterialColor("AMMiniMedBay_BaseColor", gameObject, _currentBodyColor);
-                }
+                ReadySaveData();
             }
-            else
-            {
-                QuickLogger.Error("PrefabIdentifier is null");
-            }
+
+            _currentBodyColor = _data.BodyColor.Vector4ToColor();
+            MaterialHelpers.ChangeMaterialColor("AMMiniMedBay_BaseColor", gameObject, _currentBodyColor);
+
             QuickLogger.Debug("// ****************************** Loaded Data *********************************** //");
         }
 
-        public void SetCurrentBodyColor(Color color)
+        public void OnProtoSerialize(ProtobufSerializer serializer)
+        {
+            if (Mod.IsSaving()) return;
+            QuickLogger.Info("Saving MedBay");
+            Mod.SaveMod();
+        }
+
+        internal void Save(SaveData saveDataList)
+        {
+            var prefabIdentifier = GetComponent<PrefabIdentifier>() ?? GetComponentInParent<PrefabIdentifier>();
+            var id = prefabIdentifier.Id;
+            var saveData = new SaveDataEntry();
+
+            saveData.Id = id;
+            saveData.SCA = Container.NumberOfFirstAids;
+            saveData.TTS = Container.GetTimeToSpawn();
+            saveData.BodyColor = _currentBodyColor.ColorToVector4();
+            saveDataList.Entries.Add(saveData);
+        }
+
+        internal void SetCurrentBodyColor(Color color)
         {
             _currentBodyColor = color;
         }

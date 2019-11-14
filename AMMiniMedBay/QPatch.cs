@@ -14,7 +14,8 @@ namespace AMMiniMedBay
         //public static AssetBundle Bundle { get; private set; }
         public static void Patch()
         {
-            QuickLogger.Info("Started patching. Version: " + QuickLogger.GetAssemblyVersion());
+            var assembly = Assembly.GetExecutingAssembly();
+            QuickLogger.Info("Started patching. Version: " + QuickLogger.GetAssemblyVersion(assembly));
 
 #if DEBUG
             QuickLogger.DebugLogsEnabled = true;
