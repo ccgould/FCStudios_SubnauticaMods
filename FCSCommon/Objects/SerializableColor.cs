@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace FCSCommon.Objects
 {
+
+
     [Serializable]
     public class SerializableColor
     {

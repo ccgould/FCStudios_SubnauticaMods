@@ -1,6 +1,6 @@
-﻿using FCSCommon.Models.Abstract;
+﻿using FCSCommon.Abstract;
 using FCSCommon.Utilities;
-using FCSCommon.Utilities.Enums;
+using FCSCommon.Enums;
 using System;
 using System.Collections;
 using UnityEngine;

@@ -3,7 +3,7 @@ using FCSCommon.Utilities;
 using System;
 using UnityEngine;
 
-namespace FCSCommon.Models.Components
+namespace FCSCommon.Controllers
 {
     [RequireComponent(typeof(WeldablePoint))]
     public class HealthController : MonoBehaviour

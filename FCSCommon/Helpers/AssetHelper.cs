@@ -12,20 +12,20 @@ namespace FCSCommon.Helpers
         /// <summary>
         /// The AssetBundle for the mod
         /// </summary>
-        public static AssetBundle Asset(string modName, string modBundleName)
+        public static AssetBundle Asset(string modDirName, string modBundleName)
         {
-            if (modName.Equals(string.Empty) && modBundleName.Equals(string.Empty))
+            if (modDirName.Equals(string.Empty) && modBundleName.Equals(string.Empty))
             {
-                throw new ArgumentException($"Both {nameof(modName)} and {nameof(modBundleName)} are empty");
+                throw new ArgumentException($"Both {nameof(modDirName)} and {nameof(modBundleName)} are empty");
             }
 
-            if (modName.Equals(string.Empty) || modBundleName.Equals(string.Empty))
+            if (modDirName.Equals(string.Empty) || modBundleName.Equals(string.Empty))
             {
-                var result = modName.Equals(string.Empty) ? nameof(modName) : nameof(modBundleName);
+                var result = modDirName.Equals(string.Empty) ? nameof(modDirName) : nameof(modBundleName);
                 throw new ArgumentException($"{result} is empty");
             }
 
-            return AssetBundle.LoadFromFile(Path.Combine(Path.Combine(Environment.CurrentDirectory, "QMods"), Path.Combine(modName, Path.Combine("Assets", modBundleName))));
+            return AssetBundle.LoadFromFile(Path.Combine(Path.Combine(Environment.CurrentDirectory, "QMods"), Path.Combine(modDirName, Path.Combine("Assets", modBundleName))));
         }
 
         public static string GetModDirectory(string modName)

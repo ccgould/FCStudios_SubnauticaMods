@@ -358,5 +358,37 @@ namespace FCSCommon.Helpers
                 }
             }
         }
+
+        public static void ChangeEmissionColor(string materialName, GameObject gameObject, Color color)
+        {
+            Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>(true);
+            foreach (Renderer renderer in renderers)
+            {
+                foreach (Material material in renderer.materials)
+                {
+                    if (material.name.StartsWith(materialName))
+                    {
+                        material.SetVector("_GlowColor", color);
+                    }
+                }
+            }
+        }
+
+        public static Color? GetBodyColor(GameObject gameObject, string materialName)
+        {
+            Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>(true);
+            foreach (Renderer renderer in renderers)
+            {
+                foreach (Material material in renderer.materials)
+                {
+                    if (material.name.StartsWith(materialName))
+                    {
+                        return material.GetColor("_Color");
+                    }
+                }
+            }
+
+            return null;
+        }
     }
 }

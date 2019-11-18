@@ -1,4 +1,4 @@
-﻿using FCSCommon.Models;
+﻿using FCSCommon.Controllers;
 
 namespace FCSCommon.Interfaces
 {

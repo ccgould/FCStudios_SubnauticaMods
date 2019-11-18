@@ -1,8 +1,10 @@
 ﻿using System;
 using FCSCommon.Interfaces;
 using FCSCommon.Utilities;
+using UnityEngine;
+using UnityEngine.UI;
 
-namespace FCSCommon.Models
+namespace FCSCommon.Controllers
 {
     public class NameController
     {
@@ -35,6 +37,21 @@ namespace FCSCommon.Models
             QuickLogger.Debug($"Setting unit name to : {name}");
             _name = name;
             OnLabelChanged?.Invoke(name);
+        }
+
+        public void SetCurrentName(string name,GameObject gameObject)
+        {
+            SetCurrentName(name);
+            var textComponent = gameObject.GetComponent<Text>();
+            
+            if (textComponent == null)
+            {
+                QuickLogger.Error<NameController>("Text Component is null");
+                return;
+            }
+
+            textComponent.text = name;
+
         }
     }
 }

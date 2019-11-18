@@ -54,6 +54,16 @@
                 ErrorMessage.AddError(msg);
         }
 
+        public static void Error<T>(string msg, bool showOnScreen = false)
+        {
+            string name = Assembly.GetCallingAssembly().GetName().Name;
+
+            Console.WriteLine($"[{name}:ERROR] {typeof(T).FullName}: {msg}");
+
+            if (showOnScreen)
+                ErrorMessage.AddError(msg);
+        }
+
         public static void Error(string msg, Exception ex)
         {
             string name = Assembly.GetCallingAssembly().GetName().Name;

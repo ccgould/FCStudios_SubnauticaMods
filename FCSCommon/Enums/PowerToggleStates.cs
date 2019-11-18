@@ -1,4 +1,4 @@
-﻿namespace FCSCommon.Utilities.Enums
+﻿namespace FCSCommon.Enums
 {
     /// <summary>
     /// The toggle states for the FCS Power Storage

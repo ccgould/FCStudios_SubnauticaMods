@@ -15,11 +15,10 @@ namespace FCSCommon.Helpers
         private Text _pageNumberText;
         
 
-        private int _maxColorPage = 1;
+        private int _maxPage = 1;
         private int _currentPage;
         private GameObject _itemPrefab;
         private GameObject _itemsGrid;
-        private int _count;
 
         public void Initialize(GameObject itemPrefab, GameObject itemsGrid,GameObject pageNumberText, int itemsPerPage, Action<string, object> onButtonClick)
         {
@@ -41,6 +40,11 @@ namespace FCSCommon.Helpers
             DrawPage(_currentPage + amount);
         }
 
+        public void DrawPage()
+        {
+            DrawPage(_currentPage);
+        }
+
         public void DrawPage(int page)
         {
             _currentPage = page;
@@ -49,27 +53,18 @@ namespace FCSCommon.Helpers
             {
                 _currentPage = 1;
             }
-            else if (_currentPage > _maxColorPage)
+            else if (_currentPage > _maxPage)
             {
-                _currentPage = _maxColorPage;
+                _currentPage = _maxPage;
             }
 
             StartingPosition = (_currentPage - 1) * _itemsPerPage;
             EndingPosition = StartingPosition + _itemsPerPage;
-
-            if (EndingPosition > _count)
-            {
-                EndingPosition = _count;
-            }
-
-            ClearPage();
-
-            OnLoadDisplay?.Invoke(_itemPrefab,_itemsGrid);
-
-            UpdaterPaginator();
+            
+            OnLoadDisplay?.Invoke(_itemPrefab,_itemsGrid,StartingPosition,EndingPosition);
         }
 
-        public Action<GameObject, GameObject> OnLoadDisplay { get; set; }
+        public Action<GameObject, GameObject,int,int> OnLoadDisplay { get; set; }
 
         public int EndingPosition { get; private set; }
 
@@ -97,7 +92,7 @@ namespace FCSCommon.Helpers
             //itemButton.BtnName = "ShippingContainer";
         //}
 
-        private void ClearPage()
+        public void ClearPage()
         {
             for (int i = 0; i < _itemsGrid.transform.childCount; i++)
             {
@@ -105,25 +100,21 @@ namespace FCSCommon.Helpers
             }
         }
 
-        private void UpdaterPaginator()
+        public void UpdaterPaginator(int count)
         {
-            CalculateNewMaxPages();
+            CalculateNewMaxPages(count);
             if (_pageNumberText == null) return;
-            _pageNumberText.text = $"{_currentPage.ToString()} | {_maxColorPage}";
+            _pageNumberText.text = $"{_currentPage.ToString()} | {_maxPage}";
         }
 
-        private void CalculateNewMaxPages()
-        {
-            _maxColorPage = Mathf.CeilToInt((_count - 1) / _itemsPerPage) + 1;
-            if (_currentPage > _maxColorPage)
+        private void CalculateNewMaxPages(int count)
+        { 
+            _maxPage = (count - 1) / _itemsPerPage + 1;
+
+            if (_currentPage > _maxPage)
             {
-                _currentPage = _maxColorPage;
+                _currentPage = _maxPage;
             }
-        }
-
-        public void UpdateCount(int value)
-        {
-            _count = value;
         }
     }
 }

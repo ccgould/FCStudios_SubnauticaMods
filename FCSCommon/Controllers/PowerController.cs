@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-namespace FCSCommon.Models
+namespace FCSCommon.Controllers
 {
     public class PowerController : MonoBehaviour, IPowerInterface
     {

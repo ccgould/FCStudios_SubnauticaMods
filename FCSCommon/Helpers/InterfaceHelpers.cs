@@ -117,5 +117,14 @@ namespace FCSCommon.Helpers
             gameObject = result;
             return true;
         }
+
+        public static void CreatePaginator(GameObject go, int amountToChangeBy, Action<int> ChangePageBy, Color startColor, Color hoverColor)
+        {
+            var button = go.AddComponent<PaginatorButton>();
+            button.ChangePageBy = ChangePageBy;
+            button.AmountToChangePageBy = amountToChangeBy;
+            button.STARTING_COLOR = startColor;
+            button.HOVER_COLOR = hoverColor;
+        }
     }
 }

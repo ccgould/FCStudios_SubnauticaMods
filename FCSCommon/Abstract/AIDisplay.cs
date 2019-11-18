@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-namespace FCSCommon.Helpers
+namespace FCSCommon.Abstract
 {
     public abstract class AIDisplay : MonoBehaviour
     {
@@ -14,7 +14,10 @@ namespace FCSCommon.Helpers
 
         public int MaxPage = 1;
 
-        public abstract void ClearPage();
+        public virtual void ClearPage()
+        {
+            
+        }
 
         public int ITEMS_PER_PAGE;
 
@@ -29,7 +32,10 @@ namespace FCSCommon.Helpers
 
         public abstract void OnButtonClick(string btnName, object tag);
 
-        public abstract void ItemModified(TechType item, int newAmount = 0);
+        public virtual void ItemModified(TechType item, int newAmount = 0)
+        {
+            
+        }
 
         public abstract bool FindAllComponents();
 
@@ -48,15 +54,30 @@ namespace FCSCommon.Helpers
             StartCoroutine(PowerOff());
         }
 
-        public abstract IEnumerator PowerOff();
+        public virtual IEnumerator PowerOff()
+        {
+            throw new System.NotImplementedException();
+        }
 
-        public abstract IEnumerator PowerOn();
+        public virtual IEnumerator PowerOn()
+        {
+            throw new System.NotImplementedException();
+        }
 
-        public abstract IEnumerator ShutDown();
+        public virtual IEnumerator ShutDown()
+        {
+            throw new System.NotImplementedException();
+        }
 
-        public abstract IEnumerator CompleteSetup();
+        public virtual IEnumerator CompleteSetup()
+        {
+            throw new System.NotImplementedException();
+        }
 
-        public abstract void DrawPage(int page);
+        public virtual void DrawPage(int page)
+        {
+            
+        }
 
         public virtual void UpdatePaginator() { }
     }
