@@ -30,6 +30,7 @@ namespace AE.BaseTeleporter.Mono
         public AnimationManager AnimationManager { get; private set; }
         public BTDisplayManager DisplayManager { get; private set; }
         public AudioManager AudioManager { get; private set; }
+        public BTPowerManager PowerManager { get; private set; }
 
         public void Save(SaveData saveData)
         {
@@ -112,6 +113,10 @@ namespace AE.BaseTeleporter.Mono
                 AudioManager = new AudioManager(gameObject.GetComponent<FMOD_CustomLoopingEmitter>());
 
             AudioManager.LoadFModAssets("/env/use_teleporter_use_loop","use_teleporter_use_loop");
+
+            if (PowerManager == null)
+                PowerManager = new BTPowerManager(this);
+
 
             DisplayManager.Setup(this);
 

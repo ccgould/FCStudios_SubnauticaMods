@@ -30,8 +30,42 @@ namespace AE.BaseTeleporter.Buildables
             {
 
                 prefab = UnityEngine.Object.Instantiate(_prefab);
-
+                
                 prefab.name = this.PrefabFileName;
+
+                if (prefab != null)
+                {
+                    var model = prefab.FindChild("model");
+
+                    SkyApplier skyApplier = prefab.AddComponent<SkyApplier>();
+                    skyApplier.renderers = model.GetComponentsInChildren<MeshRenderer>();
+                    skyApplier.anchorSky = Skies.Auto;
+
+                    //========== Allows the building animation and material colors ==========// 
+
+                    QuickLogger.Debug("Adding Constructible");
+
+                    // Add constructible
+                    var constructable = prefab.AddComponent<Constructable>();
+                    constructable.allowedOnWall = false;
+                    constructable.allowedOnGround = true;
+                    constructable.allowedInSub = false;
+                    constructable.allowedInBase = true;
+                    constructable.allowedOnCeiling = false;
+                    constructable.allowedOutside = false;
+                    constructable.model = model;
+                    constructable.rotationEnabled = true;
+                    constructable.techType = TechType;
+
+                    PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
+                    prefabID.ClassId = ClassID;
+
+                    prefab.AddComponent<AnimationManager>();
+                    prefab.AddComponent<TeleportManager>();
+                    prefab.AddComponent<BTDisplayManager>();
+                    prefab.AddComponent<FMOD_CustomLoopingEmitter>();
+                    prefab.AddComponent<BaseTeleporterController>();
+                }
             }
             catch (Exception e)
             {
@@ -41,7 +75,7 @@ namespace AE.BaseTeleporter.Buildables
             return prefab;
         }
 
-        public override string AssetsFolder { get; } = $"{Mod.ModName}/Assets";
+        public override string AssetsFolder { get; } = $"{Mod.ModFolderName}/Assets";
         protected override TechData GetBlueprintRecipe()
         {
             QuickLogger.Debug($"Creating recipe...");
@@ -51,11 +85,13 @@ namespace AE.BaseTeleporter.Buildables
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(TechTypeHelpers.GetTechType(FCSTechFabricator.Configuration.BaseTeleporterClassID), 1)
+                    new Ingredient(TechTypeHelpers.GetTechType("IntraBaseTeleporterKit_AE"), 1)
                 }
             };
             return customFabRecipe;
         }
+
+        public override string IconFileName => "BaseTeleporter.png";
 
         public override TechGroup GroupForPDA { get; } = TechGroup.InteriorModules;
         public override TechCategory CategoryForPDA { get; } = TechCategory.InteriorModule;
@@ -74,40 +110,7 @@ namespace AE.BaseTeleporter.Buildables
 
         private static void Register()
         {
-            if (_prefab != null)
-            {
-                var model = _prefab.FindChild("model");
-
-                SkyApplier skyApplier = _prefab.AddComponent<SkyApplier>();
-                skyApplier.renderers = model.GetComponentsInChildren<MeshRenderer>();
-                skyApplier.anchorSky = Skies.Auto;
-
-                //========== Allows the building animation and material colors ==========// 
-
-                QuickLogger.Debug("Adding Constructible");
-
-                // Add constructible
-                var constructable = _prefab.AddComponent<Constructable>();
-                constructable.allowedOnWall = false;
-                constructable.allowedOnGround = true;
-                constructable.allowedInSub = false;
-                constructable.allowedInBase = true;
-                constructable.allowedOnCeiling = false;
-                constructable.allowedOutside = false;
-                constructable.model = model;
-                constructable.rotationEnabled = true;
-                constructable.techType = Singleton.TechType;
-
-                PrefabIdentifier prefabID = _prefab.AddComponent<PrefabIdentifier>();
-                prefabID.ClassId = Singleton.ClassID;
-
-                _prefab.AddComponent<AnimationManager>();
-                _prefab.AddComponent<TeleportManager>();
-                _prefab.AddComponent<BTDisplayManager>();
-                _prefab.AddComponent<TechTag>().type = Singleton.TechType;
-                _prefab.AddComponent<FMOD_CustomLoopingEmitter>();
-                _prefab.AddComponent<BaseTeleporterController>();
-            }
+            
         }
     }
 }

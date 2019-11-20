@@ -94,10 +94,10 @@
     <Compile Include="Configuration\SaveDataEntry.cs" />
     <Compile Include="Managers\BaseManager.cs" />
     <Compile Include="Managers\BTDisplayManager.cs" />
+    <Compile Include="Managers\BTPowerManager.cs" />
     <Compile Include="Managers\TeleportManager.cs" />
     <Compile Include="Mono\BaseTeleporterController.cs" />
     <Compile Include="Patchers\BaseTeleporterController_Patcher.cs" />
-    <Compile Include="Patchers\SubRoot_Patches.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

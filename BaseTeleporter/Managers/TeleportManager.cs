@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using AE.BaseTeleporter.Buildables;
 using AE.BaseTeleporter.Mono;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -24,7 +25,7 @@ namespace AE.BaseTeleporter.Managers
 
             if (_teleportPlayer)
             {
-                _timer += Time.deltaTime;
+                _timer += DayNightCycle.main.deltaTime;
 
                 if (_timer > _spoolTime + _delayTime)
                 {
@@ -83,13 +84,21 @@ namespace AE.BaseTeleporter.Managers
         {
             if (_initialized)
             {
-                _fromUnit = mono;
-                _fromUnit.AnimationManager.SetBoolHash(_animationRunning, true);
-                _fromUnit.AudioManager.PlayAudio();
-                _mono.AudioManager.PlayAudio();
-                _mono.AnimationManager.SetBoolHash(_animationRunning, true);
-                Player.main.playerController.SetEnabled(false);
-                _teleportPlayer = true;
+                if (_mono.PowerManager.TakePower())
+                {
+                    _fromUnit = mono;
+                    _fromUnit.AnimationManager.SetBoolHash(_animationRunning, true);
+                    _fromUnit.AudioManager.PlayAudio();
+                    _mono.AudioManager.PlayAudio();
+                    _mono.AnimationManager.SetBoolHash(_animationRunning, true);
+                    Player.main.playerController.SetEnabled(false);
+                    _teleportPlayer = true;
+                }
+                else
+                {
+                    QuickLogger.Message($"{BaseTeleporterBuildable.NotEnoughPower()}: Power Needed: {_mono.PowerManager.NeededPower()} units",true);
+                }
+
             }
         }
 

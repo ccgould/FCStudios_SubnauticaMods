@@ -218,19 +218,20 @@ namespace AE.BaseTeleporter.Managers
             QuickLogger.Debug("Loading Teleports Display");
 
             var items = _mono.Manager.BaseUnits.Where(x => x != _mono).ToList();
-            
+
+
             if (endPos > items.Count)
             {
                 endPos = items.Count;
             }
             
             _teleportGrid.ClearPage();
-
+            
             for (int i = stPos; i < endPos; i++)
             {
-                var unitName = items[i].GetName();
                 var unit = items[i];
-
+                var unitName = unit.GetName();
+                
                 if(unit == _mono) continue;
 
                 GameObject itemDisplay = Instantiate(itemPrefab);

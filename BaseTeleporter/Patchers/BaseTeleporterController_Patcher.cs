@@ -5,44 +5,6 @@ using Harmony;
 namespace AE.BaseTeleporter.Patchers
 {
     [HarmonyPatch(typeof(BaseTeleporterController))]
-    [HarmonyPatch("Awake")]
-    internal class BaseTeleporterController_Patcher
-    {
-        private static Action<BaseTeleporterController> BaseTeleporterControllerAdded;
-
-        [HarmonyPostfix]
-        internal static void Postfix(BaseTeleporterController __instance)
-        {
-            if (BaseTeleporterControllerAdded != null)
-            {
-                BaseTeleporterControllerAdded.Invoke(__instance);
-            }
-        }
-
-        internal static bool AddEventHandlerIfMissing(Action<BaseTeleporterController> newHandler)
-        {
-            if (BaseTeleporterControllerAdded == null)
-            {
-                BaseTeleporterControllerAdded += newHandler;
-                return true;
-            }
-            else
-            {
-                foreach (Action<BaseTeleporterController> action in BaseTeleporterControllerAdded.GetInvocationList())
-                {
-                    if (action == newHandler)
-                    {
-                        return false;
-                    }
-                }
-
-                BaseTeleporterControllerAdded += newHandler;
-                return true;
-            }
-        }
-    }
-
-    [HarmonyPatch(typeof(BaseTeleporterController))]
     [HarmonyPatch("OnDestroy")]
     internal class BaseTeleporterControllerDestroy_Patcher
     {
