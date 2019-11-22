@@ -5,6 +5,7 @@ using FCSCommon.Utilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using SMLHelper.V2.Utility;
 using UnityEngine;
 
 namespace FCS_AIMarineTurbine.Buildable
@@ -17,7 +18,7 @@ namespace FCS_AIMarineTurbine.Buildable
         private static readonly AIMarineMonitorBuildable Singleton = new AIMarineMonitorBuildable();
         public override TechGroup GroupForPDA { get; } = TechGroup.InteriorModules;
         public override TechCategory CategoryForPDA { get; } = TechCategory.InteriorModule;
-        public override string AssetsFolder { get; } = $"FCSAIMarineTurbine/Assets";
+        public override string AssetsFolder { get; } = $"FCS_MarineTurbine/Assets";
         public static void PatchSMLHelper()
         {
             if (!Singleton.GetPrefabs())

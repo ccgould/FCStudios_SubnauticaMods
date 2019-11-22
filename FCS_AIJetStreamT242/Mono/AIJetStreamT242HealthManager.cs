@@ -7,9 +7,9 @@ using UnityEngine;
 
 namespace FCS_AIMarineTurbine.Mono
 {
-    internal class AIJetStreamT242HealthManager : MonoBehaviour
+    internal class AIJetStreamT242HealthManager : Living
     {
-        public LiveMixin LiveMixin { get; set; } = new LiveMixin();
+        private LiveMixin _liveMixin;
         public bool IsDamagedFlag { get; set; } = true;
 
         public int HealthMultiplyer { get; set; } = 1;
@@ -20,77 +20,77 @@ namespace FCS_AIMarineTurbine.Mono
         private GameObject _damage;
         private bool _shaderApplied;
         private AIJetStreamT242Controller _mono;
+        private bool _initialized;
         public Action OnDamaged { get; set; }
         public Action OnRepaired { get; set; }
 
 
         #region Unity Methods
-
-        private void Awake()
-        {
-
-        }
-
         private void Update()
         {
             //TODO Check if will cause problem
             //if (!IsSafeToContinue) return;
+            if (_initialized)
+            {
+                UpdateHealthSystem();
+            }
 
-            UpdateHealthSystem();
         }
         #endregion
 
         private void UpdateHealthSystem()
         {
+            if (_mono.PowerManager == null) return;
+
             if (_mono.PowerManager.GetHasBreakerTripped()) return;
 
             _passedTime += DayNightCycle.main.deltaTime;
 
-            QuickLogger.Debug($"Passed Time: {_passedTime} || Damage Per Sec {_damagePerSecond}");
+            //QuickLogger.Debug($"Passed Time: {_passedTime} || Damage Per Sec {_damagePerSecond}");
 
             if (_passedTime >= _damagePerSecond)
             {
-                QuickLogger.Debug("Damaging Unit");
+                QuickLogger.Debug($"Damaging turbine unit: {_mono.GetPrefabId()}");
                 ApplyDamage();
             }
         }
 
         public bool IsDamageApplied()
         {
-            if (LiveMixin == null) return true;
+            if (_liveMixin == null) return true;
 
-            return LiveMixin.health <= 0;
+            return GetHealth() <= 0;
         }
 
         internal float GetHealth()
         {
-            return LiveMixin.health;
+            return _initialized ? _liveMixin.health : 0;
         }
 
         internal void SetHealth(float health)
         {
-            LiveMixin.health = health;
+            _liveMixin.health = health;
         }
 
         internal void Initialize(AIJetStreamT242Controller mono)
         {
             _mono = mono;
 
-            LiveMixin = GetComponentInParent<LiveMixin>();
+            _liveMixin = GetComponent<LiveMixin>() ?? GetComponentInParent<LiveMixin>();
 
             _damagePerSecond = DayNight / _damagePerDay;
 
-            if (LiveMixin != null)
+            if (_liveMixin != null)
             {
-                if (LiveMixin.data == null)
+                if (_liveMixin.data == null)
                 {
                     QuickLogger.Debug($"Creating Data");
-                    LiveMixin.data = CustomLiveMixinData.Get();
+                    _liveMixin.data = CustomLiveMixinData.Get();
                     QuickLogger.Debug($"Created Data");
                 }
                 else
                 {
-                    LiveMixin.data.weldable = true;
+                    _liveMixin.data.weldable = true;
                 }
 
                 InvokeRepeating("HealthChecks", 0, 1);
@@ -99,13 +99,15 @@ namespace FCS_AIMarineTurbine.Mono
             {
                 QuickLogger.Error($"LiveMixing not found!");
             }
+
+            _initialized = true;
         }
 
         public void ApplyDamage()
         {
-            if (LiveMixin.health > 0 && AIJetStreamT242Buildable.JetStreamT242Config.EnableWear)
+            if (_liveMixin.health > 0 && AIJetStreamT242Buildable.JetStreamT242Config.EnableWear)
             {
-                LiveMixin.health = Mathf.Clamp(LiveMixin.health - HealthMultiplyer, 0f, 100f);
+                _liveMixin.health = Mathf.Clamp(_liveMixin.health - HealthMultiplyer, 0f, 100f);
                 ResetTimer();
             }
         }

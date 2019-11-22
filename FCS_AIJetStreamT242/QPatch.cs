@@ -46,7 +46,7 @@ namespace FCS_AIMarineTurbine
         private static void LoadAssetBundle()
         {
             QuickLogger.Debug("GetPrefabs");
-            AssetBundle assetBundle = AssetHelper.Asset($"FCSAIMarineTurbine", "aimarineturbinemodbundle");
+            AssetBundle assetBundle = AssetHelper.Asset($"FCS_MarineTurbine", "aimarineturbinemodbundle");
 
             //If the result is null return false.
             if (assetBundle == null)

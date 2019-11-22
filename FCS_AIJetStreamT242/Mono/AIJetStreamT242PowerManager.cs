@@ -26,6 +26,7 @@ namespace FCS_AIJetStreamT242.Mono
         private float _timeCurrDeltaTime;
         private float _storedPower;
         private float _energyPerSec;
+        private bool _initialize;
 
 
         #region Unity Methods
@@ -39,7 +40,11 @@ namespace FCS_AIJetStreamT242.Mono
 
         private void Update()
         {
-            ProducePower();
+            if (_initialize)
+            {
+                ProducePower();
+            }
+
         }
         #endregion
 
@@ -72,6 +77,9 @@ namespace FCS_AIJetStreamT242.Mono
 
         private void ProducePower()
         {
+            if (_mono.HealthManager == null) return;
+
+            
             var decPercentage = (MaxPowerPerMin / _mono.MaxSpeed) / 60;
 
             _energyPerSec = _mono.GetCurrentSpeed() * decPercentage;
@@ -214,6 +222,7 @@ namespace FCS_AIJetStreamT242.Mono
         internal void Initialize(AIJetStreamT242Controller mono)
         {
             _mono = mono;
+            _initialize = true;
         }
 
         internal bool GetHasBreakerTripped()

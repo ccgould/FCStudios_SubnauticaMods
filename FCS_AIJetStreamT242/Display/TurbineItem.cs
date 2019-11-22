@@ -11,7 +11,7 @@ namespace FCS_AIMarineTurbine.Display
     internal class TurbineItem : MonoBehaviour
     {
         #region Private Members
-        private bool _foundComponents = true;
+        private bool _foundComponents;
         private Text _speedText;
         private Text _depthText;
         private GameObject _healthLbl;
@@ -220,11 +220,14 @@ namespace FCS_AIMarineTurbine.Display
 
             #endregion
 
+            _foundComponents = true;
             return true;
         }
 
         private void GetTurbineData()
         {
+            if (Turbine == null || !Turbine.IsConstructed || !Turbine.IsInitialized) return;
+
             _depthText.text = $"{Mathf.Round(Turbine.GetDepth())}M";
 
             _speedText.text = $"{Turbine.GetSpeed()}{LanguageHelpers.GetLanguage(DisplayLanguagePatching.RPMKey)}";
@@ -272,7 +275,6 @@ namespace FCS_AIMarineTurbine.Display
 
             if (FindAllComponents() == false)
             {
-                _foundComponents = false;
                 QuickLogger.Error("// ============== Error getting all Components ============== //");
             }
         }

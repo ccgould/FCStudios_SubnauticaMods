@@ -10,6 +10,8 @@ using Oculus.Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using FCS_AIMarineTurbine.Display;
+using FCSCommon.Objects;
 using UnityEngine;
 
 namespace FCS_AIMarineTurbine.Buildable
@@ -22,7 +24,7 @@ namespace FCS_AIMarineTurbine.Buildable
         private static readonly AIJetStreamT242Buildable Singleton = new AIJetStreamT242Buildable();
         public override TechGroup GroupForPDA { get; } = TechGroup.ExteriorModules;
         public override TechCategory CategoryForPDA { get; } = TechCategory.ExteriorModule;
-        public override string AssetsFolder { get; } = $"FCSAIMarineTurbine/Assets";
+        public override string AssetsFolder { get; } = $"FCS_MarineTurbine/Assets";
         public static void PatchSMLHelper()
         {
             if (!Singleton.GetPrefabs())
@@ -32,7 +34,7 @@ namespace FCS_AIMarineTurbine.Buildable
 
             Singleton.Patch();
 
-            string savedDataJson = File.ReadAllText(Path.Combine(AssetHelper.GetConfigFolder($"FCSAIMarineTurbine"), $"{Singleton.ClassID}.json")).Trim();
+            string savedDataJson = File.ReadAllText(Path.Combine(AssetHelper.GetConfigFolder($"FCS_MarineTurbine"), $"{Singleton.ClassID}.json")).Trim();
             JetStreamT242Config = JsonConvert.DeserializeObject<JetStreamT242Config>(savedDataJson);
             QuickLogger.Debug($"Biome Speeds Count {JetStreamT242Config.BiomeSpeeds.Count}");
         }
@@ -47,15 +49,13 @@ namespace FCS_AIMarineTurbine.Buildable
 
         public override GameObject GetGameObject()
         {
-            GameObject prefab = null;
-
             try
             {
                 QuickLogger.Debug("Making GameObject");
 
                 QuickLogger.Debug("Instantiate GameObject");
 
-                prefab = GameObject.Instantiate(_Prefab);
+                var prefab = GameObject.Instantiate(_Prefab);
                 var transmitter = GameObject.Instantiate(CraftData.GetPrefabForTechType(TechType.PowerTransmitter));
 
 
@@ -94,14 +94,17 @@ namespace FCS_AIMarineTurbine.Buildable
 
                 prefab.AddComponent<PowerPlug>();
 
-                prefab.AddComponent<LiveMixin>();
-
                 PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
                 prefabID.ClassId = this.ClassID;
+
+                var lm = prefab.AddComponent<LiveMixin>();
+                lm.data = CustomLiveMixinData.Get();
 
                 prefab.AddComponent<TechTag>().type = TechType;
 
                 prefab.AddComponent<BeaconController>();
+
+                prefab.AddComponent<AIJetStreamT242Display>();
 
                 prefab.AddComponent<AIJetStreamT242PowerManager>();
 
@@ -110,13 +113,14 @@ namespace FCS_AIMarineTurbine.Buildable
                 prefab.AddComponent<AIJetStreamT242AnimationManager>();
 
                 prefab.AddComponent<AIJetStreamT242Controller>();
+
+                return prefab;
             }
             catch (Exception e)
             {
                 QuickLogger.Error(e.Message);
+                return null;
             }
-
-            return prefab;
         }
 
         protected override TechData GetBlueprintRecipe()
@@ -132,7 +136,6 @@ namespace FCS_AIMarineTurbine.Buildable
                 }
             };
 
-            QuickLogger.Debug(ModTechTypes.JetStreamKit.ToString());
             QuickLogger.Debug($"Created Ingredients");
             return customFabRecipe;
         }

@@ -25,10 +25,26 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers
         private bool _constructed;
         private bool _isEnabled;
         private AIMarineMoniterDisplay _aiMarineMonitorDisplay;
+        private bool _runStartUpOnEnable;
 
         #endregion
 
         #region Unity Methods
+
+        private void OnEnable()
+        {
+            if (!_runStartUpOnEnable) return;
+
+            if (_isEnabled == false)
+            {
+                _isEnabled = true;
+                StartCoroutine(Startup());
+            }
+            else
+            {
+                TurnDisplayOn();
+            }
+        }
 
         private void Update()
         {
@@ -55,7 +71,7 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers
                 foreach (var turbine in jetStreamT242S)
                 {
 
-                    Turbines.Add(turbine.GetPrefabID(), turbine);
+                    Turbines.Add(turbine.GetPrefabId(), turbine);
                 }
             }
         }
@@ -105,10 +121,11 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers
 
         private void AlertedNewTurbineDestroyed(AIJetStreamT242Controller obj)
         {
+            QuickLogger.Debug("Attempting to remove turbine", true);
             if (obj != null)
             {
                 QuickLogger.Debug("OBJ Not NULL", true);
-                Turbines.Remove(obj.GetPrefabID());
+                Turbines.Remove(obj.GetPrefabId());
                 QuickLogger.Debug("Past Turbine", true);
                 _aiMarineMonitorDisplay.ItemModified(TechType.None);
                 QuickLogger.Debug("Removed Turbine");
@@ -141,11 +158,15 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers
 
         private IEnumerator TrackNewTurbineCoroutine(AIJetStreamT242Controller obj)
         {
+
+            // We yield to the end of the frame as we need the parent/children tree to update.
             yield return new WaitForEndOfFrame();
             GameObject newSeaBase = obj?.gameObject?.transform?.parent?.gameObject;
+            QuickLogger.Debug("Attempting to add turbine", true);
             if (newSeaBase != null && newSeaBase == _seaBase)
             {
-                Turbines.Add(obj.GetPrefabID(), obj);
+                Turbines.Add(obj.GetPrefabId(), obj);
+                QuickLogger.Debug($"Turbine Count: {Turbines.Count}", true);
                 _aiMarineMonitorDisplay.ItemModified(TechType.None);
             }
         }
@@ -169,23 +190,34 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers
 
             if (constructed)
             {
-                if (_isEnabled == false)
+                if (isActiveAndEnabled)
                 {
-                    _isEnabled = true;
-                    StartCoroutine(Startup());
+
+                    if (_isEnabled == false)
+                    {
+                        _isEnabled = true;
+                        StartCoroutine(Startup());
+                    }
+                    else
+                    {
+                        TurnDisplayOn();
+                    }
                 }
                 else
                 {
-                    TurnDisplayOn();
+                    _runStartUpOnEnable = true;
                 }
             }
-            else
-            {
-                if (_isEnabled)
-                {
-                    TurnDisplayOff();
-                }
-            }
+
+
+
+            //else
+            //{
+            //    if (_isEnabled)
+            //    {
+            //        TurnDisplayOff();
+            //    }
+            //}
         }
         #endregion
 

@@ -8,6 +8,8 @@ using FCSCommon.Utilities;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using FCSCommon.Abstract;
+using SMLHelper.V2.Utility;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -36,6 +38,7 @@ namespace FCS_AIMarineTurbine.Display
         private GameObject _pageCounterBottom;
         private GameObject _pageCounterTop;
         private AIMarineMonitorController _mono;
+        private bool _componentsFound;
 
         #endregion
 
@@ -62,14 +65,16 @@ namespace FCS_AIMarineTurbine.Display
 
         private void UpdateMenu()
         {
+            if (!_componentsFound) return;
+
             var working =
-                _mono.Turbines.Where(x => x.Value.HealthManager.GetHealth() <= 100 && x.Value.HealthManager.GetHealth() > 0).ToList();
+                _mono.Turbines.Where(x => x.Value.IsInitialized && x.Value.HealthManager.GetHealth() <= 100 && x.Value.HealthManager.GetHealth() > 0).ToList();
 
             var damaged =
-                _mono.Turbines.Where(x => x.Value.HealthManager.GetHealth() <= 0).ToList();
+                _mono.Turbines.Where(x => x.Value.IsInitialized && x.Value.HealthManager.GetHealth() <= 0).ToList();
 
             var poweredOff =
-                _mono.Turbines.Where(x => x.Value.PowerManager.GetHasBreakerTripped()).ToList();
+                _mono.Turbines.Where(x => x.Value.IsInitialized &&  x.Value.PowerManager.GetHasBreakerTripped()).ToList();
 
             _healthyContainer.FindChild("Value").GetComponent<Text>().text = working.Count.ToString();
             _damagedContainer.FindChild("Value").GetComponent<Text>().text = damaged.Count.ToString();
@@ -294,7 +299,7 @@ namespace FCS_AIMarineTurbine.Display
             }
             #endregion
 
-
+            _componentsFound = true;
             return true;
         }
 

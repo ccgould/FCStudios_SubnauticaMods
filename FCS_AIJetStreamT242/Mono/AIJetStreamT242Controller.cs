@@ -9,6 +9,7 @@ using Oculus.Newtonsoft.Json;
 using SMLHelper.V2.Utility;
 using System;
 using System.IO;
+using rail;
 using UnityEngine;
 
 namespace FCS_AIMarineTurbine.Mono
@@ -17,21 +18,23 @@ namespace FCS_AIMarineTurbine.Mono
     internal class AIJetStreamT242Controller : HandTarget, IHandTarget, IConstructable, IProtoEventListener
     {
         #region Public Properties
-        public bool IsBeingDeleted { get; set; }
-        public float IncreaseRate { get; set; } = 2f;
-        public bool Increasing { get; set; } = true;
-        public AIJetStreamT242PowerManager PowerManager { get; private set; }
-        public AIJetStreamT242HealthManager HealthManager { get; private set; }
-        public AIJetStreamT242AnimationManager AnimationManager { get; private set; }
-        public BeaconController BeaconManager { get; private set; }
 
-        public bool _initialized { get; private set; } = true;
+        internal bool IsInitialized { get; private set; }
+        internal bool IsBeingDeleted { get; set; }
+        internal float IncreaseRate { get; set; } = 2f;
+        internal bool Increasing { get; set; } = true;
+        internal AIJetStreamT242PowerManager PowerManager { get; private set; }
+        internal AIJetStreamT242HealthManager HealthManager { get; private set; }
+        internal AIJetStreamT242AnimationManager AnimationManager { get; private set; }
+        internal BeaconController BeaconManager { get; private set; }
+        internal bool IsConstructed => _buildable != null && _buildable.constructed;
         #endregion
 
         #region Private Members
+
+
         private GameObject _seaBase;
         private float _rpmPerDeg = 0.16667f;
-        private bool _constructed;
         private GameObject _rotor;
         private string _currentBiome;
         public float MaxSpeed;
@@ -43,77 +46,85 @@ namespace FCS_AIMarineTurbine.Mono
         private float _currentSpeed;
         private GameObject _damage;
         private AIJetStreamT242Display _display;
-
+        private bool _runStartUpOnEnable;
+        private SaveData _data;
+        private Constructable _buildable;
 
         #endregion
 
         #region Unity Methods
-        private void Awake()
+
+        public void Awake()
         {
-            if (FindComponents())
-            {
-                QuickLogger.Debug($"Turbine Components Found", true);
-
-                _prefabID = GetComponentInParent<PrefabIdentifier>();
-
-                var currentBiome = BiomeManager.GetBiome();
-
-                if (!string.IsNullOrEmpty(currentBiome))
-                {
-                    var data = BiomeManager.GetBiomeData(currentBiome);
-                }
-
-                AISolutionsData.Instance.OnRotationChanged += AiSolutionsDataOnOnRotationChanged;
-                HealthManager = gameObject.GetComponent<AIJetStreamT242HealthManager>();
-                HealthManager.Initialize(this);
-                HealthManager.SetDamageModel(_damage);
-                PowerManager = gameObject.GetComponentInParent<AIJetStreamT242PowerManager>();
-
-                if (PowerManager == null)
-                {
-                    QuickLogger.Error("Power manager component not found!");
-                    _initialized = false;
-                    return;
-                }
-
-                PowerManager.Initialize(this);
-
-                AnimationManager = gameObject.GetComponentInParent<AIJetStreamT242AnimationManager>();
-
-                BeaconManager = gameObject.GetComponentInParent<BeaconController>();
-
-                //_currentBiome = BiomeManager.GetBiome();
-            }
-            else
-            {
-                _initialized = false;
-                throw new MissingComponentException("Failed to find all components");
-            }
-
-            if (!_initialized) return;
-
-            PowerManager.OnKillBattery += Unsubscribe;
+            //Needed for the patch do not remove
         }
 
+        private void OnEnable()
+        {
+            if (!_runStartUpOnEnable) return;
+
+            if (!IsInitialized)
+            {
+                Initialize();
+            }
+
+            if (_display != null)
+            {
+                _display.Setup(this);
+            }
+
+            if (_seaBase != null)
+            {
+                _currentBiome = BiomeManager.GetBiome();
+                RotateToMag();
+                SetCurrentRotation();
+                QuickLogger.Debug($"World Rotation {AISolutionsData.StartingRotation} ", true);
+
+                QuickLogger.Debug($"Turbine Constructed Rotation Set {_rotor.transform.rotation.ToString()} ", true);
+            }
+
+            if (_data == null)
+                ReadySaveData();
+
+            if (_data != null)
+            {
+                QuickLogger.Debug("// ****************************** Load Data *********************************** //");
+
+                if (_prefabID != null)
+                {
+                    QuickLogger.Info($"Loading JetStream {_prefabID.Id}");
+
+                    PowerManager.SetHasBreakerTripped(_data.HasBreakerTripped);
+                    HealthManager.SetHealth(_data.Health);
+                    PowerManager.SetCharge(_data.Charge);
+                    _currentSpeed = _data.CurrentSpeed;
+                    //RotateTurbine(savedData.DegPerSec);
+                    _targetRotation = _data.TurbineRot.TargetRotationToQuaternion();
+                    QuickLogger.Debug($"Target Rotation Set {_targetRotation}", true);
+                    _currentBiome = _data.Biome;
+                    HealthManager.SetPassedTime(_data.PassedTime);
+                    AISolutionsData.StartingRotation = _targetRotation;
+                    PowerManager.SetStoredPower(_data.StoredPower);
+                    if (_display != null)
+                    {
+                        _display.SetCurrentPage();
+                    }
+                }
+                else
+                {
+                    QuickLogger.Error("PrefabIdentifier is null");
+                }
+                QuickLogger.Debug("// ****************************** Loaded Data *********************************** //");
+            }
+
+            _runStartUpOnEnable = false;
+        }
+        
         private void Update()
         {
-            var constructable = GetComponentInParent<Constructable>();
-
-            if (_initialized && constructable._constructed && transform.parent != null)
-            {
-                PowerManager.IsSafeToContinue = true;
-
-                //HealthManager.IsSafeToContinue = true;
-
-                SystemHandler();
-            }
-            else
-            {
-                PowerManager.IsSafeToContinue = false;
-
-                //HealthManager.IsSafeToContinue = false;
-            }
+            UpdatePowerSafeState();
         }
+        
         #endregion
 
         #region Public Methods
@@ -144,20 +155,107 @@ namespace FCS_AIMarineTurbine.Mono
             return Convert.ToInt32(_currentSpeed * _rpmPerDeg);
         }
 
-        internal string GetPrefabID()
+        internal string GetPrefabId()
         {
             if (_prefabID == null)
             {
-                QuickLogger.Error("Prefab ID was null", true);
-                return String.Empty;
+                _prefabID = GetComponent<PrefabIdentifier>() ?? GetComponentInParent<PrefabIdentifier>();
             }
-
             return _prefabID.Id;
         }
 
         #endregion
 
         #region Private Methods
+
+        private void UpdatePowerSafeState()
+        {
+
+            if (PowerManager == null) return;
+
+            if (IsInitialized && IsConstructed)
+            {
+                PowerManager.IsSafeToContinue = true;
+
+                //HealthManager.IsSafeToContinue = true;
+
+                SystemHandler();
+            }
+            else
+            {
+                PowerManager.IsSafeToContinue = false;
+
+                //HealthManager.IsSafeToContinue = false;
+            }
+        }
+
+        private void ReadySaveData()
+        {
+            _prefabID = GetComponentInParent<PrefabIdentifier>() ?? GetComponent<PrefabIdentifier>();
+            var id = _prefabID.Id ?? string.Empty;
+
+            if (File.Exists(SaveFile))
+            {
+                string savedDataJson = File.ReadAllText(SaveFile).Trim();
+
+                //LoadData
+                _data = JsonConvert.DeserializeObject<SaveData>(savedDataJson);
+
+            }
+        }
+
+        private void Initialize()
+        {
+            _buildable = GetComponent<Constructable>() ?? GetComponentInParent<Constructable>();
+
+            if (FindComponents())
+            {
+                QuickLogger.Debug($"Turbine Components Found", true);
+
+                _prefabID = GetComponentInParent<PrefabIdentifier>();
+
+                var currentBiome = BiomeManager.GetBiome();
+
+                if (!string.IsNullOrEmpty(currentBiome))
+                {
+                    var data = BiomeManager.GetBiomeData(currentBiome);
+                }
+
+                AISolutionsData.Instance.OnRotationChanged += AiSolutionsDataOnOnRotationChanged;
+
+                if (HealthManager == null)
+                    HealthManager = gameObject.GetComponent<AIJetStreamT242HealthManager>() ?? GetComponentInParent<AIJetStreamT242HealthManager>();
+
+
+                HealthManager.Initialize(this);
+                HealthManager.SetHealth(100);
+                HealthManager.SetDamageModel(_damage);
+
+                if (PowerManager == null)
+                    PowerManager = GetComponentInParent<AIJetStreamT242PowerManager>() ?? GetComponent<AIJetStreamT242PowerManager>();
+
+                PowerManager.Initialize(this);
+
+                AnimationManager = gameObject.GetComponentInParent<AIJetStreamT242AnimationManager>();
+
+                BeaconManager = gameObject.GetComponentInParent<BeaconController>();
+
+                if (_display == null)
+                    _display = GetComponent<AIJetStreamT242Display>() ?? GetComponentInParent<AIJetStreamT242Display>();
+
+                IsInitialized = true;
+                //_currentBiome = BiomeManager.GetBiome();
+            }
+            else
+            {
+                IsInitialized = false;
+                throw new MissingComponentException("Failed to find all components");
+            }
+
+            if (!IsInitialized) return;
+
+            PowerManager.OnKillBattery += Unsubscribe;
+        }
 
         private bool FindComponents()
         {
@@ -169,7 +267,7 @@ namespace FCS_AIMarineTurbine.Mono
             if (_turbine == null)
             {
                 QuickLogger.Error($"Turbine_BladeWheel not found");
-                _initialized = false;
+                IsInitialized = false;
                 return false;
             }
 
@@ -178,7 +276,7 @@ namespace FCS_AIMarineTurbine.Mono
             if (_rotor == null)
             {
                 QuickLogger.Error($"Rotor not found");
-                _initialized = false;
+                IsInitialized = false;
                 return false;
             }
 
@@ -187,7 +285,7 @@ namespace FCS_AIMarineTurbine.Mono
             if (_damage == null)
             {
                 QuickLogger.Error($"Damage not found");
-                _initialized = false;
+                IsInitialized = false;
                 return false;
             }
 
@@ -240,7 +338,7 @@ namespace FCS_AIMarineTurbine.Mono
             /*
              * Handles starting and stopping the turbine and its rotor based off conditions
              */
-            if (_constructed)
+            if (IsConstructed)
             {
                 if (PowerManager.GetHasBreakerTripped() || !IsUnderWater() || HealthManager.GetHealth() <= 0)
                 {
@@ -262,9 +360,9 @@ namespace FCS_AIMarineTurbine.Mono
             }
         }
 
-        private string GetSolarPowerData()
+        private string GetTurbinePowerData()
         {
-            return $"Output per second {Mathf.Round(PowerManager.GetEnergyPerSecond() * 10) / 10}";
+            return PowerManager == null ? "Output per second 0" : $"Output per second {Mathf.Round(PowerManager.GetEnergyPerSecond() * 10) / 10}";
         }
 
         #endregion
@@ -287,28 +385,41 @@ namespace FCS_AIMarineTurbine.Mono
         {
             QuickLogger.Debug($"Constructed - {constructed}");
 
-            _constructed = constructed;
-
-            _seaBase = gameObject?.transform?.parent?.gameObject;
-
             if (IsBeingDeleted) return;
 
             if (constructed)
             {
-                if (_seaBase != null)
-                {
-                    _currentBiome = BiomeManager.GetBiome();
-                    RotateToMag();
-                    SetCurrentRotation();
-                    QuickLogger.Debug($"Turbine Constructed Rotation Set {_rotor.transform.rotation.ToString()} ", true);
+                _seaBase = gameObject?.transform?.parent?.gameObject;
 
-                    _display = gameObject.GetOrAddComponent<AIJetStreamT242Display>();
-                    _display.Setup(this);
+                if (isActiveAndEnabled)
+                {
+                    if (!IsInitialized)
+                    {
+                        Initialize();
+                    }
+
+                    if (_display != null)
+                    {
+                        _display.Setup(this);
+                        _runStartUpOnEnable = false;
+                    }
+
+                    if (_seaBase != null)
+                    {
+                        _currentBiome = BiomeManager.GetBiome();
+                        RotateToMag();
+                        SetCurrentRotation();
+                        QuickLogger.Debug($"Turbine Constructed Rotation Set {_rotor.transform.rotation.ToString()} ", true);
+                    }
+                    else
+                    {
+                        ErrorMessage.AddMessage($"[AIJetStreamT242] ERROR: Must be on a platform to operate");
+                        QuickLogger.Debug("ERROR: Can not work out what base it was placed inside.");
+                    }
                 }
                 else
                 {
-                    ErrorMessage.AddMessage($"[AIJetStreamT242] ERROR: Must be on a platform to operate");
-                    QuickLogger.Debug("ERROR: Can not work out what base it was placed inside.");
+                    _runStartUpOnEnable = true;
                 }
             }
         }
@@ -317,7 +428,7 @@ namespace FCS_AIMarineTurbine.Mono
         {
             QuickLogger.Debug("********************************************** In Set Current Rotation **********************************************");
             if (_rotor == null) return;
-            _rotor.transform.rotation = AISolutionsData.StartingRotation;
+           _targetRotation = AISolutionsData.StartingRotation;
             QuickLogger.Debug("********************************************** In Set Current Rotation **********************************************");
         }
 
@@ -364,41 +475,7 @@ namespace FCS_AIMarineTurbine.Mono
 
         public void OnProtoDeserialize(ProtobufSerializer serializer)
         {
-            QuickLogger.Debug("// ****************************** Load Data *********************************** //");
-
-            if (_prefabID != null)
-            {
-                QuickLogger.Info($"Loading JetStream {_prefabID.Id}");
-
-                if (File.Exists(SaveFile))
-                {
-                    string savedDataJson = File.ReadAllText(SaveFile).Trim();
-
-                    //LoadData
-                    var savedData = JsonConvert.DeserializeObject<SaveData>(savedDataJson);
-
-                    PowerManager.SetHasBreakerTripped(savedData.HasBreakerTripped);
-                    HealthManager.SetHealth(savedData.Health);
-                    PowerManager.SetCharge(savedData.Charge);
-                    _currentSpeed = savedData.CurrentSpeed;
-                    //RotateTurbine(savedData.DegPerSec);
-                    _targetRotation = savedData.TurbineRot.TargetRotationToQuaternion();
-                    QuickLogger.Debug($"Target Rotation Set {_targetRotation}", true);
-                    _currentBiome = savedData.Biome;
-                    HealthManager.SetPassedTime(savedData.PassedTime);
-                    AISolutionsData.StartingRotation = _targetRotation;
-                    PowerManager.SetStoredPower(savedData.StoredPower);
-                    if (_display != null)
-                    {
-                        _display.SetCurrentPage();
-                    }
-                }
-            }
-            else
-            {
-                QuickLogger.Error("PrefabIdentifier is null");
-            }
-            QuickLogger.Debug("// ****************************** Loaded Data *********************************** //");
+            
         }
 
         public int ScreenState { get; set; }
@@ -407,7 +484,7 @@ namespace FCS_AIMarineTurbine.Mono
 
         public void OnHandHover(GUIHand hand)
         {
-            HandReticle.main.SetInteractText(GetSolarPowerData(), false);
+            HandReticle.main.SetInteractText(GetTurbinePowerData(), false);
             HandReticle.main.SetIcon(HandReticle.IconType.Default);
         }
 
