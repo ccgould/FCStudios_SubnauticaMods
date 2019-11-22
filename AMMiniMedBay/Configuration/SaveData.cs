@@ -1,10 +1,9 @@
-﻿using FCSCommon.Utilities.Enums;
-using Oculus.Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using FCSCommon.Objects;
+using Oculus.Newtonsoft.Json;
 
-namespace FCS_DeepDriller.Configuration
+namespace AMMiniMedBay.Configuration
 {
     [Serializable]
     internal class SaveDataEntry

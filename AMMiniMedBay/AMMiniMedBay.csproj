@@ -106,7 +106,6 @@
       <Name>FCSTechFabricator</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>xcopy "$(ProjectDir)bin\$(Configuration)\AMMiniMedBay.dll" "F:\Program Files\Epic Games\Subnautica\QMods\FCS_MiniMedBay\" /Y /I</PostBuildEvent>

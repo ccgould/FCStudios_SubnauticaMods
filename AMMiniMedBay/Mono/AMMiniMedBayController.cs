@@ -4,19 +4,16 @@ using AMMiniMedBay.Enumerators;
 using AMMiniMedBay.Models;
 using FCSCommon.Extensions;
 using FCSCommon.Helpers;
-using FCSCommon.Models.Abstract;
 using FCSCommon.Utilities;
-using Oculus.Newtonsoft.Json;
-using SMLHelper.V2.Utility;
 using System;
-using System.IO;
 using AMMiniMedBay.Configuration;
-using FCS_DeepDriller.Configuration;
+using FCSCommon.Abstract;
+using SMLHelper.V2.Utility;
 using UnityEngine;
 
 namespace AMMiniMedBay.Mono
 {
-    internal class AMMiniMedBayController : FCSController, IConstructable, IProtoEventListener
+    internal class AMMiniMedBayController: FCSController
     {
         private GameObject _scanner;
         private bool _initialized;
@@ -35,6 +32,7 @@ namespace AMMiniMedBay.Mono
         private SaveDataEntry _data;
 
         public override Action OnMonoUpdate { get; set; }
+        public override bool IsInitialized { get; set; }
 
         public override bool IsConstructed => _buildable != null && _buildable.constructed;
 
@@ -176,7 +174,7 @@ namespace AMMiniMedBay.Mono
             PowerManager.SetHasBreakerTripped(true);
         }
 
-        private void Initialize()
+        public override void Initialize()
         {
             _prefabId = GetComponentInParent<PrefabIdentifier>();
 
@@ -331,13 +329,13 @@ namespace AMMiniMedBay.Mono
             return true;
         }
 
-        public bool CanDeconstruct(out string reason)
+        public override bool CanDeconstruct(out string reason)
         {
             reason = !Container.GetIsEmpty() ? LanguageHelpers.GetLanguage(AMMiniMedBayBuildable.ContainerNotEmptyMessageKey) : string.Empty;
             return Container.GetIsEmpty();
         }
 
-        public void OnConstructedChanged(bool constructed)
+        public override void OnConstructedChanged(bool constructed)
         {
             QuickLogger.Debug("OnConstructedChanged Activated");
 
@@ -370,7 +368,7 @@ namespace AMMiniMedBay.Mono
             _display.ChangeStorageAmount(containerSlotsFilled);
         }
 
-        public void OnProtoDeserialize(ProtobufSerializer serializer)
+        public override void OnProtoDeserialize(ProtobufSerializer serializer)
         {
             QuickLogger.Debug("OnProtoDeserialize Activated");
             QuickLogger.Debug("// ****************************** Load Data *********************************** //");
@@ -386,7 +384,7 @@ namespace AMMiniMedBay.Mono
             QuickLogger.Debug("// ****************************** Loaded Data *********************************** //");
         }
 
-        public void OnProtoSerialize(ProtobufSerializer serializer)
+        public override void OnProtoSerialize(ProtobufSerializer serializer)
         {
             if (Mod.IsSaving()) return;
             QuickLogger.Info("Saving MedBay");

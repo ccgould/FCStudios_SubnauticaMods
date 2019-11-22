@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using AMMiniMedBay.Mono;
-using FCS_DeepDriller.Configuration;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Utility;
 using UnityEngine;
