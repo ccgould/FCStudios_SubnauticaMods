@@ -1,15 +1,14 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
-using AE.BaseTeleporter.Buildables;
-using AE.BaseTeleporter.Configuration;
+using AE.IntraBaseTeleporter.Buildables;
+using AE.IntraBaseTeleporter.Configuration;
 using FCSCommon.Utilities;
 using Harmony;
 using Oculus.Newtonsoft.Json;
 using UnityEngine;
 
-
-namespace AE.BaseTeleporter
+namespace AE.IntraBaseTeleporter
 {
     public class QPatch
     {

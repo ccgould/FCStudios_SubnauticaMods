@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using AE.BaseTeleporter.Configuration;
-using FCSCommon.Abstract;
+﻿using FCSCommon.Abstract;
 using FCSCommon.Utilities;
 
-namespace AE.BaseTeleporter.Managers
+namespace AE.IntraBaseTeleporter.Managers
 {
     internal class BTPowerManager 
     {

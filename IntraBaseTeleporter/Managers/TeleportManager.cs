@@ -1,10 +1,9 @@
-﻿using System.Collections;
-using AE.BaseTeleporter.Buildables;
-using AE.BaseTeleporter.Mono;
+﻿using AE.IntraBaseTeleporter.Buildables;
+using AE.IntraBaseTeleporter.Mono;
 using FCSCommon.Utilities;
 using UnityEngine;
 
-namespace AE.BaseTeleporter.Managers
+namespace AE.IntraBaseTeleporter.Managers
 {
     internal class TeleportManager : MonoBehaviour
     {

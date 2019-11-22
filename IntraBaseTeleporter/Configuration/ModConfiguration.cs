@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using FCSCommon.Interfaces;
 
-namespace AE.BaseTeleporter.Configuration
+namespace AE.IntraBaseTeleporter.Configuration
 {
     internal class ModConfiguration
     {

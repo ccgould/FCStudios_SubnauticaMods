@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using FCSCommon.Objects;
 
-namespace AE.BaseTeleporter.Configuration
+namespace AE.IntraBaseTeleporter.Configuration
 {
     internal class SaveDataEntry
     {

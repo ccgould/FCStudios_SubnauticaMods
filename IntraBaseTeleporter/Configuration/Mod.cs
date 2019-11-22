@@ -1,30 +1,26 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.IO;
-using AE.BaseTeleporter.Mono;
-using FCSCommon.Abstract;
-using FCSCommon.Objects;
+using AE.IntraBaseTeleporter.Mono;
 using FCSCommon.Utilities;
-using Oculus.Newtonsoft.Json;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 
-namespace AE.BaseTeleporter.Configuration
+namespace AE.IntraBaseTeleporter.Configuration
 {
     internal static class Mod
     {
-        public static string ModName => "BaseTeleporter";
-        public static string BundleName => "baseteleportermodbundle";
+        public static string ModName => "IntraBaseTeleporter";
+        public static string BundleName => "intrabaseteleportermodbundle";
         public static string SaveDataFilename => $"{ModName}SaveData.json";
-        public static string FriendlyName => "Alterra Electrical Base Teleporter";
+        public static string FriendlyName => "Alterra Electrical Intra-Base Teleporter";
         public static string Description => "Instantly teleport from one location to another in your base with this nifty teleporter by Alterra";
-        public static string ClassID => FCSTechFabricator.Configuration.BaseTeleporterClassID;
+        public static string ClassID => FCSTechFabricator.Configuration.IntraBaseTeleporterClassID;
         public static string ModDirectoryName => $"FCS_{ModName}";
 
         private static ModSaver _saveObject;
         private static SaveData _saveData;
-        internal static string GameObjectName => FCSTechFabricator.Configuration.MiniMedBayClassID; // Same name as the class
+        internal static string GameObjectName => string.Empty; // Same name as the class
         internal static string ModFolderName => $"FCS_{ModName}";
 
         #region Deep Driller

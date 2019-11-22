@@ -1,9 +1,9 @@
-﻿using AE.BaseTeleporter.Configuration;
+﻿using AE.IntraBaseTeleporter.Configuration;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
 
-namespace AE.BaseTeleporter.Buildables
+namespace AE.IntraBaseTeleporter.Buildables
 {
     internal partial class BaseTeleporterBuildable
     {
@@ -15,7 +15,6 @@ namespace AE.BaseTeleporter.Buildables
         private static string DecalMaterial => $"{Mod.ModName}_D_COL";
         public bool GetPrefabs()
         {
-
             QuickLogger.Debug($"AssetBundle Set");
 
             QuickLogger.Debug("GetPrefabs");

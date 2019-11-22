@@ -1,8 +1,8 @@
 ﻿using System;
-using AE.BaseTeleporter.Mono;
+using AE.IntraBaseTeleporter.Mono;
 using Harmony;
 
-namespace AE.BaseTeleporter.Patchers
+namespace AE.IntraBaseTeleporter.Patchers
 {
     [HarmonyPatch(typeof(BaseTeleporterController))]
     [HarmonyPatch("OnDestroy")]

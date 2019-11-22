@@ -7,8 +7,8 @@
     <ProjectGuid>{B8C62734-A2C8-472C-883B-42A7B450FB00}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>AE.BaseTeleporter</RootNamespace>
-    <AssemblyName>BaseTeleporter</AssemblyName>
+    <RootNamespace>AE.IntraBaseTeleporter</RootNamespace>
+    <AssemblyName>IntraBaseTeleporter</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -109,6 +109,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy "$(ProjectDir)bin\$(Configuration)\BaseTeleporter.dll" "F:\Program Files\Epic Games\Subnautica\QMods\FCS_BaseTeleporter\" /Y /I</PostBuildEvent>
+    <PostBuildEvent>xcopy "$(ProjectDir)bin\$(Configuration)\IntraBaseTeleporter.dll" "F:\Program Files\Epic Games\Subnautica\QMods\FCS_IntraBaseTeleporter\" /Y /I</PostBuildEvent>
   </PropertyGroup>
 </Project>

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using AE.BaseTeleporter.Configuration;
-using AE.BaseTeleporter.Managers;
-using AE.BaseTeleporter.Mono;
+using AE.IntraBaseTeleporter.Configuration;
+using AE.IntraBaseTeleporter.Managers;
+using AE.IntraBaseTeleporter.Mono;
 using FCSCommon.Controllers;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
@@ -11,12 +11,12 @@ using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
 using UnityEngine;
 
-namespace AE.BaseTeleporter.Buildables
+namespace AE.IntraBaseTeleporter.Buildables
 {
     internal partial class BaseTeleporterBuildable : Buildable
     {
         private static readonly BaseTeleporterBuildable Singleton = new BaseTeleporterBuildable();
-
+        
         public BaseTeleporterBuildable() : base(Mod.ClassID, Mod.FriendlyName, Mod.Description)
         {
             OnFinishedPatching += AdditionalPatching;
@@ -91,7 +91,7 @@ namespace AE.BaseTeleporter.Buildables
             return customFabRecipe;
         }
 
-        public override string IconFileName => "BaseTeleporter.png";
+        public override string IconFileName => $"{Mod.ModName}.png";
 
         public override TechGroup GroupForPDA { get; } = TechGroup.InteriorModules;
         public override TechCategory CategoryForPDA { get; } = TechCategory.InteriorModule;

@@ -1,7 +1,7 @@
 ﻿using FCSCommon.Utilities;
 using SMLHelper.V2.Handlers;
 
-namespace AE.BaseTeleporter.Buildables
+namespace AE.IntraBaseTeleporter.Buildables
 {
     internal partial class BaseTeleporterBuildable
     {

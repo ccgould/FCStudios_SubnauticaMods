@@ -1,15 +1,14 @@
-﻿using AE.BaseTeleporter.Buildables;
-using AE.BaseTeleporter.Configuration;
-using AE.BaseTeleporter.Managers;
+﻿using AE.IntraBaseTeleporter.Buildables;
+using AE.IntraBaseTeleporter.Configuration;
+using AE.IntraBaseTeleporter.Managers;
 using FCSCommon.Abstract;
 using FCSCommon.Controllers;
 using FCSCommon.Extensions;
-using FCSCommon.Helpers;
 using FCSCommon.Interfaces;
 using FCSCommon.Utilities;
 using UnityEngine;
 
-namespace AE.BaseTeleporter.Mono
+namespace AE.IntraBaseTeleporter.Mono
 {
     internal class BaseTeleporterController: FCSController, IRenameNameTarget
     {

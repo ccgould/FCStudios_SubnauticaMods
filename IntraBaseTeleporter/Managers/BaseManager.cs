@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using AE.BaseTeleporter.Configuration;
+using AE.IntraBaseTeleporter.Configuration;
 using FCSCommon.Abstract;
 using FCSCommon.Utilities;
 
-namespace AE.BaseTeleporter.Managers
+namespace AE.IntraBaseTeleporter.Managers
 {
     internal class BaseManager
     {

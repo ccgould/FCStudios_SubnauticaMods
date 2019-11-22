@@ -1,8 +1,7 @@
 ﻿using System.Collections;
 using System.Linq;
-using AE.BaseTeleporter.Buildables;
-using AE.BaseTeleporter.Configuration;
-using AE.BaseTeleporter.Mono;
+using AE.IntraBaseTeleporter.Buildables;
+using AE.IntraBaseTeleporter.Mono;
 using FCSCommon.Abstract;
 using FCSCommon.Components;
 using FCSCommon.Enums;
@@ -12,7 +11,7 @@ using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace AE.BaseTeleporter.Managers
+namespace AE.IntraBaseTeleporter.Managers
 {
     internal class BTDisplayManager : AIDisplay
     {
