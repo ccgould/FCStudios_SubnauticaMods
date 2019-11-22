@@ -1,6 +1,7 @@
 ﻿using FCSCommon.Utilities;
 using HorizontalDuck.Buildables;
 using System;
+using System.Reflection;
 
 namespace HorizontalDuck
 {
@@ -8,7 +9,7 @@ namespace HorizontalDuck
     {
         public static void Patch()
         {
-            QuickLogger.Info("Started patching. Version: " + QuickLogger.GetAssemblyVersion());
+            QuickLogger.Info("Started patching. Version: " + QuickLogger.GetAssemblyVersion(Assembly.GetExecutingAssembly()));
 
 #if DEBUG
             QuickLogger.DebugLogsEnabled = true;
@@ -18,10 +19,7 @@ namespace HorizontalDuck
             try
             {
                 HorizontalDuckBuildable.PatchHelper();
-
-                //var harmony = HarmonyInstance.Create("com.exstoragedepot.fcstudios");
-                //harmony.PatchAll(Assembly.GetExecutingAssembly());
-
+                
                 QuickLogger.Info("Finished patching");
             }
             catch (Exception ex)

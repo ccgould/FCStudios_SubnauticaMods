@@ -54,13 +54,7 @@ namespace HorizontalDuck.Buildables
         /// <param name="prefab">The prefab to apply shaders.</param>
         internal static void ApplyShaders(GameObject prefab)
         {
-            #region ExStorageDepotUnit_BaseColor
-            MaterialHelpers.ApplyGlassShaderTemplate("Blank", prefab, 8);
-            //MaterialHelpers.ApplyAlphaShader("ExStorageDepotUnit_BaseColor", prefab);
-            //MaterialHelpers.ApplySpecShader("ExStorageDepotUnit_BaseColor", "ExStorageDepotUnit_Spec", prefab, 1, 0.5f, _assetBundle);
-            //MaterialHelpers.ApplyNormalShader("ExStorageDepotUnit_BaseColor", "ExStorageDepotUnit_Norm", prefab, _assetBundle);
-            //MaterialHelpers.ApplyEmissionShader("ExStorageDepotUnit_BaseColor", "DeepDriller_Emissive_On", prefab, _assetBundle, new Color(0.08235294f, 1f, 1f));
-            #endregion
+            //MaterialHelpers.ApplyGlassShaderTemplate("Blank", prefab, 8);
         }
 
     }
