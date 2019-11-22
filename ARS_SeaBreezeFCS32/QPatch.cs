@@ -26,7 +26,8 @@ namespace ARS_SeaBreezeFCS32
 
             Configuration = JsonConvert.DeserializeObject<ModConfiguration>(configJson, settings);
 
-            QuickLogger.Info("Started patching. Version: " + QuickLogger.GetAssemblyVersion());
+            var assembly = Assembly.GetExecutingAssembly();
+            QuickLogger.Info("Started patching. Version: " + QuickLogger.GetAssemblyVersion(assembly));
 
 #if DEBUG
             QuickLogger.DebugLogsEnabled = true;
@@ -43,7 +44,7 @@ namespace ARS_SeaBreezeFCS32
 
                 var harmony = HarmonyInstance.Create("com.arsseabreezefcs32.fcstudios");
 
-                harmony.PatchAll(Assembly.GetExecutingAssembly());
+                harmony.PatchAll(assembly);
 
                 QuickLogger.Info("Finished patching");
             }
