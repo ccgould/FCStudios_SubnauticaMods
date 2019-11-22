@@ -7,6 +7,7 @@ namespace FCSTechFabricator
 {
     public class Configuration
     {
+        public static string IntraBaseTeleporterClassID => "AEIntraBaseTeleporter";
         public static string MiniFountainFilterClassID=> "MiniFountainFilter";
         public static string ExStorageClassID=> "ExStorageDepot";
         public static string SeaBreezeClassID=> "ARSSeaBreezeFCS32";
@@ -15,9 +16,10 @@ namespace FCSTechFabricator
         public static string PowerStorageKitClassID => "FCSPowerStorage";
         public static string DeepDrillerClassID => "FCS_DeepDriller";
         public static string SeaCookerClassID => "SeaCooker";
-        public static string MiniMedBayClassID => "SeaCooker";
-
+        public static string MiniMedBayClassID => "AMMiniMedBay";
+        public static string PowerCellSocketClassID => "AIPowerCellSocket";
         [JsonProperty] internal List<ConfigItem> Blueprints { get; set; } = new List<ConfigItem>();
+
 
         public List<IngredientItem> GetData(string classId)
         {

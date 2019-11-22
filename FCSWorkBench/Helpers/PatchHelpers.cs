@@ -186,12 +186,27 @@ namespace FCSTechFabricator.Helpers
                 },
                 new FCSKitEntry
                 {
-                    ClassID = "AMMiniMedBay",
+                    ClassID = "AMMiniMedBayKit_AMS",
                     FriendlyName = "Alterra Medical MiniMedBay Kit",
                     Description = "This kit allows you to make one MiniMedBay unit",
                     FabricatorSteps = new[]{ "AMS", "MMB" },
-                    ModParent = Configuration.MiniMedBayClassID,
-                    Icon="AMMiniMedBay.png"
+                    ModParent = Configuration.MiniMedBayClassID
+                },
+                new FCSKitEntry
+                {
+                    ClassID = "PowerCellSocket_AIS",
+                    FriendlyName = "Alterra Industrial Powercell Socket Kit",
+                    Description = "This kit allows you to make one Powercell Socket unit",
+                    FabricatorSteps = new[]{ "AIS", "PSS" },
+                    ModParent = Configuration.PowerCellSocketClassID
+                },
+                new FCSKitEntry
+                {
+                    ClassID = "IntraBaseTeleporterKit_AE",
+                    FriendlyName = "Intra-Base Teleporter Kit",
+                    Description = "This kit allows you to make one Intra-Base Teleporter unit",
+                    FabricatorSteps = new[]{ "AE", "IBT" },
+                    ModParent = Configuration.IntraBaseTeleporterClassID
                 },
             };
 
@@ -200,7 +215,7 @@ namespace FCSTechFabricator.Helpers
 
         private static void CreateModEntry()
         {
-            FCSTechFabricatorBuildable.AddMod(ModDivisions.AlterraMedicalSolutions.Key,ModDivisions.AlterraMedicalSolutions.ParentKey,"Mini MedBay","MMB");
+            //FCSTechFabricatorBuildable.AddMod(ModDivisions.AlterraMedicalSolutions.Key,ModDivisions.AlterraMedicalSolutions.ParentKey,"Mini MedBay","MMB");
         }
 
         private static List<FCSKitEntry> CreateModules()

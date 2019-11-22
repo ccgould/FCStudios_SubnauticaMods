@@ -3,9 +3,9 @@ using AE.MiniFountainFilter.Configuration;
 using AE.MiniFountainFilter.Managers;
 using FCSCommon.Extensions;
 using FCSCommon.Utilities;
-using FCSCommon.Utilities.Enums;
 using System;
 using System.Collections;
+using FCSCommon.Enums;
 using UnityEngine;
 using PowerManager = AE.MiniFountainFilter.Managers.PowerManager;
 
@@ -13,11 +13,14 @@ namespace AE.MiniFountainFilter.Mono
 {
     internal class MiniFountainFilterController : MonoBehaviour, IConstructable, IProtoEventListener
     {
-        private bool _initialized;
+        private bool IsInitialized;
         private SaveDataEntry _saveData;
         private int _isRunning;
         private bool _isOperational;
         private bool _isInSub;
+        private bool _runStartUpOnEnable;
+        private bool _fromSave;
+        private SaveDataEntry _data;
         internal ColorManager ColorManager { get; private set; }
         internal MFFDisplayManager DisplayManager { get; private set; }
         internal AnimationManager AnimationManager { get; private set; }
@@ -28,6 +31,39 @@ namespace AE.MiniFountainFilter.Mono
         internal bool IsConstructed { get; private set; }
         public PlayerManager PlayerManager { get; private set; }
         public Action OnMonoUpdate { get; set; }
+
+        private void OnEnable()
+        {
+            if (!_runStartUpOnEnable) return;
+
+            if (!IsInitialized)
+            {
+                Initialize();
+            }
+
+            if (_data == null)
+            {
+                ReadySaveData();
+            }
+
+            if (_fromSave)
+            {
+                TankManager.SetTankLevel(_data.TankLevel);
+                ColorManager.SetCurrentBodyColor(_data.BodyColor.Vector4ToColor());
+                StorageManager.NumberOfBottles = _data.ContainerAmount;
+                _isInSub = _data.IsInSub;
+                QuickLogger.Info($"Loaded {Mod.FriendlyName}");
+                _fromSave = false;
+            }
+        }
+
+        private void ReadySaveData()
+        {
+            QuickLogger.Debug("In OnProtoDeserialize");
+            var prefabIdentifier = GetComponentInParent<PrefabIdentifier>() ?? GetComponent<PrefabIdentifier>();
+            var id = prefabIdentifier?.Id ?? string.Empty;
+            _data = Mod.GetSaveData(id);
+        }
 
         private void Update()
         {
@@ -87,7 +123,7 @@ namespace AE.MiniFountainFilter.Mono
                 DisplayManager.Setup(this);
             }
 
-            _initialized = true;
+            IsInitialized = true;
 
             QuickLogger.Debug($"Initialized");
         }
@@ -126,13 +162,20 @@ namespace AE.MiniFountainFilter.Mono
 
             if (constructed)
             {
-                if (!_initialized)
+                if (isActiveAndEnabled)
                 {
-                    Initialize();
+                    if (!IsInitialized)
+                    {
+                        Initialize();
+                    }
+                }
+                else
+                {
+                    _runStartUpOnEnable = true;
                 }
             }
         }
-
+      
         public void OnProtoSerialize(ProtobufSerializer serializer)
         {
             if (!Mod.IsSaving())
@@ -145,22 +188,23 @@ namespace AE.MiniFountainFilter.Mono
 
         public void OnProtoDeserialize(ProtobufSerializer serializer)
         {
-            QuickLogger.Info($"Loading {Mod.FriendlyName}");
-            var prefabIdentifier = GetComponent<PrefabIdentifier>();
-            var id = prefabIdentifier?.Id ?? string.Empty;
-            var data = Mod.GetSaveData(id);
+            _fromSave = true;
+            //QuickLogger.Info($"Loading {Mod.FriendlyName}");
+            //var prefabIdentifier = GetComponent<PrefabIdentifier>();
+            //var id = prefabIdentifier?.Id ?? string.Empty;
+            //var data = Mod.GetSaveData(id);
 
-            if (data == null)
-            {
-                QuickLogger.Info($"No save found for PrefabId {id}");
-                return;
-            }
+            //if (data == null)
+            //{
+            //    QuickLogger.Info($"No save found for PrefabId {id}");
+            //    return;
+            //}
 
-            TankManager.SetTankLevel(data.TankLevel);
-            ColorManager.SetCurrentBodyColor(data.BodyColor.Vector4ToColor());
-            StorageManager.LoadContainer(data.ContainerAmount);
-            _isInSub = data.IsInSub;
-            QuickLogger.Info($"Loaded {Mod.FriendlyName}");
+            //TankManager.SetTankLevel(data.TankLevel);
+            //ColorManager.SetCurrentBodyColor(data.BodyColor.Vector4ToColor());
+            //StorageManager.LoadContainer(data.ContainerAmount);
+            //_isInSub = data.IsInSub;
+            //QuickLogger.Info($"Loaded {Mod.FriendlyName}");
         }
 
         internal void Save(SaveData saveData)
@@ -189,7 +233,7 @@ namespace AE.MiniFountainFilter.Mono
 
         private void UpdateSystem()
         {
-            if (!_initialized) return;
+            if (!IsInitialized) return;
 
             if (!IsConstructed && _isOperational)
             {

@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace FCSCommon.Controllers
 {
-    public class PowerController : MonoBehaviour, IPowerInterface
+    public class PowerStorageController : MonoBehaviour, IPowerInterface
     {
         private float _charge;
         private float _capacity = 200f;

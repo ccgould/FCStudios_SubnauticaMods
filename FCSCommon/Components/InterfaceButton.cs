@@ -27,6 +27,7 @@ namespace FCSCommon.Components
         public int LargeFont { get; set; } = 180;
         public object Tag { get; set; }
         public float IncreaseButtonBy { get; set; }
+        public Action<bool> OnInterfaceButton { get; set; }
 
         public Action<string, object> OnButtonClick;
 
@@ -126,6 +127,7 @@ namespace FCSCommon.Components
         {
             base.OnPointerEnter(eventData);
             UpdateTextComponent(IsTextMode());
+            OnInterfaceButton.Invoke(true);
             if (this.IsHovered)
             {
                 switch (this.ButtonMode)
@@ -159,6 +161,8 @@ namespace FCSCommon.Components
         {
             base.OnPointerExit(eventData);
             UpdateTextComponent(IsTextMode());
+            OnInterfaceButton.Invoke(false);
+
             switch (this.ButtonMode)
             {
                 case InterfaceButtonMode.TextScale:

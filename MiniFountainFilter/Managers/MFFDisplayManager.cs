@@ -1,15 +1,17 @@
 ﻿using AE.MiniFountainFilter.Buildable;
 using AE.MiniFountainFilter.Configuration;
 using AE.MiniFountainFilter.Display;
-using AE.MiniFountainFilter.Helpers;
 using AE.MiniFountainFilter.Mono;
 using FCSCommon.Enums;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using System;
 using System.Collections;
+using FCSCommon.Abstract;
 using UnityEngine;
 using UnityEngine.UI;
+using FCSCommon.Components;
+using FCSCommon.Objects;
 
 namespace AE.MiniFountainFilter.Managers
 {
@@ -276,7 +278,7 @@ namespace AE.MiniFountainFilter.Managers
             }
 
             _colorPage.OnButtonClick = OnButtonClick;
-            _colorPage.SerializedColors = Mod.SerializedColors();
+            _colorPage.SerializedColors = ColorList.Colors;
             _colorPage.ColorsPerPage = 25;
             _colorPage.ColorItemPrefab = MiniFountainFilterBuildable.ColorItemPrefab;
             _colorPage.ColorPageContainer = _grid;

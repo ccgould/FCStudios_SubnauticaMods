@@ -39,17 +39,26 @@ namespace AE.MiniFountainFilter
 
                 LoadConfiguration();
 
-                BottleTechType = QPatch.Configuration.Config.BottleTechType.ToTechType();
+                var configBottleTechType = QPatch.Configuration.Config.BottleTechType;
+                
+                if (configBottleTechType == null)
+                {
+                    QuickLogger.Error("Bottle TechType is null setting to default");
+                    BottleTechType = TechType.DisinfectedWater;
+                }
+                else
+                {
+                    BottleTechType = configBottleTechType.ToTechType();
+                }
 
                 if (BottleTechType == TechType.None)
                 {
                     QuickLogger.Error("TechType returned None");
                 }
-
-
+                
                 MiniFountainFilterBuildable.PatchSMLHelper();
 
-                var harmony = HarmonyInstance.Create("com.seacooker.fcstudios");
+                var harmony = HarmonyInstance.Create("com.minifountainfilter.fcstudios");
                 harmony.PatchAll(Assembly.GetExecutingAssembly());
 
                 QuickLogger.Info("Finished patching");

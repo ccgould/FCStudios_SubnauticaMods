@@ -13,6 +13,8 @@ namespace FCSCommon.Components
         private Image image;
         public string HoverTextLineOne { get; set; }
         public string HoverTextLineTwo { get; set; }
+        public Action<bool> OnInterfaceButton { get; set; }
+
         public Action<int> ChangePageBy;
 
         public void Start()

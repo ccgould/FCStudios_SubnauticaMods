@@ -49,7 +49,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Abstract\FCSController.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controllers\HealthController.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controllers\NameController.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Controllers\PowerController.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controllers\PowerStorageController.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\ISaveData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\ISaveDataEntry.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\ColorList.cs" />
