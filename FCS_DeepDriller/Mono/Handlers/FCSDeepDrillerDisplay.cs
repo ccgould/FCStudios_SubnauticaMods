@@ -6,13 +6,12 @@ using FCS_DeepDriller.Buildable;
 using FCS_DeepDriller.Configuration;
 using FCS_DeepDriller.Display;
 using FCSCommon.Enums;
-using FCSCommon.Helpers;
 using FCSCommon.Utilities;
-using FCSCommon.Utilities.Enums;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using FCSCommon.Abstract;
 using UnityEngine;
 using UnityEngine.UI;
 

@@ -1,7 +1,7 @@
 ﻿using FCS_DeepDriller.Buildable;
 using FCS_DeepDriller.Configuration;
 using FCS_DeepDriller.Enumerators;
-using FCSCommon.Utilities.Enums;
+using FCSCommon.Enums;
 using System;
 using UnityEngine;
 

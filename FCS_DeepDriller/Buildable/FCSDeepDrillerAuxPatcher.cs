@@ -95,7 +95,7 @@ namespace FCS_DeepDriller.Buildable
             TechTypeID = this.TechType;
 
             LanguageHandler.SetLanguageLine(OnlyPowercellsAllowedKey, "Only powercells are allowed.");
-            LanguageHandler.SetLanguageLine(DDAttachmentsOnlyKey, "Only FCS Deep Driller Attachments allowed at a time!");
+            LanguageHandler.SetLanguageLine(DDAttachmentsOnlyKey, "Only FCS Deep Driller Attachments allowed!");
             LanguageHandler.SetLanguageLine(StorageLabelKey, "FCS Deep Driller Receptacle.");
             LanguageHandler.SetLanguageLine(ItemNotAllowedKey, "Cannot place this item in here.");
             LanguageHandler.SetLanguageLine(EquipmentLabelKey, "FCS Deep Driller Attachments.");

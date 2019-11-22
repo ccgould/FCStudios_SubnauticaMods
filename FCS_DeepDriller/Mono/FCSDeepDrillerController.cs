@@ -9,7 +9,7 @@ using FCSAlterraIndustrialSolutions.Models.Controllers.Logic;
 using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
-using FCSCommon.Utilities.Enums;
+using FCSCommon.Enums;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -78,7 +78,7 @@ namespace FCS_DeepDriller.Mono
         #endregion
 
         #region Unity Methods
-
+        
         private void OnEnable()
         {
             {
@@ -387,13 +387,20 @@ namespace FCS_DeepDriller.Mono
 
             if (HealthManager.IsDamagedFlag())
             {
+                //MaterialHelpers.ChangeEmissionColor("DeepDriller_BaseColor_BaseColor",gameObject, new Color(1, 1f, 1f));
                 MaterialHelpers.ReplaceEmissionTexture("DeepDriller_BaseColor_BaseColor", "DeepDriller_Emissive_Error", gameObject, QPatch.GlobalBundle);
                 return;
             }
             if (value == FCSPowerStates.Unpowered || value == FCSPowerStates.Tripped && !HealthManager.IsDamagedFlag())
+            {
+                //MaterialHelpers.ChangeEmissionColor("DeepDriller_BaseColor_BaseColor", gameObject, new Color(0.9803922f, 0.6313726f, 0.007843138f));
+
                 MaterialHelpers.ReplaceEmissionTexture("DeepDriller_BaseColor_BaseColor", "DeepDriller_Emissive_Off",
                     gameObject, QPatch.GlobalBundle);
+            }
             else if (value == FCSPowerStates.Powered && !HealthManager.IsDamagedFlag())
+                //MaterialHelpers.ChangeEmissionColor("DeepDriller_BaseColor_BaseColor", gameObject, new Color(0.08235294f, 1f, 1f));
+
                 MaterialHelpers.ReplaceEmissionTexture("DeepDriller_BaseColor_BaseColor", "DeepDriller_Emissive_On",
                     gameObject, QPatch.GlobalBundle);
 

@@ -1,4 +1,4 @@
-﻿using FCSCommon.Utilities.Enums;
+﻿using FCSCommon.Enums;
 using Oculus.Newtonsoft.Json;
 using System;
 using System.Collections.Generic;

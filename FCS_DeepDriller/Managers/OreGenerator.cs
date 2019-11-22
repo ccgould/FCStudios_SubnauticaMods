@@ -1,6 +1,6 @@
 ﻿using FCS_DeepDriller.Mono;
 using FCSCommon.Utilities;
-using FCSCommon.Utilities.Enums;
+using FCSCommon.Enums;
 using System;
 using System.Collections.Generic;
 using UnityEngine;

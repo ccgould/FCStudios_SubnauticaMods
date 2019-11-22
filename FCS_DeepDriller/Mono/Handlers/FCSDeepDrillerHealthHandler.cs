@@ -1,6 +1,6 @@
 ﻿using FCSCommon.Objects;
 using FCSCommon.Utilities;
-using FCSCommon.Utilities.Enums;
+using FCSCommon.Enums;
 using System;
 using UnityEngine;
 
@@ -80,6 +80,7 @@ namespace FCS_DeepDriller.Mono.Handlers
         {
             _mono = mono;
             _liveMixin = mono.gameObject.AddComponent<LiveMixin>();
+            
             _damagePerSecond = DayNight / _damagePerDay;
 
             if (_liveMixin != null)

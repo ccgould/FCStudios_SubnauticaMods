@@ -115,7 +115,6 @@
     <Compile Include="Managers\VFXManager.cs" />
     <Compile Include="Mono\FCSDeepDrillerBatteryController.cs" />
     <Compile Include="Mono\FCSDeepDrillerController.cs" />
-    <Compile Include="Managers\AnimationManager.cs" />
     <Compile Include="Mono\Handlers\FCSDeepDrillerAnimationHandler.cs" />
     <Compile Include="Mono\Handlers\FCSDeepDrillerContainer.cs" />
     <Compile Include="Mono\Handlers\FCSDeepDrillerDisplay.cs" />
