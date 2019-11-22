@@ -15,7 +15,16 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Button Grid.Row="0" Content="Refresh" Command="{Binding RefreshBTNCommand}"/>
+        <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+            <StackPanel.Resources>
+                <Style TargetType="{x:Type Button}" BasedOn="{StaticResource StandardButton}">
+                    <Setter Property="Margin" Value="5,10,5,0"/>
+                    <Setter Property="Width" Value="100"/>
+                </Style>
+            </StackPanel.Resources>
+            <Button Content="Refresh" Command="{Binding RefreshBTNCommand}"/>
+            <Button  Content="Create New Mod" Command="{Binding CreateNewModBTNCommand}"/>
+        </StackPanel>
 
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <ItemsControl ItemsSource="{Binding Source={x:Static local:DataStorage.NewItemModels}}" HorizontalAlignment="Center">

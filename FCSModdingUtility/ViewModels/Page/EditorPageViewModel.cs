@@ -52,6 +52,7 @@ namespace FCSModdingUtility
                 DisableInvalid(item);
         }
 
+        [Obsolete]
         private void DisableInvalid(DirectoryItemViewModel vm)
         {
             foreach (DirectoryItemViewModel item in vm.Children)

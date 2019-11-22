@@ -9,108 +9,36 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <Grid.Resources>
-            <xcdg:DataGridCollectionViewSource x:Key="cvsOrders" 
-                                               Source="{Binding ModItemViewModel.FileStructure}">
-                <xcdg:DataGridCollectionViewSource.GroupDescriptions>
-                    <PropertyGroupDescription PropertyName="Parent" />
-                    <PropertyGroupDescription PropertyName="Include" />
-                    <!--<PropertyGroupDescription PropertyName="FileName" />-->
-
-                    <!--<PropertyGroupDescription PropertyName="Files" />-->
-                </xcdg:DataGridCollectionViewSource.GroupDescriptions>
-            </xcdg:DataGridCollectionViewSource>
-        </Grid.Resources>
-
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="20"/>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto" MinWidth="200"/>
             <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="20"/>
+            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-
+        
         <Grid.RowDefinitions>
-            <RowDefinition Height="20"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="20"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="20"/>
         </Grid.RowDefinitions>
 
-        <Button Content="Back (Save)" Width="100" Margin="10" Command="{Binding BackBTNCommand}" CommandParameter="{Binding ElementName=DataGrid}" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Left"/>
+        <Grid.Resources>
+            <local:BoolToIndexConverter x:Key="boolToIndexConverter" />
+        </Grid.Resources>
 
-        <xctk:PropertyGrid x:Name="_propertyGrid" 
-                           Grid.Column="1"
-                           Grid.Row="2"
-                           SelectedObject="{Binding ModItemViewModel}"
-                           AutoGenerateProperties="False"
-                           PreparePropertyItem="OnPreparePropertyItem"
-                           Background="Transparent"
-                           Foreground="{StaticResource ForgroundLightBlueBrush}"
-                           ShowTitle="False">
+        <Button Content="Back (Save)" Grid.ColumnSpan="3" Width="100" Margin="10" Command="{Binding BackBTNCommand}" CommandParameter="{Binding ElementName=DataGrid}" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Left"/>
 
-            <xctk:PropertyGrid.PropertyDefinitions>
-                <!-- The following properties will be displayed in the PropertyGrid 
-                 Some properties' data will be overriden-->
-
-                <xctk:PropertyDefinition TargetProperties="Enable" IsExpandable="False"/>
-                <xctk:PropertyDefinition TargetProperties="Id" IsExpandable="False"/>
-                <xctk:PropertyDefinition TargetProperties="DisplayName" IsExpandable="False"/>
-                <xctk:PropertyDefinition TargetProperties="Author" IsExpandable="False"/>
-                <xctk:PropertyDefinition TargetProperties="Version" IsExpandable="False"/>
-                <xctk:PropertyDefinition TargetProperties="Game" IsExpandable="False"/>
-                <xctk:PropertyDefinition TargetProperties="Dependencies" IsExpandable="False"/>
-                <xctk:PropertyDefinition TargetProperties="VersionDependencies" IsExpandable="False"/>
-                <xctk:PropertyDefinition TargetProperties="LoadBefore" IsExpandable="False"/>
-                <xctk:PropertyDefinition TargetProperties="LoadAfter" IsExpandable="False"/>
-                <xctk:PropertyDefinition TargetProperties="AssemblyName" IsExpandable="False"/>
-                <xctk:PropertyDefinition TargetProperties="EntryMethod" IsExpandable="False"/>
-
-            </xctk:PropertyGrid.PropertyDefinitions>
-
-
-
-
-            <xctk:PropertyGrid.PropertyContainerStyle>
-                <!--This style will be set to all PropertyItem instances (direct and expanded) in the property grid. -->
-                <Style TargetType="{x:Type xctk:PropertyItemBase}">
-                    <Setter Property="Foreground" Value="Red" />
-                </Style>
-            </xctk:PropertyGrid.PropertyContainerStyle>
-        </xctk:PropertyGrid>
-
-        <GridSplitter Grid.Column="1" Grid.Row="3" Height="5" Background="{StaticResource ForgroundLightBlueBrush}" HorizontalAlignment="Stretch" />
-        <!--ItemsSource="{Binding Source={StaticResource cvsOrders}}"-->
-
-        <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="4" HorizontalAlignment="Center" Margin="0 5">
-            <StackPanel.Resources>
-                <Style TargetType="{x:Type Button}" BasedOn="{StaticResource StandardButton}">
-                    <Setter Property="Margin" Value="5,0,5,0"/>
-                    <Setter Property="Width" Value="100"/>
-                </Style>
-            </StackPanel.Resources>
-
-            <Button Content="Collapse all" Command="{Binding CollapseTreeviewBTNCommand}" CommandParameter="{Binding ElementName=TreeView}"/>
-            <Button Content="Expand all" Command="{Binding ExpandTreeviewBTNCommand}" CommandParameter="{Binding ElementName=TreeView}"/>
-            <Button Content="De-select Invalid Files" Command="{Binding InvalidFilesFilterBTNCommand}" CommandParameter="{Binding ElementName=TreeView}"  Width="150"/>
-            <Button Content="Refresh" Command="{Binding RefreshBTNCommand}"  Width="150"/>
-        </StackPanel>
-
-        <TreeView x:Name="TreeView" ItemsSource="{Binding ModItemViewModel.FileStructure}" Background="Transparent" Grid.Row="5" Grid.Column="1">
+        <TreeView x:Name="TreeView" ItemsSource="{Binding ModItemViewModel.FileStructure}" Background="Transparent" Grid.Row="1" Grid.Column="0" MinWidth="200">
             <TreeView.ItemContainerStyle>
                 <Style TargetType="{x:Type TreeViewItem}">
                     <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
                     <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
                     <Setter Property="local:TreeItemCheck.Command"
-                                Value="{Binding OpenFileCommand}"/>
+                            Value="{Binding OpenFileCommand}"/>
                     <!--<Setter Property="commandBehaviors:MouseDoubleClick.Command"
                                 Value="{Binding OpenFileCommand}"/>
                     <Setter Property="commandBehaviors:MouseDoubleClick.CommandParameter"
                                 Value="{Binding}"/>-->
                     <EventSetter Event="PreviewMouseRightButtonDown"
-                                     Handler="OnPreviewMouseRightButtonDown" />
+                                 Handler="OnPreviewMouseRightButtonDown" />
                 </Style>
             </TreeView.ItemContainerStyle>
 
@@ -119,13 +47,79 @@
                     <StackPanel Orientation="Horizontal">
                         <CheckBox IsChecked="{Binding IsChecked}" VerticalAlignment="Center" Visibility="{Binding Visibility}"/>
                         <Image Width="20" Margin="3" 
-                                   Source="{Binding ImageName,
+                               Source="{Binding ImageName,
                                         Converter={x:Static local:HeaderToImageConverter.Instance}}" />
                         <TextBlock  Foreground="{StaticResource ForgroundWhiteBrush}" Text="{Binding Name}" VerticalAlignment="Center"/>
                     </StackPanel>
                 </HierarchicalDataTemplate>
             </TreeView.ItemTemplate>
         </TreeView>
+
+        <GridSplitter Grid.Column="1" Grid.Row="1" Width="3" Background="{StaticResource ForgroundLightBlueBrush}" HorizontalAlignment="Stretch" />
+
+        <Grid Grid.Column="2" Grid.Row="1" Background="{StaticResource DarkGrayBrush}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="10"/>
+                <RowDefinition Height="20"/>
+                <RowDefinition Height="5"/>
+                <RowDefinition Height="20"/>
+                <RowDefinition Height="5"/>
+                <RowDefinition Height="20"/>
+                <RowDefinition Height="5"/>
+                <RowDefinition Height="20"/>
+                <RowDefinition Height="5"/>
+                <RowDefinition Height="20"/>
+                <RowDefinition Height="5"/>
+                <RowDefinition Height="20"/>
+                <RowDefinition Height="5"/>
+                <RowDefinition Height="20"/>
+                <RowDefinition Height="5"/>
+                <RowDefinition Height="20"/>
+            </Grid.RowDefinitions>
+
+            <DockPanel LastChildFill="True" Grid.Row="1">
+                <TextBlock Text="ID:" Margin="5 5 66 5" DockPanel.Dock="Left" VerticalAlignment="Center"/>
+                <TextBox Width="Auto" Margin="0 0 5 0" Text="{Binding ModItemViewModel.Id}"/>
+            </DockPanel>
+
+            <DockPanel LastChildFill="True" Grid.Row="3">
+                <TextBlock Text="Display Name:" Margin="5 0 5 0" DockPanel.Dock="Left" VerticalAlignment="Center"/>
+                <TextBox Width="Auto" Margin="0 0 5 0" Text="{Binding ModItemViewModel.DisplayName}"/>
+            </DockPanel>
+
+            <DockPanel LastChildFill="True" Grid.Row="5">
+                <TextBlock Text="Author:" Margin="5 0 43 0" DockPanel.Dock="Left" VerticalAlignment="Center"/>
+                <TextBox Width="Auto" Margin="0 0 5 0" Text="{Binding ModItemViewModel.Author}"/>
+            </DockPanel>
+
+            <DockPanel LastChildFill="True" Grid.Row="7">
+                <TextBlock Text="Version:" Margin="5 0 40 0" DockPanel.Dock="Left" VerticalAlignment="Center"/>
+                <TextBox Width="Auto" Margin="0 0 5 0" Text="{Binding ModItemViewModel.Version}"/>
+            </DockPanel>
+
+            <DockPanel LastChildFill="True" Grid.Row="9">
+                <TextBlock Text="Game:" Margin="5 0 40 0" DockPanel.Dock="Left" VerticalAlignment="Center"/>
+                <TextBox Width="Auto" Margin="0 0 5 0" Text="{Binding ModItemViewModel.Game}"/>
+            </DockPanel>
+
+            <DockPanel LastChildFill="True" Grid.Row="11">
+                <TextBlock Text="Assembly Name:" Margin="5 0 10 0" DockPanel.Dock="Left" VerticalAlignment="Center"/>
+                <TextBox Width="Auto" Margin="0 0 5 0" Text="{Binding ModItemViewModel.AssemblyName}"/>
+            </DockPanel>
+
+            <DockPanel LastChildFill="True" Grid.Row="13">
+                <TextBlock Text="Entry Method:" Margin="5 0 20 0" DockPanel.Dock="Left" VerticalAlignment="Center"/>
+                <TextBox Width="Auto" Margin="0 0 5 0" Text="{Binding ModItemViewModel.EntryMethod}"/>
+            </DockPanel>
+
+            <DockPanel LastChildFill="True" Grid.Row="15">
+                <TextBlock Text="Enabled:" Margin="5 0 20 0" DockPanel.Dock="Left" VerticalAlignment="Center"/>
+                <ComboBox SelectedIndex="{Binding ModItemViewModel.Enable, Converter={StaticResource boolToIndexConverter}}" Width="45" HorizontalAlignment="Left">
+                    <ComboBoxItem>True</ComboBoxItem>
+                    <ComboBoxItem>False</ComboBoxItem>
+                </ComboBox>
+            </DockPanel>
+        </Grid>
 
     </Grid>
 </local:BasePage>

@@ -329,7 +329,7 @@ namespace FCSModdingUtility
                     if (ofd.ShowDialog() != CommonFileDialogResult.Ok) return;
 
                     //TODO Add Message dialog to let them know to chose a file that has already been renamed correctly
-                    var iconName = Path.GetFileNameWithoutExtension(_iconPath);
+                    var iconName = AssemblyName.Substring(0, AssemblyName.Length - 4);
                     ApplicationHelpers.ReplaceModIcon(iconName, _modFolder, ofd.FileName);
                     IconImageValue = CacheImage(_iconPath);
                 }
@@ -395,8 +395,7 @@ namespace FCSModdingUtility
             {
                 var json = File.ReadAllText(_fileStructureSave);
                 var save = JsonConvert.DeserializeObject<ObservableCollection<DirectoryItemViewModel>>(json);
-
-                FileStructure = save;
+                ProcessSaveData(FileStructure,save);
             }
 
             FileStructure[0].Visibility = Visibility.Collapsed;
@@ -408,6 +407,60 @@ namespace FCSModdingUtility
                 if (child1 == null) continue;
                 child1.IsInRoot = true;
             }
+        }
+
+        private void ProcessSaveData(ObservableCollection<DirectoryItemViewModel> saveData, ObservableCollection<DirectoryItemViewModel> save)
+        {
+            foreach (DirectoryItemViewModel model in saveData)
+            {
+                if (!model.IsExpanded)
+                {
+                    model.IsExpanded = true;
+                }
+
+                var match = FindSaveDataMatch(save,model);
+
+                if (match != null)
+                {
+                    model.IsChecked = match.IsChecked;
+                }
+
+                if (model.Children.Count > 0)
+                {
+                    ProcessSaveData(model.Children,save);
+                }
+            }
+        }
+
+
+        private DirectoryItemViewModel FindSaveDataMatch(ObservableCollection<DirectoryItemViewModel> save, DirectoryItemViewModel item)
+        {
+            if (save == null) return null;
+
+            DirectoryItemViewModel result = null;
+
+            foreach (DirectoryItemViewModel model in save)
+            {
+                if(model == null) continue;
+
+                if (!model.IsExpanded)
+                {
+                    model.IsExpanded = true;
+                }
+
+
+                if (item.Name.Equals(model.Name))
+                {
+                    return model;
+                }
+
+                if (model.Children.Count > 0)
+                {
+                    result= FindSaveDataMatch(model.Children,item);
+                }
+            }
+
+            return result;
         }
 
         internal void SetDependentOnTechFab()
@@ -576,6 +629,8 @@ namespace FCSModdingUtility
                 {
                     if (child.Type == DirectoryItemType.Drive || child.Type == DirectoryItemType.Folder)
                     {
+                        if(!child.IsChecked) continue;
+                        
                         Directory.CreateDirectory(Path.Combine(result, child.Name));
 
                         if (child.HasItems)
@@ -585,7 +640,7 @@ namespace FCSModdingUtility
                     }
                     else
                     {
-                        if (child.Type != DirectoryItemType.File) continue;
+                        if (child.Type != DirectoryItemType.File || !child.IsChecked) continue;
 
                         var destFile = Path.Combine(result, child.IsInRoot ? string.Empty : child.GetDirectoryName(), child.Name);
 
@@ -629,6 +684,28 @@ namespace FCSModdingUtility
             if (VersionDependencies != null)
             {
                 VersionDependenciesCount = VersionDependencies.Count;
+            }
+        }
+
+        public void DeleteTreeItem(DirectoryItemViewModel selectedElement)
+        {
+            FindTreeItem(FileStructure,selectedElement);
+        }
+
+        private void FindTreeItem(ObservableCollection<DirectoryItemViewModel> structure, DirectoryItemViewModel selectedElement)
+        {
+            foreach (var obj in structure)
+            {
+                if (obj == selectedElement)
+                {
+                    structure.Remove(obj);
+                    break;
+                }
+
+                if (obj.HasItems)
+                {
+                    FindTreeItem(obj.Children,selectedElement);
+                }
             }
         }
     }

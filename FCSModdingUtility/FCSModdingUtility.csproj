@@ -303,6 +303,7 @@
     </ApplicationDefinition>
     <Compile Include="Models\Attached Behaviours\TreeItemCheck.cs" />
     <Compile Include="Models\Attached Behaviours\MouseDoubleClick.cs" />
+    <Compile Include="Models\Converters\BoolToIndexConverter.cs" />
     <Compile Include="Models\Converters\DimensionConverter.cs" />
     <Compile Include="Models\Converters\GConv.cs" />
     <Compile Include="Models\Converters\HeaderToImageConverter.cs" />
@@ -326,12 +327,16 @@
     <Compile Include="Models\TreeView\ViewModels\DirectoryStructureViewModel.cs" />
     <Compile Include="ViewModels\Controls\ModItemViewModel.cs" />
     <Compile Include="ViewModels\Page\EditorPageViewModel.cs" />
+    <Compile Include="ViewModels\Page\NewProjectViewModel.cs" />
     <Compile Include="ViewModels\SplashScreenViewModel.cs" />
     <Compile Include="Views\Controls\ModItem.xaml.cs">
       <DependentUpon>ModItem.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Pages\EditorPage.xaml.cs">
       <DependentUpon>EditorPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Pages\NewProjectPage.xaml.cs">
+      <DependentUpon>NewProjectPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\SplashScreen.xaml.cs">
       <DependentUpon>SplashScreen.xaml</DependentUpon>
@@ -447,6 +452,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Pages\ModEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Pages\NewProjectPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

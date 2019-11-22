@@ -12,8 +12,6 @@ namespace FCSModdingUtility
 {
     public class HomeViewModel : BaseViewModel
     {
-
-        
         public ModItemViewModel SelectedItem { get; set; }
 
         public ObservableCollection<ModItemViewModel> SelectedResItems { get; set; } = new ObservableCollection<ModItemViewModel>();
@@ -31,10 +29,17 @@ namespace FCSModdingUtility
         }
 
         public ICommand RefreshBTNCommand { get; set; }
+        public ICommand CreateNewModBTNCommand { get; set; }
 
         public HomeViewModel()
         {
            RefreshBTNCommand = new RelayCommand(RefreshBTNCommandMethod);
+           CreateNewModBTNCommand = new RelayCommand(CreateNewModBTNCommandMethod);
+        }
+
+        private void CreateNewModBTNCommandMethod()
+        {
+            ViewModelApplication.GoToPage(ApplicationPage.NewProject);
         }
 
         private void RefreshBTNCommandMethod()

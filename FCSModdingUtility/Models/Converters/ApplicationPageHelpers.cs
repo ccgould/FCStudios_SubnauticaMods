@@ -20,8 +20,8 @@ namespace FCSModdingUtility
             {
                 case ApplicationPage.StartPage:
                     return new Home(viewModel as HomeViewModel);
-                //case ApplicationPage.NewProject:
-                //    return new NewProjectPage(viewModel as NewProjectViewModel);
+                case ApplicationPage.NewProject:
+                    return new NewProjectPage(viewModel as NewProjectViewModel);
                 case ApplicationPage.EditorPage:
                     return new EditorPage(viewModel as EditorPageViewModel);
                 default:
@@ -40,8 +40,8 @@ namespace FCSModdingUtility
             // Find application page that matches the base page
             if (page is Home)
                 return ApplicationPage.StartPage;
-            //if (page is NewProjectPage)
-            //    return ApplicationPage.NewProject;
+            if (page is NewProjectPage)
+                return ApplicationPage.NewProject;
             if (page is EditorPage)
                 return ApplicationPage.EditorPage;
             // Alert developer of issue

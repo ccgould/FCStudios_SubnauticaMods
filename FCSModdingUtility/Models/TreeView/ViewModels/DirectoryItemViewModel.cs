@@ -26,6 +26,8 @@ namespace FCSModdingUtility
 
         private DirectoryItemType _type;
 
+        private readonly string[] _allowedExtention = { ".json", ".png", ".dll", ".txt", "" };
+
         private bool _isChecked;
 
         public bool IsChecked
@@ -38,15 +40,16 @@ namespace FCSModdingUtility
                 {
                     foreach (DirectoryItemViewModel child in Children)
                     {
-                        if(child == null )continue;
+                        if (child == null) continue;
                         child.IsChecked = false;
                     }
                 }
             }
         }
-        
-        public Visibility Visibility { get; set; }
 
+        [JsonIgnore] public Visibility Visibility { get; set; }
+
+        [JsonIgnore]
         public DirectoryItemType Type
         {
             get => _type;
@@ -57,21 +60,21 @@ namespace FCSModdingUtility
                 OldName = Name;
             }
         }
-        
-        public string ImageName => Type == DirectoryItemType.Drive ? "drive" : (Type == DirectoryItemType.File ? "file" : (IsExpanded ? "folder-open" : "folder-closed"));
+
+        [JsonIgnore] public string ImageName => Type == DirectoryItemType.Drive ? "drive" : (Type == DirectoryItemType.File ? "file" : (IsExpanded ? "folder-open" : "folder-closed"));
 
         /// <summary>
         /// The full path to the item
         /// </summary>
 
-        public string FullPath { get; set; }
+        [JsonIgnore] public string FullPath { get; set; }
 
-        public string OldName { get; set; }
+        [JsonIgnore] public string OldName { get; set; }
 
-        public bool IsRoot { get; set; }
+        [JsonIgnore] public bool IsRoot { get; set; }
 
-        public bool IsInRoot { get; set; }
-        
+        [JsonIgnore] public bool IsInRoot { get; set; }
+
         public string Name { get; set; }
 
         /// <summary>
@@ -83,7 +86,7 @@ namespace FCSModdingUtility
         /// <summary>
         /// Indicates if this item can be expanded
         /// </summary>
-        public bool CanExpand => Type != DirectoryItemType.File;
+        [JsonIgnore] public bool CanExpand => Type != DirectoryItemType.File;
 
         /// <summary>
         /// Indicates if the current item is expanded or not
@@ -255,6 +258,28 @@ namespace FCSModdingUtility
         public string GetDirectoryName()
         {
             return Path.GetFileName(Path.GetDirectoryName(FullPath));
+        }
+
+        public void UncheckInvalid(ObservableCollection<DirectoryItemViewModel> currentItem = null)
+        {
+            if (currentItem == null)
+            {
+                currentItem = Children;
+            }
+
+            foreach (DirectoryItemViewModel item in currentItem)
+            {
+                if (item == null) continue;
+
+                if (item.Type == DirectoryItemType.File)
+                {
+                    if (_allowedExtention.Contains(item.GetFileExtention())) continue;
+                    item.IsChecked = false;
+                }
+
+                if (item.HasItems)
+                    UncheckInvalid(item.Children);
+            }
         }
     }
 }

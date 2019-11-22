@@ -20,6 +20,9 @@ namespace FCSModdingUtility
     /// </summary>
     public partial class EditorPage : BasePage<EditorPageViewModel>
     {
+        private DirectoryItemViewModel _selectedElement;
+        private TreeViewItem _item;
+
         public EditorPage()
         {
             InitializeComponent();
@@ -44,25 +47,46 @@ namespace FCSModdingUtility
         private void OnPreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             var obj = (DependencyObject)e.OriginalSource;
-            var item = (TreeViewItem)GetDependencyObjectFromVisualTree(obj, typeof(TreeViewItem));
-            var selectedElement = (DirectoryItemViewModel)item.Header;
-            item.IsSelected = true;
-            DirectoryItemType header = selectedElement.Type;
+            _item = (TreeViewItem)GetDependencyObjectFromVisualTree(obj, typeof(TreeViewItem));
+            _selectedElement = (DirectoryItemViewModel)_item.Header;
+            _item.IsSelected = true;
+            DirectoryItemType header = _selectedElement.Type;
+
 
             if (header == DirectoryItemType.Folder)
             {
-                MenuItem mnuItem1 = new MenuItem { Header = "Add New File" };
-                MenuItem mnuItem2 = new MenuItem { Header = "Reveal in Explorer" };
-                MenuItem mnuItem3 = new MenuItem { Header = "Delete Directory" };
-
+                MenuItem mnuFileItem1 = new MenuItem { Header = "Add New File" };
+                MenuItem mnuFileItem2 = new MenuItem { Header = "Reveal in Explorer" };
+                MenuItem mnuFileItem4 = new MenuItem { Header = "Check All Children" };
+                MenuItem mnuFileItem5 = new MenuItem { Header = "UnCheck All Children" };
+             
                 ContextMenu menu = new ContextMenu() { };
-                menu.Items.Add(mnuItem1);
-                menu.Items.Add(mnuItem2);
-                menu.Items.Add(mnuItem3);
+                menu.Items.Add(mnuFileItem1);
+                menu.Items.Add(mnuFileItem2);
+                
+                if (!_selectedElement.IsRoot)
+                {
+                    MenuItem mnuFileItem3 = new MenuItem { Header = "Delete Directory" };
+                    menu.Items.Add(mnuFileItem3);
+                    mnuFileItem3.Click += MnuFileItem3_Click;
+                }
+                
+                menu.Items.Add(new Separator());
+                menu.Items.Add(mnuFileItem4);
+                menu.Items.Add(mnuFileItem5);
 
-                mnuItem1.Click += MnuItem1_Click;
-                mnuItem2.Click += MnuItem2_Click;
-                mnuItem3.Click += MnuItem3_Click;
+                mnuFileItem1.Click += MnuFileItem1_Click;
+                mnuFileItem2.Click += MnuFileItem2_Click;
+                mnuFileItem4.Click += MnuFileItem4_Click;
+                mnuFileItem5.Click += MnuFileItem5_Click;
+                
+                if (_selectedElement.IsRoot)
+                {
+                    MenuItem mnuFileItem6 = new MenuItem { Header = "UnCheck Invalid Types" };
+                    menu.Items.Add(new Separator());
+                    menu.Items.Add(mnuFileItem6);
+                    mnuFileItem6.Click += MnuFileItem6_Click;
+                }
 
                 ((TreeViewItem)sender).ContextMenu = menu;
             }
@@ -83,55 +107,87 @@ namespace FCSModdingUtility
             }
         }
 
-        private void MnuItem3_Click(object sender, RoutedEventArgs e)
+        private void MnuFileItem6_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                MessageBoxResult diag =
-                    MessageBox.Show("This directory will be deleted and cant be undone would you like to continue?",
-                        "Delete Directory", MessageBoxButton.YesNo, MessageBoxImage.Information);
-
-                if (diag == MessageBoxResult.Yes)
-                {
-                    Directory.Delete(GetDVMFromTreeItem(sender).FullPath);
-                    DeleteObject(((EditorPageViewModel) DataContext).Items, GetDVMFromTreeItem(sender).FullPath);
-                }
-            }
-            catch (Exception exception)
-            {
-                MessageBox.Show(exception.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-
+            _selectedElement.UncheckInvalid();
         }
 
-        private void DeleteObject(ObservableCollection<DirectoryItemViewModel> listVM, string path)
+        private void MnuFileItem5_Click(object sender, RoutedEventArgs e)
         {
-            foreach (var item in listVM)
+            foreach (DirectoryItemViewModel child in _selectedElement.Children)
             {
-                if (item != null)
-                {
-                    if (item.FullPath == path)
-                    {
-                        listVM.Remove(item);
-                        break;
-                    }
+                CheckChildRecursion(child,false);
+            }
+        }
 
-                    if (item.ChildrenCount != 0)
-                    {
-                        DeleteObject(item.Children, path);
-                    }
+        private void CheckChildRecursion(DirectoryItemViewModel child, bool isChecked = true)
+        {
+            if(child == null) return;
+
+            child.IsChecked = isChecked;
+            
+            if (child.Children.Count > 0)
+            {
+                foreach (DirectoryItemViewModel childChild in child.Children)
+                {
+                    CheckChildRecursion(childChild,isChecked);
                 }
             }
         }
 
-        private void MnuItem2_Click(object sender, RoutedEventArgs e)
+        private void MnuFileItem4_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (DirectoryItemViewModel child in _selectedElement.Children)
+            {
+                CheckChildRecursion(child);
+            }
+        }
+
+        private void MnuFileItem3_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBoxResult diag = 
+                MessageBox.Show("This directory will be deleted and cant be undone would you like to continue?",
+                    "Delete Directory", MessageBoxButton.YesNo, MessageBoxImage.Information);
+
+            if (diag == MessageBoxResult.Yes)
+            {
+                ApplicationHelpers.SafeDeleteDirectory(GetDVMFromTreeItem(sender).FullPath);
+                DeleteObject();
+                //DeleteObject(GetDVMFromTreeItem(sender).FullPath);
+            }
+        }
+
+        private void DeleteObject()
+        {
+            var obj = (EditorPageViewModel)DataContext;
+            obj.ModItemViewModel.DeleteTreeItem(_selectedElement);
+
+            //foreach (var item in listVM)
+            //{
+            //    if (item != null)
+            //    {
+            //        if (item.FullPath == path)
+            //        {
+            //            listVM.Remove(item);
+            //            break;
+            //        }
+
+            //        if (item.ChildrenCount != 0)
+            //        {
+            //            DeleteObject(item.Children, path);
+            //        }
+            //    }
+            //}
+        }
+
+        private void MnuFileItem2_Click(object sender, RoutedEventArgs e)
         {
             string argument = "/select, \"" + GetDVMFromTreeItem(sender).FullPath + "\"";
 
             Process.Start("explorer.exe", argument);
         }
 
-        private void MnuItem1_Click(object sender, RoutedEventArgs e)
+        private void MnuFileItem1_Click(object sender, RoutedEventArgs e)
         {
             var directoryItemVM = GetDVMFromTreeItem(sender);
 
@@ -159,7 +215,7 @@ namespace FCSModdingUtility
                 {
                     var file = GetDVMFromTreeItem(sender).FullPath;
                     File.Delete(file);
-                    DeleteObject(((EditorPageViewModel)DataContext).Items, file);
+                    DeleteObject();
                 }
             }
             catch (Exception exception)
@@ -180,6 +236,17 @@ namespace FCSModdingUtility
         {
             var cmb = (MenuItem)sender;
             return (DirectoryItemViewModel)cmb.DataContext;
+        }
+
+        private ItemsControl GetSelectedTreeViewItemParent(TreeViewItem item)
+        {
+            DependencyObject parent = VisualTreeHelper.GetParent(item);
+            while (!(parent is TreeViewItem || parent is TreeView))
+            {
+                parent = VisualTreeHelper.GetParent(parent);
+            }
+
+            return parent as ItemsControl;
         }
 
         private static DependencyObject GetDependencyObjectFromVisualTree(DependencyObject startObject, Type type)
