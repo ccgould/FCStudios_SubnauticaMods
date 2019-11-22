@@ -61,7 +61,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HabitatSystemsPanel", "Habi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCSModdingUtility", "FCSModdingUtility\FCSModdingUtility.csproj", "{54B86755-3BB9-4383-8829-A5EC2023BE23}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaseTeleporter", "BaseTeleporter\BaseTeleporter.csproj", "{B8C62734-A2C8-472C-883B-42A7B450FB00}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntraBaseTeleporter", "IntraBaseTeleporter\IntraBaseTeleporter.csproj", "{B8C62734-A2C8-472C-883B-42A7B450FB00}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
