@@ -107,7 +107,7 @@ namespace AE.SeaCooker.Configuration
 
         internal static string ConfigurationFile()
         {
-            return Path.Combine(MODFOLDERLOCATION, "mod.json");
+            return Path.Combine(MODFOLDERLOCATION, "config.json");
         }
         #endregion
 

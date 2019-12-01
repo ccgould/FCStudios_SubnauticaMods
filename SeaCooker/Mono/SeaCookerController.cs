@@ -1,4 +1,5 @@
-﻿using AE.SeaCooker.Buildable;
+﻿using System;
+using AE.SeaCooker.Buildable;
 using AE.SeaCooker.Configuration;
 using AE.SeaCooker.Helpers;
 using AE.SeaCooker.Managers;
@@ -22,20 +23,70 @@ namespace AE.SeaCooker.Mono
         internal PowerManager PowerManager { get; private set; }
         internal AnimationManager AnimationManager { get; set; }
         internal FoodManager FoodManager { get; private set; }
+        internal string SelectedSeaBreezeID { get; set; }
         internal Dictionary<string, ARSolutionsSeaBreezeController> SeaBreezes { get; set; } = new Dictionary<string, ARSolutionsSeaBreezeController>();
-        private SaveDataEntry _saveData;
-        private bool _initialized;
+        internal ColorManager ColorManager { get; private set; }
+        internal AudioManager AudioManager { get; private set; }
+        internal bool IsSebreezeSelected { get; set; }
+        internal bool AutoChooseSeabreeze { get; set; } = true;
+
+        public bool IsInitialized { get; set; }
         private int _isRunning;
         private GameObject _habitat;
+        private bool _runStartUpOnEnable;
+        private SaveDataEntry _savedData;
+        private bool _fromSave;
+        internal ARSolutionsSeaBreezeController SelectedSeaBreeze { get; set; }
+        internal PlayerInteraction PlayerInteraction { get; private set; }
+
         private void Awake()
         {
             _isRunning = Animator.StringToHash("IsRunning");
         }
+        
         private void Update()
         {
             PowerManager?.ConsumePower();
         }
 
+        private void OnEnable()
+        {
+            if (_runStartUpOnEnable)
+            {
+                if (!IsInitialized)
+                {
+                    Initialize();
+                }
+
+                if (DisplayManager != null)
+                {
+                    DisplayManager.Setup(this);
+                    _runStartUpOnEnable = false;
+                }
+                
+                if (_fromSave)
+                {
+                    if (_savedData == null)
+                    {
+                        ReadySaveData();
+                    }
+
+                    AutoChooseSeabreeze = _savedData.AutoChooseSeabreeze;
+                    GasManager.SetEquipment(_savedData.TankType);
+                    GasManager.SetTankLevel(_savedData.FuelLevel);
+                    ColorManager.SetCurrentBodyColor(_savedData.BodyColor.Vector4ToColor());
+                    StorageManager.LoadExportContainer(_savedData.Export);
+                    StorageManager.LoadInputContainer(_savedData.Input);
+                    StorageManager.SetExportToSeabreeze(_savedData.ExportToSeaBreeze);
+                    FoodManager.LoadRunningState(_savedData);
+                    SelectedSeaBreezeID = string.IsNullOrEmpty(_savedData.CurrentSeaBreezeID) ? string.Empty : _savedData.CurrentSeaBreezeID;
+                    DisplayManager.UpdateSeaBreezes();
+                    QuickLogger.Info($"Loaded {Mod.FriendlyName}");
+                }
+                
+                _runStartUpOnEnable = false;
+            }
+        }
         public bool CanDeconstruct(out string reason)
         {
             reason = string.Empty;
@@ -52,16 +103,29 @@ namespace AE.SeaCooker.Mono
 
             if (!constructed) return;
 
-            if (!_initialized)
+            if (isActiveAndEnabled)
             {
-                Initialize();
+                if (!IsInitialized)
+                {
+                    Initialize();
+                }
+
+                if (DisplayManager != null)
+                {
+                    DisplayManager.Setup(this);
+                    _runStartUpOnEnable = false;
+                }
+            }
+            else
+            {
+                _runStartUpOnEnable = true;
             }
 
             _habitat = gameObject?.transform?.parent?.gameObject;
             GetSeaBreezes();
             //AnimationManager.SetBoolHash(IsRunningHash, true);
         }
-
+        
         private void Initialize()
         {
             TechTypeHelpers.Initialize();
@@ -97,7 +161,6 @@ namespace AE.SeaCooker.Mono
             if (DisplayManager == null)
             {
                 DisplayManager = gameObject.AddComponent<SCDisplayManager>();
-                DisplayManager.Setup(this);
             }
 
             if (ColorManager == null)
@@ -113,9 +176,17 @@ namespace AE.SeaCooker.Mono
                 //InvokeRepeating(nameof(UpdateAudio), 0, 1);
             }
 
+            if (PlayerInteraction == null)
+            {
+                PlayerInteraction = gameObject.GetComponent<PlayerInteraction>();
+
+            }
+
+            PlayerInteraction.Initialize(this);
+
             //FindHabitat();
 
-            _initialized = true;
+            IsInitialized = true;
         }
 
         private void FindHabitat()
@@ -130,8 +201,6 @@ namespace AE.SeaCooker.Mono
             //}
         }
 
-        public ColorManager ColorManager { get; private set; }
-        public AudioManager AudioManager { get; private set; }
 
         internal void UpdateIsRunning(bool value = true)
         {
@@ -150,27 +219,12 @@ namespace AE.SeaCooker.Mono
 
         public void OnProtoDeserialize(ProtobufSerializer serializer)
         {
-            QuickLogger.Info($"Loading {Mod.FriendlyName}");
-            var prefabIdentifier = GetComponent<PrefabIdentifier>();
-            var id = prefabIdentifier?.Id ?? string.Empty;
-            var data = Mod.GetSaveData(id);
-
-            if (data == null)
+            if (_savedData == null)
             {
-                QuickLogger.Info($"No save found for PrefabId {id}");
-                return;
+                ReadySaveData();
             }
 
-            QuickLogger.Debug("Loading Current Fuel from save");
-
-            GasManager.SetEquipment(data.TankType);
-            GasManager.SetTankLevel(data.FuelLevel);
-            ColorManager.SetCurrentBodyColor(data.BodyColor.Vector4ToColor());
-            StorageManager.LoadExportContainer(data.Export);
-            StorageManager.LoadInputContainer(data.Input);
-            StorageManager.SetExportToSeabreeze(data.ExportToSeaBreeze);
-            FoodManager.LoadRunningState(data);
-            QuickLogger.Info($"Loaded {Mod.FriendlyName}");
+            _fromSave = true;
         }
 
         internal void Save(SaveData saveData)
@@ -178,20 +232,31 @@ namespace AE.SeaCooker.Mono
             var prefabIdentifier = GetComponent<PrefabIdentifier>();
             var id = prefabIdentifier.Id;
 
-            if (_saveData == null)
+            if (_savedData == null)
             {
-                _saveData = new SaveDataEntry();
+                _savedData = new SaveDataEntry();
             }
-            _saveData.ID = id;
-            _saveData.FuelLevel = GasManager.GetTankLevel();
-            _saveData.TankType = GasManager.CurrentFuel;
-            _saveData.BodyColor = ColorManager.GetColor().ColorToVector4();
-            _saveData.Export = StorageManager.GetExportContainer();
-            _saveData.Input = StorageManager.GetInputContainer();
-            _saveData.ExportToSeaBreeze = StorageManager.GetExportToSeabreeze();
-            FoodManager.SaveRunningState(_saveData);
+            _savedData.ID = id;
+            _savedData.FuelLevel = GasManager.GetTankLevel();
+            _savedData.TankType = GasManager.CurrentFuel;
+            _savedData.BodyColor = ColorManager.GetColor().ColorToVector4();
+            _savedData.Export = StorageManager.GetExportContainer();
+            _savedData.Input = StorageManager.GetInputContainer();
+            _savedData.ExportToSeaBreeze = StorageManager.GetExportToSeabreeze();
+            _savedData.CurrentSeaBreezeID = SelectedSeaBreezeID;
+            _savedData.AutoChooseSeabreeze = AutoChooseSeabreeze;
+            FoodManager.SaveRunningState(_savedData);
 
-            saveData.Entries.Add(_saveData);
+
+            saveData.Entries.Add(_savedData);
+        }
+
+        private void ReadySaveData()
+        {
+            QuickLogger.Debug("In OnProtoDeserialize");
+            var prefabIdentifier = GetComponentInParent<PrefabIdentifier>() ?? GetComponent<PrefabIdentifier>();
+            var id = prefabIdentifier?.Id ?? string.Empty;
+            _savedData = Mod.GetSaveData(id);
         }
 
         private IEnumerator UpdatePowerState()
@@ -209,7 +274,6 @@ namespace AE.SeaCooker.Mono
             {
                 QuickLogger.Debug("OBJ Not NULL", true);
                 StartCoroutine(TrackNewSeabreezeCoroutine(obj));
-
             }
         }
 
@@ -220,7 +284,7 @@ namespace AE.SeaCooker.Mono
             QuickLogger.Debug("OBJ Not NULL", true);
             SeaBreezes.Remove(obj.GetPrefabID());
             QuickLogger.Debug("Removed Seabreeze");
-
+            DisplayManager.UpdateSeaBreezes();
         }
 
         private IEnumerator TrackNewSeabreezeCoroutine(ARSolutionsSeaBreezeController obj)
@@ -262,11 +326,15 @@ namespace AE.SeaCooker.Mono
 
                 foreach (var seaBreeze in seaBreezeList)
                 {
-
                     SeaBreezes.Add(seaBreeze.GetPrefabID(), seaBreeze);
                 }
             }
         }
 
+        public void SetCurrentSeaBreeze(ARSolutionsSeaBreezeController sb)
+        {
+            SelectedSeaBreeze = sb;
+            SelectedSeaBreezeID = sb.GetPrefabID();
+        }
     }
 }

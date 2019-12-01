@@ -25,14 +25,18 @@ namespace AE.IntraBaseTeleporter.Managers
             if (_teleportPlayer)
             {
                 _timer += DayNightCycle.main.deltaTime;
-
+                
                 if (_timer > _spoolTime + _delayTime)
                 {
-                    _mono.AnimationManager.SetBoolHash(_animationRunning, false);
-                    _mono.AudioManager.StopAudio();
-                    Player.main.playerController.SetEnabled(true);
-                    _teleportPlayer = false;
-                    _timer = 0f;
+                    if (LargeWorldStreamer.main.IsWorldSettled())
+                    {
+                        _mono.AnimationManager.SetBoolHash(_animationRunning, false);
+                        _mono.AudioManager.StopAudio();
+                        Player.main.playerController.SetEnabled(true);
+                        _teleportPlayer = false;
+                        _timer = 0f;
+                    }
+
                 }
                 else if (_timer > _spoolTime)
                 {

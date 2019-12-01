@@ -9,16 +9,18 @@ namespace AE.SeaCooker.Configuration
     [Serializable]
     internal class SaveDataEntry
     {
-        [JsonProperty] internal string ID;
-        [JsonProperty] internal float FuelLevel;
-        [JsonProperty] internal FuelType TankType;
-        [JsonProperty] internal ColorVec4 BodyColor;
-        [JsonProperty] internal bool ExportToSeaBreeze;
-        [JsonProperty] internal bool IsCooking;
-        [JsonProperty] internal float PassedTime;
-        [JsonProperty] internal float TargetTime;
-        [JsonProperty] internal IEnumerable<EatableEntities> Input;
-        [JsonProperty] internal IEnumerable<EatableEntities> Export;
+        [JsonProperty] internal string ID { get; set; }
+        [JsonProperty] internal float FuelLevel { get; set; }
+        [JsonProperty] internal FuelType TankType { get; set; }
+        [JsonProperty] internal ColorVec4 BodyColor { get; set; }
+        [JsonProperty] internal bool ExportToSeaBreeze { get; set; }
+        [JsonProperty] internal bool IsCooking { get; set; }
+        [JsonProperty] internal float PassedTime { get; set; }
+        [JsonProperty] internal float TargetTime { get; set; }
+        [JsonProperty] internal IEnumerable<EatableEntities> Input { get; set; }
+        [JsonProperty] internal IEnumerable<EatableEntities> Export { get; set; }
+        [JsonProperty] internal string CurrentSeaBreezeID { get; set; }
+    [JsonProperty] internal bool AutoChooseSeabreeze { get; set; }
     }
 
     [Serializable]

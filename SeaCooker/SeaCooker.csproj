@@ -56,8 +56,23 @@
     <Reference Include="UnityEngine">
       <HintPath>F:\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\UnityEngine.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.AnimationModule">
+      <HintPath>F:\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\UnityEngine.AnimationModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AssetBundleModule">
+      <HintPath>F:\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\UnityEngine.AssetBundleModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>F:\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.PhysicsModule">
+      <HintPath>F:\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>F:\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\UnityEngine.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UIModule">
+      <HintPath>F:\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\UnityEngine.UIModule.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -65,12 +80,10 @@
     <Compile Include="Buildable\SeaCookerModelPrefab.cs" />
     <Compile Include="Buildable\SeaCookerPatcher.cs" />
     <Compile Include="Configuration\Configuration.cs" />
-    <Compile Include="Configuration\InterfaceHelpers.cs" />
     <Compile Include="Configuration\Mod.cs" />
     <Compile Include="Configuration\SaveDataEntry.cs" />
     <Compile Include="Display\ColorItemButton.cs" />
     <Compile Include="Display\CustomToggle.cs" />
-    <Compile Include="Display\InterfaceButton.cs" />
     <Compile Include="Display\OnScreenButton.cs" />
     <Compile Include="Display\PaginatorButton.cs" />
     <Compile Include="Enumerators\FuelType.cs" />

@@ -39,7 +39,7 @@ namespace AE.MiniFountainFilter
 
                 LoadConfiguration();
 
-                var configBottleTechType = QPatch.Configuration.Config.BottleTechType;
+                var configBottleTechType = QPatch.Configuration.BottleTechType;
                 
                 if (configBottleTechType == null)
                 {

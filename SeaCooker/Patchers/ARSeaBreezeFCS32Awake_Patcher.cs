@@ -5,7 +5,7 @@ using System;
 namespace AE.SeaCooker.Patchers
 {
     [HarmonyPatch(typeof(ARSolutionsSeaBreezeController))]
-    [HarmonyPatch("Awake")]
+    [HarmonyPatch("Initialized")]
     internal class ARSeaBreezeFCS32Awake_Patcher
     {
         private static Action<ARSolutionsSeaBreezeController> onSeaBreezeAdded;

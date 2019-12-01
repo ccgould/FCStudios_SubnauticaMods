@@ -58,11 +58,14 @@ namespace AE.SeaCooker
             settings.MissingMemberHandling = MissingMemberHandling.Ignore;
 
             //LoadData
-            Configuration = JsonConvert.DeserializeObject<ModConfiguration>(configJson, settings);
+            Configuration = JsonConvert.DeserializeObject<ConfigFile>(configJson, settings);
+
+
+            QuickLogger.Debug($"Storage Height: {Configuration.Config.StorageHeight}");
         }
 
-        public static ModConfiguration Configuration { get; set; }
-        public static string Version { get; set; }
+        internal static ConfigFile Configuration { get; set; }
+        internal static string Version { get; set; }
     }
 }
 

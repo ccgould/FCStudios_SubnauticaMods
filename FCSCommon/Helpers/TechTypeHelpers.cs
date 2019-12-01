@@ -12,7 +12,6 @@ namespace FCSCommon.Helpers
             if (otherModIsInstalled) return techtype;
             QuickLogger.Error($"Couldn't find {techTypeString} Tech Type");
             return TechType.None;
-
         }
     }
 }

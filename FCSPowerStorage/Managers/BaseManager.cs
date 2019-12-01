@@ -1,11 +1,11 @@
 ﻿using FCSCommon.Utilities;
-using FCSCommon.Utilities.Enums;
 using FCSPowerStorage.Configuration;
 using FCSPowerStorage.Mono;
 using Oculus.Newtonsoft.Json;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using FCSCommon.Enums;
 using UnityEngine;
 
 namespace FCSPowerStorage.Managers
@@ -13,12 +13,12 @@ namespace FCSPowerStorage.Managers
     internal class BaseManager
     {
 
-        public static List<BaseManager> Managers { get; } = new List<BaseManager>();
-        public int InstanceID { get; }
+        internal static List<BaseManager> Managers { get; } = new List<BaseManager>();
+        internal int InstanceID { get; }
 
         internal readonly List<FCSPowerStorageController> PowerStorageUnits = new List<FCSPowerStorageController>();
         internal readonly List<FCSPowerStorageController> BasePowerStorageUnits = new List<FCSPowerStorageController>();
-        public readonly SubRoot Habitat;
+        internal readonly SubRoot Habitat;
 
         /// <summary>
         /// Saves all the bases settings
@@ -48,7 +48,7 @@ namespace FCSPowerStorage.Managers
             mono.StartCoroutine(AutoSystem());
         }
 
-        public static BaseManager FindManager(SubRoot subRoot)
+        internal static BaseManager FindManager(SubRoot subRoot)
         {
 
             //if (!subRoot.isBase) return null; //Disabled to allow Cyclops Operation
@@ -225,7 +225,7 @@ namespace FCSPowerStorage.Managers
             }
         }
 
-        public void UpdateTextBoxes(int getAutoActivateAt, int getBasePowerProtectionGoal)
+        internal void UpdateTextBoxes(int getAutoActivateAt, int getBasePowerProtectionGoal)
         {
             foreach (FCSPowerStorageController controller in BasePowerStorageUnits)
             {

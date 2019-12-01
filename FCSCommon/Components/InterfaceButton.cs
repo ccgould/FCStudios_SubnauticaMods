@@ -127,7 +127,7 @@ namespace FCSCommon.Components
         {
             base.OnPointerEnter(eventData);
             UpdateTextComponent(IsTextMode());
-            OnInterfaceButton.Invoke(true);
+            OnInterfaceButton?.Invoke(true);
             if (this.IsHovered)
             {
                 switch (this.ButtonMode)
@@ -161,7 +161,7 @@ namespace FCSCommon.Components
         {
             base.OnPointerExit(eventData);
             UpdateTextComponent(IsTextMode());
-            OnInterfaceButton.Invoke(false);
+            OnInterfaceButton?.Invoke(false);
 
             switch (this.ButtonMode)
             {

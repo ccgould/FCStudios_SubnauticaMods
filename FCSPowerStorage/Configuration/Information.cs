@@ -9,7 +9,8 @@ namespace FCSPowerStorage.Configuration
         /// <summary>
         /// The mod name "ClassID" of the FCS Power Storage
         /// </summary>
-        public static string ModName => FCSTechFabricator.Configuration.PowerStorageKitClassID;
+        public static string ModName => FCSTechFabricator.Configuration.PowerStorageClassID;
+        public static string ModFolderName  => "FCS_PowerStorage";
 
         public static string MODFOLDERLOCATION => GetModPath();
 
@@ -28,7 +29,7 @@ namespace FCSPowerStorage.Configuration
 
         private static string GetModPath()
         {
-            return Path.Combine(GetQModsPath(), ModName);
+            return Path.Combine(GetQModsPath(), ModFolderName);
         }
 
         public static string GetAssetPath()

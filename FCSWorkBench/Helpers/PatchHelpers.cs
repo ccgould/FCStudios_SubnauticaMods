@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using FCSCommon.Extensions;
 using FCSCommon.Helpers;
@@ -13,7 +14,7 @@ using UnityEngine;
 
 namespace FCSTechFabricator.Helpers
 {
-    internal static class PatchHelpers
+    public static class PatchHelpers
     {
         /// <summary>
         /// Applied settings for the FCSKit before its instantiated. 
@@ -260,7 +261,7 @@ namespace FCSTechFabricator.Helpers
             QuickLogger.Debug("GetPrefabs");
 
             #region Asset Bundle
-            AssetBundle assetBundle = AssetHelper.Asset("FCSTechFabricator", "fcstechfabricatormodbundle");
+            AssetBundle assetBundle = AssetHelper.Asset(Mod.ModFolderName, "fcstechfabricatormodbundle");
 
             //If the result is null return false.
             if (assetBundle == null)
@@ -443,23 +444,107 @@ namespace FCSTechFabricator.Helpers
 
             CreateModEntry();
 
-            foreach (FCSKitEntry kit in CreateKits())
+            //foreach (FCSKitEntry kit in CreateKits())
+            //{
+
+
+            //    QuickLogger.Debug($"Registering {kit.FriendlyName}");
+
+            //    var kitCraftable = new KitCraftable(kit.ClassID, kit.FriendlyName, kit.Description, kit.Icon, kit.FabricatorSteps);
+            //    kitCraftable.Patch();
+            //    if (!TechTypeHandler.ModdedTechTypeExists(kit.ModParent)) continue;
+            //    FCSTechFabricatorBuildable.AddTechType(kitCraftable.TechType, kit.FabricatorSteps);
+
+            //    QuickLogger.Debug($"Patched {kitCraftable.FriendlyName}");
+            //}
+
+            //foreach (FCSKitEntry module in CreateModules())
+            //{
+            //    if (!TechTypeHandler.ModdedTechTypeExists(module.ModParent)) continue;
+
+            //    QuickLogger.Debug($"Registering {module.FriendlyName}");
+
+            //    var moduleCraftable = new ModuleCraftable(module.ClassID, module.FriendlyName, module.Description, module.Icon);
+            //    moduleCraftable.Patch();
+
+            //    FCSTechFabricatorBuildable.AddTechType(moduleCraftable.TechType, module.FabricatorSteps);
+
+            //    QuickLogger.Debug($"Patched {moduleCraftable.FriendlyName}");
+            //}
+
+            //if (TechTypeHandler.ModdedTechTypeExists(Configuration.SeaBreezeClassID))
+            //{
+            //    var freon = new FreonBuildable();
+            //    freon.Patch();
+            //    FCSTechFabricatorBuildable.AddTechType(freon.TechType, freon.StepsToFabricatorTab);
+            //    QuickLogger.Debug($"Patched {freon.FriendlyName}");
+            //}
+
+            //if (TechTypeHandler.ModdedTechTypeExists(Configuration.SeaCookerClassID))
+            //{
+            //    var scGtank = new SeaGasTankCraftable();
+            //    scGtank.Patch();
+            //    FCSTechFabricatorBuildable.AddTechType(scGtank.TechType, scGtank.StepsToFabricatorTab);
+            //    QuickLogger.Debug($"Patched {scGtank.FriendlyName}");
+
+            //    var scAGtank = new SeaAlienGasTankCraftable();
+            //    scAGtank.Patch();
+            //    FCSTechFabricatorBuildable.AddTechType(scAGtank.TechType, scAGtank.StepsToFabricatorTab);
+            //    QuickLogger.Debug($"Patched {scAGtank.FriendlyName}");
+            //}
+        }
+
+        public static bool AddNewKit(string classID, string description, string unitName, string modParent, string[] fabricatorSteps, string icon, TechType requiredForUnlock = TechType.None)
+        {
+            try
             {
-                if (!TechTypeHandler.ModdedTechTypeExists(kit.ModParent)) continue;
+                if (string.IsNullOrEmpty(description))
+                {
+                    description = $"A kit that allows you to build one {unitName} Unit";
+                }
+
+                var kit = new FCSKitEntry
+                {
+                    ClassID = classID,
+                    FriendlyName = $"{unitName} kit",
+                    Description = description,
+                    FabricatorSteps = fabricatorSteps,
+                    ModParent = modParent,
+                    RequiredForUnlock = requiredForUnlock,
+                    Icon = icon
+                };
 
                 QuickLogger.Debug($"Registering {kit.FriendlyName}");
-
                 var kitCraftable = new KitCraftable(kit.ClassID, kit.FriendlyName, kit.Description, kit.Icon, kit.FabricatorSteps);
                 kitCraftable.Patch();
-
                 FCSTechFabricatorBuildable.AddTechType(kitCraftable.TechType, kit.FabricatorSteps);
-
                 QuickLogger.Debug($"Patched {kitCraftable.FriendlyName}");
+                return true;
             }
-
-            foreach (FCSKitEntry module in CreateModules())
+            catch (Exception e)
             {
-                if (!TechTypeHandler.ModdedTechTypeExists(module.ModParent)) continue;
+                QuickLogger.Error($"[AddKit() PatchHelpers]: {e.Message}");
+                return false;
+            }
+        }
+
+        public static bool AddNewModule(string classID, string description, string unitName, string modParent, string[] fabricatorSteps)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(description))
+                {
+                    description = $"A kit that allows you to build one {unitName} module";
+                }
+
+                var module = new FCSKitEntry
+                {
+                    ClassID = classID,
+                    FriendlyName = $"{unitName} kit",
+                    Description = description,
+                    FabricatorSteps = fabricatorSteps,
+                    ModParent = modParent
+                };
 
                 QuickLogger.Debug($"Registering {module.FriendlyName}");
 
@@ -469,28 +554,18 @@ namespace FCSTechFabricator.Helpers
                 FCSTechFabricatorBuildable.AddTechType(moduleCraftable.TechType, module.FabricatorSteps);
 
                 QuickLogger.Debug($"Patched {moduleCraftable.FriendlyName}");
+                return true;
             }
-
-            if (TechTypeHandler.ModdedTechTypeExists(Configuration.SeaBreezeClassID))
+            catch (Exception e)
             {
-                var freon = new FreonBuildable();
-                freon.Patch();
-                FCSTechFabricatorBuildable.AddTechType(freon.TechType, freon.StepsToFabricatorTab);
-                QuickLogger.Debug($"Patched {freon.FriendlyName}");
+                QuickLogger.Error($"[AddKit() PatchHelpers]: {e.Message}");
+                return false;
             }
+        }
 
-            if (TechTypeHandler.ModdedTechTypeExists(Configuration.SeaCookerClassID))
-            {
-                var scGtank = new SeaGasTankCraftable();
-                scGtank.Patch();
-                FCSTechFabricatorBuildable.AddTechType(scGtank.TechType, scGtank.StepsToFabricatorTab);
-                QuickLogger.Debug($"Patched {scGtank.FriendlyName}");
-
-                var scAGtank = new SeaAlienGasTankCraftable();
-                scAGtank.Patch();
-                FCSTechFabricatorBuildable.AddTechType(scAGtank.TechType, scAGtank.StepsToFabricatorTab);
-                QuickLogger.Debug($"Patched {scAGtank.FriendlyName}");
-            }
+        public static void AddTechType(TechType techType, string[] stepsToFabricatorTab)
+        {
+            FCSTechFabricatorBuildable.AddTechType(techType,stepsToFabricatorTab);
         }
     }
 }

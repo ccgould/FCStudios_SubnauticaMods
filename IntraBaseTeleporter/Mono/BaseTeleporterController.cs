@@ -60,7 +60,7 @@ namespace AE.IntraBaseTeleporter.Mono
                 _runStartUpOnEnable = false;
             }
 
-            CreateDisplayedIonCube();
+            //CreateDisplayedIonCube();
 
             if (_data == null)
             {
@@ -129,7 +129,7 @@ namespace AE.IntraBaseTeleporter.Mono
             IsInitialized = true;
         }
 
-        private void OnLabelChanged(string obj)
+        private void OnLabelChanged(string obj,NameController nameController)
         {
             Manager.UpdateUnits();
             DisplayManager.SetDisplay(GetName());
@@ -174,7 +174,7 @@ namespace AE.IntraBaseTeleporter.Mono
                         _runStartUpOnEnable = false;
                     }
 
-                    CreateDisplayedIonCube();
+                    //CreateDisplayedIonCube();
                 }
                 else
                 {
@@ -232,31 +232,7 @@ namespace AE.IntraBaseTeleporter.Mono
             Manager.AddBaseUnit(this);
             QuickLogger.Debug($"{Mod.FriendlyName} has been connected", true);
         }
-
-        private void CreateDisplayedIonCube()
-        {
-            GameObject ionSlot = gameObject.FindChild("model")
-                .FindChild("ion_cube_placeholder")?.gameObject;
-
-            if (ionSlot != null)
-            {
-                QuickLogger.Debug("Ion Cube Display Object Created", true);
-                var displayedIonCube = GameObject.Instantiate<GameObject>(CubePrefab);
-                Pickupable pickupable = displayedIonCube.GetComponent<Pickupable>();
-                pickupable.isPickupable = false;
-                pickupable.destroyOnDeath = true;
-
-                displayedIonCube.transform.SetParent(ionSlot.transform);
-                displayedIonCube.transform.localPosition = new Vector3(0f, 0.0f, 0f);
-                displayedIonCube.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
-                //displayedIonCube.transform.Rotate(new Vector3(0, 0, 90));
-            }
-            else
-            {
-                QuickLogger.Error("Cannot Find IonCube in the prefab");
-            }
-        }
-
+        
         public override void UpdateScreen()
         {
             OnBaseUnitsChanged();

@@ -1,4 +1,5 @@
-﻿using FCSAlterraShipping.Display;
+﻿using System.Collections.Generic;
+using FCSAlterraShipping.Display;
 using FCSAlterraShipping.Display.Patching;
 using FCSAlterraShipping.Models;
 using FCSAlterraShipping.Mono;
@@ -6,6 +7,9 @@ using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using System.IO;
+using FCSAlterraShipping.Configuration;
+using FCSTechFabricator.Helpers;
+using SMLHelper.V2.Utility;
 
 namespace FCSAlterraShipping.Buildable
 {
@@ -18,7 +22,7 @@ namespace FCSAlterraShipping.Buildable
         private static readonly AlterraShippingBuildable Singleton = new AlterraShippingBuildable();
 
         #region Public Properties
-        public override string AssetsFolder { get; } = $"FCSAlterraShipping/Assets";
+        public override string AssetsFolder { get; } = $"{Mod.ModFolderName}/Assets";
         public override TechGroup GroupForPDA { get; } = TechGroup.InteriorModules;
         public override TechCategory CategoryForPDA { get; } = TechCategory.InteriorModule;
         #endregion
@@ -30,11 +34,20 @@ namespace FCSAlterraShipping.Buildable
                 throw new FileNotFoundException($"Failed to retrieve the {Singleton.FriendlyName} prefab from the asset bundle");
             }
 
+
+            PatchHelpers.AddNewKit(
+                FCSTechFabricator.Configuration.ShippingKitID,
+                null,
+                Mod.FriendlyName,
+                FCSTechFabricator.Configuration.ShippingClassID,
+                new[] { "ASS", "ASU" },
+                null);
+
             Singleton.Patch();
         }
 
         public AlterraShippingBuildable() :
-            base("FCSAlterraShipping", "Alterra Shipping", "Shipping all your parcels.")
+            base(Mod.ClassID, Mod.FriendlyName, Mod.Description)
         {
             OnFinishedPatching += AdditionalPatching;
             OnFinishedPatching += DisplayLanguagePatching.AdditionPatching;
@@ -86,7 +99,14 @@ namespace FCSAlterraShipping.Buildable
             constructable.techType = this.TechType;
             constructable.model = consoleModel;
 
+            var center = new Vector3(0f, 1.022878f, 0.3840232f); // Y reduced to allow tube fitting
+            var size = new Vector3(1.63731f, 1.920672f, 0.8025026f);// Y reduced to allow tube fitting
+
+            GameObjectHelpers.AddConstructableBounds(prefab, size,center);
+
             prefab.GetOrAddComponent<AlterraShippingTransferHandler>();
+
+            prefab.GetOrAddComponent<AlterraShippingDisplay>();
 
             prefab.GetOrAddComponent<AlterraShippingAnimator>();
 
@@ -101,18 +121,21 @@ namespace FCSAlterraShipping.Buildable
 
         protected override TechData GetBlueprintRecipe()
         {
-            return new TechData
+            QuickLogger.Debug($"Creating recipe...");
+
+            // Create and associate recipe to the new TechType
+            var customFabRecipe = new TechData()
             {
-                Ingredients =
+                craftAmount = 1,
+                Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(TechType.TitaniumIngot, 1),
-                    new Ingredient(TechType.ComputerChip, 1),
-                    new Ingredient(TechType.AdvancedWiringKit, 1),
-                    new Ingredient(TechType.VehicleStorageModule, 1),
-                    new Ingredient(TechType.Beacon, 1),
-                    new Ingredient(TechType.Glass, 1)
+                    new Ingredient(TechTypeHelpers.GetTechType(FCSTechFabricator.Configuration.ShippingKitID), 1)
                 }
             };
+
+            QuickLogger.Debug($"Created Ingredients");
+
+            return customFabRecipe;
         }
 
         private void CreateDisplayedContainer(GameObject prefab)

@@ -16,8 +16,6 @@ namespace ARS_SeaBreezeFCS32
         //public static AssetBundle Bundle { get; private set; }
         public static void Patch()
         {
-            Console.WriteLine("This is a test");
-
             // == Load Configuration == //
             string configJson = File.ReadAllText(Mod.ConfigurationFile().Trim());
 
@@ -26,8 +24,11 @@ namespace ARS_SeaBreezeFCS32
 
             Configuration = JsonConvert.DeserializeObject<ModConfiguration>(configJson, settings);
 
+            var f = Configuration;
+
             var assembly = Assembly.GetExecutingAssembly();
             QuickLogger.Info("Started patching. Version: " + QuickLogger.GetAssemblyVersion(assembly));
+
 
 #if DEBUG
             QuickLogger.DebugLogsEnabled = true;
@@ -47,6 +48,8 @@ namespace ARS_SeaBreezeFCS32
                 harmony.PatchAll(assembly);
 
                 QuickLogger.Info("Finished patching");
+
+                QuickLogger.Debug($"{Configuration.StorageLimit}");
             }
             catch (Exception ex)
             {

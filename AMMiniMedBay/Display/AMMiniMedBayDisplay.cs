@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using AMMiniMedBay.Configuration;
+using FCSCommon.Extensions;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -31,7 +32,7 @@ namespace AMMiniMedBay.Display
         private const int NonPower = 2;
         private const int ColorPicker = 3;
         private const int BlackOut = 0;
-        private List<SerializableColor> _serializedColors;
+        private List<ColorVec4> _serializedColors;
         private int COLORS_PER_PAGE = 72;
         private int _maxColorPage = 1;
         private int _currentColorPage = 1;
@@ -75,8 +76,7 @@ namespace AMMiniMedBay.Display
             _mono.PowerManager.OnPowerOutage += OnPowerOutage;
             _mono.PowerManager.OnPowerResume += OnPowerResume;
 
-            _serializedColors = JsonConvert.DeserializeObject<List<SerializableColor>>(
-                File.ReadAllText(Path.Combine(AssetHelper.GetAssetFolder(Mod.ModFolderName), "colors.json")));
+            _serializedColors = ColorList.Colors;
 
             if (_serializedColors.Count < 1)
             {
@@ -475,16 +475,16 @@ namespace AMMiniMedBay.Display
             UpdateColorPaginator();
         }
 
-        private void LoadColorPicker(SerializableColor color)
+        private void LoadColorPicker(ColorVec4 color)
         {
             GameObject itemDisplay = Instantiate(AMMiniMedBayBuildable.ColorItemPrefab);
             itemDisplay.transform.SetParent(_colorPageContainer.transform, false);
-            itemDisplay.GetComponentInChildren<Image>().color = color.ToColor();
+            itemDisplay.GetComponentInChildren<Image>().color = color.Vector4ToColor();
 
             var itemButton = itemDisplay.AddComponent<ColorItemButton>();
             itemButton.OnButtonClick = OnButtonClick;
             itemButton.BtnName = "ColorItem";
-            itemButton.Color = color.ToColor();
+            itemButton.Color = color.Vector4ToColor();
         }
 
         private void UpdateColorPaginator()

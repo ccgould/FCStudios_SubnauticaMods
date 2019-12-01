@@ -15,10 +15,14 @@ namespace ExStorageDepot.Configuration
         internal static event Action<ExStorageDepotSaveData> OnExStorageDepotLoaded;
         internal const string SaveDataFilename = "ExStorageDepotSaveData.json";
         internal static readonly string ModName = FCSTechFabricator.Configuration.ExStorageClassID;
+        internal static readonly string ClassID = FCSTechFabricator.Configuration.ExStorageClassID;
+        internal static readonly string ModFolderName = $"FCS_{ModName}";
         internal const string ModFriendly = "Ex-Storage Depot";
         internal const string BundleName = "exstoragedepotunitmodbundle";
         internal const string ModDesc = "Alterra Storage Solutions Ex-Storage Depot allows you to store a large amount of items outside your base.";
         internal static string MODFOLDERLOCATION => GetModPath();
+        internal static string GameObjectName => "Ex-StorageDepotUnit";
+
         public static string GetSaveFileDirectory()
         {
             return Path.Combine(SaveUtils.GetCurrentSaveDataDir(), ModName);
@@ -46,12 +50,12 @@ namespace ExStorageDepot.Configuration
 
         internal static string ConfigurationFile()
         {
-            return Path.Combine(MODFOLDERLOCATION, "mod.json");
+            return Path.Combine(MODFOLDERLOCATION, "config.json");
         }
 
         private static string GetModPath()
         {
-            return Path.Combine(GetQModsPath(), ModName);
+            return Path.Combine(GetQModsPath(), ModFolderName);
         }
         private static string GetQModsPath()
         {

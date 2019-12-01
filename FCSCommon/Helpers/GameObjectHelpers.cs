@@ -1,9 +1,26 @@
-﻿using UnityEngine;
+﻿using System;
+using FCSCommon.Utilities;
+using SMLHelper.V2.Utility;
+using UnityEngine;
 
 namespace FCSCommon.Helpers
 {
     public class GameObjectHelpers : MonoBehaviour
     {
+        public static void AddConstructableBounds(GameObject prefab, Vector3 size, Vector3 center)
+        {
+            try
+            {
+                if (prefab == null) return;
+                var bounds = prefab.GetOrAddComponent<ConstructableBounds>();
+                bounds.bounds.size = size;
+                bounds.bounds.position = center;
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error<GameObjectHelpers>($"{e.Message}");
+            }
+        }
         public static void DestroyComponent(GameObject obj)
         {
             var list = obj.GetComponents(typeof(Component));

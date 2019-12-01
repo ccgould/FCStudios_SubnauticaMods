@@ -3,7 +3,6 @@ using FCSCommon.Enums;
 using FCSCommon.Helpers;
 using FCSCommon.Objects;
 using FCSCommon.Utilities;
-using FCSCommon.Utilities.Enums;
 using FCSPowerStorage.Buildables;
 using FCSPowerStorage.Configuration;
 using FCSPowerStorage.Display;
@@ -14,6 +13,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using FCSCommon.Abstract;
+using FCSCommon.Extensions;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -28,7 +29,7 @@ namespace FCSPowerStorage.Mono
     internal class FCSPowerStorageDisplay : AIDisplay
     {
         private FCSPowerStorageController _mono;
-        private List<SerializableColor> _serializedColors;
+        private List<ColorVec4> _serializedColors;
         private GameObject _batteryGrid;
         private Text _batteryMonitorAmountLbl;
         private GameObject _previousPageGameObject;
@@ -776,16 +777,16 @@ namespace FCSPowerStorage.Mono
             }
         }
 
-        private void LoadColorPicker(SerializableColor color)
+        private void LoadColorPicker(ColorVec4 color)
         {
             GameObject itemDisplay = Instantiate(FCSPowerStorageBuildable.ColorItemPefab);
             itemDisplay.transform.SetParent(_colorPicker.transform, false);
-            itemDisplay.GetComponentInChildren<Image>().color = color.ToColor();
+            itemDisplay.GetComponentInChildren<Image>().color = color.Vector4ToColor();
 
             var itemButton = itemDisplay.AddComponent<ColorItemButton>();
             itemButton.OnButtonClick = OnButtonClick;
             itemButton.BtnName = "ColorItem";
-            itemButton.Color = color.ToColor();
+            itemButton.Color = color.Vector4ToColor();
         }
 
         internal void Setup(FCSPowerStorageController mono)
@@ -798,8 +799,8 @@ namespace FCSPowerStorage.Mono
                 return;
             }
 
-            var colors = File.ReadAllText(Path.Combine(Information.GetAssetPath(), "colors.json"));
-            _serializedColors = JsonConvert.DeserializeObject<List<SerializableColor>>(colors);
+            //var colors = File.ReadAllText(Path.Combine(Information.GetAssetPath(), "colors.json"));
+            _serializedColors = ColorList.Colors; //JsonConvert.DeserializeObject<List<SerializableColor>>(colors);
 
             InvokeRepeating("UpdateBatteryMonitor", 1, 0.1f);
             InvokeRepeating("UpdatePowerInfo", 1, 0.1f);

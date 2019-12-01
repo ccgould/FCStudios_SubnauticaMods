@@ -7,6 +7,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using FCSTechFabricator.Helpers;
+using FCSTechFabricator.Models;
 using UnityEngine;
 
 namespace FCSTechFabricator
@@ -51,7 +52,7 @@ namespace FCSTechFabricator
             try
             {
                 // == Load Configuration == //
-                string configJson = File.ReadAllText(Information.ConfigurationFile().Trim());
+                string configJson = File.ReadAllText(Mod.ConfigurationFile().Trim());
 
                 //LoadData
                 ModConfiguration = JsonConvert.DeserializeObject<Configuration>(configJson);

@@ -1,7 +1,8 @@
 ﻿using FCSCommon.Utilities;
 using FCSPowerStorage.Buildables;
 using System;
-using Utilites.Logger;
+using System.Reflection;
+
 
 namespace FCSPowerStorage
 {
@@ -11,10 +12,13 @@ namespace FCSPowerStorage
 
         public static void Patch()
         {
-            //Clear log file
-            Logger.ClearCustomLog();
-
             QuickLogger.Info("Initializing FCS Power Storage");
+
+            var assembly = Assembly.GetExecutingAssembly();
+            QuickLogger.Info("Started patching. Version: " + QuickLogger.GetAssemblyVersion(assembly));
+
+
+
             try
             {
 #if DEBUG

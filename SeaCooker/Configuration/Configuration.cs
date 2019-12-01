@@ -1,5 +1,6 @@
 ﻿using FCSCommon.Utilities;
 using System.Collections.Generic;
+using Oculus.Newtonsoft.Json;
 
 namespace AE.SeaCooker.Configuration
 {
@@ -66,29 +67,20 @@ namespace AE.SeaCooker.Configuration
         };
     }
 
-    public class Config
+    internal class Config
     {
-        public bool PlaySFX;
-        public float AlienFecesTankCapacity { get; set; }
-        public float GasTankCapacity { get; set; }
-        public float CookTime { get; set; }
-        public float EnergyPerSec { get; set; }
-        public float UsagePerItem { get; set; }
-        public int StorageWidth { get; set; }
-        public int StorageHeight { get; set; }
+        [JsonProperty] internal bool PlaySFX { get; set; } 
+        [JsonProperty] internal float AlienFecesTankCapacity { get; set; }
+        [JsonProperty] internal float GasTankCapacity { get; set; }
+        [JsonProperty] internal float CookTime { get; set; }
+        [JsonProperty] internal float EnergyPerSec { get; set; }
+        [JsonProperty] internal float UsagePerItem { get; set; }
+        [JsonProperty] internal int StorageWidth { get; set; }
+        [JsonProperty] internal int StorageHeight { get; set; }
     }
 
-    public class ModConfiguration
+    internal class ConfigFile
     {
-        public string Id { get; set; }
-        public string DisplayName { get; set; }
-        public string Author { get; set; }
-        public string Version { get; set; }
-        public string AssemblyName { get; set; }
-        public string EntryMethod { get; set; }
-        public List<string> Dependencies { get; set; }
-        public List<string> LoadAfter { get; set; }
-        public Config Config { get; set; }
-        public bool Enable { get; set; }
+        [JsonProperty] internal Config Config { get; set; }
     }
 }

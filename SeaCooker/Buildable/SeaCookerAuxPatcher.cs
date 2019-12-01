@@ -145,5 +145,10 @@ namespace AE.SeaCooker.Buildable
         {
             return Language.main.Get(GoToHomePageKey);
         }
+
+        public static string NoPowerAvailable()
+        {
+            return Language.main.Get("NoPower");
+        }
     }
 }

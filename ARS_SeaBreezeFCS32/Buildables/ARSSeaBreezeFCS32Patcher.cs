@@ -1,6 +1,5 @@
 ﻿using ARS_SeaBreezeFCS32.Configuration;
 using ARS_SeaBreezeFCS32.Mono;
-using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Assets;
@@ -8,6 +7,8 @@ using SMLHelper.V2.Crafting;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using FCSTechFabricator.Helpers;
+using FCSTechFabricator.Mono.SeaBreeze;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 
@@ -15,7 +16,7 @@ namespace ARS_SeaBreezeFCS32.Buildables
 {
     internal partial class ARSSeaBreezeFCS32Buildable : Buildable
     {
-        private static readonly ARSSeaBreezeFCS32Buildable Singleton = new ARSSeaBreezeFCS32Buildable();
+        internal static readonly ARSSeaBreezeFCS32Buildable Singleton = new ARSSeaBreezeFCS32Buildable();
         public override TechGroup GroupForPDA { get; } = TechGroup.InteriorModules;
         public override TechCategory CategoryForPDA { get; } = TechCategory.InteriorModule;
         public override string AssetsFolder { get; } = $"FCS_ARSSeaBreeze/Assets";
@@ -32,30 +33,39 @@ namespace ARS_SeaBreezeFCS32.Buildables
                 throw new FileNotFoundException($"Failed to retrieve the {Singleton.FriendlyName} prefab from the asset bundle");
             }
 
+            PatchHelpers.AddNewKit(
+                FCSTechFabricator.Configuration.SeaBreezeKitClassID,
+                null,
+                Mod.FriendlyName,
+                FCSTechFabricator.Configuration.SeaBreezeClassID,
+                new[] { "ARS", "SB" },
+                null);
+
+            var freon = new FreonBuildable();
+            freon.Patch();
+            PatchHelpers.AddTechType(freon.TechType, freon.StepsToFabricatorTab);
+            QuickLogger.Debug($"Patched {freon.FriendlyName}");
+
             Singleton.Patch();
         }
 
         public override GameObject GetGameObject()
         {
-            GameObject prefab = null;
-
             try
             {
-                prefab = GameObject.Instantiate(_Prefab);
-
-                var meshRenderers = prefab.GetComponentsInChildren<MeshRenderer>();
+                var prefab = GameObject.Instantiate(_Prefab);
 
                 //========== Allows the building animation and material colors ==========// 
 
                 Shader shader = Shader.Find("MarmosetUBER");
-                Renderer[] renderers = prefab.GetComponentsInChildren<Renderer>();
-                foreach (Renderer renderer in renderers)
+                Renderer[] renders = prefab.GetComponentsInChildren<Renderer>();
+                foreach (Renderer renderer in renders)
                 {
                     renderer.material.shader = shader;
                 }
 
                 SkyApplier skyApplier = prefab.GetOrAddComponent<SkyApplier>();
-                skyApplier.renderers = renderers;
+                skyApplier.renderers = renders;
                 skyApplier.anchorSky = Skies.Auto;
 
                 //========== Allows the building animation and material colors ==========// 
@@ -71,19 +81,38 @@ namespace ARS_SeaBreezeFCS32.Buildables
                 constructable.model = prefab.FindChild("model");
                 constructable.techType = TechType;
 
+                //Get the Size and Center of a box ow collision around the mesh that will be used as bounds
+                var center = new Vector3(0.05496028f, 1.019654f, 0.05290359f);
+                var size = new Vector3(0.9710827f, 1.908406f, 0.4202727f);
+                
+                //Create or get the constructable bounds
+                GameObjectHelpers.AddConstructableBounds(prefab,size,center);
+                
                 prefab.GetOrAddComponent<PrefabIdentifier>().ClassId = this.ClassID;
                 prefab.GetOrAddComponent<ARSolutionsSeaBreezeAnimationManager>();
                 prefab.GetOrAddComponent<ARSolutionsSeaBreezeController>();
-
+                
+                return prefab;
             }
             catch (Exception e)
             {
                 QuickLogger.Error(e.Message);
+                return null;
             }
-
-            return prefab;
         }
 
+        private void GetBounding(GameObject prefab)
+        {
+
+            Gizmos.color = Color.magenta;
+            foreach (var mf in prefab.GetComponentsInChildren<MeshFilter>())
+            {
+                Gizmos.matrix = mf.transform.localToWorldMatrix;
+                Mesh m = mf.sharedMesh;
+                Gizmos.DrawWireCube(m.bounds.center, m.bounds.size);
+            }
+        }
+        
         protected override TechData GetBlueprintRecipe()
         {
             QuickLogger.Debug($"Creating recipe...");

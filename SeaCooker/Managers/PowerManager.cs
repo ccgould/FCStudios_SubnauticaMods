@@ -1,7 +1,7 @@
 ﻿using AE.SeaCooker.Mono;
 using FCSCommon.Utilities;
-using FCSCommon.Utilities.Enums;
 using System;
+using FCSCommon.Enums;
 using UnityEngine;
 
 namespace AE.SeaCooker.Managers
@@ -68,7 +68,7 @@ namespace AE.SeaCooker.Managers
 
         internal void ConsumePower()
         {
-            if (PowerState == FCSPowerStates.Unpowered) return;
+            if (PowerState == FCSPowerStates.Unpowered || !_mono.FoodManager.IsCooking()) return;
 
             _energyToConsume = EnergyConsumptionPerSecond * DayNightCycle.main.deltaTime;
             bool requiresEnergy = GameModeUtils.RequiresPower();

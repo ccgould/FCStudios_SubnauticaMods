@@ -7,6 +7,7 @@ using Oculus.Newtonsoft.Json;
 using SMLHelper.V2.Crafting;
 using System.Collections.Generic;
 using System.IO;
+using FCSTechFabricator.Helpers;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 
@@ -37,6 +38,61 @@ namespace FCS_DeepDriller.Buildable
             {
                 throw new FileNotFoundException($"Failed to retrieve the {Singleton.FriendlyName} prefab from the asset bundle");
             }
+
+            PatchHelpers.AddNewKit(
+                FCSTechFabricator.Configuration.DeepDrillerKitClassID,
+                null,
+                Mod.ModFriendlyName,
+                FCSTechFabricator.Configuration.DeepDrillerClassID,
+                new[] { "AIS", "DD" },
+                null);
+
+            PatchHelpers.AddNewKit(
+                FCSTechFabricator.Configuration.SolarAttachmentKitClassID,
+                "This specially made attachment allows you to run your deep driller off solar power.",
+                "Deep Driller Solar Attachment",
+                FCSTechFabricator.Configuration.DeepDrillerClassID,
+                new[] { "AIS", "DD" },
+                "SolarAttachment_DD.png");
+            
+            PatchHelpers.AddNewKit(
+                FCSTechFabricator.Configuration.FocusAttachmentKitClassID,
+                "This specially made attachment allows you to scan for one specific ore.",
+                "Deep Driller Focus Attachment",
+                FCSTechFabricator.Configuration.DeepDrillerClassID,
+                new[] { "AIS", "DD" },
+                "FocusAttachment_DD.png");
+            
+            PatchHelpers.AddNewKit(
+                FCSTechFabricator.Configuration.BatteryAttachmentKitClassID,
+                "This specially made attachment allows you to run your deep driller off powercell power",
+                "Deep Driller Powercell Attachment",
+                FCSTechFabricator.Configuration.DeepDrillerClassID,
+                new[] { "AIS", "DD" },
+                "BatteryAttachment_DD.png");
+
+            PatchHelpers.AddNewModule(
+                FCSTechFabricator.Configuration.DrillerMK1ModuleClassID,
+                "This upgrade allows deep driller to drill 15 resources per day.",
+                "Deep Driller MK 1",
+                FCSTechFabricator.Configuration.DeepDrillerClassID,
+                new[] { "AIS", "DD" });
+            
+            PatchHelpers.AddNewModule(
+                FCSTechFabricator.Configuration.DrillerMK2ModuleClassID,
+                "This upgrade allows deep driller to drill 22 resources per day.",
+                "Deep Driller MK 2",
+                FCSTechFabricator.Configuration.DeepDrillerClassID,
+                new[] { "AIS", "DD" });
+
+            PatchHelpers.AddNewModule(
+                FCSTechFabricator.Configuration.DrillerMK3ModuleClassID,
+                "This upgrade allows deep driller to drill 30 resources per day.",
+                "Deep Driller MK 3",
+                FCSTechFabricator.Configuration.DeepDrillerClassID,
+                new[] { "AIS", "DD" });
+
+            //TODO Add Updates
 
             Singleton.Patch();
 
@@ -89,6 +145,12 @@ namespace FCS_DeepDriller.Buildable
                 lwe.cellLevel = LargeWorldEntity.CellLevel.Global;
 
                 //var beacon = prefab.AddComponent<Beacon>();
+
+
+                var center = new Vector3(0, 2.433337f, 0);
+                var size = new Vector3(4.821606f, 4.582462f, 4.941598f);
+
+                GameObjectHelpers.AddConstructableBounds(prefab, size,center);
 
                 //beacon.label = "DeepDriller";
                 //prefab.AddComponent<LiveMixin>();

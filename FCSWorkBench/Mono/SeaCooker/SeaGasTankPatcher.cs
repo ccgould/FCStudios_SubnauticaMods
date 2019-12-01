@@ -1,5 +1,6 @@
 ﻿using FCSCommon.Extensions;
 using FCSTechFabricator.Helpers;
+using FCSTechFabricator.Models;
 using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
@@ -8,15 +9,15 @@ using UnityEngine;
 
 namespace FCSTechFabricator.Mono.SeaCooker
 {
-    internal  class SeaGasTankCraftable : TechFabCraftable
+    public  class SeaGasTankCraftable : TechFabCraftable
     {
         public override TechType TechTypeID { get; set; }
 
         public override string[] StepsToFabricatorTab { get; } = new[] { "AE", "SC" };
 
-        public override string AssetsFolder { get; } = "FCSTechFabricator/Assets";
+        public override string AssetsFolder { get; } = $"{Mod.ModFolderName}/Assets";
 
-        public SeaGasTankCraftable() : base("SeaGasTank_SC", "Sea Gas Tank", "This tank allows you too cook food in the Sea Cooker using Gaspod gas.",false,EquipmentType.Tank)
+        public SeaGasTankCraftable() : base("SeaGasTank_SC", "Sea Gas Tank", "This tank allows you too cook food in the Sea Cooker using Gaspod gas.",true,EquipmentType.Tank)
         {
             
         }

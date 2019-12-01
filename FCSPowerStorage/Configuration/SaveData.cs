@@ -1,8 +1,8 @@
 ﻿using FCSCommon.Objects;
-using FCSCommon.Utilities.Enums;
 using FCSPowerStorage.Models;
 using System;
 using System.Collections.Generic;
+using FCSCommon.Enums;
 
 namespace FCSPowerStorage.Configuration
 {

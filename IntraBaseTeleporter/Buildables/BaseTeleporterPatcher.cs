@@ -7,6 +7,7 @@ using AE.IntraBaseTeleporter.Mono;
 using FCSCommon.Controllers;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
+using FCSTechFabricator.Helpers;
 using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
 using UnityEngine;
@@ -16,7 +17,7 @@ namespace AE.IntraBaseTeleporter.Buildables
     internal partial class BaseTeleporterBuildable : Buildable
     {
         private static readonly BaseTeleporterBuildable Singleton = new BaseTeleporterBuildable();
-        
+        private readonly GameObject CubePrefab = CraftData.GetPrefabForTechType(TechType.PrecursorIonCrystal);
         public BaseTeleporterBuildable() : base(Mod.ClassID, Mod.FriendlyName, Mod.Description)
         {
             OnFinishedPatching += AdditionalPatching;
@@ -24,11 +25,9 @@ namespace AE.IntraBaseTeleporter.Buildables
 
         public override GameObject GetGameObject()
         {
-            GameObject prefab = null;
-
+            GameObject prefab;
             try
             {
-
                 prefab = UnityEngine.Object.Instantiate(_prefab);
                 
                 prefab.name = this.PrefabFileName;
@@ -45,6 +44,11 @@ namespace AE.IntraBaseTeleporter.Buildables
 
                     QuickLogger.Debug("Adding Constructible");
 
+                    var center = new Vector3(0f, 1.205158f, -0.2082438f);
+                    var size = new Vector3(2.100852f, 2.276049f, 2.51642f);
+
+                    GameObjectHelpers.AddConstructableBounds(prefab, size,center);
+                    
                     // Add constructible
                     var constructable = prefab.AddComponent<Constructable>();
                     constructable.allowedOnWall = false;
@@ -60,18 +64,22 @@ namespace AE.IntraBaseTeleporter.Buildables
                     PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
                     prefabID.ClassId = ClassID;
 
+                    CreateDisplayedIonCube(prefab);
+
                     prefab.AddComponent<AnimationManager>();
                     prefab.AddComponent<TeleportManager>();
                     prefab.AddComponent<BTDisplayManager>();
                     prefab.AddComponent<FMOD_CustomLoopingEmitter>();
                     prefab.AddComponent<BaseTeleporterController>();
+
+
                 }
             }
             catch (Exception e)
             {
                 QuickLogger.Error(e.Message);
+                return null;
             }
-
             return prefab;
         }
 
@@ -105,8 +113,41 @@ namespace AE.IntraBaseTeleporter.Buildables
 
             Register();
 
+            PatchHelpers.AddNewKit(
+                FCSTechFabricator.Configuration.IntraBaseTeleporterKitClassID,
+                null,
+                Mod.FriendlyName,
+                FCSTechFabricator.Configuration.IntraBaseTeleporterClassID,
+                new[] { "ASTS", "ES" },
+                null);
+
             Singleton.Patch();
         }
+
+        private void CreateDisplayedIonCube(GameObject prefab)
+        {
+            GameObject ionSlot = prefab.FindChild("model")
+                .FindChild("ion_cube_placeholder")?.gameObject;
+
+            if (ionSlot != null)
+            {
+                QuickLogger.Debug("Ion Cube Display Object Created", true);
+                var displayedIonCube = GameObject.Instantiate<GameObject>(CubePrefab);
+                Pickupable pickupable = displayedIonCube.GetComponent<Pickupable>();
+                pickupable.isPickupable = false;
+                pickupable.destroyOnDeath = true;
+
+                displayedIonCube.transform.SetParent(ionSlot.transform);
+                displayedIonCube.transform.localPosition = new Vector3(0f, 0.0f, 0f);
+                displayedIonCube.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+                //displayedIonCube.transform.Rotate(new Vector3(0, 0, 90));
+            }
+            else
+            {
+                QuickLogger.Error("Cannot Find IonCube in the prefab");
+            }
+        }
+
 
         private static void Register()
         {

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using AMMiniMedBay.Configuration;
 using FCSCommon.Helpers;
+using FCSTechFabricator.Helpers;
 using SMLHelper.V2.Utility;
 
 namespace AMMiniMedBay.Buildable
@@ -32,6 +33,14 @@ namespace AMMiniMedBay.Buildable
             {
                 throw new FileNotFoundException($"Failed to retrieve the {Singleton.FriendlyName} prefab from the asset bundle");
             }
+
+            PatchHelpers.AddNewKit(
+                FCSTechFabricator.Configuration.AMMiniMedBayKitClassID,
+                null,
+                Mod.ModFriendlyName,
+                FCSTechFabricator.Configuration.MiniMedBayClassID,
+                new[] { "AMS", "MMB" },
+                null);
 
             Singleton.Patch();
         }
@@ -66,6 +75,11 @@ namespace AMMiniMedBay.Buildable
                 constructable.model = prefab.FindChild("model");
                 constructable.techType = TechType;
                 constructable.rotationEnabled = true;
+                
+                var center = new Vector3(0.04392624f, 1.421124f, 0f);
+                var size = new Vector3(2.401972f, 2.700523f, 2.280661f);
+
+                GameObjectHelpers.AddConstructableBounds(prefab, size, center);
 
                 prefab.GetOrAddComponent<PrefabIdentifier>().ClassId = this.ClassID;
                 prefab.AddComponent<FMOD_CustomLoopingEmitter>();

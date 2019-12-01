@@ -1,9 +1,9 @@
 ﻿using AE.SeaCooker.Extenstion;
 using AE.SeaCooker.Helpers;
-using FCSCommon.Extensions;
 using Harmony;
 using System.Collections.Generic;
 using System.Reflection;
+using SMLHelper.V2.Utility;
 
 namespace AE.SeaCooker.Patchers
 {

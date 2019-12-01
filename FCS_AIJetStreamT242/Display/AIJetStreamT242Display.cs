@@ -69,6 +69,7 @@ namespace FCS_AIMarineTurbine.Display
 
         private void Update()
         {
+            if (_mono == null || !_mono.IsInitialized || !_mono.IsConnectedToBase) return;
             UpdateValues();
         }
 

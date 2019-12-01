@@ -46,7 +46,7 @@ namespace AE.MiniFountainFilter.Managers
 
                 case "waterContainerBTN":
 
-                    if (!QPatch.Configuration.Config.AutoGenerateMode)
+                    if (!QPatch.Configuration.AutoGenerateMode)
                     {
                         _mono.StorageManager.GivePlayerBottle();
                     }
@@ -131,7 +131,7 @@ namespace AE.MiniFountainFilter.Managers
 
             var fuelTankResult = InterfaceHelpers.CreateButton(home, "Button_2", "waterContainerBTN", InterfaceButtonMode.Background,
                 _startColor, _hoverColor, OnButtonClick, out var fuelTankButton);
-            fuelTankButton.TextLineOne = !QPatch.Configuration.Config.AutoGenerateMode ? "Take Water Bottle" : "Open Water Container";
+            fuelTankButton.TextLineOne = !QPatch.Configuration.AutoGenerateMode ? "Take Water Bottle" : "Open Water Container";
             fuelTankButton.OnInterfaceButton = SetOnInterfaceButton;
 
             if (!fuelTankResult)
@@ -209,7 +209,7 @@ namespace AE.MiniFountainFilter.Managers
             }
             _button2Progress = button2Progress.GetComponent<Image>();
 
-            if (!QPatch.Configuration.Config.AutoGenerateMode)
+            if (!QPatch.Configuration.AutoGenerateMode)
             {
                 _button2Progress.fillAmount = 1;
             }
@@ -221,7 +221,7 @@ namespace AE.MiniFountainFilter.Managers
                 return false;
             }
             _button2ProgressNumber = button2ProgressNumber.GetComponent<Text>();
-            _button2ProgressNumber.text = QPatch.Configuration.Config.AutoGenerateMode ? $"0 {MiniFountainFilterBuildable.Bottles()}" : string.Empty;
+            _button2ProgressNumber.text = QPatch.Configuration.AutoGenerateMode ? $"0 {MiniFountainFilterBuildable.Bottles()}" : string.Empty;
 
             //var versionResult = InterfaceHelpers.FindGameObject(canvasGameObject, "Version", out var version);
 
@@ -308,7 +308,7 @@ namespace AE.MiniFountainFilter.Managers
 
         private void UpdateBottleStatus()
         {
-            if (!QPatch.Configuration.Config.AutoGenerateMode) return;
+            if (!QPatch.Configuration.AutoGenerateMode) return;
             _button2Progress.fillAmount = _mono.StorageManager.ContainerPercentage();
             _button2ProgressNumber.text = $"{_mono.StorageManager.NumberOfBottles} {MiniFountainFilterBuildable.Bottles()}";
         }

@@ -1,6 +1,8 @@
 ﻿using ExStorageDepot.Configuration;
 using ExStorageDepot.Mono;
 using FCSCommon.Helpers;
+using FCSTechFabricator.Helpers;
+using SMLHelper.V2.Utility;
 
 namespace ExStorageDepot.Buildable
 {
@@ -22,9 +24,9 @@ namespace ExStorageDepot.Buildable
 
         public override TechType RequiredForUnlock { get; } = TechType.PowerCell;
 
-        public override string AssetsFolder { get; } = $"ExStorageDepot/Assets";
+        public override string AssetsFolder { get; } = $"{Mod.ModFolderName}/Assets";
 
-        public ExStorageDepotBuildable() : base(Mod.ModName, Mod.ModFriendly, Mod.ModDesc)
+        public ExStorageDepotBuildable() : base(Mod.ClassID, Mod.ModFriendly, Mod.ModDesc)
         {
             OnFinishedPatching += AdditionalPatching;
         }
@@ -35,6 +37,14 @@ namespace ExStorageDepot.Buildable
             {
                 throw new FileNotFoundException($"Failed to retrieve the {Singleton.FriendlyName} prefab from the asset bundle");
             }
+
+            PatchHelpers.AddNewKit(
+                FCSTechFabricator.Configuration.ExStorageKitClassID,
+                null,
+                Mod.ModFriendly,
+                FCSTechFabricator.Configuration.ExStorageClassID,
+                new[] { "ASTS", "ES" },
+                null);
 
             Singleton.Patch();
         }
@@ -80,6 +90,11 @@ namespace ExStorageDepot.Buildable
                 //var beacon = prefab.AddComponent<Beacon>();
 
                 //beacon.label = "DeepDriller";
+
+                var center = new Vector3(0f, 1.579518f,0f);
+                var size = new Vector3(2.669801f, 2.776958f, 2.464836f);
+
+                GameObjectHelpers.AddConstructableBounds(prefab, size,center);
 
                 prefab.AddComponent<PrefabIdentifier>().ClassId = this.ClassID;
                 prefab.AddComponent<FMOD_CustomLoopingEmitter>();
@@ -138,7 +153,7 @@ namespace ExStorageDepot.Buildable
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(TechTypeHelpers.GetTechType("ExStorageKit_ASTS"), 1)
+                    new Ingredient(TechTypeHelpers.GetTechType(FCSTechFabricator.Configuration.ExStorageKitClassID), 1)
                 }
             };
 

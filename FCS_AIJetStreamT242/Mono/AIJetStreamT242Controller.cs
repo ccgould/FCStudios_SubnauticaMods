@@ -122,6 +122,7 @@ namespace FCS_AIMarineTurbine.Mono
         
         private void Update()
         {
+            if(!IsConnectedToBase) return;
             UpdatePowerSafeState();
         }
         
@@ -393,19 +394,19 @@ namespace FCS_AIMarineTurbine.Mono
 
                 if (isActiveAndEnabled)
                 {
-                    if (!IsInitialized)
-                    {
-                        Initialize();
-                    }
-
-                    if (_display != null)
-                    {
-                        _display.Setup(this);
-                        _runStartUpOnEnable = false;
-                    }
-
                     if (_seaBase != null)
                     {
+                        if (!IsInitialized)
+                        {
+                            Initialize();
+                        }
+
+                        if (_display != null)
+                        {
+                            _display.Setup(this);
+                            _runStartUpOnEnable = false;
+                        }
+
                         _currentBiome = BiomeManager.GetBiome();
                         RotateToMag();
                         SetCurrentRotation();
@@ -479,6 +480,7 @@ namespace FCS_AIMarineTurbine.Mono
         }
 
         public int ScreenState { get; set; }
+        public bool IsConnectedToBase => _seaBase != null;
 
         #endregion
 

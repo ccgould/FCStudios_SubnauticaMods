@@ -5,6 +5,7 @@ using FCSCommon.Utilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using FCSTechFabricator.Helpers;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 
@@ -25,6 +26,14 @@ namespace FCS_AIMarineTurbine.Buildable
             {
                 throw new FileNotFoundException($"Failed to retrieve the {Singleton.FriendlyName} prefab from the asset bundle");
             }
+
+            PatchHelpers.AddNewKit(
+                FCSTechFabricator.Configuration.MarineMonitorKitClassID,
+                null,
+                "AI Marine Monitor",
+                FCSTechFabricator.Configuration.AIMarineMonitorClassID,
+                new[] { "AIS", "MT" },
+                null);
 
             Singleton.Patch();
         }
@@ -80,6 +89,10 @@ namespace FCS_AIMarineTurbine.Buildable
                 constructable.model = prefab.FindChild("model");
                 constructable.rotationEnabled = false;
                 constructable.techType = TechType;
+
+                var center = new Vector3(0.06065065f, 0.02289772f, 0.06869301f);
+                var size = new Vector3(2.071494f, 1.235519f, 0.1364295f);
+                GameObjectHelpers.AddConstructableBounds(prefab, size, center);
 
                 prefab.GetOrAddComponent<AIMarineMonitorController>();
 

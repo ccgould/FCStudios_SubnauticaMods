@@ -69,7 +69,7 @@ namespace FCSAlterraShipping.Models
                 QuickLogger.Debug("Initializing Container");
                 _container = new ItemsContainer(ContainerWidth, ContainerHeight, _containerRoot.transform,
                     AlterraShippingBuildable.StorageLabel(), null);
-
+                _container.Resize(ContainerWidth,ContainerHeight);
                 _container.isAllowedToAdd += IsAllowedToAdd;
                 _container.isAllowedToRemove += IsAllowedToRemove;
 

@@ -25,7 +25,7 @@ namespace ARS_SeaBreezeFCS32.Configuration
         #region Internal Methods
         internal static string ConfigurationFile()
         {
-            return Path.Combine(MODFOLDERLOCATION, "mod.json");
+            return Path.Combine(MODFOLDERLOCATION, "config.json");
         }
 
         internal static string GetNewSeabreezeName()

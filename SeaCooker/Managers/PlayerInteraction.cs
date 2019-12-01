@@ -1,5 +1,6 @@
 ﻿using AE.SeaCooker.Buildable;
 using AE.SeaCooker.Mono;
+using FCSCommon.Enums;
 using FCSCommon.Utilities;
 
 namespace AE.SeaCooker.Managers
@@ -12,9 +13,17 @@ namespace AE.SeaCooker.Managers
         {
             if (_mono == null) return;
 
-            HandReticle main = HandReticle.main;
-            main.SetIcon(HandReticle.IconType.Interact);
-            main.SetInteractText(SeaCookerBuildable.OnHover(), false, HandReticle.Hand.Left);
+            var state = _mono.PowerManager.GetPowerState();
+
+            QuickLogger.Debug($"PowerState: {state}");
+
+            if (state == FCSPowerStates.Unpowered)
+            {
+                HandReticle main = HandReticle.main;
+                main.SetIcon(HandReticle.IconType.Default);
+                main.SetInteractText(SeaCookerBuildable.NoPowerAvailable());
+            }
+
         }
 
         public void OnHandClick(GUIHand hand)

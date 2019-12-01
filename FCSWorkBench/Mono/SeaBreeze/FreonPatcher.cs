@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace FCSTechFabricator.Mono.SeaBreeze
 {
-    internal class FreonBuildable : TechFabCraftable
+    public class FreonBuildable : TechFabCraftable
     {
         public override TechGroup GroupForPDA { get; } = TechGroup.Resources;
         public override TechCategory CategoryForPDA { get; } = TechCategory.AdvancedMaterials;

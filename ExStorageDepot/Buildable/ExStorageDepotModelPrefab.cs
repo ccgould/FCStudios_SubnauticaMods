@@ -15,7 +15,7 @@ namespace ExStorageDepot.Buildable
         private bool GetPrefabs()
         {
             QuickLogger.Debug("GetPrefabs");
-            AssetBundle assetBundle = AssetHelper.Asset(Mod.ModName, Mod.BundleName);
+            AssetBundle assetBundle = AssetHelper.Asset(Mod.ModFolderName, Mod.BundleName);
 
             //If the result is null return false.
             if (assetBundle == null)
@@ -29,7 +29,7 @@ namespace ExStorageDepot.Buildable
             QuickLogger.Debug($"AssetBundle Set");
 
             //We have found the asset bundle and now we are going to continue by looking for the model.
-            GameObject prefab = assetBundle.LoadAsset<GameObject>("Ex-StorageDepotUnit");
+            GameObject prefab = assetBundle.LoadAsset<GameObject>(Mod.GameObjectName);
 
             //If the prefab isn't null lets add the shader to the materials
             if (prefab != null)

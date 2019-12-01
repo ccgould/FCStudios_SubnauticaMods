@@ -6,6 +6,8 @@ using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
 using System.Collections.Generic;
 using System.IO;
+using FCSTechFabricator.Helpers;
+using FCSTechFabricator.Mono.SeaCooker;
 using UnityEngine;
 
 namespace AE.SeaCooker.Buildable
@@ -30,6 +32,11 @@ namespace AE.SeaCooker.Buildable
             {
 
                 prefab = GameObject.Instantiate(_prefab);
+
+                var size = new Vector3(1.217227f, 1.23226f, 0.5353913f);
+                var center = new Vector3(0f, 0.1884735f, 0.2995481f);
+
+                GameObjectHelpers.AddConstructableBounds(prefab, size, center);
 
                 prefab.name = this.PrefabFileName;
             }
@@ -69,6 +76,24 @@ namespace AE.SeaCooker.Buildable
 
             Register();
 
+            PatchHelpers.AddNewKit(
+                FCSTechFabricator.Configuration.SeaCookerBuildableKitClassID,
+                null,
+                Mod.FriendlyName,
+                FCSTechFabricator.Configuration.SeaCookerClassID,
+                new[] { "AE", "SC" },
+                null);
+
+            var scGtank = new SeaGasTankCraftable();
+            scGtank.Patch();
+            PatchHelpers.AddTechType(scGtank.TechType, scGtank.StepsToFabricatorTab);
+            QuickLogger.Debug($"Patched {scGtank.FriendlyName}");
+
+            var scAGtank = new SeaAlienGasTankCraftable();
+            scAGtank.Patch();
+            PatchHelpers.AddTechType(scAGtank.TechType, scAGtank.StepsToFabricatorTab);
+            QuickLogger.Debug($"Patched {scAGtank.FriendlyName}");
+
             Singleton.Patch();
         }
 
@@ -85,14 +110,7 @@ namespace AE.SeaCooker.Buildable
                 SkyApplier skyApplier = _prefab.AddComponent<SkyApplier>();
                 skyApplier.renderers = model.GetComponentsInChildren<MeshRenderer>();
                 skyApplier.anchorSky = Skies.Auto;
-
-                //Shader shader = Shader.Find("MarmosetUBER");
-                //Renderer[] renderers = _prefab.GetComponentsInChildren<Renderer>();
-                //foreach (Renderer renderer in renderers)
-                //{
-                //    renderer.material.shader = shader;
-                //}
-
+                
                 //========== Allows the building animation and material colors ==========// 
 
                 QuickLogger.Debug("Adding Constructible");
@@ -114,7 +132,7 @@ namespace AE.SeaCooker.Buildable
 
                 _prefab.AddComponent<AnimationManager>();
                 _prefab.AddComponent<TechTag>().type = Singleton.TechType;
-                //_prefab.AddComponent<PlayerInteraction>();
+                _prefab.AddComponent<PlayerInteraction>();
                 _prefab.AddComponent<FMOD_CustomLoopingEmitter>();
                 _prefab.AddComponent<SeaCookerController>();
             }

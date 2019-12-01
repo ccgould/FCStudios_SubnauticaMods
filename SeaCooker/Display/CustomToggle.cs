@@ -30,26 +30,29 @@ namespace AE.SeaCooker.Display
 
         #endregion
 
-        private void Awake()
-        {
-            FindToggle();
-        }
-
         private void FindToggle()
         {
-            var background = gameObject.FindChild("Background");
-
-            if (background == null)
+            try
             {
-                QuickLogger.Error("CustomToggle couldn't find Background");
-                return;
+                var background = gameObject?.FindChild("Background");
+
+                if (background == null)
+                {
+                    QuickLogger.Error("CustomToggle couldn't find Background");
+                    return;
+                }
+
+                if(_checkMark == null)
+                    _checkMark = background.FindChild("Checkmark")?.gameObject;
+
+                if (_checkMark == null)
+                {
+                    QuickLogger.Error("CustomToggle couldn't find Checkmark");
+                }
             }
-
-            _checkMark = background.FindChild("Checkmark")?.gameObject;
-
-            if (_checkMark == null)
+            catch (Exception e)
             {
-                QuickLogger.Error("CustomToggle couldn't find Checkmark");
+                QuickLogger.Error<CustomToggle>(e.Message);
             }
         }
 
@@ -57,6 +60,8 @@ namespace AE.SeaCooker.Display
 
         public void OnEnable()
         {
+            FindToggle();
+
             if (string.IsNullOrEmpty(BtnName)) return;
 
             Disabled = false;
@@ -188,7 +193,7 @@ namespace AE.SeaCooker.Display
                 FindToggle();
             }
             _checkMark?.SetActive(isChecked);
-            QuickLogger.Debug($"SeaCooker Check Box Set To: {_checkMark.activeSelf}", true);
+            QuickLogger.Debug($"SeaCooker Check Box Set To: {_checkMark?.activeSelf}", true);
         }
 
         private IEnumerator AttemptToSetToggle(bool isChecked)

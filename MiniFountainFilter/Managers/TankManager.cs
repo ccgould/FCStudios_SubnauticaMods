@@ -20,7 +20,7 @@ namespace AE.MiniFountainFilter.Managers
             }
         }
 
-        private readonly float _tankCapacity = QPatch.Configuration.Config.TankCapacity;
+        private readonly float _tankCapacity = QPatch.Configuration.TankCapacity;
         private MiniFountainFilterController _mono;
         public Action OnTankUpdate { get; set; }
 
@@ -102,7 +102,7 @@ namespace AE.MiniFountainFilter.Managers
         {
             if (_mono.PowerManager.GetPowerState() == FCSPowerStates.Powered)
             {
-                AddWater(QPatch.Configuration.Config.WaterPerSecond);
+                AddWater(QPatch.Configuration.WaterPerSecond);
             }
         }
 

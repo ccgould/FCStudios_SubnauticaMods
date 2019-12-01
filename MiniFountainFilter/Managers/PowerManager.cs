@@ -8,13 +8,13 @@ namespace AE.MiniFountainFilter.Managers
 {
     internal class PowerManager
     {
+        #region Private Members
         private FCSPowerStates _powerState;
         private MiniFountainFilterController _mono;
         private SubRoot _habitat;
-        private PowerRelay _connectedRelay = null;
-        private float EnergyConsumptionPerSecond { get; set; } = QPatch.Configuration.Config.EnergyPerSec; //0.425
+        private PowerRelay _connectedRelay;
+        private float EnergyConsumptionPerSecond { get; } = QPatch.Configuration.EnergyPerSec; //0.425
         private float AvailablePower => this.ConnectedRelay.GetPower();
-
         private PowerRelay ConnectedRelay
         {
             get
@@ -31,15 +31,18 @@ namespace AE.MiniFountainFilter.Managers
             set
             {
                 _powerState = value;
-                //QuickLogger.Debug($"Current PowerState: {value}");
                 OnPowerUpdate?.Invoke(value);
             }
         }
-
-        internal Action<FCSPowerStates> OnPowerUpdate;
         private bool _hasPowerToConsume;
         private float _energyToConsume;
+        #endregion
 
+        #region Internal Properties
+        internal Action<FCSPowerStates> OnPowerUpdate;
+        #endregion
+        
+        #region Internal Methods
         internal void Initialize(MiniFountainFilterController mono)
         {
             _mono = mono;
@@ -53,14 +56,19 @@ namespace AE.MiniFountainFilter.Managers
 
         internal void UpdatePowerState()
         {
-
-            if (_habitat.powerRelay.GetPowerStatus() == PowerSystem.Status.Offline || !_hasPowerToConsume && GetPowerState() != FCSPowerStates.Unpowered)
+            if (_habitat.powerRelay.GetPowerStatus() == PowerSystem.Status.Offline)
             {
                 SetPowerStates(FCSPowerStates.Unpowered);
                 return;
             }
 
-            if (_habitat.powerRelay.GetPowerStatus() != PowerSystem.Status.Offline || _hasPowerToConsume && GetPowerState() != FCSPowerStates.Powered)
+            if (!_hasPowerToConsume && GetPowerState() != FCSPowerStates.Unpowered)
+            {
+                SetPowerStates(FCSPowerStates.Unpowered);
+                return;
+            }
+
+            if (_hasPowerToConsume && GetPowerState() != FCSPowerStates.Powered)
             {
                 SetPowerStates(FCSPowerStates.Powered);
             }
@@ -68,11 +76,11 @@ namespace AE.MiniFountainFilter.Managers
 
         internal void ConsumePower()
         {
-            if (PowerState == FCSPowerStates.Unpowered || _mono.TankManager.IsFull()) return;
-
             _energyToConsume = EnergyConsumptionPerSecond * DayNightCycle.main.deltaTime;
             bool requiresEnergy = GameModeUtils.RequiresPower();
             _hasPowerToConsume = !requiresEnergy || AvailablePower >= _energyToConsume;
+
+            if (PowerState == FCSPowerStates.Unpowered || _mono.TankManager.IsFull()) return;
 
             if (!requiresEnergy) return;
             ConnectedRelay.ConsumeEnergy(_energyToConsume, out float amountConsumed);
@@ -110,6 +118,9 @@ namespace AE.MiniFountainFilter.Managers
         {
             return _connectedRelay;
         }
+        #endregion
+
+        #region Private Methods
         private void UpdatePowerRelay()
         {
             PowerRelay relay = PowerSource.FindRelay(_mono.transform);
@@ -123,6 +134,7 @@ namespace AE.MiniFountainFilter.Managers
             {
                 _connectedRelay = null;
             }
-        }
+        } 
+        #endregion
     }
 }

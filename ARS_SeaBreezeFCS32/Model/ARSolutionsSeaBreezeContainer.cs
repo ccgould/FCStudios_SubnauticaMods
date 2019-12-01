@@ -18,7 +18,7 @@ namespace ARS_SeaBreezeFCS32.Model
         private const int ContainerHeight = 8;
         private readonly ChildObjectIdentifier _containerRoot = null;
         public Action<int, int> OnContainerUpdate { get; set; }
-        public bool IsFull => NumberOfItems >= QPatch.Configuration.Config.StorageLimit;
+        public bool IsFull => NumberOfItems >= QPatch.Configuration.StorageLimit;
 
         public int NumberOfItems => FridgeItems.Count;
         public void AttemptToTakeItem(TechType techType)
@@ -72,7 +72,7 @@ namespace ARS_SeaBreezeFCS32.Model
                 _mono.SetDeconstructionAllowed(false);
                 _mono.Display.ItemModified(TechType.None);
             }
-            OnContainerUpdate?.Invoke(NumberOfItems, QPatch.Configuration.Config.StorageLimit);
+            OnContainerUpdate?.Invoke(NumberOfItems, QPatch.Configuration.StorageLimit);
 
             QuickLogger.Debug($"Fridge Item Count: {FridgeItems.Count}", true);
         }
@@ -115,7 +115,7 @@ namespace ARS_SeaBreezeFCS32.Model
                     _mono.Display.ItemModified(TechType.None);
                 }
 
-                OnContainerUpdate?.Invoke(NumberOfItems, QPatch.Configuration.Config.StorageLimit);
+                OnContainerUpdate?.Invoke(NumberOfItems, QPatch.Configuration.StorageLimit);
             }
         }
 
@@ -234,7 +234,7 @@ namespace ARS_SeaBreezeFCS32.Model
 
         internal bool HasRoomFor(int amount)
         {
-            return NumberOfItems + amount <= QPatch.Configuration.Config.StorageLimit;
+            return NumberOfItems + amount <= QPatch.Configuration.StorageLimit;
         }
     }
 }

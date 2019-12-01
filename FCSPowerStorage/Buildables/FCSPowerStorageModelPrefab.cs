@@ -14,7 +14,7 @@ namespace FCSPowerStorage.Buildables
         public bool GetPrefabs()
         {
             QuickLogger.Debug("GetPrefabs");
-            AssetBundle assetBundle = AssetHelper.Asset($"{Information.ModName}", "fcspowerstorage-mod");
+            AssetBundle assetBundle = AssetHelper.Asset($"{Information.ModFolderName}", "fcspowerstorage-mod");
 
             //If the result is null return false.
             if (assetBundle == null)

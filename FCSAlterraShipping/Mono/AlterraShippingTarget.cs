@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace FCSAlterraShipping.Mono
 {
-    internal class AlterraShippingTarget : MonoBehaviour, IContainer, IConstructable, IProtoTreeEventListener
+    internal class AlterraShippingTarget : MonoBehaviour, IContainer, IConstructable, IProtoEventListener
     {
         #region Private Members
         private Constructable _buildable = null;
@@ -37,8 +37,11 @@ namespace FCSAlterraShipping.Mono
         private PrefabIdentifier _prefabID;
         private bool _pdaState;
         private Color _currentBodyColor = Color.white;
+        private bool _fromSave;
+        private bool _runStartUpOnEnable;
         public ShippingContainerStates ContainerMode { get; set; }
-
+        public Action OnPDAClose { get; set; }
+        public AlterraShippingDisplay DisplayManager { get; private set; }
         public bool IsFull(TechType techType)
         {
             return _container.IsFull(techType);
@@ -57,22 +60,82 @@ namespace FCSAlterraShipping.Mono
 
         //TODO clean and organize code fix awake and turn public into internal.
 
-        private void Awake()
+        private void OnEnable()
+        {
+            if (!_runStartUpOnEnable) return;
+            
+            if (!IsInitialized)
+            {
+                Initialize();
+                AddToManager();
+            }
+
+            if (_fromSave)
+            {
+                QuickLogger.Info($"In De serialized");
+
+                if (File.Exists(SaveFile))
+                {
+                    string savedDataJson = File.ReadAllText(SaveFile).Trim();
+
+                    //LoadData
+                    var savedData = JsonConvert.DeserializeObject<SaveData>(savedDataJson);
+
+                    foreach (KeyValuePair<TechType, int> containerItem in savedData.ContainerItems)
+                    {
+                        for (int i = 0; i < containerItem.Value; i++)
+                        {
+                            GameObject prefab = CraftData.GetPrefabForTechType(containerItem.Key);
+
+                            var gameObject = GameObject.Instantiate<GameObject>(prefab);
+
+                            Pickupable pickupable = gameObject.GetComponent<Pickupable>().Pickup(false);
+
+                            var item = new InventoryItem(pickupable);
+
+                            _container.AddItem(item);
+                        }
+                    }
+
+                    Name = savedData.ContainerName;
+                    ContainerMode = savedData.ContainertMode;
+                    _hasBreakerTripped = savedData.HasBreakerTripped;
+                    _transferHandler.SetMono(this);
+                    _transferHandler.SetCurrentTime(savedData.TimeLeft);
+                    _transferHandler.SetCurrentTarget(savedData.Target);
+                    _transferHandler.SetCurrentItems(_container.GetContainer());
+                    _currentBodyColor = savedData.BodyColor.Vector4ToColor();
+
+                    ColorHandler.ChangeBodyColor("AlterraShipping_BaseColor", _currentBodyColor, gameObject);
+                    AnimatorController.SetBoolHash(DoorStateHash, savedData.CurrentDoorState);
+                    AnimatorController.SetIntHash(PageHash, savedData.CurrentPage);
+
+                    Manager.UpdateGlobalTargets();
+                    _fromSave = false;
+                }
+            }
+
+            IsInitialized = true;
+        }
+
+        public bool IsInitialized { get; set; }
+
+        private void Initialize()
         {
             ID = gameObject.GetInstanceID();
 
             Name = $"Shipping Box {ShippingTargetManager.GlobalShippingTargets.Count}";
 
-            _prefabID = GetComponentInParent<PrefabIdentifier>();
+            _prefabID = GetComponentInParent<PrefabIdentifier>() ?? GetComponent<PrefabIdentifier>();
 
             if (_buildable == null)
             {
-                _buildable = GetComponentInParent<Constructable>();
+                _buildable = GetComponentInParent<Constructable>() ?? GetComponent<Constructable>();
             }
 
             if (_transferHandler == null)
             {
-                _transferHandler = GetComponentInParent<AlterraShippingTransferHandler>();
+                _transferHandler = GetComponentInParent<AlterraShippingTransferHandler>() ?? GetComponent<AlterraShippingTransferHandler>();
             }
 
             if (_transferHandler == null)
@@ -90,16 +153,34 @@ namespace FCSAlterraShipping.Mono
             _container = new AlterraShippingContainer(this);
             _container.OnPDAClose += OnPdaClose;
 
-            DoorStateHash = UnityEngine.Animator.StringToHash("DoorState");
-            PageHash = UnityEngine.Animator.StringToHash("Page");
+            DoorStateHash = Animator.StringToHash("DoorState");
+            PageHash = Animator.StringToHash("Page");
 
             AnimatorController = this.transform.GetComponent<AlterraShippingAnimator>();
             AnimatorController.Initialize(this);
-
+            
             if (AnimatorController == null)
             {
                 QuickLogger.Error("Animator component not found on the GameObject.");
             }
+
+            //SubRoot root = GetComponentInParent<SubRoot>() ?? GetComponent<SubRoot>();
+
+            //if (root != null)
+            //{
+            //    QuickLogger.Debug(root.name);
+            //    AddToManager(root);
+            //    QuickLogger.Debug($"Added to manager");
+            //}
+            //else
+            //{
+            //    QuickLogger.Error($"Root returned null");
+            //}
+
+            if(DisplayManager == null)
+                DisplayManager = gameObject.GetComponent<AlterraShippingDisplay>();
+            
+            DisplayManager.Setup(this);
 
             InvokeRepeating("CargoContainer", 1, 0.5f);
         }
@@ -112,6 +193,7 @@ namespace FCSAlterraShipping.Mono
         public int PageHash { get; private set; }
 
         public int DoorStateHash { get; private set; }
+        public SubRoot SubRoot { get; private set; }
 
         private void OnDestroy()
         {
@@ -160,27 +242,27 @@ namespace FCSAlterraShipping.Mono
             reason = string.Empty;
 
             if (IsReceivingTransfer) return false;
-            return _buildable.deconstructionAllowed;
+
+            return _buildable == null || _buildable.deconstructionAllowed;
         }
 
         public void OnConstructedChanged(bool constructed)
         {
             if (constructed)
             {
-                var display = gameObject.GetOrAddComponent<AlterraShippingDisplay>();
-                SubRoot root = GetComponentInParent<SubRoot>();
-
-                if (root != null)
+                if (isActiveAndEnabled)
                 {
-                    QuickLogger.Debug(root.name);
-                    AddToManager(root);
-                    QuickLogger.Debug($"Added to manager");
-                    gameObject.GetOrAddComponent<AlterraShippingDisplay>();
+                    if (!IsInitialized)
+                    {
+                        Initialize();
+                        AddToManager();
+                    }
                 }
                 else
                 {
-                    QuickLogger.Error($"Root returned null");
+                    _runStartUpOnEnable = true;
                 }
+                
             }
         }
 
@@ -210,9 +292,14 @@ namespace FCSAlterraShipping.Mono
             return _prefabID.Id;
         }
 
-        public void AddToManager(SubRoot subRoot, ShippingTargetManager managers = null)
+        public void AddToManager(ShippingTargetManager managers = null)
         {
-            Manager = managers ?? ShippingTargetManager.FindManager(subRoot);
+            if (SubRoot == null)
+            {
+                SubRoot = GetComponentInParent<SubRoot>() ?? GetComponent<SubRoot>();
+            }
+
+            Manager = managers ?? ShippingTargetManager.FindManager(SubRoot);
             Manager.AddShippingTarget(this);
 
             QuickLogger.Debug("Target has been connected", true);
@@ -248,9 +335,7 @@ namespace FCSAlterraShipping.Mono
             return _container.CanFit();
         }
 
-        public Action OnPDAClose { get; set; }
-
-        public void OnProtoSerializeObjectTree(ProtobufSerializer serializer)
+        public void OnProtoSerialize(ProtobufSerializer serializer)
         {
             if (!Directory.Exists(SaveDirectory))
                 Directory.CreateDirectory(SaveDirectory);
@@ -283,48 +368,9 @@ namespace FCSAlterraShipping.Mono
             File.WriteAllText(SaveFile, output);
         }
 
-        public void OnProtoDeserializeObjectTree(ProtobufSerializer serializer)
+        public void OnProtoDeserialize(ProtobufSerializer serializer)
         {
-            QuickLogger.Info($"In De serialized");
-
-            if (File.Exists(SaveFile))
-            {
-                string savedDataJson = File.ReadAllText(SaveFile).Trim();
-
-                //LoadData
-                var savedData = JsonConvert.DeserializeObject<SaveData>(savedDataJson);
-
-                foreach (KeyValuePair<TechType, int> containerItem in savedData.ContainerItems)
-                {
-                    for (int i = 0; i < containerItem.Value; i++)
-                    {
-                        GameObject prefab = CraftData.GetPrefabForTechType(containerItem.Key);
-
-                        var gameObject = GameObject.Instantiate<GameObject>(prefab);
-
-                        Pickupable pickupable = gameObject.GetComponent<Pickupable>().Pickup(false);
-
-                        var item = new InventoryItem(pickupable);
-
-                        _container.AddItem(item);
-                    }
-                }
-
-                Name = savedData.ContainerName;
-                ContainerMode = savedData.ContainertMode;
-                _hasBreakerTripped = savedData.HasBreakerTripped;
-                _transferHandler.SetMono(this);
-                _transferHandler.SetCurrentTime(savedData.TimeLeft);
-                _transferHandler.SetCurrentTarget(savedData.Target);
-                _transferHandler.SetCurrentItems(_container.GetContainer());
-                _currentBodyColor = savedData.BodyColor.Vector4ToColor();
-
-                ColorHandler.ChangeBodyColor("AlterraShipping_BaseColor", _currentBodyColor, gameObject);
-                AnimatorController.SetBoolHash(DoorStateHash, savedData.CurrentDoorState);
-                AnimatorController.SetIntHash(PageHash, savedData.CurrentPage);
-
-                Manager.UpdateGlobalTargets();
-            }
+            _fromSave = true;
         }
 
         public void SetCurrentBodyColor(Color color)

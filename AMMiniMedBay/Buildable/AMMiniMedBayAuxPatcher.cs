@@ -4,13 +4,13 @@ namespace AMMiniMedBay.Buildable
 {
     internal partial class AMMiniMedBayBuildable
     {
-        public const string HealthStatusLBLKey = "HeathStatus";
-        public const string NoPowerKey = "NoPower";
-        public const string NoPowerMessage = "NoPowerMessage";
-        public const string ColorPageTextKey = "OnColorPageBTNHover";
-        public const string OpenStorageKey = "OpenMiniMedBayStorage";
-        public const string NotInPositionMessageKey = "NotInPositionMessage";
-        public const string HomeKey = "Home";
+        public const string HealthStatusLBLKey = "AMMB_HeathStatus";
+        public const string NoPowerKey = "AMMB_NoPower";
+        public const string NoPowerMessage = "AMMB_NoPowerMessage";
+        public const string ColorPageTextKey = "AMMB_OnColorPageBTNHover";
+        public const string OpenStorageKey = "AMMB_OpenMiniMedBayStorage";
+        public const string NotInPositionMessageKey = "AMMB_NotInPositionMessage";
+        public const string HomeKey = "AMMB_Home";
 
         private const string StorageLabelKey = "AMMiniMedBayStorage";
 

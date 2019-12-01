@@ -1,7 +1,6 @@
 ﻿using AE.SeaCooker.Buildable;
 using AE.SeaCooker.Configuration;
 using AE.SeaCooker.Display;
-using AE.SeaCooker.Helpers;
 using AE.SeaCooker.Mono;
 using FCSCommon.Enums;
 using FCSCommon.Helpers;
@@ -9,9 +8,16 @@ using FCSCommon.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using ARS_SeaBreezeFCS32.Mono;
+using FCSCommon.Abstract;
+using FCSCommon.Components;
+using FCSCommon.Controllers;
+using FCSCommon.Objects;
 using UnityEngine;
 using UnityEngine.UI;
+using PaginatorButton = AE.SeaCooker.Display.PaginatorButton;
 
 namespace AE.SeaCooker.Managers
 {
@@ -34,7 +40,7 @@ namespace AE.SeaCooker.Managers
         private CustomToggle _cusToggle;
         private GridHelper _seaBreezeGrid;
         private CustomToggle _autoToggle;
-
+        private List<CustomToggle> _sbList = new List<CustomToggle>();
 
         public override void OnButtonClick(string btnName, object tag)
         {
@@ -53,14 +59,18 @@ namespace AE.SeaCooker.Managers
                     }
 
                     UpdateCookingButton();
-
                     break;
+
                 case "homeBTN":
                     UpdatePage(1);
                     break;
+
                 case "settingsBTN":
                     UpdatePage(2);
+                    UpdateSeaBreezes();
+                    UpdateCheckedSB();
                     break;
+
                 case "colorPickerBTN":
                     UpdatePage(3);
                     break;
@@ -68,36 +78,78 @@ namespace AE.SeaCooker.Managers
                 case "openInputBTN":
                     _mono.StorageManager.OpenInputStorage();
                     break;
+
                 case "openExportBTN":
                     _mono.StorageManager.OpenExportStorage();
                     break;
+
                 case "fuelTankBTN":
                     _mono.GasManager.OpenFuelTank();
                     break;
+
                 case "seaBreezeToggle":
                     var item = (CustomToggle)tag;
                     _mono.StorageManager.SetExportToSeabreeze(item.CheckState());
                     QuickLogger.Debug($"Toggle State: {item.CheckState()}", true);
                     break;
+
                 case "autoToggle":
                     var autoItem = (CustomToggle)tag;
-                    //TODO Adjust Class To support
-                    //_mono.StorageManager.SetExportToSeabreeze(autoItem.CheckState());
+                    var state = autoItem.CheckState();
+                    _mono.AutoChooseSeabreeze = state;
+                    
+                    if (state)
+                    {
+                        _mono.SelectedSeaBreezeID = String.Empty;
+                        UpdateCheckedSB();
+                    }
+
                     QuickLogger.Debug($"Toggle State: {autoItem.CheckState()}", true);
                     break;
+
                 case "ColorItem":
                     var color = (Color)tag;
                     QuickLogger.Debug($"{_mono.gameObject.name} Color Changed to {color.ToString()}", true);
                     _mono.ColorManager.SetCurrentBodyColor(color);
                     break;
+
                 case "SeaBreezeItem":
                     var seaBreeze = (Color)tag;
                     // QuickLogger.Debug($"{_mono.gameObject.name} Color Changed to {color.ToString()}", true);
                     _mono.ColorManager.SetCurrentBodyColor(seaBreeze);
                     break;
+
+                case "SeaBreeze":
+                    var sb = (ARSolutionsSeaBreezeController)tag;
+                    _mono.SelectedSeaBreezeID = sb.GetPrefabID();
+                    UpdateCheckedSB();
+                    break;
             }
         }
 
+        internal void UpdateCheckedSB()
+        {
+            _mono.IsSebreezeSelected = false;
+            
+            foreach (CustomToggle toggle in _sbList)
+            {
+                var sb =(ARSolutionsSeaBreezeController)toggle.Tag;
+
+                if (_mono.SelectedSeaBreezeID == sb.GetPrefabID())
+                {
+                    toggle.SetToggleState(true);
+                    _mono.SetCurrentSeaBreeze(sb);
+                    _mono.IsSebreezeSelected = true;
+                    _autoToggle.SetToggleState(false);
+                    _mono.AutoChooseSeabreeze = false;
+                }
+                else
+                {
+                    toggle.SetToggleState(false);
+                }
+            }
+        }
+        
         internal void UpdateCookingButton()
         {
             _startButton.ChangeText(_mono.FoodManager.IsCooking() ? SeaCookerBuildable.Cancel() : SeaCookerBuildable.Start());
@@ -434,31 +486,77 @@ namespace AE.SeaCooker.Managers
             return true;
         }
 
-        private void OnLoadDisplay(GameObject itemPrefab, GameObject itemsGrid)
+        private void OnLoadDisplay(GameObject itemPrefab, GameObject itemsGrid, int stPos, int endPos)
         {
             QuickLogger.Debug("Loading SeaBreeze Display");
 
-            for (int i = _seaBreezeGrid.StartingPosition; i < _seaBreezeGrid.EndingPosition; i++)
+            _sbList.Clear();
+
+            var items = _mono.SeaBreezes.Keys;
+
+
+            if (endPos > items.Count)
             {
-                var name = _mono.SeaBreezes.Keys.ElementAt(i);
-                var seaBreeze = _mono.SeaBreezes.Values.ElementAt(i);
+                endPos = items.Count;
+            }
+
+            _seaBreezeGrid.ClearPage();
+
+            for (int i = stPos; i < endPos; i++)
+            {
+
+                var unit = _mono.SeaBreezes.Values.ElementAt(i);
+                var unitNameController = unit.NameController;
+                var unitName = unitNameController.GetCurrentName();
+                unit.NameController.OnLabelChanged += OnLabelChanged;
 
                 GameObject itemDisplay = Instantiate(itemPrefab);
 
                 itemDisplay.transform.SetParent(itemsGrid.transform, false);
                 var text = itemDisplay.transform.Find("Text").GetComponent<Text>();
-                text.text = name;
+                text.text = unitName;
 
-                var itemButton = itemDisplay.AddComponent<InterfaceButton>();
+                var itemButton = itemDisplay.AddComponent<CustomToggle>();
                 itemButton.ButtonMode = InterfaceButtonMode.TextColor;
-                itemButton.Tag = seaBreeze;
+                itemButton.Tag = unit;
                 itemButton.TextComponent = text;
                 itemButton.OnButtonClick += OnButtonClick;
                 itemButton.BtnName = "SeaBreeze";
-
-                QuickLogger.Debug($"Added SeaBreeze {name}");
-
+                unitNameController.Tag = itemButton;
+                _sbList.Add(itemButton);
+                UpdateCheckedSB();
+                QuickLogger.Debug($"Added Unit {unitName}");
             }
+
+            _seaBreezeGrid.UpdaterPaginator(items.Count);
+
+
+            //for (int i = _seaBreezeGrid.StartingPosition; i < _seaBreezeGrid.EndingPosition; i++)
+            //{
+            //    var name = _mono.SeaBreezes.Keys.ElementAt(i);
+            //    var seaBreeze = _mono.SeaBreezes.Values.ElementAt(i);
+
+            //    GameObject itemDisplay = Instantiate(itemPrefab);
+
+            //    itemDisplay.transform.SetParent(itemsGrid.transform, false);
+            //    var text = itemDisplay.transform.Find("Text").GetComponent<Text>();
+            //    text.text = name;
+
+            //    var itemButton = itemDisplay.AddComponent<InterfaceButton>();
+            //    itemButton.ButtonMode = InterfaceButtonMode.TextColor;
+            //    itemButton.Tag = seaBreeze;
+            //    itemButton.TextComponent = text;
+            //    itemButton.OnButtonClick += OnButtonClick;
+            //    itemButton.BtnName = "SeaBreeze";
+
+            //    QuickLogger.Debug($"Added SeaBreeze {name}");
+
+            //}
+        }
+
+        private void OnLabelChanged(string obj, NameController nameController)
+        {
+            UpdateSeaBreezes();
         }
 
         public override IEnumerator PowerOn()
@@ -498,7 +596,7 @@ namespace AE.SeaCooker.Managers
             }
             
             _colorPage.OnButtonClick = OnButtonClick;
-            _colorPage.SerializedColors = Mod.SerializedColors();
+            _colorPage.SerializedColors = ColorList.Colors;
             _colorPage.ColorsPerPage = 42;
             _colorPage.ColorItemPrefab = SeaCookerBuildable.ColorItemPrefab;
             _colorPage.ColorPageContainer = _colorGrid;
@@ -529,13 +627,17 @@ namespace AE.SeaCooker.Managers
 
             //ToggleProcessDisplay();
             _mono.UpdateIsRunning();
-            uGUI_Icon fromIcon = _fromImage.gameObject.GetComponent<uGUI_Icon>();
-            fromIcon.sprite = SpriteManager.Get(raw);
-
-            uGUI_Icon toIcon = _toImage.gameObject.GetComponent<uGUI_Icon>();
-            toIcon.sprite = SpriteManager.Get(cooked);
-
+            QuickLogger.Debug("Update Is Running", true);
+            //uGUI_Icon fromIcon = _fromImage.gameObject.GetComponent<uGUI_Icon>();
+            //fromIcon.sprite = SpriteManager.Get(raw);
+            //QuickLogger.Debug("From Icon", true);
+            
+            //uGUI_Icon toIcon = _toImage.gameObject.GetComponent<uGUI_Icon>();
+            //toIcon.sprite = SpriteManager.Get(cooked);
+            //QuickLogger.Debug("From Icon", true);
+            
             UpdateCookingButton();
+            QuickLogger.Debug("Update Cooking Button", true);
         }
 
         private void OnFoodCooked(TechType raw, List<TechType> techTypes)
@@ -605,7 +707,7 @@ namespace AE.SeaCooker.Managers
         internal void UpdateSeaBreezes()
         {
             if (_seaBreezeGrid == null) return;
-
+            QuickLogger.Debug("Update Seabreezes",true);
             _seaBreezeGrid.DrawPage(_seaBreezeGrid.GetCurrentPage());
         }
     }

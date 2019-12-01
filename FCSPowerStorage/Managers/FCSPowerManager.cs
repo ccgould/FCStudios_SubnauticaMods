@@ -1,6 +1,5 @@
 ﻿using FCSCommon.Enums;
 using FCSCommon.Utilities;
-using FCSCommon.Utilities.Enums;
 using FCSPowerStorage.Configuration;
 using FCSPowerStorage.Models;
 using FCSPowerStorage.Mono;

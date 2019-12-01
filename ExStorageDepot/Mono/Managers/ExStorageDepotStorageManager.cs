@@ -46,17 +46,20 @@ namespace ExStorageDepot.Mono.Managers
         private const int DumpContainerWidth = 8;
         private const int DumpContainerHeight = 10;
         private ItemsContainer _dumpContainer;
-        private readonly int _maxItems = QPatch.Configuration.Config.MaxStorage;
+        private int _maxItems;
         private StorageContainer _container;
         private int _containerWidth = 1;
-        private readonly int _containerHeight = QPatch.Configuration.Config.MaxStorage;
+        private int _containerHeight;
         private RemovalType _removalType;
         private int ItemTotalCount => _container.container.count + _dumpContainer.count;
 
         internal void Initialize(ExStorageDepotController mono)
         {
             _mono = mono;
-
+            var maxStorageValue = QPatch.Config.GetValue("MaxStorage");
+            var maxStorage = maxStorageValue != String.Empty ? Convert.ToInt32(maxStorageValue) : 0;
+            _containerHeight = _maxItems = maxStorage;
+            
             if (_containerRoot == null)
             {
                 QuickLogger.Debug("Ex-Storage Root");
@@ -330,6 +333,15 @@ namespace ExStorageDepot.Mono.Managers
             //}
 
             StopCoroutine(StoreItems());
+        }
+
+        internal void UpdateInventory()
+        {
+            ItemsDictionary.Clear();
+            foreach (var item in _container.container)
+            {
+                UpdateScreen(item.item.GetTechType());
+            }
         }
     }
 }

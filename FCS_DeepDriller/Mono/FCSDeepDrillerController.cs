@@ -70,6 +70,7 @@ namespace FCS_DeepDriller.Mono
         internal OreGenerator OreGenerator { get; private set; }
         internal VFXManager VFXManagerHandler { get; private set; }
         public DeepDrillerComponentManager ComponentManager { get; private set; }
+        public EnvironmentManager EnvironmentManager { get; private set; }
 
 #if USE_ExStorageDepot
         internal ExStorageDepotController ExStorageDepotController { get; set; }
@@ -78,7 +79,7 @@ namespace FCS_DeepDriller.Mono
         #endregion
 
         #region Unity Methods
-        
+
         private void OnEnable()
         {
             {
@@ -328,6 +329,9 @@ namespace FCS_DeepDriller.Mono
             LavaPitHandler.OnLavaRaised += OnLavaRaised;
 
             UpdateSystemLights(PowerManager.GetPowerState());
+
+            if (EnvironmentManager == null)
+                EnvironmentManager = gameObject.AddComponent<EnvironmentManager>();
 
             _initialized = true;
             

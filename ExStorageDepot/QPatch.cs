@@ -12,7 +12,7 @@ namespace ExStorageDepot
 {
     public static class QPatch
     {
-        internal static Configuration.Configuration Configuration { get; private set; }
+        internal static Configuration.Config Config { get; private set; }
 
         public static void Patch()
         {
@@ -49,7 +49,7 @@ namespace ExStorageDepot
             settings.MissingMemberHandling = MissingMemberHandling.Ignore;
 
             //LoadData
-            Configuration = JsonConvert.DeserializeObject<Configuration.Configuration>(configJson, settings);
+            Config = JsonConvert.DeserializeObject<Config>(configJson, settings);
         }
     }
 }

@@ -7,6 +7,7 @@ using SMLHelper.V2.Crafting;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using FCSTechFabricator.Helpers;
 using UnityEngine;
 
 namespace AE.MiniFountainFilter.Buildable
@@ -16,7 +17,6 @@ namespace AE.MiniFountainFilter.Buildable
     {
         private static readonly MiniFountainFilterBuildable Singleton = new MiniFountainFilterBuildable();
 
-        //FCSAESeaCooker
         public MiniFountainFilterBuildable() : base(Mod.ClassID, Mod.FriendlyName, Mod.Description)
         {
             OnFinishedPatching += AdditionalPatching;
@@ -24,21 +24,24 @@ namespace AE.MiniFountainFilter.Buildable
 
         public override GameObject GetGameObject()
         {
-            GameObject prefab = null;
-
             try
             {
-
-                prefab = GameObject.Instantiate(_prefab);
+                var prefab = GameObject.Instantiate(_prefab);
 
                 prefab.name = this.PrefabFileName;
+
+
+                var center = new Vector3(0.003585503f, 0.08162725f, 0.2536881f);
+                var size = new Vector3(0.9551572f, 1.22244f, 0.4737879f);
+
+                GameObjectHelpers.AddConstructableBounds(prefab,size,center);
+                return prefab;
             }
             catch (Exception e)
             {
                 QuickLogger.Error(e.Message);
+                return null;
             }
-
-            return prefab;
         }
 
         public override string AssetsFolder { get; } = $"{Mod.ModName}/Assets";
@@ -68,6 +71,14 @@ namespace AE.MiniFountainFilter.Buildable
             }
 
             Register();
+
+            PatchHelpers.AddNewKit(
+                FCSTechFabricator.Configuration.MiniFountainFilterKitClassID,
+                null,
+                Mod.FriendlyName,
+                FCSTechFabricator.Configuration.MiniFountainFilterClassID,
+                new[] { "AE", "MFF" },
+                null);
 
             Singleton.Patch();
         }

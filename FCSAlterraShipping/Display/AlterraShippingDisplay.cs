@@ -11,6 +11,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using FCSCommon.Extensions;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -49,7 +50,7 @@ namespace FCSAlterraShipping.Display
         private const int Shipping = 3;
         private const int ColorPicker = 4;
         private const int BlackOut = 0;
-        private List<SerializableColor> _serializedColors;
+        private List<ColorVec4> _serializedColors;
         private int COLORS_PER_PAGE = 48;
         private int _maxColorPage = 1;
         private int _currentColorPage = 1;
@@ -65,14 +66,7 @@ namespace FCSAlterraShipping.Display
         #endregion
 
         #region Unity Methods
-        private void Awake()
-        {
-            ShippingTargetManager.GlobalChanged += GlobalChanged;
-
-            InvokeRepeating("UpdateStatus", 1f, 0.5f);
-        }
-
-        private void Start()
+        internal void Setup(AlterraShippingTarget mono)
         {
             if (!_coroutineStarted)
                 base.InvokeRepeating(nameof(UpdateDisplay), DelayedStartTime * 3f, RepeatingUpdateInterval);
@@ -80,7 +74,7 @@ namespace FCSAlterraShipping.Display
             DisplayLanguagePatching.AdditionPatching();
 
 
-            _mono = this.transform.GetComponent<AlterraShippingTarget>();
+            _mono = mono;
 
             if (FindAllComponents() == false)
             {
@@ -108,18 +102,23 @@ namespace FCSAlterraShipping.Display
             if (_mono != null) _mono.OnItemSent += OnItemSent;
             _initialized = true;
 
-            _serializedColors = JsonConvert.DeserializeObject<List<SerializableColor>>(File.ReadAllText(Path.Combine(AssetHelper.GetAssetFolder("FCSAlterraShipping"), "colors.json")));
+            _serializedColors = ColorList.Colors;
 
-            if (_serializedColors.Count < 1)
-            {
-                QuickLogger.Error($"Serialized Colors is empty.", true);
-            }
 
             CheckCurrentPage();
 
             DrawPage(1);
 
             DrawColorPage(1);
+
+            ShippingTargetManager.GlobalChanged += GlobalChanged;
+
+            InvokeRepeating("UpdateStatus", 1f, 0.5f);
+        }
+
+        private void Start()
+        {
+            
         }
 
         #endregion
@@ -804,16 +803,16 @@ namespace FCSAlterraShipping.Display
             UpdateColorPaginator();
         }
 
-        private void LoadColorPicker(SerializableColor color)
+        private void LoadColorPicker(ColorVec4 color)
         {
             GameObject itemDisplay = Instantiate(AlterraShippingBuildable.ColorItemPrefab);
             itemDisplay.transform.SetParent(_colorPageContainer.transform, false);
-            itemDisplay.GetComponentInChildren<Image>().color = color.ToColor();
+            itemDisplay.GetComponentInChildren<Image>().color = color.Vector4ToColor();
 
             var itemButton = itemDisplay.AddComponent<ColorItemButton>();
             itemButton.OnButtonClick = OnButtonClick;
             itemButton.BtnName = "ColorItem";
-            itemButton.Color = color.ToColor();
+            itemButton.Color = color.Vector4ToColor();
         }
 
         private void UpdateColorPaginator()

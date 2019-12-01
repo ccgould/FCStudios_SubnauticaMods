@@ -1,18 +1,21 @@
 ﻿using FCSCommon.Utilities;
-using FCSPowerStorage.Configuration;
 using FCSPowerStorage.Helpers;
 using FCSPowerStorage.Mono;
 using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
 using System.IO;
 using System.Linq;
+using FCSCommon.Helpers;
+using FCSTechFabricator;
+using FCSTechFabricator.Helpers;
 using UnityEngine;
+using Information = FCSPowerStorage.Configuration.Information;
 
 namespace FCSPowerStorage.Buildables
 {
     internal partial class FCSPowerStorageBuildable : Buildable
     {
-        public override string AssetsFolder { get; } = @"FCSPowerStorage/Assets";
+        public override string AssetsFolder { get; } = $"{Information.ModFolderName}/Assets";
         public override TechGroup GroupForPDA { get; } = TechGroup.InteriorModules;
         public override TechCategory CategoryForPDA { get; } = TechCategory.InteriorModule;
 
@@ -29,9 +32,17 @@ namespace FCSPowerStorage.Buildables
                 throw new FileNotFoundException($"Failed to retrieve the {Singleton.FriendlyName} prefab from the asset bundle");
             }
 
+            PatchHelpers.AddNewKit(
+                FCSTechFabricator.Configuration.PowerStorageKitClassID,
+                null,
+                "FCS Power Storage",
+                FCSTechFabricator.Configuration.PowerStorageClassID,
+                new[] { "AIS", "PS" },
+                null);
+
             Singleton.Patch();
         }
-
+        
         public override GameObject GetGameObject()
         {
             GameObject prefab = GameObject.Instantiate(_prefab);
@@ -60,11 +71,11 @@ namespace FCSPowerStorage.Buildables
             constructable.techType = TechType;
 
             // Add constructible bounds
-            prefab.AddComponent<ConstructableBounds>().bounds =
-                new OrientedBounds(
-                new Vector3(-0.1f, -0.1f, 0f),
-                new Quaternion(0, 0, 0, 0),
-                new Vector3(0.9f, 0.5f, 0f));
+
+            var center = new Vector3(0.2078698f, -0.04198265f, 0.2626062f);
+            var size = new Vector3(1.412603f, 1.45706f, 0.4747875f);
+
+            GameObjectHelpers.AddConstructableBounds(prefab,size,center);
 
             QuickLogger.Debug("GetOrAdd TechTag");
             // Allows the object to be saved into the game 
@@ -76,6 +87,8 @@ namespace FCSPowerStorage.Buildables
             prefab.GetOrAddComponent<PrefabIdentifier>().ClassId = this.ClassID;
 
             QuickLogger.Debug("Add GameObject CustomBatteryController");
+
+            prefab.GetOrAddComponent<FCSPowerStorageDisplay>();
 
             prefab.GetOrAddComponent<FCSPowerStorageController>();
 

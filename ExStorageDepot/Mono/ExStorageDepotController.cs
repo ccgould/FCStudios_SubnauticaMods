@@ -13,10 +13,37 @@ namespace ExStorageDepot.Mono
         internal ExStorageDepotDisplayManager Display { get; private set; }
         private ExStorageDepotSaveDataEntry _saveData;
         private bool _initialized;
+        private bool _runStartUpOnEnable;
+        private bool _fromSave;
         internal ExStorageDepotNameManager NameController { get; private set; }
         internal ExStorageDepotAnimationManager AnimationManager { get; private set; }
         internal ExStorageDepotStorageManager Storage { get; private set; }
         internal BulkMultipliers BulkMultiplier { get; set; }
+
+        private void OnEnable()
+        {
+            if (!_runStartUpOnEnable) return;
+
+            if (!_initialized)
+            {
+                Initialize();
+            }
+
+            if (_fromSave)
+            {
+                QuickLogger.Debug("In OnProtoDeserialize");
+                var prefabIdentifier = GetComponent<PrefabIdentifier>() ?? GetComponentInParent<PrefabIdentifier>();
+                var id = prefabIdentifier?.Id ?? string.Empty;
+                var data = Mod.GetExStorageDepotSaveData(id);
+                NameController.SetCurrentName(data.UnitName);
+                Storage.UpdateInventory();
+                //Storage.LoadFromSave(data.StorageItems);
+                BulkMultiplier = data.Multiplier;
+                Display.UpdateMultiplier();
+            }
+
+            _runStartUpOnEnable = false;
+        }
 
         public void OnProtoSerialize(ProtobufSerializer serializer)
         {
@@ -31,14 +58,7 @@ namespace ExStorageDepot.Mono
 
         public void OnProtoDeserialize(ProtobufSerializer serializer)
         {
-            QuickLogger.Debug("In OnProtoDeserialize");
-            var prefabIdentifier = GetComponent<PrefabIdentifier>();
-            var id = prefabIdentifier?.Id ?? string.Empty;
-            var data = Mod.GetExStorageDepotSaveData(id);
-            NameController.SetCurrentName(data.UnitName);
-            Storage.LoadFromSave(data.StorageItems);
-            BulkMultiplier = data.Multiplier;
-            Display.UpdateMultiplier();
+            _fromSave = true;
         }
 
         public bool CanDeconstruct(out string reason)
@@ -80,9 +100,16 @@ namespace ExStorageDepot.Mono
         {
             if (constructed)
             {
-                if (!_initialized)
+                if (isActiveAndEnabled)
                 {
-                    Initialize();
+                    if (!_initialized)
+                    {
+                        Initialize();
+                    }
+                }
+                else
+                {
+                    _runStartUpOnEnable = true;
                 }
             }
         }

@@ -37,6 +37,7 @@ namespace FCSTechFabricator.Mono
             {"Mini MedBay",new ModKey{Key = "MMB",ParentKey = "AMS"}},
             {"Powercell Socket",new ModKey{Key = "PSS",ParentKey = "AIS"}},
             {"Intra-Base Teleporter",new ModKey{Key = "IBT",ParentKey = "AE"}},
+            {"Alterra Shipping",new ModKey{Key = "ASU",ParentKey = "ASS"}},
         };
 
 
@@ -77,14 +78,14 @@ namespace FCSTechFabricator.Mono
                 if (_root.GetNode($"{division.Value}") == null)
                 {
                     QuickLogger.Debug($"{division.Key} is null creating tab");
-                    var itemTab = _root.AddTabNode($"{division.Value}", $"{division.Key}", new Atlas.Sprite(ImageUtils.LoadTextureFromFile($"./QMods/FCSTechFabricator/Assets/{division.Value}Icon.png")));
+                    var itemTab = _root.AddTabNode($"{division.Value}", $"{division.Key}", new Atlas.Sprite(ImageUtils.LoadTextureFromFile($"./QMods/{Mod.ModFolderName}/Assets/{division.Value}Icon.png")));
                     QuickLogger.Debug($"{division.Key} node tab Created");
 
                     foreach (var fcsMod in FCSMods)
                     {
                         if (fcsMod.Value.ParentKey == division.Value)
                         {
-                            var icon = new Atlas.Sprite(ImageUtils.LoadTextureFromFile($"./QMods/FCSTechFabricator/Assets/{fcsMod.Value.Key}Icon.png"));
+                            var icon = new Atlas.Sprite(ImageUtils.LoadTextureFromFile($"./QMods/{Mod.ModFolderName}/Assets/{fcsMod.Value.Key}Icon.png"));
                             itemTab.AddTabNode(fcsMod.Value.Key, fcsMod.Key, icon);
                             QuickLogger.Debug($"Child node {fcsMod.Key} tab Created");
                         }
@@ -137,6 +138,9 @@ namespace FCSTechFabricator.Mono
             Texture2D coloredTexture = QPatch.Bundle.LoadAsset<Texture2D>("FCSTechFabricator");
             SkinnedMeshRenderer skinnedMeshRenderer = prefab.GetComponentInChildren<SkinnedMeshRenderer>();
             skinnedMeshRenderer.material.mainTexture = coloredTexture;
+
+            prefab.AddComponent<FCSTechFabController>();
+
             return prefab;
 
         }
@@ -155,7 +159,7 @@ namespace FCSTechFabricator.Mono
 
         public override TechCategory CategoryForPDA { get; } = TechCategory.InteriorModule;
 
-        public override string AssetsFolder { get; } = "FCSTechFabricator/Assets";
+        public override string AssetsFolder { get; } = $"{Mod.ModFolderName}/Assets";
         protected override TechData GetBlueprintRecipe()
         {
             var customFabRecipe = new TechData()

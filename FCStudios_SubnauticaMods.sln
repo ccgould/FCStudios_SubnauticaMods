@@ -66,7 +66,6 @@ EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		FCSCommon\FCSCommon.projitems*{20e443f4-3b38-48f3-bbf2-7cbbf4090beb}*SharedItemsImports = 4
-		FCSCommon\FCSCommon.projitems*{8adcd8fa-1eb3-4df7-a44d-f689322aac03}*SharedItemsImports = 4
 		FCSCommon\FCSCommon.projitems*{b947909c-4983-4749-93ac-73ea69f6dce8}*SharedItemsImports = 4
 		FCSCommon\FCSCommon.projitems*{c801c28b-81cb-451f-94b4-251835d2b92a}*SharedItemsImports = 4
 		FCSCommon\FCSCommon.projitems*{dbc34043-0f09-42ef-beb9-f59cbc6df16f}*SharedItemsImports = 13

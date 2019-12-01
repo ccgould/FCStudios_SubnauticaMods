@@ -3,10 +3,11 @@ using AE.SeaCooker.Configuration;
 using AE.SeaCooker.Enumerators;
 using AE.SeaCooker.Mono;
 using FCSCommon.Utilities;
-using FCSCommon.Utilities.Enums;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using AE.SeaCooker.Buildable;
+using FCSCommon.Enums;
 using UnityEngine;
 
 namespace AE.SeaCooker.Managers
@@ -198,6 +199,8 @@ namespace AE.SeaCooker.Managers
         internal void CookAllFood(ItemsContainer container)
         {
             QuickLogger.Debug($"Get Powered State {_mono.PowerManager.GetPowerState()} || Current Fuel {_mono.GasManager.CurrentFuel} || Has Room for All {_mono.StorageManager.HasRoomForAll()}");
+
+            if(_mono.PowerManager.GetPowerState() == FCSPowerStates.Unpowered) { QuickLogger.Message(SeaCookerBuildable.NoPowerAvailable(),true);}
 
             if (_mono.PowerManager.GetPowerState() == FCSPowerStates.Unpowered
                 || _mono.GasManager.CurrentFuel == FuelType.None

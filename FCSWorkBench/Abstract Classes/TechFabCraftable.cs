@@ -1,4 +1,5 @@
-﻿using SMLHelper.V2.Assets;
+﻿using FCSTechFabricator.Models;
+using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
@@ -6,9 +7,9 @@ using UnityEngine;
 
 namespace FCSTechFabricator
 {
-    internal abstract class TechFabCraftable : Spawnable
+    public abstract class TechFabCraftable : Spawnable
     {
-        protected TechFabCraftable(string classId, string friendlyName, string description, bool isPlaceable = true, EquipmentType equipmentType = EquipmentType.Hand, TechType requiredForUnlock = TechType.None) : base(classId, friendlyName, description)
+        protected TechFabCraftable(string classId, string friendlyName, string description, bool useEquipmentSlot = true, EquipmentType equipmentType = EquipmentType.Hand, TechType requiredForUnlock = TechType.None) : base(classId, friendlyName, description)
         {
             OnStartedPatching = Register;
 
@@ -17,11 +18,11 @@ namespace FCSTechFabricator
 
                 TechTypeID = this.TechType;
               
-                if (isPlaceable)
+                if (useEquipmentSlot)
                 {
                     CraftDataHandler.SetEquipmentType(TechType, equipmentType);
                 }
-                
+
                 CraftDataHandler.SetTechData(TechType, GetBlueprintRecipe());
                 CraftDataHandler.AddToGroup(GroupForPDA, CategoryForPDA, TechType);
                 CorePatch();
@@ -60,7 +61,7 @@ namespace FCSTechFabricator
 
         public GameObject InstantiatedPrefab { get; set; }
 
-        public override string AssetsFolder { get; } = "FCSTechFabricator/Assets";
+        public override string AssetsFolder { get; } = $"{Mod.ModFolderName}/Assets";
         public abstract string[] StepsToFabricatorTab { get; }
         public abstract TechCategory CategoryForPDA { get; }
         public abstract TechGroup GroupForPDA { get; }

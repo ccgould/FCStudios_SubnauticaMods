@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.IO;
 using FCS_AIMarineTurbine.Display;
 using FCSCommon.Objects;
+using FCSTechFabricator.Helpers;
 using UnityEngine;
 
 namespace FCS_AIMarineTurbine.Buildable
@@ -31,6 +32,15 @@ namespace FCS_AIMarineTurbine.Buildable
             {
                 throw new FileNotFoundException($"Failed to retrieve the {Singleton.FriendlyName} prefab from the asset bundle");
             }
+
+            PatchHelpers.AddNewKit(
+                FCSTechFabricator.Configuration.JetStreamT242KitClassID,
+                null,
+                "AI JetStreamT242",
+                FCSTechFabricator.Configuration.AIJetStreamT242ClassID,
+                new[] { "AIS", "MT" },
+                null);
+
 
             Singleton.Patch();
 
@@ -91,6 +101,11 @@ namespace FCS_AIMarineTurbine.Buildable
                 constructable.model = model;
                 constructable.rotationEnabled = true;
                 constructable.techType = TechType;
+
+                var center = new Vector3(0f, 2.970485f, 0f);
+                var size = new Vector3(4.03422f, 5.701298f, 3.179399f);
+                GameObjectHelpers.AddConstructableBounds(prefab,size,center);
+
 
                 prefab.AddComponent<PowerPlug>();
 

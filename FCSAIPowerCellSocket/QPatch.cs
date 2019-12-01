@@ -1,4 +1,5 @@
-﻿using FCSAIPowerCellSocket.Buildables;
+﻿
+using FCSAIPowerCellSocket.Buildables;
 using FCSCommon.Utilities;
 using Harmony;
 using System;
@@ -10,7 +11,8 @@ namespace FCSAIPowerCellSocket
     {
         public static void Patch()
         {
-            QuickLogger.Info("Started patching. Version: " + QuickLogger.GetAssemblyVersion());
+            var assembly = Assembly.GetExecutingAssembly();
+            QuickLogger.Info("Started patching. Version: " + QuickLogger.GetAssemblyVersion(assembly));
 
 #if DEBUG
             QuickLogger.DebugLogsEnabled = true;

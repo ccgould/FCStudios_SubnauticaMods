@@ -14,8 +14,8 @@ namespace AE.MiniFountainFilter.Managers
         private Func<bool> _isConstructed;
         private ChildObjectIdentifier _containerRoot;
         private ItemsContainer _container;
-        private readonly int _containerWidth = QPatch.Configuration.Config.StorageWidth;
-        private readonly int _containerHeight = QPatch.Configuration.Config.StorageHeight;
+        private readonly int _containerWidth = QPatch.Configuration.StorageWidth;
+        private readonly int _containerHeight = QPatch.Configuration.StorageHeight;
         private static TechType _bottleTechType = QPatch.BottleTechType;
         private Vector2int _bottleSize;
         private readonly GameObject _bottle = CraftData.GetPrefabForTechType(_bottleTechType);
@@ -101,7 +101,7 @@ namespace AE.MiniFountainFilter.Managers
 
         internal void AttemptSpawnBottle()
         {
-            if (!_mono.GetIsOperational() || !QPatch.Configuration.Config.AutoGenerateMode) return;
+            if (!_mono.GetIsOperational() || !QPatch.Configuration.AutoGenerateMode) return;
 
             if (IsFull() || !_mono.TankManager.HasEnoughWater(_bottleWaterContent)) return;
             
@@ -136,7 +136,7 @@ namespace AE.MiniFountainFilter.Managers
 
         internal void LoadContainer(int waterBottleCount)
         {
-            if (QPatch.Configuration.Config.AutoGenerateMode) return;
+            if (QPatch.Configuration.AutoGenerateMode) return;
 
             for (int i = 0; i < waterBottleCount; i++)
             {

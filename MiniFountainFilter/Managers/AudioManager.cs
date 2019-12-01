@@ -58,7 +58,7 @@ namespace AE.MiniFountainFilter.Managers
         /// </summary>
         internal void PlayMachineAudio()
         {
-            if (!_soundPlaying && QPatch.Configuration.Config.PlaySFX)
+            if (!_soundPlaying && QPatch.Configuration.PlaySFX)
             {
                 _loopingEmitter.Play();
                 _soundPlaying = true;
@@ -71,7 +71,7 @@ namespace AE.MiniFountainFilter.Managers
         /// </summary>
         internal void StopMachineAudio()
         {
-            if (_soundPlaying && QPatch.Configuration.Config.PlaySFX)
+            if (_soundPlaying && QPatch.Configuration.PlaySFX)
             {
                 _loopingEmitter.Stop();
                 _soundPlaying = false;

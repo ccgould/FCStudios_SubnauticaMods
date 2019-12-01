@@ -162,37 +162,54 @@ namespace AE.SeaCooker.Managers
         {
             QuickLogger.Debug($"Sending to SeaBreeze: Available {_mono.SeaBreezes.Count}", true);
 
-            foreach (KeyValuePair<string, ARSolutionsSeaBreezeController> breezeController in _mono.SeaBreezes)
+            if (_mono.AutoChooseSeabreeze)
             {
-                QuickLogger.Debug($"Current SeaBreeze: {breezeController.Value.PrefabId.Id}", true);
-
-                if (_exportContainer.count <= 0) break;
-
-                if (breezeController.Value.CanBeStored(_exportContainer.count))
+                foreach (KeyValuePair<string, ARSolutionsSeaBreezeController> breezeController in _mono.SeaBreezes)
                 {
-                    QuickLogger.Debug($"SeaBreeze {breezeController.Value.PrefabId.Id}: Has all {_exportContainer.count} Available.", true);
+                    QuickLogger.Debug($"Current SeaBreeze: {breezeController.Value.PrefabId.Id}", true);
 
-                    for (int i = _exportContainer.count - 1; i > -1; i--)
+                    if (_exportContainer.count <= 0) break;
+
+                    if (breezeController.Value.CanBeStored(_exportContainer.count))
                     {
-                        var item = _exportContainer.FirstOrDefault();
-                        var result = breezeController.Value.AddItemToFridge(item, out string reason);
-                        _exportContainer.RemoveItem(item?.item);
-                        QuickLogger.Debug($"SeaBreeze {breezeController.Value.PrefabId.Id}: Operation successful {result}", true);
+                        QuickLogger.Debug($"SeaBreeze {breezeController.Value.PrefabId.Id}: Has all {_exportContainer.count} Available.", true);
+
+                        for (int i = _exportContainer.count - 1; i > -1; i--)
+                        {
+                            var item = _exportContainer.FirstOrDefault();
+                            var result = breezeController.Value.AddItemToFridge(item, out string reason);
+                            _exportContainer.RemoveItem(item?.item);
+                            QuickLogger.Debug($"SeaBreeze {breezeController.Value.PrefabId.Id}: Operation successful {result}", true);
+                        }
+
+                        break;
                     }
 
-                    break;
-                }
-
-                if (breezeController.Value.FreeSpace > 0)
-                {
-                    for (int i = breezeController.Value.FreeSpace - 1; i > -1; i--)
+                    if (breezeController.Value.FreeSpace > 0)
                     {
-                        var item = _exportContainer.FirstOrDefault();
-                        var result = breezeController.Value.AddItemToFridge(item, out string reason);
-                        _exportContainer.RemoveItem(item?.item);
+                        for (int i = breezeController.Value.FreeSpace - 1; i > -1; i--)
+                        {
+                            var item = _exportContainer.FirstOrDefault();
+                            var result = breezeController.Value.AddItemToFridge(item, out string reason);
+                            _exportContainer.RemoveItem(item?.item);
+                        }
                     }
                 }
             }
+            else if (_mono.IsSebreezeSelected)
+            {
+                if (_mono.SelectedSeaBreeze.CanBeStored(_exportContainer.count))
+                {
+                    for (int i = _exportContainer.count - 1; i > -1; i--)
+                    {
+                        var item = _exportContainer.FirstOrDefault();
+                        var result = _mono.SelectedSeaBreeze.AddItemToFridge(item, out string reason);
+                        _exportContainer.RemoveItem(item?.item);
+                        QuickLogger.Debug($"SeaBreeze {_mono.SelectedSeaBreeze.PrefabId.Id}: Operation successful {result}", true);
+                    }
+                }
+            }
+            
         }
 
         internal bool HasItemsToCook()

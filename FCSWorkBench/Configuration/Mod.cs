@@ -1,19 +1,18 @@
-﻿using SMLHelper.V2.Utility;
-using System;
+﻿using System;
 using System.IO;
+using SMLHelper.V2.Utility;
 
-namespace FCSTechFabricator
+namespace FCSTechFabricator.Models
 {
-    public static class Information
+    internal static class Mod
     {
-        /// <summary>
-        /// The mod name "ClassID" of the FCS Power Storage
-        /// </summary>
-        public static string ModName => "FCSTechFabricator";
+        internal static string ModName => "FCSTechFabricator";
 
-        public static string MODFOLDERLOCATION => GetModPath();
+        internal static string ModFolderName => "FCS_TechFabricator";
 
-        public static string LANGUAGEDIRECTORY => GetLanguagePath();
+        internal static string MODFOLDERLOCATION => GetModPath();
+
+        internal static string LANGUAGEDIRECTORY => GetLanguagePath();
 
         private static string GetQModsPath()
         {
@@ -22,10 +21,10 @@ namespace FCSTechFabricator
 
         private static string GetModPath()
         {
-            return Path.Combine(GetQModsPath(), ModName);
+            return Path.Combine(GetQModsPath(), ModFolderName);
         }
 
-        public static string GetAssetPath()
+        internal static string GetAssetPath()
         {
             return Path.Combine(GetModPath(), "Assets");
         }
@@ -41,12 +40,12 @@ namespace FCSTechFabricator
 
         }
 
-        public static string GetSaveFileDirectory()
+        internal static string GetSaveFileDirectory()
         {
             return Path.Combine(SaveUtils.GetCurrentSaveDataDir(), ModName);
         }
 
-        public static string ConfigurationFile()
+        internal static string ConfigurationFile()
         {
             return Path.Combine(MODFOLDERLOCATION, "config.json");
         }

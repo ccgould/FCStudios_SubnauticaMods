@@ -5,7 +5,7 @@ using System;
 namespace FCSAlterraShipping.Patchers
 {
     [HarmonyPatch(typeof(AlterraShippingTarget))]
-    [HarmonyPatch("Awake")]
+    [HarmonyPatch("Initialize")]
     internal class AlterraShippingTarget_Patcher
     {
         private static Action<AlterraShippingTarget> AlterraShippingTargetAdded;

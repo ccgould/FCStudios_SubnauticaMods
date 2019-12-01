@@ -1,4 +1,5 @@
-﻿using FCSCommon.Helpers;
+﻿using FCSAlterraShipping.Configuration;
+using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
 
@@ -15,7 +16,7 @@ namespace FCSAlterraShipping.Buildable
         public bool GetPrefabs()
         {
             QuickLogger.Debug("GetPrefabs");
-            AssetBundle assetBundle = AssetHelper.Asset(this.ClassID, "alterrashippingmodbundle");
+            AssetBundle assetBundle = AssetHelper.Asset(Mod.ModFolderName, Mod.BundleName);
 
             //If the result is null return false.
             if (assetBundle == null)
@@ -29,7 +30,7 @@ namespace FCSAlterraShipping.Buildable
             QuickLogger.Debug($"AssetBundle Set");
 
             //We have found the asset bundle and now we are going to continue by looking for the model.
-            GameObject prefab = assetBundle.LoadAsset<GameObject>("AlterraShippingMod");
+            GameObject prefab = assetBundle.LoadAsset<GameObject>(Mod.GameObjectName);
 
             //If the prefab isn't null lets add the shader to the materials
             if (prefab != null)

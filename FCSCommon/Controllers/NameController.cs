@@ -8,7 +8,8 @@ namespace FCSCommon.Controllers
 {
     public class NameController
     {
-        public Action<string> OnLabelChanged;
+        public Action<string,NameController> OnLabelChanged;
+        public object Tag { get; set; }
         private IRenameNameTarget _target;
         private string _title;
         private string _name;
@@ -36,12 +37,11 @@ namespace FCSCommon.Controllers
         {
             QuickLogger.Debug($"Setting unit name to : {name}");
             _name = name;
-            OnLabelChanged?.Invoke(name);
+            OnLabelChanged?.Invoke(name,this);
         }
 
         public void SetCurrentName(string name,GameObject gameObject)
         {
-            SetCurrentName(name);
             var textComponent = gameObject.GetComponent<Text>();
             
             if (textComponent == null)
@@ -49,8 +49,9 @@ namespace FCSCommon.Controllers
                 QuickLogger.Error<NameController>("Text Component is null");
                 return;
             }
-
             textComponent.text = name;
+
+            SetCurrentName(name);
 
         }
     }

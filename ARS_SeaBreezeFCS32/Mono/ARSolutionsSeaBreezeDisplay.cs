@@ -6,6 +6,8 @@ using FCSCommon.Utilities;
 using System.Collections;
 using System.Linq;
 using FCSCommon.Abstract;
+using FCSCommon.Controllers;
+using SMLHelper.V2.Utility;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -71,7 +73,7 @@ namespace ARS_SeaBreezeFCS32.Mono
             mono.NameController.OnLabelChanged += OnLabelChanged;
         }
 
-        internal void OnLabelChanged(string value)
+        internal void OnLabelChanged(string value,NameController nameController)
         {
             QuickLogger.Debug($"Label set to {value}", true);
             _seaBreeze_LBL.text = value;
@@ -142,7 +144,14 @@ namespace ARS_SeaBreezeFCS32.Mono
                     break;
 
                 case "RenameBTN":
-                    _mono.NameController.Show();
+                   //var cb = _mono.GetComponentInParent<ConstructableBounds>();
+                   //bool flag = cb.bounds.extents.x > 0f && cb.bounds.extents.y > 0f && cb.bounds.extents.z > 0f;
+
+                   //var newCube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                   //newCube.transform.SetParent(_mono.transform,false);
+                   //newCube.transform.localPosition = cb.bounds.position;
+                   //newCube.transform.localScale = cb.bounds.size;
+                   _mono.NameController.Show();
                     break;
             }
         }

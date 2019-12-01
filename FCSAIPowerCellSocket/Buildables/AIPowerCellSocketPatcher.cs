@@ -1,10 +1,13 @@
-﻿using FCSAIPowerCellSocket.Mono;
+﻿using System;
+using FCSAIPowerCellSocket.Mono;
 using FCSCommon.Extensions;
 using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
 using System.IO;
 using FCSAIPowerCellSocket.Configuration;
 using FCSCommon.Helpers;
+using FCSCommon.Utilities;
+using FCSTechFabricator.Helpers;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 
@@ -30,42 +33,63 @@ namespace FCSAIPowerCellSocket.Buildables
                 throw new FileNotFoundException($"Failed to retrieve the {Singleton.FriendlyName} prefab from the asset bundle");
             }
 
+            PatchHelpers.AddNewKit(
+                FCSTechFabricator.Configuration.PowerCellSocketKitClassID,
+                null,
+                Mod.ModName,
+                FCSTechFabricator.Configuration.PowerCellSocketClassID,
+                new[] { "AIS", "PSS" },
+                null);
+
             Singleton.Patch();
         }
 
         public override GameObject GetGameObject()
         {
-            var prefab = GameObject.Instantiate(_Prefab);
-            GameObject consoleModel = prefab.FindChild("model");
+            try
+            {
+                var prefab = GameObject.Instantiate(_Prefab);
+                GameObject consoleModel = prefab.FindChild("model");
 
-            // Update sky applier
-            SkyApplier skyApplier = prefab.AddComponent<SkyApplier>();
-            skyApplier.renderers = consoleModel.GetComponentsInChildren<MeshRenderer>();
-            skyApplier.anchorSky = Skies.Auto;
+                // Update sky applier
+                SkyApplier skyApplier = prefab.AddComponent<SkyApplier>();
+                skyApplier.renderers = consoleModel.GetComponentsInChildren<MeshRenderer>();
+                skyApplier.anchorSky = Skies.Auto;
 
-            //Add the constructable component to the prefab
-            Constructable constructable = prefab.AddComponent<Constructable>();
+                //Add the constructable component to the prefab
+                Constructable constructable = prefab.AddComponent<Constructable>();
 
-            constructable.allowedInBase = true; // Only allowed in Base
-            constructable.allowedInSub = false; // Not allowed in Cyclops
-            constructable.allowedOutside = false;
-            constructable.allowedOnCeiling = false;
-            constructable.allowedOnGround = false; // Only on ground
-            constructable.allowedOnWall = true;
-            constructable.allowedOnConstructables = false;
-            constructable.controlModelState = true;
-            constructable.rotationEnabled = false;
-            constructable.techType = this.TechType;
-            constructable.model = consoleModel;
+                constructable.allowedInBase = true; // Only allowed in Base
+                constructable.allowedInSub = false; // Not allowed in Cyclops
+                constructable.allowedOutside = false;
+                constructable.allowedOnCeiling = false;
+                constructable.allowedOnGround = false; // Only on ground
+                constructable.allowedOnWall = true;
+                constructable.allowedOnConstructables = false;
+                constructable.controlModelState = true;
+                constructable.rotationEnabled = false;
+                constructable.techType = this.TechType;
+                constructable.model = consoleModel;
 
-            //Add the prefabIdentifier
-            PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
-            prefabID.ClassId = this.ClassID;
-            prefab.GetOrAddComponent<AIPowerCellSocketAnimator>();
-            prefab.GetOrAddComponent<AIPowerCellSocketPowerManager>();
-            prefab.GetOrAddComponent<AIPowerCellSocketController>();
+                var center = new Vector3(-0.006649137f,0f, 0.1839597f);
+                var size = new Vector3(2.706617f, 1.698831f, 0.3483825f);
 
-            return prefab;
+                GameObjectHelpers.AddConstructableBounds(prefab,size,center);
+
+                //Add the prefabIdentifier
+                PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
+                prefabID.ClassId = this.ClassID;
+                prefab.GetOrAddComponent<AIPowerCellSocketAnimator>();
+                prefab.GetOrAddComponent<AIPowerCellSocketPowerManager>();
+                prefab.GetOrAddComponent<AIPowerCellSocketController>();
+
+                return prefab;
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error<AIPowerCellSocketBuildable>(e.Message);
+                return null;
+            }
         }
 
         protected override TechData GetBlueprintRecipe()

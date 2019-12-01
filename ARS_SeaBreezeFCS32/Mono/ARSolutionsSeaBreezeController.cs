@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.IO;
 using FCSCommon.Abstract;
 using FCSCommon.Controllers;
+using UnityEngine;
 
 namespace ARS_SeaBreezeFCS32.Mono
 {
@@ -42,7 +43,7 @@ namespace ARS_SeaBreezeFCS32.Mono
         /// </summary>
         public int NumberOfItems => _fridgeContainer.NumberOfItems;
 
-        public int FreeSpace => QPatch.Configuration.Config.StorageLimit - NumberOfItems;
+        public int FreeSpace => QPatch.Configuration.StorageLimit - NumberOfItems;
 
         public void OpenStorage() => _fridgeContainer.OpenStorage();
         public void AttemptToTakeItem(TechType techType) => _fridgeContainer.AttemptToTakeItem(techType);
@@ -74,7 +75,7 @@ namespace ARS_SeaBreezeFCS32.Mono
         private string _currentTimeHMS { get; set; }
         internal bool CoolantIsDone => currentTime <= 0;
         internal ARSolutionsSeaBreezeDisplay Display { get; private set; }
-        internal NameController NameController { get; private set; }
+        public NameController NameController { get; private set; }
 
         private bool _runTimer;
         private bool _doOnce;
@@ -98,8 +99,9 @@ namespace ARS_SeaBreezeFCS32.Mono
                 if (Display != null)
                 {
                     Display.Setup(this);
-                    Display.OnContainerUpdate(_fridgeContainer.NumberOfItems, QPatch.Configuration.Config.StorageLimit);
-                    Display.OnLabelChanged(NameController.GetCurrentName());
+                    var numberOfItems = _fridgeContainer.NumberOfItems;
+                    Display.OnContainerUpdate(numberOfItems, QPatch.Configuration.StorageLimit);
+                    Display.OnLabelChanged(NameController.GetCurrentName(), NameController);
                     _runStartUpOnEnable = false;
                 }
 
@@ -107,17 +109,18 @@ namespace ARS_SeaBreezeFCS32.Mono
                 if (_savedData != null)
                 {
                     _fridgeContainer.LoadFoodItems(_savedData.FridgeContainer);
-                    currentTime = _savedData.RemainingTime;
+                    //currentTime = _savedData.RemainingTime;
                     //PowerManager.SetHasBreakerTripped(savedData.HasBreakerTripped);
                     //_freonContainer.LoadFreon(savedData);
-                    Display.OnContainerUpdate(_fridgeContainer.NumberOfItems, QPatch.Configuration.Config.StorageLimit);
+                    //Display.OnContainerUpdate(_fridgeContainer.NumberOfItems, QPatch.Configuration.Config.StorageLimit);
                     NameController.SetCurrentName(_savedData.UnitName);
-                    Display.OnLabelChanged(NameController.GetCurrentName());
+                    Display.OnLabelChanged(_savedData.UnitName, NameController);
                 }
 
                 _runStartUpOnEnable = false;
             }
         }
+
 
         private void Awake()
         {
@@ -172,7 +175,7 @@ namespace ARS_SeaBreezeFCS32.Mono
                 QuickLogger.Error("Animation Manager Component was not found");
             }
             
-            QuickLogger.Error("Setting Name");
+            QuickLogger.Debug("Setting Name");
 
             NameController.SetCurrentName(Mod.GetNewSeabreezeName());
             //InvokeRepeating("UpdateFridgeCooler", 1, 0.5f);
@@ -183,7 +186,7 @@ namespace ARS_SeaBreezeFCS32.Mono
 
             _initialized = true;
 
-            QuickLogger.Error("Initialized");
+            QuickLogger.Info("Initialized");
         }
 
 
@@ -279,8 +282,8 @@ namespace ARS_SeaBreezeFCS32.Mono
                     if (Display != null)
                     {
                         Display.Setup(this);
-                        Display.OnContainerUpdate(_fridgeContainer.NumberOfItems, QPatch.Configuration.Config.StorageLimit);
-                        Display.OnLabelChanged(NameController.GetCurrentName());
+                        Display.OnContainerUpdate(_fridgeContainer.NumberOfItems, QPatch.Configuration.StorageLimit);
+                        Display.OnLabelChanged(NameController.GetCurrentName(), NameController);
                         _runStartUpOnEnable = false;
                     }
                 }
@@ -306,6 +309,9 @@ namespace ARS_SeaBreezeFCS32.Mono
 
         public string GetPrefabID()
         {
+            if(PrefabId == null)
+                PrefabId = GetComponentInParent<PrefabIdentifier>() ?? GetComponent<PrefabIdentifier>();
+
             return PrefabId?.Id;
         }
 
