@@ -37,7 +37,12 @@ namespace ExStorageDepot.Mono
                 var data = Mod.GetExStorageDepotSaveData(id);
                 NameController.SetCurrentName(data.UnitName);
                 Storage.UpdateInventory();
-                //Storage.LoadFromSave(data.StorageItems);
+                
+                if (data.StorageItems != null)
+                {
+                    Storage.LoadFromSave(data.StorageItems);
+                }
+
                 BulkMultiplier = data.Multiplier;
                 Display.UpdateMultiplier();
             }

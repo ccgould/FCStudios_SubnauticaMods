@@ -94,9 +94,16 @@ namespace FCSCommon.Helpers
 
         public void ClearPage()
         {
-            for (int i = 0; i < _itemsGrid.transform.childCount; i++)
+            if(_itemsGrid == null) return;
+
+            for (int i = 0; i < _itemsGrid?.transform?.childCount; i++)
             {
-                Destroy(_itemsGrid.transform.GetChild(i).gameObject);
+                var item = _itemsGrid?.transform?.GetChild(i)?.gameObject;
+                
+                if (item != null)
+                {
+                    Destroy(item);
+                }
             }
         }
 

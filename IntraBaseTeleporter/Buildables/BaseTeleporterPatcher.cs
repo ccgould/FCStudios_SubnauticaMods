@@ -71,8 +71,6 @@ namespace AE.IntraBaseTeleporter.Buildables
                     prefab.AddComponent<BTDisplayManager>();
                     prefab.AddComponent<FMOD_CustomLoopingEmitter>();
                     prefab.AddComponent<BaseTeleporterController>();
-
-
                 }
             }
             catch (Exception e)
@@ -114,10 +112,10 @@ namespace AE.IntraBaseTeleporter.Buildables
             Register();
 
             PatchHelpers.AddNewKit(
-                FCSTechFabricator.Configuration.IntraBaseTeleporterKitClassID,
+                FCSTechFabricator.Configuration.QuantumTeleporterKitClassID,
                 null,
                 Mod.FriendlyName,
-                FCSTechFabricator.Configuration.IntraBaseTeleporterClassID,
+                FCSTechFabricator.Configuration.QuantumTeleporterClassID,
                 new[] { "ASTS", "ES" },
                 null);
 

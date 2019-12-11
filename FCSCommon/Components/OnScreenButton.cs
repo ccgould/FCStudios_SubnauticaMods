@@ -29,6 +29,7 @@ namespace FCSCommon.Components
 
             if (this.IsHovered && inInteractionRange)
             {
+                if(string.IsNullOrEmpty(TextLineOne) && string.IsNullOrEmpty(TextLineTwo)) return;
                 HandReticle.main.SetInteractTextRaw(this.TextLineOne, this.TextLineTwo);
             }
 

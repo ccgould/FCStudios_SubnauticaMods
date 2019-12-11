@@ -103,6 +103,7 @@
     <Compile Include="Mono\Managers\ExStorageDepotDisplayManager.cs" />
     <Compile Include="Mono\Managers\ExStorageDepotNameManager.cs" />
     <Compile Include="Mono\Managers\ExStorageDepotStorageManager.cs" />
+    <Compile Include="Mono\MonoClassTest.cs" />
     <Compile Include="Patchers\OnProtoDeserializeObjectTree_Patcher.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

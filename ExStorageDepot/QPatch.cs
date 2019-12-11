@@ -12,7 +12,7 @@ namespace ExStorageDepot
 {
     public static class QPatch
     {
-        internal static Configuration.Config Config { get; private set; }
+        internal static Config Config { get; private set; }
 
         public static void Patch()
         {

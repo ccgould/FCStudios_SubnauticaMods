@@ -60,13 +60,13 @@ namespace AE.IntraBaseTeleporter.Buildables
         /// <param name="prefab">The prefab to apply shaders.</param>
         private void ApplyShaders(GameObject prefab, AssetBundle bundle)
         {
-            #region SystemLights_BaseColor
+            #region Decal
             MaterialHelpers.ApplyEmissionShader(DecalMaterial, $"{Mod.ModName}_D_COL_LUM", prefab, bundle, new Color(1, 1f, 1f));
             MaterialHelpers.ApplySpecShader(DecalMaterial, $"{Mod.ModName}_D_COL_SPEC", prefab, 1, 6f, bundle);
             MaterialHelpers.ApplyAlphaShader(DecalMaterial, prefab);
             #endregion
 
-            #region FCS_SUBMods_GlobalDecals
+            #region Main
             MaterialHelpers.ApplySpecShader(BodyMaterial, $"{Mod.ModName}_M_COL_SPEC", prefab, 1, 6f, bundle);
             MaterialHelpers.ApplyNormalShader(BodyMaterial, $"{Mod.ModName}_M_COL_NORM", prefab, bundle);
             #endregion

@@ -42,13 +42,13 @@ namespace FCSCommon.Helpers
 
             if (result == null)
             {
-                QuickLogger.Error<InterfaceHelpers>($"Cant game object {name}");
+                QuickLogger.Error<InterfaceHelpers>($"Cant find game object {name}");
             }
 
             return result;
         }
 
-        public static void CreateButton(GameObject go, string btnName, InterfaceButtonMode btnMode, Action<string, object> onButtonClick, Color startColor, Color hoverColor)
+        public static InterfaceButton CreateButton(GameObject go, string btnName, InterfaceButtonMode btnMode, Action<string, object> onButtonClick, Color startColor, Color hoverColor)
         {
             var button = go.AddComponent<InterfaceButton>();
             button.BtnName = btnName;
@@ -56,6 +56,7 @@ namespace FCSCommon.Helpers
             button.STARTING_COLOR = startColor;
             button.HOVER_COLOR = hoverColor;
             button.OnButtonClick = onButtonClick;
+            return button;
         }
 
         private static GameObject FindObjectRecursion(GameObject gameObject, string name)
@@ -75,8 +76,7 @@ namespace FCSCommon.Helpers
 
             return null;
         }
-
-
+        
         public static bool CreatePaginator(GameObject parent, string childName, int amountToChangeBy, Action<int> ChangePageBy, out PaginatorButton customButton)
         {
             var result = CreatePaginator(parent, childName, amountToChangeBy, ChangePageBy, Color.white, ColorBlue,

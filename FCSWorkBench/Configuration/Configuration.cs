@@ -1,6 +1,5 @@
 ﻿using FCSTechFabricator.Models;
 using Oculus.Newtonsoft.Json;
-using Oculus.Newtonsoft.Json.Serialization;
 using System.Collections.Generic;
 
 namespace FCSTechFabricator
@@ -10,7 +9,7 @@ namespace FCSTechFabricator
 
 
         #region Mod Class IDS
-        public static string IntraBaseTeleporterClassID => "AEIntraBaseTeleporter";
+        public static string QuantumTeleporterClassID => "QuantumTeleporter";
         public static string MiniFountainFilterClassID => "MiniFountainFilter";
         public static string ExStorageClassID => "ExStorageDepot";
         public static string SeaBreezeClassID => "ARSSeaBreezeFCS32";
@@ -25,7 +24,7 @@ namespace FCSTechFabricator
         #endregion
 
         #region Kit Class ID
-        public static string IntraBaseTeleporterKitClassID => "IntraBaseTeleporterKit_AE";
+        public static string QuantumTeleporterKitClassID => "QuantumTeleporterKit_AE";
         public static string PowerCellSocketKitClassID => "PowerCellSocket_AIS";
         public static string AMMiniMedBayKitClassID => "AMMiniMedBayKit_AMS";
         public static string FocusAttachmentKitClassID => "FocusAttachment_DD";

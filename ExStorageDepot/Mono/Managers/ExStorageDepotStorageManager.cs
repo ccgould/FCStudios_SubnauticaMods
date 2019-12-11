@@ -43,8 +43,8 @@ namespace ExStorageDepot.Mono.Managers
         private ChildObjectIdentifier _containerRoot;
         private ExStorageDepotController _mono;
         private int _multiplier = 1;
-        private const int DumpContainerWidth = 8;
-        private const int DumpContainerHeight = 10;
+        private const int DumpContainerWidth = 6;
+        private const int DumpContainerHeight = 8;
         private ItemsContainer _dumpContainer;
         private int _maxItems;
         private StorageContainer _container;
@@ -56,9 +56,7 @@ namespace ExStorageDepot.Mono.Managers
         internal void Initialize(ExStorageDepotController mono)
         {
             _mono = mono;
-            var maxStorageValue = QPatch.Config.GetValue("MaxStorage");
-            var maxStorage = maxStorageValue != String.Empty ? Convert.ToInt32(maxStorageValue) : 0;
-            _containerHeight = _maxItems = maxStorage;
+            _containerHeight = _maxItems = QPatch.Config.MaxStorage;
             
             if (_containerRoot == null)
             {
@@ -88,6 +86,7 @@ namespace ExStorageDepot.Mono.Managers
 
                 _dumpContainer = new ItemsContainer(DumpContainerWidth, DumpContainerHeight, _containerRoot.transform,
                     ExStorageDepotBuildable.DumpContainerLabel(), null);
+                _dumpContainer.Resize(DumpContainerWidth, DumpContainerHeight);
                 _dumpContainer.isAllowedToAdd += IsAllowedToAdd;
             }
 
@@ -225,14 +224,14 @@ namespace ExStorageDepot.Mono.Managers
 
         internal void LoadFromSave(List<ItemData> storageItems)
         {
-            //if (storageItems != null)
-            //{
-            //    foreach (ItemData itemData in storageItems)
-            //    {
-            //        QuickLogger.Debug($"Load from Save {itemData.TechType}");
-            //        AddItem(itemData);
-            //    }
-            //}
+            if (storageItems != null)
+            {
+                foreach (ItemData itemData in storageItems)
+                {
+                    QuickLogger.Debug($"Load from Save {itemData.TechType}");
+                    AddItem(itemData);
+                }
+            }
         }
 
         //internal List<ItemData> GetTrackedItems()

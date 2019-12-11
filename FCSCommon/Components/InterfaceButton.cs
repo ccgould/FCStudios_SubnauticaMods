@@ -30,6 +30,7 @@ namespace FCSCommon.Components
         public Action<bool> OnInterfaceButton { get; set; }
 
         public Action<string, object> OnButtonClick;
+        private bool _isSelected;
 
         #endregion
 
@@ -37,6 +38,7 @@ namespace FCSCommon.Components
 
         public void OnEnable()
         {
+            if(_isSelected) return;
             if (string.IsNullOrEmpty(BtnName)) return;
 
             Disabled = false;
@@ -125,6 +127,7 @@ namespace FCSCommon.Components
 
         public override void OnPointerEnter(PointerEventData eventData)
         {
+            if (_isSelected) return;
             base.OnPointerEnter(eventData);
             UpdateTextComponent(IsTextMode());
             OnInterfaceButton?.Invoke(true);
@@ -159,6 +162,8 @@ namespace FCSCommon.Components
 
         public override void OnPointerExit(PointerEventData eventData)
         {
+            if (_isSelected) return;
+
             base.OnPointerExit(eventData);
             UpdateTextComponent(IsTextMode());
             OnInterfaceButton?.Invoke(false);
@@ -216,6 +221,44 @@ namespace FCSCommon.Components
 
             }
             TextComponent.text = message;
+        }
+        public void Select()
+        {
+            _isSelected = true;
+
+            switch (this.ButtonMode)
+            {
+                case InterfaceButtonMode.Background:
+                    if (GetComponent<Image>() != null)
+                    {
+                        GetComponent<Image>().color = this.HOVER_COLOR;
+                    }
+                    break;
+
+                case InterfaceButtonMode.TextColor:
+                    if (TextComponent == null) return;
+                    this.TextComponent.color = this.HOVER_COLOR;
+                    break;
+            }
+        }
+        public void DeSelect()
+        {
+            _isSelected = false;
+
+            switch (this.ButtonMode)
+            {
+                case InterfaceButtonMode.Background:
+                    if (GetComponent<Image>() != null)
+                    {
+                        GetComponent<Image>().color = STARTING_COLOR;
+                    }
+                    break;
+
+                case InterfaceButtonMode.TextColor:
+                    if (TextComponent == null) return;
+                    this.TextComponent.color = this.STARTING_COLOR;
+                    break;
+            }
         }
     }
 }

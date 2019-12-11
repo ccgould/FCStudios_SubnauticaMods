@@ -88,7 +88,7 @@ namespace FCSAlterraShipping.Buildable
             Constructable constructable = prefab.AddComponent<Constructable>();
 
             constructable.allowedInBase = true; // Only allowed in Base
-            constructable.allowedInSub = false; // Not allowed in Cyclops
+            constructable.allowedInSub = true; // Not allowed in Cyclops
             constructable.allowedOutside = false;
             constructable.allowedOnCeiling = false;
             constructable.allowedOnGround = true; // Only on ground

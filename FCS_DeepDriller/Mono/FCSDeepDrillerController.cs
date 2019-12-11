@@ -481,7 +481,7 @@ namespace FCS_DeepDriller.Mono
 
             if (HealthManager.IsDamagedFlag() || !PowerManager.IsPowerAvailable())
             {
-                QuickLogger.Debug($"IsDamaged = {HealthManager.IsDamagedFlag()} || IsPowerAvaliable = {PowerManager.IsPowerAvailable()}", true);
+                //QuickLogger.Debug($"IsDamaged = {HealthManager.IsDamagedFlag()} || IsPowerAvaliable = {PowerManager.IsPowerAvailable()}", true);
                 return;
             }
 
@@ -502,7 +502,7 @@ namespace FCS_DeepDriller.Mono
             while (!AnimationHandler.GetBoolHash(ExtendStateHash))
             {
                 PowerOnDrill();
-                QuickLogger.Debug($"Attempting to extend legs attempt ({i++})");
+                //QuickLogger.Debug($"Attempting to extend legs attempt ({i++})");
                 yield return null;
             }
         }

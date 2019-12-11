@@ -24,13 +24,16 @@ namespace FCSAlterraShipping.Models
 
         public static ShippingTargetManager FindManager(SubRoot subRoot)
         {
-            if (!subRoot.isBase || subRoot.isCyclops) return null;
+            if (subRoot.isBase || subRoot.isCyclops) //Changed To allow in cyclops
+            {
+                QuickLogger.Debug($"Processing SubRoot = {subRoot.GetInstanceID()}");
 
-            QuickLogger.Debug($"Processing SubRoot = {subRoot.GetInstanceID()}");
+                var manager = Managers.Find(x => x.InstanceID == subRoot.GetInstanceID() && x.Habitat == subRoot);
 
-            var manager = Managers.Find(x => x.InstanceID == subRoot.GetInstanceID() && x.Habitat == subRoot);
+                return manager ?? CreateNewManager(subRoot);
+            }
 
-            return manager ?? CreateNewManager(subRoot);
+            return null;
         }
 
         internal int GetShippingTargetCount()

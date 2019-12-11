@@ -37,6 +37,7 @@ namespace FCSTechFabricator.Mono
             {"Mini MedBay",new ModKey{Key = "MMB",ParentKey = "AMS"}},
             {"Powercell Socket",new ModKey{Key = "PSS",ParentKey = "AIS"}},
             {"Intra-Base Teleporter",new ModKey{Key = "IBT",ParentKey = "AE"}},
+            {"Quantum Teleporter",new ModKey{Key = "QT",ParentKey = "AE"}},
             {"Alterra Shipping",new ModKey{Key = "ASU",ParentKey = "ASS"}},
         };
 

@@ -49,6 +49,7 @@ namespace FCS_AIMarineTurbine.Buildable
             QuickLogger.Debug($"Biome Speeds Count {JetStreamT242Config.BiomeSpeeds.Count}");
         }
         public static JetStreamT242Config JetStreamT242Config { get; set; }
+        public override string IconFileName => "QuantumTeleporter.png";
 
         public AIJetStreamT242Buildable() : base(FCSTechFabricator.Configuration.AIJetStreamT242ClassID,
             "AI JetStreamT242",
@@ -100,6 +101,7 @@ namespace FCS_AIMarineTurbine.Buildable
                 constructable.allowedOutside = true;
                 constructable.model = model;
                 constructable.rotationEnabled = true;
+                constructable.allowedOnConstructables = false;
                 constructable.techType = TechType;
 
                 var center = new Vector3(0f, 2.970485f, 0f);

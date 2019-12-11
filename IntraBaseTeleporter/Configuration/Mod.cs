@@ -15,7 +15,7 @@ namespace AE.IntraBaseTeleporter.Configuration
         public static string SaveDataFilename => $"{ModName}SaveData.json";
         public static string FriendlyName => "Alterra Electrical Intra-Base Teleporter";
         public static string Description => "Instantly teleport from one location to another in your base with this nifty teleporter by Alterra";
-        public static string ClassID => FCSTechFabricator.Configuration.IntraBaseTeleporterClassID;
+        public static string ClassID => FCSTechFabricator.Configuration.QuantumTeleporterClassID;
         public static string ModDirectoryName => $"FCS_{ModName}";
 
         private static ModSaver _saveObject;

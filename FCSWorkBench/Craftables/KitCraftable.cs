@@ -24,6 +24,7 @@ namespace FCSTechFabricator.Mono
         public KitCraftable(string classId, string friendlyName, string description, string icon, string[] stepsToFabricatorTab) : 
             base(classId, friendlyName, description)
         {
+            
             StepsToFabricatorTab = stepsToFabricatorTab;
             IconFileName = string.IsNullOrEmpty(icon) ? "Kit_FCS.png" : icon;
         }

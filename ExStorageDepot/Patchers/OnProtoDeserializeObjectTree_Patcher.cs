@@ -2,6 +2,8 @@
 using Harmony;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using ExStorageDepot.Configuration;
 using UnityEngine;
 
 namespace ExStorageDepot.Patchers
@@ -27,15 +29,31 @@ namespace ExStorageDepot.Patchers
                 GameObject parentGO = __instance.gameObject.transform.parent.gameObject;
                 PrefabIdentifier pid2 = parentGO.GetComponent<PrefabIdentifier>();
 
+                QuickLogger.Debug(parentGO.name);
+
+                
+
                 if (pid2 != null && parentGO.name.StartsWith("ExStorageDepot"))
                 {
                     QuickLogger.Debug("OnProtoDeserializeObjectTree() storageContainer Id=[" + pid2.Id + "] objName=[" + parentGO.name + "] nbItems=[" + (__instance.container != null ? Convert.ToString(__instance.container.count) : "null") + "]");
                     if (_storages.ContainsKey(pid2.Id))
                     {
-                        QuickLogger.Debug($"Transferring items and destroying {pid2.Id}");
+                        var data = Mod.GetExStorageDepotSaveData(pid2.Id);
 
-                        StorageHelper.TransferItems(__instance.storageRoot.gameObject, _storages[pid2.Id].container);
-                        GameObject.Destroy(__instance.gameObject);
+                        QuickLogger.Debug($"Data = {data} || Count = {data.StorageItems?.Count}");
+
+                        if (data != null && data.StorageItems != null)
+                        {
+                            QuickLogger.Debug($"Data exists deleting in game storage.");
+                            GameObject.Destroy(__instance.storageRoot.gameObject);
+                            GameObject.Destroy(__instance.gameObject);
+                        }
+                        else
+                        {
+                            QuickLogger.Debug($"Transferring items and destroying {pid2.Id}");
+                            StorageHelper.TransferItems(__instance.storageRoot.gameObject, _storages[pid2.Id].container);
+                            GameObject.Destroy(__instance.gameObject);
+                        }
                     }
                     else
                     {

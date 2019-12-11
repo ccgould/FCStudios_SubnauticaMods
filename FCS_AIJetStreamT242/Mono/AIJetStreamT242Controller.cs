@@ -9,6 +9,8 @@ using Oculus.Newtonsoft.Json;
 using SMLHelper.V2.Utility;
 using System;
 using System.IO;
+using FCS_AIMarineTurbine.Buildable;
+using FCS_AIMarineTurbine.Display.Patching;
 using rail;
 using UnityEngine;
 
@@ -122,7 +124,7 @@ namespace FCS_AIMarineTurbine.Mono
         
         private void Update()
         {
-            if(!IsConnectedToBase) return;
+            if(!IsOperational()) return;
             UpdatePowerSafeState();
         }
         
@@ -298,7 +300,6 @@ namespace FCS_AIMarineTurbine.Mono
             if (_seaBase == null) return;
 
             if (!_seaBase.name.StartsWith("Base", StringComparison.OrdinalIgnoreCase)) return;
-
             _rotor.transform.rotation = Quaternion.Lerp(_rotor.transform.rotation, _targetRotation, 1 * DayNightCycle.main.deltaTime);
 
         }
@@ -394,7 +395,7 @@ namespace FCS_AIMarineTurbine.Mono
 
                 if (isActiveAndEnabled)
                 {
-                    if (_seaBase != null)
+                    if (IsOperational())
                     {
                         if (!IsInitialized)
                         {
@@ -414,8 +415,7 @@ namespace FCS_AIMarineTurbine.Mono
                     }
                     else
                     {
-                        ErrorMessage.AddMessage($"[AIJetStreamT242] ERROR: Must be on a platform to operate");
-                        QuickLogger.Debug("ERROR: Can not work out what base it was placed inside.");
+                        QuickLogger.Message(DisplayLanguagePatching.NotOperational(),true);
                     }
                 }
                 else
@@ -436,8 +436,19 @@ namespace FCS_AIMarineTurbine.Mono
         private void RotateToMag()
         {
             if (_rotor == null) return;
-
             _rotor.transform.rotation = Quaternion.Euler(0, -Input.compass.magneticHeading, 0);
+        }
+
+
+        public bool IsUpright()
+        {
+
+            if (Mathf.Approximately(transform.up.y, 1f))
+            {
+                return true;
+            }
+
+            return false;
         }
 
         #endregion
@@ -484,10 +495,23 @@ namespace FCS_AIMarineTurbine.Mono
 
         #endregion
 
+        internal bool IsOperational()
+        {
+            return IsUpright() && IsConnectedToBase;
+        }
+
         public void OnHandHover(GUIHand hand)
         {
-            HandReticle.main.SetInteractText(GetTurbinePowerData(), false);
-            HandReticle.main.SetIcon(HandReticle.IconType.Default);
+            if (!IsOperational())
+            {
+                HandReticle.main.SetInteractText(DisplayLanguagePatching.NotOperational(), false);
+                HandReticle.main.SetIcon(HandReticle.IconType.Default);
+            }
+            else
+            {
+                HandReticle.main.SetInteractText(GetTurbinePowerData(), false);
+                HandReticle.main.SetIcon(HandReticle.IconType.Default);
+            }
         }
 
         public void OnHandClick(GUIHand hand)

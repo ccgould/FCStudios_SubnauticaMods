@@ -704,9 +704,9 @@ namespace FCSAlterraShipping.Display
             }
         }
 
-        private void OnTimerChanged(string obj)
+        private void OnTimerChanged(string timeAsString)
         {
-            _timeLeftTXT.text = $"{GetLanguage(DisplayLanguagePatching.TimeLeftKey)} {obj}";
+            _timeLeftTXT.text = $"{GetLanguage(DisplayLanguagePatching.TimeLeftKey)} {timeAsString}";
         }
 
         private void GlobalChanged()
@@ -856,7 +856,6 @@ namespace FCSAlterraShipping.Display
             _sender = true;
             _mono.ContainerMode = ShippingContainerStates.Shipping;
             _mono.TransferItems(target);
-
         }
 
         private IEnumerator BootScreenEnu()

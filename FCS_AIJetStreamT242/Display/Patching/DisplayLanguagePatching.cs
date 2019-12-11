@@ -21,6 +21,8 @@ namespace FCS_AIMarineTurbine.Display.Patching
         public const string PingingKey = "Pinging";
         public const string LegendKey = "Legend";
         public const string StatusOverviewKey = "StatusOverview";
+        private const string NotOperationalKey = "MT_NotOperational";
+
 
         internal static void AdditionPatching()
         {
@@ -42,6 +44,12 @@ namespace FCS_AIMarineTurbine.Display.Patching
             LanguageHandler.SetLanguageLine(LegendKey, "Legend");
             LanguageHandler.SetLanguageLine(PoweredOffKey, "Powered Off");
             LanguageHandler.SetLanguageLine(StatusOverviewKey, "Status Overview");
+            LanguageHandler.SetLanguageLine(NotOperationalKey, "Must be on a platform to operate and underwater level.");
+        }
+
+        public static string NotOperational()
+        {
+            return Language.main.Get(NotOperationalKey);
         }
     }
 }

@@ -82,7 +82,7 @@ namespace ExStorageDepot.Buildable
                 constructable.techType = TechType;
                 constructable.rotationEnabled = true;
                 constructable.allowedOnConstructables = Player.main.GetDepth() > 1;
-
+                
                 // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
                 var lwe = prefab.AddComponent<LargeWorldEntity>();
                 lwe.cellLevel = LargeWorldEntity.CellLevel.Global;
@@ -96,6 +96,7 @@ namespace ExStorageDepot.Buildable
 
                 GameObjectHelpers.AddConstructableBounds(prefab, size,center);
 
+                //prefab.AddComponent<MonoClassTest>();
                 prefab.AddComponent<PrefabIdentifier>().ClassId = this.ClassID;
                 prefab.AddComponent<FMOD_CustomLoopingEmitter>();
                 prefab.AddComponent<ExStorageDepotController>();

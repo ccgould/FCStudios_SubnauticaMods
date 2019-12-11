@@ -207,7 +207,7 @@ namespace FCSTechFabricator.Helpers
                     FriendlyName = "Intra-Base Teleporter Kit",
                     Description = "This kit allows you to make one Intra-Base Teleporter unit",
                     FabricatorSteps = new[]{ "AE", "IBT" },
-                    ModParent = Configuration.IntraBaseTeleporterClassID
+                    ModParent = Configuration.QuantumTeleporterClassID
                 },
             };
 
