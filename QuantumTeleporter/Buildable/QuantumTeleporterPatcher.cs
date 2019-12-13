@@ -11,6 +11,7 @@ using QuantumTeleporter.Configuration;
 using QuantumTeleporter.Managers;
 using QuantumTeleporter.Mono;
 using SMLHelper.V2.Crafting;
+using SMLHelper.V2.Utility;
 using UnityEngine;
 
 namespace QuantumTeleporter.Buildable
@@ -32,6 +33,10 @@ namespace QuantumTeleporter.Buildable
                 var prefab = GameObject.Instantiate(_prefab);
 
                 prefab.name = this.PrefabFileName;
+
+                var ping = prefab.GetOrAddComponent<PingInstance>();
+                ping.origin = prefab.transform;
+                ping.pingType = PingType.Signal;
 
 
                 var center = new Vector3(0f, 1.433978f, 0f);
@@ -115,6 +120,7 @@ namespace QuantumTeleporter.Buildable
                 PrefabIdentifier prefabID = _prefab.AddComponent<PrefabIdentifier>();
                 prefabID.ClassId = Singleton.ClassID;
                 
+
                 _prefab.AddComponent<AnimationManager>();
                 _prefab.AddComponent<TechTag>().type = Singleton.TechType;
                 _prefab.AddComponent<FMOD_CustomLoopingEmitter>();

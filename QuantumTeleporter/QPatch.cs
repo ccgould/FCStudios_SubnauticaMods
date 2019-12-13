@@ -29,7 +29,6 @@ namespace QuantumTeleporter
 
             try
             {
-
                 GlobalBundle = FCSTechFabricator.QPatch.Bundle;
 
                 if (GlobalBundle == null)

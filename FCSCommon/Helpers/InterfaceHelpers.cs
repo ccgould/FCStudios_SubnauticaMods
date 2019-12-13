@@ -48,7 +48,7 @@ namespace FCSCommon.Helpers
             return result;
         }
 
-        public static InterfaceButton CreateButton(GameObject go, string btnName, InterfaceButtonMode btnMode, Action<string, object> onButtonClick, Color startColor, Color hoverColor)
+        public static InterfaceButton CreateButton(GameObject go, string btnName, InterfaceButtonMode btnMode, Action<string, object> onButtonClick, Color startColor, Color hoverColor,float maxInteractionRange)
         {
             var button = go.AddComponent<InterfaceButton>();
             button.BtnName = btnName;
@@ -56,6 +56,7 @@ namespace FCSCommon.Helpers
             button.STARTING_COLOR = startColor;
             button.HOVER_COLOR = hoverColor;
             button.OnButtonClick = onButtonClick;
+            button.MaxInteractionRange = maxInteractionRange;
             return button;
         }
 

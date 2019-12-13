@@ -12,8 +12,10 @@ namespace FCSCommon.Components
         protected bool IsHovered { get; set; }
         public string TextLineOne { get; set; }
         public string TextLineTwo { get; set; }
+
         private bool isHoveredOutOfRange;
         public bool Disabled { get; set; }
+        public float MaxInteractionRange { get; set; }  = 2.5f;
 
 
         public virtual void OnDisable()
@@ -67,7 +69,8 @@ namespace FCSCommon.Components
 
         protected bool InInteractionRange()
         {
-            return Mathf.Abs(Vector3.Distance(this.gameObject.transform.position, Player.main.transform.position)) <= 2.5;
+            return Mathf.Abs(Vector3.Distance(this.gameObject.transform.position, Player.main.transform.position)) <= MaxInteractionRange;
         }
+
     }
 }

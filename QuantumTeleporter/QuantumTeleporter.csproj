@@ -9,9 +9,10 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>QuantumTeleporter</RootNamespace>
     <AssemblyName>QuantumTeleporter</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -89,6 +90,7 @@
     <Compile Include="Enumerators\QTTabs.cs" />
     <Compile Include="Managers\BaseManager.cs" />
     <Compile Include="Managers\ItemDisplayStatusHandler.cs" />
+    <Compile Include="Managers\QTPingManager.cs" />
     <Compile Include="Managers\QTDisplayManager.cs" />
     <Compile Include="Managers\QTDoorManager.cs" />
     <Compile Include="Managers\QTPowerManager.cs" />

@@ -17,6 +17,7 @@ namespace QuantumTeleporter.Managers
         private Text _textField;
         private QTDisplayManager _display;
         private Text _statusField;
+        private float _maxInteractionRange;
 
 
         public virtual void Update()
@@ -29,7 +30,7 @@ namespace QuantumTeleporter.Managers
             }
         }
 
-        internal void Initialize(QuantumTeleporterController mono, GameObject textField, GameObject statusField, QTDisplayManager display)
+        internal void Initialize(QuantumTeleporterController mono, GameObject textField, GameObject statusField, QTDisplayManager display, float maxInteractionRange)
         {
             _mono = mono;
             _display = display;
@@ -46,6 +47,7 @@ namespace QuantumTeleporter.Managers
 
             InvokeRepeating(nameof(UpdateStatus),1,1);
             mono.NameController.OnLabelChanged += OnLabelChanged;
+            _maxInteractionRange = maxInteractionRange;
         }
 
         private void OnLabelChanged(string arg1, NameController arg2)
@@ -87,7 +89,7 @@ namespace QuantumTeleporter.Managers
 
         protected bool InInteractionRange()
         {
-            return Mathf.Abs(Vector3.Distance(this.gameObject.transform.position, Player.main.transform.position)) <= 2.5;
+            return Mathf.Abs(Vector3.Distance(this.gameObject.transform.position, Player.main.transform.position)) <= _maxInteractionRange;
         }
 
         private void OnDestroy()

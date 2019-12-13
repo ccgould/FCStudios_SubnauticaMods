@@ -21,6 +21,7 @@ namespace FCS_AIMarineTurbine.Buildable
         public override TechGroup GroupForPDA { get; } = TechGroup.InteriorModules;
         public override TechCategory CategoryForPDA { get; } = TechCategory.InteriorModule;
         public override string AssetsFolder { get; } = $"FCS_MarineTurbine/Assets";
+        public override string IconFileName => "AIMarineTurbine.png";
         public static void PatchSMLHelper()
         {
             if (!Singleton.GetPrefabs())

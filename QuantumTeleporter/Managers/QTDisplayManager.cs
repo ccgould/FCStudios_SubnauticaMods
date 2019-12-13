@@ -34,7 +34,7 @@ namespace QuantumTeleporter.Managers
         private QTTeleportTypes _tType;
         private Text _destination;
         private bool _initialized;
-
+        private const float MaxInteractionRange = 0.8f;
         internal void Setup(QuantumTeleporterController mono)
         {
             _mono = mono;
@@ -196,7 +196,7 @@ namespace QuantumTeleporter.Managers
             if (colorPickerBtn == null) return false;
 
             InterfaceHelpers.CreateButton(colorPickerBtn, "ColorPageBTN", InterfaceButtonMode.Background,
-                OnButtonClick, _startColor, _hoverColor);
+                OnButtonClick, _startColor, _hoverColor, MaxInteractionRange);
             #endregion
 
             #region Color Picker Button
@@ -205,7 +205,7 @@ namespace QuantumTeleporter.Managers
             if (renameBtn == null) return false;
 
             InterfaceHelpers.CreateButton(renameBtn, "RenameBTN", InterfaceButtonMode.Background,
-                OnButtonClick, _startColor, _hoverColor);
+                OnButtonClick, _startColor, _hoverColor, MaxInteractionRange);
             #endregion
 
             #region Text Field
@@ -271,7 +271,7 @@ namespace QuantumTeleporter.Managers
             if (homeBtn == null) return false;
 
             InterfaceHelpers.CreateButton(homeBtn, "HomeBTN", InterfaceButtonMode.Background,
-                OnButtonClick, _startColor, _hoverColor);
+                OnButtonClick, _startColor, _hoverColor, MaxInteractionRange);
             #endregion
 
             #region Prev Color Button
@@ -324,7 +324,7 @@ namespace QuantumTeleporter.Managers
             if (intraTele == null) return false;
 
             _intraTeleBtn = InterfaceHelpers.CreateButton(intraTele, "IntraTeleBtn", InterfaceButtonMode.Background,
-                OnButtonClick, Color.black, Color.white);
+                OnButtonClick, Color.black, Color.white, MaxInteractionRange);
             #endregion
 
             #region GLobal Tele Button
@@ -333,7 +333,7 @@ namespace QuantumTeleporter.Managers
             if (globalTele == null) return false;
 
             _globalTeleBtn = InterfaceHelpers.CreateButton(globalTele, "GlobalTeleBtn", InterfaceButtonMode.Background,
-                OnButtonClick, Color.black, Color.white);
+                OnButtonClick, Color.black, Color.white, MaxInteractionRange);
             #endregion
 
             #region Information Label
@@ -352,7 +352,7 @@ namespace QuantumTeleporter.Managers
             if (yesBTNGO == null) return false;
 
                 var yesBTN = InterfaceHelpers.CreateButton(yesBTNGO, "ConfirmYesBtn", InterfaceButtonMode.Background,
-                OnButtonClick, Color.black, Color.white);
+                OnButtonClick, Color.black, Color.white, MaxInteractionRange);
                 yesBTN.ChangeText(QuantumTeleporterBuildable.Confirm());
             #endregion
 
@@ -362,7 +362,7 @@ namespace QuantumTeleporter.Managers
             if (noBTNGO == null) return false;
 
             var noBTN = InterfaceHelpers.CreateButton(noBTNGO, "ConfirmNoBtn", InterfaceButtonMode.Background,
-                OnButtonClick, Color.black, Color.white);
+                OnButtonClick, Color.black, Color.white, MaxInteractionRange);
             noBTN.ChangeText(QuantumTeleporterBuildable.Cancel());
             #endregion
 
@@ -459,7 +459,7 @@ namespace QuantumTeleporter.Managers
                 text.text = unitName;
 
                 var statusUpdater = itemDisplay.AddComponent<ItemDisplayStatusHandler>();
-                statusUpdater.Initialize((QuantumTeleporterController)unit, textField,statusLBL,this);
+                statusUpdater.Initialize((QuantumTeleporterController)unit, textField,statusLBL,this, MaxInteractionRange);
    
                 var itemButton = itemDisplay.AddComponent<InterfaceButton>();
                 itemButton.ButtonMode = InterfaceButtonMode.TextColor;
@@ -467,6 +467,7 @@ namespace QuantumTeleporter.Managers
                 itemButton.TextComponent = text;
                 itemButton.OnButtonClick += OnButtonClick;
                 itemButton.BtnName = "Unit";
+                itemButton.MaxInteractionRange = MaxInteractionRange;
 
                 QuickLogger.Debug($"Added Unit {unitName}");
             }

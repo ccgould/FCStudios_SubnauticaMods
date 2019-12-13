@@ -39,6 +39,7 @@ namespace QuantumTeleporter.Mono
         public SubRoot SubRoot { get; set; }
         public BaseManager Manager { get; set; }
         public QTDoorManager QTDoorManager { get; private set; }
+        public QTPingManager QTPingManager { get; private set; }
 
         private void OnEnable()
         {
@@ -120,6 +121,13 @@ namespace QuantumTeleporter.Mono
             if (PowerManager == null)
                 PowerManager = new QTPowerManager(this);
 
+            var pingInstance = gameObject.GetComponent<PingInstance>() ??
+                               gameObject.GetComponentInChildren<PingInstance>();
+
+            if (QTPingManager == null)
+                QTPingManager = new QTPingManager();
+            
+            QTPingManager.Initialize(pingInstance);
 
             DisplayManager.Setup(this);
             
@@ -243,6 +251,8 @@ namespace QuantumTeleporter.Mono
         private void OnLabelChanged(string obj, NameController nameController)
         {
             DisplayManager.SetDisplay(GetName());
+            QTPingManager.SetName(obj);
+            QTPingManager.TogglePing(true);
         }
         
         private void OnBaseUnitsChanged()
