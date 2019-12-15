@@ -11,6 +11,7 @@ using QuantumTeleporter.Configuration;
 using QuantumTeleporter.Managers;
 using QuantumTeleporter.Mono;
 using SMLHelper.V2.Crafting;
+using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 
@@ -20,10 +21,15 @@ namespace QuantumTeleporter.Buildable
     internal partial class QuantumTeleporterBuildable : Buildable
     {
         private static readonly QuantumTeleporterBuildable Singleton = new QuantumTeleporterBuildable();
+        public sealed override TechType RequiredForUnlock => TechType.PrecursorTeleporter;
 
         public QuantumTeleporterBuildable() : base(Mod.ClassID, Mod.FriendlyName, Mod.Description)
         {
-            OnFinishedPatching += AdditionalPatching;
+            OnFinishedPatching = () =>
+            {
+                AdditionalPatching();
+                //KnownTechHandler.SetAnalysisTechEntry(RequiredForUnlock, new TechType[1] { TechType }, $"{FriendlyName} blueprint discovered!");
+            };
         }
 
         public override GameObject GetGameObject()
@@ -34,9 +40,9 @@ namespace QuantumTeleporter.Buildable
 
                 prefab.name = this.PrefabFileName;
 
-                var ping = prefab.GetOrAddComponent<PingInstance>();
-                ping.origin = prefab.transform;
-                ping.pingType = PingType.Signal;
+                //var ping = prefab.GetOrAddComponent<PingInstance>();
+                //ping.origin = prefab.transform;
+                //ping.pingType = PingType.Signal;
 
 
                 var center = new Vector3(0f, 1.433978f, 0f);
@@ -81,6 +87,22 @@ namespace QuantumTeleporter.Buildable
             Register();
 
             PatchHelpers.AddNewKit(
+                FCSTechFabricator.Configuration.TeleporterScannerConnectionKitClassID,
+                "The teleport scanner connection kit has everything a new quantum teleporter needs to locate all teleports in the world.",
+                "Teleporter Scanner Connection",
+                FCSTechFabricator.Configuration.QuantumTeleporterClassID,
+                new[] { "AE", "QT" },
+                null);
+
+            PatchHelpers.AddNewKit(
+                FCSTechFabricator.Configuration.AdvancedTeleporterWiringKitClassID,
+                "The advanced teleporter wiring kit uses the newly found precursor wiring. This wiring can handle the immense power needed for teleportation.",
+                "Advanced Teleporter Wiring",
+                FCSTechFabricator.Configuration.QuantumTeleporterClassID,
+                new[] { "AE", "QT" },
+                null);
+
+            PatchHelpers.AddNewKit(
                 FCSTechFabricator.Configuration.QuantumTeleporterKitClassID,
                 null,
                 Mod.FriendlyName,
@@ -93,6 +115,9 @@ namespace QuantumTeleporter.Buildable
 
         private static void Register()
         {
+
+            
+
             if (_prefab != null)
             {
                 var model = _prefab.FindChild("model");
@@ -109,7 +134,7 @@ namespace QuantumTeleporter.Buildable
                 var constructable = _prefab.AddComponent<Constructable>();
                 constructable.allowedOnWall = false;
                 constructable.allowedOnGround = true;
-                constructable.allowedInSub = false;
+                constructable.allowedInSub = true;
                 constructable.allowedInBase = true;
                 constructable.allowedOnCeiling = false;
                 constructable.allowedOutside = false;

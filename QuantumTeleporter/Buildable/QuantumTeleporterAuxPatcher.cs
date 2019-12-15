@@ -35,7 +35,10 @@ namespace QuantumTeleporter.Buildable
             LanguageHandler.SetLanguageLine(GlobalTeleportKey, "Global Teleport Power Requirement");
             LanguageHandler.SetLanguageLine(InternalTeleportKey, "Internal Teleport Power Requirement");
             LanguageHandler.SetLanguageLine(ConfirmMessageKey, "Initiate Teleportation?");
-            LanguageHandler.SetLanguageLine(PerUnitKey, "per unit");
+            LanguageHandler.SetLanguageLine(PerUnitKey, "per teleporter");
+            LanguageHandler.SetLanguageLine(GlobalNetworkKey, "Global Network");
+            LanguageHandler.SetLanguageLine(LocalNetworkKey, "Local Network");
+            LanguageHandler.SetLanguageLine(MakeGlobalUnitKey, "Add to global network.");
         }
 
         private const string OnHoverKey = "QT_OnHover";
@@ -54,6 +57,9 @@ namespace QuantumTeleporter.Buildable
         private const string InternalTeleportKey = "QT_InternalTeleport";
         private const string ConfirmMessageKey = "QT_ConfirmMessage";
         private const string PerUnitKey = "QT_PerUnit";
+        private const string GlobalNetworkKey = "QT_GlobalNetwork";
+        private const string LocalNetworkKey = "QT_LocalNetwork";
+        private const string MakeGlobalUnitKey = "QT_MakeGlobalUnit";
 
         internal static string OnHover()
         {
@@ -158,6 +164,21 @@ namespace QuantumTeleporter.Buildable
         public static string PerUnit()
         {
             return Language.main.Get(PerUnitKey);
+        }
+
+        public static string GlobalNetwork()
+        {
+            return Language.main.Get(GlobalNetworkKey);
+        }
+
+        public static string LocalNetwork()
+        {
+            return Language.main.Get(LocalNetworkKey);
+        }
+
+        public static string MakeGlobalUnit()
+        {
+            return Language.main.Get(MakeGlobalUnitKey);
         }
     }
 }

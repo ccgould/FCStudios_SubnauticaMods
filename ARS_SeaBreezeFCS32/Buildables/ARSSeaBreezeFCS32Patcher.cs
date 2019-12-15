@@ -21,6 +21,7 @@ namespace ARS_SeaBreezeFCS32.Buildables
         public override TechCategory CategoryForPDA { get; } = TechCategory.InteriorModule;
         public override string AssetsFolder { get; } = $"FCS_ARSSeaBreeze/Assets";
 
+        public override string IconFileName => "ARSSeaBreeze.png";
         public ARSSeaBreezeFCS32Buildable() : base(Mod.ClassID, Mod.FriendlyName, Mod.Description)
         {
             OnFinishedPatching += AdditionalPatching;

@@ -494,7 +494,7 @@ namespace FCSTechFabricator.Helpers
             //}
         }
 
-        public static bool AddNewKit(string classID, string description, string unitName, string modParent, string[] fabricatorSteps, string icon, TechType requiredForUnlock = TechType.None)
+        public static bool AddNewKit(string classID, string description, string unitName, string modParent, string[] fabricatorSteps, string icon, TechType requiredForUnlock = TechType.None, UnitType type = UnitType.Kit)
         {
             try
             {
@@ -503,10 +503,15 @@ namespace FCSTechFabricator.Helpers
                     description = $"A kit that allows you to build one {unitName} Unit";
                 }
 
+                string suffix = String.Empty;
+
+                if (type == UnitType.Kit) suffix = "kit";
+
+
                 var kit = new FCSKitEntry
                 {
                     ClassID = classID,
-                    FriendlyName = $"{unitName} kit",
+                    FriendlyName = $"{unitName} {suffix}",
                     Description = description,
                     FabricatorSteps = fabricatorSteps,
                     ModParent = modParent,
@@ -567,6 +572,12 @@ namespace FCSTechFabricator.Helpers
         {
             FCSTechFabricatorBuildable.AddTechType(techType,stepsToFabricatorTab);
         }
+    }
+
+    public enum UnitType
+    {
+        Kit,
+        Unit
     }
 }
 

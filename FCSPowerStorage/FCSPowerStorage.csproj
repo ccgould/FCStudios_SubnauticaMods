@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>FCSPowerStorage</RootNamespace>
     <AssemblyName>FCSPowerStorage</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>false</Deterministic>
     <ShouldCreateLogs>True</ShouldCreateLogs>
@@ -27,6 +27,7 @@
     <AssemblyInfoVersionSettings>
     </AssemblyInfoVersionSettings>
     <AssemblyInfoVersionSemVerSettings>AssemblyVersion.IncrementWithAutoReset.None</AssemblyInfoVersionSemVerSettings>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

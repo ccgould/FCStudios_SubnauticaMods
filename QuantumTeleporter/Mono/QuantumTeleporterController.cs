@@ -29,17 +29,15 @@ namespace QuantumTeleporter.Mono
         public override bool IsConstructed => _buildable != null && _buildable.constructed;
         public override bool IsInitialized { get; set; }
         public NameController NameController { get; set; }
-        public AnimationManager AnimationManager { get; private set; }
-        public QTDisplayManager DisplayManager { get; private set; }
-        public AudioManager AudioManager { get; private set; }
-        public QTPowerManager PowerManager { get; private set; }
-        public ColorManager ColorManager { get; private set; }
-
-        public QTTriggerBoxManager PlayerTrigger { get; private set; }
-        public SubRoot SubRoot { get; set; }
-        public BaseManager Manager { get; set; }
-        public QTDoorManager QTDoorManager { get; private set; }
-        public QTPingManager QTPingManager { get; private set; }
+        internal AnimationManager AnimationManager { get; private set; }
+        internal QTDisplayManager DisplayManager { get; private set; }
+        internal AudioManager AudioManager { get; private set; }
+        internal QTPowerManager PowerManager { get; private set; }
+        internal ColorManager ColorManager { get; private set; }
+        internal SubRoot SubRoot { get; set; }
+        internal BaseManager Manager { get; set; }
+        internal QTDoorManager QTDoorManager { get; private set; }
+        internal QTPingManager QTPingManager { get; private set; }
 
         private void OnEnable()
         {
@@ -121,13 +119,13 @@ namespace QuantumTeleporter.Mono
             if (PowerManager == null)
                 PowerManager = new QTPowerManager(this);
 
-            var pingInstance = gameObject.GetComponent<PingInstance>() ??
-                               gameObject.GetComponentInChildren<PingInstance>();
+            //var pingInstance = gameObject.GetComponent<PingInstance>() ??
+            //                   gameObject.GetComponentInChildren<PingInstance>();
 
-            if (QTPingManager == null)
-                QTPingManager = new QTPingManager();
+            //if (QTPingManager == null)
+            //    QTPingManager = new QTPingManager();
             
-            QTPingManager.Initialize(pingInstance);
+            //QTPingManager.Initialize(pingInstance);
 
             DisplayManager.Setup(this);
             
@@ -250,9 +248,9 @@ namespace QuantumTeleporter.Mono
 
         private void OnLabelChanged(string obj, NameController nameController)
         {
-            DisplayManager.SetDisplay(GetName());
-            QTPingManager.SetName(obj);
-            QTPingManager.TogglePing(true);
+            DisplayManager?.SetDisplay(GetName());
+            //QTPingManager?.SetName(obj);
+            //QTPingManager?.TogglePing(true);
         }
         
         private void OnBaseUnitsChanged()
@@ -271,12 +269,12 @@ namespace QuantumTeleporter.Mono
             return $"{Mod.ModName}_{Manager.BaseUnits.Count + 1}";
         }
 
-        public bool GetIsGlobal()
+        internal bool GetIsGlobal()
         {
             return _isGlobal;
         }
 
-        public Transform GetTarget()
+        internal Transform GetTarget()
         {
             return _target;
         }

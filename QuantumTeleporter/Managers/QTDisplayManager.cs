@@ -34,7 +34,7 @@ namespace QuantumTeleporter.Managers
         private QTTeleportTypes _tType;
         private Text _destination;
         private bool _initialized;
-        private const float MaxInteractionRange = 0.8f;
+        private const float MaxInteractionRange = 1f;
         internal void Setup(QuantumTeleporterController mono)
         {
             _mono = mono;
@@ -311,6 +311,10 @@ namespace QuantumTeleporter.Managers
 
             if (isGlobalToggle == null) return false;
 
+            var globalToggleLabel = InterfaceHelpers.FindGameObject(isGlobalToggle, "Label");
+            if (globalToggleLabel == null) return false;
+            globalToggleLabel.GetComponent<Text>().text = QuantumTeleporterBuildable.MakeGlobalUnit();
+
             _isGlobalToggle = isGlobalToggle.GetComponent<Toggle>();
             _isGlobalToggle.onValueChanged.AddListener(delegate
             {
@@ -325,6 +329,7 @@ namespace QuantumTeleporter.Managers
 
             _intraTeleBtn = InterfaceHelpers.CreateButton(intraTele, "IntraTeleBtn", InterfaceButtonMode.Background,
                 OnButtonClick, Color.black, Color.white, MaxInteractionRange);
+            _intraTeleBtn.ChangeText(QuantumTeleporterBuildable.LocalNetwork());
             #endregion
 
             #region GLobal Tele Button
@@ -334,6 +339,7 @@ namespace QuantumTeleporter.Managers
 
             _globalTeleBtn = InterfaceHelpers.CreateButton(globalTele, "GlobalTeleBtn", InterfaceButtonMode.Background,
                 OnButtonClick, Color.black, Color.white, MaxInteractionRange);
+            _globalTeleBtn.ChangeText(QuantumTeleporterBuildable.GlobalNetwork());
             #endregion
 
             #region Information Label

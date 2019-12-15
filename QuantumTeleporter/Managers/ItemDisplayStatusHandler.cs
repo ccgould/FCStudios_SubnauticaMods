@@ -18,8 +18,7 @@ namespace QuantumTeleporter.Managers
         private QTDisplayManager _display;
         private Text _statusField;
         private float _maxInteractionRange;
-
-
+        
         public virtual void Update()
         {
             bool inInteractionRange = InInteractionRange();
@@ -54,7 +53,14 @@ namespace QuantumTeleporter.Managers
         {
             //TODO check if working
             QuickLogger.Debug("ItemDisplayStatusHandler: OnLabeled Changed", true);
-            _textField.text = arg1;
+            if (_textField != null && _textField.isActiveAndEnabled)
+            {
+                _textField.text = arg1;
+            }
+            else
+            {
+                QuickLogger.Info("OnLabelChanged _textfield returned null or isn't enabled");
+            }
         }
 
         private void UpdateStatus()

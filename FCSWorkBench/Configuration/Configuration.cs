@@ -39,6 +39,9 @@ namespace FCSTechFabricator
         public static string DeepDrillerKitClassID => "DeepDrillerKit_DD";
         public static string PowerStorageKitClassID => "PowerStorageKit_PS";
         public static string ShippingKitID => "ASShippingKit_AS";
+        public static string AdvancedTeleporterWiringKitClassID => "AdvancedTeleporterWiringKit_AE";
+        public static string TeleporterScannerConnectionKitClassID => "TeleporterScannerConnectionKit_AE";
+
         #endregion
 
         public static string DrillerMK1ModuleClassID => "DrillerMK1_DD";
