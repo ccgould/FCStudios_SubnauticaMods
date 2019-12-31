@@ -23,7 +23,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCStudioDebugGUI", "FCStudi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCSTesting", "FCSTesting\FCSTesting.csproj", "{20E443F4-3B38-48F3-BBF2-7CBBF4090BEB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCSTechFabricator", "FCSWorkBench\FCSTechFabricator.csproj", "{B947909C-4983-4749-93AC-73EA69F6DCE8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCSTechFabricator", "FCSTechFabricator\FCSTechFabricator.csproj", "{B947909C-4983-4749-93AC-73EA69F6DCE8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCS_DeepDriller", "FCS_DeepDriller\FCS_DeepDriller.csproj", "{61D8BA15-EE91-4245-BFC1-70064ADD23E0}"
 EndProject

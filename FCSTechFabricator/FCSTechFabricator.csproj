@@ -87,7 +87,6 @@
     <Compile Include="Configuration\ModDivisions.cs" />
     <Compile Include="Craftables\ModuleCraftable.cs" />
     <Compile Include="Helpers\PatchHelpers.cs" />
-    <Compile Include="Models\CustomFab.cs" />
     <Compile Include="Models\FCSKitEntry.cs" />
     <Compile Include="Helpers\IngredientHelper.cs" />
     <Compile Include="Interfaces\IFCSTechFabricatorItem.cs" />
