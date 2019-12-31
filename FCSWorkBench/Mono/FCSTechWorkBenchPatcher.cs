@@ -6,14 +6,19 @@ using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
 namespace FCSTechFabricator.Mono
 {
-    public partial class FCSTechFabricatorBuildable : Buildable
+    public partial class FCSTechFabricatorBuildable : CustomFabricator
     {
         public static readonly FCSTechFabricatorBuildable Singleton = new FCSTechFabricatorBuildable();
+
+        public override Models Model => Models.Custom;
+
+        public override string AssetsFolder => $"{Mod.ModFolderName}/Assets";
 
         private static readonly Dictionary<string, string> AlterraDivisions = new Dictionary<string, string>()
         {
@@ -41,100 +46,50 @@ namespace FCSTechFabricator.Mono
             {"Alterra Shipping",new ModKey{Key = "ASU",ParentKey = "ASS"}},
         };
 
-
-        internal static void AddMod(string divisionName, string divisionKey, string ModName, string ModKey)
-        {
-            if (!AlterraDivisions.ContainsKey(divisionName))
-            {
-                AlterraDivisions.Add(divisionName,divisionKey);
-            }
-
-            if (!FCSMods.ContainsKey(ModName))
-            {
-                FCSMods.Add(ModName,new ModKey{Key = ModKey, ParentKey = divisionKey});
-            }
-
-        }
-
-        public FCSTechFabricatorBuildable() : base(Mod.ModName, "FCS Tech Fabricator", "The place for all your FCStudios mod needs")
+        public FCSTechFabricatorBuildable() : base(Mod.ModName, Mod.ModFriendly, Mod.ModDescription)
         {
         }
 
         internal static void PatchHelper()
         {
             CreateCustomTree();
+            MakeBuildable();
             Singleton.Patch();
+        }
+
+        private static void MakeBuildable()
+        {
+            CraftDataHandler.SetTechData(Singleton.TechType, GetBlueprintRecipe());
+            CraftDataHandler.AddToGroup(GroupForPDA, CategoryForPDA, Singleton.TechType);
+            CraftDataHandler.AddBuildable(Singleton.TechType);
         }
 
         private static void CreateCustomTree()
         {
-            _root = CraftTreeHandler.CreateCustomCraftTreeAndType("FCSTechFabricator", out CraftTree.Type craftType);
-
-            TechFabricatorCraftTreeType = craftType;
-
             QuickLogger.Debug($"Attempting to add {Singleton.ClassID} to nodes");
 
             foreach (var division in AlterraDivisions)
             {
-                if (_root.GetNode($"{division.Value}") == null)
-                {
-                    QuickLogger.Debug($"{division.Key} is null creating tab");
-                    var itemTab = _root.AddTabNode($"{division.Value}", $"{division.Key}", new Atlas.Sprite(ImageUtils.LoadTextureFromFile($"./QMods/{Mod.ModFolderName}/Assets/{division.Value}Icon.png")));
-                    QuickLogger.Debug($"{division.Key} node tab Created");
+                QuickLogger.Debug($"Creating tab {division.Key}");
+                Singleton.AddTabNode($"{division.Value}", $"{division.Key}", new Atlas.Sprite(ImageUtils.LoadTextureFromFile($"./QMods/{Mod.ModFolderName}/Assets/{division.Value}Icon.png")));
+                QuickLogger.Debug($"{division.Key} node tab Created");
 
-                    foreach (var fcsMod in FCSMods)
-                    {
-                        if (fcsMod.Value.ParentKey == division.Value)
-                        {
-                            var icon = new Atlas.Sprite(ImageUtils.LoadTextureFromFile($"./QMods/{Mod.ModFolderName}/Assets/{fcsMod.Value.Key}Icon.png"));
-                            itemTab.AddTabNode(fcsMod.Value.Key, fcsMod.Key, icon);
-                            QuickLogger.Debug($"Child node {fcsMod.Key} tab Created");
-                        }
-                    }
+                foreach (var fcsMod in FCSMods)
+                {
+                    var icon = new Atlas.Sprite(ImageUtils.LoadTextureFromFile($"./QMods/{Mod.ModFolderName}/Assets/{fcsMod.Value.Key}Icon.png"));
+                    Singleton.AddTabNode(fcsMod.Value.Key, fcsMod.Key, icon);
+                    QuickLogger.Debug($"Child node {fcsMod.Key} tab Created");
                 }
             }
 
-            foreach (var childNode in _root.ChildNodes)
-            {
-                QuickLogger.Debug(childNode.Name);
-            }
+            Singleton.CreateCustomCraftTree(out CraftTree.Type craftType);
         }
 
-        public override GameObject GetGameObject()
+        protected override GameObject GetCustomCrafterPreFab()
         {
             // Instantiate fabricator
             GameObject prefab = GameObject.Instantiate(OriginalFabricator);
-
-            // Update prefab ID
-            var prefabId = prefab.GetComponent<PrefabIdentifier>();
-            prefabId.name = this.PrefabFileName;
-
-            // Update tech tag
-            var techTag = prefab.GetComponent<TechTag>();
-            techTag.type = TechType;
-
-            // Associate craft tree to the fabricator
-            var fabricator = prefab.GetComponent<Fabricator>();
-            fabricator.craftTree = TechFabricatorCraftTreeType;
-
-            var ghost = fabricator.GetComponent<GhostCrafter>();
-            var powerRelay = new PowerRelay();
-            // Ignore any errors you see about this fabricator not having a power relay in its parent. It does and it works.
-            FieldInfo fieldInfo = typeof(GhostCrafter).GetField("powerRelay", BindingFlags.NonPublic | BindingFlags.Instance);
-            fieldInfo.SetValue(ghost, powerRelay);
-
-            // Set where it can be built
-            var constructible = prefab.GetComponent<Constructable>();
-            constructible.allowedInBase = true;
-            constructible.allowedInSub = true;
-            constructible.allowedOutside = false;
-            constructible.allowedOnCeiling = false;
-            constructible.allowedOnGround = false;
-            constructible.allowedOnConstructables = false;
-            constructible.controlModelState = true;
-            constructible.allowedOnWall = true;
-            constructible.techType = TechType;
-
+            
             // Set the custom texture
             Texture2D coloredTexture = QPatch.Bundle.LoadAsset<Texture2D>("FCSTechFabricator");
             SkinnedMeshRenderer skinnedMeshRenderer = prefab.GetComponentInChildren<SkinnedMeshRenderer>();
@@ -143,25 +98,16 @@ namespace FCSTechFabricator.Mono
             prefab.AddComponent<FCSTechFabController>();
 
             return prefab;
-
         }
 
-        /// <summary>
-        /// This is the CraftTree.Type for the FCS Tech Fabricator.
-        /// </summary> 
-        public static CraftTree.Type TechFabricatorCraftTreeType { get; private set; }
 
         private static readonly GameObject OriginalFabricator = Resources.Load<GameObject>("Submarine/Build/Fabricator");
-        private static ModCraftTreeRoot _root;
 
-        //internal static List<FCSTechFabricatorItem> ItemsList = new List<FCSTechFabricatorItem>();
+        internal static TechGroup GroupForPDA => TechGroup.InteriorModules;
 
-        public override TechGroup GroupForPDA { get; } = TechGroup.InteriorModules;
-
-        public override TechCategory CategoryForPDA { get; } = TechCategory.InteriorModule;
-
-        public override string AssetsFolder { get; } = $"{Mod.ModFolderName}/Assets";
-        protected override TechData GetBlueprintRecipe()
+        internal static TechCategory CategoryForPDA => TechCategory.InteriorModule;
+        
+        protected static TechData GetBlueprintRecipe()
         {
             var customFabRecipe = new TechData()
             {
@@ -181,17 +127,8 @@ namespace FCSTechFabricator.Mono
         internal static void AddTechType(TechType techType, string[] steps)
         {
             QuickLogger.Debug($"Attempting to add TechType {techType} to {steps[0]}");
-
-            if (_root != null)
-            {
-                var tab = _root.GetTabNode(steps);
-                if (tab.GetCraftingNode(techType) == null)
-                {
-                    //tab.AddModdedCraftingNode("Freon_ARS");
-                    tab.AddCraftingNode(techType);
-                    QuickLogger.Debug($"Added TechType {techType} to {steps[0]}");
-                }
-            }
+            Singleton.AddCraftNode(techType,steps.Last());
+            QuickLogger.Debug($"Added TechType {techType} to {steps[0]}");
         }
     }
 

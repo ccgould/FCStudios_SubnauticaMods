@@ -144,7 +144,7 @@ namespace ARS_SeaBreezeFCS32.Mono
 
             //Power Manager has been disabled in this version
 
-            //PowerManager = gameObject.GetOrAddComponent<ARSolutionsSeaBreezePowerManager>();
+            //PowerManager = gameObject.EnsureComponent<ARSolutionsSeaBreezePowerManager>();
             //if (PowerManager != null)
             //{
             //    PowerManager.Initialize(this);

@@ -12,7 +12,7 @@ namespace FCSCommon.Helpers
             try
             {
                 if (prefab == null) return;
-                var bounds = prefab.GetOrAddComponent<ConstructableBounds>();
+                var bounds = prefab.EnsureComponent<ConstructableBounds>();
                 bounds.bounds.size = size;
                 bounds.bounds.position = center;
             }

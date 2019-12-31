@@ -79,9 +79,9 @@ namespace FCSAIPowerCellSocket.Buildables
                 //Add the prefabIdentifier
                 PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
                 prefabID.ClassId = this.ClassID;
-                prefab.GetOrAddComponent<AIPowerCellSocketAnimator>();
-                prefab.GetOrAddComponent<AIPowerCellSocketPowerManager>();
-                prefab.GetOrAddComponent<AIPowerCellSocketController>();
+                prefab.EnsureComponent<AIPowerCellSocketAnimator>();
+                prefab.EnsureComponent<AIPowerCellSocketPowerManager>();
+                prefab.EnsureComponent<AIPowerCellSocketController>();
 
                 return prefab;
             }

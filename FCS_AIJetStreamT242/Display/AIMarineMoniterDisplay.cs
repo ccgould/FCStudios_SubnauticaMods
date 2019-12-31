@@ -120,7 +120,7 @@ namespace FCS_AIMarineTurbine.Display
             itemDisplay.transform.SetParent(_itemsGrid.transform, false);
             QuickLogger.Debug("itemDisplay parent set");
 
-            TurbineItem turbineItem = itemDisplay.GetOrAddComponent<TurbineItem>();
+            TurbineItem turbineItem = itemDisplay.EnsureComponent<TurbineItem>();
             turbineItem.Turbine = turbine;
             turbineItem.Setup(this);
 

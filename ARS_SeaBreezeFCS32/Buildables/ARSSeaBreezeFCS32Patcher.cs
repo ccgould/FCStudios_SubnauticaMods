@@ -65,14 +65,14 @@ namespace ARS_SeaBreezeFCS32.Buildables
                     renderer.material.shader = shader;
                 }
 
-                SkyApplier skyApplier = prefab.GetOrAddComponent<SkyApplier>();
+                SkyApplier skyApplier = prefab.EnsureComponent<SkyApplier>();
                 skyApplier.renderers = renders;
                 skyApplier.anchorSky = Skies.Auto;
 
                 //========== Allows the building animation and material colors ==========// 
 
                 // Add constructible
-                var constructable = prefab.GetOrAddComponent<Constructable>();
+                var constructable = prefab.EnsureComponent<Constructable>();
                 constructable.allowedOnWall = false;
                 constructable.allowedOnGround = true;
                 constructable.allowedInSub = true;
@@ -89,9 +89,9 @@ namespace ARS_SeaBreezeFCS32.Buildables
                 //Create or get the constructable bounds
                 GameObjectHelpers.AddConstructableBounds(prefab,size,center);
                 
-                prefab.GetOrAddComponent<PrefabIdentifier>().ClassId = this.ClassID;
-                prefab.GetOrAddComponent<ARSolutionsSeaBreezeAnimationManager>();
-                prefab.GetOrAddComponent<ARSolutionsSeaBreezeController>();
+                prefab.EnsureComponent<PrefabIdentifier>().ClassId = this.ClassID;
+                prefab.EnsureComponent<ARSolutionsSeaBreezeAnimationManager>();
+                prefab.EnsureComponent<ARSolutionsSeaBreezeController>();
                 
                 return prefab;
             }

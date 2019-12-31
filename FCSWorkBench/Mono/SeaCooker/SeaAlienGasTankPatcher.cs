@@ -36,13 +36,13 @@ namespace FCSTechFabricator.Mono.SeaCooker
             rb.isKinematic = true;
 
             // Make the object drop slowly in water
-            var wf = prefab.GetOrAddComponent<WorldForces>();
+            var wf = prefab.EnsureComponent<WorldForces>();
             wf.underwaterGravity = 0;
             wf.underwaterDrag = 10f;
             wf.enabled = true;
 
             // Add fabricating animation
-            var fabricatingA = prefab.GetOrAddComponent<VFXFabricating>();
+            var fabricatingA = prefab.EnsureComponent<VFXFabricating>();
             fabricatingA.localMinY = -0.1f;
             fabricatingA.localMaxY = 0.6f;
             fabricatingA.posOffset = new Vector3(0f, 0f, 0f);
@@ -55,21 +55,21 @@ namespace FCSTechFabricator.Mono.SeaCooker
             //renderer.material.shader = marmosetUber;
 
             // Update sky applier
-            var applier = prefab.GetOrAddComponent<SkyApplier>();
+            var applier = prefab.EnsureComponent<SkyApplier>();
             applier.renderers = new Renderer[] { renderer };
             applier.anchorSky = Skies.Auto;
 
             // We can pick this item
-            var pickupable = prefab.GetOrAddComponent<Pickupable>();
+            var pickupable = prefab.EnsureComponent<Pickupable>();
             pickupable.isPickupable = true;
             pickupable.randomizeRotationWhenDropped = true;
 
 
-            PrefabIdentifier prefabID = prefab.GetOrAddComponent<PrefabIdentifier>();
+            PrefabIdentifier prefabID = prefab.EnsureComponent<PrefabIdentifier>();
 
             prefabID.ClassId = this.ClassID;
 
-            var techTag = prefab.GetOrAddComponent<TechTag>();
+            var techTag = prefab.EnsureComponent<TechTag>();
             techTag.type = TechType;
 
             prefab.AddComponent<FCSTechFabricatorTag>();

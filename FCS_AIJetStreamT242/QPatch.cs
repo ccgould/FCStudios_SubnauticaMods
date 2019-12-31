@@ -31,7 +31,7 @@ namespace FCS_AIMarineTurbine
                 AISolutionsData.PatchHelper();
                 AIJetStreamT242Buildable.PatchSMLHelper();
                 AIMarineMonitorBuildable.PatchSMLHelper();
-
+                AIWindSurferBuildable.PatchSMLHelper();
 
                 var harmony = HarmonyInstance.Create("com.aijetstreamt242.fcstudios");
                 harmony.PatchAll(Assembly.GetExecutingAssembly());

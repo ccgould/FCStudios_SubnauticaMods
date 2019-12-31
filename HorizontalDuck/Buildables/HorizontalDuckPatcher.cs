@@ -28,7 +28,7 @@ namespace HorizontalDuck.Buildables
                 //========== Allows the building animation and material colors ==========// 
                 Shader shader = Shader.Find("MarmosetUBER");
                 Renderer[] renderers = prefab.GetComponentsInChildren<Renderer>();
-                SkyApplier skyApplier = prefab.GetOrAddComponent<SkyApplier>();
+                SkyApplier skyApplier = prefab.EnsureComponent<SkyApplier>();
                 skyApplier.renderers = renderers;
                 skyApplier.anchorSky = Skies.Auto;
                 foreach (Renderer renderer in renderers)
@@ -39,7 +39,7 @@ namespace HorizontalDuck.Buildables
                 //========== Allows the building animation and material colors ==========// 
 
                 // Add constructable
-                var constructable = prefab.GetOrAddComponent<Constructable>();
+                var constructable = prefab.EnsureComponent<Constructable>();
                 constructable.allowedOnWall = false;
                 constructable.allowedOnGround = true;
                 constructable.allowedInSub = false;

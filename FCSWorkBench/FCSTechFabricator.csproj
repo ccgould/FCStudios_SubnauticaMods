@@ -45,6 +45,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>F:\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="QModInstaller, Version=2.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>F:\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\QModInstaller.dll</HintPath>
+    </Reference>
     <Reference Include="SMLHelper">
       <HintPath>F:\Program Files\Epic Games\Subnautica\QMods\Modding Helper\SMLHelper.dll</HintPath>
     </Reference>
@@ -83,6 +87,7 @@
     <Compile Include="Configuration\ModDivisions.cs" />
     <Compile Include="Craftables\ModuleCraftable.cs" />
     <Compile Include="Helpers\PatchHelpers.cs" />
+    <Compile Include="Models\CustomFab.cs" />
     <Compile Include="Models\FCSKitEntry.cs" />
     <Compile Include="Helpers\IngredientHelper.cs" />
     <Compile Include="Interfaces\IFCSTechFabricatorItem.cs" />

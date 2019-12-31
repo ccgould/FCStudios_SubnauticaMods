@@ -72,7 +72,7 @@ namespace FCS_AIMarineTurbine.Buildable
                     renderer.material.shader = shader;
                 }
 
-                SkyApplier skyApplier = prefab.GetOrAddComponent<SkyApplier>();
+                SkyApplier skyApplier = prefab.EnsureComponent<SkyApplier>();
                 skyApplier.renderers = model.GetComponentsInChildren<MeshRenderer>();
                 skyApplier.anchorSky = Skies.Auto;
 
@@ -81,7 +81,7 @@ namespace FCS_AIMarineTurbine.Buildable
                 QuickLogger.Debug("Adding Constructible");
 
                 // Add constructible
-                var constructable = prefab.GetOrAddComponent<Constructable>();
+                var constructable = prefab.EnsureComponent<Constructable>();
                 constructable.allowedOnWall = true;
                 constructable.allowedOnGround = false;
                 constructable.allowedInSub = false;
@@ -96,7 +96,7 @@ namespace FCS_AIMarineTurbine.Buildable
                 var size = new Vector3(2.071494f, 1.235519f, 0.1364295f);
                 GameObjectHelpers.AddConstructableBounds(prefab, size, center);
 
-                prefab.GetOrAddComponent<AIMarineMonitorController>();
+                prefab.EnsureComponent<AIMarineMonitorController>();
 
                 PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
                 prefabID.ClassId = this.ClassID;

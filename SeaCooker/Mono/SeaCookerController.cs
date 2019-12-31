@@ -91,10 +91,18 @@ namespace AE.SeaCooker.Mono
         {
             reason = string.Empty;
 
-            if (StorageManager.CanDeconstruct()) return true;
-            reason = SeaCookerBuildable.UnityNotEmpty();
-            return false;
+            if (StorageManager == null)
+            {
+                return true;
+            }
 
+            if (!StorageManager.CanDeconstruct())
+            {
+                reason = SeaCookerBuildable.UnitNotEmpty();
+                return false;
+            };
+
+            return true;
         }
 
         public void OnConstructedChanged(bool constructed)

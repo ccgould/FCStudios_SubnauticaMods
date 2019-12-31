@@ -111,7 +111,7 @@ namespace AE.SeaCooker.Buildable
             return Language.main.Get("Version");
         }
 
-        public static string UnityNotEmpty()
+        public static string UnitNotEmpty()
         {
             return Language.main.Get(UnitNotEmptyKey);
         }

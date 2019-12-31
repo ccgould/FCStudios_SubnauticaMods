@@ -50,7 +50,7 @@ namespace FCSPowerStorage.Buildables
             //========== Allows the building animation and material colors ==========// 
 
             Renderer[] renderers = prefab.GetComponentsInChildren<Renderer>();
-            SkyApplier skyApplier = prefab.GetOrAddComponent<SkyApplier>();
+            SkyApplier skyApplier = prefab.EnsureComponent<SkyApplier>();
             skyApplier.renderers = renderers;
             skyApplier.anchorSky = Skies.Auto;
 
@@ -60,7 +60,7 @@ namespace FCSPowerStorage.Buildables
             QuickLogger.Debug("Adding Constructible");
 
             // Add constructible
-            var constructable = prefab.GetOrAddComponent<Constructable>();
+            var constructable = prefab.EnsureComponent<Constructable>();
             constructable.allowedOnWall = true;
             constructable.allowedOnGround = false;
             constructable.allowedInSub = true;
@@ -80,17 +80,17 @@ namespace FCSPowerStorage.Buildables
             QuickLogger.Debug("GetOrAdd TechTag");
             // Allows the object to be saved into the game 
             //by setting the TechTag and the PrefabIdentifier 
-            prefab.GetOrAddComponent<TechTag>().type = this.TechType;
+            prefab.EnsureComponent<TechTag>().type = this.TechType;
 
             QuickLogger.Debug("GetOrAdd PrefabIdentifier");
 
-            prefab.GetOrAddComponent<PrefabIdentifier>().ClassId = this.ClassID;
+            prefab.EnsureComponent<PrefabIdentifier>().ClassId = this.ClassID;
 
             QuickLogger.Debug("Add GameObject CustomBatteryController");
 
-            prefab.GetOrAddComponent<FCSPowerStorageDisplay>();
+            prefab.EnsureComponent<FCSPowerStorageDisplay>();
 
-            prefab.GetOrAddComponent<FCSPowerStorageController>();
+            prefab.EnsureComponent<FCSPowerStorageController>();
 
             QuickLogger.Debug("Made GameObject");
 

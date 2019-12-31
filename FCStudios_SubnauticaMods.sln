@@ -7,8 +7,6 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "FCSCommon", "FCSCommon\FCSC
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCSPowerStorage", "FCSPowerStorage\FCSPowerStorage.csproj", "{32A3F9B5-9089-4478-B706-952B706F08DA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCSAlterraIndustrialSolutions", "FCSAlterraIndustrialSolutions\FCSAlterraIndustrialSolutions.csproj", "{48DD3ADD-AB90-45A0-966B-178396DC1C74}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCSAlterraShipping", "FCSAlterraShipping\FCSAlterraShipping.csproj", "{8ADCD8FA-1EB3-4DF7-A44D-F689322AAC03}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCS_AIMarineTurbine", "FCS_AIJetStreamT242\FCS_AIMarineTurbine.csproj", "{A6D5F567-127A-4EE3-9959-8C228B040290}"
@@ -67,6 +65,7 @@ Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		FCSCommon\FCSCommon.projitems*{20e443f4-3b38-48f3-bbf2-7cbbf4090beb}*SharedItemsImports = 4
 		FCSCommon\FCSCommon.projitems*{b947909c-4983-4749-93ac-73ea69f6dce8}*SharedItemsImports = 4
+		FCSCommon\FCSCommon.projitems*{c801c28b-81cb-451f-94b4-251835d2b92a}*SharedItemsImports = 4
 		FCSCommon\FCSCommon.projitems*{dbc34043-0f09-42ef-beb9-f59cbc6df16f}*SharedItemsImports = 13
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -78,10 +77,6 @@ Global
 		{32A3F9B5-9089-4478-B706-952B706F08DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{32A3F9B5-9089-4478-B706-952B706F08DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{32A3F9B5-9089-4478-B706-952B706F08DA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{48DD3ADD-AB90-45A0-966B-178396DC1C74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{48DD3ADD-AB90-45A0-966B-178396DC1C74}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{48DD3ADD-AB90-45A0-966B-178396DC1C74}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{48DD3ADD-AB90-45A0-966B-178396DC1C74}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8ADCD8FA-1EB3-4DF7-A44D-F689322AAC03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8ADCD8FA-1EB3-4DF7-A44D-F689322AAC03}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8ADCD8FA-1EB3-4DF7-A44D-F689322AAC03}.Release|Any CPU.ActiveCfg = Release|Any CPU

@@ -8,12 +8,16 @@ using System.IO;
 using System.Reflection;
 using FCSTechFabricator.Helpers;
 using FCSTechFabricator.Models;
+using QModManager.API.ModLoading;
 using UnityEngine;
 
 namespace FCSTechFabricator
 {
+    [QModCore]
     public class QPatch
     {
+        private static bool _continue = true;
+
         #region Public Properties
         public static GameObject ColorItem { get; internal set; }
 
@@ -39,6 +43,36 @@ namespace FCSTechFabricator
         #endregion
 
         #region Public Methods
+
+        [QModPrePatch]
+        public static void Initialization()
+        {
+            // Add any setup or precondition checks here
+
+            try
+            {
+                if (PatchHelpers.GetPrefabs())
+                {
+                    QuickLogger.Debug("Initializing TechFabricator PrePatch");
+                    // == Load Configuration == //
+                    string configJson = File.ReadAllText(Mod.ConfigurationFile().Trim());
+
+                    //LoadData
+                    ModConfiguration = JsonConvert.DeserializeObject<Configuration>(configJson);
+                }
+                else
+                {
+                    _continue = false;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                QuickLogger.Error(ex);
+            }
+        }
+
+        [QModPatch]
         public static void Patch()
         {
             var assembly = Assembly.GetExecutingAssembly();
@@ -51,22 +85,16 @@ namespace FCSTechFabricator
 
             try
             {
-                // == Load Configuration == //
-                string configJson = File.ReadAllText(Mod.ConfigurationFile().Trim());
-
-                //LoadData
-                ModConfiguration = JsonConvert.DeserializeObject<Configuration>(configJson);
-
-                if (PatchHelpers.GetPrefabs())
+                if (_continue)
                 {
                     FCSTechFabricatorBuildable.PatchHelper();
+                    
                     PatchHelpers.RegisterItems();
-                    QuickLogger.Debug(FCSTechFabricatorBuildable.TechFabricatorCraftTreeType.ToString());
-
+             
                     var harmony = HarmonyInstance.Create("com.fcstechfabricator.fcstudios");
 
                     harmony.PatchAll(Assembly.GetExecutingAssembly());
-
+                    
                     QuickLogger.Info("Finished patching");
                 }
                 else
@@ -79,7 +107,7 @@ namespace FCSTechFabricator
                 QuickLogger.Error(ex);
             }
         }
-
+        
         #endregion
 
     }

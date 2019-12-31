@@ -8,11 +8,14 @@ namespace FCSTechFabricator.Models
     {
         internal static string ModName => "FCSTechFabricator";
 
+        internal static string ModFriendly => "FCS Tech Fabricator";
+
         internal static string ModFolderName => "FCS_TechFabricator";
 
         internal static string MODFOLDERLOCATION => GetModPath();
 
         internal static string LANGUAGEDIRECTORY => GetLanguagePath();
+        internal static string ModDescription => "The place for all your FCStudios mod needs";
 
         private static string GetQModsPath()
         {

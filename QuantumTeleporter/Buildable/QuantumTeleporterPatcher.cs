@@ -40,7 +40,7 @@ namespace QuantumTeleporter.Buildable
 
                 prefab.name = this.PrefabFileName;
 
-                //var ping = prefab.GetOrAddComponent<PingInstance>();
+                //var ping = prefab.EnsureComponent<PingInstance>();
                 //ping.origin = prefab.transform;
                 //ping.pingType = PingType.Signal;
 

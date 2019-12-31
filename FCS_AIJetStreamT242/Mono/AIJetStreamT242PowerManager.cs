@@ -44,7 +44,6 @@ namespace FCS_AIJetStreamT242.Mono
             {
                 ProducePower();
             }
-
         }
         #endregion
 
@@ -193,6 +192,7 @@ namespace FCS_AIJetStreamT242.Mono
         {
             return _energyPerSec;
         }
+
         internal float GetCharge()
         {
             return _charge;

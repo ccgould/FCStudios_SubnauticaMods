@@ -48,7 +48,7 @@ namespace FCS_AIMarineTurbine.Buildable
 
                 prefab = GameObject.Instantiate(_Prefab);
 
-                SkyApplier skyApplier = prefab.GetOrAddComponent<SkyApplier>();
+                SkyApplier skyApplier = prefab.EnsureComponent<SkyApplier>();
                 skyApplier.renderers = prefab.GetComponentsInChildren<Renderer>();
                 skyApplier.anchorSky = Skies.Auto;
 
@@ -63,10 +63,10 @@ namespace FCS_AIMarineTurbine.Buildable
                     }
                 }
 
-                prefab.GetOrAddComponent<VFXSurface>();
-                prefab.GetOrAddComponent<LargeWorldEntity>().cellLevel = LargeWorldEntity.CellLevel.Global;
+                prefab.EnsureComponent<VFXSurface>();
+                prefab.EnsureComponent<LargeWorldEntity>().cellLevel = LargeWorldEntity.CellLevel.Global;
 
-                Rigidbody rb = prefab.GetOrAddComponent<Rigidbody>();
+                Rigidbody rb = prefab.EnsureComponent<Rigidbody>();
                 rb.angularDrag = 1f;
                 rb.mass = 12000f;
                 rb.useGravity = false;
@@ -81,7 +81,7 @@ namespace FCS_AIMarineTurbine.Buildable
                 //fabricatingA.eulerOffset = new Vector3(0f, 0f, 0f);
                 //fabricatingA.scaleFactor = 1.0f;
 
-                WorldForces forces = prefab.GetOrAddComponent<WorldForces>();
+                WorldForces forces = prefab.EnsureComponent<WorldForces>();
                 forces.aboveWaterDrag = 0f;
                 forces.aboveWaterGravity = 3f;
                 forces.handleDrag = true;

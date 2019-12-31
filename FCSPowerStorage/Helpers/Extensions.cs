@@ -10,7 +10,7 @@ namespace FCSPowerStorage.Helpers
         /// <typeparam name="T">The type of Component to return.</typeparam>
         /// <param name="gameObject">The GameObject this Component is attached to.</param>
         /// <returns>Component</returns>
-        static public T GetOrAddComponent<T>(this GameObject gameObject) where T : Component
+        static public T EnsureComponent<T>(this GameObject gameObject) where T : Component
         {
             return gameObject.GetComponent<T>() ?? gameObject.AddComponent<T>();
         }

@@ -181,10 +181,10 @@ namespace FCSPowerStorage.Mono
                 _prefabId = GetPrefabID();
             }
 
-            SystemLightManager = gameObject.GetOrAddComponent<SystemLightManager>();
+            SystemLightManager = gameObject.EnsureComponent<SystemLightManager>();
             SystemLightManager.Initialize(gameObject);
 
-            PowerManager = gameObject.GetOrAddComponent<FCSPowerManager>();
+            PowerManager = gameObject.EnsureComponent<FCSPowerManager>();
 
             if (PowerManager == null)
             {
@@ -195,7 +195,7 @@ namespace FCSPowerStorage.Mono
                 PowerManager.Initialize(this);
             }
 
-            AnimationManager = gameObject.GetOrAddComponent<FCSPowerStorageAnimationManager>();
+            AnimationManager = gameObject.EnsureComponent<FCSPowerStorageAnimationManager>();
 
             if (AnimationManager == null)
             {

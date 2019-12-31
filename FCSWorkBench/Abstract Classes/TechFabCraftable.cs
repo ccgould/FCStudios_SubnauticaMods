@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace FCSTechFabricator
 {
-    public abstract class TechFabCraftable : Spawnable
+    public abstract class TechFabCraftable : Craftable
     {
         protected TechFabCraftable(string classId, string friendlyName, string description, bool useEquipmentSlot = true, EquipmentType equipmentType = EquipmentType.Hand, TechType requiredForUnlock = TechType.None) : base(classId, friendlyName, description)
         {
@@ -49,11 +49,11 @@ namespace FCSTechFabricator
             
             GetGameObjectExt(InstantiatedPrefab);
 
-            PrefabIdentifier prefabID = InstantiatedPrefab.GetOrAddComponent<PrefabIdentifier>();
+            PrefabIdentifier prefabID = InstantiatedPrefab.EnsureComponent<PrefabIdentifier>();
 
             prefabID.ClassId = this.ClassID;
 
-            var techTag = InstantiatedPrefab.GetOrAddComponent<TechTag>();
+            var techTag = InstantiatedPrefab.EnsureComponent<TechTag>();
             techTag.type = TechType;
 
             return InstantiatedPrefab;
@@ -63,10 +63,10 @@ namespace FCSTechFabricator
 
         public override string AssetsFolder { get; } = $"{Mod.ModFolderName}/Assets";
         public abstract string[] StepsToFabricatorTab { get; }
-        public abstract TechCategory CategoryForPDA { get; }
-        public abstract TechGroup GroupForPDA { get; }
+        //public abstract TechCategory CategoryForPDA { get; }
+        //public abstract TechGroup GroupForPDA { get; }
         public abstract TechType TechTypeID { get; set; }
-        protected abstract TechData GetBlueprintRecipe();
+        //protected abstract TechData GetBlueprintRecipe();
         public abstract GameObject OriginalPrefab { get; set; }
 
         /// <summary>

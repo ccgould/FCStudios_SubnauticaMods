@@ -122,14 +122,14 @@ namespace FCS_DeepDriller.Buildable
                 //========== Allows the building animation and material colors ==========// 
                 Shader shader = Shader.Find("MarmosetUBER");
                 Renderer[] renderers = prefab.GetComponentsInChildren<Renderer>();
-                SkyApplier skyApplier = prefab.GetOrAddComponent<SkyApplier>();
+                SkyApplier skyApplier = prefab.EnsureComponent<SkyApplier>();
                 skyApplier.renderers = renderers;
                 skyApplier.anchorSky = Skies.Auto;
 
                 //========== Allows the building animation and material colors ==========// 
 
                 // Add constructible
-                var constructable = prefab.GetOrAddComponent<Constructable>();
+                var constructable = prefab.EnsureComponent<Constructable>();
                 constructable.allowedOnWall = false;
                 constructable.allowedOnGround = true;
                 constructable.allowedInSub = false;

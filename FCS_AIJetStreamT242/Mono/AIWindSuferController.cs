@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace FCS_AIMarineTurbine.Mono
 {
-    internal class AIWindSuferController : MonoBehaviour
+    internal class AIWindSuferController : MonoBehaviour, IProtoEventListener, IConstructable
     {
         private Rigidbody _rigidBody;
         private WorldForces _wordForces;
@@ -41,6 +41,7 @@ namespace FCS_AIMarineTurbine.Mono
             if (!FindAllComponents())
             {
                 QuickLogger.Error("Wasnt able to find all components!");
+                gameObject.transform.r
             }
         }
 
@@ -80,9 +81,6 @@ namespace FCS_AIMarineTurbine.Mono
                 QuickLogger.Error("Cannot find the trigger gameobject");
                 return false;
             }
-
-            //var boxcollider = dest.GetComponent<BoxCollider>();
-            //Destroy(boxcollider);
 
             var ladder = trigger.AddComponent<LadderController>();
             ladder.Target = dest;
@@ -162,5 +160,25 @@ namespace FCS_AIMarineTurbine.Mono
             return transform.position.y < 0;
         }
 
+        public void OnProtoSerialize(ProtobufSerializer serializer)
+        {
+            
+        }
+
+        public void OnProtoDeserialize(ProtobufSerializer serializer)
+        {
+
+        }
+
+        public bool CanDeconstruct(out string reason)
+        {
+            reason = String.Empty;
+            return false;
+        }
+
+        public void OnConstructedChanged(bool constructed)
+        {
+  
+        }
     }
 }

@@ -58,14 +58,14 @@ namespace AMMiniMedBay.Buildable
                 //========== Allows the building animation and material colors ==========// 
                 Shader shader = Shader.Find("MarmosetUBER");
                 Renderer[] renderers = prefab.GetComponentsInChildren<Renderer>();
-                SkyApplier skyApplier = prefab.GetOrAddComponent<SkyApplier>();
+                SkyApplier skyApplier = prefab.EnsureComponent<SkyApplier>();
                 skyApplier.renderers = renderers;
                 skyApplier.anchorSky = Skies.Auto;
 
                 //========== Allows the building animation and material colors ==========// 
 
                 // Add constructible
-                var constructable = prefab.GetOrAddComponent<Constructable>();
+                var constructable = prefab.EnsureComponent<Constructable>();
                 constructable.allowedOnWall = false;
                 constructable.allowedOnGround = true;
                 constructable.allowedInSub = true;
@@ -81,9 +81,9 @@ namespace AMMiniMedBay.Buildable
 
                 GameObjectHelpers.AddConstructableBounds(prefab, size, center);
 
-                prefab.GetOrAddComponent<PrefabIdentifier>().ClassId = this.ClassID;
+                prefab.EnsureComponent<PrefabIdentifier>().ClassId = this.ClassID;
                 prefab.AddComponent<FMOD_CustomLoopingEmitter>();
-                prefab.GetOrAddComponent<AMMiniMedBayController>();
+                prefab.EnsureComponent<AMMiniMedBayController>();
 
             }
             catch (Exception e)

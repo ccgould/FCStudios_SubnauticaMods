@@ -104,13 +104,13 @@ namespace FCSAlterraShipping.Buildable
 
             GameObjectHelpers.AddConstructableBounds(prefab, size,center);
 
-            prefab.GetOrAddComponent<AlterraShippingTransferHandler>();
+            prefab.EnsureComponent<AlterraShippingTransferHandler>();
 
-            prefab.GetOrAddComponent<AlterraShippingDisplay>();
+            prefab.EnsureComponent<AlterraShippingDisplay>();
 
-            prefab.GetOrAddComponent<AlterraShippingAnimator>();
+            prefab.EnsureComponent<AlterraShippingAnimator>();
 
-            prefab.GetOrAddComponent<AlterraShippingTarget>();
+            prefab.EnsureComponent<AlterraShippingTarget>();
 
             //Add the prefabIdentifier
             PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();

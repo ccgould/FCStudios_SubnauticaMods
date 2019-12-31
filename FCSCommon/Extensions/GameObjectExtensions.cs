@@ -16,7 +16,7 @@ namespace FCSCommon.Extensions
         ///// <typeparam name="T">The type of Component to return.</typeparam>
         ///// <param name="gameObject">The GameObject this Component is attached to.</param>
         ///// <returns>Component</returns>
-        //public static T GetOrAddComponent<T>(this GameObject gameObject) where T : Component
+        //public static T EnsureComponent<T>(this GameObject gameObject) where T : Component
         //{
         //    return gameObject.GetComponent<T>() ?? gameObject.AddComponent<T>();
         //}

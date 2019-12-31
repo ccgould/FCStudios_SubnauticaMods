@@ -196,12 +196,12 @@ namespace AMMiniMedBay.Mono
 
             if (PowerManager == null)
             {
-                PowerManager = gameObject.GetOrAddComponent<AMMiniMedBayPowerManager>();
+                PowerManager = gameObject.EnsureComponent<AMMiniMedBayPowerManager>();
             }
 
             if (PlayerTrigger == null)
             {
-                PlayerTrigger = gameObject.FindChild("model").FindChild("Trigger").GetOrAddComponent<AMMiniMedBayTrigger>();
+                PlayerTrigger = gameObject.FindChild("model").FindChild("Trigger").EnsureComponent<AMMiniMedBayTrigger>();
             }
             
 
@@ -217,7 +217,7 @@ namespace AMMiniMedBay.Mono
 
             if (AnimationManager == null)
             {
-                AnimationManager = gameObject.GetOrAddComponent<AMMiniMedBayAnimationManager>();
+                AnimationManager = gameObject.EnsureComponent<AMMiniMedBayAnimationManager>();
             }
             
             if (PowerManager != null)

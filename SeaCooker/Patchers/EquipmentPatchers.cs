@@ -25,7 +25,7 @@ namespace AE.SeaCooker.Patchers
         [HarmonyPrefix]
         internal static void Prefix(uGUI_Equipment __instance)
         {
-            __instance.gameObject.GetOrAddComponent<Initialize_uGUI>();
+            __instance.gameObject.EnsureComponent<Initialize_uGUI>();
         }
 
         [HarmonyPostfix]

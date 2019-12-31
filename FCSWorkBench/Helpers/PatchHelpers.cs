@@ -34,13 +34,13 @@ namespace FCSTechFabricator.Helpers
             collider.enabled = false;
 
             // Make the object drop slowly in water
-            var wf = QPatch.Kit.GetOrAddComponent<WorldForces>();
+            var wf = QPatch.Kit.EnsureComponent<WorldForces>();
             wf.underwaterGravity = 0;
             wf.underwaterDrag = 10f;
             wf.enabled = true;
 
             // Add fabricating animation
-            var fabricatingA = QPatch.Kit.GetOrAddComponent<VFXFabricating>();
+            var fabricatingA = QPatch.Kit.EnsureComponent<VFXFabricating>();
             fabricatingA.localMinY = -0.1f;
             fabricatingA.localMaxY = 0.6f;
             fabricatingA.posOffset = new Vector3(0f, 0f, 0f);
@@ -53,17 +53,17 @@ namespace FCSTechFabricator.Helpers
             //renderer.material.shader = marmosetUber;
 
             // Update sky applier
-            var applier = QPatch.Kit.GetOrAddComponent<SkyApplier>();
+            var applier = QPatch.Kit.EnsureComponent<SkyApplier>();
             applier.renderers = new Renderer[] { renderer };
             applier.anchorSky = Skies.Auto;
 
             // We can pick this item
-            var pickupable = QPatch.Kit.GetOrAddComponent<Pickupable>();
+            var pickupable = QPatch.Kit.EnsureComponent<Pickupable>();
             pickupable.isPickupable = true;
             pickupable.randomizeRotationWhenDropped = true;
 
             //Allow this kit to be placed on surfaces in these situations
-            var placeTool = QPatch.Kit.GetOrAddComponent<PlaceTool>();
+            var placeTool = QPatch.Kit.EnsureComponent<PlaceTool>();
             placeTool.allowedInBase = true;
             placeTool.allowedOnBase = false;
             placeTool.allowedOnCeiling = false;
@@ -498,6 +498,7 @@ namespace FCSTechFabricator.Helpers
         {
             try
             {
+                QuickLogger.Info($"Adding {classID} kit");
                 if (string.IsNullOrEmpty(description))
                 {
                     description = $"A kit that allows you to build one {unitName} Unit";
@@ -537,6 +538,8 @@ namespace FCSTechFabricator.Helpers
         {
             try
             {
+                QuickLogger.Info($"Adding {classID} module");
+
                 if (string.IsNullOrEmpty(description))
                 {
                     description = $"A kit that allows you to build one {unitName} module";
