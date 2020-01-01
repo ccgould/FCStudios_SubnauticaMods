@@ -41,7 +41,7 @@ namespace FCS_AIMarineTurbine.Mono
             if (!FindAllComponents())
             {
                 QuickLogger.Error("Wasnt able to find all components!");
-                gameObject.transform.r
+                //gameObject.transform.r
             }
         }
 
