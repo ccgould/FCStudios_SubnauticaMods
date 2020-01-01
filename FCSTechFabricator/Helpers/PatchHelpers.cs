@@ -8,6 +8,7 @@ using FCSTechFabricator.Models;
 using FCSTechFabricator.Mono;
 using FCSTechFabricator.Mono.SeaBreeze;
 using FCSTechFabricator.Mono.SeaCooker;
+using QModManager.API;
 using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
 using UnityEngine;
@@ -203,10 +204,26 @@ namespace FCSTechFabricator.Helpers
                 },
                 new FCSKitEntry
                 {
-                    ClassID = "IntraBaseTeleporterKit_AE",
-                    FriendlyName = "Intra-Base Teleporter Kit",
-                    Description = "This kit allows you to make one Intra-Base Teleporter unit",
-                    FabricatorSteps = new[]{ "AE", "IBT" },
+                    ClassID = Configuration.TeleporterScannerConnectionKitClassID,
+                    FriendlyName = "Advanced Teleporter Scanner Connection",
+                    Description = "The teleport scanner connection kit has everything a new quantum teleporter needs to locate all teleports in the world.",
+                    FabricatorSteps = new[] { "AE", "QT" },
+                    ModParent = Configuration.QuantumTeleporterClassID
+                },
+                new FCSKitEntry
+                {
+                    ClassID = Configuration.AdvancedTeleporterWiringKitClassID,
+                    FriendlyName = "Advanced Teleporter Wiring",
+                    Description = "The advanced teleporter wiring kit uses the newly found precursor wiring. This wiring can handle the immense power needed for teleportation.",
+                    FabricatorSteps = new[] { "AE", "QT" },
+                    ModParent = Configuration.QuantumTeleporterClassID
+                },
+                new FCSKitEntry
+                {
+                    ClassID = Configuration.QuantumTeleporterKitClassID,
+                    FriendlyName = "Advanced Teleporter Kit",
+                    Description = "A kit that allows you to build one Advanced Teleporter kit",
+                    FabricatorSteps = new[] { "AE", "QT" },
                     ModParent = Configuration.QuantumTeleporterClassID
                 },
             };
@@ -432,15 +449,45 @@ namespace FCSTechFabricator.Helpers
         /// <summary>
         /// Registers all FCSTechFab items into the craft tree
         /// </summary>
-        internal static void RegisterItems()
+        internal static void RegisterItems(FCSTechFabricatorBuildable fabricator)
         {
+            QuickLogger.Debug("Registering Items.");
+
+            foreach (FCSKitEntry kit in CreateKits())
+            {
+                if (QModServices.Main.ModPresent(kit.ModParent))
+                {
+                    QuickLogger.Debug($"Found mod {kit.ModParent} and adding kit {kit.FriendlyName}");
+
+                    var kitCraftable = new KitCraftable(kit.ClassID, kit.FriendlyName, kit.Description, kit.Icon,
+                        kit.FabricatorSteps);
+                    kitCraftable.Patch();
+
+                    fabricator.AddCraftNode(kitCraftable.TechType);
+                }
+            }
+
+            foreach (FCSKitEntry module in CreateModules())
+            {
+                if (QModServices.Main.ModPresent(module.ModParent))
+                {
+                    QuickLogger.Debug($"Found mod {module.ModParent} and adding kit {module.FriendlyName}");
+
+
+                    var moduleCraftable = new ModuleCraftable(module.ClassID, module.FriendlyName, module.Description, module.Icon);
+                    moduleCraftable.Patch();
+
+                    fabricator.AddCraftNode(moduleCraftable.TechType);
+                }
+            }
+
             //if (TechTypeHandler.ModdedTechTypeExists()
             //var sandGlass = new SaNDGlass();
             //sandGlass.Patch();
             //FCSTechFabricatorBuildable.AddTechType(sandGlass.TechType, sandGlass.StepsToFabricatorTab);
             //QuickLogger.Debug($"Patched {sandGlass.FriendlyName}");
 
-            QuickLogger.Debug("Registering Items.");
+
 
             CreateModEntry();
 
@@ -496,84 +543,89 @@ namespace FCSTechFabricator.Helpers
 
         public static bool AddNewKit(string classID, string description, string unitName, string modParent, string[] fabricatorSteps, string icon, TechType requiredForUnlock = TechType.None, UnitType type = UnitType.Kit)
         {
-            try
-            {
-                QuickLogger.Info($"Adding {classID} kit");
-                if (string.IsNullOrEmpty(description))
-                {
-                    description = $"A kit that allows you to build one {unitName} Unit";
-                }
 
-                string suffix = String.Empty;
+            //try
+            //{
+            //    QuickLogger.Info($"Adding {classID} kit");
+            //    if (string.IsNullOrEmpty(description))
+            //    {
+            //        description = $"A kit that allows you to build one {unitName} Unit";
+            //    }
 
-                if (type == UnitType.Kit) suffix = "kit";
+            //    string suffix = String.Empty;
+
+            //    if (type == UnitType.Kit) suffix = "kit";
 
 
-                var kit = new FCSKitEntry
-                {
-                    ClassID = classID,
-                    FriendlyName = $"{unitName} {suffix}",
-                    Description = description,
-                    FabricatorSteps = fabricatorSteps,
-                    ModParent = modParent,
-                    RequiredForUnlock = requiredForUnlock,
-                    Icon = icon
-                };
+            //    var kit = new FCSKitEntry
+            //    {
+            //        ClassID = classID,
+            //        FriendlyName = $"{unitName} {suffix}",
+            //        Description = description,
+            //        FabricatorSteps = fabricatorSteps,
+            //        ModParent = modParent,
+            //        RequiredForUnlock = requiredForUnlock,
+            //        Icon = icon
+            //    };
 
-                QuickLogger.Debug($"Registering {kit.FriendlyName}");
-                var kitCraftable = new KitCraftable(kit.ClassID, kit.FriendlyName, kit.Description, kit.Icon, kit.FabricatorSteps);
-                kitCraftable.Patch();
-                FCSTechFabricatorBuildable.AddTechType(kitCraftable.TechType, kit.FabricatorSteps);
-                QuickLogger.Debug($"Patched {kitCraftable.FriendlyName}");
-                return true;
-            }
-            catch (Exception e)
-            {
-                QuickLogger.Error($"[AddKit() PatchHelpers]: {e.Message}");
-                return false;
-            }
+            //    QuickLogger.Debug($"Registering {kit.FriendlyName}");
+            //    var kitCraftable = new KitCraftable(kit.ClassID, kit.FriendlyName, kit.Description, kit.Icon, kit.FabricatorSteps);
+            //    kitCraftable.Patch();
+            //    //FCSTechFabricatorBuildable.AddTechType(kitCraftable.TechType, kit.FabricatorSteps);
+            //    QuickLogger.Debug($"Patched {kitCraftable.FriendlyName}");
+            //    return true;
+            //}
+            //catch (Exception e)
+            //{
+            //    QuickLogger.Error($"[AddKit() PatchHelpers]: {e.Message}");
+            //    return false;
+            //}
+            return true;
+
         }
 
         public static bool AddNewModule(string classID, string description, string unitName, string modParent, string[] fabricatorSteps)
         {
-            try
-            {
-                QuickLogger.Info($"Adding {classID} module");
+            //try
+            //{
+            //    QuickLogger.Info($"Adding {classID} module");
 
-                if (string.IsNullOrEmpty(description))
-                {
-                    description = $"A kit that allows you to build one {unitName} module";
-                }
+            //    if (string.IsNullOrEmpty(description))
+            //    {
+            //        description = $"A kit that allows you to build one {unitName} module";
+            //    }
 
-                var module = new FCSKitEntry
-                {
-                    ClassID = classID,
-                    FriendlyName = $"{unitName} kit",
-                    Description = description,
-                    FabricatorSteps = fabricatorSteps,
-                    ModParent = modParent
-                };
+            //    var module = new FCSKitEntry
+            //    {
+            //        ClassID = classID,
+            //        FriendlyName = $"{unitName} kit",
+            //        Description = description,
+            //        FabricatorSteps = fabricatorSteps,
+            //        ModParent = modParent
+            //    };
 
-                QuickLogger.Debug($"Registering {module.FriendlyName}");
+            //    QuickLogger.Debug($"Registering {module.FriendlyName}");
 
-                var moduleCraftable = new ModuleCraftable(module.ClassID, module.FriendlyName, module.Description, module.Icon);
-                moduleCraftable.Patch();
+            //    var moduleCraftable = new ModuleCraftable(module.ClassID, module.FriendlyName, module.Description, module.Icon);
+            //    moduleCraftable.Patch();
 
-                FCSTechFabricatorBuildable.AddTechType(moduleCraftable.TechType, module.FabricatorSteps);
+            //    //FCSTechFabricatorBuildable.AddTechType(moduleCraftable.TechType, module.FabricatorSteps);
 
-                QuickLogger.Debug($"Patched {moduleCraftable.FriendlyName}");
-                return true;
-            }
-            catch (Exception e)
-            {
-                QuickLogger.Error($"[AddKit() PatchHelpers]: {e.Message}");
-                return false;
-            }
+            //    QuickLogger.Debug($"Patched {moduleCraftable.FriendlyName}");
+            //    return true;
+            //}
+            //catch (Exception e)
+            //{
+            //    QuickLogger.Error($"[AddKit() PatchHelpers]: {e.Message}");
+            //    return false;
+            //}
+
+            return true;
         }
 
         public static void AddTechType(TechType techType, string[] stepsToFabricatorTab)
         {
-            FCSTechFabricatorBuildable.AddTechType(techType,stepsToFabricatorTab);
+            //FCSTechFabricatorBuildable.AddTechType(techType,stepsToFabricatorTab);
         }
     }
 

@@ -17,6 +17,7 @@ namespace FCSTechFabricator
     public class QPatch
     {
         private static bool _continue = true;
+        private static FCSTechFabricatorBuildable _techFabrictor;
 
         #region Public Properties
         public static GameObject ColorItem { get; internal set; }
@@ -47,8 +48,6 @@ namespace FCSTechFabricator
         [QModPrePatch]
         public static void Initialization()
         {
-            // Add any setup or precondition checks here
-
             try
             {
                 if (PatchHelpers.GetPrefabs())
@@ -72,6 +71,7 @@ namespace FCSTechFabricator
             }
         }
 
+        
         [QModPatch]
         public static void Patch()
         {
@@ -87,14 +87,8 @@ namespace FCSTechFabricator
             {
                 if (_continue)
                 {
-                    FCSTechFabricatorBuildable.PatchHelper();
-                    
-                    PatchHelpers.RegisterItems();
-             
-                    var harmony = HarmonyInstance.Create("com.fcstechfabricator.fcstudios");
-
-                    harmony.PatchAll(Assembly.GetExecutingAssembly());
-                    
+                    _techFabrictor = new FCSTechFabricatorBuildable();
+                    _techFabrictor.Patch();
                     QuickLogger.Info("Finished patching");
                 }
                 else
@@ -107,7 +101,20 @@ namespace FCSTechFabricator
                 QuickLogger.Error(ex);
             }
         }
-        
+
+        [QModPostPatch]
+        public static void PostInitializationMethod()
+        {
+            try
+            {
+                PatchHelpers.RegisterItems(_techFabrictor);
+            }
+            catch (Exception ex)
+            {
+                QuickLogger.Error(ex);
+            }
+        }
+
         #endregion
 
     }
