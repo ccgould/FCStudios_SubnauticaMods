@@ -36,47 +36,48 @@ namespace FCSTechFabricator.Mono
 
         private static readonly Dictionary<string, string> MainTabs = new Dictionary<string, string>()
         {
-            { TabIndustrialSolutions, "Alterra Industrial Solutions" },
-            { TabMedicalSolutions, "Alterra Medical Solutions"},
-            { TabRefrigerationSolutions, "Alterra Refrigeration Solutions" },
-            { TabShippingSolutions, "Alterra Shipping Solutions" },
-            { TabStorageSolutions, "Alterra Storage Solutions" },
-            { TabElectric, "Alterra Electric" }
+            {TabIndustrialSolutions, "Alterra Industrial Solutions"},
+            {TabMedicalSolutions, "Alterra Medical Solutions"},
+            {TabRefrigerationSolutions, "Alterra Refrigeration Solutions"},
+            {TabShippingSolutions, "Alterra Shipping Solutions"},
+            {TabStorageSolutions, "Alterra Storage Solutions"},
+            {TabElectric, "Alterra Electric"}
         };
 
         private static readonly Dictionary<string, string> SubTabs = new Dictionary<string, string>()
         {
-            { SubTabMarineTurbines, TabIndustrialSolutions },
-            { SubTabDeepDriller, TabIndustrialSolutions },
-            { SubTabPowerStorage, TabIndustrialSolutions },
-            { SubTabSeaBreeze, TabRefrigerationSolutions },
-            { SubTabExStorage, TabStorageSolutions },
-            { SubTabCooker, TabElectric },
-            { SubTabFountainFilter, TabElectric },
-            { SubTabMedBay, TabMedicalSolutions },
-            { SubTabPowercellSocket, TabIndustrialSolutions },
-            { SubTabIntraBaseTeleporter, TabElectric },
-            { SubTabQuantumTeleporter, TabElectric },
-            { SubTabShipping, TabShippingSolutions },
+            {SubTabMarineTurbines, TabIndustrialSolutions},
+            {SubTabDeepDriller, TabIndustrialSolutions},
+            {SubTabPowerStorage, TabIndustrialSolutions},
+            {SubTabSeaBreeze, TabRefrigerationSolutions},
+            {SubTabExStorage, TabStorageSolutions},
+            {SubTabCooker, TabElectric},
+            {SubTabFountainFilter, TabElectric},
+            {SubTabMedBay, TabMedicalSolutions},
+            {SubTabPowercellSocket, TabIndustrialSolutions},
+            {SubTabIntraBaseTeleporter, TabElectric},
+            {SubTabQuantumTeleporter, TabElectric},
+            {SubTabShipping, TabShippingSolutions},
         };
 
         private static readonly Dictionary<string, string> SubTabNames = new Dictionary<string, string>()
         {
-            { SubTabMarineTurbines, "Marine Turbines" },
-            { SubTabDeepDriller, "Deep Driller" },
-            { SubTabPowerStorage, "Power Storage" },
-            { SubTabSeaBreeze, "SeaBreeze" },
-            { SubTabExStorage, "Ex-Storage" },
-            { SubTabCooker, "Sea Cooker" },
-            { SubTabFountainFilter, "Mini Fountain Filter" },
-            { SubTabMedBay, "Mini MedBay" },
-            { SubTabPowercellSocket, "Powercell Socket" },
-            { SubTabIntraBaseTeleporter, "Intra-Base Teleporter" },
-            { SubTabQuantumTeleporter, "Quantum Teleporter" },
-            { SubTabShipping, "Alterra Shipping" },
+            {SubTabMarineTurbines, "Marine Turbines"},
+            {SubTabDeepDriller, "Deep Driller"},
+            {SubTabPowerStorage, "Power Storage"},
+            {SubTabSeaBreeze, "SeaBreeze"},
+            {SubTabExStorage, "Ex-Storage"},
+            {SubTabCooker, "Sea Cooker"},
+            {SubTabFountainFilter, "Mini Fountain Filter"},
+            {SubTabMedBay, "Mini MedBay"},
+            {SubTabPowercellSocket, "Powercell Socket"},
+            {SubTabIntraBaseTeleporter, "Intra-Base Teleporter"},
+            {SubTabQuantumTeleporter, "Quantum Teleporter"},
+            {SubTabShipping, "Alterra Shipping"},
         };
 
-        public FCSTechFabricatorBuildable() : base(Mod.ModName, "FCS Tech Fabricator", "The place for all your FCStudios mod needs")
+        public FCSTechFabricatorBuildable() : base(Mod.ModName, "FCS Tech Fabricator",
+            "The place for all your FCStudios mod needs")
         {
             AddCraftingTabs();
 
@@ -94,7 +95,8 @@ namespace FCSTechFabricator.Mono
             {
                 string tabId = mainTab.Key;
                 string tabName = mainTab.Value;
-                var icon = new Atlas.Sprite(ImageUtils.LoadTextureFromFile(Path.Combine(Mod.GetAssetPath(), $"{tabId}Icon.png")));
+                var icon = new Atlas.Sprite(
+                    ImageUtils.LoadTextureFromFile(Path.Combine(Mod.GetAssetPath(), $"{tabId}Icon.png")));
 
                 base.AddTabNode(tabId, tabName, icon);
             }
@@ -104,7 +106,8 @@ namespace FCSTechFabricator.Mono
                 string tabId = subTab.Key;
                 string parentTab = subTab.Value;
                 string tabName = SubTabNames[tabId];
-                var icon = new Atlas.Sprite(ImageUtils.LoadTextureFromFile(Path.Combine(Mod.GetAssetPath(),$"{tabId}Icon.png")));
+                var icon = new Atlas.Sprite(
+                    ImageUtils.LoadTextureFromFile(Path.Combine(Mod.GetAssetPath(), $"{tabId}Icon.png")));
 
                 base.AddTabNode(tabId, tabName, icon, parentTab);
             }
@@ -147,11 +150,5 @@ namespace FCSTechFabricator.Mono
         {
             CraftDataHandler.AddBuildable(TechType);
         }
-    }
-    
-    internal class ModKey
-    {
-        public string Key { get; set; }
-        public string ParentKey { get; set; }
     }
 }

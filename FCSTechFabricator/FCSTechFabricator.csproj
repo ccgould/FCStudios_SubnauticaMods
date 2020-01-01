@@ -98,7 +98,6 @@
     <Compile Include="Abstract Classes\TechFabCraftable.cs" />
     <Compile Include="Abstract Classes\TechFabModule.cs" />
     <Compile Include="Configuration\Configuration.cs" />
-    <Compile Include="Configuration\ModDivisions.cs" />
     <Compile Include="Craftables\ModuleCraftable.cs" />
     <Compile Include="Helpers\PatchHelpers.cs" />
     <Compile Include="Models\FCSKitEntry.cs" />
