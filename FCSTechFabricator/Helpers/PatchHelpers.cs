@@ -471,7 +471,7 @@ namespace FCSTechFabricator.Helpers
             {
                 if (QModServices.Main.ModPresent(module.ModParent))
                 {
-                    QuickLogger.Debug($"Found mod {module.ModParent} and adding kit {module.FriendlyName}");
+                    QuickLogger.Debug($"Found mod {module.ModParent} and adding modul {module.FriendlyName}");
 
 
                     var moduleCraftable = new ModuleCraftable(module.ClassID, module.FriendlyName, module.Description, module.Icon);
@@ -489,7 +489,7 @@ namespace FCSTechFabricator.Helpers
 
 
 
-            CreateModEntry();
+            //CreateModEntry();
 
             //foreach (FCSKitEntry kit in CreateKits())
             //{
@@ -543,7 +543,6 @@ namespace FCSTechFabricator.Helpers
 
         public static bool AddNewKit(string classID, string description, string unitName, string modParent, string[] fabricatorSteps, string icon, TechType requiredForUnlock = TechType.None, UnitType type = UnitType.Kit)
         {
-
             //try
             //{
             //    QuickLogger.Info($"Adding {classID} kit");
