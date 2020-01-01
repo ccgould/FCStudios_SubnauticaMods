@@ -1,7 +1,6 @@
 ﻿using FCSCommon.Exceptions;
 using FCSCommon.Utilities;
 using FCSTechFabricator.Mono;
-using Harmony;
 using Oculus.Newtonsoft.Json;
 using System;
 using System.IO;
@@ -16,8 +15,9 @@ namespace FCSTechFabricator
     [QModCore]
     public class QPatch
     {
+        #region Private Members
         private static bool _continue = true;
-        private static FCSTechFabricatorBuildable _techFabrictor;
+        #endregion
 
         #region Public Properties
         public static GameObject ColorItem { get; internal set; }
@@ -40,10 +40,10 @@ namespace FCSTechFabricator
 
         #region Internal Properties
         internal static Configuration ModConfiguration { get; set; }
-
+        internal static FCSTechFabricatorBuildable Fabricator;
         #endregion
 
-        #region Public Methods
+        #region Patch Methods
 
         [QModPrePatch]
         public static void Initialization()
@@ -87,8 +87,8 @@ namespace FCSTechFabricator
             {
                 if (_continue)
                 {
-                    _techFabrictor = new FCSTechFabricatorBuildable();
-                    _techFabrictor.Patch();
+                    Fabricator = new FCSTechFabricatorBuildable();
+                    Fabricator.Patch();
                     QuickLogger.Info("Finished patching");
                 }
                 else
@@ -107,7 +107,7 @@ namespace FCSTechFabricator
         {
             try
             {
-                PatchHelpers.RegisterItems(_techFabrictor);
+                PatchHelpers.RegisterItems();
             }
             catch (Exception ex)
             {

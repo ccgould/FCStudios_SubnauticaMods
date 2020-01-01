@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using FCSTechFabricator.Abstract_Classes;
-using FCSTechFabricator.Helpers;
+﻿using FCSTechFabricator.Helpers;
 using FCSTechFabricator.Mono;
 using SMLHelper.V2.Crafting;
 using UnityEngine;

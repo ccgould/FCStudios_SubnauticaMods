@@ -103,11 +103,9 @@
     <Compile Include="Helpers\PatchHelpers.cs" />
     <Compile Include="Models\FCSKitEntry.cs" />
     <Compile Include="Helpers\IngredientHelper.cs" />
-    <Compile Include="Interfaces\IFCSTechFabricatorItem.cs" />
     <Compile Include="Models\IngredientItem.cs" />
     <Compile Include="Configuration\Mod.cs" />
     <Compile Include="Models\Shaders.cs" />
-    <Compile Include="Models\ModTechTypes.cs" />
     <Compile Include="Mono\FCSTechFabricatorTag.cs" />
     <Compile Include="Mono\FCSTechFabricatorPatcher.cs" />
     <Compile Include="Craftables\KitCraftable.cs" />

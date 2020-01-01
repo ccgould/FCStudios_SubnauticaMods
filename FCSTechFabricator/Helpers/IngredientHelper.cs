@@ -10,7 +10,7 @@ namespace FCSTechFabricator.Helpers
 {
     public static class IngredientHelper
     {
-        public static bool ValidateData(List<IngredientItem> ingredients)
+        private static bool ValidateData(List<IngredientItem> ingredients)
         {
             if (ingredients == null)
             {
@@ -37,7 +37,7 @@ namespace FCSTechFabricator.Helpers
             return true;
         }
 
-        public static IEnumerable<Ingredient> ConvertToIngredients(List<IngredientItem> ingredients)
+        private static IEnumerable<Ingredient> ConvertToIngredients(List<IngredientItem> ingredients)
         {
             foreach (var ingredient in ingredients)
             {
@@ -45,7 +45,7 @@ namespace FCSTechFabricator.Helpers
             }
         }
 
-        public static TechData DefaultBlueprint()
+        private static TechData DefaultBlueprint()
         {
             return new TechData()
             {
@@ -59,7 +59,7 @@ namespace FCSTechFabricator.Helpers
 
         public static TechData GetCustomRecipe(string ClassID)
         {
-            var inventoryItem = QPatch.ModConfiguration.GetData(ClassID);
+            var inventoryItem = QPatch.ModConfiguration.GetTechData(ClassID);
             TechData customFabRecipe = null;
 
             if (ValidateData(inventoryItem))

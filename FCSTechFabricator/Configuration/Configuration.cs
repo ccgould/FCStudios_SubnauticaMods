@@ -6,8 +6,6 @@ namespace FCSTechFabricator
 {
     public class Configuration
     {
-
-
         #region Mod Class IDS
         public static string QuantumTeleporterClassID => "QuantumTeleporter";
         public static string MiniFountainFilterClassID => "MiniFountainFilter";
@@ -50,8 +48,7 @@ namespace FCSTechFabricator
 
         [JsonProperty] internal List<ConfigItem> Blueprints { get; set; } = new List<ConfigItem>();
 
-
-        public List<IngredientItem> GetData(string classId)
+        internal List<IngredientItem> GetTechData(string classId)
         {
             foreach (ConfigItem configItem in Blueprints)
             {
