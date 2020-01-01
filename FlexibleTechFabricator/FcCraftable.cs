@@ -40,6 +40,13 @@
             };
         }
 
+        protected override Atlas.Sprite GetItemSprite()
+        {
+            Texture2D iconTexture = this.AssetBundle.LoadAsset<Texture2D>(this.IconFileName);
+            return new Atlas.Sprite(iconTexture);
+            
+        }
+
         public void Patch(IFcTechFabricatorService fabricatorService, IFcAssetBundlesService assetBundlesService)
         {
             this.FabricatorService = fabricatorService;

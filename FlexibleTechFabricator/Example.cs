@@ -30,6 +30,8 @@ namespace SomeOtherMod
         public override TechCategory CategoryForPDA { get; } = TechCategory.Machines;
         protected override string AssetBundleName { get; } = "examplebundlename";
 
+        public override string IconFileName => "exampleiconname1";
+
         public override GameObject GetGameObject()
         {
             throw new NotImplementedException();
@@ -51,6 +53,8 @@ namespace SomeOtherMod
         public override TechGroup GroupForPDA { get; } = TechGroup.Machines;
         public override TechCategory CategoryForPDA { get; } = TechCategory.Machines;
         protected override string AssetBundleName { get; } = "examplebundlename";
+
+        public override string IconFileName => "exampleiconname2";
 
         public override GameObject GetGameObject()
         {
