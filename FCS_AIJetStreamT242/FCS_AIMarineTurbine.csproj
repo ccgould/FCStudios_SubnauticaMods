@@ -120,6 +120,7 @@
     <Compile Include="Mono\AIJetStreamT242PowerManager.cs" />
     <Compile Include="Mono\AIMarineMonitorController.cs" />
     <Compile Include="Mono\AIWindSuferController.cs" />
+    <Compile Include="Mono\BeaconController.cs" />
     <Compile Include="Mono\LadderController.cs" />
     <Compile Include="Patches\AIMarineTurbine_Patcher.cs" />
     <Compile Include="QPatch.cs" />

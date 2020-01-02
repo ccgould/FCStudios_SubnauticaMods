@@ -6,13 +6,13 @@ namespace FlexibleTechFabricator
     public interface IFcTechFabricatorService
     {
         void AddCraftNode(Craftable item, string parentTabId);
-        void AddTabNode(string tabId, string displayText, Atlas.Sprite tabSprite);
+        void AddTabNode(string tabId, string displayText, Atlas.Sprite tabSprite, string parentTabNode = null);
         bool HasCraftingTab(string tabId);
     }
 
     internal interface IFcTechFabricatorServiceInternal
     {
-        void PatchFabriactor();
+        void PatchFabricator();
     }
 
     public class FcTechFabricatorService : IFcTechFabricatorService, IFcTechFabricatorServiceInternal
@@ -39,11 +39,11 @@ namespace FlexibleTechFabricator
             }
         }
 
-        public void AddTabNode(string tabId, string displayText, Atlas.Sprite tabSprite)
+        public void AddTabNode(string tabId, string displayText, Atlas.Sprite tabSprite,string parentTabNode = null)
         {
             if (!knownTabs.Contains(tabId))
             {
-                fcTechFabricator.AddTabNode(tabId, displayText, tabSprite);
+                fcTechFabricator.AddTabNode(tabId, displayText, tabSprite,parentTabNode);
                 knownTabs.Add(tabId);
             }
         }
@@ -53,7 +53,7 @@ namespace FlexibleTechFabricator
             return knownTabs.Contains(tabId);
         }
 
-        void IFcTechFabricatorServiceInternal.PatchFabriactor()
+        void IFcTechFabricatorServiceInternal.PatchFabricator()
         {
             fcTechFabricator.Patch();
         }

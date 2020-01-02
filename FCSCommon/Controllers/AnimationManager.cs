@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace FCSCommon.Controllers
 {
-    public class AnimationManager : MonoBehaviour
+    internal class AnimationManager : MonoBehaviour
     {
         #region Unity Methods   
         private void Start()
@@ -35,7 +35,7 @@ namespace FCSCommon.Controllers
         #endregion
 
         #region Public Methods
-        public Animator Animator { get; set; }
+        internal Animator Animator { get; set; }
         #endregion
 
         #region public Methods
@@ -44,7 +44,7 @@ namespace FCSCommon.Controllers
         /// </summary>
         /// <param name="stateHash">The hash of the parameter</param>
         /// <param name="value">Float to set</param>
-        public void SetFloatHash(int stateHash, float value)
+        internal void SetFloatHash(int stateHash, float value)
         {
             Animator.SetFloat(stateHash, value);
         }
@@ -54,7 +54,7 @@ namespace FCSCommon.Controllers
         /// </summary>
         /// <param name="stateHash">The hash of the parameter</param>
         /// <param name="value">Float to set</param>
-        public void SetBoolHash(int stateHash, bool value)
+        internal void SetBoolHash(int stateHash, bool value)
         {
             if (Animator == null)
             {
@@ -69,7 +69,7 @@ namespace FCSCommon.Controllers
         /// </summary>
         /// <param name="stateHash">The hash of the parameter</param>
         /// <param name="value">Float to set</param>
-        public void SetIntHash(int stateHash, int value)
+        internal void SetIntHash(int stateHash, int value)
         {
             if (Animator == null)
             {
@@ -81,13 +81,13 @@ namespace FCSCommon.Controllers
             Animator.SetInteger(stateHash, value);
         }
 
-        public int GetIntHash(int hash)
+        internal int GetIntHash(int hash)
         {
             if (Animator != null) return Animator.GetInteger(hash);
             return !GetAnimatorComponent() ? 0 : Animator.GetInteger(hash);
         }
 
-        public bool GetBoolHash(int hash)
+        internal bool GetBoolHash(int hash)
         {
             if (Animator != null) return Animator.GetBool(hash);
 

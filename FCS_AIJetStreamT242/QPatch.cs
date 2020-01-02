@@ -37,6 +37,10 @@ namespace FCS_AIMarineTurbine
                 harmony.PatchAll(Assembly.GetExecutingAssembly());
 
                 QuickLogger.Info("Finished patching");
+                
+                QuickLogger.Debug("Unload Bundle");
+                Bundle.Unload(false);
+                QuickLogger.Debug("Bundle Unloaded");
             }
             catch (Exception ex)
             {

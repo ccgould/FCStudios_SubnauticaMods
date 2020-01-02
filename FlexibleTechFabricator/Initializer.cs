@@ -13,7 +13,7 @@
         [QModPostPatch]
         public static void PatchFabricator()
         {
-            FcTechFabricatorService.InternalAPI.PatchFabriactor();
+            FcTechFabricatorService.InternalAPI.PatchFabricator();
         }
     }
 }

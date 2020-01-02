@@ -7,7 +7,6 @@ using System.IO;
 using FCSAIPowerCellSocket.Configuration;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
-using FCSTechFabricator.Helpers;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 
@@ -32,15 +31,7 @@ namespace FCSAIPowerCellSocket.Buildables
             {
                 throw new FileNotFoundException($"Failed to retrieve the {Singleton.FriendlyName} prefab from the asset bundle");
             }
-
-            PatchHelpers.AddNewKit(
-                FCSTechFabricator.Configuration.PowerCellSocketKitClassID,
-                null,
-                Mod.ModName,
-                FCSTechFabricator.Configuration.PowerCellSocketClassID,
-                new[] { "AIS", "PSS" },
-                null);
-
+            
             Singleton.Patch();
         }
 

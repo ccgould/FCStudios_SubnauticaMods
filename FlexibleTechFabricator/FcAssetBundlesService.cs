@@ -33,7 +33,6 @@
             if (onDemandBundle != null)
             {
                 loadedAssetBundles.Add(bundleName, onDemandBundle);
-
                 return onDemandBundle;
             }
 
