@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{B947909C-4983-4749-93AC-73EA69F6DCE8}</ProjectGuid>
+    <ProjectGuid>{5EF4ADB8-3AE7-41EC-83E1-1DAF04999F0E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>FCSTechFabricator</RootNamespace>
@@ -12,7 +12,6 @@
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -36,86 +35,72 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Dependancies\0Harmony-1.2.0.1.dll</HintPath>
     </Reference>
-    <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Assembly-CSharp">
       <HintPath>..\Dependancies\Assembly-CSharp.dll</HintPath>
     </Reference>
-    <Reference Include="Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Assembly-CSharp-firstpass">
       <HintPath>..\Dependancies\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Newtonsoft.Json">
       <HintPath>..\Dependancies\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="QModInstaller, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="QModInstaller">
       <HintPath>..\Dependancies\QModInstaller.dll</HintPath>
     </Reference>
     <Reference Include="SMLHelper">
-      <HintPath>F:\Program Files\Epic Games\Subnautica\QMods\Modding Helper\SMLHelper.dll</HintPath>
+      <HintPath>..\Dependancies\SMLHelper.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="UnityEngine">
       <HintPath>..\Dependancies\UnityEngine.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AnimationModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Dependancies\UnityEngine.AnimationModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.AssetBundleModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="UnityEngine.AssetBundleModule">
       <HintPath>..\Dependancies\UnityEngine.AssetBundleModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\Dependancies\UnityEngine.CoreModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.InputModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Dependancies\UnityEngine.InputModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.PhysicsModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Dependancies\UnityEngine.PhysicsModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="UnityEngine.UI">
       <HintPath>..\Dependancies\UnityEngine.UI.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UIModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Dependancies\UnityEngine.UIModule.dll</HintPath>
+      <HintPath>F:\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\UnityEngine.UIModule.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Abstract Classes\TechFabCraftable.cs" />
-    <Compile Include="Abstract Classes\TechFabModule.cs" />
-    <Compile Include="Configuration\Configuration.cs" />
-    <Compile Include="Craftables\ModuleCraftable.cs" />
-    <Compile Include="Helpers\PatchHelpers.cs" />
-    <Compile Include="Models\FCSKitEntry.cs" />
-    <Compile Include="Helpers\IngredientHelper.cs" />
-    <Compile Include="Models\IngredientItem.cs" />
+    <Compile Include="Components\CraftingTab.cs" />
+    <Compile Include="Components\FCSTechFabricatorTag.cs" />
+    <Compile Include="Components\NameController.cs" />
     <Compile Include="Configuration\Mod.cs" />
-    <Compile Include="Models\Shaders.cs" />
-    <Compile Include="Mono\FCSTechFabricatorTag.cs" />
-    <Compile Include="Mono\FCSTechFabricatorPatcher.cs" />
-    <Compile Include="Craftables\KitCraftable.cs" />
-    <Compile Include="Mono\SeaBreeze\Freon.cs" />
-    <Compile Include="Mono\SeaBreeze\FreonPatcher.cs" />
-    <Compile Include="Mono\SeaCooker\SeaAlienGasTankPatcher.cs" />
-    <Compile Include="Mono\SeaCooker\SeaGasTankPatcher.cs" />
-    <Compile Include="QPatch.cs" />
+    <Compile Include="Craftables\FCSKit.cs" />
+    <Compile Include="Craftables\FCSModule.cs" />
+    <Compile Include="Example.cs" />
+    <Compile Include="FcAssetBundlesService.cs" />
+    <Compile Include="FcCraftable.cs" />
+    <Compile Include="FcCraftingTab.cs" />
+    <Compile Include="FcTechFabricator.cs" />
+    <Compile Include="FcTechFabricatorService.cs" />
+    <Compile Include="Initializer.cs" />
+    <Compile Include="Objects\ColorList.cs" />
+    <Compile Include="Objects\ColorVec4.cs" />
+    <Compile Include="Patchers\Inventory_Patchers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

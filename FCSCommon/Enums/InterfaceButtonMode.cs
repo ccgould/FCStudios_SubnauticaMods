@@ -1,6 +1,6 @@
 ﻿namespace FCSCommon.Enums
 {
-    public enum InterfaceButtonMode
+    internal enum InterfaceButtonMode
     {
         None,
         TextScale,

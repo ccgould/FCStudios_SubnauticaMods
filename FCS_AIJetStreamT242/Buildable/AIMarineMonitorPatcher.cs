@@ -1,13 +1,10 @@
 ﻿using FCSAlterraIndustrialSolutions.Models.Controllers;
-using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using FCS_AIMarineTurbine.Display.Patching;
-using FCSTechFabricator.Helpers;
-using SMLHelper.V2.Utility;
+using FCS_AIMarineTurbine.Configuration;
 using UnityEngine;
 
 namespace FCS_AIMarineTurbine.Buildable
@@ -20,30 +17,19 @@ namespace FCS_AIMarineTurbine.Buildable
         private static readonly AIMarineMonitorBuildable Singleton = new AIMarineMonitorBuildable();
         public override TechGroup GroupForPDA { get; } = TechGroup.InteriorModules;
         public override TechCategory CategoryForPDA { get; } = TechCategory.InteriorModule;
-        public override string AssetsFolder { get; } = $"FCS_MarineTurbine/Assets";
-        public override string IconFileName => "AIMarineTurbine.png";
+        public override string AssetsFolder { get; } = $"{Mod.ModFolderName}/Assets";
+
         public static void PatchSMLHelper()
         {
             if (!Singleton.GetPrefabs())
             {
                 throw new FileNotFoundException($"Failed to retrieve the {Singleton.FriendlyName} prefab from the asset bundle");
             }
-
-            PatchHelpers.AddNewKit(
-                FCSTechFabricator.Configuration.MarineMonitorKitClassID,
-                null,
-                "AI Marine Monitor",
-                FCSTechFabricator.Configuration.AIMarineMonitorClassID,
-                new[] { "AIS", "MT" },
-                null);
-
+            
             Singleton.Patch();
         }
-        //public static JetStreamT242Config JetStreamT242Config { get; set; }
 
-        public AIMarineMonitorBuildable() : base(FCSTechFabricator.Configuration.AIMarineMonitorClassID,
-            "AI Marine Monitor",
-            "Why go outside and get wet? Get your turbine status and control your turbine from inside!")
+        public AIMarineMonitorBuildable() : base(Mod.MarineMonitorClassID,Mod.MarineMonitorFriendlyName,Mod.MarineMonitorDescriptription)
         {
         }
 
@@ -118,7 +104,7 @@ namespace FCS_AIMarineTurbine.Buildable
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(TechTypeHelpers.GetTechType("MarineMonitorKit_MT"), 1)
+                    new Ingredient(TechTypeHelpers.GetTechType(Mod.MarineMontiorKitClassID), 1)
                 }
             };
             QuickLogger.Debug($"Created Ingredients");

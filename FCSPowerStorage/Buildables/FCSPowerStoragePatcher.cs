@@ -6,8 +6,6 @@ using SMLHelper.V2.Crafting;
 using System.IO;
 using System.Linq;
 using FCSCommon.Helpers;
-using FCSTechFabricator;
-using FCSTechFabricator.Helpers;
 using UnityEngine;
 using Information = FCSPowerStorage.Configuration.Information;
 
@@ -20,7 +18,7 @@ namespace FCSPowerStorage.Buildables
         public override TechCategory CategoryForPDA { get; } = TechCategory.InteriorModule;
 
         private static readonly FCSPowerStorageBuildable Singleton = new FCSPowerStorageBuildable();
-        public FCSPowerStorageBuildable() : base(Information.ModName, "FCS Power Storage", Information.ModDescription)
+        public FCSPowerStorageBuildable() : base(Information.ModName, Information.ModFriendlyName, Information.ModDescription)
         {
             OnFinishedPatching += AdditionalPatching;
         }
@@ -31,14 +29,6 @@ namespace FCSPowerStorage.Buildables
             {
                 throw new FileNotFoundException($"Failed to retrieve the {Singleton.FriendlyName} prefab from the asset bundle");
             }
-
-            PatchHelpers.AddNewKit(
-                FCSTechFabricator.Configuration.PowerStorageKitClassID,
-                null,
-                "FCS Power Storage",
-                FCSTechFabricator.Configuration.PowerStorageClassID,
-                new[] { "AIS", "PS" },
-                null);
 
             Singleton.Patch();
         }

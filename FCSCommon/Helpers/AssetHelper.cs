@@ -7,12 +7,12 @@ namespace FCSCommon.Helpers
     /// <summary>
     /// A  helper class that deals with the AssetBudle
     /// </summary>
-    public static class AssetHelper
+    internal static class AssetHelper
     {
         /// <summary>
         /// The AssetBundle for the mod
         /// </summary>
-        public static AssetBundle Asset(string modDirName, string modBundleName)
+        internal static AssetBundle Asset(string modDirName, string modBundleName)
         {
             if (modDirName.Equals(string.Empty) && modBundleName.Equals(string.Empty))
             {
@@ -28,22 +28,22 @@ namespace FCSCommon.Helpers
             return AssetBundle.LoadFromFile(Path.Combine(Path.Combine(Environment.CurrentDirectory, "QMods"), Path.Combine(modDirName, Path.Combine("Assets", modBundleName))));
         }
 
-        public static string GetModDirectory(string modName)
+        internal static string GetModDirectory(string modName)
         {
             return Path.Combine(Path.Combine(Environment.CurrentDirectory, "QMods"), modName);
         }
 
-        public static string GetAssetFolder(string modName)
+        internal static string GetAssetFolder(string modName)
         {
             return Path.Combine(Path.Combine(Environment.CurrentDirectory, "QMods"), Path.Combine(modName, "Assets"));
         }
 
-        public static string GetConfigFolder(string modName)
+        internal static string GetConfigFolder(string modName)
         {
             return Path.Combine(Path.Combine(Environment.CurrentDirectory, "QMods"), Path.Combine(modName, "Configuration"));
         }
 
-        public static AssetBundle Asset(string bundleLocation)
+        internal static AssetBundle Asset(string bundleLocation)
         {
             if (string.IsNullOrEmpty(bundleLocation))
             {

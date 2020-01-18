@@ -2,20 +2,18 @@
 using FCS_AIMarineTurbine.Display.Patching;
 using FCS_AIMarineTurbine.Mono;
 using FCSAlterraIndustrialSolutions.Models.Controllers;
-using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using FCSCommon.Abstract;
-using SMLHelper.V2.Utility;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace FCS_AIMarineTurbine.Display
 {
-    public class AIMarineMoniterDisplay : AIDisplay
+    internal class AIMarineMoniterDisplay : AIDisplay
     {
         #region Private Members
 

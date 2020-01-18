@@ -12,7 +12,7 @@ using UnityEngine.UI;
 
 namespace FCS_AIMarineTurbine.Display
 {
-    public class AIJetStreamT242Display : AIDisplay
+    internal class AIJetStreamT242Display : AIDisplay
     {
 
         #region Private Members

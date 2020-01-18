@@ -1,4 +1,11 @@
-﻿using FCSAlterraShipping.Buildable;
+﻿using System.IO;
+using FCSAlterraShipping.Buildable;
+using FCSAlterraShipping.Configuration;
+using FCSTechFabricator;
+using FCSTechFabricator.Components;
+using FCSTechFabricator.Craftables;
+using QModManager.API.ModLoading;
+using SMLHelper.V2.Utility;
 
 namespace FCSAlterraShipping
 {
@@ -7,8 +14,10 @@ namespace FCSAlterraShipping
     using System;
     using System.Reflection;
 
+    [QModCore]
     public static class QPatch
     {
+        [QModPatch]
         public static void Patch()
         {
             var assembly = Assembly.GetExecutingAssembly();
@@ -21,6 +30,8 @@ namespace FCSAlterraShipping
 
             try
             {
+                AddTechFabricatorItems();
+
                 AlterraShippingBuildable.PatchSMLHelper();
 
                 var harmony = HarmonyInstance.Create("com.alterrashipping.fcstudios");
@@ -32,6 +43,15 @@ namespace FCSAlterraShipping
             {
                 QuickLogger.Error(ex);
             }
+        }
+
+        private static void AddTechFabricatorItems()
+        {
+            var icon = new Atlas.Sprite(ImageUtils.LoadTextureFromFile(Path.Combine(Mod.GetAssetPath(), $"{Mod.ClassID}.png")));
+            var craftingTab = new CraftingTab(Mod.AlterraShippingTabID, Mod.FriendlyName, icon);
+
+            var alterraShippingKit = new FCSKit(Mod.AlterraShippingKitClassID, Mod.FriendlyName, craftingTab, Mod.AlterraShippingIngredients);
+            alterraShippingKit.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
         }
     }
 }

@@ -7,6 +7,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using SMLHelper.V2.Crafting;
 using UnityEngine;
 
 namespace AE.MiniFountainFilter.Configuration
@@ -19,15 +20,30 @@ namespace AE.MiniFountainFilter.Configuration
         #endregion
 
         #region Internal Properties
-        internal static string ModName => "FCS_MiniFountainFilter";
-        internal static string BundleName => "minifountainfiltermodbundle";
-
+        internal const string ModName = "FCS_MiniFountainFilter";
+        internal const string BundleName = "minifountainfiltermodbundle";
+        internal const string FriendlyName = "Mini Fountain Filter";
+        internal const string Description = "A smaller water filtration system for your base or cyclops.";
+        internal const string ClassID = "MiniFountainFilter";
         internal const string SaveDataFilename = "MiniFountainFilterSaveData.json";
+        internal const string MiniFountainFilterTabID = "MFF";
+        internal const string MiniFountainFilterKitClassID = "MiniFountainFilterKit_MFF";
+
+
+        internal static TechData MiniFountainFilterKitIngredients => new TechData
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(TechType.AdvancedWiringKit, 1),
+                new Ingredient(TechType.Bleach, 2),
+                new Ingredient(TechType.FiberMesh, 2),
+                new Ingredient(TechType.Titanium, 1),
+                new Ingredient(TechType.Glass, 1)
+            }
+        };
 
         internal static string MODFOLDERLOCATION => GetModPath();
-        internal static string FriendlyName => "Mini Fountain Filter";
-        internal static string Description => "A smaller water filtration system for your base or cyclops.";
-        internal static string ClassID => FCSTechFabricator.Configuration.MiniFountainFilterClassID;
 
         internal static event Action<SaveData> OnDataLoaded;
         #endregion

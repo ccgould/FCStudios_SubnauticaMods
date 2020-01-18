@@ -6,8 +6,6 @@ using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
 using System.Collections.Generic;
 using System.IO;
-using FCSTechFabricator.Helpers;
-using FCSTechFabricator.Mono.SeaCooker;
 using UnityEngine;
 
 namespace AE.SeaCooker.Buildable
@@ -75,25 +73,7 @@ namespace AE.SeaCooker.Buildable
             }
 
             Register();
-
-            PatchHelpers.AddNewKit(
-                FCSTechFabricator.Configuration.SeaCookerBuildableKitClassID,
-                null,
-                Mod.FriendlyName,
-                FCSTechFabricator.Configuration.SeaCookerClassID,
-                new[] { "AE", "SC" },
-                null);
-
-            var scGtank = new SeaGasTankCraftable();
-            scGtank.Patch();
-            PatchHelpers.AddTechType(scGtank.TechType, scGtank.StepsToFabricatorTab);
-            QuickLogger.Debug($"Patched {scGtank.FriendlyName}");
-
-            var scAGtank = new SeaAlienGasTankCraftable();
-            scAGtank.Patch();
-            PatchHelpers.AddTechType(scAGtank.TechType, scAGtank.StepsToFabricatorTab);
-            QuickLogger.Debug($"Patched {scAGtank.FriendlyName}");
-
+            
             Singleton.Patch();
         }
 

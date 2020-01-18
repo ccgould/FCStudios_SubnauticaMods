@@ -10,7 +10,7 @@ namespace FCSCommon.Components
     /// <summary>
     /// This class is a component for all interface buttons except the color picker and the paginator.
     /// </summary>
-    public class InterfaceButton : OnScreenButton, IPointerEnterHandler, IPointerClickHandler, IPointerExitHandler
+    internal class InterfaceButton : OnScreenButton, IPointerEnterHandler, IPointerClickHandler, IPointerExitHandler
     {
         #region Public Properties
 
@@ -194,7 +194,7 @@ namespace FCSCommon.Components
             }
         }
 
-        public void OnPointerClick(PointerEventData eventData)
+        public override void OnPointerClick(PointerEventData eventData)
         {
             base.OnPointerClick(eventData);
 

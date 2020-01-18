@@ -3,8 +3,8 @@ using AE.SeaCooker.Enumerators;
 using AE.SeaCooker.Helpers;
 using AE.SeaCooker.Mono;
 using FCSCommon.Utilities;
-using FCSTechFabricator.Mono;
 using System;
+using FCSTechFabricator.Components;
 using UnityEngine;
 
 namespace AE.SeaCooker.Managers

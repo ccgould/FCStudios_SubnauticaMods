@@ -6,14 +6,21 @@ using Oculus.Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Reflection;
+using FCSTechFabricator;
+using FCSTechFabricator.Components;
+using FCSTechFabricator.Craftables;
+using QModManager.API.ModLoading;
+using SMLHelper.V2.Utility;
 
 
 namespace ExStorageDepot
 {
+    [QModCore]
     public static class QPatch
     {
         internal static Config Config { get; private set; }
 
+        [QModPatch]
         public static void Patch()
         {
             QuickLogger.Info("Started patching. Version: " + QuickLogger.GetAssemblyVersion(Assembly.GetExecutingAssembly()));
@@ -27,6 +34,8 @@ namespace ExStorageDepot
             {
                 LoadConfiguration();
 
+                AddTechFabricatorItems();
+                
                 ExStorageDepotBuildable.PatchHelper();
 
                 var harmony = HarmonyInstance.Create("com.exstoragedepot.fcstudios");
@@ -50,6 +59,15 @@ namespace ExStorageDepot
 
             //LoadData
             Config = JsonConvert.DeserializeObject<Config>(configJson, settings);
+        }
+
+        private static void AddTechFabricatorItems()
+        {
+            var icon = new Atlas.Sprite(ImageUtils.LoadTextureFromFile(Path.Combine(Mod.GetAssetPath(), $"{Mod.ClassID}.png")));
+            var craftingTab = new CraftingTab(Mod.ExStorageTabID, Mod.ModFriendly, icon);
+
+            var miniMedBayKit = new FCSKit(Mod.ExStorageKitClassID, Mod.ModFriendly, craftingTab, Mod.ExStorageIngredients);
+            miniMedBayKit.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
         }
     }
 }

@@ -11,6 +11,7 @@ using FCSCommon.Abstract;
 using UnityEngine;
 using UnityEngine.UI;
 using FCSCommon.Components;
+using FCSCommon.Controllers;
 using FCSCommon.Objects;
 
 namespace AE.MiniFountainFilter.Managers
@@ -26,7 +27,7 @@ namespace AE.MiniFountainFilter.Managers
         private GameObject _fromImage;
         private GameObject _toImage;
         private Image _button1Progress;
-        private ColorPageHelper _colorPage;
+        private ColorManager _colorPage;
         private Text _paginator;
         private Text _button1ProgressNumber;
         private Image _button2Progress;
@@ -64,7 +65,7 @@ namespace AE.MiniFountainFilter.Managers
                 case "ColorItem":
                     var color = (Color)tag;
                     QuickLogger.Debug($"{_mono.gameObject.name} Color Changed to {color.ToString()}", true);
-                    _mono.ColorManager.SetCurrentBodyColor(color);
+                    _mono.ColorManager.ChangeColor(color);
                     break;
 
                 case "colorPickerBTN":
@@ -265,7 +266,7 @@ namespace AE.MiniFountainFilter.Managers
             _mono.TankManager.OnTankUpdate += OnTankUpdate;
 
 
-            _colorPage = gameObject.AddComponent<ColorPageHelper>();
+            _colorPage = mono.ColorManager;
 
             if (FindAllComponents())
             {
@@ -277,13 +278,8 @@ namespace AE.MiniFountainFilter.Managers
                 return;
             }
 
-            _colorPage.OnButtonClick = OnButtonClick;
-            _colorPage.SerializedColors = ColorList.Colors;
-            _colorPage.ColorsPerPage = 25;
-            _colorPage.ColorItemPrefab = MiniFountainFilterBuildable.ColorItemPrefab;
-            _colorPage.ColorPageContainer = _grid;
-            _colorPage.ColorPageNumber = _paginator;
-            _colorPage.Initialize();
+            _colorPage.SetupGrid(25, MiniFountainFilterBuildable.ColorItemPrefab, _grid, _paginator, OnButtonClick);
+            
             StartCoroutine(CompleteSetup());
         }
 

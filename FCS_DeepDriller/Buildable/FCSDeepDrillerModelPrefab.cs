@@ -24,7 +24,7 @@ namespace FCS_DeepDriller.Buildable
         private bool GetPrefabs()
         {
             QuickLogger.Debug("GetPrefabs");
-            AssetBundle assetBundle = AssetHelper.Asset(Mod.ModName, Mod.BundleName);
+            AssetBundle assetBundle = AssetHelper.Asset(Mod.ModFolderName, Mod.BundleName);
 
             //If the result is null return false.
             if (assetBundle == null)
@@ -72,15 +72,66 @@ namespace FCS_DeepDriller.Buildable
                 return false;
             }
 
-            //if (!GetOres())
-            //{
-            //    return false;
-            //}
+            #region Battery Module
+            //We have found the asset bundle and now we are going to continue by looking for the model.
+            GameObject batteryModule = QPatch.GlobalBundle.LoadAsset<GameObject>("Battery_Attachment");
 
-            BatteryModule = FCSTechFabricator.QPatch.BatteryModule;
-            SolarModule = FCSTechFabricator.QPatch.SolarModule;
-            FocusModule = FCSTechFabricator.QPatch.FocusModule;
+            //If the prefab isn't null lets add the shader to the materials
+            if (batteryModule != null)
+            {
+                ApplyShaders(batteryModule);
 
+                BatteryModule = batteryModule;
+
+                QuickLogger.Debug($"Battery Module Prefab Found!");
+            }
+            else
+            {
+                QuickLogger.Error($"Battery Module  Prefab Not Found!");
+                return false;
+            }
+            #endregion
+
+            #region Solar Module
+            //We have found the asset bundle and now we are going to continue by looking for the model.
+            GameObject solarModule = QPatch.GlobalBundle.LoadAsset<GameObject>("Solar_Panel_Attachment");
+
+            //If the prefab isn't null lets add the shader to the materials
+            if (solarModule != null)
+            {
+                ApplyShaders(solarModule);
+
+                SolarModule = solarModule;
+
+                QuickLogger.Debug($"Solar Module Prefab Found!");
+            }
+            else
+            {
+                QuickLogger.Error($"Solar Module  Prefab Not Found!");
+                return false;
+            }
+            #endregion
+
+            #region Focus Module
+            //We have found the asset bundle and now we are going to continue by looking for the model.
+            GameObject focusModule = QPatch.GlobalBundle.LoadAsset<GameObject>("Scanner_Screen_Attachment");
+
+            //If the prefab isn't null lets add the shader to the materials
+            if (focusModule != null)
+            {
+                ApplyShaders(focusModule);
+
+                FocusModule = focusModule;
+
+                QuickLogger.Debug($"Focus Module Prefab Found!");
+            }
+            else
+            {
+                QuickLogger.Error($"Solar Module  Prefab Not Found!");
+                return false;
+            }
+            #endregion
+            
             return true;
         }
 

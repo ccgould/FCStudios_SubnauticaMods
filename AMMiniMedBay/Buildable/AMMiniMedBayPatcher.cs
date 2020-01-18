@@ -1,13 +1,10 @@
 ﻿using AMMiniMedBay.Mono;
-using FCSCommon.Extensions;
 using FCSCommon.Utilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using AMMiniMedBay.Configuration;
 using FCSCommon.Helpers;
-using FCSTechFabricator.Helpers;
-using SMLHelper.V2.Utility;
 
 namespace AMMiniMedBay.Buildable
 {
@@ -33,14 +30,6 @@ namespace AMMiniMedBay.Buildable
             {
                 throw new FileNotFoundException($"Failed to retrieve the {Singleton.FriendlyName} prefab from the asset bundle");
             }
-
-            PatchHelpers.AddNewKit(
-                FCSTechFabricator.Configuration.AMMiniMedBayKitClassID,
-                null,
-                Mod.ModFriendlyName,
-                FCSTechFabricator.Configuration.MiniMedBayClassID,
-                new[] { "AMS", "MMB" },
-                null);
 
             Singleton.Patch();
         }

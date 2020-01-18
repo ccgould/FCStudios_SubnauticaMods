@@ -2,6 +2,7 @@
 using Oculus.Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using FCSTechFabricator.Objects;
 
 namespace AE.MiniFountainFilter.Configuration
 {

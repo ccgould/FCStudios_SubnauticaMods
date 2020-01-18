@@ -6,13 +6,24 @@ using Oculus.Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Reflection;
+using AE.SeaCooker.Craftable;
+using FCSTechFabricator;
+using FCSTechFabricator.Components;
+using FCSTechFabricator.Craftables;
+using QModManager.API.ModLoading;
+using SMLHelper.V2.Utility;
 using UnityEngine;
 
 namespace AE.SeaCooker
 {
+    [QModCore]
     public class QPatch
     {
-        public static AssetBundle GlobalBundle { get; set; }
+        internal static ConfigFile Configuration { get; set; }
+        internal static string Version { get; set; }
+        internal static AssetBundle GlobalBundle { get; set; }
+        
+        [QModPatch]
         public static void Patch()
         {
             Version = QuickLogger.GetAssemblyVersion(Assembly.GetExecutingAssembly());
@@ -26,7 +37,7 @@ namespace AE.SeaCooker
 
             try
             {
-                GlobalBundle = FCSTechFabricator.QPatch.Bundle;
+                GlobalBundle = FcAssetBundlesService.PublicAPI.GetAssetBundleByName(FcAssetBundlesService.PublicAPI.GlobalBundleName);
 
                 if (GlobalBundle == null)
                 {
@@ -34,7 +45,11 @@ namespace AE.SeaCooker
                     throw new FileNotFoundException("Bundle failed to load");
                 }
 
-                LoadConfiguration();
+                Configuration = Mod.LoadConfiguration();
+
+                QuickLogger.Info($"Storage:{Configuration.Config.StorageHeight}X{Configuration.Config.StorageWidth}");
+
+                AddTechFabricatorItems();
 
                 SeaCookerBuildable.PatchSMLHelper();
 
@@ -49,23 +64,21 @@ namespace AE.SeaCooker
             }
         }
 
-        private static void LoadConfiguration()
+
+
+        private static void AddTechFabricatorItems()
         {
-            // == Load Configuration == //
-            string configJson = File.ReadAllText(Mod.ConfigurationFile().Trim());
+            var icon = new Atlas.Sprite(ImageUtils.LoadTextureFromFile(Path.Combine(Mod.GetAssetFolder(), $"{Mod.ClassID}.png")));
+            var craftingTab = new CraftingTab(Mod.SeaCookerTabID, Mod.FriendlyName, icon);
 
-            JsonSerializerSettings settings = new JsonSerializerSettings();
-            settings.MissingMemberHandling = MissingMemberHandling.Ignore;
+            var seaCookerKit = new FCSKit(Mod.SeaCookerKitClassID, Mod.FriendlyName, craftingTab, Mod.SeaCookerIngredients);
+            seaCookerKit.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
 
-            //LoadData
-            Configuration = JsonConvert.DeserializeObject<ConfigFile>(configJson, settings);
+            var seaAlienGasTank = new SeaAlienGasTankCraftable(Mod.SeaAlienGasClassID, Mod.SeaAlienGasFriendlyName,Mod.SeaAlienGasDescription, craftingTab);
+            seaAlienGasTank.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
 
-
-            QuickLogger.Debug($"Storage Height: {Configuration.Config.StorageHeight}");
+            var seaGasTank = new SeaGasTankCraftable(Mod.SeaGasClassID, Mod.SeaGasFriendlyName, Mod.SeaGasDescription, craftingTab);
+            seaGasTank.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
         }
-
-        internal static ConfigFile Configuration { get; set; }
-        internal static string Version { get; set; }
     }
 }
-

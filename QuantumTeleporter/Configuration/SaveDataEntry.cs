@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using FCSCommon.Objects;
+using FCSTechFabricator.Objects;
 using Oculus.Newtonsoft.Json;
 using QuantumTeleporter.Enumerators;
 

@@ -3,6 +3,7 @@ using FCSCommon.Objects;
 using Oculus.Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using FCSTechFabricator.Objects;
 
 namespace AE.SeaCooker.Configuration
 {

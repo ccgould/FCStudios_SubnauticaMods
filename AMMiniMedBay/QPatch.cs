@@ -1,17 +1,22 @@
 ﻿using AMMiniMedBay.Buildable;
-using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using Harmony;
 using System;
 using System.IO;
 using System.Reflection;
-using UnityEngine;
+using AMMiniMedBay.Configuration;
+using FCSTechFabricator;
+using FCSTechFabricator.Components;
+using FCSTechFabricator.Craftables;
+using QModManager.API.ModLoading;
+using SMLHelper.V2.Utility;
 
 namespace AMMiniMedBay
 {
+    [QModCore]
     public class QPatch
     {
-        //public static AssetBundle Bundle { get; private set; }
+        [QModPatch]
         public static void Patch()
         {
             var assembly = Assembly.GetExecutingAssembly();
@@ -24,7 +29,7 @@ namespace AMMiniMedBay
 
             try
             {
-                //LoadAssetBundle();
+                AddTechFabricatorItems();
 
                 AMMiniMedBayBuildable.PatchHelper();
 
@@ -39,24 +44,14 @@ namespace AMMiniMedBay
                 QuickLogger.Error(ex);
             }
         }
-
-        private static void LoadAssetBundle()
+        
+        private static void AddTechFabricatorItems()
         {
-            QuickLogger.Debug("GetPrefabs");
-            AssetBundle assetBundle = AssetHelper.Asset("AMMiniMedBay", "amminimedbaymodbundle");
+            var icon = new Atlas.Sprite(ImageUtils.LoadTextureFromFile(Path.Combine(Mod.GetAssetPath(), $"{Mod.ClassID}.png")));
+            var craftingTab = new CraftingTab(Mod.MiniMedBayTabID, Mod.ModFriendlyName, icon);
 
-            //If the result is null return false.
-            if (assetBundle == null)
-            {
-                QuickLogger.Error($"AssetBundle is Null!");
-                throw new FileLoadException();
-            }
-
-            Bundle = assetBundle;
+            var miniMedBayKit = new FCSKit(Mod.MiniMedBayKitClassID, Mod.ModFriendlyName, craftingTab, Mod.MiniMedBayIngredients);
+            miniMedBayKit.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
         }
-
-        public static AssetBundle Bundle { get; set; }
-
-        public static AssetBundle GlobalBundle { get; set; }
     }
 }

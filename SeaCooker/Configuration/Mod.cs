@@ -4,6 +4,7 @@ using FCSCommon.Objects;
 using FCSCommon.Utilities;
 using Oculus.Newtonsoft.Json;
 using System.Collections.Generic;
+using SMLHelper.V2.Crafting;
 
 namespace AE.SeaCooker.Configuration
 {
@@ -19,23 +20,45 @@ namespace AE.SeaCooker.Configuration
         #region Private Members
         private static ModSaver _saveObject;
         private static SaveData _saveData;
+        private const string ConfigFileName = "config.json";
+
         #endregion
 
         #region Internal Properties
-        internal static string ModName => "FCS_AESeaCooker";
-        internal static string BundleName => "seacookermodbundle";
-
+        internal const string ModName = "FCS_AESeaCooker";
+        internal const string BundleName = "seacookermodbundle";
+        internal const string SeaCookerTabID = "SC";
         internal const string SaveDataFilename = "SeaCookerSaveData.json";
-
+        internal const string FriendlyName = "SeaCooker";
+        internal const string Description = "A automatic food cooker for all your cooking needs";
+        internal const string ClassID = "SeaCooker";
+        internal const string SeaCookerKitClassID = "SeaCookerBuildableKit_SC";
         internal static string MODFOLDERLOCATION => GetModPath();
-        internal static string FriendlyName => "SeaCooker";
-        internal static string Description => "A automatic food cooker for all your cooking needs";
-        internal static string ClassID => FCSTechFabricator.Configuration.SeaCookerClassID;
+        internal static TechData SeaCookerIngredients => new TechData
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(TechType.AdvancedWiringKit, 1),
+                new Ingredient(TechType.Aerogel, 2),
+                new Ingredient(TechType.PlasteelIngot, 2),
+                new Ingredient(TechType.CrashPowder, 2)
+            }
+        };
+
+        internal const string SeaAlienGasClassID = "SeaAlienGasTank_SC";
+        internal const string SeaAlienGasFriendlyName = "Sea Alien Gas";
+        internal const string SeaAlienGasDescription = "This tank allows you too cook food in the Sea Cooker using Alien Feces.";
+
+        internal const string SeaGasClassID = "SeaGasTank_SC";
+        internal const string SeaGasFriendlyName = "Sea Gas";
+        internal const string SeaGasDescription = "This tank allows you too cook food in the Sea Cooker using Gaspod gas.";
 
         internal static event Action<SaveData> OnDataLoaded;
         #endregion
 
         #region Internal Methods
+        
         internal static void Save()
         {
             if (!IsSaving())
@@ -107,7 +130,12 @@ namespace AE.SeaCooker.Configuration
 
         internal static string ConfigurationFile()
         {
-            return Path.Combine(MODFOLDERLOCATION, "config.json");
+            return Path.Combine(MODFOLDERLOCATION, ConfigFileName);
+        }
+
+        internal static bool IsConfigAvailable()
+        {
+            return File.Exists(ConfigurationFile());
         }
         #endregion
 
@@ -142,5 +170,36 @@ namespace AE.SeaCooker.Configuration
         }
 
         #endregion
+
+        private static void CreateModConfiguration()
+        {
+            var config = new ConfigFile { Config = new Config() };
+
+            var saveDataJson = JsonConvert.SerializeObject(config, Formatting.Indented);
+
+            File.WriteAllText(Path.Combine(MODFOLDERLOCATION, ConfigFileName), saveDataJson);
+        }
+
+        private static ConfigFile LoadConfigurationData()
+        {
+            // == Load Configuration == //
+            string configJson = File.ReadAllText(ConfigurationFile().Trim());
+
+            JsonSerializerSettings settings = new JsonSerializerSettings();
+            settings.MissingMemberHandling = MissingMemberHandling.Ignore;
+
+            // == LoadData == //
+            return JsonConvert.DeserializeObject<ConfigFile>(configJson, settings);
+        }
+
+        internal static ConfigFile LoadConfiguration()
+        {
+            if (!IsConfigAvailable())
+            {
+                CreateModConfiguration();
+            }
+
+            return LoadConfigurationData();
+        }
     }
 }

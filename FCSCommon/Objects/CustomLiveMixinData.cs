@@ -2,11 +2,11 @@
 
 namespace FCSCommon.Objects
 {
-    public class CustomLiveMixinData
+    internal class CustomLiveMixinData
     {
         private static LiveMixinData _instance;
 
-        public static LiveMixinData Get()
+        internal static LiveMixinData Get()
         {
             if (_instance != null)
             {
@@ -33,9 +33,9 @@ namespace FCSCommon.Objects
             return _instance;
         }
 
-        public class UniqueLiveMixinData
+        internal class UniqueLiveMixinData
         {
-            public LiveMixinData Create(int maxHealth, bool weldable, bool knifeable, bool canResurrect, bool destroyOnDeath = false, bool passDamageDataOnDeath = false,
+            internal LiveMixinData Create(int maxHealth, bool weldable, bool knifeable, bool canResurrect, bool destroyOnDeath = false, bool passDamageDataOnDeath = false,
                 bool invincibleInCreative = false, bool explodeOnDestroy = false, bool broadcastKillOnDeath = false, int minDamageForSound = 0,
                 int loopEffectBelowPercent = 0, GameObject damageEffect = null, GameObject deathEffect = null, GameObject electricalDamageEffect = null,
                 GameObject loopingDamageEffect = null)

@@ -3,13 +3,11 @@ using FCSAlterraShipping.Display;
 using FCSAlterraShipping.Display.Patching;
 using FCSAlterraShipping.Models;
 using FCSAlterraShipping.Mono;
-using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using System.IO;
 using FCSAlterraShipping.Configuration;
-using FCSTechFabricator.Helpers;
-using SMLHelper.V2.Utility;
+
 
 namespace FCSAlterraShipping.Buildable
 {
@@ -33,15 +31,6 @@ namespace FCSAlterraShipping.Buildable
             {
                 throw new FileNotFoundException($"Failed to retrieve the {Singleton.FriendlyName} prefab from the asset bundle");
             }
-
-
-            PatchHelpers.AddNewKit(
-                FCSTechFabricator.Configuration.ShippingKitID,
-                null,
-                Mod.FriendlyName,
-                FCSTechFabricator.Configuration.ShippingClassID,
-                new[] { "ASS", "ASU" },
-                null);
 
             Singleton.Patch();
         }
@@ -129,7 +118,7 @@ namespace FCSAlterraShipping.Buildable
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(TechTypeHelpers.GetTechType(FCSTechFabricator.Configuration.ShippingKitID), 1)
+                    new Ingredient(TechTypeHelpers.GetTechType(Mod.AlterraShippingKitClassID), 1)
                 }
             };
 

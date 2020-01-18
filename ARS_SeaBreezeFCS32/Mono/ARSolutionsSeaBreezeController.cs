@@ -10,13 +10,14 @@ using SMLHelper.V2.Utility;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using FCSCommon.Abstract;
 using FCSCommon.Controllers;
+using FCSCommon.Interfaces;
+using FCSTechFabricator.Components;
 using UnityEngine;
 
 namespace ARS_SeaBreezeFCS32.Mono
 {
-    public partial class ARSolutionsSeaBreezeController : Refrigerator, IFridgeContainer, IProtoEventListener, IConstructable
+    public partial class ARSolutionsSeaBreezeController : MonoBehaviour, IFridgeContainer, IProtoEventListener, IConstructable,IRenameable
     {
         #region Private Members
         private Constructable _buildable;
@@ -51,7 +52,7 @@ namespace ARS_SeaBreezeFCS32.Mono
         /// <summary>
         /// Items in the fridge
         /// </summary>
-        public List<EatableEntities> FridgeItems => _fridgeContainer?.FridgeItems;
+        List<EatableEntities> IFridgeContainer.FridgeItems => _fridgeContainer?.FridgeItems;
 
         public Dictionary<TechType, int> TrackedItems => _fridgeContainer?.TrackedItems;
 
@@ -75,7 +76,7 @@ namespace ARS_SeaBreezeFCS32.Mono
         private string _currentTimeHMS { get; set; }
         internal bool CoolantIsDone => currentTime <= 0;
         internal ARSolutionsSeaBreezeDisplay Display { get; private set; }
-        public NameController NameController { get; private set; }
+        internal NameController NameController { get; private set; }
 
         private bool _runTimer;
         private bool _doOnce;
@@ -114,7 +115,7 @@ namespace ARS_SeaBreezeFCS32.Mono
                     //_freonContainer.LoadFreon(savedData);
                     //Display.OnContainerUpdate(_fridgeContainer.NumberOfItems, QPatch.Configuration.Config.StorageLimit);
                     NameController.SetCurrentName(_savedData.UnitName);
-                    Display.OnLabelChanged(_savedData.UnitName, NameController);
+                    Display?.OnLabelChanged(_savedData.UnitName, NameController);
                 }
 
                 _runStartUpOnEnable = false;
@@ -163,11 +164,10 @@ namespace ARS_SeaBreezeFCS32.Mono
 
             if (NameController == null)
             {
-                NameController = new NameController();
-                NameController.Initialize(this, ARSSeaBreezeFCS32Buildable.Submit(), Mod.FriendlyName);
+                NameController = gameObject.EnsureComponent<NameController>();
+                NameController.Initialize(ARSSeaBreezeFCS32Buildable.Submit(), Mod.FriendlyName);
             }
-
-
+            
             AnimationManager = GetComponentInParent<ARSolutionsSeaBreezeAnimationManager>();
 
             if (AnimationManager == null)
@@ -178,6 +178,7 @@ namespace ARS_SeaBreezeFCS32.Mono
             QuickLogger.Debug("Setting Name");
 
             NameController.SetCurrentName(Mod.GetNewSeabreezeName());
+            NameController.OnLabelChanged += OnLabelChangedMethod;
             //InvokeRepeating("UpdateFridgeCooler", 1, 0.5f);
 
             if(Display == null)
@@ -187,6 +188,11 @@ namespace ARS_SeaBreezeFCS32.Mono
             _initialized = true;
 
             QuickLogger.Info("Initialized");
+        }
+
+        private void OnLabelChangedMethod(string arg1, NameController arg2)
+        { 
+            OnLabelChanged?.Invoke(arg1,arg2);
         }
 
 
@@ -471,5 +477,28 @@ namespace ARS_SeaBreezeFCS32.Mono
         {
             _deconstructionAllowed = value;
         }
+
+        public void RenameDevice(string newName)
+        {
+            if (NameController != null)
+            {
+                NameController.SetCurrentName(newName);
+            }
+        }
+
+        public string GetDeviceName()
+        {
+            return NameController != null ? NameController.GetCurrentName() : string.Empty;
+        }
+
+        public void SetNameControllerTag(object obj)
+        {
+            if (NameController != null)
+            {
+                NameController.Tag = obj;
+            }
+        }
+
+        public Action<string, NameController> OnLabelChanged { get; set; }
     }
 }

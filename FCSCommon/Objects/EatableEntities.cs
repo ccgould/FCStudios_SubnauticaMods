@@ -1,4 +1,5 @@
 ﻿using FCSCommon.Utilities;
+using Oculus.Newtonsoft.Json;
 using UnityEngine;
 
 namespace FCSCommon.Objects
@@ -6,29 +7,29 @@ namespace FCSCommon.Objects
     /// <summary>
     /// Defines the Eatable object 
     /// </summary>
-    public class EatableEntities
+    internal class EatableEntities
     {
-        public TechType TechType { get; set; }
+        [JsonProperty] internal TechType TechType { get; set; }
 
-        public string PrefabID { get; set; }
+        [JsonProperty] internal string PrefabID { get; set; }
 
-        public string Name { get; set; }
+        [JsonProperty] internal string Name { get; set; }
+ 
+        [JsonProperty] internal float WaterValue { get; set; }
 
-        public float WaterValue { get; set; }
+        [JsonProperty] internal float FoodValue { get; set; }
 
-        public float FoodValue { get; set; }
+        [JsonProperty] internal float KDecayRate { get; set; }
 
-        public float KDecayRate { get; set; }
-
-        public bool Decomposes { get; set; }
+        [JsonProperty] internal bool Decomposes { get; set; }
 
 
-        public void Initialize(Pickupable food)
+        internal void Initialize(Pickupable food)
         {
             Create(food);
         }
 
-        public void Initialize(Pickupable food, bool destroy)
+        internal void Initialize(Pickupable food, bool destroy)
         {
             Create(food, destroy);
         }

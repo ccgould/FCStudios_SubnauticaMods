@@ -7,6 +7,7 @@ using System.Text;
 using FCSAIPowerCellSocket.Model;
 using FCSAIPowerCellSocket.Mono;
 using FCSCommon.Utilities;
+using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 
@@ -17,14 +18,26 @@ namespace FCSAIPowerCellSocket.Configuration
         private static ModSaver _saveObject;
         private static SaveData _saveData;
 
-        internal static string ClassID => FCSTechFabricator.Configuration.PowerCellSocketClassID;
+        internal static string ClassID => "AIPowerCellSocket";
         internal static string ModName => "PowerCellSocket";
         internal static string ModFriendlyName => "Alterra Industrial Powercell Socket";
         internal static string ModDescription => "Alterra Industrial wall mounted powercell socket for emergency power";
         internal static string SaveDataFilename => $"{ModName}SaveData.json";
-        internal static string GameObjectName => FCSTechFabricator.Configuration.PowerCellSocketClassID; // Same name as the class
+        internal static string GameObjectName => ClassID;
         internal static string ModFolderName => $"FCS_{ModName}";
         internal static string BundleName => "aipowercellsocketbundle";
+
+        internal static TechData PowercellSocketIngredients => new TechData
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(TechType.AdvancedWiringKit, 1),
+                new Ingredient(TechType.Battery, 1),
+                new Ingredient(TechType.Glass, 3),
+                new Ingredient(TechType.Titanium, 3)
+            }
+        };
 
         #region Save
 
@@ -59,7 +72,7 @@ namespace FCSAIPowerCellSocket.Configuration
                 OnDataLoaded?.Invoke(_saveData);
             });
         }
-
+        
         internal static SaveData GetSaveData()
         {
             return _saveData ?? new SaveData();
@@ -88,6 +101,13 @@ namespace FCSAIPowerCellSocket.Configuration
             return new SaveDataEntry() { Id = id };
         }
         #endregion
+
+        internal static Atlas.Sprite GetIcon(string modTabId)
+        {
+            return new Atlas.Sprite(ImageUtils.LoadTextureFromFile(Path.Combine(Mod.GetAssetPath(), $"{modTabId}Icon.png")));
+        }
+
+
 
         internal static void OnSaveComplete()
         {
@@ -163,5 +183,6 @@ namespace FCSAIPowerCellSocket.Configuration
         {
             return Path.Combine(SaveUtils.GetCurrentSaveDataDir(), ModName);
         }
+
     }
 }

@@ -1,10 +1,12 @@
-﻿using UnityEngine;
+﻿using SMLHelper.V2.Handlers;
+using UnityEngine;
+
 
 namespace FCSCommon.Extensions
 {
-    public static class TechTypeExtensions
+    internal static class FCSTechTypeExtensions
     {
-        public static Pickupable ToPickupable(this TechType techType)
+        internal static Pickupable ToPickupable(this TechType techType)
         {
             Pickupable pickupable = null;
             var prefab = CraftData.GetPrefabForTechType(techType);
@@ -17,7 +19,7 @@ namespace FCSCommon.Extensions
             return pickupable;
         }
 
-        public static InventoryItem ToInventoryItem(this TechType techType)
+        internal static InventoryItem ToInventoryItem(this TechType techType)
         {
             InventoryItem item = null;
             var prefab = CraftData.GetPrefabForTechType(techType);
@@ -28,6 +30,28 @@ namespace FCSCommon.Extensions
                 item = new InventoryItem(pickupable);
             }
             return item;
+        }
+
+        internal static TechType ToTechType(this string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return TechType.None;
+            }
+
+            // Look for a known TechType
+            if (TechTypeExtensions.FromString(value, out TechType tType, true))
+            {
+                return tType;
+            }
+
+            //  Not one of the known TechTypes - is it registered with SMLHelper?
+            if (TechTypeHandler.TryGetModdedTechType(value, out TechType custom))
+            {
+                return custom;
+            }
+
+            return TechType.None;
         }
     }
 }

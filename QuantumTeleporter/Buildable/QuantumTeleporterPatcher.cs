@@ -4,9 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using FCSCommon.Controllers;
+using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
-using FCSTechFabricator.Helpers;
 using QuantumTeleporter.Configuration;
 using QuantumTeleporter.Managers;
 using QuantumTeleporter.Mono;
@@ -21,14 +21,13 @@ namespace QuantumTeleporter.Buildable
     internal partial class QuantumTeleporterBuildable : Buildable
     {
         private static readonly QuantumTeleporterBuildable Singleton = new QuantumTeleporterBuildable();
-        public sealed override TechType RequiredForUnlock => TechType.PrecursorTeleporter;
+        public sealed override TechType RequiredForUnlock => TechType.PrecursorPrisonAquariumFinalTeleporter;
 
         public QuantumTeleporterBuildable() : base(Mod.ClassID, Mod.FriendlyName, Mod.Description)
         {
             OnFinishedPatching = () =>
             {
                 AdditionalPatching();
-                //KnownTechHandler.SetAnalysisTechEntry(RequiredForUnlock, new TechType[1] { TechType }, $"{FriendlyName} blueprint discovered!");
             };
         }
 
@@ -68,7 +67,7 @@ namespace QuantumTeleporter.Buildable
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(TechTypeHelpers.GetTechType(FCSTechFabricator.Configuration.QuantumTeleporterKitClassID), 1)
+                    new Ingredient(Mod.QuantumTeleporterKitClassID.ToTechType(), 1)
                 }
             };
             return customFabRecipe;
@@ -85,39 +84,12 @@ namespace QuantumTeleporter.Buildable
             }
 
             Register();
-
-            PatchHelpers.AddNewKit(
-                FCSTechFabricator.Configuration.TeleporterScannerConnectionKitClassID,
-                "The teleport scanner connection kit has everything a new quantum teleporter needs to locate all teleports in the world.",
-                "Teleporter Scanner Connection",
-                FCSTechFabricator.Configuration.QuantumTeleporterClassID,
-                new[] { "AE", "QT" },
-                null);
-
-            PatchHelpers.AddNewKit(
-                FCSTechFabricator.Configuration.AdvancedTeleporterWiringKitClassID,
-                "The advanced teleporter wiring kit uses the newly found precursor wiring. This wiring can handle the immense power needed for teleportation.",
-                "Advanced Teleporter Wiring",
-                FCSTechFabricator.Configuration.QuantumTeleporterClassID,
-                new[] { "AE", "QT" },
-                null);
-
-            PatchHelpers.AddNewKit(
-                FCSTechFabricator.Configuration.QuantumTeleporterKitClassID,
-                null,
-                Mod.FriendlyName,
-                FCSTechFabricator.Configuration.QuantumTeleporterClassID,
-                new[] { "AE", "QT" },
-                null);
-
+            
             Singleton.Patch();
         }
 
         private static void Register()
         {
-
-            
-
             if (_prefab != null)
             {
                 var model = _prefab.FindChild("model");

@@ -7,9 +7,6 @@ using SMLHelper.V2.Crafting;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using FCSTechFabricator.Helpers;
-using FCSTechFabricator.Mono.SeaBreeze;
-using SMLHelper.V2.Utility;
 using UnityEngine;
 
 namespace ARS_SeaBreezeFCS32.Buildables
@@ -33,20 +30,7 @@ namespace ARS_SeaBreezeFCS32.Buildables
             {
                 throw new FileNotFoundException($"Failed to retrieve the {Singleton.FriendlyName} prefab from the asset bundle");
             }
-
-            PatchHelpers.AddNewKit(
-                FCSTechFabricator.Configuration.SeaBreezeKitClassID,
-                null,
-                Mod.FriendlyName,
-                FCSTechFabricator.Configuration.SeaBreezeClassID,
-                new[] { "ARS", "SB" },
-                null);
-
-            var freon = new FreonBuildable();
-            freon.Patch();
-            PatchHelpers.AddTechType(freon.TechType, freon.StepsToFabricatorTab);
-            QuickLogger.Debug($"Patched {freon.FriendlyName}");
-
+            
             Singleton.Patch();
         }
 
@@ -102,18 +86,6 @@ namespace ARS_SeaBreezeFCS32.Buildables
             }
         }
 
-        private void GetBounding(GameObject prefab)
-        {
-
-            Gizmos.color = Color.magenta;
-            foreach (var mf in prefab.GetComponentsInChildren<MeshFilter>())
-            {
-                Gizmos.matrix = mf.transform.localToWorldMatrix;
-                Mesh m = mf.sharedMesh;
-                Gizmos.DrawWireCube(m.bounds.center, m.bounds.size);
-            }
-        }
-        
         protected override TechData GetBlueprintRecipe()
         {
             QuickLogger.Debug($"Creating recipe...");

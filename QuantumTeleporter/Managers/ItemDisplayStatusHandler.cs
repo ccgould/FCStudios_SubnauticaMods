@@ -2,6 +2,7 @@
 using FCSCommon.Abstract;
 using FCSCommon.Controllers;
 using FCSCommon.Utilities;
+using FCSTechFabricator.Components;
 using QuantumTeleporter.Buildable;
 using QuantumTeleporter.Enumerators;
 using QuantumTeleporter.Mono;

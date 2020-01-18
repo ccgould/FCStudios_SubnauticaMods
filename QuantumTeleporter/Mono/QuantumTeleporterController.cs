@@ -8,15 +8,15 @@ using FCSCommon.Controllers;
 using FCSCommon.Extensions;
 using FCSCommon.Interfaces;
 using FCSCommon.Utilities;
+using FCSTechFabricator.Components;
 using QuantumTeleporter.Buildable;
 using QuantumTeleporter.Configuration;
 using QuantumTeleporter.Managers;
-using SMLHelper.V2.Utility;
 using UnityEngine;
 
 namespace QuantumTeleporter.Mono
 {
-    internal class QuantumTeleporterController: FCSController,IRenameNameTarget
+    internal class QuantumTeleporterController: FCSController
     {
         private bool _runStartUpOnEnable;
         private SaveDataEntry _data;
@@ -55,9 +55,9 @@ namespace QuantumTeleporter.Mono
 
             if (_fromSave)
             {
-                ColorManager.ChangeColor(_data.BodyColor.Vector4ToColor());
                 NameController.SetCurrentName(_data.UnitName);
                 SetIsGlobal(_data.IsGlobal);
+                ColorManager.SetColorFromSave(_data.BodyColor.Vector4ToColor());
                 DisplayManager.SetTab(_data.SelectedTab);
                 QuickLogger.Info($"Loaded {Mod.FriendlyName}");
                 _fromSave = false;
@@ -96,7 +96,7 @@ namespace QuantumTeleporter.Mono
             TeleportManager.Initialize();
 
             if (NameController == null)
-                NameController = new NameController();
+                NameController = gameObject.EnsureComponent<NameController>();
 
 
             if (AnimationManager == null)
@@ -129,7 +129,7 @@ namespace QuantumTeleporter.Mono
 
             DisplayManager.Setup(this);
             
-            NameController.Initialize(this, QuantumTeleporterBuildable.Submit(), Mod.FriendlyName);
+            NameController.Initialize(QuantumTeleporterBuildable.Submit(), Mod.FriendlyName);
             NameController.SetCurrentName(GetNewName(), DisplayManager.GetNameTextBox());
             NameController.OnLabelChanged += OnLabelChanged;
             Manager.OnBaseUnitsChanged += OnBaseUnitsChanged;

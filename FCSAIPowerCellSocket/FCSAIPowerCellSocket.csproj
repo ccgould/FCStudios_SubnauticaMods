@@ -102,9 +102,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FlexibleTechFabricator\FlexibleTechFabricator.csproj">
+    <ProjectReference Include="..\FCSTechFabricator\FCSTechFabricator.csproj">
       <Project>{5ef4adb8-3ae7-41ec-83e1-1daf04999f0e}</Project>
-      <Name>FlexibleTechFabricator</Name>
+      <Name>FCSTechFabricator</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />

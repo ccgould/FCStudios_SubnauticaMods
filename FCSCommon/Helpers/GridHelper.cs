@@ -8,7 +8,7 @@ using UnityEngine.UI;
 
 namespace FCSCommon.Helpers
 {
-    public class GridHelper : MonoBehaviour
+    internal class GridHelper : MonoBehaviour
     {
         private int _itemsPerPage;
         private Action<string, object> _onButtonClick;
@@ -20,7 +20,7 @@ namespace FCSCommon.Helpers
         private GameObject _itemPrefab;
         private GameObject _itemsGrid;
 
-        public void Initialize(GameObject itemPrefab, GameObject itemsGrid,GameObject pageNumberText, int itemsPerPage, Action<string, object> onButtonClick)
+        internal void Initialize(GameObject itemPrefab, GameObject itemsGrid,GameObject pageNumberText, int itemsPerPage, Action<string, object> onButtonClick)
         {
             _itemPrefab = itemPrefab;
             _itemsGrid = itemsGrid;
@@ -30,22 +30,22 @@ namespace FCSCommon.Helpers
             DrawPage(1);
         }
 
-        public int GetCurrentPage()
+        internal int GetCurrentPage()
         {
             return _currentPage;
         }
 
-        public void ChangePageBy(int amount)
+        internal void ChangePageBy(int amount)
         {
             DrawPage(_currentPage + amount);
         }
 
-        public void DrawPage()
+        internal void DrawPage()
         {
             DrawPage(_currentPage);
         }
 
-        public void DrawPage(int page)
+        internal void DrawPage(int page)
         {
             _currentPage = page;
 
@@ -64,11 +64,11 @@ namespace FCSCommon.Helpers
             OnLoadDisplay?.Invoke(_itemPrefab,_itemsGrid,StartingPosition,EndingPosition);
         }
 
-        public Action<GameObject, GameObject,int,int> OnLoadDisplay { get; set; }
+        internal Action<GameObject, GameObject,int,int> OnLoadDisplay { get; set; }
 
-        public int EndingPosition { get; private set; }
+        internal int EndingPosition { get; private set; }
 
-        public int StartingPosition { get; private set; }
+        internal int StartingPosition { get; private set; }
 
         //private void LoadDisplay<T>(T item)
         //{
@@ -92,7 +92,7 @@ namespace FCSCommon.Helpers
             //itemButton.BtnName = "ShippingContainer";
         //}
 
-        public void ClearPage()
+        internal void ClearPage()
         {
             if(_itemsGrid == null) return;
 
@@ -107,7 +107,7 @@ namespace FCSCommon.Helpers
             }
         }
 
-        public void UpdaterPaginator(int count)
+        internal void UpdaterPaginator(int count)
         {
             CalculateNewMaxPages(count);
             if (_pageNumberText == null) return;

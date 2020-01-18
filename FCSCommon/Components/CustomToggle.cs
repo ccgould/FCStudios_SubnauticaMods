@@ -13,20 +13,20 @@ namespace FCSCommon.Components
     /// </summary>
     internal class CustomToggle : OnScreenButton, IPointerEnterHandler, IPointerClickHandler, IPointerExitHandler
     {
-        #region Public Properties
+        #region internal Properties
 
-        public Color HOVER_COLOR { get; set; } = new Color(0.07f, 0.38f, 0.7f, 1f);
-        public Color STARTING_COLOR { get; set; } = Color.white;
-        public Text TextComponent { get; set; }
+        internal Color HOVER_COLOR { get; set; } = new Color(0.07f, 0.38f, 0.7f, 1f);
+        internal Color STARTING_COLOR { get; set; } = Color.white;
+        internal Text TextComponent { get; set; }
 
-        public object Tag { get; set; }
+        internal object Tag { get; set; }
 
-        public Action<string, object> OnButtonClick;
+        internal Action<string, object> OnButtonClick;
         private GameObject _checkMark;
 
-        public string BtnName { get; set; }
+        internal string BtnName { get; set; }
 
-        public InterfaceButtonMode ButtonMode { get; set; }
+        internal InterfaceButtonMode ButtonMode { get; set; }
 
         #endregion
 
@@ -53,9 +53,9 @@ namespace FCSCommon.Components
             }
         }
 
-        #region Public Methods
+        #region internal Methods
 
-        public void OnEnable()
+        internal void OnEnable()
         {
             if (string.IsNullOrEmpty(BtnName)) return;
 
@@ -94,7 +94,7 @@ namespace FCSCommon.Components
             }
         }
 
-        #region Public Overrides
+        #region internal Overrides
 
         public override void OnDisable()
         {

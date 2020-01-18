@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace FCSCommon.Controllers
 {
-    public abstract class PowerManager : MonoBehaviour
+    internal abstract class PowerManager : MonoBehaviour
     {
         public Action OnPowerOutage { get; set; }
 

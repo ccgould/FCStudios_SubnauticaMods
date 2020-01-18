@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using FCSCommon.Abstract;
 using FCSCommon.Components;
+using FCSCommon.Controllers;
 using FCSCommon.Enums;
 using FCSCommon.Helpers;
 using FCSCommon.Objects;
@@ -24,7 +25,7 @@ namespace QuantumTeleporter.Managers
         private readonly Color _hoverColor = new Color(1f, 1f, 1f, 1f);
         private int _page;
         private Text _textField;
-        private ColorPageHelper _colorPage;
+        private ColorManager _colorPage;
         private GridHelper _teleportGrid;
         private Toggle _isGlobalToggle;
         internal QTTabs SelectedTab;
@@ -37,10 +38,14 @@ namespace QuantumTeleporter.Managers
         private const float MaxInteractionRange = 1f;
         internal void Setup(QuantumTeleporterController mono)
         {
+
+            QuickLogger.Info("My Name is Laterrah");
+
+
             _mono = mono;
             _page = Animator.StringToHash("Page");
 
-            _colorPage = gameObject.AddComponent<ColorPageHelper>();
+            _colorPage = mono.ColorManager;
             _teleportGrid = gameObject.AddComponent<GridHelper>();
 
             if (!FindAllComponents())
@@ -256,13 +261,7 @@ namespace QuantumTeleporter.Managers
             #endregion
 
             #region ColorPage
-            _colorPage.OnButtonClick = OnButtonClick;
-            _colorPage.SerializedColors = ColorList.Colors;
-            _colorPage.ColorsPerPage = 30;
-            _colorPage.ColorItemPrefab = QuantumTeleporterBuildable.ColorItemPrefab;
-            _colorPage.ColorPageContainer = _colorGrid;
-            _colorPage.ColorPageNumber = _colorPaginator.GetComponent<Text>();
-            _colorPage.Initialize();
+            _colorPage.SetupGrid(30, QuantumTeleporterBuildable.ColorItemPrefab, _colorGrid, _colorPaginator.GetComponent<Text>(), OnButtonClick);
             #endregion
 
             #region Home Button

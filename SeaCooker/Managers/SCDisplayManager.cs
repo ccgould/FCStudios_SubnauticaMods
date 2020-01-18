@@ -14,7 +14,9 @@ using ARS_SeaBreezeFCS32.Mono;
 using FCSCommon.Abstract;
 using FCSCommon.Components;
 using FCSCommon.Controllers;
+using FCSCommon.Interfaces;
 using FCSCommon.Objects;
+using FCSTechFabricator.Components;
 using UnityEngine;
 using UnityEngine.UI;
 using PaginatorButton = AE.SeaCooker.Display.PaginatorButton;
@@ -35,7 +37,7 @@ namespace AE.SeaCooker.Managers
         private GameObject _toImage;
         private Image _percentage;
         private Text _fuelPercentage;
-        private ColorPageHelper _colorPage;
+        private ColorManager _colorPage;
         private Text _paginator;
         private CustomToggle _cusToggle;
         private GridHelper _seaBreezeGrid;
@@ -110,13 +112,13 @@ namespace AE.SeaCooker.Managers
                 case "ColorItem":
                     var color = (Color)tag;
                     QuickLogger.Debug($"{_mono.gameObject.name} Color Changed to {color.ToString()}", true);
-                    _mono.ColorManager.SetCurrentBodyColor(color);
+                    _mono.ColorManager.ChangeColor(color);
                     break;
 
                 case "SeaBreezeItem":
                     var seaBreeze = (Color)tag;
                     // QuickLogger.Debug($"{_mono.gameObject.name} Color Changed to {color.ToString()}", true);
-                    _mono.ColorManager.SetCurrentBodyColor(seaBreeze);
+                    _mono.ColorManager.ChangeColor(seaBreeze);
                     break;
 
                 case "SeaBreeze":
@@ -506,9 +508,9 @@ namespace AE.SeaCooker.Managers
             {
 
                 var unit = _mono.SeaBreezes.Values.ElementAt(i);
-                var unitNameController = unit.NameController;
-                var unitName = unitNameController.GetCurrentName();
-                unit.NameController.OnLabelChanged += OnLabelChanged;
+                var unitNameController = unit;
+                var unitName = unitNameController.GetDeviceName();
+                unitNameController.OnLabelChanged += OnLabelChanged;
 
                 GameObject itemDisplay = Instantiate(itemPrefab);
 
@@ -522,7 +524,7 @@ namespace AE.SeaCooker.Managers
                 itemButton.TextComponent = text;
                 itemButton.OnButtonClick += OnButtonClick;
                 itemButton.BtnName = "SeaBreeze";
-                unitNameController.Tag = itemButton;
+                unitNameController.SetNameControllerTag(itemButton);
                 _sbList.Add(itemButton);
                 UpdateCheckedSB();
                 QuickLogger.Debug($"Added Unit {unitName}");
@@ -553,7 +555,7 @@ namespace AE.SeaCooker.Managers
 
             //}
         }
-
+        
         private void OnLabelChanged(string obj, NameController nameController)
         {
             UpdateSeaBreezes();
@@ -582,7 +584,7 @@ namespace AE.SeaCooker.Managers
             _mono.FoodManager.OnCookingStart += OnCookingStart;
             _mono.GasManager.OnGasUpdate += OnGasRemoved;
 
-            _colorPage = gameObject.AddComponent<ColorPageHelper>();
+            _colorPage = mono.ColorManager;
             _seaBreezeGrid = gameObject.AddComponent<GridHelper>();
 
             if (FindAllComponents())
@@ -595,14 +597,7 @@ namespace AE.SeaCooker.Managers
                 return;
             }
             
-            _colorPage.OnButtonClick = OnButtonClick;
-            _colorPage.SerializedColors = ColorList.Colors;
-            _colorPage.ColorsPerPage = 42;
-            _colorPage.ColorItemPrefab = SeaCookerBuildable.ColorItemPrefab;
-            _colorPage.ColorPageContainer = _colorGrid;
-            _colorPage.ColorPageNumber = _paginator;
-            _colorPage.Initialize();
-
+            _colorPage.SetupGrid(42, SeaCookerBuildable.ColorItemPrefab, _colorGrid, _paginator, OnButtonClick);
 
             StartCoroutine(CompleteSetup());
 

@@ -1,14 +1,11 @@
 ﻿using FCS_DeepDriller.Configuration;
 using FCS_DeepDriller.Mono;
-using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
-using Oculus.Newtonsoft.Json;
 using SMLHelper.V2.Crafting;
 using System.Collections.Generic;
 using System.IO;
-using FCSTechFabricator.Helpers;
-using SMLHelper.V2.Utility;
+using Oculus.Newtonsoft.Json;
 using UnityEngine;
 
 namespace FCS_DeepDriller.Buildable
@@ -27,7 +24,7 @@ namespace FCS_DeepDriller.Buildable
         public override string AssetsFolder { get; } = $"FCS_DeepDriller/Assets";
         public static DeepDrillerCfg DeepDrillConfig { get; internal set; }
 
-        public FCSDeepDrillerBuildable() : base(Mod.ModName, Mod.ModFriendlyName, Mod.ModDecription)
+        public FCSDeepDrillerBuildable() : base(Mod.ModClassID, Mod.ModFriendlyName, Mod.ModDecription)
         {
             OnFinishedPatching += AdditionalPatching;
         }
@@ -39,65 +36,9 @@ namespace FCS_DeepDriller.Buildable
                 throw new FileNotFoundException($"Failed to retrieve the {Singleton.FriendlyName} prefab from the asset bundle");
             }
 
-            PatchHelpers.AddNewKit(
-                FCSTechFabricator.Configuration.DeepDrillerKitClassID,
-                null,
-                Mod.ModFriendlyName,
-                FCSTechFabricator.Configuration.DeepDrillerClassID,
-                new[] { "AIS", "DD" },
-                null);
-
-            PatchHelpers.AddNewKit(
-                FCSTechFabricator.Configuration.SolarAttachmentKitClassID,
-                "This specially made attachment allows you to run your deep driller off solar power.",
-                "Deep Driller Solar Attachment",
-                FCSTechFabricator.Configuration.DeepDrillerClassID,
-                new[] { "AIS", "DD" },
-                "SolarAttachment_DD.png");
-            
-            PatchHelpers.AddNewKit(
-                FCSTechFabricator.Configuration.FocusAttachmentKitClassID,
-                "This specially made attachment allows you to scan for one specific ore.",
-                "Deep Driller Focus Attachment",
-                FCSTechFabricator.Configuration.DeepDrillerClassID,
-                new[] { "AIS", "DD" },
-                "FocusAttachment_DD.png");
-            
-            PatchHelpers.AddNewKit(
-                FCSTechFabricator.Configuration.BatteryAttachmentKitClassID,
-                "This specially made attachment allows you to run your deep driller off powercell power",
-                "Deep Driller Powercell Attachment",
-                FCSTechFabricator.Configuration.DeepDrillerClassID,
-                new[] { "AIS", "DD" },
-                "BatteryAttachment_DD.png");
-
-            PatchHelpers.AddNewModule(
-                FCSTechFabricator.Configuration.DrillerMK1ModuleClassID,
-                "This upgrade allows deep driller to drill 15 resources per day.",
-                "Deep Driller MK 1",
-                FCSTechFabricator.Configuration.DeepDrillerClassID,
-                new[] { "AIS", "DD" });
-            
-            PatchHelpers.AddNewModule(
-                FCSTechFabricator.Configuration.DrillerMK2ModuleClassID,
-                "This upgrade allows deep driller to drill 22 resources per day.",
-                "Deep Driller MK 2",
-                FCSTechFabricator.Configuration.DeepDrillerClassID,
-                new[] { "AIS", "DD" });
-
-            PatchHelpers.AddNewModule(
-                FCSTechFabricator.Configuration.DrillerMK3ModuleClassID,
-                "This upgrade allows deep driller to drill 30 resources per day.",
-                "Deep Driller MK 3",
-                FCSTechFabricator.Configuration.DeepDrillerClassID,
-                new[] { "AIS", "DD" });
-
-            //TODO Add Updates
-
             Singleton.Patch();
-
-
-            string savedDataJson = File.ReadAllText(Path.Combine(AssetHelper.GetConfigFolder(Mod.ModName), $"{Singleton.ClassID}.json")).Trim();
+            
+            string savedDataJson = File.ReadAllText(Path.Combine(AssetHelper.GetConfigFolder(Mod.ModFolderName), $"{Singleton.ClassID}.json")).Trim();
 
             var jsonSerializerSettings = new JsonSerializerSettings();
             jsonSerializerSettings.MissingMemberHandling = MissingMemberHandling.Ignore;

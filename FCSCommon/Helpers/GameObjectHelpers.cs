@@ -5,9 +5,9 @@ using UnityEngine;
 
 namespace FCSCommon.Helpers
 {
-    public class GameObjectHelpers : MonoBehaviour
+    internal class GameObjectHelpers : MonoBehaviour
     {
-        public static void AddConstructableBounds(GameObject prefab, Vector3 size, Vector3 center)
+        internal static void AddConstructableBounds(GameObject prefab, Vector3 size, Vector3 center)
         {
             try
             {
@@ -21,7 +21,7 @@ namespace FCSCommon.Helpers
                 QuickLogger.Error<GameObjectHelpers>($"{e.Message}");
             }
         }
-        public static void DestroyComponent(GameObject obj)
+        internal static void DestroyComponent(GameObject obj)
         {
             var list = obj.GetComponents(typeof(Component));
 
@@ -32,7 +32,7 @@ namespace FCSCommon.Helpers
             }
         }
 
-        public static int GetObjectCount<T>() where T : MonoBehaviour
+        internal static int GetObjectCount<T>() where T : MonoBehaviour
         {
             var length = GameObject.FindObjectsOfType<T>()?.Length;
             if (length != null)

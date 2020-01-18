@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace FCSCommon.Abstract
 {
-    public abstract class AIDisplay : MonoBehaviour
+    internal abstract class AIDisplay : MonoBehaviour
     {
         /// <summary>
         /// The max distance to the screen

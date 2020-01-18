@@ -2,11 +2,12 @@
 using System.IO;
 using SMLHelper.V2.Utility;
 
-namespace FCSTechFabricator.Models
+namespace FCSTechFabricator.Configuration
 {
     internal static class Mod
     {
         internal static string ModName => "FCSTechFabricator";
+        internal static string ModClassID => "FCSTechFabricator";
 
         internal static string ModFriendly => "FCS Tech Fabricator";
 
@@ -16,6 +17,7 @@ namespace FCSTechFabricator.Models
 
         internal static string LANGUAGEDIRECTORY => GetLanguagePath();
         internal static string ModDescription => "The place for all your FCStudios mod needs";
+        internal static string AssetBundleName => "fcstechfabricatormodbundle";
 
         private static string GetQModsPath()
         {

@@ -8,7 +8,7 @@ namespace AE.SeaCooker.Buildable
     internal partial class SeaCookerBuildable
     {
         private static GameObject _prefab;
-        internal static GameObject ColorItemPrefab => FCSTechFabricator.QPatch.ColorItem;
+        internal static GameObject ColorItemPrefab;
         internal static GameObject SeaBreezeItemPrefab { get; set; }
 
         public static string BodyMaterial => "SeaCooker_MainBaseColor";
@@ -53,6 +53,22 @@ namespace AE.SeaCooker.Buildable
                 QuickLogger.Error($"SC_SeaBreezeItem Prefab Not Found!");
                 return false;
             }
+
+            #region Color Item
+            //We have found the asset bundle and now we are going to continue by looking for the model.
+            ColorItemPrefab = QPatch.GlobalBundle.LoadAsset<GameObject>("ColorItem");
+
+            //If the prefab isn't null lets add the shader to the materials
+            if (ColorItemPrefab != null)
+            {
+                QuickLogger.Debug($"ColorItem Prefab Found!");
+            }
+            else
+            {
+                QuickLogger.Error($"UnitContainerKit Prefab Not Found!");
+                return false;
+            }
+            #endregion
 
             return true;
         }

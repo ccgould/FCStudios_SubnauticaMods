@@ -48,8 +48,13 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Dependancies\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="SMLHelper">
-      <HintPath>F:\Program Files\Epic Games\Subnautica\QMods\Modding Helper\SMLHelper.dll</HintPath>
+    <Reference Include="QModInstaller, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependancies\QModInstaller.dll</HintPath>
+    </Reference>
+    <Reference Include="SMLHelper, Version=2.5.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependancies\SMLHelper.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -73,12 +78,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Dependancies\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.InputLegacyModule">
-      <HintPath>..\Dependancies\UnityEngine.InputLegacyModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.InputModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="UnityEngine.InputLegacyModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Dependancies\UnityEngine.InputModule.dll</HintPath>
+      <HintPath>..\Dependancies\UnityEngine.InputLegacyModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.PhysicsModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -102,6 +104,7 @@
     <Compile Include="Buildable\AIWindSurferModelPrefab.cs" />
     <Compile Include="Buildable\AIWindSurferPatcher.cs" />
     <Compile Include="Configuration\JetStreamT242Config.cs" />
+    <Compile Include="Configuration\Mod.cs" />
     <Compile Include="Configuration\SaveData.cs" />
     <Compile Include="Display\InterfaceButton.cs" />
     <Compile Include="Display\AIJetStreamT242Display.cs" />
@@ -131,10 +134,11 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FCSTechFabricator\FCSTechFabricator.csproj">
-      <Project>{b947909c-4983-4749-93ac-73ea69f6dce8}</Project>
+      <Project>{5ef4adb8-3ae7-41ec-83e1-1daf04999f0e}</Project>
       <Name>FCSTechFabricator</Name>
     </ProjectReference>
   </ItemGroup>
+  <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>xcopy "$(ProjectDir)bin\$(Configuration)\FCS_AIMarineTurbine.dll" "F:\Program Files\Epic Games\Subnautica\QMods\FCS_MarineTurbine\" /Y /I</PostBuildEvent>

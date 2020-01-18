@@ -6,17 +6,17 @@ using UnityEngine;
 
 namespace FCSCommon.Helpers
 {
-    public class InterfaceHelpers
+    internal class InterfaceHelpers
     {
         private static readonly Color ColorBlue = new Color(0.07f, 0.38f, 0.7f, 1f);
-        public static bool CreateButton(GameObject parent, string childName, string btnName, InterfaceButtonMode btnMode, Action<string, object> onButtonClick, out InterfaceButton button)
+        internal static bool CreateButton(GameObject parent, string childName, string btnName, InterfaceButtonMode btnMode, Action<string, object> onButtonClick, out InterfaceButton button)
         {
             var result = CreateButton(parent, childName, btnName, btnMode, Color.white, ColorBlue, onButtonClick, out InterfaceButton cusButton);
             button = cusButton;
             return result;
         }
 
-        public static bool CreateButton(GameObject parent, string childName, string btnName, InterfaceButtonMode btnMode, Color startColor, Color hoverColor, Action<string, object> onButtonClick, out InterfaceButton customButton)
+        internal static bool CreateButton(GameObject parent, string childName, string btnName, InterfaceButtonMode btnMode, Color startColor, Color hoverColor, Action<string, object> onButtonClick, out InterfaceButton customButton)
         {
             customButton = null;
             var go = parent.FindChild(childName)?.gameObject;
@@ -36,7 +36,7 @@ namespace FCSCommon.Helpers
             return true;
         }
 
-        public static GameObject FindGameObject(GameObject gameObject, string name)
+        internal static GameObject FindGameObject(GameObject gameObject, string name)
         {
             var result =  FindObjectRecursion(gameObject, name);
 
@@ -48,7 +48,7 @@ namespace FCSCommon.Helpers
             return result;
         }
 
-        public static InterfaceButton CreateButton(GameObject go, string btnName, InterfaceButtonMode btnMode, Action<string, object> onButtonClick, Color startColor, Color hoverColor,float maxInteractionRange)
+        internal static InterfaceButton CreateButton(GameObject go, string btnName, InterfaceButtonMode btnMode, Action<string, object> onButtonClick, Color startColor, Color hoverColor,float maxInteractionRange)
         {
             var button = go.AddComponent<InterfaceButton>();
             button.BtnName = btnName;
@@ -78,7 +78,7 @@ namespace FCSCommon.Helpers
             return null;
         }
         
-        public static bool CreatePaginator(GameObject parent, string childName, int amountToChangeBy, Action<int> ChangePageBy, out PaginatorButton customButton)
+        internal static bool CreatePaginator(GameObject parent, string childName, int amountToChangeBy, Action<int> ChangePageBy, out PaginatorButton customButton)
         {
             var result = CreatePaginator(parent, childName, amountToChangeBy, ChangePageBy, Color.white, ColorBlue,
                 out var paginatorButton);
@@ -86,7 +86,7 @@ namespace FCSCommon.Helpers
             return result;
         }
 
-        public static bool CreatePaginator(GameObject parent, string childName, int amountToChangeBy, Action<int> ChangePageBy, Color startColor, Color hoverColor, out PaginatorButton customButton)
+        internal static bool CreatePaginator(GameObject parent, string childName, int amountToChangeBy, Action<int> ChangePageBy, Color startColor, Color hoverColor, out PaginatorButton customButton)
         {
             customButton = null;
             var go = parent.FindChild(childName)?.gameObject;
@@ -105,7 +105,7 @@ namespace FCSCommon.Helpers
             return true;
         }
 
-        public static bool FindGameObject(GameObject parent, string childName, out GameObject gameObject)
+        internal static bool FindGameObject(GameObject parent, string childName, out GameObject gameObject)
         {
             gameObject = null;
             var result = parent.FindChild(childName)?.gameObject;
@@ -119,7 +119,7 @@ namespace FCSCommon.Helpers
             return true;
         }
 
-        public static void CreatePaginator(GameObject go, int amountToChangeBy, Action<int> ChangePageBy, Color startColor, Color hoverColor)
+        internal static void CreatePaginator(GameObject go, int amountToChangeBy, Action<int> ChangePageBy, Color startColor, Color hoverColor)
         {
             var button = go.AddComponent<PaginatorButton>();
             button.ChangePageBy = ChangePageBy;

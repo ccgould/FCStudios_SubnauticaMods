@@ -2,10 +2,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using FCSCommon.Extensions;
+using FCSCommon.Helpers;
 using FCSCommon.Objects;
 using FCSCommon.Utilities;
 using Oculus.Newtonsoft.Json;
 using QuantumTeleporter.Mono;
+using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 
@@ -16,19 +19,60 @@ namespace QuantumTeleporter.Configuration
         #region Private Members
         private static ModSaver _saveObject;
         private static SaveData _saveData;
+
         #endregion
 
         #region Internal Properties
-        internal static string ModName => "Quantum Teleporter";
-        internal static string ModFolderName => "FCS_QuantumTeleporter";
-        internal static string BundleName => "quantumteleportermodbundle";
-
+        internal const string ModName = "Quantum Teleporter";
+        internal const string ModFolderName = "FCS_QuantumTeleporter";
+        internal const string BundleName = "quantumteleportermodbundle";
+        internal const string FriendlyName = "Quantum Teleporter";
+        internal const string Description = "A teleporter that allows you to teleport from one base to another";
+        internal const string ClassID = "QuantumTeleporter";
         internal const string SaveDataFilename = "QuantumTeleporterSaveData.json";
+        internal const string QuantumTeleporterTabID = "QT";
 
+        internal const string QuantumTeleporterKitClassID = "QuantumTeleporterKit_AE";
+        internal static string QuantumTeleporterKitText => $"{ModName} Kit";
+
+        internal const string AdvancedTeleporterWiringKitClassID = "AdvancedTeleporterWiringKit_AE";
+        internal const string AdvancedTeleporterWiringKitText = "Advanced Teleporter Wiring";
+
+        internal const string TeleporterScannerConnectionKitClassID = "TeleporterScannerConnectionKit_AE";
+        internal const string TeleporterScannerConnectionKitText = "Teleporter Scanner Connection";
         internal static string MODFOLDERLOCATION => GetModPath();
-        internal static string FriendlyName => "Quantum Teleporter";
-        internal static string Description => "A teleporter that allows you to teleport from one base to another";
-        internal static string ClassID => FCSTechFabricator.Configuration.QuantumTeleporterClassID;
+        internal static TechData QuantumTeleporterKitIngredients => new TechData
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(AdvancedTeleporterWiringKitClassID.ToTechType(), 1),
+                new Ingredient(TeleporterScannerConnectionKitClassID.ToTechType(), 1)
+            }
+        };
+        internal static TechData TeleporterScannerConnectionKitIngredients => new TechData
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(TechType.Kyanite, 3),
+                new Ingredient(TechType.MapRoomHUDChip, 2),
+                new Ingredient(TechType.Compass, 1),
+                new Ingredient(TechType.TitaniumIngot, 2)
+            }
+        };
+        internal static TechData AdvancedTeleporterWiringKitIngredients => new TechData
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(TechType.AdvancedWiringKit, 1),
+                new Ingredient(TechType.Aerogel, 2),
+                new Ingredient(TechType.Diamond, 2),
+                new Ingredient(TechType.FiberMesh, 2)
+            }
+        };
+
 
         internal static event Action<SaveData> OnDataLoaded;
         #endregion
@@ -119,7 +163,7 @@ namespace QuantumTeleporter.Configuration
             GameObject.DestroyImmediate(_saveObject.gameObject);
             _saveObject = null;
         }
-        public static string GetAssetFolder()
+        internal static string GetAssetFolder()
         {
             return Path.Combine(GetModPath(), "Assets");
         }
@@ -140,5 +184,42 @@ namespace QuantumTeleporter.Configuration
         }
 
         #endregion
+
+        private static void CreateModConfiguration()
+        {
+            var config = new ModConfiguration();
+
+            var saveDataJson = JsonConvert.SerializeObject(config, Formatting.Indented);
+
+            File.WriteAllText(Mod.ConfigurationFile().Trim(), saveDataJson);
+        }
+
+        private static ModConfiguration LoadConfigurationData()
+        {
+            // == Load Configuration == //
+            string configJson = File.ReadAllText(ConfigurationFile().Trim());
+
+            JsonSerializerSettings settings = new JsonSerializerSettings();
+            settings.MissingMemberHandling = MissingMemberHandling.Ignore;
+
+            // == LoadData == //
+            return JsonConvert.DeserializeObject<ModConfiguration>(configJson, settings);
+        }
+
+        internal static bool IsConfigAvailable()
+        {
+            return File.Exists(ConfigurationFile().Trim());
+        }
+
+        internal static ModConfiguration LoadConfiguration()
+        {
+            if (!IsConfigAvailable())
+            {
+                CreateModConfiguration();
+            }
+
+            return LoadConfigurationData();
+        }
+
     }
 }

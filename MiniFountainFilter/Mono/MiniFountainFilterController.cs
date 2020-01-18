@@ -5,8 +5,11 @@ using FCSCommon.Extensions;
 using FCSCommon.Utilities;
 using System;
 using System.Collections;
+using FCSCommon.Controllers;
 using FCSCommon.Enums;
 using UnityEngine;
+using AnimationManager = AE.MiniFountainFilter.Managers.AnimationManager;
+using AudioManager = AE.MiniFountainFilter.Managers.AudioManager;
 using PowerManager = AE.MiniFountainFilter.Managers.PowerManager;
 
 namespace AE.MiniFountainFilter.Mono
@@ -49,7 +52,7 @@ namespace AE.MiniFountainFilter.Mono
             if (_fromSave)
             {
                 TankManager.SetTankLevel(_data.TankLevel);
-                ColorManager.SetCurrentBodyColor(_data.BodyColor.Vector4ToColor());
+                ColorManager.SetColorFromSave(_data.BodyColor.Vector4ToColor());
                 StorageManager.NumberOfBottles = _data.ContainerAmount;
                 _isInSub = _data.IsInSub;
                 QuickLogger.Info($"Loaded {Mod.FriendlyName}");
@@ -95,7 +98,7 @@ namespace AE.MiniFountainFilter.Mono
             if (ColorManager == null)
             {
                 ColorManager = new ColorManager();
-                ColorManager.Initialize(this, MiniFountainFilterBuildable.BodyMaterial);
+                ColorManager.Initialize(gameObject, MiniFountainFilterBuildable.BodyMaterial);
 
             }
 

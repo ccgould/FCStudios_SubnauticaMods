@@ -6,8 +6,7 @@ using FCSCommon.Utilities;
 using System.Collections;
 using System.Linq;
 using FCSCommon.Abstract;
-using FCSCommon.Controllers;
-using SMLHelper.V2.Utility;
+using FCSTechFabricator.Components;
 using UnityEngine;
 using UnityEngine.UI;
 

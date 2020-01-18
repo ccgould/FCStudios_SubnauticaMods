@@ -4,25 +4,129 @@ using SMLHelper.V2.Utility;
 using System;
 using System.Collections;
 using System.IO;
+using FCSCommon.Helpers;
+using SMLHelper.V2.Crafting;
 using UnityEngine;
 
 namespace FCS_DeepDriller.Configuration
 {
     internal static class Mod
     {
-        internal static string ModName => FCSTechFabricator.Configuration.DeepDrillerClassID;
-        internal static string ModFriendlyName => "FCS Deep Driller";
-        internal static string ModDecription => "Let's dig down to the deep down deep dark!";
+        internal const string ModClassID = "FCS_DeepDriller";
+        internal const string ModFriendlyName = "FCS Deep Driller";
+        internal const string ModFolderName = "FCS_DeepDriller";
+        internal const string ModDecription = "Let's dig down to the deep down deep dark!";
         internal const string SaveDataFilename = "DeepDrillerSaveData.json";
-        internal static string DeepDrillerGameObjectName { get; } = "DeepDriller";
+        internal const string BundleName = "fcsdeepdrillermodbundle";
 
+        internal const string DeepDrillerGameObjectName = "DeepDriller";
+
+        internal const string DeepDrillerKitClassID = "DeepDrillerKit_DD";
+        internal const string DeepDrillerKitFriendlyName = "Deep Driller";
+        internal const string FocusAttachmentKitClassID = "FocusAttachment_DD";
+        internal const string FocusAttachmentFriendlyName = "Focus Attachment";
+        internal const string SolarAttachmentKitClassID = "SolarAttachment_DD";
+        internal const string SolarAttachmentFriendlyName = "Solar Attachment";
+        internal const string BatteryAttachmentKitClassID = "BatteryAttachment_DD";
+        internal const string BatteryAttachmentFriendlyName = "Battery Attachment";
+
+        internal const string DrillerMK1ModuleClassID = "DrillerMK1_DD";
+        internal const string DrillerMK1ModuleFriendlyName = "Driller MK1";
+        internal const string DrillerMK2ModuleClassID = "DrillerMK2_DD";
+        internal const string DrillerMK2ModuleFriendlyName = "Driller MK2";
+        internal const string DrillerMK3ModuleClassID = "DrillerMK3_DD";
+        internal const string DrillerMK3ModuleFriendlyName = "Driller MK3";
+
+        internal const string DeepDrillerTabID = "DD";
+        
+        internal static string QMODFOLDER { get; } = Path.Combine(Environment.CurrentDirectory, "QMods");
+        internal static string MODFOLDERLOCATION => GetModPath();
+        
         private static ModSaver _saveObject;
 
         private static DeepDrillerSaveData _deepDrillerSaveData;
 
         internal static event Action<DeepDrillerSaveData> OnDeepDrillerDataLoaded;
 
-        internal static bool isPDARefreshed { get; set; }
+        internal static TechData DeepDrillerKitIngredients => new TechData
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(TechType.MapRoomHUDChip, 1),
+                new Ingredient(TechType.Titanium, 2),
+                new Ingredient(TechType.AdvancedWiringKit, 1),
+                new Ingredient(TechType.ExosuitDrillArmModule, 1),
+                new Ingredient(TechType.Lubricant, 1),
+                new Ingredient(TechType.VehicleStorageModule, 1),
+            }
+        };
+        internal static TechData FocusAttachmentKitIngredients => new TechData
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(TechType.Glass, 3),
+                new Ingredient(TechType.WiringKit, 2),
+                new Ingredient(TechType.Titanium, 1)
+            }
+        };
+        internal static TechData BatteryAttachmentKitIngredients => new TechData
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(TechType.Copper, 1),
+                new Ingredient(TechType.Silicone, 1),
+                new Ingredient(TechType.Titanium, 1)
+            }
+        };
+        internal static TechData SolarAttachmentKitIngredients => new TechData
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(TechType.Copper, 1),
+                new Ingredient(TechType.Glass, 2),
+                new Ingredient(TechType.WiringKit, 1),
+                new Ingredient(TechType.Titanium, 1)
+            }
+        };
+        internal static TechData DrillerMK1Ingredients => new TechData
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(TechType.Lithium, 2),
+                new Ingredient(TechType.Diamond, 1),
+                new Ingredient(TechType.Titanium, 3)
+            }
+        };
+        internal static TechData DrillerMK2Ingredients => new TechData
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(TechTypeHelpers.GetTechType("DrillerMK1_DD"), 1),
+                new Ingredient(TechType.Diamond, 4),
+                new Ingredient(TechType.AluminumOxide, 1),
+                new Ingredient(TechType.Titanium, 4)
+            }
+        };
+        internal static TechData DrillerMK3Ingredients => new TechData
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(TechTypeHelpers.GetTechType("DrillerMK2_DD"), 1),
+                new Ingredient(TechType.Diamond, 4),
+                new Ingredient(TechType.Titanium, 3),
+                new Ingredient(TechType.AluminumOxide, 3),
+                new Ingredient(TechType.Magnetite, 3),
+                new Ingredient(TechType.EnameledGlass, 2)
+            }
+        };
+
 
         #region Deep Driller
         public static void SaveDeepDriller()
@@ -80,7 +184,7 @@ namespace FCS_DeepDriller.Configuration
         }
         #endregion
 
-        public static void OnSaveComplete()
+        internal static void OnSaveComplete()
         {
             _saveObject.StartCoroutine(SaveCoroutine());
         }
@@ -100,14 +204,6 @@ namespace FCS_DeepDriller.Configuration
             return _saveObject != null;
         }
 
-        /// <summary>
-        /// The location of the QMods directory
-        /// </summary>
-        public static string QMODFOLDER { get; } = Path.Combine(Environment.CurrentDirectory, "QMods");
-
-        public static string MODFOLDERLOCATION => GetModPath();
-        public static string BundleName => "fcsdeepdrillermodbundle";
-
         private static string GetQModsPath()
         {
             return Path.Combine(Environment.CurrentDirectory, "QMods");
@@ -115,10 +211,9 @@ namespace FCS_DeepDriller.Configuration
 
         private static string GetModPath()
         {
-            return Path.Combine(GetQModsPath(), ModName);
+            return Path.Combine(GetQModsPath(), ModFolderName);
         }
-
-        public static string GetAssetPath()
+        internal static string GetAssetFolder()
         {
             return Path.Combine(GetModPath(), "Assets");
         }
@@ -128,7 +223,7 @@ namespace FCS_DeepDriller.Configuration
             return Path.Combine(GetModPath(), "mod.json");
         }
 
-        public static string GetGlobalBundle()
+        internal static string GetGlobalBundle()
         {
             return Path.Combine(Path.Combine(QMODFOLDER, "FCSTechWorkBench"), "globalmaterials");
         }
@@ -144,14 +239,14 @@ namespace FCS_DeepDriller.Configuration
 
         }
 
-        public static string GetConfigFile(string modName)
+        internal static string GetConfigFile(string modName)
         {
             return Path.Combine(GetConfigPath(), $"{modName}.json"); ;
         }
 
-        public static string GetSaveFileDirectory()
+        internal static string GetSaveFileDirectory()
         {
-            return Path.Combine(SaveUtils.GetCurrentSaveDataDir(), ModName);
+            return Path.Combine(SaveUtils.GetCurrentSaveDataDir(), ModClassID);
         }
     }
 }

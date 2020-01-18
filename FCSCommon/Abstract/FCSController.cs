@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace FCSCommon.Abstract
 {
-    public abstract class FCSController : MonoBehaviour, IProtoEventListener, IConstructable
+    internal abstract class FCSController : MonoBehaviour, IProtoEventListener, IConstructable
     {
         public abstract bool IsConstructed { get;}
         public virtual Action OnMonoUpdate { get; set; }

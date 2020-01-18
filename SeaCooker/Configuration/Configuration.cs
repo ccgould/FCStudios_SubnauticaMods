@@ -13,6 +13,11 @@ namespace AE.SeaCooker.Configuration
 
         private static bool _addingSlots;
 
+        internal static void CreateConfiguration()
+        {
+
+        }
+
         internal static void AddNewSlots()
         {
             if (!_addingSlots)
@@ -21,7 +26,7 @@ namespace AE.SeaCooker.Configuration
                 {
                     if (slotID.StartsWith("SC"))
                     {
-                        Equipment.slotMapping.Add(slotID, EquipmentType.Tank);
+                        Equipment.slotMapping.Add(slotID, EquipmentType.NuclearReactor);
                         QuickLogger.Debug($"Adding slot {slotID}");
                     }
                 }
@@ -63,20 +68,20 @@ namespace AE.SeaCooker.Configuration
             TechType.CookedHoopfish,
             TechType.CookedSpinefish,
             TechType.CookedLavaEyeye,
-            TechType.CookedLavaBoomerang,
+            TechType.CookedLavaBoomerang
         };
     }
 
     internal class Config
     {
-        [JsonProperty] internal bool PlaySFX { get; set; } 
-        [JsonProperty] internal float AlienFecesTankCapacity { get; set; }
-        [JsonProperty] internal float GasTankCapacity { get; set; }
-        [JsonProperty] internal float CookTime { get; set; }
-        [JsonProperty] internal float EnergyPerSec { get; set; }
-        [JsonProperty] internal float UsagePerItem { get; set; }
-        [JsonProperty] internal int StorageWidth { get; set; }
-        [JsonProperty] internal int StorageHeight { get; set; }
+        [JsonProperty] internal bool PlaySFX { get; set; } = true; 
+        [JsonProperty] internal float AlienFecesTankCapacity { get; set; } = 250.0f;
+        [JsonProperty] internal float GasTankCapacity { get; set; } = 100.0f;
+        [JsonProperty] internal float CookTime { get; set; } = 5.0f;
+        [JsonProperty] internal float EnergyPerSec { get; set; } = 0.102f;
+        [JsonProperty] internal float UsagePerItem { get; set; } = 5.0f;
+        [JsonProperty] internal int StorageWidth { get; set; } = 4;
+        [JsonProperty] internal int StorageHeight { get; set; } = 4;
     }
 
     internal class ConfigFile

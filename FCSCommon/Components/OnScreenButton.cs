@@ -7,15 +7,15 @@ namespace FCSCommon.Components
     /// Component that buttons on the power storage ui will inherit from. Handles working on whether something is hovered via IsHovered as well as interaction text. 
     /// </summary>
     /// <seealso cref="UnityEngine.MonoBehaviour" />
-    public abstract class OnScreenButton : MonoBehaviour
+    internal abstract class OnScreenButton : MonoBehaviour
     {
         protected bool IsHovered { get; set; }
-        public string TextLineOne { get; set; }
-        public string TextLineTwo { get; set; }
+        internal string TextLineOne { get; set; }
+        internal string TextLineTwo { get; set; }
 
         private bool isHoveredOutOfRange;
-        public bool Disabled { get; set; }
-        public float MaxInteractionRange { get; set; }  = 2.5f;
+        internal bool Disabled { get; set; }
+        internal float MaxInteractionRange { get; set; }  = 2.5f;
 
 
         public virtual void OnDisable()

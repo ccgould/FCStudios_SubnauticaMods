@@ -7,7 +7,7 @@ using SMLHelper.V2.Crafting;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using FCSTechFabricator.Helpers;
+using FCSCommon.Extensions;
 using UnityEngine;
 
 namespace AE.MiniFountainFilter.Buildable
@@ -54,7 +54,7 @@ namespace AE.MiniFountainFilter.Buildable
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(TechTypeHelpers.GetTechType("MiniFountainFilterKit_MFF"), 1)
+                    new Ingredient(Mod.MiniFountainFilterKitClassID.ToTechType(), 1)
                 }
             };
             return customFabRecipe;
@@ -71,15 +71,7 @@ namespace AE.MiniFountainFilter.Buildable
             }
 
             Register();
-
-            PatchHelpers.AddNewKit(
-                FCSTechFabricator.Configuration.MiniFountainFilterKitClassID,
-                null,
-                Mod.FriendlyName,
-                FCSTechFabricator.Configuration.MiniFountainFilterClassID,
-                new[] { "AE", "MFF" },
-                null);
-
+            
             Singleton.Patch();
         }
 

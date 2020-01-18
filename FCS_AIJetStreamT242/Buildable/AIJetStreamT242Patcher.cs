@@ -5,14 +5,12 @@ using FCS_AIMarineTurbine.Mono;
 using FCSCommon.Components;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
-using FCSTechFabricator.Models;
 using Oculus.Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using FCS_AIMarineTurbine.Display;
 using FCSCommon.Objects;
-using FCSTechFabricator.Helpers;
 using UnityEngine;
 
 namespace FCS_AIMarineTurbine.Buildable
@@ -25,21 +23,13 @@ namespace FCS_AIMarineTurbine.Buildable
         private static readonly AIJetStreamT242Buildable Singleton = new AIJetStreamT242Buildable();
         public override TechGroup GroupForPDA { get; } = TechGroup.ExteriorModules;
         public override TechCategory CategoryForPDA { get; } = TechCategory.ExteriorModule;
-        public override string AssetsFolder { get; } = $"FCS_MarineTurbine/Assets";
+        public override string AssetsFolder { get; } = $"{Mod.ModFolderName}/Assets";
         public static void PatchSMLHelper()
         {
             if (!Singleton.GetPrefabs())
             {
                 throw new FileNotFoundException($"Failed to retrieve the {Singleton.FriendlyName} prefab from the asset bundle");
             }
-
-            PatchHelpers.AddNewKit(
-                FCSTechFabricator.Configuration.JetStreamT242KitClassID,
-                null,
-                "AI JetStreamT242",
-                FCSTechFabricator.Configuration.AIJetStreamT242ClassID,
-                new[] { "AIS", "MT" },
-                null);
 
 
             Singleton.Patch();
@@ -51,9 +41,7 @@ namespace FCS_AIMarineTurbine.Buildable
         public static JetStreamT242Config JetStreamT242Config { get; set; }
         public override string IconFileName => "AIJetStreamT242.png";
 
-        public AIJetStreamT242Buildable() : base(FCSTechFabricator.Configuration.AIJetStreamT242ClassID,
-            "AI JetStreamT242",
-            "The Jet Stream T242 provides power by using the water current. The faster the turbine spins the more power output.")
+        public AIJetStreamT242Buildable() : base(Mod.JetStreamClassID, Mod.JetStreamFriendlyName,Mod.JetStreamDescription)
         {
             OnFinishedPatching += DisplayLanguagePatching.AdditionPatching;
         }
@@ -79,13 +67,6 @@ namespace FCS_AIMarineTurbine.Buildable
                 SkyApplier skyApplier = prefab.AddComponent<SkyApplier>();
                 skyApplier.renderers = model.GetComponentsInChildren<MeshRenderer>();
                 skyApplier.anchorSky = Skies.Auto;
-
-                //Shader shader = Shader.Find("MarmosetUBER");
-                //Renderer[] renderers = prefab.GetComponentsInChildren<Renderer>();
-                //foreach (Renderer renderer in renderers)
-                //{
-                //    renderer.material.shader = shader;
-                //}
 
                 //========== Allows the building animation and material colors ==========// 
 
@@ -149,7 +130,7 @@ namespace FCS_AIMarineTurbine.Buildable
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(TechTypeHelpers.GetTechType("JetStreamT242Kit_MT"), 1)
+                    new Ingredient(TechTypeHelpers.GetTechType(Mod.JetstreamKitClassID), 1)
                 }
             };
 

@@ -9,14 +9,9 @@
     <Import_RootNamespace>FCSCommon</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)Abstract\ModAB.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Abstract\Refrigerator.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Abstract\SaveDataEntryAB.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Components\Category.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controllers\AnimationManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Components\ColorItemButton.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Components\CustomToggle.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Components\DamagedMaterialController.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Components\InterfaceButton.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Components\InternalBatteryController.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Components\OnScreenButton.cs" />
@@ -36,30 +31,23 @@
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\StringExtentions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\TechTypeExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\AssetHelper.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Helpers\ColorPageHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\GameObjectHelpers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\GridHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\InterfaceHelpers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\LanguageHelpers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\MaterialHelpers.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Helpers\TechTypeHelpers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\WorldHelpers.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IRenameNameTarget.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Abstract\AIDisplay.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Abstract\FCSController.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controllers\HealthController.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Controllers\NameController.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controllers\PowerStorageController.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IRenamable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\ISaveData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\ISaveDataEntry.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Objects\ColorList.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Objects\Colors.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\Vec3.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Objects\ColorVec4.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\CustomLiveMixinData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\EatableEntities.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\SerializableColor.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Objects\StorageConfig.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\TargetRotation.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enums\FCSPowerStates.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enums\PowerToggleStates.cs" />

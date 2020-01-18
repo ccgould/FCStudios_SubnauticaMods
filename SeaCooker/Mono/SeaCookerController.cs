@@ -10,7 +10,11 @@ using FCSCommon.Utilities;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using FCSCommon.Controllers;
 using UnityEngine;
+using AnimationManager = AE.SeaCooker.Managers.AnimationManager;
+using AudioManager = AE.SeaCooker.Managers.AudioManager;
+using PowerManager = AE.SeaCooker.Managers.PowerManager;
 
 namespace AE.SeaCooker.Mono
 {
@@ -74,7 +78,7 @@ namespace AE.SeaCooker.Mono
                     AutoChooseSeabreeze = _savedData.AutoChooseSeabreeze;
                     GasManager.SetEquipment(_savedData.TankType);
                     GasManager.SetTankLevel(_savedData.FuelLevel);
-                    ColorManager.SetCurrentBodyColor(_savedData.BodyColor.Vector4ToColor());
+                    ColorManager.SetColorFromSave(_savedData.BodyColor.Vector4ToColor());
                     StorageManager.LoadExportContainer(_savedData.Export);
                     StorageManager.LoadInputContainer(_savedData.Input);
                     StorageManager.SetExportToSeabreeze(_savedData.ExportToSeaBreeze);
@@ -173,9 +177,8 @@ namespace AE.SeaCooker.Mono
 
             if (ColorManager == null)
             {
-                ColorManager = new ColorManager();
-                ColorManager.Initialize(this, SeaCookerBuildable.BodyMaterial);
-
+                ColorManager = gameObject.AddComponent<ColorManager>();
+                ColorManager.Initialize(gameObject, SeaCookerBuildable.BodyMaterial);
             }
 
             if (AudioManager == null)
@@ -197,6 +200,7 @@ namespace AE.SeaCooker.Mono
             IsInitialized = true;
         }
 
+
         private void FindHabitat()
         {
             //if (_habitat != null) return;
@@ -208,8 +212,7 @@ namespace AE.SeaCooker.Mono
             //    QuickLogger.Debug($"Base Name = {_habitat.name}");
             //}
         }
-
-
+        
         internal void UpdateIsRunning(bool value = true)
         {
             AnimationManager.SetBoolHash(_isRunning, value);

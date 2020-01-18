@@ -7,14 +7,24 @@ using Oculus.Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Reflection;
+using FCSTechFabricator;
+using FCSTechFabricator.Components;
+using FCSTechFabricator.Craftables;
+using QModManager.API.ModLoading;
+using SMLHelper.V2.Utility;
 using UnityEngine;
 
 namespace AE.MiniFountainFilter
 {
+    [QModCore]
     public class QPatch
     {
-        public static AssetBundle GlobalBundle { get; set; }
+        internal static AssetBundle GlobalBundle { get; set; }
+        internal static ModConfiguration Configuration { get; set; }
+        internal static string Version { get; set; }
+        internal static TechType BottleTechType { get; set; }
 
+        [QModPatch]
         public static void Patch()
         {
             Version = QuickLogger.GetAssemblyVersion(Assembly.GetExecutingAssembly());
@@ -29,7 +39,7 @@ namespace AE.MiniFountainFilter
             try
             {
 
-                GlobalBundle = FCSTechFabricator.QPatch.Bundle;
+                GlobalBundle = FcAssetBundlesService.PublicAPI.GetAssetBundleByName(FcAssetBundlesService.PublicAPI.GlobalBundleName);
 
                 if (GlobalBundle == null)
                 {
@@ -39,23 +49,10 @@ namespace AE.MiniFountainFilter
 
                 LoadConfiguration();
 
-                var configBottleTechType = QPatch.Configuration.BottleTechType;
-                
-                if (configBottleTechType == null)
-                {
-                    QuickLogger.Error("Bottle TechType is null setting to default");
-                    BottleTechType = TechType.DisinfectedWater;
-                }
-                else
-                {
-                    BottleTechType = configBottleTechType.ToTechType();
-                }
+                AddItemsToTechFabricator();
 
-                if (BottleTechType == TechType.None)
-                {
-                    QuickLogger.Error("TechType returned None");
-                }
-                
+                SetWater();
+
                 MiniFountainFilterBuildable.PatchSMLHelper();
 
                 var harmony = HarmonyInstance.Create("com.minifountainfilter.fcstudios");
@@ -69,8 +66,27 @@ namespace AE.MiniFountainFilter
             }
         }
 
-        public static TechType BottleTechType { get; set; }
+        private static void SetWater()
+        {
+            if (Configuration.BottleTechType == null)
+            {
+                QuickLogger.Error("Bottle TechType is null setting to default");
+                BottleTechType = TechType.DisinfectedWater;
+                return;
+            }
 
+            var water = Configuration.BottleTechType.ToTechType();
+            
+            if (water == TechType.None)
+            {
+                QuickLogger.Error("Bottle TechType is None setting to default");
+                BottleTechType = TechType.DisinfectedWater;
+                return;
+            }
+
+            BottleTechType = water;
+        }
+        
         private static void LoadConfiguration()
         {
             // == Load Configuration == //
@@ -83,8 +99,13 @@ namespace AE.MiniFountainFilter
             Configuration = JsonConvert.DeserializeObject<ModConfiguration>(configJson, settings);
         }
 
-        public static ModConfiguration Configuration { get; set; }
+        private static void AddItemsToTechFabricator()
+        {
+            var icon = new Atlas.Sprite(ImageUtils.LoadTextureFromFile(Path.Combine(Mod.GetAssetFolder(), $"{Mod.ClassID}.png")));
+            var craftingTab = new CraftingTab(Mod.MiniFountainFilterTabID, Mod.FriendlyName, icon);
 
-        public static string Version { get; set; }
+            var quantumTeleportKit = new FCSKit(Mod.MiniFountainFilterKitClassID, Mod.FriendlyName, craftingTab, Mod.MiniFountainFilterKitIngredients);
+            quantumTeleportKit.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
+        }
     }
 }

@@ -4,6 +4,7 @@ using SMLHelper.V2.Utility;
 using System;
 using System.Collections;
 using System.IO;
+using SMLHelper.V2.Crafting;
 using UnityEngine;
 
 namespace ExStorageDepot.Configuration
@@ -12,16 +13,33 @@ namespace ExStorageDepot.Configuration
     {
         private static ModSaver _saveObject;
         private static ExStorageDepotSaveData _exStorageDepotSaveData;
+        
         internal static event Action<ExStorageDepotSaveData> OnExStorageDepotLoaded;
+        
         internal const string SaveDataFilename = "ExStorageDepotSaveData.json";
-        internal static readonly string ModName = FCSTechFabricator.Configuration.ExStorageClassID;
-        internal static readonly string ClassID = FCSTechFabricator.Configuration.ExStorageClassID;
-        internal static readonly string ModFolderName = $"FCS_{ModName}";
+        internal const string ModName = "ExStorageDepot";
+        internal const string ClassID = "ExStorageDepot";
+        internal const string ExStorageTabID = "EX";
+
         internal const string ModFriendly = "Ex-Storage Depot";
         internal const string BundleName = "exstoragedepotunitmodbundle";
         internal const string ModDesc = "Alterra Storage Solutions Ex-Storage Depot allows you to store a large amount of items outside your base.";
         internal static string MODFOLDERLOCATION => GetModPath();
         internal static string GameObjectName => "Ex-StorageDepotUnit";
+        internal static string ModFolderName => $"FCS_{ModName}";
+        public static TechData ExStorageIngredients => new TechData
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(TechType.WiringKit, 1),
+                new Ingredient(TechType.TitaniumIngot, 2),
+                new Ingredient(TechType.Glass, 1),
+                new Ingredient(TechType.PowerCell, 1)
+            }
+        };
+
+        internal const string ExStorageKitClassID = "ExStorage";
 
         public static string GetSaveFileDirectory()
         {
@@ -51,6 +69,11 @@ namespace ExStorageDepot.Configuration
         internal static string ConfigurationFile()
         {
             return Path.Combine(MODFOLDERLOCATION, "config.json");
+        }
+
+        internal static string GetAssetPath()
+        {
+            return Path.Combine(GetModPath(), "Assets");
         }
 
         private static string GetModPath()

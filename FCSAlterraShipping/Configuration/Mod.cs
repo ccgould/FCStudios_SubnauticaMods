@@ -3,6 +3,7 @@ using System.Collections;
 using System.IO;
 using FCSAlterraShipping.Models;
 using FCSCommon.Utilities;
+using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 
@@ -10,22 +11,38 @@ namespace FCSAlterraShipping.Configuration
 {
     internal static class Mod
     {
-        public static string ModName => "AlterraShipping";
-        public static string BundleName => "alterrashippingmodbundle";
-        public static string SaveDataFilename => $"{ModName}SaveData.json";
-        public static string FriendlyName => "Alterra Shipping";
-        public static string Description => "Shipping all your parcels.";
-        public static string ClassID => FCSTechFabricator.Configuration.ShippingClassID;
-        public static string ModDirectoryName => $"FCS_{ModName}";
+        internal const string ModName = "AlterraShipping";
+        internal const string BundleName = "alterrashippingmodbundle";
+        internal const string FriendlyName = "Alterra Shipping";
+        internal const string Description = "Shipping all your parcels.";
+        internal const string ClassID = "FCSAlterraShipping";
+        internal const string GameObjectName = "AlterraShippingMod";
+        internal const string AlterraShippingTabID = "ASU";
+        internal const string AlterraShippingKitClassID = "ASShippingKit_AS";
+        
+        internal static TechData AlterraShippingIngredients => new TechData
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(TechType.AdvancedWiringKit, 1),
+                new Ingredient(TechType.VehicleStorageModule, 1),
+                new Ingredient(TechType.TitaniumIngot, 1),
+                new Ingredient(TechType.Beacon, 1),
+                new Ingredient(TechType.Glass, 1)
+            }
+        };
+
+        internal static string ModDirectoryName => $"FCS_{ModName}";
+        internal static string SaveDataFilename => $"{ModName}SaveData.json";
+        internal static string ModFolderName => $"FCS_{ModName}";
 
         private static ModSaver _saveObject;
 
         private static SaveData _saveData;
-        internal static string GameObjectName => "AlterraShippingMod"; // Same name as the class
-        internal static string ModFolderName => $"FCS_{ModName}";
 
         //#region New Save System
-        //public static void SaveMod()
+        //internal static void SaveMod()
         //{
         //    if (!IsSaving())
         //    {
@@ -46,7 +63,7 @@ namespace FCSAlterraShipping.Configuration
         //    }
         //}
 
-        //public static void LoadData()
+        //internal static void LoadData()
         //{
         //    QuickLogger.Info("Loading Save Data...");
         //    ModUtils.LoadSaveData<SaveData>(SaveDataFilename, GetSaveFileDirectory(), (data) =>
@@ -57,12 +74,12 @@ namespace FCSAlterraShipping.Configuration
         //    });
         //}
 
-        //public static SaveData GetSaveData()
+        //internal static SaveData GetSaveData()
         //{
         //    return _saveData ?? new SaveData();
         //}
 
-        //public static SaveDataEntry GetSaveData(string id)
+        //internal static SaveDataEntry GetSaveData(string id)
         //{
         //    LoadData();
 
@@ -80,7 +97,7 @@ namespace FCSAlterraShipping.Configuration
         //}
         //#endregion
 
-        public static void OnSaveComplete()
+        internal static void OnSaveComplete()
         {
             _saveObject.StartCoroutine(SaveCoroutine());
         }
@@ -95,7 +112,7 @@ namespace FCSAlterraShipping.Configuration
             _saveObject = null;
         }
 
-        public static bool IsSaving()
+        internal static bool IsSaving()
         {
             return _saveObject != null;
         }
@@ -103,13 +120,13 @@ namespace FCSAlterraShipping.Configuration
         /// <summary>
         /// The location of the QMods directory
         /// </summary>
-        public static string QMODFOLDER { get; } = Path.Combine(Environment.CurrentDirectory, "QMods");
+        internal static string QMODFOLDER { get; } = Path.Combine(Environment.CurrentDirectory, "QMods");
 
-        public static string MODFOLDERLOCATION => GetModPath();
+        internal static string MODFOLDERLOCATION => GetModPath();
 
-        public static Action<SaveData> OnDataLoaded { get; private set; }
+        internal static Action<SaveData> OnDataLoaded { get; private set; }
 
-        public static string GetAssetFolder()
+        internal static string GetAssetFolder()
         {
             return Path.Combine(GetModPath(), "Assets");
         }
@@ -124,17 +141,17 @@ namespace FCSAlterraShipping.Configuration
             return Path.Combine(GetQModsPath(), ModFolderName);
         }
 
-        public static string GetAssetPath()
+        internal static string GetAssetPath()
         {
             return Path.Combine(GetModPath(), "Assets");
         }
 
-        public static string GetModInfoPath()
+        internal static string GetModInfoPath()
         {
             return Path.Combine(GetModPath(), "mod.json");
         }
 
-        public static string GetGlobalBundle()
+        internal static string GetGlobalBundle()
         {
             return Path.Combine(Path.Combine(QMODFOLDER, "FCSTechWorkBench"), "globalmaterials");
         }
@@ -150,12 +167,12 @@ namespace FCSAlterraShipping.Configuration
 
         }
 
-        public static string GetConfigFile(string modName)
+        internal static string GetConfigFile(string modName)
         {
             return Path.Combine(GetConfigPath(), $"{modName}.json"); ;
         }
 
-        public static string GetSaveFileDirectory()
+        internal static string GetSaveFileDirectory()
         {
             return Path.Combine(SaveUtils.GetCurrentSaveDataDir(), ModName);
         }

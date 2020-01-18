@@ -6,13 +6,22 @@ using Harmony;
 using System;
 using System.IO;
 using System.Reflection;
+using FCS_AIMarineTurbine.Configuration;
+using FCSTechFabricator;
+using FCSTechFabricator.Components;
+using FCSTechFabricator.Craftables;
+using QModManager.API.ModLoading;
+using SMLHelper.V2.Utility;
 using UnityEngine;
 
 namespace FCS_AIMarineTurbine
 {
+    [QModCore]
     public static class QPatch
     {
         public static AssetBundle Bundle { get; private set; }
+        
+        [QModPatch]
         public static void Patch()
         {
             var assembly = Assembly.GetExecutingAssembly();
@@ -28,11 +37,13 @@ namespace FCS_AIMarineTurbine
             try
             {
                 LoadAssetBundle();
+
+                AddItemsToTechFabricator();
+
                 AISolutionsData.PatchHelper();
                 AIJetStreamT242Buildable.PatchSMLHelper();
                 AIMarineMonitorBuildable.PatchSMLHelper();
-                AIWindSurferBuildable.PatchSMLHelper();
-
+      
                 var harmony = HarmonyInstance.Create("com.aijetstreamt242.fcstudios");
                 harmony.PatchAll(Assembly.GetExecutingAssembly());
 
@@ -61,6 +72,18 @@ namespace FCS_AIMarineTurbine
             }
 
             Bundle = assetBundle;
+        }
+
+        private static void AddItemsToTechFabricator()
+        {
+            var icon = new Atlas.Sprite(ImageUtils.LoadTextureFromFile(Path.Combine(Mod.GetAssetFolder(), $"{Mod.MarineMonitorClassID}.png")));
+            var craftingTab = new CraftingTab(Mod.MarineTurbinesTabID, Mod.MarineTurbinesFriendlyName, icon);
+
+            var jetStreamT242Kit = new FCSKit(Mod.JetstreamKitClassID, Mod.JetStreamFriendlyName, craftingTab, Mod.JetstreamKitIngredients);
+            jetStreamT242Kit.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
+
+            var marineMonitorKit = new FCSKit(Mod.MarineMontiorKitClassID, Mod.MarineMonitorFriendlyName, craftingTab, Mod.MarineMonitorKitIngredients);
+            marineMonitorKit.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
         }
     }
 }

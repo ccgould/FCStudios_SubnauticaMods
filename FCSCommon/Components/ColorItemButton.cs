@@ -14,10 +14,13 @@ namespace FCSCommon.Components
         /// <summary>
         /// The color value for the color picker button. This is used to change the color of the button and for the base color
         /// </summary>
-        public Color Color { get; set; }
-        public string BtnName { get; set; }
+        internal Color Color { get; set; }
+        internal string BtnName { get; set; }
+        private bool _isSelected;
 
-        public Action<string, object> OnButtonClick;
+        internal Action<string, object> OnButtonClick;
+        private GameObject _hover;
+
         #endregion
 
         #region Overrides
@@ -25,7 +28,7 @@ namespace FCSCommon.Components
         {
             base.OnPointerEnter(eventData);
 
-            transform.gameObject.FindChild("Hover").SetActive(true);
+            SetHoverVisible();
         }
 
         public override void OnPointerExit(PointerEventData eventData)
@@ -33,8 +36,10 @@ namespace FCSCommon.Components
 
             base.OnPointerExit(eventData);
 
-            transform.gameObject.FindChild("Hover").SetActive(false);
-
+            if(!_isSelected)
+            {
+                SetHoverVisible(false);
+            }
         }
 
         public override void OnPointerClick(PointerEventData eventData)
@@ -44,6 +49,7 @@ namespace FCSCommon.Components
             if (this.IsHovered)
             {
                 QuickLogger.Debug($"Clicked Button: {this.BtnName}", true);
+                _isSelected = true;
                 OnButtonClick?.Invoke(this.BtnName, Color);
             }
             else
@@ -52,5 +58,33 @@ namespace FCSCommon.Components
             }
         }
         #endregion
+
+
+        /// <summary>
+        /// Sets if the color item's hover ring is shown
+        /// </summary>
+        /// <param name="isSelected">Value to set the hover visible</param>
+        internal void SetIsSelected(bool isSelected = true)
+        {
+            _isSelected = isSelected;
+            SetHoverVisible(isSelected);
+
+        }
+
+        private void FindHover()
+        {
+            _hover = transform.gameObject.FindChild("Hover")?.gameObject;
+        }
+
+
+        private void SetHoverVisible(bool visible = true)
+        {
+            if (_hover == null)
+            {
+                FindHover();
+            }
+
+            _hover?.SetActive(visible);
+        }
     }
 }

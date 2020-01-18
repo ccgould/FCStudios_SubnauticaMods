@@ -1,27 +1,39 @@
 ﻿using SMLHelper.V2.Utility;
 using System;
 using System.IO;
+using SMLHelper.V2.Crafting;
 
 namespace FCSPowerStorage.Configuration
 {
-    public static class Information
+    internal static class Information
     {
-        /// <summary>
-        /// The mod name "ClassID" of the FCS Power Storage
-        /// </summary>
-        public static string ModName => FCSTechFabricator.Configuration.PowerStorageClassID;
-        public static string ModFolderName  => "FCS_PowerStorage";
+        internal const string ModName = "FCSPowerStorage";
+        internal const string ModFolderName  = "FCS_PowerStorage";
+        internal const string ModFriendlyName = "FCS Power Storage";
+        internal const string ModDescription = "This is a wall mounted battery storage for base backup power.";
+        internal const string PrefrabName = "Power_Storage";
+        internal const string PowerStorageTabID = "PS";
+        internal const string PowerStorageKitClassID = "PowerStorageKit_PS";
+        internal const string PowerStorageKitFriendlyName = "Power Storage Kit";
 
-        public static string MODFOLDERLOCATION => GetModPath();
 
-        public static string LANGUAGEDIRECTORY => GetLanguagePath();
+        internal static string MODFOLDERLOCATION => GetModPath();
+        internal static string LANGUAGEDIRECTORY => GetLanguagePath();
+        internal static TechData PowerStorageIngredients => new TechData
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(TechType.Battery, 1),
+                new Ingredient(TechType.AcidMushroom, 6),
+                new Ingredient(TechType.Titanium, 7),
+                new Ingredient(TechType.WiringKit, 1),
+                new Ingredient(TechType.Quartz, 1),
+                new Ingredient(TechType.Salt, 6),
 
-        /// <summary>
-        /// The definition of the FCS Power Storage
-        /// </summary>
-        public static string ModDescription = "This is a wall mounted battery storage for base backup power.";
+            }
+        };
 
-        public const string PrefrabName = "Power_Storage";
         private static string GetQModsPath()
         {
             return Path.Combine(Environment.CurrentDirectory, "QMods");
@@ -32,7 +44,7 @@ namespace FCSPowerStorage.Configuration
             return Path.Combine(GetQModsPath(), ModFolderName);
         }
 
-        public static string GetAssetPath()
+        internal static string GetAssetPath()
         {
             return Path.Combine(GetModPath(), "Assets");
         }
@@ -48,12 +60,12 @@ namespace FCSPowerStorage.Configuration
 
         }
 
-        public static string GetSaveFileDirectory()
+        internal static string GetSaveFileDirectory()
         {
             return Path.Combine(SaveUtils.GetCurrentSaveDataDir(), ModName);
         }
 
-        public static string ConfigurationFile()
+        internal static string ConfigurationFile()
         {
             return Path.Combine(MODFOLDERLOCATION, "config.json");
         }

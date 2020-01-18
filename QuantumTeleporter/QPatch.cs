@@ -2,20 +2,27 @@
 using System.IO;
 using System.Reflection;
 using FCSCommon.Utilities;
+using FCSTechFabricator;
+using FCSTechFabricator.Components;
+using FCSTechFabricator.Craftables;
 using Harmony;
 using Oculus.Newtonsoft.Json;
+using QModManager.API.ModLoading;
 using QuantumTeleporter.Buildable;
 using QuantumTeleporter.Configuration;
+using SMLHelper.V2.Utility;
 using UnityEngine;
 
 namespace QuantumTeleporter
 {
+    [QModCore]
     public class QPatch
     {
         internal static AssetBundle GlobalBundle { get; set; }
         
         internal static ModConfiguration Configuration { get; set; }
         
+        [QModPatch]
         public static void Patch()
         {
             var version = QuickLogger.GetAssemblyVersion(Assembly.GetExecutingAssembly());
@@ -29,7 +36,7 @@ namespace QuantumTeleporter
 
             try
             {
-                GlobalBundle = FCSTechFabricator.QPatch.Bundle;
+                GlobalBundle = FcAssetBundlesService.PublicAPI.GetAssetBundleByName(FcAssetBundlesService.PublicAPI.GlobalBundleName);
 
                 if (GlobalBundle == null)
                 {
@@ -37,7 +44,9 @@ namespace QuantumTeleporter
                     throw new FileNotFoundException("Bundle failed to load");
                 }
 
-                LoadConfiguration();
+                Configuration = Mod.LoadConfiguration();
+
+                AddItemsToTechFabricator();
 
                 QuantumTeleporterBuildable.PatchSMLHelper();
 
@@ -52,16 +61,19 @@ namespace QuantumTeleporter
             }
         }
 
-        private static void LoadConfiguration()
+        private static void AddItemsToTechFabricator()
         {
-            // == Load Configuration == //
-            string configJson = File.ReadAllText(Mod.ConfigurationFile().Trim());
+            var icon = new Atlas.Sprite(ImageUtils.LoadTextureFromFile(Path.Combine(Mod.GetAssetFolder(), $"{Mod.ClassID}.png")));
+            var craftingTab = new CraftingTab(Mod.QuantumTeleporterTabID, Mod.FriendlyName, icon);
+            
+            var quantumTeleportScannerKit = new FCSKit(Mod.TeleporterScannerConnectionKitClassID, Mod.TeleporterScannerConnectionKitText, craftingTab, Mod.TeleporterScannerConnectionKitIngredients);
+            quantumTeleportScannerKit.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
 
-            JsonSerializerSettings settings = new JsonSerializerSettings();
-            settings.MissingMemberHandling = MissingMemberHandling.Ignore;
+            var quantumTeleportWiringKit = new FCSKit(Mod.AdvancedTeleporterWiringKitClassID, Mod.AdvancedTeleporterWiringKitText, craftingTab, Mod.AdvancedTeleporterWiringKitIngredients);
+            quantumTeleportWiringKit.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
 
-            //LoadData
-            Configuration = JsonConvert.DeserializeObject<ModConfiguration>(configJson, settings);
+            var quantumTeleportKit = new FCSKit(Mod.QuantumTeleporterKitClassID, Mod.QuantumTeleporterKitText, craftingTab, Mod.QuantumTeleporterKitIngredients);
+            quantumTeleportKit.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
         }
     }
 }

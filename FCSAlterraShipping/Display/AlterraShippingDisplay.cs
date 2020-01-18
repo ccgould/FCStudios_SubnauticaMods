@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using FCSCommon.Extensions;
+using FCSTechFabricator.Objects;
 using UnityEngine;
 using UnityEngine.UI;
 

@@ -6,12 +6,22 @@ using Harmony;
 using System;
 using System.IO;
 using System.Reflection;
+using FCS_DeepDriller.Configuration;
+using FCSTechFabricator;
+using FCSTechFabricator.Components;
+using FCSTechFabricator.Craftables;
+using QModManager.API.ModLoading;
+using SMLHelper.V2.Utility;
 using UnityEngine;
 
 namespace FCS_DeepDriller
 {
+    [QModCore]
     public static class QPatch
     {
+        public static AssetBundle GlobalBundle { get; set; }
+        
+        [QModPatch]
         public static void Patch()
         {
             var assembly = Assembly.GetExecutingAssembly();
@@ -26,7 +36,7 @@ namespace FCS_DeepDriller
 #endif
             try
             {
-                GlobalBundle = FCSTechFabricator.QPatch.Bundle;
+                GlobalBundle =FcAssetBundlesService.PublicAPI.GetAssetBundleByName(FcAssetBundlesService.PublicAPI.GlobalBundleName);
 
                 if (GlobalBundle == null)
                 {
@@ -34,24 +44,14 @@ namespace FCS_DeepDriller
                     throw new FileNotFoundException("Bundle failed to load");
                 }
 
+                AddItemsToTechFabricator();
+
                 FCSDeepDrillerBuildable.PatchHelper();
 
                 SandSpawnable.PatchHelper();
 
                 var harmony = HarmonyInstance.Create("com.fcsdeepdriller.fcstudios");
-
-                //harmony.Patch(typeof(Equipment).GetMethod("GetSlotType"),
-                //    new HarmonyMethod(typeof(Equipment_GetSlotType_Patch), "Prefix"), null);
-
-                //harmony.Patch(typeof(Player).GetMethod("Awake"),null,new HarmonyMethod(typeof(Player_Patch), "Postfix"));
-
-                //harmony.Patch(typeof(uGUI_Equipment).GetMethod("Awake",
-                //        BindingFlags.NonPublic |
-                //        BindingFlags.Instance |
-                //        BindingFlags.SetField),
-                //    new HarmonyMethod(typeof(uGUI_Equipment_Awake_Patch), "Prefix"),
-                //    new HarmonyMethod(typeof(uGUI_Equipment_Awake_Patch), "Postfix"));
-
+                
                 harmony.PatchAll(Assembly.GetExecutingAssembly());
 
                 QuickLogger.Info("Finished patching");
@@ -62,6 +62,39 @@ namespace FCS_DeepDriller
             }
         }
 
-        public static AssetBundle GlobalBundle { get; set; }
+        private static void AddItemsToTechFabricator()
+        {
+            var icon = new Atlas.Sprite(ImageUtils.LoadTextureFromFile(Path.Combine(Mod.GetAssetFolder(), "FCSDeepDriller.png")));
+            var craftingTab = new CraftingTab(Mod.DeepDrillerTabID, Mod.ModFriendlyName, icon);
+            
+            var deepDrillerKit = new FCSKit(Mod.DeepDrillerKitClassID, Mod.DeepDrillerKitFriendlyName, craftingTab, Mod.DeepDrillerKitIngredients);
+            deepDrillerKit.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
+
+            var assetsFolder = Mod.GetAssetFolder();
+
+            var focusAttachmentKit = new FCSKit(Mod.FocusAttachmentKitClassID, Mod.FocusAttachmentFriendlyName, craftingTab, Mod.FocusAttachmentKitIngredients);
+            focusAttachmentKit.ChangeIconLocation(assetsFolder, "FocusAttachment_DD");
+            focusAttachmentKit.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
+            
+            var batteryAttachmentKit = new FCSKit(Mod.BatteryAttachmentKitClassID, Mod.BatteryAttachmentFriendlyName, craftingTab, Mod.BatteryAttachmentKitIngredients);
+            batteryAttachmentKit.ChangeIconLocation(assetsFolder, "BatteryAttachment_DD");
+            batteryAttachmentKit.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
+
+            var solarAttachmentKit = new FCSKit(Mod.SolarAttachmentKitClassID, Mod.SolarAttachmentFriendlyName, craftingTab, Mod.SolarAttachmentKitIngredients);
+            solarAttachmentKit.ChangeIconLocation(assetsFolder, "SolarAttachment_DD");
+            solarAttachmentKit.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
+
+            var drillerMK1Module = new FCSModule(Mod.DrillerMK1ModuleClassID, Mod.DrillerMK1ModuleFriendlyName, "This upgrade allows deep driller to drill 15 resources per day.", craftingTab, Mod.DrillerMK1Ingredients);
+            drillerMK1Module.ChangeIconLocation(assetsFolder, Mod.DrillerMK1ModuleClassID);
+            drillerMK1Module.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
+
+            var drillerMK2Module = new FCSModule(Mod.DrillerMK2ModuleClassID, Mod.DrillerMK2ModuleFriendlyName, "This upgrade allows deep driller to drill 22 resources per day.", craftingTab, Mod.DrillerMK2Ingredients);
+            drillerMK2Module.ChangeIconLocation(assetsFolder, Mod.DrillerMK2ModuleClassID);
+            drillerMK2Module.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
+
+            var drillerMK3Module = new FCSModule(Mod.DrillerMK3ModuleClassID, Mod.DrillerMK3ModuleFriendlyName, "This upgrade allows deep driller to drill 30 resources per day.", craftingTab, Mod.DrillerMK3Ingredients);
+            drillerMK3Module.ChangeIconLocation(assetsFolder, Mod.DrillerMK3ModuleClassID);
+            drillerMK3Module.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
+        }
     }
 }

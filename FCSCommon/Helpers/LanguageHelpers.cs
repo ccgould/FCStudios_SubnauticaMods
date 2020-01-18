@@ -1,8 +1,8 @@
 ﻿namespace FCSCommon.Helpers
 {
-    public static class LanguageHelpers
+    internal static class LanguageHelpers
     {
-        public static string GetLanguage(string key)
+        internal static string GetLanguage(string key)
         {
             return Language.main.Get(key);
         }

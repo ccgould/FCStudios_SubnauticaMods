@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using AMMiniMedBay.Mono;
 using FCSCommon.Utilities;
+using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 
@@ -16,14 +17,30 @@ namespace AMMiniMedBay.Configuration
         private static ModSaver _saveObject;
         private static SaveData _saveData;
 
-        internal static string ClassID => FCSTechFabricator.Configuration.MiniMedBayClassID;
-        internal static string ModName => "MiniMedBay";
-        internal static string ModFriendlyName => "Alterra Medical MiniMedBay";
-        internal static string ModDescription => "Alterra is here with all your medical needs.";
+        internal const string ClassID = "AMMiniMedBay";
+        internal const string ModName = "MiniMedBay";
+        internal const string ModFriendlyName = "Alterra Medical MiniMedBay";
+        internal const string ModDescription = "Alterra is here with all your medical needs.";
+        internal const string BundleName = "amminimedbaymodbundle";
+        internal const string MiniMedBayTabID = "MMB";
+        internal const string MiniMedBayKitClassID = "AMMiniMedBayKit_AMS";
+
+        internal static TechData MiniMedBayIngredients => new TechData
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(TechType.AdvancedWiringKit, 1),
+                new Ingredient(TechType.PowerCell, 1),
+                new Ingredient(TechType.FiberMesh, 3),
+                new Ingredient(TechType.Titanium, 2),
+                new Ingredient(TechType.Glass, 1)
+            }
+        };
+
         internal static string SaveDataFilename => $"{ModName}SaveData.json";
-        internal static string GameObjectName => FCSTechFabricator.Configuration.MiniMedBayClassID; // Same name as the class
+        internal static string GameObjectName => ClassID; // Same name as the class
         internal static string ModFolderName => $"FCS_{ModName}";
-        internal static string BundleName => "amminimedbaymodbundle";
 
         #region Deep Driller
         public static void SaveMod()
@@ -109,6 +126,8 @@ namespace AMMiniMedBay.Configuration
         public static string MODFOLDERLOCATION => GetModPath();
 
         public static Action<SaveData> OnDataLoaded { get; private set; }
+        
+
 
         private static string GetQModsPath()
         {
@@ -117,7 +136,7 @@ namespace AMMiniMedBay.Configuration
 
         private static string GetModPath()
         {
-            return Path.Combine(GetQModsPath(), ModName);
+            return Path.Combine(GetQModsPath(), ModFolderName);
         }
 
         public static string GetAssetPath()

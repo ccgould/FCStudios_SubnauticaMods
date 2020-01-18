@@ -71,6 +71,7 @@ namespace AE.MiniFountainFilter.Managers
             {
                 QuickLogger.Error($"Eatable for Bottle TechType is null");
                 GameObject.Destroy(bottle.item);
+                return;
             }
 
             _bottleWaterContent = eatable.waterValue;

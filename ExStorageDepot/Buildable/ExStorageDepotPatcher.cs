@@ -1,8 +1,6 @@
 ﻿using ExStorageDepot.Configuration;
 using ExStorageDepot.Mono;
 using FCSCommon.Helpers;
-using FCSTechFabricator.Helpers;
-using SMLHelper.V2.Utility;
 
 namespace ExStorageDepot.Buildable
 {
@@ -37,14 +35,6 @@ namespace ExStorageDepot.Buildable
             {
                 throw new FileNotFoundException($"Failed to retrieve the {Singleton.FriendlyName} prefab from the asset bundle");
             }
-
-            PatchHelpers.AddNewKit(
-                FCSTechFabricator.Configuration.ExStorageKitClassID,
-                null,
-                Mod.ModFriendly,
-                FCSTechFabricator.Configuration.ExStorageClassID,
-                new[] { "ASTS", "ES" },
-                null);
 
             Singleton.Patch();
         }
@@ -154,7 +144,7 @@ namespace ExStorageDepot.Buildable
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(TechTypeHelpers.GetTechType(FCSTechFabricator.Configuration.ExStorageKitClassID), 1)
+                    new Ingredient(TechTypeHelpers.GetTechType(Mod.ExStorageKitClassID), 1)
                 }
             };
 
