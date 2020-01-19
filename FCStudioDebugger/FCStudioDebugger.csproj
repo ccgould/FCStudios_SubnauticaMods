@@ -50,20 +50,25 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="0Harmony-1.2.0.1">
-      <HintPath>F:\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\0Harmony-1.2.0.1.dll</HintPath>
+      <HintPath>..\Dependancies\0Harmony-1.2.0.1.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Assembly-CSharp">
-      <HintPath>F:\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <HintPath>..\Dependancies\$(Game)\Assembly-CSharp.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Assembly-CSharp-firstpass">
-      <HintPath>F:\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
+      <HintPath>..\Dependancies\$(Game)\Assembly-CSharp-firstpass.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>F:\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\Dependancies\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="SMLHelper">
-      <HintPath>F:\Program Files\Epic Games\Subnautica\QMods\Modding Helper\SMLHelper.dll</HintPath>
+      <HintPath>..\Dependancies\$(Game)\SMLHelper.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -72,10 +77,12 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="UnityEngine">
-      <HintPath>F:\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\UnityEngine.dll</HintPath>
+      <HintPath>..\Dependancies\UnityEngine.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UI">
-      <HintPath>F:\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\UnityEngine.UI.dll</HintPath>
+      <HintPath>..\Dependancies\UnityEngine.UI.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -90,14 +97,20 @@
     <ProjectReference Include="..\FCSWorkBench\FCSTechFabricator.csproj">
       <Project>{b947909c-4983-4749-93ac-73ea69f6dce8}</Project>
       <Name>FCSTechFabricator</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\FCS_DeepDriller\FCS_DeepDriller.csproj">
       <Project>{61d8ba15-ee91-4245-bfc1-70064add23e0}</Project>
       <Name>FCS_DeepDriller</Name>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>xcopy "$(ProjectDir)bin\$(Configuration)\FCStudioDebugger.dll" "F:\Program Files\Epic Games\Subnautica\QMods\FCStudioDebugger\" /Y /I</PostBuildEvent>
+  <Import Project="..\FCSCommon\GamePaths.targets" />
+  <PropertyGroup Condition="$(Game) == 'Subnautica'">
+    <PostBuildEvent>xcopy "$(ProjectDir)bin\$(Configuration)\FCStudioDebugger.dll" "$(SubnauticaDir)\QMods\FCStudioDebugger\" /Y /I</PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup Condition="$(Game) == 'BelowZero'">
+    <PostBuildEvent>xcopy "$(ProjectDir)bin\$(Configuration)\FCStudioDebugger.dll" "$(BelowZeroDir)\QMods\FCStudioDebugger\" /Y /I</PostBuildEvent>
   </PropertyGroup>
 </Project>
