@@ -66,8 +66,8 @@ namespace ExStorageDepot
             var icon = new Atlas.Sprite(ImageUtils.LoadTextureFromFile(Path.Combine(Mod.GetAssetPath(), $"{Mod.ClassID}.png")));
             var craftingTab = new CraftingTab(Mod.ExStorageTabID, Mod.ModFriendly, icon);
 
-            var miniMedBayKit = new FCSKit(Mod.ExStorageKitClassID, Mod.ModFriendly, craftingTab, Mod.ExStorageIngredients);
-            miniMedBayKit.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
+            var exStorageKit = new FCSKit(Mod.ExStorageKitClassID, Mod.ModFriendly, craftingTab, Mod.ExStorageIngredients);
+            exStorageKit.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
         }
     }
 }
