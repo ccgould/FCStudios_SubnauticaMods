@@ -58,4 +58,7 @@
   <ItemGroup>
     <Folder Include="$(MSBuildThisFileDirectory)Exceptions\" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)GamePaths.targets" />
+  </ItemGroup>
 </Project>
