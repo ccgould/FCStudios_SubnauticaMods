@@ -144,7 +144,7 @@ namespace ExStorageDepot.Buildable
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(TechTypeHelpers.GetTechType(Mod.ExStorageKitClassID), 1)
+                    new Ingredient(Mod.ExStorageKitClassID.ToTechType(), 1)
                 }
             };
 

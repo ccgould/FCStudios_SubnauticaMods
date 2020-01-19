@@ -39,7 +39,7 @@ namespace ExStorageDepot.Configuration
             }
         };
 
-        internal const string ExStorageKitClassID = "ExStorage";
+        internal const string ExStorageKitClassID = "ExStorageKit_ASTS";
 
         public static string GetSaveFileDirectory()
         {
