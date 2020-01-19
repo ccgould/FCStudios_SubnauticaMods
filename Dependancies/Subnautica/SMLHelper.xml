@@ -13,7 +13,7 @@
         </member>
         <member name="P:SMLHelper.V2.Assets.Buildable.HandOverText">
             <summary>
-            Override with the text to be displayed when your hover the cursor over the built item.
+            Obsolete. No longer functional. Handle with a customized HandTarget instead.
             </summary>
         </member>
         <member name="M:SMLHelper.V2.Assets.Buildable.#ctor(System.String,System.String,System.String)">
@@ -53,7 +53,7 @@
         </member>
         <member name="T:SMLHelper.V2.Assets.CustomFabricator">
             <summary>
-            An asset class similar to <seealso cref="T:SMLHelper.V2.Assets.Buildable"/> that streamlines the process of creating a custom fabricator with a custom crafting tree.
+            An asset class inheriting from <seealso cref="T:SMLHelper.V2.Assets.Buildable"/> that streamlines the process of creating a custom fabricator with a custom crafting tree.
             </summary>
             <seealso cref="T:SMLHelper.V2.Assets.ModPrefab"/>
         </member>
@@ -154,6 +154,16 @@
             The ID value for your custom craft tree. This is set in the <see cref="M:SMLHelper.V2.Assets.CustomFabricator.CreateCustomCraftTree(CraftTree.Type@)"/> method.
             </summary>
         </member>
+        <member name="P:SMLHelper.V2.Assets.CustomFabricator.CategoryForPDA">
+            <summary>
+            Override with the category within the group in the PDA blueprints where this item appears.
+            </summary>
+        </member>
+        <member name="P:SMLHelper.V2.Assets.CustomFabricator.GroupForPDA">
+            <summary>
+            Override with the main group in the PDA blueprints where this item appears.
+            </summary>
+        </member>
         <member name="M:SMLHelper.V2.Assets.CustomFabricator.GetGameObject">
             <summary>
             The in-game <see cref="T:UnityEngine.GameObject"/>.
@@ -213,6 +223,29 @@
             <param name="parentTabId">Optional. The parent tab of this craft node.<para/>
             When this value is null, the item's <see cref="P:SMLHelper.V2.Assets.Craftable.StepsToFabricatorTab"/> property will be checked instead.<para/>
             The craft node will be added to the root of the craft tree if both are null.</param>
+        </member>
+        <member name="T:SMLHelper.V2.Assets.Equipable">
+            <summary>
+            An item that can be crafted and equipped.
+            </summary>    
+            <seealso cref="T:SMLHelper.V2.Assets.Spawnable" />
+            <seealso cref="T:SMLHelper.V2.Assets.Craftable" />
+        </member>
+        <member name="P:SMLHelper.V2.Assets.Equipable.EquipmentType">
+            <summary>
+            Gets the type of equipment slot this item can fit into.
+            </summary>
+            <value>
+            The type of the equipment slot compatible with this item.
+            </value>
+        </member>
+        <member name="M:SMLHelper.V2.Assets.Equipable.#ctor(System.String,System.String,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:SMLHelper.V2.Assets.Equipable"/> class.
+            </summary>
+            <param name="classId">The main internal identifier for this item. Your item's <see cref="T:TechType" /> will be created using this name.</param>
+            <param name="friendlyName">The name displayed in-game for this item whether in the open world or in the inventory.</param>
+            <param name="description">The description for this item; Typically seen in the PDA, inventory, or crafting screens.</param>
         </member>
         <member name="T:SMLHelper.V2.Assets.Fish">
             <summary>
@@ -410,23 +443,6 @@
             <param name="type">The techtype paired to this sprite.</param>
             <param name="sprite">The sprite to be added.</param>
         </member>
-        <member name="M:SMLHelper.V2.Assets.ModSprite.#ctor(SpriteManager.Group,System.String,UnityEngine.Sprite)">
-            <summary>
-            Creates a new ModSprite to be used with a specific group and internal ID.
-            Created with a UnityEngine Sprite.
-            </summary>
-            <param name="group">The sprite group this sprite will be added to.</param>
-            <param name="id">The sprite internal identifier.</param>
-            <param name="sprite">The sprite to be added.</param>
-        </member>
-        <member name="M:SMLHelper.V2.Assets.ModSprite.#ctor(TechType,UnityEngine.Sprite)">
-            <summary>
-            Creates a new ModSprite to be used with a specific TechType.
-            Created with a UnityEngine Sprite.
-            </summary>
-            <param name="type">The techtype paired to this sprite.</param>
-            <param name="sprite">The sprite to be added.</param>
-        </member>
         <member name="T:SMLHelper.V2.Assets.PdaItem">
             <summary>
             A <see cref="T:SMLHelper.V2.Assets.Spawnable"/> item that appears in the PDA blueprints.
@@ -519,6 +535,12 @@
             This will become <c>true</c> after the <seealso cref="M:SMLHelper.V2.Assets.Spawnable.Patch"/> method has finished running.
             </summary>
         </member>
+        <member name="P:SMLHelper.V2.Assets.Spawnable.SizeInInventory">
+            <summary>
+            Returns the size that this entity will occupy inside the player inventory.<br/>
+            By default this will be 1x1. Override to change the size.
+            </summary>
+        </member>
         <member name="M:SMLHelper.V2.Assets.Spawnable.#ctor(System.String,System.String,System.String)">
             <summary>
             Initializes a new <see cref="T:SMLHelper.V2.Assets.Spawnable"/>, the basic class needed for any item that can be spawned into the Subnautica game world.
@@ -578,15 +600,6 @@
             </summary>
         </member>
         <member name="M:SMLHelper.V2.Crafting.ModCraftTreeLinkingNode.AddTabNode(System.String,System.String,Atlas.Sprite)">
-            <summary>
-            Creates a new tab node for the crafting tree and links it to the calling node.
-            </summary>
-            <param name="nameID">The name/ID of this node.</param>
-            <param name="displayText">The hover text to display in-game.</param>
-            <param name="sprite">The custom sprite to display on this tab node.</param>
-            <returns>A new tab node linked to the root node and ready to use.</returns>
-        </member>
-        <member name="M:SMLHelper.V2.Crafting.ModCraftTreeLinkingNode.AddTabNode(System.String,System.String,UnityEngine.Sprite)">
             <summary>
             Creates a new tab node for the crafting tree and links it to the calling node.
             </summary>
@@ -894,6 +907,21 @@
         <member name="P:SMLHelper.V2.Handler.TechTypeHandler">
             <summary>
             A handler class for everything related to creating new TechTypes.
+            </summary>
+        </member>
+        <member name="P:SMLHelper.V2.Handler.LootDistributionHandler">
+            <summary>
+            A handler class for adding and editing resource spawns.
+            </summary>
+        </member>
+        <member name="P:SMLHelper.V2.Handler.WorldEntityDatabaseHandler">
+            <summary>
+            A handler for adding custom entries to the world entity database.
+            </summary>
+        </member>
+        <member name="P:SMLHelper.V2.Handler.PDAEncyclopediaHandler">
+            <summary>
+            A handler for adding custom entries to the PDA Encyclopedia.
             </summary>
         </member>
         <member name="T:SMLHelper.V2.Handlers.BioReactorHandler">
@@ -1285,30 +1313,7 @@
             <param name="displayName">The display name of the tab, which will show up when you hover your mouse on the tab.</param>
             <param name="sprite">The sprite of the tab.</param>        
         </member>
-        <member name="M:SMLHelper.V2.Handlers.CraftTreeHandler.AddTabNode(CraftTree.Type,System.String,System.String,UnityEngine.Sprite)">
-            <summary>
-            Adds a new tab node to the root of the specified crafting tree.
-            </summary>
-            <param name="craftTree">The target craft tree to edit.</param>
-            <param name="name">The ID of the tab node. Must be unique!</param>
-            <param name="displayName">The display name of the tab, which will show up when you hover your mouse on the tab.</param>
-            <param name="sprite">The sprite of the tab.</param>        
-        </member>
         <member name="M:SMLHelper.V2.Handlers.CraftTreeHandler.AddTabNode(CraftTree.Type,System.String,System.String,Atlas.Sprite,System.String[])">
-            <summary>
-            Adds a new tab node to the root of the specified crafting tree, at the specified tab location.
-            </summary>
-            <param name="craftTree">The target craft tree to edit.</param>
-            <param name="name">The ID of the tab node. Must be unique!</param>
-            <param name="displayName">The display name of the tab, which will show up when you hover your mouse on the tab.</param>
-            <param name="sprite">The sprite of the tab.</param>
-            <param name="stepsToTab">
-            <para>The steps to the target tab.</para>
-            <para>These must match the id value of the CraftNode in the crafting tree you're targeting.</para>
-            <para>Do not include "root" in this path.</para>
-            </param>        
-        </member>
-        <member name="M:SMLHelper.V2.Handlers.CraftTreeHandler.AddTabNode(CraftTree.Type,System.String,System.String,UnityEngine.Sprite,System.String[])">
             <summary>
             Adds a new tab node to the root of the specified crafting tree, at the specified tab location.
             </summary>
@@ -1393,30 +1398,7 @@
             <param name="displayName">The display name of the tab, which will show up when you hover your mouse on the tab.</param>
             <param name="sprite">The sprite of the tab.</param>        
         </member>
-        <member name="M:SMLHelper.V2.Handlers.CraftTreeHandler.SMLHelper#V2#Interfaces#ICraftTreeHandler#AddTabNode(CraftTree.Type,System.String,System.String,UnityEngine.Sprite)">
-            <summary>
-            Adds a new tab node to the root of the specified crafting tree.
-            </summary>
-            <param name="craftTree">The target craft tree to edit.</param>
-            <param name="name">The ID of the tab node. Must be unique!</param>
-            <param name="displayName">The display name of the tab, which will show up when you hover your mouse on the tab.</param>
-            <param name="sprite">The sprite of the tab.</param>
-        </member>
         <member name="M:SMLHelper.V2.Handlers.CraftTreeHandler.SMLHelper#V2#Interfaces#ICraftTreeHandler#AddTabNode(CraftTree.Type,System.String,System.String,Atlas.Sprite,System.String[])">
-            <summary>
-            Adds a new tab node to the root of the specified crafting tree, at the specified tab location.
-            </summary>
-            <param name="craftTree">The target craft tree to edit.</param>
-            <param name="name">The ID of the tab node. Must be unique!</param>
-            <param name="displayName">The display name of the tab, which will show up when you hover your mouse on the tab.</param>
-            <param name="sprite">The sprite of the tab.</param>
-            <param name="stepsToTab">
-            <para>The steps to the target tab.</para>
-            <para>These must match the id value of the CraftNode in the crafting tree you're targeting.</para>
-            <para>Do not include "root" in this path.</para>
-            </param>        
-        </member>
-        <member name="M:SMLHelper.V2.Handlers.CraftTreeHandler.SMLHelper#V2#Interfaces#ICraftTreeHandler#AddTabNode(CraftTree.Type,System.String,System.String,UnityEngine.Sprite,System.String[])">
             <summary>
             Adds a new tab node to the root of the specified crafting tree, at the specified tab location.
             </summary>
@@ -1725,6 +1707,116 @@
             <param name="techType">The <see cref="T:TechType"/> whose tooltip that is to be changed.</param>
             <param name="text">The new tooltip for the chosen <see cref="T:TechType"/>.</param>
         </member>
+        <member name="T:SMLHelper.V2.Handlers.LootDistributionHandler">
+            <summary>
+            A handler that manages Loot Distribution.
+            </summary>
+        </member>
+        <member name="P:SMLHelper.V2.Handlers.LootDistributionHandler.Main">
+            <summary>
+            Main entry point for all calls to this handler.
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.LootDistributionHandler.AddLootDistributionData(System.String,LootDistributionData.SrcData)">
+            <summary>
+            Adds in a custom entry into the Loot Distribution of the game.
+            </summary>
+            <param name="data"></param>
+            <param name="classId"></param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.LootDistributionHandler.AddLootDistributionData(System.String,LootDistributionData.SrcData,UWE.WorldEntityInfo)">
+            <summary>
+            Adds in a custom entry into the Loot Distribution of the game.
+            You must also add the <see cref="T:UWE.WorldEntityInfo"/> into the <see cref="T:UWE.WorldEntityDatabase"/> using <see cref="T:SMLHelper.V2.Handlers.WorldEntityDatabaseHandler"/>.
+            </summary>
+            <param name="data">The <see cref="T:LootDistributionData.SrcData"/> that contains data related to the spawning of a prefab, also contains the path to the prefab.</param>
+            <param name="classId">The classId of the prefab.</param>
+            <param name="info">The WorldEntityInfo of the prefab. For more information on how to set this up, see <see cref="T:SMLHelper.V2.Handlers.WorldEntityDatabaseHandler"/>.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.LootDistributionHandler.AddLootDistributionData(System.String,System.String,System.Collections.Generic.IEnumerable{LootDistributionData.BiomeData})">
+            <summary>
+            Adds in a custom entry into the Loot Distribution of the game.
+            You must also add the <see cref="T:UWE.WorldEntityInfo"/> into the <see cref="T:UWE.WorldEntityDatabase"/> using <see cref="T:SMLHelper.V2.Handlers.WorldEntityDatabaseHandler"/>.
+            </summary>
+            <param name="classId">The classId of the prefab.</param>
+            <param name="prefabPath">The prefab path of the prefab.</param>
+            <param name="biomeDistribution">The <see cref="T:LootDistributionData.BiomeData"/> dictating how the prefab should spawn in the world.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.LootDistributionHandler.AddLootDistributionData(System.String,System.String,System.Collections.Generic.IEnumerable{LootDistributionData.BiomeData},UWE.WorldEntityInfo)">
+            <summary>
+            Adds in a custom entry into the Loot Distribution of the game.
+            You must also add the <see cref="T:UWE.WorldEntityInfo"/> into the <see cref="T:UWE.WorldEntityDatabase"/> using <see cref="T:SMLHelper.V2.Handlers.WorldEntityDatabaseHandler"/>.
+            </summary>
+            <param name="classId">The classId of the prefab.</param>
+            <param name="prefabPath">The prefab path of the prefab.</param>
+            <param name="biomeDistribution">The <see cref="T:LootDistributionData.BiomeData"/> dictating how the prefab should spawn in the world.</param>
+            <param name="info">The WorldEntityInfo of the prefab. For more information on how to set this up, see <see cref="T:SMLHelper.V2.Handlers.WorldEntityDatabaseHandler"/>.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.LootDistributionHandler.AddLootDistributionData(SMLHelper.V2.Assets.ModPrefab,System.Collections.Generic.IEnumerable{LootDistributionData.BiomeData},UWE.WorldEntityInfo)">
+            <summary>
+            Adds in a custom entry into the Loot Distribution of the game.
+            You must also add the <see cref="T:UWE.WorldEntityInfo"/> into the <see cref="T:UWE.WorldEntityDatabase"/> using <see cref="T:SMLHelper.V2.Handlers.WorldEntityDatabaseHandler"/>.
+            </summary>
+            <param name="prefab">The custom prefab which you want to spawn naturally in the game.</param>
+            <param name="biomeDistribution">The <see cref="T:LootDistributionData.BiomeData"/> dictating how the prefab should spawn in the world.</param>
+            <param name="info">The WorldEntityInfo of the prefab. For more information on how to set this up, see <see cref="T:SMLHelper.V2.Handlers.WorldEntityDatabaseHandler"/>.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.LootDistributionHandler.EditLootDistributionData(System.String,BiomeType,System.Single,System.Int32)">
+            <summary>
+            Edits Loot Distribution Data for existing/original class IDs. 
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.LootDistributionHandler.EditLootDistributionData(System.String,System.Collections.Generic.IEnumerable{LootDistributionData.BiomeData})">
+            <summary>
+            Edits Loot Distribution data for existing prefabs, for e.g. original game prefabs.
+            </summary>
+            <param name="classId">The ClassID of the prefab. If unsure, use CraftData.GetClassIdForTechType.</param>
+            <param name="biomeDistribution">The list of <see cref="T:LootDistributionData.BiomeData"/> that contains information about how/when it should spawn in biomes.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.LootDistributionHandler.SMLHelper#V2#Interfaces#ILootDistributionHandler#AddLootDistributionData(System.String,LootDistributionData.SrcData,UWE.WorldEntityInfo)">
+            <summary>
+            Adds in a custom entry into the Loot Distribution of the game.
+            You must also add the <see cref="T:UWE.WorldEntityInfo"/> into the <see cref="T:UWE.WorldEntityDatabase"/> using <see cref="T:SMLHelper.V2.Handlers.WorldEntityDatabaseHandler"/>.
+            </summary>
+            <param name="data">The <see cref="T:LootDistributionData.SrcData"/> that contains data related to the spawning of a prefab, also contains the path to the prefab.</param>
+            <param name="classId">The classId of the prefab.</param>
+            <param name="info">The WorldEntityInfo of the prefab. For more information on how to set this up, see <see cref="T:SMLHelper.V2.Handlers.WorldEntityDatabaseHandler"/>.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.LootDistributionHandler.SMLHelper#V2#Interfaces#ILootDistributionHandler#AddLootDistributionData(System.String,System.String,System.Collections.Generic.IEnumerable{LootDistributionData.BiomeData})">
+            <summary>
+            Adds in a custom entry into the Loot Distribution of the game.
+            You must also add the <see cref="T:UWE.WorldEntityInfo"/> into the <see cref="T:UWE.WorldEntityDatabase"/> using <see cref="T:SMLHelper.V2.Handlers.WorldEntityDatabaseHandler"/>.
+            </summary>
+            <param name="classId">The classId of the prefab.</param>
+            <param name="prefabPath">The prefab path of the prefab.</param>
+            <param name="biomeDistribution">The <see cref="T:LootDistributionData.BiomeData"/> dictating how the prefab should spawn in the world.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.LootDistributionHandler.SMLHelper#V2#Interfaces#ILootDistributionHandler#AddLootDistributionData(System.String,System.String,System.Collections.Generic.IEnumerable{LootDistributionData.BiomeData},UWE.WorldEntityInfo)">
+            <summary>
+            Adds in a custom entry into the Loot Distribution of the game.
+            You must also add the <see cref="T:UWE.WorldEntityInfo"/> into the <see cref="T:UWE.WorldEntityDatabase"/> using <see cref="T:SMLHelper.V2.Handlers.WorldEntityDatabaseHandler"/>.
+            </summary>
+            <param name="classId">The classId of the prefab.</param>
+            <param name="prefabPath">The prefab path of the prefab.</param>
+            <param name="biomeDistribution">The <see cref="T:LootDistributionData.BiomeData"/> dictating how the prefab should spawn in the world.</param>
+            <param name="info">The WorldEntityInfo of the prefab. For more information on how to set this up, see <see cref="T:SMLHelper.V2.Handlers.WorldEntityDatabaseHandler"/>.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.LootDistributionHandler.SMLHelper#V2#Interfaces#ILootDistributionHandler#AddLootDistributionData(SMLHelper.V2.Assets.ModPrefab,System.Collections.Generic.IEnumerable{LootDistributionData.BiomeData},UWE.WorldEntityInfo)">
+            <summary>
+            Adds in a custom entry into the Loot Distribution of the game.
+            You must also add the <see cref="T:UWE.WorldEntityInfo"/> into the <see cref="T:UWE.WorldEntityDatabase"/> using <see cref="T:SMLHelper.V2.Handlers.WorldEntityDatabaseHandler"/>.
+            </summary>
+            <param name="prefab">The custom prefab which you want to spawn naturally in the game.</param>
+            <param name="biomeDistribution">The <see cref="T:LootDistributionData.BiomeData"/> dictating how the prefab should spawn in the world.</param>
+            <param name="info">The WorldEntityInfo of the prefab. For more information on how to set this up, see <see cref="T:SMLHelper.V2.Handlers.WorldEntityDatabaseHandler"/>.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.LootDistributionHandler.SMLHelper#V2#Interfaces#ILootDistributionHandler#EditLootDistributionData(System.String,System.Collections.Generic.IEnumerable{LootDistributionData.BiomeData})">
+            <summary>
+            Edits Loot Distribution data for existing prefabs, for e.g. original game prefabs.
+            </summary>
+            <param name="classId">The ClassID of the prefab. If unsure, use CraftData.GetClassIdForTechType.</param>
+            <param name="biomeDistribution">The list of <see cref="T:LootDistributionData.BiomeData"/> that contains information about how/when it should spawn in biomes.</param>
+        </member>
         <member name="T:SMLHelper.V2.Handlers.OptionsPanelHandler">
             <summary>
             A handler class for registering your custom in-game mod options.
@@ -1748,6 +1840,22 @@
             </summary>
             <param name="options">The mod options. Create a new child class inheriting from this one and add your options to it.</param>
             <seealso cref="T:SMLHelper.V2.Options.ModOptions"/>
+        </member>
+        <member name="T:SMLHelper.V2.Handlers.PDAEncyclopediaHandler">
+            <summary>
+            Handles Encyclopedia.
+            </summary>
+        </member>
+        <member name="P:SMLHelper.V2.Handlers.PDAEncyclopediaHandler.Main">
+            <summary>
+            Main entry point for all calls to this handler.
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.PDAEncyclopediaHandler.AddCustomEntry(PDAEncyclopedia.EntryData)">
+            <summary>
+            Adds custom entry.
+            </summary>
+            <param name="entry">The <see cref="T:PDAEncyclopedia.EntryData"/> entry.</param>
         </member>
         <member name="T:SMLHelper.V2.Handlers.PDAHandler">
             <summary>
@@ -1773,6 +1881,12 @@
             <param name="techType">Can be either techtype of the fragment or the crafted item.</param>
             <param name="scanTime">The relative time spent on scanning. Default value is 1.</param>
         </member>
+        <member name="M:SMLHelper.V2.Handlers.PDAHandler.SMLHelper#V2#Interfaces#IPDAHandler#AddCustomScannerEntry(PDAScanner.EntryData)">
+            <summary>
+            Adds in a custom <see cref="T:PDAScanner.EntryData"/>.
+            </summary>
+            <param name="entryData">The <see cref="T:PDAScanner.EntryData"/> of the entry. Must be populated when passed in.</param>
+        </member>
         <member name="M:SMLHelper.V2.Handlers.PDAHandler.EditFragmentsToScan(TechType,System.Int32)">
             <summary>
             Edits how many fragments must be scanned before unlocking the techtype's blueprint.
@@ -1786,6 +1900,24 @@
             </summary>
             <param name="techType">Can be either techtype of the fragment or the crafted item.</param>
             <param name="scanTime">The relative time spent on scanning. Default value is 1.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.PDAHandler.AddCustomScannerEntry(PDAScanner.EntryData)">
+            <summary>
+            Adds in a custom <see cref="T:PDAScanner.EntryData"/>.
+            </summary>
+            <param name="entryData">The <see cref="T:PDAScanner.EntryData"/> of the entry. Must be populated when passed in.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.PDAHandler.AddCustomScannerEntry(TechType,TechType,System.Boolean,System.String,System.Int32,System.Single,System.Boolean)">
+            <summary>
+            Adds in a custom <see cref="T:PDAScanner.EntryData"/>.
+            </summary>
+            <param name="key">The scanned object's <see cref="T:TechType"/>. In case of fragments, the fragment <see cref="T:TechType"/> is the key.</param>
+            <param name="blueprint">The <paramref name="blueprint"/> when unlocked when scanned. In case of fragments, this is the actual <see cref="T:TechType"/> that unlocks when all fragments are scanned.</param>
+            <param name="isFragment">Whether the <paramref name="key"/> is a fragment or not.</param>
+            <param name="totalFragmentsRequired">The total amount of objects of <paramref name="key"/> that need to be scanned to unlock the <paramref name="blueprint"/> and <paramref name="encyclopediaKey"/>.</param>
+            <param name="scanTime">The amount of time it takes to finish one scan. In seconds.</param>
+            <param name="destroyAfterScan">Whether the object should be destroyed after the scan is finished.</param>
+            <param name="encyclopediaKey">The key to the encyclopedia entry.</param>
         </member>
         <member name="T:SMLHelper.V2.Handlers.PrefabHandler">
             <summary>
@@ -1821,22 +1953,7 @@
             Main entry point for all calls to this handler.
             </summary>
         </member>
-        <member name="M:SMLHelper.V2.Handlers.SpriteHandler.RegisterSprite(TechType,Atlas.Sprite)">
-            <summary>
-            Registers a new sprite to the game.
-            </summary>
-            <param name="type">The techtype paired to this sprite.</param>
-            <param name="sprite">The sprite to be added.</param>
-        </member>
         <member name="M:SMLHelper.V2.Handlers.SpriteHandler.RegisterSprite(SpriteManager.Group,System.String,Atlas.Sprite)">
-            <summary>
-            Registers a new sprite to the game.
-            </summary>
-            <param name="group">The sprite group.</param>
-            <param name="id">The sprite internal identifier.</param>
-            <param name="sprite">The sprite to be added.</param>
-        </member>
-        <member name="M:SMLHelper.V2.Handlers.SpriteHandler.RegisterSprite(SpriteManager.Group,System.String,UnityEngine.Sprite)">
             <summary>
             Registers a new sprite to the game.
             </summary>
@@ -1844,7 +1961,7 @@
             <param name="id">The sprite internal identifier.</param>
             <param name="sprite">The sprite to be added.</param>
         </member>
-        <member name="M:SMLHelper.V2.Handlers.SpriteHandler.RegisterSprite(TechType,UnityEngine.Sprite)">
+        <member name="M:SMLHelper.V2.Handlers.SpriteHandler.RegisterSprite(TechType,Atlas.Sprite)">
             <summary>
             Registers a new sprite to the game.
             </summary>
@@ -1904,21 +2021,6 @@
             </summary>
             <param name="group">The sprite group.</param>
             <param name="id">The sprite internal identifier.</param>
-            <param name="sprite">The sprite to be added.</param>
-        </member>
-        <member name="M:SMLHelper.V2.Handlers.SpriteHandler.SMLHelper#V2#Interfaces#ISpriteHandler#RegisterSprite(SpriteManager.Group,System.String,UnityEngine.Sprite)">
-            <summary>
-            Registers a new sprite to the game.
-            </summary>
-            <param name="group">The sprite group this sprite will be added to.</param>
-            <param name="id">The sprite internal identifier.</param>
-            <param name="sprite">The sprite to be added.</param>
-        </member>
-        <member name="M:SMLHelper.V2.Handlers.SpriteHandler.SMLHelper#V2#Interfaces#ISpriteHandler#RegisterSprite(TechType,UnityEngine.Sprite)">
-            <summary>
-            Registers a new sprite to the game.
-            </summary>
-            <param name="type">The techtype paired to this sprite.</param>
             <param name="sprite">The sprite to be added.</param>
         </member>
         <member name="M:SMLHelper.V2.Handlers.SpriteHandler.SMLHelper#V2#Interfaces#ISpriteHandler#RegisterSprite(TechType,System.String)">
@@ -2011,27 +2113,6 @@
             <param name="unlockAtStart">Whether this TechType should be unlocked on game start, or not. By default, <c>true</c>.</param>
             <returns>The new <see cref="T:TechType"/> that is created.</returns>
         </member>
-        <member name="M:SMLHelper.V2.Handlers.TechTypeHandler.AddTechType(System.String,System.String,System.String,UnityEngine.Sprite)">
-            <summary>
-            Adds a new <see cref="T:TechType"/> into the game, with a sprite. This new techtype will be unlocked at the start of a the game.
-            </summary>
-            <param name="internalName">The internal name of the TechType. Should not contain special characters.</param>
-            <param name="displayName">The display name of the TechType. Can be anything.</param>
-            <param name="tooltip">The tooltip, displayed when hovered in an inventory. Can be anything.</param>
-            <param name="sprite">The sprite that will related to this TechType.</param>
-            <returns>The new <see cref="T:TechType"/> that is created.</returns>
-        </member>
-        <member name="M:SMLHelper.V2.Handlers.TechTypeHandler.AddTechType(System.String,System.String,System.String,UnityEngine.Sprite,System.Boolean)">
-            <summary>
-            Adds a new <see cref="T:TechType"/> into the game, with a sprite.
-            </summary>
-            <param name="internalName">The internal name of the TechType. Should not contain special characters.</param>
-            <param name="displayName">The display name of the TechType. Can be anything.</param>
-            <param name="tooltip">The tooltip, displayed when hovered in an inventory. Can be anything.</param>
-            <param name="sprite">The sprite that will related to this TechType.</param>
-            <param name="unlockAtStart">Whether this TechType should be unlocked on game start, or not. By default, <c>true</c>.</param>
-            <returns>The new <see cref="T:TechType"/> that is created.</returns>
-        </member>
         <member name="M:SMLHelper.V2.Handlers.TechTypeHandler.TryGetModdedTechType(System.String,TechType@)">
             <summary>
             Safely looks for a modded item from another mod in the SMLHelper TechTypeCache and outputs its <see cref="T:TechType" /> value when found.
@@ -2099,27 +2180,6 @@
             <param name="sprite">The sprite that will related to this TechType.</param>
             <returns>The new <see cref="T:TechType"/> that is created.</returns>
         </member>
-        <member name="M:SMLHelper.V2.Handlers.TechTypeHandler.SMLHelper#V2#Interfaces#ITechTypeHandler#AddTechType(System.String,System.String,System.String,UnityEngine.Sprite,System.Boolean)">
-            <summary>
-            Adds a new <see cref="T:TechType"/> into the game, with a sprite.
-            </summary>
-            <param name="internalName">The internal name of the TechType. Should not contain special characters.</param>
-            <param name="displayName">The display name of the TechType. Can be anything.</param>
-            <param name="tooltip">The tooltip, displayed when hovered in an inventory. Can be anything.</param>
-            <param name="sprite">The sprite that will related to this TechType.</param>
-            <param name="unlockAtStart">Whether this TechType should be unlocked on game start, or not. By default, <c>true</c>.</param>
-            <returns>The new <see cref="T:TechType"/> that is created.</returns>
-        </member>
-        <member name="M:SMLHelper.V2.Handlers.TechTypeHandler.SMLHelper#V2#Interfaces#ITechTypeHandler#AddTechType(System.String,System.String,System.String,UnityEngine.Sprite)">
-            <summary>
-            Adds a new <see cref="T:TechType"/> into the game, with a sprite. This new techtype will be unlocked at the start of a the game.
-            </summary>
-            <param name="internalName">The internal name of the TechType. Should not contain special characters.</param>
-            <param name="displayName">The display name of the TechType. Can be anything.</param>
-            <param name="tooltip">The tooltip, displayed when hovered in an inventory. Can be anything.</param>
-            <param name="sprite">The sprite that will related to this TechType.</param>
-            <returns>The new <see cref="T:TechType"/> that is created.</returns>
-        </member>
         <member name="M:SMLHelper.V2.Handlers.TechTypeHandler.SMLHelper#V2#Interfaces#ITechTypeHandler#TryGetModdedTechType(System.String,TechType@)">
             <summary>
             Safely looks for a modded item from another mod in the SMLHelper TechTypeCache and outputs its <see cref="T:TechType" /> value when found.
@@ -2147,12 +2207,47 @@
             so if two mods are added at the same time, it may take a second game load for both to be visible to each other.
             </remarks>
         </member>
+        <member name="T:SMLHelper.V2.Handlers.WorldEntityDatabaseHandler">
+            <summary>
+            A handler for the WorldEntityDatabase of the game.
+            </summary>
+        </member>
+        <member name="P:SMLHelper.V2.Handlers.WorldEntityDatabaseHandler.Main">
+            <summary>
+            Main entry point for all calls to this handler.
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.WorldEntityDatabaseHandler.AddCustomInfo(System.String,UWE.WorldEntityInfo)">
+            <summary>
+            Adds in a custom <see cref="T:UWE.WorldEntityInfo"/> to the <see cref="T:UWE.WorldEntityDatabase"/> of the game.
+            It contains information about the entity, like its <see cref="T:LargeWorldEntity.CellLevel"/>, its <see cref="T:EntitySlot.Type"/>, etc.
+            </summary>
+            <param name="classId">The classID of the entity whose data you are adding in.</param>
+            <param name="data">The <see cref="T:UWE.WorldEntityInfo"/> data. Data is stored in the fields of the class, so they must be populated when passed in.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.WorldEntityDatabaseHandler.AddCustomInfo(System.String,TechType,UnityEngine.Vector3,System.Boolean,LargeWorldEntity.CellLevel,EntitySlot.Type)">
+            <summary>
+            Adds in a custom <see cref="T:UWE.WorldEntityInfo"/> to the <see cref="T:UWE.WorldEntityDatabase"/> of the game.
+            It contains information about the entity, like its <see cref="T:LargeWorldEntity.CellLevel"/>, its <see cref="T:EntitySlotData.EntitySlotType"/>, etc.
+            </summary>
+            <param name="classId">The classId of the entity.</param>
+            <param name="techType">The <see cref="T:TechType"/> of the entity.</param>
+            <param name="prefabZUp">Whether the prefab's Z-axis should be facing up, when spawned.</param>
+            <param name="cellLevel">The <see cref="T:LargeWorldEntity.CellLevel"/> of the entity.</param>
+            <param name="slotType">The <see cref="T:EntitySlot.Type"/> of the entity. Dictates which "slots" are suitable for this entity to spawn in. For e.g., most in-crate fragments have a <see cref="F:EntitySlot.Type.Small"/> slot type.</param>
+            <param name="localScale">The scale that the entity's local scale is set to when spawned.</param>
+        </member>
         <member name="T:SMLHelper.V2.Initializer">
             <summary>
             WARNING: This class is for use only by QModManager.
             </summary>
         </member>
-        <member name="M:SMLHelper.V2.Initializer.Patch">
+        <member name="M:SMLHelper.V2.Initializer.PrePatch">
+            <summary>
+            WARNING: This method is for use only by QModManager.
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Initializer.PostPatch">
             <summary>
             WARNING: This method is for use only by QModManager.
             </summary>
@@ -2379,30 +2474,7 @@
             <param name="displayName">The display name of the tab, which will show up when you hover your mouse on the tab.</param>
             <param name="sprite">The sprite of the tab.</param>        
         </member>
-        <member name="M:SMLHelper.V2.Interfaces.ICraftTreeHandler.AddTabNode(CraftTree.Type,System.String,System.String,UnityEngine.Sprite)">
-            <summary>
-            Adds a new tab node to the root of the specified crafting tree.
-            </summary>
-            <param name="craftTree">The target craft tree to edit.</param>
-            <param name="name">The ID of the tab node. Must be unique!</param>
-            <param name="displayName">The display name of the tab, which will show up when you hover your mouse on the tab.</param>
-            <param name="sprite">The sprite of the tab.</param>        
-        </member>
         <member name="M:SMLHelper.V2.Interfaces.ICraftTreeHandler.AddTabNode(CraftTree.Type,System.String,System.String,Atlas.Sprite,System.String[])">
-            <summary>
-            Adds a new tab node to the root of the specified crafting tree, at the specified tab location.
-            </summary>
-            <param name="craftTree">The target craft tree to edit.</param>
-            <param name="name">The ID of the tab node. Must be unique!</param>
-            <param name="displayName">The display name of the tab, which will show up when you hover your mouse on the tab.</param>
-            <param name="sprite">The sprite of the tab.</param>
-            <param name="stepsToTab">
-            <para>The steps to the target tab.</para>
-            <para>These must match the id value of the CraftNode in the crafting tree you're targeting.</para>
-            <para>Do not include "root" in this path.</para>
-            </param>        
-        </member>
-        <member name="M:SMLHelper.V2.Interfaces.ICraftTreeHandler.AddTabNode(CraftTree.Type,System.String,System.String,UnityEngine.Sprite,System.String[])">
             <summary>
             Adds a new tab node to the root of the specified crafting tree, at the specified tab location.
             </summary>
@@ -2598,6 +2670,67 @@
             <param name="techType">The <see cref="T:TechType"/> whose tooltip that is to be changed.</param>
             <param name="text">The new tooltip for the chosen <see cref="T:TechType"/>.</param>
         </member>
+        <member name="T:SMLHelper.V2.Interfaces.ILootDistributionHandler">
+            <summary>
+            A handler that manages Loot Distribution (spawning of fragments, fish, etc).
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.ILootDistributionHandler.AddLootDistributionData(System.String,LootDistributionData.SrcData)">
+            <summary>
+            Adds in a custom entry into the Loot Distribution of the game.
+            </summary>
+            <param name="data"></param>
+            <param name="classId"></param>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.ILootDistributionHandler.AddLootDistributionData(System.String,LootDistributionData.SrcData,UWE.WorldEntityInfo)">
+            <summary>
+            Adds in a custom entry into the Loot Distribution of the game.
+            You must also add the <see cref="T:UWE.WorldEntityInfo"/> into the <see cref="T:UWE.WorldEntityDatabase"/> using <see cref="T:SMLHelper.V2.Handlers.WorldEntityDatabaseHandler"/>.
+            </summary>
+            <param name="data">The <see cref="T:LootDistributionData.SrcData"/> that contains data related to the spawning of a prefab, also contains the path to the prefab.</param>
+            <param name="classId">The classId of the prefab.</param>
+            <param name="info">The WorldEntityInfo of the prefab. For more information on how to set this up, see <see cref="T:SMLHelper.V2.Handlers.WorldEntityDatabaseHandler"/>.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.ILootDistributionHandler.AddLootDistributionData(System.String,System.String,System.Collections.Generic.IEnumerable{LootDistributionData.BiomeData})">
+            <summary>
+            Adds in a custom entry into the Loot Distribution of the game.
+            You must also add the <see cref="T:UWE.WorldEntityInfo"/> into the <see cref="T:UWE.WorldEntityDatabase"/> using <see cref="T:SMLHelper.V2.Handlers.WorldEntityDatabaseHandler"/>.
+            </summary>
+            <param name="classId">The classId of the prefab.</param>
+            <param name="prefabPath">The prefab path of the prefab.</param>
+            <param name="biomeDistribution">The <see cref="T:LootDistributionData.BiomeData"/> dictating how the prefab should spawn in the world.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.ILootDistributionHandler.AddLootDistributionData(System.String,System.String,System.Collections.Generic.IEnumerable{LootDistributionData.BiomeData},UWE.WorldEntityInfo)">
+            <summary>
+            Adds in a custom entry into the Loot Distribution of the game.
+            You must also add the <see cref="T:UWE.WorldEntityInfo"/> into the <see cref="T:UWE.WorldEntityDatabase"/> using <see cref="T:SMLHelper.V2.Handlers.WorldEntityDatabaseHandler"/>.
+            </summary>
+            <param name="classId">The classId of the prefab.</param>
+            <param name="prefabPath">The prefab path of the prefab.</param>
+            <param name="biomeDistribution">The <see cref="T:LootDistributionData.BiomeData"/> dictating how the prefab should spawn in the world.</param>
+            <param name="info">The WorldEntityInfo of the prefab. For more information on how to set this up, see <see cref="T:SMLHelper.V2.Handlers.WorldEntityDatabaseHandler"/>.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.ILootDistributionHandler.AddLootDistributionData(SMLHelper.V2.Assets.ModPrefab,System.Collections.Generic.IEnumerable{LootDistributionData.BiomeData},UWE.WorldEntityInfo)">
+            <summary>
+            Adds in a custom entry into the Loot Distribution of the game.
+            You must also add the <see cref="T:UWE.WorldEntityInfo"/> into the <see cref="T:UWE.WorldEntityDatabase"/> using <see cref="T:SMLHelper.V2.Handlers.WorldEntityDatabaseHandler"/>.
+            </summary>
+            <param name="prefab">The custom prefab which you want to spawn naturally in the game.</param>
+            <param name="biomeDistribution">The <see cref="T:LootDistributionData.BiomeData"/> dictating how the prefab should spawn in the world.</param>
+            <param name="info">The WorldEntityInfo of the prefab. For more information on how to set this up, see <see cref="T:SMLHelper.V2.Handlers.WorldEntityDatabaseHandler"/>.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.ILootDistributionHandler.EditLootDistributionData(System.String,BiomeType,System.Single,System.Int32)">
+            <summary>
+            Edits Loot Distribution Data for existing/original class IDs. 
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.ILootDistributionHandler.EditLootDistributionData(System.String,System.Collections.Generic.IEnumerable{LootDistributionData.BiomeData})">
+            <summary>
+            Edits Loot Distribution data for existing prefabs, for e.g. original game prefabs.
+            </summary>
+            <param name="classId">The ClassID of the prefab. If unsure, use CraftData.GetClassIdForTechType.</param>
+            <param name="biomeDistribution">The list of <see cref="T:LootDistributionData.BiomeData"/> that contains information about how/when it should spawn in biomes.</param>
+        </member>
         <member name="T:SMLHelper.V2.Interfaces.IOptionsPanelHandler">
             <summary>
             A handler class for registering your custom in-game mod options.
@@ -2609,6 +2742,17 @@
             </summary>
             <param name="options">The mod options. Create a new child class inheriting from this one and add your options to it.</param>
             <seealso cref="T:SMLHelper.V2.Options.ModOptions"/>
+        </member>
+        <member name="T:SMLHelper.V2.Interfaces.IPDAEncyclopediaHandler">
+            <summary>
+            Handles Encyclopedia.
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.IPDAEncyclopediaHandler.AddCustomEntry(PDAEncyclopedia.EntryData)">
+            <summary>
+            Adds custom entry.
+            </summary>
+            <param name="entry"></param>
         </member>
         <member name="T:SMLHelper.V2.Interfaces.IPDAHandler">
             <summary>
@@ -2629,6 +2773,12 @@
             <param name="techType">Can be either techtype of the fragment or the crafted item.</param>
             <param name="scanTime">The relative time spent on scanning. Default value is 1.</param>
         </member>
+        <member name="M:SMLHelper.V2.Interfaces.IPDAHandler.AddCustomScannerEntry(PDAScanner.EntryData)">
+            <summary>
+            Adds custom scanner entry.
+            </summary>
+            <param name="entryData"></param>
+        </member>
         <member name="T:SMLHelper.V2.Interfaces.IPrefabHandler">
             <summary>
             A handler for registering Unity prefabs associated to a <see cref="T:TechType"/>.
@@ -2646,22 +2796,7 @@
             A handler class for adding custom sprites into the game.
             </summary>
         </member>
-        <member name="M:SMLHelper.V2.Interfaces.ISpriteHandler.RegisterSprite(TechType,Atlas.Sprite)">
-            <summary>
-            Registers a new sprite to the game.
-            </summary>
-            <param name="type">The techtype paired to this sprite.</param>
-            <param name="sprite">The sprite to be added.</param>
-        </member>
         <member name="M:SMLHelper.V2.Interfaces.ISpriteHandler.RegisterSprite(SpriteManager.Group,System.String,Atlas.Sprite)">
-            <summary>
-            Registers a new sprite to the game.
-            </summary>
-            <param name="group">The sprite group.</param>
-            <param name="id">The sprite internal identifier.</param>
-            <param name="sprite">The sprite to be added.</param>
-        </member>
-        <member name="M:SMLHelper.V2.Interfaces.ISpriteHandler.RegisterSprite(SpriteManager.Group,System.String,UnityEngine.Sprite)">
             <summary>
             Registers a new sprite to the game.
             </summary>
@@ -2669,7 +2804,7 @@
             <param name="id">The sprite internal identifier.</param>
             <param name="sprite">The sprite to be added.</param>
         </member>
-        <member name="M:SMLHelper.V2.Interfaces.ISpriteHandler.RegisterSprite(TechType,UnityEngine.Sprite)">
+        <member name="M:SMLHelper.V2.Interfaces.ISpriteHandler.RegisterSprite(TechType,Atlas.Sprite)">
             <summary>
             Registers a new sprite to the game.
             </summary>
@@ -2761,27 +2896,6 @@
             <param name="unlockAtStart">Whether this TechType should be unlocked on game start, or not. By default, <c>true</c>.</param>
             <returns>The new <see cref="T:TechType"/> that is created.</returns>
         </member>
-        <member name="M:SMLHelper.V2.Interfaces.ITechTypeHandler.AddTechType(System.String,System.String,System.String,UnityEngine.Sprite)">
-            <summary>
-            Adds a new <see cref="T:TechType"/> into the game, with a sprite. This new techtype will be unlocked at the start of a the game.
-            </summary>
-            <param name="internalName">The internal name of the TechType. Should not contain special characters.</param>
-            <param name="displayName">The display name of the TechType. Can be anything.</param>
-            <param name="tooltip">The tooltip, displayed when hovered in an inventory. Can be anything.</param>
-            <param name="sprite">The sprite that will related to this TechType.</param>
-            <returns>The new <see cref="T:TechType"/> that is created.</returns>
-        </member>
-        <member name="M:SMLHelper.V2.Interfaces.ITechTypeHandler.AddTechType(System.String,System.String,System.String,UnityEngine.Sprite,System.Boolean)">
-            <summary>
-            Adds a new <see cref="T:TechType"/> into the game, with a sprite.
-            </summary>
-            <param name="internalName">The internal name of the TechType. Should not contain special characters.</param>
-            <param name="displayName">The display name of the TechType. Can be anything.</param>
-            <param name="tooltip">The tooltip, displayed when hovered in an inventory. Can be anything.</param>
-            <param name="sprite">The sprite that will related to this TechType.</param>
-            <param name="unlockAtStart">Whether this TechType should be unlocked on game start, or not. By default, <c>true</c>.</param>
-            <returns>The new <see cref="T:TechType"/> that is created.</returns>
-        </member>
         <member name="M:SMLHelper.V2.Interfaces.ITechTypeHandler.TryGetModdedTechType(System.String,TechType@)">
             <summary>
             Safely looks for a modded item from another mod in the SMLHelper TechTypeCache and outputs its <see cref="T:TechType" /> value when found.
@@ -2808,6 +2922,18 @@
             There's no guarantee in which order SMLHelper dependent mods are loaded,
             so if two mods are added at the same time, it may take a second game load for both to be visible to each other.
             </remarks>
+        </member>
+        <member name="T:SMLHelper.V2.Interfaces.IWorldEntityDatabaseHandler">
+            <summary>
+            Handles WorldEntityDatabase.
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.IWorldEntityDatabaseHandler.AddCustomInfo(System.String,UWE.WorldEntityInfo)">
+            <summary>
+            Adds custom World Entity data to WorldEntityDatabase.
+            </summary>
+            <param name="classId"></param>
+            <param name="data"></param>
         </member>
         <member name="T:SMLHelper.V2.Utility.IStorageHelper">
             <summary>
@@ -2922,11 +3048,20 @@
             </summary>
             <param name="filePathToImage">The path to the image file.</param>
             <param name="format">
-            <para>The texture format. By default, this uses <see cref="F:UnityEngine.TextureFormat.BC7" />.</para>
-            <para>https://docs.unity3d.com/ScriptReference/TextureFormat.BC7.html</para>
-            <para>Don't change this unless you really know what you're doing.</para>
+            The texture format. By default, this uses <see cref="F:UnityEngine.TextureFormat.BC7" />.<br/>
+            https://docs.unity3d.com/ScriptReference/TextureFormat.BC7.html <br/>
+            Don't change this unless you really know what you're doing.
             </param>
             <returns>Will return a new <see cref="T:Atlas.Sprite"/> instance if the file exists; Otherwise returns null.</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Utility.ImageUtils.LoadSpriteFromTexture(UnityEngine.Texture2D)">
+            <summary>
+            Creates a new <see cref="T:Atlas.Sprite" /> from a <see cref="T:UnityEngine.Texture2D"/>.
+            </summary>
+            <param name="texture2D">The 2D texture to convert into a sprite.</param>
+            <returns>
+            Will return a new <see cref="T:Atlas.Sprite" /> instance using the provided texture.
+            </returns>
         </member>
         <member name="T:SMLHelper.V2.Utility.IOUtilities">
             <summary>
@@ -3948,11 +4083,6 @@
         <member name="F:SMLHelper.V2.Patchers.ItemActionPatcher.CustomLeftClickItemAction">
             <summary>
             A constant <see cref="T:ItemAction"/> value to represent a custom left click item action
-            </summary>
-        </member>
-        <member name="P:SMLHelper.V2.Patchers.TooltipPatcher.ExtraItemInfoOption">
-            <summary>
-            Should be one of: '<see langword="Mod name (default)">'</see>, '<see langword="Mod name and item ID"></see>', or '<see langword="Nothing"></see>'
             </summary>
         </member>
         <member name="T:SMLHelper.V2.Patchers.SelfCheckingDictionary`2">
