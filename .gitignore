@@ -259,6 +259,6 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
-Dependancies/Assembly-CSharp.dll
 
-Dependancies/Assembly-CSharp-firstpass.dll
+Assembly-CSharp.dll
+Assembly-CSharp-firstpass.dll
