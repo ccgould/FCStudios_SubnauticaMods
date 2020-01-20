@@ -375,5 +375,15 @@ namespace FCSPowerStorage.Managers
             return _powerState;
         }
 
+        public void PollPowerRate(out float consumed, out float created)
+        {
+            consumed = 0f;
+            created = 0f;
+        }
+
+        public GameObject GetGameObject()
+        {
+            return base.gameObject;
+        }
     }
 }

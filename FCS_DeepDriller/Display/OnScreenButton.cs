@@ -31,6 +31,7 @@ namespace FCS_DeepDriller.Display
             {
                 HandReticle main = HandReticle.main;
 
+#if SUBNAUTICA
                 if (ButtonMode == InterfaceButtonMode.None)
                 {
                     main.SetIcon(HandReticle.IconType.Hand, 1f);
@@ -40,6 +41,20 @@ namespace FCS_DeepDriller.Display
                 {
                     main.SetInteractTextRaw(this.TextLineOne, this.TextLineTwo);
                 }
+#elif BELOWZERO
+                if (ButtonMode == InterfaceButtonMode.None)
+                {
+                    main.SetIcon(HandReticle.IconType.Hand, 1f);
+                    main.SetTextRaw(HandReticle.TextType.Hand, this.TextLineOne);
+                    main.SetTextRaw(HandReticle.TextType.Hand, this.TextLineTwo);
+                }
+                else
+                {
+                    main.SetTextRaw(HandReticle.TextType.Hand, this.TextLineOne);
+                    main.SetTextRaw(HandReticle.TextType.Hand, this.TextLineTwo);
+                }
+
+#endif
             }
 
             if (this.IsHovered && inInteractionRange == false)

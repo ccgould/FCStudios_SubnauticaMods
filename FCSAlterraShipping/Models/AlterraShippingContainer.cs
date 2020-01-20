@@ -25,7 +25,11 @@ namespace FCSAlterraShipping.Models
             int amount = 0;
             foreach (InventoryItem item in items)
             {
+#if SUBNAUTICA
                 var itemSize = CraftData.GetItemSize(item.item.GetTechType());
+#elif BELOWZERO
+                var itemSize = TechData.GetItemSize(item.item.GetTechType());
+#endif
                 amount += itemSize.x * itemSize.y;
             }
 
@@ -34,7 +38,11 @@ namespace FCSAlterraShipping.Models
 
         public bool IsFull(TechType techType)
         {
+#if SUBNAUTICA
             var itemSize = CraftData.GetItemSize(techType);
+#elif BELOWZERO
+            var itemSize = TechData.GetItemSize(techType);
+#endif
             return _container.count == MaxContainerSlots || !_container.HasRoomFor(itemSize.x, itemSize.y);
         }
 

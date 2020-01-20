@@ -1,13 +1,20 @@
 ﻿using System.Collections.Generic;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Assets;
+using UnityEngine;
 
 namespace FCSTechFabricator
 {
     public interface IFcTechFabricatorService
     {
         void AddCraftNode(Craftable item, string parentTabId);
+#if SUBNAUTICA
         void AddTabNode(string tabId, string displayText, Atlas.Sprite tabSprite, string parentTabNodeId = null);
+
+#elif BELOWZERO
+        void AddTabNode(string tabId, string displayText, Sprite tabSprite, string parentTabNodeId = null);
+
+#endif
         bool HasCraftingTab(string tabId);
     }
 
@@ -39,7 +46,8 @@ namespace FCSTechFabricator
                 knownItems.Add(item.ClassID);
             }
         }
-        
+
+#if SUBNAUTICA
         public void AddTabNode(string tabId, string displayText, Atlas.Sprite tabSprite,string parentTabNodeId = null)
         {
             if (parentTabNodeId != null && !knownTabs.Contains(parentTabNodeId))
@@ -54,6 +62,22 @@ namespace FCSTechFabricator
                 knownTabs.Add(tabId);
             }
         }
+#elif BELOWZERO
+        public void AddTabNode(string tabId, string displayText, Sprite tabSprite, string parentTabNodeId = null)
+        {
+            if (parentTabNodeId != null && !knownTabs.Contains(parentTabNodeId))
+            {
+                QuickLogger.Error($"Parent Tab {parentTabNodeId} does not exist and should be added before adding this tab {tabId} to the fabricator");
+                return;
+            }
+
+            if (!knownTabs.Contains(tabId))
+            {
+                fcTechFabricator.AddTabNode(tabId, displayText, tabSprite, parentTabNodeId);
+                knownTabs.Add(tabId);
+            }
+        }
+#endif
 
         public bool HasCraftingTab(string tabId)
         {

@@ -3,6 +3,7 @@ using AE.SeaCooker.Managers;
 using AE.SeaCooker.Mono;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
+using FCSCommon.Extensions;
 using SMLHelper.V2.Crafting;
 using System.Collections.Generic;
 using System.IO;
@@ -47,6 +48,7 @@ namespace AE.SeaCooker.Buildable
         }
 
         public override string AssetsFolder { get; } = $"{Mod.ModName}/Assets";
+#if SUBNAUTICA
         protected override TechData GetBlueprintRecipe()
         {
             QuickLogger.Debug($"Creating recipe...");
@@ -56,11 +58,27 @@ namespace AE.SeaCooker.Buildable
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(TechTypeHelpers.GetTechType("SeaCookerBuildableKit_SC"), 1)
+                    new Ingredient(Mod.SeaCookerKitClassID.ToTechType(), 1)
                 }
             };
             return customFabRecipe;
         }
+#elif BELOWZERO
+        protected override RecipeData GetBlueprintRecipe()
+        {
+            QuickLogger.Debug($"Creating recipe...");
+            // Create and associate recipe to the new TechType
+            var customFabRecipe = new RecipeData()
+            {
+                craftAmount = 1,
+                Ingredients = new List<Ingredient>()
+                {
+                    new Ingredient(Mod.SeaCookerKitClassID.ToTechType(), 1)
+                }
+            };
+            return customFabRecipe;
+        }
+#endif
 
         public override TechGroup GroupForPDA { get; } = TechGroup.InteriorModules;
         public override TechCategory CategoryForPDA { get; } = TechCategory.InteriorModule;

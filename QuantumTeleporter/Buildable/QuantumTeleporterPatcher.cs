@@ -58,6 +58,7 @@ namespace QuantumTeleporter.Buildable
         }
 
         public override string AssetsFolder { get; } = $"{Mod.ModFolderName}/Assets";
+#if SUBNAUTICA
         protected override TechData GetBlueprintRecipe()
         {
             QuickLogger.Debug($"Creating recipe...");
@@ -72,6 +73,23 @@ namespace QuantumTeleporter.Buildable
             };
             return customFabRecipe;
         }
+#elif BELOWZERO
+        protected override RecipeData GetBlueprintRecipe()
+        {
+            QuickLogger.Debug($"Creating recipe...");
+            // Create and associate recipe to the new TechType
+            var customFabRecipe = new RecipeData()
+            {
+                craftAmount = 1,
+                Ingredients = new List<Ingredient>()
+                {
+                    new Ingredient(Mod.QuantumTeleporterKitClassID.ToTechType(), 1)
+                }
+            };
+            return customFabRecipe;
+        }
+
+#endif
 
         public override TechGroup GroupForPDA { get; } = TechGroup.InteriorModules;
         public override TechCategory CategoryForPDA { get; } = TechCategory.InteriorModule;

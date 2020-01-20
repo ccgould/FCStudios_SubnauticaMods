@@ -26,7 +26,13 @@ namespace QuantumTeleporter.Managers
 
             if (this.IsHovered && inInteractionRange)
             {
+#if SUBNAUTICA
                 HandReticle.main.SetInteractTextRaw($"{QuantumTeleporterBuildable.Coordinate()}: {_mono.transform.position}", $"{QuantumTeleporterBuildable.PowerAvailable()}: {_mono.PowerManager.PowerAvailable()}");
+#elif BELOWZERO
+
+                HandReticle.main.SetTextRaw(HandReticle.TextType.Hand, $"{QuantumTeleporterBuildable.Coordinate()}: {_mono.transform.position}");
+                HandReticle.main.SetTextRaw(HandReticle.TextType.HandSubscript, $"{QuantumTeleporterBuildable.PowerAvailable()}: {_mono.PowerManager.PowerAvailable()}");
+#endif
             }
         }
 

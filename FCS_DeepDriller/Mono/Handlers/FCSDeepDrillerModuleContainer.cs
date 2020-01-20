@@ -221,7 +221,12 @@ namespace FCS_DeepDriller.Mono.Handlers
                 if (module.Module == TechType.None) continue;
                 var attachment = module.Module.ToPickupable();
                 if (attachment == null) continue;
+#if SUBNAUTICA
                 _equipment.AddItem(module.Slot, new InventoryItem(attachment.Pickup(false)));
+#elif BELOWZERO
+                attachment.Pickup(false);
+                _equipment.AddItem(module.Slot, new InventoryItem(attachment));
+#endif
             }
         }
 

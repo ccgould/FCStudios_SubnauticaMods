@@ -54,10 +54,17 @@ namespace FCSCommon.Components
             Charge = 0;
         }
 
+#if SUBNAUTICA
         public void OnHandHover(GUIHand hand)
         {
             HandReticle.main.SetInteractText($"{Charge}/{Capacity}", false);
         }
+#elif BELOWZERO
+        public void OnHandHover(GUIHand hand)
+        {
+            HandReticle.main.SetText(HandReticle.TextType.Hand ,$"{Charge}/{Capacity}", false);
+        }
+#endif
 
         public void OnHandClick(GUIHand hand)
         {

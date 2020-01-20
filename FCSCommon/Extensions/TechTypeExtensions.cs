@@ -6,6 +6,7 @@ namespace FCSCommon.Extensions
 {
     internal static class FCSTechTypeExtensions
     {
+#if SUBNAUTICA
         internal static Pickupable ToPickupable(this TechType techType)
         {
             Pickupable pickupable = null;
@@ -31,6 +32,36 @@ namespace FCSCommon.Extensions
             }
             return item;
         }
+#elif BELOWZERO
+        internal static Pickupable ToPickupable(this TechType techType)
+        {
+            Pickupable pickupable = null;
+            var prefab = CraftData.GetPrefabForTechType(techType);
+            if (prefab != null)
+            {
+                var go = GameObject.Instantiate(prefab);
+                pickupable = go.GetComponent<Pickupable>();
+                pickupable.Pickup(false);
+            }
+
+            return pickupable;
+        }
+
+        internal static InventoryItem ToInventoryItem(this TechType techType)
+        {
+            InventoryItem item = null;
+            var prefab = CraftData.GetPrefabForTechType(techType);
+            if (prefab != null)
+            {
+                var go = GameObject.Instantiate(prefab);
+                var pickupable = go.GetComponent<Pickupable>();
+                pickupable.Pickup(false);
+                item = new InventoryItem(pickupable);
+            }
+            return item;
+        }
+
+#endif
 
         internal static TechType ToTechType(this string value)
         {

@@ -29,6 +29,7 @@ namespace AMMiniMedBay.Display
         {
             bool inInteractionRange = InInteractionRange();
 
+#if SUBNAUTICA
             if (this.IsHovered && inInteractionRange)
             {
                 HandReticle main = HandReticle.main;
@@ -54,6 +55,36 @@ namespace AMMiniMedBay.Display
                     main.SetInteractTextRaw(this.TextLineOne, this.TextLineTwo);
                 }
             }
+#elif BELOWZERO
+            if (this.IsHovered && inInteractionRange)
+            {
+                HandReticle main = HandReticle.main;
+
+                if (ButtonMode == InterfaceButtonMode.None)
+                {
+                    if (Container != null)
+                    {
+                        if (Container.IsContainerFull)
+                        {
+                            main.SetIcon(HandReticle.IconType.Hand, 1f);
+                            main.SetTextRaw(HandReticle.TextType.Hand, this.TextLineOne);
+                            main.SetTextRaw(HandReticle.TextType.Hand, this.TextLineTwo);
+                        }
+                        else
+                        {
+                            main.SetProgress(Container.Progress);
+                            main.SetIcon(HandReticle.IconType.Progress, 1f);
+                        }
+                    }
+                }
+                else
+                {
+                    main.SetTextRaw(HandReticle.TextType.Hand, this.TextLineOne);
+                    main.SetTextRaw(HandReticle.TextType.Hand, this.TextLineTwo);
+                }
+            }
+
+#endif
 
             if (this.IsHovered && inInteractionRange == false)
             {

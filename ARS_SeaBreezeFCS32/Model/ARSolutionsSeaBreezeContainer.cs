@@ -194,7 +194,13 @@ namespace ARS_SeaBreezeFCS32.Model
                 eatable.foodValue = eatableEntities.FoodValue;
                 eatable.waterValue = eatableEntities.WaterValue;
 
+#if SUBNAUTICA
                 var item = new InventoryItem(food.gameObject.GetComponent<Pickupable>().Pickup(false));
+#elif BELOWZERO
+                Pickupable pickupable = food.gameObject.GetComponent<Pickupable>();
+                pickupable.Pickup(false);
+                var item = new InventoryItem(pickupable);
+#endif
 
                 AddItem(item);
 

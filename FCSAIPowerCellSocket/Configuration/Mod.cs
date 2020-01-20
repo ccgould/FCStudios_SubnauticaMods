@@ -26,7 +26,9 @@ namespace FCSAIPowerCellSocket.Configuration
         internal static string GameObjectName => ClassID;
         internal static string ModFolderName => $"FCS_{ModName}";
         internal static string BundleName => "aipowercellsocketbundle";
+        internal static string PowercellSocketId = "PowerCellSocket_AIS";
 
+#if SUBNAUTICA
         internal static TechData PowercellSocketIngredients => new TechData
         {
             craftAmount = 1,
@@ -38,6 +40,19 @@ namespace FCSAIPowerCellSocket.Configuration
                 new Ingredient(TechType.Titanium, 3)
             }
         };
+#elif BELOWZERO
+        internal static RecipeData PowercellSocketIngredients => new RecipeData
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(TechType.AdvancedWiringKit, 1),
+                new Ingredient(TechType.Battery, 1),
+                new Ingredient(TechType.Glass, 3),
+                new Ingredient(TechType.Titanium, 3)
+            }
+        };
+#endif
 
         #region Save
 
@@ -102,12 +117,17 @@ namespace FCSAIPowerCellSocket.Configuration
         }
         #endregion
 
+#if SUBNAUTICA
         internal static Atlas.Sprite GetIcon(string modTabId)
         {
-            return new Atlas.Sprite(ImageUtils.LoadTextureFromFile(Path.Combine(Mod.GetAssetPath(), $"{modTabId}Icon.png")));
+            return ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), $"{modTabId}Icon.png"));
         }
-
-
+#elif BELOWZERO
+        internal static Sprite GetIcon(string modTabId)
+        {
+            return ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), $"{modTabId}Icon.png"));
+        }
+#endif
 
         internal static void OnSaveComplete()
         {

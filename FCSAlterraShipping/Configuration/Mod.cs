@@ -19,7 +19,8 @@ namespace FCSAlterraShipping.Configuration
         internal const string GameObjectName = "AlterraShippingMod";
         internal const string AlterraShippingTabID = "ASU";
         internal const string AlterraShippingKitClassID = "ASShippingKit_AS";
-        
+
+#if SUBNAUTICA
         internal static TechData AlterraShippingIngredients => new TechData
         {
             craftAmount = 1,
@@ -32,6 +33,20 @@ namespace FCSAlterraShipping.Configuration
                 new Ingredient(TechType.Glass, 1)
             }
         };
+#elif BELOWZERO
+        internal static RecipeData AlterraShippingIngredients => new RecipeData
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(TechType.AdvancedWiringKit, 1),
+                new Ingredient(TechType.VehicleStorageModule, 1),
+                new Ingredient(TechType.TitaniumIngot, 1),
+                new Ingredient(TechType.Beacon, 1),
+                new Ingredient(TechType.Glass, 1)
+            }
+        };
+#endif
 
         internal static string ModDirectoryName => $"FCS_{ModName}";
         internal static string SaveDataFilename => $"{ModName}SaveData.json";

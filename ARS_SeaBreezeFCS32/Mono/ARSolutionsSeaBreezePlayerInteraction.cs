@@ -25,7 +25,11 @@ namespace ARS_SeaBreezeFCS32.Mono
         {
             if (_onInterfaceButton) return;
             HandReticle main = HandReticle.main;
+#if SUBNAUTICA
             main.SetInteractText(LanguageHelpers.GetLanguage(ARSSeaBreezeFCS32Buildable.OnSeabreezeHoverkey));
+#elif BELOWZERO
+            main.SetText(HandReticle.TextType.Hand ,LanguageHelpers.GetLanguage(ARSSeaBreezeFCS32Buildable.OnSeabreezeHoverkey), false);
+#endif
             main.SetIcon(HandReticle.IconType.Hand, 1f);
         }
 

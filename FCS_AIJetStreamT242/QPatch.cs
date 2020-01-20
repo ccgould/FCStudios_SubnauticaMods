@@ -76,7 +76,7 @@ namespace FCS_AIMarineTurbine
 
         private static void AddItemsToTechFabricator()
         {
-            var icon = new Atlas.Sprite(ImageUtils.LoadTextureFromFile(Path.Combine(Mod.GetAssetFolder(), $"{Mod.MarineMonitorClassID}.png")));
+            var icon = ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetFolder(), $"{Mod.MarineMonitorClassID}.png"));
             var craftingTab = new CraftingTab(Mod.MarineTurbinesTabID, Mod.MarineTurbinesFriendlyName, icon);
 
             var jetStreamT242Kit = new FCSKit(Mod.JetstreamKitClassID, Mod.JetStreamFriendlyName, craftingTab, Mod.JetstreamKitIngredients);

@@ -10,9 +10,12 @@ namespace FCSTechFabricator.Craftables
 {
     public class FCSModule : FcCraftable
     {
-        private TechData _ingredients;
         private string _assetFolder = Mod.GetAssetPath();
         private string _iconFileName;
+#if SUBNAUTICA
+        
+        private TechData _ingredients;
+
         public FCSModule(string classId, string friendlyName, string description, FcCraftingTab parentTab, TechData ingredients) : base(classId, friendlyName, description, parentTab)
         {
             _ingredients = ingredients;
@@ -21,6 +24,20 @@ namespace FCSTechFabricator.Craftables
                 CraftDataHandler.SetEquipmentType(TechType, EquipmentType.CyclopsModule);
             };
         }
+#elif BELOWZERO
+
+        private RecipeData _ingredients;
+
+        public FCSModule(string classId, string friendlyName, string description, FcCraftingTab parentTab, RecipeData ingredients) : base(classId, friendlyName, description, parentTab)
+        {
+            _ingredients = ingredients;
+            OnFinishedPatching += () =>
+            {
+                CraftDataHandler.SetEquipmentType(TechType, EquipmentType.CyclopsModule);
+            };
+        }
+
+#endif
 
         public override GameObject GetGameObject()
         {
@@ -33,15 +50,29 @@ namespace FCSTechFabricator.Craftables
             return prefab;
         }
 
+#if SUBNAUTICA
         protected override Atlas.Sprite GetItemSprite()
         {
-            return new Atlas.Sprite(ImageUtils.LoadTextureFromFile(Path.Combine(_assetFolder, $"{_iconFileName}.png")));
+            return ImageUtils.LoadSpriteFromFile(Path.Combine(_assetFolder, $"{_iconFileName}.png"));
         }
 
         protected override TechData GetBlueprintRecipe()
         {
             return _ingredients;
         }
+
+#elif BELOWZERO
+        protected override Sprite GetItemSprite()
+        {
+            return ImageUtils.LoadSpriteFromFile(Path.Combine(_assetFolder, $"{_iconFileName}.png"));
+        }
+
+        protected override RecipeData GetBlueprintRecipe()
+        {
+            return _ingredients;
+        }
+
+#endif
 
         public void ChangeIconLocation(string assetFolder, string iconFileName)
         {

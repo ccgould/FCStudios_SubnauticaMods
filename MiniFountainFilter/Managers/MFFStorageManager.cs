@@ -170,7 +170,13 @@ namespace AE.MiniFountainFilter.Managers
         private void SpawnBottle()
         {
             var bottle = GameObject.Instantiate(_bottle);
+#if SUBNAUTICA
             var newInventoryItem = new InventoryItem(bottle.GetComponent<Pickupable>().Pickup(false));
+#elif BELOWZERO
+            Pickupable pickupable = bottle.GetComponent<Pickupable>();
+            pickupable.Pickup(false);
+            var newInventoryItem = new InventoryItem(pickupable);
+#endif
             _container.UnsafeAdd(newInventoryItem);
             OnWaterAdded?.Invoke();
         }

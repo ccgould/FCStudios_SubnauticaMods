@@ -95,6 +95,7 @@ namespace AE.SeaCooker.Craftable
             MaterialHelpers.ApplyAlphaShader("SeaCooker_BaseColor", prefab);
         }
 
+#if SUBNAUTICA
         protected override TechData GetBlueprintRecipe()
         {
             QuickLogger.Debug($"Creating recipe...");
@@ -115,8 +116,33 @@ namespace AE.SeaCooker.Craftable
 
         protected override Atlas.Sprite GetItemSprite()
         {
-            return new Atlas.Sprite(ImageUtils.LoadTextureFromFile(Path.Combine(Mod.GetAssetFolder(), $"{ClassID}.png")));
+            return ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetFolder(), $"{ClassID}.png"));
         }
+#elif BELOWZERO
+        protected override RecipeData GetBlueprintRecipe()
+        {
+            QuickLogger.Debug($"Creating recipe...");
+            // Create and associate recipe to the new TechType
+            var customFabRecipe = new RecipeData()
+            {
+                craftAmount = 1,
+                Ingredients = new List<Ingredient>()
+                {
+                    new Ingredient(TechType.SeaTreaderPoop, 2),
+                    new Ingredient(TechType.Tank, 1),
+                    new Ingredient(TechType.HydrochloricAcid, 1),
+                    new Ingredient(TechType.BigFilteredWater, 2)
+                }
+            };
+            return customFabRecipe;
+        }
+
+        protected override Sprite GetItemSprite()
+        {
+            return ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetFolder(), $"{ClassID}.png"));
+        }
+#endif
+
         public override TechGroup GroupForPDA { get; } = TechGroup.Resources;
         public override TechCategory CategoryForPDA { get; } = TechCategory.AdvancedMaterials;
         protected override string AssetBundleName => Mod.BundleName;

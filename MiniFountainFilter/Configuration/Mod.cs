@@ -30,6 +30,7 @@ namespace AE.MiniFountainFilter.Configuration
         internal const string MiniFountainFilterKitClassID = "MiniFountainFilterKit_MFF";
 
 
+#if SUBNAUTICA
         internal static TechData MiniFountainFilterKitIngredients => new TechData
         {
             craftAmount = 1,
@@ -42,6 +43,20 @@ namespace AE.MiniFountainFilter.Configuration
                 new Ingredient(TechType.Glass, 1)
             }
         };
+#elif BELOWZERO
+        internal static RecipeData MiniFountainFilterKitIngredients => new RecipeData
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(TechType.AdvancedWiringKit, 1),
+                new Ingredient(TechType.Bleach, 2),
+                new Ingredient(TechType.FiberMesh, 2),
+                new Ingredient(TechType.Titanium, 1),
+                new Ingredient(TechType.Glass, 1)
+            }
+        };
+#endif
 
         internal static string MODFOLDERLOCATION => GetModPath();
 

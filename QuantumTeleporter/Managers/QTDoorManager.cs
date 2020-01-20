@@ -37,7 +37,8 @@ namespace QuantumTeleporter.Managers
 
             HandReticle main = HandReticle.main;
             main.SetIcon(HandReticle.IconType.Hand);
-            
+
+#if SUBNAUTICA
             if (!IsDoorOpen())
             {
                 main.SetInteractText(QuantumTeleporterBuildable.OpenDoor());
@@ -46,6 +47,16 @@ namespace QuantumTeleporter.Managers
             {
                 main.SetInteractText(QuantumTeleporterBuildable.CloseDoor());
             }
+#elif BELOWZERO
+            if (!IsDoorOpen())
+            {
+                main.SetText(HandReticle.TextType.Hand, QuantumTeleporterBuildable.OpenDoor(), false);
+            }
+            else
+            {
+                main.SetText(HandReticle.TextType.Hand, QuantumTeleporterBuildable.CloseDoor(), false);
+            }
+#endif
         }
 
         public void OnHandClick(GUIHand hand)

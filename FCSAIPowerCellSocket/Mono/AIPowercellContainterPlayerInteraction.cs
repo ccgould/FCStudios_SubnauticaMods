@@ -14,7 +14,11 @@ namespace FCSAIPowerCellSocket.Mono
         public void OnHandHover(GUIHand hand)
         {
             HandReticle main = HandReticle.main;
+#if SUBNAUTICA
             main.SetInteractText(LanguageHelpers.GetLanguage(AIPowerCellSocketBuildable.OnHandOverKey));
+#elif BELOWZERO
+            main.SetText(HandReticle.TextType.Hand, LanguageHelpers.GetLanguage(AIPowerCellSocketBuildable.OnHandOverKey), false);
+#endif
             main.SetIcon(HandReticle.IconType.Hand, 1f);
         }
     }

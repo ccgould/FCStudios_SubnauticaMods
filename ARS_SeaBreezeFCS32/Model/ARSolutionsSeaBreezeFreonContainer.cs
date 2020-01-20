@@ -173,7 +173,13 @@ namespace ARS_SeaBreezeFCS32.Model
             {
                 QuickLogger.Debug($"Attempting to add {save.FreonCount} freon");
                 var go = GameObject.Instantiate(CraftData.GetPrefabForTechType(_freonTechType));
+#if SUBNAUTICA
                 var newInventoryItem = new InventoryItem(go.GetComponent<Pickupable>().Pickup(false));
+#elif BELOWZERO
+                Pickupable pickupable = go.GetComponent<Pickupable>();
+                pickupable.Pickup(false);
+                var newInventoryItem = new InventoryItem(pickupable);
+#endif
                 _freonContainer.UnsafeAdd(newInventoryItem);
             }
             else

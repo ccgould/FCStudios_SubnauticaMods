@@ -89,10 +89,13 @@ namespace FCSAlterraShipping.Mono
 
                             var gameObject = GameObject.Instantiate<GameObject>(prefab);
 
+#if SUBNAUTICA
                             Pickupable pickupable = gameObject.GetComponent<Pickupable>().Pickup(false);
-
+#elif BELOWZERO
+                            Pickupable pickupable = gameObject.GetComponent<Pickupable>();
+                            pickupable.Pickup(false);
+#endif
                             var item = new InventoryItem(pickupable);
-
                             _container.AddItem(item);
                         }
                     }

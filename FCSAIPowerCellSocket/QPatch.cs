@@ -53,7 +53,7 @@ namespace FCSAIPowerCellSocket
 
         private static void AddTechFabricatorItems()
         {
-            var icon = new Atlas.Sprite(ImageUtils.LoadTextureFromFile(Path.Combine(Mod.GetAssetPath(), $"{PowerCellSocketTabId}Icon.png")));
+            var icon = ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), $"{PowerCellSocketTabId}Icon.png"));
             var craftingTab = new CraftingTab(PowerCellSocketTabId, PowerCellSocketTabText, icon);
             
             var powercellSocketKit = new FCSKit(PowerCellSocketKitClassId, Mod.ModFriendlyName, craftingTab, Mod.PowercellSocketIngredients);

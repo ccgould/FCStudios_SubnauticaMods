@@ -19,6 +19,7 @@ namespace FCSPowerStorage.Configuration
 
         internal static string MODFOLDERLOCATION => GetModPath();
         internal static string LANGUAGEDIRECTORY => GetLanguagePath();
+#if SUBNAUTICA
         internal static TechData PowerStorageIngredients => new TechData
         {
             craftAmount = 1,
@@ -33,6 +34,22 @@ namespace FCSPowerStorage.Configuration
 
             }
         };
+#elif BELOWZERO
+        internal static RecipeData PowerStorageIngredients => new RecipeData
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(TechType.Battery, 1),
+                new Ingredient(TechType.AcidMushroom, 6),
+                new Ingredient(TechType.Titanium, 7),
+                new Ingredient(TechType.WiringKit, 1),
+                new Ingredient(TechType.Quartz, 1),
+                new Ingredient(TechType.Salt, 6),
+
+            }
+        };
+#endif
 
         private static string GetQModsPath()
         {

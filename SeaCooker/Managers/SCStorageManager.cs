@@ -133,7 +133,13 @@ namespace AE.SeaCooker.Managers
             {
                 var newFood = GameObject.Instantiate(CraftData.GetPrefabForTechType(type));
 
+#if SUBNAUTICA
                 var item = new InventoryItem(newFood.GetComponent<Pickupable>().Pickup(false));
+#elif BELOWZERO
+                Pickupable pickupable = newFood.GetComponent<Pickupable>();
+                pickupable.Pickup(false);
+                var item = new InventoryItem(pickupable);
+#endif
 
                 _exportContainer.UnsafeAdd(item);
 
@@ -275,7 +281,13 @@ namespace AE.SeaCooker.Managers
                 var food = go.GetComponent<Eatable>();
                 food.waterValue = eatableEntity.WaterValue;
                 food.foodValue = eatableEntity.FoodValue;
+#if SUBNAUTICA
                 _exportContainer.UnsafeAdd(new InventoryItem(food.GetComponent<Pickupable>().Pickup(false)));
+#elif BELOWZERO
+                Pickupable pickupable = food.GetComponent<Pickupable>();
+                pickupable.Pickup(false);
+                _container.UnsafeAdd(new InventoryItem(pickupable));
+#endif
             }
         }
 
@@ -287,7 +299,13 @@ namespace AE.SeaCooker.Managers
                 var food = go.GetComponent<Eatable>();
                 food.waterValue = eatableEntity.WaterValue;
                 food.foodValue = eatableEntity.FoodValue;
+#if SUBNAUTICA
                 _container.UnsafeAdd(new InventoryItem(food.GetComponent<Pickupable>().Pickup(false)));
+#elif BELOWZERO
+                Pickupable pickupable = food.GetComponent<Pickupable>();
+                pickupable.Pickup(false);
+                _container.UnsafeAdd(new InventoryItem(pickupable));
+#endif
             }
         }
 

@@ -34,7 +34,12 @@ namespace AE.SeaCooker.Configuration
         internal const string ClassID = "SeaCooker";
         internal const string SeaCookerKitClassID = "SeaCookerBuildableKit_SC";
         internal static string MODFOLDERLOCATION => GetModPath();
+
+#if SUBNAUTICA
         internal static TechData SeaCookerIngredients => new TechData
+#elif BELOWZERO
+        internal static RecipeData SeaCookerIngredients => new RecipeData
+#endif
         {
             craftAmount = 1,
             Ingredients =

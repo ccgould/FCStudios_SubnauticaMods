@@ -21,7 +21,11 @@ namespace AE.SeaCooker.Managers
             {
                 HandReticle main = HandReticle.main;
                 main.SetIcon(HandReticle.IconType.Default);
+#if SUBNAUTICA
                 main.SetInteractText(SeaCookerBuildable.NoPowerAvailable());
+#elif BELOWZERO
+                main.SetText(HandReticle.TextType.Hand, SeaCookerBuildable.NoPowerAvailable(), false);
+#endif
             }
 
         }

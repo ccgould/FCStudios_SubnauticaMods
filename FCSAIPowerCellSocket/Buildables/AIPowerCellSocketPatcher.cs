@@ -83,6 +83,7 @@ namespace FCSAIPowerCellSocket.Buildables
             }
         }
 
+#if SUBNAUTICA
         protected override TechData GetBlueprintRecipe()
         {
             
@@ -90,9 +91,22 @@ namespace FCSAIPowerCellSocket.Buildables
             {
                 Ingredients =
                 {
-                    new Ingredient(TechTypeHelpers.GetTechType("PowerCellSocket_AIS"), 1)
+                    new Ingredient(Mod.PowercellSocketId.ToTechType(), 1)
                 }
             };
         }
+#elif BELOWZERO
+        protected override RecipeData GetBlueprintRecipe()
+        {
+
+            return new RecipeData
+            {
+                Ingredients =
+                {
+                    new Ingredient(Mod.PowercellSocketId.ToTechType(), 1)
+                }
+            };
+        }
+#endif
     }
 }

@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.IO;
 using FCSCommon.Helpers;
+using FCSCommon.Extensions;
 using SMLHelper.V2.Crafting;
 using UnityEngine;
 
@@ -21,6 +22,7 @@ namespace FCS_DeepDriller.Configuration
 
         internal const string DeepDrillerGameObjectName = "DeepDriller";
 
+        internal const string SandSpawnableClassID = "Sand_DD";
         internal const string DeepDrillerKitClassID = "DeepDrillerKit_DD";
         internal const string DeepDrillerKitFriendlyName = "Deep Driller";
         internal const string FocusAttachmentKitClassID = "FocusAttachment_DD";
@@ -48,6 +50,7 @@ namespace FCS_DeepDriller.Configuration
 
         internal static event Action<DeepDrillerSaveData> OnDeepDrillerDataLoaded;
 
+#if SUBNAUTICA
         internal static TechData DeepDrillerKitIngredients => new TechData
         {
             craftAmount = 1,
@@ -107,7 +110,7 @@ namespace FCS_DeepDriller.Configuration
             craftAmount = 1,
             Ingredients =
             {
-                new Ingredient(TechTypeHelpers.GetTechType("DrillerMK1_DD"), 1),
+                new Ingredient(Mod.DrillerMK1ModuleClassID.ToTechType(), 1),
                 new Ingredient(TechType.Diamond, 4),
                 new Ingredient(TechType.AluminumOxide, 1),
                 new Ingredient(TechType.Titanium, 4)
@@ -118,7 +121,7 @@ namespace FCS_DeepDriller.Configuration
             craftAmount = 1,
             Ingredients =
             {
-                new Ingredient(TechTypeHelpers.GetTechType("DrillerMK2_DD"), 1),
+                new Ingredient(Mod.DrillerMK2ModuleClassID.ToTechType(), 1),
                 new Ingredient(TechType.Diamond, 4),
                 new Ingredient(TechType.Titanium, 3),
                 new Ingredient(TechType.AluminumOxide, 3),
@@ -126,6 +129,86 @@ namespace FCS_DeepDriller.Configuration
                 new Ingredient(TechType.EnameledGlass, 2)
             }
         };
+#elif BELOWZERO
+        internal static RecipeData DeepDrillerKitIngredients => new RecipeData
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(TechType.MapRoomHUDChip, 1),
+                new Ingredient(TechType.Titanium, 2),
+                new Ingredient(TechType.AdvancedWiringKit, 1),
+                new Ingredient(TechType.ExosuitDrillArmModule, 1),
+                new Ingredient(TechType.Lubricant, 1),
+                new Ingredient(TechType.VehicleStorageModule, 1),
+            }
+        };
+        internal static RecipeData FocusAttachmentKitIngredients => new RecipeData
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(TechType.Glass, 3),
+                new Ingredient(TechType.WiringKit, 2),
+                new Ingredient(TechType.Titanium, 1)
+            }
+        };
+        internal static RecipeData BatteryAttachmentKitIngredients => new RecipeData
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(TechType.Copper, 1),
+                new Ingredient(TechType.Silicone, 1),
+                new Ingredient(TechType.Titanium, 1)
+            }
+        };
+        internal static RecipeData SolarAttachmentKitIngredients => new RecipeData
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(TechType.Copper, 1),
+                new Ingredient(TechType.Glass, 2),
+                new Ingredient(TechType.WiringKit, 1),
+                new Ingredient(TechType.Titanium, 1)
+            }
+        };
+        internal static RecipeData DrillerMK1Ingredients => new RecipeData
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(TechType.Lithium, 2),
+                new Ingredient(TechType.Diamond, 1),
+                new Ingredient(TechType.Titanium, 3)
+            }
+        };
+        internal static RecipeData DrillerMK2Ingredients => new RecipeData
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(Mod.DrillerMK1ModuleClassID.ToTechType(), 1),
+                new Ingredient(TechType.Diamond, 4),
+                new Ingredient(TechType.AluminumOxide, 1),
+                new Ingredient(TechType.Titanium, 4)
+            }
+        };
+        internal static RecipeData DrillerMK3Ingredients => new RecipeData
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(Mod.DrillerMK2ModuleClassID.ToTechType(), 1),
+                new Ingredient(TechType.Diamond, 4),
+                new Ingredient(TechType.Titanium, 3),
+                new Ingredient(TechType.AluminumOxide, 3),
+                new Ingredient(TechType.Magnetite, 3),
+                new Ingredient(TechType.EnameledGlass, 2)
+            }
+        };
+#endif
 
 
         #region Deep Driller

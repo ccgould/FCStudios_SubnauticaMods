@@ -63,7 +63,7 @@ namespace ExStorageDepot
 
         private static void AddTechFabricatorItems()
         {
-            var icon = new Atlas.Sprite(ImageUtils.LoadTextureFromFile(Path.Combine(Mod.GetAssetPath(), $"{Mod.ClassID}.png")));
+            var icon = ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), $"{Mod.ClassID}.png"));
             var craftingTab = new CraftingTab(Mod.ExStorageTabID, Mod.ModFriendly, icon);
 
             var exStorageKit = new FCSKit(Mod.ExStorageKitClassID, Mod.ModFriendly, craftingTab, Mod.ExStorageIngredients);

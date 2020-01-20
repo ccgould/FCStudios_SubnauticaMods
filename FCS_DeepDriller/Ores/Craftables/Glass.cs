@@ -1,8 +1,10 @@
 ﻿using FCSCommon.Helpers;
+using FCSCommon.Extensions;
 using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
 using System.Collections.Generic;
 using UnityEngine;
+using FCS_DeepDriller.Configuration;
 
 namespace FCS_DeepDriller.Ores.Craftables
 {
@@ -23,6 +25,8 @@ namespace FCS_DeepDriller.Ores.Craftables
             return prefab;
         }
 
+#if SUBNAUTICA
+        
         protected override TechData GetBlueprintRecipe()
         {
             // Create and associate recipe to the new TechType
@@ -31,7 +35,7 @@ namespace FCS_DeepDriller.Ores.Craftables
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(TechTypeHelpers.GetTechType("Sand_DD"), 1),
+                    new Ingredient(Mod.SandSpawnableClassID.ToTechType(), 1),
                 },
                 LinkedItems = new List<TechType>()
                 {
@@ -43,6 +47,29 @@ namespace FCS_DeepDriller.Ores.Craftables
 
             return customFabRecipe;
         }
+#elif BELOWZERO
+        protected override RecipeData GetBlueprintRecipe()
+        {
+            // Create and associate recipe to the new TechType
+            var customFabRecipe = new RecipeData()
+            {
+                craftAmount = 1,
+                Ingredients = new List<Ingredient>()
+                {
+                    new Ingredient(Mod.SandSpawnableClassID.ToTechType(), 1),
+                },
+                LinkedItems = new List<TechType>()
+                {
+                    TechType.Glass,
+                    TechType.Glass,
+                    TechType.Glass,
+                }
+            };
+
+            return customFabRecipe;
+        }
+
+#endif
 
         internal static void PatchHelper()
         {
