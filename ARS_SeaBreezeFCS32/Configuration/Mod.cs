@@ -5,6 +5,7 @@ using System.Reflection;
 using ARS_SeaBreezeFCS32.Mono;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
+using FCSCommon.Extensions;
 using SMLHelper.V2.Crafting;
 using UnityEngine;
 
@@ -27,6 +28,7 @@ namespace ARS_SeaBreezeFCS32.Configuration
 
         internal static string MODFOLDERLOCATION => GetModPath();
 
+#if SUBNAUTICA
         internal static TechData SeaBreezeIngredients => new TechData
         {
             craftAmount = 1,
@@ -37,9 +39,25 @@ namespace ARS_SeaBreezeFCS32.Configuration
                 new Ingredient(TechType.Titanium, 3),
                 new Ingredient(TechType.AdvancedWiringKit, 1),
                 new Ingredient(TechType.Glass, 1),
-                new Ingredient(TechTypeHelpers.GetTechType("Freon_ARS"), 1)
+                new Ingredient(Mod.SeaBreezeKitClassID.ToTechType(), 1)
             }
         };
+#elif BELOWZERO
+        internal static RecipeData SeaBreezeIngredients => new RecipeData
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(TechType.ComputerChip, 1),
+                new Ingredient(TechType.PowerCell, 1),
+                new Ingredient(TechType.Titanium, 3),
+                new Ingredient(TechType.AdvancedWiringKit, 1),
+                new Ingredient(TechType.Glass, 1),
+                new Ingredient(Mod.SeaBreezeKitClassID.ToTechType(), 1)
+            }
+        };
+
+#endif
 
 
 

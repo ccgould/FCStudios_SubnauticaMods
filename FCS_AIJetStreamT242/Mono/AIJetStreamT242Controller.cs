@@ -139,7 +139,11 @@ namespace FCS_AIMarineTurbine.Mono
 
         internal float GetDepth()
         {
+#if SUBNAUTICA
             return gameObject == null ? 0f : Ocean.main.GetDepthOf(gameObject);
+#elif BELOWZERO
+            return gameObject == null ? 0f : Ocean.GetDepthOf(gameObject);
+#endif
         }
 
         internal void ChangeMotorSpeed(float speed)
@@ -502,6 +506,7 @@ namespace FCS_AIMarineTurbine.Mono
 
         public void OnHandHover(GUIHand hand)
         {
+#if SUBNAUTICA
             if (!IsOperational())
             {
                 HandReticle.main.SetInteractText(DisplayLanguagePatching.NotOperational(), false);
@@ -512,6 +517,19 @@ namespace FCS_AIMarineTurbine.Mono
                 HandReticle.main.SetInteractText(GetTurbinePowerData(), false);
                 HandReticle.main.SetIcon(HandReticle.IconType.Default);
             }
+#elif BELOWZERO
+            if (!IsOperational())
+            {
+                HandReticle.main.SetText(HandReticle.TextType.Hand, DisplayLanguagePatching.NotOperational(), false);
+                HandReticle.main.SetIcon(HandReticle.IconType.Default);
+            }
+            else
+            {
+                HandReticle.main.SetText(HandReticle.TextType.Hand, GetTurbinePowerData(), false);
+                HandReticle.main.SetIcon(HandReticle.IconType.Default);
+            }
+
+#endif
         }
 
         public void OnHandClick(GUIHand hand)

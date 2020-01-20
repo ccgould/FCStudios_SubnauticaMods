@@ -5,6 +5,7 @@ using FCSAlterraShipping.Models;
 using FCSAlterraShipping.Mono;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
+using FCSCommon.Extensions;
 using System.IO;
 using FCSAlterraShipping.Configuration;
 
@@ -108,6 +109,7 @@ namespace FCSAlterraShipping.Buildable
             return prefab;
         }
 
+#if SUBNAUTICA
         protected override TechData GetBlueprintRecipe()
         {
             QuickLogger.Debug($"Creating recipe...");
@@ -118,7 +120,7 @@ namespace FCSAlterraShipping.Buildable
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(TechTypeHelpers.GetTechType(Mod.AlterraShippingKitClassID), 1)
+                    new Ingredient(Mod.AlterraShippingKitClassID.ToTechType(), 1)
                 }
             };
 
@@ -126,6 +128,26 @@ namespace FCSAlterraShipping.Buildable
 
             return customFabRecipe;
         }
+#elif BELOWZERO
+        protected override RecipeData GetBlueprintRecipe()
+        {
+            QuickLogger.Debug($"Creating recipe...");
+
+            // Create and associate recipe to the new TechType
+            var customFabRecipe = new RecipeData()
+            {
+                craftAmount = 1,
+                Ingredients = new List<Ingredient>()
+                {
+                    new Ingredient(Mod.AlterraShippingKitClassID.ToTechType(), 1)
+                }
+            };
+
+            QuickLogger.Debug($"Created Ingredients");
+
+            return customFabRecipe;
+        }
+#endif
 
         private void CreateDisplayedContainer(GameObject prefab)
         {

@@ -5,6 +5,7 @@ using FCS_AIMarineTurbine.Mono;
 using FCSCommon.Components;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
+using FCSCommon.Extensions;
 using Oculus.Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -121,6 +122,7 @@ namespace FCS_AIMarineTurbine.Buildable
             }
         }
 
+#if SUBNAUTICA
         protected override TechData GetBlueprintRecipe()
         {
             QuickLogger.Debug($"Creating recipe...");
@@ -130,12 +132,30 @@ namespace FCS_AIMarineTurbine.Buildable
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(TechTypeHelpers.GetTechType(Mod.JetstreamKitClassID), 1)
+                    new Ingredient(Mod.JetstreamKitClassID.ToTechType(), 1)
                 }
             };
 
             QuickLogger.Debug($"Created Ingredients");
             return customFabRecipe;
         }
+#elif BELOWZERO
+        protected override RecipeData GetBlueprintRecipe()
+        {
+            QuickLogger.Debug($"Creating recipe...");
+            // Create and associate recipe to the new TechType
+            var customFabRecipe = new RecipeData()
+            {
+                craftAmount = 1,
+                Ingredients = new List<Ingredient>()
+                {
+                    new Ingredient(Mod.JetstreamKitClassID.ToTechType(), 1)
+                }
+            };
+
+            QuickLogger.Debug($"Created Ingredients");
+            return customFabRecipe;
+        }
+#endif
     }
 }

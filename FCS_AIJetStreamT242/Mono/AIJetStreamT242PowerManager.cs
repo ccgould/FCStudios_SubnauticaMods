@@ -261,5 +261,16 @@ namespace FCS_AIJetStreamT242.Mono
         {
             _storedPower = value;
         }
+
+        public void PollPowerRate(out float consumed, out float created)
+        {
+            consumed = 0f;
+            created = 0f;
+        }
+
+        public GameObject GetGameObject()
+        {
+            return base.gameObject;
+        }
     }
 }

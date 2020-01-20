@@ -29,7 +29,7 @@ namespace FCS_AIMarineTurbine.Buildable
             }
             Singleton.Patch();
             CraftDataHandler.SetCraftingTime(Singleton.TechType, 5);
-            CraftTreeHandler.AddTabNode(CraftTree.Type.Constructor, "FCStudios", "FCStudios Mods", new Atlas.Sprite(ImageUtils.LoadTextureFromFile($"./QMods/AIMarineTurbine/Assets/Default.png")));
+            CraftTreeHandler.AddTabNode(CraftTree.Type.Constructor, "FCStudios", "FCStudios Mods", ImageUtils.LoadSpriteFromFile($"./QMods/AIMarineTurbine/Assets/Default.png"));
 
             //CraftTreePatcher.customTabs.Add(new CustomCraftTab("FCStudios", "FCStudios Mods", CraftScheme.Constructor, new Atlas.Sprite(ImageUtils.LoadTextureFromFile($"./QMods/AIMarineTurbine/Assets/Default.png"))));
 
@@ -104,6 +104,7 @@ namespace FCS_AIMarineTurbine.Buildable
         }
 
         public override string AssetsFolder { get; } = $"FCSAIMarineTurbine/Assets";
+#if SUBNAUTICA
         protected override TechData GetBlueprintRecipe()
         {
             QuickLogger.Debug($"Creating recipe...");
@@ -122,6 +123,26 @@ namespace FCS_AIMarineTurbine.Buildable
                     new Ingredient(TechType.Lubricant, 2),
                 }
             };
+#elif BELOWZERO
+        protected override RecipeData GetBlueprintRecipe()
+        {
+            QuickLogger.Debug($"Creating recipe...");
+            // Create and associate recipe to the new TechType
+            var customFabRecipe = new RecipeData()
+            {
+                craftAmount = 1,
+                Ingredients = new List<Ingredient>()
+                {
+                    new Ingredient(TechType.TitaniumIngot, 1),
+                    new Ingredient(TechType.CopperWire, 1),
+                    new Ingredient(TechType.ComputerChip, 1),
+                    new Ingredient(TechType.AdvancedWiringKit, 1),
+                    new Ingredient(TechType.Glass, 1),
+                    new Ingredient(TechType.FiberMesh, 2),
+                    new Ingredient(TechType.Lubricant, 2),
+                }
+            };
+#endif
 
             QuickLogger.Debug($"Created Ingredients");
             return customFabRecipe;

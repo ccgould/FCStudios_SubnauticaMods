@@ -9,7 +9,11 @@ namespace AMMiniMedBay.Mono
         public void OnHandHover(GUIHand hand)
         {
             HandReticle main = HandReticle.main;
+#if SUBNAUTICA
             main.SetInteractText("Open MedBay Storage.");
+#elif BELOWZERO
+            main.SetText(HandReticle.TextType.Hand ,"Open MedBay Storage.", false);
+#endif
             main.SetIcon(HandReticle.IconType.Hand, 1f);
         }
 

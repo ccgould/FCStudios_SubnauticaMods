@@ -29,11 +29,21 @@ namespace FCSCommon.Components
         {
             bool inInteractionRange = InInteractionRange();
 
+#if SUBNAUTICA
             if (this.IsHovered && inInteractionRange)
             {
                 if(string.IsNullOrEmpty(TextLineOne) && string.IsNullOrEmpty(TextLineTwo)) return;
                 HandReticle.main.SetInteractTextRaw(this.TextLineOne, this.TextLineTwo);
             }
+#elif BELOWZERO
+            if (this.IsHovered && inInteractionRange)
+            {
+                if (string.IsNullOrEmpty(TextLineOne) && string.IsNullOrEmpty(TextLineTwo)) return;
+                HandReticle.main.SetTextRaw(HandReticle.TextType.Hand, this.TextLineOne);
+                HandReticle.main.SetTextRaw(HandReticle.TextType.HandSubscript, this.TextLineTwo);
+            }
+
+#endif
 
             if (this.IsHovered && inInteractionRange == false)
             {

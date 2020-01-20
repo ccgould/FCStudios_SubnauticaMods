@@ -20,12 +20,16 @@ namespace FCSPowerStorage.Helpers
         /// <param name="ingredients">The List of ingredients</param>
         /// <param name="linkedItemsList"> The list of Linkitems</param>
         /// <returns></returns>
+#if SUBNAUTICA
         public static TechData CreateRecipe(int craftAmount, List<Ingredient> ingredients, List<string> linkedItemsList)
         {
             var result = new TechData();
-
+#elif BELOWZERO
+        public static RecipeData CreateRecipe(int craftAmount, List<Ingredient> ingredients, List<string> linkedItemsList)
+        {
+            var result = new RecipeData();
+#endif
             var linkedItems = new List<TechType>();
-
             result.craftAmount = craftAmount;
 
             foreach (var ingredient in ingredients)

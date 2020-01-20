@@ -94,7 +94,11 @@ namespace FCSAIPowerCellSocket.Mono
             bool flag = false;
 
             var techType = pickupable.GetTechType();
+#if SUBNAUTICA
             var equipType = CraftData.GetEquipmentType(techType);
+#elif BELOWZERO
+            var equipType = TechData.GetEquipmentType(techType);
+#endif
 
 
             if (equipType == EquipmentType.PowerCellCharger)
@@ -268,7 +272,13 @@ namespace FCSAIPowerCellSocket.Mono
                 var battery = prefab.gameObject.GetComponent<Battery>();
                 battery._charge = powercellData.Charge;
 
+#if SUBNAUTICA
                 var item = new InventoryItem(prefab.gameObject.GetComponent<Pickupable>().Pickup(false));
+#elif BELOWZERO
+                Pickupable pickupable = prefab.gameObject.GetComponent<Pickupable>();
+                pickupable.Pickup(false);
+                var item = new InventoryItem(pickupable);
+#endif
 
                 _batteryContainer.UnsafeAdd(item);
                 QuickLogger.Debug($"Load Item {item.item.name}");
@@ -282,6 +292,17 @@ namespace FCSAIPowerCellSocket.Mono
                 powercellData.SaveData();
                 yield return powercellData;
             }
+        }
+
+        public void PollPowerRate(out float consumed, out float created)
+        {
+            consumed = 0f;
+            created = 0f;
+        }
+
+        public GameObject GetGameObject()
+        {
+            return base.gameObject;
         }
     }
 }

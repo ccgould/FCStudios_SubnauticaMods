@@ -41,6 +41,7 @@ namespace QuantumTeleporter.Configuration
         internal const string TeleporterScannerConnectionKitClassID = "TeleporterScannerConnectionKit_AE";
         internal const string TeleporterScannerConnectionKitText = "Teleporter Scanner Connection";
         internal static string MODFOLDERLOCATION => GetModPath();
+#if SUBNAUTICA
         internal static TechData QuantumTeleporterKitIngredients => new TechData
         {
             craftAmount = 1,
@@ -73,6 +74,40 @@ namespace QuantumTeleporter.Configuration
             }
         };
 
+#elif BELOWZERO
+        internal static RecipeData QuantumTeleporterKitIngredients => new RecipeData
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(AdvancedTeleporterWiringKitClassID.ToTechType(), 1),
+                new Ingredient(TeleporterScannerConnectionKitClassID.ToTechType(), 1)
+            }
+        };
+        internal static RecipeData TeleporterScannerConnectionKitIngredients => new RecipeData
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(TechType.Kyanite, 3),
+                new Ingredient(TechType.MapRoomHUDChip, 2),
+                new Ingredient(TechType.Compass, 1),
+                new Ingredient(TechType.TitaniumIngot, 2)
+            }
+        };
+        internal static RecipeData AdvancedTeleporterWiringKitIngredients => new RecipeData
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(TechType.AdvancedWiringKit, 1),
+                new Ingredient(TechType.Aerogel, 2),
+                new Ingredient(TechType.Diamond, 2),
+                new Ingredient(TechType.FiberMesh, 2)
+            }
+        };
+
+#endif
 
         internal static event Action<SaveData> OnDataLoaded;
         #endregion

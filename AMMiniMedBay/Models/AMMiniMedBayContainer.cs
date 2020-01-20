@@ -56,7 +56,13 @@ namespace AMMiniMedBay.Models
         private void SpawnKit()
         {
             var medKit = GameObject.Instantiate(_medKit);
+#if SUBNAUTICA
             var newInventoryItem = new InventoryItem(medKit.GetComponent<Pickupable>().Pickup(false));
+#elif BELOWZERO
+            Pickupable pickupable = medKit.GetComponent<Pickupable>();
+            pickupable.Pickup(false);
+            var newInventoryItem = new InventoryItem(pickupable);
+#endif
             medBayContainer.UnsafeAdd(newInventoryItem);
             _timeSpawnMedKit = DayNightCycle.main.timePassedAsFloat + MedKitSpawnInterval;
         }

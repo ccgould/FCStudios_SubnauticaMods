@@ -67,6 +67,7 @@ namespace HorizontalDuck.Buildables
         }
 
         public override string AssetsFolder => "HorizontalDuck/Assets";
+#if SUBNAUTICA
         protected override TechData GetBlueprintRecipe()
         {
             QuickLogger.Debug($"Creating recipe...");
@@ -85,6 +86,26 @@ namespace HorizontalDuck.Buildables
 
             return customFabRecipe;
         }
+#elif BELOWZERO
+        protected override RecipeData GetBlueprintRecipe()
+        {
+            QuickLogger.Debug($"Creating recipe...");
+
+            // Create and associate recipe to the new TechType
+            var customFabRecipe = new RecipeData()
+            {
+                craftAmount = 1,
+                Ingredients = new List<Ingredient>()
+                {
+                    new Ingredient(TechType.Silicone, 1)
+                }
+            };
+
+            QuickLogger.Debug($"Created Ingredients");
+
+            return customFabRecipe;
+        }
+#endif
 
         internal static HorizontalDuckBuildable Singleton = new HorizontalDuckBuildable();
         public override TechGroup GroupForPDA { get; } = TechGroup.Miscellaneous;

@@ -27,6 +27,8 @@ namespace ExStorageDepot.Configuration
         internal static string MODFOLDERLOCATION => GetModPath();
         internal static string GameObjectName => "Ex-StorageDepotUnit";
         internal static string ModFolderName => $"FCS_{ModName}";
+
+#if SUBNAUTICA
         public static TechData ExStorageIngredients => new TechData
         {
             craftAmount = 1,
@@ -38,6 +40,20 @@ namespace ExStorageDepot.Configuration
                 new Ingredient(TechType.PowerCell, 1)
             }
         };
+#elif BELOWZERO
+        public static RecipeData ExStorageIngredients => new RecipeData
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(TechType.WiringKit, 1),
+                new Ingredient(TechType.TitaniumIngot, 2),
+                new Ingredient(TechType.Glass, 1),
+                new Ingredient(TechType.PowerCell, 1)
+            }
+        };
+
+#endif
 
         internal const string ExStorageKitClassID = "ExStorageKit_ASTS";
 

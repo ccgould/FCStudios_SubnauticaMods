@@ -3,11 +3,11 @@ using QuantumTeleporter.Managers;
 
 namespace QuantumTeleporter.Patches
 {
-    [HarmonyPatch(typeof(EscapePod))]
-    [HarmonyPatch("Update")]
-    internal class EscapePod_Patch
+    [HarmonyPatch(typeof(Player))]
+    [HarmonyPatch(nameof(Player.Update))]
+    internal class Player_Patch
     {
-        internal static void Postfix(ref EscapePod __instance)
+        internal static void Postfix(ref Player __instance)
         {
             TeleportManager.Update();
         }

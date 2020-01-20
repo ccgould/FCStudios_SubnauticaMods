@@ -17,10 +17,16 @@ namespace FCSTechFabricator.Craftables
 
         private static GameObject _gameObjectKit;
         private static bool _kitRegistered;
+#if SUBNAUTICA
         private TechData _ingredients;
+#elif BELOWZERO
+        private RecipeData _ingredients;
+#endif
         private string _assetFolder = Mod.GetAssetPath();
         private string _iconFileName = "Kit_FCS";
 
+
+#if SUBNAUTICA
         public FCSKit(string classId, string friendlyName, FcCraftingTab parentTab, TechData ingredients) :
             base(classId, friendlyName, $"A kit that allows you to build one {friendlyName} Unit", parentTab)
         {
@@ -31,6 +37,19 @@ namespace FCSTechFabricator.Craftables
                 CraftDataHandler.SetEquipmentType(TechType, EquipmentType.Hand);
             };
         }
+#elif BELOWZERO
+        public FCSKit(string classId, string friendlyName, FcCraftingTab parentTab, RecipeData ingredients) :
+            base(classId, friendlyName, $"A kit that allows you to build one {friendlyName} Unit", parentTab)
+        {
+            _ingredients = ingredients;
+            OnFinishedPatching += () =>
+            {
+                GetKitPrefab();
+                CraftDataHandler.SetEquipmentType(TechType, EquipmentType.Hand);
+            };
+        }
+
+#endif
 
         public override GameObject GetGameObject()
         {
@@ -68,6 +87,7 @@ namespace FCSTechFabricator.Craftables
             return null;
         }
 
+#if SUBNAUTICA
         protected override TechData GetBlueprintRecipe()
         {
             return _ingredients;
@@ -77,6 +97,17 @@ namespace FCSTechFabricator.Craftables
         {
             return new Atlas.Sprite(ImageUtils.LoadTextureFromFile(Path.Combine(_assetFolder, $"{_iconFileName}.png")));
         }
+#elif BELOWZERO
+        protected override RecipeData GetBlueprintRecipe()
+        {
+            return _ingredients;
+        }
+
+        protected override Sprite GetItemSprite()
+        {
+            return ImageUtils.LoadSpriteFromFile(Path.Combine(_assetFolder, $"{_iconFileName}.png"));
+        }
+#endif
 
         private bool SetKitLabel(GameObject prefab)
         {

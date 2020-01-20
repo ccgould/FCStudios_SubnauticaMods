@@ -205,7 +205,13 @@ namespace ExStorageDepot.Mono.Managers
             if (prefab != null)
             {
                 var go = GameObject.Instantiate(prefab);
+#if SUBNAUTICA
                 var newInventoryItem = new InventoryItem(go.GetComponent<Pickupable>().Pickup(false));
+#elif BELOWZERO
+                Pickupable pickupable = go.GetComponent<Pickupable>();
+                pickupable.Pickup(false);
+                var newInventoryItem = new InventoryItem(pickupable);
+#endif
                 newInventoryItem.SetGhostDims(1, 1);
                 _container.container.UnsafeAdd(newInventoryItem);
             }

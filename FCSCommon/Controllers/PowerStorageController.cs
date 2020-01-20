@@ -134,5 +134,17 @@ namespace FCSCommon.Controllers
                 _charge = HasBreakerTripped ? 0.0f : Mathf.Clamp(_charge + chargeAmount * DayNightCycle.main.deltaTime, 0, _capacity);
             }
         }
+#if BELOWZERO
+        public void PollPowerRate(out float consumed, out float created)
+        {
+            consumed = 0f;
+            created = 0f;
+        }
+
+        public GameObject GetGameObject()
+        {
+            return base.gameObject;
+        }
+#endif
     }
 }

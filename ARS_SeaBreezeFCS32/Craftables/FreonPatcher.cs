@@ -51,9 +51,10 @@ namespace ARS_SeaBreezeFCS32.Craftables
             }
         }
 
+#if SUBNAUTICA
         protected override Atlas.Sprite GetItemSprite()
         {
-            return new Atlas.Sprite(ImageUtils.LoadTextureFromFile(Path.Combine(Mod.GetAssetFolder(), $"{ClassID}.png")));
+            return ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetFolder(), $"{ClassID}.png"));
         }
 
         protected override TechData GetBlueprintRecipe()
@@ -72,6 +73,30 @@ namespace ARS_SeaBreezeFCS32.Craftables
             };
             return customFabRecipe;
         }
+#elif BELOWZERO
+        protected override Sprite GetItemSprite()
+        {
+            return ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetFolder(), $"{ClassID}.png"));
+        }
+
+        protected override RecipeData GetBlueprintRecipe()
+        {
+            QuickLogger.Debug($"Creating recipe...");
+            // Create and associate recipe to the new TechType
+            var customFabRecipe = new RecipeData()
+            {
+                craftAmount = 1,
+                Ingredients = new List<Ingredient>()
+                {
+                    new Ingredient(TechType.GasPod, 1),
+                    new Ingredient(TechType.AcidMushroom, 1),
+                    new Ingredient(TechType.Titanium, 1),
+                }
+            };
+            return customFabRecipe;
+        }
+
+#endif
 
         private void AddComponentsToPrefab()
         {

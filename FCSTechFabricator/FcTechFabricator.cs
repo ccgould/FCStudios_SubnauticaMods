@@ -19,10 +19,6 @@ namespace FCSTechFabricator
 
         public override Models Model => Models.Fabricator;
         
-        protected override Atlas.Sprite GetItemSprite()
-        {
-           return new Atlas.Sprite(ImageUtils.LoadTextureFromFile(Path.Combine(Mod.GetAssetPath(), $"{ClassID}.png")));
-        }
 
         public override GameObject GetGameObject()
         {
@@ -36,6 +32,12 @@ namespace FCSTechFabricator
             return prefab;
         }
 
+#if SUBNAUTICA
+        protected override Atlas.Sprite GetItemSprite()
+        {
+           return new Atlas.Sprite(ImageUtils.LoadTextureFromFile(Path.Combine(Mod.GetAssetPath(), $"{ClassID}.png")));
+        }
+        
         protected override TechData GetBlueprintRecipe()
         {
             return new TechData
@@ -50,5 +52,26 @@ namespace FCSTechFabricator
                 }
             };
         }
+#elif BELOWZERO
+        protected override Sprite GetItemSprite()
+        {
+            return ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), $"{ClassID}.png"));
+        }
+
+        protected override RecipeData GetBlueprintRecipe()
+        {
+            return new RecipeData
+            {
+                craftAmount = 1,
+                Ingredients =
+                {
+                    new Ingredient(TechType.Titanium, 1),
+                    new Ingredient(TechType.ComputerChip, 1),
+                    new Ingredient(TechType.JeweledDiskPiece, 1),
+                    new Ingredient(TechType.Magnetite, 1)
+                }
+            };
+        }
+#endif
     }
 }

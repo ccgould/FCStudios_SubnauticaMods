@@ -38,6 +38,7 @@ namespace FCS_AIMarineTurbine.Configuration
 
         internal const string SaveDataFilename = "MiniFountainFilterSaveData.json";
 
+#if SUBNAUTICA
         internal static TechData JetstreamKitIngredients => new TechData
         {
             craftAmount = 1,
@@ -65,6 +66,36 @@ namespace FCS_AIMarineTurbine.Configuration
                 new Ingredient(TechType.Glass, 1)
             }
         };
+#elif BELOWZERO
+        internal static RecipeData JetstreamKitIngredients => new RecipeData
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(TechType.TitaniumIngot, 1),
+                new Ingredient(TechType.CopperWire, 1),
+                new Ingredient(TechType.ComputerChip, 1),
+                new Ingredient(TechType.AdvancedWiringKit, 1),
+                new Ingredient(TechType.Glass, 1),
+                new Ingredient(TechType.FiberMesh, 2),
+                new Ingredient(TechType.Lubricant, 2)
+            }
+        };
+
+
+        internal static RecipeData MarineMonitorKitIngredients => new RecipeData
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(TechType.WiringKit, 1),
+                new Ingredient(TechType.ComputerChip, 1),
+                new Ingredient(TechType.Battery, 1),
+                new Ingredient(TechType.Glass, 1)
+            }
+        };
+
+#endif
 
         internal static string MODFOLDERLOCATION => GetModPath();
         

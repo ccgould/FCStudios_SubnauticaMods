@@ -71,7 +71,11 @@ namespace FCSAlterraShipping.Mono
         {
             if (!hover) return;
             HandReticle.main.SetIcon(HandReticle.IconType.Rename);
+#if SUBNAUTICA
             HandReticle.main.SetInteractTextRaw(_onHover, "");
+#elif BELOWZERO
+            HandReticle.main.SetTextRaw(HandReticle.TextType.HandSubscript, _onHover);
+#endif
         }
 
         public static FCSTextBoxController Create(string description, string onHoverText, GameObject textPrefab, Func<int> getMethod, Action<int> setMethod)

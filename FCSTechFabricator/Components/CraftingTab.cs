@@ -4,11 +4,17 @@
     {
         public override string AssetBundleName => FcAssetBundlesService.PublicAPI.GlobalBundleName;
 
-        
 
-        public CraftingTab(string id, string displayName,Atlas.Sprite icon) : base(id, displayName,icon)
+#if SUBNAUTICA
+        public CraftingTab(string id, string displayName, Atlas.Sprite icon) : base(id, displayName,icon)
         {
 
         }
+#elif BELOWZERO
+        public CraftingTab(string id, string displayName, UnityEngine.Sprite icon) : base(id, displayName, icon)
+        {
+
+        }
+#endif
     }
 }

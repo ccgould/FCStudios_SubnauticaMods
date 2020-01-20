@@ -87,6 +87,7 @@ namespace FCSPowerStorage.Buildables
             return prefab;
         }
 
+#if SUBNAUTICA
         protected override TechData GetBlueprintRecipe()
         {
             QuickLogger.Debug("Creating FCS Battery Storage recipe...");
@@ -100,5 +101,20 @@ namespace FCSPowerStorage.Buildables
             QuickLogger.Debug("Created Ingredients for FCS Power Storage");
             return customFabRecipe;
         }
+#elif BELOWZERO
+        protected override RecipeData GetBlueprintRecipe()
+        {
+            QuickLogger.Debug("Creating FCS Battery Storage recipe...");
+            // Create and associate recipe to the new TechType
+
+            var customFabRecipe = new RecipeData()
+            {
+                craftAmount = 1,
+                Ingredients = LoadData.BatteryConfiguration.ConvertToIngredients().ToList()
+            };
+            QuickLogger.Debug("Created Ingredients for FCS Power Storage");
+            return customFabRecipe;
+        }
+#endif
     }
 }

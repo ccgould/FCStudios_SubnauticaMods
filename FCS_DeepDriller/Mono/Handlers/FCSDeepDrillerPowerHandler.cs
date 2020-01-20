@@ -89,7 +89,11 @@ namespace FCS_DeepDriller.Mono.Handlers
 
         private float GetDepthScalar()
         {
+#if SUBNAUTICA
             float time = Mathf.Clamp01((_maxDepth - Ocean.main.GetDepthOf(base.gameObject)) / _maxDepth);
+#elif BELOWZERO
+            float time = Mathf.Clamp01((_maxDepth - Ocean.GetDepthOf(base.gameObject)) / _maxDepth);
+#endif
             return _depthCurve.Evaluate(time);
         }
 

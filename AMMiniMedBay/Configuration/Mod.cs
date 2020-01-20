@@ -25,6 +25,7 @@ namespace AMMiniMedBay.Configuration
         internal const string MiniMedBayTabID = "MMB";
         internal const string MiniMedBayKitClassID = "AMMiniMedBayKit_AMS";
 
+#if SUBNAUTICA
         internal static TechData MiniMedBayIngredients => new TechData
         {
             craftAmount = 1,
@@ -37,6 +38,20 @@ namespace AMMiniMedBay.Configuration
                 new Ingredient(TechType.Glass, 1)
             }
         };
+#elif BELOWZERO
+        internal static RecipeData MiniMedBayIngredients => new RecipeData
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(TechType.AdvancedWiringKit, 1),
+                new Ingredient(TechType.PowerCell, 1),
+                new Ingredient(TechType.FiberMesh, 3),
+                new Ingredient(TechType.Titanium, 2),
+                new Ingredient(TechType.Glass, 1)
+            }
+        };
+#endif
 
         internal static string SaveDataFilename => $"{ModName}SaveData.json";
         internal static string GameObjectName => ClassID; // Same name as the class

@@ -9,10 +9,17 @@ namespace FCSTechFabricator
 {
     internal class ExampleTab : FcCraftingTab
     {
+#if SUBNAUTICA
         public ExampleTab(Atlas.Sprite icon)
             : base("ExampleTab1", "displayName",icon)
         {
         }
+#elif BELOWZERO
+        public ExampleTab(Sprite icon)
+            : base("ExampleTab1", "displayName", icon)
+        {
+        }
+#endif
 
         public override string AssetBundleName { get; } = "examplebundlename";
     }
@@ -35,10 +42,17 @@ namespace FCSTechFabricator
             throw new NotImplementedException();
         }
 
+#if SUBNAUTICA
         protected override TechData GetBlueprintRecipe()
         {
             throw new NotImplementedException();
         }
+#elif BELOWZERO
+        protected override RecipeData GetBlueprintRecipe()
+        {
+            throw new NotImplementedException();
+        }
+#endif
     }
 
     internal class ExampleCraftable2 : FcCraftable
@@ -59,10 +73,17 @@ namespace FCSTechFabricator
             throw new NotImplementedException();
         }
 
+#if SUBNAUTICA
         protected override TechData GetBlueprintRecipe()
         {
             throw new NotImplementedException();
         }
+#elif BELOWZERO
+        protected override RecipeData GetBlueprintRecipe()
+        {
+            throw new NotImplementedException();
+        }
+#endif
     }
 
 

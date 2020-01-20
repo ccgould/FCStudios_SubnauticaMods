@@ -223,8 +223,15 @@ namespace AE.SeaCooker.Managers
 
             var getTank = CraftData.GetPrefabForTechType(techType);
 
+#if SUBNAUTICA
             _equipment.AddItem(Configuration.Configuration.SlotIDs[0],
                 new InventoryItem(getTank.GetComponent<Pickupable>().Pickup(false)));
+#elif BELOWZERO
+            Pickupable pickupable = getTank.GetComponent<Pickupable>();
+            pickupable.Pickup(false);
+            _equipment.AddItem(Configuration.Configuration.SlotIDs[0],
+                new InventoryItem(pickupable));
+#endif
         }
 
     }

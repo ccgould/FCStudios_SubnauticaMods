@@ -101,7 +101,7 @@ namespace AE.MiniFountainFilter
 
         private static void AddItemsToTechFabricator()
         {
-            var icon = new Atlas.Sprite(ImageUtils.LoadTextureFromFile(Path.Combine(Mod.GetAssetFolder(), $"{Mod.ClassID}.png")));
+            var icon = ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetFolder(), $"{Mod.ClassID}.png"));
             var craftingTab = new CraftingTab(Mod.MiniFountainFilterTabID, Mod.FriendlyName, icon);
 
             var quantumTeleportKit = new FCSKit(Mod.MiniFountainFilterKitClassID, Mod.FriendlyName, craftingTab, Mod.MiniFountainFilterKitIngredients);

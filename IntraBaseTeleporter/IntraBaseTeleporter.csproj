@@ -127,8 +127,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FCSWorkBench\FCSTechFabricator.csproj">
-      <Project>{b947909c-4983-4749-93ac-73ea69f6dce8}</Project>
+    <ProjectReference Include="..\FCSTechFabricator\FCSTechFabricator.csproj">
+      <Project>{5EF4ADB8-3AE7-41EC-83E1-1DAF04999F0E}</Project>
       <Name>FCSTechFabricator</Name>
       <Private>False</Private>
     </ProjectReference>

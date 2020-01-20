@@ -48,7 +48,7 @@ namespace FCSPowerStorage
 
         private static void AddTechFabricatorItems()
         {
-            var icon = new Atlas.Sprite(ImageUtils.LoadTextureFromFile(Path.Combine(Information.GetAssetPath(), $"{Information.ModName}.png")));
+            var icon = ImageUtils.LoadSpriteFromFile(Path.Combine(Information.GetAssetPath(), $"{Information.ModName}.png"));
             var craftingTab = new CraftingTab(Information.PowerStorageTabID, Information.ModFriendlyName, icon);
 
             var powercellSocketKit = new FCSKit(Information.PowerStorageKitClassID, Information.ModFriendlyName, craftingTab, Information.PowerStorageIngredients);

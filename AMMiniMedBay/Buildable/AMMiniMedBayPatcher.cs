@@ -1,5 +1,6 @@
 ﻿using AMMiniMedBay.Mono;
 using FCSCommon.Utilities;
+using FCSCommon.Extensions;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -83,6 +84,7 @@ namespace AMMiniMedBay.Buildable
             return prefab;
         }
 
+#if SUBNAUTICA
         protected override TechData GetBlueprintRecipe()
         {
             QuickLogger.Debug($"Creating recipe...");
@@ -92,11 +94,29 @@ namespace AMMiniMedBay.Buildable
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(TechTypeHelpers.GetTechType("AMMiniMedBayKit_AMS"), 1)
+                    new Ingredient(Mod.MiniMedBayKitClassID.ToTechType(), 1)
                 }
             };
             QuickLogger.Debug($"Created Ingredients");
             return customFabRecipe;
         }
+#elif BELOWZERO
+        protected override RecipeData GetBlueprintRecipe()
+        {
+            QuickLogger.Debug($"Creating recipe...");
+            // Create and associate recipe to the new TechType
+            var customFabRecipe = new RecipeData()
+            {
+                craftAmount = 1,
+                Ingredients = new List<Ingredient>()
+                {
+                    new Ingredient(Mod.MiniMedBayKitClassID.ToTechType(), 1)
+                }
+            };
+            QuickLogger.Debug($"Created Ingredients");
+            return customFabRecipe;
+        }
+
+#endif
     }
 }

@@ -47,7 +47,7 @@ namespace AMMiniMedBay
         
         private static void AddTechFabricatorItems()
         {
-            var icon = new Atlas.Sprite(ImageUtils.LoadTextureFromFile(Path.Combine(Mod.GetAssetPath(), $"{Mod.ClassID}.png")));
+            var icon = ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), $"{Mod.ClassID}.png"));
             var craftingTab = new CraftingTab(Mod.MiniMedBayTabID, Mod.ModFriendlyName, icon);
 
             var miniMedBayKit = new FCSKit(Mod.MiniMedBayKitClassID, Mod.ModFriendlyName, craftingTab, Mod.MiniMedBayIngredients);

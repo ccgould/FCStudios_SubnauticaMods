@@ -63,7 +63,11 @@ namespace FCS_DeepDriller.Mono
             bool flag = false;
 
             var techType = pickupable.GetTechType();
+#if SUBNAUTICA
             var equipType = CraftData.GetEquipmentType(techType);
+#elif BELOWZERO
+            var equipType = TechData.GetEquipmentType(techType);
+#endif
 
 
             if (equipType == EquipmentType.PowerCellCharger)
@@ -118,7 +122,11 @@ namespace FCS_DeepDriller.Mono
         public void OnHandHover(GUIHand hand)
         {
             HandReticle main = HandReticle.main;
+#if SUBNAUTICA
             main.SetInteractText(FCSDeepDrillerBuildable.OnBatteryHoverText());
+#elif BELOWZERO
+            main.SetText(HandReticle.TextType.Hand, FCSDeepDrillerBuildable.OnBatteryHoverText(), false);
+#endif
             main.SetIcon(HandReticle.IconType.Hand, 1f);
         }
 
@@ -175,7 +183,13 @@ namespace FCS_DeepDriller.Mono
                 var battery = prefab.gameObject.GetComponent<Battery>();
                 battery._charge = powercellData.Charge;
 
+#if SUBNAUTICA
                 var item = new InventoryItem(prefab.gameObject.GetComponent<Pickupable>().Pickup(false));
+#elif BELOWZERO
+                Pickupable pickupable = prefab.gameObject.GetComponent<Pickupable>();
+                pickupable.Pickup(false);
+                var item = new InventoryItem(pickupable);
+#endif
 
                 _equipment.AddItem(powercellData.Slot, item);
                 QuickLogger.Debug($"Load Item {item.item.name} to slot {powercellData.Slot}");

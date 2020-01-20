@@ -7,12 +7,12 @@ using Harmony;
 
 namespace FCS_DeepDriller.Patchers
 {
-    [HarmonyPatch(typeof(EscapePod))]
-    [HarmonyPatch("Awake")]
+    [HarmonyPatch(typeof(Player))]
+    [HarmonyPatch(nameof(Player.Update))]
     internal class Player_Patch
     {
         [HarmonyPostfix]
-        internal static void Postfix(EscapePod __instance)
+        internal static void Postfix(Player __instance)
         {
             EquipmentConfiguration.RefreshPDA();
         }

@@ -2,6 +2,7 @@
 using ARS_SeaBreezeFCS32.Mono;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
+using FCSCommon.Extensions;
 using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
 using System;
@@ -86,6 +87,8 @@ namespace ARS_SeaBreezeFCS32.Buildables
             }
         }
 
+#if SUBNAUTICA
+        
         protected override TechData GetBlueprintRecipe()
         {
             QuickLogger.Debug($"Creating recipe...");
@@ -95,11 +98,29 @@ namespace ARS_SeaBreezeFCS32.Buildables
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(TechTypeHelpers.GetTechType("SeaBreezeKit_SB"),1)
+                    new Ingredient(Mod.SeaBreezeKitClassID.ToTechType(),1)
                 }
             };
             QuickLogger.Debug($"Created Ingredients");
             return customFabRecipe;
         }
+#elif BELOWZERO
+        protected override RecipeData GetBlueprintRecipe()
+        {
+            QuickLogger.Debug($"Creating recipe...");
+            // Create and associate recipe to the new TechType
+            var customFabRecipe = new RecipeData()
+            {
+                craftAmount = 1,
+                Ingredients = new List<Ingredient>()
+                {
+                    new Ingredient(Mod.SeaBreezeKitClassID.ToTechType(), 1)
+                }
+            };
+            QuickLogger.Debug($"Created Ingredients");
+            return customFabRecipe;
+        }
+
+#endif
     }
 }

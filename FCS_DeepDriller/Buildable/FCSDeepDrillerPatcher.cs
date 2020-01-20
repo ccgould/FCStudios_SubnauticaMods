@@ -2,6 +2,7 @@
 using FCS_DeepDriller.Mono;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
+using FCSCommon.Extensions;
 using SMLHelper.V2.Crafting;
 using System.Collections.Generic;
 using System.IO;
@@ -108,6 +109,7 @@ namespace FCS_DeepDriller.Buildable
             return prefab;
         }
 
+#if SUBNAUTICA
         protected override TechData GetBlueprintRecipe()
         {
             QuickLogger.Debug($"Creating recipe...");
@@ -117,11 +119,28 @@ namespace FCS_DeepDriller.Buildable
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(TechTypeHelpers.GetTechType("DeepDrillerKit_DD"), 1)
+                    new Ingredient(Mod.DeepDrillerKitClassID.ToTechType(), 1)
                 }
             };
             QuickLogger.Debug($"Created Ingredients");
             return customFabRecipe;
         }
+#elif BELOWZERO
+        protected override RecipeData GetBlueprintRecipe()
+        {
+            QuickLogger.Debug($"Creating recipe...");
+            // Create and associate recipe to the new TechType
+            var customFabRecipe = new RecipeData()
+            {
+                craftAmount = 1,
+                Ingredients = new List<Ingredient>()
+                {
+                    new Ingredient(Mod.DeepDrillerKitClassID.ToTechType(), 1)
+                }
+            };
+            QuickLogger.Debug($"Created Ingredients");
+            return customFabRecipe;
+        }
+#endif
     }
 }

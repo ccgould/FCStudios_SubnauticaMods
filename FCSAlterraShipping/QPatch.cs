@@ -47,7 +47,7 @@ namespace FCSAlterraShipping
 
         private static void AddTechFabricatorItems()
         {
-            var icon = new Atlas.Sprite(ImageUtils.LoadTextureFromFile(Path.Combine(Mod.GetAssetPath(), $"{Mod.ClassID}.png")));
+            var icon = ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), $"{Mod.ClassID}.png"));
             var craftingTab = new CraftingTab(Mod.AlterraShippingTabID, Mod.FriendlyName, icon);
 
             var alterraShippingKit = new FCSKit(Mod.AlterraShippingKitClassID, Mod.FriendlyName, craftingTab, Mod.AlterraShippingIngredients);

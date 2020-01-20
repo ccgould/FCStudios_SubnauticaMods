@@ -68,7 +68,7 @@ namespace AE.SeaCooker
 
         private static void AddTechFabricatorItems()
         {
-            var icon = new Atlas.Sprite(ImageUtils.LoadTextureFromFile(Path.Combine(Mod.GetAssetFolder(), $"{Mod.ClassID}.png")));
+            var icon = ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetFolder(), $"{Mod.ClassID}.png"));
             var craftingTab = new CraftingTab(Mod.SeaCookerTabID, Mod.FriendlyName, icon);
 
             var seaCookerKit = new FCSKit(Mod.SeaCookerKitClassID, Mod.FriendlyName, craftingTab, Mod.SeaCookerIngredients);

@@ -134,6 +134,7 @@ namespace ExStorageDepot.Buildable
             return container;
         }
 
+#if SUBNAUTICA
         protected override TechData GetBlueprintRecipe()
         {
             QuickLogger.Debug($"Creating recipe...");
@@ -152,5 +153,25 @@ namespace ExStorageDepot.Buildable
 
             return customFabRecipe;
         }
+#elif BELOWZERO
+        protected override RecipeData GetBlueprintRecipe()
+        {
+            QuickLogger.Debug($"Creating recipe...");
+
+            // Create and associate recipe to the new TechType
+            var customFabRecipe = new RecipeData()
+            {
+                craftAmount = 1,
+                Ingredients = new List<Ingredient>()
+                {
+                    new Ingredient(Mod.ExStorageKitClassID.ToTechType(), 1)
+                }
+            };
+
+            QuickLogger.Debug($"Created Ingredients");
+
+            return customFabRecipe;
+        }
+#endif
     }
 }

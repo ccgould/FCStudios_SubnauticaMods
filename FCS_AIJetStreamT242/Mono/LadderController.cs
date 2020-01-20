@@ -16,7 +16,11 @@ namespace FCS_AIMarineTurbine.Mono
         {
             HandReticle main = HandReticle.main;
 
+#if SUBNAUTICA
             main.SetInteractText("Climb Ladder");
+#elif BELOWZERO
+            main.SetText(HandReticle.TextType.Hand, "Climb Ladder", false);
+#endif
             main.SetIcon(HandReticle.IconType.Hand, 1f);
         }
 

@@ -46,7 +46,11 @@ namespace FCSAlterraShipping.Mono
         {
             if (!hover) return;
             HandReticle.main.SetIcon(HandReticle.IconType.Rename);
+#if SUBNAUTICA
             HandReticle.main.SetInteractTextRaw("Set Shipping Container Name", "");
+#elif BELOWZERO
+            HandReticle.main.SetTextRaw(HandReticle.TextType.Hand, "Set Shipping Container Name");
+#endif
         }
 
         public static AlterraShippingNameController Create(AlterraShippingTarget shippingContainer, GameObject textPrefab)
