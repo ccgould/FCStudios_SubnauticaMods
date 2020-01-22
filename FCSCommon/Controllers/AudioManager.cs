@@ -24,7 +24,8 @@ namespace FCSCommon.Controllers
 
         public void LoadFModAssets(string audioPath, string trackName)
         {
-            while (true)
+            int Count = 0;
+            while (Count < 2)
             {
                 FMODAsset[] fMods = Resources.FindObjectsOfTypeAll<FMODAsset>();
 
@@ -44,10 +45,15 @@ namespace FCSCommon.Controllers
                 {
                     QuickLogger.Debug($"{trackName} not found trying to search again...", true);
                     Resources.Load<GameObject>(audioPath);
+                    Count++;
                     continue;
                 }
 
                 break;
+            }
+            if(Count == 2)
+            {
+                QuickLogger.Debug($"{trackName} not found", true);
             }
         }
 
