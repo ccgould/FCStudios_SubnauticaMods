@@ -21,7 +21,7 @@ namespace QuantumTeleporter.Buildable
     internal partial class QuantumTeleporterBuildable : Buildable
     {
         private static readonly QuantumTeleporterBuildable Singleton = new QuantumTeleporterBuildable();
-        public sealed override TechType RequiredForUnlock => TechType.PrecursorPrisonAquariumFinalTeleporter;
+        public sealed override TechType RequiredForUnlock => TechType.PrecursorIonCrystal;
 
         public QuantumTeleporterBuildable() : base(Mod.ClassID, Mod.FriendlyName, Mod.Description)
         {
