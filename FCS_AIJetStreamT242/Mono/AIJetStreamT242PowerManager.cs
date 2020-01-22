@@ -34,6 +34,7 @@ namespace FCS_AIJetStreamT242.Mono
         private void Start()
         {
             _capacity = AIJetStreamT242Buildable.JetStreamT242Config.MaxCapacity;
+
             StartCoroutine(UpdatePowerRelay());
             //InvokeRepeating();
         }
@@ -79,16 +80,23 @@ namespace FCS_AIJetStreamT242.Mono
             if (_mono.HealthManager == null) return;
 
             
-            var decPercentage = (MaxPowerPerMin / _mono.MaxSpeed) / 60;
-
-            _energyPerSec = _mono.GetCurrentSpeed() * decPercentage;
+            
+            if(_mono.MaxSpeed > 0)
+            {
+                var decPercentage = (MaxPowerPerMin / _mono.MaxSpeed) / 60;
+                _energyPerSec = _mono.GetCurrentSpeed() * decPercentage;
+            }
+            else
+            {
+                _energyPerSec = 0;
+            }
 
             if (_hasBreakerTripped || _mono.HealthManager.IsDamageApplied()) return;
 
             _timeCurrDeltaTime += DayNightCycle.main.deltaTime;
 
             if (!(_timeCurrDeltaTime >= 1)) return;
-
+            
             _charge = Mathf.Clamp(_charge + _energyPerSec, 0, AIJetStreamT242Buildable.JetStreamT242Config.MaxCapacity);
 
             _timeCurrDeltaTime = 0;
