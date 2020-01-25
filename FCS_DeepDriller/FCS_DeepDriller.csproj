@@ -169,7 +169,7 @@
     <Compile Include="Ores\Craftables\Glass.cs" />
     <Compile Include="Ores\SandOrePatcher.cs" />
     <Compile Include="Patchers\EquipmentPatchers.cs" />
-    <Compile Include="Patchers\PlayerPatchers.cs" />
+    <Compile Include="Patchers\uGUI_DepthCompassPatchers.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -48,16 +48,22 @@ namespace FCS_DeepDriller.Configuration
 
         internal static void RefreshPDA()
         {
-            if (Player.main == null)
+            if (_pdaRefreshed || Player.main == null) return;
+
+            PDA pdaMain = Player.main?.GetPDA();
+
+            if (pdaMain == null)
             {
-                QuickLogger.Debug("Player was null when trying to refresh PDA");
+                QuickLogger.Error("Player GetPDA was null when trying to refresh PDA");
                 return;
             }
 
-            PDA pdaMain = Player.main.GetPDA();
             pdaMain.Open(PDATab.None, null, null, -1f);
             pdaMain.Close();
             QuickLogger.Debug("Deep Driller refreshed PDA.");
+            _pdaRefreshed = true;
         }
+
+        private static bool _pdaRefreshed;
     }
 }
