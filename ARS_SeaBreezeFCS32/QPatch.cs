@@ -83,7 +83,7 @@ namespace ARS_SeaBreezeFCS32
             var icon = ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetFolder(), "ARSSeaBreeze.png"));
             var craftingTab = new CraftingTab(Mod.SeaBreezeTabID, Mod.FriendlyName, icon);
 
-            var freon = new FreonPatcher("Freon_ARS", "Freon", "Freon gives your SeaBreeze cooling on Planet 4546B.", craftingTab);
+            var freon = new FreonPatcher(Mod.FreonClassID, Mod.FreonFriendlyName, Mod.FreonDescription, craftingTab);
             freon.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
 
             var seaBreezeKit = new FCSKit(Mod.SeaBreezeKitClassID, Mod.FriendlyName, craftingTab, Mod.SeaBreezeIngredients);

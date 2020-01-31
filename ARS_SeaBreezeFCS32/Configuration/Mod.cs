@@ -26,6 +26,9 @@ namespace ARS_SeaBreezeFCS32.Configuration
         internal const string ModFolderName = ModName;
         internal static string ExecutingDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         internal const string SeaBreezeKitClassID = "SeaBreezeKit_SB";
+        internal const string FreonDescription = "Freon gives your SeaBreeze cooling on Planet 4546B.";
+        internal const string FreonClassID = "Freon_ARS";
+        internal const string FreonFriendlyName = "Freon";
 
         internal static string MODFOLDERLOCATION => GetModPath();
 
@@ -40,9 +43,10 @@ namespace ARS_SeaBreezeFCS32.Configuration
                 new Ingredient(TechType.Titanium, 3),
                 new Ingredient(TechType.AdvancedWiringKit, 1),
                 new Ingredient(TechType.Glass, 1),
-                new Ingredient(Mod.SeaBreezeKitClassID.ToTechType(), 1)
+                new Ingredient(Mod.FreonClassID.ToTechType(), 1)
             }
         };
+
 #elif BELOWZERO
         internal static RecipeData SeaBreezeIngredients => new RecipeData
         {
@@ -54,7 +58,7 @@ namespace ARS_SeaBreezeFCS32.Configuration
                 new Ingredient(TechType.Titanium, 3),
                 new Ingredient(TechType.AdvancedWiringKit, 1),
                 new Ingredient(TechType.Glass, 1),
-                new Ingredient(Mod.SeaBreezeKitClassID.ToTechType(), 1)
+                new Ingredient(Mod.FreonClassID.ToTechType(), 1)
             }
         };
 
