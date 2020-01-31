@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using ARS_SeaBreezeFCS32.Mono;
-using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using FCSCommon.Extensions;
 using Oculus.Newtonsoft.Json;
 using SMLHelper.V2.Crafting;
-using UnityEngine;
 
 namespace ARS_SeaBreezeFCS32.Configuration
 {

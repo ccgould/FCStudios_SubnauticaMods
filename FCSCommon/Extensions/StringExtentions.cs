@@ -1,7 +1,4 @@
-﻿using SMLHelper.V2.Handlers;
-using System;
-
-namespace FCSCommon.Extensions
+﻿namespace FCSCommon.Extensions
 {
     internal static class StringExtentions
     {

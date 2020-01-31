@@ -1,9 +1,7 @@
 ﻿using ARS_SeaBreezeFCS32.Buildables;
 using ARS_SeaBreezeFCS32.Configuration;
-using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using Harmony;
-using Oculus.Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Reflection;

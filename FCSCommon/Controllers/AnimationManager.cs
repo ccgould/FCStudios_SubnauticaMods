@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using FCSCommon.Abstract;
-using FCSCommon.Utilities;
+﻿using FCSCommon.Utilities;
 using UnityEngine;
 
 namespace FCSCommon.Controllers

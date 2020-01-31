@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using FCSCommon.Abstract;
-using FCSCommon.Enums;
 using UnityEngine;
 using UnityEngine.UI;
 

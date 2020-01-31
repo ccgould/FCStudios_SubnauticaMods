@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace ARS_SeaBreezeFCS32.Configuration
+﻿namespace ARS_SeaBreezeFCS32.Configuration
 {
     public class ModConfiguration
     {

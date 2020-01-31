@@ -1,5 +1,4 @@
-﻿using FCSCommon.Objects;
-using FCSTechFabricator.Objects;
+﻿using FCSTechFabricator.Objects;
 using UnityEngine;
 
 namespace FCSCommon.Extensions
