@@ -28,14 +28,8 @@ namespace ARS_SeaBreezeFCS32
         [QModPatch]
         public static void Patch()
         {
-            // == Load Configuration == //
-            string configJson = File.ReadAllText(Mod.ConfigurationFile().Trim());
+            Configuration = Mod.LoadConfiguration();
 
-            JsonSerializerSettings settings = new JsonSerializerSettings();
-            settings.MissingMemberHandling = MissingMemberHandling.Ignore;
-
-            Configuration = JsonConvert.DeserializeObject<ModConfiguration>(configJson, settings);
-            
             var assembly = Assembly.GetExecutingAssembly();
             QuickLogger.Info("Started patching. Version: " + QuickLogger.GetAssemblyVersion(assembly));
 

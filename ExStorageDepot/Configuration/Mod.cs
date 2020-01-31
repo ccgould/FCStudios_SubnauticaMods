@@ -4,6 +4,7 @@ using SMLHelper.V2.Utility;
 using System;
 using System.Collections;
 using System.IO;
+using Oculus.Newtonsoft.Json;
 using SMLHelper.V2.Crafting;
 using UnityEngine;
 
@@ -158,6 +159,42 @@ namespace ExStorageDepot.Configuration
             return new ExStorageDepotSaveDataEntry() { Id = id };
         }
         #endregion
+
+        private static void CreateModConfiguration()
+        {
+            var config = new Config();
+
+            var saveDataJson = JsonConvert.SerializeObject(config, Formatting.Indented);
+
+            File.WriteAllText(ConfigurationFile(), saveDataJson);
+        }
+
+        private static Config LoadConfigurationData()
+        {
+            // == Load Configuration == //
+            string configJson = File.ReadAllText(ConfigurationFile().Trim());
+
+            JsonSerializerSettings settings = new JsonSerializerSettings();
+            settings.MissingMemberHandling = MissingMemberHandling.Ignore;
+
+            // == LoadData == //
+            return JsonConvert.DeserializeObject<Config>(configJson, settings);
+        }
+
+        internal static Config LoadConfiguration()
+        {
+            if (!IsConfigAvailable())
+            {
+                CreateModConfiguration();
+            }
+
+            return LoadConfigurationData();
+        }
+
+        internal static bool IsConfigAvailable()
+        {
+            return File.Exists(ConfigurationFile());
+        }
 
     }
 }

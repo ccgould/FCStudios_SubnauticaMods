@@ -4,6 +4,6 @@ namespace ARS_SeaBreezeFCS32.Configuration
 {
     public class ModConfiguration
     {
-        public int StorageLimit { get; set; }
+        public int StorageLimit { get; set; } = 100;
     }
 }

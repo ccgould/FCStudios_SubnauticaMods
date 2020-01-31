@@ -47,7 +47,7 @@ namespace AE.MiniFountainFilter
                     throw new FileNotFoundException("Bundle failed to load");
                 }
 
-                LoadConfiguration();
+                Configuration = Mod.LoadConfiguration();
 
                 AddItemsToTechFabricator();
 

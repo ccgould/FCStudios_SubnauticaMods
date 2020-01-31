@@ -14,6 +14,7 @@ namespace AE.MiniFountainFilter.Managers
         #endregion
 
         #region Constructor
+
         /// <summary>
         /// Default Constructor 
         /// </summary>
@@ -25,6 +26,7 @@ namespace AE.MiniFountainFilter.Managers
 
             _loopingEmitter.asset = _loop;
         }
+
         #endregion
 
         #region Private Methods

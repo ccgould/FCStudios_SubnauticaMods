@@ -32,7 +32,7 @@ namespace ExStorageDepot
 
             try
             {
-                LoadConfiguration();
+                Config = Mod.LoadConfiguration();
 
                 AddTechFabricatorItems();
                 
@@ -49,17 +49,6 @@ namespace ExStorageDepot
             }
         }
 
-        private static void LoadConfiguration()
-        {
-            // == Load Configuration == //
-            string configJson = File.ReadAllText(Mod.ConfigurationFile().Trim());
-
-            JsonSerializerSettings settings = new JsonSerializerSettings();
-            settings.MissingMemberHandling = MissingMemberHandling.Ignore;
-
-            //LoadData
-            Config = JsonConvert.DeserializeObject<Config>(configJson, settings);
-        }
 
         private static void AddTechFabricatorItems()
         {

@@ -4,6 +4,7 @@ using FCSCommon.Extensions;
 using FCSCommon.Utilities;
 using System;
 using System.Collections.Generic;
+using SMLHelper.V2.Crafting;
 using UnityEngine;
 
 namespace AE.MiniFountainFilter.Managers
@@ -187,10 +188,15 @@ namespace AE.MiniFountainFilter.Managers
             {
                 var pickup = _bottleTechType.ToPickupable();
 
-                if (Inventory.main.Pickup(pickup))
+                if (Inventory.main.HasRoomFor(pickup))
                 {
                     _mono.TankManager.RemoveWater(_bottleWaterContent);
-                    CrafterLogic.NotifyCraftEnd(Player.main.gameObject, _bottleTechType);
+                    
+                    Inventory.main.container.UnsafeAdd(_bottleTechType.ToInventoryItem());
+
+                    uGUI_IconNotifier.main.Play(_bottleTechType, uGUI_IconNotifier.AnimationType.From, null);
+
+                    pickup.PlayPickupSound();
                 }
                 else
                 {

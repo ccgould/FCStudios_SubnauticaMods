@@ -6,6 +6,7 @@ using ARS_SeaBreezeFCS32.Mono;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using FCSCommon.Extensions;
+using Oculus.Newtonsoft.Json;
 using SMLHelper.V2.Crafting;
 using UnityEngine;
 
@@ -14,7 +15,7 @@ namespace ARS_SeaBreezeFCS32.Configuration
     internal static class Mod
     {
         private static int seabreezeCount;
-
+        private const string ConfigFileName = "config.json";
         #region Internal Properties
         internal const string ModName = "FCS_ARSSeaBreeze";
         internal const string BundleName = "arsseabreezefcs32modbundle";
@@ -91,5 +92,41 @@ namespace ARS_SeaBreezeFCS32.Configuration
         }
 
         #endregion
+
+        private static void CreateModConfiguration()
+        {
+            var config = new ModConfiguration();
+
+            var saveDataJson = JsonConvert.SerializeObject(config, Formatting.Indented);
+
+            File.WriteAllText(Path.Combine(MODFOLDERLOCATION, ConfigFileName), saveDataJson);
+        }
+
+        private static ModConfiguration LoadConfigurationData()
+        {
+            // == Load Configuration == //
+            string configJson = File.ReadAllText(ConfigurationFile().Trim());
+
+            JsonSerializerSettings settings = new JsonSerializerSettings();
+            settings.MissingMemberHandling = MissingMemberHandling.Ignore;
+
+            // == LoadData == //
+            return JsonConvert.DeserializeObject<ModConfiguration>(configJson, settings);
+        }
+
+        internal static ModConfiguration LoadConfiguration()
+        {
+            if (!IsConfigAvailable())
+            {
+                CreateModConfiguration();
+            }
+
+            return LoadConfigurationData();
+        }
+
+        internal static bool IsConfigAvailable()
+        {
+            return File.Exists(ConfigurationFile());
+        }
     }
 }

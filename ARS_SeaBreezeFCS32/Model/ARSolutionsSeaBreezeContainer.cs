@@ -5,6 +5,7 @@ using FCSCommon.Objects;
 using FCSCommon.Utilities;
 using System;
 using System.Collections.Generic;
+using FCSCommon.Extensions;
 using UnityEngine;
 
 namespace ARS_SeaBreezeFCS32.Model
@@ -79,44 +80,49 @@ namespace ARS_SeaBreezeFCS32.Model
 
         internal void RemoveItem(TechType techType)
         {
-            EatableEntities match = FindMatch(techType);
+            var pickupable = techType.ToPickupable();
 
-            if (match != null)
+            if (Inventory.main.HasRoomFor(pickupable))
             {
-                var go = GameObject.Instantiate(CraftData.GetPrefabForTechType(techType));
-                var eatable = go.GetComponent<Eatable>();
-                var pickup = go.GetComponent<Pickupable>();
+                EatableEntities match = FindMatch(techType);
 
-                eatable.foodValue = match.FoodValue;
-                eatable.waterValue = match.WaterValue;
-
-                if (Inventory.main.Pickup(pickup))
+                if (match != null)
                 {
-                    QuickLogger.Debug($"Removed Match Before || Fridge Count {FridgeItems.Count}");
-                    FridgeItems.Remove(match);
-                    QuickLogger.Debug($"Removed Match || Fridge Count {FridgeItems.Count}");
+                    var go = GameObject.Instantiate(CraftData.GetPrefabForTechType(techType));
+                    var eatable = go.GetComponent<Eatable>();
+                    var pickup = go.GetComponent<Pickupable>();
 
-                    CrafterLogic.NotifyCraftEnd(Player.main.gameObject, techType);
+                    eatable.foodValue = match.FoodValue;
+                    eatable.waterValue = match.WaterValue;
 
-                    if (TrackedItems.ContainsKey(techType))
+                    if (Inventory.main.Pickup(pickup))
                     {
-                        if (TrackedItems[techType] != 1)
+                        QuickLogger.Debug($"Removed Match Before || Fridge Count {FridgeItems.Count}");
+                        FridgeItems.Remove(match);
+                        QuickLogger.Debug($"Removed Match || Fridge Count {FridgeItems.Count}");
+
+
+                        if (TrackedItems.ContainsKey(techType))
                         {
-                            TrackedItems[techType] = TrackedItems[techType] - 1;
+                            if (TrackedItems[techType] != 1)
+                            {
+                                TrackedItems[techType] = TrackedItems[techType] - 1;
+                            }
+                            else
+                            {
+                                TrackedItems.Remove(techType);
+                            }
                         }
-                        else
-                        {
-                            TrackedItems.Remove(techType);
-                        }
+
+                        _mono.SetDeconstructionAllowed(NumberOfItems == 0);
+
+                        _mono.Display.ItemModified(TechType.None);
                     }
 
-                    _mono.SetDeconstructionAllowed(NumberOfItems == 0);
-
-                    _mono.Display.ItemModified(TechType.None);
+                    OnContainerUpdate?.Invoke(NumberOfItems, QPatch.Configuration.StorageLimit);
                 }
-
-                OnContainerUpdate?.Invoke(NumberOfItems, QPatch.Configuration.StorageLimit);
             }
+            GameObject.Destroy(pickupable);
         }
 
         public void OpenStorage()

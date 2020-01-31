@@ -170,5 +170,41 @@ namespace AE.MiniFountainFilter.Configuration
         }
 
         #endregion
+
+        private static void CreateModConfiguration()
+        {
+            var config = new ModConfiguration();
+
+            var saveDataJson = JsonConvert.SerializeObject(config, Formatting.Indented);
+
+            File.WriteAllText(ConfigurationFile(), saveDataJson);
+        }
+
+        private static ModConfiguration LoadConfigurationData()
+        {
+            // == Load Configuration == //
+            string configJson = File.ReadAllText(ConfigurationFile().Trim());
+
+            JsonSerializerSettings settings = new JsonSerializerSettings();
+            settings.MissingMemberHandling = MissingMemberHandling.Ignore;
+
+            // == LoadData == //
+            return JsonConvert.DeserializeObject<ModConfiguration>(configJson, settings);
+        }
+
+        internal static ModConfiguration LoadConfiguration()
+        {
+            if (!IsConfigAvailable())
+            {
+                CreateModConfiguration();
+            }
+
+            return LoadConfigurationData();
+        }
+
+        internal static bool IsConfigAvailable()
+        {
+            return File.Exists(ConfigurationFile());
+        }
     }
 }

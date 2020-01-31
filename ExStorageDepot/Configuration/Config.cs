@@ -7,6 +7,6 @@ namespace ExStorageDepot.Configuration
 {
     public class Config
     {
-        [JsonProperty] internal int MaxStorage { get; set; }
+        [JsonProperty] internal int MaxStorage { get; set; } = 200;
     }
 }

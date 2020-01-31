@@ -6,6 +6,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using FCSCommon.Extensions;
 using UnityEngine;
 
 
@@ -175,8 +176,7 @@ namespace ExStorageDepot.Mono.Managers
                 _dumpContainer.RemoveItem(item.item);
             }
         }
-
-
+        
         private void UpdateScreen(TechType techType, OperationMode mode = OperationMode.Addition)
         {
             switch (mode)
@@ -289,31 +289,36 @@ namespace ExStorageDepot.Mono.Managers
 
             QuickLogger.Debug($"Container returned {amount} item/s for TechType {techType}");
 
+            var pickupable = techType.ToPickupable();
 
-            if (amount > 0)
+            if (Inventory.main.HasRoomFor(pickupable))
             {
-                QuickLogger.Debug($"Attempting to take {_multiplier} item/s");
-
-                for (int i = 0; i < _multiplier; i++)
+                if (amount > 0)
                 {
-                    Pickupable pickup = _container.container.RemoveItem(techType);
+                    QuickLogger.Debug($"Attempting to take {_multiplier} item/s");
 
-                    if (pickup == null)
+                    for (int i = 0; i < _multiplier; i++)
                     {
-                        QuickLogger.Debug($"There are 0 {techType} in the container while using first or default Current Amount of {techType} is: {_container.container.GetCount(techType)}", true);
-                        return;
-                    }
+                        Pickupable pickup = _container.container.RemoveItem(techType);
 
-                    if (Inventory.main.Pickup(pickup))
-                    {
-                        CrafterLogic.NotifyCraftEnd(Player.main.gameObject, techType);
+                        if (pickup == null)
+                        {
+                            QuickLogger.Debug($"There are 0 {techType} in the container while using first or default Current Amount of {techType} is: {_container.container.GetCount(techType)}", true);
+                            return;
+                        }
+                        
+                        Inventory.main.Pickup(pickup);
+                        
+                        //pickup.PlayPickupSound();
                     }
                 }
+                else
+                {
+                    QuickLogger.Debug($"There are 0 {techType} in the container.", true);
+                }
             }
-            else
-            {
-                QuickLogger.Debug($"There are 0 {techType} in the container.", true);
-            }
+
+            GameObject.Destroy(pickupable);
         }
 
         private void ContainerOnRemoveItem(InventoryItem item)
