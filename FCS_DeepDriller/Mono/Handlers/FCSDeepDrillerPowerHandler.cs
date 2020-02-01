@@ -111,7 +111,7 @@ namespace FCS_DeepDriller.Mono.Handlers
             _depthCurve.AddKey(0.4245796f, 0.5001081f);
             _depthCurve.AddKey(1f, 1f);
 
-            _powerBank.Solar.InitializeSolar(0, FCSDeepDrillerBuildable.DeepDrillConfig.SolarCapacity);
+            _powerBank.Solar.InitializeSolar(0, QPatch.Configuration.SolarCapacity);
             PowerState = FCSPowerStates.Tripped;
 
             _initialized = true;

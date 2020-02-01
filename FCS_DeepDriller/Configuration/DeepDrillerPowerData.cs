@@ -58,7 +58,7 @@ namespace FCS_DeepDriller.Configuration
 
         internal void ConsumePower(DeepDrillModules module)
         {
-            var powerDraw = FCSDeepDrillerBuildable.DeepDrillConfig.PowerDraw;
+            var powerDraw = QPatch.Configuration.PowerDraw;
             //var charge = Mathf.Clamp(GetCharge(module) - powerDraw, 0, GetCapacity(module));
 
             switch (module)

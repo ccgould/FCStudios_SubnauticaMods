@@ -23,7 +23,6 @@ namespace FCS_DeepDriller.Buildable
         public override TechType RequiredForUnlock { get; } = TechType.ExosuitDrillArmModule;
 
         public override string AssetsFolder { get; } = $"FCS_DeepDriller/Assets";
-        public static DeepDrillerCfg DeepDrillConfig { get; internal set; }
 
         public FCSDeepDrillerBuildable() : base(Mod.ModClassID, Mod.ModFriendlyName, Mod.ModDecription)
         {
@@ -38,17 +37,6 @@ namespace FCS_DeepDriller.Buildable
             }
 
             Singleton.Patch();
-            
-            string savedDataJson = File.ReadAllText(Path.Combine(AssetHelper.GetConfigFolder(Mod.ModFolderName), $"{Singleton.ClassID}.json")).Trim();
-
-            var jsonSerializerSettings = new JsonSerializerSettings();
-            jsonSerializerSettings.MissingMemberHandling = MissingMemberHandling.Ignore;
-
-            DeepDrillConfig = JsonConvert.DeserializeObject<DeepDrillerCfg>(savedDataJson, jsonSerializerSettings);
-            DeepDrillConfig.Convert();
-
-            QuickLogger.Debug($"Biome Ores Count {DeepDrillConfig.BiomeOresTechType.Count}");
-
         }
 
         public override GameObject GetGameObject()

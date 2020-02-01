@@ -81,7 +81,7 @@ namespace FCS_DeepDriller.Mono.Handlers
                      || item.item.GetTechType() == TechTypeHelper.DrillerMK2TechType()
                      || item.item.GetTechType() == TechTypeHelper.DrillerMK3TechType())
             {
-                _mono.OreGenerator.SetOresPerDay(12);
+                _mono.OreGenerator.SetOresPerDay(QPatch.Configuration.DrillOrePerDay);
                 _upgradeAttached = false;
             }
 
@@ -108,17 +108,17 @@ namespace FCS_DeepDriller.Mono.Handlers
             }
             else if (item.item.GetTechType() == TechTypeHelper.DrillerMK1TechType())
             {
-                _mono.OreGenerator.SetOresPerDay(15);
+                _mono.OreGenerator.SetOresPerDay(QPatch.Configuration.Mk1OrePerDay);
                 _upgradeAttached = true;
             }
             else if (item.item.GetTechType() == TechTypeHelper.DrillerMK2TechType())
             {
-                _mono.OreGenerator.SetOresPerDay(22);
+                _mono.OreGenerator.SetOresPerDay(QPatch.Configuration.Mk2OrePerDay);
                 _upgradeAttached = true;
             }
             else if (item.item.GetTechType() == TechTypeHelper.DrillerMK3TechType())
             {
-                _mono.OreGenerator.SetOresPerDay(30);
+                _mono.OreGenerator.SetOresPerDay(QPatch.Configuration.Mk3OrePerDay);
                 _upgradeAttached = true;
             }
         }

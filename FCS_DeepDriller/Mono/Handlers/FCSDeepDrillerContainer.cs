@@ -19,8 +19,8 @@ namespace FCS_DeepDriller.Mono.Handlers
         private int MaxContainerSlots => _containerHeight * _containerWidth;
         private int ContainerSlotsFilled => _container.count;
         internal bool IsContainerFull => _container.count == MaxContainerSlots || !_container.HasRoomFor(1, 1);
-        private readonly int _containerWidth = FCSDeepDrillerBuildable.DeepDrillConfig.StorageSize.Width;
-        private readonly int _containerHeight = FCSDeepDrillerBuildable.DeepDrillConfig.StorageSize.Height;
+        private readonly int _containerWidth = QPatch.Configuration.StorageSize.Width;
+        private readonly int _containerHeight = QPatch.Configuration.StorageSize.Height;
         private readonly Dictionary<TechType, int> _containerItemsTracker = new Dictionary<TechType, int>();
 
 

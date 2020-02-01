@@ -20,7 +20,8 @@ namespace FCS_DeepDriller
     public static class QPatch
     {
         public static AssetBundle GlobalBundle { get; set; }
-        
+        public static DeepDrillerCfg Configuration { get; private set; }
+
         [QModPatch]
         public static void Patch()
         {
@@ -43,6 +44,9 @@ namespace FCS_DeepDriller
                     QuickLogger.Error("Global Bundle has returned null stopping patching");
                     throw new FileNotFoundException("Bundle failed to load");
                 }
+
+                Configuration = Mod.LoadConfiguration();
+                Configuration.Convert();
 
                 AddItemsToTechFabricator();
 
@@ -84,15 +88,15 @@ namespace FCS_DeepDriller
             solarAttachmentKit.ChangeIconLocation(assetsFolder, "SolarAttachment_DD");
             solarAttachmentKit.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
 
-            var drillerMK1Module = new FCSModule(Mod.DrillerMK1ModuleClassID, Mod.DrillerMK1ModuleFriendlyName, "This upgrade allows deep driller to drill 15 resources per day.", craftingTab, Mod.DrillerMK1Ingredients);
+            var drillerMK1Module = new FCSModule(Mod.DrillerMK1ModuleClassID, Mod.DrillerMK1ModuleFriendlyName, Mod.MK1Description, craftingTab, Mod.DrillerMK1Ingredients);
             drillerMK1Module.ChangeIconLocation(assetsFolder, Mod.DrillerMK1ModuleClassID);
             drillerMK1Module.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
 
-            var drillerMK2Module = new FCSModule(Mod.DrillerMK2ModuleClassID, Mod.DrillerMK2ModuleFriendlyName, "This upgrade allows deep driller to drill 22 resources per day.", craftingTab, Mod.DrillerMK2Ingredients);
+            var drillerMK2Module = new FCSModule(Mod.DrillerMK2ModuleClassID, Mod.DrillerMK2ModuleFriendlyName, Mod.MK2Description, craftingTab, Mod.DrillerMK2Ingredients);
             drillerMK2Module.ChangeIconLocation(assetsFolder, Mod.DrillerMK2ModuleClassID);
             drillerMK2Module.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
 
-            var drillerMK3Module = new FCSModule(Mod.DrillerMK3ModuleClassID, Mod.DrillerMK3ModuleFriendlyName, "This upgrade allows deep driller to drill 30 resources per day.", craftingTab, Mod.DrillerMK3Ingredients);
+            var drillerMK3Module = new FCSModule(Mod.DrillerMK3ModuleClassID, Mod.DrillerMK3ModuleFriendlyName, Mod.MK3Description, craftingTab, Mod.DrillerMK3Ingredients);
             drillerMK3Module.ChangeIconLocation(assetsFolder, Mod.DrillerMK3ModuleClassID);
             drillerMK3Module.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
         }

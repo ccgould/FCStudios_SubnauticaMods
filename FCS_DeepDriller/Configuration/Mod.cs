@@ -6,6 +6,7 @@ using System.Collections;
 using System.IO;
 using FCSCommon.Helpers;
 using FCSCommon.Extensions;
+using Oculus.Newtonsoft.Json;
 using SMLHelper.V2.Crafting;
 using UnityEngine;
 
@@ -47,6 +48,9 @@ namespace FCS_DeepDriller.Configuration
         private static ModSaver _saveObject;
 
         private static DeepDrillerSaveData _deepDrillerSaveData;
+        public static string MK1Description => $"This upgrade allows deep driller to drill {QPatch.Configuration.Mk1OrePerDay} resources per day.";
+        public static string MK2Description => $"This upgrade allows deep driller to drill {QPatch.Configuration.Mk2OrePerDay} resources per day.";
+        public static string MK3Description => $"This upgrade allows deep driller to drill {QPatch.Configuration.Mk3OrePerDay} resources per day.";
 
         internal static event Action<DeepDrillerSaveData> OnDeepDrillerDataLoaded;
 
@@ -310,10 +314,10 @@ namespace FCS_DeepDriller.Configuration
         {
             return Path.Combine(Path.Combine(QMODFOLDER, "FCSTechWorkBench"), "globalmaterials");
         }
-
+        
         private static string GetConfigPath()
         {
-            return Path.Combine(GetModPath(), "Configurations");
+            return Path.Combine(GetModPath(), "config.json");
         }
 
         private static string GetLanguagePath()
@@ -330,6 +334,42 @@ namespace FCS_DeepDriller.Configuration
         internal static string GetSaveFileDirectory()
         {
             return Path.Combine(SaveUtils.GetCurrentSaveDataDir(), ModClassID);
+        }
+
+        internal static bool IsConfigAvailable()
+        {
+            return File.Exists(GetConfigPath());
+        }
+
+        private static void CreateModConfiguration()
+        {
+            var config = new DeepDrillerCfg();
+
+            var saveDataJson = JsonConvert.SerializeObject(config, Formatting.Indented);
+
+            File.WriteAllText(Path.Combine(MODFOLDERLOCATION, GetConfigPath()), saveDataJson);
+        }
+
+        private static DeepDrillerCfg LoadConfigurationData()
+        {
+            // == Load Configuration == //
+            string configJson = File.ReadAllText(GetConfigPath().Trim());
+
+            JsonSerializerSettings settings = new JsonSerializerSettings();
+            settings.MissingMemberHandling = MissingMemberHandling.Ignore;
+
+            // == LoadData == //
+            return JsonConvert.DeserializeObject<DeepDrillerCfg>(configJson, settings);
+        }
+
+        internal static DeepDrillerCfg LoadConfiguration()
+        {
+            if (!IsConfigAvailable())
+            {
+                CreateModConfiguration();
+            }
+
+            return LoadConfigurationData();
         }
     }
 }

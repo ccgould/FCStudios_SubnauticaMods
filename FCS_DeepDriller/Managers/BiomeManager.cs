@@ -11,7 +11,7 @@ namespace FCS_DeepDriller.Managers
         {
             QuickLogger.Debug("Finding Biome Data.");
 
-            foreach (var biomeOre in FCSDeepDrillerBuildable.DeepDrillConfig.BiomeOresTechType)
+            foreach (var biomeOre in QPatch.Configuration.BiomeOresTechType)
             {
                 QuickLogger.Debug($"Comparing {biomeOre.Key}");
                 QuickLogger.Debug($" To {biome.ToLower()}");
@@ -58,7 +58,7 @@ namespace FCS_DeepDriller.Managers
             var result = string.Empty;
             QuickLogger.Debug("// ============================= IN FindMatchingBiome ============================= //");
 
-            foreach (var biomeItem in FCSDeepDrillerBuildable.DeepDrillConfig.BiomeOresTechType)
+            foreach (var biomeItem in QPatch.Configuration.BiomeOresTechType)
             {
                 QuickLogger.Debug($"Checking for {biome} || Current biome in iteration = {biomeItem.Key}");
 
