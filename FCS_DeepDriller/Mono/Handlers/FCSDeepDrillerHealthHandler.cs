@@ -33,6 +33,8 @@ namespace FCS_DeepDriller.Mono.Handlers
 
         internal bool IsDamagedFlag()
         {
+            if (_liveMixin == null) return true;
+
             return _liveMixin.health <= 0;
         }
 
@@ -58,14 +60,7 @@ namespace FCS_DeepDriller.Mono.Handlers
                 ResetPassedTime();
             }
         }
-
-        public bool IsDamageApplied()
-        {
-            if (_liveMixin == null) return true;
-
-            return _liveMixin.health <= 0;
-        }
-
+        
         internal float GetHealth()
         {
             return _liveMixin.health;
@@ -147,109 +142,5 @@ namespace FCS_DeepDriller.Mono.Handlers
         {
             _passedTime = savedDataPassedTime;
         }
-
-
-        //private LiveMixin _liveMixin;
-        //public Action OnDamaged { get; set; }
-        //public Action OnRepaired { get; set; }
-
-        ///// <summary>
-        ///// This is the first thing to set before using this controller.
-        ///// If no live mixing data in supplied it will use the default live mixing data in <see cref="CustomLiveMixinData.Get"/>
-        ///// </summary>
-        ///// <param name="liveMixinData"></param>
-        //public void Initialize(LiveMixin liveMixin)
-        //{
-
-        //    if (liveMixin != null)
-        //    {
-        //        _liveMixin = liveMixin;
-
-        //        if (_liveMixin.data == null)
-        //        {
-        //            QuickLogger.Debug($"Creating Data");
-        //            _liveMixin.data = CustomLiveMixinData.Get();
-        //            QuickLogger.Debug($"Created Data");
-        //        }
-        //        else
-        //        {
-        //            _liveMixin.data.weldable = true;
-        //        }
-
-        //        InvokeRepeating("HealthChecks", 0, 1);
-        //    }
-        //    else
-        //    {
-        //        QuickLogger.Error($"LiveMixing not found!");
-        //    }
-        //}
-
-        //private void HealthChecks() // In and InvokeRepeating
-        //{
-        //    try
-        //    {
-        //        if (GetHealth() >= 1f && IsDamagedFlag)
-        //        {
-        //            IsDamagedFlag = false;
-        //            OnRepaired?.Invoke();
-        //        }
-
-        //        if (GetHealth() <= 0f && !IsDamagedFlag)
-        //        {
-        //            IsDamagedFlag = true;
-        //            OnDamaged?.Invoke();
-        //        }
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        QuickLogger.Error(e.Message);
-        //    }
-        //}
-
-        //public bool IsDamagedFlag { get; set; }
-
-        //public float GetHealth()
-        //{
-        //    return _liveMixin.health;
-        //}
-
-        //public void SetHealth(float health)
-        //{
-        //    _liveMixin.health = Mathf.Clamp(health, 0f, _liveMixin.maxHealth);
-        //    QuickLogger.Debug($"Health set to {_liveMixin.health}", true);
-        //}
-
-        //public void ApplyDamage(float amount)
-        //{
-        //    QuickLogger.Debug($"Before Apply Damage {GetHealth()}");
-        //    if (GetHealth() <= 0) return;
-        //    _liveMixin.health = Mathf.Clamp(_liveMixin.health - amount, 0, _liveMixin.maxHealth);
-        //    QuickLogger.Debug($"After Apply Damage {GetHealth()}");
-
-        //}
-
-        //public void ApplyHealth(float amount)
-        //{
-        //    if (amount > 0)
-        //    {
-        //        _liveMixin.health = Mathf.Clamp(_liveMixin.health + amount, 0, _liveMixin.maxHealth);
-        //    }
-        //}
-
-        //public void Kill()
-        //{
-        //    _liveMixin.health = 0;
-
-        //}
-
-        //internal void FullHealth()
-        //{
-        //    _liveMixin.health = _liveMixin.maxHealth;
-        //}
-
-        //internal bool IsFullHealth()
-        //{
-        //    return _liveMixin.IsFullHealth();
-        //}
     }
 }

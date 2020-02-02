@@ -43,8 +43,6 @@ namespace FCS_DeepDriller.Mono
         private bool _sendToExStorage;
         private const float DayNight = 1200f;
         private int _damagePerDay = 10;
-        private float _damagePerSecond;
-        private float _passedTime;
         private bool _invalidPlacement;
         private bool _isBiomeKnown = true;
         private bool _runStartUpOnEnable;
@@ -228,12 +226,6 @@ namespace FCS_DeepDriller.Mono
         #endregion
 
         #region Private Methods
-
-        private void ResetPassedTime()
-        {
-            _passedTime = 0;
-        }
-
         private void Initialize()
         {
             UpdateCurrentBiome();
@@ -247,7 +239,6 @@ namespace FCS_DeepDriller.Mono
             QuickLogger.Debug($"Initializing");
 
             ComponentManager = new DeepDrillerComponentManager();
-            _damagePerSecond = DayNight / _damagePerDay;
 
             _batteryAttachment = new BatteryAttachment();
             _batteryAttachment.GetGameObject(this);
@@ -354,9 +345,12 @@ namespace FCS_DeepDriller.Mono
         private void OnRepaired()
         {
             QuickLogger.Debug("OnRepaired", true);
+            
             AnimationHandler.SetBoolHash(BitDamageState, false);
+
+            if(PowerManager.GetPowerState() == FCSPowerStates.Tripped ) return;
+            
             UpdateSystemLights(PowerManager.GetPowerState());
-            ResetPassedTime();
 
             if (isActiveAndEnabled)
             {

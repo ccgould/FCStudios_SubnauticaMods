@@ -1,5 +1,4 @@
-﻿using FCSCommon.Helpers;
-using FCSCommon.Extensions;
+﻿using FCSCommon.Extensions;
 using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
 using System.Collections.Generic;

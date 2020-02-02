@@ -6,7 +6,6 @@ using FCSCommon.Extensions;
 using SMLHelper.V2.Crafting;
 using System.Collections.Generic;
 using System.IO;
-using Oculus.Newtonsoft.Json;
 using UnityEngine;
 
 namespace FCS_DeepDriller.Buildable

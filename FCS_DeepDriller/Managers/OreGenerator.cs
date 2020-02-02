@@ -100,6 +100,8 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers.Logic
             {
                 _allowTick = false;
             }
+
+            QuickLogger.Debug($"Allowed Tick: {_allowTick}",true);
         }
 
         internal void RemoveFocus()

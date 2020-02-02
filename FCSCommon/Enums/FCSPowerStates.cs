@@ -3,7 +3,7 @@
     /// <summary>
     /// The power states for the FCS Power Storage
     /// </summary>
-    public enum FCSPowerStates
+    internal enum FCSPowerStates
     {
         None,
         Powered,

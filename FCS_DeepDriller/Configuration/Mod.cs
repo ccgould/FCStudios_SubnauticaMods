@@ -4,7 +4,6 @@ using SMLHelper.V2.Utility;
 using System;
 using System.Collections;
 using System.IO;
-using FCSCommon.Helpers;
 using FCSCommon.Extensions;
 using Oculus.Newtonsoft.Json;
 using SMLHelper.V2.Crafting;

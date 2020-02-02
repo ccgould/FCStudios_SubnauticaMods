@@ -1,6 +1,5 @@
 ﻿using FCS_DeepDriller.Buildable;
 using FCS_DeepDriller.Ores;
-using FCS_DeepDriller.Patchers;
 using FCSCommon.Utilities;
 using Harmony;
 using System;
