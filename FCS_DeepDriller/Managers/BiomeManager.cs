@@ -23,7 +23,7 @@ namespace FCS_DeepDriller.Managers
                     return biomeOre.Value;
                 }
             }
-            return null;
+            return new List<TechType>();
         }
 
         internal static string GetBiome()
