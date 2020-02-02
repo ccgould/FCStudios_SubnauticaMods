@@ -48,7 +48,7 @@ namespace FCS_DeepDriller.Configuration
 
         internal static void RefreshPDA()
         {
-            if (_pdaRefreshed || Player.main == null) return;
+            if (_pdaRefreshed || Player.main == null || !LargeWorldStreamer.main.IsReady()) return;      
 
             PDA pdaMain = Player.main?.GetPDA();
 
