@@ -36,7 +36,7 @@ namespace ExStorageDepot.Mono.Managers
         {
             _mono = mono;
             _containerHeight = _maxItems = QPatch.Config.MaxStorage;
-            
+
             if (_containerRoot == null)
             {
                 QuickLogger.Debug("Ex-Storage Root");
@@ -134,7 +134,7 @@ namespace ExStorageDepot.Mono.Managers
                 _dumpContainer.RemoveItem(item.item);
             }
         }
-        
+
         private void UpdateScreen(TechType techType, OperationMode mode = OperationMode.Addition)
         {
             switch (mode)
@@ -247,10 +247,9 @@ namespace ExStorageDepot.Mono.Managers
 
             QuickLogger.Debug($"Container returned {amount} item/s for TechType {techType}");
 
-           var itemSize =  CraftData.GetItemSize(techType);
+            var itemSize = CraftData.GetItemSize(techType);
 
-
-            if (Inventory.main.HasRoomFor(itemSize.x,itemSize.y))
+            if (Inventory.main.HasRoomFor(itemSize.x, itemSize.y))
             {
                 if (amount > 0)
                 {
@@ -265,7 +264,7 @@ namespace ExStorageDepot.Mono.Managers
                             QuickLogger.Debug($"There are 0 {techType} in the container while using first or default Current Amount of {techType} is: {_container.container.GetCount(techType)}", true);
                             return;
                         }
-                        
+
                         Inventory.main.Pickup(pickup);
                     }
                 }
