@@ -17,30 +17,8 @@ namespace ExStorageDepot.Mono.Managers
         //private readonly List<ItemData> _trackedItems = new List<ItemData>();
         internal Dictionary<TechType, int> ItemsDictionary { get; } = new Dictionary<TechType, int>();
 
-        internal List<TechType> BannedTechTypes = new List<TechType>
-        {
-            TechType.RabbitrayEggUndiscovered,
-            TechType.JellyrayEggUndiscovered,
-            TechType.StalkerEggUndiscovered,
-            TechType.ReefbackEggUndiscovered,
-            TechType.JumperEggUndiscovered,
-            TechType.BonesharkEggUndiscovered,
-            TechType.GasopodEggUndiscovered,
-            TechType.MesmerEggUndiscovered,
-            TechType.SandsharkEggUndiscovered,
-            TechType.ShockerEggUndiscovered,
-            TechType.CrashEggUndiscovered,
-            TechType.CrabsquidEggUndiscovered,
-            TechType.CutefishEggUndiscovered,
-            TechType.LavaLizardEggUndiscovered,
-            TechType.CrabsnakeEggUndiscovered,
-            TechType.SpadefishEggUndiscovered,
-
-        };
-
         public bool IsEmpty => _container != null && _container.container.count <= 0;
-        internal Action<TechType> OnAddItem;
-        internal Action<TechType> OnRemoveItem;
+
         private ChildObjectIdentifier _containerRoot;
         private ExStorageDepotController _mono;
         private int _multiplier = 1;
@@ -51,7 +29,7 @@ namespace ExStorageDepot.Mono.Managers
         private StorageContainer _container;
         private int _containerWidth = 1;
         private int _containerHeight;
-        private RemovalType _removalType;
+
         private int ItemTotalCount => _container.container.count + _dumpContainer.count;
 
         internal void Initialize(ExStorageDepotController mono)
@@ -109,26 +87,6 @@ namespace ExStorageDepot.Mono.Managers
 
         private bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
         {
-            //var food = pickupable.GetComponent<Eatable>();
-
-            //if (food != null && food.decomposes && pickupable.GetTechType() != TechType.CreepvinePiece)
-            //{
-            //    QuickLogger.Info(ExStorageDepotBuildable.FoodNotAllowed(), true);
-            //    return false;
-            //}
-
-            //if (pickupable.gameObject?.GetComponent<EnergyMixin>() != null)
-            //{
-            //    QuickLogger.Info(ExStorageDepotBuildable.NoPlayerTools(), true);
-            //    return false;
-            //}
-
-            //if (BannedTechTypes.Contains(pickupable.GetTechType()))
-            //{
-            //    QuickLogger.Info(ExStorageDepotBuildable.NoUndiscorveredEggsMessage(), true);
-            //    return false;
-            //}
-
             var containerTotal = ItemTotalCount + 1;
 
             if (_container.container.count >= _maxItems || containerTotal > _maxItems)
@@ -289,9 +247,10 @@ namespace ExStorageDepot.Mono.Managers
 
             QuickLogger.Debug($"Container returned {amount} item/s for TechType {techType}");
 
-            var pickupable = techType.ToPickupable();
+           var itemSize =  CraftData.GetItemSize(techType);
 
-            if (Inventory.main.HasRoomFor(pickupable))
+
+            if (Inventory.main.HasRoomFor(itemSize.x,itemSize.y))
             {
                 if (amount > 0)
                 {
@@ -308,8 +267,6 @@ namespace ExStorageDepot.Mono.Managers
                         }
                         
                         Inventory.main.Pickup(pickup);
-                        
-                        //pickup.PlayPickupSound();
                     }
                 }
                 else
@@ -317,8 +274,6 @@ namespace ExStorageDepot.Mono.Managers
                     QuickLogger.Debug($"There are 0 {techType} in the container.", true);
                 }
             }
-
-            GameObject.Destroy(pickupable);
         }
 
         private void ContainerOnRemoveItem(InventoryItem item)

@@ -1,6 +1,7 @@
 ﻿using FCSCommon.Utilities;
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace FCS_DeepDriller.Managers
 {
@@ -72,6 +73,15 @@ namespace FCS_DeepDriller.Managers
             QuickLogger.Debug("// ============================= IN FindMatchingBiome ============================= //");
 
             return result;
+        }
+
+        internal static string CalculateBiome(Transform transform)
+        {
+            if (LargeWorld.main)
+            {
+                return LargeWorld.main.GetBiome(transform.position);
+            }
+            return "<unknown>";
         }
     }
 }

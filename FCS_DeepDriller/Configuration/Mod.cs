@@ -294,7 +294,7 @@ namespace FCS_DeepDriller.Configuration
         {
             return Path.Combine(Environment.CurrentDirectory, "QMods");
         }
-
+        
         private static string GetModPath()
         {
             return Path.Combine(GetQModsPath(), ModFolderName);
