@@ -100,7 +100,7 @@ namespace FCSAlterraShipping.Mono
                         }
                     }
 
-                    Name = savedData.ContainerName;
+                    DisplayManager.UpdateLabelFromSave(savedData.ContainerName);
                     ContainerMode = savedData.ContainertMode;
                     _hasBreakerTripped = savedData.HasBreakerTripped;
                     _transferHandler.SetMono(this);
@@ -108,6 +108,8 @@ namespace FCSAlterraShipping.Mono
                     _transferHandler.SetCurrentTarget(savedData.Target);
                     _transferHandler.SetCurrentItems(_container.GetContainer());
                     _currentBodyColor = savedData.BodyColor.Vector4ToColor();
+                     
+                    
 
                     ColorHandler.ChangeBodyColor("AlterraShipping_BaseColor", _currentBodyColor, gameObject);
                     AnimatorController.SetBoolHash(DoorStateHash, savedData.CurrentDoorState);

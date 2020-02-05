@@ -58,6 +58,7 @@ namespace FCSAlterraShipping.Display
         private Text _colorPageBottomNumber;
         private Text _colorPageTopNumber;
         private GameObject _colorPageContainer;
+        private AlterraShippingNameController _alterraShippingNameController;
 
         #endregion
 
@@ -589,8 +590,8 @@ namespace FCSAlterraShipping.Display
             }
 
             shippingContainerLabel.GetComponent<Text>().text = _mono.Name;
-            var alterraShippingNameController = shippingContainerLabel.AddComponent<AlterraShippingNameController>();
-            alterraShippingNameController.OnLabelChanged += OnLabelChanged;
+            _alterraShippingNameController = shippingContainerLabel.AddComponent<AlterraShippingNameController>();
+            _alterraShippingNameController.OnLabelChanged += OnLabelChanged;
             AlterraShippingNameController.Create(_mono, shippingContainerLabel);
             #endregion
 
@@ -888,5 +889,10 @@ namespace FCSAlterraShipping.Display
             _animatorController.SetIntHash(_mono.PageHash, ColorPicker);
         }
         #endregion
+
+        internal void UpdateLabelFromSave(string containerName)
+        {
+            _alterraShippingNameController.SetLabel(containerName);
+        }
     }
 }

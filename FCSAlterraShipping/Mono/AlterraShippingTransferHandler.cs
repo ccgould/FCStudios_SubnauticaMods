@@ -2,6 +2,7 @@
 using FCSCommon.Converters;
 using FCSCommon.Utilities;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -38,7 +39,7 @@ namespace FCSAlterraShipping.Mono
 
         internal void SetCurrentTarget(string target)
         {
-            _target = FindTarget(target);
+            StartCoroutine(FindTarget(target));
         }
 
         internal void SetMono(AlterraShippingTarget mono)
@@ -164,22 +165,25 @@ namespace FCSAlterraShipping.Mono
             return time * 3600;
         }
 
-        private AlterraShippingTarget FindTarget(string currentTarget)
+        private IEnumerator FindTarget(string currentTarget)
         {
-            if (currentTarget == String.Empty) return null;
-
-            foreach (var target in ShippingTargetManager.GlobalShippingTargets)
+            while (!_done && _currentTime > 0 && _target == null)
             {
-                QuickLogger.Debug($"Target: {target.GetInstanceID()} located");
-                if (target.GetPrefabIdentifier() == currentTarget)
+                if (string.IsNullOrEmpty(currentTarget)) break;
+
+                foreach (var target in ShippingTargetManager.GlobalShippingTargets)
                 {
-                    return target;
+                    QuickLogger.Debug($"Target: {target.GetInstanceID()} located");
+                    if (target.GetPrefabIdentifier() == currentTarget)
+                    {
+                        _target =  target;
+                    }
                 }
+
+                QuickLogger.Debug("No Target Found!", true);
+
+                yield return null;
             }
-
-            QuickLogger.Debug("No Target Found!", true);
-
-            return null;
         }
     }
 }

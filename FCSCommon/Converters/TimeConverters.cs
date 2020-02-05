@@ -2,9 +2,9 @@
 
 namespace FCSCommon.Converters
 {
-    public static class TimeConverters
+    internal static class TimeConverters
     {
-        public static string SecondsToHMS(float seconds)
+        internal static string SecondsToHMS(float seconds)
         {
             var t = TimeSpan.FromSeconds(seconds);
 
