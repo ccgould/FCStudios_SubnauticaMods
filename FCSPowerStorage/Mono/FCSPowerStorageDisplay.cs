@@ -15,6 +15,7 @@ using System.Linq;
 using System.Reflection;
 using FCSCommon.Abstract;
 using FCSCommon.Extensions;
+using FCSTechFabricator.Extensions;
 using FCSTechFabricator.Objects;
 using UnityEngine;
 using UnityEngine.UI;

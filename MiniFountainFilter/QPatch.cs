@@ -54,10 +54,7 @@ namespace AE.MiniFountainFilter
                 SetWater();
 
                 MiniFountainFilterBuildable.PatchSMLHelper();
-
-                var harmony = HarmonyInstance.Create("com.minifountainfilter.fcstudios");
-                harmony.PatchAll(Assembly.GetExecutingAssembly());
-
+                
                 QuickLogger.Info("Finished patching");
             }
             catch (Exception ex)

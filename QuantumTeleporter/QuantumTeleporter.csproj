@@ -140,7 +140,7 @@
     <Compile Include="Managers\QTTriggerBoxManager.cs" />
     <Compile Include="Managers\TeleportManager.cs" />
     <Compile Include="Mono\QuantumTeleporterController.cs" />
-    <Compile Include="Patches\EscapePod_Patch.cs" />
+    <Compile Include="Patches\Player_Patch.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -5,11 +5,10 @@ using System.Linq;
 using System.Text;
 using FCSCommon.Abstract;
 using FCSCommon.Components;
-using FCSCommon.Controllers;
 using FCSCommon.Enums;
 using FCSCommon.Helpers;
-using FCSCommon.Objects;
 using FCSCommon.Utilities;
+using FCSTechFabricator.Managers;
 using QuantumTeleporter.Buildable;
 using QuantumTeleporter.Enumerators;
 using QuantumTeleporter.Mono;
@@ -38,10 +37,6 @@ namespace QuantumTeleporter.Managers
         private const float MaxInteractionRange = 1f;
         internal void Setup(QuantumTeleporterController mono)
         {
-
-            QuickLogger.Info("My Name is Laterrah");
-
-
             _mono = mono;
             _page = Animator.StringToHash("Page");
 

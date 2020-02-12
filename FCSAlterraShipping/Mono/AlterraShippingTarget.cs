@@ -9,6 +9,7 @@ using SMLHelper.V2.Utility;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using FCSTechFabricator.Extensions;
 using UnityEngine;
 
 namespace FCSAlterraShipping.Mono

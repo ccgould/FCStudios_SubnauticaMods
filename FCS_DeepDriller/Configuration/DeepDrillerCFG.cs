@@ -16,7 +16,7 @@ namespace FCS_DeepDriller.Configuration
         public int Mk1OrePerDay { get; set; } = 15;
         public int Mk2OrePerDay { get; set; } = 22;
         public int Mk3OrePerDay { get; set; } = 30;
-
+        public bool AllowDamage { get; set; } = true;
         public Dictionary<string, List<string>> BiomeOres { get; set; } = new Dictionary<string, List<string>>
         {
             {"safeshallows", new List<string>

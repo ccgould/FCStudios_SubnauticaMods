@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using FCSCommon.Extensions;
-using FCSCommon.Objects;
 using FCSCommon.Utilities;
+using FCSTechFabricator.Extensions;
 using UnityEngine;
 
 namespace FCSTechFabricator.Objects

@@ -9,6 +9,8 @@ using FCSCommon.Extensions;
 using FCSCommon.Interfaces;
 using FCSCommon.Utilities;
 using FCSTechFabricator.Components;
+using FCSTechFabricator.Extensions;
+using FCSTechFabricator.Managers;
 using QuantumTeleporter.Buildable;
 using QuantumTeleporter.Configuration;
 using QuantumTeleporter.Managers;

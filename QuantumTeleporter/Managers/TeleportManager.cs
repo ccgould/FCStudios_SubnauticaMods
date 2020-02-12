@@ -110,7 +110,6 @@ namespace QuantumTeleporter.Managers
             _animationRunning = Animator.StringToHash("AnimationRunning");
             _isPanelVisible = Animator.StringToHash("IsPanelVisible");
             _initialized = true;
-
         }
 
         internal static void TeleportPlayer(QuantumTeleporterController fromUnit, QuantumTeleporterController toUnit, QTTeleportTypes type)

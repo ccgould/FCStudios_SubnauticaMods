@@ -13,17 +13,14 @@
     <Compile Include="$(MSBuildThisFileDirectory)Components\ColorItemButton.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Components\CustomToggle.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Components\InterfaceButton.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Components\InternalBatteryController.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Components\OnScreenButton.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Components\PaginatorButton.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controllers\AudioManager.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Controllers\ColorManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controllers\PowerManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\TimeConverters.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enums\InterfaceButtonMode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enums\SystemLightState.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exceptions\PatchTerminatedException.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Extensions\ColorExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\FloatExtenstions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\GameObjectExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\GenericExtensions.cs" />
@@ -41,7 +38,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Abstract\FCSController.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controllers\HealthController.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controllers\PowerStorageController.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IRenamable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\ISaveData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Interfaces\ISaveDataEntry.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\Vec3.cs" />

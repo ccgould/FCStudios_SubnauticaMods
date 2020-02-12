@@ -116,22 +116,27 @@
   <ItemGroup>
     <Compile Include="Components\CraftingTab.cs" />
     <Compile Include="Components\FCSTechFabricatorTag.cs" />
+    <Compile Include="Components\InternalBatteryController.cs" />
     <Compile Include="Components\NameController.cs" />
     <Compile Include="Configuration\Mod.cs" />
     <Compile Include="Craftables\FCSKit.cs" />
     <Compile Include="Craftables\FCSModule.cs" />
     <Compile Include="Example.cs" />
+    <Compile Include="Extensions\ColorExtensions.cs" />
     <Compile Include="FcAssetBundlesService.cs" />
     <Compile Include="FcCraftable.cs" />
     <Compile Include="FcCraftingTab.cs" />
     <Compile Include="FcTechFabricator.cs" />
     <Compile Include="FcTechFabricatorService.cs" />
     <Compile Include="Initializer.cs" />
+    <Compile Include="Interfaces\IRenameable.cs" />
+    <Compile Include="Managers\ColorManager.cs" />
     <Compile Include="Objects\ColorList.cs" />
     <Compile Include="Objects\ColorVec4.cs" />
     <Compile Include="Patchers\Inventory_Patchers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\FCSCommon\GamePaths.targets" />

@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using AMMiniMedBay.Configuration;
 using FCSCommon.Extensions;
+using FCSTechFabricator.Extensions;
 using FCSTechFabricator.Objects;
 using UnityEngine;
 using UnityEngine.UI;

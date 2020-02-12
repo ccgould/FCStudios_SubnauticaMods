@@ -169,6 +169,11 @@ namespace FCS_DeepDriller.Mono.Handlers
         }
         internal bool IsPowerAvailable()
         {
+            if (_mono.DeepDrillerContainer.IsContainerFull)
+            {
+                return false;
+            }
+
             if (!_mono.DeepDrillerModuleContainer.IsPowerModuleAttached())
             {
                 return false;
@@ -179,7 +184,7 @@ namespace FCS_DeepDriller.Mono.Handlers
                 return false;
             }
 
-            if (_mono.HealthManager.IsDamagedFlag())
+            if (QPatch.Configuration.AllowDamage && _mono.HealthManager.IsDamagedFlag())
             {
                 return false;
             }

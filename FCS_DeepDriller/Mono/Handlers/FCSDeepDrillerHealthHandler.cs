@@ -9,7 +9,6 @@ namespace FCS_DeepDriller.Mono.Handlers
 {
     internal class FCSDeepDrillerHealthHandler : MonoBehaviour
     {
-
         private LiveMixin _liveMixin = new LiveMixin();
         public int HealthMultiplyer { get; set; } = 1;
         private const float DayNight = 1200f;

@@ -1,0 +1,14 @@
+{
+  "Id": "DropAllOnDeath",
+  "DisplayName": "Drop All On Death",
+  "Author": "FCStudios",
+  "Version": "1.0.0",
+  "Enable": true,
+  "AssemblyName": "DropAllOnDeath.dll",
+  "Dependencies": [
+    "SMLHelper"
+  ],
+  "Config": {
+    "Enabled": true 
+  }
+}

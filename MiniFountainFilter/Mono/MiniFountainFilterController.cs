@@ -1,12 +1,12 @@
 ﻿using AE.MiniFountainFilter.Buildable;
 using AE.MiniFountainFilter.Configuration;
 using AE.MiniFountainFilter.Managers;
-using FCSCommon.Extensions;
 using FCSCommon.Utilities;
 using System;
 using System.Collections;
-using FCSCommon.Controllers;
 using FCSCommon.Enums;
+using FCSTechFabricator.Extensions;
+using FCSTechFabricator.Managers;
 using UnityEngine;
 using AnimationManager = AE.MiniFountainFilter.Managers.AnimationManager;
 using AudioManager = AE.MiniFountainFilter.Managers.AudioManager;

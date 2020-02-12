@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.IO;
 using FCSCommon.Interfaces;
 using FCSTechFabricator.Components;
+using FCSTechFabricator.Interfaces;
 using UnityEngine;
 
 namespace ARS_SeaBreezeFCS32.Mono

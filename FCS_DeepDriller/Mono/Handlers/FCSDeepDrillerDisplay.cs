@@ -20,7 +20,6 @@ namespace FCS_DeepDriller.Mono.Handlers
 {
     //TODO Create a method that handles selecting the ExStorage
 
-
     internal class FCSDeepDrillerDisplay : AIDisplay
     {
         private FCSDeepDrillerController _mono;
@@ -42,9 +41,11 @@ namespace FCS_DeepDriller.Mono.Handlers
         private Text _focusBtnText;
         private Text _healthPercentage;
         private Text _solarValue;
+
 #if USE_ExStorageDepot
         private ExStorageDepotController _selectedExStorage;
 #endif
+
         private InterfaceButton _button;
 
         internal void Setup(FCSDeepDrillerController mono)
@@ -59,7 +60,9 @@ namespace FCS_DeepDriller.Mono.Handlers
             ITEMS_PER_PAGE = 5;
 
             DrawPage(1);
+        
             QuickLogger.Debug("Display has been set.");
+
             InvokeRepeating(nameof(UpdateHealthStatus), 1, 0.5f);
             InvokeRepeating(nameof(UpdateBatteryStatus), 1, 0.5f);
             InvokeRepeating(nameof(UpdateScreenState), 1.0f, 0.5f);
@@ -73,7 +76,14 @@ namespace FCS_DeepDriller.Mono.Handlers
 
         private void UpdateHealthStatus()
         {
-            _healthPercentage.text = $"{Mathf.RoundToInt(_mono.HealthManager.GetHealth())}%";
+            var result = "--";
+
+            if (QPatch.Configuration.AllowDamage)
+            {
+                 result = $"{Mathf.RoundToInt(_mono.HealthManager.GetHealth())}%";
+            }
+
+            _healthPercentage.text = result;
         }
 
         private void UpdateBatteryStatus()
@@ -608,25 +618,6 @@ namespace FCS_DeepDriller.Mono.Handlers
 
             UpdateFocusStates();
         }
-
-        //private IEnumerator UpdateButton(InterfaceButton button)
-        //{
-
-        //    while (button.transform.gameObject.FindChild(button.HoverItemName).activeInHierarchy)
-        //    {
-        //        QuickLogger.Debug(("activeInHierarchy is true"));
-        //        //QuickLogger.Debug($"Selecting Button {button.BtnName}");
-        //        //button.Focus();
-        //        yield return null;
-        //    }
-
-        //    //while (_mono.OreGenerator.GetIsFocused())
-        //    //{
-        //    //    QuickLogger.Debug($"Selecting Button {button.BtnName}");
-        //    //    button.Focus();
-        //    //    yield return null;
-        //    //}
-        //}
 
         private void UpdateButton()
         {

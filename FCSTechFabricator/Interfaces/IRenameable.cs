@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using FCSTechFabricator.Components;
 
-namespace FCSCommon.Interfaces
+namespace FCSTechFabricator.Interfaces
 {
-    internal interface IRenameable
+    public interface IRenameable
     {
         void RenameDevice(string newName);
         string GetDeviceName();

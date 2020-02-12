@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using FCSCommon.Components;
-using FCSCommon.Extensions;
 using FCSCommon.Helpers;
+using FCSTechFabricator.Extensions;
 using FCSTechFabricator.Objects;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace FCSCommon.Controllers
+namespace FCSTechFabricator.Managers
 {
-    internal class ColorManager : MonoBehaviour
+    public class ColorManager : MonoBehaviour
     {
         private string _bodyMaterial;
         private GameObject _gameObject;
@@ -24,8 +25,8 @@ namespace FCSCommon.Controllers
         private readonly List<ColorItemButton> _colorItemsTracker = new List<ColorItemButton>();
         private readonly Color _defaultColor = new Color(0.7529412f, 0.7529412f, 0.7529412f, 1f);
 
-        internal Action<Color> OnColorChanged;
-        
+        public Action<Color> OnColorChanged;
+
         private void ResetColorSelections(Color color)
         {
             foreach (ColorItemButton colorItemButton in _colorItemsTracker)
@@ -118,39 +119,39 @@ namespace FCSCommon.Controllers
             }
         }
 
-        internal void Initialize(GameObject gameObject, string bodyMaterial)
+        public void Initialize(GameObject gameObject, string bodyMaterial)
         {
             _gameObject = gameObject;
             _bodyMaterial = bodyMaterial;
             ColorList.AddColor(GetColor());
         }
 
-        internal void SetColorFromSave(Color color)
+        public void SetColorFromSave(Color color)
         {
             ChangeColor(color);
             SelectSavedColor(color);
         }
 
-        internal Color GetColor()
+        public Color GetColor()
         {
             var color = MaterialHelpers.GetBodyColor(_gameObject, _bodyMaterial);
             if (color == null) return _defaultColor;
             return (Color)color;
         }
 
-        internal void ChangeColor(Color color)
+        public void ChangeColor(Color color)
         {
             MaterialHelpers.ChangeMaterialColor(_bodyMaterial, _gameObject, color);
             ResetColorSelections(color);
             OnColorChanged?.Invoke(color);
         }
 
-        internal void ChangeColorPageBy(int amount)
+        public void ChangeColorPageBy(int amount)
         {
             DrawColorPage(_currentColorPage + amount);
         }
-        
-        internal void SetupGrid(int colorsPerPage, GameObject colorItemPrefab, GameObject colorGrid, Text paginator, Action<string, object> onButtonClick)
+
+        public void SetupGrid(int colorsPerPage, GameObject colorItemPrefab, GameObject colorGrid, Text paginator, Action<string, object> onButtonClick)
         {
             _colorsPerPage = colorsPerPage;
             _colorItemPrefab = colorItemPrefab;

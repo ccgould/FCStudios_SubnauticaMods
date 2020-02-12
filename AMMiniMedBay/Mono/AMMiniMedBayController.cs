@@ -8,6 +8,7 @@ using FCSCommon.Utilities;
 using System;
 using AMMiniMedBay.Configuration;
 using FCSCommon.Abstract;
+using FCSTechFabricator.Extensions;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 

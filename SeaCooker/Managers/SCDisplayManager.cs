@@ -17,6 +17,7 @@ using FCSCommon.Controllers;
 using FCSCommon.Interfaces;
 using FCSCommon.Objects;
 using FCSTechFabricator.Components;
+using FCSTechFabricator.Managers;
 using UnityEngine;
 using UnityEngine.UI;
 using PaginatorButton = AE.SeaCooker.Display.PaginatorButton;

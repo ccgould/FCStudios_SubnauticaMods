@@ -1,6 +1,4 @@
 ﻿using AE.MiniFountainFilter.Buildable;
-using AE.MiniFountainFilter.Configuration;
-using AE.MiniFountainFilter.Display;
 using AE.MiniFountainFilter.Mono;
 using FCSCommon.Enums;
 using FCSCommon.Helpers;
@@ -11,8 +9,7 @@ using FCSCommon.Abstract;
 using UnityEngine;
 using UnityEngine.UI;
 using FCSCommon.Components;
-using FCSCommon.Controllers;
-using FCSCommon.Objects;
+using FCSTechFabricator.Managers;
 
 namespace AE.MiniFountainFilter.Managers
 {

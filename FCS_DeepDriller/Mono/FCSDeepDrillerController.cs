@@ -158,7 +158,12 @@ namespace FCS_DeepDriller.Mono
             _saveData.PowerState = PowerManager.GetPowerState();
             _saveData.Modules = DeepDrillerModuleContainer.GetCurrentModules();
             _saveData.Items = DeepDrillerContainer.GetItems();
-            _saveData.Health = HealthManager.GetHealth();
+
+            if(QPatch.Configuration.AllowDamage)
+            {
+                _saveData.Health = HealthManager.GetHealth();
+            }
+
             _saveData.PowerData = PowerManager.SaveData();
             _saveData.FocusOre = OreGenerator.GetFocus();
             _saveData.IsFocused = OreGenerator.GetIsFocused();
@@ -194,8 +199,11 @@ namespace FCS_DeepDriller.Mono
             DisplayHandler.UpdateListItems(data.FocusOre);
             DeepDrillerModuleContainer.SetModules(data.Modules);
             DeepDrillerContainer.LoadItems(data.Items);
-            HealthManager.SetHealth(data.Health);
-            QuickLogger.Debug($"=============================================== Set Health {HealthManager.GetHealth()}=============================");
+            if (QPatch.Configuration.AllowDamage)
+            {
+                HealthManager?.SetHealth(data.Health);
+            }
+
             PowerManager.LoadData(data);
 
             if (data.IsFocused)
@@ -286,12 +294,16 @@ namespace FCS_DeepDriller.Mono
             PowerManager.Initialize(this);
             PowerManager.OnPowerUpdate += OnPowerUpdate;
 
-            HealthManager = gameObject.AddComponent<FCSDeepDrillerHealthHandler>();
-            HealthManager.Initialize(this);
-            HealthManager.SetHealth(100);
-            HealthManager.OnDamaged += OnDamaged;
-            HealthManager.OnRepaired += OnRepaired;
-            QuickLogger.Debug($"=============================================== Made Health {HealthManager.GetHealth()}=============================");
+            if (QPatch.Configuration.AllowDamage)
+            {
+                HealthManager = gameObject.AddComponent<FCSDeepDrillerHealthHandler>();
+                HealthManager.Initialize(this);
+                HealthManager.SetHealth(100);
+                HealthManager.OnDamaged += OnDamaged;
+                HealthManager.OnRepaired += OnRepaired;
+                QuickLogger.Debug($"=============================================== Made Health {HealthManager.GetHealth()}=============================");
+            }
+
 
             OreGenerator = gameObject.AddComponent<OreGenerator>();
             OreGenerator.Initialize(this);
@@ -383,24 +395,40 @@ namespace FCS_DeepDriller.Mono
         {
             QuickLogger.Debug($"Changing System Lights", true);
 
-            if (HealthManager.IsDamagedFlag())
+            if (QPatch.Configuration.AllowDamage)
             {
-                //MaterialHelpers.ChangeEmissionColor("DeepDriller_BaseColor_BaseColor",gameObject, new Color(1, 1f, 1f));
-                MaterialHelpers.ReplaceEmissionTexture("DeepDriller_BaseColor_BaseColor", "DeepDriller_Emissive_Error", gameObject, QPatch.GlobalBundle);
-                return;
+                if (HealthManager.IsDamagedFlag())
+                {
+                    //MaterialHelpers.ChangeEmissionColor("DeepDriller_BaseColor_BaseColor",gameObject, new Color(1, 1f, 1f));
+                    MaterialHelpers.ReplaceEmissionTexture("DeepDriller_BaseColor_BaseColor", "DeepDriller_Emissive_Error", gameObject, QPatch.GlobalBundle);
+                    return;
+                }
+                if (value == FCSPowerStates.Unpowered || value == FCSPowerStates.Tripped && !HealthManager.IsDamagedFlag())
+                {
+                    //MaterialHelpers.ChangeEmissionColor("DeepDriller_BaseColor_BaseColor", gameObject, new Color(0.9803922f, 0.6313726f, 0.007843138f));
+
+                    MaterialHelpers.ReplaceEmissionTexture("DeepDriller_BaseColor_BaseColor", "DeepDriller_Emissive_Off",
+                        gameObject, QPatch.GlobalBundle);
+                }
+                else if (value == FCSPowerStates.Powered && !HealthManager.IsDamagedFlag())
+                    //MaterialHelpers.ChangeEmissionColor("DeepDriller_BaseColor_BaseColor", gameObject, new Color(0.08235294f, 1f, 1f));
+
+                    MaterialHelpers.ReplaceEmissionTexture("DeepDriller_BaseColor_BaseColor", "DeepDriller_Emissive_On",
+                        gameObject, QPatch.GlobalBundle);
             }
-            if (value == FCSPowerStates.Unpowered || value == FCSPowerStates.Tripped && !HealthManager.IsDamagedFlag())
+            else
             {
-                //MaterialHelpers.ChangeEmissionColor("DeepDriller_BaseColor_BaseColor", gameObject, new Color(0.9803922f, 0.6313726f, 0.007843138f));
+                if (value == FCSPowerStates.Unpowered || value == FCSPowerStates.Tripped)
+                {
+                    MaterialHelpers.ReplaceEmissionTexture("DeepDriller_BaseColor_BaseColor", "DeepDriller_Emissive_Off",
+                        gameObject, QPatch.GlobalBundle);
+                }
+                else if (value == FCSPowerStates.Powered)
+                    //MaterialHelpers.ChangeEmissionColor("DeepDriller_BaseColor_BaseColor", gameObject, new Color(0.08235294f, 1f, 1f));
 
-                MaterialHelpers.ReplaceEmissionTexture("DeepDriller_BaseColor_BaseColor", "DeepDriller_Emissive_Off",
-                    gameObject, QPatch.GlobalBundle);
+                    MaterialHelpers.ReplaceEmissionTexture("DeepDriller_BaseColor_BaseColor", "DeepDriller_Emissive_On",
+                        gameObject, QPatch.GlobalBundle);
             }
-            else if (value == FCSPowerStates.Powered && !HealthManager.IsDamagedFlag())
-                //MaterialHelpers.ChangeEmissionColor("DeepDriller_BaseColor_BaseColor", gameObject, new Color(0.08235294f, 1f, 1f));
-
-                MaterialHelpers.ReplaceEmissionTexture("DeepDriller_BaseColor_BaseColor", "DeepDriller_Emissive_On",
-                    gameObject, QPatch.GlobalBundle);
 
         }
 
