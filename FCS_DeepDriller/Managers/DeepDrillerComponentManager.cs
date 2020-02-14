@@ -1,8 +1,9 @@
-﻿using FCS_DeepDriller.Buildable;
+﻿using FCS_DeepDriller.Buildable.MK1;
 using FCS_DeepDriller.Enumerators;
-using FCS_DeepDriller.Mono;
+using FCS_DeepDriller.Mono.MK1;
 using FCSCommon.Utilities;
 using UnityEngine;
+
 
 namespace FCS_DeepDriller.Managers
 {

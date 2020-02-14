@@ -1,16 +1,16 @@
-﻿using FCS_DeepDriller.Buildable;
+﻿using System;
+using System.Collections.Generic;
+using FCS_DeepDriller.Buildable.MK1;
 using FCSCommon.Extensions;
 using FCSCommon.Utilities;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 #if USE_ExStorageDepot
 #endif
 
-namespace FCS_DeepDriller.Mono.Handlers
+namespace FCS_DeepDriller.Mono.MK1
 {
-    internal class FCSDeepDrillerContainer : MonoBehaviour
+    internal class FCSDeepDrillerContainer
     {
         private FCSDeepDrillerController _mono;
         private ItemsContainer _container;

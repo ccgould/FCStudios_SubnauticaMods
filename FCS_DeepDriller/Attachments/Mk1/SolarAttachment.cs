@@ -1,10 +1,9 @@
-﻿using FCS_DeepDriller.Buildable;
+﻿using FCS_DeepDriller.Buildable.MK1;
 using FCS_DeepDriller.Enumerators;
-using FCS_DeepDriller.Mono;
-using FCS_DeepDriller.Mono.Handlers;
+using FCS_DeepDriller.Mono.MK1;
 using UnityEngine;
 
-namespace FCS_DeepDriller.Attachments
+namespace FCS_DeepDriller.Attachments.MK1
 {
     internal class SolarAttachment : MonoBehaviour
     {

@@ -2,21 +2,20 @@
 using ExStorageDepot.Mono;
 #endif
 
-using FCS_DeepDriller.Buildable;
-using FCS_DeepDriller.Configuration;
-using FCS_DeepDriller.Display;
-using FCSCommon.Enums;
-using FCSCommon.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using FCS_DeepDriller.Buildable.MK1;
+using FCS_DeepDriller.Configuration;
+using FCS_DeepDriller.Display;
 using FCSCommon.Abstract;
+using FCSCommon.Enums;
+using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
 
-
-namespace FCS_DeepDriller.Mono.Handlers
+namespace FCS_DeepDriller.Mono.MK1
 {
     //TODO Create a method that handles selecting the ExStorage
 
@@ -41,6 +40,12 @@ namespace FCS_DeepDriller.Mono.Handlers
         private Text _focusBtnText;
         private Text _healthPercentage;
         private Text _solarValue;
+        private int _lootCount => GetLootCount();
+
+        private  int GetLootCount()
+        {
+            return _mono?.GetBiomeData()?.Count ?? 0;
+        }
 
 #if USE_ExStorageDepot
         private ExStorageDepotController _selectedExStorage;
@@ -427,10 +432,9 @@ namespace FCS_DeepDriller.Mono.Handlers
             int startingPosition = (CurrentPage - 1) * ITEMS_PER_PAGE;
             int endingPosition = startingPosition + ITEMS_PER_PAGE;
 
-
-            if (endingPosition > _mono.GetBiomeData().Count)
+            if (endingPosition > _lootCount)
             {
-                endingPosition = _mono.GetBiomeData().Count;
+                endingPosition = _lootCount;
             }
 
             ClearPage();
@@ -439,7 +443,7 @@ namespace FCS_DeepDriller.Mono.Handlers
 
             for (int i = startingPosition; i < endingPosition; i++)
             {
-                var techType = _mono.GetBiomeData().ElementAt(i);
+                var techType = _mono.GetBiomeData()?.ElementAt(i) ?? TechType.None;
                 LoadDisplay(techType);
             }
 
@@ -450,6 +454,10 @@ namespace FCS_DeepDriller.Mono.Handlers
 
         private void LoadDisplay(TechType techType)
         {
+            QuickLogger.Debug($"Loading Display Current Item: {techType}");
+
+            if (techType == TechType.None) return;
+
             GameObject itemDisplay = Instantiate(FCSDeepDrillerBuildable.ItemPrefab);
             itemDisplay.transform.SetParent(_grid.transform, false);
 
@@ -498,7 +506,7 @@ namespace FCS_DeepDriller.Mono.Handlers
 
         private void CalculateNewMaxPages()
         {
-            MaxPage = Mathf.CeilToInt((_mono.GetBiomeData().Count - 1) / ITEMS_PER_PAGE) + 1;
+            MaxPage = Mathf.CeilToInt((_lootCount - 1) / ITEMS_PER_PAGE) + 1;
             if (CurrentPage > MaxPage)
             {
                 CurrentPage = MaxPage;
@@ -596,7 +604,7 @@ namespace FCS_DeepDriller.Mono.Handlers
             }
         }
 
-        internal void UpdateListItems(TechType techType)
+        internal void UpdateListItems(TechType techType = TechType.None)
         {
 
             QuickLogger.Debug($"In Update List: Target = {techType} || OreButtons {OreButtons?.Count}");

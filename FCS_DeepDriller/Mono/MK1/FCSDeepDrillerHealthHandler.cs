@@ -1,11 +1,10 @@
-﻿using FCSCommon.Objects;
-using FCSCommon.Utilities;
+﻿using System;
 using FCSCommon.Enums;
-using System;
+using FCSCommon.Objects;
+using FCSCommon.Utilities;
 using UnityEngine;
 
-
-namespace FCS_DeepDriller.Mono.Handlers
+namespace FCS_DeepDriller.Mono.MK1
 {
     internal class FCSDeepDrillerHealthHandler : MonoBehaviour
     {

@@ -1,9 +1,9 @@
 ﻿using FCS_DeepDriller.Configuration;
-using FCS_DeepDriller.Extenstion;
 using FCS_DeepDriller.Helpers;
 using Harmony;
 using System.Collections.Generic;
 using System.Reflection;
+using FCS_DeepDriller.Extensions;
 
 namespace FCS_DeepDriller.Patchers
 {

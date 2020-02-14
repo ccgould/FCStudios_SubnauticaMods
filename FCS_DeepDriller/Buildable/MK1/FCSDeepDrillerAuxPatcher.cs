@@ -1,6 +1,6 @@
 ﻿using SMLHelper.V2.Handlers;
 
-namespace FCS_DeepDriller.Buildable
+namespace FCS_DeepDriller.Buildable.MK1
 {
     internal partial class FCSDeepDrillerBuildable
     {

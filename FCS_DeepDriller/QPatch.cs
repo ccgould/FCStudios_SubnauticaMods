@@ -1,10 +1,10 @@
-﻿using FCS_DeepDriller.Buildable;
-using FCS_DeepDriller.Ores;
+﻿using FCS_DeepDriller.Ores;
 using FCSCommon.Utilities;
 using Harmony;
 using System;
 using System.IO;
 using System.Reflection;
+using FCS_DeepDriller.Buildable.MK1;
 using FCS_DeepDriller.Configuration;
 using FCSTechFabricator;
 using FCSTechFabricator.Components;
@@ -12,6 +12,7 @@ using FCSTechFabricator.Craftables;
 using QModManager.API.ModLoading;
 using SMLHelper.V2.Utility;
 using UnityEngine;
+
 
 namespace FCS_DeepDriller
 {

@@ -3,7 +3,7 @@ using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
 
-namespace FCS_DeepDriller.Buildable
+namespace FCS_DeepDriller.Buildable.MK1
 {
     internal partial class FCSDeepDrillerBuildable
     {

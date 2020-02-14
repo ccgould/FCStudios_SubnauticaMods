@@ -28,7 +28,6 @@ namespace FCS_DeepDriller.Configuration
 
                     return count;
                 case DeepDrillModules.Solar:
-                    //QuickLogger.Debug($"In Get Charge: Solar =  {Solar.Battery.charge}");
                     return Solar.Battery.charge;
                 default:
                     return 0;
@@ -58,7 +57,6 @@ namespace FCS_DeepDriller.Configuration
         internal void ConsumePower(DeepDrillModules module)
         {
             var powerDraw = QPatch.Configuration.PowerDraw;
-            //var charge = Mathf.Clamp(GetCharge(module) - powerDraw, 0, GetCapacity(module));
 
             switch (module)
             {
@@ -69,8 +67,6 @@ namespace FCS_DeepDriller.Configuration
                         if (powerUnitData.Battery.charge >= powerDraw)
                         {
                             ModifyCharge(-Mathf.Abs(powerDraw), powerUnitData);
-                            //powerUnitData.Battery.charge = Mathf.Clamp(powerUnitData.Battery.charge - powerDraw, 0,
-                            //    powerUnitData.Battery.capacity);
                             break;
                         }
                     }
@@ -79,12 +75,11 @@ namespace FCS_DeepDriller.Configuration
 
                 case DeepDrillModules.Solar:
                     ModifyCharge(-Mathf.Abs(powerDraw), Solar);
-                    //Solar.Battery.charge = charge;
                     break;
             }
         }
 
-        public float ModifyCharge(float amount, PowerUnitData unit)
+        internal float ModifyCharge(float amount, PowerUnitData unit)
         {
             float num = 0f;
 
@@ -151,14 +146,14 @@ namespace FCS_DeepDriller.Configuration
             }
         }
 
-        public void AddBattery(Pickupable battery, string slot)
+        internal void AddBattery(Pickupable battery, string slot)
         {
             var newBattery = new PowerUnitData();
             newBattery.Initialize(battery, slot);
             Batteries.Add(newBattery);
         }
 
-        public void RemoveBattery(Pickupable battery)
+        internal void RemoveBattery(Pickupable battery)
         {
             var id = battery.GetComponent<PrefabIdentifier>().Id;
 

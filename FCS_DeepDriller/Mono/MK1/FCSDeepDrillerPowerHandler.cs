@@ -1,10 +1,10 @@
-﻿using FCS_DeepDriller.Configuration;
+﻿using System;
+using FCS_DeepDriller.Configuration;
 using FCS_DeepDriller.Enumerators;
 using FCSCommon.Enums;
-using System;
 using UnityEngine;
 
-namespace FCS_DeepDriller.Mono.Handlers
+namespace FCS_DeepDriller.Mono.MK1
 {
     internal class FCSDeepDrillerPowerHandler : MonoBehaviour
     {
@@ -31,11 +31,10 @@ namespace FCS_DeepDriller.Mono.Handlers
 
         private void Update()
         {
-            if (!_mono.IsConstructed || !_initialized) return;
-
-            //QuickLogger.Debug($"Power Mode: {PowerState}");
-            //QuickLogger.Debug($"Power Available: {_powerBank.GetCharge(_module)}");
-
+            if (_mono == null || _mono.DeepDrillerContainer == null || 
+                _mono.DisplayHandler == null || !_mono.IsConstructed || 
+                !_initialized) return;
+            
             if (_mono.DeepDrillerModuleContainer.HasSolarModule())
             {
                 _produceSolarPower = true;

@@ -1,11 +1,11 @@
-﻿using FCS_DeepDriller.Buildable;
+﻿using System;
+using System.Linq;
+using FCS_DeepDriller.Buildable.MK1;
 using FCS_DeepDriller.Configuration;
 using FCSCommon.Utilities;
-using System;
-using System.Linq;
 using UnityEngine;
 
-namespace FCS_DeepDriller.Mono
+namespace FCS_DeepDriller.Mono.MK1
 {
     internal class FCSDeepDrillerBatteryController : HandTarget, IHandTarget
     {

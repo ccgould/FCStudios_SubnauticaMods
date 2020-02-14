@@ -1,8 +1,8 @@
 ﻿using System.Reflection;
 
-namespace FCS_DeepDriller.Extenstion
+namespace FCS_DeepDriller.Extensions
 {
-    internal static class Extenstions
+    internal static class Extensions
     {
         public static object GetPrivateField<T>(this T instance, string fieldName, BindingFlags bindingFlags = BindingFlags.Default)
         {

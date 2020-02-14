@@ -1,15 +1,15 @@
-﻿using FCS_DeepDriller.Buildable;
+﻿using System;
+using System.Collections.Generic;
+using FCS_DeepDriller.Buildable.MK1;
 using FCS_DeepDriller.Configuration;
 using FCS_DeepDriller.Enumerators;
 using FCS_DeepDriller.Helpers;
 using FCSCommon.Extensions;
 using FCSCommon.Utilities;
-using System;
-using System.Collections.Generic;
 using FCSTechFabricator.Components;
 using UnityEngine;
 
-namespace FCS_DeepDriller.Mono.Handlers
+namespace FCS_DeepDriller.Mono.MK1
 {
     internal class FCSDeepDrillerModuleContainer
     {
@@ -41,8 +41,6 @@ namespace FCS_DeepDriller.Mono.Handlers
             _equipment.AddSlot(EquipmentConfiguration.SlotIDs[5]);
             _equipment.AddSlot(EquipmentConfiguration.SlotIDs[6]);
         }
-
-
 
         private bool IsAllowedToRemove(Pickupable pickupable, bool verbose)
         {

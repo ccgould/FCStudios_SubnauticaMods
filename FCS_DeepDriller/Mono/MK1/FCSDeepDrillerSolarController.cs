@@ -1,4 +1,4 @@
-﻿namespace FCS_DeepDriller.Mono.Handlers
+﻿namespace FCS_DeepDriller.Mono.MK1
 {
     internal class FCSDeepDrillerSolarController : HandTarget, IHandTarget
     {

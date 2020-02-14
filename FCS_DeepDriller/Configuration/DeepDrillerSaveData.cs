@@ -21,7 +21,6 @@ namespace FCS_DeepDriller.Configuration
         [JsonProperty] internal DeepDrillerPowerData PowerData { get; set; }
         public TechType FocusOre { get; set; }
         public bool IsFocused { get; set; }
-        public string Biome { get; set; }
     }
 
     [Serializable]

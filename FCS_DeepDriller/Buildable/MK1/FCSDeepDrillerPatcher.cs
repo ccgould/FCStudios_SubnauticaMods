@@ -1,21 +1,19 @@
-﻿using FCS_DeepDriller.Configuration;
-using FCS_DeepDriller.Mono;
-using FCSCommon.Helpers;
-using FCSCommon.Utilities;
-using FCSCommon.Extensions;
-using SMLHelper.V2.Crafting;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using FCS_DeepDriller.Configuration;
+using FCS_DeepDriller.Mono.MK1;
+using FCSCommon.Extensions;
+using FCSCommon.Helpers;
+using FCSCommon.Utilities;
+using SMLHelper.V2.Crafting;
 using UnityEngine;
 
-namespace FCS_DeepDriller.Buildable
+namespace FCS_DeepDriller.Buildable.MK1
 {
-    using SMLHelper.V2.Assets;
-    using System;
-
-    internal partial class FCSDeepDrillerBuildable : Buildable
+    internal partial class FCSDeepDrillerBuildable : SMLHelper.V2.Assets.Buildable
     {
-        private static readonly FCSDeepDrillerBuildable Singleton = new FCSDeepDrillerBuildable();
+        private static readonly MK1.FCSDeepDrillerBuildable Singleton = new MK1.FCSDeepDrillerBuildable();
         public override TechGroup GroupForPDA { get; } = TechGroup.ExteriorModules;
         public override TechCategory CategoryForPDA { get; } = TechCategory.ExteriorModule;
         public override string IconFileName => "FCSDeepDriller.png";

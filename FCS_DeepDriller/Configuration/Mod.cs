@@ -1,9 +1,9 @@
-﻿using FCS_DeepDriller.Mono;
-using FCSCommon.Utilities;
+﻿using FCSCommon.Utilities;
 using SMLHelper.V2.Utility;
 using System;
 using System.Collections;
 using System.IO;
+using FCS_DeepDriller.Mono.MK1;
 using FCSCommon.Extensions;
 using Oculus.Newtonsoft.Json;
 using SMLHelper.V2.Crafting;
@@ -13,6 +13,8 @@ namespace FCS_DeepDriller.Configuration
 {
     internal static class Mod
     {
+        internal static LootDistributionData LootDistributionData { get; set; }
+
         internal const string ModClassID = "FCS_DeepDriller";
         internal const string ModFriendlyName = "FCS Deep Driller";
         internal const string ModFolderName = "FCS_DeepDriller";

@@ -1,13 +1,13 @@
-﻿using FCS_DeepDriller.Mono;
-using FCSCommon.Utilities;
-using FCSCommon.Enums;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using FCS_DeepDriller.Mono.MK1;
+using FCSCommon.Enums;
+using FCSCommon.Utilities;
 using UnityEngine;
 using Random = System.Random;
 
 
-namespace FCSAlterraIndustrialSolutions.Models.Controllers.Logic
+namespace FCS_DeepDriller.Managers
 {
     /// <summary>
     /// This component handles ore generation after a certain amount of time based off the allowed TechTypes
@@ -27,7 +27,7 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers.Logic
         #endregion
 
         #region Internal Properties
-        internal List<TechType> AllowedOres { get; set; }
+        internal List<TechType> AllowedOres { get; set; } = new List<TechType>();
         internal event Action<TechType> OnAddCreated;
         #endregion
 
@@ -92,6 +92,8 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers.Logic
 
         internal void SetAllowTick()
         {
+            if (_mono?.PowerManager == null || _mono?.DeepDrillerContainer == null) return;
+
             if (_mono.PowerManager.GetPowerState() == FCSPowerStates.Powered && !_mono.DeepDrillerContainer.IsContainerFull)
             {
                 _allowTick = true;
@@ -100,8 +102,6 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers.Logic
             {
                 _allowTick = false;
             }
-
-            QuickLogger.Debug($"Allowed Tick: {_allowTick}",true);
         }
 
         internal void RemoveFocus()

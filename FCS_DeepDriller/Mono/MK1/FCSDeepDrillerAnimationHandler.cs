@@ -1,7 +1,7 @@
 ﻿using FCSCommon.Utilities;
 using UnityEngine;
 
-namespace FCS_DeepDriller.Mono.Handlers
+namespace FCS_DeepDriller.Mono.MK1
 {
     public class FCSDeepDrillerAnimationHandler : MonoBehaviour
     {
