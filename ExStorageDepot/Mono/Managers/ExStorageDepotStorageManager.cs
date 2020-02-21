@@ -246,9 +246,11 @@ namespace ExStorageDepot.Mono.Managers
             var amount = _container.container.GetCount(techType);
 
             QuickLogger.Debug($"Container returned {amount} item/s for TechType {techType}");
-
+#if SUBNAUTICA
             var itemSize = CraftData.GetItemSize(techType);
-
+#elif BELOWZERO
+            var itemSize = TechData.GetItemSize(techType);
+#endif
             if (Inventory.main.HasRoomFor(itemSize.x, itemSize.y))
             {
                 if (amount > 0)
