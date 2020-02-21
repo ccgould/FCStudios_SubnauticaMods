@@ -5,10 +5,10 @@ using System.Collections.Generic;
 namespace AE.DropAllOnDeath.Patches
 {
     [HarmonyPatch(typeof(Inventory))]
-    [HarmonyPatch("LoseItems")]
+    [HarmonyPatch(nameof(Inventory.LoseItems))]
     internal class Inventory_Patcher
     {
-        public static void Postfix(ref Inventory __instance)
+        public static void Postfix(ref Inventory __instance, ref bool __result)
         {
             if (!Mod.Configuration.Enabled) return;
 
@@ -25,10 +25,11 @@ namespace AE.DropAllOnDeath.Patches
 
             for (int i = 0; i < list.Count; i++)
             {
-                __instance.InternalDropItem(list[i].item);
+                if (__instance.InternalDropItem(list[i].item))
+                {
+                    __result = true;
+                }
             }
-
-            EscapePod.main.RespawnPlayer();
         }
     }
 }
