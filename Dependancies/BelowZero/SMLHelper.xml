@@ -178,7 +178,6 @@
             - <see cref="M:SMLHelper.V2.Assets.CustomFabricator.AddCraftNode(TechType,System.String)"/><para/>
             - <see cref="M:SMLHelper.V2.Assets.CustomFabricator.AddCraftNode(System.String,System.String)"/><para/>
             - <see cref="M:SMLHelper.V2.Assets.CustomFabricator.AddCraftNode(SMLHelper.V2.Assets.Craftable,System.String)"/><para/>
-            - <see cref="M:SMLHelper.V2.Assets.CustomFabricator.AddTabNode(System.String,System.String,UnityEngine.Sprite,System.String)"/>
             </summary>
             <param name="craftTreeType"></param>
         </member>
@@ -478,7 +477,6 @@
         <member name="M:SMLHelper.V2.Assets.PdaItem.#ctor(System.String,System.String,System.String)">
             <summary>
             Initializes a new <see cref="T:SMLHelper.V2.Assets.PdaItem"/>, the basic class for any item that appears among your PDA blueprints.
-            DO NOT USE THIS CLASS DIRECTLY! Use <seealso cref="T:SMLHelper.V2.Assets.Craftable"/> or <see cref="T:SMLHelper.V2.Assets.Buildable"/> instead.
             </summary>
             <param name="classId">The main internal identifier for this item. Your item's <see cref="T:TechType" /> will be created using this name.</param>
             <param name="friendlyName">The name displayed in-game for this item whether in the open world or in the inventory.</param>
@@ -2008,19 +2006,19 @@
             <para>Don't change this unless you really know what you're doing.</para></param>
             <seealso cref="M:SMLHelper.V2.Utility.ImageUtils.LoadSpriteFromFile(System.String,UnityEngine.TextureFormat)" />
         </member>
+        <member name="M:SMLHelper.V2.Handlers.SpriteHandler.SMLHelper#V2#Interfaces#ISpriteHandler#RegisterSprite(SpriteManager.Group,System.String,UnityEngine.Sprite)">
+            <summary>
+            Registers a new sprite to the game.
+            </summary>
+            <param name="group">The sprite group this sprite will be added to.</param>
+            <param name="id">The sprite internal identifier.</param>
+            <param name="sprite">The sprite to be added.</param>
+        </member>
         <member name="M:SMLHelper.V2.Handlers.SpriteHandler.SMLHelper#V2#Interfaces#ISpriteHandler#RegisterSprite(TechType,UnityEngine.Sprite)">
             <summary>
             Registers a new sprite to the game.
             </summary>
             <param name="type">The techtype paired to this sprite.</param>
-            <param name="sprite">The sprite to be added.</param>
-        </member>
-        <member name="M:SMLHelper.V2.Handlers.SpriteHandler.SMLHelper#V2#Interfaces#ISpriteHandler#RegisterSprite(SpriteManager.Group,System.String,UnityEngine.Sprite)">
-            <summary>
-            Registers a new sprite to the game.
-            </summary>
-            <param name="group">The sprite group.</param>
-            <param name="id">The sprite internal identifier.</param>
             <param name="sprite">The sprite to be added.</param>
         </member>
         <member name="M:SMLHelper.V2.Handlers.SpriteHandler.SMLHelper#V2#Interfaces#ISpriteHandler#RegisterSprite(TechType,System.String)">
@@ -2242,7 +2240,12 @@
             WARNING: This class is for use only by QModManager.
             </summary>
         </member>
-        <member name="M:SMLHelper.V2.Initializer.Patch">
+        <member name="M:SMLHelper.V2.Initializer.PrePatch">
+            <summary>
+            WARNING: This method is for use only by QModManager.
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Initializer.PostPatch">
             <summary>
             WARNING: This method is for use only by QModManager.
             </summary>
@@ -3068,7 +3071,7 @@
         </member>
         <member name="M:SMLHelper.V2.Utility.ImageUtils.LoadSpriteFromTexture(UnityEngine.Texture2D)">
             <summary>
-            Creates a new <see cref="T:UnityEngine.Sprite" /> from a <see cref="T:UnityEngine.Texture2D"/>.
+            Creates a new <see cref="T:UnityEngine.Sprite" /> from an image file.
             </summary>
             <param name="texture2D">The 2D texture to convert into a sprite.</param>
             <returns>

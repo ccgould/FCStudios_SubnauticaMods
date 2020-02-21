@@ -183,7 +183,6 @@
             - <see cref="M:SMLHelper.V2.Assets.CustomFabricator.AddCraftNode(TechType,System.String)"/><para/>
             - <see cref="M:SMLHelper.V2.Assets.CustomFabricator.AddCraftNode(System.String,System.String)"/><para/>
             - <see cref="M:SMLHelper.V2.Assets.CustomFabricator.AddCraftNode(SMLHelper.V2.Assets.Craftable,System.String)"/><para/>
-            - <see cref="M:SMLHelper.V2.Assets.CustomFabricator.AddTabNode(System.String,System.String,Atlas.Sprite,System.String)"/>
             </summary>
             <param name="craftTreeType"></param>
         </member>
@@ -443,6 +442,23 @@
             <param name="type">The techtype paired to this sprite.</param>
             <param name="sprite">The sprite to be added.</param>
         </member>
+        <member name="M:SMLHelper.V2.Assets.ModSprite.#ctor(SpriteManager.Group,System.String,UnityEngine.Sprite)">
+            <summary>
+            Creates a new ModSprite to be used with a specific group and internal ID.
+            Created with a UnityEngine Sprite.
+            </summary>
+            <param name="group">The sprite group this sprite will be added to.</param>
+            <param name="id">The sprite internal identifier.</param>
+            <param name="sprite">The sprite to be added.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Assets.ModSprite.#ctor(TechType,UnityEngine.Sprite)">
+            <summary>
+            Creates a new ModSprite to be used with a specific TechType.
+            Created with a UnityEngine Sprite.
+            </summary>
+            <param name="type">The techtype paired to this sprite.</param>
+            <param name="sprite">The sprite to be added.</param>
+        </member>
         <member name="T:SMLHelper.V2.Assets.PdaItem">
             <summary>
             A <see cref="T:SMLHelper.V2.Assets.Spawnable"/> item that appears in the PDA blueprints.
@@ -483,7 +499,6 @@
         <member name="M:SMLHelper.V2.Assets.PdaItem.#ctor(System.String,System.String,System.String)">
             <summary>
             Initializes a new <see cref="T:SMLHelper.V2.Assets.PdaItem"/>, the basic class for any item that appears among your PDA blueprints.
-            DO NOT USE THIS CLASS DIRECTLY! Use <seealso cref="T:SMLHelper.V2.Assets.Craftable"/> or <see cref="T:SMLHelper.V2.Assets.Buildable"/> instead.
             </summary>
             <param name="classId">The main internal identifier for this item. Your item's <see cref="T:TechType" /> will be created using this name.</param>
             <param name="friendlyName">The name displayed in-game for this item whether in the open world or in the inventory.</param>
@@ -600,6 +615,15 @@
             </summary>
         </member>
         <member name="M:SMLHelper.V2.Crafting.ModCraftTreeLinkingNode.AddTabNode(System.String,System.String,Atlas.Sprite)">
+            <summary>
+            Creates a new tab node for the crafting tree and links it to the calling node.
+            </summary>
+            <param name="nameID">The name/ID of this node.</param>
+            <param name="displayText">The hover text to display in-game.</param>
+            <param name="sprite">The custom sprite to display on this tab node.</param>
+            <returns>A new tab node linked to the root node and ready to use.</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Crafting.ModCraftTreeLinkingNode.AddTabNode(System.String,System.String,UnityEngine.Sprite)">
             <summary>
             Creates a new tab node for the crafting tree and links it to the calling node.
             </summary>
@@ -1304,6 +1328,15 @@
             <param name="craftTree">The target craft tree to edit.</param>
             <param name="craftingItem">The item to craft.</param>        
         </member>
+        <member name="M:SMLHelper.V2.Handlers.CraftTreeHandler.AddTabNode(CraftTree.Type,System.String,System.String,UnityEngine.Sprite)">
+            <summary>
+            Adds a new tab node to the root of the specified crafting tree.
+            </summary>
+            <param name="craftTree">The target craft tree to edit.</param>
+            <param name="name">The ID of the tab node. Must be unique!</param>
+            <param name="displayName">The display name of the tab, which will show up when you hover your mouse on the tab.</param>
+            <param name="sprite">The sprite of the tab.</param>        
+        </member>
         <member name="M:SMLHelper.V2.Handlers.CraftTreeHandler.AddTabNode(CraftTree.Type,System.String,System.String,Atlas.Sprite)">
             <summary>
             Adds a new tab node to the root of the specified crafting tree.
@@ -1314,6 +1347,20 @@
             <param name="sprite">The sprite of the tab.</param>        
         </member>
         <member name="M:SMLHelper.V2.Handlers.CraftTreeHandler.AddTabNode(CraftTree.Type,System.String,System.String,Atlas.Sprite,System.String[])">
+            <summary>
+            Adds a new tab node to the root of the specified crafting tree, at the specified tab location.
+            </summary>
+            <param name="craftTree">The target craft tree to edit.</param>
+            <param name="name">The ID of the tab node. Must be unique!</param>
+            <param name="displayName">The display name of the tab, which will show up when you hover your mouse on the tab.</param>
+            <param name="sprite">The sprite of the tab.</param>
+            <param name="stepsToTab">
+            <para>The steps to the target tab.</para>
+            <para>These must match the id value of the CraftNode in the crafting tree you're targeting.</para>
+            <para>Do not include "root" in this path.</para>
+            </param>        
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CraftTreeHandler.AddTabNode(CraftTree.Type,System.String,System.String,UnityEngine.Sprite,System.String[])">
             <summary>
             Adds a new tab node to the root of the specified crafting tree, at the specified tab location.
             </summary>
@@ -1398,7 +1445,30 @@
             <param name="displayName">The display name of the tab, which will show up when you hover your mouse on the tab.</param>
             <param name="sprite">The sprite of the tab.</param>        
         </member>
+        <member name="M:SMLHelper.V2.Handlers.CraftTreeHandler.SMLHelper#V2#Interfaces#ICraftTreeHandler#AddTabNode(CraftTree.Type,System.String,System.String,UnityEngine.Sprite)">
+            <summary>
+            Adds a new tab node to the root of the specified crafting tree.
+            </summary>
+            <param name="craftTree">The target craft tree to edit.</param>
+            <param name="name">The ID of the tab node. Must be unique!</param>
+            <param name="displayName">The display name of the tab, which will show up when you hover your mouse on the tab.</param>
+            <param name="sprite">The sprite of the tab.</param>
+        </member>
         <member name="M:SMLHelper.V2.Handlers.CraftTreeHandler.SMLHelper#V2#Interfaces#ICraftTreeHandler#AddTabNode(CraftTree.Type,System.String,System.String,Atlas.Sprite,System.String[])">
+            <summary>
+            Adds a new tab node to the root of the specified crafting tree, at the specified tab location.
+            </summary>
+            <param name="craftTree">The target craft tree to edit.</param>
+            <param name="name">The ID of the tab node. Must be unique!</param>
+            <param name="displayName">The display name of the tab, which will show up when you hover your mouse on the tab.</param>
+            <param name="sprite">The sprite of the tab.</param>
+            <param name="stepsToTab">
+            <para>The steps to the target tab.</para>
+            <para>These must match the id value of the CraftNode in the crafting tree you're targeting.</para>
+            <para>Do not include "root" in this path.</para>
+            </param>        
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.CraftTreeHandler.SMLHelper#V2#Interfaces#ICraftTreeHandler#AddTabNode(CraftTree.Type,System.String,System.String,UnityEngine.Sprite,System.String[])">
             <summary>
             Adds a new tab node to the root of the specified crafting tree, at the specified tab location.
             </summary>
@@ -1953,7 +2023,22 @@
             Main entry point for all calls to this handler.
             </summary>
         </member>
+        <member name="M:SMLHelper.V2.Handlers.SpriteHandler.RegisterSprite(TechType,Atlas.Sprite)">
+            <summary>
+            Registers a new sprite to the game.
+            </summary>
+            <param name="type">The techtype paired to this sprite.</param>
+            <param name="sprite">The sprite to be added.</param>
+        </member>
         <member name="M:SMLHelper.V2.Handlers.SpriteHandler.RegisterSprite(SpriteManager.Group,System.String,Atlas.Sprite)">
+            <summary>
+            Registers a new sprite to the game.
+            </summary>
+            <param name="group">The sprite group.</param>
+            <param name="id">The sprite internal identifier.</param>
+            <param name="sprite">The sprite to be added.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.SpriteHandler.RegisterSprite(SpriteManager.Group,System.String,UnityEngine.Sprite)">
             <summary>
             Registers a new sprite to the game.
             </summary>
@@ -1961,7 +2046,7 @@
             <param name="id">The sprite internal identifier.</param>
             <param name="sprite">The sprite to be added.</param>
         </member>
-        <member name="M:SMLHelper.V2.Handlers.SpriteHandler.RegisterSprite(TechType,Atlas.Sprite)">
+        <member name="M:SMLHelper.V2.Handlers.SpriteHandler.RegisterSprite(TechType,UnityEngine.Sprite)">
             <summary>
             Registers a new sprite to the game.
             </summary>
@@ -2021,6 +2106,21 @@
             </summary>
             <param name="group">The sprite group.</param>
             <param name="id">The sprite internal identifier.</param>
+            <param name="sprite">The sprite to be added.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.SpriteHandler.SMLHelper#V2#Interfaces#ISpriteHandler#RegisterSprite(SpriteManager.Group,System.String,UnityEngine.Sprite)">
+            <summary>
+            Registers a new sprite to the game.
+            </summary>
+            <param name="group">The sprite group this sprite will be added to.</param>
+            <param name="id">The sprite internal identifier.</param>
+            <param name="sprite">The sprite to be added.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.SpriteHandler.SMLHelper#V2#Interfaces#ISpriteHandler#RegisterSprite(TechType,UnityEngine.Sprite)">
+            <summary>
+            Registers a new sprite to the game.
+            </summary>
+            <param name="type">The techtype paired to this sprite.</param>
             <param name="sprite">The sprite to be added.</param>
         </member>
         <member name="M:SMLHelper.V2.Handlers.SpriteHandler.SMLHelper#V2#Interfaces#ISpriteHandler#RegisterSprite(TechType,System.String)">
@@ -2113,6 +2213,27 @@
             <param name="unlockAtStart">Whether this TechType should be unlocked on game start, or not. By default, <c>true</c>.</param>
             <returns>The new <see cref="T:TechType"/> that is created.</returns>
         </member>
+        <member name="M:SMLHelper.V2.Handlers.TechTypeHandler.AddTechType(System.String,System.String,System.String,UnityEngine.Sprite)">
+            <summary>
+            Adds a new <see cref="T:TechType"/> into the game, with a sprite. This new techtype will be unlocked at the start of a the game.
+            </summary>
+            <param name="internalName">The internal name of the TechType. Should not contain special characters.</param>
+            <param name="displayName">The display name of the TechType. Can be anything.</param>
+            <param name="tooltip">The tooltip, displayed when hovered in an inventory. Can be anything.</param>
+            <param name="sprite">The sprite that will related to this TechType.</param>
+            <returns>The new <see cref="T:TechType"/> that is created.</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.TechTypeHandler.AddTechType(System.String,System.String,System.String,UnityEngine.Sprite,System.Boolean)">
+            <summary>
+            Adds a new <see cref="T:TechType"/> into the game, with a sprite.
+            </summary>
+            <param name="internalName">The internal name of the TechType. Should not contain special characters.</param>
+            <param name="displayName">The display name of the TechType. Can be anything.</param>
+            <param name="tooltip">The tooltip, displayed when hovered in an inventory. Can be anything.</param>
+            <param name="sprite">The sprite that will related to this TechType.</param>
+            <param name="unlockAtStart">Whether this TechType should be unlocked on game start, or not. By default, <c>true</c>.</param>
+            <returns>The new <see cref="T:TechType"/> that is created.</returns>
+        </member>
         <member name="M:SMLHelper.V2.Handlers.TechTypeHandler.TryGetModdedTechType(System.String,TechType@)">
             <summary>
             Safely looks for a modded item from another mod in the SMLHelper TechTypeCache and outputs its <see cref="T:TechType" /> value when found.
@@ -2171,6 +2292,27 @@
             <returns>The new <see cref="T:TechType"/> that is created.</returns>
         </member>
         <member name="M:SMLHelper.V2.Handlers.TechTypeHandler.SMLHelper#V2#Interfaces#ITechTypeHandler#AddTechType(System.String,System.String,System.String,Atlas.Sprite)">
+            <summary>
+            Adds a new <see cref="T:TechType"/> into the game, with a sprite. This new techtype will be unlocked at the start of a the game.
+            </summary>
+            <param name="internalName">The internal name of the TechType. Should not contain special characters.</param>
+            <param name="displayName">The display name of the TechType. Can be anything.</param>
+            <param name="tooltip">The tooltip, displayed when hovered in an inventory. Can be anything.</param>
+            <param name="sprite">The sprite that will related to this TechType.</param>
+            <returns>The new <see cref="T:TechType"/> that is created.</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.TechTypeHandler.SMLHelper#V2#Interfaces#ITechTypeHandler#AddTechType(System.String,System.String,System.String,UnityEngine.Sprite,System.Boolean)">
+            <summary>
+            Adds a new <see cref="T:TechType"/> into the game, with a sprite.
+            </summary>
+            <param name="internalName">The internal name of the TechType. Should not contain special characters.</param>
+            <param name="displayName">The display name of the TechType. Can be anything.</param>
+            <param name="tooltip">The tooltip, displayed when hovered in an inventory. Can be anything.</param>
+            <param name="sprite">The sprite that will related to this TechType.</param>
+            <param name="unlockAtStart">Whether this TechType should be unlocked on game start, or not. By default, <c>true</c>.</param>
+            <returns>The new <see cref="T:TechType"/> that is created.</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.TechTypeHandler.SMLHelper#V2#Interfaces#ITechTypeHandler#AddTechType(System.String,System.String,System.String,UnityEngine.Sprite)">
             <summary>
             Adds a new <see cref="T:TechType"/> into the game, with a sprite. This new techtype will be unlocked at the start of a the game.
             </summary>
@@ -2465,6 +2607,15 @@
             <param name="craftTree">The target craft tree to edit.</param>
             <param name="craftingItem">The item to craft.</param>        
         </member>
+        <member name="M:SMLHelper.V2.Interfaces.ICraftTreeHandler.AddTabNode(CraftTree.Type,System.String,System.String,UnityEngine.Sprite)">
+            <summary>
+            Adds a new tab node to the root of the specified crafting tree.
+            </summary>
+            <param name="craftTree">The target craft tree to edit.</param>
+            <param name="name">The ID of the tab node. Must be unique!</param>
+            <param name="displayName">The display name of the tab, which will show up when you hover your mouse on the tab.</param>
+            <param name="sprite">The sprite of the tab.</param>        
+        </member>
         <member name="M:SMLHelper.V2.Interfaces.ICraftTreeHandler.AddTabNode(CraftTree.Type,System.String,System.String,Atlas.Sprite)">
             <summary>
             Adds a new tab node to the root of the specified crafting tree.
@@ -2475,6 +2626,20 @@
             <param name="sprite">The sprite of the tab.</param>        
         </member>
         <member name="M:SMLHelper.V2.Interfaces.ICraftTreeHandler.AddTabNode(CraftTree.Type,System.String,System.String,Atlas.Sprite,System.String[])">
+            <summary>
+            Adds a new tab node to the root of the specified crafting tree, at the specified tab location.
+            </summary>
+            <param name="craftTree">The target craft tree to edit.</param>
+            <param name="name">The ID of the tab node. Must be unique!</param>
+            <param name="displayName">The display name of the tab, which will show up when you hover your mouse on the tab.</param>
+            <param name="sprite">The sprite of the tab.</param>
+            <param name="stepsToTab">
+            <para>The steps to the target tab.</para>
+            <para>These must match the id value of the CraftNode in the crafting tree you're targeting.</para>
+            <para>Do not include "root" in this path.</para>
+            </param>        
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.ICraftTreeHandler.AddTabNode(CraftTree.Type,System.String,System.String,UnityEngine.Sprite,System.String[])">
             <summary>
             Adds a new tab node to the root of the specified crafting tree, at the specified tab location.
             </summary>
@@ -2796,7 +2961,22 @@
             A handler class for adding custom sprites into the game.
             </summary>
         </member>
+        <member name="M:SMLHelper.V2.Interfaces.ISpriteHandler.RegisterSprite(TechType,Atlas.Sprite)">
+            <summary>
+            Registers a new sprite to the game.
+            </summary>
+            <param name="type">The techtype paired to this sprite.</param>
+            <param name="sprite">The sprite to be added.</param>
+        </member>
         <member name="M:SMLHelper.V2.Interfaces.ISpriteHandler.RegisterSprite(SpriteManager.Group,System.String,Atlas.Sprite)">
+            <summary>
+            Registers a new sprite to the game.
+            </summary>
+            <param name="group">The sprite group.</param>
+            <param name="id">The sprite internal identifier.</param>
+            <param name="sprite">The sprite to be added.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.ISpriteHandler.RegisterSprite(SpriteManager.Group,System.String,UnityEngine.Sprite)">
             <summary>
             Registers a new sprite to the game.
             </summary>
@@ -2804,7 +2984,7 @@
             <param name="id">The sprite internal identifier.</param>
             <param name="sprite">The sprite to be added.</param>
         </member>
-        <member name="M:SMLHelper.V2.Interfaces.ISpriteHandler.RegisterSprite(TechType,Atlas.Sprite)">
+        <member name="M:SMLHelper.V2.Interfaces.ISpriteHandler.RegisterSprite(TechType,UnityEngine.Sprite)">
             <summary>
             Registers a new sprite to the game.
             </summary>
@@ -2886,6 +3066,27 @@
             <returns>The new <see cref="T:TechType"/> that is created.</returns>
         </member>
         <member name="M:SMLHelper.V2.Interfaces.ITechTypeHandler.AddTechType(System.String,System.String,System.String,Atlas.Sprite,System.Boolean)">
+            <summary>
+            Adds a new <see cref="T:TechType"/> into the game, with a sprite.
+            </summary>
+            <param name="internalName">The internal name of the TechType. Should not contain special characters.</param>
+            <param name="displayName">The display name of the TechType. Can be anything.</param>
+            <param name="tooltip">The tooltip, displayed when hovered in an inventory. Can be anything.</param>
+            <param name="sprite">The sprite that will related to this TechType.</param>
+            <param name="unlockAtStart">Whether this TechType should be unlocked on game start, or not. By default, <c>true</c>.</param>
+            <returns>The new <see cref="T:TechType"/> that is created.</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.ITechTypeHandler.AddTechType(System.String,System.String,System.String,UnityEngine.Sprite)">
+            <summary>
+            Adds a new <see cref="T:TechType"/> into the game, with a sprite. This new techtype will be unlocked at the start of a the game.
+            </summary>
+            <param name="internalName">The internal name of the TechType. Should not contain special characters.</param>
+            <param name="displayName">The display name of the TechType. Can be anything.</param>
+            <param name="tooltip">The tooltip, displayed when hovered in an inventory. Can be anything.</param>
+            <param name="sprite">The sprite that will related to this TechType.</param>
+            <returns>The new <see cref="T:TechType"/> that is created.</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.ITechTypeHandler.AddTechType(System.String,System.String,System.String,UnityEngine.Sprite,System.Boolean)">
             <summary>
             Adds a new <see cref="T:TechType"/> into the game, with a sprite.
             </summary>
@@ -3048,15 +3249,15 @@
             </summary>
             <param name="filePathToImage">The path to the image file.</param>
             <param name="format">
-            The texture format. By default, this uses <see cref="F:UnityEngine.TextureFormat.BC7" />.<br/>
-            https://docs.unity3d.com/ScriptReference/TextureFormat.BC7.html <br/>
-            Don't change this unless you really know what you're doing.
+            <para>The texture format. By default, this uses <see cref="F:UnityEngine.TextureFormat.BC7" />.</para>
+            <para>https://docs.unity3d.com/ScriptReference/TextureFormat.BC7.html</para>
+            <para>Don't change this unless you really know what you're doing.</para>
             </param>
             <returns>Will return a new <see cref="T:Atlas.Sprite"/> instance if the file exists; Otherwise returns null.</returns>
         </member>
         <member name="M:SMLHelper.V2.Utility.ImageUtils.LoadSpriteFromTexture(UnityEngine.Texture2D)">
             <summary>
-            Creates a new <see cref="T:Atlas.Sprite" /> from a <see cref="T:UnityEngine.Texture2D"/>.
+            Creates a new <see cref="T:Atlas.Sprite" /> from an image file.
             </summary>
             <param name="texture2D">The 2D texture to convert into a sprite.</param>
             <returns>
