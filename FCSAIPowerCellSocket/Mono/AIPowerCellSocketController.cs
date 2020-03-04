@@ -143,6 +143,9 @@ namespace FCSAIPowerCellSocket.Mono
         {
             reason = String.Empty;
 
+            if (!_initialized) return true;
+
+
             if (PowerManager.PowercellTracker.Count == 0) return true;
             reason = "Please remove all powercells";
             return false;
