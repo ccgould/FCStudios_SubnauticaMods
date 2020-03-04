@@ -2,12 +2,15 @@
 using Harmony;
 using System;
 using System.Reflection;
+using QModManager.API.ModLoading;
 using UnityEngine;
 
 namespace FCStudioDebugger
 {
+    [QModCore]
     public static class QPatch
     {
+        [QModPatch]
         public static void Patch()
         {
             QuickLogger.Info("Started patching. Version: " + QuickLogger.GetAssemblyVersion());

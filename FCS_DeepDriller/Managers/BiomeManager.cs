@@ -48,9 +48,54 @@ namespace FCS_DeepDriller.Managers
             TechType.DrillableSulphur,
             TechType.DrillableKyanite
         };
-
-        private static readonly SortedDictionary<BiomeType, List<TechType>> _biomeLoot = new SortedDictionary<BiomeType, List<TechType>>();
         
+        private static void FindMatchingBiome(string biome, out string biomeType)
+        {
+            //ILZ
+
+            if (biome.ToLower().EndsWith("Mesa"))
+            {
+                biomeType = "Mesas";
+            }
+            else if (biome.ToLower().StartsWith("kelp"))
+            {
+                biomeType = "Kelp";
+            }
+            else if (biome.ToLower().StartsWith("bloodkelp"))
+            {
+                biomeType = "BloodKelp";
+            }
+            else if (biome.ToLower().StartsWith("lostriver"))
+            {
+                biomeType = "LostRiver";
+            }
+            else if (biome.ToLower().StartsWith("ilz"))
+            {
+                biomeType = "InactiveLavaZone";
+            }
+            else if (biome.ToLower().StartsWith("alz"))
+            {
+                biomeType = "ActiveLavaZone";
+            }
+            else if (biome.ToLower().StartsWith("lava"))
+            {
+                biomeType = "ActiveLavaZone";
+            }
+            else
+            {
+                biomeType = biome;
+            }
+        }
+
+        internal static string GetBiome()
+        {
+            if (Player.main != null)
+            {
+                return Player.main.GetBiomeString();
+            }
+            return string.Empty;
+        }
+
         internal static string CalculateBiome(Transform tr)
         {
             if (LargeWorld.main)
@@ -60,9 +105,9 @@ namespace FCS_DeepDriller.Managers
             return "<unknown>";
         }
 
-        internal static List<TechType> FindBiomeLoot(Transform tr)
+        internal static List<TechType> FindBiomeLoot(Transform tr, string currentBiome)
         {
-            _biomeLoot.Clear();
+            Dictionary<BiomeType, List<TechType>> biomeLoot = new Dictionary<BiomeType, List<TechType>>();
 
             var loot = new List<TechType>();
 
@@ -73,15 +118,19 @@ namespace FCS_DeepDriller.Managers
                     QuickLogger.Error("FindBiomeLoot: Transform cannot be null");
                     return null;
                 }
-                var currentBiome = CalculateBiome(tr);
+   
 
                 if (string.IsNullOrEmpty(currentBiome))
                 {
                     QuickLogger.Error($"No biome found!");
                     return null;
                 }
+                
+                QuickLogger.Debug($"Biome Found: {currentBiome}");
 
-                if (biomeType.AsString().StartsWith(currentBiome, StringComparison.OrdinalIgnoreCase))
+                FindMatchingBiome(currentBiome, out var matchingBiome);
+
+                if (biomeType.AsString().StartsWith(matchingBiome, StringComparison.OrdinalIgnoreCase))
                 {
                     if (Mod.LootDistributionData == null)
                     {
@@ -109,10 +158,10 @@ namespace FCS_DeepDriller.Managers
 
                                 if (Resources.Contains(wei.techType))
                                 {
-                                    if (!_biomeLoot.ContainsKey(biomeType))
-                                        _biomeLoot[biomeType] = new List<TechType>();
+                                    if (!biomeLoot.ContainsKey(biomeType))
+                                        biomeLoot[biomeType] = new List<TechType>();
 
-                                    _biomeLoot[biomeType].Add(wei.techType);
+                                    biomeLoot[biomeType].Add(wei.techType);
 
                                     QuickLogger.Debug($"Added Resource: {wei.techType} in biome {biomeType}");
                                 }
@@ -122,7 +171,7 @@ namespace FCS_DeepDriller.Managers
                 }
             }
             
-            foreach (KeyValuePair<BiomeType, List<TechType>> pair in _biomeLoot)
+            foreach (KeyValuePair<BiomeType, List<TechType>> pair in biomeLoot)
             {
                 foreach (TechType techType in pair.Value)
                 {
@@ -139,7 +188,7 @@ namespace FCS_DeepDriller.Managers
                     loot = loot.Distinct().ToList();
                 }
             }
-
+            
             return loot;
         }
 

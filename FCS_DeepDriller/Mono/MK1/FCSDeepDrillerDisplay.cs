@@ -11,6 +11,7 @@ using FCS_DeepDriller.Configuration;
 using FCS_DeepDriller.Display;
 using FCSCommon.Abstract;
 using FCSCommon.Enums;
+using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
@@ -52,6 +53,7 @@ namespace FCS_DeepDriller.Mono.MK1
 #endif
 
         private InterfaceButton _button;
+        private GridHelper _itemsGrid;
 
         internal void Setup(FCSDeepDrillerController mono)
         {
@@ -68,10 +70,13 @@ namespace FCS_DeepDriller.Mono.MK1
         
             QuickLogger.Debug("Display has been set.");
 
+            _itemsGrid = gameObject.AddComponent<GridHelper>();
+
             InvokeRepeating(nameof(UpdateHealthStatus), 1, 0.5f);
             InvokeRepeating(nameof(UpdateBatteryStatus), 1, 0.5f);
             InvokeRepeating(nameof(UpdateScreenState), 1.0f, 0.5f);
             InvokeRepeating(nameof(UpdateButton), 1, 1);
+            InvokeRepeating(nameof(FixEmptyListView), 1, 1);
         }
 
         private void UpdateScreenState()
@@ -395,27 +400,7 @@ namespace FCS_DeepDriller.Mono.MK1
             _solarValue = main.FindChild("Solar_LBL").GetComponent<Text>();
             return true;
         }
-
-        public override IEnumerator PowerOff()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override IEnumerator PowerOn()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override IEnumerator ShutDown()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override IEnumerator CompleteSetup()
-        {
-            throw new NotImplementedException();
-        }
-
+        
         public override void DrawPage(int page)
         {
             CurrentPage = page;
@@ -484,8 +469,6 @@ namespace FCS_DeepDriller.Mono.MK1
                     break;
             }
 
-
-
             if (icon == null)
             {
                 QuickLogger.Error("Cannot find gameObject Icon");
@@ -521,9 +504,7 @@ namespace FCS_DeepDriller.Mono.MK1
             var charge = data.Battery.charge < 1 ? 0f : data.Battery.charge;
 
             float percent = charge / data.Battery.capacity;
-
-            //QuickLogger.Debug($"P: {percent} | S: {data.Slot} | BDC {data.Battery.charge}");
-
+            
             if (data.Slot == EquipmentConfiguration.SlotIDs[0])
             {
                 text = _s1Percent;
@@ -636,6 +617,14 @@ namespace FCS_DeepDriller.Mono.MK1
                 {
                     _button.transform.gameObject.FindChild(_button.HoverItemName).SetActive(true);
                 }
+            }
+        }
+
+        private void FixEmptyListView()
+        {
+            if(OreButtons.Count == 0 && _mono.GetBiomeData().Count > 0)
+            {
+                DrawPage(CurrentPage);
             }
         }
     }

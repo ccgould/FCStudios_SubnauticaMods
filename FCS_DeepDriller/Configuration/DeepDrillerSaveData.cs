@@ -19,8 +19,12 @@ namespace FCS_DeepDriller.Configuration
         [JsonProperty] internal IEnumerable<KeyValuePair<TechType, int>> Items { get; set; }
 
         [JsonProperty] internal DeepDrillerPowerData PowerData { get; set; }
-        public TechType FocusOre { get; set; }
-        public bool IsFocused { get; set; }
+        
+        [JsonProperty] internal TechType FocusOre { get; set; }
+
+        [JsonProperty] internal bool IsFocused { get; set; }
+        
+        [JsonProperty] internal string Biome { get; set; }
     }
 
     [Serializable]

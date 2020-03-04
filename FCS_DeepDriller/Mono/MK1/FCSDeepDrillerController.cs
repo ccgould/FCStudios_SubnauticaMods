@@ -13,10 +13,6 @@ using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
 
-#if USE_ExStorageDepot
-using ExStorageDepot.Mono;
-#endif
-
 namespace FCS_DeepDriller.Mono.MK1
 {
     [RequireComponent(typeof(WeldablePoint))]
@@ -33,6 +29,7 @@ namespace FCS_DeepDriller.Mono.MK1
         private bool _runStartUpOnEnable;
         private bool _fromSave;
         private DeepDrillerSaveDataEntry _data;
+        private string _currentBiome;
 
         #endregion
 
@@ -88,7 +85,7 @@ namespace FCS_DeepDriller.Mono.MK1
 
                     if (QPatch.Configuration.AllowDamage)
                     {
-                        HealthManager?.SetHealth(_data.Health);
+                        StartCoroutine(SetHeath());
                     }
 
                     PowerManager.LoadData(_data);
@@ -100,6 +97,8 @@ namespace FCS_DeepDriller.Mono.MK1
 
                     _batteryAttachment.GetController().LoadData(_data.PowerData);
 
+                    _currentBiome = _data.Biome;
+
                     _fromSave = false;
                 }
                 
@@ -109,6 +108,14 @@ namespace FCS_DeepDriller.Mono.MK1
             }
         }
 
+        private IEnumerator SetHeath()
+        {
+            while (HealthManager.GetHealth() != _data.Health)
+            {
+                HealthManager?.SetHealth(_data.Health);
+                yield return null;
+            }
+        }
 
         #endregion
 
@@ -159,8 +166,10 @@ namespace FCS_DeepDriller.Mono.MK1
                         Initialize();
                     }
 
+                    _currentBiome = BiomeManager.GetBiome();
                     StartCoroutine(DropLegs());
                     StartCoroutine(TryGetLoot());
+
                 }
                 else
                 {
@@ -195,6 +204,7 @@ namespace FCS_DeepDriller.Mono.MK1
             _saveData.PowerData = PowerManager.SaveData();
             _saveData.FocusOre = OreGenerator.GetFocus();
             _saveData.IsFocused = OreGenerator.GetIsFocused();
+            _saveData.Biome = _currentBiome;
             saveDataList.Entries.Add(_saveData);
         }
         
@@ -446,9 +456,9 @@ namespace FCS_DeepDriller.Mono.MK1
                 yield return null;
             }
 
-            while (OreGenerator?.AllowedOres.Count <= 0)
+            while (OreGenerator.AllowedOres.Count <= 0)
             {
-                var loot = GetBiomeData(transform);
+                var loot = GetBiomeData(_currentBiome,transform);
 
                 if (loot != null)
                 {
@@ -502,9 +512,7 @@ namespace FCS_DeepDriller.Mono.MK1
             {
                 return;
             }
-
-            UpdateLegState(true);
-
+            
             PowerManager.SetPowerState(FCSPowerStates.Powered);
 
             if (DisplayHandler != null)
@@ -517,10 +525,9 @@ namespace FCS_DeepDriller.Mono.MK1
         {
             QuickLogger.Debug("Attempting to Extend legs");
 
-            int i = 1;
             while (!AnimationHandler.GetBoolHash(ExtendStateHash))
             {
-                PowerOnDrill();
+                UpdateLegState(true);
                 yield return null;
             }
         }
@@ -540,11 +547,11 @@ namespace FCS_DeepDriller.Mono.MK1
             ComponentManager.HideAttachment(module);
         }
 
-        internal List<TechType> GetBiomeData(Transform tr = null)
+        internal List<TechType> GetBiomeData(string biome = null, Transform tr = null)
         {
-            if (_bioData?.Count <= 0 && tr != null)
+            if (_bioData?.Count <= 0 && tr != null || biome != null)
             {
-                var data = BiomeManager.FindBiomeLoot(tr);
+                var data = BiomeManager.FindBiomeLoot(tr,biome);
 
                 if (data != null)
                 {
@@ -575,10 +582,6 @@ namespace FCS_DeepDriller.Mono.MK1
             return OreGenerator.GetFocus();
         }
 
-        internal void ExportStorage()
-        {
-            _sendToExStorage = true;
-        }
         #endregion
     }
 }
