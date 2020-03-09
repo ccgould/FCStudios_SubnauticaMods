@@ -21,14 +21,29 @@ namespace FCSAlterraShipping.Buildable
             TechTypeID = this.TechType;
             LanguageHandler.SetLanguageLine(StorageLabelKey, "Alterra Shipping Receptical");
             LanguageHandler.SetLanguageLine(OverLimitKey, "You can't place more than one unit in a habitat.");
+            LanguageHandler.SetLanguageLine(TargetIsShippingKey, "{0} already has a shipping in progress.");
+            LanguageHandler.SetLanguageLine(TargetIsFullKey, "{0} already has a shipping in progress.");
         }
 
-        private const string StorageLabelKey = "ShippingStorage";
-        private const string OverLimitKey = "OverLimitMessage";
+        private const string StorageLabelKey = "ATS_ShippingStorage";
+        private const string OverLimitKey = "ATS_OverLimitMessage";
+        private const string TargetIsShippingKey = "ATS_TargetIsShipping";
+        private const string TargetIsFullKey = "ATS_TargetIsFulL";
 
         public static string StorageLabel()
         {
             return Language.main.Get(StorageLabelKey);
+        }
+
+        public static string TargetIsShipping()
+        {
+            return Language.main.Get(TargetIsShippingKey);
+        }
+
+        public static string TargetIsFull()
+        {
+            return Language.main.Get(TargetIsFullKey);
+
         }
     }
 }

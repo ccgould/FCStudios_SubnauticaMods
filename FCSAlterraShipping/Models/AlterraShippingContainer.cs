@@ -4,6 +4,7 @@ using FCSAlterraShipping.Mono;
 using FCSCommon.Utilities;
 using System;
 using System.Linq;
+using SMLHelper.V2.Utility;
 using UnityEngine;
 
 namespace FCSAlterraShipping.Models
@@ -18,8 +19,12 @@ namespace FCSAlterraShipping.Models
         private const int ContainerWidth = 6;
         internal const int MaxContainerSlots = ContainerHeight * ContainerWidth;
         public Action OnPDAClose { get; set; }
+        public bool HasRoomFor(Pickupable pickupable)
+        {
+            return _container.HasRoomFor(pickupable);
+        }
 
-        public bool CanFit()
+        internal int GetUsedSpace()
         {
             var items = _container.ToList();
             int amount = 0;
@@ -33,17 +38,12 @@ namespace FCSAlterraShipping.Models
                 amount += itemSize.x * itemSize.y;
             }
 
-            return amount < MaxContainerSlots;
+            return amount;
         }
 
-        public bool IsFull(TechType techType)
+        public bool IsFull()
         {
-#if SUBNAUTICA
-            var itemSize = CraftData.GetItemSize(techType);
-#elif BELOWZERO
-            var itemSize = TechData.GetItemSize(techType);
-#endif
-            return _container.count == MaxContainerSlots || !_container.HasRoomFor(itemSize.x, itemSize.y);
+            return _container.IsFull();
         }
 
         public int NumberOfItems => _container.count;

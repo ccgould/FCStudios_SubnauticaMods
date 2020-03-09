@@ -35,7 +35,7 @@ namespace AE.SeaCooker.Managers
                 OnPowerUpdate?.Invoke(value);
             }
         }
-
+        
         internal Action<FCSPowerStates> OnPowerUpdate;
         private bool _hasPowerToConsume;
         private float _energyToConsume;

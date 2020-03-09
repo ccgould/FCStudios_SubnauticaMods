@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using FCSAlterraShipping.Buildable;
 using UnityEngine;
 
 namespace FCSAlterraShipping.Mono
@@ -20,8 +21,7 @@ namespace FCSAlterraShipping.Mono
         private float _botSpeedInKmh = 40f;
         private readonly List<Pickupable> _itemsToRemove = new List<Pickupable>();
         private const float ResetTime = 1f;
-
-
+        
         internal float GetCurrentTime()
         {
             return _currentTime;
@@ -51,30 +51,8 @@ namespace FCSAlterraShipping.Mono
         {
             _items = items;
         }
-        private void Awake()
-        {
-            if (_buildable == null)
-            {
-                _buildable = GetComponentInParent<Constructable>();
-            }
-        }
 
-        private void Update()
-        {
-            if (!_buildable.constructed)
-            {
-                QuickLogger.Debug($"Not Built");
-                return;
-            }
-
-            //QuickLogger.Debug($"T: {_target}, I: {_items}, D: {_done}", true);
-
-            if (_target == null || _items == null || _done) return;
-
-            PendTransfer();
-        }
-
-        internal void SendItems(ItemsContainer items, AlterraShippingTarget target)
+        internal bool SendItems(ItemsContainer items, AlterraShippingTarget target)
         {
             QuickLogger.Debug($"Starting Transfer to {target.GetInstanceID()}", true);
             QuickLogger.Debug($"Target Found: {target.Name}", true);
@@ -95,8 +73,35 @@ namespace FCSAlterraShipping.Mono
                 _currentTime = GetTime(_target);
                 _target.OnReceivingTransfer?.Invoke();
             }
+            else
+            {
+                QuickLogger.Message(string.Format(AlterraShippingBuildable.TargetIsShipping(), _target.Name), true);
+            }
+
+            return true;
         }
 
+        private void Awake()
+        {
+            if (_buildable == null)
+            {
+                _buildable = GetComponentInParent<Constructable>();
+            }
+        }
+
+        private void Update()
+        {
+            if (!_buildable.constructed)
+            {
+                QuickLogger.Debug($"Not Built");
+                return;
+            }
+
+            if (_target == null || _items == null || _done) return;
+
+            PendTransfer();
+        }
+        
         private void PendTransfer()
         {
             if (Mathf.CeilToInt(_currentTime) == 0)
@@ -114,8 +119,11 @@ namespace FCSAlterraShipping.Mono
 
                 foreach (Pickupable pickupable in _itemsToRemove)
                 {
-                    _mono.RemoveItem(pickupable);
-                    _target.AddItem(new InventoryItem(pickupable));
+                    if (_target.HasRoomFor(pickupable))
+                    {
+                        _mono.RemoveItem(pickupable);
+                        _target.AddItem(new InventoryItem(pickupable));
+                    }
                 }
 
                 ErrorMessage.AddMessage($"[{_target.Name} Message]: Shipment has arrived!");
@@ -139,8 +147,7 @@ namespace FCSAlterraShipping.Mono
             if (_target != null) _target.OnTimerChanged?.Invoke(TimeConverters.SecondsToHMS(_currentTime));
             _mono.OnTimerChanged?.Invoke(TimeConverters.SecondsToHMS(_currentTime));
         }
-
-
+        
         private float GetTime(AlterraShippingTarget target)
         {
             var dist = Vector3.Distance(target.transform.position, _mono.transform.position);

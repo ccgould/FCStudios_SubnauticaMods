@@ -49,7 +49,6 @@ namespace FCSTechFabricator
 
         public void LoadAssets(IFcAssetBundlesService assetBundlesService)
         {
-            QuickLogger.Debug($"Assetbundle == {AssetBundle}");
             if (this.AssetBundle == null)
             {
                 this.AssetBundle = assetBundlesService.GetAssetBundleByName(this.AssetBundleName);

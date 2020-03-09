@@ -25,6 +25,7 @@ namespace AE.SeaCooker.Managers
         private Coroutine _cookall;
         private bool _fromSave;
         private bool _continue;
+        private Coroutine _cook;
 
         internal void Initialize(SeaCookerController mono)
         {
@@ -47,15 +48,24 @@ namespace AE.SeaCooker.Managers
             }
 
             _rawTechType = item.item.GetTechType();
-            StartCoroutine(Cook());
+            _cook = StartCoroutine(Cook());
             QuickLogger.Debug($"Cooking food {_rawTechType}", true);
         }
 
         internal void KillCooking()
         {
             QuickLogger.Debug("Kill Cooking");
-            StopCoroutine(_cookall);
-            StopCoroutine(nameof(Cook));
+            
+            if (_cookall != null)
+            {
+                StopCoroutine(_cookall);
+            }
+
+            if (_cook != null)
+            {
+                StopCoroutine(_cook);
+            }
+
             _mono.UpdateIsRunning(false);
             _mono.DisplayManager.ToggleProcessDisplay(false);
             _mono.DisplayManager.ResetProgressBar();

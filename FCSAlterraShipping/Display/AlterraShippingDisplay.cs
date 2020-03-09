@@ -169,9 +169,15 @@ namespace FCSAlterraShipping.Display
                 case "ShippingContainer":
                     var target = additionalObject as AlterraShippingTarget;
 
-                    if (target.IsReceivingTransfer || !target.CanFit())
+                    if (target == null)
                     {
-                        QuickLogger.Debug($"Target Inventory doesn't have enough free slots or is receiving a shipment", true);
+                        QuickLogger.Error<AlterraShippingDisplay>("The target shipping container returned null");
+                        return;
+                    }
+
+                    if (target.IsReceivingTransfer || target.IsFull())
+                    {
+                        QuickLogger.Message($"Target Inventory doesn't have enough free slots or is receiving a shipment", true);
                         return;
                     }
 
@@ -856,9 +862,13 @@ namespace FCSAlterraShipping.Display
             _animatorController.SetIntHash(_mono.PageHash, Shipping);
 
             if (target == null) yield break;
-            _sender = true;
-            _mono.ContainerMode = ShippingContainerStates.Shipping;
-            _mono.TransferItems(target);
+            var shipping = _mono.TransferItems(target);
+
+            if (shipping)
+            {
+                _sender = true;
+                _mono.ContainerMode = ShippingContainerStates.Shipping;
+            }
         }
 
         private IEnumerator BootScreenEnu()

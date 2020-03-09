@@ -37,8 +37,8 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers
 
             if (_isEnabled == false)
             {
+                Startup();
                 _isEnabled = true;
-                StartCoroutine(Startup());
             }
             else
             {
@@ -80,18 +80,8 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers
         {
             try
             {
-                if (IsBeingDeleted) return;
-
-                if (_aiMarineMonitorDisplay != null)
-                {
-                    QuickLogger.Debug("Turnoff");
-
-                    TurnDisplayOff();
-                }
-
-                _aiMarineMonitorDisplay = gameObject.AddComponent<AIMarineMoniterDisplay>();
+                _aiMarineMonitorDisplay = gameObject.GetComponent<AIMarineMoniterDisplay>();
                 _aiMarineMonitorDisplay.Setup(this);
-
             }
             catch (Exception e)
             {
@@ -136,20 +126,17 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers
 
         #region IEnumerator
 
-        private IEnumerator Startup()
+        private void Startup()
         {
-            if (IsBeingDeleted) yield break;
-            yield return new WaitForEndOfFrame();
-            if (IsBeingDeleted) yield break;
-
             //Get the SeaBase
             _seaBase = gameObject?.transform?.parent?.gameObject;
             if (_seaBase == null)
             {
                 ErrorMessage.AddMessage($"[MarineMonitor] ERROR: Can not work out what base it was placed inside.");
                 QuickLogger.Error("ERROR: Can not work out what base it was placed inside.");
-                yield break;
+                return;
             }
+
             AIMarineTurbine_Patcher.AddEventHandlerIfMissing(AlertedNewTurbinePlaced);
             JetStreamDestroy_Patcher.AddEventHandlerIfMissing(AlertedNewTurbineDestroyed);
             GetTurbines();
@@ -173,6 +160,7 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers
 
         #endregion
 
+
         #region Interface Methods
         public bool CanDeconstruct(out string reason)
         {
@@ -195,8 +183,8 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers
 
                     if (_isEnabled == false)
                     {
+                        Startup();
                         _isEnabled = true;
-                        StartCoroutine(Startup());
                     }
                     else
                     {
@@ -208,16 +196,6 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers
                     _runStartUpOnEnable = true;
                 }
             }
-
-
-
-            //else
-            //{
-            //    if (_isEnabled)
-            //    {
-            //        TurnDisplayOff();
-            //    }
-            //}
         }
         #endregion
 

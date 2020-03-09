@@ -4,7 +4,7 @@ namespace FCSAlterraShipping.Interfaces
 {
     interface IContainer
     {
-        bool IsFull(TechType techType);
+        bool IsFull();
         int NumberOfItems { get; }
         bool HasItems();
         void OpenStorage();
@@ -13,7 +13,7 @@ namespace FCSAlterraShipping.Interfaces
         void AddItem(InventoryItem item);
         void RemoveItem(Pickupable item);
         void RemoveItem(TechType item);
-        bool CanFit();
         Action OnPDAClose { get; set; }
+        bool HasRoomFor(Pickupable pickupable);
     }
 }

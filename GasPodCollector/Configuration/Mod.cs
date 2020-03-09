@@ -1,20 +1,17 @@
-﻿
-using AE.SeaCooker.Mono;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
 using FCSCommon.Objects;
 using FCSCommon.Utilities;
+using GasPodCollector.Mono;
 using Oculus.Newtonsoft.Json;
-using System.Collections.Generic;
 using SMLHelper.V2.Crafting;
+using SMLHelper.V2.Utility;
+using UnityEngine;
 
-namespace AE.SeaCooker.Configuration
+namespace GasPodCollector.Configuration
 {
-    using SMLHelper.V2.Utility;
-    using System;
-    using System.Collections;
-    using System.IO;
-    using UnityEngine;
-
-
     internal static class Mod
     {
         #region Private Members
@@ -25,44 +22,47 @@ namespace AE.SeaCooker.Configuration
         #endregion
 
         #region Internal Properties
-        internal const string ModName = "FCS_AESeaCooker";
-        internal const string BundleName = "seacookermodbundle";
-        internal const string SeaCookerTabID = "SC";
-        internal const string SaveDataFilename = "SeaCookerSaveData.json";
-        internal const string FriendlyName = "SeaCooker";
-        internal const string Description = "A automatic food cooker for all your cooking needs";
-        internal const string ClassID = "SeaCooker";
-        internal const string SeaCookerKitClassID = "SeaCookerBuildableKit_SC";
+        internal const string ModName = "FCS_GasPodCollector";
+        internal const string BundleName = "gaspodcollectormodbundle";
+        internal const string GasPodCollectorTabID = "GPC";
+        internal const string FriendlyName = "GasPodCollector";
+        internal const string Description = "A device that collect Gaspods from the gasopod.";
+        internal const string ClassID = "GaspodCollector";
+        internal static string AssetFolder => Path.Combine(ModName, "Assets");
+
+        internal const string GaspodCollectorKitClassID = "GaspodCollector_Kit";
+
+        internal static string SaveDataFilename => $"{ClassID}SaveData.json";
         internal static string MODFOLDERLOCATION => GetModPath();
 
 #if SUBNAUTICA
-        internal static TechData SeaCookerIngredients => new TechData
+        internal static TechData GaspodCollectorIngredients => new TechData
 #elif BELOWZERO
-        internal static RecipeData SeaCookerIngredients => new RecipeData
+                internal static RecipeData GaspodCollectorIngredients => new RecipeData
 #endif
         {
             craftAmount = 1,
             Ingredients =
-            {
-                new Ingredient(TechType.AdvancedWiringKit, 1),
-                new Ingredient(TechType.Aerogel, 2),
-                new Ingredient(TechType.TitaniumIngot, 1)
-            }
+                    {
+                        new Ingredient(TechType.Beacon, 1),
+                        new Ingredient(TechType.AdvancedWiringKit, 1),
+                        new Ingredient(TechType.TitaniumIngot, 2),
+                        new Ingredient(TechType.EnameledGlass, 1),
+                        new Ingredient(TechType.Gravsphere, 1),
+                        new Ingredient(TechType.VehicleStorageModule, 1),
+                        new Ingredient(TechType.Battery, 2),
+                        new Ingredient(TechType.Gasopod, 2),
+                        new Ingredient(TechType.StalkerTooth, 5)
+                    }
         };
 
-        internal const string SeaAlienGasClassID = "SeaAlienGasTank_SC";
-        internal const string SeaAlienGasFriendlyName = "Sea Alien Gas";
-        internal const string SeaAlienGasDescription = "This tank allows you to cook food in the Sea Cooker using Alien Feces.";
 
-        internal const string SeaGasClassID = "SeaGasTank_SC";
-        internal const string SeaGasFriendlyName = "Sea Gas";
-        internal const string SeaGasDescription = "This tank allows you to cook food in the Sea Cooker using Gaspod gas.";
 
         internal static event Action<SaveData> OnDataLoaded;
         #endregion
 
         #region Internal Methods
-        
+
         internal static void Save()
         {
             if (!IsSaving())
@@ -71,7 +71,7 @@ namespace AE.SeaCooker.Configuration
 
                 SaveData newSaveData = new SaveData();
 
-                var controllers = GameObject.FindObjectsOfType<SeaCookerController>();
+                var controllers = GameObject.FindObjectsOfType<GaspodCollectorController>();
 
                 foreach (var controller in controllers)
                 {
@@ -168,11 +168,6 @@ namespace AE.SeaCooker.Configuration
             return Path.Combine(Environment.CurrentDirectory, "QMods");
         }
 
-        internal static List<SerializableColor> SerializedColors()
-        {
-            return JsonConvert.DeserializeObject<List<SerializableColor>>(File.ReadAllText(Path.Combine(GetAssetFolder(), "colors.json")));
-        }
-
         #endregion
 
         private static void CreateModConfiguration()
@@ -205,5 +200,15 @@ namespace AE.SeaCooker.Configuration
 
             return LoadConfigurationData();
         }
+    }
+
+    internal class Config
+    {
+        [JsonProperty] internal bool PlaySFX { get; set; } = true;
+    }
+
+    internal class ConfigFile
+    {
+        [JsonProperty] internal Config Config { get; set; }
     }
 }

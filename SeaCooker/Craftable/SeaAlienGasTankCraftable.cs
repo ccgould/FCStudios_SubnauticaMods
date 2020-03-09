@@ -107,8 +107,7 @@ namespace AE.SeaCooker.Craftable
                 {
                     new Ingredient(TechType.SeaTreaderPoop, 2),
                     new Ingredient(TechType.Tank, 1),
-                    new Ingredient(TechType.HydrochloricAcid, 1),
-                    new Ingredient(TechType.BigFilteredWater, 2)
+                    new Ingredient(TechType.FilteredWater, 2)
                 }
             };
             return customFabRecipe;

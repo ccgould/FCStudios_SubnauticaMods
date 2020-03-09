@@ -42,10 +42,15 @@ namespace FCSAlterraShipping.Mono
         private bool _runStartUpOnEnable;
         public ShippingContainerStates ContainerMode { get; set; }
         public Action OnPDAClose { get; set; }
-        public AlterraShippingDisplay DisplayManager { get; private set; }
-        public bool IsFull(TechType techType)
+        public bool HasRoomFor(Pickupable pickupable)
         {
-            return _container.IsFull(techType);
+            return _container.HasRoomFor(pickupable);
+        }
+
+        public AlterraShippingDisplay DisplayManager { get; private set; }
+        public bool IsFull()
+        {
+            return _container.IsFull();
         }
 
         private bool IsContainerOpen => AnimatorController.GetBoolHash(DoorStateHash);
@@ -311,9 +316,9 @@ namespace FCSAlterraShipping.Mono
             QuickLogger.Debug("Target has been connected", true);
         }
 
-        public void TransferItems(AlterraShippingTarget target)
+        public bool TransferItems(AlterraShippingTarget target)
         {
-            _transferHandler.SendItems(_container.GetContainer(), target);
+            return _transferHandler.SendItems(_container.GetContainer(), target);
         }
 
         public void ClearContainer()
@@ -334,11 +339,6 @@ namespace FCSAlterraShipping.Mono
         public void RemoveItem(TechType item)
         {
             _container.RemoveItem(item);
-        }
-
-        public bool CanFit()
-        {
-            return _container.CanFit();
         }
 
         public void OnProtoSerialize(ProtobufSerializer serializer)

@@ -151,7 +151,12 @@
         </member>
         <member name="P:SMLHelper.V2.Assets.CustomFabricator.TreeTypeID">
             <summary>
-            The ID value for your custom craft tree. This is set in the <see cref="M:SMLHelper.V2.Assets.CustomFabricator.CreateCustomCraftTree(CraftTree.Type@)"/> method.
+            The ID value for your custom craft tree. This is set after this <see cref="M:SMLHelper.V2.Assets.Spawnable.Patch"/> method is invoked.
+            </summary>
+        </member>
+        <member name="P:SMLHelper.V2.Assets.CustomFabricator.Root">
+            <summary>
+            Gets the root node of the crafting tree. This is set after this <see cref="M:SMLHelper.V2.Assets.Spawnable.Patch"/> method is invoked.
             </summary>
         </member>
         <member name="P:SMLHelper.V2.Assets.CustomFabricator.CategoryForPDA">
@@ -722,11 +727,14 @@
         </member>
         <member name="T:SMLHelper.V2.Crafting.ModCraftTreeRoot">
             <summary>
-            The root node of a CraftTree. The whole tree starts here.
+            The root node of a CraftTree. The whole tree starts here.<para/>
+            Build up your custom crafting tree from this root node using the AddCraftingNode and AddTabNode methods.<br/>
+            This tree will be automatically patched into the game. No further calls into <see cref="T:SMLHelper.V2.Handlers.CraftTreeHandler"/> required.<para/>
+            For more advanced usage, you can replace the default value of <see cref="F:SMLHelper.V2.Crafting.ModCraftTreeRoot.CraftTreeCreation"/> with your own custom function.        
             </summary>    
             <seealso cref="T:SMLHelper.V2.Crafting.ModCraftTreeLinkingNode" />
         </member>
-        <member name="P:SMLHelper.V2.Crafting.ModCraftTreeRoot.CraftTree">
+        <member name="P:SMLHelper.V2.Crafting.ModCraftTreeRoot.CustomCraftingTree">
             <summary>
             Dynamically creates the CraftTree object for this crafting tree.
             The CraftNode objects were created and linked as the classes of the ModCraftTreeFamily were created and linked.
@@ -738,6 +746,13 @@
             </summary>
             <param name="tree">The tree to create the ModCraftTreeRoot from.</param>
             <param name="root"></param>
+        </member>
+        <member name="F:SMLHelper.V2.Crafting.ModCraftTreeRoot.CraftTreeCreation">
+            <summary>
+            The craft tree creation function.<br/>
+            Default implementaion returns a new <see cref="T:CraftTree"/> instantiated with <see cref="P:SMLHelper.V2.Crafting.ModCraftTreeRoot.SchemeAsString"/> and the root <see cref="T:CraftNode"/>.<para/>
+            You can replace this function with your own to have more control of the crafting tree when it is being created.
+            </summary>
         </member>
         <member name="M:SMLHelper.V2.Crafting.ModCraftTreeRoot.GetTabNode(System.String[])">
             <summary>
@@ -1155,6 +1170,15 @@
             <param name="techType">The TechType whose TechData you want to access.</param>
             <returns>The ITechData from the modded item if it exists; Otherwise, returns <c>null</c>.</returns>
         </member>
+        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.GetTechData(TechType)">
+            <summary>
+            Safely accesses the crafting data from any item.<para/>
+            WARNING: This method is highly dependent on mod load order. 
+            Make sure your mod is loading after the mod whose TechData you are trying to access.
+            </summary>
+            <param name="techType">The TechType whose TechData you want to access.</param>
+            <returns>Returns TechData if it exists; Otherwise, returns <c>null</c>.</returns>
+        </member>
         <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SMLHelper#V2#Interfaces#ICraftDataHandler#SetTechData(TechType,ITechData)">
             <summary>
             <para>Allows you to edit recipes, i.e. TechData for TechTypes.</para>
@@ -1269,6 +1293,15 @@
             <param name="techType">The TechType whose TechData you want to access.</param>
             <returns>The ITechData from the modded item if it exists; Otherwise, returns <c>null</c>.</returns>
         </member>
+        <member name="M:SMLHelper.V2.Handlers.CraftDataHandler.SMLHelper#V2#Interfaces#ICraftDataHandler#GetTechData(TechType)">
+            <summary>
+            Safely accesses the crafting data from any item.<para/>
+            WARNING: This method is highly dependent on mod load order. 
+            Make sure your mod is loading after the mod whose TechData you are trying to access.
+            </summary>
+            <param name="techType">The TechType whose TechData you want to access.</param>
+            <returns>Returns TechData if it exists; Otherwise, returns <c>null</c>.</returns>
+        </member>
         <member name="T:SMLHelper.V2.Handlers.CraftTreeHandler">
             <summary>
             A handler class for creating and editing of crafting trees.
@@ -1281,15 +1314,16 @@
         </member>
         <member name="M:SMLHelper.V2.Handlers.CraftTreeHandler.CreateCustomCraftTreeAndType(System.String,CraftTree.Type@)">
             <summary>
-            <para>Your first method call to start a new custom crafting tree.</para>
-            <para>Creating a new CraftTree only makes sense if you're going to use it in a new type of <see cref="T:GhostCrafter"/>.</para>
+            Your first method call to start a new custom crafting tree.<br/>
+            Creating a new CraftTree only makes sense if you're going to use it in a new type of <see cref="T:GhostCrafter"/>.
             </summary>
             <param name="name">The name for the new <see cref="T:CraftTree.Type" /> enum.</param>
             <param name="craftTreeType">The new enum instance for your custom craft tree type.</param>
             <returns>
-            <para>Returns the root node for your custom craft tree, as a new <see cref="T:SMLHelper.V2.Crafting.ModCraftTreeRoot"/> instance.</para>
-            <para>Build up your custom crafting tree from this root node.</para>
-            <para>This tree will be automatically patched into the game. No further calls into <see cref="T:SMLHelper.V2.Handlers.CraftTreeHandler"/> required.</para>
+            Returns the root node for your custom craft tree, as a new <see cref="T:SMLHelper.V2.Crafting.ModCraftTreeRoot"/> instance.<br/>
+            Build up your custom crafting tree from this root node.<br/>
+            This tree will be automatically patched into the game. No further calls into <see cref="T:SMLHelper.V2.Handlers.CraftTreeHandler"/> required.<para/>
+            For more advanced usage, you can replace the default value of <see cref="F:SMLHelper.V2.Crafting.ModCraftTreeRoot.CraftTreeCreation"/> with your own custom function.        
             </returns>
             <seealso cref="T:SMLHelper.V2.Crafting.ModCraftTreeNode"/>
             <seealso cref="T:SMLHelper.V2.Crafting.ModCraftTreeLinkingNode"/>
@@ -1389,15 +1423,16 @@
         </member>
         <member name="M:SMLHelper.V2.Handlers.CraftTreeHandler.SMLHelper#V2#Interfaces#ICraftTreeHandler#CreateCustomCraftTreeAndType(System.String,CraftTree.Type@)">
             <summary>
-            <para>Your first method call to start a new custom crafting tree.</para>
-            <para>Creating a new CraftTree only makes sense if you're going to use it in a new type of <see cref="T:GhostCrafter"/>.</para>
+            Your first method call to start a new custom crafting tree.<br/>
+            Creating a new CraftTree only makes sense if you're going to use it in a new type of <see cref="T:GhostCrafter"/>.
             </summary>
             <param name="name">The name for the new <see cref="T:CraftTree.Type" /> enum.</param>
             <param name="craftTreeType">The new enum instance for your custom craft tree type.</param>
             <returns>
-            <para>Returns the root node for your custom craft tree, as a new <see cref="T:SMLHelper.V2.Crafting.ModCraftTreeRoot"/> instance.</para>
-            <para>Build up your custom crafting tree from this root node.</para>
-            <para>This tree will be automatically patched into the game. No further calls into <see cref="T:SMLHelper.V2.Handlers.CraftTreeHandler"/> required.</para>
+            Returns the root node for your custom craft tree, as a new <see cref="T:SMLHelper.V2.Crafting.ModCraftTreeRoot"/> instance.<br/>
+            Build up your custom crafting tree from this root node.<br/>
+            This tree will be automatically patched into the game. No further calls into <see cref="T:SMLHelper.V2.Handlers.CraftTreeHandler"/> required.<para/>
+            For more advanced usage, you can replace the default value of <see cref="F:SMLHelper.V2.Crafting.ModCraftTreeRoot.CraftTreeCreation"/> with your own custom function.        
             </returns>
             <seealso cref="T:SMLHelper.V2.Crafting.ModCraftTreeNode"/>
             <seealso cref="T:SMLHelper.V2.Crafting.ModCraftTreeLinkingNode"/>
@@ -1541,6 +1576,12 @@
             </summary>
             <param name="onSaveAction">The method to invoke.</param>
         </member>
+        <member name="M:SMLHelper.V2.Handlers.IngameMenuHandler.RegisterOnQuitEvent(System.Action)">
+            <summary>
+            Registers a simple <see cref="T:System.Action"/> method to invoke whenever the player quits the game via the in game menu.
+            </summary>
+            <param name="onQuitAction">The method to invoke.</param>
+        </member>
         <member name="M:SMLHelper.V2.Handlers.IngameMenuHandler.UnregisterOnSaveEvent(System.Action)">
             <summary>
             Removes a method previously added through <see cref="M:SMLHelper.V2.Handlers.IngameMenuHandler.RegisterOnSaveEvent(System.Action)"/> so it is no longer invoked when saving the game.<para/>
@@ -1548,17 +1589,36 @@
             </summary>
             <param name="onSaveAction">The method invoked.</param>
         </member>
+        <member name="M:SMLHelper.V2.Handlers.IngameMenuHandler.UnregisterOnQuitEvent(System.Action)">
+            <summary>
+            Removes a method previously added through <see cref="M:SMLHelper.V2.Handlers.IngameMenuHandler.RegisterOnSaveEvent(System.Action)"/> so it is no longer invoked when quitting the game.<para/>
+            If you plan on using this, do not register an anonymous method.
+            </summary>
+            <param name="onQuitAction">The method invoked.</param>
+        </member>
         <member name="M:SMLHelper.V2.Handlers.IngameMenuHandler.RegisterOneTimeUseOnSaveEvent(System.Action)">
             <summary>
             Registers a simple <see cref="T:System.Action"/> method to invoke the <c>first time</c> the player saves the game via the in game menu.
             </summary>
             <param name="onSaveAction">The method to invoke. This action will not be invoked a second time.</param>
         </member>
+        <member name="M:SMLHelper.V2.Handlers.IngameMenuHandler.RegisterOneTimeUseOnQuitEvent(System.Action)">
+            <summary>
+            Registers a simple <see cref="T:System.Action"/> method to invoke the <c>first time</c> the player quits the game via the in game menu.
+            </summary>
+            <param name="onQuitAction">The method to invoke. This action will not be invoked a second time.</param>
+        </member>
         <member name="M:SMLHelper.V2.Handlers.IngameMenuHandler.SMLHelper#V2#Interfaces#IIngameMenuHandler#RegisterOnSaveEvent(System.Action)">
             <summary>
             Registers a simple <see cref="T:System.Action"/> method to invoke whenever the player saves the game via the in game menu.
             </summary>
             <param name="onSaveAction">The method to invoke.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.IngameMenuHandler.SMLHelper#V2#Interfaces#IIngameMenuHandler#RegisterOnQuitEvent(System.Action)">
+            <summary>
+            Registers a simple <see cref="T:System.Action"/> method to invoke whenever the player quits the game via the in game menu.
+            </summary>
+            <param name="onQuitAction">The method to invoke.</param>
         </member>
         <member name="M:SMLHelper.V2.Handlers.IngameMenuHandler.SMLHelper#V2#Interfaces#IIngameMenuHandler#UnregisterOnSaveEvent(System.Action)">
             <summary>
@@ -1567,11 +1627,24 @@
             </summary>
             <param name="onSaveAction">The method invoked.</param>
         </member>
+        <member name="M:SMLHelper.V2.Handlers.IngameMenuHandler.SMLHelper#V2#Interfaces#IIngameMenuHandler#UnregisterOnQuitEvent(System.Action)">
+            <summary>
+            Removes a method previously added through <see cref="M:SMLHelper.V2.Handlers.IngameMenuHandler.RegisterOnSaveEvent(System.Action)"/> so it is no longer invoked when quiting the game.<para/>
+            If you plan on using this, do not register an anonymous method.
+            </summary>
+            <param name="onQuitAction">The method invoked.</param>
+        </member>
         <member name="M:SMLHelper.V2.Handlers.IngameMenuHandler.SMLHelper#V2#Interfaces#IIngameMenuHandler#RegisterOneTimeUseOnSaveEvent(System.Action)">
             <summary>
             Registers a simple <see cref="T:System.Action"/> method to invoke the <c>first time</c> the player saves the game via the in game menu.
             </summary>
             <param name="onSaveAction">The method to invoke. This action will not be invoked a second time.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.IngameMenuHandler.SMLHelper#V2#Interfaces#IIngameMenuHandler#RegisterOneTimeUseOnQuitEvent(System.Action)">
+            <summary>
+            Registers a simple <see cref="T:System.Action"/> method to invoke the <c>first time</c> the player quits the game via the in game menu.
+            </summary>
+            <param name="onQuitAction">The method to invoke. This action will not be invoked a second time.</param>
         </member>
         <member name="T:SMLHelper.V2.Handlers.ItemActionHandler">
             <summary>
@@ -2553,6 +2626,15 @@
             <param name="techType">The TechType whose TechData you want to access.</param>
             <returns>The ITechData from the modded item if it exists; Otherwise, returns <c>null</c>.</returns>
         </member>
+        <member name="M:SMLHelper.V2.Interfaces.ICraftDataHandler.GetTechData(TechType)">
+            <summary>
+            Safely accesses the crafting data from any item.<para/>
+            WARNING: This method is highly dependent on mod load order. 
+            Make sure your mod is loading after the mod whose TechData you are trying to access.
+            </summary>
+            <param name="techType">The TechType whose TechData you want to access.</param>
+            <returns>Returns TechData if it exists; Otherwise, returns <c>null</c>.</returns>
+        </member>
         <member name="T:SMLHelper.V2.Interfaces.ICraftTreeHandler">
             <summary>
             A handler class for creating and editing of crafting trees.
@@ -2560,15 +2642,16 @@
         </member>
         <member name="M:SMLHelper.V2.Interfaces.ICraftTreeHandler.CreateCustomCraftTreeAndType(System.String,CraftTree.Type@)">
             <summary>
-            <para>Your first method call to start a new custom crafting tree.</para>
-            <para>Creating a new CraftTree only makes sense if you're going to use it in a new type of <see cref="T:GhostCrafter"/>.</para>
+            Your first method call to start a new custom crafting tree.<br/>
+            Creating a new CraftTree only makes sense if you're going to use it in a new type of <see cref="T:GhostCrafter"/>.
             </summary>
             <param name="name">The name for the new <see cref="T:CraftTree.Type" /> enum.</param>
             <param name="craftTreeType">The new enum instance for your custom craft tree type.</param>
             <returns>
-            <para>Returns the root node for your custom craft tree, as a new <see cref="T:SMLHelper.V2.Crafting.ModCraftTreeRoot"/> instance.</para>
-            <para>Build up your custom crafting tree from this root node.</para>
-            <para>This tree will be automatically patched into the game. No further calls into <see cref="T:SMLHelper.V2.Interfaces.ICraftTreeHandler"/> required.</para>
+            Returns the root node for your custom craft tree, as a new <see cref="T:SMLHelper.V2.Crafting.ModCraftTreeRoot"/> instance.<br/>
+            Build up your custom crafting tree from this root node.<br/>
+            This tree will be automatically patched into the game. No further calls into <see cref="T:SMLHelper.V2.Handlers.CraftTreeHandler"/> required.<para/>
+            For more advanced usage, you can replace the default value of <see cref="F:SMLHelper.V2.Crafting.ModCraftTreeRoot.CraftTreeCreation"/> with your own custom function.        
             </returns>
             <seealso cref="T:SMLHelper.V2.Crafting.ModCraftTreeNode"/>
             <seealso cref="T:SMLHelper.V2.Crafting.ModCraftTreeLinkingNode"/>
@@ -2690,6 +2773,12 @@
             </summary>
             <param name="onSaveAction">The method to invoke.</param>
         </member>
+        <member name="M:SMLHelper.V2.Interfaces.IIngameMenuHandler.RegisterOnQuitEvent(System.Action)">
+            <summary>
+            Registers a simple <see cref="T:System.Action"/> method to invoke whenever the player quits the game via the in game menu.
+            </summary>
+            <param name="onQuitAction">The method to invoke.</param>
+        </member>
         <member name="M:SMLHelper.V2.Interfaces.IIngameMenuHandler.UnregisterOnSaveEvent(System.Action)">
             <summary>
             Removes a method previously added through <see cref="M:SMLHelper.V2.Interfaces.IIngameMenuHandler.RegisterOnSaveEvent(System.Action)"/> so it is no longer invoked when saving the game.<para/>
@@ -2697,11 +2786,24 @@
             </summary>
             <param name="onSaveAction">The method invoked.</param>
         </member>
+        <member name="M:SMLHelper.V2.Interfaces.IIngameMenuHandler.UnregisterOnQuitEvent(System.Action)">
+            <summary>
+            Removes a method previously added through <see cref="M:SMLHelper.V2.Interfaces.IIngameMenuHandler.RegisterOnQuitEvent(System.Action)"/> so it is no longer invoked when quiting the game.<para/>
+            If you plan on using this, do not register an anonymous method.
+            </summary>
+            <param name="onQuitAction">The method invoked.</param>
+        </member>
         <member name="M:SMLHelper.V2.Interfaces.IIngameMenuHandler.RegisterOneTimeUseOnSaveEvent(System.Action)">
             <summary>
             Registers a simple <see cref="T:System.Action"/> method to invoke the <c>first time</c> the player saves the game via the in game menu.
             </summary>
             <param name="onSaveAction">The method to invoke. This action will not be invoked a second time.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.IIngameMenuHandler.RegisterOneTimeUseOnQuitEvent(System.Action)">
+            <summary>
+            Registers a simple <see cref="T:System.Action"/> method to invoke the <c>first time</c> the player quits the game via the in game menu.
+            </summary>
+            <param name="onQuitAction">The method to invoke. This action will not be invoked a second time.</param>
         </member>
         <member name="T:SMLHelper.V2.Interfaces.IItemActionHandler">
             <summary>
@@ -3202,6 +3304,34 @@
             </summary>
             <param name="container">The container to check.</param>
             <returns>The collection of techtypes allowed in the container.</returns>
+        </member>
+        <member name="T:SMLHelper.V2.Utility.AudioUtils">
+            <summary>
+            Utilities for audio and sound
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Utility.AudioUtils.CreateSound(System.String,FMOD.MODE)">
+            <summary>
+            Creates a <see cref="T:FMOD.Sound"/> instance from a path. Can be stored and later used with <see cref="M:SMLHelper.V2.Utility.AudioUtils.PlaySound(FMOD.Sound)"/>
+            </summary>
+            <param name="path">The path of the sound. Relative to the base game folder.</param>
+            <param name="mode"></param>
+            <returns>The <see cref="T:FMOD.Sound"/> instance</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Utility.AudioUtils.PlaySound(System.String,FMOD.MODE)">
+            <summary>
+            Plays a <see cref="T:FMOD.Sound"/> globally from a path. Must be a .wav file
+            </summary>
+            <param name="path">The path of the sound. Relative to the base game folder.</param>
+            <param name="mode"></param>
+            <returns>The channel on which the sound was created</returns>
+        </member>
+        <member name="M:SMLHelper.V2.Utility.AudioUtils.PlaySound(FMOD.Sound)">
+            <summary>
+            Plays a <see cref="T:FMOD.Sound"/> globally
+            </summary>
+            <param name="sound">The sound which should be played</param>
+            <returns>The channel on which the sound was created</returns>
         </member>
         <member name="T:SMLHelper.V2.Utility.ExtBannedIdManager">
             <summary>
@@ -3991,12 +4121,12 @@
         </member>
         <member name="P:SMLHelper.V2.Options.ModOptions.Options">
             <summary>
-            Builds and obtains the <see cref="T:SMLHelper.V2.Options.ModOption"/>s that belong to this instance.
+            Obtains the <see cref="T:SMLHelper.V2.Options.ModOption"/>s that belong to this instance. Can be null.
             </summary>
         </member>
         <member name="M:SMLHelper.V2.Options.ModOptions.#ctor(System.String)">
             <summary>
-            Creates a new insteance of <see cref="T:SMLHelper.V2.Options.ModOptions"/>.
+            Creates a new instance of <see cref="T:SMLHelper.V2.Options.ModOptions"/>.
             </summary>
             <param name="name">The name that will display above this section of options in the in-game menu.</param>
         </member>
@@ -4008,6 +4138,9 @@
             <para>Make sure you have subscribed to the events in the constructor to handle what happens when the value is changed:
             <seealso cref="E:SMLHelper.V2.Options.ModOptions.SliderChanged"/> | <seealso cref="E:SMLHelper.V2.Options.ModOptions.ToggleChanged"/> | <seealso cref="E:SMLHelper.V2.Options.ModOptions.ChoiceChanged"/> | <seealso cref="E:SMLHelper.V2.Options.ModOptions.KeybindChanged"/>.</para>
             </summary>
+        </member>
+        <member name="E:SMLHelper.V2.Options.ModOptions.GameObjectCreated">
+            <summary> The event that is called whenever a game object created for the option </summary>
         </member>
         <member name="E:SMLHelper.V2.Options.ModOptions.SliderChanged">
             <summary>
@@ -4030,6 +4163,19 @@
             <param name="minValue">The minimum value for the range.</param>
             <param name="maxValue">The maximum value for the range.</param>
             <param name="value">The starting value.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Options.ModOptions.AddSliderOption(System.String,System.String,System.Single,System.Single,System.Single,System.Nullable{System.Single},System.String)">
+            <summary>
+            Adds a new <see cref="T:SMLHelper.V2.Options.ModSliderOption"/> to this instance.
+            </summary>
+            <param name="id">The internal ID for the slider option.</param>
+            <param name="label">The display text to use in the in-game menu.</param>
+            <param name="minValue">The minimum value for the range.</param>
+            <param name="maxValue">The maximum value for the range.</param>
+            <param name="value">The starting value.</param>
+            <param name="defaultValue">The default value for the slider. If this is null then 'value' used as default.</param>
+            <param name="valueFormat"> format for value, e.g. "{0:F2}" or "{0:F0} %"
+            (more on this <see href="https://docs.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings">here</see>)</param>
         </member>
         <member name="E:SMLHelper.V2.Options.ModOptions.ToggleChanged">
             <summary>
@@ -4126,30 +4272,19 @@
             <param name="device">The device name.</param>
             <param name="key">The starting keybind value.</param>
         </member>
-        <member name="T:SMLHelper.V2.Options.ModOptionType">
-            <summary>
-            Indicates how the option is interacted with by the user.
-            </summary>
+        <member name="T:SMLHelper.V2.Options.GameObjectCreatedEventArgs">
+            <summary> Contains all the information about a created game object event </summary>
         </member>
-        <member name="F:SMLHelper.V2.Options.ModOptionType.Slider">
-            <summary>
-            The option uses a slider that allows for a choice within a continues range of values within a maximum and minimum.
-            </summary>
+        <member name="P:SMLHelper.V2.Options.GameObjectCreatedEventArgs.Id">
+            <summary> The ID of the <see cref="T:SMLHelper.V2.Options.ModOption"/> for which game object was created </summary>
         </member>
-        <member name="F:SMLHelper.V2.Options.ModOptionType.Toggle">
-            <summary>
-            The option uses a checkbox that can be either enabled or disabled.
-            </summary>
+        <member name="P:SMLHelper.V2.Options.GameObjectCreatedEventArgs.GameObject">
+            <summary> New game object for the <see cref="T:SMLHelper.V2.Options.ModOption"/> </summary>
         </member>
-        <member name="F:SMLHelper.V2.Options.ModOptionType.Choice">
-            <summary>
-            The option uses a selection of one of a discrete number of possible values.
-            </summary>
-        </member>
-        <member name="F:SMLHelper.V2.Options.ModOptionType.Keybind">
-            <summary>
-            The option uses a keybind field that can be changed to a certain keyt
-            </summary>
+        <member name="M:SMLHelper.V2.Options.GameObjectCreatedEventArgs.#ctor(System.String,UnityEngine.GameObject)">
+            <summary> Constructs a new <see cref="T:SMLHelper.V2.Options.GameObjectCreatedEventArgs"/> </summary>
+            <param name="id"> The ID of the <see cref="T:SMLHelper.V2.Options.ModOption"/> for which game object was created </param>
+            <param name="gameObject"> New game object for the <see cref="T:SMLHelper.V2.Options.ModOption"/> </param>
         </member>
         <member name="T:SMLHelper.V2.Options.ModOption">
             <summary>
@@ -4166,16 +4301,16 @@
             The display text to be shown for this option in the in-game menus.
             </summary>
         </member>
-        <member name="P:SMLHelper.V2.Options.ModOption.Type">
-            <summary>
-            The type of option for this instance.
-            </summary>
+        <member name="P:SMLHelper.V2.Options.ModOption.OptionGameObject">
+            <summary> UI GameObject for this option </summary>
         </member>
-        <member name="M:SMLHelper.V2.Options.ModOption.#ctor(SMLHelper.V2.Options.ModOptionType,System.String,System.String)">
+        <member name="F:SMLHelper.V2.Options.ModOption.parentOptions">
+            <summary> Parent <see cref="T:SMLHelper.V2.Options.ModOptions"/> for this option </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Options.ModOption.#ctor(System.String,System.String)">
             <summary>
             Base constructor for all mod options.
             </summary>
-            <param name="type">The mod option type.</param>
             <param name="label">The display text to show on the in-game menus.</param>
             <param name="id">The internal ID if this option.</param>
         </member>
@@ -4226,7 +4361,16 @@
             The current value of the <see cref="T:SMLHelper.V2.Options.ModSliderOption"/>.
             </summary>
         </member>
-        <member name="M:SMLHelper.V2.Options.ModSliderOption.#ctor(System.String,System.String,System.Single,System.Single,System.Single)">
+        <member name="P:SMLHelper.V2.Options.ModSliderOption.DefaultValue">
+            <summary>
+            The default value of the <see cref="T:SMLHelper.V2.Options.ModSliderOption"/>.
+            Showed on the slider by small gray circle. Slider's handle will snap to the default value near it.
+            </summary>
+        </member>
+        <member name="P:SMLHelper.V2.Options.ModSliderOption.ValueFormat">
+            <summary> Format for value field (<see cref="M:SMLHelper.V2.Options.ModOptions.AddSliderOption(System.String,System.String,System.Single,System.Single,System.Single,System.Nullable{System.Single},System.String)"/>) </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Options.ModSliderOption.#ctor(System.String,System.String,System.Single,System.Single,System.Single,System.Nullable{System.Single},System.String)">
             <summary>
             Instantiates a new <see cref="T:SMLHelper.V2.Options.ModSliderOption"/> for handling an option that can have any floating point value between a minimum and maximum.
             </summary>
@@ -4235,6 +4379,78 @@
             <param name="minValue">The minimum value for the range.</param>
             <param name="maxValue">The maximum value for the range.</param>
             <param name="value">The starting value.</param>
+            <param name="defaultValue">The default value for the slider. If this is null then 'value' used as default.</param>
+            <param name="valueFormat">Format for value field (<see cref="M:SMLHelper.V2.Options.ModOptions.AddSliderOption(System.String,System.String,System.Single,System.Single,System.Single,System.Nullable{System.Single},System.String)"/>) </param>
+        </member>
+        <member name="T:SMLHelper.V2.Options.ModSliderOption.SliderValue">
+            <summary>
+            Component for customizing slider's value behaviour.
+            If you need more complex behaviour than just custom value format then you can inherit this component 
+            and add it to "Slider" game object in OnGameObjectCreated event (see <see cref="M:SMLHelper.V2.Options.ModSliderOption.AddToPanel(uGUI_TabbedControlsPanel,System.Int32)"/> for details on adding component)
+            You can override value converters <see cref="M:SMLHelper.V2.Options.ModSliderOption.SliderValue.ConvertToDisplayValue(System.Single)"/> and <see cref="M:SMLHelper.V2.Options.ModSliderOption.SliderValue.ConvertToSliderValue(System.Single)"/>,
+            in that case internal range for slider will be changed to [0.0f : 1.0f] and you can control displayed value with these converters
+            (also this value will be passed to <see cref="M:SMLHelper.V2.Options.ModOptions.OnSliderChange(System.String,System.Single)"/> event)
+            </summary>
+        </member>
+        <member name="F:SMLHelper.V2.Options.ModSliderOption.SliderValue.label">
+            <summary> The value label of the <see cref="T:SMLHelper.V2.Options.ModSliderOption.SliderValue"/> </summary>
+        </member>
+        <member name="F:SMLHelper.V2.Options.ModSliderOption.SliderValue.slider">
+            <summary> The slider controlling this <see cref="T:SMLHelper.V2.Options.ModSliderOption.SliderValue"/> </summary>
+        </member>
+        <member name="F:SMLHelper.V2.Options.ModSliderOption.SliderValue.minValue">
+            <summary>
+            The minimum value of the <see cref="T:SMLHelper.V2.Options.ModSliderOption.SliderValue"/>.
+            In case of custom value converters it can be not equal to internal minimum value for slider
+            </summary>
+        </member>
+        <member name="F:SMLHelper.V2.Options.ModSliderOption.SliderValue.maxValue">
+            <summary>
+            The maximum value of the <see cref="T:SMLHelper.V2.Options.ModSliderOption.SliderValue"/>.
+            In case of custom value converters it can be not equal to internal maximum value for slider
+            </summary>
+        </member>
+        <member name="P:SMLHelper.V2.Options.ModSliderOption.SliderValue.ValueFormat">
+            <summary> Custom value format property. Set it right after adding component to game object for proper behaviour </summary>
+        </member>
+        <member name="F:SMLHelper.V2.Options.ModSliderOption.SliderValue.valueFormat">
+            <summary> Custom value format </summary>
+        </member>
+        <member name="P:SMLHelper.V2.Options.ModSliderOption.SliderValue.ValueWidth">
+            <summary>
+            Width for value text field. Used by <see cref="T:SMLHelper.V2.Options.ModSliderOption.SliderOptionAdjust"/> to adjust label width.
+            It is calculated in <see cref="M:SMLHelper.V2.Options.ModSliderOption.SliderValue.UpdateValueWidth"/>, but you can override this property.
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Options.ModSliderOption.SliderValue.InitConverters">
+            <summary> Override this if you need to initialize custom value converters </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Options.ModSliderOption.SliderValue.ConvertToDisplayValue(System.Single)">
+            <summary> Converts internal slider value [0.0f : 1.0f] to displayed value </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Options.ModSliderOption.SliderValue.ConvertToSliderValue(System.Single)">
+            <summary> Converts displayed value to internal slider value [0.0f : 1.0f] </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Options.ModSliderOption.SliderValue.Awake">
+            <summary> Component initialization. If you overriding this, make sure that you calling base.Awake() </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Options.ModSliderOption.SliderValue.Start">
+            <summary> <see cref="T:UnityEngine.MonoBehaviour"/>.Start() </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Options.ModSliderOption.SliderValue.UpdateValueWidth">
+            <summary>
+            Method for calculating necessary label's width. Creates temporary label and compares widths of min and max values,
+            then sets <see cref="P:SMLHelper.V2.Options.ModSliderOption.SliderValue.ValueWidth"/> to the wider. Be aware that in case of using custom converters some intermediate value may be wider than min/max values.
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Options.ModSliderOption.SliderValue.OnValueChanged(System.Single)">
+            <summary> Called when user changes slider value </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Options.ModSliderOption.SliderValue.UpdateLabel">
+            <summary>
+            Updates label's text with formatted and converted slider's value.
+            Override this if you need even more control on slider's value behaviour.
+            </summary>
         </member>
         <member name="T:SMLHelper.V2.Options.ToggleChangedEventArgs">
             <summary>
