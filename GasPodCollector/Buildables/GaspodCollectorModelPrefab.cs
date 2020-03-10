@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace GasPodCollector.Buildables
 {
-    internal partial class GaspodCollectorCraftable
+    internal partial class GaspodCollectorBuildable
     {
         private static GameObject _prefab;
         internal static GameObject ColorItemPrefab { get; set; }
@@ -24,7 +24,7 @@ namespace GasPodCollector.Buildables
                 AssetBundle assetBundle = AssetHelper.Asset(Mod.ModName, Mod.BundleName);
 
                 //We have found the asset bundle and now we are going to continue by looking for the model.
-                GameObject prefab = assetBundle.LoadAsset<GameObject>(Mod.ClassID);
+                GameObject prefab = assetBundle.LoadAsset<GameObject>(Mod.PrefabName);
 
                 //If the prefab isn't null lets add the shader to the materials
                 if (prefab != null)
@@ -57,7 +57,7 @@ namespace GasPodCollector.Buildables
             }
             catch (Exception e)
             {
-                QuickLogger.Error<Buildables.GaspodCollectorCraftable>(e.Message);
+                QuickLogger.Error<Buildables.GaspodCollectorBuildable>(e.Message);
                 return false;
             }
         }

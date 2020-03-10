@@ -25,9 +25,10 @@ namespace GasPodCollector.Configuration
         internal const string ModName = "FCS_GasPodCollector";
         internal const string BundleName = "gaspodcollectormodbundle";
         internal const string GasPodCollectorTabID = "GPC";
-        internal const string FriendlyName = "GasPodCollector";
+        internal const string FriendlyName = "Gaspod Collector";
         internal const string Description = "A device that collect Gaspods from the gasopod.";
         internal const string ClassID = "GaspodCollector";
+        internal const string PrefabName = "AlterraGaspodCollector_V1";
         internal static string AssetFolder => Path.Combine(ModName, "Assets");
 
         internal const string GaspodCollectorKitClassID = "GaspodCollector_Kit";
@@ -55,6 +56,7 @@ namespace GasPodCollector.Configuration
                         new Ingredient(TechType.StalkerTooth, 5)
                     }
         };
+
 
 
 
@@ -205,6 +207,7 @@ namespace GasPodCollector.Configuration
     internal class Config
     {
         [JsonProperty] internal bool PlaySFX { get; set; } = true;
+        [JsonProperty] internal int StorageLimit { get; set; } = 50;
     }
 
     internal class ConfigFile

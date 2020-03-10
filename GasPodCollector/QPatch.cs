@@ -5,12 +5,12 @@ using FCSCommon.Utilities;
 using FCSTechFabricator;
 using FCSTechFabricator.Components;
 using FCSTechFabricator.Craftables;
+using GasPodCollector.Buildables;
 using GasPodCollector.Configuration;
 using Harmony;
 using QModManager.API.ModLoading;
 using SMLHelper.V2.Utility;
 using UnityEngine;
-using GaspodCollectorCraftable = GasPodCollector.Buildables.GaspodCollectorCraftable;
 
 namespace GasPodCollector
 {
@@ -41,7 +41,7 @@ namespace GasPodCollector
 
                 AddItemsToTechFabricator();
 
-                GaspodCollectorCraftable gscCollector = new GaspodCollectorCraftable();
+                GaspodCollectorBuildable gscCollector = new GaspodCollectorBuildable();
                 gscCollector.Register();
                 gscCollector.Patch();
 

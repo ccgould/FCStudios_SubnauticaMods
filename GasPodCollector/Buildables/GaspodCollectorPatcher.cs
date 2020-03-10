@@ -9,19 +9,24 @@ using FCSTechFabricator;
 using FCSTechFabricator.Components;
 using GasPodCollector.Configuration;
 using GasPodCollector.Mono;
+using GasPodCollector.Mono.Managers;
 using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Utility;
 using UnityEngine;
+using AnimationManager = FCSCommon.Controllers.AnimationManager;
 
 namespace GasPodCollector.Buildables
 {
-    internal partial class GaspodCollectorCraftable : Buildable
+    internal partial class GaspodCollectorBuildable : Buildable
     {
         private string _assetFolder => Mod.GetAssetFolder();
 
+        public override TechGroup GroupForPDA => TechGroup.ExteriorModules;
+        public override TechCategory CategoryForPDA => TechCategory.ExteriorModule;
+        public override string AssetsFolder => _assetFolder;
 
-        public GaspodCollectorCraftable() : base(Mod.ClassID, Mod.FriendlyName, Mod.Description)
+        public GaspodCollectorBuildable() : base(Mod.ClassID, Mod.FriendlyName, Mod.Description)
         {
             OnFinishedPatching += () =>
             {
@@ -137,13 +142,14 @@ namespace GasPodCollector.Buildables
                 //_prefab.AddComponent<AnimationManager>();
                 _prefab.AddComponent<TechTag>().type = TechTypeID;
                 _prefab.AddComponent<FMOD_CustomLoopingEmitter>();
+                _prefab.EnsureComponent<GaspodManager>();
+                _prefab.EnsureComponent<GaspodCollectorStorage>();
+                _prefab.EnsureComponent<AnimationManager>();
                 //_prefab.AddComponent<QTDisplayManager>();
                 _prefab.AddComponent<GaspodCollectorController>();
             }
         }
 
-        public override TechGroup GroupForPDA => TechGroup.ExteriorModules;
-        public override TechCategory CategoryForPDA => TechCategory.ExteriorModule;
-        public override string AssetsFolder => _assetFolder;
+
     }
 }
