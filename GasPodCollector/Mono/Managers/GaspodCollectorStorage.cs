@@ -1,4 +1,5 @@
-﻿using FCSCommon.Utilities;
+﻿using System;
+using FCSCommon.Utilities;
 using UnityEngine;
 
 namespace GasPodCollector.Mono.Managers
@@ -7,6 +8,7 @@ namespace GasPodCollector.Mono.Managers
     {
         private int _currentAmount;
         private int _storageLimit = QPatch.Configuration.Config.StorageLimit;
+        internal Action<int> OnAmountChanged { get; set; }
 
         internal bool HasSpaceAvailable()
         {
@@ -22,7 +24,9 @@ namespace GasPodCollector.Mono.Managers
 
             Destroy(collider.gameObject);
 
-            QuickLogger.Debug($"Gaspod Collector {gameObject.GetComponent<PrefabIdentifier>().Id} has {_currentAmount} items", true);
+            OnAmountChanged?.Invoke(_currentAmount);
+
+            //QuickLogger.Debug($"Gaspod Collector {gameObject.GetComponent<PrefabIdentifier>().Id} has {_currentAmount} items", true);
         }
 
         internal void RemoveGaspod()
@@ -37,10 +41,13 @@ namespace GasPodCollector.Mono.Managers
             {
                 if (_currentAmount > 0)
                 {
+                    _currentAmount -= 1;
                     var pickup = CraftData.InstantiateFromPrefab(TechType.GasPod).GetComponent<Pickupable>();
                     Inventory.main.Pickup(pickup);
                 }
             }
+
+            OnAmountChanged?.Invoke(_currentAmount);
         }
 
         internal int GetStorageAmount()

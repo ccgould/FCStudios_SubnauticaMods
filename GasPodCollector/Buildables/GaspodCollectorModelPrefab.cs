@@ -41,17 +41,17 @@ namespace GasPodCollector.Buildables
                     return false;
                 }
 
-                //GameObject colorItem = QPatch.GlobalBundle.LoadAsset<GameObject>("ColorItem");
+                GameObject colorItem = QPatch.GlobalBundle.LoadAsset<GameObject>("ColorItem");
 
-                //if (colorItem != null)
-                //{
-                //    ColorItemPrefab = colorItem;
-                //}
-                //else
-                //{
-                //    QuickLogger.Error($"Color Item Not Found!");
-                //    return false;
-                //}
+                if (colorItem != null)
+                {
+                    ColorItemPrefab = colorItem;
+                }
+                else
+                {
+                    QuickLogger.Error($"Color Item Not Found!");
+                    return false;
+                }
 
                 return true;
             }

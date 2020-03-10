@@ -8,7 +8,7 @@ namespace FCSCommon.Helpers
 {
     internal class InterfaceHelpers
     {
-        private static readonly Color ColorBlue = new Color(0.07f, 0.38f, 0.7f, 1f);
+        internal static readonly Color ColorBlue = new Color(0.07f, 0.38f, 0.7f, 1f);
         internal static bool CreateButton(GameObject parent, string childName, string btnName, InterfaceButtonMode btnMode, Action<string, object> onButtonClick, out InterfaceButton button)
         {
             var result = CreateButton(parent, childName, btnName, btnMode, Color.white, ColorBlue, onButtonClick, out InterfaceButton cusButton);
@@ -43,6 +43,7 @@ namespace FCSCommon.Helpers
             if (result == null)
             {
                 QuickLogger.Error<InterfaceHelpers>($"Cant find game object {name}");
+                throw new MissingComponentException($"A component cant be found\nMissing Component: {name}");
             }
 
             return result;

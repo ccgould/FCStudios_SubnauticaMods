@@ -19,12 +19,14 @@ namespace GasPodCollector.Mono
         private int _isExpanded;
         private bool _expand;
         private float _animationDelay = 3f;
+        private int _page;
         public override bool IsConstructed { get; }
         public override bool IsInitialized { get; set; }
         internal GaspodManager GaspodManager { get; set; }
         internal GaspodCollectorStorage GaspodCollectorStorage { get; private set; }
         internal AnimationManager AnimationManager { get; private set; }
         internal ColorManager ColorManager { get; private set; }
+        public GasopodCollectorDisplayManager DisplayManager { get; private set; }
 
         #region Unity Methods
 
@@ -36,12 +38,6 @@ namespace GasPodCollector.Mono
                 {
                     Initialize();
                 }
-
-                //if (DisplayManager != null)
-                //{
-                //    DisplayManager.Setup(this);
-                //    _runStartUpOnEnable = false;
-                //}
 
                 if (_fromSave)
                 {
@@ -73,6 +69,7 @@ namespace GasPodCollector.Mono
                 if (_animationDelay <= 0)
                 {
                     AnimationManager.SetBoolHash(_isExpanded, true);
+                    AnimationManager.SetIntHash(_page, 1);
                     _expand = false;
                 }
 
@@ -85,6 +82,7 @@ namespace GasPodCollector.Mono
         {
 
             _isExpanded = Animator.StringToHash("IsExpanded");
+            _page = Animator.StringToHash("Page");
 
             if (GaspodManager == null)
             {
@@ -107,6 +105,12 @@ namespace GasPodCollector.Mono
                 ColorManager = new ColorManager();
 
             ColorManager.Initialize(gameObject, GaspodCollectorBuildable.BodyMaterial);
+
+            if (DisplayManager == null)
+            {
+                DisplayManager = gameObject.GetComponent<GasopodCollectorDisplayManager>();
+                DisplayManager.Setup(this);
+            }
 
             IsInitialized = true;
         }
@@ -182,6 +186,11 @@ namespace GasPodCollector.Mono
             var prefabIdentifier = GetComponentInParent<PrefabIdentifier>() ?? GetComponent<PrefabIdentifier>();
             var id = prefabIdentifier?.Id ?? string.Empty;
             _savedData = Mod.GetSaveData(id);
+        }
+
+        internal void ChangePage(int pageNumber)
+        {
+            AnimationManager.SetIntHash(_page,pageNumber);
         }
     }
 }

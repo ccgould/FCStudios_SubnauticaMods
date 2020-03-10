@@ -6,8 +6,8 @@ namespace GasPodCollector.Mono.Managers
     internal class GaspodManager : MonoBehaviour
     {
         private GaspodCollectorController _mono;
-        private const float triggerRangeSqr = 10f;
-        private const float pickupRangeSqr = 30f;
+        private const float TriggerRangeSqr = 10f;
+        private const float PickupRangeSqr = 30f;
 
         internal void Initialize(GaspodCollectorController mono)
         {
@@ -16,13 +16,13 @@ namespace GasPodCollector.Mono.Managers
 
         private void Start()
         {
-            InvokeRepeating(nameof(GetInactiveInRadius),1,0.5f);
-            InvokeRepeating(nameof(DetectGasopod),1,0.5f);
+            InvokeRepeating(nameof(GetGaspodInRadius),1,0.5f);
+            InvokeRepeating(nameof(DetectGasopodInRadius),1,0.5f);
         }
 
-        void DetectGasopod()
+        private void DetectGasopodInRadius()
         {
-            Collider[] hitColliders = Physics.OverlapSphere(gameObject.transform.position, triggerRangeSqr);
+            Collider[] hitColliders = Physics.OverlapSphere(gameObject.transform.position, TriggerRangeSqr);
 
             if (hitColliders.Length > 0)
             {
@@ -43,9 +43,9 @@ namespace GasPodCollector.Mono.Managers
             }
         }
         
-        void GetInactiveInRadius()
+        private void GetGaspodInRadius()
         {
-            Collider[] hitColliders = Physics.OverlapSphere(gameObject.transform.position, pickupRangeSqr);
+            Collider[] hitColliders = Physics.OverlapSphere(gameObject.transform.position, PickupRangeSqr);
 
             if (hitColliders.Length > 0)
             {

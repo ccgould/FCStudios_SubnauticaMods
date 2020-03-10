@@ -138,18 +138,14 @@ namespace GasPodCollector.Buildables
                 component.useGravity = false;
 
                 _prefab.EnsureComponent<Stabilizer>().uprightAccelerationStiffness = 0.3f;
-
-                //_prefab.AddComponent<AnimationManager>();
-                _prefab.AddComponent<TechTag>().type = TechTypeID;
-                _prefab.AddComponent<FMOD_CustomLoopingEmitter>();
+                _prefab.EnsureComponent<TechTag>().type = TechTypeID;
+                _prefab.EnsureComponent<FMOD_CustomLoopingEmitter>();
                 _prefab.EnsureComponent<GaspodManager>();
                 _prefab.EnsureComponent<GaspodCollectorStorage>();
                 _prefab.EnsureComponent<AnimationManager>();
-                //_prefab.AddComponent<QTDisplayManager>();
-                _prefab.AddComponent<GaspodCollectorController>();
+                _prefab.EnsureComponent<GasopodCollectorDisplayManager>();
+                _prefab.EnsureComponent<GaspodCollectorController>();
             }
         }
-
-
     }
 }
