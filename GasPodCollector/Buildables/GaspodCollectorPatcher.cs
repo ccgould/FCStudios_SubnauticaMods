@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using FCSCommon.Controllers;
 using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
-using FCSTechFabricator;
 using FCSTechFabricator.Components;
 using GasPodCollector.Configuration;
 using GasPodCollector.Mono;
@@ -113,8 +111,6 @@ namespace GasPodCollector.Buildables
 
                 //========== Allows the building animation and material colors ==========// 
 
-                //QuickLogger.Debug("Adding Constructible");
-
                 // Add constructible
                 var constructable = _prefab.AddComponent<Constructable>();
                 constructable.allowedOutside = true;
@@ -137,14 +133,15 @@ namespace GasPodCollector.Buildables
                 component.detectCollisions = true;
                 component.useGravity = false;
 
-                _prefab.EnsureComponent<Stabilizer>().uprightAccelerationStiffness = 0.3f;
-                _prefab.EnsureComponent<TechTag>().type = TechTypeID;
-                _prefab.EnsureComponent<FMOD_CustomLoopingEmitter>();
-                _prefab.EnsureComponent<GaspodManager>();
-                _prefab.EnsureComponent<GaspodCollectorStorage>();
-                _prefab.EnsureComponent<AnimationManager>();
-                _prefab.EnsureComponent<GasopodCollectorDisplayManager>();
-                _prefab.EnsureComponent<GaspodCollectorController>();
+                _prefab.AddComponent<Stabilizer>().uprightAccelerationStiffness = 0.3f;
+                _prefab.AddComponent<TechTag>().type = TechTypeID;
+                _prefab.AddComponent<FMOD_CustomLoopingEmitter>();
+                _prefab.AddComponent<GaspodManager>();
+                _prefab.AddComponent<GaspodCollectorStorage>();
+                _prefab.AddComponent<AnimationManager>();
+                _prefab.AddComponent<GasopodCollectorDisplayManager>();
+                _prefab.AddComponent<GaspodCollectorController>();
+                _prefab.AddComponent<GasopdCollectorPowerManager>();
             }
         }
     }

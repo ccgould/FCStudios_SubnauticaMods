@@ -53,10 +53,12 @@
     <Reference Include="0Harmony-1.2.0.1">
       <HintPath>..\Dependancies\0Harmony-1.2.0.1.dll</HintPath>
     </Reference>
-    <Reference Include="Assembly-CSharp-firstpass_publicized">
+    <Reference Include="Assembly-CSharp-firstpass_publicized, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Dependancies\Subnautica\publicized_assemblies\Assembly-CSharp-firstpass_publicized.dll</HintPath>
     </Reference>
-    <Reference Include="Assembly-CSharp_publicized">
+    <Reference Include="Assembly-CSharp_publicized, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Dependancies\Subnautica\publicized_assemblies\Assembly-CSharp_publicized.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -114,7 +116,9 @@
     <Compile Include="Buildables\GaspodCollectorAuxPatcher.cs" />
     <Compile Include="Buildables\GaspodCollectorModelPrefab.cs" />
     <Compile Include="Buildables\GaspodCollectorPatcher.cs" />
+    <Compile Include="Models\BatteryInfo.cs" />
     <Compile Include="Mono\GaspodCollectorController.cs" />
+    <Compile Include="Mono\Managers\GasopdCollectorPowerManager.cs" />
     <Compile Include="Mono\Managers\GasopodCollectorDisplayManager.cs" />
     <Compile Include="Mono\Managers\GaspodCollectorStorage.cs" />
     <Compile Include="Mono\Managers\GaspodManager.cs" />

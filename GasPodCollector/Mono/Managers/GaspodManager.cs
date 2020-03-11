@@ -22,6 +22,9 @@ namespace GasPodCollector.Mono.Managers
 
         private void DetectGasopodInRadius()
         {
+            if(_mono == null || _mono.PowerManager == null) return;
+            if (!_mono.PowerManager.HasPower()) return;
+
             Collider[] hitColliders = Physics.OverlapSphere(gameObject.transform.position, TriggerRangeSqr);
 
             if (hitColliders.Length > 0)
@@ -31,8 +34,6 @@ namespace GasPodCollector.Mono.Managers
                     var gasopod = collider.gameObject?.GetComponentInChildren<GasoPod>();
                     if (gasopod && _mono.GaspodCollectorStorage.HasSpaceAvailable())
                     {
-                        QuickLogger.Debug($"In Range {collider.gameObject.name}", true);
-                        
                         if (gasopod.timeLastGasPodDrop + gasopod.minTimeBetweenPayloads <= Time.time)
                         {
                             gasopod.timeLastGasPodDrop = Time.time;
@@ -45,6 +46,10 @@ namespace GasPodCollector.Mono.Managers
         
         private void GetGaspodInRadius()
         {
+            if (_mono == null || _mono.PowerManager == null) return;
+
+            if (!_mono.PowerManager.HasPower()) return;
+
             Collider[] hitColliders = Physics.OverlapSphere(gameObject.transform.position, PickupRangeSqr);
 
             if (hitColliders.Length > 0)
@@ -53,7 +58,6 @@ namespace GasPodCollector.Mono.Managers
                 {
                     if (collider.gameObject.GetComponentInChildren<GasPod>() && _mono.GaspodCollectorStorage.HasSpaceAvailable())
                     {
-                        QuickLogger.Debug($"In Range {collider.gameObject.name}", true);
                         _mono.GaspodCollectorStorage.AddGaspod(collider);
                     }
                 }

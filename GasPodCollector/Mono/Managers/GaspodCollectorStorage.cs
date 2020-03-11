@@ -9,6 +9,7 @@ namespace GasPodCollector.Mono.Managers
         private int _currentAmount;
         private int _storageLimit = QPatch.Configuration.Config.StorageLimit;
         internal Action<int> OnAmountChanged { get; set; }
+        internal Action OnGaspodCollected { get; set; }
 
         internal bool HasSpaceAvailable()
         {
@@ -25,8 +26,7 @@ namespace GasPodCollector.Mono.Managers
             Destroy(collider.gameObject);
 
             OnAmountChanged?.Invoke(_currentAmount);
-
-            //QuickLogger.Debug($"Gaspod Collector {gameObject.GetComponent<PrefabIdentifier>().Id} has {_currentAmount} items", true);
+            OnGaspodCollected?.Invoke();
         }
 
         internal void RemoveGaspod()
@@ -46,7 +46,7 @@ namespace GasPodCollector.Mono.Managers
                     Inventory.main.Pickup(pickup);
                 }
             }
-
+            
             OnAmountChanged?.Invoke(_currentAmount);
         }
 
@@ -58,6 +58,33 @@ namespace GasPodCollector.Mono.Managers
         internal void SetStorageAmount(int amount)
         {
             _currentAmount = amount > _storageLimit ? _storageLimit : amount;
+        }
+
+        public void DumpToPlayer()
+        {
+            for (int i = _currentAmount - 1; i > -1; i--)
+            {
+#if SUBNAUTICA
+                var itemSize = CraftData.GetItemSize(TechType.GasPod);
+#elif BELOWZERO
+            var itemSize = TechData.GetItemSize(techType);
+#endif
+                if (Inventory.main.HasRoomFor(itemSize.x, itemSize.y))
+                {
+                    if (_currentAmount > 0)
+                    {
+                        _currentAmount -= 1;
+                        var pickup = CraftData.InstantiateFromPrefab(TechType.GasPod).GetComponent<Pickupable>();
+                        Inventory.main.Pickup(pickup);
+                    }
+                }
+                else
+                {
+                    break;
+                }
+
+                OnAmountChanged?.Invoke(_currentAmount);
+            }
         }
     }
 }

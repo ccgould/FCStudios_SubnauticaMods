@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using FCSCommon.Abstract;
 using FCSCommon.Controllers;
 using FCSCommon.Utilities;
@@ -6,6 +7,7 @@ using FCSTechFabricator.Extensions;
 using FCSTechFabricator.Managers;
 using GasPodCollector.Buildables;
 using GasPodCollector.Configuration;
+using GasPodCollector.Models;
 using GasPodCollector.Mono.Managers;
 using UnityEngine;
 
@@ -18,7 +20,7 @@ namespace GasPodCollector.Mono
         private SaveDataEntry _savedData;
         private int _isExpanded;
         private bool _expand;
-        private float _animationDelay = 3f;
+        private float _animationDelay = 1.5f;
         private int _page;
         public override bool IsConstructed { get; }
         public override bool IsInitialized { get; set; }
@@ -27,6 +29,7 @@ namespace GasPodCollector.Mono
         internal AnimationManager AnimationManager { get; private set; }
         internal ColorManager ColorManager { get; private set; }
         public GasopodCollectorDisplayManager DisplayManager { get; private set; }
+        public GasopdCollectorPowerManager PowerManager { get; private set; }
 
         #region Unity Methods
 
@@ -93,6 +96,7 @@ namespace GasPodCollector.Mono
             if (GaspodCollectorStorage == null)
             {
                 GaspodCollectorStorage = gameObject.GetComponent<GaspodCollectorStorage>();
+                GaspodCollectorStorage.OnGaspodCollected += OnGaspodCollected; 
             }
 
             if (AnimationManager == null)
@@ -112,7 +116,18 @@ namespace GasPodCollector.Mono
                 DisplayManager.Setup(this);
             }
 
+            if (PowerManager == null)
+            {
+                PowerManager = gameObject.GetComponent<GasopdCollectorPowerManager>();
+                PowerManager.Setup(this);
+            }
+
             IsInitialized = true;
+        }
+
+        private void OnGaspodCollected()
+        {
+            PowerManager.TakePower();
         }
 
         public override void OnProtoSerialize(ProtobufSerializer serializer)
@@ -140,6 +155,12 @@ namespace GasPodCollector.Mono
             if (GaspodCollectorStorage != null && GaspodCollectorStorage.GetStorageAmount() > 0)
             {
                 reason = GaspodCollectorBuildable.NotEmpty();
+                return false;
+            }
+
+            if (PowerManager != null && PowerManager.HasPower())
+            {
+                reason = GaspodCollectorBuildable.HasBatteries();
                 return false;
             }
 
@@ -177,6 +198,7 @@ namespace GasPodCollector.Mono
             _savedData.ID = id;
             _savedData.GaspodAmount = GaspodCollectorStorage.GetStorageAmount();
             _savedData.BodyColor = ColorManager.GetColor().ColorToVector4();
+            _savedData.Batteries = PowerManager.GetBatteries();
             saveData.Entries.Add(_savedData);
         }
 
@@ -191,6 +213,11 @@ namespace GasPodCollector.Mono
         internal void ChangePage(int pageNumber)
         {
             AnimationManager.SetIntHash(_page,pageNumber);
+        }
+
+        public void UpdateBatteryDisplay(Dictionary<int, BatteryInfo> batteries)
+        {
+            DisplayManager.UpdateBatteries(batteries);
         }
     }
 }
