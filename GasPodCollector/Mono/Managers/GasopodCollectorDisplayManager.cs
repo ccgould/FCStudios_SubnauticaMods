@@ -43,11 +43,11 @@ namespace GasPodCollector.Mono.Managers
             }
         }
 
-        private void OnStorageAmountChange(int amount)
+        internal void OnStorageAmountChange(int amount)
         {
             _amountOfPodsCount.text = $"{amount}/{QPatch.Configuration.Config.StorageLimit}";
         }
-
+        
         public override void OnButtonClick(string btnName, object tag)
         {
             switch (btnName)
@@ -66,6 +66,9 @@ namespace GasPodCollector.Mono.Managers
                     break;
                 case "DumpBTN":
                     _mono.GaspodCollectorStorage.DumpToPlayer();
+                    break;
+                case "ColorItem":
+                    _mono.ColorManager.ChangeColor((Color)tag);
                     break;
             }
         }
@@ -96,7 +99,7 @@ namespace GasPodCollector.Mono.Managers
                 var gasPodButtonObj = InterfaceHelpers.FindGameObject(home, "GasPodButton");
 
                 InterfaceHelpers.CreateButton(gasPodButtonObj, "GasPodBTN", InterfaceButtonMode.Background,
-                    OnButtonClick, Color.black, Color.white, MAX_INTERACTION_DISTANCE);
+                    OnButtonClick, Color.black, Color.white, MAX_INTERACTION_DISTANCE, GaspodCollectorBuildable.TakeGaspod());
 
                 uGUI_Icon icon = gasPodButtonObj.transform.Find("Image").gameObject.AddComponent<uGUI_Icon>();
                 icon.sprite = SpriteManager.Get(TechType.GasPod);
@@ -106,7 +109,7 @@ namespace GasPodCollector.Mono.Managers
                 var dumpBTNButtonObj = InterfaceHelpers.FindGameObject(home, "DumpBTN");
 
                 InterfaceHelpers.CreateButton(dumpBTNButtonObj, "DumpBTN", InterfaceButtonMode.Background,
-                    OnButtonClick, Color.black, Color.white, MAX_INTERACTION_DISTANCE);
+                    OnButtonClick, Color.black, Color.white, MAX_INTERACTION_DISTANCE,GaspodCollectorBuildable.DumpPull(), GaspodCollectorBuildable.DumpMessage());
                 #endregion
 
                 #region Messages
@@ -121,7 +124,7 @@ namespace GasPodCollector.Mono.Managers
                 var colorBTN = InterfaceHelpers.FindGameObject(home, "ColorBTN");
 
                 InterfaceHelpers.CreateButton(colorBTN, "ColorBTN", InterfaceButtonMode.Background,
-                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE);
+                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, GaspodCollectorBuildable.ColorPicker());
 
                 #endregion
 
@@ -130,7 +133,7 @@ namespace GasPodCollector.Mono.Managers
                 var batteryBTN = InterfaceHelpers.FindGameObject(home, "BatteryBTN").FindChild("Fill");
 
                 InterfaceHelpers.CreateButton(batteryBTN, "BatteryBTN", InterfaceButtonMode.Background,
-                    OnButtonClick, _greenColor, _fireBrickColor, MAX_INTERACTION_DISTANCE);
+                    OnButtonClick, _greenColor, _fireBrickColor, MAX_INTERACTION_DISTANCE, GaspodCollectorBuildable.BatteryReceptacle());
 
                 #endregion
 
@@ -167,7 +170,7 @@ namespace GasPodCollector.Mono.Managers
                 var homeBTN = InterfaceHelpers.FindGameObject(colorPicker, "HomeBTN");
 
                 InterfaceHelpers.CreateButton(homeBTN, "HomeBTN", InterfaceButtonMode.Background,
-                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE);
+                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, GaspodCollectorBuildable.GoHome());
 
                 #endregion
 

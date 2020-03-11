@@ -21,11 +21,17 @@ namespace GasPodCollector.Buildables
 
             LanguageHandler.SetLanguageLine(OnHoverKey, "On Hover");
             LanguageHandler.SetLanguageLine(NotEmptyKey, $"{Mod.FriendlyName} storage is not empty!");
-            LanguageHandler.SetLanguageLine(EquipmentContainerLabelKey, $"Gaspod Collector Powercell Receptical");
+            LanguageHandler.SetLanguageLine(EquipmentContainerLabelKey, $"Gaspod Collector Powercell Receptacle");
             LanguageHandler.SetLanguageLine(HasBatteriesKey, $"Please remove all batteries in the {Mod.FriendlyName}.");
             LanguageHandler.SetLanguageLine(AmountOfPodsMessageKey, $"AMOUNT OF PODS");
             LanguageHandler.SetLanguageLine(InstructionsKey, $"Click the left button to take one gaspod or click the right to fill your inventory.");
             LanguageHandler.SetLanguageLine(HasBatteriesKey, $"Please remove all batteries in the {Mod.FriendlyName}.");
+            LanguageHandler.SetLanguageLine(DumpPullKey, $"Bulk Pull");
+            LanguageHandler.SetLanguageLine(DumpMessageKey, $"Fill Players Inventory");
+            LanguageHandler.SetLanguageLine(TakeGaspodKey, $"Take gaspod.");
+            LanguageHandler.SetLanguageLine(ColorPickerKey, $"Color Picker");
+            LanguageHandler.SetLanguageLine(BatteryReceptacleKey, $"Battery Receptacle");
+            LanguageHandler.SetLanguageLine(GoHomeKey, "Home");
         }
 
         private const string OnHoverKey = "GSC_OnHover";
@@ -33,7 +39,13 @@ namespace GasPodCollector.Buildables
         private const string EquipmentContainerLabelKey = "GSC_EquipmentContainerLabel";
         private const string HasBatteriesKey = "GSC_HasBatteries";
         private const string AmountOfPodsMessageKey = "GSC_AmountOfPodsMessage";
-        private const string InstructionsKey = "GSC_InstructionsKey";
+        private const string InstructionsKey = "GSC_Instructions";
+        private const string DumpMessageKey = "GSC_DumpMessage";
+        private const string DumpPullKey = "GSC_DumpPull";
+        private const string TakeGaspodKey = "GSC_TakeGaspod";
+        private const string ColorPickerKey = "GSC_ColorPicker";
+        private const string BatteryReceptacleKey = "GSC_BatteryReceptacle";
+        private const string GoHomeKey = "GSC_GoHome";
 
 
         internal static string OnHover()
@@ -69,6 +81,36 @@ namespace GasPodCollector.Buildables
         internal static string AmountOfPodsMessage()
         {
             return Language.main.Get(AmountOfPodsMessageKey);
+        }
+
+        internal static string DumpMessage()
+        {
+            return Language.main.Get(DumpMessageKey);
+        }
+
+        internal static string DumpPull()
+        {
+            return Language.main.Get(DumpPullKey);
+        }
+
+        internal static string TakeGaspod()
+        {
+            return Language.main.Get(TakeGaspodKey);
+        }
+
+        internal static string ColorPicker()
+        {
+            return Language.main.Get(ColorPickerKey);
+        }
+
+        internal static string BatteryReceptacle()
+        {
+            return Language.main.Get(BatteryReceptacleKey);
+        }
+
+        internal static string GoHome()
+        {
+            return Language.main.Get(GoHomeKey);
         }
     }
 }

@@ -26,8 +26,8 @@ namespace GasPodCollector.Configuration
         internal const string BundleName = "gaspodcollectormodbundle";
         internal const string GasPodCollectorTabID = "GPC";
         internal const string FriendlyName = "Gaspod Collector";
-        internal const string Description = "A device that collect Gaspods from the gasopod.";
-        internal const string ClassID = "GaspodCollector";
+        internal const string Description = "A device that collects Gaspods from the gasopod.";
+        internal const string ClassID = "AlterraGaspodCollector";
         internal const string PrefabName = "AlterraGaspodCollector_V1";
         internal static string AssetFolder => Path.Combine(ModName, "Assets");
 
@@ -51,8 +51,7 @@ namespace GasPodCollector.Configuration
                         new Ingredient(TechType.EnameledGlass, 1),
                         new Ingredient(TechType.Gravsphere, 1),
                         new Ingredient(TechType.VehicleStorageModule, 1),
-                        new Ingredient(TechType.Battery, 2),
-                        new Ingredient(TechType.Gasopod, 2),
+                        new Ingredient(TechType.GasPod, 2),
                         new Ingredient(TechType.StalkerTooth, 5)
                     }
         };
@@ -67,6 +66,8 @@ namespace GasPodCollector.Configuration
 
         internal static void Save()
         {
+            
+
             if (!IsSaving())
             {
                 _saveObject = new GameObject().AddComponent<ModSaver>();
@@ -207,8 +208,9 @@ namespace GasPodCollector.Configuration
     internal class Config
     {
         [JsonProperty] internal bool PlaySFX { get; set; } = true;
-        [JsonProperty] internal int StorageLimit { get; set; } = 15;
+        [JsonProperty] internal int StorageLimit { get; set; } = 48;
         [JsonProperty] internal float PowerUsage { get; set; } = 0.1f;
+        [JsonProperty] internal bool PlayFloatingAnimation { get; set; } = true;
     }
 
     internal class ConfigFile

@@ -47,6 +47,7 @@ namespace GasPodCollector.Mono.Managers
                 }
             }
             
+            
             OnAmountChanged?.Invoke(_currentAmount);
         }
 

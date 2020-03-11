@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using FCSCommon.Enums;
+using FCSCommon.Extensions;
 using FCSCommon.Utilities;
 using GasPodCollector.Buildables;
 using GasPodCollector.Models;
@@ -22,6 +24,8 @@ namespace GasPodCollector.Mono.Managers
             {0,null},
             {1,null}
         };
+
+        public Action<FCSPowerStates> OnPowerChanged { get; set; }
 
         internal void Setup(GaspodCollectorController mono)
         {
@@ -77,7 +81,8 @@ namespace GasPodCollector.Mono.Managers
         private void OnEquip(string slot, InventoryItem item)
         {
             var battery = item.item.gameObject.GetComponent<IBattery>();
-            var newBattery = new BatteryInfo(item.item.GetTechType(), battery);
+            var newBattery = new BatteryInfo(item.item.GetTechType(), battery, slot);
+
             switch (slot)
             {
                 case Slot1:
@@ -143,6 +148,22 @@ namespace GasPodCollector.Mono.Managers
             }
 
             return amount >= _powerUsage;
+        }
+
+        public void LoadSaveData(Dictionary<int, BatteryInfo> savedDataBatteries)
+        {
+            foreach (KeyValuePair<int,BatteryInfo> module in savedDataBatteries)
+            {
+                if (module.Value == null) continue;
+                var attachment = module.Value.TechType.ToPickupable();
+                attachment.GetComponent<IBattery>().charge = module.Value.BatteryCharge;
+#if SUBNAUTICA
+                _equipment.AddItem(module.Value.Slot, new InventoryItem(attachment.Pickup(false)));
+#elif BELOWZERO
+                attachment.Pickup(false);
+                _equipment.AddItem(module.Value.Slot, new InventoryItem(attachment));
+#endif
+            }
         }
     }
 }

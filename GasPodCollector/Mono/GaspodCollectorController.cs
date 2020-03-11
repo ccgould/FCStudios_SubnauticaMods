@@ -21,7 +21,13 @@ namespace GasPodCollector.Mono
         private int _isExpanded;
         private bool _expand;
         private float _animationDelay = 1.5f;
+        private float _floatingAnimationDelay;
+        private float gravitySign = 1f;
         private int _page;
+        private int _isFloating;
+        private bool _float;
+        private Rigidbody rigidbody;
+        private float timeNextPhysicsChange;
         public override bool IsConstructed { get; }
         public override bool IsInitialized { get; set; }
         internal GaspodManager GaspodManager { get; set; }
@@ -30,8 +36,14 @@ namespace GasPodCollector.Mono
         internal ColorManager ColorManager { get; private set; }
         public GasopodCollectorDisplayManager DisplayManager { get; private set; }
         public GasopdCollectorPowerManager PowerManager { get; private set; }
+        public SuctionFanManager SuctionFanManager { get; private set; }
 
         #region Unity Methods
+
+        private void Awake()
+        {
+            rigidbody = gameObject.GetComponent<Rigidbody>();
+        }
 
         private void OnEnable()
         {
@@ -51,7 +63,8 @@ namespace GasPodCollector.Mono
 
                     ColorManager.SetColorFromSave(_savedData.BodyColor.Vector4ToColor());
                     GaspodCollectorStorage.SetStorageAmount(_savedData.GaspodAmount);
-
+                    PowerManager.LoadSaveData(_savedData.Batteries);
+                    DisplayManager.OnStorageAmountChange(_savedData.GaspodAmount);
                     QuickLogger.Info($"Loaded {Mod.FriendlyName}");
                 }
 
@@ -68,15 +81,25 @@ namespace GasPodCollector.Mono
         {
             if (_expand)
             {
-                _animationDelay -= Time.deltaTime;
+                _animationDelay -= DayNightCycle.main.deltaTime;
                 if (_animationDelay <= 0)
                 {
                     AnimationManager.SetBoolHash(_isExpanded, true);
                     AnimationManager.SetIntHash(_page, 1);
                     _expand = false;
                 }
-
             }
+            if (!rigidbody.isKinematic && Time.time > this.timeNextPhysicsChange)
+            { 
+                timeNextPhysicsChange = Time.time + UnityEngine.Random.Range(10f, 20f);
+                updateGravityChange();
+            }
+        }
+
+        private void updateGravityChange()
+        {
+            gravitySign = -gravitySign;
+            gameObject.GetComponent<WorldForces>().underwaterGravity = gravitySign * 0.1f * UnityEngine.Random.value;
         }
 
         #endregion
@@ -86,6 +109,7 @@ namespace GasPodCollector.Mono
 
             _isExpanded = Animator.StringToHash("IsExpanded");
             _page = Animator.StringToHash("Page");
+            _isFloating = Animator.StringToHash("IsFloating");
 
             if (GaspodManager == null)
             {
@@ -95,14 +119,17 @@ namespace GasPodCollector.Mono
 
             if (GaspodCollectorStorage == null)
             {
-                GaspodCollectorStorage = gameObject.GetComponent<GaspodCollectorStorage>();
+                GaspodCollectorStorage = gameObject.EnsureComponent<GaspodCollectorStorage>();
                 GaspodCollectorStorage.OnGaspodCollected += OnGaspodCollected; 
             }
 
             if (AnimationManager == null)
             {
                 AnimationManager = gameObject.GetComponent<AnimationManager>();
+                _floatingAnimationDelay = AnimationManager.AnimationLength("GaspodCollector_Animation");
+                QuickLogger.Debug($"Animation Time = {_floatingAnimationDelay}",true);
                 _expand = true;
+                _float = true;
             }
 
             if (ColorManager == null)
@@ -112,14 +139,20 @@ namespace GasPodCollector.Mono
 
             if (DisplayManager == null)
             {
-                DisplayManager = gameObject.GetComponent<GasopodCollectorDisplayManager>();
+                DisplayManager = gameObject.EnsureComponent<GasopodCollectorDisplayManager>();
                 DisplayManager.Setup(this);
             }
 
             if (PowerManager == null)
             {
-                PowerManager = gameObject.GetComponent<GasopdCollectorPowerManager>();
+                PowerManager = gameObject.EnsureComponent<GasopdCollectorPowerManager>();
                 PowerManager.Setup(this);
+            }
+
+            if (SuctionFanManager == null)
+            {
+                SuctionFanManager = gameObject.EnsureComponent<SuctionFanManager>();
+                SuctionFanManager.Initialize(this);
             }
 
             IsInitialized = true;
@@ -132,6 +165,7 @@ namespace GasPodCollector.Mono
 
         public override void OnProtoSerialize(ProtobufSerializer serializer)
         {
+            QuickLogger.Debug("In OnProtoSerialize");
             if (!Mod.IsSaving())
             {
                 QuickLogger.Info($"Saving {Mod.FriendlyName}");

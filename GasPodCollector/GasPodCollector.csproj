@@ -31,6 +31,7 @@
     <DefineConstants>TRACE;SUBNAUTICA</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'BelowZero_Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -122,6 +123,7 @@
     <Compile Include="Mono\Managers\GasopodCollectorDisplayManager.cs" />
     <Compile Include="Mono\Managers\GaspodCollectorStorage.cs" />
     <Compile Include="Mono\Managers\GaspodManager.cs" />
+    <Compile Include="Mono\Managers\SuctionFanManager.cs" />
     <Compile Include="Patches\Builder_CheckAsSubModule_Patch.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -6,6 +6,7 @@ namespace FCSCommon.Controllers
     internal class AnimationManager : MonoBehaviour
     {
         #region Unity Methods   
+
         private void Start()
         {
             GetAnimatorComponent();
@@ -31,10 +32,13 @@ namespace FCSCommon.Controllers
         #endregion
 
         #region Public Methods
+
         internal Animator Animator { get; set; }
+
         #endregion
 
         #region public Methods
+
         /// <summary>
         /// Sets the an animator float to a certain value (For use with setting the page on the screen)
         /// </summary>
@@ -54,7 +58,7 @@ namespace FCSCommon.Controllers
         {
             if (Animator == null)
             {
-                if(!GetAnimatorComponent()) return;
+                if (!GetAnimatorComponent()) return;
             }
 
             Animator.SetBool(stateHash, value);
@@ -89,6 +93,26 @@ namespace FCSCommon.Controllers
 
             return GetAnimatorComponent() && Animator.GetBool(hash);
         }
-        #endregion
+
+        internal float AnimationLength(string animationName,int fps = 30)
+        {
+            if (Animator == null)
+            {
+                if (!GetAnimatorComponent()) return 0f;
+            }
+
+            AnimationClip[] clips = Animator.runtimeAnimatorController.animationClips;
+            foreach (AnimationClip clip in clips)
+            {
+                if (clip.name == animationName)
+                {
+                    return clip.length / fps;
+                }
+            }
+
+            return 0f;
+
+            #endregion
+        }
     }
 }

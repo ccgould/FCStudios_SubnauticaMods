@@ -41,9 +41,7 @@ namespace GasPodCollector
 
                 AddItemsToTechFabricator();
 
-                GaspodCollectorBuildable gscCollector = new GaspodCollectorBuildable();
-                gscCollector.Register();
-                gscCollector.Patch();
+                GaspodCollectorBuildable.PatchHelper();
 
                 Configuration = Mod.LoadConfiguration();
                 

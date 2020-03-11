@@ -69,16 +69,12 @@ namespace GasPodCollector.Buildables
         private void ApplyShaders(GameObject prefab, AssetBundle bundle)
         {
             #region BaseColor
-            MaterialHelpers.ApplyNormalShader(BodyMaterial, $"{Mod.ClassID}_M_COL_NORM", prefab, bundle);
             MaterialHelpers.ApplySpecShader(BodyMaterial, $"{Mod.ClassID}_M_COL_SPEC", prefab, 1, 3f, bundle);
             #endregion
 
             MaterialHelpers.ApplyEmissionShader(DetailMaterial, $"{Mod.ClassID}_D_COL_LUM", prefab, bundle, Color.white);
             MaterialHelpers.ApplySpecShader(DetailMaterial, $"{Mod.ClassID}_D_COL_SPEC", prefab, 1, 6f, bundle);
             MaterialHelpers.ApplyAlphaShader(DetailMaterial, prefab);
-
-            MaterialHelpers.ApplyEmissionShader(LightsMaterial, $"{LightsMaterial}_D_COL_LUM", prefab, bundle, Color.white);
-            MaterialHelpers.ApplyAlphaShader(LightsMaterial, prefab);
         }
     }
 }

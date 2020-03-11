@@ -18,6 +18,7 @@ namespace GasPodCollector.Buildables
 {
     internal partial class GaspodCollectorBuildable : Buildable
     {
+        private static readonly GaspodCollectorBuildable Singleton = new GaspodCollectorBuildable();
         private string _assetFolder => Mod.GetAssetFolder();
 
         public override TechGroup GroupForPDA => TechGroup.ExteriorModules;
@@ -99,50 +100,59 @@ namespace GasPodCollector.Buildables
         }
 #endif
 
-        internal void Register()
+        internal static void Register()
         {
-            if (GetPrefabs())
+            var model = _prefab.FindChild("model");
+
+            SkyApplier skyApplier = _prefab.AddComponent<SkyApplier>();
+            skyApplier.renderers = model.GetComponentsInChildren<MeshRenderer>();
+            skyApplier.anchorSky = Skies.Auto;
+
+            // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
+            var lwe = _prefab.AddComponent<LargeWorldEntity>();
+            lwe.cellLevel = LargeWorldEntity.CellLevel.Far;
+
+            //========== Allows the building animation and material colors ==========// 
+
+            // Add constructible
+            var constructable = _prefab.AddComponent<Constructable>();
+            constructable.allowedOutside = true;
+            constructable.forceUpright = true;
+            constructable.placeMaxDistance = 7f;
+            constructable.placeMinDistance = 5f;
+            constructable.placeDefaultDistance = 6f;
+            constructable.model = model;
+            constructable.techType = Singleton.TechType;
+
+            PrefabIdentifier prefabID = _prefab.AddComponent<PrefabIdentifier>();
+            prefabID.ClassId = Singleton.ClassID;
+
+            Rigidbody component = _prefab.EnsureComponent<Rigidbody>();
+            component.mass = 400f;
+            component.angularDrag = 1f;
+            component.drag = 1f;
+            component.isKinematic = false;
+            component.freezeRotation = false;
+            component.detectCollisions = true;
+            component.useGravity = false;
+
+            _prefab.AddComponent<Stabilizer>().uprightAccelerationStiffness = 0.3f;
+            _prefab.AddComponent<TechTag>().type = Singleton.TechType;
+            _prefab.AddComponent<FMOD_CustomLoopingEmitter>();
+            _prefab.AddComponent<GaspodManager>();
+            _prefab.AddComponent<AnimationManager>();
+            _prefab.AddComponent<GaspodCollectorController>();
+        }
+
+        public static void PatchHelper()
+        {
+            if (!Singleton.GetPrefabs())
             {
-                var model = _prefab.FindChild("model");
-
-                SkyApplier skyApplier = _prefab.AddComponent<SkyApplier>();
-                skyApplier.renderers = model.GetComponentsInChildren<MeshRenderer>();
-                skyApplier.anchorSky = Skies.Auto;
-
-                //========== Allows the building animation and material colors ==========// 
-
-                // Add constructible
-                var constructable = _prefab.AddComponent<Constructable>();
-                constructable.allowedOutside = true;
-                constructable.forceUpright = true;
-                constructable.placeMaxDistance = 7f;
-                constructable.placeMinDistance = 5f;
-                constructable.placeDefaultDistance = 6f;
-                constructable.model = model;
-                constructable.techType = TechTypeID;
-
-                PrefabIdentifier prefabID = _prefab.AddComponent<PrefabIdentifier>();
-                prefabID.ClassId = Mod.ClassID;
-
-                Rigidbody component = _prefab.EnsureComponent<Rigidbody>();
-                component.mass = 400f;
-                component.angularDrag = 1f;
-                component.drag = 1f;
-                component.isKinematic = false;
-                component.freezeRotation = false;
-                component.detectCollisions = true;
-                component.useGravity = false;
-
-                _prefab.AddComponent<Stabilizer>().uprightAccelerationStiffness = 0.3f;
-                _prefab.AddComponent<TechTag>().type = TechTypeID;
-                _prefab.AddComponent<FMOD_CustomLoopingEmitter>();
-                _prefab.AddComponent<GaspodManager>();
-                _prefab.AddComponent<GaspodCollectorStorage>();
-                _prefab.AddComponent<AnimationManager>();
-                _prefab.AddComponent<GasopodCollectorDisplayManager>();
-                _prefab.AddComponent<GaspodCollectorController>();
-                _prefab.AddComponent<GasopdCollectorPowerManager>();
+                throw new FileNotFoundException($"Failed to retrieve the {Singleton.FriendlyName} prefab from the asset bundle");
             }
+
+            Register();
+            Singleton.Patch();
         }
     }
 }

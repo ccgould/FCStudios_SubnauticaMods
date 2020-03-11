@@ -61,6 +61,20 @@ namespace FCSCommon.Helpers
             return button;
         }
 
+        internal static InterfaceButton CreateButton(GameObject go, string btnName, InterfaceButtonMode btnMode, Action<string, object> onButtonClick, Color startColor, Color hoverColor, float maxInteractionRange, string lineOne, string lineTwo = "")
+        {
+            var button = go.AddComponent<InterfaceButton>();
+            button.BtnName = btnName;
+            button.ButtonMode = btnMode;
+            button.STARTING_COLOR = startColor;
+            button.HOVER_COLOR = hoverColor;
+            button.OnButtonClick = onButtonClick;
+            button.MaxInteractionRange = maxInteractionRange;
+            button.TextLineOne = lineOne;
+            button.TextLineTwo = lineTwo;
+            return button;
+        }
+
         private static GameObject FindObjectRecursion(GameObject gameObject, string name)
         {
             foreach (Transform obj in gameObject.transform)
