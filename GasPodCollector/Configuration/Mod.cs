@@ -45,18 +45,17 @@ namespace GasPodCollector.Configuration
             craftAmount = 1,
             Ingredients =
                     {
-                        new Ingredient(TechType.Beacon, 1),
                         new Ingredient(TechType.AdvancedWiringKit, 1),
                         new Ingredient(TechType.TitaniumIngot, 2),
                         new Ingredient(TechType.EnameledGlass, 1),
                         new Ingredient(TechType.Gravsphere, 1),
-                        new Ingredient(TechType.VehicleStorageModule, 1),
+                        new Ingredient(TechType.SmallStorage, 1),
                         new Ingredient(TechType.GasPod, 2),
                         new Ingredient(TechType.StalkerTooth, 5)
                     }
         };
 
-
+        internal static bool ProtectPlayer { get; set; }
 
 
         internal static event Action<SaveData> OnDataLoaded;
@@ -210,7 +209,6 @@ namespace GasPodCollector.Configuration
         [JsonProperty] internal bool PlaySFX { get; set; } = true;
         [JsonProperty] internal int StorageLimit { get; set; } = 48;
         [JsonProperty] internal float PowerUsage { get; set; } = 0.1f;
-        [JsonProperty] internal bool PlayFloatingAnimation { get; set; } = true;
     }
 
     internal class ConfigFile

@@ -47,7 +47,6 @@ namespace FCSTechFabricator
                 {
                     new Ingredient(TechType.Titanium, 1),
                     new Ingredient(TechType.ComputerChip, 1),
-                    new Ingredient(TechType.JeweledDiskPiece, 1),
                     new Ingredient(TechType.Magnetite, 1)
                 }
             };

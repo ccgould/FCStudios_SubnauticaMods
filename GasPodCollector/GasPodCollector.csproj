@@ -124,7 +124,9 @@
     <Compile Include="Mono\Managers\GaspodCollectorStorage.cs" />
     <Compile Include="Mono\Managers\GaspodManager.cs" />
     <Compile Include="Mono\Managers\SuctionFanManager.cs" />
+    <Compile Include="Patches\Beacon_Patches.cs" />
     <Compile Include="Patches\Builder_CheckAsSubModule_Patch.cs" />
+    <Compile Include="Patches\Player_Patcher.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

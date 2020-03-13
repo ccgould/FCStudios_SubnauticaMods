@@ -1,4 +1,6 @@
-﻿using FCSCommon.Utilities;
+﻿using System.Linq;
+using FCSCommon.Utilities;
+using GasPodCollector.Configuration;
 using UnityEngine;
 
 namespace GasPodCollector.Mono.Managers
@@ -16,14 +18,57 @@ namespace GasPodCollector.Mono.Managers
 
         private void Start()
         {
+            InvokeRepeating(nameof(DetectPlayerInRadius), 1, 0.5f);
             InvokeRepeating(nameof(GetGaspodInRadius),1,0.5f);
             InvokeRepeating(nameof(DetectGasopodInRadius),1,0.5f);
+        }
+
+        private void DetectPlayerInRadius()
+        {
+            if (_mono == null || _mono.PowerManager == null) return;
+            if (!_mono.PowerManager.HasPower()) return;
+
+            Collider[] hitColliders = Physics.OverlapSphere(gameObject.transform.position, TriggerRangeSqr);
+
+            if (hitColliders.Length > 0)
+            {
+                var player = hitColliders.SingleOrDefault(x => x.gameObject.name.ToLower().StartsWith("player"));
+
+                Mod.ProtectPlayer = player;
+            }
+        }
+
+        //private void DestroyAllGasPods()
+        //{
+        //    if (_mono == null || _mono.PowerManager == null) return;
+
+        //    if (!_mono.PowerManager.HasPower()) return;
+
+        //    Collider[] hitColliders = Physics.OverlapSphere(gameObject.transform.position, PickupRangeSqr);
+
+        //    if (hitColliders.Length > 0)
+        //    {
+        //        foreach (Collider collider in hitColliders)
+        //        {
+        //            if (collider.gameObject.GetComponentInChildren<GasPod>() && _mono.GaspodCollectorStorage.HasSpaceAvailable())
+        //            {
+        //                Destroy(collider.gameObject);
+        //            }
+        //        }
+        //    }
+        //}
+
+        private void AddGasPod(Collider collider)
+        {
+            _mono.GaspodCollectorStorage.AddGaspod(collider);
         }
 
         private void DetectGasopodInRadius()
         {
             if(_mono == null || _mono.PowerManager == null) return;
             if (!_mono.PowerManager.HasPower()) return;
+
+            if(Mod.ProtectPlayer) return;
 
             Collider[] hitColliders = Physics.OverlapSphere(gameObject.transform.position, TriggerRangeSqr);
 
@@ -56,13 +101,23 @@ namespace GasPodCollector.Mono.Managers
             {
                 foreach (Collider collider in hitColliders)
                 {
-                    if (collider.gameObject.GetComponentInChildren<GasPod>() && _mono.GaspodCollectorStorage.HasSpaceAvailable())
+                    var gaspod = collider.gameObject.GetComponentInChildren<GasPod>();
+
+                    if(!gaspod) continue;
+
+                    if ( _mono.GaspodCollectorStorage.HasSpaceAvailable())
                     {
-                        _mono.GaspodCollectorStorage.AddGaspod(collider);
+                        AddGasPod(collider);
+                    }
+                    else
+                    {
+                        if (Mod.ProtectPlayer)
+                        {
+                            gaspod.damagePerSecond = 0;
+                        }
                     }
                 }
             }
         }
-
     }
 }

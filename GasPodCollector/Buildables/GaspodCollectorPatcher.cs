@@ -142,6 +142,8 @@ namespace GasPodCollector.Buildables
             _prefab.AddComponent<GaspodManager>();
             _prefab.AddComponent<AnimationManager>();
             _prefab.AddComponent<GaspodCollectorController>();
+            _prefab.AddComponent<WorldForces>();
+
         }
 
         public static void PatchHelper()

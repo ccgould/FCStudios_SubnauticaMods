@@ -49,7 +49,7 @@ namespace AE.SeaCooker.Configuration
                 new Ingredient(TechType.TitaniumIngot, 1)
             }
         };
-
+        
         internal const string SeaAlienGasClassID = "SeaAlienGasTank_SC";
         internal const string SeaAlienGasFriendlyName = "Sea Alien Gas";
         internal const string SeaAlienGasDescription = "This tank allows you to cook food in the Sea Cooker using Alien Feces.";

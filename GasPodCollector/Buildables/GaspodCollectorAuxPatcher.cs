@@ -32,6 +32,7 @@ namespace GasPodCollector.Buildables
             LanguageHandler.SetLanguageLine(ColorPickerKey, $"Color Picker");
             LanguageHandler.SetLanguageLine(BatteryReceptacleKey, $"Battery Receptacle");
             LanguageHandler.SetLanguageLine(GoHomeKey, "Home");
+            LanguageHandler.SetLanguageLine(RemoveBeaconKey, "You need to remove beacon first.");
         }
 
         private const string OnHoverKey = "GSC_OnHover";
@@ -46,6 +47,7 @@ namespace GasPodCollector.Buildables
         private const string ColorPickerKey = "GSC_ColorPicker";
         private const string BatteryReceptacleKey = "GSC_BatteryReceptacle";
         private const string GoHomeKey = "GSC_GoHome";
+        private const string RemoveBeaconKey = "GSC_RemoveBeacon";
 
 
         internal static string OnHover()
@@ -111,6 +113,11 @@ namespace GasPodCollector.Buildables
         internal static string GoHome()
         {
             return Language.main.Get(GoHomeKey);
+        }
+
+        public static string RemoveBeacon()
+        {
+            return Language.main.Get(RemoveBeaconKey);
         }
     }
 }
