@@ -37,8 +37,6 @@ namespace FCS_DeepDriller.Configuration
                 QuickLogger.Debug($"Added {biomeOre.Key} to BiomeOresTechType");
                 BiomeOresTechType.Add(biomeOre.Key, types);
             }
-
-            AdditionalBiomeOres = null;
         }
     }
 

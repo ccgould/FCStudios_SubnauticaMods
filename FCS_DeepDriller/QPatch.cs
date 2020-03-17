@@ -10,6 +10,7 @@ using FCSTechFabricator;
 using FCSTechFabricator.Components;
 using FCSTechFabricator.Craftables;
 using QModManager.API.ModLoading;
+using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 
@@ -44,9 +45,12 @@ namespace FCS_DeepDriller
                     QuickLogger.Error("Global Bundle has returned null stopping patching");
                     throw new FileNotFoundException("Bundle failed to load");
                 }
-
+                
                 Configuration = Mod.LoadConfiguration();
                 Configuration.Convert();
+
+                OptionsPanelHandler.RegisterModOptions(new Options());
+
 
                 AddItemsToTechFabricator();
 

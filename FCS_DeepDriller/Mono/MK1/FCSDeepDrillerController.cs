@@ -284,16 +284,11 @@ namespace FCS_DeepDriller.Mono.MK1
             PowerManager.Initialize(this);
             PowerManager.OnPowerUpdate += OnPowerUpdate;
 
-            if (QPatch.Configuration.AllowDamage)
-            {
-                HealthManager = gameObject.AddComponent<FCSDeepDrillerHealthHandler>();
-                HealthManager.Initialize(this);
-                HealthManager.SetHealth(100);
-                HealthManager.OnDamaged += OnDamaged;
-                HealthManager.OnRepaired += OnRepaired;
-                QuickLogger.Debug($"=============================================== Made Health {HealthManager.GetHealth()}=============================");
-            }
-
+            HealthManager = gameObject.AddComponent<FCSDeepDrillerHealthHandler>();
+            HealthManager.Initialize(this);
+            HealthManager.SetHealth(100);
+            HealthManager.OnDamaged += OnDamaged;
+            HealthManager.OnRepaired += OnRepaired;
 
             OreGenerator = gameObject.AddComponent<OreGenerator>();
             OreGenerator.Initialize(this);

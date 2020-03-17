@@ -188,8 +188,29 @@ namespace FCS_DeepDriller.Managers
                     loot = loot.Distinct().ToList();
                 }
             }
-            
-            return loot;
+
+            var lootWithAdditions = AdditionalLoot(loot, currentBiome);
+
+            return lootWithAdditions;
+        }
+
+        internal static List<TechType> AdditionalLoot(List<TechType> defaultLoot, string currentBiome)
+        {
+            foreach (KeyValuePair<string, List<TechType>> valuePair in QPatch.Configuration.BiomeOresTechType)
+            {
+                if (valuePair.Key.Equals(currentBiome))
+                {
+                    foreach (TechType techType in valuePair.Value)
+                    {
+                        if (!defaultLoot.Contains(techType) && Resources.Contains(techType))
+                        {
+                            defaultLoot.Add(techType);
+                        }
+                    }
+                }
+            }
+
+            return defaultLoot;
         }
 
         private static void GetResourceForSpecial(TechType techType, List<TechType> items)

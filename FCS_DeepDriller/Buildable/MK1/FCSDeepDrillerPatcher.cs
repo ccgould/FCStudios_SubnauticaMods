@@ -74,8 +74,8 @@ namespace FCS_DeepDriller.Buildable.MK1
                 //var beacon = prefab.AddComponent<Beacon>();
 
 
-                var center = new Vector3(0, 2.433337f, 0);
-                var size = new Vector3(4.821606f, 4.582462f, 4.941598f);
+                var center = new Vector3(0, 3.048428f, 0);
+                var size = new Vector3(4.821606f, 3.35228f, 4.941598f);
 
                 GameObjectHelpers.AddConstructableBounds(prefab, size,center);
 

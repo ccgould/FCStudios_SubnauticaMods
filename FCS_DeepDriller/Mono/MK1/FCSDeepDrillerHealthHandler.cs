@@ -24,7 +24,15 @@ namespace FCS_DeepDriller.Mono.MK1
 
         private void Update()
         {
-            UpdateHealthSystem();
+            if (QPatch.Configuration.AllowDamage)
+            {
+                _liveMixin.invincible = false;
+                UpdateHealthSystem();
+            }
+            else
+            {
+                _liveMixin.invincible = true;
+            }
         }
 
         #endregion
@@ -32,6 +40,8 @@ namespace FCS_DeepDriller.Mono.MK1
         internal bool IsDamagedFlag()
         {
             if (_liveMixin == null) return true;
+
+            if (!QPatch.Configuration.AllowDamage) return false;
 
             return _liveMixin.health <= 0;
         }
@@ -106,6 +116,13 @@ namespace FCS_DeepDriller.Mono.MK1
         {
             try
             {
+                if (!QPatch.Configuration.AllowDamage && GetHealth() <= 0f)
+                {
+                    OnRepaired?.Invoke();
+                    _prevHealth = 100;
+                    return;
+                }
+
                 if (GetHealth() >= 1f && !IsDamagedFlag() && !Mathf.Approximately(_prevHealth, GetHealth()))
                 {
                     QuickLogger.Debug("Drill Repaired", true);

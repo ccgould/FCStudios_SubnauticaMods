@@ -7,6 +7,7 @@ using FCS_DeepDriller.Mono.MK1;
 using FCSCommon.Extensions;
 using Oculus.Newtonsoft.Json;
 using SMLHelper.V2.Crafting;
+using SMLHelper.V2.Options;
 using UnityEngine;
 
 namespace FCS_DeepDriller.Configuration
@@ -351,6 +352,22 @@ namespace FCS_DeepDriller.Configuration
             File.WriteAllText(Path.Combine(MODFOLDERLOCATION, GetConfigPath()), saveDataJson);
         }
 
+        internal static void SaveModConfiguration()
+        {
+            try
+            {
+                var config = new DeepDrillerCfg();
+
+                var saveDataJson = JsonConvert.SerializeObject(QPatch.Configuration, Formatting.Indented);
+
+                File.WriteAllText(Path.Combine(MODFOLDERLOCATION, GetConfigPath()), saveDataJson);
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error($"{e.Message}\n{e.StackTrace}");
+            }
+        }
+
         private static DeepDrillerCfg LoadConfigurationData()
         {
             // == Load Configuration == //
@@ -371,6 +388,37 @@ namespace FCS_DeepDriller.Configuration
             }
 
             return LoadConfigurationData();
+        }
+    }
+
+    internal class Options : ModOptions
+    {
+        private const string ToggleID = "RefreshBTN";
+        private const string AllowDamageID = "AllowDamage";
+        private bool _allowDamage;
+
+        public Options() : base("Deep Driller Settings")
+        {
+            ToggleChanged += OnToggleChanged;
+            _allowDamage = QPatch.Configuration.AllowDamage;
+        }
+
+        public void OnToggleChanged(object sender, ToggleChangedEventArgs e)
+        {
+            
+            switch (e.Id)
+            {
+                case AllowDamageID:
+                    _allowDamage = QPatch.Configuration.AllowDamage = e.Value;
+                    break;
+            }
+
+            Mod.SaveModConfiguration();
+        }
+
+        public override void BuildModOptions()
+        {
+            AddToggleOption(AllowDamageID, "Damage Overtime", _allowDamage);
         }
     }
 }
