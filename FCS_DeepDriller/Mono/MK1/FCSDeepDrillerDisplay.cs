@@ -54,6 +54,7 @@ namespace FCS_DeepDriller.Mono.MK1
 
         private InterfaceButton _button;
         private GridHelper _itemsGrid;
+        private Text _biomeTxt;
 
         internal void Setup(FCSDeepDrillerController mono)
         {
@@ -64,7 +65,7 @@ namespace FCS_DeepDriller.Mono.MK1
                 QuickLogger.Error("Unable to find all components");
                 _initialized = false;
             }
-            ITEMS_PER_PAGE = 5;
+            ITEMS_PER_PAGE = 4;
 
             DrawPage(1);
         
@@ -397,6 +398,8 @@ namespace FCS_DeepDriller.Mono.MK1
 
             _healthPercentage = main.FindChild("Health_LBL").GetComponent<Text>();
 
+            _biomeTxt = main.FindChild("BiomeTXT").GetComponent<Text>();
+
             _solarValue = main.FindChild("Solar_LBL").GetComponent<Text>();
             return true;
         }
@@ -583,6 +586,11 @@ namespace FCS_DeepDriller.Mono.MK1
                 bar.color = colorEmpty;
                 bar.fillAmount = 0f;
             }
+        }
+
+        internal void UpdateBiome(string biome)
+        {
+            _biomeTxt.text = $"{FCSDeepDrillerBuildable.Biome()}: {biome}";
         }
 
         internal void UpdateListItems(TechType techType = TechType.None)

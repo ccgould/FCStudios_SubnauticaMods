@@ -31,6 +31,13 @@ namespace FCS_DeepDriller.Mono.MK1
         private DeepDrillerSaveDataEntry _data;
         private string _currentBiome;
 
+        internal string CurrentBiome
+        {
+            get => _currentBiome;
+            set => _currentBiome = value;
+        }
+
+
         #endregion
 
         #region Internal Properties
@@ -97,7 +104,7 @@ namespace FCS_DeepDriller.Mono.MK1
 
                     _batteryAttachment.GetController().LoadData(_data.PowerData);
 
-                    _currentBiome = _data.Biome;
+                    CurrentBiome = _data.Biome;
 
                     _fromSave = false;
                 }
@@ -166,7 +173,7 @@ namespace FCS_DeepDriller.Mono.MK1
                         Initialize();
                     }
 
-                    _currentBiome = BiomeManager.GetBiome();
+                    CurrentBiome = BiomeManager.GetBiome();
                     StartCoroutine(DropLegs());
                     StartCoroutine(TryGetLoot());
 
@@ -204,7 +211,7 @@ namespace FCS_DeepDriller.Mono.MK1
             _saveData.PowerData = PowerManager.SaveData();
             _saveData.FocusOre = OreGenerator.GetFocus();
             _saveData.IsFocused = OreGenerator.GetIsFocused();
-            _saveData.Biome = _currentBiome;
+            _saveData.Biome = CurrentBiome;
             saveDataList.Entries.Add(_saveData);
         }
         
@@ -458,12 +465,13 @@ namespace FCS_DeepDriller.Mono.MK1
 
             while (OreGenerator.AllowedOres.Count <= 0)
             {
-                var loot = GetBiomeData(_currentBiome,transform);
+                var loot = GetBiomeData(CurrentBiome, transform);
 
                 if (loot != null)
                 {
                     OreGenerator.AllowedOres = loot;
                     ConnectDisplay();
+                    DisplayHandler.UpdateBiome(CurrentBiome);
                 }
 
                 yield return null;

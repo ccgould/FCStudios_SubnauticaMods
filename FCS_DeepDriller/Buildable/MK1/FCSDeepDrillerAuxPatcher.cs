@@ -19,6 +19,7 @@ namespace FCS_DeepDriller.Buildable.MK1
         private const string FocusKey = "DD_Focus";
         private const string RemoveAllModulesKey = "DD_RemoveAllAttachments";
         private const string OneUpgradeAllowedKey = "DD_OneUpgradeAllowed";
+        private const string BiomeKey = "DD_Biome";
 
         internal static string BuildableName { get; private set; }
 
@@ -109,6 +110,7 @@ namespace FCS_DeepDriller.Buildable.MK1
             LanguageHandler.SetLanguageLine(FocusKey, "FOCUS");
             LanguageHandler.SetLanguageLine(FocusingKey, "FOCUSING");
             LanguageHandler.SetLanguageLine(RemoveAllModulesKey, "Please Remove all items from the driller.");
+            LanguageHandler.SetLanguageLine(BiomeKey, "BIOME");
         }
 
         public static string RemoveAllItems()
@@ -120,6 +122,11 @@ namespace FCS_DeepDriller.Buildable.MK1
         public static string OneUpgradeAllowed()
         {
             return Language.main.Get(OneUpgradeAllowedKey);
+        }
+
+        public static string Biome()
+        {
+            return Language.main.Get(BiomeKey);
         }
     }
 }

@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Mini Fountain Filter")]
-[assembly: AssemblyDescription("A  mini water filtration machine and also a water fountain or subnautica")]
+[assembly: AssemblyTitle("FireExtingusherHolder")]
+[assembly: AssemblyDescription("A subnautica Mod that allows you to build fire extingusher holders in your base")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("FCStudios")]
-[assembly: AssemblyProduct("Mini Fountain Filter")]
-[assembly: AssemblyCopyright("Copyright ©  FCStudios 2019")]
+[assembly: AssemblyCompany("Field Creators Studios")]
+[assembly: AssemblyProduct("FireExtingusherHolder")]
+[assembly: AssemblyCopyright("Copyright © Field Creators Studios 2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("3e004a5f-6506-40ff-b4a4-6f2e330e07f5")]
+[assembly: Guid("893260b0-b246-44ff-b0a3-01c4500332e2")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.1.4.0")]
-[assembly: AssemblyFileVersion("1.1.4.0")]
+[assembly: AssemblyVersion("1.0.1.0")]
+[assembly: AssemblyFileVersion("1.0.1.0")]

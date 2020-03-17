@@ -121,7 +121,6 @@ namespace AE.MiniFountainFilter.Buildable
                 constructable.allowedOnCeiling = false;
                 constructable.allowedOutside = false;
                 constructable.model = model;
-                constructable.rotationEnabled = true;
                 constructable.techType = Singleton.TechType;
 
                 PrefabIdentifier prefabID = _prefab.AddComponent<PrefabIdentifier>();

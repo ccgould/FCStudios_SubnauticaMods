@@ -115,7 +115,7 @@ namespace FCS_DeepDriller.Managers
             {
                 if (tr == null)
                 {
-                    QuickLogger.Error("FindBiomeLoot: Transform cannot be null");
+                    QuickLogger.Debug("FindBiomeLoot: Transform cannot be null");
                     return null;
                 }
    
@@ -134,13 +134,13 @@ namespace FCS_DeepDriller.Managers
                 {
                     if (Mod.LootDistributionData == null)
                     {
-                        QuickLogger.Error("LootDistributionData is null");
+                        QuickLogger.Debug("LootDistributionData is null");
                         return null;
                     }
                     
                     if (!Mod.LootDistributionData.GetBiomeLoot(biomeType, out LootDistributionData.DstData data))
                     {
-                        QuickLogger.Error("DstData is null");
+                        QuickLogger.Debug("DstData is null");
                         continue;
                     }
 
@@ -152,7 +152,7 @@ namespace FCS_DeepDriller.Managers
                             {
                                 if (wei == null)
                                 {
-                                    QuickLogger.Error("WorldEntityInfo is null");
+                                    QuickLogger.Debug("WorldEntityInfo is null");
                                     continue;
                                 }
 
