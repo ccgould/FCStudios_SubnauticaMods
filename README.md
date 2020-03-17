@@ -34,6 +34,7 @@ Here is a Chart of all the mods and the place to download on NexusMods.
 |Fire Extinguisher Holder|A Fire Extinguisher Holder which allows you to hold fire extinguisher in your habitat.|[#322](https://www.nexusmods.com/subnautica/mods/322)
 |Drop All On Death|This mod has one purpose and that is to empty your inventor and module slots on player death.|[#363](https://www.nexusmods.com/subnautica/mods/363)
 |Alterra Electrical Quantum Teleporter|Quantum Teleporter is a mod that allows you to teleport from one point to another inside a base (local) or from one base to another (global).|[#371](https://www.nexusmods.com/subnautica/mods/371)
+|Gaspod Collector |This mod collects gaspods that are in the range of it. All pods are stored within the gaspod collector and can be taken by using either the Take gaspod button to take one gaspod or the bulk button to fill the player's inventory with gaspods. |[#430](https://www.nexusmods.com/subnautica/mods/430)
 
 
 # Mods in Collaboration/Not Included in repo
