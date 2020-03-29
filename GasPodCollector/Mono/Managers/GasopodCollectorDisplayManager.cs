@@ -6,6 +6,7 @@ using FCSCommon.Abstract;
 using FCSCommon.Enums;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
+using FCSTechFabricator;
 using FCSTechFabricator.Managers;
 using GasPodCollector.Buildables;
 using GasPodCollector.Models;
@@ -195,6 +196,7 @@ namespace GasPodCollector.Mono.Managers
                 return false;
             }
         }
+
 
         internal void UpdateBatteries(Dictionary<int, BatteryInfo> batteries)
         {

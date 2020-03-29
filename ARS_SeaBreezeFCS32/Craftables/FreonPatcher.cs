@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using ARS_SeaBreezeFCS32.Configuration;
-using ARS_SeaBreezeFCS32.Model;
+using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using FCSTechFabricator;
 using FCSTechFabricator.Components;
@@ -178,9 +178,16 @@ namespace ARS_SeaBreezeFCS32.Craftables
             placeTool.dropTime = 1;
             placeTool.holsterTime = 0.35f;
 
-            OriginalPrefab.EnsureComponent<Freon>();
-
             OriginalPrefab.EnsureComponent<FCSTechFabricatorTag>();
+
+            ApplyShaders();
+
+        }
+
+        private void ApplyShaders()
+        {
+            MaterialHelpers.ApplySpecShader("Freon_Bottle", $"Freon_Freon_Bottle_Specular", OriginalPrefab, 1, 6f, QPatch.GlobalBundle);
+            MaterialHelpers.ApplyNormalShader("Freon_Bottle", "Freon_Freon_Bottle_Normal", OriginalPrefab, QPatch.GlobalBundle);
         }
 
         public override TechGroup GroupForPDA { get; } = TechGroup.Resources;

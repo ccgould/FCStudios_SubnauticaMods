@@ -1,4 +1,5 @@
-﻿using FCSCommon.Helpers;
+﻿using ARS_SeaBreezeFCS32.Configuration;
+using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
 
@@ -8,6 +9,9 @@ namespace ARS_SeaBreezeFCS32.Buildables
     {
         private GameObject _Prefab;
         public static GameObject ItemPrefab { get; set; }
+        
+        public static string BodyMaterial { get; set; } = "SeaBreezeFCS32_BaseColor";
+        public static GameObject ColorItemPrefab { get; set; }
 
         public bool GetPrefabs()
         {
@@ -55,12 +59,21 @@ namespace ARS_SeaBreezeFCS32.Buildables
                 return false;
             }
 
+            GameObject colorItem = QPatch.GlobalBundle.LoadAsset<GameObject>("ColorItem");
+
+            if (colorItem != null)
+            {
+                ColorItemPrefab = colorItem;
+            }
+            else
+            {
+                QuickLogger.Error($"Color Item Not Found!");
+                return false;
+            }
 
             return true;
         }
-
-
-
+        
         /// <summary>
         /// Applies the shader to the materials of the reactor
         /// </summary>
@@ -77,6 +90,8 @@ namespace ARS_SeaBreezeFCS32.Buildables
             MaterialHelpers.ApplyAlphaShader("FCS_SUBMods_GlobalDecals", prefab);
             MaterialHelpers.ApplyNormalShader("FCS_SUBMods_GlobalDecals", "FCS_SUBMods_GlobalDecals_Norm", prefab, QPatch.GlobalBundle);
             #endregion
+
+            //MaterialHelpers.ApplySpecShader(DetailMaterial, $"{Mod.ClassID}_D_COL_SPEC", prefab, 1, 6f, bundle);
 
             MaterialHelpers.ApplyNormalShader("SeaBreezeFCS32_BaseColor", "SeaBreezeFCS32_Norm", prefab, QPatch.GlobalBundle);
 

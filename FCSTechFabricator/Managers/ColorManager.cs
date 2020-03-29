@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using FCSCommon.Components;
+using FCSCommon.Enums;
 using FCSCommon.Helpers;
 using FCSTechFabricator.Extensions;
 using FCSTechFabricator.Objects;
@@ -26,6 +27,8 @@ namespace FCSTechFabricator.Managers
         private readonly Color _defaultColor = new Color(0.7529412f, 0.7529412f, 0.7529412f, 1f);
 
         public Action<Color> OnColorChanged;
+        public string HomeButtonMessage { get; set; }
+        private Action<bool> _onInterfaceButton;
 
         private void ResetColorSelections(Color color)
         {
@@ -91,6 +94,10 @@ namespace FCSTechFabricator.Managers
             itemButton.OnButtonClick = _onButtonClick;
             itemButton.BtnName = "ColorItem";
             itemButton.Color = color.Vector4ToColor();
+            if (_onInterfaceButton != null)
+            {
+                itemButton.OnInterfaceButton = _onInterfaceButton;
+            }
             _colorItemsTracker.Add(itemButton);
         }
 
@@ -151,12 +158,44 @@ namespace FCSTechFabricator.Managers
             DrawColorPage(_currentColorPage + amount);
         }
 
+        [Obsolete("This method will be removed in upcoming updates of the techfabricator")]
         public void SetupGrid(int colorsPerPage, GameObject colorItemPrefab, GameObject colorGrid, Text paginator, Action<string, object> onButtonClick)
         {
             _colorsPerPage = colorsPerPage;
             _colorItemPrefab = colorItemPrefab;
             _colorPageContainer = colorGrid;
             _colorPageNumber = paginator;
+            _onButtonClick = onButtonClick;
+            DrawColorPage(1);
+        }
+
+        public void SetupGrid(int colorsPerPage, GameObject colorItemPrefab, GameObject colorPage, Action<string, object> onButtonClick,Color startColor, Color hoverColor, int maxInteractionRange = 5, string prevBtnNAme = "PrevBTN", string nextBtnName = "NextBTN" , string gridName = "Grid", string paginatorName = "Paginator", string homeBtnName = "HomeBTN")
+        {
+            _colorsPerPage = colorsPerPage;
+            _colorItemPrefab = colorItemPrefab;
+            _colorPageContainer = InterfaceHelpers.FindGameObject(colorPage, gridName);
+            _colorPageNumber = InterfaceHelpers.FindGameObject(colorPage, paginatorName)?.GetComponent<Text>();
+
+            #region Prev Color Button
+            var prevColorBtn = InterfaceHelpers.FindGameObject(colorPage, prevBtnNAme);
+
+            InterfaceHelpers.CreatePaginator(prevColorBtn, -1, ChangeColorPageBy, startColor, hoverColor);
+            #endregion
+
+            #region Next Color Button
+            var nextColorBtn = InterfaceHelpers.FindGameObject(colorPage, nextBtnName);
+
+            InterfaceHelpers.CreatePaginator(nextColorBtn, 1, ChangeColorPageBy, startColor, hoverColor);
+            #endregion
+
+            #region HomeButton
+            var homeBTN = InterfaceHelpers.FindGameObject(colorPage, homeBtnName);
+
+            InterfaceHelpers.CreateButton(homeBTN, "HomeBTN", InterfaceButtonMode.Background,
+                onButtonClick, startColor, hoverColor, maxInteractionRange, HomeButtonMessage);
+
+            #endregion
+
             _onButtonClick = onButtonClick;
             DrawColorPage(1);
         }

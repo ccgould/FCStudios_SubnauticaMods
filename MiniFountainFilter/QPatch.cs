@@ -41,6 +41,8 @@ namespace AE.MiniFountainFilter
 
                 GlobalBundle = FcAssetBundlesService.PublicAPI.GetAssetBundleByName(FcAssetBundlesService.PublicAPI.GlobalBundleName);
 
+                GlobalBundle.LoadAllAssets<Sprite>();
+
                 if (GlobalBundle == null)
                 {
                     QuickLogger.Error("Global Bundle has returned null stopping patching");

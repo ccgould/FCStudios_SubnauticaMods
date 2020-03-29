@@ -1,9 +1,9 @@
-﻿using FCSCommon.Objects;
-using Oculus.Newtonsoft.Json;
+﻿using Oculus.Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using FCSTechFabricator.Objects;
 using UnityEngine;
 
 namespace FCSCommon.Extensions
@@ -47,9 +47,9 @@ namespace FCSCommon.Extensions
                     _eatableEntites.Add(new EatableEntities
                     {
                         Name = eatable.name,
-                        FoodValue = eatable.foodValue,
-                        WaterValue = eatable.waterValue,
-                        KDecayRate = eatable.kDecayRate
+                        //FoodValue = eatable.foodValue,
+                        //WaterValue = eatable.waterValue,
+                        //KDecayRate = eatable.kDecayRate
                     });
                 }
             }

@@ -39,6 +39,7 @@ namespace AE.MiniFountainFilter.Buildable
             }
 
             GameObject colorItem = QPatch.GlobalBundle.LoadAsset<GameObject>("ColorItem");
+            //GameObject colorItem = QPatch.GlobalBundle.LoadAsset<GameObject>("ColorItem");
 
             if (colorItem != null)
             {

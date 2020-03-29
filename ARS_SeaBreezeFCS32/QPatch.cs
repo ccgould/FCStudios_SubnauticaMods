@@ -10,6 +10,7 @@ using FCSTechFabricator;
 using FCSTechFabricator.Components;
 using FCSTechFabricator.Craftables;
 using QModManager.API.ModLoading;
+using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 
@@ -40,6 +41,8 @@ namespace ARS_SeaBreezeFCS32
             try
             {
                 LoadAssetBundle();
+
+                OptionsPanelHandler.RegisterModOptions(new Options());
 
                 GlobalBundle = FcAssetBundlesService.PublicAPI.GetAssetBundleByName(FcAssetBundlesService.PublicAPI.GlobalBundleName);
                 

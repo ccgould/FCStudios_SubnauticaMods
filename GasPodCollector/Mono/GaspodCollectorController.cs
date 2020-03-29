@@ -49,7 +49,8 @@ namespace GasPodCollector.Mono
         private void Awake()
         {
             rigidbody = gameObject.GetComponent<Rigidbody>();
-            rigidbody.mass = 600f;
+            rigidbody.mass = QPatch.Configuration.Config.CollectorMass;
+            rigidbody.isKinematic = true;
         }
 
         private void OnEnable()
@@ -97,15 +98,16 @@ namespace GasPodCollector.Mono
                     _expand = false;
                 }
             }
-            //if (base.gameObject.transform.position.y > -4500f)
-            //{
-            //    this.updateDistanceFromCam();
-            //}
+            if (gameObject.transform.position.y > -4500f)
+            {
+                updateDistanceFromCam();
+            }
 
             if (!rigidbody.isKinematic && Time.time > this.timeNextPhysicsChange)
             { 
                 timeNextPhysicsChange = Time.time + UnityEngine.Random.Range(10f, 20f);
                 updateGravityChange();
+                UpdateMass();
             }
 
         }
@@ -165,7 +167,7 @@ namespace GasPodCollector.Mono
 
             IsInitialized = true;
         }
-
+        
         private void OnGaspodCollected()
         {
             PowerManager.TakePower();
@@ -374,6 +376,17 @@ namespace GasPodCollector.Mono
             }
             float sqrMagnitude = (base.gameObject.transform.position - main.cachedCameraPosition).sqrMagnitude;
             this.setRigidBodyPhysicsEnabled(sqrMagnitude < 1600f);
+        }
+
+        private void UpdateMass()
+        {
+            float massEmpty = QPatch.Configuration.Config.CollectorEmptyMass;
+            float massFull = QPatch.Configuration.Config.CollectorFullMass;
+
+            if (GaspodCollectorStorage != null)
+                this.rigidbody.mass =
+                    (massFull - massEmpty) * (GaspodCollectorStorage.GetStorageAmount() /
+                                              (float)QPatch.Configuration.Config.StorageLimit) + massEmpty;
         }
         #endregion
     }

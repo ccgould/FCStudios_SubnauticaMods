@@ -1,17 +1,18 @@
 ﻿using ARS_SeaBreezeFCS32.Mono;
 using Harmony;
 using System;
+using FCSTechFabricator.Abstract;
 
 namespace AE.SeaCooker.Patchers
 {
-    [HarmonyPatch(typeof(ARSolutionsSeaBreezeController))]
+    [HarmonyPatch(typeof(FCSController))]
     [HarmonyPatch("Initialized")]
     internal class ARSeaBreezeFCS32Awake_Patcher
     {
-        private static Action<ARSolutionsSeaBreezeController> onSeaBreezeAdded;
+        private static Action<FCSController> onSeaBreezeAdded;
 
         [HarmonyPostfix]
-        public static void Postfix(ARSolutionsSeaBreezeController __instance)
+        public static void Postfix(FCSController __instance)
         {
             if (onSeaBreezeAdded != null)
             {
@@ -19,7 +20,7 @@ namespace AE.SeaCooker.Patchers
             }
         }
 
-        public static bool AddEventHandlerIfMissing(Action<ARSolutionsSeaBreezeController> newHandler)
+        public static bool AddEventHandlerIfMissing(Action<FCSController> newHandler)
         {
             if (onSeaBreezeAdded == null)
             {
@@ -28,7 +29,7 @@ namespace AE.SeaCooker.Patchers
             }
             else
             {
-                foreach (Action<ARSolutionsSeaBreezeController> action in onSeaBreezeAdded.GetInvocationList())
+                foreach (Action<FCSController> action in onSeaBreezeAdded.GetInvocationList())
                 {
                     if (action == newHandler)
                     {
@@ -41,7 +42,7 @@ namespace AE.SeaCooker.Patchers
             }
         }
 
-        public static bool RemoveEventHandler(Action<ARSolutionsSeaBreezeController> newHandler)
+        public static bool RemoveEventHandler(Action<FCSController> newHandler)
         {
             if (onSeaBreezeAdded != null)
             {
@@ -53,14 +54,14 @@ namespace AE.SeaCooker.Patchers
         }
     }
 
-    [HarmonyPatch(typeof(ARSolutionsSeaBreezeController))]
+    [HarmonyPatch(typeof(FCSController))]
     [HarmonyPatch("OnDestroy")]
     internal class ARSeaBreezeFCS32Destroy_Patcher
     {
-        private static Action<ARSolutionsSeaBreezeController> onSeaBreezeDestroyed;
+        private static Action<FCSController> onSeaBreezeDestroyed;
 
         [HarmonyPostfix]
-        public static void Postfix(ARSolutionsSeaBreezeController __instance)
+        public static void Postfix(FCSController __instance)
         {
             if (onSeaBreezeDestroyed != null)
             {
@@ -68,7 +69,7 @@ namespace AE.SeaCooker.Patchers
             }
         }
 
-        public static bool AddEventHandlerIfMissing(Action<ARSolutionsSeaBreezeController> newHandler)
+        public static bool AddEventHandlerIfMissing(Action<FCSController> newHandler)
         {
             if (onSeaBreezeDestroyed == null)
             {
@@ -77,7 +78,7 @@ namespace AE.SeaCooker.Patchers
             }
             else
             {
-                foreach (Action<ARSolutionsSeaBreezeController> action in onSeaBreezeDestroyed.GetInvocationList())
+                foreach (Action<FCSController> action in onSeaBreezeDestroyed.GetInvocationList())
                 {
                     if (action == newHandler)
                     {
@@ -91,7 +92,7 @@ namespace AE.SeaCooker.Patchers
         }
 
 
-        public static bool RemoveEventHandler(Action<ARSolutionsSeaBreezeController> newHandler)
+        public static bool RemoveEventHandler(Action<FCSController> newHandler)
         {
             if (onSeaBreezeDestroyed != null)
             {

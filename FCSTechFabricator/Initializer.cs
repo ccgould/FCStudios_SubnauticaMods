@@ -2,6 +2,7 @@
 using FCSCommon.Utilities;
 using Harmony;
 using QModManager.API.ModLoading;
+using UnityEngine;
 
 namespace FCSTechFabricator
 {

@@ -8,18 +8,23 @@ using SMLHelper.V2.Crafting;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using FCSCommon.Controllers;
 using UnityEngine;
 
 namespace ARS_SeaBreezeFCS32.Buildables
 {
     internal partial class ARSSeaBreezeFCS32Buildable : Buildable
     {
+        #region Public Properties
+
         internal static readonly ARSSeaBreezeFCS32Buildable Singleton = new ARSSeaBreezeFCS32Buildable();
         public override TechGroup GroupForPDA { get; } = TechGroup.InteriorModules;
         public override TechCategory CategoryForPDA { get; } = TechCategory.InteriorModule;
         public override string AssetsFolder { get; } = $"FCS_ARSSeaBreeze/Assets";
-
         public override string IconFileName => "ARSSeaBreeze.png";
+
+        #endregion
+
         public ARSSeaBreezeFCS32Buildable() : base(Mod.ClassID, Mod.FriendlyName, Mod.Description)
         {
             OnFinishedPatching += AdditionalPatching;
@@ -64,6 +69,7 @@ namespace ARS_SeaBreezeFCS32.Buildables
                 constructable.allowedInBase = true;
                 constructable.allowedOnCeiling = false;
                 constructable.allowedOutside = false;
+                constructable.rotationEnabled = true;
                 constructable.model = prefab.FindChild("model");
                 constructable.techType = TechType;
 
@@ -75,7 +81,7 @@ namespace ARS_SeaBreezeFCS32.Buildables
                 GameObjectHelpers.AddConstructableBounds(prefab,size,center);
                 
                 prefab.EnsureComponent<PrefabIdentifier>().ClassId = this.ClassID;
-                prefab.EnsureComponent<ARSolutionsSeaBreezeAnimationManager>();
+                prefab.EnsureComponent<AnimationManager>();
                 prefab.EnsureComponent<ARSolutionsSeaBreezeController>();
                 
                 return prefab;

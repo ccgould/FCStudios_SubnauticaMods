@@ -254,7 +254,7 @@ namespace AE.MiniFountainFilter.Mono
 
                 AudioManager.StopMachineAudio();
                 AnimationManager.SetBoolHash(_isRunning, false);
-                DisplayManager.PowerOffDisplay();
+                DisplayManager.AboveWaterMessage();
                 _isOperational = false;
                 return;
             }

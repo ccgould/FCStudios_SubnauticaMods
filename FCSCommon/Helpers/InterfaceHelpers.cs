@@ -2,13 +2,16 @@
 using FCSCommon.Components;
 using FCSCommon.Enums;
 using FCSCommon.Utilities;
+using FCSTechFabricator;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace FCSCommon.Helpers
 {
     internal class InterfaceHelpers
     {
         internal static readonly Color ColorBlue = new Color(0.07f, 0.38f, 0.7f, 1f);
+        
         internal static bool CreateButton(GameObject parent, string childName, string btnName, InterfaceButtonMode btnMode, Action<string, object> onButtonClick, out InterfaceButton button)
         {
             var result = CreateButton(parent, childName, btnName, btnMode, Color.white, ColorBlue, onButtonClick, out InterfaceButton cusButton);
@@ -16,6 +19,7 @@ namespace FCSCommon.Helpers
             return result;
         }
 
+        [Obsolete("This method shall not be used anymore it will be deleted in up-comming releases of the tech fabricator please use another overload")]
         internal static bool CreateButton(GameObject parent, string childName, string btnName, InterfaceButtonMode btnMode, Color startColor, Color hoverColor, Action<string, object> onButtonClick, out InterfaceButton customButton)
         {
             customButton = null;
@@ -36,20 +40,7 @@ namespace FCSCommon.Helpers
             return true;
         }
 
-        internal static GameObject FindGameObject(GameObject gameObject, string name)
-        {
-            var result =  FindObjectRecursion(gameObject, name);
-
-            if (result == null)
-            {
-                QuickLogger.Error<InterfaceHelpers>($"Cant find game object {name}");
-                throw new MissingComponentException($"A component cant be found\nMissing Component: {name}");
-            }
-
-            return result;
-        }
-
-        internal static InterfaceButton CreateButton(GameObject go, string btnName, InterfaceButtonMode btnMode, Action<string, object> onButtonClick, Color startColor, Color hoverColor,float maxInteractionRange)
+        internal static InterfaceButton CreateButton(GameObject go, string btnName, InterfaceButtonMode btnMode, Action<string, object> onButtonClick, Color startColor, Color hoverColor, float maxInteractionRange)
         {
             var button = go.AddComponent<InterfaceButton>();
             button.BtnName = btnName;
@@ -58,6 +49,23 @@ namespace FCSCommon.Helpers
             button.HOVER_COLOR = hoverColor;
             button.OnButtonClick = onButtonClick;
             button.MaxInteractionRange = maxInteractionRange;
+            return button;
+        }
+
+
+        internal static InterfaceButton CreateButton(GameObject go, string btnName, InterfaceButtonMode btnMode, Action<string, object> onButtonClick, Color startColor, Color hoverColor, float maxInteractionRange, Sprite icon, string lineOne, string lineTwo = "")
+        {
+            var button = go.AddComponent<InterfaceButton>();
+            button.BtnName = btnName;
+            button.ButtonMode = btnMode;
+            button.STARTING_COLOR = startColor;
+            button.HOVER_COLOR = hoverColor;
+            button.OnButtonClick = onButtonClick;
+            button.MaxInteractionRange = maxInteractionRange;
+            button.TextLineOne = lineOne;
+            button.TextLineTwo = lineTwo; 
+            var image = go.EnsureComponent<Image>();
+            image.sprite = icon;
             return button;
         }
 
@@ -74,7 +82,20 @@ namespace FCSCommon.Helpers
             button.TextLineTwo = lineTwo;
             return button;
         }
+        
+        internal static GameObject FindGameObject(GameObject gameObject, string name)
+        {
+            var result =  FindObjectRecursion(gameObject, name);
 
+            if (result == null)
+            {
+                QuickLogger.Error<InterfaceHelpers>($"Cant find game object {name}");
+                throw new MissingComponentException($"A component cant be found.\nMissing Component: {name}");
+            }
+
+            return result;
+        }
+        
         private static GameObject FindObjectRecursion(GameObject gameObject, string name)
         {
             foreach (Transform obj in gameObject.transform)
@@ -120,6 +141,15 @@ namespace FCSCommon.Helpers
             return true;
         }
 
+        internal static void CreatePaginator(GameObject parent, int amountToChangeBy, Action<int> ChangePageBy, Color startColor, Color hoverColor)
+        {
+            var button = parent.AddComponent<PaginatorButton>();
+            button.ChangePageBy = ChangePageBy;
+            button.AmountToChangePageBy = amountToChangeBy;
+            button.STARTING_COLOR = startColor;
+            button.HOVER_COLOR = hoverColor;
+        }
+
         internal static bool FindGameObject(GameObject parent, string childName, out GameObject gameObject)
         {
             gameObject = null;
@@ -134,13 +164,9 @@ namespace FCSCommon.Helpers
             return true;
         }
 
-        internal static void CreatePaginator(GameObject go, int amountToChangeBy, Action<int> ChangePageBy, Color startColor, Color hoverColor)
+        internal static Sprite GetBundleIcon(string name)
         {
-            var button = go.AddComponent<PaginatorButton>();
-            button.ChangePageBy = ChangePageBy;
-            button.AmountToChangePageBy = amountToChangeBy;
-            button.STARTING_COLOR = startColor;
-            button.HOVER_COLOR = hoverColor;
+            return FcAssetBundlesService.PublicAPI.GetIconByName(name);
         }
     }
 }

@@ -30,8 +30,8 @@ namespace GasPodCollector.Buildables
             LanguageHandler.SetLanguageLine(DumpMessageKey, $"Fill Players Inventory");
             LanguageHandler.SetLanguageLine(TakeGaspodKey, $"Take gaspod.");
             LanguageHandler.SetLanguageLine(ColorPickerKey, $"Color Picker");
-            LanguageHandler.SetLanguageLine(BatteryReceptacleKey, $"Battery Receptacle");
             LanguageHandler.SetLanguageLine(GoHomeKey, "Home");
+            LanguageHandler.SetLanguageLine(BatteryReceptacleKey, $"Battery Receptacle");
             LanguageHandler.SetLanguageLine(RemoveBeaconKey, "You need to remove beacon first.");
         }
 
@@ -44,9 +44,9 @@ namespace GasPodCollector.Buildables
         private const string DumpMessageKey = "GSC_DumpMessage";
         private const string DumpPullKey = "GSC_DumpPull";
         private const string TakeGaspodKey = "GSC_TakeGaspod";
-        private const string ColorPickerKey = "GSC_ColorPicker";
         private const string BatteryReceptacleKey = "GSC_BatteryReceptacle";
         private const string GoHomeKey = "GSC_GoHome";
+        private const string ColorPickerKey = "GSC_ColorPicker";
         private const string RemoveBeaconKey = "GSC_RemoveBeacon";
 
 

@@ -32,6 +32,7 @@ namespace GasPodCollector
             {
 
                 GlobalBundle = FcAssetBundlesService.PublicAPI.GetAssetBundleByName(FcAssetBundlesService.PublicAPI.GlobalBundleName);
+
                 
                 if (GlobalBundle == null)
                 {

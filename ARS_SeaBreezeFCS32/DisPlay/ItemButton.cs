@@ -1,5 +1,6 @@
 ﻿using FCSCommon.Utilities;
 using System;
+using FCSTechFabricator.Enums;
 using UnityEngine.EventSystems;
 
 namespace ARS_SeaBreezeFCS32.Display
@@ -8,7 +9,8 @@ namespace ARS_SeaBreezeFCS32.Display
     {
         private TechType type = TechType.None;
         public int Amount { set; get; }
-        public Action<TechType> OnButtonClick;
+        public EatableType EatableType { set; get; }
+        public Action<TechType, EatableType> OnButtonClick;
         public Action<bool> OnInterfaceButton;
 
         public TechType Type
@@ -37,7 +39,7 @@ namespace ARS_SeaBreezeFCS32.Display
             QuickLogger.Debug($"Clicked on ItemButton", true);
             if (IsHovered && type != TechType.None)
             {
-                OnButtonClick?.Invoke(type);
+                OnButtonClick?.Invoke(type, EatableType);
                 OnInterfaceButton?.Invoke(false);
             }
         }

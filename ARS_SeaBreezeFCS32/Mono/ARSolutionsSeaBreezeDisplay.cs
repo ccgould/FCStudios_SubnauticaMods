@@ -1,12 +1,16 @@
-﻿using ARS_SeaBreezeFCS32.Buildables;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using ARS_SeaBreezeFCS32.Buildables;
 using ARS_SeaBreezeFCS32.Display;
+using FCSCommon.Abstract;
 using FCSCommon.Enums;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
-using System.Collections;
-using System.Linq;
-using FCSCommon.Abstract;
 using FCSTechFabricator.Components;
+using FCSTechFabricator.Enums;
+using FCSTechFabricator.Managers;
+using FCSTechFabricator.Objects;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,107 +18,24 @@ namespace ARS_SeaBreezeFCS32.Mono
 {
     internal class ARSolutionsSeaBreezeDisplay : AIDisplay
     {
-        #region Private Members
         private ARSolutionsSeaBreezeController _mono;
-        //private List<EatableEntities> _container;
-        private GameObject _canvasGameObject;
-        private GameObject _model;
-        private GameObject _homeScreen;
-        private GameObject _filterBtn;
-        private GameObject _itemsGrid;
-        private GameObject _homeScreenPowerBtn;
-        private GameObject _pagination;
-        private GameObject _background;
-        private GameObject _blackOut;
-        private GameObject _poweredOffScreen;
-        private GameObject _poweredScreenPowerBtn;
-        private GameObject _previousPageGameObject;
-        private GameObject _nextPageGameObject;
-        private GameObject _pageCounter;
-        private Text _pageCounterText;
-        private int _pageStateHash;
-        private readonly float BOOTING_ANIMATION_TIME = 6f;
-        private readonly float WELCOME_SCREEN_TIME = 2f;
-        private bool _completeSetup;
+        private ColorManager _colorPage;
+        private readonly Color _startColor = Color.white;
+        private readonly Color _hoverColor = new Color(0.07f, 0.38f, 0.7f, 1f);
         private Text _itemCounter_LBL;
         private Text _seaBreeze_LBL;
+        private GridHelper _foodPage;
+        private GridHelper _waterPage;
+        private GridHelper _trashPage;
 
-        #endregion
-
-        #region Internal Methods    
         internal void Setup(ARSolutionsSeaBreezeController mono)
         {
             _mono = mono;
+            _colorPage = mono.ColorManager;
 
-            if (FindAllComponents() == false)
+            if (FindAllComponents())
             {
-                QuickLogger.Error("// ============== Error getting all Components ============== //");
-                QuickLogger.Debug("Turning off display from find components", true);
-                PowerOffDisplay();
-                return;
-            }
-
-            ITEMS_PER_PAGE = 16;
-
-            _pageStateHash = UnityEngine.Animator.StringToHash("PageState");
-
-            //_mono.PowerManager.OnPowerOutage += OnPowerOutage;
-            //_mono.PowerManager.OnPowerResume += OnPowerResume;
-
-            StartCoroutine(CompleteSetup());
-
-            DrawPage(1);
-
-            InvokeRepeating("UpdateScreenState", 1, 0.5f);
-
-            mono.OnContainerUpdate += OnContainerUpdate;
-
-            mono.NameController.OnLabelChanged += OnLabelChanged;
-        }
-
-        internal void OnLabelChanged(string value,NameController nameController)
-        {
-            QuickLogger.Debug($"Label set to {value}", true);
-            _seaBreeze_LBL.text = value;
-        }
-
-        internal void OnContainerUpdate(int containerCurrent, int containerMax)
-        {
-            _itemCounter_LBL.text = $"{containerCurrent}/{containerMax} {ARSSeaBreezeFCS32Buildable.Items()}";
-        }
-
-        private void OnPowerResume()
-        {
-            //QuickLogger.Debug("Power Restored", true);
-            //if (_mono.PowerManager.GetHasBreakerTripped()) return;
-            //StartCoroutine(CompleteSetup());
-        }
-
-        private void OnPowerOutage()
-        {
-            QuickLogger.Debug("Power Outage", true);
-            ShutDownDisplay();
-        }
-
-        private void UpdateScreenState()
-        {
-            //if (!_mono.PowerManager.GetHasBreakerTripped() || !_mono.PowerManager.GetIsPowerAvailable()) return;
-            //PowerOffDisplay();
-        }
-
-        internal void UpdateTimer(string time)
-        {
-            _filterLBL.text = $"{LanguageHelpers.GetLanguage(ARSSeaBreezeFCS32Buildable.TimeLeftMessageKey)}: {time}";
-        }
-        #endregion
-
-        #region Public Methods
-        public override void ClearPage()
-        {
-            for (int i = 0; i < _itemsGrid.transform.childCount; i++)
-            {
-                var item = _itemsGrid.transform.GetChild(i).gameObject;
-                Destroy(item);
+                _mono.AnimationManager.SetIntHash(_mono.PageStateHash,1);
             }
         }
 
@@ -125,395 +46,288 @@ namespace ARS_SeaBreezeFCS32.Mono
             switch (btnName)
             {
                 case "PPBtn":
-                    //_mono.PowerManager.TogglePower();
-                    //_mono.UpdateFridgeCooler();
-                    //_mono.ResetOnInterceButton();
-                    //StartCoroutine(CompleteSetup());
+                    _mono.AnimationManager.SetIntHash(_mono.PageStateHash, 1);
+                    _mono.ToggleBreaker();
                     break;
 
                 case "HPPBtn":
-                    //_mono.PowerManager.TogglePower();
-                    // _mono.UpdateFridgeCooler();
-                    //_mono.ResetOnInterceButton();
-                    //PowerOffDisplay();
-                    break;
-
-                case "FilterBtn":
-                    _mono.OpenFilterContainer();
+                    _mono.AnimationManager.SetIntHash(_mono.PageStateHash, 3);
+                    _mono.ToggleBreaker();
                     break;
 
                 case "RenameBTN":
-                   //var cb = _mono.GetComponentInParent<ConstructableBounds>();
-                   //bool flag = cb.bounds.extents.x > 0f && cb.bounds.extents.y > 0f && cb.bounds.extents.z > 0f;
-
-                   //var newCube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                   //newCube.transform.SetParent(_mono.transform,false);
-                   //newCube.transform.localPosition = cb.bounds.position;
-                   //newCube.transform.localScale = cb.bounds.size;
-                   _mono.NameController.Show();
+                    _mono.NameController.Show();
+                    break;
+                case "ColorItem":
+                    _mono.ColorManager.ChangeColor((Color) tag);
+                    break;
+                case "HomeBTN":
+                    _mono.AnimationManager.SetIntHash(_mono.PageStateHash, 2);
+                    break;
+                case "FoodCBTN":
+                    _mono.AnimationManager.SetIntHash(_mono.PageStateHash, 7);
+                    break;
+                case "WaterCBTN":
+                    _mono.AnimationManager.SetIntHash(_mono.PageStateHash, 5);
+                    break;
+                case "TrashBTN":
+                    _mono.AnimationManager.SetIntHash(_mono.PageStateHash, 6);
+                    break;
+                case "DumpBTN":
+                    _mono.DumpContainer.OpenStorage();
+                    break;
+                case "ColorBTN":
+                    _mono.AnimationManager.SetIntHash(_mono.PageStateHash, 4);
                     break;
             }
-        }
-
-        public override void ItemModified(TechType item1, int newAmount = 0)
-        {
-            DrawPage(1);
         }
 
         public override bool FindAllComponents()
         {
-            QuickLogger.Debug("Find All Components");
-
-            #region Canvas
-
-            _canvasGameObject = gameObject.GetComponentInChildren<Canvas>()?.gameObject;
-
-            if (_canvasGameObject == null)
+            try
             {
-                QuickLogger.Error("Canvas not found.");
+                #region Canvas
+
+                var canvasGameObject = gameObject.GetComponentInChildren<Canvas>()?.gameObject;
+
+                if (canvasGameObject == null)
+                {
+                    QuickLogger.Error("Canvas not found.");
+                    return false;
+                }
+
+                #endregion
+
+                #region Home
+                var home = InterfaceHelpers.FindGameObject(canvasGameObject, "HomeScreen");
+                #endregion
+
+                #region Food
+                var food = InterfaceHelpers.FindGameObject(canvasGameObject, "FoodScreen");
+                #endregion
+
+                #region Drinks
+                var drinks = InterfaceHelpers.FindGameObject(canvasGameObject, "DrinksScreen");
+                #endregion
+
+                #region Trash
+                var trash = InterfaceHelpers.FindGameObject(canvasGameObject, "TrashScreen");
+                #endregion
+
+                #region Color Picker
+                var colorPicker = InterfaceHelpers.FindGameObject(canvasGameObject, "ColorPicker");
+                #endregion
+
+                #region PowerOff
+                var powerOff = InterfaceHelpers.FindGameObject(canvasGameObject, "PoweredOffScreen");
+                #endregion
+
+                #region PowerButton
+                var powerBtn = InterfaceHelpers.FindGameObject(home, "Power_BTN");
+
+                InterfaceHelpers.CreateButton(powerBtn, "HPPBtn", InterfaceButtonMode.Background,
+                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, ARSSeaBreezeFCS32Buildable.PowerBTNMessage());
+                #endregion
+
+                #region PowerOFf PowerButton
+                var ppowerBtn = InterfaceHelpers.FindGameObject(powerOff, "Power_BTN");
+
+                InterfaceHelpers.CreateButton(ppowerBtn, "PPBtn", InterfaceButtonMode.Background,
+                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, ARSSeaBreezeFCS32Buildable.PowerBTNMessage());
+                #endregion
+
+                #region PowerOFf PowerButton
+                var powerOffLbl = InterfaceHelpers.FindGameObject(powerOff, "Powered_Off_LBL");
+                powerOffLbl.GetComponent<Text>().text = ARSSeaBreezeFCS32Buildable.NoPower();
+                #endregion
+
+                #region DumpBTNButton
+                var dumpBtn = InterfaceHelpers.FindGameObject(home, "DumpBTN");
+
+                InterfaceHelpers.CreateButton(dumpBtn, "DumpBTN", InterfaceButtonMode.Background,
+                    OnButtonClick, Color.black, Color.white, MAX_INTERACTION_DISTANCE, ARSSeaBreezeFCS32Buildable.DumpButton(), ARSSeaBreezeFCS32Buildable.DumpMessage());
+                #endregion
+
+                #region FoodCButton
+                var foodContainterBtn = InterfaceHelpers.FindGameObject(home, "FoodCBTN");
+
+                InterfaceHelpers.CreateButton(foodContainterBtn, "FoodCBTN", InterfaceButtonMode.Background,
+                    OnButtonClick, Color.black, Color.white, MAX_INTERACTION_DISTANCE, ARSSeaBreezeFCS32Buildable.FoodCButton());
+                #endregion
+
+                #region WaterCButton
+                var WaterContainterBtn = InterfaceHelpers.FindGameObject(home, "WaterCBTN");
+
+                InterfaceHelpers.CreateButton(WaterContainterBtn, "WaterCBTN", InterfaceButtonMode.Background,
+                    OnButtonClick, Color.black, Color.white, MAX_INTERACTION_DISTANCE, ARSSeaBreezeFCS32Buildable.WaterCButton());
+                #endregion
+
+                #region Rename Button
+                var RenameBtn = InterfaceHelpers.FindGameObject(home, "RenameBTN");
+
+                InterfaceHelpers.CreateButton(RenameBtn, "RenameBTN", InterfaceButtonMode.Background,
+                    OnButtonClick, Color.black, Color.white, MAX_INTERACTION_DISTANCE, ARSSeaBreezeFCS32Buildable.RenameButton());
+                #endregion
+
+                #region Trash Button
+                var TrashBtn = InterfaceHelpers.FindGameObject(home, "TrashCBTN");
+
+                InterfaceHelpers.CreateButton(TrashBtn, "TrashBTN", InterfaceButtonMode.Background,
+                    OnButtonClick, Color.black, Color.white, MAX_INTERACTION_DISTANCE, ARSSeaBreezeFCS32Buildable.TrashButton(),ARSSeaBreezeFCS32Buildable.TrashMessage());
+                #endregion
+
+                #region ColorBTN Button
+                var colorBtn = InterfaceHelpers.FindGameObject(home, "ColorPickerBTN");
+
+                InterfaceHelpers.CreateButton(colorBtn, "ColorBTN", InterfaceButtonMode.Background,
+                    OnButtonClick, Color.black, Color.white, MAX_INTERACTION_DISTANCE, ARSSeaBreezeFCS32Buildable.ColorPicker());
+                #endregion
+
+                #region ColorPage
+                _colorPage.SetupGrid(48, ARSSeaBreezeFCS32Buildable.ColorItemPrefab, colorPicker, OnButtonClick, _startColor,_hoverColor);
+                #endregion
+
+                #region Food Page
+
+                _foodPage = _mono.gameObject.AddComponent<GridHelper>();
+                _foodPage.OnLoadDisplay += OnLoadFoodDisplay;
+                _foodPage.Setup(17, ARSSeaBreezeFCS32Buildable.ItemPrefab,food,_startColor,_hoverColor,OnButtonClick);
+
+                #endregion
+
+                #region Drink Page
+
+                _waterPage = _mono.gameObject.AddComponent<GridHelper>();
+                _waterPage.OnLoadDisplay += OnLoadWaterDisplay;
+                _waterPage.Setup(17, ARSSeaBreezeFCS32Buildable.ItemPrefab, drinks, _startColor, _hoverColor, OnButtonClick);
+
+                #endregion
+
+                #region Trash Page
+
+                _trashPage = _mono.gameObject.AddComponent<GridHelper>();
+                _trashPage.OnLoadDisplay += OnLoadTrashDisplay;
+                _trashPage.Setup(17, ARSSeaBreezeFCS32Buildable.ItemPrefab, trash, _startColor, _hoverColor, OnButtonClick);
+
+                #endregion
+
+                #region StorageAmount
+
+                _itemCounter_LBL = InterfaceHelpers.FindGameObject(home,"ItemCounter_LBL").GetComponent<Text>();
+
+                #endregion
+
+                #region Unit Name
+
+                _seaBreeze_LBL = InterfaceHelpers.FindGameObject(home, "SeaBreeze_LBL").GetComponent<Text>();
+
+                #endregion
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error($"{e.Message}:\n{e.StackTrace}");
                 return false;
             }
-
-            #endregion
-
-            // == Canvas Elements == //
-
-            #region Model
-
-            _model = gameObject.FindChild("model")?.gameObject;
-
-            if (_model == null)
-            {
-                QuickLogger.Error("Screen: Home Screen not found.");
-                return false;
-            }
-            #endregion
-
-            #region Home Screen
-            _homeScreen = _canvasGameObject.transform.Find("HomeScreen")?.gameObject;
-            if (_homeScreen == null)
-            {
-                QuickLogger.Error("Screen: Home Screen not found.");
-                return false;
-            }
-            #endregion
-
-            #region Home Screen Timer
-            _filterLBL = _homeScreen.transform.Find("FilterTimer_LBL").GetComponent<Text>();
-            _homeScreen.transform.Find("FilterTimer_LBL")?.gameObject.SetActive(false);
-            if (_filterLBL == null)
-            {
-                QuickLogger.Error("Screen: Filter label not found.");
-                return false;
-            }
-            #endregion
-
-            #region StorageAmount
-
-            _itemCounter_LBL = _homeScreen.transform.Find("ItemCounter_LBL").GetComponent<Text>();
-            if (_itemCounter_LBL == null)
-            {
-                QuickLogger.Error("Screen: Item Counter label not found.");
-                return false;
-            }
-            #endregion
-
-            #region Unit Name
-
-            _seaBreeze_LBL = _homeScreen.transform.Find("SeaBreeze_LBL").GetComponent<Text>();
-            if (_seaBreeze_LBL == null)
-            {
-                QuickLogger.Error("Screen: Seabreeze label not found.");
-                return false;
-            }
-            #endregion
-
-
-            var renameBTN = _homeScreen.FindChild("Rename")?.gameObject;
-
-            if (renameBTN == null)
-            {
-                QuickLogger.Error("Couldn't find the gameObject Rename_Button");
-                return false;
-            }
-
-            var renameBtn = renameBTN.AddComponent<InterfaceButton>();
-            renameBtn.BtnName = "RenameBTN";
-            renameBtn.OnButtonClick = OnButtonClick;
-            renameBtn.ButtonMode = InterfaceButtonMode.Background;
-            renameBtn.HOVER_COLOR = Color.gray;
-            renameBtn.OnInterfaceButton = _mono.OnInterfaceButton;
-            renameBtn.TextLineOne = ARSSeaBreezeFCS32Buildable.RenameButton();
-
-
-
-
-            #region Home Screen Power BTN
-            _homeScreenPowerBtn = _homeScreen.transform.Find("Power_BTN")?.gameObject;
-            _homeScreenPowerBtn.SetActive(false);
-            if (_homeScreenPowerBtn == null)
-            {
-                QuickLogger.Error("Screen: Powered Off Screen Button not found.");
-                return false;
-            }
-
-
-            var homeScreenPowerBTN = _homeScreenPowerBtn.AddComponent<InterfaceButton>();
-            homeScreenPowerBTN.OnButtonClick = OnButtonClick;
-            homeScreenPowerBTN.ButtonMode = InterfaceButtonMode.Background;
-            homeScreenPowerBTN.BtnName = "HPPBtn";
-            homeScreenPowerBTN.OnInterfaceButton = _mono.OnInterfaceButton;
-            #endregion
-
-            #region Paginator
-            _pagination = _homeScreen.FindChild("Paginator")?.gameObject;
-            if (_pagination == null)
-            {
-                QuickLogger.Error("Screen: Paginator not found.");
-                return false;
-            }
-            #endregion
-
-            #region Filter
-            _filterBtn = _homeScreen.transform.Find("Filter_BTN")?.gameObject;
-            _filterBtn.SetActive(false);
-            if (_filterBtn == null)
-            {
-                QuickLogger.Error("Screen: Filter Button not found.");
-                return false;
-            }
-
-            var filterrBTN = _filterBtn.AddComponent<InterfaceButton>();
-            filterrBTN.OnButtonClick = OnButtonClick;
-            filterrBTN.ButtonMode = InterfaceButtonMode.Background;
-            filterrBTN.BtnName = "FilterBtn";
-            filterrBTN.TextLineOne = LanguageHelpers.GetLanguage(ARSSeaBreezeFCS32Buildable.OnFreonBTNHoverKey);
-            filterrBTN.OnInterfaceButton = _mono.OnInterfaceButton;
-            #endregion
-
-            #region Items Grid
-            _itemsGrid = _canvasGameObject.transform.Find("HomeScreen").Find("ItemsGrid")?.gameObject;
-            if (_itemsGrid == null)
-            {
-                QuickLogger.Error("Screen: Item Grid not found.");
-                return false;
-            }
-            #endregion
-
-            #region Background
-            _background = _canvasGameObject.transform.Find("Background")?.gameObject;
-            if (_background == null)
-            {
-                QuickLogger.Error("Screen: Background not found.");
-                return false;
-            }
-            #endregion
-
-            #region BlackOut
-            _blackOut = _canvasGameObject.transform.Find("BlackOut")?.gameObject;
-            if (_blackOut == null)
-            {
-                QuickLogger.Error("Screen: BlackOut not found.");
-                return false;
-            }
-            #endregion
-
-            #region PowerOff
-            _poweredOffScreen = _canvasGameObject.transform.Find("PoweredOffScreen")?.gameObject;
-            if (_poweredOffScreen == null)
-            {
-                QuickLogger.Error("Screen: Powered Off Screen not found.");
-                return false;
-            }
-            #endregion
-
-            #region Power BTN
-            _poweredScreenPowerBtn = _poweredOffScreen.transform.Find("Power_BTN")?.gameObject;
-            if (_poweredScreenPowerBtn == null)
-            {
-                QuickLogger.Error("Screen: Powered Off Screen Button not found.");
-                return false;
-            }
-
-            var poweredOffScreenBTN = _poweredScreenPowerBtn.AddComponent<InterfaceButton>();
-            poweredOffScreenBTN.OnButtonClick = OnButtonClick;
-            poweredOffScreenBTN.BtnName = "PPBtn";
-            poweredOffScreenBTN.ButtonMode = InterfaceButtonMode.Background;
-            poweredOffScreenBTN.OnInterfaceButton = _mono.OnInterfaceButton;
-            #endregion
-
-            #region Prev Page BTN
-            _previousPageGameObject = _pagination.FindChild("PreviousPage")?.gameObject;
-            if (_previousPageGameObject == null)
-            {
-                QuickLogger.Error("Screen: PreviousPage not found.");
-                return false;
-            }
-
-            var prevPageBTN = _previousPageGameObject.AddComponent<PaginatorButton>();
-            prevPageBTN.OnChangePageBy = ChangePageBy;
-            prevPageBTN.AmountToChangePageBy = -1;
-            prevPageBTN.OnInterfaceButton = _mono.OnInterfaceButton;
-            #endregion
-
-            #region Next Page BTN
-            _nextPageGameObject = _pagination.FindChild("NextPage")?.gameObject;
-            if (_nextPageGameObject == null)
-            {
-                QuickLogger.Error("Screen: NextPage not found.");
-                return false;
-            }
-
-            var nextPageBTN = _nextPageGameObject.AddComponent<PaginatorButton>();
-            nextPageBTN.OnChangePageBy = ChangePageBy;
-            nextPageBTN.AmountToChangePageBy = 1;
-            nextPageBTN.OnInterfaceButton = _mono.OnInterfaceButton;
-            #endregion
-
-            #region Color Picker Page Counter
-            _pageCounter = _pagination.FindChild("PageNumber")?.gameObject;
-            if (_pageCounter == null)
-            {
-                QuickLogger.Error("Screen: PageNumber not found.");
-                return false;
-            }
-
-            _pageCounterText = _pageCounter.GetComponent<Text>();
-            if (_pageCounterText == null)
-            {
-                QuickLogger.Error("Screen: _pageCounterText not found.");
-                return false;
-            }
-            #endregion
 
             return true;
         }
 
-        public Text _filterLBL { get; set; }
-
-        public override void DrawPage(int page)
+        private void OnLoadFoodDisplay(GameObject itemPrefab, GameObject itemsGrid, int stPos, int endPos)
         {
-            CurrentPage = page;
+            OnLoadDisplay( EatableType.Food, itemPrefab, itemsGrid, stPos, endPos);
+        }
 
-            if (CurrentPage <= 0)
+        private void OnLoadTrashDisplay(GameObject itemPrefab, GameObject itemsGrid, int stPos, int endPos)
+        {
+            OnLoadDisplay(EatableType.Rotten, itemPrefab, itemsGrid, stPos, endPos);
+        }
+
+        private void OnLoadWaterDisplay(GameObject itemPrefab, GameObject itemsGrid, int stPos, int endPos)
+        {
+            OnLoadDisplay(EatableType.Drink, itemPrefab, itemsGrid, stPos, endPos);
+        }
+
+        private void OnLoadDisplay(EatableType eatableType, GameObject itemPrefab, GameObject itemsGrid, int stPos, int endPos)
+        {
+            switch (eatableType)
             {
-                CurrentPage = 1;
-            }
-            else if (CurrentPage > MaxPage)
-            {
-                CurrentPage = MaxPage;
-            }
+                case EatableType.Rotten:
+                    var rottenList = _mono.FridgeComponent.FridgeItems.Where(x => x.IsRotten()).ToList();
+                    _trashPage.ClearPage();
+                    CreateFoodItem(itemPrefab, itemsGrid, stPos, endPos, rottenList, _trashPage, EatableType.Rotten);
+                    break;
 
-            int startingPosition = (CurrentPage - 1) * ITEMS_PER_PAGE;
-            int endingPosition = startingPosition + ITEMS_PER_PAGE;
+                case EatableType.Food:
+                    var freshList = _mono.FridgeComponent.FridgeItems.Where(x => x.GetFoodValue() > 0 && !x.IsRotten()).ToList();
+                    _foodPage.ClearPage();
+                    CreateFoodItem(itemPrefab, itemsGrid, stPos, endPos, freshList, _foodPage, EatableType.Food);
+                    break;
 
-            QuickLogger.Debug($"startingPosition: {startingPosition} || endingPosition : {endingPosition}", true);
-            QuickLogger.Debug($"Number Of Items: {_mono.NumberOfItems}");
-            var container = _mono.TrackedItems;
-
-
-            if (endingPosition > container.Count)
-            {
-                endingPosition = container.Count;
-            }
-
-            QuickLogger.Debug($"startingPosition: {startingPosition} || endingPosition : {endingPosition}", true);
-
-            ClearPage();
-
-            QuickLogger.Debug($"startingPosition: {startingPosition} || endingPosition : {endingPosition}", true);
-
-            for (int i = startingPosition; i < endingPosition; i++)
-            {
-                var element = container.ElementAt(i);
-                var techType = element.Key;
-
-                QuickLogger.Debug($"Element: {element} || TechType : {techType}");
-
-                LoadFridgeDisplay(element.Key, element.Value);
-
-                //Tracked items was here
-            }
-
-            UpdatePaginator();
-        }
-
-        public override void UpdatePaginator()
-        {
-            base.UpdatePaginator();
-
-            CalculateNewMaxPages();
-            _pageCounter.SetActive(_mono.NumberOfItems != 0);
-            _pageCounterText.text = $"{CurrentPage} / {MaxPage}";
-            _previousPageGameObject.SetActive(true); //CurrentPage != 1
-            _nextPageGameObject.SetActive(true); //CurrentPage != MaxPage
-        }
-        #endregion
-
-        #region IEnumerators    
-        public override IEnumerator PowerOff()
-        {
-            yield return new WaitForEndOfFrame();
-            _mono.AnimationManager.SetIntHash(_pageStateHash, 3);
-            yield return new WaitForEndOfFrame();
-        }
-
-        public override IEnumerator PowerOn()
-        {
-            // QuickLogger.Debug("In Power On", true);
-            yield return new WaitForEndOfFrame();
-            _mono.AnimationManager.SetIntHash(_pageStateHash, 2);
-            yield return new WaitForEndOfFrame();
-        }
-
-        public override IEnumerator ShutDown()
-        {
-            //QuickLogger.Debug("In Shut Down", true);
-            yield return new WaitForEndOfFrame();
-            _mono.AnimationManager.SetIntHash(_pageStateHash, 0);
-            yield return new WaitForEndOfFrame();
-        }
-
-        public override IEnumerator CompleteSetup()
-        {
-            QuickLogger.Debug("In Complete Setup", true);
-            yield return new WaitForEndOfFrame();
-            _mono.AnimationManager.SetIntHash(_pageStateHash, 1);
-            _completeSetup = true;
-        }
-        #endregion
-
-        #region Private Methods
-        private void CalculateNewMaxPages()
-        {
-            MaxPage = Mathf.CeilToInt((_mono.TrackedItems.Count - 1) / ITEMS_PER_PAGE) + 1;
-            QuickLogger.Debug($"Seabreeze TrackedItems {_mono.TrackedItems.Count}, Items Per Page {ITEMS_PER_PAGE}, Max Page {MaxPage}", true);
-            if (CurrentPage > MaxPage)
-            {
-                CurrentPage = MaxPage;
+                case EatableType.Drink:
+                    var drinkList = _mono.FridgeComponent.FridgeItems.Where(x => x.GetFoodValue() <= 0 && x.GetWaterValue() > 0).ToList();
+                    _waterPage.ClearPage();
+                    CreateFoodItem(itemPrefab, itemsGrid, stPos, endPos, drinkList, _waterPage, EatableType.Drink);
+                    break;
             }
         }
-
-        private void LoadFridgeDisplay(TechType type, int amount)
+        
+        private void CreateFoodItem(GameObject itemPrefab, GameObject itemsGrid, int stPos, int endPos,List<EatableEntities> list, GridHelper page, EatableType eatableType)
         {
-            QuickLogger.Debug("Load Fridge Display");
+            var grouped = list.GroupBy(x => x.TechType).Select(x => x.First()).ToList();
 
-            GameObject itemDisplay = Instantiate(ARSSeaBreezeFCS32Buildable.ItemPrefab);
+            if (endPos > grouped.Count)
+            {
+                endPos = grouped.Count;
+            }
 
-            itemDisplay.transform.SetParent(_itemsGrid.transform, false);
-            itemDisplay.GetComponentInChildren<Text>().text = "x" + amount;
+            for (int i = stPos; i < endPos; i++)
+            {
+                var techType = grouped[i].TechType;
 
-            ItemButton itemButton = itemDisplay.AddComponent<ItemButton>();
-            itemButton.Type = type;
-            itemButton.Amount = amount;
-            itemButton.OnButtonClick = _mono.AttemptToTakeItem;
-            itemButton.OnInterfaceButton = _mono.OnInterfaceButton;
+                GameObject foodIcon = Instantiate(itemPrefab);
 
-            uGUI_Icon icon = itemDisplay.transform.Find("ItemImage").gameObject.AddComponent<uGUI_Icon>();
-            icon.sprite = SpriteManager.Get(type);
+                if (foodIcon == null || itemsGrid == null)
+                {
+                    if (foodIcon != null)
+                    {
+                        Destroy(foodIcon);
+                    }
+                    return;
+                }
 
-            CalculateNewMaxPages();
+                foodIcon.transform.SetParent(itemsGrid.transform, false);
+
+                foodIcon.GetComponentInChildren<Text>().text = "x" + list.Count(x => x.TechType == techType);
+
+                var itemButton = foodIcon.AddComponent<ItemButton>();
+                itemButton.Type = techType;
+                itemButton.EatableType = eatableType;
+                itemButton.OnButtonClick = _mono.FridgeComponent.RemoveItem;
+
+                uGUI_Icon icon = InterfaceHelpers.FindGameObject(foodIcon, "ItemImage").AddComponent<uGUI_Icon>();
+                icon.sprite = SpriteManager.Get(techType);
+            }
+
+            page.UpdaterPaginator(grouped.Count);
         }
-        #endregion
+        
+        internal void UpdateScreenLabel(string name, NameController nameController)
+        {
+            QuickLogger.Debug($"Label set to {name}", true);
+            _seaBreeze_LBL.text = name;
+        }
+
+        internal void OnContainerUpdate(int numberofItems, int storageLimit)
+        {
+            _itemCounter_LBL.text = $"{numberofItems}/{storageLimit} {ARSSeaBreezeFCS32Buildable.Items()}";
+            UpdateContainers();
+        }
+
+        private void UpdateContainers()
+        {
+            _foodPage.DrawPage();
+            _waterPage.DrawPage();
+            _trashPage.DrawPage();
+        }
     }
 }

@@ -11,15 +11,14 @@ namespace ARS_SeaBreezeFCS32.Mono
         public Action OnBreakerTripped { get; set; }
         public Action OnBreakerReset { get; set; }
 
-        private float EnergyConsumptionPerSecond = 0.2f;
+        private float EnergyConsumptionPerSecond = QPatch.Configuration.PowerUsage;
         private float AvailablePower => _connectedRelay.GetPower();
-
         public Action OnPowerOutage { get; set; }
         public Action OnPowerResume { get; set; }
 
         private ARSolutionsSeaBreezeController _mono;
 
-        public bool NotAllowToOperate => !_mono.IsConstructed || _connectedRelay == null;
+        public bool NotAllowToOperate => !_mono.IsConstructed || _connectedRelay == null || !QPatch.Configuration.UseBasePower;
 
         private PowerRelay _connectedRelay;
         private float _energyToConsume;
@@ -36,9 +35,7 @@ namespace ARS_SeaBreezeFCS32.Mono
             _energyToConsume = EnergyConsumptionPerSecond * DayNightCycle.main.deltaTime;
             bool requiresEnergy = GameModeUtils.RequiresPower();
             bool hasPowerToConsume = !requiresEnergy || (this.AvailablePower >= _energyToConsume);
-
-            //QuickLogger.Debug($"HasPowerToConsume {hasPowerToConsume} || AVP {AvailablePower}|| PrevPowerState {_prevPowerState}");
-
+            
             if (hasPowerToConsume && !_prevPowerState)
             {
                 OnPowerResume?.Invoke();
@@ -54,7 +51,13 @@ namespace ARS_SeaBreezeFCS32.Mono
                 return;
 
             if (requiresEnergy && !GetHasBreakerTripped())
+            {
                 _connectedRelay.ConsumeEnergy(_energyToConsume, out float amountConsumed);
+                QuickLogger.Debug($"Power Consumed: {amountConsumed}");
+            }
+
+            
+            
         }
         #endregion
 

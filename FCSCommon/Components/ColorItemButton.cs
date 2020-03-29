@@ -17,7 +17,7 @@ namespace FCSCommon.Components
         internal Color Color { get; set; }
         internal string BtnName { get; set; }
         private bool _isSelected;
-
+        public Action<bool> OnInterfaceButton { get; set; }
         internal Action<string, object> OnButtonClick;
         private GameObject _hover;
 
@@ -27,7 +27,7 @@ namespace FCSCommon.Components
         public override void OnPointerEnter(PointerEventData eventData)
         {
             base.OnPointerEnter(eventData);
-
+            OnInterfaceButton?.Invoke(true);
             SetHoverVisible();
         }
 
@@ -35,8 +35,8 @@ namespace FCSCommon.Components
         {
 
             base.OnPointerExit(eventData);
-
-            if(!_isSelected)
+            OnInterfaceButton?.Invoke(false);
+            if (!_isSelected)
             {
                 SetHoverVisible(false);
             }

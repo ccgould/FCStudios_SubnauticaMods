@@ -48,6 +48,7 @@ namespace FCSCommon.Components
             if (IsHovered)
             {
                 image.color = HOVER_COLOR;
+                OnInterfaceButton?.Invoke(true);
             }
         }
 
@@ -55,6 +56,7 @@ namespace FCSCommon.Components
         {
             base.OnPointerExit(eventData);
             image.color = STARTING_COLOR;
+            OnInterfaceButton?.Invoke(false);
         }
 
         public override void OnPointerClick(PointerEventData eventData)

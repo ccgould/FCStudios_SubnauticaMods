@@ -142,7 +142,11 @@ namespace GasPodCollector.Buildables
             _prefab.AddComponent<GaspodManager>();
             _prefab.AddComponent<AnimationManager>();
             _prefab.AddComponent<GaspodCollectorController>();
-            _prefab.AddComponent<WorldForces>();
+            var wf = _prefab.AddComponent<WorldForces>();
+            wf.aboveWaterGravity = 9.81f;
+            wf.underwaterDrag = 2f;
+            wf.handleGravity = true;
+            wf.handleDrag = true;
 
         }
 

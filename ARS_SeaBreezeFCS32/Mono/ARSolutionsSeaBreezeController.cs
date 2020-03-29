@@ -1,88 +1,38 @@
-﻿using ARS_SeaBreezeFCS32.Buildables;
+﻿using System;
+using ARS_SeaBreezeFCS32.Buildables;
 using ARS_SeaBreezeFCS32.Configuration;
-using ARS_SeaBreezeFCS32.Interfaces;
-using ARS_SeaBreezeFCS32.Model;
-using FCSCommon.Converters;
-using FCSCommon.Objects;
+using FCSCommon.Controllers;
 using FCSCommon.Utilities;
-using Oculus.Newtonsoft.Json;
-using SMLHelper.V2.Utility;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using FCSCommon.Interfaces;
+using FCSTechFabricator.Abstract;
 using FCSTechFabricator.Components;
-using FCSTechFabricator.Interfaces;
+using FCSTechFabricator.Enums;
+using FCSTechFabricator.Extensions;
+using FCSTechFabricator.Managers;
 using UnityEngine;
 
 namespace ARS_SeaBreezeFCS32.Mono
 {
-    public partial class ARSolutionsSeaBreezeController : MonoBehaviour, IFridgeContainer, IProtoEventListener, IConstructable,IRenameable
+    internal class ARSolutionsSeaBreezeController : FCSController
     {
         #region Private Members
-        private Constructable _buildable;
-        public PrefabIdentifier PrefabId { get; private set; }
 
-        private readonly string _saveDirectory = Path.Combine(SaveUtils.GetCurrentSaveDataDir(), "ARSSeaBreezeFCS32");
-        private string SaveFile => Path.Combine(_saveDirectory, PrefabId.Id + ".json");
-        private ARSolutionsSeaBreezeContainer _fridgeContainer;
-        private ARSolutionsSeaBreezeFreonContainer _freonContainer;
-        private bool _deconstructionAllowed = true;
-        private float _maxTime;
-        private float currentTime;
-        #endregion
-
-        #region  Public Properties
-
-        /// <summary>
-        /// Is the FridgeContainer is full
-        /// </summary>
-        public bool IsFull => _fridgeContainer.IsFull;
-
-        /// <summary>
-        /// Number of Items in the Fridge
-        /// </summary>
-        public int NumberOfItems => _fridgeContainer.NumberOfItems;
-
-        public int FreeSpace => QPatch.Configuration.StorageLimit - NumberOfItems;
-
-        public void OpenStorage() => _fridgeContainer.OpenStorage();
-        public void AttemptToTakeItem(TechType techType) => _fridgeContainer.AttemptToTakeItem(techType);
-
-        /// <summary>
-        /// Items in the fridge
-        /// </summary>
-        List<EatableEntities> IFridgeContainer.FridgeItems => _fridgeContainer?.FridgeItems;
-
-        public Dictionary<TechType, int> TrackedItems => _fridgeContainer?.TrackedItems;
-
-        /// <summary>
-        /// If the gameobject is costructed
-        /// </summary>
-        public bool IsConstructed => _buildable != null && _buildable.constructed;
-
-        public Action<int, int> OnContainerUpdate
-        {
-            get => _fridgeContainer.OnContainerUpdate;
-            set => _fridgeContainer.OnContainerUpdate = value;
-        }
-
-        #endregion
-
-        #region internal Properties
-        //internal ARSolutionsSeaBreezePowerManager PowerManager { get; private set; }
-        internal ARSolutionsSeaBreezeAnimationManager AnimationManager { get; private set; }
-
-        private string _currentTimeHMS { get; set; }
-        internal bool CoolantIsDone => currentTime <= 0;
-        internal ARSolutionsSeaBreezeDisplay Display { get; private set; }
-        internal NameController NameController { get; private set; }
-
-        private bool _runTimer;
-        private bool _doOnce;
-        private bool _initialized;
         private bool _runStartUpOnEnable;
-        private SaveData _savedData;
+        private bool _fromSave;
+        private SaveDataEntry _savedData;
+        private int _dumpStorageSizeXY = 2;
+        #endregion
+
+        #region Public Properties
+
+        internal ColorManager ColorManager { get; private set; }
+        internal Fridge FridgeComponent { get; private set; }
+        internal DumpContainer DumpContainer { get; private set; }
+        internal ARSolutionsSeaBreezePowerManager PowerManager { get; private set; }
+        internal NameController NameController { get; private set; }
+        public Action<string, NameController> OnLabelChanged { get; set; }
+        internal ARSolutionsSeaBreezeDisplay DisplayManager { get; private set; }
+        internal AnimationManager AnimationManager { get; private set; }
+        public int PageStateHash { get; private set; }
 
         #endregion
 
@@ -92,205 +42,197 @@ namespace ARS_SeaBreezeFCS32.Mono
         {
             if (_runStartUpOnEnable)
             {
-                if (!_initialized)
+                if (!IsInitialized)
                 {
-                    Initialized();
-                }
-                
-                if (Display != null)
-                {
-                    Display.Setup(this);
-                    var numberOfItems = _fridgeContainer.NumberOfItems;
-                    Display.OnContainerUpdate(numberOfItems, QPatch.Configuration.StorageLimit);
-                    Display.OnLabelChanged(NameController.GetCurrentName(), NameController);
-                    _runStartUpOnEnable = false;
+                    Initialize();
                 }
 
-
-                if (_savedData != null)
+                if (DisplayManager != null)
                 {
-                    _fridgeContainer.LoadFoodItems(_savedData.FridgeContainer);
-                    //currentTime = _savedData.RemainingTime;
-                    //PowerManager.SetHasBreakerTripped(savedData.HasBreakerTripped);
-                    //_freonContainer.LoadFreon(savedData);
-                    //Display.OnContainerUpdate(_fridgeContainer.NumberOfItems, QPatch.Configuration.Config.StorageLimit);
+                    var numberOfItems = FridgeComponent.NumberOfItems;
+                    DisplayManager.OnContainerUpdate(numberOfItems, QPatch.Configuration.StorageLimit);
+                    DisplayManager.UpdateScreenLabel(NameController.GetCurrentName(), NameController);
+                }
+
+                if (_fromSave)
+                {
+                    if (_savedData == null)
+                    {
+                        ReadySaveData();
+                    }
+
+                    FridgeComponent.LoadSave(_savedData.FridgeContainer);
                     NameController.SetCurrentName(_savedData.UnitName);
-                    Display?.OnLabelChanged(_savedData.UnitName, NameController);
+                    ColorManager.SetColorFromSave(_savedData.BodyColor.Vector4ToColor());
+                    QuickLogger.Info($"Loaded {Mod.FriendlyName}");
                 }
 
                 _runStartUpOnEnable = false;
             }
         }
 
+        #endregion
 
-        private void Awake()
+        private void ReadySaveData()
         {
-
+            QuickLogger.Debug("In OnProtoDeserialize");
+            var prefabIdentifier = GetComponentInParent<PrefabIdentifier>() ?? GetComponent<PrefabIdentifier>();
+            var id = prefabIdentifier?.Id ?? string.Empty;
+            _savedData = Mod.GetSaveData(id);
         }
 
-        private void Initialized()
+        public override void Initialize()
         {
-            //DO NOT REMOVE AWAKE ITS NEEDED BY COOKER
-            PrefabId = GetComponentInParent<PrefabIdentifier>() ?? GetComponent<PrefabIdentifier>();
-            
-            if (PrefabId == null)
+            PageStateHash = Animator.StringToHash("PageState");
+
+            QPatch.Configuration.OnModModeChanged += OnModModeChanged;
+
+            if (PowerManager == null)
             {
-                QuickLogger.Error("Prefab Identifier Component was not found");
+                PowerManager = gameObject.AddComponent<ARSolutionsSeaBreezePowerManager>();
+                PowerManager.Initialize(this);
+                PowerManager.OnBreakerTripped += OnBreakerTripped;
+                PowerManager.OnBreakerReset += OnBreakerReset;
+                PowerManager.OnPowerResume += OnPowerResume;
+                PowerManager.OnPowerOutage += OnPowerOutage;
             }
 
-            if (_buildable == null)
+            if (FridgeComponent == null)
             {
-                _buildable = GetComponentInParent<Constructable>();
+                FridgeComponent = gameObject.AddComponent<Fridge>();
+                FridgeComponent.Initialize(this,QPatch.Configuration.StorageLimit);
+                FridgeComponent.OnContainerUpdate += OnContainerUpdate;
+                FridgeComponent.SetModMode(QPatch.Configuration.ModMode);
             }
 
-            //Power Manager has been disabled in this version
+            if (ColorManager == null)
+            {
+                ColorManager = gameObject.AddComponent<ColorManager>();
+                ColorManager.Initialize(gameObject, ARSSeaBreezeFCS32Buildable.BodyMaterial);
+            }
 
-            //PowerManager = gameObject.EnsureComponent<ARSolutionsSeaBreezePowerManager>();
-            //if (PowerManager != null)
-            //{
-            //    PowerManager.Initialize(this);
-            //    PowerManager.OnPowerOutage += OnPowerOutage;
-            //    PowerManager.OnPowerResume += OnPowerResume;
-            //}
-            //else
-            //{
-            //    QuickLogger.Error("Power Manager Component was not found");
-            //}
-            
-            _fridgeContainer = new ARSolutionsSeaBreezeContainer(this);
-            //_freonContainer = new ARSolutionsSeaBreezeFreonContainer(this);
-            //_freonContainer.OnPDAClosedAction += OnPdaClosedAction;
-            //_freonContainer.OnPDAOpenedAction += OnPdaOpenedAction;
+            if (DumpContainer == null)
+            {
+                DumpContainer = gameObject.AddComponent<DumpContainer>();
+                DumpContainer.Initialize(gameObject.transform, ARSSeaBreezeFCS32Buildable.StorageLabel(),
+                    ARSSeaBreezeFCS32Buildable.ItemNotAllowed(),
+                    ARSSeaBreezeFCS32Buildable.SeaBreezeFull(),
+                    FridgeComponent, _dumpStorageSizeXY, _dumpStorageSizeXY);
+            }
 
             if (NameController == null)
             {
                 NameController = gameObject.EnsureComponent<NameController>();
                 NameController.Initialize(ARSSeaBreezeFCS32Buildable.Submit(), Mod.FriendlyName);
+                NameController.SetCurrentName(Mod.GetNewSeabreezeName());
+                NameController.OnLabelChanged += OnLabelChangedMethod;
             }
             
-            AnimationManager = GetComponentInParent<ARSolutionsSeaBreezeAnimationManager>();
-
             if (AnimationManager == null)
             {
-                QuickLogger.Error("Animation Manager Component was not found");
+                AnimationManager = gameObject.AddComponent<AnimationManager>();
             }
-            
-            QuickLogger.Debug("Setting Name");
 
-            NameController.SetCurrentName(Mod.GetNewSeabreezeName());
-            NameController.OnLabelChanged += OnLabelChangedMethod;
-            //InvokeRepeating("UpdateFridgeCooler", 1, 0.5f);
+            if (DisplayManager == null)
+            {
+                DisplayManager = gameObject.AddComponent<ARSolutionsSeaBreezeDisplay>();
+                DisplayManager.Setup(this);
+            }
 
-            if(Display == null)
-                Display = gameObject.AddComponent<ARSolutionsSeaBreezeDisplay>();
+            IsInitialized = true;
+        }
 
+        private void OnModModeChanged(ModModes modMode)
+        {
+            FridgeComponent.SetModMode(modMode);
+        }
 
-            _initialized = true;
+        private void OnBreakerReset()
+        {
+            QuickLogger.Debug("Breaker Reset", true);
+            FridgeComponent.SetDecay(false);
+        }
 
-            QuickLogger.Info("Initialized");
+        private void OnBreakerTripped()
+        {
+            QuickLogger.Debug("Breaker Tripped", true);
+            FridgeComponent.SetDecay(true);
+        }
+
+        private void OnPowerOutage()
+        {
+            QuickLogger.Debug("Power Outage", true);
+            FridgeComponent.SetDecay(true);
+            AnimationManager.SetIntHash(PageStateHash,0);
+        }
+
+        private void OnPowerResume()
+        {
+            QuickLogger.Debug("Power Resumed", true);
+            if (!PowerManager.GetHasBreakerTripped())
+            {
+                FridgeComponent.SetDecay(false);
+                AnimationManager.SetIntHash(PageStateHash, 1);
+            }
+        }
+
+        internal void ToggleBreaker()
+        {
+            PowerManager.TogglePower();
+        }
+
+        private void OnContainerUpdate(int arg1, int arg2)
+        {
+            DisplayManager.OnContainerUpdate(arg1,arg2);
         }
 
         private void OnLabelChangedMethod(string arg1, NameController arg2)
-        { 
-            OnLabelChanged?.Invoke(arg1,arg2);
-        }
-
-
-        private void Update()
         {
-            if (!_initialized) return;
-
-
-            //if (!Mathf.Approximately(currentTime, 0))
-            //{
-            //    UpdateTimer();
-            //    UpdateDisplayTimer(_currentTimeHMS);
-            //}
-            //else
-            //{
-            //    if (_freonContainer.CheckIfFreonAvailable()) return;
-            //    //QuickLogger.Debug("Setting timer to zero", true);
-            //    UpdateDisplayTimer(TimeConverters.SecondsToHMS(0));
-            //}
+            DisplayManager.UpdateScreenLabel(arg1,arg2);
         }
-
-        private void OnDestroy()
+        
+        public override void OnProtoSerialize(ProtobufSerializer serializer)
         {
-            if (!_initialized) return;
-            //PowerManager.OnPowerOutage -= OnPowerOutage;
-            //PowerManager.OnPowerResume -= OnPowerResume;
-            //_freonContainer.OnPDAClosedAction -= OnPdaClosedAction;
-            //_freonContainer.OnPDAOpenedAction -= OnPdaOpenedAction;
+            QuickLogger.Debug("In OnProtoSerialize");
+            if (!Mod.IsSaving())
+            {
+                QuickLogger.Info($"Saving {Mod.FriendlyName}");
+                Mod.Save();
+                QuickLogger.Info($"Saved {Mod.FriendlyName}");
+            }
         }
 
-        #endregion
-
-        #region Internal Methods
-        internal void UpdateDisplayTimer(string filterRemainingTime)
+        public override void OnProtoDeserialize(ProtobufSerializer serializer)
         {
-            if (Display == null) return;
-            Display.UpdateTimer(filterRemainingTime);
+            _fromSave = true;
         }
 
-        internal void StartTimer()
-        {
-            _runTimer = true;
-        }
-
-        internal void StopTimer()
-        {
-            _runTimer = false;
-        }
-
-        internal void ResetTime()
-        {
-            currentTime = _maxTime;
-        }
-
-        internal void SetMaxTime(float time)
-        {
-            _maxTime = time;
-        }
-
-        internal void InitializeTimer(float freonTime)
-        {
-            SetMaxTime(freonTime);
-            ResetTime();
-            StartTimer();
-        }
-
-        #endregion
-
-        #region Public Methods  
-
-        public bool CanDeconstruct(out string reason)
+        public override bool CanDeconstruct(out string reason)
         {
             reason = string.Empty;
-            if (_deconstructionAllowed) return true;
-            reason = "Sea Breeze is not empty";
+
+            if (FridgeComponent == null) return true;
+
+            if (FridgeComponent.IsEmpty())
+            {
+                return true;
+            }
+
+            reason = ARSSeaBreezeFCS32Buildable.NotEmpty();
             return false;
         }
 
-        public void OnConstructedChanged(bool constructed)
+        public override void OnConstructedChanged(bool constructed)
         {
-            QuickLogger.Debug("OnConstructionChanged");
+            IsConstructed = constructed;
+
             if (constructed)
             {
-                QuickLogger.Debug("Constructed");
-
                 if (isActiveAndEnabled)
                 {
-                    if (!_initialized)
+                    if (!IsInitialized)
                     {
-                        Initialized();
-                    }
-                    
-                    if (Display != null)
-                    {
-                        Display.Setup(this);
-                        Display.OnContainerUpdate(_fridgeContainer.NumberOfItems, QPatch.Configuration.StorageLimit);
-                        Display.OnLabelChanged(NameController.GetCurrentName(), NameController);
-                        _runStartUpOnEnable = false;
+                        Initialize();
                     }
                 }
                 else
@@ -300,205 +242,26 @@ namespace ARS_SeaBreezeFCS32.Mono
             }
         }
 
-        public int GetTechTypeAmount(TechType techType)
+        internal void Save(SaveData saveData)
         {
-            return _fridgeContainer.GetTechTypeAmount(techType);
-        }
-        
-        /// <summary>
-        /// Opens the filter container
-        /// </summary>
-        public void OpenFilterContainer()
-        {
-            _freonContainer.OpenStorage();
-        }
+            var prefabIdentifier = GetComponent<PrefabIdentifier>();
+            var id = prefabIdentifier.Id;
 
-        public string GetPrefabID()
-        {
-            if(PrefabId == null)
-                PrefabId = GetComponentInParent<PrefabIdentifier>() ?? GetComponent<PrefabIdentifier>();
-
-            return PrefabId?.Id;
-        }
-
-        public bool AddItemToFridge(InventoryItem item, out string reason)
-        {
-            reason = string.Empty;
-            if (_fridgeContainer != null)
+            if (_savedData == null)
             {
-                if (!_fridgeContainer.IsFull)
-                {
-                    if (!_fridgeContainer.IsAllowedToAdd(item.item, true))
-                    {
-                        reason = ARSSeaBreezeFCS32Buildable.ItemNotAllowed();
-                        return false;
-                    }
-                    _fridgeContainer.AddItemFromExternal(item);
-                }
-                else
-                {
-                    reason = ARSSeaBreezeFCS32Buildable.SeaBreezeFull();
-                    return false;
-                }
+                _savedData = new SaveDataEntry();
             }
 
-            return true;
+            _savedData.ID = id;
+            _savedData.BodyColor = ColorManager.GetColor().ColorToVector4();
+            _savedData.UnitName = NameController.GetCurrentName();
+            _savedData.FridgeContainer = FridgeComponent.Save();
+            saveData.Entries.Add(_savedData);
         }
 
-        /// <summary>
-        /// Check to see if the amount if items <see cref="int"/> can be stored in the SeaBreeze Unit.
-        /// </summary>
-        /// <param name="amount">The amount of items to check against the container</param>
-        /// <returns></returns>
-        public bool CanBeStored(int amount)
-        {
-            return _fridgeContainer != null && _fridgeContainer.HasRoomFor(amount);
-        }
-
-        #endregion
-
-        #region Private Methods
-        private void OnPdaOpenedAction()
-        {
-            //Disabled because filters where removed from the mod
-            //AnimationManager.ToggleDriveState();
-        }
-
-        internal void UpdateFridgeCooler()
-        {
-            //if (_freonContainer == null) return;
-
-            //QuickLogger.Debug($"GOS {_freonContainer.GetOpenState()} || GIPA {PowerManager.GetIsPowerAvailable()} || CID {CoolantIsDone}");
-
-            //if (!_freonContainer.GetOpenState() && PowerManager.GetIsPowerAvailable() &&
-            //    !PowerManager.GetHasBreakerTripped() && !CoolantIsDone)
-            //{
-            //    //_fridgeContainer.CoolItems();
-            //    StartTimer();
-            //    return;
-            //}
-
-            //_fridgeContainer.DecayItems();
-            //StopTimer();
-        }
-
-        private void OnPdaClosedAction()
-        {
-            //Disabled because filters where removed from the mod
-            //AnimationManager.ToggleDriveState();
-        }
-
-        private void OnPowerResume()
-        {
-            //QuickLogger.Debug("In OnPowerResume", true);
-            //UpdateFridgeCooler();
-        }
-
-        private void OnPowerOutage()
-        {
-            //QuickLogger.Debug("In OnPowerOutage", true);
-            //UpdateFridgeCooler();
-        }
-
-        private void UpdateTimer()
-        {
-            if (!_runTimer) return;
-
-            if (currentTime > 0f)
-            {
-                currentTime -= DayNightCycle.main.deltaTime;
-                _currentTimeHMS = TimeConverters.SecondsToHMS(currentTime);
-            }
-            else if (currentTime <= 0f && !_doOnce)
-            {
-                _doOnce = true;
-                _currentTimeHMS = TimeConverters.SecondsToHMS(0);
-                currentTime = 0f;
-            }
-        }
-        #endregion
-
-        #region IPhotoTreeEventListener
-        public void OnProtoSerialize(ProtobufSerializer serializer)
-        {
-            QuickLogger.Debug($"Saving {PrefabId.Id} Data");
-
-            if (!Directory.Exists(_saveDirectory))
-                Directory.CreateDirectory(_saveDirectory);
-
-            var saveData = new SaveData
-            {
-                //HasBreakerTripped = PowerManager.GetHasBreakerTripped(),
-                FridgeContainer = _fridgeContainer.GetSaveData(),
-                RemainingTime = currentTime,
-                UnitName = NameController.GetCurrentName()
-            };
-
-            var output = JsonConvert.SerializeObject(saveData, Formatting.Indented);
-            File.WriteAllText(SaveFile, output);
-
-            QuickLogger.Debug($"Saved {PrefabId.Id} Data");
-        }
-
-        public void OnProtoDeserialize(ProtobufSerializer serializer)
-        {
-            QuickLogger.Debug("// ****************************** Load Data *********************************** //");
-
-            PrefabId = GetComponentInParent<PrefabIdentifier>() ?? GetComponent<PrefabIdentifier>();
-
-            if (PrefabId == null)
-            {
-                QuickLogger.Error("Prefab Identifier Component was not found");
-            }
-
-            if (PrefabId != null)
-            {
-                QuickLogger.Info($"Loading SeaBreezeFCS32 {PrefabId.Id}");
-
-                if (File.Exists(SaveFile))
-                {
-                    string savedDataJson = File.ReadAllText(SaveFile).Trim();
-
-                    //LoadData
-                    _savedData = JsonConvert.DeserializeObject<SaveData>(savedDataJson);
-
-                }
-            }
-            else
-            {
-                QuickLogger.Error("PrefabIdentifier is null");
-            }
-
-            QuickLogger.Debug("// ****************************** Loaded Data *********************************** //");
-        }
-        #endregion
-
-        internal void SetDeconstructionAllowed(bool value)
-        {
-            _deconstructionAllowed = value;
-        }
-
-        public void RenameDevice(string newName)
-        {
-            if (NameController != null)
-            {
-                NameController.SetCurrentName(newName);
-            }
-        }
-
-        public string GetDeviceName()
+        public override string GetName()
         {
             return NameController != null ? NameController.GetCurrentName() : string.Empty;
         }
-
-        public void SetNameControllerTag(object obj)
-        {
-            if (NameController != null)
-            {
-                NameController.Tag = obj;
-            }
-        }
-
-        public Action<string, NameController> OnLabelChanged { get; set; }
     }
 }

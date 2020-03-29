@@ -1,11 +1,11 @@
 ﻿using AE.SeaCooker.Buildable;
 using AE.SeaCooker.Mono;
 using ARS_SeaBreezeFCS32.Mono;
-using FCSCommon.Objects;
 using FCSCommon.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using FCSTechFabricator.Objects;
 using UnityEngine;
 
 namespace AE.SeaCooker.Managers

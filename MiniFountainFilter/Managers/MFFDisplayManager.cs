@@ -107,10 +107,12 @@ namespace AE.MiniFountainFilter.Managers
             }
             #endregion
 
+           
+
             var takeWaterResult = InterfaceHelpers.CreateButton(home, "Button_1", "takeWaterBTN", InterfaceButtonMode.Background,
                 _startColor, _hoverColor, OnButtonClick, out var takeWaterButton);
             takeWaterButton.TextLineOne = "Take Water";
-            takeWaterButton.OnInterfaceButton = SetOnInterfaceButton;
+
             if (!takeWaterResult)
             {
                 return false;
@@ -120,7 +122,7 @@ namespace AE.MiniFountainFilter.Managers
             var colorPickerResult = InterfaceHelpers.CreateButton(home, "Paint_BTN", "colorPickerBTN", InterfaceButtonMode.Background,
                 OnButtonClick, out var colorPickerButton);
             colorPickerButton.TextLineOne = "Color Picker Page";
-            colorPickerButton.OnInterfaceButton = SetOnInterfaceButton;
+
 
             if (!colorPickerResult)
             {
@@ -130,7 +132,7 @@ namespace AE.MiniFountainFilter.Managers
             var fuelTankResult = InterfaceHelpers.CreateButton(home, "Button_2", "waterContainerBTN", InterfaceButtonMode.Background,
                 _startColor, _hoverColor, OnButtonClick, out var fuelTankButton);
             fuelTankButton.TextLineOne = !QPatch.Configuration.AutoGenerateMode ? "Take Water Bottle" : "Open Water Container";
-            fuelTankButton.OnInterfaceButton = SetOnInterfaceButton;
+
 
             if (!fuelTankResult)
             {
@@ -149,7 +151,7 @@ namespace AE.MiniFountainFilter.Managers
 
             var nextBTN = InterfaceHelpers.CreatePaginator(colorPicker, "NextPage", 1, _colorPage.ChangeColorPageBy, out var nextButton);
             nextButton.TextLineOne = "Next Page";
-            nextButton.OnInterfaceButton = SetOnInterfaceButton;
+
 
             if (!nextBTN)
             {
@@ -158,7 +160,7 @@ namespace AE.MiniFountainFilter.Managers
 
             var prevBTN = InterfaceHelpers.CreatePaginator(colorPicker, "PrevPage", -1, _colorPage.ChangeColorPageBy, out var prevButton);
             prevButton.TextLineOne = "Previous Page";
-            prevButton.OnInterfaceButton = SetOnInterfaceButton;
+
 
 
             if (!prevBTN)
@@ -334,6 +336,11 @@ namespace AE.MiniFountainFilter.Managers
         private void SetOnInterfaceButton(bool value)
         {
             _onInterfaceButton = value;
+        }
+
+        public void AboveWaterMessage()
+        {
+            _mono.AnimationManager.SetIntHash(_page, 3);
         }
     }
 }

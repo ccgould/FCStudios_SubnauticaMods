@@ -50,8 +50,7 @@ namespace FCS_DeepDriller
                 Configuration.Convert();
 
                 OptionsPanelHandler.RegisterModOptions(new Options());
-
-
+                
                 AddItemsToTechFabricator();
 
                 FCSDeepDrillerBuildable.PatchHelper();

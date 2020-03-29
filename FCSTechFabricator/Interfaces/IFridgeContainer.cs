@@ -1,8 +1,8 @@
-﻿using FCSCommon.Objects;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using FCSTechFabricator.Objects;
 
-namespace ARS_SeaBreezeFCS32.Interfaces
+namespace FCSTechFabricator.Interfaces
 {
     internal interface IFridgeContainer
     {

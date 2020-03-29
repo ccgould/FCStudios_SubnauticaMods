@@ -13,6 +13,7 @@
     <Game>$(Configuration.split(_)[0])</Game>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Subnautica_Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -22,6 +23,7 @@
     <DefineConstants>DEBUG;TRACE;SUBNAUTICA</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Subnautica_Release|AnyCPU' ">
     <DebugType>none</DebugType>
@@ -30,6 +32,7 @@
     <DefineConstants>TRACE;SUBNAUTICA</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'BelowZero_Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -39,6 +42,7 @@
     <DefineConstants>DEBUG;TRACE;BELOWZERO</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'BelowZero_Release|AnyCPU' ">
     <DebugType>none</DebugType>
@@ -47,6 +51,7 @@
     <DefineConstants>TRACE;BELOWZERO</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="0Harmony-1.2.0.1, Version=1.2.0.1, Culture=neutral, processorArchitecture=MSIL">
@@ -114,25 +119,36 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Abstract\FCSController.cs" />
     <Compile Include="Components\CraftingTab.cs" />
+    <Compile Include="Components\DumpContainer.cs" />
     <Compile Include="Components\FCSTechFabricatorTag.cs" />
     <Compile Include="Components\InternalBatteryController.cs" />
     <Compile Include="Components\NameController.cs" />
+    <Compile Include="Components\Fridge.cs" />
     <Compile Include="Configuration\Mod.cs" />
     <Compile Include="Craftables\FCSKit.cs" />
     <Compile Include="Craftables\FCSModule.cs" />
+    <Compile Include="Enums\EatableType.cs" />
+    <Compile Include="Enums\FoodPileType.cs" />
+    <Compile Include="Enums\ModModes.cs" />
     <Compile Include="Example.cs" />
     <Compile Include="Extensions\ColorExtensions.cs" />
+    <Compile Include="Extensions\VectorExtenstions.cs" />
     <Compile Include="FcAssetBundlesService.cs" />
     <Compile Include="FcCraftable.cs" />
     <Compile Include="FcCraftingTab.cs" />
     <Compile Include="FcTechFabricator.cs" />
     <Compile Include="FcTechFabricatorService.cs" />
     <Compile Include="Initializer.cs" />
+    <Compile Include="Interfaces\IFridgeContainer.cs" />
     <Compile Include="Interfaces\IRenameable.cs" />
     <Compile Include="Managers\ColorManager.cs" />
     <Compile Include="Objects\ColorList.cs" />
     <Compile Include="Objects\ColorVec4.cs" />
+    <Compile Include="Objects\EatableEntities.cs" />
+    <Compile Include="Objects\FridgeComponentSave.cs" />
+    <Compile Include="Objects\Vec3.cs" />
     <Compile Include="Patchers\Inventory_Patchers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

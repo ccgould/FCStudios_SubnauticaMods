@@ -32,5 +32,15 @@ namespace FCSTechFabricator.Extensions
             return new Color(vec4.R, vec4.G, vec4.B, vec4.A);
         }
 
+        /// <summary>
+        /// Converts a <see cref="Vec3"/> to a <see cref="Vector3"/>
+        /// </summary>
+        /// <param name="vec3"></param>
+        /// <returns></returns>
+        public static Color Vec3ToColor(this Vec3 vec3)
+        {
+            return new Color(vec3.X, vec3.Y, vec3.Z);
+        }
+
     }
 }

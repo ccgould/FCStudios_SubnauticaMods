@@ -209,6 +209,9 @@ namespace GasPodCollector.Configuration
         [JsonProperty] internal bool PlaySFX { get; set; } = true;
         [JsonProperty] internal int StorageLimit { get; set; } = 48;
         [JsonProperty] internal float PowerUsage { get; set; } = 0.1f;
+        [JsonIgnore] public float CollectorMass => 600f;
+        [JsonIgnore] public float CollectorEmptyMass => 400f;
+        [JsonIgnore] public float CollectorFullMass => 1200f;
     }
 
     internal class ConfigFile

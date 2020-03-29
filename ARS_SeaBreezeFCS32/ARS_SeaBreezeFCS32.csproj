@@ -134,16 +134,9 @@
     <Compile Include="Display\OnScreenButton.cs" />
     <Compile Include="Display\PaginatorButton.cs" />
     <Compile Include="Enum\FridgeCoolingState.cs" />
-    <Compile Include="Interfaces\IFridgeContainer.cs" />
-    <Compile Include="Model\ARSolutionsSeabreezeConfiguration.cs" />
-    <Compile Include="Model\ARSolutionsSeaBreezeContainer.cs" />
-    <Compile Include="Model\ARSolutionsSeaBreezeFreonContainer.cs" />
-    <Compile Include="Model\Freon.cs" />
-    <Compile Include="Model\SaveData.cs" />
-    <Compile Include="Mono\ARSolutionsSeaBreezeAnimationManager.cs" />
+    <Compile Include="Configuration\SaveData.cs" />
     <Compile Include="Mono\ARSolutionsSeaBreezeController.cs" />
     <Compile Include="Mono\ARSolutionsSeaBreezeDisplay.cs" />
-    <Compile Include="Mono\ARSolutionsSeaBreezePlayerInteraction.cs" />
     <Compile Include="Mono\ARSolutionsSeaBreezePowerManager.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -157,6 +150,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Abstract\" />
+    <Folder Include="Interfaces\" />
   </ItemGroup>
   <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
