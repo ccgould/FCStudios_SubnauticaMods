@@ -64,6 +64,7 @@ namespace ARS_SeaBreezeFCS32.Mono
                         ReadySaveData();
                     }
 
+                    PowerManager.LoadSave(_savedData.PowercellData);
                     FridgeComponent.LoadSave(_savedData.FridgeContainer);
                     NameController.SetCurrentName(_savedData.UnitName);
                     ColorManager.SetColorFromSave(_savedData.BodyColor.Vector4ToColor());
@@ -270,6 +271,7 @@ namespace ARS_SeaBreezeFCS32.Mono
             _savedData.BodyColor = ColorManager.GetColor().ColorToVector4();
             _savedData.UnitName = NameController.GetCurrentName();
             _savedData.FridgeContainer = FridgeComponent.Save();
+            _savedData.PowercellData = PowerManager.Save();
             saveData.Entries.Add(_savedData);
         }
 

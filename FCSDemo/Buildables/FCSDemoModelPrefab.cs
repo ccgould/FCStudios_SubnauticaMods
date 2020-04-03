@@ -69,7 +69,5 @@ namespace FCSDemo.Buildables
             MaterialHelpers.ApplyGlassShaderTemplate(prefab.FindChild("model").FindChild("HydroponicHarvesterGlass"),Mod.ClassID);
             #endregion
         }
-
-
     }
 }

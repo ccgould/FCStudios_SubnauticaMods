@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using ARS_SeaBreezeFCS32.Model;
 using FCSCommon.Objects;
 using FCSTechFabricator.Objects;
 using Oculus.Newtonsoft.Json;
@@ -14,6 +15,7 @@ namespace ARS_SeaBreezeFCS32.Configuration
         [JsonProperty] internal bool HasBreakerTripped { get; set; }
         [JsonProperty] internal string UnitName { get; set; }
         [JsonProperty] internal ColorVec4 BodyColor { get; set; }
+        [JsonProperty] internal PowercellData PowercellData { get; set; }
     }
     
     [Serializable]

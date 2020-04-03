@@ -7,10 +7,12 @@ using FCSCommon.Utilities;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using FCSCommon.Extensions;
 using FCSTechFabricator.Abstract;
 using FCSTechFabricator.Components;
 using FCSTechFabricator.Extensions;
 using FCSTechFabricator.Managers;
+using SMLHelper.V2.Handlers;
 using UnityEngine;
 using AnimationManager = AE.SeaCooker.Managers.AnimationManager;
 using AudioManager = AE.SeaCooker.Managers.AudioManager;
@@ -40,6 +42,7 @@ namespace AE.SeaCooker.Mono
         private bool _runStartUpOnEnable;
         private SaveDataEntry _savedData;
         private bool _fromSave;
+        private TechType _seabreezeTechType => _seabreezeTechType == TechType.None ? "ARSSeaBreezeFCS32".ToTechType() : _seabreezeTechType;
         internal FCSConnectableDevice SelectedSeaBreeze { get; set; }
         internal PlayerInteraction PlayerInteraction { get; private set; }
 
@@ -330,11 +333,14 @@ namespace AE.SeaCooker.Mono
             //Check if there is a base connected
             if (_habitat != null)
             {
-                var seaBreezeList = _habitat.GetComponentsInChildren<FCSConnectableDevice>().ToList();
+                var connectableDevices = _habitat.GetComponentsInChildren<FCSConnectableDevice>().ToList();
 
-                foreach (var seaBreeze in seaBreezeList)
+                foreach (var device in connectableDevices)
                 {
-                    SeaBreezes.Add(seaBreeze.GetPrefabIDString(), seaBreeze);
+                    if (device.GetTechType() == _seabreezeTechType)
+                    {
+                        SeaBreezes.Add(device.GetPrefabIDString(), device);
+                    }
                 }
             }
         }

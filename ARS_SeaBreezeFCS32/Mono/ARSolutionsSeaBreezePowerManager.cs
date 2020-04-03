@@ -1,6 +1,7 @@
 ﻿using FCSCommon.Utilities;
 using System;
 using System.Collections;
+using ARS_SeaBreezeFCS32.Model;
 using UnityEngine;
 
 namespace ARS_SeaBreezeFCS32.Mono
@@ -12,17 +13,21 @@ namespace ARS_SeaBreezeFCS32.Mono
         public Action OnBreakerReset { get; set; }
 
         private float EnergyConsumptionPerSecond = QPatch.Configuration.PowerUsage;
-        private float AvailablePower => _connectedRelay.GetPower();
+        private float AvailablePower => _connectedRelay.GetPower() + _powercellData.GetCharge();
         public Action OnPowerOutage { get; set; }
         public Action OnPowerResume { get; set; }
+        private PowercellData _powercellData;
+
+        private const float chargeSpeed = 0.005f;
 
         private ARSolutionsSeaBreezeController _mono;
 
-        public bool NotAllowToOperate => !_mono.IsConstructed || _connectedRelay == null || !QPatch.Configuration.UseBasePower;
+        public bool NotAllowToOperate => !_mono.IsConstructed || _connectedRelay == null || !QPatch.Configuration.UseBasePower || _powercellData == null;
 
         private PowerRelay _connectedRelay;
         private float _energyToConsume;
         private bool _prevPowerState;
+        private float _chargeTimer = 5f;
 
         private bool IsPowerAvailable => AvailablePower > _energyToConsume;
 
@@ -31,8 +36,9 @@ namespace ARS_SeaBreezeFCS32.Mono
         {
             if (this.NotAllowToOperate)
                 return;
-
+            
             _energyToConsume = EnergyConsumptionPerSecond * DayNightCycle.main.deltaTime;
+            var batteryChargePull = DayNightCycle.main.deltaTime * chargeSpeed * _powercellData.GetCapacity();
             bool requiresEnergy = GameModeUtils.RequiresPower();
             bool hasPowerToConsume = !requiresEnergy || (this.AvailablePower >= _energyToConsume);
             
@@ -47,17 +53,42 @@ namespace ARS_SeaBreezeFCS32.Mono
                 _prevPowerState = false;
             }
 
-            if (!hasPowerToConsume)
-                return;
+            if (!hasPowerToConsume) return;
 
-            if (requiresEnergy && !GetHasBreakerTripped())
+
+            if (requiresEnergy)
             {
-                _connectedRelay.ConsumeEnergy(_energyToConsume, out float amountConsumed);
-                //QuickLogger.Debug($"Power Consumed: {amountConsumed}");
-            }
+                if (_connectedRelay.GetPower() <= _energyToConsume)
+                {
+                    _powercellData.RemoveCharge(_energyToConsume);
+                    return;
+                }
 
-            
-            
+                if (!GetHasBreakerTripped())
+                {
+                    _connectedRelay.ConsumeEnergy(_energyToConsume, out float amountConsumed);
+                }
+
+
+                if (!_powercellData.IsFull())
+                {
+                    if (_connectedRelay.GetPower() >= batteryChargePull)
+                    {
+                        _chargeTimer -= Time.deltaTime;
+
+                        if (_chargeTimer < 0)
+                        {
+                            _connectedRelay.ConsumeEnergy(batteryChargePull, out float amountPConsumed);
+                            _powercellData.AddCharge(amountPConsumed);
+                            QuickLogger.Debug($"Charging Battery: {amountPConsumed} units", true);
+                            _chargeTimer = 5f;
+                        }
+                    }
+                }
+                //QuickLogger.Debug($"Power Consumed: {amountConsumed}");
+
+                _mono.DisplayManager.UpdateVisuals(_powercellData);
+            }
         }
         #endregion
 
@@ -102,6 +133,8 @@ namespace ARS_SeaBreezeFCS32.Mono
         internal void Initialize(ARSolutionsSeaBreezeController mono)
         {
             _mono = mono;
+            _powercellData = new PowercellData();
+            _powercellData.Initialize(200,200);
             StartCoroutine(UpdatePowerRelay());
         }
 
@@ -129,7 +162,7 @@ namespace ARS_SeaBreezeFCS32.Mono
             QuickLogger.Debug($"HasBreakerTripped: {_hasBreakerTripped}", true);
         }
 
-        public bool GetIsPowerAvailable()
+        internal bool GetIsPowerAvailable()
         {
             return _connectedRelay != null && IsPowerAvailable;
         }
@@ -137,6 +170,19 @@ namespace ARS_SeaBreezeFCS32.Mono
         private void OnDestroy()
         {
 
+        }
+
+        internal void LoadSave(PowercellData powercellData)
+        {
+            if (powercellData != null)
+            {
+                _powercellData = powercellData;
+            }
+        }
+
+        internal PowercellData Save()
+        {
+            return _powercellData; 
         }
     }
 }

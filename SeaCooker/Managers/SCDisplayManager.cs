@@ -112,7 +112,6 @@ namespace AE.SeaCooker.Managers
 
                 case "SeaBreezeItem":
                     var seaBreeze = (Color)tag;
-                    // QuickLogger.Debug($"{_mono.gameObject.name} Color Changed to {color.ToString()}", true);
                     _mono.ColorManager.ChangeColor(seaBreeze);
                     break;
 
@@ -526,29 +525,6 @@ namespace AE.SeaCooker.Managers
             }
 
             _seaBreezeGrid.UpdaterPaginator(items.Count);
-
-
-            //for (int i = _seaBreezeGrid.StartingPosition; i < _seaBreezeGrid.EndingPosition; i++)
-            //{
-            //    var name = _mono.SeaBreezes.Keys.ElementAt(i);
-            //    var seaBreeze = _mono.SeaBreezes.Values.ElementAt(i);
-
-            //    GameObject itemDisplay = Instantiate(itemPrefab);
-
-            //    itemDisplay.transform.SetParent(itemsGrid.transform, false);
-            //    var text = itemDisplay.transform.Find("Text").GetComponent<Text>();
-            //    text.text = name;
-
-            //    var itemButton = itemDisplay.AddComponent<InterfaceButton>();
-            //    itemButton.ButtonMode = InterfaceButtonMode.TextColor;
-            //    itemButton.Tag = seaBreeze;
-            //    itemButton.TextComponent = text;
-            //    itemButton.OnButtonClick += OnButtonClick;
-            //    itemButton.BtnName = "SeaBreeze";
-
-            //    QuickLogger.Debug($"Added SeaBreeze {name}");
-
-            //}
         }
         
         private void OnLabelChanged(string obj, NameController nameController)
@@ -643,12 +619,7 @@ namespace AE.SeaCooker.Managers
             //_healthPreloaderlbl.text = $"{Mathf.RoundToInt(_mono.HealthManager.GetHealthPercentageFull())}%";
             //_powerUsage.text = $"{OxStationBuildable.PowerUsage()}: <color=#ff0000ff>{_mono.PowerManager.GetPowerUsage()}</color> {OxStationBuildable.PerMinute()}.";
         }
-
-        public override void DrawPage(int page)
-        {
-            throw new NotImplementedException();
-        }
-
+        
         public override void ClearPage()
         {
             throw new NotImplementedException();
@@ -662,11 +633,6 @@ namespace AE.SeaCooker.Managers
         public override IEnumerator PowerOff()
         {
             throw new NotImplementedException();
-        }
-
-        private void UpdateCookingInfo()
-        {
-
         }
 
         public override void ItemModified(TechType item, int newAmount = 0)

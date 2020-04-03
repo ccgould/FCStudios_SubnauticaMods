@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ARS_SeaBreezeFCS32.Buildables;
 using ARS_SeaBreezeFCS32.Display;
+using ARS_SeaBreezeFCS32.Model;
 using FCSCommon.Abstract;
 using FCSCommon.Enums;
 using FCSCommon.Helpers;
@@ -27,6 +28,11 @@ namespace ARS_SeaBreezeFCS32.Mono
         private GridHelper _foodPage;
         private GridHelper _waterPage;
         private GridHelper _trashPage;
+        private Color colorEmpty = new Color(1f, 0f, 0f, 1f);
+        private Color colorHalf = new Color(1f, 1f, 0f, 1f);
+        private Color colorFull = new Color(0f, 1f, 0f, 1f);
+        private Text _batteryPercent;
+        private Image _batteryFill;
 
         internal void Setup(ARSolutionsSeaBreezeController mono)
         {
@@ -100,6 +106,14 @@ namespace ARS_SeaBreezeFCS32.Mono
 
                 #region Home
                 var home = InterfaceHelpers.FindGameObject(canvasGameObject, "HomeScreen");
+                #endregion
+
+                #region Battery
+
+                var homeBattery = InterfaceHelpers.FindGameObject(home, "Battery");
+                _batteryPercent = InterfaceHelpers.FindGameObject(homeBattery, "Text").GetComponent<Text>();
+                _batteryFill = InterfaceHelpers.FindGameObject(homeBattery, "Fill").GetComponent<Image>();
+
                 #endregion
 
                 #region Food
@@ -321,6 +335,49 @@ namespace ARS_SeaBreezeFCS32.Mono
         {
             _itemCounter_LBL.text = $"{numberofItems}/{storageLimit} {ARSSeaBreezeFCS32Buildable.Items()}";
             UpdateContainers();
+        }
+
+        internal void UpdateVisuals(PowercellData data)
+        {
+            var charge = data.GetCharge() < 1 ? 0f : data.GetCapacity();
+
+            float percent = charge / data.GetCapacity();
+
+            QuickLogger.Debug($"Percent: {percent}");
+            
+            if (_batteryPercent != null)
+            {
+                _batteryPercent.text = ((data.GetCharge() < 0f) ? Language.main.Get("ChargerSlotEmpty") : $"{Mathf.CeilToInt(percent * 100)}%");
+            }
+
+            if (_batteryFill != null)
+            {
+                if (data.GetCharge() >= 0f)
+                {
+                    Color value = (percent >= 0.5f) ? Color.Lerp(this.colorHalf, this.colorFull, 2f * percent - 1f) : Color.Lerp(this.colorEmpty, this.colorHalf, 2f * percent);
+                    _batteryFill.color = value;
+                    _batteryFill.fillAmount = percent;
+                }
+                else
+                {
+                    _batteryFill.color = colorEmpty;
+                    _batteryFill.fillAmount = 0f;
+                }
+            }
+        }
+
+        internal void EmptyBatteryVisual()
+        {
+            if (_batteryPercent != null)
+            {
+                _batteryPercent.text = Language.main.Get("ChargerSlotEmpty");
+            }
+
+            if (_batteryFill != null)
+            {
+                _batteryFill.color = colorEmpty;
+                _batteryFill.fillAmount = 0f;
+            }
         }
 
         private void UpdateContainers()
