@@ -1,5 +1,6 @@
 ﻿using System;
 using FCSCommon.Interfaces;
+using FCSTechFabricator.Components;
 using UnityEngine;
 
 namespace FCSTechFabricator.Abstract
@@ -11,26 +12,7 @@ namespace FCSTechFabricator.Abstract
 
         public virtual bool IsConstructed { get; set; }
         public bool IsInitialized { get; set; }
-
-        public virtual void OnAddItemEvent(InventoryItem item) { }
-
-        public virtual void OnRemoveItemEvent(InventoryItem item) { }
         
-        public virtual string GetPrefabIDString()
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual void OnDestroy()
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual string GetName()
-        {
-            return String.Empty;
-        }
-
         public virtual void UpdateScreen(){}
         public virtual void OnProtoSerialize(ProtobufSerializer serializer)
         {

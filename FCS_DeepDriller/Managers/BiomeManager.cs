@@ -126,7 +126,7 @@ namespace FCS_DeepDriller.Managers
                     return null;
                 }
                 
-                QuickLogger.Debug($"Biome Found: {currentBiome}");
+                //QuickLogger.Debug($"Biome Found: {currentBiome}");
 
                 FindMatchingBiome(currentBiome, out var matchingBiome);
 

@@ -53,7 +53,7 @@ namespace ARS_SeaBreezeFCS32.Mono
             if (requiresEnergy && !GetHasBreakerTripped())
             {
                 _connectedRelay.ConsumeEnergy(_energyToConsume, out float amountConsumed);
-                QuickLogger.Debug($"Power Consumed: {amountConsumed}");
+                //QuickLogger.Debug($"Power Consumed: {amountConsumed}");
             }
 
             

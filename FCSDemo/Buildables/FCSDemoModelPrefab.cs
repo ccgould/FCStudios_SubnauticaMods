@@ -15,9 +15,10 @@ namespace FCSDemo.Buildables
     {
         private static GameObject _prefab;
         internal static GameObject ColorItemPrefab { get; set; }
-        internal static string BodyMaterial => $"{Mod.ClassID}_M_COL";
-        internal static string DetailMaterial => $"{Mod.ClassID}_D_COL";
-        internal static string LightsMaterial => $"{Mod.ClassID}Lights_D_COL";
+        internal static string BodyMaterial => $"{Mod.ClassID}_COL";
+        internal static string SpecTexture => $"{Mod.ClassID}_COL_SPEC";
+        internal static string LUMTexture => $"{Mod.ClassID}_COL_LUM";
+        internal static string ColorIDTexture => $"{Mod.ClassID}_COL_ID";
         public bool GetPrefabs()
         {
 
@@ -62,12 +63,13 @@ namespace FCSDemo.Buildables
         private void ApplyShaders(GameObject prefab, AssetBundle bundle)
         {
             #region BaseColor
-            MaterialHelpers.ApplySpecShader(BodyMaterial, $"{Mod.ClassID}_M_COL_SPEC", prefab, 1, 3f, bundle);
+            MaterialHelpers.ApplySpecShader(BodyMaterial, SpecTexture, prefab, 1, 3f, bundle);
+            MaterialHelpers.ApplyColorMaskShader(BodyMaterial, ColorIDTexture, Color.white, Color.white, Color.white, prefab, bundle); //Use color2 
+            MaterialHelpers.ApplyEmissionShader(BodyMaterial, LUMTexture, prefab, bundle, Color.white);
+            MaterialHelpers.ApplyGlassShaderTemplate(prefab.FindChild("model").FindChild("HydroponicHarvesterGlass"),Mod.ClassID);
             #endregion
-
-            MaterialHelpers.ApplyEmissionShader(DetailMaterial, $"{Mod.ClassID}_D_COL_LUM", prefab, bundle, Color.white);
-            MaterialHelpers.ApplySpecShader(DetailMaterial, $"{Mod.ClassID}_D_COL_SPEC", prefab, 1, 6f, bundle);
-            MaterialHelpers.ApplyAlphaShader(DetailMaterial, prefab);
         }
+
+
     }
 }

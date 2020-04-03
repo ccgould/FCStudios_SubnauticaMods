@@ -18,18 +18,15 @@ namespace AE.SeaCooker.Buildable
 
             QuickLogger.Debug($"AssetBundle Set");
 
-            QuickLogger.Debug("GetPrefabs");
-            AssetBundle assetBundle = AssetHelper.Asset(Mod.ModName, Mod.BundleName);
-
             //We have found the asset bundle and now we are going to continue by looking for the model.
-            GameObject prefab = assetBundle.LoadAsset<GameObject>(Mod.ClassID);
+            GameObject prefab = QPatch.AssetBundle.LoadAsset<GameObject>(Mod.ClassID);
 
             //If the prefab isn't null lets add the shader to the materials
             if (prefab != null)
             {
                 _prefab = prefab;
                 //Lets apply the material shader
-                ApplyShaders(prefab, assetBundle);
+                ApplyShaders(prefab, QPatch.AssetBundle);
 
                 QuickLogger.Debug($"{this.FriendlyName} Prefab Found!");
             }
@@ -39,7 +36,7 @@ namespace AE.SeaCooker.Buildable
                 return false;
             }
 
-            GameObject seaBreezeItem = assetBundle.LoadAsset<GameObject>("SC_SeaBreezeItem");
+            GameObject seaBreezeItem = QPatch.AssetBundle.LoadAsset<GameObject>("SC_SeaBreezeItem");
 
             //If the prefab isn't null lets add the shader to the materials
             if (seaBreezeItem != null)
@@ -80,9 +77,9 @@ namespace AE.SeaCooker.Buildable
         private void ApplyShaders(GameObject prefab, AssetBundle bundle)
         {
             #region SystemLights_BaseColor
-            MaterialHelpers.ApplyEmissionShader("SeaCooker_BaseColor", "SeaCooker_Emissive", prefab, QPatch.GlobalBundle, new Color(0.08235294f, 1f, 1f));
-            MaterialHelpers.ApplyNormalShader("SeaCooker_BaseColor", "SeaCooker_Normal", prefab, QPatch.GlobalBundle);
-            MaterialHelpers.ApplySpecShader("SeaCooker_BaseColor", "SeaCooker_Spec", prefab, 1, 6f, QPatch.GlobalBundle);
+            MaterialHelpers.ApplyEmissionShader("SeaCooker_BaseColor", "SeaCooker_Emissive", prefab, bundle, new Color(0.08235294f, 1f, 1f));
+            MaterialHelpers.ApplyNormalShader("SeaCooker_BaseColor", "SeaCooker_Normal", prefab, bundle);
+            MaterialHelpers.ApplySpecShader("SeaCooker_BaseColor", "SeaCooker_Spec", prefab, 1, 6f, bundle);
             MaterialHelpers.ApplyAlphaShader("SeaCooker_BaseColor", prefab);
             #endregion
 

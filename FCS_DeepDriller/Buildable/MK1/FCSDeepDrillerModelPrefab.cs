@@ -9,7 +9,7 @@ namespace FCS_DeepDriller.Buildable.MK1
     {
         private GameObject _prefab;
 
-        private static AssetBundle _assetBundle;
+        public static AssetBundle AssetBundle { get; private set; }
 
         internal static GameObject BatteryModule { get; private set; }
 
@@ -33,7 +33,7 @@ namespace FCS_DeepDriller.Buildable.MK1
                 return false;
             }
 
-            _assetBundle = assetBundle;
+            AssetBundle = assetBundle;
 
             QuickLogger.Debug($"AssetBundle Set");
 
@@ -74,7 +74,7 @@ namespace FCS_DeepDriller.Buildable.MK1
 
             #region Battery Module
             //We have found the asset bundle and now we are going to continue by looking for the model.
-            GameObject batteryModule = QPatch.GlobalBundle.LoadAsset<GameObject>("Battery_Attachment");
+            GameObject batteryModule = assetBundle.LoadAsset<GameObject>("Battery_Attachment");
 
             //If the prefab isn't null lets add the shader to the materials
             if (batteryModule != null)
@@ -94,7 +94,7 @@ namespace FCS_DeepDriller.Buildable.MK1
 
             #region Solar Module
             //We have found the asset bundle and now we are going to continue by looking for the model.
-            GameObject solarModule = QPatch.GlobalBundle.LoadAsset<GameObject>("Solar_Panel_Attachment");
+            GameObject solarModule = assetBundle.LoadAsset<GameObject>("Solar_Panel_Attachment");
 
             //If the prefab isn't null lets add the shader to the materials
             if (solarModule != null)
@@ -114,7 +114,7 @@ namespace FCS_DeepDriller.Buildable.MK1
 
             #region Focus Module
             //We have found the asset bundle and now we are going to continue by looking for the model.
-            GameObject focusModule = QPatch.GlobalBundle.LoadAsset<GameObject>("Scanner_Screen_Attachment");
+            GameObject focusModule = assetBundle.LoadAsset<GameObject>("Scanner_Screen_Attachment");
 
             //If the prefab isn't null lets add the shader to the materials
             if (focusModule != null)
@@ -137,7 +137,7 @@ namespace FCS_DeepDriller.Buildable.MK1
 
         private bool GetOres()
         {
-            GameObject sand = _assetBundle.LoadAsset<GameObject>("Sand");
+            GameObject sand = AssetBundle.LoadAsset<GameObject>("Sand");
 
             //If the prefab isn't null lets add the shader to the materials
             if (sand != null)
@@ -166,12 +166,12 @@ namespace FCS_DeepDriller.Buildable.MK1
         {
             #region AMMiniMedBay_BaseColor
             MaterialHelpers.ApplyAlphaShader("DeepDriller_BaseColor_BaseColor", prefab);
-            MaterialHelpers.ApplySpecShader("DeepDriller_BaseColor_BaseColor", "DeepDriller_Spec", prefab, 1, 0.5f, QPatch.GlobalBundle);
-            MaterialHelpers.ApplyNormalShader("DeepDriller_BaseColor_BaseColor", "DeepDriller_Norm", prefab, QPatch.GlobalBundle);
-            MaterialHelpers.ApplyEmissionShader("DeepDriller_BaseColor_BaseColor", "DeepDriller_Emissive_On", prefab, QPatch.GlobalBundle, new Color(0.08235294f, 1f, 1f));
-            MaterialHelpers.ApplyEmissionShader("DeepDriller_DigState", "DeepDriller_DigStateEmissive", prefab, QPatch.GlobalBundle, new Color(0.08235294f, 1f, 1f));
-            MaterialHelpers.ApplyEmissionShader("Lava_Rock", "lava_rock_emission", prefab, QPatch.GlobalBundle, Color.white);
-            MaterialHelpers.ApplyNormalShader("Lava_Rock", "lava_rock_01_normal", prefab, QPatch.GlobalBundle);
+            MaterialHelpers.ApplySpecShader("DeepDriller_BaseColor_BaseColor", "DeepDriller_Spec", prefab, 1, 0.5f, AssetBundle);
+            MaterialHelpers.ApplyNormalShader("DeepDriller_BaseColor_BaseColor", "DeepDriller_Norm", prefab, AssetBundle);
+            MaterialHelpers.ApplyEmissionShader("DeepDriller_BaseColor_BaseColor", "DeepDriller_Emissive_On", prefab, AssetBundle, new Color(0.08235294f, 1f, 1f));
+            MaterialHelpers.ApplyEmissionShader("DeepDriller_DigState", "DeepDriller_DigStateEmissive", prefab, AssetBundle, new Color(0.08235294f, 1f, 1f));
+            MaterialHelpers.ApplyEmissionShader("Lava_Rock", "lava_rock_emission", prefab, AssetBundle, Color.white);
+            MaterialHelpers.ApplyNormalShader("Lava_Rock", "lava_rock_01_normal", prefab, AssetBundle);
             #endregion
         }
     }

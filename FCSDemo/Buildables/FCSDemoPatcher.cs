@@ -27,7 +27,6 @@ namespace FCSDemo.Buildables
             try
             {
                 var prefab = GameObject.Instantiate(_prefab);
-                prefab.name = this.PrefabFileName;
 
                 if (QPatch.Configuration.Config.UseCustomBoundingBox)
                 {
@@ -36,8 +35,50 @@ namespace FCSDemo.Buildables
                     GameObjectHelpers.AddConstructableBounds(prefab, size.ToVector3(), center.ToVector3());
                 }
                 
+                var model = prefab.FindChild("model");
+                
+                //========== Allows the building animation and material colors ==========// 
+                Shader shader = Shader.Find("MarmosetUBER");
+                Renderer[] renderers = prefab.GetComponentsInChildren<Renderer>();
+                SkyApplier skyApplier = prefab.EnsureComponent<SkyApplier>();
+                skyApplier.renderers = renderers;
+                skyApplier.anchorSky = Skies.Auto;
+                
+                // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
+                var lwe = prefab.AddComponent<LargeWorldEntity>();
+                lwe.cellLevel = LargeWorldEntity.CellLevel.Far;
+
+                //========== Allows the building animation and material colors ==========// 
+
+                // Add constructible
+                var constructable = prefab.AddComponent<Constructable>();
+
+                constructable.allowedOutside = QPatch.Configuration.Config.AllowedOutside;
+                constructable.allowedInBase = QPatch.Configuration.Config.AllowedInBase;
+                constructable.allowedOnGround = QPatch.Configuration.Config.AllowedOnGround;
+                constructable.allowedOnWall = QPatch.Configuration.Config.AllowedOnWall;
+                constructable.rotationEnabled = QPatch.Configuration.Config.RotationEnabled;
+                constructable.allowedOnCeiling = QPatch.Configuration.Config.AllowedOnCeiling;
+                constructable.allowedInSub = QPatch.Configuration.Config.AllowedInSub;
+                constructable.allowedOnConstructables = QPatch.Configuration.Config.AllowedOnConstructables;
+
+                constructable.placeMaxDistance = 7f;
+                constructable.placeMinDistance = 5f;
+                constructable.placeDefaultDistance = 6f;
+                constructable.model = model;
+                constructable.techType = Singleton.TechType;
+
+                PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
+                prefabID.ClassId = Singleton.ClassID;
+                MaterialHelpers.AddNewBubbles(prefab, new Vector3(0.722f, 1.03f, 0.775f),new Vector3(270f,266f,0f));
+                MaterialHelpers.AddNewBubbles(prefab, new Vector3(0.826f, 1.03f, -0.715f),new Vector3(270f,266f,0f));
+                MaterialHelpers.AddNewBubbles(prefab, new Vector3(-0.796f, 1.03f, -0.828f),new Vector3(270f,266f,0f));
+                MaterialHelpers.AddNewBubbles(prefab, new Vector3(-0.801f, 1.03f, 0.711f),new Vector3(270f,266f,0f));
+                prefab.AddComponent<TechTag>().type = Singleton.TechType;
+                prefab.AddComponent<FCSDemoController>();
                 //Add the FCSTechFabricatorTag component
                 prefab.AddComponent<FCSTechFabricatorTag>();
+
 
                 return prefab;
             }
@@ -91,56 +132,7 @@ namespace FCSDemo.Buildables
 #endif
         internal static void Register()
         {
-            var model = _prefab.FindChild("model");
-
-
-            //========== Allows the building animation and material colors ==========// 
-            Shader shader = Shader.Find("MarmosetUBER");
-            Renderer[] renderers = _prefab.GetComponentsInChildren<Renderer>();
-            SkyApplier skyApplier = _prefab.EnsureComponent<SkyApplier>();
-
-            foreach (Renderer renderer in renderers)
-            {
-                foreach (var material in renderer.materials)
-                {
-                    material.shader = shader;
-                }
-            }
-
-
-            skyApplier.renderers = renderers;
-            skyApplier.anchorSky = Skies.Auto;
-
-
-            // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
-            var lwe = _prefab.AddComponent<LargeWorldEntity>();
-            lwe.cellLevel = LargeWorldEntity.CellLevel.Far;
-
-            //========== Allows the building animation and material colors ==========// 
-
-            // Add constructible
-            var constructable = _prefab.AddComponent<Constructable>();
-
-            constructable.allowedOutside = QPatch.Configuration.Config.AllowedOutside;
-            constructable.allowedInBase = QPatch.Configuration.Config.AllowedInBase;
-            constructable.allowedOnGround = QPatch.Configuration.Config.AllowedOnGround;
-            constructable.allowedOnWall = QPatch.Configuration.Config.AllowedOnWall;
-            constructable.rotationEnabled = QPatch.Configuration.Config.RotationEnabled;
-            constructable.allowedOnCeiling = QPatch.Configuration.Config.AllowedOnCeiling;
-            constructable.allowedInSub = QPatch.Configuration.Config.AllowedInSub;
-            constructable.allowedOnConstructables = QPatch.Configuration.Config.AllowedOnConstructables;
-
-            constructable.placeMaxDistance = 7f;
-            constructable.placeMinDistance = 5f;
-            constructable.placeDefaultDistance = 6f;
-            constructable.model = model;
-            constructable.techType = Singleton.TechType;
-
-            PrefabIdentifier prefabID = _prefab.AddComponent<PrefabIdentifier>();
-            prefabID.ClassId = Singleton.ClassID;
-
-            _prefab.AddComponent<TechTag>().type = Singleton.TechType;
-            _prefab.AddComponent<FCSDemoController>();
+            
         }
 
         public static void PatchHelper()

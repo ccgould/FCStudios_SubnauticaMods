@@ -14,12 +14,15 @@ namespace AE.SeaCooker.Managers
             if (_mono == null) return;
 
             var state = _mono.PowerManager.GetPowerState();
-
-            QuickLogger.Debug($"PowerState: {state}");
+            HandReticle main = HandReticle.main;
+#if DEBUG
+            main.SetInteractText(SeaCookerBuildable.NoPowerAvailable());
+#endif
+            //QuickLogger.Debug($"PowerState: {state}");
 
             if (state == FCSPowerStates.Unpowered)
             {
-                HandReticle main = HandReticle.main;
+
                 main.SetIcon(HandReticle.IconType.Default);
 #if SUBNAUTICA
                 main.SetInteractText(SeaCookerBuildable.NoPowerAvailable());

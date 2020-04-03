@@ -8,7 +8,5 @@
         void OnProtoDeserialize(ProtobufSerializer serializer);
         bool CanDeconstruct(out string reason);
         void OnConstructedChanged(bool constructed);
-        string GetPrefabIDString();
-        void OnDestroy();
     }
 }

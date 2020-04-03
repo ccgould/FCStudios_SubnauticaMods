@@ -133,7 +133,7 @@ namespace ARS_SeaBreezeFCS32.Configuration
 
         internal static SaveDataEntry GetSaveData(string id)
         {
-            LoadData();
+            LoadData(SaveDataFilename);
 
             var saveData = GetSaveData();
 
@@ -153,11 +153,11 @@ namespace ARS_SeaBreezeFCS32.Configuration
             return _saveData ?? new SaveData();
         }
 
-        internal static void LoadData()
+        internal static void LoadData(string saveDataFilename)
         {
             QuickLogger.Info("Loading Save Data...");
             
-            ModUtils.LoadSaveData<SaveData>(SaveDataFilename, GetSaveFileDirectory(), (data) =>
+            ModUtils.LoadSaveData<SaveData>(saveDataFilename, GetSaveFileDirectory(), (data) =>
             {
                 _saveData = data;
                 QuickLogger.Info("Save Data Loaded");

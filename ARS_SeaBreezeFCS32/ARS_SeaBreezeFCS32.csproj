@@ -126,6 +126,7 @@
     <Compile Include="Buildables\ARSSeaBreezeFCS32ModelPrefab.cs" />
     <Compile Include="Buildables\ARSSeaBreezeFCS32Patcher.cs" />
     <Compile Include="Buildables\ARSSSeaBreezeFCS32AuxPatcher.cs" />
+    <Compile Include="Configuration\LegacySaveData.cs" />
     <Compile Include="Craftables\FreonPatcher.cs" />
     <Compile Include="Configuration\Configuration.cs" />
     <Compile Include="Configuration\Mod.cs" />

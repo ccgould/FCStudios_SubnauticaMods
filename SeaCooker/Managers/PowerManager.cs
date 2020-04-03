@@ -13,8 +13,9 @@ namespace AE.SeaCooker.Managers
         private SubRoot _habitat;
         private PowerRelay _connectedRelay = null;
         private float EnergyConsumptionPerSecond { get; set; } = QPatch.Configuration.Config.EnergyPerSec;
-        private float AvailablePower => this.ConnectedRelay.GetPower();
-
+        private float AvailablePower => ConnectedRelay.GetPower();
+        private bool requiresEnergy => GameModeUtils.RequiresPower();
+        private bool HasPowerToConsume => !requiresEnergy || AvailablePower >= _energyToConsume;
         private PowerRelay ConnectedRelay
         {
             get
@@ -37,7 +38,6 @@ namespace AE.SeaCooker.Managers
         }
         
         internal Action<FCSPowerStates> OnPowerUpdate;
-        private bool _hasPowerToConsume;
         private float _energyToConsume;
 
         internal void Initialize(SeaCookerController mono)
@@ -54,13 +54,13 @@ namespace AE.SeaCooker.Managers
         internal void UpdatePowerState()
         {
 
-            if (_habitat.powerRelay.GetPowerStatus() == PowerSystem.Status.Offline || !_hasPowerToConsume && GetPowerState() != FCSPowerStates.Unpowered)
+            if (_habitat.powerRelay.GetPowerStatus() == PowerSystem.Status.Offline || !HasPowerToConsume && GetPowerState() != FCSPowerStates.Unpowered)
             {
                 SetPowerStates(FCSPowerStates.Unpowered);
                 return;
             }
 
-            if (_habitat.powerRelay.GetPowerStatus() != PowerSystem.Status.Offline || _hasPowerToConsume && GetPowerState() != FCSPowerStates.Powered)
+            if (_habitat.powerRelay.GetPowerStatus() != PowerSystem.Status.Offline || HasPowerToConsume && GetPowerState() != FCSPowerStates.Powered)
             {
                 SetPowerStates(FCSPowerStates.Powered);
             }
@@ -71,8 +71,7 @@ namespace AE.SeaCooker.Managers
             if (PowerState == FCSPowerStates.Unpowered || !_mono.FoodManager.IsCooking()) return;
 
             _energyToConsume = EnergyConsumptionPerSecond * DayNightCycle.main.deltaTime;
-            bool requiresEnergy = GameModeUtils.RequiresPower();
-            _hasPowerToConsume = !requiresEnergy || AvailablePower >= _energyToConsume;
+
 
             if (!requiresEnergy) return;
             ConnectedRelay.ConsumeEnergy(_energyToConsume, out float amountConsumed);

@@ -20,7 +20,6 @@ namespace FCS_DeepDriller
     [QModCore]
     public static class QPatch
     {
-        public static AssetBundle GlobalBundle { get; set; }
         public static DeepDrillerCfg Configuration { get; private set; }
 
         [QModPatch]
@@ -38,13 +37,6 @@ namespace FCS_DeepDriller
 #endif
             try
             {
-                GlobalBundle =FcAssetBundlesService.PublicAPI.GetAssetBundleByName(FcAssetBundlesService.PublicAPI.GlobalBundleName);
-
-                if (GlobalBundle == null)
-                {
-                    QuickLogger.Error("Global Bundle has returned null stopping patching");
-                    throw new FileNotFoundException("Bundle failed to load");
-                }
                 
                 Configuration = Mod.LoadConfiguration();
                 Configuration.Convert();

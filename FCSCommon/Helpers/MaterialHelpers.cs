@@ -1,12 +1,16 @@
-﻿using FCSCommon.Utilities;
+﻿using System;
+using FCSCommon.Utilities;
 using System.Collections.Generic;
-using System.Linq;
+using SMLHelper.V2.Handlers;
 using UnityEngine;
 
 namespace FCSCommon.Helpers
 {
     internal class MaterialHelpers
     {
+        private static Material _glassMaterial;
+        private static GameObject _laterialBubbles;
+
         /// <summary>
         /// Finds a <see cref="Texture2D"/> in the asset bundle with the specified name.
         /// </summary>
@@ -19,19 +23,26 @@ namespace FCSCommon.Helpers
             {
                 var objects = new List<object>(assetBundle.LoadAllAssets(typeof(object)));
 
+                QuickLogger.Debug($"[FindTexture2D] Object Count: {objects.Count}");
+
                 for (int i = 0; i < objects.Count; i++)
                 {
                     if (objects[i] is Texture2D)
                     {
-                        if (((Texture2D)objects[i]).name.Equals(textureName))
+                        QuickLogger.Debug($"[FindTexture2D] Object Name: {((Texture2D)objects[i]).name.ToLower()}");
+
+                        if (((Texture2D)objects[i]).name.Equals(textureName, StringComparison.OrdinalIgnoreCase))
                         {
+                            QuickLogger.Debug($"Found Texture: {textureName}");
                             return ((Texture2D)objects[i]);
                         }
                     }
                 }
             }
-
-            //QuickLogger.Error($"Couldn't Find Texture: {textureName}");
+            else
+            {
+                QuickLogger.Error($"Couldn't Find Bundle");
+            }
 
             return null;
         }
@@ -50,7 +61,7 @@ namespace FCSCommon.Helpers
             {
                 if (objects[i] is Material)
                 {
-                    if (((Material)objects[i]).name.Equals(materialName))
+                    if (((Material)objects[i]).name.Equals(materialName, StringComparison.OrdinalIgnoreCase))
                     {
                         return ((Material)objects[i]);
                     }
@@ -77,14 +88,14 @@ namespace FCSCommon.Helpers
             {
                 foreach (Material material in renderer.materials)
                 {
-                    if (material.name.StartsWith(materialName))
+                    if (material.name.StartsWith(materialName, StringComparison.OrdinalIgnoreCase))
                     {
                         material.shader = shader;
                         //material.EnableKeyword("_EMISSION");
                         material.EnableKeyword("MARMO_EMISSION");
-                        material.SetVector("_EmissionColor", emissionColor * emissionMuli);
+                        //material.SetVector("_EmissionColor", emissionColor * emissionMuli);
                         material.SetTexture("_Illum", FindTexture2D(textureName, assetBundle));
-                        material.SetVector("_Illum_ST", new Vector4(1.0f, 1.0f, 0.0f, 0.0f));
+                        //material.SetVector("_Illum_ST", new Vector4(1.0f, 1.0f, 0.0f, 0.0f));
                     }
                 }
             }
@@ -105,7 +116,7 @@ namespace FCSCommon.Helpers
             {
                 foreach (Material material in renderer.materials)
                 {
-                    if (material.name.StartsWith(materialName))
+                    if (material.name.StartsWith(materialName, StringComparison.OrdinalIgnoreCase))
                     {
                         material.shader = shader;
 
@@ -124,7 +135,7 @@ namespace FCSCommon.Helpers
             {
                 foreach (Material material in renderer.materials)
                 {
-                    if (material.name.StartsWith(materialName))
+                    if (material.name.StartsWith(materialName, StringComparison.OrdinalIgnoreCase))
                     {
                         material.SetColor("_Color", color);
                     }
@@ -148,7 +159,7 @@ namespace FCSCommon.Helpers
             {
                 foreach (Material material in renderer.materials)
                 {
-                    if (material.name.StartsWith(materialName))
+                    if (material.name.StartsWith(materialName, StringComparison.OrdinalIgnoreCase))
                     {
                         material.shader = shader;
                         material.EnableKeyword("_METALLICGLOSSMAP");
@@ -176,7 +187,7 @@ namespace FCSCommon.Helpers
             {
                 foreach (Material material in renderer.materials)
                 {
-                    if (material.name.StartsWith(materialName))
+                    if (material.name.StartsWith(materialName, StringComparison.OrdinalIgnoreCase))
                     {
                         material.shader = shader;
 
@@ -212,7 +223,7 @@ namespace FCSCommon.Helpers
             {
                 foreach (Material material in renderer.materials)
                 {
-                    if (material.name.StartsWith(materialName))
+                    if (material.name.StartsWith(materialName, StringComparison.OrdinalIgnoreCase))
                     {
                         material.shader = shader;
                         material.EnableKeyword("_ZWRITE_ON");
@@ -224,35 +235,67 @@ namespace FCSCommon.Helpers
         }
 
         /// <summary>
-        /// Applies the properties for the standard shader to make a material appear like glass.
+        /// Adds glass material to the gameobject.
         /// </summary>
-        /// <param name="materialName">The name of the material to look for on the object.</param>
-        /// <param name="gameObject">The game object to process.</param>
-        /// <param name="glossiness">The amount of gloss for the metallic property.</param>
-        internal static void ApplyGlassShaderTemplate(string materialName, GameObject gameObject, float glossiness)
+        /// <param name="gameObject">The game object to add the glass material</param>
+        internal static void ApplyGlassShaderTemplate(GameObject gameObject, string newMaterialName = "object")
         {
-            var shader = Shader.Find("Standard");
-            Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>(true);
-            foreach (Renderer renderer in renderers)
+            GetIngameObjects();
+
+            var render = gameObject.GetComponent<Renderer>();
+            render.material = _glassMaterial;
+        }
+
+        internal static void AddNewBubbles(GameObject gameObject, Vector3 position, Vector3 rotation)
+        {
+            GetIngameObjects();
+
+            var newBubbles = GameObject.Instantiate(_laterialBubbles);
+            newBubbles.transform.SetParent(gameObject.transform);
+            newBubbles.transform.localPosition = position;
+            newBubbles.transform.Rotate(rotation);
+        }
+
+        internal static void GetIngameObjects()
+        {
+            QuickLogger.Debug("In GetIngameObjects");
+
+            var aquarium = GameObject.Instantiate(CraftData.GetPrefabForTechType(TechType.Aquarium));
+
+            if (_glassMaterial == null)
             {
-                foreach (Material material in renderer.materials)
+
+                Renderer[] renderers = aquarium.GetComponentsInChildren<Renderer>(true);
+
+                foreach (Renderer renderer in renderers)
                 {
-                    if (material.name.StartsWith(materialName))
+                    foreach (Material material in renderer.materials)
                     {
-
-                        material.shader = shader;
-                        material.EnableKeyword("MARMO_SPECMAP");
-                        material.EnableKeyword("MARMO_SIMPLE_GLASS");
-                        material.EnableKeyword("WBOIT");
-                        material.EnableKeyword("_ALPHAPREMULTIPLY_ON");
-                        //material.SetColor("_SpecColor", new Color(0.796875f, 0.796875f, 0.796875f, 0.796875f));
-                        //material.SetFloat("_SpecInt", 8f);
-                        //material.SetFloat("_Shininess", 0.5f);
-                        //material.SetVector("_SpecTex_ST", new Vector4(1.0f, 1.0f, 0.0f, 0.0f));
-
+                        if (material.name.StartsWith("Aquarium_glass", StringComparison.OrdinalIgnoreCase))
+                        {
+                            _glassMaterial = material;
+                            QuickLogger.Debug($"Aquarium glass result: {_glassMaterial?.name}");
+                            goto _glassEnd;
+                        }
                     }
                 }
             }
+            _glassEnd: ;
+
+            if (_laterialBubbles == null)
+            {
+                var bubbles = aquarium.FindChild("Bubbles").FindChild("xBubbles").FindChild("xLateralBubbles");
+                if (bubbles == null)
+                {
+                    QuickLogger.Error("Failed to find bubbles in the aquarium");
+                    return;
+                }
+
+                _laterialBubbles = GameObject.Instantiate(bubbles);
+                QuickLogger.Debug($"Laterial Bubbles result: {_laterialBubbles?.name}");
+            }
+
+            GameObject.Destroy(aquarium);
         }
 
         internal static void ApplyPrecursorShader(string materialName, string normalMap, string metalicmap, GameObject gameObject, AssetBundle assetBundle, float glossiness)
@@ -265,12 +308,12 @@ namespace FCSCommon.Helpers
             {
                 foreach (Material material in renderer.materials)
                 {
-                    if (material.name.StartsWith(materialName))
+                    if (material.name.StartsWith(materialName, StringComparison.OrdinalIgnoreCase))
                     {
                         material.shader = shader;
                         material.EnableKeyword("_NORMALMAP");
 
-                        material.EnableKeyword("_METALLICGLOSSMAP");
+                        //material.EnableKeyword("_METALLICGLOSSMAP");
 
                         material.SetTexture("_BumpMap", FindTexture2D(normalMap, assetBundle));
 
@@ -280,7 +323,7 @@ namespace FCSCommon.Helpers
 
                         material.SetColor("_DetailsColor", new Color(0.42f, 0.85f, 0.26f));
 
-                        material.SetTexture("_MarmoSpecEnum", MaterialHelpers.FindTexture2D(metalicmap, assetBundle));
+                        material.SetTexture("_MarmoSpecEnum", FindTexture2D(metalicmap, assetBundle));
 
                         material.SetFloat("_Glossiness", glossiness);
 
@@ -289,50 +332,46 @@ namespace FCSCommon.Helpers
             }
         }
 
-        internal static void ApplyColorMaskShader(string materialName, string normalMap, string metalicmap, string maskmap, GameObject gameObject, AssetBundle assetBundle, float glossiness)
+        internal static void ApplyColorMaskShader(string materialName, string maskTexture, Color color, Color color2, Color color3, GameObject gameObject, AssetBundle assetBundle)
         {
-            Shader[] assets = assetBundle.LoadAllAssets<Shader>();
+            QuickLogger.Debug($"[ApplyColorMaskShader] In Apply Color Mask");
 
-            Shader customColorShader = assets.FirstOrDefault(shader => shader.name.Equals("Custom/ColorMask"));
+            var shader = Shader.Find("MarmosetUBER");
+            Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>(true);
 
-            if (customColorShader == null)
+            QuickLogger.Debug($"[ApplyColorMaskShader] Renderer Count: {renderers.Length}");
+
+
+            foreach (Renderer renderer in renderers)
             {
-                QuickLogger.Error("Custom Shader: Null");
-            }
-            else
-            {
-                QuickLogger.Debug("Custom Shader: Found");
-                Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>(true);
-
-                foreach (Renderer renderer in renderers)
+                foreach (Material material in renderer.materials)
                 {
-                    foreach (Material material in renderer.materials)
+                    QuickLogger.Debug($"[ApplyColorMaskShader] Material Name: {material.name} || Compare to: {materialName} || Result: {material.name.ToLower().StartsWith(materialName.ToLower())}");
+
+
+                    if (material.name.StartsWith(materialName, StringComparison.OrdinalIgnoreCase))
                     {
-                        if (material.name.StartsWith(materialName))
-                        {
-                            material.shader = customColorShader;
+                        material.shader = shader;
 
-                            material.EnableKeyword("_NORMALMAP");
+                        material.EnableKeyword("UWE_3COLOR");
 
-                            material.EnableKeyword("_METALLICGLOSSMAP");
+                        material.SetFloat("_Enable3Color", 1);
 
-                            material.SetTexture("_Normal", FindTexture2D(normalMap, assetBundle));
+                        material.SetColor("_Color", color);
 
-                            material.SetTexture("_MaskTex", FindTexture2D(maskmap, assetBundle));
+                        material.SetColor("_Color2", color2);
 
-                            material.SetColor("_Color1", Color.green);
-                            material.SetColor("_Color2", Color.white);
-                            material.SetColor("_Color3", Color.white);
+                        material.SetColor("_Color3", color3);
 
-                            material.SetTexture("_Metallic", MaterialHelpers.FindTexture2D(metalicmap, assetBundle));
+                        material.SetTexture("_MultiColorMask", FindTexture2D(maskTexture, assetBundle));
 
-                            material.SetFloat("_Glossiness", glossiness);
-                        }
+
                     }
                 }
             }
         }
 
+        [Obsolete("This method will be removed in upcoming update please use MaterialHelpers.ChangeMaterialColor instead.")]
         /// <summary>
         /// Change the color of the body of the gameobject
         /// </summary>
@@ -351,7 +390,7 @@ namespace FCSCommon.Helpers
             {
                 foreach (Material material in renderer.materials)
                 {
-                    if (material.name.StartsWith(materialName))
+                    if (material.name.StartsWith(materialName, StringComparison.OrdinalIgnoreCase))
                     {
                         material.SetTexture("_Illum", FindTexture2D(replacementTexture, assetBundle));
                     }
@@ -366,7 +405,7 @@ namespace FCSCommon.Helpers
             {
                 foreach (Material material in renderer.materials)
                 {
-                    if (material.name.StartsWith(materialName))
+                    if (material.name.StartsWith(materialName, StringComparison.OrdinalIgnoreCase))
                     {
                         material.SetVector("_GlowColor", color);
                     }
@@ -381,7 +420,7 @@ namespace FCSCommon.Helpers
             {
                 foreach (Material material in renderer.materials)
                 {
-                    if (material.name.StartsWith(materialName))
+                    if (material.name.StartsWith(materialName, StringComparison.OrdinalIgnoreCase))
                     {
                         return material.GetColor("_Color");
                     }

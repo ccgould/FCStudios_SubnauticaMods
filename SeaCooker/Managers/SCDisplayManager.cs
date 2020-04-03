@@ -1,6 +1,4 @@
 ﻿using AE.SeaCooker.Buildable;
-using AE.SeaCooker.Configuration;
-using AE.SeaCooker.Display;
 using AE.SeaCooker.Mono;
 using FCSCommon.Enums;
 using FCSCommon.Helpers;
@@ -8,18 +6,14 @@ using FCSCommon.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using ARS_SeaBreezeFCS32.Mono;
 using FCSCommon.Abstract;
 using FCSCommon.Components;
-using FCSCommon.Controllers;
-using FCSCommon.Interfaces;
-using FCSCommon.Objects;
 using FCSTechFabricator.Components;
 using FCSTechFabricator.Managers;
 using UnityEngine;
 using UnityEngine.UI;
+using FCSController = FCSTechFabricator.Abstract.FCSController;
 using PaginatorButton = AE.SeaCooker.Display.PaginatorButton;
 
 namespace AE.SeaCooker.Managers
@@ -123,8 +117,8 @@ namespace AE.SeaCooker.Managers
                     break;
 
                 case "SeaBreeze":
-                    var sb = (ARSolutionsSeaBreezeController)tag;
-                    _mono.SelectedSeaBreezeID = sb.GetPrefabID();
+                    var sb = (FCSConnectableDevice)tag;
+                    _mono.SelectedSeaBreezeID = sb.GetPrefabIDString();
                     UpdateCheckedSB();
                     break;
             }
@@ -136,9 +130,9 @@ namespace AE.SeaCooker.Managers
             
             foreach (CustomToggle toggle in _sbList)
             {
-                var sb =(ARSolutionsSeaBreezeController)toggle.Tag;
+                var sb =(FCSConnectableDevice)toggle.Tag;
 
-                if (_mono.SelectedSeaBreezeID == sb.GetPrefabID())
+                if (_mono.SelectedSeaBreezeID == sb.GetPrefabIDString())
                 {
                     toggle.SetToggleState(true);
                     _mono.SetCurrentSeaBreeze(sb);
@@ -510,8 +504,8 @@ namespace AE.SeaCooker.Managers
 
                 var unit = _mono.SeaBreezes.Values.ElementAt(i);
                 var unitNameController = unit;
-                var unitName = unitNameController.GetDeviceName();
-                unitNameController.OnLabelChanged += OnLabelChanged;
+                var unitName = unitNameController.GetName();
+                unitNameController.SubscribeToNameChange(OnLabelChanged);
 
                 GameObject itemDisplay = Instantiate(itemPrefab);
 

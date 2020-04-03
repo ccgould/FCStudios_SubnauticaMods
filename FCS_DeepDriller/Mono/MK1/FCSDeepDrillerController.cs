@@ -7,6 +7,7 @@ using FCS_DeepDriller.Configuration;
 using FCS_DeepDriller.Enumerators;
 using FCS_DeepDriller.Helpers;
 using FCS_DeepDriller.Managers;
+using FCSCommon.Controllers;
 using FCSCommon.Enums;
 using FCSCommon.Extensions;
 using FCSCommon.Helpers;
@@ -47,6 +48,7 @@ namespace FCS_DeepDriller.Mono.MK1
         internal FCSDeepDrillerContainer DeepDrillerContainer { get; private set; }
         internal FCSDeepDrillerModuleContainer DeepDrillerModuleContainer { get; private set; }
         internal bool IsConstructed { get; private set; }  //=> _buildable != null && _buildable.constructed;
+        internal AudioManager AudioManager { get; private set; }
         internal FCSDeepDrillerPowerHandler PowerManager { get; private set; }
         internal FCSDeepDrillerDisplay DisplayHandler { get; private set; }
         internal FCSDeepDrillerHealthHandler HealthManager { get; private set; }
@@ -100,6 +102,7 @@ namespace FCS_DeepDriller.Mono.MK1
                     if (_data.IsFocused)
                     {
                         OreGenerator.SetIsFocus(_data.IsFocused);
+                        OreGenerator.SetFocus(_data.FocusOre);
                     }
 
                     _batteryAttachment.GetController().LoadData(_data.PowerData);
@@ -280,6 +283,9 @@ namespace FCS_DeepDriller.Mono.MK1
                 _buildable = GetComponentInParent<Constructable>();
             }
 
+            AudioManager = new AudioManager(gameObject.GetComponent<FMOD_CustomLoopingEmitter>());
+            //AudioManager.LoadFModAssets("","");
+
             PowerManager = gameObject.AddComponent<FCSDeepDrillerPowerHandler>();
             PowerManager.Initialize(this);
             PowerManager.OnPowerUpdate += OnPowerUpdate;
@@ -372,7 +378,7 @@ namespace FCS_DeepDriller.Mono.MK1
                 if (HealthManager.IsDamagedFlag())
                 {
                     //MaterialHelpers.ChangeEmissionColor("DeepDriller_BaseColor_BaseColor",gameObject, new Color(1, 1f, 1f));
-                    MaterialHelpers.ReplaceEmissionTexture("DeepDriller_BaseColor_BaseColor", "DeepDriller_Emissive_Error", gameObject, QPatch.GlobalBundle);
+                    MaterialHelpers.ReplaceEmissionTexture("DeepDriller_BaseColor_BaseColor", "DeepDriller_Emissive_Error", gameObject, FCSDeepDrillerBuildable.AssetBundle);
                     return;
                 }
                 if (value == FCSPowerStates.Unpowered || value == FCSPowerStates.Tripped && !HealthManager.IsDamagedFlag())
@@ -380,28 +386,27 @@ namespace FCS_DeepDriller.Mono.MK1
                     //MaterialHelpers.ChangeEmissionColor("DeepDriller_BaseColor_BaseColor", gameObject, new Color(0.9803922f, 0.6313726f, 0.007843138f));
 
                     MaterialHelpers.ReplaceEmissionTexture("DeepDriller_BaseColor_BaseColor", "DeepDriller_Emissive_Off",
-                        gameObject, QPatch.GlobalBundle);
+                        gameObject, FCSDeepDrillerBuildable.AssetBundle);
                 }
                 else if (value == FCSPowerStates.Powered && !HealthManager.IsDamagedFlag())
                     //MaterialHelpers.ChangeEmissionColor("DeepDriller_BaseColor_BaseColor", gameObject, new Color(0.08235294f, 1f, 1f));
 
                     MaterialHelpers.ReplaceEmissionTexture("DeepDriller_BaseColor_BaseColor", "DeepDriller_Emissive_On",
-                        gameObject, QPatch.GlobalBundle);
+                        gameObject, FCSDeepDrillerBuildable.AssetBundle);
             }
             else
             {
                 if (value == FCSPowerStates.Unpowered || value == FCSPowerStates.Tripped)
                 {
                     MaterialHelpers.ReplaceEmissionTexture("DeepDriller_BaseColor_BaseColor", "DeepDriller_Emissive_Off",
-                        gameObject, QPatch.GlobalBundle);
+                        gameObject, FCSDeepDrillerBuildable.AssetBundle);
                 }
                 else if (value == FCSPowerStates.Powered)
                     //MaterialHelpers.ChangeEmissionColor("DeepDriller_BaseColor_BaseColor", gameObject, new Color(0.08235294f, 1f, 1f));
 
                     MaterialHelpers.ReplaceEmissionTexture("DeepDriller_BaseColor_BaseColor", "DeepDriller_Emissive_On",
-                        gameObject, QPatch.GlobalBundle);
+                        gameObject, FCSDeepDrillerBuildable.AssetBundle);
             }
-
         }
 
         private void UpdateDrillShaftSate(FCSPowerStates value)
@@ -413,13 +418,16 @@ namespace FCS_DeepDriller.Mono.MK1
                 case FCSPowerStates.Powered:
                     AnimationHandler.SetBoolHash(BitSpinState, true);
                     AnimationHandler.SetIntHash(ShaftStateHash, 1);
+                    AudioManager.PlayAudio();
                     break;
                 case FCSPowerStates.Unpowered:
                     AnimationHandler.SetBoolHash(BitSpinState, false);
+                    AudioManager.StopAudio();
                     break;
                 case FCSPowerStates.Tripped:
                     AnimationHandler.SetBoolHash(BitSpinState, false);
                     AnimationHandler.SetIntHash(ShaftStateHash, 2);
+                    AudioManager.StopAudio();
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(value), value, null);

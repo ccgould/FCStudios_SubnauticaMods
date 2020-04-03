@@ -154,11 +154,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ARS_SeaBreezeFCS32\ARS_SeaBreezeFCS32.csproj">
-      <Project>{4963c014-f97e-4124-b3c7-9f7bb790e1bf}</Project>
-      <Name>ARS_SeaBreezeFCS32</Name>
-      <Private>False</Private>
-    </ProjectReference>
     <ProjectReference Include="..\FCSTechFabricator\FCSTechFabricator.csproj">
       <Project>{5ef4adb8-3ae7-41ec-83e1-1daf04999f0e}</Project>
       <Name>FCSTechFabricator</Name>

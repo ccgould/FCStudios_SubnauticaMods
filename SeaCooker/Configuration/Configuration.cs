@@ -78,7 +78,7 @@ namespace AE.SeaCooker.Configuration
         [JsonProperty] internal float AlienFecesTankCapacity { get; set; } = 250.0f;
         [JsonProperty] internal float GasTankCapacity { get; set; } = 100.0f;
         [JsonProperty] internal float CookTime { get; set; } = 5.0f;
-        [JsonProperty] internal float EnergyPerSec { get; set; } = 0.102f;
+        [JsonProperty] internal float EnergyPerSec { get; set; } = 0.50666666f;
         [JsonProperty] internal float UsagePerItem { get; set; } = 5.0f;
         [JsonProperty] internal int StorageWidth { get; set; } = 4;
         [JsonProperty] internal int StorageHeight { get; set; } = 4;

@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace FCSCommon.Controllers
 {
-    public class AudioManager
+    internal class AudioManager
     {
         #region Private Members
         private readonly FMOD_CustomLoopingEmitter _loopingEmitter;
@@ -14,7 +14,7 @@ namespace FCSCommon.Controllers
         /// <summary>
         /// Default Constructor 
         /// </summary>
-        public AudioManager(FMOD_CustomLoopingEmitter emitter)
+        internal AudioManager(FMOD_CustomLoopingEmitter emitter)
         {
             _loopingEmitter = emitter;
         }
@@ -63,7 +63,7 @@ namespace FCSCommon.Controllers
         /// <summary>
         /// Plays the audio.
         /// </summary>
-        public void PlayAudio()
+        internal void PlayAudio()
         {
             if (!_soundPlaying)
             {
@@ -75,7 +75,7 @@ namespace FCSCommon.Controllers
         /// <summary>
         /// Stops the audio.
         /// </summary>
-        public void StopAudio()
+        internal void StopAudio()
         {
             if (_soundPlaying)
             {

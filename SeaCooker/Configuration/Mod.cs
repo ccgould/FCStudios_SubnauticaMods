@@ -49,7 +49,36 @@ namespace AE.SeaCooker.Configuration
                 new Ingredient(TechType.TitaniumIngot, 1)
             }
         };
-        
+
+#if SUBNAUTICA
+        internal static TechData SeaAlienGasTankKitIngredients => new TechData
+#elif BELOWZERO
+        internal static RecipeData SeaAlienGasTankKitIngredients => new RecipeData
+#endif
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(TechType.SeaTreaderPoop, 2),
+                new Ingredient(TechType.Tank, 1),
+                new Ingredient(TechType.FilteredWater, 2)
+            }
+        };
+
+#if SUBNAUTICA
+        internal static TechData SeaGasTankKitIngredients => new TechData
+#elif BELOWZERO
+        internal static RecipeData SeaGasTankKitIngredients => new RecipeData
+#endif
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(TechType.GasPod, 1),
+                new Ingredient(TechType.Tank, 1)
+            }
+        };
+
         internal const string SeaAlienGasClassID = "SeaAlienGasTank_SC";
         internal const string SeaAlienGasFriendlyName = "Sea Alien Gas";
         internal const string SeaAlienGasDescription = "This tank allows you to cook food in the Sea Cooker using Alien Feces.";

@@ -63,6 +63,7 @@ namespace AE.MiniFountainFilter.Buildable
             #region BaseColor
             MaterialHelpers.ApplyNormalShader(BodyMaterial, $"{Mod.ClassID}_MainBase_Normal", prefab, bundle);
             MaterialHelpers.ApplySpecShader(BodyMaterial, $"{Mod.ClassID}_MainBase_Spec", prefab, 1, 6f, bundle);
+            //MaterialHelpers.ApplyGlassShaderTemplate("glass",prefab);
             #endregion
 
             MaterialHelpers.ApplyEmissionShader(DetailMaterial, $"{Mod.ClassID}_Detail_Emissive", prefab, bundle, new Color(0.08235294f, 1f, 1f));

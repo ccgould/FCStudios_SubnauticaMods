@@ -3,7 +3,6 @@ using AE.SeaCooker.Helpers;
 using Harmony;
 using System.Collections.Generic;
 using System.Reflection;
-using SMLHelper.V2.Utility;
 
 namespace AE.SeaCooker.Patchers
 {

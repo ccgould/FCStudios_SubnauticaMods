@@ -2,15 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using FCSCommon.Extensions;
+using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using FCSTechFabricator.Abstract;
 using FCSTechFabricator.Enums;
+using FCSTechFabricator.Interfaces;
 using FCSTechFabricator.Objects;
 using UnityEngine;
 
 namespace FCSTechFabricator.Components
 {
-    public class Fridge : MonoBehaviour
+    public class Fridge : MonoBehaviour, IFCSStorage
     { 
         private int _itemLimit;
         public Action<int, int> OnContainerUpdate;
@@ -49,7 +51,24 @@ namespace FCSTechFabricator.Components
             float time = UnityEngine.Random.Range(0f, 5f);
             InvokeRepeating(nameof(AttemptDecay), time, 5f);
         }
-        
+
+        public bool IsAllowedToAdd(Pickupable pickupable)
+        {
+            bool flag = false;
+
+            if (pickupable != null)
+            {
+                TechType techType = pickupable.GetTechType();
+
+                QuickLogger.Debug(techType.ToString());
+
+                if (pickupable.GetComponent<Eatable>() != null)
+                    flag = true;
+            }
+
+            return flag;
+        }
+
         public void AddItem(InventoryItem item,bool fromSave = false, float timeDecayPause = 0)
         {
             if (IsFull)
@@ -93,6 +112,10 @@ namespace FCSTechFabricator.Components
                         FridgeItems.Remove(match);
                         QuickLogger.Debug($"Removed Match || Fridge Count {FridgeItems.Count}");
                     }
+                    else
+                    {
+                        QuickLogger.Message(LanguageHelpers.GetLanguage("InventoryFull"),true);
+                    }
                     GameObject.Destroy(pickupable);
                     OnContainerUpdate?.Invoke(NumberOfItems, _itemLimit);
                 }
@@ -117,6 +140,8 @@ namespace FCSTechFabricator.Components
 
         public void LoadSave(List<EatableEntities> save)
         {
+            if (save == null) return;
+
             foreach (EatableEntities eatableEntities in save)
             {
                 QuickLogger.Debug($"Adding entity {eatableEntities.Name}");
@@ -164,6 +189,33 @@ namespace FCSTechFabricator.Components
         public void SetModMode(ModModes modMode)
         {
             _modMode = modMode;
+        }
+
+        public int GetContainerFreeSpace => _itemLimit - NumberOfItems;
+        public bool CanBeStored(int amount)
+        {
+            return amount < GetContainerFreeSpace;
+        }
+
+        public bool AddItemToContainer(InventoryItem item)
+        {
+            if (item == null) return false;
+
+            if (!IsFull)
+            {
+                if (!IsAllowedToAdd(item.item))
+                {
+                    return false;
+                }
+
+                AddItem(item);
+            }
+            else
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }

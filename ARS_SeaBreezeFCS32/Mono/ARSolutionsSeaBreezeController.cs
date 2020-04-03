@@ -20,6 +20,7 @@ namespace ARS_SeaBreezeFCS32.Mono
         private bool _fromSave;
         private SaveDataEntry _savedData;
         private int _dumpStorageSizeXY = 2;
+
         #endregion
 
         #region Public Properties
@@ -32,7 +33,9 @@ namespace ARS_SeaBreezeFCS32.Mono
         public Action<string, NameController> OnLabelChanged { get; set; }
         internal ARSolutionsSeaBreezeDisplay DisplayManager { get; private set; }
         internal AnimationManager AnimationManager { get; private set; }
-        public int PageStateHash { get; private set; }
+        internal int PageStateHash { get; private set; }
+        internal PrefabIdentifier PrefabId { get; set; }
+        public FCSConnectableDevice FCSConnectableDevice { get; private set; }
 
         #endregion
 
@@ -87,6 +90,11 @@ namespace ARS_SeaBreezeFCS32.Mono
 
             QPatch.Configuration.OnModModeChanged += OnModModeChanged;
 
+            if (PrefabId == null)
+            {
+                PrefabId = GetComponentInParent<PrefabIdentifier>() ?? GetComponent<PrefabIdentifier>();
+            }
+            
             if (PowerManager == null)
             {
                 PowerManager = gameObject.AddComponent<ARSolutionsSeaBreezePowerManager>();
@@ -100,7 +108,7 @@ namespace ARS_SeaBreezeFCS32.Mono
             if (FridgeComponent == null)
             {
                 FridgeComponent = gameObject.AddComponent<Fridge>();
-                FridgeComponent.Initialize(this,QPatch.Configuration.StorageLimit);
+                FridgeComponent.Initialize(this, QPatch.Configuration.StorageLimit);
                 FridgeComponent.OnContainerUpdate += OnContainerUpdate;
                 FridgeComponent.SetModMode(QPatch.Configuration.ModMode);
             }
@@ -127,7 +135,7 @@ namespace ARS_SeaBreezeFCS32.Mono
                 NameController.SetCurrentName(Mod.GetNewSeabreezeName());
                 NameController.OnLabelChanged += OnLabelChangedMethod;
             }
-            
+
             if (AnimationManager == null)
             {
                 AnimationManager = gameObject.AddComponent<AnimationManager>();
@@ -137,6 +145,12 @@ namespace ARS_SeaBreezeFCS32.Mono
             {
                 DisplayManager = gameObject.AddComponent<ARSolutionsSeaBreezeDisplay>();
                 DisplayManager.Setup(this);
+            }
+
+            if (FCSConnectableDevice == null)
+            {
+                FCSConnectableDevice = gameObject.AddComponent<FCSConnectableDevice>();
+                FCSConnectableDevice.Initialize(this,FridgeComponent);
             }
 
             IsInitialized = true;
@@ -163,7 +177,7 @@ namespace ARS_SeaBreezeFCS32.Mono
         {
             QuickLogger.Debug("Power Outage", true);
             FridgeComponent.SetDecay(true);
-            AnimationManager.SetIntHash(PageStateHash,0);
+            AnimationManager.SetIntHash(PageStateHash, 0);
         }
 
         private void OnPowerResume()
@@ -183,14 +197,15 @@ namespace ARS_SeaBreezeFCS32.Mono
 
         private void OnContainerUpdate(int arg1, int arg2)
         {
-            DisplayManager.OnContainerUpdate(arg1,arg2);
+            DisplayManager.OnContainerUpdate(arg1, arg2);
         }
 
         private void OnLabelChangedMethod(string arg1, NameController arg2)
         {
-            DisplayManager.UpdateScreenLabel(arg1,arg2);
+            DisplayManager.UpdateScreenLabel(arg1, arg2);
+            OnLabelChanged?.Invoke(arg1, arg2);
         }
-        
+
         public override void OnProtoSerialize(ProtobufSerializer serializer)
         {
             QuickLogger.Debug("In OnProtoSerialize");
@@ -244,8 +259,7 @@ namespace ARS_SeaBreezeFCS32.Mono
 
         internal void Save(SaveData saveData)
         {
-            var prefabIdentifier = GetComponent<PrefabIdentifier>();
-            var id = prefabIdentifier.Id;
+            var id = PrefabId.Id;
 
             if (_savedData == null)
             {
@@ -259,9 +273,54 @@ namespace ARS_SeaBreezeFCS32.Mono
             saveData.Entries.Add(_savedData);
         }
 
-        public override string GetName()
-        {
-            return NameController != null ? NameController.GetCurrentName() : string.Empty;
-        }
+        //    public override string GetName()
+        //    {
+        //        return NameController != null ? NameController.GetCurrentName() : string.Empty;
+        //    }
+
+        //    public override void SetNameControllerTag(object obj)
+        //    {
+        //        if (NameController != null)
+        //        {
+        //            NameController.Tag = obj;
+        //        }
+        //    }
+
+        //    public override string GetPrefabIDString()
+        //    {
+        //        if (PrefabId == null)
+        //            PrefabId = GetComponentInParent<PrefabIdentifier>() ?? GetComponent<PrefabIdentifier>();
+
+        //        return PrefabId?.Id;
+        //    }
+
+        //    public override bool CanBeStored(int amount)
+        //    {
+        //        return FridgeComponent != null && !FridgeComponent.IsFull;
+        //    }
+
+        //    public override bool AddItemToContainer(InventoryItem item, out string reason)
+        //    {
+        //        reason = string.Empty;
+        //        if (FridgeComponent != null)
+        //        {
+        //            if (!FridgeComponent.IsFull)
+        //            {
+        //                if (!FridgeComponent.IsAllowedToAdd(item.item))
+        //                {
+        //                    reason = ARSSeaBreezeFCS32Buildable.ItemNotAllowed();
+        //                    return false;
+        //                }
+        //                FridgeComponent.AddItem(item);
+        //            }
+        //            else
+        //            {
+        //                reason = ARSSeaBreezeFCS32Buildable.SeaBreezeFull();
+        //                return false;
+        //            }
+        //        }
+
+        //        return true;
+        //    }
     }
 }

@@ -1,10 +1,11 @@
 ﻿using AE.SeaCooker.Buildable;
 using AE.SeaCooker.Mono;
-using ARS_SeaBreezeFCS32.Mono;
 using FCSCommon.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using FCSTechFabricator.Abstract;
+using FCSTechFabricator.Components;
 using FCSTechFabricator.Objects;
 using UnityEngine;
 
@@ -170,33 +171,33 @@ namespace AE.SeaCooker.Managers
 
             if (_mono.AutoChooseSeabreeze)
             {
-                foreach (KeyValuePair<string, ARSolutionsSeaBreezeController> breezeController in _mono.SeaBreezes)
+                foreach (KeyValuePair<string, FCSConnectableDevice> breezeController in _mono.SeaBreezes)
                 {
-                    QuickLogger.Debug($"Current SeaBreeze: {breezeController.Value.PrefabId.Id}", true);
+                    QuickLogger.Debug($"Current SeaBreeze: {breezeController.Value.GetPrefabIDString()}", true);
 
                     if (_exportContainer.count <= 0) break;
 
                     if (breezeController.Value.CanBeStored(_exportContainer.count))
                     {
-                        QuickLogger.Debug($"SeaBreeze {breezeController.Value.PrefabId.Id}: Has all {_exportContainer.count} Available.", true);
+                        QuickLogger.Debug($"SeaBreeze {breezeController.Value.GetPrefabIDString()}: Has all {_exportContainer.count} Available.", true);
 
                         for (int i = _exportContainer.count - 1; i > -1; i--)
                         {
                             var item = _exportContainer.FirstOrDefault();
-                            var result = breezeController.Value.AddItemToFridge(item, out string reason);
+                            var result = breezeController.Value.AddItemToContainer(item, out string reason);
                             _exportContainer.RemoveItem(item?.item);
-                            QuickLogger.Debug($"SeaBreeze {breezeController.Value.PrefabId.Id}: Operation successful {result}", true);
+                            QuickLogger.Debug($"SeaBreeze {breezeController.Value.GetPrefabIDString()}: Operation successful {result}", true);
                         }
 
                         break;
                     }
 
-                    if (breezeController.Value.FreeSpace > 0)
+                    if (breezeController.Value.GetContainerFreeSpace > 0)
                     {
-                        for (int i = breezeController.Value.FreeSpace - 1; i > -1; i--)
+                        for (int i = breezeController.Value.GetContainerFreeSpace - 1; i > -1; i--)
                         {
                             var item = _exportContainer.FirstOrDefault();
-                            var result = breezeController.Value.AddItemToFridge(item, out string reason);
+                            var result = breezeController.Value.AddItemToContainer(item, out string reason);
                             _exportContainer.RemoveItem(item?.item);
                         }
                     }
@@ -209,13 +210,12 @@ namespace AE.SeaCooker.Managers
                     for (int i = _exportContainer.count - 1; i > -1; i--)
                     {
                         var item = _exportContainer.FirstOrDefault();
-                        var result = _mono.SelectedSeaBreeze.AddItemToFridge(item, out string reason);
+                        var result = _mono.SelectedSeaBreeze.AddItemToContainer(item, out string reason);
                         _exportContainer.RemoveItem(item?.item);
-                        QuickLogger.Debug($"SeaBreeze {_mono.SelectedSeaBreeze.PrefabId.Id}: Operation successful {result}", true);
+                        QuickLogger.Debug($"SeaBreeze {_mono.SelectedSeaBreeze.GetPrefabIDString()}: Operation successful {result}", true);
                     }
                 }
             }
-            
         }
 
         internal bool HasItemsToCook()
@@ -279,8 +279,8 @@ namespace AE.SeaCooker.Managers
             {
                 var go = GameObject.Instantiate(CraftData.GetPrefabForTechType(eatableEntity.TechType));
                 var food = go.GetComponent<Eatable>();
-                food.waterValue = eatableEntity.WaterValue;
-                food.foodValue = eatableEntity.FoodValue;
+                food.waterValue = eatableEntity.GetWaterValue();
+                food.foodValue = eatableEntity.GetFoodValue();
 #if SUBNAUTICA
                 _exportContainer.UnsafeAdd(new InventoryItem(food.GetComponent<Pickupable>().Pickup(false)));
 #elif BELOWZERO
@@ -297,8 +297,8 @@ namespace AE.SeaCooker.Managers
             {
                 var go = GameObject.Instantiate(CraftData.GetPrefabForTechType(eatableEntity.TechType));
                 var food = go.GetComponent<Eatable>();
-                food.waterValue = eatableEntity.WaterValue;
-                food.foodValue = eatableEntity.FoodValue;
+                food.waterValue = eatableEntity.GetWaterValue();
+                food.foodValue = eatableEntity.GetFoodValue();
 #if SUBNAUTICA
                 _container.UnsafeAdd(new InventoryItem(food.GetComponent<Pickupable>().Pickup(false)));
 #elif BELOWZERO

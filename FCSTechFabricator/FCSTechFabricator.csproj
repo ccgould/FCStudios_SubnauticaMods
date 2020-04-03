@@ -122,10 +122,12 @@
     <Compile Include="Abstract\FCSController.cs" />
     <Compile Include="Components\CraftingTab.cs" />
     <Compile Include="Components\DumpContainer.cs" />
+    <Compile Include="Components\FCSConnectableDevice.cs" />
     <Compile Include="Components\FCSTechFabricatorTag.cs" />
     <Compile Include="Components\InternalBatteryController.cs" />
     <Compile Include="Components\NameController.cs" />
     <Compile Include="Components\Fridge.cs" />
+    <Compile Include="Configuration\DefaultConfigurations.cs" />
     <Compile Include="Configuration\Mod.cs" />
     <Compile Include="Craftables\FCSKit.cs" />
     <Compile Include="Craftables\FCSModule.cs" />
@@ -141,6 +143,7 @@
     <Compile Include="FcTechFabricator.cs" />
     <Compile Include="FcTechFabricatorService.cs" />
     <Compile Include="Initializer.cs" />
+    <Compile Include="Interfaces\IFCSStorage.cs" />
     <Compile Include="Interfaces\IFridgeContainer.cs" />
     <Compile Include="Interfaces\IRenameable.cs" />
     <Compile Include="Managers\ColorManager.cs" />

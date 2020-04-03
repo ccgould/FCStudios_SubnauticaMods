@@ -24,7 +24,7 @@ namespace FCSTechFabricator.Managers
         private int _maxColorPage = 1;
         private int _currentColorPage;
         private readonly List<ColorItemButton> _colorItemsTracker = new List<ColorItemButton>();
-        private readonly Color _defaultColor = new Color(0.7529412f, 0.7529412f, 0.7529412f, 1f);
+        private readonly Color _defaultColor = Configuration.DefaultConfigurations.DefaultColor;
 
         public Action<Color> OnColorChanged;
         public string HomeButtonMessage { get; set; }

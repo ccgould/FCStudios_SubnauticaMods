@@ -1,18 +1,18 @@
-﻿using ARS_SeaBreezeFCS32.Mono;
-using Harmony;
+﻿using Harmony;
 using System;
 using FCSTechFabricator.Abstract;
+using FCSTechFabricator.Components;
 
 namespace AE.SeaCooker.Patchers
 {
-    [HarmonyPatch(typeof(FCSController))]
-    [HarmonyPatch("Initialized")]
+    [HarmonyPatch(typeof(FCSConnectableDevice))]
+    [HarmonyPatch("Start")]
     internal class ARSeaBreezeFCS32Awake_Patcher
     {
-        private static Action<FCSController> onSeaBreezeAdded;
+        private static Action<FCSConnectableDevice> onSeaBreezeAdded;
 
         [HarmonyPostfix]
-        public static void Postfix(FCSController __instance)
+        public static void Postfix(FCSConnectableDevice __instance)
         {
             if (onSeaBreezeAdded != null)
             {
@@ -20,7 +20,7 @@ namespace AE.SeaCooker.Patchers
             }
         }
 
-        public static bool AddEventHandlerIfMissing(Action<FCSController> newHandler)
+        public static bool AddEventHandlerIfMissing(Action<FCSConnectableDevice> newHandler)
         {
             if (onSeaBreezeAdded == null)
             {
@@ -29,7 +29,7 @@ namespace AE.SeaCooker.Patchers
             }
             else
             {
-                foreach (Action<FCSController> action in onSeaBreezeAdded.GetInvocationList())
+                foreach (Action<FCSConnectableDevice> action in onSeaBreezeAdded.GetInvocationList())
                 {
                     if (action == newHandler)
                     {
@@ -42,7 +42,7 @@ namespace AE.SeaCooker.Patchers
             }
         }
 
-        public static bool RemoveEventHandler(Action<FCSController> newHandler)
+        public static bool RemoveEventHandler(Action<FCSConnectableDevice> newHandler)
         {
             if (onSeaBreezeAdded != null)
             {
@@ -54,14 +54,14 @@ namespace AE.SeaCooker.Patchers
         }
     }
 
-    [HarmonyPatch(typeof(FCSController))]
+    [HarmonyPatch(typeof(FCSConnectableDevice))]
     [HarmonyPatch("OnDestroy")]
     internal class ARSeaBreezeFCS32Destroy_Patcher
     {
-        private static Action<FCSController> onSeaBreezeDestroyed;
+        private static Action<FCSConnectableDevice> onSeaBreezeDestroyed;
 
         [HarmonyPostfix]
-        public static void Postfix(FCSController __instance)
+        public static void Postfix(FCSConnectableDevice __instance)
         {
             if (onSeaBreezeDestroyed != null)
             {
@@ -69,7 +69,7 @@ namespace AE.SeaCooker.Patchers
             }
         }
 
-        public static bool AddEventHandlerIfMissing(Action<FCSController> newHandler)
+        public static bool AddEventHandlerIfMissing(Action<FCSConnectableDevice> newHandler)
         {
             if (onSeaBreezeDestroyed == null)
             {
@@ -78,7 +78,7 @@ namespace AE.SeaCooker.Patchers
             }
             else
             {
-                foreach (Action<FCSController> action in onSeaBreezeDestroyed.GetInvocationList())
+                foreach (Action<FCSConnectableDevice> action in onSeaBreezeDestroyed.GetInvocationList())
                 {
                     if (action == newHandler)
                     {
@@ -92,7 +92,7 @@ namespace AE.SeaCooker.Patchers
         }
 
 
-        public static bool RemoveEventHandler(Action<FCSController> newHandler)
+        public static bool RemoveEventHandler(Action<FCSConnectableDevice> newHandler)
         {
             if (onSeaBreezeDestroyed != null)
             {

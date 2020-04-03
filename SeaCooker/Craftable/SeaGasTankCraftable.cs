@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using AE.SeaCooker.Configuration;
-using ARS_SeaBreezeFCS32.Configuration;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using FCSTechFabricator;
@@ -22,7 +18,7 @@ namespace AE.SeaCooker.Craftable
 
         public SeaGasTankCraftable(string classId, string friendlyName, string description, FcCraftingTab parentTab) : base(classId, friendlyName, description, parentTab)
         {
-            _tank = QPatch.GlobalBundle.LoadAsset<GameObject>("SeaGasTank");
+            _tank = QPatch.AssetBundle.LoadAsset<GameObject>("SeaGasTank");
 
             OnFinishedPatching += () =>
             {
@@ -89,9 +85,9 @@ namespace AE.SeaCooker.Craftable
 
         private void ApplySeaTankShaders(GameObject prefab)
         {
-            MaterialHelpers.ApplyEmissionShader("SeaCooker_BaseColor", "SeaCooker_Emissive", prefab, QPatch.GlobalBundle, new Color(0.08235294f, 1f, 1f));
-            MaterialHelpers.ApplyNormalShader("SeaCooker_BaseColor", "SeaCooker_Normal", prefab, QPatch.GlobalBundle);
-            MaterialHelpers.ApplySpecShader("SeaCooker_BaseColor", "SeaCooker_Spec", prefab, 1, 6f, QPatch.GlobalBundle);
+            MaterialHelpers.ApplyEmissionShader("SeaCooker_BaseColor", "SeaCooker_Emissive", prefab, QPatch.AssetBundle, new Color(0.08235294f, 1f, 1f));
+            MaterialHelpers.ApplyNormalShader("SeaCooker_BaseColor", "SeaCooker_Normal", prefab, QPatch.AssetBundle);
+            MaterialHelpers.ApplySpecShader("SeaCooker_BaseColor", "SeaCooker_Spec", prefab, 1, 6f, QPatch.AssetBundle);
             MaterialHelpers.ApplyAlphaShader("SeaCooker_BaseColor", prefab);
         }
 

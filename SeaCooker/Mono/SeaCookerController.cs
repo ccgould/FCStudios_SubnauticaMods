@@ -3,12 +3,12 @@ using AE.SeaCooker.Configuration;
 using AE.SeaCooker.Helpers;
 using AE.SeaCooker.Managers;
 using AE.SeaCooker.Patchers;
-using ARS_SeaBreezeFCS32.Mono;
 using FCSCommon.Utilities;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using FCSTechFabricator.Abstract;
+using FCSTechFabricator.Components;
 using FCSTechFabricator.Extensions;
 using FCSTechFabricator.Managers;
 using UnityEngine;
@@ -28,7 +28,7 @@ namespace AE.SeaCooker.Mono
         internal AnimationManager AnimationManager { get; set; }
         internal FoodManager FoodManager { get; private set; }
         internal string SelectedSeaBreezeID { get; set; }
-        internal Dictionary<string, FCSController> SeaBreezes { get; set; } = new Dictionary<string, FCSController>();
+        internal Dictionary<string, FCSConnectableDevice> SeaBreezes { get; set; } = new Dictionary<string, FCSConnectableDevice>();
         internal ColorManager ColorManager { get; private set; }
         internal AudioManager AudioManager { get; private set; }
         internal bool IsSebreezeSelected { get; set; }
@@ -40,7 +40,7 @@ namespace AE.SeaCooker.Mono
         private bool _runStartUpOnEnable;
         private SaveDataEntry _savedData;
         private bool _fromSave;
-        internal FCSController SelectedSeaBreeze { get; set; }
+        internal FCSConnectableDevice SelectedSeaBreeze { get; set; }
         internal PlayerInteraction PlayerInteraction { get; private set; }
 
         private void Awake()
@@ -279,7 +279,7 @@ namespace AE.SeaCooker.Mono
             }
         }
 
-        private void AlertedNewSeaBreezePlaced(FCSController obj)
+        private void AlertedNewSeaBreezePlaced(FCSConnectableDevice obj)
         {
             if (obj != null)
             {
@@ -288,7 +288,7 @@ namespace AE.SeaCooker.Mono
             }
         }
 
-        private void AlertedSeaBreezeDestroyed(FCSController obj)
+        private void AlertedSeaBreezeDestroyed(FCSConnectableDevice obj)
         {
             if (obj == null || obj.GetPrefabIDString() == null) return;
 
@@ -298,7 +298,7 @@ namespace AE.SeaCooker.Mono
             DisplayManager.UpdateSeaBreezes();
         }
 
-        private IEnumerator TrackNewSeabreezeCoroutine(FCSController obj)
+        private IEnumerator TrackNewSeabreezeCoroutine(FCSConnectableDevice obj)
         {
             yield return new WaitForEndOfFrame();
 
@@ -322,9 +322,6 @@ namespace AE.SeaCooker.Mono
             ARSeaBreezeFCS32Destroy_Patcher.RemoveEventHandler(AlertedSeaBreezeDestroyed);
         }
 
-        /// <summary>
-        /// Gets all the turbines in the base
-        /// </summary>
         private void GetSeaBreezes()
         {
             //Clear the list
@@ -333,7 +330,7 @@ namespace AE.SeaCooker.Mono
             //Check if there is a base connected
             if (_habitat != null)
             {
-                var seaBreezeList = _habitat.GetComponentsInChildren<FCSController>().ToList();
+                var seaBreezeList = _habitat.GetComponentsInChildren<FCSConnectableDevice>().ToList();
 
                 foreach (var seaBreeze in seaBreezeList)
                 {
@@ -342,7 +339,7 @@ namespace AE.SeaCooker.Mono
             }
         }
 
-        public void SetCurrentSeaBreeze(FCSController sb)
+        public void SetCurrentSeaBreeze(FCSConnectableDevice sb)
         {
             SelectedSeaBreeze = sb;
             SelectedSeaBreezeID = sb.GetPrefabIDString();

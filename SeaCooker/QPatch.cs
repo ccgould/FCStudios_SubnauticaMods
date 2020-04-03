@@ -2,11 +2,11 @@
 using AE.SeaCooker.Configuration;
 using FCSCommon.Utilities;
 using Harmony;
-using Oculus.Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Reflection;
 using AE.SeaCooker.Craftable;
+using FCSCommon.Helpers;
 using FCSTechFabricator;
 using FCSTechFabricator.Components;
 using FCSTechFabricator.Craftables;
@@ -22,7 +22,8 @@ namespace AE.SeaCooker
         internal static ConfigFile Configuration { get; set; }
         internal static string Version { get; set; }
         internal static AssetBundle GlobalBundle { get; set; }
-        
+        public static AssetBundle AssetBundle { get; set; }
+
         [QModPatch]
         public static void Patch()
         {
@@ -63,18 +64,23 @@ namespace AE.SeaCooker
                 QuickLogger.Error(ex);
             }
         }
-
-
-
+        
         private static void AddTechFabricatorItems()
         {
+
+            if (AssetBundle == null)
+            {
+                QuickLogger.Debug("GetPrefabs");
+                AssetBundle = AssetHelper.Asset(Mod.ModName, Mod.BundleName);
+            }
+            
             var icon = ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetFolder(), $"{Mod.ClassID}.png"));
             var craftingTab = new CraftingTab(Mod.SeaCookerTabID, Mod.FriendlyName, icon);
 
             var seaCookerKit = new FCSKit(Mod.SeaCookerKitClassID, Mod.FriendlyName, craftingTab, Mod.SeaCookerIngredients);
             seaCookerKit.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
 
-            var seaAlienGasTank = new SeaAlienGasTankCraftable(Mod.SeaAlienGasClassID, Mod.SeaAlienGasFriendlyName,Mod.SeaAlienGasDescription, craftingTab);
+            var seaAlienGasTank = new SeaAlienGasTankCraftable(Mod.SeaAlienGasClassID, Mod.SeaAlienGasFriendlyName, Mod.SeaAlienGasDescription, craftingTab);
             seaAlienGasTank.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
 
             var seaGasTank = new SeaGasTankCraftable(Mod.SeaGasClassID, Mod.SeaGasFriendlyName, Mod.SeaGasDescription, craftingTab);
