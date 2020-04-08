@@ -38,5 +38,60 @@ namespace FCSCommon.Helpers
                 return (int) length;
             return 0;
         }
+
+        internal static GameObject FindGameObject(GameObject go,string name, SearchOption searchOption = SearchOption.Full)
+        {
+            try
+            {
+                var renders = go.GetComponentsInChildren<MeshRenderer>();
+
+                foreach (MeshRenderer mesh in renders)
+                {
+                    switch (searchOption)
+                    {
+                        case SearchOption.Full:
+                            if (mesh.name.Equals(name, StringComparison.OrdinalIgnoreCase))
+                            {
+                                return mesh.gameObject;
+                            }
+                            break;
+                        case SearchOption.StartsWith:
+                            if (mesh.name.StartsWith(name, StringComparison.OrdinalIgnoreCase))
+                            {
+                                return mesh.gameObject;
+                            }
+                            break;
+                        case SearchOption.EndsWith:
+                            if (mesh.name.EndsWith(name, StringComparison.OrdinalIgnoreCase))
+                            {
+                                return mesh.gameObject;
+                            }
+                            break;
+                        case SearchOption.Contains:
+                            if (mesh.name.Contains(name))
+                            {
+                                return mesh.gameObject;
+                            }
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException(nameof(searchOption), searchOption, null);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+               QuickLogger.Error($"Message: {e.Message} StackTrace: {e.StackTrace}");
+            }
+
+            return null;
+        }
+    }
+
+    internal enum SearchOption
+    {
+        Full,
+        StartsWith,
+        EndsWith,
+        Contains
     }
 }

@@ -6,7 +6,7 @@ namespace FCSCommon.Exceptions
     /// <summary>
     /// A custom exception for errors in patching
     /// </summary>
-    public class PatchTerminatedException : Exception
+    internal class PatchTerminatedException : Exception
     {
         #region Constructor
         /// <summary>
@@ -18,12 +18,12 @@ namespace FCSCommon.Exceptions
         }
         #endregion
 
-        public PatchTerminatedException(string message)
+        internal PatchTerminatedException(string message)
             : base(message)
         {
         }
 
-        public PatchTerminatedException(string message, Exception inner)
+        internal PatchTerminatedException(string message, Exception inner)
             : base(message, inner)
         {
         }

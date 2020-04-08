@@ -153,6 +153,13 @@ namespace FCSTechFabricator.Managers
             OnColorChanged?.Invoke(color);
         }
 
+        public void ChangeColorMask(Color color)
+        {
+            MaterialHelpers.ChangeMaterialColor(_bodyMaterial, _gameObject, Color.white,color,Color.white);
+            ResetColorSelections(color);
+            OnColorChanged?.Invoke(color);
+        }
+
         public void ChangeColorPageBy(int amount)
         {
             DrawColorPage(_currentColorPage + amount);

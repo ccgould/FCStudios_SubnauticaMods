@@ -98,7 +98,12 @@
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\FCSTechFabricator\FCSTechFabricator.csproj">
+      <Project>{5EF4ADB8-3AE7-41EC-83E1-1DAF04999F0E}</Project>
+      <Name>FCSTechFabricator</Name>
+    </ProjectReference>
+  </ItemGroup>
   <ItemGroup>
     <None Include="mod.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

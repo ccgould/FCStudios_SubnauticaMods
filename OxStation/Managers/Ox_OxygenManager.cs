@@ -109,7 +109,7 @@ namespace MAC.OxStation.Managers
             }
 
 
-            QuickLogger.Debug($"Taking: {playerO2Request}", true);
+            QuickLogger.Debug($"Taking: {playerO2Request} || RT Installed: {Mod.RTInstalled}", true);
 
             if (_o2Level >= playerO2Request)
             {

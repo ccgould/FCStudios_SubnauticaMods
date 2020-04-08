@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Alterra Medical Mini MedBay")]
-[assembly: AssemblyDescription("A medical mod bay that heals you, generates packages and decompresses you")]
+[assembly: AssemblyTitle("FCS_HydroponicHarvesters")]
+[assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Field Creators Studios")]
-[assembly: AssemblyProduct("Alterra Medical Mini MedBay")]
-[assembly: AssemblyCopyright("Copyright ©Field Creators Studios 2019")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("FCS_HydroponicHarvesters")]
+[assembly: AssemblyCopyright("Copyright ©  2020")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("ffa8c60f-f2d5-461c-bbd2-17e35a013fdf")]
+[assembly: Guid("f6cc8851-b7ef-41c1-b847-37638356d5c7")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.2.2.0")]
-[assembly: AssemblyFileVersion("1.2.2.0")]
+[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyFileVersion("1.0.0.0")]

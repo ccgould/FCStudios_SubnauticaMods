@@ -128,7 +128,7 @@ namespace FCSCommon.Helpers
             }
         }
 
-        internal static void ChangeMaterialColor(string materialName, GameObject gameObject, Color color)
+        internal static void ChangeMaterialColor(string materialName, GameObject gameObject, Color color, Color color2 = default, Color color3 = default)
         {
             Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>(true);
             foreach (Renderer renderer in renderers)
@@ -138,6 +138,8 @@ namespace FCSCommon.Helpers
                     if (material.name.StartsWith(materialName, StringComparison.OrdinalIgnoreCase))
                     {
                         material.SetColor("_Color", color);
+                        material.SetColor("_Color2", color2);
+                        material.SetColor("_Color3", color3);
                     }
                 }
             }
@@ -238,12 +240,21 @@ namespace FCSCommon.Helpers
         /// Adds glass material to the gameobject.
         /// </summary>
         /// <param name="gameObject">The game object to add the glass material</param>
-        internal static void ApplyGlassShaderTemplate(GameObject gameObject, string newMaterialName = "object")
+        internal static void ApplyGlassShaderTemplate(GameObject gameObject,string matchName, string newMaterialName = "object")
         {
             GetIngameObjects();
 
-            var render = gameObject.GetComponent<Renderer>();
-            render.material = _glassMaterial;
+            var model = GameObjectHelpers.FindGameObject(gameObject, matchName, SearchOption.EndsWith);
+
+            if(model != null)
+            {
+                var render = model.GetComponent<Renderer>();
+                render.material = _glassMaterial;
+            }
+            else
+            {
+                QuickLogger.Error($"[ApplyGlassShaderTemplate] Model was not found with the matchin name {matchName}");
+            }
         }
 
         internal static void AddNewBubbles(GameObject gameObject, Vector3 position, Vector3 rotation)
@@ -254,6 +265,7 @@ namespace FCSCommon.Helpers
             newBubbles.transform.SetParent(gameObject.transform);
             newBubbles.transform.localPosition = position;
             newBubbles.transform.Rotate(rotation);
+            newBubbles.SetActive(false);
         }
 
         internal static void GetIngameObjects()
@@ -346,8 +358,8 @@ namespace FCSCommon.Helpers
             {
                 foreach (Material material in renderer.materials)
                 {
-                    QuickLogger.Debug($"[ApplyColorMaskShader] Material Name: {material.name} || Compare to: {materialName} || Result: {material.name.ToLower().StartsWith(materialName.ToLower())}");
-
+                    QuickLogger.Debug($"[ApplyColorMaskShader] Material Name: {material.name} || Compare to: {materialName} || Result: {material.name.ToLower().StartsWith(materialName.ToLower())} || Render:{renderer.name}");
+                    
 
                     if (material.name.StartsWith(materialName, StringComparison.OrdinalIgnoreCase))
                     {
@@ -356,16 +368,14 @@ namespace FCSCommon.Helpers
                         material.EnableKeyword("UWE_3COLOR");
 
                         material.SetFloat("_Enable3Color", 1);
+                        
+                        material.SetTexture("_MultiColorMask", FindTexture2D(maskTexture, assetBundle));
 
                         material.SetColor("_Color", color);
 
                         material.SetColor("_Color2", color2);
 
                         material.SetColor("_Color3", color3);
-
-                        material.SetTexture("_MultiColorMask", FindTexture2D(maskTexture, assetBundle));
-
-
                     }
                 }
             }

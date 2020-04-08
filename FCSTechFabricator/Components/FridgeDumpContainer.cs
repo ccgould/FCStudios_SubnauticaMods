@@ -1,23 +1,22 @@
 ﻿using System;
 using FCSCommon.Utilities;
-using FCSTechFabricator.Interfaces;
 using UnityEngine;
 
 namespace FCSTechFabricator.Components
 {
-    public class DumpContainer : MonoBehaviour
+    public class FridgeDumpContainer : MonoBehaviour
     {
         private ChildObjectIdentifier _containerRoot;
         private ItemsContainer _dumpContainer;
         private string _itemNotAllowedMessage;
         private string _storageIsFullMessage;
-        private IFCSStorage _storage;
+        private Fridge _fridge;
 
-        public void Initialize(Transform trans,string label, string itemNotAllowedMessage,string storageIsFullMessage, IFCSStorage storage, int width = 6, int height = 8, string name="StorageRoot")
+        public void Initialize(Transform trans,string label, string itemNotAllowedMessage,string storageIsFullMessage, Fridge fridge, int width = 6, int height = 8, string name="StorageRoot")
         {
             _itemNotAllowedMessage = itemNotAllowedMessage;
             _storageIsFullMessage = storageIsFullMessage;
-            _storage = storage;
+            _fridge = fridge;
 
             if (_containerRoot == null)
             {
@@ -39,12 +38,38 @@ namespace FCSTechFabricator.Components
 
         private void DumpContainerOnOnAddItem(InventoryItem item)
         {
-            _storage.AddItemToContainer(item);
+            _fridge.AddItem(item);
         }
 
         private bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
         {
-            return _storage.IsAllowedToAdd(pickupable, verbose);
+            bool flag = false;
+
+            if (_fridge.IsFull)
+            {
+                QuickLogger.Message(_storageIsFullMessage, true);
+                return false;
+            }
+
+            if (pickupable != null)
+            {
+                TechType techType = pickupable.GetTechType();
+
+                QuickLogger.Debug(techType.ToString());
+
+                if (pickupable.GetComponent<Eatable>() != null)
+                    flag = true;
+            }
+
+            QuickLogger.Debug($"Adding Item {flag} || {verbose}");
+
+            if (!flag && verbose)
+            {
+                QuickLogger.Message(_itemNotAllowedMessage,true);
+                flag =  false;
+            }
+            
+            return flag;
         }
 
         public void OpenStorage()

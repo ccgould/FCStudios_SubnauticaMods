@@ -4,16 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{5EF4ADB8-3AE7-41EC-83E1-1DAF04999F0E}</ProjectGuid>
+    <ProjectGuid>{F6CC8851-B7EF-41C1-B847-37638356D5C7}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FCSTechFabricator</RootNamespace>
-    <AssemblyName>FCSTechFabricator</AssemblyName>
+    <RootNamespace>FCS_HydroponicHarvesters</RootNamespace>
+    <AssemblyName>HydroponicHarvesters</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <Game>$(Configuration.split(_)[0])</Game>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Subnautica_Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -23,7 +22,7 @@
     <DefineConstants>DEBUG;TRACE;SUBNAUTICA</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Subnautica_Release|AnyCPU' ">
     <DebugType>none</DebugType>
@@ -32,7 +31,7 @@
     <DefineConstants>TRACE;SUBNAUTICA</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'BelowZero_Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -42,7 +41,6 @@
     <DefineConstants>DEBUG;TRACE;BELOWZERO</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'BelowZero_Release|AnyCPU' ">
     <DebugType>none</DebugType>
@@ -51,33 +49,26 @@
     <DefineConstants>TRACE;BELOWZERO</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="0Harmony-1.2.0.1, Version=1.2.0.1, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="0Harmony-1.2.0.1">
       <HintPath>..\Dependancies\0Harmony-1.2.0.1.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="Assembly-CSharp">
-      <HintPath>..\Dependancies\$(Game)\Assembly-CSharp.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>..\Dependancies\Subnautica\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp-firstpass">
-      <HintPath>..\Dependancies\$(Game)\Assembly-CSharp-firstpass.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>..\Dependancies\Subnautica\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json">
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Dependancies\Newtonsoft.Json.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="QModInstaller">
       <HintPath>..\Dependancies\QModInstaller.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="SMLHelper">
-      <HintPath>..\Dependancies\$(Game)\SMLHelper.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>..\Dependancies\Subnautica\SMLHelper.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -88,86 +79,62 @@
     <Reference Include="System.Xml" />
     <Reference Include="UnityEngine">
       <HintPath>..\Dependancies\UnityEngine.dll</HintPath>
-      <Private>False</Private>
     </Reference>
-    <Reference Include="UnityEngine.AnimationModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="UnityEngine.AnimationModule">
       <HintPath>..\Dependancies\UnityEngine.AnimationModule.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.AssetBundleModule">
       <HintPath>..\Dependancies\UnityEngine.AssetBundleModule.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\Dependancies\UnityEngine.CoreModule.dll</HintPath>
-      <Private>False</Private>
     </Reference>
-    <Reference Include="UnityEngine.PhysicsModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="UnityEngine.PhysicsModule">
       <HintPath>..\Dependancies\UnityEngine.PhysicsModule.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>..\Dependancies\UnityEngine.UI.dll</HintPath>
-      <Private>False</Private>
     </Reference>
-    <Reference Include="UnityEngine.UIModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="UnityEngine.UIModule">
       <HintPath>..\Dependancies\UnityEngine.UIModule.dll</HintPath>
-      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Abstract\FCSController.cs" />
-    <Compile Include="Components\CraftingTab.cs" />
-    <Compile Include="Components\DumpContainer.cs" />
-    <Compile Include="Components\FCSDNA.cs" />
-    <Compile Include="Components\FridgeDumpContainer.cs" />
-    <Compile Include="Components\FCSConnectableDevice.cs" />
-    <Compile Include="Components\FCSTechFabricatorTag.cs" />
-    <Compile Include="Components\InternalBatteryController.cs" />
-    <Compile Include="Components\NameController.cs" />
-    <Compile Include="Components\Fridge.cs" />
-    <Compile Include="Configuration\DefaultConfigurations.cs" />
+    <Compile Include="Buildables\HydroHarvAuxPatcher.cs" />
+    <Compile Include="Buildables\HydroHarvModelPrefab.cs" />
+    <Compile Include="Buildables\HydroHarvPatcher.cs" />
     <Compile Include="Configuration\Mod.cs" />
-    <Compile Include="Craftables\FCSDNASample.cs" />
-    <Compile Include="Craftables\FCSKit.cs" />
-    <Compile Include="Craftables\FCSModule.cs" />
-    <Compile Include="Enums\EatableType.cs" />
-    <Compile Include="Enums\FCSEnvironment.cs" />
-    <Compile Include="Enums\FoodPileType.cs" />
-    <Compile Include="Enums\ModModes.cs" />
-    <Compile Include="Example.cs" />
-    <Compile Include="Extensions\ColorExtensions.cs" />
-    <Compile Include="Extensions\VectorExtenstions.cs" />
-    <Compile Include="FcAssetBundlesService.cs" />
-    <Compile Include="FcCraftable.cs" />
-    <Compile Include="FcCraftingTab.cs" />
-    <Compile Include="FcTechFabricator.cs" />
-    <Compile Include="FcTechFabricatorService.cs" />
-    <Compile Include="Initializer.cs" />
-    <Compile Include="Interfaces\IFCSStorage.cs" />
-    <Compile Include="Interfaces\IFridgeContainer.cs" />
-    <Compile Include="Interfaces\IRenameable.cs" />
-    <Compile Include="Managers\ColorManager.cs" />
-    <Compile Include="Objects\ColorList.cs" />
-    <Compile Include="Objects\ColorVec4.cs" />
-    <Compile Include="Objects\DNASample.cs" />
-    <Compile Include="Objects\EatableEntities.cs" />
-    <Compile Include="Objects\FridgeComponentSave.cs" />
-    <Compile Include="Objects\Vec3.cs" />
-    <Compile Include="Patchers\Inventory_Patchers.cs" />
+    <Compile Include="Display\InterfaceButton.cs" />
+    <Compile Include="Display\ItemButton.cs" />
+    <Compile Include="Display\OnScreenButton.cs" />
+    <Compile Include="Enumerators\CubePhases.cs" />
+    <Compile Include="Enumerators\SpeedModes.cs" />
+    <Compile Include="Model\PlantSlot.cs" />
+    <Compile Include="Model\SaveDataEntry.cs" />
+    <Compile Include="Mono\HydroHarvContainer.cs" />
+    <Compile Include="Mono\HydroHarvController.cs" />
+    <Compile Include="Mono\HydroHarvDisplayManager.cs" />
+    <Compile Include="Mono\HydroHarvEffectManager.cs" />
+    <Compile Include="Mono\HydroHarvGenerator.cs" />
+    <Compile Include="Mono\HydroHarvGrowBed.cs" />
+    <Compile Include="Mono\HydroHarvPowerManager.cs" />
+    <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FCSTechFabricator\FCSTechFabricator.csproj">
+      <Project>{5ef4adb8-3ae7-41ec-83e1-1daf04999f0e}</Project>
+      <Name>FCSTechFabricator</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup />
   <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\FCSCommon\GamePaths.targets" />
   <PropertyGroup Condition="$(Game) == 'Subnautica'">
-    <PostBuildEvent>xcopy "$(ProjectDir)bin\$(Configuration)\FCSTechFabricator.dll" "$(SubnauticaDir)\QMods\FCS_TechFabricator\" /Y /I</PostBuildEvent>
+    <PostBuildEvent>xcopy "$(ProjectDir)bin\$(Configuration)\HydroponicHarvesters.dll" "$(SubnauticaDir)\QMods\FCS_HydroponicHarvesters\" /Y /I</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup Condition="$(Game) == 'BelowZero'">
-    <PostBuildEvent>xcopy "$(ProjectDir)bin\$(Configuration)\FCSTechFabricator.dll" "$(BelowZeroDir)\QMods\FCS_TechFabricator\" /Y /I</PostBuildEvent>
+    <PostBuildEvent>xcopy "$(ProjectDir)bin\$(Configuration)\HydroponicHarvesters.dll" "$(BelowZeroDir)\QMods\FCS_HydroponicHarvesters\" /Y /I</PostBuildEvent>
   </PropertyGroup>
 </Project>

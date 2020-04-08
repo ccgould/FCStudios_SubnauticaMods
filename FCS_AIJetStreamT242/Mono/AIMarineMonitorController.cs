@@ -80,7 +80,7 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers
         {
             try
             {
-                _aiMarineMonitorDisplay = gameObject.GetComponent<AIMarineMoniterDisplay>();
+                _aiMarineMonitorDisplay = gameObject.EnsureComponent<AIMarineMoniterDisplay>();
                 _aiMarineMonitorDisplay.Setup(this);
             }
             catch (Exception e)
@@ -115,9 +115,9 @@ namespace FCSAlterraIndustrialSolutions.Models.Controllers
             if (obj != null)
             {
                 QuickLogger.Debug("OBJ Not NULL", true);
-                Turbines.Remove(obj.GetPrefabId());
+                Turbines?.Remove(obj.GetPrefabId());
                 QuickLogger.Debug("Past Turbine", true);
-                _aiMarineMonitorDisplay.ItemModified(TechType.None);
+                _aiMarineMonitorDisplay?.ItemModified(TechType.None);
                 QuickLogger.Debug("Removed Turbine");
             }
         }

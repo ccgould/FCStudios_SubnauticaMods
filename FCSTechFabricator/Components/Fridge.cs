@@ -217,5 +217,36 @@ namespace FCSTechFabricator.Components
 
             return true;
         }
+
+        public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
+        {
+            bool flag = false;
+
+            if (IsFull)
+            {
+                QuickLogger.Message(LanguageHelpers.GetLanguage("InventoryFull"), true);
+                return false;
+            }
+
+            if (pickupable != null)
+            {
+                TechType techType = pickupable.GetTechType();
+
+                QuickLogger.Debug(techType.ToString());
+
+                if (pickupable.GetComponent<Eatable>() != null)
+                    flag = true;
+            }
+
+            QuickLogger.Debug($"Adding Item {flag} || {verbose}");
+
+            if (!flag && verbose)
+            {
+                QuickLogger.Message(LanguageHelpers.GetLanguage("TimeCapsuleItemNotAllowed"), true);
+                flag = false;
+            }
+
+            return flag;
+        }
     }
 }

@@ -80,7 +80,7 @@ namespace ARS_SeaBreezeFCS32.Mono
                     _mono.AnimationManager.SetIntHash(_mono.PageStateHash, 6);
                     break;
                 case "DumpBTN":
-                    _mono.DumpContainer.OpenStorage();
+                    _mono.FridgeDumpContainer.OpenStorage();
                     break;
                 case "ColorBTN":
                     _mono.AnimationManager.SetIntHash(_mono.PageStateHash, 4);

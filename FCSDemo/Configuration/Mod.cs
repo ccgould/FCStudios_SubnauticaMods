@@ -23,7 +23,7 @@ namespace FCSDemo.Configuration
         private static SaveData _saveData;
         private const string ConfigFileName = "config.json";
 
-        #endregion
+# endregion
 
         #region Internal Properties
         internal const string ModName = "FCSDemo";
@@ -32,6 +32,7 @@ namespace FCSDemo.Configuration
         internal const string FriendlyName = "FCS Demo";
         internal const string Description = "A demo mod for FCStudios";
         internal const string ClassID = "FcsDemo";
+        internal const string ModNamew = "HydroponicHarvester";
         internal const string PrefabName = "DemoModel";
         internal static string AssetFolder => Path.Combine(ModName, "Assets");
 

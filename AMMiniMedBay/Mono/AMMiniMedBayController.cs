@@ -17,7 +17,6 @@ namespace AMMiniMedBay.Mono
     internal class AMMiniMedBayController: FCSController
     {
         private GameObject _scanner;
-        private bool _initialized;
         private float _processTime = 3.0f;
         private Constructable _buildable;
         private float _timeCurrDeltaTime;
@@ -89,7 +88,7 @@ namespace AMMiniMedBay.Mono
 
             if (_runStartUpOnEnable)
             {
-                if (!_initialized)
+                if (!IsInitialized)
                 {
                     Initialize();
                 }
@@ -191,7 +190,7 @@ namespace AMMiniMedBay.Mono
 
             if (!FindAllComponents())
             {
-                _initialized = false;
+                IsInitialized = false;
                 throw new MissingComponentException("Failed to find all components");
             }
 
@@ -259,7 +258,7 @@ namespace AMMiniMedBay.Mono
                 InvokeRepeating(nameof(UpdateNitrogenDisplay), 1, 0.5f);
             }
 
-            _initialized = true;
+            IsInitialized = true;
         }
 
         private void UpdateNitrogenDisplay()
@@ -323,7 +322,7 @@ namespace AMMiniMedBay.Mono
             if (_scanner == null)
             {
                 QuickLogger.Error($"Scanner not found");
-                _initialized = false;
+                IsInitialized = false;
                 return false;
             }
 
@@ -332,8 +331,15 @@ namespace AMMiniMedBay.Mono
 
         public override bool CanDeconstruct(out string reason)
         {
+            if (Container == null || !IsInitialized)
+            {
+                reason = string.Empty;
+                return true;
+            }
+
             reason = !Container.GetIsEmpty() ? LanguageHelpers.GetLanguage(AMMiniMedBayBuildable.ContainerNotEmptyMessageKey) : string.Empty;
             return Container.GetIsEmpty();
+
         }
 
         public override void OnConstructedChanged(bool constructed)
@@ -346,7 +352,7 @@ namespace AMMiniMedBay.Mono
 
                 if (isActiveAndEnabled)
                 {
-                    if (!_initialized)
+                    if (!IsInitialized)
                     {
                         Initialize();
                     }

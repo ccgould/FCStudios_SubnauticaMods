@@ -376,7 +376,7 @@ namespace FCS_AIMarineTurbine.Mono
         #region Overrides
         private void OnDestroy()
         {
-            Destroy(gameObject);
+
         }
         #endregion
 

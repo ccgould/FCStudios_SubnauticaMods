@@ -1,7 +1,11 @@
-﻿using System.Reflection;
+﻿using System.IO;
+using System.Reflection;
 using FCSCommon.Utilities;
+using FCSTechFabricator.Components;
+using FCSTechFabricator.Configuration;
 using Harmony;
 using QModManager.API.ModLoading;
+using SMLHelper.V2.Utility;
 using UnityEngine;
 
 namespace FCSTechFabricator
@@ -23,7 +27,7 @@ namespace FCSTechFabricator
 
             var harmony = HarmonyInstance.Create("com.fcstechfabricator.fcstudios");
             harmony.PatchAll(Assembly.GetExecutingAssembly());
-
+            
             FcTechFabricatorService.InternalAPI.PatchFabricator();
         }
     }

@@ -33,30 +33,43 @@ namespace FCSCommon.Helpers
         {
             _itemPrefab = itemPrefab;
 
-            #region Prev Color Button
-            var prevColorBtn = InterfaceHelpers.FindGameObject(gridPage, prevBtnNAme);
+            #region Prev Button
 
-            InterfaceHelpers.CreatePaginator(prevColorBtn, -1, ChangePageBy, startColor, hoverColor);
+            if (prevBtnNAme != string.Empty)
+            {
+                var prevBtn = InterfaceHelpers.FindGameObject(gridPage, prevBtnNAme);            
+                InterfaceHelpers.CreatePaginator(prevBtn, -1, ChangePageBy, startColor, hoverColor);
+            }
+            
             #endregion
 
-            #region Next Color Button
-            var nextColorBtn = InterfaceHelpers.FindGameObject(gridPage, nextBtnName);
+            #region Next Button
 
-            InterfaceHelpers.CreatePaginator(nextColorBtn, 1, ChangePageBy, startColor, hoverColor);
+            if (nextBtnName != string.Empty)
+            {
+                var nextBtn = InterfaceHelpers.FindGameObject(gridPage, nextBtnName);
+                InterfaceHelpers.CreatePaginator(nextBtn, 1, ChangePageBy, startColor, hoverColor);
+            }
             #endregion
 
             #region HomeButton
-            var homeBTN = InterfaceHelpers.FindGameObject(gridPage, homeBtnName);
-
-            InterfaceHelpers.CreateButton(homeBTN, "HomeBTN", InterfaceButtonMode.Background,
-                onButtonClick, startColor, hoverColor, maxInteractionRange, HomeButtonMessage);
-
+            if(homeBtnName != string.Empty)
+            {
+                var homeBTN = InterfaceHelpers.FindGameObject(gridPage, homeBtnName);
+                InterfaceHelpers.CreateButton(homeBTN, "HomeBTN", InterfaceButtonMode.Background,
+                    onButtonClick, startColor, hoverColor, maxInteractionRange, HomeButtonMessage);
+            }
             #endregion
             
+            if(paginatorName != string.Empty)
+            {
+                _pageNumberText = InterfaceHelpers.FindGameObject(gridPage, paginatorName)?.GetComponent<Text>();
+            }
+
             _itemsGrid = InterfaceHelpers.FindGameObject(gridPage, gridName); ;
             _itemsPerPage = itemsPerPage;
             _onButtonClick = onButtonClick;
-            _pageNumberText = InterfaceHelpers.FindGameObject(gridPage, paginatorName)?.GetComponent<Text>();
+
             DrawPage(1);
         }
 

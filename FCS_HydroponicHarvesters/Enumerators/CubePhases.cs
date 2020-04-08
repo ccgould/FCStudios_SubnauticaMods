@@ -1,0 +1,9 @@
+﻿namespace FCS_HydroponicHarvesters.Enumerators
+{
+    internal enum CubePhases
+    {
+        StartUp = 0,
+        Generating = 1,
+        CoolDown = 2
+    }
+}
