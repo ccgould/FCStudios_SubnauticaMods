@@ -111,12 +111,14 @@
     <Compile Include="Enumerators\SpeedModes.cs" />
     <Compile Include="Model\PlantSlot.cs" />
     <Compile Include="Model\SaveDataEntry.cs" />
+    <Compile Include="Mono\HydroHarvCleanerManager.cs" />
     <Compile Include="Mono\HydroHarvContainer.cs" />
     <Compile Include="Mono\HydroHarvController.cs" />
     <Compile Include="Mono\HydroHarvDisplayManager.cs" />
     <Compile Include="Mono\HydroHarvEffectManager.cs" />
     <Compile Include="Mono\HydroHarvGenerator.cs" />
     <Compile Include="Mono\HydroHarvGrowBed.cs" />
+    <Compile Include="Mono\HydroHarvLightManager.cs" />
     <Compile Include="Mono\HydroHarvPowerManager.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

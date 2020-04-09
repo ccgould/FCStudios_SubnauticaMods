@@ -18,8 +18,6 @@ namespace FCSTechFabricator.Components
 
                 var ingredientTechType = CraftDataHandler.GetModdedTechData(techType)?.GetIngredient(0)?.techType;
 
-                QuickLogger.Debug($"Trying to GetData from {ingredientTechType}");
-
                 if (ingredientTechType == null || ingredientTechType == TechType.None) return;
 
                 TechType = (TechType) ingredientTechType;
@@ -27,15 +25,8 @@ namespace FCSTechFabricator.Components
                 var go = CraftData.GetPrefabForTechType(TechType, false);
 
                 var plantable = go.GetComponentInChildren<Plantable>();
-
-                QuickLogger.Debug($"Planter Result: {plantable?.name}");
-
                 var creature = go.GetComponentInChildren<Creature>();
-                QuickLogger.Debug($"Creature Result: {creature?.name}");
-
                 var pickable = go.GetComponent<Pickupable>();
-
-                QuickLogger.Debug($"Pickable Result: {pickable?.name}");
 
                 if (plantable)
                 {
@@ -51,6 +42,13 @@ namespace FCSTechFabricator.Components
                     {
                         Environment = FCSEnvironment.Water;
                         IsPlantable = true;
+                    }
+                    
+                    GiveItem = TechType;
+
+                    if (GiveItem == TechType.None)
+                    {
+                        QuickLogger.Error($"Failed to get the PickTech from {TechType}",true);
                     }
 
                     Model = plantable.model;
@@ -78,6 +76,7 @@ namespace FCSTechFabricator.Components
                     if (pickable.GetTechType() == TechType.CoralChunk)
                     {
                         Environment = FCSEnvironment.Water;
+                        GiveItem = TechType.CoralChunk;
                         IsPlantable = true;
                         _initialized = true;
                     }
@@ -86,7 +85,7 @@ namespace FCSTechFabricator.Components
             }
         }
 
-
+        public TechType GiveItem { get; set; }
         public TechType TechType { get; set; }
         public FCSEnvironment Environment { get; set; }
         public bool IsPlantable { get; set; }

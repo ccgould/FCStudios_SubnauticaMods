@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using FCS_HydroponicHarvesters.Enumerators;
 using FCSCommon.Utilities;
 using UnityEngine;
 
@@ -48,7 +49,8 @@ namespace FCS_HydroponicHarvesters.Mono
 
         private void Update()
         {
-            _energyToConsume =  _mono.EnergyConsumptionPerSecond * DayNightCycle.main.deltaTime;
+            _energyToConsume =  EnergyConsumptionPerSecond * DayNightCycle.main.deltaTime;
+            _mono.DisplayManager.UpdatePowerUsagePerSecond();
         }
 
         internal float GetEnergyToConsume()
@@ -68,5 +70,22 @@ namespace FCS_HydroponicHarvesters.Mono
             if (requiresEnergy)
                 this.ConnectedRelay.ConsumeEnergy(_energyToConsume, out float amountConsumed);
         }
+
+        public void UpdateEnergyPerSecond(SpeedModes currentMode)
+        {
+            if (currentMode != SpeedModes.Off)
+            {
+                CreationTime = Convert.ToSingle(currentMode);
+                EnergyConsumptionPerSecond = QPatch.Configuration.Config.EnergyCost / CreationTime;
+            }
+            else
+            {
+                EnergyConsumptionPerSecond = 0f;
+            }
+        }
+
+        public float EnergyConsumptionPerSecond { get; private set; }
+
+        public float CreationTime { get; set; }
     }
 }

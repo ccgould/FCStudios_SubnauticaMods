@@ -54,7 +54,7 @@ namespace FCS_HydroponicHarvesters.Mono
             return true;
         }
 
-        public int GetContainerFreeSpace => Slots.Count(x => !x.isOccupied);
+        public int GetContainerFreeSpace => Slots.Count(x => !x.IsOccupied);
         public bool IsFull => GetContainerFreeSpace <= 0;
 
         public bool CanBeStored(int amount)
@@ -65,7 +65,6 @@ namespace FCS_HydroponicHarvesters.Mono
         public bool AddItemToContainer(InventoryItem item)
         {
             var dna = item.item.gameObject.GetComponentInChildren<FCSDNA>();
-            dna.GetData();
             return TryPlant(dna,item);
         }
 
@@ -83,6 +82,13 @@ namespace FCS_HydroponicHarvesters.Mono
                 return false;
             }
             
+            dna.GetData();
+            
+            if (_currentEnvironment != dna.Environment)
+            {
+                return false;
+            }
+
             return true;
         }
 
@@ -114,16 +120,18 @@ namespace FCS_HydroponicHarvesters.Mono
             {
                 return;
             }
-            if (slotByID.isOccupied)
+            if (slotByID.IsOccupied)
             {
                 return;
             }
+            QuickLogger.Debug($"Adding DNa with TechType {plantable.TechType}",true);
 
-            slotByID.isOccupied = true;
-            slotByID.plantable = plantable;
-            Spawn(slotByID.slot, plantable.TechType, plantable.Model);
-            _dna.Add(plantable.TechType);
-            _mono.HydroHarvContainer.AddItemToContainer(plantable.TechType, true);
+            SetSlotOccupiedState(slotID,true);
+            slotByID.Plantable = plantable;
+            slotByID.PlantModel = Spawn(slotByID.Slot, plantable.TechType, plantable.Model);
+            _dna.Add(plantable.GiveItem);
+            if(!_mono.HydroHarvContainer.Items.ContainsKey(plantable.GiveItem))
+                _mono.HydroHarvContainer.AddItemToContainer(plantable.GiveItem, true);
         }
 
         public GameObject Spawn(Transform parent, TechType techType,GameObject model)
@@ -134,6 +142,7 @@ namespace FCS_HydroponicHarvesters.Mono
             gameObject.transform.localScale = _modelScale;
             gameObject.transform.localPosition = Vector3.zero;
 
+            
 
             var growingPlant = gameObject.GetComponent<GrowingPlant>();
             if (growingPlant != null)
@@ -146,22 +155,47 @@ namespace FCS_HydroponicHarvesters.Mono
             Destroy(gameObject.GetComponent<Pickupable>());
             Destroy(gameObject.GetComponent<UniqueIdentifier>());
 
-            foreach (Transform render in gameObject.transform)
-            {
-                QuickLogger.Debug(render.gameObject.name);
-                render.gameObject.SetActive(true);
-            }
-
-
-
+            SetActiveAllChildren(parent.transform, true);
+            
             return gameObject;
         }
-        
+
+        private void SetActiveAllChildren(Transform transform, bool value)
+        {
+            foreach (Transform child in transform)
+            {
+                child.gameObject.SetActive(value);
+
+                SetActiveAllChildren(child, value);
+            }
+        }
+
+        internal void RemoveItem(int slotID)
+        {
+            var slotByID = GetSlotByID(slotID);
+
+            if (slotByID == null)
+            {
+                QuickLogger.Debug("SlotById returned null");
+                return;
+            }
+
+            GameObject plantModel = slotByID.PlantModel;
+            slotByID.Clear();
+            Destroy(plantModel);
+            SetSlotOccupiedState(slotID, false);
+        }
+
+        private void SetSlotOccupiedState(int slotID, bool state)
+        {
+            GetSlotByID(slotID).IsOccupied = state;
+        }
+
         private int GetFreeSlotID()
         {
             for (int i = 0; i < Slots.Length; i++)
             {
-                if (!Slots[i].isOccupied)
+                if (!Slots[i].IsOccupied)
                 {
                     return i;
                 }
@@ -211,7 +245,28 @@ namespace FCS_HydroponicHarvesters.Mono
 
         public void RemoveDNA(TechType item)
         {
+            if (_dna == null)
+            {
+                QuickLogger.Error("DNA is Null");
+                return;
+            }
+
+            if (Slots == null)
+            {
+                QuickLogger.Error("Slots is Null");
+                return;
+            }
             _dna.Remove(item);
+
+            foreach (PlantSlot slot in Slots)
+            {
+                if (slot?.Plantable?.GiveItem == item)
+                {
+                    RemoveItem(slot.Id);
+                    break;
+                }
+            }
+
             QuickLogger.Debug("Remove Model");
         }
     }

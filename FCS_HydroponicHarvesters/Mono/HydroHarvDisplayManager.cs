@@ -21,8 +21,8 @@ namespace FCS_HydroponicHarvesters.Mono
     internal class HydroHarvDisplayManager : AIDisplay
     {
         private HydroHarvController _mono;
-        private readonly Color _startColor = Color.white;
-        private readonly Color _hoverColor = new Color(0.07f, 0.38f, 0.7f, 1f);
+        private readonly Color _startColor = Color.black;
+        private readonly Color _hoverColor = Color.white;
         private readonly Color _fireBrickColor = new Color(0.6980392f, 0.1333333f, 0.1333333f, 1f);
         private readonly Color _greenColor = new Color(0.03424335f, 1f, 0f, 1f);
         private bool _initialized;
@@ -33,6 +33,8 @@ namespace FCS_HydroponicHarvesters.Mono
         private uGUI_Icon _modeIcon;
         private Text _powerLevelText;
         private GridHelper _dnaGrid;
+        private Text _dnaCounter;
+        private Text _powerUsage;
 
         internal Atlas.Sprite MelonIconSprite => _melonIconSprite ?? (_melonIconSprite = SpriteManager.Get(TechType.Melon));
 
@@ -70,7 +72,7 @@ namespace FCS_HydroponicHarvesters.Mono
                     _mono.AnimationManager.SetIntHash(_page,1);
                     break;
                 case "CleanerBTN":
-                    QuickLogger.Debug($"Clicked on {btnName}", true);
+                    _mono.CleanerDumpContainer.OpenStorage();
                     break;
                 case "DumpBTN":
                     _mono.DumpContainer.OpenStorage();
@@ -80,6 +82,9 @@ namespace FCS_HydroponicHarvesters.Mono
                     break;
                 case "ModeBTN":
                     _mono.ToggleMode();
+                    break;
+                case "LightBTN":
+                    _mono.LightManager.ToggleLight();
                     break;
             }
         }
@@ -168,18 +173,36 @@ namespace FCS_HydroponicHarvesters.Mono
                 var controls = InterfaceHelpers.FindGameObject(home, "Controls");
                 #endregion
 
+                #region LightButton
+                var lightBTN = InterfaceHelpers.FindGameObject(controls, "LightBTN");
+
+                InterfaceHelpers.CreateButton(lightBTN, "LightBTN", InterfaceButtonMode.Background,
+                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, "");
+
+                var ligtIcon = InterfaceHelpers.FindGameObject(lightBTN, "Icon").AddComponent<uGUI_Icon>();
+                ligtIcon.sprite = SpriteManager.Get(TechType.Flashlight);
+                #endregion
+
+                #region DNA Counter
+                _dnaCounter = InterfaceHelpers.FindGameObject(home, "Limit")?.GetComponent<Text>();
+                #endregion
+
+                #region Power Usage
+                _powerUsage = InterfaceHelpers.FindGameObject(home, "PowerUsage")?.GetComponent<Text>();
+                #endregion
+
                 #region CleanerButton
                 var cleanerButtonObj = InterfaceHelpers.FindGameObject(controls, "CleanerBTN");
 
                 InterfaceHelpers.CreateButton(cleanerButtonObj, "CleanerBTN", InterfaceButtonMode.Background,
-                    OnButtonClick, Color.black, Color.white, MAX_INTERACTION_DISTANCE, "");
+                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, "");
                 #endregion
-
+                
                 #region DumpBTNButton
                 var dumpBTNButtonObj = InterfaceHelpers.FindGameObject(controls, "DumpBTN");
 
                 InterfaceHelpers.CreateButton(dumpBTNButtonObj, "DumpBTN", InterfaceButtonMode.Background,
-                    OnButtonClick, Color.black, Color.white, MAX_INTERACTION_DISTANCE, "");
+                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, "");
                 #endregion
 
                 #region Messages
@@ -222,7 +245,7 @@ namespace FCS_HydroponicHarvesters.Mono
                 _dnaGrid.OnLoadDisplay += OnLoadDnaGrid;
                 _dnaGrid.Setup(4, HydroponicHarvestersModelPrefab.ItemPrefab, home, _startColor, _hoverColor, OnButtonClick,5,string.Empty,string.Empty,"Slots", string.Empty, string.Empty);
                 #endregion
-
+                
                 #region ModeButton
                 var modeBTN = InterfaceHelpers.FindGameObject(controls, "ModeBTN");
                 
@@ -245,6 +268,8 @@ namespace FCS_HydroponicHarvesters.Mono
 
         private void OnLoadDnaGrid(GameObject itemPrefab, GameObject itemsGrid, int stPos, int endPos)
         {
+            _dnaGrid.ClearPage();
+
             var grouped = _mono.HydroHarvContainer.Items.ToList();
 
             if (endPos > grouped.Count)
@@ -268,28 +293,52 @@ namespace FCS_HydroponicHarvesters.Mono
                 }
 
                 buttonPrefab.transform.SetParent(itemsGrid.transform, false);
-
                 buttonPrefab.GetComponentInChildren<Text>().text = grouped[i].Value.ToString();
+
                 var mainButton = buttonPrefab.FindChild("MainButton");
+                
                 var mainBTN = mainButton.AddComponent<ItemButton>();
                 mainBTN.Type = techType;
+                mainBTN.ButtonMode = InterfaceButtonMode.Background;
+                mainBTN.STARTING_COLOR = _startColor;
+                mainBTN.HOVER_COLOR = _hoverColor;
                 mainBTN.OnButtonClick = _mono.HydroHarvContainer.RemoveItemFromContainer;
+                
                 uGUI_Icon icon = InterfaceHelpers.FindGameObject(mainButton, "Icon").AddComponent<uGUI_Icon>();
                 icon.sprite = SpriteManager.Get(techType);
 
-                var deleteButton = buttonPrefab.FindChild("DeleteButton");
+                var deleteButton = buttonPrefab.FindChild("DeleteBTN");
+
                 var deleteBTN = deleteButton.AddComponent<ItemButton>();
+                deleteBTN.ButtonMode = InterfaceButtonMode.Background;
                 deleteBTN.Type = techType;
+                deleteBTN.STARTING_COLOR = _startColor;
+                deleteBTN.HOVER_COLOR = _hoverColor;
                 deleteBTN.OnButtonClick = _mono.HydroHarvContainer.DeleteItemFromContainer;
-                uGUI_Icon trashIcon = InterfaceHelpers.FindGameObject(mainButton, "Icon").AddComponent<uGUI_Icon>();
+
+                uGUI_Icon trashIcon = InterfaceHelpers.FindGameObject(deleteButton, "Icon").AddComponent<uGUI_Icon>();
                 trashIcon.sprite = SpriteManager.Get(TechType.Trashcans);
             }
+
+            UpdateDnaCounter();
+        }
+
+        private void UpdateDnaCounter()
+        {
+            if (_dnaCounter == null) return;
+            _dnaCounter.text = $"{_mono.HydroHarvGrowBed.GetDNASamples().Count}/{_mono.HydroHarvGrowBed.Slots.Length}";
+        }
+
+        internal void UpdatePowerUsagePerSecond()
+        {
+            if (_powerUsage == null) return;
+            _powerUsage.text = $"<size=100><color=Green>{_mono.PowerManager.EnergyConsumptionPerSecond}</color>{Environment.NewLine}Unit Per Second</size>";
         }
 
         internal void UpdateDna()
         {
+            if (_dnaGrid == null) return;
             _dnaGrid.DrawPage();   
         }
-
     }
 }

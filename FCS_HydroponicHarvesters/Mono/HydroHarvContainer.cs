@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using FCS_HydroponicHarvesters.Buildables;
 using FCS_HydroponicHarvesters.Enumerators;
 using FCSCommon.Utilities;
 using FCSTechFabricator.Interfaces;
@@ -17,7 +18,6 @@ namespace FCS_HydroponicHarvesters.Mono
 
         public int GetContainerFreeSpace => GetFreeSpace();
         public bool IsFull => CheckIfFull();
-        //internal List<TechType>Items = new List<TechType>();
         internal Dictionary<TechType,int> Items = new Dictionary<TechType, int>();
         
         internal void Initialize(HydroHarvController mono)
@@ -60,14 +60,16 @@ namespace FCS_HydroponicHarvesters.Mono
 
         public bool AddItemToContainer(InventoryItem item)
         {
-            _mono.HydroHarvGrowBed.AddItemToContainer(item);
-            return true;
+            //_mono.HydroHarvGrowBed.AddItemToContainer(item);
+            return false;
         }
 
         public void AddItemToContainer(TechType item,bool initializer = false)
         {
             if (!IsFull)
             {
+                QuickLogger.Debug($"Trying to add item to container {item}",true);
+
                 if (Items.ContainsKey(item))
                 {
                     Items[item] += 1;
@@ -75,6 +77,7 @@ namespace FCS_HydroponicHarvesters.Mono
                 else
                 {
                     Items.Add(item, initializer ? 0 : 1);
+                    QuickLogger.Debug($"Added item to container {item}",true);
                 }
                 OnContainerUpdate?.Invoke();
             }
@@ -84,22 +87,39 @@ namespace FCS_HydroponicHarvesters.Mono
         {
             if (Items.ContainsKey(item))
             {
-                if (Items[item] > 0)
+#if SUBNAUTICA
+                var itemSize = CraftData.GetItemSize(item);
+#elif BELOWZERO
+            var itemSize = TechData.GetItemSize(item);
+#endif
+                if (Inventory.main.HasRoomFor(itemSize.x, itemSize.y))
                 {
-                    Items[item] -= 1;
+                    if (Items[item] > 0)
+                    {
+                        Items[item] -= 1;
+                        var pickup = CraftData.InstantiateFromPrefab(item).GetComponent<Pickupable>();
+                        Inventory.main.Pickup(pickup);
+                        OnContainerUpdate?.Invoke();
+                    }
                 }
-                OnContainerUpdate?.Invoke();
             }
         }
 
         public void DeleteItemFromContainer(TechType item)
         {
-            if (Items.ContainsKey(item))
+            if (!Items.ContainsKey(item)) return;
+
+            //TODO Add Message to confirm Delete;
+
+            if (Items[item] > 0)
             {
-                Items.Remove(item);
-                _mono.HydroHarvGrowBed.RemoveDNA(item);
-                OnContainerUpdate?.Invoke();
+                QuickLogger.Message(HydroponicHarvestersBuidable.CannotDeleteDNAItem(Language.main.Get(item)),true);
+                return;
             }
+            
+            Items.Remove(item);
+            _mono.HydroHarvGrowBed.RemoveDNA(item);
+            OnContainerUpdate?.Invoke();
         }
         
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)

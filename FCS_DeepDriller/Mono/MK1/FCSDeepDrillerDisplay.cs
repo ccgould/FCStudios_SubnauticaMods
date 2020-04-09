@@ -458,19 +458,7 @@ namespace FCS_DeepDriller.Mono.MK1
 
             var icon = itemDisplay.gameObject.FindChild("Icon")?.gameObject;
             var text = itemDisplay.GetComponentInChildren<Text>();
-
-            switch (techType)
-            {
-                case TechType.AluminumOxide:
-                    text.text = "Ruby";
-                    break;
-                case TechType.UraniniteCrystal:
-                    text.text = "Uraninite Crystal";
-                    break;
-                default:
-                    text.text = techType.ToString();
-                    break;
-            }
+            text.text = Language.main.Get(techType);
 
             if (icon == null)
             {

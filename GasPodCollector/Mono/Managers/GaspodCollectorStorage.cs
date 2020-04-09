@@ -35,7 +35,7 @@ namespace GasPodCollector.Mono.Managers
 #if SUBNAUTICA
             var itemSize = CraftData.GetItemSize(TechType.GasPod);
 #elif BELOWZERO
-            var itemSize = TechData.GetItemSize(techType);
+            var itemSize = TechData.GetItemSize(TechType.GasPod);
 #endif
             if (Inventory.main.HasRoomFor(itemSize.x, itemSize.y))
             {

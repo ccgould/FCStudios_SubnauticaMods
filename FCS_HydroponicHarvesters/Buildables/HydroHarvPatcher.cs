@@ -42,9 +42,7 @@ namespace FCS_HydroponicHarvesters.Buildables
             {
                 var prefab = GameObject.Instantiate(_prefab);
 
-                var center = _bCenter;
-                var size = _bSize;
-                GameObjectHelpers.AddConstructableBounds(prefab, size, center);
+                GameObjectHelpers.AddConstructableBounds(prefab, _bSize, _bCenter);
                 
                 var model = prefab.FindChild("model");
 

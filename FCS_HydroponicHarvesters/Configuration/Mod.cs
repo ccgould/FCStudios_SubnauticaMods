@@ -55,7 +55,7 @@ namespace FCS_HydroponicHarvesters.Configuration
         public static List<DNASample> DNASamples = new List<DNASample>
         {
             new DNASample("Coral Chunk","CoralChunk",TechType.CoralChunk),
-            new DNASample("Acid Mushroom","AcidMushroom",TechType.AcidMushroomSpore),
+            new DNASample("Acid Mushroom","AcidMushroom",TechType.AcidMushroom),
             new DNASample("Blood Oil","BloodOil",TechType.BloodOil),
             new DNASample("Blue Palm","BluePalm",TechType.BluePalmSeed),
             new DNASample("Bulbo Tree","BulboTree",TechType.BulboTreePiece),
@@ -63,7 +63,7 @@ namespace FCS_HydroponicHarvesters.Configuration
             new DNASample("Cave Bush","CaveBush",TechType.PurpleBranchesSeed),
             new DNASample("Chinese Potato","ChinesePotato",TechType.PurpleVegetable),
             new DNASample("Creepvine","Creepvine",TechType.CreepvineSeedCluster),
-            new DNASample("Deep Shroom","DeepShroom",TechType.AcidMushroomSpore),
+            new DNASample("Deep Shroom","DeepShroom",TechType.WhiteMushroom),
             new DNASample("Eye Stalk","EyeStalk",TechType.EyesPlantSeed),
             new DNASample("Fern Palm","FernPalm",TechType.FernPalmSeed),
             new DNASample("Furled Papyrus","FurledPapyrus",TechType.RedRollPlantSeed),
@@ -73,7 +73,7 @@ namespace FCS_HydroponicHarvesters.Configuration
             new DNASample("Jaffa Cup","JaffaCup",TechType.OrangeMushroomSpore),
             new DNASample("Jellyshroom","Jellyshroom",TechType.SnakeMushroomSpore),
             new DNASample("Lantern Tree","LanternTree",TechType.HangingFruit),
-            new DNASample("Marblemelon Plant","MarblemelonPlant",TechType.MelonSeed),
+            new DNASample("Marblemelon Plant","MarblemelonPlant",TechType.Melon),
             new DNASample("Membrain Tree","MembrainTree",TechType.MembrainTreeSeed),
             new DNASample("Ming Plant","MingPlant",TechType.PurpleVasePlantSeed),
             new DNASample("Pygmy Fan","PygmyFan",TechType.SmallFanSeed),
@@ -89,7 +89,8 @@ namespace FCS_HydroponicHarvesters.Configuration
             new DNASample("Veined Nettle","VeinedNettle",TechType.PurpleFanSeed),
             new DNASample("Violet Beau","VioletBeau",TechType.PurpleStalkSeed),
             new DNASample("Voxel Shrub","VoxelShrub",TechType.PinkFlowerSeed),
-            new DNASample("Writhing Weed","WrithingWeed",TechType.PurpleTentacleSeed)
+            new DNASample("Writhing Weed","WrithingWeed",TechType.PurpleTentacleSeed),
+            new DNASample("Brain Coral","BrainCoral",TechType.PurpleBrainCoralPiece)
         };
 
         public static List<Vector3> LargeBubblesLocations = new List<Vector3>

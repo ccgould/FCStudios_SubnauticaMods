@@ -52,16 +52,12 @@ namespace FCSTechFabricator.Components
             Player main = Player.main;
             PDA pda = main.GetPDA();
             Inventory.main.SetUsedStorage(_dumpContainer, false);
-            pda.Open(PDATab.Inventory, null, OnFridgeClose, 4f);
+            pda.Open(PDATab.Inventory, null, OnDumpClose, 4f);
         }
 
-        private void OnFridgeClose(PDA pda)
+        internal virtual void OnDumpClose(PDA pda)
         {
-            foreach (InventoryItem item in _dumpContainer)
-            {
-                
-                GameObject.Destroy(item.item.gameObject);
-            }
+            
         }
     }
 }

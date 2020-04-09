@@ -33,9 +33,10 @@ namespace FCS_HydroponicHarvesters.Mono
         internal AnimationManager AnimationManager { get; private set; }
         internal HydroHarvDisplayManager DisplayManager { get; private set; }
         internal HydroHarvEffectManager EffectManager { get; private set; }
-        internal HydroHarvGenerator Producer { get; set; }
-        internal float EnergyConsumptionPerSecond { get; private set; }
-        internal float CreationTime { get; private set; }
+        internal HydroHarvGenerator Producer { get; private set; }
+        internal HydroHarvLightManager LightManager { get; private set; }
+        internal HydroHarvCleanerManager CleanerManager { get; private set; }
+        internal DumpContainer CleanerDumpContainer { get; private set; }
         
         public SpeedModes CurrentSpeedMode
         {
@@ -44,23 +45,22 @@ namespace FCS_HydroponicHarvesters.Mono
             {
                 SpeedModes previousMode = _currentMode;
                 _currentMode = value;
+                
                 if (_currentMode != SpeedModes.Off)
                 {
-                    CreationTime = Convert.ToSingle(_currentMode);
-                    EnergyConsumptionPerSecond = QPatch.Configuration.Config.EnergyCost / CreationTime;
-
+                    PowerManager.UpdateEnergyPerSecond(_currentMode);
                     if (previousMode == SpeedModes.Off)
                         Producer?.TryStartingNextClone();
                 }
                 else // Off State
                 {
-                    EnergyConsumptionPerSecond = 0f;
+                    PowerManager.UpdateEnergyPerSecond(_currentMode);
                 }
             }
         }
 
-        public HydroHarvPowerManager PowerManager { get; private set; }
-        
+        internal HydroHarvPowerManager PowerManager { get; private set; }
+
         #region Unity
 
         private void OnEnabled()
@@ -105,7 +105,7 @@ namespace FCS_HydroponicHarvesters.Mono
         }
 
         #endregion
-
+        
         public override bool CanDeconstruct(out string reason)
         {
             reason = string.Empty;
@@ -176,7 +176,19 @@ namespace FCS_HydroponicHarvesters.Mono
             if (DumpContainer == null)
             {
                 DumpContainer = gameObject.AddComponent<DumpContainer>();
-                DumpContainer.Initialize(transform,"Please Replace","Item Not Allowed","Storage is full", HydroHarvContainer,1,1);
+                DumpContainer.Initialize(transform,"Please Replace","Item Not Allowed","Storage is full", HydroHarvGrowBed,1,1);
+            }
+
+            if (CleanerManager == null)
+            {
+                CleanerManager = gameObject.AddComponent<HydroHarvCleanerManager>();
+                CleanerManager.Initialize(this);
+            }
+
+            if (CleanerDumpContainer == null)
+            {
+                CleanerDumpContainer = gameObject.AddComponent<DumpContainer>();
+                CleanerDumpContainer.Initialize(transform, "Please Replace", "Item Not Allowed", "Storage is full", CleanerManager, 1, 1);
             }
 
             if (AnimationManager == null)
@@ -201,7 +213,13 @@ namespace FCS_HydroponicHarvesters.Mono
                 EffectManager = gameObject.AddComponent<HydroHarvEffectManager>();
                 EffectManager.Initialize(this);
             }
-            
+
+            if (LightManager == null)
+            {
+                LightManager = gameObject.AddComponent<HydroHarvLightManager>();
+                LightManager.Initialize(this);
+            }
+
             if (DisplayManager == null)
             {
                 DisplayManager = gameObject.AddComponent<HydroHarvDisplayManager>();
@@ -210,8 +228,6 @@ namespace FCS_HydroponicHarvesters.Mono
 
             IsInitialized = true;
         }
-
-
 
         internal void Save(SaveData newSaveData)
         {

@@ -7,24 +7,25 @@ namespace FCS_HydroponicHarvesters.Model
     {
         public PlantSlot(int id, Transform slot)
         {
-            this.id = id;
-            this.slot = slot;
+            Id = id;
+            Slot = slot;
+            //PlantModel = slot.GetChild(0).gameObject;
         }
 
         public void Clear()
         {
-            this.plantable = null;
-            this.plantModel = null;
+            Plantable = null;
+            PlantModel = null;
         }
         
-        public readonly int id;
+        public readonly int Id;
 
-        public readonly Transform slot;
+        public readonly Transform Slot;
 
-        public bool isOccupied;
+        public bool IsOccupied;
 
-        public FCSDNA plantable;
+        public FCSDNA Plantable;
 
-        public GameObject plantModel;
+        public GameObject PlantModel;
 	}
 }

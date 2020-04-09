@@ -43,19 +43,19 @@ namespace FCS_HydroponicHarvesters
                 if (HydroponicHarvestersModelPrefab.GetPrefabs())
                 {
                     var hydroHavesterLarge = new HydroponicHarvestersBuidable(Mod.LargeClassID, Mod.LargeFriendlyName, Mod.LargeDescription,
-                        new Vector3(2.115407f, 2.37773f, 2.245471f), new Vector3(0f, -0.9747202f, 0.03156948f), Mod.LargeHydroHarvKitClassID.ToTechType(), HydroponicHarvestersModelPrefab.LargePrefab,Mod.LargeBubblesLocations);
+                        new Vector3(2.13536f, 2.379217f, 2.341017f), new Vector3(0f, 1.556781f, 0f), Mod.LargeHydroHarvKitClassID.ToTechType(), HydroponicHarvestersModelPrefab.LargePrefab,Mod.LargeBubblesLocations);
                     hydroHavesterLarge.Patch();
 
                     QuickLogger.Debug("Patched Large");
 
                     var hydroHavesterMedium = new HydroponicHarvestersBuidable(Mod.MediumClassID, Mod.MediumFriendlyName, Mod.MediumDescription,
-                        new Vector3(0.0119499f, 1.639193f, 0.02987486f), new Vector3(2.075496f, 2.238697f, 2.183046f), Mod.MediumHydroHarvKitClassID.ToTechType(), HydroponicHarvestersModelPrefab.MediumPrefab, Mod.MediumBubblesLocations);
+                        new Vector3(1.654228f, 2.46076f, 2.274961f), new Vector3(-0.02562737f, 1.505608f, 0.02242398f), Mod.MediumHydroHarvKitClassID.ToTechType(), HydroponicHarvestersModelPrefab.MediumPrefab, Mod.MediumBubblesLocations);
                     hydroHavesterMedium.Patch();
 
                     QuickLogger.Debug("Patched Medium");
 
                     var hydroHavesterSmall = new HydroponicHarvestersBuidable(Mod.SmallClassID, Mod.SmallFriendlyName, Mod.SmallDescription,
-                        new Vector3(0.0119499f, 1.639193f, 0.02987486f), new Vector3(2.075496f, 2.238697f, 2.183046f), Mod.SmallHydroHarvKitClassID.ToTechType(), HydroponicHarvestersModelPrefab.SmallPrefab, Mod.SmallBubblesLocations);
+                        new Vector3(1.648565f, 2.492922f, 1.784077f), new Vector3(-0.01223725f, 1.492922f, 0.1544394f), Mod.SmallHydroHarvKitClassID.ToTechType(), HydroponicHarvestersModelPrefab.SmallPrefab, Mod.SmallBubblesLocations);
                     hydroHavesterSmall.Patch();
 
                     QuickLogger.Debug("Patched Small");
