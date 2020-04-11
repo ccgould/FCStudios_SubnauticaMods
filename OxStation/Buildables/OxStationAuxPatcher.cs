@@ -9,6 +9,8 @@ namespace MAC.OxStation.Buildables
         private const string PerMinuteKey = "OS_PerMinute";
         private const string TakeOxygenKey = "OS_TakeOxygen";
         private const string BeaconAttachedKey = "OS_BeaconAttached";
+        private const string PingingKey = "OS_Pinging";
+        private const string PingKey = "OS_Ping";
         #endregion
 
         #region Internal Properties
@@ -26,6 +28,8 @@ namespace MAC.OxStation.Buildables
             LanguageHandler.SetLanguageLine(PerMinuteKey, "per minute");
             LanguageHandler.SetLanguageLine(TakeOxygenKey, "Take Oxygen");
             LanguageHandler.SetLanguageLine(BeaconAttachedKey, "Remove attached beacon to deconstruct.");
+            LanguageHandler.SetLanguageLine(PingKey, "PING");
+            LanguageHandler.SetLanguageLine(PingingKey, "PINGING");
         }
         #endregion
 
@@ -50,11 +54,24 @@ namespace MAC.OxStation.Buildables
         {
             return Language.main.Get("Damaged");
         }
-        #endregion
 
-        public static string BeaconAttached()
+        internal static string BeaconAttached()
         {
             return Language.main.Get(BeaconAttachedKey);
         }
+
+        internal static string Pinging()
+        {
+            return Language.main.Get(PingingKey);
+        }
+        
+        internal static string Ping()
+        {
+            return Language.main.Get(PingKey);
+        }
+        
+        #endregion
+
+
     }
 }

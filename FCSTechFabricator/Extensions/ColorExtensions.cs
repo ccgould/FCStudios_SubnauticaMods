@@ -29,6 +29,7 @@ namespace FCSTechFabricator.Extensions
         /// <returns></returns>
         public static Color Vector4ToColor(this ColorVec4 vec4)
         {
+            if (vec4 == null) return Color.white;
             return new Color(vec4.R, vec4.G, vec4.B, vec4.A);
         }
 

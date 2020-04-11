@@ -10,13 +10,15 @@ namespace FCSCommon.Helpers
         private int _itemsPerPage;
         private Action<string, object> _onButtonClick;
         private Text _pageNumberText;
-        
-
         private int _maxPage = 1;
         private int _currentPage;
         private GameObject _itemPrefab;
         private GameObject _itemsGrid;
-        public string HomeButtonMessage { get; set; }
+        
+        internal string HomeButtonMessage { get; set; }
+        internal Action<DisplayData> OnLoadDisplay { get; set; }
+        internal int EndingPosition { get; private set; }
+        internal int StartingPosition { get; private set; }
 
         [Obsolete("This method will be removed in upcoming updates please use setup instead")]
         internal void Initialize(GameObject itemPrefab, GameObject itemsGrid,GameObject pageNumberText, int itemsPerPage, Action<string, object> onButtonClick)
@@ -72,8 +74,7 @@ namespace FCSCommon.Helpers
 
             DrawPage(1);
         }
-
-
+        
         internal int GetCurrentPage()
         {
             return _currentPage;
@@ -103,17 +104,20 @@ namespace FCSCommon.Helpers
             }
 
             StartingPosition = (_currentPage - 1) * _itemsPerPage;
+
             EndingPosition = StartingPosition + _itemsPerPage;
             
-            OnLoadDisplay?.Invoke(_itemPrefab,_itemsGrid,StartingPosition,EndingPosition);
+            var data = new DisplayData
+            {
+                ItemsGrid = _itemsGrid,
+                ItemsPrefab = _itemPrefab,
+                StartPosition = StartingPosition,
+                EndPosition = EndingPosition,
+            };
+
+            OnLoadDisplay?.Invoke(data);
         }
-
-        internal Action<GameObject, GameObject,int,int> OnLoadDisplay { get; set; }
-
-        internal int EndingPosition { get; private set; }
-
-        internal int StartingPosition { get; private set; }
-
+        
         //private void LoadDisplay<T>(T item)
         //{
             //for (int i = StartingPosition; i < EndingPosition; i++)
@@ -167,5 +171,13 @@ namespace FCSCommon.Helpers
                 _currentPage = _maxPage;
             }
         }
+    }
+
+    internal struct DisplayData
+    {
+        public GameObject ItemsPrefab { get; set; }
+        public GameObject ItemsGrid { get; set; }
+        public int StartPosition { get; set; }
+        public int EndPosition { get; set; }
     }
 }

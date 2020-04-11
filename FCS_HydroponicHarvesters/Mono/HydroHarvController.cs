@@ -60,10 +60,11 @@ namespace FCS_HydroponicHarvesters.Mono
         }
 
         internal HydroHarvPowerManager PowerManager { get; private set; }
+        public HydroHarvCleanerManager HydroHarvCleanerManager { get; private set; }
 
         #region Unity
 
-        private void OnEnabled()
+        private void OnEnable()
         {
             if (_runStartUpOnEnable)
             {
@@ -72,11 +73,6 @@ namespace FCS_HydroponicHarvesters.Mono
                     Initialize();
                 }
 
-                //if (DisplayManager != null)
-                //{
-
-                //}
-
                 if (_fromSave)
                 {
                     if (_savedData == null)
@@ -84,10 +80,24 @@ namespace FCS_HydroponicHarvesters.Mono
                         ReadySaveData();
                     }
 
-                    QuickLogger.Info($"Loaded {Mod.LargeFriendlyName}");
+                    if (_savedData != null)
+                    {
+                        ColorManager.SetColorFromSave(_savedData.BodyColor.Vector4ToColor());
+                        HydroHarvContainer.Load(_savedData.Container);
+                        HydroHarvGrowBed.SetBedType(_savedData.BedType);
+                        DisplayManager.RefreshModeBTN(_savedData.BedType);
+                        Producer.GenerationProgress = _savedData.GenerationProgress;
+                        Producer.CoolDownProgress = _savedData.CoolDownProgress;
+                        Producer.StartUpProgress = _savedData.StartUpProgress;
+                        LightManager.SetLightSwitchedOff(_savedData.LightState);
+                        CurrentSpeedMode = _savedData.CurrentSpeedMode;
+                        HydroHarvGrowBed.Load(_savedData.DnaSamples);
+                        HydroHarvCleanerManager.Load(_savedData.UnitSanitation);
+                        DisplayManager.Load();
+                    }
                 }
-
                 _runStartUpOnEnable = false;
+                IsInitialized = true;
             }
         }
 
@@ -108,6 +118,18 @@ namespace FCS_HydroponicHarvesters.Mono
         
         public override bool CanDeconstruct(out string reason)
         {
+            if (HydroHarvContainer == null)
+            {
+                reason = string.Empty;
+                return true;
+            }
+
+            if (HydroHarvContainer.HasItems())
+            {
+                reason = HydroponicHarvestersBuildable.HasItemsMessage();
+                return false;
+            }
+
             reason = string.Empty;
             return true;
         }
@@ -124,6 +146,8 @@ namespace FCS_HydroponicHarvesters.Mono
                     {
                         Initialize();
                     }
+
+                    IsInitialized = true;
                 }
                 else
                 {
@@ -134,6 +158,13 @@ namespace FCS_HydroponicHarvesters.Mono
 
         public override void OnProtoDeserialize(ProtobufSerializer serializer)
         {
+            QuickLogger.Debug("In OnProtoDeserialize");
+
+            if (_savedData == null)
+            {
+                ReadySaveData();
+            }
+            
             _fromSave = true;
         }
 
@@ -161,18 +192,18 @@ namespace FCS_HydroponicHarvesters.Mono
                 ColorManager.Initialize(gameObject, HydroponicHarvestersModelPrefab.BodyMaterial);
             }
 
-            if (HydroHarvContainer == null)
-            {
-                HydroHarvContainer = gameObject.AddComponent<HydroHarvContainer>();
-                HydroHarvContainer.Initialize(this);
-            }
-
             if (HydroHarvGrowBed == null)
             {
                 HydroHarvGrowBed = gameObject.AddComponent<HydroHarvGrowBed>();
                 HydroHarvGrowBed.Initialize(this);
             }
 
+            if (HydroHarvContainer == null)
+            {
+                HydroHarvContainer = gameObject.AddComponent<HydroHarvContainer>();
+                HydroHarvContainer.Initialize(this);
+            }
+            
             if (DumpContainer == null)
             {
                 DumpContainer = gameObject.AddComponent<DumpContainer>();
@@ -220,26 +251,51 @@ namespace FCS_HydroponicHarvesters.Mono
                 LightManager.Initialize(this);
             }
 
+            if (HydroHarvCleanerManager == null)
+            {
+                HydroHarvCleanerManager = gameObject.AddComponent<HydroHarvCleanerManager>(); 
+                HydroHarvCleanerManager.Initialize(this);
+            }
+
             if (DisplayManager == null)
             {
                 DisplayManager = gameObject.AddComponent<HydroHarvDisplayManager>();
                 DisplayManager.Setup(this);
+                DisplayManager.OnContainerUpdate();
             }
-
-            IsInitialized = true;
         }
 
         internal void Save(SaveData newSaveData)
         {
+            if (!IsInitialized
+                ||!IsConstructed
+                ||PrefabId == null 
+                || newSaveData == null 
+                || ColorManager == null 
+                || HydroHarvContainer == null 
+                || Producer == null 
+                || LightManager == null 
+                || HydroHarvGrowBed == null 
+                || HydroHarvCleanerManager == null) return;
+
             var id = PrefabId.Id;
 
             if (_savedData == null)
             {
                 _savedData = new SaveDataEntry();
             }
-
+            
             _savedData.ID = id;
             _savedData.BodyColor = ColorManager.GetColor().ColorToVector4();
+            _savedData.Container = HydroHarvContainer.Save();
+            _savedData.GenerationProgress = Producer.GenerationProgress;
+            _savedData.CoolDownProgress = Producer.CoolDownProgress;
+            _savedData.StartUpProgress = Producer.StartUpProgress;
+            _savedData.LightState = LightManager.GetLightSwitchedOff();
+            _savedData.CurrentSpeedMode = CurrentSpeedMode;
+            _savedData.BedType = HydroHarvGrowBed.GetBedType();
+            _savedData.DnaSamples = HydroHarvGrowBed.GetDNASamples();
+            _savedData.UnitSanitation = HydroHarvCleanerManager.GetUnitSanitation();
             newSaveData.Entries.Add(_savedData);
         }
 

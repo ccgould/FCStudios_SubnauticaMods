@@ -23,34 +23,42 @@ namespace MAC.OxStation.Config
 
         #region Internal Properties
         internal static string ModName => "OxStation";
+        internal static string ModScreenName => "OxStationScreen";
         internal static string ModFolderName => "FCS_OxStation";
         internal static string BundleName => "oxstationmodbundle";
         internal const string SaveDataFilename = "OxStationSaveData.json";
         internal static string MODFOLDERLOCATION => GetModPath();
         internal static string FriendlyName => "OxStation";
+        internal static string ScreenFriendlyName => "OxStation Monitor";
         internal static string Description => "A oxygen producing unit for your habitat.";
+        internal static string ScreenDescription => "Monitor all you OxStations from the comfort indoors";
         internal static string ClassID => "OxStation";
+        internal static string ScreenClassID => "OxStationScreen";
         internal const string OxstationTabID = "OX";
+
         internal const string OxstationKitClassID = "OxstationKit_OX";
+        internal const string OxstationScreenKitClassID = "OxstationScreenKit_OX";
+        internal const string OxstationCyclopsModuleClassID = "OxstationCyclopsModule_OX";
+        internal const string OxstationSeamothModuleClassID = "OxstationSeamothModule_OX";
+        internal const string OxstationPrawnSuitModuleClassID = "OxstationPrawnSuitModule_OX";
+
+        public const string CyclopsModuleFriendlyName = "OxStation Cyclops Module";
+        public const string OxStationSeamothFriendlyName = "OxStation Seamoth Module";
+        public const string OxStationPrawnSuitFriendlyName = "OxStation PrawnSuit Module";
+
+        public const string OxstationCyclopsModuleDescription = "Provide oxygen to the cyclops with this wonderful module.";
+        public const string OxstationSeamothModuleDescription = "Provide oxygen to the seamoth with this wonderful module.";
+        public const string OxstationPrawnModuleDescription = "Provide oxygen to the prawnsuit with this wonderful module.";
+
         internal static event Action<SaveData> OnDataLoaded;
 
 #if SUBNAUTICA
         internal static TechData OxstationIngredients => new TechData
         {
-            craftAmount = 1,
-            Ingredients =
-            {
-                new Ingredient(TechType.TitaniumIngot, 1),
-                new Ingredient(TechType.WiringKit, 1),
-                new Ingredient(TechType.Silicone, 2),
-                new Ingredient(TechType.Lubricant, 2),
-                new Ingredient(TechType.Tank, 1)
-            }
-        };
-
 #elif BELOWZERO
         internal static RecipeData OxstationIngredients => new RecipeData
         {
+#endif
             craftAmount = 1,
             Ingredients =
             {
@@ -62,7 +70,70 @@ namespace MAC.OxStation.Config
             }
         };
 
+#if SUBNAUTICA
+        internal static TechData OxstationCyclopsIngredients => new TechData
+        {
+#elif BELOWZERO
+        internal static RecipeData OxstationCyclopsIngredients => new RecipeData
+        {
 #endif
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(TechType.PlasteelIngot, 1),
+                new Ingredient(TechType.WiringKit, 1),
+                new Ingredient(TechType.HighCapacityTank, 1),
+            }
+        };
+
+#if SUBNAUTICA
+        internal static TechData OxstationSeamothIngredients => new TechData
+        {
+#elif BELOWZERO
+        internal static RecipeData OxstationSeamothIngredients => new RecipeData
+        {
+#endif
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(TechType.TitaniumIngot, 1),
+                new Ingredient(TechType.WiringKit, 1),
+                new Ingredient(TechType.Tank, 1),
+            }
+        };
+
+#if SUBNAUTICA
+        internal static TechData OxstationPrawnSuitIngredients => new TechData
+        {
+#elif BELOWZERO
+        internal static RecipeData OxstationSeamothIngredients => new RecipeData
+        {
+#endif
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(TechType.TitaniumIngot, 1),
+                new Ingredient(TechType.WiringKit, 1),
+                new Ingredient(TechType.Tank, 1),
+            }
+        };
+
+#if SUBNAUTICA
+        internal static TechData OxstationScreenIngredients => new TechData
+        {
+#elif BELOWZERO
+        internal static RecipeData OxstationScreenIngredients => new RecipeData
+        {
+#endif
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(TechType.TitaniumIngot, 1),
+                new Ingredient(TechType.WiringKit, 1),
+                new Ingredient(TechType.Glass, 1)
+            }
+        };
+
         public static bool RTInstalled
         {
             get
@@ -76,6 +147,7 @@ namespace MAC.OxStation.Config
 
             }
         }
+
 
         #endregion
 

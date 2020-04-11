@@ -9,11 +9,26 @@ namespace FCSTechFabricator.Abstract
     {
 
         public virtual Action OnMonoUpdate { get; set; }
+        protected string _prefabId;
+
+
+        public virtual string GetPrefabID()
+        {
+            if (_prefabId == String.Empty)
+            {
+                var prefabIdentifier = GetComponentInParent<PrefabIdentifier>() ?? GetComponent<PrefabIdentifier>();
+                _prefabId = prefabIdentifier?.Id ?? string.Empty;
+            }
+
+            return _prefabId;
+        }
 
         public virtual bool IsConstructed { get; set; }
         public bool IsInitialized { get; set; }
         
         public virtual void UpdateScreen(){}
+        public virtual void NotifyMe<T>(T obj) where T : new()
+        { }
         public virtual void OnProtoSerialize(ProtobufSerializer serializer)
         {
             throw new NotImplementedException();

@@ -17,7 +17,7 @@ namespace MAC.OxStation.Managers
         private float _damagePerSecond;
         private float _passedTime;
         private OxStationController _mono;
-        private float _prevHealth;
+        private bool _wasDead;
         public Action OnDamaged { get; set; }
         public Action OnRepaired { get; set; }
 
@@ -119,24 +119,29 @@ namespace MAC.OxStation.Managers
         {
             try
             {
-                if (GetHealth() >= 1f && !IsDamagedFlag() && !Mathf.Approximately(_prevHealth, GetHealth()))
+                if (GetHealth() >= 1f && !IsDamagedFlag() && _wasDead)
                 {
                     QuickLogger.Debug($"{Mod.FriendlyName} Repaired", true);
                     OnRepaired?.Invoke();
-                    _prevHealth = GetHealth();
+                    _wasDead = false;
                 }
 
-                if (GetHealth() <= 0f && IsDamagedFlag() && !Mathf.Approximately(_prevHealth, GetHealth()))
+                if (GetHealth() <= 0f && IsDamagedFlag() && !_wasDead)
                 {
                     QuickLogger.Debug($"{Mod.FriendlyName} Damaged", true);
                     OnDamaged?.Invoke();
-                    _prevHealth = GetHealth();
+                    _wasDead = true;
                 }
             }
             catch (Exception e)
             {
                 QuickLogger.Error(e.Message);
             }
+        }
+
+        internal void Kill()
+        {
+            _liveMixin.health = 0;
         }
 
         private void ResetPassedTime()

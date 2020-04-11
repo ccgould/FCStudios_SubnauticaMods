@@ -3,6 +3,7 @@ using System.IO;
 using System.Reflection;
 using FCS_HydroponicHarvesters.Buildables;
 using FCS_HydroponicHarvesters.Configuration;
+using FCS_HydroponicHarvesters.Craftable;
 using FCSCommon.Exceptions;
 using FCSCommon.Extensions;
 using FCSCommon.Utilities;
@@ -42,24 +43,23 @@ namespace FCS_HydroponicHarvesters
 
                 if (HydroponicHarvestersModelPrefab.GetPrefabs())
                 {
-                    var hydroHavesterLarge = new HydroponicHarvestersBuidable(Mod.LargeClassID, Mod.LargeFriendlyName, Mod.LargeDescription,
+                    var hydroHarvesterLarge = new HydroponicHarvestersBuildable(Mod.LargeClassID, Mod.LargeFriendlyName, Mod.LargeDescription,
                         new Vector3(2.13536f, 2.379217f, 2.341017f), new Vector3(0f, 1.556781f, 0f), Mod.LargeHydroHarvKitClassID.ToTechType(), HydroponicHarvestersModelPrefab.LargePrefab,Mod.LargeBubblesLocations);
-                    hydroHavesterLarge.Patch();
+                    hydroHarvesterLarge.Patch();
 
                     QuickLogger.Debug("Patched Large");
 
-                    var hydroHavesterMedium = new HydroponicHarvestersBuidable(Mod.MediumClassID, Mod.MediumFriendlyName, Mod.MediumDescription,
+                    var hydroHarvesterMedium = new HydroponicHarvestersBuildable(Mod.MediumClassID, Mod.MediumFriendlyName, Mod.MediumDescription,
                         new Vector3(1.654228f, 2.46076f, 2.274961f), new Vector3(-0.02562737f, 1.505608f, 0.02242398f), Mod.MediumHydroHarvKitClassID.ToTechType(), HydroponicHarvestersModelPrefab.MediumPrefab, Mod.MediumBubblesLocations);
-                    hydroHavesterMedium.Patch();
+                    hydroHarvesterMedium.Patch();
 
                     QuickLogger.Debug("Patched Medium");
 
-                    var hydroHavesterSmall = new HydroponicHarvestersBuidable(Mod.SmallClassID, Mod.SmallFriendlyName, Mod.SmallDescription,
+                    var hydroHarvesterSmall = new HydroponicHarvestersBuildable(Mod.SmallClassID, Mod.SmallFriendlyName, Mod.SmallDescription,
                         new Vector3(1.648565f, 2.492922f, 1.784077f), new Vector3(-0.01223725f, 1.492922f, 0.1544394f), Mod.SmallHydroHarvKitClassID.ToTechType(), HydroponicHarvestersModelPrefab.SmallPrefab, Mod.SmallBubblesLocations);
-                    hydroHavesterSmall.Patch();
+                    hydroHarvesterSmall.Patch();
 
                     QuickLogger.Debug("Patched Small");
-
                 }
                 else
                 {
@@ -82,6 +82,9 @@ namespace FCS_HydroponicHarvesters
             var icon = ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetFolder(), "HydroHarv.png"));
             var craftingTab = new CraftingTab(Mod.HydroHarvTabID, Mod.ModFriendlyName, icon);
 
+            FloraKleen = new FloraKleenPatcher(Mod.FloraKleenClassID, Mod.FloraKleenFriendlyName, Mod.FloraKleenDescription, craftingTab);
+            FloraKleen.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
+            
             var largeHydroHarv = new FCSKit(Mod.LargeHydroHarvKitClassID, Mod.LargeFriendlyName, craftingTab, Mod.LargeHydroHarvIngredients);
             largeHydroHarv.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
 
@@ -91,11 +94,33 @@ namespace FCS_HydroponicHarvesters
             var smallHydroHarv = new FCSKit(Mod.SmallHydroHarvKitClassID, Mod.SmallFriendlyName, craftingTab, Mod.SmallHydroHarvIngredients);
             smallHydroHarv.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
 
-            foreach (var dnaSample in Mod.DNASamples)
+            FcTechFabricatorService.PublicAPI.AddTabNode("DNASample", "DNA Samples", icon);
+            FcTechFabricatorService.PublicAPI.AddTabNode("FCS_EatableDNA", "Eatable DNA Samples", icon, "DNASample");
+            FcTechFabricatorService.PublicAPI.AddTabNode("FCS_UsableDNA", "Usable DNA Samples", icon, "DNASample");
+            FcTechFabricatorService.PublicAPI.AddTabNode("FCS_DecorDNA", "Decor DNA Samples", icon, "DNASample");
+
+            foreach (var dnaSample in Mod.EatableDNASamples)
             {
                 var dna = new FCSDNASample(dnaSample.ClassID, dnaSample.Friendly, dnaSample.Description,dnaSample.Ingredient, dnaSample.Amount);
-                dna.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
+                dna.Patch();
+                FcTechFabricatorService.PublicAPI.AddCraftNode(dna, "FCS_EatableDNA");
+            }
+
+            foreach (var dnaSample in Mod.UsableDNASamples)
+            {
+                var dna = new FCSDNASample(dnaSample.ClassID, dnaSample.Friendly, dnaSample.Description, dnaSample.Ingredient, dnaSample.Amount);
+                dna.Patch();
+                FcTechFabricatorService.PublicAPI.AddCraftNode(dna, "FCS_UsableDNA");
+            }
+
+            foreach (var dnaSample in Mod.DecorSamples)
+            {
+                var dna = new FCSDNASample(dnaSample.ClassID, dnaSample.Friendly, dnaSample.Description, dnaSample.Ingredient, dnaSample.Amount);
+                dna.Patch();
+                FcTechFabricatorService.PublicAPI.AddCraftNode(dna, "FCS_DecorDNA");
             }
         }
+
+        internal static FloraKleenPatcher FloraKleen { get; set; }
     }
 }

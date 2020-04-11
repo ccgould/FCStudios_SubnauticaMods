@@ -13,7 +13,7 @@ namespace FCS_HydroponicHarvesters.Mono
     internal class HydroHarvContainer : MonoBehaviour, IFCSStorage
     {
         private HydroHarvController _mono;
-        private const int storageLimit = 50;
+        internal int StorageLimit { get; private set; }
         internal Action OnContainerUpdate { get; set; }
 
         public int GetContainerFreeSpace => GetFreeSpace();
@@ -23,14 +23,33 @@ namespace FCS_HydroponicHarvesters.Mono
         internal void Initialize(HydroHarvController mono)
         {
             _mono = mono;
+
+            switch (mono.HydroHarvGrowBed.GetHydroHarvSize())
+            {
+                case HydroHarvSize.Unknown:
+                    StorageLimit = 0;
+                    break;
+                case HydroHarvSize.Large:
+                    StorageLimit = QPatch.Configuration.Config.LargeStorageLimit;
+                    break;
+                case HydroHarvSize.Medium:
+                    StorageLimit = QPatch.Configuration.Config.MediumStorageLimit;
+                    break;
+                case HydroHarvSize.Small:
+                    StorageLimit = QPatch.Configuration.Config.SmallStorageLimit;
+                    break;
+                default:
+                    StorageLimit = 0;
+                    break;
+            }
         }
         
         private bool CheckIfFull()
         {
-            return GetTotal() > storageLimit;
+            return GetTotal() >= StorageLimit;
         }
 
-        private int GetTotal()
+        internal int GetTotal()
         {
             int amount = 0;
             foreach (KeyValuePair<TechType, int> item in Items)
@@ -50,7 +69,7 @@ namespace FCS_HydroponicHarvesters.Mono
                 amount += item.Value;
             }
 
-            return storageLimit - amount;
+            return StorageLimit - amount;
         }
 
         public bool CanBeStored(int amount)
@@ -64,7 +83,7 @@ namespace FCS_HydroponicHarvesters.Mono
             return false;
         }
 
-        public void AddItemToContainer(TechType item,bool initializer = false)
+        internal void AddItemToContainer(TechType item,bool initializer = false)
         {
             if (!IsFull)
             {
@@ -83,7 +102,7 @@ namespace FCS_HydroponicHarvesters.Mono
             }
         }
 
-        public void RemoveItemFromContainer(TechType item)
+        internal void RemoveItemFromContainer(TechType item)
         {
             if (Items.ContainsKey(item))
             {
@@ -105,7 +124,7 @@ namespace FCS_HydroponicHarvesters.Mono
             }
         }
 
-        public void DeleteItemFromContainer(TechType item)
+        internal void DeleteItemFromContainer(TechType item)
         {
             if (!Items.ContainsKey(item)) return;
 
@@ -113,7 +132,7 @@ namespace FCS_HydroponicHarvesters.Mono
 
             if (Items[item] > 0)
             {
-                QuickLogger.Message(HydroponicHarvestersBuidable.CannotDeleteDNAItem(Language.main.Get(item)),true);
+                QuickLogger.Message(HydroponicHarvestersBuildable.CannotDeleteDNAItem(Language.main.Get(item)),true);
                 return;
             }
             
@@ -127,14 +146,43 @@ namespace FCS_HydroponicHarvesters.Mono
             return true;
         }
 
-        public void SpawnClone()
+        internal void SpawnClone()
         {
            var samples = _mono.HydroHarvGrowBed.GetDNASamples();
 
-           foreach (TechType sample in samples)
+           foreach (KeyValuePair<TechType, TechType> sample in samples)
            {
-               AddItemToContainer(sample);
+               if(IsFull) break;
+               AddItemToContainer(sample.Key);
            }
+        }
+
+        internal Dictionary<TechType, int> Save()
+        {
+            return Items;
+        }
+
+        internal void Load(Dictionary<TechType, int> savedDataContainer)
+        {
+            if(savedDataContainer == null) return;
+            foreach (KeyValuePair<TechType, int> pair in savedDataContainer)
+            {
+                if (pair.Value == 0)
+                {
+                    AddItemToContainer(pair.Key,true);
+                    continue;
+                }
+
+                for (int i = 0; i < pair.Value; i++)
+                {
+                    AddItemToContainer(pair.Key);
+                }
+            }
+        }
+
+        public bool HasItems()
+        {
+            return Items.Count > 0;
         }
     }
 }

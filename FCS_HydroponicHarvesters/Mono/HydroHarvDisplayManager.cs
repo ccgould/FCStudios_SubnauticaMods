@@ -35,6 +35,8 @@ namespace FCS_HydroponicHarvesters.Mono
         private GridHelper _dnaGrid;
         private Text _dnaCounter;
         private Text _powerUsage;
+        private Text _itemsCount;
+        private Text _timeLeft;
 
         internal Atlas.Sprite MelonIconSprite => _melonIconSprite ?? (_melonIconSprite = SpriteManager.Get(TechType.Melon));
 
@@ -94,19 +96,19 @@ namespace FCS_HydroponicHarvesters.Mono
             switch (_mono.CurrentSpeedMode)
             {
                 case SpeedModes.Off:
-                    _powerLevelText.text = HydroponicHarvestersBuidable.Off();
+                    _powerLevelText.text = HydroponicHarvestersBuildable.Off();
                     break;
                 case SpeedModes.Max:
-                    _powerLevelText.text = HydroponicHarvestersBuidable.Max();
+                    _powerLevelText.text = HydroponicHarvestersBuildable.Max();
                     break;
                 case SpeedModes.High:
-                    _powerLevelText.text = HydroponicHarvestersBuidable.High();
+                    _powerLevelText.text = HydroponicHarvestersBuildable.High();
                     break;
                 case SpeedModes.Low:
-                    _powerLevelText.text = HydroponicHarvestersBuidable.Low();
+                    _powerLevelText.text = HydroponicHarvestersBuildable.Low();
                     break;
                 case SpeedModes.Min:
-                    _powerLevelText.text = HydroponicHarvestersBuidable.Min();
+                    _powerLevelText.text = HydroponicHarvestersBuildable.Min();
                     break;
             }
         }
@@ -134,20 +136,23 @@ namespace FCS_HydroponicHarvesters.Mono
 
             if (FindAllComponents())
             {
-                _initialized = true;
                 PowerOnDisplay();
                 _mono.HydroHarvContainer.OnContainerUpdate += OnContainerUpdate;
                 _dnaGrid.DrawPage(1);
+                _initialized = true;
             }
         }
 
-        private void OnContainerUpdate()
+        internal void OnContainerUpdate()
         {
             UpdateDna();
+            _itemsCount.text = string.Format(HydroponicHarvestersBuildable.AmountOfItems(),
+                $"<color=aqua>{_mono.HydroHarvContainer.GetTotal()}/{_mono.HydroHarvContainer.StorageLimit}</color>");
         }
 
         public override void PowerOnDisplay()
         {
+            QuickLogger.Debug("Power On Display",true);
            _mono.AnimationManager.SetIntHash(_page,1);
         }
 
@@ -189,6 +194,14 @@ namespace FCS_HydroponicHarvesters.Mono
 
                 #region Power Usage
                 _powerUsage = InterfaceHelpers.FindGameObject(home, "PowerUsage")?.GetComponent<Text>();
+                #endregion
+
+                #region Power Usage
+                _itemsCount = InterfaceHelpers.FindGameObject(home, "ItemsCount")?.GetComponent<Text>();
+                #endregion
+
+                #region Power Usage
+                _timeLeft = InterfaceHelpers.FindGameObject(home, "TimeLeft")?.GetComponent<Text>();
                 #endregion
 
                 #region CleanerButton
@@ -266,24 +279,24 @@ namespace FCS_HydroponicHarvesters.Mono
             return true;
         }
 
-        private void OnLoadDnaGrid(GameObject itemPrefab, GameObject itemsGrid, int stPos, int endPos)
+        private void OnLoadDnaGrid(DisplayData info)
         {
             _dnaGrid.ClearPage();
 
             var grouped = _mono.HydroHarvContainer.Items.ToList();
 
-            if (endPos > grouped.Count)
+            if (info.EndPosition > grouped.Count)
             {
-                endPos = grouped.Count;
+                info.EndPosition = grouped.Count;
             }
 
-            for (int i = stPos; i < endPos; i++)
+            for (int i = info.StartPosition; i < info.EndPosition; i++)
             {
                 var techType = grouped[i].Key;
 
-                GameObject buttonPrefab = Instantiate(itemPrefab);
+                GameObject buttonPrefab = Instantiate(info.ItemsPrefab);
 
-                if (buttonPrefab == null || itemsGrid == null)
+                if (buttonPrefab == null || info.ItemsGrid == null)
                 {
                     if (buttonPrefab != null)
                     {
@@ -292,7 +305,7 @@ namespace FCS_HydroponicHarvesters.Mono
                     return;
                 }
 
-                buttonPrefab.transform.SetParent(itemsGrid.transform, false);
+                buttonPrefab.transform.SetParent(info.ItemsGrid.transform, false);
                 buttonPrefab.GetComponentInChildren<Text>().text = grouped[i].Value.ToString();
 
                 var mainButton = buttonPrefab.FindChild("MainButton");
@@ -332,13 +345,39 @@ namespace FCS_HydroponicHarvesters.Mono
         internal void UpdatePowerUsagePerSecond()
         {
             if (_powerUsage == null) return;
-            _powerUsage.text = $"<size=100><color=Green>{_mono.PowerManager.EnergyConsumptionPerSecond}</color>{Environment.NewLine}Unit Per Second</size>";
+            _powerUsage.text = $"<size=100><color=Green>{Mathf.RoundToInt(_mono.PowerManager.EnergyConsumptionPerSecond)}</color>{Environment.NewLine}Unit Per Second</size>";
         }
 
         internal void UpdateDna()
         {
             if (_dnaGrid == null) return;
             _dnaGrid.DrawPage();   
+        }
+
+        internal void Load()
+        {
+           UpdateSpeedModeText();
+           UpdateDnaCounter();
+        }
+
+        internal void UpdateTimeLeft(string hms)
+        {
+            _timeLeft.text = string.Format(HydroponicHarvestersBuildable.HMSTime(), $"<color=aqua>{hms}</color>");
+        }
+
+        public void RefreshModeBTN(FCSEnvironment savedDataBedType)
+        {
+            switch (savedDataBedType)
+            {
+                case FCSEnvironment.Air:
+                    _modeIcon.sprite = MelonIconSprite;
+                    break;
+                case FCSEnvironment.Water:
+                    _modeIcon.sprite = KooshIconSprite;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(savedDataBedType), savedDataBedType, null);
+            }
         }
     }
 }

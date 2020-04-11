@@ -7,29 +7,29 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using FCSCommon.Extensions;
+using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
 
 namespace MAC.OxStation.Buildables
 {
-    internal partial class OxStationBuildable : Buildable
+    internal class OxStationScreenBuildable : Buildable
     {
         #region Public Overrides
-        public override TechGroup GroupForPDA { get; } = TechGroup.ExteriorModules;
-        public override TechCategory CategoryForPDA { get; } = TechCategory.ExteriorModule;
+        public override TechGroup GroupForPDA { get; } = TechGroup.InteriorModules;
+        public override TechCategory CategoryForPDA { get; } = TechCategory.InteriorModule;
         public override string AssetsFolder { get; } = $"{Mod.ModFolderName}/Assets";
         #endregion
 
         #region Private Members
-        private static readonly OxStationBuildable Singleton = new OxStationBuildable();
-        private readonly GameObject _prefab = OxStationModelPrefab.OxstationPrefab;
-
+        private static readonly OxStationScreenBuildable Singleton = new OxStationScreenBuildable();
+        private readonly GameObject _prefab = OxStationModelPrefab.OxstationScreenPrefab;
         #endregion
 
         #region Constructor
-        public OxStationBuildable() : base(Mod.ClassID, Mod.FriendlyName, Mod.Description)
+        public OxStationScreenBuildable() : base(Mod.ScreenClassID, Mod.ScreenFriendlyName, Mod.ScreenDescription)
         {
-            OnFinishedPatching += AdditionalPatching;
+
         }
         #endregion
 
@@ -47,25 +47,9 @@ namespace MAC.OxStation.Buildables
 
                 PrefabIdentifier prefabID = prefab.EnsureComponent<PrefabIdentifier>();
                 prefabID.ClassId = this.ClassID;
-
-                var pFX = prefab.AddComponent<PowerFX>();
                 
-                var attachPoint = prefab.FindChild("model").FindChild("static_objects").FindChild("CylinderNull")?.gameObject;
-                
-                if (attachPoint == null)
-                {
-                    QuickLogger.Error("AttachPoint CylinderNull was not found on the Oxstation model");
-                }
-                else
-                {
-                    pFX.attachPoint = attachPoint.transform;
-                }
-
-                prefab.AddComponent<PowerManager>();
-                prefab.AddComponent<PowerRelay>();
                 prefab.AddComponent<AnimationManager>();
-                prefab.AddComponent<OxStationController>();
-
+                prefab.AddComponent<OxStationScreenController>();
 
                 var techTag = prefab.EnsureComponent<TechTag>();
                 techTag.type = TechType;
@@ -96,22 +80,17 @@ namespace MAC.OxStation.Buildables
 
                 // Add constructible
                 var constructable = _prefab.EnsureComponent<Constructable>();
-                constructable.allowedOnWall = false;
-                constructable.allowedOnGround = true;
-                constructable.allowedInSub = false;
-                constructable.allowedInBase = false;
+                constructable.allowedOnWall = true;
+                constructable.allowedOnGround = false;
+                constructable.allowedInSub = true;
+                constructable.allowedInBase = true;
                 constructable.allowedOnCeiling = false;
-                constructable.allowedOutside = true;
+                constructable.allowedOutside = false;
                 constructable.model = _prefab.FindChild("model");
                 constructable.techType = TechType;
-                constructable.rotationEnabled = true;
-
-                // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
-                var lwe = _prefab.AddComponent<LargeWorldEntity>();
-                lwe.cellLevel = LargeWorldEntity.CellLevel.Global;
-
-                _prefab.AddComponent<PlayerInteractionManager>();
-                _prefab.AddComponent<FMOD_CustomLoopingEmitter>();
+                
+                GameObjectHelpers.AddConstructableBounds(_prefab, new Vector3(0.4528692f, 0.6682342f, 0.03642998f), 
+                    new Vector3(0, -0.02660185f, 0.05301314f));
             }
         }
 
@@ -126,7 +105,7 @@ namespace MAC.OxStation.Buildables
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(Mod.OxstationKitClassID.ToTechType(),1)
+                    new Ingredient(Mod.OxstationScreenKitClassID.ToTechType(),1)
                 }
             };
             QuickLogger.Debug($"Created Ingredients");
@@ -142,7 +121,7 @@ namespace MAC.OxStation.Buildables
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(Mod.OxstationKitClassID.ToTechType(),1)
+                    new Ingredient(Mod.OxstationScreenKitClassID.ToTechType(),1)
                 }
             };
             QuickLogger.Debug($"Created Ingredients");

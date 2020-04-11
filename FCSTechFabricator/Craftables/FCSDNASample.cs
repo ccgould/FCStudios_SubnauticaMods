@@ -3,25 +3,26 @@ using System.IO;
 using FCSCommon.Utilities;
 using FCSTechFabricator.Components;
 using FCSTechFabricator.Configuration;
+using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 
 namespace FCSTechFabricator.Craftables
 {
-    public class FCSDNASample : FcCraftable
+    public class FCSDNASample : Craftable
     {
         private string _assetFolder = Mod.GetAssetPath();
         private TechType _ingredient;
         private int _amountToReturn;
 
 
-        public FCSDNASample(string classId, string friendlyName, string description, TechType ingredient, int amountToReturn) : base(classId, friendlyName, description, DefaultConfigurations.DnaTab)
+        public FCSDNASample(string classId, string friendlyName, string description, TechType ingredient, int amountToReturn) : base(classId, friendlyName, description)
         {
             _ingredient = ingredient;
             _amountToReturn = amountToReturn;
         }
-
+        
         public override GameObject GetGameObject()
         {
             var prefab = GameObject.Instantiate(CraftData.GetPrefabForTechType(TechType.HatchingEnzymes));
@@ -82,7 +83,6 @@ namespace FCSTechFabricator.Craftables
 
         public override TechGroup GroupForPDA => TechGroup.Resources;
         public override TechCategory CategoryForPDA => TechCategory.AdvancedMaterials;
-        protected override string AssetBundleName => Mod.AssetBundleName;
         //public override string IconFileName => _iconFileName;
         public override string AssetsFolder => _assetFolder;
     }

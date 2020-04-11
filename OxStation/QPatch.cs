@@ -37,8 +37,9 @@ namespace MAC.OxStation
                 AddTechFabricatorItems();
 
                 OptionsPanelHandler.RegisterModOptions(new Options());
-
+                OxStationModelPrefab.GetPrefabs();
                 OxStationBuildable.PatchHelper();
+                OxStationScreenBuildable.PatchHelper();
 
                 var harmony = HarmonyInstance.Create("com.oxstation.MAC");
 
@@ -59,6 +60,21 @@ namespace MAC.OxStation
             
             var oxstationKit = new FCSKit(Mod.OxstationKitClassID, Mod.FriendlyName, craftingTab, Mod.OxstationIngredients);
             oxstationKit.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
+
+            var oxStationScreenKit = new FCSKit(Mod.OxstationScreenKitClassID, Mod.ScreenFriendlyName, craftingTab, Mod.OxstationScreenIngredients);
+            oxStationScreenKit.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
+
+            var oxStationCyclopsModule = new FCSVehicleModule(Mod.OxstationCyclopsModuleClassID, Mod.CyclopsModuleFriendlyName,Mod.OxstationCyclopsModuleDescription,EquipmentType.CyclopsModule, Mod.OxstationCyclopsIngredients, craftingTab);
+            oxStationCyclopsModule.ChangeIconLocation(Mod.GetAssetFolder(),"oxStation_C");
+            oxStationCyclopsModule.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
+            
+            var oxStationSeamothModule = new FCSVehicleModule(Mod.OxstationSeamothModuleClassID, Mod.OxStationSeamothFriendlyName, Mod.OxstationSeamothModuleDescription, EquipmentType.SeamothModule, Mod.OxstationSeamothIngredients, craftingTab);
+            oxStationSeamothModule.ChangeIconLocation(Mod.GetAssetFolder(), "oxStation_S");
+            oxStationSeamothModule.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
+
+            var oxStationPrawnModule = new FCSVehicleModule(Mod.OxstationPrawnSuitModuleClassID, Mod.OxStationPrawnSuitFriendlyName, Mod.OxstationPrawnModuleDescription, EquipmentType.ExosuitModule, Mod.OxstationPrawnSuitIngredients, craftingTab);
+            oxStationPrawnModule.ChangeIconLocation(Mod.GetAssetFolder(), "oxStation_P");
+            oxStationPrawnModule.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
         }
     }
 }

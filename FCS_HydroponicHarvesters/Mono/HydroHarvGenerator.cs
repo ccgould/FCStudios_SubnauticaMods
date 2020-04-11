@@ -20,18 +20,18 @@ namespace FCS_HydroponicHarvesters.Mono
 
         private HydroHarvController _mono;
 
-        public float StartUpProgress
+        internal float StartUpProgress
         {
             get => _progress[(int)CubePhases.StartUp];
             set => _progress[(int)CubePhases.StartUp] = value;
         }
-        public float GenerationProgress
+        internal float GenerationProgress
         {
             get => _progress[(int)CubePhases.Generating];
             set => _progress[(int)CubePhases.Generating] = value;
         }
 
-        public float CoolDownProgress
+        internal float CoolDownProgress
         {
             get => _progress[(int)CubePhases.CoolDown];
             set => _progress[(int)CubePhases.CoolDown] = value;

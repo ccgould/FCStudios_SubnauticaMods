@@ -329,7 +329,7 @@ namespace FCS_AIMarineTurbine.Display
                 }
                 else
                 {
-                    powerPercent = Convert.ToInt32((_mono.PowerManager.GetCharge() / AIJetStreamT242Buildable.JetStreamT242Config.MaxCapacity) * 100);
+                    powerPercent = Mathf.RoundToInt((_mono.PowerManager.GetCharge() / AIJetStreamT242Buildable.JetStreamT242Config.MaxCapacity) * 100);
                 }
 
                 _powerSlider.GetComponent<Slider>().value = powerPercent / 100f;

@@ -14,7 +14,7 @@ using UnityEngine;
 
 namespace FCS_HydroponicHarvesters.Buildables
 {
-    internal partial class HydroponicHarvestersBuidable : Buildable
+    internal partial class HydroponicHarvestersBuildable : Buildable
     {
         private Vector3 _bCenter;
         private Vector3 _bSize;
@@ -22,7 +22,7 @@ namespace FCS_HydroponicHarvesters.Buildables
         private GameObject _prefab;
         private List<Vector3> _bubbleLocations;
 
-        public HydroponicHarvestersBuidable(string classId, string friendly, string description, Vector3 bSize, Vector3 bCenter, TechType kit, GameObject prefab,List<Vector3> bubbles) : base(classId, friendly, description)
+        public HydroponicHarvestersBuildable(string classId, string friendly, string description, Vector3 bSize, Vector3 bCenter, TechType kit, GameObject prefab,List<Vector3> bubbles) : base(classId, friendly, description)
         {
             _bCenter = bCenter;
             _bSize = bSize;
@@ -77,6 +77,7 @@ namespace FCS_HydroponicHarvesters.Buildables
                 prefabID.ClassId = ClassID;
 
                 AddBubbles(prefab);
+                AddVaporBlast(prefab);
 
                 prefab.AddComponent<TechTag>().type = TechType;
                 prefab.AddComponent<HydroHarvController>();
@@ -87,6 +88,16 @@ namespace FCS_HydroponicHarvesters.Buildables
                 QuickLogger.Error(e.Message);
                 return null;
             }
+        }
+
+        private void AddVaporBlast(GameObject prefab)
+        {
+            MaterialHelpers.AddNewVaporBlast(
+                prefab, 
+                new Vector3(0f, 2.251f, 0f), 
+                new Vector3(90f, 0f, 0f),
+                new Vector3(0f, 0f, 0f
+                ));
         }
 
         private void AddBubbles(GameObject prefab)

@@ -112,12 +112,14 @@
   <ItemGroup>
     <Compile Include="Buildables\OxStationAuxPatcher.cs" />
     <Compile Include="Buildables\OxStationModelPrefab.cs" />
+    <Compile Include="Buildables\OxStationScreenPatcher.cs" />
     <Compile Include="Buildables\OxStationPatcher.cs" />
     <Compile Include="Config\Configuration.cs" />
     <Compile Include="Config\Mod.cs" />
     <Compile Include="Config\SaveDataEntry.cs" />
     <Compile Include="Display\InterfaceButton.cs" />
     <Compile Include="Display\OnScreenButton.cs" />
+    <Compile Include="Display\OxStationItemButton.cs" />
     <Compile Include="Enums\ButtonStates.cs" />
     <Compile Include="Managers\AnimationManager.cs" />
     <Compile Include="Managers\AudioManager.cs" />
@@ -127,8 +129,11 @@
     <Compile Include="Managers\Ox_OxygenManager.cs" />
     <Compile Include="Managers\PlayerInteractionManager.cs" />
     <Compile Include="Managers\PowerManager.cs" />
+    <Compile Include="Managers\ScreenDisplayManager.cs" />
     <Compile Include="Mono\OxStationController.cs" />
+    <Compile Include="Mono\OxStationScreenController.cs" />
     <Compile Include="Patches\Beacon_Patches.cs" />
+    <Compile Include="Patches\Oxstation_Patches.cs" />
     <Compile Include="Patches\Player_Patches.cs" />
     <Compile Include="Patches\SubRoot_Patches.cs" />
     <Compile Include="QPatch.cs" />

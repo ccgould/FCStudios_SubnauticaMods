@@ -35,7 +35,7 @@ namespace MAC.OxStation.Managers
             set
             {
                 _powerState = value; 
-                QuickLogger.Debug($"Current PowerState: {value}");
+                //QuickLogger.Debug($"Current PowerState: {value}");
                 OnPowerUpdate?.Invoke(value);
             }
         }

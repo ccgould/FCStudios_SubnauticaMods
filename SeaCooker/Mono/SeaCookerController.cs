@@ -202,8 +202,7 @@ namespace AE.SeaCooker.Mono
 
             IsInitialized = true;
         }
-
-
+        
         private void FindHabitat()
         {
             //if (_habitat != null) return;

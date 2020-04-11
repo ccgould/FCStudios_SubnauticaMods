@@ -110,7 +110,7 @@ namespace FCS_HydroponicHarvesters.Buildables
             }
             catch (Exception e)
             {
-                QuickLogger.Error<HydroponicHarvestersBuidable>(e.Message);
+                QuickLogger.Error<HydroponicHarvestersBuildable>(e.Message);
                 return false;
             }
         }

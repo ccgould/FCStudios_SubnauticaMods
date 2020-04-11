@@ -1,4 +1,5 @@
-﻿using FCSCommon.Utilities;
+﻿using System.Collections.Generic;
+using FCSCommon.Utilities;
 using Harmony;
 using MAC.OxStation.Config;
 using MAC.OxStation.Managers;
@@ -15,57 +16,49 @@ namespace MAC.OxStation.Patches
         private static readonly float _oxygenPerSecond = 10f;
         public static bool Prefix(ref Player __instance, ref bool __result)
         {
-            bool canBreathe = false;
-            
-            if (DefaultO2Level <= 0)
+            GetDefaultO2Level(__instance);
+
+            if (__instance.IsInBase())
             {
-                var oxygen = __instance.gameObject.GetComponentInParent<Oxygen>();
-                
-                if (oxygen == null )
-                {
-                    QuickLogger.Error("Failed to get player oxygen component");
-                }
-                else if(!oxygen.isPlayer)
-                {
-                    QuickLogger.Error("This oxygen component isnt the players");
-                }
-                else
-                {
-                    DefaultO2Level = oxygen.oxygenCapacity;
-                    QuickLogger.Debug($"Default oxygen level is: {DefaultO2Level}");
-                }
+                if (__instance.IsUnderwater()) return true;
+
+                var curBase = __instance.GetCurrentSub();
+
+                var manager = BaseManager.FindManager(curBase);
+
+                if (!IsThereAnyOxygenStationAttached(out __result, manager)) return false;
+
+                if (PerformOxygenCheckForBases(__instance, out __result, manager)) return true;
             }
-            
-            if (!__instance.IsInBase() || __instance.IsUnderwater()) return true;
+            return false;
+        }
 
-            //QuickLogger.Debug($"Is InBase {__instance.IsInBase()}", true);
-
-            var curBase = __instance.GetCurrentSub();
-
-            var manager = BaseManager.FindManager(curBase);
+        private static bool IsThereAnyOxygenStationAttached(out bool outResult, BaseManager manager)
+        {
+            outResult = false;
 
             var unitsAvailable = manager.BaseUnits.Count > 0;
 
             if (!unitsAvailable)
             {
-                //QuickLogger.Debug($"Can Breathe {canBreathe}", true);
-                __result = canBreathe;
                 return false;
             }
+            
+            return true;
+        }
 
-            QuickLogger.Debug($"RT_Installed: {Mod.RTInstalled} || HasOxygenTank: {Player.main.oxygenMgr.HasOxygenTank()}");
+        private static bool PerformOxygenCheckForBases(Player instance, out bool outResult, BaseManager manager)
+        {
+            outResult = false;
 
             if (Mod.RTInstalled && Player.main.oxygenMgr.HasOxygenTank())
             {
-                //Check if the player oxygen level is full
-                if (__instance.oxygenMgr.GetOxygenAvailable() >= DefaultO2Level)
-                {
-                    return true;
-                }
+                if (IsPlayerOxygenFullRtInstalled(instance)) return true;
 
                 foreach (OxStationController baseUnit in manager.BaseUnits)
                 {
-                    if (baseUnit.OxygenManager.GetO2Level() <= 0 || !baseUnit.IsConstructed || baseUnit.HealthManager.IsDamageApplied()) continue;
+                    if (baseUnit.OxygenManager.GetO2Level() <= 0 || !baseUnit.IsConstructed ||
+                        baseUnit.HealthManager.IsDamageApplied()) continue;
 
                     if (Player.main.oxygenMgr.GetOxygenAvailable() < DefaultO2Level)
                     {
@@ -76,24 +69,21 @@ namespace MAC.OxStation.Patches
                         {
                             Player.main.oxygenMgr.AddOxygen(amount);
                         }
-                        canBreathe = true;
+
+                        outResult = true;
                     }
+
                     break;
                 }
-                QuickLogger.Debug($"Can Breathe Check 2 {canBreathe}", true);
-                __result = canBreathe;
             }
             else
             {
-                //Check if the player oxygen level is full
-                if (__instance.oxygenMgr.GetOxygenAvailable() >= __instance.oxygenMgr.GetOxygenCapacity())
-                {
-                    return true;
-                }
+                if (IsPlayerOxygenFull(instance)) return true;
 
                 foreach (OxStationController baseUnit in manager.BaseUnits)
                 {
-                    if (baseUnit.OxygenManager.GetO2Level() <= 0 || !baseUnit.IsConstructed || baseUnit.HealthManager.IsDamageApplied()) continue;
+                    if (baseUnit.OxygenManager.GetO2Level() <= 0 || !baseUnit.IsConstructed ||
+                        baseUnit.HealthManager.IsDamageApplied()) continue;
 
                     if (Player.main.oxygenMgr.GetOxygenAvailable() < Player.main.oxygenMgr.GetOxygenCapacity())
                     {
@@ -104,16 +94,52 @@ namespace MAC.OxStation.Patches
                         {
                             Player.main.oxygenMgr.AddOxygen(amount);
                         }
-                        canBreathe = true;
+
+                        outResult = true;
                     }
+
                     break;
                 }
-                //QuickLogger.Debug($"Can Breathe Check 2 {canBreathe}", true);
-                __result = canBreathe;
             }
 
-            
             return false;
+        }
+
+        private static bool IsPlayerOxygenFullRtInstalled(Player instance)
+        {
+            if (instance.oxygenMgr.GetOxygenAvailable() >= DefaultO2Level)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private static bool IsPlayerOxygenFull(Player instance)
+        {
+            return instance.oxygenMgr.GetOxygenAvailable() >= instance.oxygenMgr.GetOxygenCapacity();
+        }
+
+        private static void GetDefaultO2Level(Player instance)
+        {
+            if (DefaultO2Level <= 0)
+            {
+                var oxygen = instance.gameObject.GetComponentInParent<Oxygen>();
+
+                if (oxygen == null)
+                {
+                    QuickLogger.Error("Failed to get player oxygen component");
+                }
+                else if (!oxygen.isPlayer)
+                {
+                    QuickLogger.Error("This oxygen component isnt the players");
+                }
+                else
+                {
+                    DefaultO2Level = oxygen.oxygenCapacity;
+                    QuickLogger.Debug($"Default oxygen level is: {DefaultO2Level}");
+                }
+            }
         }
     }
 }

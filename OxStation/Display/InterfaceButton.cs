@@ -34,7 +34,7 @@ namespace MAC.OxStation.Display
 
         #region Public Methods
 
-        public void OnEnable()
+        public virtual void OnEnable()
         {
             if (string.IsNullOrEmpty(BtnName)) return;
 

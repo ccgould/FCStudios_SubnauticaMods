@@ -16,6 +16,7 @@ namespace FCS_HydroponicHarvesters.Mono
         {
             _mono = mono;
             _light = gameObject.GetComponentInChildren<Light>();
+            _light.gameObject.SetActive(false);
             InvokeRepeating(nameof(UpdateLightState),0.5f,0.5f);
         }
 
@@ -43,6 +44,12 @@ namespace FCS_HydroponicHarvesters.Mono
         internal void SetLightSwitchedOff(bool state)
         {
             _lightSwitchedOff = state;
+        }
+
+        internal void Load(bool state)
+        {
+            _lightSwitchedOff = state;
+            _light.gameObject.SetActive(!state);
         }
 
         private void UpdateLightState()

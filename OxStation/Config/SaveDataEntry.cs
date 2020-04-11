@@ -11,6 +11,7 @@ namespace MAC.OxStation.Config
         [JsonProperty] internal float OxygenLevel { get; set; }
         [JsonProperty] internal float HealthLevel { get; set; }
         [JsonProperty] internal string BeaconID { get; set; }
+        [JsonProperty] internal bool IsPinging { get; set; }
     }
 
     [Serializable]

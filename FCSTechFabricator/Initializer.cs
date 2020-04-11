@@ -27,7 +27,6 @@ namespace FCSTechFabricator
 
             var harmony = HarmonyInstance.Create("com.fcstechfabricator.fcstudios");
             harmony.PatchAll(Assembly.GetExecutingAssembly());
-            
             FcTechFabricatorService.InternalAPI.PatchFabricator();
         }
     }

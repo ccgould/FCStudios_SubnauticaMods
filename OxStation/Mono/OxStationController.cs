@@ -19,7 +19,7 @@ namespace MAC.OxStation.Mono
         internal bool IsConstructed { get; private set; }
         internal Ox_OxygenManager OxygenManager { get; private set; }
         internal PowerManager PowerManager { get; private set; }
-        internal HealthManager HealthManager { get; private set; }
+        public HealthManager HealthManager { get; private set; }
         internal AnimationManager AnimationManager { get; private set; }
         private static readonly Dictionary<Beacon, OxStationController> AllBeaconsAttached = new Dictionary<Beacon, OxStationController>();
         internal Managers.DisplayManager DisplayManager { get; private set; }
@@ -33,8 +33,14 @@ namespace MAC.OxStation.Mono
         private bool _runStartUpOnEnable;
         private string _beaconID;
         private Beacon _attachedBeacon;
+        private int _isPinging;
         internal int IsRunningHash { get; set; }
         public PowerRelay PowerRelay { get; private set; }
+
+        public void Start()
+        {
+
+        }
 
         private void OnEnable()
         {
@@ -55,6 +61,7 @@ namespace MAC.OxStation.Mono
                     return;
                 }
 
+                SetPinging(data.IsPinging);
                 HealthManager.SetHealth(data.HealthLevel);
                 OxygenManager.SetO2Level(data.OxygenLevel);
                 _beaconID = data.BeaconID;
@@ -70,6 +77,8 @@ namespace MAC.OxStation.Mono
         {
             int i = 0;
             QuickLogger.Debug("Initializing");
+
+            _isPinging = Animator.StringToHash("IsPinging");
 
             AddToBaseManager();
 
@@ -214,6 +223,7 @@ namespace MAC.OxStation.Mono
             _saveData.OxygenLevel = OxygenManager.GetO2Level();
             _saveData.HealthLevel = HealthManager.GetHealth();
             _saveData.BeaconID = (((_attachedBeacon != null) ? _attachedBeacon.GetComponent<UniqueIdentifier>().Id : null) ?? "");
+            _saveData.IsPinging = AnimationManager.GetBoolHash(_isPinging);
             newSaveData.Entries.Add(_saveData);
         }
 
@@ -224,12 +234,12 @@ namespace MAC.OxStation.Mono
                 _prefabId = GetPrefabID();
             }
 
-            return _prefabId.Id;
+            return _prefabId?.Id;
         }
-
+        
         private PrefabIdentifier GetPrefabID()
         {
-            return GetComponentInParent<PrefabIdentifier>();
+            return GetComponentInParent<PrefabIdentifier>() ?? GetComponentInChildren<PrefabIdentifier>();
         }
 
         public bool CanDeconstruct(out string reason)
@@ -317,6 +327,16 @@ namespace MAC.OxStation.Mono
             return _attachedBeacon != null;
         }
 
+        internal void TogglePinging()
+        {
+            AnimationManager.SetBoolHash(_isPinging, !AnimationManager.GetBoolHash(_isPinging));
+        }
+
+        private void SetPinging(bool state)
+        {
+            AnimationManager.SetBoolHash(_isPinging, state);
+        }
+
         #region Code help by zorgesho
         internal bool SetBeaconAttached(Beacon beacon, bool attaching)
         {
@@ -389,5 +409,10 @@ namespace MAC.OxStation.Mono
             }
         }
         #endregion
+
+        internal bool GetPingState()
+        {
+            return AnimationManager.GetBoolHash(_isPinging);
+        }
     }
 }

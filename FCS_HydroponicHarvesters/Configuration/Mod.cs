@@ -52,18 +52,37 @@ namespace FCS_HydroponicHarvesters.Configuration
         internal const string SmallHydroHarvKitClassID = "SmallHydroHarv_Kit";
         internal const string SmallPrefabName = "HydroponicHarvesterSmall";
 
-        public static List<DNASample> DNASamples = new List<DNASample>
+        internal const string FloraKleenClassID = "FloraKleen";
+        internal const string FloraKleenFriendlyName = "FloraKleen";
+        internal const string FloraKleenDescription = "FloraKleen® removes fertilizer residues that can accumulate over time in hydroponic systems, growing media and potting soils. Use FloraKleen® monthly to purge your hydroponic Harvestor system or potted plants of excess salts that can accumulate as a result of regular fertilizer application. FloraKleen® is an excellent final flush and can be used to dissolve mineral and salt buildup.";
+
+        public static List<DNASample> EatableDNASamples = new List<DNASample>
         {
+            new DNASample("Bulbo Tree","BulboTree",TechType.BulboTreePiece),
+            new DNASample("Bulb Bush","BulbBush",TechType.KooshChunk),
+            new DNASample("Chinese Potato","ChinesePotato",TechType.PurpleVegetable),
+            new DNASample("Marblemelon Plant","MarblemelonPlant",TechType.Melon),
+            new DNASample("Bulb Bush","BulbBush",TechType.KooshChunk),
+            new DNASample("Lantern Tree","LanternTree",TechType.HangingFruit),
+        };
+
+        public static List<DNASample> UsableDNASamples = new List<DNASample>
+        {
+            new DNASample("Creepvine","Creepvine",TechType.CreepvineSeedCluster),
+            new DNASample("Deep Shroom","DeepShroom",TechType.WhiteMushroom),
             new DNASample("Coral Chunk","CoralChunk",TechType.CoralChunk),
             new DNASample("Acid Mushroom","AcidMushroom",TechType.AcidMushroom),
             new DNASample("Blood Oil","BloodOil",TechType.BloodOil),
+            new DNASample("Sulphur Plant","SulphurPlant",TechType.CrashPowder),
+            new DNASample("Table Coral","BlueJeweledDisk",TechType.JeweledDiskPiece),
+            new DNASample("Creepvine","CreepvinePiece",TechType.CreepvinePiece),
+            new DNASample("Gel Sack","GelSack",TechType.JellyPlant),
+        };
+
+        public static List<DNASample> DecorSamples = new List<DNASample>
+        {
             new DNASample("Blue Palm","BluePalm",TechType.BluePalmSeed),
-            new DNASample("Bulbo Tree","BulboTree",TechType.BulboTreePiece),
-            new DNASample("Bulb Bush","BulbBush",TechType.KooshChunk),
             new DNASample("Cave Bush","CaveBush",TechType.PurpleBranchesSeed),
-            new DNASample("Chinese Potato","ChinesePotato",TechType.PurpleVegetable),
-            new DNASample("Creepvine","Creepvine",TechType.CreepvineSeedCluster),
-            new DNASample("Deep Shroom","DeepShroom",TechType.WhiteMushroom),
             new DNASample("Eye Stalk","EyeStalk",TechType.EyesPlantSeed),
             new DNASample("Fern Palm","FernPalm",TechType.FernPalmSeed),
             new DNASample("Furled Papyrus","FurledPapyrus",TechType.RedRollPlantSeed),
@@ -72,8 +91,6 @@ namespace FCS_HydroponicHarvesters.Configuration
             new DNASample("Grub Basket","GrubBasket",TechType.OrangePetalsPlantSeed),
             new DNASample("Jaffa Cup","JaffaCup",TechType.OrangeMushroomSpore),
             new DNASample("Jellyshroom","Jellyshroom",TechType.SnakeMushroomSpore),
-            new DNASample("Lantern Tree","LanternTree",TechType.HangingFruit),
-            new DNASample("Marblemelon Plant","MarblemelonPlant",TechType.Melon),
             new DNASample("Membrain Tree","MembrainTree",TechType.MembrainTreeSeed),
             new DNASample("Ming Plant","MingPlant",TechType.PurpleVasePlantSeed),
             new DNASample("Pygmy Fan","PygmyFan",TechType.SmallFanSeed),
@@ -84,13 +101,13 @@ namespace FCS_HydroponicHarvesters.Configuration
             new DNASample("Spiked Horn Grass","SpikedHornGrass",TechType.ShellGrassSeed),
             new DNASample("Speckled Rattler","SpeckledRattler",TechType.PurpleRattleSpore),
             new DNASample("Spotted Dockleaf","SpottedDockleaf",TechType.SpottedLeavesPlantSeed),
-            new DNASample("Sulphur Plant","SulphurPlant",TechType.CrashPowder),
             new DNASample("Tiger Plant","TigerPlant",TechType.SpikePlantSeed),
             new DNASample("Veined Nettle","VeinedNettle",TechType.PurpleFanSeed),
             new DNASample("Violet Beau","VioletBeau",TechType.PurpleStalkSeed),
             new DNASample("Voxel Shrub","VoxelShrub",TechType.PinkFlowerSeed),
             new DNASample("Writhing Weed","WrithingWeed",TechType.PurpleTentacleSeed),
-            new DNASample("Brain Coral","BrainCoral",TechType.PurpleBrainCoralPiece)
+            new DNASample("Brain Coral","BrainCoral",TechType.PurpleBrainCoralPiece),
+
         };
 
         public static List<Vector3> LargeBubblesLocations = new List<Vector3>
@@ -117,6 +134,8 @@ namespace FCS_HydroponicHarvesters.Configuration
             new Vector3(-0.517f, 1.03f, -0.402f)
         };
 
+
+
         #region Ingredients
 
 #if SUBNAUTICA
@@ -128,7 +147,11 @@ namespace FCS_HydroponicHarvesters.Configuration
             craftAmount = 1,
             Ingredients =
             {
-                new Ingredient(TechType.Kyanite, 9)
+                new Ingredient(TechType.Silicone, 4),
+                new Ingredient(TechType.AramidFibers, 4),
+                new Ingredient(TechType.EnameledGlass, 3),
+                new Ingredient(TechType.AdvancedWiringKit, 1),
+                new Ingredient(TechType.PrecursorKey_Purple, 1)
             }
         };
 
@@ -141,7 +164,11 @@ namespace FCS_HydroponicHarvesters.Configuration
             craftAmount = 1,
             Ingredients =
             {
-                new Ingredient(TechType.Kyanite, 9)
+                new Ingredient(TechType.Silicone, 2),
+                new Ingredient(TechType.AramidFibers, 2),
+                new Ingredient(TechType.EnameledGlass, 2),
+                new Ingredient(TechType.AdvancedWiringKit, 1),
+                new Ingredient(TechType.PrecursorKey_Purple, 1)
             }
         };
 
@@ -154,7 +181,11 @@ namespace FCS_HydroponicHarvesters.Configuration
             craftAmount = 1,
             Ingredients =
             {
-                new Ingredient(TechType.Kyanite, 9)
+                new Ingredient(TechType.Silicone, 1),
+                new Ingredient(TechType.AramidFibers, 1),
+                new Ingredient(TechType.EnameledGlass, 1),
+                new Ingredient(TechType.AdvancedWiringKit, 1),
+                new Ingredient(TechType.PrecursorKey_Purple, 1)
             }
         };
         
@@ -309,6 +340,9 @@ namespace FCS_HydroponicHarvesters.Configuration
     internal class Config
     {
         [JsonProperty] internal  float EnergyCost = 1500f;
+        public int LargeStorageLimit { get; set; } = 100;
+        public int MediumStorageLimit { get; set; } = 50;
+        public int SmallStorageLimit { get; set; } = 25;
     }
 
     internal class ConfigFile

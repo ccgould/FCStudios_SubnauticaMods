@@ -52,7 +52,6 @@ namespace FCSTechFabricator.Components
                     }
 
                     Model = plantable.model;
-                    _initialized = true;
                     QuickLogger.Debug($"Model Is {Model?.name}");
                     return;
                 }
@@ -67,7 +66,6 @@ namespace FCSTechFabricator.Components
 
                     Environment = FCSEnvironment.Water;
                     IsPlantable = false;
-                    _initialized = true;
                     return;
                 }
 
@@ -78,13 +76,21 @@ namespace FCSTechFabricator.Components
                         Environment = FCSEnvironment.Water;
                         GiveItem = TechType.CoralChunk;
                         IsPlantable = true;
-                        _initialized = true;
+                    }
+
+                    if (pickable.GetTechType() == TechType.CrashPowder)
+                    {
+                        Environment = FCSEnvironment.Water;
+                        GiveItem = TechType.CrashPowder;
+                        Model = CraftData.GetPrefabForTechType(TechType.CrashHome);
+                        IsPlantable = true;
                     }
 
                 }
+
+                _initialized = true;
             }
         }
-
         public TechType GiveItem { get; set; }
         public TechType TechType { get; set; }
         public FCSEnvironment Environment { get; set; }

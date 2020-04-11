@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace FCSCommon.Abstract
 {
-    [Obsolete("This class has been depricated and will be removed in the future. Use IFCSContoller instead.", false)]
     internal abstract class FCSController : MonoBehaviour, IProtoEventListener, IConstructable
     {
         public abstract bool IsConstructed { get;}
