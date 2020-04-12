@@ -15,11 +15,11 @@ namespace MAC.OxStation.Mono
     internal class OxStationScreenController : FCSController
     {
         internal AnimationManager AnimationManager { get; private set; }
-        public ScreenDisplayManager DisplayManager { get; private set; }
-        public SubRoot SubRoot { get; private set; }
-        public BaseManager Manager { get; private set; }
-
+        internal ScreenDisplayManager DisplayManager { get; private set; }
+        internal SubRoot SubRoot { get; private set; }
+        internal BaseManager Manager { get; private set; }
         internal Dictionary<string,OxStationController> TrackedDevices = new Dictionary<string, OxStationController>();
+        
         private bool _runStartUpOnEnable;
         private bool _fromSave;
         private object _savedData;
@@ -63,8 +63,8 @@ namespace MAC.OxStation.Mono
         {
             if (!IsInitialized)
             {
-                OxStationAwake_Patcher.AddEventHandlerIfMissing(AlertedNewDevicePlaced);
-                OxStationDestroy_Patcher.AddEventHandlerIfMissing(AlertedDeviceDestroyed);
+                Mod.OnOxstationBuilt += AlertedNewDevicePlaced;
+                Mod.OnOxstationDestroyed += AlertedDeviceDestroyed;
                 GetOxStations();
 
                 if (AnimationManager == null)
@@ -173,6 +173,7 @@ namespace MAC.OxStation.Mono
             reason = string.Empty;
             return true;
         }
+        
         public override void OnConstructedChanged(bool constructed)
         {
             IsConstructed = constructed;
@@ -231,9 +232,11 @@ namespace MAC.OxStation.Mono
 
         private void UnTrackDevice(OxStationController device, string prefabId)
         {
+            QuickLogger.Debug($"Removing device: {prefabId} || Device: {device}");
+            TrackedDevices.Remove(prefabId);
             device.HealthManager.OnDamaged -= OnDeviceDamaged;
             device.HealthManager.OnRepaired -= OnDeviceRepaired;
-            TrackedDevices.Remove(prefabId);
+
         }
     }
 }

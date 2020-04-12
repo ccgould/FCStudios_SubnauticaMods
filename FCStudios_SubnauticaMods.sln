@@ -19,8 +19,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AMMiniMedBay", "AMMiniMedBa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCSAIPowerCellSocket", "FCSAIPowerCellSocket\FCSAIPowerCellSocket.csproj", "{CD77B27C-8AAB-4CA4-9CDF-93A4688942AB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCSTesting", "FCSTesting\FCSTesting.csproj", "{20E443F4-3B38-48F3-BBF2-7CBBF4090BEB}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCS_DeepDriller", "FCS_DeepDriller\FCS_DeepDriller.csproj", "{61D8BA15-EE91-4245-BFC1-70064ADD23E0}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Alterra Industrial Solutions", "Alterra Industrial Solutions", "{BB083365-CF95-4763-BF65-8338CA68196D}"
@@ -77,7 +75,6 @@ Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		FCSCommon\FCSCommon.projitems*{01458c4e-3f9d-40a9-aee5-8cf41fb28a3f}*SharedItemsImports = 4
 		FCSCommon\FCSCommon.projitems*{17c65a8b-851e-4b42-b946-ec63ff3165e9}*SharedItemsImports = 4
-		FCSCommon\FCSCommon.projitems*{20e443f4-3b38-48f3-bbf2-7cbbf4090beb}*SharedItemsImports = 4
 		FCSCommon\FCSCommon.projitems*{2af5e457-e1af-4bef-9681-d8138517765e}*SharedItemsImports = 4
 		FCSCommon\FCSCommon.projitems*{32a3f9b5-9089-4478-b706-952b706f08da}*SharedItemsImports = 4
 		FCSCommon\FCSCommon.projitems*{3e004a5f-6506-40ff-b4a4-6f2e330e07f5}*SharedItemsImports = 4
@@ -192,16 +189,6 @@ Global
 		{CD77B27C-8AAB-4CA4-9CDF-93A4688942AB}.Subnautica_Debug|Any CPU.Build.0 = Subnautica_Debug|Any CPU
 		{CD77B27C-8AAB-4CA4-9CDF-93A4688942AB}.Subnautica_Release|Any CPU.ActiveCfg = Subnautica_Release|Any CPU
 		{CD77B27C-8AAB-4CA4-9CDF-93A4688942AB}.Subnautica_Release|Any CPU.Build.0 = Subnautica_Release|Any CPU
-		{20E443F4-3B38-48F3-BBF2-7CBBF4090BEB}.BelowZero_Debug|Any CPU.ActiveCfg = BelowZero_Debug|Any CPU
-		{20E443F4-3B38-48F3-BBF2-7CBBF4090BEB}.BelowZero_Debug|Any CPU.Build.0 = BelowZero_Debug|Any CPU
-		{20E443F4-3B38-48F3-BBF2-7CBBF4090BEB}.BelowZero_Release|Any CPU.ActiveCfg = BelowZero_Release|Any CPU
-		{20E443F4-3B38-48F3-BBF2-7CBBF4090BEB}.BelowZero_Release|Any CPU.Build.0 = BelowZero_Release|Any CPU
-		{20E443F4-3B38-48F3-BBF2-7CBBF4090BEB}.Debug|Any CPU.ActiveCfg = Subnautica_Debug|Any CPU
-		{20E443F4-3B38-48F3-BBF2-7CBBF4090BEB}.Release|Any CPU.ActiveCfg = Subnautica_Release|Any CPU
-		{20E443F4-3B38-48F3-BBF2-7CBBF4090BEB}.Subnautica_Debug|Any CPU.ActiveCfg = Subnautica_Debug|Any CPU
-		{20E443F4-3B38-48F3-BBF2-7CBBF4090BEB}.Subnautica_Debug|Any CPU.Build.0 = Subnautica_Debug|Any CPU
-		{20E443F4-3B38-48F3-BBF2-7CBBF4090BEB}.Subnautica_Release|Any CPU.ActiveCfg = Subnautica_Release|Any CPU
-		{20E443F4-3B38-48F3-BBF2-7CBBF4090BEB}.Subnautica_Release|Any CPU.Build.0 = Subnautica_Release|Any CPU
 		{61D8BA15-EE91-4245-BFC1-70064ADD23E0}.BelowZero_Debug|Any CPU.ActiveCfg = BelowZero_Debug|Any CPU
 		{61D8BA15-EE91-4245-BFC1-70064ADD23E0}.BelowZero_Debug|Any CPU.Build.0 = BelowZero_Debug|Any CPU
 		{61D8BA15-EE91-4245-BFC1-70064ADD23E0}.BelowZero_Release|Any CPU.ActiveCfg = BelowZero_Release|Any CPU
@@ -389,7 +376,6 @@ Global
 		{4963C014-F97E-4124-B3C7-9F7BB790E1BF} = {F921AD09-63FB-40E2-9442-3103617543F3}
 		{FFA8C60F-F2D5-461C-BBD2-17E35A013FDF} = {E2AD5E97-7843-49E2-A9B3-3CD79E463FA0}
 		{CD77B27C-8AAB-4CA4-9CDF-93A4688942AB} = {BB083365-CF95-4763-BF65-8338CA68196D}
-		{20E443F4-3B38-48F3-BBF2-7CBBF4090BEB} = {6E36DA48-6498-4C58-8BF6-85923E5F6460}
 		{61D8BA15-EE91-4245-BFC1-70064ADD23E0} = {BB083365-CF95-4763-BF65-8338CA68196D}
 		{49B14137-1EC0-40FB-8AEF-E5C13D7CDFB9} = {3FD179AD-5C6F-4627-B5BB-D6B6CD72E1FF}
 		{C801C28B-81CB-451F-94B4-251835D2B92A} = {0B894656-1BA7-4F41-9311-D1C8D4F0D4CF}

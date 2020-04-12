@@ -23,6 +23,19 @@ namespace FCS_HydroponicHarvesters.Mono
         
         private HydroHarvController _mono;
         private Dictionary<TechType,TechType>  _dna = new Dictionary<TechType,TechType>();
+        private List<TechType> _invalidAdjustTechTypes = new List<TechType>
+        {
+            TechType.CreepvineSeedCluster,
+            TechType.Creepvine,
+            TechType.CreepvinePiece,
+            TechType.BloodOil,
+            TechType.BloodGrass,
+            TechType.BloodRoot,
+            TechType.BloodVine
+        };
+
+        private List<TechType> _adjustableList = new List<TechType>();
+
         private bool _fromLoad;
 
         internal void Initialize(HydroHarvController mono)
@@ -186,7 +199,12 @@ namespace FCS_HydroponicHarvesters.Mono
             Destroy(gameObject.GetComponent<WorldForces>());
 
             SetActiveAllChildren(parent.transform, true);
-            
+
+            if (!_invalidAdjustTechTypes.Contains(techType))
+            {
+                SetLocalZeroAllChildren(parent.transform);
+            }
+
             return gameObject;
         }
 
@@ -204,6 +222,16 @@ namespace FCS_HydroponicHarvesters.Mono
                 SetActiveAllChildren(child, value);
             }
         }
+
+        private void SetLocalZeroAllChildren(Transform transform)
+        {
+            foreach (Transform child in transform)
+            {
+                 child.gameObject.transform.localPosition = Vector3.zero;
+                SetLocalZeroAllChildren(child);
+            }
+        }
+
 
         internal void RemoveItem(int slotID)
         {

@@ -133,7 +133,6 @@
     <Compile Include="Mono\OxStationController.cs" />
     <Compile Include="Mono\OxStationScreenController.cs" />
     <Compile Include="Patches\Beacon_Patches.cs" />
-    <Compile Include="Patches\Oxstation_Patches.cs" />
     <Compile Include="Patches\Player_Patches.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

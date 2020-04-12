@@ -18,9 +18,6 @@ namespace MAC.OxStation.Mono
         private static readonly Dictionary<Beacon, OxStationController> AllBeaconsAttached = new Dictionary<Beacon, OxStationController>();
         private SaveDataEntry _saveData;
         private bool _initialized;
-        private Coroutine _powerStateCoroutine;
-        private Coroutine _healthCheckCoroutine;
-        private Coroutine _generateOxygenCoroutine;
         private bool _fromSave;
         private bool _runStartUpOnEnable;
         private string _beaconID;
@@ -46,12 +43,6 @@ namespace MAC.OxStation.Mono
         #endregion
 
         #region Unity Methods
-
-        public void Start()
-        {
-
-        }
-
         private void OnEnable()
         {
             if (!_runStartUpOnEnable) return;
@@ -95,11 +86,9 @@ namespace MAC.OxStation.Mono
         private void OnDestroy()
         {
             if (!_initialized) return;
-            StopCoroutine(_powerStateCoroutine);
-            StopCoroutine(_generateOxygenCoroutine);
-            StopCoroutine(_healthCheckCoroutine);
             CancelInvoke(nameof(UpdateAudio));
             BaseManager.RemoveBaseUnit(this);
+            Mod.OnOxstationDestroyed?.Invoke(this);
         }
 
         #endregion
@@ -155,6 +144,7 @@ namespace MAC.OxStation.Mono
             }
 
             QuickLogger.Debug("Initialized");
+            Mod.OnOxstationBuilt?.Invoke(this);
             _initialized = true;
         }
         

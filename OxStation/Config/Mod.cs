@@ -22,6 +22,9 @@ namespace MAC.OxStation.Config
         #endregion
 
         #region Internal Properties
+
+        internal static Action<OxStationController> OnOxstationBuilt;
+        internal static Action<OxStationController> OnOxstationDestroyed;
         internal static string ModName => "OxStation";
         internal static string ModScreenName => "OxStationScreen";
         internal static string ModFolderName => "FCS_OxStation";
