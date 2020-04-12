@@ -134,7 +134,6 @@
     <Compile Include="Craftables\FCSDNASample.cs" />
     <Compile Include="Craftables\FCSKit.cs" />
     <Compile Include="Craftables\FCSModule.cs" />
-    <Compile Include="Craftables\FCSVehicleModule.cs" />
     <Compile Include="Enums\EatableType.cs" />
     <Compile Include="Enums\FCSEnvironment.cs" />
     <Compile Include="Enums\FoodPileType.cs" />
@@ -143,7 +142,6 @@
     <Compile Include="Extensions\ColorExtensions.cs" />
     <Compile Include="Extensions\VectorExtenstions.cs" />
     <Compile Include="FcAssetBundlesService.cs" />
-    <Compile Include="FcEquipable.cs" />
     <Compile Include="FcCraftable.cs" />
     <Compile Include="FcCraftingTab.cs" />
     <Compile Include="FcTechFabricator.cs" />

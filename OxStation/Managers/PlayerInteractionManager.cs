@@ -6,37 +6,32 @@ namespace MAC.OxStation.Managers
     {
         private OxStationController _mono;
 
+        private bool ShowBeaconMessage()
+        {
+            if (_mono == null) return false;
+            return (!_mono.IsBeaconAttached() && Inventory.main.GetHeldTool() && Inventory.main.GetHeldTool().pickupable.GetTechType() == TechType.Beacon);
+        }
 
         internal void Initialize(OxStationController mono)
         {
             _mono = mono;
         }
+
         public void OnHandHover(GUIHand hand)
         {
             if (_mono == null) return;
 
-            if(ShowBeaonMessage())
+            if(ShowBeaconMessage())
             {
                 HandReticle main = HandReticle.main;
-
-                //var f = uGUI.FormatButton(GameInput.Button.RightHand, false, " / ", false);
-
                 main.SetIcon(HandReticle.IconType.Hand);
-                main.SetInteractText($"Click to attach beacon",false, HandReticle.Hand.Right); 
-
-                //main.SetInteractText($"{Mod.FriendlyName} cannot operate without being placed on a platform.", false, HandReticle.Hand.None);
+                main.SetInteractText($"Click to attach beacon",false, HandReticle.Hand.Right);
             }
         }
 
         public void OnHandClick(GUIHand hand)
         {
             //Not needed for this mod
-        }
-
-        private bool ShowBeaonMessage()
-        {
-            if (_mono == null) return false;
-            return (!_mono.IsBeaconAttached() && Inventory.main.GetHeldTool() && Inventory.main.GetHeldTool().pickupable.GetTechType() == TechType.Beacon);
         }
     }
 }

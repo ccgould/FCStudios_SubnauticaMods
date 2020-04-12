@@ -33,12 +33,13 @@ namespace MAC.OxStation.Display
 
             if (_station == null || OxstationHealth == null || OxstationOxygen == null) return;
             OxstationHealth.fillAmount = _station.HealthManager.GetHealthPercentage();
-            OxstationOxygen.fillAmount = _station.OxygenManager.GetO2LevelPercentage();
+            OxstationOxygen.fillAmount = _station.OxygenManager.GetO2LevelPercentageFloat();
             ToggleText();
         }
 
         public void ToggleText()
         {
+            if(_station == null || _text == null) return;
             _text.text = _station.GetPingState() ? OxStationBuildable.Pinging() : OxStationBuildable.Ping();
         }
     }

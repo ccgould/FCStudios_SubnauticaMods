@@ -124,9 +124,9 @@
     <Compile Include="Managers\AnimationManager.cs" />
     <Compile Include="Managers\AudioManager.cs" />
     <Compile Include="Managers\BaseManager.cs" />
-    <Compile Include="Managers\DisplayManager.cs" />
+    <Compile Include="Managers\OxDisplayManager.cs" />
     <Compile Include="Managers\HealthManager.cs" />
-    <Compile Include="Managers\Ox_OxygenManager.cs" />
+    <Compile Include="Managers\OxOxygenManager.cs" />
     <Compile Include="Managers\PlayerInteractionManager.cs" />
     <Compile Include="Managers\PowerManager.cs" />
     <Compile Include="Managers\ScreenDisplayManager.cs" />
@@ -135,7 +135,6 @@
     <Compile Include="Patches\Beacon_Patches.cs" />
     <Compile Include="Patches\Oxstation_Patches.cs" />
     <Compile Include="Patches\Player_Patches.cs" />
-    <Compile Include="Patches\SubRoot_Patches.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

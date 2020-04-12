@@ -7,25 +7,41 @@ using UnityEngine;
 
 namespace MAC.OxStation.Managers
 {
-    internal class Ox_OxygenManager
+    internal class OxOxygenManager
     {
+        #region Private Fields
+
         private float _o2Level;
         private float _tankCapacity;
         private float _amountPerSecond;
         private OxStationController _mono;
 
+        #endregion
+
+        #region Private Methods
+        /// <summary>
+        /// Resets the tank O2 Level to full capacity value
+        /// </summary>
+        private void FillTank()
+        {
+            _o2Level = QPatch.Configuration.TankCapacity;
+        }
+
+        #endregion
+
+        #region Internal Methods
+
+        /// <summary>
+        /// Setup the monobehaviour for operation
+        /// </summary>
+        /// <param name="mono"></param>
         internal void Initialize(OxStationController mono)
         {
             _mono = mono;
             FillTank();
             _tankCapacity = QPatch.Configuration.TankCapacity;
         }
-
-        private void FillTank()
-        {
-            _o2Level = QPatch.Configuration.TankCapacity;
-        }
-
+        
         /// <summary>
         /// Removes oxygen from the unit.
         /// </summary>
@@ -82,17 +98,11 @@ namespace MAC.OxStation.Managers
         {
             _amountPerSecond = amount;
         }
-
+        
         /// <summary>
-        /// Retrieves the amount of oxygen per second that is set;
+        /// Gives the player oxygen directly from the tank.
         /// </summary>
-        /// <returns></returns>
-        internal float GetAmountPerSecond()
-        {
-            return _amountPerSecond;
-        }
-
-        public void GivePlayerO2()
+        internal void GivePlayerO2()
         {
             if (_o2Level <= 0 || !_mono.IsConstructed) return;
 
@@ -107,16 +117,11 @@ namespace MAC.OxStation.Managers
             {
                 playerO2Request = o2Manager.GetOxygenCapacity() - o2Manager.GetOxygenAvailable();
             }
-
-
-            QuickLogger.Debug($"Taking: {playerO2Request} || RT Installed: {Mod.RTInstalled}", true);
-
+            
             if (_o2Level >= playerO2Request)
             {
                 _o2Level -= playerO2Request;
                 o2Manager.AddOxygen(Mathf.Abs(playerO2Request));
-                QuickLogger.Debug($"O2 Level: {_o2Level} || Tank Level {playerO2Request}", true);
-
                 return;
             }
 
@@ -127,15 +132,25 @@ namespace MAC.OxStation.Managers
 
             //var modified = -Mathf.Min(-playerO2Request, _o2Level);
         }
-
-        internal int GetO2LevelPercentageFull()
+        
+        /// <summary>
+        /// Calculates the percentage of oxygen available and returns a int.
+        /// </summary>
+        /// <returns>An <see cref="int"/> of a percentage ex. 50</returns>
+        internal int GetO2LevelPercentageInt()
         {
             return Mathf.RoundToInt((100 * _o2Level) / _tankCapacity);
         }
 
-        internal float GetO2LevelPercentage()
+        /// <summary>
+        /// Calculates the percentage of oxygen available and returns a float.
+        /// </summary>
+        /// <returns>An <see cref="float"/> of a percentage ex. 0.5</returns>
+        internal float GetO2LevelPercentageFloat()
         {
             return _o2Level / _tankCapacity;
         }
+
+        #endregion
     }
 }

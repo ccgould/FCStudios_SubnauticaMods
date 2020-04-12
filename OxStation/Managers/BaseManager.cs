@@ -11,54 +11,10 @@ namespace MAC.OxStation.Managers
 {
     internal class BaseManager
     {
-
-        public static List<BaseManager> Managers { get; } = new List<BaseManager>();
-        public int InstanceID { get; }
-
-        internal readonly List<OxStationController> Units = new List<OxStationController>();
+        internal static List<BaseManager> Managers { get; } = new List<BaseManager>();
+        internal int InstanceID { get; }
         internal readonly List<OxStationController> BaseUnits = new List<OxStationController>();
-        public readonly SubRoot Habitat;
-
-        /// <summary>
-        /// Saves all the bases settings
-        /// </summary>
-        internal static void SaveBases()
-        {
-            QuickLogger.Debug("Save Bases");
-            var saveDirectory = Mod.GetSaveFileDirectory();
-            var SaveFile = Path.Combine(saveDirectory, "Bases.json");
-
-            QuickLogger.Debug($"SD {saveDirectory} || SF {SaveFile}");
-
-            if (!Directory.Exists(saveDirectory))
-                Directory.CreateDirectory(saveDirectory);
-
-
-            var output = JsonConvert.SerializeObject(Managers, Formatting.Indented);
-            File.WriteAllText(SaveFile, output);
-        }
-
-        public BaseManager(SubRoot habitat)
-        {
-            Habitat = habitat;
-            InstanceID = habitat.GetInstanceID();
-            var mono = habitat.gameObject.GetComponent<MonoBehaviour>();
-            mono.StartCoroutine(AutoSystem());
-        }
-
-        public static BaseManager FindManager(SubRoot subRoot)
-        {
-            if (subRoot == null || !subRoot.isBase) return null;
-
-            var manager = Managers.Find(x => x.InstanceID == subRoot.GetInstanceID() && x.Habitat == subRoot);
-
-            if (manager == null)
-            {
-                QuickLogger.Debug("No manager found on base");
-            }
-
-            return manager ?? CreateNewManager(subRoot);
-        }
+        internal readonly SubRoot Habitat;
 
         private static BaseManager CreateNewManager(SubRoot habitat)
         {
@@ -79,23 +35,26 @@ namespace MAC.OxStation.Managers
             }
         }
 
-        internal static void RemoveUnit(OxStationController unit)
+        internal BaseManager(SubRoot habitat)
         {
-            foreach (BaseManager manager in Managers)
-            {
-                if (!manager.Units.Contains(unit)) continue;
-                manager.Units.Remove(unit);
-                QuickLogger.Debug($"Removed Power Storage: {unit.GetPrefabIDString()}", true);
-            }
+            Habitat = habitat;
+            InstanceID = habitat.GetInstanceID();
+            var mono = habitat.gameObject.GetComponent<MonoBehaviour>();
+            mono.StartCoroutine(AutoSystem());
         }
 
-        internal void AddUnit(OxStationController unit)
+        internal static BaseManager FindManager(SubRoot subRoot)
         {
-            if (!Units.Contains(unit) && unit.IsConstructed)
+            if (subRoot == null || !subRoot.isBase) return null;
+
+            var manager = Managers.Find(x => x.InstanceID == subRoot.GetInstanceID() && x.Habitat == subRoot);
+
+            if (manager == null)
             {
-                Units.Add(unit);
-                QuickLogger.Debug($"Add Power Storage Unit : {unit.GetPrefabIDString()}", true);
+                QuickLogger.Debug("No manager found on base");
             }
+
+            return manager ?? CreateNewManager(subRoot);
         }
 
         internal void AddBaseUnit(OxStationController unit)
@@ -117,6 +76,5 @@ namespace MAC.OxStation.Managers
                 QuickLogger.Debug($"Removed Base Unit : {unit.GetPrefabIDString()}", true);
             }
         }
-
     }
 }

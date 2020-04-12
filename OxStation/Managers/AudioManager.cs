@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace MAC.OxStation.Managers
 {
+    /// <summary>
+    /// A class that handles the audio of the oxstation.
+    /// </summary>
     internal class AudioManager
     {
         #region Private Members

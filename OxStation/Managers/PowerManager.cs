@@ -8,59 +8,63 @@ namespace MAC.OxStation.Managers
 {
     internal class PowerManager : MonoBehaviour
     {
+        #region Private Members
+
         private FCSPowerStates _powerState;
         private OxStationController _mono;
-
-        private PowerRelay _connectedRelay = null;
-        private float EnergyConsumptionPerSecond { get; set; } = QPatch.Configuration.EnergyPerSec;
-        private float AvailablePower => GetPower();
-
-        private float _energyToConsume => EnergyConsumptionPerSecond * DayNightCycle.main.deltaTime;
-
-        private float GetPower()
-        {
-            float power = 0;
-
-            if (_mono.PowerRelay != null)
-            {
-                return _useInbound ? _mono.PowerRelay.GetPowerFromInbound() : _mono.PowerRelay.GetPower();
-            }
-
-            return power;
-        }
-
+        private readonly PowerRelay _connectedRelay = null;
+        private float EnergyConsumptionPerSecond => QPatch.Configuration.EnergyPerSec;
+        private float EnergyToConsume => EnergyConsumptionPerSecond * DayNightCycle.main.deltaTime;
         private FCSPowerStates PowerState
         {
             get => _powerState;
             set
             {
-                _powerState = value; 
-                //QuickLogger.Debug($"Current PowerState: {value}");
+                _powerState = value;
                 OnPowerUpdate?.Invoke(value);
             }
         }
-
-        internal Action<FCSPowerStates> OnPowerUpdate;
-        private bool _hasPowerToConsume;
         private Coroutine _relayCoroutine;
-        private bool _checkingForRelay;
         private bool _useInbound;
 
+        #endregion
+
+        #region  Unity Methods
+
+        private void OnDestroy()
+        {
+            if (_relayCoroutine != null)
+                StopCoroutine(_relayCoroutine);
+        }
+
+        #endregion
+
+        #region Internal Methods
+
+        internal Action<FCSPowerStates> OnPowerUpdate;
+
+        internal PowerRelay PowerRelay { get; private set; }
+        
         internal void Initialize(OxStationController mono)
         {
             _mono = mono;
             var habitat = mono?.gameObject.transform?.parent?.gameObject.GetComponentInParent<SubRoot>();
 
+
+            if (PowerRelay == null)
+            {
+                PowerRelay = gameObject.GetComponent<PowerRelay>();
+            }
+            
             if (habitat != null)
             {
                 PowerRelay relay = PowerSource.FindRelay(_mono.transform);
                 if (relay != null && relay != _connectedRelay)
                 {
-                    _mono.PowerRelay.AddInboundPower(relay);
-                    _checkingForRelay = false;
+                    PowerRelay.AddInboundPower(relay);
                     QuickLogger.Debug("PowerRelay found at last!", true);
                 }
-                _mono.PowerRelay.dontConnectToRelays = true;
+                PowerRelay.dontConnectToRelays = true;
                 _useInbound = true;
             }
         }
@@ -73,9 +77,9 @@ namespace MAC.OxStation.Managers
                 return;
             }
 
-            var power = _useInbound ? _mono.PowerRelay.GetPowerFromInbound() : _mono.PowerRelay.GetPower();
+            var power = _useInbound ? PowerRelay.GetPowerFromInbound() : PowerRelay.GetPower();
 
-            if (power >= _energyToConsume)
+            if (power >= EnergyToConsume)
             {
                 SetPowerStates(FCSPowerStates.Powered);
                 return;
@@ -86,15 +90,14 @@ namespace MAC.OxStation.Managers
 
         internal void ConsumePower()
         {
-            if (_mono.HealthManager.IsDamageApplied() || _mono.PowerRelay == null) return;
+            if (_mono.HealthManager.IsDamageApplied() || PowerRelay == null) return;
             float amountConsumed;
             
             bool requiresEnergy = GameModeUtils.RequiresPower();
-            _hasPowerToConsume = !requiresEnergy || AvailablePower >= _energyToConsume;
 
             if (!requiresEnergy) return;
 
-            _mono.PowerRelay.ConsumeEnergy(_energyToConsume, out amountConsumed);
+            PowerRelay.ConsumeEnergy(EnergyToConsume, out amountConsumed);
             
             QuickLogger.Debug($"Energy Consumed: {amountConsumed}");
         }
@@ -125,11 +128,7 @@ namespace MAC.OxStation.Managers
             }
             return Mathf.Round(EnergyConsumptionPerSecond * 60);
         }
-        
-        private void OnDestroy()
-        {
-            if(_relayCoroutine != null)
-                StopCoroutine(_relayCoroutine);
-        }
+
+        #endregion
     }
 }

@@ -10,19 +10,13 @@ using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
 
-
 namespace MAC.OxStation.Managers
 {
-    internal class DisplayManager : AIDisplay
+    internal class OxDisplayManager : AIDisplay
     {
-        private Color colorEmpty = new Color(1f, 0f, 0f, 1f);
-
-        private Color colorHalf = new Color(1f, 1f, 0f, 1f);
-
-        private Color colorFull = new Color(0f, 1f, 0f, 1f);
+        #region Private Members
 
         private Color dark_bg = new Color(0.27734375f, 0.27734375f, 0.27734375f, 1f);
-
         private OxStationController _mono;
         private int _isScreenOn;
         private Text _oxPreloaderLBL;
@@ -34,10 +28,49 @@ namespace MAC.OxStation.Managers
         private Text _buttonLbl;
         private InterfaceButton _giveOIntBtn;
 
+        #endregion
+
+        #region Unity Methods
+
+        private void Destroy()
+        {
+            CancelInvoke(nameof(UpdateScreen));
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        private void OnRepaired()
+        {
+            ChangeTakeO2State(ButtonStates.Enabled);
+        }
+
+        private void OnDamaged()
+        {
+            ChangeTakeO2State(ButtonStates.Disabled);
+        }
+
+        private void UpdateScreen()
+        {
+            _oxPreloaderBar.fillAmount = _mono.OxygenManager.GetO2LevelPercentageFloat();
+            _oxPreloaderLBL.text = $"{Mathf.RoundToInt(_mono.OxygenManager.GetO2LevelPercentageInt())}%";
+            _healthPreloaderBar.fillAmount = _mono.HealthManager.GetHealthPercentage();
+            _healthPreloaderlbl.text = $"{Mathf.RoundToInt(_mono.HealthManager.GetHealthPercentageFull())}%";
+            _powerUsage.text = $"{OxStationBuildable.PowerUsage()}: <color=#ff0000ff>{_mono.PowerManager.GetPowerUsage()}</color> {OxStationBuildable.PerMinute()}.";
+
+        }
+
+        #endregion
+
+        #region Internal Methods
+
         internal void Setup(OxStationController mono)
         {
             _mono = mono;
 
+            mono.HealthManager.OnDamaged += OnDamaged;
+            mono.HealthManager.OnRepaired += OnRepaired;
             _isScreenOn = Animator.StringToHash("IsScreenOn");
 
             if (FindAllComponents())
@@ -53,16 +86,6 @@ namespace MAC.OxStation.Managers
             StartCoroutine(CompleteSetup());
 
             InvokeRepeating(nameof(UpdateScreen), 0, 0.5f);
-        }
-
-        private void UpdateScreen()
-        {
-            _oxPreloaderBar.fillAmount = _mono.OxygenManager.GetO2LevelPercentage();
-            _oxPreloaderLBL.text = $"{Mathf.RoundToInt(_mono.OxygenManager.GetO2LevelPercentageFull())}%";
-            _healthPreloaderBar.fillAmount = _mono.HealthManager.GetHealthPercentage();
-            _healthPreloaderlbl.text = $"{Mathf.RoundToInt(_mono.HealthManager.GetHealthPercentageFull())}%";
-            _powerUsage.text = $"{OxStationBuildable.PowerUsage()}: <color=#ff0000ff>{_mono.PowerManager.GetPowerUsage()}</color> {OxStationBuildable.PerMinute()}.";
-
         }
 
         internal void ChangeTakeO2State(ButtonStates state)
@@ -82,6 +105,10 @@ namespace MAC.OxStation.Managers
                     throw new ArgumentOutOfRangeException(nameof(state), state, null);
             }
         }
+
+        #endregion
+
+        #region Overrides
 
         public override void OnButtonClick(string btnName, object tag)
         {
@@ -239,15 +266,12 @@ namespace MAC.OxStation.Managers
         {
             throw new NotImplementedException();
         }
-
+        
         public override void ClearPage()
         {
             throw new NotImplementedException();
         }
 
-        private void Destroy()
-        {
-            CancelInvoke(nameof(UpdateScreen));
-        }
+        #endregion
     }
 }

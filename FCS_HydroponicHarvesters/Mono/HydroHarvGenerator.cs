@@ -59,7 +59,7 @@ namespace FCS_HydroponicHarvesters.Mono
                 PauseUpdates = true;
                 _mono.HydroHarvContainer.SpawnClone();
                 // Finished cool down - See if the next clone can be started                
-                TryStartingNextClone();
+                TryStartingNextClone(); //TODO check here
 
                 this.PauseUpdates = false;
             }

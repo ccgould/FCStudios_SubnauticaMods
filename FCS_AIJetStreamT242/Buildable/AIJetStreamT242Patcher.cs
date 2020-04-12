@@ -89,10 +89,7 @@ namespace FCS_AIMarineTurbine.Buildable
                 var center = new Vector3(0f, 2.970485f, 0f);
                 var size = new Vector3(4.03422f, 5.701298f, 3.179399f);
                 GameObjectHelpers.AddConstructableBounds(prefab,size,center);
-
-
-                prefab.AddComponent<PowerPlug>();
-
+                
                 PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
                 prefabID.ClassId = this.ClassID;
 

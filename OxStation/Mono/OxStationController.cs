@@ -13,17 +13,9 @@ namespace MAC.OxStation.Mono
     [RequireComponent(typeof(WeldablePoint))]
     internal class OxStationController : MonoBehaviour, IConstructable, IProtoEventListener
     {
-        private PrefabIdentifier _prefabId;
-        internal BaseManager Manager { get; private set; }
-        internal SubRoot SubRoot { get; private set; }
-        internal bool IsConstructed { get; private set; }
-        internal Ox_OxygenManager OxygenManager { get; private set; }
-        internal PowerManager PowerManager { get; private set; }
-        public HealthManager HealthManager { get; private set; }
-        internal AnimationManager AnimationManager { get; private set; }
+        #region Private Members
+
         private static readonly Dictionary<Beacon, OxStationController> AllBeaconsAttached = new Dictionary<Beacon, OxStationController>();
-        internal Managers.DisplayManager DisplayManager { get; private set; }
-        internal AudioManager AudioManager;
         private SaveDataEntry _saveData;
         private bool _initialized;
         private Coroutine _powerStateCoroutine;
@@ -34,8 +26,26 @@ namespace MAC.OxStation.Mono
         private string _beaconID;
         private Beacon _attachedBeacon;
         private int _isPinging;
+        private PrefabIdentifier _prefabId;
+
+        #endregion
+
+        #region Internal Properties
+
+        internal BaseManager Manager { get; private set; }
+        internal SubRoot SubRoot { get; private set; }
+        internal bool IsConstructed { get; private set; }
+        internal OxOxygenManager OxygenManager { get; private set; }
+        internal PowerManager PowerManager { get; private set; }
+        internal HealthManager HealthManager { get; private set; }
+        internal AnimationManager AnimationManager { get; private set; }
+        internal OxDisplayManager DisplayManager { get; private set; }
+        internal AudioManager AudioManager;
         internal int IsRunningHash { get; set; }
-        public PowerRelay PowerRelay { get; private set; }
+
+        #endregion
+
+        #region Unity Methods
 
         public void Start()
         {
@@ -73,40 +83,50 @@ namespace MAC.OxStation.Mono
             }
         }
 
+        private void Update()
+        {
+            OxygenManager?.GenerateOxygen();
+            HealthManager?.HealthChecks();
+            HealthManager?.UpdateHealthSystem();
+            PowerManager?.ConsumePower();
+            PowerManager?.UpdatePowerState();
+        }
+
+        private void OnDestroy()
+        {
+            if (!_initialized) return;
+            StopCoroutine(_powerStateCoroutine);
+            StopCoroutine(_generateOxygenCoroutine);
+            StopCoroutine(_healthCheckCoroutine);
+            CancelInvoke(nameof(UpdateAudio));
+            BaseManager.RemoveBaseUnit(this);
+        }
+
+        #endregion
+
+        #region Private Methods
+
         private void Initialize()
         {
-            int i = 0;
             QuickLogger.Debug("Initializing");
 
             _isPinging = Animator.StringToHash("IsPinging");
+            IsRunningHash = Animator.StringToHash("IsRunning");
 
             AddToBaseManager();
-
-            QuickLogger.Debug($"{i++}");
-
+            
             if (OxygenManager == null)
             {
-                OxygenManager = new Ox_OxygenManager();
+                OxygenManager = new OxOxygenManager();
                 OxygenManager.SetAmountPerSecond(QPatch.Configuration.OxygenPerSecond);
                 OxygenManager.Initialize(this);
-                _generateOxygenCoroutine = StartCoroutine(GenerateOxygen());
             }
-            QuickLogger.Debug($"{i++}");
 
             if (HealthManager == null)
             {
                 HealthManager = new HealthManager();
                 HealthManager.Initialize(this);
                 HealthManager.SetHealth(100);
-                HealthManager.OnDamaged += OnDamaged;
-                HealthManager.OnRepaired += OnRepaired;
-                _healthCheckCoroutine = StartCoroutine(HealthCheck());
-            }
-            QuickLogger.Debug($"{i++}");
-
-            if (PowerRelay == null)
-            {
-                PowerRelay = gameObject.GetComponent<PowerRelay>();
             }
 
             if (PowerManager == null)
@@ -114,91 +134,76 @@ namespace MAC.OxStation.Mono
                 PowerManager = gameObject.GetComponent<PowerManager>();
                 PowerManager.Initialize(this);
                 PowerManager.OnPowerUpdate += OnPowerUpdate;
-                _powerStateCoroutine = StartCoroutine(UpdatePowerState());
             }
-
-            QuickLogger.Debug($"{i++}");
 
             if (AudioManager == null)
             {
                 AudioManager = new AudioManager(gameObject.GetComponent<FMOD_CustomLoopingEmitter>());
                 InvokeRepeating(nameof(UpdateAudio), 0, 1);
             }
-            QuickLogger.Debug($"{i++}");
-
-            AnimationManager = gameObject.GetComponent<AnimationManager>();
-            IsRunningHash = Animator.StringToHash("IsRunning");
-            QuickLogger.Debug($"{i++}");
-
+            
             if (AnimationManager == null)
             {
-                QuickLogger.Error($"Animation Manager was not found");
+                AnimationManager = gameObject.GetComponent<AnimationManager>();
+                AnimationManager.SetBoolHash(IsRunningHash, true);
             }
-            QuickLogger.Debug($"{i++}");
-
-            AnimationManager.SetBoolHash(IsRunningHash, true);
-            QuickLogger.Debug($"{i++}");
-
+            
             if (DisplayManager == null)
             {
-                DisplayManager = gameObject.AddComponent<Managers.DisplayManager>();
+                DisplayManager = gameObject.AddComponent<OxDisplayManager>();
                 DisplayManager.Setup(this);
             }
-            QuickLogger.Debug($"{i++}");
-
 
             QuickLogger.Debug("Initialized");
             _initialized = true;
         }
-
-        private void OnRepaired()
-        {
-            DisplayManager.ChangeTakeO2State(ButtonStates.Enabled);
-        }
-
-        private void OnDamaged()
-        {
-            DisplayManager.ChangeTakeO2State(ButtonStates.Disabled);
-        }
-
-        private IEnumerator GenerateOxygen()
-        {
-            while (true)
-            {
-                yield return new WaitForSeconds(1);
-                OxygenManager.GenerateOxygen();
-            }
-        }
-
+        
         private void OnPowerUpdate(FCSPowerStates obj)
         {
             AnimationManager.SetBoolHash(IsRunningHash, obj == FCSPowerStates.Powered);
         }
-
-        private IEnumerator UpdatePowerState()
+        private PrefabIdentifier GetPrefabID()
         {
-            while (true)
+            return GetComponentInParent<PrefabIdentifier>() ?? GetComponentInChildren<PrefabIdentifier>();
+        }
+        
+        private void Setup()
+        {
+
+            var playerInterationManager = gameObject.GetComponent<PlayerInteractionManager>();
+
+            if (playerInterationManager != null)
             {
-                yield return new WaitForSeconds(1);
-                PowerManager.UpdatePowerState();
+                playerInterationManager.Initialize(this);
+            }
+
+            if (!_initialized)
+            {
+                Initialize();
             }
         }
 
-        private IEnumerator HealthCheck()
+        private void UpdateAudio()
         {
-            while (true)
+            if (!IsConstructed || PowerManager == null || AudioManager == null) return;
+
+            if (IsConstructed && PowerManager.GetPowerState() != FCSPowerStates.Powered || !QPatch.Configuration.PlaySFX)
             {
-                yield return new WaitForSeconds(1);
-                if (PowerManager == null) yield return null;
-                HealthManager.HealthChecks();
+                AudioManager.StopMachineAudio();
+                return;
             }
+
+            AudioManager.PlayMachineAudio();
+        }
+        
+        private void SetPinging(bool state)
+        {
+            AnimationManager.SetBoolHash(_isPinging, state);
         }
 
-        private void Update()
-        {
-            HealthManager?.UpdateHealthSystem();
-            PowerManager?.ConsumePower();
-        }
+        #endregion
+        
+        #region Public/Internal Methods
 
         internal void AddToBaseManager(BaseManager managers = null)
         {
@@ -237,11 +242,6 @@ namespace MAC.OxStation.Mono
             return _prefabId?.Id;
         }
         
-        private PrefabIdentifier GetPrefabID()
-        {
-            return GetComponentInParent<PrefabIdentifier>() ?? GetComponentInChildren<PrefabIdentifier>();
-        }
-
         public bool CanDeconstruct(out string reason)
         {
             reason = string.Empty;
@@ -267,46 +267,7 @@ namespace MAC.OxStation.Mono
                 }
             }
         }
-
-        private void Setup()
-        {
-
-            var playerInterationManager = gameObject.GetComponent<PlayerInteractionManager>();
-
-            if (playerInterationManager != null)
-            {
-                playerInterationManager.Initialize(this);
-            }
-
-            if (!_initialized)
-            {
-                Initialize();
-            }
-        }
-
-        private void UpdateAudio()
-        {
-            if (!IsConstructed || PowerManager == null || AudioManager == null) return;
-
-            if (IsConstructed && PowerManager.GetPowerState() != FCSPowerStates.Powered || !QPatch.Configuration.PlaySFX)
-            {
-                AudioManager.StopMachineAudio();
-                return;
-            }
-
-            AudioManager.PlayMachineAudio();
-        }
-
-        private void OnDestroy()
-        {
-            if (!_initialized) return;
-            StopCoroutine(_powerStateCoroutine);
-            StopCoroutine(_generateOxygenCoroutine);
-            StopCoroutine(_healthCheckCoroutine);
-            CancelInvoke(nameof(UpdateAudio));
-            BaseManager.RemoveBaseUnit(this);
-        }
-
+        
         public void OnProtoSerialize(ProtobufSerializer serializer)
         {
             if (!Mod.IsSaving())
@@ -331,11 +292,13 @@ namespace MAC.OxStation.Mono
         {
             AnimationManager.SetBoolHash(_isPinging, !AnimationManager.GetBoolHash(_isPinging));
         }
-
-        private void SetPinging(bool state)
+        
+        internal bool GetPingState()
         {
-            AnimationManager.SetBoolHash(_isPinging, state);
+            return AnimationManager.GetBoolHash(_isPinging);
         }
+
+        #endregion
 
         #region Code help by zorgesho
         internal bool SetBeaconAttached(Beacon beacon, bool attaching)
@@ -409,10 +372,5 @@ namespace MAC.OxStation.Mono
             }
         }
         #endregion
-
-        internal bool GetPingState()
-        {
-            return AnimationManager.GetBoolHash(_isPinging);
-        }
     }
 }

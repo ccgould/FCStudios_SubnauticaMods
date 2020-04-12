@@ -85,6 +85,8 @@ namespace FCS_HydroponicHarvesters.Mono
 
         internal void AddItemToContainer(TechType item,bool initializer = false)
         {
+            QuickLogger.Debug("Adding to container", true);
+
             if (!IsFull)
             {
                 QuickLogger.Debug($"Trying to add item to container {item}",true);
@@ -104,6 +106,7 @@ namespace FCS_HydroponicHarvesters.Mono
 
         internal void RemoveItemFromContainer(TechType item)
         {
+            QuickLogger.Debug("Taking From Container",true);
             if (Items.ContainsKey(item))
             {
 #if SUBNAUTICA
@@ -119,6 +122,7 @@ namespace FCS_HydroponicHarvesters.Mono
                         var pickup = CraftData.InstantiateFromPrefab(item).GetComponent<Pickupable>();
                         Inventory.main.Pickup(pickup);
                         OnContainerUpdate?.Invoke();
+                        _mono?.Producer?.TryStartingNextClone();
                     }
                 }
             }

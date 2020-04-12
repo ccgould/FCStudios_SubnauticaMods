@@ -230,6 +230,19 @@ namespace MAC.OxStation.Config
         {
             return Path.Combine(GetModPath(), "Assets");
         }
+        internal static void SaveModConfiguration()
+        {
+            try
+            {
+                var saveDataJson = JsonConvert.SerializeObject(QPatch.Configuration, Formatting.Indented);
+
+                File.WriteAllText(Path.Combine(MODFOLDERLOCATION, ConfigurationFile()), saveDataJson);
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error($"{e.Message}\n{e.StackTrace}");
+            }
+        }
         #endregion
 
         #region Private Methods
@@ -288,20 +301,6 @@ namespace MAC.OxStation.Config
             return LoadConfigurationData();
         }
         #endregion
-
-        public static void SaveModConfiguration()
-        {
-            try
-            {
-                var saveDataJson = JsonConvert.SerializeObject(QPatch.Configuration, Formatting.Indented);
-
-                File.WriteAllText(Path.Combine(MODFOLDERLOCATION, ConfigurationFile()), saveDataJson);
-            }
-            catch (Exception e)
-            {
-                QuickLogger.Error($"{e.Message}\n{e.StackTrace}");
-            }
-        }
     }
 
     internal class Options : ModOptions

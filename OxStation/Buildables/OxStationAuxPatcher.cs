@@ -71,7 +71,5 @@ namespace MAC.OxStation.Buildables
         }
         
         #endregion
-
-
     }
 }

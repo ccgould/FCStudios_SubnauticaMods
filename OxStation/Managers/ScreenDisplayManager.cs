@@ -21,6 +21,50 @@ namespace MAC.OxStation.Managers
         private Color _pingBTNHoverColor = Color.cyan;
         private int _page;
 
+        private void OnLoadDisplay(DisplayData info)
+        {
+            _oxGrid.ClearPage();
+
+            var grouped = _mono.TrackedDevices.ToList();
+
+            if (info.EndPosition > grouped.Count)
+            {
+                info.EndPosition = grouped.Count;
+            }
+
+            for (int i = info.StartPosition; i < info.EndPosition; i++)
+            {
+                GameObject buttonPrefab = Instantiate(info.ItemsPrefab);
+
+                if (buttonPrefab == null || info.ItemsGrid == null)
+                {
+                    if (buttonPrefab != null)
+                    {
+                        Destroy(buttonPrefab);
+                    }
+
+                    return;
+                }
+
+                buttonPrefab.transform.SetParent(info.ItemsGrid.transform, false);
+                //buttonPrefab.GetComponentInChildren<Text>().text = grouped[i].Value.ToString();
+
+                var mainButton = buttonPrefab.FindChild("PingBTN");
+                var mainBTN = mainButton.AddComponent<OxStationItemButton>();
+                mainBTN.Tag = grouped[i].Value;
+                mainBTN.OxstationOxygen = InterfaceHelpers.FindGameObject(buttonPrefab, "Oxygen_Preloader_Bar_Front").GetComponent<Image>();
+                mainBTN.OxstationHealth = InterfaceHelpers.FindGameObject(buttonPrefab, "Health_Preloader_Bar_Front").GetComponent<Image>();
+                mainBTN.UpdateDisplay();
+                mainBTN.ButtonMode = InterfaceButtonMode.Background;
+                mainBTN.STARTING_COLOR = _pingBTNStartColor;
+                mainBTN.HOVER_COLOR = _pingBTNHoverColor;
+                mainBTN.OnButtonClick = OnButtonClick;
+                mainBTN.BtnName = "PingBTN";
+            }
+
+            _oxGrid.UpdaterPaginator(grouped.Count);
+        }
+
         public override void OnButtonClick(string btnName, object tag)
         {
             if (btnName == string.Empty) return;
@@ -92,50 +136,6 @@ namespace MAC.OxStation.Managers
             }
 
             return true;
-        }
-
-        private void OnLoadDisplay(DisplayData info)
-        {
-            _oxGrid.ClearPage();
-
-            var grouped = _mono.TrackedDevices.ToList();
-
-            if (info.EndPosition > grouped.Count)
-            {
-                info.EndPosition = grouped.Count;
-            }
-
-            for (int i = info.StartPosition; i < info.EndPosition; i++)
-            {
-                GameObject buttonPrefab = Instantiate(info.ItemsPrefab);
-
-                if (buttonPrefab == null || info.ItemsGrid == null)
-                {
-                    if (buttonPrefab != null)
-                    {
-                        Destroy(buttonPrefab);
-                    }
-
-                    return;
-                }
-                
-                buttonPrefab.transform.SetParent(info.ItemsGrid.transform, false);
-                //buttonPrefab.GetComponentInChildren<Text>().text = grouped[i].Value.ToString();
-               
-                var mainButton = buttonPrefab.FindChild("PingBTN");
-                var mainBTN = mainButton.AddComponent<OxStationItemButton>();
-                mainBTN.Tag = grouped[i].Value;
-                mainBTN.OxstationOxygen = InterfaceHelpers.FindGameObject(buttonPrefab, "Oxygen_Preloader_Bar_Front").GetComponent<Image>();
-                mainBTN.OxstationHealth = InterfaceHelpers.FindGameObject(buttonPrefab, "Health_Preloader_Bar_Front").GetComponent<Image>();
-                mainBTN.UpdateDisplay();
-                mainBTN.ButtonMode = InterfaceButtonMode.Background;
-                mainBTN.STARTING_COLOR = _pingBTNStartColor;
-                mainBTN.HOVER_COLOR = _pingBTNHoverColor;
-                mainBTN.OnButtonClick = OnButtonClick;
-                mainBTN.BtnName = "PingBTN";
-            }
-
-            _oxGrid.UpdaterPaginator(grouped.Count);
         }
 
         internal void UpdateDamageAmount(int amount)

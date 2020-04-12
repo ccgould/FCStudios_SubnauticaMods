@@ -11,16 +11,26 @@ namespace MAC.OxStation.Managers
     internal class HealthManager
     {
         private LiveMixin _liveMixin = new LiveMixin();
-        public int HealthMultiplyer { get; set; } = 1;
+        private const int HealthMultiplier = 1;
         private const float DayNight = 1200f;
-        private int _damagePerDay = 10;
+        private const int DamagePerDay = 10;
         private float _damagePerSecond;
         private float _passedTime;
         private OxStationController _mono;
         private bool _wasDead;
-        public Action OnDamaged { get; set; }
-        public Action OnRepaired { get; set; }
+        internal Action OnDamaged { get; set; }
+        internal Action OnRepaired { get; set; }
 
+
+        private void ResetPassedTime()
+        {
+            _passedTime = 0;
+        }
+
+        /// <summary>
+        /// Gets if the oxstation is currently damaged.
+        /// </summary>
+        /// <returns>Returns true if the oxstation is damaged.</returns>
         internal bool IsDamagedFlag()
         {
             return _liveMixin.health <= 0;
@@ -28,22 +38,21 @@ namespace MAC.OxStation.Managers
 
         internal void UpdateHealthSystem()
         {
+            // Keep track of how much time has passed
             _passedTime += DayNightCycle.main.deltaTime;
-
-            //QuickLogger.Debug($"Passed Time: {_passedTime} || Health {GetHealth()}");
 
             if (_mono == null) return;
 
+            // If power is off reset the time since we cant recieve damage if the unit isnt running
             if (_mono.PowerManager?.GetPowerState() != FCSPowerStates.Powered)
             {
-                //QuickLogger.Debug("Not Damaging Unit");
                 ResetPassedTime();
                 return;
             }
 
+            //Apply damage to the device
             if (_passedTime >= _damagePerSecond)
             {
-                //QuickLogger.Debug("Damaging Unit");
                 ApplyDamage();
                 ResetPassedTime();
             }
@@ -88,7 +97,7 @@ namespace MAC.OxStation.Managers
             QuickLogger.Debug("Health Initialize");
             _mono = mono;
             _liveMixin = mono.gameObject.AddComponent<LiveMixin>();
-            _damagePerSecond = DayNight / _damagePerDay;
+            _damagePerSecond = DayNight / DamagePerDay;
 
             if (_liveMixin != null)
             {
@@ -111,7 +120,7 @@ namespace MAC.OxStation.Managers
 
             if (_liveMixin.health > 0)
             {
-                _liveMixin.health = Mathf.Clamp(_liveMixin.health - HealthMultiplyer, 0f, 100f);
+                _liveMixin.health = Mathf.Clamp(_liveMixin.health - HealthMultiplier, 0f, 100f);
             }
         }
 
@@ -142,21 +151,6 @@ namespace MAC.OxStation.Managers
         internal void Kill()
         {
             _liveMixin.health = 0;
-        }
-
-        private void ResetPassedTime()
-        {
-            _passedTime = 0;
-        }
-
-        internal float GetPassedTime()
-        {
-            return _passedTime;
-        }
-
-        internal void SetPassedTime(float savedDataPassedTime)
-        {
-            _passedTime = savedDataPassedTime;
         }
     }
 }

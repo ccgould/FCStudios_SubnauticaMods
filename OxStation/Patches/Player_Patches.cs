@@ -30,7 +30,11 @@ namespace MAC.OxStation.Patches
 
                 if (PerformOxygenCheckForBases(__instance, out __result, manager)) return true;
             }
-            return false;
+            else
+            {
+                return true;
+            }
+            return false; //return false to skip execution of the original.
         }
 
         private static bool IsThereAnyOxygenStationAttached(out bool outResult, BaseManager manager)

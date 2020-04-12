@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace MAC.OxStation.Managers
 {
+    /// <summary>
+    /// A class that handles animation for the Oxstation
+    /// </summary>
     internal class AnimationManager : MonoBehaviour
     {
         #region Unity Methods   
