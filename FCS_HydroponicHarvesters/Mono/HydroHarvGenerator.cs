@@ -99,7 +99,7 @@ namespace FCS_HydroponicHarvesters.Mono
         {
             QuickLogger.Debug("Trying to start another clone", true);
 
-            if (_mono.CurrentSpeedMode == SpeedModes.Off)
+            if (_mono.CurrentSpeedMode == SpeedModes.Off || _mono.HydroHarvCleanerManager.GetIsDirty())
                 return;// Powered off, can't start a new clone
 
             if (this.StartUpProgress < 0f || // Has not started a clone yet

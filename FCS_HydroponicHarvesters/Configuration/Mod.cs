@@ -62,7 +62,6 @@ namespace FCS_HydroponicHarvesters.Configuration
             new DNASample("Bulb Bush","BulbBush",TechType.KooshChunk),
             new DNASample("Chinese Potato","ChinesePotato",TechType.PurpleVegetable),
             new DNASample("Marblemelon Plant","MarblemelonPlant",TechType.Melon),
-            new DNASample("Bulb Bush","BulbBush",TechType.KooshChunk),
             new DNASample("Lantern Tree","LanternTree",TechType.HangingFruit),
         };
 
@@ -107,6 +106,7 @@ namespace FCS_HydroponicHarvesters.Configuration
             new DNASample("Voxel Shrub","VoxelShrub",TechType.PinkFlowerSeed),
             new DNASample("Writhing Weed","WrithingWeed",TechType.PurpleTentacleSeed),
             new DNASample("Brain Coral","BrainCoral",TechType.PurpleBrainCoralPiece),
+            new DNASample("Pink Cap","PinkCap",TechType.PinkMushroomSpore),
 
         };
 

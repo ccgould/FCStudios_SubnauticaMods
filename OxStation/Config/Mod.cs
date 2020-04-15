@@ -41,17 +41,6 @@ namespace MAC.OxStation.Config
 
         internal const string OxstationKitClassID = "OxstationKit_OX";
         internal const string OxstationScreenKitClassID = "OxstationScreenKit_OX";
-        internal const string OxstationCyclopsModuleClassID = "OxstationCyclopsModule_OX";
-        internal const string OxstationSeamothModuleClassID = "OxstationSeamothModule_OX";
-        internal const string OxstationPrawnSuitModuleClassID = "OxstationPrawnSuitModule_OX";
-
-        public const string CyclopsModuleFriendlyName = "OxStation Cyclops Module";
-        public const string OxStationSeamothFriendlyName = "OxStation Seamoth Module";
-        public const string OxStationPrawnSuitFriendlyName = "OxStation PrawnSuit Module";
-
-        public const string OxstationCyclopsModuleDescription = "Provide oxygen to the cyclops with this wonderful module.";
-        public const string OxstationSeamothModuleDescription = "Provide oxygen to the seamoth with this wonderful module.";
-        public const string OxstationPrawnModuleDescription = "Provide oxygen to the prawnsuit with this wonderful module.";
 
         internal static event Action<SaveData> OnDataLoaded;
 

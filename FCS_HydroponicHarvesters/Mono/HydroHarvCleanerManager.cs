@@ -19,6 +19,7 @@ namespace FCS_HydroponicHarvesters.Mono
         public int GetContainerFreeSpace { get; }
         public bool IsFull { get; }
         
+        
         private void Update()
         {
             if(_mono == null || !_mono.IsInitialized || !_mono.IsConstructed || !_mono.PowerManager.HasPowerToConsume()) return;
@@ -48,6 +49,11 @@ namespace FCS_HydroponicHarvesters.Mono
         public bool CanBeStored(int amount)
         {
             return false;
+        }
+
+        internal bool GetIsDirty()
+        {
+            return _isDirty;
         }
 
         public bool AddItemToContainer(InventoryItem item)

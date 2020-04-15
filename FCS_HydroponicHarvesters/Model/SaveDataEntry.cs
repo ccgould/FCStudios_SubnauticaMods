@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using FCS_HydroponicHarvesters.Enumerators;
+using FCS_HydroponicHarvesters.Mono;
 using FCSTechFabricator.Enums;
 using FCSTechFabricator.Objects;
 using Oculus.Newtonsoft.Json;
@@ -12,7 +13,7 @@ namespace Model
     [Serializable]
     internal class SaveDataEntry
     {
-        [JsonProperty] internal Dictionary<TechType, TechType> DnaSamples { get; set; }
+        [JsonProperty] internal Dictionary<TechType, StoredDNAData> DnaSamples { get; set; }
         [JsonProperty] internal string ID { get; set; }
         [JsonProperty] internal ColorVec4 BodyColor { get; set; }
         [JsonProperty] internal Dictionary<TechType, int> Container { get; set; }

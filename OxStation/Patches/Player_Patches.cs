@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using FCSCommon.Utilities;
+﻿using FCSCommon.Utilities;
 using Harmony;
 using MAC.OxStation.Config;
 using MAC.OxStation.Managers;
@@ -28,13 +27,24 @@ namespace MAC.OxStation.Patches
 
                 if (!IsThereAnyOxygenStationAttached(out __result, manager)) return false;
 
-                if (PerformOxygenCheckForBases(__instance, out __result, manager)) return true;
+                if (PerformOxygenCheckForBases(__instance, out __result, manager)) return false;
             }
-            else
+            
+            return true; //return false to skip execution of the original.
+        }
+
+        private static bool IsThereAnyOxStationModule(Vehicle curSub)
+        {
+            if (curSub == null) return false;
+
+            var oxStationCount = curSub.modules.GetCount(TechType.SeamothSonarModule);
+
+            if (oxStationCount <= 0)
             {
-                return true;
+                return false;
             }
-            return false; //return false to skip execution of the original.
+
+            return true;
         }
 
         private static bool IsThereAnyOxygenStationAttached(out bool outResult, BaseManager manager)
@@ -54,10 +64,9 @@ namespace MAC.OxStation.Patches
         private static bool PerformOxygenCheckForBases(Player instance, out bool outResult, BaseManager manager)
         {
             outResult = false;
-
             if (Mod.RTInstalled && Player.main.oxygenMgr.HasOxygenTank())
             {
-                if (IsPlayerOxygenFullRtInstalled(instance)) return true;
+                if (IsPlayerOxygenFullRtInstalled(instance)) return false;
 
                 foreach (OxStationController baseUnit in manager.BaseUnits)
                 {
@@ -72,12 +81,10 @@ namespace MAC.OxStation.Patches
                         if (result)
                         {
                             Player.main.oxygenMgr.AddOxygen(amount);
+                            outResult = true;
+                            return true;
                         }
-
-                        outResult = true;
                     }
-
-                    break;
                 }
             }
             else
@@ -97,12 +104,10 @@ namespace MAC.OxStation.Patches
                         if (result)
                         {
                             Player.main.oxygenMgr.AddOxygen(amount);
+                            outResult = true;
+                            return true;
                         }
-
-                        outResult = true;
                     }
-
-                    break;
                 }
             }
 

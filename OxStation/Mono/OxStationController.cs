@@ -38,6 +38,7 @@ namespace MAC.OxStation.Mono
         internal AnimationManager AnimationManager { get; private set; }
         internal OxDisplayManager DisplayManager { get; private set; }
         internal AudioManager AudioManager;
+        private float _timeLeft = 1f;
         internal int IsRunningHash { get; set; }
 
         #endregion
@@ -76,7 +77,13 @@ namespace MAC.OxStation.Mono
 
         private void Update()
         {
-            OxygenManager?.GenerateOxygen();
+            _timeLeft -= DayNightCycle.main.deltaTime;
+            if (_timeLeft < 0)
+            {
+                OxygenManager?.GenerateOxygen();
+                _timeLeft = 1f;
+            }
+
             HealthManager?.HealthChecks();
             HealthManager?.UpdateHealthSystem();
             PowerManager?.ConsumePower();

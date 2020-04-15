@@ -57,7 +57,7 @@ namespace MAC.OxStation.Managers
                 _o2Level = 0;
             }
 
-            QuickLogger.Debug($"Unit Oxygen Level: {_o2Level}");
+            QuickLogger.Debug($"Unit Oxygen Level: {_o2Level}", true);
             return true;
         }
 

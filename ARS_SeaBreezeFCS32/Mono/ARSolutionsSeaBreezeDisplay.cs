@@ -246,19 +246,19 @@ namespace ARS_SeaBreezeFCS32.Mono
             return true;
         }
 
-        private void OnLoadFoodDisplay(GameObject itemPrefab, GameObject itemsGrid, int stPos, int endPos)
+        private void OnLoadFoodDisplay(DisplayData data)
         {
-            OnLoadDisplay( EatableType.Food, itemPrefab, itemsGrid, stPos, endPos);
+            OnLoadDisplay( EatableType.Food, data.ItemsPrefab, data.ItemsGrid, data.StartPosition, data.EndPosition);
         }
 
-        private void OnLoadTrashDisplay(GameObject itemPrefab, GameObject itemsGrid, int stPos, int endPos)
+        private void OnLoadTrashDisplay(DisplayData data)
         {
-            OnLoadDisplay(EatableType.Rotten, itemPrefab, itemsGrid, stPos, endPos);
+            OnLoadDisplay(EatableType.Rotten, data.ItemsPrefab, data.ItemsGrid, data.StartPosition, data.EndPosition);
         }
 
-        private void OnLoadWaterDisplay(GameObject itemPrefab, GameObject itemsGrid, int stPos, int endPos)
+        private void OnLoadWaterDisplay(DisplayData data)
         {
-            OnLoadDisplay(EatableType.Drink, itemPrefab, itemsGrid, stPos, endPos);
+            OnLoadDisplay(EatableType.Drink, data.ItemsPrefab, data.ItemsGrid, data.StartPosition, data.EndPosition);
         }
 
         private void OnLoadDisplay(EatableType eatableType, GameObject itemPrefab, GameObject itemsGrid, int stPos, int endPos)

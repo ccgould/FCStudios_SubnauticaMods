@@ -254,7 +254,7 @@ namespace FCSCommon.Helpers
             }
             else
             {
-                QuickLogger.Error($"[ApplyGlassShaderTemplate] Model was not found with the matchin name {matchName}");
+                QuickLogger.Error($"[ApplyGlassShaderTemplate] Model was not found with the matching name {matchName}");
             }
         }
 

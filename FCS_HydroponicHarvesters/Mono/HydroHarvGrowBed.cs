@@ -20,10 +20,10 @@ namespace FCS_HydroponicHarvesters.Mono
         public PlantSlot[] Slots;
         private bool _initialized;
         private FCSEnvironment _currentEnvironment;
-        
+
         private HydroHarvController _mono;
-        private Dictionary<TechType,TechType>  _dna = new Dictionary<TechType,TechType>();
-        private List<TechType> _invalidAdjustTechTypes = new List<TechType>
+        private readonly Dictionary<TechType, StoredDNAData> _dna = new Dictionary<TechType, StoredDNAData>();
+        private readonly List<TechType> _invalidAdjustTechTypes = new List<TechType>
         {
             TechType.CreepvineSeedCluster,
             TechType.Creepvine,
@@ -33,8 +33,6 @@ namespace FCS_HydroponicHarvesters.Mono
             TechType.BloodRoot,
             TechType.BloodVine
         };
-
-        private List<TechType> _adjustableList = new List<TechType>();
 
         private bool _fromLoad;
 
@@ -65,7 +63,7 @@ namespace FCS_HydroponicHarvesters.Mono
                 QuickLogger.Error(e.Message);
                 return false;
             }
-            
+
             return true;
         }
 
@@ -80,7 +78,7 @@ namespace FCS_HydroponicHarvesters.Mono
         public bool AddItemToContainer(InventoryItem item)
         {
             var dna = item.item.gameObject.GetComponentInChildren<FCSDNA>();
-            return TryPlant(dna,item);
+            return TryPlant(dna, item);
         }
 
         internal HydroHarvSize GetHydroHarvSize()
@@ -97,7 +95,7 @@ namespace FCS_HydroponicHarvesters.Mono
 
             return HydroHarvSize.Unknown;
         }
-        
+
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
         {
             var dna = pickupable.GetComponent<FCSDNA>();
@@ -111,9 +109,9 @@ namespace FCS_HydroponicHarvesters.Mono
             {
                 return false;
             }
-            
-            dna.GetData();
-            
+
+            dna.GetDnaData();
+
             if (_currentEnvironment != dna.Environment)
             {
                 return false;
@@ -130,8 +128,8 @@ namespace FCS_HydroponicHarvesters.Mono
                 if (GetContainerFreeSpace >= 1)
                 {
                     var freeslot = GetFreeSlotID();
-                    AddItem(plantable, freeslot,item.item.GetTechType());
-                    result =  true;
+                    AddItem(plantable, freeslot, item.item.GetTechType());
+                    result = true;
                 }
             }
 
@@ -139,11 +137,11 @@ namespace FCS_HydroponicHarvesters.Mono
             {
                 Destroy(item.item);
             }
-            
+
             return result;
         }
 
-        private void AddItem(FCSDNA plantable, int slotID,TechType dnaTechType)
+        private void AddItem(FCSDNA plantable, int slotID, TechType dnaTechType)
         {
             var slotByID = this.GetSlotByID(slotID);
             if (slotByID == null)
@@ -154,12 +152,21 @@ namespace FCS_HydroponicHarvesters.Mono
             {
                 return;
             }
-            QuickLogger.Debug($"Adding DNa with TechType {plantable.TechType}",true);
+            QuickLogger.Debug($"Adding DNa with TechType {plantable.TechType}", true);
 
-            SetSlotOccupiedState(slotID,true);
+            SetSlotOccupiedState(slotID, true);
             slotByID.Plantable = plantable;
             slotByID.PlantModel = Spawn(slotByID.Slot, plantable.TechType, plantable.Model);
-            _dna.Add(plantable.GiveItem,dnaTechType);
+
+            if (_dna.ContainsKey(plantable.GiveItem))
+            {
+                _dna[plantable.GiveItem].Amount += 1;
+            }
+            else
+            {
+                _dna.Add(plantable.GiveItem, new StoredDNAData { Amount = 1, TechType = dnaTechType });
+            }
+            
             if (!_fromLoad)
             {
                 if (!_mono.HydroHarvContainer.Items.ContainsKey(plantable.GiveItem))
@@ -169,8 +176,10 @@ namespace FCS_HydroponicHarvesters.Mono
             }
         }
 
-        public GameObject Spawn(Transform parent, TechType techType,GameObject model)
+        public GameObject Spawn(Transform parent, TechType techType, GameObject model)
         {
+            if (!_initialized) return null;
+
             var gameObject = model != null ? Instantiate(model) : Instantiate(CraftData.GetPrefabForTechType(techType));
 
             gameObject.transform.SetParent(parent, false);
@@ -227,11 +236,10 @@ namespace FCS_HydroponicHarvesters.Mono
         {
             foreach (Transform child in transform)
             {
-                 child.gameObject.transform.localPosition = Vector3.zero;
+                child.gameObject.transform.localPosition = Vector3.zero;
                 SetLocalZeroAllChildren(child);
             }
         }
-
 
         internal void RemoveItem(int slotID)
         {
@@ -291,12 +299,12 @@ namespace FCS_HydroponicHarvesters.Mono
         {
             _currentEnvironment = environment;
         }
-        
+
         internal FCSEnvironment GetBedType()
         {
             return _currentEnvironment;
         }
-        internal Dictionary<TechType,TechType> GetDNASamples()
+        internal Dictionary<TechType, StoredDNAData> GetDNASamples()
         {
             return _dna;
         }
@@ -318,7 +326,21 @@ namespace FCS_HydroponicHarvesters.Mono
                 QuickLogger.Error("Slots is Null");
                 return;
             }
-            _dna.Remove(item);
+
+            if (_dna.ContainsKey(item))
+            {
+
+                QuickLogger.Debug($"Checking for: {item} || Amount Stored: {_dna[item].Amount}");
+
+                if (_dna[item].Amount > 1)
+                {
+                    _dna[item].Amount -= 1;
+                }
+                else
+                {
+                    _dna.Remove(item);
+                }
+            }
 
             foreach (PlantSlot slot in Slots)
             {
@@ -331,18 +353,53 @@ namespace FCS_HydroponicHarvesters.Mono
 
             QuickLogger.Debug("Remove Model");
         }
-        internal void Load(Dictionary<TechType, TechType> savedDataDnaSamples)
+        internal void Load(Dictionary<TechType, StoredDNAData> savedDataDnaSamples)
         {
             if (savedDataDnaSamples == null) return;
             _fromLoad = true;
-            foreach (KeyValuePair<TechType, TechType> dnaSample in savedDataDnaSamples)
+            foreach (KeyValuePair<TechType, StoredDNAData> dnaSample in savedDataDnaSamples)
             {
-                var dna = dnaSample.Value.ToInventoryItem();
-                var fcsDna = dna.item.gameObject.GetComponentInChildren<FCSDNA>();
-                fcsDna.GetData();
-                AddItemToContainer(dna);
+                for (int i = 0; i < dnaSample.Value.Amount; i++)
+                {
+                    var dna = dnaSample.Value.TechType.ToInventoryItem();
+                    var fcsDna = dna.item.gameObject.GetComponentInChildren<FCSDNA>();
+                    fcsDna.GetDnaData();
+                    AddItemToContainer(dna);
+                }
             }
+
             _fromLoad = false;
         }
+
+        public int GetDnaCount(TechType item)
+        {
+            try
+            {
+                return _dna.SingleOrDefault(x => x.Key == item).Value.Amount;
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error(e.Message);
+            }
+
+            return 0;
+        }
+
+        public int GetDNASamplesTotal()
+        {
+            int amount = 0;
+            foreach (KeyValuePair<TechType, StoredDNAData> dnaData in _dna)
+            {
+                amount += dnaData.Value.Amount;
+            }
+
+            return amount;
+        }
+    }
+
+    public class StoredDNAData
+    {
+        public int Amount { get; set; }
+        public TechType TechType { get; set; }
     }
 }

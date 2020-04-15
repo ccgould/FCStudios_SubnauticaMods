@@ -255,6 +255,7 @@ namespace FCSAIPowerCellSocket.Mono
 
         private void OnDestroy()
         {
+            if (_batteryContainer == null) return;
             _batteryContainer.isAllowedToAdd -= IsAllowedToAdd;
             _batteryContainer.onAddItem -= BatteryContainerOnOnAddItem;
             _batteryContainer.onRemoveItem -= BatteryContainerOnOnRemoveItem;

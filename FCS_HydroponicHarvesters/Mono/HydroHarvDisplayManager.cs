@@ -23,9 +23,7 @@ namespace FCS_HydroponicHarvesters.Mono
         private HydroHarvController _mono;
         private readonly Color _startColor = Color.black;
         private readonly Color _hoverColor = Color.white;
-        private readonly Color _fireBrickColor = new Color(0.6980392f, 0.1333333f, 0.1333333f, 1f);
-        private readonly Color _greenColor = new Color(0.03424335f, 1f, 0f, 1f);
-        private bool _initialized;
+
         private ColorManager _colorPage;
         private int _page;
         private Atlas.Sprite _melonIconSprite;
@@ -139,7 +137,6 @@ namespace FCS_HydroponicHarvesters.Mono
                 PowerOnDisplay();
                 _mono.HydroHarvContainer.OnContainerUpdate += OnContainerUpdate;
                 _dnaGrid.DrawPage(1);
-                _initialized = true;
             }
         }
 
@@ -339,7 +336,7 @@ namespace FCS_HydroponicHarvesters.Mono
         private void UpdateDnaCounter()
         {
             if (_dnaCounter == null) return;
-            _dnaCounter.text = $"{_mono.HydroHarvGrowBed.GetDNASamples().Count}/{_mono.HydroHarvGrowBed.Slots.Length}";
+            _dnaCounter.text = $"{_mono.HydroHarvGrowBed.GetDNASamplesTotal()}/{_mono.HydroHarvGrowBed.Slots.Length}";
         }
 
         internal void UpdatePowerUsagePerSecond()

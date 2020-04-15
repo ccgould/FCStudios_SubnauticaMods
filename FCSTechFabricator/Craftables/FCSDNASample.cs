@@ -28,8 +28,7 @@ namespace FCSTechFabricator.Craftables
             var prefab = GameObject.Instantiate(CraftData.GetPrefabForTechType(TechType.HatchingEnzymes));
             prefab.name = this.PrefabFileName;
             var dna = prefab.AddComponent<FCSDNA>();
-            dna.TechType = _ingredient;
-            QuickLogger.Debug(dna.TechType.ToString());
+            
             prefab.AddComponent<FCSTechFabricatorTag>();
             return prefab;
         }
@@ -52,7 +51,7 @@ namespace FCSTechFabricator.Craftables
 
         protected override Atlas.Sprite GetItemSprite()
         {
-            return SpriteManager.Get(_ingredient);
+            return ImageUtils.LoadSpriteFromFile(Path.Combine(_assetFolder, $"{ClassID}.png"));
         }
 
 #elif BELOWZERO
@@ -73,12 +72,12 @@ namespace FCSTechFabricator.Craftables
 
         protected override Sprite GetItemSprite()
         {
-            return ImageUtils.LoadSpriteFromFile(Path.Combine(_assetFolder, $"dnaSample.png"));
+            return ImageUtils.LoadSpriteFromFile(Path.Combine(_assetFolder,  $"{ClassID}.png"));
         }
 #endif
-        public void Register()
+        public void ChangeIconLocation(string assetFolder)
         {
-
+            _assetFolder = assetFolder;
         }
 
         public override TechGroup GroupForPDA => TechGroup.Resources;

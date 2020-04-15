@@ -139,8 +139,11 @@ namespace FCS_HydroponicHarvesters.Mono
                 QuickLogger.Message(HydroponicHarvestersBuildable.CannotDeleteDNAItem(Language.main.Get(item)),true);
                 return;
             }
-            
-            Items.Remove(item);
+
+            if (_mono.HydroHarvGrowBed.GetDnaCount(item) <= 1)
+            {
+                Items.Remove(item);
+            }
             _mono.HydroHarvGrowBed.RemoveDNA(item);
             OnContainerUpdate?.Invoke();
         }
@@ -154,7 +157,7 @@ namespace FCS_HydroponicHarvesters.Mono
         {
            var samples = _mono.HydroHarvGrowBed.GetDNASamples();
 
-           foreach (KeyValuePair<TechType, TechType> sample in samples)
+           foreach (KeyValuePair<TechType, StoredDNAData> sample in samples)
            {
                if(IsFull) break;
                AddItemToContainer(sample.Key);
