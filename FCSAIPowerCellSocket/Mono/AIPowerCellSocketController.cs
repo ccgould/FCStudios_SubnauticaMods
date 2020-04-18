@@ -5,6 +5,7 @@ using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
 using System;
 using System.IO;
+using FCSAIPowerCellSocket.Buildables;
 using FCSAIPowerCellSocket.Configuration;
 using UnityEngine;
 
@@ -12,23 +13,17 @@ namespace FCSAIPowerCellSocket.Mono
 {
     internal partial class AIPowerCellSocketController : IConstructable, IProtoEventListener
     {
-        public bool IsConstructed => _buildable != null && _buildable.constructed;
-        public AIPowerCellSocketPowerManager PowerManager { get; set; }
-        public AIPowerCellSocketDisplay Display { get; private set; }
-        public AIPowerCellSocketAnimator AnimationManager { get; set; }
+        internal bool IsConstructed => _buildable != null && _buildable.constructed;
+        internal AIPowerCellSocketPowerManager PowerManager { get; set; }
+        internal AIPowerCellSocketDisplay Display { get; private set; }
+        internal AIPowerCellSocketAnimator AnimationManager { get; set; }
 
         private PrefabIdentifier _prefabId;
-
-        //private readonly string _saveDirectory = Path.Combine(SaveUtils.GetCurrentSaveDataDir(), "AIPowerCellSocket");
-
         private Constructable _buildable;
         private bool _runStartUpOnEnable;
         private SaveDataEntry _data;
-        //private SaveDataEntry _oldSavedData;
         private bool _initialized;
-
-       // private string SaveFile => Path.Combine(_saveDirectory, _prefabId?.Id + ".json");
-
+        
         private void OnEnable()
         {
             if (!_runStartUpOnEnable) return;
@@ -51,18 +46,6 @@ namespace FCSAIPowerCellSocket.Mono
             {
                 PowerManager.LoadPowercellItems(_data.PowercellDatas);
             }
-
-            //if (_oldSavedData == null)
-            //{
-            //    PowerManager.LoadPowercellItems(_data.PowercellDatas);
-            //}
-            //else
-            //{
-            //    PowerManager.LoadPowercellItems(_oldSavedData.PowercellDatas);
-            //    QuickLogger.Debug("Load Items");
-            //    UpdateSlots();
-            //    File.Delete(SaveFile);
-            //}
         }
         
         private void Initialize()
@@ -97,7 +80,7 @@ namespace FCSAIPowerCellSocket.Mono
         {
             if (AnimationManager != null && PowerManager != null)
             {
-                AnimationManager.SetBatteryState(PowerManager.PowercellTracker.Count);
+                AnimationManager.SetBatteryState(PowerManager.GetPowercellCount());
             }
             else
             {
@@ -143,11 +126,11 @@ namespace FCSAIPowerCellSocket.Mono
         {
             reason = String.Empty;
 
-            if (!_initialized) return true;
+            if (!_initialized || PowerManager == null) return true;
 
 
-            if (PowerManager.PowercellTracker.Count == 0) return true;
-            reason = "Please remove all powercells";
+            if (PowerManager.GetPowercellCount() == 0) return true;
+            reason = AIPowerCellSocketBuildable.RemoveAllPowercells();
             return false;
         }
 
@@ -193,17 +176,6 @@ namespace FCSAIPowerCellSocket.Mono
             }
 
             QuickLogger.Info($"Loading  {_prefabId.Id}");
-
-            //if (File.Exists(SaveFile)) //Load old Save Data and delete
-            //{
-            //    QuickLogger.Debug("Loading old save.");
-            //    string savedDataJson = File.ReadAllText(SaveFile).Trim();
-
-            //    //LoadData
-            //    QuickLogger.Debug("Loading Data");
-            //    _oldSavedData = JsonConvert.DeserializeObject<SaveDataEntry>(savedDataJson);
-            //    QuickLogger.Debug("Loaded Data");
-            //}
 
             QuickLogger.Debug("// ****************************** Loaded Data *********************************** //");
         }

@@ -17,7 +17,6 @@ namespace FCSDemo.Buildables
         internal static string ColorIDTexture => $"{Mod.ModName}_COL_ID";
         public bool GetPrefabs()
         {
-
             try
             {
                 QuickLogger.Debug($"AssetBundle Set");

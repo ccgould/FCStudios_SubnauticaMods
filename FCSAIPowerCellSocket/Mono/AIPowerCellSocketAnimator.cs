@@ -11,7 +11,7 @@ namespace FCSAIPowerCellSocket.Mono
         #region Unity Methods   
         private void Start()
         {
-            _batteryState = UnityEngine.Animator.StringToHash("BatteryState");
+            _batteryState = Animator.StringToHash("BatteryState");
 
             this.Animator = this.transform.GetComponent<Animator>();
 

@@ -26,12 +26,12 @@ namespace FCSDemo.Configuration
 # endregion
 
         #region Internal Properties
-        internal const string ModName = "FCSDemo";
+        internal static string ModName => QPatch.Configuration.Config.ModName;
         internal const string BundleName = "fcsdemo";
         internal const string FriendlyName = "FCS Demo";
         internal const string Description = "A demo mod for FCStudios";
         internal const string ClassID = "FcsDemo";
-        internal const string PrefabName = "DemoModel";
+        internal static string PrefabName => QPatch.Configuration.Config.PrefabName;
         internal static string AssetFolder => Path.Combine(ModName, "Assets");
 
         internal const string FCSDemoKitClassID = "FCSDemo_Kit";
@@ -133,6 +133,9 @@ namespace FCSDemo.Configuration
 
         internal static string ConfigurationFile()
         {
+            QuickLogger.Info($"GetQmodsPath: {GetQModsPath()}");
+            QuickLogger.Info($"ModName: {ModName}");
+            QuickLogger.Info($"ModFolderLocation: {MODFOLDERLOCATION}");
             return Path.Combine(MODFOLDERLOCATION, ConfigFileName);
         }
 
@@ -160,6 +163,8 @@ namespace FCSDemo.Configuration
 
         private static string GetModPath()
         {
+            QuickLogger.Info($"GetQmodsPath: {GetQModsPath()}");
+            QuickLogger.Info($"ModName: {ModName}");
             return Path.Combine(GetQModsPath(), ModName);
         }
         private static string GetQModsPath()
@@ -218,10 +223,12 @@ namespace FCSDemo.Configuration
         [JsonProperty] internal bool UseCustomBoundingBox { get; set; } = false;
         [JsonProperty] internal Vec3 BoundingCenter { get; set; } = new Vec3(0f, 0, 0f);
         [JsonProperty] internal Vec3 BoundingSize { get; set; } = new Vec3(0, 0, 0);
+        [JsonProperty] internal string ModName { get; set; } = "FCSDemo";
+        [JsonProperty] internal string PrefabName { get; set; } = "DemoModel";
     }
 
     internal class ConfigFile
     {
-        [JsonProperty] internal Config Config { get; set; }
+        [JsonProperty] internal Config Config { get; set; } = new Config();
     }
 }

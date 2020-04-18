@@ -10,7 +10,7 @@ namespace FCSDemo
     [QModCore]
     public class QPatch
     {
-        internal static ConfigFile Configuration { get; private set; }
+        internal static ConfigFile Configuration { get; private set; } = new ConfigFile();
 
         [QModPatch]
         public static void Patch()

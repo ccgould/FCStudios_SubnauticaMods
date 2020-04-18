@@ -10,11 +10,10 @@ namespace FCSAIPowerCellSocket.Buildables
         internal static string BuildableName { get; private set; }
         internal static TechType TechTypeID { get; private set; }
 
-        internal const string OnHandOverKey = "AIPS_OnHandOver";
-
-        internal const string StatusKey = "AIPS_StatusKey";
-
+        private const string OnHandOverKey = "AIPS_OnHandOver";
+        private const string StatusKey = "AIPS_StatusKey";
         private const string OnlyPowercellsAllowedKey = "AIPS_OnlyPowercellsAllowed";
+        private const string RemoveAllPowercellsKey = "AIPS_RemoveAllPowercells";
         #endregion
 
         private void AdditionalPatching()
@@ -26,6 +25,7 @@ namespace FCSAIPowerCellSocket.Buildables
             LanguageHandler.SetLanguageLine(StatusKey, "STATUS");
             LanguageHandler.SetLanguageLine(OnHandOverKey, "Open Powercell Socket Slots Container.");
             LanguageHandler.SetLanguageLine(OnlyPowercellsAllowedKey, "Only powercells are allowed.");
+            LanguageHandler.SetLanguageLine(RemoveAllPowercellsKey, "Please remove all powercells");
         }
 
         private const string PowercellContainterKey = "PowercellContainter";
@@ -38,6 +38,21 @@ namespace FCSAIPowerCellSocket.Buildables
         internal static string OnlyPowercellsAllowed()
         {
             return Language.main.Get(OnlyPowercellsAllowedKey);
+        }
+
+        public static string RemoveAllPowercells()
+        {
+            return Language.main.Get(RemoveAllPowercellsKey);
+        }
+
+        public static string OnHover()
+        {
+            return Language.main.Get(OnHandOverKey);
+        }
+
+        public static string Status()
+        {
+            return Language.main.Get(StatusKey);
         }
     }
 }

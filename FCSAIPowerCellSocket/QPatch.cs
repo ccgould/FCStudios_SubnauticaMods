@@ -1,5 +1,4 @@
-﻿
-using FCSAIPowerCellSocket.Buildables;
+﻿using FCSAIPowerCellSocket.Buildables;
 using FCSCommon.Utilities;
 using Harmony;
 using System;
@@ -10,7 +9,6 @@ using FCSTechFabricator;
 using FCSTechFabricator.Components;
 using FCSTechFabricator.Craftables;
 using QModManager.API.ModLoading;
-using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Utility;
 
 namespace FCSAIPowerCellSocket
@@ -36,8 +34,7 @@ namespace FCSAIPowerCellSocket
             try
             {
                 AIPowerCellSocketBuildable.PatchSMLHelper();
-
-
+                
                 AddTechFabricatorItems();
 
                 var harmony = HarmonyInstance.Create("com.fcsaipowercellsocket.fcstudios");

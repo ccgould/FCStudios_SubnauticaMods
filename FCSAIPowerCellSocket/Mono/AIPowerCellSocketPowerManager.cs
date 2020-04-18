@@ -12,12 +12,152 @@ namespace FCSAIPowerCellSocket.Mono
     {
         private PowerRelay _connectedRelay;
         private AIPowerCellSocketController _mono;
-
-        internal List<PowercellData> PowercellTracker = new List<PowercellData>(4);
+        private const int ContainerHeight = 2;
+        private const int ContainerWidth = 2;
         private ChildObjectIdentifier _containerRoot;
         private ItemsContainer _batteryContainer;
-        public float Charge { get; set; }
-        public float Capacity { get; set; }
+        private float _charge;
+        private float _capacity;
+        private readonly List<PowercellData> _powercellTracker = new List<PowercellData>(4);
+        
+        private void OnDestroy()
+        {
+            if (_batteryContainer == null) return;
+            _batteryContainer.isAllowedToAdd -= IsAllowedToAdd;
+            _batteryContainer.onAddItem -= BatteryContainerOnOnAddItem;
+            _batteryContainer.onRemoveItem -= BatteryContainerOnOnRemoveItem;
+        }
+
+        //InvokeRepeating
+        private void UpdateSlots()
+        {
+            _mono.UpdateSlots();
+        }
+
+        private void BatteryContainerOnOnRemoveItem(InventoryItem item)
+        {
+            var battery = item.item;
+
+            var id = battery.GetComponent<PrefabIdentifier>().Id;
+
+            var powercellData = _powercellTracker.Single(x => x.PrefabID == id);
+
+            _powercellTracker.Remove(powercellData);
+
+            UpdateCharge();
+
+            UpdateCapacity();
+
+            //_mono.UpdateSlots();
+
+            _mono.EmptySlot(_powercellTracker.Count + 1);
+        }
+
+        private void BatteryContainerOnOnAddItem(InventoryItem item)
+        {
+            var battery = item.item;
+            var techType = battery.GetTechType();
+            var id = battery.GetComponent<PrefabIdentifier>().Id;
+            var charge = battery.GetComponent<Battery>().charge;
+            var capacity = battery.GetComponent<Battery>().capacity;
+
+            var data = new PowercellData();
+            data.Initialize(battery);
+            _powercellTracker.Add(data);
+
+            UpdateCapacity();
+            UpdateCharge();
+
+            //_mono.UpdateSlots();
+
+            UpdateDisplay();
+            QuickLogger.Debug($"Added {techType}|{charge} with id {id} to the trackers", true);
+        }
+
+        private bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
+        {
+            bool flag = false;
+
+            var techType = pickupable.GetTechType();
+#if SUBNAUTICA
+            var equipType = CraftData.GetEquipmentType(techType);
+#elif BELOWZERO
+            var equipType = TechData.GetEquipmentType(techType);
+#endif
+
+
+            if (equipType == EquipmentType.PowerCellCharger)
+            {
+                flag = true;
+            }
+            else
+            {
+                QuickLogger.Message(AIPowerCellSocketBuildable.OnlyPowercellsAllowed(), true);
+            }
+
+            return flag;
+        }
+
+        private void UpdateCharge()
+        {
+            var amount = 0f;
+
+            foreach (var powercellData in _powercellTracker)
+            {
+                var charge = powercellData.Battery.charge;
+                amount += charge;
+                UpdateDisplay();
+            }
+
+            _charge = amount;
+        }
+
+        private void UpdateDisplay()
+        {
+            foreach (var powercellData in _powercellTracker)
+            {
+                _mono.Display.UpdateVisuals(powercellData, _powercellTracker.IndexOf(powercellData) + 1);
+            }
+        }
+
+        private void UpdateCapacity()
+        {
+            var amount = 0f;
+
+            foreach (var powercellData in _powercellTracker)
+            {
+                amount += powercellData.Battery.capacity;
+            }
+
+            _capacity = amount;
+        }
+
+        private IEnumerator UpdatePowerRelay()
+        {
+            QuickLogger.Debug("In UpdatePowerRelay");
+
+            var i = 1;
+
+            while (_connectedRelay == null)
+            {
+                QuickLogger.Debug($"Checking For Relay... Attempt {i}");
+
+                PowerRelay relay = PowerSource.FindRelay(this.transform);
+                if (relay != null && relay != _connectedRelay)
+                {
+                    _connectedRelay = relay;
+                    _connectedRelay.AddInboundPower(this);
+                    QuickLogger.Debug("PowerRelay found");
+                }
+                else
+                {
+                    _connectedRelay = null;
+                }
+
+                i++;
+                yield return new WaitForSeconds(0.5f);
+            }
+        }
 
         internal void Initialize(AIPowerCellSocketController mono)
         {
@@ -40,126 +180,24 @@ namespace FCSAIPowerCellSocket.Mono
             _batteryContainer.onRemoveItem += BatteryContainerOnOnRemoveItem;
         }
 
-        private void UpdateSlots()
+        internal int GetPowercellCount()
         {
-            _mono.UpdateSlots();
-        }
-
-        private void BatteryContainerOnOnRemoveItem(InventoryItem item)
-        {
-            var battery = item.item;
-
-            var id = battery.GetComponent<PrefabIdentifier>().Id;
-
-            var powercellData = PowercellTracker.Single(x => x.PrefabID == id);
-
-            PowercellTracker.Remove(powercellData);
-
-            UpdateCharge();
-
-            UpdateCapacity();
-
-            //_mono.UpdateSlots();
-
-            _mono.EmptySlot(PowercellTracker.Count + 1);
-        }
-
-        private void BatteryContainerOnOnAddItem(InventoryItem item)
-        {
-            var battery = item.item;
-            var techType = battery.GetTechType();
-            var id = battery.GetComponent<PrefabIdentifier>().Id;
-            var charge = battery.GetComponent<Battery>().charge;
-            var capacity = battery.GetComponent<Battery>().capacity;
-
-            var data = new PowercellData();
-            data.Initialize(battery);
-            PowercellTracker.Add(data);
-
-            UpdateCapacity();
-            UpdateCharge();
-
-            //_mono.UpdateSlots();
-
-            UpdateDisplay();
-            QuickLogger.Debug($"Added {techType}|{charge} with id {id} to the trackers", true);
-        }
-
-        private const int ContainerHeight = 2;
-
-        private const int ContainerWidth = 2;
-
-        private bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
-        {
-            bool flag = false;
-
-            var techType = pickupable.GetTechType();
-#if SUBNAUTICA
-            var equipType = CraftData.GetEquipmentType(techType);
-#elif BELOWZERO
-            var equipType = TechData.GetEquipmentType(techType);
-#endif
-
-
-            if (equipType == EquipmentType.PowerCellCharger)
-            {
-                flag = true;
-            }
-            else
-            {
-                QuickLogger.Message(AIPowerCellSocketBuildable.OnlyPowercellsAllowed(),true);
-            }
-
-            return flag;
+            return _powercellTracker.Count;
         }
 
         public float GetPower()
         {
-            if (Charge < 1f)
+            if (_charge < 1f)
             {
-                Charge = 0.0f;
+                _charge = 0.0f;
             }
 
-            return Charge;
+            return _charge;
         }
 
         public float GetMaxPower()
         {
-            return Capacity;
-        }
-
-        private void UpdateCharge()
-        {
-            var amount = 0f;
-
-            foreach (var powercellData in PowercellTracker)
-            {
-                var charge = powercellData.Battery.charge;
-                amount += charge;
-                UpdateDisplay();
-            }
-
-            Charge = amount;
-        }
-
-        private void UpdateDisplay()
-        {
-            foreach (var powercellData in PowercellTracker)
-            {
-                _mono.Display.UpdateVisuals(powercellData, PowercellTracker.IndexOf(powercellData) + 1);
-            }
-        }
-
-        private void UpdateCapacity()
-        {
-            var amount = 0f;
-
-            foreach (var powercellData in PowercellTracker)
-            {
-                amount += powercellData.Battery.capacity;
-            }
-
-            Capacity = amount;
+            return _capacity;
         }
 
         public bool ModifyPower(float amount, out float modified)
@@ -168,7 +206,7 @@ namespace FCSAIPowerCellSocket.Mono
 
             bool result = false;
 
-            foreach (PowercellData powercellData in PowercellTracker)
+            foreach (PowercellData powercellData in _powercellTracker)
             {
                 if (powercellData.Battery.charge >= Mathf.Abs(amount))
                 {
@@ -212,35 +250,8 @@ namespace FCSAIPowerCellSocket.Mono
         {
             return false;
         }
-
-        private IEnumerator UpdatePowerRelay()
-        {
-            QuickLogger.Debug("In UpdatePowerRelay");
-
-            var i = 1;
-
-            while (_connectedRelay == null)
-            {
-                QuickLogger.Debug($"Checking For Relay... Attempt {i}");
-
-                PowerRelay relay = PowerSource.FindRelay(this.transform);
-                if (relay != null && relay != _connectedRelay)
-                {
-                    _connectedRelay = relay;
-                    _connectedRelay.AddInboundPower(this);
-                    QuickLogger.Debug("PowerRelay found");
-                }
-                else
-                {
-                    _connectedRelay = null;
-                }
-
-                i++;
-                yield return new WaitForSeconds(0.5f);
-            }
-        }
-
-        public void OpenSlots()
+        
+        internal void OpenSlots()
         {
             QuickLogger.Debug($"Powercell Slots Open", true);
 
@@ -252,15 +263,7 @@ namespace FCSAIPowerCellSocket.Mono
             Inventory.main.SetUsedStorage(_batteryContainer, false);
             pda.Open(PDATab.Inventory, null, null, 4f);
         }
-
-        private void OnDestroy()
-        {
-            if (_batteryContainer == null) return;
-            _batteryContainer.isAllowedToAdd -= IsAllowedToAdd;
-            _batteryContainer.onAddItem -= BatteryContainerOnOnAddItem;
-            _batteryContainer.onRemoveItem -= BatteryContainerOnOnRemoveItem;
-        }
-
+        
         internal void LoadPowercellItems(IEnumerable<PowercellData> savedDataPowercellDatas)
         {
             foreach (PowercellData powercellData in savedDataPowercellDatas)
@@ -288,22 +291,11 @@ namespace FCSAIPowerCellSocket.Mono
 
         internal IEnumerable<PowercellData> GetSaveData()
         {
-            foreach (PowercellData powercellData in PowercellTracker)
+            foreach (PowercellData powercellData in _powercellTracker)
             {
                 powercellData.SaveData();
                 yield return powercellData;
             }
-        }
-
-        public void PollPowerRate(out float consumed, out float created)
-        {
-            consumed = 0f;
-            created = 0f;
-        }
-
-        public GameObject GetGameObject()
-        {
-            return base.gameObject;
         }
     }
 }

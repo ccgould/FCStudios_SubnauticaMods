@@ -12,12 +12,9 @@ namespace FCSAIPowerCellSocket.Mono
 {
     internal class AIPowerCellSocketDisplay : AIDisplay
     {
-        public Color colorEmpty = new Color(1f, 0f, 0f, 1f);
-
-        public Color colorHalf = new Color(1f, 1f, 0f, 1f);
-
-        public Color colorFull = new Color(0f, 1f, 0f, 1f);
-
+        private readonly Color _colorEmpty = new Color(1f, 0f, 0f, 1f);
+        private readonly Color _colorHalf = new Color(1f, 1f, 0f, 1f);
+        private readonly Color _colorFull = new Color(0f, 1f, 0f, 1f);
         private AIPowerCellSocketController _mono;
         private Text _s1Percent;
         private Image _s1Fill;
@@ -76,7 +73,7 @@ namespace FCSAIPowerCellSocket.Mono
                 return false;
             }
 
-            statuslbl.text = LanguageHelpers.GetLanguage(AIPowerCellSocketBuildable.StatusKey);
+            statuslbl.text = AIPowerCellSocketBuildable.Status();
 
             #endregion
 
@@ -91,7 +88,7 @@ namespace FCSAIPowerCellSocket.Mono
             _s1Percent = slot1.FindChild("percentage").GetComponent<Text>();
             _s1Percent.text = Language.main.Get("ChargerSlotEmpty");
             _s1Fill = slot1.FindChild("Fill").GetComponent<Image>();
-            _s1Fill.color = colorEmpty;
+            _s1Fill.color = _colorEmpty;
             _s1Fill.fillAmount = 0f;
             #endregion
 
@@ -106,7 +103,7 @@ namespace FCSAIPowerCellSocket.Mono
             _s2Percent = slot2.FindChild("percentage").GetComponent<Text>();
             _s2Percent.text = Language.main.Get("ChargerSlotEmpty");
             _s2Fill = slot2.FindChild("Fill").GetComponent<Image>();
-            _s2Fill.color = colorEmpty;
+            _s2Fill.color = _colorEmpty;
             _s2Fill.fillAmount = 0f;
             #endregion
 
@@ -121,7 +118,7 @@ namespace FCSAIPowerCellSocket.Mono
             _s3Percent = slot3.FindChild("percentage").GetComponent<Text>();
             _s3Percent.text = Language.main.Get("ChargerSlotEmpty");
             _s3Fill = slot3.FindChild("Fill").GetComponent<Image>();
-            _s3Fill.color = colorEmpty;
+            _s3Fill.color = _colorEmpty;
             _s3Fill.fillAmount = 0f;
             #endregion
 
@@ -136,7 +133,7 @@ namespace FCSAIPowerCellSocket.Mono
             _s4Percent = slot4.FindChild("percentage").GetComponent<Text>();
             _s4Percent.text = Language.main.Get("ChargerSlotEmpty");
             _s4Fill = slot4.FindChild("Fill").GetComponent<Image>();
-            _s4Fill.color = colorEmpty;
+            _s4Fill.color = _colorEmpty;
             _s4Fill.fillAmount = 0f;
             #endregion
 
@@ -183,13 +180,13 @@ namespace FCSAIPowerCellSocket.Mono
             {
                 if (data.Battery.charge >= 0f)
                 {
-                    Color value = (percent >= 0.5f) ? Color.Lerp(this.colorHalf, this.colorFull, 2f * percent - 1f) : Color.Lerp(this.colorEmpty, this.colorHalf, 2f * percent);
+                    Color value = (percent >= 0.5f) ? Color.Lerp(this._colorHalf, this._colorFull, 2f * percent - 1f) : Color.Lerp(this._colorEmpty, this._colorHalf, 2f * percent);
                     bar.color = value;
                     bar.fillAmount = percent;
                 }
                 else
                 {
-                    bar.color = colorEmpty;
+                    bar.color = _colorEmpty;
                     bar.fillAmount = 0f;
                 }
             }
@@ -227,7 +224,7 @@ namespace FCSAIPowerCellSocket.Mono
 
             if (bar != null)
             {
-                bar.color = colorEmpty;
+                bar.color = _colorEmpty;
                 bar.fillAmount = 0f;
             }
         }

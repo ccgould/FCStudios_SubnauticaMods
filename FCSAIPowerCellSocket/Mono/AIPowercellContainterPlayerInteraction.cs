@@ -15,9 +15,9 @@ namespace FCSAIPowerCellSocket.Mono
         {
             HandReticle main = HandReticle.main;
 #if SUBNAUTICA
-            main.SetInteractText(LanguageHelpers.GetLanguage(AIPowerCellSocketBuildable.OnHandOverKey));
+            main.SetInteractText(AIPowerCellSocketBuildable.OnHover());
 #elif BELOWZERO
-            main.SetText(HandReticle.TextType.Hand, LanguageHelpers.GetLanguage(AIPowerCellSocketBuildable.OnHandOverKey), false);
+            main.SetText(HandReticle.TextType.Hand, AIPowerCellSocketBuildable.OnHover(), false);
 #endif
             main.SetIcon(HandReticle.IconType.Hand, 1f);
         }

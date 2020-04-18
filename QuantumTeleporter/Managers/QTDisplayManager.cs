@@ -215,23 +215,8 @@ namespace QuantumTeleporter.Managers
             #endregion
 
             #region Grid
-            var gridResult = InterfaceHelpers.FindGameObject(home, "Grid", out var grid);
-
-            if (!gridResult)
-            {
-                QuickLogger.Error<QTDisplayManager>("Cant find grid on home page");
-                return false;
-            }
-
-            var _paginator = InterfaceHelpers.FindGameObject(home, "Paginator");
-
-            if (_paginator == null)
-            {
-                QuickLogger.Error<QTDisplayManager>("Cant find paginator on color home page");
-                return false;
-            }
-
-            _teleportGrid.Setup(7,QuantumTeleporterBuildable.ItemPrefab, grid,_startColor,_hoverColor,OnButtonClick);
+            _teleportGrid.Setup(7, QuantumTeleporterBuildable.ItemPrefab, home, _startColor, _hoverColor, OnButtonClick,
+                5, "PrevBTN", "NextBTN", "Grid", "Paginator", string.Empty);
             _teleportGrid.OnLoadDisplay += OnLoadDisplay;
             #endregion
 
@@ -269,7 +254,7 @@ namespace QuantumTeleporter.Managers
             #endregion
 
             #region Prev Color Button
-            var prevColorBtn = InterfaceHelpers.FindGameObject(colorPicker, "PrevButton");
+            var prevColorBtn = InterfaceHelpers.FindGameObject(colorPicker, "PrevBTN");
 
             if (prevColorBtn == null) return false;
 
@@ -277,27 +262,11 @@ namespace QuantumTeleporter.Managers
             #endregion
 
             #region Next Color Button
-            var nextColorBtn = InterfaceHelpers.FindGameObject(colorPicker, "NextButton");
+            var nextColorBtn = InterfaceHelpers.FindGameObject(colorPicker, "NextBTN");
 
             if (nextColorBtn == null) return false;
 
             InterfaceHelpers.CreatePaginator(nextColorBtn, 1, _colorPage.ChangeColorPageBy, _startColor, _hoverColor);
-            #endregion
-
-            #region Prev  Button
-            var prevBtn = InterfaceHelpers.FindGameObject(home, "PrevButton");
-
-            if (prevBtn == null) return false;
-
-            InterfaceHelpers.CreatePaginator(prevBtn, -1, _teleportGrid.ChangePageBy, _startColor, _hoverColor);
-            #endregion
-
-            #region Next Color Button
-            var nextBtn = InterfaceHelpers.FindGameObject(home, "NextButton");
-
-            if (nextBtn == null) return false;
-
-            InterfaceHelpers.CreatePaginator(nextBtn, 1, _teleportGrid.ChangePageBy, _startColor, _hoverColor);
             #endregion
             
             #region Global Toggle
