@@ -1,6 +1,7 @@
 
 
 
+
 ﻿
 <p align="center">
   <img width="100" height="100" src="https://i.imgur.com/DHjcUQS.png">
@@ -35,7 +36,10 @@ Here is a Chart of all the mods and the place to download on NexusMods.
 |Drop All On Death|This mod has one purpose and that is to empty your inventor and module slots on player death.|[#363](https://www.nexusmods.com/subnautica/mods/363)
 |Alterra Electrical Quantum Teleporter|Quantum Teleporter is a mod that allows you to teleport from one point to another inside a base (local) or from one base to another (global).|[#371](https://www.nexusmods.com/subnautica/mods/371)
 |Gaspod Collector |This mod collects gaspods that are in the range of it. All pods are stored within the gaspod collector and can be taken by using either the Take gaspod button to take one gaspod or the bulk button to fill the player's inventory with gaspods. |[#430](https://www.nexusmods.com/subnautica/mods/430)
-
+|OxStation |This adds extra habitat functionality to Subnautica by removing oxygen from bases until oxstation is build |[\[#386\]](https://www.nexusmods.com/subnautica/mods/386)
+|OxStation Vehicle Module |This adds extra functionality to Subnautica by removing oxygen from seamoth or prawn suit until the module is inserted in the module slot. |[#464](https://www.nexusmods.com/subnautica/mods/464)
+|OxStation Cyclops Module |This adds extra functionality to Subnautica by removing oxygen from cyclops until the module is inserted in the module slot. |[#465](https://www.nexusmods.com/subnautica/mods/465)
+|Hydroponic Harvester |This mod adds a new buildable to the game that allows you to clone plantable plants and corals from instead and outside your base wither its a water plant or land plant. |[#466](https://www.nexusmods.com/subnautica/mods/466)
 
 # Mods in Collaboration/Not Included in repo
 
