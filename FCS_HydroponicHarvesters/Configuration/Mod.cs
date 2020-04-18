@@ -35,19 +35,19 @@ namespace FCS_HydroponicHarvesters.Configuration
         internal static string AssetFolder => Path.Combine(ModName, "Assets");
         
         internal const string LargeFriendlyName = "Large Hydroponic Harvester";
-        internal const string LargeDescription = "A demo mod for FCStudios";
+        internal const string LargeDescription = "A large hydroponic harvester that allows you to store 4 DNA samples to clone.";
         internal const string LargeClassID = "LargeHydroponicHarvester";
         internal const string LargeHydroHarvKitClassID = "LargeHydroHarv_Kit";
         internal const string LargePrefabName = "HydroponicHarvesterLarge";
 
         internal const string MediumFriendlyName = "Medium Hydroponic Harvester";
-        internal const string MediumDescription = "A demo mod for FCStudios";
+        internal const string MediumDescription = "A medium hydroponic harvester that allows you to store 2 DNA samples to clone.";
         internal const string MediumClassID = "MediumHydroponicHarvester";
         internal const string MediumHydroHarvKitClassID = "MediumHydroHarv_Kit";
         internal const string MediumPrefabName = "HydroponicHarvesterMedium";
 
         internal const string SmallFriendlyName = "Small Hydroponic Harvester";
-        internal const string SmallDescription = "A demo mod for FCStudios";
+        internal const string SmallDescription = "A large hydroponic harvester that allows you to store 1 DNA sample to clone.";
         internal const string SmallClassID = "SmallHydroponicHarvester";
         internal const string SmallHydroHarvKitClassID = "SmallHydroHarv_Kit";
         internal const string SmallPrefabName = "HydroponicHarvesterSmall";

@@ -11,9 +11,11 @@ using FCSTechFabricator;
 using FCSTechFabricator.Components;
 using FCSTechFabricator.Craftables;
 using FCSTechFabricator.Objects;
+using Harmony;
 using QModManager.API.ModLoading;
 using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
+using Straitjacket.Utility;
 using UnityEngine;
 
 namespace FCS_HydroponicHarvesters
@@ -40,7 +42,12 @@ namespace FCS_HydroponicHarvesters
                 Configuration = Mod.LoadConfiguration();
 
                 AddTechFabricatorItems();
-                
+
+                var harmony = HarmonyInstance.Create("com.hydroponicharvestor.fcstudios");
+                harmony.PatchAll(Assembly.GetExecutingAssembly());
+
+                VersionChecker.Check("https://github.com/ccgould/FCStudios_SubnauticaMods/raw/master/FCS_HydroponicHarvesters/mod.json");
+
                 QuickLogger.Info("Finished patching");
             }
             catch (Exception ex)

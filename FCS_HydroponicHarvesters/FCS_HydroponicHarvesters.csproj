@@ -70,6 +70,9 @@
     <Reference Include="SMLHelper">
       <HintPath>..\Dependancies\Subnautica\SMLHelper.dll</HintPath>
     </Reference>
+    <Reference Include="Straitjacket.Utility.VersionChecker">
+      <HintPath>F:\Program Files\Epic Games\Subnautica\QMods\VersionChecker\Straitjacket.Utility.VersionChecker.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -133,6 +136,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Modules\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="mod.json" />
   </ItemGroup>
   <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
