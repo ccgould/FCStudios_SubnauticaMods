@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using FCSCommon.Components;
 using FCSCommon.Enums;
 using FCSCommon.Helpers;
+using FCSTechFabricator.Configuration;
 using FCSTechFabricator.Extensions;
 using FCSTechFabricator.Objects;
 using UnityEngine;
@@ -24,7 +24,7 @@ namespace FCSTechFabricator.Managers
         private int _maxColorPage = 1;
         private int _currentColorPage;
         private readonly List<ColorItemButton> _colorItemsTracker = new List<ColorItemButton>();
-        private readonly Color _defaultColor = Configuration.DefaultConfigurations.DefaultColor;
+        private readonly Color _defaultColor = DefaultConfigurations.DefaultColor;
 
         public Action<Color> OnColorChanged;
         public string HomeButtonMessage { get; set; }
@@ -139,9 +139,22 @@ namespace FCSTechFabricator.Managers
             SelectSavedColor(color);
         }
 
+        public void SetMaskColorFromSave(Color color)
+        {
+            ChangeColorMask(color);
+            SelectSavedColor(color);
+        }
+
         public Color GetColor()
         {
             var color = MaterialHelpers.GetBodyColor(_gameObject, _bodyMaterial);
+            if (color == null) return _defaultColor;
+            return (Color)color;
+        }
+
+        public Color GetMaskColor()
+        {
+            var color = MaterialHelpers.GetBodyMaskColor(_gameObject, _bodyMaterial);
             if (color == null) return _defaultColor;
             return (Color)color;
         }

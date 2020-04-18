@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using FCSCommon.Utilities;
 using UnityEngine;
 
@@ -20,6 +21,7 @@ namespace FCSCommon.Helpers
                 QuickLogger.Error<GameObjectHelpers>($"{e.Message}");
             }
         }
+
         internal static void DestroyComponent(GameObject obj)
         {
             var list = obj.GetComponents(typeof(Component));
@@ -35,18 +37,22 @@ namespace FCSCommon.Helpers
         {
             var length = GameObject.FindObjectsOfType<T>()?.Length;
             if (length != null)
-                return (int) length;
+                return (int)length;
             return 0;
         }
 
-        internal static GameObject FindGameObject(GameObject go,string name, SearchOption searchOption = SearchOption.Full)
+        internal static GameObject FindGameObject(GameObject go, string name,
+            SearchOption searchOption = SearchOption.Full)
         {
             try
             {
-                var renders = go.GetComponentsInChildren<MeshRenderer>();
-
-                foreach (MeshRenderer mesh in renders)
+                QuickLogger.Debug($"Trying to Find Gameobject {name} with searchOption:{searchOption} in {go?.name}");
+                var renders = FindGameObject(go?.transform);
+                
+                foreach (GameObject mesh in renders)
                 {
+                    QuickLogger.Debug($"Current Mesh Name: {mesh.name}");
+
                     switch (searchOption)
                     {
                         case SearchOption.Full:
@@ -54,24 +60,28 @@ namespace FCSCommon.Helpers
                             {
                                 return mesh.gameObject;
                             }
+
                             break;
                         case SearchOption.StartsWith:
                             if (mesh.name.StartsWith(name, StringComparison.OrdinalIgnoreCase))
                             {
                                 return mesh.gameObject;
                             }
+
                             break;
                         case SearchOption.EndsWith:
                             if (mesh.name.EndsWith(name, StringComparison.OrdinalIgnoreCase))
                             {
                                 return mesh.gameObject;
                             }
+
                             break;
                         case SearchOption.Contains:
                             if (mesh.name.Contains(name))
                             {
                                 return mesh.gameObject;
                             }
+
                             break;
                         default:
                             throw new ArgumentOutOfRangeException(nameof(searchOption), searchOption, null);
@@ -80,10 +90,24 @@ namespace FCSCommon.Helpers
             }
             catch (Exception e)
             {
-               QuickLogger.Error($"Message: {e.Message} StackTrace: {e.StackTrace}");
+                QuickLogger.Error($"Message: {e.Message} StackTrace: {e.StackTrace}");
             }
 
             return null;
+        }
+
+        private static IEnumerable<GameObject> FindGameObject(Transform tr)
+        {
+            foreach (Transform child in tr)
+            {
+                if (child == null) continue;
+                yield return child.gameObject;
+                if (child.childCount <= 0) continue;
+                foreach (var o in FindGameObject(child))
+                {
+                    yield return o.gameObject;
+                }
+            }
         }
     }
 

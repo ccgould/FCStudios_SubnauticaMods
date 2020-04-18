@@ -47,7 +47,7 @@ namespace OxStationVehiclesModules
             var icon = ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetFolder(), "OxStation.png"));
             var craftingTab = new CraftingTab("OX", "Oxstation", icon);
             
-            var h = new FCSVehicleModule("oxstationvehiclemodule", "Oxstation Vehicle Module", "A oxstation module for the seamoth and prawn suit", EquipmentType.VehicleModule, craftingTab, Mod.Ingredients);
+            var h = new FCSVehicleModule("oxstationvehiclemodule", "Oxstation Vehicle Module", "A oxstation module for the seamoth and prawn suit", EquipmentType.VehicleModule, craftingTab, Mod.OxstationSeamothPrawnIngredients);
             h.ChangeIconLocation(Mod.GetAssetFolder(), "icon");
             h.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
             Mod.ModuleTechType = h.TechType;

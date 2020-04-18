@@ -89,6 +89,9 @@
       <HintPath>..\Dependancies\UnityEngine.CoreModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="UnityEngine.InputLegacyModule">
+      <HintPath>..\Dependancies\UnityEngine.InputLegacyModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.PhysicsModule">
       <HintPath>..\Dependancies\UnityEngine.PhysicsModule.dll</HintPath>
       <Private>False</Private>
@@ -106,6 +109,12 @@
     <Compile Include="Mono\HorizontalDuckController.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FCSTechFabricator\FCSTechFabricator.csproj">
+      <Project>{5EF4ADB8-3AE7-41EC-83E1-1DAF04999F0E}</Project>
+      <Name>FCSTechFabricator</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

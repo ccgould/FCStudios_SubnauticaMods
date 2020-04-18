@@ -77,7 +77,7 @@ namespace FCS_HydroponicHarvesters
 
             foreach (var dnaSample in Mod.EatableDNASamples)
             {
-                var dna = new FCSDNASample(dnaSample.ClassID, dnaSample.Friendly, dnaSample.Description,dnaSample.Ingredient, dnaSample.Amount);
+                var dna = new FCSDNASample(dnaSample.ClassID, dnaSample.Friendly, dnaSample.Description, dnaSample.Ingredient, dnaSample.Amount);
                 dna.ChangeIconLocation(Mod.GetAssetFolder());
                 dna.Patch();
                 FcTechFabricatorService.PublicAPI.AddCraftNode(dna, "FCS_EatableDNA");

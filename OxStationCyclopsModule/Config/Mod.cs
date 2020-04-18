@@ -8,12 +8,19 @@ namespace OxStationCyclopsModule.Config
     {
         internal const string ModFolderName = "FCS_OxStationCyclopsModule";
 
-        internal static TechData Ingredients => new TechData
+#if SUBNAUTICA
+        internal static TechData OxstationCyclopsIngredients => new TechData
         {
+#elif BELOWZERO
+        internal static RecipeData OxstationCyclopsIngredients => new RecipeData
+        {
+#endif
             craftAmount = 1,
             Ingredients =
             {
-                new Ingredient(TechType.Kyanite, 8)
+                new Ingredient(TechType.PlasteelIngot, 1),
+                new Ingredient(TechType.WiringKit, 1),
+                new Ingredient(TechType.HighCapacityTank, 1),
             }
         };
 

@@ -43,7 +43,7 @@ namespace FCS_HydroponicHarvesters.Buildables
                 var prefab = GameObject.Instantiate(_prefab);
 
                 GameObjectHelpers.AddConstructableBounds(prefab, _bSize, _bCenter);
-                
+
                 var model = prefab.FindChild("model");
 
                 //========== Allows the building animation and material colors ==========// 
@@ -53,6 +53,10 @@ namespace FCS_HydroponicHarvesters.Buildables
                 skyApplier.renderers = renderers;
                 skyApplier.anchorSky = Skies.Auto;
                 //========== Allows the building animation and material colors ==========// 
+
+                // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
+                var lwe = prefab.AddComponent<LargeWorldEntity>();
+                lwe.cellLevel = LargeWorldEntity.CellLevel.Far;
 
                 // Add constructible
                 var constructable = prefab.AddComponent<Constructable>();
@@ -81,6 +85,8 @@ namespace FCS_HydroponicHarvesters.Buildables
 
                 prefab.AddComponent<TechTag>().type = TechType;
                 prefab.AddComponent<HydroHarvController>();
+                //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
+                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModName); 
                 return prefab;
             }
             catch (Exception e)

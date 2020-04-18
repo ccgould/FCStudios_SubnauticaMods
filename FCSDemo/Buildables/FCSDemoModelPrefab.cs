@@ -11,10 +11,10 @@ namespace FCSDemo.Buildables
     {
         private static GameObject _prefab;
         internal static GameObject ColorItemPrefab { get; set; }
-        internal static string BodyMaterial => $"{Mod.ModNamew}_COL";
-        internal static string SpecTexture => $"{Mod.ModNamew}_COL_SPEC";
-        internal static string LUMTexture => $"{Mod.ModNamew}_COL_LUM";
-        internal static string ColorIDTexture => $"{Mod.ModNamew}_COL_ID";
+        internal static string BodyMaterial => $"{Mod.ModName}_COL";
+        internal static string SpecTexture => $"{Mod.ModName}_COL_SPEC";
+        internal static string LUMTexture => $"{Mod.ModName}_COL_LUM";
+        internal static string ColorIDTexture => $"{Mod.ModName}_COL_ID";
         public bool GetPrefabs()
         {
 
@@ -26,7 +26,7 @@ namespace FCSDemo.Buildables
                 AssetBundle assetBundle = AssetHelper.Asset(Mod.ModName, Mod.BundleName);
 
                 //We have found the asset bundle and now we are going to continue by looking for the model.
-                GameObject prefab = assetBundle.LoadAsset<GameObject>("HydroponicHarvesterLarge");
+                GameObject prefab = assetBundle.LoadAsset<GameObject>(Mod.PrefabName);
 
                 //If the prefab isn't null lets add the shader to the materials
                 if (prefab != null)
@@ -63,7 +63,7 @@ namespace FCSDemo.Buildables
             MaterialHelpers.ApplyColorMaskShader(BodyMaterial, ColorIDTexture, Color.white, Color.red, Color.white, prefab, bundle); //Use color2 
             MaterialHelpers.ApplyEmissionShader(BodyMaterial, LUMTexture, prefab, bundle, Color.white);
             //MaterialHelpers.ApplyGlassShaderTemplate(prefab.FindChild("model").FindChild("HydroponicHarvesterGlass"),Mod.ClassID);
-            MaterialHelpers.ApplyAlphaShader(BodyMaterial,prefab);
+            //MaterialHelpers.ApplyAlphaShader(BodyMaterial,prefab);
             #endregion
         }
     }

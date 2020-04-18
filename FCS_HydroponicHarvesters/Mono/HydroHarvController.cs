@@ -22,6 +22,7 @@ namespace FCS_HydroponicHarvesters.Mono
         private bool _runStartUpOnEnable;
         private SaveDataEntry _savedData;
         private SpeedModes _currentMode = StartingMode;
+        private GameObject _seaBase;
 
         internal const SpeedModes StartingMode = SpeedModes.Off;
         public override bool IsConstructed { get; set; }
@@ -37,8 +38,8 @@ namespace FCS_HydroponicHarvesters.Mono
         internal HydroHarvLightManager LightManager { get; private set; }
         internal HydroHarvCleanerManager CleanerManager { get; private set; }
         internal DumpContainer CleanerDumpContainer { get; private set; }
-        
-        public SpeedModes CurrentSpeedMode
+        internal bool IsConnectedToBase => _seaBase != null && _seaBase.name.StartsWith("Base", StringComparison.OrdinalIgnoreCase);
+        internal SpeedModes CurrentSpeedMode
         {
             get => _currentMode;
             set
@@ -58,9 +59,8 @@ namespace FCS_HydroponicHarvesters.Mono
                 }
             }
         }
-
         internal HydroHarvPowerManager PowerManager { get; private set; }
-        public HydroHarvCleanerManager HydroHarvCleanerManager { get; private set; }
+        internal HydroHarvCleanerManager HydroHarvCleanerManager { get; private set; }
 
         #region Unity
 
@@ -82,7 +82,7 @@ namespace FCS_HydroponicHarvesters.Mono
 
                     if (_savedData != null)
                     {
-                        ColorManager.SetColorFromSave(_savedData.BodyColor.Vector4ToColor());
+                        ColorManager.SetMaskColorFromSave(_savedData.BodyColor.Vector4ToColor());
                         HydroHarvContainer.Load(_savedData.Container);
                         HydroHarvGrowBed.SetBedType(_savedData.BedType);
                         DisplayManager.RefreshModeBTN(_savedData.BedType);
@@ -140,6 +140,8 @@ namespace FCS_HydroponicHarvesters.Mono
 
             if (constructed)
             {
+                _seaBase = gameObject?.transform?.parent?.gameObject;
+
                 if (isActiveAndEnabled)
                 {
                     if (!IsInitialized)
@@ -286,7 +288,7 @@ namespace FCS_HydroponicHarvesters.Mono
             }
             
             _savedData.ID = id;
-            _savedData.BodyColor = ColorManager.GetColor().ColorToVector4();
+            _savedData.BodyColor = ColorManager.GetMaskColor().ColorToVector4();
             _savedData.Container = HydroHarvContainer.Save();
             _savedData.GenerationProgress = Producer.GenerationProgress;
             _savedData.CoolDownProgress = Producer.CoolDownProgress;

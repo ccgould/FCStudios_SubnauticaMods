@@ -13,24 +13,24 @@ namespace FCS_HydroponicHarvesters.Mono
         private HydroHarvController _mono;
         private PowerRelay _connectedRelay;
         private float _energyToConsume;
-        private float AvailablePower => this.ConnectedRelay.GetPower();
+        private float AvailablePower => ConnectedRelay.GetPower();
         
         private PowerRelay ConnectedRelay
         {
             get
             {
-                while (_connectedRelay == null)
-                    UpdatePowerRelay();
-
+                if (_mono != null && _mono.IsConnectedToBase)
+                {
+                    while (_connectedRelay == null)
+                        UpdatePowerRelay();
+                }
                 return _connectedRelay;
             }
         }
-
-        internal Action OnPowerAvaliable { get; set; }
-
+        
         private void UpdatePowerRelay()
         {
-            PowerRelay relay = PowerSource.FindRelay(this.transform);
+            PowerRelay relay = PowerSource.FindRelay(transform);
             if (relay != null && relay != _connectedRelay)
             {
                 _connectedRelay = relay;
@@ -49,6 +49,7 @@ namespace FCS_HydroponicHarvesters.Mono
 
         private void Update()
         {
+            if (_mono == null || !_mono.IsConnectedToBase) return;
             _energyToConsume =  EnergyConsumptionPerSecond * DayNightCycle.main.deltaTime;
             _mono.DisplayManager.UpdatePowerUsagePerSecond();
         }

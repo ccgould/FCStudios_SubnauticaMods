@@ -231,7 +231,7 @@ namespace QuantumTeleporter.Managers
                 return false;
             }
 
-            _teleportGrid.Initialize(QuantumTeleporterBuildable.ItemPrefab, grid, _paginator, 7, OnButtonClick);
+            _teleportGrid.Setup(7,QuantumTeleporterBuildable.ItemPrefab, grid,_startColor,_hoverColor,OnButtonClick);
             _teleportGrid.OnLoadDisplay += OnLoadDisplay;
             #endregion
 
@@ -408,7 +408,7 @@ namespace QuantumTeleporter.Managers
            QuickLogger.Debug(change.isOn ? "Adding to Global List" : "Removing from Global List");
         }
 
-        private void OnLoadDisplay(GameObject itemPrefab, GameObject itemsGrid,int stPos,int endPos)
+        private void OnLoadDisplay(DisplayData data)
         {
             List<FCSController> items = null;
 
@@ -427,24 +427,24 @@ namespace QuantumTeleporter.Managers
                 return;
             }
 
-            if (endPos > items.Count)
+            if (data.EndPosition > items.Count)
             {
-                endPos = items.Count;
+                data.EndPosition = items.Count;
             }
             
             _teleportGrid.ClearPage();
             
-            for (int i = stPos; i < endPos; i++)
+            for (int i = data.StartPosition; i < data.EndPosition; i++)
             {
                 var unit = items[i];
                 var unitName = unit.GetName();
                 
                 if(unit == _mono) continue;
 
-                GameObject itemDisplay = Instantiate(itemPrefab);
+                GameObject itemDisplay = Instantiate(data.ItemsPrefab);
                 var statusLBL = InterfaceHelpers.FindGameObject(itemDisplay, "Status_LBL");
 
-                if (itemDisplay == null || itemsGrid == null)
+                if (itemDisplay == null || data.ItemsGrid == null)
                 {
                     if (itemDisplay != null)
                     {
@@ -453,7 +453,7 @@ namespace QuantumTeleporter.Managers
                     return;
                 }
                         
-                itemDisplay.transform.SetParent(itemsGrid.transform, false);
+                itemDisplay.transform.SetParent(data.ItemsGrid.transform, false);
                 var textField = itemDisplay.transform.Find("Location_LBL").gameObject;
                 var text = textField.GetComponent<Text>();
                 text.text = unitName;

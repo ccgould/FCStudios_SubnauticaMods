@@ -58,7 +58,7 @@ namespace FCSCommon.Helpers
             if(homeBtnName != string.Empty)
             {
                 var homeBTN = InterfaceHelpers.FindGameObject(gridPage, homeBtnName);
-                InterfaceHelpers.CreateButton(homeBTN, "HomeBTN", InterfaceButtonMode.Background,
+                InterfaceHelpers.CreateButton(homeBTN, homeBtnName, InterfaceButtonMode.Background,
                     onButtonClick, startColor, hoverColor, maxInteractionRange, HomeButtonMessage);
             }
             #endregion

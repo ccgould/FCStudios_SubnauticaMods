@@ -58,7 +58,7 @@ namespace AE.SeaCooker.Managers
                     UpdateCookingButton();
                     break;
 
-                case "homeBTN":
+                case "HomeBTN":
                     UpdatePage(1);
                     break;
 
@@ -258,17 +258,6 @@ namespace AE.SeaCooker.Managers
 
             #endregion
 
-            #region Settings Page Home BTN
-            var homeBTN = InterfaceHelpers.CreateButton(settings, "Home_BTN", "homeBTN", InterfaceButtonMode.Background,
-        OnButtonClick, out var homeButton);
-            homeButton.TextLineOne = $"{SeaCookerBuildable.GoToHomePage()}" ;
-
-            if (!homeBTN)
-            {
-                return false;
-            }
-            #endregion
-
             #region Settings Color BTN
             var settingsCResult = InterfaceHelpers.CreateButton(colorPicker, "Home_BTN", "settingsBTN", InterfaceButtonMode.TextColor,
                 OnButtonClick, out var settings_C_BTN);
@@ -333,15 +322,6 @@ namespace AE.SeaCooker.Managers
             }
             _colorGrid = colorGrid;
             #endregion
-
-            #region Paginator
-            var numKeyResult = InterfaceHelpers.FindGameObject(settings, "numKey", out var numKey);
-
-            if (!numKeyResult)
-            {
-                return false;
-            }
-            #endregion
             
             #region SeaBreeze Grid
             var seaBreezeGridResult = InterfaceHelpers.FindGameObject(settings, "Grid", out var seaBreezeGrid);
@@ -351,36 +331,8 @@ namespace AE.SeaCooker.Managers
                 return false;
             }
 
-            _seaBreezeGrid.Initialize(SeaCookerBuildable.SeaBreezeItemPrefab,seaBreezeGrid,numKey, 4,OnButtonClick );
+            _seaBreezeGrid.Setup(4,SeaCookerBuildable.SeaBreezeItemPrefab,settings,Color.white, new Color(0.07f, 0.38f, 0.7f, 1f), OnButtonClick);
             _seaBreezeGrid.OnLoadDisplay += OnLoadDisplay;
-            #endregion
-
-            #region Prev Button
-            var prevSBTN = settings.FindChild("prev_BTN")?.gameObject;
-            if (prevSBTN == null)
-            {
-                QuickLogger.Error("Settings Prev_BTN not found.");
-                return false;
-            }
-
-            PaginatorButton prev_S_BTN = prevSBTN.AddComponent<PaginatorButton>();
-            //prev_S_BTN.TextLineOne = GetLanguage(DisplayLanguagePatching.PrevPageKey);
-            prev_S_BTN.ChangePageBy = _seaBreezeGrid.ChangePageBy;
-            prev_S_BTN.AmountToChangePageBy = -1;
-            #endregion
-
-            #region Next Button
-            var nextSBTN = settings.FindChild("next_BTN")?.gameObject;
-            if (nextSBTN == null)
-            {
-                QuickLogger.Error("Setting Next_BTN not found.");
-                return false;
-            }
-
-            PaginatorButton next_S_BTN = nextSBTN.AddComponent<PaginatorButton>();
-            //next_S_BTN.TextLineOne = GetLanguage(DisplayLanguagePatching.NextPageKey);
-            next_S_BTN.ChangePageBy = _seaBreezeGrid.ChangePageBy;
-            next_S_BTN.AmountToChangePageBy = 1;
             #endregion
             
             #region From Image OMIT
@@ -482,7 +434,7 @@ namespace AE.SeaCooker.Managers
             return true;
         }
 
-        private void OnLoadDisplay(GameObject itemPrefab, GameObject itemsGrid, int stPos, int endPos)
+        private void OnLoadDisplay(DisplayData data)
         {
             QuickLogger.Debug("Loading SeaBreeze Display");
 
@@ -491,14 +443,14 @@ namespace AE.SeaCooker.Managers
             var items = _mono.SeaBreezes.Keys;
 
 
-            if (endPos > items.Count)
+            if (data.EndPosition > items.Count)
             {
-                endPos = items.Count;
+                data.EndPosition = items.Count;
             }
 
             _seaBreezeGrid.ClearPage();
 
-            for (int i = stPos; i < endPos; i++)
+            for (int i = data.StartPosition; i < data.EndPosition; i++)
             {
 
                 var unit = _mono.SeaBreezes.Values.ElementAt(i);
@@ -506,9 +458,9 @@ namespace AE.SeaCooker.Managers
                 var unitName = unitNameController.GetName();
                 unitNameController.SubscribeToNameChange(OnLabelChanged);
 
-                GameObject itemDisplay = Instantiate(itemPrefab);
+                GameObject itemDisplay = Instantiate(data.ItemsPrefab);
 
-                itemDisplay.transform.SetParent(itemsGrid.transform, false);
+                itemDisplay.transform.SetParent(data.ItemsGrid.transform, false);
                 var text = itemDisplay.transform.Find("Text").GetComponent<Text>();
                 text.text = unitName;
 

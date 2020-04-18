@@ -28,11 +28,9 @@ namespace FCSDemo.Configuration
         #region Internal Properties
         internal const string ModName = "FCSDemo";
         internal const string BundleName = "fcsdemo";
-        internal const string GasPodCollectorTabID = "FCSD";
         internal const string FriendlyName = "FCS Demo";
         internal const string Description = "A demo mod for FCStudios";
         internal const string ClassID = "FcsDemo";
-        internal const string ModNamew = "HydroponicHarvester";
         internal const string PrefabName = "DemoModel";
         internal static string AssetFolder => Path.Combine(ModName, "Assets");
 
@@ -206,17 +204,20 @@ namespace FCSDemo.Configuration
     internal class Config
     {
         [JsonProperty] internal float PowerUsage { get; set; } = 0.1f;
-        [JsonProperty] internal bool AllowedOutside = false;
-        [JsonProperty] internal bool AllowedInBase = true;
-        [JsonProperty] internal bool AllowedOnGround = true;
-        [JsonProperty] internal bool AllowedOnWall = false;
-        [JsonProperty] internal bool RotationEnabled = true;
-        [JsonProperty] internal bool AllowedOnCeiling = false;
-        [JsonProperty] internal bool AllowedInSub = false;
-        [JsonProperty] internal bool AllowedOnConstructables = false;
-        [JsonProperty] internal bool UseCustomBoundingBox = false;
-        [JsonProperty] internal Vec3 BoundingCenter = new Vec3(0f, 0, 0f);
-        [JsonProperty] internal Vec3 BoundingSize = new Vec3(0, 0, 0);
+        [JsonProperty] internal float PlaceMaxDistance { get; set; } = 5f;
+        [JsonProperty] internal float PlaceMinDistance { get; set; } = 1.2f;
+        [JsonProperty] internal float PlaceDefaultDistance { get; set; } = 2f;
+        [JsonProperty] internal bool AllowedOutside { get; set; } = false;
+        [JsonProperty] internal bool AllowedInBase { get; set; } = true;
+        [JsonProperty] internal bool AllowedOnGround { get; set; } = true;
+        [JsonProperty] internal bool AllowedOnWall { get; set; } = false;
+        [JsonProperty] internal bool RotationEnabled { get; set; } = true;
+        [JsonProperty] internal bool AllowedOnCeiling { get; set; } = false;
+        [JsonProperty] internal bool AllowedInSub { get; set; } = false;
+        [JsonProperty] internal bool AllowedOnConstructables { get; set; } = false;
+        [JsonProperty] internal bool UseCustomBoundingBox { get; set; } = false;
+        [JsonProperty] internal Vec3 BoundingCenter { get; set; } = new Vec3(0f, 0, 0f);
+        [JsonProperty] internal Vec3 BoundingSize { get; set; } = new Vec3(0, 0, 0);
     }
 
     internal class ConfigFile

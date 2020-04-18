@@ -61,55 +61,7 @@ namespace MAC.OxStation.Config
                 new Ingredient(TechType.Tank, 1)
             }
         };
-
-#if SUBNAUTICA
-        internal static TechData OxstationCyclopsIngredients => new TechData
-        {
-#elif BELOWZERO
-        internal static RecipeData OxstationCyclopsIngredients => new RecipeData
-        {
-#endif
-            craftAmount = 1,
-            Ingredients =
-            {
-                new Ingredient(TechType.PlasteelIngot, 1),
-                new Ingredient(TechType.WiringKit, 1),
-                new Ingredient(TechType.HighCapacityTank, 1),
-            }
-        };
-
-#if SUBNAUTICA
-        internal static TechData OxstationSeamothIngredients => new TechData
-        {
-#elif BELOWZERO
-        internal static RecipeData OxstationSeamothIngredients => new RecipeData
-        {
-#endif
-            craftAmount = 1,
-            Ingredients =
-            {
-                new Ingredient(TechType.TitaniumIngot, 1),
-                new Ingredient(TechType.WiringKit, 1),
-                new Ingredient(TechType.Tank, 1),
-            }
-        };
-
-#if SUBNAUTICA
-        internal static TechData OxstationPrawnSuitIngredients => new TechData
-        {
-#elif BELOWZERO
-        internal static RecipeData OxstationSeamothIngredients => new RecipeData
-        {
-#endif
-            craftAmount = 1,
-            Ingredients =
-            {
-                new Ingredient(TechType.TitaniumIngot, 1),
-                new Ingredient(TechType.WiringKit, 1),
-                new Ingredient(TechType.Tank, 1),
-            }
-        };
-
+        
 #if SUBNAUTICA
         internal static TechData OxstationScreenIngredients => new TechData
         {

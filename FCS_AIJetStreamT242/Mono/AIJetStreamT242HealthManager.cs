@@ -140,7 +140,7 @@ namespace FCS_AIMarineTurbine.Mono
 
         private void UpdateDamageState()
         {
-            if (IsDamagedFlag)
+            if (IsDamagedFlag || QPatch.Bundle != null)
             {
                 _damage.SetActive(true);
                 MaterialHelpers.ApplyEmissionShader("SystemLights_BaseColor", "SystemLights_OffMode_Emissive", gameObject, QPatch.Bundle, new Color(0.08235294f, 1f, 1f));

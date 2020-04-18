@@ -50,7 +50,7 @@ namespace FCS_AIMarineTurbine
                 QuickLogger.Info("Finished patching");
                 
                 QuickLogger.Debug("Unload Bundle");
-                Bundle.Unload(false);
+                //Bundle.Unload(false);
                 QuickLogger.Debug("Bundle Unloaded");
             }
             catch (Exception ex)

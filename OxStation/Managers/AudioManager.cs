@@ -12,8 +12,8 @@ namespace MAC.OxStation.Managers
         private readonly FMOD_CustomLoopingEmitter _loopingEmitter;
         private bool _soundPlaying;
         private FMODAsset _loop;
-        private const string BeaconAudioLoop = "water_filter_loop";
-        private const string BeaconAudioLoopPath = "Submarine/Build/FiltrationMachine";
+        private const string FilterAudioLoop = "water_filter_loop";
+        private const string FilterAudioLoopPath = "Submarine/Build/FiltrationMachine";
         #endregion
 
         #region Constructor
@@ -39,8 +39,8 @@ namespace MAC.OxStation.Managers
             {
                 switch (fmod.name.ToLower())
                 {
-                    case BeaconAudioLoop:
-                        QuickLogger.Debug($"{BeaconAudioLoop} found!", true);
+                    case FilterAudioLoop:
+                        QuickLogger.Debug($"{FilterAudioLoop} found!", true);
                         this._loop = fmod;
                         break;
                 }
@@ -48,8 +48,8 @@ namespace MAC.OxStation.Managers
 
             if (_loop == null)
             {
-                QuickLogger.Debug($"{BeaconAudioLoop} not found trying to search again...", true);
-                Resources.Load<GameObject>(BeaconAudioLoopPath);
+                QuickLogger.Debug($"{FilterAudioLoop} not found trying to search again...", true);
+                Resources.Load<GameObject>(FilterAudioLoopPath);
                 LoadFModAssets();
             }
         }

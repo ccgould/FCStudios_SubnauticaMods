@@ -164,12 +164,12 @@ namespace FCS_DeepDriller.Buildable.MK1
         /// <param name="prefab">The prefab to apply shaders.</param>
         internal static void ApplyShaders(GameObject prefab)
         {
-            #region AMMiniMedBay_BaseColor
+            #region DeepDriller_BaseColor
             MaterialHelpers.ApplyAlphaShader("DeepDriller_BaseColor_BaseColor", prefab);
             MaterialHelpers.ApplySpecShader("DeepDriller_BaseColor_BaseColor", "DeepDriller_Spec", prefab, 1, 0.5f, AssetBundle);
             MaterialHelpers.ApplyNormalShader("DeepDriller_BaseColor_BaseColor", "DeepDriller_Norm", prefab, AssetBundle);
-            MaterialHelpers.ApplyEmissionShader("DeepDriller_BaseColor_BaseColor", "DeepDriller_Emissive_On", prefab, AssetBundle, new Color(0.08235294f, 1f, 1f));
-            MaterialHelpers.ApplyEmissionShader("DeepDriller_DigState", "DeepDriller_DigStateEmissive", prefab, AssetBundle, new Color(0.08235294f, 1f, 1f));
+            MaterialHelpers.ApplyEmissionShader("DeepDriller_BaseColor_BaseColor", "DeepDriller_Emissive_On", prefab, AssetBundle, Color.white);
+            MaterialHelpers.ApplyEmissionShader("DeepDriller_DigState", "DeepDriller_DigStateEmissive", prefab, AssetBundle, Color.white);
             MaterialHelpers.ApplyEmissionShader("Lava_Rock", "lava_rock_emission", prefab, AssetBundle, Color.white);
             MaterialHelpers.ApplyNormalShader("Lava_Rock", "lava_rock_01_normal", prefab, AssetBundle);
             #endregion

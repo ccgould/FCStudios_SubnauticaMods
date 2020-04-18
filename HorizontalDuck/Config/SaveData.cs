@@ -1,4 +1,5 @@
 ﻿using FCSCommon.Objects;
+using FCSTechFabricator.Objects;
 using Oculus.Newtonsoft.Json;
 
 namespace HorizontalDuck.Config

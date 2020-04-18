@@ -8,15 +8,21 @@ namespace OxStationVehiclesModules.Configuration
     {
         internal const string ModFolderName = "FCS_OxStationVehiclesModules";
 
-        internal static TechData Ingredients => new TechData
+#if SUBNAUTICA
+        internal static TechData OxstationSeamothPrawnIngredients => new TechData
         {
+#elif BELOWZERO
+        internal static RecipeData OxstationSeamothPrawnIngredients => new RecipeData
+        {
+#endif
             craftAmount = 1,
             Ingredients =
             {
-                new Ingredient(TechType.Kyanite, 8)
+                new Ingredient(TechType.TitaniumIngot, 1),
+                new Ingredient(TechType.WiringKit, 1),
+                new Ingredient(TechType.Tank, 1),
             }
         };
-
         public static TechType ModuleTechType { get; set; }
 
         internal static string GetAssetFolder()

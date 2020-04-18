@@ -150,7 +150,8 @@ namespace FCS_HydroponicHarvesters.Mono
         public override void PowerOnDisplay()
         {
             QuickLogger.Debug("Power On Display",true);
-           _mono.AnimationManager.SetIntHash(_page,1);
+
+            _mono.AnimationManager.SetIntHash(_page, _mono.IsConnectedToBase ? 1 : -1);
         }
 
         public override bool FindAllComponents()
@@ -169,6 +170,11 @@ namespace FCS_HydroponicHarvesters.Mono
 
                 #region Home
                 var home = InterfaceHelpers.FindGameObject(canvasGameObject, "Home");
+                #endregion
+
+                #region NotOnBase
+                var notOnbase = InterfaceHelpers.FindGameObject(canvasGameObject, "NotOnBase")?.GetComponentInChildren<Text>();
+                if (notOnbase != null) notOnbase.text = HydroponicHarvestersBuildable.NotOnBaseMessage();
                 #endregion
 
                 #region Controls

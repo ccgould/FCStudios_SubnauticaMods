@@ -92,11 +92,10 @@ namespace FCSCommon.Helpers
                     if (material.name.StartsWith(materialName, StringComparison.OrdinalIgnoreCase))
                     {
                         material.shader = shader;
-                        //material.EnableKeyword("_EMISSION");
                         material.EnableKeyword("MARMO_EMISSION");
-                        //material.SetVector("_EmissionColor", emissionColor * emissionMuli);
                         material.SetTexture("_Illum", FindTexture2D(textureName, assetBundle));
-                        //material.SetVector("_Illum_ST", new Vector4(1.0f, 1.0f, 0.0f, 0.0f));
+                        material.SetFloat("_EnableGlow", 1);
+                        material.SetColor("_GlowColor", emissionColor);
                     }
                 }
             }
@@ -208,30 +207,6 @@ namespace FCSCommon.Helpers
 
                         material.SetFloat("_Fresnel", 0f);
                         material.SetVector("_SpecTex_ST", new Vector4(1.0f, 1.0f, 0.0f, 0.0f));
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Applies the properties for the MarmosetUBER shader to make a material that has a transparency layer become transparent.
-        /// </summary>
-        /// <param name="materialName">The name of the material to look for on the object.</param>
-        /// <param name="gameObject">The game object to process.</param>
-        internal static void ApplyAlphaShader(string materialName, GameObject gameObject)
-        {
-            var shader = Shader.Find("MarmosetUBER");
-            Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>(true);
-            foreach (Renderer renderer in renderers)
-            {
-                foreach (Material material in renderer.materials)
-                {
-                    if (material.name.StartsWith(materialName, StringComparison.OrdinalIgnoreCase))
-                    {
-                        material.shader = shader;
-                        material.EnableKeyword("_ZWRITE_ON");
-                        material.EnableKeyword("MARMO_ALPHA");
-                        material.EnableKeyword("MARMO_ALPHA_CLIP");
                     }
                 }
             }
@@ -381,18 +356,47 @@ namespace FCSCommon.Helpers
                     if (material.name.StartsWith(materialName, StringComparison.OrdinalIgnoreCase))
                     {
                         material.shader = shader;
-
+                        QuickLogger.Debug("Setting Color Mask Shader",true);
+                        
                         material.EnableKeyword("UWE_3COLOR");
+                        QuickLogger.Debug("Setting Color Mask UWE_3COLOR", true);
 
                         material.SetFloat("_Enable3Color", 1);
                         
                         material.SetTexture("_MultiColorMask", FindTexture2D(maskTexture, assetBundle));
+                        QuickLogger.Debug("Setting Color Mask _MultiColorMask", true);
 
                         material.SetColor("_Color", color);
+                        QuickLogger.Debug("Setting Color Mask _Color", true);
 
                         material.SetColor("_Color2", color2);
+                        QuickLogger.Debug("Setting Color Mask _Color2", true);
 
                         material.SetColor("_Color3", color3);
+                        QuickLogger.Debug("Setting Color Mask _Color3", true);
+
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Applies the properties for the MarmosetUBER shader to make a material that has a transparency layer become transparent.
+        /// </summary>
+        /// <param name="materialName">The name of the material to look for on the object.</param>
+        /// <param name="gameObject">The game object to process.</param>
+        internal static void ApplyAlphaShader(string materialName, GameObject gameObject)
+        {
+            var shader = Shader.Find("MarmosetUBER");
+            Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>(true);
+            foreach (Renderer renderer in renderers)
+            {
+                foreach (Material material in renderer.materials)
+                {
+                    if (material.name.StartsWith(materialName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        material.shader = shader;
+                        material.EnableKeyword("MARMO_ALPHA_CLIP");
                     }
                 }
             }
@@ -467,6 +471,23 @@ namespace FCSCommon.Helpers
             newBubbles.transform.Rotate(rotation);
             newBubbles.transform.localScale = scale;
             newBubbles.SetActive(false);
+        }
+
+        public static Color? GetBodyMaskColor(GameObject gameObject, string materialName)
+        {
+            Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>(true);
+            foreach (Renderer renderer in renderers)
+            {
+                foreach (Material material in renderer.materials)
+                {
+                    if (material.name.StartsWith(materialName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return material.GetColor("_Color2");
+                    }
+                }
+            }
+
+            return null;
         }
     }
 }

@@ -2,6 +2,7 @@
 using FCS_HydroponicHarvesters.Configuration;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
+using FCSTechFabricator.Configuration;
 using SMLHelper.V2.Assets;
 using UnityEngine;
 
@@ -13,6 +14,7 @@ namespace FCS_HydroponicHarvesters.Buildables
         internal static GameObject ColorItemPrefab { get; set; }
         internal static GameObject ItemPrefab { get; set; }
         internal static string BodyMaterial => $"{Mod.ModName}_COL";
+        internal static string DecalMaterial => $"{Mod.ModName}_COL_Decals";
         internal static string SpecTexture => $"{Mod.ModName}_COL_SPEC";
         internal static string LUMTexture => $"{Mod.ModName}_COL_LUM";
         internal static string ColorIDTexture => $"{Mod.ModName}_COL_ID";
@@ -141,11 +143,10 @@ namespace FCS_HydroponicHarvesters.Buildables
         private static void ApplyShaders(GameObject prefab, AssetBundle bundle)
         {
             #region BaseColor
-            MaterialHelpers.ApplyColorMaskShader(BodyMaterial, "HydroponicHarvester_COL_ID", Color.white, Color.red, Color.white, prefab, bundle); //Use color2 
+            MaterialHelpers.ApplyColorMaskShader(BodyMaterial, "HydroponicHarvester_COL_ID", Color.white, DefaultConfigurations.DefaultColor, Color.white, prefab, bundle); //Use color2 
             MaterialHelpers.ApplySpecShader(BodyMaterial, SpecTexture, prefab, 1, 3f, bundle);
             MaterialHelpers.ApplyEmissionShader(BodyMaterial, LUMTexture, prefab, bundle, Color.white);
-            MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModName);
-            MaterialHelpers.ApplyAlphaShader(BodyMaterial, prefab);
+            MaterialHelpers.ApplyAlphaShader(DecalMaterial, prefab);
             #endregion
         }
     }

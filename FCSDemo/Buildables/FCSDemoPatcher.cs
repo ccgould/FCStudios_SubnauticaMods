@@ -62,9 +62,9 @@ namespace FCSDemo.Buildables
                 constructable.allowedInSub = QPatch.Configuration.Config.AllowedInSub;
                 constructable.allowedOnConstructables = QPatch.Configuration.Config.AllowedOnConstructables;
 
-                constructable.placeMaxDistance = 7f;
-                constructable.placeMinDistance = 5f;
-                constructable.placeDefaultDistance = 6f;
+                constructable.placeMaxDistance = QPatch.Configuration.Config.PlaceMaxDistance;//7f;
+                constructable.placeMinDistance = QPatch.Configuration.Config.PlaceMinDistance; //5f;
+                constructable.placeDefaultDistance = QPatch.Configuration.Config.PlaceDefaultDistance; //6f;
                 constructable.model = model;
                 constructable.techType = Singleton.TechType;
 

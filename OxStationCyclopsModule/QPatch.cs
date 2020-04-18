@@ -49,7 +49,7 @@ namespace OxStationCyclopsModule
             var icon = ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetFolder(), "OxStation.png"));
             var craftingTab = new CraftingTab("OX", "Oxstation", icon);
 
-            var h = new FCSVehicleModule("oxstationcyclopsmodule", "Oxstation Cyclops Module", "A oxstation module for the cyclops", EquipmentType.CyclopsModule, craftingTab, Mod.Ingredients);
+            var h = new FCSVehicleModule("oxstationcyclopsmodule", "Oxstation Cyclops Module", "A oxstation module for the cyclops", EquipmentType.CyclopsModule, craftingTab, Mod.OxstationCyclopsIngredients);
             h.ChangeIconLocation(Mod.GetAssetFolder(), "icon");
             h.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
             Mod.ModuleTechType = h.TechType;

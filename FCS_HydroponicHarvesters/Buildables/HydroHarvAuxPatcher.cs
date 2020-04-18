@@ -20,6 +20,7 @@ namespace FCS_HydroponicHarvesters.Buildables
         private const string HMSTimeKey = "HH_HMSTime";
         private const string AmountOfItemsKey = "HH_Items";
         private const string HasItemsMessageKey = "HH_HasItemsMessage";
+        private const string NotOnBaseKey = "HH_NotOnBase";
         internal string BuildableName { get; set; }
 
         internal TechType TechTypeID { get; set; }
@@ -40,6 +41,7 @@ namespace FCS_HydroponicHarvesters.Buildables
             LanguageHandler.SetLanguageLine(HMSTimeKey, "Time Left Until Dirty: {0}");
             LanguageHandler.SetLanguageLine(AmountOfItemsKey, "{0} Items");
             LanguageHandler.SetLanguageLine(HasItemsMessageKey, "Hydroponic Harvester is not empty.");
+            LanguageHandler.SetLanguageLine(NotOnBaseKey, "NOT CONNECTED TO A BASE CANNOT OPERATE");
         }
 
         internal static string Max()
@@ -94,6 +96,11 @@ namespace FCS_HydroponicHarvesters.Buildables
         internal static string HasItemsMessage()
         {
             return Language.main.Get(HasItemsMessageKey);
+        }
+
+        internal static string NotOnBaseMessage()
+        {
+            return Language.main.Get(NotOnBaseKey);
         }
     }
 }

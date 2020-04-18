@@ -161,7 +161,7 @@ namespace MAC.OxStation.Mono
         }
         private PrefabIdentifier GetPrefabID()
         {
-            return GetComponentInParent<PrefabIdentifier>() ?? GetComponentInChildren<PrefabIdentifier>();
+            return GetComponentInChildren<PrefabIdentifier>() ?? GetComponentInParent<PrefabIdentifier>();
         }
         
         private void Setup()
