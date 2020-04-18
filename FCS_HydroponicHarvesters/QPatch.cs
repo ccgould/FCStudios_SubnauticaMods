@@ -4,6 +4,7 @@ using System.Reflection;
 using FCS_HydroponicHarvesters.Buildables;
 using FCS_HydroponicHarvesters.Configuration;
 using FCS_HydroponicHarvesters.Craftable;
+using FCS_HydroponicHarvesters.Model;
 using FCSCommon.Exceptions;
 using FCSCommon.Extensions;
 using FCSCommon.Utilities;
@@ -46,7 +47,7 @@ namespace FCS_HydroponicHarvesters
                 var harmony = HarmonyInstance.Create("com.hydroponicharvestor.fcstudios");
                 harmony.PatchAll(Assembly.GetExecutingAssembly());
 
-                VersionChecker.Check("https://github.com/ccgould/FCStudios_SubnauticaMods/raw/master/FCS_HydroponicHarvesters/mod.json");
+                VersionChecker.Check<ModConfiguration>("https://github.com/ccgould/FCStudios_SubnauticaMods/raw/master/FCS_HydroponicHarvesters/mod.json");
 
                 QuickLogger.Info("Finished patching");
             }
