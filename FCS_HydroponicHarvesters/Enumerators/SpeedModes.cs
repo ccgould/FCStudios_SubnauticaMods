@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace FCS_HydroponicHarvesters.Enumerators
+﻿namespace FCS_HydroponicHarvesters.Enumerators
 {
-    internal enum SpeedModes : int
+    internal enum SpeedModes
     {
         Off = 0,
         Max = 1 * 80,

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using FCS_HydroponicHarvesters.Buildables;
 using FCS_HydroponicHarvesters.Configuration;
 using FCSCommon.Helpers;
@@ -31,13 +29,19 @@ namespace FCS_HydroponicHarvesters.Craftable
             };
         }
 
+        private void ApplyShaders()
+        {
+            MaterialHelpers.ApplySpecShader("Freon_Bottle", $"Freon_Freon_Bottle_Specular", OriginalPrefab, 1, 6f, QPatch.GlobalBundle);
+            MaterialHelpers.ApplyNormalShader("Freon_Bottle", "Freon_Freon_Bottle_Normal", OriginalPrefab, QPatch.GlobalBundle);
+        }
+
         public override GameObject GetGameObject()
         {
             try
             {
                 if (_prefab == null)
                 {
-                    QuickLogger.Error("Bottle Prefab is null",true);
+                    QuickLogger.Error("Bottle Prefab is null", true);
                     return null;
                 }
                 var prefab = GameObject.Instantiate(_prefab);
@@ -83,22 +87,20 @@ namespace FCS_HydroponicHarvesters.Craftable
             var rb = _prefab.AddComponent<Rigidbody>();
             rb.isKinematic = true;
             QuickLogger.Debug("Added Rigid Body");
-            
+
             // Set collider
             var collider = _prefab.GetComponentInChildren<Collider>();
             collider.enabled = true;
             collider.isTrigger = true;
             QuickLogger.Debug("Added Getting Collider");
-
-
+            
             // Make the object drop slowly in water
             var wf = _prefab.EnsureComponent<WorldForces>();
             wf.underwaterGravity = 0;
             wf.underwaterDrag = 10f;
             wf.enabled = true;
             QuickLogger.Debug("Ensuring World Forces");
-
-
+            
             // Add fabricating animation
             var fabricatingA = _prefab.EnsureComponent<VFXFabricating>();
             fabricatingA.localMinY = -0.1f;
@@ -150,25 +152,25 @@ namespace FCS_HydroponicHarvesters.Craftable
 
 #if SUBNAUTICA
         protected override Atlas.Sprite GetItemSprite()
-    {
-        return ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetFolder(), $"{ClassID}.png"));
-    }
-
-    protected override TechData GetBlueprintRecipe()
-    {
-        QuickLogger.Debug($"Creating recipe...");
-        // Create and associate recipe to the new TechType
-        var customFabRecipe = new TechData()
         {
-            craftAmount = 1,
-            Ingredients = new List<Ingredient>()
+            return ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetFolder(), $"{ClassID}.png"));
+        }
+
+        protected override TechData GetBlueprintRecipe()
+        {
+            QuickLogger.Debug($"Creating recipe...");
+            // Create and associate recipe to the new TechType
+            var customFabRecipe = new TechData()
+            {
+                craftAmount = 1,
+                Ingredients = new List<Ingredient>()
                 {
                     new Ingredient(TechType.FilteredWater, 2),
                     new Ingredient(TechType.Salt, 1),
                 }
-        };
-        return customFabRecipe;
-    }
+            };
+            return customFabRecipe;
+        }
 #elif BELOWZERO
         protected override Sprite GetItemSprite()
         {
@@ -193,101 +195,8 @@ namespace FCS_HydroponicHarvesters.Craftable
         }
 
 #endif
-
-    private void AddComponentsToPrefab()
-    {
-        var go = FcAssetBundlesService.PublicAPI.GetAssetBundleByName(FcAssetBundlesService.PublicAPI.GlobalBundleName);
-
-        if (go != null)
-        {
-            OriginalPrefab = go.LoadAsset<GameObject>("FloraKleen_Bottle");
-        }
-        else
-        {
-            QuickLogger.Error<FloraKleenPatcher>("Couldnt find bundle in the bundle service.");
-            return;
-        }
-
-        if (OriginalPrefab == null)
-        {
-            QuickLogger.Error("Freon prefab not found");
-            return;
-        }
-
-        var rigidbody = OriginalPrefab.AddComponent<Rigidbody>();
-
-        // Make the object drop slowly in water
-        var wf = OriginalPrefab.AddComponent<WorldForces>();
-        wf.underwaterGravity = 0;
-        wf.underwaterDrag = 10f;
-        wf.enabled = true;
-        wf.useRigidbody = rigidbody;
-
-        // Add fabricating animation
-        var fabricatingA = OriginalPrefab.AddComponent<VFXFabricating>();
-        fabricatingA.localMinY = -0.1f;
-        fabricatingA.localMaxY = 0.6f;
-        fabricatingA.posOffset = new Vector3(0f, 0f, 0f);
-        fabricatingA.eulerOffset = new Vector3(0f, 0f, 0f);
-        fabricatingA.scaleFactor = 1.0f;
-
-        //// Set proper shaders (for crafting animation)
-        Shader marmosetUber = Shader.Find("MarmosetUBER");
-        var renderer = OriginalPrefab.GetComponentInChildren<Renderer>();
-
-        renderer.material.shader = marmosetUber;
-
-        // Update sky applier
-        var applier = OriginalPrefab.GetComponent<SkyApplier>();
-        if (applier == null)
-            applier = OriginalPrefab.AddComponent<SkyApplier>();
-        applier.renderers = new Renderer[] { renderer };
-        applier.anchorSky = Skies.Auto;
-
-        // We can pick this item
-        var pickupable = OriginalPrefab.AddComponent<Pickupable>();
-        pickupable.isPickupable = true;
-        pickupable.randomizeRotationWhenDropped = true;
-
-        // Set collider
-        var collider = OriginalPrefab.GetComponent<BoxCollider>();
-        collider.enabled = true;
-        collider.isTrigger = true;
-
-        var placeTool = OriginalPrefab.AddComponent<PlaceTool>();
-        placeTool.allowedInBase = true;
-        placeTool.allowedOnBase = false;
-        placeTool.allowedOnCeiling = false;
-        placeTool.allowedOnConstructable = true;
-        placeTool.allowedOnGround = true;
-        placeTool.allowedOnRigidBody = true;
-        placeTool.allowedOnWalls = false;
-        placeTool.allowedOutside = false;
-        placeTool.rotationEnabled = true;
-        placeTool.enabled = true;
-        placeTool.hasAnimations = false;
-        placeTool.hasBashAnimation = false;
-        placeTool.hasFirstUseAnimation = false;
-        placeTool.mainCollider = collider;
-        placeTool.pickupable = pickupable;
-        placeTool.drawTime = 0.5f;
-        placeTool.dropTime = 1;
-        placeTool.holsterTime = 0.35f;
-
-        OriginalPrefab.EnsureComponent<FCSTechFabricatorTag>();
-
-        ApplyShaders();
-
+        public override TechGroup GroupForPDA { get; } = TechGroup.Resources;
+        public override TechCategory CategoryForPDA { get; } = TechCategory.AdvancedMaterials;
+        protected override string AssetBundleName => Mod.BundleName;
     }
-
-    private void ApplyShaders()
-    {
-        MaterialHelpers.ApplySpecShader("Freon_Bottle", $"Freon_Freon_Bottle_Specular", OriginalPrefab, 1, 6f, QPatch.GlobalBundle);
-        MaterialHelpers.ApplyNormalShader("Freon_Bottle", "Freon_Freon_Bottle_Normal", OriginalPrefab, QPatch.GlobalBundle);
-    }
-
-    public override TechGroup GroupForPDA { get; } = TechGroup.Resources;
-    public override TechCategory CategoryForPDA { get; } = TechCategory.AdvancedMaterials;
-    protected override string AssetBundleName => Mod.BundleName;
-}
 }

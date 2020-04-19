@@ -111,7 +111,7 @@
     <Compile Include="Display\InterfaceButton.cs" />
     <Compile Include="Display\ItemButton.cs" />
     <Compile Include="Display\OnScreenButton.cs" />
-    <Compile Include="Enumerators\CubePhases.cs" />
+    <Compile Include="Enumerators\ClonePhases.cs" />
     <Compile Include="Enumerators\HydroHarvSize.cs" />
     <Compile Include="Enumerators\SpeedModes.cs" />
     <Compile Include="Model\ModConfiguration.cs" />
@@ -126,6 +126,7 @@
     <Compile Include="Mono\HydroHarvGrowBed.cs" />
     <Compile Include="Mono\HydroHarvLightManager.cs" />
     <Compile Include="Mono\HydroHarvPowerManager.cs" />
+    <Compile Include="Model\StoredDNAData.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -135,9 +136,7 @@
       <Name>FCSTechFabricator</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Modules\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="mod.json" />
   </ItemGroup>

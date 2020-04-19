@@ -11,11 +11,9 @@ using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using FCSTechFabricator.Enums;
 using FCSTechFabricator.Managers;
-using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 using UnityEngine.UI;
-using InterfaceButton = FCSCommon.Components.InterfaceButton;
 
 namespace FCS_HydroponicHarvesters.Mono
 {
@@ -24,7 +22,6 @@ namespace FCS_HydroponicHarvesters.Mono
         private HydroHarvController _mono;
         private readonly Color _startColor = Color.black;
         private readonly Color _hoverColor = Color.white;
-
         private ColorManager _colorPage;
         private int _page;
         private Atlas.Sprite _melonIconSprite;
@@ -41,7 +38,29 @@ namespace FCS_HydroponicHarvesters.Mono
         internal Atlas.Sprite MelonIconSprite => _melonIconSprite ?? (_melonIconSprite = SpriteManager.Get(TechType.Melon));
 
         internal Atlas.Sprite KooshIconSprite => _kooshIconSprite ?? (_kooshIconSprite = SpriteManager.Get(TechType.SmallKoosh));
-        
+
+        private void UpdateSpeedModeText()
+        {
+            switch (_mono.CurrentSpeedMode)
+            {
+                case SpeedModes.Off:
+                    _powerLevelText.text = HydroponicHarvestersBuildable.Off();
+                    break;
+                case SpeedModes.Max:
+                    _powerLevelText.text = HydroponicHarvestersBuildable.Max();
+                    break;
+                case SpeedModes.High:
+                    _powerLevelText.text = HydroponicHarvestersBuildable.High();
+                    break;
+                case SpeedModes.Low:
+                    _powerLevelText.text = HydroponicHarvestersBuildable.Low();
+                    break;
+                case SpeedModes.Min:
+                    _powerLevelText.text = HydroponicHarvestersBuildable.Min();
+                    break;
+            }
+        }
+
         public override void OnButtonClick(string btnName, object tag)
         {
             switch (btnName)
@@ -91,28 +110,6 @@ namespace FCS_HydroponicHarvesters.Mono
             }
         }
 
-        private void UpdateSpeedModeText()
-        {
-            switch (_mono.CurrentSpeedMode)
-            {
-                case SpeedModes.Off:
-                    _powerLevelText.text = HydroponicHarvestersBuildable.Off();
-                    break;
-                case SpeedModes.Max:
-                    _powerLevelText.text = HydroponicHarvestersBuildable.Max();
-                    break;
-                case SpeedModes.High:
-                    _powerLevelText.text = HydroponicHarvestersBuildable.High();
-                    break;
-                case SpeedModes.Low:
-                    _powerLevelText.text = HydroponicHarvestersBuildable.Low();
-                    break;
-                case SpeedModes.Min:
-                    _powerLevelText.text = HydroponicHarvestersBuildable.Min();
-                    break;
-            }
-        }
-
         internal void ToggleMode(FCSEnvironment mode)
         {
             switch (mode)
@@ -128,7 +125,7 @@ namespace FCS_HydroponicHarvesters.Mono
             }
         }
 
-        public void Setup(HydroHarvController mono)
+        internal void Setup(HydroHarvController mono)
         {
             _mono = mono;
             _page = Animator.StringToHash("Page");
@@ -367,7 +364,7 @@ namespace FCS_HydroponicHarvesters.Mono
             _timeLeft.text = QPatch.Configuration.Config.GetsDirtyOverTime ? string.Format(HydroponicHarvestersBuildable.HMSTime(), $"<color=aqua>{hms}</color>") : HydroponicHarvestersBuildable.NotAvailable();
         }
 
-        public void RefreshModeBTN(FCSEnvironment savedDataBedType)
+        internal void RefreshModeBTN(FCSEnvironment savedDataBedType)
         {
             switch (savedDataBedType)
             {

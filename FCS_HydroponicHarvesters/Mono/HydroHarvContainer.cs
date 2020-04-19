@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using FCS_HydroponicHarvesters.Buildables;
 using FCS_HydroponicHarvesters.Enumerators;
+using FCS_HydroponicHarvesters.Model;
 using FCSCommon.Utilities;
 using FCSTechFabricator.Interfaces;
 using UnityEngine;

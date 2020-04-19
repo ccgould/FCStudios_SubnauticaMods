@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using FCS_HydroponicHarvesters.Buildables;
+﻿using FCS_HydroponicHarvesters.Buildables;
 using FCSCommon.Converters;
 using FCSCommon.Utilities;
 using FCSTechFabricator.Interfaces;
@@ -13,7 +9,7 @@ namespace FCS_HydroponicHarvesters.Mono
     internal class HydroHarvCleanerManager : MonoBehaviour, IFCSStorage
     {
         private HydroHarvController _mono;
-        private const float thirtyDays = 63000f;
+        private const float ThirtyDays = 63000f;
         private float _unitSanitation = 63000f;
         private bool _isDirty;
         public int GetContainerFreeSpace { get; }
@@ -38,11 +34,21 @@ namespace FCS_HydroponicHarvesters.Mono
                 {
                     QuickLogger.Debug("Unit is dirty");
                     _isDirty = true;
-                    _unitSanitation = thirtyDays;
+                    _unitSanitation = ThirtyDays;
                 }
             }
 
             _mono.DisplayManager.UpdateTimeLeft(TimeConverters.SecondsToHMS(_unitSanitation));
+        }
+
+        private void Sanitize()
+        {
+            QuickLogger.Debug($"Sanitizing {_mono.PrefabId.Id}", true);
+            if (_isDirty)
+            {
+                _isDirty = false;
+                _unitSanitation = ThirtyDays;
+            }
         }
 
         internal void Initialize(HydroHarvController mono)
@@ -66,17 +72,7 @@ namespace FCS_HydroponicHarvesters.Mono
             Destroy(item.item);
             return true;
         }
-
-        private void Sanitize()
-        {
-            QuickLogger.Debug($"Sanitizing {_mono.PrefabId.Id}",true);
-            if (_isDirty)
-            {
-                _isDirty = false;
-                _unitSanitation = thirtyDays;
-            }
-        }
-
+        
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
         {
             QuickLogger.Debug(

@@ -3,7 +3,6 @@ using FCS_HydroponicHarvesters.Configuration;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using FCSTechFabricator.Configuration;
-using SMLHelper.V2.Assets;
 using UnityEngine;
 
 namespace FCS_HydroponicHarvesters.Buildables

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace FCS_HydroponicHarvesters.Mono
 {
@@ -36,22 +32,6 @@ namespace FCS_HydroponicHarvesters.Mono
             }
         }
 
-        internal bool GetLightSwitchedOff()
-        {
-            return _lightSwitchedOff;
-        }
-
-        internal void SetLightSwitchedOff(bool state)
-        {
-            _lightSwitchedOff = state;
-        }
-
-        internal void Load(bool state)
-        {
-            _lightSwitchedOff = state;
-            _light.gameObject.SetActive(!state);
-        }
-
         private void UpdateLightState()
         {
             if (_mono.PowerManager.HasPowerToConsume())
@@ -71,6 +51,22 @@ namespace FCS_HydroponicHarvesters.Mono
             }
         }
 
+        internal bool GetLightSwitchedOff()
+        {
+            return _lightSwitchedOff;
+        }
+
+        internal void SetLightSwitchedOff(bool state)
+        {
+            _lightSwitchedOff = state;
+        }
+
+        internal void Load(bool state)
+        {
+            _lightSwitchedOff = state;
+            _light.gameObject.SetActive(!state);
+        }
+        
         internal void ToggleLight()
         {
             _lightSwitchedOff = !_lightSwitchedOff;

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using FCS_HydroponicHarvesters.Enumerators;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -22,19 +19,19 @@ namespace FCS_HydroponicHarvesters.Mono
 
         internal float StartUpProgress
         {
-            get => _progress[(int)CubePhases.StartUp];
-            set => _progress[(int)CubePhases.StartUp] = value;
+            get => _progress[(int)ClonePhases.StartUp];
+            set => _progress[(int)ClonePhases.StartUp] = value;
         }
         internal float GenerationProgress
         {
-            get => _progress[(int)CubePhases.Generating];
-            set => _progress[(int)CubePhases.Generating] = value;
+            get => _progress[(int)ClonePhases.Generating];
+            set => _progress[(int)ClonePhases.Generating] = value;
         }
 
         internal float CoolDownProgress
         {
-            get => _progress[(int)CubePhases.CoolDown];
-            set => _progress[(int)CubePhases.CoolDown] = value;
+            get => _progress[(int)ClonePhases.CoolDown];
+            set => _progress[(int)ClonePhases.CoolDown] = value;
         }
 
         internal void Initialize(HydroHarvController mono)

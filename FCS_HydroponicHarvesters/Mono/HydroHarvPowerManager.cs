@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using FCS_HydroponicHarvesters.Enumerators;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -27,7 +24,14 @@ namespace FCS_HydroponicHarvesters.Mono
                 return _connectedRelay;
             }
         }
-        
+
+        private void Update()
+        {
+            if (_mono == null || !_mono.IsConnectedToBase) return;
+            _energyToConsume = EnergyConsumptionPerSecond * DayNightCycle.main.deltaTime;
+            _mono.DisplayManager.UpdatePowerUsagePerSecond();
+        }
+
         private void UpdatePowerRelay()
         {
             PowerRelay relay = PowerSource.FindRelay(transform);
@@ -46,14 +50,7 @@ namespace FCS_HydroponicHarvesters.Mono
         {
             _mono = mono;
         }
-
-        private void Update()
-        {
-            if (_mono == null || !_mono.IsConnectedToBase) return;
-            _energyToConsume =  EnergyConsumptionPerSecond * DayNightCycle.main.deltaTime;
-            _mono.DisplayManager.UpdatePowerUsagePerSecond();
-        }
-
+        
         internal float GetEnergyToConsume()
         {
             return _energyToConsume;
@@ -72,7 +69,7 @@ namespace FCS_HydroponicHarvesters.Mono
                 this.ConnectedRelay.ConsumeEnergy(_energyToConsume, out float amountConsumed);
         }
 
-        public void UpdateEnergyPerSecond(SpeedModes currentMode)
+        internal void UpdateEnergyPerSecond(SpeedModes currentMode)
         {
             if (currentMode != SpeedModes.Off)
             {
@@ -85,8 +82,8 @@ namespace FCS_HydroponicHarvesters.Mono
             }
         }
 
-        public float EnergyConsumptionPerSecond { get; private set; }
+        internal float EnergyConsumptionPerSecond { get; private set; }
 
-        public float CreationTime { get; set; }
+        internal float CreationTime { get; set; }
     }
 }

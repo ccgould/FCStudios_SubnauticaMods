@@ -2,7 +2,6 @@
 using FCS_HydroponicHarvesters.Buildables;
 using FCSCommon.Enums;
 using FCSCommon.Utilities;
-using FCSTechFabricator.Enums;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;

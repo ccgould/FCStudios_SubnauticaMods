@@ -6,7 +6,6 @@ using FCS_HydroponicHarvesters;
 using FCS_HydroponicHarvesters.Configuration;
 using FCS_HydroponicHarvesters.Mono;
 using FCSCommon.Utilities;
-using FCSTechFabricator.Enums;
 using FCSTechFabricator.Objects;
 using Model;
 using Oculus.Newtonsoft.Json;

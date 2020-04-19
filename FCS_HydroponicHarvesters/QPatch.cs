@@ -11,7 +11,6 @@ using FCSCommon.Utilities;
 using FCSTechFabricator;
 using FCSTechFabricator.Components;
 using FCSTechFabricator.Craftables;
-using FCSTechFabricator.Objects;
 using Harmony;
 using QModManager.API.ModLoading;
 using SMLHelper.V2.Handlers;
