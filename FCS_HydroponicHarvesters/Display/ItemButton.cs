@@ -1,4 +1,5 @@
 ﻿using System;
+using FCS_HydroponicHarvesters.Buildables;
 using FCSCommon.Enums;
 using FCSCommon.Utilities;
 using FCSTechFabricator.Enums;
@@ -11,6 +12,7 @@ namespace FCS_HydroponicHarvesters.Display
     internal class ItemButton : OnScreenButton, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
     {
         private TechType type = TechType.None;
+        public ButtonMode Mode { get; set; }
         public int Amount { set; get; }
         public Action<TechType> OnButtonClick;
         public Action<bool> OnInterfaceButton;
@@ -27,7 +29,15 @@ namespace FCS_HydroponicHarvesters.Display
         {
             set
             {
-                TextLineOne = "Take " + TechTypeExtensions.Get(Language.main, value);
+                if (Mode == Display.ButtonMode.Take)
+                {
+                    TextLineOne = $"{HydroponicHarvestersBuildable.Take()} {Language.main.Get(value)}";
+                }
+                else
+                {
+                    TextLineOne = $"{HydroponicHarvestersBuildable.Delete()} {Language.main.Get(value)} {HydroponicHarvestersBuildable.DNASample()}";
+                }
+
                 type = value;
             }
 
@@ -155,5 +165,11 @@ namespace FCS_HydroponicHarvesters.Display
                     break;
             }
         }
+    }
+
+    internal enum ButtonMode
+    {
+        Take,
+        Delete
     }
 }

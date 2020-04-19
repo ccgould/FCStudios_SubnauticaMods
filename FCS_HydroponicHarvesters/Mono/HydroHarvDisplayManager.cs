@@ -15,6 +15,7 @@ using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 using UnityEngine.UI;
+using InterfaceButton = FCSCommon.Components.InterfaceButton;
 
 namespace FCS_HydroponicHarvesters.Mono
 {
@@ -35,6 +36,7 @@ namespace FCS_HydroponicHarvesters.Mono
         private Text _powerUsage;
         private Text _itemsCount;
         private Text _timeLeft;
+
 
         internal Atlas.Sprite MelonIconSprite => _melonIconSprite ?? (_melonIconSprite = SpriteManager.Get(TechType.Melon));
 
@@ -185,7 +187,7 @@ namespace FCS_HydroponicHarvesters.Mono
                 var lightBTN = InterfaceHelpers.FindGameObject(controls, "LightBTN");
 
                 InterfaceHelpers.CreateButton(lightBTN, "LightBTN", InterfaceButtonMode.Background,
-                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, "");
+                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, HydroponicHarvestersBuildable.ToggleLightMessage());
 
                 var ligtIcon = InterfaceHelpers.FindGameObject(lightBTN, "Icon").AddComponent<uGUI_Icon>();
                 ligtIcon.sprite = SpriteManager.Get(TechType.Flashlight);
@@ -199,33 +201,29 @@ namespace FCS_HydroponicHarvesters.Mono
                 _powerUsage = InterfaceHelpers.FindGameObject(home, "PowerUsage")?.GetComponent<Text>();
                 #endregion
 
-                #region Power Usage
+                #region ItemsCount
                 _itemsCount = InterfaceHelpers.FindGameObject(home, "ItemsCount")?.GetComponent<Text>();
                 #endregion
 
-                #region Power Usage
+                #region TimeLeft
                 _timeLeft = InterfaceHelpers.FindGameObject(home, "TimeLeft")?.GetComponent<Text>();
                 #endregion
 
                 #region CleanerButton
                 var cleanerButtonObj = InterfaceHelpers.FindGameObject(controls, "CleanerBTN");
 
+                var cleanerIcon = InterfaceHelpers.FindGameObject(cleanerButtonObj, "Icon").AddComponent<uGUI_Icon>();
+                cleanerIcon.sprite = ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetFolder(), "FloraKleen.png"));
+
                 InterfaceHelpers.CreateButton(cleanerButtonObj, "CleanerBTN", InterfaceButtonMode.Background,
-                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, "");
+                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, HydroponicHarvestersBuildable.CleanerBTNMessage());
                 #endregion
                 
                 #region DumpBTNButton
                 var dumpBTNButtonObj = InterfaceHelpers.FindGameObject(controls, "DumpBTN");
 
                 InterfaceHelpers.CreateButton(dumpBTNButtonObj, "DumpBTN", InterfaceButtonMode.Background,
-                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, "");
-                #endregion
-
-                #region Messages
-                //InterfaceHelpers.FindGameObject(home, "AmountOfPods").GetComponent<Text>().text = GaspodCollectorBuildable.AmountOfPodsMessage();
-                //InterfaceHelpers.FindGameObject(home, "ClickToTake").GetComponent<Text>().text = GaspodCollectorBuildable.InstructionsMessage();
-                //InterfaceHelpers.FindGameObject(home, "Battery (1)").FindChild("Battery Label").GetComponent<Text>().text = $"{GaspodCollectorBuildable.Battery()} 1";
-                //InterfaceHelpers.FindGameObject(home, "Battery (2)").FindChild("Battery Label").GetComponent<Text>().text = $"{GaspodCollectorBuildable.Battery()} 2";
+                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, HydroponicHarvestersBuildable.DumpBTNMessage());
                 #endregion
 
                 #region ColorPicker Button
@@ -233,7 +231,7 @@ namespace FCS_HydroponicHarvesters.Mono
                 var colorBTN = InterfaceHelpers.FindGameObject(controls, "ColorBTN");
 
                 InterfaceHelpers.CreateButton(colorBTN, "ColorBTN", InterfaceButtonMode.Background,
-                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, "");
+                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, HydroponicHarvestersBuildable.ColorPickerBTNMessage());
 
                 #endregion
 
@@ -251,7 +249,7 @@ namespace FCS_HydroponicHarvesters.Mono
                 _powerLevelText = InterfaceHelpers.FindGameObject(powerLevelBTN, "Text").GetComponent<Text>();
 
                 InterfaceHelpers.CreateButton(powerLevelBTN, "PowerLevelBTN", InterfaceButtonMode.Background,
-                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, "");
+                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, HydroponicHarvestersBuildable.PowerLevelBTNMessage());
 
                 #endregion
 
@@ -269,7 +267,7 @@ namespace FCS_HydroponicHarvesters.Mono
                 _modeIcon.sprite = MelonIconSprite;
 
                 InterfaceHelpers.CreateButton(modeBTN, "ModeBTN", InterfaceButtonMode.Background,
-                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, "");
+                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, HydroponicHarvestersBuildable.ModeBTNMessage());
 
                 #endregion
             }
@@ -314,6 +312,7 @@ namespace FCS_HydroponicHarvesters.Mono
                 var mainButton = buttonPrefab.FindChild("MainButton");
                 
                 var mainBTN = mainButton.AddComponent<ItemButton>();
+                mainBTN.Mode = ButtonMode.Take;
                 mainBTN.Type = techType;
                 mainBTN.ButtonMode = InterfaceButtonMode.Background;
                 mainBTN.STARTING_COLOR = _startColor;
@@ -327,6 +326,7 @@ namespace FCS_HydroponicHarvesters.Mono
 
                 var deleteBTN = deleteButton.AddComponent<ItemButton>();
                 deleteBTN.ButtonMode = InterfaceButtonMode.Background;
+                deleteBTN.Mode = ButtonMode.Delete;
                 deleteBTN.Type = techType;
                 deleteBTN.STARTING_COLOR = _startColor;
                 deleteBTN.HOVER_COLOR = _hoverColor;
@@ -335,11 +335,9 @@ namespace FCS_HydroponicHarvesters.Mono
                 uGUI_Icon trashIcon = InterfaceHelpers.FindGameObject(deleteButton, "Icon").AddComponent<uGUI_Icon>();
                 trashIcon.sprite = SpriteManager.Get(TechType.Trashcans);
             }
-
-            UpdateDnaCounter();
         }
 
-        private void UpdateDnaCounter()
+        internal void UpdateDnaCounter()
         {
             if (_dnaCounter == null) return;
             _dnaCounter.text = $"{_mono.HydroHarvGrowBed.GetDNASamplesTotal()}/{_mono.HydroHarvGrowBed.Slots.Length}";
@@ -365,7 +363,8 @@ namespace FCS_HydroponicHarvesters.Mono
 
         internal void UpdateTimeLeft(string hms)
         {
-            _timeLeft.text = string.Format(HydroponicHarvestersBuildable.HMSTime(), $"<color=aqua>{hms}</color>");
+            if (!QPatch.Configuration.Config.GetsDirtyOverTime && _timeLeft.text.Equals(HydroponicHarvestersBuildable.NotAvailable())) return;
+            _timeLeft.text = QPatch.Configuration.Config.GetsDirtyOverTime ? string.Format(HydroponicHarvestersBuildable.HMSTime(), $"<color=aqua>{hms}</color>") : HydroponicHarvestersBuildable.NotAvailable();
         }
 
         public void RefreshModeBTN(FCSEnvironment savedDataBedType)

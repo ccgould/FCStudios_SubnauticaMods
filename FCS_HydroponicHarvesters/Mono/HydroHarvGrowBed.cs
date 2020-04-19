@@ -174,6 +174,7 @@ namespace FCS_HydroponicHarvesters.Mono
                     _mono.HydroHarvContainer.AddItemToContainer(plantable.GiveItem, true);
                 }
             }
+            _mono.DisplayManager.UpdateDnaCounter();
         }
 
         public GameObject Spawn(Transform parent, TechType techType, GameObject model)
@@ -255,6 +256,7 @@ namespace FCS_HydroponicHarvesters.Mono
             slotByID.Clear();
             Destroy(plantModel);
             SetSlotOccupiedState(slotID, false);
+            _mono.DisplayManager.UpdateDnaCounter();
         }
 
         private void SetSlotOccupiedState(int slotID, bool state)

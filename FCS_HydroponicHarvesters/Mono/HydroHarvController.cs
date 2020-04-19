@@ -209,7 +209,7 @@ namespace FCS_HydroponicHarvesters.Mono
             if (DumpContainer == null)
             {
                 DumpContainer = gameObject.AddComponent<DumpContainer>();
-                DumpContainer.Initialize(transform,"Please Replace","Item Not Allowed","Storage is full", HydroHarvGrowBed,1,1);
+                DumpContainer.Initialize(transform,HydroponicHarvestersBuildable.DNADropContainerTitle(), HydroponicHarvestersBuildable.NotAllowedItem(), HydroponicHarvestersBuildable.StorageFull(), HydroHarvGrowBed,1,1);
             }
 
             if (CleanerManager == null)
@@ -221,7 +221,7 @@ namespace FCS_HydroponicHarvesters.Mono
             if (CleanerDumpContainer == null)
             {
                 CleanerDumpContainer = gameObject.AddComponent<DumpContainer>();
-                CleanerDumpContainer.Initialize(transform, "Please Replace", "Item Not Allowed", "Storage is full", CleanerManager, 1, 1);
+                CleanerDumpContainer.Initialize(transform, HydroponicHarvestersBuildable.FloraKleenDropContainerTitle(), HydroponicHarvestersBuildable.NotAllowedItem(), HydroponicHarvestersBuildable.StorageFull(), CleanerManager, 1, 1);
             }
 
             if (AnimationManager == null)

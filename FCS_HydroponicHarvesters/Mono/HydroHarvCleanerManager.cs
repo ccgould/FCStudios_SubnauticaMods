@@ -30,12 +30,16 @@ namespace FCS_HydroponicHarvesters.Mono
         private void Desterilize()
         {
             if (_isDirty) return;
-            _unitSanitation -= DayNightCycle.main.deltaTime;
-            if (_unitSanitation <= 0)
+
+            if (QPatch.Configuration.Config.GetsDirtyOverTime)
             {
-                QuickLogger.Debug("Unit is dirty");
-                _isDirty = true;
-                _unitSanitation = thirtyDays;
+                _unitSanitation -= DayNightCycle.main.deltaTime;
+                if (_unitSanitation <= 0)
+                {
+                    QuickLogger.Debug("Unit is dirty");
+                    _isDirty = true;
+                    _unitSanitation = thirtyDays;
+                }
             }
 
             _mono.DisplayManager.UpdateTimeLeft(TimeConverters.SecondsToHMS(_unitSanitation));
@@ -53,7 +57,7 @@ namespace FCS_HydroponicHarvesters.Mono
 
         internal bool GetIsDirty()
         {
-            return _isDirty;
+            return QPatch.Configuration.Config.GetsDirtyOverTime && _isDirty;
         }
 
         public bool AddItemToContainer(InventoryItem item)

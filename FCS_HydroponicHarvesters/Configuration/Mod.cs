@@ -2,12 +2,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using FCS_HydroponicHarvesters;
+using FCS_HydroponicHarvesters.Configuration;
 using FCS_HydroponicHarvesters.Mono;
 using FCSCommon.Utilities;
+using FCSTechFabricator.Enums;
 using FCSTechFabricator.Objects;
 using Model;
 using Oculus.Newtonsoft.Json;
 using SMLHelper.V2.Crafting;
+using SMLHelper.V2.Options;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 
@@ -335,6 +339,20 @@ namespace FCS_HydroponicHarvesters.Configuration
 
             return LoadConfigurationData();
         }
+
+        public static void SaveModConfiguration()
+        {
+            try
+            {
+                var saveDataJson = JsonConvert.SerializeObject(QPatch.Configuration, Formatting.Indented);
+
+                File.WriteAllText(Path.Combine(MODFOLDERLOCATION, ConfigurationFile()), saveDataJson);
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error($"{e.Message}\n{e.StackTrace}");
+            }
+        }
     }
 
     internal class Config
@@ -343,10 +361,43 @@ namespace FCS_HydroponicHarvesters.Configuration
         [JsonProperty] internal int LargeStorageLimit { get; set; } = 100;
         [JsonProperty] internal int MediumStorageLimit { get; set; } = 50;
         [JsonProperty] internal int SmallStorageLimit { get; set; } = 25;
+        [JsonProperty] internal bool GetsDirtyOverTime { get; set; } = true;
     }
 
     internal class ConfigFile
     {
         [JsonProperty] internal Config Config { get; set; }
+    }
+
+}
+
+internal class Options : ModOptions
+{
+    private bool _getsDirtyOverTime;
+    private const string DirtyOverTimeID = "HHDirtyOverTime";
+
+
+    public Options() : base("Hydroponic Harvester Settings")
+    {
+        ToggleChanged += OnToggleChanged;
+        _getsDirtyOverTime = QPatch.Configuration.Config.GetsDirtyOverTime;
+    }
+
+    public void OnToggleChanged(object sender, ToggleChangedEventArgs e)
+    {
+
+        switch (e.Id)
+        {
+            case DirtyOverTimeID:
+                _getsDirtyOverTime = QPatch.Configuration.Config.GetsDirtyOverTime = e.Value;
+                break;
+        }
+
+        Mod.SaveModConfiguration();
+    }
+
+    public override void BuildModOptions()
+    {
+        AddToggleOption(DirtyOverTimeID, "Gets Dirty Overtime", _getsDirtyOverTime);
     }
 }

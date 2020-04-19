@@ -159,8 +159,11 @@ namespace FCS_HydroponicHarvesters.Mono
 
            foreach (KeyValuePair<TechType, StoredDNAData> sample in samples)
            {
-               if(IsFull) break;
-               AddItemToContainer(sample.Key);
+               for (int i = 0; i < sample.Value.Amount; i++)
+               {
+                   if (IsFull) break;
+                    AddItemToContainer(sample.Key);
+               }
            }
         }
 

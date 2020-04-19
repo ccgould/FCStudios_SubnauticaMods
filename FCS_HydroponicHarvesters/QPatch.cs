@@ -42,6 +42,8 @@ namespace FCS_HydroponicHarvesters
 
                 Configuration = Mod.LoadConfiguration();
 
+                OptionsPanelHandler.RegisterModOptions(new Options());
+
                 AddTechFabricatorItems();
 
                 var harmony = HarmonyInstance.Create("com.hydroponicharvestor.fcstudios");
