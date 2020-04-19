@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using FCSDemo.Configuration;
@@ -76,7 +75,9 @@ namespace FCSDemo.Buildables
                 MaterialHelpers.AddNewBubbles(prefab, new Vector3(-0.801f, 1.03f, 0.711f),new Vector3(270f,266f,0f));
                 prefab.AddComponent<TechTag>().type = Singleton.TechType;
                 prefab.AddComponent<FCSDemoController>();
+                
                 //Add the FCSTechFabricatorTag component
+                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModName);
                 prefab.AddComponent<FCSTechFabricatorTag>();
 
 

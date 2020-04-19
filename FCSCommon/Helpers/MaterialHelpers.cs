@@ -1,7 +1,7 @@
 ﻿using System;
 using FCSCommon.Utilities;
 using System.Collections.Generic;
-using SMLHelper.V2.Handlers;
+using SMLHelper.V2.Assets;
 using UnityEngine;
 
 namespace FCSCommon.Helpers
@@ -220,17 +220,21 @@ namespace FCSCommon.Helpers
         {
             GetIngameObjects();
 
-            var model = GameObjectHelpers.FindGameObject(gameObject, matchName, SearchOption.EndsWith);
+            var models = GameObjectHelpers.FindGameObjects(gameObject, matchName, SearchOption.EndsWith);
 
-            if(model != null)
+            foreach (var model in models)
             {
-                var render = model.GetComponent<Renderer>();
-                render.material = _glassMaterial;
+                if (model != null)
+                {
+                    var render = model.GetComponent<Renderer>();
+                    render.material = _glassMaterial;
+                }
+                else
+                {
+                    QuickLogger.Error($"[ApplyGlassShaderTemplate] Model was not found with the matching name {matchName}");
+                }
             }
-            else
-            {
-                QuickLogger.Error($"[ApplyGlassShaderTemplate] Model was not found with the matching name {matchName}");
-            }
+            
         }
 
         internal static void AddNewBubbles(GameObject gameObject, Vector3 position, Vector3 rotation)

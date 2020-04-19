@@ -225,6 +225,7 @@ namespace FCSDemo.Configuration
         [JsonProperty] internal Vec3 BoundingSize { get; set; } = new Vec3(0, 0, 0);
         [JsonProperty] internal string ModName { get; set; } = "FCSDemo";
         [JsonProperty] internal string PrefabName { get; set; } = "DemoModel";
+        public ColorVec4 BodyColor { get; set; } = new ColorVec4(1,1,1,1);
     }
 
     internal class ConfigFile

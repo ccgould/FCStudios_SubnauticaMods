@@ -13,7 +13,7 @@
     <Game>$(Configuration.split(_)[0])</Game>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-  </PropertyGroup>			 
+  </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Subnautica_Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
@@ -92,6 +92,10 @@
     <Reference Include="UnityEngine.IMGUIModule">
       <HintPath>..\Dependancies\UnityEngine.IMGUIModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.InputLegacyModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependancies\UnityEngine.InputLegacyModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.PhysicsModule">
       <HintPath>..\Dependancies\UnityEngine.PhysicsModule.dll</HintPath>
     </Reference>
@@ -107,7 +111,9 @@
     <Compile Include="Buildables\FCSDemoPatcher.cs" />
     <Compile Include="Configuration\Mod.cs" />
     <Compile Include="Model\SaveDataEntry.cs" />
+    <Compile Include="Mono\DebugMenu.cs" />
     <Compile Include="Mono\FCSDemoController.cs" />
+    <Compile Include="Patches\OpenDebugMenu.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -120,7 +126,7 @@
   </ItemGroup>
   <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\FCSCommon\GamePaths.targets" />													 
+  <Import Project="..\FCSCommon\GamePaths.targets" />
   <PropertyGroup Condition="$(Game) == 'Subnautica'">
     <PostBuildEvent>xcopy "$(ProjectDir)bin\$(Configuration)\FCSDemo.dll" "$(SubnauticaDir)\QMods\FCSDemo\" /Y /I</PostBuildEvent>
   </PropertyGroup>

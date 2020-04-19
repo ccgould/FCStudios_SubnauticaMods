@@ -2,6 +2,7 @@
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using FCSDemo.Configuration;
+using FCSTechFabricator.Extensions;
 using SMLHelper.V2.Assets;
 using UnityEngine;
 
@@ -15,6 +16,7 @@ namespace FCSDemo.Buildables
         internal static string SpecTexture => $"{Mod.ModName}_COL_SPEC";
         internal static string LUMTexture => $"{Mod.ModName}_COL_LUM";
         internal static string ColorIDTexture => $"{Mod.ModName}_COL_ID";
+        internal static string DecalMaterial => $"{Mod.ModName}_COL_Decals";
         public bool GetPrefabs()
         {
             try
@@ -59,10 +61,10 @@ namespace FCSDemo.Buildables
         {
             #region BaseColor
             MaterialHelpers.ApplySpecShader(BodyMaterial, SpecTexture, prefab, 1, 3f, bundle);
-            MaterialHelpers.ApplyColorMaskShader(BodyMaterial, ColorIDTexture, Color.white, Color.red, Color.white, prefab, bundle); //Use color2 
+            MaterialHelpers.ApplyColorMaskShader(BodyMaterial, ColorIDTexture, Color.white, QPatch.Configuration.Config.BodyColor.Vector4ToColor(), Color.white, prefab, bundle); //Use color2 
             MaterialHelpers.ApplyEmissionShader(BodyMaterial, LUMTexture, prefab, bundle, Color.white);
             //MaterialHelpers.ApplyGlassShaderTemplate(prefab.FindChild("model").FindChild("HydroponicHarvesterGlass"),Mod.ClassID);
-            //MaterialHelpers.ApplyAlphaShader(BodyMaterial,prefab);
+            MaterialHelpers.ApplyAlphaShader(DecalMaterial, prefab);
             #endregion
         }
     }

@@ -3,6 +3,7 @@ using System.Reflection;
 using FCSCommon.Utilities;
 using FCSDemo.Buildables;
 using FCSDemo.Configuration;
+using Harmony;
 using QModManager.API.ModLoading;
 
 namespace FCSDemo
@@ -21,6 +22,10 @@ namespace FCSDemo
             QuickLogger.DebugLogsEnabled = true;
             QuickLogger.Debug("Debug logs enabled");
 #endif
+
+            var harmony = HarmonyInstance.Create("com.fcsdemo.fcstudios");
+            harmony.PatchAll(Assembly.GetExecutingAssembly());
+
             Configuration = Mod.LoadConfiguration();
             FCSDemoBuidable.PatchHelper();
 

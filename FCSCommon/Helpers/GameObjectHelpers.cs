@@ -96,6 +96,54 @@ namespace FCSCommon.Helpers
             return null;
         }
 
+
+        internal static IEnumerable<GameObject> FindGameObjects(GameObject go, string name,
+    SearchOption searchOption = SearchOption.Full)
+        {
+                QuickLogger.Debug($"Trying to Find Gameobject {name} with searchOption:{searchOption} in {go?.name}");
+                var renders = FindGameObject(go?.transform);
+
+                foreach (GameObject mesh in renders)
+                {
+                    QuickLogger.Debug($"Current Mesh Name: {mesh.name}");
+
+                    switch (searchOption)
+                    {
+                        case SearchOption.Full:
+                            if (mesh.name.Equals(name, StringComparison.OrdinalIgnoreCase))
+                            {
+                                yield return mesh.gameObject;
+                            }
+
+                            break;
+                        case SearchOption.StartsWith:
+                            if (mesh.name.StartsWith(name, StringComparison.OrdinalIgnoreCase))
+                            {
+                                yield return mesh.gameObject;
+                            }
+
+                            break;
+                        case SearchOption.EndsWith:
+                            if (mesh.name.EndsWith(name, StringComparison.OrdinalIgnoreCase))
+                            {
+                                yield return mesh.gameObject;
+                            }
+
+                            break;
+                        case SearchOption.Contains:
+                            if (mesh.name.Contains(name))
+                            {
+                                yield return mesh.gameObject;
+                            }
+
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException(nameof(searchOption), searchOption, null);
+                    }
+                }
+        }
+
+
         private static IEnumerable<GameObject> FindGameObject(Transform tr)
         {
             foreach (Transform child in tr)
