@@ -55,28 +55,38 @@ namespace GasPodCollector.Mono
 
         private void OnEnable()
         {
-            if (_runStartUpOnEnable)
+            try
             {
-                if (!IsInitialized)
+                if (_runStartUpOnEnable)
                 {
-                    Initialize();
-                }
-
-                if (_fromSave)
-                {
-                    if (_savedData == null)
+                    if (!IsInitialized)
                     {
-                        ReadySaveData();
+                        Initialize();
                     }
 
-                    ColorManager.SetColorFromSave(_savedData.BodyColor.Vector4ToColor());
-                    GaspodCollectorStorage.SetStorageAmount(_savedData.GaspodAmount);
-                    PowerManager.LoadSaveData(_savedData.Batteries);
-                    DisplayManager.OnStorageAmountChange(_savedData.GaspodAmount);
-                    ReattachBeaconAfterLoad();
-                    QuickLogger.Info($"Loaded {Mod.FriendlyName}");
-                }
+                    if (_fromSave)
+                    {
+                        if (_savedData == null)
+                        {
+                            ReadySaveData();
+                        }
 
+                        GaspodCollectorStorage.SetStorageAmount(_savedData.GaspodAmount);
+                        PowerManager.LoadSaveData(_savedData.Batteries);
+                        DisplayManager.OnStorageAmountChange(_savedData.GaspodAmount);
+                        ReattachBeaconAfterLoad();
+                        ColorManager.SetColorFromSave(_savedData.BodyColor.Vector4ToColor());
+                        QuickLogger.Info($"Loaded {Mod.FriendlyName}");
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error(e.Message);
+                QuickLogger.Error(e.StackTrace);
+            }
+            finally
+            {
                 _runStartUpOnEnable = false;
             }
         }
