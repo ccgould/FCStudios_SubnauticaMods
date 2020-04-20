@@ -136,10 +136,9 @@
       <Name>FCSTechFabricator</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
-    <None Include="F:\Program Files\Epic Games\Subnautica\QMods\FCS_HydroponicHarvesters\mod.json">
-      <Link>mod.json</Link>
-    </None>
+    <None Include="mod.json" />
   </ItemGroup>
   <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
