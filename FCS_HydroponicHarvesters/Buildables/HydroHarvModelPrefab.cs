@@ -10,6 +10,7 @@ namespace FCS_HydroponicHarvesters.Buildables
     internal static class HydroponicHarvestersModelPrefab
     {
         private static bool _initialized;
+        private static AssetBundle _assetBundle;
         internal static GameObject ColorItemPrefab { get; set; }
         internal static GameObject ItemPrefab { get; set; }
         internal static string BodyMaterial => $"{Mod.ModName}_COL";
@@ -31,20 +32,20 @@ namespace FCS_HydroponicHarvesters.Buildables
                     QuickLogger.Debug($"AssetBundle Set");
 
                     QuickLogger.Debug("GetPrefabs");
-                    AssetBundle assetBundle = AssetHelper.Asset(Mod.ModFolderName, Mod.BundleName);
+                    _assetBundle = AssetHelper.Asset(Mod.ModFolderName, Mod.BundleName);
 
-                    Bundle = assetBundle;
+                    Bundle = _assetBundle;
 
                     //We have found the asset bundle and now we are going to continue by looking for the model.
-                    GameObject lPrefab = assetBundle.LoadAsset<GameObject>(Mod.LargePrefabName);
-                    GameObject mPrefab = assetBundle.LoadAsset<GameObject>(Mod.MediumPrefabName);
-                    GameObject sPrefab = assetBundle.LoadAsset<GameObject>(Mod.SmallPrefabName);
+                    GameObject lPrefab = _assetBundle.LoadAsset<GameObject>(Mod.LargePrefabName);
+                    GameObject mPrefab = _assetBundle.LoadAsset<GameObject>(Mod.MediumPrefabName);
+                    GameObject sPrefab = _assetBundle.LoadAsset<GameObject>(Mod.SmallPrefabName);
 
                     //If the prefab isn't null lets add the shader to the materials
                     if (lPrefab != null)
                     {
                         //Lets apply the material shader
-                        ApplyShaders(lPrefab, assetBundle);
+                        ApplyShaders(lPrefab, _assetBundle);
 
                         LargePrefab = lPrefab;
                         QuickLogger.Debug($"Large Prefab Found!");
@@ -58,7 +59,7 @@ namespace FCS_HydroponicHarvesters.Buildables
                     if (mPrefab != null)
                     {
                         //Lets apply the material shader
-                        ApplyShaders(mPrefab, assetBundle);
+                        ApplyShaders(mPrefab, _assetBundle);
 
                         MediumPrefab = mPrefab;
 
@@ -73,7 +74,7 @@ namespace FCS_HydroponicHarvesters.Buildables
                     if (sPrefab != null)
                     {
                         //Lets apply the material shader
-                        ApplyShaders(sPrefab, assetBundle);
+                        ApplyShaders(sPrefab, _assetBundle);
 
                         SmallPrefab = sPrefab;
 
@@ -98,11 +99,11 @@ namespace FCS_HydroponicHarvesters.Buildables
                         return false;
                     }
 
-                    GameObject bottleModel = assetBundle.LoadAsset<GameObject>("HydroponicHarvesterBottleModel");
+                    GameObject bottleModel = _assetBundle.LoadAsset<GameObject>("HydroponicHarvesterBottleModel");
 
                     if (bottleModel != null)
                     {
-                        ApplyShaders(bottleModel, assetBundle);
+                        ApplyShaders(bottleModel, _assetBundle);
                         BottlePrefab = bottleModel;
                     }
                     else
@@ -111,7 +112,7 @@ namespace FCS_HydroponicHarvesters.Buildables
                         return false;
                     }
 
-                    GameObject item = assetBundle.LoadAsset<GameObject>("HydroHarvItem");
+                    GameObject item = _assetBundle.LoadAsset<GameObject>("HydroHarvItem");
 
                     if (item != null)
                     {
@@ -139,8 +140,13 @@ namespace FCS_HydroponicHarvesters.Buildables
         /// Applies the shader to the materials of the reactor
         /// </summary>
         /// <param name="prefab">The prefab to apply shaders.</param>
-        private static void ApplyShaders(GameObject prefab, AssetBundle bundle)
+        internal static void ApplyShaders(GameObject prefab, AssetBundle bundle = null)
         {
+            if (bundle == null)
+            {
+                bundle = _assetBundle;
+            }
+
             #region BaseColor
             MaterialHelpers.ApplyColorMaskShader(BodyMaterial, "HydroponicHarvester_COL_ID", Color.white, DefaultConfigurations.DefaultColor, Color.white, prefab, bundle); //Use color2 
             MaterialHelpers.ApplySpecShader(BodyMaterial, SpecTexture, prefab, 1, 3f, bundle);

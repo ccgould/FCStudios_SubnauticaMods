@@ -32,6 +32,15 @@ namespace GasPodCollector.Mono.Managers
         private readonly Color _colorHalf = new Color(1f, 1f, 0f, 1f);
         private readonly Color _colorFull = new Color(0f, 1f, 0f, 1f);
         private readonly string _empty = Language.main.Get("ChargerSlotEmpty");
+        private bool _isInitialized;
+
+
+        private void Start()
+        {
+
+        }
+        
+        
         internal void Setup(GaspodCollectorController mono)
         {
             _mono = mono;
@@ -41,6 +50,7 @@ namespace GasPodCollector.Mono.Managers
                 _mono.GaspodCollectorStorage.OnAmountChanged += OnStorageAmountChange;
                 _amountOfPodsCount.text = $"0/{QPatch.Configuration.Config.StorageLimit}";
                 UpdateBatteries(null);
+                _isInitialized = true;
             }
         }
 
@@ -51,6 +61,7 @@ namespace GasPodCollector.Mono.Managers
         
         public override void OnButtonClick(string btnName, object tag)
         {
+
             switch (btnName)
             {
                 case "GasPodBTN":
@@ -78,6 +89,7 @@ namespace GasPodCollector.Mono.Managers
         {
             try
             {
+                if (_isInitialized) return true;
                 #region Canvas  
                 var canvasGameObject = gameObject.GetComponentInChildren<Canvas>()?.gameObject;
 
@@ -102,8 +114,10 @@ namespace GasPodCollector.Mono.Managers
                 InterfaceHelpers.CreateButton(gasPodButtonObj, "GasPodBTN", InterfaceButtonMode.Background,
                     OnButtonClick, Color.black, Color.white, MAX_INTERACTION_DISTANCE, GaspodCollectorBuildable.TakeGaspod());
 
-                uGUI_Icon icon = gasPodButtonObj.transform.Find("Image").gameObject.AddComponent<uGUI_Icon>();
-                icon.sprite = SpriteManager.Get(TechType.GasPod);
+                var image = gasPodButtonObj.transform.Find("Image");
+                var guiIcon = image.gameObject.EnsureComponent<uGUI_Icon>();
+                guiIcon.sprite = SpriteManager.Get(TechType.GasPod);
+
                 #endregion
 
                 #region DumpBTNButton

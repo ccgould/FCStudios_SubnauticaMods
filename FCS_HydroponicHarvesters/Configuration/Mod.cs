@@ -50,7 +50,7 @@ namespace FCS_HydroponicHarvesters.Configuration
         internal const string MediumPrefabName = "HydroponicHarvesterMedium";
 
         internal const string SmallFriendlyName = "Small Hydroponic Harvester";
-        internal const string SmallDescription = "A large hydroponic harvester that allows you to store 1 DNA sample to clone.";
+        internal const string SmallDescription = "A small hydroponic harvester that allows you to store 1 DNA sample to clone.";
         internal const string SmallClassID = "SmallHydroponicHarvester";
         internal const string SmallHydroHarvKitClassID = "SmallHydroHarv_Kit";
         internal const string SmallPrefabName = "HydroponicHarvesterSmall";

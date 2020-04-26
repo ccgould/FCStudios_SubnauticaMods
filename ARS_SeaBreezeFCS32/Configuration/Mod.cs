@@ -286,7 +286,7 @@ namespace ARS_SeaBreezeFCS32.Configuration
 
             switch (e.Id)
             {
-                case ModModeID:
+                case UsePowerID:
                     _useBasePower = QPatch.Configuration.UseBasePower = e.Value;
                     break;
             }

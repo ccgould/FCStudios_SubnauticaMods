@@ -173,17 +173,7 @@ namespace FCS_AIMarineTurbine.Display
                 return false;
             }
             #endregion
-
-            #region Turbine Speed Value
-            _turbineSpeedValue = _turbineSpeed.transform.Find("TurbineSpeed_Value")?.GetComponent<Text>();
-
-            if (_turbineSpeedValue == null)
-            {
-                QuickLogger.Error("Text: Turbine Speed Value not found.");
-                return false;
-            }
-            #endregion
-
+            
             #region Home Screen Power BTN
             _homeScreenPowerBTN = _homePage.transform.Find("Power_BTN")?.gameObject;
 
@@ -309,13 +299,6 @@ namespace FCS_AIMarineTurbine.Display
                 _turbineSpeed.GetComponent<Text>().text =
                     LanguageHelpers.GetLanguage(DisplayLanguagePatching.SpeedKey) + ": " + $"<color=#00ffffff>" + _mono.GetSpeed()
                     + LanguageHelpers.GetLanguage(DisplayLanguagePatching.RPMKey) + "</color>";
-
-
-
-                //_depthValue.text = $"{Math.Round(_mono.GetDepth())}m";
-                //_turbineSpeedValue.text = $"{_mono.GetSpeed()}{LanguageHelpers.GetLanguage(DisplayLanguagePatching.RPMKey)}";
-
-                //Speed: < color =#00ffffff>200 rpm</color>
 
 
                 _healthSlider.GetComponent<Slider>().value = _mono.HealthManager.GetHealth() / 100f;

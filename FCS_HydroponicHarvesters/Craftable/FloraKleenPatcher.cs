@@ -57,6 +57,43 @@ namespace FCS_HydroponicHarvesters.Craftable
                 //Add the FCSTechFabricatorTag component
                 prefab.AddComponent<FCSTechFabricatorTag>();
 
+                // Set collider
+                var collider = prefab.GetComponentInChildren<Collider>();
+                collider.enabled = true;
+                collider.isTrigger = true;
+                QuickLogger.Debug("Added Getting Collider");
+
+                // We can pick this item
+                var pickupable = prefab.EnsureComponent<Pickupable>();
+                pickupable.isPickupable = true;
+                pickupable.randomizeRotationWhenDropped = true;
+                QuickLogger.Debug("Ensuring Pickupable");
+
+                //Allow this kit to be placed on surfaces in these situations
+                var placeTool = prefab.EnsureComponent<PlaceTool>();
+                placeTool.allowedInBase = true;
+                placeTool.allowedOnBase = false;
+                placeTool.allowedOnCeiling = false;
+                placeTool.allowedOnConstructable = true;
+                placeTool.allowedOnGround = true;
+                placeTool.allowedOnRigidBody = true;
+                placeTool.allowedOnWalls = false;
+                placeTool.allowedOutside = false;
+                placeTool.rotationEnabled = true;
+                placeTool.enabled = true;
+                placeTool.hasAnimations = false;
+                placeTool.hasBashAnimation = false;
+                placeTool.hasFirstUseAnimation = false;
+                placeTool.mainCollider = collider;
+                placeTool.pickupable = pickupable;
+                placeTool.drawTime = 0.5f;
+                placeTool.dropTime = 1;
+                placeTool.holsterTime = 0.35f;
+                QuickLogger.Debug("Ensuring PlaceTool");
+
+
+                MaterialHelpers.ApplyAlphaShader(HydroponicHarvestersModelPrefab.BodyMaterial, prefab);
+
                 return prefab;
             }
             catch (Exception e)
@@ -68,7 +105,6 @@ namespace FCS_HydroponicHarvesters.Craftable
 
         internal void Register()
         {
-
             HydroponicHarvestersModelPrefab.GetPrefabs();
 
             _prefab = HydroponicHarvestersModelPrefab.BottlePrefab;
@@ -88,11 +124,7 @@ namespace FCS_HydroponicHarvesters.Craftable
             rb.isKinematic = true;
             QuickLogger.Debug("Added Rigid Body");
 
-            // Set collider
-            var collider = _prefab.GetComponentInChildren<Collider>();
-            collider.enabled = true;
-            collider.isTrigger = true;
-            QuickLogger.Debug("Added Getting Collider");
+
             
             // Make the object drop slowly in water
             var wf = _prefab.EnsureComponent<WorldForces>();
@@ -119,34 +151,6 @@ namespace FCS_HydroponicHarvesters.Craftable
             applier.renderers = new Renderer[] { renderer };
             applier.anchorSky = Skies.Auto;
             QuickLogger.Debug("Ensuring SkyApplier");
-
-            // We can pick this item
-            var pickupable = _prefab.EnsureComponent<Pickupable>();
-            pickupable.isPickupable = true;
-            pickupable.randomizeRotationWhenDropped = true;
-            QuickLogger.Debug("Ensuring Pickupable");
-
-            //Allow this kit to be placed on surfaces in these situations
-            var placeTool = _prefab.EnsureComponent<PlaceTool>();
-            placeTool.allowedInBase = true;
-            placeTool.allowedOnBase = false;
-            placeTool.allowedOnCeiling = false;
-            placeTool.allowedOnConstructable = true;
-            placeTool.allowedOnGround = true;
-            placeTool.allowedOnRigidBody = true;
-            placeTool.allowedOnWalls = false;
-            placeTool.allowedOutside = false;
-            placeTool.rotationEnabled = true;
-            placeTool.enabled = true;
-            placeTool.hasAnimations = false;
-            placeTool.hasBashAnimation = false;
-            placeTool.hasFirstUseAnimation = false;
-            placeTool.mainCollider = collider;
-            placeTool.pickupable = pickupable;
-            placeTool.drawTime = 0.5f;
-            placeTool.dropTime = 1;
-            placeTool.holsterTime = 0.35f;
-            QuickLogger.Debug("Ensuring PlaceTool");
         }
 
 
@@ -165,7 +169,7 @@ namespace FCS_HydroponicHarvesters.Craftable
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(TechType.FilteredWater, 2),
+                    new Ingredient(TechType.BigFilteredWater, 2),
                     new Ingredient(TechType.Salt, 1),
                 }
             };
@@ -186,9 +190,8 @@ namespace FCS_HydroponicHarvesters.Craftable
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(TechType.GasPod, 1),
-                    new Ingredient(TechType.AcidMushroom, 1),
-                    new Ingredient(TechType.Titanium, 1),
+                    new Ingredient(TechType.BigFilteredWater, 2),
+                    new Ingredient(TechType.Salt, 1),
                 }
             };
             return customFabRecipe;

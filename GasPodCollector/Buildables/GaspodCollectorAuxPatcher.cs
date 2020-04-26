@@ -25,7 +25,6 @@ namespace GasPodCollector.Buildables
             LanguageHandler.SetLanguageLine(HasBatteriesKey, $"Please remove all batteries in the {Mod.FriendlyName}.");
             LanguageHandler.SetLanguageLine(AmountOfPodsMessageKey, $"AMOUNT OF PODS");
             LanguageHandler.SetLanguageLine(InstructionsKey, $"Click the left button to take one gaspod or click the right to fill your inventory.");
-            LanguageHandler.SetLanguageLine(HasBatteriesKey, $"Please remove all batteries in the {Mod.FriendlyName}.");
             LanguageHandler.SetLanguageLine(DumpPullKey, $"Bulk Pull");
             LanguageHandler.SetLanguageLine(DumpMessageKey, $"Fill Players Inventory");
             LanguageHandler.SetLanguageLine(TakeGaspodKey, $"Take gaspod.");

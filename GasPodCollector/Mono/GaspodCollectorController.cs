@@ -51,33 +51,17 @@ namespace GasPodCollector.Mono
             rigidbody = gameObject.GetComponent<Rigidbody>();
             rigidbody.mass = QPatch.Configuration.Config.CollectorMass;
             rigidbody.isKinematic = true;
-        }
 
-        private void OnEnable()
-        {
             try
             {
-                if (_runStartUpOnEnable)
+                if (!IsInitialized)
                 {
-                    if (!IsInitialized)
-                    {
-                        Initialize();
-                    }
+                    Initialize();
+                }
 
-                    if (_fromSave)
-                    {
-                        if (_savedData == null)
-                        {
-                            ReadySaveData();
-                        }
-
-                        GaspodCollectorStorage.SetStorageAmount(_savedData.GaspodAmount);
-                        PowerManager.LoadSaveData(_savedData.Batteries);
-                        DisplayManager.OnStorageAmountChange(_savedData.GaspodAmount);
-                        ReattachBeaconAfterLoad();
-                        ColorManager.SetColorFromSave(_savedData.BodyColor.Vector4ToColor());
-                        QuickLogger.Info($"Loaded {Mod.FriendlyName}");
-                    }
+                if (_savedData == null)
+                {
+                    ReadySaveData();
                 }
             }
             catch (Exception e)
@@ -199,9 +183,20 @@ namespace GasPodCollector.Mono
             if (_savedData == null)
             {
                 ReadySaveData();
+                _fromSave = true;
             }
 
-            _fromSave = true;
+            if (!IsInitialized)
+            {
+                Initialize();
+            }
+
+            GaspodCollectorStorage.SetStorageAmount(_savedData.GaspodAmount);
+            PowerManager.LoadSaveData(_savedData.Batteries);
+            DisplayManager.OnStorageAmountChange(_savedData.GaspodAmount);
+            ReattachBeaconAfterLoad();
+            ColorManager.SetColorFromSave(_savedData.BodyColor.Vector4ToColor());
+            QuickLogger.Info($"Loaded {Mod.FriendlyName}");
         }
 
         public override bool CanDeconstruct(out string reason)

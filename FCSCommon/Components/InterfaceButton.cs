@@ -30,7 +30,10 @@ namespace FCSCommon.Components
         public Action<bool> OnInterfaceButton { get; set; }
 
         public Action<string, object> OnButtonClick;
+
         private bool _isSelected;
+
+        
 
         #endregion
 
@@ -93,7 +96,7 @@ namespace FCSCommon.Components
             if (string.IsNullOrEmpty(BtnName)) return;
             UpdateTextComponent(IsTextMode());
             QuickLogger.Debug($"Button Name:{BtnName} || Button Mode {ButtonMode}", true);
-
+            
             switch (this.ButtonMode)
             {
                 case InterfaceButtonMode.TextScale:
@@ -197,6 +200,8 @@ namespace FCSCommon.Components
         public override void OnPointerClick(PointerEventData eventData)
         {
             base.OnPointerClick(eventData);
+
+            if(!EventSystem.current.IsPointerOverGameObject()) return;
 
             if (this.IsHovered)
             {

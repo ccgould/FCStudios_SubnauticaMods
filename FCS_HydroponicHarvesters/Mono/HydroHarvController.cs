@@ -36,7 +36,7 @@ namespace FCS_HydroponicHarvesters.Mono
         internal HydroHarvLightManager LightManager { get; private set; }
         internal HydroHarvCleanerManager CleanerManager { get; private set; }
         internal DumpContainer CleanerDumpContainer { get; private set; }
-        internal bool IsConnectedToBase => _seaBase != null && _seaBase.name.StartsWith("Base", StringComparison.OrdinalIgnoreCase);
+        internal bool IsConnectedToBase => _seaBase != null && (_seaBase.name.StartsWith("Cyclops", StringComparison.OrdinalIgnoreCase) || _seaBase.name.StartsWith("Base", StringComparison.OrdinalIgnoreCase));
         internal SpeedModes CurrentSpeedMode
         {
             get => _currentMode;

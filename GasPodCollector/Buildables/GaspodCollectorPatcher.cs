@@ -44,9 +44,16 @@ namespace GasPodCollector.Buildables
                 var size = new Vector3(0.5021304f, 0.5062426f, 0.5044461f);
 
                 GameObjectHelpers.AddConstructableBounds(prefab, size, center);
-
+                
                 //Add the FCSTechFabricatorTag component
                 prefab.AddComponent<FCSTechFabricatorTag>();
+
+                // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
+                var lwe = prefab.AddComponent<LargeWorldEntity>();
+                lwe.cellLevel = LargeWorldEntity.CellLevel.Global;
+
+                prefab.AddComponent<GaspodManager>();
+                prefab.AddComponent<GaspodCollectorController>();
 
                 return prefab;
             }
@@ -108,11 +115,8 @@ namespace GasPodCollector.Buildables
             skyApplier.renderers = model.GetComponentsInChildren<MeshRenderer>();
             skyApplier.anchorSky = Skies.Auto;
 
-            // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
-            var lwe = _prefab.AddComponent<LargeWorldEntity>();
-            lwe.cellLevel = LargeWorldEntity.CellLevel.Far;
-
             //========== Allows the building animation and material colors ==========// 
+
 
             // Add constructible
             var constructable = _prefab.AddComponent<Constructable>();
@@ -139,9 +143,9 @@ namespace GasPodCollector.Buildables
             _prefab.AddComponent<Stabilizer>().uprightAccelerationStiffness = 0.3f;
             _prefab.AddComponent<TechTag>().type = Singleton.TechType;
             _prefab.AddComponent<FMOD_CustomLoopingEmitter>();
-            _prefab.AddComponent<GaspodManager>();
+
             _prefab.AddComponent<AnimationManager>();
-            _prefab.AddComponent<GaspodCollectorController>();
+            
             var wf = _prefab.AddComponent<WorldForces>();
             wf.aboveWaterGravity = 9.81f;
             wf.underwaterDrag = 2f;

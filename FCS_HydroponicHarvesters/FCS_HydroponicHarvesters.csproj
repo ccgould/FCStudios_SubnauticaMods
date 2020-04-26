@@ -70,9 +70,6 @@
     <Reference Include="SMLHelper">
       <HintPath>..\Dependancies\Subnautica\SMLHelper.dll</HintPath>
     </Reference>
-    <Reference Include="Straitjacket.Utility.VersionChecker">
-      <HintPath>F:\Program Files\Epic Games\Subnautica\QMods\VersionChecker\Straitjacket.Utility.VersionChecker.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />

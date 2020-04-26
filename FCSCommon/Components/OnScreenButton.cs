@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace FCSCommon.Components
@@ -12,7 +13,8 @@ namespace FCSCommon.Components
         protected bool IsHovered { get; set; }
         internal string TextLineOne { get; set; }
         internal string TextLineTwo { get; set; }
-
+        public bool GetAdditionalDataFromString { get; set; } = false;
+        public Func<string> GetAdditionalString { get; set; }
         private bool isHoveredOutOfRange;
         internal bool Disabled { get; set; }
         internal float MaxInteractionRange { get; set; }  = 2.5f;
@@ -33,7 +35,18 @@ namespace FCSCommon.Components
             if (this.IsHovered && inInteractionRange)
             {
                 if(string.IsNullOrEmpty(TextLineOne) && string.IsNullOrEmpty(TextLineTwo)) return;
-                HandReticle.main.SetInteractTextRaw(this.TextLineOne, this.TextLineTwo);
+
+                if(GetAdditionalDataFromString)
+                {
+                    HandReticle.main.SetIcon(HandReticle.IconType.Hand, 1f);
+                    HandReticle.main.SetInteractTextRaw(this.TextLineOne,GetAdditionalString.Invoke());
+                }
+                else
+                {
+                    HandReticle.main.SetInteractTextRaw(this.TextLineOne, this.TextLineTwo);
+                }
+
+
             }
 #elif BELOWZERO
             if (this.IsHovered && inInteractionRange)

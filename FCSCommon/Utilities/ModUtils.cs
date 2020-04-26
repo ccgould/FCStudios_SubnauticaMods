@@ -6,13 +6,13 @@ using UnityEngine;
 
 namespace FCSCommon.Utilities
 {
-    public static class ModUtils
+    internal static class ModUtils
     {
 
         private static MonoBehaviour _coroutineObject;
 
 
-        public static void Save<SaveDataT>(SaveDataT newSaveData, string fileName, string saveDirectory, Action onSaveComplete = null)
+        internal static void Save<SaveDataT>(SaveDataT newSaveData, string fileName, string saveDirectory, Action onSaveComplete = null)
         {
             if (newSaveData != null)
             {
@@ -29,7 +29,7 @@ namespace FCSCommon.Utilities
             }
         }
 
-        public static void LoadSaveData<TSaveData>(string fileName, string saveDirectory, Action<TSaveData> onSuccess) where TSaveData : new()
+        internal static void LoadSaveData<TSaveData>(string fileName, string saveDirectory, Action<TSaveData> onSuccess) where TSaveData : new()
         {
             var path = Path.Combine(saveDirectory, fileName);
             if (!File.Exists(path)) return;

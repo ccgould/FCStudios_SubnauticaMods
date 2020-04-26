@@ -1,0 +1,13 @@
+﻿{
+  "Id": "FCSDataStorageSolutions",
+  "DisplayName": "Data Storage Solutions",
+  "Author": "FCStudios",
+  "Version": "1.0.0",
+  "Enable": true,
+  "Game": "Subnautica",
+  "VersionDependencies": {
+    "FCSTechFabricator": "2.0.3",
+    "SMLHelper": "2.6.1",
+    "Straitjacket.Subnautica.Mods.VersionChecker": "1.0"
+  }
+}

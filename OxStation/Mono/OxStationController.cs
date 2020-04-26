@@ -159,6 +159,7 @@ namespace MAC.OxStation.Mono
         {
             AnimationManager.SetBoolHash(IsRunningHash, obj == FCSPowerStates.Powered);
         }
+        
         private PrefabIdentifier GetPrefabID()
         {
             return GetComponentInChildren<PrefabIdentifier>() ?? GetComponentInParent<PrefabIdentifier>();
