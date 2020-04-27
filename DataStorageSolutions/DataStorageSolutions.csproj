@@ -117,9 +117,11 @@
     <Compile Include="Configuration\Mod.cs" />
     <Compile Include="Configuration\SaveDataEntry.cs" />
     <Compile Include="Craftables\ServerCraftable.cs" />
+    <Compile Include="Helpers\DSSHelpers.cs" />
     <Compile Include="Interfaces\IBaseAntenna.cs" />
     <Compile Include="Interfaces\IDataSoluationsSave.cs" />
     <Compile Include="Model\BaseManager.cs" />
+    <Compile Include="Model\Catergories.cs" />
     <Compile Include="Model\RackSlot.cs" />
     <Compile Include="Model\ObjectDataTransferData.cs" />
     <Compile Include="Mono\DSSAntennaController.cs" />

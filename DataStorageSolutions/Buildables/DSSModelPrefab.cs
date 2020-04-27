@@ -29,6 +29,7 @@ namespace DataStorageSolutions.Buildables
         internal static AssetBundle Bundle { get; set; }
         internal static GameObject ServerPrefab { get; set; }
         internal static GameObject BaseItemPrefab { get; set; }
+        internal static GameObject FilterItemPrefab { get; set; }
         public static bool GetPrefabs()
         {
             try
@@ -52,6 +53,7 @@ namespace DataStorageSolutions.Buildables
                     GameObject item = assetBundle.LoadAsset<GameObject>("DSS_Item");
                     GameObject antenna = assetBundle.LoadAsset<GameObject>(Mod.AntennaPrefabName);
                     GameObject formatMachine = assetBundle.LoadAsset<GameObject>(Mod.ServerFormattingStationPrefabName);
+                    GameObject filterItemPrefab = assetBundle.LoadAsset<GameObject>("FilterItem");
 
                     //If the prefab isn't null lets add the shader to the materials
                     if (wallMountRackPrefab != null)
@@ -159,6 +161,16 @@ namespace DataStorageSolutions.Buildables
                     else
                     {
                         QuickLogger.Error($"Format Machine Not Found!");
+                        return false;
+                    }
+
+                    if (filterItemPrefab != null)
+                    {
+                        FilterItemPrefab = filterItemPrefab;
+                    }
+                    else
+                    {
+                        QuickLogger.Error($"Filter Item Not Found!");
                         return false;
                     }
 

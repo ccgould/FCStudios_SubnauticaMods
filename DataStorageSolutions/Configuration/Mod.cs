@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using DataStorageSolutions.Abstract;
@@ -79,7 +80,6 @@ namespace DataStorageSolutions.Configuration
         public static List<string> TrackedServers { get; set; } = new List<string>();
         #endregion
 
-        //TODO Change Ingredients
         #region Ingredients
 
 #if SUBNAUTICA
@@ -358,14 +358,20 @@ namespace DataStorageSolutions.Configuration
 
             return LoadConfigurationData();
         }
+
+        public static string GetAssetPath(string fileName)
+        {
+            return Path.Combine(GetAssetFolder(), fileName);
+        }
     }
 
     internal class Config
     {
         [JsonProperty] internal  float EnergyCost = 1500f;
         [JsonProperty] internal int ServerStorageLimit { get; set; } = 48;
-        public float AntennaPowerUsage { get; set; } = 0.1f;
-        public float ScreenPowerUsage { get; set; } = 0.1f;
+        [JsonProperty] internal float AntennaPowerUsage { get; set; } = 0.1f;
+        [JsonProperty] internal float ScreenPowerUsage { get; set; } = 0.1f;
+        [JsonProperty] internal bool ShowAllItems { get; set; }
     }
 
     internal class ConfigFile

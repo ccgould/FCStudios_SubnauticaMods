@@ -5,14 +5,18 @@ using System.Text;
 using DataStorageSolutions.Abstract;
 using DataStorageSolutions.Buildables;
 using DataStorageSolutions.Configuration;
+using DataStorageSolutions.Helpers;
+using DataStorageSolutions.Model;
 using FCSCommon.Controllers;
 using FCSCommon.Utilities;
+using FCSTechFabricator.Components;
+using FCSTechFabricator.Interfaces;
 using FCSTechFabricator.Managers;
 using UnityEngine;
 
 namespace DataStorageSolutions.Mono
 {
-    internal class DSSServerFormattingStationController : DataStorageSolutionsController
+    internal class DSSServerFormattingStationController : DataStorageSolutionsController, IFCSStorage
     {
         private bool _runStartUpOnEnable;
         private bool _fromSave;
@@ -20,10 +24,13 @@ namespace DataStorageSolutions.Mono
         private string _prefabID;
         private bool _isContructed;
         private int _slotState;
+        private List<ObjectData> _items;
+        private DSSServerController _controller;
 
         public ColorManager ColorManager { get; private set; }
         public DSSServerFormattingStationDisplay DisplayManager { get; private set; }
         public AnimationManager AnimationManager { get; private set; }
+        public DumpContainer DumpContainer { get; private set; }
 
         private void OnEnable()
         {
@@ -62,6 +69,8 @@ namespace DataStorageSolutions.Mono
 
         public override void Initialize()
         {
+            QuickLogger.Debug("Initialize Formatter", true);
+
             _slotState = Animator.StringToHash("SlotState");
 
             if (AnimationManager == null)
@@ -81,7 +90,11 @@ namespace DataStorageSolutions.Mono
                 DisplayManager.Setup(this);
             }
 
-            Mod.OnAntennaBuilt?.Invoke(true);
+            if (DumpContainer == null)
+            {
+                DumpContainer = new DumpContainer();
+                DumpContainer.Initialize(transform, AuxPatchers.BaseDumpReceptacle(), AuxPatchers.NotAllowed(), AuxPatchers.DriveFull(), this, 4, 4);
+            }
 
             IsInitialized = true;
         }
@@ -149,14 +162,41 @@ namespace DataStorageSolutions.Mono
             }
         }
 
-        public void OpenDump()
-        {
-            QuickLogger.Info("Please add a server.",true);
-        }
-
         public void ToggleDummyServer()
         {
             AnimationManager.SetBoolHash(_slotState,!AnimationManager.GetBoolHash(_slotState));
+        }
+
+        public int GetContainerFreeSpace { get; }
+        public bool IsFull { get; }
+        public bool CanBeStored(int amount)
+        {
+            return false;
+        }
+
+        public bool AddItemToContainer(InventoryItem item)
+        {
+            _controller = item.item.GetComponent<DSSServerController>();
+            _items = new List<ObjectData>(_controller.Items);
+            DisplayManager.GoToPage(FilterPages.FilterPage);
+            ToggleDummyServer();
+            Destroy(item.item.gameObject);
+            return true;
+        }
+
+        public void GivePlayerItem()
+        {
+            DSSHelpers.GivePlayerItem(QPatch.Server.TechType, new ObjectDataTransferData{data = _items, IsServer = true}, null);
+        }
+
+        public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
+        {
+            if (AnimationManager.GetBoolHash(_slotState))
+            {
+                return false;
+            }
+
+            return pickupable.GetTechType() == QPatch.Server.TechType;
         }
     }
 }

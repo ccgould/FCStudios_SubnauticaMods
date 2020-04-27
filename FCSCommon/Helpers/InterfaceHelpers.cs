@@ -100,7 +100,7 @@ namespace FCSCommon.Helpers
         {
             foreach (Transform obj in gameObject.transform)
             {
-                if (obj.name.StartsWith(name))
+                if (obj.name.Trim().StartsWith(name, StringComparison.OrdinalIgnoreCase))
                 {
                     return obj.gameObject;
                 }
