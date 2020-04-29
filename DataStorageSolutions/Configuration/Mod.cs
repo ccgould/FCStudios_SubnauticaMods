@@ -76,7 +76,7 @@ namespace DataStorageSolutions.Configuration
 
         internal static Action<bool> OnAntennaBuilt;
 
-        internal static Dictionary<string, List<ObjectData>> Servers { get; set; } = new Dictionary<string, List<ObjectData>>();
+        internal static Dictionary<string, ServerData> Servers { get; set; } = new Dictionary<string, ServerData>();
         public static List<string> TrackedServers { get; set; } = new List<string>();
         #endregion
 
@@ -268,7 +268,13 @@ namespace DataStorageSolutions.Configuration
             ModUtils.LoadSaveData<SaveData>(SaveDataFilename, GetSaveFileDirectory(), (data) =>
             {
                 _saveData = data;
-                Mod.Servers = data.Servers;
+                Servers = data.Servers;
+
+                foreach (KeyValuePair<string, ServerData> objServer in data.Servers)
+                {
+                    QuickLogger.Debug($"Server Data: S={objServer.Value.Server?.Count} || F={objServer.Value.ServerFilters?.Count}");
+                }
+
                 QuickLogger.Info("Save Data Loaded");
                 OnDataLoaded?.Invoke(_saveData);
             });

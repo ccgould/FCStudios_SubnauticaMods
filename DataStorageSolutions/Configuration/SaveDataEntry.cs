@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using DataStorageSolutions.Model;
+using DataStorageSolutions.Mono;
 using FCSCommon.Enums;
 using FCSCommon.Objects;
 using FCSTechFabricator.Objects;
@@ -15,33 +17,35 @@ namespace DataStorageSolutions.Configuration
         [JsonProperty] internal string ID { get; set; }
         [JsonProperty] internal ColorVec4 BodyColor { get; set; }
         [JsonProperty] internal ColorVec4 AntennaBodyColor { get; set; }
-        [JsonProperty] internal List<List<ObjectData>> Servers { get; set; }
+        [JsonProperty] internal List<ServerData> Servers { get; set; }
         [JsonProperty] internal List<ObjectData> ServerData { get; set; }
         [JsonProperty] internal string AntennaName { get; set; }
+        [JsonProperty] internal List<Filter> Filters { get; set; }
     }
 
     [Serializable]
     internal class SaveData
     {
         [JsonProperty] internal List<SaveDataEntry> Entries = new List<SaveDataEntry>();
-        public Dictionary<string, List<ObjectData>> Servers { get; set; }
+        [JsonProperty] internal Dictionary<string, ServerData> Servers { get; set; }
     }
 
     [Serializable]
     internal class ObjectData
     {
-        public SaveDataObjectType DataObjectType { get; set; }
-        public TechType TechType { get; set; }
-        public int Slot { get; set; }
-        public EatableEntities EatableEntity { get; set; }
-        public PlayerToolData PlayToolData { get; set; }
-        public List<ObjectData> ServerData { get; set; }
+        [JsonProperty] internal SaveDataObjectType DataObjectType { get; set; }
+        [JsonProperty] internal TechType TechType { get; set; }
+        [JsonProperty] internal int Slot { get; set; }
+        [JsonProperty] internal EatableEntities EatableEntity { get; set; }
+        [JsonProperty] internal PlayerToolData PlayToolData { get; set; }
+        [JsonProperty] internal List<ObjectData> ServerData { get; set; }
+        [JsonProperty] internal List<Filter> Filters { get; set; }
     }
 
     internal class PlayerToolData
     {
-        public TechType TechType { get; set; }
-        public BatteryInfo BatteryInfo { get; set; }
-        public bool HasBattery => BatteryInfo != null;
+        [JsonProperty] internal TechType TechType { get; set; }
+        [JsonProperty] internal BatteryInfo BatteryInfo { get; set; }
+        [JsonProperty] internal bool HasBattery => BatteryInfo != null;
     }
 }

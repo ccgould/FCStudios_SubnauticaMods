@@ -78,7 +78,8 @@ namespace DataStorageSolutions.Helpers
                     var data = (List<ObjectData>)itemData.data;
                     var controller = pickup.gameObject.GetComponent<DSSServerController>();
                     controller.Initialize();
-                    controller.Items = data;
+                    controller.Items = new List<ObjectData>(data);
+                    controller.Filters= new List<Filter>(itemData.Filters);
                     controller.DisplayManager.UpdateDisplay();
                     isSuccessful = true;
                 }

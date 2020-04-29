@@ -444,6 +444,7 @@ namespace DataStorageSolutions.Model
     public class Filter
     {
         public string Category;
+
         public List<TechType> Types = new List<TechType>();
 
         public bool IsCategory() => !string.IsNullOrEmpty(Category);

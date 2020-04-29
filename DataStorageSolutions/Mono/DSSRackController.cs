@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using DataStorageSolutions.Abstract;
 using DataStorageSolutions.Buildables;
@@ -8,10 +7,8 @@ using DataStorageSolutions.Configuration;
 using DataStorageSolutions.Helpers;
 using DataStorageSolutions.Model;
 using FCSCommon.Utilities;
-using FCSCommon.Abstract;
 using FCSCommon.Controllers;
 using FCSCommon.Enums;
-using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Interfaces;
 using FCSCommon.Objects;
@@ -20,7 +17,6 @@ using FCSTechFabricator.Extensions;
 using FCSTechFabricator.Interfaces;
 using FCSTechFabricator.Managers;
 using FCSTechFabricator.Objects;
-using rail;
 using UnityEngine;
 
 namespace DataStorageSolutions.Mono
@@ -38,7 +34,7 @@ namespace DataStorageSolutions.Mono
         private int _rackDoor;
         private int _buttonState;
         private GameObject _drives;
-        private int _state;
+
 
         public int GetContainerFreeSpace { get; }
         public bool IsFull => GetIsFull();
@@ -96,12 +92,12 @@ namespace DataStorageSolutions.Mono
 
             QuickLogger.Debug($"Save Data Count: {_savedData.Servers.Count}");
 
-            foreach (List<ObjectData> data in _savedData.Servers)
+            foreach (ServerData data in _savedData.Servers)
             {
                 if (data != null)
                 {
                     var slot = GetSlotByID(GetFreeSlotID());
-                    AddServer(data);
+                    AddServer(data.Server, data.ServerFilters);
                 }
             }
         }
@@ -157,7 +153,7 @@ namespace DataStorageSolutions.Mono
             return true;
         }
 
-        private bool AddServerToSlot(List<ObjectData> server, int slotID)
+        private bool AddServerToSlot(List<ObjectData> server,List<Filter> filters, int slotID)
         {
             var slotByID = this.GetSlotByID(slotID);
 
@@ -175,7 +171,13 @@ namespace DataStorageSolutions.Mono
             SetSlotOccupiedState(slotID, true);
             QuickLogger.Debug($"Current ID Occupied Stat = {slotByID.IsOccupied}");
             QuickLogger.Debug($"Data Count = {server.Count}");
+
             slotByID.Server = new List<ObjectData>(server);
+            if (filters != null)
+            {
+                slotByID.Filter = new List<Filter>(filters);
+            }
+
             return true;
         }
 
@@ -203,13 +205,13 @@ namespace DataStorageSolutions.Mono
             _savedData = Mod.GetSaveData(GetPrefabIDString());
         }
 
-        private IEnumerable<List<ObjectData>> SaveRackData()
+        private IEnumerable<ServerData> SaveRackData()
         {
             foreach (RackSlot server in _servers)
             {
                 if (server.Server != null)
                 {
-                    yield return server.Server;
+                    yield return new ServerData{Server = server.Server, ServerFilters = server.Filter };
                 }
             }
         }
@@ -228,9 +230,9 @@ namespace DataStorageSolutions.Mono
             }
         }
 
-        internal bool GetRackCageState()
+        internal bool IsRackOpen()
         {
-            return Convert.ToBoolean(_state);
+            return AnimationManager.GetIntHash(_rackDoor) == 1;
         }
 
         /// <summary>
@@ -246,12 +248,12 @@ namespace DataStorageSolutions.Mono
         /// Gets a server that is not full.
         /// </summary>
         /// <returns></returns>
-        internal RackSlot GetUsableServer()
+        internal RackSlot GetUsableServer(TechType techType)
         {
-            return _servers?.FirstOrDefault(x => !x.IsFull() && x.IsOccupied);
+            return _servers?.FirstOrDefault(x => !x.IsFull() && x.IsAllowedToAdd(techType) && x.IsOccupied);
         }
 
-        internal bool AddServer(List<ObjectData> server)
+        internal bool AddServer(List<ObjectData> server,List<Filter> filters)
         {
             if (server == null)
             {
@@ -261,7 +263,7 @@ namespace DataStorageSolutions.Mono
 
             QuickLogger.Debug($"In Add Server Adding", true);
             var freeSlotId = GetFreeSlotID();
-            var success = AddServerToSlot(server, freeSlotId);
+            var success = AddServerToSlot(server,filters, freeSlotId);
 
             QuickLogger.Debug($"Success Result = {success}");
 
@@ -409,10 +411,21 @@ namespace DataStorageSolutions.Mono
 
         public override bool CanDeconstruct(out string reason)
         {
+            if (HasServers())
+            {
+                reason = AuxPatchers.HasItemsMessage();
+                return false;
+            }
             reason = string.Empty;
             return true;
         }
-        
+
+        private bool HasServers()
+        {
+            var result = _servers.Count(x => x.IsOccupied);
+            return result > 0;
+        }
+
         internal Dictionary<TechType, int> GetStoredData()
         {
             var result = new Dictionary<TechType, int>();
@@ -474,9 +487,7 @@ namespace DataStorageSolutions.Mono
 
             return null;
         }
-
-
-
+        
         private RackSlot GetServerWithObjectData(ObjectData data)
         {
             foreach (RackSlot rackSlot in _servers)
@@ -495,8 +506,7 @@ namespace DataStorageSolutions.Mono
         {
             if (!forceOpen)
             {
-                _state = AnimationManager.GetIntHash(_rackDoor) < 1 ? 1 : 0;
-                AnimationManager.SetIntHash(_rackDoor, _state);
+                AnimationManager.SetIntHash(_rackDoor, AnimationManager.GetIntHash(_rackDoor) < 1 ? 1 : 0);
                 AnimationManager.SetBoolHash(_buttonState, AnimationManager.GetBoolHash(_buttonState) != true);
             }
             else
@@ -539,7 +549,7 @@ namespace DataStorageSolutions.Mono
             //var controller = serverClone.GetComponent<DSSServerController>();
             //controller.Items = new List<ObjectData>(originalController.Items);
             //controller.DisplayManager.UpdateDisplay();
-            var server = AddServer(originalController.Items);
+            var server = AddServer(originalController.Items,originalController.Filters);
             Destroy(item.item.gameObject);
             return server;
         }
@@ -551,7 +561,7 @@ namespace DataStorageSolutions.Mono
 
         internal void AddItemToAServer(InventoryItem item)
         {
-            var server = GetUsableServer();
+            var server = GetUsableServer(item.item.GetTechType());
             if (server == null) return;
             server.Add(MakeObjectData(item,server.Id));
             Destroy(item.item.gameObject);
@@ -666,5 +676,11 @@ namespace DataStorageSolutions.Mono
         {
             return DSSHelpers.GivePlayerItem(techType, data, GetServerWithObjectData);
         }
+    }
+
+    internal class ServerData
+    {
+        public List<ObjectData> Server { get; set; }
+        public List<Filter> ServerFilters { get; set; }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using DataStorageSolutions.Abstract;
 using DataStorageSolutions.Configuration;
+using DataStorageSolutions.Model;
 using FCSCommon.Abstract;
 using FCSCommon.Enums;
 using FCSCommon.Extensions;
@@ -23,6 +24,10 @@ namespace DataStorageSolutions.Mono
         private bool _fromSave;
         private SaveDataEntry _savedData;
         private List<ObjectData> _items = new List<ObjectData>();
+        private List<Filter> _filters;
+        private ServerData _data;
+        
+        private Dictionary<string, ServerData> LoadedData => Mod.Servers; //TODO Delete
 
         [JsonIgnore] internal int StorageLimit => QPatch.Configuration.Config.ServerStorageLimit;
         [JsonIgnore] public int GetContainerFreeSpace => GetFreeSpace();
@@ -32,14 +37,28 @@ namespace DataStorageSolutions.Mono
             get => _items;
             set
             {
+                QuickLogger.Debug($"Server Value: {value.Count}"); 
                 _items = value;
 
                 UpdateServerData(GetPrefabIDString());
             }
         }
+
         [JsonIgnore] public TechType TechType => GetTechType();
         [JsonIgnore] internal bool IsMounted => _mono != null;
         [JsonIgnore] public DSSServerDisplay DisplayManager { get; private set; }
+        [JsonProperty] internal List<Filter> Filters
+        {
+            get => _filters ?? (_filters = _data?.ServerFilters);
+            set
+            {
+                QuickLogger.Debug($"Filter Value: {value.Count}");
+
+                _filters = value;
+
+                UpdateServerData(GetPrefabIDString());
+            }
+        }
 
         //private void OnEnable()
         //{
@@ -110,10 +129,9 @@ namespace DataStorageSolutions.Mono
 
             if (Mod.Servers.ContainsKey(id))
             {
-                Items = Mod.Servers[id];
+                _data = Mod.Servers[id];
+                Items = _data.Server;
             }
-
-            UpdateServerData(id);
         }
 
         private TechType GetTechType()
@@ -198,23 +216,12 @@ namespace DataStorageSolutions.Mono
 
             if (Mod.Servers.ContainsKey(id))
             {
-                Mod.Servers[id] = Items;
+                Mod.Servers[id].Server = Items;
+                Mod.Servers[id].ServerFilters = Filters;
             }
             else
             {
-                Mod.Servers.Add(id, Items);
-            }
-        }
-
-        internal void AddItemToContainer(TechType item, bool initializer = false)
-        {
-            QuickLogger.Debug("Adding to container", true);
-
-            if (!IsFull)
-            {
-                Items.Add(new ObjectData { TechType = item});
-                DisplayManager.UpdateDisplay();
-                Mod.OnContainerUpdate?.Invoke();
+                Mod.Servers.Add(id, new ServerData{ServerFilters = Filters, Server = Items});
             }
         }
 
@@ -234,6 +241,18 @@ namespace DataStorageSolutions.Mono
             }
 
             return objectDataMatch;
+        }
+
+        internal void AddItemToContainer(TechType item, bool initializer = false)
+        {
+            QuickLogger.Debug("Adding to container", true);
+
+            if (!IsFull)
+            {
+                Items.Add(new ObjectData { TechType = item});
+                DisplayManager.UpdateDisplay();
+                Mod.OnContainerUpdate?.Invoke();
+            }
         }
 
         internal void RemoveItemFromContainer(TechType item)
@@ -325,6 +344,7 @@ namespace DataStorageSolutions.Mono
 
             _savedData.ID = id;
             _savedData.ServerData = Items;
+            _savedData.Filters = Filters;
             newSaveData.Entries.Add(_savedData);
         }
         
@@ -347,8 +367,6 @@ namespace DataStorageSolutions.Mono
             }
         }
 
-        public Dictionary<string, List<ObjectData>> ModServer => Mod.Servers;
-
         public override void OnProtoDeserialize(ProtobufSerializer serializer)
         {
             QuickLogger.Debug("In OnProtoDeserialize");
@@ -363,6 +381,7 @@ namespace DataStorageSolutions.Mono
             var id = GetPrefabIDString();
             QuickLogger.Info($"Loading Server {id}");
             _fromSave = true;
+
         }
 
         public bool HasItem(TechType techType)

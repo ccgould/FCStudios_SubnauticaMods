@@ -9,6 +9,7 @@ using FCSCommon.Components;
 using FCSCommon.Enums;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
+using RootMotion.FinalIK;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -25,6 +26,7 @@ namespace DataStorageSolutions.Mono
         private readonly Color _hoverColor = Color.white;
         private List<Filter> _filters => FilterList.GetFilters();
         private List<Filter> _grouped = new List<Filter>();
+        private List<InterfaceButton> _trackedButtons = new List<InterfaceButton>();
 
         internal void Setup(DSSServerFormattingStationController mono)
         {
@@ -54,9 +56,29 @@ namespace DataStorageSolutions.Mono
                     GoToPage(FilterPages.FilterPage);
                     break;
 
-                //case "ItemBTN":
-                //    _currentBase?.TakeItem((TechType)tag);
-                //    break;
+                case "FilterBTN":
+                    
+                    var filter = (FilterTransferData) tag;
+
+                    QuickLogger.Debug($"Filter Button Clicked: {filter.Filter} || {filter.Toggle?.isOn}",true);
+
+                    if (filter.Toggle == null)
+                    {
+                        QuickLogger.Error("ToggleButton is null");
+                        return;
+                    }
+
+                    if (filter.Toggle.isOn)
+                    {
+                        _mono.AddFilter(filter.Filter);
+                        UpdatePages();
+                    }
+                    else
+                    {
+                        _mono.RemoveFilter(filter.Filter);
+                        UpdatePages();
+                    }
+                    break;
 
                 case "AddServerBTN":
                     _mono.DumpContainer.OpenStorage();
@@ -181,13 +203,44 @@ namespace DataStorageSolutions.Mono
             }
         }
 
-        private void OnLoadFilterGrid(DisplayData obj)
+        private void OnLoadFilterGrid(DisplayData data)
         {
-            
+            _filterGrid.ClearPage();
+
+            _grouped = _mono.GetFilters();
+
+            if (_grouped == null) return;
+
+            QuickLogger.Debug("Load Filters");
+
+            if (data.EndPosition > _grouped.Count)
+            {
+                data.EndPosition = _grouped.Count;
+            }
+
+            for (int i = data.StartPosition; i < data.EndPosition; i++)
+            {
+                GameObject buttonPrefab = Instantiate(data.ItemsPrefab);
+
+                if (buttonPrefab == null || data.ItemsGrid == null)
+                {
+                    if (buttonPrefab != null)
+                    {
+                        QuickLogger.Debug("Destroying Tab", true);
+                        Destroy(buttonPrefab);
+                    }
+                    return;
+                }
+
+                CreateButton(data, buttonPrefab, _grouped, i, true);
+            }
+            _filterGrid.UpdaterPaginator(_grouped.Count);
         }
 
         private void OnLoadItemsGrid(DisplayData data)
         {
+            _trackedButtons.Clear();
+
             _itemGrid.ClearPage();
 
             _grouped = new List<Filter>();
@@ -224,10 +277,12 @@ namespace DataStorageSolutions.Mono
                 CreateButton(data, buttonPrefab, _grouped, i);
             }
             _itemGrid.UpdaterPaginator(_grouped.Count);
+            UpdateCheckMarks();
         }
 
         private void OnLoadCategoryGrid(DisplayData data)
         {
+            _trackedButtons.Clear();
             _categoryGrid.ClearPage();
             
             _grouped = new List<Filter>();
@@ -262,27 +317,69 @@ namespace DataStorageSolutions.Mono
                 CreateButton(data, buttonPrefab, _grouped, i);
             }
             _categoryGrid.UpdaterPaginator(_grouped.Count);
+            UpdateCheckMarks();
         }
 
-        private void CreateButton(DisplayData data, GameObject buttonPrefab, List<Filter> grouped, int i)
+        private void CreateButton(DisplayData data, GameObject buttonPrefab, List<Filter> grouped, int i,bool isMain = false)
         {
             buttonPrefab.transform.SetParent(data.ItemsGrid.transform, false);
             buttonPrefab.GetComponentInChildren<Text>().text = grouped[i].GetString();
+            
+            if(!grouped[i].IsCategory())
+            {
+                var icon = InterfaceHelpers.FindGameObject(buttonPrefab, "Icon");
+                icon.AddComponent<uGUI_Icon>().sprite = SpriteManager.Get(grouped[i].Types[0]);
+            }
+
+            var buttonToggle = buttonPrefab.GetComponent<Toggle>();
+
+            if (isMain)
+            {
+                buttonToggle.isOn = true;
+            }
 
             var mainBTN = buttonPrefab.AddComponent<InterfaceButton>();
             mainBTN.ButtonMode = InterfaceButtonMode.Background;
             mainBTN.STARTING_COLOR = _startColor;
             mainBTN.HOVER_COLOR = _hoverColor;
-            mainBTN.BtnName = "BaseBTN";
-            mainBTN.Tag = grouped[i].Types;
+            mainBTN.BtnName = "FilterBTN";
+            mainBTN.Tag = new FilterTransferData{Filter = grouped[i],  Toggle = buttonToggle};
             mainBTN.OnButtonClick = OnButtonClick;
+            _trackedButtons.Add(mainBTN);
         }
 
+        private void UpdateCheckMarks()
+        {
+            var filters = _mono.GetFilters();
+
+            if(filters == null) return;
+
+            foreach (InterfaceButton button in _trackedButtons)
+            {
+                foreach (Filter filter in filters)
+                {
+                    var curFilter = (FilterTransferData)button.Tag;
+
+                    if (!curFilter.Filter.IsSame(filter)) continue;
+                    curFilter.Toggle.isOn = true;
+                    break;
+                }
+
+            }
+
+        }
 
         internal void GoToPage(FilterPages page)
         {
             QuickLogger.Debug($"Going to page{page} | {(int)page}");
             _mono.AnimationManager.SetIntHash(_page,(int)page);
+        }
+
+        internal void UpdatePages()
+        {
+            _filterGrid.DrawPage();
+            _categoryGrid.DrawPage();
+            _itemGrid.DrawPage();
         }
     }
 
@@ -293,5 +390,11 @@ namespace DataStorageSolutions.Mono
         FilterPage = 2,
         Items = 3,
         Categories = 4
+    }
+
+    internal struct FilterTransferData
+    {
+        public Filter Filter { get; set; }
+        public Toggle Toggle { get; set; }
     }
 }

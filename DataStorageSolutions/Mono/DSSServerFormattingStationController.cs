@@ -22,10 +22,10 @@ namespace DataStorageSolutions.Mono
         private bool _fromSave;
         private SaveDataEntry _savedData;
         private string _prefabID;
-        private bool _isContructed;
         private int _slotState;
         private List<ObjectData> _items;
         private DSSServerController _controller;
+        private List<Filter> _filters = new List<Filter>();
 
         public ColorManager ColorManager { get; private set; }
         public DSSServerFormattingStationDisplay DisplayManager { get; private set; }
@@ -46,6 +46,13 @@ namespace DataStorageSolutions.Mono
                 if (_savedData == null)
                 {
                     ReadySaveData();
+                }
+
+                _items = _savedData.ServerData;
+                if (_items != null)
+                {
+                    ToggleDummyServer();
+                    DisplayManager.GoToPage(FilterPages.FilterPage);
                 }
             }
         }
@@ -93,7 +100,7 @@ namespace DataStorageSolutions.Mono
             if (DumpContainer == null)
             {
                 DumpContainer = new DumpContainer();
-                DumpContainer.Initialize(transform, AuxPatchers.BaseDumpReceptacle(), AuxPatchers.NotAllowed(), AuxPatchers.DriveFull(), this, 4, 4);
+                DumpContainer.Initialize(transform, AuxPatchers.BaseDumpReceptacle(), AuxPatchers.NotAllowed(), AuxPatchers.DriveFull(), this, 1, 1);
             }
 
             IsInitialized = true;
@@ -101,8 +108,7 @@ namespace DataStorageSolutions.Mono
 
         public override void Save(SaveData newSaveData)
         {
-            if (!IsInitialized
-                || !IsConstructed) return;
+            if (!IsInitialized || !IsConstructed) return;
 
             var id = GetPrefabIDString();
 
@@ -112,6 +118,7 @@ namespace DataStorageSolutions.Mono
             }
 
             _savedData.ID = id;
+            _savedData.ServerData = _items;
             newSaveData.Entries.Add(_savedData);
         }
 
@@ -141,13 +148,18 @@ namespace DataStorageSolutions.Mono
 
         public override bool CanDeconstruct(out string reason)
         {
+            if (_items != null)
+            {
+                reason = AuxPatchers.HasItemsMessage();
+                return false;
+            }
             reason = string.Empty;
             return true;
         }
 
         public override void OnConstructedChanged(bool constructed)
         {
-            _isContructed = constructed;
+            IsConstructed = constructed;
 
             if (constructed)
             {
@@ -177,16 +189,34 @@ namespace DataStorageSolutions.Mono
         public bool AddItemToContainer(InventoryItem item)
         {
             _controller = item.item.GetComponent<DSSServerController>();
-            _items = new List<ObjectData>(_controller.Items);
+
+            if (_controller != null)
+            {
+                if(_controller.Items != null)
+                    _items = new List<ObjectData>(_controller.Items);
+                if (_controller.Filters != null)
+                    _filters = new List<Filter>(_controller.Filters);
+            }
+
             DisplayManager.GoToPage(FilterPages.FilterPage);
+            DisplayManager.UpdatePages();
             ToggleDummyServer();
             Destroy(item.item.gameObject);
+            var pda = Player.main.GetPDA();
+            if(pda.isOpen)
+            {
+                pda.Close();
+            }
             return true;
         }
 
         public void GivePlayerItem()
         {
-            DSSHelpers.GivePlayerItem(QPatch.Server.TechType, new ObjectDataTransferData{data = _items, IsServer = true}, null);
+            var result = DSSHelpers.GivePlayerItem(QPatch.Server.TechType, new ObjectDataTransferData{data = _items,Filters= _filters, IsServer = true}, null);
+            if (result)
+            {
+                _items = null;
+            }
         }
 
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
@@ -197,6 +227,27 @@ namespace DataStorageSolutions.Mono
             }
 
             return pickupable.GetTechType() == QPatch.Server.TechType;
+        }
+
+        internal void AddFilter(Filter filter)
+        {
+            if (!_filters.Contains(filter))
+            {
+                _filters.Add(filter);
+            }
+        }
+
+        internal void RemoveFilter(Filter filter)
+        {
+            if (_filters.Contains(filter))
+            {
+                _filters.Remove(filter);
+            }
+        }
+
+        public List<Filter> GetFilters()
+        {
+            return _filters;
         }
     }
 }

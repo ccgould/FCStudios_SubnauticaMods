@@ -8,6 +8,8 @@ namespace DataStorageSolutions.Model
     internal struct ObjectDataTransferData
     {
         public object data { get; set; }
+
+        public List<Filter> Filters { get; set; }
         public bool IsServer { get; set; }
     }
 }

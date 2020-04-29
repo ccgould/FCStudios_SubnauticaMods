@@ -25,6 +25,7 @@ namespace DataStorageSolutions.Model
         private DSSRackController _mono;
         private bool _isOccupied;
         private List<ObjectData> _server;
+        private List<Filter> _filter = new List<Filter>();
 
         internal bool IsOccupied
         {
@@ -44,6 +45,12 @@ namespace DataStorageSolutions.Model
                 _server = value;
                 UpdateNetwork();
             }
+        }
+
+        public List<Filter> Filter
+        {
+            get => _filter;
+            set { _filter = value ?? new List<Filter>(); }
         }
 
         private void ChangeDummyState(bool b = true)
@@ -158,9 +165,9 @@ namespace DataStorageSolutions.Model
 
         private void OnButtonClick(string arg1, object arg2)
         {
-            if (_mono.GetRackCageState())
+            if (_mono.IsRackOpen())
             {
-                var result = _mono.GivePlayerItem(QPatch.Server.TechType,new ObjectDataTransferData{data = Server,IsServer = true});
+                var result = _mono.GivePlayerItem(QPatch.Server.TechType,new ObjectDataTransferData{data = Server, Filters = Filter, IsServer = true});
                 QuickLogger.Debug($"Give Player ITem Result: {result}",true);
                 if(result)
                     DisconnectFromRack();
@@ -198,6 +205,39 @@ namespace DataStorageSolutions.Model
         {
             UpdateScreen();
             Mod.OnContainerUpdate?.Invoke();
+        }
+
+        public bool IsAllowedToAdd(TechType techType)
+        {
+            if (_filter.Count == 0)
+            {
+                return true;
+            }
+            else
+            {
+                return FilterCrossCheck(techType);
+            }
+        }
+
+        private bool FilterCrossCheck(TechType techType)
+        {
+            foreach (Filter filter in _filter)
+            {
+                if (filter.IsCategory() && filter.IsTechTypeAllowed(techType))
+                {
+                    return true;
+                }
+            }
+
+            foreach (var filter in _filter)
+            {
+                if (!filter.IsCategory() && filter.IsTechTypeAllowed(techType))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }
