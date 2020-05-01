@@ -18,7 +18,7 @@ namespace DataStorageSolutions.Mono
     internal class DSSTerminalDisplay : AIDisplay
     {
         private DSSTerminalController _mono;
-        private readonly Color _startColor = Color.black;
+        private readonly Color _startColor = Color.grey;
         private readonly Color _hoverColor = Color.white;
         private int _page;
         private GridHelper _baseGrid;
@@ -29,6 +29,7 @@ namespace DataStorageSolutions.Mono
         private ColorManager _antennaColorPage;
         private GameObject _antennaColorPicker;
         private ColorPage _currentColorPage;
+        private Text _baseNameLabel;
 
         internal void Setup(DSSTerminalController mono)
         {
@@ -54,8 +55,8 @@ namespace DataStorageSolutions.Mono
                 case "BaseBTN":
                     _currentBase = ((TransferData) tag).Manager;
                     _currentData = (TransferData) tag;
-                    QuickLogger.Debug($"Base clicked: {_currentBase}");
                     GoToPage(TerminalPages.BaseItems);
+                    _baseNameLabel.text = _currentBase.GetBaseName();
                     Refresh();
                     break;
 
@@ -100,7 +101,15 @@ namespace DataStorageSolutions.Mono
                     break;
 
                 case "RenameBTN":
-                    _mono.Manager.GetCurrentBaseAntenna()?.ChangeBaseName();
+                    var currentBase = _mono.Manager?.GetCurrentBaseAntenna();
+                    if (currentBase != null)
+                    {
+                        currentBase.ChangeBaseName();
+                    }
+                    else
+                    {
+                        QuickLogger.Message(AuxPatchers.NoAntennaOnBase(),true);
+                    }
                     break;
             }
         }
@@ -173,49 +182,62 @@ namespace DataStorageSolutions.Mono
             var closeBTN = InterfaceHelpers.FindGameObject(baseItemsPage, "DumpButton");
 
             InterfaceHelpers.CreateButton(closeBTN, "DumpBTN", InterfaceButtonMode.Background,
-                OnButtonClick, Color.white, Color.cyan, MAX_INTERACTION_DISTANCE, AuxPatchers.DumpToBase());
+                OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.DumpToBase());
             #endregion
 
             #region ColorPickerBTN
             var colorPickerBTN = InterfaceHelpers.FindGameObject(home, "ColorPickerBTN");
 
             InterfaceHelpers.CreateButton(colorPickerBTN, "ColorPickerBTN", InterfaceButtonMode.Background,
-                OnButtonClick, Color.white, Color.cyan, MAX_INTERACTION_DISTANCE, AuxPatchers.ColorPage());
+                OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.ColorPage());
             #endregion
 
             #region RenameBTN
             var renameBTN = InterfaceHelpers.FindGameObject(home, "RenameBaseBTN");
 
             InterfaceHelpers.CreateButton(renameBTN, "RenameBTN", InterfaceButtonMode.Background,
-                OnButtonClick, Color.white, Color.cyan, MAX_INTERACTION_DISTANCE, AuxPatchers.Rename());
+                OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.Rename());
             #endregion
 
             #region ColorPickerMainHomeBTN
             var colorPickerMainHomeBTN = InterfaceHelpers.FindGameObject(colorMainPage, "HomeBTN");
             
             InterfaceHelpers.CreateButton(colorPickerMainHomeBTN, "HomeBTN", InterfaceButtonMode.Background,
-                OnButtonClick, Color.white, Color.cyan, MAX_INTERACTION_DISTANCE, AuxPatchers.ColorPage());
+                OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.ColorPage());
             #endregion
 
             #region Terminal Color BTN
             var terminalColorBTN = InterfaceHelpers.FindGameObject(colorMainPage, "TerminalColorBTN");
 
             InterfaceHelpers.CreateButton(terminalColorBTN, "TerminalColorBTN", InterfaceButtonMode.Background,
-                OnButtonClick, Color.white, Color.cyan, MAX_INTERACTION_DISTANCE, string.Format(AuxPatchers.ColorPageFormat(), AuxPatchers.Terminal()));
+                OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, string.Format(AuxPatchers.ColorPageFormat(), AuxPatchers.Terminal()));
             #endregion
 
             #region DumpBTNButton
             var antennaColorBTN = InterfaceHelpers.FindGameObject(colorMainPage, "AntennaColorBTN");
 
             InterfaceHelpers.CreateButton(antennaColorBTN, "AntennaColorBTN", InterfaceButtonMode.Background,
-                OnButtonClick, Color.white, Color.cyan, MAX_INTERACTION_DISTANCE, string.Format(AuxPatchers.ColorPageFormat(), AuxPatchers.Antenna()));
+                OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, string.Format(AuxPatchers.ColorPageFormat(), AuxPatchers.Antenna()));
             #endregion
 
             #region ColorPage
             _terminalColorPage.SetupGrid(90, DSSModelPrefab.ColorItemPrefab, screenColorPicker, OnButtonClick, _startColor, _hoverColor,5,
             "PrevBTN", "NextBTN", "Grid", "Paginator","HomeBTN", "ColorPickerBTN");
             #endregion
+
+            #region BaseItemDecription
+
+            var baseItemPageDesc = InterfaceHelpers.FindGameObject(colorMainPage, "Title")?.GetComponent<Text>();
+            baseItemPageDesc.text = AuxPatchers.ColorMainPageDesc();
+
+            #endregion
+
+            #region BaseNAme
+
+            _baseNameLabel = InterfaceHelpers.FindGameObject(baseItemsPage, "BaseLabel")?.GetComponent<Text>();
             
+            #endregion
+
             return true;
         }
 
@@ -228,10 +250,7 @@ namespace DataStorageSolutions.Mono
             if(_currentBase == null) return;
 
             var grouped = _currentBase.GetItemsWithin()?.ToList();
-
             
-
-
             if (data.EndPosition > grouped.Count)
             {
                 data.EndPosition = grouped.Count;
@@ -270,10 +289,16 @@ namespace DataStorageSolutions.Mono
         internal void OnLoadBaseGrid(DisplayData data)
         {
             _baseGrid.ClearPage();
-
-            var grouped = BaseManager.BaseAntennas;
             
+            var grouped  = new List<IBaseAntenna>();
+            
+            foreach (BaseManager manager in BaseManager.Managers)
+            {
+                if(manager == null) continue;
 
+                grouped.Add(manager.GetCurrentBaseAntenna());
+            }
+            
             if (data.EndPosition > grouped.Count)
             {
                 data.EndPosition = grouped.Count;
@@ -291,7 +316,6 @@ namespace DataStorageSolutions.Mono
             mainBTN.Tag = new TransferData { AntennaController = null, Manager = _mono.Manager };
             mainBTN.OnButtonClick = OnButtonClick;
 
-
             if (_mono.Manager.GetCurrentBaseAntenna() != null)
             {
                 for (int i = data.StartPosition; i < data.EndPosition; i++)
@@ -307,9 +331,8 @@ namespace DataStorageSolutions.Mono
                         }
                         return;
                     }
-                    
-                    if (grouped[i].Manager == _mono.Manager || !grouped[i].Manager.GetCurrentBaseAntenna().IsVisible()) continue;
-
+                    var antenna = grouped[i]?.Manager?.GetCurrentBaseAntenna();
+                    if (antenna == null || grouped[i].Manager == _mono.Manager || !antenna.IsVisible()) continue;
                     CreateButton(data, buttonPrefab, grouped, i);
                 }
             }

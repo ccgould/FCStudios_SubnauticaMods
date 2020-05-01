@@ -373,12 +373,12 @@ namespace DataStorageSolutions.Configuration
 
     internal class Config
     {
-        [JsonProperty] internal  float EnergyCost = 1500f;
         [JsonProperty] internal int ServerStorageLimit { get; set; } = 48;
-        [JsonProperty] internal float AntennaPowerUsage { get; set; } = 0.1f;
-        [JsonProperty] internal float ScreenPowerUsage { get; set; } = 0.1f;
+        [JsonProperty] internal float AntennaPowerUsage { get; set; } = 0.45f;
+        [JsonProperty] internal float ScreenPowerUsage { get; set; } = 0.3f;
         [JsonProperty] internal bool ShowAllItems { get; set; }
-        [JsonProperty] internal float RackPowerUsage { get; set; } = 0.1f;
+        [JsonProperty] internal float RackPowerUsage { get; set; } = 0.5f;
+        [JsonProperty] internal float ServerPowerUsage { get; set; } = 0.1f;
     }
 
     internal class ConfigFile

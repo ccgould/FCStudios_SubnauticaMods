@@ -91,7 +91,6 @@ namespace DataStorageSolutions.Mono
             {
                 PowerManager?.UpdatePowerState();
                 PowerManager?.ConsumePower();
-                QuickLogger.Debug($"Terminal {GetPrefabIDString()} Power Usage: {PowerManager.GetPowerUsage()}");
             }
         }
 
@@ -248,6 +247,11 @@ namespace DataStorageSolutions.Mono
             }
         }
 
+        internal void UpdatePowerUsage()
+        {
+            PowerManager.UpdatePowerUsage((QPatch.Configuration.Config.ServerPowerUsage * GetServerCount() + QPatch.Configuration.Config.RackPowerUsage));
+        }
+
         internal bool IsRackOpen()
         {
             return AnimationManager.GetIntHash(_rackDoor) == 1;
@@ -259,7 +263,7 @@ namespace DataStorageSolutions.Mono
         /// <returns><see cref="int"/> of the amount of servers</returns>
         internal int GetServerCount()
         {
-            return _servers?.Length ?? 0;
+            return _servers.Count(rackSlot => rackSlot != null && rackSlot.IsOccupied);
         }
 
         /// <summary>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using SMLHelper.V2.Handlers;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace DataStorageSolutions.Buildables
 {
@@ -38,7 +39,8 @@ namespace DataStorageSolutions.Buildables
             { $"{ModKey}_Antenna","antenna"},
             { $"{ModKey}_Terminal","terminal"},
             { $"{ModKey}_Rename","Rename this base."},
-
+            { $"{ModKey}_ColorPageDesc","Rename this base."},
+            { $"{ModKey}_PowerUsage","Power Usage"},
         };
 
         internal static void AdditionalPatching()
@@ -192,6 +194,16 @@ namespace DataStorageSolutions.Buildables
         internal static string Rename()
         {
             return Language.main.Get(LanguageDictionary.Keys.ElementAt(25));
+        }
+
+        public static string ColorMainPageDesc()
+        {
+            return Language.main.Get(LanguageDictionary.Keys.ElementAt(26));
+        }
+
+        public static string PowerUsage()
+        {
+            return Language.main.Get(LanguageDictionary.Keys.ElementAt(27));
         }
     }
 }

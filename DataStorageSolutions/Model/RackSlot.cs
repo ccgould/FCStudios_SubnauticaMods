@@ -162,8 +162,10 @@ namespace DataStorageSolutions.Model
             {
                 var result = _mono.GivePlayerItem(QPatch.Server.TechType,new ObjectDataTransferData{data = Server, Filters = Filter, IsServer = true});
                 QuickLogger.Debug($"Give Player ITem Result: {result}",true);
-                if(result)
+                if (result)
+                {
                     DisconnectFromRack();
+                }
             }
         }
         
@@ -196,6 +198,7 @@ namespace DataStorageSolutions.Model
         
         internal void UpdateNetwork()
         {
+            _mono.UpdatePowerUsage();
             UpdateScreen();
             Mod.OnContainerUpdate?.Invoke();
         }

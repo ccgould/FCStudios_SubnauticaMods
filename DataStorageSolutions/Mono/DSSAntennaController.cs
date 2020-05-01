@@ -16,15 +16,12 @@ namespace DataStorageSolutions.Mono
     internal class DSSAntennaController : DataStorageSolutionsController, IBaseAntenna, IHandTarget
     {
         private bool _isContructed;
-        private PowerRelay _powerRelay;
-        private float _energyToConsume;
         private bool _showConsumption = true;
         private string _prefabID;
         private TechType _techType = TechType.None;
         private bool _runStartUpOnEnable;
         private bool _fromSave;
         private SaveDataEntry _savedData;
-        private float _amountConsumed;
 
         public override bool IsConstructed => _isContructed;
         public SubRoot SubRoot { get; private set; }
@@ -113,7 +110,6 @@ namespace DataStorageSolutions.Mono
             {
                 PowerManager?.UpdatePowerState();
                 PowerManager?.ConsumePower();
-                QuickLogger.Debug($"Antenna {GetPrefabIDString()} Power Usage: {PowerManager.GetPowerUsage()}");
             }
         }
 
@@ -130,15 +126,7 @@ namespace DataStorageSolutions.Mono
                 SubRoot = GetComponentInParent<SubRoot>();
             }
         }
-
-        private void GetPowerRelay()
-        {
-            if (SubRoot != null)
-            {
-                _powerRelay = SubRoot.powerRelay;
-            }
-        }
-
+        
         public string GetPrefabIDString()
         {
             if (string.IsNullOrEmpty(_prefabID))
@@ -183,13 +171,19 @@ namespace DataStorageSolutions.Mono
                 if (Manager != null)
                 {
                     QuickLogger.Debug("Trying to set default name");
-                    SetBaseName(Manager.GetDefaultName());
+                    if (string.IsNullOrEmpty(Manager.GetBaseName()))
+                    {
+                        SetBaseName(Manager.GetDefaultName());
+                        NameController.SetCurrentName(Manager.GetDefaultName());
+                    }
+                    else
+                    {
+                        NameController.SetCurrentName(Manager.GetBaseName());
+                    }
                 }
             }
 
-            GetPowerRelay();
-            
-            Manager?.AddAntenna(this);
+            BaseManager.AddAntenna(this);
 
             Mod.OnAntennaBuilt?.Invoke(true);
 
@@ -286,7 +280,7 @@ namespace DataStorageSolutions.Mono
             HandReticle main = HandReticle.main;
             var state = PowerManager?.GetPowerState() == FCSPowerStates.Powered ? "On" : "Off";
 #if SUBNAUTICA
-            main.SetInteractTextRaw(Manager?.GetBaseName(), $"Antenna {state} || Power usage: {PowerManager?.GetPowerUsage():F1}");
+            main.SetInteractTextRaw(Manager?.GetBaseName(), $"{AuxPatchers.Antenna()}: {state} || {AuxPatchers.PowerUsage()}: {PowerManager?.GetPowerUsage():F1}");
 #elif BELOWZERO
             main.SetText(HandReticle.TextType.Info, Manager.GetBaseName(), false);
 #endif

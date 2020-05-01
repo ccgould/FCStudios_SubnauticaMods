@@ -96,7 +96,6 @@ namespace DataStorageSolutions.Mono
             {
                 PowerManager?.UpdatePowerState();
                 PowerManager?.ConsumePower();
-                QuickLogger.Debug($"Terminal {GetPrefabIDString()} Power Usage: {PowerManager.GetPowerUsage()}");
             }
         }
 

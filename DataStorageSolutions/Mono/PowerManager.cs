@@ -73,13 +73,7 @@ namespace DataStorageSolutions.Mono
                 return;
             }
 
-            if (!_hasPowerToConsume && GetPowerState() != FCSPowerStates.Unpowered)
-            {
-                SetPowerStates(FCSPowerStates.Unpowered);
-                return;
-            }
-
-            if (_hasPowerToConsume && GetPowerState() != FCSPowerStates.Powered)
+            if (_habitat.powerRelay.GetPowerStatus() == PowerSystem.Status.Normal || _habitat.powerRelay.GetPowerStatus() == PowerSystem.Status.Emergency)
             {
                 SetPowerStates(FCSPowerStates.Powered);
             }
@@ -147,5 +141,10 @@ namespace DataStorageSolutions.Mono
             }
         } 
         #endregion
+
+        public void UpdatePowerUsage(float configServerPowerUsage)
+        {
+            _energyConsumptionPerSecond = configServerPowerUsage;
+        }
     }
 }

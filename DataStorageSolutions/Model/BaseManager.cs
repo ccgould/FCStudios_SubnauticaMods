@@ -17,14 +17,14 @@ namespace DataStorageSolutions.Model
 {
     internal class BaseManager : IFCSStorage
     {
-        internal static List<BaseManager> Managers { get; } = new List<BaseManager>();
-        internal int InstanceID { get; }
-        internal readonly List<DSSRackController> BaseUnits = new List<DSSRackController>();
-        internal static readonly List<IBaseAntenna> BaseAntennas = new List<IBaseAntenna>();
-        internal readonly SubRoot Habitat;
-
         private string _baseName;
 
+        internal static List<BaseManager> Managers { get; } = new List<BaseManager>();
+        internal static readonly List<IBaseAntenna> BaseAntennas = new List<IBaseAntenna>();
+
+        internal int InstanceID { get; }
+        internal readonly List<DSSRackController> BaseUnits = new List<DSSRackController>();
+        internal readonly SubRoot Habitat;
         public DumpContainer DumpContainer { get; private set; }
 
         public BaseManager(SubRoot habitat)
@@ -86,7 +86,7 @@ namespace DataStorageSolutions.Model
             }
         }
 
-        internal void AddAntenna(DSSAntennaController unit)
+        internal static void AddAntenna(DSSAntennaController unit)
         {
             if (!BaseAntennas.Contains(unit) && unit.IsConstructed)
             {
@@ -174,7 +174,7 @@ namespace DataStorageSolutions.Model
 
         public IBaseAntenna GetCurrentBaseAntenna()
         {
-            return BaseAntennas.FirstOrDefault(antenna => antenna?.Manager == this);
+            return BaseAntennas.FirstOrDefault(antenna => antenna?.Manager.InstanceID == InstanceID);
         }
         public int GetContainerFreeSpace { get; }
         public bool IsFull { get; }
