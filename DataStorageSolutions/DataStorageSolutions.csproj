@@ -120,6 +120,7 @@
     <Compile Include="Helpers\DSSHelpers.cs" />
     <Compile Include="Interfaces\IBaseAntenna.cs" />
     <Compile Include="Interfaces\IDataSoluationsSave.cs" />
+    <Compile Include="Model\AudioHandler.cs" />
     <Compile Include="Model\BaseManager.cs" />
     <Compile Include="Model\Catergories.cs" />
     <Compile Include="Model\RackSlot.cs" />
@@ -133,6 +134,7 @@
     <Compile Include="Mono\DSSRackController.cs" />
     <Compile Include="Mono\DSSServerController.cs" />
     <Compile Include="Mono\DSSTerminalDisplay.cs" />
+    <Compile Include="Mono\PowerManager.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

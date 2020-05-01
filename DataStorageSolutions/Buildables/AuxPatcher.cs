@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using SMLHelper.V2.Handlers;
 using UnityEngine;
@@ -27,6 +28,17 @@ namespace DataStorageSolutions.Buildables
             { $"{ModKey}_DriveReceptacle","Drive Receptacle"},
             { $"{ModKey}_AddItemsToBase","Add Items to Base"},
             { $"{ModKey}_BaseDumpReceptacle","Base Dump Receptacle"},
+            { $"{ModKey}_AddFilterItem","Item Filters"},
+            { $"{ModKey}_AddCategoryItem","Category Filters"},
+            { $"{ModKey}_RemoveServer","Remove Server"},
+            { $"{ModKey}_InsertServer","Insert Server"},
+            { $"{ModKey}_AddServer","Add Server To Rack"},
+            { $"{ModKey}_NoAntennaAttached","No Antenna Attached To Base."},
+            { $"{ModKey}_ColorPageFormat","Go to {0} color page."},
+            { $"{ModKey}_Antenna","antenna"},
+            { $"{ModKey}_Terminal","terminal"},
+            { $"{ModKey}_Rename","Rename this base."},
+
         };
 
         internal static void AdditionalPatching()
@@ -125,6 +137,61 @@ namespace DataStorageSolutions.Buildables
         public static string TakeServer()
         {
             return Language.main.Get("PickUpFormat");
+        }
+
+        internal static string AddFilterItem()
+        {
+            return Language.main.Get(LanguageDictionary.Keys.ElementAt(16));
+        }
+
+        internal static string AddFilterCategory()
+        {
+            return Language.main.Get(LanguageDictionary.Keys.ElementAt(17));
+        }
+
+        internal static string RemoveServer()
+        {
+            return Language.main.Get(LanguageDictionary.Keys.ElementAt(18));
+        }
+        
+        internal static string InsertServer()
+        {
+            return Language.main.Get(LanguageDictionary.Keys.ElementAt(19));
+        }
+
+        internal static string Submit()
+        { 
+            return Language.main.Get("Submit");
+        }
+
+        internal static string AddServer()
+        {
+            return Language.main.Get(LanguageDictionary.Keys.ElementAt(20));
+        }
+
+        public static string NoAntennaOnBase()
+        {
+            return Language.main.Get(LanguageDictionary.Keys.ElementAt(21));
+        }
+
+        internal static string ColorPageFormat()
+        {
+            return Language.main.Get(LanguageDictionary.Keys.ElementAt(22));
+        }
+
+        internal static string Antenna()
+        {
+            return Language.main.Get(LanguageDictionary.Keys.ElementAt(23));
+        }
+
+        internal static string Terminal()
+        {
+            return Language.main.Get(LanguageDictionary.Keys.ElementAt(24));
+        }
+
+        internal static string Rename()
+        {
+            return Language.main.Get(LanguageDictionary.Keys.ElementAt(25));
         }
     }
 }

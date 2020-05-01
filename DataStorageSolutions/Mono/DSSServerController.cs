@@ -27,8 +27,6 @@ namespace DataStorageSolutions.Mono
         private List<Filter> _filters;
         private ServerData _data;
         
-        private Dictionary<string, ServerData> LoadedData => Mod.Servers; //TODO Delete
-
         [JsonIgnore] internal int StorageLimit => QPatch.Configuration.Config.ServerStorageLimit;
         [JsonIgnore] public int GetContainerFreeSpace => GetFreeSpace();
         [JsonIgnore] public bool IsFull => CheckIfFull();

@@ -70,13 +70,7 @@ namespace DataStorageSolutions.Model
         {
             _counter.text = $"{Server?.Count}/{QPatch.Configuration.Config.ServerStorageLimit}";
         }
-
-        private void OnInterfaceButton(bool obj)
-        {
-            //Not sure if needed anymore 
-            //TODO Remove
-        }
-
+        
         private string FormatData()
         {
             sb.Clear();
@@ -144,7 +138,6 @@ namespace DataStorageSolutions.Model
                 var interactionFace = InterfaceHelpers.FindGameObject(canvasGameObject, "Hit");
                 var catcher = interactionFace.AddComponent<InterfaceButton>();
                 catcher.ButtonMode = InterfaceButtonMode.TextColor;
-                catcher.OnInterfaceButton += OnInterfaceButton;
                 catcher.TextLineOne = string.Format(AuxPatchers.TakeServer(),Mod.ServerFriendlyName);
                 catcher.TextLineTwo = "Data: {0}";
                 catcher.GetAdditionalDataFromString = true;

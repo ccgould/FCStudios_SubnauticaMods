@@ -85,7 +85,6 @@ namespace DataStorageSolutions.Mono
                     break;
 
                 case "RemoveServerBTN":
-                    //TODO Give Player back a server
                     GoToPage(FilterPages.Home);
                     _mono.ToggleDummyServer();
                     _mono.GivePlayerItem();
@@ -98,18 +97,6 @@ namespace DataStorageSolutions.Mono
                 case "AddItemBTN":
                     GoToPage(FilterPages.Items);
                     break;
-
-                    //case "ColorPickerBTN":
-                    //    //TODO Check if antenna is attached
-                    //    _mono.AnimationManager.SetIntHash(_page, 3);
-                    //    break;
-
-                    //case "ColorItem":
-                    //    if (_currentColorPage == ColorPage.Terminal)
-                    //        _mono.TerminalColorManager.ChangeColorMask((Color)tag);
-                    //    else
-                    //        _mono.AntennaColorManager.ChangeColorMask((Color)tag);
-                    //    break;
             }
         }
 
@@ -166,32 +153,32 @@ namespace DataStorageSolutions.Mono
 
                 #endregion
 
-                #region OpenRackBTNButton
+                #region Remove Server
                 var removeServerBTN = InterfaceHelpers.FindGameObject(filterPage, "RemoveServerBTN");
 
                 InterfaceHelpers.CreateButton(removeServerBTN, "RemoveServerBTN", InterfaceButtonMode.Background,
-                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.OpenServerRackPage());
+                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.RemoveServer());
                 #endregion
 
-                #region CloseRackBTNButton
+                #region Add Server
                 var addServerBTN = InterfaceHelpers.FindGameObject(home, "AddServerBTN");
 
                 InterfaceHelpers.CreateButton(addServerBTN, "AddServerBTN", InterfaceButtonMode.Background,
-                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.CloseServerRackPage());
+                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.InsertServer());
                 #endregion
 
                 #region AddItemBTN
                 var itemPageBTN = InterfaceHelpers.FindGameObject(filterPage, "AddItemBTN");
 
                 InterfaceHelpers.CreateButton(itemPageBTN, "AddItemBTN", InterfaceButtonMode.Background,
-                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.CloseServerRackPage());
+                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.AddFilterItem());
                 #endregion
 
                 #region AddCategoryBTN
                 var categoryBTN = InterfaceHelpers.FindGameObject(filterPage, "AddCategoryBTN");
 
                 InterfaceHelpers.CreateButton(categoryBTN, "AddCategoryBTN", InterfaceButtonMode.Background,
-                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.CloseServerRackPage());
+                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.AddFilterCategory());
                 #endregion
 
                 return true;

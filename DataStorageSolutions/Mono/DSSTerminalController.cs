@@ -5,8 +5,10 @@ using DataStorageSolutions.Configuration;
 using DataStorageSolutions.Model;
 using FCSCommon.Abstract;
 using FCSCommon.Controllers;
+using FCSCommon.Enums;
 using FCSCommon.Interfaces;
 using FCSCommon.Utilities;
+using FCSTechFabricator.Components;
 using FCSTechFabricator.Extensions;
 using FCSTechFabricator.Managers;
 
@@ -24,6 +26,7 @@ namespace DataStorageSolutions.Mono
         private ColorManager _antennaColorController;
         private SaveDataEntry _savedData;
         private bool _fromSave;
+        private float _amountConsumed;
 
         public override bool IsConstructed => _isContructed;
         public SubRoot SubRoot { get; private set; }
@@ -33,6 +36,8 @@ namespace DataStorageSolutions.Mono
         public DSSTerminalDisplay DisplayManager { get; private set; }
         internal ColorManager TerminalColorManager { get; private set; }
         public ColorManager AntennaColorManager => GetAntennaColorManager();
+
+        public PowerManager PowerManager { get; private set; }
 
         private ColorManager GetAntennaColorManager()
         {
@@ -86,23 +91,12 @@ namespace DataStorageSolutions.Mono
         private void Update()
         {
             FindSubRoot();
-            if (SubRoot == null || !_isContructed) return;
-            ConsumePower();
-        }
-
-        private void ConsumePower()
-        {
-            _energyToConsume = QPatch.Configuration.Config.ScreenPowerUsage * DayNightCycle.main.deltaTime;
-
-            bool requiresEnergy = GameModeUtils.RequiresPower();
-
-            if (!requiresEnergy) return;
-
-            _powerRelay.ConsumeEnergy(_energyToConsume, out var amountConsumed);
-
-            if (_showConsumption)
+            
+            if(IsConstructed && PowerManager != null)
             {
-                QuickLogger.Debug($"Energy Used by Antenna {GetPrefabIDString()}: {amountConsumed}");
+                PowerManager?.UpdatePowerState();
+                PowerManager?.ConsumePower();
+                QuickLogger.Debug($"Terminal {GetPrefabIDString()} Power Usage: {PowerManager.GetPowerUsage()}");
             }
         }
 
@@ -110,18 +104,10 @@ namespace DataStorageSolutions.Mono
         {
             if (SubRoot == null)
             {
-                SubRoot = gameObject?.GetComponentInParent<SubRoot>();
+                SubRoot = GetComponentInParent<SubRoot>();
             }
         }
-
-        private void GetPowerRelay()
-        {
-            if (SubRoot != null)
-            {
-                _powerRelay = SubRoot.powerRelay;
-            }
-        }
-
+        
         public string GetPrefabIDString()
         {
             if (string.IsNullOrEmpty(_prefabID))
@@ -136,15 +122,17 @@ namespace DataStorageSolutions.Mono
 
             return _prefabID;
         }
-
-        internal void ToggleShowConsumption()
-        {
-            _showConsumption = !true;
-        }
-
+        
         public override void Initialize()
         {
             GetData();
+
+            if (PowerManager == null)
+            {
+                PowerManager = new PowerManager();
+                PowerManager.Initialize(gameObject,QPatch.Configuration.Config.ScreenPowerUsage);
+                PowerManager.OnPowerUpdate += OnPowerUpdate;
+            }
 
             if (TerminalColorManager == null)
             {
@@ -162,9 +150,24 @@ namespace DataStorageSolutions.Mono
                 DisplayManager = gameObject.AddComponent<DSSTerminalDisplay>();
                 DisplayManager.Setup(this);
             }
-
+            
             Mod.OnAntennaBuilt += OnAntennaBuilt;
             Mod.OnBaseUpdate += OnBaseUpdate;
+        }
+
+        private void OnPowerUpdate(FCSPowerStates obj)
+        {
+            QuickLogger.Debug($"Terminal {GetPrefabIDString()} Power State Updated", true);
+            switch (obj)
+            {
+                case FCSPowerStates.Powered:
+                    DisplayManager.PowerOnDisplay();
+                    break;
+                case FCSPowerStates.Tripped:
+                case FCSPowerStates.Unpowered:
+                    DisplayManager.PowerOffDisplay();
+                    break;
+            }
         }
 
         private void OnBaseUpdate()
@@ -216,8 +219,7 @@ namespace DataStorageSolutions.Mono
             QuickLogger.Error("SubRoot not found");
             return null;
         }
-
-
+        
         public override void OnProtoSerialize(ProtobufSerializer serializer)
         {
             QuickLogger.Debug("In OnProtoSerialize");
@@ -272,8 +274,6 @@ namespace DataStorageSolutions.Mono
 
             if (constructed)
             {
-                //_seaBase = gameObject?.transform?.parent?.gameObject;
-
                 if (isActiveAndEnabled)
                 {
                     if (!IsInitialized)

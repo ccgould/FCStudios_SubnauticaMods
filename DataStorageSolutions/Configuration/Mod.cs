@@ -193,7 +193,7 @@ namespace DataStorageSolutions.Configuration
                 _saveObject = new GameObject().AddComponent<ModSaver>();
 
                 SaveData newSaveData = new SaveData();
-
+                //GameObject.FindObjectsOfType<MonoBehaviour>().OfType<IDataSoluationsSave>();
                 var controllers = GameObject.FindObjectsOfType<DataStorageSolutionsController>();
 
                 foreach (var controller in controllers)
@@ -378,6 +378,7 @@ namespace DataStorageSolutions.Configuration
         [JsonProperty] internal float AntennaPowerUsage { get; set; } = 0.1f;
         [JsonProperty] internal float ScreenPowerUsage { get; set; } = 0.1f;
         [JsonProperty] internal bool ShowAllItems { get; set; }
+        [JsonProperty] internal float RackPowerUsage { get; set; } = 0.1f;
     }
 
     internal class ConfigFile

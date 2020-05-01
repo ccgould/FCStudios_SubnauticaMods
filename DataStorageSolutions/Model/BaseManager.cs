@@ -221,5 +221,10 @@ namespace DataStorageSolutions.Model
         { 
             _baseName = baseName;
         }
+
+        internal string GetDefaultName()
+        {
+            return $"Base {Managers.Count}";
+        }
     }
 }

@@ -52,8 +52,9 @@ namespace DataStorageSolutions
                 var antenna = new AntennaBuildable();
                 antenna.Patch();
 
-                var floorMountedRack = new FloorMountedRackBuildable();
-                floorMountedRack.Patch();
+                //Floor Mounted Rack Has Been Cut
+                //var floorMountedRack = new FloorMountedRackBuildable();
+                //floorMountedRack.Patch();
 
                 var wallMountedRack = new WallMountedRackBuildable();
                 wallMountedRack.Patch();
@@ -77,8 +78,9 @@ namespace DataStorageSolutions
             var icon = ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetFolder(), $"{Mod.ModName}.png"));
             var craftingTab = new CraftingTab(Mod.DSSTabID, Mod.ModFriendlyName, icon);
 
-            var floorMountedRack = new FCSKit(Mod.FloorMountedRackKitClassID, Mod.FloorMountedRackFriendlyName, craftingTab , Mod.FloorMountedRackIngredients);
-            floorMountedRack.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
+            //Floor Mounted Rack Has Been Cut
+            //var floorMountedRack = new FCSKit(Mod.FloorMountedRackKitClassID, Mod.FloorMountedRackFriendlyName, craftingTab , Mod.FloorMountedRackIngredients);
+            //floorMountedRack.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
 
             var wallMountedRack = new FCSKit(Mod.WallMountedRackKitClassID, Mod.WallMountedRackFriendlyName, craftingTab, Mod.WallMountedRackIngredients);
             wallMountedRack.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);

@@ -70,20 +70,21 @@ namespace DataStorageSolutions.Buildables
                         return false;
                     }
 
-                    if (floorMountRackPrefab != null)
-                    {
-                        //Lets apply the material shader
-                        ApplyShaders(floorMountRackPrefab, assetBundle);
+                    //Floor Mounted Rack Has Been Cut
+                    //if (floorMountRackPrefab != null)
+                    //{
+                    //    //Lets apply the material shader
+                    //    ApplyShaders(floorMountRackPrefab, assetBundle);
 
-                        FloorMountRackPrefab = floorMountRackPrefab;
+                    //    FloorMountRackPrefab = floorMountRackPrefab;
 
-                        QuickLogger.Debug($"Floor Mount Rack Prefab Found!");
-                    }
-                    else
-                    {
-                        QuickLogger.Error($"Floor Mount Rack Prefab Not Found!");
-                        return false;
-                    }
+                    //    QuickLogger.Debug($"Floor Mount Rack Prefab Found!");
+                    //}
+                    //else
+                    //{
+                    //    QuickLogger.Error($"Floor Mount Rack Prefab Not Found!");
+                    //    return false;
+                    //}
 
                     if (terminalPrefab != null)
                     {

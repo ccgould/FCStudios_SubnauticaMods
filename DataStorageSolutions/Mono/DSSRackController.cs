@@ -30,11 +30,12 @@ namespace DataStorageSolutions.Mono
         private bool _isConstructed;
         private string _prefabID;
         private TechType _techType = TechType.None;
-        private List<ObjectData> _currentServer;
         private int _rackDoor;
         private int _buttonState;
         private GameObject _drives;
-
+        private DSSAudioHandler _audioManager;
+        private const int RackDoorStateClosed = 0;
+        private const int RackDoorStateOpen = 1;
 
         public int GetContainerFreeSpace { get; }
         public bool IsFull => GetIsFull();
@@ -47,6 +48,7 @@ namespace DataStorageSolutions.Mono
         internal DSSRackDisplayController DisplayManager { get; private set; }
         internal DumpContainer DumpContainer { get; private set; }
         internal ColorManager ColorManager { get; private set; }
+        public PowerManager PowerManager { get; private set; }
 
         #region Unity
 
@@ -83,6 +85,16 @@ namespace DataStorageSolutions.Mono
             BaseManager.RemoveUnit(this);
         }
 
+        private void Update()
+        {
+            if (IsConstructed && PowerManager != null)
+            {
+                PowerManager?.UpdatePowerState();
+                PowerManager?.ConsumePower();
+                QuickLogger.Debug($"Terminal {GetPrefabIDString()} Power Usage: {PowerManager.GetPowerUsage()}");
+            }
+        }
+
         #endregion
 
         private void LoadRack()
@@ -114,7 +126,13 @@ namespace DataStorageSolutions.Mono
 
         private bool GetIsRackFull()
         {
-            int amount = _servers.Count(server => server.IsOccupied);
+            if (_servers == null)
+            {
+                QuickLogger.Error("Rack Servers Array is null. Please let FCS Studios know about this issue");
+                return true;
+            }
+
+            var amount = _servers.Count(server => server.IsOccupied);
 
             return amount >= _servers.Length;
         }
@@ -330,12 +348,21 @@ namespace DataStorageSolutions.Mono
 
             FindSlots();
 
+            _audioManager = new DSSAudioHandler(transform);
+            
             Mod.OnContainerUpdate += OnContainerUpdate;
 
             _rackDoor = Animator.StringToHash("WallMountRackDriveState");
             _buttonState = Animator.StringToHash("ButtonState");
 
             InvokeRepeating(nameof(CheckIfRemoved), 0.5f, 0.5f);
+
+            if (PowerManager == null)
+            {
+                PowerManager = new PowerManager();
+                PowerManager.Initialize(gameObject, QPatch.Configuration.Config.RackPowerUsage);
+                PowerManager.OnPowerUpdate += OnPowerUpdate;
+            }
 
             if (ColorManager == null)
             {
@@ -358,6 +385,20 @@ namespace DataStorageSolutions.Mono
             {
                 DumpContainer = gameObject.AddComponent<DumpContainer>();
                 DumpContainer.Initialize(transform, AuxPatchers.DriveReceptacle(), AuxPatchers.NotAllowed(), AuxPatchers.RackFull(), this, 1, 1);
+            }
+        }
+
+        private void OnPowerUpdate(FCSPowerStates obj)
+        {
+            switch (obj)
+            {
+                case FCSPowerStates.Powered:
+                    DisplayManager.GoToPage(RackPages.Home);
+                    break;
+                case FCSPowerStates.Tripped:
+                case FCSPowerStates.Unpowered:
+                    DisplayManager.GoToPage(RackPages.Blackout);
+                    break;
             }
         }
 
@@ -422,7 +463,7 @@ namespace DataStorageSolutions.Mono
 
         private bool HasServers()
         {
-            var result = _servers.Count(x => x.IsOccupied);
+            var result = _servers?.Count(x => x != null && x.IsOccupied);
             return result > 0;
         }
 
@@ -506,15 +547,18 @@ namespace DataStorageSolutions.Mono
         {
             if (!forceOpen)
             {
-                AnimationManager.SetIntHash(_rackDoor, AnimationManager.GetIntHash(_rackDoor) < 1 ? 1 : 0);
+                AnimationManager.SetIntHash(_rackDoor, AnimationManager.GetIntHash(_rackDoor) < RackDoorStateOpen ? RackDoorStateOpen : RackDoorStateClosed);
                 AnimationManager.SetBoolHash(_buttonState, AnimationManager.GetBoolHash(_buttonState) != true);
             }
             else
             {
-                if (AnimationManager.GetIntHash(_rackDoor) != 0) return;
-                AnimationManager.SetIntHash(_rackDoor, 1);
+                if (AnimationManager.GetIntHash(_rackDoor) == RackDoorStateOpen) return;
+                AnimationManager.SetIntHash(_rackDoor, RackDoorStateOpen);
                 AnimationManager.SetBoolHash(_buttonState, AnimationManager.GetBoolHash(_buttonState) != true);
             }
+
+            if(AnimationManager.GetIntHash(_rackDoor) < 0) return;
+            _audioManager.PlaySound(Convert.ToBoolean(AnimationManager.GetIntHash(_rackDoor)));
         }
 
         public Vector2 GetTotalStorage()

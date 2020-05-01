@@ -24,11 +24,10 @@ namespace DataStorageSolutions.Mono
             _mono = mono;
             _page = Animator.StringToHash("Page");
             _colorPickerPage = mono.ColorManager;
-            if (FindAllComponents())
-            {
-                PowerOnDisplay();
-                UpdateContainerAmount();
-            }
+
+            if (!FindAllComponents()) return;
+            PowerOnDisplay();
+            UpdateContainerAmount();
         }
         
         public override void OnButtonClick(string btnName, object tag)
@@ -48,14 +47,13 @@ namespace DataStorageSolutions.Mono
                     _mono.ToggleRackState();
                     break;
                 case "ColorPickerBTN":
-                    //TODO Check if antenna is attached
-                    _mono.AnimationManager.SetIntHash(_page, 2);
+                    GoToPage(RackPages.ColorPicker);
                     break;
                 case "ColorItem":
                     _mono.ColorManager.ChangeColorMask((Color) tag);
                     break;
                 case "HomeBTN":
-                    _mono.AnimationManager.SetIntHash(_page, 1);
+                    GoToPage(RackPages.Home);
                     break;
             }
         }
@@ -102,14 +100,14 @@ namespace DataStorageSolutions.Mono
                 var colorPickerBTN = InterfaceHelpers.FindGameObject(home, "ColorPicker");
 
                 InterfaceHelpers.CreateButton(colorPickerBTN, "ColorPickerBTN", InterfaceButtonMode.Background,
-                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.DumpToBase());//TODO replace
+                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.ColorPage());
                 #endregion
 
                 #region ColorPickerMainHomeBTN
                 var colorPickerHomeBTN = InterfaceHelpers.FindGameObject(colorPickerPage, "HomeBTN");
 
                 InterfaceHelpers.CreateButton(colorPickerHomeBTN, "HomeBTN", InterfaceButtonMode.Background,
-                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.DumpToBase());//TODO replace
+                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.Home());
                 #endregion
 
                 #region ColorPage
@@ -120,7 +118,7 @@ namespace DataStorageSolutions.Mono
                 var addServerBTN = InterfaceHelpers.FindGameObject(home, "AddServerBTN");
 
                 InterfaceHelpers.CreateButton(addServerBTN, "AddServerBTN", InterfaceButtonMode.Background,
-                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.DumpToBase());//TODO replace
+                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.AddServer());
                 #endregion
 
                 _counter = InterfaceHelpers.FindGameObject(home, "Counter")?.GetComponent<Text>();
@@ -138,12 +136,29 @@ namespace DataStorageSolutions.Mono
         {
             if(_mono == null || _counter == null) return;
             var total = _mono.GetTotalStorage();
-            _counter.text = $"{total.x}/ {total.y}";
+            _counter.text = $"{total.x} / {total.y}";
         }
 
         public override void PowerOnDisplay()
         {
             _mono.AnimationManager.SetIntHash(_page, 1);
         }
+
+        public override void PowerOffDisplay()
+        {
+            GoToPage(RackPages.Blackout);
+        }
+
+        internal void GoToPage(RackPages page)
+        {
+            _mono.AnimationManager.SetIntHash(_page, (int)page);
+        }
+    }
+
+    internal enum RackPages
+    {
+        Blackout = 0,
+        Home = 1,
+        ColorPicker = 2,
     }
 }
