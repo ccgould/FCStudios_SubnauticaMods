@@ -189,7 +189,7 @@ namespace FCSTechFabricator.Managers
             DrawColorPage(1);
         }
 
-        public void SetupGrid(int colorsPerPage, GameObject colorItemPrefab, GameObject colorPage, Action<string, object> onButtonClick,Color startColor, Color hoverColor, int maxInteractionRange = 5, string prevBtnNAme = "PrevBTN", string nextBtnName = "NextBTN" , string gridName = "Grid", string paginatorName = "Paginator", string homeBtnName = "HomeBTN")
+        public void SetupGrid(int colorsPerPage, GameObject colorItemPrefab, GameObject colorPage, Action<string, object> onButtonClick,Color startColor, Color hoverColor, int maxInteractionRange = 5, string prevBtnNAme = "PrevBTN", string nextBtnName = "NextBTN" , string gridName = "Grid", string paginatorName = "Paginator", string homeBtnName = "HomeBTN",string customHomeBTN = "")
         {
             _colorsPerPage = colorsPerPage;
             _colorItemPrefab = colorItemPrefab;
@@ -211,7 +211,7 @@ namespace FCSTechFabricator.Managers
             #region HomeButton
             var homeBTN = InterfaceHelpers.FindGameObject(colorPage, homeBtnName);
 
-            InterfaceHelpers.CreateButton(homeBTN, "HomeBTN", InterfaceButtonMode.Background,
+            InterfaceHelpers.CreateButton(homeBTN, string.IsNullOrEmpty(customHomeBTN) ? "HomeBTN" : customHomeBTN, InterfaceButtonMode.Background,
                 onButtonClick, startColor, hoverColor, maxInteractionRange, HomeButtonMessage);
 
             #endregion
