@@ -84,8 +84,7 @@ namespace DataStorageSolutions.Mono
 
             }
         }
-
-
+        
         internal void UpdateDisplay()
         {
             _counter.text = $"{_mono.GetTotal()} / {_mono.StorageLimit}";

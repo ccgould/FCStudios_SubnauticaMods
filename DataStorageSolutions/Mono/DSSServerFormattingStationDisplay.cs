@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using DataStorageSolutions.Buildables;
+using DataStorageSolutions.Enumerators;
+using DataStorageSolutions.Interfaces;
 using DataStorageSolutions.Model;
+using DataStorageSolutions.Structs;
 using FCSCommon.Abstract;
 using FCSCommon.Components;
 using FCSCommon.Enums;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
-using RootMotion.FinalIK;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -26,169 +26,7 @@ namespace DataStorageSolutions.Mono
         private readonly Color _hoverColor = Color.white;
         private List<Filter> _filters => FilterList.GetFilters();
         private List<Filter> _grouped = new List<Filter>();
-        private List<InterfaceButton> _trackedButtons = new List<InterfaceButton>();
-
-        internal void Setup(DSSServerFormattingStationController mono)
-        {
-            _mono = mono;
-            
-            if (FindAllComponents())
-            {
-                QuickLogger.Debug("Passed",true);
-                _page = Animator.StringToHash("Page");
-                _filterGrid?.DrawPage(1);
-                PowerOnDisplay();
-            }
-        }
-
-        public override void PowerOnDisplay()
-        {
-            GoToPage(FilterPages.Home);
-        }
-
-        public override void OnButtonClick(string btnName, object tag)
-        {
-            if (btnName == string.Empty) return;
-
-            switch (btnName)
-            {
-                case "HomeBTN":
-                    GoToPage(FilterPages.FilterPage);
-                    break;
-
-                case "FilterBTN":
-                    
-                    var filter = (FilterTransferData) tag;
-
-                    QuickLogger.Debug($"Filter Button Clicked: {filter.Filter} || {filter.Toggle?.isOn}",true);
-
-                    if (filter.Toggle == null)
-                    {
-                        QuickLogger.Error("ToggleButton is null");
-                        return;
-                    }
-
-                    if (filter.Toggle.isOn)
-                    {
-                        _mono.AddFilter(filter.Filter);
-                        UpdatePages();
-                    }
-                    else
-                    {
-                        _mono.RemoveFilter(filter.Filter);
-                        UpdatePages();
-                    }
-                    break;
-
-                case "AddServerBTN":
-                    _mono.DumpContainer.OpenStorage();
-                    break;
-
-                case "RemoveServerBTN":
-                    GoToPage(FilterPages.Home);
-                    _mono.ToggleDummyServer();
-                    _mono.GivePlayerItem();
-                    break;
-
-                case "AddCategoryBTN":
-                    GoToPage(FilterPages.Categories);
-                    break;
-
-                case "AddItemBTN":
-                    GoToPage(FilterPages.Items);
-                    break;
-            }
-        }
-
-        public override bool FindAllComponents()
-        {
-            try
-            {
-                #region Canvas  
-                var canvasGameObject = gameObject.GetComponentInChildren<Canvas>()?.gameObject;
-
-                if (canvasGameObject == null)
-                {
-                    throw new MissingComponentException($"A component cant be found.\nMissing Component: Canvas");
-                }
-                #endregion
-
-                #region Home Page
-                var home = InterfaceHelpers.FindGameObject(canvasGameObject, "HomePage");
-                #endregion
-
-                #region Filter Page
-                var filterPage = InterfaceHelpers.FindGameObject(canvasGameObject, "FilterPage");
-                #endregion
-
-                #region Category Page
-                var categoryPage = InterfaceHelpers.FindGameObject(canvasGameObject, "CategoryPage");
-                #endregion
-
-                #region Item Page
-                var itemPage = InterfaceHelpers.FindGameObject(canvasGameObject, "ItemPage");
-                #endregion
-
-                #region Filter Grid
-
-                _filterGrid = _mono.gameObject.AddComponent<GridHelper>();
-                _filterGrid.OnLoadDisplay += OnLoadFilterGrid;
-                _filterGrid.Setup(3, DSSModelPrefab.FilterItemPrefab, filterPage, _startColor, _hoverColor, OnButtonClick); //Minus 1 ItemPerPage because of the added Home button
-
-                #endregion
-
-                #region Item Grid
-
-                _itemGrid = _mono.gameObject.AddComponent<GridHelper>();
-                _itemGrid.OnLoadDisplay += OnLoadItemsGrid;
-                _itemGrid.Setup(3, DSSModelPrefab.FilterItemPrefab, itemPage, _startColor, _hoverColor, OnButtonClick); //Minus 1 ItemPerPage because of the added Home button
-
-                #endregion
-
-                #region Category Grid
-
-                _categoryGrid = _mono.gameObject.AddComponent<GridHelper>();
-                _categoryGrid.OnLoadDisplay += OnLoadCategoryGrid;
-                _categoryGrid.Setup(3, DSSModelPrefab.FilterItemPrefab, categoryPage, _startColor, _hoverColor, OnButtonClick); //Minus 1 ItemPerPage because of the added Home button
-
-                #endregion
-
-                #region Remove Server
-                var removeServerBTN = InterfaceHelpers.FindGameObject(filterPage, "RemoveServerBTN");
-
-                InterfaceHelpers.CreateButton(removeServerBTN, "RemoveServerBTN", InterfaceButtonMode.Background,
-                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.RemoveServer());
-                #endregion
-
-                #region Add Server
-                var addServerBTN = InterfaceHelpers.FindGameObject(home, "AddServerBTN");
-
-                InterfaceHelpers.CreateButton(addServerBTN, "AddServerBTN", InterfaceButtonMode.Background,
-                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.InsertServer());
-                #endregion
-
-                #region AddItemBTN
-                var itemPageBTN = InterfaceHelpers.FindGameObject(filterPage, "AddItemBTN");
-
-                InterfaceHelpers.CreateButton(itemPageBTN, "AddItemBTN", InterfaceButtonMode.Background,
-                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.AddFilterItem());
-                #endregion
-
-                #region AddCategoryBTN
-                var categoryBTN = InterfaceHelpers.FindGameObject(filterPage, "AddCategoryBTN");
-
-                InterfaceHelpers.CreateButton(categoryBTN, "AddCategoryBTN", InterfaceButtonMode.Background,
-                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.AddFilterCategory());
-                #endregion
-
-                return true;
-            }
-            catch (Exception e)
-            {
-                QuickLogger.Error($"{e.Message}: {e.StackTrace}");
-                return false;
-            }
-        }
+        private readonly List<InterfaceButton> _trackedButtons = new List<InterfaceButton>();
 
         private void OnLoadFilterGrid(DisplayData data)
         {
@@ -356,6 +194,168 @@ namespace DataStorageSolutions.Mono
 
         }
 
+        internal void Setup(DSSServerFormattingStationController mono)
+        {
+            _mono = mono;
+
+            if (FindAllComponents())
+            {
+                QuickLogger.Debug("Passed", true);
+                _page = Animator.StringToHash("Page");
+                _filterGrid?.DrawPage(1);
+                PowerOnDisplay();
+            }
+        }
+
+        public override void PowerOnDisplay()
+        {
+            GoToPage(FilterPages.Home);
+        }
+
+        public override void OnButtonClick(string btnName, object tag)
+        {
+            if (btnName == string.Empty) return;
+
+            switch (btnName)
+            {
+                case "HomeBTN":
+                    GoToPage(FilterPages.FilterPage);
+                    break;
+
+                case "FilterBTN":
+
+                    var filter = (FilterTransferData)tag;
+
+                    QuickLogger.Debug($"Filter Button Clicked: {filter.Filter} || {filter.Toggle?.isOn}", true);
+
+                    if (filter.Toggle == null)
+                    {
+                        QuickLogger.Error("ToggleButton is null");
+                        return;
+                    }
+
+                    if (filter.Toggle.isOn)
+                    {
+                        _mono.AddFilter(filter.Filter);
+                        UpdatePages();
+                    }
+                    else
+                    {
+                        _mono.RemoveFilter(filter.Filter);
+                        UpdatePages();
+                    }
+                    break;
+
+                case "AddServerBTN":
+                    _mono.DumpContainer.OpenStorage();
+                    break;
+
+                case "RemoveServerBTN":
+                    GoToPage(FilterPages.Home);
+                    _mono.ToggleDummyServer();
+                    _mono.GivePlayerItem();
+                    break;
+
+                case "AddCategoryBTN":
+                    GoToPage(FilterPages.Categories);
+                    break;
+
+                case "AddItemBTN":
+                    GoToPage(FilterPages.Items);
+                    break;
+            }
+        }
+
+        public override bool FindAllComponents()
+        {
+            try
+            {
+                #region Canvas  
+                var canvasGameObject = gameObject.GetComponentInChildren<Canvas>()?.gameObject;
+
+                if (canvasGameObject == null)
+                {
+                    throw new MissingComponentException($"A component cant be found.\nMissing Component: Canvas");
+                }
+                #endregion
+
+                #region Home Page
+                var home = InterfaceHelpers.FindGameObject(canvasGameObject, "HomePage");
+                #endregion
+
+                #region Filter Page
+                var filterPage = InterfaceHelpers.FindGameObject(canvasGameObject, "FilterPage");
+                #endregion
+
+                #region Category Page
+                var categoryPage = InterfaceHelpers.FindGameObject(canvasGameObject, "CategoryPage");
+                #endregion
+
+                #region Item Page
+                var itemPage = InterfaceHelpers.FindGameObject(canvasGameObject, "ItemPage");
+                #endregion
+
+                #region Filter Grid
+
+                _filterGrid = _mono.gameObject.AddComponent<GridHelper>();
+                _filterGrid.OnLoadDisplay += OnLoadFilterGrid;
+                _filterGrid.Setup(3, DSSModelPrefab.FilterItemPrefab, filterPage, _startColor, _hoverColor, OnButtonClick); //Minus 1 ItemPerPage because of the added Home button
+
+                #endregion
+
+                #region Item Grid
+
+                _itemGrid = _mono.gameObject.AddComponent<GridHelper>();
+                _itemGrid.OnLoadDisplay += OnLoadItemsGrid;
+                _itemGrid.Setup(3, DSSModelPrefab.FilterItemPrefab, itemPage, _startColor, _hoverColor, OnButtonClick); //Minus 1 ItemPerPage because of the added Home button
+
+                #endregion
+
+                #region Category Grid
+
+                _categoryGrid = _mono.gameObject.AddComponent<GridHelper>();
+                _categoryGrid.OnLoadDisplay += OnLoadCategoryGrid;
+                _categoryGrid.Setup(3, DSSModelPrefab.FilterItemPrefab, categoryPage, _startColor, _hoverColor, OnButtonClick); //Minus 1 ItemPerPage because of the added Home button
+
+                #endregion
+
+                #region Remove Server
+                var removeServerBTN = InterfaceHelpers.FindGameObject(filterPage, "RemoveServerBTN");
+
+                InterfaceHelpers.CreateButton(removeServerBTN, "RemoveServerBTN", InterfaceButtonMode.Background,
+                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.RemoveServer());
+                #endregion
+
+                #region Add Server
+                var addServerBTN = InterfaceHelpers.FindGameObject(home, "AddServerBTN");
+
+                InterfaceHelpers.CreateButton(addServerBTN, "AddServerBTN", InterfaceButtonMode.Background,
+                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.InsertServer());
+                #endregion
+
+                #region AddItemBTN
+                var itemPageBTN = InterfaceHelpers.FindGameObject(filterPage, "AddItemBTN");
+
+                InterfaceHelpers.CreateButton(itemPageBTN, "AddItemBTN", InterfaceButtonMode.Background,
+                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.AddFilterItem());
+                #endregion
+
+                #region AddCategoryBTN
+                var categoryBTN = InterfaceHelpers.FindGameObject(filterPage, "AddCategoryBTN");
+
+                InterfaceHelpers.CreateButton(categoryBTN, "AddCategoryBTN", InterfaceButtonMode.Background,
+                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.AddFilterCategory());
+                #endregion
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error($"{e.Message}: {e.StackTrace}");
+                return false;
+            }
+        }
+
         internal void GoToPage(FilterPages page)
         {
             QuickLogger.Debug($"Going to page{page} | {(int)page}");
@@ -368,20 +368,5 @@ namespace DataStorageSolutions.Mono
             _categoryGrid.DrawPage();
             _itemGrid.DrawPage();
         }
-    }
-
-    internal enum FilterPages
-    {
-        Blackout = 0,
-        Home = 1,
-        FilterPage = 2,
-        Items = 3,
-        Categories = 4
-    }
-
-    internal struct FilterTransferData
-    {
-        public Filter Filter { get; set; }
-        public Toggle Toggle { get; set; }
     }
 }

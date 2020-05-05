@@ -10,13 +10,13 @@ using FCSCommon.Utilities;
 using FCSTechFabricator.Components;
 using FCSTechFabricator.Extensions;
 using FCSTechFabricator.Managers;
+using UnityEngine;
 
 namespace DataStorageSolutions.Mono
 {
     internal class DSSAntennaController : DataStorageSolutionsController, IBaseAntenna, IHandTarget
     {
         private bool _isContructed;
-        private bool _showConsumption = true;
         private string _prefabID;
         private TechType _techType = TechType.None;
         private bool _runStartUpOnEnable;
@@ -24,11 +24,9 @@ namespace DataStorageSolutions.Mono
         private SaveDataEntry _savedData;
 
         public override bool IsConstructed => _isContructed;
-        public SubRoot SubRoot { get; private set; }
         public BaseManager Manager { get; set; }
         public TechType TechType => GetTechType();
         public ColorManager ColorManager { get; set; }
-        internal NameController NameController { get; private set; }
         public PowerManager PowerManager { get; private set; }
 
         private TechType GetTechType()
@@ -56,23 +54,7 @@ namespace DataStorageSolutions.Mono
                     {
                         ReadySaveData();
                     }
-
-                    QuickLogger.Debug("Trying to set base name");
                     
-                    if (string.IsNullOrEmpty(_savedData.AntennaName))
-                    {
-                        QuickLogger.Debug("Base Name is null or empty");
-                        var defaultName = Manager.GetDefaultName();
-                        SetBaseName(defaultName);
-                    }
-                    else
-                    {
-                        SetBaseName(_savedData.AntennaName);
-                    }
-                    
-                    QuickLogger.Debug("Trying to set antenna color");
-
-
                     if (_savedData?.AntennaBodyColor != null)
                     {
                         ColorManager.SetMaskColorFromSave(_savedData.AntennaBodyColor.Vector4ToColor());
@@ -80,22 +62,7 @@ namespace DataStorageSolutions.Mono
                 }
             }
         }
-
-        private void SetBaseName(string defaultName)
-        {
-            QuickLogger.Debug("Got Default Name");
-            NameController.SetCurrentName(defaultName);
-            QuickLogger.Debug("Setting Name Controller");
-            Manager.SetBaseName(defaultName);
-            QuickLogger.Debug("Setting Base Name");
-        }
-
-        private void OnLabelChangedMethod(string newName, NameController controller)
-        {
-            Manager.SetBaseName(newName);
-            Mod.OnBaseUpdate?.Invoke();
-        }
-
+        
         private void ReadySaveData()
         {
             QuickLogger.Debug("In OnProtoDeserialize");
@@ -104,9 +71,7 @@ namespace DataStorageSolutions.Mono
 
         private void Update()
         {
-            FindSubRoot();
-
-            if (IsConstructed && PowerManager != null)
+            if (IsConstructed && PowerManager != null && SubRoot != null)
             {
                 PowerManager?.UpdatePowerState();
                 PowerManager?.ConsumePower();
@@ -138,11 +103,6 @@ namespace DataStorageSolutions.Mono
             return _prefabID;
         }
 
-        internal void ToggleShowConsumption()
-        {
-            _showConsumption = !true;
-        }
-
         public override void Initialize()
         {
             GetData();
@@ -152,7 +112,7 @@ namespace DataStorageSolutions.Mono
             if (PowerManager == null)
             {
                 PowerManager = new PowerManager();
-                PowerManager.Initialize(gameObject, QPatch.Configuration.Config.AntennaPowerUsage);
+                PowerManager.Initialize(this, QPatch.Configuration.Config.AntennaPowerUsage);
                 PowerManager.OnPowerUpdate += OnPowerUpdate;
             }
 
@@ -160,27 +120,6 @@ namespace DataStorageSolutions.Mono
             {
                 ColorManager = gameObject.AddComponent<ColorManager>();
                 ColorManager.Initialize(gameObject, DSSModelPrefab.BodyMaterial);
-            }
-
-            if (NameController == null)
-            {
-                NameController = gameObject.EnsureComponent<NameController>();
-                NameController.Initialize(AuxPatchers.Submit(), Mod.AntennaFriendlyName);
-                NameController.OnLabelChanged += OnLabelChangedMethod;
-
-                if (Manager != null)
-                {
-                    QuickLogger.Debug("Trying to set default name");
-                    if (string.IsNullOrEmpty(Manager.GetBaseName()))
-                    {
-                        SetBaseName(Manager.GetDefaultName());
-                        NameController.SetCurrentName(Manager.GetDefaultName());
-                    }
-                    else
-                    {
-                        NameController.SetCurrentName(Manager.GetBaseName());
-                    }
-                }
             }
 
             BaseManager.AddAntenna(this);
@@ -213,7 +152,7 @@ namespace DataStorageSolutions.Mono
             newSaveData.Entries.Add(_savedData);
         }
 
-        internal List<DSSRackController> GetData()
+        internal HashSet<DSSRackController> GetData()
         {
             if (!_isContructed) return null;
 
@@ -264,17 +203,7 @@ namespace DataStorageSolutions.Mono
                 }
             }
         }
-
-        string IBaseAntenna.GetName()
-        {
-            return Manager.GetBaseName();
-        }
-
-        public void ChangeBaseName()
-        {
-            NameController.Show();
-        }
-
+        
         public void OnHandHover(GUIHand hand)
         {
             HandReticle main = HandReticle.main;
@@ -297,18 +226,9 @@ namespace DataStorageSolutions.Mono
             return IsConstructed && PowerManager.GetPowerState() == FCSPowerStates.Powered;
         }
 
-        //private void UpdatePower()
-        //{
-        //    if (IsConstructed)
-        //    {
-        //        if (_powerRelay)
-        //        {
-        //            if (_powerRelay.GetPowerStatus() == PowerSystem.Status.Normal)
-        //            {
-        //                _powerRelay.ConsumeEnergy(powerPerSecond * updateInterval, out num);
-        //            }
-        //        }
-        //    }
-        //}
+        public void ChangeColorMask(Color color)
+        {
+            ColorManager.ChangeColorMask(color);
+        }
     }
 }

@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using DataStorageSolutions.Buildables;
 using DataStorageSolutions.Buildables.Antenna;
 using DataStorageSolutions.Buildables.FilterMachine;
@@ -15,6 +12,7 @@ using FCSCommon.Utilities;
 using FCSTechFabricator;
 using FCSTechFabricator.Components;
 using FCSTechFabricator.Craftables;
+using Harmony;
 using QModManager.API.ModLoading;
 using SMLHelper.V2.Utility;
 using UnityEngine;
@@ -65,7 +63,14 @@ namespace DataStorageSolutions
                 var serverFormattingStation = new ServerFormattingStationBuildable();
                 serverFormattingStation.Patch();
 
+                var harmony = HarmonyInstance.Create("com.datastoragesolutions.fstudios");
+
+                harmony.PatchAll(Assembly.GetExecutingAssembly());
+
                 QuickLogger.Info("Finished patching");
+                //string json = JsonConvert.SerializeObject(FilterList.GetFilters(), Formatting.Indented);
+                //File.WriteAllText(@"C:\temp.json", json);
+
             }
             catch (Exception ex)
             {

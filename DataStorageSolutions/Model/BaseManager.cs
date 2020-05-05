@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Eventing.Reader;
-using System.IO;
 using System.Linq;
 using DataStorageSolutions.Buildables;
 using DataStorageSolutions.Configuration;
 using DataStorageSolutions.Interfaces;
 using DataStorageSolutions.Mono;
+using DataStorageSolutions.Structs;
 using FCSCommon.Utilities;
 using FCSTechFabricator.Components;
 using FCSTechFabricator.Interfaces;
-using Oculus.Newtonsoft.Json;
 using UnityEngine;
 
 namespace DataStorageSolutions.Model
@@ -18,43 +16,57 @@ namespace DataStorageSolutions.Model
     internal class BaseManager : IFCSStorage
     {
         private string _baseName;
+        private BaseSaveData _savedData;
 
         internal static List<BaseManager> Managers { get; } = new List<BaseManager>();
         internal static readonly List<IBaseAntenna> BaseAntennas = new List<IBaseAntenna>();
-
-        internal int InstanceID { get; }
-        internal readonly List<DSSRackController> BaseUnits = new List<DSSRackController>();
+        internal string InstanceID { get; }
+        internal readonly HashSet<DSSRackController> BaseUnits = new HashSet<DSSRackController>();
         internal readonly SubRoot Habitat;
-        public DumpContainer DumpContainer { get; private set; }
+        internal DumpContainer DumpContainer { get; private set; }
+        public int GetContainerFreeSpace { get; }
+        public bool IsFull { get; }
+        public NameController NameController { get; private set; }
 
-        public BaseManager(SubRoot habitat)
+        
+        private void Initialize(SubRoot habitat)
         {
-            Habitat = habitat;
-            InstanceID = habitat.GetInstanceID();
+            ReadySaveData();
+
+            if (NameController == null)
+            {
+                NameController = new NameController();
+                NameController.Initialize(AuxPatchers.Submit(), Mod.AntennaFriendlyName);
+                NameController.OnLabelChanged += OnLabelChangedMethod;
+
+                if (string.IsNullOrEmpty(_savedData?.InstanceID))
+                {
+                    NameController.SetCurrentName(GetDefaultName());
+                }
+                else
+                {
+                    NameController.SetCurrentName(_savedData?.BaseName);
+                }
+            }
+
             if (DumpContainer == null)
             {
                 DumpContainer = new DumpContainer();
-                DumpContainer.Initialize(habitat.transform, AuxPatchers.BaseDumpReceptacle(), AuxPatchers.NotAllowed(), AuxPatchers.DriveFull(), this, 4, 4);
+                DumpContainer.Initialize(habitat.transform, AuxPatchers.BaseDumpReceptacle(), AuxPatchers.NotAllowed(),
+                    AuxPatchers.CannotBeStored(), this, 4, 4);
             }
         }
 
-        internal static BaseManager FindManager(SubRoot subRoot)
+        private void ReadySaveData()
         {
-
-            //if (!subRoot.isBase) return null; //Disabled to allow Cyclops Operation
-
-            QuickLogger.Debug($"Processing SubRoot = {subRoot.GetInstanceID()} || Name {subRoot.GetSubName()}");
-
-            var pre = subRoot.gameObject.GetComponent<PrefabIdentifier>();
-
-            var manager = Managers.Find(x => x.InstanceID == subRoot.GetInstanceID() && x.Habitat == subRoot);
-
-            if (manager == null)
-            {
-                QuickLogger.Debug("No manager found on base");
-            }
-
-            return manager ?? CreateNewManager(subRoot);
+            QuickLogger.Debug("In OnProtoDeserialize");
+            _savedData = Mod.GetBaseSaveData(InstanceID);
+        }
+        
+        private void OnLabelChangedMethod(string newName, NameController controller)
+        {
+            SetBaseName(newName);
+            Mod.OnBaseUpdate?.Invoke();
         }
 
         private static BaseManager CreateNewManager(SubRoot habitat)
@@ -66,6 +78,77 @@ namespace DataStorageSolutions.Model
             return manager;
         }
         
+        private static void GetStoredData(DSSRackController rackController, Dictionary<TechType, int> data)
+        {
+            if (rackController == null)
+            {
+                QuickLogger.Debug("RackController is null", true);
+                return;
+            }
+
+            foreach (KeyValuePair<TechType, int> storedItems in rackController.GetStoredData())
+            {
+                CollectServerItems(storedItems, data);
+            }
+        }
+
+        private static void CollectServerItems(KeyValuePair<TechType, int> storedItem, Dictionary<TechType, int> data)
+        {
+            if (data.ContainsKey(storedItem.Key))
+            {
+                data[storedItem.Key] += storedItem.Value;
+            }
+            else
+            {
+                data.Add(storedItem.Key, storedItem.Value);
+            }
+        }
+
+        public BaseManager(SubRoot habitat)
+        {
+            if (habitat == null) return;
+            Habitat = habitat;
+            InstanceID = habitat.gameObject.gameObject?.GetComponentInChildren<PrefabIdentifier>()?.Id;
+            Initialize(habitat);
+        }
+
+        internal static BaseManager FindManager(SubRoot subRoot)
+        {
+            QuickLogger.Debug($"Processing SubRoot = {subRoot.GetInstanceID()} || Name {subRoot.GetSubName()}");
+            var g = FindManager(subRoot.gameObject.GetComponentInChildren<PrefabIdentifier>()?.Id);
+            var manager = Managers.Find(x => x.InstanceID == g?.InstanceID && x.Habitat == subRoot);
+
+            if (manager == null)
+            {
+                QuickLogger.Debug("No manager found on base");
+            }
+
+            return manager ?? CreateNewManager(subRoot);
+        }
+
+        internal static BaseManager FindManager(string instanceID)
+        {
+            QuickLogger.Debug($"Trying to find a Base with the ID {instanceID}",true);
+
+            var manager = Managers.Find(x => x.InstanceID == instanceID);
+
+            if (manager == null)
+            {
+                QuickLogger.Debug($"No manager was found with the instanceID {instanceID}",true);
+            }
+
+            return manager;
+        }
+        
+        internal bool HasAntenna()
+        {
+            if (Habitat.isCyclops)
+            {
+                return true;
+            }
+
+            return GetCurrentBaseAntenna() != null;
+        }
 
         internal void AddUnit(DSSRackController unit)
         {
@@ -124,32 +207,6 @@ namespace DataStorageSolutions.Model
             }
         }
 
-        private static void GetStoredData(DSSRackController rackController, Dictionary<TechType, int> data)
-        {
-            if (rackController == null)
-            {
-                QuickLogger.Debug("RackController is null", true);
-                return;
-            }
-            
-            foreach (KeyValuePair<TechType, int> storedItems in rackController.GetStoredData())
-            {
-                CollectServerItems(storedItems, data);
-            }
-        }
-
-        private static void CollectServerItems(KeyValuePair<TechType,int> storedItem, Dictionary<TechType, int> data)
-        {
-            if (data.ContainsKey(storedItem.Key))
-            {
-                data[storedItem.Key] += storedItem.Value;
-            }
-            else
-            {
-                data.Add(storedItem.Key, storedItem.Value);
-            }
-        }
-
         public void TakeItem(TechType techType)
         {
             QuickLogger.Debug("In TakeItem",true);
@@ -174,42 +231,75 @@ namespace DataStorageSolutions.Model
 
         public IBaseAntenna GetCurrentBaseAntenna()
         {
+            QuickLogger.Debug($"Current ID: {InstanceID}",true);
             return BaseAntennas.FirstOrDefault(antenna => antenna?.Manager.InstanceID == InstanceID);
         }
-        public int GetContainerFreeSpace { get; }
-        public bool IsFull { get; }
-        public bool CanBeStored(int amount)
+        
+        public bool CanBeStored(int amount, TechType techType)
         {
-            //TODO Allow Filtering
-            return BaseUnits.Any(x => x.IsFull != true);
+            return FindValidRack(techType) != null;
         }
 
-        public bool AddItemToContainer(InventoryItem item)
+        private DSSRackController FindValidRack(TechType itemTechType)
         {
-            foreach (DSSRackController rackController in BaseUnits)
+            //Check the filtered racks first
+            foreach (DSSRackController baseUnit in BaseUnits)
             {
-                if (!rackController.IsFull)
+                if (!baseUnit.IsFull && baseUnit.IsTechTypeAllowedInRack(itemTechType) && baseUnit.HasFilters())
                 {
-                    rackController.AddItemToAServer(item);
-                    return true;
+                    QuickLogger.Debug($"Item: {itemTechType} is allowed in server rack {baseUnit.GetPrefabIDString()} is Filtered: {baseUnit.HasFilters()}", true);
+                    return baseUnit;
                 }
             }
 
-            return false;
+            //Check the filtered racks first then the unfiltered
+            foreach (DSSRackController baseUnit in BaseUnits)
+            {
+                if (!baseUnit.IsFull && baseUnit.IsTechTypeAllowedInRack(itemTechType))
+                {
+                    QuickLogger.Debug($"Item: {itemTechType} is allowed in server rack {baseUnit.GetPrefabIDString()} is Filtered: {baseUnit.HasFilters()}", true);
+                    return baseUnit;
+                }
+            }
+
+            QuickLogger.Debug($"No qualified server rack is found to hold techtype: {itemTechType}", true);
+            return null;
+        }
+        
+        public bool AddItemToContainer(InventoryItem item)
+        {
+            var rackController = FindValidRack(item.item.GetTechType());
+            if (rackController == null) return false;
+            rackController.AddItemToAServer(item);
+            return true;
+
         }
 
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
         {
             var food = pickupable.GetComponentInChildren<Eatable>();
+
             if (food != null)
             {
                 if (!Mathf.Approximately(food.foodValue, 0))
                 {
+                    QuickLogger.Message(AuxPatchers.NoFoodItems(),true);
                     return false;
                 }
             }
+            
+            if (!CanBeStored(1,pickupable.GetTechType()))
+            {
+                QuickLogger.Message(AuxPatchers.CannotBeStored(), true);
+                return false;
+            }
 
-            return CanBeStored(1);
+            return true;
+        }
+        
+        internal void ChangeBaseName()
+        {
+            NameController.Show();
         }
 
         internal string GetBaseName()
@@ -225,6 +315,25 @@ namespace DataStorageSolutions.Model
         internal string GetDefaultName()
         {
             return $"Base {Managers.Count}";
+        }
+
+        internal IEnumerable<IBaseAntenna> GetBaseAntennas()
+        {
+            foreach (IBaseAntenna antenna in BaseAntennas)
+            {
+                if (antenna.Manager.InstanceID == InstanceID)
+                {
+                    yield return antenna;
+                }
+            }
+        }
+
+        public static IEnumerable<BaseSaveData> GetSaveData()
+        {
+            foreach (BaseManager manager in Managers)
+            {
+                yield return new BaseSaveData {BaseName = manager.GetBaseName(), InstanceID = manager.InstanceID};
+            }
         }
     }
 }

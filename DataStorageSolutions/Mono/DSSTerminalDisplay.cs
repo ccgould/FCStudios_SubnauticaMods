@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using DataStorageSolutions.Buildables;
-using DataStorageSolutions.Configuration;
+using DataStorageSolutions.Enumerators;
 using DataStorageSolutions.Interfaces;
 using DataStorageSolutions.Model;
+using DataStorageSolutions.Structs;
 using FCSCommon.Abstract;
 using FCSCommon.Components;
 using FCSCommon.Enums;
@@ -30,13 +32,147 @@ namespace DataStorageSolutions.Mono
         private GameObject _antennaColorPicker;
         private ColorPage _currentColorPage;
         private Text _baseNameLabel;
+        private Text _gettingData;
+        private string _currentSearchString;
+
+        private void OnLoadBaseItemsGrid(DisplayData data)
+        {
+            try
+            {
+                QuickLogger.Debug($"OnLoadBaseItemsGrid : {data.ItemsGrid}", true);
+
+                _baseItemsGrid.ClearPage();
+
+                if(_currentBase == null) return;
+
+                var grouped = _currentBase.GetItemsWithin().OrderBy(x=>x.Key)?.ToList();
+
+                if (!string.IsNullOrEmpty(_currentSearchString?.Trim()))
+                {
+                    grouped = grouped.Where(p => Language.main.Get(p.Key).StartsWith(_currentSearchString.Trim(), StringComparison.OrdinalIgnoreCase)).ToList();
+                }
+                
+                if (data.EndPosition > grouped.Count)
+                {
+                    data.EndPosition = grouped.Count;
+                }
+                
+                for (int i = data.StartPosition; i < data.EndPosition; i++)
+                {
+
+                    GameObject buttonPrefab = Instantiate(data.ItemsPrefab);
+
+                    if (buttonPrefab == null || data.ItemsGrid == null)
+                    {
+                        if (buttonPrefab != null)
+                        {
+                            Destroy(buttonPrefab);
+                        }
+                        return;
+                    }
+
+                    buttonPrefab.transform.SetParent(data.ItemsGrid.transform, false);
+                    var amount = buttonPrefab.GetComponentInChildren<Text>();
+                    amount.text = grouped[i].Value.ToString();
+                    var itemBTN = buttonPrefab.AddComponent<InterfaceButton>();
+                    itemBTN.ButtonMode = InterfaceButtonMode.Background;
+                    itemBTN.STARTING_COLOR = _startColor;
+                    itemBTN.HOVER_COLOR = _hoverColor;
+                    itemBTN.BtnName = "ItemBTN";
+                    itemBTN.Tag = grouped[i].Key;
+                    itemBTN.OnButtonClick = OnButtonClick;
+                
+                    uGUI_Icon trashIcon = InterfaceHelpers.FindGameObject(buttonPrefab, "Icon").AddComponent<uGUI_Icon>();
+                    trashIcon.sprite = SpriteManager.Get(grouped[i].Key);
+                }
+                _baseItemsGrid.UpdaterPaginator(grouped.Count);
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error("Error Caught");
+                QuickLogger.Error($"Error Message: {e.Message}");
+                QuickLogger.Error($"Error StackTrace: {e.StackTrace}");
+            }
+        }
+
+        private void OnLoadBaseGrid(DisplayData data)
+        {
+            try
+            {
+                if(_mono.SubRoot == null) return;
+
+                _baseGrid.ClearPage();
+
+                var grouped = BaseManager.Managers;
+
+
+
+                if (data.EndPosition > grouped.Count)
+                {
+                    data.EndPosition = grouped.Count;
+                }
+
+                if(data.ItemsGrid?.transform == null) return;
+
+                CreateButton(data, Instantiate(data.ItemsPrefab), _mono.Manager, true);
+
+                if (_mono.Manager.GetCurrentBaseAntenna() != null || _mono.Manager.Habitat.isCyclops)
+                {
+                    for (int i = data.StartPosition; i < data.EndPosition; i++)
+                    {
+
+                        if (!grouped[i].Habitat.gameObject.activeSelf ||grouped[i].InstanceID == _mono.Manager.InstanceID || !grouped[i].HasAntenna()) continue;
+                        
+                        GameObject buttonPrefab = Instantiate(data.ItemsPrefab);
+
+                        if (buttonPrefab == null || data.ItemsGrid == null)
+                        {
+                            if (buttonPrefab != null)
+                            {
+                                QuickLogger.Debug("Destroying Tab", true);
+                                Destroy(buttonPrefab);
+                            }
+                            return;
+                        }
+
+                        CreateButton(data, buttonPrefab, grouped[i]);
+                    }
+                }
+            
+                _baseGrid.UpdaterPaginator(grouped.Count);
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error("Error Caught");
+                QuickLogger.Error($"Error Message: {e.Message}");
+                QuickLogger.Error($"Error StackTrace: {e.StackTrace}");
+            }
+        }
+
+        private void CreateButton(DisplayData data, GameObject buttonPrefab, BaseManager manager,bool isHome = false)
+        {
+            buttonPrefab.transform.SetParent(data.ItemsGrid.transform, false);
+            buttonPrefab.GetComponentInChildren<Text>().text = isHome ? AuxPatchers.Home() : manager.GetBaseName().TruncateWEllipsis(30);
+
+            var mainBtn = buttonPrefab.AddComponent<InterfaceButton>();
+            mainBtn.ButtonMode = InterfaceButtonMode.Background;
+            mainBtn.STARTING_COLOR = _startColor;
+            mainBtn.HOVER_COLOR = _hoverColor;
+            mainBtn.BtnName = "BaseBTN";
+            mainBtn.Tag = new TransferData {Manager = manager, IsHomeBase = isHome};
+            mainBtn.OnButtonClick = OnButtonClick;
+        }
+
+        private void UpdateSearch(string newSearch)
+        {
+            _currentSearchString = newSearch;
+            _baseItemsGrid.DrawPage();
+        }
 
         internal void Setup(DSSTerminalController mono)
         {
             _mono = mono;
             _terminalColorPage = mono.TerminalColorManager;
-            
-
 
             if (FindAllComponents())
             {
@@ -53,17 +189,27 @@ namespace DataStorageSolutions.Mono
             switch (btnName)
             {
                 case "BaseBTN":
-                    _currentBase = ((TransferData) tag).Manager;
-                    _currentData = (TransferData) tag;
-                    GoToPage(TerminalPages.BaseItems);
+                    if (!SubrootCheck()) return;
+                    _currentBase = ((TransferData)tag).Manager;
+                    _currentData = (TransferData)tag;
                     _baseNameLabel.text = _currentBase.GetBaseName();
+                    if (_currentData.IsHomeBase)
+                    {
+                        GoToPage(TerminalPages.BaseItemsDirect);
+                    }
+                    else
+                    {
+                        _gettingData.text = string.Format(AuxPatchers.GettingData(), _currentBase.GetBaseName());
+                        GoToPage(TerminalPages.BaseItems);
+                    }
+
                     Refresh();
                     break;
 
                 case "HomeBTN":
                     GoToPage(TerminalPages.Home);
                     break;
-                
+
                 case "ItemBTN":
                     _currentBase?.TakeItem((TechType)tag);
                     break;
@@ -78,14 +224,21 @@ namespace DataStorageSolutions.Mono
                     break;
 
                 case "AntennaColorBTN":
-                    if (_mono.Manager.GetCurrentBaseAntenna() != null)
+                    var antennas = _mono.Manager.GetCurrentBaseAntenna();
+
+                    if (antennas != null)
                     {
                         GoToPage(TerminalPages.AntennaColorPage);
                         _currentColorPage = ColorPage.Antenna;
+                        UpdateAntennaColorPage();
                     }
-                    else
+                    else if(_mono.Manager.Habitat.isBase)
                     {
                         QuickLogger.Message(AuxPatchers.NoAntennaOnBase(), true);
+                    }
+                    else if (_mono.Manager.Habitat.isCyclops)
+                    {
+                        QuickLogger.Message(AuxPatchers.CannotChangeCyclopsAntenna(), true);
                     }
                     break;
 
@@ -95,34 +248,64 @@ namespace DataStorageSolutions.Mono
 
                 case "ColorItem":
                     if (_currentColorPage == ColorPage.Terminal)
-                        _mono.TerminalColorManager.ChangeColorMask((Color) tag);
+                        _mono.TerminalColorManager.ChangeColorMask((Color)tag);
                     else
-                        _mono.AntennaColorManager.ChangeColorMask((Color) tag);
+                        ChangeAntennaColor((Color)tag);
                     break;
 
                 case "RenameBTN":
-                    var currentBase = _mono.Manager?.GetCurrentBaseAntenna();
-                    if (currentBase != null)
-                    {
-                        currentBase.ChangeBaseName();
-                    }
-                    else
-                    {
-                        QuickLogger.Message(AuxPatchers.NoAntennaOnBase(),true);
-                    }
+                    _mono.Manager.ChangeBaseName();
                     break;
             }
         }
 
+        private void ChangeAntennaColor(Color color)
+        {
+            foreach (var baseAntenna in _mono.Manager.GetBaseAntennas())
+            {
+                baseAntenna.ChangeColorMask(color);
+            }
+        }
+
+        public override void PowerOnDisplay()
+        {
+            _mono.AnimationManager.SetIntHash(_page,1);
+        }
+
+        public override void PowerOffDisplay()
+        {
+            GoToPage(TerminalPages.BlackOut);
+        }
+
+        public void Refresh()
+        {
+            _baseGrid.DrawPage();
+            _baseItemsGrid.DrawPage();
+            _baseNameLabel.text = _currentBase?.GetBaseName() ?? AuxPatchers.FailedToGetBaseName();
+        }
+
+        internal void GoToPage(TerminalPages page)
+        {
+            _mono.AnimationManager.SetIntHash(_page, (int)page);
+        }
+
+        internal bool SubrootCheck()
+        {
+            if (_mono.SubRoot != null) return true;
+            QuickLogger.Error("Terminal cant find the base please contact FCS", true);
+            return false;
+
+        }
+
         internal void UpdateAntennaColorPage()
         {
-            _antennaColorPage = _mono?.AntennaColorManager;
+            _antennaColorPage = _mono?.Manager?.GetCurrentBaseAntenna()?.ColorManager;
 
             if (_antennaColorPage != null)
             {
                 #region ColorPage
-                _antennaColorPage.SetupGrid(90, DSSModelPrefab.ColorItemPrefab, _antennaColorPicker, OnButtonClick, _startColor, _hoverColor,5
-                ,"PrevBTN","NextBTN","Grid","Paginator", "HomeBTN", "ColorPickerBTN");
+                _antennaColorPage.SetupGrid(90, DSSModelPrefab.ColorItemPrefab, _antennaColorPicker, OnButtonClick, _startColor, _hoverColor, 5
+                , "PrevBTN", "NextBTN", "Grid", "Paginator", "HomeBTN", "ColorPickerBTN");
                 #endregion
             }
         }
@@ -147,6 +330,10 @@ namespace DataStorageSolutions.Mono
             var baseItemsPage = InterfaceHelpers.FindGameObject(canvasGameObject, "BaseItemsPage");
             #endregion
 
+            #region GettingDataPage
+            var gettingDataPage = InterfaceHelpers.FindGameObject(canvasGameObject, "GettingData");
+            #endregion
+
             #region ColorPageMain
             var colorMainPage = InterfaceHelpers.FindGameObject(canvasGameObject, "ColorPageMain");
             #endregion
@@ -167,8 +354,8 @@ namespace DataStorageSolutions.Mono
 
             _baseGrid = _mono.gameObject.AddComponent<GridHelper>();
             _baseGrid.OnLoadDisplay += OnLoadBaseGrid;
-            _baseGrid.Setup(12-1, DSSModelPrefab.BaseItemPrefab, home, _startColor, _hoverColor, OnButtonClick); //Minus 1 ItemPerPage because of the added Home button
-            
+            _baseGrid.Setup(12 - 1, DSSModelPrefab.BaseItemPrefab, home, _startColor, _hoverColor, OnButtonClick); //Minus 1 ItemPerPage because of the added Home button
+
             #endregion
 
             #region Base Items Page
@@ -177,7 +364,7 @@ namespace DataStorageSolutions.Mono
             _baseItemsGrid.OnLoadDisplay += OnLoadBaseItemsGrid;
             _baseItemsGrid.Setup(44, DSSModelPrefab.ItemPrefab, baseItemsPage, _startColor, _hoverColor, OnButtonClick);
             #endregion
-            
+
             #region DumpBTNButton
             var closeBTN = InterfaceHelpers.FindGameObject(baseItemsPage, "DumpButton");
 
@@ -201,7 +388,7 @@ namespace DataStorageSolutions.Mono
 
             #region ColorPickerMainHomeBTN
             var colorPickerMainHomeBTN = InterfaceHelpers.FindGameObject(colorMainPage, "HomeBTN");
-            
+
             InterfaceHelpers.CreateButton(colorPickerMainHomeBTN, "HomeBTN", InterfaceButtonMode.Background,
                 OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.ColorPage());
             #endregion
@@ -213,6 +400,32 @@ namespace DataStorageSolutions.Mono
                 OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, string.Format(AuxPatchers.ColorPageFormat(), AuxPatchers.Terminal()));
             #endregion
 
+            #region Search
+            var inputField = InterfaceHelpers.FindGameObject(baseItemsPage, "InputField");
+
+            if(inputField != null)
+            {
+                var text = InterfaceHelpers.FindGameObject(inputField, "Placeholder")?.GetComponent<Text>();
+                if (text != null)
+                {
+                    text.text = AuxPatchers.SearchForItemsMessage();
+                }
+                else
+                {
+                    return false;
+                }
+
+                var searchField = inputField.AddComponent<SearchField>();
+                searchField.OnSearchValueChanged += UpdateSearch;
+            }
+            else
+            {
+                //throw new MissingComponentException("Cannot find Input Field");
+                return false;
+            }
+            
+            #endregion
+
             #region DumpBTNButton
             var antennaColorBTN = InterfaceHelpers.FindGameObject(colorMainPage, "AntennaColorBTN");
 
@@ -221,8 +434,8 @@ namespace DataStorageSolutions.Mono
             #endregion
 
             #region ColorPage
-            _terminalColorPage.SetupGrid(90, DSSModelPrefab.ColorItemPrefab, screenColorPicker, OnButtonClick, _startColor, _hoverColor,5,
-            "PrevBTN", "NextBTN", "Grid", "Paginator","HomeBTN", "ColorPickerBTN");
+            _terminalColorPage.SetupGrid(90, DSSModelPrefab.ColorItemPrefab, screenColorPicker, OnButtonClick, _startColor, _hoverColor, 5,
+            "PrevBTN", "NextBTN", "Grid", "Paginator", "HomeBTN", "ColorPickerBTN");
             #endregion
 
             #region BaseItemDecription
@@ -235,166 +448,16 @@ namespace DataStorageSolutions.Mono
             #region BaseNAme
 
             _baseNameLabel = InterfaceHelpers.FindGameObject(baseItemsPage, "BaseLabel")?.GetComponent<Text>();
-            
+
+            #endregion
+
+            #region BaseItemsLoading
+
+            _gettingData = InterfaceHelpers.FindGameObject(gettingDataPage, "Title")?.GetComponent<Text>();
+
             #endregion
 
             return true;
         }
-
-        private void OnLoadBaseItemsGrid(DisplayData data)
-        {
-            QuickLogger.Debug($"OnLoadBaseItemsGrid : {data.ItemsGrid}", true);
-
-            _baseItemsGrid.ClearPage();
-
-            if(_currentBase == null) return;
-
-            var grouped = _currentBase.GetItemsWithin()?.ToList();
-            
-            if (data.EndPosition > grouped.Count)
-            {
-                data.EndPosition = grouped.Count;
-            }
-
-            for (int i = data.StartPosition; i < data.EndPosition; i++)
-            {
-
-                GameObject buttonPrefab = Instantiate(data.ItemsPrefab);
-
-                if (buttonPrefab == null || data.ItemsGrid == null)
-                {
-                    if (buttonPrefab != null)
-                    {
-                        Destroy(buttonPrefab);
-                    }
-                    return;
-                }
-
-                buttonPrefab.transform.SetParent(data.ItemsGrid.transform, false);
-
-                var itemBTN = buttonPrefab.AddComponent<InterfaceButton>();
-                itemBTN.ButtonMode = InterfaceButtonMode.Background;
-                itemBTN.STARTING_COLOR = _startColor;
-                itemBTN.HOVER_COLOR = _hoverColor;
-                itemBTN.BtnName = "ItemBTN";
-                itemBTN.Tag = grouped[i].Key;
-                itemBTN.OnButtonClick = OnButtonClick;
-                
-                uGUI_Icon trashIcon = InterfaceHelpers.FindGameObject(buttonPrefab, "Icon").AddComponent<uGUI_Icon>();
-                trashIcon.sprite = SpriteManager.Get(grouped[i].Key);
-            }
-            _baseItemsGrid.UpdaterPaginator(grouped.Count);
-        }
-
-        internal void OnLoadBaseGrid(DisplayData data)
-        {
-            _baseGrid.ClearPage();
-            
-            var grouped  = new List<IBaseAntenna>();
-            
-            foreach (BaseManager manager in BaseManager.Managers)
-            {
-                if(manager == null) continue;
-
-                grouped.Add(manager.GetCurrentBaseAntenna());
-            }
-            
-            if (data.EndPosition > grouped.Count)
-            {
-                data.EndPosition = grouped.Count;
-            }
-
-            GameObject button1Prefab = Instantiate(data.ItemsPrefab);
-            button1Prefab.transform.SetParent(data.ItemsGrid.transform, false);
-            button1Prefab.GetComponentInChildren<Text>().text = "HOME";
-
-            var mainBTN = button1Prefab.AddComponent<InterfaceButton>();
-            mainBTN.ButtonMode = InterfaceButtonMode.Background;
-            mainBTN.STARTING_COLOR = _startColor;
-            mainBTN.HOVER_COLOR = _hoverColor;
-            mainBTN.BtnName = "BaseBTN";
-            mainBTN.Tag = new TransferData { AntennaController = null, Manager = _mono.Manager };
-            mainBTN.OnButtonClick = OnButtonClick;
-
-            if (_mono.Manager.GetCurrentBaseAntenna() != null)
-            {
-                for (int i = data.StartPosition; i < data.EndPosition; i++)
-                {
-                    GameObject buttonPrefab = Instantiate(data.ItemsPrefab);
-
-                    if (buttonPrefab == null || data.ItemsGrid == null)
-                    {
-                        if (buttonPrefab != null)
-                        {
-                            QuickLogger.Debug("Destroying Tab", true);
-                            Destroy(buttonPrefab);
-                        }
-                        return;
-                    }
-                    var antenna = grouped[i]?.Manager?.GetCurrentBaseAntenna();
-                    if (antenna == null || grouped[i].Manager == _mono.Manager || !antenna.IsVisible()) continue;
-                    CreateButton(data, buttonPrefab, grouped, i);
-                }
-            }
-            
-            _baseGrid.UpdaterPaginator(grouped.Count);
-        }
-
-        private void CreateButton(DisplayData data, GameObject buttonPrefab, List<IBaseAntenna> grouped, int i)
-        {
-            buttonPrefab.transform.SetParent(data.ItemsGrid.transform, false);
-            buttonPrefab.GetComponentInChildren<Text>().text = grouped[i].GetName().TruncateWEllipsis(30);
-
-            var mainBTN = buttonPrefab.AddComponent<InterfaceButton>();
-            mainBTN.ButtonMode = InterfaceButtonMode.Background;
-            mainBTN.STARTING_COLOR = _startColor;
-            mainBTN.HOVER_COLOR = _hoverColor;
-            mainBTN.BtnName = "BaseBTN";
-            mainBTN.Tag = new TransferData {AntennaController = grouped[i], Manager = grouped[i].Manager};
-            mainBTN.OnButtonClick = OnButtonClick;
-        }
-
-        public override void PowerOnDisplay()
-        {
-            _mono.AnimationManager.SetIntHash(_page,1);
-        }
-
-        public override void PowerOffDisplay()
-        {
-            GoToPage(TerminalPages.BlackOut);
-        }
-
-        public void Refresh()
-        {
-            _baseGrid.DrawPage();
-            _baseItemsGrid.DrawPage();
-        }
-
-        internal void GoToPage(TerminalPages page)
-        {
-            _mono.AnimationManager.SetIntHash(_page, (int)page);
-        }
     }
-
-    internal struct TransferData
-    {
-        public IBaseAntenna AntennaController { get; set; }
-        public BaseManager Manager { get; set; }
-    }
-}
-
-internal enum ColorPage
-{
-    Terminal,
-    Antenna
-}
-
-internal enum TerminalPages
-{
-    BlackOut = 0,
-    Home = 1,
-    BaseItems = 2,
-    ColorPageMain = 3,
-    TerminalColorPage = 4,
-    AntennaColorPage = 5
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using DataStorageSolutions.Model;
 using DataStorageSolutions.Mono;
+using DataStorageSolutions.Structs;
 using FCSCommon.Enums;
 using FCSCommon.Objects;
 using FCSTechFabricator.Objects;
@@ -12,7 +13,7 @@ namespace DataStorageSolutions.Configuration
     [Serializable]
     internal class SaveDataEntry
     {
-        [JsonProperty] internal string FileVersion { get; set; } = "1.0.0";
+        [JsonProperty] internal string BaseID;
         [JsonProperty] internal ColorVec4 TerminalBodyColor { get; set; }
         [JsonProperty] internal string ID { get; set; }
         [JsonProperty] internal ColorVec4 BodyColor { get; set; }
@@ -26,8 +27,10 @@ namespace DataStorageSolutions.Configuration
     [Serializable]
     internal class SaveData
     {
-        [JsonProperty] internal List<SaveDataEntry> Entries = new List<SaveDataEntry>();
+        [JsonProperty] internal string FileVersion { get; set; } = "1.0.0";
         [JsonProperty] internal Dictionary<string, ServerData> Servers { get; set; }
+        [JsonProperty] internal List<BaseSaveData> Bases { get; set; }
+        [JsonProperty] internal List<SaveDataEntry> Entries = new List<SaveDataEntry>();
     }
 
     [Serializable]

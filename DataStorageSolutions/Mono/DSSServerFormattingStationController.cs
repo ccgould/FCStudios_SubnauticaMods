@@ -5,7 +5,9 @@ using System.Text;
 using DataStorageSolutions.Abstract;
 using DataStorageSolutions.Buildables;
 using DataStorageSolutions.Configuration;
+using DataStorageSolutions.Enumerators;
 using DataStorageSolutions.Helpers;
+using DataStorageSolutions.Interfaces;
 using DataStorageSolutions.Model;
 using FCSCommon.Controllers;
 using FCSCommon.Utilities;
@@ -21,7 +23,6 @@ namespace DataStorageSolutions.Mono
         private bool _runStartUpOnEnable;
         private bool _fromSave;
         private SaveDataEntry _savedData;
-        private string _prefabID;
         private int _slotState;
         private List<ObjectData> _items;
         private DSSServerController _controller;
@@ -31,6 +32,8 @@ namespace DataStorageSolutions.Mono
         public DSSServerFormattingStationDisplay DisplayManager { get; private set; }
         public AnimationManager AnimationManager { get; private set; }
         public DumpContainer DumpContainer { get; private set; }
+        public int GetContainerFreeSpace { get; }
+        public bool IsFull { get; }
 
         private void OnEnable()
         {
@@ -65,13 +68,13 @@ namespace DataStorageSolutions.Mono
 
         public string GetPrefabIDString()
         {
-            if (string.IsNullOrEmpty(_prefabID))
+            if (string.IsNullOrEmpty(_prefabId))
             {
                 var id = GetComponentInChildren<PrefabIdentifier>() ?? GetComponentInParent<PrefabIdentifier>();
-                _prefabID = id != null ? id.Id : string.Empty;
+                _prefabId = id != null ? id.Id : string.Empty;
             }
 
-            return _prefabID;
+            return _prefabId;
         }
 
         public override void Initialize()
@@ -100,7 +103,7 @@ namespace DataStorageSolutions.Mono
             if (DumpContainer == null)
             {
                 DumpContainer = new DumpContainer();
-                DumpContainer.Initialize(transform, AuxPatchers.BaseDumpReceptacle(), AuxPatchers.NotAllowed(), AuxPatchers.DriveFull(), this, 1, 1);
+                DumpContainer.Initialize(transform, AuxPatchers.BaseDumpReceptacle(), AuxPatchers.NotAllowed(), AuxPatchers.CannotBeStored(), this, 1, 1);
             }
 
             IsInitialized = true;
@@ -179,9 +182,7 @@ namespace DataStorageSolutions.Mono
             AnimationManager.SetBoolHash(_slotState,!AnimationManager.GetBoolHash(_slotState));
         }
 
-        public int GetContainerFreeSpace { get; }
-        public bool IsFull { get; }
-        public bool CanBeStored(int amount)
+        public bool CanBeStored(int amount,TechType techType = TechType.None)
         {
             return false;
         }
@@ -213,10 +214,13 @@ namespace DataStorageSolutions.Mono
         public void GivePlayerItem()
         {
             var result = DSSHelpers.GivePlayerItem(QPatch.Server.TechType, new ObjectDataTransferData{data = _items,Filters= _filters, IsServer = true}, null);
+            
             if (result)
             {
                 _items = null;
             }
+
+            QuickLogger.Debug($"Items result: {_items} || Result = {result}");
         }
 
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)

@@ -118,13 +118,17 @@
     <Compile Include="Configuration\SaveDataEntry.cs" />
     <Compile Include="Craftables\ServerCraftable.cs" />
     <Compile Include="Helpers\DSSHelpers.cs" />
+    <Compile Include="Enumerators\ColorPage.cs" />
+    <Compile Include="Enumerators\FilterPages.cs" />
     <Compile Include="Interfaces\IBaseAntenna.cs" />
     <Compile Include="Interfaces\IDataSoluationsSave.cs" />
+    <Compile Include="Enumerators\TerminalPages.cs" />
     <Compile Include="Model\AudioHandler.cs" />
     <Compile Include="Model\BaseManager.cs" />
     <Compile Include="Model\Catergories.cs" />
     <Compile Include="Model\RackSlot.cs" />
     <Compile Include="Model\ObjectDataTransferData.cs" />
+    <Compile Include="Model\ServerData.cs" />
     <Compile Include="Mono\DSSAntennaController.cs" />
     <Compile Include="Mono\DSSRackDisplayController.cs" />
     <Compile Include="Mono\DSSServerDisplay.cs" />
@@ -135,8 +139,13 @@
     <Compile Include="Mono\DSSServerController.cs" />
     <Compile Include="Mono\DSSTerminalDisplay.cs" />
     <Compile Include="Mono\PowerManager.cs" />
+    <Compile Include="Mono\SearchField.cs" />
+    <Compile Include="Patches\SubRoot_Patches.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Model\BaseSaveData.cs" />
+    <Compile Include="Structs\FilterTransferData.cs" />
+    <Compile Include="Structs\TransferData.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FCSTechFabricator\FCSTechFabricator.csproj">

@@ -1,6 +1,7 @@
 ﻿using DataStorageSolutions.Model;
 using FCSCommon.Interfaces;
 using FCSTechFabricator.Managers;
+using UnityEngine;
 
 namespace DataStorageSolutions.Interfaces
 {
@@ -8,8 +9,7 @@ namespace DataStorageSolutions.Interfaces
     {
         ColorManager ColorManager { get; set; }
         BaseManager Manager { get; set; }
-        string GetName();
-        void ChangeBaseName();
         bool IsVisible();
+        void ChangeColorMask(Color color);
     }
 }

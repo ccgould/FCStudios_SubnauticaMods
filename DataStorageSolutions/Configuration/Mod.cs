@@ -6,7 +6,9 @@ using System.IO;
 using System.Linq;
 using DataStorageSolutions.Abstract;
 using DataStorageSolutions.Interfaces;
+using DataStorageSolutions.Model;
 using DataStorageSolutions.Mono;
+using DataStorageSolutions.Structs;
 using FCSCommon.Interfaces;
 using FCSCommon.Utilities;
 using FCSTechFabricator.Objects;
@@ -64,7 +66,7 @@ namespace DataStorageSolutions.Configuration
         internal const string AntennaPrefabName = "Antenna";
 
         internal const string ServerFormattingStationFriendlyName = "Server Format Station";
-        internal const string ServerFormattingStationDescription = "Use this machine to filter you servers. so they only store what you want int them.";
+        internal const string ServerFormattingStationDescription = "Use this machine to filter your servers so they only store what you want them to accept.";
         internal const string ServerFormattingStationClassID = "DSSFormatStation";
         internal const string ServerFormattingStationKitClassID = "FormatStation_Kit";
         internal const string ServerFormattingStationPrefabName = "ServerFormatMachine";
@@ -126,7 +128,7 @@ namespace DataStorageSolutions.Configuration
                 new Ingredient(TechType.Glass , 4),
                 new Ingredient(TechType.AdvancedWiringKit, 1),
                 new Ingredient(TechType.Titanium, 2),
-                new Ingredient(TechType.MapRoomHUDChip, 2)
+                new Ingredient(TechType.MapRoomHUDChip, 1)
             }
         };
 
@@ -156,7 +158,7 @@ namespace DataStorageSolutions.Configuration
             Ingredients =
             {
                 new Ingredient(TechType.WiringKit, 1),
-                new Ingredient(TechType.ComputerChip, 2),
+                new Ingredient(TechType.ComputerChip, 1),
                 new Ingredient(TechType.Aerogel, 1),
                 new Ingredient(TechType.Titanium, 1)
             }
@@ -204,7 +206,7 @@ namespace DataStorageSolutions.Configuration
                 CleanServers();
 
                 newSaveData.Servers = Servers;
-
+                newSaveData.Bases = BaseManager.GetSaveData().ToList();
                 _saveData = newSaveData;
 
                 if (_saveData == null)
@@ -248,6 +250,8 @@ namespace DataStorageSolutions.Configuration
 
             foreach (var entry in saveData.Entries)
             {
+                if(string.IsNullOrEmpty(entry.ID)) continue;
+
                 if (entry.ID == id)
                 {
                     return entry;
@@ -262,8 +266,30 @@ namespace DataStorageSolutions.Configuration
             return _saveData ?? new SaveData();
         }
 
+        internal static BaseSaveData GetBaseSaveData(string instanceId)
+        {
+            LoadData();
+
+            var saveData = GetSaveData();
+
+            if (saveData.Bases == null) return null;
+
+            foreach (var entry in saveData.Bases)
+            {
+                if(string.IsNullOrEmpty(entry.InstanceID)) continue;
+
+                if (entry.InstanceID == instanceId)
+                {
+                    return new BaseSaveData{BaseName = entry.BaseName, InstanceID = entry.InstanceID};
+                }
+            }
+
+            return null;
+        }
+
         internal static void LoadData()
         {
+            if (_saveData != null) return;
             QuickLogger.Info("Loading Save Data...");
             ModUtils.LoadSaveData<SaveData>(SaveDataFilename, GetSaveFileDirectory(), (data) =>
             {

@@ -1,4 +1,5 @@
 ﻿using System;
+using DataStorageSolutions.Abstract;
 using FCSCommon.Enums;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -9,9 +10,8 @@ namespace DataStorageSolutions.Mono
     {
         #region Private Members
         private FCSPowerStates _powerState;
-        private SubRoot _habitat;
         private PowerRelay _connectedRelay;
-        private GameObject _mono;
+        private DataStorageSolutionsController _mono;
         private float _energyConsumptionPerSecond;
         private FCSPowerStates _prevPowerState;
         private float AvailablePower => this.ConnectedRelay.GetPower();
@@ -52,28 +52,25 @@ namespace DataStorageSolutions.Mono
         #endregion
         
         #region Internal Methods
-        internal void Initialize(GameObject mono, float powerConsumption)
+        internal void Initialize(DataStorageSolutionsController mono, float powerConsumption)
         {
             _mono = mono;
 
-            var habitat = mono?.gameObject.transform?.parent?.gameObject.GetComponentInParent<SubRoot>();
-            
             _energyConsumptionPerSecond = powerConsumption;
-            if (habitat != null)
-            {
-                _habitat = habitat;
-            }
         }
         
         internal void UpdatePowerState()
         {
-            if (_habitat.powerRelay.GetPowerStatus() == PowerSystem.Status.Offline)
+            var habitat = _mono.SubRoot;
+            if (habitat == null || habitat.powerRelay == null) return;
+
+            if (habitat.powerRelay.GetPowerStatus() == PowerSystem.Status.Offline)
             {
                 SetPowerStates(FCSPowerStates.Unpowered);
                 return;
             }
 
-            if (_habitat.powerRelay.GetPowerStatus() == PowerSystem.Status.Normal || _habitat.powerRelay.GetPowerStatus() == PowerSystem.Status.Emergency)
+            if (habitat.powerRelay.GetPowerStatus() == PowerSystem.Status.Normal || habitat.powerRelay.GetPowerStatus() == PowerSystem.Status.Emergency)
             {
                 SetPowerStates(FCSPowerStates.Powered);
             }
@@ -89,7 +86,7 @@ namespace DataStorageSolutions.Mono
 
             if (!requiresEnergy) return;
             ConnectedRelay.ConsumeEnergy(_energyToConsume, out float amountConsumed);
-            QuickLogger.Debug($"Energy Consumed: {amountConsumed}");
+            //QuickLogger.Debug($"Energy Consumed: {amountConsumed}");
         }
         
         /// <summary>

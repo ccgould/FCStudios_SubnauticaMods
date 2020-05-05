@@ -41,7 +41,6 @@ namespace DataStorageSolutions.Mono
         public bool IsFull => GetIsFull();
         public bool IsRackSlotsFull => GetIsRackFull();
         public override bool IsConstructed => _isConstructed;
-        public SubRoot SubRoot { get; private set; }
         public BaseManager Manager { get; private set; }
         public TechType TechType => GetTechType();
         internal AnimationManager AnimationManager { get; private set; }
@@ -192,7 +191,7 @@ namespace DataStorageSolutions.Mono
             slotByID.Server = new List<ObjectData>(server);
             if (filters != null)
             {
-                slotByID.Filter = new List<Filter>(filters);
+                slotByID.Filter = new List<Filter>(FilterList.GetNewVersion(filters));
             }
 
             return true;
@@ -364,7 +363,7 @@ namespace DataStorageSolutions.Mono
             if (PowerManager == null)
             {
                 PowerManager = new PowerManager();
-                PowerManager.Initialize(gameObject, QPatch.Configuration.Config.RackPowerUsage);
+                PowerManager.Initialize(this, QPatch.Configuration.Config.RackPowerUsage);
                 PowerManager.OnPowerUpdate += OnPowerUpdate;
             }
 
@@ -492,7 +491,7 @@ namespace DataStorageSolutions.Mono
             }
             return result;
         }
-
+         
         public bool HasItem(TechType techType)
         {
             QuickLogger.Debug($"Checking for TechType: {techType}", true);
@@ -581,7 +580,7 @@ namespace DataStorageSolutions.Mono
             return new Vector2(amount, storage);
         }
 
-        public bool CanBeStored(int amount)
+        public bool CanBeStored(int amount,TechType techType = TechType.None)
         {
             return IsRackSlotsFull;
         }
@@ -589,14 +588,6 @@ namespace DataStorageSolutions.Mono
         public bool AddItemToContainer(InventoryItem item)
         {
             var originalController = item.item.GetComponent<DSSServerController>();
-
-            //var serverClone = GameObject.Instantiate(item.item);
-            //serverClone.gameObject.SetActive(true);
-            //serverClone.GetComponent<Rigidbody>().isKinematic = true;
-
-            //var controller = serverClone.GetComponent<DSSServerController>();
-            //controller.Items = new List<ObjectData>(originalController.Items);
-            //controller.DisplayManager.UpdateDisplay();
             var server = AddServer(originalController.Items,originalController.Filters);
             Destroy(item.item.gameObject);
             return server;
@@ -614,7 +605,7 @@ namespace DataStorageSolutions.Mono
             server.Add(MakeObjectData(item,server.Id));
             Destroy(item.item.gameObject);
         }
-
+        
         private ObjectData MakeObjectData(InventoryItem item,int slot)
         {
             var go = item.item.gameObject;
@@ -637,10 +628,13 @@ namespace DataStorageSolutions.Mono
                 case SaveDataObjectType.Server:
                     result = new ObjectData { DataObjectType = objectType, TechType = item.item.GetTechType(),  ServerData= GetServerData(item) };
                     break;
+                case SaveDataObjectType.Battery:
+                    result = new ObjectData { DataObjectType = objectType, TechType = item.item.GetTechType(), PlayToolData = GetBatteryData(item) };
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-
+            
             return result;
         }
 
@@ -673,6 +667,18 @@ namespace DataStorageSolutions.Mono
             return playerToolData;
         }
 
+        private PlayerToolData GetBatteryData(InventoryItem item)
+        {
+            var batteryGo = item.item.GetComponentInChildren<Battery>();
+
+            var playerToolData = new PlayerToolData { TechType = item.item.GetTechType() };
+            var techType = batteryGo.GetComponent<TechTag>().type;
+            var iBattery = batteryGo.GetComponent<IBattery>();
+            playerToolData.BatteryInfo = new BatteryInfo(techType, iBattery, string.Empty);
+
+            return playerToolData;
+        }
+
         private SaveDataObjectType FindSaveDataObjectType(GameObject go)
         {
             SaveDataObjectType objectType;
@@ -688,6 +694,10 @@ namespace DataStorageSolutions.Mono
             else if (go.GetComponent<PlayerTool>())
             {
                 objectType = SaveDataObjectType.PlayerTool;
+            }
+            else if (go.GetComponent<Battery>())
+            {
+                objectType = SaveDataObjectType.Battery;
             }
             else
             {
@@ -724,11 +734,21 @@ namespace DataStorageSolutions.Mono
         {
             return DSSHelpers.GivePlayerItem(techType, data, GetServerWithObjectData);
         }
-    }
 
-    internal class ServerData
-    {
-        public List<ObjectData> Server { get; set; }
-        public List<Filter> ServerFilters { get; set; }
+        public bool IsTechTypeAllowedInRack(TechType techType)
+        {
+            if (_servers.Where(rackSlot => rackSlot.HasFilters).Any(rackSlot => rackSlot.IsAllowedToAdd(techType)))
+            {
+                return true;
+            }
+
+            return _servers.Where(rackSlot => !rackSlot.HasFilters).Any(rackSlot => rackSlot.IsAllowedToAdd(techType));
+        }
+
+        internal bool HasFilters()
+        {
+            return _servers.Any(rackSlot => rackSlot != null && rackSlot.HasFilters);
+        }
+
     }
 }

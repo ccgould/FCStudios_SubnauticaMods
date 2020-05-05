@@ -42,13 +42,8 @@ namespace DataStorageSolutions.Buildables.Terminal
                 skyApplier.anchorSky = Skies.Auto;
                 //========== Allows the building animation and material colors ==========// 
 
-                // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
-                var lwe = prefab.AddComponent<LargeWorldEntity>();
-                lwe.cellLevel = LargeWorldEntity.CellLevel.Far;
-
                 // Add constructible
                 var constructable = prefab.AddComponent<Constructable>();
-
                 constructable.allowedOutside = false;
                 constructable.allowedInBase = true;
                 constructable.allowedOnGround = false;

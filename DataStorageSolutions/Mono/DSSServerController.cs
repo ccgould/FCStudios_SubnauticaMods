@@ -190,7 +190,7 @@ namespace DataStorageSolutions.Mono
             return _prefabId;
         }
 
-        public bool CanBeStored(int amount)
+        public bool CanBeStored(int amount,TechType techType = TechType.None)
         {
             return true;
         }

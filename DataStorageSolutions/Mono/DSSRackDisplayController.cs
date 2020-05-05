@@ -107,7 +107,7 @@ namespace DataStorageSolutions.Mono
                 var colorPickerHomeBTN = InterfaceHelpers.FindGameObject(colorPickerPage, "HomeBTN");
 
                 InterfaceHelpers.CreateButton(colorPickerHomeBTN, "HomeBTN", InterfaceButtonMode.Background,
-                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.Home());
+                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.GoToHome());
                 #endregion
 
                 #region ColorPage

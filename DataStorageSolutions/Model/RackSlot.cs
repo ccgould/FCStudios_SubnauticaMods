@@ -37,6 +37,8 @@ namespace DataStorageSolutions.Model
             }
         }
 
+        public bool HasFilters => Filter != null && Filter.Count > 0;
+
         internal List<ObjectData> Server
         {
             get => _server;
@@ -50,12 +52,12 @@ namespace DataStorageSolutions.Model
         public List<Filter> Filter
         {
             get => _filter;
-            set { _filter = value ?? new List<Filter>(); }
+            set => _filter = value ?? new List<Filter>();
         }
 
         private void ChangeDummyState(bool b = true)
         {
-            if(_dummy == null)
+            if (_dummy == null)
             {
                 InstantiateDummy();
             }
@@ -70,21 +72,27 @@ namespace DataStorageSolutions.Model
         {
             _counter.text = $"{Server?.Count}/{QPatch.Configuration.Config.ServerStorageLimit}";
         }
-        
+
         private string FormatData()
         {
             sb.Clear();
 
-            var lookup = Server?.Where(x => x != null).ToLookup(x => x.TechType);
+            var lookup = Server?.Where(x => x != null).ToLookup(x => x.TechType).ToArray();
 
             if (lookup == null) return sb.ToString();
+
+            sb.Append(string.Format(AuxPatchers.FiltersCheckFormat(), Filter != null && Filter.Count > 0));
+            sb.Append(Environment.NewLine);
+
+            for (int i = 0; i < lookup.Length; i++)
             {
-                foreach (var data in lookup)
+                if (i < 5)
                 {
-                    if (data.All(objectData => objectData.TechType != data.Key)) continue;
-                    sb.Append($"{Language.main.Get(data.Key)} x{data.Count()}");
+                    if (lookup[i].All(objectData => objectData.TechType != lookup[i].Key)) continue;
+                    sb.Append($"{Language.main.Get(lookup[i].Key)} x{lookup[i].Count()}");
                     sb.Append(Environment.NewLine);
                 }
+
             }
 
             return sb.ToString();
@@ -96,7 +104,7 @@ namespace DataStorageSolutions.Model
             Id = id;
             Slot = slot;
         }
-        
+
         internal void Clear()
         {
             Server = null;
@@ -113,7 +121,7 @@ namespace DataStorageSolutions.Model
             Server.Remove(data);
             UpdateNetwork();
         }
-        
+
         internal bool FindAllComponents()
         {
             try
@@ -138,7 +146,7 @@ namespace DataStorageSolutions.Model
                 var interactionFace = InterfaceHelpers.FindGameObject(canvasGameObject, "Hit");
                 var catcher = interactionFace.AddComponent<InterfaceButton>();
                 catcher.ButtonMode = InterfaceButtonMode.TextColor;
-                catcher.TextLineOne = string.Format(AuxPatchers.TakeServer(),Mod.ServerFriendlyName);
+                catcher.TextLineOne = string.Format(AuxPatchers.TakeServer(), Mod.ServerFriendlyName);
                 catcher.TextLineTwo = "Data: {0}";
                 catcher.GetAdditionalDataFromString = true;
                 catcher.GetAdditionalString = FormatData;
@@ -160,21 +168,21 @@ namespace DataStorageSolutions.Model
         {
             if (_mono.IsRackOpen())
             {
-                var result = _mono.GivePlayerItem(QPatch.Server.TechType,new ObjectDataTransferData{data = Server, Filters = Filter, IsServer = true});
-                QuickLogger.Debug($"Give Player ITem Result: {result}",true);
+                var result = _mono.GivePlayerItem(QPatch.Server.TechType, new ObjectDataTransferData { data = Server, Filters = Filter, IsServer = true });
+                QuickLogger.Debug($"Give Player ITem Result: {result}", true);
                 if (result)
                 {
                     DisconnectFromRack();
                 }
             }
         }
-        
+
         internal void InstantiateDummy()
         {
             if (_isInstantiated) return;
 
             _dummy = Slot.Find("Server")?.gameObject;
-                
+
             if (FindAllComponents())
             {
                 UpdateScreen();
@@ -182,7 +190,7 @@ namespace DataStorageSolutions.Model
 
             _isInstantiated = true;
         }
-        
+
         internal bool IsFull()
         {
             return Server != null && Server.Count >= QPatch.Configuration.Config.ServerStorageLimit;
@@ -195,7 +203,7 @@ namespace DataStorageSolutions.Model
             _mono.DisplayManager.UpdateContainerAmount();
             Mod.OnBaseUpdate?.Invoke();
         }
-        
+
         internal void UpdateNetwork()
         {
             _mono.UpdatePowerUsage();
@@ -205,14 +213,9 @@ namespace DataStorageSolutions.Model
 
         public bool IsAllowedToAdd(TechType techType)
         {
-            if (_filter.Count == 0)
-            {
-                return true;
-            }
-            else
-            {
-                return FilterCrossCheck(techType);
-            }
+            if (!IsOccupied) return false;
+
+            return _filter.Count == 0 || FilterCrossCheck(techType);
         }
 
         private bool FilterCrossCheck(TechType techType)

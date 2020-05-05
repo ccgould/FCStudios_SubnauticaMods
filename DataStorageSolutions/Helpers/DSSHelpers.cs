@@ -67,6 +67,10 @@ namespace DataStorageSolutions.Helpers
                             server.Initialize();
                             server.DisplayManager.UpdateDisplay();
                             break;
+                        case SaveDataObjectType.Battery:
+                            var battery = pickup.gameObject.GetComponent<Battery>();
+                            battery.charge = data.PlayToolData.BatteryInfo.BatteryCharge;
+                            break;
                     }
 
                     var result = getServerWithObjectData?.Invoke(data);
@@ -87,6 +91,18 @@ namespace DataStorageSolutions.Helpers
             }
             Mod.OnBaseUpdate?.Invoke();
             return isSuccessful;
+        }
+
+        public static  SubRoot GetBaseFromPlayer()
+        {
+            var result = Player.main?.currentSub;
+
+            if (result == null)
+            {
+                QuickLogger.Error("Couldn't get the SubRoot from player");
+            }
+
+            return result;
         }
     }
 }

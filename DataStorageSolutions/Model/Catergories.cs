@@ -341,6 +341,8 @@ namespace DataStorageSolutions.Model
             TechType.SeaTreaderPoop,
             TechType.StalkerTooth,
             TechType.JellyPlant,
+            TechType.Glass,
+            TechType.EnameledGlass,
         };
 
         public static List<TechType> Electronics = new List<TechType> {
@@ -357,9 +359,7 @@ namespace DataStorageSolutions.Model
             TechType.AramidFibers,
             TechType.Benzene,
             TechType.Bleach,
-            TechType.EnameledGlass,
             TechType.FiberMesh,
-            TechType.Glass,
             TechType.HatchingEnzymes,
             TechType.HydrochloricAcid,
             TechType.Lubricant,
@@ -488,7 +488,7 @@ namespace DataStorageSolutions.Model
         public static List<TechType> GetOldFilter(string oldCategory, out bool success, out string newCategory)
         {
             var category = Category.None;
-            if (!Int32.TryParse(oldCategory, out int oldCategoryInt))
+            if (!int.TryParse(oldCategory, out int oldCategoryInt))
             {
                 newCategory = "";
                 success = false;
@@ -525,6 +525,56 @@ namespace DataStorageSolutions.Model
                 case Category.Torpedoes: return CategoryData.Torpedoes;
                 case Category.AlterraStuff: return CategoryData.AlterraArtifacts;
             }
+        }
+
+        public static List<Filter> GetNewVersion(List<Filter> filterData)
+        {
+            Dictionary<string, Filter> validCategories = new Dictionary<string, Filter>();
+
+            var filterList = GetFilters();
+
+            foreach (var filter in filterList)
+            {
+                if (filter.IsCategory())
+                {
+                    validCategories[filter.Category] = filter;
+                }
+            }
+
+            var newData = new List<Filter>();
+
+            foreach (var filter in filterData)
+            {
+                if (validCategories.ContainsKey(filter.Category))
+                {
+                    newData.Add(validCategories[filter.Category]);
+                    continue;
+                }
+
+                if (filter.Category == "")
+                {
+                    newData.Add(filter);
+                    continue;
+                }
+
+                if (filter.Category == "0")
+                {
+                    filter.Category = "";
+                    newData.Add(filter);
+                    continue;
+                }
+
+                var newTypes = GetOldFilter(filter.Category, out bool success, out string newCategory);
+                
+                if (success)
+                {
+                    newData.Add(new Filter{ Category = newCategory, Types = newTypes });
+                    continue;
+                }
+
+                newData.Add(filter);
+            }
+            return newData;
         }
 
         [Serializable]

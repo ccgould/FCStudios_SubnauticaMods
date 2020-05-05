@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using DataStorageSolutions.Abstract;
 using DataStorageSolutions.Buildables;
 using DataStorageSolutions.Configuration;
@@ -11,44 +13,27 @@ using FCSCommon.Utilities;
 using FCSTechFabricator.Components;
 using FCSTechFabricator.Extensions;
 using FCSTechFabricator.Managers;
+using UnityEngine;
 
 namespace DataStorageSolutions.Mono
 {
     internal class DSSTerminalController : DataStorageSolutionsController,IBaseUnit
     {
         private bool _isContructed;
-        private PowerRelay _powerRelay;
-        private float _energyToConsume;
-        private bool _showConsumption = true;
         private string _prefabID;
         private TechType _techType = TechType.None;
         private bool _runStartUpOnEnable;
-        private ColorManager _antennaColorController;
+
         private SaveDataEntry _savedData;
         private bool _fromSave;
-        private float _amountConsumed;
-
         public override bool IsConstructed => _isContructed;
-        public SubRoot SubRoot { get; private set; }
         public BaseManager Manager { get; set; }
         public TechType TechType => GetTechType();
         internal AnimationManager AnimationManager { get; private set; }
         public DSSTerminalDisplay DisplayManager { get; private set; }
         internal ColorManager TerminalColorManager { get; private set; }
-        public ColorManager AntennaColorManager => GetAntennaColorManager();
 
         public PowerManager PowerManager { get; private set; }
-
-        private ColorManager GetAntennaColorManager()
-        {
-            if (_antennaColorController != null) return _antennaColorController;
-
-            if (Manager == null) return null;
-
-            _antennaColorController = Manager?.GetCurrentBaseAntenna()?.ColorManager;
-
-            return _antennaColorController != null ? _antennaColorController : null;
-        }
 
         private void OnEnable()
         {
@@ -70,6 +55,8 @@ namespace DataStorageSolutions.Mono
                     {
                         TerminalColorManager.SetMaskColorFromSave(_savedData.TerminalBodyColor.Vector4ToColor());
                     }
+
+                    FindBaseById(_savedData?.BaseID);
                 }
 
                 UpdateScreen();
@@ -90,68 +77,11 @@ namespace DataStorageSolutions.Mono
 
         private void Update()
         {
-            FindSubRoot();
-            
-            if(IsConstructed && PowerManager != null)
+            if(IsConstructed && PowerManager != null && SubRoot != null)
             {
                 PowerManager?.UpdatePowerState();
                 PowerManager?.ConsumePower();
             }
-        }
-
-        private void FindSubRoot()
-        {
-            if (SubRoot == null)
-            {
-                SubRoot = GetComponentInParent<SubRoot>();
-            }
-        }
-        
-        public string GetPrefabIDString()
-        {
-            if (string.IsNullOrEmpty(_prefabID))
-            {
-                var id = GetComponentInChildren<PrefabIdentifier>() ?? GetComponentInParent<PrefabIdentifier>();
-                
-                if (id != null)
-                {
-                    _prefabID = id.Id;
-                }
-            }
-
-            return _prefabID;
-        }
-        
-        public override void Initialize()
-        {
-            GetData();
-
-            if (PowerManager == null)
-            {
-                PowerManager = new PowerManager();
-                PowerManager.Initialize(gameObject,QPatch.Configuration.Config.ScreenPowerUsage);
-                PowerManager.OnPowerUpdate += OnPowerUpdate;
-            }
-
-            if (TerminalColorManager == null)
-            {
-                TerminalColorManager = gameObject.AddComponent<ColorManager>();
-                TerminalColorManager.Initialize(gameObject, DSSModelPrefab.BodyMaterial);
-            }
-
-            if (AnimationManager == null)
-            {
-                AnimationManager = gameObject.AddComponent<AnimationManager>();
-            }
-
-            if (DisplayManager == null)
-            {
-                DisplayManager = gameObject.AddComponent<DSSTerminalDisplay>();
-                DisplayManager.Setup(this);
-            }
-            
-            Mod.OnAntennaBuilt += OnAntennaBuilt;
-            Mod.OnBaseUpdate += OnBaseUpdate;
         }
 
         private void OnPowerUpdate(FCSPowerStates obj)
@@ -183,42 +113,90 @@ namespace DataStorageSolutions.Mono
             _savedData = Mod.GetSaveData(id);
         }
 
+        private void OnAntennaBuilt(bool isBuilt)
+        {
+            UpdateScreen();
+            DisplayManager.UpdateAntennaColorPage();
+        }
+
+        private void FindBaseById(string id)
+        {
+            Manager = BaseManager.FindManager(id);
+            if (Manager != null)
+            {
+                SubRoot = Manager.Habitat;
+            }
+        }
+
+        public string GetPrefabIDString()
+        {
+            if (string.IsNullOrEmpty(_prefabID))
+            {
+                var id = GetComponentInChildren<PrefabIdentifier>() ?? GetComponentInParent<PrefabIdentifier>();
+                
+                if (id != null)
+                {
+                    _prefabID = id.Id;
+                }
+            }
+
+            return _prefabID;
+        }
+        
+        public override void Initialize()
+        {
+            GetData();
+
+            if (PowerManager == null)
+            {
+                PowerManager = new PowerManager();
+                PowerManager.Initialize(this,QPatch.Configuration.Config.ScreenPowerUsage);
+                PowerManager.OnPowerUpdate += OnPowerUpdate;
+            }
+
+            if (TerminalColorManager == null)
+            {
+                TerminalColorManager = gameObject.AddComponent<ColorManager>();
+                TerminalColorManager.Initialize(gameObject, DSSModelPrefab.BodyMaterial);
+            }
+
+            if (AnimationManager == null)
+            {
+                AnimationManager = gameObject.AddComponent<AnimationManager>();
+            }
+
+            if (DisplayManager == null)
+            {
+                DisplayManager = gameObject.AddComponent<DSSTerminalDisplay>();
+                DisplayManager.Setup(this);
+            }
+            
+            Mod.OnAntennaBuilt += OnAntennaBuilt;
+            Mod.OnBaseUpdate += OnBaseUpdate;
+        }
+        
         public override void UpdateScreen()
         {
             QuickLogger.Debug($"Refreshing Monitor: {GetPrefabIDString()}", true);
             DisplayManager.Refresh();
         }
 
-        private void OnAntennaBuilt(bool isBuilt)
+        internal HashSet<DSSRackController> GetData()
         {
-            UpdateScreen();
-
-            if (!isBuilt)
-            {
-                _antennaColorController = null;
-            }
-
-            DisplayManager.UpdateAntennaColorPage();
-        }
-
-        internal List<DSSRackController> GetData()
-        {
-            FindSubRoot();
-
             if (SubRoot)
             {
-           
                 if (!_isContructed ) return null;
-
-                Manager = Manager ?? BaseManager.FindManager(SubRoot);
                 
+                Manager = Manager ?? BaseManager.FindManager(SubRoot);
+
                 return Manager.BaseUnits;
             }
 
             QuickLogger.Error("SubRoot not found");
+            
             return null;
         }
-        
+
         public override void OnProtoSerialize(ProtobufSerializer serializer)
         {
             QuickLogger.Debug("In OnProtoSerialize");
@@ -258,6 +236,7 @@ namespace DataStorageSolutions.Mono
 
             _savedData.ID = id;
             _savedData.TerminalBodyColor = TerminalColorManager.GetMaskColor().ColorToVector4();
+            _savedData.BaseID = SubRoot?.gameObject.GetComponentInChildren<PrefabIdentifier>()?.Id;
             newSaveData.Entries.Add(_savedData);
         }
 
@@ -275,6 +254,12 @@ namespace DataStorageSolutions.Mono
             {
                 if (isActiveAndEnabled)
                 {
+
+                    if (SubRoot == null)
+                    {
+                        SubRoot = GetComponentInParent<SubRoot>();
+                    }
+
                     if (!IsInitialized)
                     {
                         Initialize();

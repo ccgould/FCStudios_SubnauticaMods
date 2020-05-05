@@ -18,8 +18,8 @@ namespace DataStorageSolutions.Buildables
             { $"{ModKey}_HasItemsMessage","Server rack is not empty."},
             { $"{ModKey}_NotOnBase","NOT CONNECTED TO A BASE CANNOT OPERATE."},
             { $"{ModKey}_RackFull","This rack cannot hold anymore items."},
-            { $"{ModKey}_DriveFull","This drive cannot hold anymore items."},
-            { $"{ModKey}_Home","Go to home."},
+            { $"{ModKey}_CannotBeStored","This base cannot hold this item. The drives may be full, there are no  drives or they are formatted."},
+            { $"{ModKey}_GoToHome","Go to home."},
             { $"{ModKey}_ColorPage","Go to color page."},
             { $"{ModKey}_NextPage","Next Page"},
             { $"{ModKey}_PrevPage","Previous Page"},
@@ -41,6 +41,12 @@ namespace DataStorageSolutions.Buildables
             { $"{ModKey}_Rename","Rename this base."},
             { $"{ModKey}_ColorPageDesc","Rename this base."},
             { $"{ModKey}_PowerUsage","Power Usage"},
+            { $"{ModKey}_GettingData","Please Wait Retrieving {0} data."},
+            { $"{ModKey}_IsFormattedFormat","Is Formatted: {0}."},
+            { $"{ModKey}_Home","HOME"},
+            { $"{ModKey}_FailedToGetBaseName","[Failed To Get Base Name.]"},
+            { $"{ModKey}_CyclopsAntennaMessage","Cannot change the cyclops antenna color."},
+            { $"{ModKey}_SearchForItemsMessage","Click to search for items..."},
         };
 
         internal static void AdditionalPatching()
@@ -76,12 +82,12 @@ namespace DataStorageSolutions.Buildables
             return Language.main.Get(LanguageDictionary.Keys.ElementAt(4));
         }
         
-        internal static string DriveFull()
+        internal static string CannotBeStored()
         {
             return Language.main.Get(LanguageDictionary.Keys.ElementAt(5));
         }
 
-        internal static string Home()
+        internal static string GoToHome()
         {
             return Language.main.Get(LanguageDictionary.Keys.ElementAt(6));
         }
@@ -204,6 +210,35 @@ namespace DataStorageSolutions.Buildables
         public static string PowerUsage()
         {
             return Language.main.Get(LanguageDictionary.Keys.ElementAt(27));
+        }
+
+        public static string GettingData()
+        {
+            return Language.main.Get(LanguageDictionary.Keys.ElementAt(28));
+        }
+
+        public static string FiltersCheckFormat()
+        {
+            return Language.main.Get(LanguageDictionary.Keys.ElementAt(29));
+        }
+        internal static string Home()
+        {
+            return Language.main.Get(LanguageDictionary.Keys.ElementAt(30));
+        }
+
+        internal static string FailedToGetBaseName()
+        {
+            return Language.main.Get(LanguageDictionary.Keys.ElementAt(31));
+        }
+
+        public static string CannotChangeCyclopsAntenna()
+        {
+            return Language.main.Get(LanguageDictionary.Keys.ElementAt(32));
+        }
+
+        public static string SearchForItemsMessage()
+        {
+            return Language.main.Get(LanguageDictionary.Keys.ElementAt(33));
         }
     }
 }
