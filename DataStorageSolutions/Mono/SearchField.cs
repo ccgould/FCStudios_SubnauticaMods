@@ -13,6 +13,22 @@ namespace DataStorageSolutions.Mono
         private bool hover;
         private InputField _inputField;
         internal Action<string> OnSearchValueChanged;
+        private bool _cursorLockCached;
+        private GameObject _inputDummy;
+
+        private GameObject inputDummy
+        {
+            get
+            {
+                if (this._inputDummy == null)
+                {
+                    this._inputDummy = new GameObject("InputDummy");
+                    this._inputDummy.SetActive(false);
+                }
+                return this._inputDummy;
+            }
+        }
+
 
         private void Update()
         {
@@ -32,15 +48,39 @@ namespace DataStorageSolutions.Mono
             _inputField.onEndEdit.AddListener(OnEndEdit);
         }
 
-        private void OnEndEdit(string arg0)
+        private void OnEndEdit(string text)
         {
-            Player.main.playerController.SetEnabled(true);
+            LockMovement(false);
+            InterceptInput(false);
+        }
+        private void LockMovement(bool state)
+        {
+            FPSInputModule.current.lockMovement = state;
         }
 
         public void OnPointerClick(PointerEventData eventData)
         {
             QuickLogger.Debug("Searching",true);
-            Player.main.playerController.SetEnabled(false);
+            InterceptInput(true);
+            LockMovement(true);
+            //Player.main.playerController.SetEnabled(false);
+        }
+
+        private void InterceptInput(bool state)
+        {
+            if (inputDummy.activeSelf == state)
+            {
+                return;
+            }
+            if (state)
+            {
+                InputHandlerStack.main.Push(inputDummy);
+                _cursorLockCached = UWE.Utils.lockCursor;
+                UWE.Utils.lockCursor = false;
+                return;
+            }
+            UWE.Utils.lockCursor = _cursorLockCached;
+            InputHandlerStack.main.Pop(inputDummy);
         }
 
         private void OnValueChanged(string newSearch)

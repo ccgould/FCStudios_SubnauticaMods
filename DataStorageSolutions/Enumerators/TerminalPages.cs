@@ -9,5 +9,7 @@
         TerminalColorPage = 4,
         AntennaColorPage = 5,
         BaseItemsDirect = 6,
+        SettingsPage = 7,
+        Tripped = 8
     }
 }

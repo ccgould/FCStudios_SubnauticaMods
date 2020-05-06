@@ -1,6 +1,8 @@
 ﻿using DataStorageSolutions.Configuration;
 using DataStorageSolutions.Interfaces;
+using DataStorageSolutions.Model;
 using FCSTechFabricator.Abstract;
+using Steamworks;
 
 
 namespace DataStorageSolutions.Abstract
@@ -9,5 +11,6 @@ namespace DataStorageSolutions.Abstract
     {
         public virtual SubRoot SubRoot { get; set; }
         public abstract void Save(SaveData save);
+        public abstract BaseManager Manager { get; set; }
     }
 }

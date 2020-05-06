@@ -17,6 +17,7 @@ namespace DataStorageSolutions.Model
     {
         private string _baseName;
         private BaseSaveData _savedData;
+        private bool _hasBreakerTripped;
 
         internal static List<BaseManager> Managers { get; } = new List<BaseManager>();
         internal static readonly List<IBaseAntenna> BaseAntennas = new List<IBaseAntenna>();
@@ -27,8 +28,9 @@ namespace DataStorageSolutions.Model
         public int GetContainerFreeSpace { get; }
         public bool IsFull { get; }
         public NameController NameController { get; private set; }
+        internal Action<bool> OnBreakerToggled { get; set; }
 
-        
+
         private void Initialize(SubRoot habitat)
         {
             ReadySaveData();
@@ -104,6 +106,12 @@ namespace DataStorageSolutions.Model
             }
         }
 
+        internal void ToggleBreaker()
+        {
+            _hasBreakerTripped = !_hasBreakerTripped;
+            OnBreakerToggled?.Invoke(_hasBreakerTripped);
+        }
+
         public BaseManager(SubRoot habitat)
         {
             if (habitat == null) return;
@@ -146,8 +154,20 @@ namespace DataStorageSolutions.Model
             {
                 return true;
             }
-
+            
             return GetCurrentBaseAntenna() != null;
+        }
+
+        internal bool IsVisible()
+        {
+            if (Habitat.isCyclops)
+            {
+                return !_hasBreakerTripped;
+            }
+
+            var antenna = GetCurrentBaseAntenna();
+
+            return antenna != null && antenna.IsVisible();
         }
 
         internal void AddUnit(DSSRackController unit)
@@ -281,7 +301,7 @@ namespace DataStorageSolutions.Model
 
             if (food != null)
             {
-                if (!Mathf.Approximately(food.foodValue, 0))
+                if (food.decomposes && food.kDecayRate > 0)
                 {
                     QuickLogger.Message(AuxPatchers.NoFoodItems(),true);
                     return false;

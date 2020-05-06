@@ -27,6 +27,7 @@ namespace DataStorageSolutions.Mono
         private List<ObjectData> _items;
         private DSSServerController _controller;
         private List<Filter> _filters = new List<Filter>();
+        public override BaseManager Manager { get; set; }
 
         public ColorManager ColorManager { get; private set; }
         public DSSServerFormattingStationDisplay DisplayManager { get; private set; }
@@ -124,7 +125,7 @@ namespace DataStorageSolutions.Mono
             _savedData.ServerData = _items;
             newSaveData.Entries.Add(_savedData);
         }
-
+        
         public override void OnProtoSerialize(ProtobufSerializer serializer)
         {
             QuickLogger.Debug("In OnProtoSerialize");

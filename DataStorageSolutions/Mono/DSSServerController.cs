@@ -26,7 +26,8 @@ namespace DataStorageSolutions.Mono
         private List<ObjectData> _items = new List<ObjectData>();
         private List<Filter> _filters;
         private ServerData _data;
-        
+
+        [JsonIgnore] public override BaseManager Manager { get; set; }
         [JsonIgnore] internal int StorageLimit => QPatch.Configuration.Config.ServerStorageLimit;
         [JsonIgnore] public int GetContainerFreeSpace => GetFreeSpace();
         [JsonIgnore] public bool IsFull => CheckIfFull();
@@ -345,7 +346,6 @@ namespace DataStorageSolutions.Mono
             _savedData.Filters = Filters;
             newSaveData.Entries.Add(_savedData);
         }
-        
         internal int GetSeverCount()
         {
             return Mod.Servers?.Count() ?? 0;

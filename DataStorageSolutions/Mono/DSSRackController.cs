@@ -41,7 +41,7 @@ namespace DataStorageSolutions.Mono
         public bool IsFull => GetIsFull();
         public bool IsRackSlotsFull => GetIsRackFull();
         public override bool IsConstructed => _isConstructed;
-        public BaseManager Manager { get; private set; }
+        public override BaseManager Manager { get; set; }
         public TechType TechType => GetTechType();
         internal AnimationManager AnimationManager { get; private set; }
         internal DSSRackDisplayController DisplayManager { get; private set; }
@@ -390,17 +390,19 @@ namespace DataStorageSolutions.Mono
                 DumpContainer.Initialize(transform, AuxPatchers.DriveReceptacle(), AuxPatchers.NotAllowed(), AuxPatchers.RackFull(), this, 1, 1);
             }
         }
-
+        
         private void OnPowerUpdate(FCSPowerStates obj)
         {
             switch (obj)
             {
                 case FCSPowerStates.Powered:
-                    DisplayManager.GoToPage(RackPages.Home);
+                    DisplayManager.PowerOnDisplay();
                     break;
                 case FCSPowerStates.Tripped:
+                    DisplayManager.PowerOffDisplay();
+                    break;
                 case FCSPowerStates.Unpowered:
-                    DisplayManager.GoToPage(RackPages.Blackout);
+                    DisplayManager.PowerOffDisplay();
                     break;
             }
         }

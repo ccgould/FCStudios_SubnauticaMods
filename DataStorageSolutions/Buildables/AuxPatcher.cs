@@ -24,7 +24,7 @@ namespace DataStorageSolutions.Buildables
             { $"{ModKey}_NextPage","Next Page"},
             { $"{ModKey}_PrevPage","Previous Page"},
             { $"{ModKey}_OpenServerRack","Open Server Rack"},
-            { $"{ModKey}_NoFoodItems","Please use a seabreeze or another container to store food items"},
+            { $"{ModKey}_NoFoodItems","Cannot store food that decay. Please use a seabreeze or another container to store food items that can decay."},
             { $"{ModKey}_CloseServerRack","Close Server Rack"},
             { $"{ModKey}_DriveReceptacle","Drive Receptacle"},
             { $"{ModKey}_AddItemsToBase","Add Items to Base"},
@@ -47,6 +47,10 @@ namespace DataStorageSolutions.Buildables
             { $"{ModKey}_FailedToGetBaseName","[Failed To Get Base Name.]"},
             { $"{ModKey}_CyclopsAntennaMessage","Cannot change the cyclops antenna color."},
             { $"{ModKey}_SearchForItemsMessage","Click to search for items..."},
+            { $"{ModKey}_TakeFormatted","Take {0}"},
+            { $"{ModKey}_SettingsPage","Go to settings page."},
+            { $"{ModKey}_PowerBTN","Turn ON/OFF"},
+            { $"{ModKey}_PoweredOff","POWERED OFF"},
         };
 
         internal static void AdditionalPatching()
@@ -132,17 +136,17 @@ namespace DataStorageSolutions.Buildables
             return Language.main.Get("TimeCapsuleItemNotAllowed");
         }
 
-        public static string DumpToBase()
+        internal static string DumpToBase()
         {
             return Language.main.Get(LanguageDictionary.Keys.ElementAt(14));
         }
 
-        public static string BaseDumpReceptacle()
+        internal static string BaseDumpReceptacle()
         {
             return Language.main.Get(LanguageDictionary.Keys.ElementAt(15));
         }
 
-        public static string TakeServer()
+        internal static string TakeServer()
         {
             return Language.main.Get("PickUpFormat");
         }
@@ -176,8 +180,8 @@ namespace DataStorageSolutions.Buildables
         {
             return Language.main.Get(LanguageDictionary.Keys.ElementAt(20));
         }
-
-        public static string NoAntennaOnBase()
+        
+        internal static string NoAntennaOnBase()
         {
             return Language.main.Get(LanguageDictionary.Keys.ElementAt(21));
         }
@@ -202,25 +206,26 @@ namespace DataStorageSolutions.Buildables
             return Language.main.Get(LanguageDictionary.Keys.ElementAt(25));
         }
 
-        public static string ColorMainPageDesc()
+        internal static string ColorMainPageDesc()
         {
             return Language.main.Get(LanguageDictionary.Keys.ElementAt(26));
         }
 
-        public static string PowerUsage()
+        internal static string PowerUsage()
         {
             return Language.main.Get(LanguageDictionary.Keys.ElementAt(27));
         }
 
-        public static string GettingData()
+        internal static string GettingData()
         {
             return Language.main.Get(LanguageDictionary.Keys.ElementAt(28));
         }
 
-        public static string FiltersCheckFormat()
+        internal static string FiltersCheckFormat()
         {
             return Language.main.Get(LanguageDictionary.Keys.ElementAt(29));
         }
+
         internal static string Home()
         {
             return Language.main.Get(LanguageDictionary.Keys.ElementAt(30));
@@ -231,14 +236,34 @@ namespace DataStorageSolutions.Buildables
             return Language.main.Get(LanguageDictionary.Keys.ElementAt(31));
         }
 
-        public static string CannotChangeCyclopsAntenna()
+        internal static string CannotChangeCyclopsAntenna()
         {
             return Language.main.Get(LanguageDictionary.Keys.ElementAt(32));
         }
 
-        public static string SearchForItemsMessage()
+        internal static string SearchForItemsMessage()
         {
             return Language.main.Get(LanguageDictionary.Keys.ElementAt(33));
+        }
+
+        internal static string TakeFormatted()
+        {
+            return Language.main.Get(LanguageDictionary.Keys.ElementAt(34));
+        }
+
+        public static string SettingPage()
+        {
+            return Language.main.Get(LanguageDictionary.Keys.ElementAt(35));
+        }
+
+        public static string PowerButton()
+        {
+            return Language.main.Get(LanguageDictionary.Keys.ElementAt(36));
+        }
+
+        public static string PoweredOff()
+        {
+            return Language.main.Get(LanguageDictionary.Keys.ElementAt(37));
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using DataStorageSolutions.Buildables;
+using DataStorageSolutions.Enumerators;
 using FCSCommon.Abstract;
 using FCSCommon.Enums;
 using FCSCommon.Helpers;
@@ -76,6 +77,10 @@ namespace DataStorageSolutions.Mono
                 var home = InterfaceHelpers.FindGameObject(canvasGameObject, "Home");
                 #endregion
 
+                #region Powered Off Page
+                var poweredOffPage = InterfaceHelpers.FindGameObject(canvasGameObject, "PoweredOff");
+                #endregion
+
                 #region ColorPickerPage
 
                 var colorPickerPage = InterfaceHelpers.FindGameObject(canvasGameObject, "ColorPage");
@@ -123,6 +128,9 @@ namespace DataStorageSolutions.Mono
 
                 _counter = InterfaceHelpers.FindGameObject(home, "Counter")?.GetComponent<Text>();
 
+                var poweredOffMessage = InterfaceHelpers.FindGameObject(poweredOffPage, "Text")?.GetComponent<Text>();
+                poweredOffMessage.text = AuxPatchers.PoweredOff();
+                
                 return true;
             }
             catch (Exception e)
@@ -141,24 +149,25 @@ namespace DataStorageSolutions.Mono
 
         public override void PowerOnDisplay()
         {
-            _mono.AnimationManager.SetIntHash(_page, 1);
+            GoToPage(RackPages.Home);
         }
 
         public override void PowerOffDisplay()
         {
-            GoToPage(RackPages.Blackout);
+            if (_mono.PowerManager.GetPowerState() == FCSPowerStates.Unpowered)
+            {
+                GoToPage(RackPages.Blackout);
+            }
+            else if (_mono.PowerManager.GetPowerState() == FCSPowerStates.Tripped)
+            {
+                GoToPage(RackPages.Tripped);
+            }
+
         }
 
         internal void GoToPage(RackPages page)
         {
             _mono.AnimationManager.SetIntHash(_page, (int)page);
         }
-    }
-
-    internal enum RackPages
-    {
-        Blackout = 0,
-        Home = 1,
-        ColorPicker = 2,
     }
 }

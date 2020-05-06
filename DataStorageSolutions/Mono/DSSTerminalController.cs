@@ -26,8 +26,23 @@ namespace DataStorageSolutions.Mono
 
         private SaveDataEntry _savedData;
         private bool _fromSave;
+        private BaseManager _manager;
         public override bool IsConstructed => _isContructed;
-        public BaseManager Manager { get; set; }
+
+        public override BaseManager Manager
+        {
+            get => _manager;
+            set
+            {
+                _manager = value; 
+                //Because the way the Terminal is lazy loaded. I choose to lazy load the power manager based on the manager setter
+                if (value != null)
+                {
+                    PowerManager?.Initialize(this, QPatch.Configuration.Config.ScreenPowerUsage);
+                }
+            }
+        }
+
         public TechType TechType => GetTechType();
         internal AnimationManager AnimationManager { get; private set; }
         public DSSTerminalDisplay DisplayManager { get; private set; }
@@ -86,13 +101,14 @@ namespace DataStorageSolutions.Mono
 
         private void OnPowerUpdate(FCSPowerStates obj)
         {
-            QuickLogger.Debug($"Terminal {GetPrefabIDString()} Power State Updated", true);
             switch (obj)
             {
                 case FCSPowerStates.Powered:
                     DisplayManager.PowerOnDisplay();
                     break;
                 case FCSPowerStates.Tripped:
+                    DisplayManager.PowerOffDisplay();
+                    break;
                 case FCSPowerStates.Unpowered:
                     DisplayManager.PowerOffDisplay();
                     break;
@@ -150,7 +166,6 @@ namespace DataStorageSolutions.Mono
             if (PowerManager == null)
             {
                 PowerManager = new PowerManager();
-                PowerManager.Initialize(this,QPatch.Configuration.Config.ScreenPowerUsage);
                 PowerManager.OnPowerUpdate += OnPowerUpdate;
             }
 

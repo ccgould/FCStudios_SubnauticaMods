@@ -24,7 +24,7 @@ namespace DataStorageSolutions.Mono
         private SaveDataEntry _savedData;
 
         public override bool IsConstructed => _isContructed;
-        public BaseManager Manager { get; set; }
+        public override BaseManager Manager { get; set; }
         public TechType TechType => GetTechType();
         public ColorManager ColorManager { get; set; }
         public PowerManager PowerManager { get; private set; }

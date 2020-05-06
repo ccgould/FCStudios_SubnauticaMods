@@ -31,13 +31,11 @@ namespace DataStorageSolutions.Mono
             set
             {
                 _powerState = value;
-
                 if (_prevPowerState != value)
                 {
                     OnPowerUpdate?.Invoke(value);
                     _prevPowerState = value;
                 }
-
             }
         }
         private bool _hasPowerToConsume;
@@ -47,22 +45,35 @@ namespace DataStorageSolutions.Mono
         #region Internal Properties
 
         internal Action<FCSPowerStates> OnPowerUpdate;
-
+        private bool _isInitailized;
 
         #endregion
         
         #region Internal Methods
         internal void Initialize(DataStorageSolutionsController mono, float powerConsumption)
         {
-            _mono = mono;
+            if (_isInitailized) return;
+
+                _mono = mono;
+            if (_mono.Manager != null)
+            {
+                _mono.Manager.OnBreakerToggled += OnBreakerToggled;
+            }
 
             _energyConsumptionPerSecond = powerConsumption;
+
+            _isInitailized = true;
         }
-        
+
+        private void OnBreakerToggled(bool obj)
+        {
+            SetPowerStates(obj ? FCSPowerStates.Tripped : FCSPowerStates.None);
+        }
+
         internal void UpdatePowerState()
         {
             var habitat = _mono.SubRoot;
-            if (habitat == null || habitat.powerRelay == null) return;
+            if (habitat == null || habitat.powerRelay == null || _powerState == FCSPowerStates.Tripped) return;
 
             if (habitat.powerRelay.GetPowerStatus() == PowerSystem.Status.Offline)
             {
@@ -78,6 +89,7 @@ namespace DataStorageSolutions.Mono
 
         internal void ConsumePower()
         {
+            if(PowerState == FCSPowerStates.Tripped)return;
             _energyToConsume = _energyConsumptionPerSecond * DayNightCycle.main.deltaTime;
             bool requiresEnergy = GameModeUtils.RequiresPower();
             _hasPowerToConsume = !requiresEnergy || AvailablePower >= _energyToConsume;

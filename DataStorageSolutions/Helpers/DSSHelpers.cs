@@ -25,8 +25,17 @@ namespace DataStorageSolutions.Helpers
 #endif
             if (Inventory.main.HasRoomFor(itemSize.x, itemSize.y))
             {
-                var pickup = CraftData.InstantiateFromPrefab(techType).GetComponent<Pickupable>();
+                Pickupable pickup;
 
+                if (EggHandler.GetDiscoveredEgg(techType, out TechType value))
+                {
+                    pickup = CraftData.InstantiateFromPrefab(value).GetComponent<Pickupable>();
+                }
+                else
+                {
+                    pickup = CraftData.InstantiateFromPrefab(techType).GetComponent<Pickupable>();
+                }
+                
                 if (!itemData.IsServer)
                 {
                     var data = (ObjectData)itemData.data;
@@ -56,9 +65,7 @@ namespace DataStorageSolutions.Helpers
                             break;
 
                         case SaveDataObjectType.Eatable:
-                            var eatable = pickup.gameObject.GetComponent<Eatable>();
-                            eatable.waterValue = data.EatableEntity.GetWaterValue();
-                            eatable.foodValue = data.EatableEntity.GetFoodValue();
+                            //We are not handling decaying items so I dont need to set anything
                             break;
 
                         case SaveDataObjectType.Server:

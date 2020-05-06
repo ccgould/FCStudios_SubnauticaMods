@@ -79,6 +79,7 @@ namespace DataStorageSolutions.Mono
                     itemBTN.STARTING_COLOR = _startColor;
                     itemBTN.HOVER_COLOR = _hoverColor;
                     itemBTN.BtnName = "ItemBTN";
+                    itemBTN.TextLineOne = string.Format(AuxPatchers.TakeFormatted(), Language.main.Get(grouped[i].Key));
                     itemBTN.Tag = grouped[i].Key;
                     itemBTN.OnButtonClick = OnButtonClick;
                 
@@ -121,7 +122,7 @@ namespace DataStorageSolutions.Mono
                     for (int i = data.StartPosition; i < data.EndPosition; i++)
                     {
 
-                        if (!grouped[i].Habitat.gameObject.activeSelf ||grouped[i].InstanceID == _mono.Manager.InstanceID || !grouped[i].HasAntenna()) continue;
+                        if (!grouped[i].Habitat.gameObject.activeSelf ||grouped[i].InstanceID == _mono.Manager.InstanceID || !grouped[i].HasAntenna() || !grouped[i].IsVisible()) continue;
                         
                         GameObject buttonPrefab = Instantiate(data.ItemsPrefab);
 
@@ -193,6 +194,7 @@ namespace DataStorageSolutions.Mono
                     _currentBase = ((TransferData)tag).Manager;
                     _currentData = (TransferData)tag;
                     _baseNameLabel.text = _currentBase.GetBaseName();
+
                     if (_currentData.IsHomeBase)
                     {
                         GoToPage(TerminalPages.BaseItemsDirect);
@@ -256,6 +258,14 @@ namespace DataStorageSolutions.Mono
                 case "RenameBTN":
                     _mono.Manager.ChangeBaseName();
                     break;
+
+                case "PowerBTN":
+                    _mono.Manager.ToggleBreaker();
+                    break;
+
+                case "SettingsBTN":
+                    GoToPage(TerminalPages.SettingsPage);
+                    break;
             }
         }
 
@@ -274,7 +284,14 @@ namespace DataStorageSolutions.Mono
 
         public override void PowerOffDisplay()
         {
-            GoToPage(TerminalPages.BlackOut);
+            if (_mono.PowerManager.GetPowerState() == FCSPowerStates.Unpowered)
+            {
+                GoToPage(TerminalPages.BlackOut);
+            }
+            else if (_mono.PowerManager.GetPowerState() == FCSPowerStates.Tripped)
+            {
+                GoToPage(TerminalPages.Tripped);
+            }
         }
 
         public void Refresh()
@@ -334,6 +351,14 @@ namespace DataStorageSolutions.Mono
             var gettingDataPage = InterfaceHelpers.FindGameObject(canvasGameObject, "GettingData");
             #endregion
 
+            #region Settings
+            var settings = InterfaceHelpers.FindGameObject(canvasGameObject, "SettingsPage");
+            #endregion
+
+            #region PoweredOff
+            var poweredOff = InterfaceHelpers.FindGameObject(canvasGameObject, "PowerOffPage");
+            #endregion
+
             #region ColorPageMain
             var colorMainPage = InterfaceHelpers.FindGameObject(canvasGameObject, "ColorPageMain");
             #endregion
@@ -373,24 +398,52 @@ namespace DataStorageSolutions.Mono
             #endregion
 
             #region ColorPickerBTN
-            var colorPickerBTN = InterfaceHelpers.FindGameObject(home, "ColorPickerBTN");
+            var colorPickerBTN = InterfaceHelpers.FindGameObject(settings, "ColorPickerBTN");
 
             InterfaceHelpers.CreateButton(colorPickerBTN, "ColorPickerBTN", InterfaceButtonMode.Background,
                 OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.ColorPage());
             #endregion
 
             #region RenameBTN
-            var renameBTN = InterfaceHelpers.FindGameObject(home, "RenameBaseBTN");
+            var renameBTN = InterfaceHelpers.FindGameObject(settings, "RenameBaseBTN");
 
             InterfaceHelpers.CreateButton(renameBTN, "RenameBTN", InterfaceButtonMode.Background,
+                OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.Rename());
+            #endregion
+
+            #region SettingsBTN
+            var settingsBTN = InterfaceHelpers.FindGameObject(home, "SettingsBTN");
+
+            InterfaceHelpers.CreateButton(settingsBTN, "SettingsBTN", InterfaceButtonMode.Background,
+                OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.SettingPage());
+            #endregion
+
+            #region HomePowerBTN
+            var homePowerBTN = InterfaceHelpers.FindGameObject(home, "PowerBTN");
+
+            InterfaceHelpers.CreateButton(homePowerBTN, "PowerBTN", InterfaceButtonMode.Background,
+                OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.PowerButton());
+            #endregion
+
+            #region PoweredOffPowerBTN
+            var poweredOffPowerBTN = InterfaceHelpers.FindGameObject(poweredOff, "PowerBTN");
+
+            InterfaceHelpers.CreateButton(poweredOffPowerBTN, "PowerBTN", InterfaceButtonMode.Background,
                 OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.Rename());
             #endregion
 
             #region ColorPickerMainHomeBTN
             var colorPickerMainHomeBTN = InterfaceHelpers.FindGameObject(colorMainPage, "HomeBTN");
 
-            InterfaceHelpers.CreateButton(colorPickerMainHomeBTN, "HomeBTN", InterfaceButtonMode.Background,
-                OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.ColorPage());
+            InterfaceHelpers.CreateButton(colorPickerMainHomeBTN, "SettingsBTN", InterfaceButtonMode.Background,
+                OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.SettingPage());
+            #endregion
+
+            #region SettingHomeBTN
+            var settingsHomeBTN = InterfaceHelpers.FindGameObject(settings, "HomeBTN");
+
+            InterfaceHelpers.CreateButton(settingsHomeBTN, "HomeBTN", InterfaceButtonMode.Background,
+                OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.GoToHome());
             #endregion
 
             #region Terminal Color BTN
