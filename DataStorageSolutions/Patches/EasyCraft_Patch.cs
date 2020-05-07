@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using DataStorageSolutions.Abstract;
 using DataStorageSolutions.Helpers;
 using DataStorageSolutions.Model;
 using FCSCommon.Utilities;
@@ -12,10 +10,28 @@ namespace DataStorageSolutions.Patches
 {
     internal class EasyCraft_Patch
     {
+        private static float _cacheExpired;
+        private const float CacheDuration = 1f;
+        private static BaseManager[] _cached = new BaseManager[0];
+
+
+        private static BaseManager[] Containers
+        {
+            get
+            {
+                if (_cacheExpired < Time.unscaledTime || _cacheExpired > Time.unscaledTime + CacheDuration)
+                {
+                    _cached = Find();
+                    _cacheExpired = Time.unscaledTime + CacheDuration;
+                }
+                return _cached;
+            }
+        }
+
+
         public static void GetPickupCount(TechType techType, ref int __result)
         {
-            
-            var bases = Find();
+            var bases = Containers;
 
             QuickLogger.Debug($"Bases Count: {bases.Length}");
 
@@ -50,26 +66,35 @@ namespace DataStorageSolutions.Patches
             {
                 int num = 0;
 
-                var baseManager = BaseManager.FindManager(Player.main.currentSub);
+                var baseManager = Containers;
 
-                QuickLogger.Debug($"Attempting to take items from base {baseManager?.GetBaseName()}");
+ 
 
-                for (int i = 0; i < count; i++)
+                for (var index = 0; index < Containers.Length; index++)
                 {
-                    var server = baseManager?.GetServerWithItem(techType);
+                    var currentBase = Containers[index];
 
-                    if (server != null)
+                    QuickLogger.Debug($"Attempting to take items from base {currentBase?.GetBaseName()}");
+
+
+                    for (int i = 0; i < count; i++)
                     {
-                        server.Remove(techType);
-                        num++;
+                        var server = currentBase?.GetServerWithItem(techType);
+
+                        if (server != null)
+                        {
+                            server.Remove(techType);
+                            num++;
+                        }
+                    }
+
+                    if (num == count)
+                    {
+                        __result = true;
+                        QuickLogger.Info($"[EasyCraft] removed {count} {techType}");
                     }
                 }
 
-                if (num == count)
-                {
-                    __result = true;
-                    QuickLogger.Info($"[EasyCraft] removed {count} {techType}");
-                }
 
                 QuickLogger.Debug($"Count: {count}");
 
