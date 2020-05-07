@@ -1,136 +1,117 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using EasyCraft;
-using Harmony;
+using DataStorageSolutions.Abstract;
+using DataStorageSolutions.Helpers;
+using DataStorageSolutions.Model;
+using FCSCommon.Utilities;
+using UnityEngine;
+
 
 namespace DataStorageSolutions.Patches
 {
-//    [HarmonyPatch(typeof(CrafterLogic), nameof(CrafterLogic.IsCraftRecipeFulfilled))]
-//    internal class CrafterLogic_IsCraftRecipeFulfilled
-//    {
-//        [HarmonyPostfix]
-//        public static void CrafterLogic_IsCraftRecipeFulfilled_Postfix(TechType techType, ref bool __result)
-//        {
-//            if (__result && GameModeUtils.RequiresIngredients())
-//            {
-//                Inventory main = Inventory.main;
-//#if SUBNAUTICA
-//                ITechData techData = CraftData.Get(techType, true);
-//                if (techData != null)
-//                {
-//                    int i = 0;
-//                    int ingredientCount = techData.ingredientCount;
-//                    while (i < ingredientCount)
-//                    {
-//                        IIngredient ingredient = techData.GetIngredient(i);
-//#elif BELOWZERO
-//                IList<Ingredient> ingredients = TechData.GetIngredients(techType);
-//                if(ingredients != null)
-//                {
-//                    int i = 0;
-//                    int ingredientCount = ingredients.Count;
-//                    while(i < ingredientCount)
-//                    {
-//                        Ingredient ingredient = ingredients[i];
-//#endif
-//                        int count = 0;
-//                        IList<InventoryItem> inventoryItems = main.container.GetItems(ingredient.techType);
-//                        if (inventoryItems != null)
-//                        {
-//                            foreach (InventoryItem inventoryItem in inventoryItems)
-//                            {
-//                                if (Main.BatteryCheck(inventoryItem.item))
-//                                {
-//                                    count++;
-//                                }
-//                            }
-//                        }
-//                        if (count < ingredient.amount)
-//                        {
-//                            __result = false;
-//                            return;
-//                        }
-//                        i++;
-//                    }
-//                    __result = true;
-//                    return;
-//                }
-//                __result = false;
-//                return;
-//            }
-//        }
-//    }
+    internal class EasyCraft_Patch
+    {
+        public static void GetPickupCount(TechType techType, ref int __result)
+        {
+            
+            var bases = Find();
 
-//    [HarmonyPatch(typeof(ClosestItemContainers), nameof(ClosestItemContainers.DestroyItem))]
-//    internal class ClosestItemContainers_DestroyItem
-//    {
-//        [HarmonyPrefix]
-//        public static bool ClosestItemContainers_DestroyItem_Prefix(TechType techType, ref bool __result, int count = 1)
-//        {
-//            int num = 0;
-//            foreach (ItemsContainer itemsContainer in ClosestItemContainers.containers)
-//            {
-//                var items = new List<InventoryItem>();
-//                itemsContainer.GetItems(techType, items);
-//                foreach (InventoryItem item in items)
-//                {
-//                    if (Main.BatteryCheck(item.item))
-//                    {
-//                        if (itemsContainer.RemoveItem(item.item))
-//                        {
-//                            UnityEngine.Object.Destroy(item.item.gameObject);
-//                            num++;
-//                        }
-//                    }
+            QuickLogger.Debug($"Bases Count: {bases.Length}");
 
-//                    if (num == count)
-//                    {
-//                        break;
-//                    }
-//                }
+            if (bases.Length == 0)
+            {
+                __result += 0;
+            }
+            else
+            {
+                for (int i = 0; i < bases.Length; i++)
+                {
+                    var baseManager = bases[i];
+                    if (baseManager != null)
+                    {
+                        __result += baseManager.GetItemCount(techType);
+                    }
+                    else
+                    {
+                        __result += 0;
+                    }
+                }
+                
+            }
+            
+        }
 
-//                if (num == count)
-//                {
-//                    break;
-//                }
-//            }
-//            if (num < count)
-//            {
-//                Console.WriteLine(string.Format("[EasyCraft] Unable to remove {0} {1}", count, techType));
-//                __result = false;
-//                return false;
-//            }
+        public static void DestroyItem(TechType techType, ref bool __result, ref int count)
+        {
+            QuickLogger.Debug("Attempting to take items");
 
-//            __result = true;
-//            Console.WriteLine(string.Format("[EasyCraft] removed {0} {1}", count, techType));
-//            return false;
-//        }
-//    }
+            if (!__result)
+            {
+                int num = 0;
 
-//    [HarmonyPatch(typeof(ClosestItemContainers), nameof(ClosestItemContainers.GetPickupCount))]
-//    internal class ClosestItemContainers_GetPickupCount
-//    {
-//        [HarmonyPrefix]
-//        public static bool ClosestItemContainers_GetPickupCount_Prefix(TechType techType, ref int __result)
-//        {
-//            int num = 0;
-//            foreach (ItemsContainer itemsContainer in ClosestItemContainers.containers)
-//            {
-//                var items = new List<InventoryItem>();
-//                itemsContainer.GetItems(techType, items);
-//                foreach (InventoryItem item in items)
-//                {
-//                    if (Main.BatteryCheck(item.item))
-//                    {
-//                        num++;
-//                    }
-//                }
-//            }
-//            __result = num;
-//            return false;
-//        }
-//    }
-//}
+                var baseManager = BaseManager.FindManager(Player.main.currentSub);
+
+                QuickLogger.Debug($"Attempting to take items from base {baseManager?.GetBaseName()}");
+
+                for (int i = 0; i < count; i++)
+                {
+                    var server = baseManager?.GetServerWithItem(techType);
+
+                    if (server != null)
+                    {
+                        server.Remove(techType);
+                        num++;
+                    }
+                }
+
+                if (num == count)
+                {
+                    __result = true;
+                    QuickLogger.Info($"[EasyCraft] removed {count} {techType}");
+                }
+
+                QuickLogger.Debug($"Count: {count}");
+
+                if (num >= count) return;
+                QuickLogger.Info($"[EasyCraft] Unable to remove {count} {techType}");
+                __result = false;
+            }
+        }
+
+        private static BaseManager[] Find()
+        {
+            var usageStorage = (int)QPatch.UseStorage.GetValue(QPatch.EasyCraftSettingsInstance);
+
+            HashSet<BaseManager> list = new HashSet<BaseManager>();
+
+            if (usageStorage != 0)
+            {
+                if (usageStorage == 1 && Player.main.IsInside())
+                {
+                    if (Player.main.IsInSub())
+                    {
+                        list.Add(BaseManager.FindManager(Player.main.currentSub));
+                    }
+                }
+                else if (usageStorage == 2)
+                {
+                    foreach (SubRoot subRoot in GameObject.FindObjectsOfType<SubRoot>())
+                    {
+                        Vector3 position = Player.main.transform.position;
+                        BaseRoot baseRoot;
+                        if ((subRoot.isCyclops && (position - subRoot.GetWorldCenterOfMass()).sqrMagnitude < 10000f) || (subRoot.isBase && (baseRoot = (subRoot as BaseRoot)) != null && baseRoot.GetDistanceToPlayer() < 100f))
+                        {
+                            list.Add(BaseManager.FindManager(subRoot));
+                        }
+                    }
+                }
+                
+                return (from x in list.Distinct<BaseManager>()
+                        orderby (Player.main.transform.position - x.Habitat.transform.position).sqrMagnitude
+                        select x).ToArray<BaseManager>();
+            }
+            return list.ToArray();
+        }
+    }
 }

@@ -181,7 +181,7 @@ namespace DataStorageSolutions.Configuration
         };
 
         internal static Action OnBaseUpdate { get; set; }
-        public static Action OnContainerUpdate { get; set; }
+        public static Action<DSSRackController> OnContainerUpdate { get; set; }
 
         internal static event Action<SaveData> OnDataLoaded;
         #endregion

@@ -319,10 +319,13 @@ namespace DataStorageSolutions.Mono
             return success;
         }
 
-        private void OnContainerUpdate()
+        private void OnContainerUpdate(DSSRackController dssRackController)
         {
-            DisplayManager.UpdateContainerAmount();
-            Mod.OnBaseUpdate?.Invoke();
+            if (dssRackController == this)
+            {
+                DisplayManager.UpdateContainerAmount();
+                Mod.OnBaseUpdate?.Invoke();
+            }
         }
 
         public override void Save(SaveData newSaveData)
@@ -535,8 +538,9 @@ namespace DataStorageSolutions.Mono
         public RackSlot GetServerWithItem(TechType techType)
         {
             QuickLogger.Debug($"Checking for TechType: {techType}", true);
-            foreach (var rackSlot in _servers)
+            for (var i = 0; i < _servers.Length; i++)
             {
+                var rackSlot = _servers[i];
                 if (rackSlot == null || rackSlot.Server == null)
                 {
                     continue;
@@ -622,111 +626,10 @@ namespace DataStorageSolutions.Mono
         {
             var server = GetUsableServer(item.item.GetTechType());
             if (server == null) return;
-            server.Add(MakeObjectData(item,server.Id));
+            server.Add(DSSHelpers.MakeObjectData(item,server.Id));
             Destroy(item.item.gameObject);
         }
         
-        private ObjectData MakeObjectData(InventoryItem item,int slot)
-        {
-            var go = item.item.gameObject;
-            
-            var objectType = FindSaveDataObjectType(go);
-
-            ObjectData result;
-
-            switch (objectType)
-            {
-                case SaveDataObjectType.Item:
-                    result = new ObjectData {DataObjectType = objectType,TechType = item.item.GetTechType()};
-                    break;
-                case SaveDataObjectType.PlayerTool:
-                    result = new ObjectData { DataObjectType = objectType, TechType = item.item.GetTechType(),PlayToolData = GetPlayerToolData(item)};
-                    break;
-                case SaveDataObjectType.Eatable:
-                    result = new ObjectData { DataObjectType = objectType, TechType = item.item.GetTechType(), EatableEntity = GetEatableData(item)};
-                    break;
-                case SaveDataObjectType.Server:
-                    result = new ObjectData { DataObjectType = objectType, TechType = item.item.GetTechType(),  ServerData= GetServerData(item) };
-                    break;
-                case SaveDataObjectType.Battery:
-                    result = new ObjectData { DataObjectType = objectType, TechType = item.item.GetTechType(), PlayToolData = GetBatteryData(item) };
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-            
-            return result;
-        }
-
-        private List<ObjectData> GetServerData(InventoryItem item)
-        {
-            var data = item.item.GetComponent<DSSServerController>().Items;
-            return new List<ObjectData>(data);
-        }
-
-        private EatableEntities GetEatableData(InventoryItem item)
-        {
-            var eatableEntity = new EatableEntities();
-            eatableEntity.Initialize(item.item,false);
-            return eatableEntity;
-        }
-
-        private PlayerToolData GetPlayerToolData(InventoryItem item)
-        {
-            var energyMixin = item.item.GetComponentInChildren<EnergyMixin>();
-            
-            var playerToolData = new PlayerToolData {TechType = item.item.GetTechType()};
-
-            if (energyMixin == null) return playerToolData;
-
-            var batteryGo = energyMixin.GetBattery().gameObject;
-            var techType = batteryGo.GetComponent<TechTag>().type;
-            var iBattery = batteryGo.GetComponent<IBattery>();
-            playerToolData.BatteryInfo = new BatteryInfo(techType,iBattery,string.Empty);
-
-            return playerToolData;
-        }
-
-        private PlayerToolData GetBatteryData(InventoryItem item)
-        {
-            var batteryGo = item.item.GetComponentInChildren<Battery>();
-
-            var playerToolData = new PlayerToolData { TechType = item.item.GetTechType() };
-            var techType = batteryGo.GetComponent<TechTag>().type;
-            var iBattery = batteryGo.GetComponent<IBattery>();
-            playerToolData.BatteryInfo = new BatteryInfo(techType, iBattery, string.Empty);
-
-            return playerToolData;
-        }
-
-        private SaveDataObjectType FindSaveDataObjectType(GameObject go)
-        {
-            SaveDataObjectType objectType;
-
-            if (go.GetComponent<Eatable>())
-            {
-                objectType = SaveDataObjectType.Eatable;
-            }
-            else if (go.GetComponent<DSSServerController>()) // Must check for Server first before playertool
-            {
-                objectType = SaveDataObjectType.Server;
-            }
-            else if (go.GetComponent<PlayerTool>())
-            {
-                objectType = SaveDataObjectType.PlayerTool;
-            }
-            else if (go.GetComponent<Battery>())
-            {
-                objectType = SaveDataObjectType.Battery;
-            }
-            else
-            {
-                objectType = SaveDataObjectType.Item;
-            }
-
-            return objectType;
-        }
-
         public ObjectDataTransferData GetItemDataFromServer(TechType techType)
         {
             QuickLogger.Debug($"Checking for TechType: {techType}", true);
@@ -769,5 +672,16 @@ namespace DataStorageSolutions.Mono
             return _servers.Any(rackSlot => rackSlot != null && rackSlot.HasFilters);
         }
 
+        public int GetItemCount(TechType techType)
+        {
+            int amount = 0;
+
+            for (int i = 0; i < _servers.Length; i++)
+            {
+                amount += _servers[i].GetItemCount(techType);
+            }
+
+            return amount;
+        }
     }
 }

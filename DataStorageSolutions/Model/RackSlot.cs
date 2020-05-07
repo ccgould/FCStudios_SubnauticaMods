@@ -255,7 +255,7 @@ namespace DataStorageSolutions.Model
         internal void UpdateNetwork()
         {
             UpdateScreen();
-            Mod.OnContainerUpdate?.Invoke();
+            Mod.OnContainerUpdate?.Invoke(_mono);
         }
 
         public bool IsAllowedToAdd(TechType techType)
@@ -268,6 +268,21 @@ namespace DataStorageSolutions.Model
         ~RackSlot()
         {
             _mono.OnUpdate -= Update;
+        }
+
+        internal void Remove(TechType techType)
+        {
+            for (int i = 0; i < Server.Count; i++)
+            {
+                if (Server.ElementAt(i).TechType != techType) continue;
+                Remove(Server.ElementAt(i));
+                break;
+            }
+        }
+
+        internal int GetItemCount(TechType techType)
+        {
+            return Server?.Where((t, i) => Server.ElementAt(i).TechType == techType).Count() ?? 0;
         }
     }
 }

@@ -60,9 +60,6 @@
     <Reference Include="Assembly-CSharp-firstpass">
       <HintPath>..\Dependancies\Subnautica\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
-    <Reference Include="EasyCraft">
-      <HintPath>F:\Program Files\Epic Games\Subnautica\QMods\EasyCraft\EasyCraft.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Dependancies\Newtonsoft.Json.dll</HintPath>
@@ -121,6 +118,7 @@
     <Compile Include="Configuration\SaveDataEntry.cs" />
     <Compile Include="Craftables\ServerCraftable.cs" />
     <Compile Include="Enumerators\RackPages.cs" />
+    <Compile Include="Helpers\BaseRootExtensions.cs" />
     <Compile Include="Helpers\DSSHelpers.cs" />
     <Compile Include="Enumerators\ColorPage.cs" />
     <Compile Include="Enumerators\FilterPages.cs" />

@@ -41,7 +41,7 @@ namespace DataStorageSolutions.Configuration
         [JsonProperty] internal int Slot { get; set; }
         [JsonProperty] internal EatableEntities EatableEntity { get; set; }
         [JsonProperty] internal PlayerToolData PlayToolData { get; set; }
-        [JsonProperty] internal List<ObjectData> ServerData { get; set; }
+        [JsonProperty] internal HashSet<ObjectData> ServerData { get; set; }
         [JsonProperty] internal List<Filter> Filters { get; set; }
     }
 

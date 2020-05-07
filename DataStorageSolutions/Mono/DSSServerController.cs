@@ -250,7 +250,7 @@ namespace DataStorageSolutions.Mono
             {
                 Items.Add(new ObjectData { TechType = item});
                 DisplayManager.UpdateDisplay();
-                Mod.OnContainerUpdate?.Invoke();
+                Mod.OnContainerUpdate?.Invoke(_mono);
             }
         }
 
@@ -273,7 +273,7 @@ namespace DataStorageSolutions.Mono
                     var pickup = CraftData.InstantiateFromPrefab(item).GetComponent<Pickupable>();
                     Inventory.main.Pickup(pickup);
                     DeleteItemFromContainer(item);
-                    Mod.OnContainerUpdate?.Invoke();
+                    Mod.OnContainerUpdate?.Invoke(_mono);
                 }
             }
         }
@@ -285,7 +285,7 @@ namespace DataStorageSolutions.Mono
             Items.Remove(objectData);
             DisplayManager.UpdateDisplay();
             UpdateServerData(GetPrefabIDString());
-            Mod.OnContainerUpdate?.Invoke();
+            Mod.OnContainerUpdate?.Invoke(_mono);
         }
 
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)

@@ -14,6 +14,7 @@ using FCSTechFabricator;
 using FCSTechFabricator.Components;
 using FCSTechFabricator.Craftables;
 using Harmony;
+using QModManager.API;
 using QModManager.API.ModLoading;
 using SMLHelper.V2.Utility;
 using UnityEngine;
@@ -68,15 +69,81 @@ namespace DataStorageSolutions
 
                 harmony.PatchAll(Assembly.GetExecutingAssembly());
 
-                QuickLogger.Info("Finished patching");
+                var isEasyCraftInstalled = QModServices.Main.ModPresent("EasyCraft");
 
+                if (isEasyCraftInstalled)
+                {
+                    QuickLogger.Debug("EasyCraft is installed");
+
+                    var easyCraftClosestItemContainersType = Type.GetType("EasyCraft.ClosestItemContainers, EasyCraft");
+                    var easyCraftMainType = Type.GetType("EasyCraft.Main, EasyCraft");
+                    var easyCraftSettingsType = Type.GetType("EasyCraft.Settings, EasyCraft");
+
+                    if (easyCraftMainType != null)
+                    {
+                        QuickLogger.Debug("Got EasyCraft Main Type");
+                        EasyCraftSettingsInstance = easyCraftMainType.GetField("settings", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
+                        if (EasyCraftSettingsInstance != null)
+                        {
+                            QuickLogger.Debug("Got EasyCraft Settings Field Info");
+                            if (easyCraftSettingsType != null)
+                            {
+                                QuickLogger.Debug("Got EasyCraft Settings type");
+
+                                QuickLogger.Debug($"Got EasyCraft Settings type: {easyCraftSettingsType.Name}");
+                                var autoCraft = easyCraftSettingsType.GetField("autoCraft").GetValue(EasyCraftSettingsInstance); 
+                                UseStorage = easyCraftSettingsType.GetField("useStorage");
+                                var returnSurplus = easyCraftSettingsType.GetField("returnSurplus").GetValue(EasyCraftSettingsInstance);
+                            }
+
+                        }
+                    }
+
+
+                    if (easyCraftClosestItemContainersType != null)
+                    {
+                        QuickLogger.Debug("Got EasyCraft Type");
+                        var destroyItemMethodInfo = easyCraftClosestItemContainersType.GetMethod("DestroyItem");
+                        var getPickupCountMethodInfo = easyCraftClosestItemContainersType.GetMethod("GetPickupCount");
+                        
+                        if (destroyItemMethodInfo != null)
+                        {
+                            QuickLogger.Debug("Got EasyCraft DestroyItem Method");
+                            var postfix = typeof(EasyCraft_Patch).GetMethod("DestroyItem");
+                            harmony.Patch(destroyItemMethodInfo, null, new HarmonyMethod(postfix));
+                        }
+
+                        if (getPickupCountMethodInfo != null)
+                        {
+                            QuickLogger.Debug("Got EasyCraft GetPickupCount Method");
+                            var postfix = typeof(EasyCraft_Patch).GetMethod("GetPickupCount");
+                            harmony.Patch(getPickupCountMethodInfo, null, new HarmonyMethod(postfix));
+                        }
+                    }
+                    else
+                    {
+                        QuickLogger.Error("Failed to get EasyCraft Type");
+                    }
+                }
+                else
+                {
+                    QuickLogger.Debug("EasyCraft  not installed");
+                }
+                
+                QuickLogger.Info("Finished patching");
             }
             catch (Exception ex)
             {
                 QuickLogger.Error(ex);
             }
         }
-        
+
+        public static object EasyCraftSettingsInstance { get; set; }
+
+        public static FieldInfo UseStorage { get; set; }
+
+        public static Type EasyCraftSettingsType { get; set; }
+
         private static void AddTechFabricatorItems()
         {
             var icon = ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetFolder(), $"{Mod.ModName}.png"));

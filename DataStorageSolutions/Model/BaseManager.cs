@@ -417,5 +417,29 @@ namespace DataStorageSolutions.Model
                 }
             }
         }
+
+        public RackSlot GetServerWithItem(TechType techType)
+        {
+            for (int i = 0; i < BaseRacks.Count; i++)
+            {
+                var serverWithItem = BaseRacks.ElementAt(i).GetServerWithItem(techType);
+                if(serverWithItem == null) continue;
+                return serverWithItem;
+            }
+
+            return null;
+        }
+
+        public int GetItemCount(TechType techType)
+        {
+            int amount = 0;
+
+            for (int i = 0; i < BaseRacks.Count; i++)
+            {
+                amount += BaseRacks.ElementAt(i).GetItemCount(techType);
+            }
+            
+            return amount;
+        }
     }
 }
