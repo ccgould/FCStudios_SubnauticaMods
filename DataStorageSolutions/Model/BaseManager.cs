@@ -6,6 +6,7 @@ using DataStorageSolutions.Configuration;
 using DataStorageSolutions.Interfaces;
 using DataStorageSolutions.Mono;
 using DataStorageSolutions.Structs;
+using FCSCommon.Enums;
 using FCSCommon.Utilities;
 using FCSTechFabricator.Components;
 using FCSTechFabricator.Interfaces;
@@ -22,15 +23,31 @@ namespace DataStorageSolutions.Model
         internal static List<BaseManager> Managers { get; } = new List<BaseManager>();
         internal static readonly List<IBaseAntenna> BaseAntennas = new List<IBaseAntenna>();
         internal string InstanceID { get; }
-        internal readonly HashSet<DSSRackController> BaseUnits = new HashSet<DSSRackController>();
-        internal readonly SubRoot Habitat;
+        internal readonly HashSet<DSSRackController> BaseRacks = new HashSet<DSSRackController>();
+        internal readonly HashSet<DSSTerminalController> BaseTerminals = new HashSet<DSSTerminalController>();
+        internal bool IsVisible
+        {
+            get
+            {
+                if (Habitat.isCyclops)
+                {
+                    return !_hasBreakerTripped;
+                }
+
+                var antenna = GetCurrentBaseAntenna();
+                return antenna != null && antenna.IsVisible();
+            }
+        }
+
+        internal FCSPowerStates PrevPowerState { get; set; }
+
+        internal SubRoot Habitat { get; }
         internal DumpContainer DumpContainer { get; private set; }
         public int GetContainerFreeSpace { get; }
         public bool IsFull { get; }
         public NameController NameController { get; private set; }
         internal Action<bool> OnBreakerToggled { get; set; }
-
-
+        
         private void Initialize(SubRoot habitat)
         {
             ReadySaveData();
@@ -61,7 +78,6 @@ namespace DataStorageSolutions.Model
 
         private void ReadySaveData()
         {
-            QuickLogger.Debug("In OnProtoDeserialize");
             _savedData = Mod.GetBaseSaveData(InstanceID);
         }
         
@@ -84,7 +100,6 @@ namespace DataStorageSolutions.Model
         {
             if (rackController == null)
             {
-                QuickLogger.Debug("RackController is null", true);
                 return;
             }
 
@@ -108,7 +123,13 @@ namespace DataStorageSolutions.Model
 
         internal void ToggleBreaker()
         {
+            if (HasAntenna(true))
+            {
+                SendBaseMessage(_hasBreakerTripped);
+            }
+
             _hasBreakerTripped = !_hasBreakerTripped;
+
             OnBreakerToggled?.Invoke(_hasBreakerTripped);
         }
 
@@ -125,66 +146,60 @@ namespace DataStorageSolutions.Model
             QuickLogger.Debug($"Processing SubRoot = {subRoot.GetInstanceID()} || Name {subRoot.GetSubName()}");
             var g = FindManager(subRoot.gameObject.GetComponentInChildren<PrefabIdentifier>()?.Id);
             var manager = Managers.Find(x => x.InstanceID == g?.InstanceID && x.Habitat == subRoot);
-
-            if (manager == null)
-            {
-                QuickLogger.Debug("No manager found on base");
-            }
-
             return manager ?? CreateNewManager(subRoot);
         }
 
         internal static BaseManager FindManager(string instanceID)
         {
-            QuickLogger.Debug($"Trying to find a Base with the ID {instanceID}",true);
-
             var manager = Managers.Find(x => x.InstanceID == instanceID);
-
-            if (manager == null)
-            {
-                QuickLogger.Debug($"No manager was found with the instanceID {instanceID}",true);
-            }
-
             return manager;
         }
         
-        internal bool HasAntenna()
+        internal bool HasAntenna(bool ignoreVisibleCheck = false)
         {
             if (Habitat.isCyclops)
             {
                 return true;
             }
             
-            return GetCurrentBaseAntenna() != null;
+            return GetCurrentBaseAntenna(ignoreVisibleCheck) != null;
         }
-
-        internal bool IsVisible()
+        
+        internal void AddTerminal(DSSTerminalController unit)
         {
-            if (Habitat.isCyclops)
+            if (!BaseTerminals.Contains(unit) && unit.IsConstructed)
             {
-                return !_hasBreakerTripped;
+                BaseTerminals.Add(unit);
+                unit.PowerManager.OnPowerUpdate += OnPowerUpdate;
+                QuickLogger.Debug($"Add Unit : {unit.GetPrefabIDString()}", true);
             }
-
-            var antenna = GetCurrentBaseAntenna();
-
-            return antenna != null && antenna.IsVisible();
         }
 
-        internal void AddUnit(DSSRackController unit)
+        internal void RemoveTerminal(DSSTerminalController unit)
         {
-            if (!BaseUnits.Contains(unit) && unit.IsConstructed)
+            if (!BaseTerminals.Contains(unit)) return;
+            BaseTerminals.Remove(unit);
+            unit.PowerManager.OnPowerUpdate -= OnPowerUpdate;
+            QuickLogger.Debug($"Removed Unit : {unit.GetPrefabIDString()}", true);
+        }
+
+        internal void AddRack(DSSRackController unit)
+        {
+            if (!BaseRacks.Contains(unit) && unit.IsConstructed)
             {
-                BaseUnits.Add(unit);
+                BaseRacks.Add(unit);
+                unit.PowerManager.OnPowerUpdate += OnPowerUpdate;
                 QuickLogger.Debug($"Add Unit : {unit.GetPrefabIDString()}", true);
             }
         }
         
-        internal static void RemoveUnit(DSSRackController unit)
+        internal static void RemoveRack(DSSRackController unit)
         {
             foreach (BaseManager manager in Managers)
             {
-                if (!manager.BaseUnits.Contains(unit)) continue;
-                manager.BaseUnits.Remove(unit);
+                if (!manager.BaseRacks.Contains(unit)) continue;
+                manager.BaseRacks.Remove(unit); 
+                unit.PowerManager.OnPowerUpdate -= OnPowerUpdate;
                 QuickLogger.Debug($"Removed Unit : {unit.GetPrefabIDString()}", true);
             }
         }
@@ -193,17 +208,58 @@ namespace DataStorageSolutions.Model
         {
             if (!BaseAntennas.Contains(unit) && unit.IsConstructed)
             {
+                unit.PowerManager.OnPowerUpdate += OnPowerUpdate;
+
+                if (!unit.Manager.HasAntenna())
+                {
+                    unit.Manager.SendBaseMessage(true);
+                }
+                
                 BaseAntennas.Add(unit);
                 QuickLogger.Debug($"Add Unit : {unit.GetPrefabIDString()}", true);
             }
         }
+
+        internal static void OnPowerUpdate(FCSPowerStates state, BaseManager manager)
+        {
+            if (manager == null ||  manager.PrevPowerState == state) return;
+
+            manager.PrevPowerState = state;
+            
+            Mod.OnBaseUpdate?.Invoke();
+        }
+
+        internal void SendBaseMessage(bool state)
+        {
+            QuickLogger.Message(string.Format(AuxPatchers.BaseOnOffMessage(), GetBaseName(), state ? AuxPatchers.Online() : AuxPatchers.Offline()), true);
+        }
+
 
         internal static void RemoveAntenna(DSSAntennaController unit)
         {
             if (BaseAntennas.Contains(unit))
             {
                 BaseAntennas.Remove(unit);
+
+                if (!unit.Manager.HasAntenna())
+                {
+                    unit.Manager.SendBaseMessage(false);
+                }
+
+                unit.PowerManager.OnPowerUpdate -= OnPowerUpdate;
             }
+        }
+
+        private int GetAntennaCount()
+        {
+            int i = 0;
+
+            for (int j = 0; j < BaseAntennas.Count; j++)
+            {
+                i++;
+            }
+
+            return i;
         }
 
         internal Dictionary<TechType,int> GetItemsWithin()
@@ -212,7 +268,7 @@ namespace DataStorageSolutions.Model
             {
                 Dictionary<TechType, int> data = new Dictionary<TechType, int>();
 
-                foreach (DSSRackController rackController in BaseUnits)
+                foreach (DSSRackController rackController in BaseRacks)
                 {
                     if(rackController == null) continue;
                     GetStoredData(rackController, data);
@@ -229,12 +285,8 @@ namespace DataStorageSolutions.Model
 
         public void TakeItem(TechType techType)
         {
-            QuickLogger.Debug("In TakeItem",true);
-
-            foreach (DSSRackController baseUnit in BaseUnits)
+            foreach (DSSRackController baseUnit in BaseRacks)
             {
-                QuickLogger.Debug($"Base: {baseUnit?.Manager?.Habitat?.GetSubName()} || TechType: {techType}");
-
                 if (baseUnit.HasItem(techType))
                 {
                     var data = baseUnit.GetItemDataFromServer(techType);
@@ -249,10 +301,10 @@ namespace DataStorageSolutions.Model
            DumpContainer.OpenStorage();
         }
 
-        public IBaseAntenna GetCurrentBaseAntenna()
+        public IBaseAntenna GetCurrentBaseAntenna(bool ignoreVisible = false)
         {
-            QuickLogger.Debug($"Current ID: {InstanceID}",true);
-            return BaseAntennas.FirstOrDefault(antenna => antenna?.Manager.InstanceID == InstanceID);
+            return ignoreVisible ? BaseAntennas.FirstOrDefault(antenna => antenna != null && antenna.Manager.InstanceID == InstanceID) : 
+                BaseAntennas.FirstOrDefault(antenna => antenna != null && antenna.Manager.InstanceID == InstanceID && antenna.IsVisible());
         }
         
         public bool CanBeStored(int amount, TechType techType)
@@ -263,7 +315,7 @@ namespace DataStorageSolutions.Model
         private DSSRackController FindValidRack(TechType itemTechType)
         {
             //Check the filtered racks first
-            foreach (DSSRackController baseUnit in BaseUnits)
+            foreach (DSSRackController baseUnit in BaseRacks)
             {
                 if (!baseUnit.IsFull && baseUnit.IsTechTypeAllowedInRack(itemTechType) && baseUnit.HasFilters())
                 {
@@ -273,7 +325,7 @@ namespace DataStorageSolutions.Model
             }
 
             //Check the filtered racks first then the unfiltered
-            foreach (DSSRackController baseUnit in BaseUnits)
+            foreach (DSSRackController baseUnit in BaseRacks)
             {
                 if (!baseUnit.IsFull && baseUnit.IsTechTypeAllowedInRack(itemTechType))
                 {
@@ -292,7 +344,6 @@ namespace DataStorageSolutions.Model
             if (rackController == null) return false;
             rackController.AddItemToAServer(item);
             return true;
-
         }
 
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
@@ -353,6 +404,17 @@ namespace DataStorageSolutions.Model
             foreach (BaseManager manager in Managers)
             {
                 yield return new BaseSaveData {BaseName = manager.GetBaseName(), InstanceID = manager.InstanceID};
+            }
+        }
+
+        public static void RemoveDestroyedBases()
+        {
+            for (int i = Managers.Count - 1; i > -1; i--)
+            {
+                if (Managers[i].Habitat == null)
+                {
+                    Managers.RemoveAt(i);
+                }
             }
         }
     }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,12 +21,16 @@ namespace DataStorageSolutions.Model
         private Text _counter;
         private bool _isInstantiated;
         private StringBuilder sb = new StringBuilder();
-        internal readonly int Id;
-        internal readonly Transform Slot;
         private DSSRackController _mono;
         private bool _isOccupied;
-        private List<ObjectData> _server;
+        private HashSet<ObjectData> _server;
         private List<Filter> _filter = new List<Filter>();
+        private float timeLeft = 1.0f;
+        private const float TimerLimit = 1f;
+        private bool _update;
+
+        internal readonly int Id;
+        internal readonly Transform Slot;
 
         internal bool IsOccupied
         {
@@ -33,13 +38,14 @@ namespace DataStorageSolutions.Model
             set
             {
                 _isOccupied = value;
+                _mono.UpdatePowerUsage();
                 ChangeDummyState(value);
             }
         }
 
         public bool HasFilters => Filter != null && Filter.Count > 0;
 
-        internal List<ObjectData> Server
+        internal HashSet<ObjectData> Server
         {
             get => _server;
             set
@@ -53,6 +59,41 @@ namespace DataStorageSolutions.Model
         {
             get => _filter;
             set => _filter = value ?? new List<Filter>();
+        }
+
+        private bool FilterCrossCheck(TechType techType)
+        {
+            foreach (Filter filter in _filter)
+            {
+                if (filter.IsCategory() && filter.IsTechTypeAllowed(techType))
+                {
+                    return true;
+                }
+            }
+
+            foreach (var filter in _filter)
+            {
+                if (!filter.IsCategory() && filter.IsTechTypeAllowed(techType))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private void Update()
+        {
+            if (_update)
+            {
+                timeLeft -= Time.deltaTime;
+                if (timeLeft < 0)
+                {
+                    UpdateNetwork();
+                    _update = false;
+                    timeLeft = TimerLimit;
+                }
+            }
         }
 
         private void ChangeDummyState(bool b = true)
@@ -98,9 +139,29 @@ namespace DataStorageSolutions.Model
             return sb.ToString();
         }
 
+        private void ResetTimer()
+        {
+            _update = true;
+            timeLeft = TimerLimit;
+        }
+
+        private void OnButtonClick(string arg1, object arg2)
+        {
+            if (_mono.IsRackOpen())
+            {
+                var result = _mono.GivePlayerItem(QPatch.Server.TechType, new ObjectDataTransferData { data = Server, Filters = Filter, IsServer = true });
+                QuickLogger.Debug($"Give Player ITem Result: {result}", true);
+                if (result)
+                {
+                    DisconnectFromRack();
+                }
+            }
+        }
+
         internal RackSlot(DSSRackController controller, int id, Transform slot)
         {
             _mono = controller;
+            _mono.OnUpdate += Update;
             Id = id;
             Slot = slot;
         }
@@ -113,15 +174,15 @@ namespace DataStorageSolutions.Model
         internal void Add(ObjectData data)
         {
             Server.Add(data);
-            UpdateNetwork();
+            ResetTimer();
         }
 
         internal void Remove(ObjectData data)
         {
             Server.Remove(data);
-            UpdateNetwork();
+            ResetTimer();
         }
-
+        
         internal bool FindAllComponents()
         {
             try
@@ -163,20 +224,7 @@ namespace DataStorageSolutions.Model
                 return false;
             }
         }
-
-        private void OnButtonClick(string arg1, object arg2)
-        {
-            if (_mono.IsRackOpen())
-            {
-                var result = _mono.GivePlayerItem(QPatch.Server.TechType, new ObjectDataTransferData { data = Server, Filters = Filter, IsServer = true });
-                QuickLogger.Debug($"Give Player ITem Result: {result}", true);
-                if (result)
-                {
-                    DisconnectFromRack();
-                }
-            }
-        }
-
+        
         internal void InstantiateDummy()
         {
             if (_isInstantiated) return;
@@ -206,7 +254,6 @@ namespace DataStorageSolutions.Model
 
         internal void UpdateNetwork()
         {
-            _mono.UpdatePowerUsage();
             UpdateScreen();
             Mod.OnContainerUpdate?.Invoke();
         }
@@ -217,26 +264,10 @@ namespace DataStorageSolutions.Model
 
             return _filter.Count == 0 || FilterCrossCheck(techType);
         }
-
-        private bool FilterCrossCheck(TechType techType)
+        
+        ~RackSlot()
         {
-            foreach (Filter filter in _filter)
-            {
-                if (filter.IsCategory() && filter.IsTechTypeAllowed(techType))
-                {
-                    return true;
-                }
-            }
-
-            foreach (var filter in _filter)
-            {
-                if (!filter.IsCategory() && filter.IsTechTypeAllowed(techType))
-                {
-                    return true;
-                }
-            }
-
-            return false;
+            _mono.OnUpdate -= Update;
         }
     }
 }

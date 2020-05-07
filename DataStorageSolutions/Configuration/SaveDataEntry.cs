@@ -19,7 +19,7 @@ namespace DataStorageSolutions.Configuration
         [JsonProperty] internal ColorVec4 BodyColor { get; set; }
         [JsonProperty] internal ColorVec4 AntennaBodyColor { get; set; }
         [JsonProperty] internal List<ServerData> Servers { get; set; }
-        [JsonProperty] internal List<ObjectData> ServerData { get; set; }
+        [JsonProperty] internal HashSet<ObjectData> ServerData { get; set; }
         [JsonProperty] internal string AntennaName { get; set; }
         [JsonProperty] internal List<Filter> Filters { get; set; }
     }

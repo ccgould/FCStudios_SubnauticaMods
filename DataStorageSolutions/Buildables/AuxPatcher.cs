@@ -51,6 +51,9 @@ namespace DataStorageSolutions.Buildables
             { $"{ModKey}_SettingsPage","Go to settings page."},
             { $"{ModKey}_PowerBTN","Turn ON/OFF"},
             { $"{ModKey}_PoweredOff","POWERED OFF"},
+            { $"{ModKey}_BaseOnOff","{0} is now {1}."},
+            { $"{ModKey}_Online","online"},
+            { $"{ModKey}_Offline","offline"},
         };
 
         internal static void AdditionalPatching()
@@ -264,6 +267,21 @@ namespace DataStorageSolutions.Buildables
         public static string PoweredOff()
         {
             return Language.main.Get(LanguageDictionary.Keys.ElementAt(37));
+        }
+
+        public static string BaseOnOffMessage()
+        {
+            return Language.main.Get(LanguageDictionary.Keys.ElementAt(38));
+        }
+
+        public static string Online()
+        {
+            return Language.main.Get(LanguageDictionary.Keys.ElementAt(39));
+        }
+
+        public static string Offline()
+        {
+            return Language.main.Get(LanguageDictionary.Keys.ElementAt(40));
         }
     }
 }

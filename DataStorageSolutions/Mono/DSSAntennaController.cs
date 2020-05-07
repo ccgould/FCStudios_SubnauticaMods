@@ -107,7 +107,7 @@ namespace DataStorageSolutions.Mono
         {
             GetData();
             
-            QuickLogger.Debug($"Manager Count: {BaseManager.BaseAntennas.Count}");
+            QuickLogger.Debug($"Antenna Count: {BaseManager.BaseAntennas.Count}");
 
             if (PowerManager == null)
             {
@@ -129,7 +129,7 @@ namespace DataStorageSolutions.Mono
             IsInitialized = true;
         }
 
-        private void OnPowerUpdate(FCSPowerStates obj)
+        private void OnPowerUpdate(FCSPowerStates obj, BaseManager manager)
         {
             Mod.OnBaseUpdate?.Invoke();
         }
@@ -160,7 +160,7 @@ namespace DataStorageSolutions.Mono
 
             Manager = Manager ?? BaseManager.FindManager(SubRoot);
 
-            return Manager.BaseUnits;
+            return Manager.BaseRacks;
         }
 
         public override void OnProtoSerialize(ProtobufSerializer serializer)

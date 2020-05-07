@@ -8,6 +8,7 @@ using DataStorageSolutions.Buildables.Racks;
 using DataStorageSolutions.Buildables.Terminal;
 using DataStorageSolutions.Configuration;
 using DataStorageSolutions.Craftables;
+using DataStorageSolutions.Patches;
 using FCSCommon.Utilities;
 using FCSTechFabricator;
 using FCSTechFabricator.Components;
@@ -68,8 +69,6 @@ namespace DataStorageSolutions
                 harmony.PatchAll(Assembly.GetExecutingAssembly());
 
                 QuickLogger.Info("Finished patching");
-                //string json = JsonConvert.SerializeObject(FilterList.GetFilters(), Formatting.Indented);
-                //File.WriteAllText(@"C:\temp.json", json);
 
             }
             catch (Exception ex)

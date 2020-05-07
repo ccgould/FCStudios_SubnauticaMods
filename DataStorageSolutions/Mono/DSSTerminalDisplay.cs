@@ -45,16 +45,16 @@ namespace DataStorageSolutions.Mono
 
                 if(_currentBase == null) return;
 
-                var grouped = _currentBase.GetItemsWithin().OrderBy(x=>x.Key)?.ToList();
+                var grouped = _currentBase.GetItemsWithin().OrderBy(x=>x.Key);
 
                 if (!string.IsNullOrEmpty(_currentSearchString?.Trim()))
                 {
-                    grouped = grouped.Where(p => Language.main.Get(p.Key).StartsWith(_currentSearchString.Trim(), StringComparison.OrdinalIgnoreCase)).ToList();
+                    grouped = (IOrderedEnumerable<KeyValuePair<TechType, int>>) grouped.Where(p => Language.main.Get(p.Key).StartsWith(_currentSearchString.Trim(), StringComparison.OrdinalIgnoreCase));
                 }
                 
-                if (data.EndPosition > grouped.Count)
+                if (data.EndPosition > grouped.Count())
                 {
-                    data.EndPosition = grouped.Count;
+                    data.EndPosition = grouped.Count();
                 }
                 
                 for (int i = data.StartPosition; i < data.EndPosition; i++)
@@ -73,20 +73,20 @@ namespace DataStorageSolutions.Mono
 
                     buttonPrefab.transform.SetParent(data.ItemsGrid.transform, false);
                     var amount = buttonPrefab.GetComponentInChildren<Text>();
-                    amount.text = grouped[i].Value.ToString();
+                    amount.text = grouped.ElementAt(i).Value.ToString();
                     var itemBTN = buttonPrefab.AddComponent<InterfaceButton>();
                     itemBTN.ButtonMode = InterfaceButtonMode.Background;
                     itemBTN.STARTING_COLOR = _startColor;
                     itemBTN.HOVER_COLOR = _hoverColor;
                     itemBTN.BtnName = "ItemBTN";
-                    itemBTN.TextLineOne = string.Format(AuxPatchers.TakeFormatted(), Language.main.Get(grouped[i].Key));
-                    itemBTN.Tag = grouped[i].Key;
+                    itemBTN.TextLineOne = string.Format(AuxPatchers.TakeFormatted(), Language.main.Get(grouped.ElementAt(i).Key));
+                    itemBTN.Tag = grouped.ElementAt(i).Key;
                     itemBTN.OnButtonClick = OnButtonClick;
                 
                     uGUI_Icon trashIcon = InterfaceHelpers.FindGameObject(buttonPrefab, "Icon").AddComponent<uGUI_Icon>();
-                    trashIcon.sprite = SpriteManager.Get(grouped[i].Key);
+                    trashIcon.sprite = SpriteManager.Get(grouped.ElementAt(i).Key);
                 }
-                _baseItemsGrid.UpdaterPaginator(grouped.Count);
+                _baseItemsGrid.UpdaterPaginator(grouped.Count());
             }
             catch (Exception e)
             {
@@ -105,9 +105,7 @@ namespace DataStorageSolutions.Mono
                 _baseGrid.ClearPage();
 
                 var grouped = BaseManager.Managers;
-
-
-
+                
                 if (data.EndPosition > grouped.Count)
                 {
                     data.EndPosition = grouped.Count;
@@ -121,9 +119,8 @@ namespace DataStorageSolutions.Mono
                 {
                     for (int i = data.StartPosition; i < data.EndPosition; i++)
                     {
+                        if (grouped[i].Habitat == null || !grouped[i].Habitat.gameObject.activeSelf || grouped[i].InstanceID == _mono.Manager.InstanceID || !grouped[i].HasAntenna() || !grouped[i].IsVisible) continue;
 
-                        if (!grouped[i].Habitat.gameObject.activeSelf ||grouped[i].InstanceID == _mono.Manager.InstanceID || !grouped[i].HasAntenna() || !grouped[i].IsVisible()) continue;
-                        
                         GameObject buttonPrefab = Instantiate(data.ItemsPrefab);
 
                         if (buttonPrefab == null || data.ItemsGrid == null)
@@ -429,7 +426,7 @@ namespace DataStorageSolutions.Mono
             var poweredOffPowerBTN = InterfaceHelpers.FindGameObject(poweredOff, "PowerBTN");
 
             InterfaceHelpers.CreateButton(poweredOffPowerBTN, "PowerBTN", InterfaceButtonMode.Background,
-                OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.Rename());
+                OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.PowerButton());
             #endregion
 
             #region ColorPickerMainHomeBTN
@@ -498,7 +495,7 @@ namespace DataStorageSolutions.Mono
 
             #endregion
 
-            #region BaseNAme
+            #region BaseName
 
             _baseNameLabel = InterfaceHelpers.FindGameObject(baseItemsPage, "BaseLabel")?.GetComponent<Text>();
 

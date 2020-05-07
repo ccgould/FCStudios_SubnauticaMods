@@ -42,20 +42,17 @@ namespace DataStorageSolutions.Helpers
                     switch (data.DataObjectType)
                     {
                         case SaveDataObjectType.PlayerTool:
-                            QuickLogger.Debug("Making PlayerTool", true);
+
                             if (data.PlayToolData.HasBattery)
                             {
                                 var tempBattery = CraftData.GetPrefabForTechType(data.PlayToolData.BatteryInfo.TechType);
                                 var capacity = tempBattery?.gameObject.GetComponent<IBattery>()?.capacity;
 
-                                QuickLogger.Debug($"Checking Capacity: {capacity}", true);
                                 if (data.PlayToolData.HasBattery && capacity != null && capacity > 0)
                                 {
-                                    QuickLogger.Debug("Passed Capacity Check", true);
                                     var energyMixin = pickup.gameObject.GetComponent<EnergyMixin>();
                                     var normalizedCharge = data.PlayToolData.BatteryInfo.BatteryCharge / capacity;
                                     energyMixin.SetBattery(data.PlayToolData.BatteryInfo.TechType, (float)normalizedCharge);
-                                    QuickLogger.Debug("Setting PlayerTool Battery", true);
                                 }
                                 else
                                 {
@@ -70,7 +67,7 @@ namespace DataStorageSolutions.Helpers
 
                         case SaveDataObjectType.Server:
                             var server = pickup.gameObject.GetComponent<DSSServerController>();
-                            server.Items = new List<ObjectData>(data.ServerData);
+                            server.Items = new HashSet<ObjectData>(data.ServerData);
                             server.Initialize();
                             server.DisplayManager.UpdateDisplay();
                             break;
@@ -89,27 +86,16 @@ namespace DataStorageSolutions.Helpers
                     var data = (List<ObjectData>)itemData.data;
                     var controller = pickup.gameObject.GetComponent<DSSServerController>();
                     controller.Initialize();
-                    controller.Items = new List<ObjectData>(data);
-                    controller.Filters= new List<Filter>(itemData.Filters);
+                    controller.Items = new HashSet<ObjectData>(data);
+                    controller.Filters = new List<Filter>(itemData.Filters);
                     controller.DisplayManager.UpdateDisplay();
                     isSuccessful = true;
                 }
+
                 Inventory.main.Pickup(pickup);
             }
             Mod.OnBaseUpdate?.Invoke();
             return isSuccessful;
-        }
-
-        public static  SubRoot GetBaseFromPlayer()
-        {
-            var result = Player.main?.currentSub;
-
-            if (result == null)
-            {
-                QuickLogger.Error("Couldn't get the SubRoot from player");
-            }
-
-            return result;
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using DataStorageSolutions.Abstract;
+using DataStorageSolutions.Model;
 using FCSCommon.Enums;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -33,7 +34,7 @@ namespace DataStorageSolutions.Mono
                 _powerState = value;
                 if (_prevPowerState != value)
                 {
-                    OnPowerUpdate?.Invoke(value);
+                    OnPowerUpdate?.Invoke(value,_mono.Manager);
                     _prevPowerState = value;
                 }
             }
@@ -44,7 +45,7 @@ namespace DataStorageSolutions.Mono
 
         #region Internal Properties
 
-        internal Action<FCSPowerStates> OnPowerUpdate;
+        internal Action<FCSPowerStates,BaseManager> OnPowerUpdate;
         private bool _isInitailized;
 
         #endregion

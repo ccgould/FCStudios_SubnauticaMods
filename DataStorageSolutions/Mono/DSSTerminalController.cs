@@ -35,11 +35,10 @@ namespace DataStorageSolutions.Mono
             set
             {
                 _manager = value; 
+
+                if (value == null || PowerManager == null) return;
                 //Because the way the Terminal is lazy loaded. I choose to lazy load the power manager based on the manager setter
-                if (value != null)
-                {
-                    PowerManager?.Initialize(this, QPatch.Configuration.Config.ScreenPowerUsage);
-                }
+                PowerManager.Initialize(this, QPatch.Configuration.Config.ScreenPowerUsage);
             }
         }
 
@@ -80,6 +79,11 @@ namespace DataStorageSolutions.Mono
             }
         }
         
+        private void OnDestroy()
+        {
+            Manager?.RemoveTerminal(this);
+        }
+
         private TechType GetTechType()
         {
             if (_techType != TechType.None) return _techType;
@@ -99,7 +103,7 @@ namespace DataStorageSolutions.Mono
             }
         }
 
-        private void OnPowerUpdate(FCSPowerStates obj)
+        private void OnPowerUpdate(FCSPowerStates obj, BaseManager manager)
         {
             switch (obj)
             {
@@ -161,8 +165,6 @@ namespace DataStorageSolutions.Mono
         
         public override void Initialize()
         {
-            GetData();
-
             if (PowerManager == null)
             {
                 PowerManager = new PowerManager();
@@ -180,12 +182,14 @@ namespace DataStorageSolutions.Mono
                 AnimationManager = gameObject.AddComponent<AnimationManager>();
             }
 
+            GetData();
+
             if (DisplayManager == null)
             {
                 DisplayManager = gameObject.AddComponent<DSSTerminalDisplay>();
                 DisplayManager.Setup(this);
             }
-            
+
             Mod.OnAntennaBuilt += OnAntennaBuilt;
             Mod.OnBaseUpdate += OnBaseUpdate;
         }
@@ -203,12 +207,9 @@ namespace DataStorageSolutions.Mono
                 if (!_isContructed ) return null;
                 
                 Manager = Manager ?? BaseManager.FindManager(SubRoot);
-
-                return Manager.BaseUnits;
+                Manager.AddTerminal(this);
+                return Manager.BaseRacks;
             }
-
-            QuickLogger.Error("SubRoot not found");
-            
             return null;
         }
 

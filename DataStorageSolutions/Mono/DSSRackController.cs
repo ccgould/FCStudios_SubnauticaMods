@@ -34,6 +34,7 @@ namespace DataStorageSolutions.Mono
         private int _buttonState;
         private GameObject _drives;
         private DSSAudioHandler _audioManager;
+        private BaseManager _manager;
         private const int RackDoorStateClosed = 0;
         private const int RackDoorStateOpen = 1;
 
@@ -41,7 +42,24 @@ namespace DataStorageSolutions.Mono
         public bool IsFull => GetIsFull();
         public bool IsRackSlotsFull => GetIsRackFull();
         public override bool IsConstructed => _isConstructed;
-        public override BaseManager Manager { get; set; }
+        internal Action OnUpdate;
+
+
+        public override BaseManager Manager
+        {
+            get => _manager;
+            set
+            {
+                _manager = value;
+                //Because the way the Terminal is lazy loaded. I choose to lazy load the power manager based on the manager setter
+                if (value != null)
+                {
+                    PowerManager?.Initialize(this, QPatch.Configuration.Config.ScreenPowerUsage);
+                }
+
+            }
+        }
+
         public TechType TechType => GetTechType();
         internal AnimationManager AnimationManager { get; private set; }
         internal DSSRackDisplayController DisplayManager { get; private set; }
@@ -81,11 +99,12 @@ namespace DataStorageSolutions.Mono
         
         private void OnDestroy()
         {
-            BaseManager.RemoveUnit(this);
+            BaseManager.RemoveRack(this);
         }
 
         private void Update()
         {
+            OnUpdate?.Invoke();
             if (IsConstructed && PowerManager != null)
             {
                 PowerManager?.UpdatePowerState();
@@ -169,7 +188,7 @@ namespace DataStorageSolutions.Mono
             return true;
         }
 
-        private bool AddServerToSlot(List<ObjectData> server,List<Filter> filters, int slotID)
+        private bool AddServerToSlot(HashSet<ObjectData> server,List<Filter> filters, int slotID)
         {
             var slotByID = this.GetSlotByID(slotID);
 
@@ -188,7 +207,7 @@ namespace DataStorageSolutions.Mono
             QuickLogger.Debug($"Current ID Occupied Stat = {slotByID.IsOccupied}");
             QuickLogger.Debug($"Data Count = {server.Count}");
 
-            slotByID.Server = new List<ObjectData>(server);
+            slotByID.Server = new HashSet<ObjectData>(server);
             if (filters != null)
             {
                 slotByID.Filter = new List<Filter>(FilterList.GetNewVersion(filters));
@@ -274,7 +293,7 @@ namespace DataStorageSolutions.Mono
             return _servers?.FirstOrDefault(x => !x.IsFull() && x.IsAllowedToAdd(techType) && x.IsOccupied);
         }
 
-        internal bool AddServer(List<ObjectData> server,List<Filter> filters)
+        internal bool AddServer(HashSet<ObjectData> server,List<Filter> filters)
         {
             if (server == null)
             {
@@ -332,7 +351,8 @@ namespace DataStorageSolutions.Mono
             }
 
             Manager = managers ?? BaseManager.FindManager(SubRoot);
-            Manager.AddUnit(this);
+            
+            Manager.AddRack(this);
         }
 
         public string GetPrefabIDString()
@@ -347,8 +367,6 @@ namespace DataStorageSolutions.Mono
 
         public override void Initialize()
         {
-            AddToBaseManager();
-
             FindSlots();
 
             _audioManager = new DSSAudioHandler(transform);
@@ -363,7 +381,6 @@ namespace DataStorageSolutions.Mono
             if (PowerManager == null)
             {
                 PowerManager = new PowerManager();
-                PowerManager.Initialize(this, QPatch.Configuration.Config.RackPowerUsage);
                 PowerManager.OnPowerUpdate += OnPowerUpdate;
             }
 
@@ -389,11 +406,13 @@ namespace DataStorageSolutions.Mono
                 DumpContainer = gameObject.AddComponent<DumpContainer>();
                 DumpContainer.Initialize(transform, AuxPatchers.DriveReceptacle(), AuxPatchers.NotAllowed(), AuxPatchers.RackFull(), this, 1, 1);
             }
+
+            AddToBaseManager();
         }
         
-        private void OnPowerUpdate(FCSPowerStates obj)
+        private void OnPowerUpdate(FCSPowerStates state,BaseManager manager)
         {
-            switch (obj)
+            switch (state)
             {
                 case FCSPowerStates.Powered:
                     DisplayManager.PowerOnDisplay();
@@ -501,7 +520,6 @@ namespace DataStorageSolutions.Mono
             {
                 if (rackSlot == null || rackSlot.Server == null)
                 {
-                    QuickLogger.Debug("Server is null", true);
                     continue;
                 }
 
@@ -521,7 +539,6 @@ namespace DataStorageSolutions.Mono
             {
                 if (rackSlot == null || rackSlot.Server == null)
                 {
-                    QuickLogger.Debug("Server is null", true);
                     continue;
                 }
 
@@ -536,12 +553,13 @@ namespace DataStorageSolutions.Mono
         
         private RackSlot GetServerWithObjectData(ObjectData data)
         {
-            foreach (RackSlot rackSlot in _servers)
+            for (int i = 0; i < _servers.Length; i++)
             {
-                if (rackSlot.Server == null) continue;
-                foreach (var objectData in rackSlot.Server)
+                if (_servers[i].Server == null) continue;
+
+                for (int j = 0; j < _servers[i].Server.Count; j++)
                 {
-                    if (objectData == data) return rackSlot;
+                    if (_servers[i].Server.ElementAt(j) == data) return _servers[i];
                 }
             }
 
@@ -716,7 +734,6 @@ namespace DataStorageSolutions.Mono
             {
                 if (rackSlot?.Server == null)
                 {
-                    QuickLogger.Debug("Server is null", true);
                     continue;
                 }
 

@@ -24,7 +24,7 @@ namespace DataStorageSolutions.Mono
         private bool _fromSave;
         private SaveDataEntry _savedData;
         private int _slotState;
-        private List<ObjectData> _items;
+        private HashSet<ObjectData> _items;
         private DSSServerController _controller;
         private List<Filter> _filters = new List<Filter>();
         public override BaseManager Manager { get; set; }
@@ -195,7 +195,7 @@ namespace DataStorageSolutions.Mono
             if (_controller != null)
             {
                 if(_controller.Items != null)
-                    _items = new List<ObjectData>(_controller.Items);
+                    _items = new HashSet<ObjectData>(_controller.Items);
                 if (_controller.Filters != null)
                     _filters = new List<Filter>(_controller.Filters);
             }

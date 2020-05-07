@@ -23,7 +23,7 @@ namespace DataStorageSolutions.Mono
         private bool _runStartUpOnEnable = true;
         private bool _fromSave;
         private SaveDataEntry _savedData;
-        private List<ObjectData> _items = new List<ObjectData>();
+        private HashSet<ObjectData> _items = new HashSet<ObjectData>();
         private List<Filter> _filters;
         private ServerData _data;
 
@@ -31,7 +31,7 @@ namespace DataStorageSolutions.Mono
         [JsonIgnore] internal int StorageLimit => QPatch.Configuration.Config.ServerStorageLimit;
         [JsonIgnore] public int GetContainerFreeSpace => GetFreeSpace();
         [JsonIgnore] public bool IsFull => CheckIfFull();
-        [JsonProperty] internal List<ObjectData> Items
+        [JsonProperty] internal HashSet<ObjectData> Items
         {
             get => _items;
             set

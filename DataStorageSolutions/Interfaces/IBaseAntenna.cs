@@ -9,7 +9,7 @@ namespace DataStorageSolutions.Interfaces
     {
         ColorManager ColorManager { get; set; }
         BaseManager Manager { get; set; }
-        bool IsVisible();
         void ChangeColorMask(Color color);
+        bool IsVisible();
     }
 }
