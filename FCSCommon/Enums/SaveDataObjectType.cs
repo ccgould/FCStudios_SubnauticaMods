@@ -10,6 +10,7 @@ namespace FCSCommon.Enums
         Egg,
         PlayerTool,
         Eatable,
-        Server
+        Server,
+        Battery
     }
 }

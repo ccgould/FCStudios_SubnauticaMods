@@ -5,14 +5,14 @@ using DataStorageSolutions.Buildables;
 using DataStorageSolutions.Helpers;
 using DataStorageSolutions.Model;
 using FCSCommon.Utilities;
+using FMOD;
+using SMLHelper.V2.Utility;
 using UnityEngine;
 
 namespace DataStorageSolutions.Mono
 {
     internal class DSSVehicleDockingManager
     {
-        internal List<VehicleDockingBay> DockingBays { get; set; } = new List<VehicleDockingBay>();
-        internal List<Vehicle> Vehicles { get; }= new List<Vehicle>();
         private bool _extractingItems;
         private SubRoot _mono;
         private bool _isToggled;
@@ -20,6 +20,12 @@ namespace DataStorageSolutions.Mono
         private BaseManager _manager;
         private int _prevAmount;
         private List<Vehicle> _vehiclesSnapshot;
+        private Dictionary<int, int> Subscibers = new Dictionary<int, int>();
+        private List<ItemsContainer> _trackedContainers = new List<ItemsContainer>();
+        private int _prevContainerAmount;
+
+        internal List<VehicleDockingBay> DockingBays { get; set; } = new List<VehicleDockingBay>();
+        internal List<Vehicle> Vehicles { get; }= new List<Vehicle>();
 
         private IEnumerator StartCheck()
         {
@@ -30,10 +36,11 @@ namespace DataStorageSolutions.Mono
                     GetDockingBays();
                     yield return TryExtractItems();
                 }
+                
                 yield return new WaitForSeconds(QPatch.Configuration.Config.CheckVehiclesInterval);
             }
         }
-
+        
         private IEnumerator TryExtractItems()
         {
             if(!_isToggled) yield break;
@@ -55,7 +62,7 @@ namespace DataStorageSolutions.Mono
             {
                 var vehicleName = vehicle.GetName();
                 extractionResults[vehicleName] = 0;
-                var vehicleContainers = GetVehicleContainers(vehicle);
+                var vehicleContainers = DSSHelpers.GetVehicleContainers(vehicle);
                 bool couldNotAdd = false;
                 foreach (var vehicleContainer in vehicleContainers)
                 {
@@ -139,14 +146,16 @@ namespace DataStorageSolutions.Mono
             var list3 = _vehiclesSnapshot.Except(Vehicles);
             foreach (Vehicle vehicle in list3)
             {
-                var vehicleContainers = GetVehicleContainers(vehicle);
-                UpdateSubscription(vehicleContainers, false);
+                var vehicleContainers = DSSHelpers.GetVehicleContainers(vehicle);
+                UpdateSubscription(vehicleContainers, false,vehicle);
             }
             _manager.OnVehicleUpdate?.Invoke(Vehicles,_manager);
         }
 
         private void UpdateDockedVehicles()
         {
+
+
             _prevAmount = DockingBays.Count;
             _vehiclesSnapshot = new List<Vehicle>(Vehicles);
             Vehicles.Clear();
@@ -155,46 +164,60 @@ namespace DataStorageSolutions.Mono
                 var vehicle = dockingBay.GetDockedVehicle();
                 if (vehicle != null)
                 {
-                    var vehicleContainers = GetVehicleContainers(vehicle);
+                    vehicle.modules.onRemoveItem += ModulesOnOnRemoveItem;
+                    var vehicleContainers = DSSHelpers.GetVehicleContainers(vehicle);
+                    _trackedContainers.AddRange(vehicleContainers);
                     Vehicles.Add(vehicle);
-                    UpdateSubscription(vehicleContainers, true);
+                    UpdateSubscription(vehicleContainers, true,vehicle);
                 }
             }
+
+            if (_prevContainerAmount != _trackedContainers.Count)
+            {
+                _manager.OnContainerUpdate?.Invoke(_manager);
+            }
+
+            _prevContainerAmount = _trackedContainers.Count;
+            _trackedContainers.Clear();
         }
 
-        private void UpdateSubscription(List<ItemsContainer> vehicleContainers, bool subscribing)
+        private void ModulesOnOnRemoveItem(InventoryItem item)
+        {
+            _manager.OnContainerUpdate?.Invoke(_manager);
+        }
+
+        private void UpdateSubscription(List<ItemsContainer> vehicleContainers, bool subscribing,Vehicle v)
         {
             foreach (ItemsContainer container in vehicleContainers)
             {
                 if (subscribing)
                 {
-                    container.onAddItem += ContainerOnOnAddItem;
-                    container.onRemoveItem += ContainerOnOnRemoveItem;
+                    if (!Subscibers.ContainsKey(container.tr.GetInstanceID()))
+                    {
+                        QuickLogger.Debug($"Subscribing vehicle {v.GetName()} {container.tr.GetInstanceID()}",true);
+                        container.onAddItem += ContainerOnOnAddItem;
+                        container.onRemoveItem += ContainerOnOnRemoveItem;
+                        Subscibers.Add(container.tr.GetInstanceID(), v.GetInstanceID());
+                    }
                 }
                 else
                 {
+                    QuickLogger.Debug($"Un-Subscribing vehicle {v.GetName()} {container.tr.GetInstanceID()}",true);
                     container.onAddItem -= ContainerOnOnAddItem;
                     container.onRemoveItem -= ContainerOnOnRemoveItem;
+                    Subscibers.Clear();
                 }
             }
         }
-
-        internal static List<ItemsContainer> GetVehicleContainers(Vehicle vehicle)
-        {
-            var vehicleContainers = vehicle.gameObject.GetComponentsInChildren<StorageContainer>().Select((x) => x.container)
-                .ToList();
-            vehicleContainers.AddRange(DSSHelpers.GetSeamothStorage(vehicle));
-            return vehicleContainers;
-        }
-
+        
         private void ContainerOnOnRemoveItem(InventoryItem item)
         {
-            _manager.OnVehicleStorageUpdate?.Invoke();
+            _manager.OnVehicleStorageUpdate?.Invoke(_manager);
         }
 
         private void ContainerOnOnAddItem(InventoryItem item)
         {
-            _manager.OnVehicleStorageUpdate?.Invoke();
+            _manager.OnVehicleStorageUpdate?.Invoke(_manager);
         }
 
         internal void Initialize(SubRoot mono, BaseManager manager)
@@ -233,6 +256,52 @@ namespace DataStorageSolutions.Mono
             }
 
             return value;
+        }
+
+        internal ItemsContainer AddItem(Vehicle vehicle, InventoryItem item)
+        {
+            var containers = DSSHelpers.GetVehicleContainers(vehicle);
+            foreach (ItemsContainer container in containers)
+            {
+                if (container.HasRoomFor(item.width, item.height))
+                {
+                    return container;
+                }
+            }
+
+            return null;
+        }
+
+        public bool IsAllowedToAdd(Vehicle vehicle, Pickupable pickupable)
+        {
+            var containers = DSSHelpers.GetVehicleContainers(vehicle);
+            foreach (ItemsContainer container in containers)
+            {
+                if (container.HasRoomFor(pickupable))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public void OpenContainer(Vehicle vehicle,ItemsContainer container)
+        {
+            var containers = DSSHelpers.GetVehicleContainers(vehicle);
+            foreach (ItemsContainer currentContainer in containers)
+            {
+                if(container != currentContainer) continue;
+
+                if (!currentContainer.IsFull())
+                {
+                    Player main = Player.main;
+                    PDA pda = main.GetPDA();
+                    Inventory.main.SetUsedStorage(container, false);
+                    pda.Open(PDATab.Inventory, null, null, 4f);
+                }
+                break;
+            }
         }
     }
 }

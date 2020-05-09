@@ -19,7 +19,6 @@ namespace FCSCommon.Components
         internal bool Disabled { get; set; }
         internal float MaxInteractionRange { get; set; }  = 2.5f;
 
-
         public virtual void OnDisable()
         {
             this.IsHovered = false;

@@ -38,7 +38,6 @@ namespace FCSCommon.Components
         #endregion
 
         #region Public Methods
-
         public void OnEnable()
         {
             if(_isSelected) return;

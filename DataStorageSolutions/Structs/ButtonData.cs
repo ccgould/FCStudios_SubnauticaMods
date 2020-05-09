@@ -10,6 +10,7 @@ namespace DataStorageSolutions.Structs
     {
         internal BaseManager Manager { get; set; }
         internal Vehicle Vehicle { get; set; }
+        internal ItemsContainer Container { get; set; }
         internal TechType TechType { get; set; }
         internal int Amount { get; set; }
     }

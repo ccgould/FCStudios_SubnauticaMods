@@ -34,7 +34,7 @@ namespace FCSCommon.Helpers
 
                         if (((Texture2D)objects[i]).name.Equals(textureName, StringComparison.OrdinalIgnoreCase))
                         {
-                            QuickLogger.Debug($"Found Texture: {textureName}");
+                            //QuickLogger.Debug($"Found Texture: {textureName}");
                             return ((Texture2D)objects[i]);
                         }
                     }

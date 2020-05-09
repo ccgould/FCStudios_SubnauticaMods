@@ -62,6 +62,7 @@ namespace DataStorageSolutions.Buildables
             { $"{ModKey}_DockedVehicles","View docked vehicles."},
             { $"{ModKey}_VehicleFormat","Vehicle: {0}"},
             { $"{ModKey}_ViewStorageBFormat","View {0} server data."},
+            { $"{ModKey}_VehicleDumpContainer","Add items to this vehicle"},
         };
 
         internal static void AdditionalPatching()
@@ -327,6 +328,11 @@ namespace DataStorageSolutions.Buildables
         public static string ViewBaseStorageFormat()
         {
             return Language.main.Get(LanguageDictionary.Keys.ElementAt(48));
+        }
+
+        public static string VehicleDumpReceptacle()
+        {
+            return Language.main.Get(LanguageDictionary.Keys.ElementAt(49));
         }
     }
 }

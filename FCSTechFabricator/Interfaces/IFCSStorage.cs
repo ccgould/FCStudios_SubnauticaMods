@@ -9,7 +9,7 @@ namespace FCSTechFabricator.Interfaces
     {
        int GetContainerFreeSpace { get; }
        bool IsFull { get;}
-       bool CanBeStored(int amount);
+       bool CanBeStored(int amount,TechType techType);
        bool AddItemToContainer(InventoryItem item);
        bool IsAllowedToAdd(Pickupable pickupable, bool verbose);
     }

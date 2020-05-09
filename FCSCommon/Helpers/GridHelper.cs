@@ -31,7 +31,7 @@ namespace FCSCommon.Helpers
             DrawPage(1);
         }
 
-        internal void Setup(int itemsPerPage, GameObject itemPrefab, GameObject gridPage, Color startColor, Color hoverColor, Action<string, object> onButtonClick, int maxInteractionRange = 5, string prevBtnNAme = "PrevBTN", string nextBtnName = "NextBTN", string gridName = "Grid", string paginatorName = "Paginator", string homeBtnName = "HomeBTN")
+        internal void Setup(int itemsPerPage, GameObject itemPrefab, GameObject gridPage, Color startColor, Color hoverColor, Action<string, object> onButtonClick, int maxInteractionRange = 5, string prevBtnNAme = "PrevBTN", string nextBtnName = "NextBTN", string gridName = "Grid", string paginatorName = "Paginator", string homeBtnName = "HomeBTN", string customHomeBTN = "")
         {
             _itemPrefab = itemPrefab;
 
@@ -58,7 +58,7 @@ namespace FCSCommon.Helpers
             if(homeBtnName != string.Empty)
             {
                 var homeBTN = InterfaceHelpers.FindGameObject(gridPage, homeBtnName);
-                InterfaceHelpers.CreateButton(homeBTN, homeBtnName, InterfaceButtonMode.Background,
+                InterfaceHelpers.CreateButton(homeBTN, string.IsNullOrEmpty(customHomeBTN) ? homeBtnName : customHomeBTN, InterfaceButtonMode.Background,
                     onButtonClick, startColor, hoverColor, maxInteractionRange, HomeButtonMessage);
             }
             #endregion

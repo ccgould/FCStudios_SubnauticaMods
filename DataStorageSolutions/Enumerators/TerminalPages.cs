@@ -13,5 +13,6 @@
         Tripped = 8,
         VehiclesPage = 9,
         VehiclesItemsPage = 10,
+        StorageContainer = 11
     }
 }

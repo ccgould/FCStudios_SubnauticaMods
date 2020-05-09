@@ -25,7 +25,6 @@ namespace DataStorageSolutions.Model
         internal string InstanceID { get; }
         internal readonly HashSet<DSSRackController> BaseRacks = new HashSet<DSSRackController>();
         internal readonly HashSet<DSSTerminalController> BaseTerminals = new HashSet<DSSTerminalController>();
-
         internal bool IsVisible
         {
             get
@@ -42,6 +41,7 @@ namespace DataStorageSolutions.Model
         internal FCSPowerStates PrevPowerState { get; set; }
         internal SubRoot Habitat { get; }
         internal DumpContainer DumpContainer { get; private set; }
+        public DumpContainer VehicleDumpContainer { get; set; }
         public int GetContainerFreeSpace { get; }
         public bool IsFull { get; }
         public NameController NameController { get; private set; }
@@ -50,8 +50,9 @@ namespace DataStorageSolutions.Model
 
         public bool IsOperational => !_hasBreakerTripped || BaseHasPower();
         public static Action OnPlayerTick { get; set; }
-        public Action OnVehicleStorageUpdate { get; set; }
+        public Action<BaseManager> OnVehicleStorageUpdate { get; set; }
         public Action<List<Vehicle>,BaseManager> OnVehicleUpdate { get; set; }
+        public Action<BaseManager> OnContainerUpdate { get; set; }
 
         //I was about to check the subscription on the vehicles
 
@@ -77,10 +78,19 @@ namespace DataStorageSolutions.Model
 
             if (DumpContainer == null)
             {
-                DumpContainer = new DumpContainer();
+                DumpContainer = habitat.gameObject.AddComponent<DumpContainer>();
                 DumpContainer.Initialize(habitat.transform, AuxPatchers.BaseDumpReceptacle(), AuxPatchers.NotAllowed(),
                     AuxPatchers.CannotBeStored(), this, 4, 4);
             }
+
+            //if (VehicleDumpContainer == null)
+            //{
+            //    VehicleDumpContainerController = new VehicleDumpContainer();
+            //    VehicleDumpContainerController.Initialize(this);
+            //    VehicleDumpContainer = habitat.gameObject.AddComponent<DumpContainer>();
+            //    VehicleDumpContainer.Initialize(habitat.transform, AuxPatchers.VehicleDumpReceptacle(), AuxPatchers.NotAllowed(),
+            //        AuxPatchers.CannotBeStored(), VehicleDumpContainerController, 4, 4);
+            //}
 
             if (DockingManager == null)
             {
@@ -88,6 +98,8 @@ namespace DataStorageSolutions.Model
                 DockingManager.Initialize(habitat,this);
             }
         }
+
+
 
         private void ReadySaveData()
         {
@@ -333,7 +345,7 @@ namespace DataStorageSolutions.Model
 
         public void OpenDump(TransferData data)
         {
-           DumpContainer.OpenStorage();
+            DumpContainer.OpenStorage();
         }
 
         public IBaseAntenna GetCurrentBaseAntenna(bool ignoreVisible = false)

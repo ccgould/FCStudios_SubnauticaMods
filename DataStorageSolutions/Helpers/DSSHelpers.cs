@@ -60,14 +60,14 @@ namespace DataStorageSolutions.Helpers
         {
             var energyMixin = item.item.GetComponentInChildren<EnergyMixin>();
 
-            var playerToolData = new PlayerToolData {TechType = item.item.GetTechType()};
+            var playerToolData = new PlayerToolData { TechType = item.item.GetTechType() };
 
             if (energyMixin == null) return playerToolData;
 
             var batteryGo = energyMixin.GetBattery().gameObject;
             var techType = batteryGo.GetComponentInChildren<TechTag>().type;
             var iBattery = batteryGo.GetComponentInChildren<Battery>();
-            playerToolData.BatteryInfo = new BatteryInfo(techType, iBattery, string.Empty);
+            playerToolData.BatteryInfo = new BatteryInfo(techType, iBattery, String.Empty);
 
             return playerToolData;
         }
@@ -76,10 +76,10 @@ namespace DataStorageSolutions.Helpers
         {
             var batteryGo = item.item.GetComponentInChildren<Battery>();
 
-            var playerToolData = new PlayerToolData {TechType = item.item.GetTechType()};
+            var playerToolData = new PlayerToolData { TechType = item.item.GetTechType() };
             var techType = batteryGo.GetComponent<TechTag>().type;
             var iBattery = batteryGo.GetComponent<IBattery>();
-            playerToolData.BatteryInfo = new BatteryInfo(techType, iBattery, string.Empty);
+            playerToolData.BatteryInfo = new BatteryInfo(techType, iBattery, String.Empty);
 
             return playerToolData;
         }
@@ -205,7 +205,7 @@ namespace DataStorageSolutions.Helpers
                                     if (Inventory.main.Pickup(item.item))
                                     {
                                         CrafterLogic.NotifyCraftEnd(Player.main.gameObject, item.item.GetTechType());
-                                        
+
                                         goto _end;
                                     }
                                 }
@@ -213,7 +213,7 @@ namespace DataStorageSolutions.Helpers
                         }
                     }
 
-                    _end:
+                _end:
                     isSuccessful = true;
                 }
             }
@@ -221,80 +221,92 @@ namespace DataStorageSolutions.Helpers
             Mod.OnBaseUpdate?.Invoke();
             return isSuccessful;
         }
-        
+
         internal static ObjectData MakeObjectData(InventoryItem item, int slot)
+        {
+            var go = item.item.gameObject;
+
+            var objectType = FindSaveDataObjectType(go);
+
+            ObjectData result;
+
+            switch (objectType)
             {
-                var go = item.item.gameObject;
-
-                var objectType = FindSaveDataObjectType(go);
-
-                ObjectData result;
-
-                switch (objectType)
-                {
-                    case SaveDataObjectType.Item:
-                        result = new ObjectData {DataObjectType = objectType, TechType = item.item.GetTechType()};
-                        break;
-                    case SaveDataObjectType.PlayerTool:
-                        result = new ObjectData
-                        {
-                            DataObjectType = objectType, TechType = item.item.GetTechType(),
-                            PlayToolData = GetPlayerToolData(item)
-                        };
-                        break;
-                    case SaveDataObjectType.Eatable:
-                        result = new ObjectData
-                        {
-                            DataObjectType = objectType, TechType = item.item.GetTechType(),
-                            EatableEntity = GetEatableData(item)
-                        };
-                        break;
-                    case SaveDataObjectType.Server:
-                        result = new ObjectData
-                        {
-                            DataObjectType = objectType, TechType = item.item.GetTechType(),
-                            ServerData = GetServerData(item)
-                        };
-                        break;
-                    case SaveDataObjectType.Battery:
-                        result = new ObjectData
-                        {
-                            DataObjectType = objectType, TechType = item.item.GetTechType(),
-                            PlayToolData = GetBatteryData(item)
-                        };
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-
-                return result;
+                case SaveDataObjectType.Item:
+                    result = new ObjectData { DataObjectType = objectType, TechType = item.item.GetTechType() };
+                    break;
+                case SaveDataObjectType.PlayerTool:
+                    result = new ObjectData
+                    {
+                        DataObjectType = objectType,
+                        TechType = item.item.GetTechType(),
+                        PlayToolData = GetPlayerToolData(item)
+                    };
+                    break;
+                case SaveDataObjectType.Eatable:
+                    result = new ObjectData
+                    {
+                        DataObjectType = objectType,
+                        TechType = item.item.GetTechType(),
+                        EatableEntity = GetEatableData(item)
+                    };
+                    break;
+                case SaveDataObjectType.Server:
+                    result = new ObjectData
+                    {
+                        DataObjectType = objectType,
+                        TechType = item.item.GetTechType(),
+                        ServerData = GetServerData(item)
+                    };
+                    break;
+                case SaveDataObjectType.Battery:
+                    result = new ObjectData
+                    {
+                        DataObjectType = objectType,
+                        TechType = item.item.GetTechType(),
+                        PlayToolData = GetBatteryData(item)
+                    };
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
 
-            internal static List<ItemsContainer> GetSeamothStorage(Vehicle seamoth)
-            {
-                var results = new List<ItemsContainer>();
-                if (seamoth is SeaMoth && seamoth.modules != null)
-                {
-                    using (var e = seamoth.modules.GetEquipment())
-                    {
-                        while (e.MoveNext())
-                        {
-                            var module = e.Current.Value;
-                            if (module == null || module.item == null)
-                            {
-                                continue;
-                            }
+            return result;
+        }
 
-                            var container = module.item.GetComponent<SeamothStorageContainer>();
-                            if (container != null && !container.gameObject.name.Contains("Torpedo"))
-                            {
-                                results.Add(container.container);
-                            }
+        internal static List<ItemsContainer> GetSeamothStorage(Vehicle seamoth)
+        {
+            var results = new List<ItemsContainer>();
+            if (seamoth is SeaMoth && seamoth.modules != null)
+            {
+                using (var e = seamoth.modules.GetEquipment())
+                {
+                    while (e.MoveNext())
+                    {
+                        var module = e.Current.Value;
+                        if (module == null || module.item == null)
+                        {
+                            continue;
+                        }
+
+                        var container = module.item.GetComponent<SeamothStorageContainer>();
+                        if (container != null && !container.gameObject.name.Contains("Torpedo"))
+                        {
+                            results.Add(container.container);
                         }
                     }
                 }
-
-                return results;
             }
+
+            return results;
+        }
+
+        internal static List<ItemsContainer> GetVehicleContainers(Vehicle vehicle)
+        {
+            var vehicleContainers = vehicle?.gameObject.GetComponentsInChildren<StorageContainer>().Select((x) => x?.container)
+                .ToList();
+            vehicleContainers?.AddRange(GetSeamothStorage(vehicle));
+            return vehicleContainers;
         }
     }
+}

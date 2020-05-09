@@ -38,9 +38,9 @@ namespace FCSTechFabricator.Components
             return _prefabId?.Id;
         }
         
-        public bool CanBeStored(int amount)
+        public bool CanBeStored(int amount, TechType techType = TechType.None)
         {
-            return _storage.CanBeStored(amount);
+            return _storage.CanBeStored(amount,techType);
         }
 
         public virtual bool AddItemToContainer(InventoryItem item, out string reason)

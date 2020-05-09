@@ -192,7 +192,7 @@ namespace FCSTechFabricator.Components
         }
 
         public int GetContainerFreeSpace => _itemLimit - NumberOfItems;
-        public bool CanBeStored(int amount)
+        public bool CanBeStored(int amount, TechType techType = TechType.None)
         {
             return amount < GetContainerFreeSpace;
         }

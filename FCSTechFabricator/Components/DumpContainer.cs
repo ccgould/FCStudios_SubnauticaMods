@@ -51,8 +51,15 @@ namespace FCSTechFabricator.Components
         {
             Player main = Player.main;
             PDA pda = main.GetPDA();
-            Inventory.main.SetUsedStorage(_dumpContainer, false);
-            pda.Open(PDATab.Inventory, null, OnDumpClose, 4f);
+            if (_dumpContainer != null && pda != null)
+            {
+                Inventory.main.SetUsedStorage(_dumpContainer, false);
+                pda.Open(PDATab.Inventory, null, OnDumpClose, 4f);
+            }
+            else
+            {
+                QuickLogger.Error($"Failed to open the pda values: PDA = {pda} || Dump Container: {_dumpContainer}");
+            }
         }
 
         internal virtual void OnDumpClose(PDA pda)

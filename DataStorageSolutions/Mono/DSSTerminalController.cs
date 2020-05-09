@@ -209,9 +209,18 @@ namespace DataStorageSolutions.Mono
                 Manager.AddTerminal(this);
                 Manager.OnVehicleStorageUpdate += OnVehicleStorageUpdate;
                 Manager.OnVehicleUpdate += OnVehicleUpdate;
+                Manager.OnContainerUpdate += OnContainerUpdate;
                 return Manager.BaseRacks;
             }
             return null;
+        }
+
+        private void OnContainerUpdate(BaseManager manager)
+        {
+            if (manager == Manager)
+            {
+                DisplayManager.RefreshVehicleItems();
+            }
         }
 
         private void OnVehicleUpdate(List<Vehicle> vehicles, BaseManager baseManager)
@@ -222,9 +231,12 @@ namespace DataStorageSolutions.Mono
             }
         }
 
-        private void OnVehicleStorageUpdate()
+        private void OnVehicleStorageUpdate(BaseManager manager)
         {
-            DisplayManager.RefreshVehicleItems();
+            if (manager == Manager)
+            {
+                DisplayManager.RefreshVehicleItems();
+            }
         }
 
         public override void OnProtoSerialize(ProtobufSerializer serializer)

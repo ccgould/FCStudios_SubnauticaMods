@@ -6,6 +6,7 @@
         Item,
         Vehicle,
         Base,
+        Container,
         None
     }
 }

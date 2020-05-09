@@ -9,6 +9,7 @@ namespace DataStorageSolutions.Display
         float _timeLeft = 2.0f;
         public Vehicle Vehicle { get; set; }
         public Text Label { get; set; }
+
         private new void Update()
         {
             if (Vehicle == null || Label == null) return;

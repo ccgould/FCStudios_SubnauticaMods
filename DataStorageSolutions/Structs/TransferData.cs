@@ -9,5 +9,7 @@ namespace DataStorageSolutions.Structs
         public ButtonType ButtonType { get; set; }
         public BaseManager Manager { get; set; }
         public Vehicle Vehicle { get; set; }
+        public ItemsContainer Container { get; set; }
+
     }
 }
