@@ -60,7 +60,7 @@ namespace DataStorageSolutions.Helpers
         {
             var energyMixin = item.item.GetComponentInChildren<EnergyMixin>();
 
-            var playerToolData = new PlayerToolData { TechType = item.item.GetTechType() };
+            var playerToolData = new PlayerToolData {TechType = item.item.GetTechType()};
 
             if (energyMixin == null) return playerToolData;
 
@@ -76,15 +76,16 @@ namespace DataStorageSolutions.Helpers
         {
             var batteryGo = item.item.GetComponentInChildren<Battery>();
 
-            var playerToolData = new PlayerToolData { TechType = item.item.GetTechType() };
+            var playerToolData = new PlayerToolData {TechType = item.item.GetTechType()};
             var techType = batteryGo.GetComponent<TechTag>().type;
             var iBattery = batteryGo.GetComponent<IBattery>();
             playerToolData.BatteryInfo = new BatteryInfo(techType, iBattery, string.Empty);
 
             return playerToolData;
         }
-        
-        internal static bool GivePlayerItem(TechType techType, ObjectDataTransferData itemData,Func<ObjectData,RackSlot> getServerWithObjectData)
+
+        internal static bool GivePlayerItem(TechType techType, ObjectDataTransferData itemData,
+            Func<ObjectData, RackSlot> getServerWithObjectData)
         {
             QuickLogger.Debug($"Give Player Item: {techType}", true);
 
@@ -98,120 +99,202 @@ namespace DataStorageSolutions.Helpers
             if (Inventory.main.HasRoomFor(itemSize.x, itemSize.y))
             {
                 Pickupable pickup;
-
-                if (EggHandler.GetDiscoveredEgg(techType, out TechType value))
+                if (itemData.Vehicle == null)
                 {
-                    pickup = CraftData.InstantiateFromPrefab(value).GetComponent<Pickupable>();
-                }
-                else
-                {
-                    pickup = CraftData.InstantiateFromPrefab(techType).GetComponent<Pickupable>();
-                }
-                
-                if (!itemData.IsServer)
-                {
-                    var data = (ObjectData)itemData.data;
-                    switch (data.DataObjectType)
+                    if (EggHandler.GetDiscoveredEgg(techType, out TechType value))
                     {
-                        case SaveDataObjectType.PlayerTool:
+                        pickup = CraftData.InstantiateFromPrefab(value).GetComponent<Pickupable>();
+                    }
+                    else
+                    {
+                        pickup = CraftData.InstantiateFromPrefab(techType).GetComponent<Pickupable>();
+                    }
+                    if (!itemData.IsServer)
+                    {
+                        var data = (ObjectData)itemData.data;
+                        switch (data.DataObjectType)
+                        {
+                            case SaveDataObjectType.PlayerTool:
 
-                            if (data.PlayToolData.HasBattery)
-                            {
-                                var batteryTechType = data.PlayToolData.BatteryInfo.TechType;
-                                var tempBattery = CraftData.GetPrefabForTechType(batteryTechType);
-                                var capacity = tempBattery?.gameObject.GetComponent<IBattery>()?.capacity;
-
-                                if (data.PlayToolData.HasBattery && capacity != null && capacity > 0)
+                                if (data.PlayToolData.HasBattery)
                                 {
-                                    var energyMixin = pickup.gameObject.GetComponent<EnergyMixin>();
-                                    var normalizedCharge = data.PlayToolData.BatteryInfo.BatteryCharge / capacity;
-                                    if (energyMixin.GetBattery() != null)
+                                    var batteryTechType = data.PlayToolData.BatteryInfo.TechType;
+                                    var tempBattery = CraftData.GetPrefabForTechType(batteryTechType);
+                                    var capacity = tempBattery?.gameObject.GetComponent<IBattery>()?.capacity;
+
+                                    if (data.PlayToolData.HasBattery && capacity != null && capacity > 0)
                                     {
-                                        QuickLogger.Debug("Battery was already in device destroying");
-                                    }
+                                        var energyMixin = pickup.gameObject.GetComponent<EnergyMixin>();
+                                        var normalizedCharge = data.PlayToolData.BatteryInfo.BatteryCharge / capacity;
+                                        if (energyMixin.GetBattery() != null)
+                                        {
+                                            QuickLogger.Debug("Battery was already in device destroying");
+                                        }
 
-                                    if (!energyMixin.compatibleBatteries.Contains(batteryTechType))
+                                        if (!energyMixin.compatibleBatteries.Contains(batteryTechType))
+                                        {
+                                            energyMixin.compatibleBatteries.Add(batteryTechType);
+                                        }
+
+                                        energyMixin.SetBattery(data.PlayToolData.BatteryInfo.TechType,
+                                            (float)normalizedCharge);
+                                        QuickLogger.Info(
+                                            $"Gave Player Player tool {data.PlayToolData.TechType} with battery {batteryTechType}");
+                                    }
+                                    else
                                     {
-                                        energyMixin.compatibleBatteries.Add(batteryTechType);
+                                        QuickLogger.Error<DSSServerController>(
+                                            "While trying to get the batter capacity of the battery it returned null or 0.");
                                     }
-
-                                    energyMixin.SetBattery(data.PlayToolData.BatteryInfo.TechType, (float)normalizedCharge);
-                                    QuickLogger.Info($"Gave Player Player tool {data.PlayToolData.TechType} with battery {batteryTechType}");
                                 }
-                                else
-                                {
-                                    QuickLogger.Error<DSSServerController>("While trying to get the batter capacity of the battery it returned null or 0.");
-                                }
-                            }
-                            break;
 
-                        case SaveDataObjectType.Eatable:
-                            //We are not handling decaying items so I dont need to set anything
-                            break;
+                                break;
 
-                        case SaveDataObjectType.Server:
-                            var server = pickup.gameObject.GetComponent<DSSServerController>();
-                            server.Items = new HashSet<ObjectData>(data.ServerData);
-                            server.Initialize();
-                            server.DisplayManager.UpdateDisplay();
-                            break;
-                        case SaveDataObjectType.Battery:
-                            var battery = pickup.gameObject.GetComponent<Battery>();
-                            battery.charge = data.PlayToolData.BatteryInfo.BatteryCharge;
-                            break;
+                            case SaveDataObjectType.Eatable:
+                                //We are not handling decaying items so I dont need to set anything
+                                break;
+
+                            case SaveDataObjectType.Server:
+                                var server = pickup.gameObject.GetComponent<DSSServerController>();
+                                server.Items = new HashSet<ObjectData>(data.ServerData);
+                                server.Initialize();
+                                server.DisplayManager.UpdateDisplay();
+                                break;
+                            case SaveDataObjectType.Battery:
+                                var battery = pickup.gameObject.GetComponent<Battery>();
+                                battery.charge = data.PlayToolData.BatteryInfo.BatteryCharge;
+                                break;
+                        }
+
+                        var result = getServerWithObjectData?.Invoke(data);
+                        result?.Remove(data);
+                        isSuccessful = true;
+                    }
+                    else
+                    {
+                        var data = (HashSet<ObjectData>)itemData.data;
+                        var controller = pickup.gameObject.GetComponent<DSSServerController>();
+                        controller.Initialize();
+                        controller.Items = new HashSet<ObjectData>(data);
+                        controller.Filters = new List<Filter>(itemData.Filters);
+                        controller.DisplayManager.UpdateDisplay();
+                        isSuccessful = true;
                     }
 
-                    var result = getServerWithObjectData?.Invoke(data);
-                    result?.Remove(data);
+                    Inventory.main.Pickup(pickup);
+                }
+                else if (itemData.Vehicle != null)
+                {
+                    QuickLogger.Debug("Is Vehicle Item");
+
+                    var vehicleContainers = itemData.Vehicle.gameObject.GetComponentsInChildren<StorageContainer>()
+                        .Select((x) => x.container).ToList();
+                    vehicleContainers.AddRange(GetSeamothStorage(itemData.Vehicle));
+
+                    for (var index = 0; index < vehicleContainers.Count; index++)
+                    {
+                        for (var i = 0; i < vehicleContainers[index].ToList().Count; i++)
+                        {
+                            var item = vehicleContainers[index].ToList()[i];
+
+                            if (item.item.GetTechType() == techType)
+                            {
+                                var passedItem = vehicleContainers[index].RemoveItem(item.item);
+                                if (passedItem)
+                                {
+                                    if (Inventory.main.Pickup(item.item))
+                                    {
+                                        CrafterLogic.NotifyCraftEnd(Player.main.gameObject, item.item.GetTechType());
+                                        
+                                        goto _end;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    _end:
                     isSuccessful = true;
                 }
-                else
-                {
-                    var data = (HashSet<ObjectData>)itemData.data;
-                    var controller = pickup.gameObject.GetComponent<DSSServerController>();
-                    controller.Initialize();
-                    controller.Items = new HashSet<ObjectData>(data);
-                    controller.Filters = new List<Filter>(itemData.Filters);
-                    controller.DisplayManager.UpdateDisplay();
-                    isSuccessful = true; 
-                }
-
-                Inventory.main.Pickup(pickup);
             }
+
             Mod.OnBaseUpdate?.Invoke();
             return isSuccessful;
         }
-
+        
         internal static ObjectData MakeObjectData(InventoryItem item, int slot)
-        {
-            var go = item.item.gameObject;
-
-            var objectType = FindSaveDataObjectType(go);
-
-            ObjectData result;
-
-            switch (objectType)
             {
-                case SaveDataObjectType.Item:
-                    result = new ObjectData { DataObjectType = objectType, TechType = item.item.GetTechType() };
-                    break;
-                case SaveDataObjectType.PlayerTool:
-                    result = new ObjectData { DataObjectType = objectType, TechType = item.item.GetTechType(), PlayToolData = GetPlayerToolData(item) };
-                    break;
-                case SaveDataObjectType.Eatable:
-                    result = new ObjectData { DataObjectType = objectType, TechType = item.item.GetTechType(), EatableEntity = GetEatableData(item) };
-                    break;
-                case SaveDataObjectType.Server:
-                    result = new ObjectData { DataObjectType = objectType, TechType = item.item.GetTechType(), ServerData = GetServerData(item) };
-                    break;
-                case SaveDataObjectType.Battery:
-                    result = new ObjectData { DataObjectType = objectType, TechType = item.item.GetTechType(), PlayToolData = GetBatteryData(item) };
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
+                var go = item.item.gameObject;
+
+                var objectType = FindSaveDataObjectType(go);
+
+                ObjectData result;
+
+                switch (objectType)
+                {
+                    case SaveDataObjectType.Item:
+                        result = new ObjectData {DataObjectType = objectType, TechType = item.item.GetTechType()};
+                        break;
+                    case SaveDataObjectType.PlayerTool:
+                        result = new ObjectData
+                        {
+                            DataObjectType = objectType, TechType = item.item.GetTechType(),
+                            PlayToolData = GetPlayerToolData(item)
+                        };
+                        break;
+                    case SaveDataObjectType.Eatable:
+                        result = new ObjectData
+                        {
+                            DataObjectType = objectType, TechType = item.item.GetTechType(),
+                            EatableEntity = GetEatableData(item)
+                        };
+                        break;
+                    case SaveDataObjectType.Server:
+                        result = new ObjectData
+                        {
+                            DataObjectType = objectType, TechType = item.item.GetTechType(),
+                            ServerData = GetServerData(item)
+                        };
+                        break;
+                    case SaveDataObjectType.Battery:
+                        result = new ObjectData
+                        {
+                            DataObjectType = objectType, TechType = item.item.GetTechType(),
+                            PlayToolData = GetBatteryData(item)
+                        };
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+
+                return result;
             }
 
-            return result;
+            internal static List<ItemsContainer> GetSeamothStorage(Vehicle seamoth)
+            {
+                var results = new List<ItemsContainer>();
+                if (seamoth is SeaMoth && seamoth.modules != null)
+                {
+                    using (var e = seamoth.modules.GetEquipment())
+                    {
+                        while (e.MoveNext())
+                        {
+                            var module = e.Current.Value;
+                            if (module == null || module.item == null)
+                            {
+                                continue;
+                            }
+
+                            var container = module.item.GetComponent<SeamothStorageContainer>();
+                            if (container != null && !container.gameObject.name.Contains("Torpedo"))
+                            {
+                                results.Add(container.container);
+                            }
+                        }
+                    }
+                }
+
+                return results;
+            }
         }
     }
-}

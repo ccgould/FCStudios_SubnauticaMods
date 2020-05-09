@@ -17,6 +17,7 @@ namespace DataStorageSolutions.Patches
             if (_timeLeft < 0)
             {
                 BaseManager.RemoveDestroyedBases();
+                BaseManager.OnPlayerTick?.Invoke();
                 _timeLeft = 1f;
             }
         }

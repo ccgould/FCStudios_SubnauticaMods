@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using DataStorageSolutions.Buildables;
+using DataStorageSolutions.Display;
 using DataStorageSolutions.Enumerators;
+using DataStorageSolutions.Helpers;
 using DataStorageSolutions.Interfaces;
 using DataStorageSolutions.Model;
 using DataStorageSolutions.Structs;
@@ -25,6 +27,8 @@ namespace DataStorageSolutions.Mono
         private int _page;
         private GridHelper _baseGrid;
         private GridHelper _baseItemsGrid;
+        private GridHelper _vehicleItemsGrid;
+        private GridHelper _vehicleGrid;
         private BaseManager _currentBase;
         private TransferData _currentData;
         private ColorManager _terminalColorPage;
@@ -34,7 +38,132 @@ namespace DataStorageSolutions.Mono
         private Text _baseNameLabel;
         private Text _gettingData;
         private string _currentSearchString;
+        private Vehicle _currentVehicle;
+        private Text _VehicleItemsPageLabel;
+        float timeLeft = 2.0f;
+        private bool _startBuffer;
 
+        private void Update()
+        {
+            if (_startBuffer)
+            {
+                timeLeft -= Time.deltaTime;
+                if (timeLeft < 0)
+                {
+                    _startBuffer = false;
+                    timeLeft = 2f;
+                }
+            }
+        }
+        private void OnLoadVehicleGrid(DisplayData data)
+        {
+            try
+            {
+                _vehicleGrid?.ClearPage();
+
+                var grouped = _mono.Manager.DockingManager.Vehicles;
+
+                QuickLogger.Debug($"Vehicle Count to process: {grouped.Count}");
+
+                if (data.EndPosition > grouped.Count)
+                {
+                    data.EndPosition = grouped.Count;
+                }
+
+                if (data.ItemsGrid?.transform == null) return;
+
+                QuickLogger.Debug($"Adding Vehicles");
+
+
+                for (int i = data.StartPosition; i < data.EndPosition; i++)
+                {
+                    if (grouped[i] == null) continue;
+
+                    GameObject buttonPrefab = Instantiate(data.ItemsPrefab);
+
+                    if (buttonPrefab == null || data.ItemsGrid == null)
+                    {
+                        if (buttonPrefab != null)
+                        {
+                            QuickLogger.Debug("Destroying Tab", true);
+                            Destroy(buttonPrefab);
+                        }
+                        return;
+                    }
+
+                    QuickLogger.Debug($"Creating Vehicle Button: {grouped[i].GetName()}");
+                    CreateButton(data, buttonPrefab,new ButtonData{Vehicle = grouped[i]}, ButtonType.Vehicle, grouped[i].GetName(),"VehicleBTN");
+                }
+
+                _vehicleGrid.UpdaterPaginator(grouped.Count);
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error("Error Caught");
+                QuickLogger.Error($"Error Message: {e.Message}");
+                QuickLogger.Error($"Error StackTrace: {e.StackTrace}");
+            }
+        }
+
+        private void OnLoadVehicleItemsGrid(DisplayData data)
+        {
+            try
+            {
+                QuickLogger.Debug($"OnLoadVehicleItemsGrid : {data.ItemsGrid}", true);
+
+                _vehicleItemsGrid.ClearPage();
+
+                if (_currentVehicle == null) return;
+
+                var items = DSSVehicleDockingManager.GetVehicleContainers(_currentVehicle);
+                List<InventoryItem> group = new List<InventoryItem>();
+                foreach (ItemsContainer item in items)
+                {
+                    foreach (InventoryItem inventoryItem in item)
+                    {
+                        group.Add(inventoryItem);
+                    }
+                }
+
+                
+                IEnumerable<IGrouping<TechType, InventoryItem>> grouped = group.GroupBy(x => x.item.GetTechType()).OrderBy(x=>x.Key);
+
+                if (!string.IsNullOrEmpty(_currentSearchString?.Trim()))
+                {
+                    grouped = grouped.Where(p => Language.main.Get(p.Key).StartsWith(_currentSearchString.Trim(), StringComparison.OrdinalIgnoreCase));
+                }
+
+                if (data.EndPosition > grouped.Count())
+                {
+                    data.EndPosition = grouped.Count();
+                }
+
+                for (int i = data.StartPosition; i < data.EndPosition; i++)
+                {
+
+                    GameObject buttonPrefab = Instantiate(data.ItemsPrefab);
+
+                    if (buttonPrefab == null || data.ItemsGrid == null)
+                    {
+                        if (buttonPrefab != null)
+                        {
+                            Destroy(buttonPrefab);
+                        }
+                        return;
+                    }
+
+                    CreateButton(data,buttonPrefab,new ButtonData{TechType = grouped.ElementAt(i).Key, Amount = grouped.ElementAt(i).Count()}, ButtonType.Item, string.Format(AuxPatchers.TakeFormatted(), Language.main.Get(grouped.ElementAt(i).Key)), "VehicleItemBTN");
+                }
+                _vehicleItemsGrid.UpdaterPaginator(grouped.Count());
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error("Error Caught");
+                QuickLogger.Error($"Error Message: {e.Message}");
+                QuickLogger.Error($"Error StackTrace: {e.StackTrace}");
+            }
+        }
+        
         private void OnLoadBaseItemsGrid(DisplayData data)
         {
             try
@@ -113,7 +242,8 @@ namespace DataStorageSolutions.Mono
 
                 if(data.ItemsGrid?.transform == null) return;
 
-                CreateButton(data, Instantiate(data.ItemsPrefab), _mono.Manager, true);
+                CreateButton(data, Instantiate(data.ItemsPrefab), new ButtonData{Manager = _mono.Manager }, ButtonType.Home, AuxPatchers.Home(), "BaseBTN");
+                CreateButton(data, Instantiate(data.ItemsPrefab), new ButtonData(), ButtonType.None, AuxPatchers.GoToVehicles(), "VehiclesPageBTN");
 
                 if (_mono.Manager.GetCurrentBaseAntenna() != null || _mono.Manager.Habitat.isCyclops)
                 {
@@ -133,7 +263,7 @@ namespace DataStorageSolutions.Mono
                             return;
                         }
 
-                        CreateButton(data, buttonPrefab, grouped[i]);
+                        CreateButton(data, buttonPrefab, new ButtonData{ Manager = grouped[i]}, ButtonType.Base, grouped[i].GetBaseName().TruncateWEllipsis(30),"BaseBTN");
                     }
                 }
             
@@ -147,18 +277,44 @@ namespace DataStorageSolutions.Mono
             }
         }
 
-        private void CreateButton(DisplayData data, GameObject buttonPrefab, BaseManager manager,bool isHome = false)
+        private void CreateButton(DisplayData data, GameObject buttonPrefab, ButtonData buttonData, ButtonType buttonType, string btnText,string btnName)
         {
             buttonPrefab.transform.SetParent(data.ItemsGrid.transform, false);
-            buttonPrefab.GetComponentInChildren<Text>().text = isHome ? AuxPatchers.Home() : manager.GetBaseName().TruncateWEllipsis(30);
-
-            var mainBtn = buttonPrefab.AddComponent<InterfaceButton>();
+            var mainBtn = buttonPrefab.AddComponent<DSSUIButton>();
+            var text = buttonPrefab.GetComponentInChildren<Text>();
+            text.text = btnText;
             mainBtn.ButtonMode = InterfaceButtonMode.Background;
             mainBtn.STARTING_COLOR = _startColor;
             mainBtn.HOVER_COLOR = _hoverColor;
-            mainBtn.BtnName = "BaseBTN";
-            mainBtn.Tag = new TransferData {Manager = manager, IsHomeBase = isHome};
+            mainBtn.BtnName = btnName;
             mainBtn.OnButtonClick = OnButtonClick;
+
+            switch (buttonType)
+            {
+                case ButtonType.Home:
+                    mainBtn.TextLineOne = AuxPatchers.Home();
+                    mainBtn.Tag = new TransferData { Manager = buttonData.Manager, ButtonType = buttonType };
+                    break;
+                case ButtonType.Item:
+                    var amount = buttonPrefab.GetComponentInChildren<Text>();
+                    amount.text = buttonData.Amount.ToString();
+                    mainBtn.Tag = buttonData.TechType;
+                    uGUI_Icon trashIcon = InterfaceHelpers.FindGameObject(buttonPrefab, "Icon").AddComponent<uGUI_Icon>();
+                    trashIcon.sprite = SpriteManager.Get(buttonData.TechType);
+                    break;
+                case ButtonType.Vehicle:
+                    mainBtn.TextLineOne = string.Format(AuxPatchers.ViewVehicleStorageFormat(), buttonData.Vehicle.GetName());
+                    mainBtn.Tag = new TransferData { Vehicle = buttonData.Vehicle};
+                    uGUI_Icon trashIcon2 = InterfaceHelpers.FindGameObject(buttonPrefab, "Icon").AddComponent<uGUI_Icon>();
+                    trashIcon2.sprite = SpriteManager.Get(buttonData.Vehicle is SeaMoth ? TechType.Seamoth : TechType.Exosuit);
+                    mainBtn.Vehicle = buttonData.Vehicle;
+                    mainBtn.Label = text;
+                    break;
+                case ButtonType.Base:
+                    mainBtn.TextLineOne = AuxPatchers.ViewBaseStorageFormat();
+                    mainBtn.Tag = new TransferData { Manager = buttonData.Manager, ButtonType = buttonType };
+                    break;
+            }
         }
 
         private void UpdateSearch(string newSearch)
@@ -192,16 +348,16 @@ namespace DataStorageSolutions.Mono
                     _currentData = (TransferData)tag;
                     _baseNameLabel.text = _currentBase.GetBaseName();
 
-                    if (_currentData.IsHomeBase)
+                    if (_currentData.ButtonType == ButtonType.Home)
                     {
                         GoToPage(TerminalPages.BaseItemsDirect);
                     }
-                    else
+                    else if(_currentData.ButtonType == ButtonType.Base)
                     {
                         _gettingData.text = string.Format(AuxPatchers.GettingData(), _currentBase.GetBaseName());
                         GoToPage(TerminalPages.BaseItems);
                     }
-
+                    
                     Refresh();
                     break;
 
@@ -263,6 +419,33 @@ namespace DataStorageSolutions.Mono
                 case "SettingsBTN":
                     GoToPage(TerminalPages.SettingsPage);
                     break;
+
+                case "VehiclesPageBTN":
+                    if (_mono.Manager.DockingManager.HasVehicles(true))
+                    {
+                        _vehicleGrid.DrawPage();
+                        GoToPage(TerminalPages.VehiclesPage);
+                    }
+                    else
+                    {
+                        GoToPage(TerminalPages.Home);    
+                    }
+                    break;
+
+                case "VehicleBTN":
+                    _currentVehicle = ((TransferData)tag).Vehicle;
+                    _VehicleItemsPageLabel.text = string.Format(AuxPatchers.VehiclePageLabelFormat(),_currentVehicle.GetName());
+                    _vehicleItemsGrid.DrawPage();
+                    GoToPage(TerminalPages.VehiclesItemsPage);
+                    break;
+
+                case "VehicleItemBTN":
+                    var result = DSSHelpers.GivePlayerItem((TechType)tag, new ObjectDataTransferData{Vehicle = _currentVehicle},null );
+                    if(!result)
+                    {
+                        //TODO Add Message
+                    }
+                    break;
             }
         }
 
@@ -293,9 +476,12 @@ namespace DataStorageSolutions.Mono
 
         public void Refresh()
         {
-            _baseGrid.DrawPage();
-            _baseItemsGrid.DrawPage();
-            _baseNameLabel.text = _currentBase?.GetBaseName() ?? AuxPatchers.FailedToGetBaseName();
+            _baseGrid?.DrawPage();
+            _baseItemsGrid?.DrawPage();
+            if (_baseNameLabel != null)
+            {
+                _baseNameLabel.text = _currentBase?.GetBaseName() ?? AuxPatchers.FailedToGetBaseName();
+            }
         }
 
         internal void GoToPage(TerminalPages page)
@@ -340,6 +526,14 @@ namespace DataStorageSolutions.Mono
             var home = InterfaceHelpers.FindGameObject(canvasGameObject, "Home");
             #endregion
 
+            #region VehiclesPage
+            var vehiclesPage = InterfaceHelpers.FindGameObject(canvasGameObject, "VehiclesPage");
+            #endregion
+
+            #region VehicleItemsPage
+            var vehiclesItemsPage = InterfaceHelpers.FindGameObject(canvasGameObject, "VehiclesItemsPage");
+            #endregion
+
             #region BaseItemsPage
             var baseItemsPage = InterfaceHelpers.FindGameObject(canvasGameObject, "BaseItemsPage");
             #endregion
@@ -376,8 +570,25 @@ namespace DataStorageSolutions.Mono
 
             _baseGrid = _mono.gameObject.AddComponent<GridHelper>();
             _baseGrid.OnLoadDisplay += OnLoadBaseGrid;
-            _baseGrid.Setup(12 - 1, DSSModelPrefab.BaseItemPrefab, home, _startColor, _hoverColor, OnButtonClick); //Minus 1 ItemPerPage because of the added Home button
+            _baseGrid.Setup(12 - 2, DSSModelPrefab.BaseItemPrefab, home, _startColor, _hoverColor, OnButtonClick); //Minus 2 ItemPerPage because of the added Home button
 
+            #endregion
+
+            #region Vehicle Grid
+
+            _vehicleGrid = _mono.gameObject.AddComponent<GridHelper>();
+            _vehicleGrid.OnLoadDisplay += OnLoadVehicleGrid;
+            _vehicleGrid.Setup(12, DSSModelPrefab.VehicleItemPrefab, vehiclesPage, _startColor, _hoverColor, OnButtonClick); //Minus 1 ItemPerPage because of the added Home button
+
+            #endregion
+
+            #region Vehicles Page
+
+           _vehicleItemsGrid = _mono.gameObject.AddComponent<GridHelper>();
+           _vehicleItemsGrid.OnLoadDisplay += OnLoadVehicleItemsGrid;
+            _vehicleItemsGrid.Setup(44, DSSModelPrefab.ItemPrefab, vehiclesItemsPage, _startColor, _hoverColor, OnButtonClick,5,
+                "PrevBTN", "NextBTN", "Grid", "Paginator", "HomeBTN", "VehiclesPageBTN");
+            _VehicleItemsPageLabel = vehiclesItemsPage.FindChild("VehicleLabel").GetComponentInChildren<Text>();
             #endregion
 
             #region Base Items Page
@@ -476,7 +687,7 @@ namespace DataStorageSolutions.Mono
             
             #endregion
 
-            #region DumpBTNButton
+            #region Antenna Color BTN
             var antennaColorBTN = InterfaceHelpers.FindGameObject(colorMainPage, "AntennaColorBTN");
 
             InterfaceHelpers.CreateButton(antennaColorBTN, "AntennaColorBTN", InterfaceButtonMode.Background,
@@ -508,6 +719,29 @@ namespace DataStorageSolutions.Mono
             #endregion
 
             return true;
+        }
+
+        public void RefreshVehicles(List<Vehicle> vehicles)
+        {
+            QuickLogger.Debug("Refreshing Vehicles");
+
+            if (!vehicles.Contains(_currentVehicle))
+            {
+                _vehicleItemsGrid.ClearPage();
+                _currentVehicle = null;
+                _vehicleGrid.DrawPage();
+                GoToPage(TerminalPages.VehiclesPage);
+            }
+        }
+
+        //TODO Fix refresh on item removal
+        public void RefreshVehicleItems()
+        {
+            if (!_startBuffer)
+            {
+                _vehicleItemsGrid?.DrawPage();
+                _startBuffer = true;
+            }
         }
     }
 }

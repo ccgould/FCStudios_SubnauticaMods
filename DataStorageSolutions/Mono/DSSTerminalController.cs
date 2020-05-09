@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using DataStorageSolutions.Abstract;
 using DataStorageSolutions.Buildables;
 using DataStorageSolutions.Configuration;
@@ -23,12 +24,11 @@ namespace DataStorageSolutions.Mono
         private string _prefabID;
         private TechType _techType = TechType.None;
         private bool _runStartUpOnEnable;
-
         private SaveDataEntry _savedData;
         private bool _fromSave;
         private BaseManager _manager;
-        public override bool IsConstructed => _isContructed;
 
+        public override bool IsConstructed => _isContructed;
         public override BaseManager Manager
         {
             get => _manager;
@@ -41,13 +41,12 @@ namespace DataStorageSolutions.Mono
                 PowerManager.Initialize(this, QPatch.Configuration.Config.ScreenPowerUsage);
             }
         }
-
         public TechType TechType => GetTechType();
         internal AnimationManager AnimationManager { get; private set; }
         public DSSTerminalDisplay DisplayManager { get; private set; }
         internal ColorManager TerminalColorManager { get; private set; }
-
         public PowerManager PowerManager { get; private set; }
+        internal DSSVehicleDockingManager DockingManager { get; set; }
 
         private void OnEnable()
         {
@@ -189,7 +188,7 @@ namespace DataStorageSolutions.Mono
                 DisplayManager = gameObject.AddComponent<DSSTerminalDisplay>();
                 DisplayManager.Setup(this);
             }
-
+            
             Mod.OnAntennaBuilt += OnAntennaBuilt;
             Mod.OnBaseUpdate += OnBaseUpdate;
         }
@@ -208,9 +207,24 @@ namespace DataStorageSolutions.Mono
                 
                 Manager = Manager ?? BaseManager.FindManager(SubRoot);
                 Manager.AddTerminal(this);
+                Manager.OnVehicleStorageUpdate += OnVehicleStorageUpdate;
+                Manager.OnVehicleUpdate += OnVehicleUpdate;
                 return Manager.BaseRacks;
             }
             return null;
+        }
+
+        private void OnVehicleUpdate(List<Vehicle> vehicles, BaseManager baseManager)
+        {
+            if (baseManager == Manager)
+            {
+                DisplayManager.RefreshVehicles(vehicles);
+            }
+        }
+
+        private void OnVehicleStorageUpdate()
+        {
+            DisplayManager.RefreshVehicleItems();
         }
 
         public override void OnProtoSerialize(ProtobufSerializer serializer)

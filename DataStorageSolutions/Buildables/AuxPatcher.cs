@@ -54,6 +54,14 @@ namespace DataStorageSolutions.Buildables
             { $"{ModKey}_BaseOnOff","{0} is now {1}."},
             { $"{ModKey}_Online","online"},
             { $"{ModKey}_Offline","offline"},
+            { $"{ModKey}_NoVehicles","No vehicles are docked at this base."},
+            { $"{ModKey}_SelectAVehicle","Please select a vehicle"},
+            { $"{ModKey}_GoToVehicles","Go to vehicles page."},
+            { $"{ModKey}_ViewStorageVFormat","View {0} vehicle storage."},
+            { $"{ModKey}_AddToStorageVFormat","Add to {0} vehicle storage."},
+            { $"{ModKey}_DockedVehicles","View docked vehicles."},
+            { $"{ModKey}_VehicleFormat","Vehicle: {0}"},
+            { $"{ModKey}_ViewStorageBFormat","View {0} server data."},
         };
 
         internal static void AdditionalPatching()
@@ -282,6 +290,43 @@ namespace DataStorageSolutions.Buildables
         public static string Offline()
         {
             return Language.main.Get(LanguageDictionary.Keys.ElementAt(40));
+        }
+
+        public static string NoVehiclesDocked()
+        {
+            return Language.main.Get(LanguageDictionary.Keys.ElementAt(41));
+        }
+        public static string SelectAVehicle()
+        {
+            return Language.main.Get(LanguageDictionary.Keys.ElementAt(42));
+        }
+
+        public static string GoToVehicles()
+        {
+            return Language.main.Get(LanguageDictionary.Keys.ElementAt(43));
+        }
+        public static string ViewVehicleStorageFormat()
+        {
+            return Language.main.Get(LanguageDictionary.Keys.ElementAt(44));
+        }
+        public static string AddToVehicleStorageFormat()
+        {
+            return Language.main.Get(LanguageDictionary.Keys.ElementAt(45));
+        }
+
+        public static string ViewDickedVehicles()
+        {
+            return Language.main.Get(LanguageDictionary.Keys.ElementAt(46));
+        }
+
+        public static string VehiclePageLabelFormat()
+        {
+            return Language.main.Get(LanguageDictionary.Keys.ElementAt(47));
+        }
+
+        public static string ViewBaseStorageFormat()
+        {
+            return Language.main.Get(LanguageDictionary.Keys.ElementAt(48));
         }
     }
 }

@@ -11,5 +11,6 @@ namespace DataStorageSolutions.Model
 
         public List<Filter> Filters { get; set; }
         public bool IsServer { get; set; }
+        public Vehicle Vehicle { get; set; }
     }
 }

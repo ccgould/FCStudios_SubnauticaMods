@@ -30,6 +30,8 @@ namespace DataStorageSolutions.Buildables
         internal static GameObject ServerPrefab { get; set; }
         internal static GameObject BaseItemPrefab { get; set; }
         internal static GameObject FilterItemPrefab { get; set; }
+        internal static GameObject VehicleItemPrefab { get; set; }
+
         public static bool GetPrefabs()
         {
             try
@@ -50,6 +52,7 @@ namespace DataStorageSolutions.Buildables
                     GameObject colorItem = QPatch.GlobalBundle.LoadAsset<GameObject>("ColorItem");
                     GameObject serverModel = assetBundle.LoadAsset<GameObject>(Mod.ServerPrefabName);
                     GameObject baseItem = assetBundle.LoadAsset<GameObject>("DSS_Base_Item");
+                    GameObject vehicleItem = assetBundle.LoadAsset<GameObject>("DSS_Vehicle_Item");
                     GameObject item = assetBundle.LoadAsset<GameObject>("DSS_Item");
                     GameObject antenna = assetBundle.LoadAsset<GameObject>(Mod.AntennaPrefabName);
                     GameObject formatMachine = assetBundle.LoadAsset<GameObject>(Mod.ServerFormattingStationPrefabName);
@@ -132,7 +135,17 @@ namespace DataStorageSolutions.Buildables
                         QuickLogger.Error($"DSS_Base_Item Not Found!");
                         return false;
                     }
-                    
+
+                    if (vehicleItem != null)
+                    {
+                        VehicleItemPrefab = vehicleItem;
+                    }
+                    else
+                    {
+                        QuickLogger.Error($"DSS_Vehicle_Item Not Found!");
+                        return false;
+                    }
+
                     if (item != null)
                     {
                         ItemPrefab =item;

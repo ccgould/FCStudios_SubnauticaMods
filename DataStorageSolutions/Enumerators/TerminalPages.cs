@@ -10,6 +10,8 @@
         AntennaColorPage = 5,
         BaseItemsDirect = 6,
         SettingsPage = 7,
-        Tripped = 8
+        Tripped = 8,
+        VehiclesPage = 9,
+        VehiclesItemsPage = 10,
     }
 }

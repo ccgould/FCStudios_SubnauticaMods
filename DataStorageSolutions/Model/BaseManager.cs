@@ -25,6 +25,7 @@ namespace DataStorageSolutions.Model
         internal string InstanceID { get; }
         internal readonly HashSet<DSSRackController> BaseRacks = new HashSet<DSSRackController>();
         internal readonly HashSet<DSSTerminalController> BaseTerminals = new HashSet<DSSTerminalController>();
+
         internal bool IsVisible
         {
             get
@@ -38,16 +39,22 @@ namespace DataStorageSolutions.Model
                 return antenna != null && antenna.IsVisible();
             }
         }
-
         internal FCSPowerStates PrevPowerState { get; set; }
-
         internal SubRoot Habitat { get; }
         internal DumpContainer DumpContainer { get; private set; }
         public int GetContainerFreeSpace { get; }
         public bool IsFull { get; }
         public NameController NameController { get; private set; }
         internal Action<bool> OnBreakerToggled { get; set; }
-        
+        public DSSVehicleDockingManager DockingManager { get; set; }
+
+        public bool IsOperational => !_hasBreakerTripped || BaseHasPower();
+        public static Action OnPlayerTick { get; set; }
+        public Action OnVehicleStorageUpdate { get; set; }
+        public Action<List<Vehicle>,BaseManager> OnVehicleUpdate { get; set; }
+
+        //I was about to check the subscription on the vehicles
+
         private void Initialize(SubRoot habitat)
         {
             ReadySaveData();
@@ -73,6 +80,12 @@ namespace DataStorageSolutions.Model
                 DumpContainer = new DumpContainer();
                 DumpContainer.Initialize(habitat.transform, AuxPatchers.BaseDumpReceptacle(), AuxPatchers.NotAllowed(),
                     AuxPatchers.CannotBeStored(), this, 4, 4);
+            }
+
+            if (DockingManager == null)
+            {
+                DockingManager = new DSSVehicleDockingManager();
+                DockingManager.Initialize(habitat,this);
             }
         }
 
@@ -139,6 +152,24 @@ namespace DataStorageSolutions.Model
             Habitat = habitat;
             InstanceID = habitat.gameObject.gameObject?.GetComponentInChildren<PrefabIdentifier>()?.Id;
             Initialize(habitat);
+        }
+
+        private bool BaseHasPower()
+        {
+            if(Habitat != null)
+            {
+                if (Habitat.powerRelay.GetPowerStatus() == PowerSystem.Status.Offline)
+                {
+                    return false;
+                }
+
+                if (Habitat.powerRelay.GetPowerStatus() == PowerSystem.Status.Normal || Habitat.powerRelay.GetPowerStatus() == PowerSystem.Status.Emergency)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         internal static BaseManager FindManager(SubRoot subRoot)
@@ -290,7 +321,11 @@ namespace DataStorageSolutions.Model
                 if (baseUnit.HasItem(techType))
                 {
                     var data = baseUnit.GetItemDataFromServer(techType);
-                    baseUnit.GivePlayerItem(techType,data);
+                    var result = baseUnit.GivePlayerItem(techType,data);
+                    if(!result)
+                    {
+                        //TODO Add Message
+                    }
                     break;
                 }
             }
@@ -352,6 +387,8 @@ namespace DataStorageSolutions.Model
 
             if (food != null)
             {
+                QuickLogger.Debug($"Is food item: Decay = {food.decomposes} : DRate = {food.kDecayRate}",true);
+
                 if (food.decomposes && food.kDecayRate > 0)
                 {
                     QuickLogger.Message(AuxPatchers.NoFoodItems(),true);

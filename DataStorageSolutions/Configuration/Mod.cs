@@ -405,6 +405,9 @@ namespace DataStorageSolutions.Configuration
         [JsonProperty] internal bool ShowAllItems { get; set; }
         [JsonProperty] internal float RackPowerUsage { get; set; } = 0.1f;
         [JsonProperty] internal float ServerPowerUsage { get; set; } = 0.1f;
+        [JsonProperty] internal bool PullFromDockedVehicles { get; set; } = true;
+        [JsonProperty] internal float CheckVehiclesInterval { get; set; } = 2.0f;
+        [JsonProperty] internal float ExtractInterval = 0.25f;
     }
 
     internal class ConfigFile

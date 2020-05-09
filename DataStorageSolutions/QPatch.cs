@@ -26,7 +26,36 @@ namespace DataStorageSolutions
     {
         internal static ConfigFile Configuration { get; private set; }
         internal static AssetBundle GlobalBundle { get; set; }
+        internal static object EasyCraftSettingsInstance { get; set; }
+        internal static FieldInfo UseStorage { get; set; }
+        internal static bool IsDockedVehicleStorageAccessInstalled { get; set; }
 
+        private static void AddTechFabricatorItems()
+        {
+            var icon = ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetFolder(), $"{Mod.ModName}.png"));
+            var craftingTab = new CraftingTab(Mod.DSSTabID, Mod.ModFriendlyName, icon);
+
+            //Floor Mounted Rack Has Been Cut
+            //var floorMountedRack = new FCSKit(Mod.FloorMountedRackKitClassID, Mod.FloorMountedRackFriendlyName, craftingTab , Mod.FloorMountedRackIngredients);
+            //floorMountedRack.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
+
+            var wallMountedRack = new FCSKit(Mod.WallMountedRackKitClassID, Mod.WallMountedRackFriendlyName, craftingTab, Mod.WallMountedRackIngredients);
+            wallMountedRack.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
+
+            var terminal = new FCSKit(Mod.TerminalKitClassID, Mod.TerminalFriendlyName, craftingTab, Mod.TerminalIngredients);
+            terminal.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
+
+            var antenna = new FCSKit(Mod.AntennaKitClassID, Mod.AntennaFriendlyName, craftingTab, Mod.AntennaIngredients);
+            antenna.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
+
+            var serverFormattingStation = new FCSKit(Mod.ServerFormattingStationKitClassID, Mod.ServerFormattingStationFriendlyName, craftingTab, Mod.ServerFormattingStationIngredients);
+            serverFormattingStation.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
+
+            Server = new ServerCraftable(Mod.ServerClassID, Mod.ServerFriendlyName, Mod.ServerDescription, craftingTab);
+            Server.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
+        }
+
+        internal static ServerCraftable Server { get; set; }
         [QModPatch]
         public static void Patch()
         {
@@ -69,66 +98,9 @@ namespace DataStorageSolutions
 
                 harmony.PatchAll(Assembly.GetExecutingAssembly());
 
-                var isEasyCraftInstalled = QModServices.Main.ModPresent("EasyCraft");
+                PatchEasyCraft(harmony);
 
-                if (isEasyCraftInstalled)
-                {
-                    QuickLogger.Debug("EasyCraft is installed");
-
-                    var easyCraftClosestItemContainersType = Type.GetType("EasyCraft.ClosestItemContainers, EasyCraft");
-                    var easyCraftMainType = Type.GetType("EasyCraft.Main, EasyCraft");
-                    var easyCraftSettingsType = Type.GetType("EasyCraft.Settings, EasyCraft");
-
-                    if (easyCraftMainType != null)
-                    {
-                        QuickLogger.Debug("Got EasyCraft Main Type");
-                        EasyCraftSettingsInstance = easyCraftMainType.GetField("settings", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
-                        if (EasyCraftSettingsInstance != null)
-                        {
-                            QuickLogger.Debug("Got EasyCraft Settings Field Info");
-                            if (easyCraftSettingsType != null)
-                            {
-                                QuickLogger.Debug("Got EasyCraft Settings type");
-
-                                QuickLogger.Debug($"Got EasyCraft Settings type: {easyCraftSettingsType.Name}");
-                                var autoCraft = easyCraftSettingsType.GetField("autoCraft").GetValue(EasyCraftSettingsInstance); 
-                                UseStorage = easyCraftSettingsType.GetField("useStorage");
-                                var returnSurplus = easyCraftSettingsType.GetField("returnSurplus").GetValue(EasyCraftSettingsInstance);
-                            }
-
-                        }
-                    }
-
-
-                    if (easyCraftClosestItemContainersType != null)
-                    {
-                        QuickLogger.Debug("Got EasyCraft Type");
-                        var destroyItemMethodInfo = easyCraftClosestItemContainersType.GetMethod("DestroyItem");
-                        var getPickupCountMethodInfo = easyCraftClosestItemContainersType.GetMethod("GetPickupCount");
-                        
-                        if (destroyItemMethodInfo != null)
-                        {
-                            QuickLogger.Debug("Got EasyCraft DestroyItem Method");
-                            var postfix = typeof(EasyCraft_Patch).GetMethod("DestroyItem");
-                            harmony.Patch(destroyItemMethodInfo, null, new HarmonyMethod(postfix));
-                        }
-
-                        if (getPickupCountMethodInfo != null)
-                        {
-                            QuickLogger.Debug("Got EasyCraft GetPickupCount Method");
-                            var postfix = typeof(EasyCraft_Patch).GetMethod("GetPickupCount");
-                            harmony.Patch(getPickupCountMethodInfo, null, new HarmonyMethod(postfix));
-                        }
-                    }
-                    else
-                    {
-                        QuickLogger.Error("Failed to get EasyCraft Type");
-                    }
-                }
-                else
-                {
-                    QuickLogger.Debug("EasyCraft  not installed");
-                }
+                IsDockedVehicleStorageAccessInstalled = QModServices.Main.ModPresent("DockedVehicleStorageAccess");
                 
                 QuickLogger.Info("Finished patching");
             }
@@ -137,38 +109,70 @@ namespace DataStorageSolutions
                 QuickLogger.Error(ex);
             }
         }
-
-        public static object EasyCraftSettingsInstance { get; set; }
-
-        public static FieldInfo UseStorage { get; set; }
-
-        public static Type EasyCraftSettingsType { get; set; }
-
-        private static void AddTechFabricatorItems()
+        
+        private static void PatchEasyCraft(HarmonyInstance harmony)
         {
-            var icon = ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetFolder(), $"{Mod.ModName}.png"));
-            var craftingTab = new CraftingTab(Mod.DSSTabID, Mod.ModFriendlyName, icon);
+            var isEasyCraftInstalled = QModServices.Main.ModPresent("EasyCraft");
 
-            //Floor Mounted Rack Has Been Cut
-            //var floorMountedRack = new FCSKit(Mod.FloorMountedRackKitClassID, Mod.FloorMountedRackFriendlyName, craftingTab , Mod.FloorMountedRackIngredients);
-            //floorMountedRack.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
+            if (isEasyCraftInstalled)
+            {
+                QuickLogger.Debug("EasyCraft is installed");
 
-            var wallMountedRack = new FCSKit(Mod.WallMountedRackKitClassID, Mod.WallMountedRackFriendlyName, craftingTab, Mod.WallMountedRackIngredients);
-            wallMountedRack.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
+                var easyCraftClosestItemContainersType = Type.GetType("EasyCraft.ClosestItemContainers, EasyCraft");
+                var easyCraftMainType = Type.GetType("EasyCraft.Main, EasyCraft");
+                var easyCraftSettingsType = Type.GetType("EasyCraft.Settings, EasyCraft");
 
-            var terminal = new FCSKit(Mod.TerminalKitClassID, Mod.TerminalFriendlyName, craftingTab, Mod.TerminalIngredients);
-            terminal.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
+                if (easyCraftMainType != null)
+                {
+                    QuickLogger.Debug("Got EasyCraft Main Type");
+                    EasyCraftSettingsInstance = easyCraftMainType
+                        .GetField("settings", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
+                    if (EasyCraftSettingsInstance != null)
+                    {
+                        QuickLogger.Debug("Got EasyCraft Settings Field Info");
+                        if (easyCraftSettingsType != null)
+                        {
+                            QuickLogger.Debug("Got EasyCraft Settings type");
 
-            var antenna = new FCSKit(Mod.AntennaKitClassID, Mod.AntennaFriendlyName, craftingTab, Mod.AntennaIngredients);
-            antenna.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
+                            QuickLogger.Debug($"Got EasyCraft Settings type: {easyCraftSettingsType.Name}");
+                            var autoCraft = easyCraftSettingsType.GetField("autoCraft").GetValue(EasyCraftSettingsInstance);
+                            UseStorage = easyCraftSettingsType.GetField("useStorage");
+                            var returnSurplus = easyCraftSettingsType.GetField("returnSurplus")
+                                .GetValue(EasyCraftSettingsInstance);
+                        }
+                    }
+                }
 
-            var serverFormattingStation = new FCSKit(Mod.ServerFormattingStationKitClassID, Mod.ServerFormattingStationFriendlyName, craftingTab, Mod.ServerFormattingStationIngredients);
-            serverFormattingStation.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
 
-            Server = new ServerCraftable(Mod.ServerClassID, Mod.ServerFriendlyName, Mod.ServerDescription, craftingTab);
-            Server.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
+                if (easyCraftClosestItemContainersType != null)
+                {
+                    QuickLogger.Debug("Got EasyCraft Type");
+                    var destroyItemMethodInfo = easyCraftClosestItemContainersType.GetMethod("DestroyItem");
+                    var getPickupCountMethodInfo = easyCraftClosestItemContainersType.GetMethod("GetPickupCount");
+
+                    if (destroyItemMethodInfo != null)
+                    {
+                        QuickLogger.Debug("Got EasyCraft DestroyItem Method");
+                        var postfix = typeof(EasyCraft_Patch).GetMethod("DestroyItem");
+                        harmony.Patch(destroyItemMethodInfo, null, new HarmonyMethod(postfix));
+                    }
+
+                    if (getPickupCountMethodInfo != null)
+                    {
+                        QuickLogger.Debug("Got EasyCraft GetPickupCount Method");
+                        var postfix = typeof(EasyCraft_Patch).GetMethod("GetPickupCount");
+                        harmony.Patch(getPickupCountMethodInfo, null, new HarmonyMethod(postfix));
+                    }
+                }
+                else
+                {
+                    QuickLogger.Error("Failed to get EasyCraft Type");
+                }
+            }
+            else
+            {
+                QuickLogger.Debug("EasyCraft  not installed");
+            }
         }
-
-        internal static ServerCraftable Server { get; set; }
     }
 }
