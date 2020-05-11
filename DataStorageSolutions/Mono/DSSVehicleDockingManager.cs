@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using DataStorageSolutions.Buildables;
+using DataStorageSolutions.Configuration;
 using DataStorageSolutions.Helpers;
 using DataStorageSolutions.Model;
 using FCSCommon.Utilities;
@@ -73,7 +74,7 @@ namespace DataStorageSolutions.Mono
                             break;
                         }
 
-                        if (_manager.IsAllowedToAdd(item.item,true) && _manager.CanBeStored(1, item.item.GetTechType()))
+                        if (!Mod.IsFilterAdded(item.item.GetTechType()) && _manager.IsAllowedToAdd(item.item,true) && _manager.CanBeStored(1, item.item.GetTechType()))
                         {
                             var success = _manager.AddItemToContainer(item);
                             if (success)
@@ -228,15 +229,16 @@ namespace DataStorageSolutions.Mono
             Player.main.StartCoroutine(StartCheck());
         }
 
-        internal void ToggleIsEnabled()
+        internal void ToggleIsEnabled(bool value)
         {
+
             if (_isVDSInstalled)
             {
                 _isToggled = false;
                 return;
             }
 
-            _isToggled = !_isToggled;
+            _isToggled = value;
 
             QuickLogger.Debug($"Toggle State: {_isToggled}",true);
         }

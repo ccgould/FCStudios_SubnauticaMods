@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using DataStorageSolutions.Buildables;
+using DataStorageSolutions.Configuration;
 using DataStorageSolutions.Display;
 using DataStorageSolutions.Enumerators;
 using DataStorageSolutions.Helpers;
@@ -30,6 +31,7 @@ namespace DataStorageSolutions.Mono
         private GridHelper _vehicleItemsGrid;
         private GridHelper _vehicleGrid;
         private GridHelper _vehicleContainersGrid;
+        private GridHelper _vehicleSettingsGrid;
         private BaseManager _currentBase;
         private TransferData _currentData;
         private ColorManager _terminalColorPage;
@@ -41,19 +43,50 @@ namespace DataStorageSolutions.Mono
         private string _currentSearchString;
         private Vehicle _currentVehicle;
         private Text _VehicleItemsPageLabel;
-        float timeLeft = 2.0f;
-        private bool _startBuffer;
 
-        private void Update()
+        private void OnLoadDockSettingsGrid(DisplayData data)
         {
-            if (_startBuffer)
+            try
             {
-                timeLeft -= Time.deltaTime;
-                if (timeLeft < 0)
+                _vehicleSettingsGrid?.ClearPage();
+
+                var grouped = CategoryData.AllItems;
+
+                if (grouped == null) return;
+
+                if (data.EndPosition > grouped.Count)
                 {
-                    _startBuffer = false;
-                    timeLeft = 2f;
+                    data.EndPosition = grouped.Count;
                 }
+
+                if (data.ItemsGrid?.transform == null) return;
+                
+                for (int i = data.StartPosition; i < data.EndPosition; i++)
+                {
+                    if (grouped[i] == TechType.None) continue;
+
+                    GameObject buttonPrefab = Instantiate(data.ItemsPrefab);
+
+                    if (buttonPrefab == null || data.ItemsGrid == null)
+                    {
+                        if (buttonPrefab != null)
+                        {
+                            QuickLogger.Debug("Destroying Tab", true);
+                            Destroy(buttonPrefab);
+                        }
+                        return;
+                    }
+
+                    CreateFilterButton(data, buttonPrefab, grouped[i]);
+                }
+
+                _vehicleSettingsGrid.UpdaterPaginator(grouped.Count);
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error("Error Caught");
+                QuickLogger.Error($"Error Message: {e.Message}");
+                QuickLogger.Error($"Error StackTrace: {e.StackTrace}");
             }
         }
 
@@ -65,8 +98,8 @@ namespace DataStorageSolutions.Mono
 
                 var grouped = _mono.Manager.DockingManager.Vehicles;
 
-                QuickLogger.Debug($"Vehicle Count to process: {grouped.Count}");
-
+                if(grouped == null) return;
+                
                 if (data.EndPosition > grouped.Count)
                 {
                     data.EndPosition = grouped.Count;
@@ -176,10 +209,10 @@ namespace DataStorageSolutions.Mono
                 
                 IEnumerable<IGrouping<TechType, InventoryItem>> grouped = group.GroupBy(x => x.item.GetTechType()).OrderBy(x=>x.Key);
 
-                if (!string.IsNullOrEmpty(_currentSearchString?.Trim()))
-                {
-                    grouped = grouped.Where(p => Language.main.Get(p.Key).StartsWith(_currentSearchString.Trim(), StringComparison.OrdinalIgnoreCase));
-                }
+                //if (!string.IsNullOrEmpty(_currentSearchString?.Trim()))
+                //{
+                //    grouped = grouped.Where(p => Language.main.Get(p.Key).StartsWith(_currentSearchString.Trim(), StringComparison.OrdinalIgnoreCase));
+                //}
 
                 if (data.EndPosition > grouped.Count())
                 {
@@ -222,16 +255,19 @@ namespace DataStorageSolutions.Mono
 
                 if(_currentBase == null) return;
 
-                var grouped = _currentBase.GetItemsWithin().OrderBy(x=>x.Key);
+                var grouped = _currentBase.GetItemsWithin().OrderBy(x=>x.Key).ToList();
 
                 if (!string.IsNullOrEmpty(_currentSearchString?.Trim()))
                 {
-                    grouped = (IOrderedEnumerable<KeyValuePair<TechType, int>>) grouped.Where(p => Language.main.Get(p.Key).StartsWith(_currentSearchString.Trim(), StringComparison.OrdinalIgnoreCase));
+                    grouped = grouped.Where(p => Language.main.Get(p.Key).StartsWith(_currentSearchString.Trim(), StringComparison.OrdinalIgnoreCase)).ToList();
                 }
-                
-                if (data.EndPosition > grouped.Count())
+
+                QuickLogger.Debug($"Grouped Count = {grouped.Count} || Search: {_currentSearchString}",true);
+
+
+                if (data.EndPosition > grouped.Count)
                 {
-                    data.EndPosition = grouped.Count();
+                    data.EndPosition = grouped.Count;
                 }
                 
                 for (int i = data.StartPosition; i < data.EndPosition; i++)
@@ -290,8 +326,11 @@ namespace DataStorageSolutions.Mono
 
                 if(data.ItemsGrid?.transform == null) return;
 
-                CreateButton(data, Instantiate(data.ItemsPrefab), new ButtonData{Manager = _mono.Manager }, ButtonType.Home, AuxPatchers.Home(), "BaseBTN");
-                CreateButton(data, Instantiate(data.ItemsPrefab), new ButtonData(), ButtonType.None, AuxPatchers.GoToVehicles(), "VehiclesPageBTN");
+                if (_baseGrid.GetCurrentPage() < 2)
+                {
+                    CreateButton(data, Instantiate(data.ItemsPrefab), new ButtonData { Manager = _mono.Manager }, ButtonType.Home, AuxPatchers.Home(), "BaseBTN");
+                    CreateButton(data, Instantiate(data.ItemsPrefab), new ButtonData(), ButtonType.None, AuxPatchers.GoToVehicles(), "VehiclesPageBTN");
+                }
 
                 QuickLogger.Debug($"Bases Count: {grouped.Count}");
                 QuickLogger.Debug($"Bases Antenna: {_mono.Manager.GetCurrentBaseAntenna()}");
@@ -376,6 +415,23 @@ namespace DataStorageSolutions.Mono
                     mainBtn.Tag = new TransferData { Manager = buttonData.Manager, ButtonType = buttonType };
                     break;
             }
+        }
+
+        private void CreateFilterButton(DisplayData data, GameObject buttonPrefab, TechType techType)
+        {
+            buttonPrefab.transform.SetParent(data.ItemsGrid.transform, false);
+            buttonPrefab.GetComponentInChildren<Text>().text = Language.main.Get(techType);
+            //var icon = InterfaceHelpers.FindGameObject(buttonPrefab, "Icon");
+            //icon.AddComponent<uGUI_Icon>().sprite = SpriteManager.Get(techType);
+            var buttonToggle = buttonPrefab.GetComponent<Toggle>();
+            buttonToggle.isOn = Mod.IsFilterAdded(techType);
+            var mainBTN = buttonPrefab.AddComponent<InterfaceButton>();
+            mainBTN.ButtonMode = InterfaceButtonMode.Background;
+            mainBTN.STARTING_COLOR = _startColor;
+            mainBTN.HOVER_COLOR = _hoverColor;
+            mainBTN.BtnName = "FilterBTN";
+            mainBTN.Tag = techType;
+            mainBTN.OnButtonClick = OnButtonClick;
         }
 
         private void UpdateSearch(string newSearch)
@@ -520,6 +576,20 @@ namespace DataStorageSolutions.Mono
                         //TODO Add Message
                     }
                     break;
+
+                case "AutoDockBTN":
+                    GoToPage(TerminalPages.DockSettingPage);
+                    break;
+
+                case "FilterBTN":
+                    var techType = (TechType) tag;
+                    if (Mod.IsFilterAdded(techType))
+                    {
+                        Mod.RemoveBlackListFilter(techType);
+                        return;
+                    }
+                    Mod.AddBlackListFilter(techType);
+                    break;
             }
         }
 
@@ -586,233 +656,271 @@ namespace DataStorageSolutions.Mono
 
         public override bool FindAllComponents()
         {
-            #region Canvas  
-            var canvasGameObject = gameObject.GetComponentInChildren<Canvas>()?.gameObject;
-
-            if (canvasGameObject == null)
+            try
             {
-                QuickLogger.Error("Canvas cannot be found");
-                return false;
-            }
-            #endregion
+                #region Canvas  
+                var canvasGameObject = gameObject.GetComponentInChildren<Canvas>()?.gameObject;
 
-            #region Home
-            var home = InterfaceHelpers.FindGameObject(canvasGameObject, "Home");
-            #endregion
-
-            #region VehiclesPage
-            var vehiclesPage = InterfaceHelpers.FindGameObject(canvasGameObject, "VehiclesPage");
-            #endregion
-
-            #region VehiclesContainersPage
-            var vehiclesContainersPage = InterfaceHelpers.FindGameObject(canvasGameObject, "VehiclesContainersPage");
-            #endregion
-
-            #region VehicleItemsPage
-            var vehiclesItemsPage = InterfaceHelpers.FindGameObject(canvasGameObject, "VehiclesItemsPage");
-            #endregion
-
-            #region BaseItemsPage
-            var baseItemsPage = InterfaceHelpers.FindGameObject(canvasGameObject, "BaseItemsPage");
-            #endregion
-
-            #region GettingDataPage
-            var gettingDataPage = InterfaceHelpers.FindGameObject(canvasGameObject, "GettingData");
-            #endregion
-
-            #region Settings
-            var settings = InterfaceHelpers.FindGameObject(canvasGameObject, "SettingsPage");
-            #endregion
-
-            #region PoweredOff
-            var poweredOff = InterfaceHelpers.FindGameObject(canvasGameObject, "PowerOffPage");
-            #endregion
-
-            #region ColorPageMain
-            var colorMainPage = InterfaceHelpers.FindGameObject(canvasGameObject, "ColorPageMain");
-            #endregion
-
-            #region ScreenColorPicker
-
-            var screenColorPicker = InterfaceHelpers.FindGameObject(canvasGameObject, "TerminalColorPage");
-
-            #endregion
-
-            #region AntennnaColorPicker
-
-            _antennaColorPicker = InterfaceHelpers.FindGameObject(canvasGameObject, "AntennaColorPage");
-
-            #endregion
-
-            #region Base Grid
-
-            _baseGrid = _mono.gameObject.AddComponent<GridHelper>();
-            _baseGrid.OnLoadDisplay += OnLoadBaseGrid;
-            _baseGrid.Setup(12 - 2, DSSModelPrefab.BaseItemPrefab, home, _startColor, _hoverColor, OnButtonClick); //Minus 2 ItemPerPage because of the added Home button
-
-            #endregion
-
-            #region Vehicle Grid
-
-            _vehicleGrid = _mono.gameObject.AddComponent<GridHelper>();
-            _vehicleGrid.OnLoadDisplay += OnLoadVehicleGrid;
-            _vehicleGrid.Setup(12, DSSModelPrefab.VehicleItemPrefab, vehiclesPage, _startColor, _hoverColor, OnButtonClick); //Minus 1 ItemPerPage because of the added Home button
-
-            #endregion
-
-            #region Vehicle Containers Grid
-
-            _vehicleContainersGrid = _mono.gameObject.AddComponent<GridHelper>();
-            _vehicleContainersGrid.OnLoadDisplay += OnLoadVehicleContainersGrid;
-            _vehicleContainersGrid.Setup(12, DSSModelPrefab.VehicleItemPrefab, vehiclesContainersPage, _startColor, _hoverColor, OnButtonClick, 5,
-                "PrevBTN", "NextBTN", "Grid", "Paginator", "HomeBTN", "VehicleItemsPage"); //Minus 1 ItemPerPage because of the added Home button
-
-            #endregion
-
-            #region Vehicles Page
-
-            _vehicleItemsGrid = _mono.gameObject.AddComponent<GridHelper>();
-           _vehicleItemsGrid.OnLoadDisplay += OnLoadVehicleItemsGrid;
-            _vehicleItemsGrid.Setup(44, DSSModelPrefab.ItemPrefab, vehiclesItemsPage, _startColor, _hoverColor, OnButtonClick,5,
-                "PrevBTN", "NextBTN", "Grid", "Paginator", "HomeBTN", "VehiclesPageBTN");
-            _VehicleItemsPageLabel = vehiclesItemsPage.FindChild("VehicleLabel").GetComponentInChildren<Text>();
-            #endregion
-
-            #region Base Items Page
-
-            _baseItemsGrid = _mono.gameObject.AddComponent<GridHelper>();
-            _baseItemsGrid.OnLoadDisplay += OnLoadBaseItemsGrid;
-            _baseItemsGrid.Setup(44, DSSModelPrefab.ItemPrefab, baseItemsPage, _startColor, _hoverColor, OnButtonClick);
-            #endregion
-
-            #region DumpBTNButton
-            var closeBTN = InterfaceHelpers.FindGameObject(baseItemsPage, "DumpButton");
-
-            InterfaceHelpers.CreateButton(closeBTN, "DumpBTN", InterfaceButtonMode.Background,
-                OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.DumpToBase());
-            #endregion
-
-            #region ColorPickerBTN
-            var colorPickerBTN = InterfaceHelpers.FindGameObject(settings, "ColorPickerBTN");
-
-            InterfaceHelpers.CreateButton(colorPickerBTN, "ColorPickerBTN", InterfaceButtonMode.Background,
-                OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.ColorPage());
-            #endregion
-
-            #region RenameBTN
-            var renameBTN = InterfaceHelpers.FindGameObject(settings, "RenameBaseBTN");
-
-            InterfaceHelpers.CreateButton(renameBTN, "RenameBTN", InterfaceButtonMode.Background,
-                OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.Rename());
-            #endregion
-
-            #region SettingsBTN
-            var settingsBTN = InterfaceHelpers.FindGameObject(home, "SettingsBTN");
-
-            InterfaceHelpers.CreateButton(settingsBTN, "SettingsBTN", InterfaceButtonMode.Background,
-                OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.SettingPage());
-            #endregion
-
-            #region HomePowerBTN
-            var homePowerBTN = InterfaceHelpers.FindGameObject(home, "PowerBTN");
-
-            InterfaceHelpers.CreateButton(homePowerBTN, "PowerBTN", InterfaceButtonMode.Background,
-                OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.PowerButton());
-            #endregion
-
-            #region PoweredOffPowerBTN
-            var poweredOffPowerBTN = InterfaceHelpers.FindGameObject(poweredOff, "PowerBTN");
-
-            InterfaceHelpers.CreateButton(poweredOffPowerBTN, "PowerBTN", InterfaceButtonMode.Background,
-                OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.PowerButton());
-            #endregion
-
-            #region ColorPickerMainHomeBTN
-            var colorPickerMainHomeBTN = InterfaceHelpers.FindGameObject(colorMainPage, "HomeBTN");
-
-            InterfaceHelpers.CreateButton(colorPickerMainHomeBTN, "SettingsBTN", InterfaceButtonMode.Background,
-                OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.SettingPage());
-            #endregion
-
-            #region SettingHomeBTN
-            var settingsHomeBTN = InterfaceHelpers.FindGameObject(settings, "HomeBTN");
-
-            InterfaceHelpers.CreateButton(settingsHomeBTN, "HomeBTN", InterfaceButtonMode.Background,
-                OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.GoToHome());
-            #endregion
-
-            #region Terminal Color BTN
-            var terminalColorBTN = InterfaceHelpers.FindGameObject(colorMainPage, "TerminalColorBTN");
-
-            InterfaceHelpers.CreateButton(terminalColorBTN, "TerminalColorBTN", InterfaceButtonMode.Background,
-                OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, string.Format(AuxPatchers.ColorPageFormat(), AuxPatchers.Terminal()));
-            #endregion
-
-            #region Search
-            var inputField = InterfaceHelpers.FindGameObject(baseItemsPage, "InputField");
-
-            if(inputField != null)
-            {
-                var text = InterfaceHelpers.FindGameObject(inputField, "Placeholder")?.GetComponent<Text>();
-                if (text != null)
+                if (canvasGameObject == null)
                 {
-                    text.text = AuxPatchers.SearchForItemsMessage();
+                    QuickLogger.Error("Canvas cannot be found");
+                    return false;
+                }
+                #endregion
+
+                #region Home
+                var home = InterfaceHelpers.FindGameObject(canvasGameObject, "Home");
+                #endregion
+
+                #region VehiclesPage
+                var vehiclesPage = InterfaceHelpers.FindGameObject(canvasGameObject, "VehiclesPage");
+                #endregion
+
+                #region VehicleDockingSettingsPage
+                var vehiclesDockingSettingsPage = InterfaceHelpers.FindGameObject(canvasGameObject, "VehicleDockingSettingsPage");
+                #endregion
+
+                #region VehiclesContainersPage
+                var vehiclesContainersPage = InterfaceHelpers.FindGameObject(canvasGameObject, "VehiclesContainersPage");
+                #endregion
+
+                #region VehicleItemsPage
+                var vehiclesItemsPage = InterfaceHelpers.FindGameObject(canvasGameObject, "VehiclesItemsPage");
+                #endregion
+
+                #region BaseItemsPage
+                var baseItemsPage = InterfaceHelpers.FindGameObject(canvasGameObject, "BaseItemsPage");
+                #endregion
+
+                #region GettingDataPage
+                var gettingDataPage = InterfaceHelpers.FindGameObject(canvasGameObject, "GettingData");
+                #endregion
+
+                #region Settings
+                var settings = InterfaceHelpers.FindGameObject(canvasGameObject, "SettingsPage");
+                #endregion
+
+                #region PoweredOff
+                var poweredOff = InterfaceHelpers.FindGameObject(canvasGameObject, "PowerOffPage");
+                #endregion
+
+                #region ColorPageMain
+                var colorMainPage = InterfaceHelpers.FindGameObject(canvasGameObject, "ColorPageMain");
+                #endregion
+
+                #region ScreenColorPicker
+
+                var screenColorPicker = InterfaceHelpers.FindGameObject(canvasGameObject, "TerminalColorPage");
+
+                #endregion
+
+                #region AntennnaColorPicker
+
+                _antennaColorPicker = InterfaceHelpers.FindGameObject(canvasGameObject, "AntennaColorPage");
+
+                #endregion
+
+                #region Base Grid
+
+                _baseGrid = _mono.gameObject.AddComponent<GridHelper>();
+                _baseGrid.OnLoadDisplay += OnLoadBaseGrid;
+                _baseGrid.Setup(12, DSSModelPrefab.BaseItemPrefab, home, _startColor, _hoverColor, OnButtonClick); //Minus 2 ItemPerPage because of the added Home button
+
+                #endregion
+
+                #region Vehicle Grid
+
+                _vehicleGrid = _mono.gameObject.AddComponent<GridHelper>();
+                _vehicleGrid.OnLoadDisplay += OnLoadVehicleGrid;
+                _vehicleGrid.Setup(12, DSSModelPrefab.VehicleItemPrefab, vehiclesPage, _startColor, _hoverColor, OnButtonClick); //Minus 1 ItemPerPage because of the added Home button
+
+                #endregion
+
+                #region Vehicle Containers Grid
+
+                _vehicleContainersGrid = _mono.gameObject.AddComponent<GridHelper>();
+                _vehicleContainersGrid.OnLoadDisplay += OnLoadVehicleContainersGrid;
+                _vehicleContainersGrid.Setup(12, DSSModelPrefab.VehicleItemPrefab, vehiclesContainersPage, _startColor, _hoverColor, OnButtonClick, 5,
+                    "PrevBTN", "NextBTN", "Grid", "Paginator", "HomeBTN", "VehicleItemsPage"); //Minus 1 ItemPerPage because of the added Home button
+
+                #endregion
+
+                #region Vehicles Page
+
+                _vehicleItemsGrid = _mono.gameObject.AddComponent<GridHelper>();
+                _vehicleItemsGrid.OnLoadDisplay += OnLoadVehicleItemsGrid;
+                _vehicleItemsGrid.Setup(44, DSSModelPrefab.ItemPrefab, vehiclesItemsPage, _startColor, _hoverColor, OnButtonClick,5,
+                    "PrevBTN", "NextBTN", "Grid", "Paginator", "HomeBTN", "VehiclesPageBTN");
+                _VehicleItemsPageLabel = vehiclesItemsPage.FindChild("VehicleLabel").GetComponentInChildren<Text>();
+                #endregion
+                
+                #region Vehicles Settings Page
+                QuickLogger.Debug("1");
+                _vehicleSettingsGrid = _mono.gameObject.AddComponent<GridHelper>();
+                _vehicleSettingsGrid.OnLoadDisplay += OnLoadDockSettingsGrid;
+                _vehicleSettingsGrid.Setup(5, DSSModelPrefab.FilterItemPrefab, vehiclesDockingSettingsPage, _startColor, _hoverColor, OnButtonClick, 5,
+                    "PrevBTN", "NextBTN", "Grid", "Paginator", "HomeBTN", "SettingsBTN");
+                //_VehicleItemsPageLabel = vehiclesItemsPage.FindChild("VehicleLabel").GetComponentInChildren<Text>();
+                #endregion
+
+                #region Base Items Page
+
+                _baseItemsGrid = _mono.gameObject.AddComponent<GridHelper>();
+                _baseItemsGrid.OnLoadDisplay += OnLoadBaseItemsGrid;
+                _baseItemsGrid.Setup(44, DSSModelPrefab.ItemPrefab, baseItemsPage, _startColor, _hoverColor, OnButtonClick);
+                #endregion
+
+                #region DumpBTNButton
+                var closeBTN = InterfaceHelpers.FindGameObject(baseItemsPage, "DumpButton");
+
+                InterfaceHelpers.CreateButton(closeBTN, "DumpBTN", InterfaceButtonMode.Background,
+                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.DumpToBase());
+                #endregion
+
+                #region ColorPickerBTN
+                var colorPickerBTN = InterfaceHelpers.FindGameObject(settings, "ColorPickerBTN");
+
+                InterfaceHelpers.CreateButton(colorPickerBTN, "ColorPickerBTN", InterfaceButtonMode.Background,
+                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.ColorPage());
+                #endregion
+
+                #region RenameBTN
+                var renameBTN = InterfaceHelpers.FindGameObject(settings, "RenameBaseBTN");
+
+                InterfaceHelpers.CreateButton(renameBTN, "RenameBTN", InterfaceButtonMode.Background,
+                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.Rename());
+                #endregion
+
+                #region SettingsBTN
+                var settingsBTN = InterfaceHelpers.FindGameObject(home, "SettingsBTN");
+
+                InterfaceHelpers.CreateButton(settingsBTN, "SettingsBTN", InterfaceButtonMode.Background,
+                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.SettingPage());
+                #endregion
+
+                #region HomePowerBTN
+                var homePowerBTN = InterfaceHelpers.FindGameObject(home, "PowerBTN");
+
+                InterfaceHelpers.CreateButton(homePowerBTN, "PowerBTN", InterfaceButtonMode.Background,
+                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.PowerButton());
+                #endregion
+
+                #region PoweredOffPowerBTN
+                var poweredOffPowerBTN = InterfaceHelpers.FindGameObject(poweredOff, "PowerBTN");
+
+                InterfaceHelpers.CreateButton(poweredOffPowerBTN, "PowerBTN", InterfaceButtonMode.Background,
+                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.PowerButton());
+                #endregion
+
+                #region ColorPickerMainHomeBTN
+                var colorPickerMainHomeBTN = InterfaceHelpers.FindGameObject(colorMainPage, "HomeBTN");
+
+                InterfaceHelpers.CreateButton(colorPickerMainHomeBTN, "SettingsBTN", InterfaceButtonMode.Background,
+                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.SettingPage());
+                #endregion
+
+                #region SettingHomeBTN
+                var settingsHomeBTN = InterfaceHelpers.FindGameObject(settings, "HomeBTN");
+
+                InterfaceHelpers.CreateButton(settingsHomeBTN, "HomeBTN", InterfaceButtonMode.Background,
+                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.GoToHome());
+                #endregion
+
+                #region Terminal Color BTN
+                var terminalColorBTN = InterfaceHelpers.FindGameObject(colorMainPage, "TerminalColorBTN");
+
+                InterfaceHelpers.CreateButton(terminalColorBTN, "TerminalColorBTN", InterfaceButtonMode.Background,
+                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, string.Format(AuxPatchers.ColorPageFormat(), AuxPatchers.Terminal()));
+                #endregion
+
+                #region VehicleSettingsBTN
+                var vehicleSettingBTN = InterfaceHelpers.FindGameObject(settings, "AutoDockBTN");
+
+                InterfaceHelpers.CreateButton(vehicleSettingBTN, "AutoDockBTN", InterfaceButtonMode.Background,
+                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.ColorPage());//TODO Change
+                #endregion
+                
+                var toggle = InterfaceHelpers.FindGameObject(vehiclesDockingSettingsPage, "Toggle").GetComponent<Toggle>();
+                toggle.onValueChanged.AddListener(OnAutoPullToggled);
+
+                #region Search
+                var inputField = InterfaceHelpers.FindGameObject(baseItemsPage, "InputField");
+
+                if(inputField != null)
+                {
+                    var text = InterfaceHelpers.FindGameObject(inputField, "Placeholder")?.GetComponent<Text>();
+                    if (text != null)
+                    {
+                        text.text = AuxPatchers.SearchForItemsMessage();
+                    }
+                    else
+                    {
+                        return false;
+                    }
+
+                    var searchField = inputField.AddComponent<SearchField>();
+                    searchField.OnSearchValueChanged += UpdateSearch;
                 }
                 else
                 {
+                    //throw new MissingComponentException("Cannot find Input Field");
                     return false;
                 }
+            
+                #endregion
 
-                var searchField = inputField.AddComponent<SearchField>();
-                searchField.OnSearchValueChanged += UpdateSearch;
+                #region Antenna Color BTN
+                var antennaColorBTN = InterfaceHelpers.FindGameObject(colorMainPage, "AntennaColorBTN");
+
+                InterfaceHelpers.CreateButton(antennaColorBTN, "AntennaColorBTN", InterfaceButtonMode.Background,
+                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, string.Format(AuxPatchers.ColorPageFormat(), AuxPatchers.Antenna()));
+                #endregion
+
+                #region ColorPage
+                _terminalColorPage.SetupGrid(90, DSSModelPrefab.ColorItemPrefab, screenColorPicker, OnButtonClick, _startColor, _hoverColor, 5,
+                    "PrevBTN", "NextBTN", "Grid", "Paginator", "HomeBTN", "ColorPickerBTN");
+                #endregion
+
+                #region BaseItemDecription
+
+                var baseItemPageDesc = InterfaceHelpers.FindGameObject(colorMainPage, "Title")?.GetComponent<Text>();
+                baseItemPageDesc.text = AuxPatchers.ColorMainPageDesc();
+
+                #endregion
+
+                #region BaseName
+
+                _baseNameLabel = InterfaceHelpers.FindGameObject(baseItemsPage, "BaseLabel")?.GetComponent<Text>();
+
+                #endregion
+
+                #region BaseItemsLoading
+
+                _gettingData = InterfaceHelpers.FindGameObject(gettingDataPage, "Title")?.GetComponent<Text>();
+
+                #endregion
+
+                #region VehicleDumpBTNButton
+                var vehicleDumpBTN = InterfaceHelpers.FindGameObject(vehiclesItemsPage, "DumpButton");
+
+                InterfaceHelpers.CreateButton(vehicleDumpBTN, "VehicleDumpBTN", InterfaceButtonMode.Background,
+                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.VehicleDumpReceptacle());
+                #endregion
+
+                return true;
             }
-            else
+            catch (Exception e)
             {
-                //throw new MissingComponentException("Cannot find Input Field");
+                QuickLogger.Error(e.Message);
+                QuickLogger.Error(e.StackTrace);
                 return false;
             }
-            
-            #endregion
-
-            #region Antenna Color BTN
-            var antennaColorBTN = InterfaceHelpers.FindGameObject(colorMainPage, "AntennaColorBTN");
-
-            InterfaceHelpers.CreateButton(antennaColorBTN, "AntennaColorBTN", InterfaceButtonMode.Background,
-                OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, string.Format(AuxPatchers.ColorPageFormat(), AuxPatchers.Antenna()));
-            #endregion
-
-            #region ColorPage
-            _terminalColorPage.SetupGrid(90, DSSModelPrefab.ColorItemPrefab, screenColorPicker, OnButtonClick, _startColor, _hoverColor, 5,
-            "PrevBTN", "NextBTN", "Grid", "Paginator", "HomeBTN", "ColorPickerBTN");
-            #endregion
-
-            #region BaseItemDecription
-
-            var baseItemPageDesc = InterfaceHelpers.FindGameObject(colorMainPage, "Title")?.GetComponent<Text>();
-            baseItemPageDesc.text = AuxPatchers.ColorMainPageDesc();
-
-            #endregion
-
-            #region BaseName
-
-            _baseNameLabel = InterfaceHelpers.FindGameObject(baseItemsPage, "BaseLabel")?.GetComponent<Text>();
-
-            #endregion
-
-            #region BaseItemsLoading
-
-            _gettingData = InterfaceHelpers.FindGameObject(gettingDataPage, "Title")?.GetComponent<Text>();
-
-            #endregion
-
-            #region VehicleDumpBTNButton
-            var vehicleDumpBTN = InterfaceHelpers.FindGameObject(vehiclesItemsPage, "DumpButton");
-
-            InterfaceHelpers.CreateButton(vehicleDumpBTN, "VehicleDumpBTN", InterfaceButtonMode.Background,
-                OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.VehicleDumpReceptacle());
-            #endregion
-
-            return true;
+        }
+        
+        internal void OnAutoPullToggled(bool value)
+        {
+            QuickLogger.Debug($"Setting Toggle to {value}",true);
+            _mono.Manager.DockingManager.ToggleIsEnabled(value);
         }
 
         public void RefreshVehicles(List<Vehicle> vehicles)
@@ -828,16 +936,10 @@ namespace DataStorageSolutions.Mono
             }
         }
 
-        //TODO Fix refresh on item removal
         public void RefreshVehicleItems()
         {
             _vehicleItemsGrid?.DrawPage();
             _vehicleContainersGrid.DrawPage();
-            //if (!_startBuffer)
-            //{
-            //    _vehicleItemsGrid?.DrawPage();
-            //    _startBuffer = true;
-            //}
         }
     }
 }

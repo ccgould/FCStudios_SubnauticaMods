@@ -67,6 +67,7 @@ namespace DataStorageSolutions.Mono
                     if (_savedData?.TerminalBodyColor != null)
                     {
                         TerminalColorManager.SetMaskColorFromSave(_savedData.TerminalBodyColor.Vector4ToColor());
+                        //DisplayManager.OnAutoPullToggled(Manager?.DockingManager?.GetToggleState() ?? false);
                     }
 
                     FindBaseById(_savedData?.BaseID);

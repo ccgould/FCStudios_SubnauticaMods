@@ -47,7 +47,6 @@ namespace DataStorageSolutions.Model
         public NameController NameController { get; private set; }
         internal Action<bool> OnBreakerToggled { get; set; }
         public DSSVehicleDockingManager DockingManager { get; set; }
-
         public bool IsOperational => !_hasBreakerTripped || BaseHasPower();
         public static Action OnPlayerTick { get; set; }
         public Action<BaseManager> OnVehicleStorageUpdate { get; set; }

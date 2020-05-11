@@ -181,7 +181,7 @@ namespace DataStorageSolutions.Configuration
         };
 
         internal static Action OnBaseUpdate { get; set; }
-        public static Action<DSSRackController> OnContainerUpdate { get; set; }
+        internal static Action<DSSRackController> OnContainerUpdate { get; set; }
 
         internal static event Action<SaveData> OnDataLoaded;
         #endregion
@@ -327,16 +327,17 @@ namespace DataStorageSolutions.Configuration
             GameObject.DestroyImmediate(_saveObject.gameObject);
             _saveObject = null;
         }
+        
         public static string GetAssetFolder()
         {
             return Path.Combine(GetModPath(), "Assets");
         }
-
-
+        
         private static string GetModPath()
         {
             return Path.Combine(GetQModsPath(), ModFolderName);
         }
+        
         private static string GetQModsPath()
         {
             return Path.Combine(Environment.CurrentDirectory, "QMods");
@@ -395,6 +396,48 @@ namespace DataStorageSolutions.Configuration
         {
             return Path.Combine(GetAssetFolder(), fileName);
         }
+
+        internal static void AddBlackListFilter(TechType techType)
+        {
+            var dockingList = QPatch.Configuration.Config.DockingBlackList;
+            if (!dockingList.Contains(techType))
+            {
+                dockingList.Add(techType);
+            }
+
+            SaveModConfiguration();
+        }
+
+        internal static void RemoveBlackListFilter(TechType techType)
+        {
+            var dockingList = QPatch.Configuration.Config.DockingBlackList;
+            if (dockingList.Contains(techType))
+            {
+                dockingList.Remove(techType);
+            }
+
+            SaveModConfiguration();
+        }
+
+        internal static bool IsFilterAdded(TechType techType)
+        {
+            var dockingList = QPatch.Configuration.Config.DockingBlackList;
+            return dockingList.Contains(techType);
+        }
+
+        internal static void SaveModConfiguration()
+        {
+            try
+            {
+                var saveDataJson = JsonConvert.SerializeObject(QPatch.Configuration, Formatting.Indented);
+
+                File.WriteAllText(Path.Combine(MODFOLDERLOCATION, ConfigurationFile()), saveDataJson);
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error($"{e.Message}\n{e.StackTrace}");
+            }
+        }
     }
 
     internal class Config
@@ -407,7 +450,9 @@ namespace DataStorageSolutions.Configuration
         [JsonProperty] internal float ServerPowerUsage { get; set; } = 0.1f;
         [JsonProperty] internal bool PullFromDockedVehicles { get; set; } = true;
         [JsonProperty] internal float CheckVehiclesInterval { get; set; } = 2.0f;
+
         [JsonProperty] internal float ExtractInterval = 0.25f;
+        [JsonProperty] internal HashSet<TechType> DockingBlackList { get; set; } = new HashSet<TechType>();
     }
 
     internal class ConfigFile
