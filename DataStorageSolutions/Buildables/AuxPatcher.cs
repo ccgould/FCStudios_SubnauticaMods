@@ -63,6 +63,8 @@ namespace DataStorageSolutions.Buildables
             { $"{ModKey}_VehicleFormat","Vehicle: {0}"},
             { $"{ModKey}_ViewStorageBFormat","View {0} server data."},
             { $"{ModKey}_VehicleDumpContainer","Add items to this vehicle"},
+            { $"{ModKey}_BlackListItemFormat","{0} item is in the blacklist an will not be pulled from the vehicle."},
+            { $"{ModKey}_DockedVehiclesSettingsPage","Go to docked vehicles settings page."},
         };
 
         internal static void AdditionalPatching()
@@ -333,6 +335,15 @@ namespace DataStorageSolutions.Buildables
         public static string VehicleDumpReceptacle()
         {
             return Language.main.Get(LanguageDictionary.Keys.ElementAt(49));
+        }
+        public static string BlackListFormat()
+        {
+            return Language.main.Get(LanguageDictionary.Keys.ElementAt(50));
+        }
+
+        public static string GoToDockedVehiclesSettings()
+        {
+            return Language.main.Get(LanguageDictionary.Keys.ElementAt(51));
         }
     }
 }

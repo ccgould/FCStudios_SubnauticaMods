@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using DataStorageSolutions.Buildables;
@@ -12,30 +13,32 @@ using UnityEngine;
 
 namespace DataStorageSolutions.Mono
 {
-    internal class DSSVehicleDockingManager
+    internal class DSSVehicleDockingManager : MonoBehaviour
     {
         private bool _extractingItems;
-        private SubRoot _mono;
+
         private bool _isToggled;
         private readonly bool _isVDSInstalled = QPatch.IsDockedVehicleStorageAccessInstalled;
         private BaseManager _manager;
-        private int _prevAmount;
         private List<Vehicle> _vehiclesSnapshot;
         private Dictionary<int, int> Subscibers = new Dictionary<int, int>();
         private List<ItemsContainer> _trackedContainers = new List<ItemsContainer>();
         private int _prevContainerAmount;
+        private IEnumerable<Vehicle> _newlyDockedVehicle;
+        private bool _isBeingDestroyed;
+        private Coroutine _startCheck;
+        private Coroutine _tryExtractItems;
 
         internal List<VehicleDockingBay> DockingBays { get; set; } = new List<VehicleDockingBay>();
         internal List<Vehicle> Vehicles { get; }= new List<Vehicle>();
 
         private IEnumerator StartCheck()
         {
-            while (true)
+            while (!_isBeingDestroyed)
             {
                 if (QPatch.Configuration.Config.PullFromDockedVehicles)
                 {
                     GetDockingBays();
-                    yield return TryExtractItems();
                 }
                 
                 yield return new WaitForSeconds(QPatch.Configuration.Config.CheckVehiclesInterval);
@@ -55,10 +58,12 @@ namespace DataStorageSolutions.Mono
                 yield break;
             }
 
-            bool extractedAnything = false;
             Dictionary<string, int> extractionResults = new Dictionary<string, int>();
 
-            List<Vehicle> localVehicles = Vehicles.ToList();
+            List<Vehicle> localVehicles = _newlyDockedVehicle?.ToList(); //Vehicles.ToList();
+
+            if (localVehicles == null) yield break;
+
             foreach (var vehicle in localVehicles)
             {
                 var vehicleName = vehicle.GetName();
@@ -74,7 +79,9 @@ namespace DataStorageSolutions.Mono
                             break;
                         }
 
-                        if (!Mod.IsFilterAdded(item.item.GetTechType()) && _manager.IsAllowedToAdd(item.item,true) && _manager.CanBeStored(1, item.item.GetTechType()))
+                        if (ValidateCheck(item)) continue;
+
+                        if (_manager.CanBeStored(1, item.item.GetTechType()))
                         {
                             var success = _manager.AddItemToContainer(item);
                             if (success)
@@ -84,7 +91,6 @@ namespace DataStorageSolutions.Mono
                                 {
                                     ErrorMessage.AddDebug("Extracting items from vehicle storage...");
                                 }
-                                extractedAnything = true;
                                 _extractingItems = true;
                                 yield return new WaitForSeconds(QPatch.Configuration.Config.ExtractInterval);
                             }
@@ -108,11 +114,25 @@ namespace DataStorageSolutions.Mono
                 }
             }
 
-            //if (extractedAnything)
-            //{
-            //    NotifyExtraction(extractionResults);
-            //}
             _extractingItems = false;
+            _newlyDockedVehicle = null;
+        }
+
+        private bool ValidateCheck(InventoryItem item)
+        {
+            if (Mod.IsFilterAddedWithType(item.item.GetTechType()))
+            {
+                QuickLogger.Info(string.Format(AuxPatchers.BlackListFormat(), Language.main.Get(item.item.GetTechType())),
+                    true);
+                return true;
+            }
+
+            if (!_manager.IsAllowedToAdd(item.item, true))
+            {
+                return true;
+            }
+
+            return false;
         }
 
         private void GetDockingBays()
@@ -142,31 +162,36 @@ namespace DataStorageSolutions.Mono
         private void OnDockedVehicleChanged()
         {
             UpdateDockedVehicles();
-            _mono.StartCoroutine(TryExtractItems());
+
+            _newlyDockedVehicle = Vehicles.Except(_vehiclesSnapshot);
+
+            _tryExtractItems = StartCoroutine(TryExtractItems());
 
             var list3 = _vehiclesSnapshot.Except(Vehicles);
+
+            // Un-subscribe all undocked vehicles
             foreach (Vehicle vehicle in list3)
             {
                 var vehicleContainers = DSSHelpers.GetVehicleContainers(vehicle);
                 UpdateSubscription(vehicleContainers, false,vehicle);
             }
+            
             _manager.OnVehicleUpdate?.Invoke(Vehicles,_manager);
         }
 
         private void UpdateDockedVehicles()
         {
-
-
-            _prevAmount = DockingBays.Count;
             _vehiclesSnapshot = new List<Vehicle>(Vehicles);
             Vehicles.Clear();
+            ItemsTracker.Clear();
             foreach (var dockingBay in DockingBays)
             {
                 var vehicle = dockingBay.GetDockedVehicle();
                 if (vehicle != null)
                 {
-                    vehicle.modules.onRemoveItem += ModulesOnOnRemoveItem;
+                    vehicle.modules.onRemoveItem += ModulesOnRemoveItem;
                     var vehicleContainers = DSSHelpers.GetVehicleContainers(vehicle);
+                    ItemsTracker.Add(vehicle, GetItems(vehicleContainers));
                     _trackedContainers.AddRange(vehicleContainers);
                     Vehicles.Add(vehicle);
                     UpdateSubscription(vehicleContainers, true,vehicle);
@@ -182,7 +207,20 @@ namespace DataStorageSolutions.Mono
             _trackedContainers.Clear();
         }
 
-        private void ModulesOnOnRemoveItem(InventoryItem item)
+        public Dictionary<Vehicle, IEnumerable<TechType>> ItemsTracker { get; set; } = new Dictionary<Vehicle, IEnumerable<TechType>>();
+
+        private IEnumerable<TechType> GetItems(List<ItemsContainer> vehicleContainers)
+        {
+            foreach (ItemsContainer container in vehicleContainers)
+            {
+                foreach (InventoryItem inventoryItem in container)
+                {
+                    yield return inventoryItem.item.GetTechType();
+                }
+            }
+        }
+
+        private void ModulesOnRemoveItem(InventoryItem item)
         {
             _manager.OnContainerUpdate?.Invoke(_manager);
         }
@@ -223,10 +261,9 @@ namespace DataStorageSolutions.Mono
 
         internal void Initialize(SubRoot mono, BaseManager manager)
         {
-            _mono = mono;
             _manager = manager;
             GetDockingBays();
-            Player.main.StartCoroutine(StartCheck());
+           _startCheck = StartCoroutine(StartCheck());
         }
 
         internal void ToggleIsEnabled(bool value)
@@ -274,7 +311,7 @@ namespace DataStorageSolutions.Mono
             return null;
         }
 
-        public bool IsAllowedToAdd(Vehicle vehicle, Pickupable pickupable)
+        internal bool IsAllowedToAdd(Vehicle vehicle, Pickupable pickupable)
         {
             var containers = DSSHelpers.GetVehicleContainers(vehicle);
             foreach (ItemsContainer container in containers)
@@ -288,22 +325,47 @@ namespace DataStorageSolutions.Mono
             return false;
         }
 
-        public void OpenContainer(Vehicle vehicle,ItemsContainer container)
+        internal void OpenContainer(Vehicle vehicle,ItemsContainer container)
         {
             var containers = DSSHelpers.GetVehicleContainers(vehicle);
             foreach (ItemsContainer currentContainer in containers)
             {
                 if(container != currentContainer) continue;
 
-                if (!currentContainer.IsFull())
-                {
-                    Player main = Player.main;
-                    PDA pda = main.GetPDA();
-                    Inventory.main.SetUsedStorage(container, false);
-                    pda.Open(PDATab.Inventory, null, null, 4f);
-                }
+                Player main = Player.main;
+                PDA pda = main.GetPDA();
+                Inventory.main.SetUsedStorage(container, false);
+                pda.Open(PDATab.Inventory, null, null, 4f);
                 break;
             }
+        }
+
+        private void OnDestroy()
+        {
+            _isBeingDestroyed = true;
+
+            if (_startCheck != null)
+            {
+                StopCoroutine(_startCheck);
+            }
+
+            if (_tryExtractItems != null)
+            {
+                StopCoroutine(_tryExtractItems);
+            }
+        }
+
+        public IEnumerable<TechType> GetVehicleItems(Vehicle currentVehicle)
+        {
+            foreach (KeyValuePair<Vehicle, IEnumerable<TechType>> valuePair in ItemsTracker)
+            {
+                if (valuePair.Key != null)
+                {
+                    return valuePair.Value;
+                }
+            }
+
+            return null;
         }
     }
 }

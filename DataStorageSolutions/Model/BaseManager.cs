@@ -41,19 +41,17 @@ namespace DataStorageSolutions.Model
         internal FCSPowerStates PrevPowerState { get; set; }
         internal SubRoot Habitat { get; }
         internal DumpContainer DumpContainer { get; private set; }
-        public DumpContainer VehicleDumpContainer { get; set; }
         public int GetContainerFreeSpace { get; }
         public bool IsFull { get; }
-        public NameController NameController { get; private set; }
+        internal NameController NameController { get; private set; }
         internal Action<bool> OnBreakerToggled { get; set; }
-        public DSSVehicleDockingManager DockingManager { get; set; }
-        public bool IsOperational => !_hasBreakerTripped || BaseHasPower();
-        public static Action OnPlayerTick { get; set; }
-        public Action<BaseManager> OnVehicleStorageUpdate { get; set; }
-        public Action<List<Vehicle>,BaseManager> OnVehicleUpdate { get; set; }
-        public Action<BaseManager> OnContainerUpdate { get; set; }
+        internal DSSVehicleDockingManager DockingManager { get; set; }
+        internal bool IsOperational => !_hasBreakerTripped || BaseHasPower();
+        internal static Action OnPlayerTick { get; set; }
+        internal Action<BaseManager> OnVehicleStorageUpdate { get; set; }
+        internal Action<List<Vehicle>,BaseManager> OnVehicleUpdate { get; set; }
+        internal Action<BaseManager> OnContainerUpdate { get; set; }
 
-        //I was about to check the subscription on the vehicles
 
         private void Initialize(SubRoot habitat)
         {
@@ -81,25 +79,15 @@ namespace DataStorageSolutions.Model
                 DumpContainer.Initialize(habitat.transform, AuxPatchers.BaseDumpReceptacle(), AuxPatchers.NotAllowed(),
                     AuxPatchers.CannotBeStored(), this, 4, 4);
             }
-
-            //if (VehicleDumpContainer == null)
-            //{
-            //    VehicleDumpContainerController = new VehicleDumpContainer();
-            //    VehicleDumpContainerController.Initialize(this);
-            //    VehicleDumpContainer = habitat.gameObject.AddComponent<DumpContainer>();
-            //    VehicleDumpContainer.Initialize(habitat.transform, AuxPatchers.VehicleDumpReceptacle(), AuxPatchers.NotAllowed(),
-            //        AuxPatchers.CannotBeStored(), VehicleDumpContainerController, 4, 4);
-            //}
-
+            
             if (DockingManager == null)
             {
-                DockingManager = new DSSVehicleDockingManager();
+                DockingManager = habitat.gameObject.AddComponent<DSSVehicleDockingManager>();
                 DockingManager.Initialize(habitat,this);
+                DockingManager.ToggleIsEnabled(_savedData?.AllowDocking ?? false);
             }
         }
-
-
-
+        
         private void ReadySaveData()
         {
             _savedData = Mod.GetBaseSaveData(InstanceID);
@@ -156,15 +144,7 @@ namespace DataStorageSolutions.Model
 
             OnBreakerToggled?.Invoke(_hasBreakerTripped);
         }
-
-        public BaseManager(SubRoot habitat)
-        {
-            if (habitat == null) return;
-            Habitat = habitat;
-            InstanceID = habitat.gameObject.gameObject?.GetComponentInChildren<PrefabIdentifier>()?.Id;
-            Initialize(habitat);
-        }
-
+        
         private bool BaseHasPower()
         {
             if(Habitat != null)
@@ -181,6 +161,26 @@ namespace DataStorageSolutions.Model
             }
 
             return false;
+        }
+
+        private int GetAntennaCount()
+        {
+            int i = 0;
+
+            for (int j = 0; j < BaseAntennas.Count; j++)
+            {
+                i++;
+            }
+
+            return i;
+        }
+
+        public BaseManager(SubRoot habitat)
+        {
+            if (habitat == null) return;
+            Habitat = habitat;
+            InstanceID = habitat.gameObject.gameObject?.GetComponentInChildren<PrefabIdentifier>()?.Id;
+            Initialize(habitat);
         }
 
         internal static BaseManager FindManager(SubRoot subRoot)
@@ -275,8 +275,7 @@ namespace DataStorageSolutions.Model
         {
             QuickLogger.Message(string.Format(AuxPatchers.BaseOnOffMessage(), GetBaseName(), state ? AuxPatchers.Online() : AuxPatchers.Offline()), true);
         }
-
-
+        
         internal static void RemoveAntenna(DSSAntennaController unit)
         {
             if (BaseAntennas.Contains(unit))
@@ -291,19 +290,7 @@ namespace DataStorageSolutions.Model
                 unit.PowerManager.OnPowerUpdate -= OnPowerUpdate;
             }
         }
-
-        private int GetAntennaCount()
-        {
-            int i = 0;
-
-            for (int j = 0; j < BaseAntennas.Count; j++)
-            {
-                i++;
-            }
-
-            return i;
-        }
-
+        
         internal Dictionary<TechType,int> GetItemsWithin()
         {
             try
@@ -325,7 +312,7 @@ namespace DataStorageSolutions.Model
             }
         }
 
-        public void TakeItem(TechType techType)
+        internal void TakeItem(TechType techType)
         {
             foreach (DSSRackController baseUnit in BaseRacks)
             {
@@ -342,12 +329,12 @@ namespace DataStorageSolutions.Model
             }
         }
 
-        public void OpenDump(TransferData data)
+        internal void OpenDump(TransferData data)
         {
             DumpContainer.OpenStorage();
         }
 
-        public IBaseAntenna GetCurrentBaseAntenna(bool ignoreVisible = false)
+        internal IBaseAntenna GetCurrentBaseAntenna(bool ignoreVisible = false)
         {
             return ignoreVisible ? BaseAntennas.FirstOrDefault(antenna => antenna != null && antenna.Manager.InstanceID == InstanceID) : 
                 BaseAntennas.FirstOrDefault(antenna => antenna != null && antenna.Manager.InstanceID == InstanceID && antenna.IsVisible());
@@ -451,11 +438,11 @@ namespace DataStorageSolutions.Model
         {
             foreach (BaseManager manager in Managers)
             {
-                yield return new BaseSaveData {BaseName = manager.GetBaseName(), InstanceID = manager.InstanceID};
+                yield return new BaseSaveData {BaseName = manager.GetBaseName(), InstanceID = manager.InstanceID, AllowDocking = manager.DockingManager.GetToggleState()};
             }
         }
 
-        public static void RemoveDestroyedBases()
+        internal static void RemoveDestroyedBases()
         {
             for (int i = Managers.Count - 1; i > -1; i--)
             {
@@ -466,7 +453,7 @@ namespace DataStorageSolutions.Model
             }
         }
 
-        public RackSlot GetServerWithItem(TechType techType)
+        internal RackSlot GetServerWithItem(TechType techType)
         {
             for (int i = 0; i < BaseRacks.Count; i++)
             {
@@ -477,8 +464,8 @@ namespace DataStorageSolutions.Model
 
             return null;
         }
-
-        public int GetItemCount(TechType techType)
+        
+        internal int GetItemCount(TechType techType)
         {
             int amount = 0;
 

@@ -280,7 +280,7 @@ namespace DataStorageSolutions.Configuration
 
                 if (entry.InstanceID == instanceId)
                 {
-                    return new BaseSaveData{BaseName = entry.BaseName, InstanceID = entry.InstanceID};
+                    return new BaseSaveData{BaseName = entry.BaseName, InstanceID = entry.InstanceID, AllowDocking = entry.AllowDocking};
                 }
             }
 
@@ -397,32 +397,54 @@ namespace DataStorageSolutions.Configuration
             return Path.Combine(GetAssetFolder(), fileName);
         }
 
-        internal static void AddBlackListFilter(TechType techType)
+        internal static void AddBlackListFilter(Filter filter)
         {
             var dockingList = QPatch.Configuration.Config.DockingBlackList;
-            if (!dockingList.Contains(techType))
+            if (!dockingList.Contains(filter))
             {
-                dockingList.Add(techType);
+                dockingList.Add(filter);
             }
 
             SaveModConfiguration();
         }
 
-        internal static void RemoveBlackListFilter(TechType techType)
+        internal static void RemoveBlackListFilter(Filter filter)
         {
             var dockingList = QPatch.Configuration.Config.DockingBlackList;
-            if (dockingList.Contains(techType))
+            if (dockingList.Contains(filter))
             {
-                dockingList.Remove(techType);
+                dockingList.Remove(filter);
             }
 
             SaveModConfiguration();
         }
 
-        internal static bool IsFilterAdded(TechType techType)
+        internal static bool IsFilterAdded(Filter compareFilter)
         {
-            var dockingList = QPatch.Configuration.Config.DockingBlackList;
-            return dockingList.Contains(techType);
+            foreach (Filter filter in QPatch.Configuration.Config.DockingBlackList)
+            {
+                if (filter.IsSame(compareFilter))
+                {
+                    QuickLogger.Debug("Filter is in the list",true);
+                    return true;
+                }
+            }
+            QuickLogger.Debug("Filter is not in the list", true);
+
+            return false;
+        }
+
+        internal static bool IsFilterAddedWithType(TechType techType)
+        {
+            foreach (Filter filter in QPatch.Configuration.Config.DockingBlackList)
+            {
+                if (filter.IsTechTypeAllowed(techType))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         internal static void SaveModConfiguration()
@@ -452,7 +474,7 @@ namespace DataStorageSolutions.Configuration
         [JsonProperty] internal float CheckVehiclesInterval { get; set; } = 2.0f;
 
         [JsonProperty] internal float ExtractInterval = 0.25f;
-        [JsonProperty] internal HashSet<TechType> DockingBlackList { get; set; } = new HashSet<TechType>();
+        [JsonProperty] internal HashSet<Filter> DockingBlackList { get; set; } = new HashSet<Filter>();
     }
 
     internal class ConfigFile

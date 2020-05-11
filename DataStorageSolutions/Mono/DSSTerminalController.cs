@@ -27,6 +27,7 @@ namespace DataStorageSolutions.Mono
         private SaveDataEntry _savedData;
         private bool _fromSave;
         private BaseManager _manager;
+        private bool _isBeingDestroyed;
 
         public override bool IsConstructed => _isContructed;
         public override BaseManager Manager
@@ -46,7 +47,6 @@ namespace DataStorageSolutions.Mono
         public DSSTerminalDisplay DisplayManager { get; private set; }
         internal ColorManager TerminalColorManager { get; private set; }
         public PowerManager PowerManager { get; private set; }
-        internal DSSVehicleDockingManager DockingManager { get; set; }
 
         private void OnEnable()
         {
@@ -67,7 +67,6 @@ namespace DataStorageSolutions.Mono
                     if (_savedData?.TerminalBodyColor != null)
                     {
                         TerminalColorManager.SetMaskColorFromSave(_savedData.TerminalBodyColor.Vector4ToColor());
-                        //DisplayManager.OnAutoPullToggled(Manager?.DockingManager?.GetToggleState() ?? false);
                     }
 
                     FindBaseById(_savedData?.BaseID);
@@ -81,6 +80,7 @@ namespace DataStorageSolutions.Mono
         
         private void OnDestroy()
         {
+            _isBeingDestroyed = true;
             Manager?.RemoveTerminal(this);
         }
 
@@ -96,7 +96,7 @@ namespace DataStorageSolutions.Mono
 
         private void Update()
         {
-            if(IsConstructed && PowerManager != null && SubRoot != null)
+            if(IsConstructed && PowerManager != null && SubRoot != null && !_isBeingDestroyed)
             {
                 PowerManager?.UpdatePowerState();
                 PowerManager?.ConsumePower();
@@ -196,6 +196,7 @@ namespace DataStorageSolutions.Mono
         
         public override void UpdateScreen()
         {
+            if (_isBeingDestroyed) return;
             QuickLogger.Debug($"Refreshing Monitor: {GetPrefabIDString()}", true);
             DisplayManager.Refresh();
         }
