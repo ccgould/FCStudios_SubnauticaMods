@@ -39,7 +39,7 @@ namespace DataStorageSolutions.Buildables
             { $"{ModKey}_Antenna","antenna"},
             { $"{ModKey}_Terminal","terminal"},
             { $"{ModKey}_Rename","Rename this base."},
-            { $"{ModKey}_ColorPageDesc","Rename this base."},
+            { $"{ModKey}_ColorPageDesc","Change the color of the antenna or terminal."},
             { $"{ModKey}_PowerUsage","Power Usage"},
             { $"{ModKey}_GettingData","Please Wait Retrieving {0} data."},
             { $"{ModKey}_IsFormattedFormat","Is Formatted: {0}."},
