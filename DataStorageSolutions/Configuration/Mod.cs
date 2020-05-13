@@ -280,7 +280,7 @@ namespace DataStorageSolutions.Configuration
 
                 if (entry.InstanceID == instanceId)
                 {
-                    return new BaseSaveData{BaseName = entry.BaseName, InstanceID = entry.InstanceID, AllowDocking = entry.AllowDocking};
+                    return new BaseSaveData{BaseName = entry.BaseName, InstanceID = entry.InstanceID, AllowDocking = entry.AllowDocking, HasBreakerTripped = entry.HasBreakerTripped};
                 }
             }
 

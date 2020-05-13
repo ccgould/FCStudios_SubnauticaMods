@@ -70,6 +70,11 @@ namespace DataStorageSolutions.Mono
                     }
 
                     FindBaseById(_savedData?.BaseID);
+
+                    if (Manager.GetHasBreakerTripped())
+                    {
+                        Manager.OnBreakerToggled?.Invoke(Manager.GetHasBreakerTripped());
+                    }
                 }
 
                 UpdateScreen();

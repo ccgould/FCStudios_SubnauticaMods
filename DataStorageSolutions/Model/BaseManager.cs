@@ -53,6 +53,8 @@ namespace DataStorageSolutions.Model
         internal Action<BaseManager> OnContainerUpdate { get; set; }
 
 
+        
+
         private void Initialize(SubRoot habitat)
         {
             ReadySaveData();
@@ -86,6 +88,8 @@ namespace DataStorageSolutions.Model
                 DockingManager.Initialize(habitat,this);
                 DockingManager.ToggleIsEnabled(_savedData?.AllowDocking ?? false);
             }
+
+            _hasBreakerTripped = _savedData?.HasBreakerTripped ?? false;
         }
         
         private void ReadySaveData()
@@ -181,6 +185,11 @@ namespace DataStorageSolutions.Model
             Habitat = habitat;
             InstanceID = habitat.gameObject.gameObject?.GetComponentInChildren<PrefabIdentifier>()?.Id;
             Initialize(habitat);
+        }
+
+        internal bool GetHasBreakerTripped()
+        {
+            return _hasBreakerTripped;
         }
 
         internal static BaseManager FindManager(SubRoot subRoot)
@@ -438,7 +447,7 @@ namespace DataStorageSolutions.Model
         {
             foreach (BaseManager manager in Managers)
             {
-                yield return new BaseSaveData {BaseName = manager.GetBaseName(), InstanceID = manager.InstanceID, AllowDocking = manager.DockingManager.GetToggleState()};
+                yield return new BaseSaveData {BaseName = manager.GetBaseName(), InstanceID = manager.InstanceID, AllowDocking = manager.DockingManager.GetToggleState(), HasBreakerTripped = manager.GetHasBreakerTripped() };
             }
         }
 

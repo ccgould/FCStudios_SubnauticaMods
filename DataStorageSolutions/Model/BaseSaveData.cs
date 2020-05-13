@@ -5,5 +5,6 @@
         public string InstanceID { get; set; }
         public string BaseName { get; set; }
         public bool AllowDocking { get; set; }
+        public bool HasBreakerTripped { get; set; }
     }
 }
