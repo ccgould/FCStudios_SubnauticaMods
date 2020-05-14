@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using FCSTechFabricator.Enums;
 using UnityEngine;
@@ -8,29 +9,10 @@ namespace FCS_HydroponicHarvesters.Mono
     internal class HydroHarvEffectManager : MonoBehaviour
     {
         private HydroHarvController _mono;
-        private const float SprayTimeDefault = 180f;
-        private float _sprayTime;
         private readonly List<GameObject> _bubbles = new List<GameObject>();
-        private VFXController _vaporFx;
-        private bool _fireVapor;
+        private GameObject _vaporFx;
         private bool PowerAvailable => _mono.PowerManager.HasPowerToConsume();
-        private float _timeLeft = 1;
-
-        private static Transform FindObject(Transform tr, string value)
-        {
-            foreach (Transform child in tr)
-            {
-                if (child.name.StartsWith(value))
-                {
-                    return child;
-                }
-
-                FindObject(child, value);
-            }
-
-            return null;
-        }
-
+        
         private void FindBubbles()
         {
             foreach (Transform transform in gameObject.transform)
@@ -44,12 +26,7 @@ namespace FCS_HydroponicHarvesters.Mono
 
         private void FindVaporBlast()
         {
-            _vaporFx = FindObject(gameObject.transform, "MaterialEmitter")?.GetComponent<VFXController>();
-            if (_vaporFx != null)
-            {
-                _vaporFx.emitters[1] = null;
-                _vaporFx.gameObject.SetActive(true);
-            }
+            _vaporFx = GameObjectHelpers.FindGameObject(gameObject, "PressurisedSteam_FCS");
         }
 
         private void ShowBubbles()
@@ -78,11 +55,13 @@ namespace FCS_HydroponicHarvesters.Mono
             }
         }
 
-        private void FireSpray()
+        private void ToggleVapor(bool state)
         {
-            QuickLogger.Debug($"Firing {_mono?.PrefabId?.Id} Spray",true);
-           _vaporFx.Play(0);
-            _fireVapor = true;
+            if (state != _vaporFx?.activeSelf)
+            {
+                _vaporFx?.SetActive(state);
+            }
+
         }
 
         private void Update()
@@ -93,26 +72,7 @@ namespace FCS_HydroponicHarvesters.Mono
             if (PowerAvailable)
             {
                 //Handle Spray Firing
-                _sprayTime -= DayNightCycle.main.deltaTime;
-                if (_sprayTime < 0)
-                {
-                    if (_mono.HydroHarvGrowBed.GetBedType() == FCSEnvironment.Air)
-                    {
-                        FireSpray();
-                        _sprayTime = SprayTimeDefault;
-                    }
-                }
-
-                if (_fireVapor)
-                {
-                    _timeLeft -= DayNightCycle.main.deltaTime;
-                    if (_timeLeft < 0)
-                    {
-                       _vaporFx.Stop(0);
-                        _fireVapor = false;
-                        _timeLeft = 1f;
-                    }
-                }
+                ToggleVapor(_mono.HydroHarvGrowBed.GetBedType() == FCSEnvironment.Air);
 
                 //Handle Bubbles
                 if (_mono.HydroHarvGrowBed.GetBedType() == FCSEnvironment.Water)
@@ -134,7 +94,6 @@ namespace FCS_HydroponicHarvesters.Mono
         internal void Initialize(HydroHarvController mono)
         {
             _mono = mono;
-            _sprayTime = SprayTimeDefault;
             FindBubbles();
             FindVaporBlast();
         }

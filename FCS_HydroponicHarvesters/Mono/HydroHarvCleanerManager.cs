@@ -56,7 +56,7 @@ namespace FCS_HydroponicHarvesters.Mono
             _mono = mono;
         }
         
-        public bool CanBeStored(int amount)
+        public bool CanBeStored(int amount,TechType techType = TechType.None)
         {
             return false;
         }

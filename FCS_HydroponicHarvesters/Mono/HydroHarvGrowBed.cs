@@ -20,6 +20,7 @@ namespace FCS_HydroponicHarvesters.Mono
         private bool _fromLoad;
         private HydroHarvController _mono;
         private readonly Dictionary<TechType, StoredDNAData> _dna = new Dictionary<TechType, StoredDNAData>();
+
         private readonly List<TechType> _invalidAdjustTechTypes = new List<TechType>
         {
             TechType.CreepvineSeedCluster,
@@ -30,8 +31,7 @@ namespace FCS_HydroponicHarvesters.Mono
             TechType.BloodRoot,
             TechType.BloodVine
         };
-
-
+        
         public int GetContainerFreeSpace => Slots.Count(x => !x.IsOccupied);
         public bool IsFull => GetContainerFreeSpace <= 0;
         internal PlantSlot[] Slots;
@@ -187,7 +187,7 @@ namespace FCS_HydroponicHarvesters.Mono
             }
         }
 
-        public bool CanBeStored(int amount)
+        public bool CanBeStored(int amount, TechType techType = TechType.None)
         {
             throw new NotImplementedException();
         }
@@ -243,6 +243,14 @@ namespace FCS_HydroponicHarvesters.Mono
 
             var gameObject = model != null ? Instantiate(model) : Instantiate(CraftData.GetPrefabForTechType(techType));
 
+            if (techType == TechType.CrashPowder)
+            {
+                var crash = gameObject.GetComponent<CrashHome>();
+                SafeAnimator.SetBool(crash.animator, "attacking",true);
+                GameObject.Destroy(crash);
+            }
+
+
             gameObject.transform.SetParent(parent, false);
             gameObject.transform.localScale = GetModelScale(techType);
             gameObject.transform.localPosition = Vector3.zero;
@@ -265,6 +273,8 @@ namespace FCS_HydroponicHarvesters.Mono
                 gameObject.AddComponent<GrownPlant>().seed = null;
             }
 
+
+
             Destroy(gameObject.GetComponent<Rigidbody>());
             Destroy(gameObject.GetComponent<WorldForces>());
 
@@ -273,6 +283,11 @@ namespace FCS_HydroponicHarvesters.Mono
             if (!_invalidAdjustTechTypes.Contains(techType))
             {
                 SetLocalZeroAllChildren(parent.transform);
+            }
+
+            if (techType == TechType.TreeMushroomPiece)
+            {
+                gameObject.transform.localRotation = Quaternion.Euler(0f, 180f, 180f);
             }
 
             return gameObject;
@@ -360,10 +375,13 @@ namespace FCS_HydroponicHarvesters.Mono
         {
             if (savedDataDnaSamples == null) return;
             _fromLoad = true;
+
+            QuickLogger.Debug($"Loading {savedDataDnaSamples.Count} DNA.");
             foreach (KeyValuePair<TechType, StoredDNAData> dnaSample in savedDataDnaSamples)
             {
                 for (int i = 0; i < dnaSample.Value.Amount; i++)
                 {
+                    QuickLogger.Debug($"Loading DNA item {dnaSample.Value.TechType}");
                     var dna = dnaSample.Value.TechType.ToInventoryItem();
                     var fcsDna = dna.item.gameObject.GetComponentInChildren<FCSDNA>();
                     fcsDna.GetDnaData();

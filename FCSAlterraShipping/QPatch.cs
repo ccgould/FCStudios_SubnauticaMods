@@ -5,6 +5,7 @@ using FCSTechFabricator;
 using FCSTechFabricator.Components;
 using FCSTechFabricator.Craftables;
 using QModManager.API.ModLoading;
+using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
 
 namespace FCSAlterraShipping
@@ -31,6 +32,9 @@ namespace FCSAlterraShipping
             try
             {
                 AddTechFabricatorItems();
+
+                CraftDataHandler.SetHarvestType(TechType.Peeper, HarvestType.DamageAlive);
+                CraftDataHandler.SetHarvestOutput(TechType.Peeper, TechType.AcidMushroom);
 
                 AlterraShippingBuildable.PatchSMLHelper();
 

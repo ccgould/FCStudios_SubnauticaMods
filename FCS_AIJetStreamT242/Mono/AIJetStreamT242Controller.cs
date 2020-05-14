@@ -239,7 +239,31 @@ namespace FCS_AIMarineTurbine.Mono
                 HealthManager.SetDamageModel(_damage);
 
                 if (PowerManager == null)
+                {
                     PowerManager = GetComponentInParent<AIJetStreamT242PowerManager>() ?? GetComponent<AIJetStreamT242PowerManager>();
+                    PowerManager.maxPower = 300;
+                }
+
+
+                
+                if (PowerRelay == null)
+                {
+                    PowerRelay = gameObject.AddComponent<PowerRelay>();
+
+                    PowerRelay.internalPowerSource = PowerManager;
+                    PowerRelay.maxOutboundDistance = 15;
+                    PowerRelay.dontConnectToRelays = false;
+                    
+
+                    PowerFX yourPowerFX = gameObject.AddComponent<PowerFX>();
+                    PowerRelay powerRelay = CraftData.GetPrefabForTechType(TechType.SolarPanel).GetComponent<PowerRelay>();
+
+                    yourPowerFX.vfxPrefab = powerRelay.powerFX.vfxPrefab;
+                    yourPowerFX.attachPoint = gameObject.transform;
+                    PowerRelay.powerFX = yourPowerFX;
+
+                    Resources.UnloadAsset(powerRelay);
+                }
 
                 PowerManager.Initialize(this);
 
@@ -368,7 +392,7 @@ namespace FCS_AIMarineTurbine.Mono
 
         private string GetTurbinePowerData()
         {
-            return PowerManager == null ? "Output per second 0" : $"Output per second {Mathf.Round(PowerManager.GetEnergyPerSecond() * 10) / 10}";
+            return PowerManager == null ? "Output per second 0" : $"Output per minute {PowerManager.GetEnergyPerMinute()}";
         }
 
         #endregion
@@ -496,6 +520,8 @@ namespace FCS_AIMarineTurbine.Mono
 
         public int ScreenState { get; set; }
         public bool IsConnectedToBase => _seaBase != null;
+
+        public PowerRelay PowerRelay { get; private set; }
 
         #endregion
 

@@ -29,8 +29,6 @@ namespace MAC.OxStation.Managers
         {
             while (true)
             {
-
-
                 yield return new WaitForSeconds(0.5f);
             }
         }

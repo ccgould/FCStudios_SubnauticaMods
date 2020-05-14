@@ -250,8 +250,7 @@ namespace FCS_AIMarineTurbine.Display
                 return false;
             }
             #endregion
-
-
+            
             #region Background
             _background = CanvasGameObject.transform.Find("Background")?.gameObject;
             if (_background == null)
@@ -306,13 +305,13 @@ namespace FCS_AIMarineTurbine.Display
                 _healthPercentage.GetComponent<Text>().text = $"{_mono.HealthManager.GetHealth()}%";
 
                 int powerPercent;
-                if (_mono.PowerManager.GetCharge() <= 0.0f || AIJetStreamT242Buildable.JetStreamT242Config.MaxCapacity <= 0.0f)
+                if (_mono.PowerManager.GetPower() <= 0.0f || _mono.PowerManager.GetMaxPower() <= 0.0f)
                 {
                     powerPercent = 0;
                 }
                 else
                 {
-                    powerPercent = Mathf.RoundToInt((_mono.PowerManager.GetCharge() / AIJetStreamT242Buildable.JetStreamT242Config.MaxCapacity) * 100);
+                    powerPercent = Mathf.RoundToInt((_mono.PowerManager.GetPower() / _mono.PowerManager.GetMaxPower()) * 100);
                 }
 
                 _powerSlider.GetComponent<Slider>().value = powerPercent / 100f;

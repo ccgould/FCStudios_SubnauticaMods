@@ -1,4 +1,5 @@
-﻿using FCSCommon.Utilities;
+﻿using FCSCommon.Helpers;
+using FCSCommon.Utilities;
 using FCSTechFabricator.Enums;
 using SMLHelper.V2.Handlers;
 using UnityEngine;
@@ -18,8 +19,8 @@ namespace FCSTechFabricator.Components
         
         private void GetPickupableData(GameObject go)
         {
-            var pickable = go.GetComponent<Pickupable>();
-            if (pickable)
+            var pickable = go?.GetComponent<Pickupable>();
+            if (pickable != null)
             {
                 if (pickable.GetTechType() == TechType.CoralChunk)
                 {
@@ -43,12 +44,14 @@ namespace FCSTechFabricator.Components
                     IsPlantable = true;
                 }
             }
+
         }
 
         private bool GetCreatureData(GameObject go)
         {
-            var creature = go.GetComponentInChildren<Creature>();
-            if (creature)
+            var creature = go?.GetComponentInChildren<Creature>();
+
+            if (creature != null)
             {
                 if (creature.gameObject.GetComponentInChildren<Skyray>())
                 {
@@ -66,8 +69,13 @@ namespace FCSTechFabricator.Components
 
         private bool GetPlantableData(GameObject go)
         {
-            var plantable = go.GetComponentInChildren<Plantable>();
-            if (plantable)
+            QuickLogger.Debug($"GetPlantableData:  GameObject Name: {go?.name}");
+
+            var plantable = go?.GetComponentInChildren<Plantable>();
+
+            QuickLogger.Debug($"Plantable Result: {plantable}");
+
+            if (plantable != null)
             {
                 QuickLogger.Debug("Is Plantable");
 
@@ -94,6 +102,16 @@ namespace FCSTechFabricator.Components
                 QuickLogger.Debug($"Model Is {Model?.name}");
                 return true;
             }
+            else
+            {
+                if (TechType == TechType.TreeMushroomPiece)
+                {
+                    Model = go;
+                    GiveItem = TechType;
+                    Environment = FCSEnvironment.Water;
+                    IsPlantable = true;
+                }
+            }
 
             return false;
         }
@@ -106,6 +124,15 @@ namespace FCSTechFabricator.Components
             TechType = (TechType) ingredientTechType;
 
             go = CraftData.GetPrefabForTechType(TechType, false);
+
+            if (go == null && TechType == TechType.TreeMushroomPiece)
+            {
+                QuickLogger.Debug("Is Mushroom");
+                var treeMushroomResourcePath = "WorldEntities/Doodads/Coral_reef/Coral_reef_tree_mushrooms_01_01";
+                var treeMushroom = Resources.Load<GameObject>(treeMushroomResourcePath);
+                go = GameObject.Instantiate(treeMushroom);
+            }
+
             return false;
         }
 
@@ -132,13 +159,23 @@ namespace FCSTechFabricator.Components
 
                 if (GetIngredientTechType(techType, out var ingredientTechType)) return;
 
+                QuickLogger.Debug($"Ingredient TechType: {ingredientTechType}");
+
                 if (GetPrefabForTechType(ingredientTechType, out var go)) return;
 
+                QuickLogger.Debug($"Prefab TechType: {go?.name}");
+                
                 if (GetPlantableData(go)) return;
 
-                if (GetCreatureData(go)) return;
+                QuickLogger.Debug($"Environment: {Environment}");
 
+                if (GetCreatureData(go)) return;
+                
                 GetPickupableData(go);
+
+                QuickLogger.Debug($"Prefab Name: {Model?.name}");
+                QuickLogger.Debug($"Environment: {Environment}");
+                QuickLogger.Debug($"Is Plantable: {IsPlantable}");
 
                 _initialized = true;
             }

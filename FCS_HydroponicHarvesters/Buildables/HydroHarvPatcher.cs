@@ -79,7 +79,6 @@ namespace FCS_HydroponicHarvesters.Buildables
                 prefabID.ClassId = ClassID;
 
                 AddBubbles(prefab);
-                AddVaporBlast(prefab);
 
                 prefab.AddComponent<TechTag>().type = TechType;
                 prefab.AddComponent<HydroHarvController>();
@@ -92,16 +91,6 @@ namespace FCS_HydroponicHarvesters.Buildables
                 QuickLogger.Error(e.Message);
                 return null;
             }
-        }
-
-        private void AddVaporBlast(GameObject prefab)
-        {
-            MaterialHelpers.AddNewVaporBlast(
-                prefab, 
-                new Vector3(0f, 2.251f, 0f), 
-                new Vector3(90f, 0f, 0f),
-                new Vector3(0f, 0f, 0f
-                ));
         }
 
         private void AddBubbles(GameObject prefab)

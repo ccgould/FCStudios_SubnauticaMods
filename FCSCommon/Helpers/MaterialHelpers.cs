@@ -10,7 +10,7 @@ namespace FCSCommon.Helpers
     {
         private static Material _glassMaterial;
         private static GameObject _laterialBubbles;
-        private static GameObject _extinguisherFX;
+
 
         /// <summary>
         /// Finds a <see cref="Texture2D"/> in the asset bundle with the specified name.
@@ -288,22 +288,8 @@ namespace FCSCommon.Helpers
                 QuickLogger.Debug($"Laterial Bubbles result: {_laterialBubbles?.name}");
             }
 
-            if (_extinguisherFX == null)
-            {
-                var extinguisher = fireExtinguisher.FindChild("MaterialEmitter");
-                if (extinguisher == null)
-                {
-                    QuickLogger.Error("Failed to find MaterialEmitter in the FireExtinguisher");
-                    return;
-                }
-
-                _extinguisherFX = GameObject.Instantiate(extinguisher);
-                _extinguisherFX.SetActive(true);
-                QuickLogger.Debug($"Laterial Bubbles result: {_laterialBubbles?.name}");
-            }
-
             GameObject.Destroy(aquarium);
-            GameObject.Destroy(fireExtinguisher);
+
         }
 
         internal static void ApplyPrecursorShader(string materialName, string normalMap, string metalicmap, GameObject gameObject, AssetBundle assetBundle, float glossiness)
@@ -463,18 +449,6 @@ namespace FCSCommon.Helpers
             }
 
             return null;
-        }
-
-        public static void AddNewVaporBlast(GameObject prefab, Vector3 position, Vector3 rotation, Vector3 scale)
-        {
-            GetIngameObjects();
-
-            var newBubbles = GameObject.Instantiate(_extinguisherFX);
-            newBubbles.transform.SetParent(prefab.transform);
-            newBubbles.transform.localPosition = position;
-            newBubbles.transform.Rotate(rotation);
-            newBubbles.transform.localScale = scale;
-            newBubbles.SetActive(false);
         }
 
         public static Color? GetBodyMaskColor(GameObject gameObject, string materialName)

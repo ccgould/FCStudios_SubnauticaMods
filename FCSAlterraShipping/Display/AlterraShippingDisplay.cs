@@ -25,6 +25,7 @@ namespace FCSAlterraShipping.Display
     internal class AlterraShippingDisplay : MonoBehaviour
     {
         #region Private Members
+
         private GameObject _canvasGameObject;
         private bool _coroutineStarted;
         private AlterraShippingTarget _mono;
@@ -47,11 +48,6 @@ namespace FCSAlterraShipping.Display
         private const int MaxContainerSpaces = AlterraShippingContainer.MaxContainerSlots;
         private const float DelayedStartTime = 0.5f;
         private const float RepeatingUpdateInterval = 1f;
-        private const int Main = 1;
-        private const int BaseSelect = 2;
-        private const int Shipping = 3;
-        private const int ColorPicker = 4;
-        private const int BlackOut = 0;
         private List<ColorVec4> _serializedColors;
         private int COLORS_PER_PAGE = 48;
         private int _maxColorPage = 1;
@@ -64,11 +60,14 @@ namespace FCSAlterraShipping.Display
         #endregion
 
         #region Public Properties
+
         public bool ShowBootScreen { get; set; } = true;
         public int BootTime { get; set; } = 3;
+
         #endregion
 
         #region Unity Methods
+
         internal void Setup(AlterraShippingTarget mono)
         {
             if (!_coroutineStarted)
@@ -106,10 +105,7 @@ namespace FCSAlterraShipping.Display
             _initialized = true;
 
             _serializedColors = ColorList.Colors;
-
-
-            CheckCurrentPage();
-
+            
             DrawPage(1);
 
             DrawColorPage(1);
@@ -117,16 +113,19 @@ namespace FCSAlterraShipping.Display
             ShippingTargetManager.GlobalChanged += GlobalChanged;
 
             InvokeRepeating("UpdateStatus", 1f, 0.5f);
+
+            GoToPage(Pages.Main);
         }
 
         private void Start()
         {
-            
+
         }
 
         #endregion
 
         #region Internal Methods
+
         internal void OnButtonClick(string btnName, object additionalObject)
         {
             switch (btnName)
@@ -152,7 +151,7 @@ namespace FCSAlterraShipping.Display
                     break;
 
                 case "ColorItem":
-                    var color = (Color)additionalObject;
+                    var color = (Color) additionalObject;
                     ColorHandler.ChangeBodyColor("AlterraShipping_BaseColor", color, _mono.gameObject);
                     QuickLogger.Debug($"{_mono.gameObject.name} Color Changed to {color.ToString()}");
                     _mono.SetCurrentBodyColor(color);
@@ -165,6 +164,11 @@ namespace FCSAlterraShipping.Display
                 case "ColorCancelBTN":
                     MainScreen();
                     break;
+                    
+                case "CancelTransferBTN":
+                    _mono.CancelTransfer();
+                    break;
+
 
                 case "ShippingContainer":
                     var target = additionalObject as AlterraShippingTarget;
@@ -177,7 +181,8 @@ namespace FCSAlterraShipping.Display
 
                     if (target.IsReceivingTransfer || target.IsFull())
                     {
-                        QuickLogger.Message($"Target Inventory doesn't have enough free slots or is receiving a shipment", true);
+                        QuickLogger.Message(
+                            $"Target Inventory doesn't have enough free slots or is receiving a shipment", true);
                         return;
                     }
 
@@ -240,6 +245,7 @@ namespace FCSAlterraShipping.Display
         {
             DrawPage(_currentPage + amount);
         }
+
         #endregion
 
         #region Private Methods
@@ -247,30 +253,36 @@ namespace FCSAlterraShipping.Display
         private bool FindAllComponents()
         {
             #region Canvas
+
             _canvasGameObject = this.gameObject.GetComponentInChildren<Canvas>()?.gameObject;
             if (_canvasGameObject == null)
             {
                 QuickLogger.Error("Canvas not found.");
                 return false;
             }
+
             #endregion
 
             #region Top
+
             var top = _canvasGameObject.FindChild("Top")?.gameObject;
             if (top == null)
             {
                 QuickLogger.Error("Top not found.");
                 return false;
             }
+
             #endregion
 
             #region Overlay
+
             var overlay = _canvasGameObject.FindChild("Overlay")?.gameObject;
             if (overlay == null)
             {
                 QuickLogger.Error("Overlay not found.");
                 return false;
             }
+
             #endregion
 
             #region Page_Name
@@ -281,54 +293,66 @@ namespace FCSAlterraShipping.Display
                 QuickLogger.Error("Page_Name not found.");
                 return false;
             }
+
             #endregion
 
             #region Message
+
             _message = top.FindChild("Message").GetComponent<Text>();
             if (_message == null)
             {
                 QuickLogger.Error("Message found.");
                 return false;
             }
+
             #endregion
 
             #region Main
+
             var main = _canvasGameObject.FindChild("Main")?.gameObject;
             if (main == null)
             {
                 QuickLogger.Error("Main not found.");
                 return false;
             }
+
             #endregion
 
             #region Page_1
+
             var page1 = main.FindChild("Page_1")?.gameObject;
             if (page1 == null)
             {
                 QuickLogger.Error("Page_1 not found.");
                 return false;
             }
+
             #endregion
 
             #region Page_2
+
             var page2 = main.FindChild("Page_2")?.gameObject;
             if (page2 == null)
             {
                 QuickLogger.Error("Page_2 not found.");
                 return false;
             }
+
             #endregion
 
             #region Page_3
+
             var page3 = main.FindChild("Page_3")?.gameObject;
             if (page3 == null)
             {
                 QuickLogger.Error("Page_3 not found.");
                 return false;
             }
+
             #endregion
 
             #region Color Picker Page
+
             var colorPickerPage = main.FindChild("Color_Picker")?.gameObject;
             if (colorPickerPage == null)
             {
@@ -337,9 +361,11 @@ namespace FCSAlterraShipping.Display
             }
 
             _colorPickerPage = colorPickerPage;
+
             #endregion
 
             #region Sent_Package Button
+
             var sentPackages = page1.FindChild("Sent_Package")?.gameObject;
             if (sentPackages == null)
             {
@@ -353,9 +379,11 @@ namespace FCSAlterraShipping.Display
             sentPackages_BTN.ButtonMode = InterfaceButtonMode.Background;
             sentPackages_BTN.TextLineOne = GetLanguage(DisplayLanguagePatching.SendPackageKey);
             sentPackages_BTN.Tag = this;
+
             #endregion
 
             #region Open_Container Button
+
             var openContainer = page1.FindChild("Open_Container")?.gameObject;
             if (openContainer == null)
             {
@@ -369,9 +397,11 @@ namespace FCSAlterraShipping.Display
             openContainer_BTN.ButtonMode = InterfaceButtonMode.Background;
             openContainer_BTN.TextLineOne = GetLanguage(DisplayLanguagePatching.OpenShippingContainerKey);
             openContainer_BTN.Tag = this;
+
             #endregion
 
             #region Color_Picker Button
+
             var colorPicker = page1.FindChild("Color_Picker")?.gameObject;
 
             if (colorPicker == null)
@@ -386,9 +416,11 @@ namespace FCSAlterraShipping.Display
             colorPicker_BTN.ButtonMode = InterfaceButtonMode.Background;
             colorPicker_BTN.TextLineOne = GetLanguage(DisplayLanguagePatching.ColorPickerKey);
             colorPicker_BTN.Tag = this;
+
             #endregion
 
             #region Prev Button
+
             var prevBTN = page2.FindChild("Prev_BTN")?.gameObject;
             if (prevBTN == null)
             {
@@ -400,9 +432,11 @@ namespace FCSAlterraShipping.Display
             prev_BTN.TextLineOne = GetLanguage(DisplayLanguagePatching.PrevPageKey);
             prev_BTN.ChangePageBy = ChangePageBy;
             prev_BTN.AmountToChangePageBy = -1;
+
             #endregion
 
             #region Next Button
+
             var nextBTN = page2.FindChild("Next_BTN")?.gameObject;
             if (nextBTN == null)
             {
@@ -414,9 +448,11 @@ namespace FCSAlterraShipping.Display
             next_BTN.TextLineOne = GetLanguage(DisplayLanguagePatching.NextPageKey);
             next_BTN.ChangePageBy = ChangePageBy;
             next_BTN.AmountToChangePageBy = 1;
+
             #endregion
 
             #region Prev Button
+
             var colorPrevBTN = colorPickerPage.FindChild("Prev_BTN")?.gameObject;
             if (colorPrevBTN == null)
             {
@@ -428,9 +464,11 @@ namespace FCSAlterraShipping.Display
             colorPrev_BTN.TextLineOne = GetLanguage(DisplayLanguagePatching.PrevPageKey);
             colorPrev_BTN.ChangePageBy = ChangeColorPageBy;
             colorPrev_BTN.AmountToChangePageBy = -1;
+
             #endregion
 
             #region Next Button
+
             var colorNextBTN = colorPickerPage.FindChild("Next_BTN")?.gameObject;
             if (colorNextBTN == null)
             {
@@ -442,9 +480,11 @@ namespace FCSAlterraShipping.Display
             colorNext_BTN.TextLineOne = GetLanguage(DisplayLanguagePatching.NextPageKey);
             colorNext_BTN.ChangePageBy = ChangeColorPageBy;
             colorNext_BTN.AmountToChangePageBy = 1;
+
             #endregion
 
             #region Cancel Button Text
+
             var cancelBtntxt = page2.FindChild("Cancel_BTN").GetComponent<Text>();
             if (cancelBtntxt == null)
             {
@@ -453,9 +493,11 @@ namespace FCSAlterraShipping.Display
             }
 
             cancelBtntxt.text = GetLanguage(DisplayLanguagePatching.CancelKey);
+
             #endregion
 
             #region Cancel Button
+
             var cancelBTN = page2.FindChild("Cancel_BTN")?.gameObject;
             if (cancelBTN == null)
             {
@@ -470,9 +512,11 @@ namespace FCSAlterraShipping.Display
             cancel_BTN.TextLineOne = GetLanguage(DisplayLanguagePatching.CancelKey);
             cancel_BTN.TextComponent = cancelBtntxt;
             cancel_BTN.Tag = this;
+
             #endregion
 
             #region Color Cancel Button Text
+
             var colorCancelBtntxt = colorPickerPage.FindChild("Cancel_BTN").GetComponent<Text>();
             if (colorCancelBtntxt == null)
             {
@@ -481,9 +525,11 @@ namespace FCSAlterraShipping.Display
             }
 
             colorCancelBtntxt.text = GetLanguage(DisplayLanguagePatching.ColorBackKey);
+
             #endregion
 
             #region Color Cancel Button
+
             var colorCancelBTN = colorPickerPage.FindChild("Cancel_BTN")?.gameObject;
             if (colorCancelBTN == null)
             {
@@ -498,27 +544,33 @@ namespace FCSAlterraShipping.Display
             colorCancel_BTN.TextLineOne = GetLanguage(DisplayLanguagePatching.ColorBackKey);
             colorCancel_BTN.TextComponent = colorCancelBtntxt;
             colorCancel_BTN.Tag = this;
+
             #endregion
 
             #region Container
+
             _itemsGrid = page2.FindChild("Container")?.gameObject;
             if (_itemsGrid == null)
             {
                 QuickLogger.Error("Container not found.");
                 return false;
             }
+
             #endregion
 
             #region Color Page Container
+
             _colorPageContainer = colorPickerPage.FindChild("Container")?.gameObject;
             if (_colorPageContainer == null)
             {
                 QuickLogger.Error("Color Page Container not found.");
                 return false;
             }
+
             #endregion
 
             #region Message Page 2
+
             var messagePag2 = page2.FindChild("Message").GetComponent<Text>();
             if (messagePag2 == null)
             {
@@ -527,9 +579,11 @@ namespace FCSAlterraShipping.Display
             }
 
             messagePag2.text = GetLanguage(DisplayLanguagePatching.BasePageDescriptionKey);
+
             #endregion
 
             #region Message Color Page
+
             var messageColorPage = colorPickerPage.FindChild("Message").GetComponent<Text>();
             if (messageColorPage == null)
             {
@@ -538,45 +592,55 @@ namespace FCSAlterraShipping.Display
             }
 
             messageColorPage.text = GetLanguage(DisplayLanguagePatching.ColorPageDescriptionKey);
+
             #endregion
 
             #region Page_Top Text
+
             _pageTopNumber = page2.FindChild("TopNumber").GetComponent<Text>();
             if (_pageTopNumber == null)
             {
                 QuickLogger.Error("TopNumber Text not found.");
                 return false;
             }
+
             #endregion
 
             #region Page_Bottom Text
+
             _pageBottomNumber = page2.FindChild("BottomNumber").GetComponent<Text>();
             if (_pageBottomNumber == null)
             {
                 QuickLogger.Error("BottomNumber Text not found.");
                 return false;
             }
+
             #endregion
 
             #region Color Page_Top Text
+
             _colorPageTopNumber = colorPickerPage.FindChild("TopNumber").GetComponent<Text>();
             if (_colorPageTopNumber == null)
             {
                 QuickLogger.Error("Color TopNumber Text not found.");
                 return false;
             }
+
             #endregion
 
             #region Color Page_Bottom Text
+
             _colorPageBottomNumber = colorPickerPage.FindChild("BottomNumber").GetComponent<Text>();
             if (_colorPageBottomNumber == null)
             {
                 QuickLogger.Error("Color BottomNumber Text not found.");
                 return false;
             }
+
             #endregion
 
             #region Shipping Text
+
             _shippingLabel = page3.FindChild("Shipping_LBL").GetComponent<Text>();
             if (_shippingLabel == null)
             {
@@ -585,9 +649,11 @@ namespace FCSAlterraShipping.Display
             }
 
             _shippingLabel.text = GetLanguage(DisplayLanguagePatching.ShippingKey);
+
             #endregion
 
             #region Shipping Container Label
+
             var shippingContainerLabel = page1.FindChild("ShippingContainerLabel")?.gameObject;
 
             if (shippingContainerLabel == null)
@@ -600,9 +666,35 @@ namespace FCSAlterraShipping.Display
             _alterraShippingNameController = shippingContainerLabel.AddComponent<AlterraShippingNameController>();
             _alterraShippingNameController.OnLabelChanged += OnLabelChanged;
             AlterraShippingNameController.Create(_mono, shippingContainerLabel);
+
+            #endregion
+
+            #region Cancel Button
+
+            var cancelTransferBTN = Instantiate(cancelBTN);
+            cancelTransferBTN.transform.SetParent(page3.transform,false);
+
+            #region Cancel Button Text
+
+            var cancelTransferBtntxt = cancelTransferBTN.GetComponent<Text>();
+            if (cancelTransferBtntxt == null)
+            {
+                QuickLogger.Error("cancelTransferBtntxt Text not found.");
+                return false;
+            }
+            #endregion
+
+
+            InterfaceButton cancelTransfer_BTN = cancelTransferBTN.AddComponent<InterfaceButton>();
+            cancelTransfer_BTN.OnButtonClick = OnButtonClick;
+            cancelTransfer_BTN.BtnName = "CancelTransferBTN";
+            cancelTransfer_BTN.ButtonMode = InterfaceButtonMode.TextColor;
+            cancelTransfer_BTN.TextLineOne = GetLanguage(DisplayLanguagePatching.CancelKey);
+            cancelTransfer_BTN.TextComponent = cancelTransferBtntxt;
             #endregion
 
             #region Time Left Text
+
             var timeLeftTXT = page3.FindChild("TimeLeft_LBL").GetComponent<Text>();
             if (timeLeftTXT == null)
             {
@@ -611,6 +703,7 @@ namespace FCSAlterraShipping.Display
             }
 
             _timeLeftTXT = timeLeftTXT;
+
             #endregion
 
             return true;
@@ -659,15 +752,7 @@ namespace FCSAlterraShipping.Display
         {
             StartCoroutine(TargetScreenEnu());
         }
-
-        private void CheckCurrentPage()
-        {
-            if (_animatorController.GetIntHash(_mono.PageHash) == BlackOut)
-            {
-                _animatorController.SetIntHash(_mono.PageHash, Main);
-            }
-        }
-
+        
         private void OnReceivingTransfer()
         {
             ShippingScreen(null);
@@ -708,6 +793,7 @@ namespace FCSAlterraShipping.Display
                     {
                         _mono.ContainerMode = ShippingContainerStates.Waiting;
                     }
+
                     _message.text = GetLanguage(DisplayLanguagePatching.PickUpAvailable);
                     break;
             }
@@ -838,14 +924,16 @@ namespace FCSAlterraShipping.Display
                 Destroy(_colorPageContainer.transform.GetChild(i).gameObject);
             }
         }
+
         #endregion
 
         #region IEnumerators
+
         private IEnumerator MainScreenEnu()
         {
             yield return new WaitForEndOfFrame();
             _pageName.text = GetLanguage(DisplayLanguagePatching.MainKey);
-            _animatorController.SetIntHash(_mono.PageHash, Main);
+            GoToPage(Pages.Main);
 
             if (_mono.HasItems())
             {
@@ -857,9 +945,7 @@ namespace FCSAlterraShipping.Display
         {
             yield return new WaitForEndOfFrame();
 
-            if (_animatorController.GetIntHash(_mono.PageHash) == Shipping) yield break;
-
-            _animatorController.SetIntHash(_mono.PageHash, Shipping);
+            GoToPage(Pages.Shipping);
 
             if (target == null) yield break;
             var shipping = _mono.TransferItems(target);
@@ -878,7 +964,7 @@ namespace FCSAlterraShipping.Display
             if (ShowBootScreen)
             {
                 _pageName.text = GetLanguage(DisplayLanguagePatching.MainKey);
-                _animatorController.SetIntHash(_mono.PageHash, Main);
+                GoToPage(Pages.Main);
                 yield return new WaitForSeconds(BootTime);
             }
 
@@ -890,20 +976,35 @@ namespace FCSAlterraShipping.Display
             yield return new WaitForEndOfFrame();
             _pageName.text = GetLanguage(DisplayLanguagePatching.ShippingKey);
             _animatorController.CloseDoors();
-            _animatorController.SetIntHash(_mono.PageHash, BaseSelect);
+            GoToPage(Pages.BaseSelect);
         }
 
         private IEnumerator ColorPickerScreenEnu()
         {
             yield return new WaitForEndOfFrame();
             _pageName.text = GetLanguage(DisplayLanguagePatching.ColorPickerKey);
-            _animatorController.SetIntHash(_mono.PageHash, ColorPicker);
+            GoToPage(Pages.ColorPicker);
         }
+
         #endregion
+
+        internal void GoToPage(Pages page)
+        {
+            _animatorController.SetIntHash(_mono.PageHash, (int)page);
+        }
 
         internal void UpdateLabelFromSave(string containerName)
         {
             _alterraShippingNameController.SetLabel(containerName);
         }
+    }
+
+    internal enum Pages
+    {
+        Main = 1,
+        BaseSelect = 2,
+        Shipping = 3,
+        ColorPicker = 4,
+        BlackOut = 0,
     }
 }

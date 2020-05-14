@@ -79,6 +79,7 @@ namespace FCS_HydroponicHarvesters.Configuration
             new DNASample("Table Coral","BlueJeweledDisk",TechType.JeweledDiskPiece),
             new DNASample("Creepvine","CreepvinePiece",TechType.CreepvinePiece),
             new DNASample("Gel Sack","GelSack",TechType.JellyPlant),
+            new DNASample("Tree Mushroom Piece","TreeMushroomPiece",TechType.TreeMushroomPiece),
         };
 
         public static List<DNASample> DecorSamples = new List<DNASample>

@@ -6,6 +6,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using FCSAlterraShipping.Buildable;
+using FCSAlterraShipping.Display;
+using FCSAlterraShipping.Enums;
 using UnityEngine;
 
 namespace FCSAlterraShipping.Mono
@@ -96,8 +98,14 @@ namespace FCSAlterraShipping.Mono
                 QuickLogger.Debug($"Not Built");
                 return;
             }
+            if(_mono == null || _mono.AnimatorController == null) return;
+            
+            if ((_mono.ContainerMode == ShippingContainerStates.Shipping || _mono.ContainerMode == ShippingContainerStates.Receiving) && _target == null)
+            {
+                CancelTransfer();
+            }
 
-            if (_target == null || _items == null || _done) return;
+            if ( _target == null || _items == null || _done) return;
 
             PendTransfer();
         }
@@ -190,6 +198,23 @@ namespace FCSAlterraShipping.Mono
                 QuickLogger.Debug("No Target Found!", true);
 
                 yield return null;
+            }
+        }
+
+        internal void CancelTransfer()
+        {
+            if(_done) return;
+
+            _currentTime = ResetTime;
+            _done = true;
+            _mono.DisplayManager.GoToPage(Pages.Main);
+            _mono.ContainerMode = ShippingContainerStates.Waiting;
+                
+            _mono.OnItemSent?.Invoke();
+
+            if (_target != null)
+            {
+                _target.CancelTransfer();
             }
         }
     }

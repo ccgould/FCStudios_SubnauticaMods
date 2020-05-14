@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using FCSTechFabricator.Extensions;
+using SMLHelper.V2.Handlers;
 using UnityEngine;
 
 namespace FCSAlterraShipping.Mono
@@ -109,7 +110,6 @@ namespace FCSAlterraShipping.Mono
                     DisplayManager.UpdateLabelFromSave(savedData.ContainerName);
                     ContainerMode = savedData.ContainertMode;
                     _hasBreakerTripped = savedData.HasBreakerTripped;
-                    _transferHandler.SetMono(this);
                     _transferHandler.SetCurrentTime(savedData.TimeLeft);
                     _transferHandler.SetCurrentTarget(savedData.Target);
                     _transferHandler.SetCurrentItems(_container.GetContainer());
@@ -147,6 +147,7 @@ namespace FCSAlterraShipping.Mono
             if (_transferHandler == null)
             {
                 _transferHandler = GetComponentInParent<AlterraShippingTransferHandler>() ?? GetComponent<AlterraShippingTransferHandler>();
+                _transferHandler.SetMono(this);
             }
 
             if (_transferHandler == null)
@@ -382,6 +383,11 @@ namespace FCSAlterraShipping.Mono
         public void SetCurrentBodyColor(Color color)
         {
             _currentBodyColor = color;
+        }
+
+        internal void CancelTransfer()
+        {
+            _transferHandler.CancelTransfer();
         }
     }
 }

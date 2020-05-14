@@ -71,7 +71,7 @@ namespace FCS_HydroponicHarvesters.Mono
             return StorageLimit - amount;
         }
 
-        public bool CanBeStored(int amount)
+        public bool CanBeStored(int amount, TechType techType = TechType.None)
         {
             return true;
         }
@@ -174,19 +174,10 @@ namespace FCS_HydroponicHarvesters.Mono
         internal void Load(Dictionary<TechType, int> savedDataContainer)
         {
             if(savedDataContainer == null) return;
-            foreach (KeyValuePair<TechType, int> pair in savedDataContainer)
-            {
-                if (pair.Value == 0)
-                {
-                    AddItemToContainer(pair.Key,true);
-                    continue;
-                }
 
-                for (int i = 0; i < pair.Value; i++)
-                {
-                    AddItemToContainer(pair.Key);
-                }
-            }
+            Items = savedDataContainer;
+
+            OnContainerUpdate?.Invoke();
         }
 
         public bool HasItems()

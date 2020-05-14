@@ -160,7 +160,7 @@ namespace FCS_AIMarineTurbine.Display
             }
         }
 
-        public void OnPointerClick(PointerEventData eventData)
+        public override void OnPointerClick(PointerEventData eventData)
         {
             base.OnPointerClick(eventData);
 
