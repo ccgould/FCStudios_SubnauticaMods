@@ -1,3 +1,23 @@
 {
-  "FCSTechFabricator": 313
+  "FCSPowerStorage": 212,
+  "CyclopsNuclearReactor": 241,
+  "FCSAlterraShipping": 247,
+  "AIMarineTurbine": 249,
+  "AMMiniMedBay": 261,
+  "FCSAIPowerCellSocket": 264,
+  "FCSTechFabricator": 313,
+  "ExStorageDepot": 320,
+  "FCSDeepDriller": 319,
+  "ARSSeaBreeze": 318,
+  "MiniFountainFilter": 335,
+  "SeaCooker": 336,
+  "SaveVehicleLightState": 367,
+  "FireExtinguisherHolder": 322,
+  "DropAllOnDeath": 363,
+  "QuantumTeleporter": 371,
+  "GasPodCollector": 430,
+  "OxStation": 386,
+  "OxStationVehiclesModules": 464,
+  "OxStationCyclopsModule": 465,
+  "HydroponicHarvesters": 466
 }
