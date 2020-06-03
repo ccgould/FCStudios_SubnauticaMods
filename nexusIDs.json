@@ -1,24 +1,90 @@
 {
-  "FCSPowerStorage": 212,
-  "CyclopsNuclearReactor": 241,
-  "FCSAlterraShipping": 247,
-  "AIMarineTurbine": 249,
-  "AMMiniMedBay": 261,
-  "FCSAIPowerCellSocket": 264,
-  "FCSTechFabricator": 313,
-  "ExStorageDepot": 320,
-  "FCSDeepDriller": 319,
-  "ARSSeaBreeze": 318,
-  "MiniFountainFilter": 335,
-  "SeaCooker": 336,
-  "SaveVehicleLightState": 367,
-  "FireExtinguisherHolder": 322,
-  "DropAllOnDeath": 363,
-  "QuantumTeleporter": 371,
-  "GasPodCollector": 430,
-  "OxStation": 386,
-  "OxStationVehiclesModules": 464,
-  "OxStationCyclopsModule": 465,
-  "HydroponicHarvesters": 466,
-  "FCSDataStorageSolutions": 486
+  "FCSPowerStorage": {
+    "ID": 212,
+    "Version": "2.1.1"
+  },
+  "CyclopsNuclearReactor": {
+    "ID": 241,
+    "Version": "4.2.1"
+  },
+  "FCSAlterraShipping": {
+    "ID": 247,
+    "Version": "1.2.2"
+  },
+  "AIMarineTurbine": {
+    "ID": 249,
+    "Version": "2.3.1"
+  },
+  "AMMiniMedBay": {
+    "ID": 261,
+    "Version": "1.2.2"
+  },
+  "FCSAIPowerCellSocket": {
+    "ID": 264,
+    "Version": "1.2.3"
+  },
+  "FCSTechFabricator": {
+    "ID": 313,
+    "Version": "2.0.4"
+  },
+  "ExStorageDepot": {
+    "ID": 320,
+    "Version": "1.3.3"
+  },
+  "FCSDeepDriller": {
+    "ID": 319,
+    "Version": "1.2.5"
+  },
+  "ARSSeaBreeze": {
+    "ID": 318,
+    "Version": "2.0.2"
+  },
+  "MiniFountainFilter": {
+    "ID": 335,
+    "Version": "1.1.4"
+  },
+  "SeaCooker": {
+    "ID": 336,
+    "Version": "1.2.5"
+  },
+  "SaveVehicleLightState": {
+    "ID": 367,
+    "Version": "1.0.0"
+  },
+  "FireExtinguisherHolder": {
+    "ID": 322,
+    "Version": "1.0.1"
+  },
+  "DropAllOnDeath": {
+    "ID": 363,
+    "Version": "1.0.1"
+  },
+  "QuantumTeleporter": {
+    "ID": 371,
+    "Version": "1.0.4"
+  },
+  "GasPodCollector": {
+    "ID": 430,
+    "Version": "1.0.2"
+  },
+  "OxStation": {
+    "ID": 386,
+    "Version": "1.1.0"
+  },
+  "OxStationVehiclesModules": {
+    "ID": 464,
+    "Version": "1.0.0"
+  },
+  "OxStationCyclopsModule": {
+    "ID": 465,
+    "Version": "1.0.0"
+  },
+  "HydroponicHarvesters": {
+    "ID": 466,
+    "Version": "1.3.0"
+  },
+  "FCSDataStorageSolutions": {
+    "ID": 486,
+    "Version": "1.0.0"
+  }
 }
