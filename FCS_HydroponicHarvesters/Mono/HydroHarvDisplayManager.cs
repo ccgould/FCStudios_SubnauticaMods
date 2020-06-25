@@ -139,7 +139,7 @@ namespace FCS_HydroponicHarvesters.Mono
             }
         }
 
-        internal void OnContainerUpdate()
+        internal void OnContainerUpdate(int arg1,int arg2)
         {
             UpdateDna();
             _itemsCount.text = string.Format(HydroponicHarvestersBuildable.AmountOfItems(),

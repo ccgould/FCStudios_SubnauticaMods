@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using FCS_DeepDriller.Attachments.MK1;
 using FCS_DeepDriller.Buildable.MK1;
 using FCS_DeepDriller.Configuration;
-using FCS_DeepDriller.Enumerators;
-using FCS_DeepDriller.Helpers;
 using FCS_DeepDriller.Managers;
+using FCS_DeepDriller.Mono.MK1;
 using FCSCommon.Controllers;
 using FCSCommon.Enums;
 using FCSCommon.Extensions;
@@ -14,7 +12,7 @@ using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
 
-namespace FCS_DeepDriller.Mono.MK1
+namespace FCS_DeepDriller.Mono.MK2
 {
     [RequireComponent(typeof(WeldablePoint))]
     internal class FCSDeepDrillerController : MonoBehaviour, IConstructable, IProtoEventListener
@@ -23,7 +21,6 @@ namespace FCS_DeepDriller.Mono.MK1
         private DeepDrillerSaveDataEntry _saveData;
         private Constructable _buildable;
         private PrefabIdentifier _prefabId;
-        private BatteryAttachment _batteryAttachment;
         private List<TechType> _bioData = new List<TechType>();
         private bool _sendToExStorage;
         private bool _invalidPlacement;
@@ -46,7 +43,6 @@ namespace FCS_DeepDriller.Mono.MK1
         internal FCSDeepDrillerAnimationHandler AnimationHandler { get; private set; }
         internal FCSDeepDrillerLavaPitHandler LavaPitHandler { get; private set; }
         internal FCSDeepDrillerContainer DeepDrillerContainer { get; private set; }
-        internal FCSDeepDrillerModuleContainer DeepDrillerModuleContainer { get; private set; }
         internal bool IsConstructed { get; private set; }  //=> _buildable != null && _buildable.constructed;
         internal AudioManager AudioManager { get; private set; }
         internal FCSDeepDrillerPowerHandler PowerManager { get; private set; }
@@ -57,10 +53,9 @@ namespace FCS_DeepDriller.Mono.MK1
         internal int BitSpinState { get; private set; }
         internal int BitDamageState { get; private set; }
         internal int ScreenStateHash { get; private set; }
-        internal BatteryAttachment BatteryController { get; private set; }
         internal OreGenerator OreGenerator { get; private set; }
         internal bool IsInitialized { get; set; }
-        internal DeepDrillerComponentManager ComponentManager { get; private set; }
+        public int IsSolarExtended { get; set; }
 
 #if USE_ExStorageDepot
         internal ExStorageDepotController ExStorageDepotController { get; set; }
@@ -69,6 +64,11 @@ namespace FCS_DeepDriller.Mono.MK1
         #endregion
 
         #region Unity Methods
+
+        private void OnDestroy()
+        {
+            IsBeingDeleted = true;
+        }
 
         private void OnEnable()
         {
@@ -89,9 +89,6 @@ namespace FCS_DeepDriller.Mono.MK1
 
                 if (_fromSave)
                 {
-                    DeepDrillerModuleContainer.SetModules(_data.Modules);
-                    DeepDrillerContainer.LoadItems(_data.Items);
-
                     if (QPatch.Configuration.AllowDamage)
                     {
                         StartCoroutine(SetHeath());
@@ -102,11 +99,9 @@ namespace FCS_DeepDriller.Mono.MK1
                     if (_data.IsFocused)
                     {
                         OreGenerator.SetIsFocus(_data.IsFocused);
-                        OreGenerator.SetFocus(_data.FocusOre);
+                        OreGenerator.Load(_data.FocusOres);
                     }
-
-                    _batteryAttachment.GetController().LoadData(_data.PowerData);
-
+                    
                     CurrentBiome = _data.Biome;
 
                     _fromSave = false;
@@ -138,12 +133,7 @@ namespace FCS_DeepDriller.Mono.MK1
             {
                 return true;
             }
-
-            if (DeepDrillerModuleContainer.IsEmpty() && DeepDrillerContainer.IsEmpty())
-            {
-                return true;
-            }
-
+            
             reason = FCSDeepDrillerBuildable.RemoveAllItems();
             return false;
         }
@@ -203,7 +193,6 @@ namespace FCS_DeepDriller.Mono.MK1
 
             _saveData.Id = id;
             _saveData.PowerState = PowerManager.GetPowerState();
-            _saveData.Modules = DeepDrillerModuleContainer.GetCurrentModules();
             _saveData.Items = DeepDrillerContainer.GetItems();
 
             if (QPatch.Configuration.AllowDamage)
@@ -212,7 +201,7 @@ namespace FCS_DeepDriller.Mono.MK1
             }
 
             _saveData.PowerData = PowerManager.SaveData();
-            _saveData.FocusOre = OreGenerator.GetFocus();
+            _saveData.FocusOres = OreGenerator.GetFocuses();
             _saveData.IsFocused = OreGenerator.GetIsFocused();
             _saveData.Biome = CurrentBiome;
             saveDataList.Entries.Add(_saveData);
@@ -239,26 +228,6 @@ namespace FCS_DeepDriller.Mono.MK1
         {
             QuickLogger.Debug($"Initializing");
 
-            ComponentManager = new DeepDrillerComponentManager();
-
-            _batteryAttachment = new BatteryAttachment();
-            _batteryAttachment.GetGameObject(this);
-            _batteryAttachment.GetController().OnBatteryAdded += OnBatteryAdded;
-            _batteryAttachment.GetController().OnBatteryRemoved += OnBatteryRemoved;
-
-            BatteryController = _batteryAttachment;
-
-            var solarAttachment = new SolarAttachment();
-            solarAttachment.GetGameObject(this);
-
-            if (!ComponentManager.FindAllComponents(this, solarAttachment.GetSolarAttachment(), _batteryAttachment.GetBatteryAttachment(), null))
-            {
-                QuickLogger.Error("Couldn't find all components");
-                return;
-            }
-
-            ComponentManager.Setup();
-
             ExtendStateHash = Animator.StringToHash("Extend");
 
             ShaftStateHash = Animator.StringToHash("ShaftState");
@@ -268,9 +237,7 @@ namespace FCS_DeepDriller.Mono.MK1
             BitSpinState = Animator.StringToHash("BitSpinState");
 
             BitDamageState = Animator.StringToHash("BitDamageState");
-
-            TechTypeHelper.Initialize();
-
+            
             _prefabId = GetComponentInParent<PrefabIdentifier>() ?? GetComponent<PrefabIdentifier>();
 
             if (_prefabId == null)
@@ -284,7 +251,6 @@ namespace FCS_DeepDriller.Mono.MK1
             }
 
             AudioManager = new AudioManager(gameObject.GetComponent<FMOD_CustomLoopingEmitter>());
-            //AudioManager.LoadFModAssets("","");
 
             PowerManager = gameObject.AddComponent<FCSDeepDrillerPowerHandler>();
             PowerManager.Initialize(this);
@@ -303,8 +269,6 @@ namespace FCS_DeepDriller.Mono.MK1
             DeepDrillerContainer = new FCSDeepDrillerContainer();
             DeepDrillerContainer.Setup(this);
 
-            DeepDrillerModuleContainer = new FCSDeepDrillerModuleContainer();
-            DeepDrillerModuleContainer.Setup(this);
 
             AnimationHandler = gameObject.AddComponent<FCSDeepDrillerAnimationHandler>();
             AnimationHandler.Initialize(this);
@@ -350,16 +314,6 @@ namespace FCS_DeepDriller.Mono.MK1
             {
                 _runStartUpOnEnable = true;
             }
-        }
-
-        private void OnBatteryRemoved(Pickupable obj)
-        {
-            PowerManager.RemoveBattery(obj);
-        }
-
-        private void OnBatteryAdded(Pickupable obj, string slot)
-        {
-            PowerManager.AddBattery(obj, slot);
         }
 
         private void OnPowerUpdate(FCSPowerStates value)
@@ -436,16 +390,7 @@ namespace FCS_DeepDriller.Mono.MK1
 
         private void OreGeneratorOnAddCreated(TechType type)
         {
-            QuickLogger.Debug($"In OreGeneratorOnOnAddCreated {type}");
-
-            if (_sendToExStorage)
-            {
-                DeepDrillerContainer.SendToExStorage(type.ToInventoryItem());
-            }
-            else
-            {
-                DeepDrillerContainer.AddItem(type.ToPickupable());
-            }
+            //TODO Fill in code for  OreGeneratorOnAddCreated(TechType type) to send items
         }
 
         private void ReadySaveData()
@@ -489,7 +434,7 @@ namespace FCS_DeepDriller.Mono.MK1
             DisplayHandler.Setup(this);
 
             //TODO: SetFocus Ore
-            DisplayHandler.UpdateListItems(_data?.FocusOre ?? TechType.None);
+            DisplayHandler.UpdateListItemsState(_data?.FocusOres ?? new HashSet<TechType>());
         }
 
         #endregion
@@ -528,7 +473,7 @@ namespace FCS_DeepDriller.Mono.MK1
 
             if (DisplayHandler != null)
             {
-                DisplayHandler.UpdateListItems(GetFocusedOre());
+                DisplayHandler.UpdateListItemsState(GetFocusedOre());
             }
         }
 
@@ -541,21 +486,6 @@ namespace FCS_DeepDriller.Mono.MK1
                 UpdateLegState(true);
                 yield return null;
             }
-        }
-
-        internal void RemoveAttachment(DeepDrillModules module)
-        {
-            if (module == DeepDrillModules.Focus)
-            {
-                OreGenerator.RemoveFocus();
-            }
-
-            if (module == DeepDrillModules.Solar)
-            {
-                PowerManager.RemoveSolar();
-            }
-
-            ComponentManager.HideAttachment(module);
         }
 
         internal List<TechType> GetBiomeData(string biome = null, Transform tr = null)
@@ -573,14 +503,9 @@ namespace FCS_DeepDriller.Mono.MK1
             return _bioData;
         }
 
-        internal void AddAttachment(DeepDrillModules module)
-        {
-            ComponentManager.ShowAttachment(module);
-        }
-
         internal void SetOreFocus(TechType techType)
         {
-            OreGenerator.SetFocus(techType);
+            OreGenerator.AddFocus(techType);
         }
 
         internal bool GetFocusedState()

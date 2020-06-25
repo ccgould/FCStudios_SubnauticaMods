@@ -68,32 +68,6 @@ namespace FCS_DeepDriller
             
             var deepDrillerKit = new FCSKit(Mod.DeepDrillerKitClassID, Mod.DeepDrillerKitFriendlyName, craftingTab, Mod.DeepDrillerKitIngredients);
             deepDrillerKit.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
-
-            var assetsFolder = Mod.GetAssetFolder();
-
-            var focusAttachmentKit = new FCSKit(Mod.FocusAttachmentKitClassID, Mod.FocusAttachmentFriendlyName, craftingTab, Mod.FocusAttachmentKitIngredients);
-            focusAttachmentKit.ChangeIconLocation(assetsFolder, "FocusAttachment_DD");
-            focusAttachmentKit.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
-            
-            var batteryAttachmentKit = new FCSKit(Mod.BatteryAttachmentKitClassID, Mod.BatteryAttachmentFriendlyName, craftingTab, Mod.BatteryAttachmentKitIngredients);
-            batteryAttachmentKit.ChangeIconLocation(assetsFolder, "BatteryAttachment_DD");
-            batteryAttachmentKit.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
-
-            var solarAttachmentKit = new FCSKit(Mod.SolarAttachmentKitClassID, Mod.SolarAttachmentFriendlyName, craftingTab, Mod.SolarAttachmentKitIngredients);
-            solarAttachmentKit.ChangeIconLocation(assetsFolder, "SolarAttachment_DD");
-            solarAttachmentKit.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
-
-            var drillerMK1Module = new FCSModule(Mod.DrillerMK1ModuleClassID, Mod.DrillerMK1ModuleFriendlyName, Mod.MK1Description, craftingTab, Mod.DrillerMK1Ingredients);
-            drillerMK1Module.ChangeIconLocation(assetsFolder, Mod.DrillerMK1ModuleClassID);
-            drillerMK1Module.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
-
-            var drillerMK2Module = new FCSModule(Mod.DrillerMK2ModuleClassID, Mod.DrillerMK2ModuleFriendlyName, Mod.MK2Description, craftingTab, Mod.DrillerMK2Ingredients);
-            drillerMK2Module.ChangeIconLocation(assetsFolder, Mod.DrillerMK2ModuleClassID);
-            drillerMK2Module.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
-
-            var drillerMK3Module = new FCSModule(Mod.DrillerMK3ModuleClassID, Mod.DrillerMK3ModuleFriendlyName, Mod.MK3Description, craftingTab, Mod.DrillerMK3Ingredients);
-            drillerMK3Module.ChangeIconLocation(assetsFolder, Mod.DrillerMK3ModuleClassID);
-            drillerMK3Module.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
         }
     }
 }

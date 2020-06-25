@@ -35,6 +35,7 @@ namespace DataStorageSolutions.Mono
         public DumpContainer DumpContainer { get; private set; }
         public int GetContainerFreeSpace { get; }
         public bool IsFull { get; }
+        Action<int, int> IFCSStorage.OnContainerUpdate { get; set; }
 
         private void OnEnable()
         {
@@ -223,7 +224,7 @@ namespace DataStorageSolutions.Mono
 
             QuickLogger.Debug($"Items result: {_items} || Result = {result}");
         }
-
+        
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
         {
             if (AnimationManager.GetBoolHash(_slotState))
@@ -232,6 +233,21 @@ namespace DataStorageSolutions.Mono
             }
 
             return pickupable.GetTechType() == QPatch.Server.TechType;
+        }
+
+        public Pickupable RemoveItemFromContainer(TechType techType, int amount)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool ContainsItem(TechType techType)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Dictionary<TechType, int> GetItemsWithin()
+        {
+            throw new NotImplementedException();
         }
 
         internal void AddFilter(Filter filter)

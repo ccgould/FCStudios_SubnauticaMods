@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Serialization;
 using SMLHelper.V2.Handlers;
 using UnityEngine;
 using UnityEngine.UI;
@@ -24,7 +25,7 @@ namespace DataStorageSolutions.Buildables
             { $"{ModKey}_NextPage","Next Page"},
             { $"{ModKey}_PrevPage","Previous Page"},
             { $"{ModKey}_OpenServerRack","Open Server Rack"},
-            { $"{ModKey}_NoFoodItems","Cannot store food that decay. Please use a seabreeze or another container to store food items that can decay."},
+            { $"{ModKey}_NoFoodItems","Cannot store food item in the cloud. Please use a seabreeze or another container to store food items that can decay."},
             { $"{ModKey}_CloseServerRack","Close Server Rack"},
             { $"{ModKey}_DriveReceptacle","Drive Receptacle"},
             { $"{ModKey}_AddItemsToBase","Add Items to Base"},
@@ -65,6 +66,7 @@ namespace DataStorageSolutions.Buildables
             { $"{ModKey}_VehicleDumpContainer","Add items to this vehicle"},
             { $"{ModKey}_BlackListItemFormat","{0} item is in the blacklist an will not be pulled from the vehicle."},
             { $"{ModKey}_DockedVehiclesSettingsPage","Go to docked vehicles settings page."},
+            { $"{ModKey}_NoEmptySeaBreezeFormat","No current seabreeze in base can hold this {0}."},
         };
 
         internal static void AdditionalPatching()
@@ -344,6 +346,11 @@ namespace DataStorageSolutions.Buildables
         public static string GoToDockedVehiclesSettings()
         {
             return Language.main.Get(LanguageDictionary.Keys.ElementAt(51));
+        }
+
+        public static string NoEmptySeaBreezeFormat()
+        {
+            return Language.main.Get(LanguageDictionary.Keys.ElementAt(52));
         }
     }
 }

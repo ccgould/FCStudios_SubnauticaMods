@@ -148,7 +148,7 @@ namespace FCS_HydroponicHarvesters.Buildables
             }
 
             #region BaseColor
-            MaterialHelpers.ApplyColorMaskShader(BodyMaterial, "HydroponicHarvester_COL_ID", Color.white, DefaultConfigurations.DefaultColor, Color.white, prefab, bundle); //Use color2 
+            MaterialHelpers.ApplyColorMaskShader(BodyMaterial, ColorIDTexture, Color.white, DefaultConfigurations.DefaultColor, Color.white, prefab, bundle); //Use color2 
             MaterialHelpers.ApplySpecShader(BodyMaterial, SpecTexture, prefab, 1, 3f, bundle);
             MaterialHelpers.ApplyEmissionShader(BodyMaterial, LUMTexture, prefab, bundle, Color.white);
             MaterialHelpers.ApplyAlphaShader(DecalMaterial, prefab);

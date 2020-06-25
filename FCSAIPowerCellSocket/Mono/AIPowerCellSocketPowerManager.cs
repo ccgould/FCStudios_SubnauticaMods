@@ -86,7 +86,7 @@ namespace FCSAIPowerCellSocket.Mono
 #endif
 
 
-            if (equipType == EquipmentType.PowerCellCharger)
+            if (equipType == EquipmentType.PowerCellCharger || techType == TechType.PowerCell || techType == TechType.PrecursorIonPowerCell)
             {
                 flag = true;
             }

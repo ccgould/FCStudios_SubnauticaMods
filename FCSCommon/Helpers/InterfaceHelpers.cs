@@ -98,6 +98,13 @@ namespace FCSCommon.Helpers
         
         private static GameObject FindObjectRecursion(GameObject gameObject, string name)
         {
+            if(gameObject == null)
+            {
+                QuickLogger.Error<InterfaceHelpers>("GameObject was null in Find Object Recursion");
+                return null;
+            }
+
+
             foreach (Transform obj in gameObject.transform)
             {
                 if (obj.name.Trim().StartsWith(name, StringComparison.OrdinalIgnoreCase))

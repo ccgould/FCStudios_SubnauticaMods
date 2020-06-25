@@ -46,7 +46,7 @@ namespace FCSCommon.Components
             Disabled = false;
 
             UpdateTextComponent(IsTextMode());
-            QuickLogger.Debug($"Button Name:{BtnName} || Button Mode {ButtonMode}", true);
+            //QuickLogger.Debug($"Button Name:{BtnName} || Button Mode {ButtonMode}", true);
 
             switch (this.ButtonMode)
             {
@@ -94,7 +94,7 @@ namespace FCSCommon.Components
 
             if (string.IsNullOrEmpty(BtnName)) return;
             UpdateTextComponent(IsTextMode());
-            QuickLogger.Debug($"Button Name:{BtnName} || Button Mode {ButtonMode}", true);
+            //QuickLogger.Debug($"Button Name:{BtnName} || Button Mode {ButtonMode}", true);
             
             switch (this.ButtonMode)
             {

@@ -1,6 +1,8 @@
 ﻿using FCSTechFabricator.Abstract;
 using FCSTechFabricator.Interfaces;
 using System;
+using System.Collections.Generic;
+using System.Security.Cryptography;
 using SMLHelper.V2.Crafting;
 using UnityEngine;
 
@@ -82,6 +84,29 @@ namespace FCSTechFabricator.Components
         public void OnDestroy()
         {
 
+        }
+
+        public Pickupable RemoveItemFromContainer(TechType techType, int amount,bool destroy = false)
+        {
+            var item = _storage.RemoveItemFromContainer(techType, amount);
+            if (!destroy) return item;
+            Destroy(item);
+            return null;
+        }
+
+        public Dictionary<TechType,int> GetItemsWithin()
+        {
+            return _storage.GetItemsWithin();
+        }
+
+        public IFCSStorage GetStorage()
+        {
+            return _storage;
+        }
+
+        public bool ContainsItem(TechType techType)
+        {
+           return _storage.ContainsItem(techType);
         }
     }
 }

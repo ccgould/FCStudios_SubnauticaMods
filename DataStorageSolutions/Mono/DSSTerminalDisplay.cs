@@ -43,7 +43,7 @@ namespace DataStorageSolutions.Mono
         private Toggle _toggle;
         private GridHelper _itemGrid;
         private GridHelper _categoryGrid;
-        private List<Filter> _filters => FilterList.GetFilters();
+        private List<Filter> _filters => FilterList.GetNewVersion(FilterList.GetFilters());
         private readonly List<InterfaceButton> _trackedButtons = new List<InterfaceButton>();
         private bool _isBeingDestroyed;
 
@@ -332,15 +332,23 @@ namespace DataStorageSolutions.Mono
                 _baseGrid.ClearPage();
 
                 var grouped = BaseManager.Managers;
-                
-                if(grouped == null) return;
+
+                if (grouped == null)
+                {
+                    QuickLogger.Debug("Grouped returned null canceling operation");
+                    return;
+                }
 
                 if (data.EndPosition > grouped.Count)
                 {
                     data.EndPosition = grouped.Count;
                 }
 
-                if(data.ItemsGrid?.transform == null) return;
+                if (data.ItemsGrid?.transform == null)
+                {
+                    QuickLogger.Debug("Items Grid returned null canceling operation");
+                    return;
+                }
 
                 if (_baseGrid.GetCurrentPage() < 2)
                 {
@@ -348,16 +356,16 @@ namespace DataStorageSolutions.Mono
                     CreateButton(data, Instantiate(data.ItemsPrefab), new ButtonData(), ButtonType.None, AuxPatchers.GoToVehicles(), "VehiclesPageBTN");
                 }
 
-                QuickLogger.Debug($"Bases Count: {grouped.Count}");
-                QuickLogger.Debug($"Bases Antenna: {_mono.Manager.GetCurrentBaseAntenna()}");
+               // QuickLogger.Debug($"Bases Count: {grouped.Count}");
+                //QuickLogger.Debug($"Bases Antenna: {_mono.Manager.GetCurrentBaseAntenna()}");
 
                 if (_mono.Manager.GetCurrentBaseAntenna() != null || _mono.Manager.Habitat.isCyclops)
                 {
                     for (int i = data.StartPosition; i < data.EndPosition; i++)
                     {
-                        QuickLogger.Debug($"Hab{grouped[i].Habitat} || AS{grouped[i].Habitat.gameObject.activeSelf} || TN{grouped[i].InstanceID == _mono.Manager.InstanceID} || HAN {grouped[i].HasAntenna()} || VIS {grouped[i].IsVisible} || Instance ID : {grouped[i].InstanceID}");
+                        //QuickLogger.Debug($"Hab{grouped[i].Habitat} || AS{grouped[i].Habitat.gameObject.activeSelf} || TN{grouped[i].InstanceID == _mono.Manager.InstanceID} || HAN {grouped[i].HasAntenna()} || VIS {grouped[i].IsVisible} || Instance ID : {grouped[i].InstanceID}");
                         if (grouped[i].Habitat == null || !grouped[i].Habitat.gameObject.activeSelf || grouped[i].InstanceID == _mono.Manager.InstanceID || !grouped[i].HasAntenna() || !grouped[i].IsVisible) continue;
-                        QuickLogger.Debug($"Adding Base {grouped[i].InstanceID}");
+                        //QuickLogger.Debug($"Adding Base {grouped[i].InstanceID}");
                         
                         GameObject buttonPrefab = Instantiate(data.ItemsPrefab);
 
@@ -374,6 +382,10 @@ namespace DataStorageSolutions.Mono
                         QuickLogger.Debug($"Adding Base: {grouped[i].GetBaseName()}",true);
                         CreateButton(data, buttonPrefab, new ButtonData{ Manager = grouped[i]}, ButtonType.Base, grouped[i].GetBaseName().TruncateWEllipsis(30),"BaseBTN");
                     }
+                }
+                else
+                {
+                    QuickLogger.Debug("GetCurrentBaseAntenna most likely is null");
                 }
             
                 _baseGrid.UpdaterPaginator(grouped.Count);
@@ -510,7 +522,7 @@ namespace DataStorageSolutions.Mono
                     break;
 
                 case "ItemBTN":
-                    _currentBase?.TakeItem((TechType)tag);
+                    _currentBase?.RemoveItemFromContainer((TechType)tag);
                     break;
 
                 case "DumpBTN":

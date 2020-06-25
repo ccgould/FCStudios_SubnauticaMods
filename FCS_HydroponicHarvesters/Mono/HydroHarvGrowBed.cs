@@ -236,7 +236,23 @@ namespace FCS_HydroponicHarvesters.Mono
 
             return true;
         }
-        
+
+        public Pickupable RemoveItemFromContainer(TechType techType, int amount)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Dictionary<TechType, int> GetItemsWithin()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Action<int, int> OnContainerUpdate { get; set; }
+        public bool ContainsItem(TechType techType)
+        {
+            throw new NotImplementedException();
+        }
+
         public GameObject Spawn(Transform parent, TechType techType, GameObject model)
         {
             if (!_initialized) return null;

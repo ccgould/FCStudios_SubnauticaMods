@@ -6,9 +6,11 @@ using DataStorageSolutions.Abstract;
 using DataStorageSolutions.Buildables;
 using DataStorageSolutions.Configuration;
 using DataStorageSolutions.Model;
+using DataStorageSolutions.Patches;
 using FCSCommon.Abstract;
 using FCSCommon.Controllers;
 using FCSCommon.Enums;
+using FCSCommon.Extensions;
 using FCSCommon.Interfaces;
 using FCSCommon.Utilities;
 using FCSTechFabricator.Components;
@@ -85,6 +87,7 @@ namespace DataStorageSolutions.Mono
         
         private void OnDestroy()
         {
+            IsInitialized = false;
             _isBeingDestroyed = true;
             Manager?.RemoveTerminal(this);
         }
@@ -140,8 +143,11 @@ namespace DataStorageSolutions.Mono
 
         private void OnAntennaBuilt(bool isBuilt)
         {
-            UpdateScreen();
-            DisplayManager.UpdateAntennaColorPage();
+            if (isBuilt)
+            {
+                UpdateScreen();
+                DisplayManager.UpdateAntennaColorPage();
+            }
         }
 
         private void FindBaseById(string id)
@@ -170,6 +176,7 @@ namespace DataStorageSolutions.Mono
         
         public override void Initialize()
         {
+
             if (PowerManager == null)
             {
                 PowerManager = new PowerManager();

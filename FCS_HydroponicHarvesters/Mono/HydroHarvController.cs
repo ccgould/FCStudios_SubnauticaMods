@@ -261,7 +261,7 @@ namespace FCS_HydroponicHarvesters.Mono
             {
                 DisplayManager = gameObject.AddComponent<HydroHarvDisplayManager>();
                 DisplayManager.Setup(this);
-                DisplayManager.OnContainerUpdate();
+                DisplayManager.OnContainerUpdate(0,0);
             }
         }
 

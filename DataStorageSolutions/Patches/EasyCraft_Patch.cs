@@ -103,9 +103,7 @@ namespace DataStorageSolutions.Patches
                 int num = 0;
 
                 var baseManager = Containers;
-
- 
-
+                
                 for (var index = 0; index < Containers.Length; index++)
                 {
                     var currentBase = Containers[index];

@@ -8,6 +8,10 @@ using Oculus.Newtonsoft.Json;
 
 namespace DataStorageSolutions.Model
 {
+    // Code from AutoSort Lockers by RandyKnapp
+    // https://github.com/RandyKnapp/SubnauticaModSystem/blob/master/SubnauticaModSystem/AutosortLockers/AutosorterCategories.cs
+    //Modified a little to work with this mod.
+
     [Serializable]
     public enum Category
     {
@@ -467,6 +471,8 @@ namespace DataStorageSolutions.Model
 
         public bool IsSame(Filter other)
         {
+            if (other.IsCategory() && other.Category.Equals(Category)) return true;
+
             return Category == other.Category && Types.Count > 0 && Types.Count == other.Types.Count && Types[0] == other.Types[0];
         }
     }
@@ -621,6 +627,7 @@ namespace DataStorageSolutions.Model
             }
         }
 
+        //TODO Remove if not needed
         private static void AddEntry(string category, List<TechType> types)
         {
             Filters.Add(new Filter
@@ -630,6 +637,7 @@ namespace DataStorageSolutions.Model
             });
         }
 
+        //TODO Remove is not needed
         private static void AddEntry(TechType type)
         {
             Filters.Add(new Filter
@@ -637,6 +645,11 @@ namespace DataStorageSolutions.Model
                 Category = "",
                 Types = new List<TechType> { type }
             });
+        }
+
+        public static HashSet<Filter> GetNewVersion(HashSet<Filter> filterData)
+        {
+            return new HashSet<Filter>(GetNewVersion(filterData.ToList()));
         }
     }
 }

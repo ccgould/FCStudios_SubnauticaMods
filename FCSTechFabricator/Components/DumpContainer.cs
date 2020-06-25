@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using FCSCommon.Utilities;
 using FCSTechFabricator.Interfaces;
 using UnityEngine;
@@ -39,7 +40,12 @@ namespace FCSTechFabricator.Components
 
         private void DumpContainerOnOnAddItem(InventoryItem item)
         {
-            _storage.AddItemToContainer(item);
+            
+        }
+
+        public int GetCount()
+        {
+            return _dumpContainer.count;
         }
 
         private bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
@@ -64,7 +70,17 @@ namespace FCSTechFabricator.Components
 
         internal virtual void OnDumpClose(PDA pda)
         {
-            
+            QuickLogger.Debug($"Store Items Dump Count: {_dumpContainer.count}");
+
+            var amount = _dumpContainer.count;
+
+            for (int i = amount - 1; i > -1; i--)
+            {
+                QuickLogger.Debug($"Number of iteration: {i}");
+                var item = _dumpContainer.ElementAt(0);
+                _dumpContainer.RemoveItem(item.item, true);
+                _storage.AddItemToContainer(item);
+            }
         }
     }
 }

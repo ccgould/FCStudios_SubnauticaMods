@@ -10,7 +10,7 @@ namespace FCS_DeepDriller.Patchers
         [HarmonyPostfix]
         internal static void Postfix(uGUI_DepthCompass __instance)
         {
-            EquipmentConfiguration.RefreshPDA();
+
         }
     }
 }

@@ -19,7 +19,7 @@ namespace ARS_SeaBreezeFCS32.Mono
         private bool _runStartUpOnEnable;
         private bool _fromSave;
         private SaveDataEntry _savedData;
-        private int _dumpStorageSizeXY = 2;
+
 
         #endregion
 
@@ -27,7 +27,6 @@ namespace ARS_SeaBreezeFCS32.Mono
 
         internal ColorManager ColorManager { get; private set; }
         internal Fridge FridgeComponent { get; private set; }
-        internal DumpContainer FridgeDumpContainer { get; private set; }
         internal ARSolutionsSeaBreezePowerManager PowerManager { get; private set; }
         internal NameController NameController { get; private set; }
         public Action<string, NameController> OnLabelChanged { get; set; }
@@ -120,13 +119,13 @@ namespace ARS_SeaBreezeFCS32.Mono
                 ColorManager.Initialize(gameObject, ARSSeaBreezeFCS32Buildable.BodyMaterial);
             }
 
-            if (FridgeDumpContainer == null)
+            if (DumpContainer == null)
             {
-                FridgeDumpContainer = gameObject.AddComponent<DumpContainer>();
-                FridgeDumpContainer.Initialize(gameObject.transform, ARSSeaBreezeFCS32Buildable.StorageLabel(),
+                DumpContainer = gameObject.AddComponent<DumpContainer>();
+                DumpContainer.Initialize(gameObject.transform, ARSSeaBreezeFCS32Buildable.StorageLabel(),
                     ARSSeaBreezeFCS32Buildable.ItemNotAllowed(),
                     ARSSeaBreezeFCS32Buildable.SeaBreezeFull(),
-                    FridgeComponent, _dumpStorageSizeXY, _dumpStorageSizeXY);
+                    FridgeComponent);
             }
 
             if (NameController == null)

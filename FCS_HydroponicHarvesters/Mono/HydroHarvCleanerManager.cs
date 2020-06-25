@@ -1,4 +1,6 @@
-﻿using FCS_HydroponicHarvesters.Buildables;
+﻿using System;
+using System.Collections.Generic;
+using FCS_HydroponicHarvesters.Buildables;
 using FCSCommon.Converters;
 using FCSCommon.Utilities;
 using FCSTechFabricator.Interfaces;
@@ -93,6 +95,22 @@ namespace FCS_HydroponicHarvesters.Mono
             }
             
             return false;
+        }
+
+        public Pickupable RemoveItemFromContainer(TechType techType, int amount)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Dictionary<TechType, int> GetItemsWithin()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Action<int, int> OnContainerUpdate { get; set; }
+        public bool ContainsItem(TechType techType)
+        {
+            throw new NotImplementedException();
         }
 
         internal void Load(float savedDataUnitSanitation)

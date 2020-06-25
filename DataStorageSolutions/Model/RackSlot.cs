@@ -276,6 +276,7 @@ namespace DataStorageSolutions.Model
             {
                 if (Server.ElementAt(i).TechType != techType) continue;
                 Remove(Server.ElementAt(i));
+                _mono.RemoveFromTrackedItems(techType);
                 break;
             }
         }

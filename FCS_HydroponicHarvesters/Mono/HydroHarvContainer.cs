@@ -13,7 +13,7 @@ namespace FCS_HydroponicHarvesters.Mono
     {
         private HydroHarvController _mono;
         internal int StorageLimit { get; private set; }
-        internal Action OnContainerUpdate { get; set; }
+      
 
         public int GetContainerFreeSpace => GetFreeSpace();
         public bool IsFull => CheckIfFull();
@@ -99,7 +99,7 @@ namespace FCS_HydroponicHarvesters.Mono
                     Items.Add(item, initializer ? 0 : 1);
                     QuickLogger.Debug($"Added item to container {item}",true);
                 }
-                OnContainerUpdate?.Invoke();
+                OnContainerUpdate?.Invoke(0,0);
             }
         }
 
@@ -120,7 +120,7 @@ namespace FCS_HydroponicHarvesters.Mono
                         Items[item] -= 1;
                         var pickup = CraftData.InstantiateFromPrefab(item).GetComponent<Pickupable>();
                         Inventory.main.Pickup(pickup);
-                        OnContainerUpdate?.Invoke();
+                        OnContainerUpdate?.Invoke(0, 0);
                         _mono?.Producer?.TryStartingNextClone();
                     }
                 }
@@ -144,12 +144,28 @@ namespace FCS_HydroponicHarvesters.Mono
                 Items.Remove(item);
             }
             _mono.HydroHarvGrowBed.RemoveDNA(item);
-            OnContainerUpdate?.Invoke();
+            OnContainerUpdate?.Invoke(0, 0);
         }
         
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
         {
             return true;
+        }
+
+        public Pickupable RemoveItemFromContainer(TechType techType, int amount)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Dictionary<TechType, int> GetItemsWithin()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Action<int, int> OnContainerUpdate { get; set; }
+        public bool ContainsItem(TechType techType)
+        {
+            throw new NotImplementedException();
         }
 
         internal void SpawnClone()
@@ -177,7 +193,7 @@ namespace FCS_HydroponicHarvesters.Mono
 
             Items = savedDataContainer;
 
-            OnContainerUpdate?.Invoke();
+            OnContainerUpdate?.Invoke(0, 0);
         }
 
         public bool HasItems()

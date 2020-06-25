@@ -229,6 +229,9 @@ namespace DataStorageSolutions.Mono
         {
             foreach (ItemsContainer container in vehicleContainers)
             {
+
+                if (container?.tr == null) continue;
+
                 if (subscribing)
                 {
                     if (!Subscibers.ContainsKey(container.tr.GetInstanceID()))

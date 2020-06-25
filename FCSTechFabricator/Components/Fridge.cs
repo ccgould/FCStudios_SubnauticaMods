@@ -15,9 +15,10 @@ namespace FCSTechFabricator.Components
     public class Fridge : MonoBehaviour, IFCSStorage
     { 
         private int _itemLimit;
-        public Action<int, int> OnContainerUpdate;
+        public Action<int, int> OnContainerUpdate { get; set; }
         private bool _decay;
         private ModModes _modMode;
+        private FCSController _mono;
         public bool IsFull => NumberOfItems >= _itemLimit;
         public int NumberOfItems => FridgeItems.Count;
         
@@ -38,6 +39,8 @@ namespace FCSTechFabricator.Components
         {
             switch (eatableType)
             {
+                case EatableType.Any:
+                    return FridgeItems.FirstOrDefault(x => x.TechType == techType);
                 case EatableType.Rotten:
                     return FridgeItems.FirstOrDefault(x => (x.GetFoodValue() < 0 && x.GetWaterValue() < 0) && x.TechType == techType);
                 default:
@@ -47,6 +50,7 @@ namespace FCSTechFabricator.Components
 
         public void Initialize(FCSController mono, int itemLimit)
         {
+            _mono = mono;
             _itemLimit = itemLimit;
             float time = UnityEngine.Random.Range(0f, 5f);
             InvokeRepeating(nameof(AttemptDecay), time, 5f);
@@ -77,7 +81,7 @@ namespace FCSTechFabricator.Components
             }
             
             var eatableEntity = new EatableEntities();
-            eatableEntity.Initialize(item.item);
+            eatableEntity.Initialize(item.item,false);
             eatableEntity.PauseDecay();
             if (fromSave)
             {
@@ -85,7 +89,7 @@ namespace FCSTechFabricator.Components
             }
             FridgeItems.Add(eatableEntity);
             OnContainerUpdate?.Invoke(NumberOfItems, _itemLimit);
-            Destroy(item.item);
+            Destroy(item.item.gameObject);
         }
 
         public void RemoveItem(TechType techType, EatableType eatableType)
@@ -119,6 +123,10 @@ namespace FCSTechFabricator.Components
                     GameObject.Destroy(pickupable);
                     OnContainerUpdate?.Invoke(NumberOfItems, _itemLimit);
                 }
+            }
+            else
+            {
+                Destroy(pickupable);
             }
         }
 
@@ -247,6 +255,35 @@ namespace FCSTechFabricator.Components
             }
 
             return flag;
+        }
+
+        public Pickupable RemoveItemFromContainer(TechType techType, int amount)
+        { 
+            EatableEntities match = FindMatch(techType, EatableType.Any);
+
+            if (match == null) return null;
+
+            var go = GameObject.Instantiate(CraftData.GetPrefabForTechType(techType));
+            var eatable = go.GetComponent<Eatable>();
+            var pickup = go.GetComponent<Pickupable>();
+
+            match.UnpauseDecay();
+            eatable.timeDecayStart = match.TimeDecayStart;
+            FridgeItems.Remove(match);
+            OnContainerUpdate?.Invoke(NumberOfItems, _itemLimit);
+
+            return pickup;
+        }
+
+        public Dictionary<TechType, int> GetItemsWithin()
+        {
+            var lookup = FridgeItems?.Where(x => x != null).ToLookup(x => x.TechType).ToArray();
+            return lookup?.ToDictionary(count => count.Key, count => count.Count());
+        }
+
+        public bool ContainsItem(TechType techType)
+        {
+            return FridgeItems.Any(x => x.TechType == techType);
         }
     }
 }

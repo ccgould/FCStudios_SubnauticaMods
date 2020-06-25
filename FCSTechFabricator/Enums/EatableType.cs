@@ -9,6 +9,7 @@ namespace FCSTechFabricator.Enums
     {
         Rotten,
         Food,
-        Drink
+        Drink,
+        Any
     }
 }

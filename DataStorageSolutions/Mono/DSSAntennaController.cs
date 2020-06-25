@@ -80,6 +80,7 @@ namespace DataStorageSolutions.Mono
 
         private void OnDestroy()
         {
+            IsInitialized = false;
             BaseManager.RemoveAntenna(this);
             Mod.OnAntennaBuilt?.Invoke(false);
         }

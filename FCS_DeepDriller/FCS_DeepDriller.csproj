@@ -127,43 +127,29 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Attachments\MK1\SolarAttachment.cs" />
-    <Compile Include="Attachments\MK1\BatteryAttachment.cs" />
-    <Compile Include="Buildable\MK1\FCSDeepDrillerAuxPatcher.cs" />
-    <Compile Include="Buildable\MK1\FCSDeepDrillerModelPrefab.cs" />
-    <Compile Include="Buildable\MK1\FCSDeepDrillerPatcher.cs" />
+    <Compile Include="Abstract\PowerState.cs" />
+    <Compile Include="Buildable\MK2\FCSDeepDrillerAuxPatcher.cs" />
+    <Compile Include="Buildable\MK2\FCSDeepDrillerModelPrefab.cs" />
+    <Compile Include="Buildable\MK2\FCSDeepDrillerPatcher.cs" />
     <Compile Include="Configuration\DeepDrillerCFG.cs" />
     <Compile Include="Configuration\DeepDrillerPowerData.cs" />
     <Compile Include="Configuration\DeepDrillerSaveData.cs" />
-    <Compile Include="Configuration\EquipmentConfiguration.cs" />
     <Compile Include="Configuration\Mod.cs" />
-    <Compile Include="Configuration\PowerUnitData.cs" />
-    <Compile Include="Configuration\SlotData.cs" />
-    <Compile Include="Display\ColorItemButton.cs" />
-    <Compile Include="Display\InterfaceButton.cs" />
-    <Compile Include="Display\OnScreenButton.cs" />
-    <Compile Include="Display\PaginatorButton.cs" />
-    <Compile Include="Enumerators\DeepDrillerMountSpot.cs" />
-    <Compile Include="Enumerators\DeepDrillModules.cs" />
-    <Compile Include="Extensions\Extensions.cs" />
-    <Compile Include="Helpers\Initialize_uGUI.cs" />
-    <Compile Include="Helpers\TechTypeHelpers.cs" />
+    <Compile Include="Configuration\PowercellData.cs" />
+    <Compile Include="Helpers\MathHelpers.cs" />
     <Compile Include="Managers\BiomeManager.cs" />
-    <Compile Include="Managers\DeepDrillerComponentManager.cs" />
     <Compile Include="Managers\OreGenerator.cs" />
-    <Compile Include="Mono\MK1\FCSDeepDrillerBatteryController.cs" />
-    <Compile Include="Mono\MK1\FCSDeepDrillerController.cs" />
-    <Compile Include="Mono\MK1\FCSDeepDrillerAnimationHandler.cs" />
-    <Compile Include="Mono\MK1\FCSDeepDrillerContainer.cs" />
-    <Compile Include="Mono\MK1\FCSDeepDrillerDisplay.cs" />
-    <Compile Include="Mono\MK1\FCSDeepDrillerHealthHandler.cs" />
-    <Compile Include="Mono\MK1\FCSDeepDrillerLavaPitHandler.cs" />
-    <Compile Include="Mono\MK1\FCSDeepDrillerModuleContainer.cs" />
-    <Compile Include="Mono\MK1\FCSDeepDrillerPowerHandler.cs" />
-    <Compile Include="Mono\MK1\FCSDeepDrillerSolarController.cs" />
+    <Compile Include="Model\State.cs" />
+    <Compile Include="Mono\MK2\FCSDeepDrillerController.cs" />
+    <Compile Include="Mono\MK2\FCSDeepDrillerAnimationHandler.cs" />
+    <Compile Include="Mono\MK2\FCSDeepDrillerContainer.cs" />
+    <Compile Include="Mono\MK2\FCSDeepDrillerDisplay.cs" />
+    <Compile Include="Mono\MK2\FCSDeepDrillerHealthHandler.cs" />
+    <Compile Include="Mono\MK2\FCSDeepDrillerLavaPitHandler.cs" />
+    <Compile Include="Mono\MK2\FCSDeepDrillerPowerHandler.cs" />
+    <Compile Include="Mono\MK2\FCSDeepDrillerSolarController.cs" />
     <Compile Include="Ores\Craftables\Glass.cs" />
     <Compile Include="Ores\SandOrePatcher.cs" />
-    <Compile Include="Patchers\EquipmentPatchers.cs" />
     <Compile Include="Patchers\LootDistributionData_Patchers.cs" />
     <Compile Include="Patchers\uGUI_DepthCompassPatchers.cs" />
     <Compile Include="QPatch.cs" />
@@ -175,6 +161,11 @@
       <Name>FCSTechFabricator</Name>
       <Private>False</Private>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Display\" />
+    <Folder Include="Enumerators\" />
+    <Folder Include="Extensions\" />
   </ItemGroup>
   <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

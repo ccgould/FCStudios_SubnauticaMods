@@ -13,7 +13,7 @@ namespace DataStorageSolutions.Configuration
     [Serializable]
     internal class SaveDataEntry
     {
-        [JsonProperty] internal string BaseID;
+        [JsonProperty] internal string BaseID { get; set; }
         [JsonProperty] internal ColorVec4 TerminalBodyColor { get; set; }
         [JsonProperty] internal string ID { get; set; }
         [JsonProperty] internal ColorVec4 BodyColor { get; set; }

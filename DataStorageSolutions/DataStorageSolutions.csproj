@@ -95,6 +95,10 @@
     <Reference Include="UnityEngine.IMGUIModule">
       <HintPath>..\Dependancies\UnityEngine.IMGUIModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.InputLegacyModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependancies\UnityEngine.InputLegacyModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.PhysicsModule">
       <HintPath>..\Dependancies\UnityEngine.PhysicsModule.dll</HintPath>
     </Reference>
@@ -146,6 +150,7 @@
     <Compile Include="Mono\DSSVehicleDockingManager.cs" />
     <Compile Include="Mono\PowerManager.cs" />
     <Compile Include="Mono\SearchField.cs" />
+    <Compile Include="Patches\ARSeaBreezeFCS32Awake_Patcher.cs" />
     <Compile Include="Patches\EasyCraft_Patch.cs" />
     <Compile Include="Patches\Player_Patches.cs" />
     <Compile Include="Patches\SubRoot_Patches.cs" />

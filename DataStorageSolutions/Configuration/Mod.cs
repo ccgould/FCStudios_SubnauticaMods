@@ -9,11 +9,14 @@ using DataStorageSolutions.Interfaces;
 using DataStorageSolutions.Model;
 using DataStorageSolutions.Mono;
 using DataStorageSolutions.Structs;
+using FCSCommon.Extensions;
 using FCSCommon.Interfaces;
 using FCSCommon.Utilities;
+using FCSTechFabricator.Enums;
 using FCSTechFabricator.Objects;
 using Oculus.Newtonsoft.Json;
 using SMLHelper.V2.Crafting;
+using SMLHelper.V2.Options;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 using Object = System.Object;
@@ -77,6 +80,7 @@ namespace DataStorageSolutions.Configuration
         internal const string ServerPrefabName = "Server";
 
         internal static Action<bool> OnAntennaBuilt;
+        private static TechType _seaBreezeTechType;
 
         internal static Dictionary<string, ServerData> Servers { get; set; } = new Dictionary<string, ServerData>();
         public static List<string> TrackedServers { get; set; } = new List<string>();
@@ -400,9 +404,17 @@ namespace DataStorageSolutions.Configuration
         internal static void AddBlackListFilter(Filter filter)
         {
             var dockingList = QPatch.Configuration.Config.DockingBlackList;
-            if (!dockingList.Contains(filter))
+            
+            var result = dockingList.Any(x => x.IsSame(filter));
+
+            if (!result)
             {
                 dockingList.Add(filter);
+            }
+
+            if (!dockingList.Contains(filter))
+            {
+                
             }
 
             SaveModConfiguration();
@@ -411,11 +423,14 @@ namespace DataStorageSolutions.Configuration
         internal static void RemoveBlackListFilter(Filter filter)
         {
             var dockingList = QPatch.Configuration.Config.DockingBlackList;
-            if (dockingList.Contains(filter))
-            {
-                dockingList.Remove(filter);
-            }
 
+            foreach (Filter enabledFilter in dockingList)
+            {
+                if (enabledFilter.IsSame(filter))
+                {
+                    dockingList.Remove(enabledFilter);
+                }
+            }
             SaveModConfiguration();
         }
 
@@ -460,6 +475,16 @@ namespace DataStorageSolutions.Configuration
                 QuickLogger.Error($"{e.Message}\n{e.StackTrace}");
             }
         }
+
+        public static TechType GetSeaBreeezeTechType()
+        {
+            if (_seaBreezeTechType == TechType.None)
+            {
+                _seaBreezeTechType = "ARSSeaBreezeFCS32".ToTechType();
+            }
+
+            return _seaBreezeTechType;
+        }
     }
 
     internal class Config
@@ -469,16 +494,81 @@ namespace DataStorageSolutions.Configuration
         [JsonProperty] internal float ScreenPowerUsage { get; set; } = 0.1f;
         [JsonProperty] internal bool ShowAllItems { get; set; }
         [JsonProperty] internal float RackPowerUsage { get; set; } = 0.1f;
-        [JsonProperty] internal float ServerPowerUsage { get; set; } = 0.1f;
+        [JsonProperty] internal float ServerPowerUsage { get; set; } = 0.05f;
         [JsonProperty] internal bool PullFromDockedVehicles { get; set; } = true;
         [JsonProperty] internal float CheckVehiclesInterval { get; set; } = 2.0f;
+        [JsonProperty] internal int ExtractMultiplier { get; set; }
 
         [JsonProperty] internal float ExtractInterval = 0.25f;
-        [JsonProperty] internal HashSet<Filter> DockingBlackList { get; set; } = new HashSet<Filter>();
+        [JsonProperty] internal bool AllowFood { get; set; }
+
+        private HashSet<Filter> _dockingBlackList = new HashSet<Filter>();
+
+        [JsonProperty]
+        internal HashSet<Filter> DockingBlackList
+        {
+            get => _dockingBlackList;
+            set
+            {
+                _dockingBlackList = FilterList.GetNewVersion(value);
+                Mod.SaveModConfiguration();
+            }
+        }
     }
 
     internal class ConfigFile
     {
         [JsonProperty] internal Config Config { get; set; }
+    }
+
+    internal class Options : ModOptions
+    {
+        //private ModModes _modMode;
+        private const string ExtractMultiplierID = "DSSEMulti";
+        //private const string AllowFoodToggle = "DSSAllowFood";
+
+
+        public Options() : base("Data Storage Solutions Settings")
+        {
+            ChoiceChanged += Options_ChoiceChanged;
+            //ToggleChanged += Options_ToggleChanged;
+        }
+
+        //private void Options_ToggleChanged(object sender, ToggleChangedEventArgs e)
+        //{
+        //    switch (e.Id)
+        //    {
+        //        case ExtractMultiplierID:
+        //            QPatch.Configuration.Config.AllowFood = e.Value;
+        //            break;
+        //    }
+
+        //    Mod.SaveModConfiguration();
+        //}
+
+        private void Options_ChoiceChanged(object sender, ChoiceChangedEventArgs e)
+        {
+            switch (e.Id)
+            {
+                case ExtractMultiplierID:
+                    QPatch.Configuration.Config.ExtractMultiplier = e.Index;
+                    break;
+            }
+
+            Mod.SaveModConfiguration();
+        }
+
+        public override void BuildModOptions()
+        {
+            AddChoiceOption(ExtractMultiplierID, "Extract Multiplier", new []
+            {
+                "x0",
+                "x5",
+                "x10",
+                "x20"
+            }, QPatch.Configuration.Config.ExtractMultiplier);
+
+            //AddToggleOption(AllowFoodToggle, "Allow Food", QPatch.Configuration.Config.AllowFood);
+        }
     }
 }

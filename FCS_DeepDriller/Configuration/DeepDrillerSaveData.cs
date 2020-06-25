@@ -8,8 +8,6 @@ namespace FCS_DeepDriller.Configuration
     [Serializable]
     internal class DeepDrillerSaveDataEntry
     {
-        [JsonProperty] internal List<SlotData> Modules { get; set; }
-
         [JsonProperty] internal float Health { get; set; }
 
         [JsonProperty] internal string Id { get; set; }
@@ -20,7 +18,7 @@ namespace FCS_DeepDriller.Configuration
 
         [JsonProperty] internal DeepDrillerPowerData PowerData { get; set; }
         
-        [JsonProperty] internal TechType FocusOre { get; set; }
+        [JsonProperty] internal HashSet<TechType> FocusOres { get; set; }
 
         [JsonProperty] internal bool IsFocused { get; set; }
         
@@ -30,6 +28,7 @@ namespace FCS_DeepDriller.Configuration
     [Serializable]
     internal class DeepDrillerSaveData
     {
+        [JsonProperty] internal float SaveVersion { get; set; } = 1.0f;
         [JsonProperty] internal List<DeepDrillerSaveDataEntry> Entries = new List<DeepDrillerSaveDataEntry>();
     }
 }

@@ -58,7 +58,7 @@ namespace DataStorageSolutions.Mono
                 UpdateServerData(GetPrefabIDString());
             }
         }
-
+        [JsonIgnore] Action<int, int> IFCSStorage.OnContainerUpdate { get; set; }
         //private void OnEnable()
         //{
         //    if (_runStartUpOnEnable)
@@ -254,29 +254,6 @@ namespace DataStorageSolutions.Mono
             }
         }
 
-        internal void RemoveItemFromContainer(TechType item)
-        {
-            QuickLogger.Debug("Taking From Container", true);
-
-            var objectDataMatch = FindObjectDataMatch(item, out var objectData);
-
-            if (objectDataMatch)
-            {
-#if SUBNAUTICA
-                var itemSize = CraftData.GetItemSize(item);
-#elif BELOWZERO
-            var itemSize = TechData.GetItemSize(item);
-#endif
-                if (Inventory.main.HasRoomFor(itemSize.x, itemSize.y))
-                {
-
-                    var pickup = CraftData.InstantiateFromPrefab(item).GetComponent<Pickupable>();
-                    Inventory.main.Pickup(pickup);
-                    DeleteItemFromContainer(item);
-                    Mod.OnContainerUpdate?.Invoke(_mono);
-                }
-            }
-        }
 
         internal void DeleteItemFromContainer(TechType item)
         {
@@ -292,7 +269,22 @@ namespace DataStorageSolutions.Mono
         {
             return true;
         }
-        
+
+        public Pickupable RemoveItemFromContainer(TechType techType, int amount)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Dictionary<TechType, int> GetItemsWithin()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Dictionary<TechType, int> GetInventoryItems()
+        {
+            throw new NotImplementedException();
+        }
+
         internal void Load(Dictionary<TechType, int> savedDataContainer)
         {
             if (savedDataContainer == null) return;
@@ -382,7 +374,7 @@ namespace DataStorageSolutions.Mono
 
         }
 
-        public bool HasItem(TechType techType)
+        public bool ContainsItem(TechType techType)
         {
             return FindObjectDataMatch(techType, out var objectData);
         }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using DataStorageSolutions.Abstract;
 using DataStorageSolutions.Buildables;
 using DataStorageSolutions.Configuration;
@@ -37,13 +38,13 @@ namespace DataStorageSolutions.Mono
         private BaseManager _manager;
         private const int RackDoorStateClosed = 0;
         private const int RackDoorStateOpen = 1;
-
+        private Dictionary<TechType,int> _trackedItems = new Dictionary<TechType, int>();
         public int GetContainerFreeSpace { get; }
         public bool IsFull => GetIsFull();
         public bool IsRackSlotsFull => GetIsRackFull();
         public override bool IsConstructed => _isConstructed;
         internal Action OnUpdate;
-
+        Action<int, int> IFCSStorage.OnContainerUpdate { get; set; }
 
         public override BaseManager Manager
         {
@@ -99,6 +100,7 @@ namespace DataStorageSolutions.Mono
         
         private void OnDestroy()
         {
+            IsInitialized = false;
             BaseManager.RemoveRack(this);
         }
 
@@ -159,8 +161,7 @@ namespace DataStorageSolutions.Mono
             var server = _servers.Any(x => x.Server != null);
             if (server == false) return true;
             var storage = GetTotalStorage();
-            if (storage.x >= storage.y) return true;
-            return false;
+            return storage.x >= storage.y;
         }
 
         private RackSlot GetSlotByID(int slotID)
@@ -203,7 +204,7 @@ namespace DataStorageSolutions.Mono
             }
 
             QuickLogger.Debug($"Adding Server to slot {slotByID.Id}", true);
-            SetSlotOccupiedState(slotID, true);
+            GetSlotByID(slotID).IsOccupied = true;
             QuickLogger.Debug($"Current ID Occupied Stat = {slotByID.IsOccupied}");
             QuickLogger.Debug($"Data Count = {server.Count}");
 
@@ -214,11 +215,6 @@ namespace DataStorageSolutions.Mono
             }
 
             return true;
-        }
-
-        private void SetSlotOccupiedState(int slotID, bool state)
-        {
-            GetSlotByID(slotID).IsOccupied = state;
         }
 
         private int GetFreeSlotID()
@@ -290,6 +286,7 @@ namespace DataStorageSolutions.Mono
         /// <returns></returns>
         internal RackSlot GetUsableServer(TechType techType)
         {
+            QuickLogger.Debug($"Getting Usable Server in Rack ID: {_prefabID}", true);
             return _servers?.FirstOrDefault(x => !x.IsFull() && x.IsAllowedToAdd(techType) && x.IsOccupied);
         }
 
@@ -297,7 +294,7 @@ namespace DataStorageSolutions.Mono
         {
             if (server == null)
             {
-                QuickLogger.Error("Server was null while trying to add to the container operation cancelled!");
+                QuickLogger.Error("Server was null while trying to add to the container operation canceled!");
                 return false;
             }
 
@@ -493,29 +490,7 @@ namespace DataStorageSolutions.Mono
             var result = _servers?.Count(x => x != null && x.IsOccupied);
             return result > 0;
         }
-
-        internal Dictionary<TechType, int> GetStoredData()
-        {
-            var result = new Dictionary<TechType, int>();
-
-            foreach (RackSlot rackSlot in _servers)
-            {
-                if (rackSlot.Server == null) continue;
-                foreach (ObjectData data in rackSlot.Server)
-                {
-                    if (result.ContainsKey(data.TechType))
-                    {
-                        result[data.TechType] += 1;
-                    }
-                    else
-                    {
-                        result.Add(data.TechType, 1);
-                    }
-                }
-            }
-            return result;
-        }
-         
+        
         public bool HasItem(TechType techType)
         {
             QuickLogger.Debug($"Checking for TechType: {techType}", true);
@@ -622,14 +597,74 @@ namespace DataStorageSolutions.Mono
             return pickupable.GetTechType() == QPatch.Server.TechType && !IsRackSlotsFull;
         }
 
+        public Pickupable RemoveItemFromContainer(TechType techType, int amount)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Dictionary<TechType, int> GetItemsWithin()
+        {
+            var result = new Dictionary<TechType, int>();
+
+            foreach (RackSlot rackSlot in _servers)
+            {
+                if (rackSlot.Server == null) continue;
+                foreach (ObjectData data in rackSlot.Server)
+                {
+                    if (result.ContainsKey(data.TechType))
+                    {
+                        result[data.TechType] += 1;
+                    }
+                    else
+                    {
+                        result.Add(data.TechType, 1);
+                    }
+                }
+            }
+            return result;
+        }
+
         internal void AddItemToAServer(InventoryItem item)
         {
-            var server = GetUsableServer(item.item.GetTechType());
-            if (server == null) return;
+            QuickLogger.Debug($"Adding Item to Server {item.item.GetTechType()}");
+            var techType = item.item.GetTechType();
+            var server = GetUsableServer(techType);
+
+            if (server == null)
+            {
+                QuickLogger.Debug("Usable server returned null",true);
+                return;
+            }
+
             server.Add(DSSHelpers.MakeObjectData(item,server.Id));
+            AddToTrackedItems(techType);
             Destroy(item.item.gameObject);
         }
-        
+
+        private void AddToTrackedItems(TechType techType)
+        {
+            if (_trackedItems.ContainsKey(techType))
+            {
+                _trackedItems[techType] += 1;
+            }
+        }
+
+        internal void RemoveFromTrackedItems(TechType techType)
+        {
+            if (_trackedItems.ContainsKey(techType))
+            {
+                if (_trackedItems[techType] == 1)
+                {
+                    _trackedItems.Remove(techType);
+                }
+                else
+                {
+                    _trackedItems[techType] -= 1;
+                }
+                
+            }
+        }
+
         public ObjectDataTransferData GetItemDataFromServer(TechType techType)
         {
             QuickLogger.Debug($"Checking for TechType: {techType}", true);
@@ -682,6 +717,39 @@ namespace DataStorageSolutions.Mono
             }
 
             return amount;
+        }
+
+        public bool CanHoldItem(int amount,TechType itemTechType,bool checkFilters = false)
+        {
+            var storage = GetTotalStorage();
+            if (!IsTechTypeAllowedInRack(itemTechType) || GetIsFull() || storage.x + amount > storage.y)
+            {
+                return false;
+            }
+
+            if (checkFilters)
+            {
+                foreach (RackSlot rackSlot in _servers)
+                {
+                    if (rackSlot == null || !rackSlot.IsOccupied || rackSlot.IsFull() || !rackSlot.HasFilters) continue;
+                    if (rackSlot.IsAllowedToAdd(itemTechType)) return true;
+                }
+            }
+            else
+            {
+                foreach (RackSlot rackSlot in _servers)
+                {
+                    if (rackSlot == null || !rackSlot.IsOccupied || rackSlot.IsFull() || rackSlot.HasFilters) continue;
+                    if (rackSlot.IsAllowedToAdd(itemTechType)) return true;
+                }
+            }
+
+            return false;
+        }
+
+        public bool ContainsItem(TechType techType)
+        {
+            throw new NotImplementedException();
         }
     }
 }

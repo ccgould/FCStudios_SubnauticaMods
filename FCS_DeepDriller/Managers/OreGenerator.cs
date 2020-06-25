@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using FCS_DeepDriller.Mono.MK1;
+using System.Linq;
+using FCS_DeepDriller.Mono.MK2;
 using FCSCommon.Enums;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -18,12 +19,14 @@ namespace FCS_DeepDriller.Managers
         private bool _allowTick;
         private Random _random2;
         private float _passedTime;
-        private TechType _focus;
+        private HashSet<TechType> _focusOres;
         private bool _isFocused;
         private float _secondPerItem;
-        private FCSDeepDrillerController _mono;
         private const float DayNight = 1200f;
         private int _oresPerDay = 12;
+        private TechType _focus;
+        private FCSDeepDrillerController _mono;
+
         #endregion
 
         #region Internal Properties
@@ -94,7 +97,7 @@ namespace FCS_DeepDriller.Managers
         {
             if (_mono?.PowerManager == null || _mono?.DeepDrillerContainer == null) return;
 
-            if (_mono.PowerManager.GetPowerState() == FCSPowerStates.Powered && !_mono.DeepDrillerContainer.IsContainerFull)
+            if (_mono.PowerManager.GetPowerState() == FCSPowerStates.Powered && !_mono.DeepDrillerContainer.IsFull)
             {
                 _allowTick = true;
             }
@@ -111,10 +114,20 @@ namespace FCS_DeepDriller.Managers
             QuickLogger.Debug($"Focus has been removed!", true);
         }
 
-        internal void SetFocus(TechType techType)
+        internal void AddFocus(TechType techType)
         {
-            _focus = techType;
-            QuickLogger.Debug($"Focus set to {_focus}");
+            if (!_focusOres.Contains(techType))
+                _focusOres.Add(techType);
+
+#if DEBUG
+            QuickLogger.Debug($"Added Focus: {_focus}");
+            QuickLogger.Debug($"Focusing on:");
+            for (int i = 0; i < _focusOres.Count; i++)
+            {
+                QuickLogger.Debug($"{i}: {_focusOres.ElementAt(i)}");
+            }
+#endif
+
         }
 
         internal TechType GetFocus() => _focus;
@@ -138,6 +151,16 @@ namespace FCS_DeepDriller.Managers
             _oresPerDay = amount;
             _secondPerItem = DayNight / _oresPerDay;
             QuickLogger.Info($"Deep Driller is now configured to drill {_oresPerDay} ores per day.", true);
+        }
+
+        internal HashSet<TechType> GetFocuses()
+        {
+            return _focusOres;
+        }
+
+        public void Load(HashSet<TechType> dataFocusOres)
+        {
+            _focusOres = dataFocusOres;
         }
     }
 }
