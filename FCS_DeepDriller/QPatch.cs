@@ -45,6 +45,8 @@ namespace FCS_DeepDriller
                 
                 AddItemsToTechFabricator();
 
+                GlobalBundle = FcAssetBundlesService.PublicAPI.GetAssetBundleByName(FcAssetBundlesService.PublicAPI.GlobalBundleName);
+
                 FCSDeepDrillerBuildable.PatchHelper();
 
                 SandSpawnable.PatchHelper();
@@ -60,6 +62,8 @@ namespace FCS_DeepDriller
                 QuickLogger.Error(ex);
             }
         }
+
+        public static AssetBundle GlobalBundle { get; set; }
 
         private static void AddItemsToTechFabricator()
         {

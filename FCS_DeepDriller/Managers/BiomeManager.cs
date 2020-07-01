@@ -10,7 +10,6 @@ namespace FCS_DeepDriller.Managers
 {
     internal static class BiomeManager
     {
-
         public static List<TechType> Resources = new List<TechType>()
         {
             TechType.AluminumOxide, 

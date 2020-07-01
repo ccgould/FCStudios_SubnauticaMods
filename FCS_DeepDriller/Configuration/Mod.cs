@@ -25,7 +25,7 @@ namespace FCS_DeepDriller.Configuration
         internal const string BundleName = "fcsdeepdrillermk2modbundle";
 
         internal const string DeepDrillerGameObjectName = "DeepDriller";
-
+        internal const string MaterialBaseName = "AlterraDeepDrillerMK2";
         internal const string SandSpawnableClassID = "Sand_DD";
         internal const string DeepDrillerKitClassID = "DeepDrillerKit_DD";
         internal const string DeepDrillerKitFriendlyName = "Deep Driller";

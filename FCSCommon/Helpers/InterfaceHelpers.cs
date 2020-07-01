@@ -71,6 +71,11 @@ namespace FCSCommon.Helpers
 
         internal static InterfaceButton CreateButton(GameObject go, string btnName, InterfaceButtonMode btnMode, Action<string, object> onButtonClick, Color startColor, Color hoverColor, float maxInteractionRange, string lineOne, string lineTwo = "")
         {
+            if(go == null)
+            {
+                QuickLogger.Error<InterfaceHelpers>($"GameObject for button {btnName} is null");
+            }
+
             var button = go.AddComponent<InterfaceButton>();
             button.BtnName = btnName;
             button.ButtonMode = btnMode;

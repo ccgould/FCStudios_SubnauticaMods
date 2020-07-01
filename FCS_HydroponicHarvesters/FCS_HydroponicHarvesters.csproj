@@ -111,6 +111,7 @@
     <Compile Include="Enumerators\ClonePhases.cs" />
     <Compile Include="Enumerators\HydroHarvSize.cs" />
     <Compile Include="Enumerators\SpeedModes.cs" />
+    <Compile Include="Extensions\BaseRootExtensions.cs" />
     <Compile Include="Model\ModConfiguration.cs" />
     <Compile Include="Model\PlantSlot.cs" />
     <Compile Include="Model\SaveDataEntry.cs" />

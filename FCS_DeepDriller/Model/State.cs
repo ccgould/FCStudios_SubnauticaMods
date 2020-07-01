@@ -7,6 +7,9 @@ namespace FCS_DeepDriller.Model
 {
     internal class State
     {
-        internal void UpdateSystemLights
+        internal void UpdateSystemLights()
+        {
+
+        }
     }
 }

@@ -59,6 +59,17 @@ namespace FCS_HydroponicHarvesters.Mono
         }
         internal HydroHarvPowerManager PowerManager { get; private set; }
         internal HydroHarvCleanerManager HydroHarvCleanerManager { get; private set; }
+        public bool IsOperational => GetIsOperational();
+
+        private bool GetIsOperational()
+        {
+            if (!IsConstructed || 
+                !IsInitialized || 
+                PowerManager == null || 
+                !PowerManager.HasPowerToConsume()) return false;
+
+            return true;
+        }
 
         #region Unity
 
@@ -207,7 +218,7 @@ namespace FCS_HydroponicHarvesters.Mono
             if (DumpContainer == null)
             {
                 DumpContainer = gameObject.AddComponent<DumpContainer>();
-                DumpContainer.Initialize(transform,HydroponicHarvestersBuildable.DNADropContainerTitle(), HydroponicHarvestersBuildable.NotAllowedItem(), HydroponicHarvestersBuildable.StorageFull(), HydroHarvGrowBed,1,1);
+                DumpContainer.Initialize(transform,HydroponicHarvestersBuildable.DNADropContainerTitle(), HydroponicHarvestersBuildable.NotAllowedItem(), HydroponicHarvestersBuildable.StorageFull(), HydroHarvGrowBed,2,2);
             }
 
             if (CleanerManager == null)

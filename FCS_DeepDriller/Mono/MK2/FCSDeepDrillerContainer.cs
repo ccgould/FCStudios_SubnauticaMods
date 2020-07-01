@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FCS_DeepDriller.Helpers;
 using FCSCommon.Extensions;
+using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using FCSTechFabricator.Interfaces;
 using UnityEngine;
@@ -12,6 +14,8 @@ namespace FCS_DeepDriller.Mono.MK2
     {
         public int GetContainerFreeSpace => CalculateFreeSpace();
 
+        public Action<int, int> OnContainerUpdate { get; set; }
+
         private int CalculateFreeSpace()
         {
             var total = GetContainerTotal();
@@ -19,12 +23,12 @@ namespace FCS_DeepDriller.Mono.MK2
         }
 
         public bool IsFull => IsContainerFull();
-        private Dictionary<TechType,int> Container { get; set; } = new Dictionary<TechType, int>();
+        private Dictionary<TechType,int> _container = new Dictionary<TechType, int>();
 
         private int GetContainerTotal()
         {
             //Go through the dictionary of items and add all the values together if container is null return 0.
-            return Container?.Select((t, i) => Container?.ElementAt(i).Value).Sum() ?? 0;
+            return _container?.Select((t, i) => _container?.ElementAt(i).Value).Sum() ?? 0;
         }
 
         /// <summary>
@@ -99,14 +103,16 @@ namespace FCS_DeepDriller.Mono.MK2
         {
             try
             {
-                if (Container.ContainsKey(item))
+                if (_container.ContainsKey(item))
                 {
-                    Container[item] += 1;
+                    _container[item] += 1;
                 }
                 else
                 {
-                    Container.Add(item,1);
+                    _container.Add(item,1);
                 }
+
+                OnContainerUpdate?.Invoke(0,0);
             }
             catch (Exception e)
             {
@@ -126,25 +132,30 @@ namespace FCS_DeepDriller.Mono.MK2
         {
             try
             {
-                if (Container.ContainsKey(item))
+                if (!FCSDeepDrillerOperations.CanPlayerHold(item)) return false;
+                
+                if (_container.ContainsKey(item))
                 {
-                    if (Container[item] == 1)
-                    {
-                        Container.Remove(item);
-                    }
 
-                    Container[item] -= 1;
-                }
-                else
-                {
-                    Container.Add(item, 1);
+                    if (FCSDeepDrillerOperations.GivePlayerItem(item))
+                    {
+                        if (_container[item] == 1)
+                        {
+                            _container.Remove(item);
+                        }
+                        else
+                        {
+                            _container[item] -= 1;
+                        }
+
+                        OnContainerUpdate?.Invoke(0, 0);
+                    }
                 }
             }
             catch (Exception e)
             {
-                QuickLogger.Error<FCSDeepDrillerContainer>(e.Message);
-                QuickLogger.Error<FCSDeepDrillerContainer>(e.StackTrace);
-                return false;
+                Console.WriteLine(e);
+                throw;
             }
             return true;
         }
@@ -160,14 +171,39 @@ namespace FCS_DeepDriller.Mono.MK2
             return !IsContainerFull();
         }
 
-        public Dictionary<TechType, int> GetItems()
+        public Pickupable RemoveItemFromContainer(TechType techType, int amount)
         {
-            return Container;
+            throw new NotImplementedException();
+        }
+
+        public Dictionary<TechType, int> GetItemsWithin()
+        {
+            return _container;
+        }
+
+        public bool ContainsItem(TechType techType)
+        {
+            throw new NotImplementedException();
         }
 
         public void Setup(FCSDeepDrillerController fcsDeepDrillerController)
         {
             
+        }
+
+        public bool HasItems()
+        {
+            return _container.Count > 0;
+        }
+
+        public void LoadData(Dictionary<TechType, int> dataItems)
+        {
+            _container = dataItems;
+        }
+
+        public Dictionary<TechType,int> SaveData()
+        {
+            return _container;
         }
     }
 }

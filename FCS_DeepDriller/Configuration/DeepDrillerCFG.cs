@@ -15,11 +15,14 @@ namespace FCS_DeepDriller.Configuration
         public float SolarCapacity { get; set; } = 125;
         public int DrillOrePerDay { get; set; } = 12;
         public bool AllowDamage { get; set; } = true;
-
+        public float OilUsage { get; set; } = 1f;
+        public float OilTimePeriodInDays { get; set; } = 30.0f;
+        public float OilRestoresInDays { get; set; } = 5.0f;
         public Dictionary<string, List<string>> AdditionalBiomeOres { get; set; } = new Dictionary<string, List<string>>();
 
 
         [JsonIgnore] internal Dictionary<string, List<TechType>> BiomeOresTechType { get; set; } = new Dictionary<string, List<TechType>>();
+
 
         #endregion
         internal void Convert()

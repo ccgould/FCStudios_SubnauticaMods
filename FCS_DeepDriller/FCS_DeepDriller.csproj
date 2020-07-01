@@ -55,15 +55,11 @@
       <HintPath>..\Dependancies\0Harmony-1.2.0.1.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Dependancies\$(Game)\Assembly-CSharp.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>..\Dependancies\Subnautica\Assembly-CSharp.dll</HintPath>
     </Reference>
-    <Reference Include="Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Dependancies\$(Game)\Assembly-CSharp-firstpass.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="Assembly-CSharp-firstpass">
+      <HintPath>F:\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -136,9 +132,13 @@
     <Compile Include="Configuration\DeepDrillerSaveData.cs" />
     <Compile Include="Configuration\Mod.cs" />
     <Compile Include="Configuration\PowercellData.cs" />
+    <Compile Include="Enumerators\FCSDeepDrillerPages.cs" />
+    <Compile Include="Helpers\FCSDeepDrillerOperations.cs" />
     <Compile Include="Helpers\MathHelpers.cs" />
     <Compile Include="Managers\BiomeManager.cs" />
+    <Compile Include="Managers\LaserManager.cs" />
     <Compile Include="Managers\OreGenerator.cs" />
+    <Compile Include="Model\LaserScript.cs" />
     <Compile Include="Model\State.cs" />
     <Compile Include="Mono\MK2\FCSDeepDrillerController.cs" />
     <Compile Include="Mono\MK2\FCSDeepDrillerAnimationHandler.cs" />
@@ -146,6 +146,7 @@
     <Compile Include="Mono\MK2\FCSDeepDrillerDisplay.cs" />
     <Compile Include="Mono\MK2\FCSDeepDrillerHealthHandler.cs" />
     <Compile Include="Mono\MK2\FCSDeepDrillerLavaPitHandler.cs" />
+    <Compile Include="Managers\FCSDeepDrillerOilHandler.cs" />
     <Compile Include="Mono\MK2\FCSDeepDrillerPowerHandler.cs" />
     <Compile Include="Mono\MK2\FCSDeepDrillerSolarController.cs" />
     <Compile Include="Ores\Craftables\Glass.cs" />
@@ -164,7 +165,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Display\" />
-    <Folder Include="Enumerators\" />
     <Folder Include="Extensions\" />
   </ItemGroup>
   <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />

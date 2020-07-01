@@ -1,20 +1,30 @@
-﻿using FCS_DeepDriller.Mono.MK2;
+﻿using System;
+using System.Collections;
 using FCSCommon.Utilities;
 using UnityEngine;
 
-namespace FCS_DeepDriller.Mono.MK1
+namespace FCS_DeepDriller.Mono.MK2
 {
     public class FCSDeepDrillerAnimationHandler : MonoBehaviour
     {
         #region Private Methods
         //private AudioHandler _audioHandler;
         private FCSDeepDrillerController _mono;
+        private bool _checkBootup;
+        private int _drillState;
+
+        #endregion
+
+        #region Public Properties
+
         #endregion
 
         #region Unity Methods   
         private void Start()
         {
             this.Animator = this.transform.GetComponentInChildren<Animator>();
+
+            _drillState = Animator.StringToHash("DrillingState");
 
             if (this.Animator == null)
             {
@@ -29,6 +39,15 @@ namespace FCS_DeepDriller.Mono.MK1
 
             //_audioHandler = new AudioHandler(transform);
         }
+
+        private void Update()
+        {
+            //if (_checkBootup)
+            //{
+            //    BootUp();
+            //}
+        }
+
         #endregion
 
         #region Public Methods
@@ -106,6 +125,37 @@ namespace FCS_DeepDriller.Mono.MK1
         {
             _mono = mono;
         }
+
+        internal void BootUp(int pageHash)
+        {
+            StartCoroutine(BootUpCoroutine(pageHash));
+        }
+
+        private IEnumerator BootUpCoroutine(int pageHash)
+        {
+            while (GetIntHash(pageHash) != 2)
+            {
+                if (GetIntHash(pageHash) != 1)
+                {
+                    SetIntHash(pageHash, 1);
+                }
+                QuickLogger.Debug(this.Animator.GetCurrentAnimatorStateInfo(3).fullPathHash.ToString());
+
+                if (this.Animator.GetCurrentAnimatorStateInfo(3).IsName("DeepDriller_MK2_BootPage") &&
+                    this.Animator.GetCurrentAnimatorStateInfo(3).normalizedTime >= 1.0f)
+                {
+                    QuickLogger.Debug("Going to home.");
+                    SetIntHash(pageHash, 2);
+                }
+                yield return null;
+            }
+        }
+
         #endregion
+
+        public void DrillState(bool state)
+        { 
+            SetIntHash(_drillState,state ? 1:0);
+        }
     }
 }

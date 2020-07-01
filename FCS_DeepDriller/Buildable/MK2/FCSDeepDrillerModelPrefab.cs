@@ -8,18 +8,20 @@ namespace FCS_DeepDriller.Buildable.MK1
     internal partial class FCSDeepDrillerBuildable
     {
         private GameObject _prefab;
+        internal static string BodyMaterial => $"{Mod.MaterialBaseName}_COL";
+        internal static string DecalMaterial => $"{Mod.MaterialBaseName}_Decals";
+        internal static string SpecTexture => $"{Mod.MaterialBaseName}_S";
+        internal static string NormTexture => $"{Mod.MaterialBaseName}_N";
+        internal static string LUMTexture => $"{Mod.MaterialBaseName}_E";
+        internal static string ColorIDTexture => $"{Mod.MaterialBaseName}_ID";
 
         public static AssetBundle AssetBundle { get; private set; }
-
-        internal static GameObject BatteryModule { get; private set; }
-
-        public static GameObject FocusModule { get; set; }
-
-        public static GameObject SolarModule { get; set; }
 
         public static GameObject ItemPrefab { get; set; }
 
         internal static GameObject SandPrefab { get; set; }
+        public static GameObject ListItemPrefab { get; set; }
+        public static GameObject ColorItemPrefab { get; set; }
 
         private bool GetPrefabs()
         {
@@ -43,11 +45,11 @@ namespace FCS_DeepDriller.Buildable.MK1
             //If the prefab isn't null lets add the shader to the materials
             if (prefab != null)
             {
-                _prefab = prefab;
-
                 //Lets apply the material shader
                 ApplyShaders(prefab);
 
+                _prefab = prefab;
+                
                 QuickLogger.Debug($"{this.FriendlyName} Prefab Found!");
             }
             else
@@ -57,81 +59,47 @@ namespace FCS_DeepDriller.Buildable.MK1
             }
 
             //We have found the asset bundle and now we are going to continue by looking for the model.
-            GameObject listItem = assetBundle.LoadAsset<GameObject>("ListButton");
+            GameObject itemButton = assetBundle.LoadAsset<GameObject>("ItemButton");
 
             //If the prefab isn't null lets add the shader to the materials
-            if (listItem != null)
+            if (itemButton != null)
             {
-                ItemPrefab = listItem;
+                ItemPrefab = itemButton;
 
-                QuickLogger.Debug("List item Prefab Found!");
+                QuickLogger.Debug("Item Button Prefab Found!");
             }
             else
             {
-                QuickLogger.Error("List item Prefab Not Found!");
+                QuickLogger.Error("Item Button Prefab Not Found!");
                 return false;
             }
 
-            #region Battery Module
-            //We have found the asset bundle and now we are going to continue by looking for the model.
-            GameObject batteryModule = assetBundle.LoadAsset<GameObject>("Battery_Attachment");
+            GameObject listItemButton = assetBundle.LoadAsset<GameObject>("TransferToggleButton");
 
-            //If the prefab isn't null lets add the shader to the materials
-            if (batteryModule != null)
+            if (listItemButton != null)
             {
-                ApplyShaders(batteryModule);
+                ListItemPrefab = listItemButton;
 
-                BatteryModule = batteryModule;
-
-                QuickLogger.Debug($"Battery Module Prefab Found!");
+                QuickLogger.Debug("List Item Button Prefab Found!");
             }
             else
             {
-                QuickLogger.Error($"Battery Module  Prefab Not Found!");
+                QuickLogger.Error("Item Button Prefab Not Found!");
                 return false;
             }
-            #endregion
 
-            #region Solar Module
-            //We have found the asset bundle and now we are going to continue by looking for the model.
-            GameObject solarModule = assetBundle.LoadAsset<GameObject>("Solar_Panel_Attachment");
+            GameObject colorItem = QPatch.GlobalBundle.LoadAsset<GameObject>("ColorItem");
 
-            //If the prefab isn't null lets add the shader to the materials
-            if (solarModule != null)
+            if (colorItem != null)
             {
-                ApplyShaders(solarModule);
-
-                SolarModule = solarModule;
-
-                QuickLogger.Debug($"Solar Module Prefab Found!");
+                ColorItemPrefab = colorItem;
             }
             else
             {
-                QuickLogger.Error($"Solar Module  Prefab Not Found!");
+                QuickLogger.Error($"Color Item Not Found!");
                 return false;
             }
-            #endregion
 
-            #region Focus Module
-            //We have found the asset bundle and now we are going to continue by looking for the model.
-            GameObject focusModule = assetBundle.LoadAsset<GameObject>("Scanner_Screen_Attachment");
-
-            //If the prefab isn't null lets add the shader to the materials
-            if (focusModule != null)
-            {
-                ApplyShaders(focusModule);
-
-                FocusModule = focusModule;
-
-                QuickLogger.Debug($"Focus Module Prefab Found!");
-            }
-            else
-            {
-                QuickLogger.Error($"Solar Module  Prefab Not Found!");
-                return false;
-            }
-            #endregion
-            
             return true;
         }
 
@@ -164,15 +132,25 @@ namespace FCS_DeepDriller.Buildable.MK1
         /// <param name="prefab">The prefab to apply shaders.</param>
         internal static void ApplyShaders(GameObject prefab)
         {
-            #region DeepDriller_BaseColor
-            MaterialHelpers.ApplyAlphaShader("DeepDriller_BaseColor_BaseColor", prefab);
-            MaterialHelpers.ApplySpecShader("DeepDriller_BaseColor_BaseColor", "DeepDriller_Spec", prefab, 1, 0.5f, AssetBundle);
-            MaterialHelpers.ApplyNormalShader("DeepDriller_BaseColor_BaseColor", "DeepDriller_Norm", prefab, AssetBundle);
-            MaterialHelpers.ApplyEmissionShader("DeepDriller_BaseColor_BaseColor", "DeepDriller_Emissive_On", prefab, AssetBundle, Color.white);
-            MaterialHelpers.ApplyEmissionShader("DeepDriller_DigState", "DeepDriller_DigStateEmissive", prefab, AssetBundle, Color.white);
-            MaterialHelpers.ApplyEmissionShader("Lava_Rock", "lava_rock_emission", prefab, AssetBundle, Color.white);
-            MaterialHelpers.ApplyNormalShader("Lava_Rock", "lava_rock_01_normal", prefab, AssetBundle);
-            #endregion
+
+            //MaterialHelpers.ApplyColorMaskShader(BodyMaterial, ColorIDTexture, Color.white, DefaultConfigurations.DefaultColor, Color.white, prefab, bundle); //Use color2 
+            MaterialHelpers.ApplySpecShader(BodyMaterial, SpecTexture, prefab, 1, 3f, AssetBundle);
+            MaterialHelpers.ApplyEmissionShader(BodyMaterial, LUMTexture, prefab, AssetBundle, Color.white);
+            MaterialHelpers.ApplyNormalShader(BodyMaterial, NormTexture, prefab, AssetBundle);
+
+
+            MaterialHelpers.ApplyAlphaShader(DecalMaterial, prefab);
+            MaterialHelpers.ApplySpecShader(DecalMaterial, SpecTexture, prefab, 1, 3f, AssetBundle);
+            MaterialHelpers.ApplyEmissionShader(DecalMaterial, LUMTexture, prefab, AssetBundle, Color.white);
+            MaterialHelpers.ApplyNormalShader(DecalMaterial, NormTexture, prefab, AssetBundle);
+
+
+
+
+
+            //MaterialHelpers.ApplyEmissionShader("DeepDriller_DigState", "DeepDriller_DigStateEmissive", prefab, AssetBundle, Color.white);
+            //MaterialHelpers.ApplyEmissionShader("Lava_Rock", "lava_rock_emission", prefab, AssetBundle, Color.white);
+            //MaterialHelpers.ApplyNormalShader("Lava_Rock", "lava_rock_01_normal", prefab, AssetBundle);
         }
     }
 }

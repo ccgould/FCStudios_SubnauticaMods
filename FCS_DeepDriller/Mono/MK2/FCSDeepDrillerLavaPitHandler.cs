@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections;
-using FCS_DeepDriller.Mono.MK2;
 using FCSCommon.Enums;
 using FCSCommon.Utilities;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace FCS_DeepDriller.Mono.MK1
+namespace FCS_DeepDriller.Mono.MK2
 {
     internal class FCSDeepDrillerLavaPitHandler : MonoBehaviour
     {

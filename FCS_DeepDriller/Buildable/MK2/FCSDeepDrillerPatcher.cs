@@ -45,13 +45,9 @@ namespace FCS_DeepDriller.Buildable.MK1
             {
                 prefab = GameObject.Instantiate(_prefab);
 
-                var meshRenderers = prefab.GetComponentsInChildren<MeshRenderer>();
-
                 //========== Allows the building animation and material colors ==========// 
-                Shader shader = Shader.Find("MarmosetUBER");
-                Renderer[] renderers = prefab.GetComponentsInChildren<Renderer>();
                 SkyApplier skyApplier = prefab.EnsureComponent<SkyApplier>();
-                skyApplier.renderers = renderers;
+                skyApplier.renderers = prefab.GetComponentsInChildren<Renderer>();
                 skyApplier.anchorSky = Skies.Auto;
 
                 //========== Allows the building animation and material colors ==========// 

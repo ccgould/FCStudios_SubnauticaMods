@@ -2,6 +2,7 @@
 using Oculus.Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using FCSTechFabricator.Objects;
 
 namespace FCS_DeepDriller.Configuration
 {
@@ -14,7 +15,7 @@ namespace FCS_DeepDriller.Configuration
 
         [JsonProperty] internal FCSPowerStates PowerState { get; set; }
 
-        [JsonProperty] internal IEnumerable<KeyValuePair<TechType, int>> Items { get; set; }
+        [JsonProperty] internal Dictionary<TechType, int> Items { get; set; }
 
         [JsonProperty] internal DeepDrillerPowerData PowerData { get; set; }
         
@@ -23,6 +24,9 @@ namespace FCS_DeepDriller.Configuration
         [JsonProperty] internal bool IsFocused { get; set; }
         
         [JsonProperty] internal string Biome { get; set; }
+        [JsonProperty] internal float OilTimeLeft { get; set; }
+        [JsonProperty] internal bool SolarExtended { get; set; }
+        public ColorVec4 BodyColor { get; set; }
     }
 
     [Serializable]

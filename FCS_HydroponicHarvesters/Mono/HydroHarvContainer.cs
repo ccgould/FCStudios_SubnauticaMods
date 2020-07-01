@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using FCS_HydroponicHarvesters.Buildables;
 using FCS_HydroponicHarvesters.Enumerators;
 using FCS_HydroponicHarvesters.Model;
@@ -13,12 +14,12 @@ namespace FCS_HydroponicHarvesters.Mono
     {
         private HydroHarvController _mono;
         internal int StorageLimit { get; private set; }
-      
+
 
         public int GetContainerFreeSpace => GetFreeSpace();
         public bool IsFull => CheckIfFull();
-        internal Dictionary<TechType,int> Items = new Dictionary<TechType, int>();
-        
+        internal Dictionary<TechType, int> Items = new Dictionary<TechType, int>();
+
         internal void Initialize(HydroHarvController mono)
         {
             _mono = mono;
@@ -42,7 +43,7 @@ namespace FCS_HydroponicHarvesters.Mono
                     break;
             }
         }
-        
+
         private bool CheckIfFull()
         {
             return GetTotal() >= StorageLimit;
@@ -82,13 +83,13 @@ namespace FCS_HydroponicHarvesters.Mono
             return false;
         }
 
-        internal void AddItemToContainer(TechType item,bool initializer = false)
+        internal void AddItemToContainer(TechType item, bool initializer = false)
         {
             QuickLogger.Debug("Adding to container", true);
 
             if (!IsFull)
             {
-                QuickLogger.Debug($"Trying to add item to container {item}",true);
+                QuickLogger.Debug($"Trying to add item to container {item}", true);
 
                 if (Items.ContainsKey(item))
                 {
@@ -97,15 +98,15 @@ namespace FCS_HydroponicHarvesters.Mono
                 else
                 {
                     Items.Add(item, initializer ? 0 : 1);
-                    QuickLogger.Debug($"Added item to container {item}",true);
+                    QuickLogger.Debug($"Added item to container {item}", true);
                 }
-                OnContainerUpdate?.Invoke(0,0);
+                OnContainerUpdate?.Invoke(0, 0);
             }
         }
 
         internal void RemoveItemFromContainer(TechType item)
         {
-            QuickLogger.Debug("Taking From Container",true);
+            QuickLogger.Debug("Taking From Container", true);
             if (Items.ContainsKey(item))
             {
 #if SUBNAUTICA
@@ -113,18 +114,23 @@ namespace FCS_HydroponicHarvesters.Mono
 #elif BELOWZERO
             var itemSize = TechData.GetItemSize(item);
 #endif
-                if (Inventory.main.HasRoomFor(itemSize.x, itemSize.y))
-                {
-                    if (Items[item] > 0)
-                    {
-                        Items[item] -= 1;
-                        var pickup = CraftData.InstantiateFromPrefab(item).GetComponent<Pickupable>();
-                        Inventory.main.Pickup(pickup);
-                        OnContainerUpdate?.Invoke(0, 0);
-                        _mono?.Producer?.TryStartingNextClone();
-                    }
-                }
+                if (!Inventory.main.HasRoomFor(itemSize.x, itemSize.y) || Items[item] <= 0) return;
+
+                Items[item] -= 1;
+                var pickup = CraftData.InstantiateFromPrefab(item).GetComponent<Pickupable>();
+                Inventory.main.Pickup(pickup);
+                OnContainerUpdate?.Invoke(0, 0);
+                _mono?.Producer?.TryStartingNextClone();
             }
+        }
+
+        internal void RemoveItemFromContainerOnly(TechType item)
+        {
+            QuickLogger.Debug("Taking From Container", true);
+
+            Items[item] -= 1;
+            OnContainerUpdate?.Invoke(0, 0);
+            _mono?.Producer?.TryStartingNextClone();
         }
 
         internal void DeleteItemFromContainer(TechType item)
@@ -135,7 +141,7 @@ namespace FCS_HydroponicHarvesters.Mono
 
             if (Items[item] > 0)
             {
-                QuickLogger.Message(HydroponicHarvestersBuildable.CannotDeleteDNAItem(Language.main.Get(item)),true);
+                QuickLogger.Message(HydroponicHarvestersBuildable.CannotDeleteDNAItem(Language.main.Get(item)), true);
                 return;
             }
 
@@ -146,7 +152,7 @@ namespace FCS_HydroponicHarvesters.Mono
             _mono.HydroHarvGrowBed.RemoveDNA(item);
             OnContainerUpdate?.Invoke(0, 0);
         }
-        
+
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
         {
             return true;
@@ -165,21 +171,21 @@ namespace FCS_HydroponicHarvesters.Mono
         public Action<int, int> OnContainerUpdate { get; set; }
         public bool ContainsItem(TechType techType)
         {
-            throw new NotImplementedException();
+            return Items.Any(x => x.Key == techType);
         }
 
         internal void SpawnClone()
         {
-           var samples = _mono.HydroHarvGrowBed.GetDNASamples();
+            var samples = _mono.HydroHarvGrowBed.GetDNASamples();
 
-           foreach (KeyValuePair<TechType, StoredDNAData> sample in samples)
-           {
-               for (int i = 0; i < sample.Value.Amount; i++)
-               {
-                   if (IsFull) break;
+            foreach (KeyValuePair<TechType, StoredDNAData> sample in samples)
+            {
+                for (int i = 0; i < sample.Value.Amount; i++)
+                {
+                    if (IsFull) break;
                     AddItemToContainer(sample.Key);
-               }
-           }
+                }
+            }
         }
 
         internal Dictionary<TechType, int> Save()
@@ -189,7 +195,7 @@ namespace FCS_HydroponicHarvesters.Mono
 
         internal void Load(Dictionary<TechType, int> savedDataContainer)
         {
-            if(savedDataContainer == null) return;
+            if (savedDataContainer == null) return;
 
             Items = savedDataContainer;
 
@@ -199,6 +205,21 @@ namespace FCS_HydroponicHarvesters.Mono
         public bool HasItems()
         {
             return Items.Count > 0;
+        }
+
+        public int GetItemCount(TechType techType)
+        {
+            int amount = 0;
+
+            foreach (var item in Items)
+            {
+                if (item.Key == techType)
+                {
+                    amount += item.Value;
+                }
+            }
+
+            return amount;
         }
     }
 }
