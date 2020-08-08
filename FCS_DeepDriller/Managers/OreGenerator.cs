@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using FCS_DeepDriller.Buildable.MK1;
+using FCS_DeepDriller.Enumerators;
 using FCS_DeepDriller.Mono.MK2;
 using FCSCommon.Enums;
 using FCSCommon.Utilities;
@@ -20,7 +21,7 @@ namespace FCS_DeepDriller.Managers
         private bool _allowTick;
         private Random _random2;
         private float _passedTime;
-        private HashSet<TechType> _focusOres;
+        private HashSet<TechType> _focusOres = new HashSet<TechType>();
 
         private bool IsFocused
         {
@@ -71,6 +72,12 @@ namespace FCS_DeepDriller.Managers
             if (_allowTick)
             {
                 _passedTime += DayNightCycle.main.deltaTime;
+
+                //if (_mono.UpgradeManager.HasUpgradeFunction(UpgradeFunctions.OresPerDay,
+                //    out UpgradeFunction function))
+                //{
+                //    SetOresPerDay(((OresPerDayUpgrade)function).OreCount);
+                //}
 
                 if (_passedTime >= _secondPerItem)
                 {
@@ -173,6 +180,23 @@ namespace FCS_DeepDriller.Managers
         public string GetItemsPerDay()
         {
             return string.Format(FCSDeepDrillerBuildable.ItemsPerDayFormat(), _oresPerDay);
+        }
+        internal void ApplyUpgrade(UpgradeFunction upgrade)
+        {
+            switch (upgrade.UpgradeType)
+            {
+                case UpgradeFunctions.OresPerDay:
+                    var function = (OresPerDayUpgrade) upgrade;
+                    SetOresPerDay(function.OreCount);
+                    break;
+                case UpgradeFunctions.MaxOreCount:
+                    break;
+                case UpgradeFunctions.SilkTouch:
+                    break;
+                case UpgradeFunctions.MinOreCount:
+                    break;
+            }
+            _mono.PowerManager.UpdatePowerUsage();
         }
     }
 }

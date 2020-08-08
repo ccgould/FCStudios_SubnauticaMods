@@ -66,6 +66,7 @@ namespace FCS_DeepDriller.Mono.MK2
         internal DumpContainer OilDumpContainer { get; set; }
         public PowerRelay PowerRelay { get; private set; }
         public ColorManager ColorManager { get; private set; }
+        public UpgradeManager UpgradeManager { get; private set; }
 
 #if USE_ExStorageDepot
         internal ExStorageDepotController ExStorageDepotController { get; set; }
@@ -214,6 +215,7 @@ namespace FCS_DeepDriller.Mono.MK2
             _saveData.Id = id;
             _saveData.BodyColor = ColorManager.GetMaskColor().ColorToVector4();
             _saveData.PowerState = PowerManager.GetPowerState();
+            _saveData.PullFromRelay = PowerManager.GetPullFromPowerRelay();
             _saveData.Items = DeepDrillerContainer.SaveData();
 
             if (QPatch.Configuration.AllowDamage)
@@ -282,7 +284,12 @@ namespace FCS_DeepDriller.Mono.MK2
             {
                 _buildable = GetComponentInParent<Constructable>();
             }
-            
+
+            OreGenerator = gameObject.AddComponent<OreGenerator>();
+            OreGenerator.Initialize(this);
+            OreGenerator.OnAddCreated += OreGeneratorOnAddCreated;
+
+
             PowerManager = gameObject.AddComponent<FCSDeepDrillerPowerHandler>();
             PowerManager.Initialize(this);
             PowerManager.OnPowerUpdate += OnPowerUpdate;
@@ -306,11 +313,7 @@ namespace FCS_DeepDriller.Mono.MK2
             HealthManager.SetHealth(100);
             HealthManager.OnDamaged += OnDamaged;
             HealthManager.OnRepaired += OnRepaired;
-
-            OreGenerator = gameObject.AddComponent<OreGenerator>();
-            OreGenerator.Initialize(this);
-            OreGenerator.OnAddCreated += OreGeneratorOnAddCreated;
-
+            
             DeepDrillerContainer = new FCSDeepDrillerContainer();
             DeepDrillerContainer.Setup(this);
 
@@ -339,6 +342,12 @@ namespace FCS_DeepDriller.Mono.MK2
                     FCSDeepDrillerBuildable.NotAllowedItem(),
                     FCSDeepDrillerBuildable.StorageFull(),
                     PowerManager, 1, 1);
+            }
+
+            if(UpgradeManager == null)
+            {
+                UpgradeManager = gameObject.AddComponent<UpgradeManager>();
+                UpgradeManager.Initialize(this);
             }
 
 
@@ -491,7 +500,6 @@ namespace FCS_DeepDriller.Mono.MK2
                 {
                     OreGenerator.AllowedOres = loot;
                     ConnectDisplay();
-                    DisplayHandler.UpdateBiome(CurrentBiome);
                 }
 
                 yield return null;
@@ -504,8 +512,8 @@ namespace FCS_DeepDriller.Mono.MK2
             QuickLogger.Debug($"Creating Display");
             DisplayHandler = gameObject.AddComponent<FCSDeepDrillerDisplay>();
             DisplayHandler.Setup(this);
-
-            //TODO: SetFocus Ore
+            DisplayHandler.UpdateBiome(CurrentBiome);
+            DisplayHandler.OnIsFocusedChanged(_data.IsFocused);
             DisplayHandler.UpdateListItemsState(_data?.FocusOres ?? new HashSet<TechType>());
         }
 

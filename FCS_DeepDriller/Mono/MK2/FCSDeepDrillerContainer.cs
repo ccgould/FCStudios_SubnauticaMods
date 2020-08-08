@@ -22,7 +22,7 @@ namespace FCS_DeepDriller.Mono.MK2
             return Mathf.Max(0, QPatch.Configuration.StorageSize - total);
         }
 
-        public bool IsFull => IsContainerFull();
+        public bool IsFull => IsContainerFull(); 
         private Dictionary<TechType,int> _container = new Dictionary<TechType, int>();
 
         private int GetContainerTotal()
@@ -80,6 +80,24 @@ namespace FCS_DeepDriller.Mono.MK2
         public bool CanBeStored(int amount, TechType techType)
         {
             return true;
+        }
+
+        //internal void CraftItem(KeyValuePair<TechType, CraftData.TechData> item)
+        //{
+        //    foreach (CraftData.Ingredient ingredient in item.Value._ingredients)
+        //    {
+        //        for (int i = 0; i < ingredient.amount; i++)
+        //        {
+        //            RemoveItemFromContainer(ingredient.techType);
+        //        }
+        //    }
+
+        //    AddItemToContainer(item.Key.ToInventoryItem());
+        //}
+
+        internal bool ContainsItem(TechType techType, int amount)
+        {
+            return _container.Any(x => x.Key == techType && x.Value >= amount);
         }
 
         /// <summary>

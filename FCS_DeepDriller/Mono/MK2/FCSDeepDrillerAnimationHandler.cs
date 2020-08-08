@@ -139,8 +139,7 @@ namespace FCS_DeepDriller.Mono.MK2
                 {
                     SetIntHash(pageHash, 1);
                 }
-                QuickLogger.Debug(this.Animator.GetCurrentAnimatorStateInfo(3).fullPathHash.ToString());
-
+               
                 if (this.Animator.GetCurrentAnimatorStateInfo(3).IsName("DeepDriller_MK2_BootPage") &&
                     this.Animator.GetCurrentAnimatorStateInfo(3).normalizedTime >= 1.0f)
                 {

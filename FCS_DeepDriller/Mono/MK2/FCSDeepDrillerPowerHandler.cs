@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using FCS_DeepDriller.Configuration;
 using FCS_DeepDriller.Helpers;
 using FCS_DeepDriller.Mono.MK2;
@@ -55,7 +56,7 @@ namespace FCS_DeepDriller.Mono.MK1
                 _timePassed = 0.0f;
             }
         }
-
+        
         private void UpdatePowerState()
         {
             if (PowerState == FCSPowerStates.Tripped) return;
@@ -132,6 +133,7 @@ namespace FCS_DeepDriller.Mono.MK1
         {
             _powerBank.SolarPanel = data.PowerData.SolarPanel;
             _powerBank.Battery = data.PowerData.Battery;
+            _pullPowerFromRelay = data.PullFromRelay;
 
             if(data.SolarExtended)
             {
@@ -148,7 +150,8 @@ namespace FCS_DeepDriller.Mono.MK1
 
         internal float CalculatePowerUsage()
         {
-            return _powerDraw;
+            var amount = _mono.UpgradeManager.UpgradeFunctions.Sum(x => x.PowerUsage);
+            return _powerDraw + amount;
         }
 
         internal string GetSolarPowerData()
@@ -251,21 +254,18 @@ namespace FCS_DeepDriller.Mono.MK1
                 _powerBank.Battery.ChargeBattery(_powerBank.SolarPanel/2);
             }
 
-
-
-
             OnBatteryUpdate?.Invoke(_powerBank.Battery);
         }
 
         //TODO Connect to base
 
-        internal void UpdatePowerUsage(float amount)
+        internal void UpdatePowerUsage()
         {
             OnUsageChange?.Invoke();
         }
         public float GetPowerUsage()
         {
-            return _powerDraw;
+            return CalculatePowerUsage();
         }
 
         public int GetContainerFreeSpace { get; }
@@ -323,6 +323,16 @@ namespace FCS_DeepDriller.Mono.MK1
         public void SetPowerRelay(PowerRelay powerRelay)
         {
             _powerRelay = powerRelay;
+        }
+
+        internal void TogglePullFromRelay()
+        {
+            _pullPowerFromRelay = !_pullPowerFromRelay;
+        }
+
+        public bool GetPullFromPowerRelay()
+        {
+            return _pullPowerFromRelay;
         }
     }
 }

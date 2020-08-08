@@ -71,7 +71,6 @@ namespace FCS_DeepDriller.Managers
 
         internal float GetOilPercent()
         {
-            QuickLogger.Debug("Getting Oil Percent");
             return _timeLeft / _setOilTime;
         }
 

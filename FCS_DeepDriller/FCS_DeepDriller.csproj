@@ -23,6 +23,7 @@
     <DefineConstants>DEBUG;TRACE;SUBNAUTICA</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Subnautica_Release|AnyCPU' ">
     <DebugType>none</DebugType>
@@ -56,7 +57,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Assembly-CSharp">
-      <HintPath>..\Dependancies\Subnautica\Assembly-CSharp.dll</HintPath>
+      <HintPath>F:\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp-firstpass">
       <HintPath>F:\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
@@ -134,10 +135,13 @@
     <Compile Include="Configuration\PowercellData.cs" />
     <Compile Include="Enumerators\FCSDeepDrillerPages.cs" />
     <Compile Include="Helpers\FCSDeepDrillerOperations.cs" />
+    <Compile Include="Helpers\Hekpers.cs" />
     <Compile Include="Helpers\MathHelpers.cs" />
     <Compile Include="Managers\BiomeManager.cs" />
     <Compile Include="Managers\LaserManager.cs" />
     <Compile Include="Managers\OreGenerator.cs" />
+    <Compile Include="Enumerators\UpgradeFunctions.cs" />
+    <Compile Include="Managers\UpgradeManager.cs" />
     <Compile Include="Model\LaserScript.cs" />
     <Compile Include="Model\State.cs" />
     <Compile Include="Mono\MK2\FCSDeepDrillerController.cs" />

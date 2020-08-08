@@ -9,13 +9,12 @@ namespace FCS_DeepDriller.Configuration
     {
         #region Public declarations
 
-        public int StorageSize { get; set; } = 48;
+        public int StorageSize { get; set; } = 100;
+        public int CrafterStorageSize { get; set; } = 100;
 
         public float PowerDraw { get; set; } = 0.1f;
         public float SolarCapacity { get; set; } = 125;
-        public int DrillOrePerDay { get; set; } = 12;
         public bool AllowDamage { get; set; } = true;
-        public float OilUsage { get; set; } = 1f;
         public float OilTimePeriodInDays { get; set; } = 30.0f;
         public float OilRestoresInDays { get; set; } = 5.0f;
         public Dictionary<string, List<string>> AdditionalBiomeOres { get; set; } = new Dictionary<string, List<string>>();

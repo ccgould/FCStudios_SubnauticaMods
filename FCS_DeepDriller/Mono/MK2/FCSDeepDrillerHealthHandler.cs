@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using FCSCommon.Enums;
 using FCSCommon.Objects;
 using FCSCommon.Utilities;
@@ -9,13 +10,15 @@ namespace FCS_DeepDriller.Mono.MK2
     internal class FCSDeepDrillerHealthHandler : MonoBehaviour
     {
         private LiveMixin _liveMixin = new LiveMixin();
-        public int HealthMultiplyer { get; set; } = 1;
+        public float HealthMultiplyer { get; set; } = 1;
         private const float DayNight = 1200f;
         private int _damagePerDay = 10;
         private float _damagePerSecond;
         private float _passedTime;
         private FCSDeepDrillerController _mono;
         private float _prevHealth;
+        private const float HealthMultiplierBase = 1;
+        
         public Action OnDamaged { get; set; }
         public Action OnRepaired { get; set; }
 
@@ -28,11 +31,18 @@ namespace FCS_DeepDriller.Mono.MK2
             {
                 _liveMixin.invincible = false;
                 UpdateHealthSystem();
+                UpdateHealthMultiplier();
             }
             else
             {
                 _liveMixin.invincible = true;
             }
+        }
+
+        private void UpdateHealthMultiplier()
+        {
+            var amount = _mono.UpgradeManager.UpgradeFunctions.Sum(x => x.Damage);
+            HealthMultiplyer = HealthMultiplierBase + amount;
         }
 
         #endregion

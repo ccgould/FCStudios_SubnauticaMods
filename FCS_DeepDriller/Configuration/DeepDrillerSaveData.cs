@@ -24,9 +24,14 @@ namespace FCS_DeepDriller.Configuration
         [JsonProperty] internal bool IsFocused { get; set; }
         
         [JsonProperty] internal string Biome { get; set; }
+        
         [JsonProperty] internal float OilTimeLeft { get; set; }
+        
         [JsonProperty] internal bool SolarExtended { get; set; }
-        public ColorVec4 BodyColor { get; set; }
+        
+        [JsonProperty] internal ColorVec4 BodyColor { get; set; }
+        
+        [JsonProperty] internal bool PullFromRelay { get; set; }
     }
 
     [Serializable]

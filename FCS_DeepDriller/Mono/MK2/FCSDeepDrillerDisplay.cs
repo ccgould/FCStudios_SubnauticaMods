@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using FCS_DeepDriller.Buildable.MK1;
@@ -10,6 +11,7 @@ using FCSCommon.Enums;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using FCSTechFabricator.Managers;
+using SMLHelper.V2.Crafting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -38,6 +40,10 @@ namespace FCS_DeepDriller.Mono.MK2
         private GridHelper _filterGrid;
         private ColorManager _colorPage;
         private Text _filterBTNText;
+        private Dictionary<TechType,Toggle> _trackedFilterState = new Dictionary<TechType, Toggle>();
+        //private readonly List<KeyValuePair<TechType, CraftData.TechData>> _craftableItems = new List<KeyValuePair<TechType, CraftData.TechData>>();
+
+
 
         private void OnDestroy()
         {
@@ -65,6 +71,45 @@ namespace FCS_DeepDriller.Mono.MK2
                 UpdatePowerUsage();
                 UpdateItemsPerDay();
                 PowerOnDisplay();
+                RecheckFilters();
+                //StartCoroutine(nameof(CheckForCraftingItems));
+            }
+        }
+
+        //private IEnumerable CheckForCraftingItems()
+        //{
+        //    foreach (var data in CraftData.techData)
+        //    {
+        //        bool passed = true;
+        //        foreach (CraftData.Ingredient ingredient in data.Value._ingredients)
+        //        {
+        //            if (!_mono.DeepDrillerContainer.ContainsItem(ingredient.techType, ingredient.amount))
+        //            {
+        //                passed = false;
+        //                goto _break;
+        //            }
+        //        }
+
+        //        _break:
+
+        //        if (passed && CraftTree.IsCraftable(data.Key))
+        //        {
+        //            _craftableItems.Add(data);
+        //        }
+        //    }
+
+        //    yield return null;
+
+        //}
+
+        private void RecheckFilters()
+        {
+            foreach (TechType ore in _mono.OreGenerator.GetFocusedOres())
+            {
+                if (_trackedFilterState.ContainsKey(ore))
+                {
+                    _trackedFilterState[ore].isOn = true;
+                }
             }
         }
 
@@ -140,6 +185,7 @@ namespace FCS_DeepDriller.Mono.MK2
                     break;
                 case "ProgrammingBTN":
                     QuickLogger.Debug("Opening Programming window!",true);
+                    _mono.UpgradeManager.Show();
                     break;
                 case "SettingsBTN":
                     GotoPage(FCSDeepDrillerPages.Settings);
@@ -174,8 +220,18 @@ namespace FCS_DeepDriller.Mono.MK2
                     _mono.DeepDrillerContainer.RemoveItemFromContainer(item);
                     break;
                 case "FilterToggleBTN":
-                    var toggle = (Toggle) tag;
-                    QuickLogger.Debug($"Toggle is {toggle.isOn}");
+                    var data = (FilterBtnData) tag;
+                    QuickLogger.Debug($"Toggle for {data.TechType} is {data.Toggle.isOn}",true);
+
+                    if (data.Toggle)
+                    {
+                        _mono.OreGenerator.AddFocus(data.TechType);
+                    }
+                    else
+                    {
+                        _mono.OreGenerator.RemoveFocus(data.TechType);
+                    }
+
                     break;
             }
         }
@@ -419,54 +475,66 @@ namespace FCS_DeepDriller.Mono.MK2
 
                 QuickLogger.Debug($"OnLoadFilterGrid : {data.ItemsGrid}", true);
 
-                _itemsGrid.ClearPage();
+                //_filterGrid.ClearPage();
 
-
-                var grouped = _mono.OreGenerator.AllowedOres;
-
-
-                if (data.EndPosition > grouped.Count)
+                if (_trackedFilterState.Count <= 0)
                 {
-                    data.EndPosition = grouped.Count;
+                    var grouped = _mono.OreGenerator.AllowedOres;
+                    
+                    for (int i = 0; i < grouped.Count; i++)
+                    {
+                        GameObject buttonPrefab = Instantiate(data.ItemsPrefab);
+
+                        if (buttonPrefab == null || data.ItemsGrid == null)
+                        {
+                            if (buttonPrefab != null)
+                            {
+                                Destroy(buttonPrefab);
+                            }
+                            return;
+                        }
+
+                        buttonPrefab.transform.SetParent(data.ItemsGrid.transform, false);
+                        var toggle = buttonPrefab.GetComponent<Toggle>();
+                        toggle.isOn = false;
+                        buttonPrefab.SetActive(false);
+                        var oreIndex = i;
+                        toggle.onValueChanged.AddListener(delegate {
+                            OnButtonClick("FilterToggleBTN", new FilterBtnData{TechType = grouped.ElementAt(oreIndex) , Toggle = toggle});
+                        });
+
+                        var itemName = buttonPrefab.GetComponentInChildren<Text>();
+                        itemName.text = TechTypeExtensions.Get(Language.main, grouped.ElementAt(i));
+
+                        if (_trackedFilterState.ContainsKey(grouped.ElementAt(i)))
+                        {
+                            toggle.isOn = _trackedFilterState[grouped.ElementAt(i)].isOn;
+                        }
+                        else
+                        {
+                            _trackedFilterState.Add(grouped.ElementAt(i), toggle);
+                        }
+                    }
+                }
+
+                foreach (KeyValuePair<TechType, Toggle> toggle in _trackedFilterState)
+                {
+                    toggle.Value.gameObject.SetActive(false);
+                }
+
+                var trackedFilterState = _trackedFilterState;
+
+                if (data.EndPosition > trackedFilterState.Count)
+                {
+                    data.EndPosition = trackedFilterState.Count;
                 }
 
                 for (int i = data.StartPosition; i < data.EndPosition; i++)
                 {
-
-                    GameObject buttonPrefab = Instantiate(data.ItemsPrefab);
-
-                    if (buttonPrefab == null || data.ItemsGrid == null)
-                    {
-                        if (buttonPrefab != null)
-                        {
-                            Destroy(buttonPrefab);
-                        }
-                        return;
-                    }
-
-                    buttonPrefab.transform.SetParent(data.ItemsGrid.transform, false);
-                    var toggle = buttonPrefab.GetComponent<Toggle>();
-                    toggle.onValueChanged.AddListener(delegate {
-                        OnButtonClick( "FilterToggleBTN",toggle);
-                    });
-                    var itemName = buttonPrefab.GetComponentInChildren<Text>();
-                    itemName.text = TechTypeExtensions.Get(Language.main, grouped.ElementAt(i));
-
-
-                    //amount.text = TechTypeExtensions.Get(Language.main, grouped.ElementAt(i));
-                    //var itemBTN = buttonPrefab.AddComponent<InterfaceButton>();
-                    //itemBTN.ButtonMode = InterfaceButtonMode.Background;
-                    //itemBTN.STARTING_COLOR = _startColor;
-                    //itemBTN.HOVER_COLOR = _hoverColor;
-                    //itemBTN.BtnName = "ItemBTN";
-                    //itemBTN.TextLineOne = string.Format(FCSDeepDrillerBuildable.TakeFormatted(), Language.main.Get(grouped.ElementAt(i).Key));
-                    //itemBTN.Tag = grouped.ElementAt(i).Key;
-                    //itemBTN.OnButtonClick = OnButtonClick;
-
-                    //uGUI_Icon trashIcon = InterfaceHelpers.FindGameObject(buttonPrefab, "Icon").AddComponent<uGUI_Icon>();
-                    //trashIcon.sprite = SpriteManager.Get(grouped.ElementAt(i).Key);
+                    _trackedFilterState.ElementAt(i).Value.gameObject.SetActive(true);
                 }
-                _itemsGrid.UpdaterPaginator(grouped.Count());
+
+                _filterGrid.UpdaterPaginator(_trackedFilterState.Count);
             }
             catch (Exception e)
             {
