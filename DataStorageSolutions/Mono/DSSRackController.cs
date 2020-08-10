@@ -10,6 +10,7 @@ using DataStorageSolutions.Model;
 using FCSCommon.Utilities;
 using FCSCommon.Controllers;
 using FCSCommon.Enums;
+using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Interfaces;
 using FCSCommon.Objects;
@@ -38,8 +39,14 @@ namespace DataStorageSolutions.Mono
         private BaseManager _manager;
         private const int RackDoorStateClosed = 0;
         private const int RackDoorStateOpen = 1;
-        private Dictionary<TechType,int> _trackedItems = new Dictionary<TechType, int>();
-        public int GetContainerFreeSpace { get; }
+        public int GetContainerFreeSpace => CalculateContainerFreeSpace();
+
+        private int CalculateContainerFreeSpace()
+        {
+            var storage = GetTotalStorage();
+            return (int)storage.y - (int)storage.x;
+        }
+
         public bool IsFull => GetIsFull();
         public bool IsRackSlotsFull => GetIsRackFull();
         public override bool IsConstructed => _isConstructed;
@@ -128,7 +135,7 @@ namespace DataStorageSolutions.Mono
                 if (data != null)
                 {
                     var slot = GetSlotByID(GetFreeSlotID());
-                    AddServer(data.Server, data.ServerFilters);
+                    AddServer(data.Server, data.ServerFilters, data.SlotID, true);
                 }
             }
         }
@@ -208,7 +215,7 @@ namespace DataStorageSolutions.Mono
             QuickLogger.Debug($"Current ID Occupied Stat = {slotByID.IsOccupied}");
             QuickLogger.Debug($"Data Count = {server.Count}");
 
-            slotByID.Server = new HashSet<ObjectData>(server);
+            slotByID.LoadServer(server);
             if (filters != null)
             {
                 slotByID.Filter = new List<Filter>(FilterList.GetNewVersion(filters));
@@ -242,7 +249,7 @@ namespace DataStorageSolutions.Mono
             {
                 if (server.Server != null)
                 {
-                    yield return new ServerData{Server = server.Server, ServerFilters = server.Filter };
+                    yield return new ServerData{Server = server.Server, ServerFilters = server.Filter, SlotID = server.Id};
                 }
             }
         }
@@ -290,7 +297,7 @@ namespace DataStorageSolutions.Mono
             return _servers?.FirstOrDefault(x => !x.IsFull() && x.IsAllowedToAdd(techType) && x.IsOccupied);
         }
 
-        internal bool AddServer(HashSet<ObjectData> server,List<Filter> filters)
+        internal bool AddServer(HashSet<ObjectData> server,List<Filter> filters, int suppliedSlot = 0, bool useSuppliedSlot = false)
         {
             if (server == null)
             {
@@ -299,21 +306,30 @@ namespace DataStorageSolutions.Mono
             }
 
             QuickLogger.Debug($"In Add Server Adding", true);
-            var freeSlotId = GetFreeSlotID();
-            var success = AddServerToSlot(server,filters, freeSlotId);
 
-            QuickLogger.Debug($"Success Result = {success}");
+            if (!AddServerToSlot(server, filters, GetEmptySlot(suppliedSlot, useSuppliedSlot))) return false;
 
-            if (success)
+            DisplayManager.UpdateContainerAmount();
+            QuickLogger.Debug("Made it");
+            Mod.OnBaseUpdate?.Invoke();
+            return true;
+
+        }
+
+        private int GetEmptySlot(int suppliedSlot, bool useSuppliedSlot)
+        {
+            int assignedSlot;
+
+            if (useSuppliedSlot && !GetSlotByID(suppliedSlot).IsOccupied)
             {
-                //server.transform.SetParent(slot.Slot, false);
-                //server.transform.localPosition = new Vector3(server.transform.localPosition.x, server.transform.localPosition.y + -0.0397f, server.transform.localPosition.z);
-                DisplayManager.UpdateContainerAmount();
-                QuickLogger.Debug("Made it");
-                Mod.OnBaseUpdate?.Invoke();
+                assignedSlot = suppliedSlot;
+            }
+            else
+            {
+                assignedSlot = GetFreeSlotID();
             }
 
-            return success;
+            return assignedSlot;
         }
 
         private void OnContainerUpdate(DSSRackController dssRackController)
@@ -404,7 +420,7 @@ namespace DataStorageSolutions.Mono
             if (DumpContainer == null)
             {
                 DumpContainer = gameObject.AddComponent<DumpContainer>();
-                DumpContainer.Initialize(transform, AuxPatchers.DriveReceptacle(), AuxPatchers.NotAllowed(), AuxPatchers.RackFull(), this, 1, 1);
+                DumpContainer.Initialize(transform, AuxPatchers.DriveReceptacle(), AuxPatchers.NotAllowed(), AuxPatchers.RackFull(), this, 1, 6);
             }
 
             AddToBaseManager();
@@ -545,6 +561,19 @@ namespace DataStorageSolutions.Mono
             return null;
         }
 
+        private bool CanHoldServerAmount(int amount)
+        {
+            if (_servers == null)
+            {
+                QuickLogger.Error("Rack Servers Array is null. Please let FCS Studios know about this issue");
+                return true;
+            }
+
+            var occupiedAmount = _servers.Count(server => server.IsOccupied);
+
+            return occupiedAmount + amount < _servers.Length;
+        }
+
         public void ToggleRackState(bool forceOpen = false)
         {
             if (!forceOpen)
@@ -581,7 +610,7 @@ namespace DataStorageSolutions.Mono
 
         public bool CanBeStored(int amount,TechType techType = TechType.None)
         {
-            return IsRackSlotsFull;
+            return !IsRackSlotsFull && CanHoldServerAmount(amount);
         }
 
         public bool AddItemToContainer(InventoryItem item)
@@ -594,7 +623,7 @@ namespace DataStorageSolutions.Mono
 
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
         {
-            return pickupable.GetTechType() == QPatch.Server.TechType && !IsRackSlotsFull;
+            return CanBeStored(DumpContainer.GetCount(), pickupable.GetTechType());
         }
 
         public Pickupable RemoveItemFromContainer(TechType techType, int amount)
@@ -637,32 +666,7 @@ namespace DataStorageSolutions.Mono
             }
 
             server.Add(DSSHelpers.MakeObjectData(item,server.Id));
-            AddToTrackedItems(techType);
             Destroy(item.item.gameObject);
-        }
-
-        private void AddToTrackedItems(TechType techType)
-        {
-            if (_trackedItems.ContainsKey(techType))
-            {
-                _trackedItems[techType] += 1;
-            }
-        }
-
-        internal void RemoveFromTrackedItems(TechType techType)
-        {
-            if (_trackedItems.ContainsKey(techType))
-            {
-                if (_trackedItems[techType] == 1)
-                {
-                    _trackedItems.Remove(techType);
-                }
-                else
-                {
-                    _trackedItems[techType] -= 1;
-                }
-                
-            }
         }
 
         public ObjectDataTransferData GetItemDataFromServer(TechType techType)
@@ -689,6 +693,7 @@ namespace DataStorageSolutions.Mono
 
         public bool GivePlayerItem(TechType techType, ObjectDataTransferData data)
         {
+            QuickLogger.Debug($"Giving Player Item {techType}",true);
             return DSSHelpers.GivePlayerItem(techType, data, GetServerWithObjectData);
         }
 
@@ -706,19 +711,7 @@ namespace DataStorageSolutions.Mono
         {
             return _servers.Any(rackSlot => rackSlot != null && rackSlot.HasFilters);
         }
-
-        public int GetItemCount(TechType techType)
-        {
-            int amount = 0;
-
-            for (int i = 0; i < _servers.Length; i++)
-            {
-                amount += _servers[i].GetItemCount(techType);
-            }
-
-            return amount;
-        }
-
+        
         public bool CanHoldItem(int amount,TechType itemTechType,bool checkFilters = false)
         {
             var storage = GetTotalStorage();
@@ -750,6 +743,27 @@ namespace DataStorageSolutions.Mono
         public bool ContainsItem(TechType techType)
         {
             throw new NotImplementedException();
+        }
+
+        private void FillWithDummyData()
+        {
+            var random = new System.Random();
+
+            for (int i = 0; i < _servers.Length; i++)
+            {
+                if (_servers[i].IsOccupied && !_servers[i].IsFull())
+                {
+                    for (int j = _servers[i].SpaceAvailable() - 1; i > -1; i--)
+                    {
+                        var questions = new List<TechType>{
+                            TechType.Copper,
+                            TechType.Quartz,
+                            TechType.Titanium};
+                        int index = random.Next(questions.Count);
+                        _servers[i].Add(DSSHelpers.MakeObjectData(questions[index].ToInventoryItem(), _servers[i].Id));
+                    }
+                }
+            }
         }
     }
 }

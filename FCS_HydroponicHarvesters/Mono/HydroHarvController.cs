@@ -61,6 +61,8 @@ namespace FCS_HydroponicHarvesters.Mono
         internal HydroHarvCleanerManager HydroHarvCleanerManager { get; private set; }
         public bool IsOperational => GetIsOperational();
 
+        public FCSConnectableDevice FCSConnectableDevice { get; private set; }
+
         private bool GetIsOperational()
         {
             if (!IsConstructed || 
@@ -131,6 +133,12 @@ namespace FCS_HydroponicHarvesters.Mono
             {
                 reason = string.Empty;
                 return true;
+            }
+
+            if (HydroHarvGrowBed.HasItems())
+            {
+                reason = HydroponicHarvestersBuildable.HasDNAItemsMessage();
+                return false;
             }
 
             if (HydroHarvContainer.HasItems())
@@ -273,6 +281,12 @@ namespace FCS_HydroponicHarvesters.Mono
                 DisplayManager = gameObject.AddComponent<HydroHarvDisplayManager>();
                 DisplayManager.Setup(this);
                 DisplayManager.OnContainerUpdate(0,0);
+            }
+
+            if (FCSConnectableDevice == null)
+            {
+                FCSConnectableDevice = gameObject.AddComponent<FCSConnectableDevice>();
+                FCSConnectableDevice.Initialize(this, HydroHarvContainer);
             }
         }
 

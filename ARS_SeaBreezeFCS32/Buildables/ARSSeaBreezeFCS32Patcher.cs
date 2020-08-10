@@ -79,7 +79,10 @@ namespace ARS_SeaBreezeFCS32.Buildables
                 
                 //Create or get the constructable bounds
                 GameObjectHelpers.AddConstructableBounds(prefab,size,center);
-                
+
+                var techTag = prefab.EnsureComponent<TechTag>();
+                techTag.type = TechType;
+
                 prefab.EnsureComponent<PrefabIdentifier>().ClassId = this.ClassID;
                 prefab.EnsureComponent<AnimationManager>();
                 prefab.EnsureComponent<ARSolutionsSeaBreezeController>();

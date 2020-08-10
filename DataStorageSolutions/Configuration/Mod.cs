@@ -476,7 +476,7 @@ namespace DataStorageSolutions.Configuration
             }
         }
 
-        public static TechType GetSeaBreeezeTechType()
+        public static TechType GetSeaBreezeTechType()
         {
             if (_seaBreezeTechType == TechType.None)
             {

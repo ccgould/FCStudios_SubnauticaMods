@@ -166,7 +166,7 @@ namespace DataStorageSolutions.Model
             Slot = slot;
         }
 
-        internal void Clear()
+        internal void ClearServer()
         {
             Server = null;
         }
@@ -174,11 +174,13 @@ namespace DataStorageSolutions.Model
         internal void Add(ObjectData data)
         {
             Server.Add(data);
+            _mono.Manager.AddToTrackedItems(data.TechType);
             ResetTimer();
         }
 
         internal void Remove(ObjectData data)
         {
+            _mono.Manager.RemoveFromTrackedItems(data.TechType);
             Server.Remove(data);
             ResetTimer();
         }
@@ -246,10 +248,20 @@ namespace DataStorageSolutions.Model
 
         internal void DisconnectFromRack()
         {
+            RemoveFromBaseTracker();
+
             IsOccupied = false;
-            Clear();
+            ClearServer();
             _mono.DisplayManager.UpdateContainerAmount();
             Mod.OnBaseUpdate?.Invoke();
+        }
+
+        private void RemoveFromBaseTracker()
+        {
+            foreach (ObjectData data in Server)
+            {
+                _mono.Manager.RemoveFromTrackedItems(data.TechType);
+            }
         }
 
         internal void UpdateNetwork()
@@ -276,7 +288,6 @@ namespace DataStorageSolutions.Model
             {
                 if (Server.ElementAt(i).TechType != techType) continue;
                 Remove(Server.ElementAt(i));
-                _mono.RemoveFromTrackedItems(techType);
                 break;
             }
         }
@@ -284,6 +295,23 @@ namespace DataStorageSolutions.Model
         internal int GetItemCount(TechType techType)
         {
             return Server?.Where((t, i) => Server.ElementAt(i).TechType == techType).Count() ?? 0;
+        }
+
+        public int SpaceAvailable()
+        {
+            return QPatch.Configuration.Config.ServerStorageLimit - Server.Count;
+        }
+
+        public void LoadServer(HashSet<ObjectData> server)
+        {
+            QuickLogger.Debug($"Loading Server ID: {Id}",true);
+            //To make a deep copy
+            Server = new HashSet<ObjectData>(server);
+
+            foreach (ObjectData data in server)
+            {
+                _mono.Manager.AddToTrackedItems(data.TechType);
+            }
         }
     }
 }

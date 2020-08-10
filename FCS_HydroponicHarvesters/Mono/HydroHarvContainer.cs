@@ -14,7 +14,7 @@ namespace FCS_HydroponicHarvesters.Mono
     {
         private HydroHarvController _mono;
         internal int StorageLimit { get; private set; }
-
+        public Action<int, int> OnContainerUpdate { get; set; }
 
         public int GetContainerFreeSpace => GetFreeSpace();
         public bool IsFull => CheckIfFull();
@@ -100,7 +100,7 @@ namespace FCS_HydroponicHarvesters.Mono
                     Items.Add(item, initializer ? 0 : 1);
                     QuickLogger.Debug($"Added item to container {item}", true);
                 }
-                OnContainerUpdate?.Invoke(0, 0);
+                OnContainerUpdate?.Invoke(GetTotal(), StorageLimit);
             }
         }
 
@@ -119,7 +119,7 @@ namespace FCS_HydroponicHarvesters.Mono
                 Items[item] -= 1;
                 var pickup = CraftData.InstantiateFromPrefab(item).GetComponent<Pickupable>();
                 Inventory.main.Pickup(pickup);
-                OnContainerUpdate?.Invoke(0, 0);
+                OnContainerUpdate?.Invoke(GetTotal(), StorageLimit);
                 _mono?.Producer?.TryStartingNextClone();
             }
         }
@@ -129,7 +129,7 @@ namespace FCS_HydroponicHarvesters.Mono
             QuickLogger.Debug("Taking From Container", true);
 
             Items[item] -= 1;
-            OnContainerUpdate?.Invoke(0, 0);
+            OnContainerUpdate?.Invoke(GetTotal(), StorageLimit);
             _mono?.Producer?.TryStartingNextClone();
         }
 
@@ -160,15 +160,19 @@ namespace FCS_HydroponicHarvesters.Mono
 
         public Pickupable RemoveItemFromContainer(TechType techType, int amount)
         {
-            throw new NotImplementedException();
+            Items[techType] -= 1;
+            var go = GameObject.Instantiate(CraftData.GetPrefabForTechType(techType));
+            var pickup = go.GetComponent<Pickupable>();
+            OnContainerUpdate?.Invoke(0, 0);
+            _mono?.Producer?.TryStartingNextClone();
+            return pickup;
         }
 
         public Dictionary<TechType, int> GetItemsWithin()
         {
-            throw new NotImplementedException();
+            return Items.Where(x => x.Value > 0).ToDictionary(x => x.Key, x => x.Value);
         }
 
-        public Action<int, int> OnContainerUpdate { get; set; }
         public bool ContainsItem(TechType techType)
         {
             return Items.Any(x => x.Key == techType);
@@ -199,12 +203,12 @@ namespace FCS_HydroponicHarvesters.Mono
 
             Items = savedDataContainer;
 
-            OnContainerUpdate?.Invoke(0, 0);
+            OnContainerUpdate?.Invoke(GetTotal(), StorageLimit);
         }
 
         public bool HasItems()
         {
-            return Items.Count > 0;
+            return Items.Any(x => x.Value > 0);
         }
 
         public int GetItemCount(TechType techType)

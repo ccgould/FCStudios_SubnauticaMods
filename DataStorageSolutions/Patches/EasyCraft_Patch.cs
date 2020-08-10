@@ -66,8 +66,6 @@ namespace DataStorageSolutions.Patches
         {
             var bases = Containers;
 
-            QuickLogger.Debug($"Bases Count: {bases.Length}");
-
             if (bases.Length == 0)
             {
                 __result += 0;

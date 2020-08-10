@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using FCSCommon.Utilities;
-using Harmony;
+﻿using FCSCommon.Utilities;
+using HarmonyLib;
 
 namespace FCSTechFabricator.Patchers
 {

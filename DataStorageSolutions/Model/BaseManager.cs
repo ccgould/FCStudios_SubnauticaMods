@@ -22,7 +22,7 @@ namespace DataStorageSolutions.Model
         private string _baseName;
         private BaseSaveData _savedData;
         private bool _hasBreakerTripped;
-        private TechType _seabreezeTechType;
+
 
         internal static List<BaseManager> Managers { get; } = new List<BaseManager>();
         internal static readonly List<IBaseAntenna> BaseAntennas = new List<IBaseAntenna>();
@@ -61,18 +61,17 @@ namespace DataStorageSolutions.Model
             throw new NotImplementedException();
         }
 
-        internal Dictionary<string, FCSConnectableDevice> SeaBreezes { get; set; } = new Dictionary<string, FCSConnectableDevice>();
+        internal Dictionary<string, FCSConnectableDevice> FCSConnectables { get; set; } = new Dictionary<string, FCSConnectableDevice>();
 
         Action<int, int> IFCSStorage.OnContainerUpdate { get; set; }
 
         private void Initialize(SubRoot habitat)
         {
             ReadySaveData();
-            _seabreezeTechType = Mod.GetSeaBreeezeTechType();
-            ARSeaBreezeFCS32Awake_Patcher.AddEventHandlerIfMissing(AlertedNewSeaBreezePlaced);
-            ARSeaBreezeFCS32Destroy_Patcher.AddEventHandlerIfMissing(AlertedSeaBreezeDestroyed);
+            FCSConnectableAwake_Patcher.AddEventHandlerIfMissing(AlertedNewFCSConnectablePlaced);
+            FCSConnectableDestroy_Patcher.AddEventHandlerIfMissing(AlertedFCSConnectableDestroyed);
 
-            GetSeaBreezes();
+            GetFCSConnectables();
 
 
             if (NameController == null)
@@ -128,23 +127,22 @@ namespace DataStorageSolutions.Model
             return manager;
         }
 
-        private void AlertedNewSeaBreezePlaced(FCSConnectableDevice obj)
+        private void AlertedNewFCSConnectablePlaced(FCSConnectableDevice obj)
         {
             if (obj != null)
             {
                 QuickLogger.Debug("OBJ Not NULL", true);
-                TrackNewSeabreeze(obj);
+                TrackNewFCSConnectable(obj);
             }
         }
 
-        private void AlertedSeaBreezeDestroyed(FCSConnectableDevice obj)
+        private void AlertedFCSConnectableDestroyed(FCSConnectableDevice obj)
         {
             if (obj == null || obj.GetPrefabIDString() == null) return;
 
             QuickLogger.Debug("OBJ Not NULL", true);
-            SeaBreezes.Remove(obj.GetPrefabIDString());
-            QuickLogger.Debug("Removed Seabreeze");
-            //DisplayManager.UpdateSeaBreezes();
+            FCSConnectables.Remove(obj.GetPrefabIDString());
+            QuickLogger.Debug("Removed FCSConnectable");
         }
 
         private static void GetStoredData(DSSRackController rackController, Dictionary<TechType, int> data)
@@ -220,6 +218,44 @@ namespace DataStorageSolutions.Model
             Habitat = habitat;
             InstanceID = habitat.gameObject.gameObject?.GetComponentInChildren<PrefabIdentifier>()?.Id;
             Initialize(habitat);
+        }
+
+        internal void AddToTrackedItems(TechType techType)
+        {
+            if (TrackedItems.ContainsKey(techType))
+            {
+                TrackedItems[techType] += 1;
+#if DEBUG
+                QuickLogger.Debug($"Added another {techType}", true);
+#endif
+            }
+            else
+            {
+                TrackedItems.Add(techType, 1);
+#if DEBUG
+                QuickLogger.Debug($"Item {techType} was added to the tracking list.", true);
+#endif
+            }
+        }
+
+        internal void RemoveFromTrackedItems(TechType techType)
+        {
+            if (!TrackedItems.ContainsKey(techType)) return;
+
+            if (TrackedItems[techType] == 1)
+            {
+                TrackedItems.Remove(techType);
+#if DEBUG
+                QuickLogger.Debug($"Removed another {techType}", true);
+#endif
+            }
+            else
+            {
+                TrackedItems[techType] -= 1;
+#if DEBUG
+                QuickLogger.Debug($"Item {techType} is now {TrackedItems[techType]}", true);
+#endif
+            }
         }
 
         internal bool GetHasBreakerTripped()
@@ -347,9 +383,9 @@ namespace DataStorageSolutions.Model
                     GetStoredData(rackController, data);
                 }
 
-                foreach (var seaBreeze in SeaBreezes)
+                foreach (var fcsConnectable in FCSConnectables)
                 {
-                    var items = seaBreeze.Value.GetItemsWithin();
+                    var items = fcsConnectable.Value.GetItemsWithin();
                     foreach (KeyValuePair<TechType, int> item in items)
                     {
                         if (data.ContainsKey(item.Key))
@@ -374,27 +410,30 @@ namespace DataStorageSolutions.Model
 
         private void PerformTakeOperation(TechType techType)
         {
+            QuickLogger.Debug("Perform Take Operation",true);
             foreach (DSSRackController baseUnit in BaseRacks)
             {
                 if (baseUnit.HasItem(techType))
                 {
                     var data = baseUnit.GetItemDataFromServer(techType);
+                    QuickLogger.Debug("Calling Take",true);
                     var result = baseUnit.GivePlayerItem(techType, data);
                     if (!result)
                     {
                         return;
                         //TODO Add Message
                     }
+                    return;
                 }
             }
 
-
-            foreach (KeyValuePair<string, FCSConnectableDevice> seaBreeze in SeaBreezes)
+            //Check connectables
+            foreach (KeyValuePair<string, FCSConnectableDevice> fcsConnectable in FCSConnectables)
             {
                 Vector2int itemSize = CraftData.GetItemSize(techType);
-                if (seaBreeze.Value.ContainsItem(techType) && Inventory.main.HasRoomFor(itemSize.x,itemSize.y))
+                if (fcsConnectable.Value.ContainsItem(techType) && Inventory.main.HasRoomFor(itemSize.x,itemSize.y))
                 {
-                    DSSHelpers.GivePlayerItem(seaBreeze.Value.RemoveItemFromContainer(techType, 1));
+                    DSSHelpers.GivePlayerItem(fcsConnectable.Value.RemoveItemFromContainer(techType, 1));
                     break;
                 }
             }
@@ -448,32 +487,31 @@ namespace DataStorageSolutions.Model
             return null;
         }
 
-        private void TrackNewSeabreeze(FCSConnectableDevice obj)
+        private void TrackNewFCSConnectable(FCSConnectableDevice obj)
         {
             GameObject newSeaBase = obj?.gameObject?.transform?.parent?.gameObject;
-            var seaBreezeBase = BaseManager.FindManager(newSeaBase?.GetComponentInChildren<PrefabIdentifier>().Id);
+            var fcsConnectableBase = BaseManager.FindManager(newSeaBase?.GetComponentInChildren<PrefabIdentifier>().Id);
             QuickLogger.Debug($"SeaBase Base Found in Track {newSeaBase?.name}");
             QuickLogger.Debug($"Terminal Base Found in Track {Habitat?.name}");
 
-            if (newSeaBase != null && seaBreezeBase.Habitat == Habitat)
+            if (newSeaBase != null && fcsConnectableBase.Habitat == Habitat)
             {
-                QuickLogger.Debug("Adding Seabreeze");
-                obj.GetStorage().OnContainerUpdate += OnSeabreezeContainerUpdate;
-                SeaBreezes.Add(obj.GetPrefabIDString(), obj);
-                //DisplayManager.UpdateSeaBreezes();
-                QuickLogger.Debug("Added Seabreeze");
+                QuickLogger.Debug("Adding FCSConnectable");
+                obj.GetStorage().OnContainerUpdate += OnFCSConnectableContainerUpdate;
+                FCSConnectables.Add(obj.GetPrefabIDString(), obj);
+                QuickLogger.Debug("Added FCSConnectable");
             }
         }
 
-        private void OnSeabreezeContainerUpdate(int arg1, int arg2)
+        private void OnFCSConnectableContainerUpdate(int arg1, int arg2)
         {
             Mod.OnBaseUpdate?.Invoke();
         }
 
-        private void GetSeaBreezes()
+        private void GetFCSConnectables()
         {
             //Clear the list
-            SeaBreezes.Clear();
+            FCSConnectables.Clear();
 
             //Check if there is a base connected
             if (Habitat != null)
@@ -482,14 +520,9 @@ namespace DataStorageSolutions.Model
 
                 foreach (var device in connectableDevices)
                 {
-                    if (device?.GetTechType() == _seabreezeTechType)
-                    {
-                        SeaBreezes.Add(device.GetPrefabIDString(), device);
-                    }
+                    FCSConnectables.Add(device.GetPrefabIDString(), device);
                 }
             }
-
-            QuickLogger.Debug($"Seabreeze Count: {SeaBreezes.Count}");
         }
 
         public bool AddItemToContainer(InventoryItem item)
@@ -499,21 +532,31 @@ namespace DataStorageSolutions.Model
             if (food != null)
             {
                 bool successful = false;
-                foreach (KeyValuePair<string, FCSConnectableDevice> seaBreeze in SeaBreezes)
+                if (!food.decomposes || item.item.GetTechType() == TechType.CreepvinePiece && CanBeStored(DumpContainer.GetCount() + 1, item.item.GetTechType()))
                 {
-                    if (seaBreeze.Value.CanBeStored(1, item.item.GetTechType()))
+                    var rackController = FindValidRack(item.item.GetTechType(), 1);
+                    if (rackController == null) return false;
+                    rackController.AddItemToAServer(item);
+                    successful = true;
+                }
+                else
+                {
+                    foreach (KeyValuePair<string, FCSConnectableDevice> fcsConnectable in FCSConnectables)
                     {
-                        var result = seaBreeze.Value.AddItemToContainer(new InventoryItem(item.item), out string reason);
-                        successful = true;
-                        //DumpContainer.DestroyItem(item);
-                        if (!result)
+                        if (fcsConnectable.Value.CanBeStored(1, item.item.GetTechType()) && fcsConnectable.Value.GetTechType() == Mod.GetSeaBreezeTechType())
                         {
-                            QuickLogger.Error(reason);
+                            var result = fcsConnectable.Value.AddItemToContainer(new InventoryItem(item.item), out string reason);
+                            successful = true;
+
+                            if (!result)
+                            {
+                                QuickLogger.Error(reason);
+                            }
+                            break;
                         }
-                        break;
                     }
                 }
-
+                
                 if (!successful)
                 {
                     QuickLogger.Message(string.Format(AuxPatchers.NoEmptySeaBreezeFormat(), item.item.GetTechType()), true);
@@ -532,36 +575,39 @@ namespace DataStorageSolutions.Model
 
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
         {
+            var successful = false;
             var food = pickupable.GetComponentInChildren<Eatable>();
 
             if (food != null)
             {
-                var successful = false;
-
-                if (SeaBreezes.Count == 0)
+                if (!food.decomposes || food.GetComponent<Pickupable>().GetTechType() == TechType.CreepvinePiece && CanBeStored(DumpContainer.GetCount() + 1, pickupable.GetTechType()))
                 {
-                    QuickLogger.Message(AuxPatchers.NoFoodItems(), true);
-                    return false;
+                    successful =  true;
+                }
+                else
+                {
+                    foreach (KeyValuePair<string, FCSConnectableDevice> seaBreeze in FCSConnectables)
+                    {
+                        if (seaBreeze.Value.GetTechType() != Mod.GetSeaBreezeTechType()) continue;
+                        if (!seaBreeze.Value.CanBeStored(1, pickupable.GetTechType())) continue;
+                        successful =  true;
+                    }
                 }
 
-                foreach (KeyValuePair<string, FCSConnectableDevice> seaBreeze in SeaBreezes)
+                if (!successful)
                 {
-                    if (!seaBreeze.Value.CanBeStored(1, pickupable.GetTechType())) continue;
-                    successful = true;
-                    break;
+                    QuickLogger.Message(AuxPatchers.NoFoodItems(), true);
                 }
 
                 return successful;
-
             }
 
             if (!CanBeStored(DumpContainer.GetCount() + 1, pickupable.GetTechType()))
             {
                 QuickLogger.Message(AuxPatchers.CannotBeStored(), true);
-                return false;
             }
 
-            return true;
+            return false;
         }
 
         public Pickupable RemoveItemFromContainer(TechType techType, int amount = 1)
@@ -647,13 +693,11 @@ namespace DataStorageSolutions.Model
         internal int GetItemCount(TechType techType)
         {
             int amount = 0;
-
             
-            for (int i = 0; i < BaseRacks.Count; i++)
+            if (TrackedItems.ContainsKey(techType))
             {
-                amount += BaseRacks.ElementAt(i).GetItemCount(techType);
+                amount = TrackedItems[techType];
             }
-            
             return amount;
         }
     }

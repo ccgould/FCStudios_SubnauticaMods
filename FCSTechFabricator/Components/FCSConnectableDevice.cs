@@ -3,6 +3,7 @@ using FCSTechFabricator.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
+using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
 using UnityEngine;
 
@@ -27,9 +28,10 @@ namespace FCSTechFabricator.Components
             if (_techtype == TechType.None)
             {
                 var techTag = GetComponentInParent<TechTag>() ?? GetComponentInChildren<TechTag>();
-                _techtype = techTag.type;
+                _techtype = techTag == null ? TechType.None : techTag.type;
             }
 
+            QuickLogger.Debug($"FCSConnectable TechType: {_techtype}",true);
             return _techtype;
         }
         

@@ -51,8 +51,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="0Harmony-1.2.0.1">
-      <HintPath>..\Dependancies\0Harmony-1.2.0.1.dll</HintPath>
+    <Reference Include="0Harmony">
+      <HintPath>..\Dependancies\0Harmony.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath>..\Dependancies\Subnautica\Assembly-CSharp.dll</HintPath>
@@ -150,7 +150,7 @@
     <Compile Include="Mono\DSSVehicleDockingManager.cs" />
     <Compile Include="Mono\PowerManager.cs" />
     <Compile Include="Mono\SearchField.cs" />
-    <Compile Include="Patches\ARSeaBreezeFCS32Awake_Patcher.cs" />
+    <Compile Include="Patches\FCSConnectableAwake_Patcher.cs" />
     <Compile Include="Patches\EasyCraft_Patch.cs" />
     <Compile Include="Patches\Player_Patches.cs" />
     <Compile Include="Patches\SubRoot_Patches.cs" />

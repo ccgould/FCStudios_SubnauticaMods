@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 using FCSCommon.Utilities;
-using Harmony;
+using HarmonyLib;
 using QModManager.API.ModLoading;
 
 namespace FCSTechFabricator
@@ -20,7 +20,7 @@ namespace FCSTechFabricator
             QuickLogger.Debug("Debug logs enabled");
 #endif
 
-            var harmony = HarmonyInstance.Create("com.fcstechfabricator.fcstudios");
+            var harmony = new Harmony("com.fcstechfabricator.fcstudios");
             harmony.PatchAll(Assembly.GetExecutingAssembly());
             FcTechFabricatorService.InternalAPI.PatchFabricator();
         }

@@ -27,6 +27,7 @@ namespace FCS_HydroponicHarvesters.Buildables
         private const string StorageFullKey = "HH_StorageFull";
         private const string FloraKleenDropContainerTitleKey = "HH_FloraKleenDropContainerTitle";
         private const string DNADropContainerTitleKey = "HH_DNADropContainerTitle";
+        private const string HasDNAItemsMessageKey = "HH_HasDNAItemsMessage";
 
         internal string BuildableName { get; set; }
 
@@ -50,6 +51,7 @@ namespace FCS_HydroponicHarvesters.Buildables
             LanguageHandler.SetLanguageLine(HMSTimeKey, "Time Left Until Dirty: {0}");
             LanguageHandler.SetLanguageLine(AmountOfItemsKey, "{0} Items");
             LanguageHandler.SetLanguageLine(HasItemsMessageKey, "Hydroponic Harvester is not empty.");
+            LanguageHandler.SetLanguageLine(HasDNAItemsMessageKey, "Hydroponic Harvester has DNA samples please remove to deconstruct.");
             LanguageHandler.SetLanguageLine(NotOnBaseKey, "NOT CONNECTED TO A BASE CANNOT OPERATE");
             LanguageHandler.SetLanguageLine(ToggleLightMessageKey, "Toggle Internal Light");
             LanguageHandler.SetLanguageLine(CleanerBTNMessageKey, "Add FloraKleen");
@@ -184,6 +186,11 @@ namespace FCS_HydroponicHarvesters.Buildables
         internal static string NotAvailable()
         {
             return string.Format(HMSTime(), Language.main.Get("ChargerSlotEmpty"));
+        }
+
+        public static string HasDNAItemsMessage()
+        {
+            return Language.main.Get(HasDNAItemsMessageKey);
         }
     }
 }

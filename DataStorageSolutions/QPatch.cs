@@ -13,7 +13,7 @@ using FCSCommon.Utilities;
 using FCSTechFabricator;
 using FCSTechFabricator.Components;
 using FCSTechFabricator.Craftables;
-using Harmony;
+using HarmonyLib;
 using QModManager.API;
 using QModManager.API.ModLoading;
 using SMLHelper.V2.Handlers;
@@ -97,7 +97,7 @@ namespace DataStorageSolutions
                 var serverFormattingStation = new ServerFormattingStationBuildable();
                 serverFormattingStation.Patch();
 
-                var harmony = HarmonyInstance.Create("com.datastoragesolutions.fstudios");
+                var harmony = new Harmony("com.datastoragesolutions.fstudios");
 
                 harmony.PatchAll(Assembly.GetExecutingAssembly());
 
@@ -113,7 +113,7 @@ namespace DataStorageSolutions
             }
         }
         
-        private static void PatchEasyCraft(HarmonyInstance harmony)
+        private static void PatchEasyCraft(Harmony harmony)
         {
             var isEasyCraftInstalled = QModServices.Main.ModPresent("EasyCraft");
 
