@@ -458,15 +458,19 @@ namespace DataStorageSolutions.Model
         /// <returns></returns>
         public bool CanBeStored(int amount, TechType techType)
         {
+            QuickLogger.Debug($"In Can Be Stored",true);
             return FindValidRack(techType,amount) != null;
         }
 
         private DSSRackController FindValidRack(TechType itemTechType,int amount)
         {
+            QuickLogger.Debug($"In FindValidRack",true);
             //Check the filtered racks first
             foreach (DSSRackController baseUnit in BaseRacks)
             {
-                if (baseUnit.CanHoldItem(amount,itemTechType,true))
+                var d = DumpContainer.GetTechTypeCount(itemTechType);
+                QuickLogger.Debug(d.ToString(),true);
+                if (baseUnit.CanHoldItem(amount,itemTechType,d,true))
                 {
                     QuickLogger.Debug($"Item: {itemTechType} is allowed in server rack {baseUnit.GetPrefabIDString()} is Filtered: {baseUnit.HasFilters()}", true);
                     return baseUnit;
@@ -532,7 +536,7 @@ namespace DataStorageSolutions.Model
             if (food != null)
             {
                 bool successful = false;
-                if (!food.decomposes || item.item.GetTechType() == TechType.CreepvinePiece && CanBeStored(DumpContainer.GetCount() + 1, item.item.GetTechType()))
+                if ((!food.decomposes || item.item.GetTechType() == TechType.CreepvinePiece) && CanBeStored(DumpContainer.GetCount() + 1, item.item.GetTechType()))
                 {
                     var rackController = FindValidRack(item.item.GetTechType(), 1);
                     if (rackController == null) return false;
@@ -580,7 +584,10 @@ namespace DataStorageSolutions.Model
 
             if (food != null)
             {
-                if (!food.decomposes || food.GetComponent<Pickupable>().GetTechType() == TechType.CreepvinePiece && CanBeStored(DumpContainer.GetCount() + 1, pickupable.GetTechType()))
+
+                QuickLogger.Debug($"Food Check {CanBeStored(DumpContainer.GetCount() + 1, pickupable.GetTechType())}",true);
+
+                if ((!food.decomposes || food.GetComponent<Pickupable>().GetTechType() == TechType.CreepvinePiece) && CanBeStored(DumpContainer.GetCount() + 1, pickupable.GetTechType()))
                 {
                     successful =  true;
                 }
@@ -599,15 +606,20 @@ namespace DataStorageSolutions.Model
                     QuickLogger.Message(AuxPatchers.NoFoodItems(), true);
                 }
 
+
+                QuickLogger.Debug($"Food Allowed Result: {successful}",true);
                 return successful;
             }
+
+            QuickLogger.Debug($"{DumpContainer.GetCount() + 1}",true);
 
             if (!CanBeStored(DumpContainer.GetCount() + 1, pickupable.GetTechType()))
             {
                 QuickLogger.Message(AuxPatchers.CannotBeStored(), true);
+                return false;
             }
 
-            return false;
+            return true;
         }
 
         public Pickupable RemoveItemFromContainer(TechType techType, int amount = 1)

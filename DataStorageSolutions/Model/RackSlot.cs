@@ -274,6 +274,8 @@ namespace DataStorageSolutions.Model
         {
             if (!IsOccupied) return false;
 
+            QuickLogger.Debug($"Filter Cross Check: {FilterCrossCheck(techType)}",true);
+
             return _filter.Count == 0 || FilterCrossCheck(techType);
         }
         
@@ -312,6 +314,11 @@ namespace DataStorageSolutions.Model
             {
                 _mono.Manager.AddToTrackedItems(data.TechType);
             }
+        }
+
+        public bool CanHoldAmount(int amount)
+        {
+            return Server != null && Server.Count + amount <= QPatch.Configuration.Config.ServerStorageLimit;
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FCS_HydroponicHarvesters.Buildables;
 using FCS_HydroponicHarvesters.Enumerators;
 using FCS_HydroponicHarvesters.Model;
 using FCSCommon.Extensions;
@@ -34,9 +35,9 @@ namespace FCS_HydroponicHarvesters.Mono
         
         public int GetContainerFreeSpace => Slots.Count(x => !x.IsOccupied);
         public bool IsFull => GetContainerFreeSpace <= 0;
+
         internal PlantSlot[] Slots;
-
-
+        
         private bool FindPots()
         {
             try
@@ -189,7 +190,12 @@ namespace FCS_HydroponicHarvesters.Mono
 
         public bool CanBeStored(int amount, TechType techType = TechType.None)
         {
-            throw new NotImplementedException();
+            if (IsFull)
+            {
+                return false;
+            }
+            QuickLogger.Debug($"Can be Stored Values: Amount: {amount} || Free Space: {GetContainerFreeSpace}",true);
+            return amount <= GetContainerFreeSpace;
         }
 
         public bool AddItemToContainer(InventoryItem item)
@@ -224,6 +230,7 @@ namespace FCS_HydroponicHarvesters.Mono
 
             if (IsFull)
             {
+                QuickLogger.Message(HydroponicHarvestersBuildable.StorageFull(), true);
                 return false;
             }
 
@@ -231,10 +238,18 @@ namespace FCS_HydroponicHarvesters.Mono
 
             if (_currentEnvironment != dna.Environment)
             {
+                QuickLogger.Message(HydroponicHarvestersBuildable.IncorrectEnvironment(),true);
                 return false;
             }
 
-            return true;
+            var result = CanBeStored(_mono.DumpContainer.GetCount() + 1, pickupable.GetTechType());
+
+            if (!result)
+            {
+                QuickLogger.Message(HydroponicHarvestersBuildable.StorageFull(),true);
+            }
+
+            return result;
         }
 
         public Pickupable RemoveItemFromContainer(TechType techType, int amount)

@@ -114,7 +114,7 @@ namespace FCS_HydroponicHarvesters.Mono
 #elif BELOWZERO
             var itemSize = TechData.GetItemSize(item);
 #endif
-                if (!Inventory.main.HasRoomFor(itemSize.x, itemSize.y) || Items[item] <= 0) return;
+                if (!Inventory.main.HasRoomFor(itemSize.x, itemSize.y) || Items[item] <= 1) return;
 
                 Items[item] -= 1;
                 var pickup = CraftData.InstantiateFromPrefab(item).GetComponent<Pickupable>();
@@ -128,9 +128,13 @@ namespace FCS_HydroponicHarvesters.Mono
         {
             QuickLogger.Debug("Taking From Container", true);
 
-            Items[item] -= 1;
-            OnContainerUpdate?.Invoke(GetTotal(), StorageLimit);
-            _mono?.Producer?.TryStartingNextClone();
+            if (Items.ContainsKey(item) || Items[item] >= 0)
+            {
+                Items[item] -= 1;
+                OnContainerUpdate?.Invoke(GetTotal(), StorageLimit);
+                _mono?.Producer?.TryStartingNextClone();
+            }
+
         }
 
         internal void DeleteItemFromContainer(TechType item)

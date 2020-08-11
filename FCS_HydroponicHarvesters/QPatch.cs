@@ -4,7 +4,6 @@ using System.Reflection;
 using FCS_HydroponicHarvesters.Buildables;
 using FCS_HydroponicHarvesters.Configuration;
 using FCS_HydroponicHarvesters.Craftable;
-using FCS_HydroponicHarvesters.Model;
 using FCS_HydroponicHarvesters.Patches;
 using FCSCommon.Exceptions;
 using FCSCommon.Extensions;
@@ -12,7 +11,7 @@ using FCSCommon.Utilities;
 using FCSTechFabricator;
 using FCSTechFabricator.Components;
 using FCSTechFabricator.Craftables;
-using Harmony;
+using HarmonyLib;
 using QModManager.API;
 using QModManager.API.ModLoading;
 using SMLHelper.V2.Handlers;
@@ -46,7 +45,7 @@ namespace FCS_HydroponicHarvesters
 
                 AddTechFabricatorItems();
 
-                var harmony = HarmonyInstance.Create("com.hydroponicharvestor.fcstudios");
+                var harmony = new Harmony("com.hydroponicharvestor.fcstudios");
                 harmony.PatchAll(Assembly.GetExecutingAssembly());
                 PatchEasyCraft(harmony);
 
@@ -140,7 +139,7 @@ namespace FCS_HydroponicHarvesters
             }
         }
 
-        private static void PatchEasyCraft(HarmonyInstance harmony)
+        private static void PatchEasyCraft(Harmony harmony)
         {
             var isEasyCraftInstalled = QModServices.Main.ModPresent("EasyCraft");
 

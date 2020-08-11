@@ -46,8 +46,9 @@ namespace FCSTechFabricator
                 Ingredients =
                 {
                     new Ingredient(TechType.Titanium, 1),
-                    new Ingredient(TechType.ComputerChip, 1),
-                    new Ingredient(TechType.Magnetite, 1)
+                    new Ingredient(TechType.Gold, 1),
+                    new Ingredient(TechType.JeweledDiskPiece, 1),
+                    new Ingredient(TechType.Quartz, 2)
                 }
             };
         }
@@ -65,9 +66,9 @@ namespace FCSTechFabricator
                 Ingredients =
                 {
                     new Ingredient(TechType.Titanium, 1),
-                    new Ingredient(TechType.ComputerChip, 1),
+                    new Ingredient(TechType.Gold, 1),
                     new Ingredient(TechType.JeweledDiskPiece, 1),
-                    new Ingredient(TechType.Magnetite, 1)
+                    new Ingredient(TechType.Quartz, 2)
                 }
             };
         }

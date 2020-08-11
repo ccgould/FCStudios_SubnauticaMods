@@ -712,9 +712,12 @@ namespace DataStorageSolutions.Mono
             return _servers.Any(rackSlot => rackSlot != null && rackSlot.HasFilters);
         }
         
-        public bool CanHoldItem(int amount,TechType itemTechType,bool checkFilters = false)
+        public bool CanHoldItem(int amount,TechType itemTechType,int filterAmount = 0,bool checkFilters = false)
         {
             var storage = GetTotalStorage();
+
+            QuickLogger.Debug($"Server Rack: {_prefabID} Total: {storage.y} || Trying: { storage.x + amount}",true);
+
             if (!IsTechTypeAllowedInRack(itemTechType) || GetIsFull() || storage.x + amount > storage.y)
             {
                 return false;
@@ -724,7 +727,8 @@ namespace DataStorageSolutions.Mono
             {
                 foreach (RackSlot rackSlot in _servers)
                 {
-                    if (rackSlot == null || !rackSlot.IsOccupied || rackSlot.IsFull() || !rackSlot.HasFilters) continue;
+                    QuickLogger.Debug($"Is TechType Allowed {rackSlot.IsAllowedToAdd(itemTechType)}",true);
+                    if (rackSlot == null || !rackSlot.IsOccupied || rackSlot.IsFull() || !rackSlot.HasFilters || !rackSlot.CanHoldAmount(filterAmount + 1)) continue;
                     if (rackSlot.IsAllowedToAdd(itemTechType)) return true;
                 }
             }
@@ -732,6 +736,7 @@ namespace DataStorageSolutions.Mono
             {
                 foreach (RackSlot rackSlot in _servers)
                 {
+                    QuickLogger.Debug($"Is TechType Allowed {rackSlot.IsAllowedToAdd(itemTechType)}", true);
                     if (rackSlot == null || !rackSlot.IsOccupied || rackSlot.IsFull() || rackSlot.HasFilters) continue;
                     if (rackSlot.IsAllowedToAdd(itemTechType)) return true;
                 }

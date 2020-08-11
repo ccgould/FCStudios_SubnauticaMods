@@ -225,8 +225,26 @@ namespace FCS_HydroponicHarvesters.Mono
             
             if (DumpContainer == null)
             {
+                Vector2 size = Vector2.zero;
+
+                switch (HydroHarvGrowBed.GetHydroHarvSize())
+                {
+                    case HydroHarvSize.Unknown:
+                        size = new Vector2(1,1);
+                        break;
+                    case HydroHarvSize.Large:
+                        size = new Vector2(2, 2);
+                        break;
+                    case HydroHarvSize.Medium:
+                        size = new Vector2(1, 2);
+                        break;
+                    case HydroHarvSize.Small:
+                        size = Vector2.one;
+                        break;
+                }
+
                 DumpContainer = gameObject.AddComponent<DumpContainer>();
-                DumpContainer.Initialize(transform,HydroponicHarvestersBuildable.DNADropContainerTitle(), HydroponicHarvestersBuildable.NotAllowedItem(), HydroponicHarvestersBuildable.StorageFull(), HydroHarvGrowBed,2,2);
+                DumpContainer.Initialize(transform,HydroponicHarvestersBuildable.DNADropContainerTitle(), HydroponicHarvestersBuildable.NotAllowedItem(), HydroponicHarvestersBuildable.StorageFull(), HydroHarvGrowBed, (int)size.x, (int)size.y);
             }
 
             if (CleanerManager == null)

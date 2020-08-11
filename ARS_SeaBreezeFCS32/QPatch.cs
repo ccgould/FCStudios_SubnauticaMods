@@ -1,7 +1,6 @@
 ﻿using ARS_SeaBreezeFCS32.Buildables;
 using ARS_SeaBreezeFCS32.Configuration;
 using FCSCommon.Utilities;
-using Harmony;
 using System;
 using System.IO;
 using System.Reflection;
@@ -9,6 +8,7 @@ using ARS_SeaBreezeFCS32.Craftables;
 using FCSTechFabricator;
 using FCSTechFabricator.Components;
 using FCSTechFabricator.Craftables;
+using HarmonyLib;
 using QModManager.API.ModLoading;
 using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
@@ -50,7 +50,7 @@ namespace ARS_SeaBreezeFCS32
                 
                 ARSSeaBreezeFCS32Buildable.PatchHelper();
 
-                var harmony = HarmonyInstance.Create("com.arsseabreezefcs32.fcstudios");
+                var harmony = new Harmony("com.arsseabreezefcs32.fcstudios");
 
                 harmony.PatchAll(assembly);
 

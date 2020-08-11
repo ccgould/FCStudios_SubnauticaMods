@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using FCSCommon.Utilities;
 using FCSTechFabricator.Interfaces;
@@ -37,6 +38,22 @@ namespace FCSTechFabricator.Components
                 _dumpContainer.onAddItem += DumpContainerOnOnAddItem;
             }
         }
+
+        public ItemsContainer GetItemsContainer()
+        {
+            return _dumpContainer;
+        }
+
+        public int GetTechTypeCount(TechType techType)
+        {
+            return _dumpContainer.GetItems(techType)?.Count ?? 0;
+        }
+
+        public IList<InventoryItem> GetTechType(TechType techType)
+        {
+            return _dumpContainer.GetItems(techType);
+        }
+
 
         private void DumpContainerOnOnAddItem(InventoryItem item)
         {

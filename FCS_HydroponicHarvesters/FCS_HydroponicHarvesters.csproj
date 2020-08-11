@@ -51,8 +51,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="0Harmony-1.2.0.1">
-      <HintPath>..\Dependancies\0Harmony-1.2.0.1.dll</HintPath>
+    <Reference Include="0Harmony">
+      <HintPath>..\Dependancies\0Harmony.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath>..\Dependancies\Subnautica\Assembly-CSharp.dll</HintPath>

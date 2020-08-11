@@ -28,6 +28,7 @@ namespace FCS_HydroponicHarvesters.Buildables
         private const string FloraKleenDropContainerTitleKey = "HH_FloraKleenDropContainerTitle";
         private const string DNADropContainerTitleKey = "HH_DNADropContainerTitle";
         private const string HasDNAItemsMessageKey = "HH_HasDNAItemsMessage";
+        private const string IncorrectEnvironmentKey = "HH_IncorrectEnvironment";
 
         internal string BuildableName { get; set; }
 
@@ -62,6 +63,7 @@ namespace FCS_HydroponicHarvesters.Buildables
             LanguageHandler.SetLanguageLine(StorageFullKey, "Cannot add anymore DNA samples. Remove one to add.");
             LanguageHandler.SetLanguageLine(FloraKleenDropContainerTitleKey, "FloraKleen Refill.");
             LanguageHandler.SetLanguageLine(DNADropContainerTitleKey, "DNA Sample receptacle");
+            LanguageHandler.SetLanguageLine(IncorrectEnvironmentKey, "Incorrect environment please switch the grow bed mod to another.");
         }
 
         internal static string Max()
@@ -191,6 +193,11 @@ namespace FCS_HydroponicHarvesters.Buildables
         public static string HasDNAItemsMessage()
         {
             return Language.main.Get(HasDNAItemsMessageKey);
+        }
+
+        public static string IncorrectEnvironment()
+        {
+            return Language.main.Get(IncorrectEnvironmentKey);
         }
     }
 }
