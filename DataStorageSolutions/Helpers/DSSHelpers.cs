@@ -8,6 +8,8 @@ using DataStorageSolutions.Mono;
 using FCSCommon.Enums;
 using FCSCommon.Objects;
 using FCSCommon.Utilities;
+using FCSTechFabricator.Enums;
+using FCSTechFabricator.Managers;
 using FCSTechFabricator.Objects;
 using UnityEngine;
 
@@ -45,7 +47,7 @@ namespace DataStorageSolutions.Helpers
 
         private static HashSet<ObjectData> GetServerData(InventoryItem item)
         {
-            var data = item.item.GetComponent<DSSServerController>().Items;
+            var data = item.item.GetComponent<DSSServerController>().FCSFilteredStorage.Items;
             return new HashSet<ObjectData>(data);
         }
 
@@ -174,7 +176,7 @@ namespace DataStorageSolutions.Helpers
 
                                 case SaveDataObjectType.Server:
                                     var server = pickup.gameObject.GetComponent<DSSServerController>();
-                                    server.Items = new HashSet<ObjectData>(data.ServerData);
+                                    server.FCSFilteredStorage.Items = new HashSet<ObjectData>(data.ServerData);
                                     server.Initialize();
                                     server.DisplayManager.UpdateDisplay();
                                     break;
@@ -195,8 +197,8 @@ namespace DataStorageSolutions.Helpers
                         var data = (HashSet<ObjectData>)itemData.data;
                         var controller = pickup.gameObject.GetComponent<DSSServerController>();
                         controller.Initialize();
-                        controller.Items = new HashSet<ObjectData>(data);
-                        controller.Filters = new List<Filter>(itemData.Filters);
+                        controller.FCSFilteredStorage.Items = new HashSet<ObjectData>(data);
+                        controller.FCSFilteredStorage.Filters = new List<Filter>(itemData.Filters);
                         controller.DisplayManager.UpdateDisplay();
                         isSuccessful = true;
                     }

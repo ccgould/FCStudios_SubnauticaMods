@@ -4,6 +4,7 @@ using SMLHelper.V2.Utility;
 using System;
 using System.Collections;
 using System.IO;
+using FCSCommon.Extensions;
 using Oculus.Newtonsoft.Json;
 using SMLHelper.V2.Crafting;
 using UnityEngine;
@@ -14,7 +15,8 @@ namespace ExStorageDepot.Configuration
     {
         private static ModSaver _saveObject;
         private static ExStorageDepotSaveData _exStorageDepotSaveData;
-        
+        private static TechType _dSSServerTechType;
+
         internal static event Action<ExStorageDepotSaveData> OnExStorageDepotLoaded;
         
         internal const string SaveDataFilename = "ExStorageDepotSaveData.json";
@@ -196,5 +198,14 @@ namespace ExStorageDepot.Configuration
             return File.Exists(ConfigurationFile());
         }
 
+        public static TechType GetDSSServerTechType()
+        {
+            if (_dSSServerTechType == TechType.None)
+            {
+                _dSSServerTechType = "DSSServer".ToTechType();
+            }
+
+            return _dSSServerTechType;
+        }
     }
 }

@@ -1,17 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using DataStorageSolutions.Abstract;
 using DataStorageSolutions.Configuration;
 using DataStorageSolutions.Model;
-using FCSCommon.Abstract;
-using FCSCommon.Enums;
-using FCSCommon.Extensions;
 using FCSCommon.Interfaces;
 using FCSCommon.Utilities;
+using FCSTechFabricator.Enums;
 using FCSTechFabricator.Interfaces;
+using FCSTechFabricator.Objects;
 using Oculus.Newtonsoft.Json;
-using PriorityQueueInternal;
 
 namespace DataStorageSolutions.Mono
 {
@@ -31,64 +28,19 @@ namespace DataStorageSolutions.Mono
         [JsonIgnore] internal int StorageLimit => QPatch.Configuration.Config.ServerStorageLimit;
         [JsonIgnore] public int GetContainerFreeSpace => GetFreeSpace();
         [JsonIgnore] public bool IsFull => CheckIfFull();
-        [JsonProperty] internal HashSet<ObjectData> Items
-        {
-            get => _items;
-            set
-            {
-                QuickLogger.Debug($"Server Value: {value.Count}"); 
-                _items = value;
-
-                UpdateServerData(GetPrefabIDString());
-            }
-        }
 
         [JsonIgnore] public TechType TechType => GetTechType();
         [JsonIgnore] internal bool IsMounted => _mono != null;
         [JsonIgnore] public DSSServerDisplay DisplayManager { get; private set; }
-        [JsonProperty] internal List<Filter> Filters
-        {
-            get => _filters ?? (_filters = _data?.ServerFilters);
-            set
-            {
-                QuickLogger.Debug($"Filter Value: {value.Count}");
 
-                _filters = value;
-
-                UpdateServerData(GetPrefabIDString());
-            }
-        }
         [JsonIgnore] Action<int, int> IFCSStorage.OnContainerUpdate { get; set; }
-        //private void OnEnable()
-        //{
-        //    if (_runStartUpOnEnable)
-        //    {
-        //        if (!IsInitialized)
-        //        {
-        //            Initialize();
-        //        }
-
-        //        if (_fromSave)
-        //        {
-        //            if (_savedData == null)
-        //            {
-        //                ReadySaveData();
-        //            }
-
-        //            if (_savedData != null)
-        //            {
-        //                Items = _savedData.ServerData.Items;
-        //            }
-        //        }
-        //        _runStartUpOnEnable = false;
-        //        IsInitialized = true;
-        //    }
-        //}
+        public FCSFilteredStorage FCSFilteredStorage { get; private set; }
 
         private void ReadySaveData()
         {
             QuickLogger.Debug("In OnProtoDeserialize");
             _savedData = Mod.GetSaveData(GetPrefabIDString());
+            LoadSaveData();
         }
          
         private void OnDestroy()
@@ -106,8 +58,6 @@ namespace DataStorageSolutions.Mono
             {
                 if (!IsInitialized)
                 {
-                    Initialize();
-
                     if (_fromSave)
                     {
                         if (_savedData == null)
@@ -115,10 +65,12 @@ namespace DataStorageSolutions.Mono
                             ReadySaveData();
                         }
                     }
+
+                    Initialize();
+
                     _runStartUpOnEnable = false;
 
                 }
-                IsInitialized = true;
             }
         }
 
@@ -129,7 +81,6 @@ namespace DataStorageSolutions.Mono
             if (Mod.Servers.ContainsKey(id))
             {
                 _data = Mod.Servers[id];
-                Items = _data.Server;
             }
         }
 
@@ -150,32 +101,12 @@ namespace DataStorageSolutions.Mono
 
         private int GetFreeSpace()
         {
-            return StorageLimit - Items.Count;
-        }
-
-        internal void DemoAddItem()
-        {
-            for (int i = 0; i < 5; i++)
-            {
-                AddItemToContainer(TechType.Glass.ToInventoryItem());
-            }
-        }
-
-        internal void ConnectToRack(DSSRackController mono, int slot)
-        {
-            _mono = mono;
-            _slot = slot;
-        }
-
-        internal void DisconnectFromRack()
-        {
-            _mono = null;
-            _slot = 0;
+            return StorageLimit - FCSFilteredStorage?.Items?.Count ?? 0;
         }
 
         internal int GetTotal()
         {
-            return Items.Count;
+            return FCSFilteredStorage?.Items?.Count ?? 0;
         }
 
         internal string GetPrefabIDString()
@@ -215,12 +146,12 @@ namespace DataStorageSolutions.Mono
 
             if (Mod.Servers.ContainsKey(id))
             {
-                Mod.Servers[id].Server = Items;
-                Mod.Servers[id].ServerFilters = Filters;
+                Mod.Servers[id].Server = FCSFilteredStorage.Items;
+                Mod.Servers[id].ServerFilters = FCSFilteredStorage.Filters;
             }
             else
             {
-                Mod.Servers.Add(id, new ServerData{ServerFilters = Filters, Server = Items});
+                Mod.Servers.Add(id, new ServerData{ServerFilters = FCSFilteredStorage.Filters, Server = FCSFilteredStorage.Items });
             }
         }
 
@@ -229,7 +160,7 @@ namespace DataStorageSolutions.Mono
             bool objectDataMatch = false;
             objectData = null;
             QuickLogger.Debug($"Trying to add item to container {item}", true);
-            foreach (ObjectData data in Items)
+            foreach (ObjectData data in FCSFilteredStorage.Items)
             {
                 if (data.TechType == item)
                 {
@@ -248,23 +179,12 @@ namespace DataStorageSolutions.Mono
 
             if (!IsFull)
             {
-                Items.Add(new ObjectData { TechType = item});
-                DisplayManager.UpdateDisplay();
+                FCSFilteredStorage.Items.Add(new ObjectData { TechType = item});
+                UpdateScreen();
                 Mod.OnContainerUpdate?.Invoke(_mono);
             }
         }
-
-
-        internal void DeleteItemFromContainer(TechType item)
-        {
-            var objectDataMatch = FindObjectDataMatch(item, out var objectData);
-            if (!objectDataMatch) return;
-            Items.Remove(objectData);
-            DisplayManager.UpdateDisplay();
-            UpdateServerData(GetPrefabIDString());
-            Mod.OnContainerUpdate?.Invoke(_mono);
-        }
-
+        
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
         {
             return true;
@@ -279,49 +199,42 @@ namespace DataStorageSolutions.Mono
         {
             throw new NotImplementedException();
         }
-
-        public Dictionary<TechType, int> GetInventoryItems()
-        {
-            throw new NotImplementedException();
-        }
-
-        internal void Load(Dictionary<TechType, int> savedDataContainer)
-        {
-            if (savedDataContainer == null) return;
-            foreach (KeyValuePair<TechType, int> pair in savedDataContainer)
-            {
-                if (pair.Value == 0)
-                {
-                    AddItemToContainer(pair.Key, true);
-                    continue;
-                }
-
-                for (int i = 0; i < pair.Value; i++)
-                {
-                    AddItemToContainer(pair.Key);
-                }
-            }
-        }
-
-        public bool HasItems()
-        {
-            return Items.Count > 0;
-        }
-
-        internal int GetSlot()
-        {
-            return _slot;
-        }
-
+        
         public override void Initialize()
         {
-            if(DisplayManager == null)
+            if (FCSFilteredStorage == null)
+            {
+                FCSFilteredStorage = gameObject.GetComponent<FCSFilteredStorage>();
+                FCSFilteredStorage.Initialize(_data?.ServerFilters,UpdateScreen);
+                FCSFilteredStorage.Items = _data?.Server;
+                FCSFilteredStorage.OnFiltersUpdate += OnFiltersUpdate;
+                FCSFilteredStorage.OnItemsUpdate += OnItemsUpdate;
+            }
+
+            if (DisplayManager == null)
             {
                 DisplayManager = gameObject.AddComponent<DSSServerDisplay>();
                 DisplayManager.Setup(this);
             }
+
+            IsInitialized = true;
         }
-        
+
+        public override void UpdateScreen()
+        {
+            DisplayManager.UpdateDisplay();
+        }
+
+        private void OnItemsUpdate(HashSet<ObjectData> obj)
+        {
+            UpdateServerData(GetPrefabIDString());
+        }
+
+        private void OnFiltersUpdate(List<Filter> obj)
+        {
+            UpdateServerData(GetPrefabIDString());
+        }
+
         public override void Save(SaveData newSaveData)
         {
             if (!IsInitialized) return;
@@ -334,15 +247,11 @@ namespace DataStorageSolutions.Mono
             }
 
             _savedData.ID = id;
-            _savedData.ServerData = Items;
-            _savedData.Filters = Filters;
+            _savedData.ServerData = FCSFilteredStorage.Items;
+            _savedData.Filters = FCSFilteredStorage.Filters;
             newSaveData.Entries.Add(_savedData);
         }
-        internal int GetSeverCount()
-        {
-            return Mod.Servers?.Count() ?? 0;
-        }
-
+     
         public override void OnProtoSerialize(ProtobufSerializer serializer)
         {
             var id = GetPrefabIDString();
@@ -365,8 +274,6 @@ namespace DataStorageSolutions.Mono
             {
                 ReadySaveData();
             }
-
-            LoadSaveData();
 
             var id = GetPrefabIDString();
             QuickLogger.Info($"Loading Server {id}");

@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using DataStorageSolutions.Configuration;
+using FCSTechFabricator.Objects;
 
 namespace DataStorageSolutions.Model
 {

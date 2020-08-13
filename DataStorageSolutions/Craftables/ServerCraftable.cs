@@ -9,6 +9,7 @@ using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using FCSTechFabricator;
 using FCSTechFabricator.Components;
+using FCSTechFabricator.Objects;
 using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
@@ -108,6 +109,7 @@ namespace DataStorageSolutions.Craftables
                     placeTool.drawTime = 0.5f;
                     placeTool.dropTime = 1;
                     placeTool.holsterTime = 0.35f;
+                    prefab.AddComponent<FCSFilteredStorage>();
                     prefab.AddComponent<DSSServerController>();
                     
                     //Add the FCSTechFabricatorTag component

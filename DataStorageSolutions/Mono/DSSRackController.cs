@@ -71,7 +71,7 @@ namespace DataStorageSolutions.Mono
         public TechType TechType => GetTechType();
         internal AnimationManager AnimationManager { get; private set; }
         internal DSSRackDisplayController DisplayManager { get; private set; }
-        internal DumpContainer DumpContainer { get; private set; }
+        public override DumpContainer DumpContainer { get; set; }
         internal ColorManager ColorManager { get; private set; }
         public PowerManager PowerManager { get; private set; }
 
@@ -616,7 +616,7 @@ namespace DataStorageSolutions.Mono
         public bool AddItemToContainer(InventoryItem item)
         {
             var originalController = item.item.GetComponent<DSSServerController>();
-            var server = AddServer(originalController.Items,originalController.Filters);
+            var server = AddServer(originalController.FCSFilteredStorage.Items,originalController.FCSFilteredStorage.Filters);
             Destroy(item.item.gameObject);
             return server;
         }

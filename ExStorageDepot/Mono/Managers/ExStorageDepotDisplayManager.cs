@@ -1,28 +1,29 @@
 ﻿using ExStorageDepot.Buildable;
-using ExStorageDepot.Display;
 using ExStorageDepot.Enumerators;
 using FCSCommon.Enums;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using FCSCommon.Abstract;
 using UnityEngine;
 using UnityEngine.UI;
+using InterfaceButton = FCSCommon.Components.InterfaceButton;
 
 namespace ExStorageDepot.Mono.Managers
 {
     internal class ExStorageDepotDisplayManager : AIDisplay
     {
+        private readonly Color _startColor = Color.grey;
+        private readonly Color _hoverColor = Color.white;
         private ExStorageDepotController _mono;
         private GameObject _storageLabels;
-        private GameObject _grid;
-        private Text _pageCounter;
+        private GridHelper _grid;
         private Text _plier;
         private Text _itemCount;
-        private readonly Dictionary<TechType, GameObject> _trackedResourcesDisplayElements = new Dictionary<TechType, GameObject>();
+        private bool _isBeingDestroyed;
+
         internal void Initialize(ExStorageDepotController mono)
         {
             _mono = mono;
@@ -33,6 +34,8 @@ namespace ExStorageDepot.Mono.Managers
             {
                 PowerOnDisplay();
                 DrawPage(1);
+                SetItemCount(_mono.Storage.GetTotalCount());
+                _mono.Storage.OnContainerUpdate += OnContainerUpdate;
             }
             else
             {
@@ -48,6 +51,13 @@ namespace ExStorageDepot.Mono.Managers
             mono.NameController.OnLabelChanged += OnLabelChanged;
 
             UpdateLabels();
+        }
+
+        private void OnContainerUpdate(int arg1, int arg2)
+        {
+            QuickLogger.Debug($"Updating Container.",true);
+           _grid.DrawPage();
+            SetItemCount(arg1);
         }
 
         private void OnLabelChanged(string obj)
@@ -68,23 +78,17 @@ namespace ExStorageDepot.Mono.Managers
             }
         }
 
-        public override void ClearPage()
-        {
-            for (int i = 0; i < _grid.transform.childCount; i++)
-            {
-                Destroy(_grid.transform.GetChild(i).gameObject);
-            }
-
-            _trackedResourcesDisplayElements?.Clear();
-        }
-
         public override void OnButtonClick(string btnName, object tag)
         {
             switch (btnName)
             {
+                case "ItemBTN":
+                    _mono.Storage.AttemptToTakeItem((TechType)tag);
+                    break;
                 case "DumpBTN":
                     QuickLogger.Debug($"In {btnName} switch", true);
-                    _mono.Storage.OpenStorage();
+                    _mono.AnimationManager.ToggleDriveState();
+                    _mono.DumpContainer.OpenStorage();
                     break;
 
                 case "RenameBTN":
@@ -172,307 +176,168 @@ namespace ExStorageDepot.Mono.Managers
                     break;
             }
         }
-
-        public override void ItemModified(TechType type, int newAmount = 0)
-        {
-            QuickLogger.Debug($"New Amount = {newAmount}");
-
-            if (_trackedResourcesDisplayElements.ContainsKey(type))
-            {
-                if (newAmount > 0)
-                {
-                    _trackedResourcesDisplayElements[type].GetComponentInChildren<Text>().text = newAmount.ToString();
-                    return;
-                }
-            }
-
-            DrawPage(CurrentPage);
-        }
-
+        
         public override bool FindAllComponents()
         {
-            var canvas = gameObject.GetComponentInChildren<Canvas>()?.gameObject;
-
-            if (canvas == null)
+            try
             {
-                QuickLogger.Error("Canvas could not be found!");
+                #region Canvas
+
+                var canvas = gameObject.GetComponentInChildren<Canvas>()?.gameObject;
+
+                if (canvas == null)
+                {
+                    QuickLogger.Error("Canvas could not be found!");
+                    return false;
+                }
+
+                #endregion
+
+                #region Home Screen
+
+                var home = InterfaceHelpers.FindGameObject(canvas, "Home");
+
+                #endregion
+
+                #region Multiplier
+
+                var multiplier = InterfaceHelpers.FindGameObject(home, "Multiplier");
+
+                #endregion
+
+                #region Item Count
+
+                _itemCount = InterfaceHelpers.FindGameObject(home, "StorageAmount")?.GetComponent<Text>();
+
+                #endregion
+
+                #region Plier
+
+                _plier = InterfaceHelpers.FindGameObject(multiplier, "plier")?.GetComponent<Text>();
+
+                #endregion
+
+                #region Storage Labels
+
+                _storageLabels = InterfaceHelpers.FindGameObject(home, "Storage_Labels");
+
+                #endregion
+
+                #region Grid
+
+                var grid = InterfaceHelpers.FindGameObject(home, "Grid");
+                _grid = _mono.gameObject.AddComponent<GridHelper>();
+                _grid.OnLoadDisplay += OnLoadDisplay;
+                _grid.Setup(16, ExStorageDepotBuildable.ItemPrefab, home, _startColor, _hoverColor, OnButtonClick);
+
+                #endregion
+
+                #region Dump Button
+
+                var dumpBTN = InterfaceHelpers.FindGameObject(home, "Dump_Button");
+                InterfaceHelpers.CreateButton(dumpBTN, "DumpBTN", InterfaceButtonMode.Background,
+                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, ExStorageDepotBuildable.AddToExStorage());
+
+                #endregion
+
+                #region Rename Button
+
+                var renameBTN = InterfaceHelpers.FindGameObject(home, "Rename_Button");
+                InterfaceHelpers.CreateButton(renameBTN, "RenameBTN", InterfaceButtonMode.Background,
+                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, ExStorageDepotBuildable.RenameStorage());
+
+                #endregion
+                
+                #region Multiplier Previous Button
+
+                var multiplierPrevBtn = InterfaceHelpers.FindGameObject(multiplier, "Prev_BTN");
+                InterfaceHelpers.CreateButton(multiplierPrevBtn, "LButton", InterfaceButtonMode.Background,
+                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, "");
+
+                #endregion
+
+                #region Multiplier Next Button
+
+                var multiplierNextBtn = InterfaceHelpers.FindGameObject(multiplier, "Next_BTN");
+                InterfaceHelpers.CreateButton(multiplierNextBtn, "RButton", InterfaceButtonMode.Background,
+                    OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, "");
+
+                #endregion
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error($"{e.Message}:\n{e.StackTrace}");
                 return false;
             }
-
-            var home = canvas.FindChild("Home")?.gameObject;
-
-            if (home == null)
-            {
-                QuickLogger.Error("Couldn't find the gameobject Home");
-                return false;
-            }
-
-            _storageLabels = home.FindChild("Storage_Labels")?.gameObject;
-
-            if (_storageLabels == null)
-            {
-                QuickLogger.Error("Couldn't find the gameobject Storage_Labels");
-                return false;
-            }
-
-            _grid = home.FindChild("Grid")?.gameObject;
-
-            if (_grid == null)
-            {
-                QuickLogger.Error("Couldn't find the gameobject Grid");
-                return false;
-            }
-
-            var dumpBTN = home.FindChild("Dump_Button")?.gameObject;
-
-            if (dumpBTN == null)
-            {
-                QuickLogger.Error("Couldn't find the gameobject Dump_Button");
-                return false;
-            }
-
-            var dumpBtn = dumpBTN.AddComponent<InterfaceButton>();
-            dumpBtn.BtnName = "DumpBTN";
-            dumpBtn.OnButtonClick = OnButtonClick;
-            dumpBtn.ButtonMode = InterfaceButtonMode.Background;
-            dumpBtn.HOVER_COLOR = Color.gray;
-
-
-            var renameBTN = home.FindChild("Rename_Button")?.gameObject;
-
-            if (renameBTN == null)
-            {
-                QuickLogger.Error("Couldn't find the gameobject Rename_Button");
-                return false;
-            }
-
-            var renameBtn = renameBTN.AddComponent<InterfaceButton>();
-            renameBtn.BtnName = "RenameBTN";
-            renameBtn.OnButtonClick = OnButtonClick;
-            renameBtn.ButtonMode = InterfaceButtonMode.Background;
-            renameBtn.HOVER_COLOR = Color.gray;
-
-
-            var paginator = home.FindChild("Paginator")?.gameObject;
-
-            if (paginator == null)
-            {
-                QuickLogger.Error("Couldn't find the gameobject Paginator");
-                return false;
-            }
-
-            var pprevBTN = paginator.FindChild("Prev_BTN")?.gameObject;
-
-            if (pprevBTN == null)
-            {
-                QuickLogger.Error("Couldn't find the gameobject Prev_BTN");
-                return false;
-            }
-
-            var ppBtn = pprevBTN.AddComponent<PaginatorButton>();
-            ppBtn.AmountToChangePageBy = -1;
-            ppBtn.HoverTextLineTwo = ExStorageDepotBuildable.PrevPage();
-            ppBtn.OnChangePageBy = ChangePageBy;
-
-            var pnextBTN = paginator.FindChild("Next_BTN")?.gameObject;
-
-            if (pnextBTN == null)
-            {
-                QuickLogger.Error("Couldn't find the gameobject Next_BTN");
-                return false;
-            }
-
-            var pnBtn = pnextBTN.AddComponent<PaginatorButton>();
-            pnBtn.AmountToChangePageBy = 1;
-            pnBtn.HoverTextLineTwo = ExStorageDepotBuildable.NextPage();
-            pnBtn.OnChangePageBy = ChangePageBy;
-
-
-            _pageCounter = paginator.FindChild("PageCounter").GetComponent<Text>();
-
-            if (_pageCounter == null)
-            {
-                QuickLogger.Error("Couldn't find Text in the PageCounter");
-                return false;
-            }
-
-
-            var multiplier = home.FindChild("Multiplier")?.gameObject;
-
-            if (multiplier == null)
-            {
-                QuickLogger.Error("Couldn't find the gameobject Multiplier");
-                return false;
-            }
-
-            var mprevBTN = multiplier.FindChild("Prev_BTN")?.gameObject;
-
-            if (mprevBTN == null)
-            {
-                QuickLogger.Error("Couldn't find the gameobject Prev_BTN in Multiplier");
-                return false;
-            }
-
-            var mpBtn = mprevBTN.AddComponent<InterfaceButton>();
-            mpBtn.BtnName = "LButton";
-            mpBtn.OnButtonClick = OnButtonClick;
-            mpBtn.ButtonMode = InterfaceButtonMode.Background;
-
-            var mnextBTN = multiplier.FindChild("Next_BTN")?.gameObject;
-
-            if (mnextBTN == null)
-            {
-                QuickLogger.Error("Couldn't find the gameobject Next_BTN in Multiplier");
-                return false;
-            }
-
-            var mnBtn = mnextBTN.AddComponent<InterfaceButton>();
-            mnBtn.BtnName = "RButton";
-            mnBtn.OnButtonClick = OnButtonClick;
-            mnBtn.ButtonMode = InterfaceButtonMode.Background;
-
-
-            _plier = multiplier.FindChild("plier").GetComponent<Text>();
-
-            if (_pageCounter == null)
-            {
-                QuickLogger.Error("Couldn't find the Text on PageCounter in Multiplier");
-                return false;
-            }
-
-
-            _itemCount = home.FindChild("StorageAmount").GetComponent<Text>();
-
-            if (_pageCounter == null)
-            {
-                QuickLogger.Error("Couldn't find the Text on StorageAmount in Home");
-                return false;
-            }
-
             return true;
         }
 
-        public override IEnumerator PowerOff()
+        private void OnLoadDisplay(DisplayData data)
         {
-            throw new NotImplementedException();
-        }
+            if (_isBeingDestroyed) return;
 
+            _grid.ClearPage();
+
+            var grouped = _mono.Storage.GetItemsWithin();
+            
+            if (data.EndPosition > grouped.Count)
+            {
+                data.EndPosition = grouped.Count;
+            }
+
+            for (int i = data.StartPosition; i < data.EndPosition; i++)
+            {
+                GameObject buttonPrefab = Instantiate(data.ItemsPrefab);
+
+                if (buttonPrefab == null || data.ItemsGrid == null)
+                {
+                    if (buttonPrefab != null)
+                    {
+                        QuickLogger.Debug("Destroying Tab", true);
+                        Destroy(buttonPrefab);
+                    }
+                    return;
+                }
+
+                var item = grouped.ElementAt(i);
+                LoadDisplay(data,item.Key, item.Value);
+            }
+            _grid.UpdaterPaginator(grouped.Count);
+        }
+        
         public override IEnumerator PowerOn()
         {
             yield return new WaitForEndOfFrame();
             _mono.AnimationManager.ToggleScreenState();
 
         }
-
-        public override IEnumerator ShutDown()
+        
+        private void LoadDisplay(DisplayData data, TechType elementTechType, int techTypeCount)
         {
-            throw new NotImplementedException();
-        }
-
-        public override IEnumerator CompleteSetup()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void DrawPage(int page)
-        {
-            QuickLogger.Debug($"Drawing Current Page = {page}", true);
-
-            CurrentPage = page;
-
-            //if (_trackedResourcesDisplayElements.Count <= 0)
-            //{
-            //    CurrentPage -= 1;
-            //}
-
-            if (CurrentPage <= 0)
-            {
-                CurrentPage = 1;
-            }
-            else if (CurrentPage > MaxPage)
-            {
-                CurrentPage = MaxPage;
-            }
-
-            UpdatePaginator();
-
-            int startingPosition = (CurrentPage - 1) * ITEMS_PER_PAGE;
-            int endingPosition = startingPosition + ITEMS_PER_PAGE;
-
-            //QuickLogger.Debug($"startingPosition: {startingPosition} || endingPosition : {endingPosition}", true);
-            //QuickLogger.Debug($"Number Of Items: {_mono.Storage.GetItemsCount()}");
-
-            var container = _mono.Storage.ItemsDictionary;
-
-            if (endingPosition > container.Count)
-            {
-                endingPosition = container.Count;
-            }
-
-            //QuickLogger.Debug($"startingPosition: {startingPosition} || endingPosition : {endingPosition}", true);
-
-            ClearPage();
-
-            //QuickLogger.Debug($"startingPosition: {startingPosition} || endingPosition : {endingPosition}", true);
-
-            for (int i = startingPosition; i < endingPosition; i++)
-            {
-                var element = container.ElementAt(i);
-                var techType = element;
-
-                QuickLogger.Debug($"Element: {element} || TechType : {techType} || SPosition {startingPosition} || EPosition {endingPosition} || CPosition {i} || Container_Count {container.Count}");
-                //if (_trackedResourcesDisplayElements.ContainsKey(techType)) continue;
-                LoadDisplay(element.Key, element.Value);
-                //Tracked items was here
-            }
-        }
-
-        private void LoadDisplay(TechType elementTechType, int techTypeCount)
-        {
-            QuickLogger.Debug("Load Fridge Display");
-
-            GameObject itemDisplay = Instantiate(ExStorageDepotBuildable.ItemPrefab);
-
-            itemDisplay.transform.SetParent(_grid.transform, false);
-            itemDisplay.GetComponentInChildren<Text>().text = techTypeCount.ToString();
-
-            ItemButton itemButton = itemDisplay.AddComponent<ItemButton>();
-            itemButton.Type = elementTechType;
-            itemButton.Amount = techTypeCount;
-            itemButton.OnButtonClick = _mono.Storage.AttemptToTakeItem;
-
-            uGUI_Icon icon = itemDisplay.transform.Find("Image").gameObject.AddComponent<uGUI_Icon>();
+            GameObject buttonPrefab = Instantiate(ExStorageDepotBuildable.ItemPrefab);
+            buttonPrefab.transform.SetParent(data.ItemsGrid.transform, false);
+            var mainBtn = buttonPrefab.AddComponent<InterfaceButton>();
+            var text = buttonPrefab.GetComponentInChildren<Text>();
+            text.text = techTypeCount.ToString();
+            mainBtn.ButtonMode = InterfaceButtonMode.Background;
+            mainBtn.STARTING_COLOR = _startColor;
+            mainBtn.HOVER_COLOR = _hoverColor;
+            mainBtn.TextLineOne = string.Format(ExStorageDepotBuildable.TakeItemFormat(), Language.main.Get(elementTechType));
+            mainBtn.OnButtonClick = OnButtonClick;
+            mainBtn.BtnName = "ItemBTN";
+            mainBtn.Tag = elementTechType;
+            uGUI_Icon icon = buttonPrefab.transform.Find("Image").gameObject.AddComponent<uGUI_Icon>();
             icon.sprite = SpriteManager.Get(elementTechType);
-
-            _trackedResourcesDisplayElements.Add(elementTechType, itemDisplay);
         }
 
-        public override void UpdatePaginator()
+        internal void SetItemCount(int count)
         {
-            base.UpdatePaginator();
-
-            CalculateNewMaxPages();
-            //_pageCounter.SetActive(_mono.NumberOfItems != 0);
-            _pageCounter.text = $"{CurrentPage} / {MaxPage}";
-            //_previousPageGameObject.SetActive(true); //CurrentPage != 1
-            //_nextPageGameObject.SetActive(true); //CurrentPage != MaxPage
+            _itemCount.text = $"Item Count: {count}/{QPatch.Config.MaxStorage}";
         }
 
-        private void CalculateNewMaxPages()
+        private void OnDestroy()
         {
-            QuickLogger.Debug($"Ex-Storage TrackedItems {_mono.Storage.ItemsDictionary.Count}, Items Per Page {ITEMS_PER_PAGE}, Max Page {MaxPage}", true);
-
-            MaxPage = Mathf.CeilToInt((_mono.Storage.ItemsDictionary.Count - 1) / ITEMS_PER_PAGE) + 1;
-
-            if (CurrentPage > MaxPage)
-            {
-                CurrentPage = MaxPage;
-            }
-        }
-
-        internal void SetItemCount(int count, int maxCount)
-        {
-            _itemCount.text = $"Item Count: {count}/{maxCount}";
+            _isBeingDestroyed = true;
         }
     }
 }

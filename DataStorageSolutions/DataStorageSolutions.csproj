@@ -134,7 +134,6 @@
     <Compile Include="Model\AudioHandler.cs" />
     <Compile Include="Model\BaseManager.cs" />
     <Compile Include="Model\Catergories.cs" />
-    <Compile Include="Model\EggHandler.cs" />
     <Compile Include="Model\RackSlot.cs" />
     <Compile Include="Model\ObjectDataTransferData.cs" />
     <Compile Include="Model\ServerData.cs" />

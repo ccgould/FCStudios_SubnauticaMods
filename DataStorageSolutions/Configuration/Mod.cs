@@ -1,25 +1,20 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using DataStorageSolutions.Abstract;
-using DataStorageSolutions.Interfaces;
 using DataStorageSolutions.Model;
 using DataStorageSolutions.Mono;
-using DataStorageSolutions.Structs;
 using FCSCommon.Extensions;
-using FCSCommon.Interfaces;
+using FCSCommon.Objects;
 using FCSCommon.Utilities;
-using FCSTechFabricator.Enums;
 using FCSTechFabricator.Objects;
 using Oculus.Newtonsoft.Json;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Options;
 using SMLHelper.V2.Utility;
 using UnityEngine;
-using Object = System.Object;
 
 namespace DataStorageSolutions.Configuration
 {

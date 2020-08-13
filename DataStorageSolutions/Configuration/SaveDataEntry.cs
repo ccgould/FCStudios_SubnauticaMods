@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using DataStorageSolutions.Model;
-using DataStorageSolutions.Mono;
-using DataStorageSolutions.Structs;
-using FCSCommon.Enums;
 using FCSCommon.Objects;
 using FCSTechFabricator.Objects;
 using Oculus.Newtonsoft.Json;
@@ -31,24 +28,5 @@ namespace DataStorageSolutions.Configuration
         [JsonProperty] internal Dictionary<string, ServerData> Servers { get; set; }
         [JsonProperty] internal List<BaseSaveData> Bases { get; set; }
         [JsonProperty] internal List<SaveDataEntry> Entries = new List<SaveDataEntry>();
-    }
-
-    [Serializable]
-    internal class ObjectData
-    {
-        [JsonProperty] internal SaveDataObjectType DataObjectType { get; set; }
-        [JsonProperty] internal TechType TechType { get; set; }
-        [JsonProperty] internal int Slot { get; set; }
-        [JsonProperty] internal EatableEntities EatableEntity { get; set; }
-        [JsonProperty] internal PlayerToolData PlayToolData { get; set; }
-        [JsonProperty] internal HashSet<ObjectData> ServerData { get; set; }
-        [JsonProperty] internal List<Filter> Filters { get; set; }
-    }
-
-    internal class PlayerToolData
-    {
-        [JsonProperty] internal TechType TechType { get; set; }
-        [JsonProperty] internal BatteryInfo BatteryInfo { get; set; }
-        [JsonProperty] internal bool HasBattery => BatteryInfo != null;
     }
 }

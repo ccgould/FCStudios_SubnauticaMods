@@ -46,12 +46,10 @@ namespace FCSCommon.Helpers
         {
             try
             {
-                QuickLogger.Debug($"Trying to Find Gameobject {name} with searchOption:{searchOption} in {go?.name}");
                 var renders = FindGameObject(go?.transform);
                 
                 foreach (GameObject mesh in renders)
                 {
-                    QuickLogger.Debug($"Current Mesh Name: {mesh.name}");
 
                     switch (searchOption)
                     {
@@ -100,13 +98,10 @@ namespace FCSCommon.Helpers
         internal static IEnumerable<GameObject> FindGameObjects(GameObject go, string name,
     SearchOption searchOption = SearchOption.Full)
         {
-                QuickLogger.Debug($"Trying to Find Gameobject {name} with searchOption:{searchOption} in {go?.name}");
-                var renders = FindGameObject(go?.transform);
+            var renders = FindGameObject(go?.transform);
 
                 foreach (GameObject mesh in renders)
                 {
-                    QuickLogger.Debug($"Current Mesh Name: {mesh.name}");
-
                     switch (searchOption)
                     {
                         case SearchOption.Full:

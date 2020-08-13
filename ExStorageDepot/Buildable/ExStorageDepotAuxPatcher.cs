@@ -1,4 +1,5 @@
 ﻿using SMLHelper.V2.Handlers;
+using UnityEngine;
 
 namespace ExStorageDepot.Buildable
 {
@@ -14,7 +15,9 @@ namespace ExStorageDepot.Buildable
         private const string NoMoreSpaceKey = "Ex_NoMoreSpace";
         private const string NoPlayerToolsMessageKey = "Ex_NoPlayerToolsMessage";
         private const string NoUndiscorveredEggsMessageKey = "Ex_NoUndiscorveredEggsMessage";
-        private const string NoDegradableFoodMessageMessageKey = "Ex_NoDegradableFoodMessage";
+        private const string NoDegradableFoodMessageKey = "Ex_NoDegradableFoodMessage";
+        private const string AddToExStorageKey = "Ex_AddToExStorage";
+        private const string TakeItemFormatKey = "Ex_TakeItemFormat";
 
         internal static string BuildableName { get; private set; }
         internal static TechType TechTypeID { get; private set; }
@@ -34,7 +37,9 @@ namespace ExStorageDepot.Buildable
             LanguageHandler.SetLanguageLine(NoMoreSpaceKey, "Ex-Storage wont be able to hold any more items");
             LanguageHandler.SetLanguageLine(NoPlayerToolsMessageKey, "Ex-Storage cannot store PlayerTools at this time.");
             LanguageHandler.SetLanguageLine(NoUndiscorveredEggsMessageKey, "Ex-Storage cannot store undiscovered eggs at this time.");
-            LanguageHandler.SetLanguageLine(NoDegradableFoodMessageMessageKey, "Ex-Storage cannot store degradable food.");
+            LanguageHandler.SetLanguageLine(NoDegradableFoodMessageKey, "Ex-Storage cannot store degradable food.");
+            LanguageHandler.SetLanguageLine(AddToExStorageKey, "Add items to Ex-Storage.");
+            LanguageHandler.SetLanguageLine(TakeItemFormatKey, "Take {0}.");
         }
 
         internal static string ContainerFullMessage()
@@ -92,7 +97,17 @@ namespace ExStorageDepot.Buildable
 
         public static string FoodNotAllowed()
         {
-            return Language.main.Get(NoDegradableFoodMessageMessageKey);
+            return Language.main.Get(NoDegradableFoodMessageKey);
+        }
+
+        public static string AddToExStorage()
+        {
+            return Language.main.Get(AddToExStorageKey);
+        }
+
+        public static string TakeItemFormat()
+        {
+            return Language.main.Get(TakeItemFormatKey);
         }
     }
 }

@@ -65,7 +65,7 @@ namespace ExStorageDepot.Buildable
                 constructable.allowedOnWall = false;
                 constructable.allowedOnGround = true;
                 constructable.allowedInSub = false;
-                constructable.allowedInBase = false;
+                constructable.allowedInBase = QPatch.Config.AllowInBase;
                 constructable.allowedOnCeiling = false;
                 constructable.allowedOutside = true;
                 constructable.model = prefab.FindChild("model");
@@ -77,16 +77,14 @@ namespace ExStorageDepot.Buildable
                 var lwe = prefab.AddComponent<LargeWorldEntity>();
                 lwe.cellLevel = LargeWorldEntity.CellLevel.Global;
 
-                //var beacon = prefab.AddComponent<Beacon>();
-
-                //beacon.label = "DeepDriller";
-
                 var center = new Vector3(0f, 1.579518f,0f);
                 var size = new Vector3(2.669801f, 2.776958f, 2.464836f);
 
-                GameObjectHelpers.AddConstructableBounds(prefab, size,center);
+                if (!QPatch.Config.AllowInBase) //Adjust to fit inside
+                {
+                    GameObjectHelpers.AddConstructableBounds(prefab, size, center);
+                }
 
-                //prefab.AddComponent<MonoClassTest>();
                 prefab.AddComponent<PrefabIdentifier>().ClassId = this.ClassID;
                 prefab.AddComponent<FMOD_CustomLoopingEmitter>();
                 prefab.AddComponent<ExStorageDepotController>();

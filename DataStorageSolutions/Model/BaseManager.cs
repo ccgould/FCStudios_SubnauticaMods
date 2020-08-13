@@ -500,8 +500,9 @@ namespace DataStorageSolutions.Model
 
             if (newSeaBase != null && fcsConnectableBase.Habitat == Habitat)
             {
-                QuickLogger.Debug("Adding FCSConnectable");
+                QuickLogger.Debug("Subscribing to OnContainerUpdate");
                 obj.GetStorage().OnContainerUpdate += OnFCSConnectableContainerUpdate;
+                QuickLogger.Debug("Adding FCSConnectable");
                 FCSConnectables.Add(obj.GetPrefabIDString(), obj);
                 QuickLogger.Debug("Added FCSConnectable");
             }

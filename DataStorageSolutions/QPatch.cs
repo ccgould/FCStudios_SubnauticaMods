@@ -57,6 +57,7 @@ namespace DataStorageSolutions
         }
 
         internal static ServerCraftable Server { get; set; }
+        
         [QModPatch]
         public static void Patch()
         {

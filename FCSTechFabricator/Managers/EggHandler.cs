@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
 
-
-namespace DataStorageSolutions.Model
+namespace FCSTechFabricator.Managers
 {
-    internal static class EggHandler
+    public static class EggHandler
     {
-        private static Dictionary<TechType, TechType> _eggTypes { get; } = new Dictionary<TechType, TechType>
+        private static Dictionary<TechType, TechType> EggTypes { get; } = new Dictionary<TechType, TechType>
         {
             {
                 TechType.ShockerEggUndiscovered,
@@ -65,9 +64,9 @@ namespace DataStorageSolutions.Model
             }
         };
 
-        internal static bool GetDiscoveredEgg(TechType unDiscovered, out TechType value)
+        public static bool GetDiscoveredEgg(TechType unDiscovered, out TechType value)
         {
-            foreach (KeyValuePair<TechType, TechType> eggType in _eggTypes)
+            foreach (KeyValuePair<TechType, TechType> eggType in EggTypes)
             {
                 if (eggType.Key != unDiscovered) continue;
                 value = eggType.Value;

@@ -15,6 +15,8 @@ namespace FCSTechFabricator.Components
         private string _storageIsFullMessage;
         private IFCSStorage _storage;
 
+        public Action OnDumpContainerClosed { get; set; }
+
         public void Initialize(Transform trans,string label, string itemNotAllowedMessage,string storageIsFullMessage, IFCSStorage storage, int width = 6, int height = 8, string name="StorageRoot")
         {
             _itemNotAllowedMessage = itemNotAllowedMessage;
@@ -88,7 +90,7 @@ namespace FCSTechFabricator.Components
         internal virtual void OnDumpClose(PDA pda)
         {
             QuickLogger.Debug($"Store Items Dump Count: {_dumpContainer.count}");
-
+            OnDumpContainerClosed?.Invoke();
             var amount = _dumpContainer.count;
 
             for (int i = amount - 1; i > -1; i--)
@@ -98,6 +100,7 @@ namespace FCSTechFabricator.Components
                 _dumpContainer.RemoveItem(item.item, true);
                 _storage.AddItemToContainer(item);
             }
+            
         }
     }
 }

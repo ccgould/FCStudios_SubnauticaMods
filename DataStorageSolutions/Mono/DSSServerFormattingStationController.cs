@@ -1,19 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using DataStorageSolutions.Abstract;
 using DataStorageSolutions.Buildables;
 using DataStorageSolutions.Configuration;
 using DataStorageSolutions.Enumerators;
 using DataStorageSolutions.Helpers;
-using DataStorageSolutions.Interfaces;
 using DataStorageSolutions.Model;
 using FCSCommon.Controllers;
 using FCSCommon.Utilities;
 using FCSTechFabricator.Components;
 using FCSTechFabricator.Interfaces;
 using FCSTechFabricator.Managers;
+using FCSTechFabricator.Objects;
 using UnityEngine;
 
 namespace DataStorageSolutions.Mono
@@ -195,10 +193,10 @@ namespace DataStorageSolutions.Mono
 
             if (_controller != null)
             {
-                if(_controller.Items != null)
-                    _items = new HashSet<ObjectData>(_controller.Items);
-                if (_controller.Filters != null)
-                    _filters = new List<Filter>(_controller.Filters);
+                if(_controller.FCSFilteredStorage.Items != null)
+                    _items = new HashSet<ObjectData>(_controller.FCSFilteredStorage.Items);
+                if (_controller.FCSFilteredStorage.Filters != null)
+                    _filters = new List<Filter>(_controller.FCSFilteredStorage.Filters);
             }
 
             DisplayManager.GoToPage(FilterPages.FilterPage);

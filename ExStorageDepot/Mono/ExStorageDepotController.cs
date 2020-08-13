@@ -4,11 +4,12 @@ using ExStorageDepot.Enumerators;
 using ExStorageDepot.Mono.Managers;
 using FCSCommon.Utilities;
 using System;
-using UnityEngine;
+using FCSTechFabricator.Abstract;
+using FCSTechFabricator.Components;
 
 namespace ExStorageDepot.Mono
 {
-    public class ExStorageDepotController : MonoBehaviour, IProtoEventListener, IConstructable
+    public class ExStorageDepotController : FCSController
     {
         internal ExStorageDepotDisplayManager Display { get; private set; }
         private ExStorageDepotSaveDataEntry _saveData;
@@ -19,6 +20,7 @@ namespace ExStorageDepot.Mono
         internal ExStorageDepotAnimationManager AnimationManager { get; private set; }
         internal ExStorageDepotStorageManager Storage { get; private set; }
         internal BulkMultipliers BulkMultiplier { get; set; }
+        public FCSConnectableDevice FCSConnectableDevice { get; private set; }
 
         private void OnEnable()
         {
@@ -36,7 +38,6 @@ namespace ExStorageDepot.Mono
                 var id = prefabIdentifier?.Id ?? string.Empty;
                 var data = Mod.GetExStorageDepotSaveData(id);
                 NameController.SetCurrentName(data.UnitName);
-                Storage.UpdateInventory();
                 
                 if (data.StorageItems != null)
                 {
@@ -50,7 +51,7 @@ namespace ExStorageDepot.Mono
             _runStartUpOnEnable = false;
         }
 
-        public void OnProtoSerialize(ProtobufSerializer serializer)
+        public override void OnProtoSerialize(ProtobufSerializer serializer)
         {
             if (!_initialized) return;
 
@@ -61,47 +62,21 @@ namespace ExStorageDepot.Mono
             }
         }
 
-        public void OnProtoDeserialize(ProtobufSerializer serializer)
+        public override void OnProtoDeserialize(ProtobufSerializer serializer)
         {
             _fromSave = true;
         }
 
-        public bool CanDeconstruct(out string reason)
+        public override bool CanDeconstruct(out string reason)
         {
             reason = string.Empty;
 
-            if (Storage == null || Storage.IsEmpty) return true;
+            if (Storage == null || !Storage.IsFull) return true;
             reason = "Please empty the Ex-Storage";
             return false;
         }
 
-        public bool AddToStorage(InventoryItem item, out string reason)
-        {
-            if (Storage.CanHoldItem(1))
-            {
-                reason = String.Empty;
-                Storage.ForceAddItem(item);
-                return true;
-            }
-
-            reason = ExStorageDepotBuildable.ContainerFullMessage();
-            return false;
-        }
-
-        public InventoryItem GetInventoryItem(TechType item)
-        {
-            if (Storage != null)
-            {
-                if (Storage.DoesItemExist(item))
-                {
-                    return Storage.ForceRemoveItem(item);
-                }
-            }
-
-            return null;
-        }
-
-        public void OnConstructedChanged(bool constructed)
+        public override void OnConstructedChanged(bool constructed)
         {
             if (constructed)
             {
@@ -119,23 +94,45 @@ namespace ExStorageDepot.Mono
             }
         }
 
-        private void Initialize()
+        public override void Initialize()
         {
+            
             if (NameController == null)
             {
                 NameController = new ExStorageDepotNameManager();
                 NameController.Initialize(this);
             }
+            
+            if (AnimationManager == null)
+            {
+                AnimationManager = gameObject.AddComponent<ExStorageDepotAnimationManager>();
+            }
 
-            AnimationManager = gameObject.AddComponent<ExStorageDepotAnimationManager>();
-            Storage = gameObject.AddComponent<ExStorageDepotStorageManager>();
-            Storage.Initialize(this);
+            if (Storage == null)
+            {
+                Storage = gameObject.AddComponent<ExStorageDepotStorageManager>();
+                Storage.Initialize(this);
+            }
+            
+            if (DumpContainer == null)
+            {
+                DumpContainer = gameObject.AddComponent<DumpContainer>();
+                DumpContainer.Initialize(transform, ExStorageDepotBuildable.DumpContainerLabel(), ExStorageDepotBuildable.FoodNotAllowed(), ExStorageDepotBuildable.ContainerFullMessage(), Storage);
+                DumpContainer.OnDumpContainerClosed += Storage.OnDumpContainerClosed;
+            }
 
             if (Display == null)
             {
                 Display = gameObject.AddComponent<ExStorageDepotDisplayManager>();
                 Display.Initialize(this);
             }
+
+            if (FCSConnectableDevice == null)
+            {
+                FCSConnectableDevice = gameObject.AddComponent<FCSConnectableDevice>();
+                FCSConnectableDevice.Initialize(this, Storage);
+            }
+
             _initialized = true;
         }
 
@@ -150,7 +147,7 @@ namespace ExStorageDepot.Mono
             }
             _saveData.Id = id;
             _saveData.UnitName = NameController.GetCurrentName();
-            //_saveData.StorageItems = Storage.GetTrackedItems();
+            _saveData.StorageItems = Storage.ContainerItems;
             _saveData.Multiplier = BulkMultiplier;
             saveDataList.Entries.Add(_saveData);
         }

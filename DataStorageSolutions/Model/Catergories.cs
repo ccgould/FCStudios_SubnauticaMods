@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using DataStorageSolutions.Configuration;
+using FCSCommon.Objects;
+using FCSTechFabricator.Objects;
 using Oculus.Newtonsoft.Json;
 
 namespace DataStorageSolutions.Model
@@ -443,40 +444,7 @@ namespace DataStorageSolutions.Model
             TechType.PrecursorIonPowerCell,
         };
     }
-
-    [Serializable]
-    public class Filter
-    {
-        public string Category;
-
-        public List<TechType> Types = new List<TechType>();
-
-        public bool IsCategory() => !string.IsNullOrEmpty(Category);
-
-        public string GetString()
-        {
-            if (IsCategory())
-            {
-                return Category;
-            }
-
-            var textInfo = (new CultureInfo("en-US", false)).TextInfo;
-            return textInfo.ToTitleCase(Language.main.Get(Types[0]));
-        }
-
-        public bool IsTechTypeAllowed(TechType techType)
-        {
-            return Types.Contains(techType);
-        }
-
-        public bool IsSame(Filter other)
-        {
-            if (other.IsCategory() && other.Category.Equals(Category)) return true;
-
-            return Category == other.Category && Types.Count > 0 && Types.Count == other.Types.Count && Types[0] == other.Types[0];
-        }
-    }
-
+    
     [Serializable]
     public static class FilterList
     {

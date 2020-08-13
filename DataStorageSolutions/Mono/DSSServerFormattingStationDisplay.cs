@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using DataStorageSolutions.Buildables;
 using DataStorageSolutions.Enumerators;
-using DataStorageSolutions.Interfaces;
 using DataStorageSolutions.Model;
 using DataStorageSolutions.Structs;
 using FCSCommon.Abstract;
@@ -10,6 +9,7 @@ using FCSCommon.Components;
 using FCSCommon.Enums;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
+using FCSTechFabricator.Objects;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -225,9 +225,7 @@ namespace DataStorageSolutions.Mono
                 case "FilterBTN":
 
                     var filter = (FilterTransferData)tag;
-
-                    QuickLogger.Debug($"Filter Button Clicked: {filter.Filter} || {filter.Toggle?.isOn}", true);
-
+                    
                     if (filter.Toggle == null)
                     {
                         QuickLogger.Error("ToggleButton is null");

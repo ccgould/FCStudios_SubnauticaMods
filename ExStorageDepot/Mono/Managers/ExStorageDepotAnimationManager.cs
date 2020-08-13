@@ -30,9 +30,12 @@ namespace ExStorageDepot.Mono.Managers
         #region Internal Methods
         internal void ToggleDriveState()
         {
-            var state = Animator.GetBool(_driveStateHash);
+            SetBoolHash(_driveStateHash, !GetDriveState());
+        }
 
-            SetBoolHash(_driveStateHash, !state);
+        internal bool GetDriveState()
+        {
+            return Animator.GetBool(_driveStateHash);
         }
 
         internal void SetBoolHash(int stateHash, bool value)

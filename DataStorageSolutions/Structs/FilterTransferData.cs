@@ -1,4 +1,4 @@
-﻿using DataStorageSolutions.Model;
+﻿using FCSTechFabricator.Objects;
 using UnityEngine.UI;
 
 namespace DataStorageSolutions.Structs
