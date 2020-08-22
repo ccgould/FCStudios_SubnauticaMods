@@ -32,6 +32,7 @@ namespace FCSCommon.Components
         public Action<string, object> OnButtonClick;
 
         private bool _isSelected;
+        private Image _bgImage;
 
         
 
@@ -57,9 +58,10 @@ namespace FCSCommon.Components
                     this.TextComponent.color = this.STARTING_COLOR;
                     break;
                 case InterfaceButtonMode.Background:
-                    if (GetComponent<Image>() != null)
+                    _bgImage = GetComponentInChildren<Image>();
+                    if (_bgImage != null)
                     {
-                        GetComponent<Image>().color = this.STARTING_COLOR;
+                        _bgImage.color = this.STARTING_COLOR;
                     }
                     break;
                 case InterfaceButtonMode.BackgroundScale:
@@ -105,9 +107,9 @@ namespace FCSCommon.Components
                     this.TextComponent.color = this.STARTING_COLOR;
                     break;
                 case InterfaceButtonMode.Background:
-                    if (GetComponent<Image>() != null)
+                    if (_bgImage != null)
                     {
-                        GetComponent<Image>().color = this.STARTING_COLOR;
+                        _bgImage.color = this.STARTING_COLOR;
                     }
                     break;
                 case InterfaceButtonMode.BackgroundScale:
@@ -146,9 +148,9 @@ namespace FCSCommon.Components
                         this.TextComponent.color = this.HOVER_COLOR;
                         break;
                     case InterfaceButtonMode.Background:
-                        if (GetComponent<Image>() != null)
+                        if (_bgImage != null)
                         {
-                            GetComponent<Image>().color = this.HOVER_COLOR;
+                            _bgImage.color = this.HOVER_COLOR;
                         }
                         break;
                     case InterfaceButtonMode.BackgroundScale:
@@ -181,9 +183,9 @@ namespace FCSCommon.Components
                     this.TextComponent.color = this.STARTING_COLOR;
                     break;
                 case InterfaceButtonMode.Background:
-                    if (GetComponent<Image>() != null)
+                    if (_bgImage != null)
                     {
-                        GetComponent<Image>().color = this.STARTING_COLOR;
+                        _bgImage.color = this.STARTING_COLOR;
                     }
                     break;
                 case InterfaceButtonMode.BackgroundScale:
@@ -233,9 +235,9 @@ namespace FCSCommon.Components
             switch (this.ButtonMode)
             {
                 case InterfaceButtonMode.Background:
-                    if (GetComponent<Image>() != null)
+                    if (_bgImage != null)
                     {
-                        GetComponent<Image>().color = this.HOVER_COLOR;
+                        _bgImage.color = this.HOVER_COLOR;
                     }
                     break;
 
@@ -252,9 +254,9 @@ namespace FCSCommon.Components
             switch (this.ButtonMode)
             {
                 case InterfaceButtonMode.Background:
-                    if (GetComponent<Image>() != null)
+                    if (_bgImage != null)
                     {
-                        GetComponent<Image>().color = STARTING_COLOR;
+                        _bgImage.color = STARTING_COLOR;
                     }
                     break;
 

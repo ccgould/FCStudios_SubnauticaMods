@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using FCS_DeepDriller.Buildable.MK1;
@@ -9,9 +8,9 @@ using FCSCommon.Abstract;
 using FCSCommon.Components;
 using FCSCommon.Enums;
 using FCSCommon.Helpers;
+using FCSCommon.Objects;
 using FCSCommon.Utilities;
 using FCSTechFabricator.Managers;
-using SMLHelper.V2.Crafting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -36,11 +35,17 @@ namespace FCS_DeepDriller.Mono.MK2
         private Text _itemsPerDay;
         private Text _powerUsage;
         private GridHelper _itemsGrid;
-        private bool _isBeingDestroyed;
         private GridHelper _filterGrid;
+        private GridHelper _programmingGrid;
+        private bool _isBeingDestroyed;
         private ColorManager _colorPage;
         private Text _filterBTNText;
-        private Dictionary<TechType,Toggle> _trackedFilterState = new Dictionary<TechType, Toggle>();
+        private readonly Dictionary<TechType,Toggle> _trackedFilterState = new Dictionary<TechType, Toggle>();
+
+        private Text _itemCounter;
+        private Image _solarPanelBtnIcon;
+
+
         //private readonly List<KeyValuePair<TechType, CraftData.TechData>> _craftableItems = new List<KeyValuePair<TechType, CraftData.TechData>>();
 
 
@@ -65,6 +70,7 @@ namespace FCS_DeepDriller.Mono.MK2
                 _mono.OreGenerator.OnItemsPerDayChanged += UpdateItemsPerDay;
                 _mono.DeepDrillerContainer.OnContainerUpdate += OnContainerUpdate;
                 _mono.OreGenerator.OnIsFocusedChanged += OnIsFocusedChanged;
+                _mono.UpgradeManager.OnUpgradeUpdate += OnUpgradeUpdate;
                 _itemsGrid.DrawPage(1);
                 _filterGrid.DrawPage(1);
                 UpdateOilLevel();
@@ -72,8 +78,13 @@ namespace FCS_DeepDriller.Mono.MK2
                 UpdateItemsPerDay();
                 PowerOnDisplay();
                 RecheckFilters();
-                //StartCoroutine(nameof(CheckForCraftingItems));
+                RefreshItemCount();
             }
+        }
+
+        private void RefreshItemCount(int currentTotal = 0)
+        {
+            _itemCounter.text = $"{currentTotal} / {QPatch.Configuration.StorageSize}";
         }
 
         //private IEnumerable CheckForCraftingItems()
@@ -129,6 +140,7 @@ namespace FCS_DeepDriller.Mono.MK2
 
         private void OnContainerUpdate(int arg1, int arg2)
         {
+            RefreshItemCount(arg1);
             RefreshItems();
         }
 
@@ -181,10 +193,16 @@ namespace FCS_DeepDriller.Mono.MK2
                     _mono.PowerManager.ToggleSolarState();
                     break;
                 case "ItemsBTN":
+                    RefreshItemCount(_mono.DeepDrillerContainer.GetContainerTotal());
                     GotoPage(FCSDeepDrillerPages.ItemsPage);
                     break;
                 case "ProgrammingBTN":
-                    QuickLogger.Debug("Opening Programming window!",true);
+                    QuickLogger.Debug("Color Picker", true);
+                    GotoPage(FCSDeepDrillerPages.Programming);
+
+                    break;
+                case "AddProgramBTN":
+                    QuickLogger.Debug("Opening Programming window!", true);
                     _mono.UpgradeManager.Show();
                     break;
                 case "SettingsBTN":
@@ -233,6 +251,18 @@ namespace FCS_DeepDriller.Mono.MK2
                     }
 
                     break;
+                case "ColorItem":
+                    _mono.ColorManager.ChangeColorMask((Color)tag);
+                    break;
+            }
+        }
+
+        internal void ToggleSolarPanelButton(bool state)
+        {
+            QuickLogger.Debug("Toggling Solar  Button Color",true);
+            if (_solarPanelBtnIcon != null)
+            {
+                _solarPanelBtnIcon.color = state ? Color.green : Color.red;
             }
         }
 
@@ -279,8 +309,13 @@ namespace FCS_DeepDriller.Mono.MK2
                 var poweredOffPage = InterfaceHelpers.FindGameObject(canvasGameObject, "PoweredOffPage");
                 #endregion
 
+                #region Powered Off Page
+                var programmingPage = InterfaceHelpers.FindGameObject(canvasGameObject, "ProgrammingPage");
+                #endregion
+
+
                 //================= Home Page ================//
-                
+
 
                 #region Items Button
 
@@ -380,6 +415,8 @@ namespace FCS_DeepDriller.Mono.MK2
 
                 #endregion
 
+                _itemCounter = GameObjectHelpers.FindGameObject(itemsPage, "ItemsCounter")?.GetComponent<Text>();
+
                 //================= Settings Page ================//
 
                 #region Filter Grid
@@ -393,8 +430,9 @@ namespace FCS_DeepDriller.Mono.MK2
                 #region Solar Panel Button
 
                 var solarPanelBTN = GameObjectHelpers.FindGameObject(settingsPage, "SolarPanelBTN");
+                _solarPanelBtnIcon = GameObjectHelpers.FindGameObject(solarPanelBTN, "Icon")?.GetComponent<Image>();
                 InterfaceHelpers.CreateButton(solarPanelBTN, "SolarPanelBTN", InterfaceButtonMode.Background, OnButtonClick,
-                    _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, FCSDeepDrillerBuildable.ItemsButton());
+                    _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, FCSDeepDrillerBuildable.SolarButton());
 
                 #endregion
 
@@ -406,7 +444,7 @@ namespace FCS_DeepDriller.Mono.MK2
 
 
                 InterfaceHelpers.CreateButton(filterToggleBTN, "FilterBTN", InterfaceButtonMode.Background, OnButtonClick,
-                    _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, FCSDeepDrillerBuildable.ItemsButton());
+                    _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, FCSDeepDrillerBuildable.FilterButton());
 
                 #endregion
 
@@ -414,13 +452,8 @@ namespace FCS_DeepDriller.Mono.MK2
 
                 var colorPickerBTN = GameObjectHelpers.FindGameObject(settingsPage, "ColorPickerBTN");
 
-                if (colorPickerBTN == null)
-                {
-                    QuickLogger.Debug("Color Button Null",true);
-                }
-
                 InterfaceHelpers.CreateButton(colorPickerBTN, "ColorPickerBTN", InterfaceButtonMode.Background, OnButtonClick,
-                    _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, FCSDeepDrillerBuildable.ItemsButton());
+                    _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, FCSDeepDrillerBuildable.ColorButton());
 
                 #endregion
 
@@ -455,6 +488,23 @@ namespace FCS_DeepDriller.Mono.MK2
                     _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, FCSDeepDrillerBuildable.ItemsButton());
 
                 #endregion
+
+                //================= Programming Page ================//
+
+                #region Programming Grid
+
+                _programmingGrid = _mono.gameObject.AddComponent<GridHelper>();
+                _programmingGrid.OnLoadDisplay += OnLoadProgrammingGrid;
+                _programmingGrid.Setup(6, FCSDeepDrillerBuildable.ProgrammingItemPrefab, programmingPage, _startColor, _hoverColor, OnButtonClick);
+                
+                var addBTN = GameObjectHelpers.FindGameObject(programmingPage, "AddBTN");
+
+                InterfaceHelpers.CreateButton(addBTN, "AddProgramBTN", InterfaceButtonMode.Background, OnButtonClick,
+                    _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, FCSDeepDrillerBuildable.AddProgramButton());
+
+
+                #endregion
+
             }
             catch (Exception e)
             {
@@ -465,6 +515,74 @@ namespace FCS_DeepDriller.Mono.MK2
             }
 
             return true;
+        }
+
+        private void OnUpgradeUpdate(UpgradeFunction obj)
+        {
+            QuickLogger.Debug("Refreshing the Upgrade Page",true);
+            _programmingGrid.DrawPage();
+        }
+
+        private void OnLoadProgrammingGrid(DisplayData data)
+        {
+            try
+            {
+                if (_isBeingDestroyed) return;
+
+                QuickLogger.Debug($"OnLoadProgrammingGrid : {data.ItemsGrid}", true);
+
+                _programmingGrid.ClearPage();
+
+
+                var grouped = _mono.UpgradeManager.Upgrades;
+
+
+                if (data.EndPosition > grouped.Count)
+                {
+                    data.EndPosition = grouped.Count;
+                }
+
+                for (int i = data.StartPosition; i < data.EndPosition; i++)
+                {
+
+                    GameObject buttonPrefab = Instantiate(data.ItemsPrefab);
+
+                    if (buttonPrefab == null || data.ItemsGrid == null)
+                    {
+                        if (buttonPrefab != null)
+                        {
+                            Destroy(buttonPrefab);
+                        }
+                        return;
+                    }
+
+                    buttonPrefab.transform.SetParent(data.ItemsGrid.transform, false);
+                    var upgradeText = buttonPrefab.GetComponentInChildren<Text>();
+                    upgradeText.text = grouped.ElementAt(i).Format();
+                    
+                    var deleteButton = GameObjectHelpers.FindGameObject(buttonPrefab, "DeleteBTN")?.GetComponent<Button>();
+                    deleteButton?.onClick.AddListener(Test);
+                    var function = grouped.ElementAt(i);
+                    deleteButton?.onClick.AddListener(() => {_mono.UpgradeManager.DeleteFunction(function);});
+
+                    var activateButton = GameObjectHelpers.FindGameObject(buttonPrefab, "ActivationBTN")?.GetComponent<Button>();
+                    activateButton?.onClick.AddListener(Test);
+                    activateButton?.onClick.AddListener(() => { function.ToggleUpdate(); });
+                }
+
+                _programmingGrid.UpdaterPaginator(grouped.Count);
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error("Error Caught");
+                QuickLogger.Error($"Error Message: {e.Message}");
+                QuickLogger.Error($"Error StackTrace: {e.StackTrace}");
+            }
+        }
+
+        private void Test()
+        {
+            QuickLogger.Debug("Got it", true);
         }
 
         private void OnLoadFilterGrid(DisplayData data)
@@ -631,13 +749,14 @@ namespace FCS_DeepDriller.Mono.MK2
         internal void UpdateBatteryStatus(PowercellData data)
         {
             var charge = data.Charge < 1 ? 0f : data.Charge;
-            float percent = charge / data.Capacity;
+
+            var percent = charge / data.Capacity;
 
             if (_batteryFill != null)
             {
                 if (data.Charge >= 0f)
                 {
-                    Color value = (percent >= 0.5f) ? Color.Lerp(this._colorHalf, this._colorFull, 2f * percent - 1f) : Color.Lerp(this._colorEmpty, this._colorHalf, 2f * percent);
+                    var value = (percent >= 0.5f) ? Color.Lerp(this._colorHalf, this._colorFull, 2f * percent - 1f) : Color.Lerp(this._colorEmpty, this._colorHalf, 2f * percent);
                     _batteryFill.color = value;
                     _batteryFill.fillAmount = percent;
                 }
@@ -647,6 +766,7 @@ namespace FCS_DeepDriller.Mono.MK2
                     _batteryFill.fillAmount = 0f;
                 }
             }
+
             _batteryPercentage.text = ((data.Charge < 0f) ? Language.main.Get("ChargerSlotEmpty") : $"{Mathf.CeilToInt(percent * 100)}%");
         }
 

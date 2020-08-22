@@ -1,8 +1,10 @@
 ﻿using FCSCommon.Utilities;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using FCS_DeepDriller.Configuration;
+using Oculus.Newtonsoft.Json;
 using UnityEngine;
 using UWE;
 
@@ -47,7 +49,10 @@ namespace FCS_DeepDriller.Managers
             TechType.DrillableSulphur,
             TechType.DrillableKyanite
         };
-        
+
+        private static List<TechType> _allOres = new List<TechType>();
+
+
         private static void FindMatchingBiome(string biome, out string biomeType)
         {
             //ILZ
@@ -193,7 +198,13 @@ namespace FCS_DeepDriller.Managers
             return lootWithAdditions;
         }
 
-        internal static List<TechType> AdditionalLoot(List<TechType> defaultLoot, string currentBiome)
+        /// <summary>
+        /// Get all player added ores to the list
+        /// </summary>
+        /// <param name="defaultLoot"></param>
+        /// <param name="currentBiome"></param>
+        /// <returns></returns>
+        private static List<TechType> AdditionalLoot(List<TechType> defaultLoot, string currentBiome)
         {
             foreach (KeyValuePair<string, List<TechType>> valuePair in QPatch.Configuration.BiomeOresTechType)
             {
@@ -279,6 +290,123 @@ namespace FCS_DeepDriller.Managers
                     items.Add(TechType.Kyanite);
                     break;
             }
+        }
+
+        public static Dictionary<BiomeType, List<TechType>> GetAllBiomesData()
+        {
+            Dictionary<BiomeType, List<TechType>> biomeLoot = new Dictionary<BiomeType, List<TechType>>();
+
+            foreach (BiomeType biomeType in Enum.GetValues(typeof(BiomeType)))
+            {
+                if (Mod.LootDistributionData == null)
+                {
+                    QuickLogger.Debug("LootDistributionData is null");
+                    return null; 
+                }
+
+                if (!Mod.LootDistributionData.GetBiomeLoot(biomeType, out LootDistributionData.DstData data))
+                {
+                    QuickLogger.Debug("DstData is null");
+                    continue;
+                }
+
+                foreach (LootDistributionData.PrefabData prefabData in data.prefabs)
+                {
+                    if (prefabData.classId.ToLower() != "none")
+                    {
+                        if (WorldEntityDatabase.TryGetInfo(prefabData.classId, out WorldEntityInfo wei))
+                        {
+                            if (wei == null)
+                            {
+                                QuickLogger.Debug("WorldEntityInfo is null");
+                                continue;
+                            }
+
+                            if (Resources.Contains(wei.techType))
+                            {
+                                if (!biomeLoot.ContainsKey(biomeType))
+                                    biomeLoot[biomeType] = new List<TechType>();
+
+                                biomeLoot[biomeType].Add(wei.techType);
+
+                                QuickLogger.Debug($"Added Resource: {wei.techType} in biome {biomeType}");
+                            }
+                        }
+                    }
+                }
+
+                
+                var tempDictionary = new Dictionary<BiomeType, List<TechType>>();
+
+                foreach (KeyValuePair<BiomeType, List<TechType>> pair in biomeLoot)
+                {
+                    var loot = new List<TechType>();
+                    foreach (TechType techType in pair.Value)
+                    {
+                        if (techType.ToString().EndsWith("Chunk", StringComparison.OrdinalIgnoreCase) ||
+                            techType.ToString().StartsWith("Drillable", StringComparison.OrdinalIgnoreCase))
+                        {
+                            GetResourceForSpecial(techType, loot);
+                        }
+                        else
+                        {
+                            loot.Add(techType);
+                        }
+                    }
+
+                    tempDictionary.Add(pair.Key, loot.Distinct().ToList());
+                }
+                
+                var newList = new Dictionary<string, List<string>>();
+
+                foreach (KeyValuePair<BiomeType, List<TechType>> biomeData in tempDictionary)
+                {
+                    var name = biomeData.Key.AsString(true).Split('_')[0];
+                    if (!newList.ContainsKey(name))
+                    {
+                        var g = new List<string>();
+
+                        foreach (var techType in biomeData.Value)
+                        {
+                            g.Add(techType.AsString());
+                        }
+                        newList.Add(name,g);
+                    }
+                    else
+                    {
+                        foreach (TechType techType in biomeData.Value)
+                        {
+                            if (!newList[name].Contains(techType.AsString()))
+                            {
+                                newList[name].Add(techType.AsString());
+                            }
+
+                            if (!_allOres.Contains(techType))
+                            {
+                                _allOres.Add(techType);
+                            }
+                        }
+                    }
+                }
+
+                //string json = JsonConvert.SerializeObject(newList, Formatting.Indented);
+                //File.WriteAllText("Output_Formatted_TechTypeAsString.json", json);
+
+                //string json = JsonConvert.SerializeObject(biomeLoot, Formatting.Indented);
+                //File.WriteAllText("Output.json",json);
+            }
+
+            return biomeLoot;
+        }
+
+        public static bool IsApproved(TechType techType)
+        {
+            if (_allOres == null || _allOres.Count == 0)
+            {
+                GetAllBiomesData();
+            }
+
+            return _allOres != null && _allOres.Contains(techType);
         }
     }
 }

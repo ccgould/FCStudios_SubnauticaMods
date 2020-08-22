@@ -25,7 +25,7 @@ namespace FCS_DeepDriller.Mono.MK2
         public bool IsFull => IsContainerFull(); 
         private Dictionary<TechType,int> _container = new Dictionary<TechType, int>();
 
-        private int GetContainerTotal()
+        internal int GetContainerTotal()
         {
             //Go through the dictionary of items and add all the values together if container is null return 0.
             return _container?.Select((t, i) => _container?.ElementAt(i).Value).Sum() ?? 0;
@@ -130,7 +130,7 @@ namespace FCS_DeepDriller.Mono.MK2
                     _container.Add(item,1);
                 }
 
-                OnContainerUpdate?.Invoke(0,0);
+                OnContainerUpdate?.Invoke(GetContainerTotal(),QPatch.Configuration.StorageSize);
             }
             catch (Exception e)
             {
@@ -166,7 +166,7 @@ namespace FCS_DeepDriller.Mono.MK2
                             _container[item] -= 1;
                         }
 
-                        OnContainerUpdate?.Invoke(0, 0);
+                        OnContainerUpdate?.Invoke(GetContainerTotal(), QPatch.Configuration.StorageSize);
                     }
                 }
             }
@@ -222,6 +222,16 @@ namespace FCS_DeepDriller.Mono.MK2
         public Dictionary<TechType,int> SaveData()
         {
             return _container;
+        }
+
+        public int GetItemCount(TechType item)
+        {
+            if (_container.ContainsKey(item))
+            {
+                return _container[item];
+            }
+
+            return 0;
         }
     }
 }

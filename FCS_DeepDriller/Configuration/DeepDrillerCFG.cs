@@ -12,7 +12,8 @@ namespace FCS_DeepDriller.Configuration
         public int StorageSize { get; set; } = 100;
         public int CrafterStorageSize { get; set; } = 100;
 
-        public float PowerDraw { get; set; } = 0.1f;
+        public float PowerDraw { get; set; } = 0.7f;
+        public float ChargePullAmount { get; set; } = 0.3f;
         public float SolarCapacity { get; set; } = 125;
         public bool AllowDamage { get; set; } = true;
         public float OilTimePeriodInDays { get; set; } = 30.0f;
@@ -21,7 +22,7 @@ namespace FCS_DeepDriller.Configuration
 
 
         [JsonIgnore] internal Dictionary<string, List<TechType>> BiomeOresTechType { get; set; } = new Dictionary<string, List<TechType>>();
-
+        
 
         #endregion
         internal void Convert()

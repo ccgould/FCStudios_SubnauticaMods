@@ -19,8 +19,10 @@
     <Compile Include="$(MSBuildThisFileDirectory)Controllers\AudioManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controllers\PowerManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\TimeConverters.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\UpgradeFunctionConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enums\InterfaceButtonMode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enums\SystemLightState.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Enums\UpgradeFunctions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exceptions\PatchTerminatedException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\GameObjectExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\GenericExtensions.cs" />
@@ -48,6 +50,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Objects\TargetRotation.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enums\FCSPowerStates.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enums\PowerToggleStates.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Objects\UpgradeFunction.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utilities\ModSaver.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utilities\ModUtils.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utilities\QuickLogger.cs" />

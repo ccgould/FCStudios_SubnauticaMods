@@ -114,7 +114,7 @@ namespace FCS_HydroponicHarvesters.Mono
 #elif BELOWZERO
             var itemSize = TechData.GetItemSize(item);
 #endif
-                if (!Inventory.main.HasRoomFor(itemSize.x, itemSize.y) || Items[item] <= 1) return;
+                if (!Inventory.main.HasRoomFor(itemSize.x, itemSize.y) || Items[item] < 1) return;
 
                 Items[item] -= 1;
                 var pickup = CraftData.InstantiateFromPrefab(item).GetComponent<Pickupable>();

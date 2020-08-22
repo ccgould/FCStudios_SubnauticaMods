@@ -1,6 +1,5 @@
 ﻿using FCS_DeepDriller.Ores;
 using FCSCommon.Utilities;
-using Harmony;
 using System;
 using System.IO;
 using System.Reflection;
@@ -9,6 +8,7 @@ using FCS_DeepDriller.Configuration;
 using FCSTechFabricator;
 using FCSTechFabricator.Components;
 using FCSTechFabricator.Craftables;
+using HarmonyLib;
 using QModManager.API.ModLoading;
 using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
@@ -51,7 +51,7 @@ namespace FCS_DeepDriller
 
                 SandSpawnable.PatchHelper();
 
-                var harmony = HarmonyInstance.Create("com.fcsdeepdriller.fcstudios");
+                var harmony = new Harmony("com.fcsdeepdriller.fcstudios");
                 
                 harmony.PatchAll(Assembly.GetExecutingAssembly());
 

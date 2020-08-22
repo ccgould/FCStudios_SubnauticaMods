@@ -1,6 +1,7 @@
 ﻿using FCS_DeepDriller.Configuration;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
+using FCSTechFabricator.Configuration;
 using UnityEngine;
 
 namespace FCS_DeepDriller.Buildable.MK1
@@ -22,6 +23,7 @@ namespace FCS_DeepDriller.Buildable.MK1
         internal static GameObject SandPrefab { get; set; }
         public static GameObject ListItemPrefab { get; set; }
         public static GameObject ColorItemPrefab { get; set; }
+        public static GameObject ProgrammingItemPrefab { get; set; }
 
         private bool GetPrefabs()
         {
@@ -71,6 +73,22 @@ namespace FCS_DeepDriller.Buildable.MK1
             else
             {
                 QuickLogger.Error("Item Button Prefab Not Found!");
+                return false;
+            }
+
+            //We have found the asset bundle and now we are going to continue by looking for the model.
+            GameObject programmingItemButton = assetBundle.LoadAsset<GameObject>("ProgrammingItem");
+
+            //If the prefab isn't null lets add the shader to the materials
+            if (programmingItemButton != null)
+            {
+                ProgrammingItemPrefab = programmingItemButton;
+
+                QuickLogger.Debug("Programming Item Button Prefab Found!");
+            }
+            else
+            {
+                QuickLogger.Error("Programming Item Button Prefab Not Found!");
                 return false;
             }
 
@@ -133,7 +151,7 @@ namespace FCS_DeepDriller.Buildable.MK1
         internal static void ApplyShaders(GameObject prefab)
         {
 
-            //MaterialHelpers.ApplyColorMaskShader(BodyMaterial, ColorIDTexture, Color.white, DefaultConfigurations.DefaultColor, Color.white, prefab, bundle); //Use color2 
+            MaterialHelpers.ApplyColorMaskShader(BodyMaterial, ColorIDTexture, Color.white, DefaultConfigurations.DefaultColor, Color.white, prefab, AssetBundle); //Use color2 
             MaterialHelpers.ApplySpecShader(BodyMaterial, SpecTexture, prefab, 1, 3f, AssetBundle);
             MaterialHelpers.ApplyEmissionShader(BodyMaterial, LUMTexture, prefab, AssetBundle, Color.white);
             MaterialHelpers.ApplyNormalShader(BodyMaterial, NormTexture, prefab, AssetBundle);

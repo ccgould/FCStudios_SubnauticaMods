@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using FCS_DeepDriller.Configuration;
-using FCS_DeepDriller.Mono.MK1;
 using FCS_DeepDriller.Mono.MK2;
 using FCSCommon.Extensions;
 using FCSCommon.Helpers;
@@ -63,6 +62,8 @@ namespace FCS_DeepDriller.Buildable.MK1
                 constructable.model = prefab.FindChild("model");
                 constructable.techType = TechType;
                 constructable.rotationEnabled = true;
+                constructable.forceUpright = true;
+                constructable.placeDefaultDistance = 10f;
 
                 // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
                 var lwe = prefab.AddComponent<LargeWorldEntity>();
@@ -71,8 +72,8 @@ namespace FCS_DeepDriller.Buildable.MK1
                 //var beacon = prefab.AddComponent<Beacon>();
 
 
-                var center = new Vector3(0, 3.048428f, 0);
-                var size = new Vector3(4.821606f, 3.35228f, 4.941598f);
+                var center = new Vector3(0, 3.106274f, 0);
+                var size = new Vector3(6.85554f, 6.670462f, 7.002856f);
 
                 GameObjectHelpers.AddConstructableBounds(prefab, size,center);
 

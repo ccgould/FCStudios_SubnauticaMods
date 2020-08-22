@@ -3,18 +3,27 @@ using System.Collections.Generic;
 using System.Linq;
 using FCS_DeepDriller.Configuration;
 using FCS_DeepDriller.Helpers;
-using FCS_DeepDriller.Mono.MK2;
 using FCSCommon.Enums;
 using FCSCommon.Utilities;
 using FCSTechFabricator.Interfaces;
-using RadicalLibrary;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
-namespace FCS_DeepDriller.Mono.MK1
+namespace FCS_DeepDriller.Mono.MK2
 {
     internal class FCSDeepDrillerPowerHandler : MonoBehaviour, IFCSStorage
     {
+        #region Private Fields
+
+        private const bool PullPowerFromRelay = true; //Setting this to true by default until I feel like making it a toggle option
+        private FCSPowerStates _powerState;
+        private AnimationCurve _depthCurve;
+        private readonly DeepDrillerPowerData _powerBank = new DeepDrillerPowerData();
+        private float _powerDraw;
+        private PowerRelay _powerRelay;
+        private FCSPowerStates _prevPowerState;
+        private FCSDeepDrillerController _mono;
+        private bool _initialized;
+        private const float MaxDepth = 200f;
         private FCSPowerStates PowerState
         {
             get => _powerState;
@@ -24,60 +33,110 @@ namespace FCS_DeepDriller.Mono.MK1
                 OnPowerUpdate?.Invoke(value);
             }
         }
-        private FCSPowerStates _powerState;
-        private FCSDeepDrillerController _mono;
-        private float _maxDepth = 200f;
-        private float _timePassed = 0.0f;
-        private AnimationCurve _depthCurve;
-        private readonly DeepDrillerPowerData _powerBank = new DeepDrillerPowerData();
-        private bool _prevPowerState;
+        private float _timePassed;
+        #endregion
+
+        #region Properties
+
+        internal Action OnUsageChange { get; set; }
         internal Action<FCSPowerStates> OnPowerUpdate;
-        private bool _initialized;
-        private float _powerDraw;
-        private PowerRelay _powerRelay;
-        private PowerRelay _connectedRelay;
-        private bool _pullPowerFromRelay;
-        public Action<PowercellData> OnBatteryUpdate { get; set; }
-        public Action OnUsageChange { get; set; }
+        internal Action<PowercellData> OnBatteryUpdate { get; set; }
+
+        #endregion
+
+        #region IFCSStorage Interface Properties
+
+        public int GetContainerFreeSpace { get; }
+        public bool IsFull => _powerBank.Battery.IsFull();
+
+        #endregion
+
+        #region Private Methods
 
         private void Update()
         {
-            if (_mono == null || _mono.DeepDrillerContainer == null || 
-                _mono.DisplayHandler == null || !_mono.IsConstructed || 
+            if (_mono == null || _mono.DeepDrillerContainer == null ||
+                _mono.DisplayHandler == null || !_mono.IsConstructed ||
                 !_initialized) return;
-            
-            ChargeBattery();
-            UpdatePowerState();
 
+            ChargeSolarPanel();
+            UpdatePowerState();
+             
             _timePassed += DayNightCycle.main.deltaTime;
+            
             if (_timePassed >= 1)
             {
-                TakePower(CalculatePowerUsage());
+                ConsumePower(CalculatePowerUsage());
+                AttemptToChargeBattery();
+                _mono.DisplayHandler.ToggleSolarPanelButton(IsSolarExtended());
                 _timePassed = 0.0f;
             }
         }
-        
+
+        private void ConsumePower(float amount)
+        {
+
+            if (!_mono.IsOperational()) return;
+
+            if (_powerRelay != null && _powerRelay.GetPower() >= amount)
+            {
+                _powerRelay.ConsumeEnergy(amount, out float amountConsumed);
+            }
+            else if (_powerBank.SolarPanel >= amount)
+            {
+                _powerBank.SolarPanel -= amount;
+            }
+            else if(_powerBank.Battery.Charge >= amount)
+            {
+                _powerBank.Battery.TakePower(amount);
+                OnBatteryUpdate?.Invoke(_powerBank.Battery);
+            }
+        }
+
+        private void AttemptToChargeBattery()
+        {
+            if (GetTotalCharge() <= 0) return;
+
+            var amount = QPatch.Configuration.ChargePullAmount;
+
+            if (_powerRelay != null && _powerRelay.GetPower() >= amount)
+            {
+                _powerRelay.ConsumeEnergy(amount, out float amountConsumed);
+                _powerBank.Battery.ChargeBattery(amountConsumed);
+                OnBatteryUpdate?.Invoke(_powerBank.Battery);
+            }
+            
+            if (_powerBank.SolarPanel >= amount)
+            {
+                _powerBank.SolarPanel -= amount;
+                _powerBank.Battery.ChargeBattery(amount);
+                OnBatteryUpdate?.Invoke(_powerBank.Battery);
+            }
+        }
+
+
         private void UpdatePowerState()
         {
             if (PowerState == FCSPowerStates.Tripped) return;
 
-            if (IsPowerAvailable() && _prevPowerState != true)
+            if (IsPowerAvailable() && _prevPowerState != FCSPowerStates.Powered)
             {
                 PowerState = FCSPowerStates.Powered;
-                _prevPowerState = true;
+                _prevPowerState = FCSPowerStates.Powered;
             }
-            else if (!IsPowerAvailable() && _prevPowerState)
+            else if (!IsPowerAvailable() && _prevPowerState == FCSPowerStates.Powered)
             {
                 PowerState = FCSPowerStates.Unpowered;
-                _prevPowerState = false;
+                _prevPowerState = FCSPowerStates.Unpowered;
             }
         }
 
-        private void ChargeBattery()
+        private void ChargeSolarPanel()
         {
-            
-
-            //QuickLogger.Debug($"Current Solar Charge: {_powerBank.Solar.Battery.charge} || Current Solar Capacity: {_powerBank.Solar.Battery.capacity}");
+            if (IsSolarExtended())
+            {
+                _powerBank.SolarPanel = Mathf.Clamp(_powerBank.SolarPanel + GetRechargeScalar() * DayNightCycle.main.deltaTime * 0.25f * 10f, 0f, QPatch.Configuration.SolarCapacity);
+            }
         }
 
         private float GetRechargeScalar()
@@ -88,9 +147,9 @@ namespace FCS_DeepDriller.Mono.MK1
         private float GetDepthScalar()
         {
 #if SUBNAUTICA
-            float time = Mathf.Clamp01((_maxDepth - Ocean.main.GetDepthOf(base.gameObject)) / _maxDepth);
+            float time = Mathf.Clamp01((MaxDepth - Ocean.main.GetDepthOf(base.gameObject)) / MaxDepth);
 #elif BELOWZERO
-            float time = Mathf.Clamp01((_maxDepth - Ocean.GetDepthOf(base.gameObject)) / _maxDepth);
+    float time = Mathf.Clamp01((_maxDepth - Ocean.GetDepthOf(base.gameObject)) / _maxDepth);
 #endif
             return _depthCurve.Evaluate(time);
         }
@@ -99,11 +158,16 @@ namespace FCS_DeepDriller.Mono.MK1
         {
             return DayNightCycle.main.GetLocalLightScalar();
         }
-
-        private void ChargeSolarPanel()
+        
+        private float CalculatePowerUsage()
         {
-            _powerBank.SolarPanel = Mathf.Clamp(_powerBank.SolarPanel + GetRechargeScalar() * DayNightCycle.main.deltaTime * 0.50f * 5f, 0f, QPatch.Configuration.SolarCapacity);
+            var amount = _mono.UpgradeManager.Upgrades.Sum(x => x.PowerUsage);
+            return _powerDraw + amount;
         }
+
+        #endregion
+
+        #region Internal Methods
 
         internal void Initialize(FCSDeepDrillerController mono)
         {
@@ -113,29 +177,17 @@ namespace FCS_DeepDriller.Mono.MK1
             _depthCurve.AddKey(0f, 0f);
             _depthCurve.AddKey(0.4245796f, 0.5001081f);
             _depthCurve.AddKey(1f, 1f);
-            PowerState = FCSPowerStates.Powered;
-            _powerBank.Battery = new PowercellData {Charge = 0, Capacity = 3000};
-            InvokeRepeating(nameof(ChargeSolarPanel),0.5f,0.5f);
+            _powerBank.Battery = new PowercellData { Charge = 0, Capacity = 3000 };
             _initialized = true;
         }
 
-        internal FCSPowerStates GetPowerState()
-        {
-            return PowerState;
-        }
-
-        internal void SetPowerState(FCSPowerStates state)
-        {
-            PowerState = state;
-        }
-        
         internal void LoadData(DeepDrillerSaveDataEntry data)
         {
             _powerBank.SolarPanel = data.PowerData.SolarPanel;
             _powerBank.Battery = data.PowerData.Battery;
-            _pullPowerFromRelay = data.PullFromRelay;
+            //PullPowerFromRelay = data.PullFromRelay; Disabled to until I decide to make it a toggle option
 
-            if(data.SolarExtended)
+            if (data.SolarExtended)
             {
                 ToggleSolarState();
             }
@@ -143,15 +195,9 @@ namespace FCS_DeepDriller.Mono.MK1
             PowerState = data.PowerState;
         }
 
-        internal float GetCharge()
+        internal float GetPowerUsage()
         {
-            return _powerBank.Battery.Charge;
-        }
-
-        internal float CalculatePowerUsage()
-        {
-            var amount = _mono.UpgradeManager.UpgradeFunctions.Sum(x => x.PowerUsage);
-            return _powerDraw + amount;
+            return CalculatePowerUsage();
         }
 
         internal string GetSolarPowerData()
@@ -159,37 +205,8 @@ namespace FCS_DeepDriller.Mono.MK1
             return $"Solar panel (sun: {Mathf.RoundToInt(GetRechargeScalar() * 100f)}% charge {Mathf.RoundToInt(_powerBank.SolarPanel)}/{Mathf.RoundToInt(QPatch.Configuration.SolarCapacity)})";
         }
 
-        /// <summary>
-        /// Gets the data for saving the power data.
-        /// </summary>
-        /// <returns></returns>
-        internal DeepDrillerPowerData SaveData()
-        {
-            return _powerBank;
-        }
-        
-        /// <summary>
-        /// Checks to see if all the conditions are met for being powered
-        /// </summary>
-        /// <returns>Returns true if power is available</returns>
-        internal bool IsPowerAvailable()
-        {
-            if (GetCharge() <= 0)
-            {
-                return false;
-            }
-
-            return !QPatch.Configuration.AllowDamage || !_mono.HealthManager.IsDamagedFlag();
-        }
-
-        /// <summary>
-        /// Gives the states of the solar panel
-        /// </summary>
-        /// <returns>Returns true if the solar panel is extended.</returns>
-        internal bool IsSolarExtended()
-        {
-           return _mono.AnimationHandler.GetBoolHash(_mono.SolarStateHash);
-        }
+        private int solarAnimHash = Animator.StringToHash("SolarPanel.DeepDriller_Solar");
+        private int solarAnimExtractHash = Animator.StringToHash("SolarPanel.DeepDriller_Solar_Retract");
 
         internal void ToggleSolarState()
         {
@@ -206,10 +223,10 @@ namespace FCS_DeepDriller.Mono.MK1
 
             //Get the amount the battery needs
             var remainder = MathHelpers.GetRemainder(_powerBank.Battery.Charge, _powerBank.Battery.Capacity);
-            
+
             //Get the minium amount of power from the battery and the power requirements
             var amount = Mathf.Min(powercell.charge, remainder);
-            
+
             //Set the new battery value
             powercell.charge = Mathf.Max(0f, powercell.charge - amount);
 
@@ -222,60 +239,92 @@ namespace FCS_DeepDriller.Mono.MK1
             OnBatteryUpdate?.Invoke(_powerBank.Battery);
         }
 
-        internal void TakePower(float amount)
+        /// <summary>
+        /// Gives the states of the solar panel
+        /// </summary>
+        /// <returns>Returns true if the solar panel is extended.</returns>
+        internal bool IsSolarExtended()
         {
-            if (PowerState != FCSPowerStates.Powered || _powerRelay == null || _powerBank == null) return;
-
-            if (IsSolarExtended() && _powerBank.SolarPanel >= amount)
-            {
-                _powerBank.SolarPanel -= amount;
-            }
-            else if (_pullPowerFromRelay && _powerRelay.GetPower() > 0)
-            {
-                _powerRelay.ConsumeEnergy(amount, out var amountConsumed);
-                QuickLogger.Debug($"Energy Consumed: {amountConsumed}");
-            }
-            else
-            {
-                _powerBank.Battery.TakePower(amount);
-            }
-
-            //Charge Battery
-
-            if (_pullPowerFromRelay && _powerRelay.GetPower() > 0)
-            {
-                _powerRelay.ConsumeEnergy(amount / 2, out var amountConsumed);
-                _powerBank.Battery.ChargeBattery(amountConsumed);
-                QuickLogger.Debug($"Energy Consumed: {amountConsumed}");
-                OnBatteryUpdate?.Invoke(_powerBank.Battery);
-            }
-            else if (IsSolarExtended())
-            {
-                _powerBank.Battery.ChargeBattery(_powerBank.SolarPanel/2);
-            }
-
-            OnBatteryUpdate?.Invoke(_powerBank.Battery);
+            return _mono.AnimationHandler.GetBoolHash(_mono.SolarStateHash);
         }
 
-        //TODO Connect to base
+        /// <summary>
+        /// Checks to see if all the conditions are met for being powered
+        /// </summary>
+        /// <returns>Returns true if power is available</returns>
+        internal bool IsPowerAvailable()
+        {
+            if (GetTotalCharge() <= 0 || _mono.HealthManager.IsDamagedFlag())
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        internal float GetTotalCharge()
+        {
+            return (_powerRelay?.GetPower() ?? 0) + _powerBank.Battery.Charge + _powerBank.SolarPanel;
+        }
+
+        internal float GetBatteryCharge()
+        {
+            return !QPatch.Configuration.AllowDamage ? _powerBank.Battery.Capacity : _powerBank.Battery.Charge;
+        }
+
+        internal void SetPowerRelay(PowerRelay powerRelay)
+        {
+            _powerRelay = powerRelay;
+        }
+
+        internal FCSPowerStates GetPowerState()
+        {
+            return PowerState;
+        }
+
+        internal void SetPowerState(FCSPowerStates state)
+        {
+            PowerState = state;
+        }
+
+        internal bool HasEnoughPowerToOperate()
+        {
+            if (!IsPowerAvailable()) return false;
+            var amount = CalculatePowerUsage();
+
+            return _powerRelay?.GetPower() >= amount || _powerBank.SolarPanel >= amount ||
+                   _powerBank.Battery.Charge >= amount;
+        }
 
         internal void UpdatePowerUsage()
         {
             OnUsageChange?.Invoke();
         }
-        public float GetPowerUsage()
+
+        internal bool GetPullFromPowerRelay()
         {
-            return CalculatePowerUsage();
+            return PullPowerFromRelay;
         }
 
-        public int GetContainerFreeSpace { get; }
-        public bool IsFull => _powerBank.Battery.IsFull();
+        /// <summary>
+        /// Gets the data for saving the power data.
+        /// </summary>
+        /// <returns></returns>
+        internal DeepDrillerPowerData SaveData()
+        {
+            return _powerBank;
+        }
+
+        #endregion
+
+        #region IFCSStorage Interface
+
         public bool CanBeStored(int amount, TechType techType)
         {
 #if SUBNAUTICA
             var equipType = CraftData.GetEquipmentType(techType);
 #elif BELOWZERO
-            var equipType = TechData.GetEquipmentType(techType);
+    var equipType = TechData.GetEquipmentType(techType);
 #endif
 
             return equipType == EquipmentType.PowerCellCharger || techType == TechType.PowerCell ||
@@ -320,19 +369,6 @@ namespace FCS_DeepDriller.Mono.MK1
             throw new NotImplementedException();
         }
 
-        public void SetPowerRelay(PowerRelay powerRelay)
-        {
-            _powerRelay = powerRelay;
-        }
-
-        internal void TogglePullFromRelay()
-        {
-            _pullPowerFromRelay = !_pullPowerFromRelay;
-        }
-
-        public bool GetPullFromPowerRelay()
-        {
-            return _pullPowerFromRelay;
-        }
+        #endregion
     }
 }

@@ -1,6 +1,6 @@
 ﻿using FCS_DeepDriller.Configuration;
 using FCSCommon.Utilities;
-using Harmony;
+using HarmonyLib;
 
 namespace FCS_DeepDriller.Patchers
 {

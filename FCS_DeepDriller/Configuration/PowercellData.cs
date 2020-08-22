@@ -16,9 +16,7 @@ namespace FCS_DeepDriller.Configuration
 
         public void TakePower(float amount)
         {
-            QuickLogger.Debug($"Taking Power: {amount}");
             Charge = Mathf.Clamp(Charge - amount, 0,Capacity);
-            QuickLogger.Debug($"New Power: {Charge}");
         }
 
         public void ChargeBattery(float amount)

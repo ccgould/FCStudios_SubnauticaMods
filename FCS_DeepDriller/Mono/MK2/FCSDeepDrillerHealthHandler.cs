@@ -41,7 +41,7 @@ namespace FCS_DeepDriller.Mono.MK2
 
         private void UpdateHealthMultiplier()
         {
-            var amount = _mono.UpgradeManager.UpgradeFunctions.Sum(x => x.Damage);
+            var amount = _mono.UpgradeManager.Upgrades.Sum(x => x.Damage);
             HealthMultiplyer = HealthMultiplierBase + amount;
         }
 

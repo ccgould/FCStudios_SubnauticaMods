@@ -1,4 +1,4 @@
-﻿namespace FCS_DeepDriller.Enumerators
+﻿namespace FCSCommon.Enums
 {
     internal enum UpgradeFunctions
     {

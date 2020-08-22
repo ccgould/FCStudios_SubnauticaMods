@@ -2,6 +2,9 @@
 using Oculus.Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using FCS_DeepDriller.Managers;
+using FCS_DeepDriller.Structs;
+using FCSCommon.Objects;
 using FCSTechFabricator.Objects;
 
 namespace FCS_DeepDriller.Configuration
@@ -32,6 +35,7 @@ namespace FCS_DeepDriller.Configuration
         [JsonProperty] internal ColorVec4 BodyColor { get; set; }
         
         [JsonProperty] internal bool PullFromRelay { get; set; }
+        [JsonProperty] internal IEnumerable<UpgradeSave> Upgrades { get; set; }
     }
 
     [Serializable]

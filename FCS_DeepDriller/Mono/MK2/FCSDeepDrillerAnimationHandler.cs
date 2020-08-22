@@ -152,9 +152,24 @@ namespace FCS_DeepDriller.Mono.MK2
 
         #endregion
 
-        public void DrillState(bool state)
+        internal void DrillState(bool state)
         { 
             SetIntHash(_drillState,state ? 1:0);
+        }
+
+        internal bool AnimationIsPlaying(string animationName)
+        {
+            if (Animator == null) return false;
+
+            var result = Animator.GetCurrentAnimatorStateInfo(4).IsName(animationName);
+
+
+
+
+
+            QuickLogger.Debug($"Animation with hash {animationName} is playing returned {result}",true);
+
+            return result;
         }
     }
 }

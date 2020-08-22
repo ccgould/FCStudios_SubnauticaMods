@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using FCS_DeepDriller.Buildable.MK1;
 using FCS_DeepDriller.Enumerators;
+using FCS_DeepDriller.Model.Upgrades;
 using FCS_DeepDriller.Mono.MK2;
 using FCSCommon.Enums;
+using FCSCommon.Objects;
 using FCSCommon.Utilities;
+using Steamworks;
 using UnityEngine;
 using Random = System.Random;
 
@@ -40,12 +43,12 @@ namespace FCS_DeepDriller.Managers
         private int _oresPerDay = 12;
         private FCSDeepDrillerController _mono;
         private bool _isFocused;
-
         #endregion
 
         #region Internal Properties
         internal List<TechType> AllowedOres { get; set; } = new List<TechType>();
-        public Action OnItemsPerDayChanged { get; set; }
+        internal Action OnItemsPerDayChanged { get; set; }
+        internal Action OnUsageChange { get; set; }
 
         internal event Action<TechType> OnAddCreated;
         #endregion
@@ -63,25 +66,16 @@ namespace FCS_DeepDriller.Managers
 
         private void Update()
         {
-            //QuickLogger.Debug($"PassedTime = {_passedTime} ||SecPerItem {_secondPerItem} || AllowedOres = {AllowedOres.Count} " +
-            //$"|| IsFocused {_isFocused} || Focus {_focus} || Allow Tick {_allowTick}");
-
             SetAllowTick();
-
 
             if (_allowTick)
             {
                 _passedTime += DayNightCycle.main.deltaTime;
 
-                //if (_mono.UpgradeManager.HasUpgradeFunction(UpgradeFunctions.OresPerDay,
-                //    out UpgradeFunction function))
-                //{
-                //    SetOresPerDay(((OresPerDayUpgrade)function).OreCount);
-                //}
-
                 if (_passedTime >= _secondPerItem)
                 {
                     GenerateOre();
+                    _passedTime = 0;
                 }
             }
         }
@@ -94,6 +88,8 @@ namespace FCS_DeepDriller.Managers
 
                 var index = _random2.Next(AllowedOres.Count);
                 var item = AllowedOres[index];
+                QuickLogger.Debug($"Spawning item {item}", true);
+                if (CheckUpgrades(item))return;
                 OnAddCreated?.Invoke(item);
                 QuickLogger.Debug($"Spawning item {item}", true);
 
@@ -102,25 +98,44 @@ namespace FCS_DeepDriller.Managers
             {
                 var index = _random2.Next(_focusOres.Count);
                 var item = _focusOres.ElementAt(index);
+                if (CheckUpgrades(item))return;
                 OnAddCreated?.Invoke(item);
                 QuickLogger.Debug($"Spawning item {item}", true);
             }
+        }
 
+        private void ResetPassTime()
+        {
             _passedTime = 0;
+        }
+
+        private bool CheckUpgrades(TechType techType)
+        {
+            foreach (var function in _mono.UpgradeManager.Upgrades)
+            {
+                if (!function.IsEnabled) continue;
+                
+                if (function.UpgradeType == UpgradeFunctions.MaxOreCount)
+                {
+                    var functionComp = (MaxOreCountUpgrade)function;
+                    if (functionComp.TechType != techType) continue;
+                    var itemCount = _mono.DeepDrillerContainer.GetItemCount(functionComp.TechType);
+                    if (itemCount >= functionComp.Amount)
+                    {
+                        QuickLogger.Debug($"Max ore count of {functionComp.Amount} has been reached skipping ore {techType}. Current amount: {itemCount}",true);
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         internal void SetAllowTick()
         {
             if (_mono?.PowerManager == null || _mono?.DeepDrillerContainer == null) return;
 
-            if (_mono.PowerManager.GetPowerState() == FCSPowerStates.Powered && !_mono.DeepDrillerContainer.IsFull && _mono.IsOperational())
-            {
-                _allowTick = true;
-            }
-            else
-            {
-                _allowTick = false;
-            }
+            _allowTick = _mono.IsOperational();
         }
 
         internal void RemoveFocus(TechType focus)
@@ -181,15 +196,17 @@ namespace FCS_DeepDriller.Managers
         {
             return string.Format(FCSDeepDrillerBuildable.ItemsPerDayFormat(), _oresPerDay);
         }
+
         internal void ApplyUpgrade(UpgradeFunction upgrade)
         {
             switch (upgrade.UpgradeType)
             {
                 case UpgradeFunctions.OresPerDay:
-                    var function = (OresPerDayUpgrade) upgrade;
+                    var function = (OresPerDayUpgrade)upgrade;
                     SetOresPerDay(function.OreCount);
                     break;
                 case UpgradeFunctions.MaxOreCount:
+                    upgrade.ActivateUpdate();
                     break;
                 case UpgradeFunctions.SilkTouch:
                     break;
@@ -197,6 +214,11 @@ namespace FCS_DeepDriller.Managers
                     break;
             }
             _mono.PowerManager.UpdatePowerUsage();
+        }
+
+        internal void UpdatePowerUsage()
+        {
+            OnUsageChange?.Invoke();
         }
     }
 }

@@ -9,6 +9,7 @@
         Maintenance = 4,
         ItemsPage= 5,
         PowerOff = 6,
-        ColorPicker = 7
+        ColorPicker = 7,
+        Programming = 8
     }
 }

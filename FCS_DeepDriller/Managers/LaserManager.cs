@@ -1,7 +1,5 @@
-﻿using System;
-using FCS_DeepDriller.Model;
+﻿using FCS_DeepDriller.Model;
 using FCS_DeepDriller.Mono.MK2;
-using FCSCommon.Enums;
 using FCSCommon.Helpers;
 using UnityEngine;
 
@@ -9,38 +7,51 @@ namespace FCS_DeepDriller.Managers
 {
     internal class LaserManager
     {
-        private GameObject _gameObject;
+        private FCSDeepDrillerController _mono;
         private GameObject _lasersStarters;
         private GameObject _xBubblesGroup;
+        private bool _initialized;
 
         internal void Setup(FCSDeepDrillerController mono)
         {
-            _gameObject = mono.gameObject;
+            _mono = mono;
+
             FindLaserPoints();
         }
 
         private void FindLaserPoints()
         {
-            if (_gameObject != null)
-            {
-                _lasersStarters = GameObjectHelpers.FindGameObject(_gameObject, "Lasers_Main");
-                _xBubblesGroup = GameObjectHelpers.FindGameObject(_gameObject, "xBubbles_Group");
-                var lasersEnds = GameObjectHelpers.FindGameObject(_gameObject, "Laser_Ends");
+            if (_mono?.gameObject == null) return;
 
-                for (var i = 0; i < _lasersStarters.transform.childCount; i++)
-                {
-                    var laser = _lasersStarters.transform.GetChild(i);
-                    var laserComp = laser.GetChild(0).gameObject.AddComponent<LaserScript>();
-                    var end = lasersEnds.transform.GetChild(i);
-                    laserComp.StartPoint = laser.transform;
-                    laserComp.EndPoint = end;
-                }
+            _lasersStarters = GameObjectHelpers.FindGameObject(_mono.gameObject, "Lasers_Main");
+            _xBubblesGroup = GameObjectHelpers.FindGameObject(_mono.gameObject, "xBubbles_Group");
+            var lasersEnds = GameObjectHelpers.FindGameObject(_mono.gameObject, "Laser_Ends");
+                
+            if (!_lasersStarters || !_xBubblesGroup || !lasersEnds) return;
+
+            for (var i = 0; i < _lasersStarters.transform.childCount; i++)
+            {
+                var laser = _lasersStarters.transform.GetChild(i);
+                var laserComp = laser.GetChild(0).gameObject.AddComponent<LaserScript>();
+                var end = lasersEnds.transform.GetChild(i);
+                laserComp.StartPoint = laser.transform;
+                laserComp.EndPoint = end;
             }
+
+            if (!_mono.IsUnderWater())
+            {
+                ChangeBubblesState(false);
+            }
+            _initialized = true;
         }
 
         internal void ChangeLasersState(bool state = true)
         {
             _lasersStarters.SetActive(state);
+        }
+
+        internal void ChangeBubblesState(bool state = true)
+        {
             _xBubblesGroup.SetActive(state);
         }
     }

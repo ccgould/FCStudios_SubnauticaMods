@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.IO;
+using FCSCommon.Converters;
 using UnityEngine;
 
 namespace FCSCommon.Utilities
@@ -11,12 +12,17 @@ namespace FCSCommon.Utilities
 
         private static MonoBehaviour _coroutineObject;
 
-
+        
         internal static void Save<SaveDataT>(SaveDataT newSaveData, string fileName, string saveDirectory, Action onSaveComplete = null)
         {
             if (newSaveData != null)
             {
-                var saveDataJson = JsonConvert.SerializeObject(newSaveData, Formatting.Indented);
+                var settings = new JsonSerializerSettings {
+                    NullValueHandling = NullValueHandling.Ignore, 
+                    //TypeNameHandling = TypeNameHandling.Auto
+                };
+                var saveDataJson = JsonConvert.SerializeObject(newSaveData, Formatting.Indented,settings);
+                
 
                 if (!Directory.Exists(saveDirectory))
                 {
@@ -36,8 +42,11 @@ namespace FCSCommon.Utilities
             var save = File.ReadAllText(path);
             var jsonSerializerSettings = new JsonSerializerSettings
             {
-                MissingMemberHandling = MissingMemberHandling.Ignore
+                MissingMemberHandling = MissingMemberHandling.Ignore,
+                NullValueHandling = NullValueHandling.Ignore,
+                //TypeNameHandling = TypeNameHandling.Auto
             };
+
             var json = JsonConvert.DeserializeObject<TSaveData>(save, jsonSerializerSettings);
             onSuccess?.Invoke(json);
         }
