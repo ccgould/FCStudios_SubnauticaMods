@@ -362,25 +362,15 @@ namespace FCS_DeepDriller.Mono.MK2
 
 
             UpdateSystemLights(PowerManager.GetPowerState());
-
             OnGenerate();
-
-            if (!_platformLegsExtended)
-            {
-                StartCoroutine(DropPlatFormLegs());
-            }
-
-
             IsInitialized = true;
 
             QuickLogger.Debug($"Initializing Completed");
         }
 
-        private const float MaxPillarHeight = 20f;
-        private const float ExtraHeight = 0.9f;
-        private const float MinHeight = 0f;
         private readonly List<Pillar> _pillars = new List<Pillar>();
-        private bool _platformLegsExtended;
+        private bool _allPlateFormsFound;
+        private bool PlatformLegsExtended;
 
         private void UpdateLegState(bool isExtended)
         {
@@ -495,15 +485,6 @@ namespace FCS_DeepDriller.Mono.MK2
             _data = Mod.GetDeepDrillerSaveData(id);
         }
 
-        private IEnumerator DropPlatFormLegs()
-        {
-            QuickLogger.Debug("Attempting to drop platform legs",true);
-            while (!_platformLegsExtended)
-            {
-                yield return new WaitForSeconds(2);
-                OnGenerate();
-            }
-        }
 
         private IEnumerator TryGetLoot()
         {
@@ -542,70 +523,32 @@ namespace FCS_DeepDriller.Mono.MK2
 
         private void OnGenerate()
         {
-            _pillars.Add(new Pillar(GameObjectHelpers.FindGameObject(gameObject, "PlatfromLeg")));
-            _pillars.Add(new Pillar(GameObjectHelpers.FindGameObject(gameObject, "PlatfromLeg_2")));
-            _pillars.Add(new Pillar(GameObjectHelpers.FindGameObject(gameObject, "PlatfromLeg_3")));
-            _pillars.Add(new Pillar(GameObjectHelpers.FindGameObject(gameObject, "PlatfromLeg_4")));
-            _pillars.Add(new Pillar(GameObjectHelpers.FindGameObject(gameObject, "PlatfromLeg_5")));
-            _pillars.Add(new Pillar(GameObjectHelpers.FindGameObject(gameObject, "PlatfromLeg_6")));
-            _pillars.Add(new Pillar(GameObjectHelpers.FindGameObject(gameObject, "DrillTunnelBase")));
+            if(PlatformLegsExtended) return;
 
-
-            for (int i = 0; i < _pillars.Count; i++)
+            QuickLogger.Debug("OnGenerate",true); 
+            if (!_allPlateFormsFound)
             {
-                var pillar = this._pillars[i];
+                var pillar = GameObjectHelpers.FindGameObject(gameObject, "PlatfromLeg")?.AddComponent<Pillar>();
+                pillar?.Instantiate(this);
 
-                if (pillar.Root == null)
-                {
-                    QuickLogger.Debug($"Pillar number {i} is null", true);
-                    continue;
-                }
+                var pillar1 = GameObjectHelpers.FindGameObject(gameObject, "PlatfromLeg_2")?.AddComponent<Pillar>();
+                pillar1?.Instantiate(this);
 
-                pillar.Root.SetActive(false);
+                var pillar2 = GameObjectHelpers.FindGameObject(gameObject, "PlatfromLeg_3")?.AddComponent<Pillar>();
+                pillar2?.Instantiate(this);
 
-                Vector3 position = pillar.Root.transform.position;
+                var pillar3 = GameObjectHelpers.FindGameObject(gameObject, "PlatfromLeg_4")?.AddComponent<Pillar>();
+                pillar3?.Instantiate(this);
 
-                Vector3 forward = transform.TransformDirection(-Vector3.up);
+                var pillar4 = GameObjectHelpers.FindGameObject(gameObject, "PlatfromLeg_5")?.AddComponent<Pillar>();
+                pillar4?.Instantiate(this);
 
-                float num2 = float.MaxValue;
-                float num3 = float.MaxValue;
+                var pillar5 = GameObjectHelpers.FindGameObject(gameObject, "PlatfromLeg_6")?.AddComponent<Pillar>();
+                pillar5?.Instantiate(this);
 
-                if (Physics.Raycast(position, forward, out var hit, MaxPillarHeight))
-                {
-                    Base componentInParent = hit.collider.GetComponentInParent<Base>();
-
-                    if (componentInParent && !componentInParent.isGhost)
-                    {
-                        num2 = Mathf.Min(num2, hit.distance);
-                    }
-                    if (hit.collider.gameObject.layer == 30)
-                    {
-                        num3 = Mathf.Min(num3, hit.distance);
-                    }
-                }
-
-                if (num3 < num2)
-                {
-                    float num4 = (num3 + 0.01f) / 2 + ExtraHeight;
-
-                    if (num4 >= MinHeight)
-                    {
-                        if (pillar.Name == "DrillTunnelBase")
-                        {
-                            var max = _pillars.Max(x => x.Length);
-                            pillar.Length = num4;
-                            pillar.Root.transform.localScale = new Vector3(1f, max, 1f);
-                        }
-                        else
-                        {
-                            pillar.Root.transform.localScale = new Vector3(1f, num4, 1f);
-                            pillar.Length = num4;
-                        }
-
-                        pillar.Root.SetActive(true);
-                        _platformLegsExtended = true;
-                    }
-                }
+                var pillar6 = GameObjectHelpers.FindGameObject(gameObject, "DrillTunnelBase")?.AddComponent<Pillar>();
+                pillar6?.Instantiate(this, true);
+                _allPlateFormsFound = true;
             }
         }
 

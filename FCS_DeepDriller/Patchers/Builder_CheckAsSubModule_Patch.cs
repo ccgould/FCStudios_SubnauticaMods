@@ -1,4 +1,5 @@
 ﻿using FCS_DeepDriller.Mono.MK2;
+using FCSCommon.Utilities;
 using HarmonyLib;
 using UnityEngine;
 
@@ -10,8 +11,10 @@ namespace FCS_DeepDriller.Patchers
         static bool Prefix(ref bool __result)
         {
             if (!Builder.prefab.GetComponent<FCSDeepDrillerController>())
+            {
                 return true;
-
+            }
+            
             __result = false;
 
             if (Builder.placePosition.y > 0 && !Player.main.IsUnderwater())
