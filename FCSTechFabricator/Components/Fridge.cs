@@ -257,6 +257,11 @@ namespace FCSTechFabricator.Components
             return flag;
         }
 
+        public bool IsAllowedToRemoveItems()
+        {
+            return true;
+        }
+
         public Pickupable RemoveItemFromContainer(TechType techType, int amount)
         { 
             EatableEntities match = FindMatch(techType, EatableType.Any);

@@ -5,6 +5,7 @@ using FCSPowerStorage.Models;
 using FCSPowerStorage.Mono;
 using System.Collections;
 using System.Collections.Generic;
+using FCSTechFabricator.Enums;
 using UnityEngine;
 
 namespace FCSPowerStorage.Managers

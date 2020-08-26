@@ -29,6 +29,7 @@ namespace FCS_HydroponicHarvesters.Buildables
         private const string DNADropContainerTitleKey = "HH_DNADropContainerTitle";
         private const string HasDNAItemsMessageKey = "HH_HasDNAItemsMessage";
         private const string IncorrectEnvironmentKey = "HH_IncorrectEnvironment";
+        private const string PowerUnitPerSecondKey = "HH_PowerUnitPerSecond";
 
         internal string BuildableName { get; set; }
 
@@ -47,7 +48,7 @@ namespace FCS_HydroponicHarvesters.Buildables
             LanguageHandler.SetLanguageLine(OffKey, "OFF");
             LanguageHandler.SetLanguageLine(TakeKey, "Take");
             LanguageHandler.SetLanguageLine(DNaSampleKey, "DNA Sample");
-            LanguageHandler.SetLanguageLine(CannotDeleteDNAItemKey, "Cannot delete DNA {0} because there are items still in the harvestor.");
+            LanguageHandler.SetLanguageLine(CannotDeleteDNAItemKey, "Cannot delete DNA {0} because there are items still in the harvester.");
             LanguageHandler.SetLanguageLine(NotDirtyKey, "Cannot clean! This harvester isn't dirty enough.");
             LanguageHandler.SetLanguageLine(HMSTimeKey, "Time Left Until Dirty: {0}");
             LanguageHandler.SetLanguageLine(AmountOfItemsKey, "{0} Items");
@@ -59,11 +60,12 @@ namespace FCS_HydroponicHarvesters.Buildables
             LanguageHandler.SetLanguageLine(DumpBTNMessageKey, "Add DNA Sample");
             LanguageHandler.SetLanguageLine(ColorPickerBTNMessageKey, "Change Device Color");
             LanguageHandler.SetLanguageLine(PowerLevelBTNMessageKey, "Change Power Level");
-            LanguageHandler.SetLanguageLine(ModeBTNMessageKey, "Switch Unit Harvestor Bed Mode (Water/Land).");
+            LanguageHandler.SetLanguageLine(ModeBTNMessageKey, "Switch Unit Harvester Bed Mode (Water/Land).");
             LanguageHandler.SetLanguageLine(StorageFullKey, "Cannot add anymore DNA samples. Remove one to add.");
             LanguageHandler.SetLanguageLine(FloraKleenDropContainerTitleKey, "FloraKleen Refill.");
             LanguageHandler.SetLanguageLine(DNADropContainerTitleKey, "DNA Sample receptacle");
             LanguageHandler.SetLanguageLine(IncorrectEnvironmentKey, "Incorrect environment please switch the grow bed mod to another.");
+            LanguageHandler.SetLanguageLine(PowerUnitPerSecondKey, "Power Per Second.");
         }
 
         internal static string Max()
@@ -198,6 +200,11 @@ namespace FCS_HydroponicHarvesters.Buildables
         public static string IncorrectEnvironment()
         {
             return Language.main.Get(IncorrectEnvironmentKey);
+        }
+
+        public static string PowerUnitPerSecond()
+        {
+            return Language.main.Get(PowerUnitPerSecondKey);
         }
     }
 }

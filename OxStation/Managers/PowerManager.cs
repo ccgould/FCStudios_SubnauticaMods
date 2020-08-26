@@ -2,6 +2,7 @@
 using System;
 using FCSCommon.Enums;
 using FCSCommon.Utilities;
+using FCSTechFabricator.Enums;
 using UnityEngine;
 
 namespace MAC.OxStation.Managers

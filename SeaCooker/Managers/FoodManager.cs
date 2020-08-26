@@ -8,6 +8,7 @@ using System.Collections;
 using System.Collections.Generic;
 using AE.SeaCooker.Buildable;
 using FCSCommon.Enums;
+using FCSTechFabricator.Enums;
 using UnityEngine;
 
 namespace AE.SeaCooker.Managers

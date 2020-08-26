@@ -150,7 +150,7 @@ namespace ARS_SeaBreezeFCS32.Mono
             if (FCSConnectableDevice == null)
             {
                 FCSConnectableDevice = gameObject.AddComponent<FCSConnectableDevice>();
-                FCSConnectableDevice.Initialize(this,FridgeComponent);
+                FCSConnectableDevice.Initialize(this,FridgeComponent,PowerManager);
             }
 
             IsInitialized = true;
@@ -192,7 +192,7 @@ namespace ARS_SeaBreezeFCS32.Mono
 
         internal void ToggleBreaker()
         {
-            PowerManager.TogglePower();
+            PowerManager.TogglePowerState();
         }
 
         private void OnContainerUpdate(int arg1, int arg2)

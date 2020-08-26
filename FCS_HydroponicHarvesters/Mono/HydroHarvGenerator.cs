@@ -11,7 +11,6 @@ namespace FCS_HydroponicHarvesters.Mono
         internal const float StartUpComplete = 4f;
         private readonly IList<float> _progress = new List<float>(new[] { -1f, -1f, -1f });
         public bool NotAllowToGenerate => PauseUpdates || !_mono.IsConstructed || _mono.CurrentSpeedMode == SpeedModes.Off;
-        public float EnergyCost => QPatch.Configuration.Config.EnergyCost;
 
         public bool PauseUpdates { get; set; }
 
@@ -65,7 +64,7 @@ namespace FCS_HydroponicHarvesters.Mono
                 // Is currently cooling down
                 this.CoolDownProgress = Mathf.Min(CooldownComplete, this.CoolDownProgress + DayNightCycle.main.deltaTime);
             }
-            else if (this.GenerationProgress >= EnergyCost)
+            else if (this.GenerationProgress >= _mono.EnergyCost)
             {
                 QuickLogger.Debug("[Hydroponic Harvester] Cooldown", true);
 
@@ -77,7 +76,7 @@ namespace FCS_HydroponicHarvesters.Mono
                 _mono.PowerManager.ConsumePower();
 
                 // Is currently generating clone
-                this.GenerationProgress = Mathf.Min(EnergyCost, this.GenerationProgress + _mono.PowerManager.GetEnergyToConsume());
+                this.GenerationProgress = Mathf.Min(_mono.EnergyCost, this.GenerationProgress + _mono.PowerManager.GetEnergyToConsume());
             }
             else if (this.StartUpProgress >= StartUpComplete)
             {

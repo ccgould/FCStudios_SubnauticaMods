@@ -357,7 +357,6 @@ namespace FCS_HydroponicHarvesters.Configuration
 
     internal class Config
     {
-        [JsonProperty] internal  float EnergyCost = 1500f;
         [JsonProperty] internal int LargeStorageLimit { get; set; } = 100;
         [JsonProperty] internal int MediumStorageLimit { get; set; } = 50;
         [JsonProperty] internal int SmallStorageLimit { get; set; } = 25;

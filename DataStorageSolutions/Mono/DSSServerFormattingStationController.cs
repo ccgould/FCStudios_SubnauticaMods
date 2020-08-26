@@ -233,6 +233,11 @@ namespace DataStorageSolutions.Mono
             return pickupable.GetTechType() == QPatch.Server.TechType;
         }
 
+        public bool IsAllowedToRemoveItems()
+        {
+            return true;
+        }
+
         public Pickupable RemoveItemFromContainer(TechType techType, int amount)
         {
             throw new NotImplementedException();

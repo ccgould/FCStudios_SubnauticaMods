@@ -12,6 +12,7 @@ namespace FCSTechFabricator.Interfaces
        bool CanBeStored(int amount,TechType techType);
        bool AddItemToContainer(InventoryItem item);
        bool IsAllowedToAdd(Pickupable pickupable, bool verbose);
+       bool IsAllowedToRemoveItems();
        Pickupable RemoveItemFromContainer(TechType techType, int amount);
        Dictionary<TechType, int> GetItemsWithin();
        Action<int, int> OnContainerUpdate { get; set; }

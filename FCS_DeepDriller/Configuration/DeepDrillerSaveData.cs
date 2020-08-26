@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using FCS_DeepDriller.Managers;
 using FCS_DeepDriller.Structs;
 using FCSCommon.Objects;
+using FCSTechFabricator.Enums;
 using FCSTechFabricator.Objects;
 
 namespace FCS_DeepDriller.Configuration

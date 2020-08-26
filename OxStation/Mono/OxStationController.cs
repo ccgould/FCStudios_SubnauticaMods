@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using FCSCommon.Enums;
 using FCSCommon.Utilities;
+using FCSTechFabricator.Enums;
 using MAC.OxStation.Buildables;
 using UnityEngine;
 

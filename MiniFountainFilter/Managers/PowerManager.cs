@@ -1,7 +1,7 @@
 ﻿using AE.MiniFountainFilter.Mono;
 using FCSCommon.Utilities;
 using System;
-using FCSCommon.Enums;
+using FCSTechFabricator.Enums;
 using UnityEngine;
 
 namespace AE.MiniFountainFilter.Managers

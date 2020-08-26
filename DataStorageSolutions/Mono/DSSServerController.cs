@@ -190,6 +190,11 @@ namespace DataStorageSolutions.Mono
             return true;
         }
 
+        public bool IsAllowedToRemoveItems()
+        {
+            return true;
+        }
+
         public Pickupable RemoveItemFromContainer(TechType techType, int amount)
         {
             throw new NotImplementedException();

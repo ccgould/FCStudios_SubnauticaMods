@@ -5,6 +5,7 @@ using FCS_DeepDriller.Configuration;
 using FCS_DeepDriller.Helpers;
 using FCSCommon.Enums;
 using FCSCommon.Utilities;
+using FCSTechFabricator.Enums;
 using FCSTechFabricator.Interfaces;
 using UnityEngine;
 

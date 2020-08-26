@@ -137,6 +137,7 @@ namespace FCSCommon.Helpers
                 {
                     if (material.name.StartsWith(materialName, StringComparison.OrdinalIgnoreCase))
                     {
+                        QuickLogger.Debug($"Found material {materialName} changing color to {color2}",true);
                         material.SetColor("_Color", color);
                         material.SetColor("_Color2", color2);
                         material.SetColor("_Color3", color3);

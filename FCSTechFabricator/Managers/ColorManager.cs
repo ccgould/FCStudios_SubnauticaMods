@@ -4,6 +4,7 @@ using System.Linq;
 using FCSCommon.Components;
 using FCSCommon.Enums;
 using FCSCommon.Helpers;
+using FCSCommon.Utilities;
 using FCSTechFabricator.Configuration;
 using FCSTechFabricator.Extensions;
 using FCSTechFabricator.Objects;
@@ -133,7 +134,7 @@ namespace FCSTechFabricator.Managers
             ColorList.AddColor(GetColor());
         }
 
-        public void SetColorFromSave(Color color)
+        public void SetColorFromSave(Color color) 
         {
             ChangeColor(color);
             SelectSavedColor(color);
@@ -148,7 +149,11 @@ namespace FCSTechFabricator.Managers
         public Color GetColor()
         {
             var color = MaterialHelpers.GetBodyColor(_gameObject, _bodyMaterial);
-            if (color == null) return _defaultColor;
+            if (color == null)
+            {
+                QuickLogger.Error("Color returned null on Get Color setting default color");
+                return _defaultColor;
+            }
             return (Color)color;
         }
 

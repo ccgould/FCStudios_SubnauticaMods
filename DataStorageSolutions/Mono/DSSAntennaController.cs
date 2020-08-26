@@ -8,6 +8,7 @@ using DataStorageSolutions.Model;
 using FCSCommon.Enums;
 using FCSCommon.Utilities;
 using FCSTechFabricator.Components;
+using FCSTechFabricator.Enums;
 using FCSTechFabricator.Extensions;
 using FCSTechFabricator.Managers;
 using UnityEngine;

@@ -343,7 +343,7 @@ namespace FCS_HydroponicHarvesters.Mono
         internal void UpdatePowerUsagePerSecond()
         {
             if (_powerUsage == null) return;
-            _powerUsage.text = $"<size=100><color=Green>{Mathf.RoundToInt(_mono.PowerManager.EnergyConsumptionPerSecond)}</color>{Environment.NewLine}Unit Per Second</size>";
+            _powerUsage.text = $"<size=100><color=Green>{_mono.PowerManager.GetEnergyPerSecond()}</color>{Environment.NewLine}{HydroponicHarvestersBuildable.PowerUnitPerSecond()}</size>";
         }
 
         internal void UpdateDna()

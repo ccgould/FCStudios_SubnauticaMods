@@ -2,6 +2,7 @@
 using System.Collections;
 using FCSCommon.Enums;
 using FCSCommon.Utilities;
+using FCSTechFabricator.Enums;
 using UnityEngine;
 using Random = UnityEngine.Random;
 

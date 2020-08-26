@@ -3,6 +3,7 @@ using System.Linq;
 using FCSCommon.Enums;
 using FCSCommon.Objects;
 using FCSCommon.Utilities;
+using FCSTechFabricator.Enums;
 using UnityEngine;
 
 namespace FCS_DeepDriller.Mono.MK2

@@ -3,6 +3,7 @@ using FCSPowerStorage.Models;
 using System;
 using System.Collections.Generic;
 using FCSCommon.Enums;
+using FCSTechFabricator.Enums;
 using FCSTechFabricator.Objects;
 
 namespace FCSPowerStorage.Configuration

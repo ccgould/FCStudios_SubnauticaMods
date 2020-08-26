@@ -3,6 +3,7 @@ using FCSCommon.Utilities;
 using FCSCommon.Enums;
 using System;
 using System.Collections;
+using FCSTechFabricator.Enums;
 using UnityEngine;
 
 namespace FCSCommon.Controllers

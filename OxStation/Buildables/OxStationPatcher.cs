@@ -48,6 +48,7 @@ namespace MAC.OxStation.Buildables
                 PrefabIdentifier prefabID = prefab.EnsureComponent<PrefabIdentifier>();
                 prefabID.ClassId = this.ClassID;
 
+
                 var pFX = prefab.AddComponent<PowerFX>();
                 
                 var attachPoint = prefab.FindChild("model").FindChild("static_objects").FindChild("CylinderNull")?.gameObject;

@@ -5,6 +5,7 @@ using System.Reflection;
 using FCSCommon.Enums;
 using FCSCommon.Extensions;
 using FCSCommon.Utilities;
+using FCSTechFabricator.Enums;
 using GasPodCollector.Buildables;
 using GasPodCollector.Models;
 using UnityEngine;

@@ -2,6 +2,7 @@
 using AE.SeaCooker.Mono;
 using FCSCommon.Enums;
 using FCSCommon.Utilities;
+using FCSTechFabricator.Enums;
 
 namespace AE.SeaCooker.Managers
 {

@@ -1,9 +1,9 @@
-﻿namespace FCSCommon.Enums
+﻿namespace FCSTechFabricator.Enums
 {
     /// <summary>
     /// The power states for the FCS Power Storage
     /// </summary>
-    internal enum FCSPowerStates
+    public enum FCSPowerStates
     {
         None,
         Powered,

@@ -14,6 +14,7 @@ using FCSCommon.Extensions;
 using FCSCommon.Interfaces;
 using FCSCommon.Utilities;
 using FCSTechFabricator.Components;
+using FCSTechFabricator.Enums;
 using FCSTechFabricator.Extensions;
 using FCSTechFabricator.Managers;
 using UnityEngine;

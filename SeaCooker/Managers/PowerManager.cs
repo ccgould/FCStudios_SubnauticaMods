@@ -1,7 +1,7 @@
 ﻿using AE.SeaCooker.Mono;
 using FCSCommon.Utilities;
 using System;
-using FCSCommon.Enums;
+using FCSTechFabricator.Enums;
 using UnityEngine;
 
 namespace AE.SeaCooker.Managers

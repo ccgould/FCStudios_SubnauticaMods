@@ -2,11 +2,13 @@
 using System;
 using System.Collections;
 using ARS_SeaBreezeFCS32.Model;
+using FCSTechFabricator.Enums;
+using FCSTechFabricator.Interfaces;
 using UnityEngine;
 
 namespace ARS_SeaBreezeFCS32.Mono
 {
-    internal class ARSolutionsSeaBreezePowerManager : MonoBehaviour
+    internal class ARSolutionsSeaBreezePowerManager : MonoBehaviour, IFCSPowerManager
     {
         private bool _hasBreakerTripped;
         public Action OnBreakerTripped { get; set; }
@@ -148,20 +150,6 @@ namespace ARS_SeaBreezeFCS32.Mono
             _hasBreakerTripped = value;
         }
 
-        internal void TogglePower()
-        {
-            if (GetHasBreakerTripped())
-            {
-                TriggerPowerOn();
-            }
-            else if (GetHasBreakerTripped() == false)
-            {
-                TriggerPowerOff();
-            }
-
-            QuickLogger.Debug($"HasBreakerTripped: {_hasBreakerTripped}", true);
-        }
-
         internal bool GetIsPowerAvailable()
         {
             return _connectedRelay != null && IsPowerAvailable;
@@ -184,5 +172,69 @@ namespace ARS_SeaBreezeFCS32.Mono
         {
             return _powercellData; 
         }
+
+        #region IFCSPowerManager
+
+        public float GetPowerUsagePerSecond()
+        {
+            return EnergyConsumptionPerSecond;
+        }
+
+        public float GetDevicePowerCharge()
+        {
+            return _powercellData.GetCharge();
+        }
+
+        public float GetDevicePowerCapacity()
+        {
+            return _powercellData.GetCapacity();
+        }
+
+        public FCSPowerStates GetPowerState()
+        {
+            return _hasBreakerTripped ? FCSPowerStates.Tripped : FCSPowerStates.Powered;
+        }
+
+        public void TogglePowerState()
+        {
+            if (GetHasBreakerTripped())
+            {
+                TriggerPowerOn();
+            }
+            else if (GetHasBreakerTripped() == false)
+            {
+                TriggerPowerOff();
+            }
+
+            QuickLogger.Debug($"HasBreakerTripped: {_hasBreakerTripped}", true);
+        }
+
+        public void SetPowerState(FCSPowerStates state)
+        {
+            switch (state)
+            {
+                case FCSPowerStates.Powered:
+                    TriggerPowerOn();
+                    break;
+                case FCSPowerStates.Tripped:
+                    TriggerPowerOff();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(state), state, null);
+            }
+        }
+
+        public bool IsDevicePowerFull()
+        {
+            return _powercellData.IsFull();
+        }
+
+        public bool ModifyPower(float amount, out float consumed)
+        {
+            consumed = 0f;
+            return false;
+        }
+
+        #endregion
     }
 }

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using FCSCommon.Utilities;
+using FCSTechFabricator.Enums;
 using SMLHelper.V2.Crafting;
 using UnityEngine;
 
@@ -16,13 +17,22 @@ namespace FCSTechFabricator.Components
         private FCSController _mono;
         private IFCSStorage _storage;
         private TechType _techtype;
+        private IFCSPowerManager _powerManager;
 
+        [Obsolete("Please use Initialize(FCSController mono, IFCSStorage storage, IFCSPowerManager powerManager) to allow power usage data to be accessible")]
         public void Initialize(FCSController mono, IFCSStorage storage)
         {
             _mono = mono;
             _storage = storage;
         }
-
+        
+        public void Initialize(FCSController mono, IFCSStorage storage, IFCSPowerManager powerManager)
+        {
+            _mono = mono;
+            _storage = storage;
+            _powerManager = powerManager;
+        }
+        
         public TechType GetTechType()
         {
             if (_techtype == TechType.None)
@@ -42,6 +52,48 @@ namespace FCSTechFabricator.Components
             return _prefabId?.Id;
         }
         
+        public float GetDevicePowerCharge()
+        {
+            return _powerManager?.GetDevicePowerCharge() ?? 0f;
+        }
+
+        public float GetDevicePowerCapacity()
+        {
+            return _powerManager?.GetDevicePowerCapacity() ?? 0f;
+        }
+
+        public void ToggleDevicePowerState()
+        {
+            _powerManager?.TogglePowerState();
+        }
+
+        public void SetDevicePowerState(FCSPowerStates state)
+        {
+            _powerManager?.SetPowerState(state);
+        }
+
+        public IFCSPowerManager GetPowerManager()
+        {
+            return _powerManager;
+        }
+
+        public float GetPowerUsagePerSecond()
+        {
+            return _powerManager?.GetPowerUsagePerSecond() ?? 0f;
+        }
+
+        public bool IsDevicePowerFull()
+        {
+            return _powerManager?.IsDevicePowerFull() ?? true;
+        }
+
+        public bool ModifyPower(float amount, out float consumed)
+        {
+            var result = _powerManager.ModifyPower(amount, out var consumedOut);
+            consumed = consumedOut;
+            return result;
+        }
+
         public bool CanBeStored(int amount, TechType techType = TechType.None)
         {
             return _storage.CanBeStored(amount,techType);

@@ -135,7 +135,9 @@
     <Compile Include="Craftables\FCSModule.cs" />
     <Compile Include="Enums\EatableType.cs" />
     <Compile Include="Enums\FCSEnvironment.cs" />
+    <Compile Include="Enums\FCSPowerStates.cs" />
     <Compile Include="Enums\FoodPileType.cs" />
+    <Compile Include="Interfaces\IFCSPowerManager.cs" />
     <Compile Include="Managers\EggHandler.cs" />
     <Compile Include="Objects\FCSFilteredStorage.cs" />
     <Compile Include="Enums\ModModes.cs" />

@@ -10,6 +10,7 @@ namespace FCS_HydroponicHarvesters.Mono
         private HydroHarvController _mono;
         private PowerRelay _connectedRelay;
         private float _energyToConsume;
+
         private float AvailablePower => ConnectedRelay.GetPower();
         
         private PowerRelay ConnectedRelay
@@ -74,7 +75,7 @@ namespace FCS_HydroponicHarvesters.Mono
             if (currentMode != SpeedModes.Off)
             {
                 CreationTime = Convert.ToSingle(currentMode);
-                EnergyConsumptionPerSecond = QPatch.Configuration.Config.EnergyCost / CreationTime;
+                EnergyConsumptionPerSecond = _mono.EnergyCost / CreationTime;
             }
             else
             {
@@ -83,6 +84,11 @@ namespace FCS_HydroponicHarvesters.Mono
         }
 
         internal float EnergyConsumptionPerSecond { get; private set; }
+
+        internal float GetEnergyPerSecond()
+        {
+            return Mathf.Round(EnergyConsumptionPerSecond);
+        }
 
         internal float CreationTime { get; set; }
     }

@@ -12,6 +12,7 @@ using FCSCommon.Enums;
 using FCSCommon.Extensions;
 using FCSCommon.Utilities;
 using FCSTechFabricator.Components;
+using FCSTechFabricator.Enums;
 using FCSTechFabricator.Interfaces;
 using UnityEngine;
 
@@ -385,6 +386,7 @@ namespace DataStorageSolutions.Model
 
                 foreach (var fcsConnectable in FCSConnectables)
                 {
+                    if(!fcsConnectable.Value.GetStorage().IsAllowedToRemoveItems()) continue;
                     var items = fcsConnectable.Value.GetItemsWithin();
                     foreach (KeyValuePair<TechType, int> item in items)
                     {
@@ -433,7 +435,9 @@ namespace DataStorageSolutions.Model
                 Vector2int itemSize = CraftData.GetItemSize(techType);
                 if (fcsConnectable.Value.ContainsItem(techType) && Inventory.main.HasRoomFor(itemSize.x,itemSize.y))
                 {
-                    DSSHelpers.GivePlayerItem(fcsConnectable.Value.RemoveItemFromContainer(techType, 1));
+                    var item = fcsConnectable.Value.RemoveItemFromContainer(techType, 1);
+                    if(item == null) continue;
+                    DSSHelpers.GivePlayerItem(item);
                     break;
                 }
             }
@@ -620,6 +624,11 @@ namespace DataStorageSolutions.Model
                 return false;
             }
 
+            return true;
+        }
+
+        public bool IsAllowedToRemoveItems()
+        {
             return true;
         }
 

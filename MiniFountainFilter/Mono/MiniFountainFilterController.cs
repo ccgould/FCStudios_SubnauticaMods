@@ -5,6 +5,7 @@ using FCSCommon.Utilities;
 using System;
 using System.Collections;
 using FCSCommon.Enums;
+using FCSTechFabricator.Enums;
 using FCSTechFabricator.Extensions;
 using FCSTechFabricator.Managers;
 using UnityEngine;

@@ -48,7 +48,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Objects\CustomLiveMixinData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\SerializableColor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\TargetRotation.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Enums\FCSPowerStates.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enums\PowerToggleStates.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Objects\UpgradeFunction.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utilities\ModSaver.cs" />

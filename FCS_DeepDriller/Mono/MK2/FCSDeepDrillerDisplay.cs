@@ -10,6 +10,7 @@ using FCSCommon.Enums;
 using FCSCommon.Helpers;
 using FCSCommon.Objects;
 using FCSCommon.Utilities;
+using FCSTechFabricator.Enums;
 using FCSTechFabricator.Managers;
 using UnityEngine;
 using UnityEngine.UI;
@@ -177,7 +178,8 @@ namespace FCS_DeepDriller.Mono.MK2
             switch (btnName)
             {
                 case "PowerBTN":
-                    if (_mono.PowerManager.GetPowerState() != FCSPowerStates.Powered && _mono.PowerManager.IsPowerAvailable())
+
+                    if (_mono.PowerManager.GetPowerState() != FCSPowerStates.Powered)
                     {
                         PowerOnDisplay();
                         _mono.PowerManager.SetPowerState(FCSPowerStates.Powered);
@@ -394,6 +396,7 @@ namespace FCS_DeepDriller.Mono.MK2
 
                 _powerUsage = GameObjectHelpers.FindGameObject(homePage, "PowerUsageLBL")?.GetComponent<Text>();
                 #endregion
+
 
                 //================= Power Off Page ================//
 

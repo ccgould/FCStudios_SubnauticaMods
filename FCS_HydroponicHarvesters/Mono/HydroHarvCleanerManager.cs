@@ -97,6 +97,11 @@ namespace FCS_HydroponicHarvesters.Mono
             return false;
         }
 
+        public bool IsAllowedToRemoveItems()
+        {
+            return false;
+        }
+
         public Pickupable RemoveItemFromContainer(TechType techType, int amount)
         {
             throw new NotImplementedException();

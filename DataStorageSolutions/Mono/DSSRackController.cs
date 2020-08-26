@@ -15,6 +15,7 @@ using FCSCommon.Helpers;
 using FCSCommon.Interfaces;
 using FCSCommon.Objects;
 using FCSTechFabricator.Components;
+using FCSTechFabricator.Enums;
 using FCSTechFabricator.Extensions;
 using FCSTechFabricator.Interfaces;
 using FCSTechFabricator.Managers;
@@ -624,6 +625,11 @@ namespace DataStorageSolutions.Mono
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
         {
             return CanBeStored(DumpContainer.GetCount(), pickupable.GetTechType());
+        }
+
+        public bool IsAllowedToRemoveItems()
+        {
+            return true;
         }
 
         public Pickupable RemoveItemFromContainer(TechType techType, int amount)

@@ -60,7 +60,7 @@ namespace FCS_HydroponicHarvesters.Mono
         internal HydroHarvPowerManager PowerManager { get; private set; }
         internal HydroHarvCleanerManager HydroHarvCleanerManager { get; private set; }
         public bool IsOperational => GetIsOperational();
-
+        public float EnergyCost => 1500f;
         public FCSConnectableDevice FCSConnectableDevice { get; private set; }
 
         private bool GetIsOperational()
