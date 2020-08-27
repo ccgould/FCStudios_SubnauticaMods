@@ -1,4 +1,5 @@
-﻿using DataStorageSolutions.Model;
+﻿using System;
+using DataStorageSolutions.Model;
 using FCSCommon.Utilities;
 using HarmonyLib;
 
@@ -9,16 +10,28 @@ namespace DataStorageSolutions.Patches
     internal class Player_Update
     {
         private static float _timeLeft = 1f;
+        private static bool _error;
 
         [HarmonyPostfix]
         public static void Postfix(ref Player __instance)
         {
-            _timeLeft -= DayNightCycle.main.deltaTime;
-            if (_timeLeft < 0)
+            try
             {
-                BaseManager.RemoveDestroyedBases();
-                BaseManager.OnPlayerTick?.Invoke();
-                _timeLeft = 1f;
+                _timeLeft -= DayNightCycle.main.deltaTime;
+                if (_timeLeft < 0)
+                {
+                    BaseManager.RemoveDestroyedBases();
+                    BaseManager.OnPlayerTick?.Invoke();
+                    _timeLeft = 1f;
+                }
+            }
+            catch (Exception e)
+            {
+                if (!_error)
+                {
+                    QuickLogger.Error($"Message: {e.Message} | StackTrace: {e.StackTrace}");
+                    _error = true;
+                }
             }
         }
     }

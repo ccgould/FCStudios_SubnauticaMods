@@ -1,0 +1,118 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{088706F7-949A-426F-A265-6CD0454B61A6}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CyclopsUpgradeConsole</RootNamespace>
+    <AssemblyName>CyclopsUpgradeConsole</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <Game>$(Configuration.split(_)[0])</Game>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Subnautica_Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;SUBNAUTICA</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Subnautica_Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <DefineConstants>TRACE;SUBNAUTICA</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'BelowZero_Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;BELOWZERO</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'BelowZero_Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <DefineConstants>TRACE;BELOWZERO</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>..\Dependancies\Subnautica\Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Assembly-CSharp-firstpass">
+      <HintPath>..\Dependancies\Subnautica\Assembly-CSharp-firstpass.dll</HintPath>
+    </Reference>
+    <Reference Include="MoreCyclopsUpgrades">
+      <HintPath>F:\Program Files\Epic Games\Subnautica\QMods\MoreCyclopsUpgrades\MoreCyclopsUpgrades.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependancies\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="QModInstaller">
+      <HintPath>..\Dependancies\QModInstaller.dll</HintPath>
+    </Reference>
+    <Reference Include="SMLHelper">
+      <HintPath>..\Dependancies\Subnautica\SMLHelper.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="UnityEngine">
+      <HintPath>..\Dependancies\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AnimationModule">
+      <HintPath>..\Dependancies\UnityEngine.AnimationModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AssetBundleModule">
+      <HintPath>..\Dependancies\UnityEngine.AssetBundleModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>..\Dependancies\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>..\Dependancies\UnityEngine.UI.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Buildables\CUCAuxPatcher.cs" />
+    <Compile Include="Buildables\CUCModelPrefab.cs" />
+    <Compile Include="Buildables\CUCBuildable.cs" />
+    <Compile Include="Configuration\Mod.cs" />
+    <Compile Include="Mono\CUCController.cs" />
+    <Compile Include="Mono\CUCDisplayManager.cs" />
+    <Compile Include="QPatch.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Struct\UpgradeTrans.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FCSTechFabricator\FCSTechFabricator.csproj">
+      <Project>{5EF4ADB8-3AE7-41EC-83E1-1DAF04999F0E}</Project>
+      <Name>FCSTechFabricator</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\FCSCommon\GamePaths.targets" />
+  <PropertyGroup Condition="$(Game) == 'Subnautica'">
+    <PostBuildEvent>xcopy "$(ProjectDir)bin\$(Configuration)\CyclopsUpgradeConsole.dll" "$(SubnauticaDir)\QMods\FCS_CyclopsUpgradeConsole\" /Y /I</PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup Condition="$(Game) == 'BelowZero'">
+    <PostBuildEvent>xcopy "$(ProjectDir)bin\$(Configuration)\CyclopsUpgradeConsole.dll" "$(BelowZeroDir)\QMods\FCS_CyclopsUpgradeConsole\" /Y /I</PostBuildEvent>
+  </PropertyGroup>
+</Project>

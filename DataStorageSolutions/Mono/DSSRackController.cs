@@ -659,11 +659,12 @@ namespace DataStorageSolutions.Mono
             return result;
         }
 
-        internal void AddItemToAServer(InventoryItem item)
+        internal void AddItemToAServer(InventoryItem item,int slot = -1)
         {
             QuickLogger.Debug($"Adding Item to Server {item.item.GetTechType()}");
             var techType = item.item.GetTechType();
-            var server = GetUsableServer(techType);
+            var server = slot == -1 ? GetUsableServer(techType) : GetSlotByID(slot);
+
 
             if (server == null)
             {
@@ -718,8 +719,9 @@ namespace DataStorageSolutions.Mono
             return _servers.Any(rackSlot => rackSlot != null && rackSlot.HasFilters);
         }
         
-        public bool CanHoldItem(int amount,TechType itemTechType,int filterAmount = 0,bool checkFilters = false)
+        internal bool CanHoldItem(int amount,TechType itemTechType, out int slotID, int filterAmount = 0, bool checkFilters = false)
         {
+            slotID = -1;
             var storage = GetTotalStorage();
 
             QuickLogger.Debug($"Server Rack: {_prefabID} Total: {storage.y} || Trying: { storage.x + amount}",true);
@@ -735,7 +737,13 @@ namespace DataStorageSolutions.Mono
                 {
                     QuickLogger.Debug($"Is TechType Allowed {rackSlot.IsAllowedToAdd(itemTechType)}",true);
                     if (rackSlot == null || !rackSlot.IsOccupied || rackSlot.IsFull() || !rackSlot.HasFilters || !rackSlot.CanHoldAmount(filterAmount + 1)) continue;
-                    if (rackSlot.IsAllowedToAdd(itemTechType)) return true;
+                    QuickLogger.Debug("Checking Filters",true);
+                    if (rackSlot.IsAllowedToAdd(itemTechType))
+                    {
+                        QuickLogger.Debug($"Found valid Filtered Server {rackSlot.Id} || {GetPrefabIDString()}");
+                        slotID = rackSlot.Id;
+                        return true;
+                    }
                 }
             }
             else
@@ -744,7 +752,11 @@ namespace DataStorageSolutions.Mono
                 {
                     QuickLogger.Debug($"Is TechType Allowed {rackSlot.IsAllowedToAdd(itemTechType)}", true);
                     if (rackSlot == null || !rackSlot.IsOccupied || rackSlot.IsFull() || rackSlot.HasFilters) continue;
-                    if (rackSlot.IsAllowedToAdd(itemTechType)) return true;
+                    if (rackSlot.IsAllowedToAdd(itemTechType))
+                    {
+                        slotID = rackSlot.Id;
+                        return true;
+                    }
                 }
             }
 

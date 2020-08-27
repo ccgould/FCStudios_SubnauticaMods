@@ -210,8 +210,8 @@ namespace DataStorageSolutions.Mono
             if (FCSFilteredStorage == null)
             {
                 FCSFilteredStorage = gameObject.GetComponent<FCSFilteredStorage>();
-                FCSFilteredStorage.Initialize(_data?.ServerFilters,UpdateScreen);
-                FCSFilteredStorage.Items = _data?.Server;
+                FCSFilteredStorage.Initialize(_data?.ServerFilters ?? new List<Filter>(),UpdateScreen);
+                FCSFilteredStorage.Items = _data?.Server ?? new HashSet<ObjectData>();
                 FCSFilteredStorage.OnFiltersUpdate += OnFiltersUpdate;
                 FCSFilteredStorage.OnItemsUpdate += OnItemsUpdate;
             }

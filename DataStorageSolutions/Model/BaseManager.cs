@@ -462,21 +462,25 @@ namespace DataStorageSolutions.Model
         /// <returns></returns>
         public bool CanBeStored(int amount, TechType techType)
         {
+
             QuickLogger.Debug($"In Can Be Stored",true);
-            return FindValidRack(techType,amount) != null;
+            return FindValidRack(techType,amount,out var slotId) != null; 
+
         }
 
-        private DSSRackController FindValidRack(TechType itemTechType,int amount)
+        private DSSRackController FindValidRack(TechType itemTechType,int amount, out int slot)
         {
+            slot = -1;
             QuickLogger.Debug($"In FindValidRack",true);
             //Check the filtered racks first
             foreach (DSSRackController baseUnit in BaseRacks)
             {
                 var d = DumpContainer.GetTechTypeCount(itemTechType);
                 QuickLogger.Debug(d.ToString(),true);
-                if (baseUnit.CanHoldItem(amount,itemTechType,d,true))
+                if (baseUnit.CanHoldItem(amount,itemTechType,out var slotId,d,true))
                 {
-                    QuickLogger.Debug($"Item: {itemTechType} is allowed in server rack {baseUnit.GetPrefabIDString()} is Filtered: {baseUnit.HasFilters()}", true);
+                    QuickLogger.Debug($"Item: {itemTechType} is allowed in server rack {baseUnit.GetPrefabIDString()} in slot {slotId} is Filtered: {baseUnit.HasFilters()}", true);
+                    slot = slotId;
                     return baseUnit;
                 }
             }
@@ -484,9 +488,10 @@ namespace DataStorageSolutions.Model
             //Check the filtered racks first then the unfiltered
             foreach (DSSRackController baseUnit in BaseRacks)
             {
-                if (baseUnit.CanHoldItem(amount,itemTechType))
+                if (baseUnit.CanHoldItem(amount,itemTechType,out var slotId))
                 {
-                    QuickLogger.Debug($"Item: {itemTechType} is allowed in server rack {baseUnit.GetPrefabIDString()} is Filtered: {baseUnit.HasFilters()}", true);
+                    QuickLogger.Debug($"Item: {itemTechType} is allowed in server rack {baseUnit.GetPrefabIDString()} in slot {slotId} is Filtered: {baseUnit.HasFilters()}", true);
+                    slot = slotId;
                     return baseUnit;
                 }
             }
@@ -543,9 +548,9 @@ namespace DataStorageSolutions.Model
                 bool successful = false;
                 if ((!food.decomposes || item.item.GetTechType() == TechType.CreepvinePiece) && CanBeStored(DumpContainer.GetCount() + 1, item.item.GetTechType()))
                 {
-                    var rackController = FindValidRack(item.item.GetTechType(), 1);
+                    var rackController = FindValidRack(item.item.GetTechType(), 1,out var slot);
                     if (rackController == null) return false;
-                    rackController.AddItemToAServer(item);
+                    rackController.AddItemToAServer(item, slot);
                     successful = true;
                 }
                 else
@@ -574,9 +579,9 @@ namespace DataStorageSolutions.Model
             }
             else
             {
-                var rackController = FindValidRack(item.item.GetTechType(),1);
+                var rackController = FindValidRack(item.item.GetTechType(),1, out var slot);
                 if (rackController == null) return false;
-                rackController.AddItemToAServer(item);
+                rackController.AddItemToAServer(item,slot);
             }
 
             return true;

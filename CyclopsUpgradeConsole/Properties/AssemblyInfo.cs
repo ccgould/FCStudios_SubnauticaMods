@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Data Storage Solutions")]
-[assembly: AssemblyDescription("A mod that allows you to digitally store items that you can access base to base")]
+[assembly: AssemblyTitle("CyclopsUpgradeConsole")]
+[assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Field Creators Studios")]
-[assembly: AssemblyProduct("Data Storage Solutions")]
-[assembly: AssemblyCopyright("Copyright ©  Field Creators Studios 2020")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("CyclopsUpgradeConsole")]
+[assembly: AssemblyCopyright("Copyright ©  2020")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("3f6924ba-1f59-4884-823e-cb993d32341c")]
+[assembly: Guid("088706f7-949a-426f-a265-6cd0454b61a6")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.1.4.0")]
-[assembly: AssemblyFileVersion("1.1.4.0")]
+[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyFileVersion("1.0.0.0")]
