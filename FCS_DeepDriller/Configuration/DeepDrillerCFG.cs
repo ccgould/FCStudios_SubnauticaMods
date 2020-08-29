@@ -10,8 +10,6 @@ namespace FCS_DeepDriller.Configuration
         #region Public declarations
 
         public int StorageSize { get; set; } = 100;
-        public int CrafterStorageSize { get; set; } = 100;
-
         public float PowerDraw { get; set; } = 0.7f;
         public float ChargePullAmount { get; set; } = 0.3f;
         public float SolarCapacity { get; set; } = 125;

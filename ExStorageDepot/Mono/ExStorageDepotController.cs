@@ -70,15 +70,14 @@ namespace ExStorageDepot.Mono
 
         public override bool CanDeconstruct(out string reason)
         {
-            reason = string.Empty;
-
-            if (Storage == null) return true;
-
-            if (Storage.HasItems())
+            if (Storage != null && Storage.HasItems())
             {
                 reason = "Please empty the Ex-Storage";
+                return false;
             }
-            return false;
+
+            reason = string.Empty;
+            return true;
         }
 
         public override void OnConstructedChanged(bool constructed)

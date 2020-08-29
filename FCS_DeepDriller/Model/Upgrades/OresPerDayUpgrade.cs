@@ -4,13 +4,24 @@ using FCS_DeepDriller.Mono.MK2;
 using FCSCommon.Enums;
 using FCSCommon.Objects;
 using FCSCommon.Utilities;
+using SMLHelper.V2.Handlers;
 
 
 namespace FCS_DeepDriller.Model.Upgrades
 {
     internal class OresPerDayUpgrade : UpgradeFunction
     {
-        public int OreCount { get; set; }
+        private int _oreCount;
+
+        public int OreCount
+        {
+            get => _oreCount;
+            set
+            {
+                _oreCount = value;
+                UpdateLabel();
+            }
+        }
 
         public override float PowerUsage => 1.0f;
         public override float Damage => 0.5f;
@@ -81,7 +92,8 @@ namespace FCS_DeepDriller.Model.Upgrades
 
         public override string Format()
         {
-            return $"{FriendlyName} | {OreCount}";
+            var isActive = IsEnabled ? Language.main.Get("BaseBioReactorActive") : Language.main.Get("BaseBioReactorInactive");
+            return $"{FriendlyName} | {OreCount} ({isActive})";
         }
     }
 }

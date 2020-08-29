@@ -143,11 +143,11 @@
     <Compile Include="Managers\LaserManager.cs" />
     <Compile Include="Model\Upgrades\MaxOreCountUpgrade.cs" />
     <Compile Include="Model\Upgrades\MinOreCountUpgrade.cs" />
-    <Compile Include="Managers\OreGenerator.cs" />
+    <Compile Include="Mono\MK2\FCSDeepDrillerOreGenerator.cs" />
     <Compile Include="Model\Upgrades\OresPerDayUpgrade.cs" />
     <Compile Include="Model\Upgrades\SilkTouchUpgrade.cs" />
     <Compile Include="Model\Upgrades\UpgradeClass.cs" />
-    <Compile Include="Managers\UpgradeManager.cs" />
+    <Compile Include="Mono\MK2\FCSDeepDrillerUpgradeManager.cs" />
     <Compile Include="Model\LaserScript.cs" />
     <Compile Include="Model\Pillar.cs" />
     <Compile Include="Model\State.cs" />
@@ -157,7 +157,7 @@
     <Compile Include="Mono\MK2\FCSDeepDrillerDisplay.cs" />
     <Compile Include="Mono\MK2\FCSDeepDrillerHealthHandler.cs" />
     <Compile Include="Mono\MK2\FCSDeepDrillerLavaPitHandler.cs" />
-    <Compile Include="Managers\FCSDeepDrillerOilHandler.cs" />
+    <Compile Include="Mono\MK2\FCSDeepDrillerOilHandler.cs" />
     <Compile Include="Mono\MK2\FCSDeepDrillerPowerHandler.cs" />
     <Compile Include="Mono\MK2\FCSDeepDrillerSolarController.cs" />
     <Compile Include="Mono\MK2\FCSDeepDrillerTransferManager.cs" />

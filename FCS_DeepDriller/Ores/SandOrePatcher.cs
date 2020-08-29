@@ -1,19 +1,32 @@
-﻿using SMLHelper.V2.Assets;
+﻿using FCS_DeepDriller.Buildable.MK2;
+using FCS_DeepDriller.Configuration;
+using SMLHelper.V2.Assets;
 using UnityEngine;
 
 namespace FCS_DeepDriller.Ores
 {
     internal class SandSpawnable : Spawnable
     {
-        public SandSpawnable() : base("Sand_DD", "Sand Bag", "Sand can be used to make glass.")
+        public SandSpawnable() : base(Mod.SandSpawnableClassID, "Sand", "Sand can be used to make glass.")
         {
         }
 
         public override GameObject GetGameObject()
         {
-            GameObject prefab = GameObject.Instantiate<GameObject>(GameObject.CreatePrimitive(PrimitiveType.Cube));
+            GameObject prefab = GameObject.Instantiate<GameObject>(FCSDeepDrillerBuildable.SandPrefab);
 
             prefab.name = this.PrefabFileName;
+
+            var shader = Shader.Find("MarmosetUBER");
+            Renderer[] renderers = prefab.GetComponentsInChildren<Renderer>(true);
+            for (var i = 0; i < renderers.Length; i++)
+            {
+                Renderer renderer = renderers[i];
+                foreach (Material material in renderer.materials)
+                {
+                    material.shader = shader;
+                }
+            }
 
             // We can pick this item
             var pickupable = prefab.AddComponent<Pickupable>();

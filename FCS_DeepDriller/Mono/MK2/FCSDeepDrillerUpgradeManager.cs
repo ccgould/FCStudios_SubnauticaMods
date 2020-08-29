@@ -5,17 +5,15 @@ using System.Text.RegularExpressions;
 using FCS_DeepDriller.Buildable.MK2;
 using FCS_DeepDriller.Helpers;
 using FCS_DeepDriller.Model.Upgrades;
-using FCS_DeepDriller.Mono.MK2;
 using FCS_DeepDriller.Structs;
 using FCSCommon.Enums;
 using FCSCommon.Objects;
 using FCSCommon.Utilities;
 using UnityEngine;
 
-
-namespace FCS_DeepDriller.Managers
+namespace FCS_DeepDriller.Mono.MK2
 {
-    internal class UpgradeManager : MonoBehaviour
+    internal class FCSDeepDrillerUpgradeManager : MonoBehaviour
     {
         private readonly List<UpgradeClass> _classes = new List<UpgradeClass>
         {
@@ -29,6 +27,7 @@ namespace FCS_DeepDriller.Managers
         
         public List<UpgradeFunction> Upgrades { get; set; } = new List<UpgradeFunction>();
         public Action<UpgradeFunction> OnUpgradeUpdate { get; set; }
+        private string _textHistory = "Enter Function";
 
         private FCSDeepDrillerController _mono;
 
@@ -63,12 +62,21 @@ namespace FCS_DeepDriller.Managers
                         {
                             case "OresPerDay":
 
-                                var check = Upgrades.Any(x =>
-                                    x.UpgradeType == UpgradeFunctions.OresPerDay);
+                                var check = Upgrades.Any(x => x.UpgradeType == UpgradeFunctions.OresPerDay);
 
                                 if (check)
                                 {
-                                    QuickLogger.Message("Function already implemented.", true);
+                                    QuickLogger.Message("Function already implemented. Updating Value", true);
+                                    var upgradeFunc = Upgrades.Single(x => x.UpgradeType == UpgradeFunctions.OresPerDay);
+                                    bool validFunc = OresPerDayUpgrade.IsValid(paraResults, out var orePerDayFunc);
+                                    if (validFunc)
+                                    {
+                                        ((OresPerDayUpgrade)upgradeFunc).OreCount = orePerDayFunc;
+                                    }
+                                    else
+                                    {
+                                        QuickLogger.Debug($"Invalid Function: {functionString}", true);
+                                    }
                                     return;
                                 }
 
@@ -97,20 +105,21 @@ namespace FCS_DeepDriller.Managers
 
                             case "MaxOreCount":
 
-                                var maxOreCountCheck = Upgrades.Any(x =>
-                                    x.UpgradeType == UpgradeFunctions.MaxOreCount);
-
-                                if (maxOreCountCheck)
-                                {
-                                    QuickLogger.Message("Function already implemented.", true);
-                                    return;
-                                }
-
                                 bool maxOreCountValid = MaxOreCountUpgrade.IsValid(paraResults, out var tuple);
 
                                 if (maxOreCountValid)
                                 {
                                     QuickLogger.Debug($"Function  Valid: {functionString}", true);
+                                    var maxOreCountCheck = Upgrades.Any(x => x.UpgradeType == UpgradeFunctions.MaxOreCount && ((MaxOreCountUpgrade)x).TechType == tuple.Item1);
+
+                                    if (maxOreCountCheck)
+                                    {
+                                        QuickLogger.Message("Function already implemented. Changing value", true);
+                                        var maxOreCountFunc = Upgrades.Single(x => x.UpgradeType == UpgradeFunctions.MaxOreCount && ((MaxOreCountUpgrade)x).TechType == tuple.Item1);
+                                        ((MaxOreCountUpgrade) maxOreCountFunc).Amount = tuple.Item2;
+                                        return;
+                                    }
+
                                     var maxOreCountUpgrade = new MaxOreCountUpgrade
                                     {
                                         IsEnabled = true,
@@ -354,11 +363,12 @@ namespace FCS_DeepDriller.Managers
 
         internal void Show()
         {
-            uGUI.main.userInput.RequestString("Enter Function", "Execute Function", "Enter Function", 100, ImplementCommand);
+            uGUI.main.userInput.RequestString("Enter Function", "Execute Function", _textHistory, 100, ImplementCommand);
         }
 
         private void ImplementCommand(string text)
         {
+            _textHistory = text;
             ImplementCommand(text,out var function);
         }
 

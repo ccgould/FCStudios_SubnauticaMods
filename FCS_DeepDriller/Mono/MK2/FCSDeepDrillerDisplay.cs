@@ -48,11 +48,7 @@ namespace FCS_DeepDriller.Mono.MK2
         private Text _exportToggleBTNText;
         private Image _rangeToggleBTNIcon;
         private float _timePassed;
-
-
-        //private readonly List<KeyValuePair<TechType, CraftData.TechData>> _craftableItems = new List<KeyValuePair<TechType, CraftData.TechData>>();
-
-
+        
         private void Update()
         {
             _timePassed += DayNightCycle.main.deltaTime;
@@ -92,7 +88,30 @@ namespace FCS_DeepDriller.Mono.MK2
                 PowerOnDisplay();
                 RecheckFilters();
                 RefreshItemCount();
+                InvokeRepeating(nameof(UpdateScreenOnLoad), 1f, 1f);
             }
+        }
+
+        private void UpdateScreenOnLoad()
+        {
+            if (_mono.IsFromSave && GetCurrentPage() != FCSDeepDrillerPages.PowerOff)
+            {
+                if (_mono.PowerManager.GetPowerState() == FCSPowerStates.Tripped)
+                {
+                    GotoPage(FCSDeepDrillerPages.PowerOff);
+                }
+            }
+
+            if (GetCurrentPage() == FCSDeepDrillerPages.PowerOff)
+            {
+                QuickLogger.Debug("Canceling Invoke Repeating", true);
+                CancelInvoke(nameof(UpdateScreenOnLoad));
+            }
+        }
+
+        internal FCSDeepDrillerPages GetCurrentPage()
+        {
+            return (FCSDeepDrillerPages)_mono.AnimationHandler.GetIntHash(_pageHash);
         }
 
         private void RefreshItemCount(int currentTotal = 0)
@@ -626,11 +645,15 @@ namespace FCS_DeepDriller.Mono.MK2
                     var deleteButton = GameObjectHelpers.FindGameObject(buttonPrefab, "DeleteBTN")?.GetComponent<Button>();
                     deleteButton?.onClick.AddListener(Test);
                     var function = grouped.ElementAt(i);
+                    function.Label = upgradeText; 
                     deleteButton?.onClick.AddListener(() => {_mono.UpgradeManager.DeleteFunction(function);});
 
                     var activateButton = GameObjectHelpers.FindGameObject(buttonPrefab, "ActivationBTN")?.GetComponent<Button>();
                     activateButton?.onClick.AddListener(Test);
-                    activateButton?.onClick.AddListener(() => { function.ToggleUpdate(); });
+                    activateButton?.onClick.AddListener(() =>
+                    {
+                        function.ToggleUpdate();
+                    });
                 }
 
                 _programmingGrid.UpdaterPaginator(grouped.Count);

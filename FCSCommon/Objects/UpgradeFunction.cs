@@ -2,12 +2,14 @@
 using FCSCommon.Utilities;
 using FCSTechFabricator.Abstract;
 using Oculus.Newtonsoft.Json;
+using UnityEngine.UI;
 
 namespace FCSCommon.Objects
 {
     internal abstract class UpgradeFunction
     {
         private bool _isEnabled;
+        public virtual Text Label { get; set; }
         public string Function { get; set; }
         public abstract float PowerUsage { get; }
         public abstract float Damage { get; }
@@ -37,10 +39,18 @@ namespace FCSCommon.Objects
         public void ToggleUpdate()
         {
             IsEnabled = !IsEnabled;
-
             var status = IsEnabled ? "enabled" : "disabled";
-
+            
+            UpdateLabel();
             QuickLogger.Debug($"{FriendlyName} has been {status}.");
+        }
+
+        public virtual void UpdateLabel()
+        {
+            if(Label != null)
+            {
+                Label.text = Format();
+            }
         }
     }
 }

@@ -30,8 +30,6 @@ namespace FCS_DeepDriller.Configuration
         internal const string DeepDrillerKitFriendlyName = "Deep Driller";
 
         internal const string DeepDrillerTabID = "DD";
-        
-        internal static string QMODFOLDER { get; } = Path.Combine(Environment.CurrentDirectory, "QMods");
         internal static string MODFOLDERLOCATION => GetModPath();
         
         private static ModSaver _saveObject;
@@ -42,6 +40,17 @@ namespace FCS_DeepDriller.Configuration
 
 
         internal static event Action<DeepDrillerSaveData> OnDeepDrillerDataLoaded;
+
+        internal static TechType GetSandBagTechType()
+        {
+            if (_sandBagTechType == TechType.None)
+            {
+                _sandBagTechType = SandSpawnableClassID.ToTechType();
+            }
+
+            return _sandBagTechType;
+        }
+
 
 #if SUBNAUTICA
         internal static TechData DeepDrillerKitIngredients => new TechData
@@ -57,16 +66,6 @@ namespace FCS_DeepDriller.Configuration
                 new Ingredient(TechType.VehicleStorageModule, 1),
             }
         };
-
-        internal static TechType GetSandBagTechType()
-        {
-            if (_sandBagTechType == TechType.None)
-            {
-                _sandBagTechType = "Sand_DD".ToTechType();
-            }
-
-            return _sandBagTechType;
-        }
 #elif BELOWZERO
         internal static RecipeData DeepDrillerKitIngredients => new RecipeData
         {
@@ -85,7 +84,7 @@ namespace FCS_DeepDriller.Configuration
 
 
         #region Deep Driller
-        public static void SaveDeepDriller()
+        internal static void SaveDeepDriller()
         {
             if (!IsSaving())
             {
@@ -106,7 +105,7 @@ namespace FCS_DeepDriller.Configuration
             }
         }
 
-        public static void LoadDeepDrillerData()
+        internal static void LoadDeepDrillerData()
         {
             QuickLogger.Info("Loading Save Data...");
             ModUtils.LoadSaveData<DeepDrillerSaveData>(SaveDataFilename, GetSaveFileDirectory(), (data) =>
@@ -117,12 +116,12 @@ namespace FCS_DeepDriller.Configuration
             });
         }
 
-        public static DeepDrillerSaveData GetDeepDrillerSaveData()
+        internal static DeepDrillerSaveData GetDeepDrillerSaveData()
         {
             return _deepDrillerSaveData ?? new DeepDrillerSaveData();
         }
 
-        public static DeepDrillerSaveDataEntry GetDeepDrillerSaveData(string id)
+        internal static DeepDrillerSaveDataEntry GetDeepDrillerSaveData(string id)
         {
             LoadDeepDrillerData();
 
@@ -155,7 +154,7 @@ namespace FCS_DeepDriller.Configuration
             _saveObject = null;
         }
 
-        public static bool IsSaving()
+        internal static bool IsSaving()
         {
             return _saveObject != null;
         }
@@ -174,30 +173,9 @@ namespace FCS_DeepDriller.Configuration
             return Path.Combine(GetModPath(), "Assets");
         }
 
-        private static string GetModInfoPath()
-        {
-            return Path.Combine(GetModPath(), "mod.json");
-        }
-
-        internal static string GetGlobalBundle()
-        {
-            return Path.Combine(Path.Combine(QMODFOLDER, "FCSTechWorkBench"), "globalmaterials");
-        }
-        
         private static string GetConfigPath()
         {
             return Path.Combine(GetModPath(), "config.json");
-        }
-
-        private static string GetLanguagePath()
-        {
-            return Path.Combine(GetModPath(), "Language");
-
-        }
-
-        internal static string GetConfigFile(string modName)
-        {
-            return Path.Combine(GetConfigPath(), $"{modName}.json"); ;
         }
 
         internal static string GetSaveFileDirectory()
@@ -257,7 +235,7 @@ namespace FCS_DeepDriller.Configuration
             return LoadConfigurationData();
         }
 
-        public static TechType ExStorageTechType()
+        internal static TechType ExStorageTechType()
         {
             if (_exStorageTechType == TechType.None)
             {
@@ -270,16 +248,16 @@ namespace FCS_DeepDriller.Configuration
 
     internal class Options : ModOptions
     {
-        private const string AllowDamageID = "AllowDamage";
-        private const string DrillExstorageRangeID = "DrillExstorageRange";
-        private bool _allowDamage;
+        private const string HardCoreModeID = "DD_HardCore";
+        private const string DrillExstorageRangeID = "DD_ExstorageRange";
+        private bool _hardCoreMode;
         private float _drillExStorageRange;
 
-        public Options() : base("Deep Driller Settings")
+        internal Options() : base("Deep Driller Settings")
         {
             ToggleChanged += OnToggleChanged;
             SliderChanged += OnSliderChanged;
-            _allowDamage = QPatch.Configuration.HardCoreMode;
+            _hardCoreMode = QPatch.Configuration.HardCoreMode;
             _drillExStorageRange = QPatch.Configuration.DrillExStorageRange;
         }
 
@@ -295,13 +273,13 @@ namespace FCS_DeepDriller.Configuration
             Mod.SaveModConfiguration();
         }
 
-        public void OnToggleChanged(object sender, ToggleChangedEventArgs e)
+        internal void OnToggleChanged(object sender, ToggleChangedEventArgs e)
         {
             
             switch (e.Id)
             {
-                case AllowDamageID:
-                    _allowDamage = QPatch.Configuration.HardCoreMode = e.Value;
+                case HardCoreModeID:
+                    _hardCoreMode = QPatch.Configuration.HardCoreMode = e.Value;
                     break;
             }
 
@@ -311,7 +289,7 @@ namespace FCS_DeepDriller.Configuration
 
         public override void BuildModOptions()
         {
-            AddToggleOption(AllowDamageID, "Damage Overtime", _allowDamage);
+            AddToggleOption(HardCoreModeID, "Hard Core Mode", _hardCoreMode);
             AddSliderOption(DrillExstorageRangeID,"Drill ExStorage Search Range",0f,QPatch.Configuration.DrillExStorageMaxRange, _drillExStorageRange);
         }
     }

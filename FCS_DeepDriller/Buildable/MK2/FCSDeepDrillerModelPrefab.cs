@@ -118,27 +118,12 @@ namespace FCS_DeepDriller.Buildable.MK2
                 return false;
             }
 
-
-            SandPrefab = GameObject.CreatePrimitive(PrimitiveType.Cube);
-
-            //GameObject sandBag = QPatch.GlobalBundle.LoadAsset<GameObject>("SandBag");
-
-            //if (sandBag != null)
-            //{
-            //    SandPrefab = sandBag;
-            //}
-            //else
-            //{
-            //    QuickLogger.Error($"SandBag Not Found!");
-            //    return false;
-            //}
-
-            return true;
+            return GetOres();
         }
 
         private bool GetOres()
         {
-            GameObject sand = AssetBundle.LoadAsset<GameObject>("Sand");
+            GameObject sand = AssetBundle.LoadAsset<GameObject>("SandOreBag");
 
             //If the prefab isn't null lets add the shader to the materials
             if (sand != null)

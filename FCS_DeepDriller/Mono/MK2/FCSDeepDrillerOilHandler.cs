@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using FCS_DeepDriller.Buildable.MK2;
-using FCS_DeepDriller.Helpers;
-using FCS_DeepDriller.Mono.MK2;
 using FCSCommon.Converters;
 using FCSCommon.Extensions;
 using FCSCommon.Utilities;
 using FCSTechFabricator.Interfaces;
 using UnityEngine;
 
-
-namespace FCS_DeepDriller.Managers
+namespace FCS_DeepDriller.Mono.MK2
 {
     internal class FCSDeepDrillerOilHandler : MonoBehaviour, IFCSStorage
     {

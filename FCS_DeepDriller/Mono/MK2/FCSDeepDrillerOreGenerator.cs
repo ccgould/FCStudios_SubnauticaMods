@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using FCS_DeepDriller.Buildable.MK2;
-using FCS_DeepDriller.Configuration;
 using FCS_DeepDriller.Model.Upgrades;
-using FCS_DeepDriller.Mono.MK2;
 using FCSCommon.Enums;
 using FCSCommon.Objects;
 using FCSCommon.Utilities;
@@ -12,12 +10,12 @@ using UnityEngine;
 using Random = System.Random;
 
 
-namespace FCS_DeepDriller.Managers
+namespace FCS_DeepDriller.Mono.MK2
 {
     /// <summary>
     /// This component handles ore generation after a certain amount of time based off the allowed TechTypes
     /// </summary>
-    internal class OreGenerator : MonoBehaviour
+    internal class FCSDeepDrillerOreGenerator : MonoBehaviour
     {
         #region private Properties
         private bool _allowTick;

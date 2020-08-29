@@ -25,7 +25,6 @@ namespace FCS_DeepDriller.Mono.MK2
         private PrefabIdentifier _prefabId;
         private List<TechType> _bioData = new List<TechType>();
         private bool _runStartUpOnEnable;
-        private bool _fromSave;
         private DeepDrillerSaveDataEntry _data;
         private GameObject _laser;
         private bool _allPlateFormsFound;
@@ -38,6 +37,8 @@ namespace FCS_DeepDriller.Mono.MK2
 
 
         internal string CurrentBiome { get; set; }
+        internal bool IsFromSave { get; private set; }
+
 
         #endregion
 
@@ -51,13 +52,13 @@ namespace FCS_DeepDriller.Mono.MK2
         internal FCSDeepDrillerPowerHandler PowerManager { get; private set; }
         internal FCSDeepDrillerDisplay DisplayHandler { get; private set; }
         internal int SolarStateHash { get; private set; }
-        internal OreGenerator OreGenerator { get; private set; }
+        internal FCSDeepDrillerOreGenerator OreGenerator { get; private set; }
         internal FCSDeepDrillerOilHandler OilHandler { get; set; }
         internal LaserManager LaserManager { get; private set; }
         internal DumpContainer PowercellDumpContainer { get; set; }
         internal DumpContainer OilDumpContainer { get; set; }
         public ColorManager ColorManager { get; private set; }
-        public UpgradeManager UpgradeManager { get; private set; }
+        public FCSDeepDrillerUpgradeManager UpgradeManager { get; private set; }
 
         #endregion
 
@@ -85,7 +86,7 @@ namespace FCS_DeepDriller.Mono.MK2
                     ReadySaveData();
                 }
 
-                if (_fromSave && _data != null)
+                if (IsFromSave && _data != null)
                 {
                     PowerManager.LoadData(_data);
 
@@ -101,7 +102,6 @@ namespace FCS_DeepDriller.Mono.MK2
                     OilHandler.SetOilTimeLeft(_data.OilTimeLeft);
                     UpgradeManager.Load(_data?.Upgrades);
                     _isRangeVisible = _data.IsRangeVisible;
-                    _fromSave = false;
                 }
 
                 StartCoroutine(TryGetLoot());
@@ -196,7 +196,7 @@ namespace FCS_DeepDriller.Mono.MK2
 
         public override void OnProtoDeserialize(ProtobufSerializer serializer)
         {
-            _fromSave = true;
+            IsFromSave = true;
         }
 
         #endregion
@@ -264,7 +264,7 @@ namespace FCS_DeepDriller.Mono.MK2
                 _buildable = GetComponentInParent<Constructable>();
             }
 
-            OreGenerator = gameObject.AddComponent<OreGenerator>();
+            OreGenerator = gameObject.AddComponent<FCSDeepDrillerOreGenerator>();
             OreGenerator.Initialize(this);
             OreGenerator.OnAddCreated += OreGeneratorOnAddCreated;
 
@@ -328,7 +328,7 @@ namespace FCS_DeepDriller.Mono.MK2
 
             if (UpgradeManager == null)
             {
-                UpgradeManager = gameObject.AddComponent<UpgradeManager>();
+                UpgradeManager = gameObject.AddComponent<FCSDeepDrillerUpgradeManager>();
                 UpgradeManager.Initialize(this);
             }
 

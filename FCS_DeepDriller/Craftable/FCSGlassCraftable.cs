@@ -23,7 +23,7 @@ namespace FCS_DeepDriller.Craftable
                 craftAmount = 0,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient("Sand_DD".ToTechType(), 1)
+                    new Ingredient(Mod.SandSpawnableClassID.ToTechType(), 1)
                 }
             };
         }

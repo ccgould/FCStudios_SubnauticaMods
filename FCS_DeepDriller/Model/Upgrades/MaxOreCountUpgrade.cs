@@ -10,7 +10,18 @@ namespace FCS_DeepDriller.Model.Upgrades
 {
     internal class MaxOreCountUpgrade : UpgradeFunction
     {
-        public int Amount { get; set; }
+        private int _amount;
+
+        public int Amount
+        {
+            get => _amount;
+            set
+            {
+                _amount = value;
+                UpdateLabel();
+            }
+        }
+
         public override float PowerUsage => 0.2f;
         public override float Damage { get; }
         public override UpgradeFunctions UpgradeType => UpgradeFunctions.MaxOreCount;
@@ -34,7 +45,8 @@ namespace FCS_DeepDriller.Model.Upgrades
 
         public override string Format()
         {
-            return $"{FriendlyName} | TechType: {TechType} Limit: {Amount}";
+            var isActive = IsEnabled ? Language.main.Get("BaseBioReactorActive") : Language.main.Get("BaseBioReactorInactive");
+            return $"{FriendlyName} | TechType: {TechType} Limit: {Amount} ({isActive})";
         }
 
         internal static bool IsValid(string[] paraResults, out Tuple<TechType, int> data)
