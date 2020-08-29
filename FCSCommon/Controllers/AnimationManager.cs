@@ -18,15 +18,10 @@ namespace FCSCommon.Controllers
 
         private bool GetAnimatorComponent()
         {
-            Animator = GetComponentInChildren<Animator>() ?? GetComponent<Animator>();
-
-            if (Animator == null)
-            {
-                QuickLogger.Error("Animator component not found on the GameObject.");
-                return false;
-            }
-
-            return true;
+            Animator = gameObject?.GetComponent<Animator>() ?? gameObject?.GetComponentInChildren<Animator>();
+            if (Animator != null) return true;
+            QuickLogger.Error("Animator component not found on the GameObject.");
+            return false;
         }
 
         #endregion

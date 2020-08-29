@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using FCS_DeepDriller.Buildable.MK1;
-using FCS_DeepDriller.Enumerators;
+using FCS_DeepDriller.Buildable.MK2;
 using FCS_DeepDriller.Helpers;
 using FCS_DeepDriller.Model.Upgrades;
 using FCS_DeepDriller.Mono.MK2;
@@ -12,10 +10,8 @@ using FCS_DeepDriller.Structs;
 using FCSCommon.Enums;
 using FCSCommon.Objects;
 using FCSCommon.Utilities;
-using FCSTechFabricator.Abstract;
-using Oculus.Newtonsoft.Json;
 using UnityEngine;
-using UnityEngine.Events;
+
 
 namespace FCS_DeepDriller.Managers
 {

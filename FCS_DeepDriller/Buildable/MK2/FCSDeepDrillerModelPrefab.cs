@@ -4,7 +4,7 @@ using FCSCommon.Utilities;
 using FCSTechFabricator.Configuration;
 using UnityEngine;
 
-namespace FCS_DeepDriller.Buildable.MK1
+namespace FCS_DeepDriller.Buildable.MK2
 {
     internal partial class FCSDeepDrillerBuildable
     {
@@ -117,6 +117,21 @@ namespace FCS_DeepDriller.Buildable.MK1
                 QuickLogger.Error($"Color Item Not Found!");
                 return false;
             }
+
+
+            SandPrefab = GameObject.CreatePrimitive(PrimitiveType.Cube);
+
+            //GameObject sandBag = QPatch.GlobalBundle.LoadAsset<GameObject>("SandBag");
+
+            //if (sandBag != null)
+            //{
+            //    SandPrefab = sandBag;
+            //}
+            //else
+            //{
+            //    QuickLogger.Error($"SandBag Not Found!");
+            //    return false;
+            //}
 
             return true;
         }

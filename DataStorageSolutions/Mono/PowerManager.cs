@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace DataStorageSolutions.Mono
 {
-    internal class PowerManager
+    internal class PowerManager : MonoBehaviour
     {
         #region Private Members
         private FCSPowerStates _powerState;
@@ -57,34 +57,26 @@ namespace DataStorageSolutions.Mono
             if (_isInitailized) return;
 
                 _mono = mono;
-            if (_mono.Manager != null)
-            {
-                _mono.Manager.OnBreakerToggled += OnBreakerToggled;
-            }
 
             _energyConsumptionPerSecond = powerConsumption;
-
             _isInitailized = true;
         }
-
-        private void OnBreakerToggled(bool obj)
-        {
-            SetPowerStates(obj ? FCSPowerStates.Tripped : FCSPowerStates.None);
-        }
-
+        
         internal void UpdatePowerState()
         {
             var habitat = _mono?.SubRoot;
 
-            if (habitat == null || habitat.powerRelay == null || _powerState == FCSPowerStates.Tripped) return;
+            if (habitat == null || habitat.powerRelay == null || _mono.Manager == null) return;
 
-            if (habitat.powerRelay.GetPowerStatus() == PowerSystem.Status.Offline)
+            if (_mono.Manager.GetHasBreakerTripped())
+            {
+                SetPowerStates(FCSPowerStates.Tripped);
+            }
+            else if (habitat.powerRelay.GetPowerStatus() == PowerSystem.Status.Offline)
             {
                 SetPowerStates(FCSPowerStates.Unpowered);
-                return;
             }
-
-            if (habitat.powerRelay.GetPowerStatus() == PowerSystem.Status.Normal || habitat.powerRelay.GetPowerStatus() == PowerSystem.Status.Emergency)
+            else if (habitat.powerRelay.GetPowerStatus() == PowerSystem.Status.Normal || habitat.powerRelay.GetPowerStatus() == PowerSystem.Status.Emergency)
             {
                 SetPowerStates(FCSPowerStates.Powered);
             }
@@ -140,6 +132,7 @@ namespace DataStorageSolutions.Mono
         #region Private Methods
         private void UpdatePowerRelay()
         {
+            if(_mono == null) return;
             PowerRelay relay = PowerSource.FindRelay(_mono.transform);
             if (relay != null && relay != _connectedRelay)
             {
@@ -151,7 +144,15 @@ namespace DataStorageSolutions.Mono
             {
                 _connectedRelay = null;
             }
-        } 
+        }
+
+        private void Update()
+        {
+            if (!_mono.IsConstructed) return;
+            UpdatePowerState();
+            ConsumePower();
+        }
+
         #endregion
 
         public void UpdatePowerUsage(float configServerPowerUsage)

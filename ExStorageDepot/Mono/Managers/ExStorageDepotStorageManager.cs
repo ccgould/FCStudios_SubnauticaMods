@@ -39,6 +39,11 @@ namespace ExStorageDepot.Mono.Managers
             InvokeRepeating("UpdateStorageDisplayCount", 1, 0.5f);
         }
 
+        internal bool HasItems()
+        {
+            return ContainerItems.Count > 0;
+        }
+
         internal void OnDumpContainerClosed()
         {
             if (!_mono.AnimationManager.GetDriveState()) return;
@@ -96,6 +101,11 @@ namespace ExStorageDepot.Mono.Managers
                 return false;
             }
             
+            return true;
+        }
+
+        public bool IsAllowedToRemoveItems()
+        {
             return true;
         }
 

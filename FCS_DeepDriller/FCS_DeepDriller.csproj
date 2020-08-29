@@ -132,6 +132,7 @@
     <Compile Include="Configuration\DeepDrillerSaveData.cs" />
     <Compile Include="Configuration\Mod.cs" />
     <Compile Include="Configuration\PowercellData.cs" />
+    <Compile Include="Craftable\FCSGlassCraftable.cs" />
     <Compile Include="Enumerators\FCSDeepDrillerPages.cs" />
     <Compile Include="Helpers\FCSDeepDrillerOperations.cs" />
     <Compile Include="Helpers\Hekpers.cs" />
@@ -159,9 +160,10 @@
     <Compile Include="Managers\FCSDeepDrillerOilHandler.cs" />
     <Compile Include="Mono\MK2\FCSDeepDrillerPowerHandler.cs" />
     <Compile Include="Mono\MK2\FCSDeepDrillerSolarController.cs" />
-    <Compile Include="Ores\Craftables\Glass.cs" />
+    <Compile Include="Mono\MK2\FCSDeepDrillerTransferManager.cs" />
     <Compile Include="Ores\SandOrePatcher.cs" />
     <Compile Include="Patchers\Builder_CheckAsSubModule_Patch.cs" />
+    <Compile Include="Patchers\FCSConnectableAwake_Patcher.cs" />
     <Compile Include="Patchers\LootDistributionData_Patchers.cs" />
     <Compile Include="Patchers\uGUI_DepthCompassPatchers.cs" />
     <Compile Include="QPatch.cs" />
@@ -175,10 +177,7 @@
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Display\" />
-    <Folder Include="Extensions\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\FCSCommon\GamePaths.targets" />

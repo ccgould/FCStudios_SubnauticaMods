@@ -4,6 +4,7 @@ using ExStorageDepot.Enumerators;
 using ExStorageDepot.Mono.Managers;
 using FCSCommon.Utilities;
 using System;
+using FCSCommon.Helpers;
 using FCSTechFabricator.Abstract;
 using FCSTechFabricator.Components;
 
@@ -50,7 +51,7 @@ namespace ExStorageDepot.Mono
 
             _runStartUpOnEnable = false;
         }
-
+        
         public override void OnProtoSerialize(ProtobufSerializer serializer)
         {
             if (!_initialized) return;
@@ -71,8 +72,12 @@ namespace ExStorageDepot.Mono
         {
             reason = string.Empty;
 
-            if (Storage == null || !Storage.IsFull) return true;
-            reason = "Please empty the Ex-Storage";
+            if (Storage == null) return true;
+
+            if (Storage.HasItems())
+            {
+                reason = "Please empty the Ex-Storage";
+            }
             return false;
         }
 
@@ -125,6 +130,19 @@ namespace ExStorageDepot.Mono
             {
                 Display = gameObject.AddComponent<ExStorageDepotDisplayManager>();
                 Display.Initialize(this);
+            }
+
+            var locker = GameObjectHelpers.FindGameObject(gameObject, "Locker", SearchOption.StartsWith);
+            var sRoot = GameObjectHelpers.FindGameObject(gameObject, "StorageRoot");
+
+            if (locker != null)
+            {
+                Destroy(locker);
+            }
+
+            if (sRoot != null)
+            {
+                Destroy(sRoot);
             }
 
             if (FCSConnectableDevice == null)

@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.IO;
 using FCS_DeepDriller.Mono.MK2;
+using FCSCommon.Extensions;
 using Oculus.Newtonsoft.Json;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Options;
@@ -36,6 +37,9 @@ namespace FCS_DeepDriller.Configuration
         private static ModSaver _saveObject;
 
         private static DeepDrillerSaveData _deepDrillerSaveData;
+        private static TechType _exStorageTechType;
+        private static TechType _sandBagTechType;
+
 
         internal static event Action<DeepDrillerSaveData> OnDeepDrillerDataLoaded;
 
@@ -53,6 +57,16 @@ namespace FCS_DeepDriller.Configuration
                 new Ingredient(TechType.VehicleStorageModule, 1),
             }
         };
+
+        internal static TechType GetSandBagTechType()
+        {
+            if (_sandBagTechType == TechType.None)
+            {
+                _sandBagTechType = "Sand_DD".ToTechType();
+            }
+
+            return _sandBagTechType;
+        }
 #elif BELOWZERO
         internal static RecipeData DeepDrillerKitIngredients => new RecipeData
         {
@@ -242,18 +256,43 @@ namespace FCS_DeepDriller.Configuration
 
             return LoadConfigurationData();
         }
+
+        public static TechType ExStorageTechType()
+        {
+            if (_exStorageTechType == TechType.None)
+            {
+                _exStorageTechType = "ExStorageDepot".ToTechType();
+            }
+
+            return _exStorageTechType;
+        }
     }
 
     internal class Options : ModOptions
     {
-        private const string ToggleID = "RefreshBTN";
         private const string AllowDamageID = "AllowDamage";
+        private const string DrillExstorageRangeID = "DrillExstorageRange";
         private bool _allowDamage;
+        private float _drillExStorageRange;
 
         public Options() : base("Deep Driller Settings")
         {
             ToggleChanged += OnToggleChanged;
-            _allowDamage = QPatch.Configuration.AllowDamage;
+            SliderChanged += OnSliderChanged;
+            _allowDamage = QPatch.Configuration.HardCoreMode;
+            _drillExStorageRange = QPatch.Configuration.DrillExStorageRange;
+        }
+
+        private void OnSliderChanged(object sender, SliderChangedEventArgs e)
+        {
+            switch (e.Id)
+            {
+                case DrillExstorageRangeID:
+                    _drillExStorageRange = QPatch.Configuration.DrillExStorageRange = e.Value;
+                    break;
+            }
+
+            Mod.SaveModConfiguration();
         }
 
         public void OnToggleChanged(object sender, ToggleChangedEventArgs e)
@@ -262,16 +301,18 @@ namespace FCS_DeepDriller.Configuration
             switch (e.Id)
             {
                 case AllowDamageID:
-                    _allowDamage = QPatch.Configuration.AllowDamage = e.Value;
+                    _allowDamage = QPatch.Configuration.HardCoreMode = e.Value;
                     break;
             }
 
             Mod.SaveModConfiguration();
         }
 
+
         public override void BuildModOptions()
         {
             AddToggleOption(AllowDamageID, "Damage Overtime", _allowDamage);
+            AddSliderOption(DrillExstorageRangeID,"Drill ExStorage Search Range",0f,QPatch.Configuration.DrillExStorageMaxRange, _drillExStorageRange);
         }
     }
 }

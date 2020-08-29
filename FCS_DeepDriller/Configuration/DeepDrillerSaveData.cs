@@ -37,6 +37,8 @@ namespace FCS_DeepDriller.Configuration
         
         [JsonProperty] internal bool PullFromRelay { get; set; }
         [JsonProperty] internal IEnumerable<UpgradeSave> Upgrades { get; set; }
+        [JsonProperty] internal bool IsRangeVisible { get; set; }
+        [JsonProperty] internal bool AllowedToExport { get; set; }
     }
 
     [Serializable]

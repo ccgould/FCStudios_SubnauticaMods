@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using FCS_DeepDriller.Buildable.MK1;
+using FCS_DeepDriller.Buildable.MK2;
 using FCS_DeepDriller.Configuration;
 using FCS_DeepDriller.Enumerators;
 using FCSCommon.Abstract;
@@ -45,12 +45,24 @@ namespace FCS_DeepDriller.Mono.MK2
 
         private Text _itemCounter;
         private Image _solarPanelBtnIcon;
+        private Text _exportToggleBTNText;
+        private Image _rangeToggleBTNIcon;
+        private float _timePassed;
 
 
         //private readonly List<KeyValuePair<TechType, CraftData.TechData>> _craftableItems = new List<KeyValuePair<TechType, CraftData.TechData>>();
 
 
+        private void Update()
+        {
+            _timePassed += DayNightCycle.main.deltaTime;
 
+            if (_timePassed >= 1)
+            {
+                UpdateToggleButtons();
+                _timePassed = 0.0f;
+            }
+        }
         private void OnDestroy()
         {
             _isBeingDestroyed = true;
@@ -139,6 +151,20 @@ namespace FCS_DeepDriller.Mono.MK2
             }
         }
 
+        internal void UpdateExport(bool state)
+        {
+            if (state)
+            {
+                _exportToggleBTNText.text = "ON";
+                _exportToggleBTNText.color = Color.green;
+            }
+            else
+            {
+                _exportToggleBTNText.text = "OFF";
+                _exportToggleBTNText.color = Color.red;
+            }
+        }
+
         private void OnContainerUpdate(int arg1, int arg2)
         {
             RefreshItemCount(arg1);
@@ -219,9 +245,16 @@ namespace FCS_DeepDriller.Mono.MK2
                 case "SolarPanelBTN":
                     _mono.PowerManager.ToggleSolarState();
                     break;
+                case "RangeToggleBTN":
+                    _mono.ToggleRangeView();
+                    break;
                 case "FilterBTN":
                     QuickLogger.Debug("Toggling Filter",true);
                     _mono.OreGenerator.ToggleFocus();
+                    break;
+                case "ExportToggleBTN":
+                    QuickLogger.Debug("Export Toggle", true);
+                    _mono.TransferManager.Toggle();
                     break;
                 case "ColorPickerBTN":
                     QuickLogger.Debug("Color Picker", true);
@@ -259,12 +292,18 @@ namespace FCS_DeepDriller.Mono.MK2
             }
         }
 
-        internal void ToggleSolarPanelButton(bool state)
+        internal void UpdateToggleButtons()
         {
-            QuickLogger.Debug("Toggling Solar  Button Color",true);
+            if (_mono == null || _mono.PowerManager == null) return;
+
             if (_solarPanelBtnIcon != null)
             {
-                _solarPanelBtnIcon.color = state ? Color.green : Color.red;
+                _solarPanelBtnIcon.color = _mono.PowerManager.IsSolarExtended() ? Color.green : Color.red;
+            }
+
+            if (_rangeToggleBTNIcon != null)
+            {
+                _rangeToggleBTNIcon.color = _mono.GetIsRangeVisible() ? Color.green : Color.red;
             }
         }
 
@@ -451,6 +490,19 @@ namespace FCS_DeepDriller.Mono.MK2
 
                 #endregion
 
+
+                #region Export Toggle Button
+
+                var exportToggleBTN = GameObjectHelpers.FindGameObject(settingsPage, "ExportToggleBTN");
+
+                _exportToggleBTNText = exportToggleBTN.GetComponentInChildren<Text>();
+                
+                InterfaceHelpers.CreateButton(exportToggleBTN, "ExportToggleBTN", InterfaceButtonMode.Background, OnButtonClick,
+                    _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, FCSDeepDrillerBuildable.ExportToggleButton());
+
+                #endregion
+
+
                 #region Color Picker Button
 
                 var colorPickerBTN = GameObjectHelpers.FindGameObject(settingsPage, "ColorPickerBTN");
@@ -464,6 +516,14 @@ namespace FCS_DeepDriller.Mono.MK2
                 _colorPage.SetupGrid(36, FCSDeepDrillerBuildable.ColorItemPrefab, colorPicker, OnButtonClick, _startColor, _hoverColor);
                 #endregion
 
+                #region Solar Panel Button
+
+                var rangeToggleBTN = GameObjectHelpers.FindGameObject(settingsPage, "RangeToggleBTN");
+                _rangeToggleBTNIcon = GameObjectHelpers.FindGameObject(rangeToggleBTN, "Icon")?.GetComponent<Image>();
+                InterfaceHelpers.CreateButton(rangeToggleBTN, "RangeToggleBTN", InterfaceButtonMode.Background, OnButtonClick,
+                    _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, FCSDeepDrillerBuildable.ToggleRangeButton());
+
+                #endregion
 
                 //================= Maintenance Page ================//
 

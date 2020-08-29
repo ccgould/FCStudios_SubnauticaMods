@@ -178,6 +178,32 @@ namespace FCS_DeepDriller.Mono.MK2
             return true;
         }
 
+        internal bool OnlyRemoveItemFromContainer(TechType item)
+        {
+            try
+            {
+                if (_container.ContainsKey(item))
+                {
+                    if (_container[item] == 1)
+                    {
+                        _container.Remove(item);
+                    }
+                    else
+                    {
+                        _container[item] -= 1;
+                    }
+
+                    OnContainerUpdate?.Invoke(GetContainerTotal(), QPatch.Configuration.StorageSize);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+            return true;
+        }
+
         /// <summary>
         /// Checks to see if the item is allowed in the container
         /// </summary>
@@ -187,6 +213,11 @@ namespace FCS_DeepDriller.Mono.MK2
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
         {
             return !IsContainerFull();
+        }
+
+        public bool IsAllowedToRemoveItems()
+        {
+            return true;
         }
 
         public Pickupable RemoveItemFromContainer(TechType techType, int amount)

@@ -30,7 +30,6 @@ namespace DataStorageSolutions.Mono
         private bool _fromSave;
         private SaveDataEntry _savedData;
         private readonly RackSlot[] _servers = new RackSlot[6];
-        private bool _isConstructed;
         private string _prefabID;
         private TechType _techType = TechType.None;
         private int _rackDoor;
@@ -50,7 +49,6 @@ namespace DataStorageSolutions.Mono
 
         public bool IsFull => GetIsFull();
         public bool IsRackSlotsFull => GetIsRackFull();
-        public override bool IsConstructed => _isConstructed;
         internal Action OnUpdate;
         Action<int, int> IFCSStorage.OnContainerUpdate { get; set; }
 
@@ -101,6 +99,7 @@ namespace DataStorageSolutions.Mono
                         ColorManager.SetMaskColorFromSave(_savedData.BodyColor.Vector4ToColor());
                     }
                 }
+                
                 _runStartUpOnEnable = false;
                 IsInitialized = true;
             }
@@ -397,7 +396,7 @@ namespace DataStorageSolutions.Mono
 
             if (PowerManager == null)
             {
-                PowerManager = new PowerManager();
+                PowerManager = gameObject.AddComponent<PowerManager>();
                 PowerManager.OnPowerUpdate += OnPowerUpdate;
             }
 
@@ -429,6 +428,8 @@ namespace DataStorageSolutions.Mono
         
         private void OnPowerUpdate(FCSPowerStates state,BaseManager manager)
         {
+            if (!IsConstructed) return;
+
             switch (state)
             {
                 case FCSPowerStates.Powered:
@@ -471,7 +472,7 @@ namespace DataStorageSolutions.Mono
         public override void OnConstructedChanged(bool constructed)
         {
 
-            _isConstructed = constructed;
+            IsConstructed = constructed;
 
             if (constructed)
             {
@@ -530,6 +531,9 @@ namespace DataStorageSolutions.Mono
         public RackSlot GetServerWithItem(TechType techType)
         {
             QuickLogger.Debug($"Checking for TechType: {techType}", true);
+
+            if (!IsConstructed) return null;
+            
             for (var i = 0; i < _servers.Length; i++)
             {
                 var rackSlot = _servers[i];

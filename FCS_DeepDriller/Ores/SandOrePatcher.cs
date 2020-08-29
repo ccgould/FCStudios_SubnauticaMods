@@ -1,5 +1,4 @@
-﻿using FCS_DeepDriller.Buildable.MK1;
-using SMLHelper.V2.Assets;
+﻿using SMLHelper.V2.Assets;
 using UnityEngine;
 
 namespace FCS_DeepDriller.Ores
@@ -12,7 +11,7 @@ namespace FCS_DeepDriller.Ores
 
         public override GameObject GetGameObject()
         {
-            GameObject prefab = GameObject.Instantiate<GameObject>(FCSDeepDrillerBuildable.SandPrefab);
+            GameObject prefab = GameObject.Instantiate<GameObject>(GameObject.CreatePrimitive(PrimitiveType.Cube));
 
             prefab.name = this.PrefabFileName;
 

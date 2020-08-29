@@ -73,11 +73,6 @@ namespace DataStorageSolutions.Mono
                     }
 
                     FindBaseById(_savedData?.BaseID);
-
-                    if (Manager.GetHasBreakerTripped())
-                    {
-                        Manager.OnBreakerToggled?.Invoke(Manager.GetHasBreakerTripped());
-                    }
                 }
 
                 UpdateScreen();
@@ -101,15 +96,6 @@ namespace DataStorageSolutions.Mono
             _techType = techTag != null ? techTag.type : TechType.None;
 
             return _techType;
-        }
-
-        private void Update()
-        {
-            if(IsConstructed && PowerManager != null && SubRoot != null && !_isBeingDestroyed)
-            {
-                PowerManager?.UpdatePowerState();
-                PowerManager?.ConsumePower();
-            }
         }
 
         private void OnPowerUpdate(FCSPowerStates obj, BaseManager manager)
@@ -180,7 +166,7 @@ namespace DataStorageSolutions.Mono
 
             if (PowerManager == null)
             {
-                PowerManager = new PowerManager();
+                PowerManager = gameObject.AddComponent<PowerManager>();
                 PowerManager.OnPowerUpdate += OnPowerUpdate;
             }
 

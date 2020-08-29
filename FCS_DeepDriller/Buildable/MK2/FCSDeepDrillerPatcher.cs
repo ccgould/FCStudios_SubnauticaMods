@@ -9,11 +9,11 @@ using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
 using UnityEngine;
 
-namespace FCS_DeepDriller.Buildable.MK1
+namespace FCS_DeepDriller.Buildable.MK2
 {
     internal partial class FCSDeepDrillerBuildable : SMLHelper.V2.Assets.Buildable
     {
-        private static readonly MK1.FCSDeepDrillerBuildable Singleton = new MK1.FCSDeepDrillerBuildable();
+        private static readonly FCSDeepDrillerBuildable Singleton = new FCSDeepDrillerBuildable();
         public override TechGroup GroupForPDA { get; } = TechGroup.ExteriorModules;
         public override TechCategory CategoryForPDA { get; } = TechCategory.ExteriorModule;
         public override string IconFileName => "FCSDeepDriller.png";
@@ -42,7 +42,7 @@ namespace FCS_DeepDriller.Buildable.MK1
 
             try
             {
-                prefab = GameObject.Instantiate(_prefab);
+                prefab = GameObject.Instantiate<GameObject>(_prefab);
 
                 //========== Allows the building animation and material colors ==========// 
                 SkyApplier skyApplier = prefab.EnsureComponent<SkyApplier>();

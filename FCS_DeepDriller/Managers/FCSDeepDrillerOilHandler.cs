@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using FCS_DeepDriller.Buildable.MK1;
+using FCS_DeepDriller.Buildable.MK2;
 using FCS_DeepDriller.Helpers;
 using FCS_DeepDriller.Mono.MK2;
 using FCSCommon.Converters;
@@ -8,6 +8,7 @@ using FCSCommon.Extensions;
 using FCSCommon.Utilities;
 using FCSTechFabricator.Interfaces;
 using UnityEngine;
+
 
 namespace FCS_DeepDriller.Managers
 {
@@ -25,32 +26,30 @@ namespace FCS_DeepDriller.Managers
 
         private void Update()
         {
-            if(_mono.PowerManager.IsPowerAvailable() && _timeLeft > 0)
+            if (QPatch.Configuration.HardCoreMode)
             {
-                _timeLeft -= DayNightCycle.main.deltaTime;
-                if(_timeLeft < 0)
+                if (_mono.PowerManager.IsPowerAvailable() && _timeLeft > 0)
                 {
-                    _timeLeft = 0;
+                    _timeLeft -= DayNightCycle.main.deltaTime;
+                    if (_timeLeft < 0)
+                    {
+                        _timeLeft = 0;
+                    }
                 }
-            }
 
-            _elapsed += DayNightCycle.main.deltaTime;
+                _elapsed += DayNightCycle.main.deltaTime;
 
-            if (_elapsed >= 1f)
-            {
-                _elapsed %= 1f;
-                OnOilUpdate?.Invoke();
+                if (_elapsed >= 1f)
+                {
+                    _elapsed %= 1f;
+                    OnOilUpdate?.Invoke();
+                }
             }
         }
 
         internal void Initialize(FCSDeepDrillerController mono)
         {
             _mono = mono;
-            _timeLeft = _setOilTime;
-        }
-
-        internal void FillOil()
-        {
             _timeLeft = _setOilTime;
         }
 
@@ -100,10 +99,12 @@ namespace FCS_DeepDriller.Managers
                 return false;
             }
 
-
-          
-
             return true;
+        }
+
+        public bool IsAllowedToRemoveItems()
+        {
+            return false;
         }
 
         private string TimeTilRefuel()

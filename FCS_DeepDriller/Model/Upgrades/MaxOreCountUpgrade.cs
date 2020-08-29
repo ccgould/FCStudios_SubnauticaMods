@@ -1,7 +1,6 @@
 ﻿using System;
-using FCS_DeepDriller.Buildable.MK1;
+using FCS_DeepDriller.Buildable.MK2;
 using FCS_DeepDriller.Managers;
-using FCS_DeepDriller.Mono.MK2;
 using FCSCommon.Enums;
 using FCSCommon.Extensions;
 using FCSCommon.Objects;

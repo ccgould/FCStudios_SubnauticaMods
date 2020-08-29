@@ -1,7 +1,6 @@
 ﻿using SMLHelper.V2.Handlers;
-using UnityEngine;
 
-namespace FCS_DeepDriller.Buildable.MK1
+namespace FCS_DeepDriller.Buildable.MK2
 {
     internal partial class FCSDeepDrillerBuildable
     {
@@ -41,6 +40,8 @@ namespace FCS_DeepDriller.Buildable.MK1
         private const string FilterButtonKey = "DD_FilterButton";
         private const string ColorButtonKey = "DD_ColorButton";
         private const string SolarButtonKey = "DD_SolarButton";
+        private const string ExportToggleKey = "DD_ExportToggle";
+        private const string ToggleRangeKey = "DD_ToggleRange";
 
         internal static string BuildableName { get; private set; }
 
@@ -87,6 +88,8 @@ namespace FCS_DeepDriller.Buildable.MK1
             LanguageHandler.SetLanguageLine(FilterButtonKey, "Toggle Filters.");
             LanguageHandler.SetLanguageLine(ColorButtonKey, "Go to color picker page.");
             LanguageHandler.SetLanguageLine(SolarButtonKey, "Toggle Solar Panels.");
+            LanguageHandler.SetLanguageLine(ToggleRangeKey, "Show/Hide Range");
+            LanguageHandler.SetLanguageLine(ExportToggleKey, "Toggle export to ExStorage.");
         }
 
 
@@ -261,6 +264,16 @@ namespace FCS_DeepDriller.Buildable.MK1
         internal static string SolarButton()
         {
             return Language.main.Get(SolarButtonKey);
+        }
+
+        internal static string ExportToggleButton()
+        {
+            return Language.main.Get(ExportToggleKey);
+        }
+
+        internal static string ToggleRangeButton()
+        {
+            return Language.main.Get(ToggleRangeKey);
         }
     }
 }

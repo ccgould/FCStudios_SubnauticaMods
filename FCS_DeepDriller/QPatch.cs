@@ -3,8 +3,9 @@ using FCSCommon.Utilities;
 using System;
 using System.IO;
 using System.Reflection;
-using FCS_DeepDriller.Buildable.MK1;
+using FCS_DeepDriller.Buildable.MK2;
 using FCS_DeepDriller.Configuration;
+using FCS_DeepDriller.Craftable;
 using FCSTechFabricator;
 using FCSTechFabricator.Components;
 using FCSTechFabricator.Craftables;
@@ -37,7 +38,11 @@ namespace FCS_DeepDriller
 #endif
             try
             {
-                
+
+                //var glass = TechTypeHandler.AddTechType("FCSGlass", "Glass", "SiO4. Pure fused quartz glass.", SpriteManager.Get(TechType.Glass));
+                //CraftDataHandler.SetTechData(glass,new TechData{LinkedItems = new List<TechType>{TechType.Glass}});
+          
+
                 Configuration = Mod.LoadConfiguration();
                 Configuration.Convert();
 
@@ -72,6 +77,10 @@ namespace FCS_DeepDriller
             
             var deepDrillerKit = new FCSKit(Mod.DeepDrillerKitClassID, Mod.DeepDrillerKitFriendlyName, craftingTab, Mod.DeepDrillerKitIngredients);
             deepDrillerKit.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
+
+            var FCSGlass = new FCSGlassCraftable(craftingTab);
+            FCSGlass.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
+
         }
     }
 }

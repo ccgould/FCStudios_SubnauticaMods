@@ -50,7 +50,6 @@ namespace DataStorageSolutions.Model
         public int GetContainerFreeSpace { get; }
         public bool IsFull { get; }
         internal NameController NameController { get; private set; }
-        internal Action<bool> OnBreakerToggled { get; set; }
         internal DSSVehicleDockingManager DockingManager { get; set; }
         internal bool IsOperational => !_hasBreakerTripped || BaseHasPower();
         internal static Action OnPlayerTick { get; set; }
@@ -179,8 +178,6 @@ namespace DataStorageSolutions.Model
             }
 
             _hasBreakerTripped = !_hasBreakerTripped;
-
-            OnBreakerToggled?.Invoke(_hasBreakerTripped);
         }
         
         private bool BaseHasPower()
@@ -507,7 +504,7 @@ namespace DataStorageSolutions.Model
             QuickLogger.Debug($"SeaBase Base Found in Track {newSeaBase?.name}");
             QuickLogger.Debug($"Terminal Base Found in Track {Habitat?.name}");
 
-            if (newSeaBase != null && fcsConnectableBase.Habitat == Habitat)
+            if (newSeaBase != null && fcsConnectableBase?.Habitat == Habitat)
             {
                 QuickLogger.Debug("Subscribing to OnContainerUpdate");
                 obj.GetStorage().OnContainerUpdate += OnFCSConnectableContainerUpdate;

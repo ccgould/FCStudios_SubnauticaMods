@@ -28,7 +28,7 @@ namespace DataStorageSolutions.Mono
             _colorPickerPage = mono.ColorManager;
 
             if (!FindAllComponents()) return;
-            PowerOnDisplay();
+
             UpdateContainerAmount();
         }
         
@@ -168,6 +168,7 @@ namespace DataStorageSolutions.Mono
 
         internal void GoToPage(RackPages page)
         {
+            if(!_mono.IsConstructed) return;
             _mono.AnimationManager.SetIntHash(_page, (int)page);
         }
     }

@@ -69,7 +69,6 @@ namespace FCS_DeepDriller.Mono.MK2
             {
                 ConsumePower(CalculatePowerUsage());
                 AttemptToChargeBattery();
-                _mono.DisplayHandler.ToggleSolarPanelButton(IsSolarExtended());
                 _timePassed = 0.0f;
             }
         }
@@ -114,8 +113,7 @@ namespace FCS_DeepDriller.Mono.MK2
                 OnBatteryUpdate?.Invoke(_powerBank.Battery);
             }
         }
-
-
+        
         private void UpdatePowerState()
         {
             if (PowerState == FCSPowerStates.Tripped) return;
@@ -206,9 +204,6 @@ namespace FCS_DeepDriller.Mono.MK2
             return $"Solar panel (sun: {Mathf.RoundToInt(GetRechargeScalar() * 100f)}% charge {Mathf.RoundToInt(_powerBank.SolarPanel)}/{Mathf.RoundToInt(QPatch.Configuration.SolarCapacity)})";
         }
 
-        private int solarAnimHash = Animator.StringToHash("SolarPanel.DeepDriller_Solar");
-        private int solarAnimExtractHash = Animator.StringToHash("SolarPanel.DeepDriller_Solar_Retract");
-
         internal void ToggleSolarState()
         {
             _mono.AnimationHandler.SetBoolHash(_mono.SolarStateHash, !IsSolarExtended());
@@ -255,7 +250,7 @@ namespace FCS_DeepDriller.Mono.MK2
         /// <returns>Returns true if power is available</returns>
         internal bool IsPowerAvailable()
         {
-            if (GetTotalCharge() <= 0 || _mono.HealthManager.IsDamagedFlag())
+            if (GetTotalCharge() <= 0)
             {
                 return false;
             }
@@ -270,7 +265,7 @@ namespace FCS_DeepDriller.Mono.MK2
 
         internal float GetBatteryCharge()
         {
-            return !QPatch.Configuration.AllowDamage ? _powerBank.Battery.Capacity : _powerBank.Battery.Charge;
+            return !QPatch.Configuration.HardCoreMode ? _powerBank.Battery.Capacity : _powerBank.Battery.Charge;
         }
 
         internal void SetPowerRelay(PowerRelay powerRelay)
@@ -316,6 +311,11 @@ namespace FCS_DeepDriller.Mono.MK2
             return _powerBank;
         }
 
+        internal bool IsTripped()
+        {
+            return PowerState == FCSPowerStates.Tripped;
+        }
+
         #endregion
 
         #region IFCSStorage Interface
@@ -346,12 +346,12 @@ namespace FCS_DeepDriller.Mono.MK2
                 return false;
             }
 
-            if (IsFull)
-            {
-                return false;
-            }
+            return !IsFull;
+        }
 
-            return true;
+        public bool IsAllowedToRemoveItems()
+        {
+            return false;
         }
 
         public Pickupable RemoveItemFromContainer(TechType techType, int amount)

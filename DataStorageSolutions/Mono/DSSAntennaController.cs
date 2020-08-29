@@ -113,7 +113,7 @@ namespace DataStorageSolutions.Mono
 
             if (PowerManager == null)
             {
-                PowerManager = new PowerManager();
+                PowerManager = gameObject.AddComponent<PowerManager>();
                 PowerManager.Initialize(this, QPatch.Configuration.Config.AntennaPowerUsage);
                 PowerManager.OnPowerUpdate += OnPowerUpdate;
             }
