@@ -88,27 +88,9 @@ namespace FCS_DeepDriller.Mono.MK2
                 PowerOnDisplay();
                 RecheckFilters();
                 RefreshItemCount();
-                InvokeRepeating(nameof(UpdateScreenOnLoad), 1f, 1f);
             }
         }
-
-        private void UpdateScreenOnLoad()
-        {
-            if (_mono.IsFromSave && GetCurrentPage() != FCSDeepDrillerPages.PowerOff)
-            {
-                if (_mono.PowerManager.GetPowerState() == FCSPowerStates.Tripped)
-                {
-                    GotoPage(FCSDeepDrillerPages.PowerOff);
-                }
-            }
-
-            if (GetCurrentPage() == FCSDeepDrillerPages.PowerOff)
-            {
-                QuickLogger.Debug("Canceling Invoke Repeating", true);
-                CancelInvoke(nameof(UpdateScreenOnLoad));
-            }
-        }
-
+        
         internal FCSDeepDrillerPages GetCurrentPage()
         {
             return (FCSDeepDrillerPages)_mono.AnimationHandler.GetIntHash(_pageHash);
@@ -209,7 +191,15 @@ namespace FCS_DeepDriller.Mono.MK2
         public override void PowerOnDisplay()
         {
             QuickLogger.Debug("Powering On Display!",true);
-            _mono.AnimationHandler.BootUp(_pageHash);
+            if (_mono.IsFromSave)
+            {
+                _mono.AnimationHandler.BootUp(_pageHash);
+            }
+            else
+            {
+                GotoPage(FCSDeepDrillerPages.Home);
+            }
+
         }
 
         public override void PowerOffDisplay()
@@ -326,7 +316,7 @@ namespace FCS_DeepDriller.Mono.MK2
             }
         }
 
-        private void GotoPage(FCSDeepDrillerPages page)
+        internal void GotoPage(FCSDeepDrillerPages page)
         {
             _mono.AnimationHandler.SetIntHash(_pageHash,(int)page);
         }

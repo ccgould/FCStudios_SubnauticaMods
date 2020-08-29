@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using FCSCommon.Utilities;
+using FCSTechFabricator.Enums;
 using UnityEngine;
 
 namespace FCS_DeepDriller.Mono.MK2
@@ -12,6 +13,8 @@ namespace FCS_DeepDriller.Mono.MK2
         private FCSDeepDrillerController _mono;
         private bool _checkBootup;
         private int _drillState;
+        private bool _booting;
+        private IEnumerator _bootRoutine;
 
         #endregion
 
@@ -128,13 +131,16 @@ namespace FCS_DeepDriller.Mono.MK2
 
         internal void BootUp(int pageHash)
         {
-            StartCoroutine(BootUpCoroutine(pageHash));
+            _booting = true;
+            _bootRoutine = BootUpCoroutine(pageHash);
+            StartCoroutine(_bootRoutine);
         }
 
         private IEnumerator BootUpCoroutine(int pageHash)
         {
-            while (GetIntHash(pageHash) != 2)
+            while (_booting)
             {
+                QuickLogger.Debug("k",true);
                 if (GetIntHash(pageHash) != 1)
                 {
                     SetIntHash(pageHash, 1);
@@ -143,8 +149,19 @@ namespace FCS_DeepDriller.Mono.MK2
                 if (this.Animator.GetCurrentAnimatorStateInfo(3).IsName("DeepDriller_MK2_BootPage") &&
                     this.Animator.GetCurrentAnimatorStateInfo(3).normalizedTime >= 1.0f)
                 {
-                    QuickLogger.Debug("Going to home.");
-                    SetIntHash(pageHash, 2);
+                    if (_mono.IsFromSave && _mono._saveData.PowerState == FCSPowerStates.Tripped)
+                    {
+                        QuickLogger.Debug("Going to Powered Off.");
+                        SetIntHash(pageHash, 6);
+                        _mono.IsFromSave = false;
+                    }
+                    else
+                    {
+                        QuickLogger.Debug("Going to home.");
+                        SetIntHash(pageHash, 2);
+                    }
+                    StopCoroutine(_bootRoutine);
+                    _booting = false;
                 }
                 yield return null;
             }

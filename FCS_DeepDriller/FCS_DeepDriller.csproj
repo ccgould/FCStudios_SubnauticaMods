@@ -168,6 +168,8 @@
     <Compile Include="Patchers\uGUI_DepthCompassPatchers.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StatePattern\State.cs" />
+    <Compile Include="StatePattern\StateMachine.cs" />
     <Compile Include="Structs\UpgradeSave.cs" />
   </ItemGroup>
   <ItemGroup>

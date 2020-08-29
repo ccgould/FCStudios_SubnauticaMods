@@ -20,12 +20,11 @@ namespace FCS_DeepDriller.Mono.MK2
     internal class FCSDeepDrillerController : FCSController
     {
         #region Private Members
-        private DeepDrillerSaveDataEntry _saveData;
+        internal DeepDrillerSaveDataEntry _saveData;
         private Constructable _buildable;
         private PrefabIdentifier _prefabId;
         private List<TechType> _bioData = new List<TechType>();
         private bool _runStartUpOnEnable;
-        private DeepDrillerSaveDataEntry _data;
         private GameObject _laser;
         private bool _allPlateFormsFound;
         private bool PlatformLegsExtended;
@@ -37,7 +36,7 @@ namespace FCS_DeepDriller.Mono.MK2
 
 
         internal string CurrentBiome { get; set; }
-        internal bool IsFromSave { get; private set; }
+        internal bool IsFromSave { get; set; }
 
 
         #endregion
@@ -81,27 +80,27 @@ namespace FCS_DeepDriller.Mono.MK2
                     Initialize();
                 }
 
-                if (_data == null)
+                if (_saveData == null)
                 {
                     ReadySaveData();
                 }
 
-                if (IsFromSave && _data != null)
+                if (IsFromSave && _saveData != null)
                 {
-                    PowerManager.LoadData(_data);
+                    PowerManager.LoadData(_saveData);
 
-                    DeepDrillerContainer.LoadData(_data.Items);
-                    if (_data.IsFocused)
+                    DeepDrillerContainer.LoadData(_saveData.Items);
+                    if (_saveData.IsFocused)
                     {
-                        OreGenerator.SetIsFocus(_data.IsFocused);
-                        OreGenerator.Load(_data.FocusOres);
+                        OreGenerator.SetIsFocus(_saveData.IsFocused);
+                        OreGenerator.Load(_saveData.FocusOres);
                     }
 
-                    ColorManager.SetMaskColorFromSave(_data.BodyColor.Vector4ToColor());
-                    CurrentBiome = _data.Biome;
-                    OilHandler.SetOilTimeLeft(_data.OilTimeLeft);
-                    UpgradeManager.Load(_data?.Upgrades);
-                    _isRangeVisible = _data.IsRangeVisible;
+                    ColorManager.SetMaskColorFromSave(_saveData.BodyColor.Vector4ToColor());
+                    CurrentBiome = _saveData.Biome;
+                    OilHandler.SetOilTimeLeft(_saveData.OilTimeLeft);
+                    UpgradeManager.Load(_saveData?.Upgrades);
+                    _isRangeVisible = _saveData.IsRangeVisible;
                 }
 
                 StartCoroutine(TryGetLoot());
@@ -386,7 +385,7 @@ namespace FCS_DeepDriller.Mono.MK2
             QuickLogger.Debug("In OnProtoDeserialize");
             var prefabIdentifier = GetComponentInParent<PrefabIdentifier>() ?? GetComponent<PrefabIdentifier>();
             var id = prefabIdentifier?.Id ?? string.Empty;
-            _data = Mod.GetDeepDrillerSaveData(id);
+            _saveData = Mod.GetDeepDrillerSaveData(id);
         }
         
         private IEnumerator TryGetLoot()
@@ -420,9 +419,9 @@ namespace FCS_DeepDriller.Mono.MK2
             DisplayHandler = gameObject.AddComponent<FCSDeepDrillerDisplay>();
             DisplayHandler.Setup(this);
             DisplayHandler.UpdateBiome(CurrentBiome);
-            DisplayHandler.OnIsFocusedChanged(_data.IsFocused);
-            DisplayHandler.UpdateListItemsState(_data?.FocusOres ?? new HashSet<TechType>());
-            if (_data.AllowedToExport)
+            DisplayHandler.OnIsFocusedChanged(_saveData.IsFocused);
+            DisplayHandler.UpdateListItemsState(_saveData?.FocusOres ?? new HashSet<TechType>());
+            if (_saveData.AllowedToExport)
             {
                 TransferManager.Toggle();
             }

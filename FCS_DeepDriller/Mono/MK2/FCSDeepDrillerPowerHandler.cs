@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FCS_DeepDriller.Configuration;
 using FCS_DeepDriller.Helpers;
+using FCS_DeepDriller.StatePattern;
 using FCSCommon.Enums;
 using FCSCommon.Utilities;
 using FCSTechFabricator.Enums;
@@ -11,7 +12,7 @@ using UnityEngine;
 
 namespace FCS_DeepDriller.Mono.MK2
 {
-    internal class FCSDeepDrillerPowerHandler : MonoBehaviour, IFCSStorage
+    internal class FCSDeepDrillerPowerHandler : StateMachine, IFCSStorage
     {
         #region Private Fields
 
