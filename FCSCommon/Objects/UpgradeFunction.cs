@@ -1,4 +1,5 @@
-﻿using FCSCommon.Enums;
+﻿using System;
+using FCSCommon.Enums;
 using FCSCommon.Utilities;
 using FCSTechFabricator.Abstract;
 using Oculus.Newtonsoft.Json;
@@ -10,7 +11,13 @@ namespace FCSCommon.Objects
     {
         private bool _isEnabled;
         public virtual Text Label { get; set; }
-        public string Function { get; set; }
+        public string Function => GetFunction();
+
+        public virtual string GetFunction()
+        {
+            return string.Empty;
+        }
+
         public abstract float PowerUsage { get; }
         public abstract float Damage { get; }
         public abstract UpgradeFunctions UpgradeType { get; }

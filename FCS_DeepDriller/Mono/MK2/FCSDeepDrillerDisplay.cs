@@ -74,28 +74,25 @@ namespace FCS_DeepDriller.Mono.MK2
             {
                 _isInitialized = true;
                 _mono.PowerManager.OnBatteryUpdate += OnBatteryUpdate;
-                _mono.PowerManager.OnUsageChange += UpdatePowerUsage;
-                _mono.OilHandler.OnOilUpdate += UpdateOilLevel;
-                _mono.OreGenerator.OnItemsPerDayChanged += UpdateItemsPerDay;
-                _mono.DeepDrillerContainer.OnContainerUpdate += OnContainerUpdate;
+                //_mono.DeepDrillerContainer.OnContainerUpdate += OnContainerUpdate;
                 _mono.OreGenerator.OnIsFocusedChanged += OnIsFocusedChanged;
                 _mono.UpgradeManager.OnUpgradeUpdate += OnUpgradeUpdate;
                 _itemsGrid.DrawPage(1);
                 _filterGrid.DrawPage(1);
-                UpdateOilLevel();
-                UpdatePowerUsage();
-                UpdateItemsPerDay();
+                UpdateDisplayValues();
                 PowerOnDisplay();
                 RecheckFilters();
-                RefreshItemCount();
+                InvokeRepeating(nameof(Updater),0.5f,0.5f);
             }
         }
-        
-        internal FCSDeepDrillerPages GetCurrentPage()
-        {
-            return (FCSDeepDrillerPages)_mono.AnimationHandler.GetIntHash(_pageHash);
-        }
 
+        private void Updater()
+        {
+            RefreshItemCount(_mono.DeepDrillerContainer.GetContainerTotal());
+            RefreshItems();
+            UpdateOilLevel();
+        }
+        
         private void RefreshItemCount(int currentTotal = 0)
         {
             _itemCounter.text = $"{currentTotal} / {QPatch.Configuration.StorageSize}";
@@ -166,16 +163,10 @@ namespace FCS_DeepDriller.Mono.MK2
             }
         }
 
-        private void OnContainerUpdate(int arg1, int arg2)
+        internal void UpdateDisplayValues()
         {
-            RefreshItemCount(arg1);
-            RefreshItems();
-        }
-
-        private void UpdatePowerUsage()
-        {
-            _powerUsage.text = string.Format(FCSDeepDrillerBuildable.PowerUsageFormat(),
-                _mono.PowerManager.GetPowerUsage());
+            _powerUsage.text = string.Format(FCSDeepDrillerBuildable.PowerUsageFormat(),_mono.PowerManager.GetPowerUsage());
+            _itemsPerDay.text = _mono.OreGenerator.GetItemsPerDay();
         }
 
         private void OnBatteryUpdate(PowercellData data)
@@ -183,23 +174,10 @@ namespace FCS_DeepDriller.Mono.MK2
             UpdateBatteryStatus(data);
         }
 
-        private void UpdateItemsPerDay()
-        {
-            _itemsPerDay.text = _mono.OreGenerator.GetItemsPerDay();
-        }
-
         public override void PowerOnDisplay()
         {
             QuickLogger.Debug("Powering On Display!",true);
-            if (_mono.IsFromSave)
-            {
-                _mono.AnimationHandler.BootUp(_pageHash);
-            }
-            else
-            {
-                GotoPage(FCSDeepDrillerPages.Home);
-            }
-
+            _mono.AnimationHandler.BootUp(_pageHash);
         }
 
         public override void PowerOffDisplay()
@@ -230,7 +208,6 @@ namespace FCS_DeepDriller.Mono.MK2
                     _mono.PowerManager.ToggleSolarState();
                     break;
                 case "ItemsBTN":
-                    RefreshItemCount(_mono.DeepDrillerContainer.GetContainerTotal());
                     GotoPage(FCSDeepDrillerPages.ItemsPage);
                     break;
                 case "ProgrammingBTN":
@@ -858,6 +835,7 @@ namespace FCS_DeepDriller.Mono.MK2
         {
             if (_itemsGrid != null)
             {
+                QuickLogger.Debug("Refreshing Items",true);
                 _itemsGrid.DrawPage();
             }
         }

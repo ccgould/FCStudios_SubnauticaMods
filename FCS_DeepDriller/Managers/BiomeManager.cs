@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using FCS_DeepDriller.Configuration;
+using FCSTechFabricator.Configuration;
 using Oculus.Newtonsoft.Json;
 using UnityEngine;
 using UWE;
@@ -12,6 +13,7 @@ namespace FCS_DeepDriller.Managers
 {
     internal static class BiomeManager
     {
+
         public static List<TechType> Resources = new List<TechType>()
         {
             TechType.AluminumOxide, 
@@ -193,9 +195,9 @@ namespace FCS_DeepDriller.Managers
                 }
             }
 
-            var lootWithAdditions = AdditionalLoot(loot, currentBiome);
+            AdditionalLoot(ref loot, currentBiome);
 
-            return lootWithAdditions;
+            return loot;
         }
 
         /// <summary>
@@ -204,11 +206,19 @@ namespace FCS_DeepDriller.Managers
         /// <param name="defaultLoot"></param>
         /// <param name="currentBiome"></param>
         /// <returns></returns>
-        private static List<TechType> AdditionalLoot(List<TechType> defaultLoot, string currentBiome)
+        private static void AdditionalLoot(ref List<TechType> defaultLoot, string currentBiome)
         {
+            QPatch.Configuration.Convert();
+#if DEBUG
+            QuickLogger.Debug($"Addition Ore: {QPatch.Configuration.BiomeOresTechType.Count}");
+#endif
+
             foreach (KeyValuePair<string, List<TechType>> valuePair in QPatch.Configuration.BiomeOresTechType)
             {
-                if (valuePair.Key.Equals(currentBiome))
+#if DEBUG
+                QuickLogger.Debug($"Checking if biomes match {currentBiome} => {valuePair.Key} = {valuePair.Key.Equals(currentBiome,StringComparison.OrdinalIgnoreCase)}");
+#endif
+                if (valuePair.Key.Equals(currentBiome,StringComparison.OrdinalIgnoreCase))
                 {
                     foreach (TechType techType in valuePair.Value)
                     {
@@ -219,8 +229,6 @@ namespace FCS_DeepDriller.Managers
                     }
                 }
             }
-
-            return defaultLoot;
         }
 
         private static void GetResourceForSpecial(TechType techType, List<TechType> items)

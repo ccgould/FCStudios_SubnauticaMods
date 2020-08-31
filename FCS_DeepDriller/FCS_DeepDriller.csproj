@@ -135,7 +135,7 @@
     <Compile Include="Craftable\FCSGlassCraftable.cs" />
     <Compile Include="Enumerators\FCSDeepDrillerPages.cs" />
     <Compile Include="Helpers\FCSDeepDrillerOperations.cs" />
-    <Compile Include="Helpers\Hekpers.cs" />
+    <Compile Include="Helpers\Helpers.cs" />
     <Compile Include="Helpers\MathHelpers.cs" />
     <Compile Include="Model\Upgrades\AutoShutDownAtUpgrade.cs" />
     <Compile Include="Model\Upgrades\AutoStartUpAtUpgrade.cs" />

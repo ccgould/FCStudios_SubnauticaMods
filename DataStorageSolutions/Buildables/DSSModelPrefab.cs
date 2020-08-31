@@ -7,6 +7,7 @@ using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using FCSTechFabricator.Configuration;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace DataStorageSolutions.Buildables
 {
@@ -31,6 +32,8 @@ namespace DataStorageSolutions.Buildables
         internal static GameObject BaseItemPrefab { get; set; }
         internal static GameObject FilterItemPrefab { get; set; }
         internal static GameObject VehicleItemPrefab { get; set; }
+        public static GameObject OperatorPrefab { get; set; }
+        public static GameObject ItemDisplayPrefab { get; set; }
 
         public static bool GetPrefabs()
         {
@@ -57,8 +60,38 @@ namespace DataStorageSolutions.Buildables
                     GameObject antenna = assetBundle.LoadAsset<GameObject>(Mod.AntennaPrefabName);
                     GameObject formatMachine = assetBundle.LoadAsset<GameObject>(Mod.ServerFormattingStationPrefabName);
                     GameObject filterItemPrefab = assetBundle.LoadAsset<GameObject>("FilterItem");
+                    GameObject operatorItemPrefab = assetBundle.LoadAsset<GameObject>(Mod.OperatorPrefabName);
+                    GameObject itemDisplayPrefab = assetBundle.LoadAsset<GameObject>(Mod.ItemDisplayPrefabName);
 
                     //If the prefab isn't null lets add the shader to the materials
+                    if (operatorItemPrefab != null)
+                    {
+                        //Lets apply the material shader
+                        ApplyShaders(operatorItemPrefab, assetBundle);
+
+                        OperatorPrefab = operatorItemPrefab;
+                        QuickLogger.Debug($"Operator Prefab Found!");
+                    }
+                    else
+                    {
+                        QuickLogger.Error($"Operator Prefab Not Found!");
+                        return false;
+                    }
+
+                    if (itemDisplayPrefab != null)
+                    {
+                        //Lets apply the material shader
+                        ApplyShaders(itemDisplayPrefab, assetBundle);
+
+                        ItemDisplayPrefab = itemDisplayPrefab;
+                        QuickLogger.Debug($"Item Display Prefab Found!");
+                    }
+                    else
+                    {
+                        QuickLogger.Error($"Item Display Prefab Not Found!");
+                        return false;
+                    }
+
                     if (wallMountRackPrefab != null)
                     {
                         //Lets apply the material shader
@@ -72,23 +105,7 @@ namespace DataStorageSolutions.Buildables
                         QuickLogger.Error($"Wall Mount Rack Prefab Not Found!");
                         return false;
                     }
-
-                    //Floor Mounted Rack Has Been Cut
-                    //if (floorMountRackPrefab != null)
-                    //{
-                    //    //Lets apply the material shader
-                    //    ApplyShaders(floorMountRackPrefab, assetBundle);
-
-                    //    FloorMountRackPrefab = floorMountRackPrefab;
-
-                    //    QuickLogger.Debug($"Floor Mount Rack Prefab Found!");
-                    //}
-                    //else
-                    //{
-                    //    QuickLogger.Error($"Floor Mount Rack Prefab Not Found!");
-                    //    return false;
-                    //}
-
+                    
                     if (terminalPrefab != null)
                     {
                         //Lets apply the material shader
@@ -199,6 +216,7 @@ namespace DataStorageSolutions.Buildables
                 return false;
             }
         }
+
 
         /// <summary>
         /// Applies the shader to the materials of the reactor

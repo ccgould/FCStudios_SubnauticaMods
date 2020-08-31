@@ -56,8 +56,6 @@ namespace FCS_AIMarineTurbine.Buildable
                 QuickLogger.Debug("Instantiate GameObject");
 
                 var prefab = GameObject.Instantiate(_Prefab);
-                var transmitter = GameObject.Instantiate(CraftData.GetPrefabForTechType(TechType.PowerTransmitter));
-
 
                 // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
                 var lwe = prefab.AddComponent<LargeWorldEntity>();

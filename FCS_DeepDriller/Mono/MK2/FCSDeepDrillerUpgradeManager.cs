@@ -90,7 +90,6 @@ namespace FCS_DeepDriller.Mono.MK2
                                         IsEnabled = true,
                                         Mono = _mono,
                                         OreCount = orePerDay,
-                                        Function = functionString
                                     };
                                     Upgrades.Add(orePerDayUpgrade);
                                     OnUpgradeUpdate?.Invoke(orePerDayUpgrade);
@@ -125,8 +124,7 @@ namespace FCS_DeepDriller.Mono.MK2
                                         IsEnabled = true,
                                         Mono = _mono,
                                         Amount = tuple.Item2,
-                                        TechType = tuple.Item1,
-                                        Function = functionString
+                                        TechType = tuple.Item1
 
                                     };
                                     Upgrades.Add(maxOreCountUpgrade);
@@ -161,8 +159,7 @@ namespace FCS_DeepDriller.Mono.MK2
                                         IsEnabled = true,
                                         Mono = _mono,
                                         Amount = minTuple.Item2,
-                                        TechType = minTuple.Item1,
-                                        Function = functionString
+                                        TechType = minTuple.Item1
 
                                     };
                                     Upgrades.Add(maxOreCountUpgrade);
@@ -196,8 +193,7 @@ namespace FCS_DeepDriller.Mono.MK2
                                         IsEnabled = true,
                                         Mono = _mono,
                                         Amount = silkTouchCheckTuple.Item2,
-                                        TechType = silkTouchCheckTuple.Item1,
-                                        Function = functionString
+                                        TechType = silkTouchCheckTuple.Item1
 
                                     };
                                     Upgrades.Add(silkTouchUpgrade);
@@ -226,7 +222,7 @@ namespace FCS_DeepDriller.Mono.MK2
                                 if (autoShutdownAtValid)
                                 {
                                     QuickLogger.Debug($"Function  Valid: {functionString}", true);
-                                    var autoShutDownAtUpgrade = new AutoShutDownAtUpgrade { IsEnabled = true, Mono = _mono, Time = autoShutdownAt,Function = functionString};
+                                    var autoShutDownAtUpgrade = new AutoShutDownAtUpgrade { IsEnabled = true, Mono = _mono, Time = autoShutdownAt};
                                     Upgrades.Add(autoShutDownAtUpgrade);
                                     upgrade = autoShutDownAtUpgrade;
                                     OnUpgradeUpdate?.Invoke(autoShutDownAtUpgrade);
@@ -253,7 +249,7 @@ namespace FCS_DeepDriller.Mono.MK2
                                 if (autoStartUpAtValid)
                                 {
                                     QuickLogger.Debug($"Function  Valid: {functionString}", true);
-                                    var autoStartUpAtUpgrade = new AutoStartUpAtUpgrade { IsEnabled = true, Mono = _mono, Time = autoStartUpAt,Function = functionString};
+                                    var autoStartUpAtUpgrade = new AutoStartUpAtUpgrade { IsEnabled = true, Mono = _mono, Time = autoStartUpAt};
                                     Upgrades.Add(autoStartUpAtUpgrade);
                                     upgrade = autoStartUpAtUpgrade;
                                     OnUpgradeUpdate?.Invoke(autoStartUpAtUpgrade);
@@ -263,6 +259,7 @@ namespace FCS_DeepDriller.Mono.MK2
                                     QuickLogger.Debug($"Invalid Function: {functionString}", true);
                                 }
                                 break;
+
                         }
                     }
                 }
@@ -409,8 +406,7 @@ namespace FCS_DeepDriller.Mono.MK2
 
             OnUpgradeUpdate?.Invoke(null);
         }
-
-
+        
         internal IEnumerable<UpgradeSave> Save()
         {
             foreach (UpgradeFunction upgrade in Upgrades)

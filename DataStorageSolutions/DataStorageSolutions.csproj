@@ -115,6 +115,8 @@
     <Compile Include="Buildables\DSSModelPrefab.cs" />
     <Compile Include="Buildables\AuxPatcher.cs" />
     <Compile Include="Buildables\FilterMachine\ServerFormattingStationBuildable.cs" />
+    <Compile Include="Buildables\Item Display\ItemDisplayBuildable.cs" />
+    <Compile Include="Buildables\Operator\OperatorBuildable.cs" />
     <Compile Include="Buildables\Racks\FloorMountedRackBuildable.cs" />
     <Compile Include="Buildables\Racks\WallMountedRackBuildable.cs" />
     <Compile Include="Buildables\Terminal\DSSTerminalC48Patch.cs" />
@@ -138,6 +140,8 @@
     <Compile Include="Model\ObjectDataTransferData.cs" />
     <Compile Include="Model\ServerData.cs" />
     <Compile Include="Mono\DSSAntennaController.cs" />
+    <Compile Include="Mono\DSSItemDisplayController.cs" />
+    <Compile Include="Mono\DSSOperatorController.cs" />
     <Compile Include="Mono\DSSRackDisplayController.cs" />
     <Compile Include="Mono\DSSServerDisplay.cs" />
     <Compile Include="Mono\DSSServerFormattingStationController.cs" />

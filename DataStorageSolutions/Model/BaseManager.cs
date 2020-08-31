@@ -722,6 +722,14 @@ namespace DataStorageSolutions.Model
             {
                 amount = TrackedItems[techType];
             }
+
+            foreach (KeyValuePair<string, FCSConnectableDevice> connectable in FCSConnectables)
+            {
+                if(!connectable.Value.IsOperational()) continue;
+                amount += connectable.Value.GetItemCount(techType);
+            }
+
+            
             return amount;
         }
     }

@@ -35,7 +35,8 @@ namespace ExStorageDepot.Mono.Managers
                 PowerOnDisplay();
                 DrawPage(1);
                 SetItemCount(_mono.Storage.GetTotalCount());
-                _mono.Storage.OnContainerUpdate += OnContainerUpdate;
+                //_mono.Storage.OnContainerUpdate += OnContainerUpdate;
+                InvokeRepeating(nameof(OnContainerUpdate),0.5f,0.5f);
             }
             else
             {
@@ -53,11 +54,11 @@ namespace ExStorageDepot.Mono.Managers
             UpdateLabels();
         }
 
-        private void OnContainerUpdate(int arg1, int arg2)
+        private void OnContainerUpdate()
         {
             QuickLogger.Debug($"Updating Container.",true);
            _grid.DrawPage();
-            SetItemCount(arg1);
+            SetItemCount(_mono.Storage.GetTotalCount());
         }
 
         private void OnLabelChanged(string obj)

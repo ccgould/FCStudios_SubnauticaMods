@@ -4,7 +4,6 @@ using FCS_DeepDriller.Mono.MK2;
 using FCSCommon.Enums;
 using FCSCommon.Objects;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Handlers;
 
 
 namespace FCS_DeepDriller.Model.Upgrades
@@ -19,12 +18,17 @@ namespace FCS_DeepDriller.Model.Upgrades
             set
             {
                 _oreCount = value;
-                UpdateLabel();
+                TriggerUpdate();
             }
         }
 
-        public override float PowerUsage => 1.0f;
-        public override float Damage => 0.5f;
+        public override string GetFunction()
+        {
+            return $"os.OresPerDay({OreCount});";
+        }
+
+        public override float PowerUsage => QPatch.Configuration.OrePerDayUpgradePowerUsage + (OreCount * QPatch.Configuration.OreReductionValue);
+        public override float Damage => QPatch.Configuration.OrePerDayUpgradeDamage * OreCount;
         public override UpgradeFunctions UpgradeType => UpgradeFunctions.OresPerDay;
         public override string FriendlyName => "Ores Per Day";
 
@@ -49,14 +53,10 @@ namespace FCS_DeepDriller.Model.Upgrades
             if (Mono != null)
             {
                 ((FCSDeepDrillerController)Mono).OreGenerator.SetOresPerDay(OreCount);
+                UpdateLabel();
             }
         }
-
-        internal void UpdateFunction()
-        {
-
-        }
-
+        
         internal static bool IsValid(string[] paraResults, out int amountPerDay)
         {
             amountPerDay = 0;
@@ -93,6 +93,7 @@ namespace FCS_DeepDriller.Model.Upgrades
         public override string Format()
         {
             var isActive = IsEnabled ? Language.main.Get("BaseBioReactorActive") : Language.main.Get("BaseBioReactorInactive");
+            ((FCSDeepDrillerController)Mono)?.DisplayHandler?.UpdateDisplayValues();
             return $"{FriendlyName} | {OreCount} ({isActive})";
         }
     }

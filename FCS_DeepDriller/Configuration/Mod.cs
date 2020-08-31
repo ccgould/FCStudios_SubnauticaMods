@@ -201,8 +201,6 @@ namespace FCS_DeepDriller.Configuration
         {
             try
             {
-                var config = new DeepDrillerCfg();
-
                 var saveDataJson = JsonConvert.SerializeObject(QPatch.Configuration, Formatting.Indented);
 
                 File.WriteAllText(Path.Combine(MODFOLDERLOCATION, GetConfigPath()), saveDataJson);
@@ -215,14 +213,24 @@ namespace FCS_DeepDriller.Configuration
 
         private static DeepDrillerCfg LoadConfigurationData()
         {
-            // == Load Configuration == //
-            string configJson = File.ReadAllText(GetConfigPath().Trim());
+            try
+            {
+                // == Load Configuration == //
+                string configJson = File.ReadAllText(GetConfigPath().Trim());
 
-            JsonSerializerSettings settings = new JsonSerializerSettings();
-            settings.MissingMemberHandling = MissingMemberHandling.Ignore;
+                JsonSerializerSettings settings = new JsonSerializerSettings
+                {
+                    MissingMemberHandling = MissingMemberHandling.Ignore
+                };
 
-            // == LoadData == //
-            return JsonConvert.DeserializeObject<DeepDrillerCfg>(configJson, settings);
+                // == LoadData == //
+                return JsonConvert.DeserializeObject<DeepDrillerCfg>(configJson, settings);
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error($"Failed to load configuration loading Defaults: \nError: {e.Message} | StackTrace: {e.StackTrace}");
+                return new DeepDrillerCfg();
+            }
         }
 
         internal static DeepDrillerCfg LoadConfiguration()

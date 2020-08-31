@@ -33,18 +33,10 @@ namespace FCS_DeepDriller
             QuickLogger.DebugLogsEnabled = true;
             QuickLogger.Debug("Debug logs enabled");
 #endif
-#if USE_ExStorageDepot
-            QuickLogger.Info("Ex-Storage Version");
-#endif
+
             try
             {
-
-                //var glass = TechTypeHandler.AddTechType("FCSGlass", "Glass", "SiO4. Pure fused quartz glass.", SpriteManager.Get(TechType.Glass));
-                //CraftDataHandler.SetTechData(glass,new TechData{LinkedItems = new List<TechType>{TechType.Glass}});
-          
-
                 Configuration = Mod.LoadConfiguration();
-                Configuration.Convert();
 
                 OptionsPanelHandler.RegisterModOptions(new Options());
                 

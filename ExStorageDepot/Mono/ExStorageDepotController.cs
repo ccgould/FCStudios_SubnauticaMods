@@ -7,6 +7,7 @@ using System;
 using FCSCommon.Helpers;
 using FCSTechFabricator.Abstract;
 using FCSTechFabricator.Components;
+using FCSTechFabricator.Interfaces;
 
 namespace ExStorageDepot.Mono
 {
@@ -82,6 +83,8 @@ namespace ExStorageDepot.Mono
 
         public override void OnConstructedChanged(bool constructed)
         {
+            IsConstructed = constructed;
+
             if (constructed)
             {
                 if (isActiveAndEnabled)
@@ -147,7 +150,7 @@ namespace ExStorageDepot.Mono
             if (FCSConnectableDevice == null)
             {
                 FCSConnectableDevice = gameObject.AddComponent<FCSConnectableDevice>();
-                FCSConnectableDevice.Initialize(this, Storage);
+                FCSConnectableDevice.Initialize(this, Storage,new ExStoragePowerManager());
             }
 
             _initialized = true;

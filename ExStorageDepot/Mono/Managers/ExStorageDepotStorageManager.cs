@@ -24,7 +24,7 @@ namespace ExStorageDepot.Mono.Managers
         internal List<ItemData> ContainerItems { get; private set; } = new List<ItemData>();
         public int GetContainerFreeSpace => _maxItems - GetTotalCount();
         public bool IsFull => GetIsFull();
-        public Action<int, int> OnContainerUpdate { get; set; }
+        public Action<int, int> OnContainerUpdate { get; set; } //Not being used causes lag when moving large items
 
 
         private bool GetIsFull()
@@ -66,7 +66,7 @@ namespace ExStorageDepot.Mono.Managers
             try
             {
                 ContainerItems.Add(InventoryHelpers.CovertToItemData(item, true));
-                OnContainerUpdate?.Invoke(GetTotalCount(), _maxItems);
+                //OnContainerUpdate?.Invoke(GetTotalCount(), _maxItems);
             }
             catch (Exception e)
             {
@@ -116,7 +116,7 @@ namespace ExStorageDepot.Mono.Managers
                 var itemData = ContainerItems.Single(x => x.TechType == techType);
                 var item = InventoryHelpers.ConvertToPickupable(itemData);
                 ContainerItems.Remove(itemData);
-                OnContainerUpdate?.Invoke(GetTotalCount(),_maxItems);
+                //OnContainerUpdate?.Invoke(GetTotalCount(),_maxItems);
                 return item;
             }
 
@@ -151,7 +151,7 @@ namespace ExStorageDepot.Mono.Managers
         internal void LoadFromSave(List<ItemData> storageItems)
         {
             ContainerItems = storageItems;
-            OnContainerUpdate?.Invoke(GetTotalCount(),_maxItems);
+            //OnContainerUpdate?.Invoke(GetTotalCount(),_maxItems);
         }
         
         internal void SetMultiplier(int value)
@@ -188,7 +188,7 @@ namespace ExStorageDepot.Mono.Managers
 
                         Inventory.main.Pickup(pickup); 
                         ContainerItems.Remove(itemData);
-                        OnContainerUpdate?.Invoke(GetTotalCount(),_maxItems);
+                        //OnContainerUpdate?.Invoke(GetTotalCount(),_maxItems);
                     }
                 }
                 else
@@ -196,6 +196,11 @@ namespace ExStorageDepot.Mono.Managers
                     QuickLogger.Debug($"There are 0 {techType} in the container.", true);
                 }
             }
+        }
+
+        private void FlushContainer()
+        {
+            ContainerItems.Clear();
         }
 
         private void OnDestroy()

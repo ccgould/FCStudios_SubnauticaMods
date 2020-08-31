@@ -5,7 +5,7 @@ using System.Text;
 
 namespace FCS_DeepDriller.Helpers
 {
-    internal static class Hekpers
+    internal static class Helpers
     {
         public static string GetUntilOrEmpty(this string text, string stopAt = "(")
         {

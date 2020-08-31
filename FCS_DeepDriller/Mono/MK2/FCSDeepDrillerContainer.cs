@@ -14,7 +14,7 @@ namespace FCS_DeepDriller.Mono.MK2
     {
         public int GetContainerFreeSpace => CalculateFreeSpace();
 
-        public Action<int, int> OnContainerUpdate { get; set; }
+       public Action<int, int> OnContainerUpdate { get; set; } // Not being used casing lag on large transfers
 
         private int CalculateFreeSpace()
         {
@@ -130,7 +130,7 @@ namespace FCS_DeepDriller.Mono.MK2
                     _container.Add(item,1);
                 }
 
-                OnContainerUpdate?.Invoke(GetContainerTotal(),QPatch.Configuration.StorageSize);
+                //OnContainerUpdate?.Invoke(GetContainerTotal(),QPatch.Configuration.StorageSize);
             }
             catch (Exception e)
             {
@@ -166,7 +166,7 @@ namespace FCS_DeepDriller.Mono.MK2
                             _container[item] -= 1;
                         }
 
-                        OnContainerUpdate?.Invoke(GetContainerTotal(), QPatch.Configuration.StorageSize);
+                        //OnContainerUpdate?.Invoke(GetContainerTotal(), QPatch.Configuration.StorageSize);
                     }
                 }
             }
@@ -193,7 +193,7 @@ namespace FCS_DeepDriller.Mono.MK2
                         _container[item] -= 1;
                     }
 
-                    OnContainerUpdate?.Invoke(GetContainerTotal(), QPatch.Configuration.StorageSize);
+                    //OnContainerUpdate?.Invoke(GetContainerTotal(), QPatch.Configuration.StorageSize);
                 }
             }
             catch (Exception e)

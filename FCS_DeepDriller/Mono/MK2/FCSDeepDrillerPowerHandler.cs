@@ -40,7 +40,6 @@ namespace FCS_DeepDriller.Mono.MK2
 
         #region Properties
 
-        internal Action OnUsageChange { get; set; }
         internal Action<FCSPowerStates> OnPowerUpdate;
         internal Action<PowercellData> OnBatteryUpdate { get; set; }
 
@@ -161,8 +160,8 @@ namespace FCS_DeepDriller.Mono.MK2
         
         private float CalculatePowerUsage()
         {
-            var amount = _mono.UpgradeManager.Upgrades.Sum(x => x.PowerUsage);
-            return _powerDraw + amount;
+            float sum = _mono.UpgradeManager.Upgrades.Where(upgrade => upgrade.IsEnabled).Sum(upgrade => upgrade.PowerUsage);
+            return _powerDraw + sum;
         }
 
         #endregion
@@ -177,14 +176,14 @@ namespace FCS_DeepDriller.Mono.MK2
             _depthCurve.AddKey(0f, 0f);
             _depthCurve.AddKey(0.4245796f, 0.5001081f);
             _depthCurve.AddKey(1f, 1f);
-            _powerBank.Battery = new PowercellData { Charge = 0, Capacity = 3000 };
+            _powerBank.Battery = new PowercellData { Charge = 0, Capacity = QPatch.Configuration.InternalBatteryCapacity };
             _initialized = true;
         }
 
         internal void LoadData(DeepDrillerSaveDataEntry data)
         {
             _powerBank.SolarPanel = data.PowerData.SolarPanel;
-            _powerBank.Battery = data.PowerData.Battery;
+            _powerBank.Battery.Charge = data.PowerData.Battery.Charge;
             //PullPowerFromRelay = data.PullFromRelay; Disabled to until I decide to make it a toggle option
 
             if (data.SolarExtended)
@@ -263,12 +262,7 @@ namespace FCS_DeepDriller.Mono.MK2
         {
             return (_powerRelay?.GetPower() ?? 0) + _powerBank.Battery.Charge + _powerBank.SolarPanel;
         }
-
-        internal float GetBatteryCharge()
-        {
-            return !QPatch.Configuration.HardCoreMode ? _powerBank.Battery.Capacity : _powerBank.Battery.Charge;
-        }
-
+        
         internal void SetPowerRelay(PowerRelay powerRelay)
         {
             _powerRelay = powerRelay;
@@ -291,11 +285,6 @@ namespace FCS_DeepDriller.Mono.MK2
 
             return _powerRelay?.GetPower() >= amount || _powerBank.SolarPanel >= amount ||
                    _powerBank.Battery.Charge >= amount;
-        }
-
-        internal void UpdatePowerUsage()
-        {
-            OnUsageChange?.Invoke();
         }
 
         internal bool GetPullFromPowerRelay()

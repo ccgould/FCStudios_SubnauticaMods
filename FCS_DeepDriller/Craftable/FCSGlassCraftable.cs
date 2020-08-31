@@ -1,15 +1,13 @@
-﻿using System;
-using FCS_DeepDriller.Configuration;
-using FCSTechFabricator;
-
-namespace FCS_DeepDriller.Craftable
+﻿namespace FCS_DeepDriller.Craftable
 {
-    using SMLHelper.V2.Assets;
     using System.Collections.Generic;
     using FCSCommon.Extensions;
     using FCSCommon.Utilities;
     using SMLHelper.V2.Crafting;
     using UnityEngine;
+    using System;
+    using Configuration;
+    using FCSTechFabricator;
 
     internal class FCSGlassCraftable : FcCraftable
     {

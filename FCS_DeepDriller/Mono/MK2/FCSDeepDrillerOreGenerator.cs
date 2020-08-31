@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using FCS_DeepDriller.Buildable.MK2;
+using FCS_DeepDriller.Helpers;
 using FCS_DeepDriller.Model.Upgrades;
 using FCSCommon.Enums;
 using FCSCommon.Objects;
@@ -191,7 +192,7 @@ namespace FCS_DeepDriller.Mono.MK2
 
         public string GetItemsPerDay()
         {
-            return string.Format(FCSDeepDrillerBuildable.ItemsPerDayFormat(), _oresPerDay);
+            return string.Format(FCSDeepDrillerBuildable.ItemsPerDayFormat(), _oresPerDay.ToKiloFormat());
         }
 
         internal void ApplyUpgrade(UpgradeFunction upgrade)
@@ -210,7 +211,6 @@ namespace FCS_DeepDriller.Mono.MK2
                 case UpgradeFunctions.MinOreCount:
                     break;
             }
-            _mono.PowerManager.UpdatePowerUsage();
         }
 
         internal void UpdatePowerUsage()

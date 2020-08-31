@@ -23,6 +23,7 @@ namespace FCS_DeepDriller.Mono.MK2
 
         private void Update()
         {
+            if (_mono == null || _mono.PowerManager == null) return;
             if (QPatch.Configuration.HardCoreMode)
             {
                 if (_mono.PowerManager.IsPowerAvailable() && _timeLeft > 0)
@@ -67,12 +68,13 @@ namespace FCS_DeepDriller.Mono.MK2
 
         internal float GetOilPercent()
         {
-            return _timeLeft / _setOilTime;
+            return QPatch.Configuration.HardCoreMode ?  _timeLeft / _setOilTime : 1f;
         }
 
         public bool CanBeStored(int amount, TechType techType)
         {
-            return _timeLeft + KDayInSeconds <= _setOilTime;
+            //return _timeLeft + KDayInSeconds <= _setOilTime;
+            return _timeLeft + KDayInSeconds * amount <= _setOilTime;
         }
 
         public bool AddItemToContainer(InventoryItem item)
@@ -90,7 +92,7 @@ namespace FCS_DeepDriller.Mono.MK2
                 return false;
             }
 
-            if (!CanBeStored(1, TechType.Lubricant))
+            if (!CanBeStored(_mono.OilDumpContainer.GetCount(), TechType.Lubricant))
             {   
                 QuickLogger.Message(string.Format(FCSDeepDrillerBuildable.OilTankNotEmpty(),TimeTilRefuel()), true);
                 return false;
@@ -140,7 +142,7 @@ namespace FCS_DeepDriller.Mono.MK2
 
         internal bool HasOil()
         {
-            return _timeLeft > 0;
+            return !QPatch.Configuration.HardCoreMode || _timeLeft > 0;
         }
     }
 }

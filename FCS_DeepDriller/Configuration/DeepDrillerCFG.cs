@@ -1,4 +1,5 @@
-﻿using FCSCommon.Extensions;
+﻿using System;
+using FCSCommon.Extensions;
 using FCSCommon.Utilities;
 using Oculus.Newtonsoft.Json;
 using System.Collections.Generic;
@@ -17,23 +18,36 @@ namespace FCS_DeepDriller.Configuration
         public float OilTimePeriodInDays { get; set; } = 30.0f;
         public float OilRestoresInDays { get; set; } = 5.0f;
         public Dictionary<string, List<string>> AdditionalBiomeOres { get; set; } = new Dictionary<string, List<string>>();
-        [JsonIgnore] internal Dictionary<string, List<TechType>> BiomeOresTechType { get; set; } = new Dictionary<string, List<TechType>>();
+        public float MaxOreCountUpgradePowerUsage { get; set; } = 0.2f;
+        public float OrePerDayUpgradePowerUsage { get; set; } = 1.0f;
+        public float OrePerDayUpgradeDamage { get; set; } = 0.5f;
+        public float InternalBatteryCapacity { get; set; } = 1000f;
         public float DrillExStorageRange { get; set; } = 30f;
+        [JsonIgnore] internal float OreReductionValue => 0.08f;
+        [JsonIgnore] internal Dictionary<string, List<TechType>> BiomeOresTechType { get; set; } = new Dictionary<string, List<TechType>>();
         [JsonIgnore] internal float DrillExStorageMaxRange { get; set; } = 100f;
+
 
         #endregion
         internal void Convert()
         {
-            foreach (KeyValuePair<string, List<string>> biomeOre in AdditionalBiomeOres)
+            try
             {
-                var types = new List<TechType>();
-
-                foreach (string sTechType in biomeOre.Value)
+                foreach (KeyValuePair<string, List<string>> biomeOre in AdditionalBiomeOres)
                 {
-                    types.Add(sTechType.ToTechType());
+                    var types = new List<TechType>();
+
+                    foreach (string sTechType in biomeOre.Value)
+                    {
+                        types.Add(sTechType.ToTechType());
+                    }
+                    QuickLogger.Debug($"Added {biomeOre.Key} to BiomeOresTechType");
+                    BiomeOresTechType.Add(biomeOre.Key, types);
                 }
-                QuickLogger.Debug($"Added {biomeOre.Key} to BiomeOresTechType");
-                BiomeOresTechType.Add(biomeOre.Key, types);
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error($"Error: {e.Message} || Stack Trace: {e.StackTrace}");
             }
         }
     }

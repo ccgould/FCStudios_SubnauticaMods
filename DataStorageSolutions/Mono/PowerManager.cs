@@ -148,7 +148,7 @@ namespace DataStorageSolutions.Mono
 
         private void Update()
         {
-            if (!_mono.IsConstructed) return;
+            if (_mono == null || !_mono.IsConstructed) return;
             UpdatePowerState();
             ConsumePower();
         }

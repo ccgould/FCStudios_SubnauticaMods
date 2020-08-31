@@ -19,6 +19,7 @@ namespace DataStorageSolutions.Configuration
         [JsonProperty] internal HashSet<ObjectData> ServerData { get; set; }
         [JsonProperty] internal string AntennaName { get; set; }
         [JsonProperty] internal List<Filter> Filters { get; set; }
+        [JsonProperty] internal TechType ItemDisplayItem { get; set; }
     }
 
     [Serializable]

@@ -16,11 +16,9 @@ namespace FCSTechFabricator.Abstract
         
         public virtual string GetPrefabID()
         {
-            if (_prefabId == String.Empty)
-            {
-                var prefabIdentifier = GetComponentInParent<PrefabIdentifier>() ?? GetComponentInChildren<PrefabIdentifier>();
-                _prefabId = prefabIdentifier?.Id ?? string.Empty;
-            }
+            if (!string.IsNullOrWhiteSpace(_prefabId)) return _prefabId;
+            var prefabIdentifier = GetComponentInParent<PrefabIdentifier>() ?? GetComponentInChildren<PrefabIdentifier>();
+            _prefabId = prefabIdentifier?.Id ?? string.Empty;
 
             return _prefabId;
         }

@@ -22,11 +22,16 @@ namespace FCS_DeepDriller.Model.Upgrades
             }
         }
 
-        public override float PowerUsage => 0.2f;
-        public override float Damage { get; }
+        public override float PowerUsage => QPatch.Configuration.MaxOreCountUpgradePowerUsage;
+        public override float Damage { get; } = 0;
         public override UpgradeFunctions UpgradeType => UpgradeFunctions.MaxOreCount;
         public override string FriendlyName => "Max Ore Count";
         public TechType TechType { get; set; }
+
+        public override string GetFunction()
+        {
+            return $"os.MaxOreCount({TechType},{Amount});";
+        }
 
         public override void ActivateUpdate()
         {

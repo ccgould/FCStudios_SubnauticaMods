@@ -162,5 +162,20 @@ namespace FCSTechFabricator.Components
         {
            return _storage.ContainsItem(techType);
         }
+
+        public virtual int GetItemCount(TechType techType)
+        {  var items = _storage.GetItemsWithin();
+            return items.ContainsKey(techType) ? items[techType] : 0;
+        }
+
+        public virtual bool IsConstructed()
+        {
+            return _mono.IsConstructed;
+        }
+
+        public bool IsOperational()
+        {
+            return _powerManager?.GetPowerState() == FCSPowerStates.Powered && IsConstructed();
+        }
     }
 }

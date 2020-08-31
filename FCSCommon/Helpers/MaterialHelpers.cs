@@ -24,13 +24,13 @@ namespace FCSCommon.Helpers
             {
                 var objects = new List<object>(assetBundle.LoadAllAssets(typeof(object)));
 
-                QuickLogger.Debug($"[FindTexture2D] Object Count: {objects.Count}");
+                //QuickLogger.Debug($"[FindTexture2D] Object Count: {objects.Count}");
 
                 for (int i = 0; i < objects.Count; i++)
                 {
                     if (objects[i] is Texture2D)
                     {
-                        QuickLogger.Debug($"[FindTexture2D] Object Name: {((Texture2D)objects[i]).name.ToLower()}");
+                        //QuickLogger.Debug($"[FindTexture2D] Object Name: {((Texture2D)objects[i]).name.ToLower()}");
 
                         if (((Texture2D)objects[i]).name.Equals(textureName, StringComparison.OrdinalIgnoreCase))
                         {
@@ -137,7 +137,7 @@ namespace FCSCommon.Helpers
                 {
                     if (material.name.StartsWith(materialName, StringComparison.OrdinalIgnoreCase))
                     {
-                        QuickLogger.Debug($"Found material {materialName} changing color to {color2}",true);
+                        //QuickLogger.Debug($"Found material {materialName} changing color to {color2}",true);
                         material.SetColor("_Color", color);
                         material.SetColor("_Color2", color2);
                         material.SetColor("_Color3", color3);

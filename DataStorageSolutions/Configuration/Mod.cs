@@ -74,6 +74,18 @@ namespace DataStorageSolutions.Configuration
         internal const string ServerClassID = "DSSServer";
         internal const string ServerPrefabName = "Server";
 
+        internal const string OperatorFriendlyName = "DSS Operator";
+        internal const string OperatorDescription = "The DSS Operator allows your DSS system to connect to other devices to perform repeated task and performs other crafting operations";
+        internal const string OperatorClassID = "DSSOperator";
+        internal const string OperatorPrefabName = "DSSOperator";
+        internal const string OperatorKitClassID = "DSSOperator_Kit";
+
+        internal const string ItemDisplayFriendlyName = "DSS Item Display";
+        internal const string ItemDisplayDescription = "The DSS Item display allows you to view how much of one item you have in your system.";
+        internal const string ItemDisplayClassID = "DSSItemDisplay";
+        internal const string ItemDisplayPrefabName = "ItemDisplay";
+        internal const string ItemDisplayKitID = "ItemDisplay_Kit";
+
         internal static Action<bool> OnAntennaBuilt;
         private static TechType _seaBreezeTechType;
 
@@ -176,6 +188,36 @@ namespace DataStorageSolutions.Configuration
                 new Ingredient(TechType.AdvancedWiringKit, 1),
                 new Ingredient(TechType.Aerogel, 1),
                 new Ingredient(TechType.Titanium, 1)
+            }
+        };
+
+#if SUBNAUTICA
+        internal static TechData DSSOperatorIngredients => new TechData
+#elif BELOWZERO
+                internal static RecipeData DSSOperatorIngredients => new RecipeData
+#endif
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(TechType.Glass, 1),
+                new Ingredient(TechType.AdvancedWiringKit, 1),
+                new Ingredient(TechType.Titanium, 3)
+            }
+        };
+
+#if SUBNAUTICA
+        internal static TechData ItemDisplayIngredients => new TechData
+#elif BELOWZERO
+                internal static RecipeData ItemDisplayIngredients => new RecipeData
+#endif
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(TechType.Glass, 1),
+                new Ingredient(TechType.WiringKit, 1),
+                new Ingredient(TechType.Titanium, 2)
             }
         };
 

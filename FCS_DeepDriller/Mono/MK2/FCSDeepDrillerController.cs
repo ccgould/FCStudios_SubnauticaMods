@@ -58,7 +58,7 @@ namespace FCS_DeepDriller.Mono.MK2
         internal DumpContainer OilDumpContainer { get; set; }
         public ColorManager ColorManager { get; private set; }
         public FCSDeepDrillerUpgradeManager UpgradeManager { get; private set; }
-
+        public DeepDrillerCfg Config => QPatch.Configuration;
         #endregion
 
         #region Unity Methods
@@ -74,7 +74,6 @@ namespace FCS_DeepDriller.Mono.MK2
 
             if (_runStartUpOnEnable)
             {
-
                 if (!IsInitialized)
                 {
                     Initialize();

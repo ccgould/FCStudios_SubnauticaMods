@@ -8,6 +8,7 @@ namespace FCS_DeepDriller.Model.Upgrades
     internal class AutoShutDownAtUpgrade : UpgradeFunction
     {
         public double Time { get; set; }
+
         public override float PowerUsage => 0.1f;
         public override float Damage { get; }
         public override UpgradeFunctions UpgradeType => UpgradeFunctions.AutoShutdownAt;
