@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace FCS_DeepDriller.Mono.MK2
 {
-    internal class FCSDeepDrillerPowerHandler : StateMachine, IFCSStorage
+    internal class FCSDeepDrillerPowerHandler : StateMachine, IFCSStorage, IFCSPowerManager
     {
         #region Private Fields
 
@@ -266,6 +266,56 @@ namespace FCS_DeepDriller.Mono.MK2
         internal void SetPowerRelay(PowerRelay powerRelay)
         {
             _powerRelay = powerRelay;
+        }
+
+        public float GetPowerUsagePerSecond()
+        {
+            return GetPowerUsage();
+        }
+
+        public float GetDevicePowerCharge()
+        {
+            return GetTotalCharge();
+        }
+
+        public float GetDevicePowerCapacity()
+        {
+            return QPatch.Configuration.InternalBatteryCapacity;
+        }
+
+        FCSPowerStates IFCSPowerManager.GetPowerState()
+        {
+            return GetPowerState();
+        }
+
+        public void TogglePowerState()
+        {
+            if (GetPowerState() != FCSPowerStates.Powered)
+            {
+                _mono.DisplayHandler.PowerOnDisplay();
+                _mono.PowerManager.SetPowerState(FCSPowerStates.Powered);
+            }
+            else
+            {
+                _mono.DisplayHandler.PowerOffDisplay();
+                _mono.PowerManager.SetPowerState(FCSPowerStates.Tripped);
+            }
+        }
+
+        void IFCSPowerManager.SetPowerState(FCSPowerStates state)
+        {
+            SetPowerState(state);
+        }
+
+        public bool IsDevicePowerFull()
+        {
+            return IsFull;
+        }
+
+        public bool ModifyPower(float amount, out float consumed)
+        {
+            consumed = 0f;
+            return false;
         }
 
         internal FCSPowerStates GetPowerState()

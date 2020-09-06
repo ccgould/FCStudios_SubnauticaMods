@@ -92,6 +92,8 @@ namespace AlterraGen.Mono
             {
                 _fcsConnectableDevice = gameObject.AddComponent<FCSConnectableDevice>();
                 _fcsConnectableDevice.Initialize(this,PowerManager,PowerManager);
+                FCSTechFabricator.FcTechFabricatorService.PublicAPI.RegisterDevice(_fcsConnectableDevice, GetPrefabID(), Mod.ModTabID);
+
             }
 
 
@@ -104,6 +106,11 @@ namespace AlterraGen.Mono
             _xBubbles = GameObjectHelpers.FindGameObject(gameObject, "xBubbles");
             
             IsInitialized = true;
+        }
+
+        internal FCSConnectableDevice GetFCSConnectable()
+        {
+            return _fcsConnectableDevice;
         }
 
         internal void SetXBubbles(bool value)
@@ -221,5 +228,6 @@ namespace AlterraGen.Mono
         }
 
         #endregion
+
     }
 }

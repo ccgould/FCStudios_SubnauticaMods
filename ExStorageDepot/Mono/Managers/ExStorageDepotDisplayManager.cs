@@ -23,6 +23,7 @@ namespace ExStorageDepot.Mono.Managers
         private Text _plier;
         private Text _itemCount;
         private bool _isBeingDestroyed;
+        private Text _unitID;
 
         internal void Initialize(ExStorageDepotController mono)
         {
@@ -37,6 +38,7 @@ namespace ExStorageDepot.Mono.Managers
                 SetItemCount(_mono.Storage.GetTotalCount());
                 //_mono.Storage.OnContainerUpdate += OnContainerUpdate;
                 InvokeRepeating(nameof(OnContainerUpdate),0.5f,0.5f);
+                InvokeRepeating(nameof(UpdateUnitID), 1f, 1f);
             }
             else
             {
@@ -52,6 +54,17 @@ namespace ExStorageDepot.Mono.Managers
             mono.NameController.OnLabelChanged += OnLabelChanged;
 
             UpdateLabels();
+        }
+
+        private void UpdateUnitID()
+        {
+            if (!string.IsNullOrWhiteSpace(_mono.FCSConnectableDevice.UnitID) && _unitID != null &&
+                string.IsNullOrWhiteSpace(_unitID.text))
+            {
+                QuickLogger.Debug("Setting Unit ID", true);
+                _unitID.text = $"UnitID: { _mono.FCSConnectableDevice.UnitID}";
+                CancelInvoke(nameof(UpdateUnitID));
+            }
         }
 
         private void OnContainerUpdate()
@@ -264,6 +277,9 @@ namespace ExStorageDepot.Mono.Managers
                     OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, "");
 
                 #endregion
+
+                _unitID = GameObjectHelpers.FindGameObject(home, "UnitID")?.GetComponent<Text>();
+
             }
             catch (Exception e)
             {

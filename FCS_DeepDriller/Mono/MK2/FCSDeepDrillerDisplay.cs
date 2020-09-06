@@ -48,7 +48,8 @@ namespace FCS_DeepDriller.Mono.MK2
         private Text _exportToggleBTNText;
         private Image _rangeToggleBTNIcon;
         private float _timePassed;
-        
+        private Text _unitID;
+
         private void Update()
         {
             _timePassed += DayNightCycle.main.deltaTime;
@@ -91,8 +92,19 @@ namespace FCS_DeepDriller.Mono.MK2
             RefreshItemCount(_mono.DeepDrillerContainer.GetContainerTotal());
             RefreshItems();
             UpdateOilLevel();
+            UpdateUnitID();
         }
-        
+
+        private void UpdateUnitID()
+        {
+            if (!string.IsNullOrWhiteSpace(_mono.FCSConnectableDevice.UnitID) && _unitID != null &&
+                string.IsNullOrWhiteSpace(_unitID.text))
+            {
+                QuickLogger.Debug("Setting Unit ID",true);
+                _unitID.text = $"UnitID: {_mono.FCSConnectableDevice.UnitID}";
+            }
+        }
+
         private void RefreshItemCount(int currentTotal = 0)
         {
             _itemCounter.text = $"{currentTotal} / {QPatch.Configuration.StorageSize}";
@@ -191,18 +203,7 @@ namespace FCS_DeepDriller.Mono.MK2
             switch (btnName)
             {
                 case "PowerBTN":
-
-                    if (_mono.PowerManager.GetPowerState() != FCSPowerStates.Powered)
-                    {
-                        PowerOnDisplay();
-                        _mono.PowerManager.SetPowerState(FCSPowerStates.Powered);
-                    }
-                    else
-                    {
-                        PowerOffDisplay();
-                        _mono.PowerManager.SetPowerState(FCSPowerStates.Tripped);
-                    }
-
+                    _mono.PowerManager.TogglePowerState();
                     break;
                 case "SolarStateBTN":
                     _mono.PowerManager.ToggleSolarState();
@@ -554,6 +555,12 @@ namespace FCS_DeepDriller.Mono.MK2
 
                 #endregion
 
+                #region Find Unit
+
+                _unitID = GameObjectHelpers.FindGameObject(homePage, "UnitID")?.GetComponent<Text>();
+
+                #endregion
+
             }
             catch (Exception e)
             {
@@ -565,6 +572,8 @@ namespace FCS_DeepDriller.Mono.MK2
 
             return true;
         }
+
+
 
         private void OnUpgradeUpdate(UpgradeFunction obj)
         {

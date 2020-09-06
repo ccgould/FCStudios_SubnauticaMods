@@ -18,6 +18,8 @@ namespace FCSTechFabricator.Components
         private IFCSStorage _storage;
         private TechType _techtype;
         private IFCSPowerManager _powerManager;
+        public string UnitID { get; set; }
+        public bool IsVisible { get; set; } = false;
 
         [Obsolete("Please use Initialize(FCSController mono, IFCSStorage storage, IFCSPowerManager powerManager) to allow power usage data to be accessible")]
         public void Initialize(FCSController mono, IFCSStorage storage)

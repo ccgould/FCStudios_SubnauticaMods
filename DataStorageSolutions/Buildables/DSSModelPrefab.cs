@@ -32,8 +32,10 @@ namespace DataStorageSolutions.Buildables
         internal static GameObject BaseItemPrefab { get; set; }
         internal static GameObject FilterItemPrefab { get; set; }
         internal static GameObject VehicleItemPrefab { get; set; }
-        public static GameObject OperatorPrefab { get; set; }
-        public static GameObject ItemDisplayPrefab { get; set; }
+        internal static GameObject OperatorPrefab { get; set; }
+        internal static GameObject ItemDisplayPrefab { get; set; }
+        internal static GameObject OperatorItemPrefab { get; set; }
+        internal static GameObject ItemEntryPrefab { get; set; }
 
         public static bool GetPrefabs()
         {
@@ -60,21 +62,45 @@ namespace DataStorageSolutions.Buildables
                     GameObject antenna = assetBundle.LoadAsset<GameObject>(Mod.AntennaPrefabName);
                     GameObject formatMachine = assetBundle.LoadAsset<GameObject>(Mod.ServerFormattingStationPrefabName);
                     GameObject filterItemPrefab = assetBundle.LoadAsset<GameObject>("FilterItem");
-                    GameObject operatorItemPrefab = assetBundle.LoadAsset<GameObject>(Mod.OperatorPrefabName);
+                    GameObject operatorPrefab = assetBundle.LoadAsset<GameObject>(Mod.OperatorPrefabName);
                     GameObject itemDisplayPrefab = assetBundle.LoadAsset<GameObject>(Mod.ItemDisplayPrefabName);
+                    GameObject operatorItemPrefab = assetBundle.LoadAsset<GameObject>("OperatorItem");
+                    GameObject itemEntryPrefab = assetBundle.LoadAsset<GameObject>("ItemEntry");
 
                     //If the prefab isn't null lets add the shader to the materials
-                    if (operatorItemPrefab != null)
+                    if (operatorPrefab != null)
                     {
                         //Lets apply the material shader
-                        ApplyShaders(operatorItemPrefab, assetBundle);
+                        ApplyShaders(operatorPrefab, assetBundle);
 
-                        OperatorPrefab = operatorItemPrefab;
+                        OperatorPrefab = operatorPrefab;
                         QuickLogger.Debug($"Operator Prefab Found!");
                     }
                     else
                     {
                         QuickLogger.Error($"Operator Prefab Not Found!");
+                        return false;
+                    }
+
+                    if (itemEntryPrefab != null)
+                    {
+                        ItemEntryPrefab = itemEntryPrefab;
+                        QuickLogger.Debug($"Item Entry Prefab Found!");
+                    }
+                    else
+                    {
+                        QuickLogger.Error($"Item Entry Prefab Not Found!");
+                        return false;
+                    }
+
+                    if (operatorItemPrefab != null)
+                    {
+                        OperatorItemPrefab = operatorItemPrefab;
+                        QuickLogger.Debug($"Operator Item Prefab Found!");
+                    }
+                    else
+                    {
+                        QuickLogger.Error($"Operator Item Prefab Not Found!");
                         return false;
                     }
 
@@ -204,7 +230,7 @@ namespace DataStorageSolutions.Buildables
                         QuickLogger.Error($"Filter Item Not Found!");
                         return false;
                     }
-
+                    
                     _initialized = true;
                 }
 
@@ -216,7 +242,7 @@ namespace DataStorageSolutions.Buildables
                 return false;
             }
         }
-
+        
 
         /// <summary>
         /// Applies the shader to the materials of the reactor

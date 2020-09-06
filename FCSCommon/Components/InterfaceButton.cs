@@ -39,7 +39,7 @@ namespace FCSCommon.Components
         #endregion
 
         #region Public Methods
-        public void OnEnable()
+        public virtual void OnEnable()
         {
             if(_isSelected) return;
             if (string.IsNullOrEmpty(BtnName)) return;

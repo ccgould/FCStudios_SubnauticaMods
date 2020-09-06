@@ -151,6 +151,7 @@ namespace ExStorageDepot.Mono
             {
                 FCSConnectableDevice = gameObject.AddComponent<FCSConnectableDevice>();
                 FCSConnectableDevice.Initialize(this, Storage,new ExStoragePowerManager());
+                FCSTechFabricator.FcTechFabricatorService.PublicAPI.RegisterDevice(FCSConnectableDevice, GetPrefabID(), Mod.ExStorageTabID);
             }
 
             _initialized = true;

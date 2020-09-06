@@ -11,6 +11,7 @@ using FCSTechFabricator.Abstract;
 using FCSTechFabricator.Components;
 using FCSTechFabricator.Enums;
 using FCSTechFabricator.Extensions;
+using FCSTechFabricator.Interfaces;
 using FCSTechFabricator.Managers;
 using UnityEngine;
 
@@ -22,7 +23,6 @@ namespace FCS_DeepDriller.Mono.MK2
         #region Private Members
         internal DeepDrillerSaveDataEntry _saveData;
         private Constructable _buildable;
-        private PrefabIdentifier _prefabId;
         private List<TechType> _bioData = new List<TechType>();
         private bool _runStartUpOnEnable;
         private GameObject _laser;
@@ -241,9 +241,7 @@ namespace FCS_DeepDriller.Mono.MK2
             }
             
             SolarStateHash = Animator.StringToHash("SolarState");
-
-            _prefabId = GetComponentInParent<PrefabIdentifier>() ?? GetComponent<PrefabIdentifier>();
-
+            
             InvokeRepeating(nameof(UpdateDrillShaftSate), 1, 1);
 
             if (OilHandler == null)
@@ -334,6 +332,13 @@ namespace FCS_DeepDriller.Mono.MK2
             _line.SetVertexCount(Segments + 1);
             _line.useWorldSpace = false;
 
+            if (FCSConnectableDevice == null)
+            {
+                FCSConnectableDevice = gameObject.AddComponent<FCSConnectableDevice>();
+                FCSConnectableDevice.Initialize(this,DeepDrillerContainer,PowerManager);
+                FCSTechFabricator.FcTechFabricatorService.PublicAPI.RegisterDevice(FCSConnectableDevice, GetPrefabID(),Mod.DeepDrillerTabID);
+            }
+
             OnGenerate();
 
             IsInitialized = true;
@@ -342,6 +347,7 @@ namespace FCS_DeepDriller.Mono.MK2
         }
 
         public FCSDeepDrillerTransferManager TransferManager { get; set; }
+        public FCSConnectableDevice FCSConnectableDevice { get; private set; }
 
         private void UpdateDrillShaftSate()
         {

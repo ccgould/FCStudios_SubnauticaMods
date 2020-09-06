@@ -13,6 +13,7 @@ namespace DataStorageSolutions.Mono
         private bool hover;
         private InputField _inputField;
         internal Action<string> OnSearchValueChanged;
+        internal Action<string> OnEnterPressed;
         private bool _cursorLockCached;
         private GameObject _inputDummy;
 
@@ -43,15 +44,17 @@ namespace DataStorageSolutions.Mono
 
         private void Awake()
         {
-            _inputField = GetComponent<InputField>();
+            _inputField = GetComponentInChildren<InputField>();
             _inputField.onValueChanged.AddListener(OnValueChanged);
             _inputField.onEndEdit.AddListener(OnEndEdit);
         }
 
         private void OnEndEdit(string text)
         {
+            QuickLogger.Debug("End Edit",true);
             LockMovement(false);
             InterceptInput(false);
+            //OnEnterPressed?.Invoke(text);
         }
         private void LockMovement(bool state)
         {

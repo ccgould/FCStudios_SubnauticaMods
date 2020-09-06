@@ -16,36 +16,36 @@ namespace DataStorageSolutions.Patches
 
         private static BaseManager[] Find()
         {
-            var usageStorage = (int)QPatch.UseStorage.GetValue(QPatch.EasyCraftSettingsInstance);
-
             HashSet<BaseManager> list = new HashSet<BaseManager>();
 
-            if (usageStorage != 0)
-            {
-                if (usageStorage == 1 && Player.main.IsInside())
+                var usageStorage = (int)QPatch.UseStorage.GetValue(QPatch.EasyCraftSettingsInstance);
+                
+                if (usageStorage != 0)
                 {
-                    if (Player.main.IsInSub())
+                    if (usageStorage == 1 && Player.main.IsInside())
                     {
-                        list.Add(BaseManager.FindManager(Player.main.currentSub));
-                    }
-                }
-                else if (usageStorage == 2)
-                {
-                    foreach (SubRoot subRoot in GameObject.FindObjectsOfType<SubRoot>())
-                    {
-                        Vector3 position = Player.main.transform.position;
-                        BaseRoot baseRoot;
-                        if ((subRoot.isCyclops && (position - subRoot.GetWorldCenterOfMass()).sqrMagnitude < 10000f) || (subRoot.isBase && (baseRoot = (subRoot as BaseRoot)) != null && baseRoot.GetDistanceToPlayer() < 100f))
+                        if (Player.main.IsInSub())
                         {
-                            list.Add(BaseManager.FindManager(subRoot));
+                            list.Add(BaseManager.FindManager(Player.main.currentSub));
                         }
                     }
-                }
+                    else if (usageStorage == 2)
+                    {
+                        foreach (SubRoot subRoot in GameObject.FindObjectsOfType<SubRoot>())
+                        {
+                            Vector3 position = Player.main.transform.position;
+                            BaseRoot baseRoot;
+                            if ((subRoot.isCyclops && (position - subRoot.GetWorldCenterOfMass()).sqrMagnitude < 10000f) || (subRoot.isBase && (baseRoot = (subRoot as BaseRoot)) != null && baseRoot.GetDistanceToPlayer() < 100f))
+                            {
+                                list.Add(BaseManager.FindManager(subRoot));
+                            }
+                        }
+                    }
 
-                return (from x in list.Distinct<BaseManager>()
-                    orderby (Player.main.transform.position - x.Habitat.transform.position).sqrMagnitude
-                    select x).ToArray<BaseManager>();
-            }
+                    return (from x in list.Distinct<BaseManager>()
+                        orderby (Player.main.transform.position - x.Habitat.transform.position).sqrMagnitude
+                        select x).ToArray<BaseManager>();
+                }
             return list.ToArray();
         }
 

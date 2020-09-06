@@ -54,18 +54,17 @@
     <Reference Include="0Harmony">
       <HintPath>..\Dependancies\0Harmony.dll</HintPath>
     </Reference>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>..\Dependancies\Subnautica\Assembly-CSharp.dll</HintPath>
+    <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>F:\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
-    <Reference Include="Assembly-CSharp-firstpass">
-      <HintPath>..\Dependancies\Subnautica\Assembly-CSharp-firstpass.dll</HintPath>
+    <Reference Include="Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>F:\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Dependancies\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="NexusAPIStandard">
-      <HintPath>J:\Documents\Repos\NexusAPI\NexusAPIStandard\bin\Release\netstandard2.0\NexusAPIStandard.dll</HintPath>
     </Reference>
     <Reference Include="QModInstaller">
       <HintPath>..\Dependancies\QModInstaller.dll</HintPath>
@@ -124,7 +123,9 @@
     <Compile Include="Configuration\SaveDataEntry.cs" />
     <Compile Include="Craftables\ServerCraftable.cs" />
     <Compile Include="Display\DSSUIButton.cs" />
+    <Compile Include="Display\OperationInterfaceButton.cs" />
     <Compile Include="Enumerators\ButtonType.cs" />
+    <Compile Include="Enumerators\OperatorPages.cs" />
     <Compile Include="Enumerators\RackPages.cs" />
     <Compile Include="Helpers\BaseRootExtensions.cs" />
     <Compile Include="Helpers\DSSHelpers.cs" />
@@ -142,6 +143,7 @@
     <Compile Include="Mono\DSSAntennaController.cs" />
     <Compile Include="Mono\DSSItemDisplayController.cs" />
     <Compile Include="Mono\DSSOperatorController.cs" />
+    <Compile Include="Mono\DSSOperatorDisplayManager.cs" />
     <Compile Include="Mono\DSSRackDisplayController.cs" />
     <Compile Include="Mono\DSSServerDisplay.cs" />
     <Compile Include="Mono\DSSServerFormattingStationController.cs" />
@@ -155,6 +157,7 @@
     <Compile Include="Mono\SearchField.cs" />
     <Compile Include="Patches\FCSConnectableAwake_Patcher.cs" />
     <Compile Include="Patches\EasyCraft_Patch.cs" />
+    <Compile Include="Patches\LootDistributionData_Patchers.cs" />
     <Compile Include="Patches\Player_Patches.cs" />
     <Compile Include="Patches\SubRoot_Patches.cs" />
     <Compile Include="QPatch.cs" />

@@ -151,6 +151,7 @@ namespace ARS_SeaBreezeFCS32.Mono
             {
                 FCSConnectableDevice = gameObject.AddComponent<FCSConnectableDevice>();
                 FCSConnectableDevice.Initialize(this,FridgeComponent,PowerManager);
+                FCSTechFabricator.FcTechFabricatorService.PublicAPI.RegisterDevice(FCSConnectableDevice, GetPrefabID(), Mod.SeaBreezeTabID);
             }
 
             IsInitialized = true;

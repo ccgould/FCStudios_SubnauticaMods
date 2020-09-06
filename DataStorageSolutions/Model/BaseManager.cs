@@ -29,6 +29,8 @@ namespace DataStorageSolutions.Model
         internal static readonly List<IBaseAntenna> BaseAntennas = new List<IBaseAntenna>();
         internal string InstanceID { get; }
         internal readonly HashSet<DSSRackController> BaseRacks = new HashSet<DSSRackController>();
+        internal readonly HashSet<DSSOperatorController> BaseOperators  = new HashSet<DSSOperatorController>();
+
         internal readonly HashSet<DSSTerminalController> BaseTerminals = new HashSet<DSSTerminalController>();
         internal readonly Dictionary<TechType,int> TrackedItems = new Dictionary<TechType, int>();
         internal bool IsVisible
@@ -383,7 +385,7 @@ namespace DataStorageSolutions.Model
 
                 foreach (var fcsConnectable in FCSConnectables)
                 {
-                    if(!fcsConnectable.Value.GetStorage().IsAllowedToRemoveItems()) continue;
+                    if(!fcsConnectable.Value.GetStorage().IsAllowedToRemoveItems() || !fcsConnectable.Value.IsVisible) continue;
                     var items = fcsConnectable.Value.GetItemsWithin();
                     foreach (KeyValuePair<TechType, int> item in items)
                     {
@@ -725,12 +727,85 @@ namespace DataStorageSolutions.Model
 
             foreach (KeyValuePair<string, FCSConnectableDevice> connectable in FCSConnectables)
             {
-                if(!connectable.Value.IsOperational()) continue;
+                if(!connectable.Value.IsOperational() || !connectable.Value.IsVisible) continue;
                 amount += connectable.Value.GetItemCount(techType);
             }
 
             
             return amount;
         }
+
+        internal void AddOperator(DSSOperatorController unit)
+        {
+            if (!BaseOperators.Contains(unit) && unit.IsConstructed)
+            {
+                BaseOperators.Add(unit);
+                QuickLogger.Debug($"Add Unit : {unit.GetPrefabID()}", true);
+            }
+        }
+
+        internal void RemoveOperator(DSSOperatorController unit)
+        {
+            BaseOperators.Remove(unit);
+        }
+
+        public List<string> GetCommands()
+        {
+            return new List<string>();
+        }
+
+        public void AddOperationCommand(string command)
+        {
+            //TODO Deconstruct Command
+            string[] delimiterChars = {"=>"};
+
+            var commandParts = command.Split(delimiterChars, StringSplitOptions.RemoveEmptyEntries);
+            QuickLogger.Debug($"Command Parts: {commandParts?.Length}",true);
+            QuickLogger.Debug($"Command From: {commandParts[0]}",true);
+            QuickLogger.Debug($"Command Item: {commandParts[1]}",true);
+            QuickLogger.Debug($"Command To: {commandParts[2]}",true);
+
+            if (commandParts[0].Equals("base", StringComparison.OrdinalIgnoreCase))
+            {
+                var techType = commandParts[1].ToTechType();
+
+                FCSConnectableDevice device = null;
+                foreach (KeyValuePair<string, FCSConnectableDevice> connectable in FCSConnectables)
+                {
+                    if (!connectable.Value.IsVisible || !connectable.Value.IsConstructed() ||
+                        !connectable.Value.UnitID.Equals(commandParts[2], StringComparison.OrdinalIgnoreCase)) continue;
+                    device = connectable.Value;
+                    break;
+                }
+                OperatorCommands.Add(new OperatorCommand {FromBase = this,TechType = techType, ToDevice = device});
+                //TODO Test This and link it up
+            }
+            
+            RefreshOperators();
+        }
+
+        public List<OperatorCommand> OperatorCommands { get; } = new List<OperatorCommand>();
+
+        private void RefreshOperators()
+        {
+            foreach (DSSOperatorController controller in BaseOperators)
+            {
+                controller.DisplayManager.LoadCommands();
+            }
+        }
+
+        public void RemoveOperationCommand(string command)
+        {
+            //TODO Decontruct Command
+        }
+
+        public struct OperatorCommand
+        {
+            public FCSConnectableDevice FromDevice { get; set; }
+            public BaseManager FromBase { get; set; }
+            public TechType TechType { get; set; }
+            public FCSConnectableDevice ToDevice { get; set; }
+        }
+
     }
 }

@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using DataStorageSolutions.Buildables;
 using DataStorageSolutions.Buildables.Antenna;
@@ -18,6 +21,7 @@ using FCSTechFabricator.Craftables;
 using HarmonyLib;
 using QModManager.API;
 using QModManager.API.ModLoading;
+using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
 using UnityEngine;
@@ -27,9 +31,12 @@ namespace DataStorageSolutions
     [QModCore]
     public class QPatch
     {
+        private static bool _gotData;
+        private static Harmony _harmony;
         internal static ConfigFile Configuration { get; private set; }
         internal static AssetBundle GlobalBundle { get; set; }
         internal static object EasyCraftSettingsInstance { get; set; }
+        internal static object craftDataInstance { get; set; }
         internal static FieldInfo UseStorage { get; set; }
         internal static bool IsDockedVehicleStorageAccessInstalled { get; set; }
 
@@ -78,6 +85,10 @@ namespace DataStorageSolutions
                 QuickLogger.Debug("Debug logs enabled");
 #endif
 
+                //Mod.GetAllTechTypes();
+
+
+
                 GlobalBundle = FcAssetBundlesService.PublicAPI.GetAssetBundleByName(FcAssetBundlesService.PublicAPI.GlobalBundleName);
 
                 Configuration = Mod.LoadConfiguration();
@@ -112,11 +123,12 @@ namespace DataStorageSolutions
                 var itemDisplay = new ItemDisplayBuildable();
                 itemDisplay.Patch();
 
-                var harmony = new Harmony("com.datastoragesolutions.fstudios");
+                _harmony = new Harmony("com.datastoragesolutions.fstudios");
 
-                harmony.PatchAll(Assembly.GetExecutingAssembly());
+                _harmony.PatchAll(Assembly.GetExecutingAssembly());
 
-                PatchEasyCraft(harmony);
+                PatchEasyCraft();
+                //PatchTechData(harmony);
 
                 IsDockedVehicleStorageAccessInstalled = QModServices.Main.ModPresent("DockedVehicleStorageAccess");
                 
@@ -128,7 +140,7 @@ namespace DataStorageSolutions
             }
         }
         
-        private static void PatchEasyCraft(Harmony harmony)
+        private static void PatchEasyCraft()
         {
             var isEasyCraftInstalled = QModServices.Main.ModPresent("EasyCraft");
 
@@ -172,14 +184,14 @@ namespace DataStorageSolutions
                     {
                         QuickLogger.Debug("Got EasyCraft DestroyItem Method");
                         var postfix = typeof(EasyCraft_Patch).GetMethod("DestroyItem");
-                        harmony.Patch(destroyItemMethodInfo, null, new HarmonyMethod(postfix));
+                        _harmony.Patch(destroyItemMethodInfo, null, new HarmonyMethod(postfix));
                     }
 
                     if (getPickupCountMethodInfo != null)
                     {
                         QuickLogger.Debug("Got EasyCraft GetPickupCount Method");
                         var postfix = typeof(EasyCraft_Patch).GetMethod("GetPickupCount");
-                        harmony.Patch(getPickupCountMethodInfo, null, new HarmonyMethod(postfix));
+                        _harmony.Patch(getPickupCountMethodInfo, null, new HarmonyMethod(postfix));
                     }
                 }
                 else
@@ -190,6 +202,49 @@ namespace DataStorageSolutions
             else
             {
                 QuickLogger.Debug("EasyCraft  not installed");
+            }
+        }
+        
+        internal static void PatchTechData()
+        {
+            if(_gotData) return;
+            try
+            {
+                _gotData = true;
+                var isEasyCraftInstalled = true;
+
+                if (isEasyCraftInstalled)
+                {
+                    QuickLogger.Debug("Assembly-CSharp is installed");
+
+                    var craftDataType = Type.GetType("CraftData, Assembly-CSharp");
+                    if (craftDataType != null)
+                    {
+                        QuickLogger.Debug("Got Assembly-CSharp CraftData");
+                        craftDataInstance = craftDataType.GetField("techData", BindingFlags.NonPublic | BindingFlags.Static)?.GetValue(null);
+                        if (craftDataInstance != null)
+                        {
+                            QuickLogger.Debug($"Got TechData {craftDataInstance}");
+                            Type craftDataTechDataType = craftDataType.GetNestedType("TechData", BindingFlags.Static | BindingFlags.Instance |BindingFlags.NonPublic);
+
+                            if (craftDataTechDataType != null)
+                            {
+                                if (craftDataInstance is IDictionary dictionary)
+                                {
+                                    TechType[] techTypes = new TechType[dictionary.Count]; 
+                                    dictionary.Keys.CopyTo(techTypes, 0);
+                                    Mod.AllTechTypes = techTypes.ToList();
+                                    Mod.GetAllBiomesData();
+                                }
+                            }
+
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error($"Error: {e.Message} | StackTrace: {e.StackTrace}");
             }
         }
     }

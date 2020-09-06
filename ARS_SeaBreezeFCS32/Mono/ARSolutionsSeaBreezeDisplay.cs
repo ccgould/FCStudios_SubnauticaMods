@@ -33,6 +33,7 @@ namespace ARS_SeaBreezeFCS32.Mono
         private Color colorFull = new Color(0f, 1f, 0f, 1f);
         private Text _batteryPercent;
         private Image _batteryFill;
+        private Text _unitID;
 
         internal void Setup(ARSolutionsSeaBreezeController mono)
         {
@@ -42,6 +43,18 @@ namespace ARS_SeaBreezeFCS32.Mono
             if (FindAllComponents())
             {
                 _mono.AnimationManager.SetIntHash(_mono.PageStateHash,1);
+                InvokeRepeating(nameof(UpdateUnitID), 1f, 1f);
+            }
+        }
+
+        private void UpdateUnitID()
+        {
+            if (!string.IsNullOrWhiteSpace(_mono.FCSConnectableDevice.UnitID) && _unitID != null &&
+                string.IsNullOrWhiteSpace(_unitID.text))
+            {
+                QuickLogger.Debug("Setting Unit ID", true);
+                _unitID.text = $"UnitID: { _mono.FCSConnectableDevice.UnitID}";
+                CancelInvoke(nameof(UpdateUnitID));
             }
         }
 
@@ -236,6 +249,8 @@ namespace ARS_SeaBreezeFCS32.Mono
                 _seaBreeze_LBL = InterfaceHelpers.FindGameObject(home, "SeaBreeze_LBL").GetComponent<Text>();
 
                 #endregion
+
+                _unitID = GameObjectHelpers.FindGameObject(home, "UnitID")?.GetComponent<Text>();
             }
             catch (Exception e)
             {

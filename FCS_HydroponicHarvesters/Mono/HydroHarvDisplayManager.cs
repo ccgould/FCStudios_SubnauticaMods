@@ -33,6 +33,7 @@ namespace FCS_HydroponicHarvesters.Mono
         private Text _powerUsage;
         private Text _itemsCount;
         private Text _timeLeft;
+        private Text _unitID;
 
 
         internal Atlas.Sprite MelonIconSprite => _melonIconSprite ?? (_melonIconSprite = SpriteManager.Get(TechType.Melon));
@@ -136,6 +137,18 @@ namespace FCS_HydroponicHarvesters.Mono
                 PowerOnDisplay();
                 _mono.HydroHarvContainer.OnContainerUpdate += OnContainerUpdate;
                 _dnaGrid.DrawPage(1);
+                InvokeRepeating(nameof(UpdateUnitID), 1f, 1f);
+            }
+        }
+
+        private void UpdateUnitID()
+        {
+            if (!string.IsNullOrWhiteSpace(_mono.FCSConnectableDevice.UnitID) && _unitID != null &&
+                string.IsNullOrWhiteSpace(_unitID.text))
+            {
+                QuickLogger.Debug("Setting Unit ID", true);
+                _unitID.text = $"UnitID: {_mono.FCSConnectableDevice.UnitID}";
+                CancelInvoke(nameof(UpdateUnitID));
             }
         }
 
@@ -256,7 +269,9 @@ namespace FCS_HydroponicHarvesters.Mono
                 _dnaGrid.OnLoadDisplay += OnLoadDnaGrid;
                 _dnaGrid.Setup(4, HydroponicHarvestersModelPrefab.ItemPrefab, home, _startColor, _hoverColor, OnButtonClick,5,string.Empty,string.Empty,"Slots", string.Empty, string.Empty);
                 #endregion
-                
+
+                _unitID = GameObjectHelpers.FindGameObject(home, "UnitID")?.GetComponent<Text>();
+
                 #region ModeButton
                 var modeBTN = InterfaceHelpers.FindGameObject(controls, "ModeBTN");
                 

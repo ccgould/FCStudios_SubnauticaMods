@@ -304,7 +304,8 @@ namespace FCS_HydroponicHarvesters.Mono
             if (FCSConnectableDevice == null)
             {
                 FCSConnectableDevice = gameObject.AddComponent<FCSConnectableDevice>();
-                FCSConnectableDevice.Initialize(this, HydroHarvContainer);
+                FCSConnectableDevice.Initialize(this, HydroHarvContainer,PowerManager);
+                FCSTechFabricator.FcTechFabricatorService.PublicAPI.RegisterDevice(FCSConnectableDevice, GetPrefabID(), Mod.HydroHarvTabID);
             }
         }
 

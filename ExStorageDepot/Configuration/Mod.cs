@@ -99,6 +99,7 @@ namespace ExStorageDepot.Configuration
         {
             return Path.Combine(GetQModsPath(), ModFolderName);
         }
+
         private static string GetQModsPath()
         {
             return Path.Combine(Environment.CurrentDirectory, "QMods");

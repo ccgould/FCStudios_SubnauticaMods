@@ -31,6 +31,7 @@ namespace AlterraGen.Mono
         private GridHelper _grid;
         private bool _isBeingDestroyed;
         private int _isOperational;
+        private Text _unitID;
 
         internal void Setup(AlterraGenController mono)
         {
@@ -47,6 +48,7 @@ namespace AlterraGen.Mono
                 GotoPage(AlterraGenPages.HomePage);
                 OnPowerUpdateCycle(_mono.PowerManager);
                 InvokeRepeating(nameof(UpdateScreenOnLoad), 1f,1f);
+                InvokeRepeating(nameof(UpdateUnitID), 1f,1f);
             }
         }
 
@@ -64,6 +66,17 @@ namespace AlterraGen.Mono
             {
                 QuickLogger.Debug("Canceling Invoke Repeating",true);
                 CancelInvoke(nameof(UpdateScreenOnLoad));
+            }
+        }
+
+        private void UpdateUnitID()
+        {
+            if (!string.IsNullOrWhiteSpace(_mono.GetFCSConnectable().UnitID) && _unitID != null &&
+                string.IsNullOrWhiteSpace(_unitID.text))
+            {
+                QuickLogger.Debug("Setting Unit ID", true);
+                _unitID.text =$"UnitID: { _mono.GetFCSConnectable().UnitID}";
+                CancelInvoke(nameof(UpdateUnitID));
             }
         }
 
@@ -209,6 +222,9 @@ namespace AlterraGen.Mono
                 _grid = _mono.gameObject.AddComponent<GridHelper>();
                 _grid.OnLoadDisplay += OnLoadItemsGrid;
                 _grid.Setup(3, AlterraGenBuildable.ItemPrefab, homePage, Color.gray, Color.gray, OnButtonClick);
+
+
+                _unitID = GameObjectHelpers.FindGameObject(homePage, "UnitID")?.GetComponent<Text>();
 
                 #endregion
 
