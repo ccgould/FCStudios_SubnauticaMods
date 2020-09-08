@@ -15,7 +15,7 @@ namespace AlterraGen.Mono
     {
         private float _toConsume;
 		private const float powerPerSecond = 0.8333333f;
-        private readonly List<TechType> _container = new List<TechType>(MaxSlots);
+        private readonly List<TechType> _container = new List<TechType>();
         private readonly List<TechType> _toRemove = new List<TechType>();
         private AlterraGenController _mono;
         private FCSPowerStates _prevPowerState;
@@ -125,10 +125,10 @@ namespace AlterraGen.Mono
         #region IFCSStorage
 
         public int GetContainerFreeSpace { get; }
-        public bool IsFull { get; }
+        public bool IsFull => _container.Count >= MaxSlots;
         public bool CanBeStored(int amount, TechType techType)
         {
-            throw new NotImplementedException();
+            return !IsFull && FuelTypes.Charge.ContainsKey(techType);
         }
 
         public bool AddItemToContainer(InventoryItem item)
@@ -146,10 +146,8 @@ namespace AlterraGen.Mono
             if (pickupable != null)
             {
                 TechType techType = pickupable.GetTechType();
-                if (FuelTypes.Charge.ContainsKey(techType))
-                {
-                    flag = true;
-                }
+                flag = CanBeStored(1, techType);
+
             }
             if (!flag && verbose)
             {

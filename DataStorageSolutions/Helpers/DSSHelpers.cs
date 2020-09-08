@@ -15,7 +15,7 @@ using UnityEngine;
 
 namespace DataStorageSolutions.Helpers
 {
-    internal class DSSHelpers
+    internal static class DSSHelpers
     {
         private static SaveDataObjectType FindSaveDataObjectType(GameObject go)
         {
@@ -113,84 +113,22 @@ namespace DataStorageSolutions.Helpers
             if (Inventory.main.HasRoomFor(itemSize.x, itemSize.y))
             {
                 //TODO handle null playerToolData
-                Pickupable pickup;
                 if (itemData.Vehicle == null)
                 {
-                    if (EggHandler.GetDiscoveredEgg(techType, out TechType value))
-                    {
-                        pickup = CraftData.InstantiateFromPrefab(value).GetComponent<Pickupable>();
-                    }
-                    else
-                    {
-                        pickup = CraftData.InstantiateFromPrefab(techType).GetComponent<Pickupable>();
-                    }
+                    var pickup = CheckIfEggAnExtractPickable(techType);
+
                     if (!itemData.IsServer)
                     {
                         var data = (ObjectData)itemData.data;
 
                         if (data != null)
                         {
-                            switch (data.DataObjectType)
-                            {
-                                case SaveDataObjectType.PlayerTool:
+                            DetectDataObjectTypeAndPerformConversion(data, pickup);
 
-                                    if (data.PlayToolData.HasBattery)
-                                    {
-                                        var batteryTechType = data.PlayToolData.BatteryInfo.TechType;
-                                        var tempBattery = CraftData.GetPrefabForTechType(batteryTechType);
-                                        var capacity = tempBattery?.gameObject.GetComponent<IBattery>()?.capacity;
-
-                                        if (data.PlayToolData.HasBattery && capacity != null && capacity > 0)
-                                        {
-                                            var energyMixin = pickup.gameObject.GetComponent<EnergyMixin>();
-                                            var normalizedCharge = data.PlayToolData.BatteryInfo.BatteryCharge / capacity;
-                                            if (energyMixin.GetBattery() != null)
-                                            {
-                                                QuickLogger.Debug("Battery was already in device destroying");
-                                            }
-
-                                            if (!energyMixin.compatibleBatteries.Contains(batteryTechType))
-                                            {
-                                                energyMixin.compatibleBatteries.Add(batteryTechType);
-                                            }
-
-                                            energyMixin.SetBattery(data.PlayToolData.BatteryInfo.TechType,
-                                                (float)normalizedCharge);
-                                            QuickLogger.Info(
-                                                $"Gave Player Player tool {data.PlayToolData.TechType} with battery {batteryTechType}");
-                                        }
-                                        else
-                                        {
-                                            QuickLogger.Error<DSSServerController>(
-                                                "While trying to get the batter capacity of the battery it returned null or 0.");
-                                        }
-                                    }
-
-                                    break;
-
-
-
-                                case SaveDataObjectType.Eatable:
-                                    //We are not handling decaying items so I dont need to set anything
-                                    break;
-
-                                case SaveDataObjectType.Server:
-                                    var server = pickup.gameObject.GetComponent<DSSServerController>();
-                                    server.FCSFilteredStorage.Items = new HashSet<ObjectData>(data.ServerData);
-                                    server.Initialize();
-                                    server.DisplayManager.UpdateDisplay();
-                                    break;
-                                case SaveDataObjectType.Battery:
-                                    var battery = pickup.gameObject.GetComponent<Battery>();
-                                    battery.charge = data.PlayToolData.BatteryInfo.BatteryCharge;
-                                    break;
-                            }
-
+                            var result = getServerWithObjectData?.Invoke(data);
+                            result?.Remove(data);
+                            isSuccessful = true;
                         }
-
-                        var result = getServerWithObjectData?.Invoke(data);
-                        result?.Remove(data);
-                        isSuccessful = true;
                     }
                     else
                     {
@@ -235,7 +173,7 @@ namespace DataStorageSolutions.Helpers
                         }
                     }
 
-                _end:
+                    _end:
                     isSuccessful = true;
                 }
             }
@@ -243,6 +181,80 @@ namespace DataStorageSolutions.Helpers
             Mod.OnBaseUpdate?.Invoke();
             return isSuccessful;
         }
+        
+        private static void DetectDataObjectTypeAndPerformConversion(ObjectData data, Pickupable pickup)
+        {
+            switch (data.DataObjectType)
+            {
+                case SaveDataObjectType.PlayerTool:
+
+                    if (data.PlayToolData.HasBattery)
+                    {
+                        var batteryTechType = data.PlayToolData.BatteryInfo.TechType;
+                        var tempBattery = CraftData.GetPrefabForTechType(batteryTechType);
+                        var capacity = tempBattery?.gameObject.GetComponent<IBattery>()?.capacity;
+
+                        if (data.PlayToolData.HasBattery && capacity != null && capacity > 0)
+                        {
+                            var energyMixin = pickup.gameObject.GetComponent<EnergyMixin>();
+                            var normalizedCharge = data.PlayToolData.BatteryInfo.BatteryCharge / capacity;
+                            if (energyMixin.GetBattery() != null)
+                            {
+                                QuickLogger.Debug("Battery was already in device destroying");
+                            }
+
+                            if (!energyMixin.compatibleBatteries.Contains(batteryTechType))
+                            {
+                                energyMixin.compatibleBatteries.Add(batteryTechType);
+                            }
+
+                            energyMixin.SetBattery(data.PlayToolData.BatteryInfo.TechType,
+                                (float) normalizedCharge);
+                            QuickLogger.Info(
+                                $"Gave Player Player tool {data.PlayToolData.TechType} with battery {batteryTechType}");
+                        }
+                        else
+                        {
+                            QuickLogger.Error<DSSServerController>(
+                                "While trying to get the batter capacity of the battery it returned null or 0.");
+                        }
+                    }
+
+                    break;
+
+
+                case SaveDataObjectType.Eatable:
+                    //We are not handling decaying items so I dont need to set anything
+                    break;
+
+                case SaveDataObjectType.Server:
+                    var server = pickup.gameObject.GetComponent<DSSServerController>();
+                    server.FCSFilteredStorage.Items = new HashSet<ObjectData>(data.ServerData);
+                    server.Initialize();
+                    server.DisplayManager.UpdateDisplay();
+                    break;
+                case SaveDataObjectType.Battery:
+                    var battery = pickup.gameObject.GetComponent<Battery>();
+                    battery.charge = data.PlayToolData.BatteryInfo.BatteryCharge;
+                    break;
+            }
+        }
+
+        private static Pickupable CheckIfEggAnExtractPickable(TechType techType)
+        {
+            Pickupable pickup;
+            if (EggHandler.GetDiscoveredEgg(techType, out TechType value))
+            {
+                pickup = CraftData.InstantiateFromPrefab(value).GetComponent<Pickupable>();
+            }
+            else
+            {
+                pickup = CraftData.InstantiateFromPrefab(techType).GetComponent<Pickupable>();
+            }
+
+            return pickup;
+        }
+
         internal static ObjectData MakeObjectData(InventoryItem item, int slot)
         {
             var go = item.item.gameObject;
@@ -339,6 +351,26 @@ namespace DataStorageSolutions.Helpers
                     CrafterLogic.NotifyCraftEnd(Player.main.gameObject, item.GetTechType());
                 }
             }
+        }
+
+        public static Pickupable ToPickable(this ObjectData data)
+        {
+            var pickup = CheckIfEggAnExtractPickable(data.TechType);
+
+            if (data.DataObjectType != SaveDataObjectType.Server)
+            {
+                DetectDataObjectTypeAndPerformConversion(data, pickup);
+
+            }
+            else
+            {
+                var controller = pickup.gameObject.GetComponent<DSSServerController>();
+                controller.Initialize();
+                controller.FCSFilteredStorage.Items = new HashSet<ObjectData>(data.ServerData);
+                controller.FCSFilteredStorage.Filters = new List<Filter>(data.Filters);
+            }
+
+            return pickup;
         }
     }
 }

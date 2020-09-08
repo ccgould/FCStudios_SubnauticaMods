@@ -60,7 +60,7 @@ namespace DataStorageSolutions.Model
         internal Action<BaseManager> OnContainerUpdate { get; set; }
         public bool ContainsItem(TechType techType)
         {
-            throw new NotImplementedException();
+             return TrackedItems.ContainsKey(techType);
         }
 
         internal Dictionary<string, FCSConnectableDevice> FCSConnectables { get; set; } = new Dictionary<string, FCSConnectableDevice>();
@@ -529,6 +529,10 @@ namespace DataStorageSolutions.Model
             //Check if there is a base connected
             if (Habitat != null)
             {
+                var baseConnectable = Habitat.gameObject.AddComponent<FCSConnectableDevice>();
+                baseConnectable.InitializeBase(null, this, null, Habitat.gameObject.gameObject?.GetComponentInChildren<PrefabIdentifier>());
+                FCSTechFabricator.FcTechFabricatorService.PublicAPI.RegisterDevice(baseConnectable, InstanceID, Mod.DSSTabID);
+
                 var connectableDevices = Habitat.GetComponentsInChildren<FCSConnectableDevice>().ToList();
 
                 foreach (var device in connectableDevices)
@@ -654,6 +658,7 @@ namespace DataStorageSolutions.Model
             return null;
         }
         
+
         internal void ChangeBaseName()
         {
             NameController.Show();

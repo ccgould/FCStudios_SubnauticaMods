@@ -368,221 +368,7 @@ namespace DataStorageSolutions.Configuration
         #endregion
 
         #region Private Methods
-
-
-        private static void GetResourceForSpecial(TechType techType, List<TechType> items)
-        {
-            switch (techType)
-            {
-                case TechType.LimestoneChunk:
-                    items.Add(TechType.Titanium);
-                    items.Add(TechType.Copper);
-                    break;
-                case TechType.ShaleChunk:
-                    items.Add(TechType.Diamond);
-                    items.Add(TechType.Gold);
-                    items.Add(TechType.Lithium);
-                    break;
-                case TechType.SandstoneChunk:
-                    items.Add(TechType.Silver);
-                    items.Add(TechType.Gold);
-                    items.Add(TechType.Lead);
-                    break;
-                case TechType.DrillableSalt:
-                    items.Add(TechType.Salt);
-                    break;
-                case TechType.DrillableQuartz:
-                    items.Add(TechType.Quartz);
-                    break;
-                case TechType.DrillableCopper:
-                    items.Add(TechType.Copper);
-                    break;
-                case TechType.DrillableTitanium:
-                    items.Add(TechType.Titanium);
-                    break;
-                case TechType.DrillableLead:
-                    items.Add(TechType.Lead);
-                    break;
-                case TechType.DrillableSilver:
-                    items.Add(TechType.Silver);
-                    break;
-                case TechType.DrillableDiamond:
-                    items.Add(TechType.Diamond);
-                    break;
-                case TechType.DrillableGold:
-                    items.Add(TechType.Gold);
-                    break;
-                case TechType.DrillableMagnetite:
-                    items.Add(TechType.Magnetite);
-                    break;
-                case TechType.DrillableLithium:
-                    items.Add(TechType.Lithium);
-                    break;
-                case TechType.DrillableMercury:
-                    items.Add(TechType.MercuryOre);
-                    break;
-                case TechType.DrillableUranium:
-                    items.Add(TechType.Uranium);
-                    break;
-                case TechType.DrillableAluminiumOxide:
-                    items.Add(TechType.AluminumOxide);
-                    break;
-                case TechType.DrillableNickel:
-                    items.Add(TechType.Nickel);
-                    break;
-                case TechType.DrillableSulphur:
-                    items.Add(TechType.Sulphur);
-                    break;
-                case TechType.DrillableKyanite:
-                    items.Add(TechType.Kyanite);
-                    break;
-            }
-        }
-
-        public static List<TechType> Resources = new List<TechType>()
-        {
-            TechType.AluminumOxide,
-            TechType.Sulphur,
-            TechType.Diamond,
-            TechType.Kyanite,
-            TechType.Lead,
-            TechType.Lithium ,
-            TechType.Magnetite,
-            TechType.Nickel,
-            TechType.Quartz,
-            TechType.Silver,
-            TechType.UraniniteCrystal,
-            TechType.Salt,
-            TechType.Titanium,
-            TechType.Copper,
-            TechType.Gold,
-            TechType.LimestoneChunk,
-            TechType.ShaleChunk,
-            TechType.SandstoneChunk,
-            TechType.DrillableSalt,
-            TechType.DrillableQuartz,
-            TechType.DrillableCopper,
-            TechType.DrillableTitanium,
-            TechType.DrillableLead,
-            TechType.DrillableSilver,
-            TechType.DrillableDiamond,
-            TechType.DrillableGold,
-            TechType.DrillableMagnetite,
-            TechType.DrillableLithium,
-            TechType.DrillableMercury,
-            TechType.DrillableUranium,
-            TechType.DrillableAluminiumOxide,
-            TechType.DrillableNickel,
-            TechType.DrillableSulphur,
-            TechType.DrillableKyanite,
-            "FCSGlass".ToTechType()
-        };
-
-        internal static Dictionary<BiomeType, List<TechType>> GetAllBiomesData()
-        {
-            Dictionary<BiomeType, List<TechType>> biomeLoot = new Dictionary<BiomeType, List<TechType>>();
-
-            foreach (BiomeType biomeType in Enum.GetValues(typeof(BiomeType)))
-            {
-                if (LootDistributionData == null)
-                {
-                    QuickLogger.Debug("LootDistributionData is null");
-                    return null;
-                }
-
-                if (!LootDistributionData.GetBiomeLoot(biomeType, out LootDistributionData.DstData data))
-                {
-                    QuickLogger.Debug("DstData is null");
-                    continue;
-                }
-
-                foreach (LootDistributionData.PrefabData prefabData in data.prefabs)
-                {
-                    if (prefabData.classId.ToLower() != "none")
-                    {
-                        if (WorldEntityDatabase.TryGetInfo(prefabData.classId, out WorldEntityInfo wei))
-                        {
-                            if (wei == null)
-                            {
-                                QuickLogger.Debug("WorldEntityInfo is null");
-                                continue;
-                            }
-
-                            if (Resources.Contains(wei.techType))
-                            {
-                                if (!biomeLoot.ContainsKey(biomeType))
-                                    biomeLoot[biomeType] = new List<TechType>();
-
-                                biomeLoot[biomeType].Add(wei.techType);
-
-                                QuickLogger.Debug($"Added Resource: {wei.techType} in biome {biomeType}");
-                            }
-                        }
-                    }
-                }
-
-
-                var tempDictionary = new Dictionary<BiomeType, List<TechType>>();
-
-                foreach (KeyValuePair<BiomeType, List<TechType>> pair in biomeLoot)
-                {
-                    var loot = new List<TechType>();
-                    foreach (TechType techType in pair.Value)
-                    {
-                        if (techType.ToString().EndsWith("Chunk", StringComparison.OrdinalIgnoreCase) ||
-                            techType.ToString().StartsWith("Drillable", StringComparison.OrdinalIgnoreCase))
-                        {
-                            GetResourceForSpecial(techType, loot);
-                        }
-                        else
-                        {
-                            loot.Add(techType);
-                        }
-                    }
-
-                    tempDictionary.Add(pair.Key, loot.Distinct().ToList());
-                }
-
-                var newList = new Dictionary<string, List<string>>();
-
-                foreach (KeyValuePair<BiomeType, List<TechType>> biomeData in tempDictionary)
-                {
-                    var name = biomeData.Key.AsString(true).Split('_')[0];
-                    if (!newList.ContainsKey(name))
-                    {
-                        var g = new List<string>();
-
-                        foreach (var techType in biomeData.Value)
-                        {
-                            g.Add(techType.AsString());
-                        }
-                        newList.Add(name, g);
-                    }
-                    else
-                    {
-                        foreach (TechType techType in biomeData.Value)
-                        {
-                            if (!newList[name].Contains(techType.AsString()))
-                            {
-                                newList[name].Add(techType.AsString());
-                            }
-
-                            if (!AllTechTypes.Contains(techType))
-                            {
-                                AllTechTypes.Add(techType);
-                            }
-                        }
-                    }
-                }
-            }
-
-            AllTechTypes = AllTechTypes.Where(x => !CraftData.IsBuildableTech(x) && !_blackList.Contains(x)).ToList();
-
-            //CreateItemButtons();
-            return biomeLoot;
-        }
-
-
+        
         private static IEnumerator SaveCoroutine()
         {
             while (SaveLoadManager.main != null && SaveLoadManager.main.isSaving)
@@ -609,26 +395,18 @@ namespace DataStorageSolutions.Configuration
         }
 
         #endregion
-
-        internal static void CreateItemButtons()
+        
+        public static List<TechType> BlackList = new List<TechType>
         {
-            foreach (TechType techType in AllTechTypes)
-            {
-                if(CraftData.IsBuildableTech(techType) || _blackList.Contains(techType)) continue;
-                GameObject buttonPrefab = GameObject.Instantiate(DSSModelPrefab.OperatorItemPrefab);
-                var button = buttonPrefab.AddComponent<OperationInterfaceButton>();
-                button.BtnName = "ItemTechBTN";
-                button.Tag = new OperatorButtonData { Button = button, TechType = techType };
-                button.TextLineOne = $"Send {Language.main.Get(techType)}";
-                buttonPrefab.GetComponentInChildren<Text>().text = Language.main.Get(techType);
-                uGUI_Icon icon = InterfaceHelpers.FindGameObject(buttonPrefab, "Icon").AddComponent<uGUI_Icon>();
-                icon.sprite = SpriteManager.Get(techType);
-                ItemTechTypeButtons.Add(button);
-            }
-        }
-
-        public static List<TechType> _blackList = new List<TechType>
-        {
+            TechType.None,
+           TechType.MercuryOre,
+            TechType.Placeholder,
+            TechType.Magnesium,
+            TechType.Lodestone,
+            TechType.SandLoot,
+            TechType.Fiber,
+            TechType.Enamel,
+            TechType.OpalGem,
             TechType.BaseCorridor,
             TechType.Accumulator,
             TechType.Terraformer,
@@ -655,7 +433,63 @@ namespace DataStorageSolutions.Configuration
             TechType.RocketStage1,
             TechType.RocketStage2,
             TechType.RocketStage3,
-            TechType.Transfuser
+            TechType.Transfuser,
+            TechType.SomethingPlaceholder,
+            TechType.RadiationLeakPoint,
+            TechType.Databox,
+            TechType.Unobtanium,
+            TechType.PrecursorSurfacePipe,
+            TechType.PrecursorSensor,
+            TechType.PrecursorSeaDragonSkeleton,
+            TechType.PrecursorThermalPlant,
+            TechType.PrecursorScanner,
+            TechType.PrecursorTeleporter,
+            TechType.PrecursorWarper,
+            TechType.PrecursorKeyTerminal,
+            TechType.HugeSkeleton,
+            TechType.PrecursorIonCrystalMatrix,
+            TechType.SpikePlant,
+            TechType.PurpleBrainCoral,
+            TechType.BrainCoral,
+            TechType.SnakeMushroom,
+            TechType.PurpleBrainCoral,
+            TechType.RedRollPlant,
+            TechType.SpottedLeavesPlant,
+            TechType.ShellGrass,
+            TechType.RedConePlant,
+            TechType.RedBush,
+            TechType.RedBasketPlant,
+            TechType.PurpleStalk,
+            TechType.RedGreenTentacle,
+            TechType.EyesPlant,
+            TechType.OrangePetalsPlant,
+            TechType.SeaCrown,
+            TechType.GabeSFeather,
+            TechType.BluePalm,
+            TechType.FernPalm,
+            TechType.PurpleVegetable,
+            TechType.HangingFruitTree,
+            TechType.OrangeMushroom,
+            TechType.PurpleVasePlant,
+            TechType.BulboTree,
+            TechType.PurpleRattle,
+            TechType.PinkMushroom,
+            TechType.PinkFlower,
+            TechType.BloodVine,
+            TechType.BloodRoot,
+            TechType.HeatArea,
+            TechType.SmallFan,
+            TechType.PurpleTentacle,
+            TechType.PurpleFan,
+            TechType.MembrainTree,
+            TechType.HugeKoosh,
+            TechType.LargeKoosh,
+            TechType.MediumKoosh,
+            TechType.SmallKoosh,
+            TechType.Creepvine,
+            TechType.Signal
+
+
         };
 
         public static List<OperationInterfaceButton> ItemTechTypeButtons { get; set; } = new List<OperationInterfaceButton>();

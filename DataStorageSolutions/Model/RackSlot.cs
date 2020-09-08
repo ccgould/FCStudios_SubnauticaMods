@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using DataStorageSolutions.Buildables;
 using DataStorageSolutions.Configuration;
+using DataStorageSolutions.Helpers;
 using DataStorageSolutions.Mono;
 using FCSCommon.Components;
 using FCSCommon.Enums;
@@ -285,14 +286,25 @@ namespace DataStorageSolutions.Model
             _mono.OnUpdate -= Update;
         }
 
-        internal void Remove(TechType techType)
+        internal Pickupable Remove(TechType techType,bool returnItem = false)
         {
+            ObjectData item = null;
+            Pickupable pickupable = null;
             for (int i = 0; i < Server.Count; i++)
             {
                 if (Server.ElementAt(i).TechType != techType) continue;
-                Remove(Server.ElementAt(i));
+
+                item = Server.ElementAt(i);
+
+                if (returnItem)
+                {
+                    pickupable = item.ToPickable();
+                }
                 break;
             }
+
+            Remove(item);
+            return returnItem ? pickupable : null;
         }
 
         internal int GetItemCount(TechType techType)

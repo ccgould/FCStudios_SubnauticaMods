@@ -30,9 +30,9 @@ namespace DataStorageSolutions.Mono
         private readonly Color _startColor = Color.grey;
         private readonly Color _hoverColor = Color.white;
         private GridHelper _operationsGrid;
-        private FCSConnectableDevice _fromDevices;
+        private FCSConnectableDevice _fromDevice;
         private TechType _itemTechType;
-        private FCSConnectableDevice _toDevices;
+        private FCSConnectableDevice _toDevice;
         private GridHelper _itemTechTypeGrid;
         private GridHelper _toGrid;
 
@@ -83,15 +83,18 @@ namespace DataStorageSolutions.Mono
 
         private void ToButtonClick()
         {
-            if (_toDevices == null)
+            if (_toDevice == null)
             {
                 //Add Message
                 return;
             }
+
+            _mono.AddOperation(new FCSOperation { FromDevice = _fromDevice, ToDevice = _toDevice, TechType = _itemTechType});
+
             GoToPage(OperatorPages.Operations);
         }
-
-        private void ItemButtonClick()
+    
+    private void ItemButtonClick()
         {
             if (_itemTechType == TechType.None)
             {
@@ -104,7 +107,7 @@ namespace DataStorageSolutions.Mono
 
         private void FromButtonClick()
         {
-            if (_fromDevices == null)
+            if (_fromDevice == null)
             {
                 //Add Message
                 return;
@@ -171,7 +174,7 @@ namespace DataStorageSolutions.Mono
 
                     buttonPrefab.transform.SetParent(data.ItemsGrid.transform, false);
                     var button = buttonPrefab.AddComponent<OperationInterfaceButton>();
-                    if (connectable.Value == _fromDevices)
+                    if (connectable.Value == _fromDevice)
                     {
                         button.SetCheck(true);
                     }
@@ -248,7 +251,7 @@ namespace DataStorageSolutions.Mono
 
                     buttonPrefab.transform.SetParent(data.ItemsGrid.transform, false);
                     var button = buttonPrefab.AddComponent<OperationInterfaceButton>();
-                    if (connectable.Value == _toDevices)
+                    if (connectable.Value == _toDevice)
                     {
                         button.SetCheck(true);
                     }
@@ -330,8 +333,8 @@ namespace DataStorageSolutions.Mono
                 button.BtnName = "ItemTechBTN";
                 button.OnButtonClick = OnButtonClick;
                 button.Tag = new OperatorButtonData { Button = button, TechType = grouped[i] };
-                button.TextLineOne = $"Send {Language.main.Get(grouped[i])}";
-                buttonPrefab.GetComponentInChildren<Text>().text = Language.main.Get(grouped[i]);
+                button.TextLineOne = $"Send {grouped[i].AsString()}";
+                buttonPrefab.GetComponentInChildren<Text>().text = grouped[i].AsString(); // Language.main.Get(grouped[i]);
                 uGUI_Icon icon = InterfaceHelpers.FindGameObject(buttonPrefab, "Icon").AddComponent<uGUI_Icon>();
                 icon.sprite = SpriteManager.Get(grouped[i]);
                 _itemTechTypeList.Add(button);
@@ -382,12 +385,12 @@ namespace DataStorageSolutions.Mono
                     var operatorData = (OperatorButtonData)tag;
                     if (GetCurrentPage() == OperatorPages.From)
                     {
-                        _fromDevices = operatorData.Button.IsChecked() ? operatorData.Connectable : null;
+                        _fromDevice = operatorData.Button.IsChecked() ? operatorData.Connectable : null;
 
                     }
                     else if (GetCurrentPage() == OperatorPages.To)
                     {
-                        _toDevices = operatorData.Button.IsChecked() ? operatorData.Connectable : null;
+                        _toDevice = operatorData.Button.IsChecked() ? operatorData.Connectable : null;
                     }
 
                     RefreshOperatorButtons(((OperatorButtonData)tag).Button);
@@ -530,5 +533,12 @@ namespace DataStorageSolutions.Mono
         internal OperationInterfaceButton Button { get; set; }
         internal FCSConnectableDevice Connectable { get; set; }
         internal TechType TechType { get; set; }
+    }
+
+    internal struct FCSOperation
+    {
+        public FCSConnectableDevice FromDevice { get; set; }
+        public FCSConnectableDevice ToDevice { get; set; }
+        public TechType TechType { get; set; }
     }
 }
