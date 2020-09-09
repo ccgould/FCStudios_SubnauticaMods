@@ -144,8 +144,6 @@ namespace MAC.OxStation.Mono
         public override void NotifyMe<T>(T obj)
         {
             var controller = obj as OxStationController;
-
-            
         }
 
         public override void OnProtoSerialize(ProtobufSerializer serializer)

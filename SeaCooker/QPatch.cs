@@ -5,7 +5,6 @@ using Harmony;
 using System;
 using System.IO;
 using System.Reflection;
-using AE.SeaCooker.Craftable;
 using FCSCommon.Helpers;
 using FCSTechFabricator;
 using FCSTechFabricator.Components;
@@ -79,12 +78,6 @@ namespace AE.SeaCooker
 
             var seaCookerKit = new FCSKit(Mod.SeaCookerKitClassID, Mod.FriendlyName, craftingTab, Mod.SeaCookerIngredients);
             seaCookerKit.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
-
-            var seaAlienGasTank = new SeaAlienGasTankCraftable(Mod.SeaAlienGasClassID, Mod.SeaAlienGasFriendlyName, Mod.SeaAlienGasDescription, craftingTab);
-            seaAlienGasTank.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
-
-            var seaGasTank = new SeaGasTankCraftable(Mod.SeaGasClassID, Mod.SeaGasFriendlyName, Mod.SeaGasDescription, craftingTab);
-            seaGasTank.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
         }
     }
 }

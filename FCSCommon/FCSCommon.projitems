@@ -17,7 +17,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Components\OnScreenButton.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Components\PaginatorButton.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controllers\AudioManager.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Controllers\PowerManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\TimeConverters.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\UpgradeFunctionConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Enums\InterfaceButtonMode.cs" />

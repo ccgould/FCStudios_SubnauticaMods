@@ -1,5 +1,4 @@
-﻿using AE.SeaCooker.Enumerators;
-using Oculus.Newtonsoft.Json;
+﻿using Oculus.Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using FCSTechFabricator.Objects;
@@ -10,8 +9,6 @@ namespace AE.SeaCooker.Configuration
     internal class SaveDataEntry
     {
         [JsonProperty] internal string ID { get; set; }
-        [JsonProperty] internal float FuelLevel { get; set; }
-        [JsonProperty] internal FuelType TankType { get; set; }
         [JsonProperty] internal ColorVec4 BodyColor { get; set; }
         [JsonProperty] internal bool ExportToSeaBreeze { get; set; }
         [JsonProperty] internal bool IsCooking { get; set; }

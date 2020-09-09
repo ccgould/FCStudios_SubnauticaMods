@@ -4,6 +4,7 @@ using FCSCommon.Objects;
 using FCSCommon.Utilities;
 using Oculus.Newtonsoft.Json;
 using System.Collections.Generic;
+using FCSCommon.Extensions;
 using SMLHelper.V2.Crafting;
 
 namespace AE.SeaCooker.Configuration
@@ -20,6 +21,7 @@ namespace AE.SeaCooker.Configuration
         #region Private Members
         private static ModSaver _saveObject;
         private static SaveData _saveData;
+        private static TechType _seabreezeTechType;
         private const string ConfigFileName = "config.json";
 
         #endregion
@@ -49,44 +51,7 @@ namespace AE.SeaCooker.Configuration
                 new Ingredient(TechType.TitaniumIngot, 1)
             }
         };
-
-#if SUBNAUTICA
-        internal static TechData SeaAlienGasTankKitIngredients => new TechData
-#elif BELOWZERO
-        internal static RecipeData SeaAlienGasTankKitIngredients => new RecipeData
-#endif
-        {
-            craftAmount = 1,
-            Ingredients =
-            {
-                new Ingredient(TechType.SeaTreaderPoop, 2),
-                new Ingredient(TechType.Tank, 1),
-                new Ingredient(TechType.FilteredWater, 2)
-            }
-        };
-
-#if SUBNAUTICA
-        internal static TechData SeaGasTankKitIngredients => new TechData
-#elif BELOWZERO
-        internal static RecipeData SeaGasTankKitIngredients => new RecipeData
-#endif
-        {
-            craftAmount = 1,
-            Ingredients =
-            {
-                new Ingredient(TechType.GasPod, 1),
-                new Ingredient(TechType.Tank, 1)
-            }
-        };
-
-        internal const string SeaAlienGasClassID = "SeaAlienGasTank_SC";
-        internal const string SeaAlienGasFriendlyName = "Sea Alien Gas";
-        internal const string SeaAlienGasDescription = "This tank allows you to cook food in the Sea Cooker using Alien Feces.";
-
-        internal const string SeaGasClassID = "SeaGasTank_SC";
-        internal const string SeaGasFriendlyName = "Sea Gas";
-        internal const string SeaGasDescription = "This tank allows you to cook food in the Sea Cooker using Gaspod gas.";
-
+        
         internal static event Action<SaveData> OnDataLoaded;
         #endregion
 
@@ -233,6 +198,16 @@ namespace AE.SeaCooker.Configuration
             }
 
             return LoadConfigurationData();
+        }
+
+        public static TechType SeabeezeTechType()
+        {
+            if (_seabreezeTechType == TechType.None)
+            {
+                _seabreezeTechType = "ARSSeaBreezeFCS32".ToTechType();
+            }
+
+            return _seabreezeTechType;
         }
     }
 }

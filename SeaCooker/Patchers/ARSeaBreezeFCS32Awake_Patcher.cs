@@ -1,5 +1,6 @@
 ﻿using Harmony;
 using System;
+using AE.SeaCooker.Configuration;
 using FCSTechFabricator.Abstract;
 using FCSTechFabricator.Components;
 
@@ -14,7 +15,7 @@ namespace AE.SeaCooker.Patchers
         [HarmonyPostfix]
         public static void Postfix(FCSConnectableDevice __instance)
         {
-            if (onSeaBreezeAdded != null)
+            if (onSeaBreezeAdded != null && __instance.GetTechType() == Mod.SeabeezeTechType())
             {
                 onSeaBreezeAdded.Invoke(__instance);
             }

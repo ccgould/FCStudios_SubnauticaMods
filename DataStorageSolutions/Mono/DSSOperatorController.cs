@@ -1,11 +1,9 @@
 ﻿using System.Collections.Generic;
-using System.Net.NetworkInformation;
 using DataStorageSolutions.Abstract;
 using DataStorageSolutions.Configuration;
 using DataStorageSolutions.Model;
 using FCSCommon.Controllers;
 using FCSCommon.Utilities;
-using FCSTechFabricator.Components;
 
 namespace DataStorageSolutions.Mono
 {
@@ -14,7 +12,6 @@ namespace DataStorageSolutions.Mono
         private bool _runStartUpOnEnable;
         private SaveDataEntry _savedData;
         private bool _fromSave;
-        private List<TechType> TechTypes => Mod.AllTechTypes;
         public override void Save(SaveData save)
         {
         }
@@ -22,10 +19,10 @@ namespace DataStorageSolutions.Mono
         public override BaseManager Manager { get; set; }
         public DSSOperatorDisplayManager DisplayManager { get; private set; }
 
-        private void Start()
-        {
-            InvokeRepeating(nameof(PerformOperation),1f,1f);
-        }
+        //private void Start()
+        //{
+        //    InvokeRepeating(nameof(PerformOperation),1f,1f);
+        //}
 
         private void OnEnable()
         {
@@ -61,7 +58,7 @@ namespace DataStorageSolutions.Mono
         public override void Initialize()
         {
 
-            QPatch.PatchTechData();
+            Mod.CreateAllowedTechTypes();
 
             AddToBaseManager();
 
@@ -113,42 +110,5 @@ namespace DataStorageSolutions.Mono
                 }
             }
         }
-
-        public void AddOperation(FCSOperation operation)
-        {
-            Operations.Add(operation);
-        }
-
-        private void PerformOperation()
-        {
-            foreach (FCSOperation operation in Operations)
-            {
-                if (operation.FromDevice != null && (operation.FromDevice.IsOperational() || operation.FromDevice.IsBase()) && operation.ToDevice != null && operation.ToDevice.IsOperational() && operation.TechType != TechType.None)
-                {
-                    if (operation.FromDevice.ContainsItem(operation.TechType) && operation.ToDevice.CanBeStored(1,operation.TechType))
-                    {
-                        if (operation.FromDevice.IsBase())
-                        {
-                           var server =  Manager.GetServerWithItem(operation.TechType);
-
-                           var pickupable =  server?.Remove(operation.TechType,true);
-                           if (pickupable != null)
-                           {
-                               operation.ToDevice.AddItemToContainer(new InventoryItem(pickupable), out string reason);
-                           }
-
-                        }
-                        else
-                        {
-                            var pickupable = operation.FromDevice.RemoveItemFromContainer(operation.TechType, 1);
-                            operation.ToDevice.AddItemToContainer(new InventoryItem(pickupable), out string reason);
-                        }
-
-                    }
-                }
-            }
-        }
-
-        public List<FCSOperation> Operations { get; set; } = new List<FCSOperation>();
     }
 }

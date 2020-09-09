@@ -206,7 +206,7 @@ namespace FCSCommon.Components
         {
             if (TextComponent == null)
             {
-                QuickLogger.Info("Text Component returned null when trying to change the text in the InterfaceButton.Trying to locate");
+                QuickLogger.Debug("Text Component returned null when trying to change the text in the InterfaceButton.Trying to locate");
                 UpdateTextComponent();
 
                 if (TextComponent == null)

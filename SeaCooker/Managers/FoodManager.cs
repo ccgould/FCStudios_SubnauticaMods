@@ -1,6 +1,5 @@
 ﻿
 using AE.SeaCooker.Configuration;
-using AE.SeaCooker.Enumerators;
 using AE.SeaCooker.Mono;
 using FCSCommon.Utilities;
 using System;
@@ -38,21 +37,6 @@ namespace AE.SeaCooker.Managers
             Timer();
         }
 
-        internal void CookFood(InventoryItem item)
-        {
-            if (_mono.PowerManager.GetPowerState() != FCSPowerStates.Powered
-                || _mono.GasManager.CurrentFuel == FuelType.None
-                || !_mono.StorageManager.HasRoomFor(item.item))
-            {
-                KillCooking();
-                return;
-            }
-
-            _rawTechType = item.item.GetTechType();
-            _cook = StartCoroutine(Cook());
-            QuickLogger.Debug($"Cooking food {_rawTechType}", true);
-        }
-
         internal void KillCooking()
         {
             QuickLogger.Debug("Kill Cooking");
@@ -85,7 +69,6 @@ namespace AE.SeaCooker.Managers
             }
 
             OnFoodCooked?.Invoke(_rawTechType, GetCookedFood(_rawTechType));
-            _mono.GasManager.RemoveGas(QPatch.Configuration.Config.UsagePerItem);
             QuickLogger.Debug($"Cooked food {_rawTechType}", true);
         }
 
@@ -94,19 +77,8 @@ namespace AE.SeaCooker.Managers
             var list = new List<TechType>();
             _isCooking = true;
             _targetTime = QPatch.Configuration.Config.CookTime * container.count;
-
-            if (!_fromSave)
-            {
-                _mono.GasManager.RemoveGas(QPatch.Configuration.Config.UsagePerItem);
-            }
-
             OnCookingStart?.Invoke(_rawTechType, GetCookedFood(_rawTechType));
-
-            //for (float timer = _targetTime; timer >= 0; timer -= DayNightCycle.main.deltaTime)
-            //{
-            //    yield return null;
-            //}
-
+            
             while (!_continue)
             {
                 yield return null;
@@ -209,13 +181,9 @@ namespace AE.SeaCooker.Managers
 
         internal void CookAllFood(ItemsContainer container)
         {
-            QuickLogger.Debug($"Get Powered State {_mono.PowerManager.GetPowerState()} || Current Fuel {_mono.GasManager.CurrentFuel} || Has Room for All {_mono.StorageManager.HasRoomForAll()}");
-
             if(_mono.PowerManager.GetPowerState() == FCSPowerStates.Unpowered) { QuickLogger.Message(SeaCookerBuildable.NoPowerAvailable(),true);}
 
-            if (_mono.PowerManager.GetPowerState() == FCSPowerStates.Unpowered
-                || _mono.GasManager.CurrentFuel == FuelType.None
-                || !_mono.StorageManager.HasRoomForAll())
+            if (_mono.PowerManager.GetPowerState() == FCSPowerStates.Unpowered || !_mono.StorageManager.HasRoomForAll())
             {
                 KillCooking();
                 return;

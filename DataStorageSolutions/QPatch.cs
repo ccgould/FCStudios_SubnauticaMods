@@ -32,13 +32,10 @@ namespace DataStorageSolutions
     [QModCore]
     public class QPatch
     {
-        private static bool _gotData;
         private static Harmony _harmony;
-        private static List<string> _tempList = new List<string>();
-        internal static ConfigFile Configuration { get; private set; }
+       internal static ConfigFile Configuration { get; private set; }
         internal static AssetBundle GlobalBundle { get; set; }
         internal static object EasyCraftSettingsInstance { get; set; }
-        internal static object craftDataInstance { get; set; }
         internal static FieldInfo UseStorage { get; set; }
         internal static bool IsDockedVehicleStorageAccessInstalled { get; set; }
 
@@ -204,90 +201,6 @@ namespace DataStorageSolutions
             else
             {
                 QuickLogger.Debug("EasyCraft  not installed");
-            }
-        }
-        
-        internal static void PatchTechData()
-        {
-
-            var items = Enum.GetValues(typeof(TechType));
-
-            foreach (TechType techType in items)
-            {
-                if (!CraftData.IsBuildableTech(techType)
-                    && !Mod.BlackList.Contains(techType)
-                    && CraftData.IsAllowed(techType)
-                    && !techType.AsString().EndsWith("Old", StringComparison.OrdinalIgnoreCase)
-                    && !techType.AsString().EndsWith("Chunk", StringComparison.OrdinalIgnoreCase)
-                    && !techType.AsString().EndsWith("Fragment", StringComparison.OrdinalIgnoreCase)
-                    && !techType.AsString().EndsWith("Blueprint", StringComparison.OrdinalIgnoreCase)
-                    && !techType.AsString().EndsWith("Analysis", StringComparison.OrdinalIgnoreCase)
-                    && !techType.AsString().EndsWith("Leviathan", StringComparison.OrdinalIgnoreCase)
-                    && !techType.AsString().EndsWith("Juvenile", StringComparison.OrdinalIgnoreCase)
-                    && !techType.AsString().EndsWith("Skeleton", StringComparison.OrdinalIgnoreCase)
-                    && !techType.AsString().StartsWith("PrecursorPrison", StringComparison.OrdinalIgnoreCase)
-                    && !techType.AsString().StartsWith("PrecursorPipe", StringComparison.OrdinalIgnoreCase)
-                    && !techType.AsString().StartsWith("PrecursorLab", StringComparison.OrdinalIgnoreCase)
-                    && !techType.AsString().StartsWith("Reefback", StringComparison.OrdinalIgnoreCase)
-                    && !techType.AsString().StartsWith("PrecursorLost", StringComparison.OrdinalIgnoreCase)
-                    && !techType.AsString().EndsWith("Undiscovered", StringComparison.OrdinalIgnoreCase)
-                    && !techType.AsString().StartsWith("Drillable", StringComparison.OrdinalIgnoreCase)
-                    && !SpriteManager.Get(techType).texture.name.Equals("SpriteAtlasTexture-Default-64x64-fmt4",
-                        StringComparison.OrdinalIgnoreCase))
-                {
-                    Mod.AllTechTypes.Add(techType);
-                }
-                else
-                {
-                    _tempList.Add(techType.AsString());
-                }
-                
-            }
-
-
-            // serialize JSON to a string and then write string to a file
-            File.WriteAllText(@"F:\BlackList.json", JsonConvert.SerializeObject(_tempList));
-
-            return;
-            
-            if(_gotData) return;
-            try
-            {
-                _gotData = true;
-                var isEasyCraftInstalled = true;
-
-                if (isEasyCraftInstalled)
-                {
-                    QuickLogger.Debug("Assembly-CSharp is installed");
-
-                    var craftDataType = Type.GetType("CraftData, Assembly-CSharp");
-                    if (craftDataType != null)
-                    {
-                        QuickLogger.Debug("Got Assembly-CSharp CraftData");
-                        craftDataInstance = craftDataType.GetField("groups", BindingFlags.NonPublic | BindingFlags.Static)?.GetValue(null);
-                        if (craftDataInstance != null)
-                        {
-                            QuickLogger.Debug($"Got TechData {craftDataInstance}");
-
-                            Type craftDataTechDataType = craftDataType.GetNestedType("TechData", BindingFlags.Static | BindingFlags.Instance | BindingFlags.NonPublic);
-
-                            if (craftDataTechDataType != null)
-                            {
-                                if (craftDataInstance is IDictionary dictionary)
-                                {
-                                    TechType[] techTypes = new TechType[dictionary.Count];
-                                    dictionary.Keys.CopyTo(techTypes, 0);
-                                    Mod.AllTechTypes = techTypes.ToList();
-                                }
-                            }
-
-                        }
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                QuickLogger.Error($"Error: {e.Message} | StackTrace: {e.StackTrace}");
             }
         }
     }

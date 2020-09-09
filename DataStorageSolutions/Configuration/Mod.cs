@@ -91,11 +91,520 @@ namespace DataStorageSolutions.Configuration
         internal const string ItemDisplayPrefabName = "ItemDisplay";
         internal const string ItemDisplayKitID = "ItemDisplay_Kit";
 
+        public static List<TechType> BlackList = new List<TechType>
+        {
+           TechType.None,
+TechType.LimestoneChunk,
+TechType.CalciteOld,
+TechType.DolomiteOld,
+TechType.FlintOld,
+TechType.EmeryOld,
+TechType.MercuryOre,
+TechType.CalciumChunk,
+TechType.Placeholder,
+TechType.CarbonOld,
+TechType.EthanolOld,
+TechType.EthyleneOld,
+TechType.Gold,
+TechType.Magnesium,
+TechType.HydrogenOld,
+TechType.Lodestone,
+TechType.SandLoot,
+TechType.BatteryAcidOld,
+TechType.SandstoneChunk,
+TechType.BasaltChunk,
+TechType.ShaleChunk,
+TechType.ObsidianChunk,
+TechType.Fiber,
+TechType.Enamel,
+TechType.AcidOld,
+TechType.VesselOld,
+TechType.CombustibleOld,
+TechType.OpalGem,
+TechType.AminoAcids,
+TechType.Graphene,
+TechType.Nanowires,
+TechType.PrecursorIonCrystalMatrix,
+TechType.DrillableSalt,
+TechType.DrillableQuartz,
+TechType.DrillableCopper,
+TechType.DrillableTitanium,
+TechType.DrillableLead,
+TechType.DrillableSilver,
+TechType.DrillableDiamond,
+TechType.DrillableGold,
+TechType.DrillableMagnetite,
+TechType.DrillableLithium,
+TechType.DrillableMercury,
+TechType.DrillableUranium,
+TechType.DrillableAluminiumOxide,
+TechType.DrillableNickel,
+TechType.DrillableSulphur,
+TechType.DrillableKyanite,
+TechType.DiveSuit,
+TechType.ShipComputerOld,
+TechType.Drill,
+TechType.PDA,
+TechType.EscapePod,
+TechType.Terraformer,
+TechType.Transfuser,
+TechType.BuildBot,
+TechType.StasisSphere,
+TechType.PowerGlide,
+TechType.CompostCreepvine,
+TechType.ProcessUranium,
+TechType.PrecursorIonEnergyBlueprint,
+TechType.FabricatorBlueprintOld,
+TechType.ConstructorBlueprint,
+TechType.CyclopsBlueprint,
+TechType.FragmentAnalyzerBlueprintOld,
+TechType.LockerBlueprint,
+TechType.SpecialHullPlateBlueprintOld,
+TechType.BikemanHullPlateBlueprintOld,
+TechType.EatMyDictionHullPlateBlueprintOld,
+TechType.DevTestItemBlueprintOld,
+TechType.SeamothBlueprint,
+TechType.StasisRifleBlueprint,
+TechType.ExosuitBlueprint,
+TechType.TransfuserBlueprint,
+TechType.TerraformerBlueprint,
+TechType.ReinforceHullBlueprint,
+TechType.WorkbenchBlueprint,
+TechType.PropulsionCannonBlueprint,
+TechType.SpecimenAnalyzerBlueprint,
+TechType.BioreactorBlueprint,
+TechType.ThermalPlantBlueprint,
+TechType.NuclearReactorBlueprint,
+TechType.MoonpoolBlueprint,
+TechType.FiltrationMachineBlueprint,
+TechType.TechlightBlueprint,
+TechType.LEDLightBlueprint,
+TechType.CyclopsHullBlueprint,
+TechType.CyclopsBridgeBlueprint,
+TechType.CyclopsEngineBlueprint,
+TechType.CyclopsDockingBayBlueprint,
+TechType.SpotlightBlueprint,
+TechType.RadioBlueprint,
+TechType.StarshipCargoCrateBlueprint,
+TechType.StarshipCircuitBoxBlueprint,
+TechType.StarshipDeskBlueprint,
+TechType.StarshipChairBlueprint,
+TechType.StarshipMonitorBlueprint,
+TechType.SolarPanelBlueprint,
+TechType.PowerTransmitterBlueprint,
+TechType.BaseUpgradeConsoleBlueprint,
+TechType.BaseObservatoryBlueprint,
+TechType.BaseWaterParkBlueprint,
+TechType.PictureFrameBlueprint,
+TechType.BaseRoomBlueprint,
+TechType.BaseBulkheadBlueprint,
+TechType.SeaglideBlueprint,
+TechType.BatteryChargerBlueprint,
+TechType.PowerCellChargerBlueprint,
+TechType.FarmingTrayBlueprint,
+TechType.SignBlueprint,
+TechType.BenchBlueprint,
+TechType.PlanterPotBlueprint,
+TechType.PlanterBoxBlueprint,
+TechType.PlanterShelfBlueprint,
+TechType.AquariumBlueprint,
+TechType.ReinforcedDiveSuitBlueprint,
+TechType.RadiationSuitBlueprint,
+TechType.StillsuitBlueprint,
+TechType.ScannerRoomBlueprint,
+TechType.BasePlanterBlueprint,
+TechType.PlanterPot2Blueprint,
+TechType.PlanterPot3Blueprint,
+TechType.MedicalCabinetBlueprint,
+TechType.BaseMapRoomBlueprint,
+TechType.SeamothFragment,
+TechType.StasisRifleFragment,
+TechType.ExosuitFragment,
+TechType.TransfuserFragment,
+TechType.TerraformerFragment,
+TechType.ReinforceHullFragment,
+TechType.WorkbenchFragment,
+TechType.PropulsionCannonFragment,
+TechType.BioreactorFragment,
+TechType.ThermalPlantFragment,
+TechType.NuclearReactorFragment,
+TechType.MoonpoolFragment,
+TechType.BaseFiltrationMachineFragment,
+TechType.CyclopsHullFragment,
+TechType.CyclopsBridgeFragment,
+TechType.CyclopsEngineFragment,
+TechType.CyclopsDockingBayFragment,
+TechType.SeaglideFragment,
+TechType.ConstructorFragment,
+TechType.SolarPanelFragment,
+TechType.PowerTransmitterFragment,
+TechType.BaseUpgradeConsoleFragment,
+TechType.BaseObservatoryFragment,
+TechType.BaseWaterParkFragment,
+TechType.RadioFragment,
+TechType.BaseRoomFragment,
+TechType.BaseBulkheadFragment,
+TechType.BatteryChargerFragment,
+TechType.PowerCellChargerFragment,
+TechType.ScannerRoomFragment,
+TechType.SpecimenAnalyzerFragment,
+TechType.FarmingTrayFragment,
+TechType.SignFragment,
+TechType.PictureFrameFragment,
+TechType.BenchFragment,
+TechType.PlanterPotFragment,
+TechType.PlanterBoxFragment,
+TechType.PlanterShelfFragment,
+TechType.AquariumFragment,
+TechType.ReinforcedDiveSuitFragment,
+TechType.RadiationSuitFragment,
+TechType.StillsuitFragment,
+TechType.BuilderFragment,
+TechType.LEDLightFragment,
+TechType.TechlightFragment,
+TechType.SpotlightFragment,
+TechType.BaseMapRoomFragment,
+TechType.BaseBioReactorFragment,
+TechType.BaseNuclearReactorFragment,
+TechType.LaserCutterFragment,
+TechType.BeaconFragment,
+TechType.GravSphereFragment,
+TechType.SafeShallowsEgg,
+TechType.KelpForestEgg,
+TechType.GrassyPlateausEgg,
+TechType.GrandReefsEgg,
+TechType.MushroomForestEgg,
+TechType.KooshZoneEgg,
+TechType.TwistyBridgesEgg,
+TechType.LavaZoneEgg,
+TechType.ReefbackEgg,
+TechType.RabbitrayEggUndiscovered,
+TechType.JellyrayEggUndiscovered,
+TechType.StalkerEggUndiscovered,
+TechType.ReefbackEggUndiscovered,
+TechType.JumperEggUndiscovered,
+TechType.BonesharkEggUndiscovered,
+TechType.GasopodEggUndiscovered,
+TechType.MesmerEggUndiscovered,
+TechType.SandsharkEggUndiscovered,
+TechType.ShockerEggUndiscovered,
+TechType.CrashEggUndiscovered,
+TechType.CrabsquidEggUndiscovered,
+TechType.CutefishEggUndiscovered,
+TechType.LavaLizardEggUndiscovered,
+TechType.CrabsnakeEggUndiscovered,
+TechType.SpadefishEggUndiscovered,
+TechType.ReefbackShell,
+TechType.ReefbackTissue,
+TechType.ReefbackAdvancedStructure,
+TechType.ReefbackDNA,
+TechType.Workbench,
+TechType.HullReinforcementModule,
+TechType.Fabricator,
+TechType.Aquarium,
+TechType.Locker,
+TechType.Spotlight,
+TechType.DiveHatch,
+TechType.CurrentGenerator,
+TechType.FragmentAnalyzer,
+TechType.SpecialHullPlate,
+TechType.BikemanHullPlate,
+TechType.EatMyDictionHullPlate,
+TechType.DevTestItem,
+TechType.SpecimenAnalyzer,
+TechType.HullReinforcementModule2,
+TechType.HullReinforcementModule3,
+TechType.SolarPanel,
+TechType.Sign,
+TechType.PowerTransmitter,
+TechType.Accumulator,
+TechType.Bioreactor,
+TechType.ThermalPlant,
+TechType.NuclearReactor,
+TechType.SmallLocker,
+TechType.Bench,
+TechType.PictureFrame,
+TechType.PlanterPot,
+TechType.PlanterBox,
+TechType.PlanterShelf,
+TechType.FarmingTray,
+TechType.FiltrationMachine,
+TechType.Techlight,
+TechType.Radio,
+TechType.PlanterPot2,
+TechType.PlanterPot3,
+TechType.MedicalCabinet,
+TechType.SingleWallShelf,
+TechType.WallShelves,
+TechType.Bed1,
+TechType.Bed2,
+TechType.NarrowBed,
+TechType.BatteryCharger,
+TechType.PowerCellCharger,
+TechType.Incubator,
+TechType.EnyzmeCloud,
+TechType.EnzymeCureBall,
+TechType.Centrifuge,
+TechType.CyclopsFabricator,
+TechType.StarshipCargoCrate,
+TechType.StarshipCircuitBox,
+TechType.StarshipDesk,
+TechType.StarshipChair,
+TechType.StarshipMonitor,
+TechType.StarshipChair2,
+TechType.StarshipChair3,
+TechType.CoffeeVendingMachine,
+TechType.BarTable,
+TechType.Trashcans,
+TechType.LabTrashcan,
+TechType.VendingMachine,
+TechType.LabCounter,
+TechType.Seamoth,
+TechType.Exosuit,
+TechType.CrashedShip,
+TechType.Cyclops,
+TechType.Audiolog,
+TechType.Signal,
+TechType.SeamothReinforcementModule,
+TechType.LootSensorMetal,
+TechType.LootSensorLithium,
+TechType.LootSensorFragment,
+TechType.ExosuitDrillArmFragment,
+TechType.ExosuitPropulsionArmFragment,
+TechType.ExosuitGrapplingArmFragment,
+TechType.ExosuitTorpedoArmFragment,
+TechType.ExosuitClawArmFragment,
+TechType.Creepvine,
+TechType.Slime,
+TechType.LavaLarva,
+TechType.Bloom,
+TechType.Reefback,
+TechType.Grabcrab,
+TechType.Player,
+TechType.Bleeder,
+TechType.Rockgrub,
+TechType.CrashHome,
+TechType.HoopfishSchool,
+TechType.RockPuncher,
+TechType.SeaTreader,
+TechType.SeaEmperor,
+TechType.ReaperLeviathan,
+TechType.CaveCrawler,
+TechType.Skyray,
+TechType.Biter,
+TechType.SkyrayNonRoosting,
+TechType.Shuttlebug,
+TechType.Blighter,
+TechType.Warper,
+TechType.SpineEel,
+TechType.SeaDragon,
+TechType.SeaEmperorBaby,
+TechType.WarperSpawner,
+TechType.GhostRayBlue,
+TechType.GhostRayRed,
+TechType.ReefbackBaby,
+TechType.PrecursorDroid,
+TechType.GhostLeviathan,
+TechType.SeaEmperorLeviathan,
+TechType.SeaEmperorJuvenile,
+TechType.GhostLeviathanJuvenile,
+TechType.HoleFishAnalysis,
+TechType.PeeperAnalysis,
+TechType.BladderfishAnalysis,
+TechType.GarryFishAnalysis,
+TechType.HoverfishAnalysis,
+TechType.ReginaldAnalysis,
+TechType.SpadefishAnalysis,
+TechType.BoomerangAnalysis,
+TechType.EyeyeAnalysis,
+TechType.OculusAnalysis,
+TechType.HoopfishAnalysis,
+TechType.AnalysisTreeOld,
+TechType.SpinefishAnalysis,
+TechType.PlantPlaceholder,
+TechType.BallClusters,
+TechType.BarnacleSuckers,
+TechType.BlueBarnacle,
+TechType.BlueBarnacleCluster,
+TechType.BlueCoralTubes,
+TechType.RedGrass,
+TechType.GreenGrass,
+TechType.Mohawk,
+TechType.GreenReeds,
+TechType.BlueJeweledDisk,
+TechType.GreenJeweledDisk,
+TechType.PurpleJeweledDisk,
+TechType.RedJeweledDisk,
+TechType.SmallKoosh,
+TechType.MediumKoosh,
+TechType.LargeKoosh,
+TechType.HugeKoosh,
+TechType.MembrainTree,
+TechType.PurpleFan,
+TechType.PurpleTentacle,
+TechType.RedSeaweed,
+TechType.CoralOldPlaceholder,
+TechType.CoralShellPlate,
+TechType.SmallFan,
+TechType.SmallFanCluster,
+TechType.BigCoralTubes,
+TechType.TreeMushroom,
+TechType.BlueCluster,
+TechType.BrownTubes,
+TechType.BloodGrass,
+TechType.HeatArea,
+TechType.BloodRoot,
+TechType.BloodVine,
+TechType.PinkFlower,
+TechType.PinkMushroom,
+TechType.PurpleRattle,
+TechType.BulboTree,
+TechType.PurpleVasePlant,
+TechType.OrangeMushroom,
+TechType.FernPalm,
+TechType.HangingFruitTree,
+TechType.BluePalm,
+TechType.GabeSFeather,
+TechType.SeaCrown,
+TechType.OrangePetalsPlant,
+TechType.EyesPlant,
+TechType.RedGreenTentacle,
+TechType.PurpleStalk,
+TechType.RedBasketPlant,
+TechType.RedBush,
+TechType.RedConePlant,
+TechType.ShellGrass,
+TechType.SpottedLeavesPlant,
+TechType.RedRollPlant,
+TechType.SnakeMushroom,
+TechType.GenericJeweledDisk,
+TechType.FloatingStone,
+TechType.BlueAmoeba,
+TechType.RedTipRockThings,
+TechType.BlueTipLostRiverPlant,
+TechType.BlueLostRiverLilly,
+TechType.LargeFloater,
+TechType.PiecePlaceholder,
+TechType.CoralChunk,
+TechType.KooshChunk,
+TechType.PurpleVegetable,
+TechType.EnvironmentPlaceholder,
+TechType.Boulder,
+TechType.PurpleBrainCoral,
+TechType.HangingStinger,
+TechType.SpikePlant,
+TechType.BrainCoral,
+TechType.CoveTree,
+TechType.MonsterSkeleton,
+TechType.SeaDragonSkeleton,
+TechType.ReaperSkeleton,
+TechType.CaveSkeleton,
+TechType.HugeSkeleton,
+TechType.PrecursorKey_PurpleFragment,
+TechType.PrecursorKeyTerminal,
+TechType.PrecursorTeleporter,
+TechType.PrecursorEnergyCore,
+TechType.PrecursorThermalPlant,
+TechType.PrecursorWarper,
+TechType.PrecursorFishSkeleton,
+TechType.PrecursorScanner,
+TechType.PrecursorLabCacheContainer1,
+TechType.PrecursorLabCacheContainer2,
+TechType.PrecursorLabTable,
+TechType.PrecursorSeaDragonSkeleton,
+TechType.PrecursorSensor,
+TechType.PrecursorPrisonArtifact1,
+TechType.PrecursorPrisonArtifact2,
+TechType.PrecursorPrisonArtifact3,
+TechType.PrecursorPrisonArtifact4,
+TechType.PrecursorPrisonArtifact5,
+TechType.PrecursorPrisonArtifact6,
+TechType.PrecursorPrisonArtifact7,
+TechType.PrecursorPrisonArtifact8,
+TechType.PrecursorPrisonArtifact9,
+TechType.PrecursorPrisonArtifact10,
+TechType.PrecursorPrisonArtifact11,
+TechType.PrecursorPrisonArtifact12,
+TechType.PrecursorPipeRoomIncomingPipe,
+TechType.PrecursorPipeRoomOutgoingPipe,
+TechType.PrecursorPrisonLabEmperorFetus,
+TechType.PrecursorPrisonLabEmperorEgg,
+TechType.PrecursorPrisonAquariumPipe,
+TechType.PrecursorPrisonAquariumFinalTeleporter,
+TechType.PrecursorPrisonAquariumIncubatorEggs,
+TechType.PrecursorPrisonAquariumIncubator,
+TechType.PrecursorSurfacePipe,
+TechType.PrecursorPrisonArtifact13,
+TechType.PrecursorPrisonIonGenerator,
+TechType.PrecursorPrisonOutposts,
+TechType.ObservatoryOld,
+TechType.PrecursorLostRiverBrokenAnchor,
+TechType.PrecursorLostRiverLabRays,
+TechType.PrecursorLostRiverLabBones,
+TechType.PrecursorLostRiverLabEgg,
+TechType.PrecursorLostRiverProductionLine,
+TechType.PrecursorLostRiverWarperParts,
+TechType.MembraneOld,
+TechType.Unobtanium,
+TechType.BaseRoom,
+TechType.BaseHatch,
+TechType.BaseWall,
+TechType.BaseDoor,
+TechType.BaseLadder,
+TechType.BaseWindow,
+TechType.PowerGeneratorOld,
+TechType.UnusedOld,
+TechType.BaseCorridor,
+TechType.BaseFoundation,
+TechType.BaseCorridorI,
+TechType.BaseCorridorL,
+TechType.BaseCorridorT,
+TechType.BaseCorridorX,
+TechType.BaseReinforcement,
+TechType.BaseBulkhead,
+TechType.BaseCorridorGlassI,
+TechType.BaseCorridorGlassL,
+TechType.BaseObservatory,
+TechType.BaseConnector,
+TechType.BaseMoonpool,
+TechType.BaseCorridorGlass,
+TechType.BaseUpgradeConsole,
+TechType.BasePlanter,
+TechType.BaseFiltrationMachine,
+TechType.BaseWaterPark,
+TechType.BaseMapRoom,
+TechType.BaseBioReactor,
+TechType.BaseNuclearReactor,
+TechType.BasePipeConnector,
+TechType.RocketBase,
+TechType.RocketBaseLadder,
+TechType.RocketStage1,
+TechType.RocketStage2,
+TechType.RocketStage3,
+TechType.TimeCapsule,
+TechType.DioramaHullPlate,
+TechType.MarkiplierHullPlate,
+TechType.MuyskermHullPlate,
+TechType.LordMinionHullPlate,
+TechType.JackSepticEyeHullPlate,
+TechType.IGPHullPlate,
+TechType.GilathissHullPlate,
+TechType.Marki1,
+TechType.Marki2,
+TechType.JackSepticEye,
+TechType.EatMyDiction,
+TechType.RadiationLeakPoint,
+TechType.SomethingPlaceholder,
+TechType.Fragment,
+TechType.CountOld,
+TechType.Databox
+        };
+
         internal static Action<bool> OnAntennaBuilt;
         private static TechType _seaBreezeTechType;
 
         internal static Dictionary<string, ServerData> Servers { get; set; } = new Dictionary<string, ServerData>();
-        
+
 
         public static List<string> TrackedServers { get; set; } = new List<string>();
         #endregion
@@ -230,14 +739,14 @@ namespace DataStorageSolutions.Configuration
 
         internal static Action OnBaseUpdate { get; set; }
         internal static Action<DSSRackController> OnContainerUpdate { get; set; }
-        internal static List<TechType> AllTechTypes  = new List<TechType>();
+        internal static List<TechType> AllTechTypes = new List<TechType>();
         public static LootDistributionData LootDistributionData { get; set; }
 
         internal static event Action<SaveData> OnDataLoaded;
         #endregion
 
         #region Internal Methods
-
+        
         internal static void Save()
         {
             if (!IsSaving())
@@ -300,7 +809,7 @@ namespace DataStorageSolutions.Configuration
 
             foreach (var entry in saveData.Entries)
             {
-                if(string.IsNullOrEmpty(entry.ID)) continue;
+                if (string.IsNullOrEmpty(entry.ID)) continue;
 
                 if (entry.ID == id)
                 {
@@ -326,11 +835,11 @@ namespace DataStorageSolutions.Configuration
 
             foreach (var entry in saveData.Bases)
             {
-                if(string.IsNullOrEmpty(entry.InstanceID)) continue;
+                if (string.IsNullOrEmpty(entry.InstanceID)) continue;
 
                 if (entry.InstanceID == instanceId)
                 {
-                    return new BaseSaveData{BaseName = entry.BaseName, InstanceID = entry.InstanceID, AllowDocking = entry.AllowDocking, HasBreakerTripped = entry.HasBreakerTripped};
+                    return new BaseSaveData { BaseName = entry.BaseName, InstanceID = entry.InstanceID, AllowDocking = entry.AllowDocking, HasBreakerTripped = entry.HasBreakerTripped };
                 }
             }
 
@@ -365,10 +874,22 @@ namespace DataStorageSolutions.Configuration
         {
             return File.Exists(ConfigurationFile());
         }
+
+        internal static void CreateAllowedTechTypes()
+        {
+            if (!(AllTechTypes?.Count <= 0)) return;
+            var items = Enum.GetValues(typeof(TechType));
+
+            foreach (TechType techType in items)
+            {
+                if (BlackList.Contains(techType) || CraftData.IsBuildableTech(techType)) continue;
+                AllTechTypes.Add(techType);
+            }
+        }
         #endregion
 
         #region Private Methods
-        
+
         private static IEnumerator SaveCoroutine()
         {
             while (SaveLoadManager.main != null && SaveLoadManager.main.isSaving)
@@ -378,17 +899,17 @@ namespace DataStorageSolutions.Configuration
             GameObject.DestroyImmediate(_saveObject.gameObject);
             _saveObject = null;
         }
-        
+
         public static string GetAssetFolder()
         {
             return Path.Combine(GetModPath(), "Assets");
         }
-        
+
         private static string GetModPath()
         {
             return Path.Combine(GetQModsPath(), ModFolderName);
         }
-        
+
         private static string GetQModsPath()
         {
             return Path.Combine(Environment.CurrentDirectory, "QMods");
@@ -396,104 +917,6 @@ namespace DataStorageSolutions.Configuration
 
         #endregion
         
-        public static List<TechType> BlackList = new List<TechType>
-        {
-            TechType.None,
-           TechType.MercuryOre,
-            TechType.Placeholder,
-            TechType.Magnesium,
-            TechType.Lodestone,
-            TechType.SandLoot,
-            TechType.Fiber,
-            TechType.Enamel,
-            TechType.OpalGem,
-            TechType.BaseCorridor,
-            TechType.Accumulator,
-            TechType.Terraformer,
-            TechType.CurrentGenerator,
-            TechType.PowerGlide,
-            TechType.Seamoth,
-            TechType.LootSensorFragment,
-            TechType.LootSensorMetal,
-            TechType.LootSensorLithium,
-            TechType.Cyclops,
-            TechType.StarshipCargoCrate,
-            TechType.StarshipCircuitBox,
-            TechType.StarshipMonitor,
-            TechType.HullReinforcementModule,
-            TechType.HullReinforcementModule2,
-            TechType.HullReinforcementModule3,
-            TechType.Nanowires,
-            TechType.BaseCorridorGlass,
-            TechType.SeamothReinforcementModule,
-            TechType.FiltrationMachine,
-            TechType.Exosuit,
-            TechType.RocketBase,
-            TechType.RocketBaseLadder,
-            TechType.RocketStage1,
-            TechType.RocketStage2,
-            TechType.RocketStage3,
-            TechType.Transfuser,
-            TechType.SomethingPlaceholder,
-            TechType.RadiationLeakPoint,
-            TechType.Databox,
-            TechType.Unobtanium,
-            TechType.PrecursorSurfacePipe,
-            TechType.PrecursorSensor,
-            TechType.PrecursorSeaDragonSkeleton,
-            TechType.PrecursorThermalPlant,
-            TechType.PrecursorScanner,
-            TechType.PrecursorTeleporter,
-            TechType.PrecursorWarper,
-            TechType.PrecursorKeyTerminal,
-            TechType.HugeSkeleton,
-            TechType.PrecursorIonCrystalMatrix,
-            TechType.SpikePlant,
-            TechType.PurpleBrainCoral,
-            TechType.BrainCoral,
-            TechType.SnakeMushroom,
-            TechType.PurpleBrainCoral,
-            TechType.RedRollPlant,
-            TechType.SpottedLeavesPlant,
-            TechType.ShellGrass,
-            TechType.RedConePlant,
-            TechType.RedBush,
-            TechType.RedBasketPlant,
-            TechType.PurpleStalk,
-            TechType.RedGreenTentacle,
-            TechType.EyesPlant,
-            TechType.OrangePetalsPlant,
-            TechType.SeaCrown,
-            TechType.GabeSFeather,
-            TechType.BluePalm,
-            TechType.FernPalm,
-            TechType.PurpleVegetable,
-            TechType.HangingFruitTree,
-            TechType.OrangeMushroom,
-            TechType.PurpleVasePlant,
-            TechType.BulboTree,
-            TechType.PurpleRattle,
-            TechType.PinkMushroom,
-            TechType.PinkFlower,
-            TechType.BloodVine,
-            TechType.BloodRoot,
-            TechType.HeatArea,
-            TechType.SmallFan,
-            TechType.PurpleTentacle,
-            TechType.PurpleFan,
-            TechType.MembrainTree,
-            TechType.HugeKoosh,
-            TechType.LargeKoosh,
-            TechType.MediumKoosh,
-            TechType.SmallKoosh,
-            TechType.Creepvine,
-            TechType.Signal
-
-
-        };
-
-        public static List<OperationInterfaceButton> ItemTechTypeButtons { get; set; } = new List<OperationInterfaceButton>();
-
         private static void CreateModConfiguration()
         {
             try
@@ -549,7 +972,7 @@ namespace DataStorageSolutions.Configuration
         internal static void AddBlackListFilter(Filter filter)
         {
             var dockingList = QPatch.Configuration.Config.DockingBlackList;
-            
+
             var result = dockingList.Any(x => x.IsSame(filter));
 
             if (!result)
@@ -559,7 +982,7 @@ namespace DataStorageSolutions.Configuration
 
             if (!dockingList.Contains(filter))
             {
-                
+
             }
 
             SaveModConfiguration();
@@ -585,7 +1008,7 @@ namespace DataStorageSolutions.Configuration
             {
                 if (filter.IsSame(compareFilter))
                 {
-                    QuickLogger.Debug("Filter is in the list",true);
+                    QuickLogger.Debug("Filter is in the list", true);
                     return true;
                 }
             }
@@ -705,7 +1128,7 @@ namespace DataStorageSolutions.Configuration
 
         public override void BuildModOptions()
         {
-            AddChoiceOption(ExtractMultiplierID, "Extract Multiplier", new []
+            AddChoiceOption(ExtractMultiplierID, "Extract Multiplier", new[]
             {
                 "x0",
                 "x5",

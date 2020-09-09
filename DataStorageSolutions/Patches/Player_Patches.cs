@@ -22,6 +22,7 @@ namespace DataStorageSolutions.Patches
                 {
                     BaseManager.RemoveDestroyedBases();
                     BaseManager.OnPlayerTick?.Invoke();
+                    BaseManager.PerformOperations();
                     _timeLeft = 1f;
                 }
             }

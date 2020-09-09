@@ -5,6 +5,7 @@ using DataStorageSolutions.Buildables;
 using DataStorageSolutions.Configuration;
 using DataStorageSolutions.Display;
 using DataStorageSolutions.Enumerators;
+using DataStorageSolutions.Model;
 using FCSCommon.Abstract;
 using FCSCommon.Enums;
 using FCSCommon.Helpers;
@@ -89,7 +90,7 @@ namespace DataStorageSolutions.Mono
                 return;
             }
 
-            _mono.AddOperation(new FCSOperation { FromDevice = _fromDevice, ToDevice = _toDevice, TechType = _itemTechType});
+            BaseManager.AddOperation(new FCSOperation { FromDevice = _fromDevice, ToDevice = _toDevice, TechType = _itemTechType, Manager = _mono.Manager});
 
             GoToPage(OperatorPages.Operations);
         }
@@ -116,9 +117,80 @@ namespace DataStorageSolutions.Mono
             _itemTechTypeGrid.DrawPage();
         }
 
-        private void OnLoadOperationsGrid(DisplayData obj)
+        private void OnLoadOperationsGrid(DisplayData data)
         {
+            try
+            {
+                if (_isBeingDestroyed || _mono == null || _mono?.Manager == null) return;
 
+                _operationsGrid.ClearPage();
+
+                var grouped = BaseManager.Operations;
+
+                if (grouped == null)
+                {
+                    QuickLogger.Debug("Grouped returned null canceling operation");
+                    return;
+                }
+
+                //if (!string.IsNullOrEmpty(_toCurrentSearchString?.Trim()))
+                //{
+                //    grouped = grouped.Where(p => p.Value.UnitID.StartsWith(_toCurrentSearchString.Trim(), StringComparison.OrdinalIgnoreCase)).ToDictionary(p => p.Key, p => p.Value);
+                //}
+
+                if (data.EndPosition > grouped.Count)
+                {
+                    data.EndPosition = grouped.Count;
+                }
+
+                if (data.ItemsGrid?.transform == null)
+                {
+                    QuickLogger.Debug("Grid returned null canceling operation");
+                    return;
+                }
+
+                for (int i = data.StartPosition; i < data.EndPosition; i++)
+                {
+                    var connectable = grouped.ElementAt(i);
+
+                    GameObject buttonPrefab = Instantiate(data.ItemsPrefab);
+
+                    if (buttonPrefab == null || data.ItemsGrid == null)
+                    {
+                        if (buttonPrefab != null)
+                        {
+                            QuickLogger.Debug("Destroying Tab", true);
+                            Destroy(buttonPrefab);
+                        }
+                        return;
+                    }
+
+                    buttonPrefab.transform.SetParent(data.ItemsGrid.transform, false);
+                    var button = buttonPrefab.AddComponent<OperationInterfaceButton>();
+
+                    button.BtnName = "OperationBTN";
+                    button.Tag = null;
+                    //button.TextLineOne = connectable.Value.IsBase() ? "Take from base." : $"Take from {Language.main.Get(connectable.Value.GetTechType())}";
+                    button.OnButtonClick = OnButtonClick;
+                    //buttonPrefab.GetComponentInChildren<Text>().text = connectable.Value.UnitID;
+                    uGUI_Icon icon = InterfaceHelpers.FindGameObject(InterfaceHelpers.FindGameObject(buttonPrefab,"FromIcon"), "Image").AddComponent<uGUI_Icon>();
+                    icon.sprite = connectable.FromDevice.IsBase() ? SpriteManager.Get(TechType.BaseRoom) : SpriteManager.Get(connectable.FromDevice.GetTechType());
+
+                    uGUI_Icon icon1 = InterfaceHelpers.FindGameObject(InterfaceHelpers.FindGameObject(buttonPrefab, "TechTypeIcon"), "Image").AddComponent<uGUI_Icon>();
+                    icon1.sprite = SpriteManager.Get(connectable.TechType);
+
+                    uGUI_Icon icon2 = InterfaceHelpers.FindGameObject(InterfaceHelpers.FindGameObject(buttonPrefab, "ToIcon"), "Image").AddComponent<uGUI_Icon>();
+                    icon2.sprite = connectable.ToDevice.IsBase() ? SpriteManager.Get(TechType.BaseRoom) : SpriteManager.Get(connectable.ToDevice.GetTechType());
+                }
+
+                _operationsGrid.UpdaterPaginator(grouped.Count);
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error("Error Caught");
+                QuickLogger.Error($"Error Message: {e.Message}");
+                QuickLogger.Error($"Error StackTrace: {e.StackTrace}");
+            }
         }
         
         private void OnLoadFromGrid(DisplayData data)
@@ -180,11 +252,11 @@ namespace DataStorageSolutions.Mono
                     }
                     button.BtnName = "OperatorDisplayBTN";
                     button.Tag = new OperatorButtonData{Button = button , Connectable = connectable.Value};
-                    button.TextLineOne = $"Take from {Language.main.Get(connectable.Value.GetTechType())}";
+                    button.TextLineOne = connectable.Value.IsBase() ? "Take from base." : $"Take from {Language.main.Get(connectable.Value.GetTechType())}";
                     button.OnButtonClick = OnButtonClick;
                     buttonPrefab.GetComponentInChildren<Text>().text = connectable.Value.UnitID;
                     uGUI_Icon icon = InterfaceHelpers.FindGameObject(buttonPrefab, "Icon").AddComponent<uGUI_Icon>();
-                    icon.sprite = SpriteManager.Get(connectable.Value.GetTechType());
+                    icon.sprite = connectable.Value.IsBase() ? SpriteManager.Get(TechType.BaseRoom)  : SpriteManager.Get(connectable.Value.GetTechType());
                     _fromDevicesList.Add(button);
                 }
 
@@ -198,7 +270,7 @@ namespace DataStorageSolutions.Mono
             }
         }
 
-        private void OnToFromGrid(DisplayData data)
+        private void OnLoadToGrid(DisplayData data)
         {
             try
             {
@@ -257,11 +329,11 @@ namespace DataStorageSolutions.Mono
                     }
                     button.BtnName = "OperatorDisplayBTN";
                     button.Tag = new OperatorButtonData { Button = button, Connectable = connectable.Value };
-                    button.TextLineOne = $"Take from {Language.main.Get(connectable.Value.GetTechType())}";
+                    button.TextLineOne = connectable.Value.IsBase() ? "Take from base." : $"Take from {Language.main.Get(connectable.Value.GetTechType())}";
                     button.OnButtonClick = OnButtonClick;
                     buttonPrefab.GetComponentInChildren<Text>().text = connectable.Value.UnitID;
                     uGUI_Icon icon = InterfaceHelpers.FindGameObject(buttonPrefab, "Icon").AddComponent<uGUI_Icon>();
-                    icon.sprite = SpriteManager.Get(connectable.Value.GetTechType());
+                    icon.sprite = connectable.Value.IsBase() ? SpriteManager.Get(TechType.BaseRoom) : SpriteManager.Get(connectable.Value.GetTechType());
                     _toDevicesList.Add(button);
                 }
 
@@ -333,10 +405,10 @@ namespace DataStorageSolutions.Mono
                 button.BtnName = "ItemTechBTN";
                 button.OnButtonClick = OnButtonClick;
                 button.Tag = new OperatorButtonData { Button = button, TechType = grouped[i] };
-                button.TextLineOne = $"Send {grouped[i].AsString()}";
-                buttonPrefab.GetComponentInChildren<Text>().text = grouped[i].AsString(); // Language.main.Get(grouped[i]);
+                button.TextLineOne = $"Send {Language.main.Get(grouped[i])}";
+                buttonPrefab.GetComponentInChildren<Text>().text = Language.main.Get(grouped[i]);
                 uGUI_Icon icon = InterfaceHelpers.FindGameObject(buttonPrefab, "Icon").AddComponent<uGUI_Icon>();
-                icon.sprite = SpriteManager.Get(grouped[i]);
+                icon.sprite =  SpriteManager.Get(grouped[i]);
                 _itemTechTypeList.Add(button);
             }
 
@@ -434,7 +506,7 @@ namespace DataStorageSolutions.Mono
 
                 _operationsGrid = _mono.gameObject.AddComponent<GridHelper>();
                 _operationsGrid.OnLoadDisplay += OnLoadOperationsGrid;
-                _operationsGrid.Setup(18, DSSModelPrefab.OperatorItemPrefab, currentOperationsPage, _startColor, _hoverColor, OnButtonClick);
+                _operationsGrid.Setup(18, DSSModelPrefab.ItemEntryPrefab, currentOperationsPage, _startColor, _hoverColor, OnButtonClick);
 
 
                 #endregion
@@ -469,7 +541,7 @@ namespace DataStorageSolutions.Mono
                 toNextBTNObject.onClick.AddListener(ToButtonClick);
 
                 _toGrid = _mono.gameObject.AddComponent<GridHelper>();
-                _toGrid.OnLoadDisplay += OnToFromGrid;
+                _toGrid.OnLoadDisplay += OnLoadToGrid;
                 _toGrid.Setup(18, DSSModelPrefab.OperatorItemPrefab, toPage, _startColor, _hoverColor, OnButtonClick);
                 _toGrid.DrawPage();
 
@@ -524,7 +596,7 @@ namespace DataStorageSolutions.Mono
 #if DEBUG
             QuickLogger.Debug($"Refreshing Operator: {_mono?.GetPrefabID()}", true);
 #endif
-            _fromGrid?.DrawPage();
+            _operationsGrid?.DrawPage();
         }
     }
 
@@ -540,5 +612,6 @@ namespace DataStorageSolutions.Mono
         public FCSConnectableDevice FromDevice { get; set; }
         public FCSConnectableDevice ToDevice { get; set; }
         public TechType TechType { get; set; }
+        public BaseManager Manager { get; set; }
     }
 }

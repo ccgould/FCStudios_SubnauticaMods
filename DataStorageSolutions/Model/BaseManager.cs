@@ -33,6 +33,8 @@ namespace DataStorageSolutions.Model
 
         internal readonly HashSet<DSSTerminalController> BaseTerminals = new HashSet<DSSTerminalController>();
         internal readonly Dictionary<TechType,int> TrackedItems = new Dictionary<TechType, int>();
+        internal bool GivePlayerItem { get; set; } = true;
+
         internal bool IsVisible
         {
             get
@@ -72,7 +74,6 @@ namespace DataStorageSolutions.Model
             ReadySaveData();
             FCSConnectableAwake_Patcher.AddEventHandlerIfMissing(AlertedNewFCSConnectablePlaced);
             FCSConnectableDestroy_Patcher.AddEventHandlerIfMissing(AlertedFCSConnectableDestroyed);
-
             GetFCSConnectables();
 
 
@@ -199,19 +200,7 @@ namespace DataStorageSolutions.Model
 
             return false;
         }
-
-        private int GetAntennaCount()
-        {
-            int i = 0;
-
-            for (int j = 0; j < BaseAntennas.Count; j++)
-            {
-                i++;
-            }
-
-            return i;
-        }
-
+        
         public BaseManager(SubRoot habitat)
         {
             if (habitat == null) return;
@@ -409,7 +398,7 @@ namespace DataStorageSolutions.Model
             }
         }
 
-        private void PerformTakeOperation(TechType techType)
+        private Pickupable PerformTakeOperation(TechType techType)
         {
             QuickLogger.Debug("Perform Take Operation",true);
             foreach (DSSRackController baseUnit in BaseRacks)
@@ -418,13 +407,19 @@ namespace DataStorageSolutions.Model
                 {
                     var data = baseUnit.GetItemDataFromServer(techType);
                     QuickLogger.Debug("Calling Take",true);
-                    var result = baseUnit.GivePlayerItem(techType, data);
-                    if (!result)
+
+                    if (GivePlayerItem)
                     {
-                        return;
-                        //TODO Add Message
+                        var result = baseUnit.GivePlayerItem(techType, data);
+                        if (!result)
+                        {
+                            return null;
+                            //TODO Add Message
+                        }
                     }
-                    return;
+
+                    GivePlayerItem = true;
+                    return data.ToPickable(techType);
                 }
             }
 
@@ -436,10 +431,17 @@ namespace DataStorageSolutions.Model
                 {
                     var item = fcsConnectable.Value.RemoveItemFromContainer(techType, 1);
                     if(item == null) continue;
-                    DSSHelpers.GivePlayerItem(item);
-                    break;
+                    if (GivePlayerItem)
+                    {
+                        DSSHelpers.GivePlayerItem(item);
+                    }
+
+                    GivePlayerItem = true;
+                    return item;
                 }
             }
+
+            return null;
         }
 
         internal void OpenDump(TransferData data)
@@ -501,12 +503,12 @@ namespace DataStorageSolutions.Model
 
         private void TrackNewFCSConnectable(FCSConnectableDevice obj)
         {
-            GameObject newSeaBase = obj?.gameObject?.transform?.parent?.gameObject;
-            var fcsConnectableBase = BaseManager.FindManager(newSeaBase?.GetComponentInChildren<PrefabIdentifier>().Id);
-            QuickLogger.Debug($"SeaBase Base Found in Track {newSeaBase?.name}");
-            QuickLogger.Debug($"Terminal Base Found in Track {Habitat?.name}");
+            SubRoot newSeaBase = obj.GetComponentInParent<SubRoot>(); //obj?.gameObject?.transform?.parent?.gameObject;
+            var fcsConnectableBase = FindManager(newSeaBase?.GetComponentInChildren<PrefabIdentifier>().Id);
+            QuickLogger.Debug($"FCSConnectable Base Found: {newSeaBase?.name}",true);
+            QuickLogger.Debug($"FCSConnectable found in base: {Habitat?.name}",true);
 
-            if (newSeaBase != null && fcsConnectableBase?.Habitat == Habitat)
+            if (fcsConnectableBase?.Habitat == Habitat)
             {
                 QuickLogger.Debug("Subscribing to OnContainerUpdate");
                 obj.GetStorage().OnContainerUpdate += OnFCSConnectableContainerUpdate;
@@ -533,12 +535,12 @@ namespace DataStorageSolutions.Model
                 baseConnectable.InitializeBase(null, this, null, Habitat.gameObject.gameObject?.GetComponentInChildren<PrefabIdentifier>());
                 FCSTechFabricator.FcTechFabricatorService.PublicAPI.RegisterDevice(baseConnectable, InstanceID, Mod.DSSTabID);
 
-                var connectableDevices = Habitat.GetComponentsInChildren<FCSConnectableDevice>().ToList();
+                //var connectableDevices = Habitat.GetComponentsInChildren<FCSConnectableDevice>().ToList();
 
-                foreach (var device in connectableDevices)
-                {
-                    FCSConnectables.Add(device.GetPrefabIDString(), device);
-                }
+                //foreach (var device in connectableDevices)
+                //{
+                //    FCSConnectables.Add(device.GetPrefabIDString(), device);
+                //}
             }
         }
 
@@ -646,19 +648,18 @@ namespace DataStorageSolutions.Model
             {
                 for (int i = 0; i < QPatch.Configuration.Config.ExtractMultiplier * 5; i++)
                 {
-                    PerformTakeOperation(techType);
+                    return PerformTakeOperation(techType);
                 }
             }
             else
             {
-                PerformTakeOperation(techType);
+                return PerformTakeOperation(techType);
             }
 
             //No need to return any items
             return null;
         }
         
-
         internal void ChangeBaseName()
         {
             NameController.Show();
@@ -740,6 +741,8 @@ namespace DataStorageSolutions.Model
             return amount;
         }
 
+        #region Operator Code
+
         internal void AddOperator(DSSOperatorController unit)
         {
             if (!BaseOperators.Contains(unit) && unit.IsConstructed)
@@ -753,43 +756,27 @@ namespace DataStorageSolutions.Model
         {
             BaseOperators.Remove(unit);
         }
-
-        public List<string> GetCommands()
+        
+        public static List<FCSOperation> Operations { get; set; } = new List<FCSOperation>();
+        
+        internal static void PerformOperations()
         {
-            return new List<string>();
-        }
-
-        public void AddOperationCommand(string command)
-        {
-            //TODO Deconstruct Command
-            string[] delimiterChars = {"=>"};
-
-            var commandParts = command.Split(delimiterChars, StringSplitOptions.RemoveEmptyEntries);
-            QuickLogger.Debug($"Command Parts: {commandParts?.Length}",true);
-            QuickLogger.Debug($"Command From: {commandParts[0]}",true);
-            QuickLogger.Debug($"Command Item: {commandParts[1]}",true);
-            QuickLogger.Debug($"Command To: {commandParts[2]}",true);
-
-            if (commandParts[0].Equals("base", StringComparison.OrdinalIgnoreCase))
+            foreach (FCSOperation operation in Operations)
             {
-                var techType = commandParts[1].ToTechType();
-
-                FCSConnectableDevice device = null;
-                foreach (KeyValuePair<string, FCSConnectableDevice> connectable in FCSConnectables)
+                if (operation.FromDevice != null && (operation.FromDevice.IsOperational() || (operation.FromDevice.IsBase() && operation.FromDevice.InitializeBase()) && operation.ToDevice != null && operation.ToDevice.IsOperational() && operation.TechType != TechType.None)
                 {
-                    if (!connectable.Value.IsVisible || !connectable.Value.IsConstructed() ||
-                        !connectable.Value.UnitID.Equals(commandParts[2], StringComparison.OrdinalIgnoreCase)) continue;
-                    device = connectable.Value;
-                    break;
+                    if (operation.FromDevice.ContainsItem(operation.TechType) && operation.ToDevice.CanBeStored(1, operation.TechType))
+                    {
+                        if (operation.FromDevice.IsBase())
+                        {
+                            operation.Manager.GivePlayerItem = false;
+                        }
+                        var pickupable = operation.FromDevice.RemoveItemFromContainer(operation.TechType, 1);
+                        operation.ToDevice.AddItemToContainer(new InventoryItem(pickupable), out string reason);
+                    }
                 }
-                OperatorCommands.Add(new OperatorCommand {FromBase = this,TechType = techType, ToDevice = device});
-                //TODO Test This and link it up
             }
-            
-            RefreshOperators();
         }
-
-        public List<OperatorCommand> OperatorCommands { get; } = new List<OperatorCommand>();
 
         private void RefreshOperators()
         {
@@ -799,18 +786,12 @@ namespace DataStorageSolutions.Model
             }
         }
 
-        public void RemoveOperationCommand(string command)
-        {
-            //TODO Decontruct Command
-        }
+        #endregion
 
-        public struct OperatorCommand
+        internal static void AddOperation(FCSOperation operation)
         {
-            public FCSConnectableDevice FromDevice { get; set; }
-            public BaseManager FromBase { get; set; }
-            public TechType TechType { get; set; }
-            public FCSConnectableDevice ToDevice { get; set; }
+            Operations.Add(operation);
+            operation.Manager.RefreshOperators();
         }
-
     }
 }

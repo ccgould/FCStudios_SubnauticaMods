@@ -62,7 +62,7 @@ namespace DataStorageSolutions.Helpers
         {
             if (item == null)
             {
-                QuickLogger.Error("Failed to get Inventory Item",true);
+                QuickLogger.Error("Failed to get Inventory Item", true);
                 return null;
             }
 
@@ -73,8 +73,8 @@ namespace DataStorageSolutions.Helpers
             }
 
             var energyMixin = item.item?.GetComponentInChildren<EnergyMixin>();
-            
-            var playerToolData = new PlayerToolData { TechType = item.item.GetTechType() };
+
+            var playerToolData = new PlayerToolData {TechType = item.item.GetTechType()};
 
             if (energyMixin == null) return playerToolData;
 
@@ -90,7 +90,7 @@ namespace DataStorageSolutions.Helpers
         {
             var batteryGo = item.item.GetComponentInChildren<Battery>();
 
-            var playerToolData = new PlayerToolData { TechType = item.item.GetTechType() };
+            var playerToolData = new PlayerToolData {TechType = item.item.GetTechType()};
             var techType = batteryGo.GetComponent<TechTag>().type;
             var iBattery = batteryGo.GetComponent<IBattery>();
             playerToolData.BatteryInfo = new BatteryInfo(techType, iBattery, String.Empty);
@@ -119,7 +119,7 @@ namespace DataStorageSolutions.Helpers
 
                     if (!itemData.IsServer)
                     {
-                        var data = (ObjectData)itemData.data;
+                        var data = (ObjectData) itemData.data;
 
                         if (data != null)
                         {
@@ -132,7 +132,7 @@ namespace DataStorageSolutions.Helpers
                     }
                     else
                     {
-                        var data = (HashSet<ObjectData>)itemData.data;
+                        var data = (HashSet<ObjectData>) itemData.data;
                         var controller = pickup.gameObject.GetComponent<DSSServerController>();
                         controller.Initialize();
                         controller.FCSFilteredStorage.Items = new HashSet<ObjectData>(data);
@@ -181,7 +181,7 @@ namespace DataStorageSolutions.Helpers
             Mod.OnBaseUpdate?.Invoke();
             return isSuccessful;
         }
-        
+
         private static void DetectDataObjectTypeAndPerformConversion(ObjectData data, Pickupable pickup)
         {
             switch (data.DataObjectType)
@@ -245,11 +245,11 @@ namespace DataStorageSolutions.Helpers
             Pickupable pickup;
             if (EggHandler.GetDiscoveredEgg(techType, out TechType value))
             {
-                pickup = CraftData.InstantiateFromPrefab(value).GetComponent<Pickupable>();
+                pickup = CraftData.InstantiateFromPrefab(value).EnsureComponent<Pickupable>();
             }
             else
             {
-                pickup = CraftData.InstantiateFromPrefab(techType).GetComponent<Pickupable>();
+                pickup = CraftData.InstantiateFromPrefab(techType).EnsureComponent<Pickupable>();
             }
 
             return pickup;
@@ -266,7 +266,7 @@ namespace DataStorageSolutions.Helpers
             switch (objectType)
             {
                 case SaveDataObjectType.Item:
-                    result = new ObjectData { DataObjectType = objectType, TechType = item.item.GetTechType() };
+                    result = new ObjectData {DataObjectType = objectType, TechType = item.item.GetTechType()};
                     break;
                 case SaveDataObjectType.PlayerTool:
                     result = new ObjectData
@@ -336,7 +336,8 @@ namespace DataStorageSolutions.Helpers
 
         internal static List<ItemsContainer> GetVehicleContainers(Vehicle vehicle)
         {
-            var vehicleContainers = vehicle?.gameObject.GetComponentsInChildren<StorageContainer>().Select((x) => x?.container)
+            var vehicleContainers = vehicle?.gameObject.GetComponentsInChildren<StorageContainer>()
+                .Select((x) => x?.container)
                 .ToList();
             vehicleContainers?.AddRange(GetSeamothStorage(vehicle));
             return vehicleContainers;
@@ -368,6 +369,33 @@ namespace DataStorageSolutions.Helpers
                 controller.Initialize();
                 controller.FCSFilteredStorage.Items = new HashSet<ObjectData>(data.ServerData);
                 controller.FCSFilteredStorage.Filters = new List<Filter>(data.Filters);
+            }
+
+            return pickup;
+        }
+
+        internal static Pickupable ToPickable(this ObjectDataTransferData itemData, TechType techType)
+        {
+            var pickup = CheckIfEggAnExtractPickable(techType);
+            if (itemData.Vehicle == null)
+            {
+                if (!itemData.IsServer)
+                {
+                    var data = (ObjectData) itemData.data;
+
+                    if (data != null)
+                    {
+                        DetectDataObjectTypeAndPerformConversion(data, pickup);
+                    }
+                }
+                else
+                {
+                    var data = (HashSet<ObjectData>) itemData.data;
+                    var controller = pickup.gameObject.GetComponent<DSSServerController>();
+                    controller.Initialize();
+                    controller.FCSFilteredStorage.Items = new HashSet<ObjectData>(data);
+                    controller.FCSFilteredStorage.Filters = new List<Filter>(itemData.Filters);
+                }
             }
 
             return pickup;

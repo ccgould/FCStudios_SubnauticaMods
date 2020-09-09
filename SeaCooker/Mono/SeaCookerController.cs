@@ -24,7 +24,6 @@ namespace AE.SeaCooker.Mono
     {
         internal SCDisplayManager DisplayManager { get; set; }
         internal bool IsConstructed { get; private set; }
-        internal GasManager GasManager { get; private set; }
         internal SCStorageManager StorageManager { get; private set; }
         internal PowerManager PowerManager { get; private set; }
         internal AnimationManager AnimationManager { get; set; }
@@ -42,7 +41,6 @@ namespace AE.SeaCooker.Mono
         private bool _runStartUpOnEnable;
         private SaveDataEntry _savedData;
         private bool _fromSave;
-        private TechType _seabreezeTechType => _seabreezeTechType == TechType.None ? "ARSSeaBreezeFCS32".ToTechType() : _seabreezeTechType;
         internal FCSConnectableDevice SelectedSeaBreeze { get; set; }
         internal PlayerInteraction PlayerInteraction { get; private set; }
 
@@ -79,8 +77,6 @@ namespace AE.SeaCooker.Mono
                     }
 
                     AutoChooseSeabreeze = _savedData.AutoChooseSeabreeze;
-                    GasManager.SetEquipment(_savedData.TankType);
-                    GasManager.SetTankLevel(_savedData.FuelLevel);
                     ColorManager.SetColorFromSave(_savedData.BodyColor.Vector4ToColor());
                     StorageManager.LoadExportContainer(_savedData.Export);
                     StorageManager.LoadInputContainer(_savedData.Input);
@@ -143,7 +139,6 @@ namespace AE.SeaCooker.Mono
         
         private void Initialize()
         {
-            TechTypeHelpers.Initialize();
             ARSeaBreezeFCS32Awake_Patcher.AddEventHandlerIfMissing(AlertedNewSeaBreezePlaced);
             ARSeaBreezeFCS32Destroy_Patcher.AddEventHandlerIfMissing(AlertedSeaBreezeDestroyed);
             if (FoodManager == null)
@@ -157,13 +152,7 @@ namespace AE.SeaCooker.Mono
                 StorageManager = new SCStorageManager();
                 StorageManager.Initialize(this);
             }
-
-            if (GasManager == null)
-            {
-                GasManager = new GasManager();
-                GasManager.Initialize(this);
-            }
-
+            
             if (PowerManager == null)
             {
                 PowerManager = new PowerManager();
@@ -187,7 +176,6 @@ namespace AE.SeaCooker.Mono
             if (AudioManager == null)
             {
                 AudioManager = new AudioManager(gameObject.GetComponent<FMOD_CustomLoopingEmitter>());
-                //InvokeRepeating(nameof(UpdateAudio), 0, 1);
             }
 
             if (PlayerInteraction == null)
@@ -197,22 +185,7 @@ namespace AE.SeaCooker.Mono
             }
 
             PlayerInteraction.Initialize(this);
-
-            //FindHabitat();
-
             IsInitialized = true;
-        }
-        
-        private void FindHabitat()
-        {
-            //if (_habitat != null) return;
-
-            //_habitat = PowerManager.CurrentRelay()?.transform;
-
-            //if (_habitat != null)
-            //{
-            //    QuickLogger.Debug($"Base Name = {_habitat.name}");
-            //}
         }
         
         internal void UpdateIsRunning(bool value = true)
@@ -250,8 +223,6 @@ namespace AE.SeaCooker.Mono
                 _savedData = new SaveDataEntry();
             }
             _savedData.ID = id;
-            _savedData.FuelLevel = GasManager.GetTankLevel();
-            _savedData.TankType = GasManager.CurrentFuel;
             _savedData.BodyColor = ColorManager.GetColor().ColorToVector4();
             _savedData.Export = StorageManager.GetExportContainer();
             _savedData.Input = StorageManager.GetInputContainer();
@@ -328,15 +299,15 @@ namespace AE.SeaCooker.Mono
         {
             //Clear the list
             SeaBreezes.Clear();
-
+            
             //Check if there is a base connected
-            if (_habitat != null)
+            if (_habitat != null || Mod.SeabeezeTechType() != TechType.None)
             {
                 var connectableDevices = _habitat.GetComponentsInChildren<FCSConnectableDevice>().ToList();
 
                 foreach (var device in connectableDevices)
                 {
-                    if (device.GetTechType() == _seabreezeTechType)
+                    if (device.GetTechType() == Mod.SeabeezeTechType())
                     {
                         SeaBreezes.Add(device.GetPrefabIDString(), device);
                     }

@@ -6,34 +6,6 @@ namespace AE.SeaCooker.Configuration
 {
     internal static class Configuration
     {
-        internal static readonly string[] SlotIDs = new string[]
-            {
-                "SCGasTank1"
-            };
-
-        private static bool _addingSlots;
-
-        internal static void CreateConfiguration()
-        {
-
-        }
-
-        internal static void AddNewSlots()
-        {
-            if (!_addingSlots)
-            {
-                foreach (string slotID in SlotIDs)
-                {
-                    if (slotID.StartsWith("SC"))
-                    {
-                        Equipment.slotMapping.Add(slotID, EquipmentType.NuclearReactor);
-                        QuickLogger.Debug($"Adding slot {slotID}");
-                    }
-                }
-
-                _addingSlots = true;
-            }
-        }
 
         internal static readonly List<TechType> AllowedRawItems = new List<TechType>()
         {
@@ -74,12 +46,9 @@ namespace AE.SeaCooker.Configuration
 
     internal class Config
     {
-        [JsonProperty] internal bool PlaySFX { get; set; } = true; 
-        [JsonProperty] internal float AlienFecesTankCapacity { get; set; } = 250.0f;
-        [JsonProperty] internal float GasTankCapacity { get; set; } = 100.0f;
+        [JsonProperty] internal bool PlaySFX { get; set; } = true;
         [JsonProperty] internal float CookTime { get; set; } = 5.0f;
         [JsonProperty] internal float EnergyPerSec { get; set; } = 0.50666666f;
-        [JsonProperty] internal float UsagePerItem { get; set; } = 5.0f;
         [JsonProperty] internal int StorageWidth { get; set; } = 4;
         [JsonProperty] internal int StorageHeight { get; set; } = 4;
     }

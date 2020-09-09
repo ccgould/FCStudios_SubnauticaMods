@@ -129,27 +129,20 @@
     <Compile Include="Configuration\Configuration.cs" />
     <Compile Include="Configuration\Mod.cs" />
     <Compile Include="Configuration\SaveDataEntry.cs" />
-    <Compile Include="Craftable\SeaGasTankCraftable.cs" />
-    <Compile Include="Craftable\SeaAlienGasTankCraftable.cs" />
     <Compile Include="Display\ColorItemButton.cs" />
     <Compile Include="Display\OnScreenButton.cs" />
     <Compile Include="Display\PaginatorButton.cs" />
-    <Compile Include="Enumerators\FuelType.cs" />
     <Compile Include="Extenstion\Extenstions.cs" />
     <Compile Include="Helpers\ColorPageHelper.cs" />
-    <Compile Include="Helpers\Initialize_uGUI.cs" />
-    <Compile Include="Helpers\TechTypeHelpers.cs" />
     <Compile Include="Managers\AnimationManager.cs" />
     <Compile Include="Managers\AudioManager.cs" />
     <Compile Include="Managers\FoodManager.cs" />
     <Compile Include="Managers\PlayerInteraction.cs" />
     <Compile Include="Managers\SCDisplayManager.cs" />
-    <Compile Include="Managers\GasManager.cs" />
     <Compile Include="Managers\PowerManager.cs" />
     <Compile Include="Managers\SCStorageManager.cs" />
     <Compile Include="Mono\SeaCookerController.cs" />
     <Compile Include="Patchers\ARSeaBreezeFCS32Awake_Patcher.cs" />
-    <Compile Include="Patchers\EquipmentPatchers.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

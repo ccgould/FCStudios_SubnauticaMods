@@ -217,5 +217,10 @@ namespace FCSTechFabricator.Components
         {
             return _powerManager?.GetPowerState() == FCSPowerStates.Powered && IsConstructed();
         }
+
+        public FCSController GetController()
+        {
+            return _mono;
+        }
     }
 }

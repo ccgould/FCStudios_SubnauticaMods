@@ -80,10 +80,6 @@ namespace AE.SeaCooker.Managers
                     _mono.StorageManager.OpenExportStorage();
                     break;
 
-                case "fuelTankBTN":
-                    _mono.GasManager.OpenFuelTank();
-                    break;
-
                 case "seaBreezeToggle":
                     var item = (CustomToggle)tag;
                     _mono.StorageManager.SetExportToSeabreeze(item.CheckState());
@@ -245,19 +241,7 @@ namespace AE.SeaCooker.Managers
                 return false;
             }
             #endregion
-
-            #region Fuel Tank BTN
-            var fuelTankResult = InterfaceHelpers.CreateButton(home, "Tank_BTN", "fuelTankBTN", InterfaceButtonMode.Background,
-        OnButtonClick, out var fuelTankButton);
-            fuelTankButton.TextLineOne = "Open Fuel Tank";
-
-            if (!fuelTankResult)
-            {
-                return false;
-            }
-
-            #endregion
-
+            
             #region Settings Color BTN
             var settingsCResult = InterfaceHelpers.CreateButton(colorPicker, "Home_BTN", "settingsBTN", InterfaceButtonMode.TextColor,
                 OnButtonClick, out var settings_C_BTN);
@@ -366,18 +350,7 @@ namespace AE.SeaCooker.Managers
             }
             _percentage = percentage.GetComponent<Image>();
             #endregion
-
-            #region Fuel Percentage
-            var fuelResult = InterfaceHelpers.FindGameObject(home, "FuelPercentage", out var fuelPercentage);
-
-            if (!fuelResult)
-            {
-                return false;
-            }
-            _fuelPercentage = fuelPercentage.GetComponent<Text>();
-            _fuelPercentage.text = $"{SeaCookerBuildable.TankPercentage()}: (0%)";
-            #endregion
-
+            
             #region Version
             var versionResult = InterfaceHelpers.FindGameObject(canvasGameObject, "Version", out var version);
 
@@ -505,8 +478,6 @@ namespace AE.SeaCooker.Managers
             
             _mono.FoodManager.OnFoodCookedAll += OnFoodCooked;
             _mono.FoodManager.OnCookingStart += OnCookingStart;
-            _mono.GasManager.OnGasUpdate += OnGasRemoved;
-
             _colorPage = mono.ColorManager;
             _seaBreezeGrid = gameObject.AddComponent<GridHelper>();
 
@@ -525,18 +496,6 @@ namespace AE.SeaCooker.Managers
             StartCoroutine(CompleteSetup());
 
             InvokeRepeating(nameof(UpdateScreen), 0, 0.5f);
-        }
-
-        private void OnGasRemoved()
-        {
-            QuickLogger.Debug($"Updating Gas {_mono.GasManager.GetTankPercentage()}");
-            UpdateFuelPercentage();
-        }
-
-        internal void UpdateFuelPercentage()
-        {
-            if (_fuelPercentage == null) return;
-            _fuelPercentage.text = $"{SeaCookerBuildable.TankPercentage()}: ({_mono.GasManager.GetTankPercentage()}%)";
         }
 
         private void OnCookingStart(TechType raw, TechType cooked)
