@@ -52,6 +52,7 @@ namespace DataStorageSolutions.Mono
         public bool IsRackSlotsFull => GetIsRackFull();
         public override bool IsConstructed => _isConstructed;
         internal Action OnUpdate;
+        private bool _allowNotifications;
         Action<int, int> IFCSStorage.OnContainerUpdate { get; set; }
 
         public override BaseManager Manager
@@ -312,9 +313,17 @@ namespace DataStorageSolutions.Mono
 
             DisplayManager.UpdateContainerAmount();
             QuickLogger.Debug("Made it");
-            Mod.OnBaseUpdate?.Invoke();
+            SendNotification();
             return true;
 
+        }
+
+        private void SendNotification()
+        {
+            if (_allowNotifications)
+            {
+                Mod.OnBaseUpdate?.Invoke();
+            }
         }
 
         private int GetEmptySlot(int suppliedSlot, bool useSuppliedSlot)
@@ -338,7 +347,7 @@ namespace DataStorageSolutions.Mono
             if (dssRackController == this)
             {
                 DisplayManager.UpdateContainerAmount();
-                Mod.OnBaseUpdate?.Invoke();
+                SendNotification();
             }
         }
 
