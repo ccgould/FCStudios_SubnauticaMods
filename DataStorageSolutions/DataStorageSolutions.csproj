@@ -122,6 +122,8 @@
     <Compile Include="Configuration\Mod.cs" />
     <Compile Include="Configuration\SaveDataEntry.cs" />
     <Compile Include="Craftables\ServerCraftable.cs" />
+    <Compile Include="Debug\DebugMenu.cs" />
+    <Compile Include="Debug\Patches\OpenDebugMenu.cs" />
     <Compile Include="Display\DSSUIButton.cs" />
     <Compile Include="Display\OperationInterfaceButton.cs" />
     <Compile Include="Enumerators\ButtonType.cs" />
@@ -153,6 +155,8 @@
     <Compile Include="Mono\DSSServerController.cs" />
     <Compile Include="Mono\DSSTerminalDisplay.cs" />
     <Compile Include="Mono\DSSVehicleDockingManager.cs" />
+    <Compile Include="Model\FCSOperation.cs" />
+    <Compile Include="Structs\OperatorButtonData.cs" />
     <Compile Include="Mono\PowerManager.cs" />
     <Compile Include="Mono\SearchField.cs" />
     <Compile Include="Patches\FCSConnectableAwake_Patcher.cs" />

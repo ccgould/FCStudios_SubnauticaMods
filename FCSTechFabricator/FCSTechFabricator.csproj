@@ -116,9 +116,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Abstract\FCSController.cs" />
+    <Compile Include="Abstract\FCSPowerManager.cs" />
     <Compile Include="Components\CraftingTab.cs" />
     <Compile Include="Components\DumpContainer.cs" />
     <Compile Include="Components\FCSDNA.cs" />
+    <Compile Include="Components\FCSMessageBoxDialog.cs" />
     <Compile Include="Components\FridgeDumpContainer.cs" />
     <Compile Include="Components\FCSConnectableDevice.cs" />
     <Compile Include="Components\FCSTechFabricatorTag.cs" />
@@ -133,10 +135,10 @@
     <Compile Include="Craftables\FCSModule.cs" />
     <Compile Include="Enums\EatableType.cs" />
     <Compile Include="Enums\FCSEnvironment.cs" />
+    <Compile Include="Enums\FCSMessageBox.cs" />
     <Compile Include="Enums\FCSPowerStates.cs" />
     <Compile Include="Enums\FoodPileType.cs" />
     <Compile Include="FCSTechFabGameLoadUtil.cs" />
-    <Compile Include="Interfaces\IFCSPowerManager.cs" />
     <Compile Include="Managers\EggHandler.cs" />
     <Compile Include="Objects\FCSFilteredStorage.cs" />
     <Compile Include="Enums\ModModes.cs" />

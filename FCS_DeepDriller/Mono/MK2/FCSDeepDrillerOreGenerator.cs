@@ -212,10 +212,5 @@ namespace FCS_DeepDriller.Mono.MK2
                     break;
             }
         }
-
-        internal void UpdatePowerUsage()
-        {
-            OnUsageChange?.Invoke();
-        }
     }
 }

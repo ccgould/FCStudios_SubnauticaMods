@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Linq;
 using DataStorageSolutions.Buildables;
 using DataStorageSolutions.Configuration;
 using DataStorageSolutions.Helpers;
@@ -8,12 +9,14 @@ using DataStorageSolutions.Interfaces;
 using DataStorageSolutions.Mono;
 using DataStorageSolutions.Patches;
 using DataStorageSolutions.Structs;
-using FCSCommon.Enums;
 using FCSCommon.Extensions;
 using FCSCommon.Utilities;
 using FCSTechFabricator.Components;
 using FCSTechFabricator.Enums;
 using FCSTechFabricator.Interfaces;
+using FCSTechFabricator.Objects;
+using SMLHelper.V2.Crafting;
+using SMLHelper.V2.Handlers;
 using UnityEngine;
 
 namespace DataStorageSolutions.Model
@@ -33,6 +36,12 @@ namespace DataStorageSolutions.Model
 
         internal readonly HashSet<DSSTerminalController> BaseTerminals = new HashSet<DSSTerminalController>();
         internal readonly Dictionary<TechType,int> TrackedItems = new Dictionary<TechType, int>();
+        private bool _operationSaveDataInit;
+        private bool _craftSaveDataInit;
+
+        public static List<FCSOperation> Crafts { get; set; } = new List<FCSOperation>();
+        public static List<FCSOperation> Operations { get; set; } = new List<FCSOperation>();
+
         internal bool GivePlayerItem { get; set; } = true;
 
         internal bool IsVisible
@@ -55,14 +64,29 @@ namespace DataStorageSolutions.Model
         public bool IsFull { get; }
         internal NameController NameController { get; private set; }
         internal DSSVehicleDockingManager DockingManager { get; set; }
-        internal bool IsOperational => !_hasBreakerTripped || BaseHasPower();
+        internal bool IsOperational => !_hasBreakerTripped && BaseHasPower();
         internal static Action OnPlayerTick { get; set; }
         internal Action<BaseManager> OnVehicleStorageUpdate { get; set; }
         internal Action<List<Vehicle>,BaseManager> OnVehicleUpdate { get; set; }
         internal Action<BaseManager> OnContainerUpdate { get; set; }
         public bool ContainsItem(TechType techType)
         {
-             return TrackedItems.ContainsKey(techType);
+            if (TrackedItems.ContainsKey(techType))
+            {
+                return true;
+            }
+
+            foreach (KeyValuePair<string, FCSConnectableDevice> connectable in FCSConnectables)
+            {
+                if (!connectable.Value.IsBase() && connectable.Value.IsVisible && connectable.Value.IsOperational())
+                {
+                    if (connectable.Value.ContainsItem(techType))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         internal Dictionary<string, FCSConnectableDevice> FCSConnectables { get; set; } = new Dictionary<string, FCSConnectableDevice>();
@@ -106,10 +130,71 @@ namespace DataStorageSolutions.Model
                 DockingManager.Initialize(habitat,this);
                 DockingManager.ToggleIsEnabled(_savedData?.AllowDocking ?? false);
             }
-
+            
             _hasBreakerTripped = _savedData?.HasBreakerTripped ?? false;
         }
-        
+
+        internal void LoadOperationSaveData()
+        {
+            if (_savedData?.OperationSaveData != null && !_operationSaveDataInit)
+            {
+                foreach (OperationSaveData operationSaveData in _savedData.OperationSaveData)
+                {
+                    //if (Operations.Any(x =>
+                    //    x.FromDevice.UnitID.Equals(operationSaveData.FromDeviceID) &&
+                    //    x.ToDevice.UnitID.Equals(operationSaveData.ToDeviceID) &&
+                    //    x.TechType == operationSaveData.TechType &&
+                    //    x.IsCraftable == operationSaveData.IsCraftable)) continue;
+
+                    Operations.Add(new FCSOperation
+                    {
+                        FromDevice = FindDevice(operationSaveData.FromDeviceID),
+                        ToDevice = FindDevice(operationSaveData.ToDeviceID),
+                        TechType = operationSaveData.TechType,
+                        IsCraftable = operationSaveData.IsCraftable,
+                        Manager = FindManager(operationSaveData.ManagerID)
+                    });
+                }
+
+                _operationSaveDataInit = true;
+                RefreshOperators();
+            }
+        }
+
+        internal void LoadCraftingOperations()
+        {
+            if (_savedData?.AutoCraftData != null && !_craftSaveDataInit)
+            {
+                foreach (OperationSaveData operationSaveData in _savedData.AutoCraftData)
+                {
+                    Crafts.Add(new FCSOperation
+                    {
+                        TechType = operationSaveData.TechType,
+                        IsCraftable = operationSaveData.IsCraftable,
+                        Manager = FindManager(operationSaveData.ManagerID)
+                    });
+                }
+
+                _craftSaveDataInit = true;
+                RefreshOperators();
+
+            }
+
+        }
+
+        private FCSConnectableDevice FindDevice(string deviceID)
+        {
+            if (string.IsNullOrWhiteSpace(deviceID) || FCSConnectables.Count <= 0) return null;
+
+            foreach (var connectable in FCSConnectables)
+            {
+                if (connectable.Value.UnitID.Equals(deviceID)) return connectable.Value;
+                QuickLogger.Info($"Found Device : {connectable.Value.UnitID}");
+            }
+
+            return null;
+        }
+
         private void ReadySaveData()
         {
             _savedData = Mod.GetBaseSaveData(InstanceID);
@@ -405,7 +490,7 @@ namespace DataStorageSolutions.Model
             {
                 if (baseUnit.HasItem(techType))
                 {
-                    var data = baseUnit.GetItemDataFromServer(techType);
+                    var data = baseUnit.GetItemDataFromServer(techType, out RackSlot slot);
                     QuickLogger.Debug("Calling Take",true);
 
                     if (GivePlayerItem)
@@ -417,26 +502,40 @@ namespace DataStorageSolutions.Model
                             //TODO Add Message
                         }
                     }
+                    else
+                    {
+                        slot.Remove((ObjectData)data.data);
+                        GivePlayerItem = true;
+                    }
 
-                    GivePlayerItem = true;
                     return data.ToPickable(techType);
                 }
             }
 
+            if (!TakeFromConnectables)
+            {
+                TakeFromConnectables = true;
+                return null;
+            }
             //Check connectables
             foreach (KeyValuePair<string, FCSConnectableDevice> fcsConnectable in FCSConnectables)
             {
                 Vector2int itemSize = CraftData.GetItemSize(techType);
-                if (fcsConnectable.Value.ContainsItem(techType) && Inventory.main.HasRoomFor(itemSize.x,itemSize.y))
+                if (fcsConnectable.Value.ContainsItem(techType) && fcsConnectable.Value.IsVisible && !fcsConnectable.Value.IsBase() && 
+                    fcsConnectable.Value.IsOperational())
                 {
+
                     var item = fcsConnectable.Value.RemoveItemFromContainer(techType, 1);
-                    if(item == null) continue;
+
+                    if (item == null) continue;
+                    
                     if (GivePlayerItem)
                     {
                         DSSHelpers.GivePlayerItem(item);
                     }
 
                     GivePlayerItem = true;
+                    Mod.OnBaseUpdate?.Invoke();
                     return item;
                 }
             }
@@ -503,19 +602,38 @@ namespace DataStorageSolutions.Model
 
         private void TrackNewFCSConnectable(FCSConnectableDevice obj)
         {
+            QuickLogger.Info("===========================================");
+
+            QuickLogger.Info("1");
+            if (obj == null) return;
+            QuickLogger.Info("2");
+
             SubRoot newSeaBase = obj.GetComponentInParent<SubRoot>(); //obj?.gameObject?.transform?.parent?.gameObject;
+            QuickLogger.Info("3");
+
             var fcsConnectableBase = FindManager(newSeaBase?.GetComponentInChildren<PrefabIdentifier>().Id);
+            QuickLogger.Info("4");
+
+#if DEBUG
             QuickLogger.Debug($"FCSConnectable Base Found: {newSeaBase?.name}",true);
             QuickLogger.Debug($"FCSConnectable found in base: {Habitat?.name}",true);
+#endif
 
-            if (fcsConnectableBase?.Habitat == Habitat)
+            if (fcsConnectableBase == null || Habitat) return;
+
+            if (fcsConnectableBase.Habitat == Habitat)
             {
                 QuickLogger.Debug("Subscribing to OnContainerUpdate");
                 obj.GetStorage().OnContainerUpdate += OnFCSConnectableContainerUpdate;
+                QuickLogger.Info("5");
                 QuickLogger.Debug("Adding FCSConnectable");
                 FCSConnectables.Add(obj.GetPrefabIDString(), obj);
                 QuickLogger.Debug("Added FCSConnectable");
+                QuickLogger.Info("6");
             }
+
+            QuickLogger.Info("===========================================");
+
         }
 
         private void OnFCSConnectableContainerUpdate(int arg1, int arg2)
@@ -531,16 +649,10 @@ namespace DataStorageSolutions.Model
             //Check if there is a base connected
             if (Habitat != null)
             {
-                var baseConnectable = Habitat.gameObject.AddComponent<FCSConnectableDevice>();
+                var baseConnectable = Habitat.gameObject.AddComponent<BaseConnectable>();
+                baseConnectable.Manager = this;
                 baseConnectable.InitializeBase(null, this, null, Habitat.gameObject.gameObject?.GetComponentInChildren<PrefabIdentifier>());
                 FCSTechFabricator.FcTechFabricatorService.PublicAPI.RegisterDevice(baseConnectable, InstanceID, Mod.DSSTabID);
-
-                //var connectableDevices = Habitat.GetComponentsInChildren<FCSConnectableDevice>().ToList();
-
-                //foreach (var device in connectableDevices)
-                //{
-                //    FCSConnectables.Add(device.GetPrefabIDString(), device);
-                //}
             }
         }
 
@@ -644,7 +756,7 @@ namespace DataStorageSolutions.Model
 
         public Pickupable RemoveItemFromContainer(TechType techType, int amount = 1)
         {
-            if (Input.GetKey(KeyCode.RightShift) || Input.GetKey(KeyCode.LeftShift) && QPatch.Configuration.Config.ExtractMultiplier != 0)
+            if (Input.GetKey(KeyCode.RightShift) || Input.GetKey(KeyCode.LeftShift) && QPatch.Configuration.Config.ExtractMultiplier != 0 && techType != TechType.None)
             {
                 for (int i = 0; i < QPatch.Configuration.Config.ExtractMultiplier * 5; i++)
                 {
@@ -695,7 +807,15 @@ namespace DataStorageSolutions.Model
         {
             foreach (BaseManager manager in Managers)
             {
-                yield return new BaseSaveData {BaseName = manager.GetBaseName(), InstanceID = manager.InstanceID, AllowDocking = manager.DockingManager.GetToggleState(), HasBreakerTripped = manager.GetHasBreakerTripped() };
+                yield return new BaseSaveData
+                {
+                    BaseName = manager.GetBaseName(), 
+                    InstanceID = manager.InstanceID, 
+                    AllowDocking = manager.DockingManager.GetToggleState(), 
+                    HasBreakerTripped = manager.GetHasBreakerTripped(),
+                    OperationSaveData = GetOperations(),
+                    AutoCraftData = GetCrafting()
+                };
             }
         }
 
@@ -757,32 +877,88 @@ namespace DataStorageSolutions.Model
             BaseOperators.Remove(unit);
         }
         
-        public static List<FCSOperation> Operations { get; set; } = new List<FCSOperation>();
-        
+        //TODO Taking from base creates a loop because it would take from the connected items and put back in the connected item
+
+
         internal static void PerformOperations()
         {
-            foreach (FCSOperation operation in Operations)
+            if (Operations == null) return;
+
+            for (int i = Operations.Count - 1; i > -1; i--)
             {
-                if (operation.FromDevice != null && (operation.FromDevice.IsOperational() || (operation.FromDevice.IsBase() && operation.FromDevice.InitializeBase()) && operation.ToDevice != null && operation.ToDevice.IsOperational() && operation.TechType != TechType.None)
+                var operation = Operations[i];
+
+                if (operation != null && operation.Manager != null && operation.FromDevice != null && operation.FromDevice.IsOperational() && operation.ToDevice != null && operation.ToDevice.IsOperational() && operation.TechType != TechType.None)
                 {
                     if (operation.FromDevice.ContainsItem(operation.TechType) && operation.ToDevice.CanBeStored(1, operation.TechType))
                     {
                         if (operation.FromDevice.IsBase())
                         {
                             operation.Manager.GivePlayerItem = false;
+                            operation.Manager.TakeFromConnectables = false;
                         }
                         var pickupable = operation.FromDevice.RemoveItemFromContainer(operation.TechType, 1);
-                        operation.ToDevice.AddItemToContainer(new InventoryItem(pickupable), out string reason);
+
+                        if (pickupable != null)
+                        {
+                            operation.ToDevice.AddItemToContainer(new InventoryItem(pickupable), out string reason);
+                        }
                     }
                 }
             }
+        }
+
+        public bool TakeFromConnectables { get; set; } = true;
+
+        internal static void PerformCraft()
+        {
+            for (int i = Crafts.Count - 1; i > -1; i--)
+            {
+                var craft = Crafts[i];
+                if(craft.TechType != TechType.None && craft.Manager != null)
+                {
+                    if(!craft.IsCraftable) continue;
+
+                    var techData = DSSHelpers.CheckIfTechDataAvailable(craft, out var pass);
+
+                    if (pass)
+                    {
+                        if (craft.Manager.RemoveItems(techData.Ingredients))
+                        {
+                            foreach (TechType item in techData.LinkedItems)
+                            {
+                                craft.Manager.AddItemToContainer(item.ToInventoryItem());
+                            }
+
+                            for (int j = 0; j < techData.craftAmount; j++)
+                            {
+                                craft.Manager.AddItemToContainer(craft.TechType.ToInventoryItem());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        private bool RemoveItems(List<Ingredient> techDataIngredients)
+        {
+            foreach (Ingredient ingredient in techDataIngredients)
+            {
+                for (int i = 0; i < ingredient.amount; i++)
+                {
+                    GivePlayerItem = false;
+                    RemoveItemFromContainer(ingredient.techType);
+                }
+            }
+
+            return true;
         }
 
         private void RefreshOperators()
         {
             foreach (DSSOperatorController controller in BaseOperators)
             {
-                controller.DisplayManager.LoadCommands();
+                controller.DisplayManager.Refresh();
             }
         }
 
@@ -792,6 +968,86 @@ namespace DataStorageSolutions.Model
         {
             Operations.Add(operation);
             operation.Manager.RefreshOperators();
+        }
+
+        public void DeleteOperator(FCSOperation operation)
+        {
+            Operations.Remove(operation);
+            RefreshOperators();
+        }
+
+        public static void AddCraft(FCSOperation operation)
+        {
+            Crafts.Add(operation);
+            operation.Manager.RefreshOperators();
+        }
+
+        public static void DeleteAutoCraft(FCSOperation craft)
+        {
+            Crafts.Remove(craft);
+        }
+
+        public static void PerformCraft(FCSOperation craft)
+        {
+            var techData = DSSHelpers.CheckIfTechDataAvailable(craft, out var pass);
+
+            if (pass)
+            {
+                if (craft.Manager.RemoveItems(techData.Ingredients))
+                {
+                    foreach (TechType item in techData.LinkedItems)
+                    {
+                        craft.Manager.AddItemToContainer(item.ToInventoryItem());
+                    }
+
+                    for (int j = 0; j < techData.craftAmount; j++)
+                    {
+                        craft.Manager.AddItemToContainer(craft.TechType.ToInventoryItem());
+                    }
+                }
+            }
+        }
+
+        public static IEnumerable<OperationSaveData> GetOperations()
+        {
+            foreach (FCSOperation fcsOperation in Operations)
+            {
+                yield return new OperationSaveData
+                {
+                    FromDeviceID = fcsOperation.FromDevice?.UnitID,
+                    ToDeviceID = fcsOperation.ToDevice?.UnitID,
+                    TechType = fcsOperation.TechType,
+                    IsCraftable = fcsOperation.IsCraftable,
+                    ManagerID = fcsOperation.Manager.InstanceID
+                };
+            }
+        }
+
+        public static IEnumerable<OperationSaveData> GetCrafting()
+        {
+            foreach (FCSOperation fcsOperation in Crafts)
+            {
+                yield return new OperationSaveData
+                {
+                    TechType = fcsOperation.TechType,
+                    IsCraftable = fcsOperation.IsCraftable,
+                    ManagerID = fcsOperation.Manager.InstanceID
+                };
+            }
+        }
+
+        public string GetTotalString()
+        {
+            return $"{TrackedItems.Sum(x => x.Value)} / {BaseRacks.Sum(x => x.GetServerCount()) * QPatch.Configuration.Config.ServerStorageLimit} Items";
+        }
+    }
+
+    internal class BaseConnectable : FCSConnectableDevice
+    {
+        public BaseManager Manager { get; set; }
+        public override bool IsOperational()
+        {
+            return Manager?.IsOperational ?? false;
         }
     }
 }

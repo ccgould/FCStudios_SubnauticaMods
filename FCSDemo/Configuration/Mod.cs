@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using FCSCommon.Objects;
 using FCSCommon.Utilities;
+using FCSDemo.Model;
 using FCSTechFabricator.Objects;
 using Model;
 using Mono;
@@ -31,7 +32,6 @@ namespace FCSDemo.Configuration
         internal const string FriendlyName = "FCS Demo";
         internal const string Description = "A demo mod for FCStudios";
         internal const string ClassID = "FcsDemo";
-        internal static string PrefabName => QPatch.Configuration.Config.PrefabName;
         internal static string AssetFolder => Path.Combine(ModName, "Assets");
 
         internal const string FCSDemoKitClassID = "FCSDemo_Kit";
@@ -224,8 +224,8 @@ namespace FCSDemo.Configuration
         [JsonProperty] internal Vec3 BoundingCenter { get; set; } = new Vec3(0f, 0, 0f);
         [JsonProperty] internal Vec3 BoundingSize { get; set; } = new Vec3(0, 0, 0);
         [JsonProperty] internal string ModName { get; set; } = "FCSDemo";
-        [JsonProperty] internal string PrefabName { get; set; } = "DemoModel";
-        public ColorVec4 BodyColor { get; set; } = new ColorVec4(1,1,1,1);
+        [JsonProperty] internal ColorVec4 BodyColor { get; set; } = new ColorVec4(1,1,1,1);
+        [JsonProperty] internal IEnumerable<ModEntry> Prefabs { get; set; }
     }
 
     internal class ConfigFile

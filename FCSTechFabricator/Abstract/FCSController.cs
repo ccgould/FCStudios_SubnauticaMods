@@ -1,4 +1,5 @@
 ﻿using System;
+using FCSCommon.Controllers;
 using FCSCommon.Interfaces;
 using FCSTechFabricator.Components;
 using UnityEngine;
@@ -11,8 +12,9 @@ namespace FCSTechFabricator.Abstract
         
         public virtual Action OnMonoUpdate { get; set; }
         public virtual bool IsConstructed { get; set; }
-        public bool IsInitialized { get; set; }
+        public virtual FCSPowerManager PowerManager { get; set; }
         public virtual DumpContainer DumpContainer { get; set; }
+        public bool IsInitialized { get; set; }
         
         public virtual string GetPrefabID()
         {

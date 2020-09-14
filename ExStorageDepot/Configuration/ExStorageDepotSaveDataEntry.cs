@@ -11,5 +11,6 @@ namespace ExStorageDepot.Configuration
         [JsonProperty] internal string UnitName { get; set; }
         [JsonProperty] internal BulkMultipliers Multiplier { get; set; }
         [JsonProperty] internal List<ItemData> StorageItems { get; set; }
+        [JsonProperty] internal bool IsVisible { get; set; }
     }
 }

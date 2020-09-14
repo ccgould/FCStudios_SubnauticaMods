@@ -50,6 +50,7 @@ namespace DataStorageSolutions.Mono
         public bool IsFull => GetIsFull();
         public bool IsRackSlotsFull => GetIsRackFull();
         internal Action OnUpdate;
+        private bool _allowedToNotify = true;
         Action<int, int> IFCSStorage.OnContainerUpdate { get; set; }
 
         public override BaseManager Manager
@@ -97,6 +98,7 @@ namespace DataStorageSolutions.Mono
                         QuickLogger.Debug("Loading Rack Data");
                         LoadRack();
                         ColorManager.SetMaskColorFromSave(_savedData.BodyColor.Vector4ToColor());
+    
                     }
                 }
                 
@@ -128,6 +130,8 @@ namespace DataStorageSolutions.Mono
             QuickLogger.Debug("Load Rack");
             if (_savedData.Servers == null) return;
 
+            _allowedToNotify = false;
+
             QuickLogger.Debug($"Save Data Count: {_savedData.Servers.Count}");
 
             foreach (ServerData data in _savedData.Servers)
@@ -138,6 +142,8 @@ namespace DataStorageSolutions.Mono
                     AddServer(data.Server, data.ServerFilters, data.SlotID, true);
                 }
             }
+
+            _allowedToNotify = true;
         }
 
         private TechType GetTechType()
@@ -210,10 +216,7 @@ namespace DataStorageSolutions.Mono
                 return false;
             }
 
-            QuickLogger.Debug($"Adding Server to slot {slotByID.Id}", true);
             GetSlotByID(slotID).IsOccupied = true;
-            QuickLogger.Debug($"Current ID Occupied Stat = {slotByID.IsOccupied}");
-            QuickLogger.Debug($"Data Count = {server.Count}");
 
             slotByID.LoadServer(server);
             if (filters != null)
@@ -311,8 +314,18 @@ namespace DataStorageSolutions.Mono
 
             DisplayManager.UpdateContainerAmount();
             QuickLogger.Debug("Made it");
-            Mod.OnBaseUpdate?.Invoke();
+
+            SendNotification();
             return true;
+
+        }
+
+        private void SendNotification()
+        {
+            if (_allowedToNotify)
+            {
+                Mod.OnBaseUpdate?.Invoke();
+            }
 
         }
 
@@ -337,7 +350,8 @@ namespace DataStorageSolutions.Mono
             if (dssRackController == this)
             {
                 DisplayManager.UpdateContainerAmount();
-                Mod.OnBaseUpdate?.Invoke();
+
+                SendNotification();
             }
         }
 
@@ -680,7 +694,7 @@ namespace DataStorageSolutions.Mono
             Destroy(item.item.gameObject);
         }
 
-        public ObjectDataTransferData GetItemDataFromServer(TechType techType)
+        public ObjectDataTransferData GetItemDataFromServer(TechType techType, out RackSlot slot)
         {
             QuickLogger.Debug($"Checking for TechType: {techType}", true);
             foreach (var rackSlot in _servers)
@@ -694,11 +708,13 @@ namespace DataStorageSolutions.Mono
                 {
                     if (item.TechType == techType)
                     {
+                        slot = rackSlot;
                         return new ObjectDataTransferData { data = item, IsServer = false };
                     }
                 }
             }
 
+            slot = null;
             return new ObjectDataTransferData();
         }
 
@@ -772,22 +788,31 @@ namespace DataStorageSolutions.Mono
             throw new NotImplementedException();
         }
 
+
+        internal void FillRack()
+        {
+            for (int i = 0; i < _servers.Length; i++)
+            {
+                if (!_servers[i].IsOccupied)
+                {
+                    AddServer(new HashSet<ObjectData>(), null, i);
+                }
+            }
+
+            FillWithDummyData();
+        }
+
         private void FillWithDummyData()
         {
             var random = new System.Random();
-
             for (int i = 0; i < _servers.Length; i++)
             {
                 if (_servers[i].IsOccupied && !_servers[i].IsFull())
                 {
-                    for (int j = _servers[i].SpaceAvailable() - 1; i > -1; i--)
+                    for (int j = 0; j < QPatch.Configuration.Config.ServerStorageLimit; j++)
                     {
-                        var questions = new List<TechType>{
-                            TechType.Copper,
-                            TechType.Quartz,
-                            TechType.Titanium};
-                        int index = random.Next(questions.Count);
-                        _servers[i].Add(DSSHelpers.MakeObjectData(questions[index].ToInventoryItem(), _servers[i].Id));
+                        int index = random.Next(Mod.AllTechTypes.Count);
+                        _servers[i].Add(DSSHelpers.MakeObjectData(Mod.AllTechTypes[index].ToInventoryItem(), _servers[i].Id));
                     }
                 }
             }

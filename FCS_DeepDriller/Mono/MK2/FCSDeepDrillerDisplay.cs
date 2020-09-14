@@ -57,6 +57,7 @@ namespace FCS_DeepDriller.Mono.MK2
             if (_timePassed >= 1)
             {
                 UpdateToggleButtons();
+                
                 _timePassed = 0.0f;
             }
         }
@@ -527,7 +528,7 @@ namespace FCS_DeepDriller.Mono.MK2
 
                 var oilDumpBTN = GameObjectHelpers.FindGameObject(maintenancePage, "OilBTN");
                 InterfaceHelpers.CreateButton(oilDumpBTN, "OilDumpBTN", InterfaceButtonMode.Background, OnButtonClick,
-                    _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, FCSDeepDrillerBuildable.ItemsButton());
+                    _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, FCSDeepDrillerBuildable.AddOil());
 
                 #endregion
 
@@ -535,7 +536,7 @@ namespace FCS_DeepDriller.Mono.MK2
 
                 var powercellDumpBTN = GameObjectHelpers.FindGameObject(maintenancePage, "PowerBTN");
                 InterfaceHelpers.CreateButton(powercellDumpBTN, "PowercellDumpBTN", InterfaceButtonMode.Background, OnButtonClick,
-                    _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, FCSDeepDrillerBuildable.ItemsButton());
+                    _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, FCSDeepDrillerBuildable.AddPower());
 
                 #endregion
 
@@ -572,13 +573,13 @@ namespace FCS_DeepDriller.Mono.MK2
 
             return true;
         }
-
-
-
+        
         private void OnUpgradeUpdate(UpgradeFunction obj)
         {
             QuickLogger.Debug("Refreshing the Upgrade Page",true);
+            UpdateDisplayValues();
             _programmingGrid.DrawPage();
+
         }
 
         private void OnLoadProgrammingGrid(DisplayData data)

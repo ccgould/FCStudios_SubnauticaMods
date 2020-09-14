@@ -3,6 +3,7 @@ using System.Reflection;
 using FCSCommon.Utilities;
 using FCSDemo.Buildables;
 using FCSDemo.Configuration;
+using FCSDemo.Model;
 using Harmony;
 using QModManager.API.ModLoading;
 
@@ -27,7 +28,14 @@ namespace FCSDemo
             harmony.PatchAll(Assembly.GetExecutingAssembly());
 
             Configuration = Mod.LoadConfiguration();
-            FCSDemoBuidable.PatchHelper();
+
+            foreach (ModEntry modEntry in Configuration.Config.Prefabs)
+            {
+                QuickLogger.Info($"Added Prefab {modEntry.ClassID}");
+                modEntry.Prefab = FCSDemoModel.GetPrefabs(modEntry.PrefabName);
+                var prefab = new FCSDemoBuidable(modEntry);
+                prefab.Patch();
+            }
 
             try
             {

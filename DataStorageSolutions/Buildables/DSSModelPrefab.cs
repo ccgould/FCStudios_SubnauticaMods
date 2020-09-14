@@ -36,6 +36,7 @@ namespace DataStorageSolutions.Buildables
         internal static GameObject ItemDisplayPrefab { get; set; }
         internal static GameObject OperatorItemPrefab { get; set; }
         internal static GameObject ItemEntryPrefab { get; set; }
+        internal static GameObject AutoCraftItemPrefab { get; set; }
 
         public static bool GetPrefabs()
         {
@@ -66,6 +67,7 @@ namespace DataStorageSolutions.Buildables
                     GameObject itemDisplayPrefab = assetBundle.LoadAsset<GameObject>(Mod.ItemDisplayPrefabName);
                     GameObject operatorItemPrefab = assetBundle.LoadAsset<GameObject>("OperatorItem");
                     GameObject itemEntryPrefab = assetBundle.LoadAsset<GameObject>("ItemEntry");
+                    GameObject autoCraftItemPrefab = assetBundle.LoadAsset<GameObject>("AutoCraftItem");
 
                     //If the prefab isn't null lets add the shader to the materials
                     if (operatorPrefab != null)
@@ -75,6 +77,18 @@ namespace DataStorageSolutions.Buildables
 
                         OperatorPrefab = operatorPrefab;
                         QuickLogger.Debug($"Operator Prefab Found!");
+                    }
+                    else
+                    {
+                        QuickLogger.Error($"Operator Prefab Not Found!");
+                        return false;
+                    }
+
+                    //If the prefab isn't null lets add the shader to the materials
+                    if (autoCraftItemPrefab != null)
+                    {
+                        AutoCraftItemPrefab = autoCraftItemPrefab;
+                        QuickLogger.Debug($"Autocraft Item Prefab Found!");
                     }
                     else
                     {
@@ -243,7 +257,6 @@ namespace DataStorageSolutions.Buildables
             }
         }
         
-
         /// <summary>
         /// Applies the shader to the materials of the reactor
         /// </summary>

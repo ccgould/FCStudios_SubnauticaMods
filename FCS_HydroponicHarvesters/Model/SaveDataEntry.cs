@@ -22,6 +22,7 @@ namespace Model
         [JsonProperty] internal bool LightState { get; set; }
         [JsonProperty] internal FCSEnvironment BedType { get; set; }
         [JsonProperty] internal float UnitSanitation { get; set; }
+        [JsonProperty] internal bool IsVisible { get; set; }
     }
 
     [Serializable]

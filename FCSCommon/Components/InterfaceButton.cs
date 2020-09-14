@@ -58,7 +58,7 @@ namespace FCSCommon.Components
                     this.TextComponent.color = this.STARTING_COLOR;
                     break;
                 case InterfaceButtonMode.Background:
-                    _bgImage = GetComponentInChildren<Image>();
+                    FindImage();
                     if (_bgImage != null)
                     {
                         _bgImage.color = this.STARTING_COLOR;
@@ -74,6 +74,15 @@ namespace FCSCommon.Components
                     throw new ArgumentOutOfRangeException();
             }
         }
+
+        private void FindImage()
+        {
+            if(_bgImage == null)
+            {
+                _bgImage = GetComponentInChildren<Image>();
+            }
+        }
+
         #endregion
 
         private void UpdateTextComponent(bool force = true)
@@ -107,6 +116,7 @@ namespace FCSCommon.Components
                     this.TextComponent.color = this.STARTING_COLOR;
                     break;
                 case InterfaceButtonMode.Background:
+                    FindImage();
                     if (_bgImage != null)
                     {
                         _bgImage.color = this.STARTING_COLOR;
@@ -148,6 +158,7 @@ namespace FCSCommon.Components
                         this.TextComponent.color = this.HOVER_COLOR;
                         break;
                     case InterfaceButtonMode.Background:
+                        FindImage();
                         if (_bgImage != null)
                         {
                             _bgImage.color = this.HOVER_COLOR;
@@ -183,6 +194,7 @@ namespace FCSCommon.Components
                     this.TextComponent.color = this.STARTING_COLOR;
                     break;
                 case InterfaceButtonMode.Background:
+                    FindImage();
                     if (_bgImage != null)
                     {
                         _bgImage.color = this.STARTING_COLOR;
@@ -235,6 +247,7 @@ namespace FCSCommon.Components
             switch (this.ButtonMode)
             {
                 case InterfaceButtonMode.Background:
+                    FindImage();
                     if (_bgImage != null)
                     {
                         _bgImage.color = this.HOVER_COLOR;
@@ -254,6 +267,7 @@ namespace FCSCommon.Components
             switch (this.ButtonMode)
             {
                 case InterfaceButtonMode.Background:
+                    FindImage();
                     if (_bgImage != null)
                     {
                         _bgImage.color = STARTING_COLOR;

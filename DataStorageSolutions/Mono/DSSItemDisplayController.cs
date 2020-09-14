@@ -4,6 +4,7 @@ using DataStorageSolutions.Abstract;
 using DataStorageSolutions.Buildables;
 using DataStorageSolutions.Configuration;
 using DataStorageSolutions.Model;
+using FCSCommon.Components;
 using FCSCommon.Enums;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
@@ -23,6 +24,7 @@ namespace DataStorageSolutions.Mono
         private uGUI_Icon _icon;
         private Text _amount;
         private TechType _currentTechType;
+        private InterfaceButton _button;
         public Action<int, int> OnContainerUpdate { get; set; }
         public int GetContainerFreeSpace => 1;
         public bool IsFull => false;
@@ -79,7 +81,12 @@ namespace DataStorageSolutions.Mono
                 DumpContainer.Initialize(transform, "Item Display Receptical", AuxPatchers.NotAllowed(), AuxPatchers.CannotBeStored(), this, 1, 1);
             }
 
-            _icon = GameObjectHelpers.FindGameObject(gameObject, "Icon")?.AddComponent<uGUI_Icon>();
+            var icon = GameObjectHelpers.FindGameObject(gameObject, "Icon");
+            _icon = icon?.AddComponent<uGUI_Icon>();
+            _button = InterfaceHelpers.CreateButton(icon, "IconClick", InterfaceButtonMode.Background,
+                OnButtonClick, Color.white, Color.gray, 5.0f);
+
+
             _amount = GameObjectHelpers.FindGameObject(gameObject, "Text")?.GetComponent<Text>();
 
             var addBTN = GameObjectHelpers.FindGameObject(gameObject, "AddBTN");
@@ -103,6 +110,9 @@ namespace DataStorageSolutions.Mono
             {
                 case "AddBTN":
                     DumpContainer?.OpenStorage();
+                    break;
+                case "IconClick":
+                    Manager.RemoveItemFromContainer(_currentTechType);
                     break;
                 case "DeleteBTN":
                     _icon.gameObject.SetActive(false);
@@ -158,7 +168,7 @@ namespace DataStorageSolutions.Mono
             if(_icon == null || _currentTechType == TechType.None)return;
             _icon.sprite = SpriteManager.Get(_currentTechType);
             _amount.text = $"x{Manager.GetItemCount(_currentTechType)}";
-
+            _button.TextLineOne = string.Format(AuxPatchers.TakeFormatted(), Language.main.Get(_currentTechType));
             _icon.gameObject.SetActive(true);
         }
 
@@ -185,6 +195,7 @@ namespace DataStorageSolutions.Mono
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
         {
             _currentTechType = pickupable.GetTechType();
+            Player.main.GetPDA().Close();
             return false;
         }
 

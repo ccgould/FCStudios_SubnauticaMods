@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ARS_SeaBreezeFCS32.Buildables;
 using ARS_SeaBreezeFCS32.Display;
+using ARS_SeaBreezeFCS32.Enum;
 using ARS_SeaBreezeFCS32.Model;
 using FCSCommon.Abstract;
 using FCSCommon.Enums;
@@ -42,7 +43,10 @@ namespace ARS_SeaBreezeFCS32.Mono
 
             if (FindAllComponents())
             {
-                _mono.AnimationManager.SetIntHash(_mono.PageStateHash,1);
+                GotoPage(_mono.PowerManager.GetHasBreakerTripped()
+                    ? SeaBreezePages.PowerOffPage
+                    : SeaBreezePages.BootPage);
+
                 InvokeRepeating(nameof(UpdateUnitID), 1f, 1f);
             }
         }
@@ -64,16 +68,9 @@ namespace ARS_SeaBreezeFCS32.Mono
 
             switch (btnName)
             {
-                case "PPBtn":
-                    _mono.AnimationManager.SetIntHash(_mono.PageStateHash, 1);
-                    _mono.ToggleBreaker();
+                case "PBtn":
+                    _mono?.PowerManager?.TogglePowerState();
                     break;
-
-                case "HPPBtn":
-                    _mono.AnimationManager.SetIntHash(_mono.PageStateHash, 3);
-                    _mono.ToggleBreaker();
-                    break;
-
                 case "RenameBTN":
                     _mono.NameController.Show();
                     break;
@@ -81,22 +78,22 @@ namespace ARS_SeaBreezeFCS32.Mono
                     _mono.ColorManager.ChangeColor((Color) tag);
                     break;
                 case "HomeBTN":
-                    _mono.AnimationManager.SetIntHash(_mono.PageStateHash, 2);
+                    GotoPage(SeaBreezePages.HomePage);
                     break;
                 case "FoodCBTN":
-                    _mono.AnimationManager.SetIntHash(_mono.PageStateHash, 7);
+                    GotoPage(SeaBreezePages.FoodPage);
                     break;
                 case "WaterCBTN":
-                    _mono.AnimationManager.SetIntHash(_mono.PageStateHash, 5);
+                    GotoPage(SeaBreezePages.DrinksPage);
                     break;
                 case "TrashBTN":
-                    _mono.AnimationManager.SetIntHash(_mono.PageStateHash, 6);
+                    GotoPage(SeaBreezePages.TrashPage);
                     break;
                 case "DumpBTN":
                     _mono.DumpContainer.OpenStorage();
                     break;
                 case "ColorBTN":
-                    _mono.AnimationManager.SetIntHash(_mono.PageStateHash, 4);
+                    GotoPage(SeaBreezePages.ColorPickerPage);
                     break;
             }
         }
@@ -152,14 +149,14 @@ namespace ARS_SeaBreezeFCS32.Mono
                 #region PowerButton
                 var powerBtn = InterfaceHelpers.FindGameObject(home, "Power_BTN");
 
-                InterfaceHelpers.CreateButton(powerBtn, "HPPBtn", InterfaceButtonMode.Background,
+                InterfaceHelpers.CreateButton(powerBtn, "PBtn", InterfaceButtonMode.Background,
                     OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, ARSSeaBreezeFCS32Buildable.PowerBTNMessage());
                 #endregion
 
                 #region PowerOFf PowerButton
                 var ppowerBtn = InterfaceHelpers.FindGameObject(powerOff, "Power_BTN");
 
-                InterfaceHelpers.CreateButton(ppowerBtn, "PPBtn", InterfaceButtonMode.Background,
+                InterfaceHelpers.CreateButton(ppowerBtn, "PBtn", InterfaceButtonMode.Background,
                     OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, ARSSeaBreezeFCS32Buildable.PowerBTNMessage());
                 #endregion
 
@@ -400,6 +397,11 @@ namespace ARS_SeaBreezeFCS32.Mono
             _foodPage.DrawPage();
             _waterPage.DrawPage();
             _trashPage.DrawPage();
+        }
+
+        internal void GotoPage(SeaBreezePages page)
+        {
+            _mono.AnimationManager.SetIntHash(_mono.PageStateHash, (int)page);
         }
     }
 }

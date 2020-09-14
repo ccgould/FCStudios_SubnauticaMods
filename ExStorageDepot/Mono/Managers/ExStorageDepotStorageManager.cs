@@ -113,7 +113,7 @@ namespace ExStorageDepot.Mono.Managers
         {
             if (ContainsItem(techType))
             {
-                var itemData = ContainerItems.Single(x => x.TechType == techType);
+                var itemData = ContainerItems.FirstOrDefault(x => x.TechType == techType);
                 var item = InventoryHelpers.ConvertToPickupable(itemData);
                 ContainerItems.Remove(itemData);
                 //OnContainerUpdate?.Invoke(GetTotalCount(),_maxItems);

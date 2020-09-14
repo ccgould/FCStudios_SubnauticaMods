@@ -67,6 +67,7 @@ namespace DataStorageSolutions.Buildables
             { $"{ModKey}_BlackListItemFormat","{0} item is in the blacklist an will not be pulled from the vehicle."},
             { $"{ModKey}_DockedVehiclesSettingsPage","Go to docked vehicles settings page."},
             { $"{ModKey}_NoEmptySeaBreezeFormat","No current seabreeze in base can hold this {0}."},
+            { $"{ModKey}_Craft","Craft Item"}
         };
 
         internal static void AdditionalPatching()
@@ -351,6 +352,16 @@ namespace DataStorageSolutions.Buildables
         public static string NoEmptySeaBreezeFormat()
         {
             return Language.main.Get(LanguageDictionary.Keys.ElementAt(52));
+        }
+
+        public static string Delete()
+        {
+            return Language.main.Get("DeleteConfirmButton");
+        }
+
+        public static string Craft()
+        {
+            return Language.main.Get(LanguageDictionary.Keys.ElementAt(53));
         }
     }
 }

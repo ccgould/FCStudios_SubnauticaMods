@@ -35,7 +35,7 @@ namespace DataStorageSolutions.Mono
 
             if (_fromSave)
             {
-                DisplayManager.LoadCommands();
+                DisplayManager.Refresh();
             }
 
         }  
@@ -57,9 +57,6 @@ namespace DataStorageSolutions.Mono
 
         public override void Initialize()
         {
-
-            Mod.CreateAllowedTechTypes();
-
             AddToBaseManager();
 
             if (AnimationHandler == null)

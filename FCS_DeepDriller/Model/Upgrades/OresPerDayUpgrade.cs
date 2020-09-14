@@ -28,7 +28,8 @@ namespace FCS_DeepDriller.Model.Upgrades
         }
 
         public override float PowerUsage => QPatch.Configuration.OrePerDayUpgradePowerUsage + (OreCount * QPatch.Configuration.OreReductionValue);
-        public override float Damage => QPatch.Configuration.OrePerDayUpgradeDamage * OreCount;
+        public override float Damage { get; }
+
         public override UpgradeFunctions UpgradeType => UpgradeFunctions.OresPerDay;
         public override string FriendlyName => "Ores Per Day";
 
@@ -96,5 +97,7 @@ namespace FCS_DeepDriller.Model.Upgrades
             ((FCSDeepDrillerController)Mono)?.DisplayHandler?.UpdateDisplayValues();
             return $"{FriendlyName} | {OreCount} ({isActive})";
         }
+
+
     }
 }

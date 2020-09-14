@@ -134,6 +134,7 @@
     <Compile Include="Display\PaginatorButton.cs" />
     <Compile Include="Enum\FridgeCoolingState.cs" />
     <Compile Include="Configuration\SaveData.cs" />
+    <Compile Include="Enum\SeaBreezePages.cs" />
     <Compile Include="Model\PowercellData.cs" />
     <Compile Include="Mono\ARSolutionsSeaBreezeController.cs" />
     <Compile Include="Mono\ARSolutionsSeaBreezeDisplay.cs" />

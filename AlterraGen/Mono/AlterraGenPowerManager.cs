@@ -5,13 +5,14 @@ using AlterraGen.Configuration;
 using AlterraGen.Enumerators;
 using FCSCommon.Enums;
 using FCSCommon.Utilities;
+using FCSTechFabricator.Abstract;
 using FCSTechFabricator.Enums;
 using FCSTechFabricator.Interfaces;
 using UnityEngine;
 
 namespace AlterraGen.Mono
 {
-    internal class AlterraGenPowerManager : MonoBehaviour, IFCSStorage,IFCSPowerManager
+    internal class AlterraGenPowerManager : FCSPowerManager, IFCSStorage
     {
         private float _toConsume;
 		private const float powerPerSecond = 0.8333333f;
@@ -181,7 +182,7 @@ namespace AlterraGen.Mono
 
         #endregion
 
-        #region IFCSPowerManager
+        #region FCSPowerManager
 
         internal string GetTotalPowerString()
         {
@@ -227,28 +228,23 @@ namespace AlterraGen.Mono
         {
             return _powerSource.power;
         }
-
-        public float GetPowerUsagePerSecond()
-        {
-            return 0f;
-        }
-
-        public float GetDevicePowerCharge()
+        
+        public override float GetDevicePowerCharge()
         {
             return _powerSource?.power ?? 0f;
         }
 
-        public float GetDevicePowerCapacity()
+        public override float GetDevicePowerCapacity()
         {
             return _powerSource?.maxPower ?? 0f;
         }
 
-        public FCSPowerStates GetPowerState()
+        public override FCSPowerStates GetPowerState()
         {
             return PowerState;
         }
 
-        public void TogglePowerState()
+        public override void TogglePowerState()
         {
             PowerState = PowerState == FCSPowerStates.Powered ? FCSPowerStates.Tripped : FCSPowerStates.Powered;
 
@@ -264,18 +260,18 @@ namespace AlterraGen.Mono
             }
         }
 
-        public void SetPowerState(FCSPowerStates state)
+        public override void SetPowerState(FCSPowerStates state)
         {
             PowerState = state;
         }
 
-        public bool IsDevicePowerFull()
+        public override bool IsDevicePowerFull()
         {
             if (_powerSource == null) return true;
             return _powerSource.power >= _powerSource.maxPower;
         }
 
-        public bool ModifyPower(float amount, out float consumed)
+        public override bool ModifyPower(float amount, out float consumed)
         {
             var result = _powerSource.ModifyPower(amount, out var consumedO);
             consumed = consumedO;

@@ -9,34 +9,36 @@ namespace DataStorageSolutions.Display
     internal class OperationInterfaceButton : InterfaceButton
     {
         private GameObject _checkMark;
+        private bool _initialized;
 
-        public override void OnEnable()
+        private  void Initialize()
         {
-            base.OnEnable();
+            if(_initialized) return;
             _checkMark = GameObjectHelpers.FindGameObject(gameObject, "CheckMark");
             if (_checkMark == null)
             {
                 QuickLogger.Debug("Cannot find the CheckMark");
-                return;
             }
 
-            _checkMark.SetActive(false);
-
+            _initialized = true;
         }
 
         public override void OnPointerClick(PointerEventData eventData)
         {
+            Initialize();
             _checkMark?.SetActive(!_checkMark.activeSelf);
             base.OnPointerClick(eventData);
         }
 
         internal void SetCheck(bool value)
         {
+            Initialize();
             _checkMark?.SetActive(value);
         }
 
         public bool IsChecked()
         {
+            Initialize();
             return _checkMark.activeSelf;
         }
     }

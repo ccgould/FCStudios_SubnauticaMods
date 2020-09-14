@@ -110,6 +110,7 @@
     <Compile Include="Buildables\FCSDemoModelPrefab.cs" />
     <Compile Include="Buildables\FCSDemoPatcher.cs" />
     <Compile Include="Configuration\Mod.cs" />
+    <Compile Include="Model\ModEntry.cs" />
     <Compile Include="Model\SaveDataEntry.cs" />
     <Compile Include="Mono\DebugMenu.cs" />
     <Compile Include="Mono\FCSDemoController.cs" />

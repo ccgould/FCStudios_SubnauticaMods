@@ -18,6 +18,7 @@ namespace AlterraGen.Configuration
         [JsonProperty] internal FCSPowerStates PowerState { get; set; }
         [JsonProperty] internal float Power { get; set; }
         [JsonProperty] internal float StoredPower { get; set; }
+        [JsonProperty] internal bool IsVisible { get; set; }
     }
 
     [Serializable]

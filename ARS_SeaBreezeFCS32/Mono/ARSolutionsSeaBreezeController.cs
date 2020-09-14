@@ -63,10 +63,11 @@ namespace ARS_SeaBreezeFCS32.Mono
                         ReadySaveData();
                     }
 
-                    PowerManager.LoadSave(_savedData.PowercellData);
+                    PowerManager.LoadSave(_savedData.PowercellData,_savedData.HasBreakerTripped);
                     FridgeComponent.LoadSave(_savedData.FridgeContainer);
                     NameController.SetCurrentName(_savedData.UnitName);
                     ColorManager.SetColorFromSave(_savedData.BodyColor.Vector4ToColor());
+                    FCSConnectableDevice.IsVisible = _savedData.IsVisible;
                     QuickLogger.Info($"Loaded {Mod.FriendlyName}");
                 }
 
@@ -150,7 +151,7 @@ namespace ARS_SeaBreezeFCS32.Mono
             if (FCSConnectableDevice == null)
             {
                 FCSConnectableDevice = gameObject.AddComponent<FCSConnectableDevice>();
-                FCSConnectableDevice.Initialize(this,FridgeComponent,PowerManager);
+                FCSConnectableDevice.Initialize(this,FridgeComponent,PowerManager,true);
                 FCSTechFabricator.FcTechFabricatorService.PublicAPI.RegisterDevice(FCSConnectableDevice, GetPrefabID(), Mod.SeaBreezeTabID);
             }
 
@@ -190,12 +191,7 @@ namespace ARS_SeaBreezeFCS32.Mono
                 AnimationManager.SetIntHash(PageStateHash, 1);
             }
         }
-
-        internal void ToggleBreaker()
-        {
-            PowerManager.TogglePowerState();
-        }
-
+        
         private void OnContainerUpdate(int arg1, int arg2)
         {
             DisplayManager.OnContainerUpdate(arg1, arg2);
@@ -272,6 +268,8 @@ namespace ARS_SeaBreezeFCS32.Mono
             _savedData.UnitName = NameController.GetCurrentName();
             _savedData.FridgeContainer = FridgeComponent.Save();
             _savedData.PowercellData = PowerManager.Save();
+            _savedData.IsVisible = FCSConnectableDevice.IsVisible;
+            _savedData.HasBreakerTripped = PowerManager.GetHasBreakerTripped();
             saveData.Entries.Add(_savedData);
         }
 

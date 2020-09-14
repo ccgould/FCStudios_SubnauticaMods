@@ -386,6 +386,7 @@ namespace FCS_DeepDriller.Mono.MK2
         public void DeleteFunction(UpgradeFunction function)
         {
             QuickLogger.Debug("Deleting Function",true);
+            function.DeActivateUpdate();
             Upgrades.Remove(function);
             OnUpgradeUpdate?.Invoke(null);
         }

@@ -28,6 +28,16 @@ namespace DataStorageSolutions.Configuration
         [JsonProperty] internal string FileVersion { get; set; } = "1.0.0";
         [JsonProperty] internal Dictionary<string, ServerData> Servers { get; set; }
         [JsonProperty] internal List<BaseSaveData> Bases { get; set; }
+
         [JsonProperty] internal List<SaveDataEntry> Entries = new List<SaveDataEntry>();
+    }
+
+    internal class OperationSaveData
+    {
+        public string FromDeviceID { get; set; }
+        public string ToDeviceID { get; set; }
+        public string ManagerID { get; set; }
+        public TechType TechType { get; set; }
+        public bool IsCraftable { get; set; }
     }
 }

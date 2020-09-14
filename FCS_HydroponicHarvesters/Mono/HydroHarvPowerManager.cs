@@ -1,13 +1,14 @@
 ﻿using System;
 using FCS_HydroponicHarvesters.Enumerators;
 using FCSCommon.Utilities;
+using FCSTechFabricator.Abstract;
 using FCSTechFabricator.Enums;
 using FCSTechFabricator.Interfaces;
 using UnityEngine;
 
 namespace FCS_HydroponicHarvesters.Mono
 {
-    internal class HydroHarvPowerManager : MonoBehaviour,IFCSPowerManager
+    internal class HydroHarvPowerManager : FCSPowerManager
     {
         private HydroHarvController _mono;
         private PowerRelay _connectedRelay;
@@ -93,45 +94,14 @@ namespace FCS_HydroponicHarvesters.Mono
         }
 
         internal float CreationTime { get; set; }
-        public float GetPowerUsagePerSecond()
+        public override float GetPowerUsagePerSecond()
         {
             return EnergyConsumptionPerSecond;
         }
 
-        public float GetDevicePowerCharge()
-        {
-            return 0f;
-        }
-
-        public float GetDevicePowerCapacity()
-        {
-            return 0f;
-        }
-
-        public FCSPowerStates GetPowerState()
+        public override FCSPowerStates GetPowerState()
         {
             return HasPowerToConsume() ? FCSPowerStates.Powered : FCSPowerStates.Unpowered;
-        }
-
-        public void TogglePowerState()
-        {
-     
-        }
-
-        public void SetPowerState(FCSPowerStates state)
-        {
-
-        }
-
-        public bool IsDevicePowerFull()
-        {
-            return true;
-        }
-
-        public bool ModifyPower(float amount, out float consumed)
-        {
-            consumed = 0f;
-            return false;
         }
     }
 }

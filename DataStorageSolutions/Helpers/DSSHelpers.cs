@@ -11,6 +11,8 @@ using FCSCommon.Utilities;
 using FCSTechFabricator.Enums;
 using FCSTechFabricator.Managers;
 using FCSTechFabricator.Objects;
+using SMLHelper.V2.Crafting;
+using SMLHelper.V2.Handlers;
 using UnityEngine;
 
 namespace DataStorageSolutions.Helpers
@@ -78,10 +80,13 @@ namespace DataStorageSolutions.Helpers
 
             if (energyMixin == null) return playerToolData;
 
-            var batteryGo = energyMixin.GetBattery().gameObject;
-            var techType = batteryGo.GetComponentInChildren<TechTag>().type;
-            var iBattery = batteryGo.GetComponentInChildren<Battery>();
-            playerToolData.BatteryInfo = new BatteryInfo(techType, iBattery, String.Empty);
+            var batteryGo = energyMixin.GetBattery()?.gameObject;
+            var techType = batteryGo?.GetComponentInChildren<TechTag>().type ?? TechType.None;
+            var iBattery = batteryGo?.GetComponentInChildren<Battery>();
+            if (techType != TechType.None)
+            {
+                playerToolData.BatteryInfo = new BatteryInfo(techType, iBattery, String.Empty);
+            }
 
             return playerToolData;
         }
@@ -210,8 +215,6 @@ namespace DataStorageSolutions.Helpers
 
                             energyMixin.SetBattery(data.PlayToolData.BatteryInfo.TechType,
                                 (float) normalizedCharge);
-                            QuickLogger.Info(
-                                $"Gave Player Player tool {data.PlayToolData.TechType} with battery {batteryTechType}");
                         }
                         else
                         {
@@ -257,9 +260,18 @@ namespace DataStorageSolutions.Helpers
 
         internal static ObjectData MakeObjectData(InventoryItem item, int slot)
         {
-            var go = item.item.gameObject;
+            QuickLogger.Debug($"In Make Object");
+            var go = item?.item?.gameObject;
+            if (go == null) return new ObjectData{DataObjectType = SaveDataObjectType.Item, TechType = TechType.None};
+
+            QuickLogger.Debug($"GameObject {go}");
 
             var objectType = FindSaveDataObjectType(go);
+            QuickLogger.Debug($"Object Type {objectType}");
+
+            var techType = item.item.GetTechType();
+            QuickLogger.Debug($"Object Tech Type {techType}");
+
 
             ObjectData result;
 
@@ -272,7 +284,7 @@ namespace DataStorageSolutions.Helpers
                     result = new ObjectData
                     {
                         DataObjectType = objectType,
-                        TechType = item.item.GetTechType(),
+                        TechType = techType,
                         PlayToolData = GetPlayerToolData(item)
                     };
                     break;
@@ -280,7 +292,7 @@ namespace DataStorageSolutions.Helpers
                     result = new ObjectData
                     {
                         DataObjectType = objectType,
-                        TechType = item.item.GetTechType(),
+                        TechType = techType,
                         EatableEntity = GetEatableData(item)
                     };
                     break;
@@ -288,7 +300,7 @@ namespace DataStorageSolutions.Helpers
                     result = new ObjectData
                     {
                         DataObjectType = objectType,
-                        TechType = item.item.GetTechType(),
+                        TechType = techType,
                         ServerData = GetServerData(item)
                     };
                     break;
@@ -296,7 +308,7 @@ namespace DataStorageSolutions.Helpers
                     result = new ObjectData
                     {
                         DataObjectType = objectType,
-                        TechType = item.item.GetTechType(),
+                        TechType = techType,
                         PlayToolData = GetBatteryData(item)
                     };
                     break;
@@ -399,6 +411,49 @@ namespace DataStorageSolutions.Helpers
             }
 
             return pickup;
+        }
+
+        internal static string GetTechDataString(TechType techType)
+        {
+            var techData = CraftDataHandler.GetTechData(techType);
+
+            var sb = new StringBuilder();
+            sb.Append($"Craft {Language.main.Get(techType)} Ingredients:");
+            sb.Append(Environment.NewLine);
+
+            foreach (Ingredient ingredient in techData.Ingredients)
+            {
+                sb.Append(Language.main.Get(ingredient.techType));
+                sb.Append(Environment.NewLine);
+            }
+
+            return sb.ToString();
+        }
+
+        internal static TechData CheckIfTechDataAvailable(FCSOperation craft, out bool pass)
+        {
+            var techData = CraftDataHandler.GetTechData(craft.TechType);
+
+            pass = true;
+
+            if (techData != null)
+            {
+                foreach (Ingredient ingredient in techData.Ingredients)
+                {
+                    if (craft.Manager.GetItemCount(ingredient.techType) < ingredient.amount)
+                    {
+                        pass = false;
+                        break;
+                    }
+                }
+            }
+
+            return techData;
+        }
+
+        internal static bool CheckIfTechDataAvailable(TechType craft)
+        {
+            return CraftDataHandler.GetTechData(craft) != null;
         }
     }
 }

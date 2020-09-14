@@ -16,6 +16,7 @@ namespace ARS_SeaBreezeFCS32.Configuration
         [JsonProperty] internal string UnitName { get; set; }
         [JsonProperty] internal ColorVec4 BodyColor { get; set; }
         [JsonProperty] internal PowercellData PowercellData { get; set; }
+        [JsonProperty] internal bool IsVisible { get; set; }
     }
     
     [Serializable]

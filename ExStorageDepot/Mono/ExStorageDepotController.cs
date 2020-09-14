@@ -47,6 +47,7 @@ namespace ExStorageDepot.Mono
                 }
 
                 BulkMultiplier = data.Multiplier;
+                FCSConnectableDevice.IsVisible = data.IsVisible;
                 Display.UpdateMultiplier();
             }
 
@@ -150,7 +151,7 @@ namespace ExStorageDepot.Mono
             if (FCSConnectableDevice == null)
             {
                 FCSConnectableDevice = gameObject.AddComponent<FCSConnectableDevice>();
-                FCSConnectableDevice.Initialize(this, Storage,new ExStoragePowerManager());
+                FCSConnectableDevice.Initialize(this, Storage,new ExStoragePowerManager(),true);
                 FCSTechFabricator.FcTechFabricatorService.PublicAPI.RegisterDevice(FCSConnectableDevice, GetPrefabID(), Mod.ExStorageTabID);
             }
 
@@ -170,6 +171,7 @@ namespace ExStorageDepot.Mono
             _saveData.UnitName = NameController.GetCurrentName();
             _saveData.StorageItems = Storage.ContainerItems;
             _saveData.Multiplier = BulkMultiplier;
+            _saveData.IsVisible = FCSConnectableDevice.IsVisible;
             saveDataList.Entries.Add(_saveData);
         }
     }

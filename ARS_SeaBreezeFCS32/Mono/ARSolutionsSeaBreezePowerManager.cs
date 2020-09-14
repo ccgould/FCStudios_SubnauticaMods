@@ -1,26 +1,27 @@
 ﻿using FCSCommon.Utilities;
 using System;
 using System.Collections;
+using ARS_SeaBreezeFCS32.Enum;
 using ARS_SeaBreezeFCS32.Model;
+using FCSTechFabricator.Abstract;
 using FCSTechFabricator.Enums;
-using FCSTechFabricator.Interfaces;
 using UnityEngine;
 
 namespace ARS_SeaBreezeFCS32.Mono
 {
-    internal class ARSolutionsSeaBreezePowerManager : MonoBehaviour, IFCSPowerManager
+    internal class ARSolutionsSeaBreezePowerManager : FCSPowerManager
     {
         private bool _hasBreakerTripped;
         public Action OnBreakerTripped { get; set; }
         public Action OnBreakerReset { get; set; }
 
-        private float EnergyConsumptionPerSecond = QPatch.Configuration.PowerUsage;
+        private readonly float _energyConsumptionPerSecond = QPatch.Configuration.PowerUsage;
         private float AvailablePower => _connectedRelay.GetPower() + _powercellData.GetCharge();
         public Action OnPowerOutage { get; set; }
         public Action OnPowerResume { get; set; }
         private PowercellData _powercellData;
 
-        private const float chargeSpeed = 0.005f;
+        private const float ChargeSpeed = 0.005f;
 
         private ARSolutionsSeaBreezeController _mono;
 
@@ -39,8 +40,8 @@ namespace ARS_SeaBreezeFCS32.Mono
             if (this.NotAllowToOperate)
                 return;
             
-            _energyToConsume = EnergyConsumptionPerSecond * DayNightCycle.main.deltaTime;
-            var batteryChargePull = DayNightCycle.main.deltaTime * chargeSpeed * _powercellData.GetCapacity();
+            _energyToConsume = _energyConsumptionPerSecond * DayNightCycle.main.deltaTime;
+            var batteryChargePull = DayNightCycle.main.deltaTime * ChargeSpeed * _powercellData.GetCapacity();
             bool requiresEnergy = GameModeUtils.RequiresPower();
             bool hasPowerToConsume = !requiresEnergy || (this.AvailablePower >= _energyToConsume);
             
@@ -123,12 +124,14 @@ namespace ARS_SeaBreezeFCS32.Mono
         private void TriggerPowerOff()
         {
             _hasBreakerTripped = true;
+            _mono?.DisplayManager?.GotoPage(SeaBreezePages.PowerOffPage);
             OnBreakerTripped?.Invoke();
         }
 
         private void TriggerPowerOn()
         {
             _hasBreakerTripped = false;
+            _mono?.DisplayManager?.GotoPage(SeaBreezePages.BootPage);
             OnBreakerReset?.Invoke();
         }
 
@@ -160,11 +163,16 @@ namespace ARS_SeaBreezeFCS32.Mono
 
         }
 
-        internal void LoadSave(PowercellData powercellData)
+        internal void LoadSave(PowercellData powercellData, bool hasBreakerTripped)
         {
             if (powercellData != null)
             {
                 _powercellData = powercellData;
+            }
+
+            if (hasBreakerTripped)
+            {
+                TriggerPowerOff();
             }
         }
 
@@ -173,35 +181,35 @@ namespace ARS_SeaBreezeFCS32.Mono
             return _powercellData; 
         }
 
-        #region IFCSPowerManager
+        #region FCSPowerManager
 
-        public float GetPowerUsagePerSecond()
+        public override float GetPowerUsagePerSecond()
         {
-            return EnergyConsumptionPerSecond;
+            return _energyConsumptionPerSecond;
         }
 
-        public float GetDevicePowerCharge()
+        public override float GetDevicePowerCharge()
         {
             return _powercellData.GetCharge();
         }
 
-        public float GetDevicePowerCapacity()
+        public override float GetDevicePowerCapacity()
         {
             return _powercellData.GetCapacity();
         }
 
-        public FCSPowerStates GetPowerState()
+        public override FCSPowerStates GetPowerState()
         {
             return _hasBreakerTripped ? FCSPowerStates.Tripped : FCSPowerStates.Powered;
         }
 
-        public void TogglePowerState()
+        public override void TogglePowerState()
         {
             if (GetHasBreakerTripped())
             {
                 TriggerPowerOn();
             }
-            else if (GetHasBreakerTripped() == false)
+            else
             {
                 TriggerPowerOff();
             }
@@ -209,7 +217,7 @@ namespace ARS_SeaBreezeFCS32.Mono
             QuickLogger.Debug($"HasBreakerTripped: {_hasBreakerTripped}", true);
         }
 
-        public void SetPowerState(FCSPowerStates state)
+        public override void SetPowerState(FCSPowerStates state)
         {
             switch (state)
             {
@@ -224,15 +232,9 @@ namespace ARS_SeaBreezeFCS32.Mono
             }
         }
 
-        public bool IsDevicePowerFull()
+        public override bool IsDevicePowerFull()
         {
             return _powercellData.IsFull();
-        }
-
-        public bool ModifyPower(float amount, out float consumed)
-        {
-            consumed = 0f;
-            return false;
         }
 
         #endregion

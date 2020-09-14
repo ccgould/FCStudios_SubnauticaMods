@@ -6,13 +6,14 @@ using FCS_DeepDriller.Helpers;
 using FCS_DeepDriller.StatePattern;
 using FCSCommon.Enums;
 using FCSCommon.Utilities;
+using FCSTechFabricator.Abstract;
 using FCSTechFabricator.Enums;
 using FCSTechFabricator.Interfaces;
 using UnityEngine;
 
 namespace FCS_DeepDriller.Mono.MK2
 {
-    internal class FCSDeepDrillerPowerHandler : StateMachine, IFCSStorage, IFCSPowerManager
+    internal class FCSDeepDrillerPowerHandler : FCSPowerManager, IFCSStorage
     {
         #region Private Fields
 
@@ -268,29 +269,24 @@ namespace FCS_DeepDriller.Mono.MK2
             _powerRelay = powerRelay;
         }
 
-        public float GetPowerUsagePerSecond()
+        public override float GetPowerUsagePerSecond()
         {
             return GetPowerUsage();
         }
 
-        public float GetDevicePowerCharge()
+        public override float GetDevicePowerCharge()
         {
             return GetTotalCharge();
         }
 
-        public float GetDevicePowerCapacity()
+        public override float GetDevicePowerCapacity()
         {
             return QPatch.Configuration.InternalBatteryCapacity;
         }
-
-        FCSPowerStates IFCSPowerManager.GetPowerState()
+        
+        public override void TogglePowerState()
         {
-            return GetPowerState();
-        }
-
-        public void TogglePowerState()
-        {
-            if (GetPowerState() != FCSPowerStates.Powered)
+            if (GetPowerState() == FCSPowerStates.Tripped)
             {
                 _mono.DisplayHandler.PowerOnDisplay();
                 _mono.PowerManager.SetPowerState(FCSPowerStates.Powered);
@@ -302,28 +298,23 @@ namespace FCS_DeepDriller.Mono.MK2
             }
         }
 
-        void IFCSPowerManager.SetPowerState(FCSPowerStates state)
-        {
-            SetPowerState(state);
-        }
-
-        public bool IsDevicePowerFull()
+        public override bool IsDevicePowerFull()
         {
             return IsFull;
         }
 
-        public bool ModifyPower(float amount, out float consumed)
+        public override bool ModifyPower(float amount, out float consumed)
         {
             consumed = 0f;
             return false;
         }
 
-        internal FCSPowerStates GetPowerState()
+        public override FCSPowerStates GetPowerState()
         {
             return PowerState;
         }
 
-        internal void SetPowerState(FCSPowerStates state)
+        public override void SetPowerState(FCSPowerStates state)
         {
             PowerState = state;
         }
@@ -396,18 +387,18 @@ namespace FCS_DeepDriller.Mono.MK2
 
         public Pickupable RemoveItemFromContainer(TechType techType, int amount)
         {
-            throw new NotImplementedException();
+            return null;
         }
 
         public Dictionary<TechType, int> GetItemsWithin()
         {
-            throw new NotImplementedException();
+            return null;
         }
 
         public Action<int, int> OnContainerUpdate { get; set; }
         public bool ContainsItem(TechType techType)
         {
-            throw new NotImplementedException();
+            return false;
         }
 
         #endregion

@@ -49,6 +49,7 @@ namespace AlterraGen.Mono
 
                     ColorManager.SetMaskColorFromSave(_savedData.BodyColor.Vector4ToColor());
                     PowerManager.LoadFromSave(_savedData);
+                    _fcsConnectableDevice.IsVisible = _savedData.IsVisible;
                 }
 
                 _runStartUpOnEnable = false;
@@ -200,6 +201,7 @@ namespace AlterraGen.Mono
             _savedData.PowerState = PowerManager.PowerState;
             _savedData.StoredPower = PowerManager.GetStoredPower();
             _savedData.Power = PowerManager.GetPowerSourcePower();
+            _savedData.IsVisible = _fcsConnectableDevice.IsVisible;
             newSaveData.Entries.Add(_savedData);
         }
 

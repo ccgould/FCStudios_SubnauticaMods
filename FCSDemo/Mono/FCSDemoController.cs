@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using FCSCommon.Helpers;
 using FCSDemo.Buildables;
 using FCSTechFabricator.Abstract;
@@ -16,7 +13,7 @@ namespace Mono
 
         internal void ChangeColor(Vector3 vec3)
         {
-            MaterialHelpers.ChangeMaterialColor(FCSDemoBuidable.BodyMaterial,gameObject,Color.white,new Color(vec3.x,vec3.y,vec3.z),Color.white);
+            MaterialHelpers.ChangeMaterialColor(FCSDemoModel.BodyMaterial,gameObject,Color.white,new Color(vec3.x,vec3.y,vec3.z),Color.white);
         }
 
         private void OnEnable()
@@ -26,6 +23,7 @@ namespace Mono
                 if (!IsInitialized)
                 {
                     Initialize();
+
                 }
                 _runStartUpOnEnable = false;
             }

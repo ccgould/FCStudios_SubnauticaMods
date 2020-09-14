@@ -14,7 +14,7 @@ namespace FCSCommon.Extensions
             if (prefab != null)
             {
                 var go = GameObject.Instantiate(prefab);
-                pickupable = go.GetComponent<Pickupable>().Pickup(false);
+                pickupable = go.EnsureComponent<Pickupable>().Pickup(false);
             }
 
             return pickupable;
@@ -27,7 +27,7 @@ namespace FCSCommon.Extensions
             if (prefab != null)
             {
                 var go = GameObject.Instantiate(prefab);
-                var pickupable = go.GetComponent<Pickupable>().Pickup(false);
+                var pickupable = go.EnsureComponent<Pickupable>().Pickup(false);
                 item = new InventoryItem(pickupable);
             }
             return item;

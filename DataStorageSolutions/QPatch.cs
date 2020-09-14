@@ -84,8 +84,7 @@ namespace DataStorageSolutions
                 QuickLogger.Debug("Debug logs enabled");
 #endif
 
-                //Mod.GetAllTechTypes();
-
+                Mod.CreateAllowedTechTypes();
 
 
                 GlobalBundle = FcAssetBundlesService.PublicAPI.GetAssetBundleByName(FcAssetBundlesService.PublicAPI.GlobalBundleName);

@@ -3,6 +3,7 @@ using FCSCommon.Extensions;
 using FCSCommon.Utilities;
 using Oculus.Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace FCS_DeepDriller.Configuration
 {
@@ -20,7 +21,6 @@ namespace FCS_DeepDriller.Configuration
         public Dictionary<string, List<string>> AdditionalBiomeOres { get; set; } = new Dictionary<string, List<string>>();
         public float MaxOreCountUpgradePowerUsage { get; set; } = 0.2f;
         public float OrePerDayUpgradePowerUsage { get; set; } = 1.0f;
-        public float OrePerDayUpgradeDamage { get; set; } = 0.5f;
         public float InternalBatteryCapacity { get; set; } = 1000f;
         public float DrillExStorageRange { get; set; } = 30f;
         [JsonIgnore] internal float OreReductionValue => 0.08f;
@@ -42,7 +42,15 @@ namespace FCS_DeepDriller.Configuration
                         types.Add(sTechType.ToTechType());
                     }
                     QuickLogger.Debug($"Added {biomeOre.Key} to BiomeOresTechType");
-                    BiomeOresTechType.Add(biomeOre.Key, types);
+                    if (!BiomeOresTechType.ContainsKey(biomeOre.Key))
+                    {
+                        BiomeOresTechType.Add(biomeOre.Key, types);
+                    }
+                    else
+                    {
+                        BiomeOresTechType[biomeOre.Key] = BiomeOresTechType[biomeOre.Key].Union(types).ToList();
+                    }
+
                 }
             }
             catch (Exception e)

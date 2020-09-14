@@ -105,6 +105,7 @@ namespace FCS_HydroponicHarvesters.Mono
                         HydroHarvGrowBed.Load(_savedData.DnaSamples);
                         HydroHarvCleanerManager.Load(_savedData.UnitSanitation);
                         DisplayManager.Load();
+                        FCSConnectableDevice.IsVisible = _savedData.IsVisible;
                     }
                 }
                 _runStartUpOnEnable = false;
@@ -340,6 +341,7 @@ namespace FCS_HydroponicHarvesters.Mono
             _savedData.BedType = HydroHarvGrowBed.GetBedType();
             _savedData.DnaSamples = HydroHarvGrowBed.GetDNASamples();
             _savedData.UnitSanitation = HydroHarvCleanerManager.GetUnitSanitation();
+            _savedData.IsVisible = FCSConnectableDevice.IsVisible;
             newSaveData.Entries.Add(_savedData);
         }
 

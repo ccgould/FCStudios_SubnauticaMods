@@ -105,7 +105,6 @@ TechType.Placeholder,
 TechType.CarbonOld,
 TechType.EthanolOld,
 TechType.EthyleneOld,
-TechType.Gold,
 TechType.Magnesium,
 TechType.HydrogenOld,
 TechType.Lodestone,
@@ -639,7 +638,8 @@ TechType.Databox
                 new Ingredient(TechType.Glass, 1),
                 new Ingredient(TechType.Titanium, 1),
                 new Ingredient(TechType.WiringKit, 1),
-                new Ingredient(TechType.Silicone, 1)
+                new Ingredient(TechType.Silicone, 1),
+                new Ingredient(TechType.Aerogel, 1),
             }
         };
 
@@ -668,9 +668,8 @@ TechType.Databox
             craftAmount = 1,
             Ingredients =
             {
-                new Ingredient(TechType.Glass, 1),
                 new Ingredient(TechType.AdvancedWiringKit, 1),
-                new Ingredient(TechType.TitaniumIngot, 2),
+                new Ingredient(TechType.TitaniumIngot, 1),
                 new Ingredient(TechType.MapRoomUpgradeScanRange, 1)
             }
         };
@@ -684,9 +683,7 @@ TechType.Databox
             craftAmount = 1,
             Ingredients =
             {
-                new Ingredient(TechType.WiringKit, 1),
-                new Ingredient(TechType.ComputerChip, 1),
-                new Ingredient(TechType.Aerogel, 1),
+                new Ingredient(TechType.AdvancedWiringKit, 1),
                 new Ingredient(TechType.Titanium, 1)
             }
         };
@@ -702,7 +699,6 @@ TechType.Databox
             {
                 new Ingredient(TechType.Glass, 1),
                 new Ingredient(TechType.AdvancedWiringKit, 1),
-                new Ingredient(TechType.Aerogel, 1),
                 new Ingredient(TechType.Titanium, 1)
             }
         };
@@ -733,7 +729,7 @@ TechType.Databox
             {
                 new Ingredient(TechType.Glass, 1),
                 new Ingredient(TechType.WiringKit, 1),
-                new Ingredient(TechType.Titanium, 2)
+                new Ingredient(TechType.Titanium, 1)
             }
         };
 
@@ -839,9 +835,18 @@ TechType.Databox
 
                 if (entry.InstanceID == instanceId)
                 {
-                    return new BaseSaveData { BaseName = entry.BaseName, InstanceID = entry.InstanceID, AllowDocking = entry.AllowDocking, HasBreakerTripped = entry.HasBreakerTripped };
+                    return new BaseSaveData
+                    {
+                        BaseName = entry.BaseName, 
+                        InstanceID = entry.InstanceID, 
+                        AllowDocking = entry.AllowDocking, 
+                        HasBreakerTripped = entry.HasBreakerTripped,
+                        OperationSaveData = entry.OperationSaveData,
+                        AutoCraftData = entry.AutoCraftData
+                    };
                 }
             }
+
 
             return null;
         }
@@ -1068,7 +1073,6 @@ TechType.Databox
         [JsonProperty] internal int ExtractMultiplier { get; set; }
 
         [JsonProperty] internal float ExtractInterval = 0.25f;
-        [JsonProperty] internal bool AllowFood { get; set; }
 
         private HashSet<Filter> _dockingBlackList = new HashSet<Filter>();
 

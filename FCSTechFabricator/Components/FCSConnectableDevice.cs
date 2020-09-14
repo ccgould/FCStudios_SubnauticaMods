@@ -19,26 +19,22 @@ namespace FCSTechFabricator.Components
         private FCSController _mono;
         private IFCSStorage _storage;
         private TechType _techtype;
-        private IFCSPowerManager _powerManager;
+        private FCSPowerManager _powerManager;
+        private bool _canBeVisible;
         private bool _isBase { get; set; }
         public string UnitID { get; set; }
         public bool IsVisible { get; set; } = false;
+        //TODO Save Is Visible
 
-        [Obsolete("Please use Initialize(FCSController mono, IFCSStorage storage, IFCSPowerManager powerManager) to allow power usage data to be accessible")]
-        public void Initialize(FCSController mono, IFCSStorage storage)
-        {
-            _mono = mono;
-            _storage = storage;
-        }
-        
-        public void Initialize(FCSController mono, IFCSStorage storage, IFCSPowerManager powerManager)
+        public void Initialize(FCSController mono, IFCSStorage storage, FCSPowerManager powerManager,bool canBeVisible = false)
         {
             _mono = mono;
             _storage = storage;
             _powerManager = powerManager;
+            _canBeVisible = canBeVisible;
         }
 
-        public void InitializeBase(FCSController mono, IFCSStorage storage, IFCSPowerManager powerManager,
+        public void InitializeBase(FCSController mono, IFCSStorage storage, FCSPowerManager powerManager,
             PrefabIdentifier prefabIdentifier)
         {
             _mono = mono;
@@ -112,7 +108,7 @@ namespace FCSTechFabricator.Components
             _powerManager?.SetPowerState(state);
         }
 
-        public IFCSPowerManager GetPowerManager()
+        public FCSPowerManager GetPowerManager()
         {
             return _powerManager;
         }
@@ -213,7 +209,7 @@ namespace FCSTechFabricator.Components
             return _mono.IsConstructed;
         }
 
-        public bool IsOperational()
+        public virtual bool IsOperational()
         {
             return _powerManager?.GetPowerState() == FCSPowerStates.Powered && IsConstructed();
         }
@@ -222,5 +218,11 @@ namespace FCSTechFabricator.Components
         {
             return _mono;
         }
+
+        public bool CanBeVisible()
+        {
+            return _canBeVisible;
+        }
+
     }
 }

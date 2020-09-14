@@ -4,6 +4,7 @@ using System.IO;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using FCSDemo.Configuration;
+using FCSDemo.Model;
 using FCSTechFabricator.Components;
 using FCSTechFabricator.Extensions;
 using Mono;
@@ -14,11 +15,13 @@ using UnityEngine;
 
 namespace FCSDemo.Buildables
 {
-    internal partial class FCSDemoBuidable : Buildable
+    internal class FCSDemoBuidable : Buildable
     {
-        private static readonly FCSDemoBuidable Singleton = new FCSDemoBuidable();
-        public FCSDemoBuidable() : base(Mod.ClassID, Mod.FriendlyName, Mod.Description)
+        private GameObject _prefab;
+
+        public FCSDemoBuidable(ModEntry entry) : base(entry.ClassID, entry.FriendlyName,Mod.Description)
         {
+            _prefab = entry.Prefab;
         }
 
         public override GameObject GetGameObject()
@@ -65,21 +68,20 @@ namespace FCSDemo.Buildables
                 constructable.placeMinDistance = QPatch.Configuration.Config.PlaceMinDistance; //5f;
                 constructable.placeDefaultDistance = QPatch.Configuration.Config.PlaceDefaultDistance; //6f;
                 constructable.model = model;
-                constructable.techType = Singleton.TechType;
+                constructable.techType = TechType;
 
                 PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
-                prefabID.ClassId = Singleton.ClassID;
+                prefabID.ClassId = ClassID;
                 MaterialHelpers.AddNewBubbles(prefab, new Vector3(0.722f, 1.03f, 0.775f),new Vector3(270f,266f,0f));
                 MaterialHelpers.AddNewBubbles(prefab, new Vector3(0.826f, 1.03f, -0.715f),new Vector3(270f,266f,0f));
                 MaterialHelpers.AddNewBubbles(prefab, new Vector3(-0.796f, 1.03f, -0.828f),new Vector3(270f,266f,0f));
                 MaterialHelpers.AddNewBubbles(prefab, new Vector3(-0.801f, 1.03f, 0.711f),new Vector3(270f,266f,0f));
-                prefab.AddComponent<TechTag>().type = Singleton.TechType;
+                prefab.AddComponent<TechTag>().type = TechType;
                 prefab.AddComponent<FCSDemoController>();
                 
                 //Add the FCSTechFabricatorTag component
                 MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModName);
                 prefab.AddComponent<FCSTechFabricatorTag>();
-
 
                 return prefab;
             }
@@ -138,13 +140,9 @@ namespace FCSDemo.Buildables
 
         public static void PatchHelper()
         {
-            if (!Singleton.GetPrefabs())
-            {
-                throw new FileNotFoundException($"Failed to retrieve the {Singleton.FriendlyName} prefab from the asset bundle");
-            }
 
             Register();
-            Singleton.Patch();
+
         }
 
         public override TechGroup GroupForPDA => TechGroup.Miscellaneous;

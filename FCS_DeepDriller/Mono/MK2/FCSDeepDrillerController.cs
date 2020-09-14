@@ -106,7 +106,25 @@ namespace FCS_DeepDriller.Mono.MK2
                 _runStartUpOnEnable = false;
             }
         }
-        
+
+        private void Update()
+        {
+            if (_line == null) return;
+            if (_isRangeVisible)
+            {
+                CreatePoints(Mathf.Clamp(_currentDistance + DayNightCycle.main.deltaTime * LerpSpeed * 1, 0, QPatch.Configuration.DrillExStorageRange));
+            }
+            else
+            {
+                for (int i = 0; i < _line.positionCount; i++)
+                {
+                    if (_line.GetPosition(i) != Vector3.zero)
+                        _line.SetPosition(i, Vector3.zero);
+                    _currentDistance = 0f;
+                }
+            }
+        }
+
         #endregion
 
         #region IConstructable
@@ -200,25 +218,7 @@ namespace FCS_DeepDriller.Mono.MK2
         #endregion
 
         #region Private Methods
-
-        private void Update()
-        {
-            if(_line == null) return;
-            if(_isRangeVisible)
-            {
-                CreatePoints(Mathf.Clamp(_currentDistance + DayNightCycle.main.deltaTime * LerpSpeed * 1, 0, QPatch.Configuration.DrillExStorageRange));
-            }
-            else
-            {
-                for (int i = 0; i < _line.positionCount; i++)
-                {
-                    if(_line.GetPosition(i) != Vector3.zero)
-                        _line.SetPosition(i,Vector3.zero);
-                    _currentDistance = 0f;
-                }
-            }
-        }
-
+        
         public override void Initialize()
         {
             QuickLogger.Debug($"Initializing");

@@ -257,7 +257,7 @@ namespace DataStorageSolutions.Model
             _mono.DisplayManager.UpdateContainerAmount();
             Mod.OnBaseUpdate?.Invoke();
         }
-
+        
         private void RemoveFromBaseTracker()
         {
             foreach (ObjectData data in Server)
@@ -314,6 +314,7 @@ namespace DataStorageSolutions.Model
 
         public int SpaceAvailable()
         {
+            if (Server == null) return 0;
             return QPatch.Configuration.Config.ServerStorageLimit - Server.Count;
         }
 

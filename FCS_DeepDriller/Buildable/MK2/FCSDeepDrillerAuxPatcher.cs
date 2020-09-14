@@ -1,4 +1,5 @@
 ﻿using SMLHelper.V2.Handlers;
+using UnityEngine;
 
 namespace FCS_DeepDriller.Buildable.MK2
 {
@@ -42,6 +43,8 @@ namespace FCS_DeepDriller.Buildable.MK2
         private const string SolarButtonKey = "DD_SolarButton";
         private const string ExportToggleKey = "DD_ExportToggle";
         private const string ToggleRangeKey = "DD_ToggleRange";
+        private const string AddOilKey = "DD_AddOil";
+        private const string AddPowerKey = "DD_AddPower";
 
         internal static string BuildableName { get; private set; }
 
@@ -90,6 +93,8 @@ namespace FCS_DeepDriller.Buildable.MK2
             LanguageHandler.SetLanguageLine(SolarButtonKey, "Toggle Solar Panels.");
             LanguageHandler.SetLanguageLine(ToggleRangeKey, "Show/Hide Range");
             LanguageHandler.SetLanguageLine(ExportToggleKey, "Toggle export to ExStorage.");
+            LanguageHandler.SetLanguageLine(AddOilKey, "Add oil to drill.");
+            LanguageHandler.SetLanguageLine(AddPowerKey, "Add power to drill.");
         }
 
 
@@ -274,6 +279,16 @@ namespace FCS_DeepDriller.Buildable.MK2
         internal static string ToggleRangeButton()
         {
             return Language.main.Get(ToggleRangeKey);
+        }
+
+        public static string AddOil()
+        {
+            return Language.main.Get(AddOilKey);
+        }
+
+        public static string AddPower()
+        {
+            return Language.main.Get(AddPowerKey);
         }
     }
 }

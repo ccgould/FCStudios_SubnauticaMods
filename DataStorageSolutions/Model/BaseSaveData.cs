@@ -1,4 +1,7 @@
-﻿namespace DataStorageSolutions.Model
+﻿using System.Collections.Generic;
+using DataStorageSolutions.Configuration;
+
+namespace DataStorageSolutions.Model
 {
     internal class BaseSaveData
     {
@@ -6,5 +9,7 @@
         public string BaseName { get; set; }
         public bool AllowDocking { get; set; }
         public bool HasBreakerTripped { get; set; }
+        public IEnumerable<OperationSaveData> OperationSaveData { get; set; }
+        public IEnumerable<OperationSaveData> AutoCraftData { get; set; }
     }
 }
