@@ -727,5 +727,10 @@ namespace DataStorageSolutions.Model
             }
             return amount;
         }
+
+        internal string GetTotalString()
+        {
+            return $"{TrackedItems.Sum(x => x.Value)} / {BaseRacks.Sum(x => x.GetServerCount()) * QPatch.Configuration.Config.ServerStorageLimit} Items";
+        }
     }
 }

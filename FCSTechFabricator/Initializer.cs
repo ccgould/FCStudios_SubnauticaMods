@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using FCSCommon.Utilities;
+using FCSTechFabricator.Configuration;
 using HarmonyLib;
 using QModManager.API.ModLoading;
 

@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using FCSCommon.Utilities;
+using FCSTechFabricator.Components;
+using FCSTechFabricator.Configuration;
 using SMLHelper.V2.Assets;
 using UnityEngine;
 
@@ -16,6 +18,7 @@ namespace FCSTechFabricator
 
 #endif
         bool HasCraftingTab(string tabId);
+        void RegisterDevice(FCSConnectableDevice device,string prefabID, string tabID);
     }
 
     internal interface IFcTechFabricatorServiceInternal
@@ -28,6 +31,7 @@ namespace FCSTechFabricator
         internal static readonly FcTechFabricator fcTechFabricator = new FcTechFabricator();
         internal static readonly ICollection<string> knownTabs = new List<string>();
         internal static readonly ICollection<string> knownItems = new List<string>();
+        internal static Dictionary<string,string> knownDevices = new Dictionary<string,string>();
 
         private static readonly FcTechFabricatorService singleton = new FcTechFabricatorService();
 
@@ -36,6 +40,12 @@ namespace FCSTechFabricator
 
         private FcTechFabricatorService()
         {
+            Mod.OnDataLoaded += OnDataLoaded;
+        }
+
+        private void OnDataLoaded(Dictionary<string, string> obj)
+        {
+            knownDevices = obj;
         }
 
         public void AddCraftNode(Craftable item, string parentTabId)
@@ -82,6 +92,23 @@ namespace FCSTechFabricator
         public bool HasCraftingTab(string tabId)
         {
             return knownTabs.Contains(tabId);
+        }
+
+        public void RegisterDevice(FCSConnectableDevice device, string prefabID, string tabID)
+        {
+            if (!knownDevices.ContainsKey(prefabID))
+            {
+                var id = $"{tabID}{knownDevices.Count:D3}";
+                device.UnitID = id;
+                knownDevices.Add(prefabID,id);
+                Mod.SaveDevices(knownDevices);
+            }
+            else
+            {
+                device.UnitID=knownDevices[prefabID];
+            }
+
+
         }
 
         void IFcTechFabricatorServiceInternal.PatchFabricator()

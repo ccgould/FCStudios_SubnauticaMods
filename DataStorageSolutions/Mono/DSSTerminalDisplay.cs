@@ -45,6 +45,8 @@ namespace DataStorageSolutions.Mono
         private Toggle _toggle;
         private GridHelper _itemGrid;
         private GridHelper _categoryGrid;
+        private Text _counter;
+
         private List<Filter> _filters => FilterList.GetNewVersion(FilterList.GetFilters());
         private readonly List<InterfaceButton> _trackedButtons = new List<InterfaceButton>();
         private bool _isBeingDestroyed;
@@ -315,6 +317,7 @@ namespace DataStorageSolutions.Mono
                     uGUI_Icon trashIcon = InterfaceHelpers.FindGameObject(buttonPrefab, "Icon").AddComponent<uGUI_Icon>();
                     trashIcon.sprite = SpriteManager.Get(grouped.ElementAt(i).Key);
                 }
+                _counter.text = _currentBase.GetTotalString();
                 _baseItemsGrid.UpdaterPaginator(grouped.Count());
             }
             catch (Exception e)
@@ -799,6 +802,8 @@ namespace DataStorageSolutions.Mono
                 _baseItemsGrid = _mono.gameObject.AddComponent<GridHelper>();
                 _baseItemsGrid.OnLoadDisplay += OnLoadBaseItemsGrid;
                 _baseItemsGrid.Setup(44, DSSModelPrefab.ItemPrefab, baseItemsPage, _startColor, _hoverColor, OnButtonClick);
+
+                _counter = GameObjectHelpers.FindGameObject(baseItemsPage, "Counter").GetComponent<Text>();
                 #endregion
 
                 #region DumpBTNButton
@@ -941,6 +946,8 @@ namespace DataStorageSolutions.Mono
                 InterfaceHelpers.CreateButton(dockSettingsHomeBTN, "SettingsBTN", InterfaceButtonMode.Background,
                     OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.SettingPage());
                 #endregion
+
+
 
                 return true;
             }

@@ -1,11 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using FCSCommon.Utilities;
+using Oculus.Newtonsoft.Json;
 using SMLHelper.V2.Utility;
 
 namespace FCSTechFabricator.Configuration
 {
     internal static class Mod
     {
+        private static Dictionary<string, string> _knownDevices;
         internal static string ModName => "FCSTechFabricator";
         internal static string ModClassID => "FCSTechFabricator";
 
@@ -49,6 +53,39 @@ namespace FCSTechFabricator.Configuration
         {
             return Path.Combine(SaveUtils.GetCurrentSaveDataDir(), ModName);
         }
+
+        internal static bool SaveDevices(Dictionary<string,string> knownDevices)
+        {
+            try
+            {
+                ModUtils.Save(knownDevices, SaveDataFilename, GetSaveFileDirectory(), OnSaveComplete);
+                return true;
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error($"Error: {e.Message} | StackTrace: {e.StackTrace}");
+                return false;
+            }
+        }
+
+        internal static void LoadDevicesData()
+        {
+            QuickLogger.Info("Loading Save Data...");
+            ModUtils.LoadSaveData<Dictionary<string,string>>(SaveDataFilename, GetSaveFileDirectory(), (data) =>
+            {
+                QuickLogger.Info("Save Data Loaded");
+                OnDataLoaded?.Invoke(data);
+            });
+        }
+
+        internal static Action<Dictionary<string,string>> OnDataLoaded { get; set; }
+
+        private static void OnSaveComplete()
+        {
+            
+        }
+
+        private const string SaveDataFilename = "KnownDevices.json";
 
         internal static string ConfigurationFile()
         {

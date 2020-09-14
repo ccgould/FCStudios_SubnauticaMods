@@ -6,8 +6,8 @@ namespace FCSTechFabricator.Objects
 {
     public class FCSFilteredStorage : MonoBehaviour
     {
-        private HashSet<ObjectData> _items;
-        private List<Filter> _filters;
+        private HashSet<ObjectData> _items = new HashSet<ObjectData>();
+        private List<Filter> _filters = new List<Filter>();
         private Action _updateDisplay;
 
         public Action<HashSet<ObjectData>> OnItemsUpdate { get; set; }
@@ -35,7 +35,10 @@ namespace FCSTechFabricator.Objects
 
         public void Initialize(List<Filter> filters, Action updateDisplay)
         {
-            _filters = filters;
+            if (filters != null)
+            {
+                _filters = filters;
+            }
             _updateDisplay = updateDisplay;
         }
 
