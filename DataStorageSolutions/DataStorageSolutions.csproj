@@ -153,6 +153,7 @@
     <Compile Include="Patches\EasyCraft_Patch.cs" />
     <Compile Include="Patches\Player_Patches.cs" />
     <Compile Include="Patches\SubRoot_Patches.cs" />
+    <Compile Include="Patches\TooltipFactory_Patch.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Model\BaseSaveData.cs" />

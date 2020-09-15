@@ -128,11 +128,16 @@ namespace DataStorageSolutions.Model
 
             for (int i = 0; i < lookup.Length; i++)
             {
-                if (i < 5)
+                if (i < 4)
                 {
                     if (lookup[i].All(objectData => objectData.TechType != lookup[i].Key)) continue;
                     sb.Append($"{Language.main.Get(lookup[i].Key)} x{lookup[i].Count()}");
                     sb.Append(Environment.NewLine);
+                }
+                else
+                {
+                    sb.Append($"And More.....");
+                    break;
                 }
 
             }

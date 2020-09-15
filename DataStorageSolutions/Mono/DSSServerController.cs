@@ -20,8 +20,6 @@ namespace DataStorageSolutions.Mono
         private bool _runStartUpOnEnable = true;
         private bool _fromSave;
         private SaveDataEntry _savedData;
-        private HashSet<ObjectData> _items = new HashSet<ObjectData>();
-        private List<Filter> _filters;
         private ServerData _data;
 
         [JsonIgnore] public override BaseManager Manager { get; set; }
