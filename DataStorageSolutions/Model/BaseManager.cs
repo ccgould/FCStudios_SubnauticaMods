@@ -23,7 +23,11 @@ namespace DataStorageSolutions.Model
         private string _baseName;
         private BaseSaveData _savedData;
         private bool _hasBreakerTripped;
-
+        private List<TechType> AllowedFoodItems = new List<TechType>
+        {
+            TechType.CreepvinePiece,
+            TechType.JellyPlant
+        };
 
         internal static List<BaseManager> Managers { get; } = new List<BaseManager>();
         internal static readonly List<IBaseAntenna> BaseAntennas = new List<IBaseAntenna>();
@@ -61,6 +65,7 @@ namespace DataStorageSolutions.Model
         {
             throw new NotImplementedException();
         }
+
 
         internal Dictionary<string, FCSConnectableDevice> FCSConnectables { get; set; } = new Dictionary<string, FCSConnectableDevice>();
 
@@ -311,7 +316,7 @@ namespace DataStorageSolutions.Model
             if (!BaseRacks.Contains(unit) && unit.IsConstructed)
             {
                 BaseRacks.Add(unit);
-                unit.PowerManager.OnPowerUpdate += OnPowerUpdate;
+                unit.RackPowerManager.OnPowerUpdate += OnPowerUpdate;
                 QuickLogger.Debug($"Add Unit : {unit.GetPrefabIDString()}", true);
             }
         }
@@ -322,7 +327,7 @@ namespace DataStorageSolutions.Model
             {
                 if (!manager.BaseRacks.Contains(unit)) continue;
                 manager.BaseRacks.Remove(unit); 
-                unit.PowerManager.OnPowerUpdate -= OnPowerUpdate;
+                unit.RackPowerManager.OnPowerUpdate -= OnPowerUpdate;
                 QuickLogger.Debug($"Removed Unit : {unit.GetPrefabIDString()}", true);
             }
         }
@@ -464,7 +469,7 @@ namespace DataStorageSolutions.Model
         {
 
             QuickLogger.Debug($"In Can Be Stored",true);
-            return FindValidRack(techType,amount,out var slotId) != null; 
+            return amount + TrackedItems.Sum(x => x.Value) <= BaseRacks.Sum(x => x.GetServerCount()) * QPatch.Configuration.Config.ServerStorageLimit; 
 
         }
 
@@ -594,10 +599,11 @@ namespace DataStorageSolutions.Model
 
             if (food != null)
             {
-
+#if DEBUG
                 QuickLogger.Debug($"Food Check {CanBeStored(DumpContainer.GetCount() + 1, pickupable.GetTechType())}",true);
+#endif
 
-                if ((!food.decomposes || food.GetComponent<Pickupable>().GetTechType() == TechType.CreepvinePiece) && CanBeStored(DumpContainer.GetCount() + 1, pickupable.GetTechType()))
+                if ((!food.decomposes || AllowedFoodItems.Contains(pickupable.GetTechType())) && CanBeStored(DumpContainer.GetCount() + 1, pickupable.GetTechType()))
                 {
                     successful =  true;
                 }
@@ -620,8 +626,9 @@ namespace DataStorageSolutions.Model
                 QuickLogger.Debug($"Food Allowed Result: {successful}",true);
                 return successful;
             }
-
+#if DEBUG
             QuickLogger.Debug($"{DumpContainer.GetCount() + 1}",true);
+#endif
 
             if (!CanBeStored(DumpContainer.GetCount() + 1, pickupable.GetTechType()))
             {
@@ -672,7 +679,17 @@ namespace DataStorageSolutions.Model
 
         internal string GetDefaultName()
         {
-            return $"Base {Managers.Count}";
+            if (!Habitat.isCyclops)
+            {
+
+                var amount = Managers.Count(manager => manager.Habitat != null && !manager.Habitat.isCyclops);
+                return $"Base {amount}";
+            }
+            else
+            {
+                var amount = Managers.Count(manager => manager.Habitat != null && manager.Habitat.isCyclops);
+                return $"Cyclops Base {amount}";
+            }
         }
 
         internal IEnumerable<IBaseAntenna> GetBaseAntennas()

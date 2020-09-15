@@ -52,7 +52,7 @@ namespace DataStorageSolutions.Mono
         public bool IsRackSlotsFull => GetIsRackFull();
         public override bool IsConstructed => _isConstructed;
         internal Action OnUpdate;
-        private bool _allowNotifications;
+        private bool _allowNotifications = true;
         Action<int, int> IFCSStorage.OnContainerUpdate { get; set; }
 
         public override BaseManager Manager
@@ -64,7 +64,7 @@ namespace DataStorageSolutions.Mono
                 //Because the way the Terminal is lazy loaded. I choose to lazy load the power manager based on the manager setter
                 if (value != null)
                 {
-                    PowerManager?.Initialize(this, QPatch.Configuration.Config.ScreenPowerUsage);
+                    RackPowerManager?.Initialize(this, QPatch.Configuration.Config.ScreenPowerUsage);
                 }
 
             }
@@ -75,7 +75,7 @@ namespace DataStorageSolutions.Mono
         internal DSSRackDisplayController DisplayManager { get; private set; }
         public override DumpContainer DumpContainer { get; set; }
         internal ColorManager ColorManager { get; private set; }
-        public PowerManager PowerManager { get; private set; }
+        public PowerManager RackPowerManager { get; private set; }
 
         #region Unity
 
@@ -116,10 +116,11 @@ namespace DataStorageSolutions.Mono
         private void Update()
         {
             OnUpdate?.Invoke();
-            if (IsConstructed && PowerManager != null)
+
+            if (IsConstructed && RackPowerManager != null)
             {
-                PowerManager?.UpdatePowerState();
-                PowerManager?.ConsumePower();
+                RackPowerManager?.UpdatePowerState();
+                RackPowerManager?.ConsumePower();
             }
         }
 
@@ -129,6 +130,8 @@ namespace DataStorageSolutions.Mono
         {
             QuickLogger.Debug("Load Rack");
             if (_savedData.Servers == null) return;
+
+            _allowNotifications = false;
 
             QuickLogger.Debug($"Save Data Count: {_savedData.Servers.Count}");
 
@@ -140,6 +143,8 @@ namespace DataStorageSolutions.Mono
                     AddServer(data.Server, data.ServerFilters, data.SlotID, true);
                 }
             }
+
+            _allowNotifications = true;
         }
 
         private TechType GetTechType()
@@ -272,7 +277,7 @@ namespace DataStorageSolutions.Mono
 
         internal void UpdatePowerUsage()
         {
-            PowerManager.UpdatePowerUsage((QPatch.Configuration.Config.ServerPowerUsage * GetServerCount() + QPatch.Configuration.Config.RackPowerUsage));
+            RackPowerManager.UpdatePowerUsage((QPatch.Configuration.Config.ServerPowerUsage * GetServerCount() + QPatch.Configuration.Config.RackPowerUsage));
         }
 
         internal bool IsRackOpen()
@@ -404,10 +409,10 @@ namespace DataStorageSolutions.Mono
 
             InvokeRepeating(nameof(CheckIfRemoved), 0.5f, 0.5f);
 
-            if (PowerManager == null)
+            if (RackPowerManager == null)
             {
-                PowerManager = new PowerManager();
-                PowerManager.OnPowerUpdate += OnPowerUpdate;
+                RackPowerManager = new PowerManager();
+                RackPowerManager.OnPowerUpdate += OnPowerUpdate;
             }
 
             if (ColorManager == null)

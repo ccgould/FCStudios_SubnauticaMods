@@ -1,23 +1,15 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using DataStorageSolutions.Abstract;
 using DataStorageSolutions.Buildables;
 using DataStorageSolutions.Configuration;
 using DataStorageSolutions.Model;
-using DataStorageSolutions.Patches;
-using FCSCommon.Abstract;
 using FCSCommon.Controllers;
-using FCSCommon.Enums;
-using FCSCommon.Extensions;
 using FCSCommon.Interfaces;
 using FCSCommon.Utilities;
-using FCSTechFabricator.Components;
 using FCSTechFabricator.Enums;
 using FCSTechFabricator.Extensions;
 using FCSTechFabricator.Managers;
-using UnityEngine;
 
 namespace DataStorageSolutions.Mono
 {
@@ -31,6 +23,7 @@ namespace DataStorageSolutions.Mono
         private bool _fromSave;
         private BaseManager _manager;
         private bool _isBeingDestroyed;
+        private IEnumerator _findSubRoot;
 
         public override bool IsConstructed => _isContructed;
         public override BaseManager Manager
@@ -74,9 +67,19 @@ namespace DataStorageSolutions.Mono
 
                     FindBaseById(_savedData?.BaseID);
 
+                    if (SubRoot == null)
+                    {
+                        SubRoot = GetComponentInParent<SubRoot>();
+                        FindBaseById(SubRoot.gameObject.gameObject?.GetComponentInChildren<PrefabIdentifier>()?.Id);
+                        
+                    }
+
+                    QuickLogger.Info($"BaseManager on Load {Manager} || {Manager.GetHasBreakerTripped()}");
+
+
                     if (Manager.GetHasBreakerTripped())
                     {
-                        Manager.OnBreakerToggled?.Invoke(Manager.GetHasBreakerTripped());
+                        //Manager.OnBreakerToggled?.Invoke(Manager.GetHasBreakerTripped());
                     }
                 }
 
