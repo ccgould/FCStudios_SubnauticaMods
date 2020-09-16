@@ -1,0 +1,15 @@
+{
+  "Id": "ARSSeaBreeze",
+  "DisplayName": "FCS Alterra Refrigeration Solutions SeaBreeze FCS32",
+  "Author": "Field Creators Studios",
+  "Version": "2.0.5",
+  "VersionDependencies": {
+    "FCSTechFabricator": "2.0.9",
+    "SMLHelper": "2.6.1"
+  },
+  "AssemblyName": "ARS_SeaBreezeFCS32.dll",
+  "Enable": true,
+  "VersionChecker": {
+    "LatestVersionURL": "https://https://github.com/ccgould/FCStudios_SubnauticaMods/raw/master/ARS_SeaBreezeFCS32/mod.json"
+  }
+}

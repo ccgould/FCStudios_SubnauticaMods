@@ -153,13 +153,20 @@
     <Folder Include="Abstract\" />
     <Folder Include="Interfaces\" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="mod.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
   <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\FCSCommon\GamePaths.targets" />
   <PropertyGroup Condition="$(Game) == 'Subnautica'">
     <PostBuildEvent>xcopy "$(ProjectDir)bin\$(Configuration)\ARS_SeaBreezeFCS32.dll" "$(SubnauticaDir)\QMods\FCS_ARSSeaBreeze\" /Y /I</PostBuildEvent>
+    <PostBuildEvent>xcopy "$(ProjectDir)bin\$(Configuration)\mod.json" "$(SubnauticaDir)\QMods\FCS_ARSSeaBreeze\" /Y /I</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup Condition="$(Game) == 'BelowZero'">
     <PostBuildEvent>xcopy "$(ProjectDir)bin\$(Configuration)\ARS_SeaBreezeFCS32.dll" "$(BelowZeroDir)\QMods\FCS_ARSSeaBreeze\" /Y /I</PostBuildEvent>
+    <PostBuildEvent>xcopy "$(ProjectDir)bin\$(Configuration)\mod.json" "$(BelowZeroDir)\QMods\FCS_ARSSeaBreeze\" /Y /I</PostBuildEvent>
   </PropertyGroup>
 </Project>

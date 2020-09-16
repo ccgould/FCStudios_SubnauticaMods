@@ -2,12 +2,15 @@
   "Id": "HydroponicHarvesters",
   "DisplayName": "Alterra Hydroponic Harvesters",
   "Author": "Field Creators Studios",
-  "Version": "1.2.1",
+  "Version": "1.4.3",
   "Game": "Subnautica",
   "AssemblyName": "HydroponicHarvesters.dll",
   "VersionDependencies": {
-    "SMLHelper": "2.6.0",
-    "FCSTechFabricator": "2.0.3"
+    "SMLHelper": "2.9",
+    "FCSTechFabricator": "2.0.9"
   },
-  "Enable": true
+  "Enable": true,
+  "VersionChecker": {
+    "LatestVersionURL": "https://https://github.com/ccgould/FCStudios_SubnauticaMods/raw/master/FCS_HydroponicHarvesters/mod.json"
+  }
 }
