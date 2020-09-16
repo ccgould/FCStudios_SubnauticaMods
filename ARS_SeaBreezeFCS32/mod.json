@@ -10,6 +10,6 @@
   "AssemblyName": "ARS_SeaBreezeFCS32.dll",
   "Enable": true,
   "VersionChecker": {
-    "LatestVersionURL": "https://https://github.com/ccgould/FCStudios_SubnauticaMods/raw/master/ARS_SeaBreezeFCS32/mod.json"
+    "LatestVersionURL": "https://github.com/ccgould/FCStudios_SubnauticaMods/raw/master/ARS_SeaBreezeFCS32/mod.json"
   }
 }

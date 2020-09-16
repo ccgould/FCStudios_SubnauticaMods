@@ -11,6 +11,6 @@
   "AssemblyName": "DataStorageSolutions.dll",
   "Enable": true,
   "VersionChecker": {
-    "LatestVersionURL": "https://https://github.com/ccgould/FCStudios_SubnauticaMods/raw/master/DataStorageSolutions/mod.json"
+    "LatestVersionURL": "https://github.com/ccgould/FCStudios_SubnauticaMods/raw/master/DataStorageSolutions/mod.json"
   }
 }

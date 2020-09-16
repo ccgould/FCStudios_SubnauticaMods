@@ -11,6 +11,6 @@
   "AssemblyName": "ExStorageDepot.dll",
   "Enable": true,
   "VersionChecker": {
-    "LatestVersionURL": "https://https://github.com/ccgould/FCStudios_SubnauticaMods/raw/master/ExStorageDepot/mod.json"
+    "LatestVersionURL": "https://github.com/ccgould/FCStudios_SubnauticaMods/raw/master/ExStorageDepot/mod.json"
   }
 }

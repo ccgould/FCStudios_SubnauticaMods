@@ -10,6 +10,6 @@
   "AssemblyName": "FCSTechFabricator.dll",
   "Enable": true,
   "VersionChecker": {
-    "LatestVersionURL": "https://https://github.com/ccgould/FCStudios_SubnauticaMods/raw/master/FCSTechFabricator/mod.json"
+    "LatestVersionURL": "https://github.com/ccgould/FCStudios_SubnauticaMods/raw/master/FCSTechFabricator/mod.json"
   }
 }
