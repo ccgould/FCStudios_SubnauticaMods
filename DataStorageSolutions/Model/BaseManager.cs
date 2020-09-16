@@ -512,7 +512,7 @@ namespace DataStorageSolutions.Model
             QuickLogger.Debug($"SeaBase Base Found in Track {newSeaBase?.name}");
             QuickLogger.Debug($"Terminal Base Found in Track {Habitat?.name}");
 
-            if (newSeaBase != null && fcsConnectableBase.Habitat == Habitat)
+            if (newSeaBase != null && fcsConnectableBase?.Habitat == Habitat)
             {
                 QuickLogger.Debug("Subscribing to OnContainerUpdate");
                 obj.GetStorage().OnContainerUpdate += OnFCSConnectableContainerUpdate;

@@ -118,11 +118,11 @@ namespace DataStorageSolutions.Helpers
                 {
                     if (EggHandler.GetDiscoveredEgg(techType, out TechType value))
                     {
-                        pickup = CraftData.InstantiateFromPrefab(value).GetComponent<Pickupable>();
+                        pickup = CraftData.InstantiateFromPrefab(value).EnsureComponent<Pickupable>();
                     }
                     else
                     {
-                        pickup = CraftData.InstantiateFromPrefab(techType).GetComponent<Pickupable>();
+                        pickup = CraftData.InstantiateFromPrefab(techType).EnsureComponent<Pickupable>();
                     }
                     if (!itemData.IsServer)
                     {
