@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 
 namespace FCSTechFabricator.Objects
@@ -42,6 +43,17 @@ namespace FCSTechFabricator.Objects
             _updateDisplay = updateDisplay;
         }
 
+        public string FormatFiltersData()
+        {
+            var sb = new StringBuilder();
+
+            foreach (Filter filter in _filters)
+            {
+                sb.Append($"{filter.GetString()},");
+            }
+
+            return sb.ToString();
+        }
         public void ForceUpdateDisplay()
         {
             _updateDisplay?.Invoke();
