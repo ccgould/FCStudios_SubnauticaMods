@@ -178,11 +178,11 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\FCSCommon\GamePaths.targets" />
   <PropertyGroup Condition="$(Game) == 'Subnautica'">
-    <PostBuildEvent>xcopy "$(ProjectDir)bin\$(Configuration)\FCSTechFabricator.dll" "$(SubnauticaDir)\QMods\FCS_TechFabricator\" /Y /I</PostBuildEvent>
-    <PostBuildEvent>xcopy "$(ProjectDir)bin\$(Configuration)\mod.json" "$(SubnauticaDir)\QMods\FCS_TechFabricator\" /Y /I</PostBuildEvent>
+    <PostBuildEvent>xcopy "$(ProjectDir)bin\$(Configuration)\FCSTechFabricator.dll" "$(SubnauticaDir)\QMods\FCS_TechFabricator\" /Y /I
+    xcopy "$(ProjectDir)bin\$(Configuration)\mod.json" "$(SubnauticaDir)\QMods\FCS_TechFabricator\" /Y /I</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup Condition="$(Game) == 'BelowZero'">
-    <PostBuildEvent>xcopy "$(ProjectDir)bin\$(Configuration)\FCSTechFabricator.dll" "$(BelowZeroDir)\QMods\FCS_TechFabricator\" /Y /I</PostBuildEvent>
-    <PostBuildEvent>xcopy "$(ProjectDir)bin\$(Configuration)\mod.json" "$(BelowZeroDir)\QMods\FCS_TechFabricator\" /Y /I</PostBuildEvent>
+    <PostBuildEvent>xcopy "$(ProjectDir)bin\$(Configuration)\FCSTechFabricator.dll" "$(BelowZeroDir)\QMods\FCS_TechFabricator\" /Y /I
+    xcopy "$(ProjectDir)bin\$(Configuration)\mod.json" "$(BelowZeroDir)\QMods\FCS_TechFabricator\" /Y /I</PostBuildEvent>
   </PropertyGroup>
 </Project>
