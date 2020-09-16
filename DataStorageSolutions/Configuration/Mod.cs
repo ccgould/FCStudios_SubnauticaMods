@@ -91,6 +91,13 @@ namespace DataStorageSolutions.Configuration
         internal const string ItemDisplayPrefabName = "ItemDisplay";
         internal const string ItemDisplayKitID = "ItemDisplay_Kit";
 
+        internal static Action OnBaseUpdate { get; set; }
+        internal static Action<DSSRackController> OnContainerUpdate { get; set; }
+        internal static List<TechType> AllTechTypes = new List<TechType>();
+        internal static LootDistributionData LootDistributionData { get; set; }
+
+        internal static event Action<SaveData> OnDataLoaded;
+
         public static List<TechType> BlackList = new List<TechType>
         {
            TechType.None,
@@ -732,17 +739,10 @@ TechType.Databox
                 new Ingredient(TechType.Titanium, 1)
             }
         };
-
-        internal static Action OnBaseUpdate { get; set; }
-        internal static Action<DSSRackController> OnContainerUpdate { get; set; }
-        internal static List<TechType> AllTechTypes = new List<TechType>();
-        public static LootDistributionData LootDistributionData { get; set; }
-
-        internal static event Action<SaveData> OnDataLoaded;
         #endregion
 
         #region Internal Methods
-        
+
         internal static void Save()
         {
             if (!IsSaving())
