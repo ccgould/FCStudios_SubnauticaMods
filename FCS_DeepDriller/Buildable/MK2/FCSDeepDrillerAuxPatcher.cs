@@ -80,8 +80,8 @@ namespace FCS_DeepDriller.Buildable.MK2
             LanguageHandler.SetLanguageLine(SettingsButtonKey, "Go to settings page.");
             LanguageHandler.SetLanguageLine(TakeFormattedKey, "Take {0}");
             LanguageHandler.SetLanguageLine(OilTankNotEmptyFormatKey, "Oil tank cannot oil anymore oil at this time try again in {0} minutes");
-            LanguageHandler.SetLanguageLine(OilTankDumpContainerTitleKey, "Oil Tank Dump Receptical.");
-            LanguageHandler.SetLanguageLine(PowercellDumpContainerTitleKey, "Powercell Draining Receptical.");
+            LanguageHandler.SetLanguageLine(OilTankDumpContainerTitleKey, "Oil Tank Dump Receptacle.");
+            LanguageHandler.SetLanguageLine(PowercellDumpContainerTitleKey, "Powercell Draining Receptacle.");
             LanguageHandler.SetLanguageLine(AddProgramButtonKey, "Add a upgrade function to the drill.");
             LanguageHandler.SetLanguageLine(InvalidFunctionFormatKey, "Invalid Function: {0}. This function doesn't exist please check the documentation.");
             LanguageHandler.SetLanguageLine(InvalidClassFormatKey, "Invalid Class: {0}. This class doesn't exist please check the documentation.");

@@ -17,7 +17,6 @@ namespace FCS_DeepDriller.Buildable.MK2
         public override TechGroup GroupForPDA { get; } = TechGroup.ExteriorModules;
         public override TechCategory CategoryForPDA { get; } = TechCategory.ExteriorModule;
         public override string IconFileName => "FCSDeepDriller.png";
-        public override TechType RequiredForUnlock { get; } = TechType.ExosuitDrillArmModule;
 
         public override string AssetsFolder { get; } = $"FCS_DeepDriller/Assets";
 

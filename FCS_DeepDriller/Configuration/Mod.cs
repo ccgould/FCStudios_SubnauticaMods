@@ -61,7 +61,6 @@ namespace FCS_DeepDriller.Configuration
                 new Ingredient(TechType.MapRoomHUDChip, 1),
                 new Ingredient(TechType.Titanium, 2),
                 new Ingredient(TechType.AdvancedWiringKit, 1),
-                new Ingredient(TechType.ExosuitDrillArmModule, 1),
                 new Ingredient(TechType.Lubricant, 1),
                 new Ingredient(TechType.VehicleStorageModule, 1),
             }

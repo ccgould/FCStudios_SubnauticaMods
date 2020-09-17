@@ -283,7 +283,7 @@ namespace FCS_DeepDriller.Managers
                     items.Add(TechType.MercuryOre);
                     break;
                 case TechType.DrillableUranium:
-                    items.Add(TechType.Uranium);
+                    items.Add(TechType.UraniniteCrystal);
                     break;
                 case TechType.DrillableAluminiumOxide:
                     items.Add(TechType.AluminumOxide);
