@@ -14,6 +14,7 @@ using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Interfaces;
 using FCSCommon.Objects;
+using FCSTechFabricator.Abstract;
 using FCSTechFabricator.Components;
 using FCSTechFabricator.Enums;
 using FCSTechFabricator.Extensions;
@@ -36,7 +37,6 @@ namespace DataStorageSolutions.Mono
         private int _buttonState;
         private GameObject _drives;
         private DSSAudioHandler _audioManager;
-        private BaseManager _manager;
         private const int RackDoorStateClosed = 0;
         private const int RackDoorStateOpen = 1;
         public int GetContainerFreeSpace => CalculateContainerFreeSpace();
@@ -53,27 +53,14 @@ namespace DataStorageSolutions.Mono
         private bool _allowedToNotify = true;
         Action<int, int> IFCSStorage.OnContainerUpdate { get; set; }
 
-        public override BaseManager Manager
-        {
-            get => _manager;
-            set
-            {
-                _manager = value;
-                //Because the way the Terminal is lazy loaded. I choose to lazy load the power manager based on the manager setter
-                if (value != null)
-                {
-                    PowerManager?.Initialize(this, QPatch.Configuration.Config.ScreenPowerUsage);
-                }
-
-            }
-        }
+        public override BaseManager Manager { get; set; }
 
         public TechType TechType => GetTechType();
         internal AnimationManager AnimationManager { get; private set; }
         internal DSSRackDisplayController DisplayManager { get; private set; }
         public override DumpContainer DumpContainer { get; set; }
         internal ColorManager ColorManager { get; private set; }
-        public PowerManager PowerManager { get; private set; }
+        public override FCSPowerManager PowerManager { get; set; }
 
         #region Unity
 
@@ -116,11 +103,6 @@ namespace DataStorageSolutions.Mono
         private void Update()
         {
             OnUpdate?.Invoke();
-            if (IsConstructed && PowerManager != null)
-            {
-                PowerManager?.UpdatePowerState();
-                PowerManager?.ConsumePower();
-            }
         }
 
         #endregion
@@ -270,12 +252,7 @@ namespace DataStorageSolutions.Mono
                 }
             }
         }
-
-        internal void UpdatePowerUsage()
-        {
-            PowerManager.UpdatePowerUsage((QPatch.Configuration.Config.ServerPowerUsage * GetServerCount() + QPatch.Configuration.Config.RackPowerUsage));
-        }
-
+        
         internal bool IsRackOpen()
         {
             return AnimationManager.GetIntHash(_rackDoor) == 1;
@@ -375,12 +352,7 @@ namespace DataStorageSolutions.Mono
 
         internal void AddToBaseManager(BaseManager managers = null)
         {
-            if (SubRoot == null)
-            {
-                SubRoot = GetComponentInParent<SubRoot>();
-            }
-
-            Manager = managers ?? BaseManager.FindManager(SubRoot);
+            Manager = managers ?? BaseManager.FindManager(gameObject);
             
             Manager.AddRack(this);
         }
@@ -401,18 +373,12 @@ namespace DataStorageSolutions.Mono
 
             _audioManager = new DSSAudioHandler(transform);
             
-            Mod.OnContainerUpdate += OnContainerUpdate;
+            //Mod.OnContainerUpdate += OnContainerUpdate;
 
             _rackDoor = Animator.StringToHash("WallMountRackDriveState");
             _buttonState = Animator.StringToHash("ButtonState");
 
             InvokeRepeating(nameof(CheckIfRemoved), 0.5f, 0.5f);
-
-            if (PowerManager == null)
-            {
-                PowerManager = gameObject.AddComponent<PowerManager>();
-                PowerManager.OnPowerUpdate += OnPowerUpdate;
-            }
 
             if (ColorManager == null)
             {

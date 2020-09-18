@@ -73,16 +73,16 @@ namespace DataStorageSolutions.Mono
         private void OnInterfaceButton(bool obj)
         {
             QuickLogger.Info("OnInteractionChanged");
-            if (_pickupable != null && _mono.IsMounted)
-            {
-                QuickLogger.Info("Changing Pickupable");
-                _pickupable.isPickupable = obj;
-                if (_collider != null)
-                {
-                    _collider.isTrigger = !obj;
-                }
+            //if (_pickupable != null && _mono.IsMounted)
+            //{
+            //    QuickLogger.Info("Changing Pickupable");
+            //    _pickupable.isPickupable = obj;
+            //    if (_collider != null)
+            //    {
+            //        _collider.isTrigger = !obj;
+            //    }
 
-            }
+            //}
         }
         
         internal void UpdateDisplay()

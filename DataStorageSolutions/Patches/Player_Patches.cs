@@ -1,5 +1,6 @@
 ﻿using System;
 using DataStorageSolutions.Model;
+using DataStorageSolutions.Mono;
 using FCSCommon.Utilities;
 using HarmonyLib;
 
@@ -22,8 +23,8 @@ namespace DataStorageSolutions.Patches
                 {
                     BaseManager.RemoveDestroyedBases();
                     BaseManager.OnPlayerTick?.Invoke();
-                    BaseManager.PerformOperations();
-                    BaseManager.PerformCraft();
+                    //BaseManager.PerformOperations();
+                    //BaseManager.PerformCraft();
                     _timeLeft = 1f;
                 }
             }

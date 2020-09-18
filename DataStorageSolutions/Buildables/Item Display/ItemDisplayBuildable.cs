@@ -60,7 +60,7 @@ namespace DataStorageSolutions.Buildables.Item_Display
                 prefabID.ClassId = ClassID;
 
                 prefab.AddComponent<TechTag>().type = TechType;
-                prefab.AddComponent<DSSItemDisplayController>();
+                //prefab.AddComponent<DSSItemDisplayController>();
 
                 return prefab;
             }

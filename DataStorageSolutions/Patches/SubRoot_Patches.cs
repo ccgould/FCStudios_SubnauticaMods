@@ -1,6 +1,8 @@
 ﻿using DataStorageSolutions.Model;
+using DataStorageSolutions.Mono;
 using FCSCommon.Utilities;
 using HarmonyLib;
+using UnityEngine;
 
 namespace DataStorageSolutions.Patches
 {
@@ -11,7 +13,10 @@ namespace DataStorageSolutions.Patches
         [HarmonyPostfix]
         public static void Postfix(ref SubRoot __instance)
         {
-            var manager = BaseManager.FindManager(__instance);
+            if (__instance.gameObject.activeSelf && __instance.gameObject.transform.position != Vector3.zero)
+            {
+                var manager = BaseManager.FindManager(__instance);
+            }
         }
     }
 

@@ -1,13 +1,11 @@
 ﻿using System.Collections.Generic;
-using System.Globalization;
 using DataStorageSolutions.Abstract;
 using DataStorageSolutions.Buildables;
 using DataStorageSolutions.Configuration;
+using DataStorageSolutions.Helpers;
 using DataStorageSolutions.Interfaces;
 using DataStorageSolutions.Model;
-using FCSCommon.Enums;
 using FCSCommon.Utilities;
-using FCSTechFabricator.Components;
 using FCSTechFabricator.Enums;
 using FCSTechFabricator.Extensions;
 using FCSTechFabricator.Managers;
@@ -17,28 +15,25 @@ namespace DataStorageSolutions.Mono
 {
     internal class DSSAntennaController : DataStorageSolutionsController, IBaseAntenna, IHandTarget
     {
+        #region Private Fields
+
         private bool _isContructed;
-        private string _prefabID;
-        private TechType _techType = TechType.None;
         private bool _runStartUpOnEnable;
         private bool _fromSave;
         private SaveDataEntry _savedData;
 
+        #endregion
+
+        #region Public Properties
+
         public override bool IsConstructed => _isContructed;
         public override BaseManager Manager { get; set; }
-        public TechType TechType => GetTechType();
+
         public ColorManager ColorManager { get; set; }
-        public PowerManager PowerManager { get; private set; }
 
-        private TechType GetTechType()
-        {
-            if (_techType != TechType.None) return _techType;
+        #endregion
 
-            var techTag = gameObject.GetComponentInChildren<TechTag>();
-            _techType = techTag != null ? techTag.type : TechType.None;
-
-            return _techType;
-        }
+        #region Unity Methods
 
         private void OnEnable()
         {
@@ -63,21 +58,6 @@ namespace DataStorageSolutions.Mono
                 }
             }
         }
-        
-        private void ReadySaveData()
-        {
-            QuickLogger.Debug("In OnProtoDeserialize");
-            _savedData = Mod.GetSaveData(GetPrefabIDString());
-        }
-
-        private void Update()
-        {
-            if (IsConstructed && PowerManager != null && SubRoot != null)
-            {
-                PowerManager?.UpdatePowerState();
-                PowerManager?.ConsumePower();
-            }
-        }
 
         private void OnDestroy()
         {
@@ -86,37 +66,22 @@ namespace DataStorageSolutions.Mono
             Mod.OnAntennaBuilt?.Invoke(false);
         }
 
-        private void FindSubRoot()
-        {
-            if (SubRoot == null)
-            {
-                SubRoot = GetComponentInParent<SubRoot>();
-            }
-        }
+        #endregion
         
-        public string GetPrefabIDString()
-        {
-            if (string.IsNullOrEmpty(_prefabID))
-            {
-                var id = GetComponentInChildren<PrefabIdentifier>() ?? GetComponentInParent<PrefabIdentifier>();
-                _prefabID = id != null ? id.Id : string.Empty;
-            }
-
-            return _prefabID;
-        }
-
         public override void Initialize()
         {
-            GetData();
-            
-            QuickLogger.Debug($"Antenna Count: {BaseManager.BaseAntennas.Count}");
+            Manager = BaseManager.FindManager(gameObject);
 
-            if (PowerManager == null)
+            if (Manager == null)
             {
-                PowerManager = gameObject.AddComponent<PowerManager>();
-                PowerManager.Initialize(this, QPatch.Configuration.Config.AntennaPowerUsage);
-                PowerManager.OnPowerUpdate += OnPowerUpdate;
+                //TODO Notify Player somehow.
+                return;
             }
+
+
+#if DEBUG
+            QuickLogger.Debug($"Antenna Count: {BaseManager.BaseAntennas.Count}");
+#endif
 
             if (ColorManager == null)
             {
@@ -128,42 +93,23 @@ namespace DataStorageSolutions.Mono
 
             Mod.OnAntennaBuilt?.Invoke(true);
 
+            PowerManager = Manager.BasePowerManager;
+
             IsInitialized = true;
         }
-
-        private void OnPowerUpdate(FCSPowerStates obj, BaseManager manager)
+        
+        public bool IsVisible()
         {
-            Mod.OnBaseUpdate?.Invoke();
+            return IsConstructed && IsInitialized && PowerManager.GetPowerState() == FCSPowerStates.Powered;
         }
 
-        public override void Save(SaveData newSaveData)
+        public void ChangeColorMask(Color color)
         {
-            if (!IsInitialized
-                || !IsConstructed) return;
-
-            var id = GetPrefabIDString();
-
-            if (_savedData == null)
-            {
-                _savedData = new SaveDataEntry();
-            }
-
-            _savedData.ID = id;
-            _savedData.AntennaBodyColor = ColorManager.GetMaskColor().ColorToVector4();
-            _savedData.AntennaName = Manager.GetBaseName();
-            newSaveData.Entries.Add(_savedData);
+            if (!IsInitialized) return;
+            ColorManager.ChangeColorMask(color);
         }
 
-        internal HashSet<DSSRackController> GetData()
-        {
-            if (!_isContructed) return null;
-
-            FindSubRoot();
-
-            Manager = Manager ?? BaseManager.FindManager(SubRoot);
-
-            return Manager.BaseRacks;
-        }
+        #region IProtoEventListener
 
         public override void OnProtoSerialize(ProtobufSerializer serializer)
         {
@@ -171,10 +117,10 @@ namespace DataStorageSolutions.Mono
 
             if (!Mod.IsSaving())
             {
-                var id = GetPrefabIDString();
-                QuickLogger.Info($"Saving {id}");
+
+                QuickLogger.Info($"Saving {_prefabId}");
                 Mod.Save();
-                QuickLogger.Info($"Saved {id}");
+                QuickLogger.Info($"Saved {_prefabId}");
             }
         }
 
@@ -188,7 +134,11 @@ namespace DataStorageSolutions.Mono
             }
             _fromSave = true;
         }
-        
+
+        #endregion
+
+        #region IConstructable
+
         public override void OnConstructedChanged(bool constructed)
         {
             _isContructed = constructed;
@@ -205,14 +155,29 @@ namespace DataStorageSolutions.Mono
                 }
             }
         }
-        
+
+        #endregion
+
+        #region IHandTarget
+
         public void OnHandHover(GUIHand hand)
         {
             HandReticle main = HandReticle.main;
+            
             var state = PowerManager?.GetPowerState() == FCSPowerStates.Powered ? "On" : "Off";
 #if SUBNAUTICA
-            main.SetInteractTextRaw(Manager?.GetBaseName(), $"{AuxPatchers.Antenna()}: {state} || {AuxPatchers.PowerUsage()}: {PowerManager?.GetPowerUsage():F1}");
+            if(!IsInitialized)
+            {
+                main.SetInteractTextRaw("Error","Base Not Found");
+                return;
+            }
+            main.SetInteractTextRaw(Manager?.GetBaseName(), $"{AuxPatchers.Antenna()}: {state} || {AuxPatchers.PowerUsage()}: {QPatch.Configuration.Config.AntennaPowerUsage:F1}");
 #elif BELOWZERO
+            if(!IsInitialized)
+            {
+                main.SetText("Error","Base Not Found",false);
+                return;
+            }
             main.SetText(HandReticle.TextType.Info, Manager.GetBaseName(), false);
 #endif
             main.SetIcon(HandReticle.IconType.Info, 1f);
@@ -223,14 +188,33 @@ namespace DataStorageSolutions.Mono
 
         }
 
-        public bool IsVisible()
+        #endregion
+
+        #region Save Handler
+
+        private void ReadySaveData()
         {
-            return IsConstructed && PowerManager.GetPowerState() == FCSPowerStates.Powered;
+            QuickLogger.Debug("In OnProtoDeserialize");
+            _savedData = Mod.GetSaveData(GetPrefabID());
         }
 
-        public void ChangeColorMask(Color color)
+        public override void Save(SaveData newSaveData)
         {
-            ColorManager.ChangeColorMask(color);
+            if (!IsInitialized
+                || !IsConstructed) return;
+
+            if (_savedData == null)
+            {
+                _savedData = new SaveDataEntry();
+            }
+
+            _savedData.ID = GetPrefabID();
+            _savedData.AntennaBodyColor = ColorManager.GetMaskColor().ColorToVector4();
+            _savedData.AntennaName = Manager.GetBaseName();
+            newSaveData.Entries.Add(_savedData);
         }
+
+        #endregion
+
     }
 }

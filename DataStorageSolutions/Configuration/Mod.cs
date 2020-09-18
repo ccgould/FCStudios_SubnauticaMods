@@ -92,7 +92,7 @@ namespace DataStorageSolutions.Configuration
         internal const string ItemDisplayKitID = "ItemDisplay_Kit";
 
         internal static Action OnBaseUpdate { get; set; }
-        internal static Action<DSSRackController> OnContainerUpdate { get; set; }
+        //internal static Action<DSSRackController> OnContainerUpdate { get; set; }
         internal static List<TechType> AllTechTypes = new List<TechType>();
         internal static LootDistributionData LootDistributionData { get; set; }
 
@@ -747,6 +747,7 @@ TechType.Databox
         {
             if (!IsSaving())
             {
+                //TODO ENblw
                 _saveObject = new GameObject().AddComponent<ModSaver>();
 
                 SaveData newSaveData = new SaveData();
@@ -761,7 +762,7 @@ TechType.Databox
                 CleanServers();
 
                 newSaveData.Servers = Servers;
-                newSaveData.Bases = BaseManager.GetSaveData().ToList();
+                //newSaveData.Bases = BaseManager.GetSaveData().ToList();
                 _saveData = newSaveData;
 
                 if (_saveData == null)

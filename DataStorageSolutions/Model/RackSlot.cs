@@ -40,7 +40,6 @@ namespace DataStorageSolutions.Model
             set
             {
                 _isOccupied = value;
-                _mono.UpdatePowerUsage();
                 ChangeDummyState(value);
             }
         }
@@ -269,7 +268,7 @@ namespace DataStorageSolutions.Model
         internal void UpdateNetwork()
         {
             UpdateScreen();
-            Mod.OnContainerUpdate?.Invoke(_mono);
+            //Mod.OnContainerUpdate?.Invoke(_mono);
         }
 
         public bool IsAllowedToAdd(TechType techType)

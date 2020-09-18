@@ -2,6 +2,7 @@
 using System.Linq;
 using DataStorageSolutions.Helpers;
 using DataStorageSolutions.Model;
+using DataStorageSolutions.Mono;
 using FCSCommon.Utilities;
 using UnityEngine;
 
@@ -79,7 +80,7 @@ namespace DataStorageSolutions.Patches
                     {
                         if (baseManager.IsOperational)
                         {
-                            __result += baseManager.GetItemCount(techType);
+                            //__result += baseManager.GetItemCount(techType);
                         }
                     }
                     else
@@ -111,13 +112,13 @@ namespace DataStorageSolutions.Patches
 
                     for (int i = 0; i < count; i++)
                     {
-                        var server = currentBase?.GetServerWithItem(techType);
+                        //var server ;//currentBase?.GetServerWithItem(techType);
 
-                        if (server != null)
-                        {
-                            server.Remove(techType);
-                            num++;
-                        }
+                        //if (server != null)
+                        //{
+                        //    server.Remove(techType);
+                        //    num++;
+                        //}
                     }
 
                     if (num == count)

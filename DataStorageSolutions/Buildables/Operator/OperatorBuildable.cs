@@ -62,7 +62,7 @@ namespace DataStorageSolutions.Buildables.Operator
                 prefabID.ClassId = ClassID;
 
                 prefab.AddComponent<TechTag>().type = TechType;
-                prefab.AddComponent<DSSOperatorController>();
+                //prefab.AddComponent<DSSOperatorController>();
 
                 return prefab;
             }

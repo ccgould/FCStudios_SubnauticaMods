@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 namespace DataStorageSolutions.Display
 {
-    internal class DSSUIButton : InterfaceButton
+    internal class DSSVehicleUIButton : InterfaceButton
     {
         float _timeLeft = 2.0f;
         public Vehicle Vehicle { get; set; }

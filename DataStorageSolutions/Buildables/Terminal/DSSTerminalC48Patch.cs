@@ -59,7 +59,7 @@ namespace DataStorageSolutions.Buildables.Terminal
                 prefabID.ClassId = ClassID;
 
                 prefab.AddComponent<TechTag>().type = TechType;
-                prefab.AddComponent<DSSTerminalController>();
+                //prefab.AddComponent<DSSTerminalController>();
 
                 return prefab;
             }

@@ -207,7 +207,7 @@ namespace DataStorageSolutions.Mono
                 if (!_isContructed ) return null;
                 
                 Manager = Manager ?? BaseManager.FindManager(SubRoot);
-                Manager.AddTerminal(this);
+                Manager.RegisterTerminal(this);
                 Manager.OnVehicleStorageUpdate += OnVehicleStorageUpdate;
                 Manager.OnVehicleUpdate += OnVehicleUpdate;
                 Manager.OnContainerUpdate += OnContainerUpdate;

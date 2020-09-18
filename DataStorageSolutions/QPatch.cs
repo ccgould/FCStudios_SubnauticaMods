@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using DataStorageSolutions.Buildables;
 using DataStorageSolutions.Buildables.Antenna;
@@ -19,10 +16,8 @@ using FCSTechFabricator;
 using FCSTechFabricator.Components;
 using FCSTechFabricator.Craftables;
 using HarmonyLib;
-using Oculus.Newtonsoft.Json;
 using QModManager.API;
 using QModManager.API.ModLoading;
-using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
 using UnityEngine;
@@ -44,30 +39,26 @@ namespace DataStorageSolutions
             var icon = ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetFolder(), $"{Mod.ModName}.png"));
             var craftingTab = new CraftingTab(Mod.DSSTabID, Mod.ModFriendlyName, icon);
 
-            //Floor Mounted Rack Has Been Cut
-            //var floorMountedRack = new FCSKit(Mod.FloorMountedRackKitClassID, Mod.FloorMountedRackFriendlyName, craftingTab , Mod.FloorMountedRackIngredients);
-            //floorMountedRack.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
+            //var wallMountedRack = new FCSKit(Mod.WallMountedRackKitClassID, Mod.WallMountedRackFriendlyName, craftingTab, Mod.WallMountedRackIngredients);
+            //wallMountedRack.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
 
-            var wallMountedRack = new FCSKit(Mod.WallMountedRackKitClassID, Mod.WallMountedRackFriendlyName, craftingTab, Mod.WallMountedRackIngredients);
-            wallMountedRack.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
-
-            var terminal = new FCSKit(Mod.TerminalKitClassID, Mod.TerminalFriendlyName, craftingTab, Mod.TerminalIngredients);
-            terminal.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
+            //var terminal = new FCSKit(Mod.TerminalKitClassID, Mod.TerminalFriendlyName, craftingTab, Mod.TerminalIngredients);
+            //terminal.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
 
             var antenna = new FCSKit(Mod.AntennaKitClassID, Mod.AntennaFriendlyName, craftingTab, Mod.AntennaIngredients);
             antenna.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
 
-            var serverFormattingStation = new FCSKit(Mod.ServerFormattingStationKitClassID, Mod.ServerFormattingStationFriendlyName, craftingTab, Mod.ServerFormattingStationIngredients);
-            serverFormattingStation.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
+            //var serverFormattingStation = new FCSKit(Mod.ServerFormattingStationKitClassID, Mod.ServerFormattingStationFriendlyName, craftingTab, Mod.ServerFormattingStationIngredients);
+            //serverFormattingStation.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
 
-            Server = new ServerCraftable(Mod.ServerClassID, Mod.ServerFriendlyName, Mod.ServerDescription, craftingTab);
-            Server.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
+            //Server = new ServerCraftable(Mod.ServerClassID, Mod.ServerFriendlyName, Mod.ServerDescription, craftingTab);
+            //Server.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
 
-            var operatorB = new FCSKit(Mod.OperatorKitClassID, Mod.OperatorFriendlyName, craftingTab,Mod.DSSOperatorIngredients);
-            operatorB.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
+            //var operatorB = new FCSKit(Mod.OperatorKitClassID, Mod.OperatorFriendlyName, craftingTab,Mod.DSSOperatorIngredients);
+            //operatorB.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
 
-            var itemDisplay = new FCSKit(Mod.ItemDisplayKitID, Mod.ItemDisplayFriendlyName, craftingTab,Mod.ItemDisplayIngredients);
-            itemDisplay.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
+            //var itemDisplay = new FCSKit(Mod.ItemDisplayKitID, Mod.ItemDisplayFriendlyName, craftingTab,Mod.ItemDisplayIngredients);
+            //itemDisplay.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
         }
 
         internal static ServerCraftable Server { get; set; }
@@ -102,31 +93,26 @@ namespace DataStorageSolutions
                 var antenna = new AntennaBuildable();
                 antenna.Patch();
 
-                //Floor Mounted Rack Has Been Cut
-                //var floorMountedRack = new FloorMountedRackBuildable();
-                //floorMountedRack.Patch();
+                //var wallMountedRack = new WallMountedRackBuildable();
+                //wallMountedRack.Patch();
 
-                var wallMountedRack = new WallMountedRackBuildable();
-                wallMountedRack.Patch();
+                //var terminal = new DSSTerminalC48Buildable();
+                //terminal.Patch();
 
-                var terminal = new DSSTerminalC48Buildable();
-                terminal.Patch();
-
-                var operatorB = new OperatorBuildable();
-                operatorB.Patch();
+                //var operatorB = new OperatorBuildable();
+                //operatorB.Patch();
 
                 var serverFormattingStation = new ServerFormattingStationBuildable();
                 serverFormattingStation.Patch();
 
-                var itemDisplay = new ItemDisplayBuildable();
-                itemDisplay.Patch();
+                //var itemDisplay = new ItemDisplayBuildable();
+                //itemDisplay.Patch();
 
                 _harmony = new Harmony("com.datastoragesolutions.fstudios");
 
                 _harmony.PatchAll(Assembly.GetExecutingAssembly());
 
                 PatchEasyCraft();
-                //PatchTechData(harmony);
 
                 IsDockedVehicleStorageAccessInstalled = QModServices.Main.ModPresent("DockedVehicleStorageAccess");
                 

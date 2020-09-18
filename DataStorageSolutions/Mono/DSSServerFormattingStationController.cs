@@ -26,11 +26,10 @@ namespace DataStorageSolutions.Mono
         private DSSServerController _controller;
         private List<Filter> _filters = new List<Filter>();
         public override BaseManager Manager { get; set; }
-
         public ColorManager ColorManager { get; private set; }
         public DSSServerFormattingStationDisplay DisplayManager { get; private set; }
         public AnimationManager AnimationManager { get; private set; }
-        public DumpContainer DumpContainer { get; private set; }
+        public override DumpContainer DumpContainer { get; set; }
         public int GetContainerFreeSpace { get; }
         public bool IsFull { get; }
         Action<int, int> IFCSStorage.OnContainerUpdate { get; set; }
@@ -240,17 +239,17 @@ namespace DataStorageSolutions.Mono
 
         public Pickupable RemoveItemFromContainer(TechType techType, int amount)
         {
-            throw new NotImplementedException();
+            return null;
         }
 
         public bool ContainsItem(TechType techType)
         {
-            throw new NotImplementedException();
+            return false;
         }
 
         public Dictionary<TechType, int> GetItemsWithin()
         {
-            throw new NotImplementedException();
+            return null;
         }
 
         internal void AddFilter(Filter filter)

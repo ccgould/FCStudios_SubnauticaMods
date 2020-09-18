@@ -1,22 +1,22 @@
 ﻿using System;
 using DataStorageSolutions.Abstract;
-using DataStorageSolutions.Model;
-using FCSCommon.Enums;
 using FCSCommon.Utilities;
+using FCSTechFabricator.Abstract;
 using FCSTechFabricator.Enums;
 using UnityEngine;
 
 namespace DataStorageSolutions.Mono
 {
-    internal class PowerManager : MonoBehaviour
+    internal class BasePowerManager : FCSPowerManager
     {
         #region Private Members
         private FCSPowerStates _powerState;
         private PowerRelay _connectedRelay;
-        private DataStorageSolutionsController _mono;
         private float _energyConsumptionPerSecond;
         private FCSPowerStates _prevPowerState;
-        private float AvailablePower => this.ConnectedRelay.GetPower();
+        private bool _isInitialized;
+        private BaseManager _manager;
+        private float AvailablePower => ConnectedRelay?.GetPower() ?? 0f;
         private PowerRelay ConnectedRelay
         {
             get
@@ -35,105 +35,70 @@ namespace DataStorageSolutions.Mono
                 _powerState = value;
                 if (_prevPowerState != value)
                 {
-                    OnPowerUpdate?.Invoke(value,_mono.Manager);
+                    OnPowerUpdate?.Invoke(value,_manager);
                     _prevPowerState = value;
                 }
             }
         }
-        private bool _hasPowerToConsume;
         private float _energyToConsume;
         #endregion
 
         #region Internal Properties
 
         internal Action<FCSPowerStates,BaseManager> OnPowerUpdate;
-        private bool _isInitailized;
 
         #endregion
         
         #region Internal Methods
-        internal void Initialize(DataStorageSolutionsController mono, float powerConsumption)
+        internal void Initialize(BaseManager manager)
         {
-            if (_isInitailized) return;
+            if (_isInitialized) return;
 
-                _mono = mono;
+                _manager = manager;
 
-            _energyConsumptionPerSecond = powerConsumption;
-            _isInitailized = true;
+            _isInitialized = true;
         }
         
         internal void UpdatePowerState()
         {
-            var habitat = _mono?.SubRoot;
+            var habitat = _manager.Habitat;
 
-            if (habitat == null || habitat.powerRelay == null || _mono.Manager == null) return;
+            if (habitat == null || habitat.powerRelay == null || _manager == null) return;
 
-            if (_mono.Manager.GetHasBreakerTripped())
+            if (_manager.GetHasBreakerTripped())
             {
-                SetPowerStates(FCSPowerStates.Tripped);
+                SetPowerState(FCSPowerStates.Tripped);
             }
             else if (habitat.powerRelay.GetPowerStatus() == PowerSystem.Status.Offline)
             {
-                SetPowerStates(FCSPowerStates.Unpowered);
+                SetPowerState(FCSPowerStates.Unpowered);
             }
             else if (habitat.powerRelay.GetPowerStatus() == PowerSystem.Status.Normal || habitat.powerRelay.GetPowerStatus() == PowerSystem.Status.Emergency)
             {
-                SetPowerStates(FCSPowerStates.Powered);
+                SetPowerState(FCSPowerStates.Powered);
             }
         }
 
         internal void ConsumePower()
         {
             if(PowerState == FCSPowerStates.Tripped)return;
+
             _energyToConsume = _energyConsumptionPerSecond * DayNightCycle.main.deltaTime;
             bool requiresEnergy = GameModeUtils.RequiresPower();
-            _hasPowerToConsume = !requiresEnergy || AvailablePower >= _energyToConsume;
 
             if (PowerState == FCSPowerStates.Unpowered) return;
 
             if (!requiresEnergy) return;
             ConnectedRelay.ConsumeEnergy(_energyToConsume, out float amountConsumed);
-            //QuickLogger.Debug($"Energy Consumed: {amountConsumed}");
         }
         
-        /// <summary>
-        /// Gets the powerState of the unit.
-        /// </summary>
-        /// <returns></returns>
-        internal FCSPowerStates GetPowerState()
-        {
-            return PowerState;
-        }
-
-        /// <summary>
-        /// Sets the powerstate
-        /// </summary>
-        /// <param name="powerState">The power state to set this unit</param>
-        internal void SetPowerStates(FCSPowerStates powerState)
-        {
-            PowerState = powerState;
-        }
-
-        internal float GetPowerUsage()
-        {
-            if (PowerState != FCSPowerStates.Powered)
-            {
-                return 0f;
-            }
-            return Mathf.Round(_energyConsumptionPerSecond * 60) / 10f;
-        }
-
-        internal PowerRelay CurrentRelay()
-        {
-            return _connectedRelay;
-        }
         #endregion
 
         #region Private Methods
         private void UpdatePowerRelay()
         {
-            if(_mono == null) return;
-            PowerRelay relay = PowerSource.FindRelay(_mono.transform);
+            if(_manager == null || _manager.Habitat == null) return;
+            PowerRelay relay = PowerSource.FindRelay(_manager.Habitat.transform);
             if (relay != null && relay != _connectedRelay)
             {
                 _connectedRelay = relay;
@@ -148,16 +113,36 @@ namespace DataStorageSolutions.Mono
 
         private void Update()
         {
-            if (_mono == null || !_mono.IsConstructed) return;
+            if (_manager == null) return;
             UpdatePowerState();
             ConsumePower();
         }
 
         #endregion
 
-        public void UpdatePowerUsage(float configServerPowerUsage)
+        public void AddPowerUsage(float usage)
         {
-            _energyConsumptionPerSecond = configServerPowerUsage;
+            _energyConsumptionPerSecond += usage;
+        }
+
+        public void RemovePowerUsage(float usage)
+        {
+            _energyConsumptionPerSecond -= usage;
+        }
+
+        public override float GetPowerUsagePerSecond()
+        {
+            return _energyConsumptionPerSecond;
+        }
+
+        public override FCSPowerStates GetPowerState()
+        {
+            return _powerState;
+        }
+
+        public override void SetPowerState(FCSPowerStates state)
+        {
+            PowerState = state;
         }
     }
 }

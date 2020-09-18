@@ -17,6 +17,7 @@ using UnityEngine;
 
 namespace DataStorageSolutions.Helpers
 {
+    //TODO REDO Class
     internal static class DSSHelpers
     {
         private static SaveDataObjectType FindSaveDataObjectType(GameObject go)
@@ -440,11 +441,11 @@ namespace DataStorageSolutions.Helpers
             {
                 foreach (Ingredient ingredient in techData.Ingredients)
                 {
-                    if (craft.Manager.GetItemCount(ingredient.techType) < ingredient.amount)
-                    {
-                        pass = false;
-                        break;
-                    }
+                    //if (craft.Manager.GetItemCount(ingredient.techType) < ingredient.amount)
+                    //{
+                    //    pass = false;
+                    //    break;
+                    //}
                 }
             }
 

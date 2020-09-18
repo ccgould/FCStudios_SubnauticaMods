@@ -14,7 +14,7 @@ namespace DataStorageSolutions.Mono
 {
     internal class DSSServerController : DataStorageSolutionsController, IFCSStorage, IBaseUnit
     {
-        private DSSRackController _mono;
+        //private DSSRackController _mono;
         private int _slot;
         private TechType _techType = TechType.None;
         private bool _runStartUpOnEnable = true;
@@ -30,7 +30,7 @@ namespace DataStorageSolutions.Mono
         [JsonIgnore] public bool IsFull => CheckIfFull();
 
         [JsonIgnore] public TechType TechType => GetTechType();
-        [JsonIgnore] internal bool IsMounted => _mono != null;
+        //[JsonIgnore] internal bool IsMounted => _mono != null;
         [JsonIgnore] public DSSServerDisplay DisplayManager { get; private set; }
 
         [JsonIgnore] Action<int, int> IFCSStorage.OnContainerUpdate { get; set; }
@@ -181,7 +181,7 @@ namespace DataStorageSolutions.Mono
             {
                 FCSFilteredStorage.Items.Add(new ObjectData { TechType = item});
                 UpdateScreen();
-                Mod.OnContainerUpdate?.Invoke(_mono);
+                //Mod.OnContainerUpdate?.Invoke(_mono);
             }
         }
         
