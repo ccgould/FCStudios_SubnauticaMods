@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using AlterraGen.Buildables;
 using AlterraGen.Configuration;
 using AlterraGen.Enumerators;
 using FCSCommon.Enums;
@@ -20,11 +21,11 @@ namespace AlterraGen.Mono
         private readonly List<TechType> _toRemove = new List<TechType>();
         private AlterraGenController _mono;
         private FCSPowerStates _prevPowerState;
-        private const int MaxSlots = 8;
         private PowerRelay _powerRelay;
         private PowerSource _powerSource;
         private float _storedPower;
         private FCSPowerStates _powerState = FCSPowerStates.Powered;
+        internal int MaxSlots => 9;
 
         internal bool ProducingPower
         {
@@ -70,7 +71,7 @@ namespace AlterraGen.Mono
         {
             OnPowerUpdateCycle?.Invoke(this);
 		}
-
+        
         private void Update()
         {
             if (this.ProducingPower)
@@ -101,7 +102,7 @@ namespace AlterraGen.Mono
                 {
                     TechType techType = inventoryItem;
                     float num2 = 0f;
-                    if (FuelTypes.Charge.TryGetValue(techType, out num2) && this._toConsume >= num2)
+                    if (Mod.GetBioChargeValues().TryGetValue(techType, out num2) && this._toConsume >= num2)
                     {
                         _toConsume -= num2;
                         _toRemove.Add(techType);
@@ -125,11 +126,26 @@ namespace AlterraGen.Mono
 
         #region IFCSStorage
 
-        public int GetContainerFreeSpace { get; }
+        public int GetContainerFreeSpace => MaxSlots - _container.Count;
         public bool IsFull => _container.Count >= MaxSlots;
         public bool CanBeStored(int amount, TechType techType)
         {
-            return !IsFull && FuelTypes.Charge.ContainsKey(techType);
+            
+            if (!Mod.GetBioChargeValues().ContainsKey(techType))
+            {
+                QuickLogger.ModMessage(AlterraGenBuildable.NotAllowedItem());
+                return false;
+            }
+
+            var storageResult = !IsFull && amount + _container.Count <= MaxSlots;
+            
+            if (!storageResult)
+            {
+                QuickLogger.ModMessage(AlterraGenBuildable.StorageFullMessage());
+                return false;
+            }
+            
+            return true;
         }
 
         public bool AddItemToContainer(InventoryItem item)
@@ -147,12 +163,7 @@ namespace AlterraGen.Mono
             if (pickupable != null)
             {
                 TechType techType = pickupable.GetTechType();
-                flag = CanBeStored(1, techType);
-
-            }
-            if (!flag && verbose)
-            {
-                ErrorMessage.AddMessage(Language.main.Get("BaseBioReactorCantAddItem"));
+                flag = CanBeStored(_mono.DumpContainer.GetCount() + 1, techType);
             }
             return flag;
 		}

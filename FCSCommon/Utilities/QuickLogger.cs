@@ -9,6 +9,7 @@
     internal static class QuickLogger
     {
         internal static bool DebugLogsEnabled = false;
+        internal static string ModName = "";
 
         internal static void Info(string msg, bool showOnScreen = false)
         {

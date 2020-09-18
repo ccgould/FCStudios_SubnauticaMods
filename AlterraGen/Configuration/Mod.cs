@@ -1,9 +1,12 @@
 ﻿using Oculus.Newtonsoft.Json;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
+using AlterraGen.Enumerators;
 using AlterraGen.Mono;
 using FCSCommon.Utilities;
+using HarmonyLib;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Utility;
 using UnityEngine;
@@ -16,6 +19,7 @@ namespace AlterraGen.Configuration
 
         private static ModSaver _saveObject;
         private static SaveData _saveData;
+        private static Dictionary<TechType, float> _vanillaBioChargeValues;
         private const string ConfigFileName = "config.json";
         #endregion
 
@@ -53,6 +57,22 @@ namespace AlterraGen.Configuration
         internal static event Action<SaveData> OnDataLoaded;
 
         #region Internal Methods
+
+        internal static Dictionary<TechType,float> GetBioChargeValues()
+        {
+            if (_vanillaBioChargeValues == null)
+            {
+                Type baseBioReactorType = typeof(BaseBioReactor);
+                _vanillaBioChargeValues = (Dictionary<TechType, float>)AccessTools.Field(baseBioReactorType, "charge").GetValue(baseBioReactorType);
+            }
+
+            if (_vanillaBioChargeValues == null)
+            {
+                QuickLogger.Error("Failed to get vanilla bio charge values using stored values");
+            }
+
+            return _vanillaBioChargeValues ?? FuelTypes.Charge;
+        }
 
         internal static void Save()
         {

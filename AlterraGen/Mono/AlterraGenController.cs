@@ -86,7 +86,7 @@ namespace AlterraGen.Mono
             if (DumpContainer == null)
             {
                 DumpContainer = gameObject.AddComponent<DumpContainer>();
-                DumpContainer.Initialize(transform,"AlterraGen Receptacle", "", AlterraGenBuildable.NotAllowedItem(),PowerManager);
+                DumpContainer.Initialize(transform,"AlterraGen Receptacle", AlterraGenBuildable.NotAllowedItem(), AlterraGenBuildable.StorageFullMessage(),PowerManager,3,3);
             }
 
             if (_fcsConnectableDevice == null)

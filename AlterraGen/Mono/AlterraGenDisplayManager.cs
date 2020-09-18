@@ -32,6 +32,7 @@ namespace AlterraGen.Mono
         private bool _isBeingDestroyed;
         private int _isOperational;
         private Text _unitID;
+        private Text _itemCounter;
 
         internal void Setup(AlterraGenController mono)
         {
@@ -192,6 +193,10 @@ namespace AlterraGen.Mono
                 GameObjectHelpers.FindGameObject(homePage, "PowerState_LBL").GetComponent<Text>().text = AlterraGenBuildable.PowerStateLBL();
                 _powerStateValue = GameObjectHelpers.FindGameObject(homePage, "PoweredState_Value")?.GetComponent<Text>();
 
+                //Counter
+                _itemCounter = GameObjectHelpers.FindGameObject(homePage, "ItemsCount").GetComponent<Text>();
+                UpdateItemCount(0, _mono.PowerManager.MaxSlots);
+
                 //Power Unit
                 GameObjectHelpers.FindGameObject(homePage, "PowerUnit_LBL").GetComponent<Text>().text = AlterraGenBuildable.PowerUnitLBL();
                 _powerUnitValue = GameObjectHelpers.FindGameObject(homePage, "PowerUnit_Value")?.GetComponent<Text>();
@@ -255,6 +260,11 @@ namespace AlterraGen.Mono
             return true;
         }
 
+        private void UpdateItemCount(int amount, int maxAmount)
+        {
+            _itemCounter.text = string.Format(AlterraGenBuildable.ItemCounterFormat(), amount, maxAmount);
+        }
+
         private void OnLoadItemsGrid(DisplayData data)
         {
             try
@@ -289,6 +299,7 @@ namespace AlterraGen.Mono
                     uGUI_Icon icon = InterfaceHelpers.FindGameObject(buttonPrefab, "Icon").AddComponent<uGUI_Icon>();
                     icon.sprite = SpriteManager.Get(grouped.ElementAt(i));
                 }
+                UpdateItemCount(grouped.Count(), _mono.PowerManager.MaxSlots);
                 _grid.UpdaterPaginator(grouped.Count());
             }
             catch (Exception e)
