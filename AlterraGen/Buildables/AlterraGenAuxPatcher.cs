@@ -12,6 +12,7 @@ namespace AlterraGen.Buildables
         private const string PowerUnitLBLKey = "AG_PowerUnitLBL";
         private const string BatteryPercentageLBLKey = "AG_BatteryPercentageLBL";
         private const string BreakerStateLBLKey = "AG_BreakerStateLBL";
+        private const string ItemCounterFormatKey = "AG_ItemCounterFormat";
         internal string BuildableName { get; set; }
 
         internal TechType TechTypeID { get; set; }
@@ -27,6 +28,7 @@ namespace AlterraGen.Buildables
             LanguageHandler.SetLanguageLine(PowerUnitLBLKey, "kW:");
             LanguageHandler.SetLanguageLine(BatteryPercentageLBLKey, "Battery Percentage:");
             LanguageHandler.SetLanguageLine(BreakerStateLBLKey, "Breaker State:");
+            LanguageHandler.SetLanguageLine(ItemCounterFormatKey, "Items: {0} / {1}");
         }
 
         internal static string OpenDumpContainer()
@@ -66,7 +68,17 @@ namespace AlterraGen.Buildables
 
         internal static string NotAllowedItem()
         {
-            return Language.main.Get("TimeCapsuleItemNotAllowed");
+            return Language.main.Get("BaseBioReactorCantAddItem");
+        }
+
+        public static string StorageFullMessage()
+        {
+            return Language.main.Get("InventoryFull");
+        }
+
+        public static string ItemCounterFormat()
+        {
+            return Language.main.Get(ItemCounterFormatKey);
         }
     }
 }

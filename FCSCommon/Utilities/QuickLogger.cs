@@ -9,6 +9,7 @@
     internal static class QuickLogger
     {
         internal static bool DebugLogsEnabled = false;
+        internal static string ModName = "";
 
         internal static void Info(string msg, bool showOnScreen = false)
         {
@@ -97,5 +98,11 @@
         }
 
         private static string FormatToSimpleVersion(FileVersionInfo version) => $"{version.FileMajorPart}.{version.FileMinorPart}.{version.FileBuildPart}";
+
+        internal static void ModMessage(string msg)
+        {
+            Console.WriteLine($"[{ModName}] : {msg}");
+            ErrorMessage.AddMessage($"[{ModName}] : {msg}");
+        }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using AlterraGen.Buildables;
 using AlterraGen.Configuration;
@@ -28,6 +30,7 @@ namespace AlterraGen
         {
             Version = QuickLogger.GetAssemblyVersion(Assembly.GetExecutingAssembly());
             QuickLogger.Info($"Started patching. Version: {Version}");
+            QuickLogger.ModName = Mod.ModFriendlyName;
 
 
 #if DEBUG
@@ -52,7 +55,7 @@ namespace AlterraGen
 
                 var alterraGen = new AlterraGenBuildable();
                 alterraGen.Patch();
-
+                
                 //var harmony = new Harmony("com.alterragen.fcstudios");
 
                 //harmony.PatchAll(Assembly.GetExecutingAssembly());
