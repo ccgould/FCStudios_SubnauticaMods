@@ -608,11 +608,6 @@ TechType.Databox
 
         internal static Action<bool> OnAntennaBuilt;
         private static TechType _seaBreezeTechType;
-
-        internal static Dictionary<string, ServerData> Servers { get; set; } = new Dictionary<string, ServerData>();
-
-
-        public static List<string> TrackedServers { get; set; } = new List<string>();
         #endregion
 
         #region Ingredients
@@ -759,9 +754,9 @@ TechType.Databox
                     controller.Save(newSaveData);
                 }
 
-                CleanServers();
+                BaseManager.CleanServers();
 
-                newSaveData.Servers = Servers;
+                newSaveData.GlobalServers = new HashSet<ServerData>(BaseManager.GetServersSaveData());
                 //newSaveData.Bases = BaseManager.GetSaveData().ToList();
                 _saveData = newSaveData;
 
@@ -774,15 +769,7 @@ TechType.Databox
                 ModUtils.Save<SaveData>(_saveData, SaveDataFilename, GetSaveFileDirectory(), OnSaveComplete);
             }
         }
-
-        private static void CleanServers()
-        {
-            var keysToRemove = Servers.Keys.Except(TrackedServers).ToList();
-
-            foreach (var key in keysToRemove)
-                Servers.Remove(key);
-        }
-
+        
         internal static bool IsSaving()
         {
             return _saveObject != null;
@@ -852,6 +839,15 @@ TechType.Databox
             return null;
         }
 
+        internal static ServerData GetServerSaveData(string instanceId)
+        {
+            LoadData();
+
+            var saveData = GetSaveData();
+            var server = saveData?.GlobalServers?.FirstOrDefault(x => x.PrefabID == instanceId);
+            return server ?? new ServerData();
+        }
+
         internal static void LoadData()
         {
             if (_saveData != null) return;
@@ -859,13 +855,6 @@ TechType.Databox
             ModUtils.LoadSaveData<SaveData>(SaveDataFilename, GetSaveFileDirectory(), (data) =>
             {
                 _saveData = data;
-                Servers = data.Servers;
-
-                foreach (KeyValuePair<string, ServerData> objServer in data.Servers)
-                {
-                    QuickLogger.Debug($"Server Data: S={objServer.Value.Server?.Count} || F={objServer.Value.ServerFilters?.Count}");
-                }
-
                 QuickLogger.Info("Save Data Loaded");
                 OnDataLoaded?.Invoke(_saveData);
             });

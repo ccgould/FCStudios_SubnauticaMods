@@ -51,8 +51,8 @@ namespace DataStorageSolutions
             //var serverFormattingStation = new FCSKit(Mod.ServerFormattingStationKitClassID, Mod.ServerFormattingStationFriendlyName, craftingTab, Mod.ServerFormattingStationIngredients);
             //serverFormattingStation.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
 
-            //Server = new ServerCraftable(Mod.ServerClassID, Mod.ServerFriendlyName, Mod.ServerDescription, craftingTab);
-            //Server.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
+            Server = new ServerCraftable(Mod.ServerClassID, Mod.ServerFriendlyName, Mod.ServerDescription, craftingTab);
+            Server.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
 
             //var operatorB = new FCSKit(Mod.OperatorKitClassID, Mod.OperatorFriendlyName, craftingTab,Mod.DSSOperatorIngredients);
             //operatorB.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);

@@ -448,10 +448,10 @@ namespace DataStorageSolutions.Model
     [Serializable]
     public static class FilterList
     {
-        public static List<Filter> Filters;
+        public static HashSet<Filter> Filters;
 
 
-        public static List<Filter> GetFilters()
+        public static HashSet<Filter> GetFilters()
         {
             if (Filters == null)
             {
@@ -502,7 +502,7 @@ namespace DataStorageSolutions.Model
             }
         }
 
-        public static List<Filter> GetNewVersion(List<Filter> filterData)
+        public static HashSet<Filter> GetNewVersion(HashSet<Filter> filterData)
         {
             Dictionary<string, Filter> validCategories = new Dictionary<string, Filter>();
 
@@ -516,7 +516,7 @@ namespace DataStorageSolutions.Model
                 }
             }
 
-            var newData = new List<Filter>();
+            var newData = new HashSet<Filter>();
 
             foreach (var filter in filterData)
             {
@@ -562,8 +562,8 @@ namespace DataStorageSolutions.Model
         private static void InitializeFilters()
         {
             var path = Mod.GetAssetPath("filters.json");
-            var file = JsonConvert.DeserializeObject<List<Filter>>(File.ReadAllText(path));
-            Filters = file.Where((f) => f.IsCategory()).ToList();
+            var file = JsonConvert.DeserializeObject<HashSet<Filter>>(File.ReadAllText(path));
+            Filters = new HashSet<Filter>(file.Where((f) => f.IsCategory()).ToList());
 
             if (QPatch.Configuration.Config.ShowAllItems)
             {
@@ -614,11 +614,6 @@ namespace DataStorageSolutions.Model
                 Category = "",
                 Types = new List<TechType> { type }
             });
-        }
-
-        public static HashSet<Filter> GetNewVersion(HashSet<Filter> filterData)
-        {
-            return new HashSet<Filter>(GetNewVersion(filterData.ToList()));
         }
     }
 }

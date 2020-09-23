@@ -1,45 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using FCSCommon.Utilities;
+using System.Linq;
+using FCSTechFabricator.Interfaces;
 using UnityEngine;
 
 namespace FCSTechFabricator.Objects
 {
-    public class FCSFilteredStorage : MonoBehaviour
+    public class FCSFilteredStorage : IFCSStorage
     {
-        private HashSet<ObjectData> _items = new HashSet<ObjectData>();
-        private List<Filter> _filters = new List<Filter>();
+        private readonly HashSet<InventoryItem> _container = new HashSet<InventoryItem>();
         private Action _updateDisplay;
+        private GameObject _root;
+        private int _storageLimit;
 
-        public Action<HashSet<ObjectData>> OnItemsUpdate { get; set; }
-        public Action<List<Filter>> OnFiltersUpdate { get; set; }
-        
-        public HashSet<ObjectData> Items
-        {
-            get => _items;
-            set
-            {
-                _items = value;
-                OnItemsUpdate?.Invoke(_items);
-            }
-        }
+        public HashSet<Filter> Filters { get; set; } = new HashSet<Filter>();
 
-        public List<Filter> Filters
+        public void Initialize(GameObject root, Action updateDisplay,int storageLimit)
         {
-            get => _filters;
-            set
-            {
-                _filters = value;
-                OnFiltersUpdate?.Invoke(_filters);
-            }
-        }
-
-        public void Initialize(List<Filter> filters, Action updateDisplay)
-        {
-            if (filters != null)
-            {
-                _filters = filters;
-            }
+            _root = root;
+            _storageLimit = storageLimit;
             _updateDisplay = updateDisplay;
         }
 
@@ -47,16 +28,77 @@ namespace FCSTechFabricator.Objects
         {
             var sb = new StringBuilder();
 
-            foreach (Filter filter in _filters)
+            foreach (Filter filter in Filters)
             {
                 sb.Append($"{filter.GetString()},");
             }
 
             return sb.ToString();
         }
+
         public void ForceUpdateDisplay()
         {
             _updateDisplay?.Invoke();
+        }
+
+        public void TrackItem(Pickupable pickupable)
+        {
+            _container.Add(new InventoryItem(pickupable));
+        }
+        
+        public int GetContainerFreeSpace => _storageLimit - _container.Count;
+        public bool IsFull => _container.Count >= _storageLimit;
+
+        public bool CanBeStored(int amount, TechType techType)
+        {
+            return amount + 1 <= _storageLimit;
+        }
+
+        public bool AddItemToContainer(InventoryItem item)
+        {
+            if (CanBeStored(_container.Count,item.item.GetTechType()) && !_container.Contains(item))
+            {
+                _container.Add(item);
+                item.item.Reparent(_root.transform);
+                ForceUpdateDisplay();
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
+        {
+            return true;
+        }
+
+        public bool IsAllowedToRemoveItems()
+        {
+            return true;
+        }
+
+        public Pickupable RemoveItemFromContainer(TechType techType, int amount)
+        {
+            var item = _container.FirstOrDefault(x => x.item.GetTechType() == techType);
+
+
+            if (item == null) return null;
+            _container.Remove(item);
+            ForceUpdateDisplay();
+            return item.item;
+        }
+
+        public Dictionary<TechType, int> GetItemsWithin()
+        {
+            var lookup = _container?.ToLookup(x => x.item.GetTechType()).ToArray();
+            return lookup?.ToDictionary(count => count.Key, count => count.Count());
+        }
+
+        public Action<int, int> OnContainerUpdate { get; set; }
+
+        public bool ContainsItem(TechType techType)
+        {
+            return _container.Any(x => x.item.GetTechType() == techType);
         }
     }
 }

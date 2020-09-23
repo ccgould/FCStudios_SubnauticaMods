@@ -2,7 +2,7 @@
   "Id": "FCSDataStorageSolutions",
   "DisplayName": "Data Storage Solutions",
   "Author": "FCStudios",
-  "Version": "1.1.5",
+  "Version": "1.2.0",
   "Game": "Subnautica",
   "VersionDependencies": {
     "FCSTechFabricator": "2.0.9",

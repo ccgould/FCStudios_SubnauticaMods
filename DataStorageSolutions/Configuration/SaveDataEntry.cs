@@ -10,6 +10,7 @@ namespace DataStorageSolutions.Configuration
     [Serializable]
     internal class SaveDataEntry
     {
+        [JsonProperty] internal string FileVersion { get; set; } = "2.0";
         [JsonProperty] internal string BaseID { get; set; }
         [JsonProperty] internal ColorVec4 TerminalBodyColor { get; set; }
         [JsonProperty] internal string ID { get; set; }
@@ -25,8 +26,7 @@ namespace DataStorageSolutions.Configuration
     [Serializable]
     internal class SaveData
     {
-        [JsonProperty] internal string FileVersion { get; set; } = "1.0.0";
-        [JsonProperty] internal Dictionary<string, ServerData> Servers { get; set; }
+        [JsonProperty] internal HashSet<ServerData> GlobalServers { get; set; }
         [JsonProperty] internal List<BaseSaveData> Bases { get; set; }
 
         [JsonProperty] internal List<SaveDataEntry> Entries = new List<SaveDataEntry>();

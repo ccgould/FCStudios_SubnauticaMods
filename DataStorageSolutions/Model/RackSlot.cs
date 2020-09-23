@@ -26,7 +26,7 @@ namespace DataStorageSolutions.Model
         private DSSRackController _mono;
         private bool _isOccupied;
         private HashSet<ObjectData> _server;
-        private List<Filter> _filter = new List<Filter>();
+        private HashSet<Filter> _filter = new HashSet<Filter>();
         private float timeLeft = 1.0f;
         private const float TimerLimit = 1f;
         private bool _update;
@@ -56,10 +56,10 @@ namespace DataStorageSolutions.Model
             }
         }
 
-        public List<Filter> Filter
+        public HashSet<Filter> Filter
         {
             get => _filter;
-            set => _filter = value ?? new List<Filter>();
+            set => _filter = value ?? new HashSet<Filter>();
         }
 
         private bool FilterCrossCheck(TechType techType)

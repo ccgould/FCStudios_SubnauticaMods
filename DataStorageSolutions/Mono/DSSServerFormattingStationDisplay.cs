@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using DataStorageSolutions.Buildables;
 using DataStorageSolutions.Enumerators;
 using DataStorageSolutions.Model;
@@ -24,8 +25,8 @@ namespace DataStorageSolutions.Mono
         private GridHelper _categoryGrid;
         private readonly Color _startColor = Color.gray;
         private readonly Color _hoverColor = Color.white;
-        private List<Filter> _filters => FilterList.GetFilters();
-        private List<Filter> _grouped = new List<Filter>();
+        private HashSet<Filter> _filters => FilterList.GetFilters();
+        private HashSet<Filter> _grouped = new HashSet<Filter>();
         private readonly List<InterfaceButton> _trackedButtons = new List<InterfaceButton>();
 
         private void OnLoadFilterGrid(DisplayData data)
@@ -68,7 +69,7 @@ namespace DataStorageSolutions.Mono
 
             _itemGrid.ClearPage();
 
-            _grouped = new List<Filter>();
+            _grouped = new HashSet<Filter>();
 
             QuickLogger.Debug("Load Filters");
 
@@ -110,7 +111,7 @@ namespace DataStorageSolutions.Mono
             _trackedButtons.Clear();
             _categoryGrid.ClearPage();
             
-            _grouped = new List<Filter>();
+            _grouped = new HashSet<Filter>();
 
             foreach (var filter in _filters)
             {
@@ -145,15 +146,15 @@ namespace DataStorageSolutions.Mono
             UpdateCheckMarks();
         }
 
-        private void CreateButton(DisplayData data, GameObject buttonPrefab, List<Filter> grouped, int i,bool isMain = false)
+        private void CreateButton(DisplayData data, GameObject buttonPrefab, HashSet<Filter> grouped, int i,bool isMain = false)
         {
             buttonPrefab.transform.SetParent(data.ItemsGrid.transform, false);
-            buttonPrefab.GetComponentInChildren<Text>().text = grouped[i].GetString();
+            buttonPrefab.GetComponentInChildren<Text>().text = grouped.ElementAt(i).GetString();
             
-            if(!grouped[i].IsCategory())
+            if(!grouped.ElementAt(i).IsCategory())
             {
                 var icon = InterfaceHelpers.FindGameObject(buttonPrefab, "Icon");
-                icon.AddComponent<uGUI_Icon>().sprite = SpriteManager.Get(grouped[i].Types[0]);
+                icon.AddComponent<uGUI_Icon>().sprite = SpriteManager.Get(grouped.ElementAt(i).Types[0]);
             }
 
             var buttonToggle = buttonPrefab.GetComponent<Toggle>();
@@ -168,7 +169,7 @@ namespace DataStorageSolutions.Mono
             mainBTN.STARTING_COLOR = _startColor;
             mainBTN.HOVER_COLOR = _hoverColor;
             mainBTN.BtnName = "FilterBTN";
-            mainBTN.Tag = new FilterTransferData{Filter = grouped[i],  Toggle = buttonToggle};
+            mainBTN.Tag = new FilterTransferData{Filter = grouped.ElementAt(i),  Toggle = buttonToggle};
             mainBTN.OnButtonClick = OnButtonClick;
             _trackedButtons.Add(mainBTN);
         }
@@ -250,8 +251,7 @@ namespace DataStorageSolutions.Mono
 
                 case "RemoveServerBTN":
                     GoToPage(FilterPages.Home);
-                    _mono.ToggleDummyServer();
-                    _mono.GivePlayerItem();
+                    _mono.RemoveItemFromContainer(TechType.None,-1);
                     break;
 
                 case "AddCategoryBTN":

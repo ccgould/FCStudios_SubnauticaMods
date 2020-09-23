@@ -118,11 +118,11 @@ namespace DataStorageSolutions.Mono
 
             foreach (ServerData data in _savedData.Servers)
             {
-                if (data != null)
-                {
-                    var slot = GetSlotByID(GetFreeSlotID());
-                    AddServer(data.Server, data.ServerFilters, data.SlotID, true);
-                }
+                //if (data != null)
+                //{
+                //    var slot = GetSlotByID(GetFreeSlotID());
+                //    AddServer(data.Server, data.ServerFilters, data.SlotID, true);
+                //}
             }
 
             _allowedToNotify = true;
@@ -184,7 +184,7 @@ namespace DataStorageSolutions.Mono
             return true;
         }
 
-        private bool AddServerToSlot(HashSet<ObjectData> server,List<Filter> filters, int slotID)
+        private bool AddServerToSlot(HashSet<ObjectData> server,HashSet<Filter> filters, int slotID)
         {
             var slotByID = this.GetSlotByID(slotID);
 
@@ -203,7 +203,7 @@ namespace DataStorageSolutions.Mono
             slotByID.LoadServer(server);
             if (filters != null)
             {
-                slotByID.Filter = new List<Filter>(FilterList.GetNewVersion(filters));
+                slotByID.Filter = new HashSet<Filter>(FilterList.GetNewVersion(filters));
             }
 
             return true;
@@ -230,13 +230,15 @@ namespace DataStorageSolutions.Mono
 
         private IEnumerable<ServerData> SaveRackData()
         {
-            foreach (RackSlot server in _servers)
-            {
-                if (server.Server != null)
-                {
-                    yield return new ServerData{Server = server.Server, ServerFilters = server.Filter, SlotID = server.Id};
-                }
-            }
+            //foreach (RackSlot server in _servers)
+            //{
+            //    if (server.Server != null)
+            //    {
+            //        yield return new ServerData{Server = server.Server, ServerFilters = server.Filter, SlotID = server.Id};
+            //    }
+            //}
+
+            return null;
         }
 
         private void CheckIfRemoved()
@@ -277,7 +279,7 @@ namespace DataStorageSolutions.Mono
             return _servers?.FirstOrDefault(x => !x.IsFull() && x.IsAllowedToAdd(techType) && x.IsOccupied);
         }
 
-        internal bool AddServer(HashSet<ObjectData> server,List<Filter> filters, int suppliedSlot = 0, bool useSuppliedSlot = false)
+        internal bool AddServer(HashSet<ObjectData> server,HashSet<Filter> filters, int suppliedSlot = 0, bool useSuppliedSlot = false)
         {
             if (server == null)
             {
@@ -354,7 +356,7 @@ namespace DataStorageSolutions.Mono
         {
             Manager = managers ?? BaseManager.FindManager(gameObject);
             
-            Manager.AddRack(this);
+            Manager.RegisterRack(this);
         }
 
         public string GetPrefabIDString()
@@ -601,9 +603,10 @@ namespace DataStorageSolutions.Mono
         public bool AddItemToContainer(InventoryItem item)
         {
             var originalController = item.item.GetComponent<DSSServerController>();
-            var server = AddServer(originalController.FCSFilteredStorage.Items,originalController.FCSFilteredStorage.Filters);
+            //TODO FIX
+            //var server = AddServer(originalController.FCSFilteredStorage.Items,originalController.FCSFilteredStorage.Filters);
             Destroy(item.item.gameObject);
-            return server;
+            return true;
         }
 
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)

@@ -7,6 +7,8 @@ using DataStorageSolutions.Enumerators;
 using DataStorageSolutions.Helpers;
 using DataStorageSolutions.Model;
 using FCSCommon.Controllers;
+using FCSCommon.Extensions;
+using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using FCSTechFabricator.Components;
 using FCSTechFabricator.Interfaces;
@@ -22,16 +24,17 @@ namespace DataStorageSolutions.Mono
         private bool _fromSave;
         private SaveDataEntry _savedData;
         private int _slotState;
-        private HashSet<ObjectData> _items;
+        private HashSet<Filter> _filters = new HashSet<Filter>();
+        private GameObject _slot;
+        private Pickupable _server;
         private DSSServerController _controller;
-        private List<Filter> _filters = new List<Filter>();
         public override BaseManager Manager { get; set; }
         public ColorManager ColorManager { get; private set; }
         public DSSServerFormattingStationDisplay DisplayManager { get; private set; }
         public AnimationManager AnimationManager { get; private set; }
         public override DumpContainer DumpContainer { get; set; }
-        public int GetContainerFreeSpace { get; }
-        public bool IsFull { get; }
+        public int GetContainerFreeSpace => _server != null ? 0 : 1;
+        public bool IsFull => _server != null;
         Action<int, int> IFCSStorage.OnContainerUpdate { get; set; }
 
         private void OnEnable()
@@ -49,16 +52,84 @@ namespace DataStorageSolutions.Mono
                 {
                     ReadySaveData();
                 }
-
-                _items = _savedData.ServerData;
-                if (_items != null)
+                
+                var items = _savedData.ServerData;
+                if (items != null)
                 {
-                    ToggleDummyServer();
+                    //TODO if Failed give player back item and display message
                     DisplayManager.GoToPage(FilterPages.FilterPage);
+                    CreateAndAddNewServer(items);
+                }
+                else
+                {
+                    GetServer();
                 }
             }
         }
-        
+
+        private void GetServer()
+        {
+            foreach (UniqueIdentifier uniqueIdentifier in gameObject.GetComponentsInChildren<UniqueIdentifier>(true))
+            {
+                var pickupable = uniqueIdentifier.gameObject.GetComponent<Pickupable>();
+                if (pickupable != null && pickupable.GetTechType() != Mod.ServerFormattingStationClassID.ToTechType())
+                {
+                    QuickLogger.Debug($"Found item {pickupable?.GetTechType().ToString()}");
+                    MoveServerToSlot(pickupable);
+                    ConnectServer(pickupable);
+                    DisplayManager?.GoToPage(FilterPages.FilterPage);
+                    DisplayManager?.UpdatePages();
+                    break;
+                }
+            }
+        }
+
+        private void ConnectServer(Pickupable pickupable)
+        {
+            _server = pickupable;
+            _controller = pickupable.gameObject.GetComponent<DSSServerController>();
+            _controller.SetSlot(0);
+            _filters = _controller.FCSFilteredStorage.Filters;
+        }
+
+        private void MoveServerToSlot(Pickupable pickupable)
+        {
+            if (_slot == null)
+            {
+                _slot = GameObjectHelpers.FindGameObject(gameObject, "Server");
+            }
+
+            pickupable.gameObject.GetComponent<Rigidbody>().isKinematic = true;
+            pickupable.Reparent(gameObject.transform);
+            pickupable.transform.position = new Vector3(_slot.transform.position.x, _slot.transform.position.y, _slot.transform.position.z);
+            pickupable.gameObject.SetActive(true);
+        }
+
+        private void CreateAndAddNewServer(HashSet<ObjectData> items)
+        {
+            try
+            {
+                var server = Mod.ServerClassID.ToTechType().ToInventoryItem();
+                var controller = server.item.gameObject.GetComponent<DSSServerController>();
+
+                foreach (ObjectData data in items)
+                {
+                    controller.FCSFilteredStorage.AddItemToContainer(new InventoryItem(data.ToPickable()));
+                }
+
+                var result = AddItemToContainer(server);
+                if (result)
+                {
+                    DisplayManager?.GoToPage(FilterPages.FilterPage);
+                    DisplayManager?.UpdatePages();
+                }
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error($"Message: {e.Message} || StackTrace: {e.StackTrace}");
+            }
+        }
+
         private void ReadySaveData()
         {
             QuickLogger.Debug("In OnProtoDeserialize");
@@ -110,31 +181,31 @@ namespace DataStorageSolutions.Mono
 
         public override void Save(SaveData newSaveData)
         {
-            if (!IsInitialized || !IsConstructed) return;
+            //if (!IsInitialized || !IsConstructed) return;
 
-            var id = GetPrefabIDString();
+            //var id = GetPrefabIDString();
 
-            if (_savedData == null)
-            {
-                _savedData = new SaveDataEntry();
-            }
+            //if (_savedData == null)
+            //{
+            //    _savedData = new SaveDataEntry();
+            //}
 
-            _savedData.ID = id;
-            _savedData.ServerData = _items;
-            newSaveData.Entries.Add(_savedData);
+            //_savedData.ID = id;
+            //_savedData.ServerData = _items;
+            //newSaveData.Entries.Add(_savedData);
         }
         
         public override void OnProtoSerialize(ProtobufSerializer serializer)
         {
-            QuickLogger.Debug("In OnProtoSerialize");
+            //QuickLogger.Debug("In OnProtoSerialize");
 
-            if (!Mod.IsSaving())
-            {
-                var id = GetPrefabIDString();
-                QuickLogger.Info($"Saving {id}");
-                Mod.Save();
-                QuickLogger.Info($"Saved {id}");
-            }
+            //if (!Mod.IsSaving())
+            //{
+            //    var id = GetPrefabIDString();
+            //    QuickLogger.Info($"Saving {id}");
+            //    Mod.Save();
+            //    QuickLogger.Info($"Saved {id}");
+            //}
         }
 
         public override void OnProtoDeserialize(ProtobufSerializer serializer)
@@ -150,7 +221,7 @@ namespace DataStorageSolutions.Mono
 
         public override bool CanDeconstruct(out string reason)
         {
-            if (_items != null)
+            if (_server != null)
             {
                 reason = AuxPatchers.HasItemsMessage();
                 return false;
@@ -176,11 +247,6 @@ namespace DataStorageSolutions.Mono
             }
         }
 
-        public void ToggleDummyServer()
-        {
-            AnimationManager.SetBoolHash(_slotState,!AnimationManager.GetBoolHash(_slotState));
-        }
-
         public bool CanBeStored(int amount,TechType techType = TechType.None)
         {
             return false;
@@ -188,40 +254,24 @@ namespace DataStorageSolutions.Mono
 
         public bool AddItemToContainer(InventoryItem item)
         {
-            _controller = item.item.GetComponent<DSSServerController>();
+            QuickLogger.Debug($"Adding Server to Formatter {item}",true);
+
+            _controller = item.item.GetComponentInChildren<DSSServerController>();
 
             if (_controller != null)
             {
-                if(_controller.FCSFilteredStorage.Items != null)
-                    _items = new HashSet<ObjectData>(_controller.FCSFilteredStorage.Items);
-                if (_controller.FCSFilteredStorage.Filters != null)
-                    _filters = new List<Filter>(_controller.FCSFilteredStorage.Filters);
+                DisplayManager.GoToPage(FilterPages.FilterPage);
+                DisplayManager.UpdatePages();
+                MoveServerToSlot(item.item);
+                ConnectServer(item.item);
             }
-
-            DisplayManager.GoToPage(FilterPages.FilterPage);
-            DisplayManager.UpdatePages();
-            ToggleDummyServer();
-            Destroy(item.item.gameObject);
             var pda = Player.main.GetPDA();
             if(pda.isOpen)
             {
                 pda.Close();
             }
-            return true;
+            return _controller != null;
         }
-
-        public void GivePlayerItem()
-        {
-            var result = DSSHelpers.GivePlayerItem(QPatch.Server.TechType, new ObjectDataTransferData{data = _items,Filters= _filters, IsServer = true}, null);
-            
-            if (result)
-            {
-                _items = null;
-            }
-
-            QuickLogger.Debug($"Items result: {_items} || Result = {result}");
-        }
-        
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
         {
             if (AnimationManager.GetBoolHash(_slotState))
@@ -239,6 +289,16 @@ namespace DataStorageSolutions.Mono
 
         public Pickupable RemoveItemFromContainer(TechType techType, int amount)
         {
+            var result = DSSHelpers.GivePlayerItem(_server);
+            
+            if (result)
+            {
+                _controller.Disconnect();
+                _controller = null;
+                _server = null;
+                _filters = new HashSet<Filter>();
+            }
+
             return null;
         }
 
@@ -268,7 +328,7 @@ namespace DataStorageSolutions.Mono
             }
         }
 
-        public List<Filter> GetFilters()
+        public HashSet<Filter> GetFilters()
         {
             return _filters;
         }

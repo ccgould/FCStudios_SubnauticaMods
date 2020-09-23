@@ -11,6 +11,7 @@ using FCSCommon.Utilities;
 using FCSTechFabricator.Abstract;
 using FCSTechFabricator.Components;
 using FCSTechFabricator.Enums;
+using FCSTechFabricator.Objects;
 using UnityEngine;
 
 namespace DataStorageSolutions.Mono
@@ -51,7 +52,7 @@ namespace DataStorageSolutions.Mono
 
         internal readonly HashSet<DSSRackController> BaseRacks = new HashSet<DSSRackController>();
         //internal readonly HashSet<DSSOperatorController> BaseOperators = new HashSet<DSSOperatorController>();
-        internal readonly HashSet<DSSServerController> BaseServers = new HashSet<DSSServerController>();
+        internal static readonly HashSet<DSSServerController> GlobalServers = new HashSet<DSSServerController>();
         //internal readonly HashSet<DSSTerminalController> BaseTerminals = new HashSet<DSSTerminalController>();
         internal readonly Dictionary<TechType, int> TrackedItems = new Dictionary<TechType, int>();
         private bool _isInitialized;
@@ -131,6 +132,7 @@ namespace DataStorageSolutions.Mono
         {
             QuickLogger.Debug($"Creating new manager", true);
             var manager = new BaseManager(habitat);
+            habitat.gameObject.EnsureComponent<BaseConnectable>();
             Managers.Add(manager);
             QuickLogger.Debug($"Manager Count = {Managers.Count}", true);
             return manager;
@@ -414,7 +416,7 @@ namespace DataStorageSolutions.Mono
 
         #region Rack Registration
 
-        internal void AddRack(DSSRackController unit)
+        internal void RegisterRack(DSSRackController unit)
         {
             if (!BaseRacks.Contains(unit) && unit.IsConstructed)
             {
@@ -437,7 +439,7 @@ namespace DataStorageSolutions.Mono
 
         #region Antenna Registration
 
-        internal static void AddAntenna(DSSAntennaController unit)
+        internal static void RegisterAntenna(DSSAntennaController unit)
         {
             if (!BaseAntennas.Contains(unit) && unit.IsConstructed)
             {
@@ -486,5 +488,44 @@ namespace DataStorageSolutions.Mono
         }
 
         #endregion
+
+        internal static void RegisterServer(DSSServerController dssServerController)
+        {
+            if (!GlobalServers.Contains(dssServerController))
+            {
+                var data = Mod.GetServerSaveData(dssServerController.GetPrefabID());
+                if (!string.IsNullOrWhiteSpace(data.PrefabID))
+                {
+                    dssServerController.FCSFilteredStorage.Filters = data.ServerFilters;
+                }
+                GlobalServers.Add(dssServerController);
+            }
+        }
+
+        public static void UnRegisterServer(DSSServerController dssServerController)
+        {
+            GlobalServers.Remove(dssServerController);
+        }
+
+        internal static void CleanServers()
+        {
+            //var keysToRemove = Servers.Keys.Except(TrackedServers).ToList();
+
+            //foreach (var key in keysToRemove)
+            //    Servers.Remove(key);
+        }
+
+        public static IEnumerable<ServerData> GetServersSaveData()
+        {
+            foreach (DSSServerController baseServer in GlobalServers)
+            {
+                yield return new ServerData
+                {
+                    PrefabID = baseServer.GetPrefabID(), 
+                    ServerFilters = baseServer.FCSFilteredStorage.Filters,
+                    SlotID = baseServer.GetSlotID()
+                };
+            }
+        }
     }
 }

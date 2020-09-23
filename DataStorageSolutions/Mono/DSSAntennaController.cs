@@ -89,7 +89,7 @@ namespace DataStorageSolutions.Mono
                 ColorManager.Initialize(gameObject, DSSModelPrefab.BodyMaterial);
             }
 
-            BaseManager.AddAntenna(this);
+            BaseManager.RegisterAntenna(this);
 
             Mod.OnAntennaBuilt?.Invoke(true);
 

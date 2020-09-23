@@ -6,7 +6,7 @@ namespace DataStorageSolutions.Model
     internal class ServerData
     {
         public int SlotID { get; set; }
-        public HashSet<ObjectData> Server { get; set; }
-        public List<Filter> ServerFilters { get; set; }
+        public string PrefabID { get; set; }
+        public HashSet<Filter> ServerFilters { get; set; }
     }
 }

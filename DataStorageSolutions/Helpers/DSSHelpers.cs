@@ -50,8 +50,10 @@ namespace DataStorageSolutions.Helpers
 
         private static HashSet<ObjectData> GetServerData(InventoryItem item)
         {
-            var data = item.item.GetComponent<DSSServerController>().FCSFilteredStorage.Items;
-            return new HashSet<ObjectData>(data);
+            //var data = item.item.GetComponent<DSSServerController>().FCSFilteredStorage.Items;
+            //TODO FIX
+            //return new HashSet<ObjectData>(data);
+            return new HashSet<ObjectData>();
         }
 
         private static EatableEntities GetEatableData(InventoryItem item)
@@ -76,17 +78,42 @@ namespace DataStorageSolutions.Helpers
             }
 
             var energyMixin = item.item?.GetComponentInChildren<EnergyMixin>();
+            
+            QuickLogger.Debug("GetPlayerToolData : 1");
 
             var playerToolData = new PlayerToolData {TechType = item.item.GetTechType()};
 
+            QuickLogger.Debug("GetPlayerToolData : 2");
+
+
             if (energyMixin == null) return playerToolData;
 
+            QuickLogger.Debug("GetPlayerToolData : 3");
+
+
             var batteryGo = energyMixin.GetBattery()?.gameObject;
+            
+            QuickLogger.Debug("GetPlayerToolData : 4");
+
+
             var techType = batteryGo?.GetComponentInChildren<TechTag>().type ?? TechType.None;
+
+            QuickLogger.Debug("GetPlayerToolData : 5");
+
+
             var iBattery = batteryGo?.GetComponentInChildren<Battery>();
+            
+            QuickLogger.Debug("GetPlayerToolData : 6");
+
+
             if (techType != TechType.None)
             {
+                QuickLogger.Debug("GetPlayerToolData : 7");
+
                 playerToolData.BatteryInfo = new BatteryInfo(techType, iBattery, String.Empty);
+
+                QuickLogger.Debug("GetPlayerToolData : 8");
+
             }
 
             return playerToolData;
@@ -141,8 +168,10 @@ namespace DataStorageSolutions.Helpers
                         var data = (HashSet<ObjectData>) itemData.data;
                         var controller = pickup.gameObject.GetComponent<DSSServerController>();
                         controller.Initialize();
-                        controller.FCSFilteredStorage.Items = new HashSet<ObjectData>(data);
-                        controller.FCSFilteredStorage.Filters = new List<Filter>(itemData.Filters);
+                        
+                            //TODO FIX
+                        //controller.FCSFilteredStorage.Items = new HashSet<ObjectData>(data);
+                        //controller.FCSFilteredStorage.Filters = new List<Filter>(itemData.Filters);
                         controller.DisplayManager.UpdateDisplay();
                         isSuccessful = true;
                     }
@@ -233,7 +262,9 @@ namespace DataStorageSolutions.Helpers
 
                 case SaveDataObjectType.Server:
                     var server = pickup.gameObject.GetComponent<DSSServerController>();
-                    server.FCSFilteredStorage.Items = new HashSet<ObjectData>(data.ServerData);
+
+                    //TODO FIX
+                    //server.FCSFilteredStorage.Items = new HashSet<ObjectData>(data.ServerData);
                     server.Initialize();
                     server.DisplayManager.UpdateDisplay();
                     break;
@@ -356,15 +387,19 @@ namespace DataStorageSolutions.Helpers
             return vehicleContainers;
         }
 
-        public static void GivePlayerItem(Pickupable item)
+        public static bool GivePlayerItem(Pickupable pickupable)
         {
-            if (Inventory.main.HasRoomFor(item))
+            if (pickupable == null)
             {
-                if (Inventory.main.Pickup(item))
-                {
-                    CrafterLogic.NotifyCraftEnd(Player.main.gameObject, item.GetTechType());
-                }
+                //TODO put message on screen
+                return false;
             }
+            if (!Inventory.main.HasRoomFor(pickupable)) return false;
+
+            if (!Inventory.main.Pickup(pickupable)) return false;
+
+            CrafterLogic.NotifyCraftEnd(Player.main.gameObject, pickupable.GetTechType());
+            return true;
         }
 
         public static Pickupable ToPickable(this ObjectData data)
@@ -380,8 +415,10 @@ namespace DataStorageSolutions.Helpers
             {
                 var controller = pickup.gameObject.GetComponent<DSSServerController>();
                 controller.Initialize();
-                controller.FCSFilteredStorage.Items = new HashSet<ObjectData>(data.ServerData);
-                controller.FCSFilteredStorage.Filters = new List<Filter>(data.Filters);
+
+                //TODO FIX
+                //controller.FCSFilteredStorage.Items = new HashSet<ObjectData>(data.ServerData);
+                //controller.FCSFilteredStorage.Filters = new List<Filter>(data.Filters);
             }
 
             return pickup;
@@ -406,8 +443,9 @@ namespace DataStorageSolutions.Helpers
                     var data = (HashSet<ObjectData>) itemData.data;
                     var controller = pickup.gameObject.GetComponent<DSSServerController>();
                     controller.Initialize();
-                    controller.FCSFilteredStorage.Items = new HashSet<ObjectData>(data);
-                    controller.FCSFilteredStorage.Filters = new List<Filter>(itemData.Filters);
+                    //TODO FIX
+                    // controller.FCSFilteredStorage.Items = new HashSet<ObjectData>(data);
+                    //controller.FCSFilteredStorage.Filters = new List<Filter>(itemData.Filters);
                 }
             }
 
