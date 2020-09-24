@@ -131,6 +131,7 @@
     <Compile Include="Debug\Patches\OpenDebugMenu.cs" />
     <Compile Include="Display\DSSVehicleUIButton.cs" />
     <Compile Include="Display\OperationInterfaceButton.cs" />
+    <Compile Include="Display\ServerHitController.cs" />
     <Compile Include="Enumerators\ButtonType.cs" />
     <Compile Include="Enumerators\OperatorPages.cs" />
     <Compile Include="Enumerators\RackPages.cs" />
@@ -149,6 +150,7 @@
     <Compile Include="Mono\BaseConnectable.cs" />
     <Compile Include="Mono\BaseManager.cs" />
     <Compile Include="Mono\DSSAntennaController.cs" />
+    <Compile Include="Mono\DSSItemDisplayController.cs" />
     <Compile Include="Mono\DSSRackController.cs" />
     <Compile Include="Mono\DSSRackDisplayController.cs" />
     <Compile Include="Mono\DSSServerDisplay.cs" />

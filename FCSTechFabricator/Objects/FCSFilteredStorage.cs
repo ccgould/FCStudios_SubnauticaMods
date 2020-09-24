@@ -10,11 +10,13 @@ namespace FCSTechFabricator.Objects
 {
     public class FCSFilteredStorage : IFCSStorage
     {
-        private readonly HashSet<InventoryItem> _container = new HashSet<InventoryItem>();
+        private readonly HashSet<Pickupable> _container = new HashSet<Pickupable>();
         private Action _updateDisplay;
         private GameObject _root;
         private int _storageLimit;
 
+        public int GetContainerFreeSpace => _storageLimit - _container.Count;
+        public bool IsFull => _container.Count >= _storageLimit;
         public HashSet<Filter> Filters { get; set; } = new HashSet<Filter>();
 
         public void Initialize(GameObject root, Action updateDisplay,int storageLimit)
@@ -43,22 +45,21 @@ namespace FCSTechFabricator.Objects
 
         public void TrackItem(Pickupable pickupable)
         {
-            _container.Add(new InventoryItem(pickupable));
+            if(_container.Contains(pickupable)) return;
+
+            _container.Add(pickupable);
         }
         
-        public int GetContainerFreeSpace => _storageLimit - _container.Count;
-        public bool IsFull => _container.Count >= _storageLimit;
-
         public bool CanBeStored(int amount, TechType techType)
         {
-            return amount + 1 <= _storageLimit;
+            return amount <= _storageLimit;
         }
 
         public bool AddItemToContainer(InventoryItem item)
         {
-            if (CanBeStored(_container.Count,item.item.GetTechType()) && !_container.Contains(item))
+            if (CanBeStored(_container.Count + 1,item.item.GetTechType()) && !_container.Contains(item.item))
             {
-                _container.Add(item);
+                _container.Add(item.item);
                 item.item.Reparent(_root.transform);
                 ForceUpdateDisplay();
                 return true;
@@ -79,18 +80,18 @@ namespace FCSTechFabricator.Objects
 
         public Pickupable RemoveItemFromContainer(TechType techType, int amount)
         {
-            var item = _container.FirstOrDefault(x => x.item.GetTechType() == techType);
-
-
+            var item = _container.FirstOrDefault(x => x.GetTechType() == techType);
+            
             if (item == null) return null;
             _container.Remove(item);
             ForceUpdateDisplay();
-            return item.item;
+            return item;
         }
 
         public Dictionary<TechType, int> GetItemsWithin()
         {
-            var lookup = _container?.ToLookup(x => x.item.GetTechType()).ToArray();
+            //TODO return a Dictionary<TechType, int> that is filled on item additon instead of using the ToLookup just a thought to improve performance.
+            var lookup = _container?.ToLookup(x => x.GetTechType()).ToArray();
             return lookup?.ToDictionary(count => count.Key, count => count.Count());
         }
 
@@ -98,7 +99,17 @@ namespace FCSTechFabricator.Objects
 
         public bool ContainsItem(TechType techType)
         {
-            return _container.Any(x => x.item.GetTechType() == techType);
+            return _container.Any(x => x.GetTechType() == techType);
+        }
+
+        public bool HasFilters()
+        {
+           return Filters.Count > 0;
+        }
+
+        public bool HasItem(TechType techType)
+        {
+            return _container.Any(x => x.GetTechType() == techType);
         }
     }
 }

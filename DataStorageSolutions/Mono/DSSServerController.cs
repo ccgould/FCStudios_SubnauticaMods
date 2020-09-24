@@ -38,13 +38,14 @@ namespace DataStorageSolutions.Mono
         internal bool IsMounted => _slot > -1;
         public DSSServerDisplay DisplayManager { get; private set; }
         Action<int, int> IFCSStorage.OnContainerUpdate { get; set; }
-        public FCSFilteredStorage FCSFilteredStorage { get; private set; }
+
+        private FCSFilteredStorage _fcsFilteredStorage;
 
         #endregion
 
         private void AddDummy()
         {
-            FCSFilteredStorage.AddItemToContainer(TechType.PowerCell.ToInventoryItem());
+            _fcsFilteredStorage.AddItemToContainer(TechType.PowerCell.ToInventoryItem());
         }
         
         #region Unity Methods
@@ -61,7 +62,7 @@ namespace DataStorageSolutions.Mono
             Initialize();
 
             GetStoredItems();
-
+            
             _runStartUpOnEnable = false;
         }
 
@@ -90,10 +91,10 @@ namespace DataStorageSolutions.Mono
                 if (pickupable?.GetTechType() != Mod.ServerClassID.ToTechType())
                 {
                     QuickLogger.Debug($"Found item {pickupable?.GetTechType().ToString()}");
-                    FCSFilteredStorage.TrackItem(pickupable);
+                    _fcsFilteredStorage.TrackItem(pickupable);
                 }
             }
-            FCSFilteredStorage.ForceUpdateDisplay();
+            _fcsFilteredStorage.ForceUpdateDisplay();
         }
 
         private int GetFreeSpace()
@@ -107,10 +108,10 @@ namespace DataStorageSolutions.Mono
 
             _storageRoot = gameObject;
 
-            if (FCSFilteredStorage == null && _storageRoot != null)
+            if (_fcsFilteredStorage == null && _storageRoot != null)
             {
-                FCSFilteredStorage = new FCSFilteredStorage();
-                FCSFilteredStorage.Initialize(_storageRoot, UpdateScreen, QPatch.Configuration.Config.ServerStorageLimit);
+                _fcsFilteredStorage = new FCSFilteredStorage();
+                _fcsFilteredStorage.Initialize(_storageRoot, UpdateScreen, QPatch.Configuration.Config.ServerStorageLimit);
             }
 
             if (DisplayManager == null)
@@ -119,6 +120,8 @@ namespace DataStorageSolutions.Mono
                 DisplayManager.Setup(this);
             }
 
+            _slot = BaseManager.FindSlotId(GetPrefabID());
+
             BaseManager.RegisterServer(this);
 
             IsInitialized = true;
@@ -126,7 +129,7 @@ namespace DataStorageSolutions.Mono
 
         internal int GetTotal()
         {
-           return FCSFilteredStorage?.GetItemsWithin().Sum(x => x.Value) ?? 0;
+           return _fcsFilteredStorage?.GetItemsWithin().Sum(x => x.Value) ?? 0;
         }
 
         public override string GetPrefabID()
@@ -144,12 +147,12 @@ namespace DataStorageSolutions.Mono
 
         public bool CanBeStored(int amount,TechType techType = TechType.None)
         {
-            return true;
+            return _fcsFilteredStorage.CanBeStored(amount,techType);
         }
 
         public bool AddItemToContainer(InventoryItem item)
         {
-            return FCSFilteredStorage.AddItemToContainer(item);
+            return _fcsFilteredStorage.AddItemToContainer(item);
         }
         
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
@@ -164,12 +167,12 @@ namespace DataStorageSolutions.Mono
 
         public Pickupable RemoveItemFromContainer(TechType techType, int amount)
         {
-            return FCSFilteredStorage.RemoveItemFromContainer(techType, amount);
+            return _fcsFilteredStorage.RemoveItemFromContainer(techType, amount);
         }
 
         public Dictionary<TechType, int> GetItemsWithin()
         {
-            return FCSFilteredStorage.GetItemsWithin();
+            return _fcsFilteredStorage.GetItemsWithin();
         }
 
         public override void UpdateScreen()
@@ -177,19 +180,9 @@ namespace DataStorageSolutions.Mono
             DisplayManager?.UpdateDisplay();
         }
         
-        public override void OnProtoSerialize(ProtobufSerializer serializer)
-        {
-
-        }
-
-        public override void OnProtoDeserialize(ProtobufSerializer serializer)
-        {
-
-        }
-        
         public bool ContainsItem(TechType techType)
         {
-            return FCSFilteredStorage.ContainsItem(techType);
+            return _fcsFilteredStorage.ContainsItem(techType);
         }
 
         public override void Save(SaveData save)
@@ -197,19 +190,42 @@ namespace DataStorageSolutions.Mono
 
         }
 
-        internal void SetSlot(int slotID)
+        internal void ConnectToDevice(BaseManager manager,int slotID)
         {
+            Manager = manager;
             _slot = slotID;
+            GetStoredItems();
         }
 
-        internal void Disconnect()
+        internal void DisconnectFromDevice()
         {
+            Manager = null;
             _slot = -1;
         }
-        
+
         internal int GetSlotID()
         {
             return _slot;
+        }
+
+        public bool HasFilters()
+        {
+            return _fcsFilteredStorage.HasFilters();
+        }
+
+        public bool HasItem(TechType techType)
+        {
+            return _fcsFilteredStorage.HasItem(techType);
+        }
+
+        public HashSet<Filter> GetFilters()
+        {
+            return _fcsFilteredStorage.Filters;
+        }
+
+        public void SetFilters(HashSet<Filter> dataServerFilters)
+        {
+            _fcsFilteredStorage.Filters = dataServerFilters;
         }
     }
 }

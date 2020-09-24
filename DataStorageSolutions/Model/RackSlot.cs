@@ -4,67 +4,34 @@ using System.Linq;
 using System.Text;
 using DataStorageSolutions.Buildables;
 using DataStorageSolutions.Configuration;
+using DataStorageSolutions.Display;
 using DataStorageSolutions.Helpers;
 using DataStorageSolutions.Mono;
 using FCSCommon.Components;
 using FCSCommon.Enums;
 using FCSCommon.Helpers;
-using FCSCommon.Objects;
 using FCSCommon.Utilities;
 using FCSTechFabricator.Objects;
 using UnityEngine;
-using UnityEngine.UI;
+using UWE;
 
 namespace DataStorageSolutions.Model
 {
     internal class RackSlot
     {
-        private GameObject _dummy;
-        private Text _counter;
-        private bool _isInstantiated;
-        private StringBuilder sb = new StringBuilder();
-        private DSSRackController _mono;
-        private bool _isOccupied;
-        private HashSet<ObjectData> _server;
-        private HashSet<Filter> _filter = new HashSet<Filter>();
-        private float timeLeft = 1.0f;
-        private const float TimerLimit = 1f;
-        private bool _update;
+        private readonly StringBuilder _sb = new StringBuilder();
+        private readonly DSSRackController _mono;
+        private DSSServerController _server;
 
         internal readonly int Id;
         internal readonly Transform Slot;
-
-        internal bool IsOccupied
-        {
-            get => _isOccupied;
-            set
-            {
-                _isOccupied = value;
-                ChangeDummyState(value);
-            }
-        }
-
-        public bool HasFilters => Filter != null && Filter.Count > 0;
-
-        internal HashSet<ObjectData> Server
-        {
-            get => _server;
-            set
-            {
-                _server = value;
-                UpdateNetwork();
-            }
-        }
-
-        public HashSet<Filter> Filter
-        {
-            get => _filter;
-            set => _filter = value ?? new HashSet<Filter>();
-        }
-
+        private Pickupable _pickupable;
+        private ServerHitController _hitController;
+        internal bool IsOccupied => _server != null;
+        
         private bool FilterCrossCheck(TechType techType)
         {
-            foreach (Filter filter in _filter)
+            foreach (Filter filter in _server.GetFilters())
             {
                 if (filter.IsCategory() && filter.IsTechTypeAllowed(techType))
                 {
@@ -72,7 +39,7 @@ namespace DataStorageSolutions.Model
                 }
             }
 
-            foreach (var filter in _filter)
+            foreach (var filter in _server.GetFilters())
             {
                 if (!filter.IsCategory() && filter.IsTechTypeAllowed(techType))
                 {
@@ -82,256 +49,180 @@ namespace DataStorageSolutions.Model
 
             return false;
         }
-
-        private void Update()
-        {
-            if (_update)
-            {
-                timeLeft -= Time.deltaTime;
-                if (timeLeft < 0)
-                {
-                    UpdateNetwork();
-                    _update = false;
-                    timeLeft = TimerLimit;
-                }
-            }
-        }
-
-        private void ChangeDummyState(bool b = true)
-        {
-            if (_dummy == null)
-            {
-                InstantiateDummy();
-            }
-
-            if (_dummy.activeSelf != b)
-            {
-                _dummy.SetActive(b);
-            }
-        }
-
-        private void UpdateScreen()
-        {
-            _counter.text = $"{Server?.Count}/{QPatch.Configuration.Config.ServerStorageLimit}";
-        }
-
+        
         private string FormatData()
         {
-            sb.Clear();
+            _sb.Clear();
 
-            var lookup = Server?.Where(x => x != null).ToLookup(x => x.TechType).ToArray();
+            _sb.Append(string.Format(AuxPatchers.FiltersCheckFormat(), _server != null && _server.GetFilters().Any()));
+            _sb.Append(Environment.NewLine);
+            var items = _server.GetItemsWithin().ToArray();
 
-            if (lookup == null) return sb.ToString();
-
-            sb.Append(string.Format(AuxPatchers.FiltersCheckFormat(), Filter != null && Filter.Count > 0));
-            sb.Append(Environment.NewLine);
-
-            for (int i = 0; i < lookup.Length; i++)
+            for (int i = 0; i < items.Length; i++)
             {
-                if (i < 5)
+                if (i < 4)
                 {
-                    if (lookup[i].All(objectData => objectData.TechType != lookup[i].Key)) continue;
-                    sb.Append($"{Language.main.Get(lookup[i].Key)} x{lookup[i].Count()}");
-                    sb.Append(Environment.NewLine);
-                }
-
-            }
-
-            return sb.ToString();
-        }
-
-        private void ResetTimer()
-        {
-            _update = true;
-            timeLeft = TimerLimit;
-        }
-
-        private void OnButtonClick(string arg1, object arg2)
-        {
-            if (_mono.IsRackOpen())
-            {
-                var result = _mono.GivePlayerItem(QPatch.Server.TechType, new ObjectDataTransferData { data = Server, Filters = Filter, IsServer = true });
-                QuickLogger.Debug($"Give Player ITem Result: {result}", true);
-                if (result)
-                {
-                    DisconnectFromRack();
+                    _sb.Append($"{Language.main.Get(items[i].Key)} x{items[i].Value}");
+                    _sb.Append(Environment.NewLine);
                 }
             }
+
+            return _sb.ToString();
         }
 
         internal RackSlot(DSSRackController controller, int id, Transform slot)
         {
             _mono = controller;
-            _mono.OnUpdate += Update;
             Id = id;
             Slot = slot;
         }
-
-        internal void ClearServer()
+        
+        internal void AddItemToServer(InventoryItem item)
         {
-            Server = null;
+            _server.AddItemToContainer(item);
+            _mono.Manager.AddToTrackedItems(item.item.GetTechType());
+            _mono.UpdateScreen();
         }
 
-        internal void Add(ObjectData data)
+        internal Pickupable RemoveItemFromServer(TechType techType)
         {
-            Server.Add(data);
-            _mono.Manager.AddToTrackedItems(data.TechType);
-            ResetTimer();
-        }
-
-        internal void Remove(ObjectData data)
-        {
-            _mono.Manager.RemoveFromTrackedItems(data.TechType);
-            Server.Remove(data);
-            ResetTimer();
+            var pickup =  _server.RemoveItemFromContainer(techType, 1);
+            _mono.Manager.RemoveFromTrackedItems(techType);
+            _mono.UpdateScreen();
+            return pickup;
         }
         
-        internal bool FindAllComponents()
-        {
-            try
-            {
-                #region Canvas  
-                var canvasGameObject = _dummy.gameObject.GetComponentInChildren<Canvas>()?.gameObject;
-
-                if (canvasGameObject == null)
-                {
-                    QuickLogger.Error("Canvas cannot be found");
-                    return false;
-                }
-                #endregion
-
-                #region Counter
-
-                _counter = canvasGameObject.GetComponentInChildren<Text>();
-                #endregion
-
-                #region Hit
-
-                var interactionFace = InterfaceHelpers.FindGameObject(canvasGameObject, "Hit");
-                var catcher = interactionFace.AddComponent<InterfaceButton>();
-                catcher.ButtonMode = InterfaceButtonMode.TextColor;
-                catcher.TextLineOne = string.Format(AuxPatchers.TakeServer(), Mod.ServerFriendlyName);
-                catcher.TextLineTwo = "Data: {0}";
-                catcher.GetAdditionalDataFromString = true;
-                catcher.GetAdditionalString = FormatData;
-                catcher.BtnName = "ServerClick";
-                catcher.OnButtonClick += OnButtonClick;
-
-                #endregion
-
-                return true;
-            }
-            catch (Exception e)
-            {
-                QuickLogger.Error($"{e.Message}: {e.StackTrace}");
-                return false;
-            }
-        }
-        
-        internal void InstantiateDummy()
-        {
-            if (_isInstantiated) return;
-
-            _dummy = Slot.Find("Server")?.gameObject;
-
-            if (FindAllComponents())
-            {
-                UpdateScreen();
-            }
-
-            _isInstantiated = true;
-        }
-
         internal bool IsFull()
         {
-            return Server != null && Server.Count >= QPatch.Configuration.Config.ServerStorageLimit;
-        }
-
-        internal void DisconnectFromRack()
-        {
-            RemoveFromBaseTracker();
-
-            IsOccupied = false;
-            ClearServer();
-            _mono.DisplayManager.UpdateContainerAmount();
-            Mod.OnBaseUpdate?.Invoke();
+            return _server.IsFull;
         }
         
-        private void RemoveFromBaseTracker()
-        {
-            foreach (ObjectData data in Server)
-            {
-                _mono.Manager.RemoveFromTrackedItems(data.TechType);
-            }
-        }
-
-        internal void UpdateNetwork()
-        {
-            UpdateScreen();
-            //Mod.OnContainerUpdate?.Invoke(_mono);
-        }
-
-        public bool IsAllowedToAdd(TechType techType)
+        internal bool IsAllowedToAdd(TechType techType)
         {
             if (!IsOccupied) return false;
 
             QuickLogger.Debug($"Filter Cross Check: {FilterCrossCheck(techType)}",true);
 
-            return _filter.Count == 0 || FilterCrossCheck(techType);
+            return !_server.GetFilters().Any() || FilterCrossCheck(techType);
         }
         
-        ~RackSlot()
-        {
-            _mono.OnUpdate -= Update;
-        }
-
-        internal Pickupable Remove(TechType techType,bool returnItem = false)
-        {
-            ObjectData item = null;
-            Pickupable pickupable = null;
-            for (int i = 0; i < Server.Count; i++)
-            {
-                if (Server.ElementAt(i).TechType != techType) continue;
-
-                item = Server.ElementAt(i);
-
-                if (returnItem)
-                {
-                    pickupable = item.ToPickable();
-                }
-                break;
-            }
-
-            Remove(item);
-            return returnItem ? pickupable : null;
-        }
-
         internal int GetItemCount(TechType techType)
         {
-            return Server?.Where((t, i) => Server.ElementAt(i).TechType == techType).Count() ?? 0;
+            return _server?.GetItemsWithin()[techType] ?? 0;
         }
 
-        public int SpaceAvailable()
+        internal int SpaceAvailable()
         {
-            if (Server == null) return 0;
-            return QPatch.Configuration.Config.ServerStorageLimit - Server.Count;
+            if (_server == null) return 0;
+            return (int) _server?.GetContainerFreeSpace;
         }
 
-        public void LoadServer(HashSet<ObjectData> server)
+        internal bool CanHoldAmount(int amount)
         {
-            QuickLogger.Debug($"Loading Server ID: {Id}",true);
-            //To make a deep copy
-            Server = new HashSet<ObjectData>(server);
+            return _server != null && _server.CanBeStored(amount);
+        }
 
-            foreach (ObjectData data in server)
+        internal void ConnectServer(InventoryItem server)
+        {
+            _server = server.item.gameObject.GetComponent<DSSServerController>();
+            _server.ConnectToDevice(_mono.Manager,Id);
+            _pickupable = server.item.gameObject.GetComponent<Pickupable>();
+            TrackServerItems(_server.GetItemsWithin());
+            _hitController = server.item.gameObject.GetComponentInChildren<ServerHitController>();
+            QuickLogger.Debug($"Hit Controller: {_hitController}");
+            _hitController.GetAdditionalString += FormatData;
+            _hitController.OnButtonClick += OnServerHitClick;
+
+            DSSHelpers.MoveServerToSlot(server.item, Slot, Slot.transform);
+        }
+
+        private void TrackServerItems(Dictionary<TechType, int> itemsWithin)
+        {
+            foreach (KeyValuePair<TechType, int> item in itemsWithin)
             {
-                _mono.Manager.AddToTrackedItems(data.TechType);
+                for (int i = 0; i < item.Value; i++)
+                {
+                    AddToTrackedItems(item.Key);
+                }
             }
         }
 
-        public bool CanHoldAmount(int amount)
+        private void RemoveServerItemsFromTracker(Dictionary<TechType, int> itemsWithin)
         {
-            return Server != null && Server.Count + amount <= QPatch.Configuration.Config.ServerStorageLimit;
+            foreach (KeyValuePair<TechType, int> item in itemsWithin)
+            {
+                for (int i = 0; i < item.Value; i++)
+                {
+                    RemoveFromTrackedItems(item.Key);
+                }
+            }
+        }
+
+        private void RemoveFromTrackedItems(TechType techType)
+        {
+            if (_mono.GetTrackedItems().ContainsKey(techType))
+            {
+                _mono.GetTrackedItems()[techType] -= 1;
+
+                if (_mono.GetTrackedItems()[techType] <= 0)
+                {
+                    _mono.GetTrackedItems().Remove(techType);
+                }
+            }
+
+            _mono.Manager.RemoveFromTrackedItems(techType);
+        }
+
+        private void AddToTrackedItems(TechType techType)
+        {
+            if (_mono.GetTrackedItems().ContainsKey(techType))
+            {
+                _mono.GetTrackedItems()[techType] += 1;
+            }
+            else
+            {
+                _mono.GetTrackedItems().Add(techType, 1);
+            }
+            _mono.Manager.AddToTrackedItems(techType);
+        }
+
+        internal void DisconnectFromRack()
+        {
+            RemoveServerItemsFromTracker(_server.GetItemsWithin());
+            _server.DisconnectFromDevice();
+            _server = null;
+            _pickupable = null;
+            _hitController.GetAdditionalString = null;
+            _hitController.OnButtonClick = null;
+            _hitController = null;
+            _mono.DisplayManager.UpdateContainerAmount();
+            Mod.OnBaseUpdate?.Invoke();
+        }
+
+        private void OnServerHitClick(string s, object obj)
+        {
+            DSSHelpers.GivePlayerItem(_pickupable);
+            DisconnectFromRack();
+        }
+
+        internal int GetTotal()
+        {
+            return _server.GetTotal();
+        }
+
+        internal bool HasFilters()
+        {
+            return _server.HasFilters();
+        }
+
+        public bool HasItem(TechType techType)
+        {
+            return _server.HasItem(techType);
+        }
+
+        public DSSServerController GetConnectedServer()
+        {
+            return _server;
         }
     }
 }

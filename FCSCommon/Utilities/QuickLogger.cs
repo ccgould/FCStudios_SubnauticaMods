@@ -97,5 +97,12 @@
         }
 
         private static string FormatToSimpleVersion(FileVersionInfo version) => $"{version.FileMajorPart}.{version.FileMinorPart}.{version.FileBuildPart}";
+
+        public static void ModMessage(string msg)
+        {
+            string name = Assembly.GetCallingAssembly().GetName().Name;
+            Console.WriteLine($"[{name}] {msg}");
+            ErrorMessage.AddMessage($"[{name}] {msg}");
+        }
     }
 }

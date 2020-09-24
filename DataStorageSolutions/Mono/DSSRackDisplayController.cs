@@ -155,21 +155,30 @@ namespace DataStorageSolutions.Mono
 
         public override void PowerOffDisplay()
         {
-            if (_mono.PowerManager.GetPowerState() == FCSPowerStates.Unpowered)
+            if (_mono.Manager.BasePowerManager.GetPowerState() == FCSPowerStates.Unpowered)
             {
                 GoToPage(RackPages.Blackout);
             }
-            else if (_mono.PowerManager.GetPowerState() == FCSPowerStates.Tripped)
+            else if (_mono.Manager.BasePowerManager.GetPowerState() == FCSPowerStates.Tripped)
             {
                 GoToPage(RackPages.Tripped);
             }
-
         }
 
         internal void GoToPage(RackPages page)
         {
             if(!_mono.IsConstructed) return;
             _mono.AnimationManager.SetIntHash(_page, (int)page);
+        }
+
+        public void ChangeScreenPowerState(FCSPowerStates state)
+        {
+            if (state == FCSPowerStates.Powered)
+            {
+                PowerOnDisplay();
+            }
+
+            PowerOffDisplay();
         }
     }
 }

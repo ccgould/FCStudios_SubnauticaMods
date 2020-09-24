@@ -16,17 +16,8 @@ namespace DataStorageSolutions.Mono
         private FCSPowerStates _prevPowerState;
         private bool _isInitialized;
         private BaseManager _manager;
-        private float AvailablePower => ConnectedRelay?.GetPower() ?? 0f;
-        private PowerRelay ConnectedRelay
-        {
-            get
-            {
-                while (_connectedRelay == null)
-                    UpdatePowerRelay();
+        private float AvailablePower => _connectedRelay?.GetPower() ?? 0f;
 
-                return _connectedRelay;
-            }
-        }
         private FCSPowerStates PowerState
         {
             get => _powerState;
@@ -55,8 +46,8 @@ namespace DataStorageSolutions.Mono
             if (_isInitialized) return;
 
                 _manager = manager;
-
-            _isInitialized = true;
+                _connectedRelay = gameObject.GetComponent<BasePowerRelay>();
+                _isInitialized = true;
         }
         
         internal void UpdatePowerState()
@@ -81,7 +72,7 @@ namespace DataStorageSolutions.Mono
 
         internal void ConsumePower()
         {
-            if(PowerState == FCSPowerStates.Tripped)return;
+            if(PowerState == FCSPowerStates.Tripped || _connectedRelay == null)return;
 
             _energyToConsume = _energyConsumptionPerSecond * DayNightCycle.main.deltaTime;
             bool requiresEnergy = GameModeUtils.RequiresPower();
@@ -89,28 +80,13 @@ namespace DataStorageSolutions.Mono
             if (PowerState == FCSPowerStates.Unpowered) return;
 
             if (!requiresEnergy) return;
-            ConnectedRelay.ConsumeEnergy(_energyToConsume, out float amountConsumed);
+            _connectedRelay.ConsumeEnergy(_energyToConsume, out float amountConsumed);
         }
         
         #endregion
 
         #region Private Methods
-        private void UpdatePowerRelay()
-        {
-            if(_manager == null || _manager.Habitat == null) return;
-            PowerRelay relay = PowerSource.FindRelay(_manager.Habitat.transform);
-            if (relay != null && relay != _connectedRelay)
-            {
-                _connectedRelay = relay;
-
-                QuickLogger.Debug("PowerRelay found at last!");
-            }
-            else
-            {
-                _connectedRelay = null;
-            }
-        }
-
+        
         private void Update()
         {
             if (_manager == null) return;
@@ -143,6 +119,24 @@ namespace DataStorageSolutions.Mono
         public override void SetPowerState(FCSPowerStates state)
         {
             PowerState = state;
+        }
+
+        internal bool HasPower()
+        {
+
+            if (_connectedRelay == null)
+            {
+                return false;
+            }
+
+            if (_connectedRelay == null) return false;
+
+            if (_connectedRelay.GetPowerStatus() == PowerSystem.Status.Offline)
+            {
+                return false;
+            }
+
+            return _connectedRelay.GetPowerStatus() == PowerSystem.Status.Normal || _connectedRelay.GetPowerStatus() == PowerSystem.Status.Emergency;
         }
     }
 }

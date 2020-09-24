@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using DataStorageSolutions.Buildables;
 using DataStorageSolutions.Configuration;
+using DataStorageSolutions.Helpers;
 using DataStorageSolutions.Interfaces;
 using DataStorageSolutions.Model;
 using DataStorageSolutions.Patches;
@@ -40,7 +41,7 @@ namespace DataStorageSolutions.Mono
         internal FCSPowerStates BasePrevPowerState { get; set; }
         internal NameController NameController { get; private set; }
         //internal DSSVehicleDockingManager DockingManager { get; set; }
-        internal bool IsOperational => !_hasBreakerTripped && BaseHasPower();
+        internal bool IsOperational => !_hasBreakerTripped && BasePowerManager.HasPower();
         internal Dictionary<string, FCSConnectableDevice> FCSConnectables { get; set; } = new Dictionary<string, FCSConnectableDevice>();
 
         internal static Action OnPlayerTick { get; set; }
@@ -91,6 +92,13 @@ namespace DataStorageSolutions.Mono
             {
                 BasePowerManager = habitat.gameObject.EnsureComponent<BasePowerManager>();
                 BasePowerManager.Initialize(this);
+                BasePowerManager.OnPowerUpdate += (state, manager) =>
+                {
+                    foreach (DSSRackController baseRack in BaseRacks)
+                    {
+                        baseRack.DisplayManager.ChangeScreenPowerState(state);
+                    }
+                };
             }
 
             //if (DockingManager == null)
@@ -160,12 +168,7 @@ namespace DataStorageSolutions.Mono
         {
             var subRoot = gameObject.GetComponentInParent<SubRoot>() ?? gameObject.GetComponentInChildren<SubRoot>();
 
-            if (subRoot != null)
-            {
-                return FindManager(subRoot);
-            }
-
-            return null;
+            return subRoot != null ? FindManager(subRoot) : null;
         }
 
         internal static void RemoveDestroyedBases()
@@ -242,25 +245,7 @@ namespace DataStorageSolutions.Mono
         #endregion
 
         #region Base Manager Conditionals
-
-        private bool BaseHasPower()
-        {
-            if (Habitat != null)
-            {
-                if (Habitat.powerRelay.GetPowerStatus() == PowerSystem.Status.Offline)
-                {
-                    return false;
-                }
-
-                if (Habitat.powerRelay.GetPowerStatus() == PowerSystem.Status.Normal || Habitat.powerRelay.GetPowerStatus() == PowerSystem.Status.Emergency)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
+        
         internal bool GetHasBreakerTripped()
         {
             return _hasBreakerTripped;
@@ -421,6 +406,15 @@ namespace DataStorageSolutions.Mono
             if (!BaseRacks.Contains(unit) && unit.IsConstructed)
             {
                 BaseRacks.Add(unit);
+
+                if (BasePowerManager.HasPower())
+                {
+                    unit.DisplayManager.PowerOnDisplay();
+                }
+                else
+                {
+                    unit.DisplayManager.PowerOffDisplay();
+                }
                 QuickLogger.Debug($"Add Unit : {unit.GetPrefabIDString()}", true);
             }
         }
@@ -496,7 +490,7 @@ namespace DataStorageSolutions.Mono
                 var data = Mod.GetServerSaveData(dssServerController.GetPrefabID());
                 if (!string.IsNullOrWhiteSpace(data.PrefabID))
                 {
-                    dssServerController.FCSFilteredStorage.Filters = data.ServerFilters;
+                    dssServerController.SetFilters(data.ServerFilters);
                 }
                 GlobalServers.Add(dssServerController);
             }
@@ -522,10 +516,46 @@ namespace DataStorageSolutions.Mono
                 yield return new ServerData
                 {
                     PrefabID = baseServer.GetPrefabID(), 
-                    ServerFilters = baseServer.FCSFilteredStorage.Filters,
+                    ServerFilters = baseServer.GetFilters(),
                     SlotID = baseServer.GetSlotID()
                 };
             }
+        }
+
+        public static int FindSlotId(string prefabId)
+        {
+            return Mod.GetServerSaveData(prefabId).SlotID;
+        }
+
+        public int GetItemCount(TechType techType)
+        {
+            return TrackedItems.ContainsKey(techType) ? TrackedItems[techType] : 0;
+        }
+
+        public void RemoveItemFromBaseAndGivePlayer(TechType techType)
+        {
+            var itemSize = CraftData.GetItemSize(techType);
+            if (!Inventory.main.HasRoomFor(itemSize.x, itemSize.y))
+            {
+                QuickLogger.ModMessage(string.Format(Language.main.Get("InventoryOverflow"),Language.main.Get(techType)));
+                return;
+            }
+            var pickup = GetPickupableFromRack(techType);
+           if(pickup == null) return;
+           DSSHelpers.GivePlayerItem(pickup);
+        }
+
+        private Pickupable GetPickupableFromRack(TechType techType)
+        {
+            foreach (DSSRackController baseRack in BaseRacks)
+            {
+                if (baseRack.ContainsItem(techType))
+                {
+                    return baseRack.RemoveItemFromContainer(techType, 1);
+                }
+            }
+
+            return null;
         }
     }
 }

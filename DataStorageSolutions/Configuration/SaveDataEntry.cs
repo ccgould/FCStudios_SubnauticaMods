@@ -21,6 +21,7 @@ namespace DataStorageSolutions.Configuration
         [JsonProperty] internal string AntennaName { get; set; }
         [JsonProperty] internal List<Filter> Filters { get; set; }
         [JsonProperty] internal TechType ItemDisplayItem { get; set; }
+        public IEnumerable<string> RackServers { get; set; }
     }
 
     [Serializable]
@@ -28,7 +29,7 @@ namespace DataStorageSolutions.Configuration
     {
         [JsonProperty] internal HashSet<ServerData> GlobalServers { get; set; }
         [JsonProperty] internal List<BaseSaveData> Bases { get; set; }
-
+        
         [JsonProperty] internal List<SaveDataEntry> Entries = new List<SaveDataEntry>();
     }
 

@@ -75,7 +75,7 @@ namespace DataStorageSolutions.Mono
                 if (pickupable != null && pickupable.GetTechType() != Mod.ServerFormattingStationClassID.ToTechType())
                 {
                     QuickLogger.Debug($"Found item {pickupable?.GetTechType().ToString()}");
-                    MoveServerToSlot(pickupable);
+                    DSSHelpers.MoveServerToSlot(pickupable,GetSlot(),gameObject.transform);
                     ConnectServer(pickupable);
                     DisplayManager?.GoToPage(FilterPages.FilterPage);
                     DisplayManager?.UpdatePages();
@@ -84,27 +84,24 @@ namespace DataStorageSolutions.Mono
             }
         }
 
-        private void ConnectServer(Pickupable pickupable)
-        {
-            _server = pickupable;
-            _controller = pickupable.gameObject.GetComponent<DSSServerController>();
-            _controller.SetSlot(0);
-            _filters = _controller.FCSFilteredStorage.Filters;
-        }
-
-        private void MoveServerToSlot(Pickupable pickupable)
+        private Transform GetSlot()
         {
             if (_slot == null)
             {
                 _slot = GameObjectHelpers.FindGameObject(gameObject, "Server");
             }
 
-            pickupable.gameObject.GetComponent<Rigidbody>().isKinematic = true;
-            pickupable.Reparent(gameObject.transform);
-            pickupable.transform.position = new Vector3(_slot.transform.position.x, _slot.transform.position.y, _slot.transform.position.z);
-            pickupable.gameObject.SetActive(true);
+            return _slot.transform;
         }
 
+        private void ConnectServer(Pickupable pickupable)
+        {
+            _server = pickupable;
+            _controller = pickupable.gameObject.GetComponent<DSSServerController>();
+            _controller.ConnectToDevice(Manager, 0);
+            _filters = _controller.GetFilters();
+        }
+        
         private void CreateAndAddNewServer(HashSet<ObjectData> items)
         {
             try
@@ -114,7 +111,7 @@ namespace DataStorageSolutions.Mono
 
                 foreach (ObjectData data in items)
                 {
-                    controller.FCSFilteredStorage.AddItemToContainer(new InventoryItem(data.ToPickable()));
+                    controller.AddItemToContainer(new InventoryItem(data.ToPickable()));
                 }
 
                 var result = AddItemToContainer(server);
@@ -260,10 +257,10 @@ namespace DataStorageSolutions.Mono
 
             if (_controller != null)
             {
+                ConnectServer(item.item);
                 DisplayManager.GoToPage(FilterPages.FilterPage);
                 DisplayManager.UpdatePages();
-                MoveServerToSlot(item.item);
-                ConnectServer(item.item);
+                DSSHelpers.MoveServerToSlot(item.item, GetSlot(), gameObject.transform);
             }
             var pda = Player.main.GetPDA();
             if(pda.isOpen)
@@ -272,6 +269,7 @@ namespace DataStorageSolutions.Mono
             }
             return _controller != null;
         }
+        
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
         {
             if (AnimationManager.GetBoolHash(_slotState))
@@ -293,7 +291,7 @@ namespace DataStorageSolutions.Mono
             
             if (result)
             {
-                _controller.Disconnect();
+                _controller.DisconnectFromDevice();
                 _controller = null;
                 _server = null;
                 _filters = new HashSet<Filter>();

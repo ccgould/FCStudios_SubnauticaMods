@@ -2,8 +2,9 @@
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using System;
+using DataStorageSolutions.Buildables;
 using DataStorageSolutions.Configuration;
-using FCSCommon.Components;
+using DataStorageSolutions.Display;
 using FCSCommon.Enums;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,14 +15,10 @@ namespace DataStorageSolutions.Mono
     {
         private DSSServerController _mono;
         private Text _counter;
-        private Pickupable _pickupable;
-        private Collider _collider;
 
         internal void Setup(DSSServerController mono)
         {
             _mono = mono;
-            _pickupable = _mono.gameObject.GetComponentInChildren<Pickupable>();
-            _collider = _pickupable?.gameObject.GetComponentInChildren<Collider>();
 
             if (FindAllComponents())
             {
@@ -31,7 +28,7 @@ namespace DataStorageSolutions.Mono
         
         public override void OnButtonClick(string btnName, object tag)
         {
-            throw new NotImplementedException();
+
         }
 
         public override bool FindAllComponents()
@@ -56,11 +53,16 @@ namespace DataStorageSolutions.Mono
                 #region Hit
 
                 var interactionFace = InterfaceHelpers.FindGameObject(canvasGameObject, "Hit");
-                var catcher = interactionFace.AddComponent<InterfaceButton>();
-                catcher.ButtonMode = InterfaceButtonMode.TextColor;
-                catcher.OnInterfaceButton += OnInterfaceButton;
-                
+
+                var catcher = interactionFace.EnsureComponent<ServerHitController>();
+                catcher.Controller = _mono;
+                catcher.TextLineOne = string.Format(AuxPatchers.TakeServer(), Mod.ServerFriendlyName);
+                catcher.TextLineTwo = "Data: {0}";
+                catcher.GetAdditionalDataFromString = true;
+                catcher.ButtonMode = InterfaceButtonMode.Background;
+
                 #endregion
+
 
                 return true;
             }
@@ -68,21 +70,6 @@ namespace DataStorageSolutions.Mono
             {
                 return false;
             }
-        }
-
-        private void OnInterfaceButton(bool obj)
-        {
-            QuickLogger.Info("OnInteractionChanged");
-            //if (_pickupable != null && _mono.IsMounted)
-            //{
-            //    QuickLogger.Info("Changing Pickupable");
-            //    _pickupable.isPickupable = obj;
-            //    if (_collider != null)
-            //    {
-            //        _collider.isTrigger = !obj;
-            //    }
-
-            //}
         }
         
         internal void UpdateDisplay()

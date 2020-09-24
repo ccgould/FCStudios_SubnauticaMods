@@ -32,6 +32,18 @@ namespace FCSCommon.Extensions
             }
             return item;
         }
+
+        internal static InventoryItem ToInventoryItem(this Pickupable pickupable)
+        {
+            InventoryItem item = null;
+            if (pickupable != null)
+            {
+                pickupable.Pickup(false);
+                item = new InventoryItem(pickupable);
+            }
+            return item;
+        }
+
 #elif BELOWZERO
         internal static Pickupable ToPickupable(this TechType techType)
         {

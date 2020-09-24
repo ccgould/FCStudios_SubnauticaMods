@@ -97,7 +97,7 @@ namespace DataStorageSolutions.Mono
             InterfaceHelpers.CreateButton(deleteBTN, "DeleteBTN", InterfaceButtonMode.Background,
                 OnButtonClick, Color.gray, Color.white, 5.0f, AuxPatchers.ColorPage());
 
-            AddToBaseManager();
+            FindManager();
 
             InvokeRepeating(nameof(UpdateScreen),1f,1f);
 
@@ -112,7 +112,7 @@ namespace DataStorageSolutions.Mono
                     DumpContainer?.OpenStorage();
                     break;
                 case "IconClick":
-                    Manager.RemoveItemFromContainer(_currentTechType);
+                    Manager.RemoveItemFromBaseAndGivePlayer(_currentTechType);
                     break;
                 case "DeleteBTN":
                     _icon.gameObject.SetActive(false);
@@ -172,14 +172,9 @@ namespace DataStorageSolutions.Mono
             _icon.gameObject.SetActive(true);
         }
 
-        internal void AddToBaseManager(BaseManager managers = null)
+        internal void FindManager(BaseManager managers = null)
         {
-            if (SubRoot == null)
-            {
-                SubRoot = GetComponentInParent<SubRoot>();
-            }
-
-            Manager = managers ?? BaseManager.FindManager(SubRoot);
+            Manager = managers ?? BaseManager.FindManager(gameObject);
         }
 
         public bool CanBeStored(int amount, TechType techType)

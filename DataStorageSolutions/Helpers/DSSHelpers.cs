@@ -159,7 +159,7 @@ namespace DataStorageSolutions.Helpers
                             DetectDataObjectTypeAndPerformConversion(data, pickup);
 
                             var result = getServerWithObjectData?.Invoke(data);
-                            result?.Remove(data);
+                            result?.RemoveItemFromServer(data.TechType); 
                             isSuccessful = true;
                         }
                     }
@@ -493,6 +493,15 @@ namespace DataStorageSolutions.Helpers
         internal static bool CheckIfTechDataAvailable(TechType craft)
         {
             return CraftDataHandler.GetTechData(craft) != null;
+        }
+
+        internal static void MoveServerToSlot(Pickupable pickupable, Transform slot, Transform device)
+        {
+            pickupable.gameObject.GetComponent<Rigidbody>().isKinematic = true;
+            pickupable.Reparent(device);
+            pickupable.transform.position = new Vector3(slot.transform.position.x, slot.transform.position.y, slot.transform.position.z);
+            pickupable.transform.rotation = slot.rotation;
+            pickupable.gameObject.SetActive(true);
         }
     }
 }
