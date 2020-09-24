@@ -42,8 +42,8 @@ namespace DataStorageSolutions
             var wallMountedRack = new FCSKit(Mod.WallMountedRackKitClassID, Mod.WallMountedRackFriendlyName, craftingTab, Mod.WallMountedRackIngredients);
             wallMountedRack.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
 
-            //var terminal = new FCSKit(Mod.TerminalKitClassID, Mod.TerminalFriendlyName, craftingTab, Mod.TerminalIngredients);
-            //terminal.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
+            var terminal = new FCSKit(Mod.TerminalKitClassID, Mod.TerminalFriendlyName, craftingTab, Mod.TerminalIngredients);
+            terminal.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
 
             var antenna = new FCSKit(Mod.AntennaKitClassID, Mod.AntennaFriendlyName, craftingTab, Mod.AntennaIngredients);
             antenna.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
@@ -96,8 +96,8 @@ namespace DataStorageSolutions
                 var wallMountedRack = new WallMountedRackBuildable();
                 wallMountedRack.Patch();
 
-                //var terminal = new DSSTerminalC48Buildable();
-                //terminal.Patch();
+                var terminal = new DSSTerminalC48Buildable();
+                terminal.Patch();
 
                 //var operatorB = new OperatorBuildable();
                 //operatorB.Patch();

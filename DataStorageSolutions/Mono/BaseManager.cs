@@ -50,12 +50,9 @@ namespace DataStorageSolutions.Mono
         internal static List<FCSOperation> Crafts { get; set; } = new List<FCSOperation>();
         internal static List<FCSOperation> Operations { get; set; } = new List<FCSOperation>();
         public BasePowerManager BasePowerManager { get; set; }
-
-        internal readonly HashSet<DSSRackController> BaseRacks = new HashSet<DSSRackController>();
+        public BaseStorageManager StorageManager { get; set; }
         //internal readonly HashSet<DSSOperatorController> BaseOperators = new HashSet<DSSOperatorController>();
-        internal static readonly HashSet<DSSServerController> GlobalServers = new HashSet<DSSServerController>();
-        //internal readonly HashSet<DSSTerminalController> BaseTerminals = new HashSet<DSSTerminalController>();
-        internal readonly Dictionary<TechType, int> TrackedItems = new Dictionary<TechType, int>();
+        internal readonly HashSet<DSSTerminalController> BaseTerminals = new HashSet<DSSTerminalController>();
         private bool _isInitialized;
 
         #region Default Constructor
@@ -80,6 +77,12 @@ namespace DataStorageSolutions.Mono
             FCSConnectableAwake_Patcher.AddEventHandlerIfMissing(AlertedNewFCSConnectablePlaced);
             FCSConnectableDestroy_Patcher.AddEventHandlerIfMissing(AlertedFCSConnectableDestroyed);
 
+            if (StorageManager == null)
+            {
+                StorageManager = new BaseStorageManager();
+                StorageManager.Initialize(this);
+            }
+
             if (NameController == null)
             {
                 NameController = new NameController();
@@ -94,12 +97,13 @@ namespace DataStorageSolutions.Mono
                 BasePowerManager.Initialize(this);
                 BasePowerManager.OnPowerUpdate += (state, manager) =>
                 {
-                    foreach (DSSRackController baseRack in BaseRacks)
+                    foreach (DSSRackController baseRack in StorageManager.BaseRacks)
                     {
                         baseRack.DisplayManager.ChangeScreenPowerState(state);
                     }
                 };
             }
+
 
             //if (DockingManager == null)
             //{
@@ -325,48 +329,6 @@ namespace DataStorageSolutions.Mono
 
         #endregion
 
-        #region Item Tracker Methods
-
-        internal void AddToTrackedItems(TechType techType)
-        {
-            if (TrackedItems.ContainsKey(techType))
-            {
-                TrackedItems[techType] += 1;
-#if DEBUG
-                QuickLogger.Debug($"Added another {techType}", true);
-#endif
-            }
-            else
-            {
-                TrackedItems.Add(techType, 1);
-#if DEBUG
-                QuickLogger.Debug($"Item {techType} was added to the tracking list.", true);
-#endif
-            }
-        }
-
-        internal void RemoveFromTrackedItems(TechType techType)
-        {
-            if (!TrackedItems.ContainsKey(techType)) return;
-
-            if (TrackedItems[techType] == 1)
-            {
-                TrackedItems.Remove(techType);
-#if DEBUG
-                QuickLogger.Debug($"Removed another {techType}", true);
-#endif
-            }
-            else
-            {
-                TrackedItems[techType] -= 1;
-#if DEBUG
-                QuickLogger.Debug($"Item {techType} is now {TrackedItems[techType]}", true);
-#endif
-            }
-        }
-
-        #endregion
-
         #region Name Controller
 
         private void OnLabelChangedMethod(string newName, NameController controller)
@@ -379,23 +341,21 @@ namespace DataStorageSolutions.Mono
 
         #region Terminal Registration
 
-        //internal void RegisterTerminal(DSSTerminalController unit)
-        //{
-        //    if (!BaseTerminals.Contains(unit) && unit.IsConstructed)
-        //    {
-        //        BaseTerminals.Add(unit);
-        //        unit.PowerManager.OnPowerUpdate += OnPowerUpdate;
-        //        QuickLogger.Debug($"Add Unit : {unit.GetPrefabIDString()}", true);
-        //    }
-        //}
+        internal void RegisterTerminal(DSSTerminalController unit)
+        {
+            if (!BaseTerminals.Contains(unit) && unit.IsConstructed)
+            {
+                BaseTerminals.Add(unit);
+                QuickLogger.Debug($"Add Unit : {unit.GetPrefabIDString()}", true);
+            }
+        }
 
-        //internal void RemoveTerminal(DSSTerminalController unit)
-        //{
-        //    if (!BaseTerminals.Contains(unit)) return;
-        //    BaseTerminals.Remove(unit);
-        //    unit.PowerManager.OnPowerUpdate -= OnPowerUpdate;
-        //    QuickLogger.Debug($"Removed Unit : {unit.GetPrefabIDString()}", true);
-        //}
+        internal void RemoveTerminal(DSSTerminalController unit)
+        {
+            if (!BaseTerminals.Contains(unit)) return;
+            BaseTerminals.Remove(unit);
+            QuickLogger.Debug($"Removed Unit : {unit.GetPrefabIDString()}", true);
+        }
 
         #endregion
 
@@ -403,9 +363,9 @@ namespace DataStorageSolutions.Mono
 
         internal void RegisterRack(DSSRackController unit)
         {
-            if (!BaseRacks.Contains(unit) && unit.IsConstructed)
+            if (!StorageManager.BaseRacks.Contains(unit) && unit.IsConstructed)
             {
-                BaseRacks.Add(unit);
+                StorageManager.BaseRacks.Add(unit);
 
                 if (BasePowerManager.HasPower())
                 {
@@ -423,8 +383,8 @@ namespace DataStorageSolutions.Mono
         {
             foreach (BaseManager manager in Managers)
             {
-                if (!manager.BaseRacks.Contains(unit)) continue;
-                manager.BaseRacks.Remove(unit);
+                if (!manager.StorageManager.BaseRacks.Contains(unit)) continue;
+                manager.StorageManager.BaseRacks.Remove(unit);
                 QuickLogger.Debug($"Removed Unit : {unit.GetPrefabIDString()}", true);
             }
         }
@@ -483,79 +443,48 @@ namespace DataStorageSolutions.Mono
 
         #endregion
 
-        internal static void RegisterServer(DSSServerController dssServerController)
+        internal static void RegisterServer(DSSServerController controller)
         {
-            if (!GlobalServers.Contains(dssServerController))
+            if (!BaseStorageManager.GlobalServers.Contains(controller))
             {
-                var data = Mod.GetServerSaveData(dssServerController.GetPrefabID());
+                var data = Mod.GetServerSaveData(controller.GetPrefabID());
                 if (!string.IsNullOrWhiteSpace(data.PrefabID))
                 {
-                    dssServerController.SetFilters(data.ServerFilters);
+                    controller.SetFilters(data.ServerFilters);
                 }
-                GlobalServers.Add(dssServerController);
+                BaseStorageManager.GlobalServers.Add(controller);
             }
+        }
+
+        internal void RegisterServerInBase(DSSServerController serverController)
+        {
+            serverController.Manager.StorageManager.RegisterServerInBase(serverController);
+        }
+
+        public void UnRegisterServerFromBase(DSSServerController serverController)
+        {
+            serverController.Manager.StorageManager.RemoveServerFromBase(serverController);
         }
 
         public static void UnRegisterServer(DSSServerController dssServerController)
         {
-            GlobalServers.Remove(dssServerController);
+            BaseStorageManager.GlobalServers.Remove(dssServerController);
         }
 
-        internal static void CleanServers()
+        public static void UpdateGlobalTerminals()
         {
-            //var keysToRemove = Servers.Keys.Except(TrackedServers).ToList();
-
-            //foreach (var key in keysToRemove)
-            //    Servers.Remove(key);
-        }
-
-        public static IEnumerable<ServerData> GetServersSaveData()
-        {
-            foreach (DSSServerController baseServer in GlobalServers)
+            foreach (BaseManager manager in Managers)
             {
-                yield return new ServerData
-                {
-                    PrefabID = baseServer.GetPrefabID(), 
-                    ServerFilters = baseServer.GetFilters(),
-                    SlotID = baseServer.GetSlotID()
-                };
+                manager.UpdateBaseTerminals();
             }
         }
 
-        public static int FindSlotId(string prefabId)
+        private void UpdateBaseTerminals()
         {
-            return Mod.GetServerSaveData(prefabId).SlotID;
-        }
-
-        public int GetItemCount(TechType techType)
-        {
-            return TrackedItems.ContainsKey(techType) ? TrackedItems[techType] : 0;
-        }
-
-        public void RemoveItemFromBaseAndGivePlayer(TechType techType)
-        {
-            var itemSize = CraftData.GetItemSize(techType);
-            if (!Inventory.main.HasRoomFor(itemSize.x, itemSize.y))
+            foreach (DSSTerminalController terminal in BaseTerminals)
             {
-                QuickLogger.ModMessage(string.Format(Language.main.Get("InventoryOverflow"),Language.main.Get(techType)));
-                return;
+                terminal.UpdateScreen();
             }
-            var pickup = GetPickupableFromRack(techType);
-           if(pickup == null) return;
-           DSSHelpers.GivePlayerItem(pickup);
-        }
-
-        private Pickupable GetPickupableFromRack(TechType techType)
-        {
-            foreach (DSSRackController baseRack in BaseRacks)
-            {
-                if (baseRack.ContainsItem(techType))
-                {
-                    return baseRack.RemoveItemFromContainer(techType, 1);
-                }
-            }
-
-            return null;
         }
     }
 }

@@ -52,6 +52,20 @@ namespace FCSTechFabricator.Objects
         
         public bool CanBeStored(int amount, TechType techType)
         {
+            if (HasFilters())
+            {
+                var filterPass = false;
+                foreach (Filter filter in Filters)
+                {
+                    if (filter.IsTechTypeAllowed(techType))
+                    {
+                        filterPass = true;
+                    }
+                }
+
+                return filterPass;
+            }
+
             return amount <= _storageLimit;
         }
 

@@ -29,30 +29,21 @@ namespace DataStorageSolutions.Mono
         private bool _runStartUpOnEnable;
         private SaveDataEntry _savedData;
         private bool _fromSave;
-        private BaseManager _manager;
         private bool _isBeingDestroyed;
 
         public override bool IsConstructed => _isContructed;
-        public override BaseManager Manager
-        {
-            get => _manager;
-            set
-            {
-                _manager = value; 
+        public override BaseManager Manager { get; set; }
 
-                if (value == null || PowerManager == null) return;
-                //Because the way the Terminal is lazy loaded. I choose to lazy load the power manager based on the manager setter
-                PowerManager.Initialize(this, QPatch.Configuration.Config.ScreenPowerUsage);
-            }
-        }
         public TechType TechType => GetTechType();
         internal AnimationManager AnimationManager { get; private set; }
         public DSSTerminalDisplay DisplayManager { get; private set; }
         internal ColorManager TerminalColorManager { get; private set; }
-        public PowerManager PowerManager { get; private set; }
+
 
         private void OnEnable()
         {
+
+            //TODO Put a Message on the screen saying it cant find the manager
             if (_runStartUpOnEnable)
             {
                 if (!IsInitialized)
@@ -114,11 +105,11 @@ namespace DataStorageSolutions.Mono
             }
         }
 
-        private void OnBaseUpdate()
-        {
-            GetData();
-            UpdateScreen();
-        }
+        //private void OnBaseUpdate()
+        //{
+        //    GetData();
+        //    UpdateScreen();
+        //}
 
         private void ReadySaveData()
         {
@@ -139,11 +130,8 @@ namespace DataStorageSolutions.Mono
 
         private void FindBaseById(string id)
         {
-            Manager = BaseManager.FindManager(id);
-            if (Manager != null)
-            {
-                SubRoot = Manager.Habitat;
-            }
+            if(Manager == null)
+                Manager = BaseManager.FindManager(id);
         }
 
         public string GetPrefabIDString()
@@ -163,12 +151,7 @@ namespace DataStorageSolutions.Mono
         
         public override void Initialize()
         {
-
-            if (PowerManager == null)
-            {
-                PowerManager = gameObject.AddComponent<PowerManager>();
-                PowerManager.OnPowerUpdate += OnPowerUpdate;
-            }
+            Manager = BaseManager.FindManager(gameObject);
 
             if (TerminalColorManager == null)
             {
@@ -180,9 +163,7 @@ namespace DataStorageSolutions.Mono
             {
                 AnimationManager = gameObject.AddComponent<AnimationManager>();
             }
-
-            GetData();
-
+            
             if (DisplayManager == null)
             {
                 DisplayManager = gameObject.AddComponent<DSSTerminalDisplay>();
@@ -190,7 +171,8 @@ namespace DataStorageSolutions.Mono
             }
             
             Mod.OnAntennaBuilt += OnAntennaBuilt;
-            Mod.OnBaseUpdate += OnBaseUpdate;
+            Manager?.RegisterTerminal(this);
+            //Mod.OnBaseUpdate += OnBaseUpdate;
         }
         
         public override void UpdateScreen()
@@ -199,31 +181,7 @@ namespace DataStorageSolutions.Mono
             QuickLogger.Debug($"Refreshing Monitor: {GetPrefabIDString()}", true);
             DisplayManager.Refresh();
         }
-
-        internal HashSet<DSSRackController> GetData()
-        {
-            if (SubRoot)
-            {
-                if (!_isContructed ) return null;
-                
-                Manager = Manager ?? BaseManager.FindManager(SubRoot);
-                Manager.RegisterTerminal(this);
-                Manager.OnVehicleStorageUpdate += OnVehicleStorageUpdate;
-                Manager.OnVehicleUpdate += OnVehicleUpdate;
-                Manager.OnContainerUpdate += OnContainerUpdate;
-                return Manager.BaseRacks;
-            }
-            return null;
-        }
-
-        private void OnContainerUpdate(BaseManager manager)
-        {
-            if (manager == Manager)
-            {
-                DisplayManager.RefreshVehicleItems();
-            }
-        }
-
+        
         private void OnVehicleUpdate(List<Vehicle> vehicles, BaseManager baseManager)
         {
             if (baseManager == Manager)
@@ -279,7 +237,7 @@ namespace DataStorageSolutions.Mono
 
             _savedData.ID = id;
             _savedData.TerminalBodyColor = TerminalColorManager.GetMaskColor().ColorToVector4();
-            _savedData.BaseID = SubRoot?.gameObject.GetComponentInChildren<PrefabIdentifier>()?.Id;
+            _savedData.BaseID = Manager.InstanceID;
             newSaveData.Entries.Add(_savedData);
         }
 
@@ -297,12 +255,6 @@ namespace DataStorageSolutions.Mono
             {
                 if (isActiveAndEnabled)
                 {
-
-                    if (SubRoot == null)
-                    {
-                        SubRoot = GetComponentInParent<SubRoot>();
-                    }
-
                     if (!IsInitialized)
                     {
                         Initialize();

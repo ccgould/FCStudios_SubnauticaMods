@@ -69,7 +69,18 @@ namespace FCSTechFabricator.Components
 
         private bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
         {
-            return _storage.IsAllowedToAdd(pickupable, verbose);
+            var result = _storage.IsAllowedToAdd(pickupable, verbose);
+            return result;
+        }
+
+        public string GetStorageIsFullMessage()
+        {
+            return _storageIsFullMessage;
+        }
+
+        public string GetItemNotAllowedMessage()
+        {
+            return _itemNotAllowedMessage;
         }
 
         public void OpenStorage()

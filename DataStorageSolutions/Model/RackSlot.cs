@@ -80,14 +80,16 @@ namespace DataStorageSolutions.Model
         internal void AddItemToServer(InventoryItem item)
         {
             _server.AddItemToContainer(item);
-            _mono.Manager.AddToTrackedItems(item.item.GetTechType());
+            _mono.Manager.StorageManager.AddToTrackedItems(item.item.GetTechType());
+            _mono.AddItemToRackItemTracker(item.item.GetTechType());
             _mono.UpdateScreen();
         }
 
         internal Pickupable RemoveItemFromServer(TechType techType)
         {
             var pickup =  _server.RemoveItemFromContainer(techType, 1);
-            _mono.Manager.RemoveFromTrackedItems(techType);
+            _mono.Manager.StorageManager.RemoveFromTrackedItems(techType);
+            _mono.RemoveFromRackTrackedItems(techType);
             _mono.UpdateScreen();
             return pickup;
         }
@@ -99,11 +101,15 @@ namespace DataStorageSolutions.Model
         
         internal bool IsAllowedToAdd(TechType techType)
         {
-            if (!IsOccupied) return false;
+            if (!IsOccupied || IsFull()) return false;
 
+            QuickLogger.Debug($"Slot ID: {Id}",true);
             QuickLogger.Debug($"Filter Cross Check: {FilterCrossCheck(techType)}",true);
+            QuickLogger.Debug($"Has Filters Check: {!_server.HasFilters()}",true);
 
-            return !_server.GetFilters().Any() || FilterCrossCheck(techType);
+            if (!_server.HasFilters()) return true;
+            var filterCheckResult = FilterCrossCheck(techType);
+            return filterCheckResult;
         }
         
         internal int GetItemCount(TechType techType)
@@ -129,11 +135,11 @@ namespace DataStorageSolutions.Model
             _pickupable = server.item.gameObject.GetComponent<Pickupable>();
             TrackServerItems(_server.GetItemsWithin());
             _hitController = server.item.gameObject.GetComponentInChildren<ServerHitController>();
-            QuickLogger.Debug($"Hit Controller: {_hitController}");
             _hitController.GetAdditionalString += FormatData;
             _hitController.OnButtonClick += OnServerHitClick;
-
+            _mono.Manager.RegisterServerInBase(_server);
             DSSHelpers.MoveServerToSlot(server.item, Slot, Slot.transform);
+            BaseManager.UpdateGlobalTerminals();
         }
 
         private void TrackServerItems(Dictionary<TechType, int> itemsWithin)
@@ -170,7 +176,7 @@ namespace DataStorageSolutions.Model
                 }
             }
 
-            _mono.Manager.RemoveFromTrackedItems(techType);
+            _mono.Manager.StorageManager.RemoveFromTrackedItems(techType);
         }
 
         private void AddToTrackedItems(TechType techType)
@@ -183,12 +189,13 @@ namespace DataStorageSolutions.Model
             {
                 _mono.GetTrackedItems().Add(techType, 1);
             }
-            _mono.Manager.AddToTrackedItems(techType);
+            _mono.Manager.StorageManager.AddToTrackedItems(techType);
         }
 
         internal void DisconnectFromRack()
         {
             RemoveServerItemsFromTracker(_server.GetItemsWithin());
+            _mono.Manager.UnRegisterServerFromBase(_server);
             _server.DisconnectFromDevice();
             _server = null;
             _pickupable = null;
@@ -196,7 +203,7 @@ namespace DataStorageSolutions.Model
             _hitController.OnButtonClick = null;
             _hitController = null;
             _mono.DisplayManager.UpdateContainerAmount();
-            Mod.OnBaseUpdate?.Invoke();
+            BaseManager.UpdateGlobalTerminals();
         }
 
         private void OnServerHitClick(string s, object obj)

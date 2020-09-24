@@ -754,9 +754,9 @@ TechType.Databox
                     controller.Save(newSaveData);
                 }
 
-                BaseManager.CleanServers();
+                BaseStorageManager.CleanServers();
 
-                newSaveData.GlobalServers = new HashSet<ServerData>(BaseManager.GetServersSaveData());
+                newSaveData.GlobalServers = new HashSet<ServerData>(BaseStorageManager.GetServersSaveData());
                 //newSaveData.Bases = BaseManager.GetSaveData().ToList();
                 _saveData = newSaveData;
 

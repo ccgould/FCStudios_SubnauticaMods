@@ -169,7 +169,7 @@ namespace DataStorageSolutions.Mono
 
             var list3 = _vehiclesSnapshot.Except(Vehicles);
 
-            // Un-subscribe all undocked vehicles
+            // Un-subscribe all un-docked vehicles
             foreach (Vehicle vehicle in list3)
             {
                 var vehicleContainers = DSSHelpers.GetVehicleContainers(vehicle);

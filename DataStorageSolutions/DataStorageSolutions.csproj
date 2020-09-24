@@ -130,6 +130,7 @@
     <Compile Include="Debug\DebugMenu.cs" />
     <Compile Include="Debug\Patches\OpenDebugMenu.cs" />
     <Compile Include="Display\DSSVehicleUIButton.cs" />
+    <Compile Include="Display\ItemInterfaceButton.cs" />
     <Compile Include="Display\OperationInterfaceButton.cs" />
     <Compile Include="Display\ServerHitController.cs" />
     <Compile Include="Enumerators\ButtonType.cs" />
@@ -143,6 +144,7 @@
     <Compile Include="Interfaces\IDataSoluationsSave.cs" />
     <Compile Include="Enumerators\TerminalPages.cs" />
     <Compile Include="Model\AudioHandler.cs" />
+    <Compile Include="Model\BaseStorageManager.cs" />
     <Compile Include="Model\Catergories.cs" />
     <Compile Include="Model\RackSlot.cs" />
     <Compile Include="Model\ObjectDataTransferData.cs" />
@@ -158,6 +160,8 @@
     <Compile Include="Model\FCSOperation.cs" />
     <Compile Include="Mono\DSSServerFormattingStationController.cs" />
     <Compile Include="Mono\DSSServerFormattingStationDisplay.cs" />
+    <Compile Include="Mono\DSSTerminalController.cs" />
+    <Compile Include="Mono\DSSTerminalDisplay.cs" />
     <Compile Include="Structs\OperatorButtonData.cs" />
     <Compile Include="Mono\BasePowerManager.cs" />
     <Compile Include="Mono\SearchField.cs" />

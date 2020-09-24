@@ -120,7 +120,7 @@ namespace DataStorageSolutions.Mono
                 DisplayManager.Setup(this);
             }
 
-            _slot = BaseManager.FindSlotId(GetPrefabID());
+            _slot = BaseStorageManager.FindSlotId(GetPrefabID());
 
             BaseManager.RegisterServer(this);
 

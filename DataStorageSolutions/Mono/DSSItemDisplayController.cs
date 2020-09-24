@@ -112,7 +112,8 @@ namespace DataStorageSolutions.Mono
                     DumpContainer?.OpenStorage();
                     break;
                 case "IconClick":
-                    Manager.RemoveItemFromBaseAndGivePlayer(_currentTechType);
+                    Manager.StorageManager.RemoveItemFromBase(_currentTechType);
+                    UpdateScreen();
                     break;
                 case "DeleteBTN":
                     _icon.gameObject.SetActive(false);
@@ -167,7 +168,7 @@ namespace DataStorageSolutions.Mono
         {
             if(_icon == null || _currentTechType == TechType.None)return;
             _icon.sprite = SpriteManager.Get(_currentTechType);
-            _amount.text = $"x{Manager.GetItemCount(_currentTechType)}";
+            _amount.text = $"x{Manager.StorageManager.GetItemCount(_currentTechType)}";
             _button.TextLineOne = string.Format(AuxPatchers.TakeFormatted(), Language.main.Get(_currentTechType));
             _icon.gameObject.SetActive(true);
         }

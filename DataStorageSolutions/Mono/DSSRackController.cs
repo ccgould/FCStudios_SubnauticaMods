@@ -114,11 +114,14 @@ namespace DataStorageSolutions.Mono
 
             _allowedToNotify = false;
 
-            QuickLogger.Debug($"Save Data Count: {_savedData.RackServers.Count()} || Global Servers Count: { BaseManager.GlobalServers.Count}");
+
+#if DEBUG
+            QuickLogger.Debug($"Save Data Count: {_savedData.RackServers.Count()} || Global Servers Count: { BaseStorageManager.GlobalServers.Count}");
+#endif
 
             foreach (string server in _savedData.RackServers)
             {
-                foreach (DSSServerController controller in BaseManager.GlobalServers)
+                foreach (DSSServerController controller in BaseStorageManager.GlobalServers)
                 {
                     if (controller.GetPrefabID() == server)
                     {
@@ -505,8 +508,68 @@ namespace DataStorageSolutions.Mono
 
         internal void AddItemToAServer(InventoryItem item,int slot = -1)
         {
-            if (slot >= -1) return;
+            if (slot == -1)
+            {
+                slot = GetCapableSlot(item);
+#if DEBUG
+                QuickLogger.Debug($"Capable Slot Return: {slot}", true);
+#endif
+            }
+
+            if(slot == -1) return;
+
             _servers[slot].AddItemToServer(item);
+        }
+
+        internal void AddItemToRackItemTracker(TechType techType)
+        {
+            if (_rackItemsTracker.ContainsKey(techType))
+            {
+                _rackItemsTracker[techType] += 1;
+#if DEBUG
+                QuickLogger.Debug($"Added another {techType} to rack tracker", true);
+#endif
+            }
+            else
+            {
+                _rackItemsTracker.Add(techType, 1);
+#if DEBUG
+                QuickLogger.Debug($"Item {techType} was added to the rack tracking list.", true);
+#endif
+            }
+        }
+
+        internal void RemoveFromRackTrackedItems(TechType techType)
+        {
+            if (!_rackItemsTracker.ContainsKey(techType)) return;
+
+            if (_rackItemsTracker[techType] == 1)
+            {
+                _rackItemsTracker.Remove(techType);
+#if DEBUG
+                QuickLogger.Debug($"Removed {techType}", true);
+#endif
+            }
+            else
+            {
+                _rackItemsTracker[techType] -= 1;
+#if DEBUG
+                QuickLogger.Debug($"Item {techType} is now {_rackItemsTracker[techType]}", true);
+#endif
+            }
+        }
+
+        private int GetCapableSlot(InventoryItem item)
+        {
+            foreach (RackSlot slot in _servers)
+            {
+                if (slot.IsAllowedToAdd(item.item.GetTechType()))
+                {
+                    return slot.Id;
+                }
+            }
+
+            return -1;
         }
 
         #endregion
