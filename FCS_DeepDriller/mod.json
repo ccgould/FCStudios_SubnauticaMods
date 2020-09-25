@@ -12,5 +12,8 @@
   "Enable": true,
   "VersionChecker": {
     "LatestVersionURL": "https://github.com/ccgould/FCStudios_SubnauticaMods/raw/master/FCS_DeepDriller/mod.json"
-  }
+  },
+  "NexusId": {
+    "Subnautica": 319
+  } 
 }
