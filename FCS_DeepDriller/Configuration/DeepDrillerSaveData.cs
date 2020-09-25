@@ -39,6 +39,7 @@ namespace FCS_DeepDriller.Configuration
         [JsonProperty] internal IEnumerable<UpgradeSave> Upgrades { get; set; }
         [JsonProperty] internal bool IsRangeVisible { get; set; }
         [JsonProperty] internal bool AllowedToExport { get; set; }
+        [JsonProperty] internal bool IsBlackListMode { get; set; }
     }
 
     [Serializable]

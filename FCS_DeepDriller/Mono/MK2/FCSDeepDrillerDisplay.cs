@@ -49,6 +49,7 @@ namespace FCS_DeepDriller.Mono.MK2
         private Image _rangeToggleBTNIcon;
         private float _timePassed;
         private Text _unitID;
+        private Toggle _blackListToggle;
 
         private void Update()
         {
@@ -146,6 +147,8 @@ namespace FCS_DeepDriller.Mono.MK2
                     _trackedFilterState[ore].isOn = true;
                 }
             }
+
+            _blackListToggle.isOn = _mono.OreGenerator.GetInBlackListMode();
         }
 
         internal void OnIsFocusedChanged(bool state)
@@ -264,7 +267,7 @@ namespace FCS_DeepDriller.Mono.MK2
                     var data = (FilterBtnData) tag;
                     QuickLogger.Debug($"Toggle for {data.TechType} is {data.Toggle.isOn}",true);
 
-                    if (data.Toggle)
+                    if (data.Toggle.isOn)
                     {
                         _mono.OreGenerator.AddFocus(data.TechType);
                     }
@@ -490,6 +493,14 @@ namespace FCS_DeepDriller.Mono.MK2
 
                 #endregion
 
+                #region Blacklist Toggle
+
+                _blackListToggle = GameObjectHelpers.FindGameObject(settingsPage, "Toggle").GetComponent<Toggle>();
+                _blackListToggle.onValueChanged.AddListener(  (toggleState) =>
+                {
+                    _mono.OreGenerator.SetBlackListMode(toggleState);
+                });
+                #endregion
 
                 #region Color Picker Button
 

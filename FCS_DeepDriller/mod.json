@@ -2,7 +2,7 @@
   "Id": "FCSDeepDriller",
   "DisplayName": "FCS Deep Driller",
   "Author": "Field Creators Studios",
-  "Version": "2.0.0",
+  "Version": "2.1.0",
   "VersionDependencies": {
     "FCSTechFabricator": "2.0.9",
     "SMLHelper": "2.9"
