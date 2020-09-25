@@ -79,8 +79,8 @@ namespace FCS_DeepDriller.Buildable.MK2
             LanguageHandler.SetLanguageLine(ProgrammingButtonKey, "Go to programming page.");
             LanguageHandler.SetLanguageLine(SettingsButtonKey, "Go to settings page.");
             LanguageHandler.SetLanguageLine(TakeFormattedKey, "Take {0}");
-            LanguageHandler.SetLanguageLine(OilTankNotEmptyFormatKey, "Oil tank cannot oil anymore oil at this time try again in {0} minutes");
-            LanguageHandler.SetLanguageLine(OilTankDumpContainerTitleKey, "Oil Tank Dump Receptacle.");
+            LanguageHandler.SetLanguageLine(OilTankNotEmptyFormatKey, "Cannot add anymore lubricant at this time try again in {0} minutes");
+            LanguageHandler.SetLanguageLine(OilTankDumpContainerTitleKey, "Lubricant Tank Dump Receptacle.");
             LanguageHandler.SetLanguageLine(PowercellDumpContainerTitleKey, "Powercell Draining Receptacle.");
             LanguageHandler.SetLanguageLine(AddProgramButtonKey, "Add a upgrade function to the drill.");
             LanguageHandler.SetLanguageLine(InvalidFunctionFormatKey, "Invalid Function: {0}. This function doesn't exist please check the documentation.");
@@ -93,10 +93,9 @@ namespace FCS_DeepDriller.Buildable.MK2
             LanguageHandler.SetLanguageLine(SolarButtonKey, "Toggle Solar Panels.");
             LanguageHandler.SetLanguageLine(ToggleRangeKey, "Show/Hide Range");
             LanguageHandler.SetLanguageLine(ExportToggleKey, "Toggle export to ExStorage.");
-            LanguageHandler.SetLanguageLine(AddOilKey, "Add oil to drill.");
+            LanguageHandler.SetLanguageLine(AddOilKey, "Add lubricant to drill.");
             LanguageHandler.SetLanguageLine(AddPowerKey, "Add power to drill.");
         }
-
 
         internal static string ItemNotAllowed()
         {

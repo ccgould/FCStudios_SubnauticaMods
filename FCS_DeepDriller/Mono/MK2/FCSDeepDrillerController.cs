@@ -99,6 +99,7 @@ namespace FCS_DeepDriller.Mono.MK2
                     CurrentBiome = _saveData.Biome;
                     OilHandler.SetOilTimeLeft(_saveData.OilTimeLeft);
                     UpgradeManager.Load(_saveData?.Upgrades);
+                    OreGenerator.SetBlackListMode(_saveData.IsBlackListMode);
                     _isRangeVisible = _saveData.IsRangeVisible;
                 }
 
@@ -192,6 +193,7 @@ namespace FCS_DeepDriller.Mono.MK2
             _saveData.PowerData = PowerManager.SaveData();
             _saveData.FocusOres = OreGenerator.GetFocuses();
             _saveData.IsFocused = OreGenerator.GetIsFocused();
+            _saveData.IsBlackListMode = OreGenerator.GetInBlackListMode();
             _saveData.Biome = CurrentBiome;
             _saveData.OilTimeLeft = OilHandler.GetOilTimeLeft();
             _saveData.SolarExtended = PowerManager.IsSolarExtended();

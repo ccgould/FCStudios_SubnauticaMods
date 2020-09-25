@@ -41,6 +41,8 @@ namespace FCS_DeepDriller.Mono.MK2
         private int _oresPerDay = 12;
         private FCSDeepDrillerController _mono;
         private bool _isFocused;
+        private bool _blacklistMode;
+
         #endregion
 
         #region Internal Properties
@@ -94,11 +96,23 @@ namespace FCS_DeepDriller.Mono.MK2
             }
             else
             {
-                var index = _random2.Next(_focusOres.Count);
-                var item = _focusOres.ElementAt(index);
-                if (CheckUpgrades(item))return;
-                OnAddCreated?.Invoke(item);
-                QuickLogger.Debug($"Spawning item {item}", true);
+                if(_blacklistMode)
+                {
+                    var blacklist = AllowedOres.Except(_focusOres);
+                    var index = _random2.Next(blacklist.Count());
+                    var item = blacklist.ElementAt(index);
+                    if (CheckUpgrades(item)) return;
+                    OnAddCreated?.Invoke(item);
+                    QuickLogger.Debug($"Spawning item {item}", true);
+                }
+                else
+                {
+                    var index = _random2.Next(_focusOres.Count);
+                    var item = _focusOres.ElementAt(index);
+                    if (CheckUpgrades(item)) return;
+                    OnAddCreated?.Invoke(item);
+                    QuickLogger.Debug($"Spawning item {item}", true);
+                }
             }
         }
 
@@ -136,10 +150,9 @@ namespace FCS_DeepDriller.Mono.MK2
             _allowTick = _mono.IsOperational();
         }
 
-        internal void RemoveFocus(TechType focus)
+        internal void RemoveFocus(TechType techType)
         {
-            IsFocused = false;
-            QuickLogger.Debug($"Focus has been removed!", true);
+            _focusOres.Remove(techType);
         }
 
         internal void AddFocus(TechType techType)
@@ -211,6 +224,16 @@ namespace FCS_DeepDriller.Mono.MK2
                 case UpgradeFunctions.MinOreCount:
                     break;
             }
+        }
+
+        public bool GetInBlackListMode()
+        {
+            return _blacklistMode;
+        }
+
+        internal void SetBlackListMode(bool toggleState)
+        {
+            _blacklistMode = toggleState;
         }
     }
 }
