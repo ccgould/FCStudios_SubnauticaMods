@@ -8,5 +8,6 @@ namespace DataStorageSolutions.Model
         public int SlotID { get; set; } = -1;
         public string PrefabID { get; set; }
         public HashSet<Filter> ServerFilters { get; set; }
+        public IEnumerable<string> ServerItems { get; set; }
     }
 }

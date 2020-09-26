@@ -75,7 +75,7 @@ namespace DataStorageSolutions.Mono
                 if (pickupable != null && pickupable.GetTechType() != Mod.ServerFormattingStationClassID.ToTechType())
                 {
                     QuickLogger.Debug($"Found item {pickupable?.GetTechType().ToString()}");
-                    DSSHelpers.MoveServerToSlot(pickupable,GetSlot(),gameObject.transform);
+                    DSSHelpers.MoveItemToPosition(pickupable,GetSlot(),gameObject.transform);
                     ConnectServer(pickupable);
                     DisplayManager?.GoToPage(FilterPages.FilterPage);
                     DisplayManager?.UpdatePages();
@@ -260,7 +260,7 @@ namespace DataStorageSolutions.Mono
                 ConnectServer(item.item);
                 DisplayManager.GoToPage(FilterPages.FilterPage);
                 DisplayManager.UpdatePages();
-                DSSHelpers.MoveServerToSlot(item.item, GetSlot(), gameObject.transform);
+                DSSHelpers.MoveItemToPosition(item.item, GetSlot(), gameObject.transform);
             }
             var pda = Player.main.GetPDA();
             if(pda.isOpen)

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using DataStorageSolutions.Abstract;
 using DataStorageSolutions.Configuration;
+using DataStorageSolutions.Helpers;
 using DataStorageSolutions.Model;
 using FCSCommon.Extensions;
 using FCSCommon.Helpers;
@@ -190,6 +191,11 @@ namespace DataStorageSolutions.Mono
 
         }
 
+        internal IEnumerable<string> GetItemsPrefabID()
+        {
+            return _fcsFilteredStorage.GetItemsPrefabID();
+        }
+
         internal void ConnectToDevice(BaseManager manager,int slotID)
         {
             Manager = manager;
@@ -226,6 +232,14 @@ namespace DataStorageSolutions.Mono
         public void SetFilters(HashSet<Filter> dataServerFilters)
         {
             _fcsFilteredStorage.Filters = dataServerFilters;
+        }
+
+        public void MoveItemsToStorageRoot(IEnumerable<string> serverItems)
+        {
+            foreach (string item in serverItems)
+            {
+                DSSHelpers.MoveItemToPosition(item.To);
+            }
         }
     }
 }

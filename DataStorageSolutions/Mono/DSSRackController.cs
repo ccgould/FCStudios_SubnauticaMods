@@ -472,7 +472,7 @@ namespace DataStorageSolutions.Mono
 
         internal bool HasFilters()
         {
-            return _servers.Any(rackSlot => rackSlot != null && rackSlot.HasFilters());
+            return _servers.Any(rackSlot => rackSlot != null && rackSlot.IsOccupied && rackSlot.HasFilters());
         }
 
         private bool HasServers()
@@ -561,12 +561,17 @@ namespace DataStorageSolutions.Mono
 
         private int GetCapableSlot(InventoryItem item)
         {
-            foreach (RackSlot slot in _servers)
+
+            var filteredSlot = _servers.FirstOrDefault(x => x.IsOccupied && x.HasFilters() && x.IsAllowedToAdd(item.item.GetTechType()));
+            if (filteredSlot != null)
             {
-                if (slot.IsAllowedToAdd(item.item.GetTechType()))
-                {
-                    return slot.Id;
-                }
+                return filteredSlot.Id;
+            }
+
+            var unFilteredSlot = _servers.FirstOrDefault(x => x.IsOccupied && x.IsAllowedToAdd(item.item.GetTechType()));
+            if (unFilteredSlot != null)
+            {
+                return unFilteredSlot.Id;
             }
 
             return -1;

@@ -103,9 +103,9 @@ namespace FCSTechFabricator.Objects
         }
 
         public Dictionary<TechType, int> GetItemsWithin()
-        {
+        { 
             //TODO return a Dictionary<TechType, int> that is filled on item additon instead of using the ToLookup just a thought to improve performance.
-            var lookup = _container?.ToLookup(x => x.GetTechType()).ToArray();
+            var lookup = _container?.Where(x => x != null).ToLookup(x => x.GetTechType()).ToArray();
             return lookup?.ToDictionary(count => count.Key, count => count.Count());
         }
 
@@ -124,6 +124,14 @@ namespace FCSTechFabricator.Objects
         public bool HasItem(TechType techType)
         {
             return _container.Any(x => x.GetTechType() == techType);
+        }
+
+        public IEnumerable<string> GetItemsPrefabID()
+        {
+            foreach (Pickupable pickupable in _container)
+            {
+                yield return pickupable.gameObject.GetComponent<PrefabIdentifier>()?.Id;
+            }
         }
     }
 }

@@ -2,7 +2,7 @@
   "Id": "FCSTechFabricator",
   "DisplayName": "FCS Tech Fabricator",
   "Author": "Field Creators Studios",
-  "Version": "2.0.9",
+  "Version": "2.0.10",
   "Game": "Subnautica",
   "VersionDependencies": {
     "SMLHelper": "2.9"
@@ -11,5 +11,8 @@
   "Enable": true,
   "VersionChecker": {
     "LatestVersionURL": "https://github.com/ccgould/FCStudios_SubnauticaMods/raw/master/FCSTechFabricator/mod.json"
-  }
+  },
+  "NexusId": {
+    "Subnautica" :  "313" 
+  } 
 }

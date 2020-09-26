@@ -22,7 +22,7 @@ namespace DataStorageSolutions.Model
         public Action<int, int> OnContainerUpdate { get; set; }
         public DumpContainer DumpContainer { get; private set; }
         internal static readonly HashSet<DSSServerController> GlobalServers = new HashSet<DSSServerController>();
-        internal static readonly HashSet<DSSServerController> BaseServers = new HashSet<DSSServerController>();
+        internal readonly HashSet<DSSServerController> BaseServers = new HashSet<DSSServerController>();
         //internal static readonly HashSet<StorageLo> BaseStorageLockers = new HashSet<DSSServerController>();
         private BaseManager _baseManager;
         public int GetContainerFreeSpace { get; }
@@ -105,7 +105,8 @@ namespace DataStorageSolutions.Model
                 {
                     PrefabID = baseServer.GetPrefabID(),
                     ServerFilters = baseServer.GetFilters(),
-                    SlotID = baseServer.GetSlotID()
+                    SlotID = baseServer.GetSlotID(),
+                    ServerItems = baseServer.GetItemsPrefabID()
                 };
             }
         }
@@ -164,7 +165,7 @@ namespace DataStorageSolutions.Model
             return isItemAllowed;
         }
 
-        private static bool CheckIfItemAllowed(int amount, TechType techType)
+        private bool CheckIfItemAllowed(int amount, TechType techType)
         {
             //Check all filtered drives first to see if it can be stored
             foreach (DSSServerController server in BaseServers)

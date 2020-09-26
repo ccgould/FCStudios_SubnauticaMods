@@ -138,7 +138,7 @@ namespace DataStorageSolutions.Model
             _hitController.GetAdditionalString += FormatData;
             _hitController.OnButtonClick += OnServerHitClick;
             _mono.Manager.RegisterServerInBase(_server);
-            DSSHelpers.MoveServerToSlot(server.item, Slot, Slot.transform);
+            DSSHelpers.MoveItemToPosition(server.item, Slot, Slot.transform);
             BaseManager.UpdateGlobalTerminals();
         }
 

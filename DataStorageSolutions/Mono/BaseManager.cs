@@ -451,6 +451,7 @@ namespace DataStorageSolutions.Mono
                 if (!string.IsNullOrWhiteSpace(data.PrefabID))
                 {
                     controller.SetFilters(data.ServerFilters);
+                    controller.MoveItemsToStorageRoot(data.ServerItems);
                 }
                 BaseStorageManager.GlobalServers.Add(controller);
             }

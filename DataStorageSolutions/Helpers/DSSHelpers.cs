@@ -495,13 +495,13 @@ namespace DataStorageSolutions.Helpers
             return CraftDataHandler.GetTechData(craft) != null;
         }
 
-        internal static void MoveServerToSlot(Pickupable pickupable, Transform slot, Transform device)
+        internal static void MoveItemToPosition(Pickupable pickupable, Transform destination, Transform item,bool setActive = true)
         {
             pickupable.gameObject.GetComponent<Rigidbody>().isKinematic = true;
-            pickupable.Reparent(device);
-            pickupable.transform.position = new Vector3(slot.transform.position.x, slot.transform.position.y, slot.transform.position.z);
-            pickupable.transform.rotation = slot.rotation;
-            pickupable.gameObject.SetActive(true);
+            pickupable.Reparent(item);
+            pickupable.transform.position = new Vector3(destination.transform.position.x, destination.transform.position.y, destination.transform.position.z);
+            pickupable.transform.rotation = destination.rotation;
+            pickupable.gameObject.SetActive(setActive);
         }
     }
 }
