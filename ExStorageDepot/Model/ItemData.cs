@@ -41,8 +41,9 @@ namespace ExStorageDepot.Model
                     QuickLogger.Debug("Is DDS Server",true);
                     Type = ItemType.FCSFilteredStorage;
                     var data = InventoryItem.item.gameObject.GetComponent<FCSFilteredStorage>();
-                    FcsFilteredStorage = new HashSet<ObjectData>(data.Items.ToList().ConvertAll(obj => new ObjectData(obj)));
-                    FcsFilters = data.Filters.ConvertAll(filter => new Filter(filter));
+                    //TODO Fix
+                    //FcsFilteredStorage = new HashSet<ObjectData>(data.Items.ToList().ConvertAll(obj => new ObjectData(obj)));
+                    //FcsFilters = data.Filters.ConvertAll(filter => new Filter(filter));
                 }
 
                 if(energyMixin != null)

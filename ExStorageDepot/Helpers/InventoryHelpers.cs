@@ -116,9 +116,10 @@ namespace ExStorageDepot.Helpers
                     break;
 
                 case ItemType.FCSFilteredStorage:
+                    //TODO FIX
                     var storage = go.GetComponent<FCSFilteredStorage>();
-                    storage.Items = itemData.FcsFilteredStorage;
-                    storage.Filters = itemData.FcsFilters;
+                    //storage.Items = itemData.FcsFilteredStorage;
+                    //storage.Filters = itemData.FcsFilters;
                     storage.ForceUpdateDisplay();
                     break;
             }

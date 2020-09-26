@@ -20,7 +20,6 @@ namespace ExStorageDepot.Mono.Managers
         private int _multiplier = 1;
         private int _maxItems = QPatch.Config.MaxStorage;
 
-
         internal List<ItemData> ContainerItems { get; private set; } = new List<ItemData>();
         public int GetContainerFreeSpace => _maxItems - GetTotalCount();
         public bool IsFull => GetIsFull();
