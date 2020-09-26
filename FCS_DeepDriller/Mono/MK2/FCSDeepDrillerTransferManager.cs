@@ -84,7 +84,7 @@ namespace FCS_DeepDriller.Mono.MK2
 
         private bool CheckIfInRange(FCSConnectableDevice device)
         {
-            if (_mono == null || _mono.PowerManager == null || !_mono.IsConstructed || _mono.PowerManager.IsTripped()) return false;
+            if (_mono == null || _mono.DeepDrillerPowerManager == null || !_mono.IsConstructed || _mono.DeepDrillerPowerManager.IsTripped()) return false;
             float distance = Vector3.Distance(_mono.gameObject.transform.position, device.gameObject.transform.position);
 
             QuickLogger.Debug($"Object Distance {distance}",true);

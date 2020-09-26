@@ -20,7 +20,7 @@ namespace FCS_DeepDriller.Mono.MK2
         private const bool PullPowerFromRelay = true; //Setting this to true by default until I feel like making it a toggle option
         private FCSPowerStates _powerState;
         private AnimationCurve _depthCurve;
-        private readonly DeepDrillerPowerData _powerBank = new DeepDrillerPowerData();
+        private DeepDrillerPowerData _powerBank = new DeepDrillerPowerData();
         private float _powerDraw;
         private PowerRelay _powerRelay;
         private FCSPowerStates _prevPowerState;
@@ -59,7 +59,7 @@ namespace FCS_DeepDriller.Mono.MK2
         {
             if (_mono == null || _mono.DeepDrillerContainer == null ||
                 _mono.DisplayHandler == null || !_mono.IsConstructed ||
-                !_initialized) return;
+                !_initialized || _powerBank?.Battery == null) return;
 
             ChargeSolarPanel();
             UpdatePowerState();
@@ -177,12 +177,21 @@ namespace FCS_DeepDriller.Mono.MK2
             _depthCurve.AddKey(0f, 0f);
             _depthCurve.AddKey(0.4245796f, 0.5001081f);
             _depthCurve.AddKey(1f, 1f);
-            _powerBank.Battery = new PowercellData { Charge = 0, Capacity = QPatch.Configuration.InternalBatteryCapacity };
             _initialized = true;
         }
 
         internal void LoadData(DeepDrillerSaveDataEntry data)
         {
+            if (data?.PowerData?.Battery == null) return;
+
+            QuickLogger.Message($"Solar Panel: {data.PowerData.SolarPanel} || Battery: {data.PowerData.Battery.Charge}",true);
+
+
+            if (_powerBank?.Battery == null)
+            {
+                _powerBank = new DeepDrillerPowerData();
+            }
+
             _powerBank.SolarPanel = data.PowerData.SolarPanel;
             _powerBank.Battery.Charge = data.PowerData.Battery.Charge;
             //PullPowerFromRelay = data.PullFromRelay; Disabled to until I decide to make it a toggle option
@@ -251,16 +260,12 @@ namespace FCS_DeepDriller.Mono.MK2
         /// <returns>Returns true if power is available</returns>
         internal bool IsPowerAvailable()
         {
-            if (GetTotalCharge() <= 0)
-            {
-                return false;
-            }
-
-            return true;
+            return !(GetTotalCharge() <= 0);
         }
 
         internal float GetTotalCharge()
         {
+            if (_powerBank?.Battery == null) return 0f;
             return (_powerRelay?.GetPower() ?? 0) + _powerBank.Battery.Charge + _powerBank.SolarPanel;
         }
         
@@ -289,12 +294,12 @@ namespace FCS_DeepDriller.Mono.MK2
             if (GetPowerState() == FCSPowerStates.Tripped)
             {
                 _mono.DisplayHandler.PowerOnDisplay();
-                _mono.PowerManager.SetPowerState(FCSPowerStates.Powered);
+                _mono.DeepDrillerPowerManager.SetPowerState(FCSPowerStates.Powered);
             }
             else
             {
                 _mono.DisplayHandler.PowerOffDisplay();
-                _mono.PowerManager.SetPowerState(FCSPowerStates.Tripped);
+                _mono.DeepDrillerPowerManager.SetPowerState(FCSPowerStates.Tripped);
             }
         }
 

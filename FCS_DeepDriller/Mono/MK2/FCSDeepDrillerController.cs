@@ -21,7 +21,8 @@ namespace FCS_DeepDriller.Mono.MK2
     internal class FCSDeepDrillerController : FCSController
     {
         #region Private Members
-        internal DeepDrillerSaveDataEntry _saveData;
+
+        private DeepDrillerSaveDataEntry _saveData;
         private Constructable _buildable;
         private List<TechType> _bioData = new List<TechType>();
         private bool _runStartUpOnEnable;
@@ -33,6 +34,8 @@ namespace FCS_DeepDriller.Mono.MK2
         private const float LerpSpeed = 10f;
         private bool _isRangeVisible;
         private float _currentDistance;
+        private bool _noBiomeMessageSent;
+        private bool _biomeFoundMessageSent;
 
 
         internal string CurrentBiome { get; set; }
@@ -48,7 +51,7 @@ namespace FCS_DeepDriller.Mono.MK2
         internal FCSDeepDrillerContainer DeepDrillerContainer { get; private set; }
         public override bool IsConstructed { get; set; }
         internal AudioManager AudioManager { get; private set; }
-        internal FCSDeepDrillerPowerHandler PowerManager { get; private set; }
+        public  FCSDeepDrillerPowerHandler DeepDrillerPowerManager { get;  set; }
         internal FCSDeepDrillerDisplay DisplayHandler { get; private set; }
         internal int SolarStateHash { get; private set; }
         internal FCSDeepDrillerOreGenerator OreGenerator { get; private set; }
@@ -86,7 +89,7 @@ namespace FCS_DeepDriller.Mono.MK2
 
                 if (IsFromSave && _saveData != null)
                 {
-                    PowerManager.LoadData(_saveData);
+                    DeepDrillerPowerManager.LoadData(_saveData);
 
                     DeepDrillerContainer.LoadData(_saveData.Items);
                     if (_saveData.IsFocused)
@@ -177,30 +180,41 @@ namespace FCS_DeepDriller.Mono.MK2
 
         internal void Save(DeepDrillerSaveData saveDataList)
         {
-            var prefabIdentifier = GetComponent<PrefabIdentifier>();
-            var id = prefabIdentifier.Id;
-
-            if (_saveData == null)
+            if (!IsInitialized || _saveData == null || ColorManager == null || DeepDrillerPowerManager == null ||
+                DeepDrillerContainer == null || OreGenerator == null || OilHandler == null || 
+                UpgradeManager == null || TransferManager == null)
             {
-                _saveData = new DeepDrillerSaveDataEntry();
+                QuickLogger.Error($"Failed to save driller {GetPrefabID()}");
+                return;
             }
 
-            _saveData.Id = id;
+            QuickLogger.Message($"SaveData = {_saveData}", true);
+
+            _saveData.Id = GetPrefabID();
             _saveData.BodyColor = ColorManager.GetMaskColor().ColorToVector4();
-            _saveData.PowerState = PowerManager.GetPowerState();
-            _saveData.PullFromRelay = PowerManager.GetPullFromPowerRelay();
+
+            _saveData.PowerState = DeepDrillerPowerManager.GetPowerState();
+            _saveData.PullFromRelay = DeepDrillerPowerManager.GetPullFromPowerRelay();
+            _saveData.SolarExtended = DeepDrillerPowerManager.IsSolarExtended();
+            _saveData.PowerData = DeepDrillerPowerManager.SaveData();
+
             _saveData.Items = DeepDrillerContainer.SaveData();
-            _saveData.PowerData = PowerManager.SaveData();
+
             _saveData.FocusOres = OreGenerator.GetFocuses();
             _saveData.IsFocused = OreGenerator.GetIsFocused();
             _saveData.IsBlackListMode = OreGenerator.GetInBlackListMode();
+
             _saveData.Biome = CurrentBiome;
+
             _saveData.OilTimeLeft = OilHandler.GetOilTimeLeft();
-            _saveData.SolarExtended = PowerManager.IsSolarExtended();
+
             _saveData.Upgrades = UpgradeManager.Save();
+
             _saveData.IsRangeVisible = _isRangeVisible;
+
             _saveData.AllowedToExport = TransferManager.IsAllowedToExport();
             saveDataList.Entries.Add(_saveData);
+
         }
 
         public override void OnProtoSerialize(ProtobufSerializer serializer)
@@ -252,11 +266,6 @@ namespace FCS_DeepDriller.Mono.MK2
                 OilHandler.Initialize(this);
             }
 
-            if (_prefabId == null)
-            {
-                QuickLogger.Error("Prefab Identifier Component was not found");
-            }
-
             if (_buildable == null)
             {
                 _buildable = GetComponentInParent<Constructable>();
@@ -266,12 +275,12 @@ namespace FCS_DeepDriller.Mono.MK2
             OreGenerator.Initialize(this);
             OreGenerator.OnAddCreated += OreGeneratorOnAddCreated;
 
-            if (PowerManager == null)
+            if (DeepDrillerPowerManager == null)
             {
-                PowerManager = gameObject.AddComponent<FCSDeepDrillerPowerHandler>();
-                PowerManager.Initialize(this);
+                DeepDrillerPowerManager = gameObject.AddComponent<FCSDeepDrillerPowerHandler>();
+                DeepDrillerPowerManager.Initialize(this);
                 var powerRelay = gameObject.AddComponent<PowerRelay>();
-                PowerManager.SetPowerRelay(powerRelay);
+                DeepDrillerPowerManager.SetPowerRelay(powerRelay);
             }
             
             if (LaserManager == null)
@@ -315,7 +324,7 @@ namespace FCS_DeepDriller.Mono.MK2
                     FCSDeepDrillerBuildable.PowercellDumpContainerTitle(),
                     FCSDeepDrillerBuildable.NotAllowedItem(),
                     FCSDeepDrillerBuildable.StorageFull(),
-                    PowerManager, 1, 1);
+                    DeepDrillerPowerManager, 1, 1);
             }
 
             if (TransferManager == null)
@@ -337,7 +346,7 @@ namespace FCS_DeepDriller.Mono.MK2
             if (FCSConnectableDevice == null)
             {
                 FCSConnectableDevice = gameObject.AddComponent<FCSConnectableDevice>();
-                FCSConnectableDevice.Initialize(this,DeepDrillerContainer,PowerManager);
+                FCSConnectableDevice.Initialize(this,DeepDrillerContainer,DeepDrillerPowerManager);
                 FCSTechFabricator.FcTechFabricatorService.PublicAPI.RegisterDevice(FCSConnectableDevice, GetPrefabID(),Mod.DeepDrillerTabID);
             }
 
@@ -405,18 +414,38 @@ namespace FCS_DeepDriller.Mono.MK2
                 yield return null;
             }
 
-            while (OreGenerator.AllowedOres.Count <= 0)
+
+            while (OreGenerator?.AllowedOres.Count <= 0)
             {
-                var loot = GetBiomeData(CurrentBiome, transform);
-
-                if (loot != null)
+                if (string.IsNullOrEmpty(CurrentBiome))
                 {
-                    OreGenerator.AllowedOres = loot;
-                    ConnectDisplay();
-                }
+                    if (!_noBiomeMessageSent)
+                    {
+                        QuickLogger.Info($"No biome Found trying to find biome");
+                        _noBiomeMessageSent = true;
+                    }
 
+                    CurrentBiome = BiomeManager.GetBiome(gameObject.transform);
+                }
+                else
+                {
+                    if (!_biomeFoundMessageSent)
+                    {
+                        QuickLogger.Info($"biome Found: {CurrentBiome}");
+                        _biomeFoundMessageSent = true;
+                    }
+
+                    var loot = GetBiomeData(CurrentBiome, transform);
+
+                    if (loot != null)
+                    {
+                        OreGenerator.AllowedOres = loot;
+                        ConnectDisplay();
+                    }
+                }
                 yield return null;
             }
+            yield return 0;
         }
 
         private void ConnectDisplay()
@@ -522,8 +551,8 @@ namespace FCS_DeepDriller.Mono.MK2
         
         internal bool IsOperational()
         {
-            return PowerManager.HasEnoughPowerToOperate() &&
-                   PowerManager.GetPowerState() == FCSPowerStates.Powered &&
+            return DeepDrillerPowerManager.HasEnoughPowerToOperate() &&
+                   DeepDrillerPowerManager.GetPowerState() == FCSPowerStates.Powered &&
                    OilHandler.HasOil() && !DeepDrillerContainer.IsFull;
         }
 

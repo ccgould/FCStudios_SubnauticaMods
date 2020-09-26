@@ -247,6 +247,7 @@ namespace FCS_DeepDriller.Mono.MK2
 
         public void LoadData(Dictionary<TechType, int> dataItems)
         {
+            if (dataItems == null) return;
             _container = dataItems;
         }
 

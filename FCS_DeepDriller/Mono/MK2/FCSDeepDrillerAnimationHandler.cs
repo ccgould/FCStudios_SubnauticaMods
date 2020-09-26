@@ -148,7 +148,7 @@ namespace FCS_DeepDriller.Mono.MK2
                 if (this.Animator.GetCurrentAnimatorStateInfo(3).IsName("DeepDriller_MK2_BootPage") &&
                     this.Animator.GetCurrentAnimatorStateInfo(3).normalizedTime >= 1.0f)
                 {
-                    if (_mono.PowerManager.GetPowerState() == FCSPowerStates.Tripped)
+                    if (_mono.DeepDrillerPowerManager.GetPowerState() == FCSPowerStates.Tripped)
                     {
                         QuickLogger.Debug("Going to Powered Off.");
                         SetIntHash(pageHash, 6);

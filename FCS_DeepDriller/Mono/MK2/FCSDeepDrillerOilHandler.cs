@@ -23,10 +23,10 @@ namespace FCS_DeepDriller.Mono.MK2
 
         private void Update()
         {
-            if (_mono == null || _mono.PowerManager == null) return;
+            if (_mono == null || _mono.DeepDrillerPowerManager == null) return;
             if (QPatch.Configuration.HardCoreMode)
             {
-                if (_mono.PowerManager.IsPowerAvailable() && _timeLeft > 0)
+                if (_mono.DeepDrillerPowerManager.IsPowerAvailable() && _timeLeft > 0)
                 {
                     _timeLeft -= DayNightCycle.main.deltaTime;
                     if (_timeLeft < 0)

@@ -145,7 +145,7 @@ namespace FCS_DeepDriller.Mono.MK2
 
         internal void SetAllowTick()
         {
-            if (_mono?.PowerManager == null || _mono?.DeepDrillerContainer == null) return;
+            if (_mono?.DeepDrillerPowerManager == null || _mono?.DeepDrillerContainer == null) return;
 
             _allowTick = _mono.IsOperational();
         }
@@ -200,6 +200,7 @@ namespace FCS_DeepDriller.Mono.MK2
 
         public void Load(HashSet<TechType> dataFocusOres)
         {
+            if (dataFocusOres == null) return;
             _focusOres = dataFocusOres;
         }
 

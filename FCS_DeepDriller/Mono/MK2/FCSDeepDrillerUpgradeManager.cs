@@ -394,6 +394,7 @@ namespace FCS_DeepDriller.Mono.MK2
         internal void Load(IEnumerable<UpgradeSave> functions)
         {
             if (functions == null) return;
+
             foreach (UpgradeSave function in functions)
             {
                 if (string.IsNullOrEmpty(function.Function)) continue;
