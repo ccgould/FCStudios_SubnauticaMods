@@ -76,7 +76,7 @@ namespace FCS_DeepDriller.Mono.MK2
             if (FindAllComponents())
             {
                 _isInitialized = true;
-                _mono.PowerManager.OnBatteryUpdate += OnBatteryUpdate;
+                _mono.DeepDrillerPowerManager.OnBatteryUpdate += OnBatteryUpdate;
                 //_mono.DeepDrillerContainer.OnContainerUpdate += OnContainerUpdate;
                 _mono.OreGenerator.OnIsFocusedChanged += OnIsFocusedChanged;
                 _mono.UpgradeManager.OnUpgradeUpdate += OnUpgradeUpdate;
@@ -181,7 +181,7 @@ namespace FCS_DeepDriller.Mono.MK2
 
         internal void UpdateDisplayValues()
         {
-            _powerUsage.text = string.Format(FCSDeepDrillerBuildable.PowerUsageFormat(),_mono.PowerManager.GetPowerUsage());
+            _powerUsage.text = string.Format(FCSDeepDrillerBuildable.PowerUsageFormat(),_mono.DeepDrillerPowerManager.GetPowerUsage());
             _itemsPerDay.text = _mono.OreGenerator.GetItemsPerDay();
         }
 
@@ -207,10 +207,10 @@ namespace FCS_DeepDriller.Mono.MK2
             switch (btnName)
             {
                 case "PowerBTN":
-                    _mono.PowerManager.TogglePowerState();
+                    _mono.DeepDrillerPowerManager.TogglePowerState();
                     break;
                 case "SolarStateBTN":
-                    _mono.PowerManager.ToggleSolarState();
+                    _mono.DeepDrillerPowerManager.ToggleSolarState();
                     break;
                 case "ItemsBTN":
                     GotoPage(FCSDeepDrillerPages.ItemsPage);
@@ -234,7 +234,7 @@ namespace FCS_DeepDriller.Mono.MK2
                     GotoPage(FCSDeepDrillerPages.Home);
                     break;
                 case "SolarPanelBTN":
-                    _mono.PowerManager.ToggleSolarState();
+                    _mono.DeepDrillerPowerManager.ToggleSolarState();
                     break;
                 case "RangeToggleBTN":
                     _mono.ToggleRangeView();
@@ -285,11 +285,11 @@ namespace FCS_DeepDriller.Mono.MK2
 
         internal void UpdateToggleButtons()
         {
-            if (_mono == null || _mono.PowerManager == null) return;
+            if (_mono == null || _mono.DeepDrillerPowerManager == null) return;
 
             if (_solarPanelBtnIcon != null)
             {
-                _solarPanelBtnIcon.color = _mono.PowerManager.IsSolarExtended() ? Color.green : Color.red;
+                _solarPanelBtnIcon.color = _mono.DeepDrillerPowerManager.IsSolarExtended() ? Color.green : Color.red;
             }
 
             if (_rangeToggleBTNIcon != null)

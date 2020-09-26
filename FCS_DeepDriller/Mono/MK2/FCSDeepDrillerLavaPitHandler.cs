@@ -47,7 +47,7 @@ namespace FCS_DeepDriller.Mono.MK2
         internal void Initialize(FCSDeepDrillerController mono)
         {
             _mono = mono;
-            _mono.PowerManager.OnPowerUpdate += OnPowerUpdate;
+            _mono.DeepDrillerPowerManager.OnPowerUpdate += OnPowerUpdate;
             _lavaTempState = Animator.StringToHash("LavaTempState");
             _lavaState = Animator.StringToHash("LavaState");
         }

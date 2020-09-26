@@ -102,6 +102,11 @@ namespace FCS_DeepDriller.Managers
             return string.Empty;
         }
 
+        internal static string GetBiome(Transform trans)
+        {
+            return LargeWorld.main.GetBiome(trans.position);
+        }
+
         internal static string CalculateBiome(Transform tr)
         {
             if (LargeWorld.main)
@@ -124,15 +129,12 @@ namespace FCS_DeepDriller.Managers
                     QuickLogger.Debug("FindBiomeLoot: Transform cannot be null");
                     return null;
                 }
-   
 
                 if (string.IsNullOrEmpty(currentBiome))
                 {
-                    QuickLogger.Error($"No biome found!");
+
                     return null;
                 }
-                
-                //QuickLogger.Debug($"Biome Found: {currentBiome}");
 
                 FindMatchingBiome(currentBiome, out var matchingBiome);
 

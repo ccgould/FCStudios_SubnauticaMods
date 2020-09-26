@@ -65,7 +65,7 @@ namespace FCS_DeepDriller.Mono.MK2
 
             if (_mono == null) return;
 
-            if (_mono.PowerManager?.GetPowerState() != FCSPowerStates.Powered)
+            if (_mono.DeepDrillerPowerManager?.GetPowerState() != FCSPowerStates.Powered)
             {
                 //QuickLogger.Debug("Not Damaging Unit");
                 ResetPassedTime();

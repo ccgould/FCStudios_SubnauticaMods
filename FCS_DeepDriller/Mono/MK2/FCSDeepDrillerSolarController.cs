@@ -9,7 +9,7 @@
             HandReticle main = HandReticle.main;
             main.SetIcon(HandReticle.IconType.Default);
 #if SUBNAUTICA
-            main.SetInteractText(_mono.PowerManager.GetSolarPowerData(), false, HandReticle.Hand.None);
+            main.SetInteractText(_mono.DeepDrillerPowerManager.GetSolarPowerData(), false, HandReticle.Hand.None);
 #elif BELOWZERO
             main.SetText(HandReticle.TextType.Hand, _mono.PowerManager.GetSolarPowerData(), false);
 #endif
