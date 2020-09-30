@@ -10,20 +10,36 @@ namespace FCSTechFabricator.Objects
 {
     public class FCSFilteredStorage : IFCSStorage
     {
-        private readonly HashSet<Pickupable> _container = new HashSet<Pickupable>();
+        private ItemsContainer _container;
         private Action _updateDisplay;
         private GameObject _root;
         private int _storageLimit;
 
-        public int GetContainerFreeSpace => _storageLimit - _container.Count;
-        public bool IsFull => _container.Count >= _storageLimit;
+        public int GetContainerFreeSpace => _storageLimit - _container.count;
+        public bool IsFull => _container.count >= _storageLimit;
         public HashSet<Filter> Filters { get; set; } = new HashSet<Filter>();
 
         public void Initialize(GameObject root, Action updateDisplay,int storageLimit)
         {
             _root = root;
+            _container = new ItemsContainer(1, storageLimit,root.transform ,"Filtered Storage",null);
+            _container.onAddItem += this.OnAddItem;
+            _container.onRemoveItem += this.OnRemoveItem;
             _storageLimit = storageLimit;
             _updateDisplay = updateDisplay;
+        }
+
+        private void OnRemoveItem(InventoryItem item)
+        {
+
+        }
+
+        private void OnAddItem(InventoryItem item)
+        {
+            if (item.item.gameObject.activeSelf)
+            {
+                item.item.gameObject.SetActive(false);
+            }
         }
 
         public string FormatFiltersData()
@@ -47,11 +63,13 @@ namespace FCSTechFabricator.Objects
         {
             if(_container.Contains(pickupable)) return;
 
-            _container.Add(pickupable);
+            _container.AddItem(pickupable);
         }
         
         public bool CanBeStored(int amount, TechType techType)
         {
+            if (IsFull) return false;
+
             if (HasFilters())
             {
                 var filterPass = false;
@@ -63,7 +81,7 @@ namespace FCSTechFabricator.Objects
                     }
                 }
 
-                return filterPass;
+                return filterPass && amount <= _storageLimit;
             }
 
             return amount <= _storageLimit;
@@ -71,15 +89,13 @@ namespace FCSTechFabricator.Objects
 
         public bool AddItemToContainer(InventoryItem item)
         {
-            if (CanBeStored(_container.Count + 1,item.item.GetTechType()) && !_container.Contains(item.item))
-            {
-                _container.Add(item.item);
-                item.item.Reparent(_root.transform);
-                ForceUpdateDisplay();
-                return true;
-            }
+            if (!CanBeStored(_container.count + 1, item.item.GetTechType())) return false;
 
-            return false;
+            _container.UnsafeAdd(item);
+            item.item.Reparent(_root.transform);
+            ForceUpdateDisplay();
+            return true;
+
         }
 
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
@@ -94,18 +110,18 @@ namespace FCSTechFabricator.Objects
 
         public Pickupable RemoveItemFromContainer(TechType techType, int amount)
         {
-            var item = _container.FirstOrDefault(x => x.GetTechType() == techType);
+            var item = _container.FirstOrDefault(x => x.item.GetTechType() == techType);
             
             if (item == null) return null;
-            _container.Remove(item);
+            _container.RemoveItem(item.item);
             ForceUpdateDisplay();
-            return item;
+            return item.item;
         }
 
         public Dictionary<TechType, int> GetItemsWithin()
         { 
             //TODO return a Dictionary<TechType, int> that is filled on item additon instead of using the ToLookup just a thought to improve performance.
-            var lookup = _container?.Where(x => x != null).ToLookup(x => x.GetTechType()).ToArray();
+            var lookup = _container?.Where(x => x != null).ToLookup(x => x.item.GetTechType()).ToArray();
             return lookup?.ToDictionary(count => count.Key, count => count.Count());
         }
 
@@ -113,7 +129,7 @@ namespace FCSTechFabricator.Objects
 
         public bool ContainsItem(TechType techType)
         {
-            return _container.Any(x => x.GetTechType() == techType);
+            return _container.Any(x => x.item.GetTechType() == techType);
         }
 
         public bool HasFilters()
@@ -123,15 +139,30 @@ namespace FCSTechFabricator.Objects
 
         public bool HasItem(TechType techType)
         {
-            return _container.Any(x => x.GetTechType() == techType);
+            return _container.Any(x => x.item.GetTechType() == techType);
         }
 
         public IEnumerable<string> GetItemsPrefabID()
         {
-            foreach (Pickupable pickupable in _container)
+            foreach (InventoryItem inventoryItem in _container)
             {
-                yield return pickupable.gameObject.GetComponent<PrefabIdentifier>()?.Id;
+                yield return inventoryItem.item.gameObject.GetComponent<PrefabIdentifier>()?.Id;
             }
+        }
+
+        public ItemsContainer GetContainer()
+        {
+            return _container;
+        }
+
+        public void Clear()
+        {
+            _container.Clear();
+        }
+
+        public int GetItemCount(TechType item)
+        {
+           return _container.GetCount(item);
         }
     }
 }

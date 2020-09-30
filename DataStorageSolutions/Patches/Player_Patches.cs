@@ -12,6 +12,7 @@ namespace DataStorageSolutions.Patches
     {
         private static float _timeLeft = 1f;
         private static bool _error;
+        private static bool _wasSet;
 
         [HarmonyPostfix]
         public static void Postfix(ref Player __instance)
@@ -23,6 +24,16 @@ namespace DataStorageSolutions.Patches
                 {
                     BaseManager.RemoveDestroyedBases();
                     BaseManager.OnPlayerTick?.Invoke();
+                    
+                    //QuickLogger.Debug($"Is Ready: {LargeWorldStreamer.main.IsReady()}");
+                    //QuickLogger.Debug($"Is World Settled: {LargeWorldStreamer.main.IsWorldSettled()}");
+
+                    if (LargeWorldStreamer.main.IsReady() && !_wasSet)
+                    {
+                        BaseManager.SetAllowedToNotify(true);
+                        _wasSet = true;
+                    }
+
                     //BaseManager.PerformOperations();
                     //BaseManager.PerformCraft();
                     _timeLeft = 1f;

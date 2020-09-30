@@ -130,93 +130,6 @@ namespace DataStorageSolutions.Helpers
 
             return playerToolData;
         }
-
-        internal static bool GivePlayerItem(TechType techType, ObjectDataTransferData itemData,
-            Func<ObjectData, RackSlot> getServerWithObjectData)
-        {
-            QuickLogger.Debug($"Give Player Item: {techType}", true);
-
-            bool isSuccessful = false;
-
-#if SUBNAUTICA
-            var itemSize = CraftData.GetItemSize(techType);
-#elif BELOWZERO
-            var itemSize = TechData.GetItemSize(techType);
-#endif
-            if (Inventory.main.HasRoomFor(itemSize.x, itemSize.y))
-            {
-                //TODO handle null playerToolData
-                if (itemData.Vehicle == null)
-                {
-                    var pickup = CheckIfEggAnExtractPickable(techType);
-
-                    if (!itemData.IsServer)
-                    {
-                        var data = (ObjectData) itemData.data;
-
-                        if (data != null)
-                        {
-                            DetectDataObjectTypeAndPerformConversion(data, pickup);
-
-                            var result = getServerWithObjectData?.Invoke(data);
-                            result?.RemoveItemFromServer(data.TechType); 
-                            isSuccessful = true;
-                        }
-                    }
-                    else
-                    {
-                        var data = (HashSet<ObjectData>) itemData.data;
-                        var controller = pickup.gameObject.GetComponent<DSSServerController>();
-                        controller.Initialize();
-                        
-                            //TODO FIX
-                        //controller.FCSFilteredStorage.Items = new HashSet<ObjectData>(data);
-                        //controller.FCSFilteredStorage.Filters = new List<Filter>(itemData.Filters);
-                        controller.DisplayManager.UpdateDisplay();
-                        isSuccessful = true;
-                    }
-
-                    Inventory.main.Pickup(pickup);
-                }
-                else if (itemData.Vehicle != null)
-                {
-                    QuickLogger.Debug("Is Vehicle Item");
-
-                    var vehicleContainers = itemData.Vehicle.gameObject.GetComponentsInChildren<StorageContainer>()
-                        .Select((x) => x.container).ToList();
-                    vehicleContainers.AddRange(GetSeamothStorage(itemData.Vehicle));
-
-                    for (var index = 0; index < vehicleContainers.Count; index++)
-                    {
-                        for (var i = 0; i < vehicleContainers[index].ToList().Count; i++)
-                        {
-                            var item = vehicleContainers[index].ToList()[i];
-
-                            if (item.item.GetTechType() == techType)
-                            {
-                                var passedItem = vehicleContainers[index].RemoveItem(item.item);
-                                if (passedItem)
-                                {
-                                    if (Inventory.main.Pickup(item.item))
-                                    {
-                                        CrafterLogic.NotifyCraftEnd(Player.main.gameObject, item.item.GetTechType());
-
-                                        goto _end;
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    _end:
-                    isSuccessful = true;
-                }
-            }
-
-            Mod.OnBaseUpdate?.Invoke();
-            return isSuccessful;
-        }
-
         private static void DetectDataObjectTypeAndPerformConversion(ObjectData data, Pickupable pickup)
         {
             switch (data.DataObjectType)
@@ -351,9 +264,8 @@ namespace DataStorageSolutions.Helpers
             return result;
         }
 
-        internal static List<ItemsContainer> GetSeamothStorage(Vehicle seamoth)
+        internal static IEnumerable<ItemsContainer> GetSeamothStorage(Vehicle seamoth)
         {
-            var results = new List<ItemsContainer>();
             if (seamoth is SeaMoth && seamoth.modules != null)
             {
                 using (var e = seamoth.modules.GetEquipment())
@@ -369,20 +281,16 @@ namespace DataStorageSolutions.Helpers
                         var container = module.item.GetComponent<SeamothStorageContainer>();
                         if (container != null && !container.gameObject.name.Contains("Torpedo"))
                         {
-                            results.Add(container.container);
+                            yield return container.container;
                         }
                     }
                 }
             }
-
-            return results;
         }
 
         internal static List<ItemsContainer> GetVehicleContainers(Vehicle vehicle)
         {
-            var vehicleContainers = vehicle?.gameObject.GetComponentsInChildren<StorageContainer>()
-                .Select((x) => x?.container)
-                .ToList();
+            var vehicleContainers = vehicle?.gameObject.GetComponentsInChildren<StorageContainer>().Select((x) => x?.container).ToList();
             vehicleContainers?.AddRange(GetSeamothStorage(vehicle));
             return vehicleContainers;
         }

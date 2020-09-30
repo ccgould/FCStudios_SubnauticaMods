@@ -46,7 +46,7 @@ namespace DataStorageSolutions.Mono
             if (_isInitialized) return;
 
                 _manager = manager;
-                _connectedRelay = gameObject.GetComponent<BasePowerRelay>();
+                _connectedRelay = gameObject.GetComponent<PowerRelay>();
                 _isInitialized = true;
         }
         

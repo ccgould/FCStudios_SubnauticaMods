@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using DataStorageSolutions.Configuration;
 using Serialization;
 using SMLHelper.V2.Handlers;
 using UnityEngine;
@@ -67,7 +68,9 @@ namespace DataStorageSolutions.Buildables
             { $"{ModKey}_BlackListItemFormat","{0} item is in the blacklist an will not be pulled from the vehicle."},
             { $"{ModKey}_DockedVehiclesSettingsPage","Go to docked vehicles settings page."},
             { $"{ModKey}_NoEmptySeaBreezeFormat","No current seabreeze in base can hold this {0}."},
-            { $"{ModKey}_Craft","Craft Item"}
+            { $"{ModKey}_Craft","Craft Item"},
+            { $"{ModKey}_Description",$"{Mod.ServerDescription}"},
+            {  $"{ModKey}_IsFormatted","Is Formatted:"},
         };
 
         internal static void AdditionalPatching()
@@ -362,6 +365,10 @@ namespace DataStorageSolutions.Buildables
         public static string Craft()
         {
             return Language.main.Get(LanguageDictionary.Keys.ElementAt(53));
+        }
+        public static object FiltersCheck()
+        {
+            return Language.main.Get(LanguageDictionary.Keys.ElementAt(54));
         }
     }
 }

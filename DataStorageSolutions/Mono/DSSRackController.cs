@@ -1,5 +1,6 @@
 ﻿using System;
 using System.CodeDom;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Remoting.Messaging;
@@ -7,6 +8,7 @@ using DataStorageSolutions.Abstract;
 using DataStorageSolutions.Buildables;
 using DataStorageSolutions.Configuration;
 using DataStorageSolutions.Helpers;
+using DataStorageSolutions.Interfaces;
 using DataStorageSolutions.Model;
 using FCSCommon.Utilities;
 using FCSCommon.Controllers;
@@ -26,7 +28,7 @@ using UnityEngine;
 
 namespace DataStorageSolutions.Mono
 {
-    internal class DSSRackController : DataStorageSolutionsController, IBaseUnit, IFCSStorage
+    internal class DSSRackController : DataStorageSolutionsController, IBaseUnit, IFCSStorage, ISlottedDevice
     {
         private bool _runStartUpOnEnable;
         private bool _fromSave;
@@ -43,9 +45,7 @@ namespace DataStorageSolutions.Mono
         public int GetContainerFreeSpace => CalculateContainerFreeSpace();
         public bool IsFull => GetIsFull();
         public bool IsRackSlotsFull => GetIsRackFull();
-        internal Action OnUpdate;
-        private bool _allowedToNotify = true;
-        private Dictionary<TechType, int> _rackItemsTracker = new Dictionary<TechType, int>();
+        internal Action OnUpdate; 
         Action<int, int> IFCSStorage.OnContainerUpdate { get; set; }
 
         public override BaseManager Manager { get; set; }
@@ -112,9 +112,6 @@ namespace DataStorageSolutions.Mono
             QuickLogger.Debug("Load Rack");
             if (_savedData.RackServers == null) return;
 
-            _allowedToNotify = false;
-
-
 #if DEBUG
             QuickLogger.Debug($"Save Data Count: {_savedData.RackServers.Count()} || Global Servers Count: { BaseStorageManager.GlobalServers.Count}");
 #endif
@@ -123,17 +120,17 @@ namespace DataStorageSolutions.Mono
             {
                 foreach (DSSServerController controller in BaseStorageManager.GlobalServers)
                 {
-                    if (controller.GetPrefabID() == server)
+#if DEBUG
+                    QuickLogger.Debug($"Current Server: {server} || Global Server in Iteration: {controller.GetPrefabID()}");
+#endif
+                    if (!controller.GetPrefabID().Equals(server, StringComparison.OrdinalIgnoreCase)) continue;
+                    var pickup = controller.gameObject.GetComponent<Pickupable>();
+                    if (pickup != null)
                     {
-
-                        var pickup = controller.gameObject.GetComponent<Pickupable>();
-                        if (pickup != null)
-                            AddServerToSlot(pickup.ToInventoryItem(),controller.GetSlotID());
+                        AddServerToSlot(pickup.ToInventoryItem(),controller.GetSlotID());
                     }
                 }
             }
-
-            _allowedToNotify = true;
         }
 
         private TechType GetTechType()
@@ -167,6 +164,7 @@ namespace DataStorageSolutions.Mono
 
         private RackSlot GetSlotByID(int slotID)
         {
+            QuickLogger.Debug($"Trying to get Slot from id: {slotID}");
             return _servers[slotID];
         }
 
@@ -204,7 +202,7 @@ namespace DataStorageSolutions.Mono
                 return false;
             }
 
-            slotByID.ConnectServer(server);
+            slotByID.ConnectServer(server.item);
 
             UpdateScreen();
             return true;
@@ -234,15 +232,6 @@ namespace DataStorageSolutions.Mono
             _savedData = Mod.GetSaveData(GetPrefabIDString());
         }
         
-        private void SendNotification()
-        {
-            if (_allowedToNotify)
-            {
-                Mod.OnBaseUpdate?.Invoke();
-            }
-
-        }
-
         public override void Save(SaveData newSaveData)
         {
             if (!IsInitialized
@@ -330,7 +319,7 @@ namespace DataStorageSolutions.Mono
             {
                 var id = GetPrefabIDString();
                 QuickLogger.Info($"Saving {id}");
-                Mod.Save();
+                Mod.Save(serializer);
                 QuickLogger.Info($"Saved {id}");
             }
         }
@@ -413,25 +402,27 @@ namespace DataStorageSolutions.Mono
         }
         
         #region Rack Operations
+
+        /// <summary>
+        /// Adds Server to the rack
+        /// </summary>
+        /// <param name="item">An inventory item with the techType for DSS Server</param>
+        /// <returns>Returns true if passed</returns>
         public bool AddItemToContainer(InventoryItem item)
         {
+            if (item.item.GetTechType() != Mod.GetServerTechType()) return false;
             AddServerToSlot(item, GetFreeSlotID());
             return true;
         }
 
         public Pickupable RemoveItemFromContainer(TechType techType, int amount)
         {
-            return GetSlotWithItem(techType)?.RemoveItemFromServer(techType);
+            return null;
         }
-
-        private RackSlot GetSlotWithItem(TechType techType)
-        {
-            return _servers.FirstOrDefault(x => x.IsOccupied && x.GetConnectedServer().HasItem(techType));
-        }
-
+        
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
         {
-            return CanBeStored(DumpContainer.GetCount(), pickupable.GetTechType());
+            return pickupable.GetTechType() == Mod.GetServerTechType() && CanBeStored(DumpContainer.GetCount(), pickupable.GetTechType());
         }
 
         public bool CanBeStored(int amount, TechType techType = TechType.None)
@@ -455,16 +446,6 @@ namespace DataStorageSolutions.Mono
             return new Vector2(amount, storage);
         }
 
-        public bool IsTechTypeAllowedInRack(TechType techType)
-        {
-            if (_servers.Where(rackSlot => rackSlot.HasFilters()).Any(rackSlot => rackSlot.IsAllowedToAdd(techType)))
-            {
-                return true;
-            }
-
-            return _servers.Where(rackSlot => !rackSlot.HasFilters()).Any(rackSlot => rackSlot.IsAllowedToAdd(techType));
-        }
-
         public bool IsAllowedToRemoveItems()
         {
             return true;
@@ -481,14 +462,10 @@ namespace DataStorageSolutions.Mono
             return result > 0;
         }
 
-        internal bool IsRackOpen()
-        {
-            return AnimationManager.GetIntHash(_rackDoor) == 1;
-        }
 
         public bool ContainsItem(TechType techType)
         {
-            return _rackItemsTracker.Any(x => x.Key== techType);
+            return false;
         }
 
         #endregion
@@ -496,90 +473,15 @@ namespace DataStorageSolutions.Mono
 
         public Dictionary<TechType, int> GetItemsWithin()
         {
-            return _rackItemsTracker;
+            return null;
         }
-        
-        #region Server Operations
-
-        internal Dictionary<TechType,int> GetTrackedItems()
-        {
-            return _rackItemsTracker;
-        }
-
-        internal void AddItemToAServer(InventoryItem item,int slot = -1)
-        {
-            if (slot == -1)
-            {
-                slot = GetCapableSlot(item);
-#if DEBUG
-                QuickLogger.Debug($"Capable Slot Return: {slot}", true);
-#endif
-            }
-
-            if(slot == -1) return;
-
-            _servers[slot].AddItemToServer(item);
-        }
-
-        internal void AddItemToRackItemTracker(TechType techType)
-        {
-            if (_rackItemsTracker.ContainsKey(techType))
-            {
-                _rackItemsTracker[techType] += 1;
-#if DEBUG
-                QuickLogger.Debug($"Added another {techType} to rack tracker", true);
-#endif
-            }
-            else
-            {
-                _rackItemsTracker.Add(techType, 1);
-#if DEBUG
-                QuickLogger.Debug($"Item {techType} was added to the rack tracking list.", true);
-#endif
-            }
-        }
-
-        internal void RemoveFromRackTrackedItems(TechType techType)
-        {
-            if (!_rackItemsTracker.ContainsKey(techType)) return;
-
-            if (_rackItemsTracker[techType] == 1)
-            {
-                _rackItemsTracker.Remove(techType);
-#if DEBUG
-                QuickLogger.Debug($"Removed {techType}", true);
-#endif
-            }
-            else
-            {
-                _rackItemsTracker[techType] -= 1;
-#if DEBUG
-                QuickLogger.Debug($"Item {techType} is now {_rackItemsTracker[techType]}", true);
-#endif
-            }
-        }
-
-        private int GetCapableSlot(InventoryItem item)
-        {
-
-            var filteredSlot = _servers.FirstOrDefault(x => x.IsOccupied && x.HasFilters() && x.IsAllowedToAdd(item.item.GetTechType()));
-            if (filteredSlot != null)
-            {
-                return filteredSlot.Id;
-            }
-
-            var unFilteredSlot = _servers.FirstOrDefault(x => x.IsOccupied && x.IsAllowedToAdd(item.item.GetTechType()));
-            if (unFilteredSlot != null)
-            {
-                return unFilteredSlot.Id;
-            }
-
-            return -1;
-        }
-
-        #endregion
         
         internal void FillRack()
+        {
+            StartCoroutine(FillRackCoroutine());
+        }
+
+        private IEnumerator FillRackCoroutine()
         {
             for (int i = 0; i < _servers.Length; i++)
             {
@@ -590,6 +492,7 @@ namespace DataStorageSolutions.Mono
             }
 
             FillWithDummyData();
+            yield return null;
         }
 
         private void FillWithDummyData()
@@ -602,10 +505,54 @@ namespace DataStorageSolutions.Mono
                     for (int j = 0; j < QPatch.Configuration.Config.ServerStorageLimit; j++)
                     {
                         int index = random.Next(Mod.AllTechTypes.Count);
-                        _servers[i].AddItemToServer(Mod.AllTechTypes[index].ToInventoryItem());
+                        _servers[i].GetConnectedServer().AddItemToContainer(Mod.AllTechTypes[index].ToInventoryItem());
                     }
                 }
             }
+        }
+
+        public bool CanItemBeStored(TechType techType, out RackSlot slot,bool filterCheck = false)
+        {
+            if (filterCheck)
+            {
+                var filteredSlot = _servers.FirstOrDefault(x => x.IsOccupied && x.HasFilters() && x.IsAllowedToAdd(techType));
+                if (filteredSlot != null)
+                {
+                    slot = filteredSlot;
+                    return true;
+                }
+            }
+            else
+            {
+                var unFilteredSlot = _servers.FirstOrDefault(x => x.IsOccupied && x.IsAllowedToAdd(techType));
+                if (unFilteredSlot != null)
+                {
+                    slot = unFilteredSlot;
+                    return true;
+                }
+            }
+
+            slot = null;
+            return false;
+        }
+
+        public void ClearRack()
+        {
+            for (int i = 0; i < _servers.Length; i++)
+            {
+                var server = _servers[i];
+                if (server.IsOccupied)
+                {
+                    var pickUp = server.GetConnectedServer();
+                    server.DisconnectFromRack();
+                    Destroy(pickUp.gameObject);
+                }
+            }
+        }
+
+        public bool IsDeviceOpen()
+        {
+            return AnimationManager.GetIntHash(_rackDoor) == 1;
         }
     }
 }

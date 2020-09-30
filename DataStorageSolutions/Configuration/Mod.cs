@@ -608,6 +608,8 @@ TechType.Databox
 
         internal static Action<bool> OnAntennaBuilt;
         private static TechType _seaBreezeTechType;
+        private static TechType _serverTechType;
+
         #endregion
 
         #region Ingredients
@@ -738,11 +740,11 @@ TechType.Databox
 
         #region Internal Methods
 
-        internal static void Save()
+        internal static void Save(ProtobufSerializer serializer)
         {
             if (!IsSaving())
             {
-                //TODO ENblw
+                QuickLogger.ModMessage("Saving...");
                 _saveObject = new GameObject().AddComponent<ModSaver>();
 
                 SaveData newSaveData = new SaveData();
@@ -756,8 +758,8 @@ TechType.Databox
 
                 BaseStorageManager.CleanServers();
 
-                newSaveData.GlobalServers = new HashSet<ServerData>(BaseStorageManager.GetServersSaveData());
-                //newSaveData.Bases = BaseManager.GetSaveData().ToList();
+                newSaveData.GlobalServers = new HashSet<ServerData>(BaseStorageManager.GetServersSaveData(serializer));
+                newSaveData.Bases = BaseManager.GetBaseSaveData().ToList();
                 _saveData = newSaveData;
 
                 if (_saveData == null)
@@ -1048,6 +1050,16 @@ TechType.Databox
 
             return _seaBreezeTechType;
         }
+
+        public static TechType GetServerTechType()
+        {
+            if (_serverTechType == TechType.None)
+            {
+                _serverTechType = ServerClassID.ToTechType();
+            }
+
+            return _serverTechType;
+        }
     }
 
     internal class Config
@@ -1059,10 +1071,10 @@ TechType.Databox
         [JsonProperty] internal float RackPowerUsage { get; set; } = 0.1f;
         [JsonProperty] internal float ServerPowerUsage { get; set; } = 0.05f;
         [JsonProperty] internal bool PullFromDockedVehicles { get; set; } = true;
-        [JsonProperty] internal float CheckVehiclesInterval { get; set; } = 2.0f;
         [JsonProperty] internal int ExtractMultiplier { get; set; }
 
         [JsonProperty] internal float ExtractInterval = 0.25f;
+        [JsonProperty] internal bool ShowServerCustomToolTip { get; set; } = true;
 
         private HashSet<Filter> _dockingBlackList = new HashSet<Filter>();
 
@@ -1087,34 +1099,31 @@ TechType.Databox
     {
         //private ModModes _modMode;
         private const string ExtractMultiplierID = "DSSEMulti";
-        //private const string AllowFoodToggle = "DSSAllowFood";
+        private const string ShowCustomServerToolTip = "DSSShowSeverCustomToolTip";
+
 
 
         public Options() : base("Data Storage Solutions Settings")
         {
             ChoiceChanged += Options_ChoiceChanged;
-            //ToggleChanged += Options_ToggleChanged;
+            ToggleChanged += Options_ToggleChanged;
         }
 
-        //private void Options_ToggleChanged(object sender, ToggleChangedEventArgs e)
-        //{
-        //    switch (e.Id)
-        //    {
-        //        case ExtractMultiplierID:
-        //            QPatch.Configuration.Config.AllowFood = e.Value;
-        //            break;
-        //    }
+        private void Options_ToggleChanged(object sender, ToggleChangedEventArgs e)
+        {
+            if (e.Id == ShowCustomServerToolTip)
+            {
+                QPatch.Configuration.Config.ShowServerCustomToolTip = e.Value;
+            }
 
-        //    Mod.SaveModConfiguration();
-        //}
+            Mod.SaveModConfiguration();
+        }
 
         private void Options_ChoiceChanged(object sender, ChoiceChangedEventArgs e)
         {
-            switch (e.Id)
+            if (e.Id == ExtractMultiplierID)
             {
-                case ExtractMultiplierID:
-                    QPatch.Configuration.Config.ExtractMultiplier = e.Index;
-                    break;
+                QPatch.Configuration.Config.ExtractMultiplier = e.Index;
             }
 
             Mod.SaveModConfiguration();
@@ -1130,7 +1139,7 @@ TechType.Databox
                 "x20"
             }, QPatch.Configuration.Config.ExtractMultiplier);
 
-            //AddToggleOption(AllowFoodToggle, "Allow Food", QPatch.Configuration.Config.AllowFood);
+            AddToggleOption(ShowCustomServerToolTip, "Show Server Custom ToolTip", QPatch.Configuration.Config.ShowServerCustomToolTip);
         }
     }
 }

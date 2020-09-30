@@ -49,6 +49,8 @@ namespace DataStorageSolutions.Mono
         private readonly List<InterfaceButton> _trackedButtons = new List<InterfaceButton>();
         private bool _isBeingDestroyed;
         private Text _counter;
+        private ObjectPooler _objectPooler;
+
 
         private void OnLoadCategoryGrid(DisplayData data)
         {
@@ -139,53 +141,52 @@ namespace DataStorageSolutions.Mono
 
         private void OnLoadVehicleGrid(DisplayData data)
         {
-            //TODO Enable Docking
-            //try
-            //{
-            //    if (_vehicleGrid == null) return;
-            //    _vehicleGrid.ClearPage();
+            try
+            {
+                if (_vehicleGrid == null) return;
+                _vehicleGrid.ClearPage();
 
-            //    var grouped = _mono?.Manager?.DockingManager?.Vehicles;
+                var grouped = _mono?.Manager?.DockingManager?.Vehicles;
 
-            //    if (grouped == null) return;
+                if (grouped == null) return;
 
-            //    if (data.EndPosition > grouped.Count)
-            //    {
-            //        data.EndPosition = grouped.Count;
-            //    }
+                if (data.EndPosition > grouped.Count)
+                {
+                    data.EndPosition = grouped.Count;
+                }
 
-            //    if (data.ItemsGrid?.transform == null) return;
+                if (data.ItemsGrid?.transform == null) return;
 
-            //    QuickLogger.Debug($"Adding Vehicles");
+                QuickLogger.Debug($"Adding Vehicles");
 
-            //    for (int i = data.StartPosition; i < data.EndPosition; i++)
-            //    {
-            //        if (grouped[i] == null) continue;
+                for (int i = data.StartPosition; i < data.EndPosition; i++)
+                {
+                    if (grouped[i] == null) continue;
 
-            //        GameObject buttonPrefab = Instantiate(data.ItemsPrefab);
+                    GameObject buttonPrefab = Instantiate(data.ItemsPrefab);
 
-            //        if (buttonPrefab == null || data.ItemsGrid == null)
-            //        {
-            //            if (buttonPrefab != null)
-            //            {
-            //                QuickLogger.Debug("Destroying Tab", true);
-            //                Destroy(buttonPrefab);
-            //            }
-            //            return;
-            //        }
+                    if (buttonPrefab == null || data.ItemsGrid == null)
+                    {
+                        if (buttonPrefab != null)
+                        {
+                            QuickLogger.Debug("Destroying Tab", true);
+                            Destroy(buttonPrefab);
+                        }
+                        return;
+                    }
 
-            //        QuickLogger.Debug($"Creating Vehicle Button: {grouped[i].GetName()}");
-            //        CreateButton(data, buttonPrefab, new ButtonData { Vehicle = grouped[i] }, ButtonType.Vehicle, grouped[i].GetName(), "VehicleBTN");
-            //    }
+                    QuickLogger.Debug($"Creating Vehicle Button: {grouped[i].GetName()}");
+                    CreateButton(data, buttonPrefab, new ButtonData { Vehicle = grouped[i] }, ButtonType.Vehicle, grouped[i].GetName(), "VehicleBTN");
+                }
 
-            //    _vehicleGrid.UpdaterPaginator(grouped.Count);
-            //}
-            //catch (Exception e)
-            //{
-            //    QuickLogger.Error("Error Caught");
-            //    QuickLogger.Error($"Error Message: {e.Message}");
-            //    QuickLogger.Error($"Error StackTrace: {e.StackTrace}");
-            //}
+                _vehicleGrid.UpdaterPaginator(grouped.Count);
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error("Error Caught");
+                QuickLogger.Error($"Error Message: {e.Message}");
+                QuickLogger.Error($"Error StackTrace: {e.StackTrace}");
+            }
         }
 
         private void UpdateCheckMarks()
@@ -265,11 +266,12 @@ namespace DataStorageSolutions.Mono
         {
             try
             {
-                if (_isBeingDestroyed) return;
+                if (_isBeingDestroyed || _objectPooler == null) return;
 
                 QuickLogger.Debug($"OnLoadBaseItemsGrid : {data.ItemsGrid}", true);
 
-                _baseItemsGrid.ClearPage();
+                //_baseItemsGrid.ClearPage();
+                _objectPooler.Reset(0);
 
                 if (_currentBase == null) return;
 
@@ -291,19 +293,14 @@ namespace DataStorageSolutions.Mono
                 for (int i = data.StartPosition; i < data.EndPosition; i++)
                 {
 
-                    GameObject buttonPrefab = Instantiate(data.ItemsPrefab);
+                    GameObject buttonPrefab = _objectPooler.SpawnFromPool(0, data.ItemsGrid);
 
                     if (buttonPrefab == null || data.ItemsGrid == null)
                     {
-                        if (buttonPrefab != null)
-                        {
-                            Destroy(buttonPrefab);
-                        }
                         return;
                     }
 
-                    buttonPrefab.transform.SetParent(data.ItemsGrid.transform, false);
-                    var itemBTN = buttonPrefab.AddComponent<ItemInterfaceButton>();
+                    var itemBTN = buttonPrefab.EnsureComponent<ItemInterfaceButton>();
                     itemBTN.Manager = _currentBase;
                     itemBTN.TextComponent = buttonPrefab.GetComponentInChildren<Text>(); ;
                     itemBTN.ButtonMode = InterfaceButtonMode.Background;
@@ -490,6 +487,10 @@ namespace DataStorageSolutions.Mono
         internal void Setup(DSSTerminalController mono)
         {
             _mono = mono;
+
+            _objectPooler = gameObject.AddComponent<ObjectPooler>();
+            _objectPooler.Initialize();
+            
             _terminalColorPage = mono.TerminalColorManager;
 
             if (FindAllComponents())
@@ -544,8 +545,7 @@ namespace DataStorageSolutions.Mono
                     break;
 
                 case "VehicleContainerBTN":
-                    //TODO Enable Docking
-                    //_mono.Manager.DockingManager.OpenContainer(_currentVehicle, ((TransferData)tag).Container);
+                    _mono.Manager.DockingManager.OpenContainer(_currentVehicle, ((TransferData)tag).Container);
                     break;
 
                 case "TerminalColorBTN":
@@ -596,16 +596,15 @@ namespace DataStorageSolutions.Mono
                     break;
 
                 case "VehiclesPageBTN":
-                    //TODO Enable Docking
-                    //if (_mono.Manager.DockingManager.HasVehicles(true))
-                    //{
-                    //    _vehicleGrid.DrawPage();
-                    //    GoToPage(TerminalPages.VehiclesPage);
-                    //}
-                    //else
-                    //{
-                    //    GoToPage(TerminalPages.Home);
-                    //}
+                    if (_mono.Manager.DockingManager.HasVehicles(true))
+                    {
+                        _vehicleGrid.DrawPage();
+                        GoToPage(TerminalPages.VehiclesPage);
+                    }
+                    else
+                    {
+                        GoToPage(TerminalPages.Home);
+                    }
                     break;
 
                 case "VehicleBTN":
@@ -615,8 +614,7 @@ namespace DataStorageSolutions.Mono
                     break;
 
                 case "AutoDockBTN":
-                    //TODO Enable Docking
-                    //_toggle.isOn = _mono.Manager.DockingManager.GetToggleState();
+                    _toggle.isOn = _mono.Manager.DockingManager.GetToggleState();
                     GoToPage(TerminalPages.DockSettingPage);
                     break;
 
@@ -659,6 +657,7 @@ namespace DataStorageSolutions.Mono
 
         public void Refresh()
         {
+            if (_isBeingDestroyed) return;
             _baseGrid?.DrawPage();
             _baseItemsGrid?.DrawPage();
             if (_baseNameLabel != null)
@@ -886,7 +885,11 @@ namespace DataStorageSolutions.Mono
                 #region Toggle
 
                 _toggle = InterfaceHelpers.FindGameObject(vehiclesDockingSettingsPage, "Toggle").GetComponent<Toggle>();
-                _toggle.onValueChanged.AddListener(OnAutoPullToggled);
+                _toggle.onValueChanged.AddListener(value =>
+                {
+                    QuickLogger.Debug($"Setting Toggle to {value}", true);
+                    _mono?.Manager?.DockingManager?.ToggleIsEnabled(value);
+                });
 
                 #endregion
 
@@ -964,20 +967,13 @@ namespace DataStorageSolutions.Mono
             }
         }
 
-        internal void OnAutoPullToggled(bool value)
-        {
-            QuickLogger.Debug($"Setting Toggle to {value}", true);
-            //TODO Enable Docking
-            //_mono?.Manager?.DockingManager?.ToggleIsEnabled(value);
-        }
-
-        public void RefreshVehicles(List<Vehicle> vehicles)
+        public void RefreshVehicles()
         {
             if (_isBeingDestroyed) return;
 
             QuickLogger.Debug("Refreshing Vehicles");
-
-            if (!vehicles.Contains(_currentVehicle))
+            
+            if (!_mono.Manager.DockingManager.IsVehicleDocked(_currentVehicle))
             {
                 _currentVehicle = null;
                 _vehicleGrid.DrawPage();

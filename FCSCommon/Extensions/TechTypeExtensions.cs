@@ -30,6 +30,13 @@ namespace FCSCommon.Extensions
                 var pickupable = go.EnsureComponent<Pickupable>().Pickup(false);
                 item = new InventoryItem(pickupable);
             }
+            else
+            {
+                var go = GameObject.Instantiate(GameObject.CreatePrimitive(PrimitiveType.Cube));
+                go.EnsureComponent<PrefabIdentifier>();
+                var pickupable = go.EnsureComponent<Pickupable>().Pickup(false);
+                item = new InventoryItem(pickupable);
+            }
             return item;
         }
 

@@ -9,5 +9,6 @@ namespace DataStorageSolutions.Model
         public string PrefabID { get; set; }
         public HashSet<Filter> ServerFilters { get; set; }
         public IEnumerable<string> ServerItems { get; set; }
+        public byte[] Bytes { get; set; }
     }
 }

@@ -119,7 +119,7 @@ namespace DataStorageSolutions.Mono
             {
 
                 QuickLogger.Info($"Saving {_prefabId}");
-                Mod.Save();
+                Mod.Save(serializer);
                 QuickLogger.Info($"Saved {_prefabId}");
             }
         }
@@ -213,7 +213,7 @@ namespace DataStorageSolutions.Mono
             _savedData.AntennaName = Manager.GetBaseName();
             newSaveData.Entries.Add(_savedData);
         }
-
+        
         #endregion
 
     }

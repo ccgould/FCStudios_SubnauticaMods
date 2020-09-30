@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using DataStorageSolutions.Configuration;
+using DataStorageSolutions.Model;
 using DataStorageSolutions.Mono;
 using FCSCommon.Extensions;
 using FCSCommon.Helpers;

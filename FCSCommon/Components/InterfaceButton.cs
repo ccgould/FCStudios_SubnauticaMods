@@ -25,7 +25,7 @@ namespace FCSCommon.Components
         public Text TextComponent { get; set; }
         public int SmallFont { get; set; } = 140;
         public int LargeFont { get; set; } = 180;
-        public object Tag { get; set; }
+        public virtual object Tag { get; set; }
         public float IncreaseButtonBy { get; set; }
         public Action<bool> OnInterfaceButton { get; set; }
 

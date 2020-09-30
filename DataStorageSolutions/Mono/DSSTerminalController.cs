@@ -105,12 +105,6 @@ namespace DataStorageSolutions.Mono
             }
         }
 
-        //private void OnBaseUpdate()
-        //{
-        //    GetData();
-        //    UpdateScreen();
-        //}
-
         private void ReadySaveData()
         {
             QuickLogger.Debug("In OnProtoDeserialize");
@@ -178,15 +172,17 @@ namespace DataStorageSolutions.Mono
         public override void UpdateScreen()
         {
             if (_isBeingDestroyed) return;
-            QuickLogger.Debug($"Refreshing Monitor: {GetPrefabIDString()}", true);
+#if DEBUG
+    QuickLogger.Debug($"Refreshing Monitor: {GetPrefabIDString()}", true);      
+#endif
             DisplayManager.Refresh();
         }
         
-        private void OnVehicleUpdate(List<Vehicle> vehicles, BaseManager baseManager)
+        internal void OnVehicleUpdate(BaseManager baseManager)
         {
             if (baseManager == Manager)
             {
-                DisplayManager.RefreshVehicles(vehicles);
+                DisplayManager.RefreshVehicles();
             }
         }
 
@@ -206,7 +202,7 @@ namespace DataStorageSolutions.Mono
             {
                 var id = GetPrefabIDString();
                 QuickLogger.Info($"Saving {id}");
-                Mod.Save();
+                Mod.Save(serializer);
                 QuickLogger.Info($"Saved {id}");
             }
         }

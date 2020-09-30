@@ -10,22 +10,19 @@ namespace DataStorageSolutions.Display
 {
     internal class ServerHitController: InterfaceButton
     {
-        private bool _isInitialized;
-        private GameObject _slot;
         public DSSServerController Controller { get; set; }
+        public Func<bool> IsClickable { get; set; }
 
-        //public override void OnEnable()
-        //{
-        //    base.OnEnable();
+        public override void OnPointerClick(PointerEventData eventData)
+        {
 
-        //    if (_isInitialized) return;
-            
-        //    Disabled = false;
+            if (!EventSystem.current.IsPointerOverGameObject()) return;
 
-        //    _slot = GameObjectHelpers.FindGameObject(gameObject, "Slot");
-
-        //    _isInitialized = true;
-        //}
-
+            if (this.IsHovered && IsClickable.Invoke())
+            {
+                QuickLogger.Debug($"Clicked Button: {this.BtnName}", true);
+                OnButtonClick?.Invoke(this.BtnName, this.Tag);
+            }
+        }
     }
 }

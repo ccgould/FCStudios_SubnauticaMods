@@ -110,6 +110,9 @@ namespace DataStorageSolutions.Craftables
                     placeTool.dropTime = 1;
                     placeTool.holsterTime = 0.35f;
 
+                    //var storageRoot = GameObjectHelpers.FindGameObject(prefab, "StorageRoot");
+                    //storageRoot.EnsureComponent<ChildObjectIdentifier>();
+
                     prefab.AddComponent<DSSServerController>();
 
                     //Add the FCSTechFabricatorTag component

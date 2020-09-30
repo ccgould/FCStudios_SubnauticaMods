@@ -17,7 +17,7 @@ namespace DataStorageSolutions.Mono
             if (!Mod.IsSaving())
             {
                 QuickLogger.Info($"Saving Data Storage Solutions");
-                Mod.Save();
+                Mod.Save(serializer);
                 QuickLogger.Info($"Saved Data Storage Solutions");
             }
         }

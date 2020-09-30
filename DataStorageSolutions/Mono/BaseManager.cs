@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using DataStorageSolutions.Buildables;
 using DataStorageSolutions.Configuration;
+using DataStorageSolutions.Debug;
 using DataStorageSolutions.Helpers;
 using DataStorageSolutions.Interfaces;
 using DataStorageSolutions.Model;
@@ -40,7 +41,7 @@ namespace DataStorageSolutions.Mono
         internal string InstanceID { get; }
         internal FCSPowerStates BasePrevPowerState { get; set; }
         internal NameController NameController { get; private set; }
-        //internal DSSVehicleDockingManager DockingManager { get; set; }
+        internal DSSVehicleDockingManager DockingManager { get; set; }
         internal bool IsOperational => !_hasBreakerTripped && BasePowerManager.HasPower();
         internal Dictionary<string, FCSConnectableDevice> FCSConnectables { get; set; } = new Dictionary<string, FCSConnectableDevice>();
 
@@ -54,6 +55,7 @@ namespace DataStorageSolutions.Mono
         //internal readonly HashSet<DSSOperatorController> BaseOperators = new HashSet<DSSOperatorController>();
         internal readonly HashSet<DSSTerminalController> BaseTerminals = new HashSet<DSSTerminalController>();
         private bool _isInitialized;
+        private static bool _allowedToNotify;
 
         #region Default Constructor
 
@@ -71,7 +73,6 @@ namespace DataStorageSolutions.Mono
 
         private void Initialize(SubRoot habitat)
         {
-
             if (_isInitialized) return;
             ReadySaveData();
             FCSConnectableAwake_Patcher.AddEventHandlerIfMissing(AlertedNewFCSConnectablePlaced);
@@ -104,19 +105,23 @@ namespace DataStorageSolutions.Mono
                 };
             }
 
+            Mod.OnAntennaBuilt += isBuilt =>
+            {
+                SendNotification();
+            };
 
-            //if (DockingManager == null)
-            //{
-            //    DockingManager = habitat.gameObject.AddComponent<DSSVehicleDockingManager>();
-            //    DockingManager.Initialize(habitat, this);
-            //    DockingManager.ToggleIsEnabled(_savedData?.AllowDocking ?? false);
-            //}
+            if (DockingManager == null)
+            {
+                DockingManager = habitat.gameObject.AddComponent<DSSVehicleDockingManager>();
+                DockingManager.Initialize(this);
+                DockingManager.ToggleIsEnabled(_savedData?.AllowDocking ?? false);
+            }
 
             _hasBreakerTripped = _savedData?.HasBreakerTripped ?? false;
 
             _isInitialized = true;
         }
-
+        
         #endregion
 
         #region Save Handler
@@ -265,6 +270,11 @@ namespace DataStorageSolutions.Mono
             return GetCurrentBaseAntenna(ignoreVisibleCheck) != null;
         }
 
+        private bool HasARack()
+        {
+            return StorageManager?.BaseRacks?.Count > 0;
+        }
+
         #endregion
 
         #region FCSConnectable
@@ -375,7 +385,9 @@ namespace DataStorageSolutions.Mono
                 {
                     unit.DisplayManager.PowerOffDisplay();
                 }
-                QuickLogger.Debug($"Add Unit : {unit.GetPrefabIDString()}", true);
+#if DEBUG
+                QuickLogger.Debug($"Add Unit : {unit.GetPrefabIDString()} || Base Has Power: {BasePowerManager.HasPower()}", true);
+#endif
             }
         }
 
@@ -385,7 +397,9 @@ namespace DataStorageSolutions.Mono
             {
                 if (!manager.StorageManager.BaseRacks.Contains(unit)) continue;
                 manager.StorageManager.BaseRacks.Remove(unit);
+#if DEBUG
                 QuickLogger.Debug($"Removed Unit : {unit.GetPrefabIDString()}", true);
+#endif
             }
         }
 
@@ -451,7 +465,7 @@ namespace DataStorageSolutions.Mono
                 if (!string.IsNullOrWhiteSpace(data.PrefabID))
                 {
                     controller.SetFilters(data.ServerFilters);
-                    controller.MoveItemsToStorageRoot(data.ServerItems);
+                    //controller.MoveItemsToStorageRoot(data.ServerItems);
                 }
                 BaseStorageManager.GlobalServers.Add(controller);
             }
@@ -472,19 +486,69 @@ namespace DataStorageSolutions.Mono
             BaseStorageManager.GlobalServers.Remove(dssServerController);
         }
 
-        public static void UpdateGlobalTerminals()
+        public static void UpdateGlobalTerminals(bool isVehiclesUpdate = false)
         {
             foreach (BaseManager manager in Managers)
             {
-                manager.UpdateBaseTerminals();
+                if (isVehiclesUpdate)
+                {
+                    manager.UpdateBaseTerminals(true);
+                }
+                else
+                {
+                    manager.UpdateBaseTerminals();
+                }
             }
         }
 
-        private void UpdateBaseTerminals()
+        private void UpdateBaseTerminals(bool isVehicleUpdate = false)
         {
             foreach (DSSTerminalController terminal in BaseTerminals)
             {
-                terminal.UpdateScreen();
+                if (isVehicleUpdate)
+                {
+                    terminal.OnVehicleUpdate(this);
+                }
+                else
+                {
+                    terminal.UpdateScreen();
+                }
+            }
+        }
+
+        public static IEnumerable<BaseSaveData> GetBaseSaveData()
+        {
+            foreach (var manager in Managers)
+            {
+                yield return new BaseSaveData{BaseName = manager.GetBaseName(),InstanceID = manager.InstanceID};
+            }
+        }
+
+        public static void SetAllowedToNotify(bool value)
+        {
+            if (DebugMenu.main.IsOpen)
+            {
+                _allowedToNotify = false;
+                return;
+            }
+            _allowedToNotify = value;
+            QuickLogger.Debug($"Allow Notification set to: {_allowedToNotify}",true);
+            if (value)
+            {
+                SendNotification();
+            }
+        }
+
+        internal static void SendNotification(bool isVehicleUpdate = false)
+        {
+            QuickLogger.Debug($"IsAllowed to Update: {_allowedToNotify}",true);
+            if (_allowedToNotify)
+            {
+                BaseManager.UpdateGlobalTerminals();
+                if (isVehicleUpdate)
+                {
+                    BaseManager.UpdateGlobalTerminals(true);
+                }
             }
         }
     }

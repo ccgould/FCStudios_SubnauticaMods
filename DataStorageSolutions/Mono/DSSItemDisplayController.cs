@@ -159,7 +159,7 @@ namespace DataStorageSolutions.Mono
             {
                 var id = GetPrefabID();
                 QuickLogger.Info($"Saving {id}");
-                Mod.Save();
+                Mod.Save(serializer);
                 QuickLogger.Info($"Saved {id}");
             }
         }

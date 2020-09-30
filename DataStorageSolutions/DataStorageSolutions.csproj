@@ -143,9 +143,12 @@
     <Compile Include="Interfaces\IBaseAntenna.cs" />
     <Compile Include="Interfaces\IDataSoluationsSave.cs" />
     <Compile Include="Enumerators\TerminalPages.cs" />
+    <Compile Include="Interfaces\ISlot.cs" />
+    <Compile Include="Interfaces\ISlottedDevice.cs" />
     <Compile Include="Model\AudioHandler.cs" />
     <Compile Include="Model\BaseStorageManager.cs" />
     <Compile Include="Model\Catergories.cs" />
+    <Compile Include="Model\ObjectPooler.cs" />
     <Compile Include="Model\RackSlot.cs" />
     <Compile Include="Model\ObjectDataTransferData.cs" />
     <Compile Include="Model\ServerData.cs" />
@@ -162,6 +165,11 @@
     <Compile Include="Mono\DSSServerFormattingStationDisplay.cs" />
     <Compile Include="Mono\DSSTerminalController.cs" />
     <Compile Include="Mono\DSSTerminalDisplay.cs" />
+    <Compile Include="Mono\DSSVehicleDockingManager.cs" />
+    <Compile Include="Patches\InGameMenuPatch.cs" />
+    <Compile Include="Patches\StorageContainerPatcher.cs" />
+    <Compile Include="Patches\ToolTipFactory_Patch.cs" />
+    <Compile Include="Patches\VehicleDockingBayPatcher.cs" />
     <Compile Include="Structs\OperatorButtonData.cs" />
     <Compile Include="Mono\BasePowerManager.cs" />
     <Compile Include="Mono\SearchField.cs" />

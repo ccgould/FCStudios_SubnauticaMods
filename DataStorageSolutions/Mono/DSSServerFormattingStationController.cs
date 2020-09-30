@@ -5,6 +5,7 @@ using DataStorageSolutions.Buildables;
 using DataStorageSolutions.Configuration;
 using DataStorageSolutions.Enumerators;
 using DataStorageSolutions.Helpers;
+using DataStorageSolutions.Interfaces;
 using DataStorageSolutions.Model;
 using FCSCommon.Controllers;
 using FCSCommon.Extensions;
@@ -18,7 +19,7 @@ using UnityEngine;
 
 namespace DataStorageSolutions.Mono
 {
-    internal class DSSServerFormattingStationController : DataStorageSolutionsController, IFCSStorage
+    internal class DSSServerFormattingStationController : DataStorageSolutionsController, IFCSStorage,ISlottedDevice,ISlot
     {
         private bool _runStartUpOnEnable;
         private bool _fromSave;
@@ -94,14 +95,19 @@ namespace DataStorageSolutions.Mono
             return _slot.transform;
         }
 
-        private void ConnectServer(Pickupable pickupable)
+        public void ConnectServer(Pickupable pickupable)
         {
             _server = pickupable;
             _controller = pickupable.gameObject.GetComponent<DSSServerController>();
-            _controller.ConnectToDevice(Manager, 0);
+            _controller.ConnectToDevice(Manager, null);
             _filters = _controller.GetFilters();
         }
-        
+
+        public ISlottedDevice GetConnectedDevice()
+        {
+            return this;
+        }
+
         private void CreateAndAddNewServer(HashSet<ObjectData> items)
         {
             try
@@ -329,6 +335,11 @@ namespace DataStorageSolutions.Mono
         public HashSet<Filter> GetFilters()
         {
             return _filters;
+        }
+
+        public bool IsDeviceOpen()
+        {
+            return true;
         }
     }
 }

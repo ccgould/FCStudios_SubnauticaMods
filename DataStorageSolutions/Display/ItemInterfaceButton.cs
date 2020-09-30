@@ -10,19 +10,46 @@ namespace DataStorageSolutions.Display
     {
         private float _time;
         public float interpolationPeriod = 0.1f;
+        private object _tag;
+        private uGUI_Icon _icon;
         private TechType _techType;
-        public BaseManager Manager { get; set; }
+
+        public override object Tag
+        {
+            get => _tag;
+            set
+            {
+                _tag = value;
+                SetIcon((TechType)value);
+            }
+        }
 
         private void Start()
         {
-            _techType = (TechType) Tag;
-            
-            TextLineOne = string.Format(AuxPatchers.TakeFormatted(), Language.main.Get(_techType));
-
-            uGUI_Icon trashIcon = InterfaceHelpers.FindGameObject(gameObject, "Icon").AddComponent<uGUI_Icon>();
-            trashIcon.sprite = SpriteManager.Get(_techType);
+            TextComponent.text = string.Empty;
         }
 
+        private void SetIcon(TechType value)
+        {
+            _techType = value;
+            TextLineOne = string.Format(AuxPatchers.TakeFormatted(), Language.main.Get(value));
+
+            uGUI_Icon trashIcon = GetIcon();
+            trashIcon.sprite = SpriteManager.Get(value);
+        }
+
+        private uGUI_Icon GetIcon()
+        {
+            if (_icon == null)
+            {
+                _icon = InterfaceHelpers.FindGameObject(gameObject, "Icon").AddComponent<uGUI_Icon>();
+            }
+
+            return _icon;
+        }
+
+        public BaseManager Manager { get; set; }
+        
         public override void Update()
         {
             base.Update();
@@ -32,11 +59,10 @@ namespace DataStorageSolutions.Display
             if (_time >= interpolationPeriod)
             {
                 _time = 0.0f;
-                var itemsWithin = Manager.StorageManager.GetItemsWithin();
-                if (itemsWithin.ContainsKey(_techType))
-                {
-                    TextComponent.text = itemsWithin[_techType].ToString();
-                }
+
+                if (!gameObject.activeSelf) return;
+
+                TextComponent.text = Manager.StorageManager.GetItemCount(_techType).ToString();
             }
         }
     }

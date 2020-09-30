@@ -113,6 +113,7 @@ namespace DataStorageSolutions
                 _harmony.PatchAll(Assembly.GetExecutingAssembly());
 
                 PatchEasyCraft();
+                PatchToolTipFactory(_harmony);
 
                 IsDockedVehicleStorageAccessInstalled = QModServices.Main.ModPresent("DockedVehicleStorageAccess");
                 
@@ -186,6 +187,25 @@ namespace DataStorageSolutions
             else
             {
                 QuickLogger.Debug("EasyCraft  not installed");
+            }
+        }
+
+        private static void PatchToolTipFactory(Harmony harmony)
+        {
+            var toolTipFactoryType = Type.GetType("TooltipFactory, Assembly-CSharp");
+
+            if (toolTipFactoryType != null)
+            {
+                QuickLogger.Debug("Got TooltipFactory Type");
+
+                var inventoryItemViewMethodInfo = toolTipFactoryType.GetMethod("InventoryItem");
+
+                if (inventoryItemViewMethodInfo != null)
+                {
+                    QuickLogger.Info("Got Inventory Item View Method Info");
+                    var postfix = typeof(TooltipFactory_Patch).GetMethod("GetToolTip");
+                    harmony.Patch(inventoryItemViewMethodInfo, null, new HarmonyMethod(postfix));
+                }
             }
         }
     }
