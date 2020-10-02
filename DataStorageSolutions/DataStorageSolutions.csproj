@@ -156,6 +156,8 @@
     <Compile Include="Mono\BaseManager.cs" />
     <Compile Include="Mono\DSSAntennaController.cs" />
     <Compile Include="Mono\DSSItemDisplayController.cs" />
+    <Compile Include="Mono\DSSOperatorController.cs" />
+    <Compile Include="Mono\DSSOperatorDisplayManager.cs" />
     <Compile Include="Mono\DSSRackController.cs" />
     <Compile Include="Mono\DSSRackDisplayController.cs" />
     <Compile Include="Mono\DSSServerDisplay.cs" />

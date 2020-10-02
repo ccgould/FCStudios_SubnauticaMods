@@ -80,7 +80,7 @@ namespace DataStorageSolutions.Patches
                     {
                         if (baseManager.IsOperational)
                         {
-                            //__result += baseManager.GetItemCount(techType);
+                            __result += baseManager.StorageManager.GetItemCount(techType);
                         }
                     }
                     else
@@ -100,8 +100,6 @@ namespace DataStorageSolutions.Patches
             if (!__result)
             {
                 int num = 0;
-
-                var baseManager = Containers;
                 
                 for (var index = 0; index < Containers.Length; index++)
                 {
@@ -112,13 +110,11 @@ namespace DataStorageSolutions.Patches
 
                     for (int i = 0; i < count; i++)
                     {
-                        //var server ;//currentBase?.GetServerWithItem(techType);
-
-                        //if (server != null)
-                        //{
-                        //    server.Remove(techType);
-                        //    num++;
-                        //}
+                        var pickup = currentBase.StorageManager.RemoveItemFromBase(techType);
+                        if (pickup != null)
+                        {
+                            num++;
+                        }
                     }
 
                     if (num == count)

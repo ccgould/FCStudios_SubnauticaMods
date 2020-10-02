@@ -124,7 +124,8 @@ namespace DataStorageSolutions.Mono
                 return;
             }
 
-            BaseManager.AddOperation(new FCSOperation { FromDevice = _fromDevice, ToDevice = _toDevice, TechType = _itemTechType, Manager = _mono.Manager});
+            //TODO Enable
+            //BaseManager.AddOperation(new FCSOperation { FromDevice = _fromDevice, ToDevice = _toDevice, TechType = _itemTechType, Manager = _mono.Manager});
 
             GoToPage(OperatorPages.Operations);
         }
@@ -228,7 +229,11 @@ namespace DataStorageSolutions.Mono
                     icon2.sprite = connectable.ToDevice.IsBase() ? SpriteManager.Get(TechType.BaseRoom) : SpriteManager.Get(connectable.ToDevice.GetTechType());
 
                     var deleteBTN = buttonPrefab.GetComponentInChildren<Button>();
-                    deleteBTN.onClick.AddListener(() => { _mono.Manager.DeleteOperator(connectable); });
+                    deleteBTN.onClick.AddListener(() =>
+                    {
+                        //TODO Enable
+                        //_mono.Manager.DeleteOperator(connectable);
+                    });
                 }
 
                 _operationsGrid.UpdaterPaginator(grouped.Count);
@@ -517,7 +522,8 @@ namespace DataStorageSolutions.Mono
                         deleteBTN.HOVER_COLOR = _hoverColor;
                         deleteBTN.OnButtonClick = delegate
                         {
-                            BaseManager.DeleteAutoCraft(craft); 
+                            //TODO Enable
+                            //BaseManager.DeleteAutoCraft(craft); 
                             Refresh();
                         };
                     }
@@ -540,7 +546,11 @@ namespace DataStorageSolutions.Mono
                         craftBTN.TextLineOne = AuxPatchers.Craft();
                         craftBTN.STARTING_COLOR = _startColor;
                         craftBTN.HOVER_COLOR = _hoverColor;
-                        craftBTN.OnButtonClick = delegate { BaseManager.PerformCraft(craft); };
+                        craftBTN.OnButtonClick = delegate
+                        {
+                            //TODO Enable
+                            //BaseManager.PerformCraft(craft);
+                        };
                     }
                 }
 
@@ -709,7 +719,8 @@ namespace DataStorageSolutions.Mono
             _page = Animator.StringToHash("Pages");
             if (FindAllComponents())
             {
-                _mono.Manager.LoadCraftingOperations();
+                //TODO Enable
+                //_mono.Manager.LoadCraftingOperations();
             }
         }
         
@@ -782,7 +793,8 @@ namespace DataStorageSolutions.Mono
                         return;
                     }
                     GoToPage(OperatorPages.AutoCraft);
-                    BaseManager.AddCraft(new FCSOperation {  TechType = _craftTechType, Manager = _mono.Manager });
+                    //TODO Enable
+                    //BaseManager.AddCraft(new FCSOperation {  TechType = _craftTechType, Manager = _mono.Manager });
                     _autoCraftingGrid.DrawPage();
                 });
 
@@ -958,7 +970,8 @@ namespace DataStorageSolutions.Mono
             {
                 case "ConnectionsBTN":
                     GoToPage(OperatorPages.Operations);
-                    _mono.Manager.LoadOperationSaveData();
+                    //TODO Enable
+                    //_mono.Manager.LoadOperationSaveData();
                     break;
                 case "AutoCraftBTN":
                     GoToPage(OperatorPages.AutoCraft);

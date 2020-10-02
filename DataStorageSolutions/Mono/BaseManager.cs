@@ -52,7 +52,7 @@ namespace DataStorageSolutions.Mono
         internal static List<FCSOperation> Operations { get; set; } = new List<FCSOperation>();
         public BasePowerManager BasePowerManager { get; set; }
         public BaseStorageManager StorageManager { get; set; }
-        //internal readonly HashSet<DSSOperatorController> BaseOperators = new HashSet<DSSOperatorController>();
+        internal readonly HashSet<DSSOperatorController> BaseOperators = new HashSet<DSSOperatorController>();
         internal readonly HashSet<DSSTerminalController> BaseTerminals = new HashSet<DSSTerminalController>();
         private bool _isInitialized;
         private static bool _allowedToNotify;
@@ -157,7 +157,9 @@ namespace DataStorageSolutions.Mono
 
         internal static BaseManager FindManager(SubRoot subRoot)
         {
+#if DEBUG
             QuickLogger.Debug($"Processing SubRoot = {subRoot.GetInstanceID()} || Name {subRoot.GetSubName()}");
+#endif
             var baseManager = FindManager(subRoot.gameObject.GetComponentInChildren<PrefabIdentifier>()?.Id);
             return baseManager ?? CreateNewManager(subRoot);
         }
@@ -550,6 +552,17 @@ namespace DataStorageSolutions.Mono
                     BaseManager.UpdateGlobalTerminals(true);
                 }
             }
+        }
+
+        public void UnRegisterOperator(DSSOperatorController operatorController)
+        {
+            BaseOperators.Remove(operatorController);
+        }
+
+        public void RegisterOperator(DSSOperatorController operatorController)
+        {
+            if (BaseOperators.Contains(operatorController)) return;
+            BaseOperators.Add(operatorController);
         }
     }
 }

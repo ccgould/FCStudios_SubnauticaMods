@@ -34,7 +34,13 @@ namespace DataStorageSolutions.Model
         public DumpContainer DumpContainer { get; private set; }
         internal static readonly HashSet<DSSServerController> GlobalServers = new HashSet<DSSServerController>();
         internal readonly HashSet<DSSServerController> BaseServers = new HashSet<DSSServerController>();
-        public static List<string> DONT_TRACK_GAMEOBJECTS { get; private set; } = new List<string>();
+        public static List<string> DONT_TRACK_GAMEOBJECTS { get; private set; } = new List<string>
+        {
+            "planterpot",
+            "planterbox",
+            "plantershelf",
+            "alongplanter"
+        };  
         internal static readonly HashSet<StorageContainer> BaseStorageLockers = new HashSet<StorageContainer>();
         private BaseManager _baseManager;
         private bool _allowedToNotify = true;
@@ -150,7 +156,6 @@ namespace DataStorageSolutions.Model
                 DumpContainer = manager.Habitat.gameObject.EnsureComponent<DumpContainer>();
                 DumpContainer.Initialize(manager.Habitat.transform, AuxPatchers.BaseDumpReceptacle(), AuxPatchers.NotAllowed(), AuxPatchers.CannotBeStored(), this);
             }
-            StorageContainerAwakePatcher.RegisterForNewStorageContainerUpdates(this);
             TrackExistingStorageContainers();
         }
 
@@ -182,7 +187,7 @@ namespace DataStorageSolutions.Model
             return Mod.GetServerSaveData(prefabId).SlotID;
         }
 
-        public int GetItemCount(TechType techType)
+        internal int GetItemCount(TechType techType)
         {
             return TrackedResources.ContainsKey(techType) ? TrackedResources[techType].Amount : 0;
         }
@@ -395,21 +400,9 @@ namespace DataStorageSolutions.Model
 
         public void AlertNewStorageContainerPlaced(StorageContainer storageContainer)
         {
+            if (BaseStorageLockers.Contains(storageContainer)) return;
             BaseStorageLockers.Add(storageContainer);
-            _baseManager.Habitat.StartCoroutine(nameof(TrackNewStorageContainerCoroutine), storageContainer);
-        }
-
-        public IEnumerator TrackNewStorageContainerCoroutine(StorageContainer sc)
-        {
-            // We yield to the end of the frame as we need the parent/children tree to update.
-            yield return new WaitForEndOfFrame();
-            BaseManager newSeaBase = BaseManager.FindManager(sc?.gameObject);
-            if (newSeaBase != null && newSeaBase == _baseManager)
-            {
-                TrackStorageContainer(sc);
-            }
-
-            _baseManager.Habitat.StopCoroutine("TrackNewStorageContainerCoroutine");
+            TrackStorageContainer(storageContainer);
         }
 
         private void TrackExistingStorageContainers()

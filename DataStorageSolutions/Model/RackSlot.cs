@@ -84,7 +84,7 @@ namespace DataStorageSolutions.Model
         public  void ConnectServer(Pickupable server)
         {
 #if DEBUG
-            QuickLogger.Debug($"Connecting Server: {server.item.gameObject.GetComponent<DSSServerController>()?.GetPrefabID()}");
+            QuickLogger.Debug($"Connecting Server: {server.gameObject.GetComponent<DSSServerController>()?.GetPrefabID()}");
 #endif
             _server = server.gameObject.GetComponent<DSSServerController>();
             _server.ConnectToDevice(_mono.Manager, this);

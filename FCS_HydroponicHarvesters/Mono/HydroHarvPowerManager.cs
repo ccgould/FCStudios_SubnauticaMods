@@ -14,7 +14,7 @@ namespace FCS_HydroponicHarvesters.Mono
         private PowerRelay _connectedRelay;
         private float _energyToConsume;
 
-        private float AvailablePower => ConnectedRelay.GetPower();
+        private float AvailablePower => ConnectedRelay?.GetPower() ?? 0f;
         
         private PowerRelay ConnectedRelay
         {
@@ -62,6 +62,7 @@ namespace FCS_HydroponicHarvesters.Mono
 
         internal bool HasPowerToConsume()
         {
+            if (!_mono.IsConnectedToBase) return false;
             bool requiresEnergy = GameModeUtils.RequiresPower();
             return !requiresEnergy || (this.AvailablePower >= _energyToConsume);
         }

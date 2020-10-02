@@ -42,7 +42,7 @@ namespace DataStorageSolutions.Mono
 
         private void OnDestroy()
         {
-            Manager?.RemoveOperator(this);
+            Manager?.UnRegisterOperator(this);
         }
         
         public override void OnProtoSerialize(ProtobufSerializer serializer)
@@ -75,14 +75,9 @@ namespace DataStorageSolutions.Mono
 
         internal void AddToBaseManager(BaseManager managers = null)
         {
-            if (SubRoot == null)
-            {
-                SubRoot = GetComponentInParent<SubRoot>();
-            }
+            Manager = managers ?? BaseManager.FindManager(gameObject);
 
-            Manager = managers ?? BaseManager.FindManager(SubRoot);
-
-            Manager?.AddOperator(this);
+            Manager?.RegisterOperator(this);
         }
 
         public override bool CanDeconstruct(out string reason)

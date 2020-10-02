@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using DataStorageSolutions.Model;
+using DataStorageSolutions.Mono;
+using FCSCommon.Utilities;
 using HarmonyLib;
 
 namespace DataStorageSolutions.Patches
@@ -8,33 +10,36 @@ namespace DataStorageSolutions.Patches
      * Patches into StorageContainer::Awake method to alert our Resource monitor about the newly placed storage container
      */
     [HarmonyPatch(typeof(StorageContainer))]
-    [HarmonyPatch("Awake")]
+    [HarmonyPatch("OnConstructedChanged")]
     internal class StorageContainerAwakePatcher
     {
-        private static readonly List<BaseStorageManager> registeredBaseStorageManagers = new List<BaseStorageManager>();
 
         [HarmonyPostfix]
-        internal static void Postfix(StorageContainer __instance)
+        internal static void Postfix(bool constructed, StorageContainer __instance)
         {
-            if (__instance == null)
+            if (__instance == null || !constructed)
             {
                 return;
             }
 
-            foreach (BaseStorageManager baseStorageManager in registeredBaseStorageManagers)
+            var manager = BaseManager.FindManager(__instance.prefabRoot);
+
+            if (manager == null)
             {
-                baseStorageManager.AlertNewStorageContainerPlaced(__instance);
+#if DEBUG
+                QuickLogger.Debug($"[StorageContainerPatch] GameObject Name Returned: {__instance.prefabRoot.name}");
+#endif
+                QuickLogger.Debug($"[StorageContainerPatch] Base Manager is null canceling operation");
+                return;
             }
-        }
 
-        internal static void RegisterForNewStorageContainerUpdates(BaseStorageManager baseStorageManager)
-        {
-            registeredBaseStorageManagers.Add(baseStorageManager);
-        }
+            if (manager.StorageManager == null)
+            {
+                QuickLogger.Debug($"[StorageContainerPatch] Base Storage Manager is null canceling operation");
+                return;
+            }
 
-        internal static void ClearRegisteredBaseStorageManager()
-        {
-            registeredBaseStorageManagers.Clear();
+            manager.StorageManager.AlertNewStorageContainerPlaced(__instance);
         }
     }
 }

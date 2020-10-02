@@ -54,8 +54,8 @@ namespace DataStorageSolutions
             Server = new ServerCraftable(Mod.ServerClassID, Mod.ServerFriendlyName, Mod.ServerDescription, craftingTab);
             Server.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
 
-            //var operatorB = new FCSKit(Mod.OperatorKitClassID, Mod.OperatorFriendlyName, craftingTab,Mod.DSSOperatorIngredients);
-            //operatorB.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
+            var operatorB = new FCSKit(Mod.OperatorKitClassID, Mod.OperatorFriendlyName, craftingTab,Mod.DSSOperatorIngredients);
+            operatorB.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
 
             var itemDisplay = new FCSKit(Mod.ItemDisplayKitID, Mod.ItemDisplayFriendlyName, craftingTab,Mod.ItemDisplayIngredients);
             itemDisplay.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
@@ -99,8 +99,8 @@ namespace DataStorageSolutions
                 var terminal = new DSSTerminalC48Buildable();
                 terminal.Patch();
 
-                //var operatorB = new OperatorBuildable();
-                //operatorB.Patch();
+                var operatorB = new OperatorBuildable();
+                operatorB.Patch();
 
                 var serverFormattingStation = new ServerFormattingStationBuildable();
                 serverFormattingStation.Patch();
