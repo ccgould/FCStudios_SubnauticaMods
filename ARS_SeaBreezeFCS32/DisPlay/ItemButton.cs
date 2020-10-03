@@ -1,5 +1,6 @@
 ﻿using FCSCommon.Utilities;
 using System;
+using ARS_SeaBreezeFCS32.Buildables;
 using FCSTechFabricator.Enums;
 using UnityEngine.EventSystems;
 
@@ -17,7 +18,7 @@ namespace ARS_SeaBreezeFCS32.Display
         {
             set
             {
-                TextLineOne = "Take " + TechTypeExtensions.Get(Language.main, value);
+                TextLineOne = string.Format(ARSSeaBreezeFCS32Buildable.TakeItemFormat(), value.AsString());
                 type = value;
             }
 
