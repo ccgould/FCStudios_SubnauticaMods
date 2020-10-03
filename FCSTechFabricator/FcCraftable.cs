@@ -10,7 +10,6 @@ namespace FCSTechFabricator
         protected IFcAssetBundlesService AssetBundlesService { get; private set; }
 
         protected abstract string AssetBundleName { get; }
-        protected AssetBundle AssetBundle { get; private set; }
 
         public override CraftTree.Type FabricatorType => CraftTree.Type.None;
         public IFcCraftingTab ParentTab { get; }
@@ -24,7 +23,6 @@ namespace FCSTechFabricator
             OnStartedPatching += () =>
             {
                 this.ParentTab.LoadAssets(this.AssetBundlesService);
-                this.AssetBundle = this.AssetBundlesService.GetAssetBundleByName(this.AssetBundleName);
             };
 
             OnFinishedPatching += () =>
@@ -41,14 +39,7 @@ namespace FCSTechFabricator
                 this.FabricatorService.AddCraftNode(this, this.ParentTab.Id);
             };
         }
-
-        protected override Atlas.Sprite GetItemSprite()
-        {
-            Texture2D iconTexture = this.AssetBundle.LoadAsset<Texture2D>(this.IconFileName);
-            return ImageUtils.LoadSpriteFromTexture(iconTexture);
-            
-        }
-
+        
 #elif BELOWZERO
         protected FcCraftable(string classId, string friendlyName, string description, FcCraftingTab parentTab)
             : base(classId, friendlyName, description)

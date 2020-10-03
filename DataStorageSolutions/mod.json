@@ -5,7 +5,7 @@
   "Version": "1.2.0",
   "Game": "Subnautica",
   "VersionDependencies": {
-    "FCSTechFabricator": "2.0.9",
+    "FCSTechFabricator": "2.0.10",
     "SMLHelper": "2.9"
   },
   "AssemblyName": "DataStorageSolutions.dll",

@@ -102,6 +102,11 @@ namespace DataStorageSolutions.Mono
                     {
                         baseRack.DisplayManager.ChangeScreenPowerState(state);
                     }
+
+                    foreach (DSSTerminalController terminal in BaseTerminals)
+                    {
+                        terminal.DisplayManager.ChangeScreenPowerState(state);
+                    }
                 };
             }
 
@@ -421,6 +426,8 @@ namespace DataStorageSolutions.Mono
                 BaseAntennas.Add(unit);
                 QuickLogger.Debug($"Add Unit : {unit.GetPrefabID()}", true);
             }
+
+            SendNotification();
         }
 
         internal static void RemoveAntenna(DSSAntennaController unit)
@@ -434,6 +441,8 @@ namespace DataStorageSolutions.Mono
                     unit.Manager.SendBaseMessage(false);
                 }
             }
+
+            SendNotification();
         }
 
         #endregion

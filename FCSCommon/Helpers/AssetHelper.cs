@@ -1,17 +1,20 @@
 ﻿using System;
 using System.IO;
+using System.Reflection;
 using UnityEngine;
 
 namespace FCSCommon.Helpers
 {
     /// <summary>
-    /// A  helper class that deals with the AssetBudle
+    /// A  helper class that deals with the AssetBundle
     /// </summary>
     internal static class AssetHelper
     {
+        internal static string ModDirLocation => Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         /// <summary>
         /// The AssetBundle for the mod
         /// </summary>
+        [Obsolete("Use Asset(string modBundle) instead to prevent hardcoded paths")]
         internal static AssetBundle Asset(string modDirName, string modBundleName)
         {
             if (modDirName.Equals(string.Empty) && modBundleName.Equals(string.Empty))
@@ -28,36 +31,20 @@ namespace FCSCommon.Helpers
             return AssetBundle.LoadFromFile(Path.Combine(Path.Combine(Environment.CurrentDirectory, "QMods"), Path.Combine(modDirName, Path.Combine("Assets", modBundleName))));
         }
 
-        internal static string GetModDirectory(string modName)
+        internal static AssetBundle Asset(string modBundleName)
         {
-            return Path.Combine(Path.Combine(Environment.CurrentDirectory, "QMods"), modName);
-        }
-
-        internal static string GetAssetFolder(string modName)
-        {
-            return Path.Combine(Path.Combine(Environment.CurrentDirectory, "QMods"), Path.Combine(modName, "Assets"));
-        }
-
-        internal static string GetConfigFolder(string modName)
-        {
-            return Path.Combine(Path.Combine(Environment.CurrentDirectory, "QMods"), Path.Combine(modName, "Configuration"));
-        }
-
-        internal static AssetBundle Asset(string bundleLocation)
-        {
-            if (string.IsNullOrEmpty(bundleLocation))
+            if (string.IsNullOrWhiteSpace(ModDirLocation) && string.IsNullOrWhiteSpace(modBundleName))
             {
-                throw new ArgumentException("No bundle location was provided");
+                throw new ArgumentException($"Both {nameof(ModDirLocation)} and {nameof(modBundleName)} are empty");
             }
 
-            var myLoadedAssetBundle = AssetBundle.LoadFromFile(bundleLocation);
-
-            if (myLoadedAssetBundle == null)
+            if (string.IsNullOrWhiteSpace(ModDirLocation) || string.IsNullOrWhiteSpace(modBundleName))
             {
-                throw new ArgumentException("Bundle Returned Null");
+                var result = string.IsNullOrWhiteSpace(ModDirLocation) ? nameof(ModDirLocation) : nameof(modBundleName);
+                throw new ArgumentException($"{result} is empty");
             }
 
-            return myLoadedAssetBundle;
+            return AssetBundle.LoadFromFile(Path.Combine(ModDirLocation, "Assets", modBundleName));
         }
     }
 }

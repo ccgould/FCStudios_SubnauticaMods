@@ -90,9 +90,7 @@ namespace DataStorageSolutions.Mono
             }
 
             BaseManager.RegisterAntenna(this);
-
-            Mod.OnAntennaBuilt?.Invoke(true);
-
+            
             PowerManager = Manager.BasePowerManager;
 
             IsInitialized = true;

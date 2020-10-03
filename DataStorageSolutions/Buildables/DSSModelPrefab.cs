@@ -47,7 +47,7 @@ namespace DataStorageSolutions.Buildables
                     QuickLogger.Debug($"AssetBundle Set");
 
                     QuickLogger.Debug("GetPrefabs");
-                    AssetBundle assetBundle = AssetHelper.Asset(Mod.ModFolderName, Mod.BundleName);
+                    AssetBundle assetBundle = AssetHelper.Asset(Mod.BundleName);
 
                     Bundle = assetBundle;
 

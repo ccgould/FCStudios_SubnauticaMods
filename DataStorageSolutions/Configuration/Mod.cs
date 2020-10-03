@@ -904,14 +904,9 @@ TechType.Databox
 
         private static string GetModPath()
         {
-            return Path.Combine(GetQModsPath(), ModFolderName);
+            return AssetHelper.ModDirLocation;
         }
-
-        private static string GetQModsPath()
-        {
-            return Path.Combine(Environment.CurrentDirectory, "QMods");
-        }
-
+        
         #endregion
         
         private static void CreateModConfiguration()
@@ -1072,7 +1067,6 @@ TechType.Databox
         [JsonProperty] internal float ServerPowerUsage { get; set; } = 0.05f;
         [JsonProperty] internal bool PullFromDockedVehicles { get; set; } = true;
         [JsonProperty] internal int ExtractMultiplier { get; set; }
-
         [JsonProperty] internal float ExtractInterval = 0.25f;
         [JsonProperty] internal bool ShowServerCustomToolTip { get; set; } = true;
 
@@ -1100,9 +1094,6 @@ TechType.Databox
         //private ModModes _modMode;
         private const string ExtractMultiplierID = "DSSEMulti";
         private const string ShowCustomServerToolTip = "DSSShowSeverCustomToolTip";
-
-
-
         public Options() : base("Data Storage Solutions Settings")
         {
             ChoiceChanged += Options_ChoiceChanged;

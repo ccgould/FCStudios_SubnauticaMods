@@ -50,8 +50,7 @@ namespace DataStorageSolutions.Mono
         private bool _isBeingDestroyed;
         private Text _counter;
         private ObjectPooler _objectPooler;
-
-
+        
         private void OnLoadCategoryGrid(DisplayData data)
         {
             if (_isBeingDestroyed) return;
@@ -645,11 +644,11 @@ namespace DataStorageSolutions.Mono
 
         public override void PowerOffDisplay()
         {
-            if (_mono.PowerManager.GetPowerState() == FCSPowerStates.Unpowered)
+            if (_mono.Manager.BasePowerManager.GetPowerState() == FCSPowerStates.Unpowered)
             {
                 GoToPage(TerminalPages.BlackOut);
             }
-            else if (_mono.PowerManager.GetPowerState() == FCSPowerStates.Tripped)
+            else if (_mono.Manager.BasePowerManager.GetPowerState() == FCSPowerStates.Tripped)
             {
                 GoToPage(TerminalPages.Tripped);
             }
@@ -994,6 +993,16 @@ namespace DataStorageSolutions.Mono
         private void OnDestroy()
         {
             _isBeingDestroyed = true;
+        }
+
+        public void ChangeScreenPowerState(FCSPowerStates state)
+        {
+            if (state == FCSPowerStates.Powered)
+            {
+                PowerOnDisplay();
+            }
+
+            PowerOffDisplay();
         }
     }
 }

@@ -125,7 +125,7 @@ namespace FCSTechFabricator.Craftables
 
         internal bool GetKitPrefab()
         {
-            AssetBundle assetBundle = this.AssetBundle;
+            AssetBundle assetBundle = FcAssetBundlesService.PublicAPI.GetAssetBundleByName(Mod.AssetBundleName);
 
             //If the result is null return false.
             if (assetBundle == null)

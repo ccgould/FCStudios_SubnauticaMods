@@ -23,7 +23,6 @@ namespace AlterraGen
         internal static ConfigFile Configuration { get; set; }
         internal static string Version { get; set; }
         internal static AssetBundle GlobalBundle { get; set; }
-        public static AssetBundle AssetBundle { get; set; }
 
         [QModPatch]
         public static void Patch()
@@ -70,13 +69,6 @@ namespace AlterraGen
 
         private static void AddTechFabricatorItems()
         {
-
-            if (AssetBundle == null)
-            {
-                QuickLogger.Debug("GetPrefabs");
-                AssetBundle = AssetHelper.Asset(Mod.ModName, Mod.BundleName);
-            }
-
             var icon = ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetFolder(), $"{Mod.ModClassName}.png"));
             var craftingTab = new CraftingTab(Mod.ModTabID, Mod.ModFriendlyName, icon);
 

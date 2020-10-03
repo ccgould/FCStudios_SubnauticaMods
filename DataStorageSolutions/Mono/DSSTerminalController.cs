@@ -89,7 +89,7 @@ namespace DataStorageSolutions.Mono
             return _techType;
         }
 
-        private void OnPowerUpdate(FCSPowerStates obj, BaseManager manager)
+        internal void OnPowerUpdate(FCSPowerStates obj)
         {
             switch (obj)
             {
