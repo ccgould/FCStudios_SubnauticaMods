@@ -126,13 +126,7 @@
       <Project>{5ef4adb8-3ae7-41ec-83e1-1daf04999f0e}</Project>
       <Name>FCSTechFabricator</Name>
     </ProjectReference>
-    <ProjectReference Include="..\FCS_DeepDriller\FCS_DeepDriller.csproj">
-      <Project>{61d8ba15-ee91-4245-bfc1-70064add23e0}</Project>
-      <Name>FCS_DeepDriller</Name>
-      <Private>False</Private>
-    </ProjectReference>
   </ItemGroup>
-  <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\FCSCommon\GamePaths.targets" />
   <PropertyGroup Condition="$(Game) == 'Subnautica'">

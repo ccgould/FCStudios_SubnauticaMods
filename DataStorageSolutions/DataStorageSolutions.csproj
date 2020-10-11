@@ -207,7 +207,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\FCSCommon\GamePaths.targets" />
   <PropertyGroup Condition="$(Game) == 'Subnautica'">
