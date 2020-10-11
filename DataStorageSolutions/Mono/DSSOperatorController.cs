@@ -1,7 +1,5 @@
-﻿using System.Collections.Generic;
-using DataStorageSolutions.Abstract;
+﻿using DataStorageSolutions.Abstract;
 using DataStorageSolutions.Configuration;
-using DataStorageSolutions.Model;
 using FCSCommon.Controllers;
 using FCSCommon.Utilities;
 
@@ -44,7 +42,12 @@ namespace DataStorageSolutions.Mono
         {
             Manager?.UnRegisterOperator(this);
         }
-        
+
+        public override void UpdateScreen()
+        {
+            DisplayManager.Refresh();
+        }
+
         public override void OnProtoSerialize(ProtobufSerializer serializer)
         {
         }

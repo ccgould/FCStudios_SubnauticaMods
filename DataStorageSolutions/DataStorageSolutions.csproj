@@ -116,6 +116,7 @@
   <ItemGroup>
     <Compile Include="Abstract\DataStorageSolutionsController.cs" />
     <Compile Include="Buildables\Antenna\AntennaBuildable.cs" />
+    <Compile Include="Buildables\Crafter\CrafterBuildable.cs" />
     <Compile Include="Buildables\DSSModelPrefab.cs" />
     <Compile Include="Buildables\AuxPatcher.cs" />
     <Compile Include="Buildables\FilterMachine\ServerFormattingStationBuildable.cs" />
@@ -143,9 +144,12 @@
     <Compile Include="Interfaces\IBaseAntenna.cs" />
     <Compile Include="Interfaces\IDataSoluationsSave.cs" />
     <Compile Include="Enumerators\TerminalPages.cs" />
+    <Compile Include="Interfaces\IMessageDialogSender.cs" />
     <Compile Include="Interfaces\ISlot.cs" />
     <Compile Include="Interfaces\ISlottedDevice.cs" />
     <Compile Include="Model\AudioHandler.cs" />
+    <Compile Include="Model\TransferWizardDialog.cs" />
+    <Compile Include="Model\AutoCraftingWizardDialog.cs" />
     <Compile Include="Model\BaseStorageManager.cs" />
     <Compile Include="Model\Catergories.cs" />
     <Compile Include="Model\ObjectPooler.cs" />
@@ -155,6 +159,10 @@
     <Compile Include="Mono\BaseConnectable.cs" />
     <Compile Include="Mono\BaseManager.cs" />
     <Compile Include="Mono\DSSAntennaController.cs" />
+    <Compile Include="Mono\DSSAutoCrafterController.cs" />
+    <Compile Include="Mono\DSSAutoCrafterCrateController.cs" />
+    <Compile Include="Mono\DSSAutoCraftPowerManager.cs" />
+    <Compile Include="Mono\DSSCrafterComponent.cs" />
     <Compile Include="Mono\DSSItemDisplayController.cs" />
     <Compile Include="Mono\DSSOperatorController.cs" />
     <Compile Include="Mono\DSSOperatorDisplayManager.cs" />

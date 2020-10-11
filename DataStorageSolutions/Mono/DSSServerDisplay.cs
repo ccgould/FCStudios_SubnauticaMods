@@ -62,7 +62,43 @@ namespace DataStorageSolutions.Mono
                 catcher.TextLineOne = string.Format(AuxPatchers.TakeServer(), Mod.ServerFriendlyName);
                 catcher.TextLineTwo = "Data: {0}";
                 catcher.GetAdditionalDataFromString = true;
-                catcher.GetAdditionalString += FormatData;
+                catcher.GetAdditionalString += () =>
+                {
+                    _sb.Clear();
+
+                    _sb.Append(string.Format(AuxPatchers.FiltersCheckFormat(), _mono.GetFilters().Any()));
+
+                    if (_mono.GetFilters().Any())
+                    {
+                        _sb.Append(Environment.NewLine); 
+                        _sb.Append(AuxPatchers.Filters());
+                        _sb.Append($" {_mono.GetFormatData()}");
+                    }
+
+                    var items = _mono.GetItemsWithin().ToArray();
+                    if (items.Length > 0)
+                    {
+                        _sb.Append(Environment.NewLine);
+                        _sb.Append(AuxPatchers.Items());
+                        _sb.Append(Environment.NewLine);
+
+
+                        for (int i = 0; i < items.Length; i++)
+                        {
+                            if (i < 4)
+                            {
+                                _sb.Append($"{items[i].Key.AsString()} x{items[i].Value}");
+                                _sb.Append(Environment.NewLine);
+                            }
+                            else
+                            {
+                                _sb.Append($"And More.....");
+                                break;
+                            }
+                        }
+                    }
+                    return _sb.ToString();
+                };
                 catcher.ButtonMode = InterfaceButtonMode.Background;
                 catcher.IsClickable = IsAllowedToClick;
 
@@ -79,42 +115,12 @@ namespace DataStorageSolutions.Mono
 
         private bool IsAllowedToClick()
         {
-            if (_mono.GetSlot() != null && _mono.GetSlot().GetConnectedDevice().IsDeviceOpen())
-            {
-                return true;
-            }
-
-            return false;
+            return _mono.GetSlot() != null && _mono.GetSlot().GetConnectedDevice().IsDeviceOpen();
         }
 
         internal void UpdateDisplay()
         {
             _counter.text = $"{_mono.GetTotal()} / {_mono.StorageLimit}";
-        }
-
-        private string FormatData()
-        {
-            _sb.Clear();
-
-            _sb.Append(string.Format(AuxPatchers.FiltersCheckFormat(), _mono.GetFilters().Any()));
-            _sb.Append(Environment.NewLine);
-            var items = _mono.GetItemsWithin().ToArray();
-
-            for (int i = 0; i < items.Length; i++)
-            {
-                if (i < 4)
-                {
-                    _sb.Append($"{items[i].Key.AsString()} x{items[i].Value}");
-                    _sb.Append(Environment.NewLine);
-                }
-                else
-                {
-                    _sb.Append($"And More.....");
-                    break;
-                }
-            }
-
-            return _sb.ToString();
         }
     }
 }

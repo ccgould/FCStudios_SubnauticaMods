@@ -468,5 +468,37 @@ namespace FCSCommon.Helpers
 
             return null;
         }
+
+        public static void ApplyShaderToMaterial(GameObject gameObject, string materialName,string shaderName = "MarmosetUBER")
+        {
+            var shader = Shader.Find(shaderName);
+            if(shader == null)
+            {
+                QuickLogger.Error($"Cannot find a shader by the name : {shaderName}");
+                return;
+            }
+            Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>(true);
+
+            foreach (Renderer render in renderers)
+            {
+                if (render.material.name.StartsWith(materialName, StringComparison.OrdinalIgnoreCase))
+                {
+                    render.material.shader = shader;
+                }
+            }
+        }
+
+        public static IEnumerable<Material> GetMaterials(GameObject gameObject, string materialName)
+        {
+            Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>(true);
+
+            foreach (Renderer render in renderers)
+            {
+                if (render.material.name.StartsWith(materialName, StringComparison.OrdinalIgnoreCase))
+                {
+                    yield return render.material;
+                }
+            }
+        }
     }
 }

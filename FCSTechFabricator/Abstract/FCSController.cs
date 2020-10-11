@@ -55,5 +55,10 @@ namespace FCSTechFabricator.Abstract
         {
   
         }
+
+        public virtual FCSConnectableDevice GetFCSConnectable()
+        {
+            return null;
+        }
     }
 }

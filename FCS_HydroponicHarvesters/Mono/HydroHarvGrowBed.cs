@@ -268,6 +268,9 @@ namespace FCS_HydroponicHarvesters.Mono
         }
 
         public Action<int, int> OnContainerUpdate { get; set; }
+        public Action<FCSConnectableDevice, TechType> OnContainerAddItem { get; set; }
+        public Action<FCSConnectableDevice, TechType> OnContainerRemoveItem { get; set; }
+
         public bool ContainsItem(TechType techType)
         {
             throw new NotImplementedException();

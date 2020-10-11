@@ -105,5 +105,17 @@
             Console.WriteLine($"[{name}] {msg}");
             ErrorMessage.AddMessage($"[{name}] {msg}");
         }
+
+        public static void DebugError(string msg, bool showOnScreen = false)
+        {
+            if (!DebugLogsEnabled)
+                return;
+            string name = Assembly.GetCallingAssembly().GetName().Name;
+
+            Console.WriteLine($"[{name}:DEBUG_ERROR] {msg}");
+
+            if (showOnScreen)
+                ErrorMessage.AddError($"[{name}:DEBUG_ERROR] {msg}");
+        }
     }
 }

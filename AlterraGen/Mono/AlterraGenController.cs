@@ -109,7 +109,7 @@ namespace AlterraGen.Mono
             IsInitialized = true;
         }
 
-        internal FCSConnectableDevice GetFCSConnectable()
+        public override FCSConnectableDevice GetFCSConnectable()
         {
             return _fcsConnectableDevice;
         }

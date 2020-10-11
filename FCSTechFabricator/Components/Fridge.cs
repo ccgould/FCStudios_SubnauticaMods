@@ -16,6 +16,8 @@ namespace FCSTechFabricator.Components
     { 
         private int _itemLimit;
         public Action<int, int> OnContainerUpdate { get; set; }
+        public Action<FCSConnectableDevice, TechType> OnContainerAddItem { get; set; }
+        public Action<FCSConnectableDevice, TechType> OnContainerRemoveItem { get; set; }
         private bool _decay;
         private ModModes _modMode;
         private FCSController _mono;
@@ -89,6 +91,7 @@ namespace FCSTechFabricator.Components
             }
             FridgeItems.Add(eatableEntity);
             OnContainerUpdate?.Invoke(NumberOfItems, _itemLimit);
+            OnContainerAddItem?.Invoke(_mono.GetFCSConnectable(),item.item.GetTechType());
             Destroy(item.item.gameObject);
         }
 
@@ -122,6 +125,7 @@ namespace FCSTechFabricator.Components
                     }
                     GameObject.Destroy(pickupable);
                     OnContainerUpdate?.Invoke(NumberOfItems, _itemLimit);
+                    OnContainerRemoveItem?.Invoke(_mono.GetFCSConnectable(), techType);
                 }
             }
             else

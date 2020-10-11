@@ -91,6 +91,12 @@ namespace DataStorageSolutions.Configuration
         internal const string ItemDisplayPrefabName = "ItemDisplay";
         internal const string ItemDisplayKitID = "ItemDisplay_Kit";
 
+        internal const string AutoCrafterFriendlyName = "DSS Auto Crafter";
+        internal const string AutoCrafterDescription = "The DSS crafting system that creates any item by using items in you base.";
+        internal const string AutoCrafterClassID = "DSSAutoCrafter";
+        internal const string AutoCrafterPrefabName = "DSSAutoFab";
+        internal const string AutoCrafterKitClassID = "AutoCrafter_Kit";
+
         internal static Action OnBaseUpdate { get; set; }
         //internal static Action<DSSRackController> OnContainerUpdate { get; set; }
         internal static List<TechType> AllTechTypes = new List<TechType>();
@@ -609,6 +615,7 @@ TechType.Databox
         internal static Action<bool> OnAntennaBuilt;
         private static TechType _seaBreezeTechType;
         private static TechType _serverTechType;
+        private static TechType _autoCrafterTechType;
 
         #endregion
 
@@ -656,10 +663,10 @@ TechType.Databox
             craftAmount = 1,
             Ingredients =
             {
-                new Ingredient(TechType.Glass , 4),
+                new Ingredient(TechType.Glass , 1),
                 new Ingredient(TechType.AdvancedWiringKit, 1),
                 new Ingredient(TechType.Titanium, 2),
-                new Ingredient(TechType.MapRoomHUDChip, 1)
+                new Ingredient(TechType.MapRoomUpgradeScanRange, 1)
             }
         };
 
@@ -673,7 +680,7 @@ TechType.Databox
             Ingredients =
             {
                 new Ingredient(TechType.AdvancedWiringKit, 1),
-                new Ingredient(TechType.TitaniumIngot, 1),
+                new Ingredient(TechType.Titanium, 2),
                 new Ingredient(TechType.MapRoomUpgradeScanRange, 1)
             }
         };
@@ -736,7 +743,25 @@ TechType.Databox
                 new Ingredient(TechType.Titanium, 1)
             }
         };
+
+#if SUBNAUTICA
+        internal static TechData AutoCrafterIngredients => new TechData
+#elif BELOWZERO
+                internal static RecipeData AutoCrafterIngredients => new RecipeData
+#endif
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(TechType.Titanium, 4),
+                new Ingredient(TechType.Glass, 1),
+                new Ingredient(TechType.AdvancedWiringKit, 1),
+                new Ingredient(TechType.Silicone, 4),
+                new Ingredient(TechType.Lubricant, 1),
+            }
+        };
         #endregion
+
 
         #region Internal Methods
 
@@ -760,6 +785,7 @@ TechType.Databox
 
                 newSaveData.GlobalServers = new HashSet<ServerData>(BaseStorageManager.GetServersSaveData(serializer));
                 newSaveData.Bases = BaseManager.GetBaseSaveData().ToList();
+                newSaveData.Operations = BaseManager.GetOperationSaveData();
                 _saveData = newSaveData;
 
                 if (_saveData == null)
@@ -1054,6 +1080,16 @@ TechType.Databox
             }
 
             return _serverTechType;
+        }
+
+        public static TechType GetAutoCrafterTechType()
+        {
+            if (_autoCrafterTechType == TechType.None)
+            {
+                _autoCrafterTechType = AutoCrafterClassID.ToTechType();
+            }
+
+            return _autoCrafterTechType;
         }
     }
 

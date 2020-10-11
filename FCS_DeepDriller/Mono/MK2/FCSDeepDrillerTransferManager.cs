@@ -103,7 +103,13 @@ namespace FCS_DeepDriller.Mono.MK2
             {
                 if (connectableDevice.CanBeStored(1, item))
                 {
-                    return connectableDevice.AddItemToContainer(item.ToInventoryItem(), out var reason);
+                    var r = connectableDevice.AddItemToContainer(item.ToInventoryItem(), out var reason);
+                    QuickLogger.Debug($"ExStorage Add Item result: {reason}", true);
+                    return r;
+                }
+                else
+                {
+                    QuickLogger.Debug("ExStorage Cant Hold Item",true);
                 }
             }
             

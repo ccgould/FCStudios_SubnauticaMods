@@ -37,6 +37,8 @@ namespace DataStorageSolutions.Mono
         public int GetContainerFreeSpace => _server != null ? 0 : 1;
         public bool IsFull => _server != null;
         Action<int, int> IFCSStorage.OnContainerUpdate { get; set; }
+        public Action<FCSConnectableDevice, TechType> OnContainerAddItem { get; set; }
+        public Action<FCSConnectableDevice, TechType> OnContainerRemoveItem { get; set; }
 
         private void OnEnable()
         {

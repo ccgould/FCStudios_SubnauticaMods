@@ -1,6 +1,7 @@
 ﻿using System;
 using FCSCommon.Helpers;
 using FCSTechFabricator.Enums;
+using FMOD;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,14 +13,13 @@ namespace FCSTechFabricator.Components
         public Action<string> OnConfirmButtonClick { get; set; }
         
         private string _messageId;
-        private Button _cancelBTN;
-        private Button _confirmBTN;
         private Text _messageText;
-        private Text _confirmBTNText;
-        private Text _cancelBTNText;
-        private GameObject _confirmButtonObject;
-        private GameObject _cancelBTNObject;
         private bool _initialized;
+        private Action<FCSDialogResult> _callback;
+        private GameObject _cancelBTNObject;
+        private GameObject _noBTNObject;
+        private GameObject _yesBTNObject;
+        private GameObject _okBTNObject;
 
         private void Initialize()
         {
@@ -27,23 +27,42 @@ namespace FCSTechFabricator.Components
             _messageText = GameObjectHelpers.FindGameObject(gameObject, "Message")?.GetComponent<Text>();
             
             _cancelBTNObject = GameObjectHelpers.FindGameObject(gameObject, "CancelBTN");
-            _cancelBTN = _cancelBTNObject?.GetComponent<Button>();
-            _cancelBTNText = _cancelBTNObject?.GetComponentInChildren<Text>(true);
-            _cancelBTN?.onClick.AddListener(() =>
+            var cancelBTN = _cancelBTNObject?.GetComponent<Button>();
+            _cancelBTNObject?.GetComponentInChildren<Text>(true);
+            cancelBTN?.onClick.AddListener(() =>
             {
-                OnCancelButtonClick?.Invoke(_messageId); 
+                OnCancelButtonClick?.Invoke(_messageId);
+                _callback?.Invoke(FCSDialogResult.Cancel);
                 HideMessageBox();
             });
 
-            _confirmButtonObject = GameObjectHelpers.FindGameObject(gameObject, "ConfirmBTN");
-            _confirmBTNText = _confirmButtonObject?.GetComponentInChildren<Text>(true);
-            _confirmBTN = _confirmButtonObject?.GetComponent<Button>();
-            _confirmBTN?.onClick.AddListener(() =>
+            _noBTNObject = GameObjectHelpers.FindGameObject(gameObject, "NoBTN");
+            var noBTN = _noBTNObject?.GetComponent<Button>();
+            _noBTNObject?.GetComponentInChildren<Text>(true);
+            noBTN?.onClick.AddListener(() =>
             {
-                OnConfirmButtonClick?.Invoke(_messageId); 
+                _callback?.Invoke(FCSDialogResult.No);
                 HideMessageBox();
             });
 
+            _yesBTNObject = GameObjectHelpers.FindGameObject(gameObject, "YesBTN");
+            var yesBTN = _yesBTNObject?.GetComponent<Button>();
+            _yesBTNObject?.GetComponentInChildren<Text>(true);
+            yesBTN?.onClick.AddListener(() =>
+            {
+                _callback?.Invoke(FCSDialogResult.Yes);
+                HideMessageBox();
+            });
+
+            _okBTNObject = GameObjectHelpers.FindGameObject(gameObject, "OkBTN");
+            var okBTN = _okBTNObject?.GetComponent<Button>();
+            _okBTNObject?.GetComponentInChildren<Text>(true);
+            okBTN?.onClick.AddListener(() =>
+            {
+                _callback?.Invoke(FCSDialogResult.OK);
+                HideMessageBox();
+            });
+            
             _initialized = true;
         }
 
@@ -53,17 +72,6 @@ namespace FCSTechFabricator.Components
                 _messageText.text = message;
         }
 
-        private void ChangeConfirmButtonText(string text)
-        {
-            if (_confirmBTNText != null)
-                _confirmBTNText.text = text;
-        }
-
-        private void ChangeCancelButtonText(string text)
-        {
-            if (_cancelBTNText != null)
-                _cancelBTNText.text = text;
-        }
 
         private void HideMessageBox()
         {
@@ -75,11 +83,12 @@ namespace FCSTechFabricator.Components
             _cancelBTNObject?.SetActive(false);
         }
         
-        public void ShowMessageBox(string message, string id, FCSMessageBox buttons = FCSMessageBox.YesNo)
+        public virtual void ShowMessageBox(string message, string id, Action<FCSDialogResult> callback, FCSMessageBox buttons = FCSMessageBox.YesNo)
         {
             Initialize();
             ChangeMessage(message);
             _messageId = id;
+            _callback = callback;
             RefreshButtons(buttons);
             gameObject.SetActive(true);
         }
@@ -89,20 +98,23 @@ namespace FCSTechFabricator.Components
             switch (buttons)
             {
                 case FCSMessageBox.OK:
-                    ChangeConfirmButtonText("OK");
+                    _cancelBTNObject.SetActive(false);
+                    _noBTNObject.SetActive(false);
+                    _okBTNObject.SetActive(true);
+                    _yesBTNObject.SetActive(false);
                     HideCancelBTN();
                     break;
                 case FCSMessageBox.OKCancel:
-                    ChangeConfirmButtonText("OK");
-                    ChangeCancelButtonText("CANCEL");
-                    break;
-                case FCSMessageBox.RetryCancel:
-                    ChangeConfirmButtonText("RETRY");
-                    ChangeCancelButtonText("CANCEL");
+                    _cancelBTNObject.SetActive(true);
+                    _noBTNObject.SetActive(false);
+                    _okBTNObject.SetActive(true);
+                    _yesBTNObject.SetActive(false);
                     break;
                 case FCSMessageBox.YesNo:
-                    ChangeConfirmButtonText("YES");
-                    ChangeCancelButtonText("NO");
+                    _cancelBTNObject.SetActive(false);
+                    _noBTNObject.SetActive(true);
+                    _okBTNObject.SetActive(false);
+                    _yesBTNObject.SetActive(true);
                     break;
             }
         }

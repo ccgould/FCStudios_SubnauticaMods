@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using FCS_HydroponicHarvesters.Buildables;
 using FCSCommon.Converters;
 using FCSCommon.Utilities;
+using FCSTechFabricator.Components;
 using FCSTechFabricator.Interfaces;
 using UnityEngine;
 
@@ -113,6 +114,9 @@ namespace FCS_HydroponicHarvesters.Mono
         }
 
         public Action<int, int> OnContainerUpdate { get; set; }
+        public Action<FCSConnectableDevice, TechType> OnContainerAddItem { get; set; }
+        public Action<FCSConnectableDevice, TechType> OnContainerRemoveItem { get; set; }
+
         public bool ContainsItem(TechType techType)
         {
             throw new NotImplementedException();

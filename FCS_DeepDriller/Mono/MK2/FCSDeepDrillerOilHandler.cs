@@ -4,6 +4,7 @@ using FCS_DeepDriller.Buildable.MK2;
 using FCSCommon.Converters;
 using FCSCommon.Extensions;
 using FCSCommon.Utilities;
+using FCSTechFabricator.Components;
 using FCSTechFabricator.Interfaces;
 using UnityEngine;
 
@@ -14,6 +15,8 @@ namespace FCS_DeepDriller.Mono.MK2
         private FCSDeepDrillerController _mono;
         public int GetContainerFreeSpace { get; }
         public Action<int, int> OnContainerUpdate { get; set; }
+        public Action<FCSConnectableDevice, TechType> OnContainerAddItem { get; set; }
+        public Action<FCSConnectableDevice, TechType> OnContainerRemoveItem { get; set; }
         public bool IsFull { get; }
         private const float KDayInSeconds = 1200f;
         private readonly float _setOilTime = KDayInSeconds * QPatch.Configuration.OilTimePeriodInDays;

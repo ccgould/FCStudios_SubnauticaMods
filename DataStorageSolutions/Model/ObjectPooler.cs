@@ -50,7 +50,6 @@ namespace DataStorageSolutions.Model
             if (_isBeingDestroyed) return null;
             if (!PooledDictionary.ContainsKey(tag))
             {
-                QuickLogger.Debug($"Pool with tag {tag} doesn't exist;");
                 return null;
             }
 
@@ -66,7 +65,6 @@ namespace DataStorageSolutions.Model
             if(PooledDictionary == null || _isBeingDestroyed) return;
             if (!PooledDictionary.ContainsKey(tag))
             {
-                QuickLogger.Error($"Pool with tag {tag} doesn't exist;");
                 return;
             }
             

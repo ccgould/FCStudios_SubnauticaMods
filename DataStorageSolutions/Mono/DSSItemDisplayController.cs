@@ -26,6 +26,8 @@ namespace DataStorageSolutions.Mono
         private TechType _currentTechType;
         private InterfaceButton _button;
         public Action<int, int> OnContainerUpdate { get; set; }
+        public Action<FCSConnectableDevice, TechType> OnContainerAddItem { get; set; }
+        public Action<FCSConnectableDevice, TechType> OnContainerRemoveItem { get; set; }
         public int GetContainerFreeSpace => 1;
         public bool IsFull => false;
 

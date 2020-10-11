@@ -5,6 +5,7 @@ using FCS_DeepDriller.Helpers;
 using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
+using FCSTechFabricator.Components;
 using FCSTechFabricator.Interfaces;
 using UnityEngine;
 
@@ -15,8 +16,10 @@ namespace FCS_DeepDriller.Mono.MK2
         public int GetContainerFreeSpace => CalculateFreeSpace();
 
        public Action<int, int> OnContainerUpdate { get; set; } // Not being used casing lag on large transfers
+       public Action<FCSConnectableDevice, TechType> OnContainerAddItem { get; set; }
+       public Action<FCSConnectableDevice, TechType> OnContainerRemoveItem { get; set; }
 
-        private int CalculateFreeSpace()
+       private int CalculateFreeSpace()
         {
             var total = GetContainerTotal();
             return Mathf.Max(0, QPatch.Configuration.StorageSize - total);

@@ -7,6 +7,7 @@ using AlterraGen.Enumerators;
 using FCSCommon.Enums;
 using FCSCommon.Utilities;
 using FCSTechFabricator.Abstract;
+using FCSTechFabricator.Components;
 using FCSTechFabricator.Enums;
 using FCSTechFabricator.Interfaces;
 using UnityEngine;
@@ -139,13 +140,7 @@ namespace AlterraGen.Mono
 
             var storageResult = !IsFull && amount + _container.Count <= MaxSlots;
             
-            if (!storageResult)
-            {
-                QuickLogger.ModMessage(AlterraGenBuildable.StorageFullMessage());
-                return false;
-            }
-            
-            return true;
+            return storageResult;
         }
 
         public bool AddItemToContainer(InventoryItem item)
@@ -165,6 +160,11 @@ namespace AlterraGen.Mono
                 TechType techType = pickupable.GetTechType();
                 flag = CanBeStored(_mono.DumpContainer.GetCount() + 1, techType);
             }
+
+            if (!flag && verbose)
+            {
+                QuickLogger.ModMessage(AlterraGenBuildable.StorageFullMessage());
+            }
             return flag;
 		}
 
@@ -175,6 +175,7 @@ namespace AlterraGen.Mono
 
         public Pickupable RemoveItemFromContainer(TechType techType, int amount)
         {
+            OnContainerRemoveItem(_mono.GetFCSConnectable(), techType);
             return null;
         }
 
@@ -185,7 +186,9 @@ namespace AlterraGen.Mono
 		}
 
         public Action<int, int> OnContainerUpdate { get; set; }
-        
+        public Action<FCSConnectableDevice, TechType> OnContainerAddItem { get; set; }
+        public Action<FCSConnectableDevice, TechType> OnContainerRemoveItem { get; set; }
+
         public bool ContainsItem(TechType techType)
         {
             return _container.Contains(techType);

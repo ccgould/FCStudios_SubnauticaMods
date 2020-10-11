@@ -7,6 +7,7 @@ using FCS_DeepDriller.StatePattern;
 using FCSCommon.Enums;
 using FCSCommon.Utilities;
 using FCSTechFabricator.Abstract;
+using FCSTechFabricator.Components;
 using FCSTechFabricator.Enums;
 using FCSTechFabricator.Interfaces;
 using UnityEngine;
@@ -401,6 +402,9 @@ namespace FCS_DeepDriller.Mono.MK2
         }
 
         public Action<int, int> OnContainerUpdate { get; set; }
+        public Action<FCSConnectableDevice, TechType> OnContainerAddItem { get; set; }
+        public Action<FCSConnectableDevice, TechType> OnContainerRemoveItem { get; set; }
+
         public bool ContainsItem(TechType techType)
         {
             return false;

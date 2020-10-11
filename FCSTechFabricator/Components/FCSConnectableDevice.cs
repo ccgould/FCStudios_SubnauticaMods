@@ -21,11 +21,29 @@ namespace FCSTechFabricator.Components
         private TechType _techtype;
         private FCSPowerManager _powerManager;
         private bool _canBeVisible;
+        private bool _isVisible = false;
         private bool _isBase { get; set; }
         public string UnitID { get; set; }
-        public bool IsVisible { get; set; } = false;
+
+        public bool IsVisible
+        {
+            get => _isVisible;
+            set
+            {
+                _isVisible = value;
+                OnIsVisibleToggled?.Invoke(this,value);
+            }
+        }
         //TODO Save Is Visible
 
+        /// <summary>
+        /// Initializes the FCSConnectable but doesnt register it to the tech fabricator (Registration must be dont by hand)
+        /// </summary>
+        /// <param name="mono"></param>
+        /// <param name="storage"></param>
+        /// <param name="powerManager"></param>
+        /// <param name="modID"></param>
+        /// <param name="canBeVisible"></param>
         public void Initialize(FCSController mono, IFCSStorage storage, FCSPowerManager powerManager,bool canBeVisible = false)
         {
             _mono = mono;
@@ -34,6 +52,24 @@ namespace FCSTechFabricator.Components
             _canBeVisible = canBeVisible;
         }
 
+        /// <summary>
+        /// Initializes the FCSConnectable and registers it to the tech fabricator
+        /// </summary>
+        /// <param name="mono"></param>
+        /// <param name="storage"></param>
+        /// <param name="powerManager"></param>
+        /// <param name="deviceID"></param>
+        /// <param name="canBeVisible"></param>
+        public void Initialize(FCSController mono, IFCSStorage storage, FCSPowerManager powerManager,string deviceID, bool canBeVisible = false)
+        {
+            _mono = mono;
+            _storage = storage;
+            _powerManager = powerManager;
+            _canBeVisible = canBeVisible;
+            FcTechFabricatorService.PublicAPI.RegisterDevice(this, GetPrefabIDString(), deviceID);
+        }
+
+        
         public void InitializeBase(FCSController mono, IFCSStorage storage, FCSPowerManager powerManager,
             PrefabIdentifier prefabIdentifier)
         {
@@ -77,9 +113,14 @@ namespace FCSTechFabricator.Components
         }
         
         public int GetContainerFreeSpace => _storage.GetContainerFreeSpace;
+        public Action<FCSConnectableDevice, bool> OnIsVisibleToggled { get; set; }
 
         public string GetPrefabIDString()
         {
+            if (_prefabId == null)
+            {
+                _prefabId = GetComponentInParent<PrefabIdentifier>() ?? GetComponent<PrefabIdentifier>();
+            }
             return _prefabId?.Id;
         }
 
@@ -158,9 +199,6 @@ namespace FCSTechFabricator.Components
         {
             if (_nameController == null)
                 _nameController = GetComponentInParent<NameController>();
-
-            if (_prefabId == null)
-                _prefabId = GetComponentInParent<PrefabIdentifier>() ?? GetComponent<PrefabIdentifier>();
         }
 
         public void SubscribeToNameChange(Action<string, NameController> method)
@@ -224,5 +262,9 @@ namespace FCSTechFabricator.Components
             return _canBeVisible;
         }
 
+        public SubRoot GetHabitat()
+        {
+            return _mono.GetComponentInParent<SubRoot>() ?? _mono.GetComponentInChildren<SubRoot>();
+        }
     }
 }

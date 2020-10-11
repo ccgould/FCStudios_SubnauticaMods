@@ -102,7 +102,6 @@ namespace DataStorageSolutions.Model
             _server.DisconnectFromDevice();
             _server = null;
             _pickupable = null;
-            _hitController.GetAdditionalString = null;
             _hitController.OnButtonClick = null;
             _hitController = null;
             _mono.UpdateScreen();

@@ -15,6 +15,7 @@ using FCSTechFabricator.Components;
 using FCSTechFabricator.Interfaces;
 using rail;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace DataStorageSolutions.Model
 {
@@ -26,11 +27,14 @@ namespace DataStorageSolutions.Model
             public int Amount { get; set; }
             public HashSet<StorageContainer> StorageContainers { get; set; } = new HashSet<StorageContainer>();
             public HashSet<DSSServerController> Servers { get; set; } = new HashSet<DSSServerController>();
+            public HashSet<FCSConnectableDevice> FCSConnectableDevices { get; set; } = new HashSet<FCSConnectableDevice>();
         }
 
         internal readonly Dictionary<TechType, TrackedResource> TrackedResources = new Dictionary<TechType, TrackedResource>();
         internal readonly HashSet<DSSRackController> BaseRacks = new HashSet<DSSRackController>();
         public Action<int, int> OnContainerUpdate { get; set; }
+        public Action<FCSConnectableDevice, TechType> OnContainerAddItem { get; set; }
+        public Action<FCSConnectableDevice, TechType> OnContainerRemoveItem { get; set; }
         public DumpContainer DumpContainer { get; private set; }
         internal static readonly HashSet<DSSServerController> GlobalServers = new HashSet<DSSServerController>();
         internal readonly HashSet<DSSServerController> BaseServers = new HashSet<DSSServerController>();
@@ -43,7 +47,6 @@ namespace DataStorageSolutions.Model
         };  
         internal static readonly HashSet<StorageContainer> BaseStorageLockers = new HashSet<StorageContainer>();
         private BaseManager _baseManager;
-        private bool _allowedToNotify = true;
         public int GetContainerFreeSpace { get; }
         public bool IsFull { get; }
 
@@ -52,6 +55,7 @@ namespace DataStorageSolutions.Model
 
         internal void AddItemsToTracker(DSSServerController server, TechType item, int amountToAdd = 1)
         {
+            QuickLogger.Debug($"AddItemsToTracker: DSSServerController || {item.AsString()} || {amountToAdd} ");
 
             if (TrackedResources.ContainsKey(item))
             {
@@ -71,8 +75,11 @@ namespace DataStorageSolutions.Model
             }
         }
 
-        private void AddItemsToTracker(StorageContainer sc, TechType item, int amountToAdd = 1)
+        internal void AddItemsToTracker(StorageContainer sc, TechType item, int amountToAdd = 1)
         {
+            QuickLogger.Debug($"AddItemsToTracker: StorageContainer || {item.AsString()} || {amountToAdd} ");
+
+
             if (DONT_TRACK_GAMEOBJECTS.Contains(item.AsString().ToLower()))
             {
                 return;
@@ -98,32 +105,32 @@ namespace DataStorageSolutions.Model
             }
         }
 
-        private void RemoveItemsFromTracker(StorageContainer sc, TechType item, int amountToRemove = 1)
+        internal void AddItemsToTracker(FCSConnectableDevice device, TechType item, int amountToAdd = 1)
         {
+            QuickLogger.Debug($"AddItemsToTracker: FCSConnectableDevice || {item.AsString()} || {amountToAdd} ");
             if (TrackedResources.ContainsKey(item))
             {
-                TrackedResource trackedResource = TrackedResources[item];
-                int newAmount = trackedResource.Amount - amountToRemove;
-                trackedResource.Amount = newAmount;
+                TrackedResources[item].Amount += amountToAdd;
+                TrackedResources[item].FCSConnectableDevices.Add(device);
+            }
+            else
+            {
+                TrackedResources.Add(item, new TrackedResource()
+                {
+                    TechType = item,
+                    Amount = amountToAdd,
+                    FCSConnectableDevices = new HashSet<FCSConnectableDevice>() { device }
+                });
 
-                if (newAmount <= 0)
-                {
-                    TrackedResources.Remove(item);
-                    BaseManager.SendNotification();
-                }
-                else
-                {
-                    int amountLeftInContainer = sc.container.GetCount(item);
-                    if (amountLeftInContainer <= 0)
-                    {
-                        trackedResource.StorageContainers.Remove(sc);
-                    }
-                }
+                BaseManager.SendNotification();
             }
         }
 
         internal void RemoveItemsFromTracker(DSSServerController server, TechType item, int amountToRemove = 1)
         {
+            QuickLogger.Debug($"RemoveItemsFromTracker: DSSServerController || {item.AsString()} || {amountToRemove} ");
+
+
             if (TrackedResources.ContainsKey(item))
             {
                 TrackedResource trackedResource = TrackedResources[item];
@@ -141,6 +148,59 @@ namespace DataStorageSolutions.Model
                     if (amountLeftInContainer <= 0)
                     {
                         trackedResource.Servers.Remove(server);
+                    }
+                }
+            }
+        }
+
+        internal void RemoveItemsFromTracker(FCSConnectableDevice sc, TechType item, int amountToRemove = 1)
+        {
+            QuickLogger.Debug($"RemoveItemsFromTracker: FCSConnectableDevice || {item.AsString()} || {amountToRemove} ");
+
+
+            if (TrackedResources.ContainsKey(item))
+            {
+                TrackedResource trackedResource = TrackedResources[item];
+                int newAmount = trackedResource.Amount - amountToRemove;
+                trackedResource.Amount = newAmount;
+
+                if (newAmount <= 0)
+                {
+                    TrackedResources.Remove(item);
+                    BaseManager.SendNotification();
+                }
+                else
+                {
+                    int amountLeftInContainer = sc.GetItemCount(item);
+                    if (amountLeftInContainer <= 0)
+                    {
+                        trackedResource.FCSConnectableDevices.Remove(sc);
+                    }
+                }
+            }
+        }
+
+        internal void RemoveItemsFromTracker(StorageContainer sc, TechType item, int amountToRemove = 1)
+        {
+            QuickLogger.Debug($"RemoveItemsFromTracker: StorageContainer || {item.AsString()} || {amountToRemove} ");
+
+            if (TrackedResources.ContainsKey(item))
+            {
+                TrackedResource trackedResource = TrackedResources[item];
+                int newAmount = trackedResource.Amount - amountToRemove;
+                trackedResource.Amount = newAmount;
+
+                if (newAmount <= 0)
+                {
+                    TrackedResources.Remove(item);
+                    BaseManager.SendNotification();
+                }
+                else
+                {
+                    int amountLeftInContainer = sc.container.GetCount(item);
+                    if (amountLeftInContainer <= 0)
+                    {
+                        trackedResource.StorageContainers.Remove(sc);
                     }
                 }
             }
@@ -187,10 +247,26 @@ namespace DataStorageSolutions.Model
             return Mod.GetServerSaveData(prefabId).SlotID;
         }
 
-        internal int GetItemCount(TechType techType)
+        internal int GetItemCount(TechType techType,bool serverOnly = false)
         {
-            return TrackedResources.ContainsKey(techType) ? TrackedResources[techType].Amount : 0;
+            if (!TrackedResources.ContainsKey(techType)) return 0;
+
+            if (!serverOnly)
+            {
+                return TrackedResources.ContainsKey(techType) ? TrackedResources[techType].Amount : 0;
+            }
+            
+            var i = 0;
+            var device = TrackedResources[techType];
+
+            foreach (DSSServerController controller in device.Servers)
+            {
+                i += controller.GetItemCount(techType);
+            }
+
+            return i;
         }
+ 
 
         public bool CanBeStored(int amount, TechType techType)
         {
@@ -282,6 +358,11 @@ namespace DataStorageSolutions.Model
             return TrackedResources.ContainsKey(techType);
         }
 
+        public bool ServersContainsItem(TechType techType)
+        {
+           return BaseServers.Any(x => x.ContainsItem(techType));
+        }
+
         public string GetTotalString()
         {
             return $"{GetBaseTotal()} / {GetBaseMaximumStorage()}";
@@ -314,10 +395,10 @@ namespace DataStorageSolutions.Model
             return RemoveItemFromBase(techType, false);
         }
 
-        public Pickupable RemoveItemFromBase(TechType techType, bool givePlayerItem = true)
+        public Pickupable RemoveItemFromBase(TechType techType, bool givePlayerItem = true, bool destroy = false)
         {
             var itemSize = CraftData.GetItemSize(techType);
-            if (!Inventory.main.HasRoomFor(itemSize.x, itemSize.y))
+            if (givePlayerItem && !Inventory.main.HasRoomFor(itemSize.x, itemSize.y))
             {
                 QuickLogger.ModMessage(string.Format(Language.main.Get("InventoryOverflow"), Language.main.Get(techType)));
                 return null;
@@ -334,11 +415,41 @@ namespace DataStorageSolutions.Model
             if (givePlayerItem)
                 DSSHelpers.GivePlayerItem(pickup);
 
-            return pickup;
+            if (!destroy) return pickup;
+            Object.Destroy(pickup.gameObject);
+            return null;
+
         }
 
-        private Pickupable GetItemFromStorage(TechType item)
+        public Pickupable RemoveItemFromBaseServersOnly(TechType techType, bool givePlayerItem = true, bool destroy = false)
         {
+            var itemSize = CraftData.GetItemSize(techType);
+            if (!Inventory.main.HasRoomFor(itemSize.x, itemSize.y))
+            {
+                QuickLogger.ModMessage(string.Format(Language.main.Get("InventoryOverflow"), Language.main.Get(techType)));
+                return null;
+            }
+
+            var pickup = GetItemFromStorage(techType,true);
+
+            if (pickup == null)
+            {
+                QuickLogger.Debug("Pickup returned null", true);
+                return null;
+            }
+
+            if (givePlayerItem)
+                DSSHelpers.GivePlayerItem(pickup);
+
+            if (!destroy) return pickup;
+            Object.Destroy(pickup.gameObject);
+            return null;
+
+        }
+
+        private Pickupable GetItemFromStorage(TechType item,bool serverOnly = false)
+        {
+            if (!TrackedResources.ContainsKey(item)) return null;
             var trackedResource = TrackedResources[item];
 
             QuickLogger.Debug($"Tracked Resource: {trackedResource}", true);
@@ -352,18 +463,30 @@ namespace DataStorageSolutions.Model
                 }
             }
 
-            if (trackedResource.StorageContainers.Count >= 1)
+            if (!serverOnly)
             {
-                StorageContainer sc = trackedResource.StorageContainers.ElementAt(0);
-                if (sc.container.Contains(item))
+                if (trackedResource.StorageContainers.Count >= 1)
                 {
-                    return sc.container.RemoveItem(item);
+                    StorageContainer sc = trackedResource.StorageContainers.ElementAt(0);
+                    if (sc.container.Contains(item))
+                    {
+                        return sc.container.RemoveItem(item);
+                    }
+                }
+
+                if (trackedResource.FCSConnectableDevices.Count >= 1)
+                {
+                    FCSConnectableDevice sc = trackedResource.FCSConnectableDevices.ElementAt(0);
+                    if (sc.ContainsItem(item))
+                    {
+                        return sc.RemoveItemFromContainer(item,1);
+                    }
                 }
             }
 
             return null;
         }
-
+        
         public void RemoveServerFromBase(DSSServerController server)
         {
             BaseManager.SetAllowedToNotify(false);
@@ -372,13 +495,14 @@ namespace DataStorageSolutions.Model
                 RemoveItemsFromTracker(server, item.Key, item.Value);
             }
 
+            server.OnAddItem -= OnServerAddItem;
+            server.OnRemoveItem -= OnServerRemoveItem;
             BaseServers.Remove(server);
             BaseManager.SetAllowedToNotify(true);
         }
 
         public void RegisterServerInBase(DSSServerController server)
         {
-
             if (!BaseServers.Contains(server))
             {
                 BaseManager.SetAllowedToNotify(false);
@@ -386,12 +510,22 @@ namespace DataStorageSolutions.Model
                 {
                     AddItemsToTracker(server, item.Key, item.Value);
                 }
-
-                server.GetItemsContainer().onAddItem += (item) => AddItemsToTracker(server, item.item.GetTechType());
-                server.GetItemsContainer().onRemoveItem += (item) => RemoveItemsFromTracker(server, item.item.GetTechType());
+                
+                server.OnAddItem += OnServerAddItem;
+                server.OnRemoveItem += OnServerRemoveItem;
                 BaseServers.Add(server);
                 BaseManager.SetAllowedToNotify(true);
             }
+        }
+
+        private void OnServerRemoveItem(DSSServerController server, InventoryItem item)
+        {
+            RemoveItemsFromTracker(server, item.item.GetTechType());
+        }
+        
+        private void OnServerAddItem(DSSServerController server, InventoryItem item)
+        {
+            AddItemsToTracker(server, item.item.GetTechType());
         }
 
         #endregion
@@ -443,9 +577,35 @@ namespace DataStorageSolutions.Model
 
         #endregion
 
-        public void SetIsAllowedToNotify(bool value)
+        #region FCSConnectables
+
+        public void RefreshFCSConnectable(FCSConnectableDevice device,bool isVisible)
         {
-            _allowedToNotify = value;
+            var items = device.GetItemsWithin();
+            if (isVisible)
+            {
+                foreach (KeyValuePair<TechType, int> item in items)
+                {
+                    AddItemsToTracker(device,item.Key,item.Value);
+                }
+            }
+            else
+            {
+                foreach (KeyValuePair<TechType, int> item in items)
+                {
+                    RemoveItemsFromTracker(device,item.Key,item.Value);
+                }
+            }
+        }
+
+        #endregion
+
+        public IEnumerable<ItemsContainer> GetItemContiners()
+        {
+            foreach (DSSServerController baseServer in BaseServers)
+            {
+                yield return baseServer.GetItemsContainer();
+            }
         }
     }
 }

@@ -18,7 +18,7 @@ namespace ARS_SeaBreezeFCS32.Display
         {
             set
             {
-                TextLineOne = string.Format(ARSSeaBreezeFCS32Buildable.TakeItemFormat(), value.AsString());
+                TextLineOne = string.Format(ARSSeaBreezeFCS32Buildable.TakeItemFormat(), Language.main.Get(value));
                 type = value;
             }
 

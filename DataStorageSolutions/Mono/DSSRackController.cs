@@ -47,6 +47,8 @@ namespace DataStorageSolutions.Mono
         public bool IsRackSlotsFull => GetIsRackFull();
         internal Action OnUpdate; 
         Action<int, int> IFCSStorage.OnContainerUpdate { get; set; }
+        public Action<FCSConnectableDevice, TechType> OnContainerAddItem { get; set; }
+        public Action<FCSConnectableDevice, TechType> OnContainerRemoveItem { get; set; }
 
         public override BaseManager Manager { get; set; }
 

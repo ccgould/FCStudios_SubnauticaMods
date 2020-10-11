@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using FCSTechFabricator.Components;
 
 namespace FCSTechFabricator.Interfaces
 {
@@ -16,6 +17,8 @@ namespace FCSTechFabricator.Interfaces
        Pickupable RemoveItemFromContainer(TechType techType, int amount);
        Dictionary<TechType, int> GetItemsWithin();
        Action<int, int> OnContainerUpdate { get; set; }
+       Action<FCSConnectableDevice, TechType> OnContainerAddItem { get; set; }
+       Action<FCSConnectableDevice, TechType> OnContainerRemoveItem { get; set; }
        bool ContainsItem(TechType techType);
     }
 }

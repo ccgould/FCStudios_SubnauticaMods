@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using FCSCommon.Utilities;
 using System.Linq;
+using FCSTechFabricator.Components;
 using FCSTechFabricator.Interfaces;
 using UnityEngine;
 
@@ -14,14 +15,16 @@ namespace FCSTechFabricator.Objects
         private Action _updateDisplay;
         private GameObject _root;
         private int _storageLimit;
+        private FCSConnectableDevice _fcsConnectableDevice;
 
         public int GetContainerFreeSpace => _storageLimit - _container.count;
         public bool IsFull => _container.count >= _storageLimit;
         public HashSet<Filter> Filters { get; set; } = new HashSet<Filter>();
 
-        public void Initialize(GameObject root, Action updateDisplay,int storageLimit)
+        public void Initialize(FCSConnectableDevice fcsConnectable, GameObject root, Action updateDisplay,int storageLimit)
         {
             _root = root;
+            _fcsConnectableDevice = fcsConnectable;
             _container = new ItemsContainer(1, storageLimit,root.transform ,"Filtered Storage",null);
             _container.onAddItem += this.OnAddItem;
             _container.onRemoveItem += this.OnRemoveItem;
@@ -92,6 +95,7 @@ namespace FCSTechFabricator.Objects
             if (!CanBeStored(_container.count + 1, item.item.GetTechType())) return false;
 
             _container.UnsafeAdd(item);
+            OnContainerAddItem?.Invoke(_fcsConnectableDevice, item.item.GetTechType());
             item.item.Reparent(_root.transform);
             ForceUpdateDisplay();
             return true;
@@ -114,6 +118,7 @@ namespace FCSTechFabricator.Objects
             
             if (item == null) return null;
             _container.RemoveItem(item.item);
+            OnContainerRemoveItem?.Invoke(_fcsConnectableDevice,techType);
             ForceUpdateDisplay();
             return item.item;
         }
@@ -126,6 +131,8 @@ namespace FCSTechFabricator.Objects
         }
 
         public Action<int, int> OnContainerUpdate { get; set; }
+        public Action<FCSConnectableDevice, TechType> OnContainerAddItem { get; set; }
+        public Action<FCSConnectableDevice, TechType> OnContainerRemoveItem { get; set; }
 
         public bool ContainsItem(TechType techType)
         {

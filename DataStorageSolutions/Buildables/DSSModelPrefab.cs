@@ -35,8 +35,14 @@ namespace DataStorageSolutions.Buildables
         internal static GameObject OperatorPrefab { get; set; }
         internal static GameObject ItemDisplayPrefab { get; set; }
         internal static GameObject OperatorItemPrefab { get; set; }
-        internal static GameObject ItemEntryPrefab { get; set; }
+        internal static GameObject TransferItemEntryPrefab { get; set; }
         internal static GameObject AutoCraftItemPrefab { get; set; }
+        internal static GameObject DeviceButtonPrefab { get; set; }
+        internal static GameObject AutoCrafterPrefab { get; set; }
+        public static GameObject AutoCraftTechTypeItem { get; set; }
+        public static GameObject AutoCrafterItemPrefab { get; set; }
+        public static GameObject DSSCrafterCratePrefab { get; set; }
+
 
         public static bool GetPrefabs()
         {
@@ -64,10 +70,38 @@ namespace DataStorageSolutions.Buildables
                     GameObject formatMachine = assetBundle.LoadAsset<GameObject>(Mod.ServerFormattingStationPrefabName);
                     GameObject filterItemPrefab = assetBundle.LoadAsset<GameObject>("FilterItem");
                     GameObject operatorPrefab = assetBundle.LoadAsset<GameObject>(Mod.OperatorPrefabName);
-                    GameObject itemDisplayPrefab = assetBundle.LoadAsset<GameObject>(Mod.ItemDisplayPrefabName);
-                    GameObject operatorItemPrefab = assetBundle.LoadAsset<GameObject>("OperatorItem");
-                    GameObject itemEntryPrefab = assetBundle.LoadAsset<GameObject>("ItemEntry");
                     GameObject autoCraftItemPrefab = assetBundle.LoadAsset<GameObject>("AutoCraftItem");
+                    GameObject transferItemPrefab = assetBundle.LoadAsset<GameObject>("TransferItem");
+                    GameObject deviceButtonPrefab = assetBundle.LoadAsset<GameObject>("DeviceButton");
+                    GameObject autoCraftTechTypeItem = assetBundle.LoadAsset<GameObject>("AutoCraftTechTypeItem");
+                    GameObject autoCrafterPrefab = assetBundle.LoadAsset<GameObject>(Mod.AutoCrafterPrefabName);
+                    GameObject autoCrafterItemButtonPrefab = assetBundle.LoadAsset<GameObject>("AutoCrafterItemButton");
+                    GameObject dSSCrafterCratePrefab = assetBundle.LoadAsset<GameObject>("DSSCrafterCrate");
+
+
+                    if (dSSCrafterCratePrefab != null)
+                    {
+                        DSSCrafterCratePrefab = dSSCrafterCratePrefab;
+                        QuickLogger.Debug($"DSS Crafter Crate Prefab Found!");
+                    }
+                    else
+                    {
+                        QuickLogger.Error($"DSS Crafter Crate Prefab Not Found!");
+                        return false;
+                    }
+
+                    //If the prefab isn't null lets add the shader to the materials
+                    if (autoCrafterItemButtonPrefab != null)
+                    {
+                        AutoCrafterItemPrefab = autoCrafterItemButtonPrefab;
+                        QuickLogger.Debug($"Auto Crafter Item Button Prefab Found!");
+                    }
+                    else
+                    {
+                        QuickLogger.Error($"Auto Crafter Item Button Prefab Not Found!");
+                        return false;
+                    }
+
 
                     //If the prefab isn't null lets add the shader to the materials
                     if (operatorPrefab != null)
@@ -83,6 +117,34 @@ namespace DataStorageSolutions.Buildables
                         QuickLogger.Error($"Operator Prefab Not Found!");
                         return false;
                     }
+                    
+                    //If the prefab isn't null lets add the shader to the materials
+                    if (autoCrafterPrefab != null)
+                    {
+                        //Lets apply the material shader
+                        ApplyShaders(autoCrafterPrefab, assetBundle);
+
+                        AutoCrafterPrefab = autoCrafterPrefab;
+                        QuickLogger.Debug($"Auto Crafter Prefab Found!");
+                    }
+                    else
+                    {
+                        QuickLogger.Error($"Auto Crafter Prefab Not Found!");
+                        return false;
+                    }
+
+                    //If the prefab isn't null lets add the shader to the materials
+                    if (autoCraftTechTypeItem != null)
+                    {
+
+                        AutoCraftTechTypeItem = autoCraftTechTypeItem;
+                        QuickLogger.Debug($"Auto Crafter Item Prefab Found!");
+                    }
+                    else
+                    {
+                        QuickLogger.Error($"Auto Crafter Item Prefab Not Found!");
+                        return false;
+                    }
 
                     //If the prefab isn't null lets add the shader to the materials
                     if (autoCraftItemPrefab != null)
@@ -92,43 +154,29 @@ namespace DataStorageSolutions.Buildables
                     }
                     else
                     {
-                        QuickLogger.Error($"Operator Prefab Not Found!");
+                        QuickLogger.Error($"Autocraft Prefab Not Found!");
                         return false;
                     }
 
-                    if (itemEntryPrefab != null)
+                    if (transferItemPrefab != null)
                     {
-                        ItemEntryPrefab = itemEntryPrefab;
-                        QuickLogger.Debug($"Item Entry Prefab Found!");
+                        TransferItemEntryPrefab = transferItemPrefab;
+                        QuickLogger.Debug($"Transfer Item Prefab Found!");
                     }
                     else
                     {
-                        QuickLogger.Error($"Item Entry Prefab Not Found!");
+                        QuickLogger.Error($"Transfer Item Prefab Not Found!");
                         return false;
                     }
 
-                    if (operatorItemPrefab != null)
+                    if (deviceButtonPrefab != null)
                     {
-                        OperatorItemPrefab = operatorItemPrefab;
-                        QuickLogger.Debug($"Operator Item Prefab Found!");
+                        DeviceButtonPrefab = deviceButtonPrefab;
+                        QuickLogger.Debug($"Device Button Prefab Found!");
                     }
                     else
                     {
-                        QuickLogger.Error($"Operator Item Prefab Not Found!");
-                        return false;
-                    }
-
-                    if (itemDisplayPrefab != null)
-                    {
-                        //Lets apply the material shader
-                        ApplyShaders(itemDisplayPrefab, assetBundle);
-
-                        ItemDisplayPrefab = itemDisplayPrefab;
-                        QuickLogger.Debug($"Item Display Prefab Found!");
-                    }
-                    else
-                    {
-                        QuickLogger.Error($"Item Display Prefab Not Found!");
+                        QuickLogger.Error($"Device Button Prefab Not Found!");
                         return false;
                     }
 
@@ -256,7 +304,7 @@ namespace DataStorageSolutions.Buildables
                 return false;
             }
         }
-        
+
         /// <summary>
         /// Applies the shader to the materials of the reactor
         /// </summary>

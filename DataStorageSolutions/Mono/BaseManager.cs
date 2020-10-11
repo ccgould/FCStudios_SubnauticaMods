@@ -1,19 +1,17 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using DataStorageSolutions.Buildables;
 using DataStorageSolutions.Configuration;
 using DataStorageSolutions.Debug;
-using DataStorageSolutions.Helpers;
 using DataStorageSolutions.Interfaces;
 using DataStorageSolutions.Model;
 using DataStorageSolutions.Patches;
+using FCSCommon.Extensions;
 using FCSCommon.Utilities;
-using FCSTechFabricator.Abstract;
 using FCSTechFabricator.Components;
 using FCSTechFabricator.Enums;
-using FCSTechFabricator.Objects;
 using UnityEngine;
 
 namespace DataStorageSolutions.Mono
@@ -23,6 +21,8 @@ namespace DataStorageSolutions.Mono
         private string _baseName;
         private BaseSaveData _savedData;
         private bool _hasBreakerTripped;
+        private bool _isInitialized;
+        private static bool _allowedToNotify;
 
         internal bool IsVisible
         {
@@ -44,18 +44,15 @@ namespace DataStorageSolutions.Mono
         internal DSSVehicleDockingManager DockingManager { get; set; }
         internal bool IsOperational => !_hasBreakerTripped && BasePowerManager.HasPower();
         internal Dictionary<string, FCSConnectableDevice> FCSConnectables { get; set; } = new Dictionary<string, FCSConnectableDevice>();
-
-        internal static Action OnPlayerTick { get; set; }
+        internal static Action<Player> OnPlayerTick { get; set; }
         internal static List<BaseManager> Managers { get; } = new List<BaseManager>();
         internal static readonly List<IBaseAntenna> BaseAntennas = new List<IBaseAntenna>();
-        internal static List<FCSOperation> Crafts { get; set; } = new List<FCSOperation>();
-        internal static List<FCSOperation> Operations { get; set; } = new List<FCSOperation>();
-        public BasePowerManager BasePowerManager { get; set; }
-        public BaseStorageManager StorageManager { get; set; }
+        internal static Dictionary<string,FCSOperation> Operations { get; set; } = new Dictionary<string,FCSOperation>();
+        internal BasePowerManager BasePowerManager { get; set; }
+        internal BaseStorageManager StorageManager { get; set; }
         internal readonly HashSet<DSSOperatorController> BaseOperators = new HashSet<DSSOperatorController>();
         internal readonly HashSet<DSSTerminalController> BaseTerminals = new HashSet<DSSTerminalController>();
-        private bool _isInitialized;
-        private static bool _allowedToNotify;
+        internal readonly HashSet<DSSAutoCrafterController> BaseAutoCrafters = new HashSet<DSSAutoCrafterController>();
 
         #region Default Constructor
 
@@ -123,6 +120,13 @@ namespace DataStorageSolutions.Mono
             }
 
             _hasBreakerTripped = _savedData?.HasBreakerTripped ?? false;
+            
+            if (Mod.GetSaveData().Operations != null)
+            {
+                Operations = Mod.GetSaveData().Operations;
+            }
+
+            Player.main.StartCoroutine(TransferItems());
 
             _isInitialized = true;
         }
@@ -154,7 +158,8 @@ namespace DataStorageSolutions.Mono
         {
             QuickLogger.Debug($"Creating new manager", true);
             var manager = new BaseManager(habitat);
-            habitat.gameObject.EnsureComponent<BaseConnectable>();
+            var baseConnectable  = habitat.gameObject.EnsureComponent<BaseConnectable>();
+            baseConnectable.BaseManager = manager;
             Managers.Add(manager);
             QuickLogger.Debug($"Manager Count = {Managers.Count}", true);
             return manager;
@@ -302,22 +307,64 @@ namespace DataStorageSolutions.Mono
         private void TrackNewFCSConnectable(FCSConnectableDevice obj)
         {
             if (obj == null) return;
-            SubRoot newSeaBase = obj.GetComponentInParent<SubRoot>(); //obj?.gameObject?.transform?.parent?.gameObject;
-            var fcsConnectableBase = FindManager(newSeaBase?.GetComponentInChildren<PrefabIdentifier>().Id);
+            BaseManager manager = FindManager(obj.gameObject);
 
+            QuickLogger.Debug($"Object Base ID: {manager?.InstanceID} || Current Base ID: {InstanceID}", true);
+
+            if (manager == null || Habitat == null) return;
+            
+            if (manager.InstanceID == InstanceID)
+            {
 #if DEBUG
-            QuickLogger.Debug($"FCSConnectable Base Found: {newSeaBase?.name}", true);
-            QuickLogger.Debug($"FCSConnectable found in base: {Habitat?.name}", true);
+                QuickLogger.Debug($"FCSConnectable Found: {obj.UnitID}", true);
+                QuickLogger.Debug($"FCSConnectable found in base: {Habitat?.name}", true);
 #endif
 
-            if (fcsConnectableBase == null || Habitat) return;
-
-            if (fcsConnectableBase.Habitat == Habitat)
-            {
-                obj.GetStorage().OnContainerUpdate += OnFCSConnectableContainerUpdate;
+                obj.GetStorage().OnContainerAddItem += OnContainerAddItem;
+                obj.GetStorage().OnContainerRemoveItem += OnContainerRemoveItem;
                 QuickLogger.Debug("Adding FCSConnectable");
                 FCSConnectables.Add(obj.GetPrefabIDString(), obj);
+                if (obj.IsVisible)
+                {
+                    StorageManager.RefreshFCSConnectable(obj,true);
+                }
+                obj.OnIsVisibleToggled += (connectable, value) =>
+                {
+                    StorageManager.RefreshFCSConnectable(connectable,value);
+                };
                 QuickLogger.Debug("Added FCSConnectable");
+                if (!Operations.ContainsKey(obj.UnitID))
+                {
+                    var operation = new FCSOperation {Manager = manager, ConnectableDevice = obj, ID = obj.UnitID};
+                    operation.Initialize();
+                    Operations.Add(obj.UnitID, operation);
+                }
+                else
+                {
+                    var operation = Operations[obj.UnitID];
+                    operation.Manager = manager;
+                    operation.ConnectableDevice = obj;
+                }
+                RefreshBaseOperators();
+            }
+        }
+
+        private void OnContainerRemoveItem(FCSConnectableDevice connectable,TechType techType)
+        {
+            StorageManager.RemoveItemsFromTracker(connectable,techType);
+        }
+
+        private void OnContainerAddItem(FCSConnectableDevice connectable, TechType techType)
+        {
+            StorageManager.AddItemsToTracker(connectable, techType);
+        }
+
+        private void RefreshBaseOperators()
+        {
+            QuickLogger.Debug($"Refreshing Base Operators",true);
+            foreach (DSSOperatorController baseOperator in BaseOperators)
+            {
+                baseOperator.DisplayManager.Refresh();
             }
         }
 
@@ -334,15 +381,27 @@ namespace DataStorageSolutions.Mono
         {
             if (obj == null || obj.GetPrefabIDString() == null) return;
 
-            QuickLogger.Debug("OBJ Not NULL", true);
-            FCSConnectables.Remove(obj.GetPrefabIDString());
-            QuickLogger.Debug("Removed FCSConnectable");
+            BaseManager manager = FindManager(obj.gameObject);
+
+            if(manager == null) return;
+
+            if (manager.InstanceID == InstanceID)
+            {
+                var operation = Operations.FirstOrDefault(x => x.Key == obj.UnitID);
+                operation.Value.Destroy();
+
+                obj.GetStorage().OnContainerAddItem -= OnContainerAddItem;
+                obj.GetStorage().OnContainerRemoveItem -= OnContainerRemoveItem;
+                QuickLogger.Debug("OBJ Not NULL", true);
+                FCSConnectables.Remove(obj.GetPrefabIDString());
+
+                QuickLogger.Debug("Removed FCSConnectable");
+                RefreshBaseOperators();
+                Operations.Remove(obj.UnitID);
+            }
         }
 
-        private void OnFCSConnectableContainerUpdate(int arg1, int arg2)
-        {
-            Mod.OnBaseUpdate?.Invoke();
-        }
+
 
         #endregion
 
@@ -487,17 +546,17 @@ namespace DataStorageSolutions.Mono
             serverController.Manager.StorageManager.RegisterServerInBase(serverController);
         }
 
-        public void UnRegisterServerFromBase(DSSServerController serverController)
+        internal void UnRegisterServerFromBase(DSSServerController serverController)
         {
             serverController.Manager.StorageManager.RemoveServerFromBase(serverController);
         }
 
-        public static void UnRegisterServer(DSSServerController dssServerController)
+        internal static void UnRegisterServer(DSSServerController dssServerController)
         {
             BaseStorageManager.GlobalServers.Remove(dssServerController);
         }
 
-        public static void UpdateGlobalTerminals(bool isVehiclesUpdate = false)
+        internal static void UpdateGlobalTerminals(bool isVehiclesUpdate = false)
         {
             foreach (BaseManager manager in Managers)
             {
@@ -527,7 +586,7 @@ namespace DataStorageSolutions.Mono
             }
         }
 
-        public static IEnumerable<BaseSaveData> GetBaseSaveData()
+        internal static IEnumerable<BaseSaveData> GetBaseSaveData()
         {
             foreach (var manager in Managers)
             {
@@ -535,7 +594,7 @@ namespace DataStorageSolutions.Mono
             }
         }
 
-        public static void SetAllowedToNotify(bool value)
+        internal static void SetAllowedToNotify(bool value)
         {
             if (DebugMenu.main.IsOpen)
             {
@@ -563,15 +622,113 @@ namespace DataStorageSolutions.Mono
             }
         }
 
-        public void UnRegisterOperator(DSSOperatorController operatorController)
+        internal void UnRegisterOperator(DSSOperatorController operatorController)
         {
             BaseOperators.Remove(operatorController);
+            if (BaseOperators.Count <= 0)
+            {
+                UpdateBaseTerminals();
+            }
         }
 
-        public void RegisterOperator(DSSOperatorController operatorController)
+        internal void RegisterOperator(DSSOperatorController operatorController)
         {
             if (BaseOperators.Contains(operatorController)) return;
             BaseOperators.Add(operatorController);
+            if (BaseOperators.Count == 1)
+            {
+                UpdateBaseTerminals();
+            }
+        }
+
+        internal void UnRegisterAutoCrafter(DSSAutoCrafterController crafterController)
+        {
+            BaseAutoCrafters.Remove(crafterController);
+            if (BaseOperators.Count <= 0)
+            {
+
+            }
+        }
+
+        internal void RegisterAutoCrafter(DSSAutoCrafterController crafterController)
+        {
+            if (BaseAutoCrafters.Contains(crafterController)) return;
+            BaseAutoCrafters.Add(crafterController);
+            if (BaseOperators.Count == 1)
+            {
+                
+            }
+        }
+
+        internal void UpdateBaseOperators()
+        {
+            foreach (DSSOperatorController baseOperator in BaseOperators)
+            {
+                baseOperator.UpdateScreen();
+            }
+        }
+
+        internal void UpdateBaseCrafters()
+        {
+            foreach (DSSAutoCrafterController autoCrafterController in BaseAutoCrafters)
+            {
+                autoCrafterController.UpdateScreen();
+            }
+        }
+
+        internal static IEnumerator TransferItems()
+        {
+            while (true)
+            {
+
+                yield return new WaitForSeconds(1f);
+                foreach (KeyValuePair<string, FCSOperation> operation in Operations)
+                {
+                    if (!operation.Value.IsTransferAllowed) continue;
+                    foreach (TransferOperationData data in operation.Value.TransferRequestOperations)
+                    {
+                        if (operation.Value.ConnectableDevice.GetItemCount(data.TransferRequestItem) < data.TransferRequestAmount &&
+                            operation.Value.ConnectableDevice.CanBeStored(1, data.TransferRequestItem))
+                        {
+                            if (operation.Value.Manager.StorageManager.ServersContainsItem(data.TransferRequestItem))
+                            {
+                                QuickLogger.Debug("Container contains item trying to move");
+                                var item = operation.Value.Manager.StorageManager.RemoveItemFromBaseServersOnly(data.TransferRequestItem, false);
+
+                                if (!operation.Value.ConnectableDevice.AddItemToContainer(item.ToInventoryItem(), out string reason))
+                                {
+                                    //TODO add to logger;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            yield return null;
+                        }
+                    }
+                }
+            }
+        }
+
+        internal static Dictionary<string, FCSOperation> GetOperationSaveData()
+        {
+            return Operations;
+        }
+
+        internal static FCSConnectableDevice FindConnectableDevice(string value)
+        {
+            foreach (BaseManager manager in Managers)
+            {
+                foreach (KeyValuePair<string, FCSConnectableDevice> connectable in manager.FCSConnectables)
+                {
+                    if (connectable.Value.UnitID.Equals(value))
+                    {
+                        return connectable.Value;
+                    }
+                }
+            }
+
+            return null;
         }
     }
 }

@@ -307,6 +307,7 @@ namespace DataStorageSolutions.Helpers
             if (!Inventory.main.Pickup(pickupable)) return false;
 
             CrafterLogic.NotifyCraftEnd(Player.main.gameObject, pickupable.GetTechType());
+
             return true;
         }
 
@@ -377,24 +378,9 @@ namespace DataStorageSolutions.Helpers
             return sb.ToString();
         }
 
-        internal static TechData CheckIfTechDataAvailable(FCSOperation craft, out bool pass)
+        internal static TechData CheckIfTechDataAvailable(AutoCraftOperationData autoCraftOperation)
         {
-            var techData = CraftDataHandler.GetTechData(craft.TechType);
-
-            pass = true;
-
-            if (techData != null)
-            {
-                foreach (Ingredient ingredient in techData.Ingredients)
-                {
-                    //if (craft.Manager.GetItemCount(ingredient.techType) < ingredient.amount)
-                    //{
-                    //    pass = false;
-                    //    break;
-                    //}
-                }
-            }
-
+            var techData = CraftDataHandler.GetTechData(autoCraftOperation.AutoCraftRequestItem);
             return techData;
         }
 
@@ -410,6 +396,21 @@ namespace DataStorageSolutions.Helpers
             pickupable.transform.position = new Vector3(destination.transform.position.x, destination.transform.position.y, destination.transform.position.z);
             pickupable.transform.rotation = destination.rotation;
             pickupable.gameObject.SetActive(setActive);
+        }
+
+        internal static bool CanCraftItem(BaseManager manager, TechData techData)
+        {
+            foreach (Ingredient ingredient in techData.Ingredients)
+            {
+                var hasItem = manager.StorageManager.GetItemCount(ingredient.techType) >= ingredient.amount;
+
+                if (!hasItem)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }

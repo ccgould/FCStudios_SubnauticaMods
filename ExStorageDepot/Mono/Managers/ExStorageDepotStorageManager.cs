@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ExStorageDepot.Helpers;
 using FCSCommon.Helpers;
+using FCSTechFabricator.Components;
 using FCSTechFabricator.Interfaces;
 using UnityEngine;
 
@@ -24,6 +25,8 @@ namespace ExStorageDepot.Mono.Managers
         public int GetContainerFreeSpace => _maxItems - GetTotalCount();
         public bool IsFull => GetIsFull();
         public Action<int, int> OnContainerUpdate { get; set; } //Not being used causes lag when moving large items
+        public Action<FCSConnectableDevice, TechType> OnContainerAddItem { get; set; }
+        public Action<FCSConnectableDevice, TechType> OnContainerRemoveItem { get; set; }
 
 
         private bool GetIsFull()
@@ -62,10 +65,11 @@ namespace ExStorageDepot.Mono.Managers
 
         public bool AddItemToContainer(InventoryItem item)
         {
+
             try
             {
                 ContainerItems.Add(InventoryHelpers.CovertToItemData(item, true));
-                //OnContainerUpdate?.Invoke(GetTotalCount(), _maxItems);
+                OnContainerAddItem(_mono.FCSConnectableDevice, item.item.GetTechType());
             }
             catch (Exception e)
             {
@@ -114,8 +118,8 @@ namespace ExStorageDepot.Mono.Managers
             {
                 var itemData = ContainerItems.FirstOrDefault(x => x.TechType == techType);
                 var item = InventoryHelpers.ConvertToPickupable(itemData);
+                OnContainerRemoveItem(_mono.FCSConnectableDevice, techType);
                 ContainerItems.Remove(itemData);
-                //OnContainerUpdate?.Invoke(GetTotalCount(),_maxItems);
                 return item;
             }
 
@@ -187,6 +191,7 @@ namespace ExStorageDepot.Mono.Managers
 
                         Inventory.main.Pickup(pickup); 
                         ContainerItems.Remove(itemData);
+                        OnContainerRemoveItem(_mono.FCSConnectableDevice, techType);
                         //OnContainerUpdate?.Invoke(GetTotalCount(),_maxItems);
                     }
                 }

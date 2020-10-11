@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using DataStorageSolutions.Helpers;
-using DataStorageSolutions.Model;
 using DataStorageSolutions.Mono;
 using FCSCommon.Utilities;
+using HarmonyLib;
 using UnityEngine;
 
 
@@ -11,125 +11,53 @@ namespace DataStorageSolutions.Patches
 {
     internal class EasyCraft_Patch
     {
-        private static float _cacheExpired;
-        private const float CacheDuration = 1f;
-        private static BaseManager[] _cached = new BaseManager[0];
+        public static ItemsContainer[] Items { get; set; }
 
-        private static BaseManager[] Find()
+        public static void Find(ref ItemsContainer[] __result)
         {
-            HashSet<BaseManager> list = new HashSet<BaseManager>();
-
-                var usageStorage = (int)QPatch.UseStorage.GetValue(QPatch.EasyCraftSettingsInstance);
-                
-                if (usageStorage != 0)
+            var useStorage = (int) QPatch.UseStorage.GetValue(QPatch.EasyCraftSettingsInstance);
+            List<ItemsContainer> list = new List<ItemsContainer>();
+            list.Add(Inventory.main.container);
+            if (useStorage != 0)
+            {
+                if (useStorage == 1 && Player.main.IsInside())
                 {
-                    if (usageStorage == 1 && Player.main.IsInside())
+                    if (Player.main.IsInSub())
                     {
-                        if (Player.main.IsInSub())
+                        var baseConnectables = Player.main.currentSub.GetComponentsInChildren<BaseConnectable>();
+
+                        foreach (BaseConnectable connectable in baseConnectables)
                         {
-                            list.Add(BaseManager.FindManager(Player.main.currentSub));
+                            list.AddRange(connectable.GetServers());
                         }
                     }
-                    else if (usageStorage == 2)
+                }
+                else if (useStorage == 2)
+                {
+                    foreach (SubRoot subRoot in Object.FindObjectsOfType<SubRoot>())
                     {
-                        foreach (SubRoot subRoot in GameObject.FindObjectsOfType<SubRoot>())
+                        Vector3 position = Player.main.transform.position;
+                        BaseRoot baseRoot;
+                        if ((subRoot.isCyclops && (position - subRoot.GetWorldCenterOfMass()).sqrMagnitude < 10000f) ||
+                            (subRoot.isBase && (baseRoot = (subRoot as BaseRoot)) != null &&
+                             baseRoot.GetDistanceToPlayer() < 100f))
                         {
-                            Vector3 position = Player.main.transform.position;
-                            BaseRoot baseRoot;
-                            if ((subRoot.isCyclops && (position - subRoot.GetWorldCenterOfMass()).sqrMagnitude < 10000f) || (subRoot.isBase && (baseRoot = (subRoot as BaseRoot)) != null && baseRoot.GetDistanceToPlayer() < 100f))
+                            foreach (BaseConnectable baseConnectable in
+                                subRoot.GetComponentsInChildren<BaseConnectable>())
                             {
-                                list.Add(BaseManager.FindManager(subRoot));
+                                list.AddRange(baseConnectable.GetServers());
                             }
                         }
                     }
-
-                    return (from x in list.Distinct<BaseManager>()
-                        orderby (Player.main.transform.position - x.Habitat.transform.position).sqrMagnitude
-                        select x).ToArray<BaseManager>();
-                }
-            return list.ToArray();
-        }
-
-        private static BaseManager[] Containers
-        {
-            get
-            {
-                if (_cacheExpired < Time.unscaledTime || _cacheExpired > Time.unscaledTime + CacheDuration)
-                {
-                    _cached = Find();
-                    _cacheExpired = Time.unscaledTime + CacheDuration;
-                }
-                return _cached;
-            }
-        }
-        
-        public static void GetPickupCount(TechType techType, ref int __result)
-        {
-            var bases = Containers;
-
-            if (bases.Length == 0)
-            {
-                __result += 0;
-            }
-            else
-            {
-                for (int i = 0; i < bases.Length; i++)
-                {
-                    var baseManager = bases[i];
-                    if (baseManager != null)
-                    {
-                        if (baseManager.IsOperational)
-                        {
-                            __result += baseManager.StorageManager.GetItemCount(techType);
-                        }
-                    }
-                    else
-                    {
-                        __result += 0;
-                    }
-                }
-                
-            }
-            
-        }
-
-        public static void DestroyItem(TechType techType, ref bool __result, ref int count)
-        {
-            QuickLogger.Debug("Attempting to take items");
-
-            if (!__result)
-            {
-                int num = 0;
-                
-                for (var index = 0; index < Containers.Length; index++)
-                {
-                    var currentBase = Containers[index];
-
-                    QuickLogger.Debug($"Attempting to take items from base {currentBase?.GetBaseName()}");
-
-
-                    for (int i = 0; i < count; i++)
-                    {
-                        var pickup = currentBase.StorageManager.RemoveItemFromBase(techType);
-                        if (pickup != null)
-                        {
-                            num++;
-                        }
-                    }
-
-                    if (num == count)
-                    {
-                        __result = true;
-                        QuickLogger.Info($"[EasyCraft] removed {count} {techType} from base {currentBase.GetBaseName()}");
-                    }
                 }
 
+                __result.AddRangeToArray((from x in list.Distinct<ItemsContainer>()
+                    orderby (Player.main.transform.position - x.tr.position).sqrMagnitude
+                    select x).ToArray<ItemsContainer>()) ;
 
-                QuickLogger.Debug($"Count: {count}");
 
-                if (num >= count) return;
-                QuickLogger.Info($"[EasyCraft] Unable to remove {count} {techType}");
-                __result = false;
+                Items.AddRangeToArray(__result);
+                QuickLogger.Debug($"Item Container count: {__result.Length}");
             }
         }
     }

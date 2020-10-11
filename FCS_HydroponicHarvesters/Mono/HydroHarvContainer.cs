@@ -5,6 +5,7 @@ using FCS_HydroponicHarvesters.Buildables;
 using FCS_HydroponicHarvesters.Enumerators;
 using FCS_HydroponicHarvesters.Model;
 using FCSCommon.Utilities;
+using FCSTechFabricator.Components;
 using FCSTechFabricator.Interfaces;
 using UnityEngine;
 
@@ -15,6 +16,8 @@ namespace FCS_HydroponicHarvesters.Mono
         private HydroHarvController _mono;
         internal int StorageLimit { get; private set; }
         public Action<int, int> OnContainerUpdate { get; set; }
+        public Action<FCSConnectableDevice, TechType> OnContainerAddItem { get; set; }
+        public Action<FCSConnectableDevice, TechType> OnContainerRemoveItem { get; set; }
 
         public int GetContainerFreeSpace => GetFreeSpace();
         public bool IsFull => CheckIfFull();
@@ -100,6 +103,7 @@ namespace FCS_HydroponicHarvesters.Mono
                     Items.Add(item, initializer ? 0 : 1);
                     QuickLogger.Debug($"Added item to container {item}", true);
                 }
+                OnContainerAddItem?.Invoke(_mono.FCSConnectableDevice,item);
                 OnContainerUpdate?.Invoke(GetTotal(), StorageLimit);
             }
         }
@@ -119,6 +123,7 @@ namespace FCS_HydroponicHarvesters.Mono
                 Items[item] -= 1;
                 var pickup = CraftData.InstantiateFromPrefab(item).GetComponent<Pickupable>();
                 Inventory.main.Pickup(pickup);
+                OnContainerRemoveItem?.Invoke(_mono.FCSConnectableDevice,item);
                 OnContainerUpdate?.Invoke(GetTotal(), StorageLimit);
                 _mono?.Producer?.TryStartingNextClone();
             }

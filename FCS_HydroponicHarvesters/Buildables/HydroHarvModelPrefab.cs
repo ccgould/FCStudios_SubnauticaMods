@@ -32,7 +32,7 @@ namespace FCS_HydroponicHarvesters.Buildables
                     QuickLogger.Debug($"AssetBundle Set");
 
                     QuickLogger.Debug("GetPrefabs");
-                    _assetBundle = AssetHelper.Asset(Mod.ModFolderName, Mod.BundleName);
+                    _assetBundle = AssetHelper.Asset(Mod.BundleName);
 
                     Bundle = _assetBundle;
 

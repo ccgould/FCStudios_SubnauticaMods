@@ -12,8 +12,7 @@ namespace ExStorageDepot.Helpers
     {
         internal static ItemData CovertToItemData(InventoryItem item, bool destroy = false)
         {
-            var data = new ItemData();
-            data.InventoryItem = item;
+            var data = new ItemData {InventoryItem = item};
             data.ExposeInventoryData();
 
             if (destroy)

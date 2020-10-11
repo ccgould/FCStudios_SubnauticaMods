@@ -55,11 +55,11 @@ namespace DataStorageSolutions.Patches
         private static void GetFilters(StringBuilder sb, bool isFormatted, DSSServerController controller)
         {
             sb.AppendFormat("\n<size=20><color=#FFA500FF>{0}</color> <color=#DDDEDEFF>{1}</color></size>",
-                AuxPatchers.FiltersCheck(), isFormatted);
+                AuxPatchers.IsFormatted(), isFormatted);
 
             if (isFormatted)
             {
-                sb.AppendFormat("\n<size=20><color=#FFA500FF>{0}:</color>\n<color=#DDDEDEFF>{1}</color></size>", $"Filters",
+                sb.AppendFormat("\n<size=20><color=#FFA500FF>{0}:</color>\n<color=#DDDEDEFF>{1}</color></size>", $"{AuxPatchers.Filters()}",
                     controller.GetFormatData());
             }
         }

@@ -23,7 +23,7 @@ namespace DataStorageSolutions.Patches
                 if (_timeLeft < 0)
                 {
                     BaseManager.RemoveDestroyedBases();
-                    BaseManager.OnPlayerTick?.Invoke();
+                    BaseManager.OnPlayerTick?.Invoke(__instance);
                     
                     //QuickLogger.Debug($"Is Ready: {LargeWorldStreamer.main.IsReady()}");
                     //QuickLogger.Debug($"Is World Settled: {LargeWorldStreamer.main.IsWorldSettled()}");

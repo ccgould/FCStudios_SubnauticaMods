@@ -70,7 +70,26 @@ namespace DataStorageSolutions.Buildables
             { $"{ModKey}_NoEmptySeaBreezeFormat","No current seabreeze in base can hold this {0}."},
             { $"{ModKey}_Craft","Craft Item"},
             { $"{ModKey}_Description",$"{Mod.ServerDescription}"},
-            {  $"{ModKey}_IsFormatted","Is Formatted:"},
+            { $"{ModKey}_IsFormatted","Is Formatted:"},
+            { $"{ModKey}_IsVisible","Is Visible:"},
+            { $"{ModKey}_IsVisibleToggle","Is visible to system."},
+            { $"{ModKey}_ItemTransfer","Item Transfer."},
+            { $"{ModKey}_ItemTransferToggle","Enable/Disable item transfer."},
+            { $"{ModKey}_FromDevice","From Device:"},
+            { $"{ModKey}_Item","Item:"},
+            { $"{ModKey}_MaximumAmountMessage","Maximum Amount to request (Leave blank for unlimited):"},
+            { $"{ModKey}_Devices","Devices"},
+            { $"{ModKey}_AutoCrafting","Auto Crafting."},
+            { $"{ModKey}_AutoCraftingToggle","Enable/Disable Auto Crafting."},
+            { $"{ModKey}_AddToAutoCraftingList","Add new crafting operation."},
+            { $"{ModKey}_AddToTransferList","Add new transfer operation."},
+            { $"{ModKey}_CraftExistErrorMessageFormat","A craft for {0} already exists."},
+            { $"{ModKey}_DeleteMessageFormat","Are sure you want to delete this operation for {0}?"},
+            { $"{ModKey}_Start","Start"},
+            { $"{ModKey}_Stop","Stop"},
+            { $"{ModKey}_MaxCraftLimitReachedFormat","Max craft limit of {0} reached cannot accept anymore orders."},
+            { $"{ModKey}_Filters","Filters:"},
+            { $"{ModKey}_Items","Items:"},
         };
 
         internal static void AdditionalPatching()
@@ -83,17 +102,17 @@ namespace DataStorageSolutions.Buildables
         
         internal static string Take()
         {
-            return Language.main.Get(LanguageDictionary.Keys.ElementAt(0));
+            return Language.main.Get($"{ModKey}_Take");
         }
 
         internal static string AmountOfItems()
         {
-            return Language.main.Get(LanguageDictionary.Keys.ElementAt(1));
+            return Language.main.Get($"{ModKey}_AmountOfItems");
         }
 
         internal static string HasItemsMessage()
         {
-            return Language.main.Get(LanguageDictionary.Keys.ElementAt(2));
+            return Language.main.Get($"{ModKey}_HasItemsMessage");
         }
         
         internal static string NotOnBase()
@@ -271,104 +290,184 @@ namespace DataStorageSolutions.Buildables
             return Language.main.Get(LanguageDictionary.Keys.ElementAt(34));
         }
 
-        public static string SettingPage()
+        internal static string SettingPage()
         {
             return Language.main.Get(LanguageDictionary.Keys.ElementAt(35));
         }
 
-        public static string PowerButton()
+        internal static string PowerButton()
         {
             return Language.main.Get(LanguageDictionary.Keys.ElementAt(36));
         }
 
-        public static string PoweredOff()
+        internal static string PoweredOff()
         {
             return Language.main.Get(LanguageDictionary.Keys.ElementAt(37));
         }
 
-        public static string BaseOnOffMessage()
+        internal static string BaseOnOffMessage()
         {
             return Language.main.Get(LanguageDictionary.Keys.ElementAt(38));
         }
 
-        public static string Online()
+        internal static string Online()
         {
             return Language.main.Get(LanguageDictionary.Keys.ElementAt(39));
         }
 
-        public static string Offline()
+        internal static string Offline()
         {
             return Language.main.Get(LanguageDictionary.Keys.ElementAt(40));
         }
 
-        public static string NoVehiclesDocked()
+        internal static string NoVehiclesDocked()
         {
             return Language.main.Get(LanguageDictionary.Keys.ElementAt(41));
         }
-        public static string SelectAVehicle()
+        
+        internal static string SelectAVehicle()
         {
             return Language.main.Get(LanguageDictionary.Keys.ElementAt(42));
         }
 
-        public static string GoToVehicles()
+        internal static string GoToVehicles()
         {
             return Language.main.Get(LanguageDictionary.Keys.ElementAt(43));
         }
-        public static string ViewVehicleStorageFormat()
+
+        internal static string ViewVehicleStorageFormat()
         {
             return Language.main.Get(LanguageDictionary.Keys.ElementAt(44));
         }
-        public static string AddToVehicleStorageFormat()
+        
+        internal static string AddToVehicleStorageFormat()
         {
             return Language.main.Get(LanguageDictionary.Keys.ElementAt(45));
         }
 
-        public static string ViewDickedVehicles()
+        internal static string ViewDickedVehicles()
         {
             return Language.main.Get(LanguageDictionary.Keys.ElementAt(46));
         }
 
-        public static string VehiclePageLabelFormat()
+        internal static string VehiclePageLabelFormat()
         {
             return Language.main.Get(LanguageDictionary.Keys.ElementAt(47));
         }
 
-        public static string ViewBaseStorageFormat()
+        internal static string ViewBaseStorageFormat()
         {
             return Language.main.Get(LanguageDictionary.Keys.ElementAt(48));
         }
 
-        public static string VehicleDumpReceptacle()
+        internal static string VehicleDumpReceptacle()
         {
             return Language.main.Get(LanguageDictionary.Keys.ElementAt(49));
         }
-        public static string BlackListFormat()
+        
+        internal static string BlackListFormat()
         {
             return Language.main.Get(LanguageDictionary.Keys.ElementAt(50));
         }
 
-        public static string GoToDockedVehiclesSettings()
+        internal static string GoToDockedVehiclesSettings()
         {
             return Language.main.Get(LanguageDictionary.Keys.ElementAt(51));
         }
 
-        public static string NoEmptySeaBreezeFormat()
+        internal static string NoEmptySeaBreezeFormat()
         {
             return Language.main.Get(LanguageDictionary.Keys.ElementAt(52));
         }
 
-        public static string Delete()
+        internal static string Delete()
         {
             return Language.main.Get("DeleteConfirmButton");
         }
 
-        public static string Craft()
+        internal static string Craft()
         {
             return Language.main.Get(LanguageDictionary.Keys.ElementAt(53));
         }
-        public static object FiltersCheck()
+
+        internal static string IsVisible()
         {
-            return Language.main.Get(LanguageDictionary.Keys.ElementAt(54));
+            return Language.main.Get(LanguageDictionary[$"{ModKey}_IsVisible"]);
+        }
+
+        internal static string IsVisibleToggle()
+        {
+            return Language.main.Get(LanguageDictionary[$"{ModKey}_IsVisibleToggle"]);
+        }
+
+        internal static string ItemTransfer()
+        {
+            return Language.main.Get(LanguageDictionary[$"{ModKey}_ItemTransfer"]);
+        }
+
+        internal static string ItemTransferToggle()
+        {
+            return Language.main.Get(LanguageDictionary[$"{ModKey}_ItemTransferToggle"]);
+        }
+
+        internal static string AutoCraft()
+        {
+            return Language.main.Get(LanguageDictionary[$"{ModKey}_AutoCrafting"]);
+        }
+
+        internal static string AutoCraftToggle()
+        {
+            return Language.main.Get(LanguageDictionary[$"{ModKey}_AutoCraftingToggle"]);
+        }
+
+        internal static string AddToAutoCraftingList()
+        {
+            return Language.main.Get(LanguageDictionary[$"{ModKey}_AddToAutoCraftingList"]);
+        }
+
+        internal static string AddToTransferList()
+        {
+            return Language.main.Get(LanguageDictionary[$"{ModKey}_AddToTransferList"]);
+        }
+
+        internal static string CraftExistErrorMessageFormat()
+        {
+            return Language.main.Get(LanguageDictionary[$"{ModKey}_CraftExistErrorMessageFormat"]);
+        }
+
+        internal static string DeleteConfirmationMessageFormat()
+        {
+            return Language.main.Get(LanguageDictionary[$"{ModKey}_DeleteMessageFormat"]);
+        }
+
+        internal static string Start()
+        {
+            return Language.main.Get(LanguageDictionary[$"{ModKey}_Start"]);
+        }
+
+        internal static string Stop()
+        {
+            return Language.main.Get(LanguageDictionary[$"{ModKey}_Stop"]);
+        }
+
+        internal static string IsFormatted()
+        {
+            return Language.main.Get(LanguageDictionary[$"{ModKey}_IsFormatted"]);
+        }
+
+        internal static string MaxCraftLimitReachedFormat()
+        {
+            return Language.main.Get(LanguageDictionary[$"{ModKey}_MaxCraftLimitReachedFormat"]);
+        }
+
+        internal static string Filters()
+        {
+            return Language.main.Get(LanguageDictionary[$"{ModKey}_Filters"]);
+        }
+
+        internal static string Items()
+        {
+            return Language.main.Get(LanguageDictionary[$"{ModKey}_Items"]);
         }
     }
 }

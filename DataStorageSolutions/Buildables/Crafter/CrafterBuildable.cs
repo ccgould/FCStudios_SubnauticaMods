@@ -13,14 +13,14 @@ using SMLHelper.V2.Utility;
 using UnityEngine;
 
 
-namespace DataStorageSolutions.Buildables.Operator
+namespace DataStorageSolutions.Buildables.Crafter
 {
-    internal class OperatorBuildable : Buildable
+    internal class CrafterBuildable : Buildable
     {
         public override TechGroup GroupForPDA => TechGroup.Miscellaneous;
         public override TechCategory CategoryForPDA => TechCategory.Misc;
 
-        public OperatorBuildable() : base(Mod.OperatorClassID, Mod.OperatorFriendlyName, Mod.OperatorDescription)
+        public CrafterBuildable() : base(Mod.AutoCrafterClassID, Mod.AutoCrafterFriendlyName, Mod.AutoCrafterDescription)
         {
         }
 
@@ -28,10 +28,10 @@ namespace DataStorageSolutions.Buildables.Operator
         {
             try
             {
-                var prefab = GameObject.Instantiate(DSSModelPrefab.OperatorPrefab);
+                var prefab = GameObject.Instantiate(DSSModelPrefab.AutoCrafterPrefab);
 
-                var size = new Vector3(1.379526f, 1.795855f, 0.664604f);
-                var center = new Vector3(-4.833698e-25f, 0.9322873f, -0.03126571f);
+                var size = new Vector3(2.631166f, 2.490593f, 1.942391f);
+                var center = new Vector3(0.1266578f, 1.289964f, 0.02987039f);
                 GameObjectHelpers.AddConstructableBounds(prefab, size, center);
 
                 var model = prefab.FindChild("model");
@@ -62,7 +62,11 @@ namespace DataStorageSolutions.Buildables.Operator
                 prefabID.ClassId = ClassID;
 
                 prefab.AddComponent<TechTag>().type = TechType;
-                prefab.AddComponent<DSSOperatorController>();
+                prefab.AddComponent<DSSAutoCrafterController>();
+
+                //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
+                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModName);
+                MaterialHelpers.ApplyShaderToMaterial(prefab, "DSS_ConveyorBelt");
 
                 return prefab;
             }
@@ -85,7 +89,7 @@ namespace DataStorageSolutions.Buildables.Operator
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(Mod.OperatorKitClassID.ToTechType(),1)
+                    new Ingredient(Mod.AutoCrafterKitClassID.ToTechType(),1)
                 }
             };
             return customFabRecipe;
@@ -105,7 +109,7 @@ namespace DataStorageSolutions.Buildables.Operator
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(Mod.OperatorKitClassID.ToTechType(),1)
+                    new Ingredient(Mod.AutoCrafterKitClassID.ToTechType(),1)
                 }
             };
             return customFabRecipe;

@@ -272,7 +272,7 @@ namespace DataStorageSolutions.Mono
                 //_baseItemsGrid.ClearPage();
                 _objectPooler.Reset(0);
 
-                if (_currentBase == null) return;
+                if (_currentBase == null || _mono.Manager.BaseOperators.Count <= 0) return;
 
                 var grouped = _currentBase.StorageManager.GetItemsWithin().OrderBy(x => x.Key).ToList();
 

@@ -29,7 +29,8 @@ namespace DataStorageSolutions.Configuration
     {
         [JsonProperty] internal HashSet<ServerData> GlobalServers { get; set; }
         [JsonProperty] internal List<BaseSaveData> Bases { get; set; }
-        
+        [JsonProperty] internal Dictionary<string, FCSOperation> Operations { get; set; }
+
         [JsonProperty] internal List<SaveDataEntry> Entries = new List<SaveDataEntry>();
     }
 

@@ -10,6 +10,7 @@ using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Interfaces;
 using FCSCommon.Utilities;
+using FCSTechFabricator.Components;
 using FCSTechFabricator.Interfaces;
 using FCSTechFabricator.Objects;
 using ProtoBuf;
@@ -38,8 +39,14 @@ namespace DataStorageSolutions.Mono
         public bool IsFull => CheckIfFull();
         public TechType TechType => GetTechType();
         internal bool IsMounted => _slot != null;
+        public bool IsInitialized { get; set; }
+        public Action<DSSServerController, InventoryItem> OnAddItem;
+        public Action<DSSServerController, InventoryItem> OnRemoveItem;
+        public Action<FCSConnectableDevice, TechType> OnContainerAddItem { get; set; }
+        public Action<FCSConnectableDevice, TechType> OnContainerRemoveItem { get; set; }
         public DSSServerDisplay DisplayManager { get; private set; }
         Action<int, int> IFCSStorage.OnContainerUpdate { get; set; }
+
 
         private FCSFilteredStorage _fcsFilteredStorage;
         private byte[] _storageRootBytes;
@@ -54,6 +61,8 @@ namespace DataStorageSolutions.Mono
         private void OnDestroy()
         {
             BaseManager.UnRegisterServer(this);
+            _fcsFilteredStorage.GetContainer().onAddItem -= DSSServerController_onAddItem;
+            _fcsFilteredStorage.GetContainer().onRemoveItem -= DSSServerController_onRemoveItem;
         }
 
         private void Awake()
@@ -116,7 +125,9 @@ namespace DataStorageSolutions.Mono
             if (_fcsFilteredStorage == null && GetStorageRoot() != null)
             {
                 _fcsFilteredStorage = new FCSFilteredStorage();
-                _fcsFilteredStorage.Initialize(GetStorageRoot(), UpdateScreen, QPatch.Configuration.Config.ServerStorageLimit);
+                _fcsFilteredStorage.Initialize(null,GetStorageRoot(), UpdateScreen, QPatch.Configuration.Config.ServerStorageLimit);
+                _fcsFilteredStorage.GetContainer().onAddItem += DSSServerController_onAddItem;
+                _fcsFilteredStorage.GetContainer().onRemoveItem += DSSServerController_onRemoveItem;
             }
 
             if (DisplayManager == null)
@@ -130,6 +141,16 @@ namespace DataStorageSolutions.Mono
             IsInitialized = true;
         }
 
+        private void DSSServerController_onRemoveItem(InventoryItem item)
+        {
+            OnRemoveItem?.Invoke(this,item);
+        }
+
+        private void DSSServerController_onAddItem(InventoryItem item)
+        {
+            OnAddItem?.Invoke(this, item);
+        }
+
         private GameObject GetStorageRoot()
         {
             if (_storageRootGameObject == null)
@@ -140,8 +161,6 @@ namespace DataStorageSolutions.Mono
             return _storageRootGameObject;
 
         }
-
-        public bool IsInitialized { get; set; }
 
         internal int GetTotal()
         {
@@ -253,9 +272,12 @@ namespace DataStorageSolutions.Mono
         public void OnProtoDeserialize(ProtobufSerializer serializer)
         {
             QuickLogger.Info($"In ProtoDeserialize: {GetPrefabID()}");
-            ResetInventory();
-            _slotID = Mod.GetServerSaveData(_prefabId).SlotID;
-            StorageHelper.RestoreItems(serializer, Mod.GetServerSaveData(_prefabId).Bytes, _fcsFilteredStorage.GetContainer());
+            if (_fcsFilteredStorage  != null)
+            {
+                ResetInventory();
+                _slotID = Mod.GetServerSaveData(_prefabId).SlotID;
+                StorageHelper.RestoreItems(serializer, Mod.GetServerSaveData(_prefabId).Bytes, _fcsFilteredStorage.GetContainer());
+            }
         }
 
         private IEnumerator CleanUpDuplicatedStorage()
@@ -313,8 +335,10 @@ namespace DataStorageSolutions.Mono
         
         private void ResetInventory()
         {
+            var storageRoot = GetStorageRoot();
+            if (_fcsFilteredStorage == null || storageRoot == null) return;
             _fcsFilteredStorage.Clear();
-            StorageHelper.RenewIdentifier(GetStorageRoot());
+            StorageHelper.RenewIdentifier(storageRoot);
         }
 
         public int GetItemCount(TechType item)
