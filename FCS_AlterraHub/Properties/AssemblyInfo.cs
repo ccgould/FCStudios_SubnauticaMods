@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("FCSTechFabricator")]
-[assembly: AssemblyDescription("A mod from FCStudios that allowes you to build all kits and modules requires for FCStudios mods")]
+[assembly: AssemblyTitle("FCS AlterraHub")]
+[assembly: AssemblyDescription("A mod by Field Creators Studios that allows you to crafte and by FCS Products nd more")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("FCStudios")]
-[assembly: AssemblyProduct("FCSTechFabricator")]
-[assembly: AssemblyCopyright("Copyright © FCStudios 2020")]
+[assembly: AssemblyCompany("Field Creators Studios")]
+[assembly: AssemblyProduct("FCS_AlterraHub")]
+[assembly: AssemblyCopyright("Copyright ©FieldCreatorsStudios  2020")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("5ef4adb8-3ae7-41ec-83e1-1daf04999f0e")]
+[assembly: Guid("1a17b4ba-aae5-41c2-924a-ce05dc74efe8")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("2.0.10.15")]
-[assembly: AssemblyFileVersion("2.0.10.15")]
+[assembly: AssemblyVersion("1.0.0.218")]
+[assembly: AssemblyFileVersion("1.0.0.218")]

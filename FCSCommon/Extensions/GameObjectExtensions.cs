@@ -1,11 +1,12 @@
 ﻿
 using System;
+using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
 namespace FCSCommon.Extensions
 {
-    public static class GameObjectExtensions
+    internal static class GameObjectExtensions
     {
 
         public static string GetFoodValue(string itemLocation)
@@ -37,6 +38,16 @@ namespace FCSCommon.Extensions
             }
 
             return sb.ToString();
+        }
+
+        public static GameObject[] GetChildren(this GameObject go)
+        {
+            List<GameObject> children = new List<GameObject>();
+            foreach (Transform tran in go.transform)
+            {
+                children.Add(tran.gameObject);
+            }
+            return children.ToArray();
         }
     }
 }

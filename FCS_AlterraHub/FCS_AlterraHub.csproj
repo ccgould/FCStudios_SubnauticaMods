@@ -1,0 +1,160 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{1A17B4BA-AAE5-41C2-924A-CE05DC74EFE8}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>FCS_AlterraHub</RootNamespace>
+    <AssemblyName>FCS_AlterraHub</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <Game>$(Configuration.split(_)[0])</Game>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Subnautica_Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;SUBNAUTICA</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Subnautica_Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <DefineConstants>TRACE;SUBNAUTICA</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'BelowZero_Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;BELOWZERO</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'BelowZero_Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <DefineConstants>TRACE;BELOWZERO</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="0Harmony">
+      <HintPath>..\Dependancies\0Harmony.dll</HintPath>
+    </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>..\Dependancies\Subnautica\Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Assembly-CSharp-firstpass">
+      <HintPath>..\Dependancies\Subnautica\Assembly-CSharp-firstpass.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependancies\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="QModInstaller">
+      <HintPath>..\Dependancies\QModInstaller.dll</HintPath>
+    </Reference>
+    <Reference Include="SMLHelper">
+      <HintPath>..\Dependancies\Subnautica\SMLHelper.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="UnityEngine">
+      <HintPath>..\Dependancies\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AnimationModule">
+      <HintPath>..\Dependancies\UnityEngine.AnimationModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AssetBundleModule">
+      <HintPath>..\Dependancies\UnityEngine.AssetBundleModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>..\Dependancies\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.InputLegacyModule">
+      <HintPath>..\Dependancies\UnityEngine.InputLegacyModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.PhysicsModule">
+      <HintPath>..\Dependancies\UnityEngine.PhysicsModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>..\Dependancies\UnityEngine.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UIModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependancies\UnityEngine.UIModule.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="API\FCSAssetBundlesService.cs" />
+    <Compile Include="Buildables\AlterraHub.cs" />
+    <Compile Include="Buildables\AlterraHubAuxPatcher.cs" />
+    <Compile Include="Buildables\AlterraHubModelPrefab.cs" />
+    <Compile Include="Buildables\OreConsumer.cs" />
+    <Compile Include="Configuration\Config.cs" />
+    <Compile Include="Configuration\Mod.cs" />
+    <Compile Include="Configuration\SaveData.cs" />
+    <Compile Include="Enumerators\FCSGameMode.cs" />
+    <Compile Include="Enumerators\StoreCategory.cs" />
+    <Compile Include="Interfaces\IFCSStorage.cs" />
+    <Compile Include="Mono\AlterraHub\AccountPageHandler.cs" />
+    <Compile Include="Mono\AlterraHub\AlterraHubDisplay.cs" />
+    <Compile Include="Mono\AlterraHub\CartDropDownHandler.cs" />
+    <Compile Include="Mono\AlterraHub\CartItem.cs" />
+    <Compile Include="Mono\AlterraHub\CheckOutPopupDialogWindow.cs" />
+    <Compile Include="Mono\AlterraHub\PanelGroup.cs" />
+    <Compile Include="Mono\AlterraHub\PanelHelper.cs" />
+    <Compile Include="Mono\AlterraHub\StoreItem.cs" />
+    <Compile Include="Mono\AlterraHub\TabButton.cs" />
+    <Compile Include="Mono\AlterraHub\TabGroup.cs" />
+    <Compile Include="Mono\DumpContainer.cs" />
+    <Compile Include="Mono\OreConsumer\OreConsumerDisplay.cs" />
+    <Compile Include="Mono\OreConsumer\TransferHandler.cs" />
+    <Compile Include="Spawnables\BioFuelSpawnable.cs" />
+    <Compile Include="Enumerators\ModDifficultyMode.cs" />
+    <Compile Include="Helpers\PlayerInteractionHelper.cs" />
+    <Compile Include="Mono\AlterraHub\AlterraHubController.cs" />
+    <Compile Include="Mono\FcsCard.cs" />
+    <Compile Include="Mono\FCSDevice.cs" />
+    <Compile Include="Mono\FCSGameLoadUtil.cs" />
+    <Compile Include="Mono\OreConsumer\OreConsumerController.cs" />
+    <Compile Include="QPatch.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Registration\FCSAlterraHubService.cs" />
+    <Compile Include="Spawnables\DebitCardSpawnable.cs" />
+    <Compile Include="Spawnables\FCSKit.cs" />
+    <Compile Include="Structs\CustomStoreItem.cs" />
+    <Compile Include="Systems\CardSystem.cs" />
+    <Compile Include="Systems\MessageBoxHandler.cs" />
+    <Compile Include="Systems\StoreInventorySystem.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\FCSCommon\GamePaths.targets" />
+  <PropertyGroup Condition="$(Game) == 'Subnautica'">
+    <PostBuildEvent>xcopy "$(ProjectDir)bin\$(Configuration)\FCS_AlterraHub.dll" "$(SubnauticaDir)\QMods\FCS_AlterraHub\" /Y /I</PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup Condition="$(Game) == 'BelowZero'">
+    <PostBuildEvent>xcopy "$(ProjectDir)bin\$(Configuration)\FCS_AlterraHub.dll" "$(BelowZeroDir)\QMods\FCS_AlterraHub\" /Y /I</PostBuildEvent>
+  </PropertyGroup>
+</Project>

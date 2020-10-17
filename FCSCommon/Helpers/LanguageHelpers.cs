@@ -6,5 +6,10 @@
         {
             return Language.main.Get(key);
         }
+
+        internal static string GetLanguage(TechType techType)
+        {
+            return Language.main.Get(techType);
+        }
     }
 }

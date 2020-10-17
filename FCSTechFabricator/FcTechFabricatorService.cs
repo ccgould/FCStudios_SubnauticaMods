@@ -107,8 +107,6 @@ namespace FCSTechFabricator
             {
                 device.UnitID=knownDevices[prefabID];
             }
-
-
         }
 
         void IFcTechFabricatorServiceInternal.PatchFabricator()

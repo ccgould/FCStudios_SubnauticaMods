@@ -2,7 +2,6 @@
 using FCSCommon.Components;
 using FCSCommon.Enums;
 using FCSCommon.Utilities;
-using FCSTechFabricator;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -174,11 +173,6 @@ namespace FCSCommon.Helpers
 
             gameObject = result;
             return true;
-        }
-
-        internal static Sprite GetBundleIcon(string name)
-        {
-            return FcAssetBundlesService.PublicAPI.GetIconByName(name);
         }
     }
 }
