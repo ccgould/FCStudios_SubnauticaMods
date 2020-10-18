@@ -4,13 +4,11 @@ using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Craftables;
 using FCS_AlterraHub.Enumerators;
-using FCS_AlterraHub.Mono.AlterraHub;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Spawnables;
-using FCS_AlterraHub.Structs;
-using FCS_AlterraHub.Systems;
 using FCSCommon.Extensions;
 using FCSCommon.Utilities;
+using HarmonyLib;
 using QModManager.API.ModLoading;
 using SMLHelper.V2.Handlers;
 using UnityEngine;
@@ -46,6 +44,9 @@ namespace FCS_AlterraHub
 
             //CreatKitEntries
             CreateKits();
+
+            var harmony = new Harmony("com.alterrahub.fcstudios");
+            harmony.PatchAll(Assembly.GetExecutingAssembly());
         }
 
 

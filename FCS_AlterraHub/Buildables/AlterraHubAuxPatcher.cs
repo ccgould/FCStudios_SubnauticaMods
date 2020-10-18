@@ -40,6 +40,7 @@ namespace FCS_AlterraHub.Buildables
             { $"{ModKey}_PINPlaceHolder", "Enter pin number..."},
             { $"{ModKey}_AccountCreated", "Thank you for registering for an Alterra Bank Account your current balance is {0}"},
             { $"{ModKey}_NoCardInventory", "Error: No debit card detected. You are to far away or there is no card in your inventory"},
+            { $"{ModKey}_AccountSetupError", "[Error] Please refill the following fields and press enter in the field to continue: {0}"},
             
         };
 
@@ -209,6 +210,11 @@ namespace FCS_AlterraHub.Buildables
         public static string CardNotDetected()
         {
             return GetLanguage($"{ModKey}_NoCardInventory");
+        }
+
+        public static string AccountSetupError(string value)
+        {
+            return string.Format(GetLanguage($"{ModKey}_AccountSetupError"),value);
         }
     }
 }

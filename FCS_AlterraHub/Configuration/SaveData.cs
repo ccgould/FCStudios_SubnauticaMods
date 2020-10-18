@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Mono.AlterraHub;
 using FCS_AlterraHub.Systems;
 using Oculus.Newtonsoft.Json;
@@ -10,6 +9,7 @@ namespace FCS_AlterraHub.Configuration
     [Serializable]
     internal class OreConsumerDataEntry
     {
+        [JsonProperty] internal float RPM;
         [JsonProperty] internal string Id { get; set; }
         [JsonProperty(PropertyName = "OC")] internal float OreConsumerCash { get; set; }
     }

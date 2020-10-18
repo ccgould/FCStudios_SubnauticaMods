@@ -4,13 +4,11 @@ using System.Linq;
 using System.Text;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
-using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Helpers;
 using FCSCommon.Extensions;
 using FCSCommon.Utilities;
 using Oculus.Newtonsoft.Json;
 using UnityEngine;
-using UnityEngine.Events;
 using Random = System.Random;
 
 
@@ -101,19 +99,13 @@ namespace FCS_AlterraHub.Systems
         /// <param name="amount">The amount of credit to add to the account.</param>
         /// <param name="callBack">Callback method to call in-case of error</param>
         /// <returns>Boolean on success</returns>
-        internal bool AddFinances(string cardNumber, float amount)
+        internal bool AddFinances(float amount)
         {
             try
             {
-                if (AccountDetails.KnownCardNumbers.ContainsValue(cardNumber))
-                {
-                    AccountDetails.Balance += amount;
-                    onBalanceUpdated?.Invoke(AccountDetails.Balance);
-                    return true;
-                }
-
-                MessageBoxHandler.main.Show(string.Format(AlterraHub.CardNotInSystemAddingBalanceFormat(), cardNumber, amount));
-                return false;
+                AccountDetails.Balance += amount;
+                onBalanceUpdated?.Invoke(AccountDetails.Balance);
+                QuickLogger.ModMessage($"Added {amount} to account new balance is {AccountDetails.Balance}");
             }
             catch (Exception e)
             {
@@ -121,6 +113,7 @@ namespace FCS_AlterraHub.Systems
                 MessageBoxHandler.main.Show(AlterraHub.ErrorHasOccured());
                 return false;
             }
+            return true;
         }
 
         /// <summary>
@@ -240,13 +233,45 @@ namespace FCS_AlterraHub.Systems
 
             CalculateBalance();
 
-            MessageBoxHandler.main.Show(AlterraHub.AccountCreated());
+            if (HasBeenRegistered())
+            {
+                MessageBoxHandler.main.Show(AlterraHub.AccountCreated());
+                var newCard = Mod.DebitCardTechType.ToInventoryItem();
+                GenerateNewCard(newCard.item.gameObject.GetComponent<PrefabIdentifier>().Id);
+                PlayerInteractionHelper.GivePlayerItem(newCard);
+            }
+            else
+            {
+                var sb = new StringBuilder();
+                if (string.IsNullOrWhiteSpace(fullName))
+                {
+                    sb.Append(AlterraHub.FullName());
+                    sb.Append(",");
+                }
 
-            var newCard = Mod.DebitCardTechType.ToInventoryItem();
-            GenerateNewCard(newCard.item.gameObject.GetComponent<PrefabIdentifier>().Id);
-            PlayerInteractionHelper.GivePlayerItem(newCard);
+                if (string.IsNullOrWhiteSpace(userName))
+                {
+                    sb.Append(AlterraHub.UserName());
+                    sb.Append(",");
+                }
 
+                if (string.IsNullOrWhiteSpace(password))
+                {
+                    sb.Append(AlterraHub.Password());
+                    sb.Append(",");
+                }
+
+                if (string.IsNullOrWhiteSpace(pin))
+                {
+                    sb.Append(AlterraHub.PIN());
+                    sb.Append(",");
+                }
+                
+                MessageBoxHandler.main.Show(AlterraHub.AccountSetupError(sb.ToString()));
+
+            }
         }
+
 
         internal void CalculateBalance()
         {

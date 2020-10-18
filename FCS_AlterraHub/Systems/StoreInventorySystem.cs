@@ -15,7 +15,7 @@ namespace FCS_AlterraHub.Systems
     internal static class StoreInventorySystem
     {
         private const float PlayerPaymentPercentage = .5f;
-        private static Dictionary<TechType, StoreItem> _knownPrices = new Dictionary<TechType, StoreItem>();
+        private static Dictionary<TechType, float> _knownPrices = new Dictionary<TechType, float>();
 
         private static Dictionary<TechType, float> _orePrices = new Dictionary<TechType, float>
         {
@@ -39,7 +39,7 @@ namespace FCS_AlterraHub.Systems
             //Price will be calculated by the ingredients of an item if an ingredient is unknown it will apply a default value to that item
             if (_knownPrices.ContainsKey(techType))
             {
-                return _knownPrices[techType].GetPrice();
+                return _knownPrices[techType];
             }
 
             return 0f;
@@ -56,20 +56,22 @@ namespace FCS_AlterraHub.Systems
             return 0f;
         }
 
-        internal static GameObject AddNewStoreItem(TechType techType,TechType receiveTechType, StoreCategory category, float cost, Action<TechType,TechType> addItemCallBack)
+        internal static void AddNewStoreItem(TechType techType, float cost)
         {
             if (!_knownPrices.ContainsKey(techType))
             {
-                var item = GameObject.Instantiate(AlterraHub.ItemPrefab);
-                var storeItem = item.AddComponent<StoreItem>();
-                storeItem.Initialize(Language.main.Get(techType),techType,receiveTechType,cost,addItemCallBack,category);
-                _knownPrices.Add(techType,storeItem);
-                return item;
+                _knownPrices.Add(techType,cost);
             }
-
-            return _knownPrices[techType].gameObject;
         }
-        
+
+        internal static GameObject CreateStoreItem(TechType techType, TechType receiveTechType, StoreCategory category, float cost, Action<TechType, TechType> addItemCallBack)
+        {
+            var item = GameObject.Instantiate(AlterraHub.ItemPrefab);
+            var storeItem = item.AddComponent<StoreItem>();
+            storeItem.Initialize(LanguageHelpers.GetLanguage(techType), techType, receiveTechType, cost, addItemCallBack, category);
+            return item;
+        }
+
         internal static float CalculateCost(int multiplyer, TechType techType)
         {
             return multiplyer * GetPrice(techType);
@@ -84,7 +86,7 @@ namespace FCS_AlterraHub.Systems
             }
 
             var getItemPrice = GetPrice(item.item.GetTechType());
-            CardSystem.main.AddFinances(cardNumber, getItemPrice);
+            CardSystem.main.AddFinances(getItemPrice);
             return true;
 
         }

@@ -19,10 +19,11 @@ namespace FCS_AlterraHub.Mono.AlterraHub
         private Text _newBalance;
         public CartDropDownHandler _cart;
         public UnityEvent onCheckOutPopupDialogClosed  = new UnityEvent();
-        private bool _cardLoaded;
+
         private string _cardNumber;
         private bool _isInitialized;
         private AlterraHubController _mono;
+        private bool _cardLoaded;
         private AccountDetails cards => CardSystem.main.AccountDetails;
 
         public int GetContainerFreeSpace => 0;
@@ -62,19 +63,16 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             var purchaseBTN = GameObjectHelpers.FindGameObject(gameObject, "PurchaseBTN").GetComponent<Button>();
             purchaseBTN.onClick.AddListener(() =>
             {
-                if (_cardLoaded)
+                if (CardSystem.main.HasEnough(_cart.GetTotal()))
                 {
-                    if (CardSystem.main.HasEnough( _cart.GetTotal()))
+                    var result = _mono.MakeAPurchase(_cart);
+                    if (result)
                     {
-                        var result = _mono.MakeAPurchase(_cart);
-                        if (result)
-                        {
-                            _cart.TransactionComplete();
-                            HideDialog();
-                        }
-
-                        return;
+                        _cart.TransactionComplete();
+                        HideDialog();
                     }
+
+                    return;
                 }
 
                 MessageBoxHandler.main.Show(Buildables.AlterraHub.NoValidCardForPurchase());
@@ -138,6 +136,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             return techType == Mod.DebitCardTechType;
         }
 
+        [Obsolete("This method is not in use and can be deleted",true)]
         public bool AddItemToContainer(InventoryItem item)
         {
             _cardNumber = item.item.gameObject.GetComponent<FcsCard>().GetCardNumber();

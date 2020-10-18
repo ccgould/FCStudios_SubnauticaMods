@@ -25,6 +25,8 @@ namespace FCS_AlterraHub.Mono.AlterraHub
         private Text _accountBalance;
         private InputField _paymentInput;
         private Text _debitBalance;
+        private Text _userNameLBL;
+        private GameObject _createAccountDialog;
 
         internal AccountPageHandler(AlterraHubController mono)
         {
@@ -35,6 +37,8 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             GameObjectHelpers.FindGameObject(accountPage, "PageTitle").GetComponentInChildren<Text>().text = Buildables.AlterraHub.Account();
             
             _accountCreation = GameObjectHelpers.FindGameObject(accountPage, "AccountCreation");
+
+            _createAccountDialog = GameObjectHelpers.FindGameObject(mono.gameObject, "CreateAccountDialog");
 
             _noCardScreen = GameObjectHelpers.FindGameObject(accountPage, "NoCardScreen");
 
@@ -86,15 +90,25 @@ namespace FCS_AlterraHub.Mono.AlterraHub
                 SwitchToCorrectPage();
             };
 
-            SetupFullTitle(accountPage);
+            SetupFullTitle(_createAccountDialog);
 
-            SetupUserField(accountPage);
+            SetupUserField(_createAccountDialog);
 
-            SetupPasswordField(accountPage);
+            SetupPasswordField(_createAccountDialog);
 
-            SetupPINField(accountPage);
+            SetupPINField(_createAccountDialog);
 
-            SetupSubmitButton();
+            SetupApplyButton();
+
+            var createBTN = _createAccountDialog.GetComponentInChildren<Button>();
+            createBTN.onClick.AddListener(() =>
+            {
+                CardSystem.main.CreateUserAccount(_fullName, _userName, _password, _pin);
+                _userNameLBL.text = CardSystem.main.GetUserName();
+                SwitchToCorrectPage();
+                _createAccountDialog.SetActive(false);
+            });
+            
 
             CreateWelcomePage(accountPage);
             
@@ -119,57 +133,57 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             _debitBalance.text = Buildables.AlterraHub.DebitBalanceFormat(0);
         }
 
-        private void SetupSubmitButton()
+        private void SetupApplyButton()
         {
             var button = _accountCreation.GetComponentInChildren<Button>();
             button.onClick.AddListener((() =>
             {
-                CardSystem.main.CreateUserAccount(_fullName, _userName, _password, _pin);
-                SwitchToCorrectPage();
+                _createAccountDialog.SetActive(true);
             }));
         }
 
-        private void SetupFullTitle(GameObject accountPage)
+        private void SetupFullTitle(GameObject dialog)
         {
-            GameObjectHelpers.FindGameObject(accountPage, "FullNameTitle").GetComponentInChildren<Text>().text =
+            GameObjectHelpers.FindGameObject(dialog, "FullNameTitle").GetComponentInChildren<Text>().text =
                 Buildables.AlterraHub.FullName();
-            var fullNameInputField = GameObjectHelpers.FindGameObject(accountPage, "FullNameInputField")
+            var fullNameInputField = GameObjectHelpers.FindGameObject(dialog, "FullNameInputField")
                 .GetComponentInChildren<InputField>();
+
             fullNameInputField.onEndEdit.AddListener((value => { _fullName = value; }));
-            GameObjectHelpers.FindGameObject(accountPage, "FullNamePlaceholder").GetComponentInChildren<Text>().text =
+            GameObjectHelpers.FindGameObject(dialog, "FullNamePlaceholder").GetComponentInChildren<Text>().text =
                 Buildables.AlterraHub.FullNamePlaceholder();
         }
 
-        private void SetupUserField(GameObject accountPage)
+        private void SetupUserField(GameObject dialog)
         {
-            var userNameInputField = GameObjectHelpers.FindGameObject(accountPage, "UserNameInputField")
+            var userNameInputField = GameObjectHelpers.FindGameObject(dialog, "UserNameInputField")
                 .GetComponentInChildren<InputField>();
             userNameInputField.onEndEdit.AddListener((value => { _userName = value; }));
-            GameObjectHelpers.FindGameObject(accountPage, "UserNamePlaceholder").GetComponentInChildren<Text>().text =
+            GameObjectHelpers.FindGameObject(dialog, "UserNamePlaceholder").GetComponentInChildren<Text>().text =
                 Buildables.AlterraHub.UserNamePlaceholder();
-            GameObjectHelpers.FindGameObject(accountPage, "UserNameTitle").GetComponentInChildren<Text>().text =
+            GameObjectHelpers.FindGameObject(dialog, "UserNameTitle").GetComponentInChildren<Text>().text =
                 Buildables.AlterraHub.UserName();
         }
 
-        private void SetupPasswordField(GameObject accountPage)
+        private void SetupPasswordField(GameObject dialog)
         {
-            var passwordInputField = GameObjectHelpers.FindGameObject(accountPage, "PasswordInputField")
+            var passwordInputField = GameObjectHelpers.FindGameObject(dialog, "PasswordInputField")
                 .GetComponentInChildren<InputField>();
             passwordInputField.onEndEdit.AddListener((value => { _password = value; }));
-            GameObjectHelpers.FindGameObject(accountPage, "PasswordPlaceholder").GetComponentInChildren<Text>().text =
+            GameObjectHelpers.FindGameObject(dialog, "PasswordPlaceholder").GetComponentInChildren<Text>().text =
                 Buildables.AlterraHub.PasswordPlaceholder();
-            GameObjectHelpers.FindGameObject(accountPage, "PasswordTitle").GetComponentInChildren<Text>().text =
+            GameObjectHelpers.FindGameObject(dialog, "PasswordTitle").GetComponentInChildren<Text>().text =
                 Buildables.AlterraHub.Password();
         }
 
-        private void SetupPINField(GameObject accountPage)
+        private void SetupPINField(GameObject dialog)
         {
-            var pinInputField = GameObjectHelpers.FindGameObject(accountPage, "PINInputField")
+            var pinInputField = GameObjectHelpers.FindGameObject(dialog, "PINInputField")
                 .GetComponentInChildren<InputField>();
             pinInputField.onEndEdit.AddListener((value => { _pin = value; }));
-            GameObjectHelpers.FindGameObject(accountPage, "PINPlaceholder").GetComponentInChildren<Text>().text =
+            GameObjectHelpers.FindGameObject(dialog, "PINPlaceholder").GetComponentInChildren<Text>().text =
                 Buildables.AlterraHub.PINPlaceholder();
-            GameObjectHelpers.FindGameObject(accountPage, "PINTitle").GetComponentInChildren<Text>().text =
+            GameObjectHelpers.FindGameObject(dialog, "PINTitle").GetComponentInChildren<Text>().text =
                 Buildables.AlterraHub.PIN();
         }
 
@@ -207,10 +221,10 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             _welcomeScreen = GameObjectHelpers.FindGameObject(accountPage, "Welcome Screen");
             GameObjectHelpers.FindGameObject(_welcomeScreen, "MessageLBL").GetComponentInChildren<Text>().text =
                 Buildables.AlterraHub.WelcomeBack();
-            
-            
 
-            GameObjectHelpers.FindGameObject(_welcomeScreen, "UserName").GetComponentInChildren<Text>().text = CardSystem.main.GetUserName();
+
+            _userNameLBL = GameObjectHelpers.FindGameObject(_welcomeScreen, "UserName").GetComponentInChildren<Text>();
+            _userNameLBL.text = CardSystem.main.GetUserName();
 
             var requestButton = _noCardScreen.GetComponentInChildren<Button>();
 

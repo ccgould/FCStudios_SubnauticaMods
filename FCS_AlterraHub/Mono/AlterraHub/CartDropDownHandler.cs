@@ -21,7 +21,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
 
         internal void Initialize()
         {
-            _cartList = GameObjectHelpers.FindGameObject(gameObject, "Content");
+            _cartList = GameObjectHelpers.FindGameObject(gameObject, "CartDropDownContent");
             _totalAmount = GameObjectHelpers.FindGameObject(gameObject, "TotalAmount").GetComponent<Text>();
             ResetDropDown();
 

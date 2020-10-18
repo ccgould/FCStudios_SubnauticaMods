@@ -9,6 +9,7 @@ using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace FCS_AlterraHub.Mono.AlterraHub
 {
@@ -72,6 +73,15 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.ModID);
 
             LoadStore();
+
+            var inputField = gameObject.GetComponentsInChildren<InputField>(true);
+            if (inputField != null && inputField.Length > 0)
+            {
+                foreach (InputField field in inputField)
+                {
+                    field.gameObject.AddComponent<CustomInputField>();
+                }
+            }
 
             IsInitialized = true;
         }
@@ -185,8 +195,8 @@ namespace FCS_AlterraHub.Mono.AlterraHub
                     if (panelHelper.StoreCategory == storeItem.Value.StoreCategory)
                     {
                         var item = storeItem.Value;
-                        var storeItemGo = StoreInventorySystem.AddNewStoreItem(item.TechType,item.ReceiveTechType,item.StoreCategory,item.Cost,AddToCardCallBack);
-                        panelHelper.AddContent(storeItemGo);
+                        StoreInventorySystem.AddNewStoreItem(item.TechType,item.Cost);
+                        panelHelper.AddContent(StoreInventorySystem.CreateStoreItem(item.TechType, item.ReceiveTechType, item.StoreCategory, item.Cost, AddToCardCallBack));
                     }
                 }
 
@@ -195,10 +205,8 @@ namespace FCS_AlterraHub.Mono.AlterraHub
                     if (panelHelper.StoreCategory == customStoreItem.Category)
                     {
                         QuickLogger.Info($"Item: {customStoreItem.TechType} || Category: {customStoreItem.Category} || Cost: {customStoreItem.Cost}");
-                        var storeItemGo = StoreInventorySystem.AddNewStoreItem(customStoreItem.TechType,
-                            customStoreItem.ReturnItemTechType,
-                            customStoreItem.Category, customStoreItem.Cost, AddToCardCallBack);
-                        panelHelper.AddContent(storeItemGo);
+                        StoreInventorySystem.AddNewStoreItem(customStoreItem.TechType, customStoreItem.Cost);
+                        panelHelper.AddContent(StoreInventorySystem.CreateStoreItem(customStoreItem.TechType, customStoreItem.ReturnItemTechType, customStoreItem.Category, customStoreItem.Cost, AddToCardCallBack));
                     }
                 }
 
@@ -262,7 +270,6 @@ namespace FCS_AlterraHub.Mono.AlterraHub
 
         private void OnTriggerStay(Collider collider)
         {
-            QuickLogger.Debug("OnTriggerStay");
             if (collider.gameObject.layer != 19 || IsPlayerInRange) return;
             onTriggered?.Invoke(true);
             IsPlayerInRange = true;

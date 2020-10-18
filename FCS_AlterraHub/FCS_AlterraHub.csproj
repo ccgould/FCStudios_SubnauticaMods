@@ -90,6 +90,10 @@
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\Dependancies\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.IMGUIModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>F:\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.InputLegacyModule">
       <HintPath>..\Dependancies\UnityEngine.InputLegacyModule.dll</HintPath>
     </Reference>
@@ -113,6 +117,8 @@
     <Compile Include="Configuration\Config.cs" />
     <Compile Include="Configuration\Mod.cs" />
     <Compile Include="Configuration\SaveData.cs" />
+    <Compile Include="Debug\DebugCommand.cs" />
+    <Compile Include="Debug\DebugController.cs" />
     <Compile Include="Enumerators\FCSGameMode.cs" />
     <Compile Include="Enumerators\StoreCategory.cs" />
     <Compile Include="Interfaces\IFCSStorage.cs" />
@@ -123,12 +129,16 @@
     <Compile Include="Mono\AlterraHub\CheckOutPopupDialogWindow.cs" />
     <Compile Include="Mono\AlterraHub\PanelGroup.cs" />
     <Compile Include="Mono\AlterraHub\PanelHelper.cs" />
+    <Compile Include="Mono\CustomInputField.cs" />
     <Compile Include="Mono\AlterraHub\StoreItem.cs" />
     <Compile Include="Mono\AlterraHub\TabButton.cs" />
     <Compile Include="Mono\AlterraHub\TabGroup.cs" />
     <Compile Include="Mono\DumpContainer.cs" />
+    <Compile Include="Mono\OreConsumer\EffectsManager.cs" />
+    <Compile Include="Mono\OreConsumer\MotorHandler.cs" />
     <Compile Include="Mono\OreConsumer\OreConsumerDisplay.cs" />
     <Compile Include="Mono\OreConsumer\TransferHandler.cs" />
+    <Compile Include="Patch\Player_Patches.cs" />
     <Compile Include="Spawnables\BioFuelSpawnable.cs" />
     <Compile Include="Enumerators\ModDifficultyMode.cs" />
     <Compile Include="Helpers\PlayerInteractionHelper.cs" />
@@ -147,7 +157,9 @@
     <Compile Include="Systems\MessageBoxHandler.cs" />
     <Compile Include="Systems\StoreInventorySystem.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Model\" />
+  </ItemGroup>
   <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\FCSCommon\GamePaths.targets" />

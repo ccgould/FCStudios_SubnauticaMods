@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Systems;
+using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 
 namespace FCS_AlterraHub.Mono.OreConsumer
@@ -22,6 +23,8 @@ namespace FCS_AlterraHub.Mono.OreConsumer
         public bool IsOperational { get; set; }
         public OreConsumerDisplay DisplayManager { get; private set; }
         public TransferHandler TransferHandler { get; private set; }
+        public MotorHandler MotorHandler { get; private set; }
+        public EffectsManager EffectsManager { get; private set; }
 
         #region Unity Methods
 
@@ -57,6 +60,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
                     }
 
                     AppendMoney(_savedData.OreConsumerCash);
+                    MotorHandler.SpeedByPass(_savedData.RPM);
                 }
 
                 _runStartUpOnEnable = false;
@@ -101,10 +105,41 @@ namespace FCS_AlterraHub.Mono.OreConsumer
                     TransferHandler.OpenStorage(WithDrawMoney);
                 });
             }
+
+            if (MotorHandler == null)
+            {
+                MotorHandler = GameObjectHelpers.FindGameObject(gameObject, "core_anim").AddComponent<MotorHandler>();
+                MotorHandler.Initialize(300);
+                //TODO Control motor based off power handler
+                MotorHandler.Start();
+            }
+
+            if (EffectsManager == null)
+            {
+                EffectsManager = gameObject.AddComponent<EffectsManager>();
+                EffectsManager.Initialize(IsUnderWater());
+                //TODO Control effect based off power handler
+                EffectsManager.ShowEffect();
+            }
+
 #if DEBUG
             QuickLogger.Debug($"Initialized Ore Consumer {GetPrefabID()}");
 #endif
             IsInitialized = true;
+        }
+
+        private bool IsUnderWater()
+        {
+            return GetDepth() >= 7.0f;
+        }
+
+        internal float GetDepth()
+        {
+#if SUBNAUTICA
+            return gameObject == null ? 0f : Ocean.main.GetDepthOf(gameObject);
+#elif BELOWZERO
+            return gameObject == null ? 0f : Ocean.GetDepthOf(gameObject);
+#endif
         }
 
         public override void OnProtoSerialize(ProtobufSerializer serializer)
@@ -194,7 +229,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
         {
             if (CardSystem.main.CardExist(cardNumber))
             {
-                CardSystem.main.AddFinances(cardNumber, _balance);
+                CardSystem.main.AddFinances(_balance);
                 EmptyBalance();
                 return;
             }
@@ -207,13 +242,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
             _balance = 0f;
             DisplayManager.onTotalChanged?.Invoke(_balance);
         }
-
-        private void messageCallBack(string obj)
-        {
-            //TODO show message
-            QuickLogger.Debug(obj);
-        }
-
+        
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
         {
             return CanBeStored(0, pickupable.GetTechType());
@@ -251,6 +280,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
 
             _savedData.Id = GetPrefabID();
             _savedData.OreConsumerCash = _balance;
+            _savedData.RPM = MotorHandler.GetRPM();
             QuickLogger.Debug($"Saving ID {_savedData.Id}", true);
 
             //_savedData.BodyColor = ColorManager.GetMaskColor().ColorToVector4();
