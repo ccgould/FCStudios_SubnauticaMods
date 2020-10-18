@@ -134,6 +134,7 @@
     <Compile Include="Mono\AlterraHub\TabButton.cs" />
     <Compile Include="Mono\AlterraHub\TabGroup.cs" />
     <Compile Include="Mono\DumpContainer.cs" />
+    <Compile Include="Mono\OreConsumer\AudioManager.cs" />
     <Compile Include="Mono\OreConsumer\EffectsManager.cs" />
     <Compile Include="Mono\OreConsumer\MotorHandler.cs" />
     <Compile Include="Mono\OreConsumer\OreConsumerDisplay.cs" />

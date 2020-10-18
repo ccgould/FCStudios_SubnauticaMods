@@ -1,6 +1,7 @@
 ﻿using System;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Mono.OreConsumer;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Structs;
 using FCS_AlterraHub.Systems;
@@ -22,7 +23,8 @@ namespace FCS_AlterraHub.Mono.AlterraHub
 
         internal HubTrigger AlterraHubTrigger { get; set; }
         internal AlterraHubDisplay DisplayManager { get; private set; }
-        
+        public MotorHandler MotorHandler { get; private set; }
+
         #region Unity Methods
 
         private void OnEnable()
@@ -69,7 +71,15 @@ namespace FCS_AlterraHub.Mono.AlterraHub
                 DisplayManager = gameObject.AddComponent<AlterraHubDisplay>();
                 DisplayManager.Setup(this);
             }
-            
+
+            if (MotorHandler == null)
+            {
+                MotorHandler = GameObjectHelpers.FindGameObject(gameObject, "RoundSignDisplay01").AddComponent<MotorHandler>();
+                MotorHandler.Initialize(30);
+                //TODO Control motor based off power handler
+                MotorHandler.Start();
+            }
+
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.ModID);
 
             LoadStore();

@@ -26,6 +26,17 @@ namespace FCS_AlterraHub.Configuration
         [Choice("Mode Game Mode"), OnChange(nameof(ChangeGameModeEvent))]
         public FCSGameMode GameModeOption { get; set; }
 
+        [Toggle("Play Sound Effects"), OnChange(nameof(PlaySoundToggleEvent))]
+        public bool PlaySFX = true;
+
+        private void PlaySoundToggleEvent(ToggleChangedEventArgs e)
+        {
+            OnPlaySoundToggleEvent?.Invoke(e.Value);
+        }
+
+        [JsonIgnore]
+        internal Action<bool> OnPlaySoundToggleEvent { get; set; }
+
         private void ChangeGameModeEvent(ChoiceChangedEventArgs e)
         {
             onGameModeChanged?.Invoke(e.Index);

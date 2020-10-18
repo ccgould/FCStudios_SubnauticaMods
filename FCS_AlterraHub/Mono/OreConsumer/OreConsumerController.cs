@@ -25,6 +25,8 @@ namespace FCS_AlterraHub.Mono.OreConsumer
         public TransferHandler TransferHandler { get; private set; }
         public MotorHandler MotorHandler { get; private set; }
         public EffectsManager EffectsManager { get; private set; }
+        public AudioManager AudioManager { get; private set; }
+        public Action<bool> onUpdateSound { get; private set; }
 
         #region Unity Methods
 
@@ -109,7 +111,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
             if (MotorHandler == null)
             {
                 MotorHandler = GameObjectHelpers.FindGameObject(gameObject, "core_anim").AddComponent<MotorHandler>();
-                MotorHandler.Initialize(300);
+                MotorHandler.Initialize(30);
                 //TODO Control motor based off power handler
                 MotorHandler.Start();
             }
@@ -121,6 +123,26 @@ namespace FCS_AlterraHub.Mono.OreConsumer
                 //TODO Control effect based off power handler
                 EffectsManager.ShowEffect();
             }
+
+            if(AudioManager == null)
+            {
+                AudioManager = new AudioManager(gameObject.EnsureComponent<FMOD_CustomLoopingEmitter>());
+                AudioManager.PlayMachineAudio();
+            }
+
+            QPatch.Configuration.OnPlaySoundToggleEvent += value => { onUpdateSound?.Invoke(value); };
+
+            onUpdateSound += value =>
+            {
+                if(value)
+                {
+                    AudioManager.PlayMachineAudio();
+                }
+                else
+                {
+                    AudioManager.StopMachineAudio();
+                }
+            };
 
 #if DEBUG
             QuickLogger.Debug($"Initialized Ore Consumer {GetPrefabID()}");
