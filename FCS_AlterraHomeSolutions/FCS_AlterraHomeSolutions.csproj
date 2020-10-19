@@ -7,50 +7,50 @@
     <ProjectGuid>{7317FEE1-C0B2-443E-AB9D-3F656B6C766A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FCS_HomeSolutions</RootNamespace>
-    <AssemblyName>FCS_HomeSolutions</AssemblyName>
+    <RootNamespace>FCS_AlterraHomeSolutions</RootNamespace>
+    <AssemblyName>FCS_AlterraHomeSolutions</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <Game>$(Configuration.split(_)[0])</Game>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <TargetFrameworkProfile />
   </PropertyGroup>
-<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Subnautica_Debug|AnyCPU' ">
-  <DebugSymbols>true</DebugSymbols>
-  <DebugType>full</DebugType>
-  <Optimize>false</Optimize>
-  <OutputPath>bin\$(Configuration)\</OutputPath>
-  <DefineConstants>DEBUG;TRACE;SUBNAUTICA</DefineConstants>
-  <ErrorReport>prompt</ErrorReport>
-  <WarningLevel>4</WarningLevel>
-  <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
-</PropertyGroup>
-<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Subnautica_Release|AnyCPU' ">
-  <DebugType>none</DebugType>
-  <Optimize>true</Optimize>
-  <OutputPath>bin\$(Configuration)\</OutputPath>
-  <DefineConstants>TRACE;SUBNAUTICA</DefineConstants>
-  <ErrorReport>prompt</ErrorReport>
-  <WarningLevel>4</WarningLevel>
-  <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
-</PropertyGroup>
-<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'BelowZero_Debug|AnyCPU' ">
-  <DebugSymbols>true</DebugSymbols>
-  <DebugType>full</DebugType>
-  <Optimize>false</Optimize>
-  <OutputPath>bin\$(Configuration)\</OutputPath>
-  <DefineConstants>DEBUG;TRACE;BELOWZERO</DefineConstants>
-  <ErrorReport>prompt</ErrorReport>
-  <WarningLevel>4</WarningLevel>
-</PropertyGroup>
-<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'BelowZero_Release|AnyCPU' ">
-  <DebugType>none</DebugType>
-  <Optimize>true</Optimize>
-  <OutputPath>bin\$(Configuration)\</OutputPath>
-  <DefineConstants>TRACE;BELOWZERO</DefineConstants>
-  <ErrorReport>prompt</ErrorReport>
-  <WarningLevel>4</WarningLevel>
-</PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Subnautica_Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;SUBNAUTICA</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Subnautica_Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <DefineConstants>TRACE;SUBNAUTICA</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'BelowZero_Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;BELOWZERO</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'BelowZero_Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <DefineConstants>TRACE;BELOWZERO</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="0Harmony">
       <HintPath>..\Dependancies\0Harmony.dll</HintPath>

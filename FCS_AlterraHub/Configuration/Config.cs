@@ -21,7 +21,9 @@ namespace FCS_AlterraHub.Configuration
         [JsonIgnore]
         public UnityAction<int> onGameModeChanged;
         
-        public IEnumerable<CustomStoreItem> AdditionalStoreItems { get; set; }
+        public List<CustomStoreItem> AdditionalStoreItems = new List<CustomStoreItem>();
+
+
 
         [Choice("Mode Game Mode"), OnChange(nameof(ChangeGameModeEvent))]
         public FCSGameMode GameModeOption { get; set; }

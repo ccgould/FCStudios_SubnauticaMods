@@ -1,24 +1,45 @@
 ﻿
 using System;
+using System.Collections.Generic;
+using System.IO;
+using FCS_AlterraHub.Enumerators;
+using FCS_AlterraHub.Registration;
+using FCS_AlterraHub.Spawnables;
 using FCS_HomeSolutions.Configuration;
+using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
 using UnityEngine;
-using Valve.VR;
 
 namespace FCS_HomeSolutions.Buildables
 {
-    internal class DecorationEntryPatch :  Buildable
+    internal class DecorationEntryPatch: Buildable
     {
         private GameObject _prefab;
         private Settings _settings;
+
+        public override TechGroup GroupForPDA => TechGroup.InteriorModules;
+        public override TechCategory CategoryForPDA => TechCategory.InteriorModule;
+        public override string AssetsFolder => Mod.GetAssetPath();
 
         public DecorationEntryPatch(string classId, string friendlyName, string description, GameObject prefab,Settings settings) : base(classId, friendlyName, description)
         {
             _prefab = prefab;
             _settings = settings;
+
+            OnStartedPatching += () =>
+            {
+                QuickLogger.Debug("Patched Kit");
+                var kit = new FCSKit(settings.KitClassID, friendlyName, Path.Combine(AssetsFolder, $"{classId}.png"));
+                kit.Patch();
+            };
+
+            OnFinishedPatching += () =>
+            {
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, settings.KitClassID.ToTechType(), 500f, StoreCategory.Home);
+            };
         }
 
         public override GameObject GetGameObject()
@@ -27,10 +48,7 @@ namespace FCS_HomeSolutions.Buildables
             {
                 var prefab = GameObject.Instantiate(_prefab);
 
-                var size = new Vector3(1.353966f, 2.503282f, 1.006555f);
-                var center = new Vector3(0.006554961f, 1.394679f, 0.003277525f);
-
-                GameObjectHelpers.AddConstructableBounds(prefab, size, center);
+                GameObjectHelpers.AddConstructableBounds(prefab, _settings.Size, _settings.Center);
 
                 var model = prefab.FindChild("model");
 
@@ -73,10 +91,41 @@ namespace FCS_HomeSolutions.Buildables
             return null;
         }
 
+#if SUBNAUTICA
+
         protected override TechData GetBlueprintRecipe()
         {
-            throw new System.NotImplementedException();
+            QuickLogger.Debug($"Creating recipe...");
+            // Create and associate recipe to the new TechType
+            var customFabRecipe = new TechData()
+            {
+                craftAmount = 1,
+                Ingredients = new List<Ingredient>()
+                {
+                    new Ingredient(_settings.KitClassID.ToTechType(),1)
+                }
+            };
+            QuickLogger.Debug($"Created Ingredients");
+            return customFabRecipe;
         }
+#elif BELOWZERO
+        protected override RecipeData GetBlueprintRecipe()
+        {
+            QuickLogger.Debug($"Creating recipe...");
+            // Create and associate recipe to the new TechType
+            var customFabRecipe = new RecipeData()
+            {
+                craftAmount = 1,
+                Ingredients = new List<Ingredient>()
+                {
+                    new Ingredient(_settings.KitClassID.ToTechType(),1)
+                }
+            };
+            QuickLogger.Debug($"Created Ingredients");
+            return customFabRecipe;
+        }
+
+#endif
     }
 
     internal struct Settings
@@ -89,5 +138,8 @@ namespace FCS_HomeSolutions.Buildables
         internal bool AllowedOnCeiling;
         internal bool AllowedInSub;
         internal bool AllowedOnConstructables;
+        internal string KitClassID;
+        internal Vector3 Size;
+        internal Vector3 Center;
     }
 }

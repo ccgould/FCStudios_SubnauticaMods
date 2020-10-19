@@ -10,11 +10,11 @@ using UnityEngine.UI;
 
 namespace FCS_AlterraHub.Spawnables
 {
-    internal  class FCSKit : Spawnable
+    public class FCSKit : Spawnable
     {
         private readonly string _iconPath;
 
-        public FCSKit(string classId, string friendlyName,string iconPath) : base(classId, friendlyName, $"A kit that allows you to build one {friendlyName} Unit")
+        public FCSKit(string classId, string friendlyName,string iconPath) : base(classId, $"{friendlyName} Kit", $"A kit that allows you to build one {friendlyName} Unit")
         {
             _iconPath = iconPath;
             OnFinishedPatching += () =>
