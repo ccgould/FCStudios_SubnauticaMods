@@ -1,6 +1,6 @@
 ﻿namespace FCS_AlterraHub.Enumerators
 {
-    public enum StoreCategory
+    internal enum StoreCategory
     {
         Home,
         Energy,

@@ -3,7 +3,7 @@ using Oculus.Newtonsoft.Json;
 
 namespace FCS_AlterraHub.Structs
 {
-    public struct CustomStoreItem
+    internal struct CustomStoreItem
     {
         [JsonProperty] internal TechType TechType { get; set; }
         [JsonProperty] internal TechType ReturnItemTechType { get; set; }
