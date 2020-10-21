@@ -144,6 +144,24 @@ namespace FCSCommon.Helpers
                 }
             }
         }
+        
+        /// <summary>
+        /// Changes the speed of the tree animation
+        /// </summary>
+        /// <param name="gameObject"></param>
+        /// <param name="value"></param>
+        internal static void ChangeWavingSpeed(GameObject gameObject, Vector4 value)
+        {
+            Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>(true);
+            foreach (Renderer renderer in renderers)
+            {
+                foreach (Material material in renderer.materials)
+                {
+                    //Set the property _ObjectUp in the UWE_WAVING or the UWE/SIG AlphaCutOut + Noisey Wave
+                    material.SetVector("_ObjectUp", value);
+                }
+            }
+        }
 
         /// <summary>
         /// Applies the properties for the MarmosetUBER shader that has a metallic texture.

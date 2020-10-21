@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using SMLHelper.V2.Handlers;
+using UnityEngine;
 
 namespace FCS_AlterraHub.Buildables
 {
@@ -43,7 +44,7 @@ namespace FCS_AlterraHub.Buildables
             { $"{ModKey}_AccountSetupError", "[Error] Please refill the following fields and press enter in the field to continue: {0}"},
             
         };
-
+        
         private void AdditionalPatching()
         {
             foreach (KeyValuePair<string, string> languageEntry in LanguageDictionary)

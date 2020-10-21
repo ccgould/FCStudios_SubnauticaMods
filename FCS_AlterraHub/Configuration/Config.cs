@@ -15,24 +15,21 @@ namespace FCS_AlterraHub.Configuration
     [Menu("AlterraHub Menu")]
     public class Config : ConfigFile
     {
-        [JsonProperty]
+
         [Toggle("Enable Debugs"), OnChange(nameof(EnableDebugsToggleEvent))]
-        internal bool EnableDebugLogs = false;
+        public bool EnableDebugLogs = false;
 
-        [JsonProperty]
         [JsonIgnore]
-        internal UnityAction<int> onGameModeChanged;
+        public UnityAction<int> onGameModeChanged;
         
-        [JsonProperty]
-        internal List<CustomStoreItem> AdditionalStoreItems = new List<CustomStoreItem>();
-        
-        [JsonProperty]
-        [Choice("Mode Game Mode"), OnChange(nameof(ChangeGameModeEvent))]
-        internal FCSGameMode GameModeOption { get; set; }
 
-        [JsonProperty]
+        public List<CustomStoreItem> AdditionalStoreItems = new List<CustomStoreItem>();
+        
+        [Choice("Mode Game Mode"), OnChange(nameof(ChangeGameModeEvent))]
+        public FCSGameMode GameModeOption { get; set; }
+
         [Toggle("Play Sound Effects"), OnChange(nameof(PlaySoundToggleEvent))]
-        internal bool PlaySFX = true;
+        public bool PlaySFX = true;
 
         private void PlaySoundToggleEvent(ToggleChangedEventArgs e)
         {

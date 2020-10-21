@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using FCS_AlterraHub.Configuration;
+using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
+using UnityEngine;
 
 namespace FCS_AlterraHub.Mono.OreConsumer
 {
-    internal class OreConsumerController : FcsDevice, IFCSStorage
+    internal class OreConsumerController : FcsDevice, IFCSStorage, IFCSSave<SaveData>
     {
         private float _balance;
         private bool _isFromSave;
@@ -27,6 +29,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
         public EffectsManager EffectsManager { get; private set; }
         public AudioManager AudioManager { get; private set; }
         public Action<bool> onUpdateSound { get; private set; }
+        public ColorManager ColorManager { get; private set; }
 
         #region Unity Methods
 
@@ -63,6 +66,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
 
                     AppendMoney(_savedData.OreConsumerCash);
                     MotorHandler.SpeedByPass(_savedData.RPM);
+                    ColorManager.ChangeColor(_savedData.Color.Vector4ToColor());
                 }
 
                 _runStartUpOnEnable = false;
@@ -143,6 +147,12 @@ namespace FCS_AlterraHub.Mono.OreConsumer
                     AudioManager.StopMachineAudio();
                 }
             };
+
+            if (ColorManager == null)
+            {
+                ColorManager = gameObject.AddComponent<ColorManager>();
+                ColorManager.Initialize(gameObject, Buildables.AlterraHub.BodyMaterial);
+            }
 
 #if DEBUG
             QuickLogger.Debug($"Initialized Ore Consumer {GetPrefabID()}");
@@ -303,6 +313,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
             _savedData.Id = GetPrefabID();
             _savedData.OreConsumerCash = _balance;
             _savedData.RPM = MotorHandler.GetRPM();
+            _savedData.Color = ColorManager.GetColor().ColorToVector4();
             QuickLogger.Debug($"Saving ID {_savedData.Id}", true);
 
             //_savedData.BodyColor = ColorManager.GetMaskColor().ColorToVector4();
@@ -313,6 +324,11 @@ namespace FCS_AlterraHub.Mono.OreConsumer
         {
             QuickLogger.Debug("In OnProtoDeserialize");
             _savedData = Mod.GetOreConsumerDataEntrySaveData(GetPrefabID());
+        }
+
+        public override void ChangeBodyColor(Color color)
+        {
+            ColorManager.ChangeColor(color);   
         }
     }
 }

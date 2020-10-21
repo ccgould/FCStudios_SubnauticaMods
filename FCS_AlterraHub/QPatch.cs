@@ -4,6 +4,8 @@ using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Craftables;
 using FCS_AlterraHub.Enumerators;
+using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Patch;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Spawnables;
 using FCSCommon.Extensions;
@@ -24,17 +26,20 @@ namespace FCS_AlterraHub
     {
         internal static Config Configuration { get;} = OptionsPanelHandler.Main.RegisterModOptions<Config>();
         public static AssetBundle GlobalBundle { get; set; }
+        public static ColorPickerDialog ColorPickerDialog { get; private set; }
 
         [QModPatch]
         public static void Patch()
         {
             QuickLogger.Info($"Started patching. Version: {QuickLogger.GetAssemblyVersion(Assembly.GetExecutingAssembly())}");
             GlobalBundle = FCSAssetBundlesService.PublicAPI.GetAssetBundleByName(Mod.AssetBundleName);
-            Configuration.Load();
-
+ 
             QuickLogger.DebugLogsEnabled = Configuration.EnableDebugLogs;
             //Load Prefabs
             AlterraHub.GetPrefabs();
+
+            //var ui = GameObject.Instantiate(AlterraHub.ColorPickerDialogPrefab);
+            //ColorPickerDialog = ui.AddComponent<ColorPickerDialog>();
 
             //Patch all the buildables
             PatchBuildables();
@@ -48,9 +53,7 @@ namespace FCS_AlterraHub
             var harmony = new Harmony("com.alterrahub.fcstudios");
             harmony.PatchAll(Assembly.GetExecutingAssembly());
         }
-
-
-
+        
         private static void CreateKits()
         {
             FCSAlterraHubService.PublicAPI.CreateStoreEntry(Mod.OreConsumerTechType, Mod.OreConsumerKitClassID.ToTechType(), 30000f, StoreCategory.Production);
@@ -78,7 +81,9 @@ namespace FCS_AlterraHub
             //Patch OreConsumer
             var oreConsumer = new OreConsumer();
             oreConsumer.Patch();
-            
+
+            PDATabPatcher.AddPDATab("FSColor");
+
         }
     }
 }

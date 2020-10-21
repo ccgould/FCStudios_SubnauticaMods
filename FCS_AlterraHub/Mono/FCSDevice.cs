@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using FCS_AlterraHub.Configuration;
+using FCSCommon.Utilities;
+using UnityEngine;
 
 namespace FCS_AlterraHub.Mono
 {
@@ -65,5 +67,19 @@ namespace FCS_AlterraHub.Mono
         public abstract bool CanDeconstruct(out string reason);
 
         public abstract void OnConstructedChanged(bool constructed);
+
+        /// <summary>
+        /// Changes the body color of the device
+        /// </summary>
+        /// <param name="color"></param>
+        public virtual void ChangeBodyColor(Color color)
+        {
+            QuickLogger.ModMessage("I don't have any color changing abilities");
+        }
+    }
+
+    public interface IFCSSave<T>
+    {
+        void Save(T newSaveData);
     }
 }

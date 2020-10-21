@@ -1,11 +1,10 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using FCS_AlterraHomeSolutions.Configuration;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Spawnables;
-using FCS_HomeSolutions.Configuration;
 using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
@@ -13,12 +12,12 @@ using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
 using UnityEngine;
 
-namespace FCS_HomeSolutions.Buildables
+namespace FCS_AlterraHomeSolutions.Buildables
 {
     internal class DecorationEntryPatch: Buildable
     {
-        private GameObject _prefab;
-        private Settings _settings;
+        protected GameObject _prefab;
+        protected Settings _settings;
 
         public override TechGroup GroupForPDA => TechGroup.InteriorModules;
         public override TechCategory CategoryForPDA => TechCategory.InteriorModule;
@@ -76,6 +75,7 @@ namespace FCS_HomeSolutions.Buildables
 
                 prefab.AddComponent<PrefabIdentifier>().ClassId = ClassID;
                 prefab.AddComponent<TechTag>().type = TechType;
+                prefab.AddComponent<DecorationController>();
                 //prefab.AddComponent<AlterraHubController>();
                 //prefab.AddComponent<FCSGameLoadUtil>();
 

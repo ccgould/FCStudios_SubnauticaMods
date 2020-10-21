@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
-using FCS_AlterraHub.API;
+using FCS_AlterraHomeSolutions.Buildables;
+using FCS_AlterraHomeSolutions.Spawnables;
 using FCS_HomeSolutions.Buildables;
-using FCS_HomeSolutions.Configuration;
 using FCSCommon.Utilities;
 using QModManager.API.ModLoading;
 using UnityEngine;
 
-namespace FCS_HomeSolutions
+namespace FCS_AlterraHomeSolutions
 {
     /*
      * Alterra Home Solutions mod pack adds objects to subnautica that deals with bases and decorations
@@ -49,8 +49,8 @@ namespace FCS_HomeSolutions
                     AllowedOutside = true,
                     AllowedOnGround = true,
                     RotationEnabled = true,
-                    Size = new Vector3(1.104156f, 1.028278f, 1433573f),
-                    Center = new Vector3(0f, 0.6523819f,0f)
+                    Size = new Vector3(1f, 0.822893f, 0.1791649f),
+                    Center = new Vector3(-1.365597e-25f, 0.7452481f,-0.004088677f)
                 }),
             new DecorationEntryPatch("ahssmallrailglass", "Small Railing With Glass", "A railing to create a barrior", ModelPrefab.GetPrefab("Small_Rail_wGlass_01"),
                 new Settings
@@ -60,8 +60,8 @@ namespace FCS_HomeSolutions
                     AllowedOutside = true,
                     AllowedOnGround = true,
                     RotationEnabled = true,
-                    Size = new Vector3(1.104156f, 1.028278f, 1433573f),
-                    Center = new Vector3(0f, 0.6523819f,0f)
+                    Size = new Vector3(1f, 0.822893f, 0.1791649f),
+                    Center = new Vector3(-1.365597e-25f, 0.7452481f,-0.004088677f)
                 }),
             new DecorationEntryPatch("ahssmallstairplatform", "Small Stair Platform", "A stairs for your personal needs.", ModelPrefab.GetPrefab("Small_PlatformDoorStairs"),
                 new Settings
@@ -74,16 +74,27 @@ namespace FCS_HomeSolutions
                     Size = new Vector3(4.033218f, 2.194448f, 2.34824f),
                     Center = new Vector3(4.449882e-24f, 1.225415f,0.8919346f)
                 }),
-            new DecorationEntryPatch("ahsSweetWaterBar", "Sweet Water Bar", "All drinks on the house.", ModelPrefab.GetPrefab("SweetWaterBar"),
+            new DecorationEntryPatch("ahssmallrailmesh", "Small Railing With Mesh", "A railing to create a barrior", ModelPrefab.GetPrefab("Small_Rail_wNeat_01"),
                 new Settings
                 {
-                    KitClassID = "ahsSweetWaterBar_kit",
+                    KitClassID = "ahsSmallRailMesh_kit",
                     AllowedInBase = true,
                     AllowedOutside = true,
                     AllowedOnGround = true,
                     RotationEnabled = true,
-                    Size = new Vector3(3.075155f, 2.793444f, 1.905103f),
-                    Center = new Vector3(-0.1215184f, 1.516885f,-0.008380651f)
+                    Size = new Vector3(1f, 0.822893f, 0.1791649f),
+                    Center = new Vector3(-1.365597e-25f, 0.7452481f,-0.004088677f)
+                }),
+            new DecorationEntryPatch("ahslargerailmesh", "Large Railing With Mesh", "A railing to create a barrior", ModelPrefab.GetPrefab("Large_Rail_wNeat_01"),
+                new Settings
+                {
+                    KitClassID = "ahsSmallRailMesh_kit",
+                    AllowedInBase = true,
+                    AllowedOutside = true,
+                    AllowedOnGround = true,
+                    RotationEnabled = true,
+                    Size = new Vector3(1.963638f, 1.020765f, 0.1433573f),
+                    Center = new Vector3(0f, 0.6343491f,0f)
                 }),
 
     };
@@ -91,17 +102,38 @@ namespace FCS_HomeSolutions
             [QModPatch]
         public void Patch()
         {
-
 #if DEBUG
             QuickLogger.DebugLogsEnabled = true;
 #endif
 
             QuickLogger.Info($"Started patching. Version: {QuickLogger.GetAssemblyVersion(Assembly.GetExecutingAssembly())}");
 
+            ModelPrefab.LoadSelfLoadingPrefab();
+
+            var ahsSweetWaterBar = new SweetWaterBarPatch("ahsSweetWaterBar", "Sweet Water Bar", "All drinks on the house.", ModelPrefab.GetPrefab("SweetWaterBar"), new Settings
+            {
+                KitClassID = "ahsSweetWaterBar_kit",
+                AllowedInBase = true,
+                AllowedOutside = true,
+                AllowedOnGround = true,
+                RotationEnabled = true,
+                Size = new Vector3(3.075155f, 2.793444f, 1.905103f),
+                Center = new Vector3(-0.1215184f, 1.516885f, -0.008380651f)
+            });
+            ahsSweetWaterBar.Patch();
+
+
+
+
             foreach (var decoration in _decorations)
             {
                 decoration.Patch();
             }
+
+
+            //Patch Paint Tool
+            var paintToolSpawnable = new PaintToolSpawnable();
+            paintToolSpawnable.Patch();
         }
     }
 

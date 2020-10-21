@@ -121,6 +121,12 @@
     <Compile Include="Debug\DebugController.cs" />
     <Compile Include="Enumerators\FCSGameMode.cs" />
     <Compile Include="Enumerators\StoreCategory.cs" />
+    <Compile Include="Extensions\ColorExtensions.cs" />
+    <Compile Include="Extensions\VectorExtensions.cs" />
+    <Compile Include="Helpers\SpawnHelper.cs" />
+    <Compile Include="Mono\FCSAquarium.cs" />
+    <Compile Include="Objects\ColorList.cs" />
+    <Compile Include="Helpers\ColorPickerDialog.cs" />
     <Compile Include="Interfaces\IFCSStorage.cs" />
     <Compile Include="Mono\AlterraHub\AccountPageHandler.cs" />
     <Compile Include="Mono\AlterraHub\AlterraHubDisplay.cs" />
@@ -129,6 +135,7 @@
     <Compile Include="Mono\AlterraHub\CheckOutPopupDialogWindow.cs" />
     <Compile Include="Mono\AlterraHub\PanelGroup.cs" />
     <Compile Include="Mono\AlterraHub\PanelHelper.cs" />
+    <Compile Include="Mono\ColorManager.cs" />
     <Compile Include="Mono\CustomInputField.cs" />
     <Compile Include="Mono\AlterraHub\StoreItem.cs" />
     <Compile Include="Mono\AlterraHub\TabButton.cs" />
@@ -139,7 +146,13 @@
     <Compile Include="Mono\OreConsumer\MotorHandler.cs" />
     <Compile Include="Mono\OreConsumer\OreConsumerDisplay.cs" />
     <Compile Include="Mono\OreConsumer\TransferHandler.cs" />
+    <Compile Include="Objects\ColorVec4.cs" />
+    <Compile Include="Objects\Vec3.cs" />
+    <Compile Include="Patch\EnumCacheManager.cs" />
+    <Compile Include="Patch\EnumTypeCache.cs" />
+    <Compile Include="Patch\PDATabPatcher.cs" />
     <Compile Include="Patch\Player_Patches.cs" />
+    <Compile Include="Patch\UIPatches.cs" />
     <Compile Include="Spawnables\BioFuelSpawnable.cs" />
     <Compile Include="Enumerators\ModDifficultyMode.cs" />
     <Compile Include="Helpers\PlayerInteractionHelper.cs" />
@@ -160,6 +173,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Model\" />
+    <Folder Include="UI\" />
   </ItemGroup>
   <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

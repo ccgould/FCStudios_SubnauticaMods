@@ -26,6 +26,8 @@ namespace FCS_AlterraHub.Buildables
         internal static GameObject KitPrefab { get; set; }
         internal static GameObject CartItemPrefab { get; set; }
 
+        public static GameObject ColorPickerDialogPrefab { get; set; }
+
         public static bool GetPrefabs()
         {
             try
@@ -36,6 +38,12 @@ namespace FCS_AlterraHub.Buildables
 
                     QuickLogger.Debug("GetPrefabs");
 
+                    if (!LoadAsset("ColorPickerCanvas", QPatch.GlobalBundle, out var colorPickerDialog)) return false;
+                    ColorPickerDialogPrefab = colorPickerDialog;
+
+                    if (!LoadAsset("ColorItem", QPatch.GlobalBundle, out var colorItem)) return false;
+                    ColorItemPrefab = colorItem;
+                    
                     if (!LoadAsset(Mod.ModPrefabName, QPatch.GlobalBundle, out var prefabGo)) return false;
                     AlterraHubPrefab = prefabGo;
 

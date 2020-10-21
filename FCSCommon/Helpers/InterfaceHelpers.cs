@@ -111,17 +111,24 @@ namespace FCSCommon.Helpers
 
             foreach (Transform obj in gameObject.transform)
             {
-                if (obj.name.Trim().StartsWith(name, StringComparison.OrdinalIgnoreCase))
+                QuickLogger.Debug($"Current Object in search: ({obj.name.Trim()}) || Name Looking for: ({name}) || {obj.name.Trim().StartsWith(name.Trim(), StringComparison.OrdinalIgnoreCase)}");
+                if (obj.name.Trim().StartsWith(name.Trim(), StringComparison.OrdinalIgnoreCase))
                 {
+                    QuickLogger.Debug($"Found: {name}");
                     return obj.gameObject;
                 }
 
                 if (obj.transform.childCount > 0)
                 {
-                    FindObjectRecursion(obj.gameObject, name);
+                    var result = FindObjectRecursion(obj.gameObject, name);
+                    if (result != null)
+                    {
+                        return result;
+                    }
                 }
             }
 
+            QuickLogger.Debug("Returning null");
             return null;
         }
         

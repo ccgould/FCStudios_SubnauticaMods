@@ -165,7 +165,7 @@ namespace FCSCommon.Components
             }
         }
 
-        public void OnPointerClick(PointerEventData eventData)
+        public override void OnPointerClick(PointerEventData eventData)
         {
             base.OnPointerClick(eventData);
 

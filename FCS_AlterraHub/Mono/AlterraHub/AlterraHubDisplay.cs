@@ -22,7 +22,6 @@ namespace FCS_AlterraHub.Mono.AlterraHub
         private CartDropDownHandler _cartDropDownManager;
         internal Action<TechType,TechType> onItemAddedToCart;
         private PanelGroup _panelGroup;
-        private AccountPageHandler _accountPage;
 
         internal void Setup(AlterraHubController mono)
         {
@@ -71,7 +70,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
                 CreateCartDropDown(_homePage);
 
                 //HomePage
-                _accountPage = new AccountPageHandler(_mono);
+                new AccountPageHandler(_mono);
                 
                 #endregion
 

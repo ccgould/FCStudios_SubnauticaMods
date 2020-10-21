@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
-using FCS_AlterraHub.Mono.AlterraHub;
-using FCS_AlterraHub.Mono.OreConsumer;
+using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
@@ -49,6 +49,8 @@ namespace FCS_AlterraHub.Configuration
         internal const string OreConsumerDescription = "Ore consumer yum yum give me more.The Ore consumer takes your ores and turns it into money.";
         internal const string OreConsumerPrefabName = "OreConsumer";
         internal const string OreConsumerKitClassID = "OreConsumer_Kit";
+        
+        
         internal static TechType OreConsumerTechType { get; set; }
 
         internal static Action<SaveData> OnDataLoaded { get; set; }
@@ -140,15 +142,9 @@ namespace FCS_AlterraHub.Configuration
 
                 SaveData newSaveData = new SaveData();
 
-                var alterraHubControllers = GameObject.FindObjectsOfType<AlterraHubController>();
-                var oreConsumerControllers = GameObject.FindObjectsOfType<OreConsumerController>();
+                var controllers = GameObject.FindObjectsOfType<MonoBehaviour>().OfType<IFCSSave<SaveData>>();
 
-                foreach (var controller in alterraHubControllers)
-                {
-                    controller.Save(newSaveData);
-                }
-
-                foreach (var controller in oreConsumerControllers)
+                foreach (var controller in controllers)
                 {
                     controller.Save(newSaveData);
                 }
@@ -178,7 +174,12 @@ namespace FCS_AlterraHub.Configuration
         {
             return _saveObject != null;
         }
-        
+
+        internal static SaveData GetSaveData()
+        {
+            return _saveData ?? new SaveData();
+        }
+
         internal static OreConsumerDataEntry GetOreConsumerDataEntrySaveData(string id)
         {
             LoadData();
@@ -214,10 +215,6 @@ namespace FCS_AlterraHub.Configuration
             }
 
             return new AlterraHubDataEntry() { Id = id };
-        }
-        internal static SaveData GetSaveData()
-        {
-            return _saveData ?? new SaveData();
         }
     }
 }

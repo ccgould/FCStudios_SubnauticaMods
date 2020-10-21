@@ -1,6 +1,7 @@
 ﻿using System;
+using FCS_AlterraHomeSolutions;
+using FCS_AlterraHomeSolutions.Configuration;
 using FCS_AlterraHub.API;
-using FCS_HomeSolutions.Configuration;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -21,6 +22,7 @@ namespace FCS_HomeSolutions.Buildables
         internal static string DetailTexture => $"fcs{Mod.ModName}_D";
         public static AssetBundle GlobalBundle { get; set; }
         public static AssetBundle ModBundle { get; set; }
+        internal static GameObject PaintToolPrefab { get; set; }
 
         internal static GameObject GetPrefab(string prefabName)
         {
@@ -44,6 +46,20 @@ namespace FCS_HomeSolutions.Buildables
             {
                 QuickLogger.Error(e.Message);
                 return null;
+            }
+        }
+
+
+        internal static void LoadSelfLoadingPrefab()
+        {
+            try
+            {
+                if (!LoadAsset(Mod.PaintToolPrefabName, ModBundle, out var paintToolPrefabGo));
+            PaintToolPrefab = paintToolPrefabGo;
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error(e.Message);
             }
         }
 

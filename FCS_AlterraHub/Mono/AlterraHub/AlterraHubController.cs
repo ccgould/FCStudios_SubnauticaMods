@@ -14,7 +14,7 @@ using UnityEngine.UI;
 
 namespace FCS_AlterraHub.Mono.AlterraHub
 {
-    internal class AlterraHubController : FcsDevice
+    internal class AlterraHubController: FcsDevice, IFCSSave<SaveData>
     {
         private bool _runStartUpOnEnable;
         private bool _isFromSave;
@@ -219,7 +219,6 @@ namespace FCS_AlterraHub.Mono.AlterraHub
                         panelHelper.AddContent(StoreInventorySystem.CreateStoreItem(customStoreItem.TechType, customStoreItem.ReturnItemTechType, customStoreItem.Category, customStoreItem.Cost, AddToCardCallBack));
                     }
                 }
-
             }
         }
 
