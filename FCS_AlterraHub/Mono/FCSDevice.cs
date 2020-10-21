@@ -13,11 +13,16 @@ namespace FCS_AlterraHub.Mono
     [RequireComponent(typeof(TechTag))]
     public abstract class FcsDevice : MonoBehaviour, IProtoEventListener, IConstructable
     {
+
+        /// <summary>
+        /// Boolean that represents if the device is visible to the network.
+        /// </summary>
+        public bool IsVisible { get; set; }
+
         /// <summary>
         /// Boolean that represents if the device is constructed and ready to operate
         /// </summary>
         public bool IsConstructed { get; set; }
-
 
         /// <summary>
         /// Boolean that shows if the device has been full initialized.
@@ -76,6 +81,15 @@ namespace FCS_AlterraHub.Mono
         public virtual void ChangeBodyColor(Color color, ColorTargetMode mode)
         {
             QuickLogger.ModMessage("I don't have any color changing abilities");
+        }
+
+        /// <summary>
+        /// Gets the body color of the device
+        /// </summary>
+        /// <param name="color"></param>
+        public virtual void GetBodyColor(Color color, ColorTargetMode mode)
+        {
+            QuickLogger.Debug("This device hasnt set this method");
         }
     }
 

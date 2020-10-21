@@ -121,10 +121,12 @@
     <Compile Include="Debug\DebugController.cs" />
     <Compile Include="Enumerators\FCSGameMode.cs" />
     <Compile Include="Enumerators\ColorTargetMode.cs" />
+    <Compile Include="Enumerators\FCSPowerStates.cs" />
     <Compile Include="Enumerators\StoreCategory.cs" />
     <Compile Include="Extensions\ColorExtensions.cs" />
     <Compile Include="Extensions\VectorExtensions.cs" />
     <Compile Include="Helpers\SpawnHelper.cs" />
+    <Compile Include="Managers\FCSPowerManager.cs" />
     <Compile Include="Mono\FCSAquarium.cs" />
     <Compile Include="Objects\ColorList.cs" />
     <Compile Include="Helpers\ColorPickerDialog.cs" />

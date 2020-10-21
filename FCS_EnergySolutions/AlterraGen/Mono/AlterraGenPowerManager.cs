@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using AlterraGen.Buildables;
-using AlterraGen.Configuration;
-using AlterraGen.Enumerators;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Managers;
 using FCS_AlterraHub.Mono;
+using FCS_EnergySolutions.AlterraGen.Buildables;
+using FCS_EnergySolutions.AlterraGen.Enumerators;
+using FCS_EnergySolutions.Configuration;
 using FCSCommon.Utilities;
 using UnityEngine;
 
-namespace AlterraGen.Mono
+
+namespace FCS_EnergySolutions.AlterraGen.Mono
 {
     internal class AlterraGenPowerManager : FCSPowerManager, IFCSStorage
     {

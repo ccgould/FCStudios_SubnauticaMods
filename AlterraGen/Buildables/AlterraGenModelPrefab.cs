@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using AlterraGen.Configuration;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
-using FCSTechFabricator.Configuration;
 using UnityEngine;
 
 namespace AlterraGen.Buildables
@@ -115,8 +114,6 @@ namespace AlterraGen.Buildables
             MaterialHelpers.ApplyEmissionShader(BodyMaterial, LUMTexture, prefab, bundle, Color.white);
             MaterialHelpers.ApplyNormalShader(BodyMaterial, NormalTexture,prefab,bundle);
             MaterialHelpers.ApplyAlphaShader(DecalMaterial, prefab);
-            MaterialHelpers.ApplyColorMaskShader(BodyMaterial, ColorIDTexture, Color.white, DefaultConfigurations.DefaultColor, Color.white, prefab, bundle); //Use color2 
-
             #endregion
         }
     }

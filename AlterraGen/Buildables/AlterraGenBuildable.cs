@@ -6,7 +6,6 @@ using AlterraGen.Mono;
 using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
-using FCSTechFabricator.Components;
 using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Utility;

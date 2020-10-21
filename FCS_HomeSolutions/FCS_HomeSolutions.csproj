@@ -7,8 +7,8 @@
     <ProjectGuid>{7317FEE1-C0B2-443E-AB9D-3F656B6C766A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FCS_AlterraHomeSolutions</RootNamespace>
-    <AssemblyName>FCS_AlterraHomeSolutions</AssemblyName>
+    <RootNamespace>FCS_HomeSolutions</RootNamespace>
+    <AssemblyName>FCS_HomeSolutions</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <Game>$(Configuration.split(_)[0])</Game>
     <FileAlignment>512</FileAlignment>

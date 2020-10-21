@@ -1,7 +1,8 @@
 ﻿using FCSCommon.Utilities;
+using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
 
-namespace AlterraGen.Buildables
+namespace FCS_EnergySolutions.AlterraGen.Buildables
 {
     internal partial class AlterraGenBuildable
     {

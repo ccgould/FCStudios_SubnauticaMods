@@ -1,16 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using AlterraGen.Buildables;
 using AlterraGen.Configuration;
-using FCSCommon.Helpers;
+using FCS_AlterraHub.API;
+using FCS_AlterraHub.Spawnables;
 using FCSCommon.Utilities;
-using FCSTechFabricator;
-using FCSTechFabricator.Components;
-using FCSTechFabricator.Craftables;
-using HarmonyLib;
 using QModManager.API.ModLoading;
 using SMLHelper.V2.Utility;
 using UnityEngine;
@@ -39,7 +34,7 @@ namespace AlterraGen
 
             try
             {
-                GlobalBundle = FcAssetBundlesService.PublicAPI.GetAssetBundleByName(FcAssetBundlesService.PublicAPI
+                GlobalBundle = FCSAssetBundlesService.PublicAPI.GetAssetBundleByName(FCSAssetBundlesService.PublicAPI
                         .GlobalBundleName);
 
                 if (GlobalBundle == null)
@@ -50,30 +45,15 @@ namespace AlterraGen
 
                 Configuration = Mod.LoadConfiguration();
 
-                AddTechFabricatorItems();
-
                 var alterraGen = new AlterraGenBuildable();
                 alterraGen.Patch();
                 
-                //var harmony = new Harmony("com.alterragen.fcstudios");
-
-                //harmony.PatchAll(Assembly.GetExecutingAssembly());
-
                 QuickLogger.Info("Finished patching");
             }
             catch (Exception ex)
             {
                 QuickLogger.Error(ex);
             }
-        }
-
-        private static void AddTechFabricatorItems()
-        {
-            var icon = ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetFolder(), $"{Mod.ModClassName}.png"));
-            var craftingTab = new CraftingTab(Mod.ModTabID, Mod.ModFriendlyName, icon);
-
-            var alterraGenKit = new FCSKit(Mod.AlterraGenKitClassID, Mod.ModFriendlyName, craftingTab, Mod.AlterraGenIngredients);
-            alterraGenKit.Patch(FcTechFabricatorService.PublicAPI, FcAssetBundlesService.PublicAPI);
         }
     }
 }

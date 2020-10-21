@@ -1,4 +1,4 @@
-﻿namespace AlterraGen.Struct
+﻿namespace FCS_EnergySolutions.AlterraGen.Struct
 {
     internal struct BatteryData
     {

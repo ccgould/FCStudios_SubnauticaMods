@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Linq;
-using AlterraGen.Buildables;
-using AlterraGen.Enumerators;
-using AlterraGen.Extensions;
 using FCS_AlterraHub.Enumerators;
+using FCS_EnergySolutions.AlterraGen.Buildables;
+using FCS_EnergySolutions.AlterraGen.Enumerators;
+using FCS_EnergySolutions.AlterraGen.Extensions;
+using FCS_EnergySolutions.Buildable;
 using FCSCommon.Abstract;
 using FCSCommon.Enums;
 using FCSCommon.Helpers;
@@ -11,7 +12,8 @@ using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace AlterraGen.Mono
+
+namespace FCS_EnergySolutions.AlterraGen.Mono
 {
     internal class AlterraGenDisplayManager : AIDisplay
     {
@@ -207,9 +209,8 @@ namespace AlterraGen.Mono
                 
                 _grid = _mono.gameObject.AddComponent<GridHelper>();
                 _grid.OnLoadDisplay += OnLoadItemsGrid;
-                _grid.Setup(3, AlterraGenBuildable.ItemPrefab, homePage, Color.gray, Color.gray, OnButtonClick);
-
-
+                _grid.Setup(3, ModelPrefab.ItemPrefab, homePage, Color.gray, Color.gray, OnButtonClick);
+                
                 _unitID = GameObjectHelpers.FindGameObject(homePage, "UnitID")?.GetComponent<Text>();
 
                 #endregion

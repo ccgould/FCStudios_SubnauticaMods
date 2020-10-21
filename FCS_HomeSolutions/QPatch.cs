@@ -16,7 +16,6 @@ namespace FCS_AlterraHomeSolutions
     [QModCore]
     public class QPatch
     {
-
         private static List<DecorationEntryPatch> _decorations = new List<DecorationEntryPatch>
         {
             new DecorationEntryPatch("ahsrailing", "Large Railing", "A railing to create a barrior", ModelPrefab.GetPrefab("Large_Rail_01"),
@@ -99,13 +98,9 @@ namespace FCS_AlterraHomeSolutions
 
     };
 
-            [QModPatch]
+        [QModPatch]
         public void Patch()
         {
-#if DEBUG
-            QuickLogger.DebugLogsEnabled = true;
-#endif
-
             QuickLogger.Info($"Started patching. Version: {QuickLogger.GetAssemblyVersion(Assembly.GetExecutingAssembly())}");
 
             ModelPrefab.LoadSelfLoadingPrefab();
@@ -122,9 +117,6 @@ namespace FCS_AlterraHomeSolutions
             });
             ahsSweetWaterBar.Patch();
 
-
-
-
             foreach (var decoration in _decorations)
             {
                 decoration.Patch();
@@ -137,5 +129,5 @@ namespace FCS_AlterraHomeSolutions
         }
     }
 
-    
+
 }

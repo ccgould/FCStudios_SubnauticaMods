@@ -1,28 +1,27 @@
 ﻿using System;
-using FCS_AlterraHomeSolutions.Configuration;
 using FCS_AlterraHub.API;
+using FCS_EnergySolutions.Configuration;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
 
-namespace FCS_HomeSolutions.Buildables
+namespace FCS_EnergySolutions.Buildable
 {
     internal static class ModelPrefab
     {
         private static bool _initialized;
         internal static GameObject ColorItemPrefab { get; set; }
         internal static GameObject ItemPrefab { get; set; }
-        internal static string BodyMaterial => $"fcs{Mod.ModName}_COL";
-        internal static string SecondaryMaterial => $"fcs{Mod.ModName}_COL_S";
-        internal static string DecalMaterial => $"fcs{Mod.ModName}_DECALS";
-        internal static string DetailsMaterial => $"fcs{Mod.ModName}_DETAILS";
-        internal static string SpecTexture => $"fcs{Mod.ModName}_S";
-        internal static string LUMTexture => $"fcs{Mod.ModName}_E";
-        internal static string NormalTexture => $"fcs{Mod.ModName}_N";
-        internal static string DetailTexture => $"fcs{Mod.ModName}_D";
+        internal static string BodyMaterial => $"{Mod.ModName}_COL";
+        internal static string SecondaryMaterial => $"{Mod.ModName}_COL_S";
+        internal static string DecalMaterial => $"{Mod.ModName}_DECALS";
+        internal static string DetailsMaterial => $"{Mod.ModName}_DETAILS";
+        internal static string SpecTexture => $"{Mod.ModName}_S";
+        internal static string LUMTexture => $"{Mod.ModName}_E";
+        internal static string NormalTexture => $"{Mod.ModName}_N";
+        internal static string DetailTexture => $"{Mod.ModName}_D";
         public static AssetBundle GlobalBundle { get; set; }
         public static AssetBundle ModBundle { get; set; }
-        internal static GameObject PaintToolPrefab { get; set; }
 
         internal static GameObject GetPrefab(string prefabName)
         {
@@ -46,20 +45,6 @@ namespace FCS_HomeSolutions.Buildables
             {
                 QuickLogger.Error(e.Message);
                 return null;
-            }
-        }
-
-
-        internal static void LoadSelfLoadingPrefab()
-        {
-            try
-            {
-                if (!LoadAsset(Mod.PaintToolPrefabName, ModBundle, out var paintToolPrefabGo));
-            PaintToolPrefab = paintToolPrefabGo;
-            }
-            catch (Exception e)
-            {
-                QuickLogger.Error(e.Message);
             }
         }
 

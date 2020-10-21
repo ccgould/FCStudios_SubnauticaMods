@@ -4,7 +4,7 @@ using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Objects;
 using Oculus.Newtonsoft.Json;
 
-namespace AlterraGen.Configuration
+namespace FCS_EnergySolutions.Configuration
 {
     [Serializable]
     internal class SaveDataEntry

@@ -1,4 +1,4 @@
-﻿namespace AlterraGen.Enumerators
+﻿namespace FCS_EnergySolutions.AlterraGen.Enumerators
 {
     internal enum AlterraGenPages
     {

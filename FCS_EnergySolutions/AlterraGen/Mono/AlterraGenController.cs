@@ -1,14 +1,15 @@
-﻿using AlterraGen.Buildables;
-using AlterraGen.Configuration;
-using FCS_AlterraHub.Extensions;
+﻿using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
+using FCS_EnergySolutions.AlterraGen.Buildables;
+using FCS_EnergySolutions.Buildable;
+using FCS_EnergySolutions.Configuration;
 using FCSCommon.Controllers;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
 
-namespace AlterraGen.Mono
+namespace FCS_EnergySolutions.AlterraGen.Mono
 {
     internal class AlterraGenController : FcsDevice
     {
@@ -72,7 +73,7 @@ namespace AlterraGen.Mono
             if (ColorManager == null)
             {
                 ColorManager = gameObject.AddComponent<ColorManager>();
-                ColorManager.Initialize(gameObject, AlterraGenBuildable.BodyMaterial);
+                ColorManager.Initialize(gameObject, ModelPrefab.BodyMaterial);
             }
 
             if (AnimationManager == null)
@@ -86,7 +87,7 @@ namespace AlterraGen.Mono
                 DumpContainer.Initialize(transform,"AlterraGen Receptacle",PowerManager,4,4);
             }
 
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.ModTabID);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.AlterraGenModTabID);
 
 
             if (DisplayManager == null)
