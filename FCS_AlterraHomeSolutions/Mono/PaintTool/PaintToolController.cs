@@ -24,6 +24,14 @@ namespace FCS_AlterraHomeSolutions.Mono.PaintTool
         private bool _isFromSave;
         private PaintToolDataEntry _savedData;
         private string _prefabID;
+        private Text _mode;
+        private Text _currentIndexLBL;
+        private Text _colorNameLbl;
+        private Image _selectedColor;
+        private ColorTargetMode _colorTargetMode;
+        private Text _totalColorsLBL;
+        private int _numberColorTargetModeTypes;
+        private int _painterModeIndex = 1;
         internal bool IsInitialized { get; set; }
 
         public override string animToolName => TechType.Scanner.AsString(true);
@@ -31,9 +39,15 @@ namespace FCS_AlterraHomeSolutions.Mono.PaintTool
         private void Initialize()
         {
             if (IsInitialized) return;
+            _numberColorTargetModeTypes = System.Enum.GetValues(typeof(ColorTargetMode)).Length;
             _collider = gameObject.GetComponent<BoxCollider>();
             _colorRing = GameObjectHelpers.FindGameObject(gameObject, "ColorFill").GetComponent<Image>();
             _amountLbl = GameObjectHelpers.FindGameObject(gameObject, "Amount").GetComponent<Text>();
+            _selectedColor = GameObjectHelpers.FindGameObject(gameObject, "SelectedColor").GetComponent<Image>();
+            _colorNameLbl = GameObjectHelpers.FindGameObject(gameObject, "ColorName").GetComponent<Text>();
+            _currentIndexLBL = GameObjectHelpers.FindGameObject(gameObject, "CurrentIndex").GetComponent<Text>();
+            _totalColorsLBL = GameObjectHelpers.FindGameObject(gameObject, "TotalColors").GetComponent<Text>();
+            _mode = GameObjectHelpers.FindGameObject(gameObject, "Mode").GetComponent<Text>();
             _liquid = GameObjectHelpers.FindGameObject(gameObject, "liquid");
             Mod.RegisterPaintTool(this);
             ChangeColor(Color.black);
@@ -58,34 +72,81 @@ namespace FCS_AlterraHomeSolutions.Mono.PaintTool
 
                 _paintCanFillAmount = _savedData.Amount;
                 _currentColor = _savedData.Color.Vector4ToColor();
+                _colorTargetMode = _savedData.ColorTargetMode == 0 ? ColorTargetMode.Primary : _savedData.ColorTargetMode;
+                switch (_colorTargetMode)
+                {
+                    case ColorTargetMode.Primary:
+                        _painterModeIndex = 1;
+                        break;
+                    case ColorTargetMode.Secondary:
+                        _painterModeIndex = 2;
+                        break;
+                    case ColorTargetMode.Both:
+                        _painterModeIndex = 3;
+                        break;
+                }
+
+
+
                 ChangeColor(_currentColor);
+                RefreshUI();
                 _isFromSave = false;
             }
         }
 
         private void Update()
         {
-            if(base.isDrawn && Input.GetKeyDown(KeyCode.RightArrow))
+            if (base.isDrawn && Input.GetKeyDown(KeyCode.UpArrow))
             {
-                _currentIndex++;
-                if (_currentIndex > ColorList.Colors.Count - 1)
+                _painterModeIndex += 1;
+                
+                if (_painterModeIndex <= _numberColorTargetModeTypes)
                 {
-                    _currentIndex = ColorList.Colors.Count - 1;
+                    _colorTargetMode = (ColorTargetMode)_painterModeIndex;
                 }
-
-                ChangeColor(ColorList.Colors.ElementAt(_currentIndex).Vector4ToColor());
+                else
+                {
+                    _painterModeIndex = 1;
+                    _colorTargetMode = (ColorTargetMode)_painterModeIndex;
+                }
             }
-
-            if (base.isDrawn && Input.GetKeyDown(KeyCode.LeftArrow))
+            else if (base.isDrawn && Input.GetKeyDown(KeyCode.DownArrow))
             {
-                _currentIndex--;
-                if (_currentIndex < 0)
+                _painterModeIndex -= 1;
+
+                if (_painterModeIndex >= 1)
+                {
+                    _colorTargetMode = (ColorTargetMode)_painterModeIndex;
+                }
+                else
+                {
+                    _painterModeIndex = _numberColorTargetModeTypes;
+                    _colorTargetMode = (ColorTargetMode)_painterModeIndex;
+                }
+            }
+            else if (base.isDrawn && Input.GetKeyDown(KeyCode.RightArrow))
+            {
+                _currentIndex += 1;
+
+                if (_currentIndex == ColorList.Colors.Count - 1)
                 {
                     _currentIndex = 0;
                 }
 
-                ChangeColor(ColorList.Colors.ElementAt(_currentIndex).Vector4ToColor());
+                ChangeColor(ColorList.Colors.ElementAt(_currentIndex).Key.Vector4ToColor());
             }
+            else if (base.isDrawn && Input.GetKeyDown(KeyCode.LeftArrow))
+            {
+                _currentIndex -= 1;
+
+                if (_currentIndex == -1)
+                {
+                    _currentIndex = ColorList.Colors.Count -1;
+                }
+
+                ChangeColor(ColorList.Colors.ElementAt(_currentIndex).Key.Vector4ToColor());
+            }
+            RefreshUI();
         }
 
         protected override void OnDestroy()
@@ -97,9 +158,7 @@ namespace FCS_AlterraHomeSolutions.Mono.PaintTool
         private void ChangeColor(Color color)
         {
             _currentColor = color;
-
             MaterialHelpers.ChangeMaterialColor(ModelPrefab.BodyMaterial, _liquid, color);
-            RefreshUI();
         }
 
         private void Reload()
@@ -114,7 +173,7 @@ namespace FCS_AlterraHomeSolutions.Mono.PaintTool
             if (Physics.Raycast(Player.main.camRoot.transform.position, Player.main.camRoot.transform.forward, out var hit, _range))
             {
                 var fcsDevice = hit.transform.parent.gameObject.transform.parent.gameObject.transform.parent.GetComponent<FcsDevice>();
-                fcsDevice?.ChangeBodyColor(_currentColor);
+                fcsDevice?.ChangeBodyColor(_currentColor,_colorTargetMode);
                 _paintCanFillAmount -= 1;
                 RefreshUI();
             };
@@ -122,9 +181,32 @@ namespace FCS_AlterraHomeSolutions.Mono.PaintTool
 
         private void RefreshUI()
         {
+            if (!IsInitialized) return;
+            _currentIndexLBL.text = _currentIndex.ToString();
+            _totalColorsLBL.text = ColorList.Colors.Count.ToString();
+
+            var currentColorVec4 = _currentColor.ColorToVector4();
+            if (ColorList.Colors.ContainsKey(currentColorVec4))
+            {
+                _colorNameLbl.text = ColorList.Colors[currentColorVec4];
+            }
+            else
+            {
+                ResetColor();
+            }
+
+            _selectedColor.color = _currentColor;
+            _mode.text = ((int) _colorTargetMode).ToString();
             _colorRing.color = _currentColor;
             _colorRing.fillAmount = _paintCanFillAmount /100f;
             _amountLbl.text = _paintCanFillAmount.ToString();
+        }
+
+        private void ResetColor()
+        {
+            ChangeColor(Color.black);
+            _currentIndex = 0;
+            _currentColor = Color.black;
         }
 
         public void OnProtoSerialize(ProtobufSerializer serializer)
@@ -176,9 +258,7 @@ namespace FCS_AlterraHomeSolutions.Mono.PaintTool
             _savedData.Id = GetPrefabID();
             _savedData.Color = _currentColor.ColorToVector4();
             _savedData.Amount = _paintCanFillAmount;
-            
-
-            //_savedData.BodyColor = ColorManager.GetMaskColor().ColorToVector4();
+            _savedData.ColorTargetMode = _colorTargetMode;
             newSaveData.PaintToolEntries.Add(_savedData);
         }
         
@@ -206,7 +286,6 @@ namespace FCS_AlterraHomeSolutions.Mono.PaintTool
 
         public override void OnHolster()
         {
-            Initialize();
             _collider.isTrigger = false;
         }
 
@@ -217,7 +296,6 @@ namespace FCS_AlterraHomeSolutions.Mono.PaintTool
         
         public override void OnDraw(Player p)
         {
-            Initialize();
             _collider.isTrigger = true;
             base.OnDraw(p);
         }

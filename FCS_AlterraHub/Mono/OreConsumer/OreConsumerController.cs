@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Interfaces;
@@ -66,7 +67,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
 
                     AppendMoney(_savedData.OreConsumerCash);
                     MotorHandler.SpeedByPass(_savedData.RPM);
-                    ColorManager.ChangeColor(_savedData.Color.Vector4ToColor());
+                    ColorManager.ChangeColor(_savedData.Color.Vector4ToColor(),ColorTargetMode.Both);
                 }
 
                 _runStartUpOnEnable = false;
@@ -326,9 +327,9 @@ namespace FCS_AlterraHub.Mono.OreConsumer
             _savedData = Mod.GetOreConsumerDataEntrySaveData(GetPrefabID());
         }
 
-        public override void ChangeBodyColor(Color color)
+        public override void ChangeBodyColor(Color color, ColorTargetMode mode)
         {
-            ColorManager.ChangeColor(color);   
+            ColorManager.ChangeColor(color,mode);   
         }
     }
 }

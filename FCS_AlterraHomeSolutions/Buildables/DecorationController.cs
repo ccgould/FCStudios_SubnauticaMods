@@ -1,4 +1,5 @@
 ﻿using FCS_AlterraHomeSolutions.Configuration;
+using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Mono;
 using FCS_HomeSolutions.Buildables;
@@ -30,7 +31,7 @@ namespace FCS_AlterraHomeSolutions.Buildables
                         ReadySaveData();
                     }
 
-                    ColorManager.ChangeColor(_savedData.Color.Vector4ToColor());
+                    ColorManager.ChangeColor(_savedData.Color.Vector4ToColor(),ColorTargetMode.Both);
                 }
 
                 _runStartUpOnEnable = false;
@@ -121,9 +122,9 @@ namespace FCS_AlterraHomeSolutions.Buildables
             }
         }
 
-        public override void ChangeBodyColor(Color color)
+        public override void ChangeBodyColor(Color color,ColorTargetMode mode)
         {
-            ColorManager.ChangeColor(color);
+            ColorManager.ChangeColor(color,mode);
         }
     }
 }

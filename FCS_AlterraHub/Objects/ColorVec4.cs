@@ -4,7 +4,7 @@ using UnityEngine;
 namespace FCS_AlterraHub.Objects
 {
     [Serializable]
-    public class ColorVec4
+    public struct ColorVec4
     {
         public ColorVec4(float r, float g, float b, float a)
         {
@@ -48,5 +48,15 @@ namespace FCS_AlterraHub.Objects
         public float G { get; set; }
         public float B { get; set; }
         public float A { get; set; }
+
+        public static bool operator ==(ColorVec4 first, ColorVec4 second)
+        {
+            return Equals(first, second);
+        }
+        public static bool operator !=(ColorVec4 first, ColorVec4 second)
+        {
+            // or !Equals(first, second), but we want to reuse the existing comparison 
+            return !(first == second);
+        }
     }
 }

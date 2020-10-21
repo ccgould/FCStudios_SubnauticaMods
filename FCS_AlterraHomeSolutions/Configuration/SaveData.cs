@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Objects;
 using Oculus.Newtonsoft.Json;
 
@@ -18,6 +19,7 @@ namespace FCS_AlterraHomeSolutions.Configuration
         [JsonProperty] internal string Id { get; set; }
         [JsonProperty(PropertyName = "COL")] internal ColorVec4 Color { get; set; }
         [JsonProperty(PropertyName = "A")] internal int Amount { get; set; }
+        [JsonProperty(PropertyName = "PTM")] internal ColorTargetMode ColorTargetMode { get; set; }
     }
 
 

@@ -1,5 +1,4 @@
 ﻿using System;
-using FCS_AlterraHomeSolutions;
 using FCS_AlterraHomeSolutions.Configuration;
 using FCS_AlterraHub.API;
 using FCSCommon.Helpers;
@@ -14,6 +13,7 @@ namespace FCS_HomeSolutions.Buildables
         internal static GameObject ColorItemPrefab { get; set; }
         internal static GameObject ItemPrefab { get; set; }
         internal static string BodyMaterial => $"fcs{Mod.ModName}_COL";
+        internal static string SecondaryMaterial => $"fcs{Mod.ModName}_COL_S";
         internal static string DecalMaterial => $"fcs{Mod.ModName}_DECALS";
         internal static string DetailsMaterial => $"fcs{Mod.ModName}_DETAILS";
         internal static string SpecTexture => $"fcs{Mod.ModName}_S";

@@ -1,4 +1,5 @@
 ﻿using System;
+using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -11,21 +12,13 @@ namespace FCS_AlterraHub.Mono
         private GameObject _gameObject;
         private readonly Color _defaultColor = new Color(0.7529412f, 0.7529412f, 0.7529412f, 1f);
         public Action<Color> OnColorChanged;
-        
-        public void Initialize(GameObject gameObject, string bodyMaterial)
+        private string _bodySecondary;
+
+        public void Initialize(GameObject gameObject, string bodyMaterial, string secondaryMaterial = "")
         {
             _gameObject = gameObject;
             _bodyMaterial = bodyMaterial;
-        }
-
-        public void SetColorFromSave(Color color) 
-        {
-            ChangeColor(color);
-        }
-
-        public void SetMaskColorFromSave(Color color)
-        {
-            ChangeColorMask(color);
+            _bodySecondary = secondaryMaterial;
         }
 
         public Color GetColor()
@@ -39,22 +32,24 @@ namespace FCS_AlterraHub.Mono
             return (Color)color;
         }
 
-        public Color GetMaskColor()
+        public void ChangeColor(Color color,ColorTargetMode mode = ColorTargetMode.Primary)
         {
-            var color = MaterialHelpers.GetBodyMaskColor(_gameObject, _bodyMaterial);
-            if (color == null) return _defaultColor;
-            return (Color)color;
-        }
+            switch (mode)
+            {
+                case ColorTargetMode.Primary:
+                    MaterialHelpers.ChangeMaterialColor(_bodyMaterial, _gameObject, color);
+                    break;
+                case ColorTargetMode.Secondary:
+                    if(!string.IsNullOrWhiteSpace(_bodySecondary))
+                        MaterialHelpers.ChangeMaterialColor(_bodySecondary, _gameObject, color);
+                    break;
+                case ColorTargetMode.Both:
+                    MaterialHelpers.ChangeMaterialColor(_bodyMaterial, _gameObject, color);
+                    if (!string.IsNullOrWhiteSpace(_bodySecondary))
+                        MaterialHelpers.ChangeMaterialColor(_bodySecondary, _gameObject, color);
+                    break;
+            }
 
-        public void ChangeColor(Color color)
-        {
-            MaterialHelpers.ChangeMaterialColor(_bodyMaterial, _gameObject, color);
-            OnColorChanged?.Invoke(color);
-        }
-
-        public void ChangeColorMask(Color color)
-        {
-            MaterialHelpers.ChangeMaterialColor(_bodyMaterial, _gameObject, Color.white,color,Color.white);
             OnColorChanged?.Invoke(color);
         }
     }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using FCS_AlterraHub.Extensions;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -7,7 +8,27 @@ namespace FCS_AlterraHub.Objects
 {
     public static class ColorList
     {
-        public static List<ColorVec4> Colors = new List<ColorVec4>
+        public static Dictionary<ColorVec4,string> Colors = new Dictionary<ColorVec4,string>
+        {
+            {new ColorVec4(0f,0f,0f,1f), "Black"},
+            {new ColorVec4(1f,1f,1f,1f),"White"},
+            {new ColorVec4(1f,0f,0f,1f),"Red"},
+            {new ColorVec4(1f, 0.4980392f, 0f,1f), "Orange"},
+            {new ColorVec4(1f, 1f, 0f,1f), "Yellow"},
+            {new ColorVec4(0.5019608f, 1f, 0f,1f), "Lime Green"},
+            {new ColorVec4(0f, 1f, 0f,1f),"Green"},
+            {new ColorVec4(0.058f, 1f, 0f,1f), "Spring Green"},
+            {new ColorVec4(0f, 1f, 1f,1f), "Aqua"},
+            {new ColorVec4(0f, 0.5019608f, 1f,1f), "Dodger Blue"},
+            {new ColorVec4(0f,0f,1f,1f), "Blue"},
+            {new ColorVec4(0.5019608f,0f,1f,1f), "Electric Indigo"},
+            {new ColorVec4(1f,0f,1f,1f),"Magenta"},
+            {new ColorVec4(0.9960785f,0f,0.4980392f,1f), "Deep Pink"}
+        };
+
+
+
+        public static List<ColorVec4> OldColorsList = new List<ColorVec4>
         {
             new ColorVec4(0f,0f,0f,1f),
             new ColorVec4(0.827451f,1f,0.9921569f,1f),
@@ -145,23 +166,15 @@ namespace FCS_AlterraHub.Objects
             new ColorVec4(0.3f,0.3f,0.3f,1f),
         };
 
-        public static void AddColor(Color color)
+        public static void AddColor(Color color, string colorName = "N/A")
         {
             var vec4Color = color.ColorToVector4();
-            var match = false;
 
-            foreach (ColorVec4 colorVec4 in Colors)
-            {
-                if (!colorVec4.Compare(vec4Color)) continue;
-                match = true;
-                break;
-            }
-            
-            if (!match)
-            {
-                Colors.Add(vec4Color);
-                QuickLogger.Info($"Added new color to ColorsList: {color}");
-            }
+            var result = Colors.Any(x => x.Key == vec4Color);
+            if (result) return;
+
+            Colors.Add(vec4Color, colorName);
+            QuickLogger.Info($"Added new color to ColorsList: {color}");
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using FCS_AlterraHub.Configuration;
+﻿using FCS_AlterraHomeSolutions.Mono.PaintTool;
+using FCS_AlterraHub.Configuration;
 using FCSCommon.Utilities;
 using UnityEngine;
 
@@ -72,7 +73,7 @@ namespace FCS_AlterraHub.Mono
         /// Changes the body color of the device
         /// </summary>
         /// <param name="color"></param>
-        public virtual void ChangeBodyColor(Color color)
+        public virtual void ChangeBodyColor(Color color, ColorTargetMode mode)
         {
             QuickLogger.ModMessage("I don't have any color changing abilities");
         }

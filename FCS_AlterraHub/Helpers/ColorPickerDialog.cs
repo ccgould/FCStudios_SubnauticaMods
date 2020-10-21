@@ -79,7 +79,7 @@ namespace FCS_AlterraHub.Helpers
             for (int i = startingPosition; i < endingPosition; i++)
             {
                 var colorID = ColorList.Colors.ElementAt(i);
-                CreateColorItem(colorID);
+                CreateColorItem(colorID.Key);
             }
 
             UpdateColorPaginator();
