@@ -4,7 +4,7 @@ using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Objects;
 using Oculus.Newtonsoft.Json;
 
-namespace FCS_AlterraHomeSolutions.Configuration
+namespace FCS_HomeSolutions.Configuration
 {
     [Serializable]
     internal class DecorationDataEntry

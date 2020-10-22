@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using FCS_AlterraHomeSolutions.Configuration;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Mono;
+using FCS_HomeSolutions.Configuration;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
 
-namespace FCS_AlterraHomeSolutions.Buildables
+namespace FCS_HomeSolutions.Buildables
 {
     internal class SweetWaterBarPatch : DecorationEntryPatch
     {

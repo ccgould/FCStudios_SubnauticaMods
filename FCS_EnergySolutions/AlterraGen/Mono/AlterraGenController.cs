@@ -1,5 +1,7 @@
-﻿using FCS_AlterraHub.Extensions;
+﻿using FCS_AlterraHomeSolutions.Mono.PaintTool;
+using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Mono;
+using FCS_AlterraHub.Objects;
 using FCS_AlterraHub.Registration;
 using FCS_EnergySolutions.AlterraGen.Buildables;
 using FCS_EnergySolutions.Buildable;
@@ -11,9 +13,9 @@ using UnityEngine;
 
 namespace FCS_EnergySolutions.AlterraGen.Mono
 {
-    internal class AlterraGenController : FcsDevice
+    internal class AlterraGenController : FcsDevice, IFCSSave<SaveData>
     {
-        private SaveDataEntry _savedData;
+        private AlterraGenDataEntry _savedData;
         internal bool IsFromSave { get; private set; }
     
         private string _prefabID;
@@ -123,6 +125,15 @@ namespace FCS_EnergySolutions.AlterraGen.Mono
             return _prefabID;
         }
 
+        public override void ChangeBodyColor(Color color, ColorTargetMode mode)
+        {
+#if DEBUG
+            QuickLogger.Debug($"Changing AlterraGen color to {ColorList.GetName(color)}",true);
+#endif
+
+            ColorManager.ChangeColor(color,mode);
+        }
+
         #endregion
 
         #region IConstructable
@@ -165,23 +176,22 @@ namespace FCS_EnergySolutions.AlterraGen.Mono
             QuickLogger.Debug("In OnProtoDeserialize");
             var prefabIdentifier = GetComponentInParent<PrefabIdentifier>() ?? GetComponent<PrefabIdentifier>();
             var id = prefabIdentifier?.Id ?? string.Empty;
-            _savedData = Mod.GetSaveData(id);
+            _savedData = Mod.GetAlterraGenSaveData(id);
         }
 
-        internal void Save(SaveData newSaveData)
+        public void Save(SaveData newSaveData)
         {
             if (!IsInitialized
                 || !IsConstructed) return;
 
             if (_savedData == null)
             {
-                _savedData = new SaveDataEntry();
+                _savedData = new AlterraGenDataEntry();
             }
 
             _savedData.ID = GetPrefabID();
 
             QuickLogger.Debug($"Saving ID {_savedData.ID}",true);
-
             _savedData.BodyColor = ColorManager.GetColor().ColorToVector4();
             _savedData.Storage = PowerManager.GetItemsWithin();
             _savedData.ToConsume = PowerManager.GetToConsume();
@@ -189,7 +199,7 @@ namespace FCS_EnergySolutions.AlterraGen.Mono
             _savedData.StoredPower = PowerManager.GetStoredPower();
             _savedData.Power = PowerManager.GetPowerSourcePower();
             _savedData.IsVisible = IsVisible;
-            newSaveData.Entries.Add(_savedData);
+            newSaveData.AlterraGenEntries.Add(_savedData);
         }
 
         public override void OnProtoDeserialize(ProtobufSerializer serializer)

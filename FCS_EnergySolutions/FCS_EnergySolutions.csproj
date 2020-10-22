@@ -117,6 +117,7 @@
     <Compile Include="AlterraGen\Mono\AlterraGenPowerManager.cs" />
     <Compile Include="AlterraGen\Struct\BatteryData.cs" />
     <Compile Include="Buildable\ModelPrefab.cs" />
+    <Compile Include="Configuration\Config.cs" />
     <Compile Include="Configuration\Mod.cs" />
     <Compile Include="Configuration\SaveDataEntry.cs" />
     <Compile Include="QPatch.cs" />

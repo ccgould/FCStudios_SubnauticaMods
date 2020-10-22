@@ -11,7 +11,7 @@ namespace FCS_EnergySolutions.Buildable
     {
         private static bool _initialized;
         internal static GameObject ColorItemPrefab { get; set; }
-        internal static GameObject ItemPrefab { get; set; }
+        internal static GameObject AlterraGenItemPrefab { get; set; }
         internal static string BodyMaterial => $"{Mod.ModName}_COL";
         internal static string SecondaryMaterial => $"{Mod.ModName}_COL_S";
         internal static string DecalMaterial => $"{Mod.ModName}_DECALS";
@@ -23,20 +23,26 @@ namespace FCS_EnergySolutions.Buildable
         public static AssetBundle GlobalBundle { get; set; }
         public static AssetBundle ModBundle { get; set; }
 
+
+        internal static void Initialize()
+        {
+            if (GlobalBundle == null)
+            {
+                GlobalBundle = FCSAssetBundlesService.PublicAPI.GetAssetBundleByName(FCSAssetBundlesService.PublicAPI.GlobalBundleName);
+            }
+
+            if (ModBundle == null)
+            {
+                ModBundle = FCSAssetBundlesService.PublicAPI.GetAssetBundleByName(Mod.ModBundleName, Mod.GetModDirectory());
+            }
+
+            AlterraGenItemPrefab = GetPrefab("ItemButton");
+        }
+
         internal static GameObject GetPrefab(string prefabName)
         {
             try
             {
-                if (GlobalBundle == null)
-                {
-                    GlobalBundle = FCSAssetBundlesService.PublicAPI.GetAssetBundleByName(FCSAssetBundlesService.PublicAPI.GlobalBundleName);
-                }
-
-                if (ModBundle == null)
-                {
-                    ModBundle = FCSAssetBundlesService.PublicAPI.GetAssetBundleByName(Mod.ModBundleName, Mod.GetModDirectory());
-                }
-
                 QuickLogger.Debug($"Getting Prefab: {prefabName}");
                 if (!LoadAsset(prefabName, ModBundle, out var prefabGo)) return null;
                 return prefabGo;

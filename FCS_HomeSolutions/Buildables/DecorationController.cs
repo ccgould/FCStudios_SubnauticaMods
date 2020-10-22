@@ -1,12 +1,11 @@
-﻿using FCS_AlterraHomeSolutions.Configuration;
-using FCS_AlterraHomeSolutions.Mono.PaintTool;
+﻿using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Mono;
-using FCS_HomeSolutions.Buildables;
+using FCS_HomeSolutions.Configuration;
 using FCSCommon.Utilities;
 using UnityEngine;
 
-namespace FCS_AlterraHomeSolutions.Buildables
+namespace FCS_HomeSolutions.Buildables
 {
     internal class DecorationController : FcsDevice,IFCSSave<SaveData>
     {

@@ -209,7 +209,7 @@ namespace FCS_EnergySolutions.AlterraGen.Mono
                 
                 _grid = _mono.gameObject.AddComponent<GridHelper>();
                 _grid.OnLoadDisplay += OnLoadItemsGrid;
-                _grid.Setup(3, ModelPrefab.ItemPrefab, homePage, Color.gray, Color.gray, OnButtonClick);
+                _grid.Setup(3, ModelPrefab.AlterraGenItemPrefab, homePage, Color.gray, Color.gray, OnButtonClick);
                 
                 _unitID = GameObjectHelpers.FindGameObject(homePage, "UnitID")?.GetComponent<Text>();
 

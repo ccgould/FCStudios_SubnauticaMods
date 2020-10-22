@@ -1,13 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
-using FCS_AlterraHomeSolutions.Buildables;
-using FCS_AlterraHomeSolutions.Spawnables;
 using FCS_HomeSolutions.Buildables;
+using FCS_HomeSolutions.Spawnables;
 using FCSCommon.Utilities;
 using QModManager.API.ModLoading;
 using UnityEngine;
 
-namespace FCS_AlterraHomeSolutions
+namespace FCS_HomeSolutions
 {
     /*
      * Alterra Home Solutions mod pack adds objects to subnautica that deals with bases and decorations

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using FCS_AlterraHub.Spawnables;
 using FCS_EnergySolutions.AlterraGen.Mono;
 using FCS_EnergySolutions.Buildable;
 using FCS_EnergySolutions.Configuration;
@@ -20,7 +21,12 @@ namespace FCS_EnergySolutions.AlterraGen.Buildables
         public AlterraGenBuildable() : base(Mod.AlterraGenModClassName, Mod.AlterraGenModFriendlyName, Mod.ModDescription)
         {
             _prefab = ModelPrefab.GetPrefab(Mod.AlterraGenModPrefabName);
-            OnFinishedPatching += AdditionalPatching;
+            OnFinishedPatching += () =>
+            {
+                AdditionalPatching();
+                var oreGeneratorKit = new FCSKit(Mod.AlterraGenKitClassID, Mod.AlterraGenModFriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
+                oreGeneratorKit.Patch();
+            };
         }
 
         public override GameObject GetGameObject()

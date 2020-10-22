@@ -1,6 +1,6 @@
 ﻿using System;
-using FCS_AlterraHomeSolutions.Configuration;
 using FCS_AlterraHub.API;
+using FCS_HomeSolutions.Configuration;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;

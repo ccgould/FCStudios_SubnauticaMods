@@ -2,11 +2,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
+using FCS_AlterraHub.Mono;
 using FCS_EnergySolutions.AlterraGen.Enumerators;
 using FCS_EnergySolutions.AlterraGen.Mono;
+using FCSCommon.Extensions;
 using FCSCommon.Utilities;
 using HarmonyLib;
+using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 
@@ -32,22 +36,18 @@ namespace FCS_EnergySolutions.Configuration
         internal static string AlterraGenModClassName => AlterraGenModName;
         internal static string AlterraGenModPrefabName => AlterraGenModName;
 
-//#if SUBNAUTICA
-//        internal static TechData AlterraGenIngredients => new TechData
-//#elif BELOWZERO
-//                internal static RecipeData AlterraGenIngredients => new RecipeData
-//#endif
-//        {
-//            craftAmount = 1,
-//            Ingredients =
-//            {
-//                new Ingredient(TechType.Titanium, 1),
-//                new Ingredient(TechType.Quartz, 1),
-//                new Ingredient(TechType.Lubricant, 1),
-//                new Ingredient(TechType.Battery, 1),
-//                new Ingredient(TechType.Silicone, 1)
-//            }
-//        };
+#if SUBNAUTICA
+        internal static TechData AlterraGenIngredients => new TechData
+#elif BELOWZERO
+                internal static RecipeData AlterraGenIngredients => new RecipeData
+#endif
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(AlterraGenKitClassID.ToTechType(), 1),
+            }
+        };
 
         internal const string ModDescription ="";
 
@@ -81,7 +81,7 @@ namespace FCS_EnergySolutions.Configuration
 
                 SaveData newSaveData = new SaveData();
 
-                var controllers = GameObject.FindObjectsOfType<AlterraGenController>();
+                var controllers = GameObject.FindObjectsOfType<MonoBehaviour>().OfType<IFCSSave<SaveData>>();
 
                 foreach (var controller in controllers)
                 {
@@ -120,13 +120,13 @@ namespace FCS_EnergySolutions.Configuration
             return Path.Combine(SaveUtils.GetCurrentSaveDataDir(), ModName);
         }
 
-        internal static SaveDataEntry GetSaveData(string id)
+        internal static AlterraGenDataEntry GetAlterraGenSaveData(string id)
         {
             LoadData();
 
             var saveData = GetSaveData();
 
-            foreach (var entry in saveData.Entries)
+            foreach (var entry in saveData.AlterraGenEntries)
             {
                 if (string.IsNullOrEmpty(entry.ID)) continue;
 
@@ -136,7 +136,7 @@ namespace FCS_EnergySolutions.Configuration
                 }
             }
 
-            return new SaveDataEntry() { ID = id };
+            return new AlterraGenDataEntry() { ID = id };
         }
 
         internal static SaveData GetSaveData()

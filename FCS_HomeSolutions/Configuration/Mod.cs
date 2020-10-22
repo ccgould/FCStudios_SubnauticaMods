@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Mono;
+using FCS_HomeSolutions.Mono.PaintTool;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 
-namespace FCS_AlterraHomeSolutions.Configuration
+namespace FCS_HomeSolutions.Configuration
 {
     internal static class Mod
     {
@@ -18,8 +18,8 @@ namespace FCS_AlterraHomeSolutions.Configuration
         private static List<PaintToolController> _registeredPaintTool;
         
         internal const string ModName = "HomeSolutions";
-        internal const string ModFriendlyName = "Alterra Home Solutions";
-        internal const string ModBundleName = "fcsalterrahomesolutions";
+        internal const string ModFriendlyName = "Home Solutions";
+        internal const string ModBundleName = "fcshomesolutions";
         internal const string PaintToolClassID = "PaintTool";
         internal const string PaintToolFriendly = "Alterra Paint Tool";
         internal const string PaintToolDescription = "Change the color of FCStudios mods";

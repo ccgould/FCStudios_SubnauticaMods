@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHub.Extensions;
 using FCSCommon.Utilities;
@@ -23,7 +24,8 @@ namespace FCS_AlterraHub.Objects
             {new ColorVec4(0f,0f,1f,1f), "Blue"},
             {new ColorVec4(0.5019608f,0f,1f,1f), "Electric Indigo"},
             {new ColorVec4(1f,0f,1f,1f),"Magenta"},
-            {new ColorVec4(0.9960785f,0f,0.4980392f,1f), "Deep Pink"}
+            {new ColorVec4(0.9960785f,0f,0.4980392f,1f), "Deep Pink"},
+            {new ColorVec4(0.8941177f,0.6784314f,0.01960784f,1f), "Gamboge"}
         };
 
 
@@ -175,6 +177,12 @@ namespace FCS_AlterraHub.Objects
 
             Colors.Add(vec4Color, colorName);
             QuickLogger.Info($"Added new color to ColorsList: {color}");
+        }
+
+        public static string GetName(Color color)
+        {
+            var vecColor = color.ColorToVector4();
+            return Colors.ContainsKey(vecColor) ? Colors[vecColor] : "Unknown Color";
         }
     }
 }

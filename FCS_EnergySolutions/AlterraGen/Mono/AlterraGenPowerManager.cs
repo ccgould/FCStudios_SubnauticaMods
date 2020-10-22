@@ -219,7 +219,7 @@ namespace FCS_EnergySolutions.AlterraGen.Mono
             return _toConsume;
         }
 
-        internal void LoadFromSave(SaveDataEntry saveData)
+        internal void LoadFromSave(AlterraGenDataEntry saveData)
         {
             if (saveData.Storage != null) 
             {

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using FCS_AlterraHomeSolutions.Configuration;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Spawnables;
+using FCS_HomeSolutions.Configuration;
 using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
@@ -12,7 +12,7 @@ using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
 using UnityEngine;
 
-namespace FCS_AlterraHomeSolutions.Buildables
+namespace FCS_HomeSolutions.Buildables
 {
     internal class DecorationEntryPatch: Buildable
     {

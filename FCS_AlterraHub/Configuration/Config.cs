@@ -13,7 +13,7 @@ using UnityEngine.Events;
 namespace FCS_AlterraHub.Configuration
 {
     [Menu("AlterraHub Menu")]
-    public class Config : ConfigFile
+    internal class Config : ConfigFile
     {
 
         [Toggle("Enable Debugs"), OnChange(nameof(EnableDebugsToggleEvent))]
