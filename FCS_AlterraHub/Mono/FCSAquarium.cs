@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
@@ -20,15 +21,11 @@ namespace FCS_AlterraHub.Mono
 
 			fishRoot = storageRoot;
 
-            foreach (var creature in creatures)
-            {
-                _itemsContainer.AddItem(creature.ToPickupable());
-            }
-
             this.tracks = new List<FishTrack>();
             for (int i = 0; i < this.trackObjects.Length; i++)
             {
-                this.tracks.Add(new FishTrack(this.trackObjects[i]));
+                _itemsContainer.AddItem(creatures[i].ToPickupable());
+				this.tracks.Add(new FishTrack(trackObjects[i]));
             }
             Invoke("InitFishDelayed", 0f);
             _isInitialized = true;
@@ -73,7 +70,15 @@ namespace FCS_AlterraHub.Mono
             }
             this.subscribed = state;
         }
-		
+
+        public void Destroy()
+        {
+			for (int i = _itemsContainer.count - 1; i > -1; i--)
+            {
+                _itemsContainer.RemoveItem(_itemsContainer.ElementAt(0).item);
+            }
+		}
+
 		private void InitFishDelayed()
 		{
             if (_itemsContainer != null)
@@ -106,33 +111,38 @@ namespace FCS_AlterraHub.Mono
 
 		private void AddItem(InventoryItem item)
 		{
-			GameObject gameObject = item.item.gameObject;
-			AquariumFish component = gameObject.GetComponent<AquariumFish>();
-			if (component == null)
-			{
-				return;
-			}
+			if(item == null) return;
+			GameObject fish = item.item.gameObject;
+			AquariumFish aquariumFish = fish.GetComponent<AquariumFish>();
+			
+            if (aquariumFish == null) return;
+
 			TechType techType = item.item.GetTechType();
 			FishTrack freeTrack = this.GetFreeTrack();
-			GameObject gameObject2 = Instantiate(component.model, Vector3.zero, Quaternion.identity);
-			gameObject2.transform.SetParent(freeTrack.track.transform, false);
-			gameObject2.transform.localScale *= 0.3f;
-			this.SetupRenderers(gameObject2);
-			AnimateByVelocity componentInChildren = gameObject2.GetComponentInChildren<AnimateByVelocity>();
-			componentInChildren.rootGameObject = gameObject2;
-			componentInChildren.animationMoveMaxSpeed = 0.5f;
+            GameObject fishClone = Instantiate(aquariumFish.model, Vector3.zero, Quaternion.identity);
+			fishClone.transform.SetParent(freeTrack.track.transform, false);
+			fishClone.transform.localScale *= fishScale;
+			this.SetupRenderers(fishClone);
+			AnimateByVelocity animateByVelocity = fishClone.GetComponentInChildren<AnimateByVelocity>();
+			animateByVelocity.rootGameObject = fishClone;
+			animateByVelocity.animationMoveMaxSpeed = fishMaxSpeed;
+
 			freeTrack.fishType = techType;
-			freeTrack.fish = gameObject2;
-			freeTrack.item = gameObject;
-			InfectedMixin component2 = gameObject.GetComponent<InfectedMixin>();
-			if (component2 != null)
+			freeTrack.fish = fishClone;
+			freeTrack.item = fish;
+            freeTrack.animateComponent = animateByVelocity;
+
+			InfectedMixin component2 = fish.GetComponent<InfectedMixin>();
+			
+            if (component2 != null)
 			{
-				InfectedMixin infectedMixin = gameObject2.AddComponent<InfectedMixin>();
-				infectedMixin.renderers = GetMarmosetRenderers(gameObject2).ToArray();
+				InfectedMixin infectedMixin = fishClone.AddComponent<InfectedMixin>();
+				infectedMixin.renderers = GetMarmosetRenderers(fishClone).ToArray();
 				infectedMixin.SetInfectedAmount(component2.GetInfectedAmount());
 				freeTrack.infectedMixin = infectedMixin;
 			}
-			gameObject2.SetActive(true);
+			
+            fishClone.SetActive(true);
 			this.UpdateInfectionSpreading();
 		}
 
@@ -153,8 +163,10 @@ namespace FCS_AlterraHub.Mono
 					component.SetInfectedAmount(infectedMixin.GetInfectedAmount());
 				}
 			}
-			trackByItem.Clear();
-			this.UpdateInfectionSpreading();
+
+            trackByItem.Clear();
+            this.UpdateInfectionSpreading();
+            DestroyImmediate(gameObject);
 		}
 
 		private FishTrack GetFreeTrack()
@@ -309,7 +321,8 @@ namespace FCS_AlterraHub.Mono
 				this.fishType = TechType.None;
 				this.item = null;
 				this.infectedMixin = null;
-				UnityEngine.Object.Destroy(this.fish);
+                Object.Destroy(animateComponent);
+				Destroy(fish);
 			}
 
 			public FishTrack(GameObject track)
@@ -326,6 +339,7 @@ namespace FCS_AlterraHub.Mono
 			public GameObject item;
 
 			public InfectedMixin infectedMixin;
-		}
+            public AnimateByVelocity animateComponent;
+        }
 	}
 }

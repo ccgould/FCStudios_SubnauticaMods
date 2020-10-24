@@ -71,13 +71,6 @@ namespace FCS_HomeSolutions.Buildables
     {
         private FCSAquarium _fcsAquarium;
         private bool _runStartUpOnEnable;
-        private Dictionary<string,string> _plantResourceDictionary = new Dictionary<string, string>
-        {
-            { "[CORAL_REEF_PLANT_MIDDLE]","WorldEntities/Doodads/Coral_reef/coral_reef_plant_middle_03"},
-            { "[CORAL_REEF_G3]","WorldEntities/Doodads/Coral_reef/coral_reef_grass_03"},
-            { "[CORAL_REEF_SMALL_DECO]","WorldEntities/Doodads/Coral_reef/coral_reef_small_deco_14"},
-            { "[PURPLE_FAN]","WorldEntities/Doodads/Coral_reef/Coral_reef_purple_fan"},
-        }; 
         
         private void OnEnable()
         {
@@ -90,6 +83,11 @@ namespace FCS_HomeSolutions.Buildables
                 
                 _runStartUpOnEnable = false;
             }
+        }
+
+        private void OnDestroy()
+        {
+            
         }
 
         public bool CanDeconstruct(out string reason)
@@ -113,9 +111,9 @@ namespace FCS_HomeSolutions.Buildables
             {
                 var name = plantGo.gameObject.name;
 
-                if (_plantResourceDictionary.ContainsKey(name))
+                if (SpawnHelper.ContainsPlant(name))
                 {
-                    SpawnHelper.SpawnAtPoint(_plantResourceDictionary[name], plantGo);
+                    SpawnHelper.SpawnAtPoint(name, plantGo);
                 }
             }
 
@@ -142,6 +140,10 @@ namespace FCS_HomeSolutions.Buildables
                 {
                     _runStartUpOnEnable = true;
                 }
+            }
+            else
+            {
+                _fcsAquarium?.Destroy();
             }
         }
     }

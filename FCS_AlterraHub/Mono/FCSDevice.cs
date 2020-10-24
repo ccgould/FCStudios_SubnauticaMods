@@ -78,9 +78,10 @@ namespace FCS_AlterraHub.Mono
         /// Changes the body color of the device
         /// </summary>
         /// <param name="color"></param>
-        public virtual void ChangeBodyColor(Color color, ColorTargetMode mode)
+        public virtual bool ChangeBodyColor(Color color, ColorTargetMode mode)
         {
             QuickLogger.ModMessage("I don't have any color changing abilities");
+            return false;
         }
 
         /// <summary>

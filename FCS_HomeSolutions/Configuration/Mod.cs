@@ -17,9 +17,10 @@ namespace FCS_HomeSolutions.Configuration
         private static SaveData _saveData;
         private static List<PaintToolController> _registeredPaintTool;
         
-        internal const string ModName = "HomeSolutions";
+        internal const string ModName = "FCSHomeSolutions";
         internal const string ModFriendlyName = "Home Solutions";
         internal const string ModBundleName = "fcshomesolutions";
+
         internal const string PaintToolClassID = "PaintTool";
         internal const string PaintToolFriendly = "Alterra Paint Tool";
         internal const string PaintToolDescription = "Change the color of FCStudios mods";

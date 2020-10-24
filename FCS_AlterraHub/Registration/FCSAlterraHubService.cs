@@ -44,7 +44,8 @@ namespace FCS_AlterraHub.Registration
         public void RegisterDevice(FcsDevice device, string tabID)
         {
             var prefabID = device.GetPrefabID();
-            if (string.IsNullOrWhiteSpace(device.UnitID) || string.IsNullOrWhiteSpace(prefabID)) return;
+
+            if (string.IsNullOrWhiteSpace(prefabID)) return;
             
             if (!knownDevices.ContainsKey(prefabID))
             {

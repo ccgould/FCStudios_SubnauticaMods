@@ -12,14 +12,14 @@ namespace FCS_HomeSolutions.Buildables
         private static bool _initialized;
         internal static GameObject ColorItemPrefab { get; set; }
         internal static GameObject ItemPrefab { get; set; }
-        internal static string BodyMaterial => $"fcs{Mod.ModName}_COL";
-        internal static string SecondaryMaterial => $"fcs{Mod.ModName}_COL_S";
-        internal static string DecalMaterial => $"fcs{Mod.ModName}_DECALS";
-        internal static string DetailsMaterial => $"fcs{Mod.ModName}_DETAILS";
-        internal static string SpecTexture => $"fcs{Mod.ModName}_S";
-        internal static string LUMTexture => $"fcs{Mod.ModName}_E";
-        internal static string NormalTexture => $"fcs{Mod.ModName}_N";
-        internal static string DetailTexture => $"fcs{Mod.ModName}_D";
+        internal static string BodyMaterial => $"{Mod.ModName}_COL";
+        internal static string SecondaryMaterial => $"{Mod.ModName}_COL_S";
+        internal static string DecalMaterial => $"{Mod.ModName}_DECALS";
+        internal static string DetailsMaterial => $"{Mod.ModName}_DETAILS";
+        internal static string SpecTexture => $"{Mod.ModName}_S";
+        internal static string LUMTexture => $"{Mod.ModName}_E";
+        internal static string NormalTexture => $"{Mod.ModName}_N";
+        internal static string DetailTexture => $"{Mod.ModName}_D";
         public static AssetBundle GlobalBundle { get; set; }
         public static AssetBundle ModBundle { get; set; }
         internal static GameObject PaintToolPrefab { get; set; }

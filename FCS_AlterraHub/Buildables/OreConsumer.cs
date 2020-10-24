@@ -14,8 +14,8 @@ namespace FCS_AlterraHub.Buildables
 {
     internal class OreConsumer : Buildable
     {
-        public override TechGroup GroupForPDA => TechGroup.InteriorModules;
-        public override TechCategory CategoryForPDA => TechCategory.InteriorModule;
+        public override TechGroup GroupForPDA => TechGroup.ExteriorModules;
+        public override TechCategory CategoryForPDA => TechCategory.ExteriorModule;
         public override string AssetsFolder => Mod.GetAssetPath();
 
 

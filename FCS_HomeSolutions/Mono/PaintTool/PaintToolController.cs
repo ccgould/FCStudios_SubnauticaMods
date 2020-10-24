@@ -90,6 +90,7 @@ namespace FCS_HomeSolutions.Mono.PaintTool
 
 
                 ChangeColor(_currentColor);
+                _currentIndex = ColorList.GetColorIndex(_currentColor);
                 RefreshUI();
                 _isFromSave = false;
             }
@@ -129,23 +130,23 @@ namespace FCS_HomeSolutions.Mono.PaintTool
             {
                 _currentIndex += 1;
 
-                if (_currentIndex == ColorList.Colors.Count - 1)
+                if (_currentIndex > ColorList.GetCount() - 1)
                 {
                     _currentIndex = 0;
                 }
 
-                ChangeColor(ColorList.Colors.ElementAt(_currentIndex).Key.Vector4ToColor());
+                ChangeColor(ColorList.GetColor(_currentIndex));
             }
             else if (base.isDrawn && Input.GetKeyDown(KeyCode.LeftArrow))
             {
                 _currentIndex -= 1;
 
-                if (_currentIndex == -1)
+                if (_currentIndex < 0)
                 {
-                    _currentIndex = ColorList.Colors.Count -1;
+                    _currentIndex = ColorList.GetCount() - 1;
                 }
 
-                ChangeColor(ColorList.Colors.ElementAt(_currentIndex).Key.Vector4ToColor());
+                ChangeColor(ColorList.GetColor(_currentIndex));
             }
             RefreshUI();
         }
@@ -174,22 +175,29 @@ namespace FCS_HomeSolutions.Mono.PaintTool
             if (Physics.Raycast(Player.main.camRoot.transform.position, Player.main.camRoot.transform.forward, out var hit, _range))
             {
                 var fcsDevice = hit.transform.parent.gameObject.transform.parent.gameObject.transform.parent.GetComponent<FcsDevice>();
-                fcsDevice?.ChangeBodyColor(_currentColor,_colorTargetMode);
-                _paintCanFillAmount -= 1;
-                RefreshUI();
+                if (fcsDevice != null)
+                {
+                    var result = fcsDevice.ChangeBodyColor(_currentColor, _colorTargetMode);
+
+                    if (result)
+                    {
+                        _paintCanFillAmount -= 1;
+                        RefreshUI();
+                    }
+                }
             };
         }
 
         private void RefreshUI()
         {
             if (!IsInitialized) return;
-            _currentIndexLBL.text = _currentIndex.ToString();
-            _totalColorsLBL.text = ColorList.Colors.Count.ToString();
+            _currentIndexLBL.text = (_currentIndex + 1).ToString();
+            _totalColorsLBL.text = ColorList.GetCount().ToString();
 
             var currentColorVec4 = _currentColor.ColorToVector4();
-            if (ColorList.Colors.ContainsKey(currentColorVec4))
+            if (ColorList.Contains(currentColorVec4))
             {
-                _colorNameLbl.text = ColorList.Colors[currentColorVec4];
+                _colorNameLbl.text = ColorList.GetName(currentColorVec4);
             }
             else
             {

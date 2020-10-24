@@ -249,7 +249,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             {
                 ResetPaymentScreen();
                 _debitBalance.text = Buildables.AlterraHub.AccountBalanceFormat(CardSystem.main.AlterraBalance());
-                _accountBalance.text = Buildables.AlterraHub.AccountBalanceFormat(CardSystem.main.AccountDetails.Balance);
+                _accountBalance.text = Buildables.AlterraHub.AccountBalanceFormat(CardSystem.main.GetAccountBalance());
                 ShowPaymentScreen();
             });
 

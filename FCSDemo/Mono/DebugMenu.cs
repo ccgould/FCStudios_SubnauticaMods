@@ -179,35 +179,6 @@ namespace FCSDemo.Mono
         private void ColorChangerMenu()
         {
 
-            GUILayout.BeginHorizontal();
-
-
-            GUILayout.BeginVertical();
-            GUILayout.Label("R");
-            _rTextBox = GUILayout.TextField(_rTextBox, GUILayout.Width(100));
-            rSliderValue = GUILayout.HorizontalSlider(rSliderValue, 0.0F, 1.0F);
-            _rTextBox = rSliderValue.ToString();
-            GUILayout.EndVertical();
-
-            GUILayout.BeginVertical();
-            GUILayout.Label("G");
-            _gTextBox = GUILayout.TextField(_gTextBox, GUILayout.Width(100));
-            gSliderValue = GUILayout.HorizontalSlider(gSliderValue, 0.0F, 1.0F);
-            _gTextBox = gSliderValue.ToString();
-            GUILayout.EndVertical();
-
-            GUILayout.BeginVertical();
-            GUILayout.Label("B");
-            _bTextBox = GUILayout.TextField(_bTextBox, GUILayout.Width(100));
-            bSliderValue = GUILayout.HorizontalSlider(bSliderValue, 0.0F, 1.0F);
-            _bTextBox = bSliderValue.ToString();
-            GUILayout.EndVertical();
-            
-            GUILayout.EndHorizontal();
-            
-
-            GUILayout.BeginHorizontal();
-
             GUILayout.BeginVertical("Box");
             _selGridInt = GUILayout.SelectionGrid(_selGridInt, _selStrings, 1);
             GUILayout.EndVertical();
@@ -220,40 +191,10 @@ namespace FCSDemo.Mono
             {
                 GetFCSDemos();
             }
-            if (GUILayout.Button("Change Color"))
-            {
-                ChangeSelectedColor();
-            }
             GUILayout.EndHorizontal();
         }
 
-        private void ChangeSelectedColor(FCSDemoController controller = null)
-        {
-            try
-            {
-                if (controller == null)
-                {
-                    var h = _demoControllers[_selGridInt];
-
-                    if (h != null)
-                    {
-                        h.ChangeColor(new Vector3(rSliderValue, gSliderValue, bSliderValue));
-                    }
-                }
-                else
-                {
-                    controller.ChangeColor(new Vector3(rSliderValue, gSliderValue, bSliderValue));
-                }
-            }
-            catch (IndexOutOfRangeException)
-            {
-                QuickLogger.Error("No FCSDemo object Seletected",true);
-            }
-            catch (Exception e)
-            {
-                QuickLogger.Error($"Message:{e.Message}\nAtackTrace:{e.StackTrace}");
-            }
-        }
+        
 
         public void SelectAndShowObject(Transform target)
         {
@@ -265,7 +206,6 @@ namespace FCSDemo.Mono
 
             if(controller == null) return;
 
-            ChangeSelectedColor(controller);
             QuickLogger.Info($"Model {controller.Name} Selected", true);
 
             //while (target != null)

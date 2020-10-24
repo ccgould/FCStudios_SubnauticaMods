@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using FCS_AlterraHub.Extensions;
 using FCSCommon.Utilities;
@@ -9,10 +11,13 @@ namespace FCS_AlterraHub.Objects
 {
     public static class ColorList
     {
-        public static Dictionary<ColorVec4,string> Colors = new Dictionary<ColorVec4,string>
+        private static object[] _keys;
+
+        private static readonly OrderedDictionary Colors = new OrderedDictionary
         {
             {new ColorVec4(0f,0f,0f,1f), "Black"},
             {new ColorVec4(1f,1f,1f,1f),"White"},
+            {new ColorVec4(0.7529412f, 0.7529412f, 0.7529412f, 1f),"Silver"},
             {new ColorVec4(1f,0f,0f,1f),"Red"},
             {new ColorVec4(1f, 0.4980392f, 0f,1f), "Orange"},
             {new ColorVec4(1f, 1f, 0f,1f), "Yellow"},
@@ -27,8 +32,6 @@ namespace FCS_AlterraHub.Objects
             {new ColorVec4(0.9960785f,0f,0.4980392f,1f), "Deep Pink"},
             {new ColorVec4(0.8941177f,0.6784314f,0.01960784f,1f), "Gamboge"}
         };
-
-
 
         public static List<ColorVec4> OldColorsList = new List<ColorVec4>
         {
@@ -167,13 +170,15 @@ namespace FCS_AlterraHub.Objects
             new ColorVec4(0.1843137f,0.3098039f,0.3098039f,1f),
             new ColorVec4(0.3f,0.3f,0.3f,1f),
         };
-
+        
         public static void AddColor(Color color, string colorName = "N/A")
         {
             var vec4Color = color.ColorToVector4();
 
-            var result = Colors.Any(x => x.Key == vec4Color);
-            if (result) return;
+            foreach (DictionaryEntry entry in Colors)
+            {
+                if ((string)entry.Value == colorName) return;
+            }
 
             Colors.Add(vec4Color, colorName);
             QuickLogger.Info($"Added new color to ColorsList: {color}");
@@ -182,7 +187,47 @@ namespace FCS_AlterraHub.Objects
         public static string GetName(Color color)
         {
             var vecColor = color.ColorToVector4();
-            return Colors.ContainsKey(vecColor) ? Colors[vecColor] : "Unknown Color";
+            return Colors.Contains(vecColor) ? (string)Colors[vecColor] : "Unknown Color";
+        }
+
+        public static int GetColorIndex(Color currentColor)
+        {
+            if (_keys == null)
+            {
+                _keys = new object[Colors.Keys.Count];
+                Colors.Keys.CopyTo(_keys, 0);
+            }
+
+            for (int i = 0; i < Colors.Keys.Count; i++)
+            {
+#if DEBUG
+                QuickLogger.Debug($"Index = {i}, Key = {_keys[i]}, Value = {Colors[i]}");
+#endif
+                if((ColorVec4)_keys[i] == currentColor.ColorToVector4())
+                    return i;
+            }
+
+            return 0;
+        }
+
+        public static int GetCount()
+        {
+            return Colors.Count;
+        }
+
+        public static Color GetColor(int currentIndex)
+        {
+            return ((ColorVec4)_keys[currentIndex]).Vector4ToColor();
+        }
+
+        public static bool Contains(ColorVec4 currentColorVec4)
+        {
+            return Colors.Contains(currentColorVec4);
+        }
+
+        public static string GetName(ColorVec4 currentColorVec4)
+        {
+            return (string)Colors[currentColorVec4];
         }
     }
 }

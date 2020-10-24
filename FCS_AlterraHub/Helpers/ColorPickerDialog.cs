@@ -69,17 +69,16 @@ namespace FCS_AlterraHub.Helpers
             int startingPosition = (_currentColorPage - 1) * _colorsPerPage;
             int endingPosition = startingPosition + _colorsPerPage;
 
-            if (endingPosition > ColorList.Colors.Count)
+            if (endingPosition > ColorList.GetCount())
             {
-                endingPosition = ColorList.Colors.Count;
+                endingPosition = ColorList.GetCount();
             }
 
             ClearColorPage();
 
             for (int i = startingPosition; i < endingPosition; i++)
             {
-                var colorID = ColorList.Colors.ElementAt(i);
-                CreateColorItem(colorID.Key);
+                CreateColorItem(ColorList.GetColor(i).ColorToVector4());
             }
 
             UpdateColorPaginator();
@@ -130,7 +129,7 @@ namespace FCS_AlterraHub.Helpers
 
         private void CalculateNewMaxColorPages()
         {
-            _maxColorPage = Mathf.CeilToInt((ColorList.Colors.Count - 1) / _colorsPerPage) + 1;
+            _maxColorPage = Mathf.CeilToInt((ColorList.GetCount() - 1) / _colorsPerPage) + 1;
             if (_currentColorPage > _maxColorPage)
             {
                 _currentColorPage = _maxColorPage;

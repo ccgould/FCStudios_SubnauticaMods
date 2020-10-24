@@ -26,7 +26,7 @@ namespace FCS_AlterraHub.Configuration
     }
     
     [Serializable]
-    public class SaveData
+    internal class SaveData
     {
         [JsonProperty] internal float SaveVersion { get; set; } = 1.0f;
         [JsonProperty] internal List<OreConsumerDataEntry> OreConsumerEntries = new List<OreConsumerDataEntry>();

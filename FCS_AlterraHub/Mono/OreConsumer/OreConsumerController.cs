@@ -327,9 +327,9 @@ namespace FCS_AlterraHub.Mono.OreConsumer
             _savedData = Mod.GetOreConsumerDataEntrySaveData(GetPrefabID());
         }
 
-        public override void ChangeBodyColor(Color color, ColorTargetMode mode)
+        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
         {
-            ColorManager.ChangeColor(color,mode);   
+            return ColorManager.ChangeColor(color,mode);   
         }
     }
 }

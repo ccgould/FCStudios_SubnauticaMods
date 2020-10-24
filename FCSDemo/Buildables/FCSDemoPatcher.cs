@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using FCS_AlterraHub.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using FCSDemo.Configuration;
 using FCSDemo.Model;
-using FCSTechFabricator.Components;
-using FCSTechFabricator.Extensions;
 using Mono;
 using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
@@ -30,10 +29,10 @@ namespace FCSDemo.Buildables
             {
                 var prefab = GameObject.Instantiate(_prefab);
 
-                if (QPatch.Configuration.Config.UseCustomBoundingBox)
+                if (QPatch.Configuration.UseCustomBoundingBox)
                 {
-                    var center = QPatch.Configuration.Config.BoundingCenter;
-                    var size = QPatch.Configuration.Config.BoundingSize;
+                    var center = QPatch.Configuration.BoundingCenter;
+                    var size = QPatch.Configuration.BoundingSize;
                     GameObjectHelpers.AddConstructableBounds(prefab, size.ToVector3(), center.ToVector3());
                 }
                 
@@ -52,36 +51,33 @@ namespace FCSDemo.Buildables
 
                 //========== Allows the building animation and material colors ==========// 
 
+                QuickLogger.Info("Loading Configurations",true);
+
                 // Add constructible
                 var constructable = prefab.AddComponent<Constructable>();
 
-                constructable.allowedOutside = QPatch.Configuration.Config.AllowedOutside;
-                constructable.allowedInBase = QPatch.Configuration.Config.AllowedInBase;
-                constructable.allowedOnGround = QPatch.Configuration.Config.AllowedOnGround;
-                constructable.allowedOnWall = QPatch.Configuration.Config.AllowedOnWall;
-                constructable.rotationEnabled = QPatch.Configuration.Config.RotationEnabled;
-                constructable.allowedOnCeiling = QPatch.Configuration.Config.AllowedOnCeiling;
-                constructable.allowedInSub = QPatch.Configuration.Config.AllowedInSub;
-                constructable.allowedOnConstructables = QPatch.Configuration.Config.AllowedOnConstructables;
+                constructable.allowedOutside = QPatch.Configuration.AllowedOutside;
+                constructable.allowedInBase = QPatch.Configuration.AllowedInBase;
+                constructable.allowedOnGround = QPatch.Configuration.AllowedOnGround;
+                constructable.allowedOnWall = QPatch.Configuration.AllowedOnWall;
+                constructable.rotationEnabled = QPatch.Configuration.RotationEnabled;
+                constructable.allowedOnCeiling = QPatch.Configuration.AllowedOnCeiling;
+                constructable.allowedInSub = QPatch.Configuration.AllowedInSub;
+                constructable.allowedOnConstructables = QPatch.Configuration.AllowedOnConstructables;
 
-                constructable.placeMaxDistance = QPatch.Configuration.Config.PlaceMaxDistance;//7f;
-                constructable.placeMinDistance = QPatch.Configuration.Config.PlaceMinDistance; //5f;
-                constructable.placeDefaultDistance = QPatch.Configuration.Config.PlaceDefaultDistance; //6f;
+                constructable.placeMaxDistance = QPatch.Configuration.PlaceMaxDistance;//7f;
+                constructable.placeMinDistance = QPatch.Configuration.PlaceMinDistance; //5f;
+                constructable.placeDefaultDistance = QPatch.Configuration.PlaceDefaultDistance; //6f;
                 constructable.model = model;
                 constructable.techType = TechType;
 
+                QuickLogger.Info("Loaded Configurations",true);
+
                 PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
                 prefabID.ClassId = ClassID;
-                MaterialHelpers.AddNewBubbles(prefab, new Vector3(0.722f, 1.03f, 0.775f),new Vector3(270f,266f,0f));
-                MaterialHelpers.AddNewBubbles(prefab, new Vector3(0.826f, 1.03f, -0.715f),new Vector3(270f,266f,0f));
-                MaterialHelpers.AddNewBubbles(prefab, new Vector3(-0.796f, 1.03f, -0.828f),new Vector3(270f,266f,0f));
-                MaterialHelpers.AddNewBubbles(prefab, new Vector3(-0.801f, 1.03f, 0.711f),new Vector3(270f,266f,0f));
                 prefab.AddComponent<TechTag>().type = TechType;
                 prefab.AddComponent<FCSDemoController>();
-                
-                //Add the FCSTechFabricatorTag component
                 MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModName);
-                prefab.AddComponent<FCSTechFabricatorTag>();
 
                 return prefab;
             }

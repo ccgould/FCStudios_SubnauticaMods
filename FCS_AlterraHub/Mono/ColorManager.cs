@@ -1,5 +1,6 @@
 ﻿using System;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
+using FCS_AlterraHub.Objects;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -10,9 +11,9 @@ namespace FCS_AlterraHub.Mono
     {
         private string _bodyMaterial;
         private GameObject _gameObject;
-        private readonly Color _defaultColor = new Color(0.7529412f, 0.7529412f, 0.7529412f, 1f);
         public Action<Color> OnColorChanged;
         private string _bodySecondary;
+        private Color _currentColor = Color.white;
 
         public void Initialize(GameObject gameObject, string bodyMaterial, string secondaryMaterial = "")
         {
@@ -23,34 +24,41 @@ namespace FCS_AlterraHub.Mono
 
         public Color GetColor()
         {
-            var color = MaterialHelpers.GetBodyColor(_gameObject, _bodyMaterial);
-            if (color == null)
-            {
-                QuickLogger.Error("Color returned null on Get Color setting default color");
-                return _defaultColor;
-            }
-            return (Color)color;
+            return _currentColor;
         }
 
-        public void ChangeColor(Color color,ColorTargetMode mode = ColorTargetMode.Primary)
+        public bool ChangeColor(Color color,ColorTargetMode mode = ColorTargetMode.Primary)
         {
+            bool result = false;
             switch (mode)
             {
                 case ColorTargetMode.Primary:
-                    MaterialHelpers.ChangeMaterialColor(_bodyMaterial, _gameObject, color);
+                    result =  MaterialHelpers.ChangeMaterialColor(_bodyMaterial, _gameObject, color);
                     break;
+
                 case ColorTargetMode.Secondary:
-                    if(!string.IsNullOrWhiteSpace(_bodySecondary))
-                        MaterialHelpers.ChangeMaterialColor(_bodySecondary, _gameObject, color);
+                    result = !string.IsNullOrWhiteSpace(_bodySecondary) && MaterialHelpers.ChangeMaterialColor(_bodySecondary, _gameObject, color);
                     break;
+                    
                 case ColorTargetMode.Both:
-                    MaterialHelpers.ChangeMaterialColor(_bodyMaterial, _gameObject, color);
+                    result =  MaterialHelpers.ChangeMaterialColor(_bodyMaterial, _gameObject, color);
+                    
                     if (!string.IsNullOrWhiteSpace(_bodySecondary))
-                        MaterialHelpers.ChangeMaterialColor(_bodySecondary, _gameObject, color);
+                    {
+
+                        var secResult = MaterialHelpers.ChangeMaterialColor(_bodySecondary, _gameObject, color);
+                        if (secResult)
+                        {
+                            result = secResult;
+                        }
+                    }
+
                     break;
             }
 
+            _currentColor = color;
             OnColorChanged?.Invoke(color);
+            return result;
         }
     }
 }

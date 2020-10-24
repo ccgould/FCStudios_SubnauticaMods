@@ -188,9 +188,9 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             }
         }
 
-        internal string GetAccountAmount(string cardNumber)
+        internal string GetAccountAmount()
         {
-            var amount = CardSystem.main.GetAccountBalance(cardNumber);
+            var amount = CardSystem.main.GetAccountBalance();
             return Converters.FloatToMoney("C",amount);
         }
 
@@ -260,8 +260,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
     {
         private AlterraHubController _mono;
         internal bool IsPlayerInRange;
-
-
+        
         internal Action<bool> onTriggered { get; set; }
 
         internal void Initialize(AlterraHubController mono)
@@ -283,8 +282,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             onTriggered?.Invoke(true);
             IsPlayerInRange = true;
         }
-
-
+        
         private void OnTriggerExit(Collider collider)
         {
             if (collider.gameObject.layer != 19) return;

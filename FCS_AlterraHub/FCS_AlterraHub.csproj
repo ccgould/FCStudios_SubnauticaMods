@@ -115,10 +115,9 @@
     <Compile Include="Buildables\AlterraHubModelPrefab.cs" />
     <Compile Include="Buildables\OreConsumer.cs" />
     <Compile Include="Configuration\Config.cs" />
+    <Compile Include="Configuration\DebugCommands.cs" />
     <Compile Include="Configuration\Mod.cs" />
     <Compile Include="Configuration\SaveData.cs" />
-    <Compile Include="Debug\DebugCommand.cs" />
-    <Compile Include="Debug\DebugController.cs" />
     <Compile Include="Enumerators\FCSGameMode.cs" />
     <Compile Include="Enumerators\ColorTargetMode.cs" />
     <Compile Include="Enumerators\FCSPowerStates.cs" />
@@ -126,7 +125,9 @@
     <Compile Include="Extensions\ColorExtensions.cs" />
     <Compile Include="Extensions\VectorExtensions.cs" />
     <Compile Include="Helpers\SpawnHelper.cs" />
+    <Compile Include="Interfaces\IFCSGrowBed.cs" />
     <Compile Include="Managers\FCSPowerManager.cs" />
+    <Compile Include="Model\FCSGrowingPlant.cs" />
     <Compile Include="Mono\FCSAquarium.cs" />
     <Compile Include="Objects\ColorList.cs" />
     <Compile Include="Helpers\ColorPickerDialog.cs" />
@@ -154,7 +155,6 @@
     <Compile Include="Patch\EnumCacheManager.cs" />
     <Compile Include="Patch\EnumTypeCache.cs" />
     <Compile Include="Patch\PDATabPatcher.cs" />
-    <Compile Include="Patch\Player_Patches.cs" />
     <Compile Include="Patch\UIPatches.cs" />
     <Compile Include="Spawnables\BioFuelSpawnable.cs" />
     <Compile Include="Enumerators\ModDifficultyMode.cs" />
@@ -175,7 +175,6 @@
     <Compile Include="Systems\StoreInventorySystem.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Model\" />
     <Folder Include="UI\" />
   </ItemGroup>
   <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />

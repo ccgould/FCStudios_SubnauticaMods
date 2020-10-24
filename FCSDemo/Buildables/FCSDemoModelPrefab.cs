@@ -2,7 +2,6 @@
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using FCSDemo.Configuration;
-using FCSTechFabricator.Extensions;
 using UnityEngine;
 
 namespace FCSDemo.Buildables
@@ -13,10 +12,14 @@ namespace FCSDemo.Buildables
         private static AssetBundle _assetBundle;
         internal static GameObject ColorItemPrefab { get; set; }
         internal static string BodyMaterial => $"{Mod.ModName}_COL";
-        internal static string SpecTexture => $"{Mod.ModName}_COL_SPEC";
-        internal static string LUMTexture => $"{Mod.ModName}_COL_LUM";
-        internal static string ColorIDTexture => $"{Mod.ModName}_COL_ID";
-        internal static string DecalMaterial => $"{Mod.ModName}_COL_Decals";
+        internal static string SecondaryMaterial => $"{Mod.ModName}_COL_S";
+        internal static string DecalMaterial => $"{Mod.ModName}_DECALS";
+        internal static string DetailsMaterial => $"{Mod.ModName}_DETAILS";
+        internal static string SpecTexture => $"{Mod.ModName}_S";
+        internal static string LUMTexture => $"{Mod.ModName}_E";
+        internal static string NormalTexture => $"{Mod.ModName}_N";
+        internal static string DetailTexture => $"{Mod.ModName}_D";
+
         public static GameObject GetPrefabs(string prefabName)
         {
             try
@@ -27,7 +30,7 @@ namespace FCSDemo.Buildables
                     QuickLogger.Debug($"AssetBundle Set");
 
                     QuickLogger.Debug("GetPrefabs"); 
-                    _assetBundle = AssetHelper.Asset(Mod.ModName, Mod.BundleName);
+                    _assetBundle = AssetHelper.Asset(Mod.BundleName);
                     _init = true;
                 }
                 
@@ -67,7 +70,6 @@ namespace FCSDemo.Buildables
         {
             #region BaseColor
             MaterialHelpers.ApplySpecShader(BodyMaterial, SpecTexture, prefab, 1, 3f, bundle);
-            MaterialHelpers.ApplyColorMaskShader(BodyMaterial, ColorIDTexture, Color.white, QPatch.Configuration.Config.BodyColor.Vector4ToColor(), Color.white, prefab, bundle); //Use color2 
             MaterialHelpers.ApplyEmissionShader(BodyMaterial, LUMTexture, prefab, bundle, Color.white);
             MaterialHelpers.ApplyAlphaShader(DecalMaterial, prefab);
             #endregion

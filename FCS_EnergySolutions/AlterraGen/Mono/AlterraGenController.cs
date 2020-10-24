@@ -22,7 +22,6 @@ namespace FCS_EnergySolutions.AlterraGen.Mono
         private bool _runStartUpOnEnable;
         private GameObject _xBubbles;
 
-
         internal AlterraGenPowerManager PowerManager { get; private set; }
         internal ColorManager ColorManager { get; set; }
         internal AnimationManager AnimationManager { get; set; }
@@ -125,13 +124,13 @@ namespace FCS_EnergySolutions.AlterraGen.Mono
             return _prefabID;
         }
 
-        public override void ChangeBodyColor(Color color, ColorTargetMode mode)
+        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
         {
 #if DEBUG
             QuickLogger.Debug($"Changing AlterraGen color to {ColorList.GetName(color)}",true);
 #endif
 
-            ColorManager.ChangeColor(color,mode);
+           return ColorManager.ChangeColor(color,mode);
         }
 
         #endregion

@@ -149,7 +149,7 @@ namespace FCS_AlterraHub.Configuration
                     controller.Save(newSaveData);
                 }
 
-                newSaveData.AccountDetails = CardSystem.main.AccountDetails;
+                newSaveData.AccountDetails = CardSystem.main.SaveDetails();
 
                 _saveData = newSaveData;
 

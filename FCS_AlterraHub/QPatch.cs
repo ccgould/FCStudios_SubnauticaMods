@@ -52,6 +52,9 @@ namespace FCS_AlterraHub
 
             var harmony = new Harmony("com.alterrahub.fcstudios");
             harmony.PatchAll(Assembly.GetExecutingAssembly());
+
+            //Register debug commands
+            ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));
         }
         
         private static void CreateKits()

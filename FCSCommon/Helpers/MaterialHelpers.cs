@@ -1,6 +1,7 @@
 ﻿using System;
 using FCSCommon.Utilities;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace FCSCommon.Helpers
@@ -127,8 +128,9 @@ namespace FCSCommon.Helpers
             }
         }
 
-        internal static void ChangeMaterialColor(string materialName, GameObject gameObject, Color color, Color color2 = default, Color color3 = default)
+        internal static bool ChangeMaterialColor(string materialName, GameObject gameObject, Color color, Color color2 = default, Color color3 = default)
         {
+            var result = false;
             Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>(true);
             foreach (Renderer renderer in renderers)
             {
@@ -140,9 +142,12 @@ namespace FCSCommon.Helpers
                         material.SetColor("_Color", color);
                         material.SetColor("_Color2", color2);
                         material.SetColor("_Color3", color3);
+                        result = true;
                     }
                 }
             }
+
+            return result;
         }
         
         /// <summary>
@@ -239,12 +244,15 @@ namespace FCSCommon.Helpers
             GetIngameObjects();
 
             var models = GameObjectHelpers.FindGameObjects(gameObject, matchName, SearchOption.EndsWith);
-
+            
             foreach (var model in models)
             {
                 if (model != null)
                 {
                     var render = model.GetComponent<Renderer>();
+
+                    if(render == null) continue;
+
                     render.material = _glassMaterial;
                 }
                 else
@@ -268,45 +276,53 @@ namespace FCSCommon.Helpers
 
         internal static void GetIngameObjects()
         {
-            QuickLogger.Debug("In GetIngameObjects");
-
             var aquarium = GameObject.Instantiate(CraftData.GetPrefabForTechType(TechType.Aquarium));
-            var fireExtinguisher = GameObject.Instantiate(CraftData.GetPrefabForTechType(TechType.FireExtinguisher));
 
-            if (_glassMaterial == null)
+            try
             {
+                QuickLogger.Debug("In GetIngameObjects");
 
-                Renderer[] renderers = aquarium.GetComponentsInChildren<Renderer>(true);
+                
 
-                foreach (Renderer renderer in renderers)
+                if (_glassMaterial == null)
                 {
-                    foreach (Material material in renderer.materials)
+
+                    Renderer[] renderers = aquarium.GetComponentsInChildren<Renderer>(true);
+
+                    foreach (Renderer renderer in renderers)
                     {
-                        if (material.name.StartsWith("Aquarium_glass", StringComparison.OrdinalIgnoreCase))
+                        foreach (Material material in renderer.materials)
                         {
-                            _glassMaterial = material;
-                            QuickLogger.Debug($"Aquarium glass result: {_glassMaterial?.name}");
-                            goto _glassEnd;
+                            if (material.name.StartsWith("Aquarium_glass", StringComparison.OrdinalIgnoreCase))
+                            {
+                                _glassMaterial = material;
+                                QuickLogger.Debug($"Aquarium glass result: {_glassMaterial?.name}");
+                                goto _glassEnd;
+                            }
                         }
                     }
                 }
-            }
-            _glassEnd: ;
+                _glassEnd: ;
 
-            if (_laterialBubbles == null)
-            {
-                var bubbles = aquarium.FindChild("Bubbles").FindChild("xBubbles").FindChild("xLateralBubbles");
-                if (bubbles == null)
+                if (_laterialBubbles == null)
                 {
-                    QuickLogger.Error("Failed to find bubbles in the aquarium");
-                    return;
-                }
+                    var bubbles = aquarium.FindChild("Bubbles").FindChild("xBubbles").FindChild("xLateralBubbles");
+                    if (bubbles == null)
+                    {
+                        QuickLogger.Error("Failed to find bubbles in the aquarium");
+                        return;
+                    }
 
-                _laterialBubbles = GameObject.Instantiate(bubbles);
-                QuickLogger.Debug($"Laterial Bubbles result: {_laterialBubbles?.name}");
+                    _laterialBubbles = GameObject.Instantiate(bubbles);
+                    QuickLogger.Debug($"Laterial Bubbles result: {_laterialBubbles?.name}");
+                }
+            }
+            finally
+            {
+                GameObject.Destroy(aquarium);
             }
 
-            GameObject.Destroy(aquarium);
+            
 
         }
 

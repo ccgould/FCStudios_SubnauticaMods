@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Structs;
-using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
 using Oculus.Newtonsoft.Json;
 using SMLHelper.V2.Json;

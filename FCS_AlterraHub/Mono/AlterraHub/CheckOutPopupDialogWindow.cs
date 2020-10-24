@@ -24,7 +24,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
         private bool _isInitialized;
         private AlterraHubController _mono;
         private bool _cardLoaded;
-        private AccountDetails cards => CardSystem.main.AccountDetails;
+        private CardSystem cardSystem => CardSystem.main;
 
         public int GetContainerFreeSpace => 0;
         public bool IsFull => true;
@@ -109,9 +109,9 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             else
             {
                 QuickLogger.Debug($"Player is in range: {_mono.IsPlayerInRange()}", true);
-                _accountBalance.text = Buildables.AlterraHub.AccountBalanceFormat(CardSystem.main.AccountDetails.Balance);
+                _accountBalance.text = Buildables.AlterraHub.AccountBalanceFormat(CardSystem.main.GetAccountBalance());
                 _total.text = Buildables.AlterraHub.CheckOutTotalFormat(_cart.GetTotal());
-                _newBalance.text = Buildables.AlterraHub.AccountNewBalanceFormat(CardSystem.main.AccountDetails.Balance - _cart.GetTotal());
+                _newBalance.text = Buildables.AlterraHub.AccountNewBalanceFormat(CardSystem.main.GetAccountBalance() - _cart.GetTotal());
             }
         }
 
