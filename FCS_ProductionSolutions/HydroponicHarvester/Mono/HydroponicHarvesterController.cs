@@ -8,9 +8,11 @@ using FCS_AlterraHub.Registration;
 using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
 using FCSCommon.Controllers;
+using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using HarmonyLib;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
 {
@@ -127,11 +129,13 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
                 ColorManager.Initialize(gameObject, ModelPrefab.BodyMaterial);
             }
 
-#if DEBUG
-            QuickLogger.Debug($"Initialized Ore Consumer {GetPrefabID()}");
-#endif
-
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.HydroponicHarvesterModTabID);
+
+            GameObjectHelpers.FindGameObject(gameObject, "UNITID").GetComponent<Text>().text = $"UNIT ID: {UnitID}";
+
+#if DEBUG
+            QuickLogger.Debug($"Initialized Harvester {GetPrefabID()}");
+#endif
 
             IsInitialized = true;
         }

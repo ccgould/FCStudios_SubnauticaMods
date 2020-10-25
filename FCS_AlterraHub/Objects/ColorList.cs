@@ -192,12 +192,7 @@ namespace FCS_AlterraHub.Objects
 
         public static int GetColorIndex(Color currentColor)
         {
-            if (_keys == null)
-            {
-                _keys = new object[Colors.Keys.Count];
-                Colors.Keys.CopyTo(_keys, 0);
-            }
-
+            GetKeys();
             for (int i = 0; i < Colors.Keys.Count; i++)
             {
 #if DEBUG
@@ -210,6 +205,15 @@ namespace FCS_AlterraHub.Objects
             return 0;
         }
 
+        private static void GetKeys()
+        {
+            if (_keys == null)
+            {
+                _keys = new object[Colors.Keys.Count];
+                Colors.Keys.CopyTo(_keys, 0);
+            }
+        }
+
         public static int GetCount()
         {
             return Colors.Count;
@@ -217,6 +221,7 @@ namespace FCS_AlterraHub.Objects
 
         public static Color GetColor(int currentIndex)
         {
+            GetKeys();
             return ((ColorVec4)_keys[currentIndex]).Vector4ToColor();
         }
 

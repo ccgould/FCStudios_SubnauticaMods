@@ -4,15 +4,17 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Models
 {
     internal class PlantSlot
     {
-        public PlantSlot(int id, Transform slot)
+        internal GameObject SlotBounds { get; set; }
+        internal Plantable Plantable { get; set; }
+
+        public PlantSlot(int id, Transform slot, Transform slotBounds)
         {
             Id = id;
             Slot = slot;
+            SlotBounds = slotBounds.gameObject;
             //PlantModel = slot.GetChild(0).gameObject;
         }
-
-        public Plantable Plantable { get; set; }
-
+        
         public void Clear()
         {
             PlantModel = null;

@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Model;
 using FCS_ProductionSolutions.HydroponicHarvester.Models;
@@ -30,18 +31,25 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
         {
             try
             {
+                QuickLogger.Debug("1");
                 if (amount > Slots.Length)
                 {
+                    QuickLogger.Debug("2");
                     amount = Slots.Length;
+                    QuickLogger.Debug("3");
                 }
 
+                QuickLogger.Debug("4");
                 var item = type.ToInventoryItem();
-
+                QuickLogger.Debug("5");
                 if (item != null)
                 {
+                    QuickLogger.Debug("6");
                     for (int i = 0; i < amount; i++)
                     {
+                        QuickLogger.Debug("7");
                         AddItem(item);
+                        QuickLogger.Debug("8");
                     }
                 }
                 else
@@ -52,7 +60,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
             }
             catch (Exception e)
             {
-                QuickLogger.Error(e.Message,true);
+                QuickLogger.Error($"[GrowBedManager_AddDummy]{e.Message} : {e.StackTrace}",true);
 
             }
 
@@ -64,16 +72,18 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
             try
             {
                 var planters = gameObject.transform.Find("model").Find("Planters").transform;
+
                 Slots = new PlantSlot[planters.childCount];
 
                 for (int i = 0; i < planters.childCount; i++)
                 {
-                    Slots[i] = new PlantSlot(i, planters.GetChild(i));
+                    var planter = planters.GetChild(i);
+                    Slots[i] = new PlantSlot(i, planter, planter.Find("PlanterBounds"));
                 }
             }
             catch (Exception e)
             {
-                QuickLogger.Error(e.Message);
+                QuickLogger.Error($"[Find Pots] {e.Message}");
                 return false;
             }
 
@@ -151,7 +161,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
             if (growingPlant != null)
             {
                 var fcsGrowing = gameObject.AddComponent<FCSGrowingPlant>();
-                fcsGrowing.Initialize(growingPlant, this);
+                fcsGrowing.Initialize(growingPlant, this,slotByID.SlotBounds.GetComponent<Collider>().bounds.size);
                 Destroy(growingPlant);
             }
 

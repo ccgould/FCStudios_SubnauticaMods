@@ -1,4 +1,5 @@
-﻿using FCS_AlterraHub.Interfaces;
+﻿using System.Collections.Generic;
+using FCS_AlterraHub.Interfaces;
 using FCSCommon.Utilities;
 using UnityEngine;
 
@@ -6,8 +7,43 @@ namespace FCS_AlterraHub.Model
 {
     public class FCSGrowingPlant : MonoBehaviour
     {
-        public void Initialize(GrowingPlant growingPlant, IFCSGrowBed growBed)
+        private readonly List<TechType> _invalidAdjustTechTypes = new List<TechType>
         {
+            TechType.CreepvineSeedCluster,
+            TechType.Creepvine,
+            TechType.CreepvinePiece,
+            TechType.BloodOil,
+            TechType.BloodGrass,
+            TechType.BloodRoot,
+            TechType.BloodVine
+        };
+
+        public void Initialize(GrowingPlant growingPlant, IFCSGrowBed growBed, Vector3 slotBounds)
+        {
+
+            QuickLogger.Debug($"Slot Bounds {slotBounds}", true);
+
+            var colliders = gameObject.GetComponentsInChildren<Collider>();
+            var bounds = colliders[0].bounds;
+            foreach (var c in colliders)
+            {
+                bounds.Encapsulate(c.bounds);
+            }
+
+            var szA = slotBounds;
+            var szB = bounds.size;
+
+            var targetX = szA.x / szB.x;
+            var targetY = szA.y / szB.y;
+            var targetZ = szA.z / szB.z;
+
+            var minScale = Mathf.Min(new[] { targetX, targetY, targetZ });
+
+            
+
+            QuickLogger.Debug($"Min Scale {minScale}", true);
+
+
             _growBed = growBed;
 
             growthDuration = growingPlant.growthDuration;
@@ -22,17 +58,21 @@ namespace FCS_AlterraHub.Model
 
             positionOffset = growingPlant.positionOffset;
 
-            heightProgressFactor = growingPlant.heightProgressFactor;
-
             growingTransform = growingPlant.growingTransform;
 
             grownModelPrefab = growingPlant.grownModelPrefab;
 
             seed = growingPlant.seed;
 
-            Destroy(growingPlant);
+            growingPlant.SetProgress(1f);
+            growingPlant.SetScale(gameObject.transform, 1f);
 
-            ShowGrowingTransform();
+            Destroy(gameObject.GetComponent<Pickupable>());
+            Destroy(gameObject.GetComponent<UniqueIdentifier>());
+
+            Destroy(growingPlant);
+            
+            SpawnGrownModel(minScale);
         }
 
         private void OnEnable()
@@ -42,31 +82,32 @@ namespace FCS_AlterraHub.Model
 
         private void OnDisable()
         {
-            this.growingTransform.gameObject.SetActive(false);
+            //this.growingTransform.gameObject.SetActive(false);
         }
 
         private void Update()
         {
-            float progress = this.GetProgress();
-            this.SetScale(this.growingTransform, progress);
+            //float progress = this.GetProgress();
+            //this.SetScale(this.growingTransform, progress);
             this.SetPosition(this.growingTransform);
-            if (progress == 1f)
-            {
-                this.SpawnGrownModel();
-            }
+            //if (progress == 1f)
+            //{
+            //    this.SpawnGrownModel();
+            //}
         }
 
-        private void SpawnGrownModel()
+        private void SpawnGrownModel(float minScale)
         {
             this.growingTransform.gameObject.SetActive(false);
             GameObject gameObject = Instantiate<GameObject>(this.grownModelPrefab, this.growingTransform.position, this.growingTransform.rotation);
-            this.SetScale(gameObject.transform, 1f);
             if (this.isPickupable)
             {
                 Plantable component = gameObject.GetComponent<Plantable>();
                 if (component != null && this.seed.ReplaceSeedByPlant(component))
                 {
                     gameObject.SetActive(false);
+                    ScaleObject(minScale, gameObject);
+                    Destroy(component);
                     return;
                 }
             }
@@ -75,7 +116,16 @@ namespace FCS_AlterraHub.Model
             grownPlant.SendMessage("OnGrown", SendMessageOptions.DontRequireReceiver);
             gameObject.transform.parent = _growBed.grownPlantsRoot.transform;
             _growBed.SetupRenderers(gameObject, true);
+            ScaleObject(minScale, gameObject);
+
             base.enabled = false;
+        }
+
+        private void ScaleObject(float minScale, GameObject gameObject)
+        {
+            gameObject.transform.localScale = _invalidAdjustTechTypes.Contains(seed.plantTechType)
+                ? new Vector3(minScale, minScale, minScale)
+                : new Vector3(minScale * 0.3f, minScale * 0.3f, minScale * 0.3f);
         }
 
         private void ShowGrowingTransform()
@@ -143,9 +193,9 @@ namespace FCS_AlterraHub.Model
 
         public void SetProgress(float progress)
         {
-            progress = Mathf.Clamp(progress, 0f, this.maxProgress);
-            this.SetScale(this.growingTransform, progress);
-            this.timeStartGrowth = DayNightCycle.main.timePassedAsFloat - this.GetGrowthDuration() * progress;
+            //progress = Mathf.Clamp(progress, 0f, this.maxProgress);
+            //this.SetScale(this.growingTransform, progress);
+            //this.timeStartGrowth = DayNightCycle.main.timePassedAsFloat - this.GetGrowthDuration() * progress;
         }
 
         public void SetMaxHeight(float height)
@@ -174,7 +224,7 @@ namespace FCS_AlterraHub.Model
 
         public Vector3 positionOffset = Vector3.zero;
 
-        public float heightProgressFactor;
+        public float heightProgressFactor = 0.5f;
 
         public Transform growingTransform;
 
