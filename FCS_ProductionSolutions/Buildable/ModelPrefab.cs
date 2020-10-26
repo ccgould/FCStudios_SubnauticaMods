@@ -15,6 +15,7 @@ namespace FCS_ProductionSolutions.Buildable
         internal static string SecondaryMaterial => $"{Mod.ModName}_COL_S";
         internal static string DecalMaterial => $"{Mod.ModName}_DECALS";
         internal static string DetailsMaterial => $"{Mod.ModName}_DETAILS";
+        internal static string EmissionControllerMaterial => $"{Mod.ModName}_E_Controller";
         internal static string SpecTexture => $"{Mod.ModName}_S";
         internal static string LUMTexture => $"{Mod.ModName}_E";
         internal static string NormalTexture => $"{Mod.ModName}_N";
@@ -92,6 +93,7 @@ namespace FCS_ProductionSolutions.Buildable
             MaterialHelpers.ApplySpecShader(BodyMaterial, SpecTexture, prefab, 1, 3f, bundle);
             MaterialHelpers.ApplyEmissionShader(DecalMaterial, LUMTexture, prefab, bundle, Color.white);
             MaterialHelpers.ApplyEmissionShader(DetailsMaterial, LUMTexture, prefab, bundle, Color.white);
+            MaterialHelpers.ApplyEmissionShader(EmissionControllerMaterial, LUMTexture, prefab, bundle, Color.white);
             MaterialHelpers.ApplyAlphaShader(DecalMaterial, prefab);
             MaterialHelpers.ApplyAlphaShader(DetailsMaterial, prefab);
             #endregion

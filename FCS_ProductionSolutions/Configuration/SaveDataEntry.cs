@@ -14,6 +14,7 @@ namespace FCS_ProductionSolutions.Configuration
         [JsonProperty] internal ColorVec4 BodyColor { get; set; }
         [JsonProperty] internal Dictionary<TechType, int> Storage { get; set; }
         [JsonProperty] internal bool IsVisible { get; set; }
+        [JsonProperty] internal bool IsInBase { get; set; }
     }
 
     [Serializable]

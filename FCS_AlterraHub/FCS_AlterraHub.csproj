@@ -120,6 +120,7 @@
     <Compile Include="Configuration\SaveData.cs" />
     <Compile Include="Enumerators\FCSGameMode.cs" />
     <Compile Include="Enumerators\ColorTargetMode.cs" />
+    <Compile Include="Enumerators\FCSLightState.cs" />
     <Compile Include="Enumerators\FCSPowerStates.cs" />
     <Compile Include="Enumerators\StoreCategory.cs" />
     <Compile Include="Extensions\ColorExtensions.cs" />

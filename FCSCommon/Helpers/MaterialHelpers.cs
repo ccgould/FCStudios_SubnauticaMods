@@ -468,6 +468,28 @@ namespace FCSCommon.Helpers
             }
         }
 
+        internal static void ToggleEmission(string materialName, GameObject gameObject, bool value)
+        {
+            Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>(true);
+            foreach (Renderer renderer in renderers)
+            {
+                foreach (Material material in renderer.materials)
+                {
+                    if (material.name.StartsWith(materialName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (value)
+                        {
+                            material.EnableKeyword("MARMO_EMISSION");
+                        }
+                        else
+                        {
+                            material.DisableKeyword("MARMO_EMISSION");
+                        }
+                    }
+                }
+            }
+        }
+
         internal static Color? GetBodyColor(GameObject gameObject, string materialName)
         {
             Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>(true);
@@ -530,6 +552,22 @@ namespace FCSCommon.Helpers
                 if (render.material.name.StartsWith(materialName, StringComparison.OrdinalIgnoreCase))
                 {
                     yield return render.material;
+                }
+            }
+        }
+
+        public static void ChangeEmissionStrength(string materialName, GameObject gameObject, float value)
+        {
+            Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>(true);
+            foreach (Renderer renderer in renderers)
+            {
+                foreach (Material material in renderer.materials)
+                {
+                    if (material.name.StartsWith(materialName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        material.SetFloat("_GlowStrength", value);
+                        material.SetFloat("_GlowStrengthNight", value);
+                    }
                 }
             }
         }

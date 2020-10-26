@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using FCS_AlterraHub.Configuration;
 using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.HydroponicHarvester.Buildable;
@@ -12,7 +11,8 @@ namespace FCS_ProductionSolutions
     [QModCore]
     public class QPatch
     {
-        //internal static Config Configuration { get; } = OptionsPanelHandler.Main.RegisterModOptions<Config>();
+        internal static Config Configuration { get; } = OptionsPanelHandler.Main.RegisterModOptions<Config>();
+        internal static HarvesterConfig HarvesterConfiguration { get; } = OptionsPanelHandler.Main.RegisterModOptions<HarvesterConfig>();
 
         [QModPatch]
         public void Patch()

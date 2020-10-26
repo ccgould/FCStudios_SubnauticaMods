@@ -1,5 +1,5 @@
-﻿using FCS_AlterraHomeSolutions.Mono.PaintTool;
-using FCS_AlterraHub.Configuration;
+﻿using System;
+using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCSCommon.Utilities;
 using UnityEngine;
 

@@ -6,5 +6,6 @@ namespace FCS_AlterraHub.Interfaces
     { 
         void SetupRenderers(GameObject gameObject, bool interior);
         GameObject grownPlantsRoot { get; set; }
+        bool IsInBase();
     }
 }

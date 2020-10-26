@@ -1,4 +1,5 @@
 ﻿using System;
+using FCS_ProductionSolutions.HydroponicHarvester.Enumerators;
 using FCS_ProductionSolutions.HydroponicHarvester.Mono;
 using FCSCommon.Extensions;
 using FCSCommon.Utilities;
@@ -9,52 +10,77 @@ namespace FCS_ProductionSolutions.Configuration
 {
     internal class DebugCommands
     {
-        [ConsoleCommand("addharvesteritem")]
-        public static string AddHarvesterItemCommand(string unitNameAndItem, int amount, bool myBool = false)
+        [ConsoleCommand("harvesterspawn")]
+        public static string AddHarvesterItemCommand(int id, string techTypeString, int amount)
         {
-            QuickLogger.DebugLogsEnabled = true;
             QuickLogger.Debug($"Executing Command Add Harvester", true);
-            var param = unitNameAndItem.Split('_');
-            QuickLogger.Debug($"Parameter Count: {param.Length}", true);
 
-            if (param.Length == 2)
+            var unitName = $"{Mod.HydroponicHarvesterModTabID}{id:D3}";
+            var hh = GameObject.FindObjectsOfType<HydroponicHarvesterController>();
+
+            var techType = techTypeString.ToTechType();
+
+            if (techType != TechType.None)
             {
-                var unitName = param[0].Trim();
-                QuickLogger.Debug($"Unit Name: {unitName}",true);
-                var techType = param[1].Trim().ToTechType();
-                QuickLogger.Debug($"TechType: {techType.AsString()}", true);
-
-                var hh = GameObject.FindObjectsOfType<HydroponicHarvesterController>();
-
                 foreach (HydroponicHarvesterController controller in hh)
                 {
                     if (controller.UnitID.Equals(unitName, StringComparison.OrdinalIgnoreCase))
                     {
-                        QuickLogger.Debug($"Adding Dummy to harvester",true);
-                        controller.GrowBedManager.AddDummy(techType,amount);
+                        QuickLogger.Debug($"Adding Dummy to harvester", true);
+                        controller.GrowBedManager.AddDummy(techType, amount);
                         break;
                     }
                 }
             }
-            
-            return $"Parameters: {unitNameAndItem} {amount}";
+            else
+            {
+                QuickLogger.Error($"Invalid TechType: {techTypeString}",true);
+            }
+            return $"Parameters: {id} {techTypeString} {amount}";
         }
 
         [ConsoleCommand("clearharvester")]
-        public static string ClearHarvesterCommand(string unitName, int amount, bool myBool = false)
+        public static string ClearHarvesterCommand(int id)
         {
             var hh = GameObject.FindObjectsOfType<HydroponicHarvesterController>();
 
             foreach (HydroponicHarvesterController controller in hh)
             {
-                if (controller.UnitID.Equals(unitName, StringComparison.OrdinalIgnoreCase))
+                if (controller.UnitID.Equals($"{Mod.HydroponicHarvesterModTabID}{id:D3}", StringComparison.OrdinalIgnoreCase))
                 {
                     controller.GrowBedManager.ClearGrowBed();
                     break;
                 }
             }
 
-            return $"Parameters: {unitName}";
+            return $"Parameters: {id}";
+        }
+
+
+        [ConsoleCommand("harvesterMode")]
+        public static string HarvesterModeCommand(int id, string mode)
+        {
+            var hh = GameObject.FindObjectsOfType<HydroponicHarvesterController>();
+
+            foreach (HydroponicHarvesterController controller in hh)
+            {
+                QuickLogger.Debug($"Current ID: {controller.UnitID} || Match: HH{id:D3}");
+                if (controller.UnitID.Equals($"HH{id:D3}", StringComparison.OrdinalIgnoreCase))
+                {
+
+                    if (Enum.TryParse(mode, true, out SpeedModes result))
+                    {
+                        controller.GrowBedManager.SetSpeedMode(result);
+                    }
+                    else
+                    {
+                        QuickLogger.Error($"Invalid harvester speed mode valid are: Min,Low,High,Max,", true);
+                    }
+                    break;
+                }
+            }
+
+            return $"Parameters: {mode}";
         }
     }
 }

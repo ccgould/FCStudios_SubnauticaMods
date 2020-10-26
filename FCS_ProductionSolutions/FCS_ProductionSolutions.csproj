@@ -113,9 +113,12 @@
     <Compile Include="Configuration\Mod.cs" />
     <Compile Include="Configuration\SaveDataEntry.cs" />
     <Compile Include="HydroponicHarvester\Buildable\HydroponicHarvesterPatch.cs" />
+    <Compile Include="HydroponicHarvester\Enumerators\ClonePhases.cs" />
+    <Compile Include="HydroponicHarvester\Enumerators\SpeedModes.cs" />
     <Compile Include="HydroponicHarvester\Models\PlantSlot.cs" />
     <Compile Include="HydroponicHarvester\Mono\GrowBedManager.cs" />
     <Compile Include="HydroponicHarvester\Mono\HydroponicHarvesterController.cs" />
+    <Compile Include="HydroponicHarvester\Mono\LightManager.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
