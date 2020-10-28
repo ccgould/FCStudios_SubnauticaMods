@@ -5,7 +5,9 @@ using System.Linq;
 using System.Reflection;
 using FCS_AlterraHub.Mono;
 using FCS_HomeSolutions.Mono.PaintTool;
+using FCSCommon.Extensions;
 using FCSCommon.Utilities;
+using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 
@@ -19,14 +21,49 @@ namespace FCS_HomeSolutions.Configuration
         
         internal const string ModName = "FCSHomeSolutions";
         internal const string ModFriendlyName = "Home Solutions";
-        internal const string ModBundleName = "fcshomesolutions";
+        internal const string ModBundleName = "fcshomesolutionsbundle";
 
         internal const string PaintToolClassID = "PaintTool";
         internal const string PaintToolFriendly = "Alterra Paint Tool";
         internal const string PaintToolDescription = "Change the color of FCStudios mods";
         internal const string PaintToolPrefabName = "PaintTool";
         internal const string PaintToolKitClassID = "PaintTool_Kit";
-        
+
+
+        internal const string BaseOperatorClassID = "BaseOperator";
+        internal const string BaseOperatorFriendly = "Alterra Base Operator";
+        internal const string BaseOperatorDescription = "Control your base from one giant screen";
+        internal const string BaseOperatorPrefabName = "BaseOperator";
+        internal const string BaseOperatorKitClassID = "BaseOperator_Kit";
+
+#if SUBNAUTICA
+        internal static TechData PaintToolIngredients => new TechData
+#elif BELOWZERO
+                internal static RecipeData PaintToolIngredients => new RecipeData
+#endif
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(PaintToolKitClassID.ToTechType(), 1),
+            }
+        };
+
+
+#if SUBNAUTICA
+        internal static TechData BaseOperatorIngredients => new TechData
+#elif BELOWZERO
+                internal static RecipeData BaseOperatorIngredients => new RecipeData
+#endif
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(BaseOperatorKitClassID.ToTechType(), 1),
+            }
+        };
+
+
         internal static Action<SaveData> OnDataLoaded { get; set; }
 
         internal static string SaveDataFilename => $"{ModName}SaveData.json";

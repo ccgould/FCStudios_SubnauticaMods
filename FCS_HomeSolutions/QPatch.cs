@@ -97,12 +97,14 @@ namespace FCS_HomeSolutions
 
     };
 
+
+
         [QModPatch]
         public void Patch()
         {
             QuickLogger.Info($"Started patching. Version: {QuickLogger.GetAssemblyVersion(Assembly.GetExecutingAssembly())}");
 
-            ModelPrefab.LoadSelfLoadingPrefab();
+            ModelPrefab.Initialize();
 
             var ahsSweetWaterBar = new SweetWaterBarPatch("ahsSweetWaterBar", "Sweet Water Bar", "All drinks on the house.", ModelPrefab.GetPrefab("SweetWaterBar"), new Settings
             {
@@ -125,6 +127,10 @@ namespace FCS_HomeSolutions
             //Patch Paint Tool
             var paintToolSpawnable = new PaintToolSpawnable();
             paintToolSpawnable.Patch();
+
+            //Patch Base Operator
+            var baseOperator = new BaseOperatorPatch();
+            baseOperator.Patch();
         }
     }
 

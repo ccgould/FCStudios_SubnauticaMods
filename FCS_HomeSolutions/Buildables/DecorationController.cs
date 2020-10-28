@@ -30,7 +30,8 @@ namespace FCS_HomeSolutions.Buildables
                         ReadySaveData();
                     }
 
-                    ColorManager.ChangeColor(_savedData.Color.Vector4ToColor(),ColorTargetMode.Both);
+                    ColorManager.ChangeColor(_savedData.Color.Vector4ToColor());
+                    ColorManager.ChangeColor(_savedData.SecondaryColor.Vector4ToColor(),ColorTargetMode.Secondary);
                 }
 
                 _runStartUpOnEnable = false;
@@ -42,7 +43,7 @@ namespace FCS_HomeSolutions.Buildables
             if (ColorManager == null)
             {
                 ColorManager = gameObject.AddComponent<ColorManager>();
-                ColorManager.Initialize(gameObject,ModelPrefab.BodyMaterial);
+                ColorManager.Initialize(gameObject,ModelPrefab.BodyMaterial,ModelPrefab.SecondaryMaterial);
             }
 
             IsInitialized = true;
@@ -84,6 +85,7 @@ namespace FCS_HomeSolutions.Buildables
 
             _savedData.Id = GetPrefabID();
             _savedData.Color = ColorManager.GetColor().ColorToVector4();
+            _savedData.SecondaryColor = ColorManager.GetSecondaryColor().ColorToVector4();
             QuickLogger.Debug($"Saving ID {_savedData.Id}");
             newSaveData.DecorationEntries.Add(_savedData);
         }

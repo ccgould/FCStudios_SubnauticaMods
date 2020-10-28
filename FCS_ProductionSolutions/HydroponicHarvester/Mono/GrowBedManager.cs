@@ -133,9 +133,16 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
             }
 
             GameObject plantModel = slotByID.PlantModel;
+            _mono.EffectsManager.ChangeEffectState(FindEffectType(slotByID), slotByID.Id, false);
             slotByID.Clear();
             Destroy(plantModel);
             SetSlotOccupiedState(slotID, false);
+        }
+
+        private static EffectType FindEffectType(PlantSlot slotByID)
+        {
+            QuickLogger.Debug($"PlantSlot: {slotByID.Plantable.underwater}",true);
+            return slotByID.Plantable.underwater ? EffectType.Bubbles : EffectType.Smoke;
         }
 
         private void AddItem(Plantable plantable, int slotID)
@@ -152,13 +159,13 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
             }
 
             this.SetSlotOccupiedState(slotID, true);
-            GameObject gameObject = plantable.Spawn(slotByID.Slot, true);
-            this.SetupRenderers(gameObject, true);
+            GameObject gameObject = plantable.Spawn(slotByID.Slot, _mono.IsInBase());
+            this.SetupRenderers(gameObject, _mono.IsInBase());
             gameObject.SetActive(true);
             slotByID.Plantable = plantable;
             slotByID.PlantModel = gameObject;
             slotByID.SetMaxPlantHeight(MaxPlantsHeight);
-            
+            _mono.EffectsManager.ChangeEffectState(FindEffectType(slotByID), slotByID.Id, true);
             var growingPlant = gameObject.GetComponent<GrowingPlant>();
             
             if (growingPlant != null)
@@ -173,6 +180,8 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
                 plantable.eatable.SetDecomposes(false);
             }
             
+
+
             //slotByID.ShowPlant();
         }
 

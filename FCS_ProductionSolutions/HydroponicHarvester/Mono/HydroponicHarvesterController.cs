@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using Discord;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
-using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Extensions;
-using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_ProductionSolutions.Buildable;
@@ -22,11 +18,11 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
         private bool _isFromSave;
         private bool _runStartUpOnEnable;
         private HydroponicHarvesterDataEntry _savedData;
-        private LightManager _lightManager;
+        private EffectsManager _effectsManager;
         private bool _isInBase;
 
 
-        public LightManager LightManager => _lightManager;
+        public EffectsManager EffectsManager => _effectsManager;
         public bool IsOperational { get; set; }
         public AudioManager AudioManager { get; private set; }
         public Action<bool> onUpdateSound { get; private set; }
@@ -106,9 +102,9 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
                 ColorManager.Initialize(gameObject, ModelPrefab.BodyMaterial);
             }
 
-            if (LightManager == null)
+            if (EffectsManager == null)
             {
-                _lightManager = new LightManager(this);
+                _effectsManager = new EffectsManager(this);
                 InvokeRepeating(nameof(CheckSystem), .5f, .5f);
             }
 
@@ -127,7 +123,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
 
         private void CheckSystem()
         {
-            _lightManager?.ToggleLightsByDistance();
+            _effectsManager?.ToggleLightsByDistance();
         }
 
         public override void OnProtoSerialize(ProtobufSerializer serializer)
@@ -210,8 +206,8 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
 
             _savedData.ID = GetPrefabID();
             _savedData.BodyColor = ColorManager.GetColor().ColorToVector4();
-            newSaveData.HydroponicHarvesterEntries.Add(_savedData);
             _savedData.IsInBase = _isInBase;
+            newSaveData.HydroponicHarvesterEntries.Add(_savedData);
             QuickLogger.Debug($"Saving ID {_savedData.ID}", true);
         }
 

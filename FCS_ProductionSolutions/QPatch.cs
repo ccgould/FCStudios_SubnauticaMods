@@ -2,6 +2,7 @@
 using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.HydroponicHarvester.Buildable;
+using FCS_ProductionSolutions.MatterAnalyzer.Buildable;
 using FCSCommon.Utilities;
 using QModManager.API.ModLoading;
 using SMLHelper.V2.Handlers;
@@ -21,8 +22,13 @@ namespace FCS_ProductionSolutions
             
             ModelPrefab.Initialize();
 
+            AuxPatchers.AdditionalPatching();
+
             var hydroHarvester = new HydroponicHarvesterPatch();
             hydroHarvester.Patch();
+
+            var matterAnalyzer = new MatterAnalyzerPatch();
+            matterAnalyzer.Patch();
 
             //Register debug commands
             ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));

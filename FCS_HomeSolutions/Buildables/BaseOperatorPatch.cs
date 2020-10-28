@@ -1,46 +1,46 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Spawnables;
-using FCS_ProductionSolutions.Buildable;
-using FCS_ProductionSolutions.Configuration;
-using FCS_ProductionSolutions.HydroponicHarvester.Mono;
+using FCS_HomeSolutions.Configuration;
+using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
+using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
 using UnityEngine;
 
-namespace FCS_ProductionSolutions.HydroponicHarvester.Buildable
+namespace FCS_HomeSolutions.Buildables
 {
-    internal class HydroponicHarvesterPatch : SMLHelper.V2.Assets.Buildable
+    internal class BaseOperatorPatch : Buildable
     {
-        public HydroponicHarvesterPatch() : base(Mod.HydroponicHarvesterModClassName, Mod.HydroponicHarvesterModFriendlyName, Mod.HydroponicHarvesterModDescription)
+        public override TechGroup GroupForPDA => TechGroup.InteriorModules;
+        public override TechCategory CategoryForPDA => TechCategory.InteriorModule;
+        public override string AssetsFolder => Mod.GetAssetPath();
+
+        public BaseOperatorPatch() : base(Mod.BaseOperatorClassID, Mod.BaseOperatorFriendly, Mod.BaseOperatorDescription)
         {
             OnFinishedPatching += () =>
             {
-                var hydroponicHarvesterKit = new FCSKit(Mod.HydroponicHarvesterKitClassID, Mod.HydroponicHarvesterModFriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
-                hydroponicHarvesterKit.Patch();
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, hydroponicHarvesterKit.TechType, 30000f, StoreCategory.Production);
+                var baseOperatorKit = new FCSKit(Mod.BaseOperatorKitClassID, Mod.BaseOperatorFriendly, Path.Combine(AssetsFolder, $"{ClassID}.png"));
+                baseOperatorKit.Patch();
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, baseOperatorKit.TechType, 30000f, StoreCategory.Home);
 
             };
         }
-        public override TechGroup GroupForPDA => TechGroup.Miscellaneous;
-        public override TechCategory CategoryForPDA => TechCategory.Misc;
-        public override string AssetsFolder => Mod.GetAssetPath();
-
-
 
         public override GameObject GetGameObject()
         {
             try
             {
-                var prefab = GameObject.Instantiate(ModelPrefab.HydroponicHarvesterPrefab);
+                var prefab = GameObject.Instantiate(ModelPrefab.BaseOperatorPrefab);
 
-                var size = new Vector3(1.353966f, 2.503282f, 1.006555f);
-                var center = new Vector3(0.006554961f, 1.394679f, 0.003277525f);
+                //var size = new Vector3(1.353966f, 2.503282f, 1.006555f);
+                //var center = new Vector3(0.006554961f, 1.394679f, 0.003277525f);
 
-                GameObjectHelpers.AddConstructableBounds(prefab, size, center);
+                //GameObjectHelpers.AddConstructableBounds(prefab, size, center);
 
                 var model = prefab.FindChild("model");
 
@@ -55,11 +55,11 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Buildable
                 // Add constructible
                 var constructable = prefab.AddComponent<Constructable>();
 
-                constructable.allowedOutside = true;
+                constructable.allowedOutside = false;
                 constructable.allowedInBase = true;
-                constructable.allowedOnGround = true;
-                constructable.allowedOnWall = false;
-                constructable.rotationEnabled = true;
+                constructable.allowedOnGround = false;
+                constructable.allowedOnWall = true;
+                constructable.rotationEnabled = false;
                 constructable.allowedOnCeiling = false;
                 constructable.allowedInSub = true;
                 constructable.allowedOnConstructables = false;
@@ -70,10 +70,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Buildable
                 prefabID.ClassId = ClassID;
 
                 prefab.AddComponent<TechTag>().type = TechType;
-                prefab.AddComponent<HydroponicHarvesterController>();
-
-                //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
-                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModName);
+                //prefab.AddComponent<HydroponicHarvesterController>();
                 return prefab;
 
             }
@@ -89,12 +86,12 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Buildable
 #if SUBNAUTICA
         protected override TechData GetBlueprintRecipe()
         {
-            return Mod.HydroponicHarvesterIngredients;
+            return Mod.BaseOperatorIngredients;
         }
 #elif BELOWZERO
         protected override RecipeData GetBlueprintRecipe()
         {
-            return Mod.HydroponicHarvesterIngredients;
+            return Mod.BaseOperatorIngredients;
         }
 #endif
     }

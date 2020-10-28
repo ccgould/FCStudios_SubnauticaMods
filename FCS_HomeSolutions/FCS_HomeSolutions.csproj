@@ -112,7 +112,9 @@
     <Compile Include="Buildables\DecorationController.cs" />
     <Compile Include="Buildables\DecorationEntryPatch.cs" />
     <Compile Include="Buildables\ModelPrefab.cs" />
+    <Compile Include="Buildables\BaseOperatorPatch.cs" />
     <Compile Include="Buildables\SweetWaterBarPatch.cs" />
+    <Compile Include="Configuration\Config.cs" />
     <Compile Include="Configuration\Mod.cs" />
     <Compile Include="Configuration\SaveData.cs" />
     <Compile Include="Mono\PaintTool\PaintToolController.cs" />
@@ -125,6 +127,9 @@
       <Project>{1a17b4ba-aae5-41c2-924a-ce05dc74efe8}</Project>
       <Name>FCS_AlterraHub</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Mono\BaseOperator\" />
   </ItemGroup>
   <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

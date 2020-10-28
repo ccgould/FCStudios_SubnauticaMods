@@ -1,7 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.IO;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Registration;
+using FCS_AlterraHub.Spawnables;
 using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
 using FCS_HomeSolutions.Mono.PaintTool;
@@ -27,6 +28,8 @@ namespace FCS_HomeSolutions.Spawnables
         {
             OnFinishedPatching += () =>
             {
+                var paintToolKit = new FCSKit(Mod.PaintToolKitClassID, Mod.PaintToolFriendly, Path.Combine(AssetsFolder, $"{ClassID}.png"));
+                paintToolKit.Patch();
                 FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.PaintToolKitClassID.ToTechType(),
                     300000000f, StoreCategory.Home);
             };
@@ -104,14 +107,7 @@ namespace FCS_HomeSolutions.Spawnables
 
         protected override TechData GetBlueprintRecipe()
         {
-            return new TechData
-            {
-                craftAmount = 1,
-                Ingredients = new List<Ingredient>
-                {
-                    new Ingredient(TechType.Copper,1)
-                }
-            };
+            return Mod.PaintToolIngredients;
         }
     }
 }

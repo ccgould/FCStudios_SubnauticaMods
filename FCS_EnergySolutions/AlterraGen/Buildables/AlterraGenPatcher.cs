@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using FCS_AlterraHub.Enumerators;
+using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Spawnables;
 using FCS_EnergySolutions.AlterraGen.Mono;
 using FCS_EnergySolutions.Buildable;
@@ -26,6 +28,7 @@ namespace FCS_EnergySolutions.AlterraGen.Buildables
                 AdditionalPatching();
                 var oreGeneratorKit = new FCSKit(Mod.AlterraGenKitClassID, Mod.AlterraGenModFriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 oreGeneratorKit.Patch();
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.AlterraGenKitClassID.ToTechType(), 500f, StoreCategory.Energy);
             };
         }
 

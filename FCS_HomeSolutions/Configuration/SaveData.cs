@@ -11,6 +11,7 @@ namespace FCS_HomeSolutions.Configuration
     {
         [JsonProperty] internal string Id { get; set; }
         [JsonProperty(PropertyName = "COL")] internal ColorVec4 Color { get; set; }
+        [JsonProperty(PropertyName = "SCOL")] internal ColorVec4 SecondaryColor { get; set; }
     }
 
     [Serializable]

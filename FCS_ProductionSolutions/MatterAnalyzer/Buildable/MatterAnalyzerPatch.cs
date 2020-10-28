@@ -5,37 +5,35 @@ using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Spawnables;
 using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
-using FCS_ProductionSolutions.HydroponicHarvester.Mono;
+using FCS_ProductionSolutions.MatterAnalyzer.Mono;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
 using UnityEngine;
 
-namespace FCS_ProductionSolutions.HydroponicHarvester.Buildable
+namespace FCS_ProductionSolutions.MatterAnalyzer.Buildable
 {
-    internal class HydroponicHarvesterPatch : SMLHelper.V2.Assets.Buildable
+    internal class MatterAnalyzerPatch : SMLHelper.V2.Assets.Buildable
     {
-        public HydroponicHarvesterPatch() : base(Mod.HydroponicHarvesterModClassName, Mod.HydroponicHarvesterModFriendlyName, Mod.HydroponicHarvesterModDescription)
+        public MatterAnalyzerPatch() : base(Mod.MatterAnalyzerClassName, Mod.MatterAnalyzerFriendlyName, Mod.MatterAnalyzerDescription)
         {
             OnFinishedPatching += () =>
             {
-                var hydroponicHarvesterKit = new FCSKit(Mod.HydroponicHarvesterKitClassID, Mod.HydroponicHarvesterModFriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
-                hydroponicHarvesterKit.Patch();
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, hydroponicHarvesterKit.TechType, 30000f, StoreCategory.Production);
+                var matterAnalyzerKit = new FCSKit(Mod.MatterAnalyzerKitClassID, Mod.MatterAnalyzerFriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
+                matterAnalyzerKit.Patch();
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, matterAnalyzerKit.TechType, 30000f, StoreCategory.Production);
 
             };
         }
-        public override TechGroup GroupForPDA => TechGroup.Miscellaneous;
-        public override TechCategory CategoryForPDA => TechCategory.Misc;
+        public override TechGroup GroupForPDA => TechGroup.InteriorModules;
+        public override TechCategory CategoryForPDA => TechCategory.InteriorModule;
         public override string AssetsFolder => Mod.GetAssetPath();
-
-
-
+        
         public override GameObject GetGameObject()
         {
             try
             {
-                var prefab = GameObject.Instantiate(ModelPrefab.HydroponicHarvesterPrefab);
+                var prefab = GameObject.Instantiate(ModelPrefab.MatterAnalyzerPrefab);
 
                 var size = new Vector3(1.353966f, 2.503282f, 1.006555f);
                 var center = new Vector3(0.006554961f, 1.394679f, 0.003277525f);
@@ -70,7 +68,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Buildable
                 prefabID.ClassId = ClassID;
 
                 prefab.AddComponent<TechTag>().type = TechType;
-                prefab.AddComponent<HydroponicHarvesterController>();
+                prefab.AddComponent<MatterAnalyzerController>();
 
                 //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
                 MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModName);

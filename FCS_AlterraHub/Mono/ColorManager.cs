@@ -14,6 +14,7 @@ namespace FCS_AlterraHub.Mono
         public Action<Color> OnColorChanged;
         private string _bodySecondary;
         private Color _currentColor = Color.white;
+        private Color _currentSecondaryColor = Color.white;
 
         public void Initialize(GameObject gameObject, string bodyMaterial, string secondaryMaterial = "")
         {
@@ -34,10 +35,12 @@ namespace FCS_AlterraHub.Mono
             {
                 case ColorTargetMode.Primary:
                     result =  MaterialHelpers.ChangeMaterialColor(_bodyMaterial, _gameObject, color);
+                    _currentColor = color;
                     break;
 
                 case ColorTargetMode.Secondary:
                     result = !string.IsNullOrWhiteSpace(_bodySecondary) && MaterialHelpers.ChangeMaterialColor(_bodySecondary, _gameObject, color);
+                    _currentSecondaryColor = color;
                     break;
                     
                 case ColorTargetMode.Both:
@@ -53,12 +56,20 @@ namespace FCS_AlterraHub.Mono
                         }
                     }
 
+                    _currentColor = color;
+                    _currentSecondaryColor = color;
+
                     break;
             }
 
-            _currentColor = color;
+            
             OnColorChanged?.Invoke(color);
             return result;
+        }
+
+        public Color GetSecondaryColor()
+        {
+            return _currentSecondaryColor;
         }
     }
 }

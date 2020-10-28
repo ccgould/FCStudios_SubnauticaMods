@@ -181,7 +181,10 @@ namespace FCS_HomeSolutions.Mono.PaintTool
 
                     if (result)
                     {
-                        _paintCanFillAmount -= 1;
+                        if (GameModeUtils.RequiresPower())
+                        {
+                            _paintCanFillAmount -= 1;
+                        }
                         RefreshUI();
                     }
                 }
@@ -311,7 +314,7 @@ namespace FCS_HomeSolutions.Mono.PaintTool
 
         public override bool OnRightHandDown()
         {
-            if (_paintCanFillAmount > 0)
+            if (_paintCanFillAmount > 0 || !GameModeUtils.RequiresPower())
             {
                 Paint();
             }

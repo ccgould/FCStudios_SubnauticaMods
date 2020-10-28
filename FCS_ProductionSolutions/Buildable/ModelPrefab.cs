@@ -4,6 +4,7 @@ using FCS_ProductionSolutions.Configuration;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace FCS_ProductionSolutions.Buildable
 {
@@ -23,6 +24,7 @@ namespace FCS_ProductionSolutions.Buildable
         public static AssetBundle GlobalBundle { get; set; }
         public static AssetBundle ModBundle { get; set; }
         public static GameObject HydroponicHarvesterPrefab { get; set; }
+        public static GameObject MatterAnalyzerPrefab { get; set; }
 
 
         internal static void Initialize()
@@ -38,6 +40,7 @@ namespace FCS_ProductionSolutions.Buildable
             }
 
             HydroponicHarvesterPrefab = GetPrefab(Mod.HydroponicHarvesterModPrefabName);
+            MatterAnalyzerPrefab = GetPrefab(Mod.MatterAnalyzerPrefabName);
         }
 
         internal static GameObject GetPrefab(string prefabName)

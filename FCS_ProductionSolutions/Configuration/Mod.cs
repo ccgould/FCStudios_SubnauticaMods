@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -18,6 +19,8 @@ namespace FCS_ProductionSolutions.Configuration
 
         private static ModSaver _saveObject;
         private static SaveData _saveData;
+        private static List<TechType> _hydroponicKnownTech;
+
         #endregion
 
         internal static string ModName => "FCSProductionSolutions";
@@ -31,6 +34,14 @@ namespace FCS_ProductionSolutions.Configuration
         internal static string HydroponicHarvesterKitClassID => $"{HydroponicHarvesterModName}_Kit";
         internal static string HydroponicHarvesterModClassName => HydroponicHarvesterModName;
         internal static string HydroponicHarvesterModPrefabName => HydroponicHarvesterModName;
+
+        internal const string MatterAnalyzerTabID = "MA";
+        internal const string MatterAnalyzerFriendlyName = "Matter Analyzer";
+        internal const string MatterAnalyzerModName = "MatterAnalyzer";
+        public const string MatterAnalyzerDescription = "A device that scans items and learns its matter makeup.";
+        internal static string MatterAnalyzerKitClassID => $"{MatterAnalyzerModName}_Kit";
+        internal static string MatterAnalyzerClassName => MatterAnalyzerModName;
+        internal static string MatterAnalyzerPrefabName => MatterAnalyzerModName;
 
 #if SUBNAUTICA
         internal static TechData HydroponicHarvesterIngredients => new TechData
@@ -53,8 +64,6 @@ namespace FCS_ProductionSolutions.Configuration
 
         internal static void Save()
         {
-
-
             if (!IsSaving())
             {
                 _saveObject = new GameObject().AddComponent<ModSaver>();
@@ -67,6 +76,8 @@ namespace FCS_ProductionSolutions.Configuration
                 {
                     controller.Save(newSaveData);
                 }
+
+                newSaveData.HydroponicHarvesterKnownTech = _hydroponicKnownTech;
 
                 _saveData = newSaveData;
 
@@ -124,6 +135,25 @@ namespace FCS_ProductionSolutions.Configuration
             return new HydroponicHarvesterDataEntry() { ID = id };
         }
 
+        internal static MatterAnalyzerDataEntry GetMatterAnalyzerSaveData(string id)
+        {
+            LoadData();
+
+            var saveData = GetSaveData();
+
+            foreach (var entry in saveData.MatterAnalyzerEntries)
+            {
+                if (string.IsNullOrEmpty(entry.ID)) continue;
+
+                if (entry.ID == id)
+                {
+                    return entry;
+                }
+            }
+
+            return new MatterAnalyzerDataEntry() { ID = id };
+        }
+
         internal static SaveData GetSaveData()
         {
             return _saveData ?? new SaveData();
@@ -152,5 +182,22 @@ namespace FCS_ProductionSolutions.Configuration
         }
 
         #endregion
+
+        public static void AddHydroponicKnownTech(TechType techType)
+        {
+            if (_hydroponicKnownTech == null)
+            {
+                _hydroponicKnownTech = new List<TechType>();
+            }
+            _hydroponicKnownTech.Add(techType);
+        }
+        public static bool IsHydroponicKnownTech(TechType techType)
+        {
+            if (_hydroponicKnownTech == null)
+            {
+                _hydroponicKnownTech = new List<TechType>();
+            }
+            return _hydroponicKnownTech.Contains(techType);
+        }
     }
 }

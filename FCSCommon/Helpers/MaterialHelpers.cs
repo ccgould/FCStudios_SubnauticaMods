@@ -2,6 +2,7 @@
 using FCSCommon.Utilities;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace FCSCommon.Helpers
@@ -136,7 +137,7 @@ namespace FCSCommon.Helpers
             {
                 foreach (Material material in renderer.materials)
                 {
-                    if (material.name.StartsWith(materialName, StringComparison.OrdinalIgnoreCase))
+                    if (RemoveClone(material.name).Trim().Equals(materialName, StringComparison.OrdinalIgnoreCase))
                     {
                         //QuickLogger.Debug($"Found material {materialName} changing color to {color2}",true);
                         material.SetColor("_Color", color);
@@ -148,6 +149,12 @@ namespace FCSCommon.Helpers
             }
 
             return result;
+        }
+
+
+        private static string RemoveClone(string oldName)
+        {
+            return Regex.Replace(oldName, @"[(][a-zA-Z]*[)]", "");
         }
         
         /// <summary>
