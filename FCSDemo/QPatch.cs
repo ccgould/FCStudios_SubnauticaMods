@@ -35,7 +35,10 @@ namespace FCSDemo
                         prefab.Patch();
                     }
                 }
-
+                else
+                {
+                    QuickLogger.Error($"Failed to load Configuration.");
+                }
                 QuickLogger.Info("Finished patching");
             }
             catch (Exception ex)

@@ -1,8 +1,6 @@
 ﻿using System;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
-using FCS_AlterraHub.Objects;
 using FCSCommon.Helpers;
-using FCSCommon.Utilities;
 using UnityEngine;
 
 namespace FCS_AlterraHub.Mono

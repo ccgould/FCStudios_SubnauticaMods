@@ -20,9 +20,29 @@ namespace FCS_EnergySolutions.Configuration
         [JsonProperty] internal bool IsVisible { get; set; }
     }
 
+    internal class JetStreamT242DataEntry
+    {
+        [JsonProperty] internal string ID { get; set; }
+        [JsonProperty] internal string SaveVersion { get; set; } = "1.0";
+        [JsonProperty] internal ColorVec4 BodyColor { get; set; }
+        [JsonProperty] internal ColorVec4 SecondaryBodyColor { get; set; }
+        [JsonProperty] internal FCSPowerStates PowerState { get; set; }
+        [JsonProperty] internal float StoredPower { get; set; }
+        [JsonProperty] internal string CurrentBiome { get; set; }
+        [JsonProperty] internal bool IsIncreasing { get; set; }
+        [JsonProperty] internal float CurrentSpeed { get; set; }
+        [JsonProperty] internal float TargetRPM { get; set; }
+        [JsonProperty] internal float TilterDeg { get; set; }
+        [JsonProperty] internal bool TilterUseGlobal { get; set; }
+        [JsonProperty] internal TargetAxis TilterAxis { get; set; }
+        [JsonProperty] internal bool AxisTilterSet { get; set; }
+        [JsonProperty] internal bool TilterMove { get; set; }
+    }
+
     [Serializable]
     internal class SaveData
     {
         [JsonProperty] internal List<AlterraGenDataEntry> AlterraGenEntries = new List<AlterraGenDataEntry>();
+        [JsonProperty] internal List<JetStreamT242DataEntry> MarineTurbineEntries = new List<JetStreamT242DataEntry>();
     }
 }

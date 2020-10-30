@@ -123,12 +123,14 @@
     <Compile Include="Enumerators\FCSLightState.cs" />
     <Compile Include="Enumerators\FCSPowerStates.cs" />
     <Compile Include="Enumerators\StoreCategory.cs" />
+    <Compile Include="Enumerators\TargetAxis.cs" />
     <Compile Include="Extensions\ColorExtensions.cs" />
     <Compile Include="Extensions\VectorExtensions.cs" />
     <Compile Include="Helpers\SpawnHelper.cs" />
     <Compile Include="Interfaces\IFCSGrowBed.cs" />
     <Compile Include="Managers\FCSPowerManager.cs" />
     <Compile Include="Model\FCSGrowingPlant.cs" />
+    <Compile Include="Mono\BaseManager.cs" />
     <Compile Include="Mono\FCSAquarium.cs" />
     <Compile Include="Objects\ColorList.cs" />
     <Compile Include="Helpers\ColorPickerDialog.cs" />
@@ -153,6 +155,7 @@
     <Compile Include="Mono\OreConsumer\TransferHandler.cs" />
     <Compile Include="Objects\ColorVec4.cs" />
     <Compile Include="Objects\Vec3.cs" />
+    <Compile Include="Patches\SubRoot_Patches.cs" />
     <Compile Include="Patch\EnumCacheManager.cs" />
     <Compile Include="Patch\EnumTypeCache.cs" />
     <Compile Include="Patch\PDATabPatcher.cs" />

@@ -124,10 +124,10 @@ namespace Mono
 
         }
 
-        public override void ChangeBodyColor(Color color, ColorTargetMode mode)
+        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
         {
             QuickLogger.Info($"Changing material {FCSDemoModel.BodyMaterial} color to {ColorList.GetName(color)}",true);
-            ColorManager.ChangeColor(color,mode);
+            return ColorManager.ChangeColor(color, mode);
         }
     }
 }

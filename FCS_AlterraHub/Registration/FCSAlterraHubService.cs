@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Systems;
+using FCSCommon.Utilities;
 
 namespace FCS_AlterraHub.Registration
 {
@@ -14,6 +16,7 @@ namespace FCS_AlterraHub.Registration
         void CreateStoreEntry(TechType techType, TechType receiveTechType, float cost, StoreCategory category);
         Dictionary<TechType, FCSStoreEntry> GetRegisteredKits();
         TechType GetRegisteredKit(TechType techType);
+        Dictionary<string, FcsDevice> GetRegisteredDevices();
     }
 
     internal interface IFCSAlterraHubServiceInternal
@@ -26,7 +29,7 @@ namespace FCS_AlterraHub.Registration
         private static readonly FCSAlterraHubService singleton = new FCSAlterraHubService();
 
         public static Dictionary<string,string> knownDevices = new Dictionary<string,string>();
-        public static Dictionary<string, FcsDevice> GlobalDevices = new Dictionary<string,FcsDevice>();
+        private static readonly Dictionary<string, FcsDevice> GlobalDevices = new Dictionary<string,FcsDevice>();
         private static Dictionary<TechType, FCSStoreEntry> _storeItems = new Dictionary<TechType, FCSStoreEntry>();
         public static IFCSAlterraHubService PublicAPI => singleton;
         internal static IFCSAlterraHubServiceInternal InternalAPI => singleton;
@@ -62,6 +65,25 @@ namespace FCS_AlterraHub.Registration
             {
                 device.UnitID=knownDevices[prefabID];
             }
+
+            BaseManagerSetup(device);
+        }
+
+        private static void BaseManagerSetup(FcsDevice device)
+        {
+            if (string.IsNullOrEmpty(device.BaseId))
+            {
+                var subRoot = device.gameObject.GetComponentInParent<SubRoot>();
+                if(subRoot != null)
+                {
+                    device.BaseId = subRoot.gameObject.GetComponent<PrefabIdentifier>().Id;
+                }
+            }
+
+            var manager = BaseManager.FindManager(device.BaseId);
+            QuickLogger.Debug($"Manager Returned: {manager?.BaseID}");
+            device.Manager = manager;
+            manager.RegisterDevice(device);
         }
 
         public void RegisterNewCard(string prefabID)
@@ -95,6 +117,11 @@ namespace FCS_AlterraHub.Registration
         public TechType GetRegisteredKit(TechType techType)
         {
             return _storeItems.Any(x=>x.Value.ReceiveTechType == techType) ? _storeItems.FirstOrDefault(x => x.Value.ReceiveTechType == techType).Key : TechType.None;
+        }
+
+        public Dictionary<string, FcsDevice> GetRegisteredDevices()
+        {
+            return GlobalDevices;
         }
     }
 

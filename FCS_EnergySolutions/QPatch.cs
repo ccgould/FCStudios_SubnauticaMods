@@ -1,8 +1,8 @@
 ﻿using System.Reflection;
-using FCS_AlterraHub.Configuration;
 using FCS_EnergySolutions.AlterraGen.Buildables;
 using FCS_EnergySolutions.Buildable;
 using FCS_EnergySolutions.Configuration;
+using FCS_EnergySolutions.JetStreamT242.Buildables;
 using FCSCommon.Utilities;
 using QModManager.API.ModLoading;
 using SMLHelper.V2.Handlers;
@@ -19,7 +19,9 @@ namespace FCS_EnergySolutions
     public class QPatch
     {
         internal string Version { get; private set; }
-        //internal static AlterraGenConfig Configuration { get; } = OptionsPanelHandler.Main.RegisterModOptions<AlterraGenConfig>();
+
+        internal static JetStreamT242Config JetStreamT242Configuration { get; } = OptionsPanelHandler.Main.RegisterModOptions<JetStreamT242Config>();
+        internal static Config Configuration { get; } = OptionsPanelHandler.Main.RegisterModOptions<Config>();
 
         [QModPatch]
         public void Patch()
@@ -32,6 +34,13 @@ namespace FCS_EnergySolutions
 
             var alterraGen = new AlterraGenBuildable();
             alterraGen.Patch();
+
+            var jetStreamT242 = new JetStreamT242Patcher();
+            jetStreamT242.Patch();
+
+
+            //Register debug commands
+            ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));
         }
     }
 }

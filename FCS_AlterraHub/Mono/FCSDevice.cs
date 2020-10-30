@@ -1,5 +1,4 @@
-﻿using System;
-using FCS_AlterraHomeSolutions.Mono.PaintTool;
+﻿using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCSCommon.Utilities;
 using UnityEngine;
 
@@ -13,6 +12,10 @@ namespace FCS_AlterraHub.Mono
     [RequireComponent(typeof(TechTag))]
     public abstract class FcsDevice : MonoBehaviour, IProtoEventListener, IConstructable
     {
+        /// <summary>
+        /// The prefab id of the base this device is connected to.
+        /// </summary>
+        public string BaseId;
 
         /// <summary>
         /// Boolean that represents if the device is visible to the network.
@@ -40,9 +43,17 @@ namespace FCS_AlterraHub.Mono
         public virtual bool DoesTakePower { get; set; } = true;
 
         /// <summary>
+        /// States if the device is in an operational state.
+        /// </summary>
+        public virtual bool IsOperational { get; }
+
+        /// <summary>
         /// Boolean that represents if the device can take damage.
         /// </summary>
         public virtual bool IsDamageable { get; set; } = false;
+
+        //The base manager for this device
+        public BaseManager Manager { get; set; }
 
         /// <summary>
         /// The initializer of this device
@@ -59,6 +70,10 @@ namespace FCS_AlterraHub.Mono
                    gameObject.GetComponentInChildren<PrefabIdentifier>()?.Id;
         }
 
+        /// <summary>
+        /// Gets the TechType of this device
+        /// </summary>
+        /// <returns></returns>
         public TechType GetTechType()
         {
             return gameObject.GetComponent<TechTag>()?.type ?? 
@@ -91,6 +106,42 @@ namespace FCS_AlterraHub.Mono
         public virtual void GetBodyColor(Color color, ColorTargetMode mode)
         {
             QuickLogger.Debug("This device hasnt set this method");
+        }
+
+        /// <summary>
+        /// The amount of power this device pulls
+        /// </summary>
+        /// <returns></returns>
+        public virtual float GetPowerUsage()
+        {
+            return 0f;
+        }
+
+        /// <summary>
+        /// The amount of power this device produces
+        /// </summary>
+        /// <returns></returns>
+        public virtual  float GetPowerProducing()
+        {
+            return 0f;
+        }
+
+        /// <summary>
+        /// Gets the amount of power stored within the device
+        /// </summary>
+        /// <returns></returns>
+        public virtual float GetStoredPower()
+        {
+            return 0f;
+        }
+
+        /// <summary>
+        /// Returns the max amount of power this device can hold
+        /// </summary>
+        /// <returns></returns>
+        public virtual float GetMaxPower()
+        {
+            return 0f;
         }
     }
 

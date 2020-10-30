@@ -6,7 +6,6 @@ using System.Linq;
 using System.Reflection;
 using FCS_AlterraHub.Mono;
 using FCS_EnergySolutions.AlterraGen.Enumerators;
-using FCS_EnergySolutions.AlterraGen.Mono;
 using FCSCommon.Extensions;
 using FCSCommon.Utilities;
 using HarmonyLib;
@@ -35,6 +34,14 @@ namespace FCS_EnergySolutions.Configuration
         internal static string AlterraGenKitClassID => $"{AlterraGenModName}_Kit";
         internal static string AlterraGenModClassName => AlterraGenModName;
         internal static string AlterraGenModPrefabName => AlterraGenModName;
+
+        internal const string JetStreamT242TabID = "MT";
+        internal const string JetStreamT242Description = "The Jet Stream T242 provides power by using the water current.The faster the turbine spins the more power output";
+        internal const string JetStreamT242FriendlyName = "JetStreamT242";
+        internal const string JetStreamT242ModName = "JetStreamT242";
+        internal const string JetStreamT242ClassName = "AIJetStreamT242";
+        internal static string JetStreamT242KitClassID => $"{AlterraGenModName}_Kit";
+        internal static string JetStreamT242PrefabName => JetStreamT242ModName;
 
 #if SUBNAUTICA
         internal static TechData AlterraGenIngredients => new TechData
@@ -137,6 +144,25 @@ namespace FCS_EnergySolutions.Configuration
             }
 
             return new AlterraGenDataEntry() { ID = id };
+        }
+
+        internal static JetStreamT242DataEntry GetJetStreamT242SaveData(string id)
+        {
+            LoadData();
+
+            var saveData = GetSaveData();
+
+            foreach (var entry in saveData.MarineTurbineEntries)
+            {
+                if (string.IsNullOrEmpty(entry.ID)) continue;
+
+                if (entry.ID == id)
+                {
+                    return entry;
+                }
+            }
+
+            return new JetStreamT242DataEntry() { ID = id };
         }
 
         internal static SaveData GetSaveData()

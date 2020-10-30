@@ -97,7 +97,7 @@
             return FormatToSimpleVersion(fvi);
         }
 
-        private static string FormatToSimpleVersion(FileVersionInfo version) => $"{version.FileMajorPart}.{version.FileMinorPart}.{version.FileBuildPart}";
+        private static string FormatToSimpleVersion(FileVersionInfo version) => $"{version.FileMajorPart}.{version.FileMinorPart}.{version.FileBuildPart}.{version.FilePrivatePart}";
 
         public static void ModMessage(string msg)
         {

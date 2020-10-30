@@ -27,6 +27,8 @@ namespace FCS_HomeSolutions.Buildables
 
         internal static void Initialize()
         {
+            if (_initialized) return;
+
             if (GlobalBundle == null)
             {
                 GlobalBundle = FCSAssetBundlesService.PublicAPI.GetAssetBundleByName(FCSAssetBundlesService.PublicAPI.GlobalBundleName);
@@ -39,10 +41,9 @@ namespace FCS_HomeSolutions.Buildables
 
             PaintToolPrefab = GetPrefab(Mod.PaintToolPrefabName);
             BaseOperatorPrefab = GetPrefab(Mod.BaseOperatorPrefabName);
+            _initialized = true;
         }
-
         
-
         internal static GameObject GetPrefab(string prefabName)
         {
             try

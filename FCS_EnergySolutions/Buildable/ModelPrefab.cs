@@ -12,16 +12,18 @@ namespace FCS_EnergySolutions.Buildable
         private static bool _initialized;
         internal static GameObject ColorItemPrefab { get; set; }
         internal static GameObject AlterraGenItemPrefab { get; set; }
-        internal static string BodyMaterial => $"{Mod.ModName}_COL";
-        internal static string SecondaryMaterial => $"{Mod.ModName}_COL_S";
-        internal static string DecalMaterial => $"{Mod.ModName}_DECALS";
-        internal static string DetailsMaterial => $"{Mod.ModName}_DETAILS";
-        internal static string SpecTexture => $"{Mod.ModName}_S";
-        internal static string LUMTexture => $"{Mod.ModName}_E";
-        internal static string NormalTexture => $"{Mod.ModName}_N";
+        internal static string BodyMaterial { get; } = $"{Mod.ModName}_COL";
+        internal static string SecondaryMaterial { get; } = $"{Mod.ModName}_COL_S";
+        internal static string DecalMaterial { get; } = $"{Mod.ModName}_DECALS";
+        internal static string DetailsMaterial { get; } = $"{Mod.ModName}_DETAILS";
+        internal static string SpecTexture { get; } = $"{Mod.ModName}_S";
+        internal static string LUMTexture { get; } = $"{Mod.ModName}_E";
+        internal static string NormalTexture { get; } = $"{Mod.ModName}_N";
         internal static string DetailTexture => $"{Mod.ModName}_D";
         public static AssetBundle GlobalBundle { get; set; }
         public static AssetBundle ModBundle { get; set; }
+        public static string EmissiveBControllerMaterial { get;} = $"{Mod.ModName}_B_Controller";
+        public static string EmissiveControllerMaterial { get; } = $"{Mod.ModName}_E_Controller";
 
 
         internal static void Initialize()
@@ -92,6 +94,8 @@ namespace FCS_EnergySolutions.Buildable
             MaterialHelpers.ApplySpecShader(BodyMaterial, SpecTexture, prefab, 1, 3f, bundle);
             MaterialHelpers.ApplyEmissionShader(DecalMaterial, LUMTexture, prefab, bundle, Color.white);
             MaterialHelpers.ApplyEmissionShader(DetailsMaterial, LUMTexture, prefab, bundle, Color.white);
+            MaterialHelpers.ApplyEmissionShader(EmissiveBControllerMaterial, LUMTexture, prefab, bundle, Color.white);
+            MaterialHelpers.ApplyEmissionShader(EmissiveControllerMaterial, LUMTexture, prefab, bundle, Color.white);
             MaterialHelpers.ApplyAlphaShader(DecalMaterial, prefab);
             MaterialHelpers.ApplyAlphaShader(DetailsMaterial, prefab);
             #endregion

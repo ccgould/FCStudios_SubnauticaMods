@@ -29,10 +29,11 @@ namespace FCS_HomeSolutions.Mono.PaintTool
         private Text _currentIndexLBL;
         private Text _colorNameLbl;
         private Image _selectedColor;
-        private ColorTargetMode _colorTargetMode;
+        private ColorTargetMode _colorTargetMode = ColorTargetMode.Primary;
         private Text _totalColorsLBL;
         private int _numberColorTargetModeTypes;
         private int _painterModeIndex = 1;
+        private int _layerMask;
         internal bool IsInitialized { get; set; }
 
         public override string animToolName => TechType.Scanner.AsString(true);
@@ -50,6 +51,7 @@ namespace FCS_HomeSolutions.Mono.PaintTool
             _totalColorsLBL = GameObjectHelpers.FindGameObject(gameObject, "TotalColors").GetComponent<Text>();
             _mode = GameObjectHelpers.FindGameObject(gameObject, "Mode").GetComponent<Text>();
             _liquid = GameObjectHelpers.FindGameObject(gameObject, "liquid");
+            _layerMask = ~(1 << LayerMask.NameToLayer("Player") | 1 << LayerMask.NameToLayer("Trigger"));
             Mod.RegisterPaintTool(this);
             ChangeColor(Color.black);
             RefreshUI();
@@ -172,9 +174,12 @@ namespace FCS_HomeSolutions.Mono.PaintTool
 
         private void Paint()
         {
-            if (Physics.Raycast(Player.main.camRoot.transform.position, Player.main.camRoot.transform.forward, out var hit, _range))
+
+            if (Physics.Raycast(Player.main.camRoot.transform.position, MainCamera.camera.transform.forward, out var hit, _range,_layerMask, QueryTriggerInteraction.Ignore))
             {
-                var fcsDevice = hit.transform.parent.gameObject.transform.parent.gameObject.transform.parent.GetComponent<FcsDevice>();
+                QuickLogger.Debug($"Painter Hit: {hit.transform.gameObject.name}",true);
+                //var fcsDevice = hit.transform?.parent?.gameObject?.transform?.parent?.gameObject?.transform?.parent?.GetComponent<FcsDevice>();
+                var fcsDevice = hit.transform.GetComponentInParent<FcsDevice>();
                 if (fcsDevice != null)
                 {
                     var result = fcsDevice.ChangeBodyColor(_currentColor, _colorTargetMode);

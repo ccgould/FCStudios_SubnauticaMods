@@ -118,8 +118,14 @@
     <Compile Include="AlterraGen\Struct\BatteryData.cs" />
     <Compile Include="Buildable\ModelPrefab.cs" />
     <Compile Include="Configuration\Config.cs" />
+    <Compile Include="Configuration\DebugCommands.cs" />
     <Compile Include="Configuration\Mod.cs" />
     <Compile Include="Configuration\SaveDataEntry.cs" />
+    <Compile Include="JetStreamT242\Buildables\JetStreamT242Patcher.cs" />
+    <Compile Include="JetStreamT242\Mono\JetStreamT242Controller.cs" />
+    <Compile Include="JetStreamT242\Mono\JetStreamT242PowerManager.cs" />
+    <Compile Include="JetStreamT242\Mono\MotorHandler.cs" />
+    <Compile Include="JetStreamT242\Mono\RotorHandler.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -129,6 +135,7 @@
       <Name>FCS_AlterraHub</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\FCSCommon\GamePaths.targets" />

@@ -96,6 +96,7 @@ namespace FCSCommon.Helpers
                         material.EnableKeyword("MARMO_EMISSION");
                         material.SetTexture("_Illum", FindTexture2D(textureName, assetBundle));
                         material.SetFloat("_EnableGlow", 1);
+                        material.SetFloat("_EnableLighting", 1);
                         material.SetColor("_GlowColor", emissionColor);
                     }
                 }
@@ -150,8 +151,7 @@ namespace FCSCommon.Helpers
 
             return result;
         }
-
-
+        
         private static string RemoveClone(string oldName)
         {
             return Regex.Replace(oldName, @"[(][a-zA-Z]*[)]", "");

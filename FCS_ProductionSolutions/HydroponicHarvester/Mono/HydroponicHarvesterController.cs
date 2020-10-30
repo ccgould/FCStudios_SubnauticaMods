@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection.Emit;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Mono;
@@ -21,16 +22,17 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
         private EffectsManager _effectsManager;
         private bool _isInBase;
 
-
         public EffectsManager EffectsManager => _effectsManager;
-        public bool IsOperational { get; set; }
+        
         public AudioManager AudioManager { get; private set; }
         public Action<bool> onUpdateSound { get; private set; }
         public ColorManager ColorManager { get; private set; }
         public GrowBedManager GrowBedManager { get; set; }
 
-        #region Unity Methods
+        public override bool IsOperational => IsOperationalCheck();
         
+        #region Unity Methods
+
         private void OnEnable()
         {
             if (_runStartUpOnEnable)
@@ -62,6 +64,12 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
 
         #endregion
 
+        private bool IsOperationalCheck()
+        {
+            //Returning true until further notice
+            return true;
+        }
+
         private void ReadySaveData()
         {
             QuickLogger.Debug("In OnProtoDeserialize");
@@ -89,7 +97,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
             //        AudioManager.StopMachineAudio();
             //    }
             //};
-
+            
             if (GrowBedManager == null)
             {
                 GrowBedManager = gameObject.AddComponent<GrowBedManager>();
