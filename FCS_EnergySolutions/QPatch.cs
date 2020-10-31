@@ -29,7 +29,7 @@ namespace FCS_EnergySolutions
             Version = QuickLogger.GetAssemblyVersion(Assembly.GetExecutingAssembly());
             QuickLogger.Info($"Started patching. Version: {Version}");
             QuickLogger.ModName = Mod.ModName;
-
+            AuxPatchers.AdditionalPatching();
             ModelPrefab.Initialize();
 
             var alterraGen = new AlterraGenBuildable();

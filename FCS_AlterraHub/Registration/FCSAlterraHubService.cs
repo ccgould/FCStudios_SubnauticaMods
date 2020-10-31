@@ -55,18 +55,24 @@ namespace FCS_AlterraHub.Registration
                 var id = $"{tabID}{knownDevices.Count:D3}";
                 device.UnitID = id;
                 knownDevices.Add(device.GetPrefabID(), id);
-                if (!GlobalDevices.ContainsKey(prefabID))
-                {
-                    GlobalDevices.Add(id,device);
-                }
+                AddToGlobalDevices(device, prefabID, id);
                 Mod.SaveDevices(knownDevices);
             }
             else
             {
                 device.UnitID=knownDevices[prefabID];
+                AddToGlobalDevices(device, prefabID, knownDevices[prefabID]);
             }
 
             BaseManagerSetup(device);
+        }
+
+        private static void AddToGlobalDevices(FcsDevice device, string prefabId, string id)
+        {
+            if (!GlobalDevices.ContainsKey(prefabId))
+            {
+                GlobalDevices.Add(id, device);
+            }
         }
 
         private static void BaseManagerSetup(FcsDevice device)

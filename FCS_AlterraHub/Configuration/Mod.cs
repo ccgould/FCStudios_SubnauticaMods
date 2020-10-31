@@ -35,7 +35,7 @@ namespace FCS_AlterraHub.Configuration
 
         internal const string DebitCardClassID = "DebitCard";
         internal const string DebitCardFriendly = "Alterra Debit Card";
-        internal const string DebitCardDescription = "A card that stores you money.";
+        internal const string DebitCardDescription = "A card that stores your money.";
         internal const string CardPrefabName = "CreditCard";
         internal static TechType DebitCardTechType { get; set; }
 
@@ -49,7 +49,6 @@ namespace FCS_AlterraHub.Configuration
         internal const string OreConsumerDescription = "Ore consumer yum yum give me more.The Ore consumer takes your ores and turns it into money.";
         internal const string OreConsumerPrefabName = "OreConsumer";
         internal const string OreConsumerKitClassID = "OreConsumer_Kit";
-        
         
         internal static TechType OreConsumerTechType { get; set; }
 

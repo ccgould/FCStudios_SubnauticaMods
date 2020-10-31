@@ -66,6 +66,6 @@ namespace FCS_EnergySolutions.Configuration
             {"None",0f }
         };
 
-        public float PowerPerMinute { get; set; } = 300f;
+        public float PowerPerSecond { get; set; } = 0.8333333f;
     }
 }

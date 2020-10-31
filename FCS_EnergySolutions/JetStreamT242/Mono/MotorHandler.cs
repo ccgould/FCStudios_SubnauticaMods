@@ -12,7 +12,7 @@ namespace FCS_EnergySolutions.JetStreamT242.Mono
         private bool _initialized;
         private const float RpmPerDeg = 0.16667f;
         private const float IncreaseRate = 2f;
-        private bool _increasing = true;
+        private bool _increasing;
 
         private void Update()
         {

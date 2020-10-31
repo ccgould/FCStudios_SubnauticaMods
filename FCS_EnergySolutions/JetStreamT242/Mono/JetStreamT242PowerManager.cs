@@ -6,12 +6,11 @@ using UnityEngine;
 
 namespace FCS_EnergySolutions.JetStreamT242.Mono
 {
-    internal class JetStreamT242PowerManager : MonoBehaviour
+    internal class JetStreamT242PowerManager : HandTarget, IHandTarget
     {
         private PowerRelay _powerRelay;
         private PowerSource _powerSource;
         private JetStreamT242Controller _mono;
-        private const float PowerPerSecond = 0.8333333f;
         private FCSPowerStates _powerState;
         private const float MaxSpeed = 300f;
         private float _secondsInAMinute = 60f;
@@ -54,14 +53,16 @@ namespace FCS_EnergySolutions.JetStreamT242.Mono
 
         private void ProducePower()
         {
+            float perSecondDelta = 0f;
             if (MaxSpeed > 0)
             {
-                var decPercentage = (QPatch.JetStreamT242Configuration.PowerPerMinute / MaxSpeed) / _secondsInAMinute;
-                _energyPerSec = (_mono.GetCurrentSpeed() * decPercentage) * DayNightCycle.main.deltaTime;
+                var decPercentage = (QPatch.JetStreamT242Configuration.PowerPerSecond / MaxSpeed);
+                _energyPerSec = (_mono.GetCurrentSpeed() * decPercentage);
+                perSecondDelta = _energyPerSec * DayNightCycle.main.deltaTime;
             }
             else
             {
-                _energyPerSec = 0;
+                perSecondDelta = 0;
             }
 
             if (_hasBreakerTripped) return;
@@ -70,12 +71,12 @@ namespace FCS_EnergySolutions.JetStreamT242.Mono
 
             if (num2 > 0f)
             {
-                if (num2 < _energyPerSec)
+                if (num2 < perSecondDelta)
                 {
-                    _energyPerSec = num2;
+                    perSecondDelta = num2;
                 }
 
-                _powerSource.AddEnergy(_energyPerSec, out var amountStored);
+                _powerSource.AddEnergy(perSecondDelta, out var amountStored);
             }
         }
 
@@ -112,7 +113,8 @@ namespace FCS_EnergySolutions.JetStreamT242.Mono
         
         public void LoadFromSave(JetStreamT242DataEntry savedData)
         {
-           
+            if(_powerSource == null || savedData?.StoredPower == null) return;
+           _powerSource.power = savedData.StoredPower;
         }
 
         public float GetEnergyProducing()
@@ -135,6 +137,18 @@ namespace FCS_EnergySolutions.JetStreamT242.Mono
             savedData.PowerState = _powerState;
             savedData.StoredPower = GetStoredPower();
             savedData.CurrentBiome = _curBiome;
+        }
+
+        public void OnHandHover(GUIHand hand)
+        {
+            HandReticle main = HandReticle.main;
+            main.SetInteractText(Language.main.GetFormat(AuxPatchers.JetStreamOnHover(), _mono.UnitID,Mathf.RoundToInt(this._powerSource.GetPower()), Mathf.RoundToInt(this._powerSource.GetMaxPower()), (_energyPerSec * 60).ToString("N1")));
+            main.SetIcon(HandReticle.IconType.Info);
+        }
+
+        public void OnHandClick(GUIHand hand)
+        {
+
         }
     }
 }

@@ -24,6 +24,8 @@ namespace FCS_EnergySolutions.JetStreamT242.Mono
         private RotorHandler _tilter;
         private RotorHandler _rotor;
 
+        private IFCSAlterraHubService publicApi => FCSAlterraHubService.PublicAPI;
+
         #region Unity Methods       
 
         private void OnEnable()
@@ -43,15 +45,20 @@ namespace FCS_EnergySolutions.JetStreamT242.Mono
                     }
 
                     _colorManager.ChangeColor(_savedData.BodyColor.Vector4ToColor());
-                    _colorManager.ChangeColor(_savedData.SecondaryBodyColor.Vector4ToColor(),ColorTargetMode.Secondary);
+                    _colorManager.ChangeColor(_savedData.SecondaryBodyColor.Vector4ToColor(), ColorTargetMode.Secondary);
                     _powerManager.LoadFromSave(_savedData);
                     _motor.LoadSave(_savedData);
                     _tilter.LoadSave(_savedData);
+
                     if (_savedData.IsIncreasing)
                     {
                         ChangeStatusLight();
                         _rotor.ResetToMag();
                         _rotor.Run();
+                    }
+                    else
+                    {
+                        DeActivateTurbine();
                     }
 
                 }
@@ -108,8 +115,9 @@ namespace FCS_EnergySolutions.JetStreamT242.Mono
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.JetStreamT242TabID);
 
             GameObjectHelpers.FindGameObject(gameObject, "UNITID").GetComponent<Text>().text = $"UnitID: {UnitID}";
-            ChangeStatusLight(false);
+            DeActivateTurbine();
             MaterialHelpers.ChangeEmissionStrength(ModelPrefab.EmissiveBControllerMaterial, gameObject,5);
+            IsInitialized = true;
         }
         
         public override void OnProtoSerialize(ProtobufSerializer serializer)
@@ -166,8 +174,7 @@ namespace FCS_EnergySolutions.JetStreamT242.Mono
 
         public void Save(SaveData newSaveData)
         {
-            if (!IsInitialized
-                || !IsConstructed) return;
+            if (!IsInitialized|| !IsConstructed) return;
 
             if (_savedData == null)
             {

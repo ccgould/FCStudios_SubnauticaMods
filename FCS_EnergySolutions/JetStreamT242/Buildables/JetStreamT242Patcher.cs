@@ -37,13 +37,10 @@ namespace FCS_EnergySolutions.JetStreamT242.Buildables
             {
                 var prefab = GameObject.Instantiate(_prefab);
 
-                //Scale the object
-                prefab.transform.localScale += new Vector3(0.24f, 0.24f, 0.24f);
-
                 var size = new Vector3(2.493512f, 1.875936f, 1.439421f);
                 var center = new Vector3(0.07963049f, 1.088284f, 0f);
 
-                GameObjectHelpers.AddConstructableBounds(prefab, size, center);
+                //GameObjectHelpers.AddConstructableBounds(prefab, size, center);
 
                 var model = prefab.FindChild("model");
 
