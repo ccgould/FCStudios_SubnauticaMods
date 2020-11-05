@@ -1,6 +1,7 @@
 ﻿using System;
 using FCSCommon.Utilities;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
@@ -574,6 +575,24 @@ namespace FCSCommon.Helpers
                     {
                         material.SetFloat("_GlowStrength", value);
                         material.SetFloat("_GlowStrengthNight", value);
+                    }
+                }
+            }
+        }
+
+        public static void SetTextureFromFile(GameObject go, string materialName, string filePath)
+        {
+            if (File.Exists(filePath))
+            {
+                var bytes = File.ReadAllBytes(filePath);
+                var texture = new Texture2D(2, 2);
+                Renderer[] renderers = go.GetComponentsInChildren<Renderer>(true);
+
+                foreach (Renderer render in renderers)
+                {
+                    if (render.material.name.StartsWith(materialName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        render.material.mainTexture = texture;
                     }
                 }
             }

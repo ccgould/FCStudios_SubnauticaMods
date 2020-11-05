@@ -12,9 +12,6 @@ namespace FCS_AlterraHub.Mono.AlterraHub
     internal class AccountPageHandler
     {
         private AlterraHubController _mono;
-        private readonly GameObject _accountCreation;
-        private GameObject _welcomeScreen;
-        private GameObject _noCardScreen;
         private string _fullName;
         private string _userName;
         private string _password;
@@ -27,6 +24,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
         private Text _debitBalance;
         private Text _userNameLBL;
         private GameObject _createAccountDialog;
+        private Text _requestButtonText;
 
         internal AccountPageHandler(AlterraHubController mono)
         {
@@ -34,16 +32,12 @@ namespace FCS_AlterraHub.Mono.AlterraHub
 
             var accountPage = GameObjectHelpers.FindGameObject(mono.gameObject, "AccountPage");
             
-            GameObjectHelpers.FindGameObject(accountPage, "PageTitle").GetComponentInChildren<Text>().text = Buildables.AlterraHub.Account();
-            
-            _accountCreation = GameObjectHelpers.FindGameObject(accountPage, "AccountCreation");
-
             _createAccountDialog = GameObjectHelpers.FindGameObject(mono.gameObject, "CreateAccountDialog");
-
-            _noCardScreen = GameObjectHelpers.FindGameObject(accountPage, "NoCardScreen");
-
-            GameObjectHelpers.FindGameObject(_noCardScreen, "MessageLBL").GetComponent<Text>().text =
-                Buildables.AlterraHub.CardNotDetected();
+            var createAccountDialogCloseBtn = GameObjectHelpers.FindGameObject(_createAccountDialog, "CloseBTN").GetComponent<Button>();
+            createAccountDialogCloseBtn.onClick.AddListener(() =>
+            {
+                _createAccountDialog.SetActive(false);
+            });
 
             _paymentScreen = GameObjectHelpers.FindGameObject(mono.gameObject, "DebitDialog");
             
@@ -87,7 +81,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
 
             mono.AlterraHubTrigger.onTriggered += value =>
             {
-                SwitchToCorrectPage();
+
             };
 
             SetupFullTitle(_createAccountDialog);
@@ -97,22 +91,17 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             SetupPasswordField(_createAccountDialog);
 
             SetupPINField(_createAccountDialog);
-
-            SetupApplyButton();
-
+            
             var createBTN = _createAccountDialog.GetComponentInChildren<Button>();
             createBTN.onClick.AddListener(() =>
             {
                 CardSystem.main.CreateUserAccount(_fullName, _userName, _password, _pin);
                 _userNameLBL.text = CardSystem.main.GetUserName();
-                SwitchToCorrectPage();
-                _createAccountDialog.SetActive(false);
+                 _createAccountDialog.SetActive(false);
+                UpdateRequestBTN(true);
             });
             
-
             CreateWelcomePage(accountPage);
-            
-            SwitchToCorrectPage();
         }
 
         private void HidePaymentScreen()
@@ -122,7 +111,10 @@ namespace FCS_AlterraHub.Mono.AlterraHub
 
         private void ShowPaymentScreen()
         {
+            ResetPaymentScreen();
             _paymentScreen.SetActive(true);
+            _accountBalance.text = Buildables.AlterraHub.AccountBalanceFormat(CardSystem.main.GetAccountBalance());
+            _debitBalance.text = Buildables.AlterraHub.AccountBalanceFormat(CardSystem.main.AlterraBalance());
         }
 
         private void ResetPaymentScreen()
@@ -131,15 +123,6 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             _newBalance.text = Buildables.AlterraHub.AccountNewBalanceFormat(0);
             _accountBalance.text = Buildables.AlterraHub.AccountNewBalanceFormat(0);
             _debitBalance.text = Buildables.AlterraHub.DebitBalanceFormat(0);
-        }
-
-        private void SetupApplyButton()
-        {
-            var button = _accountCreation.GetComponentInChildren<Button>();
-            button.onClick.AddListener((() =>
-            {
-                _createAccountDialog.SetActive(true);
-            }));
         }
 
         private void SetupFullTitle(GameObject dialog)
@@ -186,75 +169,47 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             GameObjectHelpers.FindGameObject(dialog, "PINTitle").GetComponentInChildren<Text>().text =
                 Buildables.AlterraHub.PIN();
         }
-
-        private void SwitchToCorrectPage()
-        {
-            QuickLogger.Debug("Switch to correct page");
-            if (!CardSystem.main.HasBeenRegistered())
-            {
-                QuickLogger.Debug("Switched to account creation page");
-                _accountCreation.SetActive(true);
-                _welcomeScreen.SetActive(false);
-                _noCardScreen.SetActive(false);
-            }
-            else
-            {
-                if (_mono.IsPlayerInRange() && PlayerInteractionHelper.HasCard())
-                {
-                    QuickLogger.Debug("Switched to welcome page");
-                    _noCardScreen.SetActive(false);
-                    _welcomeScreen.SetActive(true);
-                }
-                else
-                {
-                    QuickLogger.Debug("Switched to no card page");
-                    _noCardScreen.SetActive(true);
-                    _welcomeScreen.SetActive(false);
-                }
-
-                _accountCreation.SetActive(false);
-            }
-        }
-
+        
         private void CreateWelcomePage(GameObject accountPage)
         {
-            _welcomeScreen = GameObjectHelpers.FindGameObject(accountPage, "Welcome Screen");
-            GameObjectHelpers.FindGameObject(_welcomeScreen, "MessageLBL").GetComponentInChildren<Text>().text =
-                Buildables.AlterraHub.WelcomeBack();
-
-
-            _userNameLBL = GameObjectHelpers.FindGameObject(_welcomeScreen, "UserName").GetComponentInChildren<Text>();
+            _userNameLBL = GameObjectHelpers.FindGameObject(_mono.gameObject, "UserName").GetComponentInChildren<Text>();
             _userNameLBL.text = CardSystem.main.GetUserName();
-
-            var requestButton = _noCardScreen.GetComponentInChildren<Button>();
+            
+            var requestButton = GameObjectHelpers.FindGameObject( accountPage, "CardRequestBTN").GetComponent<Button>();
+            _requestButtonText = requestButton.GetComponentInChildren<Text>();
+            UpdateRequestBTN(CardSystem.main.HasBeenRegistered());
 
             requestButton.onClick.AddListener(() =>
             {
-                //Check if player has any FiberMesh and Magniette
-                if (!PlayerHasIngredients())
+                if (CardSystem.main.HasBeenRegistered())
                 {
-                    MessageBoxHandler.main.Show(string.Format(Buildables.AlterraHub.CardRequirementsMessageFormat(),
-                        LanguageHelpers.GetLanguage(TechType.FiberMesh), LanguageHelpers.GetLanguage(TechType.Magnetite)));
-                    return;
+                    //Check if player has any FiberMesh and Magniette
+                    if (!PlayerHasIngredients())
+                    {
+                        MessageBoxHandler.main.Show(string.Format(Buildables.AlterraHub.CardRequirementsMessageFormat(),
+                            LanguageHelpers.GetLanguage(TechType.FiberMesh), LanguageHelpers.GetLanguage(TechType.Magnetite)));
+                        return;
+                    }
+
+                    PlayerInteractionHelper.GivePlayerItem(Mod.DebitCardTechType);
+                    RemoveItemsFromContainer();
                 }
-
-                PlayerInteractionHelper.GivePlayerItem(Mod.DebitCardTechType);
-                RemoveItemsFromContainer();
+                else
+                {
+                    _createAccountDialog.SetActive(true);
+                }
             });
 
+            var payDebitButton = GameObjectHelpers.FindGameObject(accountPage, "RepayBTN").GetComponent<Button>();
 
-            var repayButton = _welcomeScreen.GetComponentInChildren<Button>();
-
-            repayButton.onClick.AddListener(() =>
-            {
-                ResetPaymentScreen();
-                _debitBalance.text = Buildables.AlterraHub.AccountBalanceFormat(CardSystem.main.AlterraBalance());
-                _accountBalance.text = Buildables.AlterraHub.AccountBalanceFormat(CardSystem.main.GetAccountBalance());
-                ShowPaymentScreen();
-            });
-
+            payDebitButton.onClick.AddListener(ShowPaymentScreen);
         }
-        
+
+        private void UpdateRequestBTN(bool accountReg)
+        {
+            _requestButtonText.text = accountReg ? Buildables.AlterraHub.RequestNewCard() : Buildables.AlterraHub.CreateNewAccount();
+        }
+
         private static void RemoveItemsFromContainer()
         {
             var fiberMesh = Inventory.main.container.RemoveItem(TechType.FiberMesh);

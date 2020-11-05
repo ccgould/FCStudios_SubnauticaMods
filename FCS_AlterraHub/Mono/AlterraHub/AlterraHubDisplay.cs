@@ -52,10 +52,14 @@ namespace FCS_AlterraHub.Mono.AlterraHub
                 #region Home
 
                 //HomePage
-                _homePage = GameObjectHelpers.FindGameObject(canvas, "Home");
+                _homePage = GameObjectHelpers.FindGameObject(canvas, "MainUI");
 
-                _mainTotal = GameObjectHelpers.FindGameObject(_homePage, "total").GetComponent<Text>();
+                _mainTotal = GameObjectHelpers.FindGameObject(_homePage, "CreditAmount").GetComponent<Text>();
                 _mainTotal.text = "0";
+                CardSystem.main.onBalanceUpdated += amount =>
+                {
+                    _mainTotal.text = amount.ToString("n0");
+                };
 
                 //Body
                 _panelGroup = GetDisplayBody();
@@ -94,9 +98,11 @@ namespace FCS_AlterraHub.Mono.AlterraHub
 
         private void CreateCartDropDown(GameObject homePage)
         {
-            var cartBTNObj = GameObjectHelpers.FindGameObject(homePage, "CartButton");
-            var cartButtonNumber =
-                GameObjectHelpers.FindGameObject(cartBTNObj, "Amount").GetComponentInChildren<Text>();
+            var cartBTNObj = GameObjectHelpers.FindGameObject(homePage, "CartIcon");
+            var closeBTN = GameObjectHelpers.FindGameObject(homePage, "CloseBTN").GetComponent<Button>();
+            closeBTN.onClick.AddListener(() => { _cartDropDownManager.ToggleVisibility(); });
+
+            var cartButtonNumber = GameObjectHelpers.FindGameObject(cartBTNObj, "CartAmount").GetComponentInChildren<Text>();
             var cartBTN = cartBTNObj.GetComponent<Button>();
             cartBTN.onClick.AddListener(() => { _cartDropDownManager.ToggleVisibility(); });
             
@@ -111,7 +117,6 @@ namespace FCS_AlterraHub.Mono.AlterraHub
 
             _cartDropDownManager.onTotalChanged += amount =>
             {
-                _mainTotal.text = amount.ToString("n0");
                 cartButtonNumber.text = _cartDropDownManager.GetCartCount().ToString();
             };
 
@@ -121,17 +126,17 @@ namespace FCS_AlterraHub.Mono.AlterraHub
         private void GetDisplayTabs(PanelGroup panelGroup)
         {
             QuickLogger.Debug("Getting Tabs");
-            var tabs = GameObjectHelpers.FindGameObject(_homePage, "Tabs");
+            var tabs = GameObjectHelpers.FindGameObject(_homePage, "NavigationBar");
             var tabGroup = tabs.AddComponent<TabGroup>();
             tabGroup.tabIdle = Color.white;
-            tabGroup.tabHover = new Color(1f, 0.6235294f, 0.1019608f);
-            tabGroup.tabActive = Color.white;
+            tabGroup.tabHover = Color.cyan;
+            tabGroup.tabActive = Color.cyan;
             tabGroup.panelGroup = panelGroup;
             panelGroup.TabGroup = tabGroup;
 
             foreach (Transform child in tabs.transform)
             {
-                var tabBar = GameObjectHelpers.FindGameObject(child.gameObject, "TabBar");
+                var tabBar = GameObjectHelpers.FindGameObject(child.gameObject, "Tick");
                 var tabButton = child.gameObject.AddComponent<TabButton>();
                 tabButton.tabGroup = tabGroup;
                 tabButton.onTabDeselected.AddListener(() => { tabBar.SetActive(false); });
@@ -153,7 +158,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
 
         private PanelGroup GetDisplayBody()
         {
-            var body = GameObjectHelpers.FindGameObject(_homePage, "Body");
+            var body = GameObjectHelpers.FindGameObject(_homePage, "Pages");
             var panelGroup = body.AddComponent<PanelGroup>();
             panelGroup.LinkPanels(body.GetChildren());
             return panelGroup;

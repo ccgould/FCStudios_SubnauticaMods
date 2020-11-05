@@ -9,16 +9,22 @@ using FCSCommon.Converters;
 using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
+using rail;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace FCS_AlterraHub.Mono.AlterraHub
 {
-    internal class AlterraHubController: FcsDevice, IFCSSave<SaveData>
+    internal class AlterraHubController: FcsDevice, IFCSSave<SaveData>, IHandTarget
     {
         private bool _runStartUpOnEnable;
         private bool _isFromSave;
         private AlterraHubDataEntry _savedData;
+        private bool _cursorLockCached;
+        private GameObject _inputDummy;
+        private GameObject _hubCameraPosition;
+        private bool _isInRange;
+        private GameObject _screenBlock;
 
 
         internal HubTrigger AlterraHubTrigger { get; set; }
@@ -26,6 +32,14 @@ namespace FCS_AlterraHub.Mono.AlterraHub
         public MotorHandler MotorHandler { get; private set; }
 
         #region Unity Methods
+        
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.Escape) && _isInRange)
+            {
+                ResetCamera();
+            }
+        }
 
         private void OnEnable()
         {
@@ -80,6 +94,8 @@ namespace FCS_AlterraHub.Mono.AlterraHub
                 MotorHandler.Start();
             }
 
+            _screenBlock = GameObjectHelpers.FindGameObject(gameObject, "Blocker");
+
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.ModID);
 
             LoadStore();
@@ -93,9 +109,20 @@ namespace FCS_AlterraHub.Mono.AlterraHub
                 }
             }
 
+            AlterraHubTrigger.onTriggered += value =>
+            {
+                _isInRange = true;
+                if (!value)
+                {
+                    _isInRange = false;
+                }
+            };
+
+            _hubCameraPosition = GameObjectHelpers.FindGameObject(gameObject, "CameraPosition");
+
             IsInitialized = true;
         }
-        
+
         private void onBuyBTNClick(CartDropDownHandler dropDownHandler)
         {
             //TODO Show CheckOut
@@ -254,6 +281,70 @@ namespace FCS_AlterraHub.Mono.AlterraHub
         {
             return AlterraHubTrigger.IsPlayerInRange;
         }
+
+        private GameObject inputDummy
+        {
+            get
+            {
+                if (this._inputDummy == null)
+                {
+                    this._inputDummy = new GameObject("InputDummy");
+                    this._inputDummy.SetActive(false);
+                }
+                return this._inputDummy;
+            }
+        }
+
+        internal void InterceptInput(bool state)
+        {
+            if (inputDummy.activeSelf == state)
+            {
+                return;
+            }
+            if (state)
+            {
+                _screenBlock.SetActive(false);
+                Player.main.EnterLockedMode(null, false);
+                MainCameraControl.main.enabled = false;
+                InputHandlerStack.main.Push(inputDummy);
+                _cursorLockCached = UWE.Utils.lockCursor;
+                UWE.Utils.lockCursor = false;
+                return;
+            }
+            
+            UWE.Utils.lockCursor = _cursorLockCached;
+            InputHandlerStack.main.Pop(inputDummy);
+            MainCameraControl.main.enabled = true;
+            _screenBlock.SetActive(true);
+        }
+
+        public void OnHandHover(GUIHand hand)
+        {
+            if (_isInRange)
+            {
+                HandReticle main = HandReticle.main;
+                main.SetInteractText("Click to use Alterra Hub");
+                main.SetIcon(HandReticle.IconType.Hand);
+            }
+        }
+
+        public void OnHandClick(GUIHand hand)
+        {
+            if (_isInRange)
+            {
+                InterceptInput(true);
+                SNCameraRoot.main.transform.position = _hubCameraPosition.transform.position;
+                SNCameraRoot.main.transform.rotation = _hubCameraPosition.transform.rotation;
+            }
+        }
+
+        private void ResetCamera()
+        {
+            SNCameraRoot.main.transform.localPosition = Vector3.zero;
+            SNCameraRoot.main.transform.localRotation = Quaternion.identity;
+            Player.main.ExitLockedMode(false, false);
+            InterceptInput(false);
+        }
     }
 
     internal class HubTrigger : MonoBehaviour
@@ -273,7 +364,6 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             if (collider.gameObject.layer != 19) return;
             IsPlayerInRange = true;
             onTriggered?.Invoke(true);
-
         }
 
         private void OnTriggerStay(Collider collider)

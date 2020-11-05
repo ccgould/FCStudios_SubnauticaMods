@@ -25,7 +25,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             
             foreach (GameObject panel in panelList)
             {
-                var storeGrid = GameObjectHelpers.FindGameObject(panel, "StoreGrid");
+                var storeGrid = GameObjectHelpers.FindGameObject(panel, "Grid");
                 if (storeGrid != null)
                 {
                     var panelHelper = panel.AddComponent<PanelHelper>();

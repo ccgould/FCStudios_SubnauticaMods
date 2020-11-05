@@ -30,7 +30,10 @@ namespace FCS_AlterraHub.Objects
             {new ColorVec4(0.5019608f,0f,1f,1f), "Electric Indigo"},
             {new ColorVec4(1f,0f,1f,1f),"Magenta"},
             {new ColorVec4(0.9960785f,0f,0.4980392f,1f), "Deep Pink"},
-            {new ColorVec4(0.8941177f,0.6784314f,0.01960784f,1f), "Gamboge"}
+            {new ColorVec4(0.8941177f,0.6784314f,0.01960784f,1f), "Gamboge"},
+            {new ColorVec4(0.1882353f,0.1843137f,0.1803922f,1f), "Acadia"},
+            {new ColorVec4(0.4941177f,0.4941177f,0.4941177f,1f), "Grey"},
+            {new ColorVec4(0.3333333f,0.3333333f,0.3333333f,1f), "Matterhorn"},
         };
 
         public static List<ColorVec4> OldColorsList = new List<ColorVec4>

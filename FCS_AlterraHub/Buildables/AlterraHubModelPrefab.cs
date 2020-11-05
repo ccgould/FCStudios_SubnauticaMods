@@ -62,7 +62,7 @@ namespace FCS_AlterraHub.Buildables
                     if (!LoadAsset("CartItem", QPatch.GlobalBundle, out var cartItemPrefabGo)) return false;
                     CartItemPrefab = cartItemPrefabGo;
 
-                    if (!LoadAsset("Item", QPatch.GlobalBundle, out var itemPrefabGo)) return false;
+                    if (!LoadAsset("StoreItem", QPatch.GlobalBundle, out var itemPrefabGo)) return false;
                     ItemPrefab = itemPrefabGo;
 
                     _initialized = true;

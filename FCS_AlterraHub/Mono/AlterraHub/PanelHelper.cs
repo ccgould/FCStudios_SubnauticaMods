@@ -17,19 +17,22 @@ namespace FCS_AlterraHub.Mono.AlterraHub
 
             if (_isInitialized) return;
 
-            _content = GameObjectHelpers.FindGameObject(gameObject, "StoreGrid");
+            _content = GameObjectHelpers.FindGameObject(gameObject, "Grid");
 
-            foreach (Transform child in _content.transform)
+            if (_content != null)
             {
-                Destroy(child.gameObject);
+                foreach (Transform child in _content.transform)
+                {
+                    Destroy(child.gameObject);
+                }
+                _isInitialized = true;
             }
-
-            _isInitialized = true;
         }
 
         internal void AddContent(GameObject storeItem)
         {
             Initialize();
+            if (!_isInitialized) return;
             storeItem.transform.SetParent(_content.transform, false);
         }
     }

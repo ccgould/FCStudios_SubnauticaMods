@@ -10,7 +10,8 @@ namespace FCS_AlterraHub.Buildables
 
         internal static Dictionary<string,string> LanguageDictionary = new Dictionary<string, string>
         {
-            { $"{ModKey}_Request","Request"},
+            { $"{ModKey}_RequestNewCard","Request New Card."},
+            { $"{ModKey}_CreateNewAccount","Create New Account."},
             { $"{ModKey}_CardNotInSystemSettingBalanceFormat", "This card number ({0}) wasn't found in the system. Setting balance to {1}." },
             { $"{ModKey}_ErrorHasOccured", "An error has occurred please let FCStudios in the Alterra Corp. know about this error. Thank you and sorry for the inconvenience." },
             { $"{ModKey}_NotEnoughMoneyOnAccount", "There is not enough money on card to perform this transaction." },
@@ -58,9 +59,14 @@ namespace FCS_AlterraHub.Buildables
             return LanguageDictionary.ContainsKey(key) ? Language.main.Get(LanguageDictionary[key]) : string.Empty;
         }
 
-        internal static string Request()
+        internal static string RequestNewCard()
         {
-            return GetLanguage($"{ModKey}_Request");
+            return GetLanguage($"{ModKey}_RequestNewCard");
+        }
+
+        internal static string CreateNewAccount()
+        {
+            return GetLanguage($"{ModKey}_CreateNewAccount");
         }
 
         internal static string CardNotInSystemAddingBalanceFormat()
