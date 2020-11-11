@@ -13,12 +13,17 @@ namespace FCS_AlterraHub.Mono
         private string _bodySecondary;
         private Color _currentColor = Color.white;
         private Color _currentSecondaryColor = Color.white;
+        private Color _currentLumColor = Color.white;
+        private string _lumMaterial;
+        
 
-        public void Initialize(GameObject gameObject, string bodyMaterial, string secondaryMaterial = "")
+        public void Initialize(GameObject gameObject, string bodyMaterial, string secondaryMaterial = "",
+            string lumControllerMaterial = "")
         {
             _gameObject = gameObject;
             _bodyMaterial = bodyMaterial;
             _bodySecondary = secondaryMaterial;
+            _lumMaterial = lumControllerMaterial;
         }
 
         public Color GetColor()
@@ -58,6 +63,17 @@ namespace FCS_AlterraHub.Mono
                     _currentSecondaryColor = color;
 
                     break;
+
+                case ColorTargetMode.Emission:
+
+                    if (!string.IsNullOrWhiteSpace(_lumMaterial))
+                    {
+                        var emissionResult = MaterialHelpers.ChangeEmissionColor(_lumMaterial, _gameObject, color);
+                        _currentLumColor = color;
+                        OnColorChanged?.Invoke(color);
+                        return true;
+                    }
+                    break;
             }
 
             
@@ -68,6 +84,11 @@ namespace FCS_AlterraHub.Mono
         public Color GetSecondaryColor()
         {
             return _currentSecondaryColor;
+        }
+
+        public Color GetLumColor()
+        {
+            return _currentLumColor;
         }
     }
 }

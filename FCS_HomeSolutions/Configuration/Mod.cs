@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using FCS_AlterraHub.Mono;
+using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Mono.PaintTool;
 using FCSCommon.Extensions;
 using FCSCommon.Utilities;
@@ -36,6 +37,21 @@ namespace FCS_HomeSolutions.Configuration
         internal const string BaseOperatorPrefabName = "BaseOperator";
         internal const string BaseOperatorKitClassID = "BaseOperator_Kit";
 
+        internal const string HoverLiftPadClassID = "HoverLiftPad";
+        internal const string HoverLiftPadFriendly = "Alterra Hover Lift Pad";
+        internal const string HoverLiftPadDescription = "Get from one platform to the other with ease and why not bring your prawn suit with you";
+        internal const string HoverLiftPrefabName = "HoverLiftPad";
+        internal static string HoverLiftPadKitClassID = $"{HoverLiftPadClassID}_Kit";
+        internal const string HoverLiftPadTabID = "HLP";
+
+        internal const string SmartPlanterPotClassID = "SmartPlanterPot";
+        internal const string SmartPlanterPotFriendly = "Smart Planter Pot";
+        internal static string SmartPlanterPotDescription { get; } =
+            "Just like another other planter but with color changing abilities.";
+        internal const string SmartPlanterPotPrefabName = "SmartPlanterPot";
+        internal static string SmartPlanterPotKitClassID = $"{SmartPlanterPotClassID}_Kit";
+        internal const string SmartPlanterPotTabID = "SMP";
+
 #if SUBNAUTICA
         internal static TechData PaintToolIngredients => new TechData
 #elif BELOWZERO
@@ -60,6 +76,32 @@ namespace FCS_HomeSolutions.Configuration
             Ingredients =
             {
                 new Ingredient(BaseOperatorKitClassID.ToTechType(), 1),
+            }
+        };
+
+#if SUBNAUTICA
+        internal static TechData HoverLiftPadIngredients => new TechData
+#elif BELOWZERO
+                internal static RecipeData HoverLiftPadIngredients => new RecipeData
+#endif
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(HoverLiftPadKitClassID.ToTechType(), 1),
+            }
+        };
+
+#if SUBNAUTICA
+        internal static TechData SmartPlanterIngredients => new TechData
+#elif BELOWZERO
+                internal static RecipeData SmartPlanterIngredients => new RecipeData
+#endif
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(SmartPlanterPotKitClassID.ToTechType(), 1),
             }
         };
 
@@ -88,7 +130,7 @@ namespace FCS_HomeSolutions.Configuration
 
         }
         
-        internal static void Save()
+        internal static void Save(ProtobufSerializer serializer)
         {
             if (!IsSaving())
             {
@@ -98,14 +140,17 @@ namespace FCS_HomeSolutions.Configuration
 
                 var controllers = GameObject.FindObjectsOfType<MonoBehaviour>().OfType<IFCSSave<SaveData>>();
 
-                foreach (PaintToolController controller in _registeredPaintTool)
+                if (_registeredPaintTool != null)
                 {
-                    controller.Save(newSaveData);
+                    foreach (PaintToolController controller in _registeredPaintTool)
+                    {
+                        controller.Save(newSaveData);
+                    }
                 }
 
                 foreach (var controller in controllers)
                 {
-                    controller.Save(newSaveData);
+                    controller.Save(newSaveData,serializer);
                 }
                 _saveData = newSaveData;
 
@@ -172,6 +217,25 @@ namespace FCS_HomeSolutions.Configuration
             return new PaintToolDataEntry() { Id = id };
         }
 
+        internal static HoverLiftDataEntry GetHoverLiftSaveData(string id)
+        {
+            LoadData();
+
+            var saveData = GetSaveData();
+
+            foreach (var entry in saveData.HoverLiftDataEntries)
+            {
+                if (string.IsNullOrEmpty(entry.Id)) continue;
+
+                if (entry.Id == id)
+                {
+                    return entry;
+                }
+            }
+
+            return new HoverLiftDataEntry { Id = id };
+        }
+
         internal static void RegisterPaintTool(PaintToolController paintTool)
         {
             if (_registeredPaintTool == null)
@@ -200,6 +264,30 @@ namespace FCS_HomeSolutions.Configuration
                 _registeredPaintTool.Remove(paintTool);
             }
 
+        }
+
+        public static bool IsModPatched(string mod)
+        {
+            return FCSAlterraHubService.PublicAPI.IsModPatched(mod);
+        }
+
+        public static PlanterDataEntry GetPlanterDataEntrySaveData(string id)
+        {
+            LoadData();
+
+            var saveData = GetSaveData();
+
+            foreach (var entry in saveData.PlanterEntries)
+            {
+                if (string.IsNullOrEmpty(entry.Id)) continue;
+
+                if (entry.Id == id)
+                {
+                    return entry;
+                }
+            }
+
+            return new PlanterDataEntry { Id = id };
         }
     }
 }

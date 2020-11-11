@@ -94,22 +94,22 @@ namespace FCS_AlterraHub.Buildables
             return GetLanguage($"{ModKey}_CardReader");
         }
 
-        internal static string AccountBalanceFormat(float amount)
+        internal static string AccountBalanceFormat(decimal amount)
         {
             return string.Format(GetLanguage($"{ModKey}_AccountBalanceFormat"), amount.ToString("n0"));
         }
 
-        internal static string CheckOutTotalFormat(float amount)
+        internal static string CheckOutTotalFormat(decimal amount)
         {
             return string.Format(GetLanguage($"{ModKey}_CheckOutTotalFormat"), amount.ToString("n0"));
         }
 
-        internal static string AccountNewBalanceFormat(float amount)
+        internal static string AccountNewBalanceFormat(decimal amount)
         {
             return string.Format(GetLanguage($"{ModKey}_AccountNewBalanceFormat"), amount.ToString("n0"));
         }
 
-        internal static string DebitBalanceFormat(float amount)
+        internal static string DebitBalanceFormat(decimal amount)
         {
             return string.Format(GetLanguage($"{ModKey}_DebitBalanceFormat"), amount.ToString("n0"));
         }

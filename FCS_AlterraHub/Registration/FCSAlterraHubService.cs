@@ -12,10 +12,12 @@ namespace FCS_AlterraHub.Registration
     {
         void RegisterDevice(FcsDevice device, string tabID);
         void RemoveDeviceFromGlobal(string unitID);
-        void CreateStoreEntry(TechType techType, TechType receiveTechType, float cost, StoreCategory category);
+        void CreateStoreEntry(TechType techType, TechType receiveTechType, decimal cost, StoreCategory category);
         Dictionary<TechType, FCSStoreEntry> GetRegisteredKits();
         TechType GetRegisteredKit(TechType techType);
         Dictionary<string, FcsDevice> GetRegisteredDevices();
+        bool IsModPatched(string mod);
+        void RegisterPatchedMod(string mod);
     }
 
     internal interface IFCSAlterraHubServiceInternal
@@ -30,6 +32,7 @@ namespace FCS_AlterraHub.Registration
         public static Dictionary<string,string> knownDevices = new Dictionary<string,string>();
         private static readonly Dictionary<string, FcsDevice> GlobalDevices = new Dictionary<string,FcsDevice>();
         private static Dictionary<TechType, FCSStoreEntry> _storeItems = new Dictionary<TechType, FCSStoreEntry>();
+        private List<string> _patchedMods = new List<string>();
         public static IFCSAlterraHubService PublicAPI => singleton;
         internal static IFCSAlterraHubServiceInternal InternalAPI => singleton;
 
@@ -106,7 +109,7 @@ namespace FCS_AlterraHub.Registration
             GlobalDevices.Remove(unitID);
         }
 
-        public void CreateStoreEntry(TechType techType,TechType recieveTechType,float cost,StoreCategory category)
+        public void CreateStoreEntry(TechType techType,TechType recieveTechType, decimal cost,StoreCategory category)
         {
             if (!_storeItems.ContainsKey(techType))
             {
@@ -128,12 +131,25 @@ namespace FCS_AlterraHub.Registration
         {
             return GlobalDevices;
         }
+
+        public bool IsModPatched(string mod)
+        {
+            return _patchedMods.Contains(mod);
+        }
+
+        public void RegisterPatchedMod(string mod)
+        {
+            if(!_patchedMods.Contains(mod))
+            {
+                _patchedMods.Add(mod);
+            }
+        }
     }
 
     public struct FCSStoreEntry
     {
         public TechType TechType { get; set; }
-        public float Cost { get; set; }
+        public decimal Cost { get; set; }
         public StoreCategory StoreCategory { get; set; }
         public TechType ReceiveTechType { get; set; }
     }

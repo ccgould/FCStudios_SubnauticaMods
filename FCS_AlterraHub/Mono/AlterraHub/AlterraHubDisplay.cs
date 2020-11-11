@@ -30,7 +30,10 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             if (FindAllComponents())
             {
                 PowerOnDisplay();
-                onItemAddedToCart += (tech,rTech) => { _cartDropDownManager?.AddItem(tech,rTech); };
+                onItemAddedToCart += (tech, rTech) =>
+                {
+                    _cartDropDownManager?.AddItem(tech,rTech);
+                };
             }
         }
 
@@ -55,7 +58,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
                 _homePage = GameObjectHelpers.FindGameObject(canvas, "MainUI");
 
                 _mainTotal = GameObjectHelpers.FindGameObject(_homePage, "CreditAmount").GetComponent<Text>();
-                _mainTotal.text = "0";
+                _mainTotal.text = CardSystem.main.GetAccountBalance().ToString("n0");
                 CardSystem.main.onBalanceUpdated += amount =>
                 {
                     _mainTotal.text = amount.ToString("n0");

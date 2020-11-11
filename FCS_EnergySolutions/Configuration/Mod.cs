@@ -39,7 +39,7 @@ namespace FCS_EnergySolutions.Configuration
         internal const string JetStreamT242Description = "The Jet Stream T242 provides power by using the water current.The faster the turbine spins the more power output";
         internal const string JetStreamT242FriendlyName = "JetStreamT242";
         internal const string JetStreamT242ModName = "JetStreamT242";
-        internal const string JetStreamT242ClassName = "AIJetStreamT242";
+        internal const string JetStreamT242ClassName = "JetStreamT242";
         internal static string JetStreamT242KitClassID => $"{AlterraGenModName}_Kit";
         internal static string JetStreamT242PrefabName => JetStreamT242ModName;
 

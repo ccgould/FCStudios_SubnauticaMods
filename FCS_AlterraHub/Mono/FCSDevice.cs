@@ -147,6 +147,6 @@ namespace FCS_AlterraHub.Mono
 
     public interface IFCSSave<T>
     {
-        void Save(T newSaveData);
+        void Save(T newSaveData,ProtobufSerializer serializer = null);
     }
 }

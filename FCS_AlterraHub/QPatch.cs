@@ -59,7 +59,7 @@ namespace FCS_AlterraHub
         
         private static void CreateKits()
         {
-            FCSAlterraHubService.PublicAPI.CreateStoreEntry(Mod.OreConsumerTechType, Mod.OreConsumerKitClassID.ToTechType(), 30000f, StoreCategory.Production);
+            FCSAlterraHubService.PublicAPI.CreateStoreEntry(Mod.OreConsumerTechType, Mod.OreConsumerKitClassID.ToTechType(), 30000, StoreCategory.Production);
         }
 
         private static void PatchSpawnables()

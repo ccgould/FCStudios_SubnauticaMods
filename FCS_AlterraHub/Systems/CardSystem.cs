@@ -24,9 +24,9 @@ namespace FCS_AlterraHub.Systems
         [JsonProperty] internal string Username { get; set; }
         [JsonProperty] internal string Password { get; set; }
         [JsonProperty] internal string PIN { get; set; }
-        [JsonProperty] internal float Balance { get; set; }
-        [JsonProperty] internal static float AlterraDebitPayed { get; set; }
-        [JsonProperty] internal float AccountBeforeDebit { get; set; }
+        [JsonProperty] internal decimal Balance { get; set; }
+        [JsonProperty] internal static decimal AlterraDebitPayed { get; set; }
+        [JsonProperty] internal decimal AccountBeforeDebit { get; set; }
         [JsonProperty] internal Dictionary<string, string> KnownCardNumbers = new Dictionary<string, string>();
 
         internal AccountDetails()
@@ -51,8 +51,8 @@ namespace FCS_AlterraHub.Systems
 
         private AccountDetails _accountDetails = new AccountDetails();
         public static CardSystem main = new CardSystem();
-        private const float AlterraDebit = -3000000f;
-        internal Action<float> onBalanceUpdated;
+        private const decimal AlterraDebit = -3000000;
+        internal Action<decimal> onBalanceUpdated;
 
         /// <summary>
         /// Generates a new card number.
@@ -115,7 +115,7 @@ namespace FCS_AlterraHub.Systems
         /// <param name="amount">The amount of credit to add to the account.</param>
         /// <param name="callBack">Callback method to call in-case of error</param>
         /// <returns>Boolean on success</returns>
-        internal bool AddFinances(float amount)
+        internal bool AddFinances(decimal amount)
         {
             try
             {
@@ -139,7 +139,7 @@ namespace FCS_AlterraHub.Systems
         /// <param name="amount">The amount of credit to add to the account.</param>
         /// <param name="callBack">Callback method to call in-case of error</param>
         /// <returns>Boolean on success</returns>
-        internal bool RemoveFinances(float amount)
+        internal bool RemoveFinances(decimal amount)
         {
             if (HasEnough(amount))
             {
@@ -157,9 +157,9 @@ namespace FCS_AlterraHub.Systems
         /// </summary>
         /// <param name="cardNumber">The number of the card.</param>
         /// <returns></returns>
-        internal float GetAccountBalance()
+        internal decimal GetAccountBalance()
         {
-            return _accountDetails.Balance;
+            return _accountDetails?.Balance ?? 0;
         }
         
         /// <summary>
@@ -189,7 +189,7 @@ namespace FCS_AlterraHub.Systems
         /// </summary>
         /// <param name="cost">Amount to check for</param>
         /// <returns></returns>
-        internal bool HasEnough(float cost)
+        internal bool HasEnough(decimal cost)
         {
             return _accountDetails.Balance >= cost;
         }
@@ -312,7 +312,7 @@ namespace FCS_AlterraHub.Systems
             return AccountDetails.AlterraDebitPayed >= AlterraDebit;
         }
 
-        internal void PayDebit(float amount)
+        internal void PayDebit(decimal amount)
         {
             AccountDetails.AlterraDebitPayed += amount;
             RemoveFinances(amount);
@@ -340,9 +340,9 @@ namespace FCS_AlterraHub.Systems
                    !string.IsNullOrWhiteSpace(_accountDetails.PIN);
         }
 
-        internal float AlterraBalance()
+        internal decimal AlterraBalance()
         {
-            return Mathf.Abs(AlterraDebit) - AccountDetails.AlterraDebitPayed;
+            return AlterraDebit - AccountDetails.AlterraDebitPayed;
         }
 
         internal bool IsAccountNameValid(string accountName)

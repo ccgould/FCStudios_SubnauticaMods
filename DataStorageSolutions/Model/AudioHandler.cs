@@ -71,7 +71,7 @@ namespace DataStorageSolutions.Model
             FMODAsset asset = !doorState ? this.doorOpen : this.doorClose;
             if (!(asset != null))
                 return;
-            FMODUWE.PlayOneShot(asset, _transform.position, 1f);
+            FMODUWE.PlayOneShot(asset, _transform.position);
         }
         #endregion
     }

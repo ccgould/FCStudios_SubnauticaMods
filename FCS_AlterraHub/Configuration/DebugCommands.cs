@@ -6,10 +6,9 @@ namespace FCS_AlterraHub.Configuration
     internal class DebugCommands
     {
         [ConsoleCommand("givecredit")]
-        public static string GiveCreditCommand(float amount)
+        public static string GiveCreditCommand(double amount)
         {
-            CardSystem.main.AddFinances(amount);
-
+            CardSystem.main.AddFinances((decimal) amount);
             return $"Parameters: {amount}";
         }
     }

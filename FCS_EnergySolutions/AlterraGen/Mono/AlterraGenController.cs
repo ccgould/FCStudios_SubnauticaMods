@@ -178,7 +178,7 @@ namespace FCS_EnergySolutions.AlterraGen.Mono
             _savedData = Mod.GetAlterraGenSaveData(id);
         }
 
-        public void Save(SaveData newSaveData)
+        public void Save(SaveData newSaveData, ProtobufSerializer serializer)
         {
             if (!IsInitialized
                 || !IsConstructed) return;

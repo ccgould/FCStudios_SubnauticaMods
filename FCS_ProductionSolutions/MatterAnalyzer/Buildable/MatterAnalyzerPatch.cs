@@ -21,7 +21,7 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Buildable
             {
                 var matterAnalyzerKit = new FCSKit(Mod.MatterAnalyzerKitClassID, Mod.MatterAnalyzerFriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 matterAnalyzerKit.Patch();
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, matterAnalyzerKit.TechType, 30000f, StoreCategory.Production);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, matterAnalyzerKit.TechType, 30000, StoreCategory.Production);
 
             };
         }

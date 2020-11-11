@@ -320,7 +320,7 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
             }
         }
 
-        public void Save(SaveData newSaveData)
+        public void Save(SaveData newSaveData, ProtobufSerializer serializer)
         {
             if (!IsInitialized
                 || !IsConstructed) return;

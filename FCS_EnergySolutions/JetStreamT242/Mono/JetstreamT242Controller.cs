@@ -172,7 +172,7 @@ namespace FCS_EnergySolutions.JetStreamT242.Mono
             }
         }
 
-        public void Save(SaveData newSaveData)
+        public void Save(SaveData newSaveData, ProtobufSerializer serializer)
         {
             if (!IsInitialized|| !IsConstructed) return;
 

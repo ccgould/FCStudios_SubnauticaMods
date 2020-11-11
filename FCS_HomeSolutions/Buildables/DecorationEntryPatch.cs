@@ -37,7 +37,7 @@ namespace FCS_HomeSolutions.Buildables
 
             OnFinishedPatching += () =>
             {
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, settings.KitClassID.ToTechType(), 500f, StoreCategory.Home);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, settings.KitClassID.ToTechType(), 500, StoreCategory.Home);
             };
         }
 

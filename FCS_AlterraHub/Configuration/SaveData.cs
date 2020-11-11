@@ -13,7 +13,7 @@ namespace FCS_AlterraHub.Configuration
     {
         [JsonProperty] internal float RPM;
         [JsonProperty] internal string Id { get; set; }
-        [JsonProperty(PropertyName = "OC")] internal float OreConsumerCash { get; set; }
+        [JsonProperty(PropertyName = "OC")] internal decimal OreConsumerCash { get; set; }
         [JsonProperty(PropertyName = "COL")] internal ColorVec4 Color { get; set; }
     }
 

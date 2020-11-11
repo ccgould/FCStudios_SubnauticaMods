@@ -8,6 +8,6 @@ namespace FCS_AlterraHub.Structs
         public TechType TechType { get; set; }
         public TechType ReturnItemTechType { get; set; }
         public StoreCategory Category { get; set; }
-        public float Cost { get; set; }
+        public decimal Cost { get; set; }
     }
 }

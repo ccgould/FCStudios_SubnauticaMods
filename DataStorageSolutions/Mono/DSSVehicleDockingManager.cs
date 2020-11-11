@@ -237,7 +237,7 @@ namespace DataStorageSolutions.Mono
 
                 Player main = Player.main;
                 PDA pda = main.GetPDA();
-                Inventory.main.SetUsedStorage(container, false);
+                Inventory.main.SetUsedStorage(container);
                 pda.Open(PDATab.Inventory, null, null, 4f);
                 break;
             }

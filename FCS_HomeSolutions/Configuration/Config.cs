@@ -2,10 +2,11 @@
 using SMLHelper.V2.Json;
 using SMLHelper.V2.Options;
 using SMLHelper.V2.Options.Attributes;
+using UnityEngine;
 
 namespace FCS_HomeSolutions.Configuration
 {
-
+    
     [Menu("FCS Home Solutions Menu")]
     public class Config : ConfigFile
     {
@@ -26,6 +27,20 @@ namespace FCS_HomeSolutions.Configuration
                 QuickLogger.DebugLogsEnabled = false;
                 QuickLogger.Info("Debug logs disabled");
             }
+
+            
         }
+    }
+
+    [Menu("Hover Lift Pad Menu")]
+    public class HoverLiftPadConfig : ConfigFile
+    {
+        public HoverLiftPadConfig() : base("hoverliftPad-config", "Configurations") { }
+        
+        [Keybind("Lift Pad Up Button")]
+        public KeyCode LiftPadUpKeyCode = KeyCode.None;
+
+        [Keybind("Lift Pad Down Button")]
+        public KeyCode LiftPadDownKeyCode = KeyCode.None;
     }
 }

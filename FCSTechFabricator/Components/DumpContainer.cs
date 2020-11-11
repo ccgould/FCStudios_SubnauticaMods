@@ -89,7 +89,7 @@ namespace FCSTechFabricator.Components
             PDA pda = main.GetPDA();
             if (_dumpContainer != null && pda != null)
             {
-                Inventory.main.SetUsedStorage(_dumpContainer, false);
+                Inventory.main.SetUsedStorage(_dumpContainer);
                 pda.Open(PDATab.Inventory, null, OnDumpClose, 4f);
             }
             else

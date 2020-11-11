@@ -178,7 +178,7 @@ namespace DataStorageSolutions.Mono
             }
             main.SetText(HandReticle.TextType.Info, Manager.GetBaseName(), false);
 #endif
-            main.SetIcon(HandReticle.IconType.Info, 1f);
+            main.SetIcon(HandReticle.IconType.Info);
         }
 
         public void OnHandClick(GUIHand hand)

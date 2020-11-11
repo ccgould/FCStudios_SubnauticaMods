@@ -10,7 +10,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
     internal class OreConsumerDisplay : AIDisplay
     {
         private Text _totalAmount;
-        internal Action<float> onTotalChanged;
+        internal Action<decimal> onTotalChanged;
         internal UnityEvent onDumpButtonClicked = new UnityEvent();
         internal UnityEvent onTransferMoneyClicked = new UnityEvent();
 

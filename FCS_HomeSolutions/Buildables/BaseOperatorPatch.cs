@@ -26,7 +26,7 @@ namespace FCS_HomeSolutions.Buildables
             {
                 var baseOperatorKit = new FCSKit(Mod.BaseOperatorKitClassID, Mod.BaseOperatorFriendly, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 baseOperatorKit.Patch();
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, baseOperatorKit.TechType, 30000f, StoreCategory.Home);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, baseOperatorKit.TechType, 30000, StoreCategory.Home);
 
             };
         }

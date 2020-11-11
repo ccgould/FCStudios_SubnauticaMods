@@ -8,13 +8,11 @@ namespace FCS_AlterraHub.Mono.AlterraHub
 {
     internal class StoreItem : MonoBehaviour
     {
-        private  float _price;
+        private decimal _price;
 
-        internal void Initialize(string objectName,TechType techType, TechType receiveTechType, float cost, Action<TechType,TechType> callback,StoreCategory category)
+        internal void Initialize(string objectName,TechType techType, TechType receiveTechType, decimal cost, Action<TechType,TechType> callback,StoreCategory category)
         {
             _price = cost;
-            //var objectNameObj = GameObjectHelpers.FindGameObject(gameObject, "ObjectText").GetComponent<Text>();
-            //objectNameObj.text = objectName;
 
             var costObj = GameObjectHelpers.FindGameObject(gameObject, "ItemAmount").GetComponent<Text>();
             costObj.text = cost.ToString("n0");

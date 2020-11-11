@@ -28,7 +28,7 @@ namespace FCS_EnergySolutions.AlterraGen.Buildables
                 AdditionalPatching();
                 var oreGeneratorKit = new FCSKit(Mod.AlterraGenKitClassID, Mod.AlterraGenModFriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 oreGeneratorKit.Patch();
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.AlterraGenKitClassID.ToTechType(), 500f, StoreCategory.Energy);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.AlterraGenKitClassID.ToTechType(), 500, StoreCategory.Energy);
             };
         }
 

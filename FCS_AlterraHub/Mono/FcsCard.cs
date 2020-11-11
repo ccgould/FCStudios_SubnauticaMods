@@ -45,7 +45,7 @@ namespace FCS_AlterraHub.Mono
             return _cardNumber;
         }
 
-        internal float GetCardBalance()
+        internal decimal GetCardBalance()
         {
             return CardSystem.main.GetAccountBalance();
         }

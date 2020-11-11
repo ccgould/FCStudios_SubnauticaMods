@@ -201,7 +201,7 @@ namespace FCS_AlterraHub.Mono
 		private void SetupRenderers(GameObject gameObject)
 		{
 			int newLayer = LayerMask.NameToLayer("Viewmodel");
-			Utils.SetLayerRecursively(gameObject, newLayer, true, -1);
+			Utils.SetLayerRecursively(gameObject, newLayer);
 		}
 
 		private bool ContainsHeroPeepers()

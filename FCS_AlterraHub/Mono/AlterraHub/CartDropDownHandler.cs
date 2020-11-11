@@ -17,7 +17,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
         private GameObject _cartList;
         private readonly List<CartItem> _pendingItems = new List<CartItem>();
         private Text _totalAmount;
-        internal Action<float> onTotalChanged;
+        internal Action<decimal> onTotalChanged;
 
         internal void Initialize()
         {
@@ -109,7 +109,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             QuickLogger.Debug("Updating Total Amount");
         }
 
-        internal float GetTotal()
+        internal decimal GetTotal()
         {
             return  _pendingItems.Sum(x => StoreInventorySystem.GetPrice(x.TechType));
         }

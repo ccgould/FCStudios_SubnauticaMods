@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace FCSCommon.Converters
+﻿namespace FCSCommon.Converters
 {
     internal class Converters
     {
-        internal static string FloatToMoney(string moneyUnit, float amount)
+        internal static string DecimalToMoney(string moneyUnit, decimal amount)
         {
             return moneyUnit + amount.ToString("N");
         }

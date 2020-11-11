@@ -4,6 +4,7 @@
     {
         Primary = 1,
         Secondary = 2,
-        Both = 3
+        Both = 3,
+        Emission = 4,
     }
 }

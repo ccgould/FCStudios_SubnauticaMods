@@ -461,8 +461,9 @@ namespace FCSCommon.Helpers
             }
         }
 
-        internal static void ChangeEmissionColor(string materialName, GameObject gameObject, Color color)
+        internal static bool ChangeEmissionColor(string materialName, GameObject gameObject, Color color)
         {
+            var result = false;
             Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>(true);
             foreach (Renderer renderer in renderers)
             {
@@ -471,9 +472,12 @@ namespace FCSCommon.Helpers
                     if (material.name.StartsWith(materialName, StringComparison.OrdinalIgnoreCase))
                     {
                         material.SetVector("_GlowColor", color);
+                        result = true;
                     }
                 }
             }
+
+            return result;
         }
 
         internal static void ToggleEmission(string materialName, GameObject gameObject, bool value)

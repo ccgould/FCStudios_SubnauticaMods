@@ -76,7 +76,7 @@ namespace FCSTechFabricator.Components
         {
             Player main = Player.main;
             PDA pda = main.GetPDA();
-            Inventory.main.SetUsedStorage(_dumpContainer, false);
+            Inventory.main.SetUsedStorage(_dumpContainer);
             pda.Open(PDATab.Inventory, null, OnFridgeClose, 4f);
         }
 

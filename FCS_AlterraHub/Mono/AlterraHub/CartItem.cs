@@ -24,7 +24,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             itemName.text = Language.main.Get(TechType);
 
             var itemPrice = GameObjectHelpers.FindGameObject(gameObject, "ItemPrice").GetComponent<Text>();
-            itemPrice.text = StoreInventorySystem.GetPrice(TechType).ToString(CultureInfo.InvariantCulture);
+            itemPrice.text = StoreInventorySystem.GetPrice(TechType).ToString("n0");
 
             var removeBTN = gameObject.GetComponentInChildren<Button>();
             removeBTN.onClick.AddListener((() => { onRemoveBTNClicked?.Invoke(this); }));

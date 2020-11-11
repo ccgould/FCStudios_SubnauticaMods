@@ -194,7 +194,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
         {
             int newLayer;
             newLayer = LayerMask.NameToLayer(interior ? "Viewmodel" : "Default");
-            Utils.SetLayerRecursively(gameObject, newLayer, true, -1);
+            Utils.SetLayerRecursively(gameObject, newLayer);
         }
 
         public GameObject grownPlantsRoot { get; set; }
@@ -227,7 +227,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
         public bool AddItemToContainer(InventoryItem item)
         {
             Plantable component = item.item.GetComponent<Plantable>();
-            item.item.SetTechTypeOverride(component.plantTechType, false);
+            item.item.SetTechTypeOverride(component.plantTechType);
             item.isEnabled = false;
             AddItem(component, this.GetFreeSlotID());
             return true;

@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Reflection;
+﻿using System.Reflection;
 using FCS_HomeSolutions.Buildables;
+using FCS_HomeSolutions.Buildables.OutDoorPlanters;
 using FCS_HomeSolutions.Configuration;
 using FCS_HomeSolutions.Spawnables;
 using FCSCommon.Utilities;
+using HarmonyLib;
 using QModManager.API.ModLoading;
 using SMLHelper.V2.Handlers;
 using UnityEngine;
@@ -18,6 +19,7 @@ namespace FCS_HomeSolutions
     public class QPatch
     {
         internal static Config Configuration { get; } = OptionsPanelHandler.Main.RegisterModOptions<Config>();
+        internal static HoverLiftPadConfig HoverLiftPadConfiguration { get; } = OptionsPanelHandler.Main.RegisterModOptions<HoverLiftPadConfig>();
 
         [QModPatch]
         public void Patch()
@@ -26,6 +28,27 @@ namespace FCS_HomeSolutions
                 $"Started patching. Version: {QuickLogger.GetAssemblyVersion(Assembly.GetExecutingAssembly())}");
 
             ModelPrefab.Initialize();
+
+            AuxPatchers.AdditionalPatching();
+
+            var smartOutDoorPlanter = new OutDoorPlanterPatch(Mod.SmartPlanterPotClassID, Mod.SmartPlanterPotFriendly,Mod.SmartPlanterPotDescription, ModelPrefab.SmallOutdoorPot, new Settings
+            {
+                KitClassID = Mod.SmartPlanterPotKitClassID,
+                Size = new Vector3(0.7929468f, 0.3463891f, 0.7625999f),
+                Center = new Vector3(0f, 0.2503334f, 0f)
+            });
+
+            smartOutDoorPlanter.Patch();
+
+
+            var demo = new DemoBuildingPatch("D3emo", "Demo Pot", "demo", GameObject.CreatePrimitive(PrimitiveType.Cube), new Settings
+            {
+                KitClassID = Mod.SmartPlanterPotKitClassID,
+                Size = new Vector3(0.7929468f, 0.3463891f, 0.7625999f),
+                Center = new Vector3(0f, 0.2503334f, 0f)
+            });
+
+            demo.Patch();
 
             var ahsSweetWaterBar = new SweetWaterBarPatch("ahsSweetWaterBar", "Sweet Water Bar",
                 "All drinks on the house.", ModelPrefab.GetPrefab("SweetWaterBar"), new Settings
@@ -48,7 +71,14 @@ namespace FCS_HomeSolutions
             var baseOperator = new BaseOperatorPatch();
             baseOperator.Patch();
 
+            //Patch Base Operator
+            var hoverLiftPad = new HoverLiftPadPatch();
+            hoverLiftPad.Patch();
+
             LoadOtherObjects();
+
+            var harmony = new Harmony("com.homesolutions.fstudios");
+            harmony.PatchAll(Assembly.GetExecutingAssembly());
         }
 
         private void LoadOtherObjects()

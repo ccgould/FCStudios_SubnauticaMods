@@ -13,7 +13,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
 {
     internal class OreConsumerController : FcsDevice, IFCSStorage, IFCSSave<SaveData>
     {
-        private float _balance;
+        private decimal _balance;
         private bool _isFromSave;
         private bool _runStartUpOnEnable;
         private OreConsumerDataEntry _savedData;
@@ -233,7 +233,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
 
         public bool CanBeStored(int amount, TechType techType)
         {
-            return StoreInventorySystem.VaildResource(techType);
+            return StoreInventorySystem.ValidResource(techType);
         }
 
         public bool AddItemToContainer(InventoryItem item)
@@ -252,7 +252,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
             return true;
         }
 
-        private void AppendMoney(float price)
+        private void AppendMoney(decimal price)
         {
             _balance += price;
             DisplayManager.onTotalChanged?.Invoke(_balance);
@@ -272,7 +272,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
 
         private void EmptyBalance()
         {
-            _balance = 0f;
+            _balance = 0;
             DisplayManager.onTotalChanged?.Invoke(_balance);
         }
         
@@ -301,7 +301,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
             return false;
         }
 
-        public void Save(SaveData newSaveData)
+        public void Save(SaveData newSaveData, ProtobufSerializer serializer)
         {
             if (!IsInitialized
                 || !IsConstructed) return;

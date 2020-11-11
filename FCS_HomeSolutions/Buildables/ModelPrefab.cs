@@ -5,6 +5,7 @@ using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
 
+
 namespace FCS_HomeSolutions.Buildables
 {
     internal static class ModelPrefab
@@ -18,12 +19,15 @@ namespace FCS_HomeSolutions.Buildables
         internal static string DetailsMaterial => $"{Mod.ModName}_DETAILS";
         internal static string SpecTexture => $"{Mod.ModName}_S";
         internal static string LUMTexture => $"{Mod.ModName}_E";
+        internal static string LUMControllerMaterial => $"{Mod.ModName}_E_Controller";
         internal static string NormalTexture => $"{Mod.ModName}_N";
         internal static string DetailTexture => $"{Mod.ModName}_D";
         public static AssetBundle GlobalBundle { get; set; }
         public static AssetBundle ModBundle { get; set; }
         internal static GameObject PaintToolPrefab { get; set; }
         internal static GameObject BaseOperatorPrefab { get; set; }
+        public static GameObject HoverLiftPadPrefab { get; set; }
+        public static GameObject SmallOutdoorPot { get; set; }
 
         internal static void Initialize()
         {
@@ -40,7 +44,9 @@ namespace FCS_HomeSolutions.Buildables
             }
 
             PaintToolPrefab = GetPrefab(Mod.PaintToolPrefabName);
+            SmallOutdoorPot = GetPrefab(Mod.SmartPlanterPotPrefabName);
             BaseOperatorPrefab = GetPrefab(Mod.BaseOperatorPrefabName);
+            HoverLiftPadPrefab = GetPrefab(Mod.HoverLiftPrefabName);
             _initialized = true;
         }
         
@@ -97,6 +103,7 @@ namespace FCS_HomeSolutions.Buildables
             MaterialHelpers.ApplySpecShader(BodyMaterial, SpecTexture, prefab, 1, 3f, bundle);
             MaterialHelpers.ApplyEmissionShader(DecalMaterial, LUMTexture, prefab, bundle, Color.white);
             MaterialHelpers.ApplyEmissionShader(DetailsMaterial, LUMTexture, prefab, bundle, Color.white);
+            MaterialHelpers.ApplyEmissionShader(LUMControllerMaterial, LUMTexture, prefab, bundle, Color.white);
             MaterialHelpers.ApplyAlphaShader(DecalMaterial, prefab);
             MaterialHelpers.ApplyAlphaShader(DetailsMaterial, prefab);
             #endregion

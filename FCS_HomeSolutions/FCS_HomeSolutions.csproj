@@ -111,13 +111,22 @@
   <ItemGroup>
     <Compile Include="Buildables\DecorationController.cs" />
     <Compile Include="Buildables\DecorationEntryPatch.cs" />
+    <Compile Include="Buildables\DemoBuilding\DemoBuildingPatch.cs" />
     <Compile Include="Buildables\ModelPrefab.cs" />
     <Compile Include="Buildables\BaseOperatorPatch.cs" />
+    <Compile Include="Buildables\OutDoorPlanters\OutDoorPlanterPatch.cs" />
     <Compile Include="Buildables\SweetWaterBarPatch.cs" />
+    <Compile Include="Configuration\AuxPatchers.cs" />
     <Compile Include="Configuration\Config.cs" />
     <Compile Include="Configuration\Mod.cs" />
     <Compile Include="Configuration\SaveData.cs" />
+    <Compile Include="HoverLiftPad\Buildable\HoverLiftPadPatch.cs" />
+    <Compile Include="HoverLiftPad\Mono\HoverLiftPadController.cs" />
+    <Compile Include="Mono\OutDoorPlanters\OutDoorPlanterController.cs" />
     <Compile Include="Mono\PaintTool\PaintToolController.cs" />
+    <Compile Include="Patches\Player_Patches.cs" />
+    <Compile Include="Patches\PrawnSuit_Patches.cs" />
+    <Compile Include="Patches\Storage_Patcher.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Spawnables\PaintToolSpawnable.cs" />
@@ -129,6 +138,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Enumerators\" />
     <Folder Include="Mono\BaseOperator\" />
   </ItemGroup>
   <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />

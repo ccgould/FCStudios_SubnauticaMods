@@ -99,16 +99,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.ModID);
 
             LoadStore();
-
-            var inputField = gameObject.GetComponentsInChildren<InputField>(true);
-            if (inputField != null && inputField.Length > 0)
-            {
-                foreach (InputField field in inputField)
-                {
-                    field.gameObject.AddComponent<CustomInputField>();
-                }
-            }
-
+            
             AlterraHubTrigger.onTriggered += value =>
             {
                 _isInRange = true;
@@ -218,7 +209,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
         internal string GetAccountAmount()
         {
             var amount = CardSystem.main.GetAccountBalance();
-            return Converters.FloatToMoney("C",amount);
+            return Converters.DecimalToMoney("C",amount);
         }
 
         private void LoadStore()
@@ -254,7 +245,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             DisplayManager.onItemAddedToCart?.Invoke(techType, receiveTechType);
         }
 
-        public void Save(SaveData newSaveData)
+        public void Save(SaveData newSaveData, ProtobufSerializer serializer)
         {
             if (!IsInitialized || !IsConstructed) return;
 
@@ -265,10 +256,8 @@ namespace FCS_AlterraHub.Mono.AlterraHub
 
             _savedData.Id = GetPrefabID();
             _savedData.CartItems = DisplayManager.SaveCartItems();
-            QuickLogger.Debug($"Saving ID {_savedData.Id}", true);
-
-            //_savedData.BodyColor = ColorManager.GetMaskColor().ColorToVector4();
             newSaveData.AlterraHubEntries.Add(_savedData);
+            QuickLogger.Debug($"Saved ID {_savedData.Id}", true);
         }
 
         private void ReadySaveData()
@@ -304,7 +293,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             if (state)
             {
                 _screenBlock.SetActive(false);
-                Player.main.EnterLockedMode(null, false);
+                Player.main.EnterLockedMode(null);
                 MainCameraControl.main.enabled = false;
                 InputHandlerStack.main.Push(inputDummy);
                 _cursorLockCached = UWE.Utils.lockCursor;
@@ -333,8 +322,12 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             if (_isInRange)
             {
                 InterceptInput(true);
-                SNCameraRoot.main.transform.position = _hubCameraPosition.transform.position;
-                SNCameraRoot.main.transform.rotation = _hubCameraPosition.transform.rotation;
+
+                var hudCameraPos = _hubCameraPosition.transform.position;
+                var hudCameraRot = _hubCameraPosition.transform.rotation;
+                Player.main.gameObject.transform.position = new Vector3(hudCameraPos.x, Player.main.gameObject.transform.position.y, hudCameraPos.z);
+                SNCameraRoot.main.transform.position = hudCameraPos;
+                SNCameraRoot.main.transform.rotation = hudCameraRot;
             }
         }
 

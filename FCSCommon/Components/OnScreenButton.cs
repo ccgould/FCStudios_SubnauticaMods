@@ -37,7 +37,7 @@ namespace FCSCommon.Components
 
                 if(GetAdditionalDataFromString)
                 {
-                    HandReticle.main.SetIcon(HandReticle.IconType.Hand, 1f);
+                    HandReticle.main.SetIcon(HandReticle.IconType.Hand);
                     HandReticle.main.SetInteractTextRaw(this.TextLineOne,GetAdditionalString?.Invoke());
                 }
                 else

@@ -30,7 +30,7 @@ namespace FCS_HomeSolutions.Spawnables
             {
                 var paintToolKit = new FCSKit(Mod.PaintToolKitClassID, Mod.PaintToolFriendly, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 paintToolKit.Patch();
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, TechType,3000f, StoreCategory.Home);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, TechType,3000, StoreCategory.Home);
             };
         }
 

@@ -17,7 +17,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
         private string _password;
         private string _pin;
         private GameObject _paymentScreen;
-        private float _pendingPayment;
+        private decimal _pendingPayment;
         private Text _newBalance;
         private Text _accountBalance;
         private InputField _paymentInput;
@@ -50,7 +50,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             _paymentInput = _paymentScreen.GetComponentInChildren<InputField>();
             _paymentInput.onEndEdit.AddListener((value) =>
             {
-                if(float.TryParse(value,out float result))
+                if(decimal.TryParse(value,out decimal result))
                 {
                     _newBalance.text = Buildables.AlterraHub.AccountNewBalanceFormat(CardSystem.main.AlterraBalance() - result);
                     _pendingPayment = result;

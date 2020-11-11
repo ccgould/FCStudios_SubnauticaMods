@@ -56,7 +56,7 @@ namespace FCS_HomeSolutions.Buildables
             if (!Mod.IsSaving())
             {
                 QuickLogger.Info($"Saving {GetPrefabID()}");
-                Mod.Save();
+                Mod.Save(serializer);
                 QuickLogger.Info($"Saved {GetPrefabID()}");
             }
         }
@@ -73,7 +73,7 @@ namespace FCS_HomeSolutions.Buildables
             _isFromSave = true;
         }
 
-        public void Save(SaveData newSaveData)
+        public void Save(SaveData newSaveData, ProtobufSerializer serializer)
         {
             if (!IsInitialized
                 || !IsConstructed) return;

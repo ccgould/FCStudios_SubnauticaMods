@@ -76,20 +76,7 @@ namespace FCS_HomeSolutions.Mono.PaintTool
                 _paintCanFillAmount = _savedData.Amount;
                 _currentColor = _savedData.Color.Vector4ToColor();
                 _colorTargetMode = _savedData.ColorTargetMode == 0 ? ColorTargetMode.Primary : _savedData.ColorTargetMode;
-                switch (_colorTargetMode)
-                {
-                    case ColorTargetMode.Primary:
-                        _painterModeIndex = 1;
-                        break;
-                    case ColorTargetMode.Secondary:
-                        _painterModeIndex = 2;
-                        break;
-                    case ColorTargetMode.Both:
-                        _painterModeIndex = 3;
-                        break;
-                }
-
-
+                _painterModeIndex = (int) _colorTargetMode;
 
                 ChangeColor(_currentColor);
                 _currentIndex = ColorList.GetColorIndex(_currentColor);
@@ -233,7 +220,7 @@ namespace FCS_HomeSolutions.Mono.PaintTool
             if (!Mod.IsSaving())
             {
                 QuickLogger.Info($"Saving {GetPrefabID()}");
-                Mod.Save();
+                Mod.Save(serializer);
                 QuickLogger.Info($"Saved {GetPrefabID()}");
             }
         }
@@ -261,7 +248,7 @@ namespace FCS_HomeSolutions.Mono.PaintTool
             _isFromSave = true;
         }
 
-        public void Save(SaveData newSaveData)
+        public void Save(SaveData newSaveData, ProtobufSerializer serializer=null)
         {
             QuickLogger.Debug($"Paint Tool Save Entry{GetPrefabID()}", true);
 

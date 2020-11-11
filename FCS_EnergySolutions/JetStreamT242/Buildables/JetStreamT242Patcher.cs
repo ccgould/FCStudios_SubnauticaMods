@@ -27,7 +27,7 @@ namespace FCS_EnergySolutions.JetStreamT242.Buildables
             {
                 var jetStreamT242Kit = new FCSKit(Mod.JetStreamT242KitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 jetStreamT242Kit.Patch();
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.JetStreamT242KitClassID.ToTechType(), 500000f, StoreCategory.Energy);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.JetStreamT242KitClassID.ToTechType(), 500000, StoreCategory.Energy);
             };
         }
         
