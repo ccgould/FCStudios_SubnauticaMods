@@ -21,6 +21,9 @@ namespace FCS_HomeSolutions.Configuration
             { $"{ModKey}_FloorSelect","Selecting Floor: {0}"},
             { $"{ModKey}_HoverPadInOperation","Hover Lift Pad is in operation please unlock any prawn suit or yourself."},
             { $"{ModKey}_UnDockPrawnSuitToEnter","Undock prawn suit to enter."},
+            { $"{ModKey}_ClickToOpen","Click to open {0}."},
+            { $"{ModKey}_NoRecyclerConnected","No Recycler connected to the base"},
+            { $"{ModKey}_TrashReceptacleDumpLabel","Trash Receptacle Bin"},
         };
 
         internal static void AdditionalPatching()
@@ -84,6 +87,21 @@ namespace FCS_HomeSolutions.Configuration
         public static string UnDockPrawnSuitToEnter()
         {
             return Language.main.Get($"{ModKey}_UnDockPrawnSuitToEnter");
+        }
+
+        public static string ClickToOpenRecycle(string name)
+        {
+            return string.Format(Language.main.Get($"{ModKey}_ClickToOpen"),name);
+        }
+
+        public static string NoRecyclerConnected()
+        {
+            return Language.main.Get($"{ModKey}_NoRecyclerConnected");
+        }
+
+        public static string TrashReceptacleDumpLabel()
+        {
+            return Language.main.Get($"{ModKey}_TrashReceptacleDumpLabel");
         }
     }
 }

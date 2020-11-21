@@ -3,24 +3,28 @@ using System.Collections.Generic;
 using FCS_AlterraHub.Mono.AlterraHub;
 using FCS_AlterraHub.Objects;
 using FCS_AlterraHub.Systems;
+using FCSCommon.Interfaces;
 using Oculus.Newtonsoft.Json;
 using UnityEngine;
 
 namespace FCS_AlterraHub.Configuration
 {
     [Serializable]
-    internal class OreConsumerDataEntry
+    internal class OreConsumerDataEntry : ISaveDataEntry
     {
         [JsonProperty] internal float RPM;
-        [JsonProperty] internal string Id { get; set; }
-        [JsonProperty(PropertyName = "OC")] internal decimal OreConsumerCash { get; set; }
+        public string Id { get; set; }
+        public string BaseId { get; set; }
         [JsonProperty(PropertyName = "COL")] internal ColorVec4 Color { get; set; }
+        [JsonProperty(PropertyName = "TL")] internal float TimeLeft { get; set; }
+        [JsonProperty(PropertyName = "OQ")] internal Queue<TechType> OreQueue { get; set; }
     }
 
     [Serializable]
-    internal class AlterraHubDataEntry
+    internal class AlterraHubDataEntry: ISaveDataEntry
     {
-        [JsonProperty] internal string Id { get; set; }
+        public string Id { get; set; }
+        public string BaseId { get; set; }
         [JsonProperty(PropertyName = "C")] internal IEnumerable<CartItemSaveData> CartItems { get; set; }
         [JsonProperty(PropertyName = "COL")] internal ColorVec4 Color { get; set; }
     }

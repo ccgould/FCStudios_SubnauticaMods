@@ -22,6 +22,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
         private CartDropDownHandler _cartDropDownManager;
         internal Action<TechType,TechType> onItemAddedToCart;
         private PanelGroup _panelGroup;
+        public Action OnReturnButtonClicked { get; set; }
 
         internal void Setup(AlterraHubController mono)
         {
@@ -78,6 +79,10 @@ namespace FCS_AlterraHub.Mono.AlterraHub
 
                 //HomePage
                 new AccountPageHandler(_mono);
+
+                //Return Button
+                var returnBTN = GameObjectHelpers.FindGameObject(canvas, "CartReturnIcon").GetComponent<Button>();
+                returnBTN.onClick.AddListener(() => { OnReturnButtonClicked?.Invoke(); });
                 
                 #endregion
 
@@ -92,7 +97,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
 
             return false;
         }
-
+        
         private void CreateCheckOutPopup(GameObject canvas)
         {
             var checkOutPopupGo = GameObjectHelpers.FindGameObject(canvas, "CheckOutPopUp");

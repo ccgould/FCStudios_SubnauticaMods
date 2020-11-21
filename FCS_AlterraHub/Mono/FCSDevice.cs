@@ -25,7 +25,7 @@ namespace FCS_AlterraHub.Mono
         /// <summary>
         /// Boolean that represents if the device is constructed and ready to operate
         /// </summary>
-        public bool IsConstructed { get; set; }
+        public virtual bool IsConstructed { get; set; }
 
         /// <summary>
         /// Boolean that shows if the device has been full initialized.
@@ -142,6 +142,11 @@ namespace FCS_AlterraHub.Mono
         public virtual float GetMaxPower()
         {
             return 0f;
+        }
+
+        public virtual void OnDestroy()
+        {
+            Manager?.UnRegisterDevice(this);
         }
     }
 

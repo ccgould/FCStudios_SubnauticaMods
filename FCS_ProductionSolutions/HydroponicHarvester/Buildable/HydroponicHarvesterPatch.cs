@@ -62,7 +62,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Buildable
                 constructable.rotationEnabled = true;
                 constructable.allowedOnCeiling = false;
                 constructable.allowedInSub = true;
-                constructable.allowedOnConstructables = false;
+                constructable.allowedOnConstructables = true;
                 constructable.model = model;
                 constructable.techType = TechType;
 

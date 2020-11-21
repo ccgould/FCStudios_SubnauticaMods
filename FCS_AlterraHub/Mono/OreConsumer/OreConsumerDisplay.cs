@@ -2,7 +2,9 @@
 using FCSCommon.Abstract;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
+using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace FCS_AlterraHub.Mono.OreConsumer
@@ -12,13 +14,13 @@ namespace FCS_AlterraHub.Mono.OreConsumer
         private Text _totalAmount;
         internal Action<decimal> onTotalChanged;
         internal UnityEvent onDumpButtonClicked = new UnityEvent();
-        internal UnityEvent onTransferMoneyClicked = new UnityEvent();
+
+        public CheckInteraction CheckInteraction { get; private set; }
 
         internal void Setup(OreConsumerController mono)
         {
             if(FindAllComponents())
-            {
-                mono.IsOperational = true;
+            { 
                 onTotalChanged += total => { _totalAmount.text = total.ToString("n0"); };
             }
         }
@@ -34,13 +36,10 @@ namespace FCS_AlterraHub.Mono.OreConsumer
             {
                 SetTotalLabel();
 
-                SetTransferMoneyButtonText();
 
                 FindTotalLabel();
 
                 CreateDumpButton();
-
-                CreateTransferMoneyButton();
             }
             catch (Exception e)
             {
@@ -50,17 +49,17 @@ namespace FCS_AlterraHub.Mono.OreConsumer
 
             return true;
         }
-
-        private void CreateTransferMoneyButton()
-        {
-            var transferButton = GameObjectHelpers.FindGameObject(gameObject, "TransferMoney").GetComponent<Button>();
-            transferButton.onClick.AddListener(() => { onTransferMoneyClicked?.Invoke(); });
-        }
-
+        
         private void CreateDumpButton()
         {
-            var dumpButton = GameObjectHelpers.FindGameObject(gameObject, "AddBTN").GetComponent<Button>();
-            dumpButton.onClick.AddListener(() => { onDumpButtonClicked?.Invoke(); });
+            var addBTN = GameObjectHelpers.FindGameObject(gameObject, "AddBTN");
+            CheckInteraction = addBTN.AddComponent<CheckInteraction>();
+            var dumpButton = addBTN.GetComponent<Button>();
+            dumpButton.onClick.AddListener(() =>
+            {
+                onDumpButtonClicked?.Invoke();
+            });
+
         }
 
         private void FindTotalLabel()
@@ -68,15 +67,23 @@ namespace FCS_AlterraHub.Mono.OreConsumer
             _totalAmount = GameObjectHelpers.FindGameObject(gameObject, "TotalAmount").GetComponent<Text>();
         }
 
-        private void SetTransferMoneyButtonText()
-        {
-            GameObjectHelpers.FindGameObject(gameObject, "Text").GetComponent<Text>().text =
-                Buildables.AlterraHub.TransferMoney();
-        }
-
         private void SetTotalLabel()
         {
-            GameObjectHelpers.FindGameObject(gameObject, "Total").GetComponent<Text>().text = Buildables.AlterraHub.Total();
+            GameObjectHelpers.FindGameObject(gameObject, "Total").GetComponent<Text>().text = Buildables.AlterraHub.AccountTotal();
+        }
+    }
+
+    internal class CheckInteraction : MonoBehaviour, IPointerHoverHandler,IPointerExitHandler
+    {
+        public void OnPointerHover(PointerEventData eventData)
+        {
+            IsHovered = true;
+        }
+
+        public bool IsHovered { get; set; }
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            IsHovered = false;
         }
     }
 }

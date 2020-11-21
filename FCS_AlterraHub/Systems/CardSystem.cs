@@ -29,21 +29,6 @@ namespace FCS_AlterraHub.Systems
         [JsonProperty] internal decimal AccountBeforeDebit { get; set; }
         [JsonProperty] internal Dictionary<string, string> KnownCardNumbers = new Dictionary<string, string>();
 
-        internal AccountDetails()
-        {
-            
-        }
-
-        internal AccountDetails(AccountDetails info)
-        {
-            FullName = info.FullName;
-            Username = info.Username;
-            Password = info.Password;
-            PIN = info.PIN;
-            Balance = info.Balance;
-            AccountBeforeDebit = info.AccountBeforeDebit;
-            KnownCardNumbers = new Dictionary<string, string>(KnownCardNumbers);
-        }
     }
     internal class CardSystem
     {
@@ -166,7 +151,7 @@ namespace FCS_AlterraHub.Systems
         /// Saves the current accounts information.
         /// </summary>
         /// <returns></returns>
-        internal AccountDetails Save()
+        internal AccountDetails SaveDetails()
         {
             return _accountDetails;
         }
@@ -240,8 +225,8 @@ namespace FCS_AlterraHub.Systems
             
             _accountDetails.FullName = fullName;
             _accountDetails.Username = userName;
-            _accountDetails.Password = password;
-            _accountDetails.PIN = pin;
+            _accountDetails.Password = EncodeDecode.Encrypt(password);
+            _accountDetails.PIN = EncodeDecode.Encrypt(pin);
 
             CalculateBalance();
 
@@ -348,11 +333,6 @@ namespace FCS_AlterraHub.Systems
         internal bool IsAccountNameValid(string accountName)
         {
             return accountName.Equals(_accountDetails.Username, StringComparison.OrdinalIgnoreCase);
-        }
-
-        public AccountDetails SaveDetails()
-        {
-            return new AccountDetails(_accountDetails);
         }
     }
 }

@@ -26,7 +26,6 @@ namespace FCS_AlterraHub
     {
         internal static Config Configuration { get;} = OptionsPanelHandler.Main.RegisterModOptions<Config>();
         public static AssetBundle GlobalBundle { get; set; }
-        public static ColorPickerDialog ColorPickerDialog { get; private set; }
 
         [QModPatch]
         public static void Patch()
@@ -37,10 +36,7 @@ namespace FCS_AlterraHub
             QuickLogger.DebugLogsEnabled = Configuration.EnableDebugLogs;
             //Load Prefabs
             AlterraHub.GetPrefabs();
-
-            //var ui = GameObject.Instantiate(AlterraHub.ColorPickerDialogPrefab);
-            //ColorPickerDialog = ui.AddComponent<ColorPickerDialog>();
-
+            
             //Patch all the buildables
             PatchBuildables();
             
@@ -56,7 +52,9 @@ namespace FCS_AlterraHub
             //Register debug commands
             ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));
         }
-        
+
+        public static FCSHUD HUD { get; set; }
+
         private static void CreateKits()
         {
             FCSAlterraHubService.PublicAPI.CreateStoreEntry(Mod.OreConsumerTechType, Mod.OreConsumerKitClassID.ToTechType(), 30000, StoreCategory.Production);

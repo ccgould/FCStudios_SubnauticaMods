@@ -2,7 +2,7 @@
 
 namespace FCSCommon.Interfaces
 {
-    public interface ISaveData
+    internal interface ISaveData
     {
         List<ISaveDataEntry> Entries { get; set; }
     }

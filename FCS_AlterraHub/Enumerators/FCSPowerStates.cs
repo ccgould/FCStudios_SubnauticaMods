@@ -5,9 +5,9 @@
     /// </summary>
     public enum FCSPowerStates
     {
-        None,
-        Powered,
-        Unpowered,
-        Tripped
+        None = 0,
+        Powered = 1,
+        UnPowered = 2,
+        Tripped = 3
     }
 }

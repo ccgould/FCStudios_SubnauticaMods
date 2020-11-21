@@ -38,12 +38,9 @@ namespace FCS_AlterraHub.Buildables
 
                     QuickLogger.Debug("GetPrefabs");
 
-                    if (!LoadAsset("ColorPickerCanvas", QPatch.GlobalBundle, out var colorPickerDialog)) return false;
-                    ColorPickerDialogPrefab = colorPickerDialog;
+                    if (!LoadAsset("TestItem", QPatch.GlobalBundle, out var colorPickerCanvasGo)) return false;
+                    ColorPickerDialogPrefab = colorPickerCanvasGo;
 
-                    if (!LoadAsset("ColorItem", QPatch.GlobalBundle, out var colorItem)) return false;
-                    ColorItemPrefab = colorItem;
-                    
                     if (!LoadAsset(Mod.ModPrefabName, QPatch.GlobalBundle, out var prefabGo)) return false;
                     AlterraHubPrefab = prefabGo;
 

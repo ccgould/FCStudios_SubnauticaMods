@@ -10,6 +10,7 @@ using FCSCommon.Extensions;
 using FCSCommon.Utilities;
 using HarmonyLib;
 using SMLHelper.V2.Crafting;
+using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 
@@ -40,7 +41,7 @@ namespace FCS_EnergySolutions.Configuration
         internal const string JetStreamT242FriendlyName = "JetStreamT242";
         internal const string JetStreamT242ModName = "JetStreamT242";
         internal const string JetStreamT242ClassName = "JetStreamT242";
-        internal static string JetStreamT242KitClassID => $"{AlterraGenModName}_Kit";
+        internal static string JetStreamT242KitClassID => $"{JetStreamT242ModName}_Kit";
         internal static string JetStreamT242PrefabName => JetStreamT242ModName;
 
 #if SUBNAUTICA
@@ -135,15 +136,15 @@ namespace FCS_EnergySolutions.Configuration
 
             foreach (var entry in saveData.AlterraGenEntries)
             {
-                if (string.IsNullOrEmpty(entry.ID)) continue;
+                if (string.IsNullOrEmpty(entry.Id)) continue;
 
-                if (entry.ID == id)
+                if (entry.Id == id)
                 {
                     return entry;
                 }
             }
 
-            return new AlterraGenDataEntry() { ID = id };
+            return new AlterraGenDataEntry() { Id = id };
         }
 
         internal static JetStreamT242DataEntry GetJetStreamT242SaveData(string id)
@@ -154,15 +155,15 @@ namespace FCS_EnergySolutions.Configuration
 
             foreach (var entry in saveData.MarineTurbineEntries)
             {
-                if (string.IsNullOrEmpty(entry.ID)) continue;
+                if (string.IsNullOrEmpty(entry.Id)) continue;
 
-                if (entry.ID == id)
+                if (entry.Id == id)
                 {
                     return entry;
                 }
             }
 
-            return new JetStreamT242DataEntry() { ID = id };
+            return new JetStreamT242DataEntry() { Id = id };
         }
 
         internal static SaveData GetSaveData()

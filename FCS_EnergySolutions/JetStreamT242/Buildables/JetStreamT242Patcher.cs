@@ -23,10 +23,16 @@ namespace FCS_EnergySolutions.JetStreamT242.Buildables
         public JetStreamT242Patcher() : base(Mod.JetStreamT242ClassName, Mod.JetStreamT242FriendlyName, Mod.JetStreamT242Description)
         {
             _prefab = ModelPrefab.GetPrefab(Mod.JetStreamT242PrefabName);
+
+            OnStartedPatching += () =>
+            {
+                var jetStreamT242Kit = new FCSKit(Mod.JetStreamT242KitClassID, FriendlyName,
+                    Path.Combine(AssetsFolder, $"{ClassID}.png"));
+                jetStreamT242Kit.Patch();
+            };
+            
             OnFinishedPatching += () =>
             {
-                var jetStreamT242Kit = new FCSKit(Mod.JetStreamT242KitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
-                jetStreamT242Kit.Patch();
                 FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.JetStreamT242KitClassID.ToTechType(), 500000, StoreCategory.Energy);
             };
         }

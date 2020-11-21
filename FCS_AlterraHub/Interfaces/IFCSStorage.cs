@@ -19,4 +19,10 @@ namespace FCS_AlterraHub.Interfaces
         Action<FcsDevice, TechType> OnContainerRemoveItem { get; set; }
         bool ContainsItem(TechType techType);
     }
+
+    public interface IFCSDumpContainer
+    {
+        bool AddItemToContainer(InventoryItem item);
+        bool IsAllowedToAdd(Pickupable pickupable, bool verbose);
+    }
 }

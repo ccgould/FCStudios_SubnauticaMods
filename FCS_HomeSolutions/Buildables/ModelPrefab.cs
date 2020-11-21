@@ -4,6 +4,7 @@ using FCS_HomeSolutions.Configuration;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 
 namespace FCS_HomeSolutions.Buildables
@@ -28,6 +29,11 @@ namespace FCS_HomeSolutions.Buildables
         internal static GameObject BaseOperatorPrefab { get; set; }
         public static GameObject HoverLiftPadPrefab { get; set; }
         public static GameObject SmallOutdoorPot { get; set; }
+        public static GameObject MiniFountainFilterPrefab { get; set; }
+        public static GameObject SeaBreezeItemPrefab { get; set; }
+        public static GameObject SeaBreezePrefab { get; set; }
+        public static GameObject TrashReceptaclePrefab { get; set; }
+        public static GameObject PaintCanPrefab { get; set; }
 
         internal static void Initialize()
         {
@@ -47,6 +53,11 @@ namespace FCS_HomeSolutions.Buildables
             SmallOutdoorPot = GetPrefab(Mod.SmartPlanterPotPrefabName);
             BaseOperatorPrefab = GetPrefab(Mod.BaseOperatorPrefabName);
             HoverLiftPadPrefab = GetPrefab(Mod.HoverLiftPrefabName);
+            MiniFountainFilterPrefab = GetPrefab(Mod.MiniFountainFilterPrefabName);
+            SeaBreezePrefab = GetPrefab(Mod.SeaBreezePrefabName);
+            TrashReceptaclePrefab = GetPrefab(Mod.TrashReceptaclePrefabName);
+            PaintCanPrefab = GetPrefab(Mod.PaintCanPrefabName);
+            SeaBreezeItemPrefab = GetPrefab("ARSItem");
             _initialized = true;
         }
         
@@ -107,6 +118,12 @@ namespace FCS_HomeSolutions.Buildables
             MaterialHelpers.ApplyAlphaShader(DecalMaterial, prefab);
             MaterialHelpers.ApplyAlphaShader(DetailsMaterial, prefab);
             #endregion
+        }
+
+        public static Texture2D GetImageFromPrefab(string imageName)
+        {
+            var prefab = ModBundle.LoadAsset<Texture2D>(imageName);
+            return prefab != null ? prefab : null;
         }
     }
 }

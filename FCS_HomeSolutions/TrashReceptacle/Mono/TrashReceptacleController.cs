@@ -1,0 +1,112 @@
+﻿using System;
+using System.Text;
+using System.Threading.Tasks;
+using FCS_AlterraHomeSolutions.Mono.PaintTool;
+using FCS_AlterraHub.Mono;
+using FCS_HomeSolutions.Buildables;
+using FCS_HomeSolutions.Configuration;
+using UnityEngine;
+
+namespace FCS_HomeSolutions.TrashReceptacle.Mono
+{
+    internal class TrashReceptacleController : FcsDevice,IHandTarget,IConstructable
+    {
+        private bool _runStartUpOnEnable;
+        private DumpContainer _dumpContainer;
+        private TrashStorage _storage;
+        private ColorManager _colorManager;
+
+        private void OnEnable()
+        {
+            if (!_runStartUpOnEnable) return;
+
+            if (!IsInitialized)
+            {
+                Initialize();
+            }
+            _runStartUpOnEnable = false;
+        }
+
+        public void OnHandHover(GUIHand hand)
+        {
+            if(!IsInitialized || Manager == null) return;
+            var main = HandReticle.main;
+            main.SetIcon(HandReticle.IconType.Info);
+            main.SetInteractText( Manager.DeviceBuilt(Mod.RecyclerTabID)
+                ? AuxPatchers.ClickToOpenRecycle(Mod.TrashReceptacleFriendly)
+                : AuxPatchers.NoRecyclerConnected());
+        }
+
+        public void OnHandClick(GUIHand hand)
+        {
+            if (!IsInitialized || Manager == null) return;
+
+            if(Manager.DeviceBuilt(Mod.RecyclerTabID))
+            {
+                _dumpContainer.OpenStorage();
+            }
+        }
+
+        public override void Initialize()
+        {
+            Manager = BaseManager.FindManager(gameObject);
+
+            if (_storage == null)
+            {
+                _storage = gameObject.AddComponent<TrashStorage>();
+                _storage.Manager = Manager;
+            }
+
+            if (_dumpContainer == null)
+            {
+                _dumpContainer = gameObject.AddComponent<DumpContainer>();
+                _dumpContainer.Initialize(transform, AuxPatchers.TrashReceptacleDumpLabel(), _storage);
+            }
+
+            if (_colorManager == null)
+            {
+                _colorManager = gameObject.AddComponent<ColorManager>();
+                _colorManager.Initialize(gameObject,ModelPrefab.BodyMaterial);
+            }
+
+            IsInitialized = true;
+        }
+
+        public override void OnProtoSerialize(ProtobufSerializer serializer)
+        {
+            
+        }
+
+        public override void OnProtoDeserialize(ProtobufSerializer serializer)
+        {
+
+        }
+
+        public override bool CanDeconstruct(out string reason)
+        {
+            reason = String.Empty;
+            return true;
+        }
+
+        public override void OnConstructedChanged(bool constructed)
+        {
+            IsConstructed = true;
+            if (isActiveAndEnabled)
+            {
+                if (!IsInitialized)
+                {
+                    Initialize();
+                }
+            }
+            else
+            {
+                _runStartUpOnEnable = true;
+            }
+        }
+
+        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
+        {
+            return _colorManager.ChangeColor(color, mode);
+        }
+    }
+}

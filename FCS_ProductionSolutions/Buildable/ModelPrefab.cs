@@ -25,7 +25,11 @@ namespace FCS_ProductionSolutions.Buildable
         public static AssetBundle ModBundle { get; set; }
         public static GameObject HydroponicHarvesterPrefab { get; set; }
         public static GameObject MatterAnalyzerPrefab { get; set; }
-
+        public static GameObject DeepDrillerItemPrefab { get; set; }
+        public static GameObject DeepDrillerPrefab { get; set; }
+        internal static GameObject DeepDrillerSandPrefab { get; set; }
+        public static GameObject DeepDrillerListItemPrefab { get; set; }
+        public static GameObject DeepDrillerProgrammingItemPrefab { get; set; }
 
         internal static void Initialize()
         {
@@ -41,6 +45,11 @@ namespace FCS_ProductionSolutions.Buildable
 
             HydroponicHarvesterPrefab = GetPrefab(Mod.HydroponicHarvesterModPrefabName);
             MatterAnalyzerPrefab = GetPrefab(Mod.MatterAnalyzerPrefabName);
+            DeepDrillerItemPrefab = GetPrefab("DeepDrillerItemButton");
+            DeepDrillerPrefab = GetPrefab(Mod.DeepDrillerMk2PrefabName);
+            DeepDrillerSandPrefab = GetPrefab("SandOreBag");
+            DeepDrillerListItemPrefab = GetPrefab("DeepDrillerTransferToggleButton");
+            DeepDrillerProgrammingItemPrefab = GetPrefab("DeepDrillerProgrammingItem");
         }
 
         internal static GameObject GetPrefab(string prefabName)

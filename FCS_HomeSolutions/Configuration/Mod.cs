@@ -24,12 +24,24 @@ namespace FCS_HomeSolutions.Configuration
         internal const string ModFriendlyName = "Home Solutions";
         internal const string ModBundleName = "fcshomesolutionsbundle";
 
+        internal const string RecyclerClassID = "Recycler";
+        internal const string RecyclerFriendly = "Recycler";
+        internal const string RecyclerDescription = "Recycle your trash and get your resources back";
+        internal const string RecyclerPrefabName = "Recycler";
+        internal const string RecyclerKitClassID = "Recycler_Kit";
+        internal const string RecyclerTabID = "RR";
+
+        internal const string TrashReceptacleClassID = "TrashReceptacle";
+        internal const string TrashReceptacleFriendly = "Trash Receptacle";
+        internal const string TrashReceptacleDescription = "Use the Trash Receptacle to quickly send you trash to the recycler form the inside of your base";
+        internal const string TrashReceptaclePrefabName = "TrashReceptacle";
+        internal const string TrashReceptacleKitClassID = "TrashReceptacle_Kit";
+
         internal const string PaintToolClassID = "PaintTool";
         internal const string PaintToolFriendly = "Alterra Paint Tool";
         internal const string PaintToolDescription = "Change the color of FCStudios mods";
         internal const string PaintToolPrefabName = "PaintTool";
         internal const string PaintToolKitClassID = "PaintTool_Kit";
-
 
         internal const string BaseOperatorClassID = "BaseOperator";
         internal const string BaseOperatorFriendly = "Alterra Base Operator";
@@ -46,11 +58,59 @@ namespace FCS_HomeSolutions.Configuration
 
         internal const string SmartPlanterPotClassID = "SmartPlanterPot";
         internal const string SmartPlanterPotFriendly = "Smart Planter Pot";
-        internal static string SmartPlanterPotDescription { get; } =
-            "Just like another other planter but with color changing abilities.";
+        internal static string SmartPlanterPotDescription { get; } = "Just like another other planter but with color changing abilities.";
         internal const string SmartPlanterPotPrefabName = "SmartPlanterPot";
         internal static string SmartPlanterPotKitClassID = $"{SmartPlanterPotClassID}_Kit";
         internal const string SmartPlanterPotTabID = "SMP";
+        
+        internal const string MiniFountainFilterClassID = "MiniFountainFilter";
+        internal const string MiniFountainFilterFriendly = "Mini Fountain Filter";
+        internal const string MiniFountainFilterDescription = "A smaller water filtration system for your base or cyclops.";
+        internal const string MiniFountainFilterPrefabName = "MiniFountainFilter";
+        internal static string MiniFountainFilterKitClassID = $"{MiniFountainFilterClassID}_Kit";
+        internal const string MiniFountainFilterTabID = "MFF";
+
+        internal const string SeaBreezeClassID = "Seabreeze";
+        internal const string SeaBreezeFriendly = "Seabreeze";
+        internal const string SeaBreezeDescription = "Alterra Refrigeration Sea Breeze will keep your items fresh longer!";
+        internal const string SeaBreezePrefabName = "SeaBreezeFCS32";
+        internal static string SeaBreezeKitClassID = $"{SeaBreezeClassID}_Kit";
+        internal const string SeaBreezeTabID = "SB";
+
+        internal const string PaintCanClassID = "PaintCan";
+        internal const string PaintCanFriendly = "Paint Can";
+        internal const string PaintCanDescription = "More paint for you paint tool. Use the paint can to allow you to paint devices with your paint tool";
+        internal const string PaintCanPrefabName = "PaintCan";
+
+
+#if SUBNAUTICA
+        internal static TechData MiniFountainFilterKitIngredients => new TechData
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(TechType.AdvancedWiringKit, 1),
+                new Ingredient(TechType.Bleach, 2),
+                new Ingredient(TechType.FiberMesh, 2),
+                new Ingredient(TechType.Titanium, 1),
+                new Ingredient(TechType.Glass, 1)
+            }
+        };
+#elif BELOWZERO
+        internal static RecipeData MiniFountainFilterKitIngredients => new RecipeData
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(TechType.AdvancedWiringKit, 1),
+                new Ingredient(TechType.Bleach, 2),
+                new Ingredient(TechType.FiberMesh, 2),
+                new Ingredient(TechType.Titanium, 1),
+                new Ingredient(TechType.Glass, 1)
+            }
+        };
+#endif
+
 
 #if SUBNAUTICA
         internal static TechData PaintToolIngredients => new TechData
@@ -83,6 +143,19 @@ namespace FCS_HomeSolutions.Configuration
         internal static TechData HoverLiftPadIngredients => new TechData
 #elif BELOWZERO
                 internal static RecipeData HoverLiftPadIngredients => new RecipeData
+#endif
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(HoverLiftPadKitClassID.ToTechType(), 1),
+            }
+        };
+
+#if SUBNAUTICA
+        internal static TechData TrashReceptacleIngredients => new TechData
+#elif BELOWZERO
+                internal static RecipeData TrashReceptacleIngredients => new RecipeData
 #endif
         {
             craftAmount = 1,
@@ -288,6 +361,44 @@ namespace FCS_HomeSolutions.Configuration
             }
 
             return new PlanterDataEntry { Id = id };
+        }
+
+        public static MiniFountainFilterDataEntry GetMiniFountainFilterSaveData(string id)
+        {
+            LoadData();
+
+            var saveData = GetSaveData();
+
+            foreach (var entry in saveData.MiniFountainFilterEntries)
+            {
+                if (string.IsNullOrEmpty(entry.Id)) continue;
+
+                if (entry.Id == id)
+                {
+                    return entry;
+                }
+            }
+
+            return new MiniFountainFilterDataEntry { Id = id };
+        }
+
+        public static SeaBreezeDataEntry GetSeabreezeSaveData(string id)
+        {
+            LoadData();
+
+            var saveData = GetSaveData();
+
+            foreach (var entry in saveData.SeaBreezeDataEntries)
+            {
+                if (string.IsNullOrEmpty(entry.Id)) continue;
+
+                if (entry.Id == id)
+                {
+                    return entry;
+                }
+            }
+
+            return new SeaBreezeDataEntry { Id = id };
         }
     }
 }

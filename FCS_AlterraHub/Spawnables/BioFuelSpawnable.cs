@@ -1,6 +1,8 @@
 ﻿using System;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
+using FCS_AlterraHub.Enumerators;
+using FCS_AlterraHub.Registration;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Assets;
 using SMLHelper.V2.Handlers;
@@ -16,6 +18,8 @@ namespace FCS_AlterraHub.Craftables
         {
             OnFinishedPatching += () =>
             {
+                BioReactorHandler.SetBioReactorCharge(TechType,840f);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, TechType, 3000, StoreCategory.Production);
                 CraftDataHandler.SetEquipmentType(TechType, EquipmentType.Hand);
             };
         }

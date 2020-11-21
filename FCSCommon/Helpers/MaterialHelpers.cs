@@ -93,6 +93,8 @@ namespace FCSCommon.Helpers
                 {
                     if (material.name.StartsWith(materialName, StringComparison.OrdinalIgnoreCase))
                     {
+                        //QuickLogger.Debug($"Adding Emission to: Found {material.name} || search {materialName}");
+
                         material.shader = shader;
                         material.EnableKeyword("MARMO_EMISSION");
                         material.SetTexture("_Illum", FindTexture2D(textureName, assetBundle));

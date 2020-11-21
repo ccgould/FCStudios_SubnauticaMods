@@ -284,7 +284,6 @@ namespace AE.MiniFountainFilter.Managers
 
         private void OnTankUpdate()
         {
-            QuickLogger.Debug("On Tank Update", true);
             _button1Progress.fillAmount = _mono.TankManager.GetTankPercentageDec();
             _button1ProgressNumber.text = $"{_mono.TankManager.GetTankPercentage()}%";
         }

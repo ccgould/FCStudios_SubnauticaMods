@@ -42,6 +42,16 @@ namespace FCS_AlterraHub.Helpers
             }
         }
 
+        public static void GivePlayerItem(Pickupable pickupable)
+        {
+            if (pickupable == null) return;
+
+            if (Player.main.HasInventoryRoom(pickupable))
+            {
+                Inventory.main.Pickup(pickupable);
+            }
+        }
+
         public static bool HasCard()
         {
             return Inventory.main.container.Contains(Mod.DebitCardTechType);

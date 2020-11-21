@@ -1,4 +1,5 @@
 ﻿using System;
+using FCS_AlterraHub.Mono;
 using FCSCommon.Abstract;
 using FCSCommon.Enums;
 using FCSCommon.Utilities;
@@ -22,7 +23,7 @@ namespace FCSCommon.Objects
         public abstract float Damage { get; }
         public abstract UpgradeFunctions UpgradeType { get; }
         public abstract string FriendlyName { get; }
-        [JsonIgnore] public FCSController Mono { get; set; }
+        [JsonIgnore] public FcsDevice Mono { get; set; }
         public bool IsEnabled
         {
             get => _isEnabled;

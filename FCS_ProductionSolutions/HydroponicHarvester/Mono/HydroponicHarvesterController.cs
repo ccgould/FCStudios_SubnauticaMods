@@ -6,6 +6,7 @@ using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
+using FCS_ProductionSolutions.HydroponicHarvester.Enumerators;
 using FCSCommon.Controllers;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
@@ -14,13 +15,14 @@ using UnityEngine.UI;
 
 namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
 {
-    internal class HydroponicHarvesterController : FcsDevice, IFCSSave<SaveData>
+    internal class HydroponicHarvesterController : FcsDevice, IFCSSave<SaveData>, IHandTarget
     {
         private bool _isFromSave;
         private bool _runStartUpOnEnable;
         private HydroponicHarvesterDataEntry _savedData;
         private EffectsManager _effectsManager;
         private bool _isInBase;
+        private const float powerUsage = 0.85f;
 
         public EffectsManager EffectsManager => _effectsManager;
         
@@ -56,13 +58,26 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
                 _runStartUpOnEnable = false;
             }
         }
-
-        private void OnDestroy()
-        {
-
-        }
-
         #endregion
+
+        public override float GetPowerUsage()
+        {
+            switch (GrowBedManager.CurrentSpeedMode)
+            {
+                case SpeedModes.Off:
+                    return 0;
+                case SpeedModes.Max:
+                    return powerUsage * 4;
+                case SpeedModes.High:
+                    return powerUsage * 3;
+                case SpeedModes.Low:
+                    return powerUsage * 2;
+                case SpeedModes.Min:
+                    return powerUsage;
+                default:
+                    return 0f;
+            }
+        }
 
         private bool IsOperationalCheck()
         {
@@ -132,6 +147,16 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
         private void CheckSystem()
         {
             _effectsManager?.ToggleLightsByDistance();
+
+            float distance = Vector3.Distance(transform.position, Player.main.camRoot.transform.position);
+            if (distance <= 3f)
+            {
+                GrowBedManager?.ShowDisplay();
+            }
+            else
+            {
+                GrowBedManager?.HideDisplay();
+            }
         }
 
         public override void OnProtoSerialize(ProtobufSerializer serializer)
@@ -237,6 +262,18 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
         public bool IsInBase()
         {
             return _isInBase;
+        }
+
+        public void OnHandHover(GUIHand hand)
+        {
+            HandReticle main = HandReticle.main;
+            main.SetInteractText(Mod.HydroponicHarvesterModFriendlyName,$"Slot 1 {GrowBedManager.GetSlotInfo(0)} | Slot 2 {GrowBedManager.GetSlotInfo(1)} | Slot 3 {GrowBedManager.GetSlotInfo(2)}");
+            main.SetIcon(HandReticle.IconType.Info);
+        }
+
+        public void OnHandClick(GUIHand hand)
+        {
+
         }
     }
 }

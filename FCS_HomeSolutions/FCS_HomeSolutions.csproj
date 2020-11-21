@@ -98,6 +98,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Dependancies\UnityEngine.InputLegacyModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.ParticleSystemModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependancies\UnityEngine.ParticleSystemModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.PhysicsModule">
       <HintPath>..\Dependancies\UnityEngine.PhysicsModule.dll</HintPath>
     </Reference>
@@ -118,10 +122,21 @@
     <Compile Include="Buildables\SweetWaterBarPatch.cs" />
     <Compile Include="Configuration\AuxPatchers.cs" />
     <Compile Include="Configuration\Config.cs" />
+    <Compile Include="Configuration\DebugCommands.cs" />
     <Compile Include="Configuration\Mod.cs" />
     <Compile Include="Configuration\SaveData.cs" />
     <Compile Include="HoverLiftPad\Buildable\HoverLiftPadPatch.cs" />
     <Compile Include="HoverLiftPad\Mono\HoverLiftPadController.cs" />
+    <Compile Include="MiniFountainFilter\Buildables\MiniFountainFilterAuxPatcher.cs" />
+    <Compile Include="MiniFountainFilter\Buildables\MiniFountainFilterPatcher.cs" />
+    <Compile Include="ModManagers\AnimationManager.cs" />
+    <Compile Include="MiniFountainFilter\Managers\AudioManager.cs" />
+    <Compile Include="MiniFountainFilter\Managers\MFFDisplayManager.cs" />
+    <Compile Include="MiniFountainFilter\Managers\MFFStorageManager.cs" />
+    <Compile Include="MiniFountainFilter\Managers\PlayerManager.cs" />
+    <Compile Include="MiniFountainFilter\Managers\PowerManager.cs" />
+    <Compile Include="MiniFountainFilter\Managers\TankManager.cs" />
+    <Compile Include="MiniFountainFilter\Mono\MiniFountainFilterController.cs" />
     <Compile Include="Mono\OutDoorPlanters\OutDoorPlanterController.cs" />
     <Compile Include="Mono\PaintTool\PaintToolController.cs" />
     <Compile Include="Patches\Player_Patches.cs" />
@@ -129,7 +144,21 @@
     <Compile Include="Patches\Storage_Patcher.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SeaBreeze\Buildable\SeaBreezeAuxPatcher.cs" />
+    <Compile Include="SeaBreeze\Buildable\SeaBreezePatcher.cs" />
+    <Compile Include="SeaBreeze\Display\InterfaceButton.cs" />
+    <Compile Include="SeaBreeze\Display\ItemButton.cs" />
+    <Compile Include="SeaBreeze\Display\OnScreenButton.cs" />
+    <Compile Include="SeaBreeze\Display\PaginatorButton.cs" />
+    <Compile Include="SeaBreeze\Enumerators\SeaBreezePages.cs" />
+    <Compile Include="SeaBreeze\Mono\SeaBreezeDisplay.cs" />
+    <Compile Include="SeaBreeze\Mono\SeaBreezePowerManager.cs" />
+    <Compile Include="SeaBreeze\Mono\SeaBreezeController.cs" />
+    <Compile Include="Spawnables\PaintCanSpawnable.cs" />
     <Compile Include="Spawnables\PaintToolSpawnable.cs" />
+    <Compile Include="TrashReceptacle\Buildable\TrashReceptaclePatch.cs" />
+    <Compile Include="TrashReceptacle\Mono\TrashReceptacleController.cs" />
+    <Compile Include="TrashReceptacle\Mono\TrashStorage.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FCS_AlterraHub\FCS_AlterraHub.csproj">
@@ -140,6 +169,7 @@
   <ItemGroup>
     <Folder Include="Enumerators\" />
     <Folder Include="Mono\BaseOperator\" />
+    <Folder Include="Mono\MiniFountainFilter\" />
   </ItemGroup>
   <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

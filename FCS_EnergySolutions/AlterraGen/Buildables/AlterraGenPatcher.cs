@@ -23,11 +23,17 @@ namespace FCS_EnergySolutions.AlterraGen.Buildables
         public AlterraGenBuildable() : base(Mod.AlterraGenModClassName, Mod.AlterraGenModFriendlyName, Mod.ModDescription)
         {
             _prefab = ModelPrefab.GetPrefab(Mod.AlterraGenModPrefabName);
+
+            OnStartedPatching += () =>
+            {
+                var alterraGenKit = new FCSKit(Mod.AlterraGenKitClassID, Mod.AlterraGenModFriendlyName,
+                    Path.Combine(AssetsFolder, $"{ClassID}.png"));
+                alterraGenKit.Patch();
+            };
+            
             OnFinishedPatching += () =>
             {
                 AdditionalPatching();
-                var oreGeneratorKit = new FCSKit(Mod.AlterraGenKitClassID, Mod.AlterraGenModFriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
-                oreGeneratorKit.Patch();
                 FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.AlterraGenKitClassID.ToTechType(), 500, StoreCategory.Energy);
             };
         }

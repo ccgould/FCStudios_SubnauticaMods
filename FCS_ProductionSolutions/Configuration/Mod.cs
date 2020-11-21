@@ -20,9 +20,11 @@ namespace FCS_ProductionSolutions.Configuration
         private static ModSaver _saveObject;
         private static SaveData _saveData;
         private static List<TechType> _hydroponicKnownTech;
+        private static TechType _sandBagTechType;
 
         #endregion
 
+        internal static LootDistributionData LootDistributionData { get; set; }
         internal static string ModName => "FCSProductionSolutions";
         internal static string SaveDataFilename => $"FCSProductionSolutionsSaveData.json";
         internal const string ModBundleName = "fcsproductionsolutionsbundle";
@@ -42,6 +44,28 @@ namespace FCS_ProductionSolutions.Configuration
         internal static string MatterAnalyzerKitClassID => $"{MatterAnalyzerModName}_Kit";
         internal static string MatterAnalyzerClassName => MatterAnalyzerModName;
         internal static string MatterAnalyzerPrefabName => MatterAnalyzerModName;
+
+
+        internal const string DeepDrillerMk2TabID = "DD";
+        internal const string DeepDrillerMk2FriendlyName = "Deep Driller MK2";
+        internal const string DeepDrillerMk2ModName = "DeepDrillerMK2";
+        internal static string DeepDrillerMk2KitClassID => $"{DeepDrillerMk2ClassName}_Kit";
+        internal const string DeepDrillerMk2ClassName = "DeepDrillerMk2";
+        internal const string DeepDrillerMk2PrefabName = "AlterraDeepDriller";
+        internal const string DeepDrillerMk2Description = "Let's dig down to the deep down deep dark! A deep driller allows you to collect specific ores from biomes.";
+        internal const string SandSpawnableClassID = "Sand_DD";
+
+
+        internal static TechType GetSandBagTechType()
+        {
+            if (_sandBagTechType == TechType.None)
+            {
+                _sandBagTechType = SandSpawnableClassID.ToTechType();
+            }
+
+            return _sandBagTechType;
+        }
+
 
 #if SUBNAUTICA
         internal static TechData HydroponicHarvesterIngredients => new TechData
@@ -133,6 +157,25 @@ namespace FCS_ProductionSolutions.Configuration
             }
 
             return new HydroponicHarvesterDataEntry() { ID = id };
+        }
+
+        internal static DeepDrillerMk2SaveDataEntry  GetDeepDrillerMK2SaveData(string id)
+        {
+            LoadData();
+
+            var saveData = GetSaveData();
+
+            foreach (var entry in saveData.DeepDrillerMk2Entries)
+            {
+                if (string.IsNullOrEmpty(entry.Id)) continue;
+
+                if (entry.Id == id)
+                {
+                    return entry;
+                }
+            }
+
+            return new DeepDrillerMk2SaveDataEntry() { Id = id };
         }
 
         internal static MatterAnalyzerDataEntry GetMatterAnalyzerSaveData(string id)

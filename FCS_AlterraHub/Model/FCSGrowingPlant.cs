@@ -27,7 +27,7 @@ namespace FCS_AlterraHub.Model
   
 
             seed = growingPlant.seed;
-
+            
             positionOffset = growingPlant.positionOffset;
 
             heightProgressFactor = growingPlant.heightProgressFactor;

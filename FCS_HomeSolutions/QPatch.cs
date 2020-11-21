@@ -2,6 +2,8 @@
 using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Buildables.OutDoorPlanters;
 using FCS_HomeSolutions.Configuration;
+using FCS_HomeSolutions.MiniFountainFilter.Buildables;
+using FCS_HomeSolutions.SeaBreeze.Buildable;
 using FCS_HomeSolutions.Spawnables;
 using FCSCommon.Utilities;
 using HarmonyLib;
@@ -20,6 +22,8 @@ namespace FCS_HomeSolutions
     {
         internal static Config Configuration { get; } = OptionsPanelHandler.Main.RegisterModOptions<Config>();
         internal static HoverLiftPadConfig HoverLiftPadConfiguration { get; } = OptionsPanelHandler.Main.RegisterModOptions<HoverLiftPadConfig>();
+        internal static MiniFountainConfig MiniFountainFilterConfiguration { get; } = OptionsPanelHandler.Main.RegisterModOptions<MiniFountainConfig>();
+        internal static SeaBreezeConfig SeaBreezeConfiguration { get; } = OptionsPanelHandler.Main.RegisterModOptions<SeaBreezeConfig>();
 
         [QModPatch]
         public void Patch()
@@ -31,24 +35,14 @@ namespace FCS_HomeSolutions
 
             AuxPatchers.AdditionalPatching();
 
-            var smartOutDoorPlanter = new OutDoorPlanterPatch(Mod.SmartPlanterPotClassID, Mod.SmartPlanterPotFriendly,Mod.SmartPlanterPotDescription, ModelPrefab.SmallOutdoorPot, new Settings
-            {
-                KitClassID = Mod.SmartPlanterPotKitClassID,
-                Size = new Vector3(0.7929468f, 0.3463891f, 0.7625999f),
-                Center = new Vector3(0f, 0.2503334f, 0f)
-            });
+            //var demo = new DemoBuildingPatch("D3emo", "Demo Pot", "demo", GameObject.CreatePrimitive(PrimitiveType.Cube), new Settings
+            //{
+            //    KitClassID = Mod.SmartPlanterPotKitClassID,
+            //    Size = new Vector3(0.7929468f, 0.3463891f, 0.7625999f),
+            //    Center = new Vector3(0f, 0.2503334f, 0f)
+            //});
 
-            smartOutDoorPlanter.Patch();
-
-
-            var demo = new DemoBuildingPatch("D3emo", "Demo Pot", "demo", GameObject.CreatePrimitive(PrimitiveType.Cube), new Settings
-            {
-                KitClassID = Mod.SmartPlanterPotKitClassID,
-                Size = new Vector3(0.7929468f, 0.3463891f, 0.7625999f),
-                Center = new Vector3(0f, 0.2503334f, 0f)
-            });
-
-            demo.Patch();
+            //demo.Patch();
 
             var ahsSweetWaterBar = new SweetWaterBarPatch("ahsSweetWaterBar", "Sweet Water Bar",
                 "All drinks on the house.", ModelPrefab.GetPrefab("SweetWaterBar"), new Settings
@@ -71,14 +65,43 @@ namespace FCS_HomeSolutions
             var baseOperator = new BaseOperatorPatch();
             baseOperator.Patch();
 
-            //Patch Base Operator
+            //Patch hover Lift Operator
             var hoverLiftPad = new HoverLiftPadPatch();
             hoverLiftPad.Patch();
+
+            //Patch Smart Planter Pot
+            var smartOutDoorPlanter = new OutDoorPlanterPatch(Mod.SmartPlanterPotClassID, Mod.SmartPlanterPotFriendly, Mod.SmartPlanterPotDescription, ModelPrefab.SmallOutdoorPot, new Settings
+            {
+                KitClassID = Mod.SmartPlanterPotKitClassID,
+                Size = new Vector3(0.7929468f, 0.3463891f, 0.7625999f),
+                Center = new Vector3(0f, 0.2503334f, 0f)
+            });
+
+            smartOutDoorPlanter.Patch();
+
+            //Patch Mini Fountain Filter
+            var miniFountainFilter = new MiniFountainFilterBuildable();
+            miniFountainFilter.Patch();
+
+            //Patch SeaBreeze
+            var seaBreeze = new SeaBreezeBuildable();
+            seaBreeze.Patch();
+
+            //Patch Paint Can
+            var paintCan = new PaintCanSpawnable();
+            paintCan.Patch();
+
+            //Patch Trash Receptacle
+            var trashReceptacle = new TrashReceptaclePatch();
+            trashReceptacle.Patch();
 
             LoadOtherObjects();
 
             var harmony = new Harmony("com.homesolutions.fstudios");
             harmony.PatchAll(Assembly.GetExecutingAssembly());
+
+            //Register debug commands
+            ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));
         }
 
         private void LoadOtherObjects()

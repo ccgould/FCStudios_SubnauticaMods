@@ -33,6 +33,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             _newBalance = GameObjectHelpers.FindGameObject(gameObject, "NewBalance").GetComponent<Text>();
             
             CreatePurchaseButton();
+            CreatePurchaseExitButton();
 
             var backBtn = GameObjectHelpers.FindGameObject(gameObject, "CloseBTN").GetComponent<Button>();
             backBtn.onClick.AddListener(HideDialog);
@@ -55,6 +56,28 @@ namespace FCS_AlterraHub.Mono.AlterraHub
                     {
                         _cart.TransactionComplete();
                         HideDialog();
+                    }
+
+                    return;
+                }
+
+                MessageBoxHandler.main.Show(Buildables.AlterraHub.NoValidCardForPurchase());
+            });
+        }
+        
+        private void CreatePurchaseExitButton()
+        {
+            var purchaseBTN = GameObjectHelpers.FindGameObject(gameObject, "PurchaseExitBTN").GetComponent<Button>();
+            purchaseBTN.onClick.AddListener(() =>
+            {
+                if (CardSystem.main.HasEnough(_cart.GetTotal()))
+                {
+                    var result = _mono.MakeAPurchase(_cart);
+                    if (result)
+                    {
+                        _cart.TransactionComplete();
+                        HideDialog();
+                        _mono.ExitStore();
                     }
 
                     return;

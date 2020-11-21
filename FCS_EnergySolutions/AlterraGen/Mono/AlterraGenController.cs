@@ -55,11 +55,6 @@ namespace FCS_EnergySolutions.AlterraGen.Mono
             }
         }
 
-        private void OnDestroy()
-        {
-
-        }
-
         #endregion
 
         #region Public Methods
@@ -188,9 +183,9 @@ namespace FCS_EnergySolutions.AlterraGen.Mono
                 _savedData = new AlterraGenDataEntry();
             }
 
-            _savedData.ID = GetPrefabID();
+            _savedData.Id = GetPrefabID();
 
-            QuickLogger.Debug($"Saving ID {_savedData.ID}",true);
+            QuickLogger.Debug($"Saving ID {_savedData.Id}",true);
             _savedData.BodyColor = ColorManager.GetColor().ColorToVector4();
             _savedData.Storage = PowerManager.GetItemsWithin();
             _savedData.ToConsume = PowerManager.GetToConsume();
@@ -198,6 +193,7 @@ namespace FCS_EnergySolutions.AlterraGen.Mono
             _savedData.StoredPower = PowerManager.GetStoredPower();
             _savedData.Power = PowerManager.GetPowerSourcePower();
             _savedData.IsVisible = IsVisible;
+            _savedData.BaseId = BaseId;
             newSaveData.AlterraGenEntries.Add(_savedData);
         }
 

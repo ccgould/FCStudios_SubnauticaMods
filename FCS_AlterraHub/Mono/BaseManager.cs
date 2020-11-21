@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using FCS_AlterraHub.Patches;
 using FCSCommon.Utilities;
 using UnityEngine;
 
@@ -18,10 +20,12 @@ namespace FCS_AlterraHub.Mono
         private bool _hasBreakerTripped;
         private string _baseName;
         public string BaseID { get; set; }
-
+        
         private readonly Dictionary<string, FcsDevice> _registeredDevices;
+        private float _timeLeft = 1f;
 
         public SubRoot Habitat { get; set; }
+        
         public bool IsVisible { get; set; }
 
         public static List<BaseManager> Managers { get; } = new List<BaseManager>();
@@ -35,6 +39,7 @@ namespace FCS_AlterraHub.Mono
             BaseID = habitat.gameObject.gameObject?.GetComponentInChildren<PrefabIdentifier>()?.Id;
             _registeredDevices = new Dictionary<string, FcsDevice>();
             _baseName = GetDefaultName();
+            Player_Patch.OnPlayerUpdate += PowerConsumption;
         }
         
         #endregion
@@ -139,9 +144,61 @@ namespace FCS_AlterraHub.Mono
         {
             if (!_registeredDevices.ContainsKey(device.UnitID))
             {
+
                 _registeredDevices.Add(device.UnitID, device);
                 QuickLogger.Debug($"Registered device: {device.UnitID}", true);
             }
+        }
+
+        private void PowerConsumption()
+        {
+            if (_registeredDevices == null) return;
+            _timeLeft -= DayNightCycle.main.deltaTime;
+            if (_timeLeft <= 0)
+            {
+                //Take power from the base
+                for (int i = _registeredDevices.Count - 1; i >= 0; i--)
+                {
+                    var device = _registeredDevices.ElementAt(i);
+                    if (device.Value.DoesTakePower && device.Value.IsOperational && Habitat.powerRelay != null)
+                    {
+                        var num = 1f * DayNightCycle.main.dayNightSpeed;
+                        Habitat.powerRelay.ConsumeEnergy(device.Value.GetPowerUsage() * num, out float amountConsumed);
+                        QuickLogger.Debug($"Base {_baseName} consumed {amountConsumed} || requested {device.Value.GetPowerUsage()} || Device {device.Value.UnitID}", true);
+                    }
+                }
+
+                _timeLeft = 1f;
+            }
+        }
+
+        public bool HasEnoughPower(float power)
+        {
+            if(Habitat.powerRelay == null) {QuickLogger.Debug("Habitat is null");}
+            if (Habitat.powerRelay == null || Habitat.powerRelay.GetPower() < power) return false;
+            return true;
+        }
+
+        public void UnRegisterDevice(FcsDevice device)
+        {
+            if(_registeredDevices.ContainsKey(device.UnitID))
+                _registeredDevices?.Remove(device.UnitID);
+        }
+
+        public IEnumerable<FcsDevice> GetDevices(string tabID)
+        {
+            foreach (KeyValuePair<string, FcsDevice> device in _registeredDevices)
+            {
+                if (device.Key.StartsWith(tabID, StringComparison.OrdinalIgnoreCase))
+                {
+                    yield return device.Value;
+                }
+            }
+        }
+
+        public bool DeviceBuilt(string tabID)
+        {
+            return _registeredDevices.Any(x => x.Key.StartsWith(tabID, StringComparison.OrdinalIgnoreCase));
         }
     }
 }

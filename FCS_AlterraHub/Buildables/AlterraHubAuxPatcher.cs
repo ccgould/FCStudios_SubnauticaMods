@@ -25,7 +25,7 @@ namespace FCS_AlterraHub.Buildables
             { $"{ModKey}_NoItemsInCart", "No items in the card to purchase!" },
             { $"{ModKey}_CartMaxItems", "No more items can be added to the cart!. Please remove items to add more to the cart." },
             { $"{ModKey}_OreConsumerReceptacle", "Add ores to cash in." },
-            { $"{ModKey}_Total", "Total" },
+            { $"{ModKey}_AccountTotal", "Account Total" },
             { $"{ModKey}_TransferMoney", "Transfer Money" },
             { $"{ModKey}_RemoveAllCreditFromDevice", "Remove all credit to card before destroying." },
             { $"{ModKey}_Account", "ACCOUNT" },
@@ -43,6 +43,8 @@ namespace FCS_AlterraHub.Buildables
             { $"{ModKey}_AccountCreated", "Thank you for registering for an Alterra Bank Account your current balance is {0}"},
             { $"{ModKey}_NoCardInventory", "Error: No debit card detected. You are to far away or there is no card in your inventory"},
             { $"{ModKey}_AccountSetupError", "[Error] Please refill the following fields and press enter in the field to continue: {0}"},
+            { $"{ModKey}_OreConsumerTimeLeftFormat", "Time left till {0} ore processed {1} | Pending {2}."},
+            { $"{ModKey}_NoOresToProcess", "No ores to process."},
             
         };
         
@@ -134,9 +136,9 @@ namespace FCS_AlterraHub.Buildables
             return GetLanguage($"{ModKey}_OreConsumerReceptacle");
         }
 
-        internal static string Total()
+        internal static string AccountTotal()
         {
-            return GetLanguage($"{ModKey}_Total");
+            return GetLanguage($"{ModKey}_AccountTotal");
         }
 
         internal static string TransferMoney()
@@ -222,6 +224,16 @@ namespace FCS_AlterraHub.Buildables
         public static string AccountSetupError(string value)
         {
             return string.Format(GetLanguage($"{ModKey}_AccountSetupError"),value);
+        }
+
+        public static string OreConsumerTimeLeftFormat(string ore, string timeLeft,string pending)
+        {
+            return string.Format(GetLanguage($"{ModKey}_OreConsumerTimeLeftFormat"), ore,timeLeft,pending);
+        }
+
+        public static string NoOresToProcess()
+        {
+            return GetLanguage($"{ModKey}_NoOresToProcess");
         }
     }
 }

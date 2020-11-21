@@ -1,7 +1,8 @@
 ﻿namespace FCSCommon.Interfaces
 {
-    public interface ISaveDataEntry
+    internal interface ISaveDataEntry
     {
         string Id { get; set; }
+        string BaseId { get; set; }
     }
 }

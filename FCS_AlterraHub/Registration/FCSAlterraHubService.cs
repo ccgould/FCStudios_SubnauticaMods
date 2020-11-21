@@ -18,6 +18,7 @@ namespace FCS_AlterraHub.Registration
         Dictionary<string, FcsDevice> GetRegisteredDevices();
         bool IsModPatched(string mod);
         void RegisterPatchedMod(string mod);
+        int GetRegisterModCount(string tabID);
     }
 
     internal interface IFCSAlterraHubServiceInternal
@@ -57,21 +58,21 @@ namespace FCS_AlterraHub.Registration
                 var id = $"{tabID}{knownDevices.Count:D3}";
                 device.UnitID = id;
                 knownDevices.Add(device.GetPrefabID(), id);
-                AddToGlobalDevices(device, prefabID, id);
+                AddToGlobalDevices(device, id);
                 Mod.SaveDevices(knownDevices);
             }
             else
             {
                 device.UnitID=knownDevices[prefabID];
-                AddToGlobalDevices(device, prefabID, knownDevices[prefabID]);
+                AddToGlobalDevices(device, knownDevices[prefabID]);
             }
 
             BaseManagerSetup(device);
         }
 
-        private static void AddToGlobalDevices(FcsDevice device, string prefabId, string id)
+        private static void AddToGlobalDevices(FcsDevice device, string id)
         {
-            if (!GlobalDevices.ContainsKey(prefabId))
+            if (!GlobalDevices.ContainsKey(id))
             {
                 GlobalDevices.Add(id, device);
             }
@@ -143,6 +144,11 @@ namespace FCS_AlterraHub.Registration
             {
                 _patchedMods.Add(mod);
             }
+        }
+
+        public int GetRegisterModCount(string tabID)
+        {
+            return knownDevices.Count(x => x.Value.Equals(tabID));
         }
     }
 

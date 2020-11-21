@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
@@ -10,7 +11,6 @@ using FCS_ProductionSolutions.HydroponicHarvester.Models;
 using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
-using HarmonyLib;
 using UnityEngine;
 
 namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
@@ -23,14 +23,39 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
         private readonly IList<float> _progress = new List<float>(new[] { -1f, -1f, -1f });
         private List<TechType> _activeClones;
         private Dictionary<TechType, int> _storage;
+        public bool NotAllowToGenerate => PauseUpdates || !_mono.IsConstructed || CurrentSpeedMode == SpeedModes.Off;
+        internal SpeedModes CurrentSpeedMode
+        {
+            get => _currentMode;
+            set
+            {
+                SpeedModes previousMode = _currentMode;
+                _currentMode = value;
+
+                if (_currentMode != SpeedModes.Off)
+                {
+                    //PowerManager.UpdateEnergyPerSecond(_currentMode);
+                    if (previousMode == SpeedModes.Off)
+                        TryStartingNextClone();
+                }
+                else // Off State
+                {
+                    //PowerManager.UpdateEnergyPerSecond(_currentMode);
+                }
+            }
+        }
+
+        public bool PauseUpdates { get; set; }
 
         internal PlantSlot[] Slots;
+        private TechType _currentItemTech;
+        private SpeedModes _currentMode;
         public Action<int, int> OnContainerUpdate { get; set; }
         public Action<FcsDevice, TechType> OnContainerAddItem { get; set; }
         public Action<FcsDevice, TechType> OnContainerRemoveItem { get; set; }
         internal const float CooldownComplete = 19f;
         internal const float StartUpComplete = 4f;
-
+        
         internal void Initialize(HydroponicHarvesterController mono)
         {
             _mono = mono;
@@ -76,6 +101,22 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
             }
         }
         
+        internal void ShowDisplay()
+        {
+            foreach (PlantSlot slot in Slots)
+            {
+                slot.ShowDisplay();
+            }
+        }
+
+        internal void HideDisplay()
+        {
+            foreach (PlantSlot slot in Slots)
+            {
+                slot.HideDisplay();
+            }
+        }
+
         private bool FindPots()
         {
             try
@@ -87,7 +128,8 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
                 for (int i = 0; i < planters.childCount; i++)
                 {
                     var planter = planters.GetChild(i);
-                    Slots[i] = new PlantSlot(i, planter, planter.Find("PlanterBounds"));
+                    Slots[i] = new PlantSlot(this,i, planter, planter.Find("PlanterBounds"),
+                        GameObjectHelpers.FindGameObject(gameObject, $"Slot{i+1}Item").AddComponent<SlotItemTab>());
                 }
             }
             catch (Exception e)
@@ -131,11 +173,8 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
                 QuickLogger.Debug("SlotById returned null");
                 return;
             }
-
-            GameObject plantModel = slotByID.PlantModel;
             _mono.EffectsManager.ChangeEffectState(FindEffectType(slotByID), slotByID.Id, false);
             slotByID.Clear();
-            Destroy(plantModel);
             SetSlotOccupiedState(slotID, false);
         }
 
@@ -148,6 +187,8 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
         private void AddItem(Plantable plantable, int slotID)
         {
             PlantSlot slotByID = this.GetSlotByID(slotID);
+
+
             if (slotByID == null)
             {
                 return;
@@ -159,19 +200,34 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
             }
 
             this.SetSlotOccupiedState(slotID, true);
+         
             GameObject gameObject = plantable.Spawn(slotByID.Slot, _mono.IsInBase());
+
             this.SetupRenderers(gameObject, _mono.IsInBase());
             gameObject.SetActive(true);
             slotByID.Plantable = plantable;
             slotByID.PlantModel = gameObject;
             slotByID.SetMaxPlantHeight(MaxPlantsHeight);
+            
             _mono.EffectsManager.ChangeEffectState(FindEffectType(slotByID), slotByID.Id, true);
             var growingPlant = gameObject.GetComponent<GrowingPlant>();
-            
+
             if (growingPlant != null)
             {
                 var fcsGrowing = gameObject.AddComponent<FCSGrowingPlant>();
                 fcsGrowing.Initialize(growingPlant, this,slotByID.SlotBounds.GetComponent<Collider>().bounds.size, AddActiveClone);
+                
+                var pickPrefab = growingPlant.grownModelPrefab.GetComponentInChildren<PickPrefab>();
+
+                if (pickPrefab != null)
+                {
+                    slotByID.ReturnTechType = pickPrefab.pickTech;
+                }
+                else
+                {
+                    slotByID.ReturnTechType = _currentItemTech;
+                }
+
                 Destroy(growingPlant);
             }
 
@@ -179,10 +235,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
             {
                 plantable.eatable.SetDecomposes(false);
             }
-            
 
-
-            //slotByID.ShowPlant();
         }
 
         internal void AddActiveClone(TechType techType)
@@ -226,10 +279,11 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
 
         public bool AddItemToContainer(InventoryItem item)
         {
+            _currentItemTech = item.item.GetTechType();
             Plantable component = item.item.GetComponent<Plantable>();
             item.item.SetTechTypeOverride(component.plantTechType);
             item.isEnabled = false;
-            AddItem(component, this.GetFreeSlotID());
+            AddItem(component, GetFreeSlotID());
             return true;
         }
 
@@ -250,7 +304,8 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
             if (!_storage.ContainsKey(techType)) return null;
 
             _storage[techType] -= 1;
-            
+            TryStartingNextClone();
+
             if (_storage[techType] == 0)
             {
                 _storage.Remove(techType);
@@ -273,16 +328,12 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
             return _storage.ContainsKey(techType);
         }
         
-        public bool NotAllowToGenerate => PauseUpdates || !_mono.IsConstructed || CurrentSpeedMode == SpeedModes.Off;
-        public SpeedModes CurrentSpeedMode { get; set; }
-
-        public bool PauseUpdates { get; set; }
-
         internal float StartUpProgress
         {
             get => _progress[(int)ClonePhases.StartUp];
             set => _progress[(int)ClonePhases.StartUp] = value;
         }
+        
         internal float GenerationProgress
         {
             get => _progress[(int)ClonePhases.Generating];
@@ -411,6 +462,36 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
         {
             QuickLogger.Debug($"Setting SpeedMode to {result}",true);
             CurrentSpeedMode = result;
+        }
+
+        public string GetSlotInfo(int slotIndex)
+        {
+            if (Slots[slotIndex].Plantable != null)
+            {
+                var nameOfPlant = Language.main.Get(Slots[slotIndex].Plantable.plantTechType);
+                if (Slots[slotIndex].GetPlantSeedTechType() != TechType.None)
+                {
+                    int amount = 0;
+
+                    if (_storage.ContainsKey(Slots[slotIndex].ReturnTechType))
+                    {
+                        amount = _storage[Slots[slotIndex].ReturnTechType];
+                    }
+                    
+                    return $"{nameOfPlant} x{amount}";
+                }                
+            }
+
+            return "N/A";
+        }
+
+        public void OnItemButtonClicked(string arg1, object arg2)
+        {
+            var item = RemoveItemFromContainer((TechType) arg2, 1);
+            if (item != null)
+            {
+                PlayerInteractionHelper.GivePlayerItem(item);
+            }
         }
     }
 }

@@ -2,14 +2,15 @@
 using System.Collections.Generic;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Objects;
+using FCSCommon.Interfaces;
 using Oculus.Newtonsoft.Json;
 
 namespace FCS_EnergySolutions.Configuration
 {
     [Serializable]
-    internal class AlterraGenDataEntry
+    internal class AlterraGenDataEntry : ISaveDataEntry
     {
-        [JsonProperty] internal string ID { get; set; }
+        public string Id { get; set; }
         [JsonProperty] internal string SaveVersion { get; set; } = "1.0";
         [JsonProperty] internal ColorVec4 BodyColor { get; set; }
         [JsonProperty] internal Dictionary<TechType, int> Storage { get; set; }
@@ -17,12 +18,14 @@ namespace FCS_EnergySolutions.Configuration
         [JsonProperty] internal FCSPowerStates PowerState { get; set; }
         [JsonProperty] internal float Power { get; set; }
         [JsonProperty] internal float StoredPower { get; set; }
+        public string BaseId { get; set; }
         [JsonProperty] internal bool IsVisible { get; set; }
     }
 
-    internal class JetStreamT242DataEntry
+    internal class JetStreamT242DataEntry : ISaveDataEntry
     {
-        [JsonProperty] internal string ID { get; set; }
+        public string Id { get; set; }
+        public string BaseId { get; set; }
         [JsonProperty] internal string SaveVersion { get; set; } = "1.0";
         [JsonProperty] internal ColorVec4 BodyColor { get; set; }
         [JsonProperty] internal ColorVec4 SecondaryBodyColor { get; set; }

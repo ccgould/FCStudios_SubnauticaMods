@@ -49,7 +49,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
                 TurnOffLights();
             }
         }
-
+        
         internal void TurnOnLights()
         {
             if (_lightState == FCSLightState.On) return;

@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Interfaces;
+using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
@@ -11,9 +13,8 @@ using UnityEngine;
 
 namespace FCS_AlterraHub.Mono.OreConsumer
 {
-    internal class OreConsumerController : FcsDevice, IFCSStorage, IFCSSave<SaveData>
+    internal class OreConsumerController : FcsDevice, IFCSStorage, IFCSSave<SaveData>, IHandTarget
     {
-        private decimal _balance;
         private bool _isFromSave;
         private bool _runStartUpOnEnable;
         private OreConsumerDataEntry _savedData;
@@ -23,7 +24,20 @@ namespace FCS_AlterraHub.Mono.OreConsumer
         public Action<FcsDevice, TechType> OnContainerAddItem { get; set; }
         public Action<FcsDevice, TechType> OnContainerRemoveItem { get; set; }
         public DumpContainer DumpContainer { get; private set; }
-        public bool IsOperational { get; set; }
+        public override bool IsOperational => CheckIfOperational();
+
+        private bool CheckIfOperational()
+        {
+            if(IsInitialized && IsConstructed && Manager != null && _oreQueue != null)
+            {
+                if (Manager.HasEnoughPower(GetPowerUsage()) && _oreQueue.Count > 0)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         public OreConsumerDisplay DisplayManager { get; private set; }
         public TransferHandler TransferHandler { get; private set; }
         public MotorHandler MotorHandler { get; private set; }
@@ -31,22 +45,51 @@ namespace FCS_AlterraHub.Mono.OreConsumer
         public AudioManager AudioManager { get; private set; }
         public Action<bool> onUpdateSound { get; private set; }
         public ColorManager ColorManager { get; private set; }
+        private Queue<TechType> _oreQueue;
+        private const float OreProcessingTime = 90f;
+        private float _timeLeft;
+        public override float GetPowerUsage()
+        {
+            return 0.85f;
+        }
 
         #region Unity Methods
 
         private void Awake()
         {
-
+            _timeLeft = OreProcessingTime;
         }
 
         private void Start()
         {
+            InvokeRepeating(nameof(UpdateAnimation),1f,1f);
+        }
 
+        private void UpdateAnimation()
+        {
+            if (_oreQueue != null && _oreQueue.Count > 0)
+            {
+                MotorHandler.Start();
+                EffectsManager.ShowEffect();
+            }
+            else
+            {
+                MotorHandler.Stop();
+                EffectsManager.HideEffect();
+            }
         }
 
         private void Update()
         {
-            //Try not to use update if possible
+            if (_oreQueue != null && IsOperational && _oreQueue.Count > 0)
+            {
+                _timeLeft -= Time.deltaTime;
+                if (_timeLeft < 0)
+                {
+                    AppendMoney(StoreInventorySystem.GetOrePrice(_oreQueue.Dequeue()));
+                    _timeLeft = OreProcessingTime;
+                }
+            }
         }
 
         private void OnEnable()
@@ -65,7 +108,11 @@ namespace FCS_AlterraHub.Mono.OreConsumer
                         ReadySaveData();
                     }
 
-                    AppendMoney(_savedData.OreConsumerCash);
+                    if(_savedData.OreQueue != null)
+                    {
+                        _oreQueue = _savedData.OreQueue;
+                        _timeLeft = _savedData.TimeLeft;
+                    }
                     MotorHandler.SpeedByPass(_savedData.RPM);
                     ColorManager.ChangeColor(_savedData.Color.Vector4ToColor(),ColorTargetMode.Both);
                 }
@@ -73,17 +120,17 @@ namespace FCS_AlterraHub.Mono.OreConsumer
                 _runStartUpOnEnable = false;
             }
         }
-
-        private void OnDestroy()
-        {
-
-        }
-
+        
         #endregion
 
         public override void Initialize()
         {
             if (IsInitialized) return;
+
+            if (_oreQueue == null)
+            {
+               _oreQueue = new Queue<TechType>();
+            }
 
             if (DumpContainer == null)
             {
@@ -106,27 +153,18 @@ namespace FCS_AlterraHub.Mono.OreConsumer
                 {
                     DumpContainer.OpenStorage();
                 });
-
-                DisplayManager.onTransferMoneyClicked.AddListener(() =>
-                {
-                    TransferHandler.OpenStorage(WithDrawMoney);
-                });
             }
 
             if (MotorHandler == null)
             {
                 MotorHandler = GameObjectHelpers.FindGameObject(gameObject, "core_anim").AddComponent<MotorHandler>();
                 MotorHandler.Initialize(30);
-                //TODO Control motor based off power handler
-                MotorHandler.Start();
             }
 
             if (EffectsManager == null)
             {
                 EffectsManager = gameObject.AddComponent<EffectsManager>();
                 EffectsManager.Initialize(IsUnderWater());
-                //TODO Control effect based off power handler
-                EffectsManager.ShowEffect();
             }
 
             if(AudioManager == null)
@@ -154,6 +192,13 @@ namespace FCS_AlterraHub.Mono.OreConsumer
                 ColorManager = gameObject.AddComponent<ColorManager>();
                 ColorManager.Initialize(gameObject, Buildables.AlterraHub.BodyMaterial);
             }
+
+            CardSystem.main.onBalanceUpdated += amount =>
+            {
+                DisplayManager?.onTotalChanged?.Invoke(amount);
+            };
+
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.OreConsumerTabID);
 
 #if DEBUG
             QuickLogger.Debug($"Initialized Ore Consumer {GetPrefabID()}");
@@ -201,11 +246,6 @@ namespace FCS_AlterraHub.Mono.OreConsumer
 
         public override bool CanDeconstruct(out string reason)
         {
-            if (_balance > 0)
-            {
-                reason = Buildables.AlterraHub.RemoveAllCreditFromDevice();
-                return false;
-            }
             reason = string.Empty;
             return true;
         }
@@ -240,7 +280,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
         {
             try
             {
-                AppendMoney(StoreInventorySystem.GetOrePrice(item.item.GetTechType()));
+                _oreQueue.Enqueue(item.item.GetTechType());
                 Destroy(item.item.gameObject);
             }
             catch (Exception e)
@@ -254,26 +294,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
 
         private void AppendMoney(decimal price)
         {
-            _balance += price;
-            DisplayManager.onTotalChanged?.Invoke(_balance);
-        }
-
-        private void WithDrawMoney(string cardNumber)
-        {
-            if (CardSystem.main.CardExist(cardNumber))
-            {
-                CardSystem.main.AddFinances(_balance);
-                EmptyBalance();
-                return;
-            }
-
-            MessageBoxHandler.main.Show(string.Format(Buildables.AlterraHub.AccountNotFoundFormat(),cardNumber));
-        }
-
-        private void EmptyBalance()
-        {
-            _balance = 0;
-            DisplayManager.onTotalChanged?.Invoke(_balance);
+            CardSystem.main.AddFinances(price);
         }
         
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
@@ -312,12 +333,12 @@ namespace FCS_AlterraHub.Mono.OreConsumer
             }
 
             _savedData.Id = GetPrefabID();
-            _savedData.OreConsumerCash = _balance;
+            _savedData.OreQueue = _oreQueue;
+            _savedData.TimeLeft = _timeLeft;
             _savedData.RPM = MotorHandler.GetRPM();
             _savedData.Color = ColorManager.GetColor().ColorToVector4();
+            _savedData.BaseId = BaseId;
             QuickLogger.Debug($"Saving ID {_savedData.Id}", true);
-
-            //_savedData.BodyColor = ColorManager.GetMaskColor().ColorToVector4();
             newSaveData.OreConsumerEntries.Add(_savedData);
         }
 
@@ -330,6 +351,30 @@ namespace FCS_AlterraHub.Mono.OreConsumer
         public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
         {
             return ColorManager.ChangeColor(color,mode);   
+        }
+
+        public void OnHandHover(GUIHand hand)
+        {
+            var main = HandReticle.main;
+            main.SetIcon(HandReticle.IconType.Info);
+
+            if (_oreQueue != null && DisplayManager?.CheckInteraction.IsHovered == false)
+            {
+                if (_oreQueue.Any())
+                {
+                    var pendingAmount = _oreQueue.Count > 1 ? _oreQueue.Count - 1 : 0;
+                    main.SetInteractText(Buildables.AlterraHub.OreConsumerTimeLeftFormat(Language.main.Get(_oreQueue.Peek()), _timeLeft.ToString("N0"),$"{pendingAmount}"));
+                }
+                else
+                {
+                    main.SetInteractText(Buildables.AlterraHub.NoOresToProcess());
+                }
+            }
+        }
+
+        public void OnHandClick(GUIHand hand)
+        {
+            QuickLogger.Debug("Clicked",true);
         }
     }
 }

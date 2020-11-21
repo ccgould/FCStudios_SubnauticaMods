@@ -100,6 +100,16 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
             }
         }
 
+        public override float GetPowerUsage()
+        {
+            if (_isScanning)
+            {
+                return 0.2125f;
+            }
+
+            return 0;
+        }
+
         private void OnEnable()
         {
             if (_runStartUpOnEnable)
@@ -125,13 +135,7 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
                 _runStartUpOnEnable = false;
             }
         }
-
-
-        private void OnDestroy()
-        {
-
-        }
-
+        
         #endregion
 
         public ColorManager ColorManager { get; private set; }

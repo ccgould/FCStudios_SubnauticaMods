@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Registration;
@@ -6,9 +7,11 @@ using FCS_AlterraHub.Spawnables;
 using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.MatterAnalyzer.Mono;
+using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
+using SMLHelper.V2.Utility;
 using UnityEngine;
 
 namespace FCS_ProductionSolutions.MatterAnalyzer.Buildable
@@ -87,12 +90,42 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Buildable
 #if SUBNAUTICA
         protected override TechData GetBlueprintRecipe()
         {
-            return Mod.HydroponicHarvesterIngredients;
+            QuickLogger.Debug($"Creating recipe...");
+            // Create and associate recipe to the new TechType
+            var customFabRecipe = new TechData()
+            {
+                craftAmount = 1,
+                Ingredients = new List<Ingredient>()
+                {
+                    new Ingredient(Mod.MatterAnalyzerKitClassID.ToTechType(),1)
+                }
+            };
+            return customFabRecipe;
+        }
+
+        protected override Atlas.Sprite GetItemSprite()
+        {
+            return new Atlas.Sprite(ImageUtils.LoadTextureFromFile(Path.Combine(AssetsFolder, $"{ClassID}.png")));
         }
 #elif BELOWZERO
         protected override RecipeData GetBlueprintRecipe()
         {
-            return Mod.HydroponicHarvesterIngredients;
+            QuickLogger.Debug($"Creating recipe...");
+            // Create and associate recipe to the new TechType
+            var customFabRecipe = new RecipeData()
+            {
+                craftAmount = 1,
+                Ingredients = new List<Ingredient>()
+                {
+                    new Ingredient(Mod.MatterAnalyzerKitClassID.ToTechType(),1)
+                }
+            };
+            return customFabRecipe;
+        }
+
+        protected override Sprite GetItemSprite()
+        {
+            return ImageUtils.LoadSpriteFromFile(Path.Combine(AssetsFolder, $"{ClassID}.png"));
         }
 #endif
     }

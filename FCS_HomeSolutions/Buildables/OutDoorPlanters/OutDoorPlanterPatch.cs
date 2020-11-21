@@ -54,6 +54,15 @@ namespace FCS_HomeSolutions.Buildables.OutDoorPlanters
                 //========== Allows the building animation and material colors ==========// 
                 Shader shader = Shader.Find("MarmosetUBER");
                 Renderer[] renderers = prefab.GetComponentsInChildren<Renderer>();
+
+                foreach (Renderer renderer in renderers)
+                {
+                    foreach (Material material in renderer.materials)
+                    {
+                        material.shader = shader;
+                    }
+                }
+
                 SkyApplier skyApplier = prefab.EnsureComponent<SkyApplier>();
                 skyApplier.renderers = renderers;
                 skyApplier.anchorSky = Skies.Auto;
@@ -115,7 +124,7 @@ namespace FCS_HomeSolutions.Buildables.OutDoorPlanters
                 prefab.AddComponent<OutDoorPlanterController>();
                 
                 //Apply the glass shader here because of autosort lockers for some reason doesn't like it.
-                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModName);
+                //MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModName);
                 return prefab;
             }
             catch (Exception e)

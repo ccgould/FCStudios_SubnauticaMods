@@ -1,4 +1,4 @@
-﻿namespace ARS_SeaBreezeFCS32.Enum
+﻿namespace FCS_AlterraHub.Enumerators
 {
     internal enum FridgeCoolingState
     {

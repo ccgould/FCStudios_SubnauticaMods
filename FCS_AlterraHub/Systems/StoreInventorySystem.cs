@@ -72,11 +72,10 @@ namespace FCS_AlterraHub.Systems
             return multiplier * GetPrice(techType);
         }
 
-        internal static bool ItemReturn(string cardNumber, InventoryItem item)
+        internal static bool ItemReturn(InventoryItem item)
         {
             if (item == null)
             {
-                MessageBoxHandler.main.Show(string.Format(AlterraHub.AccountNotFoundFormat(), cardNumber));
                 return false;
             }
 
@@ -88,6 +87,11 @@ namespace FCS_AlterraHub.Systems
         internal static bool ValidResource(TechType techType)
         {
             return OrePrices.ContainsKey(techType);
+        }
+
+        public static bool ValidStoreItem(TechType techType)
+        {
+            return KnownPrices.ContainsKey(techType);
         }
     }
 }

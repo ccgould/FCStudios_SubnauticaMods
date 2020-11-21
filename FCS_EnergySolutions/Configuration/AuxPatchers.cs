@@ -10,6 +10,7 @@ namespace FCS_EnergySolutions.Configuration
         private static readonly Dictionary<string, string> LanguageDictionary = new Dictionary<string, string>
         {
             { $"{ModKey}_JetStreamT242OnHover","JetStream {0} Information: (charge: {1}/{2}) | (production per minute: {3})"},
+            { $"{ModKey}_JetStreamOnHoverInteractionFormatted","Press {0} to Turn on / off Turbine. Current State {1}"},
         };
 
         internal static void AdditionalPatching()
@@ -25,6 +26,11 @@ namespace FCS_EnergySolutions.Configuration
         internal static string JetStreamOnHover()
         {
             return Language.main.Get($"{ModKey}_JetStreamT242OnHover");
+        }
+
+        public static string JetStreamOnHoverInteractionFormatted(string keyBind,string state)
+        {
+            return string.Format(Language.main.Get($"{ModKey}_JetStreamOnHoverInteractionFormatted"), keyBind,state);
         }
     }
 }

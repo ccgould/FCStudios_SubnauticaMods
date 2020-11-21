@@ -9,6 +9,7 @@ using FCSTechFabricator.Enums;
 using FCSTechFabricator.Extensions;
 using FCSTechFabricator.Managers;
 using UnityEngine;
+using Fridge = ARS_SeaBreezeFCS32.Model.Fridge;
 
 namespace ARS_SeaBreezeFCS32.Mono
 {

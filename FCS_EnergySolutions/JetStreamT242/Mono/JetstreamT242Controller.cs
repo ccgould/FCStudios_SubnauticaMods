@@ -72,12 +72,7 @@ namespace FCS_EnergySolutions.JetStreamT242.Mono
             QuickLogger.Debug("In OnProtoDeserialize");
             _savedData = Mod.GetJetStreamT242SaveData(GetPrefabID());
         }
-
-        private void OnDestroy()
-        {
-
-        }
-
+        
         #endregion
 
         private bool IsUpright()
@@ -104,6 +99,7 @@ namespace FCS_EnergySolutions.JetStreamT242.Mono
             if (_powerManager == null)
             {
                 _powerManager = gameObject.AddComponent<JetStreamT242PowerManager>();
+                _powerManager.Initialize(this);
             }
 
             if (_colorManager == null)
@@ -181,14 +177,15 @@ namespace FCS_EnergySolutions.JetStreamT242.Mono
                 _savedData = new JetStreamT242DataEntry();
             }
 
-            _savedData.ID = GetPrefabID();
+            _savedData.Id = GetPrefabID();
 
-            QuickLogger.Debug($"Saving ID {_savedData.ID}", true);
+            QuickLogger.Debug($"Saving ID {_savedData.Id}", true);
             _savedData.BodyColor = _colorManager.GetColor().ColorToVector4();
             _savedData.SecondaryBodyColor = _colorManager.GetSecondaryColor().ColorToVector4();
             _powerManager.Save(_savedData);
             _motor.Save(_savedData);
             _tilter.Save(_savedData);
+            _savedData.BaseId = BaseId;
             newSaveData.MarineTurbineEntries.Add(_savedData);
         }
 
@@ -209,13 +206,17 @@ namespace FCS_EnergySolutions.JetStreamT242.Mono
             _motor.Run();
 
             ChangeStatusLight();
+
+            _powerManager.ChangePowerState(FCSPowerStates.Powered);
         }
 
         public void DeActivateTurbine()
         {
             _tilter.ChangePosition(-90);
             _tilter.Stop();
+            _motor.Stop();
             ChangeStatusLight(false);
+            _powerManager.ChangePowerState(FCSPowerStates.Tripped);
         }
 
         private void ChangeStatusLight(bool isOperational = true)

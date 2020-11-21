@@ -49,7 +49,8 @@ namespace FCS_AlterraHub.Configuration
         internal const string OreConsumerDescription = "Ore consumer yum yum give me more.The Ore consumer takes your ores and turns it into money.";
         internal const string OreConsumerPrefabName = "OreConsumer";
         internal const string OreConsumerKitClassID = "OreConsumer_Kit";
-        
+        internal const string OreConsumerTabID = "OC";
+
         internal static TechType OreConsumerTechType { get; set; }
 
         internal static Action<SaveData> OnDataLoaded { get; set; }

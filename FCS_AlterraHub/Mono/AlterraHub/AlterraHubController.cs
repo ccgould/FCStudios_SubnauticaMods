@@ -1,6 +1,9 @@
 ﻿using System;
+using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Configuration;
+using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Mono.OreConsumer;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Structs;
@@ -15,7 +18,7 @@ using UnityEngine.UI;
 
 namespace FCS_AlterraHub.Mono.AlterraHub
 {
-    internal class AlterraHubController: FcsDevice, IFCSSave<SaveData>, IHandTarget
+    internal class AlterraHubController: FcsDevice, IFCSSave<SaveData>, IHandTarget, IFCSDumpContainer
     {
         private bool _runStartUpOnEnable;
         private bool _isFromSave;
@@ -25,6 +28,8 @@ namespace FCS_AlterraHub.Mono.AlterraHub
         private GameObject _hubCameraPosition;
         private bool _isInRange;
         private GameObject _screenBlock;
+        private ColorManager _colorManager;
+        private DumpContainerSimplified _dumpContainer;
 
 
         internal HubTrigger AlterraHubTrigger { get; set; }
@@ -37,7 +42,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
         {
             if (Input.GetKeyDown(KeyCode.Escape) && _isInRange)
             {
-                ResetCamera();
+                ExitStore();
             }
         }
 
@@ -58,15 +63,11 @@ namespace FCS_AlterraHub.Mono.AlterraHub
                     }
 
                     DisplayManager.Load(_savedData);
+                    _colorManager.ChangeColor(_savedData.Color.Vector4ToColor());
                 }
-
+                
                 _runStartUpOnEnable = false;
             }
-        }
-
-        private void OnDestroy()
-        {
-            FCSAlterraHubService.PublicAPI.RemoveDeviceFromGlobal(GetPrefabID());
         }
 
         #endregion
@@ -80,10 +81,17 @@ namespace FCS_AlterraHub.Mono.AlterraHub
                 AlterraHubTrigger = GameObjectHelpers.FindGameObject(gameObject, "Trigger").AddComponent<HubTrigger>();
             }
 
+            if (_dumpContainer == null)
+            {
+                _dumpContainer = gameObject.AddComponent<DumpContainerSimplified>();
+                _dumpContainer.Initialize(transform, "Item Return", this);
+            }
+
             if (DisplayManager == null)
             {
                 DisplayManager = gameObject.AddComponent<AlterraHubDisplay>();
                 DisplayManager.Setup(this);
+                DisplayManager.OnReturnButtonClicked += () => { _dumpContainer.OpenStorage();};
             }
 
             if (MotorHandler == null)
@@ -94,6 +102,15 @@ namespace FCS_AlterraHub.Mono.AlterraHub
                 MotorHandler.Start();
             }
 
+            if (_colorManager == null)
+            {
+                _colorManager = gameObject.AddComponent<ColorManager>();
+                _colorManager.Initialize(gameObject, Buildables.AlterraHub.BodyMaterial);
+            }
+
+            //var ui = GameObject.Instantiate(Buildables.AlterraHub.ColorPickerDialogPrefab);
+            //HUD = ui.AddComponent<FCSHUD>();
+            //HUD.Move();
             _screenBlock = GameObjectHelpers.FindGameObject(gameObject, "Blocker");
 
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.ModID);
@@ -106,6 +123,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
                 if (!value)
                 {
                     _isInRange = false;
+                    ExitStore();
                 }
             };
 
@@ -114,10 +132,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             IsInitialized = true;
         }
 
-        private void onBuyBTNClick(CartDropDownHandler dropDownHandler)
-        {
-            //TODO Show CheckOut
-        }
+        public FCSHUD HUD { get; set; }
 
         public override void OnProtoSerialize(ProtobufSerializer serializer)
         {
@@ -195,9 +210,9 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             return false;
         }
 
-        internal void ReturnItem(string cardNumber, InventoryItem item)
+        internal void ReturnItem(InventoryItem item)
         {
-            var result = StoreInventorySystem.ItemReturn(cardNumber, item);
+            var result = StoreInventorySystem.ItemReturn(item);
             
             if (result)
             {
@@ -256,6 +271,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
 
             _savedData.Id = GetPrefabID();
             _savedData.CartItems = DisplayManager.SaveCartItems();
+            _savedData.Color = _colorManager.GetColor().ColorToVector4();
             newSaveData.AlterraHubEntries.Add(_savedData);
             QuickLogger.Debug($"Saved ID {_savedData.Id}", true);
         }
@@ -325,53 +341,42 @@ namespace FCS_AlterraHub.Mono.AlterraHub
 
                 var hudCameraPos = _hubCameraPosition.transform.position;
                 var hudCameraRot = _hubCameraPosition.transform.rotation;
-                Player.main.gameObject.transform.position = new Vector3(hudCameraPos.x, Player.main.gameObject.transform.position.y, hudCameraPos.z);
+                Player.main.SetPosition(new Vector3(hudCameraPos.x, Player.main.transform.position.y, hudCameraPos.z), hudCameraRot);
+
+                //Player.main.gameObject.transform.position = new Vector3(hudCameraPos.x, Player.main.gameObject.transform.position.y, hudCameraPos.z);
                 SNCameraRoot.main.transform.position = hudCameraPos;
                 SNCameraRoot.main.transform.rotation = hudCameraRot;
             }
         }
 
-        private void ResetCamera()
+        internal void ExitStore()
         {
             SNCameraRoot.main.transform.localPosition = Vector3.zero;
             SNCameraRoot.main.transform.localRotation = Quaternion.identity;
+            ExitLockedMode();
+        }
+
+        private void ExitLockedMode()
+        {
             Player.main.ExitLockedMode(false, false);
             InterceptInput(false);
         }
-    }
 
-    internal class HubTrigger : MonoBehaviour
-    {
-        private AlterraHubController _mono;
-        internal bool IsPlayerInRange;
-        
-        internal Action<bool> onTriggered { get; set; }
-
-        internal void Initialize(AlterraHubController mono)
+        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
         {
-            _mono = mono;
+            return _colorManager.ChangeColor(color, mode);
         }
 
-        private void OnTriggerEnter(Collider collider)
+        public bool AddItemToContainer(InventoryItem item)
         {
-            if (collider.gameObject.layer != 19) return;
-            IsPlayerInRange = true;
-            onTriggered?.Invoke(true);
+            CardSystem.main.AddFinances(StoreInventorySystem.GetPrice(item.item.GetTechType()));
+            Destroy(item.item.gameObject);
+            return true;
         }
 
-        private void OnTriggerStay(Collider collider)
+        public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
         {
-            if (collider.gameObject.layer != 19 || IsPlayerInRange) return;
-            onTriggered?.Invoke(true);
-            IsPlayerInRange = true;
-        }
-        
-        private void OnTriggerExit(Collider collider)
-        {
-            if (collider.gameObject.layer != 19) return;
-            IsPlayerInRange = false;
-            onTriggered?.Invoke(false);
-            
+            return StoreInventorySystem.ValidStoreItem(pickupable.GetTechType());
         }
     }
 }

@@ -1,9 +1,12 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
 using FCS_EnergySolutions.AlterraGen.Buildables;
 using FCS_EnergySolutions.Buildable;
 using FCS_EnergySolutions.Configuration;
 using FCS_EnergySolutions.JetStreamT242.Buildables;
 using FCSCommon.Utilities;
+using HarmonyLib;
 using QModManager.API.ModLoading;
 using SMLHelper.V2.Handlers;
 
@@ -31,7 +34,7 @@ namespace FCS_EnergySolutions
             QuickLogger.ModName = Mod.ModName;
             AuxPatchers.AdditionalPatching();
             ModelPrefab.Initialize();
-
+            
             var alterraGen = new AlterraGenBuildable();
             alterraGen.Patch();
 

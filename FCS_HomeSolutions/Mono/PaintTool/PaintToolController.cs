@@ -5,6 +5,7 @@ using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Objects;
 using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
+using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -34,6 +35,7 @@ namespace FCS_HomeSolutions.Mono.PaintTool
         private int _numberColorTargetModeTypes;
         private int _painterModeIndex = 1;
         private int _layerMask;
+        private TechType _validFuelTechType;
         internal bool IsInitialized { get; set; }
 
         public override string animToolName => TechType.Scanner.AsString(true);
@@ -41,6 +43,7 @@ namespace FCS_HomeSolutions.Mono.PaintTool
         private void Initialize()
         {
             if (IsInitialized) return;
+            _validFuelTechType = Mod.PaintCanClassID.ToTechType();
             _numberColorTargetModeTypes = System.Enum.GetValues(typeof(ColorTargetMode)).Length;
             _collider = gameObject.GetComponent<BoxCollider>();
             _colorRing = GameObjectHelpers.FindGameObject(gameObject, "ColorFill").GetComponent<Image>();
@@ -273,10 +276,10 @@ namespace FCS_HomeSolutions.Mono.PaintTool
         }
 
         public override bool OnAltDown()
-        {
-            if (Inventory.main.container.Contains(TechType.BloodOil))
+        { 
+            if (Inventory.main.container.Contains(_validFuelTechType))
             {
-                var item = Inventory.main.container.RemoveItem(TechType.BloodOil);
+                var item = Inventory.main.container.RemoveItem(_validFuelTechType);
                 Destroy(item.gameObject);
                 Reload();
             }
