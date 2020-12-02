@@ -15,7 +15,7 @@ namespace FCS_AlterraHub.Buildables
             { $"{ModKey}_CardNotInSystemSettingBalanceFormat", "This card number ({0}) wasn't found in the system. Setting balance to {1}." },
             { $"{ModKey}_ErrorHasOccured", "An error has occurred please let FCStudios in the Alterra Corp. know about this error. Thank you and sorry for the inconvenience." },
             { $"{ModKey}_NotEnoughMoneyOnAccount", "There is not enough money on card to perform this transaction." },
-            { $"{ModKey}_AccountNotFoundFormat", "There is no account found for the card number ({0}). Please consult FCSStudios in the Alterra Corp." },
+            { $"{ModKey}_AccountNotFoundFormat", "There is no account found for you please register an account in the Alterra Hub" },
             { $"{ModKey}_CardReader", "Card Reader" },
             { $"{ModKey}_AccountBalanceFormat", "Account Balance: {0}" },
             { $"{ModKey}_DebitBalanceFormat", "Debit Balance: {0}" },
@@ -45,6 +45,7 @@ namespace FCS_AlterraHub.Buildables
             { $"{ModKey}_AccountSetupError", "[Error] Please refill the following fields and press enter in the field to continue: {0}"},
             { $"{ModKey}_OreConsumerTimeLeftFormat", "Time left till {0} ore processed {1} | Pending {2}."},
             { $"{ModKey}_NoOresToProcess", "No ores to process."},
+            { $"{ModKey}_PleaseBuildOnPlatForm", "Please Build on a platform to operate."},
             
         };
         
@@ -211,9 +212,9 @@ namespace FCS_AlterraHub.Buildables
             return GetLanguage($"{ModKey}_PINPlaceHolder");
         }
 
-        public static string AccountCreated()
+        public static string AccountCreated(string amount)
         {
-            return GetLanguage($"{ModKey}_AccountCreated");
+            return string.Format(GetLanguage($"{ModKey}_AccountCreated"), amount);
         }
 
         public static string CardNotDetected()
@@ -234,6 +235,11 @@ namespace FCS_AlterraHub.Buildables
         public static string NoOresToProcess()
         {
             return GetLanguage($"{ModKey}_NoOresToProcess");
+        }
+
+        public static string PleaseBuildOnPlatForm()
+        {
+            return GetLanguage($"{ModKey}_PleaseBuildOnPlatForm");
         }
     }
 }

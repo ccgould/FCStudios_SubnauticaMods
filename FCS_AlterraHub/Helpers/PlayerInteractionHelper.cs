@@ -9,27 +9,7 @@ namespace FCS_AlterraHub.Helpers
     {
         public static void GivePlayerItem(TechType techType)
         {
-            if (techType == TechType.None) return;
-
-#if SUBNAUTICA
-            var itemSize = CraftData.GetItemSize(techType);
-#elif BELOWZERO
-            var itemSize = TechData.GetItemSize(techType);
-#endif
-           
-            if (Player.main.HasInventoryRoom(itemSize.x, itemSize.y))
-            {
-                var item = techType.ToPickupable();
-                if (item != null)
-                {
-                    Inventory.main.Pickup(item);
-                }
-                else
-                {
-                    MessageBoxHandler.main.Show($"[GivePlayerItem]:{AlterraHub.ErrorHasOccured()}");
-                }
-
-            }
+            CraftData.AddToInventory(techType,1,false,false);
         }
 
         public static void GivePlayerItem(InventoryItem inventoryItem)

@@ -30,6 +30,11 @@ namespace FCS_EnergySolutions.AlterraGen.Mono
 
         #region Unity Methods
 
+        private void Start()
+        {
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.AlterraGenModTabID, Mod.ModName);
+        }
+
         private void OnEnable()
         {
             if (_runStartUpOnEnable)
@@ -82,10 +87,7 @@ namespace FCS_EnergySolutions.AlterraGen.Mono
                 DumpContainer = gameObject.AddComponent<DumpContainer>();
                 DumpContainer.Initialize(transform,"AlterraGen Receptacle",PowerManager,4,4);
             }
-
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.AlterraGenModTabID);
-
-
+            
             if (DisplayManager == null)
             {
                 DisplayManager = gameObject.AddComponent<AlterraGenDisplayManager>();

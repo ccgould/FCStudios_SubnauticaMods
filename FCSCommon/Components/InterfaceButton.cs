@@ -25,13 +25,12 @@ namespace FCSCommon.Components
         public Text TextComponent { get; set; }
         public int SmallFont { get; set; } = 140;
         public int LargeFont { get; set; } = 180;
-        public virtual object Tag { get; set; }
         public float IncreaseButtonBy { get; set; }
         public Action<bool> OnInterfaceButton { get; set; }
 
         public Action<string, object> OnButtonClick;
 
-        private bool _isSelected;
+        internal bool IsSelected { get; set; }
         private Image _bgImage;
 
         
@@ -41,7 +40,7 @@ namespace FCSCommon.Components
         #region Public Methods
         public virtual void OnEnable()
         {
-            if(_isSelected) return;
+            if(IsSelected) return;
             if (string.IsNullOrEmpty(BtnName)) return;
 
             Disabled = false;
@@ -141,7 +140,6 @@ namespace FCSCommon.Components
 
         public override void OnPointerEnter(PointerEventData eventData)
         {
-            if (_isSelected) return;
             base.OnPointerEnter(eventData);
             UpdateTextComponent(IsTextMode());
             OnInterfaceButton?.Invoke(true);
@@ -150,22 +148,22 @@ namespace FCSCommon.Components
                 switch (this.ButtonMode)
                 {
                     case InterfaceButtonMode.TextScale:
-                        if (TextComponent == null) return;
+                        if (TextComponent == null || IsSelected) return;
                         this.TextComponent.fontSize = this.LargeFont;
                         break;
                     case InterfaceButtonMode.TextColor:
-                        if (TextComponent == null) return;
+                        if (TextComponent == null || IsSelected) return;
                         this.TextComponent.color = this.HOVER_COLOR;
                         break;
                     case InterfaceButtonMode.Background:
                         FindImage();
-                        if (_bgImage != null)
+                        if (_bgImage != null || !IsSelected)
                         {
                             _bgImage.color = this.HOVER_COLOR;
                         }
                         break;
                     case InterfaceButtonMode.BackgroundScale:
-                        if (this.gameObject != null)
+                        if (this.gameObject != null || !IsSelected)
                         {
                             this.gameObject.transform.localScale +=
                                 new Vector3(this.IncreaseButtonBy, this.IncreaseButtonBy, this.IncreaseButtonBy);
@@ -177,9 +175,9 @@ namespace FCSCommon.Components
 
         public override void OnPointerExit(PointerEventData eventData)
         {
-            if (_isSelected) return;
-
             base.OnPointerExit(eventData);
+
+            if (IsSelected) return;
             UpdateTextComponent(IsTextMode());
             OnInterfaceButton?.Invoke(false);
 
@@ -214,12 +212,20 @@ namespace FCSCommon.Components
         {
             base.OnPointerClick(eventData);
 
-            if(!EventSystem.current.IsPointerOverGameObject()) return;
+            if (!EventSystem.current.IsPointerOverGameObject())
+            {
+                QuickLogger.Debug("OnPointerClick Interface Button: IsPointerOverGameObject: False",true);
+                return;
+            }
 
             if (this.IsHovered)
             {
                 QuickLogger.Debug($"Clicked Button: {this.BtnName}", true);
                 OnButtonClick?.Invoke(this.BtnName, this.Tag);
+            }
+            else
+            {
+                QuickLogger.Debug("Is Hovered Returned false",true);
             }
         }
         #endregion
@@ -242,7 +248,7 @@ namespace FCSCommon.Components
         }
         public void Select()
         {
-            _isSelected = true;
+            IsSelected = true;
 
             switch (this.ButtonMode)
             {
@@ -262,7 +268,7 @@ namespace FCSCommon.Components
         }
         public void DeSelect()
         {
-            _isSelected = false;
+            IsSelected = false;
 
             switch (this.ButtonMode)
             {

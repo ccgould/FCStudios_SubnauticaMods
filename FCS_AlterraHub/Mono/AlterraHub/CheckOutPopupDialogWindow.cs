@@ -38,7 +38,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             var backBtn = GameObjectHelpers.FindGameObject(gameObject, "CloseBTN").GetComponent<Button>();
             backBtn.onClick.AddListener(HideDialog);
 
-            CardSystem.main.onBalanceUpdated += balance => { UpdateScreen(); };
+            CardSystem.main.onBalanceUpdated += UpdateScreen;
             _mono.AlterraHubTrigger.onTriggered += value => { UpdateScreen(); };
             
             _isInitialized = true;
@@ -49,6 +49,12 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             var purchaseBTN = GameObjectHelpers.FindGameObject(gameObject, "PurchaseBTN").GetComponent<Button>();
             purchaseBTN.onClick.AddListener(() =>
             {
+                if (!CardSystem.main.HasBeenRegistered())
+                {
+                    QuickLogger.ModMessage(Buildables.AlterraHub.AccountNotFoundFormat());
+                    return;
+                }
+
                 if (CardSystem.main.HasEnough(_cart.GetTotal()))
                 {
                     var result = _mono.MakeAPurchase(_cart);
@@ -70,6 +76,12 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             var purchaseBTN = GameObjectHelpers.FindGameObject(gameObject, "PurchaseExitBTN").GetComponent<Button>();
             purchaseBTN.onClick.AddListener(() =>
             {
+                if (!CardSystem.main.HasBeenRegistered())
+                {
+                    QuickLogger.ModMessage(Buildables.AlterraHub.AccountNotFoundFormat());
+                    return;
+                }
+
                 if (CardSystem.main.HasEnough(_cart.GetTotal()))
                 {
                     var result = _mono.MakeAPurchase(_cart);

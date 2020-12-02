@@ -41,7 +41,7 @@ namespace FCS_AlterraHub.Buildables
                     if (!LoadAsset("TestItem", QPatch.GlobalBundle, out var colorPickerCanvasGo)) return false;
                     ColorPickerDialogPrefab = colorPickerCanvasGo;
 
-                    if (!LoadAsset(Mod.ModPrefabName, QPatch.GlobalBundle, out var prefabGo)) return false;
+                    if (!LoadAsset(Mod.AlterraHubPrefabName, QPatch.GlobalBundle, out var prefabGo)) return false;
                     AlterraHubPrefab = prefabGo;
 
                     if (!LoadAsset(Mod.CardPrefabName, QPatch.GlobalBundle,out var cardPrefabGo)) return false;

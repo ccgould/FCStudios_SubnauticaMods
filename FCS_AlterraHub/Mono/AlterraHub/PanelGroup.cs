@@ -49,7 +49,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
                 return StoreCategory.Energy;
             }
 
-            if (go.name.StartsWith("LifeSupport", StringComparison.OrdinalIgnoreCase))
+            if (go.name.StartsWith("Life", StringComparison.OrdinalIgnoreCase))
             {
                 return StoreCategory.LifeSupport;
             }
@@ -59,7 +59,17 @@ namespace FCS_AlterraHub.Mono.AlterraHub
                 return StoreCategory.Production;
             }
 
-            return go.name.StartsWith("Vehicles", StringComparison.OrdinalIgnoreCase) ? StoreCategory.Vehicles : StoreCategory.None;
+            if (go.name.StartsWith("Storage", StringComparison.OrdinalIgnoreCase))
+            {
+                return StoreCategory.Storage;
+            }
+
+            if (go.name.StartsWith("Misc", StringComparison.OrdinalIgnoreCase))
+            {
+                return StoreCategory.Misc;
+            }
+
+            return go.name.StartsWith("Vehicle", StringComparison.OrdinalIgnoreCase) ? StoreCategory.Vehicles : StoreCategory.None;
         }
 
         private void ShowCurrentPanel()

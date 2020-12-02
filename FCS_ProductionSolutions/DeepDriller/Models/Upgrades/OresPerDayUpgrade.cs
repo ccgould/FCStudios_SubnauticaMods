@@ -26,7 +26,19 @@ namespace FCS_ProductionSolutions.DeepDriller.Models.Upgrades
             return $"os.OresPerDay({OreCount});";
         }
 
-        public override float PowerUsage => QPatch.DeepDrillerMk2Configuration.OrePerDayUpgradePowerUsage + (OreCount * QPatch.DeepDrillerMk2Configuration.OreReductionValue);
+        public override float PowerUsage => CalculatePowerUsage();
+
+        private float CalculatePowerUsage()
+        {
+            if (OreCount == 12)
+            {
+                return 0;
+            }
+
+            return QPatch.DeepDrillerMk3Configuration.OrePerDayUpgradePowerUsage +
+                   (OreCount * QPatch.DeepDrillerMk3Configuration.OreReductionValue);
+        }
+
         public override float Damage { get; }
 
         public override UpgradeFunctions UpgradeType => UpgradeFunctions.OresPerDay;
@@ -65,7 +77,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Models.Upgrades
                 if (paraResults.Length != 1)
                 {
                     //TODO Show Message Box with error of incorrect parameters
-                    QuickLogger.Message(string.Format(FCSDeepDrillerBuildable.IncorrectAmountOfParameterFormat(),"1", paraResults.Length), true);
+                    QuickLogger.Message(FCSDeepDrillerBuildable.IncorrectAmountOfParameterFormat("1", paraResults.Length), true);
                     return false;
                 }
 
@@ -75,7 +87,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Models.Upgrades
                 }
                 else
                 {
-                    QuickLogger.Message(string.Format(FCSDeepDrillerBuildable.IncorrectParameterFormat(),"INT", "OS.OresPerDay(10);"), true);
+                    QuickLogger.Message(FCSDeepDrillerBuildable.IncorrectParameterFormat("INT", "OS.OresPerDay(10);"), true);
                     return false;
                 }
             }

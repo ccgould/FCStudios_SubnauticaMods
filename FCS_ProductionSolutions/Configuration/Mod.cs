@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using FCS_AlterraHub.Mono;
+using FCS_AlterraHub.Registration;
 using FCSCommon.Extensions;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
@@ -21,6 +22,7 @@ namespace FCS_ProductionSolutions.Configuration
         private static SaveData _saveData;
         private static List<TechType> _hydroponicKnownTech;
         private static TechType _sandBagTechType;
+        private static TechType _alterraStorageTechType;
 
         #endregion
 
@@ -46,13 +48,13 @@ namespace FCS_ProductionSolutions.Configuration
         internal static string MatterAnalyzerPrefabName => MatterAnalyzerModName;
 
 
-        internal const string DeepDrillerMk2TabID = "DD";
-        internal const string DeepDrillerMk2FriendlyName = "Deep Driller MK2";
-        internal const string DeepDrillerMk2ModName = "DeepDrillerMK2";
-        internal static string DeepDrillerMk2KitClassID => $"{DeepDrillerMk2ClassName}_Kit";
-        internal const string DeepDrillerMk2ClassName = "DeepDrillerMk2";
-        internal const string DeepDrillerMk2PrefabName = "AlterraDeepDriller";
-        internal const string DeepDrillerMk2Description = "Let's dig down to the deep down deep dark! A deep driller allows you to collect specific ores from biomes.";
+        internal const string DeepDrillerMk3TabID = "DD";
+        internal const string DeepDrillerMk3FriendlyName = "Deep Driller MK3";
+        internal const string DeepDrillerMk3ModName = "DeepDrillerMK3";
+        internal static string DeepDrillerMk3KitClassID => $"{DeepDrillerMk3ClassName}_Kit";
+        internal const string DeepDrillerMk3ClassName = "DeepDrillerMk3";
+        internal const string DeepDrillerMk3PrefabName = "DeepDrillerMK3";
+        internal const string DeepDrillerMk3Description = "Let's dig down to the deep down deep dark! A deep driller allows you to collect specific ores from biomes.";
         internal const string SandSpawnableClassID = "Sand_DD";
 
 
@@ -94,11 +96,13 @@ namespace FCS_ProductionSolutions.Configuration
 
                 SaveData newSaveData = new SaveData();
 
-                var controllers = GameObject.FindObjectsOfType<MonoBehaviour>().OfType<IFCSSave<SaveData>>();
-
-                foreach (var controller in controllers)
+                foreach (var controller in FCSAlterraHubService.PublicAPI.GetRegisteredDevices())
                 {
-                    controller.Save(newSaveData);
+                    if (controller.Value.PackageId == ModName)
+                    {
+                        QuickLogger.Debug($"Saving device: {controller.Value.UnitID}");
+                        ((IFCSSave<SaveData>)controller.Value).Save(newSaveData);
+                    }
                 }
 
                 newSaveData.HydroponicHarvesterKnownTech = _hydroponicKnownTech;
@@ -159,7 +163,7 @@ namespace FCS_ProductionSolutions.Configuration
             return new HydroponicHarvesterDataEntry() { ID = id };
         }
 
-        internal static DeepDrillerMk2SaveDataEntry  GetDeepDrillerMK2SaveData(string id)
+        internal static DeepDrillerSaveDataEntry  GetDeepDrillerMK2SaveData(string id)
         {
             LoadData();
 
@@ -175,7 +179,7 @@ namespace FCS_ProductionSolutions.Configuration
                 }
             }
 
-            return new DeepDrillerMk2SaveDataEntry() { Id = id };
+            return new DeepDrillerSaveDataEntry() { Id = id };
         }
 
         internal static MatterAnalyzerDataEntry GetMatterAnalyzerSaveData(string id)
@@ -241,6 +245,16 @@ namespace FCS_ProductionSolutions.Configuration
                 _hydroponicKnownTech = new List<TechType>();
             }
             return _hydroponicKnownTech.Contains(techType);
+        }
+
+        public static TechType AlterraStorageTechType()
+        {
+            if (_alterraStorageTechType == TechType.None)
+            {
+                _alterraStorageTechType = "AlterraStorage".ToTechType();
+            }
+
+            return _alterraStorageTechType;
         }
     }
 }

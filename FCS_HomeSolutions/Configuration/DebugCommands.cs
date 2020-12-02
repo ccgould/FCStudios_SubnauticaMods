@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
+using FCS_HomeSolutions.QuantumTeleporter.Mono;
 using FCS_HomeSolutions.SeaBreeze.Mono;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Commands;
@@ -27,6 +28,17 @@ namespace FCS_HomeSolutions.Configuration
                 }
             }
             return $"Parameters: {unitID}";
+        }
+
+        [ConsoleCommand("setallglobal")]
+        public static string SetAllGlobal(bool setGlobal)
+        {
+            foreach (KeyValuePair<string, FcsDevice> device in FCSAlterraHubService.PublicAPI.GetRegisteredDevicesOfId(Mod.QuantumTeleporterTabID))
+            {
+                var controller = device.Value.gameObject.GetComponent<QuantumTeleporterController>();
+                controller.IsGlobal = setGlobal;
+            }
+            return $"Parameters: {setGlobal}";
         }
     }
 }

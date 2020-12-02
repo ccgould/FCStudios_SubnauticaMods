@@ -19,7 +19,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         public Action<FcsDevice, TechType> OnContainerRemoveItem { get; set; }
         public bool IsFull { get; }
         private const float KDayInSeconds = 1200f;
-        private readonly float _setOilTime = KDayInSeconds * QPatch.DeepDrillerMk2Configuration.OilTimePeriodInDays;
+        private readonly float _setOilTime = KDayInSeconds * QPatch.DeepDrillerMk3Configuration.OilTimePeriodInDays;
         private float _timeLeft;
         private float _elapsed;
         internal Action OnOilUpdate { get; set; }
@@ -27,7 +27,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         private void Update()
         {
             if (_mono == null || _mono.DeepDrillerPowerManager == null) return;
-            if (QPatch.DeepDrillerMk2Configuration.HardCoreMode)
+            if (QPatch.DeepDrillerMk3Configuration.HardCoreMode)
             {
                 if (_mono.DeepDrillerPowerManager.IsPowerAvailable() && _timeLeft > 0)
                 {
@@ -51,7 +51,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         internal void Initialize(FCSDeepDrillerController mono)
         {
             _mono = mono;
-            _timeLeft = _setOilTime;
+            _timeLeft = 0f;
         }
 
         internal void SetOilTimeLeft(float amount)
@@ -66,12 +66,12 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         
         internal void ReplenishOil()
         {
-            _timeLeft = Mathf.Clamp(_timeLeft + (KDayInSeconds * QPatch.DeepDrillerMk2Configuration.OilRestoresInDays), 0, _setOilTime);
+            _timeLeft = Mathf.Clamp(_timeLeft + (KDayInSeconds * QPatch.DeepDrillerMk3Configuration.OilRestoresInDays), 0, _setOilTime);
         }
 
         internal float GetOilPercent()
         {
-            return QPatch.DeepDrillerMk2Configuration.HardCoreMode ?  _timeLeft / _setOilTime : 1f;
+            return QPatch.DeepDrillerMk3Configuration.HardCoreMode ?  _timeLeft / _setOilTime : 1f;
         }
 
         public bool CanBeStored(int amount, TechType techType)
@@ -91,13 +91,13 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         {
             if (pickupable.GetTechType() != TechType.Lubricant)
             {
-                QuickLogger.Message(FCSDeepDrillerBuildable.ItemNotAllowed(),true);
+                QuickLogger.Message(FCSDeepDrillerBuildable.NotAllowedItem(),true);
                 return false;
             }
 
             if (!CanBeStored(_mono.OilDumpContainer.GetCount(), TechType.Lubricant))
             {   
-                QuickLogger.Message(string.Format(FCSDeepDrillerBuildable.OilTankNotEmpty(),TimeTilRefuel()), true);
+                QuickLogger.Message(FCSDeepDrillerBuildable.OilTankNotFormatEmpty(TimeTilRefuel()), true);
                 return false;
             }
 
@@ -145,7 +145,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
 
         internal bool HasOil()
         {
-            return !QPatch.DeepDrillerMk2Configuration.HardCoreMode || _timeLeft > 0;
+            return !QPatch.DeepDrillerMk3Configuration.HardCoreMode || _timeLeft > 0;
         }
     }
 }

@@ -4,6 +4,8 @@ using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Objects;
 using FCS_HomeSolutions.HoverLiftPad.Mono;
+using FCS_HomeSolutions.QuantumTeleporter.Enumerators;
+using FCS_HomeSolutions.TrashRecycler.Model;
 using Oculus.Newtonsoft.Json;
 using UnityEngine;
 
@@ -39,6 +41,8 @@ namespace FCS_HomeSolutions.Configuration
         [JsonProperty(PropertyName = "SCOL")] internal ColorVec4 SecondaryColor { get; set; }
         [JsonProperty] internal bool PlayerLocked { get; set; }
         [JsonProperty] internal bool ExosuitLocked { get; set; }
+        [JsonProperty(PropertyName = "BID")] internal string BaseID { get; set; }
+
     }
 
     internal class PlanterDataEntry
@@ -48,6 +52,8 @@ namespace FCS_HomeSolutions.Configuration
         [JsonProperty(PropertyName = "SCOL")] internal ColorVec4 SecondaryColor { get; set; }
         [JsonProperty(PropertyName = "LUMCOL")] internal ColorVec4 LUMColor { get; set; }
         [JsonProperty]  internal byte[] Bytes { get; set; }
+        [JsonProperty(PropertyName = "BID")] internal string BaseID { get; set; }
+
     }
 
     internal class MiniFountainFilterDataEntry
@@ -57,6 +63,8 @@ namespace FCS_HomeSolutions.Configuration
         [JsonProperty] internal float TankLevel { get; set; }
         [JsonProperty] internal int ContainerAmount { get; set; }
         [JsonProperty] internal bool IsInSub { get; set; }
+        [JsonProperty(PropertyName = "BID")] internal string BaseID { get; set; }
+
     }
 
     internal class SeaBreezeDataEntry
@@ -68,6 +76,34 @@ namespace FCS_HomeSolutions.Configuration
         [JsonProperty] internal ColorVec4 BodyColor { get; set; }
         [JsonProperty] internal PowercellData PowercellData { get; set; }
         [JsonProperty] internal bool IsVisible { get; set; }
+        [JsonProperty(PropertyName = "BID")] internal string BaseID { get; set; }
+
+    }
+
+    internal class TrashRecyclerDataEntry
+    {
+        [JsonProperty] internal string Id { get; set; }
+        [JsonProperty(PropertyName = "COL")] internal ColorVec4 Color { get; set; }
+        [JsonProperty(PropertyName = "SCOL")] internal ColorVec4 SecondaryColor { get; set; }
+        [JsonProperty(PropertyName = "BID")] internal string BaseID { get; set; }
+        [JsonProperty(PropertyName = "Data")] internal byte[] Storage { get; set; }
+        public bool IsRecycling { get; set; }
+        public float CurrentTime { get; set; }
+        public IEnumerable<string> QueuedItems { get; set; }
+        [JsonProperty(PropertyName = "DropData")] internal byte[] DropStorage { get; set; }
+    }
+
+    internal class QuantumTeleporterDataEntry
+    {
+        [JsonProperty] internal string Id { get; set; }
+        [JsonProperty(PropertyName = "COL")] internal ColorVec4 Color { get; set; }
+        [JsonProperty(PropertyName = "SCOL")] internal ColorVec4 SecondaryColor { get; set; }
+        [JsonProperty(PropertyName = "BID")] internal string BaseID { get; set; }
+        [JsonProperty] internal string UnitName { get; set; }
+        [JsonProperty] internal bool IsGlobal { get; set; }
+        [JsonProperty] internal QTTeleportTypes SelectedTab { get; set; }
+        [JsonProperty] internal string LinkedPortal { get; set; }
+        [JsonProperty] internal bool IsLinked { get; set; }
     }
 
 
@@ -82,5 +118,7 @@ namespace FCS_HomeSolutions.Configuration
         [JsonProperty] internal List<PaintToolDataEntry> PaintToolEntries = new List<PaintToolDataEntry>();
         [JsonProperty] internal List<PlanterDataEntry> PlanterEntries = new List<PlanterDataEntry>();
         [JsonProperty] internal List<MiniFountainFilterDataEntry> MiniFountainFilterEntries = new List<MiniFountainFilterDataEntry>();
+        [JsonProperty] internal List<TrashRecyclerDataEntry> TrashRecyclerEntries = new List<TrashRecyclerDataEntry>();
+        [JsonProperty] internal List<QuantumTeleporterDataEntry> QuantumTeleporterEntries = new List<QuantumTeleporterDataEntry>();
     }
 }

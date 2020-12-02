@@ -28,6 +28,11 @@ namespace FCS_EnergySolutions.JetStreamT242.Mono
 
         #region Unity Methods       
 
+        private void Start()
+        {
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.JetStreamT242TabID, Mod.ModName);
+        }
+
         private void OnEnable()
         {
             if (_runStartUpOnEnable)
@@ -107,8 +112,6 @@ namespace FCS_EnergySolutions.JetStreamT242.Mono
                 _colorManager = gameObject.AddComponent<ColorManager>();
                 _colorManager.Initialize(gameObject, ModelPrefab.BodyMaterial);
             }
-
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.JetStreamT242TabID);
 
             GameObjectHelpers.FindGameObject(gameObject, "UNITID").GetComponent<Text>().text = $"UnitID: {UnitID}";
             DeActivateTurbine();

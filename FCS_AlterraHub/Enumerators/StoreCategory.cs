@@ -7,6 +7,8 @@
         Energy = 2 ,
         LifeSupport = 3,
         Production = 4,
-        Vehicles = 5
+        Vehicles = 5,
+        Storage = 6,
+        Misc = 7
     }
 }

@@ -35,8 +35,14 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
         
         #region Unity Methods
 
+        private void Start()
+        {
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.HydroponicHarvesterModTabID, Mod.ModName);
+        }
+
         private void OnEnable()
         {
+
             if (_runStartUpOnEnable)
             {
                 if (!IsInitialized)
@@ -94,13 +100,13 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
         public override void Initialize()
         {
             if (IsInitialized) return;
-
+            
             //if (AudioManager == null)
             //{
             //    AudioManager = new AudioManager(gameObject.EnsureComponent<FMOD_CustomLoopingEmitter>());
             //    AudioManager.PlayMachineAudio();
             //}
-            
+
             //onUpdateSound += value =>
             //{
             //    if (value)
@@ -112,7 +118,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
             //        AudioManager.StopMachineAudio();
             //    }
             //};
-            
+
             if (GrowBedManager == null)
             {
                 GrowBedManager = gameObject.AddComponent<GrowBedManager>();
@@ -131,8 +137,8 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
                 InvokeRepeating(nameof(CheckSystem), .5f, .5f);
             }
 
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.HydroponicHarvesterModTabID);
-
+            FCSAlterraHubService.PublicAPI.AddEncyclopediaEntries(GetTechType(), true);
+            
             GameObjectHelpers.FindGameObject(gameObject, "UNITID").GetComponent<Text>().text = $"UNIT ID: {UnitID}";
 
 #if DEBUG

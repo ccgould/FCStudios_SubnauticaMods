@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using FCS_AlterraHub.Mono;
+using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
@@ -16,17 +18,19 @@ namespace FCS_AlterraHub.Configuration
     {
         private static ModSaver _saveObject;
         private static SaveData _saveData;
-        internal static string SaveDataFilename => $"{ModName}SaveData.json";
 
+        internal static string SaveDataFilename => $"{ModName}SaveData.json";
+        
         private const string KnownDevicesFilename = "KnownDevices.json";
         internal const string AssetBundleName = "fcsalterrahubbundle";
         internal const string ModName = "AlterraHub";
-        internal const string ModID = "AHB";
 
-        internal const string ModClassID = "AlterraHub";
-        internal const string ModFriendly = "Alterra Hub";
-        internal const string ModDescription = "AlterraHub your central location for all your Alterra needs!";
-        internal const string ModPrefabName = "AlterraHub";
+
+        internal const string AlterraHubClassID = "AlterraHub";
+        internal const string AlterraHubFriendly = "Alterra Hub";
+        internal const string AlterraHubDescription = "AlterraHub your central location for all your Alterra needs!";
+        internal const string AlterraHubPrefabName = "AlterraHub";
+        internal const string AlterraHubTabID = "AHB";
 
         internal const string KitClassID = "FCSKit";
         internal const string KitFriendly = "FCS Kit";
@@ -102,7 +106,7 @@ namespace FCS_AlterraHub.Configuration
 
         internal static string GetSaveFileDirectory()
         {
-            return Path.Combine(SaveUtils.GetCurrentSaveDataDir(), ModClassID);
+            return Path.Combine(SaveUtils.GetCurrentSaveDataDir(), AlterraHubClassID);
         }
 
         internal static void LoadDevicesData()
@@ -129,9 +133,19 @@ namespace FCS_AlterraHub.Configuration
             }
         }
 
-        private static void OnSaveComplete()
+        internal static void OnSaveComplete()
         {
+            _saveObject?.StartCoroutine(SaveCoroutine());
+        }
 
+        private static IEnumerator SaveCoroutine()
+        {
+            while (SaveLoadManager.main != null && SaveLoadManager.main.isSaving)
+            {
+                yield return null;
+            }
+            GameObject.DestroyImmediate(_saveObject.gameObject);
+            _saveObject = null;
         }
 
         internal static void Save()
@@ -142,11 +156,15 @@ namespace FCS_AlterraHub.Configuration
 
                 SaveData newSaveData = new SaveData();
 
-                var controllers = GameObject.FindObjectsOfType<MonoBehaviour>().OfType<IFCSSave<SaveData>>();
+                QuickLogger.Debug($"Registered Devices Returned: {FCSAlterraHubService.PublicAPI.GetRegisteredDevices().Count}");
 
-                foreach (var controller in controllers)
+                foreach (var controller in FCSAlterraHubService.PublicAPI.GetRegisteredDevices())
                 {
-                    controller.Save(newSaveData);
+                    if (controller.Value.PackageId == ModName)
+                    {
+                        QuickLogger.Debug($"Saving device: {controller.Value.UnitID}");
+                        ((IFCSSave<SaveData>) controller.Value).Save(newSaveData);
+                    }
                 }
 
                 newSaveData.AccountDetails = CardSystem.main.SaveDetails();
@@ -156,7 +174,7 @@ namespace FCS_AlterraHub.Configuration
                 ModUtils.Save<SaveData>(_saveData, SaveDataFilename, GetSaveFileDirectory(), OnSaveComplete);
             }
         }
-
+        
         internal static void LoadData()
         {
             QuickLogger.Info("Loading Save Data...");

@@ -22,7 +22,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Models.Upgrades
             }
         }
 
-        public override float PowerUsage => QPatch.DeepDrillerMk2Configuration.MaxOreCountUpgradePowerUsage;
+        public override float PowerUsage => QPatch.DeepDrillerMk3Configuration.MaxOreCountUpgradePowerUsage;
         public override float Damage { get; } = 0;
         public override UpgradeFunctions UpgradeType => UpgradeFunctions.MaxOreCount;
         public override string FriendlyName => "Max Ore Count";
@@ -62,7 +62,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Models.Upgrades
                 if (paraResults.Length != 2)
                 {
                     //TODO Show Message Box with error of incorrect parameters
-                    QuickLogger.Message(string.Format(FCSDeepDrillerBuildable.IncorrectAmountOfParameterFormat(), "2", paraResults.Length), true);
+                    QuickLogger.Message(FCSDeepDrillerBuildable.IncorrectAmountOfParameterFormat("2", paraResults.Length), true);
                     return false;
                 }
 
@@ -73,7 +73,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Models.Upgrades
                 }
                 else
                 {
-                    QuickLogger.Message(string.Format(FCSDeepDrillerBuildable.IncorrectParameterFormat(), "TechType,INT", "OS.MaxOreCount(Silver,10);"), true);
+                    QuickLogger.Message(FCSDeepDrillerBuildable.IncorrectParameterFormat("TechType,INT", "OS.MaxOreCount(Silver,10);"), true);
                     return false;
                 }
 
@@ -84,7 +84,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Models.Upgrades
                 }
                 else
                 {
-                    QuickLogger.Message(string.Format(FCSDeepDrillerBuildable.NotOreErrorFormat(), paraResults[0]), true);
+                    QuickLogger.Message(FCSDeepDrillerBuildable.NotOreErrorFormat(paraResults[0]), true);
                     return false;
                 }
 

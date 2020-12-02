@@ -42,6 +42,11 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
 
         #region Unity Methods
 
+        private void Start()
+        {
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.MatterAnalyzerTabID, Mod.ModName);
+        }
+
         private void Update()
         {
             ScanItem();
@@ -50,66 +55,7 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
 
             DrawLasers();
         }
-
-        private void DrawLasers()
-        {
-            if (IsInitialized)
-            {
-                for (var i = 0; i < _lasers.Length; i++)
-                {
-                    var lineRenderer = _lasers[i];
-                    lineRenderer.SetPosition(0, lineRenderer.gameObject.transform.position);
-                    lineRenderer.SetPosition(1, _laserEnds[i].transform.position);
-                }
-            }
-        }
-
-        private void ResetScanner()
-        {
-            if (_reset && _scanController != null)
-            {
-                _scanTime -= DayNightCycle.main.deltaTime * _resetMultiplier;
-                var resetPercentage = _scanTime / _maxScanTime;
-                _scanController.SetPercentage(resetPercentage);
-                _percentageTxt.text = $"{(resetPercentage * 100.0f):f2} %";
-                if (_scanTime <= 0)
-                {
-                    _reset = false;
-                    _scanTime = 0f;
-                    StopScanning();
-                }
-            }
-        }
-
-        private void ScanItem()
-        {
-            if (_isScanning && _scanController != null)
-            {
-                _scanTime += DayNightCycle.main.deltaTime;
-                _percentage = _scanTime / _maxScanTime;
-                _scanController.SetPercentage(_percentage);
-                _percentageBar.fillAmount = _percentage;
-                _percentageTxt.text = $"{(_percentage * 100.0f):f2} %";
-
-                if (_scanTime >= _maxScanTime)
-                {
-                    _isScanning = false;
-                    _reset = true;
-                    Mod.AddHydroponicKnownTech(_currentTechType);
-                }
-            }
-        }
-
-        public override float GetPowerUsage()
-        {
-            if (_isScanning)
-            {
-                return 0.2125f;
-            }
-
-            return 0;
-        }
-
+        
         private void OnEnable()
         {
             if (_runStartUpOnEnable)
@@ -183,9 +129,67 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
 #if DEBUG
             QuickLogger.Debug($"Initialized Matter Analyzer {GetPrefabID()}");
 #endif
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.MatterAnalyzerTabID);
 
             IsInitialized = true;
+        }
+
+        private void DrawLasers()
+        {
+            if (IsInitialized)
+            {
+                for (var i = 0; i < _lasers.Length; i++)
+                {
+                    var lineRenderer = _lasers[i];
+                    lineRenderer.SetPosition(0, lineRenderer.gameObject.transform.position);
+                    lineRenderer.SetPosition(1, _laserEnds[i].transform.position);
+                }
+            }
+        }
+
+        private void ResetScanner()
+        {
+            if (_reset && _scanController != null)
+            {
+                _scanTime -= DayNightCycle.main.deltaTime * _resetMultiplier;
+                var resetPercentage = _scanTime / _maxScanTime;
+                _scanController.SetPercentage(resetPercentage);
+                _percentageTxt.text = $"{(resetPercentage * 100.0f):f2} %";
+                if (_scanTime <= 0)
+                {
+                    _reset = false;
+                    _scanTime = 0f;
+                    StopScanning();
+                }
+            }
+        }
+
+        private void ScanItem()
+        {
+            if (_isScanning && _scanController != null)
+            {
+                _scanTime += DayNightCycle.main.deltaTime;
+                _percentage = _scanTime / _maxScanTime;
+                _scanController.SetPercentage(_percentage);
+                _percentageBar.fillAmount = _percentage;
+                _percentageTxt.text = $"{(_percentage * 100.0f):f2} %";
+
+                if (_scanTime >= _maxScanTime)
+                {
+                    _isScanning = false;
+                    _reset = true;
+                    Mod.AddHydroponicKnownTech(_currentTechType);
+                }
+            }
+        }
+
+        public override float GetPowerUsage()
+        {
+            if (_isScanning)
+            {
+                return 0.2125f;
+            }
+
+            return 0;
         }
 
         private void OnStorageOnContainerAddItem(FcsDevice device, TechType techype)

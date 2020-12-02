@@ -19,15 +19,14 @@ namespace FCS_ProductionSolutions.DeepDriller.Buildable
     {
         public override TechGroup GroupForPDA { get; } = TechGroup.ExteriorModules;
         public override TechCategory CategoryForPDA { get; } = TechCategory.ExteriorModule;
-        public override string IconFileName => "FCSDeepDriller.png";
 
-        public override string AssetsFolder { get; } = $"FCS_DeepDriller/Assets";
+        public override string AssetsFolder => Mod.GetAssetFolder();
 
-        public FCSDeepDrillerBuildable() : base(Mod.DeepDrillerMk2ClassName, Mod.DeepDrillerMk2FriendlyName, Mod.DeepDrillerMk2Description)
+        public FCSDeepDrillerBuildable() : base(Mod.DeepDrillerMk3ClassName, Mod.DeepDrillerMk3FriendlyName, Mod.DeepDrillerMk3Description)
         {
             OnFinishedPatching += () =>
             {
-                var deepDrillerMk2Kit = new FCSKit(Mod.DeepDrillerMk2KitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
+                var deepDrillerMk2Kit = new FCSKit(Mod.DeepDrillerMk3KitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 deepDrillerMk2Kit.Patch();
                 FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, deepDrillerMk2Kit.TechType, 30000, StoreCategory.Production);
                 AdditionalPatching();
@@ -62,25 +61,24 @@ namespace FCS_ProductionSolutions.DeepDriller.Buildable
                 constructable.rotationEnabled = true;
                 constructable.forceUpright = true;
                 constructable.placeDefaultDistance = 10f;
+                constructable.placeMaxDistance = 10f;
 
                 // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
                 var lwe = prefab.AddComponent<LargeWorldEntity>();
                 lwe.cellLevel = LargeWorldEntity.CellLevel.Global;
 
-                //var beacon = prefab.AddComponent<Beacon>();
-
-
-                var center = new Vector3(0, 3.106274f, 0);
-                var size = new Vector3(6.85554f, 6.670462f, 7.002856f);
+                var center = new Vector3(-2.384186e-07f, 2.500637f, -0.007555246f);
+                var size = new Vector3(5.605133f, 8.229565f, 5.689059f);
 
                 GameObjectHelpers.AddConstructableBounds(prefab, size,center);
 
-                //beacon.label = "DeepDriller";
-                //prefab.AddComponent<LiveMixin>();
                 prefab.AddComponent<PrefabIdentifier>().ClassId = this.ClassID;
                 prefab.AddComponent<TechTag>().type = TechTypeID;
                 prefab.AddComponent<FMOD_CustomLoopingEmitter>();
                 prefab.AddComponent<FCSDeepDrillerController>();
+
+                //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
+                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModName);
 
             }
             catch (Exception e)
@@ -101,12 +99,13 @@ namespace FCS_ProductionSolutions.DeepDriller.Buildable
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(Mod.DeepDrillerMk2KitClassID.ToTechType(), 1)
+                    new Ingredient(Mod.DeepDrillerMk3KitClassID.ToTechType(), 1)
                 }
             };
             QuickLogger.Debug($"Created Ingredients");
             return customFabRecipe;
         }
+
 #elif BELOWZERO
         protected override RecipeData GetBlueprintRecipe()
         {

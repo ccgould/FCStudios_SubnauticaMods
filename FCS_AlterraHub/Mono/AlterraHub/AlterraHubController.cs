@@ -30,14 +30,20 @@ namespace FCS_AlterraHub.Mono.AlterraHub
         private GameObject _screenBlock;
         private ColorManager _colorManager;
         private DumpContainerSimplified _dumpContainer;
+        private MotorHandler _motorHandler;
 
 
         internal HubTrigger AlterraHubTrigger { get; set; }
         internal AlterraHubDisplay DisplayManager { get; private set; }
-        public MotorHandler MotorHandler { get; private set; }
+
 
         #region Unity Methods
-        
+
+        private void Start()
+        {
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.AlterraHubTabID, Mod.ModName);
+        }
+
         private void Update()
         {
             if (Input.GetKeyDown(KeyCode.Escape) && _isInRange)
@@ -94,12 +100,11 @@ namespace FCS_AlterraHub.Mono.AlterraHub
                 DisplayManager.OnReturnButtonClicked += () => { _dumpContainer.OpenStorage();};
             }
 
-            if (MotorHandler == null)
+            if (_motorHandler == null)
             {
-                MotorHandler = GameObjectHelpers.FindGameObject(gameObject, "RoundSignDisplay01").AddComponent<MotorHandler>();
-                MotorHandler.Initialize(30);
-                //TODO Control motor based off power handler
-                MotorHandler.Start();
+                _motorHandler = GameObjectHelpers.FindGameObject(gameObject, "RoundSignDisplay01").AddComponent<MotorHandler>();
+                _motorHandler.Initialize(30);
+                _motorHandler.Start();
             }
 
             if (_colorManager == null)
@@ -112,8 +117,6 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             //HUD = ui.AddComponent<FCSHUD>();
             //HUD.Move();
             _screenBlock = GameObjectHelpers.FindGameObject(gameObject, "Blocker");
-
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.ModID);
 
             LoadStore();
             
@@ -233,23 +236,26 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             
             foreach (PanelHelper panelHelper in panelGroup.PanelHelpers)
             {
+                QuickLogger.Debug($"Loading Panel: {panelHelper.StoreCategory}:");
                 foreach (var storeItem in FCSAlterraHubService.PublicAPI.GetRegisteredKits())
                 {
+                    QuickLogger.Debug($"Trying to add Store Item  {Language.main.Get(storeItem.Key)} to Panel: {panelHelper.StoreCategory}:");
+
                     if (panelHelper.StoreCategory == storeItem.Value.StoreCategory)
                     {
-                        var item = storeItem.Value;
-                        StoreInventorySystem.AddNewStoreItem(item.TechType,item.Cost);
-                        panelHelper.AddContent(StoreInventorySystem.CreateStoreItem(item.TechType, item.ReceiveTechType, item.StoreCategory, item.Cost, AddToCardCallBack));
+                        StoreInventorySystem.AddNewStoreItem(storeItem.Value);
+                        panelHelper.AddContent(StoreInventorySystem.CreateStoreItem(storeItem.Value, AddToCardCallBack));
+                        QuickLogger.Debug($"Added Store Item  {Language.main.Get(storeItem.Key)} to Panel: {panelHelper.StoreCategory}:");
                     }
                 }
 
-                foreach (CustomStoreItem customStoreItem in QPatch.Configuration.AdditionalStoreItems)
+                foreach (FCSStoreEntry storeItem in QPatch.Configuration.AdditionalStoreItems)
                 {
-                    if (panelHelper.StoreCategory == customStoreItem.Category)
+                    if (panelHelper.StoreCategory == storeItem.StoreCategory)
                     {
-                        QuickLogger.Info($"Item: {customStoreItem.TechType} || Category: {customStoreItem.Category} || Cost: {customStoreItem.Cost}");
-                        StoreInventorySystem.AddNewStoreItem(customStoreItem.TechType, customStoreItem.Cost);
-                        panelHelper.AddContent(StoreInventorySystem.CreateStoreItem(customStoreItem.TechType, customStoreItem.ReturnItemTechType, customStoreItem.Category, customStoreItem.Cost, AddToCardCallBack));
+                        QuickLogger.Info($"Item: {storeItem.TechType} || Category: {storeItem.StoreCategory} || Cost: {storeItem.Cost}");
+                        StoreInventorySystem.AddNewStoreItem(storeItem);
+                        panelHelper.AddContent(StoreInventorySystem.CreateStoreItem(storeItem, AddToCardCallBack));
                     }
                 }
             }
@@ -369,14 +375,14 @@ namespace FCS_AlterraHub.Mono.AlterraHub
 
         public bool AddItemToContainer(InventoryItem item)
         {
-            CardSystem.main.AddFinances(StoreInventorySystem.GetPrice(item.item.GetTechType()));
+            CardSystem.main.AddFinances(StoreInventorySystem.GetPrice(item.item.GetTechType(),true));
             Destroy(item.item.gameObject);
             return true;
         }
 
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
         {
-            return StoreInventorySystem.ValidStoreItem(pickupable.GetTechType());
+            return StoreInventorySystem.StoreHasItem(pickupable.GetTechType(),true);
         }
     }
 }

@@ -60,9 +60,8 @@ namespace FCS_AlterraHub.Mono.AlterraHub
 
                 _mainTotal = GameObjectHelpers.FindGameObject(_homePage, "CreditAmount").GetComponent<Text>();
                 _mainTotal.text = CardSystem.main.GetAccountBalance().ToString("n0");
-                CardSystem.main.onBalanceUpdated += amount =>
-                {
-                    _mainTotal.text = amount.ToString("n0");
+                CardSystem.main.onBalanceUpdated += () => {
+                    _mainTotal.text = CardSystem.main.GetAccountBalance().ToString("n0");
                 };
 
                 //Body

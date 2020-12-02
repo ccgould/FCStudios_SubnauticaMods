@@ -3,8 +3,10 @@ using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Buildables.OutDoorPlanters;
 using FCS_HomeSolutions.Configuration;
 using FCS_HomeSolutions.MiniFountainFilter.Buildables;
+using FCS_HomeSolutions.QuantumTeleporter.Buildable;
 using FCS_HomeSolutions.SeaBreeze.Buildable;
 using FCS_HomeSolutions.Spawnables;
+using FCS_HomeSolutions.TrashReceptacle.Buildable;
 using FCSCommon.Utilities;
 using HarmonyLib;
 using QModManager.API.ModLoading;
@@ -24,6 +26,7 @@ namespace FCS_HomeSolutions
         internal static HoverLiftPadConfig HoverLiftPadConfiguration { get; } = OptionsPanelHandler.Main.RegisterModOptions<HoverLiftPadConfig>();
         internal static MiniFountainConfig MiniFountainFilterConfiguration { get; } = OptionsPanelHandler.Main.RegisterModOptions<MiniFountainConfig>();
         internal static SeaBreezeConfig SeaBreezeConfiguration { get; } = OptionsPanelHandler.Main.RegisterModOptions<SeaBreezeConfig>();
+        internal static QuantumTeleporterConfig QuantumTeleporterConfiguration { get; } = OptionsPanelHandler.Main.RegisterModOptions<QuantumTeleporterConfig>();
 
         [QModPatch]
         public void Patch()
@@ -34,16 +37,7 @@ namespace FCS_HomeSolutions
             ModelPrefab.Initialize();
 
             AuxPatchers.AdditionalPatching();
-
-            //var demo = new DemoBuildingPatch("D3emo", "Demo Pot", "demo", GameObject.CreatePrimitive(PrimitiveType.Cube), new Settings
-            //{
-            //    KitClassID = Mod.SmartPlanterPotKitClassID,
-            //    Size = new Vector3(0.7929468f, 0.3463891f, 0.7625999f),
-            //    Center = new Vector3(0f, 0.2503334f, 0f)
-            //});
-
-            //demo.Patch();
-
+            
             var ahsSweetWaterBar = new SweetWaterBarPatch("ahsSweetWaterBar", "Sweet Water Bar",
                 "All drinks on the house.", ModelPrefab.GetPrefab("SweetWaterBar"), new Settings
                 {
@@ -95,6 +89,14 @@ namespace FCS_HomeSolutions
             var trashReceptacle = new TrashReceptaclePatch();
             trashReceptacle.Patch();
 
+            //Patch Trash Recycler
+            var trashRecycler = new TrashRecyclerPatch();
+            trashRecycler.Patch();
+
+            //Patch Quantum Teleporter
+            var quantumTeleporter = new QuantumTeleporterBuildable();
+            quantumTeleporter.Patch();
+            
             LoadOtherObjects();
 
             var harmony = new Harmony("com.homesolutions.fstudios");

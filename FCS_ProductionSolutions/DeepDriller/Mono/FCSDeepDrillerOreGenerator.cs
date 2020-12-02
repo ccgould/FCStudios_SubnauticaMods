@@ -23,7 +23,6 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         private Random _random2;
         private float _passedTime;
         private HashSet<TechType> _focusOres = new HashSet<TechType>();
-
         private bool IsFocused
         {
             get => _isFocused;
@@ -35,6 +34,25 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         }
 
         public Action<bool> OnIsFocusedChanged { get; set; }
+
+
+        //TODO implement weight system
+        private Dictionary<TechType, int> OreWeight = new Dictionary<TechType, int>
+        {
+            { TechType.Titanium, 90},
+            { TechType.Quartz, 85},
+            { TechType.Salt, 80},
+            { TechType.Copper, 75},
+            { TechType.Silver, 70},
+            { TechType.Lead, 65},
+            { TechType.Gold, 60},
+            { TechType.UraniniteCrystal, 55},
+            { TechType.Magnetite, 50},
+            { TechType.Nickel, 45},
+            { TechType.AluminumOxide, 40},
+            { TechType.Diamond, 35},
+            { TechType.Kyanite, 30},
+        };
 
         private float _secondPerItem;
         private const float DayNight = 1200f;
@@ -206,7 +224,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
 
         public string GetItemsPerDay()
         {
-            return string.Format(FCSDeepDrillerBuildable.ItemsPerDayFormat(), _oresPerDay.ToKiloFormat());
+            return _oresPerDay.ToKiloFormat();
         }
 
         internal void ApplyUpgrade(UpgradeFunction upgrade)
@@ -235,6 +253,11 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         internal void SetBlackListMode(bool toggleState)
         {
             _blacklistMode = toggleState;
+        }
+
+        public bool GetIsDrilling()
+        {
+            return _allowTick;
         }
     }
 }

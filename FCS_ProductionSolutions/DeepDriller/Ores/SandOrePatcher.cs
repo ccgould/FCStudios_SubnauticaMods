@@ -46,7 +46,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Ores
             return prefab;
         }
 
-        public override string AssetsFolder => $"FCS_DeepDriller/Assets";
+        public override string AssetsFolder => Mod.GetAssetFolder();
 
         private static readonly SandSpawnable Singleton = new SandSpawnable();
 

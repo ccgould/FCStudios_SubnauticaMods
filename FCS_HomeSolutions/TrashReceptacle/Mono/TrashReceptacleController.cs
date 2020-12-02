@@ -3,18 +3,25 @@ using System.Text;
 using System.Threading.Tasks;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Mono;
+using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
+using FCS_HomeSolutions.TrashRecycler.Mono;
 using UnityEngine;
 
 namespace FCS_HomeSolutions.TrashReceptacle.Mono
 {
-    internal class TrashReceptacleController : FcsDevice,IHandTarget,IConstructable
+    internal class TrashReceptacleController : FcsDevice, IFCSSave<SaveData>, IHandTarget,IConstructable
     {
         private bool _runStartUpOnEnable;
         private DumpContainer _dumpContainer;
         private TrashStorage _storage;
         private ColorManager _colorManager;
+
+        private void Start()
+        {
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.TrashReceptacleTabID, Mod.ModName);
+        }
 
         private void OnEnable()
         {
@@ -24,6 +31,8 @@ namespace FCS_HomeSolutions.TrashReceptacle.Mono
             {
                 Initialize();
             }
+
+            //TODO Save
             _runStartUpOnEnable = false;
         }
 
@@ -41,7 +50,7 @@ namespace FCS_HomeSolutions.TrashReceptacle.Mono
         {
             if (!IsInitialized || Manager == null) return;
 
-            if(Manager.DeviceBuilt(Mod.RecyclerTabID))
+            if (Manager.DeviceBuilt(Mod.RecyclerTabID))
             {
                 _dumpContainer.OpenStorage();
             }
@@ -54,7 +63,7 @@ namespace FCS_HomeSolutions.TrashReceptacle.Mono
             if (_storage == null)
             {
                 _storage = gameObject.AddComponent<TrashStorage>();
-                _storage.Manager = Manager;
+                _storage.Initialize(this);
             }
 
             if (_dumpContainer == null)
@@ -107,6 +116,11 @@ namespace FCS_HomeSolutions.TrashReceptacle.Mono
         public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
         {
             return _colorManager.ChangeColor(color, mode);
+        }
+
+        public void Save(SaveData newSaveData, ProtobufSerializer serializer = null)
+        {
+            
         }
     }
 }

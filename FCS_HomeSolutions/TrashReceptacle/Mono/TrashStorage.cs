@@ -4,19 +4,26 @@ using System.Linq;
 using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Mono;
 using FCS_HomeSolutions.Configuration;
+using FCS_HomeSolutions.TrashRecycler.Mono;
+using FCSCommon.Utilities;
 using UnityEngine;
 
 namespace FCS_HomeSolutions.TrashReceptacle.Mono
 {
     internal class TrashStorage: MonoBehaviour, IFCSStorage
     {
+        private Recycler _recycler;
+        private FcsDevice _mono;
         public int GetContainerFreeSpace { get; }
         public bool IsFull { get; } = false;
         public Action<int, int> OnContainerUpdate { get; set; }
         public Action<FcsDevice, TechType> OnContainerAddItem { get; set; }
         public Action<FcsDevice, TechType> OnContainerRemoveItem { get; set; }
-        public BaseManager Manager { get; set; }
 
+        internal void Initialize(FcsDevice mono)
+        {
+            _mono = mono;
+        }
 
         public bool CanBeStored(int amount, TechType techType)
         {
@@ -25,26 +32,38 @@ namespace FCS_HomeSolutions.TrashReceptacle.Mono
 
         public bool AddItemToContainer(InventoryItem item)
         {
-            var recycler = FindRecycler();
-            if (recycler != null)
-            {
-                //TODO SendItem to recycler
-                return true;
-            }
-
-            return false;
+            _recycler.AddItem(item);
+            ((TrashRecyclerController)_recycler.Controller).TryStartRecycling();
+            return true;
         }
 
-        private object FindRecycler()
+        private Recycler FindRecycler(Pickupable item)
         {
-            //TODO Change to a recycler no object
-            var recyclers = Manager.GetDevices(Mod.RecyclerTabID).ToArray();
-            return recyclers.Any() ? recyclers[0] : null;
+            var recyclers = _mono.Manager.GetDevices(Mod.RecyclerTabID).ToArray();
+            
+            foreach (FcsDevice device in recyclers)
+            {
+                var trashRecycler = (TrashRecyclerController) device;
+                if (device.IsOperational && trashRecycler.IsAllowedToAdd(item,false))
+                {
+                    return trashRecycler.GetRecycler();
+                }
+            }
+
+            return null;
         }
 
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
         {
-            return true;
+            _recycler = FindRecycler(pickupable);
+            
+            if (_recycler == null)
+            {
+                QuickLogger.Debug($"Failed to locate a Recycler",true);
+                return false;
+            }
+            
+            return _recycler.IsAllowedToAdd(pickupable);
         }
         
         public bool IsAllowedToRemoveItems()

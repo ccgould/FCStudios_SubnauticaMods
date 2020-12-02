@@ -1,203 +1,107 @@
-﻿using SMLHelper.V2.Handlers;
+﻿using System.Collections.Generic;
+using SMLHelper.V2.Handlers;
+using UnityEngine;
 
 namespace FCS_ProductionSolutions.DeepDriller.Buildable
 {
     internal partial class FCSDeepDrillerBuildable
     {
-        private const string StorageLabelKey = "DD_StorageLabel";
-        private const string ItemNotAllowedKey = "DD_ItemNotAllowed";
-        private const string EquipmentLabelKey = "DD_EquipmentLabel";
-        private const string BEquipmentLabelKey = "DD_BEquipmentLabel";
-        private const string DDAttachmentsOnlyKey = "DD_AttachmentsOnly";
-        private const string OnlyPowercellsAllowedKey = "DD_OnlyPowercellsAllowed";
-        private const string OnBatteryHoverTextKey = "DD_OnBatteryHoverText";
-        private const string OPAllowedKey = "DD_OPAllowed";
-        private const string BatteryAttachmentHasBatteriesKey = "DD_BatteryAttachmentHasBatteries";
-        private const string NextPageKey = "DD_NextPage";
-        private const string PrevPageKey = "DD_PrevPage";
-        private const string FocusingKey = "DD_Focusing";
-        private const string FocusKey = "DD_Focus";
-        private const string RemoveAllModulesKey = "DD_RemoveAllAttachments";
-        private const string OneUpgradeAllowedKey = "DD_OneUpgradeAllowed";
-        private const string BiomeKey = "DD_Biome";
-        private const string PowerButtonKey = "DD_PowerBTN";
-        private const string ItemsPerDayFormatKey = "DD_ItemsPerDayFormat";
-        private const string PowerUsageFormatKey = "DD_PowerUsageFormat";
-        private const string ItemsButtonKey = "DD_ItemsButton";
-        private const string MaintenanceButtonKey = "DD_MaintenanceButton";
-        private const string ProgrammingButtonKey = "DD_ProgrammingButton";
-        private const string SettingsButtonKey = "DD_SettingsButton";
-        private const string TakeFormattedKey = "DD_TakeFormatted";
-        private const string OilTankNotEmptyFormatKey = "DD_OilTankNotEmptyFormat";
-        private const string OilTankDumpContainerTitleKey = "DD_OilTankDropContainerTitle";
-        private const string PowercellDumpContainerTitleKey = "DD_PowercellDumpContainerTitle";
-        private const string AddProgramButtonKey = "DD_AddProgramButton";
-        private const string InvalidFunctionFormatKey = "DD_InvalidFunctionFormat";
-        private const string InvalidClassFormatKey = "DD_InvalidClassFormat";
-        private const string IncorrectAmountOfParameterFormatKey = "DD_IncorrectAmountOfParameterFormat";
-        private const string IncorrectParameterFormatKey = "DD_IncorrectParameterFormat";
-        private const string NotOreErrorFormatKey = "DD_NotOreErrorFormat";
-        private const string FilterButtonKey = "DD_FilterButton";
-        private const string ColorButtonKey = "DD_ColorButton";
-        private const string SolarButtonKey = "DD_SolarButton";
-        private const string ExportToggleKey = "DD_ExportToggle";
-        private const string ToggleRangeKey = "DD_ToggleRange";
-        private const string AddOilKey = "DD_AddOil";
-        private const string AddPowerKey = "DD_AddPower";
-
+        private const string ModKey = "DD";
         internal static string BuildableName { get; private set; }
-
         internal static TechType TechTypeID { get; private set; }
         
+        private static readonly Dictionary<string, string> LanguageDictionary = new Dictionary<string, string>
+        {
+            { $"{ModKey}_Stop","STOP"},
+            { $"{ModKey}_ItemNotAllowed","Cannot place this item in here."},
+            { $"{ModKey}_OnlyPowercellsAllowed","Only powercells are allowed."},
+            { $"{ModKey}_NextPage","Next Page"},
+            { $"{ModKey}_PrevPage","Previous Page"},
+            { $"{ModKey}_ItemsButton","Go to inventory page."},
+            { $"{ModKey}_ProgrammingButton","Go to programming page."},
+            { $"{ModKey}_SettingsButton","Go to settings page."},
+            { $"{ModKey}_TakeFormatted","Take {0}"},
+            { $"{ModKey}_OilTankNotEmptyFormat","Cannot add anymore lubricant at this time try again in {0} minutes"},
+            { $"{ModKey}_OilTankDropContainerTitle","Lubricant Tank Dump Receptacle."},
+            { $"{ModKey}_PowercellDumpContainerTitle","PowerCell Draining Receptacle."},
+            { $"{ModKey}_AddProgramButton","Add a upgrade function to the drill."},
+            { $"{ModKey}_InvalidFunctionFormat","Invalid Function: {0}. This function doesn't exist please check the documentation."},
+            { $"{ModKey}_InvalidClassFormat","Invalid Class: {0}. This class doesn't exist please check the documentation."},
+            { $"{ModKey}_IncorrectParameterFormat", "Incorrect type in parameter expected: {0} ex: ({1};) ."},
+            { $"{ModKey}_IncorrectAmountOfParameterFormat", "Incorrect amount of parameters expected {0} got {1}."},
+            { $"{ModKey}_NotOreErrorFormat", "TechType {0} is not an ore."},
+            { $"{ModKey}_FilterButton", "Toggle Filters."},
+            { $"{ModKey}_ToggleRangeButtonToolTip", "Show/Hide Range"},
+            { $"{ModKey}_ExportToggleButtonToolTip", "Toggle export to Alterra Storage."},
+            { $"{ModKey}_AddLubricantButtonToolTip", "Add lubricant to drill."},
+            { $"{ModKey}_AddPowerButtonToolTip", "Add power to drill."},
+            { $"{ModKey}_PowercellDrainButtonToolTip", "Add power from draining powercells."},
+            { $"{ModKey}_LubeRefillButtonToolTip", "Refill lubricant tank."},
+            { $"{ModKey}_LubeRefillButtonDescToolTip", "Refill lubricant tank for the drill to use for operation."},
+            { $"{ModKey}_AlterraStorageButtonToolTip", "Change Alterra Storage connection settings."},
+            { $"{ModKey}_GoToHomeToolTip", "Go to home page."},
+            { $"{ModKey}_GoToSettingsToolTip", "Go to settings page."},
+            { $"{ModKey}_BlackListToggleToolTip", "Blacklist Toggle."},
+            { $"{ModKey}_BlackListDesc", "Toggles the filter list between a Whitelist and a Blacklist."},
+            { $"{ModKey}_AlterraStorageToggleToolTip", "Alterra Storage toggle."},
+            { $"{ModKey}_AlterraStorageToggleDesc", "Toggles whether  the driller exports its items to a nearby Alterra Storage."},
+            { $"{ModKey}_AlterraStorageRangeToggleToolTip", "Alterra Storage Range Viewer Toggle."},
+            { $"{ModKey}_AlterraStorageRangeToggleDesc", "Toggles the range ring that show the search radius for nearby Alterra Storage."},
+            { $"{ModKey}_RemoveAllItems", "Deep Driller is not empty please remove all items to deconstruct."},
+            { $"{ModKey}_ProgrammingAddBTNDesc", "Allows you to add more functionality to your drill with functions."},
+            { $"{ModKey}_ProgrammingTemplateBTN", "Programming Templates."},
+            { $"{ModKey}_ProgrammingTemplateBTNDesc", "Shows all available functions the drill can use."},
+            { $"{ModKey}_OresPerDay", "Ores Per Day:"},
+            { $"{ModKey}_PowerConsumption", "Power Consumption:"},
+            { $"{ModKey}_BiomeFormat", "Current Biome: {0}"},
+            { $"{ModKey}_InventoryStorageFormat", "INVENTORY: Items {0}/{1}"},
+        };
+
+
         private void AdditionalPatching()
         {
             BuildableName = this.FriendlyName;
             TechTypeID = this.TechType;
 
-            LanguageHandler.SetLanguageLine(OnlyPowercellsAllowedKey, "Only powercells are allowed.");
-            LanguageHandler.SetLanguageLine(DDAttachmentsOnlyKey, "Only FCS Deep Driller Attachments allowed!");
-            LanguageHandler.SetLanguageLine(StorageLabelKey, "FCS Deep Driller Receptacle.");
-            LanguageHandler.SetLanguageLine(ItemNotAllowedKey, "Cannot place this item in here.");
-            LanguageHandler.SetLanguageLine(EquipmentLabelKey, "FCS Deep Driller Attachments.");
-            LanguageHandler.SetLanguageLine(BEquipmentLabelKey, "FCS Deep Driller Powercell Attachment Receptacle.");
-            LanguageHandler.SetLanguageLine(OnBatteryHoverTextKey, "Open Powercell Attachment.");
-            LanguageHandler.SetLanguageLine(OPAllowedKey, "Only One Power Attachment Allowed.");
-            LanguageHandler.SetLanguageLine(OneUpgradeAllowedKey, "Only One Upgrade Allowed.");
-            LanguageHandler.SetLanguageLine(BatteryAttachmentHasBatteriesKey, "Battery attachment has powercells cannot remove!");
-            LanguageHandler.SetLanguageLine(NextPageKey, "Next Page");
-            LanguageHandler.SetLanguageLine(PrevPageKey, "Previous Page");
-            LanguageHandler.SetLanguageLine(FocusKey, "FOCUS");
-            LanguageHandler.SetLanguageLine(FocusingKey, "FOCUSING");
-            LanguageHandler.SetLanguageLine(RemoveAllModulesKey, "Please Remove all items from the driller.");
-            LanguageHandler.SetLanguageLine(BiomeKey, "BIOME");
-            LanguageHandler.SetLanguageLine(PowerButtonKey, "Power ON/OFF");
-            LanguageHandler.SetLanguageLine(ItemsPerDayFormatKey, "Items Daily: {0}");
-            LanguageHandler.SetLanguageLine(PowerUsageFormatKey, "Power Usage Per Second: {0}");
-            LanguageHandler.SetLanguageLine(ItemsButtonKey, "Go to inventory page.");
-            LanguageHandler.SetLanguageLine(MaintenanceButtonKey, "Go to maintenance page.");
-            LanguageHandler.SetLanguageLine(ProgrammingButtonKey, "Go to programming page.");
-            LanguageHandler.SetLanguageLine(SettingsButtonKey, "Go to settings page.");
-            LanguageHandler.SetLanguageLine(TakeFormattedKey, "Take {0}");
-            LanguageHandler.SetLanguageLine(OilTankNotEmptyFormatKey, "Cannot add anymore lubricant at this time try again in {0} minutes");
-            LanguageHandler.SetLanguageLine(OilTankDumpContainerTitleKey, "Lubricant Tank Dump Receptacle.");
-            LanguageHandler.SetLanguageLine(PowercellDumpContainerTitleKey, "Powercell Draining Receptacle.");
-            LanguageHandler.SetLanguageLine(AddProgramButtonKey, "Add a upgrade function to the drill.");
-            LanguageHandler.SetLanguageLine(InvalidFunctionFormatKey, "Invalid Function: {0}. This function doesn't exist please check the documentation.");
-            LanguageHandler.SetLanguageLine(InvalidClassFormatKey, "Invalid Class: {0}. This class doesn't exist please check the documentation.");
-            LanguageHandler.SetLanguageLine(IncorrectParameterFormatKey, "Incorrect type in parameter expected: {0} ex: ({1};) .");
-            LanguageHandler.SetLanguageLine(IncorrectAmountOfParameterFormatKey, "Incorrect amount of parameters expected {0} got {1}.");
-            LanguageHandler.SetLanguageLine(NotOreErrorFormatKey, "TechType {0} is not an ore.");
-            LanguageHandler.SetLanguageLine(FilterButtonKey, "Toggle Filters.");
-            LanguageHandler.SetLanguageLine(ColorButtonKey, "Go to color picker page.");
-            LanguageHandler.SetLanguageLine(SolarButtonKey, "Toggle Solar Panels.");
-            LanguageHandler.SetLanguageLine(ToggleRangeKey, "Show/Hide Range");
-            LanguageHandler.SetLanguageLine(ExportToggleKey, "Toggle export to ExStorage.");
-            LanguageHandler.SetLanguageLine(AddOilKey, "Add lubricant to drill.");
-            LanguageHandler.SetLanguageLine(AddPowerKey, "Add power to drill.");
+            foreach (KeyValuePair<string, string> languageEntry in LanguageDictionary)
+            {
+                LanguageHandler.SetLanguageLine(languageEntry.Key, languageEntry.Value);
+            }
         }
 
-        internal static string ItemNotAllowed()
+        private static string GetLanguage(string key)
         {
-            return Language.main.Get(ItemNotAllowedKey);
+            return LanguageDictionary.ContainsKey(key) ? Language.main.Get(LanguageDictionary[key]) : string.Empty;
         }
-        internal static string EquipmentContainerLabel()
-        {
-            return Language.main.Get(EquipmentLabelKey);
-        }
-
-        internal static string BEquipmentContainerLabel()
-        {
-            return Language.main.Get(BEquipmentLabelKey);
-        }
-
-        internal static string OnlyPowercellsAllowed()
-        {
-            return Language.main.Get(OnlyPowercellsAllowedKey);
-        }
-
-        internal static string OnBatteryHoverText()
-        {
-            return Language.main.Get(OnBatteryHoverTextKey);
-        }
-
-        internal static string OnePowerAttachmentAllowed()
-        {
-            return Language.main.Get(OPAllowedKey);
-        }
-
-        internal static string BatteryAttachmentHasBatteries()
-        {
-            return Language.main.Get(BatteryAttachmentHasBatteriesKey);
-        }
-
+        
         internal static string PrevPage()
         {
-            return Language.main.Get(PrevPageKey);
+            return GetLanguage($"{ModKey}_PrevPage");
         }
 
         internal static string NextPage()
         {
-            return Language.main.Get(NextPageKey);
-        }
-
-        internal static string Focusing()
-        {
-            return Language.main.Get(FocusingKey);
-        }
-
-        internal static string Focus()
-        {
-            return Language.main.Get(FocusKey);
-        }
-
-        internal static string RemoveAllItems()
-        {
-            return Language.main.Get(RemoveAllModulesKey);
+            return GetLanguage($"{ModKey}_NextPage");
         }
         
-        internal static string Biome()
+        internal static string InventoryButton()
         {
-            return Language.main.Get(BiomeKey);
-        }
-
-        internal static string PowerButton()
-        {
-            return Language.main.Get(PowerButtonKey);
-        }
-
-        internal static string ItemsPerDayFormat()
-        {
-            return Language.main.Get(ItemsPerDayFormatKey);
-        }
-
-        internal static string PowerUsageFormat()
-        {
-            return Language.main.Get(PowerUsageFormatKey);
-        }
-
-        internal static string ItemsButton()
-        {
-            return Language.main.Get(ItemsButtonKey);
-        }
-
-        internal static string MaintenanceButton()
-        {
-            return Language.main.Get(MaintenanceButtonKey);
+            return GetLanguage($"{ModKey}_ItemsButton");
         }
 
         internal static string ProgrammingButton()
         {
-            return Language.main.Get(ProgrammingButtonKey);
+            return GetLanguage($"{ModKey}_ProgrammingButton");
         }
 
         internal static string SettingsButton()
         {
-            return Language.main.Get(SettingsButtonKey);
+            return GetLanguage($"{ModKey}_GoToSettingsToolTip");
         }
 
-        internal static string TakeFormatted()
+        internal static string TakeFormatted(string item)
         {
-            return Language.main.Get(TakeFormattedKey);
+            return string.Format(GetLanguage($"{ModKey}_TakeFormatted"), item);
         }
 
         internal static string StorageFull()
@@ -205,14 +109,14 @@ namespace FCS_ProductionSolutions.DeepDriller.Buildable
             return Language.main.Get("InventoryFull");
         }
 
-        internal static string OilTankNotEmpty()
+        internal static string OilTankNotFormatEmpty(string time)
         {
-            return Language.main.Get(OilTankNotEmptyFormatKey);
+            return string.Format(GetLanguage($"{ModKey}_OilTankNotEmptyFormat"),time);
         }
 
         internal static string OilDropContainerTitle()
         {
-            return Language.main.Get(OilTankDumpContainerTitleKey);
+            return GetLanguage($"{ModKey}_OilTankDropContainerTitle");
         }
 
         internal static string NotAllowedItem()
@@ -222,71 +126,142 @@ namespace FCS_ProductionSolutions.DeepDriller.Buildable
 
         internal static string PowercellDumpContainerTitle()
         {
-            return Language.main.Get(PowercellDumpContainerTitleKey);
+            return GetLanguage($"{ModKey}_PowercellDumpContainerTitle");
         }
 
         internal static string AddProgramButton()
         {
-            return Language.main.Get(AddProgramButtonKey);
+            return GetLanguage($"{ModKey}_AddProgramButton");
         }
 
-        internal static string InvalidFunctionFormat()
+        internal static string InvalidFunctionFormat(string invalidFunction)
         {
-            return Language.main.Get(InvalidFunctionFormatKey);
+            return string.Format(GetLanguage($"{ModKey}_InvalidFunctionFormat"),invalidFunction);
         }
-        internal static string InvalidClassFormat()
+        
+        internal static string InvalidClassFormat(string invalidClass)
         {
-            return Language.main.Get(InvalidClassFormatKey);
-        }
-
-        internal static string IncorrectParameterFormat()
-        {
-            return Language.main.Get(IncorrectParameterFormatKey);
+            return string.Format(GetLanguage($"{ModKey}_InvalidClassFormat"), invalidClass);
         }
 
-        internal static string IncorrectAmountOfParameterFormat()
+        internal static string IncorrectParameterFormat(string expected,string example)
         {
-            return Language.main.Get(IncorrectAmountOfParameterFormatKey);
+            return string.Format(GetLanguage($"{ModKey}_IncorrectParameterFormat"), expected,example);
         }
 
-        internal static string NotOreErrorFormat()
+        internal static string IncorrectAmountOfParameterFormat(string expected, int amount)
         {
-            return Language.main.Get(NotOreErrorFormatKey);
+            return string.Format(GetLanguage($"{ModKey}_IncorrectAmountOfParameterFormat"),expected, amount);
         }
 
-        internal static string ColorButton()
+        internal static string NotOreErrorFormat(string invalidOreTechType)
         {
-            return Language.main.Get(ColorButtonKey);
+            return string.Format(GetLanguage($"{ModKey}_NotOreErrorFormat"), invalidOreTechType);
         }
 
         internal static string FilterButton()
         {
-            return Language.main.Get(FilterButtonKey);
+            return GetLanguage($"{ModKey}_FilterButton");
         }
 
-        internal static string SolarButton()
+        public static string PowercellDrainButton()
         {
-            return Language.main.Get(SolarButtonKey);
+            return GetLanguage($"{ModKey}_PowercellDrainButtonToolTip");
         }
 
-        internal static string ExportToggleButton()
+        public static string LubeRefillButton()
         {
-            return Language.main.Get(ExportToggleKey);
+            return GetLanguage($"{ModKey}_LubeRefillButtonToolTip");
         }
 
-        internal static string ToggleRangeButton()
+        public static string LubeRefillButtonDesc()
         {
-            return Language.main.Get(ToggleRangeKey);
+            return GetLanguage($"{ModKey}_LubeRefillButtonDescToolTip");
         }
 
-        public static string AddOil()
+        public static string AlterraStorageButton()
         {
-            return Language.main.Get(AddOilKey);
+            return GetLanguage($"{ModKey}_AlterraStorageButtonToolTip");
         }
 
-        public static string AddPower()
+        public static string GoToHome()
         {
-            return Language.main.Get(AddPowerKey);
+            return GetLanguage($"{ModKey}_GoToHomeToolTip");
+        }
+
+        public static string GoToSettings()
+        {
+            return GetLanguage($"{ModKey}_GoToSettingsToolTip");
+        }
+
+        public static string BlackListToggle()
+        {
+            return GetLanguage($"{ModKey}_BlackListToggleToolTip");
+        }
+
+        public static string BlackListToggleDesc()
+        {
+            return GetLanguage($"{ModKey}_BlackListDesc");
+        }
+
+        public static string AlterraStorageToggle()
+        {
+            return GetLanguage($"{ModKey}_AlterraStorageToggleToolTip");
+        }
+
+        public static string AlterraStorageToggleDesc()
+        {
+            return GetLanguage($"{ModKey}_AlterraStorageToggleDesc");
+        }
+
+        public static string AlterraStorageRangeToggle()
+        {
+            return GetLanguage($"{ModKey}_AlterraStorageRangeToggleToolTip");
+        }
+
+        public static string AlterraStorageRangeToggleDesc()
+        {
+            return GetLanguage($"{ModKey}_AlterraStorageRangeToggleDesc");
+        }
+
+        public static string RemoveAllItems()
+        {
+            return GetLanguage($"{ModKey}_RemoveAllItems");
+        }
+
+        public static string AddProgramButtonDec()
+        {
+            return GetLanguage($"{ModKey}_ProgrammingAddBTNDesc");
+        }
+
+        public static string ProgrammingTemplateButton()
+        {
+            return GetLanguage($"{ModKey}_ProgrammingTemplateBTN");
+        }
+
+        public static string ProgrammingTemplateButtonDesc()
+        {
+            return GetLanguage($"{ModKey}_ProgrammingTemplateBTNDesc");
+        }
+
+        public static string OresPerDay()
+        {
+            return GetLanguage($"{ModKey}_OresPerDay");
+        }        
+        
+        public static string PowerConsumption()
+        {
+            return GetLanguage($"{ModKey}_PowerConsumption");
+        }
+
+        public static string BiomeFormat(string biome)
+        {
+            return string.Format(GetLanguage($"{ModKey}_BiomeFormat"), biome);
+        }
+
+        public static string InventoryStorageFormat(int total, int capacity)
+        {
+            return string.Format(GetLanguage($"{ModKey}_InventoryStorageFormat"), total,capacity);
         }
     }
 }

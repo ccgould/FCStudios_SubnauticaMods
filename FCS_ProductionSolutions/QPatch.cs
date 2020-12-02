@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using FCS_AlterraHub.Registration;
 using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.DeepDriller.Buildable;
@@ -7,6 +8,7 @@ using FCS_ProductionSolutions.DeepDriller.Ores;
 using FCS_ProductionSolutions.HydroponicHarvester.Buildable;
 using FCS_ProductionSolutions.MatterAnalyzer.Buildable;
 using FCSCommon.Utilities;
+using HarmonyLib;
 using QModManager.API.ModLoading;
 using SMLHelper.V2.Handlers;
 
@@ -16,7 +18,7 @@ namespace FCS_ProductionSolutions
     public class QPatch
     {
         internal static Config Configuration { get; } = OptionsPanelHandler.Main.RegisterModOptions<Config>();
-        internal static DeepDrillerMk2Config DeepDrillerMk2Configuration { get; } = OptionsPanelHandler.Main.RegisterModOptions<DeepDrillerMk2Config>();
+        internal static DeepDrillerMk2Config DeepDrillerMk3Configuration { get; } = OptionsPanelHandler.Main.RegisterModOptions<DeepDrillerMk2Config>();
         internal static HarvesterConfig HarvesterConfiguration { get; } = OptionsPanelHandler.Main.RegisterModOptions<HarvesterConfig>();
 
         [QModPatch]
@@ -46,9 +48,11 @@ namespace FCS_ProductionSolutions
             //Register debug commands
             ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));
 
+            //Harmony
+            var harmony = new Harmony("com.productionsolutions.fcstudios");
+            harmony.PatchAll(Assembly.GetExecutingAssembly());
+
             QuickLogger.Info($"Finished Patching");
-
-
         }
     }
 }

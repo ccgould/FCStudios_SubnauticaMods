@@ -1,4 +1,7 @@
 ﻿using System;
+using System.IO;
+using System.Text;
+using FCS_ProductionSolutions.DeepDriller.Mono;
 using FCS_ProductionSolutions.HydroponicHarvester.Enumerators;
 using FCS_ProductionSolutions.HydroponicHarvester.Mono;
 using FCSCommon.Extensions;
@@ -82,5 +85,62 @@ namespace FCS_ProductionSolutions.Configuration
 
             return $"Parameters: {mode}";
         }
+
+
+        [ConsoleCommand("cleardrill")]
+        public static string HarvesterModeCommand(int id)
+        {
+            var dd = GameObject.FindObjectsOfType<FCSDeepDrillerController>();
+
+            foreach (FCSDeepDrillerController controller in dd)
+            {
+                QuickLogger.Debug($"Current ID: {controller.UnitID} || Match: DD{id:D3}");
+                if (controller.UnitID.Equals($"DD{id:D3}", StringComparison.OrdinalIgnoreCase))
+                {
+                    controller.EmptyDrill();
+                    break;
+                }
+            }
+
+            return $"Parameters: {id}";
+        }
+
+
+        //[ConsoleCommand("testMe")]
+        //public static void TestMeCommand()
+        //{
+        //    QuickLogger.Debug($"{PDAEncyclopedia.entries.Count}");
+        //    var sb = new StringBuilder();
+        //    foreach (var entry in PDAEncyclopedia.entries)
+        //    {
+        //        PDAEncyclopedia.GetEntryData(entry.Key, out var entryData);
+        //        sb.Append("// --------------------- //");
+        //        sb.Append(Environment.NewLine);
+        //        sb.Append($"Entry:{ entry.Key}");
+        //        sb.Append(Environment.NewLine);
+        //        sb.Append($"Path:{ entryData.path}");
+        //        sb.Append(Environment.NewLine);
+        //        sb.Append($"Key:{ entryData.key}");
+        //        sb.Append(Environment.NewLine);
+        //        sb.Append($"Time Capsule:{ entryData.timeCapsule}");
+        //        sb.Append(Environment.NewLine);
+        //        sb.Append($"Unlocked:{ entryData.unlocked}");
+        //        sb.Append(Environment.NewLine);
+        //        sb.Append($"Nodes:{ entryData.nodes.Length}");
+        //        sb.Append(Environment.NewLine);
+        //        foreach (string dataNode in entryData.nodes)
+        //        {
+        //            sb.Append($"Node:{dataNode}");
+        //            sb.Append(Environment.NewLine);
+        //        }
+        //        sb.Append("// --------------------- //");
+        //        sb.Append(Environment.NewLine);
+        //    }
+
+        //    using (StreamWriter file = new StreamWriter(@"F:\Game Development\EncyclopediaData.txt"))
+        //    {
+        //        file.WriteLine(sb.ToString());
+        //    }
+        //}
     }
 }

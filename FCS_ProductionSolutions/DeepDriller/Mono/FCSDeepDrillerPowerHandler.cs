@@ -26,7 +26,6 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         private PowerRelay _powerRelay;
         private FCSPowerStates _prevPowerState;
         private FCSDeepDrillerController _mono;
-        private bool _initialized;
         private const float MaxDepth = 200f;
         private FCSPowerStates PowerState
         {
@@ -60,7 +59,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         {
             if (_mono == null || _mono.DeepDrillerContainer == null ||
                 _mono.DisplayHandler == null || !_mono.IsConstructed ||
-                !_initialized || _powerBank?.Battery == null) return;
+                !IsInitialized || _powerBank?.Battery == null) return;
 
             ChargeSolarPanel();
             UpdatePowerState();
@@ -69,53 +68,67 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             
             if (_timePassed >= 1)
             {
-                ConsumePower(CalculatePowerUsage());
                 AttemptToChargeBattery();
+                ConsumePower(CalculatePowerUsage());
                 _timePassed = 0.0f;
             }
         }
 
         private void ConsumePower(float amount)
         {
-
-            if (!_mono.IsOperational) return;
-
-            if (_powerRelay != null && _powerRelay.GetPower() >= amount)
-            {
-                _powerRelay.ConsumeEnergy(amount, out float amountConsumed);
-            }
-            else if (_powerBank.SolarPanel >= amount)
-            {
-                _powerBank.SolarPanel -= amount;
-            }
-            else if(_powerBank.Battery.GetCharge() >= amount)
-            {
-                _powerBank.Battery.RemoveCharge(amount);
-                OnBatteryUpdate?.Invoke(_powerBank.Battery);
-            }
+            if (!_mono.IsOperational || !_mono.OreGenerator.GetIsDrilling()) return;
+            
+            _powerBank.Battery.RemoveCharge(amount);
+            QuickLogger.Debug($"Remove {amount} from battery",true);
+            OnBatteryUpdate?.Invoke(_powerBank.Battery);
         }
 
         private void AttemptToChargeBattery()
         {
-            if (GetTotalCharge() <= 0) return;
+            if (GetTotalCharge() <= 0 || _powerBank.Battery.IsFull()) return;
 
-            var amount = QPatch.DeepDrillerMk2Configuration.ChargePullAmount;
+            var amount = _powerBank.Battery.GetCapacity() - _powerBank.Battery.GetCharge();
+            
+            ModifyPower(_powerBank.Thermal, amount, out var thermalConsumed);
+            amount -= thermalConsumed;
+            _powerBank.Battery.AddCharge(thermalConsumed);
 
-            if (_powerRelay != null && _powerRelay.GetPower() >= amount)
+            if (amount <= 0) return;
+
+            ModifyPower(_powerBank.SolarPanel, amount, out var solarConsumed);
+            _powerBank.Battery.AddCharge(solarConsumed);
+
+            if (_powerBank.Battery.IsFull() || amount <= 0) return;
+
+            if (_powerRelay != null && _powerRelay.GetPower() > 0)
             {
                 _powerRelay.ConsumeEnergy(amount, out float amountConsumed);
                 _powerBank.Battery.AddCharge(amountConsumed);
-                OnBatteryUpdate?.Invoke(_powerBank.Battery);
+                amount -= amountConsumed;
             }
-            
-            if (_powerBank.SolarPanel >= amount)
-            {
-                _powerBank.SolarPanel -= amount;
-                _powerBank.Battery.AddCharge(amount);
-                OnBatteryUpdate?.Invoke(_powerBank.Battery);
-            }
+
+            OnBatteryUpdate?.Invoke(_powerBank.Battery);
         }
-        
+
+
+
+        private void ModifyPower(PowercellData devicePower, float amount, out float consumed)
+        {
+            consumed = 0;
+            //First find out how much power the device has
+            if (devicePower.GetCharge() <= 0) return;
+
+            if (devicePower.GetCharge() <= amount)
+            {
+                consumed = devicePower.GetCharge();
+                devicePower.Flush();
+                return;
+            }
+
+            consumed = devicePower.GetCharge() - amount;
+            devicePower.RemoveCharge(consumed);
+        }
+
         private void UpdatePowerState()
         {
             if (PowerState == FCSPowerStates.Tripped) return;
@@ -134,13 +147,10 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
 
         private void ChargeSolarPanel()
         {
-            if (IsSolarExtended())
-            {
-                _powerBank.SolarPanel = Mathf.Clamp(_powerBank.SolarPanel + GetRechargeScalar() * DayNightCycle.main.deltaTime * 0.25f * 10f, 0f, QPatch.DeepDrillerMk2Configuration.SolarCapacity);
-            }
+            _powerBank.SolarPanel.AddCharge(Mathf.Clamp(_powerBank.SolarPanel.GetCharge() + GetRechargeScalar() * DayNightCycle.main.deltaTime * 0.50f * 5f, 0f, _powerBank.SolarPanel.GetCapacity()));
         }
 
-        private float GetRechargeScalar()
+        internal float GetRechargeScalar()
         {
             return this.GetDepthScalar() * this.GetSunScalar();
         }
@@ -172,16 +182,22 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
 
         internal void Initialize(FCSDeepDrillerController mono)
         {
+            if (IsInitialized) return;
             _mono = mono;
-            _powerDraw = QPatch.DeepDrillerMk2Configuration.PowerDraw;
+
+            var thermal = gameObject.EnsureComponent<FCSDeepDrillerThermalController>();
+            thermal.Initialize(_powerBank);
+
+            _powerDraw = QPatch.DeepDrillerMk3Configuration.PowerDraw + 
+                         QPatch.DeepDrillerMk3Configuration.OrePerDayUpgradePowerUsage + 12 * QPatch.DeepDrillerMk3Configuration.OreReductionValue;
             _depthCurve = new AnimationCurve();
             _depthCurve.AddKey(0f, 0f);
             _depthCurve.AddKey(0.4245796f, 0.5001081f);
             _depthCurve.AddKey(1f, 1f);
-            _initialized = true;
+            IsInitialized = true;
         }
 
-        internal void LoadData(DeepDrillerMk2SaveDataEntry data)
+        internal void LoadData(DeepDrillerSaveDataEntry data)
         {
             if (data?.PowerData?.Battery == null) return;
 
@@ -193,15 +209,10 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
                 _powerBank = new DeepDrillerPowerData();
             }
 
+            _powerBank.Thermal = data.PowerData.Thermal;
             _powerBank.SolarPanel = data.PowerData.SolarPanel;
             _powerBank.Battery.AddCharge(data.PowerData.Battery.GetCharge());
             //PullPowerFromRelay = data.PullFromRelay; Disabled to until I decide to make it a toggle option
-
-            if (data.SolarExtended)
-            {
-                ToggleSolarState();
-            }
-
             PowerState = data.PowerState;
         }
 
@@ -212,14 +223,9 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
 
         internal string GetSolarPowerData()
         {
-            return $"Solar panel (sun: {Mathf.RoundToInt(GetRechargeScalar() * 100f)}% charge {Mathf.RoundToInt(_powerBank.SolarPanel)}/{Mathf.RoundToInt(QPatch.DeepDrillerMk2Configuration.SolarCapacity)})";
+            return $"Solar panel (sun: {Mathf.RoundToInt(GetRechargeScalar() * 100f)}% charge {Mathf.RoundToInt(_powerBank.SolarPanel.GetCharge())}/{Mathf.RoundToInt(QPatch.DeepDrillerMk3Configuration.SolarCapacity)})";
         }
-
-        internal void ToggleSolarState()
-        {
-            _mono.AnimationHandler.SetBoolHash(_mono.SolarStateHash, !IsSolarExtended());
-        }
-
+        
         /// <summary>
         /// Add power to the battery from another power source
         /// </summary>
@@ -245,16 +251,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             //Notify the drill of the change
             OnBatteryUpdate?.Invoke(_powerBank.Battery);
         }
-
-        /// <summary>
-        /// Gives the states of the solar panel
-        /// </summary>
-        /// <returns>Returns true if the solar panel is extended.</returns>
-        internal bool IsSolarExtended()
-        {
-            return _mono.AnimationHandler.GetBoolHash(_mono.SolarStateHash);
-        }
-
+        
         /// <summary>
         /// Checks to see if all the conditions are met for being powered
         /// </summary>
@@ -267,7 +264,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         internal float GetTotalCharge()
         {
             if (_powerBank?.Battery == null) return 0f;
-            return (_powerRelay?.GetPower() ?? 0) + _powerBank.Battery.GetCharge() + _powerBank.SolarPanel;
+            return (_powerRelay?.GetPower() ?? 0) + _powerBank.Battery.GetCharge() + _powerBank.SolarPanel.GetCharge() + _powerBank.Thermal.GetCharge();
         }
         
         internal void SetPowerRelay(PowerRelay powerRelay)
@@ -287,7 +284,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
 
         public override float GetDevicePowerCapacity()
         {
-            return QPatch.DeepDrillerMk2Configuration.InternalBatteryCapacity;
+            return QPatch.DeepDrillerMk3Configuration.InternalBatteryCapacity;
         }
         
         public override void TogglePowerState()
@@ -330,8 +327,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             if (!IsPowerAvailable()) return false;
             var amount = CalculatePowerUsage();
 
-            return _powerRelay?.GetPower() >= amount || _powerBank.SolarPanel >= amount ||
-                   _powerBank.Battery.GetCharge() >= amount;
+           return _powerRelay?.GetPower() + _powerBank.SolarPanel.GetCharge() + _powerBank.Thermal.GetCharge() + _powerBank.Battery.GetCharge() >= amount;
         }
 
         internal bool GetPullFromPowerRelay()
@@ -404,6 +400,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         public Action<int, int> OnContainerUpdate { get; set; }
         public Action<FcsDevice, TechType> OnContainerAddItem { get; set; }
         public Action<FcsDevice, TechType> OnContainerRemoveItem { get; set; }
+        public bool IsInitialized { get; set; }
 
         public bool ContainsItem(TechType techType)
         {
@@ -411,5 +408,43 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         }
 
         #endregion
+
+        public float GetSourcePower(DeepDrillerPowerSources powerSource)
+        {
+            switch (powerSource)
+            {
+                case DeepDrillerPowerSources.PowerRelay:
+                    return _powerRelay?.GetPower() ?? 0f;
+                case DeepDrillerPowerSources.Solar:
+                    return _powerBank.SolarPanel.GetCharge();
+                case DeepDrillerPowerSources.Thermal:
+                    return _powerBank.Thermal.GetCharge();
+                default:
+                    return 0f;
+            }
+        }
+
+        public float GetSourcePowerCapacity(DeepDrillerPowerSources powerSource)
+        {
+            switch (powerSource)
+            {
+                case DeepDrillerPowerSources.PowerRelay:
+                    return _powerRelay?.GetMaxPower() ?? 0f;
+                case DeepDrillerPowerSources.Solar:
+                    return _powerBank.SolarPanel.GetCapacity();
+                case DeepDrillerPowerSources.Thermal:
+                    return _powerBank.Thermal.GetCapacity();
+                default:
+                    return 0f;
+            }
+        }
+    }
+
+    internal enum DeepDrillerPowerSources
+    {
+        None,
+        Thermal,
+        Solar,
+        PowerRelay
     }
 }

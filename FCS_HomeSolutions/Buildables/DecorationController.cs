@@ -1,6 +1,7 @@
 ﻿using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Mono;
+using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Configuration;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -14,6 +15,11 @@ namespace FCS_HomeSolutions.Buildables
         private DecorationDataEntry _savedData;
         public ColorManager ColorManager { get; private set; }
         
+        private void Start()
+        {
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.DecorationItemTabId, Mod.ModName);
+        }
+
         private void OnEnable()
         {
             if (_runStartUpOnEnable)
@@ -45,7 +51,7 @@ namespace FCS_HomeSolutions.Buildables
                 ColorManager = gameObject.AddComponent<ColorManager>();
                 ColorManager.Initialize(gameObject,ModelPrefab.BodyMaterial,ModelPrefab.SecondaryMaterial);
             }
-
+            
             IsInitialized = true;
         }
 

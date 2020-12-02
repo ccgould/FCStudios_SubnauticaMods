@@ -71,7 +71,6 @@ namespace FCS_HomeSolutions.Configuration
 
         public Action<int> OnGameModeChanged { get; set; }
     }
-
     
     [Menu("Hover Lift Pad Menu")]
     public class HoverLiftPadConfig : ConfigFile
@@ -83,5 +82,15 @@ namespace FCS_HomeSolutions.Configuration
 
         [Keybind("Lift Pad Down Button")]
         public KeyCode LiftPadDownKeyCode = KeyCode.None;
+    }
+
+    [Menu("Quantum Teleporter Menu")]
+    public class QuantumTeleporterConfig : ConfigFile
+    {
+        public QuantumTeleporterConfig() : base("quantumTeleporterConfig-config", "Configurations") { }
+
+        [JsonProperty] internal float GlobalTeleportPowerUsage { get; set; } = 1500f;
+        [JsonProperty] internal float InternalTeleportPowerUsage { get; set; } = 150f;
+
     }
 }

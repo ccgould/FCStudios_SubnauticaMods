@@ -1,4 +1,5 @@
 ﻿using FCS_AlterraHomeSolutions.Mono.PaintTool;
+using FCS_AlterraHub.Registration;
 using FCSCommon.Utilities;
 using UnityEngine;
 
@@ -12,10 +13,31 @@ namespace FCS_AlterraHub.Mono
     [RequireComponent(typeof(TechTag))]
     public abstract class FcsDevice : MonoBehaviour, IProtoEventListener, IConstructable
     {
+        public virtual void Awake()
+        {
+
+        }
+
+        /// <summary>
+        /// Checks to see if the device can store this item and amount
+        /// </summary>
+        /// <param name="techType"></param>
+        /// <param name="amount"></param>
+        /// <returns></returns>
+        public virtual bool CanBeStored(int amount, TechType techType)
+        {
+            return false;
+        }
+
+        /// <summary>
+        /// The package which this item belongs to
+        /// </summary>
+        public virtual string PackageId { get; set; }
+
         /// <summary>
         /// The prefab id of the base this device is connected to.
         /// </summary>
-        public string BaseId;
+        public virtual string BaseId { get; set; }
 
         /// <summary>
         /// Boolean that represents if the device is visible to the network.
@@ -147,7 +169,22 @@ namespace FCS_AlterraHub.Mono
         public virtual void OnDestroy()
         {
             Manager?.UnRegisterDevice(this);
+            FCSAlterraHubService.PublicAPI.UnRegisterDevice(this);
         }
+
+        /// <summary>
+        /// Refreshes the UI of the device if implemented
+        /// </summary>
+        public virtual void RefreshUI()
+        {
+
+        }
+
+        public virtual bool AddItemToContainer(InventoryItem item)
+        {
+            return false;
+        }
+
     }
 
     public interface IFCSSave<T>

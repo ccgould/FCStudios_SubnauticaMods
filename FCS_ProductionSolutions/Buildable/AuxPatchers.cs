@@ -21,16 +21,19 @@ namespace FCS_ProductionSolutions.Buildable
             }
         }
 
-
+        private static string GetLanguage(string key)
+        {
+            return LanguageDictionary.ContainsKey(key) ? Language.main.Get(LanguageDictionary[key]) : string.Empty;
+        }
 
         internal static string Stop()
         {
-            return Language.main.Get($"{ModKey}_Stop");
+            return GetLanguage( $"{ModKey}_Stop");
         }
         
         internal static string Scan()
         {
-            return Language.main.Get($"{ModKey}_Scan");
+            return GetLanguage($"{ModKey}_Scan");
         }
     }
 }

@@ -208,12 +208,27 @@ namespace FCS_ProductionSolutions.DeepDriller.Managers
         /// <returns></returns>
         private static void AdditionalLoot(ref List<TechType> defaultLoot, string currentBiome)
         {
-            QPatch.DeepDrillerMk2Configuration.Convert();
+            if (currentBiome.Equals("FloatingIsland",StringComparison.OrdinalIgnoreCase))
+            {
+                defaultLoot.Add(TechType.Diamond);
+                defaultLoot.Add(TechType.Titanium);
+                defaultLoot.Add(TechType.Lithium);
+                defaultLoot.Add(TechType.Gold);
+                defaultLoot.Add(TechType.Salt);
+                defaultLoot.Add(TechType.UraniniteCrystal);
+                defaultLoot.Add(TechType.Magnetite);
+                defaultLoot.Add(TechType.Quartz);
+                defaultLoot.Add(TechType.Silver);
+                defaultLoot.Add(TechType.Lead);
+            }
+
+
+            QPatch.DeepDrillerMk3Configuration.Convert();
 #if DEBUG
-            QuickLogger.Debug($"Addition Ore: {QPatch.DeepDrillerMk2Configuration.BiomeOresTechType.Count}");
+            QuickLogger.Debug($"Addition Ore: {QPatch.DeepDrillerMk3Configuration.BiomeOresTechType.Count}");
 #endif
 
-            foreach (KeyValuePair<string, List<TechType>> valuePair in QPatch.DeepDrillerMk2Configuration.BiomeOresTechType)
+            foreach (KeyValuePair<string, List<TechType>> valuePair in QPatch.DeepDrillerMk3Configuration.BiomeOresTechType)
             {
 #if DEBUG
                 QuickLogger.Debug($"Checking if biomes match {currentBiome} => {valuePair.Key} = {valuePair.Key.Equals(currentBiome,StringComparison.OrdinalIgnoreCase)}");

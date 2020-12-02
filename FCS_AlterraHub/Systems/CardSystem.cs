@@ -37,7 +37,7 @@ namespace FCS_AlterraHub.Systems
         private AccountDetails _accountDetails = new AccountDetails();
         public static CardSystem main = new CardSystem();
         private const decimal AlterraDebit = -3000000;
-        internal Action<decimal> onBalanceUpdated;
+        internal Action onBalanceUpdated;
 
         /// <summary>
         /// Generates a new card number.
@@ -105,12 +105,13 @@ namespace FCS_AlterraHub.Systems
             try
             {
                 _accountDetails.Balance += amount;
-                onBalanceUpdated?.Invoke(_accountDetails.Balance);
                 QuickLogger.ModMessage($"Added {amount} to account new balance is {_accountDetails.Balance}");
+                onBalanceUpdated?.Invoke();
             }
             catch (Exception e)
             {
                 QuickLogger.Error($"[AddFinances]: {e.Message}");
+                QuickLogger.Error($"[AddFinances]: {e.StackTrace}");
                 MessageBoxHandler.main.Show(AlterraHub.ErrorHasOccured());
                 return false;
             }
@@ -129,7 +130,7 @@ namespace FCS_AlterraHub.Systems
             if (HasEnough(amount))
             {
                 _accountDetails.Balance -= amount;
-                onBalanceUpdated?.Invoke(_accountDetails.Balance);
+                onBalanceUpdated?.Invoke();
                 return true;
             }
             
@@ -232,7 +233,7 @@ namespace FCS_AlterraHub.Systems
 
             if (HasBeenRegistered())
             {
-                MessageBoxHandler.main.Show(AlterraHub.AccountCreated());
+                MessageBoxHandler.main.Show(AlterraHub.AccountCreated(GetAccountBalance().ToString("N0")));
                 var newCard = Mod.DebitCardTechType.ToInventoryItem();
                 GenerateNewCard(newCard.item.gameObject.GetComponent<PrefabIdentifier>().Id);
                 PlayerInteractionHelper.GivePlayerItem(newCard);

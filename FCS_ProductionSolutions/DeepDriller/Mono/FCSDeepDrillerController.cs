@@ -1,4 +1,5 @@
-﻿using FCS_AlterraHub.Enumerators;
+﻿using System;
+using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
@@ -11,23 +12,23 @@ using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
+using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_ProductionSolutions.Buildable;
-using SMLHelper.V2.Assets;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 
 namespace FCS_ProductionSolutions.DeepDriller.Mono
 {
-    [RequireComponent(typeof(LineRenderer))]
-    internal class FCSDeepDrillerController : FcsDevice, IFCSSave<SaveData>
+    internal class FCSDeepDrillerController : FcsDevice, IFCSSave<SaveData>, IHandTarget
     {
         #region Private Members
 
-        private DeepDrillerMk2SaveDataEntry _mk2SaveData;
+        private DeepDrillerSaveDataEntry _saveData;
         private Constructable _buildable;
         private List<TechType> _bioData = new List<TechType>();
         private bool _runStartUpOnEnable;
-        private GameObject _laser;
         private bool _allPlateFormsFound;
         private bool PlatformLegsExtended;
         private const int Segments = 50;
@@ -37,7 +38,8 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         private float _currentDistance;
         private bool _noBiomeMessageSent;
         private bool _biomeFoundMessageSent;
-
+        private List<PistonBobbing> _pistons = new List<PistonBobbing>();
+        private StringBuilder _sb;
 
         internal string CurrentBiome { get; set; }
         internal bool IsFromSave { get; set; }
@@ -53,21 +55,28 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         internal AudioManager AudioManager { get; private set; }
         public  FCSDeepDrillerPowerHandler DeepDrillerPowerManager { get;  set; }
         internal FCSDeepDrillerDisplay DisplayHandler { get; private set; }
-        internal int SolarStateHash { get; private set; }
         internal FCSDeepDrillerOreGenerator OreGenerator { get; private set; }
         internal FCSDeepDrillerOilHandler OilHandler { get; set; }
-        internal LaserManager LaserManager { get; private set; }
         internal DumpContainer PowercellDumpContainer { get; set; }
         internal DumpContainer OilDumpContainer { get; set; }
         public ColorManager ColorManager { get; private set; }
         public FCSDeepDrillerUpgradeManager UpgradeManager { get; private set; }
-        public DeepDrillerMk2Config Config => QPatch.DeepDrillerMk2Configuration;
+        public DeepDrillerMk2Config Config => QPatch.DeepDrillerMk3Configuration;
+        public FCSDeepDrillerTransferManager TransferManager { get; set; }
+
         #endregion
 
         #region Unity Methods
 
-        private void OnDestroy()
+        private void Start()
         {
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.DeepDrillerMk3TabID, Mod.ModName);
+            DisplayHandler?.UpdateUnitID();
+        }
+
+        public override void OnDestroy()
+        {
+            base.OnDestroy();
             IsBeingDeleted = true;
         }
 
@@ -82,28 +91,30 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
                     Initialize();
                 }
 
-                if (_mk2SaveData == null)
+                if (_saveData == null)
                 {
                     ReadySaveData();
                 }
 
-                if (IsFromSave && _mk2SaveData != null)
+                if (IsFromSave && _saveData != null)
                 {
-                    DeepDrillerPowerManager.LoadData(_mk2SaveData);
+                    DeepDrillerPowerManager.LoadData(_saveData);
 
-                    DeepDrillerContainer.LoadData(_mk2SaveData.Items);
-                    if (_mk2SaveData.IsFocused)
+                    DeepDrillerContainer.LoadData(_saveData.Items);
+                    if (_saveData.IsFocused)
                     {
-                        OreGenerator.SetIsFocus(_mk2SaveData.IsFocused);
-                        OreGenerator.Load(_mk2SaveData.FocusOres);
+                        OreGenerator.SetIsFocus(_saveData.IsFocused);
+                        OreGenerator.Load(_saveData.FocusOres);
                     }
 
-                    ColorManager.ChangeColor(_mk2SaveData.BodyColor.Vector4ToColor());
-                    CurrentBiome = _mk2SaveData.Biome;
-                    OilHandler.SetOilTimeLeft(_mk2SaveData.OilTimeLeft);
-                    UpgradeManager.Load(_mk2SaveData?.Upgrades);
-                    OreGenerator.SetBlackListMode(_mk2SaveData.IsBlackListMode);
-                    _isRangeVisible = _mk2SaveData.IsRangeVisible;
+                    ColorManager.ChangeColor(_saveData.BodyColor.Vector4ToColor());
+                    ColorManager.ChangeColor(_saveData.SecColor.Vector4ToColor(), ColorTargetMode.Secondary);
+                    CurrentBiome = _saveData.Biome;
+                    OilHandler.SetOilTimeLeft(_saveData.OilTimeLeft);
+                    UpgradeManager.Load(_saveData?.Upgrades);
+                    OreGenerator.SetBlackListMode(_saveData.IsBlackListMode);
+                    _isRangeVisible = _saveData.IsRangeVisible;
+
                 }
 
                 StartCoroutine(TryGetLoot());
@@ -113,20 +124,20 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
 
         private void Update()
         {
-            //if (_line == null) return;
-            //if (_isRangeVisible)
-            //{
-            //    CreatePoints(Mathf.Clamp(_currentDistance + DayNightCycle.main.deltaTime * LerpSpeed * 1, 0, QPatch.DeepDrillerMk2Configuration.DrillExStorageRange));
-            //}
-            //else
-            //{
-            //    for (int i = 0; i < _line.positionCount; i++)
-            //    {
-            //        if (_line.GetPosition(i) != Vector3.zero)
-            //            _line.SetPosition(i, Vector3.zero);
-            //        _currentDistance = 0f;
-            //    }
-            //}
+            if (_line == null) return;
+            if (_isRangeVisible)
+            {
+                CreatePoints(Mathf.Clamp(_currentDistance + DayNightCycle.main.deltaTime * LerpSpeed * 1, 0, QPatch.DeepDrillerMk3Configuration.DrillAlterraStorageRange));
+            }
+            else
+            {
+                for (int i = 0; i < _line.positionCount; i++)
+                {
+                    if (_line.GetPosition(i) != Vector3.zero)
+                        _line.SetPosition(i, Vector3.zero);
+                    _currentDistance = 0f;
+                }
+            }
         }
 
         #endregion
@@ -180,7 +191,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
 
         public void Save(SaveData saveDataList, ProtobufSerializer serializer = null)
         {
-            if (!IsInitialized || _mk2SaveData == null || ColorManager == null || DeepDrillerPowerManager == null ||
+            if (!IsInitialized || ColorManager == null || DeepDrillerPowerManager == null ||
                 DeepDrillerContainer == null || OreGenerator == null || OilHandler == null || 
                 UpgradeManager == null || TransferManager == null)
             {
@@ -188,32 +199,38 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
                 return;
             }
 
-            QuickLogger.Message($"SaveData = {_mk2SaveData}", true);
+            if (_saveData == null)
+            {
+                _saveData = new DeepDrillerSaveDataEntry();
+            }
 
-            _mk2SaveData.Id = GetPrefabID();
-            _mk2SaveData.BodyColor = ColorManager.GetColor().ColorToVector4();
 
-            _mk2SaveData.PowerState = DeepDrillerPowerManager.GetPowerState();
-            _mk2SaveData.PullFromRelay = DeepDrillerPowerManager.GetPullFromPowerRelay();
-            _mk2SaveData.SolarExtended = DeepDrillerPowerManager.IsSolarExtended();
-            _mk2SaveData.PowerData = DeepDrillerPowerManager.SaveData();
+            QuickLogger.Message($"SaveData = {_saveData}", true);
 
-            _mk2SaveData.Items = DeepDrillerContainer.SaveData();
+            _saveData.Id = GetPrefabID();
+            _saveData.BodyColor = ColorManager.GetColor().ColorToVector4();
+            _saveData.SecColor = ColorManager.GetSecondaryColor().ColorToVector4();
 
-            _mk2SaveData.FocusOres = OreGenerator.GetFocuses();
-            _mk2SaveData.IsFocused = OreGenerator.GetIsFocused();
-            _mk2SaveData.IsBlackListMode = OreGenerator.GetInBlackListMode();
+            _saveData.PowerState = DeepDrillerPowerManager.GetPowerState();
+            _saveData.PullFromRelay = DeepDrillerPowerManager.GetPullFromPowerRelay();
+            _saveData.PowerData = DeepDrillerPowerManager.SaveData();
 
-            _mk2SaveData.Biome = CurrentBiome;
+            _saveData.Items = DeepDrillerContainer.SaveData();
 
-            _mk2SaveData.OilTimeLeft = OilHandler.GetOilTimeLeft();
+            _saveData.FocusOres = OreGenerator.GetFocuses();
+            _saveData.IsFocused = OreGenerator.GetIsFocused();
+            _saveData.IsBlackListMode = OreGenerator.GetInBlackListMode();
 
-            _mk2SaveData.Upgrades = UpgradeManager.Save();
+            _saveData.Biome = CurrentBiome;
 
-            _mk2SaveData.IsRangeVisible = _isRangeVisible;
+            _saveData.OilTimeLeft = OilHandler.GetOilTimeLeft();
 
-            _mk2SaveData.AllowedToExport = TransferManager.IsAllowedToExport();
-            saveDataList.DeepDrillerMk2Entries.Add(_mk2SaveData);
+            _saveData.Upgrades = UpgradeManager.Save();
+
+            _saveData.IsRangeVisible = _isRangeVisible;
+
+            _saveData.AllowedToExport = TransferManager.IsAllowedToExport();
+            saveDataList.DeepDrillerMk2Entries.Add(_saveData);
 
         }
 
@@ -239,27 +256,20 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         {
             QuickLogger.Debug($"Initializing");
 
-            var listSolar = new List<GameObject>
-            {
-                GameObjectHelpers.FindGameObject(gameObject, "Cube_2_2"),
-                GameObjectHelpers.FindGameObject(gameObject, "Cube_1_2"),
-                GameObjectHelpers.FindGameObject(gameObject, "Cube_1"),
-                GameObjectHelpers.FindGameObject(gameObject, "Cube_2"),
-                GameObjectHelpers.FindGameObject(gameObject, "Cube_2_3"),
-                GameObjectHelpers.FindGameObject(gameObject, "Cube_1_4"),
-                GameObjectHelpers.FindGameObject(gameObject, "Cube_2_4")
-            };
+            _sb = new StringBuilder();
 
-            foreach (GameObject solarObj in listSolar)
-            {
-                var sController = solarObj.AddComponent<FCSDeepDrillerSolarController>();
-                sController.Setup(this);
-            }
+            //InvokeRepeating(nameof(UpdateDrillShaftSate), 1, 1);
+            //foreach (Transform child in gameObject.transform.FirstOrDefault(x => x.name == "hover_pistons_pumps").transform)
+            //{
+                
+            //}
+            _pistons.Add(gameObject.transform.FirstOrDefault(x => x.name == "hover_piston_pump_01").gameObject.AddComponent<PistonBobbing>());
+            _pistons.Add(gameObject.transform.FirstOrDefault(x => x.name == "hover_piston_pump_02").gameObject.AddComponent<PistonBobbing>());
+            _pistons.Add(gameObject.transform.FirstOrDefault(x => x.name == "hover_piston_pump_03").gameObject.AddComponent<PistonBobbing>());
+            _pistons.Add(gameObject.transform.FirstOrDefault(x => x.name == "hover_piston_pump_04").gameObject.AddComponent<PistonBobbing>());
+            _pistons.Add(gameObject.transform.FirstOrDefault(x => x.name == "hover_piston_pump_05").gameObject.AddComponent<PistonBobbing>());
+            _pistons.Add(gameObject.transform.FirstOrDefault(x => x.name == "hover_piston_pump_06").gameObject.AddComponent<PistonBobbing>());
             
-            SolarStateHash = Animator.StringToHash("SolarState");
-            
-            InvokeRepeating(nameof(UpdateDrillShaftSate), 1, 1);
-
             if (OilHandler == null)
             {
                 OilHandler = gameObject.AddComponent<FCSDeepDrillerOilHandler>();
@@ -282,17 +292,11 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
                 var powerRelay = gameObject.AddComponent<PowerRelay>();
                 DeepDrillerPowerManager.SetPowerRelay(powerRelay);
             }
-            
-            if (LaserManager == null)
-            {
-                LaserManager = new LaserManager();
-                LaserManager.Setup(this);
-            }
 
             if (ColorManager == null)
             {
                 ColorManager = gameObject.AddComponent<ColorManager>();
-                ColorManager.Initialize(gameObject, ModelPrefab.BodyMaterial);
+                ColorManager.Initialize(gameObject, ModelPrefab.BodyMaterial,ModelPrefab.SecondaryMaterial);
             }
 
             AudioManager = new AudioManager(gameObject.GetComponent<FMOD_CustomLoopingEmitter>());
@@ -304,8 +308,8 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             AnimationHandler = gameObject.AddComponent<FCSDeepDrillerAnimationHandler>();
             AnimationHandler.Initialize(this);
 
-            LavaPitHandler = gameObject.AddComponent<FCSDeepDrillerLavaPitHandler>();
-            LavaPitHandler.Initialize(this);
+            //LavaPitHandler = gameObject.AddComponent<FCSDeepDrillerLavaPitHandler>();
+            //LavaPitHandler.Initialize(this);
 
             if (OilDumpContainer == null)
             {
@@ -334,49 +338,43 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
                 UpgradeManager = gameObject.AddComponent<FCSDeepDrillerUpgradeManager>();
                 UpgradeManager.Initialize(this);
             }
-
+            
             _line = gameObject.GetComponent<LineRenderer>();
             _line.SetVertexCount(Segments + 1);
             _line.useWorldSpace = false;
 
-            //if (FCSConnectableDevice == null)
-            //{
-            //    FCSConnectableDevice = gameObject.AddComponent<FcsDevice>();
-            //    FCSConnectableDevice.Initialize(this,DeepDrillerContainer,DeepDrillerPowerManager);
-            //    FCSTechFabricator.FcTechFabricatorService.PublicAPI.RegisterDevice(FCSConnectableDevice, GetPrefabID(),Mod.DeepDrillerTabID);
-            //}
-
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this,Mod.DeepDrillerMk2TabID);
-
             OnGenerate();
+
+            InvokeRepeating(nameof(UpdateDrillShaftState), .5f, .5f);
 
             IsInitialized = true;
 
             QuickLogger.Debug($"Initializing Completed");
         }
 
-        public FCSDeepDrillerTransferManager TransferManager { get; set; }
-
-        private void UpdateDrillShaftSate()
+        private void UpdateDrillShaftState()
         {
-            if (IsOperational)
+            if(!IsConstructed || !IsInitialized) return;
+
+            if (OreGenerator.GetIsDrilling())
             {
-                LaserManager.ChangeLasersState();
-
-                if (IsUnderWater())
-                {
-                    LaserManager.ChangeBubblesState();
-                }
-
+                ChangePistonState();
                 AnimationHandler.DrillState(true);
                 AudioManager.PlayAudio();
             }
             else
             {
-                LaserManager.ChangeLasersState(false);
-                LaserManager.ChangeBubblesState(false);
+                ChangePistonState(false);
                 AnimationHandler.DrillState(false);
                 AudioManager.StopAudio();
+            }
+        }
+
+        private void ChangePistonState(bool isRunning = true)
+        {
+            foreach (var piston in _pistons)
+            {
+                piston.SetState(isRunning);
             }
         }
 
@@ -398,7 +396,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             QuickLogger.Debug("In OnProtoDeserialize");
             var prefabIdentifier = GetComponentInParent<PrefabIdentifier>() ?? GetComponent<PrefabIdentifier>();
             var id = prefabIdentifier?.Id ?? string.Empty;
-            _mk2SaveData = Mod.GetDeepDrillerMK2SaveData(id);
+            _saveData = Mod.GetDeepDrillerMK2SaveData(id);
         }
         
         private IEnumerator TryGetLoot()
@@ -451,13 +449,22 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             QuickLogger.Debug($"Creating Display");
             DisplayHandler = gameObject.AddComponent<FCSDeepDrillerDisplay>();
             DisplayHandler.Setup(this);
-            DisplayHandler.UpdateBiome(CurrentBiome);
-            DisplayHandler.OnIsFocusedChanged(_mk2SaveData.IsFocused);
-            DisplayHandler.UpdateListItemsState(_mk2SaveData?.FocusOres ?? new HashSet<TechType>());
-            if (_mk2SaveData.AllowedToExport)
+            DisplayHandler.RefreshStorageAmount();
+            DisplayHandler.UpdateListItemsState(_saveData?.FocusOres ?? new HashSet<TechType>());
+
+            if (_saveData != null)
             {
-                TransferManager.Toggle();
+                if (_saveData.AllowedToExport)
+                {
+                    TransferManager?.Toggle();
+                }
+
+                if (_saveData != null)
+                {
+                    DisplayHandler.LoadFromSave(_saveData);
+                }
             }
+            
         }
 
         private void OnGenerate()
@@ -467,25 +474,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             QuickLogger.Debug("OnGenerate", true);
             if (!_allPlateFormsFound)
             {
-                var pillar = GameObjectHelpers.FindGameObject(gameObject, "PlatfromLeg")?.AddComponent<Pillar>();
-                pillar?.Instantiate(this);
-
-                var pillar1 = GameObjectHelpers.FindGameObject(gameObject, "PlatfromLeg_2")?.AddComponent<Pillar>();
-                pillar1?.Instantiate(this);
-
-                var pillar2 = GameObjectHelpers.FindGameObject(gameObject, "PlatfromLeg_3")?.AddComponent<Pillar>();
-                pillar2?.Instantiate(this);
-
-                var pillar3 = GameObjectHelpers.FindGameObject(gameObject, "PlatfromLeg_4")?.AddComponent<Pillar>();
-                pillar3?.Instantiate(this);
-
-                var pillar4 = GameObjectHelpers.FindGameObject(gameObject, "PlatfromLeg_5")?.AddComponent<Pillar>();
-                pillar4?.Instantiate(this);
-
-                var pillar5 = GameObjectHelpers.FindGameObject(gameObject, "PlatfromLeg_6")?.AddComponent<Pillar>();
-                pillar5?.Instantiate(this);
-
-                var pillar6 = GameObjectHelpers.FindGameObject(gameObject, "DrillTunnelBase")?.AddComponent<Pillar>();
+                var pillar6 = GameObjectHelpers.FindGameObject(gameObject, "DrillSupportLeg")?.AddComponent<Pillar>();
                 pillar6?.Instantiate(this, true);
                 _allPlateFormsFound = true;
             }
@@ -550,7 +539,6 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
                    DeepDrillerPowerManager.GetPowerState() == FCSPowerStates.Powered &&
                    OilHandler.HasOil() && !DeepDrillerContainer.IsFull;
         
-
         internal bool GetIsRangeVisible()
         {
             return _isRangeVisible;
@@ -561,6 +549,54 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             _isRangeVisible = !_isRangeVisible;
         }
 
+        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
+        {
+            return ColorManager.ChangeColor(color, mode);
+        }
+
         #endregion
+
+        public void EmptyDrill()
+        {
+            DeepDrillerContainer.Clear();
+        }
+
+        public void OnHandHover(GUIHand hand)
+        {
+            if(DeepDrillerPowerManager == null || !DeepDrillerPowerManager.IsInitialized || DisplayHandler == null ||DisplayHandler.IsInteraction()) return;
+
+            if (IsConstructed && IsInitialized)
+            {
+                _sb.Clear();
+                _sb.Append(UnitID);
+                _sb.Append(Environment.NewLine);
+                _sb.Append(Language.main.GetFormat<int, int>("ThermalPlantStatus", Mathf.RoundToInt(DeepDrillerPowerManager.GetSourcePower(DeepDrillerPowerSources.Thermal)), Mathf.RoundToInt(DeepDrillerPowerManager.GetSourcePowerCapacity(DeepDrillerPowerSources.Thermal))));
+                _sb.Append(Environment.NewLine);
+                _sb.Append(Language.main.GetFormat<int, int, int>("SolarPanelStatus", Mathf.RoundToInt(DeepDrillerPowerManager.GetRechargeScalar() * 100f), Mathf.RoundToInt(DeepDrillerPowerManager.GetSourcePower(DeepDrillerPowerSources.Solar)), Mathf.RoundToInt(DeepDrillerPowerManager.GetSourcePowerCapacity(DeepDrillerPowerSources.Solar))));
+
+                HandReticle.main.SetInteractText(_sb.ToString(),false, HandReticle.Hand.None);
+                HandReticle.main.SetIcon(HandReticle.IconType.Info, 1f);
+            }
+        }
+
+        public void OnHandClick(GUIHand hand)
+        {
+
+        }
+    }
+
+    internal class InterfaceInteraction : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+    {
+        public bool IsInRange { get; set; }
+
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            IsInRange = true;
+        }
+
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            IsInRange = false;
+        }
     }
 }

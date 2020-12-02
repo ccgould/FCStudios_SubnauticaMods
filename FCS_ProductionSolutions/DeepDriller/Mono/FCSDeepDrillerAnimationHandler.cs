@@ -1,5 +1,6 @@
-﻿using System.Collections;
-using FCS_AlterraHub.Enumerators;
+﻿using FCS_AlterraHub.Enumerators;
+using FCS_AlterraHub.Mono.OreConsumer;
+using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
 
@@ -10,10 +11,14 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         #region Private Methods
         //private AudioHandler _audioHandler;
         private FCSDeepDrillerController _mono;
-        private bool _checkBootup;
         private int _drillState;
-        private bool _booting;
-        private IEnumerator _bootRoutine;
+        private MotorHandler _radarMotor;
+        private MotorHandler _drillMotor;
+        private AnimationCurve _drillAnimationCurve;
+        private GameObject _drillbit;
+        private bool _allowedToMove;
+        private float maxProgress = 1f;
+        private double _timeStartGrowth;
 
         #endregion
 
@@ -38,16 +43,40 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
                 QuickLogger.Debug("Animator was disabled and now has been enabled");
                 this.Animator.enabled = true;
             }
-
-            //_audioHandler = new AudioHandler(transform);
+            _drillAnimationCurve = new AnimationCurve(new Keyframe(0, 1.686938f), new Keyframe(1, -0.581f));
         }
 
         private void Update()
         {
-            //if (_checkBootup)
-            //{
-            //    BootUp();
-            //}
+            if(!_allowedToMove) return;
+            float progress = this.GetProgress();
+            this.SetPosition(_drillbit.transform,progress);
+            if (progress == 1f)
+            {
+                //this.SpawnGrownModel();
+            }
+        }
+
+        public float GetProgress()
+        {
+            if (this._timeStartGrowth == -1f)
+            {
+                this.SetProgress(0f);
+                return 0f;
+            }
+            return Mathf.Clamp((float)(DayNightCycle.main.timePassed - (double)this._timeStartGrowth) / 30, 0f, this.maxProgress);
+        }
+
+        public void SetProgress(float progress)
+        {
+            progress = Mathf.Clamp(progress, 0f, this.maxProgress);
+            this._timeStartGrowth = DayNightCycle.main.timePassedAsFloat - 30 * progress;
+        }
+
+        public void SetPosition(Transform tr, float progress)
+        {
+            float y = Mathf.Clamp(_drillAnimationCurve.Evaluate(progress), 0, 1.686938f);
+            tr.localPosition = new Vector3(tr.localPosition.x, y, tr.localPosition.z);
         }
 
         #endregion
@@ -126,49 +155,43 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         internal void Initialize(FCSDeepDrillerController mono)
         {
             _mono = mono;
-        }
 
-        internal void BootUp(int pageHash)
-        {
-            _booting = true;
-            _bootRoutine = BootUpCoroutine(pageHash);
-            StartCoroutine(_bootRoutine);
-        }
-
-        private IEnumerator BootUpCoroutine(int pageHash)
-        {
-            while (_booting)
+            if (_radarMotor == null)
             {
-                if (GetIntHash(pageHash) != 1)
-                {
-                    SetIntHash(pageHash, 1);
-                }
-               
-                if (this.Animator.GetCurrentAnimatorStateInfo(3).IsName("DeepDriller_MK2_BootPage") &&
-                    this.Animator.GetCurrentAnimatorStateInfo(3).normalizedTime >= 1.0f)
-                {
-                    if (_mono.DeepDrillerPowerManager.GetPowerState() == FCSPowerStates.Tripped)
-                    {
-                        QuickLogger.Debug("Going to Powered Off.");
-                        SetIntHash(pageHash, 6);
-                    }
-                    else
-                    {
-                        QuickLogger.Debug("Going to home.");
-                        SetIntHash(pageHash, 2);
-                    }
-                    StopCoroutine(_bootRoutine);
-                    _booting = false;
-                }
-                yield return null;
+                _radarMotor = GameObjectHelpers.FindGameObject(gameObject, "radar").AddComponent<MotorHandler>();
+                _radarMotor.Initialize(30);
+                _radarMotor.Start();
+            }
+
+            if (_drillMotor == null)
+            {
+                _drillbit = GameObjectHelpers.FindGameObject(gameObject, "dill_bit_");
+                _drillMotor = _drillbit.AddComponent<MotorHandler>();
+                _drillMotor.Initialize(200);
+                _drillMotor.SetIncreaseRate(20);
             }
         }
 
         #endregion
 
         internal void DrillState(bool state)
-        { 
-            SetIntHash(_drillState,state ? 1:0);
+        {
+            QuickLogger.Debug($"Setting Driller bit state to: {state}",true);
+            if (state)
+            {
+                if (_timeStartGrowth <= 0)
+                {
+                    _timeStartGrowth = DayNightCycle.main.timePassed;
+                }
+
+                _drillMotor.Start();
+                _allowedToMove = true;
+            }
+            else
+            {
+                _drillMotor.Stop();
+                _allowedToMove = false;
+            }
         }
 
         internal bool AnimationIsPlaying(string animationName)
@@ -176,10 +199,6 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             if (Animator == null) return false;
 
             var result = Animator.GetCurrentAnimatorStateInfo(4).IsName(animationName);
-
-
-
-
 
             QuickLogger.Debug($"Animation with hash {animationName} is playing returned {result}",true);
 

@@ -25,16 +25,11 @@ namespace FCS_AlterraHub.Mono.OreConsumer
         public Action<FcsDevice, TechType> OnContainerRemoveItem { get; set; }
         public DumpContainer DumpContainer { get; private set; }
         public override bool IsOperational => CheckIfOperational();
+        public bool IsOnPlatform => Manager?.Habitat != null;
 
         private bool CheckIfOperational()
         {
-            if(IsInitialized && IsConstructed && Manager != null && _oreQueue != null)
-            {
-                if (Manager.HasEnoughPower(GetPowerUsage()) && _oreQueue.Count > 0)
-                {
-                    return true;
-                }
-            }
+            if(IsInitialized && IsConstructed && Manager != null && _oreQueue != null && Manager.HasEnoughPower(GetPowerUsage())) return true;
             return false;
         }
 
@@ -45,12 +40,14 @@ namespace FCS_AlterraHub.Mono.OreConsumer
         public AudioManager AudioManager { get; private set; }
         public Action<bool> onUpdateSound { get; private set; }
         public ColorManager ColorManager { get; private set; }
+        
+
         private Queue<TechType> _oreQueue;
         private const float OreProcessingTime = 90f;
         private float _timeLeft;
         public override float GetPowerUsage()
         {
-            return 0.85f;
+            return _oreQueue?.Count > 0 ? 0.85f : 0;
         }
 
         #region Unity Methods
@@ -63,6 +60,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
         private void Start()
         {
             InvokeRepeating(nameof(UpdateAnimation),1f,1f);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.OreConsumerTabID, Mod.ModName);
         }
 
         private void UpdateAnimation()
@@ -71,11 +69,13 @@ namespace FCS_AlterraHub.Mono.OreConsumer
             {
                 MotorHandler.Start();
                 EffectsManager.ShowEffect();
+                AudioManager.PlayMachineAudio();
             }
             else
             {
                 MotorHandler.Stop();
                 EffectsManager.HideEffect();
+                AudioManager.StopMachineAudio();
             }
         }
 
@@ -148,11 +148,11 @@ namespace FCS_AlterraHub.Mono.OreConsumer
             {
                 DisplayManager = gameObject.AddComponent<OreConsumerDisplay>();
                 DisplayManager.Setup(this);
-
                 DisplayManager.onDumpButtonClicked.AddListener(() =>
                 {
                     DumpContainer.OpenStorage();
                 });
+                DisplayManager.ForceRefresh(CardSystem.main.GetAccountBalance());
             }
 
             if (MotorHandler == null)
@@ -193,12 +193,14 @@ namespace FCS_AlterraHub.Mono.OreConsumer
                 ColorManager.Initialize(gameObject, Buildables.AlterraHub.BodyMaterial);
             }
 
-            CardSystem.main.onBalanceUpdated += amount =>
+
+
+            CardSystem.main.onBalanceUpdated += () =>
             {
-                DisplayManager?.onTotalChanged?.Invoke(amount);
+                DisplayManager?.onTotalChanged?.Invoke(CardSystem.main.GetAccountBalance());
             };
 
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.OreConsumerTabID);
+            DisplayManager?.onTotalChanged?.Invoke(CardSystem.main.GetAccountBalance());
 
 #if DEBUG
             QuickLogger.Debug($"Initialized Ore Consumer {GetPrefabID()}");

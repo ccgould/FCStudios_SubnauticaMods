@@ -87,17 +87,20 @@ namespace FCSCommon.Helpers
             return button;
         }
         
-        internal static GameObject FindGameObject(GameObject gameObject, string name)
+        internal static GameObject FindGameObject(GameObject gameObject, string name, bool throwException = true)
         {
-            var result =  FindObjectRecursion(gameObject, name);
-
+            var result = gameObject.transform.FirstOrDefault(x => x.name == name);
+            
             if (result == null)
             {
-                QuickLogger.Error<InterfaceHelpers>($"Cant find game object {name}");
-                throw new MissingComponentException($"A component cant be found.\nMissing Component: {name}");
+                QuickLogger.Debug($"[InterfaceHelpers] Cant find game object {name} this maybe intentional. throwException {throwException}");
+                if (throwException)
+                {
+                    throw new MissingComponentException($"A component cant be found.\nMissing Component: {name}");
+                }
             }
 
-            return result;
+            return result?.gameObject;
         }
         
         private static GameObject FindObjectRecursion(GameObject gameObject, string name)

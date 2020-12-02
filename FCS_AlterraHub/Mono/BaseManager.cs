@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHub.Patches;
+using FCS_AlterraHub.Registration;
 using FCSCommon.Utilities;
 using UnityEngine;
 
@@ -20,15 +21,17 @@ namespace FCS_AlterraHub.Mono
         private bool _hasBreakerTripped;
         private string _baseName;
         public string BaseID { get; set; }
-        
+        public static Action<BaseManager> OnManagerCreated { get; set; }
         private readonly Dictionary<string, FcsDevice> _registeredDevices;
         private float _timeLeft = 1f;
+        private PowerSystem.Status _prevPowerState;
 
         public SubRoot Habitat { get; set; }
         
         public bool IsVisible { get; set; }
 
         public static List<BaseManager> Managers { get; } = new List<BaseManager>();
+        public Action<PowerSystem.Status> OnPowerStateChanged { get; set; }
 
         #region Default Constructor
 
@@ -40,8 +43,19 @@ namespace FCS_AlterraHub.Mono
             _registeredDevices = new Dictionary<string, FcsDevice>();
             _baseName = GetDefaultName();
             Player_Patch.OnPlayerUpdate += PowerConsumption;
+            Player_Patch.OnPlayerUpdate += PowerStateCheck;
+            
         }
-        
+
+        private void PowerStateCheck()
+        {
+            if (_prevPowerState != Habitat.powerRelay.GetPowerStatus())
+            {
+                _prevPowerState = Habitat.powerRelay.GetPowerStatus();
+                OnPowerStateChanged?.Invoke(Habitat.powerRelay.GetPowerStatus());
+            }
+        }
+
         #endregion
 
         public void ToggleBreaker()
@@ -56,9 +70,10 @@ namespace FCS_AlterraHub.Mono
             QuickLogger.Debug($"Created new base manager with ID {manager.BaseID}",true);
             Managers.Add(manager);
             QuickLogger.Debug($"Manager Count = {Managers.Count}", true);
+            OnManagerCreated?.Invoke(manager);
             return manager;
         }
-
+        
         public static BaseManager FindManager(SubRoot subRoot)
         {
 #if DEBUG
@@ -70,6 +85,7 @@ namespace FCS_AlterraHub.Mono
 
         public static BaseManager FindManager(string instanceID)
         {
+            QuickLogger.Debug($"InstanceID: {instanceID} Base Count: {Managers.Count}");
             var manager = Managers.Find(x => x.BaseID == instanceID);
             return manager;
         }
@@ -181,7 +197,7 @@ namespace FCS_AlterraHub.Mono
 
         public void UnRegisterDevice(FcsDevice device)
         {
-            if(_registeredDevices.ContainsKey(device.UnitID))
+            if (_registeredDevices.ContainsKey(device.UnitID))
                 _registeredDevices?.Remove(device.UnitID);
         }
 
@@ -189,8 +205,10 @@ namespace FCS_AlterraHub.Mono
         {
             foreach (KeyValuePair<string, FcsDevice> device in _registeredDevices)
             {
+                QuickLogger.Debug($"Checking registered devices: Device: {device.Key} || Key {tabID}");
                 if (device.Key.StartsWith(tabID, StringComparison.OrdinalIgnoreCase))
                 {
+                    QuickLogger.Debug($"Key Match",true);
                     yield return device.Value;
                 }
             }

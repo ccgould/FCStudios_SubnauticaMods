@@ -322,7 +322,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
 
             if (!result)
             {
-                QuickLogger.Message(string.Format(FCSDeepDrillerBuildable.InvalidClassFormat(), parts.Length > 0 ? parts[0] : "N/A"), true);
+                QuickLogger.Message(FCSDeepDrillerBuildable.InvalidClassFormat(parts.Length > 0 ? parts[0] : "N/A"), true);
             }
 
             return result;
@@ -353,7 +353,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
                 }
             }
 
-            QuickLogger.Message(string.Format(FCSDeepDrillerBuildable.InvalidFunctionFormat(),methodName), true);
+            QuickLogger.Message(FCSDeepDrillerBuildable.InvalidFunctionFormat(methodName), true);
 
             return false;
         }

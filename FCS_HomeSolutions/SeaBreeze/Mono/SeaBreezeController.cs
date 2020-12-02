@@ -43,6 +43,11 @@ namespace FCS_HomeSolutions.SeaBreeze.Mono
 
         #region Unity Methods
 
+        private void Start()
+        {
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.SeaBreezeTabID, Mod.ModName);
+        }
+
         private void OnEnable()
         {
             if (_runStartUpOnEnable)
@@ -92,8 +97,6 @@ namespace FCS_HomeSolutions.SeaBreeze.Mono
         {
             PageStateHash = Animator.StringToHash("PageState");
             
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.SeaBreezeTabID);
-
             QPatch.SeaBreezeConfiguration.OnGameModeChanged += OnModModeChanged;
 
             if (PrefabId == null)

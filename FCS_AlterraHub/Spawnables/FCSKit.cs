@@ -19,7 +19,7 @@ namespace FCS_AlterraHub.Spawnables
             _iconPath = iconPath;
             OnFinishedPatching += () =>
             {
-                CraftDataHandler.SetEquipmentType(TechType, EquipmentType.Hand);
+                //CraftDataHandler.SetEquipmentType(TechType, EquipmentType.);
             };
         }
         

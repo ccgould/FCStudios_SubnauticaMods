@@ -135,6 +135,7 @@
     <Compile Include="DeepDriller\Models\Upgrades\OresPerDayUpgrade.cs" />
     <Compile Include="DeepDriller\Models\Upgrades\SilkTouchUpgrade.cs" />
     <Compile Include="DeepDriller\Models\Upgrades\UpgradeClass.cs" />
+    <Compile Include="DeepDriller\Mono\DrillInventoryButton.cs" />
     <Compile Include="DeepDriller\Mono\FCSDeepDrillerAnimationHandler.cs" />
     <Compile Include="DeepDriller\Mono\FCSDeepDrillerContainer.cs" />
     <Compile Include="DeepDriller\Mono\FCSDeepDrillerController.cs" />
@@ -148,6 +149,10 @@
     <Compile Include="DeepDriller\Mono\FCSDeepDrillerTransferManager.cs" />
     <Compile Include="DeepDriller\Mono\FCSDeepDrillerUpgradeManager.cs" />
     <Compile Include="DeepDriller\Enumerators\FCSDeepDrillerPages.cs" />
+    <Compile Include="DeepDriller\Mono\FCSDeepDrillerThermalController.cs" />
+    <Compile Include="DeepDriller\Structs\FilterBtnData.cs" />
+    <Compile Include="DeepDriller\Mono\NotificationSystem.cs" />
+    <Compile Include="DeepDriller\Mono\PistonBobbing.cs" />
     <Compile Include="DeepDriller\Ores\SandOrePatcher.cs" />
     <Compile Include="DeepDriller\Patchers\Builder_CheckAsSubModule_Patch.cs" />
     <Compile Include="DeepDriller\Patchers\FCSConnectableAwake_Patcher.cs" />
@@ -174,7 +179,6 @@
       <Name>FCS_AlterraHub</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\FCSCommon\GamePaths.targets" />

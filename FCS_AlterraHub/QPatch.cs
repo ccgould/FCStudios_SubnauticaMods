@@ -6,6 +6,7 @@ using FCS_AlterraHub.Craftables;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Patch;
+using FCS_AlterraHub.Patches;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Spawnables;
 using FCSCommon.Extensions;
@@ -32,7 +33,7 @@ namespace FCS_AlterraHub
         {
             QuickLogger.Info($"Started patching. Version: {QuickLogger.GetAssemblyVersion(Assembly.GetExecutingAssembly())}");
             GlobalBundle = FCSAssetBundlesService.PublicAPI.GetAssetBundleByName(Mod.AssetBundleName);
- 
+            
             QuickLogger.DebugLogsEnabled = Configuration.EnableDebugLogs;
             //Load Prefabs
             AlterraHub.GetPrefabs();
@@ -49,6 +50,7 @@ namespace FCS_AlterraHub
             var harmony = new Harmony("com.alterrahub.fcstudios");
             harmony.PatchAll(Assembly.GetExecutingAssembly());
 
+            
             //Register debug commands
             ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));
         }

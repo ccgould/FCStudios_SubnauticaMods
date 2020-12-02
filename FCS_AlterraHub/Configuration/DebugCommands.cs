@@ -1,5 +1,6 @@
 ﻿using FCS_AlterraHub.Mono.AlterraHub;
 using FCS_AlterraHub.Systems;
+using FCSCommon.Utilities;
 using SMLHelper.V2.Commands;
 using UnityEngine;
 
@@ -7,6 +8,8 @@ namespace FCS_AlterraHub.Configuration
 {
     internal class DebugCommands
     {
+        private static TeleportScreenFXController _teleportEffects;
+
         [ConsoleCommand("givecredit")]
         public static string GiveCreditCommand(double amount)
         {
@@ -28,6 +31,25 @@ namespace FCS_AlterraHub.Configuration
             {
                 hubController.HUD.Open();
             }
+        }
+
+
+        [ConsoleCommand("TeleportEffects")]
+        public static string TeleportPlayerCommand(bool activate)
+        {
+            if (_teleportEffects == null)
+            {
+                _teleportEffects = Player.main.camRoot.mainCam.GetComponentInChildren<TeleportScreenFXController>();
+            }
+            if (activate)
+            {
+                _teleportEffects.StartTeleport();
+            }
+            else
+            {
+                _teleportEffects.StopTeleport();
+            }
+            return $"Parameters: {activate}";
         }
     }
 }

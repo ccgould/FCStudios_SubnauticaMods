@@ -138,11 +138,15 @@
     <Compile Include="Model\FCSGrowingPlant.cs" />
     <Compile Include="Model\Fridge.cs" />
     <Compile Include="Model\PowercellData.cs" />
+    <Compile Include="Model\ProximityActivate.cs" />
     <Compile Include="Mono\AlterraHub\HubTrigger.cs" />
     <Compile Include="Mono\BaseManager.cs" />
     <Compile Include="Mono\Controllers\NameController.cs" />
     <Compile Include="Mono\DumpContainerSimplified.cs" />
     <Compile Include="Mono\FCSAquarium.cs" />
+    <Compile Include="Mono\FCSStorage.cs" />
+    <Compile Include="Mono\ObjectPooler\ButtonPool.cs" />
+    <Compile Include="Mono\ObjectPooler\ObjectPooler.cs" />
     <Compile Include="Objects\ColorList.cs" />
     <Compile Include="Helpers\FCSHUD.cs" />
     <Compile Include="Interfaces\IFCSStorage.cs" />
@@ -174,6 +178,8 @@
     <Compile Include="Patch\EnumTypeCache.cs" />
     <Compile Include="Patch\PDATabPatcher.cs" />
     <Compile Include="Patch\UIPatches.cs" />
+    <Compile Include="Structs\FcsEntryData.cs" />
+    <Compile Include="Structs\FCSStoreEntry.cs" />
     <Compile Include="Spawnables\BioFuelSpawnable.cs" />
     <Compile Include="Enumerators\ModDifficultyMode.cs" />
     <Compile Include="Helpers\PlayerInteractionHelper.cs" />
@@ -187,7 +193,6 @@
     <Compile Include="Registration\FCSAlterraHubService.cs" />
     <Compile Include="Spawnables\DebitCardSpawnable.cs" />
     <Compile Include="Spawnables\FCSKit.cs" />
-    <Compile Include="Structs\CustomStoreItem.cs" />
     <Compile Include="Systems\CardSystem.cs" />
     <Compile Include="Systems\MessageBoxHandler.cs" />
     <Compile Include="Systems\StoreInventorySystem.cs" />

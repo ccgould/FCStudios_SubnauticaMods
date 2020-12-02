@@ -27,7 +27,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
 
         private void Update()
         {
-            if (QPatch.DeepDrillerMk2Configuration.HardCoreMode)
+            if (QPatch.DeepDrillerMk3Configuration.HardCoreMode)
             {
                 _liveMixin.invincible = false;
                 UpdateHealthSystem();
@@ -51,7 +51,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         {
             if (_liveMixin == null) return true;
 
-            if (!QPatch.DeepDrillerMk2Configuration.HardCoreMode) return false;
+            if (!QPatch.DeepDrillerMk3Configuration.HardCoreMode) return false;
 
             return _liveMixin.health <= 0;
         }
@@ -126,7 +126,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         {
             try
             {
-                if (!QPatch.DeepDrillerMk2Configuration.HardCoreMode && GetHealth() <= 0f)
+                if (!QPatch.DeepDrillerMk3Configuration.HardCoreMode && GetHealth() <= 0f)
                 {
                     OnRepaired?.Invoke();
                     _prevHealth = 100;

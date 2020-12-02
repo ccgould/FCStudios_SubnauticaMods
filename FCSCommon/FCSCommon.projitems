@@ -10,6 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Abstract\FCSCraftableController.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Components\FCSToggleButton.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Controllers\AnimationManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Components\ColorItemButton.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Components\CustomToggle.cs" />
@@ -31,6 +32,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\TechTypeExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\AssetHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\GameObjectHelpers.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\GridHelperPooled.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\GridHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\InterfaceHelpers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\LanguageHelpers.cs" />
@@ -54,6 +56,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Utilities\ModSaver.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utilities\ModUtils.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utilities\QuickLogger.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utilities\TechUtil.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="$(MSBuildThisFileDirectory)Exceptions\" />

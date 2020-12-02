@@ -16,8 +16,8 @@ namespace FCS_ProductionSolutions.DeepDriller.Patchers
             
             __result = false;
 
-            if (Builder.placePosition.y > 0 && !Player.main.IsUnderwater())
-                return false;
+            //if (Builder.placePosition.y > 0 && !Player.main.IsUnderwater())
+            //    return false;
 
             Transform aimTransform = Builder.GetAimTransform();
             Builder.placementTarget = null;

@@ -1,6 +1,7 @@
 ﻿using System;
 using FCS_AlterraHub.API;
 using FCS_HomeSolutions.Configuration;
+using FCS_HomeSolutions.TrashRecycler.Mono;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -33,7 +34,10 @@ namespace FCS_HomeSolutions.Buildables
         public static GameObject SeaBreezeItemPrefab { get; set; }
         public static GameObject SeaBreezePrefab { get; set; }
         public static GameObject TrashReceptaclePrefab { get; set; }
+        public static GameObject TrashRecyclerPrefab { get; set; }
         public static GameObject PaintCanPrefab { get; set; }
+        public static GameObject QuantumTeleporterPrefab { get; set; }
+        public static GameObject NetworkItemPrefab { get; set; }
 
         internal static void Initialize()
         {
@@ -56,11 +60,17 @@ namespace FCS_HomeSolutions.Buildables
             MiniFountainFilterPrefab = GetPrefab(Mod.MiniFountainFilterPrefabName);
             SeaBreezePrefab = GetPrefab(Mod.SeaBreezePrefabName);
             TrashReceptaclePrefab = GetPrefab(Mod.TrashReceptaclePrefabName);
+            TrashRecyclerPrefab = GetPrefab(Mod.RecyclerPrefabName);
             PaintCanPrefab = GetPrefab(Mod.PaintCanPrefabName);
+            QuantumTeleporterPrefab = GetPrefab(Mod.QuantumTeleporterPrefabName);
+            TrashRecyclerItemPrefab = GetPrefab("RecyclerItem");
             SeaBreezeItemPrefab = GetPrefab("ARSItem");
+            NetworkItemPrefab = GetPrefab("NetworkItem");
             _initialized = true;
         }
-        
+
+        public static GameObject TrashRecyclerItemPrefab { get; set; }
+
         internal static GameObject GetPrefab(string prefabName)
         {
             try

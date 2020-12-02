@@ -14,14 +14,14 @@ namespace FCSCommon.Helpers
         private int _currentPage;
         private GameObject _itemPrefab;
         private GameObject _itemsGrid;
-        
+
         internal string HomeButtonMessage { get; set; }
         internal Action<DisplayData> OnLoadDisplay { get; set; }
         internal int EndingPosition { get; private set; }
         internal int StartingPosition { get; private set; }
 
         [Obsolete("This method will be removed in upcoming updates please use setup instead")]
-        internal void Initialize(GameObject itemPrefab, GameObject itemsGrid,GameObject pageNumberText, int itemsPerPage, Action<string, object> onButtonClick)
+        internal void Initialize(GameObject itemPrefab, GameObject itemsGrid, GameObject pageNumberText, int itemsPerPage, Action<string, object> onButtonClick)
         {
             _itemPrefab = itemPrefab;
             _itemsGrid = itemsGrid;
@@ -39,10 +39,10 @@ namespace FCSCommon.Helpers
 
             if (prevBtnNAme != string.Empty)
             {
-                var prevBtn = InterfaceHelpers.FindGameObject(gridPage, prevBtnNAme);            
+                var prevBtn = InterfaceHelpers.FindGameObject(gridPage, prevBtnNAme);
                 InterfaceHelpers.CreatePaginator(prevBtn, -1, ChangePageBy, startColor, hoverColor);
             }
-            
+
             #endregion
 
             #region Next Button
@@ -55,15 +55,15 @@ namespace FCSCommon.Helpers
             #endregion
 
             #region HomeButton
-            if(homeBtnName != string.Empty)
+            if (homeBtnName != string.Empty)
             {
                 var homeBTN = InterfaceHelpers.FindGameObject(gridPage, homeBtnName);
                 InterfaceHelpers.CreateButton(homeBTN, string.IsNullOrEmpty(customHomeBTN) ? homeBtnName : customHomeBTN, InterfaceButtonMode.Background,
                     onButtonClick, startColor, hoverColor, maxInteractionRange, HomeButtonMessage);
             }
             #endregion
-            
-            if(paginatorName != string.Empty)
+
+            if (paginatorName != string.Empty)
             {
                 _pageNumberText = InterfaceHelpers.FindGameObject(gridPage, paginatorName)?.GetComponent<Text>();
             }
@@ -74,7 +74,7 @@ namespace FCSCommon.Helpers
 
             DrawPage(1);
         }
-        
+
         internal int GetCurrentPage()
         {
             return _currentPage;
@@ -106,7 +106,7 @@ namespace FCSCommon.Helpers
             StartingPosition = (_currentPage - 1) * _itemsPerPage;
 
             EndingPosition = StartingPosition + _itemsPerPage;
-            
+
             var data = new DisplayData
             {
                 ItemsGrid = _itemsGrid,
@@ -117,37 +117,37 @@ namespace FCSCommon.Helpers
 
             OnLoadDisplay?.Invoke(data);
         }
-        
+
         //private void LoadDisplay<T>(T item)
         //{
-            //for (int i = StartingPosition; i < EndingPosition; i++)
-            //{
-            //    var colorID = SerializedColors.ElementAt(i);
-            //    LoadDisplay(colorID);
-            //}
+        //for (int i = StartingPosition; i < EndingPosition; i++)
+        //{
+        //    var colorID = SerializedColors.ElementAt(i);
+        //    LoadDisplay(colorID);
+        //}
 
-            //GameObject itemDisplay = Instantiate(_itemPrefab);
+        //GameObject itemDisplay = Instantiate(_itemPrefab);
 
-            //itemDisplay.transform.SetParent(_itemsGrid.transform, false);
-            //var text = itemDisplay.transform.Find("Location_LBL").GetComponent<Text>();
-            //text.text = storageItemName.Name;
+        //itemDisplay.transform.SetParent(_itemsGrid.transform, false);
+        //var text = itemDisplay.transform.Find("Location_LBL").GetComponent<Text>();
+        //text.text = storageItemName.Name;
 
-            //var itemButton = itemDisplay.AddComponent<InterfaceButton>();
-            //itemButton.ButtonMode = InterfaceButtonMode.TextColor;
-            //itemButton.Tag = storageItemName;
-            //itemButton.TextComponent = text;
-            //itemButton.OnButtonClick += _onButtonClick;
-            //itemButton.BtnName = "ShippingContainer";
+        //var itemButton = itemDisplay.AddComponent<InterfaceButton>();
+        //itemButton.ButtonMode = InterfaceButtonMode.TextColor;
+        //itemButton.Tag = storageItemName;
+        //itemButton.TextComponent = text;
+        //itemButton.OnButtonClick += _onButtonClick;
+        //itemButton.BtnName = "ShippingContainer";
         //}
 
         internal void ClearPage()
         {
-            if(_itemsGrid == null) return;
+            if (_itemsGrid == null) return;
 
             for (int i = 0; i < _itemsGrid?.transform?.childCount; i++)
             {
                 var item = _itemsGrid?.transform?.GetChild(i)?.gameObject;
-                
+
                 if (item != null)
                 {
                     Destroy(item);
@@ -163,7 +163,7 @@ namespace FCSCommon.Helpers
         }
 
         private void CalculateNewMaxPages(int count)
-        { 
+        {
             _maxPage = (count - 1) / _itemsPerPage + 1;
 
             if (_currentPage > _maxPage)
@@ -172,7 +172,6 @@ namespace FCSCommon.Helpers
             }
         }
     }
-
     internal struct DisplayData
     {
         public GameObject ItemsPrefab { get; set; }

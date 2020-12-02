@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Mono;
+using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Configuration;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
@@ -67,11 +68,16 @@ namespace FCS_HomeSolutions.Buildables
         }
     }
 
-    internal class SweetWaterBarController : MonoBehaviour, IConstructable
+    internal class SweetWaterBarController : FcsDevice, IConstructable
     {
         private FCSAquarium _fcsAquarium;
         private bool _runStartUpOnEnable;
-        
+
+        private void Start()
+        {
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.SeaBreezeTabID, Mod.ModName);
+        }
+
         private void OnEnable()
         {
             if (_runStartUpOnEnable)
@@ -85,18 +91,24 @@ namespace FCS_HomeSolutions.Buildables
             }
         }
 
-        private void OnDestroy()
+
+        public override void OnProtoSerialize(ProtobufSerializer serializer)
         {
-            
+
         }
 
-        public bool CanDeconstruct(out string reason)
+        public override void OnProtoDeserialize(ProtobufSerializer serializer)
+        {
+
+        }
+
+        public override bool CanDeconstruct(out string reason)
         {
             reason= string.Empty;
             return true;
         }
 
-        private void Initialize()
+        public override void Initialize()
         {
             if (_fcsAquarium == null)
             {
@@ -123,7 +135,7 @@ namespace FCS_HomeSolutions.Buildables
 
         public bool IsInitialized { get; set; }
 
-        public void OnConstructedChanged(bool constructed)
+        public override void OnConstructedChanged(bool constructed)
         {
             if (constructed)
             {

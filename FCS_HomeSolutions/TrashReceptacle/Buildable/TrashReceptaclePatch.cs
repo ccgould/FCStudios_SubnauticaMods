@@ -3,18 +3,17 @@ using System.IO;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Spawnables;
+using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
-using FCS_HomeSolutions.HoverLiftPad.Mono;
 using FCS_HomeSolutions.TrashReceptacle.Mono;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
 using UnityEngine;
 
-namespace FCS_HomeSolutions.Buildables
+namespace FCS_HomeSolutions.TrashReceptacle.Buildable
 {
-    internal class TrashReceptaclePatch : Buildable
+    internal class TrashReceptaclePatch : SMLHelper.V2.Assets.Buildable
     {
         public override TechGroup GroupForPDA => TechGroup.InteriorModules;
         public override TechCategory CategoryForPDA => TechCategory.InteriorModule;

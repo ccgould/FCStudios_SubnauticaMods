@@ -21,7 +21,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
        private int CalculateFreeSpace()
         {
             var total = GetContainerTotal();
-            return Mathf.Max(0, QPatch.DeepDrillerMk2Configuration.StorageSize - total);
+            return Mathf.Max(0, QPatch.DeepDrillerMk3Configuration.StorageSize - total);
         }
 
         public bool IsFull => IsContainerFull(); 
@@ -39,7 +39,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         /// <returns>Returns true if the container is full.</returns>
         private bool IsContainerFull()
         {
-            return GetContainerTotal() >= QPatch.DeepDrillerMk2Configuration.StorageSize;
+            return GetContainerTotal() >= QPatch.DeepDrillerMk3Configuration.StorageSize;
         }
 
         /// <summary>
@@ -84,19 +84,6 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             return true;
         }
 
-        //internal void CraftItem(KeyValuePair<TechType, CraftData.TechData> item)
-        //{
-        //    foreach (CraftData.Ingredient ingredient in item.Value._ingredients)
-        //    {
-        //        for (int i = 0; i < ingredient.amount; i++)
-        //        {
-        //            RemoveItemFromContainer(ingredient.techType);
-        //        }
-        //    }
-
-        //    AddItemToContainer(item.Key.ToInventoryItem());
-        //}
-
         internal bool ContainsItem(TechType techType, int amount)
         {
             return _container.Any(x => x.Key == techType && x.Value >= amount);
@@ -132,7 +119,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
                     _container.Add(item,1);
                 }
 
-                //OnContainerUpdate?.Invoke(GetContainerTotal(),QPatch.Configuration.StorageSize);
+                OnContainerUpdate?.Invoke(GetContainerTotal(),QPatch.DeepDrillerMk3Configuration.StorageSize);
             }
             catch (Exception e)
             {
@@ -168,7 +155,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
                             _container[item] -= 1;
                         }
 
-                        //OnContainerUpdate?.Invoke(GetContainerTotal(), QPatch.Configuration.StorageSize);
+                        OnContainerUpdate?.Invoke(GetContainerTotal(), QPatch.DeepDrillerMk3Configuration.StorageSize);
                     }
                 }
             }
@@ -180,7 +167,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             return true;
         }
 
-        internal bool OnlyRemoveItemFromContainer(TechType item)
+        internal bool OnlyRemoveItemFromContainer(TechType item, bool bypassNotification = false)
         {
             try
             {
@@ -195,7 +182,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
                         _container[item] -= 1;
                     }
 
-                    //OnContainerUpdate?.Invoke(GetContainerTotal(), QPatch.Configuration.StorageSize);
+                    OnContainerUpdate?.Invoke(GetContainerTotal(), QPatch.DeepDrillerMk3Configuration.StorageSize);
                 }
             }
             catch (Exception e)
@@ -224,7 +211,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
 
         public Pickupable RemoveItemFromContainer(TechType techType, int amount)
         {
-            throw new NotImplementedException();
+            return null;
         }
 
         public Dictionary<TechType, int> GetItemsWithin()
@@ -234,7 +221,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
 
         public bool ContainsItem(TechType techType)
         {
-            throw new NotImplementedException();
+            return false;
         }
 
         public void Setup(FCSDeepDrillerController fcsDeepDrillerController)
@@ -266,6 +253,11 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             }
 
             return 0;
+        }
+
+        public void Clear()
+        {
+            _container.Clear();
         }
     }
 }

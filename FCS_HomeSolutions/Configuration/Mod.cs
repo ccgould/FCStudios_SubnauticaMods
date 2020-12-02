@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -24,6 +25,8 @@ namespace FCS_HomeSolutions.Configuration
         internal const string ModFriendlyName = "Home Solutions";
         internal const string ModBundleName = "fcshomesolutionsbundle";
 
+        internal const string DecorationItemTabId = "DI";
+
         internal const string RecyclerClassID = "Recycler";
         internal const string RecyclerFriendly = "Recycler";
         internal const string RecyclerDescription = "Recycle your trash and get your resources back";
@@ -36,6 +39,7 @@ namespace FCS_HomeSolutions.Configuration
         internal const string TrashReceptacleDescription = "Use the Trash Receptacle to quickly send you trash to the recycler form the inside of your base";
         internal const string TrashReceptaclePrefabName = "TrashReceptacle";
         internal const string TrashReceptacleKitClassID = "TrashReceptacle_Kit";
+        internal const string TrashReceptacleTabID = "TR";
 
         internal const string PaintToolClassID = "PaintTool";
         internal const string PaintToolFriendly = "Alterra Paint Tool";
@@ -48,6 +52,7 @@ namespace FCS_HomeSolutions.Configuration
         internal const string BaseOperatorDescription = "Control your base from one giant screen";
         internal const string BaseOperatorPrefabName = "BaseOperator";
         internal const string BaseOperatorKitClassID = "BaseOperator_Kit";
+        internal const string BaseOperatorTabID = "BO";
 
         internal const string HoverLiftPadClassID = "HoverLiftPad";
         internal const string HoverLiftPadFriendly = "Alterra Hover Lift Pad";
@@ -76,6 +81,13 @@ namespace FCS_HomeSolutions.Configuration
         internal const string SeaBreezePrefabName = "SeaBreezeFCS32";
         internal static string SeaBreezeKitClassID = $"{SeaBreezeClassID}_Kit";
         internal const string SeaBreezeTabID = "SB";
+
+        internal const string QuantumTeleporterClassID = "QuantumTeleporter";
+        internal const string QuantumTeleporterFriendly = "Quantum Teleporter";
+        internal const string QuantumTeleporterDescription = "A teleporter that allows you to teleport from one base to another.";
+        internal const string QuantumTeleporterPrefabName = "QuantumTeleporter";
+        internal static string QuantumTeleporterKitClassID = $"{QuantumTeleporterClassID}_Kit";
+        internal const string QuantumTeleporterTabID = "QT";
 
         internal const string PaintCanClassID = "PaintCan";
         internal const string PaintCanFriendly = "Paint Can";
@@ -161,7 +173,20 @@ namespace FCS_HomeSolutions.Configuration
             craftAmount = 1,
             Ingredients =
             {
-                new Ingredient(HoverLiftPadKitClassID.ToTechType(), 1),
+                new Ingredient(TrashReceptacleKitClassID.ToTechType(), 1),
+            }
+        };
+
+#if SUBNAUTICA
+        internal static TechData TrashRecyclerIngredients => new TechData
+#elif BELOWZERO
+                internal static RecipeData TrashRecyclerIngredients => new RecipeData
+#endif
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(RecyclerKitClassID.ToTechType(), 1),
             }
         };
 
@@ -198,11 +223,6 @@ namespace FCS_HomeSolutions.Configuration
             return Path.Combine(SaveUtils.GetCurrentSaveDataDir(), ModName);
         }
 
-        private static void OnSaveComplete()
-        {
-
-        }
-        
         internal static void Save(ProtobufSerializer serializer)
         {
             if (!IsSaving())
@@ -211,19 +231,23 @@ namespace FCS_HomeSolutions.Configuration
 
                 SaveData newSaveData = new SaveData();
 
-                var controllers = GameObject.FindObjectsOfType<MonoBehaviour>().OfType<IFCSSave<SaveData>>();
-
                 if (_registeredPaintTool != null)
                 {
                     foreach (PaintToolController controller in _registeredPaintTool)
                     {
-                        controller.Save(newSaveData);
+                        controller.Save(newSaveData, serializer);
                     }
                 }
 
-                foreach (var controller in controllers)
+                foreach (var controller in FCSAlterraHubService.PublicAPI.GetRegisteredDevices())
                 {
-                    controller.Save(newSaveData,serializer);
+                    QuickLogger.Debug($"Attempting to save device: {controller.Value?.UnitID} | Package Valid: { controller.Value?.PackageId == ModName}");
+                    
+                    if (controller.Value != null && controller.Value.PackageId == ModName)
+                    {
+                        QuickLogger.Debug($"Saving device: {controller.Value.UnitID}");
+                        ((IFCSSave<SaveData>)controller.Value).Save(newSaveData,serializer);
+                    }
                 }
                 _saveData = newSaveData;
 
@@ -247,12 +271,27 @@ namespace FCS_HomeSolutions.Configuration
             return _saveObject != null;
         }
 
+        internal static void OnSaveComplete()
+        {
+            _saveObject.StartCoroutine(SaveCoroutine());
+        }
+
+        private static IEnumerator SaveCoroutine()
+        {
+            while (SaveLoadManager.main != null && SaveLoadManager.main.isSaving)
+            {
+                yield return null;
+            }
+            GameObject.DestroyImmediate(_saveObject.gameObject);
+            _saveObject = null;
+        }
+
         internal static SaveData GetSaveData()
         {
             return _saveData ?? new SaveData();
         }
 
-        public static DecorationDataEntry GetDecorationDataEntrySaveData(string id)
+        internal static DecorationDataEntry GetDecorationDataEntrySaveData(string id)
         {
             LoadData();
 
@@ -339,12 +378,12 @@ namespace FCS_HomeSolutions.Configuration
 
         }
 
-        public static bool IsModPatched(string mod)
+        internal static bool IsModPatched(string mod)
         {
             return FCSAlterraHubService.PublicAPI.IsModPatched(mod);
         }
 
-        public static PlanterDataEntry GetPlanterDataEntrySaveData(string id)
+        internal static PlanterDataEntry GetPlanterDataEntrySaveData(string id)
         {
             LoadData();
 
@@ -363,7 +402,7 @@ namespace FCS_HomeSolutions.Configuration
             return new PlanterDataEntry { Id = id };
         }
 
-        public static MiniFountainFilterDataEntry GetMiniFountainFilterSaveData(string id)
+        internal static MiniFountainFilterDataEntry GetMiniFountainFilterSaveData(string id)
         {
             LoadData();
 
@@ -382,7 +421,7 @@ namespace FCS_HomeSolutions.Configuration
             return new MiniFountainFilterDataEntry { Id = id };
         }
 
-        public static SeaBreezeDataEntry GetSeabreezeSaveData(string id)
+        internal static SeaBreezeDataEntry GetSeabreezeSaveData(string id)
         {
             LoadData();
 
@@ -399,6 +438,44 @@ namespace FCS_HomeSolutions.Configuration
             }
 
             return new SeaBreezeDataEntry { Id = id };
+        }
+
+        internal static TrashRecyclerDataEntry GetTrashRecyclerSaveData(string id)
+        {
+            LoadData();
+
+            var saveData = GetSaveData();
+
+            foreach (var entry in saveData.TrashRecyclerEntries)
+            {
+                if (string.IsNullOrEmpty(entry.Id)) continue;
+
+                if (entry.Id == id)
+                {
+                    return entry;
+                }
+            }
+
+            return new TrashRecyclerDataEntry() { Id = id };
+        }
+
+        internal static QuantumTeleporterDataEntry GetQuantumTeleporterSaveData(string id)
+        {
+            LoadData();
+
+            var saveData = GetSaveData();
+
+            foreach (var entry in saveData.QuantumTeleporterEntries)
+            {
+                if (string.IsNullOrEmpty(entry.Id)) continue;
+
+                if (entry.Id == id)
+                {
+                    return entry;
+                }
+            }
+
+            return new QuantumTeleporterDataEntry() { Id = id };
         }
     }
 }

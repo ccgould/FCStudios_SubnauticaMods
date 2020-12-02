@@ -1,4 +1,5 @@
 ﻿using System;
+using FCS_AlterraHub.Systems;
 using FCSCommon.Abstract;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
@@ -11,17 +12,18 @@ namespace FCS_AlterraHub.Mono.OreConsumer
 {
     internal class OreConsumerDisplay : AIDisplay
     {
-        private Text _totalAmount;
         internal Action<decimal> onTotalChanged;
         internal UnityEvent onDumpButtonClicked = new UnityEvent();
-
+        private OreConsumerController _mono;
+        private Text _totalAmount;
+        private CardSystem cardSystem => CardSystem.main;
         public CheckInteraction CheckInteraction { get; private set; }
 
         internal void Setup(OreConsumerController mono)
         {
+            _mono = mono;
             if(FindAllComponents())
             { 
-                onTotalChanged += total => { _totalAmount.text = total.ToString("n0"); };
             }
         }
 
@@ -35,7 +37,6 @@ namespace FCS_AlterraHub.Mono.OreConsumer
             try
             {
                 SetTotalLabel();
-
 
                 FindTotalLabel();
 
@@ -57,6 +58,17 @@ namespace FCS_AlterraHub.Mono.OreConsumer
             var dumpButton = addBTN.GetComponent<Button>();
             dumpButton.onClick.AddListener(() =>
             {
+                if(!CardSystem.main.HasBeenRegistered())
+                {
+                    QuickLogger.ModMessage(Buildables.AlterraHub.AccountNotFoundFormat());
+                    return;
+                }
+
+                if (!_mono.IsOnPlatform)
+                {
+                    QuickLogger.ModMessage(Buildables.AlterraHub.PleaseBuildOnPlatForm());
+                }
+
                 onDumpButtonClicked?.Invoke();
             });
 
@@ -65,11 +77,25 @@ namespace FCS_AlterraHub.Mono.OreConsumer
         private void FindTotalLabel()
         {
             _totalAmount = GameObjectHelpers.FindGameObject(gameObject, "TotalAmount").GetComponent<Text>();
+            onTotalChanged += total =>
+            {
+                if(_totalAmount != null && _mono.IsOperational && CardSystem.main.HasBeenRegistered())
+                    _totalAmount.text = total.ToString("n0");
+            };
+
         }
 
         private void SetTotalLabel()
         {
             GameObjectHelpers.FindGameObject(gameObject, "Total").GetComponent<Text>().text = Buildables.AlterraHub.AccountTotal();
+        }
+
+        public void ForceRefresh(decimal total)
+        {
+            if (_totalAmount != null)
+            {
+                _totalAmount.text = total.ToString("n0");
+            }
         }
     }
 

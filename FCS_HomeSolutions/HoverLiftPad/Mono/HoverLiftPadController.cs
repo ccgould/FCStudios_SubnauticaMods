@@ -12,7 +12,6 @@ using FCS_HomeSolutions.Configuration;
 using FCS_HomeSolutions.Patches;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
-using Oculus.Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -58,7 +57,6 @@ namespace FCS_HomeSolutions.HoverLiftPad.Mono
         private bool _isPrawnLocked;
         private static Exosuit[] _globalExosuits;
         private Color _orangeColor { get; } = new Color(1f, 0.7176471f, 0f, 1f);
-
 
         private void FixedUpdate()
         {
@@ -141,6 +139,8 @@ namespace FCS_HomeSolutions.HoverLiftPad.Mono
 
         private void OnEnable()
         {
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.HoverLiftPadTabID, Mod.ModName);
+
             if (_runStartUpOnEnable)
             {
                 if (!IsInitialized)
@@ -687,8 +687,6 @@ namespace FCS_HomeSolutions.HoverLiftPad.Mono
                 _colorManager.Initialize(gameObject, ModelPrefab.BodyMaterial);
             }
 
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.HoverLiftPadTabID);
-
             IsInitialized = true;
             QuickLogger.Debug($"Initialization Complete: {GetPrefabID()} | ID {UnitID}", true);
         }
@@ -777,174 +775,5 @@ namespace FCS_HomeSolutions.HoverLiftPad.Mono
         {
             return _colorManager.ChangeColor(color, mode);
         }
-    }
-
-    internal class PlayerTrigger : MonoBehaviour
-    {
-        public Action OnPlayerEntered;
-        public Action OnPlayerExited;
-        public Action OnPlayerStay;
-        public bool IsPlayerInRange { get; set; }
-
-        private void OnTriggerEnter(Collider collider)
-        {
-            if (collider.gameObject.layer != 19) return;
-            IsPlayerInRange = true;
-            OnPlayerEntered?.Invoke();
-        }
-
-        private void OnTriggerStay(Collider collider)
-        {
-            if (collider.gameObject.layer != 19 || IsPlayerInRange) return;
-            OnPlayerStay?.Invoke();
-            IsPlayerInRange = true;
-        }
-
-        private void OnTriggerExit(Collider collider)
-        {
-            if (collider.gameObject.layer != 19) return;
-            IsPlayerInRange = false;
-            OnPlayerExited?.Invoke();
-        }
-    }
-
-    internal class PrawnSuitTrigger : MonoBehaviour
-    {
-        public Action<Exosuit> OnPrawnEntered;
-        public Action<Exosuit> OnPrawnExit;
-        //public Collider CurrentCollider { get; set; }
-        public bool IsPrawnOnPad { get; set; }
-        //When the Primitive collides with the walls, it will reverse direction
-        private void OnTriggerEnter(Collider collision)
-        {
-            QuickLogger.Debug($"[PrawnSuitTrigger] Collision with {collision.name} detected", true);
-            var exosuit = collision.GetComponentInParent<Exosuit>();
-            if (exosuit != null)
-            {
-                OnPrawnEntered?.Invoke(exosuit);
-                IsPrawnOnPad = true;
-            }
-        }
-
-        //private void OnTriggerStay(Collider collision)
-        //{
-        //    CurrentCollider = collision;
-        //}
-
-        private void OnTriggerExit(Collider collision)
-        {
-            QuickLogger.Debug($"[PrawnSuitTrigger] Collision with {collision.name} detected", true);
-            var exosuit = collision.GetComponentInParent<Exosuit>();
-            if (exosuit != null)
-            {
-                OnPrawnExit?.Invoke(exosuit);
-                IsPrawnOnPad = false;
-            }
-        }
-    }
-
-    internal enum Gate
-    {
-        Front,
-        Back,
-        Both
-    }
-
-    internal class GateController : MonoBehaviour
-    {
-        private bool _allowedToMove;
-        private float _targetRotation;
-        private bool _isOpen;
-        internal Gate GateType;
-        internal float RotateDegrees;
-        internal float StartRotateDegrees;
-        internal float RotateTime = 10.0f;
-
-        internal Action<bool> OnGateStateChanged { get; set; }
-
-        private void Update()
-        {
-            if (_allowedToMove)
-            {
-                RotateRotor();
-            }
-        }
-
-        private void RotateRotor()
-        {
-            var currentRotation = transform.localRotation;
-            var wantedRotation = Quaternion.Euler(currentRotation.x, _targetRotation, currentRotation.z);
-            transform.localRotation = Quaternion.RotateTowards(currentRotation, wantedRotation, Time.deltaTime * RotateTime);
-
-            if (transform.localRotation == wantedRotation)
-            {
-                _isOpen = Mathf.Approximately(_targetRotation, RotateDegrees);
-            }
-        }
-
-        internal void Open()
-        {
-            _isOpen = true;
-            _allowedToMove = true;
-            _targetRotation = RotateDegrees;
-        }
-
-        internal void Close()
-        {
-            _isOpen = true;
-            _allowedToMove = true;
-            _targetRotation = StartRotateDegrees;
-        }
-
-        internal bool IsOpen()
-        {
-            return _isOpen;
-        }
-
-        internal bool IsClosed()
-        {
-            return _isOpen == false;
-        }
-    }
-
-    internal enum UIButtons
-    {
-        IncreaseSpeed = 0,
-        DecreaseSpeed = 1,
-        LockPlayer = 2,
-        UnlockPlayer = 3,
-        ToggleDockPrawn = 4,
-        SaveLevel = 5,
-        ToggleFrontGate = 6,
-        ToggleBackGate = 7,
-        DecreaseLevel = 8,
-        IncreaseLevel = 9,
-        GoToFloor
-    }
-
-    internal struct LevelData
-    {
-        private Vector3 _currentVector3Position;
-        [JsonProperty] internal string LevelName { get; set; }
-        [JsonProperty] internal Vec3 Position { get; set; }
-        [JsonProperty] internal bool IsBase { get; set; }
-
-        public Vector3 CurrentPosition()
-        {
-            if (_currentVector3Position == default)
-            {
-                _currentVector3Position = Position.ToVector3();
-            }
-
-            return _currentVector3Position;
-        }
-    }
-
-    internal enum SpeedModes
-    {
-        Min = 1,
-        Low = 2,
-        High = 3,
-        Max = 4
     }
 }

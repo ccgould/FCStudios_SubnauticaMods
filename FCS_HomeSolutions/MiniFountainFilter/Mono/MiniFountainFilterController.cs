@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Mono;
+using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
 using FCS_HomeSolutions.MiniFountainFilter.Buildables;
@@ -12,7 +14,7 @@ using FCS_HomeSolutions.ModManagers;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
-
+using UnityEngine.SceneManagement;
 
 
 namespace FCS_HomeSolutions.MiniFountainFilter.Mono
@@ -28,6 +30,7 @@ namespace FCS_HomeSolutions.MiniFountainFilter.Mono
         private MiniFountainFilterDataEntry _data;
         private MiniFountainFilterDataEntry _saveData;
         private ParticleSystem _xBubbles;
+        private Dictionary<string, FcsDevice> _registeredDevices;
         internal ColorManager ColorManager { get; private set; }
         internal MFFDisplayManager DisplayManager { get; private set; }
         internal AnimationManager AnimationManager { get; private set; }
@@ -35,14 +38,21 @@ namespace FCS_HomeSolutions.MiniFountainFilter.Mono
         internal PowerManager PowerManager { get; private set; }
         internal AudioManager AudioManager { get; private set; }
         internal TankManager TankManager { get; private set; }
-        internal bool IsConstructed { get; private set; }
         public PlayerManager PlayerManager { get; private set; }
         public Action OnMonoUpdate { get; set; }
 
+
+        private void Start()
+        {
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.MiniFountainFilterTabID, Mod.ModName);
+        }
+
         private void OnEnable()
         {
-            if (!_runStartUpOnEnable) return;
+            _registeredDevices = FCSAlterraHubService.PublicAPI.GetRegisteredDevices();
 
+            if (!_runStartUpOnEnable) return;
+            
             if (!IsInitialized)
             {
                 Initialize();
@@ -132,7 +142,7 @@ namespace FCS_HomeSolutions.MiniFountainFilter.Mono
             _xBubbles = GameObjectHelpers.FindGameObject(gameObject, "xBubbles").GetComponent<ParticleSystem>();
 
             IsInitialized = true;
-
+            
             QuickLogger.Debug($"Initialized");
         }
         
@@ -170,6 +180,7 @@ namespace FCS_HomeSolutions.MiniFountainFilter.Mono
 
             if (constructed)
             {
+
                 if (isActiveAndEnabled)
                 {
                     if (!IsInitialized)

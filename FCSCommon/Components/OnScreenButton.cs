@@ -14,9 +14,10 @@ namespace FCSCommon.Components
         internal string TextLineOne { get; set; }
         internal string TextLineTwo { get; set; }
         public bool GetAdditionalDataFromString { get; set; } = false;
-        public Func<string> GetAdditionalString { get; set; }
+        public Func<object, string> GetAdditionalString { get; set; }
         private bool isHoveredOutOfRange;
         internal bool Disabled { get; set; }
+        public virtual object Tag { get; set; }
         internal float MaxInteractionRange { get; set; }  = 2.5f;
 
         public virtual void OnDisable()
@@ -38,7 +39,7 @@ namespace FCSCommon.Components
                 if(GetAdditionalDataFromString)
                 {
                     HandReticle.main.SetIcon(HandReticle.IconType.Hand);
-                    HandReticle.main.SetInteractTextRaw(this.TextLineOne,GetAdditionalString?.Invoke());
+                    HandReticle.main.SetInteractTextRaw(this.TextLineOne,GetAdditionalString?.Invoke(Tag));
                 }
                 else
                 {

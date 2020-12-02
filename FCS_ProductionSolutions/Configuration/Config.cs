@@ -14,7 +14,7 @@ namespace FCS_ProductionSolutions.Configuration
     [Menu("FCS Production Solutions Menu")]
     public class Config : ConfigFile
     {
-        public Config() : base("productionSolutions-config","Configurations") { }
+        public Config() : base("productionSolutions-config", "Configurations") { }
 
         [Toggle("Enable Debugs"), OnChange(nameof(EnableDebugsToggleEvent))]
         public bool EnableDebugLogs = false;
@@ -44,7 +44,7 @@ namespace FCS_ProductionSolutions.Configuration
         [Toggle("Enable/Disable Light Trigger")]
         public bool IsLightTriggerEnabled = true;
 
-        [Slider("Light Trigger Range",0,20)]
+        [Slider("Light Trigger Range", 0, 20)]
         public int LightTriggerRange = 4;
     }
 
@@ -55,9 +55,9 @@ namespace FCS_ProductionSolutions.Configuration
 
         public int StorageSize { get; set; } = 300;
         public float PowerDraw { get; set; } = 0.7f;
-        public float ChargePullAmount { get; set; } = 0.3f;
+        public float ChargePullAmount { get; set; } = 1.5f;
         public float SolarCapacity { get; set; } = 125;
-        
+
         [Toggle("Is HardCore Mode")]
         public bool HardCoreMode { get; set; } = true;
         public float OilTimePeriodInDays { get; set; } = 30.0f;
@@ -66,9 +66,10 @@ namespace FCS_ProductionSolutions.Configuration
         public float MaxOreCountUpgradePowerUsage { get; set; } = 0.2f;
         public float OrePerDayUpgradePowerUsage { get; set; } = 1.0f;
         public float InternalBatteryCapacity { get; set; } = 1000f;
+        public float DrillAlterraStorageRange { get; set; } = 30f;
         [JsonIgnore] internal float OreReductionValue => 0.08f;
         [JsonIgnore] internal Dictionary<string, List<TechType>> BiomeOresTechType { get; set; } = new Dictionary<string, List<TechType>>();
-        
+
         internal void Convert()
         {
             try

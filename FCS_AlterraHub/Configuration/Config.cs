@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using FCS_AlterraHub.Enumerators;
+using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Structs;
 using FCSCommon.Utilities;
 using Oculus.Newtonsoft.Json;
@@ -22,7 +23,7 @@ namespace FCS_AlterraHub.Configuration
         public UnityAction<int> onGameModeChanged;
         
 
-        public List<CustomStoreItem> AdditionalStoreItems = new List<CustomStoreItem>();
+        public List<FCSStoreEntry> AdditionalStoreItems = new List<FCSStoreEntry>();
         
         [Choice("Mode Game Mode"), OnChange(nameof(ChangeGameModeEvent))]
         public FCSGameMode GameModeOption { get; set; }

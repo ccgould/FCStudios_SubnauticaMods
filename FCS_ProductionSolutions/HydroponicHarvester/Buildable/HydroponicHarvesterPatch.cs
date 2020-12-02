@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Spawnables;
+using FCS_AlterraHub.Structs;
 using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.HydroponicHarvester.Mono;
@@ -22,6 +24,31 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Buildable
                 var hydroponicHarvesterKit = new FCSKit(Mod.HydroponicHarvesterKitClassID, Mod.HydroponicHarvesterModFriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 hydroponicHarvesterKit.Patch();
                 FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, hydroponicHarvesterKit.TechType, 30000, StoreCategory.Production);
+                FCSAlterraHubService.PublicAPI.RegisterEncyclopediaEntry(TechType,new List<FcsEntryData>
+                {
+                    new FcsEntryData
+                    {
+                        key = "HydroHarvester",
+                        unlocked = true,
+                        path = "fcs",
+                        timeCapsule = false,
+                        nodes = new []{ "fcs"},
+                        Description = "The hydroponic Harvester .....",
+                        Title = "Hydroponic Harvester",
+                        Verbose = true
+                    },
+                    new FcsEntryData
+                    {
+                        key = "HydroHarvester1",
+                        unlocked = true,
+                        path = "fcs",
+                        timeCapsule = false,
+                        nodes = new []{ "fcs"},
+                        Description = "The hydroponic Harvester .....",
+                        Title = "Hydroponic Harvester 1",
+                        Verbose = false
+                    }
+                });
 
             };
         }

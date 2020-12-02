@@ -1,4 +1,5 @@
-﻿using Oculus.Newtonsoft.Json;
+﻿using FCSCommon.Utilities;
+using Oculus.Newtonsoft.Json;
 using UnityEngine;
 
 namespace FCS_AlterraHub.Model
@@ -44,6 +45,11 @@ namespace FCS_AlterraHub.Model
         public float GetCapacity()
         {
             return Capacity;
+        }
+
+        public void Flush()
+        {
+            Charge = 0f;
         }
     }
 }

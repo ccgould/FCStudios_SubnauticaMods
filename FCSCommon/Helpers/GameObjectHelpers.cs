@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace FCSCommon.Helpers
 {
-    internal class GameObjectHelpers : MonoBehaviour
+    internal static class GameObjectHelpers
     {
         internal static void AddConstructableBounds(GameObject prefab, Vector3 size, Vector3 center)
         {
@@ -18,21 +18,10 @@ namespace FCSCommon.Helpers
             }
             catch (Exception e)
             {
-                QuickLogger.Error<GameObjectHelpers>($"{e.Message}");
+                QuickLogger.Error($"{e.Message}");
             }
         }
-
-        internal static void DestroyComponent(GameObject obj)
-        {
-            var list = obj.GetComponents(typeof(Component));
-
-            for (int i = 0; i < list.Length; i++)
-            {
-                if (!list[i].name.StartsWith("Transform"))
-                    Destroy(list[i]);
-            }
-        }
-
+        
         internal static int GetObjectCount<T>() where T : MonoBehaviour
         {
             var length = GameObject.FindObjectsOfType<T>()?.Length;
@@ -152,6 +141,27 @@ namespace FCSCommon.Helpers
                 }
             }
         }
+
+
+        public static Transform FirstOrDefault(this Transform transform, Func<Transform, bool> query)
+        {
+            if (query(transform))
+            {
+                return transform;
+            }
+
+            for (int i = 0; i < transform.childCount; i++)
+            {
+                var result = FirstOrDefault(transform.GetChild(i), query);
+                if (result != null)
+                {
+                    return result;
+                }
+            }
+
+            return null;
+        }
+
     }
 
     internal enum SearchOption

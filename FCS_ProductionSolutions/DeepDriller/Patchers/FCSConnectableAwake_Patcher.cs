@@ -5,7 +5,7 @@ using HarmonyLib;
 namespace FCS_ProductionSolutions.DeepDriller.Patchers
 {
     [HarmonyPatch(typeof(FcsDevice))]
-    [HarmonyPatch("Start")]
+    [HarmonyPatch("Awake")]
     internal class FCSConnectableAwake_Patcher
     {
         private static Action<FcsDevice> onFCSConnectableAdded;

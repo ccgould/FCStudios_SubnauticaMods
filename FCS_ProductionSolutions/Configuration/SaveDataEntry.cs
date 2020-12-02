@@ -32,7 +32,7 @@ namespace FCS_ProductionSolutions.Configuration
     }
 
     [Serializable]
-    internal class DeepDrillerMk2SaveDataEntry
+    internal class DeepDrillerSaveDataEntry
     {
         [JsonProperty] internal float Health { get; set; }
 
@@ -61,6 +61,7 @@ namespace FCS_ProductionSolutions.Configuration
         [JsonProperty] internal bool IsRangeVisible { get; set; }
         [JsonProperty] internal bool AllowedToExport { get; set; }
         [JsonProperty] internal bool IsBlackListMode { get; set; }
+        public ColorVec4 SecColor { get; set; }
     }
 
     [Serializable]
@@ -68,7 +69,7 @@ namespace FCS_ProductionSolutions.Configuration
     {
         [JsonProperty] internal List<HydroponicHarvesterDataEntry> HydroponicHarvesterEntries = new List<HydroponicHarvesterDataEntry>();
         [JsonProperty] internal List<MatterAnalyzerDataEntry> MatterAnalyzerEntries = new List<MatterAnalyzerDataEntry>();
-        [JsonProperty] internal List<DeepDrillerMk2SaveDataEntry> DeepDrillerMk2Entries = new List<DeepDrillerMk2SaveDataEntry>();
+        [JsonProperty] internal List<DeepDrillerSaveDataEntry> DeepDrillerMk2Entries = new List<DeepDrillerSaveDataEntry>();
         [JsonProperty] internal List<TechType> HydroponicHarvesterKnownTech { get; set; } = new List<TechType>();
     }
 }

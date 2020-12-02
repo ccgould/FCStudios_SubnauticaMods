@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Mono.AlterraHub;
+using FCS_AlterraHub.Registration;
+using FCS_AlterraHub.Structs;
 using FCSCommon.Helpers;
+using FCSCommon.Utilities;
 using UnityEngine;
 
 namespace FCS_AlterraHub.Systems
@@ -14,8 +18,7 @@ namespace FCS_AlterraHub.Systems
     internal static class StoreInventorySystem
     {
         private const decimal PlayerPaymentPercentage = .5m;
-        private static readonly Dictionary<TechType, decimal> KnownPrices = new Dictionary<TechType, decimal>();
-
+        private static readonly Dictionary<FCSStoreEntry, decimal> KnownPrices = new Dictionary<FCSStoreEntry, decimal>();
         private static readonly Dictionary<TechType, decimal> OrePrices = new Dictionary<TechType, decimal>
         {
             {TechType.CrashPowder, 7.5m },
@@ -33,11 +36,20 @@ namespace FCS_AlterraHub.Systems
             {TechType.Silver,39000 },
             {TechType.UraniniteCrystal,7000000 }
         };
-
-        internal static decimal GetPrice(TechType techType)
+        
+        internal static decimal GetPrice(TechType techType,bool checkKit = false)
         {
             //Price will be calculated by the ingredients of an item if an ingredient is unknown it will apply a default value to that item
-            return KnownPrices.ContainsKey(techType) ? KnownPrices[techType] : 0;
+            if (checkKit)
+            {
+                return StoreHasItem(techType,true) ? KnownPrices.FirstOrDefault(x => x.Key.ReceiveTechType == techType).Value : 0;
+            }
+            return StoreHasItem(techType) ? KnownPrices.FirstOrDefault(x => x.Key.TechType == techType).Value : 0;
+        }
+
+        internal static bool StoreHasItem(TechType techType,bool checkKit = false)
+        {
+            return checkKit ? KnownPrices.Any(x => x.Key.ReceiveTechType == techType) : KnownPrices.Any(x => x.Key.TechType == techType);
         }
 
         internal static decimal GetOrePrice(TechType techType)
@@ -51,19 +63,19 @@ namespace FCS_AlterraHub.Systems
             return 0;
         }
 
-        internal static void AddNewStoreItem(TechType techType, decimal cost)
+        internal static void AddNewStoreItem(FCSStoreEntry entry)
         {
-            if (!KnownPrices.ContainsKey(techType))
+            if (!KnownPrices.ContainsKey(entry))
             {
-                KnownPrices.Add(techType,cost);
+                KnownPrices.Add(entry, entry.Cost);
             }
         }
 
-        internal static GameObject CreateStoreItem(TechType techType, TechType receiveTechType, StoreCategory category, decimal cost, Action<TechType, TechType> addItemCallBack)
+        internal static GameObject CreateStoreItem(FCSStoreEntry entry, Action<TechType, TechType> addItemCallBack)
         {
             var item = GameObject.Instantiate(AlterraHub.ItemPrefab);
             var storeItem = item.AddComponent<StoreItem>();
-            storeItem.Initialize(LanguageHelpers.GetLanguage(techType), techType, receiveTechType, cost, addItemCallBack, category);
+            storeItem.Initialize(LanguageHelpers.GetLanguage(entry.TechType), entry.TechType, entry.ReceiveTechType, entry.Cost, addItemCallBack, entry.StoreCategory);
             return item;
         }
 
@@ -87,11 +99,6 @@ namespace FCS_AlterraHub.Systems
         internal static bool ValidResource(TechType techType)
         {
             return OrePrices.ContainsKey(techType);
-        }
-
-        public static bool ValidStoreItem(TechType techType)
-        {
-            return KnownPrices.ContainsKey(techType);
         }
     }
 }

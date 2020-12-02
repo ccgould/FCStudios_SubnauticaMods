@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Resources;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Mono.AlterraHub;
@@ -6,6 +7,7 @@ using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
+using SMLHelper.V2.Handlers;
 using UnityEngine;
 
 namespace FCS_AlterraHub.Buildables
@@ -16,9 +18,8 @@ namespace FCS_AlterraHub.Buildables
         public override TechCategory CategoryForPDA => TechCategory.InteriorModule;
         public override string AssetsFolder => Mod.GetAssetPath();
 
-
-        public AlterraHub() : base(Mod.ModClassID, Mod.ModFriendly, Mod.ModDescription)
-        {
+        public AlterraHub() : base(Mod.AlterraHubClassID, Mod.AlterraHubFriendly, Mod.AlterraHubDescription)
+        { 
             OnFinishedPatching += AdditionalPatching;
         }
 
@@ -27,9 +28,8 @@ namespace FCS_AlterraHub.Buildables
             try
             {
                     var prefab = GameObject.Instantiate(AlterraHubPrefab);
-
-                    var size = new Vector3(1.353966f, 2.503282f, 1.006555f);
-                    var center = new Vector3(0.006554961f, 1.394679f, 0.003277525f);
+                    var center = new Vector3(0.006554961f, 0.698558f, 0.00327754f);
+                    var size = new Vector3(1.353966f, 1.11104f, 1.006555f);
 
                     GameObjectHelpers.AddConstructableBounds(prefab, size, center);
 

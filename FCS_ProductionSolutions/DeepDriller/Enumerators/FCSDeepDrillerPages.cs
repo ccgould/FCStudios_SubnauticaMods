@@ -2,14 +2,13 @@
 {
     internal enum FCSDeepDrillerPages
     {
-        BlackOut = 0,
-        Boot = 1,
-        Home = 2,
+        BlackOut = -1,
+        Boot = 0,
+        Home = 1,
+        Programming = 2,
         Settings = 3,
-        Maintenance = 4,
-        ItemsPage= 5,
-        PowerOff = 6,
-        ColorPicker = 7,
-        Programming = 8
+        Filter = 4,
+        AlterraStorage = 5,
+        Inventory = 6,
     }
 }

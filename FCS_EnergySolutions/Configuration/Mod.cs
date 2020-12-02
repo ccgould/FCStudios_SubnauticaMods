@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using FCS_AlterraHub.Mono;
+using FCS_AlterraHub.Registration;
 using FCS_EnergySolutions.AlterraGen.Enumerators;
 using FCSCommon.Extensions;
 using FCSCommon.Utilities;
@@ -24,7 +25,7 @@ namespace FCS_EnergySolutions.Configuration
         private static SaveData _saveData;
         private static Dictionary<TechType, float> _vanillaBioChargeValues;
         #endregion
-        
+
         internal static string ModName => "FCSEnergySolutions";
         internal static string SaveDataFilename => $"FCSEnergySolutionsSaveData.json";
         internal const string ModBundleName = "fcsenergysolutionsbundle";
@@ -81,19 +82,19 @@ namespace FCS_EnergySolutions.Configuration
 
         internal static void Save()
         {
-
-
             if (!IsSaving())
             {
                 _saveObject = new GameObject().AddComponent<ModSaver>();
 
                 SaveData newSaveData = new SaveData();
 
-                var controllers = GameObject.FindObjectsOfType<MonoBehaviour>().OfType<IFCSSave<SaveData>>();
-
-                foreach (var controller in controllers)
+                foreach (var controller in FCSAlterraHubService.PublicAPI.GetRegisteredDevices())
                 {
-                    controller.Save(newSaveData);
+                    if (controller.Value.PackageId == ModName)
+                    {
+                        QuickLogger.Debug($"Saving device: {controller.Value.UnitID}");
+                        ((IFCSSave<SaveData>)controller.Value).Save(newSaveData);
+                    }
                 }
 
                 _saveData = newSaveData;
