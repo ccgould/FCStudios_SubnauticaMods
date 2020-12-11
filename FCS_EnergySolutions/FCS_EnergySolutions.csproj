@@ -90,6 +90,9 @@
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\Dependancies\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.ImageConversionModule">
+      <HintPath>..\Dependancies\UnityEngine.ImageConversionModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.IMGUIModule">
       <HintPath>F:\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
     </Reference>
@@ -127,6 +130,10 @@
     <Compile Include="JetStreamT242\Mono\JetStreamT242PowerManager.cs" />
     <Compile Include="JetStreamT242\Mono\MotorHandler.cs" />
     <Compile Include="JetStreamT242\Mono\RotorHandler.cs" />
+    <Compile Include="PowerStorage\Buildable\PowerStoragePatcher.cs" />
+    <Compile Include="PowerStorage\Mono\PowerCellCharger.cs" />
+    <Compile Include="PowerStorage\Mono\PowerSupply.cs" />
+    <Compile Include="PowerStorage\Mono\PowerStorageController.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

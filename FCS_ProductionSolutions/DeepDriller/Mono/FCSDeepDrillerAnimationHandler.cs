@@ -175,8 +175,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         #endregion
 
         internal void DrillState(bool state)
-        {
-            QuickLogger.Debug($"Setting Driller bit state to: {state}",true);
+        { 
             if (state)
             {
                 if (_timeStartGrowth <= 0)

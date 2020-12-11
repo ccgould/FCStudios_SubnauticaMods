@@ -1,4 +1,5 @@
-﻿using FCS_AlterraHomeSolutions.Mono.PaintTool;
+﻿using System;
+using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Registration;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -13,6 +14,11 @@ namespace FCS_AlterraHub.Mono
     [RequireComponent(typeof(TechTag))]
     public abstract class FcsDevice : MonoBehaviour, IProtoEventListener, IConstructable
     {
+        /// <summary>
+        /// Inter Process Communication used to communicate with devices
+        /// </summary>
+        public virtual Action<string> IPCMessage { get; set; }
+    
         public virtual void Awake()
         {
 

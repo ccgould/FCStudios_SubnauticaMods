@@ -85,7 +85,7 @@ namespace FCS_AlterraHub
             var oreConsumer = new OreConsumer();
             oreConsumer.Patch();
 
-            PDATabPatcher.AddPDATab("FSColor");
+            //PDATabPatcher.AddPDATab("FSColor");
 
         }
     }

@@ -4,6 +4,7 @@
     {
         internal string FunctionName { get; set; }
         internal string FriendlyName { get; set; }
+        internal string  Template { get; set; }
 
 
 

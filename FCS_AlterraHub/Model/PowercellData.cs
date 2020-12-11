@@ -1,5 +1,4 @@
-﻿using FCSCommon.Utilities;
-using Oculus.Newtonsoft.Json;
+﻿using Oculus.Newtonsoft.Json;
 using UnityEngine;
 
 namespace FCS_AlterraHub.Model

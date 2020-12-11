@@ -2,12 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHub.Buildables;
-using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Mono.AlterraHub;
-using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Structs;
 using FCSCommon.Helpers;
-using FCSCommon.Utilities;
 using UnityEngine;
 
 namespace FCS_AlterraHub.Systems
@@ -16,25 +13,23 @@ namespace FCS_AlterraHub.Systems
     /// A class that deals with purchasing items, returning items and crafting items
     /// </summary>
     internal static class StoreInventorySystem
-    {
-        private const decimal PlayerPaymentPercentage = .5m;
+    { 
         private static readonly Dictionary<FCSStoreEntry, decimal> KnownPrices = new Dictionary<FCSStoreEntry, decimal>();
         private static readonly Dictionary<TechType, decimal> OrePrices = new Dictionary<TechType, decimal>
         {
-            {TechType.CrashPowder, 7.5m },
-            {TechType.Copper,200},
+            {TechType.Copper,2000},
             {TechType.Sulphur,50 },
-            {TechType.Diamond,2834950000 },
-            {TechType.Gold,1330428 },
-            {TechType.Kyanite,2800 },
+            {TechType.Diamond,232553 },
+            {TechType.Gold,9401 },
+            {TechType.Kyanite, 291965 },
             {TechType.Lead,500 },
-            {TechType.Lithium,800 },
+            {TechType.Lithium,5644 },
             {TechType.Magnetite,300 },
             {TechType.Nickel,330 },
-            {TechType.Quartz,19800 },
-            {TechType.AluminumOxide,4535920 },
-            {TechType.Silver,39000 },
-            {TechType.UraniniteCrystal,7000000 }
+            {TechType.Quartz,4800 },
+            {TechType.AluminumOxide,10635 },
+            {TechType.Silver,4777 },
+            {TechType.UraniniteCrystal,836 }
         };
         
         internal static decimal GetPrice(TechType techType,bool checkKit = false)
@@ -57,7 +52,7 @@ namespace FCS_AlterraHub.Systems
             //Price will be calculated by the ingredients of an item if an ingredient is unknown it will apply a default value to that item
             if (OrePrices.ContainsKey(techType))
             {
-                return OrePrices[techType] * PlayerPaymentPercentage / 100;
+                return OrePrices[techType];
             }
 
             return 0;

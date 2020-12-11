@@ -14,18 +14,19 @@ namespace FCS_HomeSolutions.QuantumTeleporter.Mono
         private static bool _teleportComplete;
         private static bool _startTeleportCheck;
         private static int _freezeStatsCount;
-        private static float _timeLeft = 3f;
+        private static float _timeLeft;
         private static QTTeleportTypes _tab;
 
         internal static void Update()
         {
             if (!_teleportComplete && _startTeleportCheck)
             {
-                _timeLeft -= DayNightCycle.main.deltaTime;
-                if (_timeLeft <= 0)
+                _timeLeft += DayNightCycle.main.deltaTime;
+                if (_timeLeft >= 3f)
                 {
+                    SetWarpPosition();
                     CheckTeleportationComplete();
-                    _timeLeft = 1f;
+                    _timeLeft = 0f;
                 }
                 
             }
@@ -66,8 +67,10 @@ namespace FCS_HomeSolutions.QuantumTeleporter.Mono
             QuickLogger.Debug($"In Teleport Player", true);
             ToggleWarpScreen(true);
 
+            _currentTeleporter.PowerManager.TakePower(_tab);
+            _destinationTeleporter.PowerManager.TakePower(_tab);
+
             //bool flag2 = Player.main.AddUsedTool(TechType.PrecursorTeleporter);
-            SetWarpPosition();
             Player.main.playerController.inputEnabled = false;
             Inventory.main.quickSlots.SetIgnoreHotkeyInput(true);
             Player.main.GetPDA().SetIgnorePDAInput(true);

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
@@ -13,76 +14,118 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         private FCSDeepDrillerController _mono;
         private readonly List<FcsDevice> _storagesList = new List<FcsDevice>();
         private bool _isAllowedToExport;
+        private bool _isSorting;
+        private int _unsortableItems;
+        private bool _sortedItem;
+        public const float SortInterval = 1f;
 
         internal void Initialize(FCSDeepDrillerController mono)
         {
             _mono = mono;
-            InvokeRepeating(nameof(FindAlterraStorage),0.5f,0.5f);
-            InvokeRepeating(nameof(CheckInternalStorageForItems),1f,1f);
+
+            InvokeRepeating(nameof(FindAlterraStorage),1f,1f);
         }
 
-        internal void CheckInternalStorageForItems()
+        private IEnumerator Start()
         {
-            if (_mono == null || _mono.DeepDrillerContainer == null || !_isAllowedToExport) return;
-
-            if(_mono.DeepDrillerContainer.HasItems())
+            while (true)
             {
-                var items = _mono.DeepDrillerContainer.GetItemsWithin();
+                yield return new WaitForSeconds(Mathf.Max(0, SortInterval - (_unsortableItems / 60.0f)));
 
-                QuickLogger.Debug($"Items within Returned: {items?.Count}",true);
+                yield return Sort();
+            }
+        }
+        
+        private IEnumerator Sort()
+        {
+            if (!_isAllowedToExport)
+            {
+                _mono.DisplayHandler.ResetAlterraStorageList();
+                _isSorting = false;
+                yield break;
+            }
 
-                if (items == null)return;
+            _sortedItem = false;
+            _unsortableItems = _mono.DeepDrillerContainer.GetContainerTotal();
 
-                for (int i = items.Count -1 ; i >= 0; i--)
+            if (_mono.DeepDrillerContainer.IsEmpty())
+            {
+                _isSorting = false;
+                yield break;
+            }
+            
+            if (_storagesList.Count <= 0)
+            {
+                _isSorting = false;
+                yield break;
+            }
+            
+            yield return SortAnyTargets();
+
+            if (_sortedItem)
+            {
+                yield break;
+            }
+
+            _isSorting = false;
+        }
+
+        private IEnumerator SortAnyTargets()
+        {
+            int callsToCanAddItem = 0;
+            const int CanAddItemCallThreshold = 10;
+            foreach (var item in _mono.DeepDrillerContainer.GetItemsWithin())
+            {
+                foreach (FcsDevice target in _storagesList)
                 {
-                    var curItem = items.ElementAt(i);
-                    for (int j = curItem.Value - 1; j >= 0; j--)
+
+                    for (int i = 0; i < item.Value; i++)
                     {
-                        QuickLogger.Debug($"Attempting to remove: {Language.main.Get(curItem.Key)}",true);
-                        var result = TransferToAlterraStorage(curItem.Key);
-                        QuickLogger.Debug($"Remove result: {result}", true);
-                        if (result)
+                        callsToCanAddItem++;
+                        if (target.CanBeStored(1, item.Key))
                         {
-                            _mono.DeepDrillerContainer.OnlyRemoveItemFromContainer(curItem.Key,true);
+                            SortItem(item.Key, target);
+                            _unsortableItems--;
+                            _sortedItem = true;
+                            yield break;
+                        }
+                        else if (callsToCanAddItem > CanAddItemCallThreshold)
+                        {
+                            callsToCanAddItem = 0;
+                            yield return null;
                         }
                     }
                 }
             }
         }
 
-        internal bool TransferToAlterraStorage(TechType item)
+        private void SortItem(TechType techType, FcsDevice target)
         {
-            foreach (FcsDevice connectableDevice in _storagesList)
-            {
-                if (connectableDevice.CanBeStored(1,item))
-                {
-                    return connectableDevice.AddItemToContainer(item.ToInventoryItem());
-                }
-
-                QuickLogger.Debug("AlterraStorage Cant Hold Item", true);
-            }
-
-            return false;
+            _mono.DeepDrillerContainer.OnlyRemoveItemFromContainer(techType);
+            target.AddItemToContainer(techType.ToInventoryItem());
         }
 
         private void FindAlterraStorage()
         {
             _storagesList.Clear();
 
-            for (int i = FCSAlterraHubService.PublicAPI.GetRegisteredDevices().Count- 1; i > -1; i--)
+            var foundDevices = FCSAlterraHubService.PublicAPI.GetRegisteredDevicesOfId("AS");
+
+            for (int i = foundDevices.Count- 1; i > -1; i--)
             {
-                if (FCSAlterraHubService.PublicAPI.GetRegisteredDevices().ElementAt(i).Value.UnitID.StartsWith("AS"))
+                if (CheckIfInRange(foundDevices.ElementAt(i).Value))
                 {
-                    if (CheckIfInRange(FCSAlterraHubService.PublicAPI.GetRegisteredDevices().ElementAt(i).Value))
-                    {
-                        _storagesList.Add(FCSAlterraHubService.PublicAPI.GetRegisteredDevices().ElementAt(i).Value);
-                    }
+                    _storagesList.Add(foundDevices.ElementAt(i).Value);
                 }
             }
 
             if (_storagesList.Any())
             {
                 _mono.DisplayHandler.RefreshAlterraStorageList();
+            }
+            else
+            {
+                QuickLogger.Debug("No Alterra Storage Found",true);
             }
         }
 

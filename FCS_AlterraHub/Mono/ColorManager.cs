@@ -66,7 +66,7 @@ namespace FCS_AlterraHub.Mono
 
                 case ColorTargetMode.Emission:
 
-                    if (!string.IsNullOrWhiteSpace(_lumMaterial))
+                    if (!string.IsNullOrWhiteSpace(_lumMaterial) || _currentLumColor != color)
                     {
                         var emissionResult = MaterialHelpers.ChangeEmissionColor(_lumMaterial, _gameObject, color);
                         _currentLumColor = color;

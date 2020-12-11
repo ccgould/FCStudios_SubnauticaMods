@@ -259,7 +259,7 @@ namespace FCS_StorageSolutions.AlterraStorage.Mono
 
         public override bool CanDeconstruct(out string reason)
         {
-            if (_storageContainer.GetCount() > 0)
+            if (_storageContainer?.GetCount() > 0)
             {
                 reason = AuxPatchers.ContainerNotEmpty();
                 return false;
@@ -314,12 +314,16 @@ namespace FCS_StorageSolutions.AlterraStorage.Mono
 
         public void OnHandHover(GUIHand hand)
         {
-            if (!_interactionHelper.IsInRange && IsInitialized && IsConstructed)
+            HandReticle main = HandReticle.main;
+
+            if (!IsInitialized || !IsConstructed || _interactionHelper.IsInRange)
             {
-                HandReticle main = HandReticle.main;
-                main.SetInteractText(AuxPatchers.OpenAlterraStorage());
-                main.SetIcon(HandReticle.IconType.Hand);
+                main.SetIcon(HandReticle.IconType.Default);
+                return;
             }
+            
+            main.SetInteractText(AuxPatchers.OpenAlterraStorage());
+            main.SetIcon(HandReticle.IconType.Hand);
         }
 
         public void OnHandClick(GUIHand hand)

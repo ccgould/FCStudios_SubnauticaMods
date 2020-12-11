@@ -41,6 +41,9 @@ namespace FCS_EnergySolutions
             var jetStreamT242 = new JetStreamT242Patcher();
             jetStreamT242.Patch();
 
+            var powerStorage = new PowerStoragePatcher();
+            powerStorage.Patch();
+
 
             //Register debug commands
             ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));

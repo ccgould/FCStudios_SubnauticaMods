@@ -25,13 +25,16 @@ namespace FCS_AlterraHub.Mono
         private readonly Dictionary<string, FcsDevice> _registeredDevices;
         private float _timeLeft = 1f;
         private PowerSystem.Status _prevPowerState;
+        private Dictionary<string,TechLight> _baseTechLights;
 
         public SubRoot Habitat { get; set; }
-        
+
         public bool IsVisible { get; set; }
 
         public static List<BaseManager> Managers { get; } = new List<BaseManager>();
+        public static Dictionary<string,TrackedLight> GlobalTrackedLights { get; } = new Dictionary<string, TrackedLight>();
         public Action<PowerSystem.Status> OnPowerStateChanged { get; set; }
+        public bool IsBaseExternalLightsActivated { get; set; }
 
         #region Default Constructor
 
@@ -41,10 +44,11 @@ namespace FCS_AlterraHub.Mono
             Habitat = habitat;
             BaseID = habitat.gameObject.gameObject?.GetComponentInChildren<PrefabIdentifier>()?.Id;
             _registeredDevices = new Dictionary<string, FcsDevice>();
+            _baseTechLights = new Dictionary<string, TechLight>();
             _baseName = GetDefaultName();
             Player_Patch.OnPlayerUpdate += PowerConsumption;
             Player_Patch.OnPlayerUpdate += PowerStateCheck;
-            
+
         }
 
         private void PowerStateCheck()
@@ -67,13 +71,13 @@ namespace FCS_AlterraHub.Mono
         {
             QuickLogger.Debug($"Creating new manager", true);
             var manager = new BaseManager(habitat);
-            QuickLogger.Debug($"Created new base manager with ID {manager.BaseID}",true);
+            QuickLogger.Debug($"Created new base manager with ID {manager.BaseID}", true);
             Managers.Add(manager);
             QuickLogger.Debug($"Manager Count = {Managers.Count}", true);
             OnManagerCreated?.Invoke(manager);
             return manager;
         }
-        
+
         public static BaseManager FindManager(SubRoot subRoot)
         {
 #if DEBUG
@@ -88,6 +92,11 @@ namespace FCS_AlterraHub.Mono
             QuickLogger.Debug($"InstanceID: {instanceID} Base Count: {Managers.Count}");
             var manager = Managers.Find(x => x.BaseID == instanceID);
             return manager;
+        }
+
+        public static BaseManager FindManager(TechLight techLight)
+        {
+            return GlobalTrackedLights.FirstOrDefault(x => x.Value.TechLight == techLight).Value.Manager;
         }
 
         /// <summary>
@@ -153,7 +162,7 @@ namespace FCS_AlterraHub.Mono
 
         public void SendBaseMessage(string baseMessage)
         {
-            QuickLogger.Message(baseMessage,true);
+            QuickLogger.Message(baseMessage, true);
         }
 
         public void RegisterDevice(FcsDevice device)
@@ -180,7 +189,9 @@ namespace FCS_AlterraHub.Mono
                     {
                         var num = 1f * DayNightCycle.main.dayNightSpeed;
                         Habitat.powerRelay.ConsumeEnergy(device.Value.GetPowerUsage() * num, out float amountConsumed);
-                        QuickLogger.Debug($"Base {_baseName} consumed {amountConsumed} || requested {device.Value.GetPowerUsage()} || Device {device.Value.UnitID}", true);
+                        QuickLogger.Debug(
+                            $"Base {_baseName} consumed {amountConsumed} || requested {device.Value.GetPowerUsage()} || Device {device.Value.UnitID}",
+                            true);
                     }
                 }
 
@@ -190,7 +201,11 @@ namespace FCS_AlterraHub.Mono
 
         public bool HasEnoughPower(float power)
         {
-            if(Habitat.powerRelay == null) {QuickLogger.Debug("Habitat is null");}
+            if (Habitat.powerRelay == null)
+            {
+                QuickLogger.Debug("Habitat is null");
+            }
+
             if (Habitat.powerRelay == null || Habitat.powerRelay.GetPower() < power) return false;
             return true;
         }
@@ -201,6 +216,16 @@ namespace FCS_AlterraHub.Mono
                 _registeredDevices?.Remove(device.UnitID);
         }
 
+        public void UnRegisterDevice(TechLight device)
+        {
+            var prefabId = device.gameObject.GetComponent<PrefabIdentifier>()?.Id;
+            if (!string.IsNullOrEmpty(prefabId) && _baseTechLights.ContainsKey(prefabId))
+            {
+                _baseTechLights.Remove(prefabId);
+                RemoveGlobalTrackedLight(prefabId);
+            }
+        }
+
         public IEnumerable<FcsDevice> GetDevices(string tabID)
         {
             foreach (KeyValuePair<string, FcsDevice> device in _registeredDevices)
@@ -208,7 +233,7 @@ namespace FCS_AlterraHub.Mono
                 QuickLogger.Debug($"Checking registered devices: Device: {device.Key} || Key {tabID}");
                 if (device.Key.StartsWith(tabID, StringComparison.OrdinalIgnoreCase))
                 {
-                    QuickLogger.Debug($"Key Match",true);
+                    QuickLogger.Debug($"Key Match", true);
                     yield return device.Value;
                 }
             }
@@ -217,6 +242,87 @@ namespace FCS_AlterraHub.Mono
         public bool DeviceBuilt(string tabID)
         {
             return _registeredDevices.Any(x => x.Key.StartsWith(tabID, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public void NotifyByID(string modID, string commandMessage)
+        {
+            if (!string.IsNullOrEmpty(modID))
+            {
+                foreach (KeyValuePair<string, FcsDevice> device in FCSAlterraHubService.PublicAPI
+                    .GetRegisteredDevicesOfId(modID))
+                {
+                    device.Value.IPCMessage?.Invoke(commandMessage);
+                }
+            }
+            else
+            {
+                foreach (KeyValuePair<string, FcsDevice> device in FCSAlterraHubService.PublicAPI.GetRegisteredDevices()
+                )
+                {
+                    device.Value.IPCMessage?.Invoke(commandMessage);
+                }
+            }
+        }
+
+        public float GetPower()
+        {
+            if (Habitat.powerRelay != null)
+            {
+                return Habitat.powerRelay.GetPower();
+            }
+
+            return 0;
+        }
+
+        public void RegisterDevice(TechLight device)
+        {
+            var prefabId = device.gameObject.GetComponent<PrefabIdentifier>()?.Id;
+            if (!string.IsNullOrEmpty(prefabId) && !_baseTechLights.ContainsKey(prefabId))
+            {
+                _baseTechLights.Add(prefabId,device);
+                var controller = device.gameObject.AddComponent<FCSTechLigtController>();
+                controller.Initialize(this);
+                AddGlobalTrackedLight(prefabId, device,null, this);
+            }
+        }
+
+        private static void AddGlobalTrackedLight(string prefabId, TechLight techLight, BaseSpotLight spotLight, BaseManager baseManager)
+        {
+            if (!GlobalTrackedLights.ContainsKey(prefabId))
+            {
+                GlobalTrackedLights.Add(prefabId,new TrackedLight{Manager = baseManager, TechLight = techLight, SpotLight = spotLight});
+            }
+        }
+
+        private static void RemoveGlobalTrackedLight(string prefabId)
+        {
+            if (GlobalTrackedLights.ContainsKey(prefabId))
+            {
+                GlobalTrackedLights.Remove(prefabId);
+            }
+        }
+    }
+
+    public struct TrackedLight 
+    {
+        public BaseManager Manager { get; set; }
+        public TechLight TechLight { get; set; }
+        public BaseSpotLight SpotLight { get; set; }
+    }
+
+    public class FCSTechLigtController : MonoBehaviour
+    {
+        private BaseManager _manager;
+
+        public void Initialize(BaseManager manager)
+        {
+            _manager = manager;
+        }
+
+
+        private void Update()
+        {
+
         }
     }
 }

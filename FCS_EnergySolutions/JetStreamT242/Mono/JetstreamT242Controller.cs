@@ -7,7 +7,6 @@ using FCS_EnergySolutions.Buildable;
 using FCS_EnergySolutions.Configuration;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Json.ExtensionMethods;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -23,6 +22,7 @@ namespace FCS_EnergySolutions.JetStreamT242.Mono
         private MotorHandler _motor;
         private RotorHandler _tilter;
         private RotorHandler _rotor;
+        private Text _unitID;
 
         private IFCSAlterraHubService publicApi => FCSAlterraHubService.PublicAPI;
 
@@ -31,6 +31,7 @@ namespace FCS_EnergySolutions.JetStreamT242.Mono
         private void Start()
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.JetStreamT242TabID, Mod.ModName);
+            _unitID.text = $"UnitID: {UnitID}";
         }
 
         private void OnEnable()
@@ -113,7 +114,7 @@ namespace FCS_EnergySolutions.JetStreamT242.Mono
                 _colorManager.Initialize(gameObject, ModelPrefab.BodyMaterial);
             }
 
-            GameObjectHelpers.FindGameObject(gameObject, "UNITID").GetComponent<Text>().text = $"UnitID: {UnitID}";
+            _unitID = GameObjectHelpers.FindGameObject(gameObject, "UNITID").GetComponent<Text>();
             DeActivateTurbine();
             MaterialHelpers.ChangeEmissionStrength(ModelPrefab.EmissiveBControllerMaterial, gameObject,5);
             IsInitialized = true;
@@ -126,7 +127,7 @@ namespace FCS_EnergySolutions.JetStreamT242.Mono
             if (!Mod.IsSaving())
             {
                 QuickLogger.Info($"Saving {GetPrefabID()}");
-                Mod.Save();
+                Mod.Save(serializer);
                 QuickLogger.Info($"Saved {GetPrefabID()}");
             }
         }

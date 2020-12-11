@@ -31,6 +31,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Buildable
             { $"{ModKey}_IncorrectAmountOfParameterFormat", "Incorrect amount of parameters expected {0} got {1}."},
             { $"{ModKey}_NotOreErrorFormat", "TechType {0} is not an ore."},
             { $"{ModKey}_FilterButton", "Toggle Filters."},
+            { $"{ModKey}_FilterButtonDesc", "With filters enabled the drill will only drill the checked items, with filters disabled all items in the list will be drilled."},
             { $"{ModKey}_ToggleRangeButtonToolTip", "Show/Hide Range"},
             { $"{ModKey}_ExportToggleButtonToolTip", "Toggle export to Alterra Storage."},
             { $"{ModKey}_AddLubricantButtonToolTip", "Add lubricant to drill."},
@@ -42,7 +43,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Buildable
             { $"{ModKey}_GoToHomeToolTip", "Go to home page."},
             { $"{ModKey}_GoToSettingsToolTip", "Go to settings page."},
             { $"{ModKey}_BlackListToggleToolTip", "Blacklist Toggle."},
-            { $"{ModKey}_BlackListDesc", "Toggles the filter list between a Whitelist and a Blacklist."},
+            { $"{ModKey}_BlackListDesc", "While in whitelist mode all checked items will be allowed in the drill, while in blacklist mode checked items will not be allowed. Blacklist Enabled: {0}."},
             { $"{ModKey}_AlterraStorageToggleToolTip", "Alterra Storage toggle."},
             { $"{ModKey}_AlterraStorageToggleDesc", "Toggles whether  the driller exports its items to a nearby Alterra Storage."},
             { $"{ModKey}_AlterraStorageRangeToggleToolTip", "Alterra Storage Range Viewer Toggle."},
@@ -55,6 +56,11 @@ namespace FCS_ProductionSolutions.DeepDriller.Buildable
             { $"{ModKey}_PowerConsumption", "Power Consumption:"},
             { $"{ModKey}_BiomeFormat", "Current Biome: {0}"},
             { $"{ModKey}_InventoryStorageFormat", "INVENTORY: Items {0}/{1}"},
+            { $"{ModKey}_Idle", "Idle"},
+            { $"{ModKey}_Drilling", "Drilling"},
+            { $"{ModKey}_NoPower", "No Power"},
+            { $"{ModKey}_NeedsOil", "Lubricant Needed"},
+            { $"{ModKey}_DrillDeactivated", "Drill Deactivated"},
         };
 
 
@@ -71,7 +77,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Buildable
 
         private static string GetLanguage(string key)
         {
-            return LanguageDictionary.ContainsKey(key) ? Language.main.Get(LanguageDictionary[key]) : string.Empty;
+            return LanguageDictionary.ContainsKey(key) ? Language.main.Get(key) : "N/A";
         }
         
         internal static string PrevPage()
@@ -159,6 +165,11 @@ namespace FCS_ProductionSolutions.DeepDriller.Buildable
             return string.Format(GetLanguage($"{ModKey}_NotOreErrorFormat"), invalidOreTechType);
         }
 
+        internal static string FilterButtonDesc()
+        {
+            return GetLanguage($"{ModKey}_FilterButtonDesc");
+        }
+
         internal static string FilterButton()
         {
             return GetLanguage($"{ModKey}_FilterButton");
@@ -199,9 +210,9 @@ namespace FCS_ProductionSolutions.DeepDriller.Buildable
             return GetLanguage($"{ModKey}_BlackListToggleToolTip");
         }
 
-        public static string BlackListToggleDesc()
+        public static string BlackListToggleDesc(bool isEnabled)
         {
-            return GetLanguage($"{ModKey}_BlackListDesc");
+            return string.Format(GetLanguage($"{ModKey}_BlackListDesc"),isEnabled);
         }
 
         public static string AlterraStorageToggle()
@@ -262,6 +273,31 @@ namespace FCS_ProductionSolutions.DeepDriller.Buildable
         public static string InventoryStorageFormat(int total, int capacity)
         {
             return string.Format(GetLanguage($"{ModKey}_InventoryStorageFormat"), total,capacity);
+        }
+
+        public static string NeedsOil()
+        {
+            return GetLanguage($"{ModKey}_NeedsOil");
+        }
+
+        public static string Idle()
+        {
+            return GetLanguage($"{ModKey}_Idle");
+        }
+
+        public static string Drilling()
+        {
+            return GetLanguage($"{ModKey}_Drilling");
+        }
+
+        public static string NoPower()
+        {
+            return GetLanguage($"{ModKey}_NoPower");
+        }
+
+        public static string DrillDeactivated()
+        {
+            return GetLanguage($"{ModKey}_DrillDeactivated");
         }
     }
 }

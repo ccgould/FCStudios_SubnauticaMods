@@ -20,6 +20,17 @@ namespace FCS_HomeSolutions.Configuration
     }
 
     [Serializable]
+    internal class CurtainDataEntry
+    {
+        [JsonProperty] internal string Id { get; set; }
+        [JsonProperty(PropertyName = "COL")] internal ColorVec4 Color { get; set; }
+        [JsonProperty(PropertyName = "SCOL")] internal ColorVec4 SecondaryColor { get; set; }
+        public string SelectedTexturePath { get; set; }
+        [JsonProperty] internal bool IsOpen { get; set; }
+    }
+
+
+    [Serializable]
     internal class PaintToolDataEntry
     {
         [JsonProperty] internal string Id { get; set; }
@@ -106,6 +117,14 @@ namespace FCS_HomeSolutions.Configuration
         [JsonProperty] internal bool IsLinked { get; set; }
     }
 
+    internal class BaseOperatorDataEntry
+    {
+        [JsonProperty] internal string Id { get; set; }
+        [JsonProperty(PropertyName = "COL")] internal ColorVec4 Color { get; set; }
+        [JsonProperty(PropertyName = "SCOL")] internal ColorVec4 SecondaryColor { get; set; }
+        [JsonProperty(PropertyName = "BID")] internal string BaseID { get; set; }
+    }
+
 
     [Serializable]
     internal class SaveData
@@ -120,5 +139,7 @@ namespace FCS_HomeSolutions.Configuration
         [JsonProperty] internal List<MiniFountainFilterDataEntry> MiniFountainFilterEntries = new List<MiniFountainFilterDataEntry>();
         [JsonProperty] internal List<TrashRecyclerDataEntry> TrashRecyclerEntries = new List<TrashRecyclerDataEntry>();
         [JsonProperty] internal List<QuantumTeleporterDataEntry> QuantumTeleporterEntries = new List<QuantumTeleporterDataEntry>();
+        [JsonProperty] internal List<CurtainDataEntry> CurtainEntries = new List<CurtainDataEntry>();
+        [JsonProperty] internal List<BaseOperatorDataEntry> BaseOperatorEntries = new List<BaseOperatorDataEntry>();
     }
 }

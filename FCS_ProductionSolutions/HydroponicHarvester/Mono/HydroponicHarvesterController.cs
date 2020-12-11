@@ -22,6 +22,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
         private HydroponicHarvesterDataEntry _savedData;
         private EffectsManager _effectsManager;
         private bool _isInBase;
+        private Text _unitID;
         private const float powerUsage = 0.85f;
 
         public EffectsManager EffectsManager => _effectsManager;
@@ -38,6 +39,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
         private void Start()
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.HydroponicHarvesterModTabID, Mod.ModName);
+            _unitID.text = $"UNIT ID: {UnitID}";
         }
 
         private void OnEnable()
@@ -139,7 +141,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
 
             FCSAlterraHubService.PublicAPI.AddEncyclopediaEntries(GetTechType(), true);
             
-            GameObjectHelpers.FindGameObject(gameObject, "UNITID").GetComponent<Text>().text = $"UNIT ID: {UnitID}";
+            _unitID = GameObjectHelpers.FindGameObject(gameObject, "UNITID").GetComponent<Text>();
 
 #if DEBUG
             QuickLogger.Debug($"Initialized Harvester {GetPrefabID()}");

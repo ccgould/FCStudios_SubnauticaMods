@@ -28,6 +28,9 @@ namespace FCS_AlterraHub.Registration
 
         void UnRegisterDevice(FcsDevice miniFountainFilterController);
         Dictionary<string,FcsDevice> GetRegisteredDevicesOfId(string id);
+        void RegisterTechLight(TechLight techLight);
+        bool ChargeAccount(decimal amount);
+        bool IsCreditAvailable(decimal amount);
     }
 
     internal interface IFCSAlterraHubServiceInternal
@@ -98,17 +101,12 @@ namespace FCS_AlterraHub.Registration
 
         private static void BaseManagerSetup(FcsDevice device)
         {
-            QuickLogger.Debug($"BMS: Device {device.UnitID}");
             if (string.IsNullOrEmpty(device.BaseId))
             {
-                QuickLogger.Debug($"BMS: 1");
                 var subRoot = device.gameObject.GetComponentInParent<SubRoot>();
-                QuickLogger.Debug($"BMS: 2");
                 if (subRoot != null)
                 {
-                    QuickLogger.Debug($"BMS: 3");
                     device.BaseId = subRoot.gameObject.GetComponent<PrefabIdentifier>().Id;
-                    QuickLogger.Debug($"BMS: 4");
                 }
                 else
                 {
@@ -116,15 +114,32 @@ namespace FCS_AlterraHub.Registration
                     return;
                 }
             }
-            QuickLogger.Debug($"BMS: 5");
             var manager = BaseManager.FindManager(device.BaseId);
-            QuickLogger.Debug($"Manager Returned: {manager?.BaseID}");
             if (manager != null)
             {
                 device.Manager = manager;
-                QuickLogger.Debug($"BMS: 6");
                 manager.RegisterDevice(device);
-                QuickLogger.Debug($"BMS: Device {device.UnitID}");
+            }
+        }
+
+        private static void BaseManagerSetup(TechLight device)
+        {
+            string baseId = string.Empty;
+            var subRoot = device.gameObject.GetComponentInParent<SubRoot>();
+            if (subRoot != null)
+            {
+                baseId = subRoot.gameObject.GetComponent<PrefabIdentifier>().Id;
+            }
+            else
+            {
+                QuickLogger.Debug($"Failed to Setup the Base Manager for TechLight {device.gameObject.GetComponent<PrefabIdentifier>().Id}");
+                return;
+            }
+
+            var manager = BaseManager.FindManager(baseId);
+            if (manager != null)
+            {
+                manager.RegisterDevice(device);
             }
         }
 
@@ -256,6 +271,27 @@ namespace FCS_AlterraHub.Registration
         {
             return GlobalDevices.Where(x => x.Key.StartsWith(id, StringComparison.OrdinalIgnoreCase))
                 .ToDictionary(x => x.Key, x => x.Value);
+        }
+
+        public void RegisterTechLight(TechLight techLight)
+        {
+            BaseManagerSetup(techLight);
+        }
+
+        public bool ChargeAccount(decimal amount)
+        {
+            if (CardSystem.main.HasBeenRegistered())
+            {
+                CardSystem.main.RemoveFinances(amount);
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool IsCreditAvailable(decimal amount)
+        {
+            return CardSystem.main.HasEnough(amount);
         }
     }
 }

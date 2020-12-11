@@ -4,6 +4,7 @@ using FCS_EnergySolutions.Configuration;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace FCS_EnergySolutions.Buildable
 {
@@ -24,6 +25,7 @@ namespace FCS_EnergySolutions.Buildable
         public static AssetBundle ModBundle { get; set; }
         public static string EmissiveBControllerMaterial { get;} = $"{Mod.ModName}_B_Controller";
         public static string EmissiveControllerMaterial { get; } = $"{Mod.ModName}_E_Controller";
+        public static GameObject PowerStoragePrefab { get; set; }
 
 
         internal static void Initialize()
@@ -39,6 +41,7 @@ namespace FCS_EnergySolutions.Buildable
             }
 
             AlterraGenItemPrefab = GetPrefab("ItemButton");
+            PowerStoragePrefab = GetPrefab(Mod.PowerStoragePrefabName);
         }
 
         internal static GameObject GetPrefab(string prefabName)

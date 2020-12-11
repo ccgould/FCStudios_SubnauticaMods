@@ -1,33 +1,34 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Spawnables;
+using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
+using FCS_HomeSolutions.Curtains.Mono;
+using FCS_HomeSolutions.TrashReceptacle.Mono;
 using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
 using UnityEngine;
 
-namespace FCS_HomeSolutions.Buildables
+namespace FCS_HomeSolutions.TrashReceptacle.Buildable
 {
-    internal class BaseOperatorPatch : Buildable
+    internal class CurtainPatch : SMLHelper.V2.Assets.Buildable
     {
         public override TechGroup GroupForPDA => TechGroup.InteriorModules;
         public override TechCategory CategoryForPDA => TechCategory.InteriorModule;
         public override string AssetsFolder => Mod.GetAssetPath();
 
-        public BaseOperatorPatch() : base(Mod.BaseOperatorClassID, Mod.BaseOperatorFriendly, Mod.BaseOperatorDescription)
+        public CurtainPatch() : base("Curtain", "Curtain","Get some privacy from all the fish that steer at you.")
         {
             OnFinishedPatching += () =>
             {
-                var baseOperatorKit = new FCSKit(Mod.BaseOperatorKitClassID, Mod.BaseOperatorFriendly, Path.Combine(AssetsFolder, $"{ClassID}.png"));
-                baseOperatorKit.Patch();
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, baseOperatorKit.TechType, 30000, StoreCategory.Home);
-
+                var curtainKit = new FCSKit("Curtain_Kit", FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
+                curtainKit.Patch();
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, "Curtain_Kit".ToTechType(), 200, StoreCategory.Home);
+                FCSAlterraHubService.PublicAPI.RegisterPatchedMod(ClassID);
             };
         }
 
@@ -35,12 +36,12 @@ namespace FCS_HomeSolutions.Buildables
         {
             try
             {
-                var prefab = GameObject.Instantiate(ModelPrefab.BaseOperatorPrefab);
+                var prefab = GameObject.Instantiate(ModelPrefab.CurtainPrefab);
 
-                //var size = new Vector3(1.353966f, 2.503282f, 1.006555f);
-                //var center = new Vector3(0.006554961f, 1.394679f, 0.003277525f);
+                var size = new Vector3(3.242206f, 2.483261f, 0.2225349f);
+                var center = new Vector3(0.07472074f, -1.171088f, 0.1221731f);
 
-                //GameObjectHelpers.AddConstructableBounds(prefab, size, center);
+                GameObjectHelpers.AddConstructableBounds(prefab, size, center);
 
                 var model = prefab.FindChild("model");
 
@@ -65,12 +66,13 @@ namespace FCS_HomeSolutions.Buildables
                 constructable.allowedOnConstructables = false;
                 constructable.model = model;
                 constructable.techType = TechType;
+                
 
                 PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
                 prefabID.ClassId = ClassID;
 
                 prefab.AddComponent<TechTag>().type = TechType;
-                //prefab.AddComponent<HydroponicHarvesterController>();
+                prefab.AddComponent<CurtainController>();
                 return prefab;
 
             }
@@ -86,12 +88,12 @@ namespace FCS_HomeSolutions.Buildables
 #if SUBNAUTICA
         protected override TechData GetBlueprintRecipe()
         {
-            return Mod.BaseOperatorIngredients;
+            return Mod.TrashReceptacleIngredients;
         }
 #elif BELOWZERO
         protected override RecipeData GetBlueprintRecipe()
         {
-            return Mod.BaseOperatorIngredients;
+            return Mod.TrashReceptacleIngredients;
         }
 #endif
     }

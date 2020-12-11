@@ -12,6 +12,7 @@ using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using System.Text;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_ProductionSolutions.Buildable;
@@ -40,6 +41,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         private bool _biomeFoundMessageSent;
         private List<PistonBobbing> _pistons = new List<PistonBobbing>();
         private StringBuilder _sb;
+        private bool _isBreakSet;
 
         internal string CurrentBiome { get; set; }
         internal bool IsFromSave { get; set; }
@@ -72,6 +74,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.DeepDrillerMk3TabID, Mod.ModName);
             DisplayHandler?.UpdateUnitID();
+            UpdateEmission();
         }
 
         public override void OnDestroy()
@@ -114,7 +117,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
                     UpgradeManager.Load(_saveData?.Upgrades);
                     OreGenerator.SetBlackListMode(_saveData.IsBlackListMode);
                     _isRangeVisible = _saveData.IsRangeVisible;
-
+                    _isBreakSet = _saveData.IsBrakeSet;
                 }
 
                 StartCoroutine(TryGetLoot());
@@ -229,6 +232,8 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
 
             _saveData.IsRangeVisible = _isRangeVisible;
 
+            _saveData.IsBrakeSet = _isBreakSet;
+
             _saveData.AllowedToExport = TransferManager.IsAllowedToExport();
             saveDataList.DeepDrillerMk2Entries.Add(_saveData);
 
@@ -269,7 +274,13 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             _pistons.Add(gameObject.transform.FirstOrDefault(x => x.name == "hover_piston_pump_04").gameObject.AddComponent<PistonBobbing>());
             _pistons.Add(gameObject.transform.FirstOrDefault(x => x.name == "hover_piston_pump_05").gameObject.AddComponent<PistonBobbing>());
             _pistons.Add(gameObject.transform.FirstOrDefault(x => x.name == "hover_piston_pump_06").gameObject.AddComponent<PistonBobbing>());
-            
+
+            _pistons[1].Invert = true;
+            _pistons[3].Invert = true;
+            _pistons[5].Invert = true;
+
+
+
             if (OilHandler == null)
             {
                 OilHandler = gameObject.AddComponent<FCSDeepDrillerOilHandler>();
@@ -451,6 +462,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             DisplayHandler.Setup(this);
             DisplayHandler.RefreshStorageAmount();
             DisplayHandler.UpdateListItemsState(_saveData?.FocusOres ?? new HashSet<TechType>());
+            DisplayHandler?.UpdateUnitID();
 
             if (_saveData != null)
             {
@@ -537,7 +549,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
 
         public override bool IsOperational => DeepDrillerPowerManager.HasEnoughPowerToOperate() &&
                    DeepDrillerPowerManager.GetPowerState() == FCSPowerStates.Powered &&
-                   OilHandler.HasOil() && !DeepDrillerContainer.IsFull;
+                   OilHandler.HasOil() && !DeepDrillerContainer.IsFull && !_isBreakSet;
         
         internal bool GetIsRangeVisible()
         {
@@ -556,6 +568,11 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
 
         #endregion
 
+        internal bool IsBreakSet()
+        {
+            return _isBreakSet;
+        }
+
         public void EmptyDrill()
         {
             DeepDrillerContainer.Clear();
@@ -570,13 +587,27 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
                 _sb.Clear();
                 _sb.Append(UnitID);
                 _sb.Append(Environment.NewLine);
+                _sb.Append(AuxPatchers.PressKeyToOperate(GameInput.GetBindingName(GameInput.Button.Exit,GameInput.BindingSet.Primary), Mod.DeepDrillerMk3FriendlyName));
+                _sb.Append(Environment.NewLine);
                 _sb.Append(Language.main.GetFormat<int, int>("ThermalPlantStatus", Mathf.RoundToInt(DeepDrillerPowerManager.GetSourcePower(DeepDrillerPowerSources.Thermal)), Mathf.RoundToInt(DeepDrillerPowerManager.GetSourcePowerCapacity(DeepDrillerPowerSources.Thermal))));
                 _sb.Append(Environment.NewLine);
                 _sb.Append(Language.main.GetFormat<int, int, int>("SolarPanelStatus", Mathf.RoundToInt(DeepDrillerPowerManager.GetRechargeScalar() * 100f), Mathf.RoundToInt(DeepDrillerPowerManager.GetSourcePower(DeepDrillerPowerSources.Solar)), Mathf.RoundToInt(DeepDrillerPowerManager.GetSourcePowerCapacity(DeepDrillerPowerSources.Solar))));
 
                 HandReticle.main.SetInteractText(_sb.ToString(),false, HandReticle.Hand.None);
                 HandReticle.main.SetIcon(HandReticle.IconType.Info, 1f);
+
+                if(GameInput.GetButtonDown(GameInput.Button.Exit))
+                {
+                    _isBreakSet ^= true;
+                    UpdateEmission();
+                }
             }
+        }
+
+        private void UpdateEmission()
+        {
+            MaterialHelpers.ChangeEmissionColor(ModelPrefab.EmissionControllerMaterial, gameObject,
+                _isBreakSet ? Color.red : Color.cyan);
         }
 
         public void OnHandClick(GUIHand hand)

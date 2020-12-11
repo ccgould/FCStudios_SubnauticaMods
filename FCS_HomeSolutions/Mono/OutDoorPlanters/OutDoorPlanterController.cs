@@ -140,7 +140,6 @@ namespace FCS_HomeSolutions.Mono.OutDoorPlanters
 
         public byte[] GetStorageBytes(ProtobufSerializer serializer)
         {
-            QuickLogger.ModMessage($"Getting Storage Bytes");
             return StorageHelper.Save(serializer, GetStorageRoot());
         }
 

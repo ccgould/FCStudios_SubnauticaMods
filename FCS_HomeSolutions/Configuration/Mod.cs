@@ -477,5 +477,43 @@ namespace FCS_HomeSolutions.Configuration
 
             return new QuantumTeleporterDataEntry() { Id = id };
         }
+
+        internal static CurtainDataEntry GetCurtainDataEntrySaveData(string id)
+        {
+            LoadData();
+
+            var saveData = GetSaveData();
+
+            foreach (var entry in saveData.CurtainEntries)
+            {
+                if (string.IsNullOrEmpty(entry.Id)) continue;
+
+                if (entry.Id == id)
+                {
+                    return entry;
+                }
+            }
+
+            return new CurtainDataEntry() { Id = id };
+        }
+
+        internal static BaseOperatorDataEntry GetBaseOperatorDataEntrySaveData(string id)
+        {
+            LoadData();
+
+            var saveData = GetSaveData();
+
+            foreach (var entry in saveData.BaseOperatorEntries)
+            {
+                if (string.IsNullOrEmpty(entry.Id)) continue;
+
+                if (entry.Id == id)
+                {
+                    return entry;
+                }
+            }
+
+            return new BaseOperatorDataEntry() { Id = id };
+        }
     }
 }

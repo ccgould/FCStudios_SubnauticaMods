@@ -78,7 +78,7 @@ namespace FCS_HomeSolutions.QuantumTeleporter.Mono
                 case "NetworkItem":
                     _toUnit = (QuantumTeleporterController)tag;
 
-                    if (_toUnit.PowerManager.HasEnoughPower(SelectedTab))
+                    if (_toUnit.PowerManager.HasEnoughPower(SelectedTab) && _mono.PowerManager.HasEnoughPower(SelectedTab))
                     {
                         _destination.text = $"[{_toUnit.GetName()}]";
                         GotoPage(QttPages.Confirmation);
@@ -290,8 +290,6 @@ namespace FCS_HomeSolutions.QuantumTeleporter.Mono
             
             _teleportGrid.UpdaterPaginator(items?.Count ?? 0);
         }
-
-
 
         private string NetworkFormat(object go)
         {

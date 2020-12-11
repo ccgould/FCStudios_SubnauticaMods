@@ -1,4 +1,5 @@
-﻿using UnityEngine.EventSystems;
+﻿using FCSCommon.Enums;
+using UnityEngine.EventSystems;
 
 namespace FCSCommon.Components
 {
@@ -7,11 +8,20 @@ namespace FCSCommon.Components
         public override void OnEnable()
         {
             base.OnEnable();
-            ChangeState(!IsSelected);
+
+            if (IsSelected)
+            {
+                Select();
+            }
+            else
+            {
+                DeSelect();
+            }
         }
 
         private void ChangeState(bool value)
         {
+            if(IsRadial && IsSelected) return;
             if (value)
             {
                 DeSelect();

@@ -482,6 +482,11 @@ namespace FCSCommon.Helpers
             return result;
         }
 
+        internal static void ChangeEmissionColor(Material material, Color color)
+        {
+            material.SetVector("_GlowColor", color);
+        }
+
         internal static void ToggleEmission(string materialName, GameObject gameObject, bool value)
         {
             Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>(true);
@@ -590,15 +595,64 @@ namespace FCSCommon.Helpers
         {
             if (File.Exists(filePath))
             {
-                var bytes = File.ReadAllBytes(filePath);
-                var texture = new Texture2D(2, 2);
+                var shader = Shader.Find("MarmosetUBER");
+                byte[] fileData = File.ReadAllBytes(filePath);
+
+                /* Working fine dont delete
+                Texture2D tex = new Texture2D(2, 2, TextureFormat.RGBA32, false);
+                tex.LoadImage(fileData);
+
+                Texture2D texPNG = new Texture2D(tex.width, tex.height, TextureFormat.RGBA32, false);
+                texPNG.SetPixels(tex.GetPixels());
+                texPNG.Apply();
+                */
+
                 Renderer[] renderers = go.GetComponentsInChildren<Renderer>(true);
 
                 foreach (Renderer render in renderers)
                 {
-                    if (render.material.name.StartsWith(materialName, StringComparison.OrdinalIgnoreCase))
+                    foreach (Material material in render.materials)
                     {
-                        render.material.mainTexture = texture;
+                        if (material.name.StartsWith(materialName, StringComparison.OrdinalIgnoreCase))
+                        {
+                            material.mainTexture = LoadPNG(filePath);
+                            material.shader = shader;
+                            material.EnableKeyword("MARMO_ALPHA_CLIP");
+                        }
+                    }
+                }
+            }
+        }
+
+        public static Texture2D LoadPNG(string filePath)
+        {
+
+            Texture2D tex = null;
+            byte[] fileData;
+
+            if (File.Exists(filePath))
+            {
+                fileData = File.ReadAllBytes(filePath);
+                tex = new Texture2D(2, 2);
+                tex.LoadImage(fileData); //..this will auto-resize the texture dimensions.
+            }
+            return tex;
+        }
+
+        public static void SetTexture(string materialName, GameObject go, Texture2D texture)
+        {
+            var shader = Shader.Find("MarmosetUBER");
+            Renderer[] renderers = go.GetComponentsInChildren<Renderer>(true);
+
+            foreach (Renderer render in renderers)
+            {
+                foreach (Material material in render.materials)
+                {
+                    if (material.name.StartsWith(materialName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        material.mainTexture = texture;
+                        material.shader = shader;
+                        material.EnableKeyword("MARMO_ALPHA_CLIP");
                     }
                 }
             }

@@ -171,7 +171,6 @@ namespace FCS_AlterraHub.Mono
 
         public byte[] Save(ProtobufSerializer serializer)
         {
-            QuickLogger.ModMessage($"Getting Storage Bytes: {serializer}");
             if (serializer == null || _storageRoot == null)
             {
                 QuickLogger.DebugError($"Failed to save: Serializer: {serializer} || Root {_storageRoot?.name}",true);
@@ -179,7 +178,6 @@ namespace FCS_AlterraHub.Mono
             }
 
             _storageRootBytes = StorageHelper.Save(serializer, _storageRoot);
-            QuickLogger.ModMessage($"Storage Bytes Returned: {_storageRootBytes.Length}");
             return _storageRootBytes;
         }
 

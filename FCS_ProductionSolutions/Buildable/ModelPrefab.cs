@@ -32,6 +32,7 @@ namespace FCS_ProductionSolutions.Buildable
         public static GameObject DeepDrillerOreBTNPrefab { get; set; }
         public static GameObject DeepDrillerProgrammingItemPrefab { get; set; }
         public static GameObject DeepDrillerOverrideItemPrefab { get; set; }
+        public static GameObject DeepDrillerFunctionOptionItemPrefab { get; set; }
 
         internal static void Initialize()
         {
@@ -54,6 +55,7 @@ namespace FCS_ProductionSolutions.Buildable
             DeepDrillerListItemPrefab = GetPrefab("DeepDrillerTransferToggleButton");
             DeepDrillerProgrammingItemPrefab = GetPrefab("DeepDrillerProgrammingItem");
             DeepDrillerOverrideItemPrefab = GetPrefab("OverrideItem");
+            DeepDrillerFunctionOptionItemPrefab = GetPrefab("FunctionOptionItem");
         }
 
         

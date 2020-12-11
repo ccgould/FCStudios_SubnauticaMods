@@ -61,7 +61,8 @@ namespace FCS_ProductionSolutions.Configuration
         [JsonProperty] internal bool IsRangeVisible { get; set; }
         [JsonProperty] internal bool AllowedToExport { get; set; }
         [JsonProperty] internal bool IsBlackListMode { get; set; }
-        public ColorVec4 SecColor { get; set; }
+        [JsonProperty] internal ColorVec4 SecColor { get; set; }
+        [JsonProperty] internal bool IsBrakeSet { get; set; }
     }
 
     [Serializable]

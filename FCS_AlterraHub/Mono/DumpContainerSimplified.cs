@@ -87,7 +87,6 @@ namespace FCS_AlterraHub.Mono
 
         public byte[] Save(ProtobufSerializer serializer)
         {
-            QuickLogger.ModMessage($"Getting Storage Bytes");
             if (serializer == null || _containerRoot == null)
             {
                 QuickLogger.DebugError($"Failed to save: Serializer: {serializer} || Root {_containerRoot?.name}", true);

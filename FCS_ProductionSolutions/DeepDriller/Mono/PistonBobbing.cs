@@ -11,6 +11,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         // Position Storage Variable
         private Vector3 originalLocalPosition;
         private bool _isRunning;
+        public bool Invert { get; set; }
 
         // Use this for initialization
         private void Start()
@@ -40,7 +41,14 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             transform.localPosition = originalLocalPosition;
 
             // Apply offset
-            transform.position += globalOffset;
+            if (!Invert)
+            {
+                transform.position += globalOffset;
+            }
+            else
+            {
+                transform.position -= globalOffset;
+            }
         }
     }
 }

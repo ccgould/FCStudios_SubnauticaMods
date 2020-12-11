@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using SMLHelper.V2.Handlers;
 
 namespace FCS_ProductionSolutions.Buildable
@@ -11,6 +12,7 @@ namespace FCS_ProductionSolutions.Buildable
         {
             { $"{ModKey}_Scan","SCAN"},
             { $"{ModKey}_Stop","STOP"},
+            { $"{ModKey}_PressKeyToOperate","Press {0} to activate or deactivate {1}."},
         };
 
         internal static void AdditionalPatching()
@@ -23,7 +25,7 @@ namespace FCS_ProductionSolutions.Buildable
 
         private static string GetLanguage(string key)
         {
-            return LanguageDictionary.ContainsKey(key) ? Language.main.Get(LanguageDictionary[key]) : string.Empty;
+            return LanguageDictionary.ContainsKey(key) ? Language.main.Get(key) : "N/A";
         }
 
         internal static string Stop()
@@ -35,5 +37,16 @@ namespace FCS_ProductionSolutions.Buildable
         {
             return GetLanguage($"{ModKey}_Scan");
         }
+
+        public static string InventoryFull()
+        {
+            return Language.main.Get("InventoryFull");
+        }
+
+        public static string PressKeyToOperate(string buttonName,string modName)
+        {
+            return String.Format(GetLanguage($"{ModKey}_PressKeyToOperate"),buttonName,modName);
+        }
+
     }
 }

@@ -90,6 +90,9 @@
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\Dependancies\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.ImageConversionModule">
+      <HintPath>..\Dependancies\UnityEngine.ImageConversionModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.IMGUIModule">
       <HintPath>F:\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
     </Reference>

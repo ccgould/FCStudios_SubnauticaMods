@@ -90,6 +90,9 @@
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\Dependancies\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.ImageConversionModule">
+      <HintPath>..\Dependancies\UnityEngine.ImageConversionModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.IMGUIModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>F:\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
@@ -127,6 +130,7 @@
     <Compile Include="Enumerators\StoreCategory.cs" />
     <Compile Include="Enumerators\TargetAxis.cs" />
     <Compile Include="Extensions\ColorExtensions.cs" />
+    <Compile Include="Extensions\GameObjectExtensions.cs" />
     <Compile Include="Extensions\VectorExtensions.cs" />
     <Compile Include="Helpers\EncodeDecode.cs" />
     <Compile Include="Helpers\MathHelpers.cs" />
@@ -147,6 +151,7 @@
     <Compile Include="Mono\FCSStorage.cs" />
     <Compile Include="Mono\ObjectPooler\ButtonPool.cs" />
     <Compile Include="Mono\ObjectPooler\ObjectPooler.cs" />
+    <Compile Include="Mono\ToggleController.cs" />
     <Compile Include="Objects\ColorList.cs" />
     <Compile Include="Helpers\FCSHUD.cs" />
     <Compile Include="Interfaces\IFCSStorage.cs" />

@@ -7,6 +7,7 @@
         TextColor,
         Background,
         BackgroundScale,
-        HoverImage
+        HoverImage,
+        RadialButton
     }
 }

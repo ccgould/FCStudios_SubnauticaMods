@@ -9,7 +9,6 @@ using FCSCommon.Controllers;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
-using UnityEngine.Experimental.PlayerLoop;
 
 namespace FCS_HomeSolutions.QuantumTeleporter.Mono
 {
@@ -23,6 +22,7 @@ namespace FCS_HomeSolutions.QuantumTeleporter.Mono
         private string _linkedPortal;
         private bool _displayRefreshed;
         private GameObject _portal;
+        private bool _notifyCreation;
         internal bool IsGlobal { get; set; }
         public override bool IsConstructed => _buildable != null && _buildable.constructed;
         public override bool IsInitialized { get; set; }
@@ -38,9 +38,17 @@ namespace FCS_HomeSolutions.QuantumTeleporter.Mono
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.QuantumTeleporterTabID, Mod.ModName);
             NameController.SetCurrentName(string.IsNullOrWhiteSpace(_data?.UnitName) ? GetNewName() : _data.UnitName, DisplayManager.GetNameTextBox());
+            
             if (Manager != null)
             {
                 Manager.OnPowerStateChanged += status => { TeleporterState(status != PowerSystem.Status.Offline); };
+                
+                if (_notifyCreation)
+                {
+                    QuickLogger.Debug("Notifying Creation on start",true);
+                    Manager?.NotifyByID(Mod.QuantumTeleporterTabID, "RefreshDisplay");
+                    _notifyCreation = false;
+                }
             }
         }
 
@@ -93,6 +101,12 @@ namespace FCS_HomeSolutions.QuantumTeleporter.Mono
             }
         }
 
+        public override void OnDestroy()
+        {
+            base.OnDestroy();
+            Manager?.NotifyByID(Mod.QuantumTeleporterTabID, "RefreshDisplay");
+        }
+
         public override void Initialize()
         {
             _target = gameObject.FindChild("Target").transform;
@@ -113,8 +127,6 @@ namespace FCS_HomeSolutions.QuantumTeleporter.Mono
 
             ColorManager.Initialize(gameObject, ModelPrefab.BodyMaterial);
 
-            //TeleportManager.Initialize();
-
             if (NameController == null)
                 NameController = gameObject.EnsureComponent<NameController>();
             
@@ -131,6 +143,13 @@ namespace FCS_HomeSolutions.QuantumTeleporter.Mono
                 PowerManager = new QTPowerManager(this);
             }
 
+            IPCMessage += message =>
+            {
+                if (message.Equals("RefreshDisplay"))
+                {
+                    DisplayManager?.RefreshTabs();
+                }
+            };
 
             DisplayManager.Setup(this);
 
@@ -200,6 +219,8 @@ namespace FCS_HomeSolutions.QuantumTeleporter.Mono
                     {
                         Initialize();
                     }
+
+                    _notifyCreation = true;
                 }
                 else
                 {
@@ -211,6 +232,7 @@ namespace FCS_HomeSolutions.QuantumTeleporter.Mono
         private void OnLabelChanged(string obj, NameController nameController)
         {
             DisplayManager?.RefreshBaseName(GetName());
+            Manager?.NotifyByID(Mod.QuantumTeleporterTabID, "RefreshDisplay");
         }
         
         public string GetName()

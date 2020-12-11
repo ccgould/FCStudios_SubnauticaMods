@@ -23,7 +23,7 @@
     <DefineConstants>DEBUG;TRACE;SUBNAUTICA</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Subnautica_Release|AnyCPU' ">
     <DebugType>none</DebugType>
@@ -32,7 +32,7 @@
     <DefineConstants>TRACE;SUBNAUTICA</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'BelowZero_Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -55,11 +55,11 @@
     <Reference Include="0Harmony">
       <HintPath>..\Dependancies\0Harmony.dll</HintPath>
     </Reference>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>..\Dependancies\Subnautica\Assembly-CSharp.dll</HintPath>
+    <Reference Include="Assembly-CSharp-firstpass_publicized">
+      <HintPath>F:\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\publicized_assemblies\Assembly-CSharp-firstpass_publicized.dll</HintPath>
     </Reference>
-    <Reference Include="Assembly-CSharp-firstpass">
-      <HintPath>..\Dependancies\Subnautica\Assembly-CSharp-firstpass.dll</HintPath>
+    <Reference Include="Assembly-CSharp_publicized">
+      <HintPath>F:\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\publicized_assemblies\Assembly-CSharp_publicized.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -91,6 +91,9 @@
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\Dependancies\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.ImageConversionModule">
+      <HintPath>..\Dependancies\UnityEngine.ImageConversionModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.IMGUIModule">
       <HintPath>F:\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
     </Reference>
@@ -113,11 +116,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BaseOperator\Model\TimeCache.cs" />
+    <Compile Include="BaseOperator\Mono\BaseOperatorController.cs" />
+    <Compile Include="BaseOperator\Mono\BaseOperatorDisplay.cs" />
     <Compile Include="Buildables\DecorationController.cs" />
     <Compile Include="Buildables\DecorationEntryPatch.cs" />
     <Compile Include="Buildables\DemoBuilding\DemoBuildingPatch.cs" />
     <Compile Include="Buildables\ModelPrefab.cs" />
-    <Compile Include="Buildables\BaseOperatorPatch.cs" />
+    <Compile Include="BaseOperator\Buildable\BaseOperatorPatch.cs" />
     <Compile Include="Buildables\OutDoorPlanters\OutDoorPlanterPatch.cs" />
     <Compile Include="Buildables\SweetWaterBarPatch.cs" />
     <Compile Include="Configuration\AuxPatchers.cs" />
@@ -125,6 +131,8 @@
     <Compile Include="Configuration\DebugCommands.cs" />
     <Compile Include="Configuration\Mod.cs" />
     <Compile Include="Configuration\SaveData.cs" />
+    <Compile Include="Curtains\Buildable\CurtainPatch.cs" />
+    <Compile Include="Curtains\Mono\CurtainController.cs" />
     <Compile Include="HoverLiftPad\Buildable\HoverLiftPadPatch.cs" />
     <Compile Include="HoverLiftPad\Mono\Gate.cs" />
     <Compile Include="HoverLiftPad\Mono\GateController.cs" />
@@ -146,6 +154,8 @@
     <Compile Include="MiniFountainFilter\Mono\MiniFountainFilterController.cs" />
     <Compile Include="Mono\OutDoorPlanters\OutDoorPlanterController.cs" />
     <Compile Include="Mono\PaintTool\PaintToolController.cs" />
+    <Compile Include="Patches\Builder_Pathes.cs" />
+    <Compile Include="Patches\Light_Patches.cs" />
     <Compile Include="Patches\Player_Patches.cs" />
     <Compile Include="Patches\PrawnSuit_Patches.cs" />
     <Compile Include="Patches\Storage_Patcher.cs" />

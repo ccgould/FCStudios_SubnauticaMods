@@ -11,6 +11,14 @@ namespace FCS_EnergySolutions.Configuration
         {
             { $"{ModKey}_JetStreamT242OnHover","JetStream {0} Information: (charge: {1}/{2}) | (production per minute: {3})"},
             { $"{ModKey}_JetStreamOnHoverInteractionFormatted","Press {0} to Turn on / off Turbine. Current State {1}"},
+            { $"{ModKey}_OnlyPowercellsAllowed.","Only powercells are allowed."},
+            { $"{ModKey}_PowerStorageNotEmpty","Please remove all powercells before trying to deconstruct."},
+            { $"{ModKey}_PowerStorageChargeMode","Charge Mode"},
+            { $"{ModKey}_PowerStorageChargeModeDesc","In this mode PowerStorage will only charge the powercells for later use."},
+            { $"{ModKey}_PowerStorageDischargeMode","Discharge Mode"},
+            { $"{ModKey}_PowerStorageDischargeModeDesc","In this mode PowerStorage will use the powercells to power the habitat."},
+            { $"{ModKey}_PowerStorageAutoMode","Auto Mode"},
+            { $"{ModKey}_PowerStorageAutoModeDesc","Automatically switches the mode of PowerStorage based on if the habitat goes into Emergency or PoweredOff"},
         };
 
         internal static void AdditionalPatching()
@@ -21,16 +29,59 @@ namespace FCS_EnergySolutions.Configuration
             }
         }
 
-
+        private static string GetLanguage(string key)
+        {
+            return LanguageDictionary.ContainsKey(key) ? Language.main.Get(key) : "N/A";
+        }
 
         internal static string JetStreamOnHover()
         {
-            return Language.main.Get($"{ModKey}_JetStreamT242OnHover");
+            return GetLanguage($"{ModKey}_JetStreamT242OnHover");
         }
 
         public static string JetStreamOnHoverInteractionFormatted(string keyBind,string state)
         {
-            return string.Format(Language.main.Get($"{ModKey}_JetStreamOnHoverInteractionFormatted"), keyBind,state);
+            return string.Format(GetLanguage( $"{ModKey}_JetStreamOnHoverInteractionFormatted"), keyBind,state);
+        }
+
+        public static string OnlyPowercellsAllowed()
+        {
+            return GetLanguage($"{ModKey}_OnlyPowercellsAllowed");
+        }
+
+        public static string PowerStorageNotEmpty()
+        {
+            return GetLanguage($"{ModKey}_PowerStorageNotEmpty");
+        }
+
+        public static string PowerStorageChargeMode()
+        {
+            return GetLanguage($"{ModKey}_PowerStorageChargeMode");
+        }
+
+        public static string PowerStorageChargeModeDesc()
+        {
+            return GetLanguage($"{ModKey}_PowerStorageChargeModeDesc");
+        }
+
+        public static string PowerStorageDischargeMode()
+        {
+            return GetLanguage($"{ModKey}_PowerStorageDischargeMode");
+        }
+
+        public static string PowerStorageDischargeModeDesc()
+        {
+            return GetLanguage($"{ModKey}_PowerStorageDischargeModeDesc");
+        }
+
+        public static string PowerStorageAutoMode()
+        {
+            return GetLanguage($"{ModKey}_PowerStorageAutoMode");
+        }
+
+        public static string PowerStorageAutoModeDesc()
+        {
+            return GetLanguage($"{ModKey}_PowerStorageAutoModeDesc");
         }
     }
 }

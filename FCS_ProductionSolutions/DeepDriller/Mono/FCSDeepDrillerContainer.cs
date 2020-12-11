@@ -259,5 +259,10 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         {
             _container.Clear();
         }
+
+        public bool IsEmpty()
+        {
+            return GetContainerTotal() <= 0;
+        }
     }
 }

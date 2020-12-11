@@ -9,6 +9,7 @@ using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.DeepDriller.Buildable;
 using FCS_ProductionSolutions.DeepDriller.Configuration;
 using FCS_ProductionSolutions.DeepDriller.Enumerators;
+using FCS_ProductionSolutions.DeepDriller.Models.Upgrades;
 using FCS_ProductionSolutions.DeepDriller.Structs;
 using FCSCommon.Abstract;
 using FCSCommon.Components;
@@ -17,6 +18,7 @@ using FCSCommon.Helpers;
 using FCSCommon.Objects;
 using FCSCommon.Utilities;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace FCS_ProductionSolutions.DeepDriller.Mono
@@ -55,12 +57,21 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         private ObjectPooler _pooler;
         private HashSet<DrillInventoryButton> _trackedItems = new HashSet<DrillInventoryButton>();
         private InterfaceInteraction _interfaceInteraction;
+        private float _updateStatusTimeLeft;
+        private GridHelperPooled _libraryGrid;
+        private GameObject _libraryDialogWindow;
         private const string AlterraStoragePoolTag = "AlterraStorage";
         private const string InventoryPoolTag = "Inventory";
+        private const string FunctionPoolTag = "Function";
 
         private void OnDestroy()
         {
             _isBeingDestroyed = true;
+        }
+
+        private void Update()
+        {
+            UpdateStatus();
         }
 
         internal void Setup(FCSDeepDrillerController mono)
@@ -78,8 +89,8 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
                 _filterGrid.DrawPage(1);
                 UpdateDisplayValues();
                 PowerOnDisplay();
-                //RecheckFilters();
                 InvokeRepeating(nameof(Updater), 0.5f, 0.5f);
+                _libraryGrid.DrawPage();
             }
         }
 
@@ -95,8 +106,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
 
         internal void UpdateUnitID()
         {
-            if (!string.IsNullOrWhiteSpace(_mono.UnitID) && _unitID != null &&
-                string.IsNullOrWhiteSpace(_unitID.text))
+            if (!string.IsNullOrWhiteSpace(_mono?.UnitID) && !string.IsNullOrWhiteSpace(_unitID?.text))
             {
                 QuickLogger.Debug("Setting Unit ID", true);
                 _unitID.text = $"UnitID: {_mono.UnitID}";
@@ -208,6 +218,17 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
                 case "ToggleBlackListBTN":
                     _mono.OreGenerator.SetBlackListMode(((FilterBtnData)tag).Toggle.IsSelected);
                     break;
+                case "LibraryBTN":
+                    _mono.UpgradeManager.SetUpdateDialogText(((UpgradeClass) tag).Template);
+                    _mono.UpgradeManager.Show();
+                    _libraryDialogWindow.SetActive(false);
+                    break;
+                case "LibraryCloseBTN":
+                    _libraryDialogWindow.SetActive(false);
+                    break;
+                case "ProgrammingTemplateBTN":
+                    _libraryDialogWindow.SetActive(true);
+                    break;
             }
         }
 
@@ -226,6 +247,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
                     _pooler = gameObject.AddComponent<ObjectPooler>();
                     _pooler.AddPool(AlterraStoragePoolTag, 6, ModelPrefab.DeepDrillerOreBTNPrefab);
                     _pooler.AddPool(InventoryPoolTag, 12, ModelPrefab.DeepDrillerItemPrefab);
+                    _pooler.AddPool(FunctionPoolTag, 9, ModelPrefab.DeepDrillerFunctionOptionItemPrefab);
                     _pooler.Initialize();
                 }
 
@@ -449,6 +471,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
                 _filterToggle.HOVER_COLOR = _hoverColor;
                 _filterToggle.BtnName = "ToggleFilterBTN";
                 _filterToggle.TextLineOne = FCSDeepDrillerBuildable.FilterButton();
+                _filterToggle.TextLineTwo = FCSDeepDrillerBuildable.FilterButtonDesc();
                 _filterToggle.OnButtonClick = OnButtonClick;
 
                 #endregion
@@ -460,10 +483,16 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
                 _filterBlackListToggle.ButtonMode = InterfaceButtonMode.Background;
                 _filterBlackListToggle.STARTING_COLOR = _startColor;
                 _filterBlackListToggle.HOVER_COLOR = _hoverColor;
+                _filterBlackListToggle.GetAdditionalDataFromString = true;
+                _filterBlackListToggle.GetAdditionalString += o =>
+                {
+                    
+                    return FCSDeepDrillerBuildable.BlackListToggleDesc(_filterBlackListToggle.IsSelected); 
+
+                };
                 _filterBlackListToggle.BtnName = "ToggleBlackListBTN";
                 _filterBlackListToggle.Tag = new FilterBtnData { Toggle = _filterBlackListToggle };
                 _filterBlackListToggle.TextLineOne = FCSDeepDrillerBuildable.BlackListToggle();
-                _filterBlackListToggle.TextLineTwo = FCSDeepDrillerBuildable.BlackListToggleDesc();
                 _filterBlackListToggle.OnButtonClick = OnButtonClick;
 
                 #endregion
@@ -524,6 +553,22 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
 
                 #endregion
 
+                #region Library Grid
+
+                _libraryDialogWindow = programmingPage.FindChild("Library");
+                _libraryGrid = _mono.gameObject.AddComponent<GridHelperPooled>();
+                _libraryGrid.OnLoadDisplay += OnLoadLibraryGrid;
+                _libraryGrid.Setup(9, _pooler, _libraryDialogWindow, OnButtonClick,false);
+
+                var closeBtnObj = _libraryDialogWindow.FindChild("CloseBTN");
+                InterfaceHelpers.CreateButton(closeBtnObj, "LibraryCloseBTN",
+                    InterfaceButtonMode.Background, OnButtonClick, Color.white, Color.cyan,5);
+
+                #endregion
+
+
+
+
                 #region Programming Back Button
 
                 var programmingBackBTN = InterfaceHelpers.FindGameObject(programmingPage, "BackBTN");
@@ -559,39 +604,72 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             return true;
         }
 
-        private void OnLoadAlterraStorageGrid(DisplayDataPooled data)
+        private void OnLoadLibraryGrid(DisplayDataPooled data)
         {
-            data.Pool.Reset(AlterraStoragePoolTag);
+            data.Pool.Reset(FunctionPoolTag);
 
-            var grouped = _mono.TransferManager.GetTrackedAlterraStorage();
+            var grouped = _mono.UpgradeManager.Classes;
 
             if (data.EndPosition > grouped.Count)
             {
                 data.EndPosition = grouped.Count;
             }
 
-            QuickLogger.Debug($"Load Items: {grouped.Count} SP:{data.StartPosition} EP:{data.EndPosition}", true);
-
             for (int i = data.StartPosition; i < data.EndPosition; i++)
             {
-                GameObject buttonPrefab = data.Pool.SpawnFromPool(AlterraStoragePoolTag, data.ItemsGrid);
+                if(string.IsNullOrEmpty(grouped[i].Template)) continue;
 
-                QuickLogger.Debug($"Button Prefab: {buttonPrefab}");
+                GameObject buttonPrefab = data.Pool.SpawnFromPool(FunctionPoolTag, data.ItemsGrid);
 
                 if (buttonPrefab == null || data.ItemsGrid == null)
                 {
                     return;
                 }
 
-                var item = buttonPrefab.EnsureComponent<InterfaceButton>();
+                var item = buttonPrefab.EnsureComponent<LibraryUpdateItemButton>();
+                item.ChangeText(grouped[i].FriendlyName);
                 item.ButtonMode = InterfaceButtonMode.Background;
-                item.TextLineOne = grouped[i].UnitID;
+                item.Tag = grouped[i];
+                item.TextLineOne = grouped[i].FriendlyName;
                 item.STARTING_COLOR = Color.gray;
                 item.HOVER_COLOR = Color.white;
+                item.BtnName = "LibraryBTN";
+                item.OnButtonClick = OnButtonClick;
+
+            }
+            _libraryGrid.UpdaterPaginator(grouped.Count);
+        }
+
+        private void OnLoadAlterraStorageGrid(DisplayDataPooled data)
+        {
+            _pooler.Reset(AlterraStoragePoolTag);
+
+            var grouped = _mono.TransferManager.GetTrackedAlterraStorage();
+            var active = data.Pool.GetActive();
+            
+            if (grouped.Count <= 0)
+            {
+                data.Pool.Reset(AlterraStoragePoolTag);
+            }
+
+            if (data.EndPosition > grouped.Count)
+            {
+                data.EndPosition = grouped.Count;
+            }
+
+            for (int i = data.StartPosition; i < data.EndPosition; i++)
+            {
+                GameObject buttonPrefab = data.Pool.SpawnFromPool(AlterraStoragePoolTag, data.ItemsGrid);
+
+                if (buttonPrefab == null || data.ItemsGrid == null)
+                {
+                    return;
+                }
+
+                var item = buttonPrefab.EnsureComponent<InfoButton>();
+                item.TextLineOne = grouped[i].UnitID;
                 uGUI_Icon icon = InterfaceHelpers.FindGameObject(buttonPrefab, "Icon").EnsureComponent<uGUI_Icon>();
                 icon.sprite = SpriteManager.Get(Mod.AlterraStorageTechType());
-
-
             }
             _alterraStorageGrid.UpdaterPaginator(grouped.Count);
         }
@@ -829,7 +907,8 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
                 }
             }
 
-            _batteryPercentage.text = ((data.GetCharge() < 0f) ? Language.main.Get("ChargerSlotEmpty") : $"{Mathf.CeilToInt(percent * 100)}%");
+            _batteryPercentage.text = ((data.GetCharge() < 0f) ? Language.main.Get("ChargerSlotEmpty") : $"{percent:P0}"
+                );
             _batteryStatus.text = $"{Mathf.RoundToInt(data.GetCharge())}/{data.GetCapacity()}";
 
         }
@@ -880,14 +959,63 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             _itemCounter.text = FCSDeepDrillerBuildable.InventoryStorageFormat(_mono.DeepDrillerContainer.GetContainerTotal(), QPatch.DeepDrillerMk3Configuration.StorageSize);
         }
 
-        internal void UpdateStatus(string message)
+        internal void UpdateStatus()
         {
-            _statusLabel.text = message;
+            _updateStatusTimeLeft -= Time.deltaTime;
+            if (_updateStatusTimeLeft <= 0)
+            {
+                if (_mono == null || !_mono.IsConstructed || !_mono.IsInitialized) return;
+
+                var message = string.Empty;
+
+                if (!_mono.OilHandler.HasOil())
+                {
+                    message = FCSDeepDrillerBuildable.NeedsOil();
+                }
+                else if (_mono.IsBreakSet())
+                {
+                    message = FCSDeepDrillerBuildable.DrillDeactivated();
+                }
+                else if (_mono.DeepDrillerContainer.IsFull)
+                {
+                    message = AuxPatchers.InventoryFull();
+                }
+                else if (!_mono.OreGenerator.GetIsDrilling())
+                {
+                    message = FCSDeepDrillerBuildable.Idle();
+                }
+                else if (_mono.OreGenerator.GetIsDrilling())
+                {
+                    message = FCSDeepDrillerBuildable.Drilling();
+                }
+
+                _updateStatusTimeLeft = 1f;
+
+                if (_statusLabel.text.Equals(message)) return;
+                _statusLabel.text = message;
+            }
         }
 
         public Text GetStatusField()
         {
             return _statusLabel;
         }
+
+        public void ResetAlterraStorageList()
+        {
+            _pooler.Reset(AlterraStoragePoolTag);
+        }
+    }
+
+    internal class InfoButton : OnScreenButton, IPointerEnterHandler, IPointerExitHandler
+    {
+        private void OnEnable()
+        {
+            Disabled = false;
+        }
+    }
+
+    internal class LibraryUpdateItemButton : InterfaceButton
+    {
     }
 }

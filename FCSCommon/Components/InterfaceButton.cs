@@ -1,6 +1,7 @@
 ﻿using FCSCommon.Enums;
 using FCSCommon.Utilities;
 using System;
+using FCSCommon.Helpers;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -26,14 +27,14 @@ namespace FCSCommon.Components
         public int SmallFont { get; set; } = 140;
         public int LargeFont { get; set; } = 180;
         public float IncreaseButtonBy { get; set; }
+        public bool IsRadial { get; set; }
         public Action<bool> OnInterfaceButton { get; set; }
 
         public Action<string, object> OnButtonClick;
 
         internal bool IsSelected { get; set; }
         private Image _bgImage;
-
-        
+        private GameObject _toggleRadial;
 
         #endregion
 
@@ -41,6 +42,7 @@ namespace FCSCommon.Components
         public virtual void OnEnable()
         {
             if(IsSelected) return;
+
             if (string.IsNullOrEmpty(BtnName)) return;
 
             Disabled = false;
@@ -69,8 +71,19 @@ namespace FCSCommon.Components
                         this.gameObject.transform.localScale = this.gameObject.transform.localScale;
                     }
                     break;
+                case InterfaceButtonMode.RadialButton:
+                    FindRadial();
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        private void FindRadial()
+        {
+            if(_toggleRadial == null)
+            {
+                _toggleRadial = GameObjectHelpers.FindGameObject(gameObject, "ToggleBTNFull");
             }
         }
 
@@ -264,6 +277,10 @@ namespace FCSCommon.Components
                     if (TextComponent == null) return;
                     this.TextComponent.color = this.HOVER_COLOR;
                     break;
+                case InterfaceButtonMode.RadialButton:
+                    FindRadial();
+                    _toggleRadial.SetActive(true);
+                    break;
             }
         }
         public void DeSelect()
@@ -283,6 +300,10 @@ namespace FCSCommon.Components
                 case InterfaceButtonMode.TextColor:
                     if (TextComponent == null) return;
                     this.TextComponent.color = this.STARTING_COLOR;
+                    break;
+                case InterfaceButtonMode.RadialButton:
+                    FindRadial();
+                    _toggleRadial.SetActive(false);
                     break;
             }
         }

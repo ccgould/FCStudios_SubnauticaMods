@@ -15,12 +15,12 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
 {
     internal class FCSDeepDrillerUpgradeManager : MonoBehaviour
     {
-        private readonly List<UpgradeClass> _classes = new List<UpgradeClass>
+        internal readonly List<UpgradeClass> Classes = new List<UpgradeClass>
         {
-            new UpgradeClass{FunctionName = "OresPerDay", FriendlyName = "Ores Per Day"},
+            new UpgradeClass{FunctionName = "OresPerDay", FriendlyName = "Ores Per Day", Template = "os.OresPerDay({Amount});"},
             new UpgradeClass{FunctionName = "SilkTouch", FriendlyName = "Silk Touch"},
             new UpgradeClass{FunctionName = "MinOreCount", FriendlyName = "Minimum Ore Count"},
-            new UpgradeClass{FunctionName = "MaxOreCount", FriendlyName = "Maximum Ore Count"},
+            new UpgradeClass{FunctionName = "MaxOreCount", FriendlyName = "Maximum Ore Count",Template = "os.MaxOreCount({TechType},{Amount});"},
             new UpgradeClass{FunctionName = "AutoStartUpAt", FriendlyName = "Auto Start Down At"},
             new UpgradeClass{FunctionName = "AutoShutDownAt", FriendlyName = "Auto Shut Down At"}
         };
@@ -344,7 +344,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
                 {
                     methodName = item.GetUntilOrEmpty();
 
-                    if (_classes.Any(x => x.FunctionName == methodName))
+                    if (Classes.Any(x => x.FunctionName == methodName))
                     {
                         QuickLogger.Debug($"Method Name = {methodName}", true);
                         result = methodName;
@@ -415,6 +415,11 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             {
                 yield return new UpgradeSave{Function = upgrade.Function , IsEnabled = upgrade.IsEnabled};
             }
+        }
+
+        public void SetUpdateDialogText(string function)
+        {
+            _textHistory = function;
         }
     }
 }

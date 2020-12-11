@@ -16,7 +16,7 @@ namespace FCS_HomeSolutions.Mono.PaintTool
     internal class PaintToolController: PlayerTool,IProtoEventListener, IFCSSave<SaveData>
     {
         private BoxCollider _collider;
-        private float _range = 10f;
+        private const float Range = 10f;
         private Image _colorRing;
         private Text _amountLbl;
         private Color _currentColor;
@@ -34,7 +34,6 @@ namespace FCS_HomeSolutions.Mono.PaintTool
         private Text _totalColorsLBL;
         private int _numberColorTargetModeTypes;
         private int _painterModeIndex = 1;
-        private int _layerMask;
         private TechType _validFuelTechType;
         internal bool IsInitialized { get; set; }
 
@@ -54,11 +53,15 @@ namespace FCS_HomeSolutions.Mono.PaintTool
             _totalColorsLBL = GameObjectHelpers.FindGameObject(gameObject, "TotalColors").GetComponent<Text>();
             _mode = GameObjectHelpers.FindGameObject(gameObject, "Mode").GetComponent<Text>();
             _liquid = GameObjectHelpers.FindGameObject(gameObject, "liquid");
-            _layerMask = ~(1 << LayerMask.NameToLayer("Player") | 1 << LayerMask.NameToLayer("Trigger"));
             Mod.RegisterPaintTool(this);
             ChangeColor(Color.black);
             RefreshUI();
             IsInitialized = true;
+        }
+
+        private new void OnDestroy()
+        {
+            Mod.UnRegisterPaintTool(this);
         }
 
         private void OnEnable()
@@ -142,13 +145,7 @@ namespace FCS_HomeSolutions.Mono.PaintTool
             }
             RefreshUI();
         }
-
-        protected override void OnDestroy()
-        {
-            base.OnDestroy();
-            Mod.UnRegisterPaintTool(this);
-        }
-
+        
         private void ChangeColor(Color color)
         {
             _currentColor = color;
@@ -164,26 +161,24 @@ namespace FCS_HomeSolutions.Mono.PaintTool
 
         private void Paint()
         {
-
-            if (Physics.Raycast(Player.main.camRoot.transform.position, MainCamera.camera.transform.forward, out var hit, _range,_layerMask, QueryTriggerInteraction.Ignore))
+            Vector3 vector = default(Vector3);
+            GameObject go = null;
+            UWE.Utils.TraceFPSTargetPosition(Player.main.gameObject, Range, ref go, ref vector, false);
+            QuickLogger.Debug($"Painter Hit: {go.name} || Layer: {go.layer}",true);
+            var fcsDevice = go.GetComponentInParent<FcsDevice>();
+            if (fcsDevice != null)
             {
-                QuickLogger.Debug($"Painter Hit: {hit.transform.gameObject.name}",true);
-                //var fcsDevice = hit.transform?.parent?.gameObject?.transform?.parent?.gameObject?.transform?.parent?.GetComponent<FcsDevice>();
-                var fcsDevice = hit.transform.GetComponentInParent<FcsDevice>();
-                if (fcsDevice != null)
-                {
-                    var result = fcsDevice.ChangeBodyColor(_currentColor, _colorTargetMode);
+                var result = fcsDevice.ChangeBodyColor(_currentColor, _colorTargetMode);
 
-                    if (result)
+                if (result)
+                {
+                    if (GameModeUtils.RequiresPower())
                     {
-                        if (GameModeUtils.RequiresPower())
-                        {
-                            _paintCanFillAmount -= 1;
-                        }
-                        RefreshUI();
+                        _paintCanFillAmount -= 1;
                     }
+                    RefreshUI();
                 }
-            };
+            }
         }
 
         private void RefreshUI()

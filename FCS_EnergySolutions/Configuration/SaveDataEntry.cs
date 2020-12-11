@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Objects;
+using FCS_EnergySolutions.PowerStorage.Mono;
 using FCSCommon.Interfaces;
 using Oculus.Newtonsoft.Json;
 
@@ -42,10 +43,24 @@ namespace FCS_EnergySolutions.Configuration
         [JsonProperty] internal bool TilterMove { get; set; }
     }
 
+
+    internal class PowerStorageDataEntry : ISaveDataEntry
+    {
+        public string Id { get; set; }
+        public string BaseId { get; set; }
+        [JsonProperty] internal string SaveVersion { get; set; } = "1.0";
+        [JsonProperty] internal ColorVec4 BodyColor { get; set; }
+        [JsonProperty] internal ColorVec4 SecondaryBodyColor { get; set; }
+        [JsonProperty] internal FCSPowerStates PowerState { get; set; }
+        [JsonProperty] internal byte[] Data { get; set; }
+        [JsonProperty] internal PowerChargerMode Mode { get; set; }
+    }
+
     [Serializable]
     internal class SaveData
     {
         [JsonProperty] internal List<AlterraGenDataEntry> AlterraGenEntries = new List<AlterraGenDataEntry>();
         [JsonProperty] internal List<JetStreamT242DataEntry> MarineTurbineEntries = new List<JetStreamT242DataEntry>();
+        [JsonProperty] internal List<PowerStorageDataEntry> PowerStorageEntries = new List<PowerStorageDataEntry>();
     }
 }

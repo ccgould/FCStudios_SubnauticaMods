@@ -19,6 +19,7 @@ namespace FCS_HomeSolutions.Buildables
         internal static string SecondaryMaterial => $"{Mod.ModName}_COL_S";
         internal static string DecalMaterial => $"{Mod.ModName}_DECALS";
         internal static string DetailsMaterial => $"{Mod.ModName}_DETAILS";
+        internal const string CurtainDecalMaterial = "CurtainPackTemplate_Decal";
         internal static string SpecTexture => $"{Mod.ModName}_S";
         internal static string LUMTexture => $"{Mod.ModName}_E";
         internal static string LUMControllerMaterial => $"{Mod.ModName}_E_Controller";
@@ -38,6 +39,9 @@ namespace FCS_HomeSolutions.Buildables
         public static GameObject PaintCanPrefab { get; set; }
         public static GameObject QuantumTeleporterPrefab { get; set; }
         public static GameObject NetworkItemPrefab { get; set; }
+        public static GameObject TemplateItem { get; set; }
+        public static GameObject TrashRecyclerItemPrefab { get; set; }
+        public static GameObject CurtainPrefab { get; set; }
 
         internal static void Initialize()
         {
@@ -66,11 +70,11 @@ namespace FCS_HomeSolutions.Buildables
             TrashRecyclerItemPrefab = GetPrefab("RecyclerItem");
             SeaBreezeItemPrefab = GetPrefab("ARSItem");
             NetworkItemPrefab = GetPrefab("NetworkItem");
+            TemplateItem = GetPrefab("TemplateItem");
+            CurtainPrefab = GetPrefab("Curtain");
             _initialized = true;
         }
-
-        public static GameObject TrashRecyclerItemPrefab { get; set; }
-
+        
         internal static GameObject GetPrefab(string prefabName)
         {
             try
@@ -127,6 +131,7 @@ namespace FCS_HomeSolutions.Buildables
             MaterialHelpers.ApplyEmissionShader(LUMControllerMaterial, LUMTexture, prefab, bundle, Color.white);
             MaterialHelpers.ApplyAlphaShader(DecalMaterial, prefab);
             MaterialHelpers.ApplyAlphaShader(DetailsMaterial, prefab);
+            MaterialHelpers.ApplyAlphaShader(CurtainDecalMaterial, prefab);
             #endregion
         }
 

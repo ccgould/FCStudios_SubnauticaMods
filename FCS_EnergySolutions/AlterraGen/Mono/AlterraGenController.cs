@@ -218,7 +218,7 @@ namespace FCS_EnergySolutions.AlterraGen.Mono
             if (!Mod.IsSaving())
             {
                 QuickLogger.Info($"Saving {_prefabID}");
-                Mod.Save();
+                Mod.Save(serializer);
                 QuickLogger.Info($"Saved {_prefabID}");
             }
         }

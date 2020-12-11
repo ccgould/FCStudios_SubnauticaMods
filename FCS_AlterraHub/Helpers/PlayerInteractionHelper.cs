@@ -1,17 +1,20 @@
-﻿using FCS_AlterraHub.Buildables;
-using FCS_AlterraHub.Configuration;
-using FCS_AlterraHub.Systems;
-using FCSCommon.Extensions;
+﻿using FCS_AlterraHub.Configuration;
 
 namespace FCS_AlterraHub.Helpers
 {
     public static class PlayerInteractionHelper
     {
-        public static void GivePlayerItem(TechType techType)
+        public static bool GivePlayerItem(TechType techType)
         {
-            CraftData.AddToInventory(techType,1,false,false);
+            var size = CraftData.GetItemSize(techType);
+            if (Player.main.HasInventoryRoom(size.x,size.y))
+            {
+                CraftData.AddToInventory(techType, 1, false, false);
+                return true;
+            }
+            return false;
         }
-
+    
         public static void GivePlayerItem(InventoryItem inventoryItem)
         {
             if (inventoryItem == null) return;

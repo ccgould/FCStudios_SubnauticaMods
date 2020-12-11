@@ -72,8 +72,6 @@ namespace FCS_HomeSolutions.QuantumTeleporter.Buildable
                 PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
                 prefabID.ClassId = ClassID;
 
-
-                prefab.AddComponent<AnimationManager>();
                 prefab.AddComponent<TechTag>().type = TechType;
                 prefab.AddComponent<FMOD_CustomLoopingEmitter>();
                 prefab.AddComponent<QuantumTeleporterController>();

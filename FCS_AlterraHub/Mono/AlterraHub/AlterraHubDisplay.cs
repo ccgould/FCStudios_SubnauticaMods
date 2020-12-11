@@ -35,6 +35,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
                 {
                     _cartDropDownManager?.AddItem(tech,rTech);
                 };
+                CardSystem.main.onBalanceUpdated += OnBalanceUpdated;
             }
         }
 
@@ -60,9 +61,6 @@ namespace FCS_AlterraHub.Mono.AlterraHub
 
                 _mainTotal = GameObjectHelpers.FindGameObject(_homePage, "CreditAmount").GetComponent<Text>();
                 _mainTotal.text = CardSystem.main.GetAccountBalance().ToString("n0");
-                CardSystem.main.onBalanceUpdated += () => {
-                    _mainTotal.text = CardSystem.main.GetAccountBalance().ToString("n0");
-                };
 
                 //Body
                 _panelGroup = GetDisplayBody();
@@ -96,7 +94,12 @@ namespace FCS_AlterraHub.Mono.AlterraHub
 
             return false;
         }
-        
+
+        private void OnBalanceUpdated()
+        {
+            _mainTotal.text = CardSystem.main.GetAccountBalance().ToString("n0");
+        }
+
         private void CreateCheckOutPopup(GameObject canvas)
         {
             var checkOutPopupGo = GameObjectHelpers.FindGameObject(canvas, "CheckOutPopUp");

@@ -45,6 +45,14 @@ namespace FCS_EnergySolutions.Configuration
         internal static string JetStreamT242KitClassID => $"{JetStreamT242ModName}_Kit";
         internal static string JetStreamT242PrefabName => JetStreamT242ModName;
 
+        internal const string PowerStorageTabID = "PS";
+        internal const string PowerStorageDescription = "PowerStorage allows you to charge your powercells and use your powercells as a for of backup power to supply your base with emergency power.";
+        internal const string PowerStorageFriendlyName = "PowerStorage";
+        internal const string PowerStorageModName = "PowerStorage";
+        internal const string PowerStorageClassName = "PowerStorage";
+        internal static string PowerStorageKitClassID => $"{PowerStorageModName}_Kit";
+        internal static string PowerStoragePrefabName => PowerStorageModName;
+
 #if SUBNAUTICA
         internal static TechData AlterraGenIngredients => new TechData
 #elif BELOWZERO
@@ -80,7 +88,7 @@ namespace FCS_EnergySolutions.Configuration
             return _vanillaBioChargeValues ?? FuelTypes.Charge;
         }
 
-        internal static void Save()
+        internal static void Save(ProtobufSerializer serializer)
         {
             if (!IsSaving())
             {
@@ -93,7 +101,7 @@ namespace FCS_EnergySolutions.Configuration
                     if (controller.Value.PackageId == ModName)
                     {
                         QuickLogger.Debug($"Saving device: {controller.Value.UnitID}");
-                        ((IFCSSave<SaveData>)controller.Value).Save(newSaveData);
+                        ((IFCSSave<SaveData>)controller.Value).Save(newSaveData,serializer);
                     }
                 }
 
@@ -195,5 +203,24 @@ namespace FCS_EnergySolutions.Configuration
         }
 
         #endregion
+
+        public static PowerStorageDataEntry GetPowerStorageSaveData(string id)
+        {
+            LoadData();
+
+            var saveData = GetSaveData();
+
+            foreach (var entry in saveData.PowerStorageEntries)
+            {
+                if (string.IsNullOrEmpty(entry.Id)) continue;
+
+                if (entry.Id == id)
+                {
+                    return entry;
+                }
+            }
+
+            return new PowerStorageDataEntry() { Id = id };
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using FCS_AlterraHub.Helpers;
+﻿using FCS_AlterraHub.Configuration;
+using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
@@ -47,55 +48,44 @@ namespace FCS_AlterraHub.Mono.AlterraHub
         private void CreatePurchaseButton()
         {
             var purchaseBTN = GameObjectHelpers.FindGameObject(gameObject, "PurchaseBTN").GetComponent<Button>();
-            purchaseBTN.onClick.AddListener(() =>
-            {
-                if (!CardSystem.main.HasBeenRegistered())
-                {
-                    QuickLogger.ModMessage(Buildables.AlterraHub.AccountNotFoundFormat());
-                    return;
-                }
-
-                if (CardSystem.main.HasEnough(_cart.GetTotal()))
-                {
-                    var result = _mono.MakeAPurchase(_cart);
-                    if (result)
-                    {
-                        _cart.TransactionComplete();
-                        HideDialog();
-                    }
-
-                    return;
-                }
-
-                MessageBoxHandler.main.Show(Buildables.AlterraHub.NoValidCardForPurchase());
-            });
+            purchaseBTN.onClick.AddListener(() => { MakePurchase(); });
         }
-        
+
+        private bool MakePurchase()
+        {
+            if (!CardSystem.main.HasBeenRegistered())
+            {
+                QuickLogger.ModMessage(Buildables.AlterraHub.AccountNotFoundFormat());
+                return false;
+            }
+
+            if (Inventory.main.container.GetCount(Mod.DebitCardTechType) <= 0)
+            {
+                MessageBoxHandler.main.Show(Buildables.AlterraHub.CardNotDetected());
+                return false;
+            }
+
+            if (CardSystem.main.HasEnough(_cart.GetTotal()))
+            {
+                if (!_mono.MakeAPurchase(_cart)) return false;
+                _cart.TransactionComplete();
+                HideDialog();
+                return true;
+            }
+
+            MessageBoxHandler.main.Show(Buildables.AlterraHub.NotEnoughMoneyOnAccount());
+            return false;
+        }
+
         private void CreatePurchaseExitButton()
         {
             var purchaseBTN = GameObjectHelpers.FindGameObject(gameObject, "PurchaseExitBTN").GetComponent<Button>();
             purchaseBTN.onClick.AddListener(() =>
             {
-                if (!CardSystem.main.HasBeenRegistered())
+                if(MakePurchase())
                 {
-                    QuickLogger.ModMessage(Buildables.AlterraHub.AccountNotFoundFormat());
-                    return;
+                    _mono.ExitStore();
                 }
-
-                if (CardSystem.main.HasEnough(_cart.GetTotal()))
-                {
-                    var result = _mono.MakeAPurchase(_cart);
-                    if (result)
-                    {
-                        _cart.TransactionComplete();
-                        HideDialog();
-                        _mono.ExitStore();
-                    }
-
-                    return;
-                }
-
-                MessageBoxHandler.main.Show(Buildables.AlterraHub.NoValidCardForPurchase());
             });
         }
 

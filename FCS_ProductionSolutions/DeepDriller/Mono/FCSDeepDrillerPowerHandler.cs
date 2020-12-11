@@ -42,6 +42,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         #region Properties
 
         internal Action<FCSPowerStates> OnPowerUpdate;
+        private const float SolarPanelRateControl = 25f;
         internal Action<PowercellData> OnBatteryUpdate { get; set; }
 
         #endregion
@@ -93,12 +94,20 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             amount -= thermalConsumed;
             _powerBank.Battery.AddCharge(thermalConsumed);
 
-            if (amount <= 0) return;
+            if (amount <= 0)
+            {
+                OnBatteryUpdate?.Invoke(_powerBank.Battery);
+                return;
+            }
 
             ModifyPower(_powerBank.SolarPanel, amount, out var solarConsumed);
             _powerBank.Battery.AddCharge(solarConsumed);
 
-            if (_powerBank.Battery.IsFull() || amount <= 0) return;
+            if (_powerBank.Battery.IsFull() || amount <= 0)
+            {
+                OnBatteryUpdate?.Invoke(_powerBank.Battery);
+                return;
+            }
 
             if (_powerRelay != null && _powerRelay.GetPower() > 0)
             {
@@ -106,10 +115,8 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
                 _powerBank.Battery.AddCharge(amountConsumed);
                 amount -= amountConsumed;
             }
-
             OnBatteryUpdate?.Invoke(_powerBank.Battery);
         }
-
 
 
         private void ModifyPower(PowercellData devicePower, float amount, out float consumed)
@@ -145,9 +152,11 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             }
         }
 
+        #region Solar Panel
+
         private void ChargeSolarPanel()
         {
-            _powerBank.SolarPanel.AddCharge(Mathf.Clamp(_powerBank.SolarPanel.GetCharge() + GetRechargeScalar() * DayNightCycle.main.deltaTime * 0.50f * 5f, 0f, _powerBank.SolarPanel.GetCapacity()));
+            _powerBank.SolarPanel.AddCharge(Mathf.Clamp(GetRechargeScalar() * DayNightCycle.main.deltaTime * 0.25f * SolarPanelRateControl, 0f, _powerBank.SolarPanel.GetCapacity()));
         }
 
         internal float GetRechargeScalar()
@@ -169,7 +178,9 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         {
             return DayNightCycle.main.GetLocalLightScalar();
         }
-        
+
+        #endregion
+
         private float CalculatePowerUsage()
         {
             float sum = _mono.UpgradeManager.Upgrades.Where(upgrade => upgrade.IsEnabled).Sum(upgrade => upgrade.PowerUsage);

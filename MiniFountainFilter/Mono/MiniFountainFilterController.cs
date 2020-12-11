@@ -50,8 +50,9 @@ namespace AE.MiniFountainFilter.Mono
                 ReadySaveData();
             }
 
-            if (_fromSave)
+            if (_fromSave && _data != null)
             {
+                QuickLogger.Info($"Loading from save: {Mod.FriendlyName}");
                 TankManager.SetTankLevel(_data.TankLevel);
                 ColorManager.SetColorFromSave(_data.BodyColor.Vector4ToColor());
                 StorageManager.NumberOfBottles = _data.ContainerAmount;

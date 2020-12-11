@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
+using FCS_HomeSolutions.Curtains.Mono;
 using FCS_HomeSolutions.QuantumTeleporter.Mono;
 using FCS_HomeSolutions.SeaBreeze.Mono;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Commands;
+using UnityEngine;
 
 namespace FCS_HomeSolutions.Configuration
 {
@@ -40,5 +42,6 @@ namespace FCS_HomeSolutions.Configuration
             }
             return $"Parameters: {setGlobal}";
         }
+
     }
 }

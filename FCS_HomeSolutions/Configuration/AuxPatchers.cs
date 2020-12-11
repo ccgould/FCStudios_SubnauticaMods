@@ -45,11 +45,12 @@ namespace FCS_HomeSolutions.Configuration
             { $"{ModKey}_GlobalNetwork","Global Network"},
             { $"{ModKey}_LocalNetwork","Local Network"},
             { $"{ModKey}_RequirementsFormat","Teleport Power Requirement: Local ({0}) / Global ({1})"},
-            { $"{ModKey}_Confirm,","Confirm"},
+            { $"{ModKey}_Confirm","Confirm"},
             { $"{ModKey}_Cancel","Cancel"},
             { $"{ModKey}_PowerAvailable","Power Available"},
             { $"{ModKey}_TeleportConfirmMessage","Initiate Teleportation?"},
             { $"{ModKey}_Coordinates","Coordinates"},
+            { $"{ModKey}_CurtainInteractionFormat","Press {0} to change curtain pattern."},
             { $"{ModKey}_TeleportCanceledMessage","Something went wrong with the teleport sequence canceled operation for your safety."},
         };
 
@@ -259,6 +260,12 @@ namespace FCS_HomeSolutions.Configuration
         public static string PowerAvailable()
         {
             return GetLanguage($"{ModKey}_PowerAvailable");
+        }
+
+        public static string CurtainInteractionFormat(string key)
+        {
+            return string.Format(GetLanguage($"{ModKey}_CurtainInteractionFormat"), key);
+
         }
     }
 }
