@@ -54,6 +54,13 @@ namespace FCS_LifeSupportSolutions.Patches
 
                 var curBase = __instance.GetCurrentSub();
 
+                if (QPatch.BaseUtilityUnitConfiguration.SmallBaseOxygen)
+                {
+                    Int3 size = curBase.GetComponent<Base>().GetSize();
+                    if (size.x <= 4 && size.y == 1 && size.z <= 4)
+                        return true;
+                }
+
                 var manager = BaseManager.FindManager(curBase);
 
                 if (!IsThereAnyBaseUtilityUnitAttached(out __result, manager)) return false;

@@ -42,6 +42,9 @@ namespace FCS_LifeSupportSolutions.Configuration
         [Toggle("Affect Player Oxygen")]
         public bool AffectPlayerOxygen = false;
 
+        [Toggle("Easy Small Base Oxygen", Tooltip = "When Affect Player Oxygen is enabled and this option is enabled, you can have a small base about the size of a MoonPool without needing a life support system")]
+        public bool SmallBaseOxygen = false;
+
         [Toggle("PlaySFX")]
         public bool PlaySFX = true;
 
