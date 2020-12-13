@@ -1,4 +1,5 @@
-﻿using FCS_AlterraHub.Mono;
+﻿using System.Linq;
+using FCS_AlterraHub.Mono;
 using FCS_LifeSupportSolutions.Configuration;
 using FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Mono;
 using FCS_LifeSupportSolutions.Mods.EnergyPillVendingMachine.mono;
@@ -43,7 +44,7 @@ namespace FCS_LifeSupportSolutions.Patches
         
         public static bool Prefix(ref Player __instance, ref bool __result)
         {
-            if (!QPatch.BaseUtilityUnitConfiguration.AffectPlayerOxygen) return true;
+            if (!QPatch.BaseUtilityUnitConfiguration.AffectPlayerOxygen|| !QPatch.BaseUtilityUnitConfiguration.IsModEnabled) return true;
 
             GetDefaultO2Level(__instance);
 
@@ -57,7 +58,9 @@ namespace FCS_LifeSupportSolutions.Patches
 
                 if (!IsThereAnyBaseUtilityUnitAttached(out __result, manager)) return false;
 
-                if (PerformOxygenCheckForBases(__instance, out __result, manager)) return false;
+                PerformOxygenCheckForBases(__instance, out __result, manager);
+
+                return false;
             }
 
             return true; //return false to skip execution of the original.
@@ -96,10 +99,14 @@ namespace FCS_LifeSupportSolutions.Patches
             outResult = false;
             var baseUtilityUnits = manager.GetDevices(Mod.BaseUtilityUnitTabID);
 
+            QuickLogger.Debug($"Amount Base Utility : {baseUtilityUnits.Count()}",true);
+
             if (QPatch.IsRefillableOxygenTanksInstalled && Player.main.oxygenMgr.HasOxygenTank())
             {
                 if (IsPlayerOxygenFullRtInstalled(instance)) return false;
                 
+                QuickLogger.Debug("Passed RTTest",true);
+
                 foreach (var baseUnit in baseUtilityUnits)
                 {
 
@@ -128,13 +135,13 @@ namespace FCS_LifeSupportSolutions.Patches
                 foreach (var baseUnit in baseUtilityUnits)
                 {
                     var utility = (BaseUtilityUnitController)baseUnit;
+
                     if (utility.OxygenManager.GetO2Level() <= 0 || !baseUnit.IsOperational) continue;
 
                     if (Player.main.oxygenMgr.GetOxygenAvailable() < Player.main.oxygenMgr.GetOxygenCapacity())
                     {
-                        var amount = _oxygenPerSecond * Time.deltaTime;
+                        var amount = _oxygenPerSecond * DayNightCycle.main.deltaTime;
                         var result = utility.OxygenManager.RemoveOxygen(amount);
-
                         if (result)
                         {
                             Player.main.oxygenMgr.AddOxygen(amount);

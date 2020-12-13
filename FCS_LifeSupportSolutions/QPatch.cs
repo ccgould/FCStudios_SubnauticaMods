@@ -3,6 +3,7 @@ using FCS_LifeSupportSolutions.Buildable;
 using FCS_LifeSupportSolutions.Configuration;
 using FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Buildable;
 using FCS_LifeSupportSolutions.Mods.EnergyPillVendingMachine.Buildable;
+using FCS_LifeSupportSolutions.Mods.MiniMedBay.Buildable;
 using FCS_LifeSupportSolutions.Spawnables;
 using FCSCommon.Utilities;
 using HarmonyLib;
@@ -62,8 +63,11 @@ namespace FCS_LifeSupportSolutions
             var miniMedBay = new MiniMedBayPatcher();
             miniMedBay.Patch();
 
-            var baseUtilityUnit = new BaseUtilityUnitPatch();
-            baseUtilityUnit.Patch();
+            if (BaseUtilityUnitConfiguration.IsModEnabled)
+            {
+                var baseUtilityUnit = new BaseUtilityUnitPatch();
+                baseUtilityUnit.Patch();
+            }
 
             //Register debug commands
             ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));

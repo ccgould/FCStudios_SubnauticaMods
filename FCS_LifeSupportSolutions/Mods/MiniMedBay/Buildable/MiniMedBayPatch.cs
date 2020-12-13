@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Spawnables;
 using FCS_LifeSupportSolutions.Buildable;
 using FCS_LifeSupportSolutions.Configuration;
-using FCS_LifeSupportSolutions.Mods.EnergyPillVendingMachine.mono;
 using FCS_LifeSupportSolutions.Mods.MiniMedBay.mono;
 using FCSCommon.Extensions;
 using FCSCommon.Helpers;
@@ -15,7 +13,7 @@ using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 
-namespace FCS_LifeSupportSolutions.Mods.EnergyPillVendingMachine.Buildable
+namespace FCS_LifeSupportSolutions.Mods.MiniMedBay.Buildable
 {
     internal class MiniMedBayPatcher : SMLHelper.V2.Assets.Buildable
     {
@@ -34,7 +32,7 @@ namespace FCS_LifeSupportSolutions.Mods.EnergyPillVendingMachine.Buildable
 
             OnFinishedPatching += () =>
             {
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.MiniMedBayClassName.ToTechType(), 560970, StoreCategory.LifeSupport);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.MiniMedBayKitClassID.ToTechType(), 560970, StoreCategory.LifeSupport);
             };
         }
 

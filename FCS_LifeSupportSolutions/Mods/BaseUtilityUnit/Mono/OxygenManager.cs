@@ -74,7 +74,6 @@ namespace FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Mono
                 _o2Level = 0;
             }
             OnOxygenUpdated?.Invoke(_o2Level, _o2Level / TankCapacity);
-            QuickLogger.Debug($"Unit Oxygen Level: {_o2Level}", true);
             return true;
         }
 

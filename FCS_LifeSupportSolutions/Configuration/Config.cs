@@ -36,7 +36,7 @@ namespace FCS_LifeSupportSolutions.Configuration
         public BaseUtilityUnitConfig() : base("baseUtilityUnit-config", "Configurations")
         {
         }
-        [Toggle("Is Mode Enabled"), OnChange(nameof(IsModeEnabledToggleEvent))]
+        [Toggle("Is Mod Enabled"), OnChange(nameof(IsModeEnabledToggleEvent))]
         public bool IsModEnabled = false;
 
         [Toggle("Affect Player Oxygen")]

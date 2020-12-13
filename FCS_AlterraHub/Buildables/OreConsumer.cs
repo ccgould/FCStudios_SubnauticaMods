@@ -24,8 +24,6 @@ namespace FCS_AlterraHub.Buildables
             OnFinishedPatching += () =>
             {
                 Mod.OreConsumerTechType = TechType;
-                var oreGeneratorKit = new FCSKit(Mod.OreConsumerKitClassID, Mod.OreConsumerFriendly, Path.Combine(AssetsFolder, $"{ClassID}.png"));
-                oreGeneratorKit.Patch();
             };
         }
 

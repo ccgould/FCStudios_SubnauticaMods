@@ -23,10 +23,16 @@ namespace FCS_HomeSolutions.TrashReceptacle.Buildable
 
         public CurtainPatch() : base("Curtain", "Curtain","Get some privacy from all the fish that steer at you.")
         {
-            OnFinishedPatching += () =>
+
+            OnStartedPatching += () =>
             {
                 var curtainKit = new FCSKit("Curtain_Kit", FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 curtainKit.Patch();
+                
+            };
+
+            OnFinishedPatching += () =>
+            {
                 FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, "Curtain_Kit".ToTechType(), 200, StoreCategory.Home);
                 FCSAlterraHubService.PublicAPI.RegisterPatchedMod(ClassID);
                 Mod.CurtainTechType = TechType;
@@ -89,12 +95,12 @@ namespace FCS_HomeSolutions.TrashReceptacle.Buildable
 #if SUBNAUTICA
         protected override TechData GetBlueprintRecipe()
         {
-            return Mod.TrashReceptacleIngredients;
+            return Mod.CurtainIngredients;
         }
 #elif BELOWZERO
         protected override RecipeData GetBlueprintRecipe()
         {
-            return Mod.TrashReceptacleIngredients;
+            return Mod.CurtainIngredients;
         }
 #endif
     }

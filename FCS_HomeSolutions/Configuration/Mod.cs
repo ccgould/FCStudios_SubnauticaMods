@@ -122,7 +122,7 @@ namespace FCS_HomeSolutions.Configuration
             }
         };
 #endif
-
+        
 
 #if SUBNAUTICA
         internal static TechData PaintToolIngredients => new TechData
@@ -148,6 +148,19 @@ namespace FCS_HomeSolutions.Configuration
             Ingredients =
             {
                 new Ingredient(BaseOperatorKitClassID.ToTechType(), 1),
+            }
+        };
+
+#if SUBNAUTICA
+        internal static TechData CurtainIngredients => new TechData
+#elif BELOWZERO
+                internal static RecipeData CurtainIngredients => new RecipeData
+#endif
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient("Curtain_Kit".ToTechType(), 1),
             }
         };
 

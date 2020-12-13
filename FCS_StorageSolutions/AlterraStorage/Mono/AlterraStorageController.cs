@@ -178,7 +178,7 @@ namespace FCS_StorageSolutions.AlterraStorage.Mono
             {
                 if (_isBeingDestroyed) return;
 
-                data.Pool.Reset(InventoryPoolTag);
+                //data.Pool.Reset(InventoryPoolTag);
 
                 var grouped = _storageContainer.GetItems();
 

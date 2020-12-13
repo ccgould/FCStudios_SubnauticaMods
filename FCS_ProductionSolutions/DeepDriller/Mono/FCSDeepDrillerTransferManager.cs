@@ -30,8 +30,10 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         {
             while (true)
             {
+                
                 yield return new WaitForSeconds(Mathf.Max(0, SortInterval - (_unsortableItems / 60.0f)));
 
+                QuickLogger.Debug("Deep Driller Sorting",true);
                 yield return Sort();
             }
         }
@@ -89,12 +91,15 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
                             _sortedItem = true;
                             yield break;
                         }
-                        else if (callsToCanAddItem > CanAddItemCallThreshold)
+
+                        if (callsToCanAddItem > CanAddItemCallThreshold)
                         {
                             callsToCanAddItem = 0;
-                            yield return null;
+                            goto skip;
                         }
                     }
+
+                    skip:;
                 }
             }
         }

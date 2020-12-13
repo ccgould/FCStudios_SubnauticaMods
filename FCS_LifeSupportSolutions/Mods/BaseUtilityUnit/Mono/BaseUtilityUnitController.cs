@@ -30,7 +30,8 @@ namespace FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Mono
         private AudioManager _audioManager;
         private bool _prevPowerState;
         public OxygenManager OxygenManager { get; set; }
-        
+        public override bool IsOperational => IsConstructed && Manager != null && IsInitialized;
+
 
         private void Start()
         {
@@ -105,7 +106,7 @@ namespace FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Mono
                 OxygenManager.Initialize(this);
                 OxygenManager.OnOxygenUpdated += (amount, percentage) =>
                 {
-                    _percent.text = $"{percentage * 100}%";
+                    _percent.text = $"{Mathf.RoundToInt(percentage) * 100}%";
                     _percentBar.fillAmount = percentage;
                 };
             }
