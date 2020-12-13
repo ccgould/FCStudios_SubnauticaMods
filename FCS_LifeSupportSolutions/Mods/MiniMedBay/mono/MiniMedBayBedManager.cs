@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FCS_LifeSupportSolutions.Mods.MiniMedBay.Enumerators;
-using FCSCommon.Helpers;
+﻿using FCS_LifeSupportSolutions.Mods.MiniMedBay.Enumerators;
 using FCSCommon.Utilities;
 using UnityEngine;
 
@@ -13,13 +7,13 @@ namespace FCS_LifeSupportSolutions.Mods.MiniMedBay.mono
     internal class MiniMedBayBedManager : MonoBehaviour
     {
         private MiniMedBayController _mono;
-        private bool _isHealing;
         private HealingStatus _healingStatus;
         private float _timeCurrDeltaTime;
         private float _nitrogenPartial;
         private NitrogenLevel _nitrogenLevel;
         private float _healthPartial;
         private const float ProcessTime = 3.0f;
+        public bool IsHealing => _healingStatus == HealingStatus.Healing;
 
         internal void Initialize(MiniMedBayController mono)
         {
@@ -43,10 +37,8 @@ namespace FCS_LifeSupportSolutions.Mods.MiniMedBay.mono
                 return;
             }
 
-            if (!_isHealing) return;
-
-            _healingStatus = HealingStatus.Healing;
-
+            if (_healingStatus != HealingStatus.Healing) return;
+            
             QuickLogger.Debug("Healing Player", true);
 
             _timeCurrDeltaTime += DayNightCycle.main.deltaTime;
@@ -84,15 +76,14 @@ namespace FCS_LifeSupportSolutions.Mods.MiniMedBay.mono
         {
             Player.main?.playerController.SetEnabled(true);
             QuickLogger.Debug("Resetting", true);
-            _healingStatus = HealingStatus.Idle;
-            UpdateIsHealing(false);
+            UpdateIsHealing(HealingStatus.Idle);
         }
 
-        private void UpdateIsHealing(bool value)
+        private void UpdateIsHealing(HealingStatus status)
         {
-            _isHealing = value;
+            _healingStatus = status;
 
-            if (_isHealing)
+            if (status == HealingStatus.Healing)
             {
                 _mono.AudioHandler.PlayScanAudio();
             }
@@ -125,7 +116,7 @@ namespace FCS_LifeSupportSolutions.Mods.MiniMedBay.mono
             Player.main.playerController.SetEnabled(false);
             var remainder = Player.main.liveMixin.maxHealth - Player.main.liveMixin.health;
             _healthPartial = remainder / ProcessTime;
-            UpdateIsHealing(true);
+            UpdateIsHealing(HealingStatus.Healing);
         }
 
     }

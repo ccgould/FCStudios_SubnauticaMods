@@ -182,5 +182,10 @@ namespace FCS_LifeSupportSolutions.Mods.MiniMedBay.mono
             QuickLogger.Debug($"Change Color: {color} {mode}",true);
             return _colorManager.ChangeColor(color, mode);
         }
+
+        public override float GetPowerUsage()
+        {
+            return HealBedManager != null && HealBedManager.IsHealing ? 8.0f : 0f;
+        }
     }
 }

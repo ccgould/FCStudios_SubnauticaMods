@@ -119,6 +119,10 @@
     <Compile Include="Configuration\DebugCommands.cs" />
     <Compile Include="Configuration\Mod.cs" />
     <Compile Include="Configuration\SaveDataEntry.cs" />
+    <Compile Include="Mods\BaseUtilityUnit\Buildable\BaseUtilityUnitPatch.cs" />
+    <Compile Include="Mods\BaseUtilityUnit\Mono\AudioManager.cs" />
+    <Compile Include="Mods\BaseUtilityUnit\Mono\BaseUtilityUnitController.cs" />
+    <Compile Include="Mods\BaseUtilityUnit\Mono\OxygenManager.cs" />
     <Compile Include="Mods\EnergyPillVendingMachine\mono\EnergyPillVendingMachineDisplay.cs" />
     <Compile Include="Mods\EnergyPillVendingMachine\Buildable\EnergyPillVendingMachinePatch.cs" />
     <Compile Include="Mods\EnergyPillVendingMachine\mono\EnergyPillVendingMachineController.cs" />

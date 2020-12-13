@@ -206,6 +206,8 @@ namespace FCS_AlterraHub.Mono
                 QuickLogger.Debug("Habitat is null");
             }
 
+            if (!GameModeUtils.RequiresPower()) return true;
+
             if (Habitat.powerRelay == null || Habitat.powerRelay.GetPower() < power) return false;
             return true;
         }
@@ -300,6 +302,20 @@ namespace FCS_AlterraHub.Mono
             {
                 GlobalTrackedLights.Remove(prefabId);
             }
+        }
+
+        public int GetDevicesCount(string unitTabId)
+        {
+            var i = 0;
+            foreach (var device in _registeredDevices)
+            {
+                if (device.Value.UnitID.StartsWith(unitTabId))
+                {
+                    i++;
+                }
+            }
+
+            return i;
         }
     }
 

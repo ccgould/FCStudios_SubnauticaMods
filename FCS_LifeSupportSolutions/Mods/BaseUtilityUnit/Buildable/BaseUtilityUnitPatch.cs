@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Spawnables;
-using FCS_ProductionSolutions.Buildable;
-using FCS_ProductionSolutions.Configuration;
-using FCS_ProductionSolutions.MatterAnalyzer.Mono;
+using FCS_LifeSupportSolutions.Buildable;
+using FCS_LifeSupportSolutions.Configuration;
+using FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Mono;
 using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
@@ -14,32 +13,37 @@ using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 
-namespace FCS_ProductionSolutions.MatterAnalyzer.Buildable
+namespace FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Buildable
 {
-    internal class MatterAnalyzerPatch : SMLHelper.V2.Assets.Buildable
+    internal class BaseUtilityUnitPatch : SMLHelper.V2.Assets.Buildable
     {
-        public MatterAnalyzerPatch() : base(Mod.MatterAnalyzerClassName, Mod.MatterAnalyzerFriendlyName, Mod.MatterAnalyzerDescription)
+        public override TechGroup GroupForPDA => TechGroup.ExteriorModules;
+        public override TechCategory CategoryForPDA => TechCategory.ExteriorModule;
+        private string _assetFolder => Mod.GetAssetFolder();
+        public override string AssetsFolder => _assetFolder;
+
+        public BaseUtilityUnitPatch() : base(Mod.BaseUtilityUnityClassName, Mod.BaseUtilityUnitFriendlyName, Mod.BaseUtilityUnitDescription)
         {
+            OnStartedPatching += () =>
+            {
+                var baseUtilityUnitPatch = new FCSKit(Mod.BaseUtilityUnityKitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
+                baseUtilityUnitPatch.Patch();
+            };
+
             OnFinishedPatching += () =>
             {
-                var matterAnalyzerKit = new FCSKit(Mod.MatterAnalyzerKitClassID, Mod.MatterAnalyzerFriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
-                matterAnalyzerKit.Patch();
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, matterAnalyzerKit.TechType, 30000, StoreCategory.Production);
-
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.BaseUtilityUnityKitClassID.ToTechType(), 300000, StoreCategory.LifeSupport);
             };
         }
-        public override TechGroup GroupForPDA => TechGroup.InteriorModules;
-        public override TechCategory CategoryForPDA => TechCategory.InteriorModule;
-        public override string AssetsFolder => Mod.GetAssetPath();
-        
+
         public override GameObject GetGameObject()
         {
             try
             {
-                var prefab = GameObject.Instantiate(ModelPrefab.MatterAnalyzerPrefab);
+                var prefab = GameObject.Instantiate(ModelPrefab.BaseUtilityUnitPrefab);
 
-                var size = new Vector3(0.7803999f, 1.231386f, 0.8337255f);
-                var center = new Vector3(7.350417e-25f, 0.8944204f, -0.08313727f);
+                var center = new Vector3(-0.01851273f, 1.397769f, 0f);
+                var size = new Vector3(2.703247f, 2.499594f, 2.679479f);
 
                 GameObjectHelpers.AddConstructableBounds(prefab, size, center);
 
@@ -55,28 +59,26 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Buildable
 
                 // Add constructible
                 var constructable = prefab.AddComponent<Constructable>();
-
                 constructable.allowedOutside = true;
-                constructable.allowedInBase = true;
+                constructable.allowedInBase = false;
                 constructable.allowedOnGround = true;
                 constructable.allowedOnWall = false;
                 constructable.rotationEnabled = true;
                 constructable.allowedOnCeiling = false;
-                constructable.allowedInSub = true;
+                constructable.allowedInSub = false;
                 constructable.allowedOnConstructables = false;
                 constructable.model = model;
                 constructable.techType = TechType;
 
                 PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
                 prefabID.ClassId = ClassID;
-
                 prefab.AddComponent<TechTag>().type = TechType;
-                prefab.AddComponent<MatterAnalyzerController>();
+                prefab.AddComponent<BaseUtilityUnitController>();
 
-                //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
+                //Apply the glass shader here because of autosort lockers for some reason doesn't like it.
                 MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModName);
-                return prefab;
 
+                return prefab;
             }
             catch (Exception e)
             {
@@ -86,46 +88,29 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Buildable
             return null;
         }
 
-
 #if SUBNAUTICA
         protected override TechData GetBlueprintRecipe()
         {
             QuickLogger.Debug($"Creating recipe...");
             // Create and associate recipe to the new TechType
-            var customFabRecipe = new TechData()
-            {
-                craftAmount = 1,
-                Ingredients = new List<Ingredient>()
-                {
-                    new Ingredient(Mod.MatterAnalyzerKitClassID.ToTechType(),1)
-                }
-            };
-            return customFabRecipe;
+            return Mod.BaseUtilityUnitIngredients;
         }
 
         protected override Atlas.Sprite GetItemSprite()
         {
-            return new Atlas.Sprite(ImageUtils.LoadTextureFromFile(Path.Combine(AssetsFolder, $"{ClassID}.png")));
+            return new Atlas.Sprite(ImageUtils.LoadTextureFromFile(Path.Combine(_assetFolder, $"{ClassID}.png")));
         }
 #elif BELOWZERO
         protected override RecipeData GetBlueprintRecipe()
         {
             QuickLogger.Debug($"Creating recipe...");
             // Create and associate recipe to the new TechType
-            var customFabRecipe = new RecipeData()
-            {
-                craftAmount = 1,
-                Ingredients = new List<Ingredient>()
-                {
-                    new Ingredient(Mod.MatterAnalyzerKitClassID.ToTechType(),1)
-                }
-            };
-            return customFabRecipe;
+            return Mod.BaseUtilityUnitIngredients;
         }
 
         protected override Sprite GetItemSprite()
         {
-            return ImageUtils.LoadSpriteFromFile(Path.Combine(AssetsFolder, $"{ClassID}.png"));
+            return ImageUtils.LoadSpriteFromFile(Path.Combine(_assetFolder, $"{ClassID}.png"));
         }
 #endif
     }

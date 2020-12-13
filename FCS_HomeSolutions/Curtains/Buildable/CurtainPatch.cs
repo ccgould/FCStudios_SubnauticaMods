@@ -29,6 +29,7 @@ namespace FCS_HomeSolutions.TrashReceptacle.Buildable
                 curtainKit.Patch();
                 FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, "Curtain_Kit".ToTechType(), 200, StoreCategory.Home);
                 FCSAlterraHubService.PublicAPI.RegisterPatchedMod(ClassID);
+                Mod.CurtainTechType = TechType;
             };
         }
 

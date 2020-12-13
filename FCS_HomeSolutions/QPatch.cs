@@ -31,10 +31,10 @@ namespace FCS_HomeSolutions
     {
         internal static Config Configuration { get; } = OptionsPanelHandler.Main.RegisterModOptions<Config>();
         internal static HoverLiftPadConfig HoverLiftPadConfiguration { get; } = OptionsPanelHandler.Main.RegisterModOptions<HoverLiftPadConfig>();
+        internal static PaintToolConfig PaintToolConfiguration { get; } = OptionsPanelHandler.Main.RegisterModOptions<PaintToolConfig>();
         internal static MiniFountainConfig MiniFountainFilterConfiguration { get; } = OptionsPanelHandler.Main.RegisterModOptions<MiniFountainConfig>();
         internal static SeaBreezeConfig SeaBreezeConfiguration { get; } = OptionsPanelHandler.Main.RegisterModOptions<SeaBreezeConfig>();
         internal static QuantumTeleporterConfig QuantumTeleporterConfiguration { get; } = OptionsPanelHandler.Main.RegisterModOptions<QuantumTeleporterConfig>();
-
         internal static Dictionary<string,Texture2D> Patterns = new Dictionary<string, Texture2D>();
         internal static Dictionary<Texture2D, Atlas.Sprite> PatternsIcon = new Dictionary<Texture2D, Atlas.Sprite>();
 
@@ -56,8 +56,8 @@ namespace FCS_HomeSolutions
                     AllowedOutside = true,
                     AllowedOnGround = true,
                     RotationEnabled = true,
-                    Size = new Vector3(3.075155f, 2.793444f, 1.905103f),
-                    Center = new Vector3(-0.1215184f, 1.516885f, -0.008380651f)
+                    Size = new Vector3(3.009064f, 2.474508f, 1.905116f),
+                    Center = new Vector3(-0.1594486f, 1.41353f, 0.02790368f)
                 });
             ahsSweetWaterBar.Patch();
 

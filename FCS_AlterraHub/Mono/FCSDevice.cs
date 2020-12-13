@@ -7,7 +7,7 @@ using UnityEngine;
 namespace FCS_AlterraHub.Mono
 {
     /// <summary>
-    /// This class will be attached to all FCStudios mods ad a means of registering the device to the system.
+    /// This class will be attached to all FCStudios mods and a means of registering the device to the system.
     /// This class should provide important information such as Power, Health, UnitID
     /// </summary>
     [RequireComponent(typeof(PrefabIdentifier))]
@@ -19,6 +19,7 @@ namespace FCS_AlterraHub.Mono
         /// </summary>
         public virtual Action<string> IPCMessage { get; set; }
     
+
         public virtual void Awake()
         {
 
@@ -186,6 +187,11 @@ namespace FCS_AlterraHub.Mono
 
         }
 
+        /// <summary>
+        /// Adds items to the device from external sources.
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
         public virtual bool AddItemToContainer(InventoryItem item)
         {
             return false;

@@ -31,10 +31,20 @@ namespace FCSCommon.Components
         {
             bool inInteractionRange = InInteractionRange();
 
+            if (this.IsHovered && inInteractionRange == false)
+            {
+                this.IsHovered = false;
+            }
+
+            if (this.IsHovered == false && isHoveredOutOfRange && inInteractionRange)
+            {
+                this.IsHovered = true;
+            }
+
 #if SUBNAUTICA
             if (this.IsHovered && inInteractionRange)
             {
-                if(string.IsNullOrEmpty(TextLineOne) && string.IsNullOrEmpty(TextLineTwo)) return;
+                if(string.IsNullOrEmpty(TextLineOne) && string.IsNullOrEmpty(TextLineTwo) && !GetAdditionalDataFromString) return;
 
                 if(GetAdditionalDataFromString)
                 {
@@ -57,16 +67,6 @@ namespace FCSCommon.Components
             }
 
 #endif
-
-            if (this.IsHovered && inInteractionRange == false)
-            {
-                this.IsHovered = false;
-            }
-
-            if (this.IsHovered == false && isHoveredOutOfRange && inInteractionRange)
-            {
-                this.IsHovered = true;
-            }
         }
 
         public virtual void OnPointerEnter(PointerEventData eventData)

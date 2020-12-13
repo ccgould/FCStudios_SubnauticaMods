@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using FCS_HomeSolutions.Configuration;
 using FCSCommon.Extensions;
 using HarmonyLib;
 using UnityEngine;
@@ -13,10 +14,13 @@ namespace FCS_HomeSolutions.Patches
             [HarmonyPostfix]
             public static void Postfix(ref bool __result)
             {
-				Builder.SetDefaultPlaceTransform(ref Builder.placePosition, ref Builder.placeRotation);
+                Constructable component = Builder.prefab.GetComponent<Constructable>();
+                if (component.techType != Mod.CurtainTechType || !Player.main.IsInBase()) return;
+
+                Builder.SetDefaultPlaceTransform(ref Builder.placePosition, ref Builder.placeRotation);
                 bool flag = false;
                 ConstructableBase componentInParent = Builder.ghostModel.GetComponentInParent<ConstructableBase>();
-                Constructable component = Builder.prefab.GetComponent<Constructable>();
+                
                 bool flag2;
                 if (componentInParent != null)
                 {
@@ -35,15 +39,8 @@ namespace FCS_HomeSolutions.Patches
                 else
                 {
 
-                    if (component.techType == "Curtain".ToTechType() && Player.main.IsInBase())
-                    {
-                        flag2 = Builder.CheckAsSubModule();
-                        flag2 = true;
-                    }
-                    else
-                    {
-                        flag2 = Builder.CheckAsSubModule();
-                    }
+                    Builder.CheckAsSubModule();
+                    flag2 = true;
                 }
                 if (flag2)
                 {

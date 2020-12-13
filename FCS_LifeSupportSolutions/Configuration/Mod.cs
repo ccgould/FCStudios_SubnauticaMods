@@ -42,6 +42,15 @@ namespace FCS_LifeSupportSolutions.Configuration
         internal static string MiniMedBayClassName => MiniMedBayName;
         internal static string MiniMedBayPrefabName => MiniMedBayName;
 
+        internal const string BaseUtilityUnitTabID = "BUU";
+        internal const string BaseUtilityUnitFriendlyName = "Base Utility Unit";
+        internal const string BaseUtilityUnitName = "BaseUtilityUnit";
+        internal const string BaseUtilityUnitDescription = "The Base Utility Unity provides oxygen and water to your base. Mini fountain filter benefits from this by using the water for use above the water line";
+        internal static string BaseUtilityUnityKitClassID => $"{BaseUtilityUnitName}_Kit";
+        internal static string BaseUtilityUnityClassName => BaseUtilityUnitName;
+        internal static string BaseUtilityUnityPrefabName => BaseUtilityUnitName;
+
+
 #if SUBNAUTICA
         internal static TechData EnergyPillVendingMachineIngredients => new TechData
 #elif BELOWZERO
@@ -51,7 +60,7 @@ namespace FCS_LifeSupportSolutions.Configuration
             craftAmount = 1,
             Ingredients =
             {
-                new Ingredient(EnergyPillVendingMachineClassName.ToTechType(), 1),
+                new Ingredient(EnergyPillVendingMachineKitClassID.ToTechType(), 1),
             }
         };
 
@@ -65,6 +74,19 @@ namespace FCS_LifeSupportSolutions.Configuration
             Ingredients =
             {
                 new Ingredient(MiniMedBayKitClassID.ToTechType(), 1),
+            }
+        };
+
+#if SUBNAUTICA
+        internal static TechData BaseUtilityUnitIngredients => new TechData
+#elif BELOWZERO
+                internal static RecipeData BaseUtilityUnitIngredients => new RecipeData
+#endif
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(BaseUtilityUnityKitClassID.ToTechType(), 1),
             }
         };
 
@@ -165,7 +187,26 @@ namespace FCS_LifeSupportSolutions.Configuration
             return new EnergyPillVendingMachineEntry() { Id = id };
         }
 
-internal static SaveData GetSaveData()
+        public static BaseUtilityEntry GetBaseUtilityUnitSaveData(string id)
+        {
+            LoadData();
+
+            var saveData = GetSaveData();
+
+            foreach (var entry in saveData.BaseUtilityUnitEntries)
+            {
+                if (string.IsNullOrEmpty(entry.Id)) continue;
+
+                if (entry.Id == id)
+                {
+                    return entry;
+                }
+            }
+
+            return new BaseUtilityEntry() { Id = id };
+        }
+
+        internal static SaveData GetSaveData()
         {
             return _saveData ?? new SaveData();
         }
@@ -193,5 +234,5 @@ internal static SaveData GetSaveData()
         }
 
         #endregion
-}
+    }
 }

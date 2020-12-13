@@ -4,11 +4,9 @@ using System.Linq;
 using System.Text;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
-using FCS_AlterraHub.Mono.Controllers;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
-using FCS_HomeSolutions.QuantumTeleporter.Buildable;
 using FCS_HomeSolutions.QuantumTeleporter.Enumerators;
 using FCSCommon.Abstract;
 using FCSCommon.Components;
@@ -16,7 +14,6 @@ using FCSCommon.Enums;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace FCS_HomeSolutions.QuantumTeleporter.Mono
@@ -270,16 +267,14 @@ namespace FCS_HomeSolutions.QuantumTeleporter.Mono
                     var text = textField.GetComponent<Text>();
                     text.text = unitName;
 
-                    //var statusUpdater = itemDisplay.AddComponent<ItemDisplayStatusHandler>();
-                    //statusUpdater.Initialize((QuantumTeleporterController)unit, GameObjectHelpers.FindGameObject(itemDisplay, "ConnectionIcon"), this, 5);
-
-
                     var itemButton = itemDisplay.AddComponent<InterfaceButton>();
                     var status =  itemDisplay.AddComponent<StatusUpdater>();
                     status.Unit = unit;
                     itemButton.ButtonMode = InterfaceButtonMode.TextColor;
                     itemButton.Tag = unit;
                     itemButton.TextComponent = text;
+                    itemButton.GetAdditionalDataFromString = true;
+                    itemButton.GetAdditionalString += fcsDevice => $"{Language.main.GetFormat("HUDPowerStatus", ((FcsDevice) fcsDevice).Manager.Habitat.powerRelay.GetPower(), ((FcsDevice) fcsDevice).Manager.Habitat.powerRelay.GetMaxPower())}";
                     itemButton.OnButtonClick += OnButtonClick;
                     itemButton.BtnName = "NetworkItem";
                     itemButton.MaxInteractionRange = 5;
@@ -290,6 +285,7 @@ namespace FCS_HomeSolutions.QuantumTeleporter.Mono
             
             _teleportGrid.UpdaterPaginator(items?.Count ?? 0);
         }
+        
 
         private string NetworkFormat(object go)
         {

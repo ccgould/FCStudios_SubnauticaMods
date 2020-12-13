@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using FCS_LifeSupportSolutions.Buildable;
 using FCS_LifeSupportSolutions.Configuration;
+using FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Buildable;
 using FCS_LifeSupportSolutions.Mods.EnergyPillVendingMachine.Buildable;
 using FCS_LifeSupportSolutions.Spawnables;
 using FCSCommon.Utilities;
@@ -19,8 +20,13 @@ namespace FCS_LifeSupportSolutions
     [QModCore]
     public class QPatch
     {
+        public static bool IsRefillableOxygenTanksInstalled { get; } =
+            TechTypeHandler.ModdedTechTypeExists("HighCapacityTankRefill");
+
+
         internal string Version { get; private set; } 
         internal static Config Configuration { get; } = OptionsPanelHandler.Main.RegisterModOptions<Config>();
+        internal static BaseUtilityUnitConfig BaseUtilityUnitConfiguration { get; } = OptionsPanelHandler.Main.RegisterModOptions<BaseUtilityUnitConfig>();
         public static bool IsEnabled { get; set; }
 
         [QModPatch]
@@ -35,26 +41,29 @@ namespace FCS_LifeSupportSolutions
             var energyPillVendingMachine = new EnergyPillVendingMachinePatcher();
             energyPillVendingMachine.Patch();
 
-            var redEngeryPill = new PillPatch("RedEnergyPill", "Red Adrenaline Pill",
+            var redEnergyPill = new PillPatch("RedEnergyPill", "Red Adrenaline Pill",
                 "The red adrenaline pill refills you adrenaline bar to give you 2 minutes of speed when thrusty or hungry",
                 ModelPrefab.RedEnergyPillPrefab);
-            redEngeryPill.Patch();
-            Mod.RedEnergyPillTechType = redEngeryPill.TechType;
+            redEnergyPill.Patch();
+            Mod.RedEnergyPillTechType = redEnergyPill.TechType;
 
-            var greenEngeryPill = new PillPatch("GreenEnergyPill", "Green Adrenaline Pill",
+            var greenEnergyPill = new PillPatch("GreenEnergyPill", "Green Adrenaline Pill",
                 "The red adrenaline pill adds to your adrenaline bar to give you an additional minute of speed when thrusty or hungry",
                 ModelPrefab.RedEnergyPillPrefab);
-            greenEngeryPill.Patch();
-            Mod.GreenEnergyPillTechType = greenEngeryPill.TechType;
+            greenEnergyPill.Patch();
+            Mod.GreenEnergyPillTechType = greenEnergyPill.TechType;
 
-            var blueEngeryPill = new PillPatch("BlueEnergyPill", "Blue Adrenaline Pill",
+            var blueEnergyPill = new PillPatch("BlueEnergyPill", "Blue Adrenaline Pill",
                 "The red adrenaline pill adds to your adrenaline bar to give you an additional 30 seconds of speed when thrusty or hungry",
                 ModelPrefab.RedEnergyPillPrefab);
-            blueEngeryPill.Patch();
-            Mod.BlueEnergyPillTechType = blueEngeryPill.TechType;
+            blueEnergyPill.Patch();
+            Mod.BlueEnergyPillTechType = blueEnergyPill.TechType;
 
             var miniMedBay = new MiniMedBayPatcher();
             miniMedBay.Patch();
+
+            var baseUtilityUnit = new BaseUtilityUnitPatch();
+            baseUtilityUnit.Patch();
 
             //Register debug commands
             ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));

@@ -18,6 +18,7 @@ namespace FCS_EnergySolutions.Configuration
             { $"{ModKey}_PowerStorageDischargeMode","Discharge Mode"},
             { $"{ModKey}_PowerStorageDischargeModeDesc","In this mode PowerStorage will use the powercells to power the habitat."},
             { $"{ModKey}_PowerStorageAutoMode","Auto Mode"},
+            { $"{ModKey}_PowerStorageClickToAddPowercells","Click to add powercells"},
             { $"{ModKey}_PowerStorageAutoModeDesc","Automatically switches the mode of PowerStorage based on if the habitat goes into Emergency or PoweredOff"},
         };
 
@@ -82,6 +83,10 @@ namespace FCS_EnergySolutions.Configuration
         public static string PowerStorageAutoModeDesc()
         {
             return GetLanguage($"{ModKey}_PowerStorageAutoModeDesc");
+        }        
+        public static string PowerStorageClickToAddPowercells()
+        {
+            return GetLanguage($"{ModKey}_PowerStorageClickToAddPowercells");
         }
     }
 }

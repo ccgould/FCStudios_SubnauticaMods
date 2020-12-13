@@ -56,7 +56,7 @@ namespace FCS_HomeSolutions.Configuration
     [Menu("SeaBreeze Menu")]
     public class SeaBreezeConfig : ConfigFile
     {
-        public SeaBreezeConfig() : base("seabreezeConfigconfig", "Configurations") { }
+        public SeaBreezeConfig() : base("seabreeze-config", "Configurations") { }
 
         public int StorageLimit { get; set; } = 100;
         public float PowerUsage { get; set; } = 0.5066666666666667f;
@@ -84,10 +84,22 @@ namespace FCS_HomeSolutions.Configuration
         public KeyCode LiftPadDownKeyCode = KeyCode.None;
     }
 
+    [Menu("Paint Tool Menu")]
+    public class PaintToolConfig : ConfigFile
+    {
+        public PaintToolConfig() : base("paintTool-config", "Configurations") { }
+
+        [Keybind("Select Color Forward")]
+        public KeyCode SelectColorForwardKeyCode = KeyCode.RightArrow;
+
+        [Keybind("Select Color Back")]
+        public KeyCode SelectColorBackKeyCode = KeyCode.LeftArrow;
+    }
+
     [Menu("Quantum Teleporter Menu")]
     public class QuantumTeleporterConfig : ConfigFile
     {
-        public QuantumTeleporterConfig() : base("quantumTeleporterConfig-config", "Configurations") { }
+        public QuantumTeleporterConfig() : base("quantumTeleporter-config", "Configurations") { }
 
         [JsonProperty] internal float GlobalTeleportPowerUsage { get; set; } = 1500f;
         [JsonProperty] internal float InternalTeleportPowerUsage { get; set; } = 150f;

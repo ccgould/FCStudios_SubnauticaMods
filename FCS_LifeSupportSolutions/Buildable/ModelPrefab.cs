@@ -30,6 +30,7 @@ namespace FCS_LifeSupportSolutions.Buildable
         public static GameObject GreenEnergyPillPrefab { get; set; }
         public static GameObject PillHudPrefab { get; set; }
         public static GameObject MiniMedBayPrefab { get; set; }
+        public static GameObject BaseUtilityUnitPrefab { get; set; }
 
 
         internal static void Initialize()
@@ -50,6 +51,7 @@ namespace FCS_LifeSupportSolutions.Buildable
             BlueEnergyPillPrefab = GetPrefab("BluePill");
             PillHudPrefab = GetPrefab("PillHUD");
             MiniMedBayPrefab = GetPrefab(Mod.MiniMedBayPrefabName);
+            BaseUtilityUnitPrefab = GetPrefab(Mod.BaseUtilityUnityPrefabName);
         }
 
 

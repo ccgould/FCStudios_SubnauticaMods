@@ -297,7 +297,7 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
         {
             if (!IsInitialized || !IsConstructed || _interactionChecker == null ||_interactionChecker.IsInRange) return;
             HandReticle main = HandReticle.main;
-            main.SetInteractText("Click to open");
+            main.SetInteractText(AuxPatchers.PowerStorageClickToAddPowercells());
             main.SetIcon(HandReticle.IconType.Hand);
         }
 

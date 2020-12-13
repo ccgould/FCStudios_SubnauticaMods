@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using SMLHelper.V2.Handlers;
+using UnityEngine;
 
 namespace FCS_LifeSupportSolutions.Configuration
 {
@@ -17,6 +18,8 @@ namespace FCS_LifeSupportSolutions.Configuration
             { $"{ModKey}_NotEnoughCredit","NOT ENOUGH CREDIT"},
             { $"{ModKey}_NoMedKitsToTake","There are no MedKits please wait for more to generate."},
             { $"{ModKey}_HealPlayer","Heal Player"},
+            { $"{ModKey}_TakeOxygen","TAKE OXYGEN"},
+            { $"{ModKey}_TakeOxygenDesc","Gives you oxygen directly from the base utility unit"}
         };
 
         internal static void AdditionalPatching()
@@ -80,6 +83,16 @@ namespace FCS_LifeSupportSolutions.Configuration
         public static string HealPlayer()
         {
             return GetLanguage($"{ModKey}_HealPlayer");
+        }
+
+        public static string TakeOxygen()
+        {
+            return GetLanguage($"{ModKey}_TakeOxygen");
+        }
+
+        public static string TakeOxygenDesc()
+        {
+            return GetLanguage($"{ModKey}_TakeOxygenDesc");
         }
     }
 }

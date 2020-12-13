@@ -93,35 +93,7 @@ namespace FCS_HomeSolutions.Mono.PaintTool
 
         private void Update()
         {
-            if (base.isDrawn && Input.GetKeyDown(KeyCode.UpArrow))
-            {
-                _painterModeIndex += 1;
-                
-                if (_painterModeIndex <= _numberColorTargetModeTypes)
-                {
-                    _colorTargetMode = (ColorTargetMode)_painterModeIndex;
-                }
-                else
-                {
-                    _painterModeIndex = 1;
-                    _colorTargetMode = (ColorTargetMode)_painterModeIndex;
-                }
-            }
-            else if (base.isDrawn && Input.GetKeyDown(KeyCode.DownArrow))
-            {
-                _painterModeIndex -= 1;
-
-                if (_painterModeIndex >= 1)
-                {
-                    _colorTargetMode = (ColorTargetMode)_painterModeIndex;
-                }
-                else
-                {
-                    _painterModeIndex = _numberColorTargetModeTypes;
-                    _colorTargetMode = (ColorTargetMode)_painterModeIndex;
-                }
-            }
-            else if (base.isDrawn && Input.GetKeyDown(KeyCode.RightArrow))
+            if (base.isDrawn && Input.GetKeyDown(QPatch.PaintToolConfiguration.SelectColorForwardKeyCode))
             {
                 _currentIndex += 1;
 
@@ -132,7 +104,7 @@ namespace FCS_HomeSolutions.Mono.PaintTool
 
                 ChangeColor(ColorList.GetColor(_currentIndex));
             }
-            else if (base.isDrawn && Input.GetKeyDown(KeyCode.LeftArrow))
+            else if (base.isDrawn && Input.GetKeyDown(QPatch.PaintToolConfiguration.SelectColorBackKeyCode))
             {
                 _currentIndex -= 1;
 
@@ -271,7 +243,24 @@ namespace FCS_HomeSolutions.Mono.PaintTool
         }
 
         public override bool OnAltDown()
-        { 
+        {
+            _painterModeIndex += 1;
+
+            if (_painterModeIndex <= _numberColorTargetModeTypes)
+            {
+                _colorTargetMode = (ColorTargetMode)_painterModeIndex;
+            }
+            else
+            {
+                _painterModeIndex = 1;
+                _colorTargetMode = (ColorTargetMode)_painterModeIndex;
+            }
+
+            return true;
+        }
+
+        public override bool OnReloadDown()
+        {
             if (Inventory.main.container.Contains(_validFuelTechType))
             {
                 var item = Inventory.main.container.RemoveItem(_validFuelTechType);
@@ -280,7 +269,7 @@ namespace FCS_HomeSolutions.Mono.PaintTool
             }
             return true;
         }
-        
+
         public override bool OnAltUp()
         {
             return true;

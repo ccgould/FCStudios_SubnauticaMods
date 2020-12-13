@@ -30,7 +30,7 @@ namespace FCS_StorageSolutions.AlterraStorage.Mono
         private FCSStorage _storageContainer;
         private GridHelperPooled _inventoryGrid;
         private bool _isBeingDestroyed;
-        private InterfaceInteration _interactionHelper;
+        private InterfaceInteraction _interactionHelper;
         private MotorHandler _motorHandler;
         private ProtobufSerializer _serializer;
         private Text _storageAmount;
@@ -140,7 +140,7 @@ namespace FCS_StorageSolutions.AlterraStorage.Mono
 
 
             var canvas = gameObject.GetComponentInChildren<Canvas>();
-            _interactionHelper = canvas.gameObject.AddComponent<InterfaceInteration>();
+            _interactionHelper = canvas.gameObject.AddComponent<InterfaceInteraction>();
 
             _inventoryGrid = gameObject.AddComponent<GridHelperPooled>();
             _inventoryGrid.OnLoadDisplay += OnLoadItemsGrid;
@@ -177,6 +177,8 @@ namespace FCS_StorageSolutions.AlterraStorage.Mono
             try
             {
                 if (_isBeingDestroyed) return;
+
+                data.Pool.Reset(InventoryPoolTag);
 
                 var grouped = _storageContainer.GetItems();
 
@@ -426,6 +428,7 @@ namespace FCS_StorageSolutions.AlterraStorage.Mono
 
             }
             _icon.sprite = SpriteManager.Get((TechType)Tag);
+            UpdateAmount();
         }
 
         public bool IsValidAndActive(TechType techType)
@@ -434,7 +437,7 @@ namespace FCS_StorageSolutions.AlterraStorage.Mono
         }
     }
 
-    internal class InterfaceInteration : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+    internal class InterfaceInteraction : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
         public bool IsInRange { get; set; }
 

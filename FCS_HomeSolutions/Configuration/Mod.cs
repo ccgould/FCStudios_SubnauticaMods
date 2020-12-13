@@ -208,6 +208,8 @@ namespace FCS_HomeSolutions.Configuration
 
         internal static string SaveDataFilename => $"{ModName}SaveData.json";
 
+        public static TechType CurtainTechType { get; internal set; }
+
         internal static string GetModDirectory()
         {
             return Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
