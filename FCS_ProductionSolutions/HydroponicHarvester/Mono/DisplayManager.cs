@@ -22,12 +22,14 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
         private GameObject _aquaticSamplesGrid;
         private GameObject _landSamplesGrid;
         private SlotItemTab _caller;
+        private Text _powerUsagePerSecond;
 
         internal void Setup(HydroponicHarvesterController mono)
         {
             _mono = mono;
             if (FindAllComponents())
             {
+                UpdatePowerUsage();
                 _isInitialized = true;
             }
         }
@@ -73,7 +75,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
 
                 _landSamplesGrid = InterfaceHelpers.FindGameObject(gameObject, "LandSamplesGrid");
                 _aquaticSamplesGrid = InterfaceHelpers.FindGameObject(gameObject, "AquaticSamplesGrid");
-
+                _powerUsagePerSecond =InterfaceHelpers.FindGameObject(gameObject, "PowerUsagePerSecond").GetComponent<Text>();
                 LoadKnownSamples();
 
             }
@@ -92,6 +94,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
             var knownSamples = Mod.GetHydroponicKnownTech();
             foreach (var sample in knownSamples)
             {
+                if(sample.Key == TechType.None) continue;
                 var button = GameObject.Instantiate(ModelPrefab.HydroponicDNASamplePrefab).AddComponent<InterfaceButton>();
                 var icon = GameObjectHelpers.FindGameObject(button.gameObject, "Icon").AddComponent<uGUI_Icon>();
                 icon.sprite = SpriteManager.Get(sample.Key);
@@ -105,6 +108,11 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
                 
                 button.gameObject.transform.SetParent(sample.Value ? _landSamplesGrid.transform : _aquaticSamplesGrid.transform, false);
             }
+        }
+
+        internal void UpdatePowerUsage()
+        {
+            _powerUsagePerSecond.text = AuxPatchers.PowerUsagePerSecondFormat(_mono.GetPowerUsage());
         }
 
         public void OpenDnaSamplesPage(SlotItemTab slotItemTab)

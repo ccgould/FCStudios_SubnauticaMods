@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Model;
-using FCS_AlterraHub.Mono;
 using FCS_ProductionSolutions.HydroponicHarvester.Enumerators;
 using FCS_ProductionSolutions.HydroponicHarvester.Models;
 using FCSCommon.Extensions;
@@ -18,21 +16,16 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
     {
         private HydroponicHarvesterController _mono;
         private const float MaxPlantsHeight = 3f;
-        private List<TechType> _activeClones;
         internal PlantSlot[] Slots;
         private TechType _currentItemTech;
-        public Action<int, int> OnContainerUpdate { get; set; }
-        public Action<FcsDevice, TechType> OnContainerAddItem { get; set; }
-        public Action<FcsDevice, TechType> OnContainerRemoveItem { get; set; }
+        private List<TechType> _activeClones;// TODO Remove is if unnecessary
 
-        
         internal void Initialize(HydroponicHarvesterController mono)
         {
             _mono = mono;
 
             if (FindPots())
             {
-                _activeClones = new List<TechType>();
                 grownPlantsRoot = GameObjectHelpers.FindGameObject(gameObject, "Planters");
             }
         }
@@ -43,24 +36,13 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
             if (item != null)
             {
                 AddItemToContainer(item,slotID);
-                //Destroy(item.item.gameObject);
             }
             else
             {
                 QuickLogger.Error($"To inventory item failed to create with techtype {type}");
             }
         }
-
-        internal void ShowDisplay()
-        {
-
-        }
-
-        internal void HideDisplay()
-        {
-
-        }
-
+        
         private bool FindPots()
         {
             try
@@ -84,19 +66,6 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
             }
 
             return true;
-        }
-
-        private int GetFreeSlotID()
-        {
-            for (int i = 0; i < Slots.Length; i++)
-            {
-                if (!Slots[i].IsOccupied)
-                {
-                    return i;
-                }
-            }
-
-            return 0;
         }
 
         private PlantSlot GetSlotByID(int slotID)
@@ -206,19 +175,6 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
             return Slots?.Any(plantSlot => plantSlot != null && plantSlot.IsOccupied) ?? false;
         }
 
-        public int GetContainerFreeSpace { get; }
-        public bool IsFull { get; }
-        public bool CanBeStored(int amount, TechType techType = TechType.None)
-        {
-            if (IsFull) return false;
-            return true;
-        }
-
-        public bool AddItemToContainer(InventoryItem item)
-        {
-            throw new NotImplementedException();
-        }
-
         public bool AddItemToContainer(InventoryItem item, int slotId)
         {
             _currentItemTech = item.item.GetTechType();
@@ -229,48 +185,6 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
             return true;
         }
 
-        public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
-        {
-            var plantable = pickupable.gameObject.GetComponentInChildren<Plantable>();
-            if (plantable  != null && !plantable.isSeedling) return false;
-            return CanBeStored(1);
-        }
-
-        public bool IsAllowedToRemoveItems()
-        {
-            return true;
-        }
-
-        public Pickupable RemoveItemFromContainer(TechType techType, int amount)
-        {
-            foreach (PlantSlot plantSlot in Slots)
-            {
-                if (plantSlot.GetReturnType() == techType)
-                {
-                    if (plantSlot.RemoveItem())
-                    {
-                        return techType.ToPickupable();
-                    }
-                }
-            }
-            return null;
-        }
-
-        internal void RemoveSample(TechType techType)
-        {
-            _activeClones.Remove(techType);
-        }
-
-        public Dictionary<TechType, int> GetItemsWithin()
-        {
-            return null;
-        }
-
-        public bool ContainsItem(TechType techType)
-        {
-            return Slots.Any(plantSlot => plantSlot.GetReturnType() == techType);
-        }
-        
         public void SetSpeedMode(SpeedModes result)
         {
             QuickLogger.Debug($"Setting SpeedMode to {result}",true);
@@ -278,6 +192,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
             {
                 plantSlot.CurrentSpeedMode = result;
             }
+            _mono.DisplayManager.UpdatePowerUsage();
         }
 
         //public string GetSlotInfo(int slotIndex)
@@ -314,6 +229,11 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
         public PlantSlot GetSlot(int slotIndex)
         {
             return Slots[slotIndex];
+        }
+
+        public SpeedModes GetCurrentSpeedMode()
+        {
+            return Slots[0].CurrentSpeedMode;
         }
     }
 }

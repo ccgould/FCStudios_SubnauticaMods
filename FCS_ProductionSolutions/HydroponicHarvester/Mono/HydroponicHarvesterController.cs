@@ -22,7 +22,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
         private EffectsManager _effectsManager;
         private bool _isInBase;
         private Text _unitID;
-        private DisplayManager _displayManager;
+        internal DisplayManager DisplayManager;
         private const float powerUsage = 0.85f;
         
         public EffectsManager EffectsManager => _effectsManager;
@@ -68,7 +68,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
 
         public override float GetPowerUsage()
         {
-            switch (GrowBedManager.Slots[0].CurrentSpeedMode)
+            switch (GrowBedManager.GetCurrentSpeedMode())
             {
                 case SpeedModes.Off:
                     return 0;
@@ -138,10 +138,10 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
                 InvokeRepeating(nameof(CheckSystem), .5f, .5f);
             }
 
-            if (_displayManager == null)
+            if (DisplayManager == null)
             {
-                _displayManager = gameObject.AddComponent<DisplayManager>();
-                _displayManager.Setup(this);
+                DisplayManager = gameObject.AddComponent<DisplayManager>();
+                DisplayManager.Setup(this);
             }
 
             FCSAlterraHubService.PublicAPI.AddEncyclopediaEntries(GetTechType(), true);
@@ -160,16 +160,6 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
         private void CheckSystem()
         {
             _effectsManager?.ToggleLightsByDistance();
-
-            float distance = Vector3.Distance(transform.position, Player.main.camRoot.transform.position);
-            if (distance <= 3f)
-            {
-                GrowBedManager?.ShowDisplay();
-            }
-            else
-            {
-                GrowBedManager?.HideDisplay();
-            }
         }
 
         public override void OnProtoSerialize(ProtobufSerializer serializer)
