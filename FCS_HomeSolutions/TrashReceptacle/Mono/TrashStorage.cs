@@ -37,14 +37,14 @@ namespace FCS_HomeSolutions.TrashReceptacle.Mono
             return true;
         }
 
-        private Recycler FindRecycler(Pickupable item)
+        private Recycler FindRecycler()
         {
             var recyclers = _mono.Manager.GetDevices(Mod.RecyclerTabID).ToArray();
             
             foreach (FcsDevice device in recyclers)
             {
                 var trashRecycler = (TrashRecyclerController) device;
-                if (device.IsOperational && trashRecycler.IsAllowedToAdd(item,false))
+                if (device.IsOperational)
                 {
                     return trashRecycler.GetRecycler();
                 }
@@ -55,7 +55,7 @@ namespace FCS_HomeSolutions.TrashReceptacle.Mono
 
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
         {
-            _recycler = FindRecycler(pickupable);
+            _recycler = FindRecycler();
             
             if (_recycler == null)
             {
