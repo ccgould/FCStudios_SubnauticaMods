@@ -30,7 +30,7 @@ namespace FCS_ProductionSolutions.Configuration
                     if (controller.UnitID.Equals(unitName, StringComparison.OrdinalIgnoreCase))
                     {
                         QuickLogger.Debug($"Adding Dummy to harvester", true);
-                        controller.GrowBedManager.AddDummy(techType, amount);
+                        controller.GrowBedManager.AddSample(techType, amount);
                         break;
                     }
                 }

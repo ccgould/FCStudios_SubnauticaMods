@@ -14,17 +14,11 @@ using UnityEngine;
 
 namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
 {
-    internal class GrowBedManager : MonoBehaviour, IFCSGrowBed, IFCSStorage
+    internal class GrowBedManager : MonoBehaviour, IFCSGrowBed
     {
         private HydroponicHarvesterController _mono;
-        private bool _initialized;
         private const float MaxPlantsHeight = 3f;
         private List<TechType> _activeClones;
-        public bool NotAllowToGenerate => PauseUpdates || !_mono.IsConstructed || CurrentSpeedMode == SpeedModes.Off;
-        internal SpeedModes CurrentSpeedMode { get; set; }
-
-        public bool PauseUpdates { get; set; }
-
         internal PlantSlot[] Slots;
         private TechType _currentItemTech;
         public Action<int, int> OnContainerUpdate { get; set; }
@@ -40,42 +34,23 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
             {
                 _activeClones = new List<TechType>();
                 grownPlantsRoot = GameObjectHelpers.FindGameObject(gameObject, "Planters");
-                _initialized = true;
             }
         }
         
-        internal void AddDummy(TechType type, int amount = 1)
+        internal void AddSample(TechType type,int slotID)
         {
-            try
-            { 
-                if (amount > Slots.Length)
-                {
-                    amount = Slots.Length;
-                }
-
-                var item = type.ToInventoryItem();
-                if (item != null)
-                {
-                    for (int i = 0; i < amount; i++)
-                    {
-                       var result =  AddItemToContainer(item);
-                       if (result) continue;
-                       QuickLogger.Error($"Failed to add item to container");
-                        Destroy(item.item.gameObject);
-                    }
-                }
-                else
-                {
-                    QuickLogger.Error($"To inventory item failed to create with techtype {type}");
-                }
-            }
-            catch (Exception e)
+            var item = type.ToInventoryItem();
+            if (item != null)
             {
-                QuickLogger.Error($"[GrowBedManager_AddDummy]{e.Message} : {e.StackTrace}",true);
-
+                AddItemToContainer(item,slotID);
+                //Destroy(item.item.gameObject);
+            }
+            else
+            {
+                QuickLogger.Error($"To inventory item failed to create with techtype {type}");
             }
         }
-        
+
         internal void ShowDisplay()
         {
 
@@ -97,7 +72,9 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
                 for (int i = 0; i < planters.childCount; i++)
                 {
                     var planter = planters.GetChild(i);
-                    Slots[i] = new PlantSlot(this,i, planter, planter.Find("PlanterBounds"));
+                    var slot = planter.gameObject.AddComponent<PlantSlot>();
+                    slot.Initialize(this,i);
+                    Slots[i] = slot;
                 }
             }
             catch (Exception e)
@@ -154,9 +131,8 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
 
         private void AddItem(Plantable plantable, int slotID)
         {
-            PlantSlot slotByID = this.GetSlotByID(slotID);
-
-
+            PlantSlot slotByID = GetSlotByID(slotID);
+            
             if (slotByID == null)
             {
                 return;
@@ -169,7 +145,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
 
             this.SetSlotOccupiedState(slotID, true);
          
-            GameObject gameObject = plantable.Spawn(slotByID.Slot, _mono.IsInBase());
+            GameObject gameObject = plantable.Spawn(slotByID.transform, _mono.IsInBase());
 
             this.SetupRenderers(gameObject, _mono.IsInBase());
             gameObject.SetActive(true);
@@ -187,14 +163,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
                 
                 var pickPrefab = growingPlant.grownModelPrefab.GetComponentInChildren<PickPrefab>();
 
-                if (pickPrefab != null)
-                {
-                    slotByID.ReturnTechType = pickPrefab.pickTech;
-                }
-                else
-                {
-                    slotByID.ReturnTechType = _currentItemTech;
-                }
+                slotByID.ReturnTechType = pickPrefab != null ? pickPrefab.pickTech : _currentItemTech;
 
                 Destroy(growingPlant);
             }
@@ -247,11 +216,16 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
 
         public bool AddItemToContainer(InventoryItem item)
         {
+            throw new NotImplementedException();
+        }
+
+        public bool AddItemToContainer(InventoryItem item, int slotId)
+        {
             _currentItemTech = item.item.GetTechType();
             Plantable component = item.item.GetComponent<Plantable>();
             item.item.SetTechTypeOverride(component.plantTechType);
             item.isEnabled = false;
-            AddItem(component, GetFreeSlotID());
+            AddItem(component, slotId);
             return true;
         }
 
@@ -300,7 +274,10 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
         public void SetSpeedMode(SpeedModes result)
         {
             QuickLogger.Debug($"Setting SpeedMode to {result}",true);
-            CurrentSpeedMode = result;
+            foreach (PlantSlot plantSlot in Slots)
+            {
+                plantSlot.CurrentSpeedMode = result;
+            }
         }
 
         //public string GetSlotInfo(int slotIndex)

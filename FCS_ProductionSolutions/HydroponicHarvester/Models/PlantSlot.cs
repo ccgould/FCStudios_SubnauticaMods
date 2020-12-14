@@ -1,28 +1,27 @@
 ﻿using System;
-using System.CodeDom;
 using System.Collections.Generic;
 using FCS_ProductionSolutions.HydroponicHarvester.Enumerators;
 using FCS_ProductionSolutions.HydroponicHarvester.Mono;
 using FCSCommon.Utilities;
 using UnityEngine;
-using Object = UnityEngine.Object;
-
 namespace FCS_ProductionSolutions.HydroponicHarvester.Models
 {
-    internal class PlantSlot
+    internal class PlantSlot : MonoBehaviour
     {
         internal GameObject SlotBounds { get; set; }
         internal Plantable Plantable { get; set; }
-        public readonly int Id;
-        public readonly Transform Slot;
+        public int Id;
         public bool IsOccupied;
         private SpeedModes _currentMode;
         public GameObject PlantModel;
+        private const int MaxCapacity = 50;
         public bool PauseUpdates { get; set; }
-        public bool IsFull { get; set; }
+        public bool IsFull => _itemCount >= MaxCapacity;
+
+
         internal const float CooldownComplete = 19f;
         internal const float StartUpComplete = 4f;
-        public bool NotAllowToGenerate => PauseUpdates || !_growBedManager.GetIsConstructed() || CurrentSpeedMode == SpeedModes.Off;
+        public bool NotAllowToGenerate => PauseUpdates || !GrowBedManager.GetIsConstructed() || CurrentSpeedMode == SpeedModes.Off || Plantable == null;
         internal float StartUpProgress
         {
             get => _progress[(int)ClonePhases.StartUp];
@@ -65,22 +64,12 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Models
                 _returnTechType = value;
             }
         }
-
         private readonly IList<float> _progress = new List<float>(new[] { -1f, -1f, -1f });
         private TechType _returnTechType;
-        private GrowBedManager _growBedManager;
+        internal GrowBedManager GrowBedManager;
         private int _itemCount;
+        private SlotItemTab _trackedTab;
         
-        
-        public PlantSlot(GrowBedManager growBedManager,int id, Transform slot, Transform slotBounds)
-        {
-            _growBedManager = growBedManager;
-            Id = id;
-            Slot = slot;
-            SlotBounds = slotBounds.gameObject;
-            PlantModel = slot.GetChild(0).gameObject;
-        }
-
         private void Update()
         {
             //QuickLogger.Debug($"PauseUpdates: {PauseUpdates} || IsConstructed: {_mono.IsConstructed} || CurrentSpeedMode: {_mono.CurrentSpeedMode}",true);
@@ -91,7 +80,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Models
             var energyToConsume = CalculateEnergyPerSecond() * DayNightCycle.main.deltaTime;
 
             //TODO Deal with Power
-            if (!_growBedManager.HasPowerToConsume())
+            if (!GrowBedManager.HasPowerToConsume())
                 return;
 
             if (CoolDownProgress >= CooldownComplete)
@@ -144,11 +133,11 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Models
 
         public void Clear()
         {
-            Object.Destroy(PlantModel);
+            GameObject.Destroy(PlantModel);
 
             if (Plantable.linkedGrownPlant)
             {
-                Object.Destroy(Plantable.linkedGrownPlant.gameObject);
+                GameObject.Destroy(Plantable.linkedGrownPlant.gameObject);
             }
             PlantModel = null;
             Plantable = null;
@@ -156,8 +145,8 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Models
         
         public void ShowPlant()
         {
-            var model = Object.Instantiate(PlantModel);
-            model.transform.SetParent(Slot,false);
+            var model = GameObject.Instantiate(PlantModel);
+            model.transform.SetParent(transform,false);
             model.transform.localPosition = Vector3.zero;
         }
 
@@ -177,7 +166,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Models
             {
                 return;
             }
-            Plantable.SetMaxPlantHeight(height - Slot.localPosition.y);
+            Plantable.SetMaxPlantHeight(height - transform.localPosition.y);
         }
 
         public bool RemoveItem()
@@ -185,14 +174,17 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Models
             if (_itemCount <= 0) return false;
             _itemCount--;
             TryStartingNextClone();
+            _trackedTab?.UpdateCount();
             return true;
         }
 
         public void AddItem()
         {
+            if(IsFull) return;
             _itemCount++;
+            _trackedTab?.UpdateCount();
         }
-
+        
         public TechType GetReturnType()
         {
             return _returnTechType;
@@ -229,6 +221,29 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Models
             {
                 QuickLogger.Debug("Cannot start another clone, another clone is currently in progress", true);
             }
+        }
+
+        public int GetCount()
+        {
+            return _itemCount;
+        }
+
+        public int GetMaxCapacity()
+        {
+            return MaxCapacity;
+        }
+
+        public void TrackTab(SlotItemTab slotItemTab)
+        {
+            _trackedTab = slotItemTab;
+        }
+
+        public void Initialize(GrowBedManager growBedManager, int id)
+        {
+            GrowBedManager = growBedManager;
+            Id = id;
+            SlotBounds = gameObject.FindChild("PlanterBounds");
+            PlantModel = transform.GetChild(0).gameObject;
         }
     }
 }

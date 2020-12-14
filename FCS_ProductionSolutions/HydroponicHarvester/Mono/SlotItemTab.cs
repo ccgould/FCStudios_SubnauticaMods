@@ -3,6 +3,8 @@ using FCS_ProductionSolutions.HydroponicHarvester.Models;
 using FCSCommon.Components;
 using FCSCommon.Helpers;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
 {
@@ -11,12 +13,8 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
         private uGUI_Icon _icon;
         private TechType _iconTechType;
         internal PlantSlot Slot;
+        private Text _amount;
         private bool Initialized => _icon != null;
-
-        private void UpdateCount()
-        {
-           
-        }
 
         internal void Initialize(DisplayManager display, Action<string,object> onButtonClicked,int slotIndex)
         {
@@ -36,18 +34,27 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
             removeDnaBtn.HOVER_COLOR = Color.white;
             removeDnaBtn.OnButtonClick += (s, o) => { display.ClearDNASample(this); };
 
-            bat amount = InterfaceHelpers.FindGameObject(gameObject, "Amount");
+            _amount = InterfaceHelpers.FindGameObject(gameObject, "Amount").GetComponent<Text>();
+            UpdateCount();
 
             HOVER_COLOR = Color.white;
             STARTING_COLOR = new Color(.5f,.5f,.5f);
             OnButtonClick += onButtonClicked;
+
+            Slot.TrackTab(this);
         }
 
         internal void SetIcon(TechType techType)
         {
             _iconTechType = techType;
             _icon.sprite = SpriteManager.Get(techType);
+            Slot.GrowBedManager.AddSample(techType, Slot.Id);
             Tag = techType;
+        }
+
+        internal void UpdateCount()
+        {
+            _amount.text = $"{Slot.GetCount()}/{Slot.GetMaxCapacity()}";
         }
 
         internal void Clear()
