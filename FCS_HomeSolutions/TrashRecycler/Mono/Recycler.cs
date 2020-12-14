@@ -303,6 +303,7 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
         internal byte[] Save(ProtobufSerializer serializer, TrashRecyclerDataEntry savedData)
         {
             savedData.QueuedItems = GetQueuedItems();
+            savedData.BioMaterialsCount = BioMaterials;
             return _storageContainer.Save(serializer);
         }
 
@@ -335,6 +336,8 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
             {
                 _saveQueuedItems = data.QueuedItems.ToList();
             }
+
+            BioMaterials = data.BioMaterialsCount;
             _storageContainer.RestoreItems(serializer, data.Storage);
         }
     }

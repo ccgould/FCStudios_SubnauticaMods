@@ -35,7 +35,9 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
             removeDnaBtn.STARTING_COLOR = Color.gray;
             removeDnaBtn.HOVER_COLOR = Color.white;
             removeDnaBtn.OnButtonClick += (s, o) => { display.ClearDNASample(this); };
-            
+
+            bat amount = InterfaceHelpers.FindGameObject(gameObject, "Amount");
+
             HOVER_COLOR = Color.white;
             STARTING_COLOR = new Color(.5f,.5f,.5f);
             OnButtonClick += onButtonClicked;

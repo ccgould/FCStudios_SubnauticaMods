@@ -118,10 +118,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DataStorageSolutions\DataStorageSolutions.csproj">
-      <Project>{3f6924ba-1f59-4884-823e-cb993d32341c}</Project>
-      <Name>DataStorageSolutions</Name>
-    </ProjectReference>
     <ProjectReference Include="..\FCSTechFabricator\FCSTechFabricator.csproj">
       <Project>{5ef4adb8-3ae7-41ec-83e1-1daf04999f0e}</Project>
       <Name>FCSTechFabricator</Name>

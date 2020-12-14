@@ -102,6 +102,7 @@ namespace FCS_HomeSolutions.Configuration
         public float CurrentTime { get; set; }
         public IEnumerable<string> QueuedItems { get; set; }
         [JsonProperty(PropertyName = "DropData")] internal byte[] DropStorage { get; set; }
+        [JsonProperty(PropertyName = "BMC")] internal int BioMaterialsCount { get; set; }
     }
 
     internal class QuantumTeleporterDataEntry
