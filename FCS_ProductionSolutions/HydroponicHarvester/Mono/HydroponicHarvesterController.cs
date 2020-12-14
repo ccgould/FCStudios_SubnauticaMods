@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reflection.Emit;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Mono;
@@ -15,7 +14,7 @@ using UnityEngine.UI;
 
 namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
 {
-    internal class HydroponicHarvesterController : FcsDevice, IFCSSave<SaveData>, IHandTarget
+    internal class HydroponicHarvesterController : FcsDevice, IFCSSave<SaveData>
     {
         private bool _isFromSave;
         private bool _runStartUpOnEnable;
@@ -23,15 +22,14 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
         private EffectsManager _effectsManager;
         private bool _isInBase;
         private Text _unitID;
+        private DisplayManager _displayManager;
         private const float powerUsage = 0.85f;
-
-        public EffectsManager EffectsManager => _effectsManager;
         
+        public EffectsManager EffectsManager => _effectsManager;
         public AudioManager AudioManager { get; private set; }
         public Action<bool> onUpdateSound { get; private set; }
         public ColorManager ColorManager { get; private set; }
         public GrowBedManager GrowBedManager { get; set; }
-
         public override bool IsOperational => IsOperationalCheck();
         
         #region Unity Methods
@@ -70,7 +68,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
 
         public override float GetPowerUsage()
         {
-            switch (GrowBedManager.CurrentSpeedMode)
+            switch (GrowBedManager.Slots[0].CurrentSpeedMode)
             {
                 case SpeedModes.Off:
                     return 0;
@@ -121,6 +119,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
             //    }
             //};
 
+
             if (GrowBedManager == null)
             {
                 GrowBedManager = gameObject.AddComponent<GrowBedManager>();
@@ -137,6 +136,12 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
             {
                 _effectsManager = new EffectsManager(this);
                 InvokeRepeating(nameof(CheckSystem), .5f, .5f);
+            }
+
+            if (_displayManager == null)
+            {
+                _displayManager = gameObject.AddComponent<DisplayManager>();
+                _displayManager.Setup(this);
             }
 
             FCSAlterraHubService.PublicAPI.AddEncyclopediaEntries(GetTechType(), true);
@@ -262,26 +267,9 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
             return true;
         }
 
-        public void ConsumePower()
-        {
-            
-        }
-
         public bool IsInBase()
         {
             return _isInBase;
-        }
-
-        public void OnHandHover(GUIHand hand)
-        {
-            HandReticle main = HandReticle.main;
-            main.SetInteractText(Mod.HydroponicHarvesterModFriendlyName,$"Slot 1 {GrowBedManager.GetSlotInfo(0)} | Slot 2 {GrowBedManager.GetSlotInfo(1)} | Slot 3 {GrowBedManager.GetSlotInfo(2)}");
-            main.SetIcon(HandReticle.IconType.Info);
-        }
-
-        public void OnHandClick(GUIHand hand)
-        {
-
         }
     }
 }

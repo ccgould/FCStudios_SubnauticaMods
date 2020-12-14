@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHub.Helpers;
@@ -20,41 +19,18 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
         private HydroponicHarvesterController _mono;
         private bool _initialized;
         private const float MaxPlantsHeight = 3f;
-        private readonly IList<float> _progress = new List<float>(new[] { -1f, -1f, -1f });
         private List<TechType> _activeClones;
-        private Dictionary<TechType, int> _storage;
         public bool NotAllowToGenerate => PauseUpdates || !_mono.IsConstructed || CurrentSpeedMode == SpeedModes.Off;
-        internal SpeedModes CurrentSpeedMode
-        {
-            get => _currentMode;
-            set
-            {
-                SpeedModes previousMode = _currentMode;
-                _currentMode = value;
-
-                if (_currentMode != SpeedModes.Off)
-                {
-                    //PowerManager.UpdateEnergyPerSecond(_currentMode);
-                    if (previousMode == SpeedModes.Off)
-                        TryStartingNextClone();
-                }
-                else // Off State
-                {
-                    //PowerManager.UpdateEnergyPerSecond(_currentMode);
-                }
-            }
-        }
+        internal SpeedModes CurrentSpeedMode { get; set; }
 
         public bool PauseUpdates { get; set; }
 
         internal PlantSlot[] Slots;
         private TechType _currentItemTech;
-        private SpeedModes _currentMode;
         public Action<int, int> OnContainerUpdate { get; set; }
         public Action<FcsDevice, TechType> OnContainerAddItem { get; set; }
         public Action<FcsDevice, TechType> OnContainerRemoveItem { get; set; }
-        internal const float CooldownComplete = 19f;
-        internal const float StartUpComplete = 4f;
+
         
         internal void Initialize(HydroponicHarvesterController mono)
         {
@@ -63,7 +39,6 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
             if (FindPots())
             {
                 _activeClones = new List<TechType>();
-                _storage = new Dictionary<TechType, int>();
                 grownPlantsRoot = GameObjectHelpers.FindGameObject(gameObject, "Planters");
                 _initialized = true;
             }
@@ -103,18 +78,12 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
         
         internal void ShowDisplay()
         {
-            foreach (PlantSlot slot in Slots)
-            {
-                slot.ShowDisplay();
-            }
+
         }
 
         internal void HideDisplay()
         {
-            foreach (PlantSlot slot in Slots)
-            {
-                slot.HideDisplay();
-            }
+
         }
 
         private bool FindPots()
@@ -128,8 +97,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
                 for (int i = 0; i < planters.childCount; i++)
                 {
                     var planter = planters.GetChild(i);
-                    Slots[i] = new PlantSlot(this,i, planter, planter.Find("PlanterBounds"),
-                        GameObjectHelpers.FindGameObject(gameObject, $"Slot{i+1}Item").AddComponent<SlotItemTab>());
+                    Slots[i] = new PlantSlot(this,i, planter, planter.Find("PlanterBounds"));
                 }
             }
             catch (Exception e)
@@ -301,16 +269,17 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
 
         public Pickupable RemoveItemFromContainer(TechType techType, int amount)
         {
-            if (!_storage.ContainsKey(techType)) return null;
-
-            _storage[techType] -= 1;
-            TryStartingNextClone();
-
-            if (_storage[techType] == 0)
+            foreach (PlantSlot plantSlot in Slots)
             {
-                _storage.Remove(techType);
+                if (plantSlot.GetReturnType() == techType)
+                {
+                    if (plantSlot.RemoveItem())
+                    {
+                        return techType.ToPickupable();
+                    }
+                }
             }
-            return techType.ToPickupable();
+            return null;
         }
 
         internal void RemoveSample(TechType techType)
@@ -320,178 +289,54 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
 
         public Dictionary<TechType, int> GetItemsWithin()
         {
-            return _storage;
+            return null;
         }
 
         public bool ContainsItem(TechType techType)
         {
-            return _storage.ContainsKey(techType);
+            return Slots.Any(plantSlot => plantSlot.GetReturnType() == techType);
         }
         
-        internal float StartUpProgress
-        {
-            get => _progress[(int)ClonePhases.StartUp];
-            set => _progress[(int)ClonePhases.StartUp] = value;
-        }
-        
-        internal float GenerationProgress
-        {
-            get => _progress[(int)ClonePhases.Generating];
-            set => _progress[(int)ClonePhases.Generating] = value;
-        }
-
-        internal float CoolDownProgress
-        {
-            get => _progress[(int)ClonePhases.CoolDown];
-            set => _progress[(int)ClonePhases.CoolDown] = value;
-        }
-        
-        private void Update()
-        {
-            //QuickLogger.Debug($"PauseUpdates: {PauseUpdates} || IsConstructed: {_mono.IsConstructed} || CurrentSpeedMode: {_mono.CurrentSpeedMode}",true);
-
-            if (NotAllowToGenerate)
-                return;
-
-           var energyToConsume = CalculateEnergyPerSecond() * DayNightCycle.main.deltaTime;
-
-            //TODO Deal with Power
-            if (!_mono.HasPowerToConsume())
-                return;
-
-            if (CoolDownProgress >= CooldownComplete)
-            {
-                QuickLogger.Debug("[Hydroponic Harvester] Finished Cooldown", true);
-
-                PauseUpdates = true;
-                SpawnClone();
-                // Finished cool down - See if the next clone can be started                
-                TryStartingNextClone(); //TODO check here
-
-                this.PauseUpdates = false;
-            }
-            else if (this.CoolDownProgress >= 0f)
-            {
-                // Is currently cooling down
-                this.CoolDownProgress = Mathf.Min(CooldownComplete, this.CoolDownProgress + DayNightCycle.main.deltaTime);
-            }
-            else if (this.GenerationProgress >= QPatch.Configuration.EnergyConsumpion)
-            {
-                QuickLogger.Debug("[Hydroponic Harvester] Cooldown", true);
-
-                // Finished generating clone - Start cool down
-                this.CoolDownProgress = 0f;
-            }
-            else if (this.GenerationProgress >= 0f)
-            {
-                _mono.ConsumePower();
-
-                // Is currently generating clone
-                this.GenerationProgress = Mathf.Min(QPatch.Configuration.EnergyConsumpion, this.GenerationProgress + energyToConsume);
-            }
-            else if (this.StartUpProgress >= StartUpComplete)
-            {
-                QuickLogger.Debug("[Hydroponic Harvester] Generating", true);
-                // Finished start up - Start generating clone
-                this.GenerationProgress = 0f;
-            }
-            else if (this.StartUpProgress >= 0f)
-            {
-                // Is currently in start up routine
-                this.StartUpProgress = Mathf.Min(StartUpComplete, this.StartUpProgress + DayNightCycle.main.deltaTime);
-            }
-        }
-
-        private float CalculateEnergyPerSecond()
-        {
-            if (CurrentSpeedMode == SpeedModes.Off) return 0f;
-            var creationTime = Convert.ToSingle(CurrentSpeedMode);
-            return QPatch.Configuration.EnergyConsumpion / creationTime;
-        }
-
-        internal void TryStartingNextClone()
-        {
-            QuickLogger.Debug("Trying to start another clone", true);
-
-            if (CurrentSpeedMode == SpeedModes.Off)
-                return;// Powered off, can't start a new clone
-
-            if (this.StartUpProgress < 0f || // Has not started a clone yet
-                this.CoolDownProgress == CooldownComplete) // Has finished a clone
-            {
-                if (!IsFull)
-                {
-                    QuickLogger.Debug("[Hydroponic Harvester] Start up", true);
-                    this.CoolDownProgress = -1f;
-                    this.GenerationProgress = -1f;
-                    this.StartUpProgress = 0f;
-                }
-                else
-                {
-                    QuickLogger.Debug("Cannot start another clone, container is full", true);
-                }
-            }
-            else
-            {
-                QuickLogger.Debug("Cannot start another clone, another clone is currently in progress", true);
-            }
-        }
-
-        internal void SpawnClone()
-        {
-            foreach (TechType sample in _activeClones)
-            {
-                if (IsFull) break;
-                AddToStorage(sample);
-            }
-        }
-
-        private void AddToStorage(TechType sample)
-        {
-            if (_storage.ContainsKey(sample))
-            {
-                _storage[sample] += 1;
-            }
-            else
-            {
-                _storage.Add(sample,1);
-            }
-        }
-
         public void SetSpeedMode(SpeedModes result)
         {
             QuickLogger.Debug($"Setting SpeedMode to {result}",true);
             CurrentSpeedMode = result;
         }
 
-        public string GetSlotInfo(int slotIndex)
-        {
-            if (Slots[slotIndex].Plantable != null)
-            {
-                var nameOfPlant = Language.main.Get(Slots[slotIndex].Plantable.plantTechType);
-                if (Slots[slotIndex].GetPlantSeedTechType() != TechType.None)
-                {
-                    int amount = 0;
+        //public string GetSlotInfo(int slotIndex)
+        //{
+        //    if (Slots[slotIndex].Plantable != null)
+        //    {
+        //        var nameOfPlant = Language.main.Get(Slots[slotIndex].Plantable.plantTechType);
+        //        if (Slots[slotIndex].GetPlantSeedTechType() != TechType.None)
+        //        {
+        //            int amount = 0;
 
-                    if (_storage.ContainsKey(Slots[slotIndex].ReturnTechType))
-                    {
-                        amount = _storage[Slots[slotIndex].ReturnTechType];
-                    }
+        //            if (_storage.ContainsKey(Slots[slotIndex].ReturnTechType))
+        //            {
+        //                amount = _storage[Slots[slotIndex].ReturnTechType];
+        //            }
                     
-                    return $"{nameOfPlant} x{amount}";
-                }                
-            }
+        //            return $"{nameOfPlant} x{amount}";
+        //        }                
+        //    }
 
-            return "N/A";
+        //    return "N/A";
+        //}
+
+        public bool GetIsConstructed()
+        {
+            return _mono.IsConstructed;
         }
 
-        public void OnItemButtonClicked(string arg1, object arg2)
+        public bool HasPowerToConsume()
         {
-            var item = RemoveItemFromContainer((TechType) arg2, 1);
-            if (item != null)
-            {
-                PlayerInteractionHelper.GivePlayerItem(item);
-            }
+            return _mono.Manager.HasEnoughPower(_mono.GetPowerUsage());
+        }
+
+        public PlantSlot GetSlot(int slotIndex)
+        {
+            return Slots[slotIndex];
         }
     }
 }

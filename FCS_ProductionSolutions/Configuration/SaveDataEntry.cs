@@ -71,6 +71,6 @@ namespace FCS_ProductionSolutions.Configuration
         [JsonProperty] internal List<HydroponicHarvesterDataEntry> HydroponicHarvesterEntries = new List<HydroponicHarvesterDataEntry>();
         [JsonProperty] internal List<MatterAnalyzerDataEntry> MatterAnalyzerEntries = new List<MatterAnalyzerDataEntry>();
         [JsonProperty] internal List<DeepDrillerSaveDataEntry> DeepDrillerMk2Entries = new List<DeepDrillerSaveDataEntry>();
-        [JsonProperty] internal List<TechType> HydroponicHarvesterKnownTech { get; set; } = new List<TechType>();
+        [JsonProperty] internal Dictionary<TechType,bool> HydroponicHarvesterKnownTech { get; set; } = new Dictionary<TechType, bool>();
     }
 }

@@ -20,7 +20,7 @@ namespace FCS_ProductionSolutions.Configuration
 
         private static ModSaver _saveObject;
         private static SaveData _saveData;
-        private static List<TechType> _hydroponicKnownTech;
+        private static Dictionary<TechType, bool> _hydroponicKnownTech;
         private static TechType _sandBagTechType;
         private static TechType _alterraStorageTechType;
 
@@ -124,9 +124,15 @@ namespace FCS_ProductionSolutions.Configuration
             ModUtils.LoadSaveData<SaveData>(SaveDataFilename, GetSaveFileDirectory(), (data) =>
             {
                 _saveData = data;
+                _hydroponicKnownTech = _saveData.HydroponicHarvesterKnownTech;
                 QuickLogger.Info("Save Data Loaded");
                 OnDataLoaded?.Invoke(_saveData);
             });
+        }
+
+        internal static Dictionary<TechType,bool> GetHydroponicKnownTech()
+        {
+            return _hydroponicKnownTech;
         }
 
         internal static bool IsSaving()
@@ -230,21 +236,21 @@ namespace FCS_ProductionSolutions.Configuration
 
         #endregion
 
-        public static void AddHydroponicKnownTech(TechType techType)
+        public static void AddHydroponicKnownTech(TechType techType,bool isLandPlant)
         {
             if (_hydroponicKnownTech == null)
             {
-                _hydroponicKnownTech = new List<TechType>();
+                _hydroponicKnownTech = new Dictionary<TechType, bool>();
             }
-            _hydroponicKnownTech.Add(techType);
+            _hydroponicKnownTech.Add(techType, isLandPlant);
         }
         public static bool IsHydroponicKnownTech(TechType techType)
         {
             if (_hydroponicKnownTech == null)
             {
-                _hydroponicKnownTech = new List<TechType>();
+                _hydroponicKnownTech = new Dictionary<TechType, bool>();
             }
-            return _hydroponicKnownTech.Contains(techType);
+            return _hydroponicKnownTech.ContainsKey(techType);
         }
 
         public static TechType AlterraStorageTechType()

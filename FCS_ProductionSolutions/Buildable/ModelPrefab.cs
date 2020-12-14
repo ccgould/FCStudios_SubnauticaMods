@@ -24,6 +24,8 @@ namespace FCS_ProductionSolutions.Buildable
         public static AssetBundle GlobalBundle { get; set; }
         public static AssetBundle ModBundle { get; set; }
         public static GameObject HydroponicHarvesterPrefab { get; set; }
+        public static GameObject HydroponicDNASamplePrefab { get; set; }
+        public static GameObject HydroponicScreenItemPrefab { get; set; }
         public static GameObject MatterAnalyzerPrefab { get; set; }
         public static GameObject DeepDrillerItemPrefab { get; set; }
         public static GameObject DeepDrillerPrefab { get; set; }
@@ -47,6 +49,8 @@ namespace FCS_ProductionSolutions.Buildable
             }
 
             HydroponicHarvesterPrefab = GetPrefab(Mod.HydroponicHarvesterModPrefabName);
+            HydroponicScreenItemPrefab = GetPrefab("HarvesterScreenItem");
+            HydroponicDNASamplePrefab = GetPrefab("DNASampleEntry");
             MatterAnalyzerPrefab = GetPrefab(Mod.MatterAnalyzerPrefabName);
             DeepDrillerItemPrefab = GetPrefab("InventoryItemBTN");
             DeepDrillerOreBTNPrefab = GetPrefab("OreBTN");
@@ -57,9 +61,7 @@ namespace FCS_ProductionSolutions.Buildable
             DeepDrillerOverrideItemPrefab = GetPrefab("OverrideItem");
             DeepDrillerFunctionOptionItemPrefab = GetPrefab("FunctionOptionItem");
         }
-
         
-
         internal static GameObject GetPrefab(string prefabName)
         {
             try
@@ -117,6 +119,11 @@ namespace FCS_ProductionSolutions.Buildable
             MaterialHelpers.ApplyAlphaShader(DecalMaterial, prefab);
             MaterialHelpers.ApplyAlphaShader(DetailsMaterial, prefab);
             #endregion
+        }
+
+        internal static Sprite GetSprite(string spriteName)
+        {
+            return ModBundle.LoadAsset<Sprite>(spriteName);
         }
     }
 }

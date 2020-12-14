@@ -39,6 +39,7 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
         private Vector3 _bounds;
         private GameObject _currentSeed;
         private TechType _currentTechType;
+        private bool _isLandPlant;
 
         #region Unity Methods
 
@@ -177,7 +178,7 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
                 {
                     _isScanning = false;
                     _reset = true;
-                    Mod.AddHydroponicKnownTech(_currentTechType);
+                    Mod.AddHydroponicKnownTech(_currentTechType,_isLandPlant);
                 }
             }
         }
@@ -210,7 +211,9 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
             seed.transform.SetParent(_slot.transform, false);
 
             _currentSeed = seed;
+            var plantable = seed.GetComponent<Plantable>();
 
+            _isLandPlant = !plantable.underwater;
             _currentTechType = techype;
 
             StartScanning();

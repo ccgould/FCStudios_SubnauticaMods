@@ -18,6 +18,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
         private ParticleSystem[] _slot1_Smoke;
         private ParticleSystem[] _slot2_Smoke;
         private ParticleSystem[] _slot3_Smoke;
+        private bool _isBreakerSwitched;
 
         internal EffectsManager(HydroponicHarvesterController controller)
         {
@@ -42,7 +43,10 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
             float distance = Vector3.Distance(_controller.transform.position, Player.main.camRoot.transform.position);
             if (distance <= QPatch.HarvesterConfiguration.LightTriggerRange)
             {
-                TurnOnLights();
+                if (!_isBreakerSwitched)
+                {
+                    TurnOnLights();
+                }
             }
             else
             {
@@ -115,6 +119,19 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
                     QuickLogger.Debug($"Stopping effect", true);
                     system.Stop();
                 }
+            }
+        }
+
+        internal void SetBreaker(bool isTripped)
+        {
+            _isBreakerSwitched = isTripped;
+            if (isTripped)
+            {
+                TurnOffLights();
+            }
+            else
+            {
+                TurnOnLights();
             }
         }
     }

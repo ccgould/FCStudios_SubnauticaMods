@@ -121,6 +121,8 @@ namespace FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Mono
             _percent = InterfaceHelpers.FindGameObject(gameObject, "percentage").GetComponent<Text>();
             _percentBar = InterfaceHelpers.FindGameObject(gameObject, "PreLoader_Bar_Front").GetComponent<Image>();
 
+            MaterialHelpers.ChangeEmissionStrength(ModelPrefab.EmissiveControllerMaterial,gameObject,5f);
+
             IsInitialized = true;
         }
 
