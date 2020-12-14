@@ -319,9 +319,7 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
 
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
         {
-            if (!_recycler.IsAllowedToAdd(pickupable)) return false;
-
-            return true;
+            return _recycler.IsAllowedToAdd(pickupable);
         }
 
         public Recycler GetRecycler()

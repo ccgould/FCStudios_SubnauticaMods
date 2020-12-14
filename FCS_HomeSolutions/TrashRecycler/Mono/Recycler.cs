@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHub.Mono;
@@ -6,10 +7,8 @@ using FCS_HomeSolutions.Configuration;
 using FCS_HomeSolutions.TrashRecycler.Model;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Crafting;
-using SMLHelper.V2.Json.ExtensionMethods;
+using SMLHelper.V2.Handlers;
 using UnityEngine;
-
 
 namespace FCS_HomeSolutions.TrashRecycler.Mono
 {
@@ -17,53 +16,18 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
     {
         public FcsDevice Controller { get; set; }
         private readonly Queue<Waste> _wasteList = new Queue<Waste>();
-        private static readonly List<IIngredient> Ingredients = new List<IIngredient>();
-        private static readonly HashSet<TechType> BatteryTech = new HashSet<TechType>
-        {
-            TechType.Battery,
-            TechType.PowerCell,
-            TechType.PrecursorIonBattery,
-            TechType.PrecursorIonPowerCell,
-            TechType.PrecursorIonCrystal
-        };
-        public static readonly HashSet<TechType> BannedTech = new HashSet<TechType>
-        {
-            TechType.CookedBladderfish,
-            TechType.CookedBoomerang,
-            TechType.CookedEyeye,
-            TechType.CookedGarryFish,
-            TechType.CookedHoleFish,
-            TechType.CookedHoopfish,
-            TechType.CookedHoverfish,
-            TechType.CookedLavaBoomerang,
-            TechType.CookedLavaEyeye,
-            TechType.CookedOculus,
-            TechType.CookedPeeper,
-            TechType.CookedReginald,
-            TechType.CookedSpadefish,
-            TechType.CookedSpinefish,
-            TechType.CuredBladderfish,
-            TechType.CuredBoomerang,
-            TechType.CuredEyeye,
-            TechType.CuredGarryFish,
-            TechType.CuredHoleFish,
-            TechType.CuredHoopfish,
-            TechType.CuredHoverfish,
-            TechType.CuredLavaBoomerang,
-            TechType.CuredLavaEyeye,
-            TechType.CuredOculus,
-            TechType.CuredPeeper,
-            TechType.CuredReginald,
-            TechType.CuredSpadefish,
-            TechType.CuredSpinefish,
-            TechType.AirBladder,
-            TechType.FilteredWater,
-            TechType.Titanium,
-            TechType.Bleach,
-            TechType.Lubricant,
-            TechType.Silicone
-        };
-
+        private static HashSet<TechType> batteryTech;
+        public static HashSet<TechType> BatteryTech 
+        { 
+            get 
+            { 
+                if(batteryTech is null || batteryTech.Count == 0)
+                {
+                    batteryTech = new HashSet<TechType>(BatteryCharger.compatibleTech).Concat(PowerCellCharger.compatibleTech).ToHashSet();
+                }
+                return batteryTech;
+            } 
+        }
 
         private FCSStorage _storageContainer;
         private List<string> _saveQueuedItems = new List<string>();
@@ -71,6 +35,7 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
         public Action OnContainerUpdated { get; set; }
         public Action<TechType> OnRecyclingItem { get; set; }
         public int MaxStorage { get; set; }
+        public int BioMaterials { get; set; }
 
         public void Initialize(FcsDevice mono, int maxStorage)
         {
@@ -85,7 +50,59 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
 
         internal void AddItem(InventoryItem item)
         {
-            _wasteList.Enqueue(new Waste(item, DayNightCycle.main.timePassed));
+
+            var data = CraftData.Get(item.item.GetTechType());
+
+            if(data != null && data.linkedItemCount > 0)
+            {
+                Dictionary<TechType, int> pairs = new Dictionary<TechType, int>();
+                int count = 0;
+                for (int i = 0; i < data.linkedItemCount; i++)
+                {
+                    TechType techType = data.GetLinkedItem(i);
+                    if (pairs.ContainsKey(techType))
+                        pairs[techType] += 1;
+                    else
+                        pairs[techType] = 1;
+
+                    count++;
+                }
+
+                ItemsContainer inventory = Inventory.main?.container;
+                List<InventoryItem> inventoryItems = new List<InventoryItem>();
+
+                if (inventory != null)
+                {
+                    foreach (KeyValuePair<TechType, int> pair in pairs)
+                    {
+                        if (inventory.GetCount(pair.Key) >= pair.Value)
+                        {
+                            var items = inventory.GetItems(pair.Key);
+                            for (int j =0; j< pair.Value; j++)
+                            {
+                                InventoryItem item1 = items[j];
+                                if (inventory.RemoveItem(item1.item))
+                                    inventoryItems.Add(item1);
+                            }
+                        }
+                    }
+                }
+
+                if(count > inventoryItems.Count)
+                {
+                    inventoryItems.ForEach((x) => inventory.UnsafeAdd(x));
+                    inventory.UnsafeAdd(item);
+                    return;
+                }
+                else
+                {
+                    inventoryItems.ForEach((x) => Destroy(x.item.gameObject));
+                }
+
+            }
+
+            double time = DayNightCycle.main.timePassed;
+            _wasteList.Enqueue(new Waste(item, time));
             OnStartingRecycle?.Invoke();
             OnContainerUpdated?.Invoke();
         }
@@ -115,10 +132,11 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
 
             InventoryItem inventoryItem = wasteItem.InventoryItem;
             GameObject gameObject = inventoryItem.item.gameObject;
-            TechType techType = CraftData.GetTechType(gameObject);
+            TechType techType = inventoryItem.item.GetTechType();
+
             List<IIngredient> list = GetIngredients(wasteItem.InventoryItem.item);
-            QuickLogger.Debug($"List Null: {list != null} | List Count: {list.Count > 0} | Craft Amount: {CraftData.Get(techType).craftAmount <= 1} | {!BannedTech.Contains(techType)}", true);
-            if (list != null && list.Count > 0 && CraftData.Get(techType).craftAmount <= 1 && !BannedTech.Contains(techType))
+            QuickLogger.Debug($"Ingredients != Null: {list != null} | List Count: {list.Count > 0}", true);
+            if (list != null && list.Count > 0 )
             {
                 QuickLogger.Debug($"Attempting Recycling Item.", true);
                 EnergyMixin component = gameObject.GetComponent<EnergyMixin>();
@@ -127,27 +145,16 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
                     GameObject battery = component.GetBattery();
                     if (battery)
                     {
-                        //TODO Remove Battery
-                        InventoryItem inventoryItem2 = new InventoryItem(battery.GetComponent<Pickupable>());
-                        _storageContainer.UnsafeAdd(inventoryItem2);
-                    }
-                }
-                foreach (IIngredient ingredient in list)
-                {
-                    for (int i = 0; i < ingredient.amount; i++)
-                    {
-                        if (!BatteryTech.Contains(ingredient.techType))
+                        Pickupable pickupable = battery.GetComponent<Pickupable>();
+                        if(techType != TechType.Welder || pickupable.GetTechType() != TechType.Battery)
                         {
-                            InventoryItem newInventoryItem = new InventoryItem(Instantiate(CraftData.GetPrefabForTechType(ingredient.techType)).GetComponent<Pickupable>());
-                            QuickLogger.Debug($"Message: {newInventoryItem.item.name}", true);
-                            _storageContainer.UnsafeAdd(newInventoryItem);
+                            InventoryItem inventoryItem2 = new InventoryItem(pickupable);
+                            _storageContainer.UnsafeAdd(inventoryItem2);
                         }
                     }
                 }
 
-                UpdateTracker();
-                Destroy(gameObject);
-                OnContainerUpdated?.Invoke();
+                StartCoroutine(RecycleCoroutine(gameObject, list));
             }
             else
             {
@@ -155,53 +162,115 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
             }
         }
 
-        private bool IsUsedBattery(GameObject obj)
+        private IEnumerator RecycleCoroutine(GameObject gameObject, List<IIngredient> list)
         {
-            Battery component = obj.GetComponent<Battery>();
+            foreach (IIngredient ingredient in list)
+            {
+                for (int i = 0; i < ingredient.amount; i++)
+                {
+                    if (!BatteryTech.Contains(ingredient.techType))
+                    {
+                        CoroutineTask<GameObject> getPrefab = CraftData.GetPrefabForTechTypeAsync(ingredient.techType, false);
+                        yield return getPrefab;
+
+                        GameObject ingredientObject = Instantiate(getPrefab.GetResult());
+                        if (!ingredientObject.GetComponent<LiveMixin>() && !ingredientObject.GetComponent<Plantable>() && !ingredientObject.GetComponent<Eatable>())
+                        {
+                            InventoryItem newInventoryItem = new InventoryItem(ingredientObject.GetComponent<Pickupable>());
+                            QuickLogger.Debug($"Message: {newInventoryItem.item.name}", true);
+                            _storageContainer.UnsafeAdd(newInventoryItem);
+                        }
+                        else
+                        {
+                            DestroyImmediate(ingredientObject);
+                            BioMaterials++;
+
+                            if(BioMaterials >= 10 && TechTypeHandler.TryGetModdedTechType("FCSBioFuel", out TechType FCSBioFuel))
+                            {
+                                getPrefab = CraftData.GetPrefabForTechTypeAsync(FCSBioFuel, false);
+                                yield return getPrefab;
+
+                                ingredientObject = Instantiate(getPrefab.GetResult());
+                                InventoryItem newInventoryItem = new InventoryItem(ingredientObject.GetComponent<Pickupable>());
+                                QuickLogger.Debug($"Message: {newInventoryItem.item.name}", true);
+                                _storageContainer.UnsafeAdd(newInventoryItem);
+                                BioMaterials = 0;
+                            }
+                        }
+                    }
+                }
+            }
+
+            UpdateTracker();
+            Destroy(gameObject);
+            OnContainerUpdated?.Invoke();
+            yield break;
+        }
+
+        private bool IsUsedBattery(Pickupable pickupable)
+        {
+            IBattery component = pickupable.GetComponent<IBattery>();
             return component != null && (double)component.charge < (double)component.capacity * 0.97;
         }
 
         public List<IIngredient> GetIngredients(Pickupable pickup)
         {
-            Ingredients.Clear();
-            GameObject gObj = pickup.gameObject;
+            List<IIngredient> Ingredients = new List<IIngredient>();
+            GameObject gObj = pickup?.gameObject;
             if (gObj)
             {
-                var it = CraftData.Get(CraftData.GetTechType(gObj));
-                List<IIngredient> readOnlyCollection = new List<IIngredient>();
-                for (int i = 0; i < it.ingredientCount; i++)
+                var it = CraftData.Get(pickup.GetTechType());
+                if(it != null)
                 {
-                    readOnlyCollection.Add(it.GetIngredient(i));
-                }
-
-                foreach (IIngredient ingredient in readOnlyCollection)
-                {
-                    if (!BatteryTech.Contains(ingredient.techType))
+                    List<IIngredient> readOnlyCollection = new List<IIngredient>();
+                    for (int i = 0; i < it.ingredientCount; i++)
                     {
-                        Ingredients.Add(ingredient);
+                        readOnlyCollection.Add(it.GetIngredient(i));
                     }
-                }
 
-                EnergyMixin component = gObj.GetComponent<EnergyMixin>();
-                if (component)
-                {
-                    GameObject battery = component.GetBattery();
-                    if (battery)
+                    foreach (IIngredient ingredient in readOnlyCollection)
                     {
-                        Ingredients.Add(new Ingredient(CraftData.GetTechType(battery), 1));
+                        if (!BatteryTech.Contains(ingredient.techType))
+                        {
+                            Ingredients.Add(ingredient);
+                        }
                     }
                 }
             }
             return Ingredients;
         }
 
-        private bool ContainsCraftData(TechType techType)
+        private bool ContainsValidCraftData(TechType techType)
         {
-            var originData = CraftData.Get(techType, true);
-            if (originData == null)
+            var data = CraftData.Get(techType, true);
+            if (data == null || data.craftAmount > 1)
             {
-                QuickLogger.DebugError($"Failed to load ITechData for TechType '{techType}'.");
+                QuickLogger.Debug($"TechType '{techType}' has no valid recipe for recycling.");
                 return false;
+            }
+
+            if (data.linkedItemCount > 0)
+            {
+                Dictionary<TechType, int> pairs = new Dictionary<TechType, int>();
+                for (int i = 0; i < data.linkedItemCount; i++)
+                {
+                    TechType techType2 = data.GetLinkedItem(i);
+                    if (pairs.ContainsKey(techType2))
+                        pairs[techType2] += 1;
+                    else
+                        pairs[techType2] = 1;
+                }
+
+                ItemsContainer inventory = Inventory.main?.container;
+
+                if (inventory is null)
+                    return false;
+
+                foreach(KeyValuePair<TechType, int> pair in pairs)
+                {
+                    if (inventory.GetCount(pair.Key) < pair.Value)
+                        return false;
+                }
             }
 
             return true;
@@ -210,12 +279,13 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
         public bool IsAllowedToAdd(Pickupable pickupable)
         {
             var techType = pickupable.GetTechType();
-            var result = ContainsCraftData(techType) && !BannedTech.Contains(techType) && !IsUsedBattery(gameObject) && (GetIngredients(pickupable).Count + _storageContainer.GetCount()) <= MaxStorage;
-            QuickLogger.Debug($"Can hold item result: {result} || Storage Total: {GetIngredients(pickupable).Count + _storageContainer.GetCount()}", true);
+            List<IIngredient> list = GetIngredients(pickupable);
+            var result = ContainsValidCraftData(techType) && !IsUsedBattery(pickupable) && (list.Count + _storageContainer.GetCount()) <= MaxStorage;
+            QuickLogger.Debug($"Can hold item result: {result} || Storage Total: {list.Count + _storageContainer.GetCount()}", true);
             return result;
         }
 
-        private void  UpdateTracker()
+        private void UpdateTracker()
         {
             Controller.RefreshUI();
         }
