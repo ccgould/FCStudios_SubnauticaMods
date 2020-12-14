@@ -318,7 +318,7 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
                 UpdateVisuals(definition, -1f);
             }
 
-            var battery = item.InventoryItem.item.gameObject.GetComponent<IBattery>();
+            Batteries.Remove(slot);
         }
 
         private SlotDefinition FindAvailableSlot()
