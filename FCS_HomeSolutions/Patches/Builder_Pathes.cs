@@ -9,18 +9,19 @@ namespace FCS_HomeSolutions.Patches
 {
     internal class Builder_Pathes
     {
+		public static List<TechType> acceptableColliders = new List<TechType>() { TechType.BaseWindow, TechType.BaseRoom, TechType.BaseMoonpool, TechType.BaseReinforcement, TechType.BaseConnector, TechType.BaseCorridor,  TechType.BaseCorridorI, TechType.BaseCorridorT };
+
 		[HarmonyPatch(typeof(Builder), nameof(Builder.CheckSpace), new Type[] { typeof(Vector3), typeof(Quaternion), typeof(Vector3), typeof(int), typeof(Collider), })]
 		internal class Builder_CheckSpace_Patch
 		{
 			[HarmonyPostfix]
-			public static void Postfix(Vector3 position, Quaternion rotation, Vector3 extents, int layerMask, Collider allowedCollider, ref bool __result)
+			public static void Postfix(Vector3 extents, Collider allowedCollider, ref bool __result)
 			{
 
 				if (__result || Builder.constructableTechType != Mod.CurtainTechType || extents.x <= 0f || extents.y <= 0f || extents.z <= 0f)
 					return;
 
-				int num = Physics.OverlapBoxNonAlloc(position, extents, Builder.sColliders, rotation, layerMask, QueryTriggerInteraction.Ignore);
-				if (num == 1 && Builder.sColliders[0]?.gameObject?.GetComponentInParent<BaseDeconstructable>()?.recipe == TechType.BaseRoom && allowedCollider?.gameObject?.GetComponentInParent<BaseDeconstructable>()?.recipe == TechType.BaseWindow)
+				if (acceptableColliders.Contains(Builder.sColliders[0]?.gameObject?.GetComponentInParent<BaseDeconstructable>()?.recipe ?? TechType.None) && acceptableColliders.Contains(allowedCollider?.gameObject?.GetComponentInParent<BaseDeconstructable>()?.recipe ?? TechType.None))
 					__result = true;
             }
 		}
