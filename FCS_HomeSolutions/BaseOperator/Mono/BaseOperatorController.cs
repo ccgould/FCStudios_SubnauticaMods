@@ -23,6 +23,11 @@ namespace FCS_HomeSolutions.BaseOperator.Mono
             _displayManager?.SetBaseName();
         }
 
+        public override Vector3 GetPosition()
+        {
+            return transform.position;
+        }
+
         private void OnEnable()
         {
             if (_runStartUpOnEnable)

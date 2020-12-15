@@ -42,6 +42,11 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
             CheckMode();
         }
 
+        public override Vector3 GetPosition()
+        {
+            return transform.position;
+        }
+
         private void CheckMode()
         {
             if(Manager?.Habitat == null)return;

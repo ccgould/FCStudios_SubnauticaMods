@@ -93,6 +93,11 @@ namespace FCS_HomeSolutions.SeaBreeze.Mono
             _savedData = Mod.GetSeabreezeSaveData(id);
         }
 
+        public override Vector3 GetPosition()
+        {
+            return transform.position;
+        }
+
         public override void Initialize()
         {
             PageStateHash = Animator.StringToHash("PageState");

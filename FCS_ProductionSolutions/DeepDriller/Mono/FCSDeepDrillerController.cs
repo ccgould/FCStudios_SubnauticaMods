@@ -573,6 +573,11 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             return _isBreakSet;
         }
 
+        public override Vector3 GetPosition()
+        {
+            return transform.position;
+        }
+
         public void EmptyDrill()
         {
             DeepDrillerContainer.Clear();

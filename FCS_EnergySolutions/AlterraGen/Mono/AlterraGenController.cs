@@ -64,6 +64,12 @@ namespace FCS_EnergySolutions.AlterraGen.Mono
 
         #region Public Methods
 
+        public override Vector3 GetPosition()
+        {
+            return transform.position;
+        }
+
+
         public override void Initialize()
         {
             if (PowerManager == null)

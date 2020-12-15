@@ -91,6 +91,11 @@ namespace FCS_EnergySolutions.JetStreamT242.Mono
             return false;
         }
 
+        public override Vector3 GetPosition()
+        {
+            return transform.position;
+        }
+
         public override void Initialize()
         {
             _tilter = GameObjectHelpers.FindGameObject(gameObject, "Tilter").AddComponent<RotorHandler>();

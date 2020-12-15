@@ -32,6 +32,11 @@ namespace FCS_HomeSolutions.Curtains.Mono
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, "C", Mod.ModName);
         }
 
+        public override Vector3 GetPosition()
+        {
+            return transform.position;
+        }
+
         private void OnEnable()
         {
             if (_runStartUpOnEnable)

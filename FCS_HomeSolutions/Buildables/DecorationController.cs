@@ -20,6 +20,11 @@ namespace FCS_HomeSolutions.Buildables
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.DecorationItemTabId, Mod.ModName);
         }
 
+        public override Vector3 GetPosition()
+        {
+            return transform.position;
+        }
+
         private void OnEnable()
         {
             if (_runStartUpOnEnable)

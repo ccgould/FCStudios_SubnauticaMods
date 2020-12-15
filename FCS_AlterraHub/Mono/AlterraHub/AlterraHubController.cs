@@ -77,7 +77,12 @@ namespace FCS_AlterraHub.Mono.AlterraHub
         }
 
         #endregion
-        
+
+        public override Vector3 GetPosition()
+        {
+            return transform.position;
+        }
+
         public override void Initialize()
         {
             if(IsInitialized) return;

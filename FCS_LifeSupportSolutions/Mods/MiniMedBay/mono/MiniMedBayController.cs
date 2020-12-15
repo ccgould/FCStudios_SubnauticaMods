@@ -30,6 +30,11 @@ namespace FCS_LifeSupportSolutions.Mods.MiniMedBay.mono
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.MiniMedBayTabID, Mod.ModName);
         }
 
+        public override Vector3 GetPosition()
+        {
+            return transform.position;
+        }
+
         private void OnEnable()
         {
             if (_runStartUpOnEnable)

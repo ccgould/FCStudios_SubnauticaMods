@@ -282,5 +282,10 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
         {
             return _isInBase;
         }
+
+        public override Vector3 GetPosition()
+        {
+            return transform.position;
+        }
     }
 }

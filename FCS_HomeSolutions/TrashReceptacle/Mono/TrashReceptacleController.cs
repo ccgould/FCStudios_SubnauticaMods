@@ -36,6 +36,11 @@ namespace FCS_HomeSolutions.TrashReceptacle.Mono
             _runStartUpOnEnable = false;
         }
 
+        public override Vector3 GetPosition()
+        {
+            return transform.position;
+        }
+
         public void OnHandHover(GUIHand hand)
         {
             if(!IsInitialized || Manager == null) return;

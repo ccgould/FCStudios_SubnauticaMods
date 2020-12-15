@@ -78,6 +78,11 @@ namespace FCS_HomeSolutions.Buildables
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.SeaBreezeTabID, Mod.ModName);
         }
 
+        public override Vector3 GetPosition()
+        {
+            return transform.position;
+        }
+
         private void OnEnable()
         {
             if (_runStartUpOnEnable)

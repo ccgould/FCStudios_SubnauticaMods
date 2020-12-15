@@ -86,6 +86,17 @@ namespace FCS_StorageSolutions.AlterraStorage.Mono
 
         #endregion
 
+
+        public override Vector3 GetPosition()
+        {
+            return transform.position;
+        }
+
+        public override FCSStorage GetStorage()
+        {
+            return _storageContainer;
+        }
+
         public override void Initialize()
         {
             IsVisible = true;

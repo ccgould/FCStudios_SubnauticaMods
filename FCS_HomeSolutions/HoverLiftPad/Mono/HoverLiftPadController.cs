@@ -58,6 +58,11 @@ namespace FCS_HomeSolutions.HoverLiftPad.Mono
         private static Exosuit[] _globalExosuits;
         private Color _orangeColor { get; } = new Color(1f, 0.7176471f, 0f, 1f);
 
+        public override Vector3 GetPosition()
+        {
+            return transform.position;
+        }
+
         private void FixedUpdate()
         {
             if (!IsConstructed || !IsInitialized) return;

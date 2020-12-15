@@ -33,6 +33,12 @@ namespace FCS_AlterraHub.Mono.OreConsumer
             return false;
         }
 
+        public override Vector3 GetPosition()
+        {
+            return transform.position;
+        }
+
+
         public OreConsumerDisplay DisplayManager { get; private set; }
         public TransferHandler TransferHandler { get; private set; }
         public MotorHandler MotorHandler { get; private set; }

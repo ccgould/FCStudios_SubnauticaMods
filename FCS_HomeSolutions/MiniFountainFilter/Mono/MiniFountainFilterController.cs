@@ -47,6 +47,11 @@ namespace FCS_HomeSolutions.MiniFountainFilter.Mono
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.MiniFountainFilterTabID, Mod.ModName);
         }
 
+        public override Vector3 GetPosition()
+        {
+            return transform.position;
+        }
+
         private void OnEnable()
         {
             _registeredDevices = FCSAlterraHubService.PublicAPI.GetRegisteredDevices();

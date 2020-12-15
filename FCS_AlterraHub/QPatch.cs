@@ -12,6 +12,7 @@ using FCS_AlterraHub.Spawnables;
 using FCSCommon.Extensions;
 using FCSCommon.Utilities;
 using HarmonyLib;
+using QModManager.API;
 using QModManager.API.ModLoading;
 using SMLHelper.V2.Handlers;
 using UnityEngine;
@@ -48,7 +49,10 @@ namespace FCS_AlterraHub
             CreateKits();
 
             //Run Harmony Patches
-            Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), "com.alterrahub.fcstudios");
+            var harmony = Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), "com.alterrahub.fcstudios");
+
+            if (QModServices.Main.ModPresent("EasyCraft"))
+                EasyCraft_API.Init(harmony);
 
             //Register debug commands
             ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));

@@ -37,6 +37,17 @@ namespace FCS_AlterraHub.Mono
         }
 
         /// <summary>
+        /// Gets the storage of a unit if it is accesable.
+        /// </summary>
+        /// <returns><see cref="FCSStorage"/></returns>
+        public virtual FCSStorage GetStorage()
+        {
+            return null;
+        }
+
+        public abstract Vector3 GetPosition();
+
+        /// <summary>
         /// The package which this item belongs to
         /// </summary>
         public virtual string PackageId { get; set; }

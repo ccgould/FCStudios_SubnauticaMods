@@ -289,9 +289,9 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
             Controller.RefreshUI();
         }
 
-        public Dictionary<TechType,int> GetStorage()
+        public FCSStorage GetStorage()
         {
-            return _storageContainer.GetItems();
+            return _storageContainer;
         }
 
         public int GetCount(TechType techType)

@@ -48,6 +48,16 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.RecyclerTabID, Mod.ModName);
         }
 
+        public override Vector3 GetPosition()
+        {
+            return transform.position;
+        }
+
+        public override FCSStorage GetStorage()
+        {
+            return _recycler.GetStorage();
+        }
+
         private void OnEnable()
         {
             if (_runStartUpOnEnable)
@@ -190,7 +200,7 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
         {
             data.Pool.Reset(RecyclerPoolTag);
 
-            var grouped = _recycler.GetStorage().OrderBy(x => x.Key).ToList();
+            var grouped = _recycler.GetStorage().GetItems().OrderBy(x => x.Key).ToList();
 
             if (data.EndPosition > grouped.Count)
             {

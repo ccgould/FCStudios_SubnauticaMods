@@ -52,6 +52,11 @@ namespace FCS_HomeSolutions.QuantumTeleporter.Mono
             }
         }
 
+        public override Vector3 GetPosition()
+        {
+            return transform.position;
+        }
+
         private void TeleporterState(bool isOn)
         {
             if (isOn)

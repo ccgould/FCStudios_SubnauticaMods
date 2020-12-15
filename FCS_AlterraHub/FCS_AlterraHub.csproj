@@ -112,6 +112,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="API\EasyCraft_API.cs" />
     <Compile Include="API\FCSAssetBundlesService.cs" />
     <Compile Include="Buildables\AlterraHub.cs" />
     <Compile Include="Buildables\AlterraHubAuxPatcher.cs" />
