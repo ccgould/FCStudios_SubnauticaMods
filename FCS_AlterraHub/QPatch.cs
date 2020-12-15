@@ -47,10 +47,9 @@ namespace FCS_AlterraHub
             //CreatKitEntries
             CreateKits();
 
-            var harmony = new Harmony("com.alterrahub.fcstudios");
-            harmony.PatchAll(Assembly.GetExecutingAssembly());
+            //Run Harmony Patches
+            Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), "com.alterrahub.fcstudios");
 
-            
             //Register debug commands
             ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));
         }
