@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using FCS_HomeSolutions.Configuration;
 using FCSCommon.Extensions;
 using HarmonyLib;
@@ -8,49 +9,31 @@ namespace FCS_HomeSolutions.Patches
 {
     internal class Builder_Pathes
     {
-        [HarmonyPatch(typeof(Builder), nameof(Builder.UpdateAllowed))]
-        internal class Builder_UpdateAllowed_Patch
-        {
-            [HarmonyPostfix]
-            public static void Postfix(ref bool __result)
-            {
-                Constructable component = Builder.prefab.GetComponent<Constructable>();
-                if (component.techType != Mod.CurtainTechType || !Player.main.IsInBase()) return;
+		[HarmonyPatch(typeof(Builder), nameof(Builder.CheckSpace), new Type[] { typeof(Vector3), typeof(Quaternion), typeof(Vector3), typeof(int), typeof(Collider), })]
+		internal class Builder_CheckSpace_Patch
+		{
+			[HarmonyPostfix]
+			public static void Postfix(Vector3 position, Quaternion rotation, Vector3 extents, int layerMask, Collider allowedCollider, ref bool __result)
+			{
 
-                Builder.SetDefaultPlaceTransform(ref Builder.placePosition, ref Builder.placeRotation);
-                bool flag = false;
-                ConstructableBase componentInParent = Builder.ghostModel.GetComponentInParent<ConstructableBase>();
-                
-                bool flag2;
-                if (componentInParent != null)
-                {
-                    Transform transform = componentInParent.transform;
-                    transform.position = Builder.placePosition;
-                    transform.rotation = Builder.placeRotation;
-                    flag2 = componentInParent.UpdateGhostModel(Builder.GetAimTransform(), Builder.ghostModel, default(RaycastHit), out flag, componentInParent);
-                    Builder.placePosition = transform.position;
-                    Builder.placeRotation = transform.rotation;
-                    if (flag)
-                    {
-                        Builder.renderers = MaterialExtensions.AssignMaterial(Builder.ghostModel, Builder.ghostStructureMaterial);
-                        Builder.InitBounds(Builder.ghostModel);
-                    }
-                }
-                else
-                {
+				if (__result || Builder.constructableTechType != Mod.CurtainTechType || extents.x <= 0f || extents.y <= 0f || extents.z <= 0f)
+					return;
 
-                    Builder.CheckAsSubModule();
-                    flag2 = true;
-                }
-                if (flag2)
-                {
-                    List<GameObject> list = new List<GameObject>();
-                    Builder.GetObstacles(Builder.placePosition, Builder.placeRotation, Builder.bounds, list);
-                    flag2 = (list.Count == 0);
-                    list.Clear();
-                }
-                __result = flag2;
+				int num = Physics.OverlapBoxNonAlloc(position, extents, Builder.sColliders, rotation, layerMask, QueryTriggerInteraction.Ignore);
+				if (num == 1 && Builder.sColliders[0]?.gameObject?.GetComponentInParent<BaseDeconstructable>()?.recipe == TechType.BaseRoom && allowedCollider?.gameObject?.GetComponentInParent<BaseDeconstructable>()?.recipe == TechType.BaseWindow)
+					__result = true;
+            }
+		}
+
+		[HarmonyPatch(typeof(Builder), nameof(Builder.CheckTag))]
+		internal class Builder_CheckTag_Patch
+		{
+			[HarmonyPostfix]
+			public static void Postfix(Collider c, ref bool __result)
+			{
+				if (Builder.constructableTechType == Mod.CurtainTechType && (c?.gameObject?.GetComponentInParent<BaseDeconstructable>()?.recipe ?? TechType.None) == TechType.BaseWindow)
+					__result = true;
 			}
-        }
-    }
+		}
+	}
 }
