@@ -25,16 +25,30 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
 
         public bool AddItemToContainer(InventoryItem item)
         {
-            var size = item.item.gameObject.GetComponentInChildren<Plantable>().size;
+            var plantable = item.item.gameObject.GetComponentInChildren<Plantable>();
+            var size = plantable.size;
+            var grown = plantable.Spawn(_device.transform,true);
+
+            var growingPlant = grown.GetComponent<GrowingPlant>();
+
+            if (growingPlant != null)
+            {
+                _device.PickPrefab = growingPlant.grownModelPrefab.GetComponentInChildren<PickPrefab>();
+            }
+
+
+            _device.GrownPlant = grown;
+            _device.Seed = plantable;
             _device.SetScanTime(size);
             OnContainerAddItem?.Invoke(_device,item.item.GetTechType());
+            GameObject.Destroy(item.item.gameObject);
             GameObject.Destroy(item.item.gameObject);
             return true;
         }
 
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
         {
-            return !Mod.IsHydroponicKnownTech(pickupable.GetTechType()) && 
+            return !Mod.IsHydroponicKnownTech(pickupable.GetTechType(),out var data) && 
                    _device.DumpContainer.GetCount() != 1 && 
                    pickupable.gameObject.GetComponentInChildren<Plantable>() != null;
         }

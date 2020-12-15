@@ -20,7 +20,7 @@ namespace FCS_ProductionSolutions.Configuration
 
         private static ModSaver _saveObject;
         private static SaveData _saveData;
-        private static Dictionary<TechType, bool> _hydroponicKnownTech;
+        private static List<DNASampleData> _hydroponicKnownTech;
         private static TechType _sandBagTechType;
         private static TechType _alterraStorageTechType;
 
@@ -130,7 +130,7 @@ namespace FCS_ProductionSolutions.Configuration
             });
         }
 
-        internal static Dictionary<TechType,bool> GetHydroponicKnownTech()
+        internal static List<DNASampleData> GetHydroponicKnownTech()
         {
             return _hydroponicKnownTech;
         }
@@ -236,21 +236,37 @@ namespace FCS_ProductionSolutions.Configuration
 
         #endregion
 
-        public static void AddHydroponicKnownTech(TechType techType,bool isLandPlant)
+        public static void AddHydroponicKnownTech(DNASampleData data)
         {
             if (_hydroponicKnownTech == null)
             {
-                _hydroponicKnownTech = new Dictionary<TechType, bool>();
+                _hydroponicKnownTech = new List<DNASampleData>();
             }
-            _hydroponicKnownTech.Add(techType, isLandPlant);
+            if(IsHydroponicKnownTech(data.TechType, out var sampleData)) return;
+            _hydroponicKnownTech.Add(data);
+            BaseManager.GlobalNotifyByID(HydroponicHarvesterModTabID,"UpdateDNA");
         }
-        public static bool IsHydroponicKnownTech(TechType techType)
+        public static bool IsHydroponicKnownTech(TechType techType, out DNASampleData data)
         {
+            QuickLogger.Debug($"Checking if {techType} is known tech",true);
+            data = new DNASampleData();
             if (_hydroponicKnownTech == null)
             {
-                _hydroponicKnownTech = new Dictionary<TechType, bool>();
+                _hydroponicKnownTech = new List<DNASampleData>();
             }
-            return _hydroponicKnownTech.ContainsKey(techType);
+
+            foreach (DNASampleData sampleData in _hydroponicKnownTech)
+            {
+                if (sampleData.TechType == techType)
+                {
+                    data = sampleData;
+                    QuickLogger.Debug($"{techType} is known tech", true);
+
+                    return true;
+                }
+            }
+            QuickLogger.Debug($"{techType} is not known tech", true);
+            return false;
         }
 
         public static TechType AlterraStorageTechType()
@@ -262,5 +278,12 @@ namespace FCS_ProductionSolutions.Configuration
 
             return _alterraStorageTechType;
         }
+    }
+
+    internal struct DNASampleData
+    {
+        public TechType TechType { get; set; }
+        public TechType PickType { get; set; }
+        public bool IsLandPlant { get; set; }
     }
 }

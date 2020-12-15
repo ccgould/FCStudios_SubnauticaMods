@@ -110,8 +110,7 @@ namespace FCS_StorageSolutions.AlterraStorage.Mono
 
             if (_storageContainer == null)
             {
-                _storageContainer = gameObject.AddComponent<FCSStorage>();
-                _storageContainer.Initialize(MAXSTORAGE,GameObjectHelpers.FindGameObject(gameObject,"StorageRoot"));
+                _storageContainer = new FCSStorage(MAXSTORAGE,GameObjectHelpers.FindGameObject(gameObject,"StorageRoot"));
                 _storageContainer.onAddItem += item =>
                 {
                     _inventoryGrid.DrawPage();

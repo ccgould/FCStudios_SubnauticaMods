@@ -41,8 +41,7 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
         {
             Controller = mono;
             MaxStorage = maxStorage;
-            _storageContainer = mono.gameObject.AddComponent<FCSStorage>();
-            _storageContainer.Initialize(maxStorage, GameObjectHelpers.FindGameObject(gameObject, "ProcessingStorageRoot"));
+            _storageContainer = new FCSStorage(maxStorage, GameObjectHelpers.FindGameObject(gameObject, "ProcessingStorageRoot"));
             _storageContainer.onAddItem += item => { UpdateTracker(); };
             _storageContainer.onRemoveItem += item => { UpdateTracker(); };
             

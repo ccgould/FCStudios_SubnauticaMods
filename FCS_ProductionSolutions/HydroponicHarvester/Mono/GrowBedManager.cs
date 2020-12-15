@@ -1,28 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Model;
+using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.HydroponicHarvester.Enumerators;
 using FCS_ProductionSolutions.HydroponicHarvester.Models;
 using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
+using SMLHelper.V2.Json.ExtensionMethods;
 using UnityEngine;
 
 namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
 {
     internal class GrowBedManager : MonoBehaviour, IFCSGrowBed
     {
-        private HydroponicHarvesterController _mono;
+        internal HydroponicHarvesterController Mono;
         private const float MaxPlantsHeight = 3f;
-        internal PlantSlot[] Slots;
         private TechType _currentItemTech;
         private List<TechType> _activeClones;// TODO Remove is if unnecessary
 
+        internal PlantSlot[] Slots;
+        public GameObject grownPlantsRoot { get; set; }
+
         internal void Initialize(HydroponicHarvesterController mono)
         {
-            _mono = mono;
+            Mono = mono;
 
             if (FindPots())
             {
@@ -87,15 +92,15 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
                 QuickLogger.Debug("SlotById returned null");
                 return;
             }
-            _mono.EffectsManager.ChangeEffectState(FindEffectType(slotByID), slotByID.Id, false);
+            Mono.EffectsManager.ChangeEffectState(FindEffectType(slotByID), slotByID.Id, false);
             slotByID.Clear();
             SetSlotOccupiedState(slotID, false);
         }
 
-        private static EffectType FindEffectType(PlantSlot slotByID)
+        internal static EffectType FindEffectType(PlantSlot slotByID)
         {
-            QuickLogger.Debug($"PlantSlot: {slotByID.Plantable.underwater}",true);
-            return slotByID.Plantable.underwater ? EffectType.Bubbles : EffectType.Smoke;
+            QuickLogger.Debug($"PlantSlot: {slotByID.GetPlantable().underwater}",true);
+            return slotByID.GetPlantable().underwater ? EffectType.Bubbles : EffectType.Smoke;
         }
 
         private void AddItem(Plantable plantable, int slotID)
@@ -114,15 +119,15 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
 
             this.SetSlotOccupiedState(slotID, true);
          
-            GameObject gameObject = plantable.Spawn(slotByID.transform, _mono.IsInBase());
+            GameObject gameObject = plantable.Spawn(slotByID.transform, Mono.IsInBase());
 
-            this.SetupRenderers(gameObject, _mono.IsInBase());
+            this.SetupRenderers(gameObject, Mono.IsInBase());
             gameObject.SetActive(true);
-            slotByID.Plantable = plantable;
+            slotByID.SetPlantable(plantable);
             slotByID.PlantModel = gameObject;
             slotByID.SetMaxPlantHeight(MaxPlantsHeight);
-            
-            _mono.EffectsManager.ChangeEffectState(FindEffectType(slotByID), slotByID.Id, true);
+            slotByID.SetSeedType(_currentItemTech);
+            Mono.EffectsManager.ChangeEffectState(FindEffectType(slotByID), slotByID.Id, true);
             var growingPlant = gameObject.GetComponent<GrowingPlant>();
 
             if (growingPlant != null)
@@ -156,10 +161,9 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
             Utils.SetLayerRecursively(gameObject, newLayer);
         }
 
-        public GameObject grownPlantsRoot { get; set; }
         public bool IsInBase()
         {
-            return _mono.IsInBase();
+            return Mono.IsInBase();
         }
 
         public void ClearGrowBed()
@@ -177,11 +181,17 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
 
         public bool AddItemToContainer(InventoryItem item, int slotId)
         {
+            QuickLogger.Debug("1");
             _currentItemTech = item.item.GetTechType();
+            QuickLogger.Debug("2");
             Plantable component = item.item.GetComponent<Plantable>();
+            QuickLogger.Debug("3");
             item.item.SetTechTypeOverride(component.plantTechType);
+            QuickLogger.Debug("4");
             item.isEnabled = false;
+            QuickLogger.Debug("5");
             AddItem(component, slotId);
+            QuickLogger.Debug("6");
             return true;
         }
 
@@ -192,38 +202,17 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
             {
                 plantSlot.CurrentSpeedMode = result;
             }
-            _mono.DisplayManager.UpdatePowerUsage();
+            Mono.DisplayManager.UpdateUI();
         }
-
-        //public string GetSlotInfo(int slotIndex)
-        //{
-        //    if (Slots[slotIndex].Plantable != null)
-        //    {
-        //        var nameOfPlant = Language.main.Get(Slots[slotIndex].Plantable.plantTechType);
-        //        if (Slots[slotIndex].GetPlantSeedTechType() != TechType.None)
-        //        {
-        //            int amount = 0;
-
-        //            if (_storage.ContainsKey(Slots[slotIndex].ReturnTechType))
-        //            {
-        //                amount = _storage[Slots[slotIndex].ReturnTechType];
-        //            }
-                    
-        //            return $"{nameOfPlant} x{amount}";
-        //        }                
-        //    }
-
-        //    return "N/A";
-        //}
 
         public bool GetIsConstructed()
         {
-            return _mono.IsConstructed;
+            return Mono.IsConstructed;
         }
 
         public bool HasPowerToConsume()
         {
-            return _mono.Manager.HasEnoughPower(_mono.GetPowerUsage());
+            return Mono.Manager.HasEnoughPower(Mono.GetPowerUsage());
         }
 
         public PlantSlot GetSlot(int slotIndex)
@@ -234,6 +223,42 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
         public SpeedModes GetCurrentSpeedMode()
         {
             return Slots[0].CurrentSpeedMode;
+        }
+
+        public void Load(HydroponicHarvesterDataEntry savedData)
+        {
+            SetSpeedMode(savedData.SpeedMode);
+            
+            if (savedData.SlotData.Count != 3) return;
+            for (int i = 0; i < savedData.SlotData.Count; i++)
+            {
+                var slot = Slots[i];
+                var data = savedData.SlotData[i];
+                if(data.TechType == TechType.None) continue;
+                slot.GenerationProgress = data.GenerationProgress;
+                slot.SetItemCount(data.Amount);
+                slot.GetTab().SetIcon(data.TechType);
+            }
+        }
+
+        internal void Save(HydroponicHarvesterDataEntry data)
+        {
+            data.SlotData = new List<SlotsData>
+            {
+                new SlotsData{Amount = Slots[0].GetCount(),TechType = Slots[0].GetPlantSeedTechType(), GenerationProgress = Slots[0].GenerationProgress},
+                new SlotsData{Amount = Slots[1].GetCount(),TechType = Slots[1].GetPlantSeedTechType(), GenerationProgress = Slots[1].GenerationProgress},
+                new SlotsData{Amount = Slots[2].GetCount(),TechType = Slots[2].GetPlantSeedTechType(), GenerationProgress = Slots[2].GenerationProgress},
+            };
+        }
+
+        public void TakeItem(TechType techType,int slotId)
+        {
+            var slot = GetSlotByID(slotId);
+            if (slot.GetPlantSeedTechType() != techType) return;
+            if (slot.RemoveItem())
+            {
+                PlayerInteractionHelper.GivePlayerItem(slot.ReturnTechType);
+            }
         }
     }
 }

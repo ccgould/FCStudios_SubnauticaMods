@@ -42,7 +42,6 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
 
         private void OnEnable()
         {
-
             if (_runStartUpOnEnable)
             {
                 if (!IsInitialized)
@@ -58,7 +57,17 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
                     }
 
                     ColorManager.ChangeColor(_savedData.BodyColor.Vector4ToColor(), ColorTargetMode.Both);
+                    DisplayManager.SetSpeedGraphic(_savedData.SpeedMode);
+                    if (_savedData.SetBreaker)
+                    {
+                        EffectsManager.SetBreaker(true);
+                        EffectsManager.TurnOffLights();
+                        DisplayManager.SetLightGraphicOff();
+                    }
+
+                    
                     _isInBase = _savedData.IsInBase;
+                    GrowBedManager.Load(_savedData);
                 }
 
                 _runStartUpOnEnable = false;
@@ -153,7 +162,16 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
 #endif
 
             MaterialHelpers.ChangeEmissionStrength(ModelPrefab.EmissionControllerMaterial, gameObject, 4f);
-            
+
+            IPCMessage += message =>
+            {
+                if (message.Equals("UpdateDNA"))
+                {
+                    DisplayManager.LoadKnownSamples();
+                    QuickLogger.Debug("Loading DNA Samples");
+                }
+            };
+
             IsInitialized = true;
         }
 
@@ -243,6 +261,9 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
             _savedData.ID = GetPrefabID();
             _savedData.BodyColor = ColorManager.GetColor().ColorToVector4();
             _savedData.IsInBase = _isInBase;
+            _savedData.SpeedMode = GrowBedManager.GetCurrentSpeedMode();
+            _savedData.SetBreaker = EffectsManager.GetBreakerState();
+            GrowBedManager.Save(_savedData);
             newSaveData.HydroponicHarvesterEntries.Add(_savedData);
             QuickLogger.Debug($"Saving ID {_savedData.ID}", true);
         }

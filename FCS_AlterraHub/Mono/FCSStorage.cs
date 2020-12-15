@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace FCS_AlterraHub.Mono
 {
-    public class FCSStorage : MonoBehaviour, IItemsContainer
+    public class FCSStorage : ItemsContainer
     {
         private GameObject _storageRoot;
         private Dictionary<TechType, ItemGroup> _items;
@@ -17,25 +17,18 @@ namespace FCS_AlterraHub.Mono
         private int _slots;
         public event OnAddItem onAddItem;
         public event OnRemoveItem onRemoveItem;
-
-        public void Initialize(int slots,GameObject storageRoot)
-        {
-            _storageRoot = storageRoot;
-            _slots = slots;
-            _items = new Dictionary<TechType, ItemGroup>();
-        }
-
-        public bool Contains(TechType techType)
+        
+        public new bool Contains(TechType techType)
         {
             return _items.ContainsKey(techType);
         }
 
-        public bool Contains(InventoryItem item)
+        public new bool Contains(InventoryItem item)
         {
             return Contains(item.item.GetTechType());
         }
 
-        public void UnsafeAdd(InventoryItem item)
+        public new void UnsafeAdd(InventoryItem item)
         {
             TechType techType = item.item.GetTechType();
             ItemGroup itemGroup;
@@ -64,7 +57,7 @@ namespace FCS_AlterraHub.Mono
             NotifyAddItem(item);
         }
 
-        public Pickupable RemoveItem(TechType techType)
+        public new Pickupable RemoveItem(TechType techType)
         {
             if (!_items.TryGetValue(techType, out var itemGroup))
             {
@@ -88,28 +81,28 @@ namespace FCS_AlterraHub.Mono
             return item;
         }
         
-        public bool DestroyItem(TechType techType)
+        public new bool DestroyItem(TechType techType)
         {
             Pickupable pickupable = RemoveItem(techType);
             if (pickupable == null)
             {
                 return false;
             }
-            Destroy(pickupable.gameObject);
+            GameObject.Destroy(pickupable.gameObject);
             return true;
         }
 
-        private void NotifyAddItem(InventoryItem item)
+        private new void NotifyAddItem(InventoryItem item)
         {
             onAddItem?.Invoke(item);
         }
         
-        private void NotifyRemoveItem(InventoryItem item)
+        private new void NotifyRemoveItem(InventoryItem item)
         {
             onRemoveItem?.Invoke(item);
         }
 
-        private void UpdateItemTechType(Pickupable pickupable, TechType oldTechType)
+        private new void UpdateItemTechType(Pickupable pickupable, TechType oldTechType)
         {
             TechType techType = pickupable.GetTechType();
             if (techType == oldTechType)
@@ -149,7 +142,7 @@ namespace FCS_AlterraHub.Mono
             }
         }
         
-        private class ItemGroup
+        private new class ItemGroup
         {
             public ItemGroup(int id, int width, int height)
             {
@@ -181,7 +174,7 @@ namespace FCS_AlterraHub.Mono
             return _storageRootBytes;
         }
 
-        public bool Contains(Pickupable pickupable)
+        public new bool Contains(Pickupable pickupable)
         {
             TechType techType = pickupable.GetTechType();
             ItemGroup itemGroup;
@@ -214,7 +207,7 @@ namespace FCS_AlterraHub.Mono
                 GameObject gObj = serializer.DeserializeObjectTree(memoryStream, 0);
                 QuickLogger.Debug($"Deserialized Object Stream. {gObj}");
                 TransferItems(gObj);
-                Destroy(gObj);
+                GameObject.Destroy(gObj);
             }
         }
 
@@ -245,8 +238,10 @@ namespace FCS_AlterraHub.Mono
         private void CleanUpDuplicatedStorageNoneRoutine()
         {
             QuickLogger.Debug("Cleaning Duplicates", true);
-            Transform hostTransform = transform;
-            StoreInformationIdentifier[] sids = gameObject.GetComponentsInChildren<StoreInformationIdentifier>(true);
+            //TODO Check here
+
+            Transform hostTransform = _storageRoot.transform;
+            StoreInformationIdentifier[] sids = _storageRoot.GetComponentsInChildren<StoreInformationIdentifier>(true);
 #if DEBUG
             QuickLogger.Debug($"SIDS: {sids.Length}", true);
 #endif
@@ -257,14 +252,14 @@ namespace FCS_AlterraHub.Mono
                 StoreInformationIdentifier storeInformationIdentifier = sids[i];
                 if (storeInformationIdentifier != null && storeInformationIdentifier.name.StartsWith("SerializerEmptyGameObject", StringComparison.OrdinalIgnoreCase))
                 {
-                    Destroy(storeInformationIdentifier.gameObject);
+                    GameObject.Destroy(storeInformationIdentifier.gameObject);
                     QuickLogger.Debug($"Destroyed Duplicate", true);
                 }
                 num = i;
             }
         }
 
-        public int GetCount(TechType techType)
+        public new int GetCount(TechType techType)
         {
             return !_items.TryGetValue(techType, out var itemGroup) ? 0 : itemGroup.items.Count;
         }
@@ -283,7 +278,7 @@ namespace FCS_AlterraHub.Mono
             return i;
         }
 
-        public IList<InventoryItem> GetItems(TechType techType)
+        public new IList<InventoryItem> GetItems(TechType techType)
         {
             return !_items.TryGetValue(techType, out var itemGroup) ? null : itemGroup.items.AsReadOnly();
         }
@@ -357,8 +352,13 @@ namespace FCS_AlterraHub.Mono
             return null;
         }
 
-        public string label => "FCSStorage";
-    }
 
+        public FCSStorage(int slots, GameObject storageRoot) : base(slots, slots, storageRoot.transform, "FCSStorage", null)
+        {
+            _storageRoot = storageRoot;
+            _slots = slots;
+            _items = new Dictionary<TechType, ItemGroup>();
+        }
+    }
 
 }

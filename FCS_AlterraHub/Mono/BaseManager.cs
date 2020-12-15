@@ -53,6 +53,7 @@ namespace FCS_AlterraHub.Mono
 
         private void PowerStateCheck()
         {
+            if (Habitat?.powerRelay == null) return;
             if (_prevPowerState != Habitat.powerRelay.GetPowerStatus())
             {
                 _prevPowerState = Habitat.powerRelay.GetPowerStatus();
@@ -247,6 +248,26 @@ namespace FCS_AlterraHub.Mono
         }
 
         public void NotifyByID(string modID, string commandMessage)
+        {
+            if (!string.IsNullOrEmpty(modID))
+            {
+                foreach (KeyValuePair<string, FcsDevice> device in FCSAlterraHubService.PublicAPI
+                    .GetRegisteredDevicesOfId(modID))
+                {
+                    device.Value.IPCMessage?.Invoke(commandMessage);
+                }
+            }
+            else
+            {
+                foreach (KeyValuePair<string, FcsDevice> device in FCSAlterraHubService.PublicAPI.GetRegisteredDevices()
+                )
+                {
+                    device.Value.IPCMessage?.Invoke(commandMessage);
+                }
+            }
+        }
+
+        public static void GlobalNotifyByID(string modID, string commandMessage)
         {
             if (!string.IsNullOrEmpty(modID))
             {

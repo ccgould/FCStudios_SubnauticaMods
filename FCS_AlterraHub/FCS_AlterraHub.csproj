@@ -55,11 +55,11 @@
     <Reference Include="0Harmony">
       <HintPath>..\Dependancies\0Harmony.dll</HintPath>
     </Reference>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>..\Dependancies\Subnautica\Assembly-CSharp.dll</HintPath>
+    <Reference Include="Assembly-CSharp-firstpass_publicized">
+      <HintPath>..\Dependancies\Subnautica\publicized_assemblies\Assembly-CSharp-firstpass_publicized.dll</HintPath>
     </Reference>
-    <Reference Include="Assembly-CSharp-firstpass">
-      <HintPath>..\Dependancies\Subnautica\Assembly-CSharp-firstpass.dll</HintPath>
+    <Reference Include="Assembly-CSharp_publicized">
+      <HintPath>..\Dependancies\Subnautica\publicized_assemblies\Assembly-CSharp_publicized.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>

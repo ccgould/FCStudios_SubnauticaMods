@@ -1,14 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
+using FCS_AlterraHub.Model;
 using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.HydroponicHarvester.Enumerators;
 using FCSCommon.Abstract;
 using FCSCommon.Components;
+using FCSCommon.Converters;
 using FCSCommon.Enums;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
@@ -23,21 +25,32 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
         private GameObject _landSamplesGrid;
         private SlotItemTab _caller;
         private Text _powerUsagePerSecond;
+        private Text _generationTime;
+        private HarvesterSpeedButton _speedBTN;
+        private FCSToggleButton _lightToggleBTN;
+        private List<TechType> _loadedDNASamples;
 
         internal void Setup(HydroponicHarvesterController mono)
         {
             _mono = mono;
             if (FindAllComponents())
             {
-                UpdatePowerUsage();
+                UpdateUI();
                 _isInitialized = true;
             }
         }
+       
         public override void OnButtonClick(string btnName, object tag)
         {
             if (btnName.Equals("BackBTN"))
             {
                 GoToHome();
+            }
+
+            if(btnName.Equals("SlotButton"))
+            {
+                var data = (SlotData)tag;
+                _mono.GrowBedManager.TakeItem(data.TechType,data.SlotId);
             }
         }
 
@@ -45,6 +58,11 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
         {
             try
             {
+                var canvas = gameObject.FindChild("Canvas2");
+                //Add ProximityActivate to controller screen visiblity
+                var px = canvas.AddComponent<ProximityActivate>();
+                px.Initialize(canvas.gameObject, gameObject, 2);
+
                 _dnaSamplePage = GameObjectHelpers.FindGameObject(gameObject, "DNAPicker");
                 _homePage = GameObjectHelpers.FindGameObject(gameObject, "Home");
 
@@ -52,18 +70,19 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
                 InterfaceHelpers.CreateButton(backBTNObj, "BackBTN",InterfaceButtonMode.Background,OnButtonClick,Color.gray,Color.white, 5,AuxPatchers.HarvesterBackButton(), AuxPatchers.HarvesterBackButtonDesc());
                 
                 var speedBTNObj = InterfaceHelpers.FindGameObject(gameObject, "SpeedBTN");
-                var speedBTN = speedBTNObj.AddComponent<HarvesterSpeedButton>();
-                speedBTN.GrowBedManager = _mono.GrowBedManager;
+                _speedBTN = speedBTNObj.AddComponent<HarvesterSpeedButton>();
+                _speedBTN.GrowBedManager = _mono.GrowBedManager;
 
                 var lightToggleBTNObj = GameObjectHelpers.FindGameObject(gameObject, "LightBTN");
-                var lightToggleBTN = lightToggleBTNObj.AddComponent<FCSToggleButton>();
-                lightToggleBTN.BtnName = "LightBTN";
-                lightToggleBTN.ButtonMode = InterfaceButtonMode.Background;
-                lightToggleBTN.TextLineOne = AuxPatchers.HarvesterToggleLight();
-                lightToggleBTN.TextLineTwo = AuxPatchers.HarvesterToggleLightDesc();
-                lightToggleBTN.OnButtonClick += (s, o) =>
+                
+                _lightToggleBTN = lightToggleBTNObj.AddComponent<FCSToggleButton>();
+                _lightToggleBTN.BtnName = "LightBTN";
+                _lightToggleBTN.ButtonMode = InterfaceButtonMode.Background;
+                _lightToggleBTN.TextLineOne = AuxPatchers.HarvesterToggleLight();
+                _lightToggleBTN.TextLineTwo = AuxPatchers.HarvesterToggleLightDesc();
+                _lightToggleBTN.OnButtonClick += (s, o) =>
                 {
-                    _mono.EffectsManager.SetBreaker(lightToggleBTN.IsSelected);
+                    _mono.EffectsManager.SetBreaker(_lightToggleBTN.IsSelected);
                 };
 
                 var slot1 = GameObjectHelpers.FindGameObject(gameObject, "HarvesterScreenItem").AddComponent<SlotItemTab>();
@@ -76,6 +95,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
                 _landSamplesGrid = InterfaceHelpers.FindGameObject(gameObject, "LandSamplesGrid");
                 _aquaticSamplesGrid = InterfaceHelpers.FindGameObject(gameObject, "AquaticSamplesGrid");
                 _powerUsagePerSecond =InterfaceHelpers.FindGameObject(gameObject, "PowerUsagePerSecond").GetComponent<Text>();
+                _generationTime =InterfaceHelpers.FindGameObject(gameObject, "UnitPerSecond").GetComponent<Text>();
                 LoadKnownSamples();
 
             }
@@ -89,30 +109,39 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
             return true;
         }
 
-        private void LoadKnownSamples()
+        internal void LoadKnownSamples()
         {
+            if (_loadedDNASamples == null)
+            {
+                _loadedDNASamples = new List<TechType>();
+            }
+
             var knownSamples = Mod.GetHydroponicKnownTech();
+
+            if (knownSamples == null) return;
+
             foreach (var sample in knownSamples)
             {
-                if(sample.Key == TechType.None) continue;
+                if(sample.TechType == TechType.None || _loadedDNASamples.Contains(sample.TechType)) continue;
                 var button = GameObject.Instantiate(ModelPrefab.HydroponicDNASamplePrefab).AddComponent<InterfaceButton>();
                 var icon = GameObjectHelpers.FindGameObject(button.gameObject, "Icon").AddComponent<uGUI_Icon>();
-                icon.sprite = SpriteManager.Get(sample.Key);
-                button.TextLineOne = Language.main.Get((sample.Key));
-                button.Tag = sample.Key;
+                icon.sprite = SpriteManager.Get(sample.TechType);
+                button.TextLineOne = Language.main.Get((sample.TechType));
+                button.Tag = sample.TechType;
                 button.OnButtonClick += (s, o) =>
                 {
                     _caller.SetIcon((TechType)o);
                     GoToHome();
                 };
-                
-                button.gameObject.transform.SetParent(sample.Value ? _landSamplesGrid.transform : _aquaticSamplesGrid.transform, false);
+                _loadedDNASamples.Add(sample.TechType);
+                button.gameObject.transform.SetParent(sample.IsLandPlant ? _landSamplesGrid.transform : _aquaticSamplesGrid.transform, false);
             }
         }
 
-        internal void UpdatePowerUsage()
+        internal void UpdateUI()
         {
             _powerUsagePerSecond.text = AuxPatchers.PowerUsagePerSecondFormat(_mono.GetPowerUsage());
+            _generationTime.text = AuxPatchers.GenerationTimeFormat(Convert.ToSingle(_mono.GrowBedManager.GetCurrentSpeedMode()));
         }
 
         public void OpenDnaSamplesPage(SlotItemTab slotItemTab)
@@ -121,75 +150,21 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
             _dnaSamplePage.SetActive(true);
             _homePage.SetActive(false);
         }
+        
         public void GoToHome()
         {
             _dnaSamplePage.SetActive(false);
             _homePage.SetActive(true);
         }
-
-        public void ClearDNASample(SlotItemTab tab)
+        
+        public void SetSpeedGraphic(SpeedModes speedMode)
         {
-            
-        }
-    }
-
-    internal class HarvesterSpeedButton : InterfaceButton
-    {
-        private int _index;
-        private Image _icon;
-        private Sprite[] _images;
-        internal GrowBedManager GrowBedManager { get; set; }
-
-        private void Start()
-        {
-            _images = new[]
-            {
-                ModelPrefab.GetSprite("HH icon off"),
-                ModelPrefab.GetSprite("HH icon low"),
-                ModelPrefab.GetSprite("HH icon medium"),
-                ModelPrefab.GetSprite("HH icon high")
-            };
+            _speedBTN.SetSpeedMode(speedMode);
         }
 
-        public override void OnPointerClick(PointerEventData eventData)
+        public void SetLightGraphicOff()
         {
-            base.OnPointerClick(eventData);
-            SwitchImage();
-            GrowBedManager.SetSpeedMode(GetMode());
-        }
-
-        private void SwitchImage()
-        {
-
-            if (_icon == null)
-            {
-                _icon = gameObject.EnsureComponent<Image>();
-            }
-            _index += 1;
-
-            if (_index > 3)
-            {
-                _index = 0;
-            }
-            _icon.sprite = _images[_index];
-           
-        }
-
-        public SpeedModes GetMode()
-        {
-            switch (_index)
-            {
-                case 0:
-                    return SpeedModes.Off;
-                case 1:
-                    return SpeedModes.Low;
-                case 2:
-                    return SpeedModes.High;
-                case 3:
-                    return SpeedModes.Max;
-            }
-
-            return SpeedModes.Off;
+            _lightToggleBTN.Select();
         }
     }
 }

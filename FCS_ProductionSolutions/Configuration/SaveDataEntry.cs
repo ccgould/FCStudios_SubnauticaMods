@@ -4,6 +4,8 @@ using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Objects;
 using FCS_ProductionSolutions.DeepDriller.Configuration;
 using FCS_ProductionSolutions.DeepDriller.Structs;
+using FCS_ProductionSolutions.HydroponicHarvester.Enumerators;
+using FCS_ProductionSolutions.HydroponicHarvester.Mono;
 using Oculus.Newtonsoft.Json;
 
 namespace FCS_ProductionSolutions.Configuration
@@ -17,6 +19,9 @@ namespace FCS_ProductionSolutions.Configuration
         [JsonProperty] internal Dictionary<TechType, int> Storage { get; set; }
         [JsonProperty] internal bool IsVisible { get; set; }
         [JsonProperty] internal bool IsInBase { get; set; }
+        [JsonProperty] internal SpeedModes SpeedMode { get; set; }
+        [JsonProperty] internal List<SlotsData> SlotData { get; set; }
+        [JsonProperty] internal bool SetBreaker { get; set; }
     }
 
     internal class MatterAnalyzerDataEntry
@@ -71,6 +76,6 @@ namespace FCS_ProductionSolutions.Configuration
         [JsonProperty] internal List<HydroponicHarvesterDataEntry> HydroponicHarvesterEntries = new List<HydroponicHarvesterDataEntry>();
         [JsonProperty] internal List<MatterAnalyzerDataEntry> MatterAnalyzerEntries = new List<MatterAnalyzerDataEntry>();
         [JsonProperty] internal List<DeepDrillerSaveDataEntry> DeepDrillerMk2Entries = new List<DeepDrillerSaveDataEntry>();
-        [JsonProperty] internal Dictionary<TechType,bool> HydroponicHarvesterKnownTech { get; set; } = new Dictionary<TechType, bool>();
+        [JsonProperty] internal List<DNASampleData> HydroponicHarvesterKnownTech { get; set; } = new List<DNASampleData>();
     }
 }

@@ -1,9 +1,9 @@
 ﻿using System;
+using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.HydroponicHarvester.Models;
 using FCSCommon.Components;
 using FCSCommon.Helpers;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
@@ -19,7 +19,9 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
         internal void Initialize(DisplayManager display, Action<string,object> onButtonClicked,int slotIndex)
         {
             if (Initialized) return;
-            
+
+            BtnName = "SlotButton";
+
             Slot = display._mono.GrowBedManager.GetSlot(slotIndex);
             _icon = gameObject.FindChild("Icon").AddComponent<uGUI_Icon>();
             _icon.sprite = SpriteManager.defaultSprite;
@@ -32,7 +34,14 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
             var removeDnaBtn = GameObjectHelpers.FindGameObject(gameObject, "RemoveDNABTN").AddComponent<InterfaceButton>();
             removeDnaBtn.STARTING_COLOR = Color.gray;
             removeDnaBtn.HOVER_COLOR = Color.white;
-            removeDnaBtn.OnButtonClick += (s, o) => { display.ClearDNASample(this); };
+            removeDnaBtn.OnButtonClick += (s, o) =>
+            {
+                var result = Slot.TryClear();
+                if (result)
+                {
+                    Clear();
+                }
+            };
 
             _amount = InterfaceHelpers.FindGameObject(gameObject, "Amount").GetComponent<Text>();
             UpdateCount();
@@ -46,10 +55,18 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
 
         internal void SetIcon(TechType techType)
         {
-            _iconTechType = techType;
-            _icon.sprite = SpriteManager.Get(techType);
-            Slot.GrowBedManager.AddSample(techType, Slot.Id);
-            Tag = techType;
+            if (Mod.IsHydroponicKnownTech(techType, out var data))
+            {
+                _iconTechType = techType;
+                _icon.sprite = SpriteManager.Get(data.PickType);
+                Slot.GrowBedManager.AddSample(techType, Slot.Id);
+                UpdateCount();
+                Tag = new SlotData(techType, Slot.Id);
+            }
+            else
+            {
+                _icon.sprite = SpriteManager.Get(TechType.None);
+            }
         }
 
         internal void UpdateCount()

@@ -163,7 +163,10 @@
     <Compile Include="DeepDriller\Structs\UpgradeSave.cs" />
     <Compile Include="HydroponicHarvester\Buildable\HydroponicHarvesterPatch.cs" />
     <Compile Include="HydroponicHarvester\Mono\DisplayManager.cs" />
+    <Compile Include="HydroponicHarvester\Mono\HarvesterSpeedButton.cs" />
+    <Compile Include="HydroponicHarvester\Mono\SlotData.cs" />
     <Compile Include="HydroponicHarvester\Mono\SlotItemTab.cs" />
+    <Compile Include="HydroponicHarvester\Mono\SlotsData.cs" />
     <Compile Include="MatterAnalyzer\Buildable\MatterAnalyzerPatch.cs" />
     <Compile Include="HydroponicHarvester\Enumerators\ClonePhases.cs" />
     <Compile Include="HydroponicHarvester\Enumerators\SpeedModes.cs" />

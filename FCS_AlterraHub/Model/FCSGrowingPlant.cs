@@ -39,6 +39,7 @@ namespace FCS_AlterraHub.Model
 
             _minScale = !_invalidAdjustTechTypes.Contains(seed.plantTechType) ? Mathf.Clamp(GetMinScale() * 0.3f, 0, 1) : Mathf.Clamp(GetMinScale(), 0, 1);
 
+            QuickLogger.Debug($"Setting minScale: {_minScale} || TechType: {seed.plantTechType} || bounds {slotBounds} || Get Minscale: {GetMinScale()}",true);
 
             growthWidth = new AnimationCurve(new Keyframe(0, 0.01f), new Keyframe(1, _minScale));
             growthWidth.SmoothTangents(0,0.8f);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using FCSCommon.Converters;
 using SMLHelper.V2.Handlers;
 using UnityEngine;
 
@@ -19,7 +20,7 @@ namespace FCS_ProductionSolutions.Buildable
             { $"{ModKey}_HHBackButton","Back"},
             { $"{ModKey}_HHBackButtonDesc","Go back to the Hydroponic Harvester home screen"},
             { $"{ModKey}_PowerUsagePerSecondFormat","Power Usage Per Second : {0}"},
-            { $"{ModKey}_UnitPerMinuteFormat","Unit Per Minute : {0}"},
+            { $"{ModKey}_GenerationTimeFormat","Generation Time : {0}"},
         };
 
         internal static void AdditionalPatching()
@@ -79,9 +80,9 @@ namespace FCS_ProductionSolutions.Buildable
         {
             return string.Format(GetLanguage($"{ModKey}_PowerUsagePerSecondFormat"),amount);
         }
-        public static string UnitPerMinuteFormat(float amount)
+        public static string GenerationTimeFormat(float amount)
         {
-            return string.Format(GetLanguage($"{ModKey}_UnitPerMinuteFormat"), amount);
+            return string.Format(GetLanguage($"{ModKey}_GenerationTimeFormat"), TimeConverters.SecondsToHMS(amount));
         }
     }
 }

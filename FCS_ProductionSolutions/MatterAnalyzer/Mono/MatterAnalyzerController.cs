@@ -7,6 +7,7 @@ using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
+using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using Steamworks;
@@ -41,6 +42,7 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
         private GameObject _currentSeed;
         private TechType _currentTechType;
         private bool _isLandPlant;
+        private TechType _pickTechType;
 
         #region Unity Methods
 
@@ -77,7 +79,10 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
                     ColorManager.ChangeColor(_savedData.BodyColor.Vector4ToColor(), ColorTargetMode.Both);
                     _scanTime = _savedData.CurrentScanTime;
                     _maxScanTime = _savedData.CurrentMaxScanTime;
-                    OnStorageOnContainerAddItem(this,_savedData.CurrentTechType);
+                    if (_savedData.CurrentTechType != TechType.None)
+                    {
+                        OnStorageOnContainerAddItem(this,_savedData.CurrentTechType);
+                    }
                 }
 
                 _runStartUpOnEnable = false;
@@ -88,6 +93,9 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
 
         public ColorManager ColorManager { get; private set; }
         public DumpContainer DumpContainer { get; private set; }
+        public Plantable Seed { get; set; }
+        public PickPrefab PickPrefab { get; set; }
+        public GameObject GrownPlant { get; set; }
 
         public override void Initialize()
         {
@@ -179,7 +187,13 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
                 {
                     _isScanning = false;
                     _reset = true;
-                    Mod.AddHydroponicKnownTech(_currentTechType,_isLandPlant);
+
+                    Mod.AddHydroponicKnownTech(new DNASampleData
+                    {
+                        TechType = _currentTechType, 
+                        PickType = _pickTechType, 
+                        IsLandPlant = _isLandPlant
+                    });
                 }
             }
         }
@@ -194,35 +208,40 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
             return 0;
         }
 
-        private void OnStorageOnContainerAddItem(FcsDevice device, TechType techype)
+        private void OnStorageOnContainerAddItem(FcsDevice device, TechType techType)
         {
 
-            PrefabDatabase.TryGetPrefabFilename(CraftData.GetClassIdForTechType(TechType.MelonSeed), out string filepath);
-            GameObject prefab = Resources.Load<GameObject>(filepath);
+            if (PrefabDatabase.TryGetPrefabFilename(CraftData.GetClassIdForTechType(techType), out string filepath))
+            {
+                GameObject prefab = Resources.Load<GameObject>(filepath);
+                
+                if (prefab != null)
+                {
+                    var go = GameObject.Instantiate(prefab);
+                    var collider = go.GetComponent<Collider>();
+                    if (collider != null) collider.isTrigger = true;
 
-            GameObject seed = GameObject.Instantiate(prefab);
+                    var rg = go.GetComponent<Rigidbody>();
+                    if (rg != null) rg.isKinematic = true;
 
-            var collider = seed.GetComponent<Collider>();
-            if (collider != null) collider.isTrigger = true;
+                    go.transform.SetParent(_slot.transform, false);
+                    //go.transform.localScale = new Vector3(2.30f, 2.30f, 2.30f);
+                    go.transform.localPosition = new Vector3(0f, 0.24f, 0f);
+                    //go.transform.Rotate(90f, 0, 0, Space.Self);
+                    
+                    _currentSeed = go;
 
-            var rg = seed.GetComponent<Rigidbody>();
-            if (rg != null) rg.isKinematic = true;
+                }
+      
+            }
 
-            seed.transform.localScale = new Vector3(2.30f, 2.30f, 2.30f);
-            seed.transform.localPosition = new Vector3(0f, 0.24f, 0f);
-            seed.transform.Rotate(90f, 0, 0, Space.Self);
-
-
-            seed.transform.SetParent(_slot.transform, false);
-
-            _currentSeed = seed;
-            var plantable = seed.GetComponent<Plantable>();
-
-            _isLandPlant = !plantable.underwater;
-            _currentTechType = techype;
+            _pickTechType = PickPrefab != null ? PickPrefab.pickTech : _currentTechType;
+            _isLandPlant = Seed.aboveWater;
+            _currentTechType = techType;
 
             StartScanning();
         }
+
 
         private void ScanStopButtonInitialization()
         {
@@ -271,6 +290,7 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
             _currentTechType = TechType.None;
             //Destroy
             Destroy(_currentSeed);
+            Destroy(GrownPlant);
         }
 
         private void StartScanning()
