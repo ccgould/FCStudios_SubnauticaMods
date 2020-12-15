@@ -16,11 +16,7 @@ namespace FCS_HomeSolutions.MiniFountainFilter.Managers
         private ItemsContainer _container;
         private readonly int _containerWidth = QPatch.MiniFountainFilterConfiguration.StorageWidth;
         private readonly int _containerHeight = QPatch.MiniFountainFilterConfiguration.StorageHeight;
-        private static TechType _bottleTechType = QPatch.MiniFountainFilterConfiguration.BottleTechType;
-        private Vector2int _bottleSize;
-        private readonly GameObject _bottle = CraftData.GetPrefabForTechType(_bottleTechType);
         private int MaxContainerSlots => _containerHeight * _containerWidth;
-        private float _bottleWaterContent;
         private float _passedTime;
 
         internal int NumberOfBottles
@@ -54,31 +50,6 @@ namespace FCS_HomeSolutions.MiniFountainFilter.Managers
         internal void Initialize(MiniFountainFilterController mono)
         {
             _mono = mono;
-
-            if (_bottleTechType == TechType.None)
-            {
-                QuickLogger.Error($"TechType for Bottle TechType is None");
-                return;
-            }
-
-            var bottle = _bottleTechType.ToInventoryItem();
-
-            _bottleSize = new Vector2int(bottle.width, bottle.height);
-
-            var eatable = bottle.item.transform.GetComponentInChildren<Eatable>();
-
-            if (eatable == null)
-            {
-                QuickLogger.Error($"Eatable for Bottle TechType is null");
-                GameObject.Destroy(bottle.item);
-                return;
-            }
-
-            _bottleWaterContent = eatable.waterValue;
-            QuickLogger.Debug($"Water Content Set To: {eatable.waterValue}");
-
-            GameObject.Destroy(bottle.item);
-
             _isConstructed = () => mono.IsConstructed;
 
             if (_containerRoot == null)
@@ -104,16 +75,13 @@ namespace FCS_HomeSolutions.MiniFountainFilter.Managers
         {
             if (!_mono.GetIsOperational() || !QPatch.MiniFountainFilterConfiguration.AutoGenerateMode) return;
 
-            if (IsFull() || !_mono.TankManager.HasEnoughWater(_bottleWaterContent)) return;
+            if (IsFull() || !_mono.TankManager.HasEnoughWater(50)) return;
             
-
-            DayNightCycle main = DayNightCycle.main;
-
             _passedTime += DayNightCycle.main.deltaTime;
 
             if(_passedTime >= 2f)
             {
-                _mono.TankManager.RemoveWater(_bottleWaterContent);
+                _mono.TankManager.RemoveWater(50);
                 NumberOfBottles++;
                 _passedTime = 0;
             }
@@ -149,7 +117,7 @@ namespace FCS_HomeSolutions.MiniFountainFilter.Managers
 
         internal bool IsFull()
         {
-            return !_container.HasRoomFor(_bottleSize.x, _bottleSize.y);
+            return !_container.HasRoomFor(1, 1);
         }
 
         internal void OpenStorage()
@@ -162,38 +130,31 @@ namespace FCS_HomeSolutions.MiniFountainFilter.Managers
 
         private void RemoveSingleBottle()
         {
-            IList<InventoryItem> bottle = _container.GetItems(_bottleTechType);
+            IList<InventoryItem> bottle = _container.GetItems(TechType.BigFilteredWater);
             _container.RemoveItem(bottle[0].item);
             OnWaterRemoved?.Invoke();
         }
 
         private void SpawnBottle()
         {
-            var bottle = GameObject.Instantiate(_bottle);
-#if SUBNAUTICA
-            var newInventoryItem = new InventoryItem(bottle.GetComponent<Pickupable>().Pickup(false));
-#elif BELOWZERO
-            Pickupable pickupable = bottle.GetComponent<Pickupable>();
-            pickupable.Pickup(false);
-            var newInventoryItem = new InventoryItem(pickupable);
-#endif
+            var newInventoryItem = TechType.BigFilteredWater.ToInventoryItem();
             _container.UnsafeAdd(newInventoryItem);
             OnWaterAdded?.Invoke();
         }
 
         internal void GivePlayerBottle()
         {
-            if (_mono.TankManager.TankLevel >= _bottleWaterContent)
+            if (_mono.TankManager.TankLevel >= 50)
             {
-                var pickup = _bottleTechType.ToPickupable();
+                var pickup = TechType.BigFilteredWater.ToPickupable();
 
-                if (Inventory.main.HasRoomFor(pickup))
+                if (Inventory.main.HasRoomFor(1, 1))
                 {
-                    _mono.TankManager.RemoveWater(_bottleWaterContent);
+                    _mono.TankManager.RemoveWater(50);
                     
-                    Inventory.main.container.UnsafeAdd(_bottleTechType.ToInventoryItem());
+                    Inventory.main.container.UnsafeAdd(pickup.ToInventoryItem());
 
-                    uGUI_IconNotifier.main.Play(_bottleTechType, uGUI_IconNotifier.AnimationType.From, null);
+                    uGUI_IconNotifier.main.Play(TechType.BigFilteredWater, uGUI_IconNotifier.AnimationType.From, null);
 
                     pickup.PlayPickupSound();
                 }

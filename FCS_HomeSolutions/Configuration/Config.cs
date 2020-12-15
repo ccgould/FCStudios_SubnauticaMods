@@ -50,7 +50,6 @@ namespace FCS_HomeSolutions.Configuration
         public int StorageHeight { get; set; } = 2;
         public float WaterPerSecond { get; set; } = 1f;
         public bool AutoGenerateMode { get; set; } = false;
-        public TechType BottleTechType { get; set; } = TechType.FilteredWater;
     }
 
     [Menu("SeaBreeze Menu")]
