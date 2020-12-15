@@ -55,7 +55,7 @@ namespace FCS_HomeSolutions.Curtains.Mono
 
                     _colorManager.ChangeColor(_savedData.Color.Vector4ToColor());
                     _colorManager.ChangeColor(_savedData.SecondaryColor.Vector4ToColor(), ColorTargetMode.Secondary);
-                    if (QPatch.Patterns.ContainsKey(_savedData.SelectedTexturePath))
+                    if (_savedData.SelectedTexturePath != null && QPatch.Patterns.ContainsKey(_savedData.SelectedTexturePath))
                     {
                         LoadImage(QPatch.Patterns[_savedData.SelectedTexturePath]);
                     }
