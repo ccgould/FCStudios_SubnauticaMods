@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UWE;
 
 namespace FCSCommon.Utilities
 {
@@ -13,10 +14,14 @@ namespace FCSCommon.Utilities
         internal static bool TechTypePrefabContains<T>(TechType techType) where T : MonoBehaviour
         {
             if (PrefabComponentSearches<T>.cash.TryGetValue(techType, out var result)) { return result; }
+            
+            GameObject prefab = null;
+            if (PrefabDatabase.TryGetPrefabFilename(CraftData.GetClassIdForTechType(techType), out string filepath))
+            {
+                prefab = Resources.Load<GameObject>(filepath);
+            }
 
-            var prefab = CraftData.GetPrefabForTechType(techType, false);
             result = prefab != null && prefab.GetComponent<T>();
-
             PrefabComponentSearches<T>.cash[techType] = result;
             return result;
         }

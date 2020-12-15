@@ -1,6 +1,6 @@
 ﻿using SMLHelper.V2.Handlers;
 using UnityEngine;
-
+using UWE;
 
 namespace FCSCommon.Extensions
 {
@@ -10,11 +10,17 @@ namespace FCSCommon.Extensions
         internal static Pickupable ToPickupable(this TechType techType)
         {
             Pickupable pickupable = null;
-            var prefab = CraftData.GetPrefabForTechType(techType);
-            if (prefab != null)
+
+            if (PrefabDatabase.TryGetPrefabFilename(CraftData.GetClassIdForTechType(techType), out string filepath))
             {
-                var go = GameObject.Instantiate(prefab);
-                pickupable = go.EnsureComponent<Pickupable>().Pickup(false);
+                GameObject prefab = Resources.Load<GameObject>(filepath);
+
+                if (prefab != null)
+                { 
+                    var go = GameObject.Instantiate(prefab);
+                    pickupable = go.EnsureComponent<Pickupable>();
+                    PickupReplacement(pickupable);
+                }
             }
 
             return pickupable;
@@ -23,19 +29,25 @@ namespace FCSCommon.Extensions
         internal static InventoryItem ToInventoryItem(this TechType techType)
         {
             InventoryItem item = null;
-            var prefab = CraftData.GetPrefabForTechType(techType);
-            if (prefab != null)
+            if (PrefabDatabase.TryGetPrefabFilename(CraftData.GetClassIdForTechType(techType), out string filepath))
             {
-                var go = GameObject.Instantiate(prefab);
-                var pickupable = go.EnsureComponent<Pickupable>().Pickup(false);
-                item = new InventoryItem(pickupable);
-            }
-            else
-            {
-                var go = GameObject.Instantiate(GameObject.CreatePrimitive(PrimitiveType.Cube));
-                go.EnsureComponent<PrefabIdentifier>();
-                var pickupable = go.EnsureComponent<Pickupable>().Pickup(false);
-                item = new InventoryItem(pickupable);
+                GameObject prefab = Resources.Load<GameObject>(filepath);
+
+                if (prefab != null)
+                {
+                    var go = GameObject.Instantiate(prefab);
+                    var pickupable = go.EnsureComponent<Pickupable>();
+                    PickupReplacement(pickupable);
+                    item = new InventoryItem(pickupable);
+                }
+                else
+                {
+                    var go = GameObject.Instantiate(GameObject.CreatePrimitive(PrimitiveType.Cube));
+                    go.EnsureComponent<PrefabIdentifier>();
+                    var pickupable = go.EnsureComponent<Pickupable>();
+                    PickupReplacement(pickupable);
+                    item = new InventoryItem(pickupable);
+                }
             }
             return item;
         }
@@ -45,7 +57,7 @@ namespace FCSCommon.Extensions
             InventoryItem item = null;
             if (pickupable != null)
             {
-                pickupable.Pickup(false);
+                PickupReplacement(pickupable);
                 item = new InventoryItem(pickupable);
             }
             return item;
@@ -102,6 +114,23 @@ namespace FCSCommon.Extensions
             }
 
             return TechType.None;
+        }
+
+        private static void PickupReplacement(Pickupable pickupable)
+        {
+            pickupable.SendMessage("OnExamine", SendMessageOptions.DontRequireReceiver);
+            int num = pickupable.gameObject.GetComponentsInChildren<Rigidbody>(true).Length;
+            if (num == 0)
+            {
+                pickupable.gameObject.AddComponent<Rigidbody>();
+            }
+            pickupable.Deactivate();
+            pickupable.attached = true;
+            if (pickupable._isInSub)
+            {
+                pickupable.Unplace();
+                pickupable._isInSub = false;
+            }
         }
     }
 }

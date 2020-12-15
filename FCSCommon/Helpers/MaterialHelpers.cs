@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
+using UWE;
 
 namespace FCSCommon.Helpers
 {
@@ -286,53 +287,60 @@ namespace FCSCommon.Helpers
 
         internal static void GetIngameObjects()
         {
-            var aquarium = GameObject.Instantiate(CraftData.GetPrefabForTechType(TechType.Aquarium));
-
-            try
+            GameObject prefab = null;
+            if (PrefabDatabase.TryGetPrefabFilename(CraftData.GetClassIdForTechType(TechType.Aquarium), out string filepath))
             {
-                QuickLogger.Debug("In GetIngameObjects");
+                prefab = Resources.Load<GameObject>(filepath);
+                var aquarium = GameObject.Instantiate(prefab);
 
-                
-
-                if (_glassMaterial == null)
+                try
                 {
+                    QuickLogger.Debug("In GetIngameObjects");
 
-                    Renderer[] renderers = aquarium.GetComponentsInChildren<Renderer>(true);
 
-                    foreach (Renderer renderer in renderers)
+
+                    if (_glassMaterial == null)
                     {
-                        foreach (Material material in renderer.materials)
+
+                        Renderer[] renderers = aquarium.GetComponentsInChildren<Renderer>(true);
+
+                        foreach (Renderer renderer in renderers)
                         {
-                            if (material.name.StartsWith("Aquarium_glass", StringComparison.OrdinalIgnoreCase))
+                            foreach (Material material in renderer.materials)
                             {
-                                _glassMaterial = material;
-                                QuickLogger.Debug($"Aquarium glass result: {_glassMaterial?.name}");
-                                goto _glassEnd;
+                                if (material.name.StartsWith("Aquarium_glass", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    _glassMaterial = material;
+                                    QuickLogger.Debug($"Aquarium glass result: {_glassMaterial?.name}");
+                                    goto _glassEnd;
+                                }
                             }
                         }
                     }
-                }
-                _glassEnd: ;
+                _glassEnd:
+                    ;
 
-                if (_laterialBubbles == null)
-                {
-                    var bubbles = aquarium.FindChild("Bubbles").FindChild("xBubbles").FindChild("xLateralBubbles");
-                    if (bubbles == null)
+                    if (_laterialBubbles == null)
                     {
-                        QuickLogger.Error("Failed to find bubbles in the aquarium");
-                        return;
+                        var bubbles = aquarium.FindChild("Bubbles").FindChild("xBubbles").FindChild("xLateralBubbles");
+                        if (bubbles == null)
+                        {
+                            QuickLogger.Error("Failed to find bubbles in the aquarium");
+                            return;
+                        }
+
+                        _laterialBubbles = GameObject.Instantiate(bubbles);
+                        QuickLogger.Debug($"Laterial Bubbles result: {_laterialBubbles?.name}");
                     }
-
-                    _laterialBubbles = GameObject.Instantiate(bubbles);
-                    QuickLogger.Debug($"Laterial Bubbles result: {_laterialBubbles?.name}");
                 }
-            }
-            finally
-            {
-                GameObject.Destroy(aquarium);
+                finally
+                {
+                    GameObject.Destroy(aquarium);
+                }
+
             }
 
-            
+
 
         }
 

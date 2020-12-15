@@ -124,7 +124,6 @@
     <Compile Include="DeepDriller\Buildable\FCSDeepDrillerPatcher.cs" />
     <Compile Include="DeepDriller\Configuration\DeepDrillerPowerData.cs" />
     <Compile Include="DeepDriller\Craftable\FCSGlassCraftable.cs" />
-    <Compile Include="DeepDriller\Helpers\FCSDeepDrillerOperations.cs" />
     <Compile Include="DeepDriller\Helpers\Helpers.cs" />
     <Compile Include="DeepDriller\Managers\BiomeManager.cs" />
     <Compile Include="DeepDriller\Managers\LaserManager.cs" />

@@ -12,6 +12,7 @@ using FCSCommon.Utilities;
 using Steamworks;
 using UnityEngine;
 using UnityEngine.UI;
+using UWE;
 
 namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
 {
@@ -195,7 +196,11 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
 
         private void OnStorageOnContainerAddItem(FcsDevice device, TechType techype)
         {
-            GameObject seed = CraftData.InstantiateFromPrefab(TechType.MelonSeed);
+
+            PrefabDatabase.TryGetPrefabFilename(CraftData.GetClassIdForTechType(TechType.MelonSeed), out string filepath);
+            GameObject prefab = Resources.Load<GameObject>(filepath);
+
+            GameObject seed = GameObject.Instantiate(prefab);
 
             var collider = seed.GetComponent<Collider>();
             if (collider != null) collider.isTrigger = true;

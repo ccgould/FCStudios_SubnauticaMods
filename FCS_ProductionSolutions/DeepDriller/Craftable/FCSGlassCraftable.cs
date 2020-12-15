@@ -5,6 +5,7 @@ using FCSCommon.Extensions;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
 using UnityEngine;
+using UWE;
 
 namespace FCS_ProductionSolutions.DeepDriller.Craftable
 {
@@ -25,8 +26,16 @@ namespace FCS_ProductionSolutions.DeepDriller.Craftable
         {
             try
             {
-                var prefab = GameObject.Instantiate(CraftData.GetPrefabForTechType(TechType.Glass));
-                return prefab;
+                if (PrefabDatabase.TryGetPrefabFilename(CraftData.GetClassIdForTechType(TechType.Glass), out string filepath))
+                {
+                    GameObject prefab = Resources.Load<GameObject>(filepath);
+
+                    if (prefab != null)
+                    {
+                        var Obj = GameObject.Instantiate(prefab);
+                        return Obj;
+                    }
+                }
             }
             catch (Exception e)
             {

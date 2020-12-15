@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Mono;
 using FCS_ProductionSolutions.DeepDriller.Helpers;
@@ -139,12 +140,12 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         {
             try
             {
-                if (!FCSDeepDrillerOperations.CanPlayerHold(item)) return false;
+                if (!PlayerInteractionHelper.CanPlayerHold(item)) return false;
                 
                 if (_container.ContainsKey(item))
                 {
 
-                    if (FCSDeepDrillerOperations.GivePlayerItem(item))
+                    if (PlayerInteractionHelper.GivePlayerItem(item))
                     {
                         if (_container[item] == 1)
                         {

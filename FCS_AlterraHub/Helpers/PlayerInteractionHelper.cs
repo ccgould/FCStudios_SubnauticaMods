@@ -39,5 +39,11 @@ namespace FCS_AlterraHub.Helpers
         {
             return Inventory.main.container.Contains(Mod.DebitCardTechType);
         }
+
+        public static bool CanPlayerHold(TechType techType)
+        {
+            var size = CraftData.GetItemSize(techType);
+            return Inventory.main.HasRoomFor(size.x, size.y);
+        }
     }
 }
