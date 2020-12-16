@@ -117,7 +117,7 @@ namespace FCS_HomeSolutions.MiniFountainFilter.Mono
 
             if (ColorManager == null)
             {
-                ColorManager = new ColorManager();
+                ColorManager = gameObject.AddComponent<ColorManager>();
                 ColorManager.Initialize(gameObject, ModelPrefab.BodyMaterial);
             }
 

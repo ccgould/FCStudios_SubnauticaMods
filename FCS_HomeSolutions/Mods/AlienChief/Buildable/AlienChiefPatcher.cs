@@ -93,15 +93,7 @@ namespace FCS_HomeSolutions.Mods.AlienChief.Buildables
         {
             QuickLogger.Debug($"Creating recipe...");
             // Create and associate recipe to the new TechType
-            var customFabRecipe = new TechData()
-            {
-                craftAmount = 1,
-                Ingredients = new List<Ingredient>()
-                {
-                    new Ingredient(Mod.AlienChiefKitClassID.ToTechType(), 1)
-                }
-            };
-            return customFabRecipe;
+            return Mod.AlienChiefIngredients;
         }
 #elif BELOWZERO
 
@@ -109,15 +101,7 @@ namespace FCS_HomeSolutions.Mods.AlienChief.Buildables
         {
             QuickLogger.Debug($"Creating recipe...");
             // Create and associate recipe to the new TechType
-            var customFabRecipe = new RecipeData()
-            {
-                craftAmount = 1,
-                Ingredients = new List<Ingredient>()
-                {
-                    new Ingredient(Mod.AlienChiefKitClassID.ToTechType(), 1)
-                }
-            };
-            return customFabRecipe;
+            return Mod.AlienChiefIngredients;
         }
 #endif
 

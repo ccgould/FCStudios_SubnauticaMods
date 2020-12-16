@@ -8,6 +8,7 @@ using FCS_HomeSolutions.Configuration;
 using FCS_HomeSolutions.Curtains.Mono;
 using FCS_HomeSolutions.MiniFountainFilter.Buildables;
 using FCS_HomeSolutions.Mods.AlienChief.Buildables;
+using FCS_HomeSolutions.Mods.Cabinets.Buildable;
 using FCS_HomeSolutions.QuantumTeleporter.Buildable;
 using FCS_HomeSolutions.SeaBreeze.Buildable;
 using FCS_HomeSolutions.Spawnables;
@@ -120,6 +121,8 @@ namespace FCS_HomeSolutions
             LoadOtherObjects();
 
             LoadCurtainTemplates();
+
+            LoadCabinets();
 
             var harmony = new Harmony("com.homesolutions.fstudios");
             harmony.PatchAll(Assembly.GetExecutingAssembly());
@@ -251,6 +254,21 @@ namespace FCS_HomeSolutions
             }
 
             QuickLogger.Debug($"Curtain templates loaded: {Patterns.Count}.");
+        }
+
+        private void LoadCabinets()
+        {
+            //Patch Cabinet 1
+            var cabinet1 = new Cabinet1Buildable();
+            cabinet1.Patch();
+
+            //Patch Cabinet 2
+            var cabinet2 = new Cabinet2Buildable();
+            cabinet2.Patch();
+
+            //Patch Cabinet 3
+            var cabinet3 = new Cabinet3Buildable();
+            cabinet3.Patch();
         }
 
         public static Sprite ConvertTextureToSprite(Texture2D texture, float PixelsPerUnit = 100.0f, SpriteMeshType spriteType = SpriteMeshType.Tight)

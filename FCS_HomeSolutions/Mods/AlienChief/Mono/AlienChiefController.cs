@@ -47,7 +47,7 @@ namespace FCS_HomeSolutions.Mods.AlienChief.Mono
         {
             if (_colorManager == null)
             {
-                _colorManager = new ColorManager();
+                _colorManager = gameObject.AddComponent<ColorManager>();
                 _colorManager.Initialize(gameObject, ModelPrefab.BodyMaterial);
             }
 

@@ -121,6 +121,7 @@
     <Compile Include="Configuration\DebugCommands.cs" />
     <Compile Include="Configuration\Mod.cs" />
     <Compile Include="Configuration\SaveDataEntry.cs" />
+    <Compile Include="Patches\StorageContainterPatches.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -128,7 +128,7 @@ namespace FCS_HomeSolutions.QuantumTeleporter.Mono
                 _buildable = GetComponentInParent<Constructable>() ?? GetComponent<Constructable>();
 
             if (ColorManager == null)
-                ColorManager = new ColorManager();
+                ColorManager = gameObject.AddComponent<ColorManager>();
 
             ColorManager.Initialize(gameObject, ModelPrefab.BodyMaterial);
 

@@ -279,9 +279,18 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
             }
 
             var totalPerc = GetTotal() / GetCapacity();
-            _mono.PowerTotalMeterTotal.text = _powerSupply.GetPowerString();
-            _mono.PowerTotalMeterPercent.text = $"{totalPerc:P0}";
-            _mono.PowerTotalMeterRing.fillAmount = totalPerc;
+            if (float.IsNaN(totalPerc))
+            {
+                _mono.PowerTotalMeterTotal.text = _powerSupply.GetPowerString();
+                _mono.PowerTotalMeterPercent.text = "0%";
+                _mono.PowerTotalMeterRing.fillAmount = 0f;
+            }
+            else
+            {
+                _mono.PowerTotalMeterTotal.text = _powerSupply.GetPowerString();
+                _mono.PowerTotalMeterPercent.text = $"{totalPerc:P0}";
+                _mono.PowerTotalMeterRing.fillAmount = totalPerc;
+            }
 
 
             ProfilingUtils.EndSample(null);
@@ -317,8 +326,6 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
             {
                 UpdateVisuals(definition, -1f);
             }
-
-            Batteries.Remove(slot);
         }
 
         private SlotDefinition FindAvailableSlot()
@@ -370,6 +377,7 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
                         if (GameModeUtils.RequiresPower())
                         {
                             battery.charge += -Mathf.Min(-consumed, battery.charge);
+                            UpdateVisuals();
                         }
                     }
                     break;
@@ -414,7 +422,7 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
 
         public bool HasPowerCells()
         {
-            return Batteries.Count > 0;
+            return Batteries.Any(x => x.Value != null);
         }
     }
 
@@ -440,7 +448,7 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
             set
             {
                 _inventoryItem = value;
-                _battery = value.item.GetComponent<Battery>();
+                _battery = value?.item.GetComponent<Battery>();
             }
         }
 
@@ -469,6 +477,8 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
         public void OnHandClick(GUIHand hand)
         {
             _charger.OnUnEquip(_slot,this);
+            _battery = null;
+            InventoryItem = null;
         }
 
         public void IsVisible(bool value)

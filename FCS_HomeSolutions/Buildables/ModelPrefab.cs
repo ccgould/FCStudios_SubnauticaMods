@@ -43,6 +43,9 @@ namespace FCS_HomeSolutions.Buildables
         public static GameObject TrashRecyclerItemPrefab { get; set; }
         public static GameObject CurtainPrefab { get; set; }
         public static GameObject AlienChiefPrefab { get; set; }
+        public static GameObject Cabinet1Prefab { get; set; }
+        public static GameObject Cabinet2Prefab { get; set; }
+        public static GameObject Cabinet3Prefab { get; set; }
 
         internal static void Initialize()
         {
@@ -69,6 +72,9 @@ namespace FCS_HomeSolutions.Buildables
             PaintCanPrefab = GetPrefab(Mod.PaintCanPrefabName);
             QuantumTeleporterPrefab = GetPrefab(Mod.QuantumTeleporterPrefabName);
             AlienChiefPrefab = GetPrefab(Mod.AlienChiefPrefabName);
+            Cabinet1Prefab = GetPrefab(Mod.Cabinet1PrefabName);
+            Cabinet2Prefab = GetPrefab(Mod.Cabinet2PrefabName);
+            Cabinet3Prefab = GetPrefab(Mod.Cabinet3PrefabName);
             TrashRecyclerItemPrefab = GetPrefab("RecyclerItem");
             SeaBreezeItemPrefab = GetPrefab("ARSItem");
             NetworkItemPrefab = GetPrefab("NetworkItem");

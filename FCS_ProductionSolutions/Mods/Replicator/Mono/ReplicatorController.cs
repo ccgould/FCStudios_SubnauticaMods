@@ -4,6 +4,8 @@ using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
+using FCS_ProductionSolutions.HydroponicHarvester.Enumerators;
+using FCS_ProductionSolutions.HydroponicHarvester.Mono;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -16,6 +18,8 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
         private bool _fromSave;
         private ReplicatorDataEntry _saveData;
         private ColorManager _colorManager;
+        private ReplicatorSlot _replicatorSlot;
+        private const float PowerUsage = 0.85f;
 
         private void Start()
         {
@@ -43,6 +47,14 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
             }
         }
 
+        private void ChangeSpeed()
+        {
+            if (_replicatorSlot != null)
+            {
+                _replicatorSlot.CurrentSpeedMode = SpeedModes.Max;
+            }
+        }
+
         private void ReadySaveData()
         {
             QuickLogger.Debug("In OnProtoDeserialize");
@@ -51,12 +63,37 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
             _saveData = Mod.GetReplicatorSaveData(id);
         }
 
+        public override float GetPowerUsage()
+        {
+            switch(_replicatorSlot.CurrentSpeedMode)
+            {
+                case SpeedModes.Off:
+                return 0;
+                case SpeedModes.Max:
+                return PowerUsage * 4;
+                case SpeedModes.High:
+                return PowerUsage * 3;
+                case SpeedModes.Low:
+                return PowerUsage * 2;
+                case SpeedModes.Min:
+                return PowerUsage;
+                default:
+                return 0f;
+            }
+        }
+
         public override void Initialize()
         {
             if (_colorManager == null)
             {
-                _colorManager = new ColorManager();
+                _colorManager = gameObject.AddComponent<ColorManager>();
                 _colorManager.Initialize(gameObject, ModelPrefab.BodyMaterial);
+            }
+
+            if (_replicatorSlot == null)
+            {
+                _replicatorSlot = gameObject.AddComponent<ReplicatorSlot>();
+                _replicatorSlot.Initialize(this);
             }
 
             MaterialHelpers.ChangeEmissionStrength(ModelPrefab.EmissionControllerMaterial,gameObject,5f);

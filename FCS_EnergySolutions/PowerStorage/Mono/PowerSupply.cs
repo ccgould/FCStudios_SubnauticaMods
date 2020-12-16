@@ -30,8 +30,7 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
 
         internal string  GetPowerString()
         {
-            if (_powerCharger?.GetTotal() == null) return "0/0";
-            return $"{Mathf.RoundToInt(_powerCharger.GetTotal())}/{Mathf.RoundToInt(_powerCharger.GetCapacity())}";
+            return _powerCharger?.GetTotal() == null ? "0/0" : $"{Mathf.RoundToInt(_powerCharger.GetTotal())}/{Mathf.RoundToInt(_powerCharger.GetCapacity())}";
         }
 
         public bool ModifyPower(float amount, out float consumed)

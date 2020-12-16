@@ -96,6 +96,27 @@ namespace FCS_HomeSolutions.Configuration
         internal static string AlienChiefKitClassID = $"{AlienChiefClassID}_Kit";
         internal const string AlienChiefTabID = "AC";
 
+        internal const string Cabinet1ClassID = "CabinetWide";
+        internal const string Cabinet1Friendly = "Cabinet Wide";
+        internal const string Cabinet1Description = "A stylish furniture piece for storage and decoration";
+        internal const string Cabinet1PrefabName = "Cabinet_01";
+        internal static string Cabinet1KitClassID = $"{Cabinet1ClassID}_Kit";
+        internal const string CabinetTabID = "CB";
+
+        internal const string Cabinet2ClassID = "CabinetMediumTall";
+        internal const string Cabinet2Friendly = "Cabinet Medium Tall";
+        internal const string Cabinet2Description = "A stylish furniture piece for storage and decoration";
+        internal const string Cabinet2PrefabName = "Cabinet_02";
+        internal static string Cabinet2KitClassID = $"{Cabinet2ClassID}_Kit";
+
+
+        internal const string Cabinet3ClassID = "CabinetTall";
+        internal const string Cabinet3Friendly = "CabinetTall";
+        internal const string Cabinet3Description = "A stylish furniture piece for storage and decoration";
+        internal const string Cabinet3PrefabName = "Cabinet_03";
+        internal static string Cabinet3KitClassID = $"{Cabinet3ClassID}_Kit";
+
+
         internal const string PaintCanClassID = "PaintCan";
         internal const string PaintCanFriendly = "Paint Can";
         internal const string PaintCanDescription = "More paint for you paint tool. Use the paint can to allow you to paint devices with your paint tool";
@@ -568,6 +589,25 @@ namespace FCS_HomeSolutions.Configuration
             }
 
             return new BaseOperatorDataEntry() { Id = id };
+        }
+
+        public static CabinetDataEntry GetCabinetSaveData(string id)
+        {
+            LoadData();
+
+            var saveData = GetSaveData();
+
+            foreach (var entry in saveData.CabinetDataEntries)
+            {
+                if (string.IsNullOrEmpty(entry.Id)) continue;
+
+                if (entry.Id == id)
+                {
+                    return entry;
+                }
+            }
+
+            return new CabinetDataEntry() { Id = id };
         }
     }
 }
