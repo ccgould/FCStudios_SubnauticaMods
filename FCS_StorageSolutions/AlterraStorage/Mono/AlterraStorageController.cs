@@ -121,13 +121,14 @@ namespace FCS_StorageSolutions.AlterraStorage.Mono
 
             if (_storageContainer == null)
             {
-                _storageContainer = new FCSStorage(MAXSTORAGE,GameObjectHelpers.FindGameObject(gameObject,"StorageRoot"));
-                _storageContainer.onAddItem += item =>
+                _storageContainer = gameObject.AddComponent<FCSStorage>();
+                _storageContainer.Initialize( MAXSTORAGE);
+                _storageContainer.ItemsContainer.onAddItem += item =>
                 {
                     _inventoryGrid.DrawPage();
                     UpdateStorageCount();
                 };
-                _storageContainer.onRemoveItem += item =>
+                _storageContainer.ItemsContainer.onRemoveItem += item =>
                 {
                     _inventoryGrid.DrawPage();
                     UpdateStorageCount();
@@ -158,6 +159,8 @@ namespace FCS_StorageSolutions.AlterraStorage.Mono
 
             MaterialHelpers.ChangeEmissionStrength(ModelPrefab.EmissionControllerMaterial,gameObject,2f);
 
+            UpdateStorageCount();
+
             IsInitialized = true;
         }
 
@@ -176,7 +179,7 @@ namespace FCS_StorageSolutions.AlterraStorage.Mono
                     var size = CraftData.GetItemSize((TechType) arg2);
                     if (Inventory.main.HasRoomFor(size.x,size.y))
                     {
-                        FCS_AlterraHub.Helpers.PlayerInteractionHelper.GivePlayerItem(_storageContainer.RemoveItem((TechType)arg2));
+                        FCS_AlterraHub.Helpers.PlayerInteractionHelper.GivePlayerItem(_storageContainer.ItemsContainer.RemoveItem((TechType)arg2));
                     }
                     break;
             }
@@ -368,7 +371,7 @@ namespace FCS_StorageSolutions.AlterraStorage.Mono
 
         public Pickupable RemoveItemFromContainer(TechType techType, int amount)
         {
-            return _storageContainer.RemoveItem(techType);
+            return _storageContainer.ItemsContainer.RemoveItem(techType);
         }
 
         public Dictionary<TechType, int> GetItemsWithin()
@@ -378,7 +381,7 @@ namespace FCS_StorageSolutions.AlterraStorage.Mono
 
         public bool ContainsItem(TechType techType)
         {
-            return _storageContainer.Contains(techType);
+            return _storageContainer.ItemsContainer.Contains(techType);
         }
 
         public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
@@ -412,7 +415,7 @@ namespace FCS_StorageSolutions.AlterraStorage.Mono
 
         internal void UpdateAmount()
         {
-            var amount = Storage.GetCount((TechType) Tag);
+            var amount = Storage.ItemsContainer.GetCount((TechType) Tag);
             if (amount <= 0)
             {
                 gameObject.SetActive(false);

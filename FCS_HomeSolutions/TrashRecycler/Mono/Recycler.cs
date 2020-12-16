@@ -41,9 +41,10 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
         {
             Controller = mono;
             MaxStorage = maxStorage;
-            _storageContainer = new FCSStorage(maxStorage, GameObjectHelpers.FindGameObject(gameObject, "ProcessingStorageRoot"));
-            _storageContainer.onAddItem += item => { UpdateTracker(); };
-            _storageContainer.onRemoveItem += item => { UpdateTracker(); };
+            _storageContainer = gameObject.AddComponent<FCSStorage>();
+            _storageContainer.Initialize(maxStorage);
+            _storageContainer.ItemsContainer.onAddItem += item => { UpdateTracker(); };
+            _storageContainer.ItemsContainer.onRemoveItem += item => { UpdateTracker(); };
             
         }
 
@@ -110,7 +111,7 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
 
         internal Pickupable RemoveItem(TechType item)
         {
-            var inventoryItem = _storageContainer.RemoveItem(item);
+            var inventoryItem = _storageContainer.ItemsContainer.RemoveItem(item);
             UpdateTracker();
             OnContainerUpdated?.Invoke();
             return inventoryItem;
@@ -148,7 +149,7 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
                         if(techType != TechType.Welder || pickupable.GetTechType() != TechType.Battery)
                         {
                             InventoryItem inventoryItem2 = new InventoryItem(pickupable);
-                            _storageContainer.UnsafeAdd(inventoryItem2);
+                            _storageContainer.ItemsContainer.UnsafeAdd(inventoryItem2);
                         }
                     }
                 }
@@ -177,7 +178,7 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
                         {
                             InventoryItem newInventoryItem = new InventoryItem(ingredientObject.GetComponent<Pickupable>());
                             QuickLogger.Debug($"Message: {newInventoryItem.item.name}", true);
-                            _storageContainer.UnsafeAdd(newInventoryItem);
+                            _storageContainer.ItemsContainer.UnsafeAdd(newInventoryItem);
                         }
                         else
                         {
@@ -192,7 +193,7 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
                                 ingredientObject = Instantiate(getPrefab.GetResult());
                                 InventoryItem newInventoryItem = new InventoryItem(ingredientObject.GetComponent<Pickupable>());
                                 QuickLogger.Debug($"Message: {newInventoryItem.item.name}", true);
-                                _storageContainer.UnsafeAdd(newInventoryItem);
+                                _storageContainer.ItemsContainer.UnsafeAdd(newInventoryItem);
                                 BioMaterials = 0;
                             }
                         }
@@ -296,7 +297,7 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
 
         public int GetCount(TechType techType)
         {
-            return _storageContainer.GetCount(techType);
+            return _storageContainer.ItemsContainer.GetCount(techType);
         }
 
         internal byte[] Save(ProtobufSerializer serializer, TrashRecyclerDataEntry savedData)

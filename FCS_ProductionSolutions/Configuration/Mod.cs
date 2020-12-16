@@ -47,6 +47,14 @@ namespace FCS_ProductionSolutions.Configuration
         internal static string MatterAnalyzerClassName => MatterAnalyzerModName;
         internal static string MatterAnalyzerPrefabName => MatterAnalyzerModName;
 
+        internal const string ReplicatorTabID = "RM";
+        internal const string ReplicatorFriendlyName = "Replicator";
+        internal const string ReplicatorModName = "Replicator";
+        public const string ReplicatorDescription = "A device replicates gasopods and stalker teeth once scanned by the matter analyzer.";
+        internal static string ReplicatorKitClassID => $"{ReplicatorModName}_Kit";
+        internal static string ReplicatorClassName => ReplicatorModName;
+        internal static string ReplicatorPrefabName => "Replica-Fabricator";
+
 
         internal const string DeepDrillerMk3TabID = "DD";
         internal const string DeepDrillerMk3FriendlyName = "Deep Driller MK3";
@@ -56,7 +64,6 @@ namespace FCS_ProductionSolutions.Configuration
         internal const string DeepDrillerMk3PrefabName = "DeepDrillerMK3";
         internal const string DeepDrillerMk3Description = "Let's dig down to the deep down deep dark! A deep driller allows you to collect specific ores from biomes.";
         internal const string SandSpawnableClassID = "Sand_DD";
-
 
         internal static TechType GetSandBagTechType()
         {
@@ -88,7 +95,7 @@ namespace FCS_ProductionSolutions.Configuration
 
         #region Internal Methods
 
-        internal static void Save()
+        internal static void Save(ProtobufSerializer serializer)
         {
             if (!IsSaving())
             {
@@ -101,7 +108,7 @@ namespace FCS_ProductionSolutions.Configuration
                     if (controller.Value.PackageId == ModName)
                     {
                         QuickLogger.Debug($"Saving device: {controller.Value.UnitID}");
-                        ((IFCSSave<SaveData>)controller.Value).Save(newSaveData);
+                        ((IFCSSave<SaveData>)controller.Value).Save(newSaveData,serializer);
                     }
                 }
 
@@ -205,6 +212,25 @@ namespace FCS_ProductionSolutions.Configuration
             }
 
             return new MatterAnalyzerDataEntry() { ID = id };
+        }
+
+        internal static ReplicatorDataEntry GetReplicatorSaveData(string id)
+        {
+            LoadData();
+
+            var saveData = GetSaveData();
+
+            foreach (var entry in saveData.ReplicatorEntries)
+            {
+                if (string.IsNullOrEmpty(entry.ID)) continue;
+
+                if (entry.ID == id)
+                {
+                    return entry;
+                }
+            }
+
+            return new ReplicatorDataEntry() { ID = id };
         }
 
         internal static SaveData GetSaveData()

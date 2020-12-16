@@ -28,21 +28,19 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
             var plantable = item.item.gameObject.GetComponentInChildren<Plantable>();
             var size = plantable.size;
             var grown = plantable.Spawn(_device.transform,true);
-
+            grown.SetActive(false);
             var growingPlant = grown.GetComponent<GrowingPlant>();
 
             if (growingPlant != null)
             {
-                _device.PickPrefab = growingPlant.grownModelPrefab.GetComponentInChildren<PickPrefab>();
+                _device.PickTech = growingPlant.grownModelPrefab.GetComponentInChildren<PickPrefab>()?.pickTech ?? TechType.None;
             }
-
-
-            _device.GrownPlant = grown;
+            GameObject.Destroy(grown);
             _device.Seed = plantable;
             _device.SetScanTime(size);
             OnContainerAddItem?.Invoke(_device,item.item.GetTechType());
             GameObject.Destroy(item.item.gameObject);
-            GameObject.Destroy(item.item.gameObject);
+            
             return true;
         }
 

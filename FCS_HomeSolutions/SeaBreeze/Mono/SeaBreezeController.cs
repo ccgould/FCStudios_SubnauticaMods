@@ -158,7 +158,7 @@ namespace FCS_HomeSolutions.SeaBreeze.Mono
                 NameController.SetCurrentName(GetNewSeaBreezeName());
             }
 
-            MaterialHelpers.ChangeEmissionStrength(ModelPrefab.LUMControllerMaterial, gameObject, 5);
+            MaterialHelpers.ChangeEmissionStrength(ModelPrefab.EmissionControllerMaterial, gameObject, 5);
 
             IsInitialized = true;
         }

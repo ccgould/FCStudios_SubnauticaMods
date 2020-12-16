@@ -94,8 +94,7 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
         public ColorManager ColorManager { get; private set; }
         public DumpContainer DumpContainer { get; private set; }
         public Plantable Seed { get; set; }
-        public PickPrefab PickPrefab { get; set; }
-        public GameObject GrownPlant { get; set; }
+        public TechType PickTech { get; set; }
 
         public override void Initialize()
         {
@@ -235,7 +234,7 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
       
             }
 
-            _pickTechType = PickPrefab != null ? PickPrefab.pickTech : _currentTechType;
+            _pickTechType = PickTech != TechType.None ? PickTech : _currentTechType;
             _isLandPlant = Seed.aboveWater;
             _currentTechType = techType;
 
@@ -290,7 +289,6 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
             _currentTechType = TechType.None;
             //Destroy
             Destroy(_currentSeed);
-            Destroy(GrownPlant);
         }
 
         private void StartScanning()
@@ -311,7 +309,7 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
             if (!Mod.IsSaving())
             {
                 QuickLogger.Info($"Saving {GetPrefabID()}");
-                Mod.Save();
+                Mod.Save(serializer);
                 QuickLogger.Info($"Saved {GetPrefabID()}");
             }
         }

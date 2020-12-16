@@ -22,7 +22,7 @@ namespace FCS_HomeSolutions.Buildables
         internal const string CurtainDecalMaterial = "CurtainPackTemplate_Decal";
         internal static string SpecTexture => $"{Mod.ModName}_S";
         internal static string LUMTexture => $"{Mod.ModName}_E";
-        internal static string LUMControllerMaterial => $"{Mod.ModName}_E_Controller";
+        internal static string EmissionControllerMaterial => $"{Mod.ModName}_E_Controller";
         internal static string NormalTexture => $"{Mod.ModName}_N";
         internal static string DetailTexture => $"{Mod.ModName}_D";
         public static AssetBundle GlobalBundle { get; set; }
@@ -42,6 +42,7 @@ namespace FCS_HomeSolutions.Buildables
         public static GameObject TemplateItem { get; set; }
         public static GameObject TrashRecyclerItemPrefab { get; set; }
         public static GameObject CurtainPrefab { get; set; }
+        public static GameObject AlienChiefPrefab { get; set; }
 
         internal static void Initialize()
         {
@@ -67,6 +68,7 @@ namespace FCS_HomeSolutions.Buildables
             TrashRecyclerPrefab = GetPrefab(Mod.RecyclerPrefabName);
             PaintCanPrefab = GetPrefab(Mod.PaintCanPrefabName);
             QuantumTeleporterPrefab = GetPrefab(Mod.QuantumTeleporterPrefabName);
+            AlienChiefPrefab = GetPrefab(Mod.AlienChiefPrefabName);
             TrashRecyclerItemPrefab = GetPrefab("RecyclerItem");
             SeaBreezeItemPrefab = GetPrefab("ARSItem");
             NetworkItemPrefab = GetPrefab("NetworkItem");
@@ -74,7 +76,9 @@ namespace FCS_HomeSolutions.Buildables
             CurtainPrefab = GetPrefab("Curtain");
             _initialized = true;
         }
-        
+
+       
+
         internal static GameObject GetPrefab(string prefabName)
         {
             try
@@ -128,7 +132,7 @@ namespace FCS_HomeSolutions.Buildables
             MaterialHelpers.ApplySpecShader(BodyMaterial, SpecTexture, prefab, 1, 3f, bundle);
             MaterialHelpers.ApplyEmissionShader(DecalMaterial, LUMTexture, prefab, bundle, Color.white);
             MaterialHelpers.ApplyEmissionShader(DetailsMaterial, LUMTexture, prefab, bundle, Color.white);
-            MaterialHelpers.ApplyEmissionShader(LUMControllerMaterial, LUMTexture, prefab, bundle, Color.white);
+            MaterialHelpers.ApplyEmissionShader(EmissionControllerMaterial, LUMTexture, prefab, bundle, Color.white);
             MaterialHelpers.ApplyAlphaShader(DecalMaterial, prefab);
             MaterialHelpers.ApplyAlphaShader(DetailsMaterial, prefab);
             MaterialHelpers.ApplyAlphaShader(CurtainDecalMaterial, prefab);

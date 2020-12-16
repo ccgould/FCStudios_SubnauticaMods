@@ -7,6 +7,7 @@ using FCS_HomeSolutions.Buildables.OutDoorPlanters;
 using FCS_HomeSolutions.Configuration;
 using FCS_HomeSolutions.Curtains.Mono;
 using FCS_HomeSolutions.MiniFountainFilter.Buildables;
+using FCS_HomeSolutions.Mods.AlienChief.Buildables;
 using FCS_HomeSolutions.QuantumTeleporter.Buildable;
 using FCS_HomeSolutions.SeaBreeze.Buildable;
 using FCS_HomeSolutions.Spawnables;
@@ -111,7 +112,11 @@ namespace FCS_HomeSolutions
             //Patch Quantum Teleporter
             var quantumTeleporter = new QuantumTeleporterBuildable();
             quantumTeleporter.Patch();
-            
+
+            //Patch Alien Chief
+            var alienChief = new AlienChiefBuildable();
+            alienChief.Patch();
+
             LoadOtherObjects();
 
             LoadCurtainTemplates();

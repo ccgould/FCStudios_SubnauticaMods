@@ -23,7 +23,7 @@
     <DefineConstants>TRACE;DEBUG;SUBNAUTICA</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Subnautica_Release|AnyCPU' ">
     <DebugType>none</DebugType>
@@ -32,7 +32,7 @@
     <DefineConstants>TRACE;SUBNAUTICA</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'BelowZero_Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -150,6 +150,7 @@
     <Compile Include="Mono\DumpContainerSimplified.cs" />
     <Compile Include="Mono\FCSAquarium.cs" />
     <Compile Include="Mono\FCSStorage.cs" />
+    <Compile Include="Mono\FCSStorageNonSerialized.cs" />
     <Compile Include="Mono\ObjectPooler\ButtonPool.cs" />
     <Compile Include="Mono\ObjectPooler\ObjectPooler.cs" />
     <Compile Include="Mono\ToggleController.cs" />

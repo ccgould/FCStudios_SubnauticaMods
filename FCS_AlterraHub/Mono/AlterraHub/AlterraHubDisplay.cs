@@ -22,7 +22,20 @@ namespace FCS_AlterraHub.Mono.AlterraHub
         private CartDropDownHandler _cartDropDownManager;
         internal Action<TechType,TechType> onItemAddedToCart;
         private PanelGroup _panelGroup;
+        private AccountPageHandler _accountPageHandler;
+        private Text _cartButtonNumber;
         public Action OnReturnButtonClicked { get; set; }
+
+        private void OnDestroy()
+        {
+            QuickLogger.Debug("Distroying screen",true);
+            _accountPageHandler = null;
+            CardSystem.main.onBalanceUpdated -= OnReturnButtonClicked;
+            onItemAddedToCart -= onItemAddedToCart;
+            _cartDropDownManager.OnBuyAllBtnClick -= OnBuyAllBtnClick;
+            _cartDropDownManager.onTotalChanged -= OnTotalChanged;
+
+        }
 
         internal void Setup(AlterraHubController mono)
         {
@@ -31,12 +44,14 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             if (FindAllComponents())
             {
                 PowerOnDisplay();
-                onItemAddedToCart += (tech, rTech) =>
-                {
-                    _cartDropDownManager?.AddItem(tech,rTech);
-                };
+                onItemAddedToCart += OnItemAddedToCart;
                 CardSystem.main.onBalanceUpdated += OnBalanceUpdated;
             }
+        }
+
+        private void OnItemAddedToCart(TechType tech, TechType rTech)
+        {
+            _cartDropDownManager?.AddItem(tech, rTech);
         }
 
         public override void OnButtonClick(string btnName, object tag)
@@ -75,7 +90,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
                 CreateCartDropDown(_homePage);
 
                 //HomePage
-                new AccountPageHandler(_mono);
+                _accountPageHandler = new AccountPageHandler(_mono);
 
                 //Return Button
                 var returnBTN = GameObjectHelpers.FindGameObject(canvas, "CartReturnIcon").GetComponent<Button>();
@@ -97,7 +112,11 @@ namespace FCS_AlterraHub.Mono.AlterraHub
 
         private void OnBalanceUpdated()
         {
-            _mainTotal.text = CardSystem.main.GetAccountBalance().ToString("n0");
+            //TODO Error Happening possible subscrition issue
+            if (_mainTotal != null && _mainTotal.isActiveAndEnabled)
+            {
+                _mainTotal.text = CardSystem.main.GetAccountBalance().ToString("n0");
+            }
         }
 
         private void CreateCheckOutPopup(GameObject canvas)
@@ -112,25 +131,29 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             var closeBTN = GameObjectHelpers.FindGameObject(homePage, "CloseBTN").GetComponent<Button>();
             closeBTN.onClick.AddListener(() => { _cartDropDownManager.ToggleVisibility(); });
 
-            var cartButtonNumber = GameObjectHelpers.FindGameObject(cartBTNObj, "CartAmount").GetComponentInChildren<Text>();
+            _cartButtonNumber = GameObjectHelpers.FindGameObject(cartBTNObj, "CartAmount").GetComponentInChildren<Text>();
             var cartBTN = cartBTNObj.GetComponent<Button>();
             cartBTN.onClick.AddListener(() => { _cartDropDownManager.ToggleVisibility(); });
             
             var cartDropDown = GameObjectHelpers.FindGameObject(homePage, "CartDropDown");
             _cartDropDownManager = cartDropDown.AddComponent<CartDropDownHandler>();
 
-            _cartDropDownManager.OnBuyAllBtnClick += handler =>
-            {
-                _checkoutDialog.ShowDialog(_mono,_cartDropDownManager);
-                _cartDropDownManager.ToggleVisibility();
-            };
+            _cartDropDownManager.OnBuyAllBtnClick += OnBuyAllBtnClick;
 
-            _cartDropDownManager.onTotalChanged += amount =>
-            {
-                cartButtonNumber.text = _cartDropDownManager.GetCartCount().ToString();
-            };
+            _cartDropDownManager.onTotalChanged += OnTotalChanged;
 
             _cartDropDownManager.Initialize();
+        }
+
+        private void OnTotalChanged(decimal obj)
+        {
+            _cartButtonNumber.text = _cartDropDownManager.GetCartCount().ToString();
+        }
+
+        private void OnBuyAllBtnClick(CartDropDownHandler obj)
+        {
+            _checkoutDialog.ShowDialog(_mono, _cartDropDownManager);
+            _cartDropDownManager.ToggleVisibility();
         }
 
         private void GetDisplayTabs(PanelGroup panelGroup)

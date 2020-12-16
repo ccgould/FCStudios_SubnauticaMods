@@ -244,7 +244,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             if (!Mod.IsSaving())
             {
                 QuickLogger.Info("Saving Drills");
-                Mod.Save();
+                Mod.Save(serializer);
             }
         }
 

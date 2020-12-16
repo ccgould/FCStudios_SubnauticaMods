@@ -45,7 +45,7 @@ namespace FCSDemo.Buildables
                 {
                     //Lets apply the material shader
                     ApplyShaders(prefab, _assetBundle);
-                    QuickLogger.Debug($"{prefabName} Found!");
+                    QuickLogger.Info($"{prefabName} Found!");
                     return prefab;
 
                 }

@@ -35,6 +35,7 @@ namespace FCS_ProductionSolutions.Buildable
         public static GameObject DeepDrillerProgrammingItemPrefab { get; set; }
         public static GameObject DeepDrillerOverrideItemPrefab { get; set; }
         public static GameObject DeepDrillerFunctionOptionItemPrefab { get; set; }
+        public static GameObject ReplicatorPrefab { get; set; }
 
         internal static void Initialize()
         {
@@ -60,6 +61,7 @@ namespace FCS_ProductionSolutions.Buildable
             DeepDrillerProgrammingItemPrefab = GetPrefab("DeepDrillerProgrammingItem");
             DeepDrillerOverrideItemPrefab = GetPrefab("OverrideItem");
             DeepDrillerFunctionOptionItemPrefab = GetPrefab("FunctionOptionItem");
+            ReplicatorPrefab = GetPrefab(Mod.ReplicatorPrefabName);
         }
         
         internal static GameObject GetPrefab(string prefabName)

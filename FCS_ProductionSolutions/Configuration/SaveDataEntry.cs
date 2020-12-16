@@ -24,6 +24,14 @@ namespace FCS_ProductionSolutions.Configuration
         [JsonProperty] internal bool SetBreaker { get; set; }
     }
 
+    internal class ReplicatorDataEntry
+    {
+        [JsonProperty] internal string ID { get; set; }
+        [JsonProperty] internal string SaveVersion { get; set; } = "1.0";
+        [JsonProperty] internal ColorVec4 BodyColor { get; set; }
+        [JsonProperty] internal bool IsVisible { get; set; }
+    }
+
     internal class MatterAnalyzerDataEntry
     {
         [JsonProperty] internal string ID { get; set; }
@@ -76,6 +84,7 @@ namespace FCS_ProductionSolutions.Configuration
         [JsonProperty] internal List<HydroponicHarvesterDataEntry> HydroponicHarvesterEntries = new List<HydroponicHarvesterDataEntry>();
         [JsonProperty] internal List<MatterAnalyzerDataEntry> MatterAnalyzerEntries = new List<MatterAnalyzerDataEntry>();
         [JsonProperty] internal List<DeepDrillerSaveDataEntry> DeepDrillerMk2Entries = new List<DeepDrillerSaveDataEntry>();
+        [JsonProperty] internal List<ReplicatorDataEntry> ReplicatorEntries = new List<ReplicatorDataEntry>();
         [JsonProperty] internal List<DNASampleData> HydroponicHarvesterKnownTech { get; set; } = new List<DNASampleData>();
     }
 }

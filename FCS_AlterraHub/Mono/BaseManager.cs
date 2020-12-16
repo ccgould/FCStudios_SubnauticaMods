@@ -81,16 +81,12 @@ namespace FCS_AlterraHub.Mono
 
         public static BaseManager FindManager(SubRoot subRoot)
         {
-#if DEBUG
-            QuickLogger.Debug($"Processing SubRoot = {subRoot.GetInstanceID()} || Name {subRoot.GetSubName()}");
-#endif
             var baseManager = FindManager(subRoot.gameObject.GetComponentInChildren<PrefabIdentifier>()?.Id);
             return baseManager ?? CreateNewManager(subRoot);
         }
 
         public static BaseManager FindManager(string instanceID)
         {
-            QuickLogger.Debug($"InstanceID: {instanceID} Base Count: {Managers.Count}");
             var manager = Managers.Find(x => x.BaseID == instanceID);
             return manager;
         }
@@ -172,7 +168,6 @@ namespace FCS_AlterraHub.Mono
             {
 
                 _registeredDevices.Add(device.UnitID, device);
-                QuickLogger.Debug($"Registered device: {device.UnitID}", true);
             }
         }
 
@@ -190,9 +185,6 @@ namespace FCS_AlterraHub.Mono
                     {
                         var num = 1f * DayNightCycle.main.dayNightSpeed;
                         Habitat.powerRelay.ConsumeEnergy(device.Value.GetPowerUsage() * num, out float amountConsumed);
-                        QuickLogger.Debug(
-                            $"Base {_baseName} consumed {amountConsumed} || requested {device.Value.GetPowerUsage()} || Device {device.Value.UnitID}",
-                            true);
                     }
                 }
 
@@ -204,7 +196,7 @@ namespace FCS_AlterraHub.Mono
         {
             if (Habitat.powerRelay == null)
             {
-                QuickLogger.Debug("Habitat is null");
+                QuickLogger.DebugError("Habitat is null");
             }
 
             if (!GameModeUtils.RequiresPower()) return true;
@@ -233,10 +225,8 @@ namespace FCS_AlterraHub.Mono
         {
             foreach (KeyValuePair<string, FcsDevice> device in _registeredDevices)
             {
-                QuickLogger.Debug($"Checking registered devices: Device: {device.Key} || Key {tabID}");
                 if (device.Key.StartsWith(tabID, StringComparison.OrdinalIgnoreCase))
                 {
-                    QuickLogger.Debug($"Key Match", true);
                     yield return device.Value;
                 }
             }

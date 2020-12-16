@@ -203,8 +203,8 @@ namespace FCS_AlterraHub.Mono.AlterraHub
                     CardSystem.main.RemoveFinances(totalCash);
                     foreach (CartItem item in cart.GetItems())
                     {
-                        var invType = item.ReceiveTechType.ToInventoryItem();
-                        PlayerInteractionHelper.GivePlayerItem(invType);
+                        QuickLogger.Debug($"{item.ReceiveTechType}",true);
+                        PlayerInteractionHelper.GivePlayerItem(item.ReceiveTechType);
                     }
                 }
 

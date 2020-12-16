@@ -88,8 +88,8 @@ namespace FCS_HomeSolutions.Mono.OutDoorPlanters
         public override void Initialize()
         {
             _colorManager = gameObject.AddComponent<ColorManager>();
-            _colorManager.Initialize(gameObject,ModelPrefab.BodyMaterial,ModelPrefab.SecondaryMaterial,ModelPrefab.LUMControllerMaterial);
-            MaterialHelpers.ChangeEmissionStrength(ModelPrefab.LUMControllerMaterial, gameObject, 5);
+            _colorManager.Initialize(gameObject,ModelPrefab.BodyMaterial,ModelPrefab.SecondaryMaterial,ModelPrefab.EmissionControllerMaterial);
+            MaterialHelpers.ChangeEmissionStrength(ModelPrefab.EmissionControllerMaterial, gameObject, 5);
             IsInitialized = true;
         }
 

@@ -176,6 +176,8 @@
     <Compile Include="HydroponicHarvester\Mono\EffectsManager.cs" />
     <Compile Include="MatterAnalyzer\Mono\MatterAnalyzerController.cs" />
     <Compile Include="MatterAnalyzer\Mono\MatterAnalyzerStorage.cs" />
+    <Compile Include="Mods\Replicator\Buildable\ReplicatorPatcher.cs" />
+    <Compile Include="Mods\Replicator\Mono\ReplicatorController.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -87,7 +87,14 @@ namespace FCS_HomeSolutions.Configuration
         internal const string QuantumTeleporterDescription = "A teleporter that allows you to teleport from one base to another.";
         internal const string QuantumTeleporterPrefabName = "QuantumTeleporter";
         internal static string QuantumTeleporterKitClassID = $"{QuantumTeleporterClassID}_Kit";
-        internal const string QuantumTeleporterTabID = "QT";
+        internal const string QuantumTeleporterTabID = "QT";        
+        
+        internal const string AlienChiefClassID = "AlienChief";
+        internal const string AlienChiefFriendly = "Alien Chief";
+        internal const string AlienChiefDescription = "An easy way to cook surplus of food";
+        internal const string AlienChiefPrefabName = "AlienChief";
+        internal static string AlienChiefKitClassID = $"{AlienChiefClassID}_Kit";
+        internal const string AlienChiefTabID = "AC";
 
         internal const string PaintCanClassID = "PaintCan";
         internal const string PaintCanFriendly = "Paint Can";
@@ -213,6 +220,19 @@ namespace FCS_HomeSolutions.Configuration
             Ingredients =
             {
                 new Ingredient(SmartPlanterPotKitClassID.ToTechType(), 1),
+            }
+        };
+
+#if SUBNAUTICA
+        internal static TechData AlienChiefIngredients => new TechData
+#elif BELOWZERO
+                internal static RecipeData AlienChiefIngredients => new RecipeData
+#endif
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(AlienChiefKitClassID.ToTechType(), 1),
             }
         };
 
@@ -361,6 +381,25 @@ namespace FCS_HomeSolutions.Configuration
             }
 
             return new HoverLiftDataEntry { Id = id };
+        }
+
+        internal static AlienChiefDataEntry GetAlienChiefSaveData(string id)
+        {
+            LoadData();
+
+            var saveData = GetSaveData();
+
+            foreach (var entry in saveData.AlienChiefDataEntries)
+            {
+                if (string.IsNullOrEmpty(entry.Id)) continue;
+
+                if (entry.Id == id)
+                {
+                    return entry;
+                }
+            }
+
+            return new AlienChiefDataEntry { Id = id };
         }
 
         internal static void RegisterPaintTool(PaintToolController paintTool)

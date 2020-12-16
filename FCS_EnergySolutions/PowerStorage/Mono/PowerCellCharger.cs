@@ -77,8 +77,9 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
 
             if (_storageContainer == null)
             {
-                _storageContainer = new FCSStorage(10, GameObjectHelpers.FindGameObject(gameObject, "StorageRoot"));
-                _storageContainer.onAddItem += item =>
+                _storageContainer = gameObject.AddComponent<FCSStorage>();
+                _storageContainer.Initialize(10);
+                _storageContainer.ItemsContainer.onAddItem += item =>
                 {
                     var slot = FindAvailableSlot();
 

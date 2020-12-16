@@ -97,9 +97,6 @@ namespace FCS_StorageSolutions.AlterraStorage.Buildable
 
                 prefab.AddComponent<TechTag>().type = TechType;
                 prefab.AddComponent<AlterraStorageController>();
-
-                //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
-                //MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModName);
                 return prefab;
 
             }

@@ -45,7 +45,10 @@ namespace FCS_AlterraHub.Mono
             return null;
         }
 
-        public abstract Vector3 GetPosition();
+        public virtual Vector3 GetPosition()
+        {
+            return transform.position;
+        }
 
         /// <summary>
         /// The package which this item belongs to

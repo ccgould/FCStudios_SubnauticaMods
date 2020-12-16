@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using FCS_AlterraHub.Registration;
+using FCS_HomeSolutions.Mods.Replicator.Buildables;
 using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.DeepDriller.Buildable;
@@ -44,6 +45,9 @@ namespace FCS_ProductionSolutions
 
             var deepDriller = new FCSDeepDrillerBuildable();
             deepDriller.Patch();
+
+            var replicator = new ReplicatorBuildable();
+            replicator.Patch();
 
             //Register debug commands
             ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));

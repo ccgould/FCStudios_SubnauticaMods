@@ -90,9 +90,9 @@ namespace FCS_AlterraHub.API
 							foreach (FcsDevice fcsDevice in subRoot.GetComponentsInChildren<FcsDevice>())
 							{
 								var storage = fcsDevice.GetStorage();
-								if (storage != null && storage.containerType == ItemsContainerType.Default && fcsDevice.IsConstructed)
+								if (storage != null && storage.ItemsContainer.containerType == ItemsContainerType.Default && fcsDevice.IsConstructed)
 								{
-									list.Add(storage);
+									list.Add(storage.ItemsContainer);
 								}
 							}
 						}
@@ -100,9 +100,9 @@ namespace FCS_AlterraHub.API
 					foreach (FcsDevice fcsDevice in UnityEngine.Object.FindObjectsOfType<FcsDevice>())
 					{
 						FCSStorage storage = fcsDevice.GetStorage();
-						if (storage != null && storage.containerType == ItemsContainerType.Default && (Player.main.transform.position - fcsDevice.GetPosition()).sqrMagnitude < 10000f)
+						if (storage != null && storage.ItemsContainer.containerType == ItemsContainerType.Default && (Player.main.transform.position - fcsDevice.GetPosition()).sqrMagnitude < 10000f)
 						{
-							list.Add(storage);
+							list.Add(storage.ItemsContainer);
 						}
 					}
 				}
@@ -110,9 +110,9 @@ namespace FCS_AlterraHub.API
 				foreach (FcsDevice fcsDevice in array)
 				{
 					FCSStorage storage = fcsDevice.GetStorage();
-					if (storage != null && storage.containerType == ItemsContainerType.Default && fcsDevice.IsConstructed)
+					if (storage != null && storage.ItemsContainer.containerType == ItemsContainerType.Default && fcsDevice.IsConstructed)
 					{
-						list.Add(storage);
+						list.Add(storage.ItemsContainer);
 					}
 				}
 

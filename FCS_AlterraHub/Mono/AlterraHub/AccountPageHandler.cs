@@ -79,10 +79,6 @@ namespace FCS_AlterraHub.Mono.AlterraHub
                 HidePaymentScreen();
             }));
 
-            mono.AlterraHubTrigger.onTriggered += value =>
-            {
-
-            };
 
             SetupFullTitle(_createAccountDialog);
 

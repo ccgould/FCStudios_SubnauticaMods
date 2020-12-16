@@ -187,7 +187,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
             if (!Mod.IsSaving())
             {
                 QuickLogger.Info($"Saving {GetPrefabID()}");
-                Mod.Save();
+                Mod.Save(serializer);
                 QuickLogger.Info($"Saved {GetPrefabID()}");
             }
         }

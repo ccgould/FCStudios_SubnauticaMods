@@ -152,6 +152,8 @@
     <Compile Include="MiniFountainFilter\Managers\PowerManager.cs" />
     <Compile Include="MiniFountainFilter\Managers\TankManager.cs" />
     <Compile Include="MiniFountainFilter\Mono\MiniFountainFilterController.cs" />
+    <Compile Include="Mods\AlienChief\Buildable\AlienChiefPatcher.cs" />
+    <Compile Include="Mods\AlienChief\Mono\AlienChiefController.cs" />
     <Compile Include="Mono\OutDoorPlanters\OutDoorPlanterController.cs" />
     <Compile Include="Mono\PaintTool\PaintToolController.cs" />
     <Compile Include="Patches\Builder_Pathes.cs" />

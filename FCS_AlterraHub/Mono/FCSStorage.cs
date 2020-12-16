@@ -7,11 +7,11 @@ using UnityEngine;
 
 namespace FCS_AlterraHub.Mono
 {
-    public class FCSStorage : ItemsContainer
+    public class FCSStorage : MonoBehaviour
     {
         private GameObject _storageRoot;
         private byte[] _storageRootBytes;
-        
+        public ItemsContainer ItemsContainer;
 
         public byte[] Save(ProtobufSerializer serializer)
         {
@@ -27,20 +27,27 @@ namespace FCS_AlterraHub.Mono
 
         public void RestoreItems(ProtobufSerializer serializer, byte[] serialData)
         {
+            QuickLogger.Debug("RestoreItems");
             StorageHelper.RenewIdentifier(_storageRoot);
+            QuickLogger.Debug("RenewIdentifier Called");
             if (serialData == null)
             {
                 return;
             }
+            
             using (MemoryStream memoryStream = new MemoryStream(serialData))
             {
                 QuickLogger.Debug("Getting Data from memory stream");
-                GameObject gObj = serializer.DeserializeObjectTree(memoryStream, 0);
+                GameObject gObj = serializer.DeserializeObjectTree(memoryStream, 1);
                 QuickLogger.Debug($"Deserialized Object Stream. {gObj}");
                 TransferItems(gObj);
+                QuickLogger.Debug("Items Transfered");
                 GameObject.Destroy(gObj);
+                QuickLogger.Debug("Item destroyed");
             }
         }
+
+
 
         private void TransferItems(GameObject source)
         {
@@ -53,10 +60,11 @@ namespace FCS_AlterraHub.Mono
                     QuickLogger.Debug($"{uniqueIdentifier.Id} is not the source continuing to process");
 
                     Pickupable pickupable = uniqueIdentifier.gameObject.EnsureComponent<Pickupable>();
-                    if (!Contains(pickupable))
+                    if (!ItemsContainer.Contains(pickupable))
                     {
+                        QuickLogger.Debug("Creating new inventory item");
                         InventoryItem item = new InventoryItem(pickupable);
-                        UnsafeAdd(item);
+                        ItemsContainer.UnsafeAdd(item);
                         QuickLogger.Debug($"Adding {uniqueIdentifier.Id}");
 
                     }
@@ -69,7 +77,6 @@ namespace FCS_AlterraHub.Mono
         private void CleanUpDuplicatedStorageNoneRoutine()
         {
             QuickLogger.Debug("Cleaning Duplicates", true);
-            //TODO Check here
 
             Transform hostTransform = _storageRoot.transform;
             StoreInformationIdentifier[] sids = _storageRoot.GetComponentsInChildren<StoreInformationIdentifier>(true);
@@ -93,9 +100,9 @@ namespace FCS_AlterraHub.Mono
         public int GetCount()
         {
             int i = 0;
-            foreach (TechType techType in GetItemTypes())
+            foreach (TechType techType in ItemsContainer.GetItemTypes())
             {
-                foreach (var invItem in GetItems(techType))
+                foreach (var invItem in ItemsContainer.GetItems(techType))
                 {
                     i++;
                 }
@@ -106,22 +113,24 @@ namespace FCS_AlterraHub.Mono
 
         public Dictionary<TechType,int> GetItems()
         {
-            //TODO get items
-            List<TechType> keys = GetItemTypes();
+            List<TechType> keys = ItemsContainer.GetItemTypes();
             var lookup = keys?.Where(x => x != TechType.None).ToLookup(x => x).ToArray();
-            return lookup?.ToDictionary(count => count.Key, count => GetCount(count.Key));
+            return lookup?.ToDictionary(count => count.Key, count => ItemsContainer.GetCount(count.Key));
         }
 
         public bool AddItem(InventoryItem item)
-        { 
-            UnsafeAdd(item);
+        {
+            ItemsContainer.UnsafeAdd(item);
           return true;
         }
 
-        public FCSStorage(int slots, GameObject storageRoot) : base(slots, slots, storageRoot.transform, "FCSStorage", null)
+        public void Initialize(int slots)
         {
-            _storageRoot = storageRoot;
+            _storageRoot = new GameObject("FCSStorage");
+            _storageRoot.transform.parent = transform;
+            UWE.Utils.ZeroTransform(_storageRoot);
+            _storageRoot.AddComponent<StoreInformationIdentifier>();
+            ItemsContainer = new ItemsContainer(slots, slots, _storageRoot.transform, "FCSStorage", null);
         }
     }
-
 }

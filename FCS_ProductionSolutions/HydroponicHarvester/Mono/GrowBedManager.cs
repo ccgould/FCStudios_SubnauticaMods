@@ -10,7 +10,6 @@ using FCS_ProductionSolutions.HydroponicHarvester.Models;
 using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Json.ExtensionMethods;
 using UnityEngine;
 
 namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
@@ -181,17 +180,11 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
 
         public bool AddItemToContainer(InventoryItem item, int slotId)
         {
-            QuickLogger.Debug("1");
             _currentItemTech = item.item.GetTechType();
-            QuickLogger.Debug("2");
             Plantable component = item.item.GetComponent<Plantable>();
-            QuickLogger.Debug("3");
             item.item.SetTechTypeOverride(component.plantTechType);
-            QuickLogger.Debug("4");
             item.isEnabled = false;
-            QuickLogger.Debug("5");
             AddItem(component, slotId);
-            QuickLogger.Debug("6");
             return true;
         }
 

@@ -1,26 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Interfaces;
 using FCSCommon.Utilities;
+using Oculus.Newtonsoft.Json;
 using UnityEngine;
 
 namespace FCS_AlterraHub.Model
 {
     public class FCSGrowingPlant : MonoBehaviour
     {
-        private readonly List<TechType> _invalidAdjustTechTypes = new List<TechType>
+
+        private void SaveSnapShot()
         {
-            TechType.CreepvineSeedCluster,
-            TechType.Creepvine,
-            TechType.CreepvinePiece,
-            TechType.BloodOil,
-            TechType.BloodGrass,
-            TechType.BloodRoot,
-            TechType.BloodVine
-        };
+            if(Mod.HeightRestrictions.ContainsKey(seed.plantTechType)) return;
+            Mod.HeightRestrictions.Add(seed.plantTechType,_y);
+            using (StreamWriter sw = new StreamWriter(@"f:\json.txt"))
+            using (JsonWriter writer = new JsonTextWriter(sw))
+            {
+                _serializer.Serialize(writer, Mod.HeightRestrictions);
+            }
+        }
 
         public void Initialize(GrowingPlant growingPlant, IFCSGrowBed growBed, Vector3 slotBounds,Action<TechType> callback)
         {
+            _serializer = new JsonSerializer();
             _callback = callback;
             _growBed = growBed;
             _slotBounds = slotBounds;
@@ -35,9 +40,8 @@ namespace FCS_AlterraHub.Model
             growingTransform = growingPlant.growingTransform;
 
             grownModelPrefab = growingPlant.grownModelPrefab;
-
-
-            _minScale = !_invalidAdjustTechTypes.Contains(seed.plantTechType) ? Mathf.Clamp(GetMinScale() * 0.3f, 0, 1) : Mathf.Clamp(GetMinScale(), 0, 1);
+            
+            _minScale = Mod.HeightRestrictions.ContainsKey(seed.plantTechType) ? Mod.HeightRestrictions[seed.plantTechType] : 1f;
 
             QuickLogger.Debug($"Setting minScale: {_minScale} || TechType: {seed.plantTechType} || bounds {slotBounds} || Get Minscale: {GetMinScale()}",true);
 
@@ -49,24 +53,6 @@ namespace FCS_AlterraHub.Model
             growthHeight = new AnimationCurve(new Keyframe(0, 0.01f), new Keyframe(1, _minScale));
             growthHeight.SmoothTangents(0, 0.8f);
             growthHeight.SmoothTangents(1, 0.8f);
-
-            growthWidthIndoor = new AnimationCurve(new Keyframe(0, 0.01f), new Keyframe(1, _minScale));
-            growthWidthIndoor.SmoothTangents(0, 0.8f);
-            growthWidthIndoor.SmoothTangents(1, 0.8f);
-
-            growthHeightIndoor = new AnimationCurve(new Keyframe(0, 0.01f), new Keyframe(1, _minScale));
-            growthHeightIndoor.SmoothTangents(0, 0.8f);
-            growthHeightIndoor.SmoothTangents(1, 0.8f);
-
-            growthDuration = growingPlant.growthDuration;
-
-            //growthWidth = growingPlant.growthWidth;
-
-            //growthHeight = growingPlant.growthHeight;
-
-            //growthWidthIndoor = growingPlant.growthWidthIndoor;
-
-            //growthHeightIndoor = growingPlant.growthHeightIndoor;
             
             Destroy(growingPlant);
 
@@ -94,22 +80,22 @@ namespace FCS_AlterraHub.Model
 
         private void OnEnable()
         {
-            this.ShowGrowingTransform();
+            ShowGrowingTransform();
         }
 
         private void OnDisable()
         {
-            this.growingTransform.gameObject.SetActive(false);
+            growingTransform.gameObject.SetActive(false);
         }
 
         private void Update()
         {
-            float progress = this.GetProgress();
-            this.SetScale(this.growingTransform, progress);
-            this.SetPosition(this.growingTransform);
+            float progress = GetProgress();
+            SetScale(growingTransform, progress);
+            SetPosition(growingTransform);
             if (progress == 1f)
             {
-                this.SpawnGrownModel();
+                SpawnGrownModel();
             }
         }
 
@@ -117,40 +103,63 @@ namespace FCS_AlterraHub.Model
         {
             try
             {
-                this.growingTransform.gameObject.SetActive(false);
-                GameObject gameObject = Instantiate<GameObject>(this.grownModelPrefab, this.growingTransform.position,
-                    this.growingTransform.rotation);
-                this.SetScale(gameObject.transform, 1f);
-                if (this.isPickupable)
+                QuickLogger.Debug("1");
+                growingTransform.gameObject.SetActive(false);
+                QuickLogger.Debug("2");
+                GameObject go = Instantiate<GameObject>(grownModelPrefab, growingTransform.position,growingTransform.rotation);
+                QuickLogger.Debug("3");
+                SetScale(go.transform, 1f);
+                QuickLogger.Debug("4");
+                if (isPickupable)
                 {
-                    Plantable component = gameObject.GetComponent<Plantable>();
-                    if (component != null && this.seed.ReplaceSeedByPlant(component))
+                    QuickLogger.Debug("5");
+                    Plantable component = go.GetComponent<Plantable>();
+                    QuickLogger.Debug("6");
+                    if (component != null && seed.ReplaceSeedByPlant(component))
                     {
-                        gameObject.SetActive(false);
+                        QuickLogger.Debug("7");
+                        go.SetActive(false);
+                        QuickLogger.Debug("8");
                         return;
                     }
                 }
-
-                GrownPlant grownPlant = gameObject.AddComponent<GrownPlant>();
-                grownPlant.seed = this.seed;
+                QuickLogger.Debug("9");
+                GrownPlant grownPlant = go.AddComponent<GrownPlant>();
+                QuickLogger.Debug("10");
+                grownPlant.seed = seed;
+                QuickLogger.Debug("11");
                 grownPlant.SendMessage("OnGrown", SendMessageOptions.DontRequireReceiver);
-                gameObject.transform.parent = _growBed.grownPlantsRoot.transform;
-                _growBed.SetupRenderers(gameObject, _growBed.IsInBase());
-                
+                QuickLogger.Debug("12");
+                go.transform.parent = _growBed.grownPlantsRoot.transform;
+                QuickLogger.Debug("13");
+                _growBed.SetupRenderers(go, _growBed.IsInBase());
+                QuickLogger.Debug("14");
+
                 if (seed != null)
                 {
-                    var pickPrefab = gameObject.GetComponentInChildren<PickPrefab>();
+                    QuickLogger.Debug("15");
+                    var pickPrefab = go.GetComponentInChildren<PickPrefab>();
+                    QuickLogger.Debug("16");
                     if (pickPrefab != null)
                     {
+                        QuickLogger.Debug("16.1");
                         QuickLogger.Debug($"Adding {pickPrefab.pickTech.AsString()} to samples", true);
 
                         _callback?.Invoke(pickPrefab.pickTech);
+                        QuickLogger.Debug("17");
                     }
                     else
                     {
-                        QuickLogger.Debug($"Adding {seed.GetComponent<TechTag>().type.AsString()} to samples", true);
-
-                        _callback?.Invoke(seed.GetComponent<TechTag>().type);
+                        QuickLogger.Debug("16.2");
+                        var techTag = seed.GetComponent<TechTag>();
+                        
+                        if(techTag != null)
+                        {
+                            QuickLogger.Debug($"Adding {seed.GetComponent<TechTag>().type.AsString()} to samples", true);
+                            _callback?.Invoke(seed.GetComponent<TechTag>().type);
+                        }
+                        
+                        QuickLogger.Debug("18");
                     }
                 }
             }
@@ -163,97 +172,74 @@ namespace FCS_AlterraHub.Model
         private void ShowGrowingTransform()
         {
             if (growingTransform == null) return;
-            if (this.growingTransform.gameObject.activeSelf)
+            if (growingTransform.gameObject.activeSelf)
             {
                 return;
             }
 
-            this.passYbounds = this.growingTransform.GetComponent<VFXPassYboundsToMat>();
+            passYbounds = growingTransform.GetComponent<VFXPassYboundsToMat>();
 
-            if (this.passYbounds == null)
+            if (passYbounds == null)
             {
-                this.wavingScaler = this.growingTransform.gameObject.EnsureComponent<VFXScaleWaving>();
+                wavingScaler = growingTransform.gameObject.EnsureComponent<VFXScaleWaving>();
             }
 
-            this.growingTransform.gameObject.SetActive(true);
+            growingTransform.gameObject.SetActive(true);
         }
 
         public void SetScale(Transform tr, float progress)
         {
 
-            float num = Mathf.Clamp(this.growthWidth.Evaluate(progress),0,_minScale);
-            float y = Mathf.Clamp(this.growthHeight.Evaluate(progress),0, _minScale);
-            tr.localScale = new Vector3(num, y, num);
-            if (this.passYbounds != null)
+            _num = Mathf.Clamp(growthWidth.Evaluate(progress),0,_minScale);
+            _y = Mathf.Clamp(growthHeight.Evaluate(progress),0, _minScale);
+            tr.localScale = new Vector3(_num, _y, _num);
+            if (passYbounds != null)
             {
-                this.passYbounds.UpdateWavingScale(tr.localScale);
+                passYbounds.UpdateWavingScale(tr.localScale);
                 return;
             }
-            if (this.wavingScaler != null)
+            if (wavingScaler != null)
             {
-                this.wavingScaler.UpdateWavingScale(tr.localScale);
+                wavingScaler.UpdateWavingScale(tr.localScale);
             }
         }
 
         public void SetPosition(Transform tr)
         {
             Vector3 localScale = tr.localScale;
-            Vector3 position = new Vector3(localScale.x * this.positionOffset.x, localScale.y * this.positionOffset.y, localScale.z * this.positionOffset.z);
+            Vector3 position = new Vector3(localScale.x * positionOffset.x, localScale.y * positionOffset.y, localScale.z * positionOffset.z);
             tr.position = base.transform.TransformPoint(position);
-        }
-
-        public void EnableIndoorState()
-        {
-            this.isIndoor = true;
         }
 
         private float GetGrowthDuration()
         {
             float num = NoCostConsoleCommand.main.fastGrowCheat ? 0.01f : 1f;
-            return this.growthDuration * num;
+            return growthDuration * num;
         }
 
         public float GetProgress()
         {
-            if (this.timeStartGrowth == -1f)
+            if (timeStartGrowth == -1f)
             {
-                this.SetProgress(0f);
+                SetProgress(0f);
                 return 0f;
             }
-            return Mathf.Clamp((float)(DayNightCycle.main.timePassed - (double)this.timeStartGrowth) / this.GetGrowthDuration(), 0f, this.maxProgress);
+            return Mathf.Clamp((float)(DayNightCycle.main.timePassed - (double)timeStartGrowth) / GetGrowthDuration(), 0f, maxProgress);
         }
 
         public void SetProgress(float progress)
         {
-            progress = Mathf.Clamp(progress, 0f, this.maxProgress);
-            this.SetScale(this.growingTransform, progress);
-            this.timeStartGrowth = DayNightCycle.main.timePassedAsFloat - this.GetGrowthDuration() * progress;
+            progress = Mathf.Clamp(progress, 0f, maxProgress);
+            SetScale(growingTransform, progress);
+            timeStartGrowth = DayNightCycle.main.timePassedAsFloat - GetGrowthDuration() * progress;
         }
-
-        public void SetMaxHeight(float height)
-        {
-            if (this.heightProgressFactor <= 0f)
-            {
-                return;
-            }
-            if (this.GetProgress() >= this.maxProgress)
-            {
-                this.SetProgress(this.maxProgress);
-            }
-            this.maxProgress = Mathf.Clamp01(height * this.heightProgressFactor);
-        }
-
-
+        
         public float growthDuration = 1200f;
 
         public AnimationCurve growthWidth;
 
         public AnimationCurve growthHeight;
-
-        public AnimationCurve growthWidthIndoor;
-
-        public AnimationCurve growthHeightIndoor;
-
+        
         public Vector3 positionOffset = Vector3.zero;
 
         public float heightProgressFactor;
@@ -270,14 +256,14 @@ namespace FCS_AlterraHub.Model
 
         private float maxProgress = 1f;
 
-        private bool isIndoor;
-
         private VFXPassYboundsToMat passYbounds;
-
         private VFXScaleWaving wavingScaler;
         private IFCSGrowBed _growBed;
         private Vector3 _slotBounds;
         private float _minScale;
         private Action<TechType> _callback;
+        private float _y;
+        private float _num;
+        private JsonSerializer _serializer;
     }
 }

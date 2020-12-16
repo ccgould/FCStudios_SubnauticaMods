@@ -126,7 +126,14 @@ namespace FCS_HomeSolutions.Configuration
         [JsonProperty(PropertyName = "BID")] internal string BaseID { get; set; }
     }
 
-
+    internal class AlienChiefDataEntry
+    {
+        [JsonProperty] internal string Id { get; set; }
+        [JsonProperty(PropertyName = "COL")] internal ColorVec4 Color { get; set; }
+        [JsonProperty(PropertyName = "SCOL")] internal ColorVec4 SecondaryColor { get; set; }
+        [JsonProperty(PropertyName = "BID")] internal string BaseID { get; set; }
+    }
+    
     [Serializable]
     internal class SaveData
     {
@@ -142,5 +149,6 @@ namespace FCS_HomeSolutions.Configuration
         [JsonProperty] internal List<QuantumTeleporterDataEntry> QuantumTeleporterEntries = new List<QuantumTeleporterDataEntry>();
         [JsonProperty] internal List<CurtainDataEntry> CurtainEntries = new List<CurtainDataEntry>();
         [JsonProperty] internal List<BaseOperatorDataEntry> BaseOperatorEntries = new List<BaseOperatorDataEntry>();
+        [JsonProperty] internal List<AlienChiefDataEntry> AlienChiefDataEntries = new List<AlienChiefDataEntry>();
     }
 }
