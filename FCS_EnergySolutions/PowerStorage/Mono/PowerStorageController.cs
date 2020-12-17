@@ -61,7 +61,7 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
                     _powercellSupply.SetAllowedToCharge(false);
                     break;
                 case PowerChargerMode.Auto:
-                    _powercellSupply.SetAllowedToCharge(Manager.GetPower() - _powercellSupply.GetPower() > 0);
+                    _powercellSupply.SetAllowedToCharge(Manager.GetPower() - _powercellSupply.GetPower() > 25);
                     break;
             }
         }
