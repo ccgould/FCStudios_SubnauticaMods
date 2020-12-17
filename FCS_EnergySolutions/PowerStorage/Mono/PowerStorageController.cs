@@ -39,6 +39,11 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
 
         private void Update()
         {
+            if (DayNightCycle.main.deltaTime == 0)
+            {
+                return;
+            }
+
             CheckMode();
         }
 

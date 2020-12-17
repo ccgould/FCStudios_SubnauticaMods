@@ -191,8 +191,10 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
                     {
                         TechType = _currentTechType, 
                         PickType = _pickTechType, 
-                        IsLandPlant = _isLandPlant
+                        IsLandPlant = _isLandPlant,
+                        IsNonePlantable = true
                     });
+
                 }
             }
         }
@@ -223,6 +225,9 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
                     var rg = go.GetComponent<Rigidbody>();
                     if (rg != null) rg.isKinematic = true;
 
+                    var gp = go.GetComponent<GasPod>();
+                    if (gp != null)Destroy(gp);
+
                     go.transform.SetParent(_slot.transform, false);
                     //go.transform.localScale = new Vector3(2.30f, 2.30f, 2.30f);
                     go.transform.localPosition = new Vector3(0f, 0.24f, 0f);
@@ -234,14 +239,21 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
       
             }
 
-            _pickTechType = PickTech != TechType.None ? PickTech : _currentTechType;
-            _isLandPlant = Seed.aboveWater;
-            _currentTechType = techType;
-
+            if (techType == TechType.GasPod || techType == TechType.StalkerTooth)
+            {
+                _pickTechType = techType;
+                _currentTechType = techType;
+            }
+            else
+            {
+                _pickTechType = PickTech != TechType.None ? PickTech : _currentTechType;
+                _isLandPlant = Seed.aboveWater;
+                _currentTechType = techType;
+            }
+            
             StartScanning();
         }
-
-
+        
         private void ScanStopButtonInitialization()
         {
             var scanStopBtnObj = GameObjectHelpers.FindGameObject(gameObject, "Add/ScanBTN");

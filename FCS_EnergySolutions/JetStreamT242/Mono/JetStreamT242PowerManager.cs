@@ -60,45 +60,18 @@ namespace FCS_EnergySolutions.JetStreamT242.Mono
 
         private void ProducePower()
         {
-            //float perSecondDelta = 0f;
-            //if (MaxSpeed > 0)
-            //{
-            //    var decPercentage = (QPatch.JetStreamT242Configuration.PowerPerSecond / MaxSpeed);
-            //    _energyPerSec = (_mono.GetCurrentSpeed() * decPercentage);
-            //    perSecondDelta = _energyPerSec * DayNightCycle.main.deltaTime;
-            //}
-            //else
-            //{
-            //    perSecondDelta = 0;
-            //}
+            if (DayNightCycle.main.deltaTime == 0f)
+            {
+                return;
+            }
 
-            //if (_hasBreakerTripped) return;
-
-            //float num2 = _powerSource.maxPower - _powerSource.power;
-
-            //if (num2 > 0f)
-            //{
-            //    if (num2 < perSecondDelta)
-            //    {
-            //        perSecondDelta = num2;
-            //    }
-            //    _powerSource.AddEnergy(perSecondDelta, out var amountStored);
-            //}
-
-            var energryGen = GenerationAmount * DayNightCycle.main.deltaTime;
-            _inverseLerp = Mathf.Clamp01(Mathf.InverseLerp(25f, 100f, this.temperature));
-            _energyPerSec = energryGen + _inverseLerp;
-            
-            //float amount = 4.1666665f * DayNightCycle.main.deltaTime;
-
-            _powerSource.AddEnergy(_energyPerSec, out float num2);
-            
-            //float amount = this.GetRechargeScalar() * DayNightCycle.main.deltaTime * 40f * WindyMultiplier();
-            //float num;
-            //_powerSource.AddEnergy(amount / 4f, out num);
-
-            //QuickLogger.Debug($" Amount: {amount} || Per Minute: {amount * 60}",true);
-
+            if (GameModeUtils.RequiresPower())
+            {
+                var energryGen = GenerationAmount * DayNightCycle.main.deltaTime;
+                _inverseLerp = Mathf.Clamp01(Mathf.InverseLerp(25f, 100f, this.temperature));
+                _energyPerSec = energryGen + _inverseLerp;
+                _powerSource.AddEnergy(_energyPerSec, out float num2);
+            }
         }
 
         private void QueryTemperature()

@@ -40,11 +40,11 @@ namespace FCS_EnergySolutions.JetStreamT242.Mono
 
             if (_useGlobal)
             {
-                _transform.rotation = Quaternion.RotateTowards(currentRotation, wantedRotation, Time.deltaTime * _speed);
+                _transform.rotation = Quaternion.RotateTowards(currentRotation, wantedRotation, DayNightCycle.main.deltaTime * _speed);
             }
             else
             {
-                _transform.localRotation = Quaternion.RotateTowards(currentRotation, wantedRotation, Time.deltaTime * _speed);
+                _transform.localRotation = Quaternion.RotateTowards(currentRotation, wantedRotation, DayNightCycle.main.deltaTime * _speed);
             }
         }
 

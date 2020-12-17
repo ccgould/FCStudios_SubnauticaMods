@@ -961,7 +961,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
 
         internal void UpdateStatus()
         {
-            _updateStatusTimeLeft -= Time.deltaTime;
+            _updateStatusTimeLeft -= DayNightCycle.main.deltaTime;
             if (_updateStatusTimeLeft <= 0)
             {
                 if (_mono == null || !_mono.IsConstructed || !_mono.IsInitialized) return;

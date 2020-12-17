@@ -11,13 +11,13 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
     {
         private readonly IList<float> _progress = new List<float>(new[] { -1f, -1f, -1f });
         private int _itemCount;
-        private SlotItemTab _trackedTab;
         private ReplicatorController _mono;
-        public bool IsOccupied;
+        public bool IsOccupied => _targetItem != TechType.None;
         private SpeedModes _currentMode;
         private TechType _targetItem;
+        private const int MAXCOUNT = 25;
         internal bool PauseUpdates { get; set; }
-        internal bool NotAllowToGenerate => PauseUpdates || CurrentSpeedMode == SpeedModes.Off || _targetItem == TechType.None || IsFull;
+        internal bool NotAllowToGenerate => _mono == null || !_mono.IsOperational || PauseUpdates || CurrentSpeedMode == SpeedModes.Off || _targetItem == TechType.None || IsFull;
         internal float GenerationProgress
         {
             get => _progress[(int)ClonePhases.Generating];
@@ -43,16 +43,22 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
         {
             _mono = mono;
         }
-
-        private void Test()
-        {
-            ChangeTargetItem(TechType.StalkerTooth);
-        }
-
+        
         internal void ChangeTargetItem(TechType type)
         {
             if (IsOccupied) return;
             _targetItem = type;
+            GenerationProgress = 0;
+            
+        }
+
+        internal float GetPercentageDone()
+        {
+            if(Mathf.Approximately(GenerationProgress,-1f))
+            {
+                return 0f;
+            }
+            return GenerationProgress/QPatch.Configuration.EnergyConsumpion;
         }
 
         private void Update()
@@ -88,24 +94,21 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
             return QPatch.Configuration.EnergyConsumpion / creationTime;
         }
 
-        public void Clear()
-        {
-
-        }
-
         internal bool TryClear()
         {
             if (_itemCount > 0) return false;
-            Clear();
+            _targetItem = TechType.None;
             return true;
         }
 
-        public bool RemoveItem()
+        public bool RemoveItem(out TechType techType)
         {
+            techType = TechType.None;
             if (_itemCount <= 0) return false;
+            techType = _targetItem;
             _itemCount--;
             TryStartingNextClone();
-            _trackedTab?.UpdateCount();
+            _mono.UpdateUI();
             return true;
         }
 
@@ -113,10 +116,10 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
         {
             if(IsFull) return;
             _itemCount++;
-            _trackedTab?.UpdateCount();
+            _mono.UpdateUI();
         }
 
-        public bool IsFull { get; set; }
+        public bool IsFull =>_itemCount >= MAXCOUNT;
 
         internal void SpawnClone()
         {
@@ -151,9 +154,14 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
             _itemCount = amount;
         }
 
-        public SlotItemTab GetTab()
+        public int GetMaxCount()
         {
-            return _trackedTab;
+           return MAXCOUNT;
+        }
+
+        public TechType GetTargetItem()
+        {
+            return _targetItem;
         }
     }
 }

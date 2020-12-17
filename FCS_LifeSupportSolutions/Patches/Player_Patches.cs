@@ -123,7 +123,7 @@ namespace FCS_LifeSupportSolutions.Patches
 
                     if (Player.main.oxygenMgr.GetOxygenAvailable() < DefaultO2Level)
                     {
-                        var amount = _oxygenPerSecond * Time.deltaTime;
+                        var amount = _oxygenPerSecond * DayNightCycle.main.deltaTime;
                         var result = utility.OxygenManager.RemoveOxygen(amount);
 
                         if (result)

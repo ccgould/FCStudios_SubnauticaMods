@@ -271,6 +271,7 @@ namespace FCS_ProductionSolutions.Configuration
             if(IsHydroponicKnownTech(data.TechType, out var sampleData)) return;
             _hydroponicKnownTech.Add(data);
             BaseManager.GlobalNotifyByID(HydroponicHarvesterModTabID,"UpdateDNA");
+            BaseManager.GlobalNotifyByID(ReplicatorTabID,"UpdateDNA");
         }
         public static bool IsHydroponicKnownTech(TechType techType, out DNASampleData data)
         {
@@ -311,5 +312,6 @@ namespace FCS_ProductionSolutions.Configuration
         public TechType TechType { get; set; }
         public TechType PickType { get; set; }
         public bool IsLandPlant { get; set; }
+        public bool IsNonePlantable { get; set; }
     }
 }

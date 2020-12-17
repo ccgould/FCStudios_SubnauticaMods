@@ -84,5 +84,10 @@ namespace FCS_ProductionSolutions.Buildable
         {
             return string.Format(GetLanguage($"{ModKey}_GenerationTimeFormat"), TimeConverters.SecondsToHMS(amount));
         }
+
+        public static string GenerationTimeMinutesOnlyFormat(float amount)
+        {
+            return string.Format(GetLanguage($"{ModKey}_GenerationTimeFormat"), TimeConverters.SecondsToMS(amount));
+        }
     }
 }

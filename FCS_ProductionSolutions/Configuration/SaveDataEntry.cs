@@ -30,6 +30,10 @@ namespace FCS_ProductionSolutions.Configuration
         [JsonProperty] internal string SaveVersion { get; set; } = "1.0";
         [JsonProperty] internal ColorVec4 BodyColor { get; set; }
         [JsonProperty] internal bool IsVisible { get; set; }
+        [JsonProperty] internal TechType TargetItem { get; set; }
+        [JsonProperty] internal float Progress { get; set; }
+        [JsonProperty] internal int ItemCount { get; set; }
+        [JsonProperty] internal SpeedModes Speed { get; set; }
     }
 
     internal class MatterAnalyzerDataEntry

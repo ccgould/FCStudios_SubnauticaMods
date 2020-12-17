@@ -73,6 +73,13 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
                 _runStartUpOnEnable = false;
             }
         }
+
+        public override void OnDestroy()
+        {
+            base.OnDestroy();
+            IPCMessage -= OnIpcMessage;
+        }
+
         #endregion
 
         public override float GetPowerUsage()
@@ -163,16 +170,18 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
 
             MaterialHelpers.ChangeEmissionStrength(ModelPrefab.EmissionControllerMaterial, gameObject, 4f);
 
-            IPCMessage += message =>
-            {
-                if (message.Equals("UpdateDNA"))
-                {
-                    DisplayManager.LoadKnownSamples();
-                    QuickLogger.Debug("Loading DNA Samples");
-                }
-            };
+            IPCMessage += OnIpcMessage;
 
             IsInitialized = true;
+        }
+
+        private void OnIpcMessage(string message)
+        {
+            if (message.Equals("UpdateDNA"))
+            {
+                DisplayManager.LoadKnownSamples();
+                QuickLogger.Debug("Loading DNA Samples");
+            }
         }
 
         private void CheckSystem()

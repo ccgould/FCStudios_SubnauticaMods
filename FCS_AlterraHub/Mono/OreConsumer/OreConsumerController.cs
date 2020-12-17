@@ -89,7 +89,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
         {
             if (_oreQueue != null && IsOperational && _oreQueue.Count > 0)
             {
-                _timeLeft -= Time.deltaTime;
+                _timeLeft -= DayNightCycle.main.deltaTime;
                 if (_timeLeft < 0)
                 {
                     AppendMoney(StoreInventorySystem.GetOrePrice(_oreQueue.Dequeue()));

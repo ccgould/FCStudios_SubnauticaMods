@@ -10,6 +10,9 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
     internal class MatterAnalyzerStorage : IFCSStorage
     {
         private MatterAnalyzerController _device;
+        public Action<int, int> OnContainerUpdate { get; set; }
+        public Action<FcsDevice, TechType> OnContainerAddItem { get; set; }
+        public Action<FcsDevice, TechType> OnContainerRemoveItem { get; set; }
 
         public MatterAnalyzerStorage(MatterAnalyzerController device)
         {
@@ -18,6 +21,7 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
 
         public int GetContainerFreeSpace => 1;
         public bool IsFull => false;
+
         public bool CanBeStored(int amount, TechType techType)
         {
             return false;
@@ -26,27 +30,44 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
         public bool AddItemToContainer(InventoryItem item)
         {
             var plantable = item.item.gameObject.GetComponentInChildren<Plantable>();
-            var size = plantable.size;
-            var grown = plantable.Spawn(_device.transform,true);
-            grown.SetActive(false);
-            var growingPlant = grown.GetComponent<GrowingPlant>();
-
-            if (growingPlant != null)
-            {
-                _device.PickTech = growingPlant.grownModelPrefab.GetComponentInChildren<PickPrefab>()?.pickTech ?? TechType.None;
-            }
-            GameObject.Destroy(grown);
-            _device.Seed = plantable;
-            _device.SetScanTime(size);
-            OnContainerAddItem?.Invoke(_device,item.item.GetTechType());
-            GameObject.Destroy(item.item.gameObject);
             
+            if (plantable != null)
+            {
+                var size = plantable.size;
+                var grown = plantable.Spawn(_device.transform, true);
+                grown.SetActive(false);
+                var growingPlant = grown.GetComponent<GrowingPlant>();
+
+                if (growingPlant != null)
+                {
+                    _device.PickTech = growingPlant.grownModelPrefab.GetComponentInChildren<PickPrefab>()?.pickTech ?? TechType.None;
+                }
+
+                GameObject.Destroy(grown);
+                _device.Seed = plantable;
+                _device.SetScanTime(size);
+                OnContainerAddItem?.Invoke(_device, item.item.GetTechType());
+            }
+            else
+            {
+                _device.SetScanTime(Plantable.PlantSize.Large);
+                OnContainerAddItem?.Invoke(_device, item.item.GetTechType());
+            }
+
+            GameObject.Destroy(item.item.gameObject);
+
             return true;
         }
 
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
         {
-            return !Mod.IsHydroponicKnownTech(pickupable.GetTechType(),out var data) && 
+            var techType = pickupable.GetTechType();
+            if (techType == TechType.StalkerTooth || techType == TechType.GasPod)
+            {
+                return true;
+            }
+
+            return !Mod.IsHydroponicKnownTech(techType, out var data) && 
                    _device.DumpContainer.GetCount() != 1 && 
                    pickupable.gameObject.GetComponentInChildren<Plantable>() != null;
         }
@@ -66,9 +87,6 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
             return null;
         }
 
-        public Action<int, int> OnContainerUpdate { get; set; }
-        public Action<FcsDevice, TechType> OnContainerAddItem { get; set; }
-        public Action<FcsDevice, TechType> OnContainerRemoveItem { get; set; }
         public bool ContainsItem(TechType techType)
         {
             return false;

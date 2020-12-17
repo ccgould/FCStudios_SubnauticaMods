@@ -81,14 +81,14 @@ namespace FCS_AlterraHub.Model
                     activeState = false;
                 }
             }
-            target.alpha = Mathf.Clamp01(target.alpha + alpha * Time.deltaTime);
+            target.alpha = Mathf.Clamp01(target.alpha + alpha * DayNightCycle.main.deltaTime);
             if (lookAtCamera)
             {
                 if (activeState)
                     targetRotation = Quaternion.LookRotation(activator.position - transform.position);
                 else
                     targetRotation = originRotation;
-                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, DayNightCycle.main.deltaTime);
             }
         }
 

@@ -80,7 +80,7 @@ namespace FCS_HomeSolutions.SeaBreeze.Mono
                 {
                     if (_connectedRelay.GetPower() >= batteryChargePull)
                     {
-                        _chargeTimer -= Time.deltaTime;
+                        _chargeTimer -= DayNightCycle.main.deltaTime;
 
                         if (_chargeTimer < 0)
                         {

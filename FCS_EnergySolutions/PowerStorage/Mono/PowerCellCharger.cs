@@ -132,7 +132,7 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
             PowerRelay powerRelay = PowerSource.FindRelay(transform);
             AddPowerSource(_powerSupply);
 
-            if (Time.deltaTime == 0f ||!_allowedToCharge)
+            if (DayNightCycle.main.deltaTime == 0f ||!_allowedToCharge)
 			{
 				return;
 			}

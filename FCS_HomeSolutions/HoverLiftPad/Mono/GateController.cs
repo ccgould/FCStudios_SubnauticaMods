@@ -27,7 +27,7 @@ namespace FCS_HomeSolutions.HoverLiftPad.Mono
         {
             var currentRotation = transform.localRotation;
             var wantedRotation = Quaternion.Euler(currentRotation.x, _targetRotation, currentRotation.z);
-            transform.localRotation = Quaternion.RotateTowards(currentRotation, wantedRotation, Time.deltaTime * RotateTime);
+            transform.localRotation = Quaternion.RotateTowards(currentRotation, wantedRotation, DayNightCycle.main.deltaTime * RotateTime);
 
             if (transform.localRotation == wantedRotation)
             {
