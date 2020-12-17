@@ -2,6 +2,7 @@
 using FCS_StorageSolutions.AlterraStorage.Buildable;
 using FCS_StorageSolutions.Configuration;
 using FCSCommon.Utilities;
+using HarmonyLib;
 using QModManager.API.ModLoading;
 using SMLHelper.V2.Handlers;
 

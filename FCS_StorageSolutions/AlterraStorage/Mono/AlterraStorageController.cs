@@ -48,6 +48,7 @@ namespace FCS_StorageSolutions.AlterraStorage.Mono
         private void Start()
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.AlterraStorageTabID, Mod.ModName);
+            _storageContainer.CleanUpDuplicatedStorageNoneRoutine();
         }
 
         private void Update()
@@ -72,7 +73,6 @@ namespace FCS_StorageSolutions.AlterraStorage.Mono
                     }
 
                     _colorManager.ChangeColor(_savedData.BodyColor.Vector4ToColor(), ColorTargetMode.Both);
-                    _storageContainer.RestoreItems(_serializer,_savedData.Data);
                 }
 
                 _runStartUpOnEnable = false;
@@ -269,6 +269,11 @@ namespace FCS_StorageSolutions.AlterraStorage.Mono
                 ReadySaveData();
             }
 
+            if (!IsInitialized)
+            {
+                Initialize();
+            }
+            _storageContainer.RestoreItems(_serializer, _savedData.Data);
             _isFromSave = true;
         }
 

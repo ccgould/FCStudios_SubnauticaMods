@@ -35,6 +35,8 @@ namespace FCS_AlterraHub.Mono
                 return;
             }
             
+            QuickLogger.Debug($"Storage root Position: {_storageRoot.transform.position}");
+
             using (MemoryStream memoryStream = new MemoryStream(serialData))
             {
                 QuickLogger.Debug("Getting Data from memory stream");
@@ -47,14 +49,13 @@ namespace FCS_AlterraHub.Mono
             }
         }
 
-
-
         private void TransferItems(GameObject source)
         {
             QuickLogger.Debug("Attempting to transfer items");
+
             foreach (UniqueIdentifier uniqueIdentifier in source.GetComponentsInChildren<UniqueIdentifier>(true))
             {
-                QuickLogger.Debug($"Processing {uniqueIdentifier.Id}");
+                QuickLogger.Debug($"Processing {uniqueIdentifier.Id} :Position: {uniqueIdentifier.transform.position}: Parent: {uniqueIdentifier.transform.parent} Parent transform: {uniqueIdentifier.transform.parent.position}");
                 if (!(uniqueIdentifier.transform.parent != source.transform))
                 {
                     QuickLogger.Debug($"{uniqueIdentifier.Id} is not the source continuing to process");
@@ -64,9 +65,20 @@ namespace FCS_AlterraHub.Mono
                     {
                         QuickLogger.Debug("Creating new inventory item");
                         InventoryItem item = new InventoryItem(pickupable);
+                        QuickLogger.Debug($"Is Active and Enabled: {item.item.gameObject.GetComponent<UniqueIdentifier>().isActiveAndEnabled}");
+                        var h = item.item.gameObject.GetComponentsInChildren<UniqueIdentifier>(true);
+                        foreach (var identifier in h)
+                        {
+                            identifier.Id = Guid.NewGuid().ToString();
+                        }
+                        
+                        item.item.transform.parent = _storageRoot.transform;
+
+                        QuickLogger.Debug($"Object posiiton = {item.item.transform.position}");
+
+                        QuickLogger.Debug($"ItemsContainer position: {ItemsContainer.tr.position}");
                         ItemsContainer.UnsafeAdd(item);
                         QuickLogger.Debug($"Adding {uniqueIdentifier.Id}");
-
                     }
                 }
             }
@@ -74,12 +86,11 @@ namespace FCS_AlterraHub.Mono
             CleanUpDuplicatedStorageNoneRoutine();
         }
 
-        private void CleanUpDuplicatedStorageNoneRoutine()
+        public void CleanUpDuplicatedStorageNoneRoutine()
         {
             QuickLogger.Debug("Cleaning Duplicates", true);
 
-            Transform hostTransform = _storageRoot.transform;
-            StoreInformationIdentifier[] sids = _storageRoot.GetComponentsInChildren<StoreInformationIdentifier>(true);
+            StoreInformationIdentifier[] sids = gameObject.GetComponentsInChildren<StoreInformationIdentifier>(true);
 #if DEBUG
             QuickLogger.Debug($"SIDS: {sids.Length}", true);
 #endif
@@ -128,7 +139,7 @@ namespace FCS_AlterraHub.Mono
         {
             _storageRoot = new GameObject("FCSStorage");
             _storageRoot.transform.parent = transform;
-            UWE.Utils.ZeroTransform(_storageRoot);
+            //UWE.Utils.ZeroTransform(_storageRoot);
             _storageRoot.AddComponent<StoreInformationIdentifier>();
             ItemsContainer = new ItemsContainer(slots, slots, _storageRoot.transform, "FCSStorage", null);
         }

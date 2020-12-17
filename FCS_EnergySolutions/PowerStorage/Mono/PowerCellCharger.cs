@@ -422,6 +422,7 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
 
         public bool HasPowerCells()
         {
+            if (Batteries == null) return false;
             return Batteries.Any(x => x.Value != null);
         }
     }
