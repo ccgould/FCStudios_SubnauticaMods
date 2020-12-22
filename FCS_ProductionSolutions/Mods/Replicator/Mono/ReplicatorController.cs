@@ -25,7 +25,6 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
         private bool _runStartUpOnEnable;
         private bool _fromSave;
         private ReplicatorDataEntry _saveData;
-        private ColorManager _colorManager;
         private ReplicatorSlot _replicatorSlot;
         private List<TechType> _loadedDNASamples;
         private GameObject _samplesGrid;
@@ -65,7 +64,7 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
 
             if (_fromSave)
             {
-                _colorManager.ChangeColor(_saveData.BodyColor.Vector4ToColor());
+                _colorManager.ChangeColor(_saveData.Body.Vector4ToColor());
                 
                 _speedBTN.SetSpeedMode(_saveData.Speed);
                 _replicatorSlot.CurrentSpeedMode = _saveData.Speed;
@@ -99,7 +98,7 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
 
             foreach (var sample in knownSamples)
             {
-                if (sample.TechType == TechType.None || _loadedDNASamples.Contains(sample.TechType) || !sample.IsNonePlantable) continue;
+                if (sample.TechType == TechType.None || _loadedDNASamples.Contains(sample.TechType) || !Mod.IsNonePlantableAllowedList.Contains(sample.TechType)) continue;
                 var button = GameObject.Instantiate(ModelPrefab.HydroponicDNASamplePrefab).AddComponent<InterfaceButton>();
                 var icon = GameObjectHelpers.FindGameObject(button.gameObject, "Icon").AddComponent<uGUI_Icon>();
                 icon.sprite = SpriteManager.Get(sample.TechType);
@@ -149,8 +148,10 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
         public override void Initialize()
         {
             var canvas = gameObject.GetComponentInChildren<Canvas>().gameObject;
+            
             var prxy = canvas.EnsureComponent<ProximityActivate>();
             prxy.Initialize(canvas, gameObject, 2);
+            
             _samplesGrid = GameObjectHelpers.FindGameObject(gameObject, "Grid");
             _techTypeIcon = GameObjectHelpers.FindGameObject(gameObject, "CurrentTechTypeIcon").EnsureComponent<uGUI_Icon>();
             _techTypeIcon.sprite = SpriteManager.Get(TechType.None);
@@ -158,6 +159,7 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
             _powerUsagePerSecond = GameObjectHelpers.FindGameObject(gameObject, "PowerUsagePerSecond").GetComponent<Text>();
             _containerAmount = GameObjectHelpers.FindGameObject(gameObject, "Amount").GetComponent<Text>();
             _spawnPoint = GameObjectHelpers.FindGameObject(gameObject, "SpawnPnt");
+            
             var bobbing = _spawnPoint.AddComponent<Bobbing>();
             bobbing.SetState(true);
 
@@ -168,8 +170,7 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
             var clearBTNObj = InterfaceHelpers.FindGameObject(gameObject, "RemoveDNABTN");
             InterfaceHelpers.CreateButton(clearBTNObj, "ClearBtn", InterfaceButtonMode.Background,
                 OnButtonClick, Color.gray, Color.white, 5);
-
-
+            
             if (_colorManager == null)
             {
                 _colorManager = gameObject.AddComponent<ColorManager>();
@@ -232,6 +233,7 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
         private void OnIpcMessage(string message)
         {
             QuickLogger.Debug($"Recieving Message: {message}",true);
+            
             if (message.Equals("UpdateDNA"))
             {
                 LoadKnownSamples();
@@ -371,7 +373,7 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
                 _saveData = new ReplicatorDataEntry();
             }
             _saveData.ID = id;
-            _saveData.BodyColor = _colorManager.GetColor().ColorToVector4();
+            _saveData.Body = _colorManager.GetColor().ColorToVector4();
             _saveData.TargetItem = _replicatorSlot.GetTargetItem();
             _saveData.Progress = _replicatorSlot.GenerationProgress;
             _saveData.Speed = _replicatorSlot.CurrentSpeedMode;

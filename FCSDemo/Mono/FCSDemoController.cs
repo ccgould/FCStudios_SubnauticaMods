@@ -19,7 +19,6 @@ namespace Mono
         private FCSAquarium _fcsAquarium;
 
         public string Name => gameObject.name;
-        public ColorManager ColorManager { get; private set; }
         public override bool IsInitialized { get; set; }
 
         private void OnEnable()
@@ -37,38 +36,43 @@ namespace Mono
         public override void Initialize()
         {
             QuickLogger.Info("Initializing",true);
-            if (ColorManager == null)
+            
+            if (_colorManager == null)
             {
                 QuickLogger.Info($"Creating Color Component", true);
-                ColorManager = gameObject.AddComponent<ColorManager>();
-                ColorManager.Initialize(gameObject,FCSDemoModel.BodyMaterial,FCSDemoModel.SecondaryMaterial);
-                QuickLogger.Info($"Color Component: {ColorManager}", true);
-            }
+                _colorManager = gameObject.AddComponent<ColorManager>();
+                _colorManager.Initialize(gameObject,FCSDemoModel.BodyMaterial,FCSDemoModel.SecondaryMaterial,FCSDemoModel.EmissiveControllerMaterial);
 
-            if (_fcsAquarium == null && QPatch.Configuration.HasAquarium)
-            {
-                var storageRoot = GameObjectHelpers.FindGameObject(gameObject, "StorageRoot");
-                _fcsAquarium = gameObject.AddComponent<FCSAquarium>();
-                _fcsAquarium.Initialize(storageRoot, new[] { TechType.Peeper, TechType.GarryFish, TechType.Bladderfish, TechType.HoleFish });
-            }
-
-            if (QPatch.Configuration.AddPlants)
-            {
-                var plantSpawns = GameObjectHelpers.FindGameObject(gameObject, "spawn_pnt");
-
-                if (plantSpawns != null)
+                if (QPatch.Configuration.ControlEmissionStrength)
                 {
-                    foreach (Transform plantGo in plantSpawns.transform)
-                    {
-                        var name = plantGo.gameObject.name;
-
-                        if (SpawnHelper.ContainsPlant(name))
-                        {
-                            SpawnHelper.SpawnAtPoint(name, plantGo);
-                        }
-                    }
+                    MaterialHelpers.ChangeEmissionStrength(FCSDemoModel.EmissiveControllerMaterial, gameObject, QPatch.Configuration.EmissionStrength);
                 }
             }
+
+            //if (_fcsAquarium == null && QPatch.Configuration.HasAquarium)
+            //{
+            //    var storageRoot = GameObjectHelpers.FindGameObject(gameObject, "StorageRoot");
+            //    _fcsAquarium = gameObject.AddComponent<FCSAquarium>();
+            //    _fcsAquarium.Initialize(storageRoot, new[] { TechType.Peeper, TechType.GarryFish, TechType.Bladderfish, TechType.HoleFish });
+            //}
+
+            //if (QPatch.Configuration.AddPlants)
+            //{
+            //    var plantSpawns = GameObjectHelpers.FindGameObject(gameObject, "spawn_pnt");
+
+            //    if (plantSpawns != null)
+            //    {
+            //        foreach (Transform plantGo in plantSpawns.transform)
+            //        {
+            //            var name = plantGo.gameObject.name;
+
+            //            if (SpawnHelper.ContainsPlant(name))
+            //            {
+            //                SpawnHelper.SpawnAtPoint(name, plantGo);
+            //            }
+            //        }
+            //    }
+            //}
             QuickLogger.Info("Initialized", true);
         }
 
@@ -127,7 +131,23 @@ namespace Mono
         public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
         {
             QuickLogger.Info($"Changing material {FCSDemoModel.BodyMaterial} color to {ColorList.GetName(color)}",true);
-            return ColorManager.ChangeColor(color, mode);
+            
+            var result = _colorManager.ChangeColor(color, mode);
+
+            if(result && mode == ColorTargetMode.Emission)
+            {
+                var lights = gameObject.GetComponentsInChildren<Light>();
+                if (lights != null)
+                {
+                    foreach (Light light in lights)
+                    {
+                        light.color = color;
+                    }
+                }
+            }
+
+            return result;
+
         }
     }
 }

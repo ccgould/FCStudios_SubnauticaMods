@@ -52,6 +52,14 @@ namespace FCS_HomeSolutions.Configuration
             { $"{ModKey}_Coordinates","Coordinates"},
             { $"{ModKey}_CurtainInteractionFormat","Press {0} to change curtain pattern."},
             { $"{ModKey}_TeleportCanceledMessage","Something went wrong with the teleport sequence canceled operation for your safety."},
+            { $"{ModKey}_IngredientsFormat","Ingredients: {0}"},
+            { $"{ModKey}_CookedFoods","Cooked Foods"},
+            { $"{ModKey}_CuredFoods","Cured Foods"},
+            { $"{ModKey}_Order","ORDER"},
+            { $"{ModKey}_NothingToCook","Nothing to cook"},
+            { $"{ModKey}_CookerInventoryFull","Alien Chef inventory is full canceling"},
+            { $"{ModKey}_ClickToRotate","Click to rotate"},
+            { $"{ModKey}_PressToToggleLight","Press {0} to toggle led light."},
         };
 
         internal static void AdditionalPatching()
@@ -266,6 +274,46 @@ namespace FCS_HomeSolutions.Configuration
         {
             return string.Format(GetLanguage($"{ModKey}_CurtainInteractionFormat"), key);
 
+        }
+
+        public static string IngredientsFormat(string ingredients)
+        {
+            return string.Format(GetLanguage($"{ModKey}_IngredientsFormat"), ingredients);
+        }
+
+        public static string CookedFoods()
+        {
+            return GetLanguage($"{ModKey}_CookedFoods");
+        }
+
+        public static string CuredFoods()
+        {
+            return GetLanguage($"{ModKey}_CuredFoods");
+        }
+
+        public static string Order()
+        {
+            return GetLanguage($"{ModKey}_Order");
+        }
+
+        public static string CookerInventoryFull()
+        {
+            return GetLanguage($"{ModKey}_CookerInventoryFull");
+        }
+
+        public static string NothingToCook()
+        {
+            return GetLanguage($"{ModKey}_NothingToCook");
+        }
+
+        public static string ClickToRotate()
+        {
+            return GetLanguage($"{ModKey}_ClickToRotate");
+        }
+        
+        public static string PressToToggleLightFormat(string message)
+        {
+            return string.Format(GetLanguage($"{ModKey}_PressToToggleLight"),message);
         }
     }
 }

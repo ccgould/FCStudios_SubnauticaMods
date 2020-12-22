@@ -28,7 +28,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Buildable
             {
                 var deepDrillerMk2Kit = new FCSKit(Mod.DeepDrillerMk3KitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 deepDrillerMk2Kit.Patch();
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, deepDrillerMk2Kit.TechType, 30000, StoreCategory.Production);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, deepDrillerMk2Kit.TechType, 55000, StoreCategory.Production);
                 AdditionalPatching();
             };
         }

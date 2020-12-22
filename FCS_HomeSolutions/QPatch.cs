@@ -115,11 +115,13 @@ namespace FCS_HomeSolutions
             quantumTeleporter.Patch();
 
             //Patch Alien Chief
-            var alienChief = new AlienChiefBuildable();
+            var alienChief = new AlienChefBuildable();
             alienChief.Patch();
 
             LoadOtherObjects();
 
+            LoadLights();
+            
             LoadCurtainTemplates();
 
             LoadCabinets();
@@ -129,6 +131,63 @@ namespace FCS_HomeSolutions
             
             //Register debug commands
             ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));
+        }
+
+        private void LoadLights()
+        {
+            var longLight = new LedLightPatch(new LedLightData
+            {
+                classId = "LedLightStickLong",
+                description = "A long led light stick for external use on your base exterior with color changing.",
+                friendlyName = "Long Led Light Stick",
+                allowedInBase = true,
+                allowedInSub = false,
+                allowedOnGround = true,
+                allowedOnWall = false,
+                allowedOutside = true,
+                categoryForPDA = TechCategory.ExteriorModule,
+                groupForPda = TechGroup.ExteriorModules,
+                size = new Vector3(1.653859f, 0.1378375f, 0.07659748f),
+                center = new Vector3(0f, 0f, 0.09088595f),
+                prefab = ModelPrefab.LedLightLongPrefab
+            });
+            longLight.Patch();
+
+            var shortLight = new LedLightPatch(new LedLightData
+            {
+                classId = "LedLightStickShort",
+                description = "A long led light stick for external use on your base exterior with color changing.",
+                friendlyName = "Short Led Light Stick",
+                allowedInBase = true,
+                allowedInSub = true,
+                allowedOnGround = true,
+                allowedOnWall = false,
+                allowedOutside = true,
+                categoryForPDA = TechCategory.Misc,
+                groupForPda = TechGroup.Miscellaneous,
+                size = new Vector3(0.1145213f, 1.667081f, 0.1145213f),
+                center = new Vector3(0f, 1.09443f, 0f),
+                prefab = ModelPrefab.LedLightShortPrefab
+            });
+            shortLight.Patch();
+
+            var wallLight = new LedLightPatch(new LedLightData
+            {
+                classId = "LedLightStickWall",
+                description = "A wall mountable led light strip for internal use on your base exterior with color changing.",
+                friendlyName = "Wall Mountable Led Light Strip",
+                allowedInBase = true,
+                allowedInSub = true,
+                allowedOnGround = false,
+                allowedOnWall = true,
+                allowedOutside = false,
+                categoryForPDA = TechCategory.InteriorModule,
+                groupForPda = TechGroup.InteriorModules,
+                size = new Vector3(0.1145213f, 1.663376f, 0.04982199f),
+                center = new Vector3(0f, -0.01005119f, 0.08844218f),
+                prefab = ModelPrefab.LedLightWallPrefab
+            });
+            wallLight.Patch();
         }
 
         private void LoadOtherObjects()

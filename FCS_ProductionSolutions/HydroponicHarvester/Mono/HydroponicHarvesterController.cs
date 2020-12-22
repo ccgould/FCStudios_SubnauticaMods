@@ -28,7 +28,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
         public EffectsManager EffectsManager => _effectsManager;
         public AudioManager AudioManager { get; private set; }
         public Action<bool> onUpdateSound { get; private set; }
-        public ColorManager ColorManager { get; private set; }
+
         public GrowBedManager GrowBedManager { get; set; }
         public override bool IsOperational => IsOperationalCheck();
         
@@ -56,7 +56,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
                         ReadySaveData();
                     }
 
-                    ColorManager.ChangeColor(_savedData.BodyColor.Vector4ToColor(), ColorTargetMode.Both);
+                    _colorManager.ChangeColor(_savedData.Body.Vector4ToColor(), ColorTargetMode.Both);
                     DisplayManager.SetSpeedGraphic(_savedData.SpeedMode);
                     if (_savedData.SetBreaker)
                     {
@@ -142,10 +142,10 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
                 GrowBedManager.Initialize(this);
             }
 
-            if (ColorManager == null)
+            if (_colorManager == null)
             {
-                ColorManager = gameObject.AddComponent<ColorManager>();
-                ColorManager.Initialize(gameObject, ModelPrefab.BodyMaterial);
+                _colorManager = gameObject.AddComponent<ColorManager>();
+                _colorManager.Initialize(gameObject, ModelPrefab.BodyMaterial);
             }
 
             if (EffectsManager == null)
@@ -268,7 +268,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
             }
 
             _savedData.ID = GetPrefabID();
-            _savedData.BodyColor = ColorManager.GetColor().ColorToVector4();
+            _savedData.Body = _colorManager.GetColor().ColorToVector4();
             _savedData.IsInBase = _isInBase;
             _savedData.SpeedMode = GrowBedManager.GetCurrentSpeedMode();
             _savedData.SetBreaker = EffectsManager.GetBreakerState();
@@ -279,7 +279,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
 
         public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
         {
-            return ColorManager.ChangeColor(color, mode);
+            return _colorManager.ChangeColor(color, mode);
         }
 
         public bool HasPowerToConsume()

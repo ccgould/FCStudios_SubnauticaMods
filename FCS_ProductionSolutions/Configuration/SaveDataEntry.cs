@@ -15,7 +15,7 @@ namespace FCS_ProductionSolutions.Configuration
     {
         [JsonProperty] internal string ID { get; set; }
         [JsonProperty] internal string SaveVersion { get; set; } = "1.0";
-        [JsonProperty] internal ColorVec4 BodyColor { get; set; }
+        [JsonProperty] internal Vec4 Body { get; set; }
         [JsonProperty] internal Dictionary<TechType, int> Storage { get; set; }
         [JsonProperty] internal bool IsVisible { get; set; }
         [JsonProperty] internal bool IsInBase { get; set; }
@@ -28,7 +28,7 @@ namespace FCS_ProductionSolutions.Configuration
     {
         [JsonProperty] internal string ID { get; set; }
         [JsonProperty] internal string SaveVersion { get; set; } = "1.0";
-        [JsonProperty] internal ColorVec4 BodyColor { get; set; }
+        [JsonProperty] internal Vec4 Body { get; set; }
         [JsonProperty] internal bool IsVisible { get; set; }
         [JsonProperty] internal TechType TargetItem { get; set; }
         [JsonProperty] internal float Progress { get; set; }
@@ -40,12 +40,15 @@ namespace FCS_ProductionSolutions.Configuration
     {
         [JsonProperty] internal string ID { get; set; }
         [JsonProperty] internal string SaveVersion { get; set; } = "1.0";
-        [JsonProperty] internal ColorVec4 BodyColor { get; set; }
+        [JsonProperty] internal Vec4 Body { get; set; }
         [JsonProperty] internal Dictionary<TechType, int> Storage { get; set; }
         [JsonProperty] internal bool IsVisible { get; set; }
         [JsonProperty] internal TechType CurrentTechType { get; set; }
         [JsonProperty] internal float CurrentScanTime { get; set; }
         [JsonProperty] internal float CurrentMaxScanTime { get; set; }
+        [JsonProperty] internal TechType PickTechType { get; set; }
+        [JsonProperty] internal bool IsLandPlant { get; set; }
+        [JsonProperty] internal bool Reset { get; set; }
     }
 
     [Serializable]
@@ -71,14 +74,14 @@ namespace FCS_ProductionSolutions.Configuration
 
         [JsonProperty] internal bool SolarExtended { get; set; }
 
-        [JsonProperty] internal ColorVec4 BodyColor { get; set; }
+        [JsonProperty] internal Vec4 Body { get; set; }
 
         [JsonProperty] internal bool PullFromRelay { get; set; }
         [JsonProperty] internal IEnumerable<UpgradeSave> Upgrades { get; set; }
         [JsonProperty] internal bool IsRangeVisible { get; set; }
         [JsonProperty] internal bool AllowedToExport { get; set; }
         [JsonProperty] internal bool IsBlackListMode { get; set; }
-        [JsonProperty] internal ColorVec4 SecColor { get; set; }
+        [JsonProperty] internal Vec4 Sec { get; set; }
         [JsonProperty] internal bool IsBrakeSet { get; set; }
     }
 

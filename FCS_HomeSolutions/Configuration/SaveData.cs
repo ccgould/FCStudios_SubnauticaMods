@@ -15,16 +15,16 @@ namespace FCS_HomeSolutions.Configuration
     internal class DecorationDataEntry
     {
         [JsonProperty] internal string Id { get; set; }
-        [JsonProperty(PropertyName = "COL")] internal ColorVec4 Color { get; set; }
-        [JsonProperty(PropertyName = "SCOL")] internal ColorVec4 SecondaryColor { get; set; }
+        [JsonProperty(PropertyName = "COL")] internal Vec4 Fcs { get; set; }
+        [JsonProperty(PropertyName = "SCOL")] internal Vec4 Secondary { get; set; }
     }
 
     [Serializable]
     internal class CurtainDataEntry
     {
         [JsonProperty] internal string Id { get; set; }
-        [JsonProperty(PropertyName = "COL")] internal ColorVec4 Color { get; set; }
-        [JsonProperty(PropertyName = "SCOL")] internal ColorVec4 SecondaryColor { get; set; }
+        [JsonProperty(PropertyName = "COL")] internal Vec4 Fcs { get; set; }
+        [JsonProperty(PropertyName = "SCOL")] internal Vec4 Secondary { get; set; }
         public string SelectedTexturePath { get; set; }
         [JsonProperty] internal bool IsOpen { get; set; }
     }
@@ -34,7 +34,7 @@ namespace FCS_HomeSolutions.Configuration
     internal class PaintToolDataEntry
     {
         [JsonProperty] internal string Id { get; set; }
-        [JsonProperty(PropertyName = "COL")] internal ColorVec4 Color { get; set; }
+        [JsonProperty(PropertyName = "COL")] internal Vec4 Fcs { get; set; }
         [JsonProperty(PropertyName = "A")] internal int Amount { get; set; }
         [JsonProperty(PropertyName = "PTM")] internal ColorTargetMode ColorTargetMode { get; set; }
     }
@@ -48,8 +48,8 @@ namespace FCS_HomeSolutions.Configuration
         [JsonProperty] internal Vec3 PadCurrentPosition { get; set; }
         [JsonProperty] internal bool FrontGatesOpen { get; set; }
         [JsonProperty] internal bool BackGatesOpen { get; set; }
-        [JsonProperty(PropertyName = "COL")] internal ColorVec4 Color { get; set; }
-        [JsonProperty(PropertyName = "SCOL")] internal ColorVec4 SecondaryColor { get; set; }
+        [JsonProperty(PropertyName = "COL")] internal Vec4 Fcs { get; set; }
+        [JsonProperty(PropertyName = "SCOL")] internal Vec4 Secondary { get; set; }
         [JsonProperty] internal bool PlayerLocked { get; set; }
         [JsonProperty] internal bool ExosuitLocked { get; set; }
         [JsonProperty(PropertyName = "BID")] internal string BaseID { get; set; }
@@ -59,9 +59,9 @@ namespace FCS_HomeSolutions.Configuration
     internal class PlanterDataEntry
     {
         [JsonProperty] internal string Id { get; set; }
-        [JsonProperty(PropertyName = "COL")] internal ColorVec4 Color { get; set; }
-        [JsonProperty(PropertyName = "SCOL")] internal ColorVec4 SecondaryColor { get; set; }
-        [JsonProperty(PropertyName = "LUMCOL")] internal ColorVec4 LUMColor { get; set; }
+        [JsonProperty(PropertyName = "COL")] internal Vec4 Fcs { get; set; }
+        [JsonProperty(PropertyName = "SCOL")] internal Vec4 Secondary { get; set; }
+        [JsonProperty(PropertyName = "LUMCOL")] internal Vec4 Lum { get; set; }
         [JsonProperty]  internal byte[] Bytes { get; set; }
         [JsonProperty(PropertyName = "BID")] internal string BaseID { get; set; }
 
@@ -70,7 +70,7 @@ namespace FCS_HomeSolutions.Configuration
     internal class MiniFountainFilterDataEntry
     {
         [JsonProperty] internal string Id { get; set; }
-        [JsonProperty(PropertyName = "COL")] internal ColorVec4 BodyColor { get; set; }
+        [JsonProperty(PropertyName = "COL")] internal Vec4 Body { get; set; }
         [JsonProperty] internal float TankLevel { get; set; }
         [JsonProperty] internal int ContainerAmount { get; set; }
         [JsonProperty] internal bool IsInSub { get; set; }
@@ -84,7 +84,7 @@ namespace FCS_HomeSolutions.Configuration
         [JsonProperty] internal List<EatableEntities> FridgeContainer { get; set; }
         [JsonProperty] internal bool HasBreakerTripped { get; set; }
         [JsonProperty] internal string UnitName { get; set; }
-        [JsonProperty] internal ColorVec4 BodyColor { get; set; }
+        [JsonProperty] internal Vec4 Body { get; set; }
         [JsonProperty] internal PowercellData PowercellData { get; set; }
         [JsonProperty] internal bool IsVisible { get; set; }
         [JsonProperty(PropertyName = "BID")] internal string BaseID { get; set; }
@@ -94,8 +94,8 @@ namespace FCS_HomeSolutions.Configuration
     internal class TrashRecyclerDataEntry
     {
         [JsonProperty] internal string Id { get; set; }
-        [JsonProperty(PropertyName = "COL")] internal ColorVec4 Color { get; set; }
-        [JsonProperty(PropertyName = "SCOL")] internal ColorVec4 SecondaryColor { get; set; }
+        [JsonProperty(PropertyName = "COL")] internal Vec4 Fcs { get; set; }
+        [JsonProperty(PropertyName = "SCOL")] internal Vec4 Secondary { get; set; }
         [JsonProperty(PropertyName = "BID")] internal string BaseID { get; set; }
         [JsonProperty(PropertyName = "Data")] internal byte[] Storage { get; set; }
         public bool IsRecycling { get; set; }
@@ -108,8 +108,8 @@ namespace FCS_HomeSolutions.Configuration
     internal class QuantumTeleporterDataEntry
     {
         [JsonProperty] internal string Id { get; set; }
-        [JsonProperty(PropertyName = "COL")] internal ColorVec4 Color { get; set; }
-        [JsonProperty(PropertyName = "SCOL")] internal ColorVec4 SecondaryColor { get; set; }
+        [JsonProperty(PropertyName = "COL")] internal Vec4 Fcs { get; set; }
+        [JsonProperty(PropertyName = "SCOL")] internal Vec4 Secondary { get; set; }
         [JsonProperty(PropertyName = "BID")] internal string BaseID { get; set; }
         [JsonProperty] internal string UnitName { get; set; }
         [JsonProperty] internal bool IsGlobal { get; set; }
@@ -121,26 +121,33 @@ namespace FCS_HomeSolutions.Configuration
     internal class BaseOperatorDataEntry
     {
         [JsonProperty] internal string Id { get; set; }
-        [JsonProperty(PropertyName = "COL")] internal ColorVec4 Color { get; set; }
-        [JsonProperty(PropertyName = "SCOL")] internal ColorVec4 SecondaryColor { get; set; }
+        [JsonProperty(PropertyName = "COL")] internal Vec4 Fcs { get; set; }
+        [JsonProperty(PropertyName = "SCOL")] internal Vec4 Secondary { get; set; }
         [JsonProperty(PropertyName = "BID")] internal string BaseID { get; set; }
     }    
     
     internal class CabinetDataEntry
     {
         [JsonProperty] internal string Id { get; set; }
-        [JsonProperty(PropertyName = "COL")] internal ColorVec4 Color { get; set; }
-        [JsonProperty(PropertyName = "SCOL")] internal ColorVec4 SecondaryColor { get; set; }
+        [JsonProperty(PropertyName = "COL")] internal Vec4 Fcs { get; set; }
+        [JsonProperty(PropertyName = "SCOL")] internal Vec4 Secondary { get; set; }
     }
-
+    
     internal class AlienChiefDataEntry
     {
         [JsonProperty] internal string Id { get; set; }
-        [JsonProperty(PropertyName = "COL")] internal ColorVec4 Color { get; set; }
-        [JsonProperty(PropertyName = "SCOL")] internal ColorVec4 SecondaryColor { get; set; }
+        [JsonProperty(PropertyName = "COL")] internal Vec4 Fcs { get; set; }
+        [JsonProperty(PropertyName = "SCOL")] internal Vec4 Secondary { get; set; }
         [JsonProperty(PropertyName = "BID")] internal string BaseID { get; set; }
     }
-    
+
+    internal class LedLightDataEntry
+    {
+        [JsonProperty] internal string Id { get; set; }
+        [JsonProperty(PropertyName = "LUM")] internal Vec4 Lum { get; set; }
+        [JsonProperty(PropertyName = "ROT")] internal Vec4 Rotation { get; set; }
+    }
+
     [Serializable]
     internal class SaveData
     {
@@ -158,5 +165,6 @@ namespace FCS_HomeSolutions.Configuration
         [JsonProperty] internal List<BaseOperatorDataEntry> BaseOperatorEntries = new List<BaseOperatorDataEntry>();
         [JsonProperty] internal List<AlienChiefDataEntry> AlienChiefDataEntries = new List<AlienChiefDataEntry>();
         [JsonProperty] internal List<CabinetDataEntry> CabinetDataEntries = new List<CabinetDataEntry>();
+        [JsonProperty] internal List<LedLightDataEntry> LedLightDataEntries = new List<LedLightDataEntry>();
     }
 }

@@ -4,12 +4,14 @@ using FCS_StorageSolutions.Configuration;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
-namespace FCS_StorageSolutions.AlterraStorage.Buildable
+namespace FCS_StorageSolutions.Mods.AlterraStorage.Buildable
 {
     internal static class ModelPrefab
     {
         private static bool _initialized;
+        public static GameObject DSSServerPrefab;
         internal static GameObject ColorItemPrefab { get; set; }
         internal static string BodyMaterial => $"{Mod.ModName}_COL";
         internal static string SecondaryMaterial => $"{Mod.ModName}_COL_S";
@@ -24,6 +26,13 @@ namespace FCS_StorageSolutions.AlterraStorage.Buildable
         public static AssetBundle ModBundle { get; set; }
         public static GameObject AlterraStoragePrefab { get; set; }
         public static GameObject InventoryItemPrefab { get; set; }
+        public static GameObject DSSItemDisplayPrefab { get; set; }
+        public static GameObject DSSAntennaPrefab { get; set; }
+        public static GameObject DSSWallServerRackPrefab { get; set; }
+        public static GameObject DSSFloorServerRackPrefab { get; set; }
+        public static GameObject DSSAutoCrafterPrefab { get; set; }
+        public static GameObject DSSTerminalPrefab { get; set; }
+        public static GameObject DSSFormattingStationPrefab { get; set; }
 
 
         internal static void Initialize()
@@ -39,6 +48,14 @@ namespace FCS_StorageSolutions.AlterraStorage.Buildable
             }
 
             AlterraStoragePrefab = GetPrefab(Mod.AlterraStoragePrefabName);
+            DSSServerPrefab = GetPrefab(Mod.DSSServerPrefabName);
+            DSSFormattingStationPrefab = GetPrefab(Mod.DSSFormattingStationPrefabName);
+            DSSTerminalPrefab = GetPrefab(Mod.DSSTerminalPrefabName);
+            DSSAutoCrafterPrefab = GetPrefab(Mod.DSSAutoCrafterPrefabName);
+            DSSWallServerRackPrefab = GetPrefab(Mod.DSSWallServerRackPrefabName);
+            DSSFloorServerRackPrefab = GetPrefab(Mod.DSSFloorServerRackPrefabName);
+            DSSAntennaPrefab = GetPrefab(Mod.DSSAntennaPrefabName);
+            DSSItemDisplayPrefab = GetPrefab(Mod.DSSItemDisplayPrefabName);
             InventoryItemPrefab = GetPrefab("InventoryItem");
         }
         
@@ -91,6 +108,11 @@ namespace FCS_StorageSolutions.AlterraStorage.Buildable
         /// <param name="prefab">The prefab to apply shaders.</param>
         internal static void ApplyShaders(GameObject prefab, AssetBundle bundle = null)
         {
+            if (bundle == null)
+            {
+                bundle = ModBundle;
+            }
+
             #region BaseColor
             MaterialHelpers.ApplySpecShader(BodyMaterial, SpecTexture, prefab, 1, 3f, bundle);
             MaterialHelpers.ApplyEmissionShader(DecalMaterial, LUMTexture, prefab, bundle, Color.white);

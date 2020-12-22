@@ -179,5 +179,7 @@ namespace FCSDemo.Configuration
         public Vec3 BoundingSize { get; set; } = new Vec3(0, 0, 0);
         public string ModName { get; set; } = "FCSDemo";
         public IEnumerable<ModEntry> Prefabs { get; set; }
+        public bool ControlEmissionStrength { get; set; } = false;
+        public float EmissionStrength { get; set; } = 5f;
     }
 }

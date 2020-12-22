@@ -7,6 +7,7 @@ using SMLHelper.V2.Options.Attributes;
 using FCSCommon.Utilities;
 using Oculus.Newtonsoft.Json;
 using SMLHelper.V2.Options;
+using UnityEngine;
 
 namespace FCS_ProductionSolutions.Configuration
 {
@@ -20,7 +21,7 @@ namespace FCS_ProductionSolutions.Configuration
         public bool EnableDebugLogs = false;
 
         public float EnergyConsumpion { get; set; } = 15000f;
-
+        
         private void EnableDebugsToggleEvent(ToggleChangedEventArgs e)
         {
             if (e.Value)

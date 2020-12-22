@@ -7,8 +7,6 @@ using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_LifeSupportSolutions.Buildable;
 using FCS_LifeSupportSolutions.Configuration;
-using FCS_LifeSupportSolutions.Mods.EnergyPillVendingMachine.Buildable;
-using FCS_LifeSupportSolutions.Patches;
 using FCSCommon.Utilities;
 using UnityEngine;
 
@@ -16,7 +14,6 @@ namespace FCS_LifeSupportSolutions.Mods.EnergyPillVendingMachine.mono
 {
     internal class EnergyPillVendingMachineController : FcsDevice, IFCSSave<SaveData>
     {
-        private ColorManager _colorManager;
         private EnergyPillVendingMachineEntry _savedData;
         private bool _isFromSave;
         private bool _runStartUpOnEnable;
@@ -54,8 +51,8 @@ namespace FCS_LifeSupportSolutions.Mods.EnergyPillVendingMachine.mono
                         ReadySaveData();
                     }
 
-                    _colorManager.ChangeColor(_savedData.BodyColor.Vector4ToColor());
-                    _colorManager.ChangeColor(_savedData.SecondaryBodyColor.Vector4ToColor(), ColorTargetMode.Secondary);
+                    _colorManager.ChangeColor(_savedData.Body.Vector4ToColor());
+                    _colorManager.ChangeColor(_savedData.SecondaryBody.Vector4ToColor(), ColorTargetMode.Secondary);
                 }
 
                 _runStartUpOnEnable = false;
@@ -145,8 +142,8 @@ namespace FCS_LifeSupportSolutions.Mods.EnergyPillVendingMachine.mono
             }
 
             _savedData.Id = GetPrefabID();
-            _savedData.BodyColor = _colorManager.GetColor().ColorToVector4();
-            _savedData.SecondaryBodyColor = _colorManager.GetSecondaryColor().ColorToVector4();
+            _savedData.Body = _colorManager.GetColor().ColorToVector4();
+            _savedData.SecondaryBody = _colorManager.GetSecondaryColor().ColorToVector4();
             QuickLogger.Debug($"Saving ID {_savedData.Id}");
             newSaveData.EnergyPillVendingMachineEntries.Add(_savedData);
         }

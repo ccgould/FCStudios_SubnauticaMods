@@ -162,6 +162,20 @@ namespace FCSCommon.Helpers
             return null;
         }
 
+        public static void SetConstructableBounds(GameObject go, Vector3 size, Vector3 center)
+        {
+            try
+            {
+                if (go == null) return;
+                var bounds = go.EnsureComponent<ConstructableBounds>();
+                bounds.bounds.size = size;
+                bounds.bounds.position = center;
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error($"{e.Message}");
+            }
+        }
     }
 
     internal enum SearchOption

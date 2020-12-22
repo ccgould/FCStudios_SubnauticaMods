@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
-using FCS_StorageSolutions.AlterraStorage.Buildable;
 using FCS_StorageSolutions.Configuration;
+using FCS_StorageSolutions.Mods.AlterraStorage.Buildable;
+using FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable;
 using FCSCommon.Utilities;
 using HarmonyLib;
 using QModManager.API.ModLoading;
@@ -28,6 +29,30 @@ namespace FCS_StorageSolutions
 
             var alterraStorage = new AlterraStoragePatch();
             alterraStorage.Patch();
+
+            var dssserver = new DSSServerSpawnable();
+            dssserver.Patch();
+
+            var dssItemDisplay = new DSSItemDisplayPatch();
+            dssItemDisplay.Patch();
+
+            var dssFormattingStation = new DSSFormattingStationPatch();
+            dssFormattingStation.Patch();
+
+            var dssTerminal = new DSSTerminalPatch();
+            dssTerminal.Patch();
+
+            var dssAutoCrafter = new DSSAutoCrafterPatch();
+            dssAutoCrafter.Patch();
+
+            var dssAntenna = new DSSAntennaPatch();
+            dssAntenna.Patch();
+
+            var wallServerRack = new DSSWallServerRackPatch();
+            wallServerRack.Patch();
+
+            var floorServerRack = new DSSFloorServerRackPatch();
+            floorServerRack.Patch();
 
             //Register debug commands
             ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));

@@ -61,7 +61,6 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         internal FCSDeepDrillerOilHandler OilHandler { get; set; }
         internal DumpContainer PowercellDumpContainer { get; set; }
         internal DumpContainer OilDumpContainer { get; set; }
-        public ColorManager ColorManager { get; private set; }
         public FCSDeepDrillerUpgradeManager UpgradeManager { get; private set; }
         public DeepDrillerMk2Config Config => QPatch.DeepDrillerMk3Configuration;
         public FCSDeepDrillerTransferManager TransferManager { get; set; }
@@ -110,8 +109,8 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
                         OreGenerator.Load(_saveData.FocusOres);
                     }
 
-                    ColorManager.ChangeColor(_saveData.BodyColor.Vector4ToColor());
-                    ColorManager.ChangeColor(_saveData.SecColor.Vector4ToColor(), ColorTargetMode.Secondary);
+                    _colorManager.ChangeColor(_saveData.Body.Vector4ToColor());
+                    _colorManager.ChangeColor(_saveData.Sec.Vector4ToColor(), ColorTargetMode.Secondary);
                     CurrentBiome = _saveData.Biome;
                     OilHandler.SetOilTimeLeft(_saveData.OilTimeLeft);
                     UpgradeManager.Load(_saveData?.Upgrades);
@@ -194,7 +193,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
 
         public void Save(SaveData saveDataList, ProtobufSerializer serializer = null)
         {
-            if (!IsInitialized || ColorManager == null || DeepDrillerPowerManager == null ||
+            if (!IsInitialized || _colorManager == null || DeepDrillerPowerManager == null ||
                 DeepDrillerContainer == null || OreGenerator == null || OilHandler == null || 
                 UpgradeManager == null || TransferManager == null)
             {
@@ -211,8 +210,8 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             QuickLogger.Message($"SaveData = {_saveData}", true);
 
             _saveData.Id = GetPrefabID();
-            _saveData.BodyColor = ColorManager.GetColor().ColorToVector4();
-            _saveData.SecColor = ColorManager.GetSecondaryColor().ColorToVector4();
+            _saveData.Body = _colorManager.GetColor().ColorToVector4();
+            _saveData.Sec = _colorManager.GetSecondaryColor().ColorToVector4();
 
             _saveData.PowerState = DeepDrillerPowerManager.GetPowerState();
             _saveData.PullFromRelay = DeepDrillerPowerManager.GetPullFromPowerRelay();
@@ -304,10 +303,10 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
                 DeepDrillerPowerManager.SetPowerRelay(powerRelay);
             }
 
-            if (ColorManager == null)
+            if (_colorManager == null)
             {
-                ColorManager = gameObject.AddComponent<ColorManager>();
-                ColorManager.Initialize(gameObject, ModelPrefab.BodyMaterial,ModelPrefab.SecondaryMaterial);
+                _colorManager = gameObject.AddComponent<ColorManager>();
+                _colorManager.Initialize(gameObject, ModelPrefab.BodyMaterial,ModelPrefab.SecondaryMaterial);
             }
 
             AudioManager = new AudioManager(gameObject.GetComponent<FMOD_CustomLoopingEmitter>());
@@ -563,7 +562,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
 
         public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
         {
-            return ColorManager.ChangeColor(color, mode);
+            return _colorManager.ChangeColor(color, mode);
         }
 
         #endregion

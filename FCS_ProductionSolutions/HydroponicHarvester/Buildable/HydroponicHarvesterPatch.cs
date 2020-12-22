@@ -23,7 +23,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Buildable
             {
                 var hydroponicHarvesterKit = new FCSKit(Mod.HydroponicHarvesterKitClassID, Mod.HydroponicHarvesterModFriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 hydroponicHarvesterKit.Patch();
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, hydroponicHarvesterKit.TechType, 30000, StoreCategory.Production);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, hydroponicHarvesterKit.TechType, 200000, StoreCategory.Production);
                 FCSAlterraHubService.PublicAPI.RegisterEncyclopediaEntry(TechType,new List<FcsEntryData>
                 {
                     new FcsEntryData

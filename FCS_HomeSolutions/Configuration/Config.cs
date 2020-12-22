@@ -20,6 +20,8 @@ namespace FCS_HomeSolutions.Configuration
 
         public FCSGameMode ModMode { get; set; }
 
+        [Toggle("Alterra Chief Mod Enabled")] public bool IsAlienChiefEnabled { get; set; } = true;
+
         private void EnableDebugsToggleEvent(ToggleChangedEventArgs e)
         {
             if (e.Value)

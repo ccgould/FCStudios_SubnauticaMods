@@ -31,6 +31,7 @@ namespace FCS_AlterraHub.Registration
         void RegisterTechLight(TechLight techLight);
         bool ChargeAccount(decimal amount);
         bool IsCreditAvailable(decimal amount);
+        KeyValuePair<string, FcsDevice> FindDevice(string prefabID);
     }
 
     internal interface IFCSAlterraHubServiceInternal
@@ -41,7 +42,7 @@ namespace FCS_AlterraHub.Registration
     {
         private static readonly FCSAlterraHubService singleton = new FCSAlterraHubService();
 
-        public static Dictionary<string,string> knownDevices = new Dictionary<string,string>();
+        public static List<KnownDevice> knownDevices = new List<KnownDevice>();
         private static readonly Dictionary<string, FcsDevice> GlobalDevices = new Dictionary<string,FcsDevice>();
         private static Dictionary<TechType, FCSStoreEntry> _storeItems = new Dictionary<TechType, FCSStoreEntry>();
         private static Dictionary<TechType, List<FcsEntryData>> _pdaEntries = new Dictionary<TechType, List<FcsEntryData>>();
@@ -55,9 +56,10 @@ namespace FCS_AlterraHub.Registration
             Mod.OnDevicesDataLoaded += OnDataLoaded;
         }
 
-        private void OnDataLoaded(Dictionary<string, string> obj)
+        private void OnDataLoaded(List<KnownDevice> obj)
         {
-            knownDevices = obj;
+            if(obj != null)
+                knownDevices = obj;
         }
         
         public void RegisterDevice(FcsDevice device, string tabID,string packageId)
@@ -66,22 +68,25 @@ namespace FCS_AlterraHub.Registration
 
             QuickLogger.Debug($"Attempting to Register: {prefabID} : Contructed {device.IsConstructed}");
 
-            if (string.IsNullOrWhiteSpace(prefabID) || !device.IsConstructed) return;
-            
-            if (!knownDevices.ContainsKey(prefabID))
+            if (!device.BypassRegisterCheck)
             {
-                var id = $"{tabID}{knownDevices.Count:D3}";
-                device.UnitID = id;
+                if (string.IsNullOrWhiteSpace(prefabID) || !device.IsConstructed) return;
+            }
+            
+
+            if (!knownDevices.Any(x=>x.PrefabID.Equals(prefabID)))
+            {
+                var unitID = GenerateNewID(tabID,prefabID);
+                device.UnitID = unitID;
                 device.PackageId = packageId;
-                knownDevices.Add(device.GetPrefabID(), id);
-                AddToGlobalDevices(device, id);
+                AddToGlobalDevices(device, unitID);
                 Mod.SaveDevices(knownDevices);
             }
             else
             {
                 device.PackageId = packageId;
-                device.UnitID=knownDevices[prefabID];
-                AddToGlobalDevices(device, knownDevices[prefabID]);
+                device.UnitID=knownDevices.FirstOrDefault(x=>x.PrefabID.Equals(prefabID)).ToString();
+                AddToGlobalDevices(device, device.UnitID);
             }
 
             QuickLogger.Debug($"Registering Device: {device.UnitID}");
@@ -91,11 +96,29 @@ namespace FCS_AlterraHub.Registration
             BaseManagerSetup(device);
         }
 
-        private static void AddToGlobalDevices(FcsDevice device, string id)
+        private string GenerateNewID(string tabId,string prefabID)
         {
-            if (!GlobalDevices.ContainsKey(id))
+            var newEntry = new KnownDevice();
+            var id = 0;
+            if (knownDevices.Any())
             {
-                GlobalDevices.Add(id, device);
+                id = knownDevices.Where(x => x.DeviceTabId.Equals(tabId)).DefaultIfEmpty().Max(x=>x.ID);
+                id++;
+            }
+
+            newEntry.ID = id;
+            newEntry.PrefabID = prefabID;
+            newEntry.DeviceTabId = tabId;
+            knownDevices.Add(newEntry);
+            return newEntry.ToString();
+        }
+
+
+        private static void AddToGlobalDevices(FcsDevice device, string unitID)
+        {
+            if (!GlobalDevices.ContainsKey(unitID))
+            {
+                GlobalDevices.Add(unitID, device);
             }
         }
 
@@ -197,7 +220,7 @@ namespace FCS_AlterraHub.Registration
 
         public int GetRegisterModCount(string tabID)
         {
-            return knownDevices.Count(x => x.Value.Equals(tabID));
+            return knownDevices.Count(x => x.DeviceTabId.Equals(tabID));
         }
 
         public bool IsTechTypeRegistered(TechType techType)
@@ -262,9 +285,16 @@ namespace FCS_AlterraHub.Registration
 
         public void UnRegisterDevice(FcsDevice device)
         {
-            knownDevices.Remove(device.GetPrefabID());
-            _registeredTechTypes.Remove(device.GetTechType());
-            RemoveDeviceFromGlobal(device.UnitID);
+            foreach (KnownDevice knownDevice in knownDevices)
+            {
+                if (!string.IsNullOrEmpty(knownDevice.PrefabID) && knownDevice.PrefabID.Equals(device.GetPrefabID()))
+                {
+                    knownDevices.Remove(knownDevice);
+                    _registeredTechTypes.Remove(device.GetTechType());
+                    RemoveDeviceFromGlobal(device.UnitID);
+                    break;
+                }
+            }
         }
 
         public Dictionary<string, FcsDevice> GetRegisteredDevicesOfId(string id)
@@ -292,6 +322,11 @@ namespace FCS_AlterraHub.Registration
         public bool IsCreditAvailable(decimal amount)
         {
             return CardSystem.main.HasEnough(amount);
+        }
+
+        public KeyValuePair<string, FcsDevice> FindDevice(string unitID)
+        {
+            return GlobalDevices.FirstOrDefault(x => x.Key.Equals(unitID, StringComparison.OrdinalIgnoreCase));
         }
     }
 }

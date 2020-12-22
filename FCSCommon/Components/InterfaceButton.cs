@@ -35,6 +35,7 @@ namespace FCSCommon.Components
         internal bool IsSelected { get; set; }
         private Image _bgImage;
         private GameObject _toggleRadial;
+        private GameObject _hoverImage;
 
         #endregion
 
@@ -73,6 +74,9 @@ namespace FCSCommon.Components
                     break;
                 case InterfaceButtonMode.RadialButton:
                     FindRadial();
+                    break;
+                case InterfaceButtonMode.HoverImage:
+                    _hoverImage = InterfaceHelpers.FindGameObject(gameObject,"Hover");
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -182,6 +186,16 @@ namespace FCSCommon.Components
                                 new Vector3(this.IncreaseButtonBy, this.IncreaseButtonBy, this.IncreaseButtonBy);
                         }
                         break;
+                    case InterfaceButtonMode.HoverImage:
+                        if (_hoverImage == null)
+                        {
+                            _hoverImage = InterfaceHelpers.FindGameObject(gameObject, "Hover");
+                        }
+                        if (_hoverImage != null)
+                        {
+                            _hoverImage.SetActive(true);
+                        }
+                        break;
                 }
             }
         }
@@ -216,6 +230,16 @@ namespace FCSCommon.Components
                     {
                         this.gameObject.transform.localScale -=
                             new Vector3(this.IncreaseButtonBy, this.IncreaseButtonBy, this.IncreaseButtonBy);
+                    }
+                    break;
+                case InterfaceButtonMode.HoverImage:
+                    if (_hoverImage == null)
+                    {
+                        _hoverImage = InterfaceHelpers.FindGameObject(gameObject, "Hover");
+                    }
+                    if (_hoverImage != null)
+                    {
+                        _hoverImage.SetActive(false);
                     }
                     break;
             }
@@ -281,6 +305,12 @@ namespace FCSCommon.Components
                     FindRadial();
                     _toggleRadial.SetActive(true);
                     break;
+                case InterfaceButtonMode.HoverImage:
+                    if (_hoverImage != null)
+                    {
+                        _hoverImage.SetActive(true);
+                    }
+                    break;
             }
         }
         public void DeSelect()
@@ -304,6 +334,12 @@ namespace FCSCommon.Components
                 case InterfaceButtonMode.RadialButton:
                     FindRadial();
                     _toggleRadial.SetActive(false);
+                    break;
+                case InterfaceButtonMode.HoverImage:
+                    if (_hoverImage != null)
+                    {
+                        _hoverImage.SetActive(false);
+                    }
                     break;
             }
         }

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Extensions;
+using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
@@ -10,6 +12,7 @@ using FCS_ProductionSolutions.Configuration;
 using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
+using SMLHelper.V2.Utility;
 using Steamworks;
 using UnityEngine;
 using UnityEngine.UI;
@@ -43,6 +46,13 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
         private TechType _currentTechType;
         private bool _isLandPlant;
         private TechType _pickTechType;
+        private float PowerUsage = 0.2125f;
+        public override bool IsOperational => CheckIfOperational();
+
+        private bool CheckIfOperational()
+        {
+            return IsConstructed && IsInitialized && Manager != null && Manager.HasEnoughPower(PowerUsage);
+        }
 
         #region Unity Methods
 
@@ -53,6 +63,8 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
 
         private void Update()
         {
+            if (!IsOperational) return;
+
             ScanItem();
 
             ResetScanner();
@@ -76,22 +88,34 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
                         ReadySaveData();
                     }
 
-                    ColorManager.ChangeColor(_savedData.BodyColor.Vector4ToColor(), ColorTargetMode.Both);
+                    _colorManager.ChangeColor(_savedData.Body.Vector4ToColor(), ColorTargetMode.Both);
                     _scanTime = _savedData.CurrentScanTime;
                     _maxScanTime = _savedData.CurrentMaxScanTime;
+                    _pickTechType = _savedData.PickTechType;
+                    _isLandPlant = _savedData.IsLandPlant;
+                    _currentTechType = _savedData.CurrentTechType;
+                    _reset = _savedData.Reset;
+
+                    if (_scanTime > 0)
+                    {
+                        _isScanning = true;
+                        _laserObj.SetActive(true);
+                    }
+
+
                     if (_savedData.CurrentTechType != TechType.None)
                     {
                         OnStorageOnContainerAddItem(this,_savedData.CurrentTechType);
                     }
                 }
 
+                _savedData = null;
                 _runStartUpOnEnable = false;
             }
         }
         
         #endregion
 
-        public ColorManager ColorManager { get; private set; }
         public DumpContainer DumpContainer { get; private set; }
         public Plantable Seed { get; set; }
         public TechType PickTech { get; set; }
@@ -118,10 +142,10 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
             _slot = GameObjectHelpers.FindGameObject(gameObject, "SpawnPNT");
             _bounds = GameObjectHelpers.FindGameObject(gameObject, "Bounds").GetComponent<Collider>().bounds.size;
 
-            if (ColorManager == null)
+            if (_colorManager == null)
             {
-                ColorManager = gameObject.AddComponent<ColorManager>();
-                ColorManager.Initialize(gameObject, ModelPrefab.BodyMaterial);
+                _colorManager = gameObject.AddComponent<ColorManager>();
+                _colorManager.Initialize(gameObject, ModelPrefab.BodyMaterial);
             }
 
             var storage = new MatterAnalyzerStorage(this);
@@ -163,6 +187,7 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
                 var resetPercentage = _scanTime / _maxScanTime;
                 _scanController.SetPercentage(resetPercentage);
                 _percentageTxt.text = $"{(resetPercentage * 100.0f):f2} %";
+                _percentageBar.fillAmount = resetPercentage;
                 if (_scanTime <= 0)
                 {
                     _reset = false;
@@ -180,7 +205,7 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
                 _percentage = _scanTime / _maxScanTime;
                 _scanController.SetPercentage(_percentage);
                 _percentageBar.fillAmount = _percentage;
-                _percentageTxt.text = $"{(_percentage * 100.0f):f2} %";
+                _percentageTxt.text = $"{_percentage * 100.0f:f2}%";
 
                 if (_scanTime >= _maxScanTime)
                 {
@@ -192,9 +217,7 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
                         TechType = _currentTechType, 
                         PickType = _pickTechType, 
                         IsLandPlant = _isLandPlant,
-                        IsNonePlantable = true
                     });
-
                 }
             }
         }
@@ -203,7 +226,7 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
         {
             if (_isScanning)
             {
-                return 0.2125f;
+                return PowerUsage;
             }
 
             return 0;
@@ -211,6 +234,7 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
 
         private void OnStorageOnContainerAddItem(FcsDevice device, TechType techType)
         {
+            if (device == null || techType == TechType.None) return;
 
             if (PrefabDatabase.TryGetPrefabFilename(CraftData.GetClassIdForTechType(techType), out string filepath))
             {
@@ -239,14 +263,14 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
       
             }
 
-            if (techType == TechType.GasPod || techType == TechType.StalkerTooth)
+            if (Mod.IsNonePlantableAllowedList.Contains(techType))
             {
                 _pickTechType = techType;
                 _currentTechType = techType;
             }
             else
             {
-                _pickTechType = PickTech != TechType.None ? PickTech : _currentTechType;
+                _pickTechType = PickTech != TechType.None ? PickTech : techType;
                 _isLandPlant = Seed.aboveWater;
                 _currentTechType = techType;
             }
@@ -264,9 +288,19 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
 
             scanStopBtn.onClick.AddListener(() =>
             {
+                if (!IsOperational) return;
+
                 if (_isScanning)
                 {
-                    CancelScanning();
+                    var size = CraftData.GetItemSize(_currentTechType);
+                    if (Inventory.main.HasRoomFor(size.x,size.y))
+                    {
+                        CancelScanning();
+                    }
+                    else
+                    {
+                        QuickLogger.ModMessage(AuxPatchers.InventoryFull());
+                    }
                 }
                 else
                 {
@@ -299,8 +333,25 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
             _laserObj.SetActive(false);
             //Reset TechType;
             _currentTechType = TechType.None;
-            //Destroy
-            Destroy(_currentSeed);
+
+            DumpContainer.GetItemsContainer().Clear();
+
+            if (_reset)
+            {
+                PlayerInteractionHelper.GivePlayerItem(_currentSeed.GetComponent<Pickupable>());
+            }
+            else
+            {
+                //Destroy
+                DestroyImmediate(_currentSeed);
+            }
+
+
+            _pickTechType = TechType.None;
+            
+            _maxScanTime = 0;
+            
+            _isLandPlant = false;
         }
 
         private void StartScanning()
@@ -340,6 +391,11 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
 
         public override bool CanDeconstruct(out string reason)
         {
+            if (_isScanning || _reset)
+            {
+                reason = AuxPatchers.MatterAnalyzerHasItems();
+                return false;
+            }
             reason = String.Empty;
             return true;
         }
@@ -377,11 +433,14 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
             }
 
             _savedData.ID = GetPrefabID();
-            _savedData.BodyColor = ColorManager.GetColor().ColorToVector4();
+            _savedData.Body = _colorManager.GetColor().ColorToVector4();
             _savedData.CurrentTechType = _currentTechType;
+            _savedData.PickTechType = _pickTechType;
+            _savedData.IsLandPlant = _isLandPlant;
             _savedData.CurrentScanTime = _scanTime;
             _savedData.CurrentMaxScanTime = _maxScanTime;
             newSaveData.MatterAnalyzerEntries.Add(_savedData);
+            _savedData.Reset = _reset;
             QuickLogger.Debug($"Saving ID {_savedData.ID}", true);
         }
 
@@ -393,7 +452,7 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
 
         public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
         {
-            return ColorManager.ChangeColor(color, mode);
+            return _colorManager.ChangeColor(color, mode);
         }
 
         public void SetScanTime(Plantable.PlantSize plantSize)
@@ -401,28 +460,6 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
             _maxScanTime = plantSize == Plantable.PlantSize.Large ? MaxScanTimeL : MaxScanTimeS;
             QuickLogger.Debug($"Max Scan Time was set to: {_maxScanTime}",true);
 
-        }
-    }
-
-    internal class ScannerController : MonoBehaviour
-    {
-        private AnimationCurve _animationCurve;
-        private float _percentage;
-
-        private void Start()
-        {
-            _animationCurve = new AnimationCurve(new Keyframe(0, 1.313115f), new Keyframe(1, 0.845f));
-        }
-
-        private void Update()
-        {
-            var location = _animationCurve.Evaluate(_percentage);
-            gameObject.transform.localPosition = new Vector3(gameObject.transform.localPosition.x,location, gameObject.transform.localPosition.z);
-        }
-
-        internal void SetPercentage(float percentage)
-        {
-            _percentage = percentage;
         }
     }
 }

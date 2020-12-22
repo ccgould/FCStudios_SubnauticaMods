@@ -15,7 +15,7 @@ namespace FCS_AlterraHub.Configuration
         [JsonProperty] internal float RPM;
         public string Id { get; set; }
         public string BaseId { get; set; }
-        [JsonProperty(PropertyName = "COL")] internal ColorVec4 Color { get; set; }
+        [JsonProperty(PropertyName = "COL")] internal Vec4 Fcs { get; set; }
         [JsonProperty(PropertyName = "TL")] internal float TimeLeft { get; set; }
         [JsonProperty(PropertyName = "OQ")] internal Queue<TechType> OreQueue { get; set; }
     }
@@ -26,7 +26,7 @@ namespace FCS_AlterraHub.Configuration
         public string Id { get; set; }
         public string BaseId { get; set; }
         [JsonProperty(PropertyName = "C")] internal IEnumerable<CartItemSaveData> CartItems { get; set; }
-        [JsonProperty(PropertyName = "COL")] internal ColorVec4 Color { get; set; }
+        [JsonProperty(PropertyName = "COL")] internal Vec4 Fcs { get; set; }
     }
     
     [Serializable]

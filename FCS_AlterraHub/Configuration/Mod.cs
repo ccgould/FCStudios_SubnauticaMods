@@ -57,7 +57,7 @@ namespace FCS_AlterraHub.Configuration
         internal static TechType OreConsumerTechType { get; set; }
 
         internal static Action<SaveData> OnDataLoaded { get; set; }
-        internal static Action<Dictionary<string,string>> OnDevicesDataLoaded { get; set; }
+        internal static Action<List<KnownDevice>> OnDevicesDataLoaded { get; set; }
 
 #if SUBNAUTICA
         internal static TechData AlterraHubIngredients => new TechData
@@ -152,14 +152,14 @@ namespace FCS_AlterraHub.Configuration
         internal static void LoadDevicesData()
         {
             QuickLogger.Info("Loading Save Data...");
-            ModUtils.LoadSaveData<Dictionary<string, string>>(KnownDevicesFilename, GetSaveFileDirectory(), (data) =>
+            ModUtils.LoadSaveData<List<KnownDevice>>(KnownDevicesFilename, GetSaveFileDirectory(), (data) =>
             {
                 QuickLogger.Info("Save Data Loaded");
                 OnDevicesDataLoaded?.Invoke(data);
             });
         }
 
-        public static bool SaveDevices(Dictionary<string, string> knownDevices)
+        public static bool SaveDevices(List<KnownDevice> knownDevices)
         {
             try
             {
@@ -273,6 +273,18 @@ namespace FCS_AlterraHub.Configuration
             }
 
             return new AlterraHubDataEntry() { Id = id };
+        }
+    }
+
+    public struct KnownDevice
+    {
+        public string PrefabID { get; set; }
+        public string DeviceTabId { get; set; }
+        public int ID { get; set; }
+
+        public override string ToString()
+        {
+            return $"{DeviceTabId}{ID:D3}";
         }
     }
 }

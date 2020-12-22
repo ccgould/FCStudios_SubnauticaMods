@@ -73,7 +73,7 @@ namespace FCS_HomeSolutions.SeaBreeze.Mono
                     _mono.NameController.Show();
                     break;
                 case "ColorItem":
-                    _mono.ColorManager.ChangeColor((Color) tag);
+                    _mono.GetColorManager().ChangeColor((Color) tag);
                     break;
                 case "HomeBTN":
                     GotoPage(SeaBreezePages.HomePage);

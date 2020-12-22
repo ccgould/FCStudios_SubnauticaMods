@@ -13,6 +13,8 @@ namespace FCS_StorageSolutions.Configuration
             { $"{ModKey}_AlterraStorageDumpContainerTitle","Alterra Storage"},
             { $"{ModKey}_TakeFormat","Take {0}"},
             { $"{ModKey}_StorageAmountFormat","{0}/{1} Items"},
+            { $"{ModKey}_OpenWallServerRack","Open Wall Server Rack"},
+            { $"{ModKey}_CloseWallServerRack","Close Wall Server Rack"},
         };
         
         internal static void AdditionalPatching()
@@ -51,6 +53,16 @@ namespace FCS_StorageSolutions.Configuration
         public static string ContainerNotEmpty()
         {
             return Language.main.Get("DeconstructNonEmptyStorageContainerError");
+        }
+
+        public static string OpenWallServerRack()
+        {
+            return GetLanguage($"{ModKey}_OpenWallServerRack");
+        }
+
+        public static string CloseWallServerRack()
+        {
+            return GetLanguage($"{ModKey}_CloseWallServerRack");
         }
     }
 }

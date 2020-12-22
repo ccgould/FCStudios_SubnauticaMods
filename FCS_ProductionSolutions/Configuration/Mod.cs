@@ -247,6 +247,14 @@ namespace FCS_ProductionSolutions.Configuration
         {
             return Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         }
+
+        internal static HashSet<TechType> IsNonePlantableAllowedList = new HashSet<TechType>{
+            TechType.StalkerTooth,
+            TechType.GasPod,
+            TechType.JeweledDiskPiece,
+            TechType.Floater,
+            TechType.TreeMushroomPiece
+        };
         #endregion
 
         #region Private Methods
@@ -312,6 +320,5 @@ namespace FCS_ProductionSolutions.Configuration
         public TechType TechType { get; set; }
         public TechType PickType { get; set; }
         public bool IsLandPlant { get; set; }
-        public bool IsNonePlantable { get; set; }
     }
 }

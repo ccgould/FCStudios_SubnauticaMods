@@ -21,6 +21,7 @@ namespace FCS_ProductionSolutions.Buildable
             { $"{ModKey}_HHBackButtonDesc","Go back to the Hydroponic Harvester home screen"},
             { $"{ModKey}_PowerUsagePerSecondFormat","Power Usage Per Second : {0}"},
             { $"{ModKey}_GenerationTimeFormat","Generation Time : {0}"},
+            { $"{ModKey}_MatterAnalyzerHasItems","Please cancel the scan to deconstruct the matter analyzer."},
         };
 
         internal static void AdditionalPatching()
@@ -88,6 +89,11 @@ namespace FCS_ProductionSolutions.Buildable
         public static string GenerationTimeMinutesOnlyFormat(float amount)
         {
             return string.Format(GetLanguage($"{ModKey}_GenerationTimeFormat"), TimeConverters.SecondsToMS(amount));
+        }
+
+        public static string MatterAnalyzerHasItems()
+        {
+            return GetLanguage($"{ModKey}_MatterAnalyzerHasItems");
         }
     }
 }

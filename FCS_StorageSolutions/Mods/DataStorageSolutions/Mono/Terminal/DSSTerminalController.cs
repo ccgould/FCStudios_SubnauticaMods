@@ -2,24 +2,22 @@
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
-using FCS_HomeSolutions.Buildables;
-using FCS_HomeSolutions.Configuration;
-using FCSCommon.Helpers;
+using FCS_StorageSolutions.Configuration;
+using FCS_StorageSolutions.Mods.AlterraStorage.Buildable;
 using FCSCommon.Utilities;
 using UnityEngine;
 
-namespace FCS_HomeSolutions.Mods.AlienChief.Mono
+namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
 {
-    internal class AlienChiefController : FcsDevice, IFCSSave<SaveData>
+    internal class DSSTerminalController : FcsDevice, IFCSSave<SaveData>
     {
         private bool _runStartUpOnEnable;
         private bool _fromSave;
-        private AlienChiefDataEntry _saveData;
-        private ColorManager _colorManager;
+        private DSSTerminalDataEntry _saveData;
 
         private void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.AlienChiefTabID, Mod.ModName);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.DSSTabID, Mod.ModName);
         }
 
         private void OnEnable()
@@ -38,24 +36,10 @@ namespace FCS_HomeSolutions.Mods.AlienChief.Mono
 
             if (_fromSave)
             {
-                _colorManager.ChangeColor(_saveData.Color.Vector4ToColor());
+                _colorManager.ChangeColor(_saveData.Body.Vector4ToColor());
+                _colorManager.ChangeColor(_saveData.SecondaryBody.Vector4ToColor(), ColorTargetMode.Secondary);
                 _fromSave = false;
             }
-        }
-
-        public override void Initialize()
-        {
-            if (_colorManager == null)
-            {
-                _colorManager = gameObject.AddComponent<ColorManager>();
-                _colorManager.Initialize(gameObject, ModelPrefab.BodyMaterial);
-            }
-
-            MaterialHelpers.ChangeEmissionStrength(ModelPrefab.EmissionControllerMaterial, gameObject, 5f);
-
-            IsInitialized = true;
-
-            QuickLogger.Debug($"Initialized");
         }
 
         private void ReadySaveData()
@@ -63,21 +47,56 @@ namespace FCS_HomeSolutions.Mods.AlienChief.Mono
             QuickLogger.Debug("In OnProtoDeserialize");
             var prefabIdentifier = GetComponentInParent<PrefabIdentifier>() ?? GetComponent<PrefabIdentifier>();
             var id = prefabIdentifier?.Id ?? string.Empty;
-            _saveData = Mod.GetAlienChiefSaveData(id);
+            _saveData = Mod.GetDSSTerminalSaveData(id);
         }
+
+        public override void Initialize()
+        {
+            if (_colorManager == null)
+            {
+                _colorManager = gameObject.AddComponent<ColorManager>();
+                _colorManager.Initialize(gameObject, ModelPrefab.BodyMaterial, ModelPrefab.SecondaryMaterial);
+            }
+
+            IsInitialized = true;
+
+            QuickLogger.Debug($"Initialized");
+        }
+
         public override void OnProtoSerialize(ProtobufSerializer serializer)
         {
             if (!Mod.IsSaving())
             {
-                QuickLogger.Info($"Saving {Mod.AlienChiefFriendly}");
+                QuickLogger.Info($"Saving {Mod.DSSTerminalFriendlyName}");
                 Mod.Save(serializer);
-                QuickLogger.Info($"Saved {Mod.AlienChiefFriendly}");
+                QuickLogger.Info($"Saved {Mod.DSSTerminalFriendlyName}");
             }
         }
 
         public override void OnProtoDeserialize(ProtobufSerializer serializer)
         {
             _fromSave = true;
+        }
+
+        public void Save(SaveData newSaveData, ProtobufSerializer serializer = null)
+        {
+            var prefabIdentifier = GetComponent<PrefabIdentifier>();
+            var id = prefabIdentifier.Id;
+
+            if (_saveData == null)
+            {
+                _saveData = new DSSTerminalDataEntry();
+            }
+            _saveData.ID = id;
+            _saveData.Body = _colorManager.GetColor().ColorToVector4();
+            _saveData.SecondaryBody = _colorManager.GetSecondaryColor().ColorToVector4();
+
+            newSaveData.DSSTerminalDataEntries.Add(_saveData);
+        }
+
+        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
+        {
+            return _colorManager.ChangeColor(color, mode);
         }
 
         public override bool CanDeconstruct(out string reason)
@@ -105,26 +124,6 @@ namespace FCS_HomeSolutions.Mods.AlienChief.Mono
                     _runStartUpOnEnable = true;
                 }
             }
-        }
-
-        public void Save(SaveData newSaveData, ProtobufSerializer serializer = null)
-        {
-            var prefabIdentifier = GetComponent<PrefabIdentifier>();
-            var id = prefabIdentifier.Id;
-
-            if (_saveData == null)
-            {
-                _saveData = new AlienChiefDataEntry();
-            }
-            _saveData.Id = id;
-            _saveData.Color = _colorManager.GetColor().ColorToVector4();
-
-            newSaveData.AlienChiefDataEntries.Add(_saveData);
-        }
-
-        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
-        {
-            return _colorManager.ChangeColor(color, mode);
         }
     }
 }

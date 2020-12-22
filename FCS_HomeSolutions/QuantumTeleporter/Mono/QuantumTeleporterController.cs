@@ -30,7 +30,6 @@ namespace FCS_HomeSolutions.QuantumTeleporter.Mono
         internal QTDisplayManager DisplayManager { get; private set; }
         internal AudioManager AudioManager { get; private set; }
         internal QTPowerManager PowerManager { get; private set; }
-        internal ColorManager ColorManager { get; private set; }
         internal SubRoot SubRoot { get; set; }
         internal bool IsLinked { get; set; }
 
@@ -98,7 +97,7 @@ namespace FCS_HomeSolutions.QuantumTeleporter.Mono
             {
                 NameController.SetCurrentName(_data.UnitName);
                 IsGlobal = _data.IsGlobal;
-                ColorManager.ChangeColor(_data.Color.Vector4ToColor());
+                _colorManager.ChangeColor(_data.Fcs.Vector4ToColor());
                 DisplayManager.Load(_data);
                 _linkedPortal = _data.LinkedPortal;
                 IsLinked = _data.IsLinked;
@@ -127,10 +126,10 @@ namespace FCS_HomeSolutions.QuantumTeleporter.Mono
             if (_buildable == null)
                 _buildable = GetComponentInParent<Constructable>() ?? GetComponent<Constructable>();
 
-            if (ColorManager == null)
-                ColorManager = gameObject.AddComponent<ColorManager>();
+            if (_colorManager == null)
+                _colorManager = gameObject.AddComponent<ColorManager>();
 
-            ColorManager.Initialize(gameObject, ModelPrefab.BodyMaterial);
+            _colorManager.Initialize(gameObject, ModelPrefab.BodyMaterial);
 
             if (NameController == null)
                 NameController = gameObject.EnsureComponent<NameController>();
@@ -183,7 +182,7 @@ namespace FCS_HomeSolutions.QuantumTeleporter.Mono
             }
 
             _data.Id = id;
-            _data.Color = ColorManager.GetColor().ColorToVector4();
+            _data.Fcs = _colorManager.GetColor().ColorToVector4();
             _data.UnitName = NameController.GetCurrentName();
             _data.IsGlobal = IsGlobal;
             _data.SelectedTab = DisplayManager.GetSelectedTab();
@@ -267,7 +266,7 @@ namespace FCS_HomeSolutions.QuantumTeleporter.Mono
 
         public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
         {
-            return ColorManager.ChangeColor(color, mode);
+            return _colorManager.ChangeColor(color, mode);
         }
     }
 }

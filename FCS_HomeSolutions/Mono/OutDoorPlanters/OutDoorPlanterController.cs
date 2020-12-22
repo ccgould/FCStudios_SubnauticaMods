@@ -13,7 +13,6 @@ namespace FCS_HomeSolutions.Mono.OutDoorPlanters
 {
     internal class OutDoorPlanterController : FcsDevice, IFCSSave<SaveData>
     {
-        private ColorManager _colorManager;
         private bool _runStartUpOnEnable;
         private bool _isFromSave;
         private PlanterDataEntry _savedData;
@@ -44,9 +43,9 @@ namespace FCS_HomeSolutions.Mono.OutDoorPlanters
 
                     LoadStorage();
 
-                    _colorManager.ChangeColor(_savedData.Color.Vector4ToColor());
-                    _colorManager.ChangeColor(_savedData.SecondaryColor.Vector4ToColor(), ColorTargetMode.Secondary);
-                    _colorManager.ChangeColor(_savedData.LUMColor.Vector4ToColor(), ColorTargetMode.Emission);
+                    _colorManager.ChangeColor(_savedData.Fcs.Vector4ToColor());
+                    _colorManager.ChangeColor(_savedData.Secondary.Vector4ToColor(), ColorTargetMode.Secondary);
+                    _colorManager.ChangeColor(_savedData.Lum.Vector4ToColor(), ColorTargetMode.Emission);
                 }
 
                 _runStartUpOnEnable = false;
@@ -70,9 +69,9 @@ namespace FCS_HomeSolutions.Mono.OutDoorPlanters
             }
 
             _savedData.Id = GetPrefabID();
-            _savedData.Color = _colorManager.GetColor().ColorToVector4();
-            _savedData.SecondaryColor = _colorManager.GetSecondaryColor().ColorToVector4();
-            _savedData.LUMColor = _colorManager.GetLumColor().ColorToVector4();
+            _savedData.Fcs = _colorManager.GetColor().ColorToVector4();
+            _savedData.Secondary = _colorManager.GetSecondaryColor().ColorToVector4();
+            _savedData.Lum = _colorManager.GetLumColor().ColorToVector4();
             if (serializer != null)
             {
                 _savedData.Bytes = GetStorageBytes(serializer);

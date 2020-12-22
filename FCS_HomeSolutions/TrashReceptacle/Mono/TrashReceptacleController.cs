@@ -16,7 +16,6 @@ namespace FCS_HomeSolutions.TrashReceptacle.Mono
         private bool _runStartUpOnEnable;
         private DumpContainer _dumpContainer;
         private TrashStorage _storage;
-        private ColorManager _colorManager;
 
         private void Start()
         {

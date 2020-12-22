@@ -19,6 +19,8 @@ namespace FCSDemo.Buildables
         internal static string LUMTexture => $"{Mod.ModName}_E";
         internal static string NormalTexture => $"{Mod.ModName}_N";
         internal static string DetailTexture => $"{Mod.ModName}_D";
+        public static string EmissiveBControllerMaterial { get; } = $"{Mod.ModName}_B_Controller";
+        public static string EmissiveControllerMaterial { get; } = $"{Mod.ModName}_E_Controller";
 
         public static GameObject GetPrefabs(string prefabName)
         {
@@ -73,6 +75,7 @@ namespace FCSDemo.Buildables
             MaterialHelpers.ApplyEmissionShader(BodyMaterial, LUMTexture, prefab, bundle, Color.white);
             MaterialHelpers.ApplyEmissionShader(DetailsMaterial, LUMTexture, prefab, bundle, Color.white);
             MaterialHelpers.ApplyEmissionShader(DecalMaterial, LUMTexture, prefab, bundle, Color.white);
+            MaterialHelpers.ApplyEmissionShader(EmissiveControllerMaterial, LUMTexture, prefab, bundle, Color.white);
             MaterialHelpers.ApplyAlphaShader(DecalMaterial, prefab);
             #endregion
         }

@@ -13,8 +13,6 @@ namespace FCS_HomeSolutions.Buildables
         private bool _runStartUpOnEnable;
         private bool _isFromSave;
         private DecorationDataEntry _savedData;
-        public ColorManager ColorManager { get; private set; }
-        
         private void Start()
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.DecorationItemTabId, Mod.ModName);
@@ -41,8 +39,8 @@ namespace FCS_HomeSolutions.Buildables
                         ReadySaveData();
                     }
 
-                    ColorManager.ChangeColor(_savedData.Color.Vector4ToColor());
-                    ColorManager.ChangeColor(_savedData.SecondaryColor.Vector4ToColor(),ColorTargetMode.Secondary);
+                    _colorManager.ChangeColor(_savedData.Fcs.Vector4ToColor());
+                    _colorManager.ChangeColor(_savedData.Secondary.Vector4ToColor(),ColorTargetMode.Secondary);
                 }
 
                 _runStartUpOnEnable = false;
@@ -51,10 +49,10 @@ namespace FCS_HomeSolutions.Buildables
 
         public override void Initialize()
         {
-            if (ColorManager == null)
+            if (_colorManager == null)
             {
-                ColorManager = gameObject.AddComponent<ColorManager>();
-                ColorManager.Initialize(gameObject,ModelPrefab.BodyMaterial,ModelPrefab.SecondaryMaterial);
+                _colorManager = gameObject.AddComponent<ColorManager>();
+                _colorManager.Initialize(gameObject,ModelPrefab.BodyMaterial,ModelPrefab.SecondaryMaterial);
             }
             
             IsInitialized = true;
@@ -95,8 +93,8 @@ namespace FCS_HomeSolutions.Buildables
             }
 
             _savedData.Id = GetPrefabID();
-            _savedData.Color = ColorManager.GetColor().ColorToVector4();
-            _savedData.SecondaryColor = ColorManager.GetSecondaryColor().ColorToVector4();
+            _savedData.Fcs = _colorManager.GetColor().ColorToVector4();
+            _savedData.Secondary = _colorManager.GetSecondaryColor().ColorToVector4();
             QuickLogger.Debug($"Saving ID {_savedData.Id}");
             newSaveData.DecorationEntries.Add(_savedData);
         }
@@ -136,7 +134,7 @@ namespace FCS_HomeSolutions.Buildables
 
         public override bool ChangeBodyColor(Color color,ColorTargetMode mode)
         {
-            return ColorManager.ChangeColor(color,mode);
+            return _colorManager.ChangeColor(color,mode);
         }
     }
 }

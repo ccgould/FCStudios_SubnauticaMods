@@ -18,7 +18,6 @@ namespace FCS_HomeSolutions.Curtains.Mono
     internal class CurtainController : FcsDevice,IFCSSave<SaveData>, IHandTarget
     {
         private bool _runStartUpOnEnable;
-        private ColorManager _colorManager;
         private bool _isFromSave;
         private CurtainDataEntry _savedData;
         private AnimationManager _animationHandler;
@@ -53,8 +52,8 @@ namespace FCS_HomeSolutions.Curtains.Mono
                         ReadySaveData();
                     }
 
-                    _colorManager.ChangeColor(_savedData.Color.Vector4ToColor());
-                    _colorManager.ChangeColor(_savedData.SecondaryColor.Vector4ToColor(), ColorTargetMode.Secondary);
+                    _colorManager.ChangeColor(_savedData.Fcs.Vector4ToColor());
+                    _colorManager.ChangeColor(_savedData.Secondary.Vector4ToColor(), ColorTargetMode.Secondary);
                     if (_savedData.SelectedTexturePath != null && QPatch.Patterns.ContainsKey(_savedData.SelectedTexturePath))
                     {
                         LoadImage(QPatch.Patterns[_savedData.SelectedTexturePath]);
@@ -145,8 +144,8 @@ namespace FCS_HomeSolutions.Curtains.Mono
             }
 
             _savedData.Id = GetPrefabID();
-            _savedData.Color = _colorManager.GetColor().ColorToVector4();
-            _savedData.SecondaryColor = _colorManager.GetSecondaryColor().ColorToVector4();
+            _savedData.Fcs = _colorManager.GetColor().ColorToVector4();
+            _savedData.Secondary = _colorManager.GetSecondaryColor().ColorToVector4();
             _savedData.SelectedTexturePath = _selectedImagePath;
             _savedData.IsOpen = _animationHandler.GetBoolHash(_isOpen);
             QuickLogger.Debug($"Saving ID {_savedData.Id}");

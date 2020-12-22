@@ -22,8 +22,7 @@ namespace FCS_EnergySolutions.AlterraGen.Mono
         private bool _runStartUpOnEnable;
         private GameObject _xBubbles;
 
-        internal AlterraGenPowerManager PowerManager { get; private set; }
-        internal ColorManager ColorManager { get; set; }
+        internal AlterraGenPowerManager PowerManager { get; private set; } 
         internal AnimationManager AnimationManager { get; set; }
         internal AlterraGenDisplayManager DisplayManager { get; private set; }
         public DumpContainer DumpContainer { get; private set; }
@@ -51,7 +50,7 @@ namespace FCS_EnergySolutions.AlterraGen.Mono
                         ReadySaveData();
                     }
 
-                    ColorManager.ChangeColor(_savedData.BodyColor.Vector4ToColor());
+                    _colorManager.ChangeColor(_savedData.Body.Vector4ToColor());
                     PowerManager.LoadFromSave(_savedData);
                     IsVisible = _savedData.IsVisible;
                 }
@@ -77,10 +76,10 @@ namespace FCS_EnergySolutions.AlterraGen.Mono
                 PowerManager = gameObject.AddComponent<AlterraGenPowerManager>();
             }
 
-            if (ColorManager == null)
+            if (_colorManager == null)
             {
-                ColorManager = gameObject.AddComponent<ColorManager>();
-                ColorManager.Initialize(gameObject, ModelPrefab.BodyMaterial);
+                _colorManager = gameObject.AddComponent<ColorManager>();
+                _colorManager.Initialize(gameObject, ModelPrefab.BodyMaterial);
             }
 
             if (AnimationManager == null)
@@ -133,7 +132,7 @@ namespace FCS_EnergySolutions.AlterraGen.Mono
             QuickLogger.Debug($"Changing AlterraGen color to {ColorList.GetName(color)}",true);
 #endif
 
-           return ColorManager.ChangeColor(color,mode);
+           return _colorManager.ChangeColor(color,mode);
         }
 
         #endregion
@@ -194,7 +193,7 @@ namespace FCS_EnergySolutions.AlterraGen.Mono
             _savedData.Id = GetPrefabID();
 
             QuickLogger.Debug($"Saving ID {_savedData.Id}",true);
-            _savedData.BodyColor = ColorManager.GetColor().ColorToVector4();
+            _savedData.Body = _colorManager.GetColor().ColorToVector4();
             _savedData.Storage = PowerManager.GetItemsWithin();
             _savedData.ToConsume = PowerManager.GetToConsume();
             _savedData.PowerState = PowerManager.PowerState;

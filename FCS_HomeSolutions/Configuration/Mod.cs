@@ -89,11 +89,11 @@ namespace FCS_HomeSolutions.Configuration
         internal static string QuantumTeleporterKitClassID = $"{QuantumTeleporterClassID}_Kit";
         internal const string QuantumTeleporterTabID = "QT";        
         
-        internal const string AlienChiefClassID = "AlienChief";
-        internal const string AlienChiefFriendly = "Alien Chief";
-        internal const string AlienChiefDescription = "An easy way to cook surplus of food";
-        internal const string AlienChiefPrefabName = "AlienChief";
-        internal static string AlienChiefKitClassID = $"{AlienChiefClassID}_Kit";
+        internal const string AlienChefClassID = "AlienChef";
+        internal const string AlienChefFriendly = "Alien Chef";
+        internal const string AlienChefDescription = "An easy way to cook surplus of food";
+        internal const string AlienChefPrefabName = "AlienChef";
+        internal static string AlienChiefKitClassID = $"{AlienChefClassID}_Kit";
         internal const string AlienChiefTabID = "AC";
 
         internal const string Cabinet1ClassID = "CabinetWide";
@@ -117,10 +117,73 @@ namespace FCS_HomeSolutions.Configuration
         internal static string Cabinet3KitClassID = $"{Cabinet3ClassID}_Kit";
 
 
+
         internal const string PaintCanClassID = "PaintCan";
         internal const string PaintCanFriendly = "Paint Can";
         internal const string PaintCanDescription = "More paint for you paint tool. Use the paint can to allow you to paint devices with your paint tool";
         internal const string PaintCanPrefabName = "PaintCan";
+
+
+        internal static readonly Dictionary<TechType, TechType> CuredCreatureList = new Dictionary<TechType, TechType>(TechTypeExtensions.sTechTypeComparer)
+        {
+            {
+                TechType.Bladderfish,
+                TechType.CuredBladderfish
+            },
+            {
+                TechType.Boomerang,
+                TechType.CuredBoomerang
+            },
+            {
+                TechType.LavaBoomerang,
+                TechType.CuredLavaBoomerang
+            },
+            {
+                TechType.Eyeye,
+                TechType.CuredEyeye
+            },
+            {
+                TechType.LavaEyeye,
+                TechType.CuredLavaEyeye
+            },
+            {
+                TechType.GarryFish,
+                TechType.CuredGarryFish
+            },
+            {
+                TechType.HoleFish,
+                TechType.CuredHoleFish
+            },
+            {
+                TechType.Hoopfish,
+                TechType.CuredHoopfish
+            },
+            {
+                TechType.Hoverfish,
+                TechType.CuredHoverfish
+            },
+            {
+                TechType.Oculus,
+                TechType.CuredOculus
+            },
+            {
+                TechType.Peeper,
+                TechType.CuredPeeper
+            },
+            {
+                TechType.Reginald,
+                TechType.CuredReginald
+            },
+            {
+                TechType.Spadefish,
+                TechType.CuredSpadefish
+            },
+            {
+                TechType.Spinefish,
+                TechType.CuredSpinefish
+            }
+        };
+
 
 
 #if SUBNAUTICA
@@ -263,6 +326,7 @@ namespace FCS_HomeSolutions.Configuration
         internal static string SaveDataFilename => $"{ModName}SaveData.json";
 
         public static TechType CurtainTechType { get; internal set; }
+
 
         internal static string GetModDirectory()
         {
@@ -608,6 +672,25 @@ namespace FCS_HomeSolutions.Configuration
             }
 
             return new CabinetDataEntry() { Id = id };
+        }
+
+        public static LedLightDataEntry GetLedLightEntrySaveData(string id)
+        {
+            LoadData();
+
+            var saveData = GetSaveData();
+
+            foreach (var entry in saveData.LedLightDataEntries)
+            {
+                if (string.IsNullOrEmpty(entry.Id)) continue;
+
+                if (entry.Id == id)
+                {
+                    return entry;
+                }
+            }
+
+            return new LedLightDataEntry() { Id = id };
         }
     }
 }

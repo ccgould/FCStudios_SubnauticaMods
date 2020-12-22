@@ -18,7 +18,7 @@ namespace FCSCommon.Utilities
             if (newSaveData != null)
             {
                 var settings = new JsonSerializerSettings {
-                    NullValueHandling = NullValueHandling.Ignore, 
+                    NullValueHandling = NullValueHandling.Ignore,
                     //TypeNameHandling = TypeNameHandling.Auto
                 };
                 var saveDataJson = JsonConvert.SerializeObject(newSaveData, Formatting.Indented,settings);
@@ -35,6 +35,12 @@ namespace FCSCommon.Utilities
             }
         }
 
+        private static void HandleDeserializationError(object sender, Oculus.Newtonsoft.Json.Serialization.ErrorEventArgs errorArgs)
+        {
+            var currentError = errorArgs.ErrorContext.Error.Message;
+            errorArgs.ErrorContext.Handled = true;
+        }
+
         internal static void LoadSaveData<TSaveData>(string fileName, string saveDirectory, Action<TSaveData> onSuccess) where TSaveData : new()
         {
             var path = Path.Combine(saveDirectory, fileName);
@@ -44,6 +50,8 @@ namespace FCSCommon.Utilities
             {
                 MissingMemberHandling = MissingMemberHandling.Ignore,
                 NullValueHandling = NullValueHandling.Ignore,
+                Error = HandleDeserializationError
+
                 //TypeNameHandling = TypeNameHandling.Auto
             };
 

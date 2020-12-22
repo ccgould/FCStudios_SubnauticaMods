@@ -28,7 +28,6 @@ namespace FCS_AlterraHub.Mono.AlterraHub
         private GameObject _hubCameraPosition;
         private bool _isInRange;
         private GameObject _screenBlock;
-        private ColorManager _colorManager;
         private DumpContainerSimplified _dumpContainer;
         private MotorHandler _motorHandler;
 
@@ -69,7 +68,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
                     }
 
                     DisplayManager.Load(_savedData);
-                    _colorManager.ChangeColor(_savedData.Color.Vector4ToColor());
+                    _colorManager.ChangeColor(_savedData.Fcs.Vector4ToColor());
                 }
                 
                 _runStartUpOnEnable = false;
@@ -282,7 +281,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
 
             _savedData.Id = GetPrefabID();
             _savedData.CartItems = DisplayManager.SaveCartItems();
-            _savedData.Color = _colorManager.GetColor().ColorToVector4();
+            _savedData.Fcs = _colorManager.GetColor().ColorToVector4();
             newSaveData.AlterraHubEntries.Add(_savedData);
             QuickLogger.Debug($"Saved ID {_savedData.Id}", true);
         }

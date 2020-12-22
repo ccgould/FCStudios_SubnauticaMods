@@ -50,7 +50,7 @@ namespace FCS_HomeSolutions.MiniFountainFilter.Managers
                 case "ColorItem":
                     var color = (Color)tag;
                     QuickLogger.Debug($"{_mono.gameObject.name} Color Changed to {color.ToString()}", true);
-                    _mono.ColorManager.ChangeColor(color);
+                    _mono.GetColorManager().ChangeColor(color);
                     break;
 
                 case "colorPickerBTN":

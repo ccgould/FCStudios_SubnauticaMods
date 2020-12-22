@@ -19,7 +19,6 @@ namespace FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Mono
     {
         private bool _runStartUpOnEnable;
         private bool _isFromSave;
-        private ColorManager _colorManager;
         private BaseUtilityEntry _savedData;
         private Text _percent;
         private Image _percentBar;
@@ -71,8 +70,8 @@ namespace FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Mono
                     }
 
                     OxygenManager.SetO2Level(_savedData.O2Level);
-                    _colorManager.ChangeColor(_savedData.BodyColor.Vector4ToColor());
-                    _colorManager.ChangeColor(_savedData.SecondaryBodyColor.Vector4ToColor(), ColorTargetMode.Secondary);
+                    _colorManager.ChangeColor(_savedData.Body.Vector4ToColor());
+                    _colorManager.ChangeColor(_savedData.SecondaryBody.Vector4ToColor(), ColorTargetMode.Secondary);
                 }
 
                 _runStartUpOnEnable = false;
@@ -228,8 +227,8 @@ namespace FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Mono
 
             _savedData.Id = GetPrefabID();
             _savedData.O2Level = OxygenManager.GetO2Level();
-            _savedData.BodyColor = _colorManager.GetColor().ColorToVector4();
-            _savedData.SecondaryBodyColor = _colorManager.GetSecondaryColor().ColorToVector4();
+            _savedData.Body = _colorManager.GetColor().ColorToVector4();
+            _savedData.SecondaryBody = _colorManager.GetSecondaryColor().ColorToVector4();
             QuickLogger.Debug($"Saving ID {_savedData.Id}");
             newSaveData.BaseUtilityUnitEntries.Add(_savedData);
         }

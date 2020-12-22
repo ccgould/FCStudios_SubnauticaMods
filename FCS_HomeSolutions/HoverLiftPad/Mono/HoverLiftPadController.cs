@@ -45,7 +45,6 @@ namespace FCS_HomeSolutions.HoverLiftPad.Mono
         private double _startTime;
         private float _totalDistance;
         private Vector3 _startPos;
-        private ColorManager _colorManager;
         private Exosuit _exosuitOnPad;
         private bool _isPrawnDocked;
         private Button _unLockPrawnButton;
@@ -160,8 +159,8 @@ namespace FCS_HomeSolutions.HoverLiftPad.Mono
                         ReadySaveData();
                     }
 
-                    _colorManager.ChangeColor(_savedData.Color.Vector4ToColor());
-                    _colorManager.ChangeColor(_savedData.SecondaryColor.Vector4ToColor(), ColorTargetMode.Secondary);
+                    _colorManager.ChangeColor(_savedData.Fcs.Vector4ToColor());
+                    _colorManager.ChangeColor(_savedData.Secondary.Vector4ToColor(), ColorTargetMode.Secondary);
 
                     if (!string.IsNullOrWhiteSpace(_savedData.DockedPrawnID) && _exosuitOnPad == null)
                     {
@@ -765,8 +764,8 @@ namespace FCS_HomeSolutions.HoverLiftPad.Mono
             _savedData.Id = GetPrefabID();
             _savedData.PlayerLocked = _playerLocked;
             _savedData.ExosuitLocked = _isPrawnDocked;
-            _savedData.Color = _colorManager.GetColor().ColorToVector4();
-            _savedData.SecondaryColor = _colorManager.GetSecondaryColor().ColorToVector4();
+            _savedData.Fcs = _colorManager.GetColor().ColorToVector4();
+            _savedData.Secondary = _colorManager.GetSecondaryColor().ColorToVector4();
             _savedData.KnownLevels = _knownLevels;
             _savedData.PadCurrentPosition = _liftPad.transform.localPosition.ToVec3();
             _savedData.FrontGatesOpen = _gates.Any(x => x.GateType == Gate.Front && x.IsOpen());

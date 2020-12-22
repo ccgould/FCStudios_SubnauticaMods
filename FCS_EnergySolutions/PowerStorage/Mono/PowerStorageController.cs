@@ -23,7 +23,6 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
         private bool _runStartUpOnEnable;
         private bool _isFromSave;
         private PowerStorageDataEntry _savedData;
-        private ColorManager _colorManager;
         private DumpContainerSimplified _dumpContainer;
         internal PowerCellCharger PowercellCharger { get; private set; }
         private PowerSupply _powercellSupply;
@@ -97,8 +96,8 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
                         ReadySaveData();
                     }
 
-                    _colorManager.ChangeColor(_savedData.BodyColor.Vector4ToColor());
-                    _colorManager.ChangeColor(_savedData.SecondaryBodyColor.Vector4ToColor(), ColorTargetMode.Secondary);
+                    _colorManager.ChangeColor(_savedData.Body.Vector4ToColor());
+                    _colorManager.ChangeColor(_savedData.SecondaryBody.Vector4ToColor(), ColorTargetMode.Secondary);
 
                     switch (_savedData.Mode)
                     {
@@ -291,8 +290,8 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
             _savedData.Id = GetPrefabID();
 
             QuickLogger.Debug($"Saving ID {_savedData.Id}", true);
-            _savedData.BodyColor = _colorManager.GetColor().ColorToVector4();
-            _savedData.SecondaryBodyColor = _colorManager.GetSecondaryColor().ColorToVector4();
+            _savedData.Body = _colorManager.GetColor().ColorToVector4();
+            _savedData.SecondaryBody = _colorManager.GetSecondaryColor().ColorToVector4();
             _savedData.Data = _powercellSupply.Save(serializer);
             _savedData.Mode = _mode;
             newSaveData.PowerStorageEntries.Add(_savedData);

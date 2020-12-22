@@ -15,7 +15,6 @@ namespace FCS_HomeSolutions.Mods.Cabinets.Mono
         private bool _runStartUpOnEnable;
         private bool _fromSave;
         private CabinetDataEntry _saveData;
-        private ColorManager _colorManager;
 
         private void Start()
         {
@@ -39,8 +38,8 @@ namespace FCS_HomeSolutions.Mods.Cabinets.Mono
 
             if (_fromSave)
             {
-                _colorManager.ChangeColor(_saveData.Color.Vector4ToColor());
-                _colorManager.ChangeColor(_saveData.SecondaryColor.Vector4ToColor(),ColorTargetMode.Secondary);
+                _colorManager.ChangeColor(_saveData.Fcs.Vector4ToColor());
+                _colorManager.ChangeColor(_saveData.Secondary.Vector4ToColor(),ColorTargetMode.Secondary);
                 _fromSave = false;
             }
         }
@@ -95,9 +94,9 @@ namespace FCS_HomeSolutions.Mods.Cabinets.Mono
         {
             if (!Mod.IsSaving())
             {
-                QuickLogger.Info($"Saving {Mod.AlienChiefFriendly}");
+                QuickLogger.Info($"Saving {Mod.AlienChefFriendly}");
                 Mod.Save(serializer);
-                QuickLogger.Info($"Saved {Mod.AlienChiefFriendly}");
+                QuickLogger.Info($"Saved {Mod.AlienChefFriendly}");
             }
         }
 
@@ -116,8 +115,8 @@ namespace FCS_HomeSolutions.Mods.Cabinets.Mono
                 _saveData = new CabinetDataEntry();
             }
             _saveData.Id = id;
-            _saveData.Color = _colorManager.GetColor().ColorToVector4();
-            _saveData.SecondaryColor = _colorManager.GetSecondaryColor().ColorToVector4();
+            _saveData.Fcs = _colorManager.GetColor().ColorToVector4();
+            _saveData.Secondary = _colorManager.GetSecondaryColor().ColorToVector4();
 
             newSaveData.CabinetDataEntries.Add(_saveData);
         }

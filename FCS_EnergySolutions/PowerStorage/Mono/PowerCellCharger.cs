@@ -27,6 +27,12 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
         private PowerStorageController _mono;
         private bool _allowedToCharge;
         private FCSStorage _storageContainer;
+
+        private void Start()
+        {
+            _storageContainer.CleanUpDuplicatedStorageNoneRoutine();
+        }
+
         public Action<string> OnBatteryAdded { get; set; }
 
         internal void Initialize(PowerStorageController mono, GameObject[] powercellDummies, GameObject[] uiBatteries, PowerSupply powerSupply)

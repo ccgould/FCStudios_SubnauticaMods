@@ -42,10 +42,15 @@ namespace FCS_HomeSolutions.Buildables
         public static GameObject TemplateItem { get; set; }
         public static GameObject TrashRecyclerItemPrefab { get; set; }
         public static GameObject CurtainPrefab { get; set; }
-        public static GameObject AlienChiefPrefab { get; set; }
+        public static GameObject AlienChefPrefab { get; set; }
         public static GameObject Cabinet1Prefab { get; set; }
         public static GameObject Cabinet2Prefab { get; set; }
         public static GameObject Cabinet3Prefab { get; set; }
+        public static GameObject CookerItemPrefab { get; set; }
+        public static GameObject CookerOrderItemPrefab { get; set; }
+        public static GameObject LedLightLongPrefab { get; set; }
+        public static GameObject LedLightWallPrefab { get; set; }
+        public static GameObject LedLightShortPrefab { get; set; }
 
         internal static void Initialize()
         {
@@ -71,7 +76,7 @@ namespace FCS_HomeSolutions.Buildables
             TrashRecyclerPrefab = GetPrefab(Mod.RecyclerPrefabName);
             PaintCanPrefab = GetPrefab(Mod.PaintCanPrefabName);
             QuantumTeleporterPrefab = GetPrefab(Mod.QuantumTeleporterPrefabName);
-            AlienChiefPrefab = GetPrefab(Mod.AlienChiefPrefabName);
+            AlienChefPrefab = GetPrefab(Mod.AlienChefPrefabName);
             Cabinet1Prefab = GetPrefab(Mod.Cabinet1PrefabName);
             Cabinet2Prefab = GetPrefab(Mod.Cabinet2PrefabName);
             Cabinet3Prefab = GetPrefab(Mod.Cabinet3PrefabName);
@@ -80,11 +85,14 @@ namespace FCS_HomeSolutions.Buildables
             NetworkItemPrefab = GetPrefab("NetworkItem");
             TemplateItem = GetPrefab("TemplateItem");
             CurtainPrefab = GetPrefab("Curtain");
+            CookerItemPrefab = GetPrefab("CookerItem");
+            CookerOrderItemPrefab = GetPrefab("OrderItem");
+            LedLightLongPrefab = GetPrefab("FCS_LedLightStick_03");
+            LedLightShortPrefab = GetPrefab("FCS_LedLightStick_01");
+            LedLightWallPrefab = GetPrefab("FCS_LedLightStick_02");
             _initialized = true;
         }
-
-       
-
+        
         internal static GameObject GetPrefab(string prefabName)
         {
             try

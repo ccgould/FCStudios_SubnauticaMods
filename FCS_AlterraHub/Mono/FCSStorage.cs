@@ -41,9 +41,9 @@ namespace FCS_AlterraHub.Mono
             {
                 QuickLogger.Debug("Getting Data from memory stream");
                 GameObject gObj = serializer.DeserializeObjectTree(memoryStream, 1);
-                QuickLogger.Debug($"Deserialized Object Stream. {gObj}");
+                QuickLogger.Debug($"De-serialized Object Stream. {gObj}");
                 TransferItems(gObj);
-                QuickLogger.Debug("Items Transfered");
+                QuickLogger.Debug("Items Transferred");
                 GameObject.Destroy(gObj);
                 QuickLogger.Debug("Item destroyed");
             }
@@ -55,35 +55,30 @@ namespace FCS_AlterraHub.Mono
 
             foreach (UniqueIdentifier uniqueIdentifier in source.GetComponentsInChildren<UniqueIdentifier>(true))
             {
-                QuickLogger.Debug($"Processing {uniqueIdentifier.Id} :Position: {uniqueIdentifier.transform.position}: Parent: {uniqueIdentifier.transform.parent} Parent transform: {uniqueIdentifier.transform.parent.position}");
                 if (!(uniqueIdentifier.transform.parent != source.transform))
                 {
-                    QuickLogger.Debug($"{uniqueIdentifier.Id} is not the source continuing to process");
-
                     Pickupable pickupable = uniqueIdentifier.gameObject.EnsureComponent<Pickupable>();
                     if (!ItemsContainer.Contains(pickupable))
                     {
-                        QuickLogger.Debug("Creating new inventory item");
                         InventoryItem item = new InventoryItem(pickupable);
-                        QuickLogger.Debug($"Is Active and Enabled: {item.item.gameObject.GetComponent<UniqueIdentifier>().isActiveAndEnabled}");
-                        var h = item.item.gameObject.GetComponentsInChildren<UniqueIdentifier>(true);
-                        foreach (var identifier in h)
-                        {
-                            identifier.Id = Guid.NewGuid().ToString();
-                        }
-                        
+                        ChangePrefabId(item);
                         item.item.transform.parent = _storageRoot.transform;
-
-                        QuickLogger.Debug($"Object posiiton = {item.item.transform.position}");
-
-                        QuickLogger.Debug($"ItemsContainer position: {ItemsContainer.tr.position}");
                         ItemsContainer.UnsafeAdd(item);
-                        QuickLogger.Debug($"Adding {uniqueIdentifier.Id}");
                     }
                 }
             }
 
             CleanUpDuplicatedStorageNoneRoutine();
+        }
+
+        private static void ChangePrefabId(InventoryItem item)
+        {
+            var uniqueIdentifiers = item.item.gameObject.GetComponentsInChildren<UniqueIdentifier>(true);
+            
+            foreach (var identifier in uniqueIdentifiers)
+            {
+                identifier.Id = Guid.NewGuid().ToString();
+            }
         }
 
         public void CleanUpDuplicatedStorageNoneRoutine()
@@ -102,7 +97,7 @@ namespace FCS_AlterraHub.Mono
                 if (storeInformationIdentifier != null && storeInformationIdentifier.name.StartsWith("SerializerEmptyGameObject", StringComparison.OrdinalIgnoreCase))
                 {
                     GameObject.Destroy(storeInformationIdentifier.gameObject);
-                    QuickLogger.Debug($"Destroyed Duplicate", true);
+                    QuickLogger.Debug($"Destroyed Duplicate");
                 }
                 num = i;
             }
@@ -135,11 +130,18 @@ namespace FCS_AlterraHub.Mono
           return true;
         }
 
-        public void Initialize(int slots)
+        public void Initialize(int slots, GameObject go = null)
         {
-            _storageRoot = new GameObject("FCSStorage");
-            _storageRoot.transform.parent = transform;
-            //UWE.Utils.ZeroTransform(_storageRoot);
+            if (go == null)
+            {
+                _storageRoot = new GameObject("FCSStorage");
+                _storageRoot.transform.parent = transform;
+                UWE.Utils.ZeroTransform(_storageRoot);
+            }
+            else
+            {
+                _storageRoot = go;
+            }
             _storageRoot.AddComponent<StoreInformationIdentifier>();
             ItemsContainer = new ItemsContainer(slots, slots, _storageRoot.transform, "FCSStorage", null);
         }

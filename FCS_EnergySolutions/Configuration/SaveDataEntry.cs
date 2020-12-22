@@ -13,7 +13,7 @@ namespace FCS_EnergySolutions.Configuration
     {
         public string Id { get; set; }
         [JsonProperty] internal string SaveVersion { get; set; } = "1.0";
-        [JsonProperty] internal ColorVec4 BodyColor { get; set; }
+        [JsonProperty] internal Vec4 Body { get; set; }
         [JsonProperty] internal Dictionary<TechType, int> Storage { get; set; }
         [JsonProperty] internal float ToConsume { get; set; }
         [JsonProperty] internal FCSPowerStates PowerState { get; set; }
@@ -28,8 +28,8 @@ namespace FCS_EnergySolutions.Configuration
         public string Id { get; set; }
         public string BaseId { get; set; }
         [JsonProperty] internal string SaveVersion { get; set; } = "1.0";
-        [JsonProperty] internal ColorVec4 BodyColor { get; set; }
-        [JsonProperty] internal ColorVec4 SecondaryBodyColor { get; set; }
+        [JsonProperty] internal Vec4 Body { get; set; }
+        [JsonProperty] internal Vec4 SecondaryBody { get; set; }
         [JsonProperty] internal FCSPowerStates PowerState { get; set; }
         [JsonProperty] internal float StoredPower { get; set; }
         [JsonProperty] internal string CurrentBiome { get; set; }
@@ -49,8 +49,8 @@ namespace FCS_EnergySolutions.Configuration
         public string Id { get; set; }
         public string BaseId { get; set; }
         [JsonProperty] internal string SaveVersion { get; set; } = "1.0";
-        [JsonProperty] internal ColorVec4 BodyColor { get; set; }
-        [JsonProperty] internal ColorVec4 SecondaryBodyColor { get; set; }
+        [JsonProperty] internal Vec4 Body { get; set; }
+        [JsonProperty] internal Vec4 SecondaryBody { get; set; }
         [JsonProperty] internal FCSPowerStates PowerState { get; set; }
         [JsonProperty] internal byte[] Data { get; set; }
         [JsonProperty] internal PowerChargerMode Mode { get; set; }

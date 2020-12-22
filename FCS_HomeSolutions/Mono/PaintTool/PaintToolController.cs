@@ -80,7 +80,7 @@ namespace FCS_HomeSolutions.Mono.PaintTool
                 }
 
                 _paintCanFillAmount = _savedData.Amount;
-                _currentColor = _savedData.Color.Vector4ToColor();
+                _currentColor = _savedData.Fcs.Vector4ToColor();
                 _colorTargetMode = _savedData.ColorTargetMode == 0 ? ColorTargetMode.Primary : _savedData.ColorTargetMode;
                 _painterModeIndex = (int) _colorTargetMode;
 
@@ -133,7 +133,7 @@ namespace FCS_HomeSolutions.Mono.PaintTool
 
         private void Paint()
         {
-            Vector3 vector = default(Vector3);
+            Vector3 vector = default;
             GameObject go = null;
             UWE.Utils.TraceFPSTargetPosition(Player.main.gameObject, Range, ref go, ref vector, false);
             QuickLogger.Debug($"Painter Hit: {go.name} || Layer: {go.layer}",true);
@@ -144,9 +144,12 @@ namespace FCS_HomeSolutions.Mono.PaintTool
 
                 if (result)
                 {
-                    if (GameModeUtils.RequiresPower())
+                    if (GameModeUtils.RequiresPower() && _colorTargetMode != ColorTargetMode.Emission)
                     {
-                        _paintCanFillAmount -= 1;
+                        if (fcsDevice.CurrentDeviceColor(_colorTargetMode ,out var deviceColor) && deviceColor != _currentColor)
+                        {
+                            _paintCanFillAmount -= 1;
+                        }
                     }
                     RefreshUI();
                 }
@@ -230,7 +233,7 @@ namespace FCS_HomeSolutions.Mono.PaintTool
             }
 
             _savedData.Id = GetPrefabID();
-            _savedData.Color = _currentColor.ColorToVector4();
+            _savedData.Fcs = _currentColor.ColorToVector4();
             _savedData.Amount = _paintCanFillAmount;
             _savedData.ColorTargetMode = _colorTargetMode;
             newSaveData.PaintToolEntries.Add(_savedData);

@@ -29,6 +29,7 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
 
         public bool AddItemToContainer(InventoryItem item)
         {
+            if (item == null) return false;
             var plantable = item.item.gameObject.GetComponentInChildren<Plantable>();
             
             if (plantable != null)
@@ -62,14 +63,14 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
         {
             var techType = pickupable.GetTechType();
-            if (techType == TechType.StalkerTooth || techType == TechType.GasPod)
+            if (Mod.IsNonePlantableAllowedList.Contains(techType))
             {
                 return true;
             }
 
             return !Mod.IsHydroponicKnownTech(techType, out var data) && 
                    _device.DumpContainer.GetCount() != 1 && 
-                   pickupable.gameObject.GetComponentInChildren<Plantable>() != null;
+                   pickupable.gameObject.GetComponentInChildren<Plantable>().isSeedling;
         }
 
         public bool IsAllowedToRemoveItems()

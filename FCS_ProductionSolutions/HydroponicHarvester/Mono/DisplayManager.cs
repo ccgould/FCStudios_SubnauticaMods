@@ -116,13 +116,14 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
                 _loadedDNASamples = new List<TechType>();
             }
 
+
             var knownSamples = Mod.GetHydroponicKnownTech();
 
             if (knownSamples == null) return;
 
             foreach (var sample in knownSamples)
             {
-                if(sample.TechType == TechType.None || _loadedDNASamples.Contains(sample.TechType) || sample.IsNonePlantable) continue;
+                if(sample.TechType == TechType.None || _loadedDNASamples.Contains(sample.TechType) || Mod.IsNonePlantableAllowedList.Contains(sample.TechType)) continue;
                 var button = GameObject.Instantiate(ModelPrefab.HydroponicDNASamplePrefab).AddComponent<InterfaceButton>();
                 var icon = GameObjectHelpers.FindGameObject(button.gameObject, "Icon").AddComponent<uGUI_Icon>();
                 icon.sprite = SpriteManager.Get(sample.TechType);

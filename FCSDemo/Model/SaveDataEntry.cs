@@ -9,7 +9,7 @@ namespace Model
     internal class SaveDataEntry
     {
         [JsonProperty] internal string ID { get; set; }
-        [JsonProperty] internal ColorVec4 BodyColor { get; set; }
+        [JsonProperty] internal Vec4 Body { get; set; }
     }
 
     [Serializable]

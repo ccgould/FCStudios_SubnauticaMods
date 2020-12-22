@@ -33,7 +33,7 @@ namespace FCS_EnergySolutions.JetStreamT242.Buildables
             
             OnFinishedPatching += () =>
             {
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.JetStreamT242KitClassID.ToTechType(), 500000, StoreCategory.Energy);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.JetStreamT242KitClassID.ToTechType(), 700000, StoreCategory.Energy);
             };
         }
         

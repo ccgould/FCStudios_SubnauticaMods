@@ -3,14 +3,14 @@ using System.IO;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Spawnables;
-using FCS_StorageSolutions.AlterraStorage.Mono;
 using FCS_StorageSolutions.Configuration;
+using FCS_StorageSolutions.Mods.AlterraStorage.Mono;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
 using UnityEngine;
 
-namespace FCS_StorageSolutions.AlterraStorage.Buildable
+namespace FCS_StorageSolutions.Mods.AlterraStorage.Buildable
 {
     internal class AlterraStoragePatch : SMLHelper.V2.Assets.Buildable
     {

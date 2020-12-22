@@ -31,7 +31,6 @@ namespace FCS_HomeSolutions.MiniFountainFilter.Mono
         private MiniFountainFilterDataEntry _saveData;
         private ParticleSystem _xBubbles;
         private Dictionary<string, FcsDevice> _registeredDevices;
-        internal ColorManager ColorManager { get; private set; }
         internal MFFDisplayManager DisplayManager { get; private set; }
         internal AnimationManager AnimationManager { get; private set; }
         internal MFFStorageManager StorageManager { get; private set; }
@@ -71,7 +70,7 @@ namespace FCS_HomeSolutions.MiniFountainFilter.Mono
             if (_fromSave)
             {
                 TankManager.SetTankLevel(_data.TankLevel);
-                ColorManager.ChangeColor(_data.BodyColor.Vector4ToColor());
+                _colorManager.ChangeColor(_data.Body.Vector4ToColor());
                 StorageManager.NumberOfBottles = _data.ContainerAmount;
                 _isInSub = _data.IsInSub;
                 QuickLogger.Info($"Loaded {Mod.MiniFountainFilterFriendly}");
@@ -115,10 +114,10 @@ namespace FCS_HomeSolutions.MiniFountainFilter.Mono
 
             AnimationManager = gameObject.GetComponent<AnimationManager>();
 
-            if (ColorManager == null)
+            if (_colorManager == null)
             {
-                ColorManager = gameObject.AddComponent<ColorManager>();
-                ColorManager.Initialize(gameObject, ModelPrefab.BodyMaterial);
+                _colorManager = gameObject.AddComponent<ColorManager>();
+                _colorManager.Initialize(gameObject, ModelPrefab.BodyMaterial);
             }
 
             if (TankManager == null)
@@ -225,7 +224,7 @@ namespace FCS_HomeSolutions.MiniFountainFilter.Mono
                 _saveData = new MiniFountainFilterDataEntry();
             }
             _saveData.Id = id;
-            _saveData.BodyColor = ColorManager.GetColor().ColorToVector4();
+            _saveData.Body = _colorManager.GetColor().ColorToVector4();
             _saveData.TankLevel = TankManager.GetTankLevel();
             _saveData.ContainerAmount = StorageManager.NumberOfBottles;
             _saveData.IsInSub = _isInSub;
@@ -292,7 +291,7 @@ namespace FCS_HomeSolutions.MiniFountainFilter.Mono
 
         public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
         {
-            return ColorManager.ChangeColor(color, mode);
+            return _colorManager.ChangeColor(color, mode);
         }
     }
 }

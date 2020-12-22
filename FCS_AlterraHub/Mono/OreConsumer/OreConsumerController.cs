@@ -45,8 +45,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
         public EffectsManager EffectsManager { get; private set; }
         public AudioManager AudioManager { get; private set; }
         public Action<bool> onUpdateSound { get; private set; }
-        public ColorManager ColorManager { get; private set; }
-        
+
 
         private Queue<TechType> _oreQueue;
         private const float OreProcessingTime = 90f;
@@ -120,7 +119,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
                         _timeLeft = _savedData.TimeLeft;
                     }
                     MotorHandler.SpeedByPass(_savedData.RPM);
-                    ColorManager.ChangeColor(_savedData.Color.Vector4ToColor(),ColorTargetMode.Both);
+                    _colorManager.ChangeColor(_savedData.Fcs.Vector4ToColor(),ColorTargetMode.Both);
                 }
 
                 _runStartUpOnEnable = false;
@@ -193,10 +192,10 @@ namespace FCS_AlterraHub.Mono.OreConsumer
                 }
             };
 
-            if (ColorManager == null)
+            if (_colorManager == null)
             {
-                ColorManager = gameObject.AddComponent<ColorManager>();
-                ColorManager.Initialize(gameObject, Buildables.AlterraHub.BodyMaterial);
+                _colorManager = gameObject.AddComponent<ColorManager>();
+                _colorManager.Initialize(gameObject, Buildables.AlterraHub.BodyMaterial);
             }
 
 
@@ -344,7 +343,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
             _savedData.OreQueue = _oreQueue;
             _savedData.TimeLeft = _timeLeft;
             _savedData.RPM = MotorHandler.GetRPM();
-            _savedData.Color = ColorManager.GetColor().ColorToVector4();
+            _savedData.Fcs = _colorManager.GetColor().ColorToVector4();
             _savedData.BaseId = BaseId;
             QuickLogger.Debug($"Saving ID {_savedData.Id}", true);
             newSaveData.OreConsumerEntries.Add(_savedData);
@@ -358,7 +357,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
 
         public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
         {
-            return ColorManager.ChangeColor(color,mode);   
+            return _colorManager.ChangeColor(color,mode);   
         }
 
         public void OnHandHover(GUIHand hand)

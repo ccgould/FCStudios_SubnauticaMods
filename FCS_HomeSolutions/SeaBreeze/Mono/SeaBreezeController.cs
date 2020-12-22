@@ -29,7 +29,6 @@ namespace FCS_HomeSolutions.SeaBreeze.Mono
 
         #region Public Properties
 
-        internal ColorManager ColorManager { get; private set; }
         internal Fridge FridgeComponent { get; private set; }
         internal SeaBreezePowerManager PowerManager { get; private set; }
         internal NameController NameController { get; private set; }
@@ -74,7 +73,7 @@ namespace FCS_HomeSolutions.SeaBreeze.Mono
                     PowerManager.LoadSave(_savedData.PowercellData, _savedData.HasBreakerTripped);
                     FridgeComponent.LoadSave(_savedData.FridgeContainer);
                     NameController.SetCurrentName(_savedData.UnitName);
-                    ColorManager.ChangeColor(_savedData.BodyColor.Vector4ToColor());
+                    _colorManager.ChangeColor(_savedData.Body.Vector4ToColor());
                     IsVisible = _savedData.IsVisible;
                     QuickLogger.Info($"Loaded {Mod.SeaBreezeFriendly}");
                 }
@@ -127,10 +126,10 @@ namespace FCS_HomeSolutions.SeaBreeze.Mono
                 FridgeComponent.SetModMode(QPatch.SeaBreezeConfiguration.ModMode);
             }
 
-            if (ColorManager == null)
+            if (_colorManager == null)
             {
-                ColorManager = gameObject.AddComponent<ColorManager>();
-                ColorManager.Initialize(gameObject, ModelPrefab.BodyMaterial);
+                _colorManager = gameObject.AddComponent<ColorManager>();
+                _colorManager.Initialize(gameObject, ModelPrefab.BodyMaterial);
             }
 
             if (_dumpContainer == null)
@@ -276,7 +275,7 @@ namespace FCS_HomeSolutions.SeaBreeze.Mono
             }
              
             _savedData.Id = id;
-            _savedData.BodyColor = ColorManager.GetColor().ColorToVector4();
+            _savedData.Body = _colorManager.GetColor().ColorToVector4();
             _savedData.UnitName = NameController.GetCurrentName();
             _savedData.FridgeContainer = FridgeComponent.Save();
             _savedData.PowercellData = PowerManager.Save();
@@ -287,7 +286,7 @@ namespace FCS_HomeSolutions.SeaBreeze.Mono
 
         public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
         {
-            return ColorManager.ChangeColor(color, mode);
+            return _colorManager.ChangeColor(color, mode);
         }
 
         public void ClearSeaBreeze()

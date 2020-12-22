@@ -18,7 +18,7 @@ namespace FCS_AlterraHub.Mono
         /// Inter Process Communication used to communicate with devices
         /// </summary>
         public virtual Action<string> IPCMessage { get; set; }
-    
+
 
         public virtual void Awake()
         {
@@ -49,6 +49,8 @@ namespace FCS_AlterraHub.Mono
         {
             return transform.position;
         }
+
+        protected ColorManager _colorManager;
 
         /// <summary>
         /// The package which this item belongs to
@@ -99,6 +101,11 @@ namespace FCS_AlterraHub.Mono
         public BaseManager Manager { get; set; }
 
         /// <summary>
+        /// Bypasses the check for the registration IsConstructed and PrefabID
+        /// </summary>
+        public virtual bool BypassRegisterCheck { get;} = false;
+
+        /// <summary>
         /// The initializer of this device
         /// </summary>
         public abstract void Initialize();
@@ -119,8 +126,8 @@ namespace FCS_AlterraHub.Mono
         /// <returns></returns>
         public TechType GetTechType()
         {
-            return gameObject.GetComponent<TechTag>()?.type ?? 
-                   gameObject.GetComponentInChildren<TechTag>()?.type ?? 
+            return gameObject.GetComponent<TechTag>()?.type ??
+                   gameObject.GetComponentInChildren<TechTag>()?.type ??
                    TechType.None;
         }
 
@@ -164,7 +171,7 @@ namespace FCS_AlterraHub.Mono
         /// The amount of power this device produces
         /// </summary>
         /// <returns></returns>
-        public virtual  float GetPowerProducing()
+        public virtual float GetPowerProducing()
         {
             return 0f;
         }
@@ -211,10 +218,48 @@ namespace FCS_AlterraHub.Mono
             return false;
         }
 
+        /// <summary>
+        /// Gets the current color of the device
+        /// </summary>
+        /// <returns></returns>
+        public virtual bool CurrentDeviceColor(ColorTargetMode mode, out Color color)
+        {
+            if (_colorManager != null)
+            {
+                color = _colorManager.GetColor();
+                return true;
+            }
+            color = Color.white;
+            return false;
+        }
+
+        /// <summary>
+        /// Returns the colorManager of this device
+        /// </summary>
+        /// <returns></returns>
+        public virtual ColorManager GetColorManager()
+        {
+            return _colorManager;
+        }
+
+        /// <summary>
+        /// Turns On the device if the device can be turned on
+        /// </summary>
+        public virtual void TurnOnDevice()
+        {
+        }
+
+        /// <summary>
+        /// Turns off the the device if the device can be turned off
+        /// </summary>
+        public virtual void TurnOffDevice()
+        {
+
+        }
     }
 
     public interface IFCSSave<T>
     {
-        void Save(T newSaveData,ProtobufSerializer serializer = null);
+        void Save(T newSaveData, ProtobufSerializer serializer = null);
     }
 }

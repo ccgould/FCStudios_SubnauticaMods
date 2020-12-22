@@ -30,7 +30,7 @@ namespace FCS_ProductionSolutions
             ModelPrefab.Initialize();
 
             AuxPatchers.AdditionalPatching();
-
+            
             var hydroHarvester = new HydroponicHarvesterPatch();
             hydroHarvester.Patch();
 

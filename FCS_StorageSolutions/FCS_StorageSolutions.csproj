@@ -114,19 +114,39 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AlterraStorage\Buildable\AlterraStoragePatch.cs" />
-    <Compile Include="AlterraStorage\Buildable\ModelPrefab.cs" />
-    <Compile Include="AlterraStorage\Mono\AlterraStorageController.cs" />
+    <Compile Include="Mods\AlterraStorage\Buildable\AlterraStoragePatch.cs" />
+    <Compile Include="Mods\AlterraStorage\Buildable\ModelPrefab.cs" />
+    <Compile Include="Mods\AlterraStorage\Mono\AlterraStorageController.cs" />
     <Compile Include="Configuration\AuxPatchers.cs" />
     <Compile Include="Configuration\Config.cs" />
     <Compile Include="Configuration\DebugCommands.cs" />
     <Compile Include="Configuration\Mod.cs" />
     <Compile Include="Configuration\SaveDataEntry.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Buildable\DSSAutoCrafterPatch.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Buildable\DSSAntennaPatch.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Buildable\DSSTerminalPatch.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Buildable\DSSFormattingStationPatch.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Buildable\DSSItemDisplayPatch.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Buildable\DSSFloorServerRackPatch.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Buildable\DSSWallServerRackPatch.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Buildable\DSSServerSpawnable.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Antenna\DSSAntennaController.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\AutoCrafter\DSSAutoCrafterController.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\FormattingStation\DSSFormattingStationController.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\ItemDisplay\DSSItemDisplayController.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Rack\DSSSlotController.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Rack\DSSFloorServerRackController.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Rack\DSSWallServerRackController.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Server\DSSServerController.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\InterfaceInteraction.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\DSSTerminalController.cs" />
     <Compile Include="Patches\StorageContainterPatches.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Mods\DataStorageSolutions\Spawnables\" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FCS_AlterraHub\FCS_AlterraHub.csproj">
       <Project>{1a17b4ba-aae5-41c2-924a-ce05dc74efe8}</Project>

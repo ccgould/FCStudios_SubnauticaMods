@@ -33,7 +33,7 @@ namespace FCS_LifeSupportSolutions.Mods.EnergyPillVendingMachine.Buildable
 
             OnFinishedPatching += () =>
             {
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.EnergyPillVendingMachineKitClassID.ToTechType(), 50550, StoreCategory.LifeSupport);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.EnergyPillVendingMachineKitClassID.ToTechType(), 60550, StoreCategory.LifeSupport);
             };
         }
 

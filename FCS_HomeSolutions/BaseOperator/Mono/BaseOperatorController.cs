@@ -13,7 +13,6 @@ namespace FCS_HomeSolutions.BaseOperator.Mono
     {
         private bool _runStartUpOnEnable;
         private bool _isFromSave;
-        private ColorManager _colorManager;
         private BaseOperatorDataEntry _savedData;
         private BaseOperatorDisplay _displayManager;
 
@@ -44,8 +43,8 @@ namespace FCS_HomeSolutions.BaseOperator.Mono
                         ReadySaveData();
                     }
 
-                    _colorManager.ChangeColor(_savedData.Color.Vector4ToColor());
-                    _colorManager.ChangeColor(_savedData.SecondaryColor.Vector4ToColor(), ColorTargetMode.Secondary);
+                    _colorManager.ChangeColor(_savedData.Fcs.Vector4ToColor());
+                    _colorManager.ChangeColor(_savedData.Secondary.Vector4ToColor(), ColorTargetMode.Secondary);
                 }
 
                 _runStartUpOnEnable = false;
@@ -136,8 +135,8 @@ namespace FCS_HomeSolutions.BaseOperator.Mono
             }
 
             _savedData.Id = GetPrefabID();
-            _savedData.Color = _colorManager.GetColor().ColorToVector4();
-            _savedData.SecondaryColor = _colorManager.GetSecondaryColor().ColorToVector4();
+            _savedData.Fcs = _colorManager.GetColor().ColorToVector4();
+            _savedData.Secondary = _colorManager.GetSecondaryColor().ColorToVector4();
             QuickLogger.Debug($"Saving ID {_savedData.Id}");
             newSaveData.BaseOperatorEntries.Add(_savedData);
         }

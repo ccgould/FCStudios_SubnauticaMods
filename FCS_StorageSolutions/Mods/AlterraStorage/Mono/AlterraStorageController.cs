@@ -8,8 +8,8 @@ using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Mono.ObjectPooler;
 using FCS_AlterraHub.Mono.OreConsumer;
 using FCS_AlterraHub.Registration;
-using FCS_StorageSolutions.AlterraStorage.Buildable;
 using FCS_StorageSolutions.Configuration;
+using FCS_StorageSolutions.Mods.AlterraStorage.Buildable;
 using FCSCommon.Components;
 using FCSCommon.Enums;
 using FCSCommon.Helpers;
@@ -18,13 +18,12 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace FCS_StorageSolutions.AlterraStorage.Mono
+namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
 {
     internal class AlterraStorageController : FcsDevice, IFCSSave<SaveData>, IHandTarget, IFCSStorage
     {
         private bool _runStartUpOnEnable;
         private AlterraStorageDataEntry _savedData;
-        private ColorManager _colorManager;
         private bool _isFromSave;
         private DumpContainer _dumpContainer;
         private FCSStorage _storageContainer;
@@ -72,7 +71,7 @@ namespace FCS_StorageSolutions.AlterraStorage.Mono
                         ReadySaveData();
                     }
 
-                    _colorManager.ChangeColor(_savedData.BodyColor.Vector4ToColor(), ColorTargetMode.Both);
+                    _colorManager.ChangeColor(_savedData.Body.Vector4ToColor(), ColorTargetMode.Both);
                 }
 
                 _runStartUpOnEnable = false;
@@ -320,7 +319,7 @@ namespace FCS_StorageSolutions.AlterraStorage.Mono
             }
 
             _savedData.ID = GetPrefabID();
-            _savedData.BodyColor = _colorManager.GetColor().ColorToVector4();
+            _savedData.Body = _colorManager.GetColor().ColorToVector4();
             _savedData.Data = _storageContainer.Save(serializer);
             newSaveData.AlterraStorageDataEntries.Add(_savedData);
             QuickLogger.Debug($"Saving ID {_savedData.ID}", true);

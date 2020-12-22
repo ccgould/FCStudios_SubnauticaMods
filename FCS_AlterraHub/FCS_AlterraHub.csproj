@@ -152,6 +152,7 @@
     <Compile Include="Mono\FCSAquarium.cs" />
     <Compile Include="Mono\FCSStorage.cs" />
     <Compile Include="Mono\FCSStorageNonSerialized.cs" />
+    <Compile Include="Mono\FCSToggleGroup.cs" />
     <Compile Include="Mono\ObjectPooler\ButtonPool.cs" />
     <Compile Include="Mono\ObjectPooler\ObjectPooler.cs" />
     <Compile Include="Mono\ToggleController.cs" />
@@ -176,7 +177,7 @@
     <Compile Include="Mono\OreConsumer\MotorHandler.cs" />
     <Compile Include="Mono\OreConsumer\OreConsumerDisplay.cs" />
     <Compile Include="Mono\OreConsumer\TransferHandler.cs" />
-    <Compile Include="Objects\ColorVec4.cs" />
+    <Compile Include="Objects\Vec4.cs" />
     <Compile Include="Objects\Vec3.cs" />
     <Compile Include="Patches\PlayerPatch.cs" />
     <Compile Include="Patches\PowerIndicatorPatch.cs" />

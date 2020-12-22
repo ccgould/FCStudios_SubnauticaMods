@@ -12,8 +12,8 @@ namespace FCS_LifeSupportSolutions.Configuration
         public string Id { get; set; }
         public string BaseId { get; set; }
         [JsonProperty] internal string SaveVersion { get; set; } = "1.0";
-        [JsonProperty] internal ColorVec4 BodyColor { get; set; }
-        [JsonProperty] internal ColorVec4 SecondaryBodyColor { get; set; }
+        [JsonProperty] internal Vec4 Body { get; set; }
+        [JsonProperty] internal Vec4 SecondaryBody { get; set; }
     }      
     
     internal class BaseUtilityEntry : ISaveDataEntry
@@ -21,8 +21,8 @@ namespace FCS_LifeSupportSolutions.Configuration
         public string Id { get; set; }
         public string BaseId { get; set; }
         [JsonProperty] internal string SaveVersion { get; set; } = "1.0";
-        [JsonProperty] internal ColorVec4 BodyColor { get; set; }
-        [JsonProperty] internal ColorVec4 SecondaryBodyColor { get; set; }
+        [JsonProperty] internal Vec4 Body { get; set; }
+        [JsonProperty] internal Vec4 SecondaryBody { get; set; }
         [JsonProperty] internal float O2Level { get; set; }
     }    
     
@@ -31,8 +31,8 @@ namespace FCS_LifeSupportSolutions.Configuration
         public string Id { get; set; }
         public string BaseId { get; set; }
         [JsonProperty] internal string SaveVersion { get; set; } = "1.0";
-        [JsonProperty] internal ColorVec4 BodyColor { get; set; }
-        [JsonProperty] internal ColorVec4 SecondaryBodyColor { get; set; }
+        [JsonProperty] internal Vec4 Body { get; set; }
+        [JsonProperty] internal Vec4 SecondaryBody { get; set; }
         [JsonProperty] internal int FirstAidCount { get; set; }
         [JsonProperty] internal float TimeToSpawn { get; set; }
     }

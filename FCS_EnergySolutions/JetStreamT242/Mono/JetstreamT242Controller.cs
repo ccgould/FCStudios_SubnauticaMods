@@ -17,7 +17,6 @@ namespace FCS_EnergySolutions.JetStreamT242.Mono
         private bool _runStartUpOnEnable;
         private bool _isFromSave;
         private JetStreamT242PowerManager _powerManager;
-        private ColorManager _colorManager;
         private JetStreamT242DataEntry _savedData;
         private MotorHandler _motor;
         private RotorHandler _tilter;
@@ -50,8 +49,8 @@ namespace FCS_EnergySolutions.JetStreamT242.Mono
                         ReadySaveData();
                     }
 
-                    _colorManager.ChangeColor(_savedData.BodyColor.Vector4ToColor());
-                    _colorManager.ChangeColor(_savedData.SecondaryBodyColor.Vector4ToColor(), ColorTargetMode.Secondary);
+                    _colorManager.ChangeColor(_savedData.Body.Vector4ToColor());
+                    _colorManager.ChangeColor(_savedData.SecondaryBody.Vector4ToColor(), ColorTargetMode.Secondary);
                     _powerManager.LoadFromSave(_savedData);
                     _motor.LoadSave(_savedData);
                     _tilter.LoadSave(_savedData);
@@ -189,8 +188,8 @@ namespace FCS_EnergySolutions.JetStreamT242.Mono
             _savedData.Id = GetPrefabID();
 
             QuickLogger.Debug($"Saving ID {_savedData.Id}", true);
-            _savedData.BodyColor = _colorManager.GetColor().ColorToVector4();
-            _savedData.SecondaryBodyColor = _colorManager.GetSecondaryColor().ColorToVector4();
+            _savedData.Body = _colorManager.GetColor().ColorToVector4();
+            _savedData.SecondaryBody = _colorManager.GetSecondaryColor().ColorToVector4();
             _powerManager.Save(_savedData);
             _motor.Save(_savedData);
             _tilter.Save(_savedData);

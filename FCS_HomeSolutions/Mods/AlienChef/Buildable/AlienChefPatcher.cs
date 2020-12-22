@@ -7,7 +7,7 @@ using FCS_AlterraHub.Spawnables;
 using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
 using FCS_HomeSolutions.ModManagers;
-using FCS_HomeSolutions.Mods.AlienChief.Mono;
+using FCS_HomeSolutions.Mods.AlienChef.Mono;
 using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
@@ -17,9 +17,9 @@ using UnityEngine;
 
 namespace FCS_HomeSolutions.Mods.AlienChief.Buildables
 {
-    internal partial class AlienChiefBuildable : Buildable
+    internal partial class AlienChefBuildable : Buildable
     {
-        public AlienChiefBuildable() : base(Mod.AlienChiefClassID, Mod.AlienChiefFriendly, Mod.AlienChiefDescription)
+        public AlienChefBuildable() : base(Mod.AlienChefClassID, Mod.AlienChefFriendly, Mod.AlienChefDescription)
         {
 
             OnStartedPatching += () =>
@@ -29,7 +29,7 @@ namespace FCS_HomeSolutions.Mods.AlienChief.Buildables
             };
             OnFinishedPatching += () =>
             {
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.AlienChiefKitClassID.ToTechType(), 30000, StoreCategory.Home);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.AlienChiefKitClassID.ToTechType(), 60500, StoreCategory.Home);
                 FCSAlterraHubService.PublicAPI.RegisterPatchedMod(ClassID);
             };
         }
@@ -38,7 +38,7 @@ namespace FCS_HomeSolutions.Mods.AlienChief.Buildables
         {
             try
             {
-                var prefab = GameObject.Instantiate(ModelPrefab.AlienChiefPrefab);
+                var prefab = GameObject.Instantiate(ModelPrefab.AlienChefPrefab);
 
                 prefab.name = this.PrefabFileName;
                 
@@ -65,6 +65,7 @@ namespace FCS_HomeSolutions.Mods.AlienChief.Buildables
                 constructable.allowedInBase = true;
                 constructable.allowedOnCeiling = false;
                 constructable.allowedOutside = false;
+                constructable.rotationEnabled = true;
                 constructable.model = model;
                 constructable.techType = TechType;
 
@@ -72,7 +73,7 @@ namespace FCS_HomeSolutions.Mods.AlienChief.Buildables
                 prefabID.ClassId = ClassID;
 
                 prefab.AddComponent<TechTag>().type = TechType;
-                prefab.AddComponent<AlienChiefController>();
+                prefab.AddComponent<AlienChefController>();
 
                 //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
                 MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModName);

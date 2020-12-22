@@ -28,7 +28,7 @@ namespace FCS_HomeSolutions.Mods.Replicator.Buildables
             };
             OnFinishedPatching += () =>
             {
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.ReplicatorKitClassID.ToTechType(), 30000, StoreCategory.Production);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.ReplicatorKitClassID.ToTechType(), 300000, StoreCategory.Production);
                 FCSAlterraHubService.PublicAPI.RegisterPatchedMod(ClassID);
             };
         }
