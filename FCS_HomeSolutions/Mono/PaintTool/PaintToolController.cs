@@ -146,10 +146,7 @@ namespace FCS_HomeSolutions.Mono.PaintTool
                 {
                     if (GameModeUtils.RequiresPower() && _colorTargetMode != ColorTargetMode.Emission)
                     {
-                        if (fcsDevice.CurrentDeviceColor(_colorTargetMode ,out var deviceColor) && deviceColor != _currentColor)
-                        {
-                            _paintCanFillAmount -= 1;
-                        }
+                        _paintCanFillAmount -= 1;
                     }
                     RefreshUI();
                 }

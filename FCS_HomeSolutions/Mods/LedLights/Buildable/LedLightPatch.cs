@@ -3,19 +3,15 @@ using System.IO;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Spawnables;
-using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
-using FCS_HomeSolutions.Curtains.Mono;
 using FCS_HomeSolutions.Mods.LedLights.Mono;
-using FCS_HomeSolutions.TrashReceptacle.Mono;
 using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
-namespace FCS_HomeSolutions.TrashReceptacle.Buildable
+namespace FCS_HomeSolutions.Mods.LedLights.Buildable
 {
     internal class LedLightPatch : SMLHelper.V2.Assets.Buildable
     {
@@ -71,10 +67,13 @@ namespace FCS_HomeSolutions.TrashReceptacle.Buildable
                 constructable.rotationEnabled = false;
                 constructable.allowedOnCeiling = false;
                 constructable.allowedInSub = _data.allowedInSub;
-                constructable.allowedOnConstructables = false;
+                constructable.allowedOnConstructables = true;
                 constructable.model = model;
                 constructable.techType = TechType;
-                
+
+                var lw = prefab.EnsureComponent<LargeWorldEntity>();
+                lw.cellLevel = LargeWorldEntity.CellLevel.Global;
+
 
                 PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
                 prefabID.ClassId = ClassID;
@@ -99,12 +98,12 @@ namespace FCS_HomeSolutions.TrashReceptacle.Buildable
 #if SUBNAUTICA
         protected override TechData GetBlueprintRecipe()
         {
-            return Mod.CurtainIngredients;
+            return _data.TechData;
         }
 #elif BELOWZERO
         protected override RecipeData GetBlueprintRecipe()
         {
-            return Mod.CurtainIngredients;
+            return _data.TechDatas;
         }
 #endif
     }
@@ -124,5 +123,6 @@ namespace FCS_HomeSolutions.TrashReceptacle.Buildable
         public bool allowedOnGround;
         public bool allowedInSub;
         public GameObject prefab;
+        public TechData TechData;
     }
 }

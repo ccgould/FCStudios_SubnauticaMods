@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Patches;
 using FCS_AlterraHub.Registration;
 using FCSCommon.Utilities;
@@ -35,6 +36,7 @@ namespace FCS_AlterraHub.Mono
         public static Dictionary<string,TrackedLight> GlobalTrackedLights { get; } = new Dictionary<string, TrackedLight>();
         public Action<PowerSystem.Status> OnPowerStateChanged { get; set; }
         public bool IsBaseExternalLightsActivated { get; set; }
+        public List<IDSSRack> BaseRacks { get; set; } = new List<IDSSRack>();
 
         #region Default Constructor
 
@@ -166,7 +168,10 @@ namespace FCS_AlterraHub.Mono
         {
             if (!_registeredDevices.ContainsKey(device.UnitID))
             {
-
+                if(device.IsRack)
+                {
+                    BaseRacks.Add((IDSSRack) device);
+                }
                 _registeredDevices.Add(device.UnitID, device);
             }
         }
@@ -327,6 +332,43 @@ namespace FCS_AlterraHub.Mono
             }
 
             return i;
+        }
+
+        public int GetItemCount(TechType techType)
+        {
+            var amount = 0;
+            foreach (IDSSRack baseRack in BaseRacks)
+            {
+                amount += baseRack.GetItemCount(techType);
+            }
+
+            return amount;
+        }
+
+        public bool HasItem(TechType techType)
+        {
+            foreach (IDSSRack baseRack in BaseRacks)
+            {
+                if (baseRack.HasItem(techType))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public Pickupable TakeItem(TechType techType)
+        {
+            foreach (IDSSRack baseRack in BaseRacks)
+            {
+                if (baseRack.HasItem(techType))
+                {
+                    return baseRack.RemoveItemFromRack(techType);
+                }
+            }
+
+            return null;
         }
     }
 

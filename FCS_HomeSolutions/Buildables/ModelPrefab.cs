@@ -1,11 +1,9 @@
 ﻿using System;
 using FCS_AlterraHub.API;
 using FCS_HomeSolutions.Configuration;
-using FCS_HomeSolutions.TrashRecycler.Mono;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 
 namespace FCS_HomeSolutions.Buildables
@@ -51,6 +49,7 @@ namespace FCS_HomeSolutions.Buildables
         public static GameObject LedLightLongPrefab { get; set; }
         public static GameObject LedLightWallPrefab { get; set; }
         public static GameObject LedLightShortPrefab { get; set; }
+        public static GameObject ObservationTankPrefab { get; set; }
 
         internal static void Initialize()
         {
@@ -80,6 +79,7 @@ namespace FCS_HomeSolutions.Buildables
             Cabinet1Prefab = GetPrefab(Mod.Cabinet1PrefabName);
             Cabinet2Prefab = GetPrefab(Mod.Cabinet2PrefabName);
             Cabinet3Prefab = GetPrefab(Mod.Cabinet3PrefabName);
+            ObservationTankPrefab = GetPrefab(Mod.EmptyObservationTankPrefabName);
             TrashRecyclerItemPrefab = GetPrefab("RecyclerItem");
             SeaBreezeItemPrefab = GetPrefab("ARSItem");
             NetworkItemPrefab = GetPrefab("NetworkItem");

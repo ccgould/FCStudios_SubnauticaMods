@@ -1,18 +1,23 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Extensions;
+using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_StorageSolutions.Configuration;
+using FCS_StorageSolutions.Helpers;
 using FCS_StorageSolutions.Mods.AlterraStorage.Buildable;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
 {
-    internal class DSSWallServerRackController : FcsDevice,IFCSSave<SaveData>,IHandTarget
+    internal class DSSWallServerRackController : FcsDevice, IFCSSave<SaveData>, IHandTarget, IDSSRack
     {
         private bool _runStartUpOnEnable;
         private bool _isFromSave;
@@ -21,14 +26,16 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         private float _targetPos;
         private float _speed = 3f;
         private GameObject _tray;
-        private Dictionary<string,DSSSlotController> _slots;
-        private FCSStorage _storage;
+        private Dictionary<string, DSSSlotController> _slots;
+        private Text _storageAmount;
+        public override bool IsRack { get; } = true;
 
-        internal bool IsOpen => _targetPos > 0;
-        
+        public bool IsOpen => _targetPos > 0;
+
         private void Start()
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.DSSTabID, Mod.ModName);
+            UpdateStorageCount();
         }
 
         private void Update()
@@ -55,7 +62,8 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
                     if (_savedData != null)
                     {
                         _colorManager.ChangeColor(_savedData.BodyColor.Vector4ToColor());
-                        _colorManager.ChangeColor(_savedData.SecondaryColor.Vector4ToColor(),ColorTargetMode.Secondary);
+                        _colorManager.ChangeColor(_savedData.SecondaryColor.Vector4ToColor(),
+                            ColorTargetMode.Secondary);
                         if (_savedData.IsTrayOpen)
                         {
                             Open();
@@ -80,9 +88,9 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
 
         public override void Initialize()
         {
-            //_storageAmount = GameObjectHelpers.FindGameObject(gameObject, "StorageAmount").GetComponent<Text>();
-            
-            _slots = new Dictionary<string,DSSSlotController>();
+            _storageAmount = gameObject.GetComponentInChildren<Text>();
+
+            _slots = new Dictionary<string, DSSSlotController>();
 
             var slotsLocation = GameObjectHelpers.FindGameObject(gameObject, "rack_door_mesh").transform;
             int i = 1;
@@ -91,7 +99,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
                 var slotName = $"Slot {i++}";
                 var slotController = slot.gameObject.AddComponent<DSSSlotController>();
                 slotController.Initialize(slotName, this);
-                _slots.Add(slotName,slotController);
+                _slots.Add(slotName, slotController);
             }
 
             _tray = GameObjectHelpers.FindGameObject(gameObject, "anim_rack_door");
@@ -99,7 +107,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
             if (_colorManager == null)
             {
                 _colorManager = gameObject.EnsureComponent<ColorManager>();
-                _colorManager.Initialize(gameObject,ModelPrefab.BodyMaterial,ModelPrefab.SecondaryMaterial);
+                _colorManager.Initialize(gameObject, ModelPrefab.BodyMaterial, ModelPrefab.SecondaryMaterial);
             }
 
             var canvas = gameObject.GetComponentInChildren<Canvas>();
@@ -107,9 +115,49 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
             IsInitialized = true;
         }
 
-        public override FCSStorage GetStorage()
+        public void UpdateStorageCount()
         {
-            return _storage;
+            if (_slots == null) return;
+            var storageTotal = 0;
+            var storageAmount = 0;
+            foreach (KeyValuePair<string, DSSSlotController> controller in _slots)
+            {
+                if (controller.Value != null && controller.Value.IsOccupied)
+                {
+                    storageTotal += 48;
+                    storageAmount += controller.Value.GetStorageAmount();
+                }
+            }
+
+            _storageAmount.text = AuxPatchers.AlterraStorageAmountFormat(storageAmount, storageTotal);
+        }
+
+        public bool HasSpace(int amount)
+        {
+            //TODO Deal with filters
+            return _slots.Any(x => x.Value.IsOccupied && x.Value.HasSpace(amount));
+        }
+
+        public bool AddItemToRack(InventoryItem item)
+        {
+            try
+            {
+                var result = TransferHelpers.AddItemToRack(this, item, 1);
+                if (!result)
+                {
+                    PlayerInteractionHelper.GivePlayerItem(item);
+                }
+
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error(e.Message);
+                QuickLogger.Error(e.StackTrace);
+                QuickLogger.Error(e.Source);
+                return false;
+            }
+
+            return true;
         }
 
         public override void OnProtoSerialize(ProtobufSerializer serializer)
@@ -127,7 +175,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         public override void OnProtoDeserialize(ProtobufSerializer serializer)
         {
             QuickLogger.Debug("In OnProtoDeserialize");
-            
+
             if (_savedData == null)
             {
                 ReadySaveData();
@@ -138,12 +186,12 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
                 Initialize();
             }
 
-            _slots.ElementAt(0).Value.RestoreItems(serializer,_savedData.Slot1);
-            _slots.ElementAt(1).Value.RestoreItems(serializer,_savedData.Slot2);
-            _slots.ElementAt(2).Value.RestoreItems(serializer,_savedData.Slot3);
-            _slots.ElementAt(3).Value.RestoreItems(serializer,_savedData.Slot4);
-            _slots.ElementAt(4).Value.RestoreItems(serializer,_savedData.Slot5);
-            _slots.ElementAt(5).Value.RestoreItems(serializer,_savedData.Slot6);
+            _slots.ElementAt(0).Value.RestoreItems(serializer, _savedData.Slot1);
+            _slots.ElementAt(1).Value.RestoreItems(serializer, _savedData.Slot2);
+            _slots.ElementAt(2).Value.RestoreItems(serializer, _savedData.Slot3);
+            _slots.ElementAt(3).Value.RestoreItems(serializer, _savedData.Slot4);
+            _slots.ElementAt(4).Value.RestoreItems(serializer, _savedData.Slot5);
+            _slots.ElementAt(5).Value.RestoreItems(serializer, _savedData.Slot6);
 
             _isFromSave = true;
         }
@@ -203,13 +251,14 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
             QuickLogger.Debug("In OnProtoDeserialize");
             _savedData = Mod.GetDSSWallServerRackSaveData(GetPrefabID());
         }
-        
+
         private void MoveTray()
         {
             if (_tray == null) return;
 
             // remember, 10 - 5 is 5, so target - position is always your direction.
-            Vector3 dir = new Vector3(_tray.transform.localPosition.x, _tray.transform.localPosition.y, _targetPos) - _tray.transform.localPosition;
+            Vector3 dir = new Vector3(_tray.transform.localPosition.x, _tray.transform.localPosition.y, _targetPos) -
+                          _tray.transform.localPosition;
 
             // magnitude is the total length of a vector.
             // getting the magnitude of the direction gives us the amount left to move
@@ -269,6 +318,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
             {
                 slot.Value.SetIsVisible(IsVisible);
             }
+
             //TODO Turn OnScreen
         }
 
@@ -279,7 +329,87 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
             {
                 slot.Value.SetIsVisible(IsVisible);
             }
+
             //TODO Turn OffScreen
+        }
+
+        public IEnumerable<KeyValuePair<string, DSSSlotController>> GetSlots()
+        {
+            return _slots;
+        }
+
+        public int GetFreeSpace()
+        {
+            int amount = 0;
+            foreach (var controller in _slots)
+            {
+                if (controller.Value != null && controller.Value.IsOccupied)
+                {
+                    amount += controller.Value.GetFreeSpace();
+                }
+            }
+
+            return amount;
+        }
+
+        public bool ItemAllowed(InventoryItem item, out ISlotController server)
+        {
+            server = null;
+            foreach (KeyValuePair<string, DSSSlotController> controller in _slots)
+            {
+                if (controller.Value != null && controller.Value.IsOccupied &&
+                    controller.Value.IsTechTypeAllowed(item.item.GetTechType()))
+                {
+                    server = controller.Value;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public int GetItemCount(TechType techType)
+        {
+            int amount = 0;
+            foreach (KeyValuePair<string, DSSSlotController> controller in _slots)
+            {
+                if (controller.Value != null && controller.Value.IsOccupied)
+                {
+                    amount += controller.Value.GetItemCount(techType);
+                }
+            }
+
+            return amount;
+        }
+
+        public bool HasItem(TechType techType)
+        {
+            foreach (KeyValuePair<string, DSSSlotController> controller in _slots)
+            {
+                if (controller.Value != null && controller.Value.IsOccupied)
+                {
+                    if (controller.Value.HasItem(techType))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        public Pickupable RemoveItemFromRack(TechType techType)
+        {
+            foreach (KeyValuePair<string, DSSSlotController> controller in _slots)
+            {
+                if (HasItem(techType))
+                {
+                    return controller.Value.RemoveItemFromServer(techType);
+                }
+            }
+
+            return null;
+
         }
     }
 }

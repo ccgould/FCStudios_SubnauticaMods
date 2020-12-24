@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Mono;
 using FCS_StorageSolutions.Configuration;
 using FCS_StorageSolutions.Mods.AlterraStorage.Buildable;
 using FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack;
 using FCSCommon.Extensions;
+using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.UI;
 
 namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
@@ -27,8 +30,9 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
         private Rigidbody _rb;
         private BoxCollider[] _colliders;
         private string _rackSlot;
-        private DSSWallServerRackController _rackController;
+        private IDSSRack _rackController;
         private const int MAXSTORAGE = 48;
+        private HashSet<TechType> FilteringSettings = new HashSet<TechType>();
         public override bool BypassRegisterCheck => true;
 
         private void Start()
@@ -82,8 +86,8 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
             IsVisible = false;
             IsConstructed = true;
 
-            //_storageAmount = GameObjectHelpers.FindGameObject(gameObject, "StorageAmount").GetComponent<Text>();
-            
+            _storageAmount = gameObject.GetComponentInChildren<Text>();
+
             _rb = gameObject.GetComponent<Rigidbody>();
             _colliders = GetComponentsInChildren<BoxCollider>();
 
@@ -91,13 +95,19 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
             {
                 _storageContainer = gameObject.EnsureComponent<FCSStorage>();
                 _storageContainer.Initialize(MAXSTORAGE);
+                _storageContainer.ItemsContainer.onAddItem += item =>
+                {
+                    UpdateStorageCount();
+                };
+
+                _storageContainer.ItemsContainer.onRemoveItem += item =>
+                {
+                    UpdateStorageCount();
+                };
             }
             Mod.RegisterServer(this);
 
-            //var canvas = gameObject.GetComponentInChildren<Canvas>();
-            //_interactionHelper = canvas.gameObject.AddComponent<InterfaceInteraction>();
-
-            //UpdateStorageCount();
+            UpdateStorageCount();
 
             IsInitialized = true;
         }
@@ -226,7 +236,14 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
 
         public override bool AddItemToContainer(InventoryItem item)
         {
-            return _storageContainer.AddItem(item);
+            var result = _storageContainer.AddItem(item);
+
+            if (result)
+            {
+                _rackController?.UpdateStorageCount();
+            }
+
+            return result;
         }
 
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
@@ -241,7 +258,13 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
 
         public Pickupable RemoveItemFromContainer(TechType techType, int amount)
         {
-            return _storageContainer.ItemsContainer.RemoveItem(techType);
+            var result =  _storageContainer.ItemsContainer.RemoveItem(techType);
+            if (result)
+            {
+                _rackController?.UpdateStorageCount();
+            }
+
+            return result;
         }
 
         public Dictionary<TechType, int> GetItemsWithin()
@@ -254,7 +277,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
             return _storageContainer.ItemsContainer.Contains(techType);
         }
 
-        public void DockServer(DSSSlotController slot, DSSWallServerRackController controller)
+        public void DockServer(DSSSlotController slot, IDSSRack controller)
         {
             _rackSlot = slot.GetSlotName();
             _rackController = controller;
@@ -275,6 +298,49 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
             _rackSlot = string.Empty;
             _rackController = null;
             IsVisible = false;
+        }
+
+        public int GetCount()
+        {
+            return _storageContainer.GetCount();
+        }
+
+        public bool HasSpace(int amount)
+        {
+            return _storageContainer.GetCount() + amount < MAXSTORAGE;
+        }
+
+        public bool IsFull()
+        {
+            return GetCount() >= MAXSTORAGE;
+        }
+
+        public int GetFreeSpace()
+        {
+            return MAXSTORAGE - GetCount();
+        }
+
+        public bool IsTechTypeAllowed(TechType techType)
+        {
+
+            if (IsFiltered)
+            {
+                return FilteringSettings.Contains(techType);
+            }
+
+            return true;
+        }
+
+        public bool IsFiltered => FilteringSettings.Count > 0;
+
+        public int GetItemCount(TechType techType)
+        {
+            return _storageContainer.ItemsContainer.GetCount(techType);
+        }
+
+        public bool HasItem(TechType techType)
+        {
+            return _storageContainer.ItemsContainer.GetCount(techType) > 0;
         }
     }
 }

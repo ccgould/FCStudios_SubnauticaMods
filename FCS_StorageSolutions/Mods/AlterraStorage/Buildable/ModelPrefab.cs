@@ -33,6 +33,7 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Buildable
         public static GameObject DSSAutoCrafterPrefab { get; set; }
         public static GameObject DSSTerminalPrefab { get; set; }
         public static GameObject DSSFormattingStationPrefab { get; set; }
+        public static GameObject DSSInventoryItemPrefab { get; set; }
 
 
         internal static void Initialize()
@@ -56,6 +57,7 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Buildable
             DSSFloorServerRackPrefab = GetPrefab(Mod.DSSFloorServerRackPrefabName);
             DSSAntennaPrefab = GetPrefab(Mod.DSSAntennaPrefabName);
             DSSItemDisplayPrefab = GetPrefab(Mod.DSSItemDisplayPrefabName);
+            DSSInventoryItemPrefab = GetPrefab("DSSInventoryItem");
             InventoryItemPrefab = GetPrefab("InventoryItem");
         }
         

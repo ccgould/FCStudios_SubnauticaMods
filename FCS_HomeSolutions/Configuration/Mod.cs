@@ -123,6 +123,12 @@ namespace FCS_HomeSolutions.Configuration
         internal const string PaintCanDescription = "More paint for you paint tool. Use the paint can to allow you to paint devices with your paint tool";
         internal const string PaintCanPrefabName = "PaintCan";
 
+        internal const string EmptyObservationTankClassID = "EmptyObservationTank";
+        internal const string EmptyObservationTankFriendly = "Empty Observation Tank";
+        internal const string EmptyObservationTankDescription = "A tank that allows you to view items";
+        internal const string EmptyObservationTankPrefabName = "ObservationTank";
+        public static string EmptyObservationTankKitClassID = $"{EmptyObservationTankClassID}_kit";
+
 
         internal static readonly Dictionary<TechType, TechType> CuredCreatureList = new Dictionary<TechType, TechType>(TechTypeExtensions.sTechTypeComparer)
         {
@@ -185,6 +191,62 @@ namespace FCS_HomeSolutions.Configuration
         };
 
 
+
+        
+
+
+#if SUBNAUTICA
+        internal static TechData EmptyObservationTankIngredients => new TechData
+#elif BELOWZERO
+                internal static RecipeData EmptyObservationTankIngredients => new RecipeData
+#endif
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(EmptyObservationTankKitClassID.ToTechType(), 1)
+            }
+        };
+
+#if SUBNAUTICA
+        internal static TechData LedLightStickLongIngredients => new TechData
+#elif BELOWZERO
+                internal static RecipeData LedLightStickLongIngredients => new RecipeData
+#endif
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient("LedLightStickLong_Kit".ToTechType(), 1)
+            }
+        };
+
+#if SUBNAUTICA
+        internal static TechData LedLightStickShortIngredients => new TechData
+#elif BELOWZERO
+                internal static RecipeData LedLightStickShortIngredients => new RecipeData
+#endif
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient("LedLightStickShort_Kit".ToTechType(), 1)
+            }
+        };
+
+
+#if SUBNAUTICA
+        internal static TechData LedLightStickWallIngredients => new TechData
+#elif BELOWZERO
+                internal static RecipeData LedLightStickWallIngredients => new RecipeData
+#endif
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient("LedLightStickWall_Kit".ToTechType(), 1)
+            }
+        };
 
 #if SUBNAUTICA
         internal static TechData MiniFountainFilterKitIngredients => new TechData
@@ -672,6 +734,25 @@ namespace FCS_HomeSolutions.Configuration
             }
 
             return new CabinetDataEntry() { Id = id };
+        } 
+        
+        public static ObservationTankDataEntry GetObservationTankDataEntrySaveData(string id)
+        {
+            LoadData();
+
+            var saveData = GetSaveData();
+
+            foreach (var entry in saveData.ObservationTankDataEntries)
+            {
+                if (string.IsNullOrEmpty(entry.Id)) continue;
+
+                if (entry.Id == id)
+                {
+                    return entry;
+                }
+            }
+
+            return new ObservationTankDataEntry() { Id = id };
         }
 
         public static LedLightDataEntry GetLedLightEntrySaveData(string id)

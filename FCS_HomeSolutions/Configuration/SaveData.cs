@@ -124,6 +124,15 @@ namespace FCS_HomeSolutions.Configuration
         [JsonProperty(PropertyName = "COL")] internal Vec4 Fcs { get; set; }
         [JsonProperty(PropertyName = "SCOL")] internal Vec4 Secondary { get; set; }
         [JsonProperty(PropertyName = "BID")] internal string BaseID { get; set; }
+    }       
+    
+    internal class ObservationTankDataEntry
+    {
+        [JsonProperty] internal string Id { get; set; }
+        [JsonProperty(PropertyName = "COL")] internal Vec4 Body { get; set; }
+        [JsonProperty(PropertyName = "SCOL")] internal Vec4 Secondary { get; set; }
+        [JsonProperty(PropertyName = "ECOL")] internal Vec4 Emission { get; set; }
+        [JsonProperty(PropertyName = "BID")] internal string BaseID { get; set; }
     }    
     
     internal class CabinetDataEntry
@@ -166,5 +175,6 @@ namespace FCS_HomeSolutions.Configuration
         [JsonProperty] internal List<AlienChiefDataEntry> AlienChiefDataEntries = new List<AlienChiefDataEntry>();
         [JsonProperty] internal List<CabinetDataEntry> CabinetDataEntries = new List<CabinetDataEntry>();
         [JsonProperty] internal List<LedLightDataEntry> LedLightDataEntries = new List<LedLightDataEntry>();
+        [JsonProperty] internal List<ObservationTankDataEntry> ObservationTankDataEntries = new List<ObservationTankDataEntry>();
     }
 }

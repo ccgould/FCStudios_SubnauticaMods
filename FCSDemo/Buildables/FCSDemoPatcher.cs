@@ -17,9 +17,15 @@ namespace FCSDemo.Buildables
     internal class FCSDemoBuidable : Buildable
     {
         private GameObject _prefab;
+        public override string IconFileName { get; }
 
         public FCSDemoBuidable(ModEntry entry) : base(entry.ClassID, entry.FriendlyName,Mod.Description)
         {
+            if (!string.IsNullOrEmpty(entry.IconName))
+            {
+                IconFileName = entry.IconName;
+            }
+            
             _prefab = entry.Prefab;
         }
 
@@ -106,7 +112,7 @@ namespace FCSDemo.Buildables
 
         protected override Atlas.Sprite GetItemSprite()
         {
-            return new Atlas.Sprite(ImageUtils.LoadTextureFromFile(Path.Combine(_assetFolder, $"{ClassID}.png")));
+            return new Atlas.Sprite(ImageUtils.LoadTextureFromFile(Path.Combine(_assetFolder, $"{IconFileName}")));
         }
 #elif BELOWZERO
         protected override RecipeData GetBlueprintRecipe()
@@ -126,7 +132,7 @@ namespace FCSDemo.Buildables
 
         protected override Sprite GetItemSprite()
         {
-            return ImageUtils.LoadSpriteFromFile(Path.Combine(_assetFolder, $"{ClassID}.png"));
+            return ImageUtils.LoadSpriteFromFile(Path.Combine(_assetFolder, $"{IconFileName}"));
         }
 #endif
         internal static void Register()

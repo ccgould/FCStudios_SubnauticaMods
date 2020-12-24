@@ -24,7 +24,7 @@ namespace FCS_HomeSolutions.Spawnables
         {
             OnFinishedPatching += () =>
             { 
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, TechType, 3000, StoreCategory.Production);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, TechType, 3000, StoreCategory.Home);
                 CraftDataHandler.SetEquipmentType(TechType, EquipmentType.Hand);
             };
         }

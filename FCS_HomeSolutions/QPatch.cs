@@ -9,6 +9,7 @@ using FCS_HomeSolutions.Curtains.Mono;
 using FCS_HomeSolutions.MiniFountainFilter.Buildables;
 using FCS_HomeSolutions.Mods.AlienChief.Buildables;
 using FCS_HomeSolutions.Mods.Cabinets.Buildable;
+using FCS_HomeSolutions.Mods.LedLights.Buildable;
 using FCS_HomeSolutions.QuantumTeleporter.Buildable;
 using FCS_HomeSolutions.SeaBreeze.Buildable;
 using FCS_HomeSolutions.Spawnables;
@@ -32,12 +33,23 @@ namespace FCS_HomeSolutions
     public class QPatch
     {
         internal static Config Configuration { get; } = OptionsPanelHandler.Main.RegisterModOptions<Config>();
-        internal static HoverLiftPadConfig HoverLiftPadConfiguration { get; } = OptionsPanelHandler.Main.RegisterModOptions<HoverLiftPadConfig>();
-        internal static PaintToolConfig PaintToolConfiguration { get; } = OptionsPanelHandler.Main.RegisterModOptions<PaintToolConfig>();
-        internal static MiniFountainConfig MiniFountainFilterConfiguration { get; } = OptionsPanelHandler.Main.RegisterModOptions<MiniFountainConfig>();
-        internal static SeaBreezeConfig SeaBreezeConfiguration { get; } = OptionsPanelHandler.Main.RegisterModOptions<SeaBreezeConfig>();
-        internal static QuantumTeleporterConfig QuantumTeleporterConfiguration { get; } = OptionsPanelHandler.Main.RegisterModOptions<QuantumTeleporterConfig>();
-        internal static Dictionary<string,Texture2D> Patterns = new Dictionary<string, Texture2D>();
+
+        internal static HoverLiftPadConfig HoverLiftPadConfiguration { get; } =
+            OptionsPanelHandler.Main.RegisterModOptions<HoverLiftPadConfig>();
+
+        internal static PaintToolConfig PaintToolConfiguration { get; } =
+            OptionsPanelHandler.Main.RegisterModOptions<PaintToolConfig>();
+
+        internal static MiniFountainConfig MiniFountainFilterConfiguration { get; } =
+            OptionsPanelHandler.Main.RegisterModOptions<MiniFountainConfig>();
+
+        internal static SeaBreezeConfig SeaBreezeConfiguration { get; } =
+            OptionsPanelHandler.Main.RegisterModOptions<SeaBreezeConfig>();
+
+        internal static QuantumTeleporterConfig QuantumTeleporterConfiguration { get; } =
+            OptionsPanelHandler.Main.RegisterModOptions<QuantumTeleporterConfig>();
+
+        internal static Dictionary<string, Texture2D> Patterns = new Dictionary<string, Texture2D>();
         internal static Dictionary<Texture2D, Atlas.Sprite> PatternsIcon = new Dictionary<Texture2D, Atlas.Sprite>();
 
         [QModPatch]
@@ -49,7 +61,7 @@ namespace FCS_HomeSolutions
             ModelPrefab.Initialize();
 
             AuxPatchers.AdditionalPatching();
-            
+
             var ahsSweetWaterBar = new SweetWaterBarPatch("ahsSweetWaterBar", "Sweet Water Bar",
                 "All drinks on the house.", ModelPrefab.GetPrefab("SweetWaterBar"), new Settings
                 {
@@ -76,12 +88,13 @@ namespace FCS_HomeSolutions
             hoverLiftPad.Patch();
 
             //Patch Smart Planter Pot
-            var smartOutDoorPlanter = new OutDoorPlanterPatch(Mod.SmartPlanterPotClassID, Mod.SmartPlanterPotFriendly, Mod.SmartPlanterPotDescription, ModelPrefab.SmallOutdoorPot, new Settings
-            {
-                KitClassID = Mod.SmartPlanterPotKitClassID,
-                Size = new Vector3(0.7929468f, 0.3463891f, 0.7625999f),
-                Center = new Vector3(0f, 0.2503334f, 0f)
-            });
+            var smartOutDoorPlanter = new OutDoorPlanterPatch(Mod.SmartPlanterPotClassID, Mod.SmartPlanterPotFriendly,
+                Mod.SmartPlanterPotDescription, ModelPrefab.SmallOutdoorPot, new Settings
+                {
+                    KitClassID = Mod.SmartPlanterPotKitClassID,
+                    Size = new Vector3(0.7929468f, 0.3463891f, 0.7625999f),
+                    Center = new Vector3(0f, 0.2503334f, 0f)
+                });
 
             smartOutDoorPlanter.Patch();
 
@@ -121,14 +134,14 @@ namespace FCS_HomeSolutions
             LoadOtherObjects();
 
             LoadLights();
-            
+
             LoadCurtainTemplates();
 
             LoadCabinets();
 
             var harmony = new Harmony("com.homesolutions.fstudios");
             harmony.PatchAll(Assembly.GetExecutingAssembly());
-            
+
             //Register debug commands
             ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));
         }
@@ -145,11 +158,12 @@ namespace FCS_HomeSolutions
                 allowedOnGround = true,
                 allowedOnWall = false,
                 allowedOutside = true,
-                categoryForPDA = TechCategory.ExteriorModule,
-                groupForPda = TechGroup.ExteriorModules,
-                size = new Vector3(1.653859f, 0.1378375f, 0.07659748f),
-                center = new Vector3(0f, 0f, 0.09088595f),
-                prefab = ModelPrefab.LedLightLongPrefab
+                categoryForPDA = TechCategory.Misc,
+                groupForPda = TechGroup.Miscellaneous,
+                size = Vector3.zero,
+                center = Vector3.zero,
+                prefab = ModelPrefab.LedLightLongPrefab,
+                TechData = Mod.LedLightStickLongIngredients,
             });
             longLight.Patch();
 
@@ -165,16 +179,18 @@ namespace FCS_HomeSolutions
                 allowedOutside = true,
                 categoryForPDA = TechCategory.Misc,
                 groupForPda = TechGroup.Miscellaneous,
-                size = new Vector3(0.1145213f, 1.667081f, 0.1145213f),
-                center = new Vector3(0f, 1.09443f, 0f),
-                prefab = ModelPrefab.LedLightShortPrefab
+                size = Vector3.zero,
+                center = Vector3.zero,
+                prefab = ModelPrefab.LedLightShortPrefab,
+                TechData = Mod.LedLightStickShortIngredients
             });
             shortLight.Patch();
 
             var wallLight = new LedLightPatch(new LedLightData
             {
                 classId = "LedLightStickWall",
-                description = "A wall mountable led light strip for internal use on your base exterior with color changing.",
+                description =
+                    "A wall mountable led light strip for internal use on your base exterior with color changing.",
                 friendlyName = "Wall Mountable Led Light Strip",
                 allowedInBase = true,
                 allowedInSub = true,
@@ -183,9 +199,10 @@ namespace FCS_HomeSolutions
                 allowedOutside = false,
                 categoryForPDA = TechCategory.InteriorModule,
                 groupForPda = TechGroup.InteriorModules,
-                size = new Vector3(0.1145213f, 1.663376f, 0.04982199f),
-                center = new Vector3(0f, -0.01005119f, 0.08844218f),
-                prefab = ModelPrefab.LedLightWallPrefab
+                size = Vector3.zero,
+                center = Vector3.zero,
+                prefab = ModelPrefab.LedLightWallPrefab,
+                TechData = Mod.LedLightStickWallIngredients
             });
             wallLight.Patch();
         }
@@ -206,7 +223,8 @@ namespace FCS_HomeSolutions
                 });
             ahsrailing.Patch();
 
-            var ahsrailingglass = new DecorationEntryPatch("ahsrailingglass", "Large Railing With Glass", "A railing to create a barrior",
+            var ahsrailingglass = new DecorationEntryPatch("ahsrailingglass", "Large Railing With Glass",
+                "A railing to create a barrior",
                 ModelPrefab.GetPrefab("Large_Rail_wGlass_01"),
                 new Settings
                 {
@@ -220,7 +238,8 @@ namespace FCS_HomeSolutions
                 });
             ahsrailingglass.Patch();
 
-            var ahssmallrail = new DecorationEntryPatch("ahssmallrail", "Small Railing", "A railing to create a barrior",
+            var ahssmallrail = new DecorationEntryPatch("ahssmallrail", "Small Railing",
+                "A railing to create a barrior",
                 ModelPrefab.GetPrefab("Small_Rail_01"),
                 new Settings
                 {
@@ -234,7 +253,8 @@ namespace FCS_HomeSolutions
                 });
             ahssmallrail.Patch();
 
-            var ahssmallrailglass = new DecorationEntryPatch("ahssmallrailglass", "Small Railing With Glass", "A railing to create a barrior",
+            var ahssmallrailglass = new DecorationEntryPatch("ahssmallrailglass", "Small Railing With Glass",
+                "A railing to create a barrior",
                 ModelPrefab.GetPrefab("Small_Rail_wGlass_01"),
                 new Settings
                 {
@@ -262,7 +282,8 @@ namespace FCS_HomeSolutions
                 });
             ahssmallstairplatform.Patch();
 
-            var ahssmallrailmesh = new DecorationEntryPatch("ahssmallrailmesh", "Small Railing With Mesh", "A railing to create a barrior",
+            var ahssmallrailmesh = new DecorationEntryPatch("ahssmallrailmesh", "Small Railing With Mesh",
+                "A railing to create a barrior",
                 ModelPrefab.GetPrefab("Small_Rail_wNeat_01"),
                 new Settings
                 {
@@ -276,7 +297,8 @@ namespace FCS_HomeSolutions
                 });
             ahssmallrailmesh.Patch();
 
-            var ahslargerailmesh = new DecorationEntryPatch("ahslargerailmesh", "Large Railing With Mesh", "A railing to create a barrior",
+            var ahslargerailmesh = new DecorationEntryPatch("ahslargerailmesh", "Large Railing With Mesh",
+                "A railing to create a barrior",
                 ModelPrefab.GetPrefab("Large_Rail_wNeat_01"),
                 new Settings
                 {
@@ -289,6 +311,115 @@ namespace FCS_HomeSolutions
                     Center = new Vector3(0f, 0.6343491f, 0f)
                 });
             ahslargerailmesh.Patch();
+
+            var floorShelf01 = new DecorationEntryPatch("floorShelf01", "Floor Shelf 1", "A neat shelf",
+                ModelPrefab.GetPrefab("FloorShelf01"),
+                new Settings
+                {
+                    KitClassID = "floorShelf01_kit",
+                    AllowedInBase = true,
+                    AllowedOutside = false,
+                    AllowedOnGround = true,
+                    AllowedOnConstructables = true,
+                    RotationEnabled = true,
+                    Center = new Vector3(0f, 0.4615f, 0f),
+                    Size = new Vector3(0.6667f, 0.9036641f, 0.6438f),
+                });
+            floorShelf01.Patch();
+
+            var floorShelf02 = new DecorationEntryPatch("floorShelf02", "Floor Shelf 2", "A neat shelf",
+                ModelPrefab.GetPrefab("FloorShelf02"),
+                new Settings
+                {
+                    KitClassID = "floorShelf02_kit",
+                    AllowedInBase = true,
+                    AllowedOutside = false,
+                    AllowedOnGround = true,
+                    RotationEnabled = true,
+                    Size = new Vector3(0.6780548f, 2.636386f, 0.6340148f),
+                    Center = new Vector3(69.55f, 1.381544f, 0f)
+                });
+            floorShelf02.Patch();
+
+            var floorShelf03 = new DecorationEntryPatch("floorShelf03", "Floor Shelf 3", "A neat shelf",
+                ModelPrefab.GetPrefab("FloorShelf03"),
+                new Settings
+                {
+                    KitClassID = "floorShelf03_kit",
+                    AllowedInBase = true,
+                    AllowedOutside = false,
+                    AllowedOnGround = true,
+                    AllowedOnConstructables = true,
+                    RotationEnabled = true,
+                    Size = new Vector3(0.6776733f, 1.692158f, 0.6340148f),
+                    Center = new Vector3(75.744f, 0.9614337f, 0f)
+                });
+            floorShelf03.Patch();
+
+
+            var floorShelf04 = new DecorationEntryPatch("floorShelf04", "Floor Shelf 4", "A neat shelf",
+                ModelPrefab.GetPrefab("FloorShelf04"),
+                new Settings
+                {
+                    KitClassID = "floorShelf04_kit",
+                    AllowedInBase = true,
+                    AllowedOutside = false,
+                    AllowedOnGround = true,
+                    AllowedOnConstructables = true,
+                    RotationEnabled = true,
+                    Size = new Vector3(2.814087f, 1.54613f, 0.6510811f),
+                    Center = new Vector3(77.73706f, 0.9081734f, -0.005623609f)
+                });
+            floorShelf04.Patch();
+
+            var floorShelf05 = new DecorationEntryPatch("floorShelf05", "Floor Shelf 5", "A neat shelf",
+                ModelPrefab.GetPrefab("FloorShelf05"),
+                new Settings
+                {
+                    KitClassID = "floorShelf05_kit",
+                    AllowedInBase = true,
+                    AllowedOutside = false,
+                    AllowedOnGround = true,
+                    AllowedOnConstructables = true,
+                    RotationEnabled = true,
+                    Size = new Vector3(2.820679f, 1.546359f, 0.6349438f),
+                    Center = new Vector3(80.90942f, 0.9178838f, -0.01041579f)
+                });
+            floorShelf05.Patch();
+
+            var floorShelf06 = new DecorationEntryPatch("floorShelf06", "Floor Shelf 6", "A neat shelf",
+                ModelPrefab.GetPrefab("FloorShelf06"),
+                new Settings
+                {
+                    KitClassID = "floorShelf06_kit",
+                    AllowedInBase = true,
+                    AllowedOutside = false,
+                    AllowedOnGround = true,
+                    AllowedOnConstructables = true,
+                    RotationEnabled = true,
+                    Size = new Vector3(2.781815f, 0.8054426f, 0.6553071f),
+                    Center = new Vector3(84.07667f, 0.5206897f, -0.01041579f)
+                });
+            floorShelf06.Patch();
+
+
+            var floorShelf07 = new DecorationEntryPatch("floorShelf07", "Floor Shelf 7", "A neat shelf",
+                ModelPrefab.GetPrefab("FloorShelf07"),
+                new Settings
+                {
+                    KitClassID = "floorShelf07_kit",
+                    AllowedInBase = true,
+                    AllowedOutside = false,
+                    AllowedOnGround = true,
+                    AllowedOnConstructables = true,
+                    RotationEnabled = true,
+                    Size = new Vector3(2.764771f, 0.7996328f, 0.6282197f),
+                    Center = new Vector3(73.80698f, 0.5240374f, -0.01041579f)
+                });
+            floorShelf07.Patch();
+
+            var observationTank = new ObservationTankBuildable();
+            observationTank.Patch();
         }
 
         private void LoadCurtainTemplates()
@@ -330,11 +461,13 @@ namespace FCS_HomeSolutions
             cabinet3.Patch();
         }
 
-        public static Sprite ConvertTextureToSprite(Texture2D texture, float PixelsPerUnit = 100.0f, SpriteMeshType spriteType = SpriteMeshType.Tight)
+        public static Sprite ConvertTextureToSprite(Texture2D texture, float PixelsPerUnit = 100.0f,
+            SpriteMeshType spriteType = SpriteMeshType.Tight)
         {
             // Converts a Texture2D to a sprite, assign this texture to a new sprite and return its reference
 
-            Sprite NewSprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0, 0), PixelsPerUnit, 0, spriteType);
+            Sprite NewSprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0, 0),
+                PixelsPerUnit, 0, spriteType);
 
             return NewSprite;
         }

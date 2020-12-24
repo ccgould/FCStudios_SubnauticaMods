@@ -193,6 +193,7 @@
     <Compile Include="SeaBreeze\Mono\SeaBreezeDisplay.cs" />
     <Compile Include="SeaBreeze\Mono\SeaBreezePowerManager.cs" />
     <Compile Include="SeaBreeze\Mono\SeaBreezeController.cs" />
+    <Compile Include="Spawnables\ObservationTank.cs" />
     <Compile Include="Spawnables\PaintCanSpawnable.cs" />
     <Compile Include="Spawnables\PaintToolSpawnable.cs" />
     <Compile Include="TrashReceptacle\Buildable\TrashReceptaclePatch.cs" />

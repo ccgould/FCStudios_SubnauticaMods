@@ -234,9 +234,9 @@ namespace FCS_AlterraHub.Systems
             if (HasBeenRegistered())
             {
                 MessageBoxHandler.main.Show(AlterraHub.AccountCreated(GetAccountBalance().ToString("N0")));
-                var newCard = Mod.DebitCardTechType.ToPickupable();
-                GenerateNewCard(newCard.gameObject.GetComponent<PrefabIdentifier>().Id);
-                PlayerInteractionHelper.GivePlayerItem(newCard);
+                var newCard = PlayerInteractionHelper.GivePlayerItem(Mod.DebitCardTechType);
+                //GenerateNewCard(newCard.gameObject.GetComponent<PrefabIdentifier>().Id);
+                
             }
             else
             {

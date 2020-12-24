@@ -14,7 +14,7 @@ namespace FCS_AlterraHub.Helpers
             }
             return false;
         }
-    
+        
         public static void GivePlayerItem(InventoryItem inventoryItem)
         {
             if (inventoryItem == null) return;

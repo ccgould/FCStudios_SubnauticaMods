@@ -32,6 +32,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\TechTypeExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\AssetHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\GameObjectHelpers.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\GridHelperV2.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\GridHelperPooled.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\GridHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\InterfaceHelpers.cs" />

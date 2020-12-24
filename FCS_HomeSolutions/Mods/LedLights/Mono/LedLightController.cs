@@ -76,6 +76,7 @@ namespace FCS_HomeSolutions.Mods.LedLights.Mono
             if (_light == null)
             {
                 _light = gameObject.GetComponentInChildren<Light>();
+                _light.enabled = true;
             }
 
             IsInitialized = true;

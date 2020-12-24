@@ -226,7 +226,7 @@ namespace FCS_AlterraHub.Mono
         {
             if (_colorManager != null)
             {
-                color = _colorManager.GetColor();
+                color = _colorManager.GetColor(mode);
                 return true;
             }
             color = Color.white;
@@ -256,6 +256,8 @@ namespace FCS_AlterraHub.Mono
         {
 
         }
+
+        public virtual bool IsRack { get;} = false;
     }
 
     public interface IFCSSave<T>

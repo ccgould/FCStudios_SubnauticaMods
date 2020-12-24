@@ -12,6 +12,7 @@ namespace FCS_AlterraHub.Mono
         private GameObject _storageRoot;
         private byte[] _storageRootBytes;
         public ItemsContainer ItemsContainer;
+        private int _slots;
 
         public byte[] Save(ProtobufSerializer serializer)
         {
@@ -40,7 +41,7 @@ namespace FCS_AlterraHub.Mono
             using (MemoryStream memoryStream = new MemoryStream(serialData))
             {
                 QuickLogger.Debug("Getting Data from memory stream");
-                GameObject gObj = serializer.DeserializeObjectTree(memoryStream, 1);
+                GameObject gObj = serializer.DeserializeObjectTree(memoryStream, 0);
                 QuickLogger.Debug($"De-serialized Object Stream. {gObj}");
                 TransferItems(gObj);
                 QuickLogger.Debug("Items Transferred");
@@ -117,6 +118,11 @@ namespace FCS_AlterraHub.Mono
             return i;
         }
 
+        public int GetFreeSpace()
+        {
+            return _slots - GetCount();
+        }
+
         public Dictionary<TechType,int> GetItems()
         {
             List<TechType> keys = ItemsContainer.GetItemTypes();
@@ -142,6 +148,8 @@ namespace FCS_AlterraHub.Mono
             {
                 _storageRoot = go;
             }
+
+            _slots = slots;
             _storageRoot.AddComponent<StoreInformationIdentifier>();
             ItemsContainer = new ItemsContainer(slots, slots, _storageRoot.transform, "FCSStorage", null);
         }

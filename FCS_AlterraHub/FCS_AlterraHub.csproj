@@ -138,7 +138,9 @@
     <Compile Include="Helpers\MathHelpers.cs" />
     <Compile Include="Helpers\SpawnHelper.cs" />
     <Compile Include="Helpers\WorldHelpers.cs" />
+    <Compile Include="Interfaces\IDSSRack.cs" />
     <Compile Include="Interfaces\IFCSGrowBed.cs" />
+    <Compile Include="Interfaces\ISlotController.cs" />
     <Compile Include="Managers\FCSPowerManager.cs" />
     <Compile Include="Model\EatableEntities.cs" />
     <Compile Include="Model\FCSGrowingPlant.cs" />

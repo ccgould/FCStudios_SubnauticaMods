@@ -1,6 +1,5 @@
 ﻿using System;
 using FCS_AlterraHub.Mono.ObjectPooler;
-using FCS_AlterraHub.Structs;
 using FCSCommon.Enums;
 using UnityEngine;
 using UnityEngine.UI;

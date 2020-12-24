@@ -31,13 +31,30 @@ namespace FCS_AlterraHub.Mono
             return _currentColor;
         }
 
-        public bool ChangeColor(Color color,ColorTargetMode mode = ColorTargetMode.Primary)
+        public Color GetColor(ColorTargetMode mode)
         {
-            bool result = false;
             switch (mode)
             {
                 case ColorTargetMode.Primary:
-                    result =  MaterialHelpers.ChangeMaterialColor(_bodyMaterial, _gameObject, color);
+                case ColorTargetMode.Both:
+                    return _currentColor;
+                case ColorTargetMode.Secondary:
+                    return _currentSecondaryColor;
+                case ColorTargetMode.Emission:
+                    return _currentLumColor;
+            }
+            return _currentColor;
+        }
+
+        public bool ChangeColor(Color color,ColorTargetMode mode = ColorTargetMode.Primary)
+        {
+            bool result = false;
+
+            //if (GetColor(mode) == color) return result; //Disabled to allow paint to be used even when the object already has the color.
+            switch (mode)
+            {
+                case ColorTargetMode.Primary:
+                    result = MaterialHelpers.ChangeMaterialColor(_bodyMaterial, _gameObject, color);
                     _currentColor = color;
                     break;
 
@@ -45,10 +62,10 @@ namespace FCS_AlterraHub.Mono
                     result = !string.IsNullOrWhiteSpace(_bodySecondary) && MaterialHelpers.ChangeMaterialColor(_bodySecondary, _gameObject, color);
                     _currentSecondaryColor = color;
                     break;
-                    
+
                 case ColorTargetMode.Both:
-                    result =  MaterialHelpers.ChangeMaterialColor(_bodyMaterial, _gameObject, color);
-                    
+                    result = MaterialHelpers.ChangeMaterialColor(_bodyMaterial, _gameObject, color);
+
                     if (!string.IsNullOrWhiteSpace(_bodySecondary))
                     {
 
@@ -76,7 +93,6 @@ namespace FCS_AlterraHub.Mono
                     break;
             }
 
-            
             OnColorChanged?.Invoke(color);
             return result;
         }

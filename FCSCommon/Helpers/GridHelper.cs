@@ -20,17 +20,6 @@ namespace FCSCommon.Helpers
         internal int EndingPosition { get; private set; }
         internal int StartingPosition { get; private set; }
 
-        [Obsolete("This method will be removed in upcoming updates please use setup instead")]
-        internal void Initialize(GameObject itemPrefab, GameObject itemsGrid, GameObject pageNumberText, int itemsPerPage, Action<string, object> onButtonClick)
-        {
-            _itemPrefab = itemPrefab;
-            _itemsGrid = itemsGrid;
-            _itemsPerPage = itemsPerPage;
-            _onButtonClick = onButtonClick;
-            _pageNumberText = pageNumberText.GetComponent<Text>();
-            DrawPage(1);
-        }
-
         internal void Setup(int itemsPerPage, GameObject itemPrefab, GameObject gridPage, Color startColor, Color hoverColor, Action<string, object> onButtonClick, int maxInteractionRange = 5, string prevBtnNAme = "PrevBTN", string nextBtnName = "NextBTN", string gridName = "Grid", string paginatorName = "Paginator", string homeBtnName = "HomeBTN", string customHomeBTN = "")
         {
             _itemPrefab = itemPrefab;
@@ -178,5 +167,6 @@ namespace FCSCommon.Helpers
         public GameObject ItemsGrid { get; set; }
         public int StartPosition { get; set; }
         public int EndPosition { get; set; }
+        public int MaxPerPage { get; set; }
     }
 }

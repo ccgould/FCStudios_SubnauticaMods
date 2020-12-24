@@ -3,17 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Extensions;
+using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_StorageSolutions.Configuration;
+using FCS_StorageSolutions.Helpers;
 using FCS_StorageSolutions.Mods.AlterraStorage.Buildable;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
 {
-    internal class DSSFloorServerRackController : FcsDevice,IFCSSave<SaveData>,IHandTarget
+    internal class DSSFloorServerRackController : FcsDevice,IFCSSave<SaveData>,IHandTarget, IDSSRack
     {
         private bool _runStartUpOnEnable;
         private bool _isFromSave;
@@ -23,13 +27,17 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         private float _speed = 3f;
         private GameObject _tray;
         private Dictionary<string,DSSSlotController> _slots;
-        private FCSStorage _storage;
+        private Text _storageAmount;
+        private const float OpenPos = 0.207f;
+        private const float ClosePos = -0.1668553f;
+        public override bool IsRack { get; } = true;
 
-        internal bool IsOpen => _targetPos > 0;
+        public bool IsOpen => Mathf.Approximately(_targetPos,OpenPos);
         
         private void Start()
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.DSSTabID, Mod.ModName);
+            UpdateStorageCount();
         }
 
         private void Update()
@@ -81,21 +89,24 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
 
         public override void Initialize()
         {
-            //_storageAmount = GameObjectHelpers.FindGameObject(gameObject, "StorageAmount").GetComponent<Text>();
+            _storageAmount = gameObject.GetComponentInChildren<Text>();
             
             _slots = new Dictionary<string,DSSSlotController>();
 
-            //var slotsLocation = GameObjectHelpers.FindGameObject(gameObject, "rack_door_mesh").transform;
-            //int i = 1;
-            //foreach (Transform slot in slotsLocation)
-            //{
-            //    var slotName = $"Slot {i++}";
-            //    var slotController = slot.gameObject.AddComponent<DSSSlotController>();
-            //    //slotController.Initialize(slotName, this);
-            //    _slots.Add(slotName,slotController);
-            //}
+            var slotsLocation = GameObjectHelpers.FindGameObject(gameObject, "Slots").transform;
+            
+            int i = 1;
+            
+            foreach (Transform slot in slotsLocation)
+            {
+                var slotName = $"Slot {i++}";
+                var slotController = slot.gameObject.AddComponent<DSSSlotController>();
+                slotController.Initialize(slotName, this);
+                _slots.Add(slotName, slotController);
+            }
 
-            //_tray = GameObjectHelpers.FindGameObject(gameObject, "anim_rack_door");
+            _tray = GameObjectHelpers.FindGameObject(gameObject, "SildingDoor_glass");
+            _targetPos = _tray.transform.localPosition.x;
 
             if (_colorManager == null)
             {
@@ -103,15 +114,125 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
                 _colorManager.Initialize(gameObject,ModelPrefab.BodyMaterial,ModelPrefab.SecondaryMaterial);
             }
 
-            //var canvas = gameObject.GetComponentInChildren<Canvas>();
-
             IsInitialized = true;
         }
 
-        public override FCSStorage GetStorage()
+        public void UpdateStorageCount()
         {
-            return _storage;
+            if (_slots == null) return;
+            var storageTotal = 0;
+            var storageAmount = 0;
+            foreach (KeyValuePair<string, DSSSlotController> controller in _slots)
+            {
+                if (controller.Value != null && controller.Value.IsOccupied)
+                {
+                    storageTotal += 48;
+                    storageAmount += controller.Value.GetStorageAmount();
+                }
+            }
+
+            _storageAmount.text = AuxPatchers.AlterraStorageAmountFormat(storageAmount, storageTotal);
         }
+
+        public bool HasSpace(int amount)
+        {
+            //TODO Deal with filters
+            return _slots.Any(x => x.Value.IsOccupied && x.Value.HasSpace(amount));
+        }
+
+        public bool AddItemToRack(InventoryItem item)
+        {
+            try
+            {
+                var result = TransferHelpers.AddItemToRack(this, item,1);
+                if (!result)
+                {
+                    PlayerInteractionHelper.GivePlayerItem(item);
+                }
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error(e.Message);
+                QuickLogger.Error(e.StackTrace);
+                QuickLogger.Error(e.Source);
+                return false;
+            }
+
+            return true;
+        }
+
+        public int GetFreeSpace()
+        {
+            int amount = 0;
+            foreach (var controller in _slots)
+            {
+                if (controller.Value != null && controller.Value.IsOccupied)
+                {
+                    amount += controller.Value.GetFreeSpace();
+                }
+            }
+
+            return amount;
+        }
+
+        public bool ItemAllowed(InventoryItem item, out ISlotController server)
+        {
+            server = null;
+            foreach (KeyValuePair<string, DSSSlotController> controller in _slots)
+            {
+                if (controller.Value != null && controller.Value.IsOccupied && !controller.Value.IsFull && controller.Value.IsTechTypeAllowed(item.item.GetTechType()))
+                {
+                    server = controller.Value;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public int GetItemCount(TechType techType)
+        {
+            int amount = 0;
+            foreach (KeyValuePair<string, DSSSlotController> controller in _slots)
+            {
+                if (controller.Value != null && controller.Value.IsOccupied)
+                {
+                    amount += controller.Value.GetItemCount(techType);
+                }
+            }
+
+            return amount;
+        }
+
+        public bool HasItem(TechType techType)
+        {
+            foreach (KeyValuePair<string, DSSSlotController> controller in _slots)
+            {
+                if (controller.Value != null && controller.Value.IsOccupied)
+                {
+                    if (controller.Value.HasItem(techType))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        public Pickupable RemoveItemFromRack(TechType techType)
+        {
+            foreach (KeyValuePair<string, DSSSlotController> controller in _slots)
+            {
+                if(HasItem(techType))
+                {
+                    return controller.Value.RemoveItemFromServer(techType);
+                }
+            }
+
+            return null;
+        }
+
 
         public override void OnProtoSerialize(ProtobufSerializer serializer)
         {
@@ -139,21 +260,23 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
                 Initialize();
             }
 
-            //_slots.ElementAt(0).Value.RestoreItems(serializer,_savedData.Slot1);
-            //_slots.ElementAt(1).Value.RestoreItems(serializer,_savedData.Slot2);
-            //_slots.ElementAt(2).Value.RestoreItems(serializer,_savedData.Slot3);
-            //_slots.ElementAt(3).Value.RestoreItems(serializer,_savedData.Slot4);
-            //_slots.ElementAt(4).Value.RestoreItems(serializer,_savedData.Slot5);
-            //_slots.ElementAt(5).Value.RestoreItems(serializer,_savedData.Slot6);
-            //_slots.ElementAt(6).Value.RestoreItems(serializer,_savedData.Slot7);
-            //_slots.ElementAt(7).Value.RestoreItems(serializer,_savedData.Slot8);
-            //_slots.ElementAt(8).Value.RestoreItems(serializer,_savedData.Slot9);
-            //_slots.ElementAt(9).Value.RestoreItems(serializer,_savedData.Slot10);
-            //_slots.ElementAt(10).Value.RestoreItems(serializer,_savedData.Slot11);
-            //_slots.ElementAt(11).Value.RestoreItems(serializer,_savedData.Slot12);
-            //_slots.ElementAt(12).Value.RestoreItems(serializer,_savedData.Slot13);
-            //_slots.ElementAt(13).Value.RestoreItems(serializer,_savedData.Slot14);
-            //_slots.ElementAt(14).Value.RestoreItems(serializer,_savedData.Slot15);
+            _slots.ElementAt(0).Value.RestoreItems(serializer, _savedData.Slot1);
+            _slots.ElementAt(1).Value.RestoreItems(serializer, _savedData.Slot2);
+            _slots.ElementAt(2).Value.RestoreItems(serializer, _savedData.Slot3);
+            _slots.ElementAt(3).Value.RestoreItems(serializer, _savedData.Slot4);
+            _slots.ElementAt(4).Value.RestoreItems(serializer, _savedData.Slot5);
+            _slots.ElementAt(5).Value.RestoreItems(serializer, _savedData.Slot6);
+            _slots.ElementAt(6).Value.RestoreItems(serializer, _savedData.Slot7);
+            _slots.ElementAt(7).Value.RestoreItems(serializer, _savedData.Slot8);
+            _slots.ElementAt(8).Value.RestoreItems(serializer, _savedData.Slot9);
+            _slots.ElementAt(9).Value.RestoreItems(serializer, _savedData.Slot10);
+            _slots.ElementAt(10).Value.RestoreItems(serializer, _savedData.Slot11);
+            _slots.ElementAt(11).Value.RestoreItems(serializer, _savedData.Slot12);
+            _slots.ElementAt(12).Value.RestoreItems(serializer, _savedData.Slot13);
+            _slots.ElementAt(13).Value.RestoreItems(serializer, _savedData.Slot14);
+            _slots.ElementAt(14).Value.RestoreItems(serializer, _savedData.Slot15);
+            _slots.ElementAt(15).Value.RestoreItems(serializer, _savedData.Slot16);
+            _slots.ElementAt(16).Value.RestoreItems(serializer, _savedData.Slot17);
 
             _isFromSave = true;
         }
@@ -200,21 +323,23 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
                 _savedData.BodyColor = _colorManager.GetColor().ColorToVector4();
                 _savedData.SecondaryColor = _colorManager.GetSecondaryColor().ColorToVector4();
                 _savedData.IsTrayOpen = IsOpen;
-                //_savedData.Slot1 = _slots.ElementAt(0).Value.Save(serializer);
-                //_savedData.Slot2 = _slots.ElementAt(1).Value.Save(serializer);
-                //_savedData.Slot3 = _slots.ElementAt(2).Value.Save(serializer);
-                //_savedData.Slot4 = _slots.ElementAt(3).Value.Save(serializer);
-                //_savedData.Slot5 = _slots.ElementAt(4).Value.Save(serializer);
-                //_savedData.Slot6 = _slots.ElementAt(5).Value.Save(serializer);
-                //_savedData.Slot7 = _slots.ElementAt(5).Value.Save(serializer);
-                //_savedData.Slot8 = _slots.ElementAt(5).Value.Save(serializer);
-                //_savedData.Slot9 = _slots.ElementAt(5).Value.Save(serializer);
-                //_savedData.Slot10 = _slots.ElementAt(5).Value.Save(serializer);
-                //_savedData.Slot11 = _slots.ElementAt(5).Value.Save(serializer);
-                //_savedData.Slot12 = _slots.ElementAt(5).Value.Save(serializer);
-                //_savedData.Slot13 = _slots.ElementAt(5).Value.Save(serializer);
-                //_savedData.Slot14 = _slots.ElementAt(5).Value.Save(serializer);
-                //_savedData.Slot15 = _slots.ElementAt(5).Value.Save(serializer);
+                _savedData.Slot1 = _slots.ElementAt(0).Value.Save(serializer);
+                _savedData.Slot2 = _slots.ElementAt(1).Value.Save(serializer);
+                _savedData.Slot3 = _slots.ElementAt(2).Value.Save(serializer);
+                _savedData.Slot4 = _slots.ElementAt(3).Value.Save(serializer);
+                _savedData.Slot5 = _slots.ElementAt(4).Value.Save(serializer);
+                _savedData.Slot6 = _slots.ElementAt(5).Value.Save(serializer);
+                _savedData.Slot7 = _slots.ElementAt(6).Value.Save(serializer);
+                _savedData.Slot8 = _slots.ElementAt(7).Value.Save(serializer);
+                _savedData.Slot9 = _slots.ElementAt(8).Value.Save(serializer);
+                _savedData.Slot10 = _slots.ElementAt(9).Value.Save(serializer);
+                _savedData.Slot11 = _slots.ElementAt(10).Value.Save(serializer);
+                _savedData.Slot12 = _slots.ElementAt(11).Value.Save(serializer);
+                _savedData.Slot13 = _slots.ElementAt(12).Value.Save(serializer);
+                _savedData.Slot14 = _slots.ElementAt(13).Value.Save(serializer);
+                _savedData.Slot15 = _slots.ElementAt(14).Value.Save(serializer);
+                _savedData.Slot16 = _slots.ElementAt(15).Value.Save(serializer);
+                _savedData.Slot17 = _slots.ElementAt(16).Value.Save(serializer);
                 newSaveData.DSSFloorServerRackDataEntries.Add(_savedData);
                 QuickLogger.Debug($"Saving ID {_savedData.ID}", true);
             }
@@ -238,7 +363,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
             if (_tray == null) return;
 
             // remember, 10 - 5 is 5, so target - position is always your direction.
-            Vector3 dir = new Vector3(_tray.transform.localPosition.x, _tray.transform.localPosition.y, _targetPos) - _tray.transform.localPosition;
+            Vector3 dir = new Vector3(_targetPos, _tray.transform.localPosition.y, _tray.transform.localPosition.z) - _tray.transform.localPosition;
 
             // magnitude is the total length of a vector.
             // getting the magnitude of the direction gives us the amount left to move
@@ -259,12 +384,12 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
 
         private void Open()
         {
-            _targetPos = 0.382f;
+            _targetPos = OpenPos;
         }
 
         private void Close()
         {
-            _targetPos = 0f;
+            _targetPos = ClosePos;
         }
 
         public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
@@ -309,6 +434,11 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
                 slot.Value.SetIsVisible(IsVisible);
             }
             //TODO Turn OffScreen
+        }
+
+        public IEnumerable<KeyValuePair<string, DSSSlotController>> GetSlots()
+        {
+            return _slots;
         }
     }
 }

@@ -64,6 +64,8 @@ namespace FCS_StorageSolutions.Configuration
         [JsonProperty] internal byte[] Slot13 { get; set; }
         [JsonProperty] internal byte[] Slot14 { get; set; }
         [JsonProperty] internal byte[] Slot15 { get; set; }
+        [JsonProperty] internal byte[] Slot16 { get; set; }
+        [JsonProperty] internal byte[] Slot17 { get; set; }
     }
 
     [Serializable]
@@ -83,6 +85,7 @@ namespace FCS_StorageSolutions.Configuration
         [JsonProperty] internal string SaveVersion { get; set; } = "1.0";
         [JsonProperty] internal Vec4 Body { get; set; }
         [JsonProperty] internal Vec4 SecondaryBody { get; set; }
+        [JsonProperty] internal TechType CurrentItem { get; set; }
     }
 
     [Serializable]

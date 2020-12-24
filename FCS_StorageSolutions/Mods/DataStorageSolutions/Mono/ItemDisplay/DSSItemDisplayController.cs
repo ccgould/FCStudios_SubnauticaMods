@@ -1,19 +1,29 @@
-﻿using FCS_AlterraHomeSolutions.Mono.PaintTool;
+﻿using System;
+using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Extensions;
+using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_StorageSolutions.Configuration;
 using FCS_StorageSolutions.Mods.AlterraStorage.Buildable;
+using FCSCommon.Components;
+using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.ItemDisplay
 {
-    internal class DSSItemDisplayController : FcsDevice, IFCSSave<SaveData>
+    internal class DSSItemDisplayController : FcsDevice, IFCSSave<SaveData>,IFCSDumpContainer
     {
         private bool _runStartUpOnEnable;
         private bool _fromSave;
         private DSSItemDisplayDataEntry _saveData;
+        private Text _amountCounter;
+        private uGUI_Icon _icon;
+        private DumpContainerSimplified _dumpContainer;
+        internal TechType currentItem;
 
         private void Start()
         {
@@ -38,8 +48,11 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.ItemDisplay
             {
                 _colorManager.ChangeColor(_saveData.Body.Vector4ToColor());
                 _colorManager.ChangeColor(_saveData.SecondaryBody.Vector4ToColor(), ColorTargetMode.Secondary);
+                currentItem = _saveData.CurrentItem;
                 _fromSave = false;
             }
+
+            Refresh();
         }
 
         private void ReadySaveData()
@@ -58,10 +71,58 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.ItemDisplay
                 _colorManager.Initialize(gameObject, ModelPrefab.BodyMaterial, ModelPrefab.SecondaryMaterial);
             }
 
+            if (_dumpContainer == null)
+            {
+                _dumpContainer = gameObject.EnsureComponent<DumpContainerSimplified>();
+                _dumpContainer.Initialize(transform,AuxPatchers.AddItemToItemDisplay(),this,1,1,"ItemDisplayDump");
+            }
+            
+            var addBTN = GameObjectHelpers.FindGameObject(gameObject, "AddBTN").AddComponent<InterfaceButton>();
+            addBTN.TextLineOne = AuxPatchers.AddItemToItemDisplay();
+            addBTN.TextLineTwo = AuxPatchers.AddItemToItemDisplayDesc();
+            addBTN.OnButtonClick += (s, o) =>
+            {
+                _dumpContainer.OpenStorage();
+            };
+
+            
+            var iconBTN = GameObjectHelpers.FindGameObject(gameObject, "Icon").AddComponent<InterfaceButton>();
+            iconBTN.GetAdditionalDataFromString = true;
+            iconBTN.Tag = this;
+            iconBTN.GetAdditionalString += GetAdditionalString;
+            iconBTN.OnButtonClick += (s, o) =>
+            {
+                if (currentItem != TechType.None && Manager.HasItem(currentItem))
+                {
+                    var item = Manager.TakeItem(currentItem);
+                    if (item != null)
+                    {
+                        PlayerInteractionHelper.GivePlayerItem(item);
+                        Refresh();
+                    }
+                }
+            };
+
+            _amountCounter = GameObjectHelpers.FindGameObject(gameObject, "Text").EnsureComponent<Text>();
+            _icon = GameObjectHelpers.FindGameObject(gameObject, "Icon").EnsureComponent<uGUI_Icon>();
+
             IsInitialized = true;
 
             QuickLogger.Debug($"Initialized");
         }
+
+        private string GetAdditionalString(object arg)
+        {
+            var techType = ((DSSItemDisplayController) arg).currentItem;
+            return techType != TechType.None ? AuxPatchers.TakeFormatted(Language.main.Get(techType)) : String.Empty;
+        }
+
+        public void Refresh()
+        {
+            _amountCounter.text = Manager.GetItemCount(currentItem).ToString();
+            _icon.sprite = SpriteManager.Get(currentItem);
+        }
+
 
         public override void OnProtoSerialize(ProtobufSerializer serializer)
         {
@@ -91,6 +152,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.ItemDisplay
             _saveData.ID = id;
             _saveData.Body = _colorManager.GetColor().ColorToVector4();
             _saveData.SecondaryBody = _colorManager.GetSecondaryColor().ColorToVector4();
+            _saveData.CurrentItem = currentItem;
             QuickLogger.Debug($"Adding device {UnitID} to {nameof(newSaveData.DSSItemDisplayDataEntries)} save");
             newSaveData.DSSItemDisplayDataEntries.Add(_saveData);
             QuickLogger.Debug($"Save Count {newSaveData.DSSItemDisplayDataEntries.Count}");
@@ -126,6 +188,21 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.ItemDisplay
                     _runStartUpOnEnable = true;
                 }
             }
+        }
+
+
+        public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
+        {
+            return true;
+        }
+
+        public override bool AddItemToContainer(InventoryItem item)
+        {
+            currentItem = item.item.GetTechType();
+            Refresh();
+            PlayerInteractionHelper.GivePlayerItem(item);
+            return true;
+
         }
     }
 }

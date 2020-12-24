@@ -1,5 +1,9 @@
-﻿using FCS_AlterraHomeSolutions.Mono.PaintTool;
+﻿using System;
+using System.Collections.Generic;
+using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Extensions;
+using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_StorageSolutions.Configuration;
@@ -9,15 +13,20 @@ using UnityEngine;
 
 namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
 {
-    internal class DSSTerminalController : FcsDevice, IFCSSave<SaveData>
+    internal class DSSTerminalController : FcsDevice, IFCSSave<SaveData>, IFCSDumpContainer
     {
         private bool _runStartUpOnEnable;
         private bool _fromSave;
         private DSSTerminalDataEntry _saveData;
+        private DumpContainerSimplified _dumpContainer;
+        private DSSTerminalDisplayManager _display;
+        private IDSSRack _targetRack;
 
         private void Start()
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.DSSTabID, Mod.ModName);
+            _display.Setup(this);
+            _dumpContainer.Initialize(transform, $"Add item to base: {Manager.GetBaseName()}", this, 6, 8, gameObject.name);
         }
 
         private void OnEnable()
@@ -54,9 +63,21 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         {
             if (_colorManager == null)
             {
-                _colorManager = gameObject.AddComponent<ColorManager>();
+                _colorManager = gameObject.EnsureComponent<ColorManager>();
                 _colorManager.Initialize(gameObject, ModelPrefab.BodyMaterial, ModelPrefab.SecondaryMaterial);
             }
+
+            if (_dumpContainer == null)
+            {
+                _dumpContainer = gameObject.EnsureComponent<DumpContainerSimplified>();
+            }
+
+            if (_display == null)
+            {
+                _display = gameObject.EnsureComponent<DSSTerminalDisplayManager>();
+                
+            }
+
 
             IsInitialized = true;
 
@@ -91,6 +112,8 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             _saveData.Body = _colorManager.GetColor().ColorToVector4();
             _saveData.SecondaryBody = _colorManager.GetSecondaryColor().ColorToVector4();
 
+
+
             newSaveData.DSSTerminalDataEntries.Add(_saveData);
         }
 
@@ -124,6 +147,87 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                     _runStartUpOnEnable = true;
                 }
             }
+        }
+
+        public void OpenStorage()
+        {
+            _dumpContainer.OpenStorage();
+        }
+
+        public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
+        {
+
+            QuickLogger.Debug($"Checking if allowed {_dumpContainer.GetItemCount() + 1}",true);
+
+            //TODO Check filter first
+
+
+            int availableSpace = 0;
+            foreach (IDSSRack baseRack in Manager.BaseRacks)
+            {
+                availableSpace += baseRack.GetFreeSpace();
+            }
+
+            var result = availableSpace >= _dumpContainer.GetItemCount() + 1;
+            QuickLogger.Debug($"Allowed result: {result}", true);
+            return result;
+        }
+
+        public override bool AddItemToContainer(InventoryItem item)
+        {
+            try
+            {
+                foreach (IDSSRack baseRack in Manager.BaseRacks)
+                {
+                    if (baseRack.ItemAllowed(item,out var server))
+                    {
+                        server?.AddItemMountedItem(item);
+                    }
+                    
+                }
+                //var result = _targetRack.AddItemToRack(item);
+                //if (!result)
+                //{
+                //    PlayerInteractionHelper.GivePlayerItem(item);
+                //    throw new InvalidOperationException($"Failed to add item to base returning item: {Language.main.Get(item.item.GetTechType())}");
+                //}
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Debug(e.Message,true);
+                QuickLogger.Debug(e.StackTrace);
+                PlayerInteractionHelper.GivePlayerItem(item);
+                return false;
+            }
+            return true;
+        }
+
+        public Dictionary<TechType,int> GetItems()
+        {
+
+            //TODO Replace this
+
+            if (Manager?.BaseRacks == null) return null;
+            
+            var dict = new Dictionary<TechType,int>();
+            
+            foreach (IDSSRack baseRack in Manager.BaseRacks)
+            {
+                if(baseRack == null || baseRack.GetStorage()) continue;
+                foreach (KeyValuePair<TechType, int> item in baseRack.GetStorage().GetItems())
+                {
+                    if (!dict.ContainsKey(item.Key))
+                    {
+                        dict.Add(item.Key,item.Value);
+                    }
+                    else
+                    {
+                        dict[item.Key] += item.Value;
+                    }
+                }
+            }
+
+            return dict;
         }
     }
 }

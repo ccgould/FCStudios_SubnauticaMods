@@ -141,5 +141,10 @@ namespace FCS_AlterraHub.Mono
                 num = i;
             }
         }
+
+        public int GetItemCount()
+        {
+            return _dumpContainer.count;
+        }
     }
 }
