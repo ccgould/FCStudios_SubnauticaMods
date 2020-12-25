@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Mono;
@@ -6,10 +7,8 @@ using FCS_StorageSolutions.Configuration;
 using FCS_StorageSolutions.Mods.AlterraStorage.Buildable;
 using FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack;
 using FCSCommon.Extensions;
-using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
-using UnityEngine.Rendering;
 using UnityEngine.UI;
 
 namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
@@ -19,9 +18,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
     //TODO Add a name feature
     internal class DSSServerController : FcsDevice, IFCSSave<SaveData>
     {
-        private bool _runStartUpOnEnable;
         private bool _isFromSave;
-        private bool _isBeingDestroyed;
         private FCSStorage _storageContainer;
         private Text _storageAmount;
         private InterfaceInteraction _interactionHelper;
@@ -33,6 +30,9 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
         private IDSSRack _rackController;
         private const int MAXSTORAGE = 48;
         private HashSet<TechType> FilteringSettings = new HashSet<TechType>();
+        private string _currentBase;
+
+        public bool IsFiltered => FilteringSettings.Count > 0;
         public override bool BypassRegisterCheck => true;
 
         private void Start()
@@ -67,7 +67,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
         public override void OnDestroy()
         {
             base.OnDestroy();
-            _isBeingDestroyed = true;
             Mod.UnRegisterServer(this);
         }
 
@@ -97,22 +96,27 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
                 _storageContainer.Initialize(MAXSTORAGE);
                 _storageContainer.ItemsContainer.onAddItem += item =>
                 {
-                    UpdateStorageCount();
+                    UpdateStorageCount(item);
+                    OnAddItem?.Invoke(this,item);
                 };
 
                 _storageContainer.ItemsContainer.onRemoveItem += item =>
                 {
-                    UpdateStorageCount();
+                    UpdateStorageCount(item);
+                    OnRemoveItem?.Invoke(this, item);
                 };
             }
+            
             Mod.RegisterServer(this);
 
-            UpdateStorageCount();
+            UpdateStorageCount(null);
+
+            InvokeRepeating(nameof(FindBaseManager),1f,1f);
 
             IsInitialized = true;
         }
-
-        private void UpdateStorageCount()
+        
+        private void UpdateStorageCount(InventoryItem item)
         {
             _storageAmount.text = AuxPatchers.AlterraStorageAmountFormat(_storageContainer.GetCount(), MAXSTORAGE);
         }
@@ -146,7 +150,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
         public override void OnProtoDeserialize(ProtobufSerializer serializer)
         {
             QuickLogger.Debug("In OnProtoDeserialize We made it");
-
+            _isFromSave = true;
             _serializer = serializer;
 
             if (_savedData == null)
@@ -161,10 +165,10 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
 
             if (_savedData != null)
             {
+                _currentBase = _savedData.CurrentBase;
                 _storageContainer.RestoreItems(_serializer, _savedData.Data);
             }
-
-            _isFromSave = true;
+            _isFromSave = false;
         }
         
         public override bool CanDeconstruct(out string reason)
@@ -179,13 +183,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
             //NOT USED
         }
 
-
-        private void Test()
-        {
-            _storageContainer.AddItem(TechType.Copper.ToInventoryItem());
-        }
-
-
         public void Save(SaveData newSaveData, ProtobufSerializer serializer = null)
         {
             if (_savedData == null)
@@ -199,6 +196,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
             {
                 _savedData.RackSlot = _rackSlot;
                 _savedData.RackSlotUnitID = _rackController.UnitID;
+                _savedData.CurrentBase = _currentBase;
             }
             newSaveData.DSSServerDataEntries.Add(_savedData);
             QuickLogger.Debug($"Saving ID {_savedData.ID}", true);
@@ -240,6 +238,11 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
 
             if (result)
             {
+                if(_rackController == null)
+                {
+                    QuickLogger.Debug("Rack Controller is null");
+                }
+
                 _rackController?.UpdateStorageCount();
             }
 
@@ -259,17 +262,13 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
         public Pickupable RemoveItemFromContainer(TechType techType, int amount)
         {
             var result =  _storageContainer.ItemsContainer.RemoveItem(techType);
+            
             if (result)
             {
                 _rackController?.UpdateStorageCount();
             }
 
             return result;
-        }
-
-        public Dictionary<TechType, int> GetItemsWithin()
-        {
-            return null;
         }
 
         public bool ContainsItem(TechType techType)
@@ -282,6 +281,12 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
             _rackSlot = slot.GetSlotName();
             _rackController = controller;
             _rb.isKinematic = true;
+            if (controller?.Manager?.BaseID != null)
+            {
+                _currentBase = controller.Manager.BaseID;
+                FindBaseManager();
+            }
+            
             foreach (BoxCollider bc in _colliders)
             {
                 bc.isTrigger = true;
@@ -292,9 +297,19 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
             transform.localPosition = Vector3.zero;
             IsVisible = true;
         }
-
+        
+        private void FindBaseManager()
+        {
+            if (Manager == null && !string.IsNullOrEmpty(_currentBase))
+            {
+                Manager = BaseManager.FindManager(_currentBase);
+            }
+        }
+        
         public void UnDockServer()
         {
+            Manager = null;
+            _currentBase = string.Empty;
             _rackSlot = string.Empty;
             _rackController = null;
             IsVisible = false;
@@ -331,9 +346,12 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
             return true;
         }
 
-        public bool IsFiltered => FilteringSettings.Count > 0;
+        public override IEnumerable<KeyValuePair<TechType, int>> GetItemsWithin()
+        {
+            return _storageContainer.GetItems();
+        }
 
-        public int GetItemCount(TechType techType)
+        public override int GetItemCount(TechType techType)
         {
             return _storageContainer.ItemsContainer.GetCount(techType);
         }
@@ -341,6 +359,12 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
         public bool HasItem(TechType techType)
         {
             return _storageContainer.ItemsContainer.GetCount(techType) > 0;
+        }
+
+        public float GetPercentage()
+        {
+            if (_storageContainer == null) return 0f;
+            return (float)_storageContainer.GetCount() / MAXSTORAGE;
         }
     }
 }

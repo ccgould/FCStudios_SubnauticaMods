@@ -58,8 +58,8 @@ namespace FCS_StorageSolutions
             ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));
 
             //Harmony
-            //var harmony = new Harmony("com.storagesolutions.fcstudios");
-            //harmony.PatchAll(Assembly.GetExecutingAssembly());
+            var harmony = new Harmony("com.storagesolutions.fcstudios");
+            harmony.PatchAll(Assembly.GetExecutingAssembly());
 
             QuickLogger.Info($"Finished Patching");
         }

@@ -17,6 +17,11 @@ namespace FCS_StorageSolutions.Configuration
             { $"{ModKey}_CloseWallServerRack","Close Wall Server Rack"},
             { $"{ModKey}_AddItemToItemDisplay","Add Item"},
             { $"{ModKey}_AddItemToItemDisplayDesc","Click to add an item to the display to should the quantity in the system"},
+            { $"{ModKey}_NoItemToTake","Please choose an item to display and extract from the network."},
+            { $"{ModKey}_AddItemToNetwork","Add item/s to base"},
+            { $"{ModKey}_AddItemToNetworkDesc","Allows you to add items to your Data Storage network."},
+            { $"{ModKey}_Reset","Reset."},
+            { $"{ModKey}_ItemDisplayResetDesc","Resets the item display so you can choose another item to display."},
         };
         
         internal static void AdditionalPatching()
@@ -75,6 +80,31 @@ namespace FCS_StorageSolutions.Configuration
         public static string AddItemToItemDisplayDesc()
         {
             return GetLanguage($"{ModKey}_AddItemToItemDisplayDesc");
+        }
+
+        public static string NoItemToTake()
+        {
+            return GetLanguage($"{ModKey}_NoItemToTake");
+        }
+
+        public static string AddItemToNetwork()
+        {
+            return GetLanguage($"{ModKey}_AddItemToNetwork");
+        }        
+        
+        public static string AddItemToNetworkDesc()
+        {
+            return GetLanguage($"{ModKey}_AddItemToNetworkDesc");
+        }
+
+        public static string Reset()
+        {
+            return GetLanguage($"{ModKey}_Reset");
+        }
+        
+        public static string ItemDisplayResetDesc()
+        {
+            return GetLanguage($"{ModKey}_ItemDisplayResetDesc");
         }
     }
 }

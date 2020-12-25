@@ -144,8 +144,16 @@ namespace FCSCommon.Components
                         this.gameObject.transform.localScale = this.gameObject.transform.localScale;
                     }
                     break;
-                default:
-                    throw new ArgumentOutOfRangeException();
+                case InterfaceButtonMode.HoverImage:
+                    if (_hoverImage == null)
+                    {
+                        _hoverImage = InterfaceHelpers.FindGameObject(gameObject, "Hover");
+                    }
+                    if (_hoverImage != null)
+                    {
+                        _hoverImage.SetActive(false);
+                    }
+                    break;
             }
 
         }
@@ -158,8 +166,11 @@ namespace FCSCommon.Components
         public override void OnPointerEnter(PointerEventData eventData)
         {
             base.OnPointerEnter(eventData);
+            
             UpdateTextComponent(IsTextMode());
+            
             OnInterfaceButton?.Invoke(true);
+
             if (this.IsHovered)
             {
                 switch (this.ButtonMode)
@@ -174,13 +185,13 @@ namespace FCSCommon.Components
                         break;
                     case InterfaceButtonMode.Background:
                         FindImage();
-                        if (_bgImage != null || !IsSelected)
+                        if (_bgImage != null && !IsSelected)
                         {
                             _bgImage.color = this.HOVER_COLOR;
                         }
                         break;
                     case InterfaceButtonMode.BackgroundScale:
-                        if (this.gameObject != null || !IsSelected)
+                        if (this.gameObject != null && !IsSelected)
                         {
                             this.gameObject.transform.localScale +=
                                 new Vector3(this.IncreaseButtonBy, this.IncreaseButtonBy, this.IncreaseButtonBy);

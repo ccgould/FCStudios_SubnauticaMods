@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Patches;
 using FCS_AlterraHub.Registration;
@@ -26,14 +27,14 @@ namespace FCS_AlterraHub.Mono
         private readonly Dictionary<string, FcsDevice> _registeredDevices;
         private float _timeLeft = 1f;
         private PowerSystem.Status _prevPowerState;
-        private Dictionary<string,TechLight> _baseTechLights;
+        private Dictionary<string, TechLight> _baseTechLights;
 
         public SubRoot Habitat { get; set; }
 
         public bool IsVisible { get; set; }
 
         public static List<BaseManager> Managers { get; } = new List<BaseManager>();
-        public static Dictionary<string,TrackedLight> GlobalTrackedLights { get; } = new Dictionary<string, TrackedLight>();
+        public static Dictionary<string, TrackedLight> GlobalTrackedLights { get; } = new Dictionary<string, TrackedLight>();
         public Action<PowerSystem.Status> OnPowerStateChanged { get; set; }
         public bool IsBaseExternalLightsActivated { get; set; }
         public List<IDSSRack> BaseRacks { get; set; } = new List<IDSSRack>();
@@ -168,9 +169,9 @@ namespace FCS_AlterraHub.Mono
         {
             if (!_registeredDevices.ContainsKey(device.UnitID))
             {
-                if(device.IsRack)
+                if (device.IsRack)
                 {
-                    BaseRacks.Add((IDSSRack) device);
+                    BaseRacks.Add((IDSSRack)device);
                 }
                 _registeredDevices.Add(device.UnitID, device);
             }
@@ -212,7 +213,7 @@ namespace FCS_AlterraHub.Mono
 
         public void UnRegisterDevice(FcsDevice device)
         {
-            if (_registeredDevices.ContainsKey(device.UnitID))
+            if (device != null && !string.IsNullOrWhiteSpace(device.UnitID) && _registeredDevices.ContainsKey(device.UnitID))
                 _registeredDevices?.Remove(device.UnitID);
         }
 
@@ -297,10 +298,10 @@ namespace FCS_AlterraHub.Mono
             var prefabId = device.gameObject.GetComponent<PrefabIdentifier>()?.Id;
             if (!string.IsNullOrEmpty(prefabId) && !_baseTechLights.ContainsKey(prefabId))
             {
-                _baseTechLights.Add(prefabId,device);
+                _baseTechLights.Add(prefabId, device);
                 var controller = device.gameObject.AddComponent<FCSTechLigtController>();
                 controller.Initialize(this);
-                AddGlobalTrackedLight(prefabId, device,null, this);
+                AddGlobalTrackedLight(prefabId, device, null, this);
             }
         }
 
@@ -308,7 +309,7 @@ namespace FCS_AlterraHub.Mono
         {
             if (!GlobalTrackedLights.ContainsKey(prefabId))
             {
-                GlobalTrackedLights.Add(prefabId,new TrackedLight{Manager = baseManager, TechLight = techLight, SpotLight = spotLight});
+                GlobalTrackedLights.Add(prefabId, new TrackedLight { Manager = baseManager, TechLight = techLight, SpotLight = spotLight });
             }
         }
 
@@ -367,12 +368,252 @@ namespace FCS_AlterraHub.Mono
                     return baseRack.RemoveItemFromRack(techType);
                 }
             }
-
             return null;
         }
+
+        public Dictionary<TechType, int> GetItemsWithin()
+        {
+            return TrackedResources.ToDictionary(x => x.Key, x => x.Value.Amount);
+        }
+
+        public bool ContainsItem(TechType techType)
+        {
+            return TrackedResources.ContainsKey(techType);
+        }
+
+        public int GetItemCount(TechType techType, bool serverOnly = false)
+        {
+            if (!TrackedResources.ContainsKey(techType)) return 0;
+
+            if (!serverOnly)
+            {
+                return TrackedResources.ContainsKey(techType) ? TrackedResources[techType].Amount : 0;
+            }
+
+            var i = 0;
+            var device = TrackedResources[techType];
+
+            foreach (FcsDevice controller in device.Servers)
+            {
+                i += controller.GetItemCount(techType);
+            }
+
+            return i;
+        }
+
+        public readonly Dictionary<TechType, TrackedResource> TrackedResources = new Dictionary<TechType, TrackedResource>();
+        public static List<string> DONT_TRACK_GAMEOBJECTS { get; private set; } = new List<string>
+        {
+            "planterpot",
+            "planterbox",
+            "plantershelf",
+            "alongplanter"
+        };
+        public static readonly HashSet<StorageContainer> BaseStorageLockers = new HashSet<StorageContainer>();
+        public readonly HashSet<FcsDevice> BaseServers = new HashSet<FcsDevice>();
+
+        public void AddItemsToTracker(FcsDevice server, TechType item, int amountToAdd = 1)
+        {
+            QuickLogger.Debug($"AddItemsToTracker: DSSServerController || {item.AsString()} || {amountToAdd} ");
+
+            if (TrackedResources.ContainsKey(item))
+            {
+                TrackedResources[item].Amount = TrackedResources[item].Amount + amountToAdd;
+                TrackedResources[item].Servers.Add(server);
+            }
+            else
+            {
+                TrackedResources.Add(item, new TrackedResource()
+                {
+                    TechType = item,
+                    Amount = amountToAdd,
+                    Servers = new HashSet<FcsDevice>() { server }
+                });
+
+                //BaseManager.SendNotification();
+            }
+        }
+
+        public void RemoveItemsFromTracker(FcsDevice server, TechType item, int amountToRemove = 1)
+        {
+            QuickLogger.Debug($"RemoveItemsFromTracker: DSSServerController || {item.AsString()} || {amountToRemove} ");
+
+
+            if (TrackedResources.ContainsKey(item))
+            {
+                TrackedResource trackedResource = TrackedResources[item];
+                int newAmount = trackedResource.Amount - amountToRemove;
+                trackedResource.Amount = newAmount;
+
+                if (newAmount <= 0)
+                {
+                    TrackedResources.Remove(item);
+                    //BaseManager.SendNotification();
+                }
+                else
+                {
+                    int amountLeftInContainer = server.GetItemCount(item);
+                    if (amountLeftInContainer <= 0)
+                    {
+                        trackedResource.Servers.Remove(server);
+                    }
+                }
+            }
+        }
+
+        public void RemoveServerFromBase(FcsDevice server)
+        {
+            //BaseManager.SetAllowedToNotify(false);
+            foreach (KeyValuePair<TechType, int> item in server.GetItemsWithin())
+            {
+                RemoveItemsFromTracker(server, item.Key, item.Value);
+            }
+
+            server.OnAddItem -= OnServerAddItem;
+            server.OnRemoveItem -= OnServerRemoveItem;
+            BaseServers.Remove(server);
+            //BaseManager.SetAllowedToNotify(true);
+        }
+
+        public void RegisterServerInBase(FcsDevice server, bool skipAdding = false)
+        {
+            if (!BaseServers.Contains(server))
+            {
+                BaseServers.Add(server);
+
+                if (!skipAdding)
+                {
+                    //BaseManager.SetAllowedToNotify(false);
+                    foreach (KeyValuePair<TechType, int> item in server.GetItemsWithin())
+                    {
+                        AddItemsToTracker(server, item.Key, item.Value);
+                    }
+                }
+
+                server.OnAddItem += OnServerAddItem;
+                server.OnRemoveItem += OnServerRemoveItem;
+                //BaseManager.SetAllowedToNotify(true);
+            }
+        }
+
+        private void OnServerRemoveItem(FcsDevice server, InventoryItem item)
+        {
+            RemoveItemsFromTracker(server, item.item.GetTechType());
+        }
+
+        private void OnServerAddItem(FcsDevice server, InventoryItem item)
+        {
+            AddItemsToTracker(server, item.item.GetTechType());
+        }
+
+
+
+        #region Storage Containers
+
+        public void AlertNewStorageContainerPlaced(StorageContainer storageContainer)
+        {
+            if (BaseStorageLockers.Contains(storageContainer)) return;
+            BaseStorageLockers.Add(storageContainer);
+            TrackStorageContainer(storageContainer);
+        }
+
+        private void TrackExistingStorageContainers()
+        {
+            StorageContainer[] containers = Habitat.GetComponentsInChildren<StorageContainer>();
+            foreach (StorageContainer sc in containers)
+            {
+                TrackStorageContainer(sc);
+            }
+        }
+
+        private void TrackStorageContainer(StorageContainer sc)
+        {
+            if (sc == null || sc.container == null)
+            {
+                return;
+            }
+
+            foreach (string notTrackedObject in DONT_TRACK_GAMEOBJECTS)
+            {
+                if (sc.gameObject.name.ToLower().Contains(notTrackedObject))
+                {
+                    return;
+                }
+            }
+
+            foreach (var item in sc.container.GetItemTypes())
+            {
+                for (int i = 0; i < sc.container.GetCount(item); i++)
+                {
+                    AddItemsToTracker(sc, item);
+                }
+            }
+
+            sc.container.onAddItem += (item) => AddItemsToTracker(sc, item.item.GetTechType());
+            sc.container.onRemoveItem += (item) => RemoveItemsFromTracker(sc, item.item.GetTechType());
+        }
+
+        public void RemoveItemsFromTracker(StorageContainer sc, TechType item, int amountToRemove = 1)
+        {
+            QuickLogger.Debug($"RemoveItemsFromTracker: StorageContainer || {item.AsString()} || {amountToRemove} ");
+
+            if (TrackedResources.ContainsKey(item))
+            {
+                TrackedResource trackedResource = TrackedResources[item];
+                int newAmount = trackedResource.Amount - amountToRemove;
+                trackedResource.Amount = newAmount;
+
+                if (newAmount <= 0)
+                {
+                    TrackedResources.Remove(item);
+                    //BaseManager.SendNotification();
+                }
+                else
+                {
+                    int amountLeftInContainer = sc.container.GetCount(item);
+                    if (amountLeftInContainer <= 0)
+                    {
+                        trackedResource.StorageContainers.Remove(sc);
+                    }
+                }
+            }
+        }
+
+        public void AddItemsToTracker(StorageContainer sc, TechType item, int amountToAdd = 1)
+        {
+            QuickLogger.Debug($"AddItemsToTracker: StorageContainer || {item.AsString()} || {amountToAdd} ");
+
+
+            if (DONT_TRACK_GAMEOBJECTS.Contains(item.AsString().ToLower()))
+            {
+                return;
+            }
+
+            if (TrackedResources.ContainsKey(item))
+            {
+                TrackedResources[item].Amount = TrackedResources[item].Amount + amountToAdd;
+                TrackedResources[item].StorageContainers.Add(sc);
+            }
+            else
+            {
+                TrackedResources.Add(item, new TrackedResource()
+                {
+                    TechType = item,
+                    Amount = amountToAdd,
+                    StorageContainers = new HashSet<StorageContainer>()
+                    {
+                        sc
+                    }
+                });
+                //BaseManager.SendNotification();
+            }
+        }
+
+        #endregion
+
     }
 
-    public struct TrackedLight 
+    public struct TrackedLight
     {
         public BaseManager Manager { get; set; }
         public TechLight TechLight { get; set; }
@@ -393,5 +634,14 @@ namespace FCS_AlterraHub.Mono
         {
 
         }
+    }
+
+    public class TrackedResource
+    {
+        public TechType TechType { get; set; }
+        public int Amount { get; set; }
+        public HashSet<StorageContainer> StorageContainers { get; set; } = new HashSet<StorageContainer>();
+        public HashSet<FcsDevice> Servers { get; set; } = new HashSet<FcsDevice>();
+        public HashSet<FcsDevice> FCSConnectableDevices { get; set; } = new HashSet<FcsDevice>();
     }
 }

@@ -24,10 +24,13 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.ItemDisplay
         private uGUI_Icon _icon;
         private DumpContainerSimplified _dumpContainer;
         internal TechType currentItem;
+        private NetworkDumpStorage _networkDump;
+        private InterfaceButton _resetBTN;
 
         private void Start()
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.DSSTabID, Mod.ModName);
+            _networkDump.Initialize(Manager);
         }
         
         private void OnEnable()
@@ -51,7 +54,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.ItemDisplay
                 currentItem = _saveData.CurrentItem;
                 _fromSave = false;
             }
-
+            
             Refresh();
         }
 
@@ -73,57 +76,85 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.ItemDisplay
 
             if (_dumpContainer == null)
             {
-                _dumpContainer = gameObject.EnsureComponent<DumpContainerSimplified>();
+                _dumpContainer = gameObject.AddComponent<DumpContainerSimplified>();
                 _dumpContainer.Initialize(transform,AuxPatchers.AddItemToItemDisplay(),this,1,1,"ItemDisplayDump");
             }
-            
-            var addBTN = GameObjectHelpers.FindGameObject(gameObject, "AddBTN").AddComponent<InterfaceButton>();
-            addBTN.TextLineOne = AuxPatchers.AddItemToItemDisplay();
-            addBTN.TextLineTwo = AuxPatchers.AddItemToItemDisplayDesc();
-            addBTN.OnButtonClick += (s, o) =>
-            {
-                _dumpContainer.OpenStorage();
-            };
 
+            if (_networkDump == null)
+            {
+                _networkDump = gameObject.EnsureComponent<NetworkDumpStorage>();
+            }
+
+            var addToNetworkBTN = GameObjectHelpers.FindGameObject(gameObject, "AddBTN").AddComponent<InterfaceButton>();
+            addToNetworkBTN.TextLineOne = AuxPatchers.AddItemToNetwork();
+            addToNetworkBTN.TextLineTwo = AuxPatchers.AddItemToNetworkDesc();
+            addToNetworkBTN.OnButtonClick += (s, o) =>
+            {
+                _networkDump.OpenStorage();
+            };            
             
+            _resetBTN = GameObjectHelpers.FindGameObject(gameObject, "ResetBTN").AddComponent<InterfaceButton>();
+            _resetBTN.TextLineOne = AuxPatchers.Reset();
+            _resetBTN.TextLineTwo = AuxPatchers.ItemDisplayResetDesc();
+            _resetBTN.OnButtonClick += (s, o) => { Reset(); };
+
             var iconBTN = GameObjectHelpers.FindGameObject(gameObject, "Icon").AddComponent<InterfaceButton>();
             iconBTN.GetAdditionalDataFromString = true;
             iconBTN.Tag = this;
             iconBTN.GetAdditionalString += GetAdditionalString;
             iconBTN.OnButtonClick += (s, o) =>
             {
-                if (currentItem != TechType.None && Manager.HasItem(currentItem))
+                if (currentItem != TechType.None)
                 {
-                    var item = Manager.TakeItem(currentItem);
-                    if (item != null)
+                    if (Manager.HasItem(currentItem) && PlayerInteractionHelper.CanPlayerHold(currentItem))
                     {
-                        PlayerInteractionHelper.GivePlayerItem(item);
-                        Refresh();
+                        var item = Manager.TakeItem(currentItem);
+                        if (item != null)
+                        {
+                            PlayerInteractionHelper.GivePlayerItem(item);
+                            Refresh();
+                        }
                     }
+                }
+                else
+                {
+                    _dumpContainer.OpenStorage();
                 }
             };
 
             _amountCounter = GameObjectHelpers.FindGameObject(gameObject, "Text").EnsureComponent<Text>();
             _icon = GameObjectHelpers.FindGameObject(gameObject, "Icon").EnsureComponent<uGUI_Icon>();
+            _icon.sprite = SpriteManager.defaultSprite;
+
+            InvokeRepeating(nameof(Refresh), 1, 1);
 
             IsInitialized = true;
 
             QuickLogger.Debug($"Initialized");
         }
 
+        private void Reset()
+        {
+            _icon.sprite = SpriteManager.defaultSprite;
+            _amountCounter.text = "0";
+            currentItem = TechType.None;
+            Refresh();
+        }
+
         private string GetAdditionalString(object arg)
         {
             var techType = ((DSSItemDisplayController) arg).currentItem;
-            return techType != TechType.None ? AuxPatchers.TakeFormatted(Language.main.Get(techType)) : String.Empty;
+            return techType != TechType.None ? AuxPatchers.TakeFormatted(Language.main.Get(techType)) : AuxPatchers.NoItemToTake();
         }
 
         public void Refresh()
         {
+            if (_amountCounter == null || _icon == null || Manager == null) return;
             _amountCounter.text = Manager.GetItemCount(currentItem).ToString();
             _icon.sprite = SpriteManager.Get(currentItem);
+            _resetBTN.gameObject.SetActive(currentItem != TechType.None);
         }
-
-
+        
         public override void OnProtoSerialize(ProtobufSerializer serializer)
         {
             if (!Mod.IsSaving())
@@ -190,7 +221,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.ItemDisplay
             }
         }
 
-
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
         {
             return true;
@@ -203,6 +233,70 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.ItemDisplay
             PlayerInteractionHelper.GivePlayerItem(item);
             return true;
 
+        }
+    }
+
+    internal class NetworkDumpStorage : MonoBehaviour, IFCSDumpContainer
+    {
+        private DumpContainerSimplified _dumpContainer;
+        private BaseManager _manager;
+
+        internal void Initialize(BaseManager manager)
+        {
+            _manager = manager;
+            if (_dumpContainer == null)
+            {
+                _dumpContainer = gameObject.AddComponent<DumpContainerSimplified>();
+                _dumpContainer.Initialize(transform, AuxPatchers.AddItemToItemDisplay(), this, 6, 8, "NetworkItemDisplayNetworkDump");
+            }
+        }
+
+
+        public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
+        {
+            if (_manager == null) return false;
+            QuickLogger.Debug($"Checking if allowed {_dumpContainer.GetItemCount() + 1}", true);
+
+            //TODO Check filter first
+
+
+            int availableSpace = 0;
+            foreach (IDSSRack baseRack in _manager.BaseRacks)
+            {
+                availableSpace += baseRack.GetFreeSpace();
+            }
+
+            var result = availableSpace >= _dumpContainer.GetItemCount() + 1;
+            QuickLogger.Debug($"Allowed result: {result}", true);
+            return result;
+        }
+
+        public bool AddItemToContainer(InventoryItem item)
+        {
+            try
+            {
+                foreach (IDSSRack baseRack in _manager.BaseRacks)
+                {
+                    if (baseRack.ItemAllowed(item, out var server))
+                    {
+                        server?.AddItemMountedItem(item);
+                    }
+
+                }
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Debug(e.Message, true);
+                QuickLogger.Debug(e.StackTrace);
+                PlayerInteractionHelper.GivePlayerItem(item);
+                return false;
+            }
+            return true;
+        }
+
+        public void OpenStorage()
+        {
+            _dumpContainer.OpenStorage();
         }
     }
 }

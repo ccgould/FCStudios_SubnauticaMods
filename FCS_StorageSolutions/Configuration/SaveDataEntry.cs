@@ -24,6 +24,7 @@ namespace FCS_StorageSolutions.Configuration
         [JsonProperty] internal byte[] Data { get; set; }
         [JsonProperty] internal string RackSlot { get; set; }
         [JsonProperty] internal string RackSlotUnitID { get; set; }
+        [JsonProperty] internal string CurrentBase { get; set; }
     }
 
     [Serializable]

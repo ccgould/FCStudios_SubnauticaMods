@@ -7,6 +7,7 @@ using FCS_StorageSolutions.Mods.AlterraStorage.Buildable;
 using FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server;
 using FCSCommon.Utilities;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
 {
@@ -19,6 +20,8 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         private BoxCollider _collider;
         private FCSStorage _storage;
         private DSSServerController _mountedServer;
+        private Image _preloader;
+        private Text _preloaderPercentage;
         public bool IsOccupied => _mountedServer != null;
         public bool IsFull => _mountedServer?.IsFull() ?? true;
 
@@ -29,12 +32,21 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
 
         private void Update()
         {
-            if (_collider == null || _controller == null) return;
+            if (_collider == null || _controller == null || _preloader == null || _preloaderPercentage == null) return;
             _collider.isTrigger = !_controller.IsOpen;
+
+            if (_mountedServer != null)
+            {
+                _preloader.fillAmount = _mountedServer.GetPercentage();
+                _preloaderPercentage.text = $"{_mountedServer.GetPercentage():P0}";
+            }
+            
         }
 
-        internal void Initialize(string slotName, IDSSRack controller)
+        internal void Initialize(string slotName, IDSSRack controller,GameObject preloader)
         {
+            _preloader = preloader.GetComponent<Image>();
+            _preloaderPercentage = preloader.GetComponentInChildren<Text>();
             _collider = gameObject.GetComponent<BoxCollider>();
             _controller = controller;
             _slotName = slotName;
@@ -50,11 +62,11 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
                 _storage = gameObject.AddComponent<FCSStorage>();
                 _storage.Initialize(1,gameObject);
                 _storage.ItemsContainer.onAddItem += ItemsContainerOnOnAddItem;
-                _storage.ItemsContainer.onRemoveItem += ItemsContainerOnOnRemoveItem;
+                _storage.ItemsContainer.onRemoveItem += ItemsContainerOnRemoveItem;
             }
         }
 
-        private void ItemsContainerOnOnRemoveItem(InventoryItem item)
+        private void ItemsContainerOnRemoveItem(InventoryItem item)
         {
             var server = item.item.gameObject.EnsureComponent<DSSServerController>();
             if (server == null)
@@ -63,6 +75,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
                 return;
             }
             server.UnDockServer();
+            _controller.Manager.RemoveServerFromBase(_mountedServer);
             _mountedServer.GetStorage().ItemsContainer.onAddItem -= OnMountedServerUpdate;
             _mountedServer.GetStorage().ItemsContainer.onRemoveItem -= OnMountedServerUpdate;
             _mountedServer = null;
@@ -108,6 +121,8 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
                 _mountedServer?.UnDockServer();
                 _mountedServer = null;
                 _inventoryItem = null;
+                _preloader.fillAmount =0;
+                _preloaderPercentage.text = $"{0:P0}";
                 _controller.UpdateStorageCount();
             }
             else
@@ -128,6 +143,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
                 if (item.item.GetTechType() != Mod.GetDSSServerTechType()) return false;
                 _inventoryItem = item;
                 _mountedServer = item.item.gameObject.GetComponentInChildren<DSSServerController>();
+                _controller?.Manager?.RegisterServerInBase(_mountedServer);
                 _mountedServer.DockServer(this, _controller);
                 _controller.UpdateStorageCount();
             }
@@ -241,6 +257,11 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         {
             if (_mountedServer == null) return null;
             return _mountedServer.RemoveItemFromContainer(techType,1);
+        }
+
+        public FcsDevice GetServer()
+        {
+            return _mountedServer;
         }
     }
 }

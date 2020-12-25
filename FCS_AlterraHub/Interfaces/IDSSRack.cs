@@ -7,6 +7,7 @@ namespace FCS_AlterraHub.Interfaces
     {
         bool IsOpen { get; }
         string UnitID { get; set; }
+        BaseManager Manager { get; set; }
         FCSStorage GetStorage();
         void UpdateStorageCount();
         bool HasSpace(int amount);

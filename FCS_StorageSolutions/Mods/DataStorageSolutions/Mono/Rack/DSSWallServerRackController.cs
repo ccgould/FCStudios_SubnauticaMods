@@ -27,7 +27,9 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         private float _speed = 3f;
         private GameObject _tray;
         private Dictionary<string, DSSSlotController> _slots;
+        private List<GameObject> _meters;
         private Text _storageAmount;
+        private Image _percentageBar;
         public override bool IsRack { get; } = true;
 
         public bool IsOpen => _targetPos > 0;
@@ -36,6 +38,18 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.DSSTabID, Mod.ModName);
             UpdateStorageCount();
+            RegisterServers();
+        }
+
+        private void RegisterServers()
+        {
+            foreach (KeyValuePair<string, DSSSlotController> controller in _slots)
+            {
+                if (controller.Value != null && controller.Value.IsOccupied)
+                {
+                    Manager.RegisterServerInBase(controller.Value.GetServer());
+                }
+            }
         }
 
         private void Update()
@@ -91,14 +105,23 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
             _storageAmount = gameObject.GetComponentInChildren<Text>();
 
             _slots = new Dictionary<string, DSSSlotController>();
+            _meters = new List<GameObject>();
+            _percentageBar = GameObjectHelpers.FindGameObject(gameObject, "Preloader").GetComponent<Image>();
 
             var slotsLocation = GameObjectHelpers.FindGameObject(gameObject, "rack_door_mesh").transform;
+            var meters = GameObjectHelpers.FindGameObject(gameObject, "Meters").transform;
+            foreach (Transform meter in meters)
+            {
+                _meters.Add(meter.gameObject);
+            }
+            
             int i = 1;
             foreach (Transform slot in slotsLocation)
             {
+                var meter = _meters[i - 1];
                 var slotName = $"Slot {i++}";
                 var slotController = slot.gameObject.AddComponent<DSSSlotController>();
-                slotController.Initialize(slotName, this);
+                slotController.Initialize(slotName, this, meter);
                 _slots.Add(slotName, slotController);
             }
 
@@ -130,6 +153,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
             }
 
             _storageAmount.text = AuxPatchers.AlterraStorageAmountFormat(storageAmount, storageTotal);
+            _percentageBar.fillAmount = (float)storageAmount / (float)storageTotal;
         }
 
         public bool HasSpace(int amount)
@@ -402,10 +426,14 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         {
             foreach (KeyValuePair<string, DSSSlotController> controller in _slots)
             {
-                if (HasItem(techType))
+                if (controller.Value != null && controller.Value.IsOccupied)
                 {
-                    return controller.Value.RemoveItemFromServer(techType);
+                    if (controller.Value.HasItem(techType))
+                    {
+                        return controller.Value.RemoveItemFromServer(techType);
+                    }
                 }
+                
             }
 
             return null;

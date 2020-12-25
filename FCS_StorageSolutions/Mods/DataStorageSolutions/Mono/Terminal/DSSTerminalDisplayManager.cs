@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using FCS_StorageSolutions.Configuration;
-using FCS_StorageSolutions.Mods.AlterraStorage.Buildable;
-using FCS_StorageSolutions.Mods.AlterraStorage.Mono;
+using FCS_AlterraHub.Helpers;
 using FCSCommon.Abstract;
 using FCSCommon.Components;
 using FCSCommon.Enums;
@@ -32,8 +30,14 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
 
             if (FindAllComponents())
             {
-                _itemGrid.DrawPage();
+                
+                InvokeRepeating(nameof(UpdateDisplay),.5f,.5f);
             }
+        }
+
+        private void UpdateDisplay()
+        {
+            _itemGrid?.DrawPage();
         }
 
         public override void OnButtonClick(string btnName, object tag)
@@ -43,7 +47,22 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                 case "BaseDump":
                     _mono.OpenStorage();
                     break;
+                case "InventoryBTN":
+                    var techType = (TechType) tag;
+                    if(!PlayerInteractionHelper.CanPlayerHold(techType)) return;
+                    var result = _mono.Manager.TakeItem(techType);
+                    if (result != null)
+                    {
+                        UpdateDisplay();
+                        PlayerInteractionHelper.GivePlayerItem(result);
+                    }
+                    break;
             }
+        }
+
+        internal void Refresh()
+        {
+            _itemGrid.DrawPage();
         }
 
         public override bool FindAllComponents()
@@ -54,6 +73,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                 {
                     var invButton = invItem.gameObject.EnsureComponent<DSSInventoryItem>();
                     invButton.ButtonMode = InterfaceButtonMode.HoverImage;
+                    invButton.BtnName = "InventoryBTN";
                     invButton.OnButtonClick += OnButtonClick;
                     _inventoryButtons.Add(invButton);
                 }
@@ -82,28 +102,23 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         {
             try
             {
-                if (_isBeingDestroyed) return;
-
-                var grouped = _mono?.GetItems();
-
+                if (_isBeingDestroyed || _mono == null) return;
+                var grouped = _mono.Manager.GetItemsWithin();
                 if (grouped == null) return;
-
                 if (data.EndPosition > grouped.Count)
                 {
                     data.EndPosition = grouped.Count;
                 }
-
                 for (int i = data.EndPosition; i < data.MaxPerPage - 1; i++)
                 {
                     _inventoryButtons[i].Reset();
                 }
 
-
                 for (int i = data.StartPosition; i < data.EndPosition; i++)
                 {
                     _inventoryButtons[i].Set(grouped.ElementAt(i).Key, grouped.ElementAt(i).Value);
-                    
                 }
+
             }
             catch (Exception e)
             {
@@ -157,7 +172,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
 
         internal void Show()
         {
-            gameObject.SetActive(false);
+            gameObject.SetActive(true);
         }
     }
 }

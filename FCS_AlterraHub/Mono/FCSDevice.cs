@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Registration;
 using FCSCommon.Utilities;
@@ -258,6 +259,18 @@ namespace FCS_AlterraHub.Mono
         }
 
         public virtual bool IsRack { get;} = false;
+        public Action<FcsDevice, InventoryItem> OnAddItem { get; set; }
+        public Action<FcsDevice, InventoryItem> OnRemoveItem { get; set; }
+
+        public virtual int GetItemCount(TechType techType)
+        {
+            return 0;
+        }
+
+        public virtual IEnumerable<KeyValuePair<TechType, int>> GetItemsWithin()
+        {
+            return null;
+        }
     }
 
     public interface IFCSSave<T>

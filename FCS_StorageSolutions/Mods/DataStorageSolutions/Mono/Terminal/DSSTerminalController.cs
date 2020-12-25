@@ -185,12 +185,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                     }
                     
                 }
-                //var result = _targetRack.AddItemToRack(item);
-                //if (!result)
-                //{
-                //    PlayerInteractionHelper.GivePlayerItem(item);
-                //    throw new InvalidOperationException($"Failed to add item to base returning item: {Language.main.Get(item.item.GetTechType())}");
-                //}
             }
             catch (Exception e)
             {
@@ -200,34 +194,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                 return false;
             }
             return true;
-        }
-
-        public Dictionary<TechType,int> GetItems()
-        {
-
-            //TODO Replace this
-
-            if (Manager?.BaseRacks == null) return null;
-            
-            var dict = new Dictionary<TechType,int>();
-            
-            foreach (IDSSRack baseRack in Manager.BaseRacks)
-            {
-                if(baseRack == null || baseRack.GetStorage()) continue;
-                foreach (KeyValuePair<TechType, int> item in baseRack.GetStorage().GetItems())
-                {
-                    if (!dict.ContainsKey(item.Key))
-                    {
-                        dict.Add(item.Key,item.Value);
-                    }
-                    else
-                    {
-                        dict[item.Key] += item.Value;
-                    }
-                }
-            }
-
-            return dict;
         }
     }
 }
