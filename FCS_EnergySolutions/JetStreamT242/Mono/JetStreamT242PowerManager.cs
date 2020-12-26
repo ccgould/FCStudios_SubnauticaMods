@@ -151,7 +151,21 @@ namespace FCS_EnergySolutions.JetStreamT242.Mono
 
         public void OnHandHover(GUIHand hand)
         {
+
+
+
             HandReticle main = HandReticle.main;
+
+
+            if (!_mono.IsUnderWater())
+            {
+                main.SetInteractText(AuxPatchers.NotUnderWater(),AuxPatchers.NotUnderWaterDesc());
+                main.SetIcon(HandReticle.IconType.HandDeny);
+                return;
+            }
+
+
+
             main.SetInteractText(
                 Language.main.GetFormat(AuxPatchers.JetStreamOnHover(), _mono.UnitID,
                     Mathf.RoundToInt(this._powerSource.GetPower()), Mathf.RoundToInt(this._powerSource.GetMaxPower()),

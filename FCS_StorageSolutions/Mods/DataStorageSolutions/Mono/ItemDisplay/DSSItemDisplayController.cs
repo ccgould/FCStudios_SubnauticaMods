@@ -6,6 +6,7 @@ using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_StorageSolutions.Configuration;
+using FCS_StorageSolutions.Helpers;
 using FCS_StorageSolutions.Mods.AlterraStorage.Buildable;
 using FCSCommon.Components;
 using FCSCommon.Helpers;
@@ -232,7 +233,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.ItemDisplay
             Refresh();
             PlayerInteractionHelper.GivePlayerItem(item);
             return true;
-
         }
     }
 
@@ -250,8 +250,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.ItemDisplay
                 _dumpContainer.Initialize(transform, AuxPatchers.AddItemToItemDisplay(), this, 6, 8, "NetworkItemDisplayNetworkDump");
             }
         }
-
-
+        
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
         {
             if (_manager == null) return false;
@@ -275,13 +274,10 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.ItemDisplay
         {
             try
             {
-                foreach (IDSSRack baseRack in _manager.BaseRacks)
+                var result = TransferHelpers.AddItemToNetwork(item,_manager);
+                if (!result)
                 {
-                    if (baseRack.ItemAllowed(item, out var server))
-                    {
-                        server?.AddItemMountedItem(item);
-                    }
-
+                    PlayerInteractionHelper.GivePlayerItem(item);
                 }
             }
             catch (Exception e)

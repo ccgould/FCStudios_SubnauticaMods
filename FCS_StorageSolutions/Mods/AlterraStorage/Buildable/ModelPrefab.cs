@@ -12,6 +12,7 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Buildable
     {
         private static bool _initialized;
         public static GameObject DSSServerPrefab;
+        public static GameObject DSSAvaliableVehiclesItemPrefab;
         internal static GameObject ColorItemPrefab { get; set; }
         internal static string BodyMaterial => $"{Mod.ModName}_COL";
         internal static string SecondaryMaterial => $"{Mod.ModName}_COL_S";
@@ -25,7 +26,6 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Buildable
         public static AssetBundle GlobalBundle { get; set; }
         public static AssetBundle ModBundle { get; set; }
         public static GameObject AlterraStoragePrefab { get; set; }
-        public static GameObject InventoryItemPrefab { get; set; }
         public static GameObject DSSItemDisplayPrefab { get; set; }
         public static GameObject DSSAntennaPrefab { get; set; }
         public static GameObject DSSWallServerRackPrefab { get; set; }
@@ -58,7 +58,7 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Buildable
             DSSAntennaPrefab = GetPrefab(Mod.DSSAntennaPrefabName);
             DSSItemDisplayPrefab = GetPrefab(Mod.DSSItemDisplayPrefabName);
             DSSInventoryItemPrefab = GetPrefab("DSSInventoryItem");
-            InventoryItemPrefab = GetPrefab("InventoryItem");
+            DSSAvaliableVehiclesItemPrefab = GetPrefab("AvaliableVehiclesItem");
         }
         
         internal static GameObject GetPrefab(string prefabName)

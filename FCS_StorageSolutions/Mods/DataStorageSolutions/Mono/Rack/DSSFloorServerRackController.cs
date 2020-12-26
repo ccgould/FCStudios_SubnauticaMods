@@ -42,6 +42,17 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
             UpdateStorageCount();
         }
 
+        private void RegisterServers()
+        {
+            foreach (KeyValuePair<string, DSSSlotController> controller in _slots)
+            {
+                if (controller.Value != null && controller.Value.IsOccupied)
+                {
+                    Manager.RegisterServerInBase(controller.Value.GetServer());
+                }
+            }
+        }
+
         private void Update()
         {
             MoveTray();
@@ -124,6 +135,8 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
                 _colorManager = gameObject.EnsureComponent<ColorManager>();
                 _colorManager.Initialize(gameObject,ModelPrefab.BodyMaterial,ModelPrefab.SecondaryMaterial);
             }
+
+            InvokeRepeating(nameof(RegisterServers), 1f, 1f);
 
             IsInitialized = true;
         }

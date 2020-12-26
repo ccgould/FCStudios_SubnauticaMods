@@ -106,5 +106,10 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
         {
             return _powerCharger.HasPowerCells();
         }
+
+        public void OpenStorage()
+        {
+            _powerCharger.OpenStorage();
+        }
     }
 }

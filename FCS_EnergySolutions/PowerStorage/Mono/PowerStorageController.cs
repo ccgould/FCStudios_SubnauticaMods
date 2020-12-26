@@ -23,7 +23,7 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
         private bool _runStartUpOnEnable;
         private bool _isFromSave;
         private PowerStorageDataEntry _savedData;
-        private DumpContainerSimplified _dumpContainer;
+
         internal PowerCellCharger PowercellCharger { get; private set; }
         private PowerSupply _powercellSupply;
         private FCSToggleButton _chargeModeToggle;
@@ -199,12 +199,6 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
                 PowercellCharger = gameObject.AddComponent<PowerCellCharger>();
             }
 
-            if (_dumpContainer == null)
-            {
-                _dumpContainer = gameObject.AddComponent<DumpContainerSimplified>();
-                _dumpContainer.Initialize(gameObject.transform, Mod.PowerStorageFriendlyName, PowercellCharger, 2, 5);
-            }
-
             if (_powercellSupply == null)
             {
                 _powercellSupply = gameObject.AddComponent<PowerSupply>();
@@ -313,7 +307,7 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
         public void OnHandClick(GUIHand hand)
         {
             if (_interactionChecker.IsInRange) return;
-            _dumpContainer.OpenStorage();
+            _powercellSupply.OpenStorage();
         }
     }
 

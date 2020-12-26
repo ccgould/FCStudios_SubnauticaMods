@@ -77,6 +77,7 @@ namespace FCS_AlterraHub.Registration
             if (!knownDevices.Any(x=>x.PrefabID.Equals(prefabID)))
             {
                 var unitID = GenerateNewID(tabID,prefabID);
+                device.TabID = tabID;
                 device.UnitID = unitID;
                 device.PackageId = packageId;
                 AddToGlobalDevices(device, unitID);

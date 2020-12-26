@@ -27,6 +27,9 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
         private PowerStorageController _mono;
         private bool _allowedToCharge;
         private FCSStorage _storageContainer;
+        private DumpContainerSimplified _dumpContainer;
+        private const int MAXSLOTS = 10;
+        public bool IsFull => _storageContainer?.GetCount() >= MAXSLOTS;
 
         private void Start()
         {
@@ -115,6 +118,13 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
                         }
                     }
                 };
+
+                if (_dumpContainer == null)
+                {
+                    _dumpContainer = gameObject.AddComponent<DumpContainerSimplified>();
+                    _dumpContainer.Initialize(gameObject.transform, Mod.PowerStorageFriendlyName, this, 2, 5);
+                }
+
                 //_storageContainer.onRemoveItem += item =>
                 //{
                 //    _inventoryGrid.DrawPage();
@@ -131,6 +141,11 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
         internal float GetCapacity()
         {
             return Batteries.Sum(x => x.Value?.capacity ?? 0);
+        }
+
+        internal int GetPowerCellCount()
+        {
+            return Slots.Count(x => x.Value.IsOccupied());
         }
         
         private void Update()
@@ -342,6 +357,9 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
         {
             bool flag = false;
+
+            if (IsFull || _dumpContainer.GetItemCount() + 1 + GetPowerCellCount() > MAXSLOTS) return flag;
+            
             var techType = pickupable.GetTechType();
 #if SUBNAUTICA
             var equipType = CraftData.GetEquipmentType(techType);
@@ -364,7 +382,7 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
 
             return flag;
         }
-        
+
         public void RemoveCharge(float consumed)
         {
             QuickLogger.Debug($"Removing: {consumed}",true);
@@ -430,6 +448,11 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
         {
             if (Batteries == null) return false;
             return Batteries.Any(x => x.Value != null);
+        }
+
+        public void OpenStorage()
+        {
+            _dumpContainer.OpenStorage();
         }
     }
 

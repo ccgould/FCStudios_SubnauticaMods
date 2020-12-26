@@ -220,6 +220,26 @@ namespace FCS_AlterraHub.Mono
         }
 
         /// <summary>
+        /// Remove items from the device from external sources.
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public virtual bool RemoveItemFromContainer(InventoryItem item)
+        {
+            return false;
+        }
+
+        /// <summary>
+        /// Remove items from the device from external sources.
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public virtual Pickupable RemoveItemFromContainer(TechType techType)
+        {
+            return null;
+        }
+
+        /// <summary>
         /// Gets the current color of the device
         /// </summary>
         /// <returns></returns>
@@ -261,6 +281,8 @@ namespace FCS_AlterraHub.Mono
         public virtual bool IsRack { get;} = false;
         public Action<FcsDevice, InventoryItem> OnAddItem { get; set; }
         public Action<FcsDevice, InventoryItem> OnRemoveItem { get; set; }
+        
+        public string TabID { get; set; }
 
         public virtual int GetItemCount(TechType techType)
         {
@@ -270,6 +292,11 @@ namespace FCS_AlterraHub.Mono
         public virtual IEnumerable<KeyValuePair<TechType, int>> GetItemsWithin()
         {
             return null;
+        }
+
+        public virtual int GetMaxStorage()
+        {
+            return 0;
         }
     }
 

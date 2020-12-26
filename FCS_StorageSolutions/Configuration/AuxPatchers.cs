@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using SMLHelper.V2.Handlers;
+using UnityEngine;
 
 namespace FCS_StorageSolutions.Configuration
 {
@@ -22,6 +23,13 @@ namespace FCS_StorageSolutions.Configuration
             { $"{ModKey}_AddItemToNetworkDesc","Allows you to add items to your Data Storage network."},
             { $"{ModKey}_Reset","Reset."},
             { $"{ModKey}_ItemDisplayResetDesc","Resets the item display so you can choose another item to display."},
+            { $"{ModKey}_RackCountFormat","Racks:{0}"},
+            { $"{ModKey}_ServerCountFormat","Servers:{0}"},
+            { $"{ModKey}_TotalItemFormat","Total Items:{0}/{1}"},
+            { $"{ModKey}_Rename","Rename"},
+            { $"{ModKey}_RenameDesc","Rename this base's name."},
+            { $"{ModKey}_GlobalNetwork","Global Network"},
+            { $"{ModKey}_GlobalNetworkDesc","Shows all bases in the network that are online. Select a base to view its items"},
         };
         
         internal static void AdditionalPatching()
@@ -105,6 +113,41 @@ namespace FCS_StorageSolutions.Configuration
         public static string ItemDisplayResetDesc()
         {
             return GetLanguage($"{ModKey}_ItemDisplayResetDesc");
+        }
+        
+        public static string RackCountFormat(int amount)
+        {
+            return string.Format(GetLanguage($"{ModKey}_RackCountFormat"),amount);
+        }
+
+        public static string ServerCountFormat(int amount)
+        {
+            return string.Format(GetLanguage($"{ModKey}_ServerCountFormat"),amount);
+        }
+
+        public static string TotalItemsFormat(int itemTotal,int serverTotal)
+        {
+            return string.Format(GetLanguage($"{ModKey}_TotalItemFormat"), itemTotal,serverTotal);
+        }
+
+        public static string RenameDesc()
+        {
+            return GetLanguage($"{ModKey}_RenameDesc");
+        }
+
+        public static string Rename()
+        {
+            return GetLanguage($"{ModKey}_Rename");
+        }
+
+        public static string GlobalNetwork()
+        {
+            return GetLanguage($"{ModKey}_GlobalNetwork");
+        }
+
+        public static string GlobalNetworkDesc()
+        {
+            return GetLanguage($"{ModKey}_GlobalNetworkDesc");
         }
     }
 }

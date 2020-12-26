@@ -140,8 +140,13 @@
     <Compile Include="Mods\DataStorageSolutions\Mono\Rack\DSSWallServerRackController.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\Server\DSSServerController.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\InterfaceInteraction.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\BaseListController.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\DSSInventoryItem.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\DSSListItemController.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\DssListItemIcon.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\DSSTerminalController.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\DSSTerminalDisplayManager.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\NetworkDialogController.cs" />
     <Compile Include="Patches\StorageContainterPatches.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

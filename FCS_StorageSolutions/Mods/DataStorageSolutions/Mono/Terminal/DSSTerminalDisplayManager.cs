@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Mono;
+using FCS_StorageSolutions.Configuration;
 using FCSCommon.Abstract;
-using FCSCommon.Components;
 using FCSCommon.Enums;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
@@ -17,7 +18,12 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         private DSSTerminalController _mono;
         private GridHelperV2 _itemGrid;
         private bool _isBeingDestroyed;
-        private List<DSSInventoryItem> _inventoryButtons = new List<DSSInventoryItem>();
+        private readonly List<DSSInventoryItem> _inventoryButtons = new List<DSSInventoryItem>();
+        private Text _baseName;
+        private Text _serverAmount;
+        private Text _rackCountAmount;
+        private Text _totalItemsAmount;
+        private BaseManager _currentBase;
 
         private void OnDestroy()
         {
@@ -30,14 +36,22 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
 
             if (FindAllComponents())
             {
-                
-                InvokeRepeating(nameof(UpdateDisplay),.5f,.5f);
+                _currentBase = _mono.Manager;
+                InvokeRepeating(nameof(UpdateDisplay), .5f, .5f);
             }
         }
 
         private void UpdateDisplay()
         {
+            var serverCount = _currentBase?.BaseServers.Count ?? 0;
+            var fcsCount = _currentBase?.BaseFcsStorage.Sum(x => x.GetMaxStorage()) ?? 0;
+            var lockersCount = _currentBase?.BaseStorageLockers.Sum(x => x.height * x.width) ?? 0;
+            var item = _currentBase?.GetTotal() ?? 0;
             _itemGrid?.DrawPage();
+            _baseName.text = _currentBase?.GetBaseName();
+            _rackCountAmount.text = AuxPatchers.RackCountFormat(_currentBase?.BaseRacks.Count ?? 0);
+            _serverAmount.text = AuxPatchers.ServerCountFormat(_currentBase?.BaseServers.Count ?? 0);
+            _totalItemsAmount.text = AuxPatchers.TotalItemsFormat(item, serverCount * 48);
         }
 
         public override void OnButtonClick(string btnName, object tag)
@@ -48,14 +62,21 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                     _mono.OpenStorage();
                     break;
                 case "InventoryBTN":
-                    var techType = (TechType) tag;
-                    if(!PlayerInteractionHelper.CanPlayerHold(techType)) return;
+                    var techType = (TechType)tag;
+                    if (!PlayerInteractionHelper.CanPlayerHold(techType)) return;
                     var result = _mono.Manager.TakeItem(techType);
                     if (result != null)
                     {
                         UpdateDisplay();
                         PlayerInteractionHelper.GivePlayerItem(result);
                     }
+                    break;
+                case "RenameBTN":
+                    _mono.Manager.ChangeBaseName();
+                    break;
+                case "BaseBTN":
+                    _currentBase = (BaseManager) tag;
+                    Refresh();
                     break;
             }
         }
@@ -78,13 +99,26 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                     _inventoryButtons.Add(invButton);
                 }
 
-
                 var addToBaseBTNObj = InterfaceHelpers.FindGameObject(gameObject, "AddToBaseBTN");
-                InterfaceHelpers.CreateButton(addToBaseBTNObj, "BaseDump",InterfaceButtonMode.Background, OnButtonClick, Color.white, new Color(0, 1, 1, 1), 2.5f);
+                InterfaceHelpers.CreateButton(addToBaseBTNObj, "BaseDump", InterfaceButtonMode.Background, OnButtonClick, Color.white, new Color(0, 1, 1, 1), 2.5f);
+
+                var renameBTNObj = GameObjectHelpers.FindGameObject(gameObject, "RenameBTN");
+                InterfaceHelpers.CreateButton(renameBTNObj, "RenameBTN", InterfaceButtonMode.Background,
+                    OnButtonClick, Color.white, new Color(0, 1, 1, 1), 2.5f, AuxPatchers.Rename(), AuxPatchers.RenameDesc());
+
+                var networkBTN = GameObjectHelpers.FindGameObject(gameObject, "NetworkBTN").EnsureComponent<NetworkDialogController>();
+                networkBTN.Initialize(_mono.Manager,gameObject,this);
 
                 _itemGrid = _mono.gameObject.EnsureComponent<GridHelperV2>();
                 _itemGrid.OnLoadDisplay += OnLoadItemsGrid;
                 _itemGrid.Setup(44, gameObject, Color.gray, Color.white, OnButtonClick);
+
+
+
+                _baseName = GameObjectHelpers.FindGameObject(gameObject, "BaseName").GetComponent<Text>();
+                _serverAmount = GameObjectHelpers.FindGameObject(gameObject, "ServerCount").GetComponent<Text>();
+                _rackCountAmount = GameObjectHelpers.FindGameObject(gameObject, "RackCount").GetComponent<Text>();
+                _totalItemsAmount = GameObjectHelpers.FindGameObject(gameObject, "TotalItems").GetComponent<Text>();
 
             }
             catch (Exception e)
@@ -103,7 +137,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             try
             {
                 if (_isBeingDestroyed || _mono == null) return;
-                var grouped = _mono.Manager.GetItemsWithin();
+                var grouped = _currentBase.GetItemsWithin();
                 if (grouped == null) return;
                 if (data.EndPosition > grouped.Count)
                 {
@@ -126,53 +160,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                 QuickLogger.Error($"Error Message: {e.Message}");
                 QuickLogger.Error($"Error StackTrace: {e.StackTrace}");
             }
-        }
-    }
-
-    internal class DSSInventoryItem : InterfaceButton
-    {
-        private uGUI_Icon _icon;
-        private Text _amount;
-
-        private void Initialize()
-        {
-            if (_icon == null)
-            {
-                _icon = gameObject.FindChild("Icon").EnsureComponent<uGUI_Icon>();
-            }
-
-            if (_amount == null)
-            {
-                _amount = gameObject.FindChild("Text").EnsureComponent<Text>();
-            }
-        }
-
-        internal void Set(TechType techType, int amount)
-        {
-            Initialize();
-            Tag = techType;
-            _amount.text = amount.ToString();
-            _icon.sprite = SpriteManager.Get(techType);
-            Show();
-        }
-
-        internal void Reset()
-        {
-            Initialize();
-            _amount.text = "";
-            _icon.sprite = SpriteManager.Get(TechType.None);
-            Tag = null;
-            Hide();
-        }
-
-        internal void Hide()
-        {
-            gameObject.SetActive(false);
-        }
-
-        internal void Show()
-        {
-            gameObject.SetActive(true);
         }
     }
 }

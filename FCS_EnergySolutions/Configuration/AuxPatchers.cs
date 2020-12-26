@@ -20,6 +20,8 @@ namespace FCS_EnergySolutions.Configuration
             { $"{ModKey}_PowerStorageAutoMode","Auto Mode"},
             { $"{ModKey}_PowerStorageClickToAddPowercells","Click to add powercells"},
             { $"{ModKey}_PowerStorageAutoModeDesc","Automatically switches the mode of PowerStorage based on if the habitat goes into Emergency or PoweredOff"},
+            { $"{ModKey}_NotUnderWater","Cannot operate out of water."},
+            { $"{ModKey}_NotUnderWaterDesc","Turbine cannot function  above 3 meters"},
         };
 
         internal static void AdditionalPatching()
@@ -87,6 +89,16 @@ namespace FCS_EnergySolutions.Configuration
         public static string PowerStorageClickToAddPowercells()
         {
             return GetLanguage($"{ModKey}_PowerStorageClickToAddPowercells");
+        }
+
+        public static string NotUnderWater()
+        {
+            return GetLanguage($"{ModKey}_NotUnderWater");
+        }
+
+        public static string NotUnderWaterDesc()
+        {
+            return GetLanguage($"{ModKey}_NotUnderWaterDesc");
         }
     }
 }

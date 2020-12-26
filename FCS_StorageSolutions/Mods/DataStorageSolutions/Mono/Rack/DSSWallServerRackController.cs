@@ -38,7 +38,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.DSSTabID, Mod.ModName);
             UpdateStorageCount();
-            RegisterServers();
         }
 
         private void RegisterServers()
@@ -134,6 +133,8 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
             }
 
             var canvas = gameObject.GetComponentInChildren<Canvas>();
+
+            InvokeRepeating(nameof(RegisterServers),1f,1f);
 
             IsInitialized = true;
         }

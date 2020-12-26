@@ -18,6 +18,13 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Antenna
         private void Start()
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.DSSTabID, Mod.ModName);
+            Manager.AlertNewAntennaPlaced(this);
+        }
+
+        public override void OnDestroy()
+        {
+            base.OnDestroy();
+            Manager?.AlertNewAntennaDestroyed(this);
         }
 
         private void OnEnable()

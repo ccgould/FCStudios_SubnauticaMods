@@ -46,7 +46,11 @@ namespace FCS_AlterraHub.Buildables
             { $"{ModKey}_OreConsumerTimeLeftFormat", "Time left till {0} ore processed {1} | Pending {2}."},
             { $"{ModKey}_NoOresToProcess", "No ores to process."},
             { $"{ModKey}_PleaseBuildOnPlatForm", "Please Build on a platform to operate."},
-            
+            { $"{ModKey}_BaseOnOff","{0} is now {1}."},
+            { $"{ModKey}_Online","online"},
+            { $"{ModKey}_Offline","offline"},
+            { $"{ModKey}_ChangeBaseName","Change Base Name"},
+
         };
         
         private void AdditionalPatching()
@@ -240,6 +244,32 @@ namespace FCS_AlterraHub.Buildables
         public static string PleaseBuildOnPlatForm()
         {
             return GetLanguage($"{ModKey}_PleaseBuildOnPlatForm");
+        }
+
+        public static string Offline()
+        {
+            return GetLanguage($"{ModKey}_Offline");
+        }        
+        
+        public static string Online()
+        {
+            return GetLanguage($"{ModKey}_Online");
+        }        
+        
+        public static string BaseOnOffMessage(string baseName,string status)
+        {
+            return string.Format(GetLanguage($"{ModKey}_BaseOnOff"),baseName,status);
+        }
+
+
+        public static string Submit()
+        {
+            return Language.main.Get("Submit");
+        }
+
+        public static string ChangeBaseName()
+        {
+            return GetLanguage($"{ModKey}_ChangeBaseName");
         }
     }
 }

@@ -27,27 +27,28 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
         private bool _isFromSave;
         private DumpContainer _dumpContainer;
         private FCSStorage _storageContainer;
-        private GridHelperPooled _inventoryGrid;
+        private GridHelperV2 _inventoryGrid;
         private bool _isBeingDestroyed;
         private InterfaceInteraction _interactionHelper;
         private MotorHandler _motorHandler;
         private ProtobufSerializer _serializer;
         private Text _storageAmount;
-        private ObjectPooler _pooler;
-        private HashSet<InventoryButton> _trackedItems = new HashSet<InventoryButton>();
         private const int MAXSTORAGE = 200;
         public Action<int, int> OnContainerUpdate { get; set; }
         public Action<FcsDevice, TechType> OnContainerAddItem { get; set; }
         public Action<FcsDevice, TechType> OnContainerRemoveItem { get; set; }
         public int GetContainerFreeSpace => MAXSTORAGE - _storageContainer.GetCount();
         public bool IsFull => _storageContainer.GetCount() >= MAXSTORAGE;
-        
+        private readonly List<InventoryButton> _inventoryButtons = new List<InventoryButton>();
+
+
         #region Unity Methods
 
         private void Start()
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.AlterraStorageTabID, Mod.ModName);
             _storageContainer.CleanUpDuplicatedStorageNoneRoutine();
+            Manager.AlertNewFcsStoragePlaced(this);
         }
 
         private void Update()
@@ -84,8 +85,7 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
         }
 
         #endregion
-
-
+        
         public override Vector3 GetPosition()
         {
             return transform.position;
@@ -101,6 +101,15 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
             IsVisible = true;
 
             _storageAmount = GameObjectHelpers.FindGameObject(gameObject, "StorageAmount").GetComponent<Text>();
+
+            foreach (Transform invItem in GameObjectHelpers.FindGameObject(gameObject, "Grid").transform)
+            {
+                var invButton = invItem.gameObject.EnsureComponent<InventoryButton>();
+                invButton.ButtonMode = InterfaceButtonMode.Background;
+                invButton.BtnName = "InventoryBTN";
+                invButton.OnButtonClick += OnButtonClick;
+                _inventoryButtons.Add(invButton);
+            }
 
             if (_dumpContainer == null)
             {
@@ -127,6 +136,7 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
                     _inventoryGrid.DrawPage();
                     UpdateStorageCount();
                 };
+
                 _storageContainer.ItemsContainer.onRemoveItem += item =>
                 {
                     _inventoryGrid.DrawPage();
@@ -141,29 +151,28 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
                 _motorHandler.Start();
             }
 
-            if (_pooler == null)
-            {
-                _pooler = gameObject.AddComponent<ObjectPooler>();
-                _pooler.AddPool(InventoryPoolTag, 12, ModelPrefab.InventoryItemPrefab);
-                _pooler.Initialize();
-            }
-
-
             var canvas = gameObject.GetComponentInChildren<Canvas>();
             _interactionHelper = canvas.gameObject.AddComponent<InterfaceInteraction>();
 
-            _inventoryGrid = gameObject.AddComponent<GridHelperPooled>();
+            _inventoryGrid = gameObject.EnsureComponent<GridHelperV2>();
             _inventoryGrid.OnLoadDisplay += OnLoadItemsGrid;
-            _inventoryGrid.Setup(12, _pooler, canvas.gameObject, OnButtonClick,false);
+            _inventoryGrid.Setup(12, gameObject, Color.gray, Color.white, OnButtonClick);
 
             MaterialHelpers.ChangeEmissionStrength(ModelPrefab.EmissionControllerMaterial,gameObject,2f);
 
             UpdateStorageCount();
 
+            InvokeRepeating(nameof(RefreshUI), .5f, .5f);
+
             IsInitialized = true;
         }
 
         public const string InventoryPoolTag = "AlterraInventoryTag";
+
+        public override void RefreshUI()
+        {
+           _inventoryGrid?.DrawPage();
+        }
 
         private void UpdateStorageCount()
         {
@@ -174,53 +183,36 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
         {
             switch (arg1)
             {
-                case "ItemBTN":
+                case "InventoryBTN":
                     var size = CraftData.GetItemSize((TechType) arg2);
                     if (Inventory.main.HasRoomFor(size.x,size.y))
                     {
-                        FCS_AlterraHub.Helpers.PlayerInteractionHelper.GivePlayerItem(_storageContainer.ItemsContainer.RemoveItem((TechType)arg2));
+                        FCS_AlterraHub.Helpers.PlayerInteractionHelper.GivePlayerItem(RemoveItemFromContainer((TechType)arg2));
                     }
                     break;
             }
         }
 
-        private void OnLoadItemsGrid(DisplayDataPooled data)
+        private void OnLoadItemsGrid(DisplayData data)
         {
             try
             {
-                if (_isBeingDestroyed) return;
-
-                //data.Pool.Reset(InventoryPoolTag);
-
+                if (_isBeingDestroyed || _storageContainer == null) return;
                 var grouped = _storageContainer.GetItems();
-
+                if (grouped == null) return;
                 if (data.EndPosition > grouped.Count)
                 {
                     data.EndPosition = grouped.Count;
                 }
+                for (int i = data.EndPosition; i < data.MaxPerPage - 1; i++)
+                {
+                    _inventoryButtons[i].Reset();
+                }
 
                 for (int i = data.StartPosition; i < data.EndPosition; i++)
                 {
-                    if (CheckIfButtonIsActive(grouped.ElementAt(i).Key))
-                    {
-                        continue;
-                    }
-
-                    GameObject buttonPrefab = data.Pool.SpawnFromPool(InventoryPoolTag, data.ItemsGrid);
-                    buttonPrefab.transform.SetParent(data.ItemsGrid.transform, false);
-                    var itemBTN = buttonPrefab.EnsureComponent<InventoryButton>();
-                    itemBTN.Storage = _storageContainer;
-                    itemBTN.ButtonMode = InterfaceButtonMode.Background;
-                    itemBTN.STARTING_COLOR = Color.gray;
-                    itemBTN.HOVER_COLOR = Color.white;
-                    itemBTN.BtnName = "ItemBTN";
-                    itemBTN.TextLineOne = AuxPatchers.TakeFormatted(Language.main.Get(grouped.ElementAt(i).Key));
-                    itemBTN.Tag = grouped.ElementAt(i).Key;
-                    itemBTN.RefreshIcon();
-                    itemBTN.OnButtonClick = OnButtonClick;
-                    _trackedItems.Add(itemBTN);
+                    _inventoryButtons[i].Set(grouped.ElementAt(i).Key, grouped.ElementAt(i).Value);
                 }
-                _inventoryGrid.UpdaterPaginator(grouped.Count);
 
             }
             catch (Exception e)
@@ -229,20 +221,6 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
                 QuickLogger.Error($"Error Message: {e.Message}");
                 QuickLogger.Error($"Error StackTrace: {e.StackTrace}");
             }
-        }
-
-        private bool CheckIfButtonIsActive(TechType techType)
-        {
-            foreach (InventoryButton button in _trackedItems)
-            {
-                if (button.IsValidAndActive(techType))
-                {
-                    button.UpdateAmount();
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         public override void OnProtoSerialize(ProtobufSerializer serializer)
@@ -378,6 +356,11 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
             return _storageContainer.ItemsContainer.RemoveItem(techType);
         }
 
+        public override Pickupable RemoveItemFromContainer(TechType techType)
+        {
+            return _storageContainer.ItemsContainer.RemoveItem(techType);
+        }
+
         public Dictionary<TechType, int> GetItemsWithin()
         {
             return null;
@@ -392,65 +375,57 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
         {
             return _colorManager.ChangeColor(color, mode);
         }
+
+        public override int GetMaxStorage()
+        {
+            return MAXSTORAGE;
+        }
     }
 
     internal class InventoryButton : InterfaceButton
     {
-        private Text _amount;
         private uGUI_Icon _icon;
-        private bool _isInitialized;
+        private Text _amount;
 
-        private void Start()
+        private void Initialize()
         {
-            if (!_isInitialized)
+            if (_icon == null)
             {
-                _icon = InterfaceHelpers.FindGameObject(gameObject, "Icon").EnsureComponent<uGUI_Icon>();
-                _isInitialized = true;
-            }
-
-            UpdateAmount();
-        }
-
-        public override void OnPointerClick(PointerEventData eventData)
-        {
-            base.OnPointerClick(eventData);
-            UpdateAmount();
-        }
-
-        internal void UpdateAmount()
-        {
-            var amount = Storage.ItemsContainer.GetCount((TechType) Tag);
-            if (amount <= 0)
-            {
-                gameObject.SetActive(false);
-                return;
+                _icon = gameObject.FindChild("Icon").EnsureComponent<uGUI_Icon>();
             }
 
             if (_amount == null)
             {
                 _amount = gameObject.GetComponentInChildren<Text>();
             }
+        }
 
+        internal void Set(TechType techType, int amount)
+        {
+            Initialize();
+            Tag = techType;
             _amount.text = amount.ToString();
-
+            _icon.sprite = SpriteManager.Get(techType);
+            Show();
         }
 
-        public FCSStorage Storage { get; set; }
-
-        public void RefreshIcon()
+        internal void Reset()
         {
-            if (_icon == null)
-            {
-                _icon = InterfaceHelpers.FindGameObject(gameObject, "Icon").EnsureComponent<uGUI_Icon>();
-
-            }
-            _icon.sprite = SpriteManager.Get((TechType)Tag);
-            UpdateAmount();
+            Initialize();
+            _amount.text = "";
+            _icon.sprite = SpriteManager.Get(TechType.None);
+            Tag = null;
+            Hide();
         }
 
-        public bool IsValidAndActive(TechType techType)
+        internal void Hide()
         {
-            return techType == (TechType)Tag && gameObject.activeSelf;
+            gameObject.SetActive(false);
+        }
+
+        internal void Show()
+        {
+            gameObject.SetActive(true);
         }
     }
 

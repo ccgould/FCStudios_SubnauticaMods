@@ -55,7 +55,7 @@ namespace FCS_EnergySolutions.JetStreamT242.Mono
                     _motor.LoadSave(_savedData);
                     _tilter.LoadSave(_savedData);
 
-                    if (_savedData.IsIncreasing)
+                    if (_savedData.IsIncreasing && IsUnderWater())
                     {
                         ChangeStatusLight();
                         _rotor.ResetToMag();
@@ -174,6 +174,20 @@ namespace FCS_EnergySolutions.JetStreamT242.Mono
                     _runStartUpOnEnable = true;
                 }
             }
+        }
+
+        internal bool IsUnderWater()
+        {
+            return GetDepth() > 3.0f;
+        }
+
+        internal float GetDepth()
+        {
+#if SUBNAUTICA
+            return gameObject == null ? 0f : Ocean.main.GetDepthOf(gameObject);
+#elif BELOWZERO
+            return gameObject == null ? 0f : Ocean.GetDepthOf(gameObject);
+#endif
         }
 
         public void Save(SaveData newSaveData, ProtobufSerializer serializer)

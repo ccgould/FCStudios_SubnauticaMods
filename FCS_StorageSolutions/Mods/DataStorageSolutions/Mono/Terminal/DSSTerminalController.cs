@@ -7,6 +7,7 @@ using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_StorageSolutions.Configuration;
+using FCS_StorageSolutions.Helpers;
 using FCS_StorageSolutions.Mods.AlterraStorage.Buildable;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -20,7 +21,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         private DSSTerminalDataEntry _saveData;
         private DumpContainerSimplified _dumpContainer;
         private DSSTerminalDisplayManager _display;
-        private IDSSRack _targetRack;
 
         private void Start()
         {
@@ -77,7 +77,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                 _display = gameObject.EnsureComponent<DSSTerminalDisplayManager>();
                 
             }
-
 
             IsInitialized = true;
 
@@ -177,13 +176,10 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         {
             try
             {
-                foreach (IDSSRack baseRack in Manager.BaseRacks)
+                var result = TransferHelpers.AddItemToNetwork(item, Manager);
+                if (!result)
                 {
-                    if (baseRack.ItemAllowed(item,out var server))
-                    {
-                        server?.AddItemMountedItem(item);
-                    }
-                    
+                    PlayerInteractionHelper.GivePlayerItem(item);
                 }
             }
             catch (Exception e)
