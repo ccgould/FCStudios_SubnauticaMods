@@ -54,21 +54,5 @@ namespace FCS_StorageSolutions.Helpers
 
             return false;
         }
-
-        internal static bool AddItemToNetwork(InventoryItem item, BaseManager manager)
-        {
-            if (manager != null)
-            {
-                foreach (IDSSRack baseRack in manager.BaseRacks)
-                {
-                    if (baseRack.ItemAllowed(item, out var server))
-                    {
-                        server?.AddItemMountedItem(item);
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
     }
 }

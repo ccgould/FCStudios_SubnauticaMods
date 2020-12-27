@@ -20,7 +20,7 @@ namespace FCS_AlterraHub.Mono
      * Should allow communication between devices
      * 
      */
-    public class BaseManager
+    public class BaseManager : IFCSDumpContainer
     {
         private bool _hasBreakerTripped;
         private string _baseName;
@@ -42,6 +42,8 @@ namespace FCS_AlterraHub.Mono
         public readonly HashSet<FcsDevice> BaseServers = new HashSet<FcsDevice>();
         public readonly HashSet<FcsDevice> BaseFcsStorage = new HashSet<FcsDevice>();
         public readonly HashSet<FcsDevice> BaseAntennas = new HashSet<FcsDevice>();
+        public readonly HashSet<FcsDevice> BaseTerminals = new HashSet<FcsDevice>();
+        private DumpContainerSimplified _dumpContainer;
 
         public SubRoot Habitat { get; set; }
 
@@ -82,6 +84,12 @@ namespace FCS_AlterraHub.Mono
                 NameController = new NameController();
                 NameController.Initialize(Buildables.AlterraHub.Submit(), Buildables.AlterraHub.ChangeBaseName());
                 NameController.OnLabelChanged += OnLabelChangedMethod;
+            }
+
+            if (_dumpContainer == null)
+            {
+                _dumpContainer = habitat.gameObject.EnsureComponent<DumpContainerSimplified>();
+                _dumpContainer.Initialize(habitat.gameObject.transform, $"Add item to base: {GetBaseName()}", this, 6, 8, habitat.gameObject.name);
             }
         }
 
@@ -760,6 +768,65 @@ namespace FCS_AlterraHub.Mono
         public void AlertNewAntennaDestroyed(FcsDevice fcsDevice)
         {
             BaseAntennas.Remove(fcsDevice);
+        }
+
+        public void OpenBaseStorage()
+        {
+            _dumpContainer.OpenStorage();
+        }
+
+        public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
+        {
+
+            QuickLogger.Debug($"Checking if allowed {_dumpContainer.GetItemCount() + 1}", true);
+
+            //TODO Check filter first
+
+
+            int availableSpace = 0;
+            foreach (IDSSRack baseRack in BaseRacks)
+            {
+                availableSpace += baseRack.GetFreeSpace();
+            }
+
+            var result = availableSpace >= _dumpContainer.GetItemCount() + 1;
+            QuickLogger.Debug($"Allowed result: {result}", true);
+            return result;
+        }
+
+        public bool AddItemToContainer(InventoryItem item)
+        {
+            try
+            {
+                var result = AddItemToNetwork(item, this);
+                if (!result)
+                {
+                    PlayerInteractionHelper.GivePlayerItem(item);
+                }
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Debug(e.Message, true);
+                QuickLogger.Debug(e.StackTrace);
+                PlayerInteractionHelper.GivePlayerItem(item);
+                return false;
+            }
+            return true;
+        }
+        public static bool AddItemToNetwork(InventoryItem item, BaseManager manager)
+        {
+            if (manager != null)
+            {
+                foreach (IDSSRack baseRack in manager.BaseRacks)
+                {
+                    if (baseRack.ItemAllowed(item, out var server))
+                    {
+                        server?.AddItemMountedItem(item);
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
     }
 

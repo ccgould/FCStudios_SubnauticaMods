@@ -14,19 +14,17 @@ using UnityEngine;
 
 namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
 {
-    internal class DSSTerminalController : FcsDevice, IFCSSave<SaveData>, IFCSDumpContainer
+    internal class DSSTerminalController : FcsDevice, IFCSSave<SaveData>
     {
         private bool _runStartUpOnEnable;
         private bool _fromSave;
         private DSSTerminalDataEntry _saveData;
-        private DumpContainerSimplified _dumpContainer;
         private DSSTerminalDisplayManager _display;
 
         private void Start()
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.DSSTabID, Mod.ModName);
             _display.Setup(this);
-            _dumpContainer.Initialize(transform, $"Add item to base: {Manager.GetBaseName()}", this, 6, 8, gameObject.name);
         }
 
         private void OnEnable()
@@ -67,10 +65,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                 _colorManager.Initialize(gameObject, ModelPrefab.BodyMaterial, ModelPrefab.SecondaryMaterial);
             }
 
-            if (_dumpContainer == null)
-            {
-                _dumpContainer = gameObject.EnsureComponent<DumpContainerSimplified>();
-            }
 
             if (_display == null)
             {
@@ -146,50 +140,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                     _runStartUpOnEnable = true;
                 }
             }
-        }
-
-        public void OpenStorage()
-        {
-            _dumpContainer.OpenStorage();
-        }
-
-        public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
-        {
-
-            QuickLogger.Debug($"Checking if allowed {_dumpContainer.GetItemCount() + 1}",true);
-
-            //TODO Check filter first
-
-
-            int availableSpace = 0;
-            foreach (IDSSRack baseRack in Manager.BaseRacks)
-            {
-                availableSpace += baseRack.GetFreeSpace();
-            }
-
-            var result = availableSpace >= _dumpContainer.GetItemCount() + 1;
-            QuickLogger.Debug($"Allowed result: {result}", true);
-            return result;
-        }
-
-        public override bool AddItemToContainer(InventoryItem item)
-        {
-            try
-            {
-                var result = TransferHelpers.AddItemToNetwork(item, Manager);
-                if (!result)
-                {
-                    PlayerInteractionHelper.GivePlayerItem(item);
-                }
-            }
-            catch (Exception e)
-            {
-                QuickLogger.Debug(e.Message,true);
-                QuickLogger.Debug(e.StackTrace);
-                PlayerInteractionHelper.GivePlayerItem(item);
-                return false;
-            }
-            return true;
         }
     }
 }

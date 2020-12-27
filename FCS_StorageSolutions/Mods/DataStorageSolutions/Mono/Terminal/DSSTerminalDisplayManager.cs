@@ -59,12 +59,12 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             switch (btnName)
             {
                 case "BaseDump":
-                    _mono.OpenStorage();
+                    _currentBase.OpenBaseStorage();
                     break;
                 case "InventoryBTN":
                     var techType = (TechType)tag;
                     if (!PlayerInteractionHelper.CanPlayerHold(techType)) return;
-                    var result = _mono.Manager.TakeItem(techType);
+                    var result = _currentBase.TakeItem(techType);
                     if (result != null)
                     {
                         UpdateDisplay();
@@ -72,7 +72,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                     }
                     break;
                 case "RenameBTN":
-                    _mono.Manager.ChangeBaseName();
+                    _currentBase.ChangeBaseName();
                     break;
                 case "BaseBTN":
                     _currentBase = (BaseManager) tag;

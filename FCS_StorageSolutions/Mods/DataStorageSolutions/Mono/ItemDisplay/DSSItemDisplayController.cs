@@ -274,7 +274,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.ItemDisplay
         {
             try
             {
-                var result = TransferHelpers.AddItemToNetwork(item,_manager);
+                var result = BaseManager.AddItemToNetwork(item,_manager);
                 if (!result)
                 {
                     PlayerInteractionHelper.GivePlayerItem(item);
