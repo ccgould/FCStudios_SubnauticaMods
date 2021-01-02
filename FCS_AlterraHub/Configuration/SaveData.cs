@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Mono.AlterraHub;
 using FCS_AlterraHub.Objects;
 using FCS_AlterraHub.Systems;
@@ -36,5 +37,6 @@ namespace FCS_AlterraHub.Configuration
         [JsonProperty] internal List<OreConsumerDataEntry> OreConsumerEntries = new List<OreConsumerDataEntry>();
         [JsonProperty] internal List<AlterraHubDataEntry> AlterraHubEntries = new List<AlterraHubDataEntry>();
         [JsonProperty(PropertyName = "Acc")] internal AccountDetails AccountDetails { get; set; }
+        [JsonProperty] internal List<BaseSaveData> BaseSaves = new List<BaseSaveData>();
     }
 }

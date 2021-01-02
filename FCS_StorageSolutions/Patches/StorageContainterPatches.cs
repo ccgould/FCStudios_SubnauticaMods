@@ -44,7 +44,7 @@ namespace FCS_StorageSolutions.Patches
         [HarmonyPostfix]
         internal static void Postfix(bool constructed, StorageContainer __instance)
         {
-            if (__instance == null || constructed == false)
+            if (__instance == null)
             {
                 return;
             }

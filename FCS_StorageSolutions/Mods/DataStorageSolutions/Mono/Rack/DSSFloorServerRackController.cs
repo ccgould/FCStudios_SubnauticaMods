@@ -30,16 +30,55 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         private Text _storageAmount;
         private List<GameObject> _meters;
         private Image _percentageBar;
+        private GameObject _canvas;
         private const float OpenPos = 0.207f;
         private const float ClosePos = -0.1668553f;
+        public override bool IsOperational => IsInitialized && IsConstructed;
         public override bool IsRack { get; } = true;
 
         public bool IsOpen => Mathf.Approximately(_targetPos,OpenPos);
-        
+
+        public override float GetPowerUsage()
+        {
+            if (Manager == null || Manager.GetBreakerState() || !IsConstructed) return 0f;
+
+            return 0.01f + _slots.Count(x => x.Value != null && x.Value.IsOccupied) * 0.01f;
+        }
+
         private void Start()
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.DSSTabID, Mod.ModName);
+            Manager.OnPowerStateChanged += OnPowerStateChanged;
+            Manager.OnBreakerStateChanged += OnBreakerStateChanged;
             UpdateStorageCount();
+        }
+
+        private void OnBreakerStateChanged(bool value)
+        {
+            UpdateScreenState();
+        }
+
+        private void OnPowerStateChanged(PowerSystem.Status obj)
+        {
+            UpdateScreenState();
+        }
+
+        private void UpdateScreenState()
+        {
+            if (Manager.GetBreakerState() || Manager.GetPowerState() != PowerSystem.Status.Normal)
+            {
+                if (_canvas.activeSelf)
+                {
+                    _canvas.SetActive(false);
+                }
+            }
+            else
+            {
+                if (!_canvas.activeSelf)
+                {
+                    _canvas.SetActive(true);
+                }
+            }
         }
 
         private void RegisterServers()
@@ -57,6 +96,8 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         {
             MoveTray();
         }
+
+        
 
         private void OnEnable()
         {
@@ -92,6 +133,9 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         public override void OnDestroy()
         {
             base.OnDestroy();
+            Manager.Un
+            Manager.OnPowerStateChanged -= OnPowerStateChanged;
+            Manager.OnBreakerStateChanged -= OnBreakerStateChanged;
             _isBeingDestroyed = true;
         }
 
@@ -103,7 +147,9 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         public override void Initialize()
         {
             _storageAmount = gameObject.GetComponentInChildren<Text>();
-            
+
+            _canvas = gameObject.GetComponentInChildren<Canvas>()?.gameObject;
+
             _slots = new Dictionary<string,DSSSlotController>();
             _meters = new List<GameObject>();
             _percentageBar = GameObjectHelpers.FindGameObject(gameObject, "Preloader").GetComponent<Image>();
@@ -215,7 +261,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
             return false;
         }
 
-        public int GetItemCount(TechType techType)
+        public override int GetItemCount(TechType techType)
         {
             int amount = 0;
             foreach (KeyValuePair<string, DSSSlotController> controller in _slots)
@@ -313,6 +359,15 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
 
         public override bool CanDeconstruct(out string reason)
         {
+            if (_slots != null)
+            {
+                if (_slots.Any(x => x.Value != null && x.Value.IsOccupied))
+                {
+                    reason = AuxPatchers.RackNotEmpty();
+                    return false;
+                }
+            }
+
             reason = string.Empty;
             return true;
         }
@@ -429,6 +484,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
 
         public void OnHandHover(GUIHand hand)
         {
+            if (!IsConstructed || !IsInitialized) return;
             HandReticle main = HandReticle.main;
             main.SetIcon(HandReticle.IconType.Hand);
             main.SetInteractText(IsOpen ? AuxPatchers.CloseWallServerRack() : AuxPatchers.OpenWallServerRack());
@@ -436,6 +492,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
 
         public void OnHandClick(GUIHand hand)
         {
+            if (!IsConstructed || !IsInitialized) return;
             if (IsOpen)
             {
                 Close();

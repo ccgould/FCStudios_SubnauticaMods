@@ -29,7 +29,16 @@ namespace FCS_StorageSolutions.Configuration
             { $"{ModKey}_Rename","Rename"},
             { $"{ModKey}_RenameDesc","Rename this base's name."},
             { $"{ModKey}_GlobalNetwork","Global Network"},
-            { $"{ModKey}_GlobalNetworkDesc","Shows all bases in the network that are online. Select a base to view its items"},
+            { $"{ModKey}_Multiplier","Multiplier"},
+            { $"{ModKey}_MultiplierDesc","Allows you to extract more with one click."},
+            { $"{ModKey}_SearchItem","Search item..."},
+            { $"{ModKey}_RackNotEmpty","Cannot deconstruct rack is not empty."},
+            { $"{ModKey}_AddServer","Add Server"},
+            { $"{ModKey}_AddServerDesc","Add server to formatting station to add filters."},
+            { $"{ModKey}_FilterItemName","Item: {0}"},
+            { $"{ModKey}_FilterCategoryName","Category: {0}"},
+            { $"{ModKey}_MoonpoolSettings","Moonpool Settings"},
+            { $"{ModKey}_AddToBlackList","Add item to blacklist"},
         };
         
         internal static void AdditionalPatching()
@@ -148,6 +157,66 @@ namespace FCS_StorageSolutions.Configuration
         public static string GlobalNetworkDesc()
         {
             return GetLanguage($"{ModKey}_GlobalNetworkDesc");
+        }
+
+        public static string Multiplier()
+        {
+            return GetLanguage($"{ModKey}_Multiplier");
+        }
+
+        public static string MultiplierDesc()
+        {
+            return GetLanguage($"{ModKey}_MultiplierDesc");
+        }
+        
+        public static string SearchForItemsMessage()
+        {
+            return GetLanguage($"{ModKey}_SearchItem");
+        }
+
+        public static string RackNotEmpty()
+        {
+            return GetLanguage($"{ModKey}_RackNotEmpty");
+        }
+
+        public static string AddServer()
+        {
+            return GetLanguage($"{ModKey}_AddServer");
+        }
+
+        public static string FormattingMachineAddServerDesc()
+        {
+            return GetLanguage($"{ModKey}_AddServerDesc");
+        }
+
+        public static string AddFilter()
+        {
+            return GetLanguage($"{ModKey}_AddFilter");
+        }
+
+        public static string AddFilterDesc()
+        {
+            return GetLanguage($"{ModKey}_AddFilterDesc");
+        }
+
+        public static string FilterItemNameFormat(string name)
+        {
+            return string.Format(GetLanguage($"{ModKey}_FilterItemName"), name);
+        }        
+        
+        public static string FilterCategoryNameFormat(string name)
+        {
+            return string.Format(GetLanguage($"{ModKey}_FilterCategoryName"), name);
+        }
+
+        public static string MoonpoolSettings()
+        {
+            return GetLanguage($"{ModKey}_MoonpoolSettings");
+        }        
+        
+        public static string AddToBlackList()
+        {
+            return GetLanguage($"{ModKey}_AddToBlackList");
         }
     }
 }

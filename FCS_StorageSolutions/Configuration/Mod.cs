@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
@@ -32,7 +33,7 @@ namespace FCS_StorageSolutions.Configuration
         internal const string ModBundleName = "fcsstoragesolutionsbundle";
         
         internal const string AlterraStorageTabID = "AS";
-        internal const string AlterraStorageFriendlyName = "Alterra Storage";
+        internal const string AlterraStorageFriendlyName = "Remote Storage Unit";
         internal const string AlterraStorageModName = "AlterraStorage";
         internal static string AlterraStorageKitClassID => $"{AlterraStorageClassName}_Kit";
         internal const string AlterraStorageClassName = "AlterraStorage";
@@ -51,7 +52,7 @@ namespace FCS_StorageSolutions.Configuration
         internal static string DSSFormattingStationKitClassID => $"{DSSFormattingStationClassName}_Kit";
         internal const string DSSFormattingStationDescription = "This station allows to you format your drive to accept or reject certain items or a category of items. Servers DO NOT have to be formatted.";
 
-        internal const string DSSItemDisplayFriendlyName = "Item Display";
+        internal const string DSSItemDisplayFriendlyName = "Terminal S23";
         internal const string DSSItemDisplayClassName = "DSSItemDisplay";
         internal const string DSSItemDisplayPrefabName = "DSS_ItemDisplay";
         internal static string DSSItemDisplayKitClassID => $"{DSSItemDisplayClassName}_Kit";
@@ -63,7 +64,7 @@ namespace FCS_StorageSolutions.Configuration
         internal static string DSSAutoCrafterKitClassID => $"{DSSAutoCrafterClassName}_Kit";
         internal const string DSSAutoCrafterDescription = "An auto crafter uses items from your inventory or your network to craft items you tell it to.";
 
-        internal const string DSSTerminalFriendlyName = "Terminal Monitor";
+        internal const string DSSTerminalFriendlyName = "Terminal C48";
         internal const string DSSTerminalClassName = "DSSTerminalMonitor";
         internal const string DSSTerminalPrefabName = "DSS_TerminalMonitor";
         internal static string DSSTerminalKitClassID => $"{DSSTerminalClassName}_Kit";

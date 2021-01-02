@@ -1,17 +1,17 @@
-﻿using FCSCommon.Enums;
-using FCSCommon.Utilities;
-using System;
+﻿using System;
+using FCS_AlterraHub.Enumerators;
 using FCSCommon.Helpers;
+using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace FCSCommon.Components
+namespace FCS_AlterraHub.Mono
 {
     /// <summary>
     /// This class is a component for all interface buttons except the color picker and the paginator.
     /// </summary>
-    internal class InterfaceButton : OnScreenButton, IPointerEnterHandler, IPointerClickHandler, IPointerExitHandler
+    public class InterfaceButton : OnScreenButton, IPointerEnterHandler, IPointerClickHandler, IPointerExitHandler
     {
         #region Public Properties
 
@@ -32,7 +32,7 @@ namespace FCSCommon.Components
 
         public Action<string, object> OnButtonClick;
 
-        internal bool IsSelected { get; set; }
+        public bool IsSelected { get; set; }
         private Image _bgImage;
         private GameObject _toggleRadial;
         private GameObject _hoverImage;
@@ -77,6 +77,13 @@ namespace FCSCommon.Components
                     break;
                 case InterfaceButtonMode.HoverImage:
                     _hoverImage = InterfaceHelpers.FindGameObject(gameObject,"Hover");
+                    break;
+                case InterfaceButtonMode.Aplha:
+                    FindImage();
+                    if (_bgImage != null)
+                    {
+                        _bgImage.color = new Color(STARTING_COLOR.r,STARTING_COLOR.g,STARTING_COLOR.b,0);
+                    }
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -154,6 +161,13 @@ namespace FCSCommon.Components
                         _hoverImage.SetActive(false);
                     }
                     break;
+                case InterfaceButtonMode.Aplha:
+                    FindImage();
+                    if (_bgImage != null)
+                    {
+                        _bgImage.color = new Color(STARTING_COLOR.r, STARTING_COLOR.g, STARTING_COLOR.b, 0);
+                    }
+                    break;
             }
 
         }
@@ -207,6 +221,13 @@ namespace FCSCommon.Components
                             _hoverImage.SetActive(true);
                         }
                         break;
+                    case InterfaceButtonMode.Aplha:
+                        FindImage();
+                        if (_bgImage != null)
+                        {
+                            _bgImage.color = new Color(STARTING_COLOR.r, STARTING_COLOR.g, STARTING_COLOR.b, 1);
+                        }
+                        break;
                 }
             }
         }
@@ -251,6 +272,13 @@ namespace FCSCommon.Components
                     if (_hoverImage != null)
                     {
                         _hoverImage.SetActive(false);
+                    }
+                    break;
+                case InterfaceButtonMode.Aplha:
+                    FindImage();
+                    if (_bgImage != null)
+                    {
+                        _bgImage.color = new Color(STARTING_COLOR.r, STARTING_COLOR.g, STARTING_COLOR.b, 0);
                     }
                     break;
             }
@@ -322,6 +350,13 @@ namespace FCSCommon.Components
                         _hoverImage.SetActive(true);
                     }
                     break;
+                case InterfaceButtonMode.Aplha:
+                    FindImage();
+                    if (_bgImage != null)
+                    {
+                        _bgImage.color = new Color(STARTING_COLOR.r, STARTING_COLOR.g, STARTING_COLOR.b, 1);
+                    }
+                    break;
             }
         }
         public void DeSelect()
@@ -350,6 +385,13 @@ namespace FCSCommon.Components
                     if (_hoverImage != null)
                     {
                         _hoverImage.SetActive(false);
+                    }
+                    break;
+                case InterfaceButtonMode.Aplha:
+                    FindImage();
+                    if (_bgImage != null)
+                    {
+                        _bgImage.color = new Color(STARTING_COLOR.r, STARTING_COLOR.g, STARTING_COLOR.b, 0);
                     }
                     break;
             }

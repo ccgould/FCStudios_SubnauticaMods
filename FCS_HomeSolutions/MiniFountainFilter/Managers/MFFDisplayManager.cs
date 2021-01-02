@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections;
+using FCS_AlterraHub.Enumerators;
+using FCS_AlterraHub.Mono;
 using FCS_HomeSolutions.MiniFountainFilter.Buildables;
 using FCS_HomeSolutions.MiniFountainFilter.Mono;
 using FCSCommon.Abstract;
@@ -115,23 +117,16 @@ namespace FCS_HomeSolutions.MiniFountainFilter.Managers
             return true;
         }
 
-        public override IEnumerator PowerOn()
+        public override void PowerOnDisplay()
         {
             _mono.AnimationManager.SetIntHash(_page, 1);
-            yield return null;
         }
 
-        public override IEnumerator PowerOff()
+        public override void HibernateDisplay()
         {
             _mono.AnimationManager.SetIntHash(_page, 0);
-            yield return null;
         }
 
-        public override IEnumerator CompleteSetup()
-        {
-            StartCoroutine(PowerOn());
-            yield return null;
-        }
 
         public void Setup(MiniFountainFilterController mono)
         {
@@ -145,15 +140,15 @@ namespace FCS_HomeSolutions.MiniFountainFilter.Managers
                 _mono.StorageManager.OnWaterAdded += OnWaterAdded;
                 _mono.StorageManager.OnWaterRemoved += OnWaterRemoved;
                 _mono.TankManager.OnTankUpdate += OnTankUpdate;
-                
-                StartCoroutine(CompleteSetup());
+
+                PowerOnDisplay();
             }
             else
             {
                 QuickLogger.Error("// ============== Error getting all Components ============== //");
                 return;
             }
-            StartCoroutine(CompleteSetup());
+            PowerOnDisplay();
         }
 
         private void OnTankUpdate()

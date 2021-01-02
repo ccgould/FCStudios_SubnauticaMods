@@ -20,12 +20,61 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         private bool _fromSave;
         private DSSTerminalDataEntry _saveData;
         private DSSTerminalDisplayManager _display;
+        public override bool IsOperational => IsInitialized && IsConstructed;
+        public BulkMultipliers BulkMultiplier { get; set; } = BulkMultipliers.TimesOne;
+
+        public override float GetPowerUsage()
+        {
+            if (Manager == null || Manager.GetBreakerState() || !IsConstructed) return 0f;
+            
+            return 0.01f;
+        }
 
         private void Start()
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.DSSTabID, Mod.ModName);
             _display.Setup(this);
+            Manager.OnPowerStateChanged += OnPowerStateChanged;
+            Manager.OnBreakerStateChanged += OnBreakerStateChanged;
+            if (Manager.GetBreakerState())
+            {
+                _display.HibernateDisplay();
+            }
         }
+
+        private void OnBreakerStateChanged(bool isTripped)
+        {
+            UpdateScreenState();
+
+            if (!isTripped && Manager.GetPowerState() == PowerSystem.Status.Normal)
+            {
+                _display.PowerOnDisplay();
+            }
+            else
+            {
+                _display.HibernateDisplay();
+            }
+        }
+
+        private void OnPowerStateChanged(PowerSystem.Status obj)
+        {
+            UpdateScreenState();
+        }
+
+        private void UpdateScreenState()
+        {
+            if (Manager.GetPowerState() != PowerSystem.Status.Normal)
+            {
+                _display?.TurnOffDisplay();
+            }
+            
+            if(Manager.GetPowerState() == PowerSystem.Status.Normal)
+            {
+                _display?.TurnOnDisplay();
+            }
+        }
+
+
 
         private void OnEnable()
         {
@@ -65,11 +114,9 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                 _colorManager.Initialize(gameObject, ModelPrefab.BodyMaterial, ModelPrefab.SecondaryMaterial);
             }
 
-
             if (_display == null)
             {
                 _display = gameObject.EnsureComponent<DSSTerminalDisplayManager>();
-                
             }
 
             IsInitialized = true;

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using FCS_AlterraHub.Mono;
-using FCSCommon.Components;
 using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,31 +9,43 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
     internal class DSSListItemController : InterfaceButton
     {
         private Text _title;
-        private readonly List<Image> _icons = new List<Image>();
+        private readonly List<GameObject> _icons = new List<GameObject>();
         private BaseManager _manager;
+        private bool _isInitialized;
 
-        internal void Initialize(BaseManager manager)
+        private void Initialize()
         {
+            if (_isInitialized) return;
             BtnName = "BaseBTN";
-            Tag = manager;
             STARTING_COLOR = new Color(0.1254902f, 0.5607843f, 0.6588235f, 1);
             HOVER_COLOR = new Color(0.181f, 0.652f, 0.708f, 1);
-            _manager = manager;
             _title = gameObject.GetComponentInChildren<Text>();
-            foreach (Transform child in transform)
+
+            for (int i = 0; i < 5; i++)
             {
-                _icons.Add(child.GetComponent<Image>());
+                _icons.Add(gameObject.transform.GetChild(i).gameObject);
             }
 
-            InvokeRepeating(nameof(UpdateState), 1f, 1f);
+            InvokeRepeating(nameof(UpdateState),1,1);
 
+            _isInitialized = true;
+        }
+
+        internal void Set(BaseManager manager, bool isCurrentBase)
+        {
+            Initialize();
+
+            ChangeIcon(isCurrentBase ? DssListItemIcon.Current : manager.Habitat.isCyclops ? DssListItemIcon.Cyclops : DssListItemIcon.HUB);
+
+            Tag = manager;
+            _manager = manager;
+            gameObject.SetActive(true);
+            UpdateState();
         }
 
         private void UpdateState()
         {
             if (_manager == null) return;
-
-            gameObject.SetActive(_manager.IsVisible);
 
             if (_title != null)
             {
@@ -46,13 +57,14 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         {
             if (_icons == null) return;
             int index = (int)icon;
+            
 
             QuickLogger.Debug($"Icon Index: {index} | Count {_icons.Count}");
 
             for (int i = 0; i < _icons.Count; i++)
             {
                 QuickLogger.Debug($"Icon Index Name: {_icons[i]?.gameObject.name}");
-                _icons[i]?.gameObject.SetActive(i == index);
+                _icons[i].SetActive(i == index);
             }
         }
         
@@ -61,9 +73,9 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             return _manager;
         }
 
-        internal void Purge()
+        internal void Reset()
         {
-            Destroy(gameObject);
+            gameObject.SetActive(false);
         }
     }
 }

@@ -3,6 +3,7 @@ using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Configuration;
+using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
 
@@ -41,6 +42,7 @@ namespace FCS_HomeSolutions.Buildables
 
                     _colorManager.ChangeColor(_savedData.Fcs.Vector4ToColor());
                     _colorManager.ChangeColor(_savedData.Secondary.Vector4ToColor(),ColorTargetMode.Secondary);
+                    _colorManager.ChangeColor(_savedData.Emission.Vector4ToColor(),ColorTargetMode.Emission);
                 }
 
                 _runStartUpOnEnable = false;
@@ -55,6 +57,8 @@ namespace FCS_HomeSolutions.Buildables
                 _colorManager.Initialize(gameObject,ModelPrefab.BodyMaterial,ModelPrefab.SecondaryMaterial);
             }
             
+            MaterialHelpers.ChangeEmissionStrength(ModelPrefab.EmissionControllerMaterial,gameObject,3f);
+
             IsInitialized = true;
         }
 
@@ -95,6 +99,7 @@ namespace FCS_HomeSolutions.Buildables
             _savedData.Id = GetPrefabID();
             _savedData.Fcs = _colorManager.GetColor().ColorToVector4();
             _savedData.Secondary = _colorManager.GetSecondaryColor().ColorToVector4();
+            _savedData.Emission = _colorManager.GetLumColor().ColorToVector4();
             QuickLogger.Debug($"Saving ID {_savedData.Id}");
             newSaveData.DecorationEntries.Add(_savedData);
         }

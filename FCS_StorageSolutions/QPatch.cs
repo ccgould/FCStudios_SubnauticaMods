@@ -4,6 +4,7 @@ using FCS_StorageSolutions.Mods.AlterraStorage.Buildable;
 using FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable;
 using FCSCommon.Utilities;
 using HarmonyLib;
+using QModManager.API;
 using QModManager.API.ModLoading;
 using SMLHelper.V2.Handlers;
 
@@ -17,11 +18,16 @@ namespace FCS_StorageSolutions
     public class QPatch
     {
         internal static Config Configuration { get; } = OptionsPanelHandler.Main.RegisterModOptions<Config>();
+        internal static DSSConfig DSSConfiguration { get; } = OptionsPanelHandler.Main.RegisterModOptions<DSSConfig>();
+        public static bool IsDockedVehicleStorageAccessInstalled { get; set; }
 
         [QModPatch]
         public void Patch()
         {
             QuickLogger.Info($"Started patching. Version: {QuickLogger.GetAssemblyVersion(Assembly.GetExecutingAssembly())}");
+
+            IsDockedVehicleStorageAccessInstalled = QModServices.Main.ModPresent("DockedVehicleStorageAccess");
+
 
             ModelPrefab.Initialize();
 

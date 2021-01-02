@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using FCSCommon.Components;
+using FCS_AlterraHub.Enumerators;
 using FCSCommon.Enums;
 using UnityEngine;
 
@@ -10,19 +10,31 @@ namespace FCS_AlterraHub.Mono
     {
         private List<FCSToggleButton> _buttons;
         public Action<string> OnToggleButtonAction;
+        public Action<string,object> OnToggleButtonActionObj;
+        private InterfaceButtonMode _toggleButtonMode = InterfaceButtonMode.HoverImage;
+        private Color _color = Color.gray;
+        private Color _hoverColor = Color.white;
+        private object Tag;
 
-        private void Awake()
+        public void Initialize()
         {
-            int i = 0;
             if (_buttons == null)
             {
                 _buttons = new List<FCSToggleButton>();
             }
 
+            RefreshList();
+        }
+
+        public void RefreshList()
+        {
+            int i = 0;
             foreach (Transform child in transform)
             {
                 var toggleBtn = child.gameObject.EnsureComponent<FCSToggleButton>();
-                toggleBtn.ButtonMode = InterfaceButtonMode.HoverImage;
+                toggleBtn.ButtonMode = _toggleButtonMode;
+                toggleBtn.STARTING_COLOR = _color;
+                toggleBtn.HOVER_COLOR = _hoverColor;
                 toggleBtn.BtnName = $"ToggleButton_{i++}";
                 _buttons.Add(toggleBtn);
                 toggleBtn.OnButtonClick += Refresh;
@@ -31,6 +43,7 @@ namespace FCS_AlterraHub.Mono
 
         private void Refresh(string name, object buttonTag)
         {
+            OnToggleButtonActionObj?.Invoke(name,buttonTag);
             OnToggleButtonAction?.Invoke(name);
             for (int i = 0; i < _buttons.Count; i++)
             {
@@ -49,6 +62,17 @@ namespace FCS_AlterraHub.Mono
                     break;
                 }
             }
+        }
+
+        public void SetMode(InterfaceButtonMode mode)
+        {
+            _toggleButtonMode = mode;
+        }
+
+        public void SetColor(Color color,Color hoverColor)
+        {
+            _color = color;
+            _hoverColor = hoverColor;
         }
     }
 }

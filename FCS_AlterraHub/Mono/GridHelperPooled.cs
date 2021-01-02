@@ -1,26 +1,25 @@
 ﻿using System;
-using FCS_AlterraHub.Mono.ObjectPooler;
-using FCSCommon.Enums;
+using FCS_AlterraHub.Enumerators;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace FCSCommon.Helpers
+namespace FCS_AlterraHub.Mono
 {
-    internal class GridHelperPooled : MonoBehaviour
+    public class GridHelperPooled : MonoBehaviour
     {
         private int _itemsPerPage;
         private Action<string, object> _onButtonClick;
         private Text _pageNumberText;
         private int _maxPage = 1;
         private int _currentPage;
-        private ObjectPooler _pooler;
+        private ObjectPooler.ObjectPooler _pooler;
         private GameObject _itemsGrid;
         
-        internal string HomeButtonMessage { get; set; }
-        internal Action<DisplayDataPooled> OnLoadDisplay { get; set; }
-        internal int EndingPosition { get; private set; }
-        internal int StartingPosition { get; private set; }
-        internal void Setup(int itemsPerPage, ObjectPooler pool, GameObject gridPage,Action<string,object> callBack,bool throwException = true)
+        public string HomeButtonMessage { get; set; }
+        public Action<DisplayDataPooled> OnLoadDisplay { get; set; }
+        public int EndingPosition { get; private set; }
+        public int StartingPosition { get; private set; }
+        public void Setup(int itemsPerPage, ObjectPooler.ObjectPooler pool, GameObject gridPage,Action<string,object> callBack,bool throwException = true)
         {
             _pooler = pool;
 
@@ -58,22 +57,22 @@ namespace FCSCommon.Helpers
             DrawPage(1);
         }
         
-        internal int GetCurrentPage()
+        public int GetCurrentPage()
         {
             return _currentPage;
         }
 
-        internal void ChangePageBy(int amount)
+        public void ChangePageBy(int amount)
         {
             DrawPage(_currentPage + amount);
         }
 
-        internal void DrawPage()
+        public void DrawPage()
         {
             DrawPage(_currentPage);
         }
 
-        internal void DrawPage(int page)
+        public void DrawPage(int page)
         {
             _currentPage = page;
 
@@ -101,7 +100,7 @@ namespace FCSCommon.Helpers
             OnLoadDisplay?.Invoke(data);
         }
         
-        internal void ClearPage()
+        public void ClearPage()
         {
             if(_itemsGrid == null) return;
 
@@ -116,7 +115,7 @@ namespace FCSCommon.Helpers
             }
         }
 
-        internal void UpdaterPaginator(int count)
+        public void UpdaterPaginator(int count)
         {
             CalculateNewMaxPages(count);
             if (_pageNumberText == null) return;
@@ -137,9 +136,9 @@ namespace FCSCommon.Helpers
         }
     }
 
-    internal struct DisplayDataPooled
+    public struct DisplayDataPooled
     {
-        public ObjectPooler Pool { get; set; }
+        public ObjectPooler.ObjectPooler Pool { get; set; }
         public GameObject ItemsGrid { get; set; }
         public int StartPosition { get; set; }
         public int EndPosition { get; set; }

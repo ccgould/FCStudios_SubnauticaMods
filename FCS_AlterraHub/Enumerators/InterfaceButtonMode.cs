@@ -1,6 +1,6 @@
-﻿namespace FCSCommon.Enums
+﻿namespace FCS_AlterraHub.Enumerators
 {
-    internal enum InterfaceButtonMode
+    public enum InterfaceButtonMode
     {
         None,
         TextScale,
@@ -8,6 +8,7 @@
         Background,
         BackgroundScale,
         HoverImage,
-        RadialButton
+        RadialButton,
+        Aplha
     }
 }

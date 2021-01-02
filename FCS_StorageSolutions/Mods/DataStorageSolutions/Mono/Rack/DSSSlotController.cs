@@ -61,37 +61,35 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
             {
                 _storage = gameObject.AddComponent<FCSStorage>();
                 _storage.Initialize(1,gameObject);
-                _storage.ItemsContainer.onAddItem += ItemsContainerOnOnAddItem;
-                _storage.ItemsContainer.onRemoveItem += ItemsContainerOnRemoveItem;
+                _storage.ItemsContainer.onAddItem += OnServerAddedToStorage;
+                _storage.ItemsContainer.onRemoveItem += OnServerRemovedFromStorage;
             }
         }
 
-        private void ItemsContainerOnRemoveItem(InventoryItem item)
+        private void OnServerRemovedFromStorage(InventoryItem item)
         {
             var server = item.item.gameObject.EnsureComponent<DSSServerController>();
+
             if (server == null)
             {
+#if DEBUG
                 QuickLogger.DebugError($"Server controller returned null on ItemsContainerOnOnAddItem. Object {item.item.gameObject.name}");
+#endif
                 return;
             }
             server.UnDockServer();
             _controller.Manager.RemoveServerFromBase(_mountedServer);
-            _mountedServer.GetStorage().ItemsContainer.onAddItem -= OnMountedServerUpdate;
-            _mountedServer.GetStorage().ItemsContainer.onRemoveItem -= OnMountedServerUpdate;
+            server.GetStorage().ItemsContainer.onAddItem -= OnMountedServerUpdate;
+            server.GetStorage().ItemsContainer.onRemoveItem -= OnMountedServerUpdate;
             _mountedServer = null;
             _inventoryItem = null;
         }
 
-        private void ItemsContainerOnOnAddItem(InventoryItem item)
+        private void OnServerAddedToStorage(InventoryItem item)
         {
-            if(item== null || item.item ==null) return;
+            if(item == null) return;
             ModelPrefab.ApplyShaders(item.item.gameObject);
-            var result = AddItemToContainer(item);
-            if(result)
-            {
-                _mountedServer.GetStorage().ItemsContainer.onAddItem += OnMountedServerUpdate;
-                _mountedServer.GetStorage().ItemsContainer.onRemoveItem += OnMountedServerUpdate;
-            }
+            MountServerToRack(item);
         }
 
         private void OnMountedServerUpdate(InventoryItem item)
@@ -101,6 +99,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
 
         public void OnHandHover(GUIHand hand)
         {
+            if(_controller == null) return;
             if(_controller.IsOpen)
             {
                 HandReticle main = HandReticle.main;
@@ -111,17 +110,16 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         
         public void OnHandClick(GUIHand hand)
         {
-            if (!_controller.IsOpen) return;
+            if (_controller == null || !_controller.IsOpen) return;
 
             FindServer();
 
             if (IsOccupied)
             {
-                PlayerInteractionHelper.GivePlayerItem(_inventoryItem);
-                _mountedServer?.UnDockServer();
-                _mountedServer = null;
-                _inventoryItem = null;
-                _preloader.fillAmount =0;
+                var pickup = _inventoryItem.item;
+                _storage.ItemsContainer.RemoveItem(pickup);
+                PlayerInteractionHelper.GivePlayerItem(pickup);
+                _preloader.fillAmount = 0;
                 _preloaderPercentage.text = $"{0:P0}";
                 _controller.UpdateStorageCount();
             }
@@ -131,6 +129,8 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
             }
         }
 
+        #region Dump Container
+
         /// <summary>
         /// Event when the DumpContainer has an item added
         /// </summary>
@@ -138,19 +138,41 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         /// <returns></returns>
         public bool AddItemToContainer(InventoryItem item)
         {
+           return  _storage.AddItem(item);
+        }
+
+        private bool MountServerToRack(InventoryItem item)
+        {
+            QuickLogger.Debug("Adding Server", true);
             try
             {
-                if (item.item.GetTechType() != Mod.GetDSSServerTechType()) return false;
+                if (item.item.GetTechType() != Mod.GetDSSServerTechType() || _controller == null) return false;
+
                 _inventoryItem = item;
+
                 _mountedServer = item.item.gameObject.GetComponentInChildren<DSSServerController>();
-                _controller?.Manager?.RegisterServerInBase(_mountedServer);
-                _mountedServer.DockServer(this, _controller);
-                _controller.UpdateStorageCount();
+
+                if (_controller == null)
+                {
+                    QuickLogger.Debug("CONTROLLER IS NULL");
+                }
+
+                if (_mountedServer != null)
+                {
+                    _mountedServer.DockServer(this, _controller);
+                    _mountedServer.GetStorage().ItemsContainer.onAddItem += OnMountedServerUpdate;
+                    _mountedServer.GetStorage().ItemsContainer.onRemoveItem += OnMountedServerUpdate;
+                    _controller.Manager?.RegisterServerInBase(_mountedServer);
+                    _controller.UpdateStorageCount();
+                }
+                else
+                {
+                    QuickLogger.Debug("Mounted Server was null");
+                }
             }
             catch (Exception e)
             {
-                
-                QuickLogger.Error("Please contact FCStudios about this fail",true);
+                QuickLogger.Error("Please contact FCStudios about this fail", true);
                 QuickLogger.DebugError(e.Message);
                 QuickLogger.DebugError(e.StackTrace);
                 PlayerInteractionHelper.GivePlayerItem(item);
@@ -160,10 +182,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
             return true;
         }
 
-        public bool AddItemMountedItem(InventoryItem item)
-        {
-            return _mountedServer.AddItemToContainer(item);
-        }
 
         /// <summary>
         /// Dump Container calls this method to see if this item can be added to the container.
@@ -174,6 +192,13 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
         {
             return pickupable.GetTechType() == Mod.GetDSSServerTechType();
+        }
+
+        #endregion
+
+        public bool AddItemToMountedServer(InventoryItem item)
+        {
+            return _mountedServer.AddItemToContainer(item);
         }
 
         public string GetSlotName()

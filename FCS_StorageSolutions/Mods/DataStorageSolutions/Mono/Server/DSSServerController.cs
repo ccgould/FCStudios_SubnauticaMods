@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using FCS_AlterraHub.Interfaces;
+using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_StorageSolutions.Configuration;
 using FCS_StorageSolutions.Mods.AlterraStorage.Buildable;
@@ -13,8 +14,6 @@ using UnityEngine.UI;
 
 namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
 {
-
-
     //TODO Add a name feature
     internal class DSSServerController : FcsDevice, IFCSSave<SaveData>
     {
@@ -29,10 +28,11 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
         private string _rackSlot;
         private IDSSRack _rackController;
         private const int MAXSTORAGE = 48;
-        private HashSet<TechType> FilteringSettings = new HashSet<TechType>();
+        private HashSet<Filter> _filteringSettings;
         private string _currentBase;
 
-        public bool IsFiltered => FilteringSettings.Count > 0;
+        public bool IsBeingFormatted { get; set; }
+        public bool IsFiltered => _filteringSettings != null && _filteringSettings.Count > 0;
         public override bool BypassRegisterCheck => true;
 
         private void Start()
@@ -82,6 +82,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
 
         public override void Initialize()
         {
+            if (IsInitialized) return;
             IsVisible = false;
             IsConstructed = true;
 
@@ -149,7 +150,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
 
         public override void OnProtoDeserialize(ProtobufSerializer serializer)
         {
-            QuickLogger.Debug("In OnProtoDeserialize We made it");
+            QuickLogger.Debug("// ====== De-Serializing Server ===== //");
             _isFromSave = true;
             _serializer = serializer;
 
@@ -165,10 +166,16 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
 
             if (_savedData != null)
             {
+                QuickLogger.Debug($"De-Serializing Server: {GetPrefabID()}");
                 _currentBase = _savedData.CurrentBase;
                 _storageContainer.RestoreItems(_serializer, _savedData.Data);
+                if (_savedData.ServerFilters != null)
+                {
+                    _filteringSettings = _savedData.ServerFilters;
+                }
             }
             _isFromSave = false;
+            QuickLogger.Debug("// ====== De-Serializing Server ===== //");
         }
         
         public override bool CanDeconstruct(out string reason)
@@ -192,12 +199,18 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
 
             _savedData.ID = GetPrefabID();
             _savedData.Data = _storageContainer.Save(serializer);
+            
             if (_rackController != null)
             {
                 _savedData.RackSlot = _rackSlot;
                 _savedData.RackSlotUnitID = _rackController.UnitID;
                 _savedData.CurrentBase = _currentBase;
             }
+
+            
+            _savedData.IsBeingFormatted = IsBeingFormatted;
+            _savedData.ServerFilters = _filteringSettings;
+
             newSaveData.DSSServerDataEntries.Add(_savedData);
             QuickLogger.Debug($"Saving ID {_savedData.ID}", true);
         }
@@ -278,6 +291,8 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
 
         public void DockServer(DSSSlotController slot, IDSSRack controller)
         {
+            QuickLogger.Debug($"DockServer: {GetPrefabID()}");
+            Initialize();
             _rackSlot = slot.GetSlotName();
             _rackController = controller;
             _rb.isKinematic = true;
@@ -296,6 +311,29 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
             transform.parent = slot.transform;
             transform.localPosition = Vector3.zero;
             IsVisible = true;
+        }
+
+        public void DockServer(BaseManager manager,Transform slot)
+        {
+            Manager = manager;
+            _rb.isKinematic = true;
+            if (!string.IsNullOrWhiteSpace(manager?.BaseID))
+            {
+                _currentBase = Manager.BaseID;
+                FindBaseManager();
+            }
+            
+            foreach (BoxCollider bc in _colliders)
+            {
+                bc.isTrigger = true;
+            }
+
+            ModelPrefab.ApplyShaders(gameObject);
+            gameObject.SetActive(true);
+            transform.parent = slot;
+            transform.localPosition = Vector3.zero;
+            IsVisible = true;
+            IsBeingFormatted = true;
         }
         
         private void FindBaseManager()
@@ -337,13 +375,17 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
 
         public bool IsTechTypeAllowed(TechType techType)
         {
-
-            if (IsFiltered)
+            if (!IsFiltered) return true;
+            bool result = false;
+            
+            foreach (Filter filter in _filteringSettings)
             {
-                return FilteringSettings.Contains(techType);
+                if (filter.HasTechType(techType))
+                {
+                    result = true;
+                }
             }
-
-            return true;
+            return result;
         }
 
         public override IEnumerable<KeyValuePair<TechType, int>> GetItemsWithin()
@@ -365,6 +407,35 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
         {
             if (_storageContainer == null) return 0f;
             return (float)_storageContainer.GetCount() / MAXSTORAGE;
+        }
+
+        public HashSet<Filter> GetFilters()
+        {
+            return _filteringSettings ?? (_filteringSettings = new HashSet<Filter>());
+        }
+
+        public void AddFilter(Filter filter)
+        {
+            if (_filteringSettings == null)
+            {
+                _filteringSettings = new HashSet<Filter>();
+            }
+            if (filter != null)
+            {
+                _filteringSettings.Add(filter);
+            }
+        }
+
+        public void RemoveFilter(Filter curFilter)
+        {
+            foreach (Filter filter in _filteringSettings)
+            {
+                if (filter.IsSame(curFilter))
+                {
+                    _filteringSettings.Remove(filter);
+                    break;
+                }
+            }
         }
     }
 }

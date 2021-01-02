@@ -30,6 +30,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
         private GameObject _screenBlock;
         private DumpContainerSimplified _dumpContainer;
         private MotorHandler _motorHandler;
+        private GameObject _playerBody;
 
 
         internal HubTrigger AlterraHubTrigger { get; set; }
@@ -116,6 +117,8 @@ namespace FCS_AlterraHub.Mono.AlterraHub
                 _colorManager = gameObject.AddComponent<ColorManager>();
                 _colorManager.Initialize(gameObject, Buildables.AlterraHub.BodyMaterial);
             }
+
+            _playerBody = Player.main.playerController.gameObject.FindChild("body");
 
             //var ui = GameObject.Instantiate(Buildables.AlterraHub.ColorPickerDialogPrefab);
             //HUD = ui.AddComponent<FCSHUD>();
@@ -352,7 +355,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
                 var hudCameraPos = _hubCameraPosition.transform.position;
                 var hudCameraRot = _hubCameraPosition.transform.rotation;
                 Player.main.SetPosition(new Vector3(hudCameraPos.x, Player.main.transform.position.y, hudCameraPos.z), hudCameraRot);
-
+                _playerBody.SetActive(false);
                 //Player.main.gameObject.transform.position = new Vector3(hudCameraPos.x, Player.main.gameObject.transform.position.y, hudCameraPos.z);
                 SNCameraRoot.main.transform.position = hudCameraPos;
                 SNCameraRoot.main.transform.rotation = hudCameraRot;
@@ -364,6 +367,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             SNCameraRoot.main.transform.localPosition = Vector3.zero;
             SNCameraRoot.main.transform.localRotation = Quaternion.identity;
             ExitLockedMode();
+            _playerBody.SetActive(true);
         }
 
         private void ExitLockedMode()

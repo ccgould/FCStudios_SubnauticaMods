@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Objects;
 using Oculus.Newtonsoft.Json;
 using UnityEngine;
@@ -25,6 +26,8 @@ namespace FCS_StorageSolutions.Configuration
         [JsonProperty] internal string RackSlot { get; set; }
         [JsonProperty] internal string RackSlotUnitID { get; set; }
         [JsonProperty] internal string CurrentBase { get; set; }
+        [JsonProperty] internal bool IsBeingFormatted { get; set; }
+        [JsonProperty] internal HashSet<Filter> ServerFilters { get; set; }
     }
 
     [Serializable]
@@ -77,6 +80,7 @@ namespace FCS_StorageSolutions.Configuration
         [JsonProperty] internal Vec4 Body { get; set; }
         [JsonProperty] internal byte[] Data { get; set; }
         [JsonProperty] internal Vec4 SecondaryBody { get; set; }
+        [JsonProperty] internal byte[] Bytes { get; set; }
     }
 
     [Serializable]

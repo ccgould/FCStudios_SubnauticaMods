@@ -1,9 +1,10 @@
 ﻿using System;
+using FCS_AlterraHub.Mono;
 using UnityEngine;
 
 namespace FCSCommon.Helpers
 {
-    internal class GridHelperV2 : MonoBehaviour
+    public class GridHelperV2 : MonoBehaviour
     {
         private int _itemsPerPage;
         private Action<string, object> _onButtonClick;
@@ -11,11 +12,11 @@ namespace FCSCommon.Helpers
         private int _currentPage;
         private GameObject _itemsGrid;
 
-        internal Action<DisplayData> OnLoadDisplay { get; set; }
-        internal int EndingPosition { get; private set; }
-        internal int StartingPosition { get; private set; }
+        public Action<DisplayData> OnLoadDisplay { get; set; }
+        public int EndingPosition { get; private set; }
+        public int StartingPosition { get; private set; }
 
-        internal void Setup(int itemsPerPage, GameObject gridPage, Color startColor, Color hoverColor, Action<string, object> onButtonClick, string gridName = "Grid")
+        public void Setup(int itemsPerPage, GameObject gridPage, Color startColor, Color hoverColor, Action<string, object> onButtonClick, string gridName = "Grid")
         {
             //#region Prev Button
 
@@ -43,22 +44,22 @@ namespace FCSCommon.Helpers
             DrawPage(1);
         }
 
-        internal int GetCurrentPage()
+        public int GetCurrentPage()
         {
             return _currentPage;
         }
 
-        internal void ChangePageBy(int amount)
+        public void ChangePageBy(int amount)
         {
             DrawPage(_currentPage + amount);
         }
 
-        internal void DrawPage()
+        public void DrawPage()
         {
             DrawPage(_currentPage);
         }
 
-        internal void DrawPage(int page)
+        public void DrawPage(int page)
         {
             _currentPage = page;
 
@@ -86,7 +87,7 @@ namespace FCSCommon.Helpers
             OnLoadDisplay?.Invoke(data);
         }
 
-        internal void ClearPage()
+        public void ClearPage()
         {
             if (_itemsGrid == null) return;
 
@@ -101,7 +102,7 @@ namespace FCSCommon.Helpers
             }
         }
 
-        internal void UpdaterPaginator(int count)
+        public void UpdaterPaginator(int count)
         {
             CalculateNewMaxPages(count);
         }

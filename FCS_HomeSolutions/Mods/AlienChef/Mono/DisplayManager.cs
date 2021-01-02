@@ -4,7 +4,6 @@ using FCS_AlterraHub.Mono;
 using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
 using FCSCommon.Abstract;
-using FCSCommon.Components;
 using FCSCommon.Converters;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
@@ -91,6 +90,7 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
                 _cookingPercentageRing = GameObjectHelpers.FindGameObject(gameObject, "Preloader").GetComponent<Image>();
                 _cookingTime = GameObjectHelpers.FindGameObject(gameObject, "Time").GetComponent<Text>();
                 _toggleGroup = GameObjectHelpers.FindGameObject(gameObject, "ToggleGroup").EnsureComponent<FCSToggleGroup>();
+                _toggleGroup.Initialize();
                 _orderWindow = GameObjectHelpers.FindGameObject(gameObject, "OrderWindow").EnsureComponent<OrderWindowDialog>();
                 _orderWindow.Initialize(_mono);
                 _toggleGroup.OnToggleButtonAction += OnToggleButtonAction;

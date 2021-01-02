@@ -16,7 +16,7 @@ namespace FCS_StorageSolutions.Helpers
                 //TODO Check filter
                 if (slotController.Value.IsOccupied && slotController.Value.HasSpace(amount))
                 {
-                    var result = slotController.Value.AddItemMountedItem(item);
+                    var result = slotController.Value.AddItemToMountedServer(item);
 
                     if (!result)
                     {
@@ -39,7 +39,7 @@ namespace FCS_StorageSolutions.Helpers
                 //TODO Check filter
                 if (slotController.Value.IsOccupied && slotController.Value.HasSpace(amount))
                 {
-                    var result = slotController.Value.AddItemMountedItem(item);
+                    var result = slotController.Value.AddItemToMountedServer(item);
 
                     if (!result)
                     {

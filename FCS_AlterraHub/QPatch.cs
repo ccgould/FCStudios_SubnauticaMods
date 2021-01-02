@@ -59,6 +59,7 @@ namespace FCS_AlterraHub
         }
 
         public static FCSHUD HUD { get; set; }
+        public static bool IsDockedVehicleStorageAccessInstalled { get; set; }
 
         private static void CreateKits()
         {

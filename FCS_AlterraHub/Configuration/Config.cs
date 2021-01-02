@@ -38,7 +38,7 @@ namespace FCS_AlterraHub.Configuration
 
         [JsonIgnore]
         internal Action<bool> OnPlaySoundToggleEvent { get; set; }
-
+        
         private void ChangeGameModeEvent(ChoiceChangedEventArgs e)
         {
             onGameModeChanged?.Invoke(e.Index);

@@ -50,7 +50,9 @@ namespace FCS_AlterraHub.Buildables
             { $"{ModKey}_Online","online"},
             { $"{ModKey}_Offline","offline"},
             { $"{ModKey}_ChangeBaseName","Change Base Name"},
-
+            { $"{ModKey}_ClickToSearchForItems","Click to search for items..."},
+            { $"{ModKey}_BlackListItemFormat","{0} item is in the blacklist an will not be pulled from the vehicle."},
+            { $"{ModKey}_NoVehicles","No vehicles are docked at this base."},
         };
         
         private void AdditionalPatching()
@@ -270,6 +272,21 @@ namespace FCS_AlterraHub.Buildables
         public static string ChangeBaseName()
         {
             return GetLanguage($"{ModKey}_ChangeBaseName");
+        }
+
+        public static string SearchForItemsMessage()
+        {
+            return GetLanguage($"{ModKey}_ClickToSearchForItems");
+        }
+
+        public static string BlackListFormat(string name)
+        {
+            return string.Format(GetLanguage($"{ModKey}_BlackListItemFormat"), name);
+        }
+
+        public static string NoVehiclesDocked()
+        {
+            return GetLanguage($"{ModKey}_NoVehicles");
         }
     }
 }

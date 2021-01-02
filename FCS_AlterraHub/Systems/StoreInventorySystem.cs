@@ -18,19 +18,19 @@ namespace FCS_AlterraHub.Systems
         private static readonly Dictionary<TechType, decimal> OrePrices = new Dictionary<TechType, decimal>
         {
             {TechType.Copper,2000},
-            {TechType.Sulphur,50 },
-            {TechType.Diamond,232553 },
-            {TechType.Gold,9401 },
+            {TechType.Sulphur,1500 },
+            {TechType.Diamond,100000 },
+            {TechType.Gold,12000 },
             {TechType.Kyanite, 291965 },
-            {TechType.Lead,500 },
+            {TechType.Lead,750 },
             {TechType.Lithium,5644 },
-            {TechType.Magnetite,300 },
-            {TechType.Nickel,330 },
-            {TechType.Quartz,4800 },
+            {TechType.Magnetite,7500 },
+            {TechType.Nickel,5500 },
+            {TechType.Quartz,2200 },
             {TechType.AluminumOxide,10635 },
-            {TechType.Silver,4777 },
-            {TechType.UraniniteCrystal,836 },
-            {TechType.Titanium,450 },
+            {TechType.Silver,3500 },
+            {TechType.UraniniteCrystal,14000 },
+            {TechType.Titanium,450 }
         };
         
         internal static decimal GetPrice(TechType techType,bool checkKit = false)

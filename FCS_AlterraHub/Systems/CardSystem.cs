@@ -226,8 +226,8 @@ namespace FCS_AlterraHub.Systems
             
             _accountDetails.FullName = fullName;
             _accountDetails.Username = userName;
-            _accountDetails.Password = EncodeDecode.Encrypt(password);
-            _accountDetails.PIN = EncodeDecode.Encrypt(pin);
+            _accountDetails.Password = EncodeDecode.CreateMD5(password);
+            _accountDetails.PIN = EncodeDecode.CreateMD5(pin);
 
             CalculateBalance();
 
@@ -269,8 +269,7 @@ namespace FCS_AlterraHub.Systems
 
             }
         }
-
-
+        
         internal void CalculateBalance()
         {
             //if (QPatch.Configuration.GameModeOption == FCSGameMode.HardCore)
@@ -300,6 +299,7 @@ namespace FCS_AlterraHub.Systems
 
         internal void PayDebit(decimal amount)
         {
+            QuickLogger.Debug($"Trying to add {amount} to {AccountDetails.AlterraDebitPayed}",true);
             AccountDetails.AlterraDebitPayed += amount;
             RemoveFinances(amount);
         }
@@ -328,7 +328,7 @@ namespace FCS_AlterraHub.Systems
 
         internal decimal AlterraBalance()
         {
-            return AlterraDebit - AccountDetails.AlterraDebitPayed;
+            return AlterraDebit + AccountDetails.AlterraDebitPayed;
         }
 
         internal bool IsAccountNameValid(string accountName)

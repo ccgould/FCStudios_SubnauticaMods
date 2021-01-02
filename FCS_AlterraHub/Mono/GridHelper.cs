@@ -1,11 +1,11 @@
 ﻿using System;
-using FCSCommon.Enums;
+using FCS_AlterraHub.Enumerators;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace FCSCommon.Helpers
+namespace FCS_AlterraHub.Mono
 {
-    internal class GridHelper : MonoBehaviour
+    public class GridHelper : MonoBehaviour
     {
         private int _itemsPerPage;
         private Action<string, object> _onButtonClick;
@@ -15,12 +15,12 @@ namespace FCSCommon.Helpers
         private GameObject _itemPrefab;
         private GameObject _itemsGrid;
 
-        internal string HomeButtonMessage { get; set; }
-        internal Action<DisplayData> OnLoadDisplay { get; set; }
-        internal int EndingPosition { get; private set; }
-        internal int StartingPosition { get; private set; }
+        public string HomeButtonMessage { get; set; }
+        public Action<DisplayData> OnLoadDisplay { get; set; }
+        public int EndingPosition { get; private set; }
+        public int StartingPosition { get; private set; }
 
-        internal void Setup(int itemsPerPage, GameObject itemPrefab, GameObject gridPage, Color startColor, Color hoverColor, Action<string, object> onButtonClick, int maxInteractionRange = 5, string prevBtnNAme = "PrevBTN", string nextBtnName = "NextBTN", string gridName = "Grid", string paginatorName = "Paginator", string homeBtnName = "HomeBTN", string customHomeBTN = "")
+        public void Setup(int itemsPerPage, GameObject itemPrefab, GameObject gridPage, Color startColor, Color hoverColor, Action<string, object> onButtonClick, int maxInteractionRange = 5, string prevBtnNAme = "PrevBTN", string nextBtnName = "NextBTN", string gridName = "Grid", string paginatorName = "Paginator", string homeBtnName = "HomeBTN", string customHomeBTN = "")
         {
             _itemPrefab = itemPrefab;
 
@@ -64,22 +64,22 @@ namespace FCSCommon.Helpers
             DrawPage(1);
         }
 
-        internal int GetCurrentPage()
+        public int GetCurrentPage()
         {
             return _currentPage;
         }
 
-        internal void ChangePageBy(int amount)
+        public void ChangePageBy(int amount)
         {
             DrawPage(_currentPage + amount);
         }
 
-        internal void DrawPage()
+        public void DrawPage()
         {
             DrawPage(_currentPage);
         }
 
-        internal void DrawPage(int page)
+        public void DrawPage(int page)
         {
             _currentPage = page;
 
@@ -129,7 +129,7 @@ namespace FCSCommon.Helpers
         //itemButton.BtnName = "ShippingContainer";
         //}
 
-        internal void ClearPage()
+        public void ClearPage()
         {
             if (_itemsGrid == null) return;
 
@@ -144,7 +144,7 @@ namespace FCSCommon.Helpers
             }
         }
 
-        internal void UpdaterPaginator(int count)
+        public void UpdaterPaginator(int count)
         {
             CalculateNewMaxPages(count);
             if (_pageNumberText == null) return;
@@ -161,7 +161,7 @@ namespace FCSCommon.Helpers
             }
         }
     }
-    internal struct DisplayData
+    public struct DisplayData
     {
         public GameObject ItemsPrefab { get; set; }
         public GameObject ItemsGrid { get; set; }

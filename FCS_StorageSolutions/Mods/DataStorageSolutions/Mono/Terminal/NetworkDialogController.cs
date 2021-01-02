@@ -1,6 +1,5 @@
 ﻿using FCS_AlterraHub.Mono;
 using FCS_StorageSolutions.Configuration;
-using FCSCommon.Components;
 using FCSCommon.Helpers;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -15,6 +14,8 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         {
             TextLineOne = AuxPatchers.GlobalNetwork();
             TextLineTwo = AuxPatchers.GlobalNetworkDesc();
+            STARTING_COLOR = Color.white;
+            HOVER_COLOR = new Color(0f,1f,1f,1f);
             _dialog = GameObjectHelpers.FindGameObject(root, "BaseList").EnsureComponent<BaseListController>();
             _dialog.Initialize(manager, displayController);
         }
@@ -28,6 +29,11 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         {
             base.OnPointerClick(pointerEventData);
             _dialog.ToggleVisibility();
+        }
+
+        public void Hide()
+        {
+            _dialog.Hide();
         }
     }
 }

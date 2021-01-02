@@ -229,6 +229,12 @@ namespace FCS_AlterraHub.Mono
             return false;
         }
 
+
+        public virtual bool IsUnderWater()
+        {
+            return transform.position.y < -1f;
+        }
+
         /// <summary>
         /// Remove items from the device from external sources.
         /// </summary>

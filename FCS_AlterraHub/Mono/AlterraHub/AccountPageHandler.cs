@@ -52,7 +52,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             {
                 if(decimal.TryParse(value,out decimal result))
                 {
-                    _newBalance.text = Buildables.AlterraHub.AccountNewBalanceFormat(CardSystem.main.AlterraBalance() - result);
+                    _newBalance.text = Buildables.AlterraHub.AccountNewBalanceFormat(CardSystem.main.AlterraBalance() + result);
                     _pendingPayment = result;
                 }
             });
@@ -117,7 +117,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
         {
             _paymentInput.text = string.Empty;
             _newBalance.text = Buildables.AlterraHub.AccountNewBalanceFormat(0);
-            _accountBalance.text = Buildables.AlterraHub.AccountNewBalanceFormat(0);
+            _accountBalance.text = Buildables.AlterraHub.AccountBalanceFormat(0);
             _debitBalance.text = Buildables.AlterraHub.DebitBalanceFormat(0);
         }
 

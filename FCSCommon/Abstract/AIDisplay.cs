@@ -14,39 +14,20 @@ namespace FCSCommon.Abstract
 
         public abstract bool FindAllComponents();
 
-        public virtual void ShutDownDisplay()
-        {
-            StartCoroutine(ShutDown());
-        }
-
         public virtual void PowerOnDisplay()
         {
-            StartCoroutine(PowerOn());
         }
 
-        public virtual void PowerOffDisplay()
+        public virtual void HibernateDisplay()
         {
-            StartCoroutine(PowerOff());
         }
 
-        public virtual IEnumerator PowerOff()
+        public virtual void TurnOnDisplay()
         {
-            return null;
         }
 
-        public virtual IEnumerator PowerOn()
+        public virtual void TurnOffDisplay()
         {
-            return null;
-        }
-
-        public virtual IEnumerator ShutDown()
-        {
-            return null;
-        }
-
-        public virtual IEnumerator CompleteSetup()
-        {
-            return null;
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Mono.ObjectPooler;
@@ -12,7 +13,6 @@ using FCS_ProductionSolutions.DeepDriller.Enumerators;
 using FCS_ProductionSolutions.DeepDriller.Models.Upgrades;
 using FCS_ProductionSolutions.DeepDriller.Structs;
 using FCSCommon.Abstract;
-using FCSCommon.Components;
 using FCSCommon.Enums;
 using FCSCommon.Helpers;
 using FCSCommon.Objects;
@@ -88,7 +88,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
                 _inventoryGrid.DrawPage(1);
                 _filterGrid.DrawPage(1);
                 UpdateDisplayValues();
-                PowerOnDisplay();
+                TurnOnDisplay();
                 InvokeRepeating(nameof(Updater), 0.5f, 0.5f);
                 _libraryGrid.DrawPage();
             }
@@ -129,13 +129,13 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             UpdateBatteryStatus(data);
         }
 
-        public override void PowerOnDisplay()
+        public override void TurnOnDisplay()
         {
             QuickLogger.Debug("Powering On Display!", true);
             GotoPage(FCSDeepDrillerPages.Boot);
         }
 
-        public override void PowerOffDisplay()
+        public override void TurnOffDisplay()
         {
             QuickLogger.Debug("Powering Off Display!", true);
             _mono.AnimationHandler.SetIntHash(_pageHash, 6);

@@ -17,6 +17,10 @@ namespace FCS_HomeSolutions.Configuration
         [JsonProperty] internal string Id { get; set; }
         [JsonProperty(PropertyName = "COL")] internal Vec4 Fcs { get; set; }
         [JsonProperty(PropertyName = "SCOL")] internal Vec4 Secondary { get; set; }
+        [JsonProperty(PropertyName = "ECOL")] internal Vec4 Emission { get; set; }
+        [JsonProperty(PropertyName = "VOL")] internal float Volume { get; set; }
+        [JsonProperty(PropertyName = "CHAN")] internal int Channel { get; set; }
+        [JsonProperty(PropertyName = "IsOn")] internal bool IsOn { get; set; }
     }
 
     [Serializable]

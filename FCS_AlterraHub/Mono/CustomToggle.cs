@@ -1,12 +1,12 @@
-﻿using FCSCommon.Enums;
-using FCSCommon.Utilities;
-using System;
+﻿using System;
 using System.Collections;
+using FCS_AlterraHub.Enumerators;
+using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace FCSCommon.Components
+namespace FCS_AlterraHub.Mono
 {
     /// <summary>
     /// This class is a component for all interface buttons except the color picker and the paginator.

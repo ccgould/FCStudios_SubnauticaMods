@@ -1,4 +1,5 @@
-﻿using FCS_AlterraHomeSolutions.Mono.PaintTool;
+﻿using System;
+using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
@@ -14,6 +15,12 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Antenna
         private bool _runStartUpOnEnable;
         private bool _fromSave;
         private DSSAntennaDataEntry _saveData;
+        public override bool IsOperational => IsInitialized && IsConstructed;
+        public override float GetPowerUsage()
+        {
+            if (Manager == null || !IsConstructed || Manager.GetBreakerState() || Manager.GetPowerState() != PowerSystem.Status.Normal) return 0f;
+            return 0.05f;
+        }
 
         private void Start()
         {

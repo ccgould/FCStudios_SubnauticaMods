@@ -93,6 +93,7 @@ namespace FCS_HomeSolutions.Mono.PaintTool
 
         private void Update()
         {
+            //TODO use te % operator to replace this watc unity videoplayer  tut in your youtube lib
             if (base.isDrawn && Input.GetKeyDown(QPatch.PaintToolConfiguration.SelectColorForwardKeyCode))
             {
                 _currentIndex += 1;

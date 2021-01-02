@@ -30,13 +30,52 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         private List<GameObject> _meters;
         private Text _storageAmount;
         private Image _percentageBar;
+        private GameObject _canvas;
         public override bool IsRack { get; } = true;
+        public override bool IsOperational => IsInitialized && IsConstructed;
+
+        public override float GetPowerUsage()
+        {
+            if (Manager == null || Manager.GetBreakerState() || !IsConstructed) return 0f;
+
+            return 0.01f + _slots.Count(x => x.Value != null && x.Value.IsOccupied) * 0.01f;
+        }
+
+        private void OnBreakerStateChanged(bool value)
+        {
+            UpdateScreenState();
+        }
+
+        private void OnPowerStateChanged(PowerSystem.Status obj)
+        {
+            UpdateScreenState();
+        }
+
+        private void UpdateScreenState()
+        {
+            if (Manager.GetBreakerState() || Manager.GetPowerState() != PowerSystem.Status.Normal)
+            {
+                if (_canvas.activeSelf)
+                {
+                    _canvas.SetActive(false);
+                }
+            }
+            else
+            {
+                if (!_canvas.activeSelf)
+                {
+                    _canvas.SetActive(true);
+                }
+            }
+        }
 
         public bool IsOpen => _targetPos > 0;
 
         private void Start()
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.DSSTabID, Mod.ModName);
+            Manager.OnPowerStateChanged += OnPowerStateChanged;
+            Manager.OnBreakerStateChanged += OnBreakerStateChanged;
             UpdateStorageCount();
         }
 
@@ -91,6 +130,8 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         public override void OnDestroy()
         {
             base.OnDestroy();
+            Manager.OnPowerStateChanged -= OnPowerStateChanged;
+            Manager.OnBreakerStateChanged -= OnBreakerStateChanged;
             _isBeingDestroyed = true;
         }
 
@@ -102,6 +143,8 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         public override void Initialize()
         {
             _storageAmount = gameObject.GetComponentInChildren<Text>();
+
+            _canvas = gameObject.GetComponentInChildren<Canvas>()?.gameObject;
 
             _slots = new Dictionary<string, DSSSlotController>();
             _meters = new List<GameObject>();
@@ -223,6 +266,15 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
 
         public override bool CanDeconstruct(out string reason)
         {
+            if (_slots != null)
+            {
+                if (_slots.Any(x => x.Value != null && x.Value.IsOccupied))
+                {
+                    reason = AuxPatchers.RackNotEmpty();
+                    return false;
+                }
+            }
+
             reason = string.Empty;
             return true;
         }
@@ -319,6 +371,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
 
         public void OnHandHover(GUIHand hand)
         {
+            if (!IsConstructed || !IsInitialized) return;
             HandReticle main = HandReticle.main;
             main.SetIcon(HandReticle.IconType.Hand);
             main.SetInteractText(IsOpen ? AuxPatchers.CloseWallServerRack() : AuxPatchers.OpenWallServerRack());
@@ -326,6 +379,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
 
         public void OnHandClick(GUIHand hand)
         {
+            if (!IsConstructed || !IsInitialized) return;
             if (IsOpen)
             {
                 Close();
@@ -440,5 +494,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
             return null;
 
         }
+
     }
 }

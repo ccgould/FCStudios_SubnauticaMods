@@ -1,9 +1,9 @@
-﻿using FCSCommon.Utilities;
-using System;
+﻿using System;
+using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace FCSCommon.Components
+namespace FCS_AlterraHub.Mono
 {
     /// <summary>
     /// This class handles operations for the color picker

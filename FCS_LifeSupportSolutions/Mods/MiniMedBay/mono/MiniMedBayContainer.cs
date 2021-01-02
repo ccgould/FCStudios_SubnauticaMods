@@ -1,7 +1,6 @@
 ﻿using FCS_AlterraHub.Helpers;
 using FCS_LifeSupportSolutions.Configuration;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Handlers;
 using UnityEngine;
 
 namespace FCS_LifeSupportSolutions.Mods.MiniMedBay.mono

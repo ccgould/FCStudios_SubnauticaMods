@@ -2,6 +2,6 @@
 {
     public interface ISlotController
     {
-        bool AddItemMountedItem(InventoryItem item);
+        bool AddItemToMountedServer(InventoryItem item);
     }
 }

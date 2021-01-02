@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
@@ -207,6 +208,7 @@ namespace FCS_AlterraHub.Configuration
                     }
                 }
 
+                newSaveData.BaseSaves = BaseManager.Save().ToList();
                 newSaveData.AccountDetails = CardSystem.main.SaveDetails();
 
                 _saveData = newSaveData;
@@ -273,6 +275,36 @@ namespace FCS_AlterraHub.Configuration
             }
 
             return new AlterraHubDataEntry() { Id = id };
+        }
+
+        internal static BaseSaveData GetBaseSaveData(string instanceId)
+        {
+            LoadData();
+
+            var saveData = GetSaveData();
+
+            if (saveData.BaseSaves == null) return null;
+
+            foreach (var entry in saveData.BaseSaves)
+            {
+                if (string.IsNullOrEmpty(entry.InstanceID)) continue;
+
+                if (entry.InstanceID == instanceId)
+                {
+                    return new BaseSaveData
+                    {
+                        BaseName = entry.BaseName,
+                        InstanceID = entry.InstanceID,
+                        AllowDocking = entry.AllowDocking,
+                        HasBreakerTripped = entry.HasBreakerTripped,
+                        BlackList = entry.BlackList
+    
+                    };
+                }
+            }
+
+
+            return null;
         }
     }
 

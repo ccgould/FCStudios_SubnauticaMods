@@ -1,4 +1,4 @@
-﻿using FCSCommon.Components;
+﻿using FCS_AlterraHub.Mono;
 using UnityEngine.UI;
 
 namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal

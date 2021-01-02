@@ -10,6 +10,7 @@ using FCS_HomeSolutions.MiniFountainFilter.Buildables;
 using FCS_HomeSolutions.Mods.AlienChief.Buildables;
 using FCS_HomeSolutions.Mods.Cabinets.Buildable;
 using FCS_HomeSolutions.Mods.LedLights.Buildable;
+using FCS_HomeSolutions.Mods.TV.Buildable;
 using FCS_HomeSolutions.QuantumTeleporter.Buildable;
 using FCS_HomeSolutions.SeaBreeze.Buildable;
 using FCS_HomeSolutions.Spawnables;
@@ -22,6 +23,7 @@ using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 using UnityEngine.UI;
+using Settings = FCS_HomeSolutions.Buildables.Settings;
 
 namespace FCS_HomeSolutions
 {
@@ -138,6 +140,8 @@ namespace FCS_HomeSolutions
             LoadCurtainTemplates();
 
             LoadCabinets();
+
+
 
             var harmony = new Harmony("com.homesolutions.fstudios");
             harmony.PatchAll(Assembly.GetExecutingAssembly());
@@ -320,6 +324,7 @@ namespace FCS_HomeSolutions
                     AllowedInBase = true,
                     AllowedOutside = false,
                     AllowedOnGround = true,
+                    AllowedInSub = true,
                     AllowedOnConstructables = true,
                     RotationEnabled = true,
                     Center = new Vector3(0f, 0.4615f, 0f),
@@ -336,6 +341,7 @@ namespace FCS_HomeSolutions
                     AllowedOutside = false,
                     AllowedOnGround = true,
                     RotationEnabled = true,
+                    AllowedInSub = true,
                     Size = new Vector3(0.6780548f, 2.636386f, 0.6340148f),
                     Center = new Vector3(69.55f, 1.381544f, 0f)
                 });
@@ -349,6 +355,7 @@ namespace FCS_HomeSolutions
                     AllowedInBase = true,
                     AllowedOutside = false,
                     AllowedOnGround = true,
+                    AllowedInSub = true,
                     AllowedOnConstructables = true,
                     RotationEnabled = true,
                     Size = new Vector3(0.6776733f, 1.692158f, 0.6340148f),
@@ -365,6 +372,7 @@ namespace FCS_HomeSolutions
                     AllowedInBase = true,
                     AllowedOutside = false,
                     AllowedOnGround = true,
+                    AllowedInSub = true,
                     AllowedOnConstructables = true,
                     RotationEnabled = true,
                     Size = new Vector3(2.814087f, 1.54613f, 0.6510811f),
@@ -380,6 +388,7 @@ namespace FCS_HomeSolutions
                     AllowedInBase = true,
                     AllowedOutside = false,
                     AllowedOnGround = true,
+                    AllowedInSub = true,
                     AllowedOnConstructables = true,
                     RotationEnabled = true,
                     Size = new Vector3(2.820679f, 1.546359f, 0.6349438f),
@@ -396,6 +405,7 @@ namespace FCS_HomeSolutions
                     AllowedOutside = false,
                     AllowedOnGround = true,
                     AllowedOnConstructables = true,
+                    AllowedInSub = true,
                     RotationEnabled = true,
                     Size = new Vector3(2.781815f, 0.8054426f, 0.6553071f),
                     Center = new Vector3(84.07667f, 0.5206897f, -0.01041579f)
@@ -411,12 +421,94 @@ namespace FCS_HomeSolutions
                     AllowedInBase = true,
                     AllowedOutside = false,
                     AllowedOnGround = true,
+                    AllowedInSub = true,
                     AllowedOnConstructables = true,
                     RotationEnabled = true,
                     Size = new Vector3(2.764771f, 0.7996328f, 0.6282197f),
                     Center = new Vector3(73.80698f, 0.5240374f, -0.01041579f)
                 });
             floorShelf07.Patch();
+
+            var tableSmartTV = new TVPatch("tableSmartTV", "Table Smart TV", "Table Smart TV",
+                ModelPrefab.GetPrefab("TableSmartTV"),
+                new Settings
+                {
+                    KitClassID = "tableSmartTV_kit",
+                    AllowedInBase = true,
+                    AllowedOutside = false,
+                    AllowedOnGround = true,
+                    AllowedOnConstructables = true,
+                    RotationEnabled = true,
+                    Size = new Vector3(1.820033f, 1.101903f, 0.08594985f),
+                    Center = new Vector3(-0.003967494f, 0.5916209f, 0.001384925f)
+                });
+            tableSmartTV.Patch();
+
+            var mountSmartTV = new TVPatch("mountSmartTV", "Mount Smart TV", "Wall Mounted Smart TV",
+                ModelPrefab.GetPrefab("MountSmartTV"),
+                new Settings
+                {
+                    KitClassID = "mountSmartTV_kit",
+                    AllowedInBase = true,
+                    AllowedOutside = false,
+                    AllowedOnGround = false,
+                    AllowedOnConstructables = true,
+                    AllowedOnWall = true,
+                    RotationEnabled = false,
+                    Size = new Vector3(1.818158f, 1.101903f, 0.08594985f),
+                    Center = new Vector3(-0.003030092f, -0.00144583f, 0.05641174f)
+                });
+            mountSmartTV.Patch();
+
+            var neonShelf01 = new DecorationEntryPatch("neonShelf01", "Neon Shelf 01", "A neat shelf",
+                ModelPrefab.GetPrefab("NeonShelf01"),
+                new Settings
+                {
+                    KitClassID = "neonShelf01_kit",
+                    AllowedInBase = true,
+                    AllowedOutside = false,
+                    AllowedOnGround = false,
+                    AllowedInSub = true,
+                    AllowedOnWall = true,
+                    AllowedOnConstructables = true,
+                    RotationEnabled = false,
+                    Size = new Vector3(1.997957f, 0.06401221f, 0.9870584f),
+                    Center = new Vector3(-2.488494e-05f, -0.01308646f, 0.5065421f)
+                });
+            neonShelf01.Patch();
+
+
+            var neonTable01 = new DecorationEntryPatch("neonTable01", "Neon Table 01", "A table",
+                ModelPrefab.GetPrefab("NeonTable01"),
+                new Settings
+                {
+                    KitClassID = "neonTable01_kit",
+                    AllowedInBase = true,
+                    AllowedOutside = false,
+                    AllowedOnGround = true,
+                    AllowedInSub = true,
+                    AllowedOnConstructables = true,
+                    RotationEnabled = true,
+                    Size = new Vector3(1.997957f, 0.8685947f, 2.000143f),
+                    Center = new Vector3(-2.488494e-05f, 0.5808856f, 0f)
+                });
+            neonTable01.Patch();
+
+            var neonTable02 = new DecorationEntryPatch("neonTable02", "Neon Table 02", "A table",
+                ModelPrefab.GetPrefab("NeonTable02"),
+                new Settings
+                {
+                    KitClassID = "neonTable02_kit",
+                    AllowedInBase = true,
+                    AllowedOutside = false,
+                    AllowedOnGround = true,
+                    AllowedInSub = true,
+                    AllowedOnConstructables = true,
+                    RotationEnabled = true,
+                    Size = new Vector3(1.997957f, 0.8685947f, 2.000143f),
+                    Center = new Vector3(-2.488494e-05f, 0.5808856f, 0f)
+                });
+            neonTable02.Patch();
 
             var observationTank = new ObservationTankBuildable();
             observationTank.Patch();

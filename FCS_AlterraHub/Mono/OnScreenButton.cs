@@ -2,23 +2,23 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace FCSCommon.Components
+namespace FCS_AlterraHub.Mono
 {
     /// <summary>
     /// Component that buttons on the power storage ui will inherit from. Handles working on whether something is hovered via IsHovered as well as interaction text. 
     /// </summary>
     /// <seealso cref="UnityEngine.MonoBehaviour" />
-    internal abstract class OnScreenButton : MonoBehaviour
+    public abstract class OnScreenButton : MonoBehaviour
     {
         protected bool IsHovered { get; set; }
-        internal string TextLineOne { get; set; }
-        internal string TextLineTwo { get; set; }
+        public string TextLineOne { get; set; }
+        public string TextLineTwo { get; set; }
         public bool GetAdditionalDataFromString { get; set; } = false;
         public Func<object, string> GetAdditionalString { get; set; }
         private bool isHoveredOutOfRange;
-        internal bool Disabled { get; set; }
+        public bool Disabled { get; set; }
         public virtual object Tag { get; set; }
-        internal float MaxInteractionRange { get; set; }  = 2.5f;
+        public float MaxInteractionRange { get; set; }  = 2.5f;
 
         public virtual void OnDisable()
         {

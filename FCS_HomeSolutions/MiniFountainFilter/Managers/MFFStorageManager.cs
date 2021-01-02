@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using FCS_HomeSolutions.Configuration;
 using FCS_HomeSolutions.MiniFountainFilter.Buildables;
 using FCS_HomeSolutions.MiniFountainFilter.Mono;
 using FCSCommon.Extensions;
@@ -162,6 +163,10 @@ namespace FCS_HomeSolutions.MiniFountainFilter.Managers
                 {
                     GameObject.Destroy(pickup);
                 }
+            }
+            else
+            {
+                QuickLogger.ModMessage(AuxPatchers.NotEnoughWaterForBottle());
             }
         }
         

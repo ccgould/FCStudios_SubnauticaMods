@@ -60,6 +60,9 @@ namespace FCS_HomeSolutions.Configuration
             { $"{ModKey}_CookerInventoryFull","Alien Chef inventory is full canceling"},
             { $"{ModKey}_ClickToRotate","Click to rotate"},
             { $"{ModKey}_PressToToggleLight","Press {0} to toggle led light."},
+            { $"{ModKey}_TVFormat","Press {0} to turn on/off tv."},
+            { $"{ModKey}_TVFormat2","Press {0}/{1} for volume and {2}/{3} for channel"},
+            { $"{ModKey}_NotEnoughWaterForBottle","Not enough water for bottle please wait for 50% tank level or more"},
         };
 
         internal static void AdditionalPatching()
@@ -314,6 +317,21 @@ namespace FCS_HomeSolutions.Configuration
         public static string PressToToggleLightFormat(string message)
         {
             return string.Format(GetLanguage($"{ModKey}_PressToToggleLight"),message);
+        }
+
+        public static string TVFormat(string key)
+        {
+            return string.Format(GetLanguage($"{ModKey}_TVFormat"),key);
+        }
+
+        public static string TVFormatContinued(string volUp,string volDown,string chanUp,string chanDown)
+        {
+            return string.Format(GetLanguage($"{ModKey}_TVFormat2"),volUp,volDown,chanUp,chanDown);
+        }
+
+        public static string NotEnoughWaterForBottle()
+        {
+            return GetLanguage($"{ModKey}_NotEnoughWaterForBottle");
         }
     }
 }

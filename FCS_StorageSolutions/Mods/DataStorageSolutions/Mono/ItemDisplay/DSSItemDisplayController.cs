@@ -1,5 +1,4 @@
-﻿using System;
-using FCS_AlterraHomeSolutions.Mono.PaintTool;
+﻿using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Interfaces;
@@ -8,7 +7,6 @@ using FCS_AlterraHub.Registration;
 using FCS_StorageSolutions.Configuration;
 using FCS_StorageSolutions.Helpers;
 using FCS_StorageSolutions.Mods.AlterraStorage.Buildable;
-using FCSCommon.Components;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -27,13 +25,57 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.ItemDisplay
         internal TechType currentItem;
         private NetworkDumpStorage _networkDump;
         private InterfaceButton _resetBTN;
+        private GameObject _canvas;
+        public override bool IsOperational => IsInitialized && IsConstructed;
+        public override float GetPowerUsage()
+        {
+            if (Manager == null || !IsConstructed || Manager.GetBreakerState()) return 0f;
+            return 0.01f;
+        }
+
+        private void OnBreakerStateChanged(bool value)
+        {
+            UpdateScreenState();
+        }
+
+        private void OnPowerStateChanged(PowerSystem.Status obj)
+        {
+            UpdateScreenState();
+        }
+
+        private void UpdateScreenState()
+        {
+            if (Manager.GetBreakerState() || Manager.GetPowerState() != PowerSystem.Status.Normal)
+            {
+                if (_canvas.activeSelf)
+                {
+                    _canvas.SetActive(false);
+                }
+            }
+            else
+            {
+                if (!_canvas.activeSelf)
+                {
+                    _canvas.SetActive(true);
+                }
+            }
+        }
 
         private void Start()
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.DSSTabID, Mod.ModName);
             _networkDump.Initialize(Manager);
+            Manager.OnPowerStateChanged += OnPowerStateChanged;
+            Manager.OnBreakerStateChanged += OnBreakerStateChanged;
         }
-        
+
+        public override void OnDestroy()
+        {
+            base.OnDestroy();
+            Manager.OnPowerStateChanged -= OnPowerStateChanged;
+            Manager.OnBreakerStateChanged -= OnBreakerStateChanged;
+        }
+
         private void OnEnable()
         {
             if (!_runStartUpOnEnable) return;
@@ -69,6 +111,9 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.ItemDisplay
         
         public override void Initialize()
         {
+            _canvas = gameObject.GetComponentInChildren<Canvas>()?.gameObject;
+
+
             if (_colorManager == null)
             {
                 _colorManager = gameObject.AddComponent<ColorManager>();
@@ -233,66 +278,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.ItemDisplay
             Refresh();
             PlayerInteractionHelper.GivePlayerItem(item);
             return true;
-        }
-    }
-
-    internal class NetworkDumpStorage : MonoBehaviour, IFCSDumpContainer
-    {
-        private DumpContainerSimplified _dumpContainer;
-        private BaseManager _manager;
-
-        internal void Initialize(BaseManager manager)
-        {
-            _manager = manager;
-            if (_dumpContainer == null)
-            {
-                _dumpContainer = gameObject.AddComponent<DumpContainerSimplified>();
-                _dumpContainer.Initialize(transform, AuxPatchers.AddItemToItemDisplay(), this, 6, 8, "NetworkItemDisplayNetworkDump");
-            }
-        }
-        
-        public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
-        {
-            if (_manager == null) return false;
-            QuickLogger.Debug($"Checking if allowed {_dumpContainer.GetItemCount() + 1}", true);
-
-            //TODO Check filter first
-
-
-            int availableSpace = 0;
-            foreach (IDSSRack baseRack in _manager.BaseRacks)
-            {
-                availableSpace += baseRack.GetFreeSpace();
-            }
-
-            var result = availableSpace >= _dumpContainer.GetItemCount() + 1;
-            QuickLogger.Debug($"Allowed result: {result}", true);
-            return result;
-        }
-
-        public bool AddItemToContainer(InventoryItem item)
-        {
-            try
-            {
-                var result = BaseManager.AddItemToNetwork(item,_manager);
-                if (!result)
-                {
-                    PlayerInteractionHelper.GivePlayerItem(item);
-                }
-            }
-            catch (Exception e)
-            {
-                QuickLogger.Debug(e.Message, true);
-                QuickLogger.Debug(e.StackTrace);
-                PlayerInteractionHelper.GivePlayerItem(item);
-                return false;
-            }
-            return true;
-        }
-
-        public void OpenStorage()
-        {
-            _dumpContainer.OpenStorage();
         }
     }
 }

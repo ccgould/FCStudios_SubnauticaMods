@@ -22,7 +22,16 @@ namespace FCS_AlterraHub.Mono
      */
     public class BaseManager : IFCSDumpContainer
     {
-        private bool _hasBreakerTripped;
+        private bool HasBreakerTripped
+        {
+            get => _hasBreakerTripped;
+            set
+            {
+                _hasBreakerTripped = value;
+                OnBreakerStateChanged?.Invoke(value);
+            }
+        }
+
         private string _baseName;
         public string BaseID { get; set; }
         public static Action<BaseManager> OnManagerCreated { get; set; }
@@ -60,6 +69,10 @@ namespace FCS_AlterraHub.Mono
         public Action<PowerSystem.Status> OnPowerStateChanged { get; set; }
         public bool IsBaseExternalLightsActivated { get; set; }
         public List<IDSSRack> BaseRacks { get; set; } = new List<IDSSRack>();
+        public DSSVehicleDockingManager DockingManager { get; set; }
+        public bool PullFromDockedVehicles { get; set; }
+        public List<TechType> DockingBlackList { get; set; } = new List<TechType>();
+        public Action<bool> OnBreakerStateChanged { get; set; }
 
         #region Default Constructor
 
@@ -70,7 +83,6 @@ namespace FCS_AlterraHub.Mono
             BaseID = habitat.gameObject.gameObject?.GetComponentInChildren<PrefabIdentifier>()?.Id;
             _registeredDevices = new Dictionary<string, FcsDevice>();
             _baseTechLights = new Dictionary<string, TechLight>();
-            _baseName = GetDefaultName();
             Initialize(habitat);
             Player_Patch.OnPlayerUpdate += PowerConsumption;
             Player_Patch.OnPlayerUpdate += PowerStateCheck;
@@ -79,17 +91,38 @@ namespace FCS_AlterraHub.Mono
 
         private void Initialize(SubRoot habitat)
         {
+            _savedData = Mod.GetBaseSaveData(BaseID);
+
             if (NameController == null)
             {
                 NameController = new NameController();
                 NameController.Initialize(Buildables.AlterraHub.Submit(), Buildables.AlterraHub.ChangeBaseName());
+                _baseName = string.IsNullOrEmpty(_savedData?.InstanceID) ? GetDefaultName() : _savedData?.BaseName;
+                QuickLogger.Debug($"Setting Base Name: {_baseName}");
+                NameController.SetCurrentName(_baseName);
                 NameController.OnLabelChanged += OnLabelChangedMethod;
+            }
+
+            if (_savedData != null)
+            {
+                DockingBlackList = _savedData.BlackList;
+                PullFromDockedVehicles = _savedData.AllowDocking;
+                HasBreakerTripped = _savedData.HasBreakerTripped;
             }
 
             if (_dumpContainer == null)
             {
                 _dumpContainer = habitat.gameObject.EnsureComponent<DumpContainerSimplified>();
                 _dumpContainer.Initialize(habitat.gameObject.transform, $"Add item to base: {GetBaseName()}", this, 6, 8, habitat.gameObject.name);
+            }
+
+            if (DockingManager == null)
+            {
+                DockingManager = habitat.gameObject.AddComponent<DSSVehicleDockingManager>();
+                DockingManager.Initialize(this);
+                
+                //TODO ReEnable
+                //DockingManager.ToggleIsEnabled(_savedData?.AllowDocking ?? false);
             }
         }
 
@@ -108,16 +141,21 @@ namespace FCS_AlterraHub.Mono
             }
         }
 
+        public PowerSystem.Status GetPowerState()
+        {
+            return Habitat.powerRelay.GetPowerStatus();
+        }
+
         #endregion
 
         public void ToggleBreaker()
         {
             if (HasAntenna())
             {
-                SendBaseMessage(_hasBreakerTripped);
+                SendBaseMessage(HasBreakerTripped);
             }
 
-            _hasBreakerTripped = !_hasBreakerTripped;
+            HasBreakerTripped = !HasBreakerTripped;
         }
 
         private static BaseManager CreateNewManager(SubRoot habitat)
@@ -194,6 +232,7 @@ namespace FCS_AlterraHub.Mono
         public void SetBaseName(string baseName)
         {
             _baseName = baseName;
+            GlobalNotifyByID(String.Empty, "BaseUpdate");
         }
 
         /// <summary>
@@ -270,7 +309,14 @@ namespace FCS_AlterraHub.Mono
         public void UnRegisterDevice(FcsDevice device)
         {
             if (device != null && !string.IsNullOrWhiteSpace(device.UnitID) && _registeredDevices.ContainsKey(device.UnitID))
+            {
+                if (device.IsRack)
+                {
+                    BaseRacks.Remove((IDSSRack)device);
+                }
+
                 _registeredDevices?.Remove(device.UnitID);
+            }
         }
 
         public void UnRegisterDevice(TechLight device)
@@ -294,9 +340,32 @@ namespace FCS_AlterraHub.Mono
             }
         }
 
+        /// <summary>
+        /// Checks to see if the device is registered at base doesnt take in count of being contructed
+        /// </summary>
+        /// <param name="tabID"></param>
+        /// <returns></returns>
         public bool DeviceBuilt(string tabID)
         {
             return _registeredDevices.Any(x => x.Key.StartsWith(tabID, StringComparison.OrdinalIgnoreCase));
+        }
+
+        /// <summary>
+        /// Checks to see if the device is registered at base and take in count of being constructed
+        /// </summary>
+        /// <param name="tabID"></param>
+        /// <param name="device">Found device</param>
+        /// <returns></returns>
+        public bool DeviceBuilt(string tabID, out IEnumerable<KeyValuePair<string, FcsDevice>> device)
+        {
+            if (DeviceBuilt(tabID))
+            {
+                device = _registeredDevices.Where(x => x.Key.StartsWith(tabID, StringComparison.OrdinalIgnoreCase) && x.Value.IsConstructed);
+                return device.Any();
+            }
+            
+            device = null;
+            return false;
         }
 
         public void NotifyByID(string modID, string commandMessage)
@@ -422,46 +491,115 @@ namespace FCS_AlterraHub.Mono
             return false;
         }
 
-        public Pickupable TakeItem(TechType techType)
+        public Pickupable TakeItem(TechType techType, StorageLocation storageFilter = StorageLocation.All)
         {
-            foreach (IDSSRack baseRack in BaseRacks)
+
+
+            if (storageFilter == StorageLocation.Servers || storageFilter == StorageLocation.All)
             {
-                if (baseRack.HasItem(techType))
+                foreach (IDSSRack baseRack in BaseRacks)
                 {
-                    return baseRack.RemoveItemFromRack(techType);
+                    if (baseRack.HasItem(techType))
+                    {
+                        return baseRack.RemoveItemFromRack(techType);
+                    }
                 }
             }
 
 
-            foreach (StorageContainer locker in BaseStorageLockers)
+            if (storageFilter == StorageLocation.StorageLockers || storageFilter == StorageLocation.All)
             {
-                if(locker.container.Contains(techType))
+                foreach (StorageContainer locker in BaseStorageLockers)
                 {
-                    return locker.container.RemoveItem(techType);
+                    if (locker.container.Contains(techType))
+                    {
+                        return locker.container.RemoveItem(techType);
+                    }
                 }
             }
 
-            foreach (FcsDevice device in BaseFcsStorage)
+
+            if (storageFilter == StorageLocation.AlterraStorage || storageFilter == StorageLocation.All)
             {
-                if (device.GetStorage().ItemsContainer.Contains(techType))
+                foreach (FcsDevice device in BaseFcsStorage)
                 {
-                    return device.RemoveItemFromContainer(techType);
+                    if (device.GetStorage().ItemsContainer.Contains(techType))
+                    {
+                        return device.RemoveItemFromContainer(techType);
+                    }
                 }
+            }
+            
+            return null;
+        }
+
+        private Dictionary<TechType, int> _item = new Dictionary<TechType, int>();
+        private BaseSaveData _savedData;
+        private bool _hasBreakerTripped;
+
+        public Dictionary<TechType, int> GetItemsWithin(StorageLocation location = StorageLocation.All)
+        {
+            _item.Clear();
+
+            switch (location)
+            {
+                case StorageLocation.All:
+                    return TrackedResources.ToDictionary(x => x.Key, x => x.Value.Amount);
+                case StorageLocation.Servers:
+                    foreach (KeyValuePair<TechType, TrackedResource> resource in TrackedResources)
+                    {
+                        foreach (FcsDevice device in resource.Value.Servers)
+                        {
+                            CalculateItems(_item, resource, device);
+                        }
+                    }
+                    return _item;
+                case StorageLocation.StorageLockers:
+                    foreach (KeyValuePair<TechType, TrackedResource> resource in TrackedResources)
+                    {
+                        foreach (StorageContainer device in resource.Value.StorageContainers)
+                        {
+                            if (_item.ContainsKey(resource.Key))
+                            {
+                                _item[resource.Key] += device.container.GetCount(resource.Key);
+                            }
+                            else
+                            {
+                                _item.Add(resource.Key, device.container.GetCount(resource.Key));
+                            }
+                        }
+                    }
+                    return _item;
+                case StorageLocation.AlterraStorage:
+                    foreach (KeyValuePair<TechType, TrackedResource> resource in TrackedResources)
+                    {
+                        foreach (FcsDevice device in resource.Value.AlterraStorage)
+                        {
+                            CalculateItems(_item, resource, device);
+                        }
+                    }
+                    return _item;
             }
 
             return null;
         }
 
-        public Dictionary<TechType, int> GetItemsWithin()
+        private static void CalculateItems(Dictionary<TechType, int> item, KeyValuePair<TechType, TrackedResource> resource, FcsDevice device)
         {
-            return TrackedResources.ToDictionary(x => x.Key, x => x.Value.Amount);
+            if (item.ContainsKey(resource.Key))
+            {
+                item[resource.Key] += device.GetStorage().ItemsContainer.GetCount(resource.Key);
+            }
+            else
+            {
+                item.Add(resource.Key, device.GetStorage().ItemsContainer.GetCount(resource.Key));
+            }
         }
 
         public bool ContainsItem(TechType techType)
         {
             return TrackedResources.ContainsKey(techType);
         }
-
 
         public void AddItemsToTracker(FcsDevice server,TechType item, int amountToAdd = 1)
         {
@@ -569,9 +707,7 @@ namespace FCS_AlterraHub.Mono
         {
             AddItemsToTracker(server, item.item.GetTechType());
         }
-
-
-
+        
         #region Storage Containers
 
         public void AlertNewStorageContainerPlaced(StorageContainer sc)
@@ -709,12 +845,11 @@ namespace FCS_AlterraHub.Mono
 
         #endregion
 
-        public int GetTotal()
+        public int GetTotal(StorageLocation location)
         {
-            return GetItemsWithin().Sum(x=>x.Value);
+            return GetItemsWithin(location).Sum(x=>x.Value);
         }
-
-
+        
         internal void RegisterAntenna(FcsDevice unit)
         {
             if (!BaseAntennas.Contains(unit) && unit.IsConstructed)
@@ -762,12 +897,14 @@ namespace FCS_AlterraHub.Mono
             if (!BaseAntennas.Contains(fcsDevice))
             {
                 BaseAntennas.Add(fcsDevice);
+                GlobalNotifyByID(String.Empty, "BaseUpdate");
             }
         }
 
         public void AlertNewAntennaDestroyed(FcsDevice fcsDevice)
         {
             BaseAntennas.Remove(fcsDevice);
+            GlobalNotifyByID(String.Empty, "BaseUpdate");
         }
 
         public void OpenBaseStorage()
@@ -821,13 +958,55 @@ namespace FCS_AlterraHub.Mono
                 {
                     if (baseRack.ItemAllowed(item, out var server))
                     {
-                        server?.AddItemMountedItem(item);
+                        server?.AddItemToMountedServer(item);
                         return true;
                     }
                 }
             }
             return false;
         }
+
+        public bool IsFilterAddedWithType(TechType techType)
+        {
+            return DockingBlackList.Contains(techType);
+        }
+
+        public static IEnumerable<BaseSaveData> Save()
+        {
+            foreach (BaseManager baseManager in Managers)
+            {
+                yield return new BaseSaveData
+                {
+                    InstanceID = baseManager.BaseID,
+                    BaseName = baseManager.GetBaseName(),
+                    AllowDocking = baseManager.PullFromDockedVehicles,
+                    HasBreakerTripped = baseManager.HasBreakerTripped,
+                    BlackList = baseManager.DockingBlackList
+                };
+            }
+        }
+
+        public bool GetBreakerState()
+        {
+            return HasBreakerTripped;
+        }
+    }
+
+    public class BaseSaveData
+    {
+        public string InstanceID { get; set; }
+        public string BaseName { get; set; }
+        public bool AllowDocking { get; set; }
+        public bool HasBreakerTripped { get; set; }
+        public List<TechType> BlackList { get; set; }
+    }
+
+    public enum StorageLocation
+    {
+        All,
+        Servers,
+        StorageLockers,
+        AlterraStorage
     }
 
     public struct TrackedLight

@@ -22,9 +22,7 @@ namespace FCS_EnergySolutions.JetStreamT242.Mono
         private RotorHandler _tilter;
         private RotorHandler _rotor;
         private Text _unitID;
-
-        private IFCSAlterraHubService publicApi => FCSAlterraHubService.PublicAPI;
-
+        
         #region Unity Methods       
 
         private void Start()

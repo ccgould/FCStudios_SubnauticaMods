@@ -1,4 +1,5 @@
-﻿using FCSCommon.Utilities;
+﻿using System.Collections.Generic;
+using FCSCommon.Utilities;
 using SMLHelper.V2.Json;
 using SMLHelper.V2.Options;
 using SMLHelper.V2.Options.Attributes;
@@ -26,5 +27,15 @@ namespace FCS_StorageSolutions.Configuration
                 QuickLogger.Info("Debug logs disabled");
             }
         }
+    }
+
+    //[Menu("FCS Storage Solutions Menu")]
+    public class DSSConfig : ConfigFile
+    {
+        public DSSConfig() : base("dataStorageSolutions-config", "Configurations") { }
+
+        //[Toggle("Pull From Vehicles")]
+        //public bool PullFromDockedVehicles = false;
+
     }
 }

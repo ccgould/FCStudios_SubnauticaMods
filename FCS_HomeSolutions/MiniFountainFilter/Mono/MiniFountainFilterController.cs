@@ -231,30 +231,37 @@ namespace FCS_HomeSolutions.MiniFountainFilter.Mono
             newSaveData.MiniFountainFilterEntries.Add(_saveData);
         }
 
-        internal bool IsUnderwater()
+        public override bool IsUnderWater()
         {
             if (_isInSub) return true;
-
-            return base.transform.position.y < -1f;
+            if (Manager.DeviceBuilt("BUU", out var device))
+            {
+                foreach (KeyValuePair<string, FcsDevice> pair in device)
+                {
+                    if(pair.Value != null && pair.Value.IsUnderWater())
+                        return true;
+                }
+            }
+            return base.IsUnderWater();
         }
-
+        
         private void UpdateSystem()
         {
             if (!IsInitialized) return;
 
             if (!IsConstructed || PowerManager.GetPowerState() != FCSPowerStates.Powered && _isOperational)
             {
-                DisplayManager.PowerOffDisplay();
+                DisplayManager.TurnOffDisplay();
                 _isOperational = false;
             }
             
-            if (!IsUnderwater() && _isOperational)
+            if (!IsUnderWater() && _isOperational)
             {
                 DisplayManager.AboveWaterMessage();
                 _isOperational = false;
             }
 
-            if (PowerManager.GetPowerState() == FCSPowerStates.Powered && IsUnderwater() && !_isOperational)
+            if (PowerManager.GetPowerState() == FCSPowerStates.Powered && IsUnderWater() && !_isOperational)
             {
                 AudioManager.PlayMachineAudio();
                 AnimationManager.SetBoolHash(_isRunning, true);

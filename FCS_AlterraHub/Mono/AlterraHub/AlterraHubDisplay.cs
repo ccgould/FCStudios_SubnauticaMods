@@ -202,7 +202,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             _homePage.SetActive(true);
         }
 
-        public override void PowerOffDisplay()
+        public override void HibernateDisplay()
         {
             _homePage.SetActive(false);
         }

@@ -10,6 +10,7 @@ using FCSCommon.Enums;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using System;
+using FCS_AlterraHub.Enumerators;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -83,7 +84,7 @@ namespace FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Mono
             _isRunningHash = Animator.StringToHash("IsRunning");
 
             _fanMotor = GameObjectHelpers.FindGameObject(gameObject, "FanRotor").AddComponent<MotorHandler>();
-            _fanMotor.Initialize(30);
+            _fanMotor.Initialize(200);
 
             _bubbles = gameObject.GetComponentsInChildren<ParticleSystem>();
 
@@ -110,7 +111,7 @@ namespace FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Mono
                 OxygenManager.Initialize(this);
                 OxygenManager.OnOxygenUpdated += (amount, percentage) =>
                 {
-                    _percent.text = $"{Mathf.RoundToInt(percentage) * 100}%";
+                    _percent.text = $"{percentage:P0}";
                     _percentBar.fillAmount = percentage;
                 };
             }

@@ -5,6 +5,7 @@
         Seamoth = 0,
         Prawn = 1,
         Current = 2,
-        HUB = 3
+        HUB = 3,
+        Cyclops = 4
     }
 }

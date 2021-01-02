@@ -34,6 +34,7 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Buildable
         public static GameObject DSSTerminalPrefab { get; set; }
         public static GameObject DSSFormattingStationPrefab { get; set; }
         public static GameObject DSSInventoryItemPrefab { get; set; }
+        public static GameObject FilterItemPrefab { get; set; }
 
 
         internal static void Initialize()
@@ -59,6 +60,7 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Buildable
             DSSItemDisplayPrefab = GetPrefab(Mod.DSSItemDisplayPrefabName);
             DSSInventoryItemPrefab = GetPrefab("DSSInventoryItem");
             DSSAvaliableVehiclesItemPrefab = GetPrefab("AvaliableVehiclesItem");
+            FilterItemPrefab = GetPrefab("FilterItem");
         }
         
         internal static GameObject GetPrefab(string prefabName)

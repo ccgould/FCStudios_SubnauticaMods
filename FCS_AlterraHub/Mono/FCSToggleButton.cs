@@ -1,9 +1,8 @@
-﻿using FCSCommon.Enums;
-using UnityEngine.EventSystems;
+﻿using UnityEngine.EventSystems;
 
-namespace FCSCommon.Components
+namespace FCS_AlterraHub.Mono
 {
-    internal class FCSToggleButton : InterfaceButton
+    public class FCSToggleButton : InterfaceButton
     {
         public override void OnEnable()
         {

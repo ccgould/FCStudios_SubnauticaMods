@@ -302,12 +302,12 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         {
             if (GetPowerState() == FCSPowerStates.Tripped)
             {
-                _mono.DisplayHandler.PowerOnDisplay();
+                _mono.DisplayHandler.TurnOnDisplay();
                 _mono.DeepDrillerPowerManager.SetPowerState(FCSPowerStates.Powered);
             }
             else
             {
-                _mono.DisplayHandler.PowerOffDisplay();
+                _mono.DisplayHandler.TurnOffDisplay();
                 _mono.DeepDrillerPowerManager.SetPowerState(FCSPowerStates.Tripped);
             }
         }
