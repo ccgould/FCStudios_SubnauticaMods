@@ -17,10 +17,7 @@ namespace FCS_StorageSolutions.Patches
                 try
                 {
                     var manager = BaseManager.FindManager(__instance.subRoot);
-                    if (manager != null)
-                    {
-                        manager.DockingManager.RegisterDockingBay(__instance);
-                    }
+                    manager?.DockingManager.RegisterDockingBay(__instance);
                 }
                 catch (Exception e)
                 {
@@ -38,8 +35,10 @@ namespace FCS_StorageSolutions.Patches
             {
                 try
                 {
+                    if (__instance.subRoot == null) return;
                     var manager = BaseManager.FindManager(__instance.subRoot);
-                    if (manager != null)
+                    
+                    if (manager?.DockingManager != null)
                     {
                         manager.DockingManager.UnRegisterDockingBay(__instance);
                     }

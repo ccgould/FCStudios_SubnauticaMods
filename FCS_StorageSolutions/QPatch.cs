@@ -18,7 +18,6 @@ namespace FCS_StorageSolutions
     public class QPatch
     {
         internal static Config Configuration { get; } = OptionsPanelHandler.Main.RegisterModOptions<Config>();
-        internal static DSSConfig DSSConfiguration { get; } = OptionsPanelHandler.Main.RegisterModOptions<DSSConfig>();
         public static bool IsDockedVehicleStorageAccessInstalled { get; set; }
 
         [QModPatch]

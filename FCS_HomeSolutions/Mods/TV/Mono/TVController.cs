@@ -51,8 +51,11 @@ namespace FCS_HomeSolutions.Mods.TV.Mono
 
         public override void OnDestroy()
         {
+            if (Manager != null)
+            {
+                Manager.OnPowerStateChanged -= OnPowerStateChanged;
+            }
             base.OnDestroy();
-            Manager.OnPowerStateChanged -= OnPowerStateChanged;
         }
 
         public override Vector3 GetPosition()
@@ -219,7 +222,6 @@ namespace FCS_HomeSolutions.Mods.TV.Mono
             QuickLogger.Debug($"Loaded: {_videoLocations.Count}.",true);
         }
 
-
         private void Play()
         {
             _video.Play();
@@ -286,7 +288,6 @@ namespace FCS_HomeSolutions.Mods.TV.Mono
 
             ForceChannel();
         }
-
 
         public override void OnProtoSerialize(ProtobufSerializer serializer)
         {

@@ -39,6 +39,8 @@ namespace FCS_StorageSolutions.Configuration
             { $"{ModKey}_FilterCategoryName","Category: {0}"},
             { $"{ModKey}_MoonpoolSettings","Moonpool Settings"},
             { $"{ModKey}_AddToBlackList","Add item to blacklist"},
+            { $"{ModKey}_CraftFormatted","Add {0} to queue"},
+            { $"{ModKey}_EnterAmount","Enter Amount"},
         };
         
         internal static void AdditionalPatching()
@@ -217,6 +219,16 @@ namespace FCS_StorageSolutions.Configuration
         public static string AddToBlackList()
         {
             return GetLanguage($"{ModKey}_AddToBlackList");
+        }
+
+        public static string CraftFormatted(string name)
+        {
+            return string.Format(GetLanguage($"{ModKey}_CraftFormatted"),name);
+        }
+
+        public static string EnterAmount()
+        {
+            return GetLanguage($"{ModKey}_EnterAmount");
         }
     }
 }

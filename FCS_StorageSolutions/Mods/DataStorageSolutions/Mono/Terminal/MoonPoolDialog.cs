@@ -19,15 +19,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
 
         internal void Initialize(BaseManager baseManager, DSSTerminalDisplayManager mono)
         {
-            _baseManager = baseManager;
-            _mono = mono;
-            _label = gameObject.GetComponentInChildren<Text>();
             _grid = GameObjectHelpers.FindGameObject(gameObject, "Grid");
-            _vehicleGrid = _grid.EnsureComponent<GridHelperV2>();
-            _vehicleGrid.OnLoadDisplay += OnLoadItemsGrid;
-            _vehicleGrid.Setup(8, gameObject, Color.gray, Color.white, null);
-            
-            mono.GetController().IPCMessage += IpcMessage;
 
             foreach (Transform child in _grid.transform)
             {
@@ -36,6 +28,16 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                 _trackedVehicles.Add(vehicleButton);
             }
 
+            _baseManager = baseManager;
+            
+            _mono = mono;
+            _label = gameObject.GetComponentInChildren<Text>();
+            _vehicleGrid = _grid.EnsureComponent<GridHelperV2>();
+            _vehicleGrid.OnLoadDisplay += OnLoadItemsGrid;
+            _vehicleGrid.Setup(8, gameObject, Color.gray, Color.white, null);
+            
+            mono.GetController().IPCMessage += IpcMessage;
+            
             _vehicleGrid.DrawPage();
         }
 
@@ -58,6 +60,8 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         {
             try
             {
+                if(_trackedVehicles?.Count == 0) return;
+
                 var grouped = _baseManager.DockingManager.Vehicles;
                 
                 if (data.EndPosition > grouped.Count)
@@ -65,14 +69,13 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                     data.EndPosition = grouped.Count;
                 }
 
-                QuickLogger.Debug($"// ====== Resetting Vehicle Grid {grouped.Count} || TV{_trackedVehicles.Count} || MP{data.MaxPerPage - 1}====== //");
+                QuickLogger.Debug($"// ====== Resetting Vehicle Grid {grouped.Count} || Tracked Vehicles {_trackedVehicles.Count} || Max Per Page{data.MaxPerPage}====== //");
                 for (int i = data.EndPosition; i < data.MaxPerPage; i++)
                 {
                     _trackedVehicles[i].Reset();
                     QuickLogger.Debug($"Reset index {i}");
                 }
                 QuickLogger.Debug("// ====== Resetting Vehicle Grid ====== //");
-
 
                 QuickLogger.Debug("// ====== Setting Vehicle Grid ====== //");
                 for (int i = data.StartPosition; i < data.EndPosition; i++)

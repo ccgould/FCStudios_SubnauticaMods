@@ -197,6 +197,8 @@ namespace FCS_StorageSolutions.Configuration
             }
         };
 
+        public static List<TechType> Craftables { get; set; } = new List<TechType>();
+
         internal const string ModDescription = "";
 
         internal static event Action<SaveData> OnDataLoaded;

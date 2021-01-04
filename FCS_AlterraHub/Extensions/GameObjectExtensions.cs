@@ -5,7 +5,7 @@ namespace FCS_AlterraHub.Extensions
 {
     public static class GameObjectExtensions
     {
-        public static GameObject[] getChildren(GameObject parent, bool recursive = false)
+        public static GameObject[] GetChildren(GameObject parent, bool recursive = false)
         {
             List<GameObject> items = new List<GameObject>();
             for (int i = 0; i < parent.transform.childCount; i++)
@@ -13,7 +13,7 @@ namespace FCS_AlterraHub.Extensions
                 items.Add(parent.transform.GetChild(i).gameObject);
                 if (recursive)
                 { // set true to go through the hiearchy.
-                    items.AddRange(getChildren(parent.transform.GetChild(i).gameObject, recursive));
+                    items.AddRange(GetChildren(parent.transform.GetChild(i).gameObject, recursive));
                 }
             }
             return items.ToArray();

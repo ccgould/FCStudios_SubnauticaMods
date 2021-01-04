@@ -70,7 +70,7 @@ namespace FCS_AlterraHub.Configuration
             Ingredients =
             {
                 new Ingredient(TechType.Glass, 2),
-                new Ingredient(TechType.Titanium, 5),
+                new Ingredient(TechType.TitaniumIngot, 1),
                 new Ingredient(TechType.WiringKit, 1),
                 new Ingredient(TechType.ComputerChip, 1)
             }

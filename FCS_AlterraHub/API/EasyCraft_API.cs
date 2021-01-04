@@ -42,11 +42,11 @@ namespace FCS_AlterraHub.API
 		public static void Init(Harmony harmony)
 		{
 			EasyCraft = QModServices.Main.FindModById("EasyCraft");
-			Assembly assembly = EasyCraft.LoadedAssembly;
+            Assembly assembly = EasyCraft?.LoadedAssembly;
+            if (assembly == null) return;
 			SettingsType = assembly.GetType("EasyCraft.Settings", true);
 			EasyCraftMain = assembly.GetType("EasyCraft.Main", true);
 			SettingsProperty = EasyCraftMain.GetProperty("Settings", SettingsType);
-
 
 			ClosestItemContainers = assembly.GetType("EasyCraft.ClosestItemContainers", true);
 			MethodInfo Find = AccessTools.Method(ClosestItemContainers, "Find");

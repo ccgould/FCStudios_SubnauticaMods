@@ -32,22 +32,17 @@ namespace FCS_HomeSolutions.Patches
         }
     }
 
-    [HarmonyPatch(typeof(Exosuit))]
-    [HarmonyPatch("OnHandHover")]
+    [HarmonyReversePatch]
+    [HarmonyPatch(typeof(Vehicle), nameof(Vehicle.OnHandHover))]
     internal class PrawnSuitOnHandHover
     {
         [HarmonyPrefix]
         public static bool Prefix(ref Exosuit __instance, GUIHand hand)
         {
-            QuickLogger.Debug($"On Hand Over Patch",true);
             if (Mod.IsModPatched(Mod.HoverLiftPadClassID))
             {
-                QuickLogger.Debug($"[On Hand Over Patch] Mod Registered", true);
-
                 if (PrawnSuitHandler.Contains(__instance))
                 {
-                    QuickLogger.Debug($"[On Hand Over Patch] Exosuit Found", true);
-
                     HandReticle.main.SetIcon(HandReticle.IconType.Info);
                     HandReticle.main.SetInteractTextRaw(AuxPatchers.UnDockPrawnSuitToEnter(),"");
                     return false;
@@ -58,8 +53,8 @@ namespace FCS_HomeSolutions.Patches
         }
     }
 
-    [HarmonyPatch(typeof(Exosuit))]
-    [HarmonyPatch("OnHandClick")]
+    [HarmonyReversePatch]
+    [HarmonyPatch(typeof(Vehicle), nameof(Vehicle.OnHandClick))]
     internal class PrawnSuitOnHandClick
     {
         [HarmonyPrefix]

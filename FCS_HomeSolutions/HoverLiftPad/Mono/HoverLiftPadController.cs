@@ -118,6 +118,7 @@ namespace FCS_HomeSolutions.HoverLiftPad.Mono
             if (_exosuitOnPad)
             {
                 UpdateDistance();
+                MovePrawnToPosition();
             }
         }
 
@@ -536,9 +537,12 @@ namespace FCS_HomeSolutions.HoverLiftPad.Mono
 
         private void MovePrawnToPosition()
         {
-            _exosuitOnPad.transform.localPosition = new Vector3(_prawnTarget.transform.localPosition.z,
-                _exosuitOnPad.transform.localPosition.y,
-                _prawnTarget.transform.localPosition.z);
+            if(_exosuitOnPad != null && _isPrawnDocked)
+            {
+                _exosuitOnPad.transform.localPosition = new Vector3(_prawnTarget.transform.localPosition.z,
+                    _exosuitOnPad.transform.localPosition.y,
+                    _prawnTarget.transform.localPosition.z);
+            }
         }
 
         private void GatesSetup()

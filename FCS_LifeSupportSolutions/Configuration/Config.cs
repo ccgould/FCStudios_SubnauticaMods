@@ -36,13 +36,13 @@ namespace FCS_LifeSupportSolutions.Configuration
         public BaseUtilityUnitConfig() : base("baseUtilityUnit-config", "Configurations")
         {
         }
-        [Toggle("Is Mod Enabled"), OnChange(nameof(IsModeEnabledToggleEvent))]
+        [Toggle("Is Mod Enabled", Tooltip = "Set to true to enable the mod. (Requires Game Restart.)"), OnChange(nameof(IsModeEnabledToggleEvent))]
         public bool IsModEnabled = false;
 
-        [Toggle("Affect Player Oxygen")]
+        [Toggle("Require Utility Unit for Oxygen")]
         public bool AffectPlayerOxygen = false;
 
-        [Toggle("Easy Small Base Oxygen", Tooltip = "When Affect Player Oxygen is enabled and this option is enabled, you can have a small base about the size of a MoonPool without needing a life support system")]
+        [Toggle("Basic Oxygen for Small Habitats", Tooltip = "When Affect Player Oxygen is enabled and this option is enabled, you can have a small base about the size of a MoonPool without needing a life support system  (4x4 area, single-floor)")]
         public bool SmallBaseOxygen = false;
 
         [Toggle("PlaySFX")]

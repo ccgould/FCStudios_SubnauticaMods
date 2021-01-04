@@ -71,9 +71,12 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.ItemDisplay
 
         public override void OnDestroy()
         {
+            if(Manager != null)
+            {
+                Manager.OnPowerStateChanged -= OnPowerStateChanged;
+                Manager.OnBreakerStateChanged -= OnBreakerStateChanged;
+            }
             base.OnDestroy();
-            Manager.OnPowerStateChanged -= OnPowerStateChanged;
-            Manager.OnBreakerStateChanged -= OnBreakerStateChanged;
         }
 
         private void OnEnable()

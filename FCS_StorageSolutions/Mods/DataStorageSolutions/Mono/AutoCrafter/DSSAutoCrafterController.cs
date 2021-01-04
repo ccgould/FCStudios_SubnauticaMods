@@ -15,12 +15,43 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
         private bool _runStartUpOnEnable;
         private bool _fromSave;
         private DSSAutoCrafterDataEntry _saveData;
+        private DSSAutoCrafterDisplay _displayManager;
+        private bool _hasBreakTripped;
+        internal  DSSCraftManager CraftManager;
 
         private void Start()
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.DSSTabID, Mod.ModName);
+            if (Mod.Craftables.Count == 0)
+            {
+               var fabricator =  CraftTree.GetTree(CraftTree.Type.Fabricator);
+               GetCraftTreeData(fabricator.nodes);
+               foreach (TechType craftable in Mod.Craftables)
+               {
+                   QuickLogger.Debug($"Craftable: {Language.main.Get(craftable)} was added.");
+               }
+            }
+            _displayManager.RefreshCraftables();
         }
 
+        private void GetCraftTreeData(CraftNode innerNodes)
+        {
+            foreach (CraftNode craftNode in innerNodes)
+            {
+                QuickLogger.Debug($"Craftable: {craftNode.string0} | {craftNode.string1} | {craftNode.techType0}");
+
+                if (craftNode.techType0 != TechType.None)
+                {
+                    Mod.Craftables.Add(craftNode.techType0);
+                }
+
+                if (craftNode.childCount > 0)
+                {
+                    GetCraftTreeData(craftNode);
+                }
+            }
+        }
+        
         private void OnEnable()
         {
             if (!_runStartUpOnEnable) return;
@@ -53,6 +84,18 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
 
         public override void Initialize()
         {
+            if (_displayManager == null)
+            {
+                _displayManager = gameObject.EnsureComponent<DSSAutoCrafterDisplay>();
+                _displayManager.Setup(this);
+            }
+
+            if (CraftManager == null)
+            {
+                CraftManager = gameObject.EnsureComponent<DSSCraftManager>();
+                CraftManager.Initialize(this);
+            }
+
             if (_colorManager == null)
             {
                 _colorManager = gameObject.AddComponent<ColorManager>();
@@ -61,7 +104,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
 
             IsInitialized = true;
 
-            QuickLogger.Debug($"Initialized");
+            QuickLogger.Debug($"Initialized - {GetPrefabID()}");
         }
 
         public override void OnProtoSerialize(ProtobufSerializer serializer)
@@ -136,6 +179,30 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
                     _runStartUpOnEnable = true;
                 }
             }
+        }
+
+        public bool ToggleBreaker()
+        {
+            _hasBreakTripped = !_hasBreakTripped;
+            return _hasBreakTripped;
+        }
+    }
+
+    internal class DSSCraftManager : MonoBehaviour
+    {
+        public void Initialize(DSSAutoCrafterController mono)
+        {
+            
+        }
+
+        public void StartOperation()
+        {
+
+        }
+
+        public void StopOperation()
+        {
+            
         }
     }
 }

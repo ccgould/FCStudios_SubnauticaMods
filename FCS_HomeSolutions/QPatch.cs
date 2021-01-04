@@ -146,6 +146,9 @@ namespace FCS_HomeSolutions
             var harmony = new Harmony("com.homesolutions.fstudios");
             harmony.PatchAll(Assembly.GetExecutingAssembly());
 
+            
+
+
             //Register debug commands
             ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));
         }
@@ -286,35 +289,35 @@ namespace FCS_HomeSolutions
                 });
             ahssmallstairplatform.Patch();
 
-            var ahssmallrailmesh = new DecorationEntryPatch("ahssmallrailmesh", "Small Railing With Mesh",
-                "A railing to create a barrior",
-                ModelPrefab.GetPrefab("Small_Rail_wNeat_01"),
-                new Settings
-                {
-                    KitClassID = "ahsSmallRailMesh_kit",
-                    AllowedInBase = true,
-                    AllowedOutside = true,
-                    AllowedOnGround = true,
-                    RotationEnabled = true,
-                    Size = new Vector3(1f, 0.822893f, 0.1791649f),
-                    Center = new Vector3(-1.365597e-25f, 0.7452481f, -0.004088677f)
-                });
-            ahssmallrailmesh.Patch();
+            //var ahssmallrailmesh = new DecorationEntryPatch("ahssmallrailmesh", "Small Railing With Mesh",
+            //    "A railing to create a barrior",
+            //    ModelPrefab.GetPrefab("Small_Rail_wNeat_01"),
+            //    new Settings
+            //    {
+            //        KitClassID = "ahsSmallRailMesh_kit",
+            //        AllowedInBase = true,
+            //        AllowedOutside = true,
+            //        AllowedOnGround = true,
+            //        RotationEnabled = true,
+            //        Size = new Vector3(1f, 0.822893f, 0.1791649f),
+            //        Center = new Vector3(-1.365597e-25f, 0.7452481f, -0.004088677f)
+            //    });
+            //ahssmallrailmesh.Patch();
 
-            var ahslargerailmesh = new DecorationEntryPatch("ahslargerailmesh", "Large Railing With Mesh",
-                "A railing to create a barrior",
-                ModelPrefab.GetPrefab("Large_Rail_wNeat_01"),
-                new Settings
-                {
-                    KitClassID = "ahsSmallRailMesh_kit",
-                    AllowedInBase = true,
-                    AllowedOutside = true,
-                    AllowedOnGround = true,
-                    RotationEnabled = true,
-                    Size = new Vector3(1.963638f, 1.020765f, 0.1433573f),
-                    Center = new Vector3(0f, 0.6343491f, 0f)
-                });
-            ahslargerailmesh.Patch();
+            //var ahslargerailmesh = new DecorationEntryPatch("ahslargerailmesh", "Large Railing With Mesh",
+            //    "A railing to create a barrior",
+            //    ModelPrefab.GetPrefab("Large_Rail_wNeat_01"),
+            //    new Settings
+            //    {
+            //        KitClassID = "ahsSmallRailMesh_kit",
+            //        AllowedInBase = true,
+            //        AllowedOutside = true,
+            //        AllowedOnGround = true,
+            //        RotationEnabled = true,
+            //        Size = new Vector3(1.963638f, 1.020765f, 0.1433573f),
+            //        Center = new Vector3(0f, 0.6343491f, 0f)
+            //    });
+            //ahslargerailmesh.Patch();
 
             var floorShelf01 = new DecorationEntryPatch("floorShelf01", "Floor Shelf 1", "A neat shelf",
                 ModelPrefab.GetPrefab("FloorShelf01"),

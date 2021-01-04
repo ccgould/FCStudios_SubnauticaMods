@@ -28,14 +28,4 @@ namespace FCS_StorageSolutions.Configuration
             }
         }
     }
-
-    //[Menu("FCS Storage Solutions Menu")]
-    public class DSSConfig : ConfigFile
-    {
-        public DSSConfig() : base("dataStorageSolutions-config", "Configurations") { }
-
-        //[Toggle("Pull From Vehicles")]
-        //public bool PullFromDockedVehicles = false;
-
-    }
 }

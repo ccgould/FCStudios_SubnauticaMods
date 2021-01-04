@@ -132,7 +132,12 @@
     <Compile Include="Mods\DataStorageSolutions\Buildable\DSSWallServerRackPatch.cs" />
     <Compile Include="Mods\DataStorageSolutions\Buildable\DSSServerSpawnable.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\Antenna\DSSAntennaController.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\AutoCrafter\CraftingItem.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\AutoCrafter\DSSAutoCrafterController.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\AutoCrafter\DSSAutoCrafterDisplay.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\AutoCrafter\DSSCraftingItem.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\AutoCrafter\DSSProductionItem.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\AutoCrafter\NumberPadController.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\FormattingStation\AddFilterController.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\FormattingStation\DSSFormattingStationController.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\FormattingStation\DSSFormattingStationDisplay.cs" />

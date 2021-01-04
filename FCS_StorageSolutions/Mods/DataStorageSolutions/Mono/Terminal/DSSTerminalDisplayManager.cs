@@ -416,7 +416,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                 _mono.Manager.DockingBlackList.Add(item.item.GetTechType());
             }
 
-            QPatch.DSSConfiguration.Save();
             PlayerInteractionHelper.GivePlayerItem(item);
             RefreshBlackListItems();
 

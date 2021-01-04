@@ -30,7 +30,7 @@ namespace FCS_AlterraHub.Systems
             {TechType.AluminumOxide,10635 },
             {TechType.Silver,3500 },
             {TechType.UraniniteCrystal,14000 },
-            {TechType.Titanium,450 }
+            {TechType.Titanium, 1500}
         };
         
         internal static decimal GetPrice(TechType techType,bool checkKit = false)

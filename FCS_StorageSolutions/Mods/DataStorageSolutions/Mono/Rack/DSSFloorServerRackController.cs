@@ -132,10 +132,13 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
 
         public override void OnDestroy()
         {
+            if (Manager != null)
+            {
+                Manager.OnPowerStateChanged -= OnPowerStateChanged;
+                Manager.OnBreakerStateChanged -= OnBreakerStateChanged;
+            }
+
             base.OnDestroy();
-            Manager.Un
-            Manager.OnPowerStateChanged -= OnPowerStateChanged;
-            Manager.OnBreakerStateChanged -= OnBreakerStateChanged;
             _isBeingDestroyed = true;
         }
 
@@ -308,8 +311,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
             return null;
 
         }
-
-
+        
         public override void OnProtoSerialize(ProtobufSerializer serializer)
         {
             QuickLogger.Debug("In OnProtoSerialize");

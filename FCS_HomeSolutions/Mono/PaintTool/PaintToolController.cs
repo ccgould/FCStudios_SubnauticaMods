@@ -137,8 +137,8 @@ namespace FCS_HomeSolutions.Mono.PaintTool
             Vector3 vector = default;
             GameObject go = null;
             UWE.Utils.TraceFPSTargetPosition(Player.main.gameObject, Range, ref go, ref vector, false);
-            QuickLogger.Debug($"Painter Hit: {go.name} || Layer: {go.layer}",true);
-            var fcsDevice = go.GetComponentInParent<FcsDevice>();
+            QuickLogger.Debug($"Painter Hit: {go?.name} || Layer: {go?.layer}",true);
+            var fcsDevice = go?.GetComponentInParent<FcsDevice>();
             if (fcsDevice != null)
             {
                 var result = fcsDevice.ChangeBodyColor(_currentColor, _colorTargetMode);

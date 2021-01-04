@@ -129,9 +129,13 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
 
         public override void OnDestroy()
         {
+            if (Manager != null)
+            {
+                Manager.OnPowerStateChanged -= OnPowerStateChanged;
+                Manager.OnBreakerStateChanged -= OnBreakerStateChanged;
+            }
+
             base.OnDestroy();
-            Manager.OnPowerStateChanged -= OnPowerStateChanged;
-            Manager.OnBreakerStateChanged -= OnBreakerStateChanged;
             _isBeingDestroyed = true;
         }
 
@@ -434,10 +438,12 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         public bool ItemAllowed(InventoryItem item, out ISlotController server)
         {
             server = null;
+
+
+
             foreach (KeyValuePair<string, DSSSlotController> controller in _slots)
             {
-                if (controller.Value != null && controller.Value.IsOccupied &&
-                    controller.Value.IsTechTypeAllowed(item.item.GetTechType()))
+                if (controller.Value != null && controller.Value.IsOccupied && !controller.Value.IsFull && controller.Value.IsTechTypeAllowed(item.item.GetTechType()))
                 {
                     server = controller.Value;
                     return true;

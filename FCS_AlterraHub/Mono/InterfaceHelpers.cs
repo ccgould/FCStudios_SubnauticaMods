@@ -171,6 +171,11 @@ namespace FCS_AlterraHub.Mono
             button.HOVER_COLOR = hoverColor;
         }
 
+        public static void CreateButton(GameObject gameObject, string v1, object onButtonClick, Color white, Color color, float v2)
+        {
+            throw new NotImplementedException();
+        }
+
         public static bool FindGameObject(GameObject parent, string childName, out GameObject gameObject)
         {
             gameObject = null;
