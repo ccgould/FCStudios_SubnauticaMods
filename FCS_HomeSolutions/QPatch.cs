@@ -9,6 +9,7 @@ using FCS_HomeSolutions.Curtains.Mono;
 using FCS_HomeSolutions.MiniFountainFilter.Buildables;
 using FCS_HomeSolutions.Mods.AlienChief.Buildables;
 using FCS_HomeSolutions.Mods.Cabinets.Buildable;
+using FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Buildable;
 using FCS_HomeSolutions.Mods.LedLights.Buildable;
 using FCS_HomeSolutions.Mods.TV.Buildable;
 using FCS_HomeSolutions.QuantumTeleporter.Buildable;
@@ -77,6 +78,7 @@ namespace FCS_HomeSolutions
                 });
             ahsSweetWaterBar.Patch();
 
+
             //Patch Paint Tool
             var paintToolSpawnable = new PaintToolSpawnable();
             paintToolSpawnable.Patch();
@@ -111,6 +113,10 @@ namespace FCS_HomeSolutions
             //Patch Paint Can
             var paintCan = new PaintCanSpawnable();
             paintCan.Patch();
+
+            //Fire Extinguisher Refueler
+            var fireExtinguisherRefueler = new FireExtinguisherRefuelerBuildable();
+            fireExtinguisherRefueler.Patch();
 
             //Patch Trash Receptacle
             var trashReceptacle = new TrashReceptaclePatch();

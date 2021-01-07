@@ -30,7 +30,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
         private const int MAXSTORAGE = 48;
         private HashSet<Filter> _filteringSettings;
         private string _currentBase;
-
+        private bool _isVisible;
         public bool IsBeingFormatted { get; set; }
         public bool IsFiltered => _filteringSettings != null && _filteringSettings.Count > 0;
         public override bool BypassRegisterCheck => true;
@@ -83,7 +83,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
         public override void Initialize()
         {
             if (IsInitialized) return;
-            IsVisible = false;
             IsConstructed = true;
 
             _storageAmount = gameObject.GetComponentInChildren<Text>();
@@ -310,8 +309,17 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
             gameObject.SetActive(true);
             transform.parent = slot.transform;
             transform.localPosition = Vector3.zero;
-            IsVisible = true;
         }
+
+        public override bool IsVisible => GetIsVisible();
+
+        private bool GetIsVisible()
+        {
+            if (_rackController == null) return false;
+            return _rackController.IsVisible;
+        }
+
+        
 
         public void DockServer(BaseManager manager,Transform slot)
         {
@@ -332,7 +340,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
             gameObject.SetActive(true);
             transform.parent = slot;
             transform.localPosition = Vector3.zero;
-            IsVisible = true;
             IsBeingFormatted = true;
         }
         
@@ -350,7 +357,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
             _currentBase = string.Empty;
             _rackSlot = string.Empty;
             _rackController = null;
-            IsVisible = false;
         }
 
         public int GetCount()

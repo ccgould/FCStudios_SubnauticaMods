@@ -124,6 +124,8 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.FormattingStation
 
             IsInitialized = true;
 
+            InvokeRepeating(nameof(UpdateScreenState),1,1);
+
             QuickLogger.Debug($"Initialized");
         }
 

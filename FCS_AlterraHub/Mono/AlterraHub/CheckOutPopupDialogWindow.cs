@@ -1,4 +1,5 @@
-﻿using FCS_AlterraHub.Configuration;
+﻿using System.Collections.Generic;
+using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Helpers;
@@ -53,6 +54,17 @@ namespace FCS_AlterraHub.Mono.AlterraHub
 
         private bool MakePurchase()
         {
+            var totalSize = new List<Vector2int>();
+            foreach (CartItem cartItem in _cart.GetItems())
+            {
+                totalSize.Add(CraftData.GetItemSize(cartItem.TechType));
+            }
+
+            if (!Inventory.main.container.HasRoomFor(totalSize))
+            {
+                QuickLogger.ModMessage(Buildables.AlterraHub.InventoryFull());
+                return false;
+            }
             if (!CardSystem.main.HasBeenRegistered())
             {
                 QuickLogger.ModMessage(Buildables.AlterraHub.AccountNotFoundFormat());

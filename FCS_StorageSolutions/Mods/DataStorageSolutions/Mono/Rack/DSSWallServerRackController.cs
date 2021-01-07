@@ -31,6 +31,8 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         private Text _storageAmount;
         private Image _percentageBar;
         private GameObject _canvas;
+        private bool _isVisible;
+        public override bool IsVisible => _isVisible;
         public override bool IsRack { get; } = true;
         public override bool IsOperational => IsInitialized && IsConstructed;
 
@@ -53,19 +55,13 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
 
         private void UpdateScreenState()
         {
-            if (Manager.GetBreakerState() || Manager.GetPowerState() != PowerSystem.Status.Normal)
+            if (Manager.GetBreakerState() || Manager.GetPowerState() == PowerSystem.Status.Offline)
             {
-                if (_canvas.activeSelf)
-                {
-                    _canvas.SetActive(false);
-                }
+                TurnOffDevice();
             }
             else
             {
-                if (!_canvas.activeSelf)
-                {
-                    _canvas.SetActive(true);
-                }
+                TurnOnDevice();
             }
         }
 
@@ -182,7 +178,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
             var canvas = gameObject.GetComponentInChildren<Canvas>();
 
             InvokeRepeating(nameof(RegisterServers),1f,1f);
-
+            InvokeRepeating(nameof(UpdateScreenState), 1, 1);
             IsInitialized = true;
         }
 
@@ -396,24 +392,20 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
 
         public override void TurnOnDevice()
         {
-            IsVisible = true;
-            foreach (KeyValuePair<string, DSSSlotController> slot in _slots)
+            _isVisible = true;
+            if (!_canvas.activeSelf)
             {
-                slot.Value.SetIsVisible(IsVisible);
+                _canvas.SetActive(true);
             }
-
-            //TODO Turn OnScreen
         }
 
         public override void TurnOffDevice()
         {
-            IsVisible = false;
-            foreach (KeyValuePair<string, DSSSlotController> slot in _slots)
+            _isVisible = false;
+            if (_canvas.activeSelf)
             {
-                slot.Value.SetIsVisible(IsVisible);
+                _canvas.SetActive(false);
             }
-
-            //TODO Turn OffScreen
         }
 
         public IEnumerable<KeyValuePair<string, DSSSlotController>> GetSlots()

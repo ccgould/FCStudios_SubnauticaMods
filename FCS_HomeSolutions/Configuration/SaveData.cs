@@ -90,7 +90,6 @@ namespace FCS_HomeSolutions.Configuration
         [JsonProperty] internal string UnitName { get; set; }
         [JsonProperty] internal Vec4 Body { get; set; }
         [JsonProperty] internal PowercellData PowercellData { get; set; }
-        [JsonProperty] internal bool IsVisible { get; set; }
         [JsonProperty(PropertyName = "BID")] internal string BaseID { get; set; }
 
     }
@@ -152,6 +151,14 @@ namespace FCS_HomeSolutions.Configuration
         [JsonProperty(PropertyName = "COL")] internal Vec4 Fcs { get; set; }
         [JsonProperty(PropertyName = "SCOL")] internal Vec4 Secondary { get; set; }
         [JsonProperty(PropertyName = "BID")] internal string BaseID { get; set; }
+    }    
+    
+    internal class FEXRDataEntry
+    {
+        [JsonProperty] internal string Id { get; set; }
+        [JsonProperty(PropertyName = "COL")] internal Vec4 Body { get; set; }
+        [JsonProperty(PropertyName = "ECOL")] internal Vec4 Emission { get; set; }
+        [JsonProperty(PropertyName = "Data")] internal byte[] Data { get; set; }
     }
 
     internal class LedLightDataEntry
@@ -180,5 +187,6 @@ namespace FCS_HomeSolutions.Configuration
         [JsonProperty] internal List<CabinetDataEntry> CabinetDataEntries = new List<CabinetDataEntry>();
         [JsonProperty] internal List<LedLightDataEntry> LedLightDataEntries = new List<LedLightDataEntry>();
         [JsonProperty] internal List<ObservationTankDataEntry> ObservationTankDataEntries = new List<ObservationTankDataEntry>();
+        [JsonProperty] internal List<FEXRDataEntry> FEXRDataEntries = new List<FEXRDataEntry>();
     }
 }

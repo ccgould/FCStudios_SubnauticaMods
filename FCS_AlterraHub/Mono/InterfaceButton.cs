@@ -181,6 +181,8 @@ namespace FCS_AlterraHub.Mono
         {
             base.OnPointerEnter(eventData);
             
+            if(Disabled) return;
+
             UpdateTextComponent(IsTextMode());
             
             OnInterfaceButton?.Invoke(true);
@@ -236,7 +238,7 @@ namespace FCS_AlterraHub.Mono
         {
             base.OnPointerExit(eventData);
 
-            if (IsSelected) return;
+            if (IsSelected || Disabled) return;
             UpdateTextComponent(IsTextMode());
             OnInterfaceButton?.Invoke(false);
 
@@ -287,6 +289,8 @@ namespace FCS_AlterraHub.Mono
         public override void OnPointerClick(PointerEventData eventData)
         {
             base.OnPointerClick(eventData);
+
+            if (Disabled) return;
 
             if (!EventSystem.current.IsPointerOverGameObject())
             {

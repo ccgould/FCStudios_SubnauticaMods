@@ -9,36 +9,6 @@ namespace FCS_AlterraHub.Mono
 {
     public class InterfaceHelpers
     {
-        public static readonly Color ColorBlue = new Color(0.07f, 0.38f, 0.7f, 1f);
-        
-        public static bool CreateButton(GameObject parent, string childName, string btnName, InterfaceButtonMode btnMode, Action<string, object> onButtonClick, out InterfaceButton button)
-        {
-            var result = CreateButton(parent, childName, btnName, btnMode, Color.white, ColorBlue, onButtonClick, out InterfaceButton cusButton);
-            button = cusButton;
-            return result;
-        }
-
-        [Obsolete("This method shall not be used anymore it will be deleted in up-comming releases of the tech fabricator please use another overload")]
-        public static bool CreateButton(GameObject parent, string childName, string btnName, InterfaceButtonMode btnMode, Color startColor, Color hoverColor, Action<string, object> onButtonClick, out InterfaceButton customButton)
-        {
-            customButton = null;
-            var go = parent.FindChild(childName)?.gameObject;
-            if (go == null)
-            {
-                QuickLogger.Error($"{childName} cannot be found");
-                return false;
-            }
-
-            var button = go.AddComponent<InterfaceButton>();
-            button.BtnName = btnName;
-            button.ButtonMode = btnMode;
-            button.STARTING_COLOR = startColor;
-            button.HOVER_COLOR = hoverColor;
-            button.OnButtonClick = onButtonClick;
-            customButton = button;
-            return true;
-        }
-
         public static InterfaceButton CreateButton(GameObject go, string btnName, InterfaceButtonMode btnMode, Action<string, object> onButtonClick, Color startColor, Color hoverColor, float maxInteractionRange)
         {
             var button = go.AddComponent<InterfaceButton>();
@@ -48,23 +18,6 @@ namespace FCS_AlterraHub.Mono
             button.HOVER_COLOR = hoverColor;
             button.OnButtonClick = onButtonClick;
             button.MaxInteractionRange = maxInteractionRange;
-            return button;
-        }
-
-
-        public static InterfaceButton CreateButton(GameObject go, string btnName, InterfaceButtonMode btnMode, Action<string, object> onButtonClick, Color startColor, Color hoverColor, float maxInteractionRange, Sprite icon, string lineOne, string lineTwo = "")
-        {
-            var button = go.AddComponent<InterfaceButton>();
-            button.BtnName = btnName;
-            button.ButtonMode = btnMode;
-            button.STARTING_COLOR = startColor;
-            button.HOVER_COLOR = hoverColor;
-            button.OnButtonClick = onButtonClick;
-            button.MaxInteractionRange = maxInteractionRange;
-            button.TextLineOne = lineOne;
-            button.TextLineTwo = lineTwo; 
-            var image = go.EnsureComponent<Image>();
-            image.sprite = icon;
             return button;
         }
 
@@ -134,33 +87,6 @@ namespace FCS_AlterraHub.Mono
             QuickLogger.Debug("Returning null");
             return null;
         }
-        
-        public static bool CreatePaginator(GameObject parent, string childName, int amountToChangeBy, Action<int> ChangePageBy, out PaginatorButton customButton)
-        {
-            var result = CreatePaginator(parent, childName, amountToChangeBy, ChangePageBy, Color.white, ColorBlue,
-                out var paginatorButton);
-            customButton = paginatorButton;
-            return result;
-        }
-
-        public static bool CreatePaginator(GameObject parent, string childName, int amountToChangeBy, Action<int> ChangePageBy, Color startColor, Color hoverColor, out PaginatorButton customButton)
-        {
-            customButton = null;
-            var go = parent.FindChild(childName)?.gameObject;
-            if (go == null)
-            {
-                QuickLogger.Error($"{childName} cannot be found");
-                return false;
-            }
-
-            var button = go.AddComponent<PaginatorButton>();
-            button.ChangePageBy = ChangePageBy;
-            button.AmountToChangePageBy = amountToChangeBy;
-            button.STARTING_COLOR = startColor;
-            button.HOVER_COLOR = hoverColor;
-            customButton = button;
-            return true;
-        }
 
         public static void CreatePaginator(GameObject parent, int amountToChangeBy, Action<int> ChangePageBy, Color startColor, Color hoverColor)
         {
@@ -169,11 +95,6 @@ namespace FCS_AlterraHub.Mono
             button.AmountToChangePageBy = amountToChangeBy;
             button.STARTING_COLOR = startColor;
             button.HOVER_COLOR = hoverColor;
-        }
-
-        public static void CreateButton(GameObject gameObject, string v1, object onButtonClick, Color white, Color color, float v2)
-        {
-            throw new NotImplementedException();
         }
 
         public static bool FindGameObject(GameObject parent, string childName, out GameObject gameObject)
@@ -189,5 +110,6 @@ namespace FCS_AlterraHub.Mono
             gameObject = result;
             return true;
         }
+
     }
 }

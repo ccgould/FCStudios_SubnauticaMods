@@ -176,7 +176,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.ItemDisplay
             _icon.sprite = SpriteManager.defaultSprite;
 
             InvokeRepeating(nameof(Refresh), 1, 1);
-
+            InvokeRepeating(nameof(UpdateScreenState), 1, 1);
             IsInitialized = true;
 
             QuickLogger.Debug($"Initialized");

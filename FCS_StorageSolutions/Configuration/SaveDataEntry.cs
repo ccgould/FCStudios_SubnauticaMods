@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Objects;
+using FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter;
 using Oculus.Newtonsoft.Json;
 using UnityEngine;
 
@@ -110,6 +112,8 @@ namespace FCS_StorageSolutions.Configuration
         [JsonProperty] internal Vec4 Body { get; set; }
         [JsonProperty] internal byte[] Data { get; set; }
         [JsonProperty] internal Vec4 SecondaryBody { get; set; }
+        [JsonProperty] internal ObservableCollection<CraftingItem> CurrentProcess { get; set; }
+        public bool IsRunning { get; set; }
     }
 
     [Serializable]

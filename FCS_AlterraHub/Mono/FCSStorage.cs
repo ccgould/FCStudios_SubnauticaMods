@@ -135,7 +135,7 @@ namespace FCS_AlterraHub.Mono
             ItemsContainer.UnsafeAdd(item);
           return true;
         }
-
+        
         public void Initialize(int slots, GameObject go = null)
         {
             if (go == null)

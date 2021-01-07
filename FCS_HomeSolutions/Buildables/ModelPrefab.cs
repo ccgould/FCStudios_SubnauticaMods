@@ -4,6 +4,7 @@ using FCS_HomeSolutions.Configuration;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 
 namespace FCS_HomeSolutions.Buildables
@@ -50,6 +51,7 @@ namespace FCS_HomeSolutions.Buildables
         public static GameObject LedLightWallPrefab { get; set; }
         public static GameObject LedLightShortPrefab { get; set; }
         public static GameObject ObservationTankPrefab { get; set; }
+        public static GameObject FireExtinguisherRefuelerPrefab { get; set; }
 
         internal static void Initialize()
         {
@@ -79,6 +81,7 @@ namespace FCS_HomeSolutions.Buildables
             Cabinet1Prefab = GetPrefab(Mod.Cabinet1PrefabName);
             Cabinet2Prefab = GetPrefab(Mod.Cabinet2PrefabName);
             Cabinet3Prefab = GetPrefab(Mod.Cabinet3PrefabName);
+            FireExtinguisherRefuelerPrefab = GetPrefab(Mod.FireExtinguisherRefuelerPrefabName);
             ObservationTankPrefab = GetPrefab(Mod.EmptyObservationTankPrefabName);
             TrashRecyclerItemPrefab = GetPrefab("RecyclerItem");
             SeaBreezeItemPrefab = GetPrefab("ARSItem");

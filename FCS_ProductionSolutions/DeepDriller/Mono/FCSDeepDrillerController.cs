@@ -555,6 +555,11 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             return _isRangeVisible;
         }
 
+        internal bool IsBreakerSet()
+        {
+            return _isBreakSet;
+        }
+
         internal void ToggleRangeView()
         {
             _isRangeVisible = !_isRangeVisible;

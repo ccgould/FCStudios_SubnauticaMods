@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_StorageSolutions.Configuration;
 using FCS_StorageSolutions.Mods.AlterraStorage.Buildable;
+using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
 
@@ -15,9 +18,22 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
         private bool _runStartUpOnEnable;
         private bool _fromSave;
         private DSSAutoCrafterDataEntry _saveData;
-        private DSSAutoCrafterDisplay _displayManager;
+        internal DSSAutoCrafterDisplay DisplayManager;
         private bool _hasBreakTripped;
         internal  DSSCraftManager CraftManager;
+        internal ObservableCollection<CraftingItem> CraftingItems = new ObservableCollection<CraftingItem>();
+        private bool _moveBelt;
+        private float _beltSpeed = 0.1f;
+        private IEnumerable<Material> _materials;
+        internal FCSStorage StorageManager { get; private set; }
+        public override bool IsVisible { get; } = true;
+        public override bool IsOperational { get; } = true;
+        public override StorageType StorageType { get; } = StorageType.AutoCrafter;
+
+        public override FCSStorage GetStorage()
+        {
+            return StorageManager;
+        }
 
         private void Start()
         {
@@ -31,7 +47,30 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
                    QuickLogger.Debug($"Craftable: {Language.main.Get(craftable)} was added.");
                }
             }
-            _displayManager.RefreshCraftables();
+            
+            _materials = MaterialHelpers.GetMaterials(gameObject, "DSS_ConveyorBelt");
+
+            DisplayManager.Refresh();
+
+            StorageManager.CleanUpDuplicatedStorageNoneRoutine();
+            Manager.AlertNewFcsStoragePlaced(this);
+        }
+
+        private void Update()
+        {
+            if (_materials != null && _moveBelt)
+            {
+                float offset = Time.time * _beltSpeed;
+                foreach (Material material in _materials)
+                {
+                    material.SetTextureOffset("_MainTex", new Vector2(0, offset));
+                }
+            }
+        }
+
+        public override Pickupable RemoveItemFromContainer(TechType techType)
+        {
+            return StorageManager.ItemsContainer.RemoveItem(techType);
         }
 
         private void GetCraftTreeData(CraftNode innerNodes)
@@ -70,6 +109,15 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
             {
                 _colorManager.ChangeColor(_saveData.Body.Vector4ToColor());
                 _colorManager.ChangeColor(_saveData.SecondaryBody.Vector4ToColor(), ColorTargetMode.Secondary);
+                if (_saveData.CurrentProcess != null)
+                {
+                    CraftingItems = _saveData.CurrentProcess;
+                }
+
+                if (_saveData.IsRunning)
+                {
+                    DisplayManager.OnButtonClick("StartBTN",null);
+                }
                 _fromSave = false;
             }
         }
@@ -84,10 +132,10 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
 
         public override void Initialize()
         {
-            if (_displayManager == null)
+            if (DisplayManager == null)
             {
-                _displayManager = gameObject.EnsureComponent<DSSAutoCrafterDisplay>();
-                _displayManager.Setup(this);
+                DisplayManager = gameObject.EnsureComponent<DSSAutoCrafterDisplay>();
+                DisplayManager.Setup(this);
             }
 
             if (CraftManager == null)
@@ -102,9 +150,22 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
                 _colorManager.Initialize(gameObject, ModelPrefab.BodyMaterial, ModelPrefab.SecondaryMaterial);
             }
 
+            if (StorageManager == null)
+            {
+                StorageManager = gameObject.AddComponent<FCSStorage>();
+                StorageManager.Initialize(48,gameObject.FindChild("StorageRoot"));
+            }
+
+            MoveBelt();
+
             IsInitialized = true;
 
             QuickLogger.Debug($"Initialized - {GetPrefabID()}");
+        }
+
+        public override bool AddItemToContainer(InventoryItem item)
+        {
+           return StorageManager.AddItem(item);
         }
 
         public override void OnProtoSerialize(ProtobufSerializer serializer)
@@ -120,6 +181,17 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
         public override void OnProtoDeserialize(ProtobufSerializer serializer)
         {
             _fromSave = true;
+
+            if (_saveData == null)
+            {
+                ReadySaveData();
+            }
+
+            if (!IsInitialized)
+            {
+                Initialize();
+            }
+            StorageManager.RestoreItems(serializer, _saveData.Data);
         }
 
         public void Save(SaveData newSaveData, ProtobufSerializer serializer = null)
@@ -136,8 +208,10 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
 
                 _saveData.ID = id;
                 _saveData.Body = _colorManager.GetColor().ColorToVector4();
+                _saveData.Data = StorageManager.Save(serializer);
                 _saveData.SecondaryBody = _colorManager.GetSecondaryColor().ColorToVector4();
-
+                _saveData.CurrentProcess = CraftingItems;
+                _saveData.IsRunning = CraftManager.IsRunning();
                 newSaveData.DSSAutoCrafterDataEntries.Add(_saveData);
             }
             catch (Exception e)
@@ -186,23 +260,25 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
             _hasBreakTripped = !_hasBreakTripped;
             return _hasBreakTripped;
         }
-    }
 
-    internal class DSSCraftManager : MonoBehaviour
-    {
-        public void Initialize(DSSAutoCrafterController mono)
+        public bool HasPendingCraft()
         {
-            
+            return CraftingItems.Count > 0;
         }
 
-        public void StartOperation()
+        internal void MoveBelt()
         {
-
+            _moveBelt = true;
         }
 
-        public void StopOperation()
+        internal void StopBelt()
         {
-            
+            _moveBelt = false;
+        }
+
+        public bool IsBeltMoving()
+        {
+            return _moveBelt;
         }
     }
 }

@@ -4,31 +4,31 @@ using System.IO;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Spawnables;
-using FCS_ProductionSolutions.Buildable;
-using FCS_ProductionSolutions.Configuration;
-using FCS_ProductionSolutions.Mods.Replicator.Mono;
+using FCS_HomeSolutions.Buildables;
+using FCS_HomeSolutions.Configuration;
+using FCS_HomeSolutions.ModManagers;
+using FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Mono;
 using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
 using UnityEngine;
 
-namespace FCS_HomeSolutions.Mods.Replicator.Buildables
+namespace FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Buildable
 {
-    internal partial class ReplicatorBuildable : Buildable
+    internal partial class FireExtinguisherRefuelerBuildable : SMLHelper.V2.Assets.Buildable
     {
-        public ReplicatorBuildable() : base(Mod.ReplicatorClassName, Mod.ReplicatorFriendlyName, Mod.ReplicatorDescription)
+        public FireExtinguisherRefuelerBuildable() : base(Mod.FireExtinguisherRefuelerClassID, Mod.FireExtinguisherRefuelerFriendly, Mod.FireExtinguisherRefuelerDescription)
         {
 
             OnStartedPatching += () =>
             {
-                var miniFountainKit = new FCSKit(Mod.ReplicatorKitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
+                var miniFountainKit = new FCSKit(Mod.FireExtinguisherRefuelerKitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 miniFountainKit.Patch();
             };
             OnFinishedPatching += () =>
             {
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.ReplicatorKitClassID.ToTechType(), 300000, StoreCategory.Production);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.FireExtinguisherRefuelerKitClassID.ToTechType(), 30000, StoreCategory.Home);
                 FCSAlterraHubService.PublicAPI.RegisterPatchedMod(ClassID);
             };
         }
@@ -37,14 +37,18 @@ namespace FCS_HomeSolutions.Mods.Replicator.Buildables
         {
             try
             {
-                var prefab = GameObject.Instantiate(ModelPrefab.ReplicatorPrefab);
+                var prefab = GameObject.Instantiate(ModelPrefab.FireExtinguisherRefuelerPrefab);
 
                 prefab.name = this.PrefabFileName;
                 
-                var center = new Vector3(0f, 1.219271f, 0f);
-                var size = new Vector3(0.7963083f, 2.037489f, 0.8331643f);
+                var center = new Vector3(0.002549291f, 0.04286739f, 0.2148812f);
+                var size = new Vector3(0.9426436f, 0.5879701f, 0.4037365f);
 
                 GameObjectHelpers.AddConstructableBounds(prefab,size,center);
+
+                // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
+                var lwe = prefab.AddComponent<LargeWorldEntity>();
+                lwe.cellLevel = LargeWorldEntity.CellLevel.Far;
 
                 var model = prefab.FindChild("model");
 
@@ -58,13 +62,13 @@ namespace FCS_HomeSolutions.Mods.Replicator.Buildables
 
                 // Add constructible
                 var constructable = prefab.AddComponent<Constructable>();
-                constructable.allowedOnWall = false;
-                constructable.allowedOnGround = true;
+                constructable.allowedOnWall = true;
+                constructable.allowedOnGround = false;
                 constructable.allowedInSub = true;
                 constructable.allowedInBase = true;
                 constructable.allowedOnCeiling = false;
                 constructable.allowedOutside = false;
-                constructable.rotationEnabled = true;
+                constructable.allowedOnConstructables = false;
                 constructable.model = model;
                 constructable.techType = TechType;
 
@@ -72,10 +76,11 @@ namespace FCS_HomeSolutions.Mods.Replicator.Buildables
                 prefabID.ClassId = ClassID;
 
                 prefab.AddComponent<TechTag>().type = TechType;
-                prefab.AddComponent<ReplicatorController>();
+                prefab.AddComponent<FMOD_CustomLoopingEmitter>();
+                prefab.AddComponent<FireExtinguisherRefuelerController>();
 
                 //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
-                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModName);
+                //MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModName);
 
                 return prefab;
             }
@@ -98,7 +103,7 @@ namespace FCS_HomeSolutions.Mods.Replicator.Buildables
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(Mod.ReplicatorKitClassID.ToTechType(), 1)
+                    new Ingredient(Mod.FireExtinguisherRefuelerKitClassID.ToTechType(), 1)
                 }
             };
             return customFabRecipe;
@@ -114,7 +119,7 @@ namespace FCS_HomeSolutions.Mods.Replicator.Buildables
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(Mod.ReplicatorKitClassID.ToTechType(), 1)
+                    new Ingredient(Mod.FireExtinguisherRefuelerKitClassID.ToTechType(), 1)
                 }
             };
             return customFabRecipe;

@@ -29,7 +29,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         private Text _totalItemsAmount;
         private BaseManager _currentBase;
         private string _currentSearchString;
-        private StorageLocation _storageFilter;
+        private StorageType _storageFilter;
         private GameObject _homeObj;
         private GameObject _moonPoolObj;
         private GameObject _vehiclesSection;
@@ -87,16 +87,16 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             var total = _currentBase.GetTotal(_storageFilter);
             switch (_storageFilter)
             {
-                case StorageLocation.All:
+                case StorageType.All:
                     _totalItemsAmount.text = AuxPatchers.TotalItemsFormat(total, combinedCapacity);
                     break;
-                case StorageLocation.Servers:
+                case StorageType.Servers:
                     _totalItemsAmount.text = AuxPatchers.TotalItemsFormat(total, serverCapacity);
                     break;
-                case StorageLocation.StorageLockers:
+                case StorageType.StorageLockers:
                     _totalItemsAmount.text = AuxPatchers.TotalItemsFormat(total, 0);
                     break;
-                case StorageLocation.AlterraStorage:
+                case StorageType.AlterraStorage:
                     _totalItemsAmount.text = AuxPatchers.TotalItemsFormat(total, alterraStorageCapacity);
                     break;
             }
@@ -365,7 +365,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             }
         }
 
-        public void ChangeStorageFilter(StorageLocation storage)
+        public void ChangeStorageFilter(StorageType storage)
         {
             _storageFilter = storage;
         }

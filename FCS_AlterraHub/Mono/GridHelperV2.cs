@@ -116,5 +116,10 @@ namespace FCSCommon.Helpers
                 _currentPage = _maxPage;
             }
         }
+
+        public int GetMaxPages()
+        {
+            return _maxPage;
+        }
     }
 }

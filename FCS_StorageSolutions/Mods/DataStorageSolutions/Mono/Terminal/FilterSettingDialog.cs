@@ -31,25 +31,25 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         {
             if (button.Equals("ToggleButton_0"))
             {
-                _mono.ChangeStorageFilter(StorageLocation.All);
+                _mono.ChangeStorageFilter(StorageType.All);
                 _label.text = "ALL";
             }
 
             if (button.Equals("ToggleButton_1"))
             {
-                _mono.ChangeStorageFilter(StorageLocation.Servers);
+                _mono.ChangeStorageFilter(StorageType.Servers);
                 _label.text = "SERVERS";
             }
 
             if (button.Equals("ToggleButton_2"))
             {
-                _mono.ChangeStorageFilter(StorageLocation.AlterraStorage);
+                _mono.ChangeStorageFilter(StorageType.AlterraStorage);
                 _label.text = "ALTERRA STORAGE";
             }
 
             if (button.Equals("ToggleButton_3"))
             {
-                _mono.ChangeStorageFilter(StorageLocation.StorageLockers);
+                _mono.ChangeStorageFilter(StorageType.StorageLockers);
                 _label.text = "STORAGE LOCKERS";
             }
         }

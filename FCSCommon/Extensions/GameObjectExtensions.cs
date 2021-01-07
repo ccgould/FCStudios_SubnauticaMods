@@ -40,6 +40,16 @@ namespace FCSCommon.Extensions
             return sb.ToString();
         }
 
+        public static Transform[] GetChildrenT(this GameObject go)
+        {
+            List<Transform> children = new List<Transform>();
+            foreach (Transform tran in go.transform)
+            {
+                children.Add(tran);
+            }
+            return children.ToArray();
+        }
+
         public static GameObject[] GetChildren(this GameObject go)
         {
             List<GameObject> children = new List<GameObject>();

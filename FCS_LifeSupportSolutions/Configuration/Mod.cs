@@ -50,6 +50,13 @@ namespace FCS_LifeSupportSolutions.Configuration
         internal static string BaseUtilityUnityClassName => BaseUtilityUnitName;
         internal static string BaseUtilityUnityPrefabName => BaseUtilityUnitName;
 
+        internal const string BaseOxygenTankClassID = "BaseOxygenTank";
+        internal const string BaseOxygenTankFriendly = "Base Oxygen Tank";
+        internal const string BaseOxygenTankDescription = "Provide your base with oxygen in the early stages of you stay here on Plant 4546B";
+        internal const string BaseOxygenTankPrefabName = "oxTank";
+        internal const string BaseOxygenTankKitClassID = "BaseOxygenTank_Kit";
+        internal const string BaseOxygenTankTabID = "OXT";
+
 
 #if SUBNAUTICA
         internal static TechData EnergyPillVendingMachineIngredients => new TechData
@@ -74,6 +81,20 @@ namespace FCS_LifeSupportSolutions.Configuration
             Ingredients =
             {
                 new Ingredient(MiniMedBayKitClassID.ToTechType(), 1),
+            }
+        };
+
+
+#if SUBNAUTICA
+        internal static TechData BaseOxygenTankIngredients => new TechData
+#elif BELOWZERO
+                internal static RecipeData BaseOxygenTankIngredients => new RecipeData
+#endif
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(BaseOxygenTankKitClassID.ToTechType(), 1),
             }
         };
 
@@ -234,5 +255,24 @@ namespace FCS_LifeSupportSolutions.Configuration
         }
 
         #endregion
+
+        public static BaseOxygenTankEntry GetOxygenTankSaveData(string id)
+        {
+            LoadData();
+
+            var saveData = GetSaveData();
+
+            foreach (var entry in saveData.BaseOxygenTankEntries)
+            {
+                if (string.IsNullOrEmpty(entry.Id)) continue;
+
+                if (entry.Id == id)
+                {
+                    return entry;
+                }
+            }
+
+            return new BaseOxygenTankEntry() { Id = id };
+        }
     }
 }

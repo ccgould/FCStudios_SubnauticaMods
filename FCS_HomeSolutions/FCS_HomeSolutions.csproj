@@ -172,6 +172,8 @@
     <Compile Include="Mods\Cabinets\Buildable\Cabinet3.cs" />
     <Compile Include="Mods\Cabinets\Buildable\Cabinet1.cs" />
     <Compile Include="Mods\Cabinets\Mono\CabinetController.cs" />
+    <Compile Include="Mods\FireExtinguisherRefueler\Buildable\FireExtinguisherRefuelerPatcher.cs" />
+    <Compile Include="Mods\FireExtinguisherRefueler\Mono\FireExtinguisherRefuelerController.cs" />
     <Compile Include="Mods\LedLights\Buildable\LedLightPatch.cs" />
     <Compile Include="Mods\LedLights\Mono\LedLightController.cs" />
     <Compile Include="Mods\TV\Buildable\TVPatch.cs" />

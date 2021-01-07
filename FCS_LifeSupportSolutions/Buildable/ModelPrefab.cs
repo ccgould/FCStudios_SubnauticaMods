@@ -4,6 +4,7 @@ using FCS_LifeSupportSolutions.Configuration;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace FCS_LifeSupportSolutions.Buildable
 {
@@ -31,6 +32,7 @@ namespace FCS_LifeSupportSolutions.Buildable
         public static GameObject PillHudPrefab { get; set; }
         public static GameObject MiniMedBayPrefab { get; set; }
         public static GameObject BaseUtilityUnitPrefab { get; set; }
+        public static GameObject BaseOxygenTankPrefab { get; set; }
 
 
         internal static void Initialize()
@@ -46,6 +48,7 @@ namespace FCS_LifeSupportSolutions.Buildable
             }
 
             EnergyPillVendingMachinePrefab = GetPrefab(Mod.EnergyPillVendingMachinePrefabName);
+            BaseOxygenTankPrefab = GetPrefab(Mod.BaseOxygenTankPrefabName);
             RedEnergyPillPrefab = GetPrefab("RedPill");
             GreenEnergyPillPrefab = GetPrefab("GreenPill");
             BlueEnergyPillPrefab = GetPrefab("BluePill");

@@ -66,7 +66,7 @@ namespace FCS_AlterraHub.Mono
         /// <summary>
         /// Boolean that represents if the device is visible to the network.
         /// </summary>
-        public bool IsVisible { get; set; }
+        public virtual bool IsVisible { get; } = false;
 
         /// <summary>
         /// Boolean that represents if the device is constructed and ready to operate
@@ -289,6 +289,7 @@ namespace FCS_AlterraHub.Mono
         public Action<FcsDevice, InventoryItem> OnRemoveItem { get; set; }
         
         public string TabID { get; set; }
+        public virtual StorageType StorageType { get; }
 
         public virtual int GetItemCount(TechType techType)
         {

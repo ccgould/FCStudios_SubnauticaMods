@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using FCS_LifeSupportSolutions.Buildable;
 using FCS_LifeSupportSolutions.Configuration;
+using FCS_LifeSupportSolutions.Mods.BaseOxygenTank.Buildable;
 using FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Buildable;
 using FCS_LifeSupportSolutions.Mods.EnergyPillVendingMachine.Buildable;
 using FCS_LifeSupportSolutions.Mods.MiniMedBay.Buildable;
@@ -67,7 +68,10 @@ namespace FCS_LifeSupportSolutions
             {
                 var baseUtilityUnit = new BaseUtilityUnitPatch();
                 baseUtilityUnit.Patch();
+                var baseOxygenTankPatch = new BaseOxygenTankPatch();
+                baseOxygenTankPatch.Patch();
             }
+
 
             //Register debug commands
             ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));

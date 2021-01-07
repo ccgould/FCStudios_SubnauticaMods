@@ -288,5 +288,10 @@ namespace FCS_AlterraHub.Buildables
         {
             return GetLanguage($"{ModKey}_NoVehicles");
         }
+
+        public static string InventoryFull()
+        {
+            return Language.main.Get("InventoryFull");
+        }
     }
 }

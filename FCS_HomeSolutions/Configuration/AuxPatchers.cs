@@ -63,6 +63,8 @@ namespace FCS_HomeSolutions.Configuration
             { $"{ModKey}_TVFormat","Press {0} to turn on/off tv."},
             { $"{ModKey}_TVFormat2","Press {0}/{1} for volume and {2}/{3} for channel"},
             { $"{ModKey}_NotEnoughWaterForBottle","Not enough water for bottle please wait for 50% tank level or more"},
+            { $"{ModKey}_ClickToOpenFormatted","Click to open the {0}"},
+            { $"{ModKey}_ModNotEmptyFormat","Please empty {0} before trying to deconstruct."},
         };
 
         internal static void AdditionalPatching()
@@ -332,6 +334,16 @@ namespace FCS_HomeSolutions.Configuration
         public static string NotEnoughWaterForBottle()
         {
             return GetLanguage($"{ModKey}_NotEnoughWaterForBottle");
+        }
+
+        public static string ClickToOpenFormatted(string modName)
+        {
+            return string.Format(GetLanguage($"{ModKey}_ClickToOpenFormatted"), modName);
+        }
+
+        public static string ModNotEmptyFormat(string modName)
+        {
+            return string.Format(GetLanguage($"{ModKey}_ModNotEmptyFormat"), modName);
         }
     }
 }

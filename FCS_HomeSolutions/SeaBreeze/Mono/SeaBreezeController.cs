@@ -37,6 +37,12 @@ namespace FCS_HomeSolutions.SeaBreeze.Mono
         internal AnimationManager AnimationManager { get; private set; }
         internal int PageStateHash { get; private set; }
         internal PrefabIdentifier PrefabId { get; set; }
+        public override bool IsVisible => GetHasBreakerTripped();
+
+        private bool GetHasBreakerTripped()
+        {
+            return PowerManager.GetHasBreakerTripped();
+        }
 
         #endregion
 
@@ -74,7 +80,6 @@ namespace FCS_HomeSolutions.SeaBreeze.Mono
                     FridgeComponent.LoadSave(_savedData.FridgeContainer);
                     NameController.SetCurrentName(_savedData.UnitName);
                     _colorManager.ChangeColor(_savedData.Body.Vector4ToColor());
-                    IsVisible = _savedData.IsVisible;
                     QuickLogger.Info($"Loaded {Mod.SeaBreezeFriendly}");
                 }
 
@@ -279,7 +284,6 @@ namespace FCS_HomeSolutions.SeaBreeze.Mono
             _savedData.UnitName = NameController.GetCurrentName();
             _savedData.FridgeContainer = FridgeComponent.Save();
             _savedData.PowercellData = PowerManager.Save();
-            _savedData.IsVisible = IsVisible;
             _savedData.HasBreakerTripped = PowerManager.GetHasBreakerTripped();
             newSaveData.SeaBreezeDataEntries.Add(_savedData);
         }

@@ -41,6 +41,13 @@ namespace FCS_HomeSolutions.Configuration
         internal const string TrashReceptacleKitClassID = "TrashReceptacle_Kit";
         internal const string TrashReceptacleTabID = "TR";
 
+        internal const string FireExtinguisherRefuelerClassID = "FireExtinguisherRefueler";
+        internal const string FireExtinguisherRefuelerFriendly = "Fire Extinguisher Refueler";
+        internal const string FireExtinguisherRefuelerDescription = "Use the Fire Extinguisher Refueler to refill any fire extinguisher";
+        internal const string FireExtinguisherRefuelerPrefabName = "FireExtinguisherRefueler";
+        internal const string FireExtinguisherRefuelerKitClassID = "FireExtinguisherRefueler_Kit";
+        internal const string FireExtinguisherRefuelerTabID = "FER";
+        
         internal const string PaintToolClassID = "PaintTool";
         internal const string PaintToolFriendly = "Alterra Paint Tool";
         internal const string PaintToolDescription = "Change the color of FCStudios mods";
@@ -772,6 +779,25 @@ namespace FCS_HomeSolutions.Configuration
             }
 
             return new LedLightDataEntry() { Id = id };
+        }
+        
+        public static FEXRDataEntry FEXREntrySaveData(string id)
+        {
+            LoadData();
+
+            var saveData = GetSaveData();
+
+            foreach (var entry in saveData.FEXRDataEntries)
+            {
+                if (string.IsNullOrEmpty(entry.Id)) continue;
+
+                if (entry.Id == id)
+                {
+                    return entry;
+                }
+            }
+
+            return new FEXRDataEntry() { Id = id };
         }
     }
 }

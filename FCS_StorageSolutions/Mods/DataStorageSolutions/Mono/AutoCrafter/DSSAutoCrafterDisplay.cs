@@ -21,13 +21,15 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
         private GridHelperV2 _productionGrid;
         private readonly List<DSSCraftingItem> _craftingButtons = new List<DSSCraftingItem>();
         private readonly List<DSSProductionItem> _productionButtons = new List<DSSProductionItem>();
-        private readonly ObservableCollection<CraftingItem> _craftingItems = new ObservableCollection<CraftingItem>();
         private Text _orderCount;
         private NumberPadController _numberPad;
         private GameObject _itemSelectionArea;
         private GameObject _productionStatusArea;
         private StatusController _productionStatusController;
-
+        private GameObject _startBtn;
+        private GameObject _stopBtn;
+        private PaginatorController _paginatorController;
+        
         internal void Setup(DSSAutoCrafterController mono)
         {
             _mono = mono;
@@ -37,9 +39,16 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
             }
         }
 
-        internal void RefreshCraftables()
+        internal void Refresh()
         {
             _craftingGrid.DrawPage();
+            _productionGrid.DrawPage();
+            UpdateOrderCount();
+        }
+
+        internal StatusController GetStatusController()
+        {
+            return _productionStatusController;
         }
 
         public override void OnButtonClick(string btnName, object tag)
@@ -50,16 +59,34 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
                     _mono.ToggleBreaker();
                     break;
 
-                case "StartButton":
-                    _mono.CraftManager.StartOperation();
+                case "StartBTN":
+                    foreach (CraftingItem item in _mono.CraftingItems)
+                    {
+                        if (item.Amount <= 0)
+                        {
+                            QuickLogger.ModMessage(AuxPatchers.AmountIsZero(Language.main.Get(item.TechType)));
+                            return;
+                        }
+                    }
+                    _mono.CraftManager.StartOperation(_productionStatusController);
                     _itemSelectionArea.SetActive(false);
                     _productionStatusArea.SetActive(true);
+                    _startBtn.SetActive(false);
+                    _stopBtn.SetActive(true);
                     break;
 
-                case "StopButton":
+                case "StopBTN":
+                    foreach (DSSProductionItem button in _productionButtons)
+                    {
+                        button.Reset();
+                    }
                     _mono.CraftManager.StopOperation();
                     _itemSelectionArea.SetActive(true);
                     _productionStatusArea.SetActive(false);
+                    _startBtn.SetActive(true);
+                    _stopBtn.SetActive(false);
+                    _mono.CraftManager.Reset(true);
+                    _productionStatusController.Reset();
                     break;
             }
         }
@@ -88,12 +115,12 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
                 _productionStatusArea = GameObjectHelpers.FindGameObject(gameObject, "ProgressStatus");
                 _productionStatusController = _productionStatusArea.AddComponent<StatusController>();
 
-                var startBtn = GameObjectHelpers.FindGameObject(gameObject, "PlayButton");
-                InterfaceHelpers.CreateButton(startBtn, "StartBTN", InterfaceButtonMode.Background, OnButtonClick,
+                _startBtn = GameObjectHelpers.FindGameObject(gameObject, "PlayButton");
+                InterfaceHelpers.CreateButton(_startBtn, "StartBTN", InterfaceButtonMode.Background, OnButtonClick,
                     Color.gray, Color.white, MAX_INTERACTION_DISTANCE);
 
-                var stopBtn = GameObjectHelpers.FindGameObject(gameObject, "StopBTN");
-                InterfaceHelpers.CreateButton(stopBtn, "StopBTN", InterfaceButtonMode.Background, OnButtonClick,
+                _stopBtn = GameObjectHelpers.FindGameObject(gameObject, "StopButton");
+                InterfaceHelpers.CreateButton(_stopBtn, "StopBTN", InterfaceButtonMode.Background, OnButtonClick,
                     Color.gray, Color.white, MAX_INTERACTION_DISTANCE);
 
                 var powerBtn = GameObjectHelpers.FindGameObject(gameObject, "PowerBTN");
@@ -113,6 +140,8 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
 
                 _numberPad = GameObjectHelpers.FindGameObject(gameObject, "NumberPad").AddComponent<NumberPadController>();
 
+                _paginatorController = GameObjectHelpers.FindGameObject(gameObject, "Paginator").AddComponent<PaginatorController>();
+                _paginatorController.Initialize(this);
                 #region Search
                 var inputField = GameObjectHelpers.FindGameObject(gameObject, "InputField");
                 var text = InterfaceHelpers.FindGameObject(inputField, "Placeholder")?.GetComponent<Text>();
@@ -135,11 +164,16 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
             return true;
         }
 
+        public override void GoToPage(int index)
+        {
+            _craftingGrid.DrawPage(index);
+        }
+
         private void OnLoadProductionGrid(DisplayData data)
         {
             try
             {
-                var grouped = _craftingItems;
+                var grouped = _mono.CraftingItems;
 
                 if (data.EndPosition > grouped.Count)
                 {
@@ -181,15 +215,27 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
                     data.EndPosition = grouped.Count;
                 }
 
-                for (int i = data.EndPosition; i < data.MaxPerPage; i++)
+                QuickLogger.Debug($"Resetting crafting buttons: {data.MaxPerPage}");
+                for (int i = 0; i < data.MaxPerPage; i++)
                 {
                     _craftingButtons[i].Reset();
                 }
 
+                int w = 0;
+
+                QuickLogger.Debug($"Setting crafting buttons: {data.MaxPerPage}");
                 for (int i = data.StartPosition; i < data.EndPosition; i++)
                 {
-                    _craftingButtons[i].Set(grouped.ElementAt(i),this);
+                    QuickLogger.Debug($"Trying to set : {i}");
+                    _craftingButtons[w++].Set(grouped.ElementAt(i), this);
+                    QuickLogger.Debug($"Set Crafting: {i}");
                 }
+
+
+                _craftingGrid.UpdaterPaginator(grouped.Count);
+                QuickLogger.Debug($"Max Pages: { _craftingGrid.GetMaxPages()}", true);
+                _paginatorController.ResetCount(_craftingGrid.GetMaxPages());
+
             }
             catch (Exception e)
             {
@@ -201,26 +247,26 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
 
         internal int GetProductIndex(CraftingItem craftingItem)
         {
-            return _craftingItems.IndexOf(craftingItem);
+            return _mono.CraftingItems.IndexOf(craftingItem);
         }
 
         public void AddNewCraftingItem(CraftingItem craftingItem)
         {
-            if(_craftingItems.Any(x=>x.TechType == craftingItem.TechType)) return; 
-            _craftingItems.Add(craftingItem);
+            if(_mono.CraftingItems.Any(x=>x.TechType == craftingItem.TechType)) return; 
+            _mono.CraftingItems.Add(craftingItem);
             _productionGrid.DrawPage();
             UpdateOrderCount();
         }
 
-        private void UpdateOrderCount()
+        internal void UpdateOrderCount()
         {
-            _orderCount.text = $"{_craftingItems.Count}/6";
+            _orderCount.text = $"{_mono.CraftingItems.Count}/6";
         }
 
         public void RemoveCraftingItem(CraftingItem craftingItem)
         {
-            _craftingItems.Remove(craftingItem);
-            _productionGrid.DrawPage();
+            _mono.CraftingItems.Remove(craftingItem);
+            
             foreach (DSSProductionItem item in _productionButtons)
             {
                 item.UpdateIndex();
@@ -230,14 +276,14 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
 
         public void Move(CraftingItem craftingItem, int index)
         {
-            var currentIndex = _craftingItems.IndexOf(craftingItem);
+            var currentIndex = _mono.CraftingItems.IndexOf(craftingItem);
 
             var activeItems = _productionButtons.Count(x => x.gameObject.activeSelf);
 
             QuickLogger.Debug($"Current Index: {currentIndex} || Going to Index: {currentIndex + index} || Active Item: {activeItems}",true);
             
             if (currentIndex + index == -1 || currentIndex + index == activeItems) return;
-            _craftingItems.Move(currentIndex, currentIndex + index);
+            _mono.CraftingItems.Move(currentIndex, currentIndex + index);
             _productionGrid.DrawPage();
         }
 
@@ -245,22 +291,10 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
         {
             _numberPad.Show(item);
         }
-    }
 
-    internal class StatusController : MonoBehaviour
-    {
-        private uGUI_Icon _slot1Icon;
-        private Text _slot1Text;
-        private uGUI_Icon _slot2Icon;
-        private Text _slot2Text;
-
-        private void Start()
+        public DSSAutoCrafterController GetController()
         {
-            _slot1Icon = gameObject.FindChild("ProductSlot1").FindChild("Icon").AddComponent<uGUI_Icon>();
-            _slot1Text = gameObject.FindChild("ProductSlot1").FindChild("ItemCount").AddComponent<Text>();
-
-            _slot2Icon = gameObject.FindChild("ProductSlot2").FindChild("Icon").AddComponent<uGUI_Icon>();
-            _slot2Text = gameObject.FindChild("ProductSlot2").FindChild("ItemCount").AddComponent<Text>();
+            return _mono;
         }
     }
 }

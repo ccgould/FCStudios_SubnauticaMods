@@ -9,6 +9,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
         private bool _isInitialized;
         private DSSAutoCrafterDisplay _controller;
         private TechType _techType;
+        private bool _isRecurring;
 
         private void Initialize()
         {

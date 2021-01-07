@@ -8,6 +8,8 @@ using FCS_AlterraHub.Mono.Controllers;
 using FCS_AlterraHub.Patches;
 using FCS_AlterraHub.Registration;
 using FCSCommon.Utilities;
+using SMLHelper.V2.Crafting;
+using SMLHelper.V2.Handlers;
 using UnityEngine;
 
 namespace FCS_AlterraHub.Mono
@@ -60,7 +62,7 @@ namespace FCS_AlterraHub.Mono
 
         private bool GetIsVisible()
         {
-            return Habitat?.powerRelay != null && HasAntenna() && Habitat.powerRelay.GetPowerStatus() == PowerSystem.Status.Normal;
+            return Habitat?.powerRelay != null && HasAntenna() && Habitat.powerRelay.GetPowerStatus() != PowerSystem.Status.Offline;
         }
 
         public static List<BaseManager> Managers { get; } = new List<BaseManager>();
@@ -466,16 +468,16 @@ namespace FCS_AlterraHub.Mono
 
             return TrackedResources.ContainsKey(techType) ? TrackedResources[techType].Amount : 0;
 
+            //TODO Delete if not needed
+            //var i = 0;
+            //var device = TrackedResources[techType];
 
-            var i = 0;
-            var device = TrackedResources[techType];
+            //foreach (FcsDevice controller in device.Servers)
+            //{
+            //    i += controller.GetItemCount(techType);
+            //}
 
-            foreach (FcsDevice controller in device.Servers)
-            {
-                i += controller.GetItemCount(techType);
-            }
-
-            return i;
+            //return i;
         }
 
         public bool HasItem(TechType techType)
@@ -491,11 +493,11 @@ namespace FCS_AlterraHub.Mono
             return false;
         }
 
-        public Pickupable TakeItem(TechType techType, StorageLocation storageFilter = StorageLocation.All)
+        public Pickupable TakeItem(TechType techType, StorageType storageFilter = StorageType.All)
         {
 
 
-            if (storageFilter == StorageLocation.Servers || storageFilter == StorageLocation.All)
+            if (storageFilter == StorageType.Servers || storageFilter == StorageType.All)
             {
                 foreach (IDSSRack baseRack in BaseRacks)
                 {
@@ -507,7 +509,7 @@ namespace FCS_AlterraHub.Mono
             }
 
 
-            if (storageFilter == StorageLocation.StorageLockers || storageFilter == StorageLocation.All)
+            if (storageFilter == StorageType.StorageLockers || storageFilter == StorageType.All)
             {
                 foreach (StorageContainer locker in BaseStorageLockers)
                 {
@@ -519,17 +521,39 @@ namespace FCS_AlterraHub.Mono
             }
 
 
-            if (storageFilter == StorageLocation.AlterraStorage || storageFilter == StorageLocation.All)
+            foreach (FcsDevice device in BaseFcsStorage)
             {
-                foreach (FcsDevice device in BaseFcsStorage)
+                QuickLogger.Debug($"Checking: Device ({device.UnitID}) || Contains: ({techType}) = ({device.GetStorage().ItemsContainer.Contains(techType)}) || StorageType: ({storageFilter})",true);
+
+                if (storageFilter == StorageType.All)
                 {
                     if (device.GetStorage().ItemsContainer.Contains(techType))
                     {
+                        QuickLogger.Debug("Made it",true);
                         return device.RemoveItemFromContainer(techType);
                     }
                 }
+                else
+                {
+                    if (device.StorageType == storageFilter)
+                    {
+                        if (device.GetStorage().ItemsContainer.Contains(techType))
+                        {
+                            return device.RemoveItemFromContainer(techType);
+                        }
+                    }
+                }
             }
-            
+
+
+
+
+            if (storageFilter == StorageType.AlterraStorage || storageFilter == StorageType.All)
+            {
+                
+            }
+
+
             return null;
         }
 
@@ -537,15 +561,15 @@ namespace FCS_AlterraHub.Mono
         private BaseSaveData _savedData;
         private bool _hasBreakerTripped;
 
-        public Dictionary<TechType, int> GetItemsWithin(StorageLocation location = StorageLocation.All)
+        public Dictionary<TechType, int> GetItemsWithin(StorageType type = StorageType.All)
         {
             _item.Clear();
 
-            switch (location)
+            switch (type)
             {
-                case StorageLocation.All:
+                case StorageType.All:
                     return TrackedResources.ToDictionary(x => x.Key, x => x.Value.Amount);
-                case StorageLocation.Servers:
+                case StorageType.Servers:
                     foreach (KeyValuePair<TechType, TrackedResource> resource in TrackedResources)
                     {
                         foreach (FcsDevice device in resource.Value.Servers)
@@ -554,7 +578,7 @@ namespace FCS_AlterraHub.Mono
                         }
                     }
                     return _item;
-                case StorageLocation.StorageLockers:
+                case StorageType.StorageLockers:
                     foreach (KeyValuePair<TechType, TrackedResource> resource in TrackedResources)
                     {
                         foreach (StorageContainer device in resource.Value.StorageContainers)
@@ -570,7 +594,7 @@ namespace FCS_AlterraHub.Mono
                         }
                     }
                     return _item;
-                case StorageLocation.AlterraStorage:
+                case StorageType.AlterraStorage:
                     foreach (KeyValuePair<TechType, TrackedResource> resource in TrackedResources)
                     {
                         foreach (FcsDevice device in resource.Value.AlterraStorage)
@@ -845,9 +869,9 @@ namespace FCS_AlterraHub.Mono
 
         #endregion
 
-        public int GetTotal(StorageLocation location)
+        public int GetTotal(StorageType type)
         {
-            return GetItemsWithin(location).Sum(x=>x.Value);
+            return GetItemsWithin(type).Sum(x=>x.Value);
         }
         
         internal void RegisterAntenna(FcsDevice unit)
@@ -990,6 +1014,45 @@ namespace FCS_AlterraHub.Mono
         {
             return HasBreakerTripped;
         }
+
+        public bool HasIngredientsFor(TechType techType)
+        {
+            var techData = CraftDataHandler.GetTechData(techType);
+            QuickLogger.Debug($"TechData: {techData?.ingredientCount}",true);
+
+
+            if (techData != null)
+            {
+                foreach (Ingredient ingredient in techData.Ingredients)
+                {
+                    var hasItem = GetItemCount(ingredient.techType) >= ingredient.amount;
+                    QuickLogger.Debug($"Has Item: {hasItem} || Item: {ingredient.techType}",true);
+                    
+                    if(!hasItem)
+                        return false;
+                }
+            }
+
+            return true;
+        }
+
+        public void ConsumeIngredientsFor(TechType techType)
+        {
+            var techData = CraftDataHandler.GetTechData(techType);
+            QuickLogger.Debug($"TechData: {techData?.ingredientCount}", true);
+
+
+            if (techData != null)
+            {
+                foreach (Ingredient ingredient in techData.Ingredients)
+                {
+                    for (int i = 0; i < ingredient.amount; i++)
+                    {
+                        GameObject.Destroy(TakeItem(ingredient.techType));
+                    }
+                }
+            }
+        }
     }
 
     public class BaseSaveData
@@ -1001,12 +1064,13 @@ namespace FCS_AlterraHub.Mono
         public List<TechType> BlackList { get; set; }
     }
 
-    public enum StorageLocation
+    public enum StorageType
     {
         All,
         Servers,
         StorageLockers,
-        AlterraStorage
+        AlterraStorage,
+        AutoCrafter
     }
 
     public struct TrackedLight

@@ -35,6 +35,7 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Buildable
         public static GameObject DSSFormattingStationPrefab { get; set; }
         public static GameObject DSSInventoryItemPrefab { get; set; }
         public static GameObject FilterItemPrefab { get; set; }
+        public static GameObject DSSCrafterCratePrefab { get; set; }
 
 
         internal static void Initialize()
@@ -60,6 +61,7 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Buildable
             DSSItemDisplayPrefab = GetPrefab(Mod.DSSItemDisplayPrefabName);
             DSSInventoryItemPrefab = GetPrefab("DSSInventoryItem");
             DSSAvaliableVehiclesItemPrefab = GetPrefab("AvaliableVehiclesItem");
+            DSSCrafterCratePrefab = GetPrefab("DSSCrafterCrate");
             FilterItemPrefab = GetPrefab("FilterItem");
         }
         
@@ -119,11 +121,11 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Buildable
 
             #region BaseColor
             MaterialHelpers.ApplySpecShader(BodyMaterial, SpecTexture, prefab, 1, 3f, bundle);
+            MaterialHelpers.ApplySpecShader(BodyMaterial, SpecTexture, prefab, 1, 3f, bundle);
             MaterialHelpers.ApplyEmissionShader(DecalMaterial, LUMTexture, prefab, bundle, Color.white);
             MaterialHelpers.ApplyEmissionShader(DetailsMaterial, LUMTexture, prefab, bundle, Color.white);
             MaterialHelpers.ApplyEmissionShader(EmissionControllerMaterial, LUMTexture, prefab, bundle, Color.white);
             MaterialHelpers.ApplyAlphaShader(DecalMaterial, prefab);
-            MaterialHelpers.ApplyAlphaShader(DetailsMaterial, prefab);
             #endregion
         }
     }

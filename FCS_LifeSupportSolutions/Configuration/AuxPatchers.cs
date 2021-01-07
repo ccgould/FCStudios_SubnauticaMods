@@ -19,7 +19,8 @@ namespace FCS_LifeSupportSolutions.Configuration
             { $"{ModKey}_NoMedKitsToTake","There are no MedKits please wait for more to generate."},
             { $"{ModKey}_HealPlayer","Heal Player"},
             { $"{ModKey}_TakeOxygen","TAKE OXYGEN"},
-            { $"{ModKey}_TakeOxygenDesc","Gives you oxygen directly from the base utility unit"}
+            { $"{ModKey}_TakeOxygenDesc","Gives you oxygen directly from the base utility unit"},
+            { $"{ModKey}_HasPipeAttachment","Tank has pipe attached please disconnect pipe to deconstruct."},
         };
 
         internal static void AdditionalPatching()
@@ -93,6 +94,11 @@ namespace FCS_LifeSupportSolutions.Configuration
         public static string TakeOxygenDesc()
         {
             return GetLanguage($"{ModKey}_TakeOxygenDesc");
+        }
+
+        public static string OxygenTankHasAttachment()
+        {
+            return GetLanguage($"{ModKey}_HasPipeAttachment");
         }
     }
 }

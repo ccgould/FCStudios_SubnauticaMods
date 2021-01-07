@@ -34,13 +34,14 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
         private ProtobufSerializer _serializer;
         private Text _storageAmount;
         private const int MAXSTORAGE = 200;
+        public override bool IsVisible => true;
         public Action<int, int> OnContainerUpdate { get; set; }
         public Action<FcsDevice, TechType> OnContainerAddItem { get; set; }
         public Action<FcsDevice, TechType> OnContainerRemoveItem { get; set; }
         public int GetContainerFreeSpace => MAXSTORAGE - _storageContainer.GetCount();
         public bool IsFull => _storageContainer.GetCount() >= MAXSTORAGE;
         private readonly List<InventoryButton> _inventoryButtons = new List<InventoryButton>();
-
+        public override StorageType StorageType { get; } = StorageType.AlterraStorage;
 
         #region Unity Methods
 
@@ -98,8 +99,6 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
 
         public override void Initialize()
         {
-            IsVisible = true;
-
             _storageAmount = GameObjectHelpers.FindGameObject(gameObject, "StorageAmount").GetComponent<Text>();
 
             foreach (Transform invItem in GameObjectHelpers.FindGameObject(gameObject, "Grid").transform)

@@ -68,7 +68,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         internal Action OnItemsPerDayChanged { get; set; }
         internal Action OnUsageChange { get; set; }
 
-        internal event Action<TechType> OnAddCreated;
+        internal Action<TechType> OnAddCreated { get; set; }
         #endregion
 
         /// <summary>

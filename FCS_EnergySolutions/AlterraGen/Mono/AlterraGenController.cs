@@ -26,6 +26,7 @@ namespace FCS_EnergySolutions.AlterraGen.Mono
         internal AnimationManager AnimationManager { get; set; }
         internal AlterraGenDisplayManager DisplayManager { get; private set; }
         public DumpContainer DumpContainer { get; private set; }
+        public override bool IsVisible { get; } = true;
 
         #region Unity Methods
 
@@ -52,7 +53,6 @@ namespace FCS_EnergySolutions.AlterraGen.Mono
 
                     _colorManager.ChangeColor(_savedData.Body.Vector4ToColor());
                     PowerManager.LoadFromSave(_savedData);
-                    IsVisible = _savedData.IsVisible;
                 }
 
                 _runStartUpOnEnable = false;
@@ -199,7 +199,6 @@ namespace FCS_EnergySolutions.AlterraGen.Mono
             _savedData.PowerState = PowerManager.PowerState;
             _savedData.StoredPower = PowerManager.GetStoredPower();
             _savedData.Power = PowerManager.GetPowerSourcePower();
-            _savedData.IsVisible = IsVisible;
             _savedData.BaseId = BaseId;
             newSaveData.AlterraGenEntries.Add(_savedData);
         }

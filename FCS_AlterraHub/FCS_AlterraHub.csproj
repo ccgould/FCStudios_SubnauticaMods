@@ -138,6 +138,7 @@
     <Compile Include="Helpers\EncodeDecode.cs" />
     <Compile Include="Helpers\MathHelpers.cs" />
     <Compile Include="Helpers\SpawnHelper.cs" />
+    <Compile Include="Helpers\TechDataHelpers.cs" />
     <Compile Include="Helpers\WorldHelpers.cs" />
     <Compile Include="Interfaces\IDSSRack.cs" />
     <Compile Include="Interfaces\IFCSGrowBed.cs" />

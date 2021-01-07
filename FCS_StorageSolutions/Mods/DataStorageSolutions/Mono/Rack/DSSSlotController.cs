@@ -216,16 +216,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
             _storage.RestoreItems(serializer,data);
         }
 
-        internal void SetIsVisible(bool value)
-        {
-            FindServer();
-
-            if (_mountedServer != null)
-            {
-                _mountedServer.IsVisible = value;
-            }
-        }
-
         public int GetStorageAmount()
         {
             FindServer();

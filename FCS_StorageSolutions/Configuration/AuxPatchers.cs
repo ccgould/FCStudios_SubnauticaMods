@@ -41,6 +41,7 @@ namespace FCS_StorageSolutions.Configuration
             { $"{ModKey}_AddToBlackList","Add item to blacklist"},
             { $"{ModKey}_CraftFormatted","Add {0} to queue"},
             { $"{ModKey}_EnterAmount","Enter Amount"},
+            { $"{ModKey}_AmountIsZero","{0} entry amount is 0 please specify ab amount."},
         };
         
         internal static void AdditionalPatching()
@@ -229,6 +230,11 @@ namespace FCS_StorageSolutions.Configuration
         public static string EnterAmount()
         {
             return GetLanguage($"{ModKey}_EnterAmount");
+        }
+
+        public static string AmountIsZero(string name)
+        {
+            return string.Format(GetLanguage($"{ModKey}_AmountIsZero"), name);
         }
     }
 }

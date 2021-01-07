@@ -29,5 +29,10 @@ namespace FCSCommon.Abstract
         public virtual void TurnOffDisplay()
         {
         }
+
+        public virtual void GoToPage(int index)
+        {
+            
+        }
     }
 }

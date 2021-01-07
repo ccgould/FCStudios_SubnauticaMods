@@ -24,6 +24,15 @@ namespace FCS_LifeSupportSolutions.Configuration
         [JsonProperty] internal Vec4 Body { get; set; }
         [JsonProperty] internal Vec4 SecondaryBody { get; set; }
         [JsonProperty] internal float O2Level { get; set; }
+    }      
+    internal class BaseOxygenTankEntry : ISaveDataEntry
+    {
+        public string Id { get; set; }
+        public string BaseId { get; set; }
+        [JsonProperty] internal string SaveVersion { get; set; } = "1.0";
+        [JsonProperty] internal Vec4 Body { get; set; }
+        [JsonProperty] internal Vec4 SecondaryBody { get; set; }
+        [JsonProperty] internal float O2Level { get; set; }
     }    
     
     internal class MiniMedBayEntry : ISaveDataEntry
@@ -43,5 +52,6 @@ namespace FCS_LifeSupportSolutions.Configuration
         [JsonProperty] internal List<EnergyPillVendingMachineEntry> EnergyPillVendingMachineEntries = new List<EnergyPillVendingMachineEntry>();
         [JsonProperty] internal List<MiniMedBayEntry> MiniMedBayEntries = new List<MiniMedBayEntry>();
         [JsonProperty] internal List<BaseUtilityEntry> BaseUtilityUnitEntries = new List<BaseUtilityEntry>();
+        [JsonProperty] internal List<BaseOxygenTankEntry> BaseOxygenTankEntries = new List<BaseOxygenTankEntry>();
     }
 }

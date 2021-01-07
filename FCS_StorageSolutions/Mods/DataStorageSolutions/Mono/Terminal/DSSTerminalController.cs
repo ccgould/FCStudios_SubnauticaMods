@@ -46,7 +46,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         {
             UpdateScreenState();
 
-            if (!isTripped && Manager.GetPowerState() == PowerSystem.Status.Normal)
+            if (!isTripped && Manager.GetPowerState() != PowerSystem.Status.Offline)
             {
                 _display.PowerOnDisplay();
             }
@@ -63,18 +63,14 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
 
         private void UpdateScreenState()
         {
-            if (Manager.GetPowerState() != PowerSystem.Status.Normal)
+            if (Manager.GetPowerState() == PowerSystem.Status.Offline)
             {
                 _display?.TurnOffDisplay();
+                return;
             }
-            
-            if(Manager.GetPowerState() == PowerSystem.Status.Normal)
-            {
-                _display?.TurnOnDisplay();
-            }
+
+            _display?.TurnOnDisplay();
         }
-
-
 
         private void OnEnable()
         {
@@ -118,7 +114,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             {
                 _display = gameObject.EnsureComponent<DSSTerminalDisplayManager>();
             }
-
+            InvokeRepeating(nameof(UpdateScreenState), 1, 1);
             IsInitialized = true;
 
             QuickLogger.Debug($"Initialized");

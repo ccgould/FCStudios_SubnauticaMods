@@ -227,7 +227,11 @@ namespace FCS_AlterraHub.Configuration
                 OnDataLoaded?.Invoke(_saveData);
             });
 
-            CardSystem.main.Load(_saveData.AccountDetails);
+
+            if (_saveData != null)
+            {
+                CardSystem.main.Load(_saveData.AccountDetails);
+            }
         }
 
         internal static bool IsSaving()

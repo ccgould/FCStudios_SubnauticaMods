@@ -3,29 +3,36 @@ using System.IO;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Spawnables;
-using FCS_HomeSolutions.Configuration;
-using FCS_HomeSolutions.HoverLiftPad.Mono;
+using FCS_LifeSupportSolutions.Buildable;
+using FCS_LifeSupportSolutions.Configuration;
+using FCS_LifeSupportSolutions.Mods.OxygenTank.Mono;
+using FCSCommon.Extensions;
+using FCSCommon.Helpers;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
+using SMLHelper.V2.Utility;
 using UnityEngine;
 
-namespace FCS_HomeSolutions.Buildables
+namespace FCS_LifeSupportSolutions.Mods.BaseOxygenTank.Buildable
 {
-    internal class HoverLiftPadPatch : Buildable
+    internal class BaseOxygenTankPatch : SMLHelper.V2.Assets.Buildable
     {
         public override TechGroup GroupForPDA => TechGroup.ExteriorModules;
         public override TechCategory CategoryForPDA => TechCategory.ExteriorModule;
-        public override string AssetsFolder => Mod.GetAssetPath();
+        private string _assetFolder => Mod.GetAssetFolder();
+        public override string AssetsFolder => _assetFolder;
 
-        public HoverLiftPadPatch() : base(Mod.HoverLiftPadClassID, Mod.HoverLiftPadFriendly, Mod.HoverLiftPadDescription)
+        public BaseOxygenTankPatch() : base(Mod.BaseOxygenTankClassID, Mod.BaseOxygenTankFriendly, Mod.BaseOxygenTankDescription)
         {
+            OnStartedPatching += () =>
+            {
+                var BaseOxygenTankPatch = new FCSKit(Mod.BaseOxygenTankKitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
+                BaseOxygenTankPatch.Patch();
+            };
+
             OnFinishedPatching += () =>
             {
-                var hoverLiftPadKit = new FCSKit(Mod.HoverLiftPadKitClassID, Mod.HoverLiftPadFriendly, Path.Combine(AssetsFolder, $"{ClassID}.png"));
-                hoverLiftPadKit.Patch();
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, hoverLiftPadKit.TechType, 50000, StoreCategory.Home);
-                FCSAlterraHubService.PublicAPI.RegisterPatchedMod(ClassID);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.BaseOxygenTankKitClassID.ToTechType(), 300000, StoreCategory.LifeSupport);
             };
         }
 
@@ -33,12 +40,12 @@ namespace FCS_HomeSolutions.Buildables
         {
             try
             {
-                var prefab = GameObject.Instantiate(ModelPrefab.HoverLiftPadPrefab);
+                var prefab = GameObject.Instantiate(ModelPrefab.BaseOxygenTankPrefab);
 
-                //var size = new Vector3(1.353966f, 2.503282f, 1.006555f);
-                //var center = new Vector3(0.006554961f, 1.394679f, 0.003277525f);
+                var center = new Vector3(-2.488494e-05f, 0.6907129f, 0.02741182f);
+                var size = new Vector3(1.997957f, 1.303595f, 1.819634f);
 
-                //GameObjectHelpers.AddConstructableBounds(prefab, size, center);
+                GameObjectHelpers.AddConstructableBounds(prefab, size, center);
 
                 var model = prefab.FindChild("model");
 
@@ -52,7 +59,6 @@ namespace FCS_HomeSolutions.Buildables
 
                 // Add constructible
                 var constructable = prefab.AddComponent<Constructable>();
-
                 constructable.allowedOutside = true;
                 constructable.allowedInBase = false;
                 constructable.allowedOnGround = true;
@@ -61,17 +67,15 @@ namespace FCS_HomeSolutions.Buildables
                 constructable.allowedOnCeiling = false;
                 constructable.allowedInSub = false;
                 constructable.allowedOnConstructables = false;
-                constructable.forceUpright = true;
                 constructable.model = model;
                 constructable.techType = TechType;
 
                 PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
                 prefabID.ClassId = ClassID;
-
                 prefab.AddComponent<TechTag>().type = TechType;
-                prefab.AddComponent<HoverLiftPadController>();
+                prefab.AddComponent<BaseOxygenTankController>();
+                
                 return prefab;
-
             }
             catch (Exception e)
             {
@@ -81,16 +85,29 @@ namespace FCS_HomeSolutions.Buildables
             return null;
         }
 
-
 #if SUBNAUTICA
         protected override TechData GetBlueprintRecipe()
         {
-            return Mod.HoverLiftPadIngredients;
+            QuickLogger.Debug($"Creating recipe...");
+            // Create and associate recipe to the new TechType
+            return Mod.BaseOxygenTankIngredients;
+        }
+
+        protected override Atlas.Sprite GetItemSprite()
+        {
+            return new Atlas.Sprite(ImageUtils.LoadTextureFromFile(Path.Combine(_assetFolder, $"{ClassID}.png")));
         }
 #elif BELOWZERO
         protected override RecipeData GetBlueprintRecipe()
         {
-            return Mod.HoverLiftPadIngredients;
+            QuickLogger.Debug($"Creating recipe...");
+            // Create and associate recipe to the new TechType
+            return Mod.BaseOxygenTankIngredients;
+        }
+
+        protected override Sprite GetItemSprite()
+        {
+            return ImageUtils.LoadSpriteFromFile(Path.Combine(_assetFolder, $"{ClassID}.png"));
         }
 #endif
     }

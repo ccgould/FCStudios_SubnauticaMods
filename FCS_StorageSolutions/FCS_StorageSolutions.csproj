@@ -133,11 +133,16 @@
     <Compile Include="Mods\DataStorageSolutions\Buildable\DSSServerSpawnable.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\Antenna\DSSAntennaController.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\AutoCrafter\CraftingItem.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\AutoCrafter\CraftMachine.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\AutoCrafter\DSSAutoCrafterController.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\AutoCrafter\DSSAutoCrafterCrateController.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\AutoCrafter\DSSAutoCrafterDisplay.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\AutoCrafter\DSSCraftingItem.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\AutoCrafter\DSSCraftManager.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\AutoCrafter\DSSProductionItem.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\AutoCrafter\NumberPadController.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\AutoCrafter\PaginatorController.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\AutoCrafter\StatusController.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\FormattingStation\AddFilterController.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\FormattingStation\DSSFormattingStationController.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\FormattingStation\DSSFormattingStationDisplay.cs" />

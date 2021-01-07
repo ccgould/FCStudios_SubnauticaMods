@@ -665,5 +665,19 @@ namespace FCSCommon.Helpers
                 }
             }
         }
+
+        public static Material GetMaterial(GameObject go, string materialName)
+        {
+            var m_Material = go.GetComponent<Renderer>();
+            foreach (var material in m_Material.materials)
+            {
+                if (material.name.StartsWith(materialName, StringComparison.OrdinalIgnoreCase))
+                {
+                    return material;
+                }
+            }
+
+            return null;
+        }
     }
 }

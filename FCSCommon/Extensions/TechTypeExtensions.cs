@@ -28,6 +28,7 @@ namespace FCSCommon.Extensions
 
         internal static InventoryItem ToInventoryItem(this TechType techType)
         {
+
             InventoryItem item = null;
             if (PrefabDatabase.TryGetPrefabFilename(CraftData.GetClassIdForTechType(techType), out string filepath))
             {
