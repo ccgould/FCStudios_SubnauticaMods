@@ -182,6 +182,11 @@ namespace FCS_LifeSupportSolutions.Mods.OxygenTank.Mono
                     _runStartUpOnEnable = true;
                 }
             }
+            else
+            {
+                if (_oxygenAttachPoint != null)
+                    _oxygenAttachPoint.SetParent(null);
+            }
         }
 
         public void Save(SaveData newSaveData, ProtobufSerializer serializer = null)
@@ -293,7 +298,57 @@ namespace FCS_LifeSupportSolutions.Mods.OxygenTank.Mono
 
         public bool GetProvidesOxygen()
         {
+            IPipeConnection parent = this.GetParent();
+            if(parent != null && parent.GetProvidesOxygen())
+            {
+                return true;
+            }
             return false;
+        }
+
+        public void Update()
+        {
+            if(this.parentPipeUID is null)
+            {
+                IPipeConnection parent = null;
+                float num = 1000f;
+                int num2 = UWE.Utils.OverlapSphereIntoSharedBuffer(base.transform.position, 11f, -1, QueryTriggerInteraction.UseGlobal);
+                for (int i = 0; i < num2; i++)
+                {
+                    GameObject entityRoot = UWE.Utils.GetEntityRoot(UWE.Utils.sharedColliderBuffer[i].gameObject);
+                    if (!(entityRoot == null))
+                    {
+                        IPipeConnection component = entityRoot.GetComponent<IPipeConnection>();
+                        if (component != null && component.GetRoot() != null && this.IsInSight(component))
+                        {
+                            float magnitude = (entityRoot.transform.position - base.transform.position).magnitude;
+                            if (magnitude < num)
+                            {
+                                parent = component;
+                                num = magnitude;
+                            }
+                        }
+                    }
+                }
+                this.SetParent(parent);
+            }
+        }
+
+        private bool IsInSight(IPipeConnection parent)
+        {
+            bool result = true;
+            Vector3 value = parent.GetAttachPoint() - this.GetAttachPoint();
+            int num = UWE.Utils.RaycastIntoSharedBuffer(new Ray(this.GetAttachPoint(), Vector3.Normalize(value)), value.magnitude, -5, QueryTriggerInteraction.UseGlobal);
+            for (int i = 0; i < num; i++)
+            {
+                if (UWE.Utils.GetEntityRoot(UWE.Utils.sharedHitBuffer[i].collider.gameObject) != parent.GetGameObject())
+                {
+                    result = false;
+                    break;
+                }
+            }
+
+            return result;
         }
 
         public Vector3 GetAttachPoint()
