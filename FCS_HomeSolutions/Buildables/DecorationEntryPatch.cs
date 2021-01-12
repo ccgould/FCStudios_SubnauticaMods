@@ -37,7 +37,7 @@ namespace FCS_HomeSolutions.Buildables
 
             OnFinishedPatching += () =>
             {
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, settings.KitClassID.ToTechType(), 500, StoreCategory.Home);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, settings.KitClassID.ToTechType(), 15000, StoreCategory.Home);
             };
         }
 
@@ -126,20 +126,5 @@ namespace FCS_HomeSolutions.Buildables
         }
 
 #endif
-    }
-
-    internal struct Settings
-    {
-        internal bool AllowedOutside;
-        internal bool AllowedInBase;
-        internal bool AllowedOnGround;
-        internal bool AllowedOnWall;
-        internal bool RotationEnabled;
-        internal bool AllowedOnCeiling;
-        internal bool AllowedInSub;
-        internal bool AllowedOnConstructables;
-        internal string KitClassID;
-        internal Vector3 Size;
-        internal Vector3 Center;
     }
 }

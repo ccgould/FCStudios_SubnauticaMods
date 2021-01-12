@@ -136,6 +136,12 @@ namespace FCS_HomeSolutions.Configuration
         internal const string EmptyObservationTankPrefabName = "ObservationTank";
         public static string EmptyObservationTankKitClassID = $"{EmptyObservationTankClassID}_kit";
 
+        internal const string AlterraMiniBathroomClassID = "AlterraMiniBathroom";
+        internal const string AlterraMiniBathroomFriendly = "Alterra Mini Bathroom";
+        internal const string AlterraMiniBathroomDescription = "A bathroom for all your humanly needs";
+        internal const string AlterraMiniBathroomPrefabName = "AlterraMiniBathroom";
+        public static string AlterraMiniBathroomKitClassID = $"{AlterraMiniBathroomClassID}_kit";
+
 
         internal static readonly Dictionary<TechType, TechType> CuredCreatureList = new Dictionary<TechType, TechType>(TechTypeExtensions.sTechTypeComparer)
         {
@@ -798,6 +804,44 @@ namespace FCS_HomeSolutions.Configuration
             }
 
             return new FEXRDataEntry() { Id = id };
+        }
+
+        public static SignDataEntry GetSignDataEntrySaveData(string id)
+        {
+            LoadData();
+
+            var saveData = GetSaveData();
+
+            foreach (var entry in saveData.SignDataEntries)
+            {
+                if (string.IsNullOrEmpty(entry.Id)) continue;
+
+                if (entry.Id == id)
+                {
+                    return entry;
+                }
+            }
+
+            return new SignDataEntry() { Id = id };
+        }        
+        
+        public static AlterraMiniBathroomDataEntry GetAlterraMiniBathroomSaveData(string id)
+        {
+            LoadData();
+
+            var saveData = GetSaveData();
+
+            foreach (var entry in saveData.AlterraMiniBathroomEntries)
+            {
+                if (string.IsNullOrEmpty(entry.Id)) continue;
+
+                if (entry.Id == id)
+                {
+                    return entry;
+                }
+            }
+
+            return new AlterraMiniBathroomDataEntry() { Id = id };
         }
     }
 }

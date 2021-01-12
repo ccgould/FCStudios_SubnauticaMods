@@ -26,7 +26,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable
             {
                 var dssTerminalKit = new FCSKit(Mod.DSSTerminalKitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 dssTerminalKit.Patch();
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.DSSTerminalKitClassID.ToTechType(), 36900, StoreCategory.Storage);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.DSSTerminalKitClassID.ToTechType(), 126000, StoreCategory.Storage);
                 //    FCSAlterraHubService.PublicAPI.RegisterEncyclopediaEntry(TechType, new List<FcsEntryData>
                 //    {
                 //        new FcsEntryData

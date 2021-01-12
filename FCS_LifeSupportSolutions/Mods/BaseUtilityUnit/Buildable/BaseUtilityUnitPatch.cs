@@ -32,7 +32,7 @@ namespace FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Buildable
 
             OnFinishedPatching += () =>
             {
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.BaseUtilityUnityKitClassID.ToTechType(), 300000, StoreCategory.LifeSupport);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.BaseUtilityUnityKitClassID.ToTechType(), 202500, StoreCategory.LifeSupport);
             };
         }
 

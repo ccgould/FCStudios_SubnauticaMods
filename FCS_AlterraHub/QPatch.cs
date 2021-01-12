@@ -45,15 +45,12 @@ namespace FCS_AlterraHub
             //Patch all spawnables
             PatchSpawnables();
 
-            //CreatKitEntries
-            CreateKits();
-
             //Run Harmony Patches
             var harmony = Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), "com.alterrahub.fcstudios");
 
             if (QModServices.Main.ModPresent("EasyCraft"))
                 EasyCraft_API.Init(harmony);
-
+            
             //Register debug commands
             ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));
         }
@@ -61,16 +58,15 @@ namespace FCS_AlterraHub
         public static FCSHUD HUD { get; set; }
         public static bool IsDockedVehicleStorageAccessInstalled { get; set; }
 
-        private static void CreateKits()
-        {
-            FCSAlterraHubService.PublicAPI.CreateStoreEntry(Mod.OreConsumerTechType, Mod.OreConsumerKitClassID.ToTechType(), 30000, StoreCategory.Production);
-        }
-
         private static void PatchSpawnables()
         {
             //Patch Bio Fuel
             var bioFuelSpawnable = new BioFuelSpawnable();
             bioFuelSpawnable.Patch();
+
+            //Patch FCS PDA Deco
+            var fcsPDADeco = new FCSPDADecoSpawnable();
+            fcsPDADeco.Patch();
 
             //Patch Debit Card
             var debitCardSpawnable = new DebitCardSpawnable();

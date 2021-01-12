@@ -479,7 +479,7 @@ namespace FCSCommon.Helpers
             {
                 foreach (Material material in renderer.materials)
                 {
-                    if (material.name.StartsWith(materialName, StringComparison.OrdinalIgnoreCase))
+                    if (RemoveClone(material.name).Trim().Equals(materialName, StringComparison.OrdinalIgnoreCase))
                     {
                         material.SetVector("_GlowColor", color);
                         result = true;

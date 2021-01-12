@@ -29,7 +29,7 @@ namespace FCS_HomeSolutions.Mods.AlienChief.Buildables
             };
             OnFinishedPatching += () =>
             {
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.AlienChiefKitClassID.ToTechType(), 60500, StoreCategory.Home);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.AlienChiefKitClassID.ToTechType(), 105000, StoreCategory.Home);
                 FCSAlterraHubService.PublicAPI.RegisterPatchedMod(ClassID);
             };
         }

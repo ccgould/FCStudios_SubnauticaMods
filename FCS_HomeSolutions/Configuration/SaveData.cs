@@ -129,6 +129,16 @@ namespace FCS_HomeSolutions.Configuration
         [JsonProperty(PropertyName = "BID")] internal string BaseID { get; set; }
     }       
     
+    internal class AlterraMiniBathroomDataEntry
+    {
+        [JsonProperty] internal string Id { get; set; }
+        [JsonProperty(PropertyName = "COL")] internal Vec4 Fcs { get; set; }
+        [JsonProperty(PropertyName = "SCOL")] internal Vec4 Secondary { get; set; }
+        public bool ShowerDoorState { get; set; }
+        public bool ToiletDoorState { get; set; }
+        public bool IsShowerOn { get; set; }
+    }       
+    
     internal class ObservationTankDataEntry
     {
         [JsonProperty] internal string Id { get; set; }
@@ -136,8 +146,18 @@ namespace FCS_HomeSolutions.Configuration
         [JsonProperty(PropertyName = "SCOL")] internal Vec4 Secondary { get; set; }
         [JsonProperty(PropertyName = "ECOL")] internal Vec4 Emission { get; set; }
         [JsonProperty(PropertyName = "BID")] internal string BaseID { get; set; }
-    }    
-    
+    }
+
+
+    internal class SignDataEntry
+    {
+        [JsonProperty] internal string Id { get; set; }
+        [JsonProperty(PropertyName = "COL")] internal Vec4 Body { get; set; }
+        [JsonProperty(PropertyName = "ADir")] internal Vec4 ArrowDirection { get; set; }
+        [JsonProperty(PropertyName = "SignName")] internal string SignName { get; set; }
+    }
+
+
     internal class CabinetDataEntry
     {
         [JsonProperty] internal string Id { get; set; }
@@ -174,6 +194,7 @@ namespace FCS_HomeSolutions.Configuration
         [JsonProperty] internal float SaveVersion { get; set; } = 1.0f;
 
         [JsonProperty] internal List<SeaBreezeDataEntry> SeaBreezeDataEntries = new List<SeaBreezeDataEntry>();
+        [JsonProperty] internal List<SignDataEntry> SignDataEntries = new List<SignDataEntry>();
         [JsonProperty] internal List<HoverLiftDataEntry> HoverLiftDataEntries = new List<HoverLiftDataEntry>();
         [JsonProperty] internal List<DecorationDataEntry> DecorationEntries = new List<DecorationDataEntry>();
         [JsonProperty] internal List<PaintToolDataEntry> PaintToolEntries = new List<PaintToolDataEntry>();
@@ -188,5 +209,6 @@ namespace FCS_HomeSolutions.Configuration
         [JsonProperty] internal List<LedLightDataEntry> LedLightDataEntries = new List<LedLightDataEntry>();
         [JsonProperty] internal List<ObservationTankDataEntry> ObservationTankDataEntries = new List<ObservationTankDataEntry>();
         [JsonProperty] internal List<FEXRDataEntry> FEXRDataEntries = new List<FEXRDataEntry>();
+        [JsonProperty] internal List<AlterraMiniBathroomDataEntry> AlterraMiniBathroomEntries = new List<AlterraMiniBathroomDataEntry>();
     }
 }

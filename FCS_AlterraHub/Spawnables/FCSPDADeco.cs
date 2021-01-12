@@ -1,30 +1,23 @@
 ﻿using System;
-using System.IO;
-using FCS_AlterraHub.Enumerators;
-using FCS_AlterraHub.Registration;
-using FCS_AlterraHub.Spawnables;
-using FCS_HomeSolutions.Buildables;
-using FCS_HomeSolutions.Configuration;
-using FCS_HomeSolutions.Mono.PaintTool;
-using FCSCommon.Extensions;
+using FCS_AlterraHub.Buildables;
+using FCS_AlterraHub.Configuration;
+using FCS_AlterraHub.Mono;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Assets;
-using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
 using UnityEngine;
 
-namespace FCS_HomeSolutions.Spawnables
+namespace FCS_AlterraHub.Spawnables
 {
-    internal class PaintCanSpawnable : Spawnable
+    internal class FCSPDADecoSpawnable : Spawnable
     {
         public override string AssetsFolder => Mod.GetAssetPath();
 
-        public PaintCanSpawnable() : base(Mod.PaintCanClassID, Mod.PaintCanFriendly, Mod.PaintCanDescription)
+        public FCSPDADecoSpawnable() : base("FCSPDADeco", "Alterra HUB PDA", "Fake FCS PDA")
         {
             OnFinishedPatching += () =>
-            { 
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, TechType, 7500, StoreCategory.Home);
+            {
                 CraftDataHandler.SetEquipmentType(TechType, EquipmentType.Hand);
             };
         }
@@ -33,7 +26,8 @@ namespace FCS_HomeSolutions.Spawnables
         {
             try
             {
-                var prefab = GameObject.Instantiate(ModelPrefab.PaintCanPrefab);
+                var prefab = GameObject.Instantiate(AlterraHub.FCSPDADecoPrefab);
+                AlterraHub.ApplyShaders(prefab, QPatch.GlobalBundle);
 
                 prefab.AddComponent<PrefabIdentifier>();
                 prefab.AddComponent<TechTag>().type = TechType;
@@ -84,6 +78,7 @@ namespace FCS_HomeSolutions.Spawnables
                 applier.renderers = new Renderer[] { renderer };
                 applier.anchorSky = Skies.Auto;
 
+                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModName);
                 return prefab;
             }
             catch (Exception e)

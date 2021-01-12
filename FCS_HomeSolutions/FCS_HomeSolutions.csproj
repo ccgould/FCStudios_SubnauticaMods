@@ -131,6 +131,8 @@
     <Compile Include="Buildables\ModelPrefab.cs" />
     <Compile Include="BaseOperator\Buildable\BaseOperatorPatch.cs" />
     <Compile Include="Buildables\OutDoorPlanters\OutDoorPlanterPatch.cs" />
+    <Compile Include="Buildables\Settings.cs" />
+    <Compile Include="Buildables\SignEntryPatch.cs" />
     <Compile Include="Buildables\SweetWaterBarPatch.cs" />
     <Compile Include="Configuration\AuxPatchers.cs" />
     <Compile Include="Configuration\Config.cs" />
@@ -168,6 +170,8 @@
     <Compile Include="Mods\AlienChef\Mono\FoodQueueList.cs" />
     <Compile Include="Mods\AlienChef\Mono\OrderListItem.cs" />
     <Compile Include="Mods\AlienChef\Mono\OrderWindowDialog.cs" />
+    <Compile Include="Mods\AlterraMiniShower\Buildable\AlterraMiniBathroomPrefab.cs" />
+    <Compile Include="Mods\AlterraMiniShower\Mono\AlterraMiniBathroomController.cs" />
     <Compile Include="Mods\Cabinets\Buildable\Cabinet2.cs" />
     <Compile Include="Mods\Cabinets\Buildable\Cabinet3.cs" />
     <Compile Include="Mods\Cabinets\Buildable\Cabinet1.cs" />

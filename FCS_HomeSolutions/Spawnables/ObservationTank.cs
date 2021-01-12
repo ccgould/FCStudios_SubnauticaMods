@@ -31,7 +31,7 @@ namespace FCS_HomeSolutions.Spawnables
             {
                 var observationTankKit = new FCSKit(Mod.EmptyObservationTankKitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 observationTankKit.Patch();
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.EmptyObservationTankKitClassID.ToTechType(), 120, StoreCategory.Home);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.EmptyObservationTankKitClassID.ToTechType(), 13500, StoreCategory.Home);
             };
         }
 

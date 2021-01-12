@@ -151,6 +151,7 @@
     <Compile Include="Model\Fridge.cs" />
     <Compile Include="Model\PowercellData.cs" />
     <Compile Include="Model\ProximityActivate.cs" />
+    <Compile Include="Model\TimeCache.cs" />
     <Compile Include="Mono\AlterraHub\HubTrigger.cs" />
     <Compile Include="Mono\BaseManager.cs" />
     <Compile Include="Mono\ColorItemButton.cs" />
@@ -159,6 +160,7 @@
     <Compile Include="Mono\DSSVehicleDockingManager.cs" />
     <Compile Include="Mono\DumpContainerSimplified.cs" />
     <Compile Include="Mono\FCSAquarium.cs" />
+    <Compile Include="Mono\FCSPDA\Mono\FCSPDAController.cs" />
     <Compile Include="Mono\FCSStorage.cs" />
     <Compile Include="Mono\FCSStorageNonSerialized.cs" />
     <Compile Include="Mono\FCSToggleButton.cs" />
@@ -205,6 +207,7 @@
     <Compile Include="Patch\EnumTypeCache.cs" />
     <Compile Include="Patch\PDATabPatcher.cs" />
     <Compile Include="Patch\UIPatches.cs" />
+    <Compile Include="Spawnables\FCSPDADeco.cs" />
     <Compile Include="Structs\FcsEntryData.cs" />
     <Compile Include="Structs\FCSStoreEntry.cs" />
     <Compile Include="Spawnables\BioFuelSpawnable.cs" />

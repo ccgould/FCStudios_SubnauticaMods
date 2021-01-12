@@ -38,7 +38,7 @@ namespace FCS_HomeSolutions.SeaBreeze.Buildable
             };
             OnFinishedPatching += () =>
             {
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.SeaBreezeKitClassID.ToTechType(), 44500, StoreCategory.Home);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.SeaBreezeKitClassID.ToTechType(), 131250, StoreCategory.Home);
                 FCSAlterraHubService.PublicAPI.RegisterPatchedMod(ClassID);
                 SeaBreezeAuxPatcher.AdditionalPatching();
             };

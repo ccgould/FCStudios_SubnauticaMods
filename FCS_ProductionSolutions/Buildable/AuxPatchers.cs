@@ -69,6 +69,8 @@ namespace FCS_ProductionSolutions.Buildable
 
         public static string HarvesterToggleLight()
         {
+
+             
             return GetLanguage($"{ModKey}_ToggleLight");
         }
 

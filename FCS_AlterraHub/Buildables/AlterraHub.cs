@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace FCS_AlterraHub.Buildables
 {
-    internal partial class AlterraHub : Buildable
+    public partial class AlterraHub : Buildable
     {
         public override TechGroup GroupForPDA => TechGroup.InteriorModules;
         public override TechCategory CategoryForPDA => TechCategory.InteriorModule;

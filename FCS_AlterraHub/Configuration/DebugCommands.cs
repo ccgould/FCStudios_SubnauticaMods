@@ -1,4 +1,5 @@
-﻿using FCS_AlterraHub.Mono.AlterraHub;
+﻿using System.Linq;
+using FCS_AlterraHub.Mono.AlterraHub;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Commands;
@@ -50,6 +51,16 @@ namespace FCS_AlterraHub.Configuration
                 _teleportEffects.StopTeleport();
             }
             return $"Parameters: {activate}";
+        }        
+        
+        [ConsoleCommand("OrePrices")]
+        public static void OrePricesCommand()
+        {
+            for (int i = 0; i < StoreInventorySystem.OrePrices.Count; i++)
+            {
+                var tech = StoreInventorySystem.OrePrices.ElementAt(i).Key;
+                QuickLogger.ModMessage($"{Language.main.Get(tech)} : {StoreInventorySystem.GetOrePrice(tech)}");
+            }
         }
     }
 }

@@ -34,7 +34,7 @@ namespace FCS_EnergySolutions.AlterraGen.Buildables
             OnFinishedPatching += () =>
             {
                 AdditionalPatching();
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.AlterraGenKitClassID.ToTechType(), 10000, StoreCategory.Energy);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.AlterraGenKitClassID.ToTechType(), 90000, StoreCategory.Energy);
             };
         }
 

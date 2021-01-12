@@ -37,7 +37,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
         {
             return transform.position;
         }
-
+        
 
         public OreConsumerDisplay DisplayManager { get; private set; }
         public TransferHandler TransferHandler { get; private set; }

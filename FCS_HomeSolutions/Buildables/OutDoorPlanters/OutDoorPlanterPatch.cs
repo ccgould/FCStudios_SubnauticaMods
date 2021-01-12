@@ -35,7 +35,7 @@ namespace FCS_HomeSolutions.Buildables.OutDoorPlanters
 
             OnFinishedPatching += () =>
             {
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.SmartPlanterPotKitClassID.ToTechType(), 50, StoreCategory.Home);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.SmartPlanterPotKitClassID.ToTechType(), 21000, StoreCategory.Home);
             };
         }
 

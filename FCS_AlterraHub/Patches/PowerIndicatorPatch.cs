@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Helpers;
 using FCSCommon.Utilities;
 using HarmonyLib;
@@ -27,6 +28,7 @@ namespace FCS_AlterraHub.Patches
             }
 
             IndicatorInstance = __instance;
+
         }
 
         public static uGUI_PowerIndicator IndicatorInstance { get; set; }

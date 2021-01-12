@@ -1,7 +1,7 @@
 ﻿using FCSCommon.Utilities;
-using Harmony;
 using System;
 using System.Reflection;
+using HarmonyLib;
 using QModManager.API.ModLoading;
 using UnityEngine;
 
@@ -22,7 +22,7 @@ namespace FCStudioDebugger
 
             try
             {
-                var harmony = HarmonyInstance.Create("com.fcsdebugger.fcstudios");
+                var harmony = new Harmony("com.fcsdebugger.fcstudios");
                 harmony.PatchAll(Assembly.GetExecutingAssembly());
 
                 GetGlassShader();

@@ -32,7 +32,7 @@ namespace FCS_LifeSupportSolutions.Mods.MiniMedBay.Buildable
 
             OnFinishedPatching += () =>
             {
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.MiniMedBayKitClassID.ToTechType(), 560970, StoreCategory.LifeSupport);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.MiniMedBayKitClassID.ToTechType(), 131250, StoreCategory.LifeSupport);
             };
         }
 

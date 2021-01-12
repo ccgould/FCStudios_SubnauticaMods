@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace FCS_AlterraHub.Buildables
 {
-    internal partial class AlterraHub
+    public partial class AlterraHub
     {
         private const string ModKey = "AHB";
 

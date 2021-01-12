@@ -31,7 +31,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable
             {
                 var dssItemDisplayKit = new FCSKit(Mod.DSSItemDisplayKitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 dssItemDisplayKit.Patch();
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.DSSItemDisplayKitClassID.ToTechType(), 10000, StoreCategory.Storage);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.DSSItemDisplayKitClassID.ToTechType(), 37500, StoreCategory.Storage);
                 //    FCSAlterraHubService.PublicAPI.RegisterEncyclopediaEntry(TechType, new List<FcsEntryData>
                 //    {
                 //        new FcsEntryData

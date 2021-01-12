@@ -271,6 +271,7 @@ namespace FCS_HomeSolutions.Mono.PaintTool
             return true;
         }
 
+
         public override bool OnAltUp()
         {
             return true;

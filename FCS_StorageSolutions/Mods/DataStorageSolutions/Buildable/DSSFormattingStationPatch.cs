@@ -27,7 +27,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable
             {
                 var dssFormattingStationKit = new FCSKit(Mod.DSSFormattingStationKitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 dssFormattingStationKit.Patch();
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.DSSFormattingStationKitClassID.ToTechType(), 36900, StoreCategory.Storage);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.DSSFormattingStationKitClassID.ToTechType(), 105000, StoreCategory.Storage);
                 //    FCSAlterraHubService.PublicAPI.RegisterEncyclopediaEntry(TechType, new List<FcsEntryData>
                 //    {
                 //        new FcsEntryData

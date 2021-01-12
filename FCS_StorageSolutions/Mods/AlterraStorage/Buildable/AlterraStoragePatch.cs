@@ -24,7 +24,7 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Buildable
             {
                 var AlterraStorageKit = new FCSKit(Mod.AlterraStorageKitClassID, Mod.AlterraStorageFriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 AlterraStorageKit.Patch();
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, AlterraStorageKit.TechType, 30000, StoreCategory.Storage);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, AlterraStorageKit.TechType, 94500, StoreCategory.Storage);
             //    FCSAlterraHubService.PublicAPI.RegisterEncyclopediaEntry(TechType, new List<FcsEntryData>
             //    {
             //        new FcsEntryData

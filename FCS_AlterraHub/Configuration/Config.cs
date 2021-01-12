@@ -8,6 +8,7 @@ using Oculus.Newtonsoft.Json;
 using SMLHelper.V2.Json;
 using SMLHelper.V2.Options;
 using SMLHelper.V2.Options.Attributes;
+using UnityEngine;
 using UnityEngine.Events;
 
 namespace FCS_AlterraHub.Configuration
@@ -21,12 +22,14 @@ namespace FCS_AlterraHub.Configuration
 
         [JsonIgnore]
         public UnityAction<int> onGameModeChanged;
-        
+
+        [Keybind("Open/Close FCS PDA")]
+        public KeyCode FCSPDAKeyCode = KeyCode.F2;
 
         public List<FCSStoreEntry> AdditionalStoreItems = new List<FCSStoreEntry>();
-        
-        [Choice("Mode Game Mode"), OnChange(nameof(ChangeGameModeEvent))]
-        public FCSGameMode GameModeOption { get; set; }
+
+        [Slider("Ore Payout Difficulty", 0.1f, 1.9f, DefaultValue = 1, Step = 0.1f, Format = "{0}",Tooltip = "The higher the value the more payout per ore.")] 
+        public float OrePayoutMultiplier { get; set; }
 
         [Toggle("Play Sound Effects"), OnChange(nameof(PlaySoundToggleEvent))]
         public bool PlaySFX = true;

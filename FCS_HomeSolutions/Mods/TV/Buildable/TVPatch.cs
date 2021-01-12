@@ -38,7 +38,7 @@ namespace FCS_HomeSolutions.Mods.TV.Buildable
 
             OnFinishedPatching += () =>
             {
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, settings.KitClassID.ToTechType(), 500, StoreCategory.Home);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, settings.KitClassID.ToTechType(), 78750, StoreCategory.Home);
             };
         }
 

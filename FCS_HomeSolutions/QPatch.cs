@@ -53,6 +53,7 @@ namespace FCS_HomeSolutions
             OptionsPanelHandler.Main.RegisterModOptions<QuantumTeleporterConfig>();
 
         internal static Dictionary<string, Texture2D> Patterns = new Dictionary<string, Texture2D>();
+
         internal static Dictionary<Texture2D, Atlas.Sprite> PatternsIcon = new Dictionary<Texture2D, Atlas.Sprite>();
 
         [QModPatch]
@@ -83,9 +84,9 @@ namespace FCS_HomeSolutions
             var paintToolSpawnable = new PaintToolSpawnable();
             paintToolSpawnable.Patch();
 
-            //Patch Base Operator
-            var baseOperator = new BaseOperatorPatch();
-            baseOperator.Patch();
+            ////Patch Base Operator
+            //var baseOperator = new BaseOperatorPatch();
+            //baseOperator.Patch();
 
             //Patch hover Lift Operator
             var hoverLiftPad = new HoverLiftPadPatch();
@@ -138,6 +139,13 @@ namespace FCS_HomeSolutions
             //Patch Alien Chief
             var alienChief = new AlienChefBuildable();
             alienChief.Patch();
+
+
+            //Patch Alterra Mini Bathroom
+            var alterraMiniBathroom = new AlterraMiniBathroomBuildable();
+            alterraMiniBathroom.Patch();
+
+            LoadSigns();
 
             LoadOtherObjects();
 
@@ -562,15 +570,40 @@ namespace FCS_HomeSolutions
             cabinet3.Patch();
         }
 
-        public static Sprite ConvertTextureToSprite(Texture2D texture, float PixelsPerUnit = 100.0f,
-            SpriteMeshType spriteType = SpriteMeshType.Tight)
+        private void LoadSigns()
         {
-            // Converts a Texture2D to a sprite, assign this texture to a new sprite and return its reference
+            var wallSign = new SignEntryPatch("wallSign", "Wall Sign", "A sign to place around your base",
+                ModelPrefab.GetPrefab("AlterraWallSign"),
+                new Settings
+                {
+                    KitClassID = "wallSign_kit",
+                    AllowedInBase = true,
+                    AllowedOutside = false,
+                    AllowedOnGround = false,
+                    AllowedOnWall = true,
+                    RotationEnabled = false,
+                    CategoryForPDA = TechCategory.InteriorModule,
+                    GroupForPDA = TechGroup.InteriorModules,
+                    Size = new Vector3(0.9294822f, 0.204877f, 0.04135694f),
+                    Center = new Vector3(0f, 0f, 0.04976267f)
+                });
+            wallSign.Patch();
 
-            Sprite NewSprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0, 0),
-                PixelsPerUnit, 0, spriteType);
-
-            return NewSprite;
+            var outsideSign = new SignEntryPatch("outsideSign", "Outside Sign", "A sign to place outside your base",
+                ModelPrefab.GetPrefab("AlterraOutsideSign"),
+                new Settings
+                {
+                    KitClassID = "outsideSign_kit",
+                    AllowedInBase = false,
+                    AllowedOutside = true,
+                    AllowedOnGround = true,
+                    RotationEnabled = true,
+                    CategoryForPDA = TechCategory.ExteriorModule,
+                    GroupForPDA = TechGroup.ExteriorModules,
+                    Size = new Vector3(0.920086f, 0.8915547f, 0.07656322f),
+                    Center = new Vector3(0f, 0.5162937f, 0f)
+                });
+            outsideSign.Patch();
         }
     }
 }

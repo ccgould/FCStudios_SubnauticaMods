@@ -6,52 +6,81 @@ using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Spawnables;
 using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
-using FCS_HomeSolutions.MiniFountainFilter.Managers;
-using FCS_HomeSolutions.MiniFountainFilter.Mono;
-using FCS_HomeSolutions.ModManagers;
+using FCS_HomeSolutions.Mods.AlterraMiniShower.Mono;
+using FCS_HomeSolutions.Mods.Cabinets.Mono;
 using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
 using UnityEngine;
 
-namespace FCS_HomeSolutions.MiniFountainFilter.Buildables
+namespace FCS_HomeSolutions.Mods.Cabinets.Buildable
 {
-    internal partial class MiniFountainFilterBuildable : Buildable
+    internal class AlterraMiniBathroomBuildable : SMLHelper.V2.Assets.Buildable
     {
-        public MiniFountainFilterBuildable() : base(Mod.MiniFountainFilterClassID, Mod.MiniFountainFilterFriendly, Mod.MiniFountainFilterDescription)
-        {
+        private GameObject _locker;
+        private GameObject _stairShipChair;
 
+        public AlterraMiniBathroomBuildable() : base(Mod.AlterraMiniBathroomClassID, Mod.AlterraMiniBathroomFriendly, Mod.AlterraMiniBathroomDescription)
+        {
             OnStartedPatching += () =>
             {
-                var miniFountainKit = new FCSKit(Mod.MiniFountainFilterKitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
-                miniFountainKit.Patch();
+                var alterraMiniBathroomKit = new FCSKit(Mod.AlterraMiniBathroomKitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
+                alterraMiniBathroomKit.Patch();
             };
             OnFinishedPatching += () =>
             {
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.MiniFountainFilterKitClassID.ToTechType(), 45000, StoreCategory.Home);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.AlterraMiniBathroomKitClassID.ToTechType(), 500, StoreCategory.Home);
                 FCSAlterraHubService.PublicAPI.RegisterPatchedMod(ClassID);
-                AdditionalPatching();
             };
+
+            _stairShipChair = Resources.Load<GameObject>("Submarine/Build/StarshipChair");
+
         }
 
         public override GameObject GetGameObject()
         {
             try
             {
-                var prefab = GameObject.Instantiate(ModelPrefab.MiniFountainFilterPrefab);
+                GameObject starShipChair  = GameObject.Instantiate(_stairShipChair);
+                var prefab = GameObject.Instantiate(ModelPrefab.AlterraMiniBathroomPrefab);
+
+
+                // Scale
+                starShipChair.transform.localScale *= 0.5f;
+                foreach (Transform tr in starShipChair.transform)
+                {
+                    tr.localPosition = new Vector3(tr.localPosition.x, tr.localPosition.y + 0.3f, tr.localPosition.z);
+                }
+
+                Renderer[] renderers = starShipChair.GetComponentsInChildren<Renderer>();
+                foreach (Renderer rend in renderers)
+                {
+                    rend.enabled = false;
+                }
+
+                // Add large world entity
+                var lwe = starShipChair.GetComponent<LargeWorldEntity>();
+                if (lwe == null)
+                    lwe = starShipChair.AddComponent<LargeWorldEntity>();
+                lwe.cellLevel = LargeWorldEntity.CellLevel.Near;
+
+
+                starShipChair.transform.parent = prefab.transform;
+                UWE.Utils.ZeroTransform(starShipChair);
+                starShipChair.transform.localPosition = new Vector3(0.80f,-0.30f,0.43f);
+
+                var cb = starShipChair.GetComponentInChildren<ConstructableBounds>();
+                cb.bounds.size = Vector3.zero;
+                cb.bounds.position = Vector3.zero;
+                //GameObject.Destroy(cb);
 
                 prefab.name = this.PrefabFileName;
-                
-                var center = new Vector3(0.003585503f, 0.08162725f, 0.2536881f);
-                var size = new Vector3(0.9551572f, 1.22244f, 0.4737879f);
 
-                GameObjectHelpers.AddConstructableBounds(prefab,size,center);
+                var center = new Vector3(0.03977585f, 1.502479f, 0.4276283f);
+                var size = new Vector3(2.949196f, 1.283838f, 1.457463f);
 
-                // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
-                var lwe = prefab.AddComponent<LargeWorldEntity>();
-                lwe.cellLevel = LargeWorldEntity.CellLevel.Far;
+                GameObjectHelpers.AddConstructableBounds(prefab, size, center);
 
                 var model = prefab.FindChild("model");
 
@@ -65,24 +94,24 @@ namespace FCS_HomeSolutions.MiniFountainFilter.Buildables
 
                 // Add constructible
                 var constructable = prefab.AddComponent<Constructable>();
-                constructable.allowedOnWall = true;
-                constructable.allowedOnGround = false;
+                constructable.allowedOnWall = false;
+                constructable.allowedOnGround = true;
                 constructable.allowedInSub = true;
                 constructable.allowedInBase = true;
                 constructable.allowedOnCeiling = false;
                 constructable.allowedOutside = false;
+                constructable.allowedOnConstructables = true;
+                constructable.rotationEnabled = true;
                 constructable.model = model;
                 constructable.techType = TechType;
 
                 PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
                 prefabID.ClassId = ClassID;
 
-                prefab.AddComponent<AnimationManager>();
                 prefab.AddComponent<TechTag>().type = TechType;
-                prefab.AddComponent<FMOD_CustomLoopingEmitter>();
-                prefab.AddComponent<MiniFountainFilterController>();
+                prefab.AddComponent<AlterraMiniBathroomController>();
 
-                //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
+                //Apply the glass shader here because of autosort lockers for some reason doesn't like it.
                 MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModName);
 
                 return prefab;
@@ -106,7 +135,7 @@ namespace FCS_HomeSolutions.MiniFountainFilter.Buildables
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(Mod.MiniFountainFilterKitClassID.ToTechType(), 1)
+                    new Ingredient(Mod.AlterraMiniBathroomKitClassID.ToTechType(), 1)
                 }
             };
             return customFabRecipe;
@@ -122,7 +151,7 @@ namespace FCS_HomeSolutions.MiniFountainFilter.Buildables
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(Mod.MiniFountainFilterKitClassID.ToTechType(), 1)
+                    new Ingredient(Mod.AlterraMiniBathroomKitClassID.ToTechType(), 1)
                 }
             };
             return customFabRecipe;

@@ -26,7 +26,7 @@ namespace FCS_HomeSolutions.TrashReceptacle.Buildable
             {
                 var recyclerKit = new FCSKit(Mod.RecyclerKitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 recyclerKit.Patch();
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, recyclerKit.TechType, 100000, StoreCategory.Home);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, recyclerKit.TechType, 157500, StoreCategory.Home);
                 FCSAlterraHubService.PublicAPI.RegisterPatchedMod(ClassID);
             };
         }

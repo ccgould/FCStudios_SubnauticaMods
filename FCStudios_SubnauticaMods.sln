@@ -48,6 +48,7 @@ Global
 		FCSCommon\FCSCommon.projitems*{7317fee1-c0b2-443e-ab9d-3f656b6c766a}*SharedItemsImports = 4
 		FCSCommon\FCSCommon.projitems*{a698ff65-e6f7-4924-a84e-f96c81f4d98e}*SharedItemsImports = 4
 		FCSCommon\FCSCommon.projitems*{a6e4e0fb-a509-4711-a5ee-341541abdd39}*SharedItemsImports = 4
+		FCSCommon\FCSCommon.projitems*{b260a268-5873-4147-953c-1ef67a65cb4e}*SharedItemsImports = 4
 		FCSCommon\FCSCommon.projitems*{dbc34043-0f09-42ef-beb9-f59cbc6df16f}*SharedItemsImports = 13
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

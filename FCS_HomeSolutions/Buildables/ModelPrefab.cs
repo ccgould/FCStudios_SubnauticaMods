@@ -1,5 +1,6 @@
 ﻿using System;
 using FCS_AlterraHub.API;
+using FCS_AlterraHub.Buildables;
 using FCS_HomeSolutions.Configuration;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
@@ -52,6 +53,7 @@ namespace FCS_HomeSolutions.Buildables
         public static GameObject LedLightShortPrefab { get; set; }
         public static GameObject ObservationTankPrefab { get; set; }
         public static GameObject FireExtinguisherRefuelerPrefab { get; set; }
+        public static GameObject AlterraMiniBathroomPrefab { get; set; }
 
         internal static void Initialize()
         {
@@ -81,6 +83,7 @@ namespace FCS_HomeSolutions.Buildables
             Cabinet1Prefab = GetPrefab(Mod.Cabinet1PrefabName);
             Cabinet2Prefab = GetPrefab(Mod.Cabinet2PrefabName);
             Cabinet3Prefab = GetPrefab(Mod.Cabinet3PrefabName);
+            AlterraMiniBathroomPrefab = GetPrefab(Mod.AlterraMiniBathroomPrefabName,true);
             FireExtinguisherRefuelerPrefab = GetPrefab(Mod.FireExtinguisherRefuelerPrefabName);
             ObservationTankPrefab = GetPrefab(Mod.EmptyObservationTankPrefabName);
             TrashRecyclerItemPrefab = GetPrefab("RecyclerItem");
@@ -96,12 +99,22 @@ namespace FCS_HomeSolutions.Buildables
             _initialized = true;
         }
         
-        internal static GameObject GetPrefab(string prefabName)
+        internal static GameObject GetPrefab(string prefabName, bool isV2 = false)
         {
             try
             {
+                GameObject prefabGo;
+
                 QuickLogger.Debug($"Getting Prefab: {prefabName}");
-                if (!LoadAsset(prefabName, ModBundle, out var prefabGo)) return null;
+                if (isV2)
+                {
+                    if (!LoadAssetV2(prefabName, ModBundle, out prefabGo)) return null;
+                }
+                else
+                {
+                    if (!LoadAsset(prefabName, ModBundle, out prefabGo)) return null;
+                }
+                
                 return prefabGo;
             }
             catch (Exception e)
@@ -138,6 +151,37 @@ namespace FCS_HomeSolutions.Buildables
             go = null;
             return false;
         }
+
+
+        private static bool LoadAssetV2(string prefabName, AssetBundle assetBundle, out GameObject go, bool applyShaders = true)
+        {
+            QuickLogger.Debug("Loading Asset");
+            //We have found the asset bundle and now we are going to continue by looking for the model.
+            GameObject prefab = assetBundle.LoadAsset<GameObject>(prefabName);
+            QuickLogger.Debug($"Loaded Prefab {prefabName}");
+
+            //If the prefab isn't null lets add the shader to the materials
+            if (prefab != null)
+            {
+                if (applyShaders)
+                {
+                    //Lets apply the material shader
+                    AlterraHub.ApplyShadersV2(prefab,assetBundle);
+                    QuickLogger.Debug($"Applied shaderes to prefab {prefabName}");
+                }
+
+                go = prefab;
+                QuickLogger.Debug($"{prefabName} Prefab Found!");
+                return true;
+            }
+
+            QuickLogger.Error($"{prefabName} Prefab Not Found!");
+
+            go = null;
+            return false;
+        }
+
+
 
         /// <summary>
         /// Applies the shader to the materials of the reactor

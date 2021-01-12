@@ -31,7 +31,7 @@ namespace FCS_HomeSolutions.QuantumTeleporter.Buildable
             };
             OnFinishedPatching += () =>
             {
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.QuantumTeleporterKitClassID.ToTechType(), 1100500, StoreCategory.Home);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.QuantumTeleporterKitClassID.ToTechType(), 750000, StoreCategory.Home);
                 FCSAlterraHubService.PublicAPI.RegisterPatchedMod(ClassID);
             };
         }

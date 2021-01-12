@@ -93,9 +93,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         {
             MoveTray();
         }
-
         
-
         private void OnEnable()
         {
             if (_runStartUpOnEnable)

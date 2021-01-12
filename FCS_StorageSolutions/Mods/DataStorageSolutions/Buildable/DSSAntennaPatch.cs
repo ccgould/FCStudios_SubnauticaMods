@@ -26,7 +26,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable
             {
                 var dssAntennaKit = new FCSKit(Mod.DSSAntennaKitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 dssAntennaKit.Patch();
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.DSSAntennaKitClassID.ToTechType(), 20000, StoreCategory.Storage);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.DSSAntennaKitClassID.ToTechType(), 210000, StoreCategory.Storage);
                 //    FCSAlterraHubService.PublicAPI.RegisterEncyclopediaEntry(TechType, new List<FcsEntryData>
                 //    {
                 //        new FcsEntryData

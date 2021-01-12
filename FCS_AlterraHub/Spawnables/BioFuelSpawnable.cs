@@ -19,7 +19,7 @@ namespace FCS_AlterraHub.Craftables
             OnFinishedPatching += () =>
             {
                 BioReactorHandler.SetBioReactorCharge(TechType,840f);
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, TechType, 3000, StoreCategory.Production);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, TechType, 37500, StoreCategory.Production);
                 CraftDataHandler.SetEquipmentType(TechType, EquipmentType.Hand);
             };
         }

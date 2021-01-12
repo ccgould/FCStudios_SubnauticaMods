@@ -24,7 +24,7 @@ namespace FCS_HomeSolutions.Buildables
             {
                 var hoverLiftPadKit = new FCSKit(Mod.HoverLiftPadKitClassID, Mod.HoverLiftPadFriendly, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 hoverLiftPadKit.Patch();
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, hoverLiftPadKit.TechType, 50000, StoreCategory.Home);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, hoverLiftPadKit.TechType, 157500, StoreCategory.Home);
                 FCSAlterraHubService.PublicAPI.RegisterPatchedMod(ClassID);
             };
         }

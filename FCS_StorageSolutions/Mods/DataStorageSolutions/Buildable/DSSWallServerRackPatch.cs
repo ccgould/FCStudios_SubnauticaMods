@@ -25,7 +25,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable
             {
                 var DSSWallServerRackKit = new FCSKit(Mod.DSSWallServerRackKitClassID, Mod.DSSWallServerRackFriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 DSSWallServerRackKit.Patch();
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, DSSWallServerRackKit.TechType, 700, StoreCategory.Storage);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, DSSWallServerRackKit.TechType, 65625, StoreCategory.Storage);
             //    FCSAlterraHubService.PublicAPI.RegisterEncyclopediaEntry(TechType, new List<FcsEntryData>
             //    {
             //        new FcsEntryData

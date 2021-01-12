@@ -5,6 +5,7 @@ using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Mono.AlterraHub;
 using FCS_AlterraHub.Structs;
 using FCSCommon.Helpers;
+using QModManager.API.ModLoading;
 using UnityEngine;
 
 namespace FCS_AlterraHub.Systems
@@ -15,22 +16,22 @@ namespace FCS_AlterraHub.Systems
     internal static class StoreInventorySystem
     { 
         private static readonly Dictionary<FCSStoreEntry, decimal> KnownPrices = new Dictionary<FCSStoreEntry, decimal>();
-        private static readonly Dictionary<TechType, decimal> OrePrices = new Dictionary<TechType, decimal>
+        internal static readonly Dictionary<TechType, decimal> OrePrices = new Dictionary<TechType, decimal>
         {
-            {TechType.Copper,2000},
-            {TechType.Sulphur,1500 },
-            {TechType.Diamond,100000 },
-            {TechType.Gold,12000 },
-            {TechType.Kyanite, 291965 },
-            {TechType.Lead,750 },
-            {TechType.Lithium,5644 },
-            {TechType.Magnetite,7500 },
-            {TechType.Nickel,5500 },
-            {TechType.Quartz,2200 },
-            {TechType.AluminumOxide,10635 },
-            {TechType.Silver,3500 },
-            {TechType.UraniniteCrystal,14000 },
-            {TechType.Titanium, 1500}
+            {TechType.Titanium, 1500},
+            {TechType.Copper,2250},
+            {TechType.Quartz,6000 },
+            {TechType.Lead,9000 },
+            {TechType.Diamond,20475 },
+            {TechType.Silver,11250 },
+            {TechType.Gold,15750 },
+            {TechType.Lithium,15750 },
+            {TechType.Sulphur,22200 },
+            {TechType.Magnetite,19425 },
+            {TechType.Nickel,24000 },
+            {TechType.AluminumOxide,25200 },
+            {TechType.UraniniteCrystal,22050 },
+            {TechType.Kyanite, 37500 }
         };
         
         internal static decimal GetPrice(TechType techType,bool checkKit = false)
@@ -53,7 +54,7 @@ namespace FCS_AlterraHub.Systems
             //Price will be calculated by the ingredients of an item if an ingredient is unknown it will apply a default value to that item
             if (OrePrices.ContainsKey(techType))
             {
-                return OrePrices[techType];
+                return OrePrices[techType] * (decimal)QPatch.Configuration.OrePayoutMultiplier;
             }
 
             return 0;
