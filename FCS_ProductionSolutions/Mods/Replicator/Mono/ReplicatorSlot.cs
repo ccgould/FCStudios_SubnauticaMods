@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using FCS_AlterraHub.Helpers;
+using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.HydroponicHarvester.Enumerators;
 using FCS_ProductionSolutions.HydroponicHarvester.Mono;
 using FCSCommon.Utilities;
@@ -43,13 +45,14 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
         {
             _mono = mono;
         }
-        
-        internal void ChangeTargetItem(TechType type)
+
+        internal void ChangeTargetItem(TechType type, bool force = false)
         {
-            if (IsOccupied) return;
+            QuickLogger.Debug($"ChangeTargetItem condition: {IsOccupied && !force}",true);
+            if (IsOccupied && !force) return;
+            QuickLogger.Debug($"Changing target item {type}", true);
             _targetItem = type;
             GenerationProgress = 0;
-            
         }
 
         internal float GetPercentageDone()
@@ -73,7 +76,7 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
             
             if (GenerationProgress >= QPatch.Configuration.EnergyConsumpion)
             {
-                QuickLogger.Debug("[Hydroponic Harvester] Generated Clone", true);
+                QuickLogger.Debug("[Replicator] Generated Clone", true);
                 PauseUpdates = true;
                 GenerationProgress = -1f;
                 SpawnClone();
@@ -96,8 +99,11 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
 
         internal bool TryClear()
         {
+            QuickLogger.Debug($"Item Count {_itemCount}.", true);
             if (_itemCount > 0) return false;
-            _targetItem = TechType.None;
+            
+            ChangeTargetItem(TechType.None,true);
+            _mono.UpdateUI();
             return true;
         }
 
@@ -105,11 +111,18 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
         {
             techType = TechType.None;
             if (_itemCount <= 0) return false;
-            techType = _targetItem;
-            _itemCount--;
-            TryStartingNextClone();
-            _mono.UpdateUI();
-            return true;
+
+            if (PlayerInteractionHelper.CanPlayerHold(_targetItem))
+            {
+                techType = _targetItem;
+                _itemCount--;
+                TryStartingNextClone();
+                _mono.UpdateUI();
+                return true;
+            }
+
+            QuickLogger.ModMessage(AuxPatchers.InventoryFull());
+            return false;
         }
 
         public void AddItem()
@@ -130,12 +143,12 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
         {
             QuickLogger.Debug("Trying to start another clone", true);
 
-            if (CurrentSpeedMode == SpeedModes.Off)
+            if (CurrentSpeedMode == SpeedModes.Off || _targetItem == TechType.None)
                 return;// Powered off, can't start a new clone
 
             if (!IsFull && GenerationProgress == -1f)
             {
-                QuickLogger.Debug("[Hydroponic Harvester] Generating", true);
+                QuickLogger.Debug("[Replicator] Generating", true);
                 GenerationProgress = 0f;
             }
             else

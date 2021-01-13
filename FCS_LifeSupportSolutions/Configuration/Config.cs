@@ -37,7 +37,7 @@ namespace FCS_LifeSupportSolutions.Configuration
         {
         }
         [Toggle("Is Mod Enabled", Tooltip = "Set to true to enable the mod. (Requires Game Restart.)"), OnChange(nameof(IsModeEnabledToggleEvent))]
-        public bool IsModEnabled = false;
+        public bool IsModEnabled = true;
 
         [Toggle("Require Utility Unit for Oxygen")]
         public bool AffectPlayerOxygen = false;

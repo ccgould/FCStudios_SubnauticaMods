@@ -31,10 +31,12 @@ namespace FCS_AlterraHub.Mono.AlterraHub
         private DumpContainerSimplified _dumpContainer;
         private MotorHandler _motorHandler;
         private GameObject _playerBody;
+        private bool _isInUse;
 
 
         internal HubTrigger AlterraHubTrigger { get; set; }
         internal AlterraHubDisplay DisplayManager { get; private set; }
+        private MessageBoxHandler messageBoxHandler => MessageBoxHandler.main;
 
 
         #region Unity Methods
@@ -87,6 +89,8 @@ namespace FCS_AlterraHub.Mono.AlterraHub
         {
             if(IsInitialized) return;
 
+            MessageBoxHandler.main.ObjectRoot = gameObject;
+
             if (AlterraHubTrigger == null)
             {
                 AlterraHubTrigger = GameObjectHelpers.FindGameObject(gameObject, "Trigger").AddComponent<HubTrigger>();
@@ -102,7 +106,11 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             {
                 DisplayManager = gameObject.AddComponent<AlterraHubDisplay>();
                 DisplayManager.Setup(this);
-                DisplayManager.OnReturnButtonClicked += () => { _dumpContainer.OpenStorage();};
+                DisplayManager.OnReturnButtonClicked += () =>
+                {
+                    ExitStore();
+                    _dumpContainer.OpenStorage();
+                };
             }
 
             if (_motorHandler == null)
@@ -251,7 +259,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
                     if (panelHelper.StoreCategory == storeItem.Value.StoreCategory)
                     {
                         StoreInventorySystem.AddNewStoreItem(storeItem.Value);
-                        panelHelper.AddContent(StoreInventorySystem.CreateStoreItem(storeItem.Value, AddToCardCallBack));
+                        panelHelper.AddContent(StoreInventorySystem.CreateStoreItem(storeItem.Value, AddToCardCallBack,IsInUse));
                         QuickLogger.Debug($"Added Store Item  {Language.main.Get(storeItem.Key)} to Panel: {panelHelper.StoreCategory}:");
                     }
                 }
@@ -262,10 +270,15 @@ namespace FCS_AlterraHub.Mono.AlterraHub
                     {
                         QuickLogger.Info($"Item: {storeItem.TechType} || Category: {storeItem.StoreCategory} || Cost: {storeItem.Cost}");
                         StoreInventorySystem.AddNewStoreItem(storeItem);
-                        panelHelper.AddContent(StoreInventorySystem.CreateStoreItem(storeItem, AddToCardCallBack));
+                        panelHelper.AddContent(StoreInventorySystem.CreateStoreItem(storeItem, AddToCardCallBack, IsInUse));
                     }
                 }
             }
+        }
+
+        private bool IsInUse()
+        {
+            return _isInUse;
         }
 
         private void AddToCardCallBack(TechType techType,TechType receiveTechType)
@@ -351,7 +364,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             if (_isInRange)
             {
                 InterceptInput(true);
-
+                _isInUse = true;
                 var hudCameraPos = _hubCameraPosition.transform.position;
                 var hudCameraRot = _hubCameraPosition.transform.rotation;
                 Player.main.SetPosition(new Vector3(hudCameraPos.x, Player.main.transform.position.y, hudCameraPos.z), hudCameraRot);
@@ -364,6 +377,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
 
         internal void ExitStore()
         {
+            _isInUse = false;
             SNCameraRoot.main.transform.localPosition = Vector3.zero;
             SNCameraRoot.main.transform.localRotation = Quaternion.identity;
             ExitLockedMode();

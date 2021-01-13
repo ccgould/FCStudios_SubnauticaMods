@@ -28,8 +28,8 @@ namespace FCS_AlterraHub.Configuration
 
         public List<FCSStoreEntry> AdditionalStoreItems = new List<FCSStoreEntry>();
 
-        [Slider("Ore Payout Difficulty", 0.1f, 1.9f, DefaultValue = 1, Step = 0.1f, Format = "{0}",Tooltip = "The higher the value the more payout per ore.")] 
-        public float OrePayoutMultiplier { get; set; }
+        [Slider("Ore Payout Difficulty", 0.1f, 1.9f, DefaultValue = 1, Step = 0.1f, Format = "{0}",Tooltip = "The higher the value the more payout per ore.")]
+        public float OrePayoutMultiplier { get; set; } = 1f;
 
         [Toggle("Play Sound Effects"), OnChange(nameof(PlaySoundToggleEvent))]
         public bool PlaySFX = true;

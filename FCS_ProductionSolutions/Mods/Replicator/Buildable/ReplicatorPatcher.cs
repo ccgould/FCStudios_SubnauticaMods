@@ -63,7 +63,7 @@ namespace FCS_HomeSolutions.Mods.Replicator.Buildables
                 constructable.allowedInSub = true;
                 constructable.allowedInBase = true;
                 constructable.allowedOnCeiling = false;
-                constructable.allowedOutside = false;
+                constructable.allowedOutside = true;
                 constructable.rotationEnabled = true;
                 constructable.model = model;
                 constructable.techType = TechType;

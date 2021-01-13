@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using FCS_AlterraHub.Model;
 using FCS_ProductionSolutions.HydroponicHarvester.Enumerators;
 using FCS_ProductionSolutions.HydroponicHarvester.Mono;
 using FCSCommon.Converters;
@@ -18,8 +19,25 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Models
         private const int MaxCapacity = 50;
         public bool PauseUpdates { get; set; }
         public bool IsFull => _itemCount >= MaxCapacity;
+        public TechType ReturnTechType
+        {
+            get => _returnTechType;
+            set
+            {
+                _returnTechType = value;
+            }
+        }
+        private readonly IList<float> _progress = new List<float>(new[] { -1f, -1f, -1f });
+        private TechType _returnTechType;
+        internal GrowBedManager GrowBedManager;
+        private int _itemCount;
+        private SlotItemTab _trackedTab;
+        private TechType _seedTech;
 
-        public bool NotAllowToGenerate => PauseUpdates || !GrowBedManager.GetIsConstructed() || CurrentSpeedMode == SpeedModes.Off || _plantable == null;
+        public bool NotAllowToGenerate()
+        {
+            return GrowBedManager == null || !GrowBedManager.GetIsConstructed() || PauseUpdates|| CurrentSpeedMode == SpeedModes.Off || _plantable == null;
+        }
 
         internal float GenerationProgress
         {
@@ -42,25 +60,12 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Models
                 }
             }
         }
-        
-        public TechType ReturnTechType
-        {
-            get => _returnTechType;
-            set
-            {
-                _returnTechType = value;
-            }
-        }
-        private readonly IList<float> _progress = new List<float>(new[] { -1f, -1f, -1f });
-        private TechType _returnTechType;
-        internal GrowBedManager GrowBedManager;
-        private int _itemCount;
-        private SlotItemTab _trackedTab;
-        private TechType _seedTech;
+
+        public FCSGrowingPlant GrowingPlant { get; set; }
 
         private void Update()
         {
-            if (NotAllowToGenerate)
+            if (NotAllowToGenerate())
                 return;
             
             var energyToConsume = CalculateEnergyPerSecond() * DayNightCycle.main.deltaTime;
@@ -107,6 +112,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Models
             IsOccupied = false;
             _seedTech = TechType.None;
             ReturnTechType = TechType.None;
+            GrowingPlant = null;
             PlantModel = null;
             _plantable = null;
         }

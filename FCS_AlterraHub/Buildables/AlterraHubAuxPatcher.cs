@@ -41,7 +41,7 @@ namespace FCS_AlterraHub.Buildables
             { $"{ModKey}_PasswordPlaceHolder", "Enter password..."},
             { $"{ModKey}_PINPlaceHolder", "Enter pin number..."},
             { $"{ModKey}_AccountCreated", "Thank you for registering for an Alterra Bank Account your current balance is {0}"},
-            { $"{ModKey}_NoCardInventory", "Error: No debit card detected. You are to far away or there is no card in your inventory"},
+            { $"{ModKey}_NoCardInventory", "Error: No debit card detected. There is no card in your inventory. Your account card is needed for validation.Please get you card or request a new on from the account page."},
             { $"{ModKey}_AccountSetupError", "[Error] Please refill the following fields and press enter in the field to continue: {0}"},
             { $"{ModKey}_OreConsumerTimeLeftFormat", "Time left till {0} ore processed {1} | Pending {2}."},
             { $"{ModKey}_NoOresToProcess", "No ores to process."},
@@ -53,6 +53,8 @@ namespace FCS_AlterraHub.Buildables
             { $"{ModKey}_ClickToSearchForItems","Click to search for items..."},
             { $"{ModKey}_BlackListItemFormat","{0} item is in the blacklist an will not be pulled from the vehicle."},
             { $"{ModKey}_NoVehicles","No vehicles are docked at this base."},
+            { $"{ModKey}_NegativeNumbersNotAllowed","Negative numbers not allowed"},
+            { $"{ModKey}_NoSpaceAccountCreation","To complete your account creation, you need at least one slot to receive your debit card. Please try again once one inventory slot is available in your inventory."},
         };
         
         private void AdditionalPatching()
@@ -292,6 +294,16 @@ namespace FCS_AlterraHub.Buildables
         public static string InventoryFull()
         {
             return Language.main.Get("InventoryFull");
+        }
+
+        public static string NegativeNumbersNotAllowed()
+        {
+            return GetLanguage($"{ModKey}_NegativeNumbersNotAllowed");
+        }
+
+        public static string NoSpaceAccountCreation()
+        {
+            return GetLanguage($"{ModKey}_NoSpaceAccountCreation");
         }
     }
 }

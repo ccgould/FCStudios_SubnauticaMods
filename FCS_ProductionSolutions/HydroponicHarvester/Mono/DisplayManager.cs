@@ -7,8 +7,6 @@ using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.HydroponicHarvester.Enumerators;
 using FCSCommon.Abstract;
-using FCSCommon.Converters;
-using FCSCommon.Enums;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -41,7 +39,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
             }
         }
        
-        public override void OnButtonClick(string btnName, object tag)
+        public override void OnButtonClick(string btnName, object Tag)
         {
             if (btnName.Equals("BackBTN"))
             {
@@ -50,7 +48,9 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
 
             if(btnName.Equals("SlotButton"))
             {
-                var data = (SlotData)tag;
+                if (Tag == null) return;
+                var data = (SlotData)Tag;
+                QuickLogger.Debug($"Data: {data} | TechType: {data.TechType} | Slot: {data.SlotId} | GrowBed: {_mono?.GrowBedManager}",true);
                 _mono.GrowBedManager.TakeItem(data.TechType,data.SlotId);
             }
         }
@@ -60,6 +60,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
             try
             {
                 var canvas = gameObject.FindChild("Canvas2");
+
                 //Add ProximityActivate to controller screen visiblity
                 var px = canvas.AddComponent<ProximityActivate>();
                 px.Initialize(canvas.gameObject, gameObject, 2);
@@ -75,7 +76,6 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
                 _speedBTN.GrowBedManager = _mono.GrowBedManager;
 
                 var lightToggleBTNObj = GameObjectHelpers.FindGameObject(gameObject, "LightBTN");
-                
                 _lightToggleBTN = lightToggleBTNObj.AddComponent<FCSToggleButton>();
                 _lightToggleBTN.BtnName = "LightBTN";
                 _lightToggleBTN.ButtonMode = InterfaceButtonMode.Background;
@@ -86,19 +86,24 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
                     _mono.EffectsManager.SetBreaker(_lightToggleBTN.IsSelected);
                 };
 
-                var slot1 = GameObjectHelpers.FindGameObject(gameObject, "HarvesterScreenItem").AddComponent<SlotItemTab>();
+                var hi1 = GameObjectHelpers.FindGameObject(gameObject, "HarvesterScreenItem");
+                var slot1 = GameObjectHelpers.FindGameObject(hi1, "Icon").AddComponent<SlotItemTab>();
                 slot1.Initialize(this,OnButtonClick,0);
-                var slot2 = GameObjectHelpers.FindGameObject(gameObject, "HarvesterScreenItem (1)").AddComponent<SlotItemTab>();
+
+                var hi2 = GameObjectHelpers.FindGameObject(gameObject, "HarvesterScreenItem (1)");
+                var slot2 = GameObjectHelpers.FindGameObject(hi2, "Icon").AddComponent<SlotItemTab>();
                 slot2.Initialize(this,OnButtonClick,1);
-                var slot3 = GameObjectHelpers.FindGameObject(gameObject, "HarvesterScreenItem (2)").AddComponent<SlotItemTab>();
+
+                var hi3 = GameObjectHelpers.FindGameObject(gameObject, "HarvesterScreenItem (2)");
+                var slot3 = GameObjectHelpers.FindGameObject(hi3, "Icon").AddComponent<SlotItemTab>();
                 slot3.Initialize(this,OnButtonClick,2);
 
                 _landSamplesGrid = InterfaceHelpers.FindGameObject(gameObject, "LandSamplesGrid");
                 _aquaticSamplesGrid = InterfaceHelpers.FindGameObject(gameObject, "AquaticSamplesGrid");
                 _powerUsagePerSecond =InterfaceHelpers.FindGameObject(gameObject, "PowerUsagePerSecond").GetComponent<Text>();
                 _generationTime =InterfaceHelpers.FindGameObject(gameObject, "UnitPerSecond").GetComponent<Text>();
-                LoadKnownSamples();
 
+                LoadKnownSamples();
             }
             catch (Exception e)
             {
@@ -117,7 +122,6 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
                 _loadedDNASamples = new List<TechType>();
             }
 
-
             var knownSamples = Mod.GetHydroponicKnownTech();
 
             if (knownSamples == null) return;
@@ -130,6 +134,9 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
                 icon.sprite = SpriteManager.Get(sample.TechType);
                 button.TextLineOne = Language.main.Get((sample.TechType));
                 button.Tag = sample.TechType;
+                button.HOVER_COLOR = Color.white;
+                button.STARTING_COLOR = Color.gray;
+                button.InteractionRequirement = InteractionRequirement.None;
                 button.OnButtonClick += (s, o) =>
                 {
                     _caller.SetIcon((TechType)o);

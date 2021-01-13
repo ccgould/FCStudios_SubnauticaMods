@@ -22,6 +22,8 @@ namespace FCS_ProductionSolutions.Buildable
             { $"{ModKey}_PowerUsagePerSecondFormat","Power Usage Per Second : {0}"},
             { $"{ModKey}_GenerationTimeFormat","Generation Time : {0}"},
             { $"{ModKey}_MatterAnalyzerHasItems","Please cancel the scan to deconstruct the matter analyzer."},
+            { $"{ModKey}_PleaseClearReplicatorSlot","Please clear the replicator slot before trying to replicate another item."},
+            { $"{ModKey}_NotBuildOnBase","Base not found. Please build on/in a base"},
         };
 
         internal static void AdditionalPatching()
@@ -96,6 +98,16 @@ namespace FCS_ProductionSolutions.Buildable
         public static string MatterAnalyzerHasItems()
         {
             return GetLanguage($"{ModKey}_MatterAnalyzerHasItems");
+        }
+
+        public static string PleaseClearReplicatorSlot()
+        {
+            return GetLanguage($"{ModKey}_PleaseClearReplicatorSlot");
+        }
+
+        public static string NotBuildOnBase()
+        {
+            return GetLanguage($"{ModKey}_NotBuildOnBase");
         }
     }
 }

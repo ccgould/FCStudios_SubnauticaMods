@@ -12,6 +12,7 @@ namespace FCS_AlterraHub.Mono.Controllers
         private string _title;
         private string _name;
         private string _submitLabel;
+        private int _maxChar = 25;
 
         public void Initialize(string submitLabel, string title)
         {
@@ -22,7 +23,7 @@ namespace FCS_AlterraHub.Mono.Controllers
 
         public void Show()
         {
-            uGUI.main.userInput.RequestString(_title, _submitLabel, _name, 25, SetCurrentName);
+            uGUI.main.userInput.RequestString(_title, _submitLabel, _name, _maxChar, SetCurrentName);
         }
 
         public string GetCurrentName()
@@ -61,6 +62,11 @@ namespace FCS_AlterraHub.Mono.Controllers
             textComponent.text = name;
 
             SetCurrentName(name);
+        }
+
+        public void SetMaxChar(int amount)
+        {
+            _maxChar = amount;
         }
     }
 }

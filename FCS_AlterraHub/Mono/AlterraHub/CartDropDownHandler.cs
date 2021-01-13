@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
@@ -28,6 +30,12 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             var buyAllButton = GameObjectHelpers.FindGameObject(gameObject, "BuyButton").GetComponent<Button>();
             buyAllButton.onClick.AddListener(() =>
             {
+                if (!PlayerInteractionHelper.HasCard())
+                {
+                    SendMessageFromDialog(Buildables.AlterraHub.CardNotDetected());
+                    return;
+                }
+
                 if (_pendingItems.Count <= 0)
                 {
                     SendMessageFromDialog(Buildables.AlterraHub.NoItemsInCart());
@@ -40,7 +48,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
 
         private void SendMessageFromDialog(string message)
         {
-            MessageBoxHandler.main.Show(message);
+            MessageBoxHandler.main.Show(message,FCSMessageButton.OK);
         }
 
         internal void ToggleVisibility(bool forceClose = false)

@@ -353,31 +353,34 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
         {
             return Slots.FirstOrDefault(x => !x.Value.IsOccupied()).Value;
         }
-
+        
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
         {
             bool flag = false;
 
             if (IsFull || _dumpContainer.GetItemCount() + 1 + GetPowerCellCount() > MAXSLOTS) return flag;
-            
+
+            if (string.IsNullOrWhiteSpace(FindAvailableSlot().id))
+            {
+                QuickLogger.ModMessage(AuxPatchers.NoSlotsAvailable());
+                return flag;
+            }
+
             var techType = pickupable.GetTechType();
 #if SUBNAUTICA
             var equipType = CraftData.GetEquipmentType(techType);
 #elif BELOWZERO
             var equipType = TechData.GetEquipmentType(techType);
 #endif
-            if(equipType == EquipmentType.PowerCellCharger)
+            QuickLogger.Debug($"Equipment Slot: {equipType}", true);
+            
+            if (equipType == EquipmentType.PowerCellCharger || BatteryInfoHelpers.IsPowercell(techType))
             {
                 flag = true;
             }
             else
-            { 
-                QuickLogger.ModMessage(AuxPatchers.OnlyPowercellsAllowed());
-            }
-
-            if (string.IsNullOrWhiteSpace(FindAvailableSlot().id))
             {
-                flag = false;
+                QuickLogger.ModMessage(AuxPatchers.OnlyPowercellsAllowed());
             }
 
             return flag;

@@ -42,11 +42,13 @@ namespace FCS_AlterraHub.Mono
         #region Public Methods
         public virtual void OnEnable()
         {
-            if(IsSelected) return;
+            Disabled = false;
 
+            if (IsSelected) return;
+            
             if (string.IsNullOrEmpty(BtnName)) return;
 
-            Disabled = false;
+            
 
             UpdateTextComponent(IsTextMode());
             //QuickLogger.Debug($"Button Name:{BtnName} || Button Mode {ButtonMode}", true);
@@ -124,12 +126,11 @@ namespace FCS_AlterraHub.Mono
 
         public override void OnDisable()
         {
+            QuickLogger.Debug($"Button : {BtnName} disabled");
             base.OnDisable();
 
-            if (string.IsNullOrEmpty(BtnName)) return;
             UpdateTextComponent(IsTextMode());
-            //QuickLogger.Debug($"Button Name:{BtnName} || Button Mode {ButtonMode}", true);
-            
+           
             switch (this.ButtonMode)
             {
                 case InterfaceButtonMode.TextScale:
@@ -169,7 +170,6 @@ namespace FCS_AlterraHub.Mono
                     }
                     break;
             }
-
         }
 
         private bool IsTextMode()

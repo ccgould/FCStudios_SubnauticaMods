@@ -106,14 +106,10 @@ namespace FCS_LifeSupportSolutions.Patches
             outResult = false;
             var baseUtilityUnits = manager.GetDevices(Mod.BaseUtilityUnitTabID);
 
-            QuickLogger.Debug($"Amount Base Utility : {baseUtilityUnits.Count()}",true);
-
             if (QPatch.IsRefillableOxygenTanksInstalled && Player.main.oxygenMgr.HasOxygenTank())
             {
                 if (IsPlayerOxygenFullRtInstalled(instance)) return false;
                 
-                QuickLogger.Debug("Passed RTTest",true);
-
                 foreach (var baseUnit in baseUtilityUnits)
                 {
 
@@ -164,12 +160,7 @@ namespace FCS_LifeSupportSolutions.Patches
 
         private static bool IsPlayerOxygenFullRtInstalled(Player instance)
         {
-            if (instance.oxygenMgr.GetOxygenAvailable() >= DefaultO2Level)
-            {
-                return true;
-            }
-
-            return false;
+            return instance.oxygenMgr.GetOxygenAvailable() >= DefaultO2Level;
         }
 
         private static bool IsPlayerOxygenFull(Player instance)
@@ -183,19 +174,9 @@ namespace FCS_LifeSupportSolutions.Patches
             {
                 var oxygen = instance.gameObject.GetComponentInParent<Oxygen>();
 
-                if (oxygen == null)
-                {
-                    QuickLogger.Error("Failed to get player oxygen component");
-                }
-                else if (!oxygen.isPlayer)
-                {
-                    QuickLogger.Error("This oxygen component isnt the players");
-                }
-                else
-                {
-                    DefaultO2Level = oxygen.oxygenCapacity;
-                    QuickLogger.Debug($"Default oxygen level is: {DefaultO2Level}");
-                }
+                if (oxygen == null || !oxygen.isPlayer) return;
+                
+                DefaultO2Level = oxygen.oxygenCapacity;
             }
         }
     }

@@ -117,6 +117,7 @@ namespace FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Mono
             var o2Manager = Player.main.oxygenMgr;
 
             float playerO2Request;
+
             if (QPatch.IsRefillableOxygenTanksInstalled && Player.main.oxygenMgr.HasOxygenTank())
             {
                 playerO2Request = Player_CanBreathe.DefaultO2Level - o2Manager.GetOxygenAvailable();
@@ -130,12 +131,14 @@ namespace FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Mono
             {
                 _o2Level -= playerO2Request;
                 o2Manager.AddOxygen(Mathf.Abs(playerO2Request));
+                OnOxygenUpdated?.Invoke(_o2Level, _o2Level / TankCapacity);
                 return;
             }
 
             var playerO2RequestRemainder = Mathf.Min(_o2Level, playerO2Request);
             _o2Level -= playerO2RequestRemainder;
             o2Manager.AddOxygen(Mathf.Abs(playerO2RequestRemainder));
+            OnOxygenUpdated?.Invoke(_o2Level, _o2Level / TankCapacity);
             QuickLogger.Debug($"O2 Level: {_o2Level} || Tank Level {playerO2RequestRemainder}", true);
         }
         

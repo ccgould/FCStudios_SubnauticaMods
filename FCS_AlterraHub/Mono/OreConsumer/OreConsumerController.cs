@@ -70,7 +70,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
 
         private void UpdateAnimation()
         {
-            if (_oreQueue != null && _oreQueue.Count > 0)
+            if (_oreQueue != null && _oreQueue.Count > 0 && (Manager.GetPowerState() == PowerSystem.Status.Normal || Manager.GetPowerState() == PowerSystem.Status.Emergency))
             {
                 MotorHandler.Start();
                 EffectsManager.ShowEffect();

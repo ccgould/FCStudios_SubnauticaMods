@@ -4,6 +4,7 @@ using System.Linq;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Model;
+using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.HydroponicHarvester.Enumerators;
 using FCS_ProductionSolutions.HydroponicHarvester.Models;
@@ -136,6 +137,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
                 
                 var pickPrefab = growingPlant.grownModelPrefab.GetComponentInChildren<PickPrefab>();
 
+                slotByID.GrowingPlant = fcsGrowing;
                 slotByID.ReturnTechType = pickPrefab != null ? pickPrefab.pickTech : _currentItemTech;
 
                 Destroy(growingPlant);
@@ -231,6 +233,8 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
                 slot.GenerationProgress = data.GenerationProgress;
                 slot.SetItemCount(data.Amount);
                 slot.GetTab().SetIcon(data.TechType);
+                slot.GrowingPlant?.SetProgress(data.PlantProgress);
+
             }
         }
 
@@ -238,19 +242,26 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
         {
             data.SlotData = new List<SlotsData>
             {
-                new SlotsData{Amount = Slots[0].GetCount(),TechType = Slots[0].GetPlantSeedTechType(), GenerationProgress = Slots[0].GenerationProgress},
-                new SlotsData{Amount = Slots[1].GetCount(),TechType = Slots[1].GetPlantSeedTechType(), GenerationProgress = Slots[1].GenerationProgress},
-                new SlotsData{Amount = Slots[2].GetCount(),TechType = Slots[2].GetPlantSeedTechType(), GenerationProgress = Slots[2].GenerationProgress},
+                new SlotsData{Amount = Slots[0].GetCount(),TechType = Slots[0].GetPlantSeedTechType(), GenerationProgress = Slots[0].GenerationProgress,PlantProgress = Slots[0].GrowingPlant?.GetProgress() ?? 0},
+                new SlotsData{Amount = Slots[1].GetCount(),TechType = Slots[1].GetPlantSeedTechType(), GenerationProgress = Slots[1].GenerationProgress,PlantProgress = Slots[1].GrowingPlant?.GetProgress() ?? 0},
+                new SlotsData{Amount = Slots[2].GetCount(),TechType = Slots[2].GetPlantSeedTechType(), GenerationProgress = Slots[2].GenerationProgress,PlantProgress = Slots[2].GrowingPlant?.GetProgress() ?? 0},
             };
         }
 
         public void TakeItem(TechType techType,int slotId)
         {
-            var slot = GetSlotByID(slotId);
-            if (slot.GetPlantSeedTechType() != techType) return;
-            if (slot.RemoveItem())
+            if (PlayerInteractionHelper.CanPlayerHold(techType))
             {
-                PlayerInteractionHelper.GivePlayerItem(slot.ReturnTechType);
+                var slot = GetSlotByID(slotId);
+                if (slot.GetPlantSeedTechType() != techType) return;
+                if (slot.RemoveItem())
+                {
+                    PlayerInteractionHelper.GivePlayerItem(slot.ReturnTechType);
+                }
+            }
+            else
+            {
+                QuickLogger.ModMessage(AuxPatchers.InventoryFull());
             }
         }
     }

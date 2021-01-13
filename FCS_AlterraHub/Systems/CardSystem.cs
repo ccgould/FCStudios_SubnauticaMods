@@ -5,6 +5,7 @@ using System.Text;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Model;
 using FCSCommon.Extensions;
 using FCSCommon.Utilities;
 using Oculus.Newtonsoft.Json;
@@ -29,6 +30,16 @@ namespace FCS_AlterraHub.Systems
         [JsonProperty] internal decimal AccountBeforeDebit { get; set; }
         [JsonProperty] internal Dictionary<string, string> KnownCardNumbers = new Dictionary<string, string>();
 
+        public void ResetAccount()
+        {
+            FullName = string.Empty;
+            Username = string.Empty;
+            Password = string.Empty;
+            PIN = string.Empty;
+            Balance = 0;
+            AlterraDebitPayed = 0;
+            KnownCardNumbers.Clear();
+        }
     }
     internal class CardSystem
     {
@@ -112,7 +123,7 @@ namespace FCS_AlterraHub.Systems
             {
                 QuickLogger.Error($"[AddFinances]: {e.Message}");
                 QuickLogger.Error($"[AddFinances]: {e.StackTrace}");
-                MessageBoxHandler.main.Show(AlterraHub.ErrorHasOccured());
+                MessageBoxHandler.main.Show(AlterraHub.ErrorHasOccured(),FCSMessageButton.OK);
                 return false;
             }
             return true;
@@ -134,7 +145,7 @@ namespace FCS_AlterraHub.Systems
                 return true;
             }
             
-            MessageBoxHandler.main.Show(string.Format(AlterraHub.NotEnoughMoneyOnAccount(), 0));
+            MessageBoxHandler.main.Show(string.Format(AlterraHub.NotEnoughMoneyOnAccount(), 0), FCSMessageButton.OK);
             return false;
         }
 
@@ -233,7 +244,7 @@ namespace FCS_AlterraHub.Systems
 
             if (HasBeenRegistered())
             {
-                MessageBoxHandler.main.Show(AlterraHub.AccountCreated(GetAccountBalance().ToString("N0")));
+                MessageBoxHandler.main.Show(AlterraHub.AccountCreated(GetAccountBalance().ToString("N0")), FCSMessageButton.OK);
                 var newCard = PlayerInteractionHelper.GivePlayerItem(Mod.DebitCardTechType);
                 //GenerateNewCard(newCard.gameObject.GetComponent<PrefabIdentifier>().Id);
                 
@@ -265,7 +276,7 @@ namespace FCS_AlterraHub.Systems
                     sb.Append(",");
                 }
                 
-                MessageBoxHandler.main.Show(AlterraHub.AccountSetupError(sb.ToString()));
+                MessageBoxHandler.main.Show(AlterraHub.AccountSetupError(sb.ToString()), FCSMessageButton.OK);
 
             }
         }
@@ -334,6 +345,15 @@ namespace FCS_AlterraHub.Systems
         internal bool IsAccountNameValid(string accountName)
         {
             return accountName.Equals(_accountDetails.Username, StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        /// Resets all the fields in the account to default. [Warning] user will have to create a new account
+        /// </summary>
+        public void ResetAccount()
+        {
+            _accountDetails.ResetAccount();
+            QuickLogger.ModMessage("Account has been reset");
         }
     }
 }

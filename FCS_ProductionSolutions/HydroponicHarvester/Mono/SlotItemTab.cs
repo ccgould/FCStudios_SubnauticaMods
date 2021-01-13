@@ -23,15 +23,15 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
             BtnName = "SlotButton";
 
             Slot = display._mono.GrowBedManager.GetSlot(slotIndex);
-            _icon = gameObject.FindChild("Icon").AddComponent<uGUI_Icon>();
+            _icon = gameObject.AddComponent<uGUI_Icon>();
             _icon.sprite = SpriteManager.defaultSprite;
             
-            var addDnaBtn = GameObjectHelpers.FindGameObject(gameObject, "AddDNABTN").AddComponent<InterfaceButton>();
+            var addDnaBtn = GameObjectHelpers.FindGameObject(gameObject.transform.parent.gameObject, "AddDNABTN").AddComponent<InterfaceButton>();
             addDnaBtn.STARTING_COLOR = Color.gray;
             addDnaBtn.HOVER_COLOR = Color.white;
             addDnaBtn.OnButtonClick += (s, o) => { display.OpenDnaSamplesPage(this); };
             
-            var removeDnaBtn = GameObjectHelpers.FindGameObject(gameObject, "RemoveDNABTN").AddComponent<InterfaceButton>();
+            var removeDnaBtn = GameObjectHelpers.FindGameObject(gameObject.transform.parent.gameObject, "RemoveDNABTN").AddComponent<InterfaceButton>();
             removeDnaBtn.STARTING_COLOR = Color.gray;
             removeDnaBtn.HOVER_COLOR = Color.white;
             removeDnaBtn.OnButtonClick += (s, o) =>
@@ -43,7 +43,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
                 }
             };
 
-            _amount = InterfaceHelpers.FindGameObject(gameObject, "Amount").GetComponent<Text>();
+            _amount = InterfaceHelpers.FindGameObject(gameObject.transform.parent.gameObject, "Amount").GetComponent<Text>();
             UpdateCount();
 
             HOVER_COLOR = Color.white;

@@ -11,7 +11,7 @@ namespace FCS_EnergySolutions.Configuration
         {
             { $"{ModKey}_JetStreamT242OnHover","JetStream {0} Information: (charge: {1}/{2}) | (production per minute: {3})"},
             { $"{ModKey}_JetStreamOnHoverInteractionFormatted","Press {0} to Turn on / off Turbine. Current State {1}"},
-            { $"{ModKey}_OnlyPowercellsAllowed.","Only powercells are allowed."},
+            { $"{ModKey}_OnlyPowercellsAllowed","Only powercells are allowed."},
             { $"{ModKey}_PowerStorageNotEmpty","Please remove all powercells before trying to deconstruct."},
             { $"{ModKey}_PowerStorageChargeMode","Charge Mode"},
             { $"{ModKey}_PowerStorageChargeModeDesc","In this mode PowerStorage will only charge the powercells for later use."},
@@ -22,6 +22,7 @@ namespace FCS_EnergySolutions.Configuration
             { $"{ModKey}_PowerStorageAutoModeDesc","Automatically switches the mode of PowerStorage based on if the habitat goes into Emergency or PoweredOff"},
             { $"{ModKey}_NotUnderWater","Cannot operate out of water."},
             { $"{ModKey}_NotUnderWaterDesc","Turbine cannot function  above 3 meters"},
+            { $"{ModKey}_NoSlotsAvailable","No charging slots available."},
         };
 
         internal static void AdditionalPatching()
@@ -99,6 +100,11 @@ namespace FCS_EnergySolutions.Configuration
         public static string NotUnderWaterDesc()
         {
             return GetLanguage($"{ModKey}_NotUnderWaterDesc");
+        }
+
+        public static string NoSlotsAvailable()
+        {
+            return GetLanguage($"{ModKey}_NoSlotsAvailable");
         }
     }
 }

@@ -253,7 +253,8 @@ namespace FCS_ProductionSolutions.Configuration
             TechType.GasPod,
             TechType.JeweledDiskPiece,
             TechType.Floater,
-            TechType.TreeMushroomPiece
+            TechType.TreeMushroomPiece,
+            TechType.CoralChunk
         };
         #endregion
 

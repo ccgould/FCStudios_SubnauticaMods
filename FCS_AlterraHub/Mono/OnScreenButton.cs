@@ -17,6 +17,7 @@ namespace FCS_AlterraHub.Mono
         public Func<object, string> GetAdditionalString { get; set; }
         private bool isHoveredOutOfRange;
         public bool Disabled { get; set; }
+        public InteractionRequirement InteractionRequirement { get; set; } = InteractionRequirement.None;
         public virtual object Tag { get; set; }
         public float MaxInteractionRange { get; set; }  = 2.5f;
 
@@ -92,8 +93,29 @@ namespace FCS_AlterraHub.Mono
 
         protected bool InInteractionRange()
         {
-            return Mathf.Abs(Vector3.Distance(this.gameObject.transform.position, Player.main.transform.position)) <= MaxInteractionRange;
+            return Mathf.Abs(Vector3.Distance(this.gameObject.transform.position, Player.main.transform.position)) <= MaxInteractionRange && InteractionRequirementCheck();
         }
 
+        private bool InteractionRequirementCheck()
+        {
+            switch (InteractionRequirement)
+            {
+                case InteractionRequirement.IsInside:
+                    return Player.main.IsInBase();
+                case InteractionRequirement.IsOutSide:
+                    return !Player.main.IsInBase();
+                case InteractionRequirement.None:
+                    return true;
+                default:
+                    return true;
+            }
+        }
+    }
+
+    public enum InteractionRequirement
+    {
+        None,
+        IsOutSide,
+        IsInside,
     }
 }

@@ -62,5 +62,11 @@ namespace FCS_AlterraHub.Configuration
                 QuickLogger.ModMessage($"{Language.main.Get(tech)} : {StoreInventorySystem.GetOrePrice(tech)}");
             }
         }
+
+        [ConsoleCommand("ResetAccount")]
+        public static void ResetAccountCommand()
+        {
+            CardSystem.main.ResetAccount();
+        }
     }
 }

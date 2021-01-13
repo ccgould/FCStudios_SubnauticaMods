@@ -34,12 +34,17 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
         private Text _containerAmount;
         private GameObject _spawnPoint;
         private ReplicatorSpeedButton _speedBTN;
+        private GameObject _canvas;
         private const float PowerUsage = 0.85f;
         public override bool IsOperational => IsConstructed && IsInitialized;
 
         private void Start()
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.ReplicatorTabID, Mod.ModName);
+            if(Manager == null)
+            {
+                _canvas.SetActive(false);
+            }
         }
 
         public override void OnDestroy()
@@ -104,13 +109,24 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
                 icon.sprite = SpriteManager.Get(sample.TechType);
                 button.TextLineOne = Language.main.Get((sample.TechType));
                 button.Tag = sample.TechType;
+                button.HOVER_COLOR = Color.white;
+                button.STARTING_COLOR = Color.gray;
 
                 button.OnButtonClick += (s, o) =>
                 {
-                    var techType = (TechType) o;
-                    SpawnModel(techType);
-                    _techTypeIcon.sprite = SpriteManager.Get(techType);
-                    _replicatorSlot.ChangeTargetItem(techType);
+                    if (!_replicatorSlot.IsOccupied)
+                    {
+                        Clear();
+                        var techType = (TechType)o;
+                        SpawnModel(techType);
+                        _techTypeIcon.sprite = SpriteManager.Get(techType);
+                        _replicatorSlot.ChangeTargetItem(techType);
+                        UpdateUI();
+                    }
+                    else
+                    {
+                        QuickLogger.ModMessage(AuxPatchers.PleaseClearReplicatorSlot());
+                    }
                 };
                 _loadedDNASamples.Add(sample.TechType);
                 button.gameObject.transform.SetParent(_samplesGrid.transform, false);
@@ -147,10 +163,10 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
 
         public override void Initialize()
         {
-            var canvas = gameObject.GetComponentInChildren<Canvas>().gameObject;
+            _canvas = gameObject.GetComponentInChildren<Canvas>().gameObject;
             
-            var prxy = canvas.EnsureComponent<ProximityActivate>();
-            prxy.Initialize(canvas, gameObject, 2);
+            var prxy = _canvas.EnsureComponent<ProximityActivate>();
+            prxy.Initialize(_canvas, gameObject, 2);
             
             _samplesGrid = GameObjectHelpers.FindGameObject(gameObject, "Grid");
             _techTypeIcon = GameObjectHelpers.FindGameObject(gameObject, "CurrentTechTypeIcon").EnsureComponent<uGUI_Icon>();
@@ -218,15 +234,18 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
 
         private void Clear()
         {
+            QuickLogger.Debug("Trying to clear.",true);
             if (_replicatorSlot.TryClear())
             {
                 if (_spawnPoint.transform.childCount > 0)
                 {
                     foreach (Transform child in _spawnPoint.transform)
                     {
-                        Destroy(child);
+                        Destroy(child.gameObject);
                     }
                 }
+
+                _techTypeIcon.sprite = SpriteManager.Get(TechType.None);
             }
         }
 
@@ -399,6 +418,14 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
         {
             if (!IsInitialized || !IsConstructed || _replicatorSlot == null) return;
             HandReticle main = HandReticle.main;
+            if (Manager == null)
+            {
+                main.SetIcon(HandReticle.IconType.HandDeny);
+                main.SetInteractTextRaw(AuxPatchers.NotBuildOnBase(),"");
+                return;
+            }
+
+            
             main.SetProgress(_replicatorSlot.GetPercentageDone());
             main.SetIcon(HandReticle.IconType.Progress, 1f);
         }

@@ -119,9 +119,10 @@ namespace FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Mono
             InvokeRepeating(nameof(UpdateAnimation),1f,1f);
 
             var takeOxygenBtnObj = InterfaceHelpers.FindGameObject(gameObject, "Button");
-            InterfaceHelpers.CreateButton(takeOxygenBtnObj, "TakeBTN", InterfaceButtonMode.Background,
+            var takeButton = InterfaceHelpers.CreateButton(takeOxygenBtnObj, "TakeBTN", InterfaceButtonMode.Background,
                 GivePlayerOxygen, new Color(0.2784314f, 0.2784314f, 0.2784314f), new Color(0, 1, 1, 1), 5,
                 AuxPatchers.TakeOxygen(), AuxPatchers.TakeOxygenDesc());
+            takeButton.InteractionRequirement = InteractionRequirement.IsOutSide;
             
             _percent = InterfaceHelpers.FindGameObject(gameObject, "percentage").GetComponent<Text>();
             _percentBar = InterfaceHelpers.FindGameObject(gameObject, "PreLoader_Bar_Front").GetComponent<Image>();

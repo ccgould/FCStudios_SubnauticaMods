@@ -1,9 +1,11 @@
 ﻿using System;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
+using HarmonyLib;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -48,9 +50,16 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             _debitBalance = GameObjectHelpers.FindGameObject(_paymentScreen, "DebitBalance").GetComponent<Text>();
 
             _paymentInput = _paymentScreen.GetComponentInChildren<InputField>();
+
             _paymentInput.onEndEdit.AddListener((value) =>
             {
-                if(decimal.TryParse(value,out decimal result))
+
+                if (_paymentInput.text.Contains("-"))
+                {
+                    return;
+                }
+
+                if (decimal.TryParse(value,out decimal result))
                 {
                     _newBalance.text = Buildables.AlterraHub.AccountNewBalanceFormat(CardSystem.main.AlterraBalance() + result);
                     _pendingPayment = result;
@@ -60,13 +69,19 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             var paymentButton = GameObjectHelpers.FindGameObject(_paymentScreen, "SubmitPaymentBTN").GetComponent<Button>();
             paymentButton.onClick.AddListener((() =>
             {
+                if (_paymentInput.text.Contains("-"))
+                {
+                    MessageBoxHandler.main.Show(Buildables.AlterraHub.NegativeNumbersNotAllowed(), FCSMessageButton.OK);
+                    _paymentInput.text = string.Empty;
+                    return;
+                }
                 if (CardSystem.main.HasEnough(_pendingPayment))
                 {
                     CardSystem.main.PayDebit(_pendingPayment);
                 }
                 else
                 {
-                    MessageBoxHandler.main.Show(Buildables.AlterraHub.NotEnoughMoneyOnAccount());
+                    MessageBoxHandler.main.Show(Buildables.AlterraHub.NotEnoughMoneyOnAccount(),FCSMessageButton.OK,null);
                 }
 
                 HidePaymentScreen();
@@ -91,10 +106,17 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             var createBTN = _createAccountDialog.GetComponentInChildren<Button>();
             createBTN.onClick.AddListener(() =>
             {
-                CardSystem.main.CreateUserAccount(_fullName, _userName, _password, _pin);
-                _userNameLBL.text = CardSystem.main.GetUserName();
-                 _createAccountDialog.SetActive(false);
-                UpdateRequestBTN(true);
+                if (PlayerInteractionHelper.CanPlayerHold(Mod.DebitCardTechType))
+                {
+                    CardSystem.main.CreateUserAccount(_fullName, _userName, _password, _pin);
+                    _userNameLBL.text = CardSystem.main.GetUserName();
+                    _createAccountDialog.SetActive(false);
+                    UpdateRequestBTN(true);
+                }
+                else
+                {
+                    MessageBoxHandler.main.Show(Buildables.AlterraHub.NoSpaceAccountCreation(),FCSMessageButton.OK,null);
+                }
             });
             
             CreateWelcomePage(accountPage);
@@ -183,7 +205,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
                     if (!PlayerHasIngredients())
                     {
                         MessageBoxHandler.main.Show(string.Format(Buildables.AlterraHub.CardRequirementsMessageFormat(),
-                            LanguageHelpers.GetLanguage(TechType.FiberMesh), LanguageHelpers.GetLanguage(TechType.Magnetite)));
+                            LanguageHelpers.GetLanguage(TechType.FiberMesh), LanguageHelpers.GetLanguage(TechType.Magnetite)),FCSMessageButton.OK,null);
                         return;
                     }
 

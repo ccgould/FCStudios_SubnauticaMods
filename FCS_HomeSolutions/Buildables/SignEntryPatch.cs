@@ -290,6 +290,7 @@ namespace FCS_HomeSolutions.Buildables
                 _nameController.Initialize("Submit", "Rename Sign");
                 _nameController.OnLabelChanged += (s, controller) => { _text.text = s; };
                 _nameController.SetCurrentName("SIGN NAME");
+                _nameController.SetMaxChar(100);
             }
 
             TextLineOne = "Click change the sign text.";

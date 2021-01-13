@@ -28,8 +28,8 @@ namespace FCS_AlterraHub.Buildables
             try
             {
                     var prefab = GameObject.Instantiate(AlterraHubPrefab);
-                    var center = new Vector3(0.006554961f, 0.698558f, 0.00327754f);
-                    var size = new Vector3(1.353966f, 1.11104f, 1.006555f);
+                    var center = new Vector3(0.006554961f, 1.398353f, 0.00327754f);
+                    var size = new Vector3(1.353966f, 2.510629f, 1.006555f);
 
                     GameObjectHelpers.AddConstructableBounds(prefab, size, center);
 

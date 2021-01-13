@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
@@ -73,7 +74,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
 
             if (Inventory.main.container.GetCount(Mod.DebitCardTechType) <= 0)
             {
-                MessageBoxHandler.main.Show(Buildables.AlterraHub.CardNotDetected());
+                MessageBoxHandler.main.Show(Buildables.AlterraHub.CardNotDetected(),FCSMessageButton.OK);
                 return false;
             }
 
@@ -85,7 +86,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
                 return true;
             }
 
-            MessageBoxHandler.main.Show(Buildables.AlterraHub.NotEnoughMoneyOnAccount());
+            MessageBoxHandler.main.Show(Buildables.AlterraHub.NotEnoughMoneyOnAccount(),FCSMessageButton.OK);
             return false;
         }
 
