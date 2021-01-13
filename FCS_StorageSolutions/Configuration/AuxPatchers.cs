@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using SMLHelper.V2.Handlers;
-using UnityEngine;
 
 namespace FCS_StorageSolutions.Configuration
 {
@@ -42,6 +41,8 @@ namespace FCS_StorageSolutions.Configuration
             { $"{ModKey}_CraftFormatted","Add {0} to queue"},
             { $"{ModKey}_EnterAmount","Enter Amount"},
             { $"{ModKey}_AmountIsZero","{0} entry amount is 0 please specify ab amount."},
+            { $"{ModKey}_CurrentBase","[Current Base]"},
+            { $"{ModKey}_RemoteBase","[Remote Base]"},
         };
         
         internal static void AdditionalPatching()
@@ -235,6 +236,16 @@ namespace FCS_StorageSolutions.Configuration
         public static string AmountIsZero(string name)
         {
             return string.Format(GetLanguage($"{ModKey}_AmountIsZero"), name);
+        }
+
+        public static string CurrentBase()
+        {
+            return GetLanguage($"{ModKey}_CurrentBase");
+        }
+        
+        public static string RemoteBase()
+        {
+            return GetLanguage($"{ModKey}_RemoteBase");
         }
     }
 }

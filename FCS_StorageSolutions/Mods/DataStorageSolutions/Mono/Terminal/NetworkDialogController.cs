@@ -35,5 +35,10 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         {
             _dialog.Hide();
         }
+
+        public void Refresh(SubRoot subRoot)
+        {
+            _dialog.UpdateList();
+        }
     }
 }

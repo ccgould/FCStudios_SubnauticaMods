@@ -20,7 +20,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
         internal HydroponicHarvesterController Mono;
         private const float MaxPlantsHeight = 3f;
         private TechType _currentItemTech;
-        private List<TechType> _activeClones;// TODO Remove is if unnecessary
+
 
         internal PlantSlot[] Slots;
         public GameObject grownPlantsRoot { get; set; }
@@ -133,7 +133,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
             if (growingPlant != null)
             {
                 var fcsGrowing = gameObject.AddComponent<FCSGrowingPlant>();
-                fcsGrowing.Initialize(growingPlant, this,slotByID.SlotBounds.GetComponent<Collider>().bounds.size, AddActiveClone);
+                fcsGrowing.Initialize(growingPlant, this,slotByID.SlotBounds.GetComponent<Collider>().bounds.size, null);
                 
                 var pickPrefab = growingPlant.grownModelPrefab.GetComponentInChildren<PickPrefab>();
 
@@ -148,11 +148,6 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
                 plantable.eatable.SetDecomposes(false);
             }
 
-        }
-
-        internal void AddActiveClone(TechType techType)
-        {
-            _activeClones.Add(techType);
         }
 
         public void SetupRenderers(GameObject gameObject, bool interior)

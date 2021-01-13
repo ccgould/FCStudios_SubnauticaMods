@@ -62,7 +62,7 @@ namespace FCS_AlterraHub.Mono
 
         private bool GetIsVisible()
         {
-            return Habitat?.powerRelay != null && HasAntenna() && Habitat.powerRelay.GetPowerStatus() != PowerSystem.Status.Offline;
+            return Habitat?.powerRelay != null && HasAntenna() && Habitat.powerRelay.GetPowerStatus() != PowerSystem.Status.Offline && !_hasBreakerTripped;
         }
 
         public static List<BaseManager> Managers { get; } = new List<BaseManager>();
@@ -173,6 +173,7 @@ namespace FCS_AlterraHub.Mono
 
         public static BaseManager FindManager(SubRoot subRoot)
         {
+            if (subRoot == null) return null;
             var baseManager = FindManager(subRoot.gameObject.GetComponentInChildren<PrefabIdentifier>()?.Id);
             if (baseManager == null)
             {

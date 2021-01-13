@@ -12,6 +12,7 @@ using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
+using UWE;
 
 namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
 {
@@ -43,6 +44,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         private FilterSettingDialog _filterSettingList;
         private NetworkDialogController _networkBTN;
         private GameObject _powerOffScreen;
+        private Text _currentBaseLBL;
 
         private void OnDestroy()
         {
@@ -66,20 +68,25 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                     RefreshBlackListItems();
                     //DockingManager.ToggleIsEnabled(_savedData?.AllowDocking ?? false);
                 }
-
+                Player.main.currentSubChangedEvent.AddHandler(base.gameObject, OnCurrentSubRootChanged);
                 InvokeRepeating(nameof(UpdateDisplay), .5f, .5f);
                 //InvokeRepeating(nameof(UpdateFilters), .5f, .5f);
             }
         }
 
+        private void OnCurrentSubRootChanged(SubRoot parms)
+        {
+            _networkBTN.Refresh(parms);
+        }
+
         private void UpdateDisplay()
         {
-            if (_currentBase == null) return;
+            if (_currentBase == null || Player.main.currentSub == null) return;
             _itemGrid?.DrawPage();
             _baseName.text = _currentBase?.GetBaseName();
             _rackCountAmount.text = AuxPatchers.RackCountFormat(_currentBase?.BaseRacks.Count ?? 0);
             _serverAmount.text = AuxPatchers.ServerCountFormat(_currentBase?.BaseServers.Count ?? 0);
-
+            _currentBaseLBL.text = Player.main.currentSub == _currentBase.Habitat ? AuxPatchers.CurrentBase() : AuxPatchers.RemoteBase();
             var serverCapacity = _currentBase?.BaseServers.Count * 48 ?? 0;
             var alterraStorageCapacity = _currentBase?.BaseFcsStorage.Sum(x => x.GetMaxStorage()) ?? 0;
             var combinedCapacity = serverCapacity + alterraStorageCapacity;
@@ -101,6 +108,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                     break;
             }
             _vehicleSectionName.text = _currentVehicle?.GetName();
+            
         }
 
         public override void OnButtonClick(string btnName, object tag)
@@ -153,6 +161,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                     break;
                 case "PowerBTN":
                     _mono.Manager.ToggleBreaker();
+                    _networkBTN.Refresh(null);
                     break;
             }
         }
@@ -310,6 +319,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                 _serverAmount = GameObjectHelpers.FindGameObject(gameObject, "ServerCount").GetComponent<Text>();
                 _rackCountAmount = GameObjectHelpers.FindGameObject(gameObject, "RackCount").GetComponent<Text>();
                 _totalItemsAmount = GameObjectHelpers.FindGameObject(gameObject, "TotalItems").GetComponent<Text>();
+                _currentBaseLBL = GameObjectHelpers.FindGameObject(gameObject, "CurrentBaseLBL").GetComponent<Text>();
             }
             catch (Exception e)
             {

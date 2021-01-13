@@ -48,7 +48,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             }
         }
 
-        private void UpdateList()
+        internal void UpdateList()
         {
             if (_manager == null) return;
             _baseGrid.DrawPage();
@@ -82,7 +82,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
 
                 for (int i = data.StartPosition; i < data.EndPosition; i++)
                 {
-                    _baseButtons[i].Set(grouped[i], grouped[i] == _manager);
+                    _baseButtons[i].Set(grouped[i], grouped[i] == BaseManager.FindManager(Player.main.currentSub));
                 }
 
             }

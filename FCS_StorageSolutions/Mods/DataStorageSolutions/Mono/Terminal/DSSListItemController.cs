@@ -33,6 +33,8 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
 
         internal void Set(BaseManager manager, bool isCurrentBase)
         {
+            if (manager == null) return;
+
             Initialize();
 
             ChangeIcon(isCurrentBase ? DssListItemIcon.Current : manager.Habitat.isCyclops ? DssListItemIcon.Cyclops : DssListItemIcon.HUB);

@@ -188,7 +188,7 @@
     <Compile Include="Patches\Light_Patches.cs" />
     <Compile Include="Patches\Player_Patches.cs" />
     <Compile Include="Patches\PrawnSuit_Patches.cs" />
-    <Compile Include="Patches\StorageContainterPatches.cs" />
+    <Compile Include="Patches\StorageContainerPatches.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QuantumTeleporter\Buildable\QuantumTeleporterPatcher.cs" />

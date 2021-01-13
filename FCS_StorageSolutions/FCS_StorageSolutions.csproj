@@ -169,7 +169,8 @@
     <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\NetworkDialogController.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\VehicleButton.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\VehicleItemButton.cs" />
-    <Compile Include="Patches\StorageContainterPatches.cs" />
+    <Compile Include="Patches\StorageContainerPatches.cs" />
+    <Compile Include="Patches\ToolTipFactory_Patch.cs" />
     <Compile Include="Patches\VehicleDockingBayPatcher.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

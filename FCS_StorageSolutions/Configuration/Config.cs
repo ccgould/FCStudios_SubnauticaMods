@@ -14,6 +14,11 @@ namespace FCS_StorageSolutions.Configuration
 
         [Toggle("Enable Debugs"), OnChange(nameof(EnableDebugsToggleEvent))]
         public bool EnableDebugLogs = false;
+
+        [Toggle("Enable Debugs"), OnChange(nameof(EnableDebugsToggleEvent))]
+        public bool ShowServerCustomToolTip { get; set; } = true;
+
+
         private void EnableDebugsToggleEvent(ToggleChangedEventArgs e)
         {
             if (e.Value)
