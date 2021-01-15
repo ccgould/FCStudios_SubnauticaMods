@@ -65,6 +65,9 @@ namespace FCS_HomeSolutions.Configuration
             { $"{ModKey}_NotEnoughWaterForBottle","Not enough water for bottle please wait for 50% tank level or more"},
             { $"{ModKey}_ClickToOpenFormatted","Click to open the {0}"},
             { $"{ModKey}_ModNotEmptyFormat","Please empty {0} before trying to deconstruct."},
+            { $"{ModKey}_FailedToRecycleFormat","Failed to recycle item: {0}"},
+            { $"{ModKey}_CannotDeleteLevelFormat","Cannot delete level: {0}"},
+            { $"{ModKey}_DeleteLevelConfirmation","Are you sure you would like to delete level ({0})"},
         };
 
         internal static void AdditionalPatching()
@@ -344,6 +347,21 @@ namespace FCS_HomeSolutions.Configuration
         public static string ModNotEmptyFormat(string modName)
         {
             return string.Format(GetLanguage($"{ModKey}_ModNotEmptyFormat"), modName);
+        }
+
+        public static string FailedToRecycleItemFormat(string techTypeName)
+        {
+            return string.Format(GetLanguage($"{ModKey}_FailedToRecycleFormat"),techTypeName);
+        }
+
+        public static string CannotDeleteLevelFormat(string value)
+        {
+            return string.Format(GetLanguage($"{ModKey}_CannotDeleteLevelFormat"),value);
+        }
+
+        public static string DeleteLevelConfirmation(string level)
+        {
+            return string.Format(GetLanguage($"{ModKey}_DeleteLevelConfirmation"),level);
         }
     }
 }

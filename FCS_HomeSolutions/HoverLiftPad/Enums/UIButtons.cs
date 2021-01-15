@@ -12,6 +12,7 @@
         ToggleBackGate = 7,
         DecreaseLevel = 8,
         IncreaseLevel = 9,
-        GoToFloor
+        GoToFloor,
+        Delete
     }
 }

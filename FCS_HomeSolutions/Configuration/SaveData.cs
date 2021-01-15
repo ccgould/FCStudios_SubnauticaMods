@@ -4,6 +4,7 @@ using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Objects;
 using FCS_HomeSolutions.HoverLiftPad.Mono;
+using FCS_HomeSolutions.Mono.OutDoorPlanters;
 using FCS_HomeSolutions.QuantumTeleporter.Enumerators;
 using FCS_HomeSolutions.TrashRecycler.Model;
 using Oculus.Newtonsoft.Json;
@@ -68,7 +69,7 @@ namespace FCS_HomeSolutions.Configuration
         [JsonProperty(PropertyName = "LUMCOL")] internal Vec4 Lum { get; set; }
         [JsonProperty]  internal byte[] Bytes { get; set; }
         [JsonProperty(PropertyName = "BID")] internal string BaseID { get; set; }
-
+        public IEnumerable<PlantData> PlantAges { get; set; }
     }
 
     internal class MiniFountainFilterDataEntry

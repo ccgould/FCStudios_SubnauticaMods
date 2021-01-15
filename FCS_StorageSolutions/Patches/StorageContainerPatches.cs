@@ -24,9 +24,6 @@ namespace FCS_StorageSolutions.Patches
 
             if (manager == null)
             {
-#if DEBUG
-                QuickLogger.Debug($"[StorageContainerPatch] GameObject Name Returned: {__instance.prefabRoot.name}");
-#endif
                 QuickLogger.Debug($"[StorageContainerPatch] Base Manager is null canceling operation");
                 return;
             }
@@ -44,7 +41,7 @@ namespace FCS_StorageSolutions.Patches
         [HarmonyPostfix]
         internal static void Postfix(bool constructed, StorageContainer __instance)
         {
-            if (__instance == null)
+            if (__instance == null || !constructed)
             {
                 return;
             }
@@ -53,9 +50,6 @@ namespace FCS_StorageSolutions.Patches
 
             if (manager == null)
             {
-#if DEBUG
-                QuickLogger.Debug($"[StorageContainerPatch] GameObject Name Returned: {__instance.prefabRoot.name}");
-#endif
                 QuickLogger.Debug($"[StorageContainerPatch] Base Manager is null canceling operation");
                 return;
             }

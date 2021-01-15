@@ -53,6 +53,27 @@ namespace FCSCommon.Extensions
             return item;
         }
 
+        internal static InventoryItem ToInventoryItemLegacy(this TechType techType)
+        {
+
+            InventoryItem item = null;
+            var prefab = CraftData.GetPrefabForTechType(techType);
+            if (prefab != null)
+            {
+                var go = GameObject.Instantiate(prefab);
+                var pickupable = go.EnsureComponent<Pickupable>().Pickup(false);
+                item = new InventoryItem(pickupable);
+            }
+            else
+            {
+                var go = GameObject.Instantiate(GameObject.CreatePrimitive(PrimitiveType.Cube));
+                go.EnsureComponent<PrefabIdentifier>();
+                var pickupable = go.EnsureComponent<Pickupable>().Pickup(false);
+                item = new InventoryItem(pickupable);
+            }
+            return item;
+        }
+
         internal static InventoryItem ToInventoryItem(this Pickupable pickupable)
         {
             InventoryItem item = null;

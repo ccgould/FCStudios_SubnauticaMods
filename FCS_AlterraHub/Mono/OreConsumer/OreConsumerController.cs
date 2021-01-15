@@ -29,7 +29,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
 
         private bool CheckIfOperational()
         {
-            if(IsInitialized && IsConstructed && Manager != null && _oreQueue != null && Manager.HasEnoughPower(GetPowerUsage())) return true;
+            if(IsInitialized && IsConstructed && Manager != null && _oreQueue != null && Manager.HasEnoughPower(GetPowerUsage()) && !_isBreakerTripped) return true;
             return false;
         }
 
@@ -38,26 +38,28 @@ namespace FCS_AlterraHub.Mono.OreConsumer
             return transform.position;
         }
         
-
         public OreConsumerDisplay DisplayManager { get; private set; }
         public TransferHandler TransferHandler { get; private set; }
         public MotorHandler MotorHandler { get; private set; }
         public EffectsManager EffectsManager { get; private set; }
         public AudioManager AudioManager { get; private set; }
-        public Action<bool> onUpdateSound { get; private set; }
+        public Action<bool> OnUpdateSound { get; private set; }
 
 
         private Queue<TechType> _oreQueue;
         private const float OreProcessingTime = 90f;
         private float _timeLeft;
+        private bool _isBreakerTripped;
+        private GameObject _canvas;
+
         public override float GetPowerUsage()
         {
-            return _oreQueue?.Count > 0 ? 0.85f : 0;
+            return _oreQueue != null && _oreQueue?.Count > 0 && !_isBreakerTripped ? 0.85f : 0;
         }
 
         #region Unity Methods
 
-        private void Awake()
+        public override void Awake()
         {
             _timeLeft = OreProcessingTime;
         }
@@ -70,7 +72,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
 
         private void UpdateAnimation()
         {
-            if (_oreQueue != null && _oreQueue.Count > 0 && (Manager.GetPowerState() == PowerSystem.Status.Normal || Manager.GetPowerState() == PowerSystem.Status.Emergency))
+            if (_oreQueue != null && _oreQueue.Count > 0 && (Manager.GetPowerState() == PowerSystem.Status.Normal || Manager.GetPowerState() == PowerSystem.Status.Emergency) && !_isBreakerTripped)
             {
                 MotorHandler.Start();
                 EffectsManager.ShowEffect();
@@ -86,7 +88,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
 
         private void Update()
         {
-            if (_oreQueue != null && IsOperational && _oreQueue.Count > 0)
+            if (IsOperational && _oreQueue.Count > 0)
             {
                 _timeLeft -= DayNightCycle.main.deltaTime;
                 if (_timeLeft < 0)
@@ -118,6 +120,12 @@ namespace FCS_AlterraHub.Mono.OreConsumer
                         _oreQueue = _savedData.OreQueue;
                         _timeLeft = _savedData.TimeLeft;
                     }
+
+                    if(_savedData.IsBreakerTripped)
+                    {
+                        _isBreakerTripped = true;
+                        ToggleBreakerState();
+                    }
                     MotorHandler.SpeedByPass(_savedData.RPM);
                     _colorManager.ChangeColor(_savedData.Fcs.Vector4ToColor(),ColorTargetMode.Both);
                 }
@@ -125,12 +133,19 @@ namespace FCS_AlterraHub.Mono.OreConsumer
                 _runStartUpOnEnable = false;
             }
         }
-        
+
+        private void ToggleBreakerState()
+        {
+            _isBreakerTripped ^= true;
+        }
+
         #endregion
 
         public override void Initialize()
         {
             if (IsInitialized) return;
+
+            _canvas = gameObject.GetComponentInChildren<Canvas>()?.gameObject;
 
             if (_oreQueue == null)
             {
@@ -178,9 +193,9 @@ namespace FCS_AlterraHub.Mono.OreConsumer
                 AudioManager.PlayMachineAudio();
             }
 
-            QPatch.Configuration.OnPlaySoundToggleEvent += value => { onUpdateSound?.Invoke(value); };
+            QPatch.Configuration.OnPlaySoundToggleEvent += value => { OnUpdateSound?.Invoke(value); };
 
-            onUpdateSound += value =>
+            OnUpdateSound += value =>
             {
                 if(value)
                 {
@@ -213,7 +228,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
             IsInitialized = true;
         }
 
-        private bool IsUnderWater()
+        public override bool IsUnderWater()
         {
             return GetDepth() >= 7.0f;
         }
@@ -278,12 +293,12 @@ namespace FCS_AlterraHub.Mono.OreConsumer
             }
         }
 
-        public bool CanBeStored(int amount, TechType techType)
+        public override bool CanBeStored(int amount, TechType techType)
         {
             return StoreInventorySystem.ValidResource(techType);
         }
 
-        public bool AddItemToContainer(InventoryItem item)
+        public override bool AddItemToContainer(InventoryItem item)
         {
             try
             {
@@ -345,6 +360,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
             _savedData.RPM = MotorHandler.GetRPM();
             _savedData.Fcs = _colorManager.GetColor().ColorToVector4();
             _savedData.BaseId = BaseId;
+            _savedData.IsBreakerTripped = _isBreakerTripped;
             QuickLogger.Debug($"Saving ID {_savedData.Id}", true);
             newSaveData.OreConsumerEntries.Add(_savedData);
         }
@@ -365,23 +381,36 @@ namespace FCS_AlterraHub.Mono.OreConsumer
             var main = HandReticle.main;
             main.SetIcon(HandReticle.IconType.Info);
 
+            if(_isBreakerTripped)
+            {
+                main.SetInteractTextRaw(Buildables.AlterraHub.DeviceOff(),Buildables.AlterraHub.PressToTurnDeviceOnOff(KeyCode.F.ToString()));
+            }
+
+
             if (_oreQueue != null && DisplayManager?.CheckInteraction.IsHovered == false)
             {
                 if (_oreQueue.Any())
                 {
                     var pendingAmount = _oreQueue.Count > 1 ? _oreQueue.Count - 1 : 0;
-                    main.SetInteractText(Buildables.AlterraHub.OreConsumerTimeLeftFormat(Language.main.Get(_oreQueue.Peek()), _timeLeft.ToString("N0"),$"{pendingAmount}"));
+                    main.SetInteractTextRaw(Buildables.AlterraHub.OreConsumerTimeLeftFormat(Language.main.Get(_oreQueue.Peek()), _timeLeft.ToString("N0"),$"{pendingAmount}"),
+                        Buildables.AlterraHub.PressToTurnDeviceOnOff(KeyCode.F.ToString()));
                 }
                 else
                 {
-                    main.SetInteractText(Buildables.AlterraHub.NoOresToProcess());
+                    main.SetInteractTextRaw(Buildables.AlterraHub.NoOresToProcess(),
+                        Buildables.AlterraHub.PressToTurnDeviceOnOff(KeyCode.F.ToString()));
                 }
+            }
+
+            if (Input.GetKeyDown(KeyCode.F))
+            {
+                ToggleBreakerState();
             }
         }
 
         public void OnHandClick(GUIHand hand)
         {
-            QuickLogger.Debug("Clicked",true);
+
         }
     }
 }

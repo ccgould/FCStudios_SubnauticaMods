@@ -17,6 +17,7 @@ namespace FCS_StorageSolutions.Configuration
         [JsonProperty] internal Vec4 Body { get; set; }
         [JsonProperty] internal bool IsVisible { get; set; }
         [JsonProperty] internal byte[] Data { get; set; }
+        [JsonProperty] internal string StorageName { get; set; }
     }
 
     [Serializable]

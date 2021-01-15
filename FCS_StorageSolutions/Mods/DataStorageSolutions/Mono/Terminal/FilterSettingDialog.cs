@@ -44,7 +44,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             if (button.Equals("ToggleButton_2"))
             {
                 _mono.ChangeStorageFilter(StorageType.AlterraStorage);
-                _label.text = "ALTERRA STORAGE";
+                _label.text = "REMOTE STORAGE UNIT";
             }
 
             if (button.Equals("ToggleButton_3"))

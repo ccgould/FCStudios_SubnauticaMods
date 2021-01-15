@@ -25,14 +25,58 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
         private bool _moveBelt;
         private float _beltSpeed = 0.1f;
         private IEnumerable<Material> _materials;
+        private GameObject _canvas
+            ;
         internal FCSStorage StorageManager { get; private set; }
-        public override bool IsVisible { get; } = true;
-        public override bool IsOperational { get; } = true;
+        public override bool IsVisible => IsInitialized && IsConstructed;
+        public override bool IsOperational => IsInitialized && IsConstructed;
         public override StorageType StorageType { get; } = StorageType.AutoCrafter;
 
         public override FCSStorage GetStorage()
         {
             return StorageManager;
+        }
+
+        public override float GetPowerUsage()
+        {
+            if (Manager == null || !IsConstructed || Manager.GetBreakerState() || CraftManager ==  null || !CraftManager.IsRunning()) return 0f;
+            return 0.01f;
+        }
+
+        private void OnBreakerStateChanged(bool value)
+        {
+            OnPowerStateChanged(!value ? PowerSystem.Status.Offline : Manager.GetPowerState());
+        }
+
+        private void OnPowerStateChanged(PowerSystem.Status obj)
+        {
+            UpdateScreenState();
+            if (obj == PowerSystem.Status.Offline)
+            {
+                StopBelt();
+            }
+            else
+            {
+                MoveBelt();
+            }
+        }
+
+        private void UpdateScreenState()
+        {
+            if (Manager.GetBreakerState() || Manager.GetPowerState() != PowerSystem.Status.Normal)
+            {
+                if (_canvas.activeSelf)
+                {
+                    _canvas.SetActive(false);
+                }
+            }
+            else
+            {
+                if (!_canvas.activeSelf)
+                {
+                    _canvas.SetActive(true);
+                }
+            }
         }
 
         private void Start()
@@ -54,6 +98,9 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
 
             StorageManager.CleanUpDuplicatedStorageNoneRoutine();
             Manager.AlertNewFcsStoragePlaced(this);
+            Manager.OnPowerStateChanged += OnPowerStateChanged;
+            Manager.OnBreakerStateChanged += OnBreakerStateChanged;
+            OnPowerStateChanged(Manager.GetPowerState());
         }
 
         private void Update()
@@ -66,6 +113,16 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
                     material.SetTextureOffset("_MainTex", new Vector2(0, offset));
                 }
             }
+        }
+
+        public override void OnDestroy()
+        {
+            if (Manager != null)
+            {
+                Manager.OnPowerStateChanged -= OnPowerStateChanged;
+                Manager.OnBreakerStateChanged -= OnBreakerStateChanged;
+            }
+            base.OnDestroy();
         }
 
         public override Pickupable RemoveItemFromContainer(TechType techType)
@@ -132,6 +189,8 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
 
         public override void Initialize()
         {
+            _canvas = gameObject.GetComponentInChildren<Canvas>()?.gameObject;
+
             if (DisplayManager == null)
             {
                 DisplayManager = gameObject.EnsureComponent<DSSAutoCrafterDisplay>();

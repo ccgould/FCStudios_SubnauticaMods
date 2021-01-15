@@ -73,7 +73,6 @@ namespace FCS_AlterraHub.Registration
                 if (string.IsNullOrWhiteSpace(prefabID) || !device.IsConstructed) return;
             }
             
-
             if (!knownDevices.Any(x=>x.PrefabID.Equals(prefabID)))
             {
                 var unitID = GenerateNewID(tabID,prefabID);
@@ -85,6 +84,7 @@ namespace FCS_AlterraHub.Registration
             }
             else
             {
+                device.TabID = tabID;
                 device.PackageId = packageId;
                 device.UnitID=knownDevices.FirstOrDefault(x=>x.PrefabID.Equals(prefabID)).ToString();
                 AddToGlobalDevices(device, device.UnitID);

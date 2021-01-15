@@ -56,16 +56,12 @@ namespace FCS_AlterraHub.Systems
 
         private void OnMessageResult(FCSMessageResult result)
         {
-            _result?.Invoke(result);
-
             if (_messageQueue.Any())
             {
                 var data = _messageQueue.Dequeue();
                 _result = data.Result;
                 _messageBox.Show(data.Message, data.Button, OnMessageResult);
-                return;
             }
-            _messageBox.Close();
         }
 
         private struct MessageBoxData

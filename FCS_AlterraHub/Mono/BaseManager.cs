@@ -47,7 +47,10 @@ namespace FCS_AlterraHub.Mono
             "planterpot",
             "planterbox",
             "plantershelf",
-            "alongplanter"
+            "alongplanter",
+            "BasicExteriorPlantPot",
+            "ChicExteriorPlantPot",
+            "CompositeExteriorPlantPot",
         };
         public readonly HashSet<StorageContainer> BaseStorageLockers = new HashSet<StorageContainer>();
         public readonly HashSet<FcsDevice> BaseServers = new HashSet<FcsDevice>();
@@ -200,12 +203,14 @@ namespace FCS_AlterraHub.Mono
         /// <returns></returns>
         public static BaseManager FindManager(GameObject gameObject)
         {
-            var subRoot = gameObject.GetComponentInParent<SubRoot>() ?? gameObject.GetComponentInChildren<SubRoot>();
+            var subRoot = gameObject?.GetComponentInParent<SubRoot>() ?? gameObject?.GetComponentInChildren<SubRoot>();
+            
             if (subRoot == null)
             {
                 QuickLogger.Debug($"[BaseManager] SubRoot Returned null");
+                return null;
             }
-            return subRoot != null ? FindManager(subRoot) : null;
+            return FindManager(subRoot);
         }
 
         public static void RemoveDestroyedBases()
@@ -626,16 +631,16 @@ namespace FCS_AlterraHub.Mono
             return TrackedResources.ContainsKey(techType);
         }
 
-        public void AddItemsToTracker(FcsDevice server,TechType item, int amountToAdd = 1)
+        public void AddItemsToTracker(FcsDevice device,TechType item, int amountToAdd = 1)
         {
             QuickLogger.Debug($"AddItemsToTracker: DSSServerController || {item.AsString()} || {amountToAdd} ");
 
-            if (server.TabID == "AS")
+            if (device.TabID == "AS")
             {
                 if (TrackedResources.ContainsKey(item))
                 {
                     TrackedResources[item].Amount = TrackedResources[item].Amount + amountToAdd;
-                    TrackedResources[item].AlterraStorage.Add(server);
+                    TrackedResources[item].AlterraStorage.Add(device);
                 }
                 else
                 {
@@ -643,7 +648,7 @@ namespace FCS_AlterraHub.Mono
                     {
                         TechType = item,
                         Amount = amountToAdd,
-                        AlterraStorage = new HashSet<FcsDevice>() { server }
+                        AlterraStorage = new HashSet<FcsDevice>() { device }
                     });
                 }
             }
@@ -652,7 +657,7 @@ namespace FCS_AlterraHub.Mono
                 if (TrackedResources.ContainsKey(item))
                 {
                     TrackedResources[item].Amount = TrackedResources[item].Amount + amountToAdd;
-                    TrackedResources[item].Servers.Add(server);
+                    TrackedResources[item].Servers.Add(device);
                 }
                 else
                 {
@@ -660,7 +665,7 @@ namespace FCS_AlterraHub.Mono
                     {
                         TechType = item,
                         Amount = amountToAdd,
-                        Servers = new HashSet<FcsDevice>() { server }
+                        Servers = new HashSet<FcsDevice>() { device }
                     });
                 }
             }

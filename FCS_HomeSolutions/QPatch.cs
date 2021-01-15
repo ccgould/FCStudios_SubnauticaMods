@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using FCS_HomeSolutions.BaseOperator.Buildable;
+using FCS_AlterraHub.Model;
+using FCS_AlterraHub.Objects;
 using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Buildables.OutDoorPlanters;
 using FCS_HomeSolutions.Configuration;
-using FCS_HomeSolutions.Curtains.Mono;
 using FCS_HomeSolutions.MiniFountainFilter.Buildables;
 using FCS_HomeSolutions.Mods.AlienChief.Buildables;
 using FCS_HomeSolutions.Mods.Cabinets.Buildable;
@@ -16,15 +16,12 @@ using FCS_HomeSolutions.QuantumTeleporter.Buildable;
 using FCS_HomeSolutions.SeaBreeze.Buildable;
 using FCS_HomeSolutions.Spawnables;
 using FCS_HomeSolutions.TrashReceptacle.Buildable;
-using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using HarmonyLib;
 using QModManager.API.ModLoading;
 using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
 using UnityEngine;
-using UnityEngine.UI;
-using Settings = FCS_HomeSolutions.Buildables.Settings;
 
 namespace FCS_HomeSolutions
 {
@@ -36,6 +33,8 @@ namespace FCS_HomeSolutions
     public class QPatch
     {
         internal static Config Configuration { get; } = OptionsPanelHandler.Main.RegisterModOptions<Config>();
+        internal static TelevisionConfig TelevisionConfiguration { get; } = OptionsPanelHandler.Main.RegisterModOptions<TelevisionConfig>();
+        internal static QuantumTeleporterConfig QuantumTeleporterConfiguration { get; } = OptionsPanelHandler.Main.RegisterModOptions<QuantumTeleporterConfig>();
 
         internal static HoverLiftPadConfig HoverLiftPadConfiguration { get; } =
             OptionsPanelHandler.Main.RegisterModOptions<HoverLiftPadConfig>();
@@ -48,9 +47,6 @@ namespace FCS_HomeSolutions
 
         internal static SeaBreezeConfig SeaBreezeConfiguration { get; } =
             OptionsPanelHandler.Main.RegisterModOptions<SeaBreezeConfig>();
-
-        internal static QuantumTeleporterConfig QuantumTeleporterConfiguration { get; } =
-            OptionsPanelHandler.Main.RegisterModOptions<QuantumTeleporterConfig>();
 
         internal static Dictionary<string, Texture2D> Patterns = new Dictionary<string, Texture2D>();
 
@@ -65,6 +61,9 @@ namespace FCS_HomeSolutions
             ModelPrefab.Initialize();
 
             AuxPatchers.AdditionalPatching();
+
+            //Load Additional Colors
+            LoadAdditionalColors();
 
             var ahsSweetWaterBar = new SweetWaterBarPatch("ahsSweetWaterBar", "Sweet Water Bar",
                 "All drinks on the house.", ModelPrefab.GetPrefab("SweetWaterBar"), new Settings
@@ -88,9 +87,9 @@ namespace FCS_HomeSolutions
             //var baseOperator = new BaseOperatorPatch();
             //baseOperator.Patch();
 
-            //Patch hover Lift Operator
-            var hoverLiftPad = new HoverLiftPadPatch();
-            hoverLiftPad.Patch();
+            ////Patch hover Lift Operator
+            //var hoverLiftPad = new HoverLiftPadPatch();
+            //hoverLiftPad.Patch();
 
             //Patch Smart Planter Pot
             var smartOutDoorPlanter = new OutDoorPlanterPatch(Mod.SmartPlanterPotClassID, Mod.SmartPlanterPotFriendly,
@@ -154,17 +153,20 @@ namespace FCS_HomeSolutions
             LoadCurtainTemplates();
 
             LoadCabinets();
-
-
-
+            
             var harmony = new Harmony("com.homesolutions.fstudios");
             harmony.PatchAll(Assembly.GetExecutingAssembly());
-
             
-
-
             //Register debug commands
             ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));
+        }
+
+        private void LoadAdditionalColors()
+        {
+            foreach (AdditionalColor additionalColor in PaintToolConfiguration.AdditionalPaintColors)
+            {
+                ColorList.AddColor(additionalColor.Color,additionalColor.ColorName);
+            }
         }
 
         private void LoadLights()
@@ -239,6 +241,7 @@ namespace FCS_HomeSolutions
                     AllowedOutside = true,
                     AllowedOnGround = true,
                     RotationEnabled = true,
+                    Cost = 20000,
                     Size = new Vector3(1.963638f, 1.020765f, 0.1433573f),
                     Center = new Vector3(0f, 0.6343491f, 0f)
                 });
@@ -254,6 +257,7 @@ namespace FCS_HomeSolutions
                     AllowedOutside = true,
                     AllowedOnGround = true,
                     RotationEnabled = true,
+                    Cost = 20000,
                     Size = new Vector3(1.963638f, 1.020765f, 0.1433573f),
                     Center = new Vector3(0f, 0.6343491f, 0f)
                 });
@@ -269,6 +273,7 @@ namespace FCS_HomeSolutions
                     AllowedOutside = true,
                     AllowedOnGround = true,
                     RotationEnabled = true,
+                    Cost = 15000,
                     Size = new Vector3(1f, 0.822893f, 0.1791649f),
                     Center = new Vector3(-1.365597e-25f, 0.7452481f, -0.004088677f)
                 });
@@ -284,6 +289,7 @@ namespace FCS_HomeSolutions
                     AllowedOutside = true,
                     AllowedOnGround = true,
                     RotationEnabled = true,
+                    Cost = 15000,
                     Size = new Vector3(1f, 0.822893f, 0.1791649f),
                     Center = new Vector3(-1.365597e-25f, 0.7452481f, -0.004088677f)
                 });
@@ -298,6 +304,7 @@ namespace FCS_HomeSolutions
                     AllowedOutside = true,
                     AllowedOnGround = true,
                     RotationEnabled = true,
+                    Cost = 18000,
                     Size = new Vector3(4.033218f, 2.194448f, 2.34824f),
                     Center = new Vector3(4.449882e-24f, 1.225415f, 0.8919346f)
                 });
@@ -344,8 +351,9 @@ namespace FCS_HomeSolutions
                     AllowedInSub = true,
                     AllowedOnConstructables = true,
                     RotationEnabled = true,
-                    Center = new Vector3(0f, 0.4615f, 0f),
-                    Size = new Vector3(0.6667f, 0.9036641f, 0.6438f),
+                    Cost = 4500,
+                    Center = new Vector3(-0.006723166f, 0.4907906f, 0f),
+                    Size = new Vector3(0.6996989f, 0.8610544f, 0.6298063f),
                 });
             floorShelf01.Patch();
 
@@ -359,8 +367,9 @@ namespace FCS_HomeSolutions
                     AllowedOnGround = true,
                     RotationEnabled = true,
                     AllowedInSub = true,
-                    Size = new Vector3(0.6780548f, 2.636386f, 0.6340148f),
-                    Center = new Vector3(69.55f, 1.381544f, 0f)
+                    Cost = 4500,
+                    Center = new Vector3(0f, 1.405873f, 0f),
+                    Size = new Vector3(0.6692477f, 2.594568f, 0.6355314f),
                 });
             floorShelf02.Patch();
 
@@ -375,8 +384,9 @@ namespace FCS_HomeSolutions
                     AllowedInSub = true,
                     AllowedOnConstructables = true,
                     RotationEnabled = true,
-                    Size = new Vector3(0.6776733f, 1.692158f, 0.6340148f),
-                    Center = new Vector3(75.744f, 0.9614337f, 0f)
+                    Cost = 4500,
+                    Size = new Vector3(0.6614718f, 1.675184f, 0.6331196f),
+                    Center = new Vector3(0f, 0.9526114f, 0f)
                 });
             floorShelf03.Patch();
 
@@ -392,8 +402,9 @@ namespace FCS_HomeSolutions
                     AllowedInSub = true,
                     AllowedOnConstructables = true,
                     RotationEnabled = true,
-                    Size = new Vector3(2.814087f, 1.54613f, 0.6510811f),
-                    Center = new Vector3(77.73706f, 0.9081734f, -0.005623609f)
+                    Cost = 4500,
+                    Size = new Vector3(2.743652f, 1.61677f, 0.6635007f),
+                    Center = new Vector3(-0.1762199f, 0.8602326f, 0f)
                 });
             floorShelf04.Patch();
 
@@ -408,8 +419,9 @@ namespace FCS_HomeSolutions
                     AllowedInSub = true,
                     AllowedOnConstructables = true,
                     RotationEnabled = true,
-                    Size = new Vector3(2.820679f, 1.546359f, 0.6349438f),
-                    Center = new Vector3(80.90942f, 0.9178838f, -0.01041579f)
+                    Cost = 4500,
+                    Size = new Vector3(2.772398f, 1.636121f, 0.6347024f),
+                    Center = new Vector3(-0.1675282f, 0.86191998f, 0f)
                 });
             floorShelf05.Patch();
 
@@ -424,8 +436,9 @@ namespace FCS_HomeSolutions
                     AllowedOnConstructables = true,
                     AllowedInSub = true,
                     RotationEnabled = true,
-                    Size = new Vector3(2.781815f, 0.8054426f, 0.6553071f),
-                    Center = new Vector3(84.07667f, 0.5206897f, -0.01041579f)
+                    Cost = 4500,
+                    Size = new Vector3(2.759224f, 0.8717237f, 0.647239f),
+                    Center = new Vector3(-0.1740894f, 0.4856191f, 0.002290621f)
                 });
             floorShelf06.Patch();
 
@@ -441,8 +454,9 @@ namespace FCS_HomeSolutions
                     AllowedInSub = true,
                     AllowedOnConstructables = true,
                     RotationEnabled = true,
-                    Size = new Vector3(2.764771f, 0.7996328f, 0.6282197f),
-                    Center = new Vector3(73.80698f, 0.5240374f, -0.01041579f)
+                    Cost = 4500,
+                    Size = new Vector3(-0.1693296f, 0.4921141f, 0f),
+                    Center = new Vector3(2.764177f, 0.8583584f, 0.6468056f)
                 });
             floorShelf07.Patch();
 
@@ -456,6 +470,7 @@ namespace FCS_HomeSolutions
                     AllowedOnGround = true,
                     AllowedOnConstructables = true,
                     RotationEnabled = true,
+                    Cost = 78750,
                     Size = new Vector3(1.820033f, 1.101903f, 0.08594985f),
                     Center = new Vector3(-0.003967494f, 0.5916209f, 0.001384925f)
                 });
@@ -472,6 +487,7 @@ namespace FCS_HomeSolutions
                     AllowedOnConstructables = true,
                     AllowedOnWall = true,
                     RotationEnabled = false,
+                    Cost = 78750,
                     Size = new Vector3(1.818158f, 1.101903f, 0.08594985f),
                     Center = new Vector3(-0.003030092f, -0.00144583f, 0.05641174f)
                 });
@@ -489,6 +505,7 @@ namespace FCS_HomeSolutions
                     AllowedOnWall = true,
                     AllowedOnConstructables = true,
                     RotationEnabled = false,
+                    Cost = 27000,
                     Size = new Vector3(1.997957f, 0.06401221f, 0.9870584f),
                     Center = new Vector3(-2.488494e-05f, -0.01308646f, 0.5065421f)
                 });
@@ -506,6 +523,7 @@ namespace FCS_HomeSolutions
                     AllowedInSub = true,
                     AllowedOnConstructables = true,
                     RotationEnabled = true,
+                    Cost = 45000,
                     Size = new Vector3(1.997957f, 0.8685947f, 2.000143f),
                     Center = new Vector3(-2.488494e-05f, 0.5808856f, 0f)
                 });
@@ -522,6 +540,7 @@ namespace FCS_HomeSolutions
                     AllowedInSub = true,
                     AllowedOnConstructables = true,
                     RotationEnabled = true,
+                    Cost = 45000,
                     Size = new Vector3(1.997957f, 0.8685947f, 2.000143f),
                     Center = new Vector3(-2.488494e-05f, 0.5808856f, 0f)
                 });
@@ -582,6 +601,7 @@ namespace FCS_HomeSolutions
                     AllowedOnGround = false,
                     AllowedOnWall = true,
                     RotationEnabled = false,
+                    Cost = 3750,
                     CategoryForPDA = TechCategory.InteriorModule,
                     GroupForPDA = TechGroup.InteriorModules,
                     Size = new Vector3(0.9294822f, 0.204877f, 0.04135694f),
@@ -598,6 +618,7 @@ namespace FCS_HomeSolutions
                     AllowedOutside = true,
                     AllowedOnGround = true,
                     RotationEnabled = true,
+                    Cost = 3750,
                     CategoryForPDA = TechCategory.ExteriorModule,
                     GroupForPDA = TechGroup.ExteriorModules,
                     Size = new Vector3(0.920086f, 0.8915547f, 0.07656322f),

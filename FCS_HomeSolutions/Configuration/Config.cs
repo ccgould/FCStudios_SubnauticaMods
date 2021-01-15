@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using FCS_AlterraHub.Enumerators;
+using FCS_AlterraHub.Model;
+using FCS_AlterraHub.Objects;
 using FCSCommon.Utilities;
 using Oculus.Newtonsoft.Json;
 using SMLHelper.V2.Json;
@@ -20,7 +23,8 @@ namespace FCS_HomeSolutions.Configuration
 
         public FCSGameMode ModMode { get; set; }
 
-        [Toggle("Alterra Chief Mod Enabled")] public bool IsAlienChiefEnabled { get; set; } = true;
+        [Toggle("Alterra Chief Mod Enabled")] 
+        public bool IsAlienChiefEnabled { get; set; } = true;
 
         private void EnableDebugsToggleEvent(ToggleChangedEventArgs e)
         {
@@ -95,7 +99,18 @@ namespace FCS_HomeSolutions.Configuration
 
         [Keybind("Select Color Back")]
         public KeyCode SelectColorBackKeyCode = KeyCode.LeftArrow;
+
+        public List<AdditionalColor> AdditionalPaintColors { get; set; } = new List<AdditionalColor>
+        {
+            new AdditionalColor
+            {
+                Color = new Vec4(178f,34f,34f,255),
+                ColorName = "FireBrick"
+            }
+        };
     }
+
+
 
     [Menu("Quantum Teleporter Menu")]
     public class QuantumTeleporterConfig : ConfigFile
@@ -104,6 +119,28 @@ namespace FCS_HomeSolutions.Configuration
 
         [JsonProperty] internal float GlobalTeleportPowerUsage { get; set; } = 1500f;
         [JsonProperty] internal float InternalTeleportPowerUsage { get; set; } = 150f;
+
+    }
+
+    [Menu("Television Menu")]
+    public class TelevisionConfig : ConfigFile
+    {
+        public TelevisionConfig() : base("television-config", "Configurations") { }
+
+        [Keybind("Volume Up")]
+        public KeyCode VolumeUp = KeyCode.UpArrow;
+
+        [Keybind("Volume Down")]
+        public KeyCode VolumeDown = KeyCode.DownArrow;
+
+        [Keybind("Channel Up")]
+        public KeyCode ChannelUp = KeyCode.RightArrow;
+
+        [Keybind("Channel Down")]
+        public KeyCode ChannelDown = KeyCode.LeftArrow;
+
+        [Keybind("Turn On/Off Tv")]
+        public KeyCode ToggleTv = KeyCode.F;
 
     }
 }

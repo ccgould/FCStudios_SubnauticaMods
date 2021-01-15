@@ -2,6 +2,7 @@
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Extensions;
+using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Mono.ObjectPooler;
@@ -35,6 +36,7 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
         private ProtobufSerializer _serializer;
         private const string RecyclerPoolTag = "recycleItem";
         private const float MaxRecycleTime = 30f;
+
         public override bool IsOperational => OperationalCheck();
 
         private bool OperationalCheck()
@@ -279,6 +281,11 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
 
         public override bool CanDeconstruct(out string reason)
         {
+            if (_recycler.HasItems())
+            {
+                reason = AuxPatchers.ModNotEmptyFormat(Mod.RecyclerFriendly);
+                return false;
+            }
             reason = string.Empty;
             return true;
         }
@@ -350,6 +357,11 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
         public override float GetPowerUsage()
         {
             return _isRecycling ? 0.85f : 0f;
+        }
+
+        public int GetFreeSpace()
+        {
+            return _recycler.GetStorage().GetFreeSpace();
         }
     }
 }

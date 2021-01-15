@@ -67,6 +67,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.ItemDisplay
             _networkDump.Initialize(Manager);
             Manager.OnPowerStateChanged += OnPowerStateChanged;
             Manager.OnBreakerStateChanged += OnBreakerStateChanged;
+            UpdateScreenState();
         }
 
         public override void OnDestroy()

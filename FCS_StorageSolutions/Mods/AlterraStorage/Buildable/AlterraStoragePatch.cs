@@ -25,32 +25,6 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Buildable
                 var AlterraStorageKit = new FCSKit(Mod.AlterraStorageKitClassID, Mod.AlterraStorageFriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 AlterraStorageKit.Patch();
                 FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, AlterraStorageKit.TechType, 94500, StoreCategory.Storage);
-            //    FCSAlterraHubService.PublicAPI.RegisterEncyclopediaEntry(TechType, new List<FcsEntryData>
-            //    {
-            //        new FcsEntryData
-            //        {
-            //            key = "HydroHarvester",
-            //            unlocked = true,
-            //            path = "fcs",
-            //            timeCapsule = false,
-            //            nodes = new []{ "fcs"},
-            //            Description = "The hydroponic Harvester .....",
-            //            Title = "Hydroponic Harvester",
-            //            Verbose = true
-            //        },
-            //        new FcsEntryData
-            //        {
-            //            key = "HydroHarvester1",
-            //            unlocked = true,
-            //            path = "fcs",
-            //            timeCapsule = false,
-            //            nodes = new []{ "fcs"},
-            //            Description = "The hydroponic Harvester .....",
-            //            Title = "Hydroponic Harvester 1",
-            //            Verbose = false
-            //        }
-            //    });
-
             };
         }
 

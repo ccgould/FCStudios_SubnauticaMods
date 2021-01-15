@@ -17,5 +17,6 @@ namespace FCS_HomeSolutions.Buildables
         internal Vector3 Center;
         internal TechGroup GroupForPDA;
         internal TechCategory CategoryForPDA;
+        internal decimal Cost;
     }
 }

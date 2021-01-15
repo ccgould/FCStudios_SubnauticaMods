@@ -38,6 +38,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.FormattingStation
             _storageManager.CleanUpDuplicatedStorageNoneRoutine();
             Manager.OnPowerStateChanged += OnPowerStateChanged;
             Manager.OnBreakerStateChanged += OnBreakerStateChanged;
+            UpdateScreenState();
         }
 
         private void OnBreakerStateChanged(bool value)

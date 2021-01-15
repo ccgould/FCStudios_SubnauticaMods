@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Mono;
 using FCS_HomeSolutions.Configuration;
 using FCS_HomeSolutions.TrashRecycler.Model;
@@ -16,19 +17,6 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
     {
         public FcsDevice Controller { get; set; }
         private readonly Queue<Waste> _wasteList = new Queue<Waste>();
-        private static HashSet<TechType> batteryTech;
-        public static HashSet<TechType> BatteryTech 
-        { 
-            get 
-            { 
-                if(batteryTech is null || batteryTech.Count == 0)
-                {
-                    batteryTech = new HashSet<TechType>(BatteryCharger.compatibleTech).Concat(PowerCellCharger.compatibleTech).ToHashSet();
-                }
-                return batteryTech;
-            } 
-        }
-
         private FCSStorage _storageContainer;
         private List<string> _saveQueuedItems = new List<string>();
 
@@ -94,11 +82,8 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
                     inventory.UnsafeAdd(item);
                     return;
                 }
-                else
-                {
-                    inventoryItems.ForEach((x) => Destroy(x.item.gameObject));
-                }
 
+                inventoryItems.ForEach((x) => Destroy(x.item.gameObject));
             }
 
             double time = DayNightCycle.main.timePassed;
@@ -134,7 +119,7 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
             GameObject gameObject = inventoryItem.item.gameObject;
             TechType techType = inventoryItem.item.GetTechType();
 
-            List<IIngredient> list = GetIngredients(wasteItem.InventoryItem.item);
+            List<IIngredient> list = TechDataHelpers.GetIngredients(wasteItem.InventoryItem.item);
             QuickLogger.Debug($"Ingredients != Null: {list != null} | List Count: {list.Count > 0}", true);
             if (list != null && list.Count > 0 )
             {
@@ -168,7 +153,7 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
             {
                 for (int i = 0; i < ingredient.amount; i++)
                 {
-                    if (!BatteryTech.Contains(ingredient.techType))
+                    if (!TechDataHelpers.BatteryTech.Contains(ingredient.techType))
                     {
                         CoroutineTask<GameObject> getPrefab = CraftData.GetPrefabForTechTypeAsync(ingredient.techType, false);
                         yield return getPrefab;
@@ -206,84 +191,16 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
             OnContainerUpdated?.Invoke();
             yield break;
         }
-
-        private bool IsUsedBattery(Pickupable pickupable)
-        {
-            IBattery component = pickupable.GetComponent<IBattery>();
-            return component != null && (double)component.charge < (double)component.capacity * 0.97;
-        }
-
-        public List<IIngredient> GetIngredients(Pickupable pickup)
-        {
-            List<IIngredient> Ingredients = new List<IIngredient>();
-            GameObject gObj = pickup?.gameObject;
-            if (gObj)
-            {
-                var it = CraftData.Get(pickup.GetTechType());
-                if(it != null)
-                {
-                    List<IIngredient> readOnlyCollection = new List<IIngredient>();
-                    for (int i = 0; i < it.ingredientCount; i++)
-                    {
-                        readOnlyCollection.Add(it.GetIngredient(i));
-                    }
-
-                    foreach (IIngredient ingredient in readOnlyCollection)
-                    {
-                        if (!BatteryTech.Contains(ingredient.techType))
-                        {
-                            Ingredients.Add(ingredient);
-                        }
-                    }
-                }
-            }
-            return Ingredients;
-        }
-
-        private bool ContainsValidCraftData(TechType techType)
-        {
-            var data = CraftData.Get(techType, true);
-            if (data == null || data.craftAmount > 1)
-            {
-                QuickLogger.Debug($"TechType '{techType}' has no valid recipe for recycling.");
-                return false;
-            }
-
-            if (data.linkedItemCount > 0)
-            {
-                Dictionary<TechType, int> pairs = new Dictionary<TechType, int>();
-                for (int i = 0; i < data.linkedItemCount; i++)
-                {
-                    TechType techType2 = data.GetLinkedItem(i);
-                    if (pairs.ContainsKey(techType2))
-                        pairs[techType2] += 1;
-                    else
-                        pairs[techType2] = 1;
-                }
-
-                ItemsContainer inventory = Inventory.main?.container;
-
-                if (inventory is null)
-                    return false;
-
-                foreach(KeyValuePair<TechType, int> pair in pairs)
-                {
-                    if (inventory.GetCount(pair.Key) < pair.Value)
-                        return false;
-                }
-            }
-
-            return true;
-        }
-
+        
         public bool IsAllowedToAdd(Pickupable pickupable)
         {
             var techType = pickupable.GetTechType();
-            List<IIngredient> list = GetIngredients(pickupable);
-            var result = ContainsValidCraftData(techType) && !IsUsedBattery(pickupable) && (list.Count + _storageContainer.GetCount()) <= MaxStorage;
+            List<IIngredient> list = TechDataHelpers.GetIngredients(pickupable);
+            var result = TechDataHelpers.ContainsValidCraftData(techType) && !TechDataHelpers.IsUsedBattery(pickupable) && (list.Count + _storageContainer.GetCount()) <= MaxStorage;
             QuickLogger.Debug($"Can hold item result: {result} || Storage Total: {list.Count + _storageContainer.GetCount()}", true);
             return result;
         }
+
 
         private void UpdateTracker()
         {
@@ -322,7 +239,7 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
 
         public bool HasItems()
         {
-            return _wasteList.Count > 0;
+            return _wasteList.Count > 0 || _storageContainer.ItemsContainer.count > 0;
         }
 
         public string GetCurrentItem()
@@ -339,6 +256,16 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
 
             BioMaterials = data.BioMaterialsCount;
             _storageContainer.RestoreItems(serializer, data.Storage);
+        }
+
+        public bool CanPendItem(Pickupable pickupable)
+        {
+            var ingredientCount = TechDataHelpers.GetIngredientCount(pickupable);
+            var pendingIngredientCount = _wasteList.Sum(x => x.IngredientCount);
+            var storageTotal = _storageContainer.GetCount();
+            QuickLogger.Debug($"Can Pend Calc: {ingredientCount + pendingIngredientCount + storageTotal} | Result: {ingredientCount + pendingIngredientCount <= MaxStorage}",true);
+            return ingredientCount + pendingIngredientCount + storageTotal <= MaxStorage;
+
         }
     }
 }

@@ -4,6 +4,8 @@ namespace FCS_AlterraHub.Mono
 {
     public class FCSToggleButton : InterfaceButton
     {
+        public bool IgnoreDoubleClicking = false;
+
         public override void OnEnable()
         {
             base.OnEnable();
@@ -20,7 +22,8 @@ namespace FCS_AlterraHub.Mono
 
         private void ChangeState(bool value)
         {
-            if(IsRadial && IsSelected) return;
+            if(IsRadial && IsSelected || IgnoreDoubleClicking) return;
+
             if (value)
             {
                 DeSelect();

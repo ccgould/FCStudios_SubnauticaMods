@@ -54,6 +54,9 @@ namespace FCS_AlterraHub.Buildables
             { $"{ModKey}_BlackListItemFormat","{0} item is in the blacklist an will not be pulled from the vehicle."},
             { $"{ModKey}_NoVehicles","No vehicles are docked at this base."},
             { $"{ModKey}_NegativeNumbersNotAllowed","Negative numbers not allowed"},
+            { $"{ModKey}_PressToTurnDeviceOnOff","Press {0} to turn device on/off"},
+            { $"{ModKey}_DeviceOn","Device ON"},
+            { $"{ModKey}_DeviceOff","Device OFF"},
             { $"{ModKey}_NoSpaceAccountCreation","To complete your account creation, you need at least one slot to receive your debit card. Please try again once one inventory slot is available in your inventory."},
         };
         
@@ -304,6 +307,21 @@ namespace FCS_AlterraHub.Buildables
         public static string NoSpaceAccountCreation()
         {
             return GetLanguage($"{ModKey}_NoSpaceAccountCreation");
+        }
+
+        public static string PressToTurnDeviceOnOff(string key)
+        {
+            return string.Format(GetLanguage($"{ModKey}_PressToTurnDeviceOnOff"), key);
+        }
+
+        public static string DeviceOn()
+        {
+            return GetLanguage($"{ModKey}_DeviceOn");
+        }
+
+        public static string DeviceOff()
+        {
+            return GetLanguage($"{ModKey}_DeviceOff");
         }
     }
 }

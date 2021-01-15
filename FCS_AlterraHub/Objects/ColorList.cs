@@ -23,7 +23,6 @@ namespace FCS_AlterraHub.Objects
             {new Vec4(1f, 1f, 0f,1f), "Yellow"},
             {new Vec4(0.5019608f, 1f, 0f,1f), "Lime Green"},
             {new Vec4(0f, 1f, 0f,1f),"Green"},
-            {new Vec4(0.058f, 1f, 0f,1f), "Spring Green"},
             {new Vec4(0f, 1f, 1f,1f), "Aqua"},
             {new Vec4(0f, 0.5019608f, 1f,1f), "Dodger Blue"},
             {new Vec4(0f,0f,1f,1f), "Blue"},
@@ -174,6 +173,8 @@ namespace FCS_AlterraHub.Objects
             new Vec4(0.3f,0.3f,0.3f,1f),
         };
         
+
+
         public static void AddColor(Color color, string colorName = "N/A")
         {
             var vec4Color = color.ColorToVector4();
@@ -187,7 +188,27 @@ namespace FCS_AlterraHub.Objects
             QuickLogger.Info($"Added new color to ColorsList: {color}");
         }
 
-        public static string GetName(Color color)
+        public static void AddColor(Vec4 color, string colorName = "N/A")
+        {
+            var vec4Color = ConvertColor(color);
+
+            foreach (DictionaryEntry entry in Colors)
+            {
+                if ((string)entry.Value == colorName) return;
+            }
+
+            Colors.Add(vec4Color, colorName);
+            QuickLogger.Info($"Added new color to ColorsList: {color}");
+        }
+
+
+
+        public static Vec4 ConvertColor(Vec4 color)
+        {
+            return new Vec4(color.R/255.0f, color.G/ 255.0f, color.B / 255.0f, color.A / 255.0f);
+        }
+
+    public static string GetName(Color color)
         {
             var vecColor = color.ColorToVector4();
             return Colors.Contains(vecColor) ? (string)Colors[vecColor] : "Unknown Color";

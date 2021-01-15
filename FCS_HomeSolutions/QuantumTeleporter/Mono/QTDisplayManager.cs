@@ -221,7 +221,7 @@ namespace FCS_HomeSolutions.QuantumTeleporter.Mono
                     foreach (var device in FCSAlterraHubService.PublicAPI.GetRegisteredDevicesOfId(Mod.QuantumTeleporterTabID))
                     {
                         var fcsDevice = (QuantumTeleporterController)device.Value;
-                        if (fcsDevice.IsGlobal)
+                        if (fcsDevice.IsGlobal && fcsDevice.Manager != _mono.Manager)
                         {
                             items.Add(device.Value);
                         }

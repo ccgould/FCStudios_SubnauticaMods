@@ -145,6 +145,7 @@
     <Compile Include="HoverLiftPad\Mono\Gate.cs" />
     <Compile Include="HoverLiftPad\Mono\GateController.cs" />
     <Compile Include="HoverLiftPad\Mono\HoverLiftPadController.cs" />
+    <Compile Include="HoverLiftPad\Mono\Lift.cs" />
     <Compile Include="HoverLiftPad\Structs\LevelData.cs" />
     <Compile Include="HoverLiftPad\Mono\PlayerTrigger.cs" />
     <Compile Include="HoverLiftPad\Mono\PrawnSuitTrigger.cs" />
@@ -185,6 +186,7 @@
     <Compile Include="Mono\OutDoorPlanters\OutDoorPlanterController.cs" />
     <Compile Include="Mono\PaintTool\PaintToolController.cs" />
     <Compile Include="Patches\Builder_Pathes.cs" />
+    <Compile Include="Patches\InGameMenuPatcher.cs" />
     <Compile Include="Patches\Light_Patches.cs" />
     <Compile Include="Patches\Player_Patches.cs" />
     <Compile Include="Patches\PrawnSuit_Patches.cs" />

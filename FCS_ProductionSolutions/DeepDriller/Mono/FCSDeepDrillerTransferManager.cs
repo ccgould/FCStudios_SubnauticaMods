@@ -107,7 +107,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         private void SortItem(TechType techType, FcsDevice target)
         {
             _mono.DeepDrillerContainer.OnlyRemoveItemFromContainer(techType);
-            target.AddItemToContainer(techType.ToInventoryItem());
+            target.AddItemToContainer(techType.ToInventoryItemLegacy());
         }
 
         private void FindAlterraStorage()

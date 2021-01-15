@@ -30,7 +30,7 @@ namespace FCS_HomeSolutions.Mods.Cabinets.Buildable
             };
             OnFinishedPatching += () =>
             {
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.Cabinet3KitClassID.ToTechType(), 500, StoreCategory.Home);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.Cabinet3KitClassID.ToTechType(), 6000, StoreCategory.Home);
                 FCSAlterraHubService.PublicAPI.RegisterPatchedMod(ClassID);
             };
         }

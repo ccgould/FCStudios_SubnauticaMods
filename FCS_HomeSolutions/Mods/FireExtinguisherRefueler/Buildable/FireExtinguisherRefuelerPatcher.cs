@@ -6,7 +6,6 @@ using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Spawnables;
 using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
-using FCS_HomeSolutions.ModManagers;
 using FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Mono;
 using FCSCommon.Extensions;
 using FCSCommon.Helpers;
@@ -28,7 +27,7 @@ namespace FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Buildable
             };
             OnFinishedPatching += () =>
             {
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.FireExtinguisherRefuelerKitClassID.ToTechType(), 30000, StoreCategory.Home);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.FireExtinguisherRefuelerKitClassID.ToTechType(), 60000, StoreCategory.Home);
                 FCSAlterraHubService.PublicAPI.RegisterPatchedMod(ClassID);
             };
         }

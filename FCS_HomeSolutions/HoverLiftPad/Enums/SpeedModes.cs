@@ -1,10 +1,10 @@
-﻿namespace FCS_HomeSolutions.HoverLiftPad.Mono
+﻿namespace FCS_HomeSolutions.HoverLiftPad.Enums
 {
     internal enum SpeedModes
     {
-        Min = 1,
-        Low = 2,
-        High = 3,
-        Max = 4
+        Min = 2,
+        Low = 5,
+        High = 8,
+        Max = 10
     }
 }

@@ -19,6 +19,7 @@ namespace FCS_AlterraHub.Configuration
         [JsonProperty(PropertyName = "COL")] internal Vec4 Fcs { get; set; }
         [JsonProperty(PropertyName = "TL")] internal float TimeLeft { get; set; }
         [JsonProperty(PropertyName = "OQ")] internal Queue<TechType> OreQueue { get; set; }
+        [JsonProperty(PropertyName = "BT")] internal bool IsBreakerTripped { get; set; }
     }
 
     [Serializable]

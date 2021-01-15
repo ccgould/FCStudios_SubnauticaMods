@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Mono;
@@ -19,7 +20,9 @@ namespace FCS_HomeSolutions.Mono.OutDoorPlanters
         private GameObject _storageRootGameObject;
         private StorageContainer _storageContainer;
         private ProtobufSerializer _serializer;
-        
+        private Planter _planter;
+        private List<Plantable> _trackedPlants = new List<Plantable>();
+
         private void Start()
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.SmartPlanterPotTabID, Mod.ModName);
@@ -41,11 +44,10 @@ namespace FCS_HomeSolutions.Mono.OutDoorPlanters
                         ReadySaveData();
                     }
 
-                    LoadStorage();
-
                     _colorManager.ChangeColor(_savedData.Fcs.Vector4ToColor());
                     _colorManager.ChangeColor(_savedData.Secondary.Vector4ToColor(), ColorTargetMode.Secondary);
                     _colorManager.ChangeColor(_savedData.Lum.Vector4ToColor(), ColorTargetMode.Emission);
+                    LoadStorage();
                 }
 
                 _runStartUpOnEnable = false;
@@ -72,6 +74,8 @@ namespace FCS_HomeSolutions.Mono.OutDoorPlanters
             _savedData.Fcs = _colorManager.GetColor().ColorToVector4();
             _savedData.Secondary = _colorManager.GetSecondaryColor().ColorToVector4();
             _savedData.Lum = _colorManager.GetLumColor().ColorToVector4();
+            _savedData.PlantAges = GetPlantAges();
+            
             if (serializer != null)
             {
                 _savedData.Bytes = GetStorageBytes(serializer);
@@ -84,14 +88,36 @@ namespace FCS_HomeSolutions.Mono.OutDoorPlanters
             newSaveData.PlanterEntries.Add(_savedData);
         }
 
+        private IEnumerable<PlantData> GetPlantAges()
+        {
+            foreach (Plantable plant in _trackedPlants)
+            {
+                yield return new PlantData(plant.plantAge,plant.GetSlotID());
+            }
+        }
+
         public override void Initialize()
         {
             _colorManager = gameObject.AddComponent<ColorManager>();
             _colorManager.Initialize(gameObject,ModelPrefab.BodyMaterial,ModelPrefab.SecondaryMaterial,ModelPrefab.EmissionControllerMaterial);
             MaterialHelpers.ChangeEmissionStrength(ModelPrefab.EmissionControllerMaterial, gameObject, 5);
+            _planter = gameObject.GetComponent<Planter>();
+
             IsInitialized = true;
+            _planter.storageContainer.container.onAddItem += OnPlanterAddItem;
+            _planter.storageContainer.container.onRemoveItem += OnPlanterRemoveItem;
         }
 
+        private void OnPlanterRemoveItem(InventoryItem item)
+        {
+            _trackedPlants.Remove(item.item.GetComponent<Plantable>());
+        }
+
+        private void OnPlanterAddItem(InventoryItem item)   
+        {
+            _trackedPlants.Add(item.item.GetComponent<Plantable>());
+        }
+        
         public override void OnProtoSerialize(ProtobufSerializer serializer)
         {
             QuickLogger.Debug("In OnProtoSerialize");
@@ -132,6 +158,15 @@ namespace FCS_HomeSolutions.Mono.OutDoorPlanters
                 else
                 {
                     StorageHelper.RestoreItems(_serializer, _savedData.Bytes, _storageContainer.container);
+                    if (_savedData.PlantAges != null)
+                    {
+                        foreach (PlantData data in _savedData.PlantAges)
+                        {
+                            var slot = _planter.GetSlotByID(data.Slot);
+                            slot.plantable.plantAge = data.Age;
+                        }
+                        
+                    }
                     QuickLogger.Debug("Loaded Storage Data", true);
                 }
             }
@@ -199,6 +234,18 @@ namespace FCS_HomeSolutions.Mono.OutDoorPlanters
         public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
         {
             return _colorManager.ChangeColor(color, mode);
+        }
+    }
+
+    internal struct PlantData
+    {
+        public float Age { get; set; }
+        public int Slot { get; set; }
+
+        public PlantData(float age,int slot)
+        {
+            Age = age;
+            Slot = slot;
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
+using DataStorageSolutions.Patches;
 using FCS_StorageSolutions.Configuration;
 using FCS_StorageSolutions.Mods.AlterraStorage.Buildable;
 using FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable;
@@ -66,7 +68,29 @@ namespace FCS_StorageSolutions
             var harmony = new Harmony("com.storagesolutions.fcstudios");
             harmony.PatchAll(Assembly.GetExecutingAssembly());
 
+            PatchToolTipFactory(harmony);
+
             QuickLogger.Info($"Finished Patching");
         }
+
+        private static void PatchToolTipFactory(Harmony harmony)
+        {
+            var toolTipFactoryType = Type.GetType("TooltipFactory, Assembly-CSharp");
+
+            if (toolTipFactoryType != null)
+            {
+                QuickLogger.Debug("Got TooltipFactory Type");
+
+                var inventoryItemViewMethodInfo = toolTipFactoryType.GetMethod("InventoryItem");
+
+                if (inventoryItemViewMethodInfo != null)
+                {
+                    QuickLogger.Info("Got Inventory Item View Method Info");
+                    var postfix = typeof(TooltipFactory_Patch).GetMethod("GetToolTip");
+                    harmony.Patch(inventoryItemViewMethodInfo, null, new HarmonyMethod(postfix));
+                }
+            }
+        }
+
     }
 }

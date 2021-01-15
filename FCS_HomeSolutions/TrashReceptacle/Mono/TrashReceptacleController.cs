@@ -64,17 +64,19 @@ namespace FCS_HomeSolutions.TrashReceptacle.Mono
         {
             Manager = BaseManager.FindManager(gameObject);
 
-            if (_storage == null)
-            {
-                _storage = gameObject.AddComponent<TrashStorage>();
-                _storage.Initialize(this);
-            }
 
             if (_dumpContainer == null)
             {
                 _dumpContainer = gameObject.AddComponent<DumpContainer>();
+            }
+
+            if (_storage == null)
+            {
+                _storage = gameObject.AddComponent<TrashStorage>();
+                _storage.Initialize(this,_dumpContainer);
                 _dumpContainer.Initialize(transform, AuxPatchers.TrashReceptacleDumpLabel(), _storage);
             }
+
 
             if (_colorManager == null)
             {

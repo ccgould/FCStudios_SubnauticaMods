@@ -45,6 +45,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         private NetworkDialogController _networkBTN;
         private GameObject _powerOffScreen;
         private Text _currentBaseLBL;
+        private GameObject _screen;
 
         private void OnDestroy()
         {
@@ -58,19 +59,15 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             if (FindAllComponents())
             {
                 _currentBase = _mono.Manager;
-
+                _screen.SetActive(true);
                 if (_blackListDumpContainer == null)
                 {
-                    _canvas.gameObject.SetActive(true);
                     _blackListDumpContainer = gameObject.AddComponent<DumpContainerSimplified>();
                     _blackListDumpContainer.Initialize(transform, "Add to blacklist", this);
-                    //TODO ReEnable
                     RefreshBlackListItems();
-                    //DockingManager.ToggleIsEnabled(_savedData?.AllowDocking ?? false);
                 }
                 Player.main.currentSubChangedEvent.AddHandler(base.gameObject, OnCurrentSubRootChanged);
                 InvokeRepeating(nameof(UpdateDisplay), .5f, .5f);
-                //InvokeRepeating(nameof(UpdateFilters), .5f, .5f);
             }
         }
 
@@ -204,6 +201,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         {
             try
             {
+
                 foreach (Transform invItem in GameObjectHelpers.FindGameObject(gameObject, "Grid").transform)
                 {
                     var invButton = invItem.gameObject.EnsureComponent<DSSInventoryItem>();
@@ -214,6 +212,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                 }
                 
                 _canvas = gameObject.GetComponentInChildren<Canvas>(true);
+                _screen = _canvas.gameObject;
                 _homeObj = GameObjectHelpers.FindGameObject(gameObject, "Home");
                 _moonPoolObj = GameObjectHelpers.FindGameObject(gameObject, "MoonPool");
 
@@ -237,7 +236,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
 
                 var addToBaseBTNObj = InterfaceHelpers.FindGameObject(gameObject, "AddToBaseBTN");
                 InterfaceHelpers.CreateButton(addToBaseBTNObj, "BaseDump", InterfaceButtonMode.Background,
-                    OnButtonClick, Color.white, new Color(0, 1, 1, 1), 2.5f);
+                    OnButtonClick, Color.white, new Color(0, 1, 1, 1), 2.5f, AuxPatchers.AddItemToNetwork(), AuxPatchers.AddItemToNetworkDesc());
 
                 var renameBTNObj = GameObjectHelpers.FindGameObject(gameObject, "RenameBTN");
                 InterfaceHelpers.CreateButton(renameBTNObj, "RenameBTN", InterfaceButtonMode.Background,
@@ -309,11 +308,11 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
 
                 var powerButton = GameObjectHelpers.FindGameObject(_powerOffScreen, "PowerBTN");
                 InterfaceHelpers.CreateButton(powerButton, "PowerBTN", InterfaceButtonMode.Background,
-                    OnButtonClick, Color.white, new Color(0, 1, 1, 1), 2.5f, AuxPatchers.AddToBlackList());
+                    OnButtonClick, Color.white, new Color(0, 1, 1, 1), 2.5f, AuxPatchers.PowerOnOff());
 
                 var powerHButton = GameObjectHelpers.FindGameObject(gameObject, "PowerBTN");
                 InterfaceHelpers.CreateButton(powerHButton, "PowerBTN", InterfaceButtonMode.Background,
-                    OnButtonClick, Color.white, new Color(0, 1, 1, 1), 2.5f, AuxPatchers.AddToBlackList());
+                    OnButtonClick, Color.white, new Color(0, 1, 1, 1), 2.5f, AuxPatchers.PowerOnOff());
 
                 _baseName = GameObjectHelpers.FindGameObject(gameObject, "BaseName").GetComponent<Text>();
                 _serverAmount = GameObjectHelpers.FindGameObject(gameObject, "ServerCount").GetComponent<Text>();
@@ -348,7 +347,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
 
                 if (!string.IsNullOrEmpty(_currentSearchString?.Trim()))
                 {
-                    grouped = grouped.Where(p => Language.main.Get(p.Key).StartsWith(_currentSearchString.Trim(), StringComparison.OrdinalIgnoreCase)).ToList();
+                    grouped = grouped.Where(p => Language.main.Get(p.Key).Contains(_currentSearchString.Trim())).ToList();
                 }
 
                 if (data.EndPosition > grouped.Count)
@@ -439,12 +438,12 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
 
         public override void TurnOffDisplay()
         {
-            _canvas.gameObject.SetActive(false);
+            _screen?.SetActive(false);
         }
 
         public override void TurnOnDisplay()
         {
-            _canvas.gameObject.SetActive(true);
+            _screen?.SetActive(true);
         }
 
         public DSSTerminalController GetController()

@@ -30,7 +30,7 @@ namespace FCS_HomeSolutions.Mods.Cabinets.Buildable
             };
             OnFinishedPatching += () =>
             {
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.AlterraMiniBathroomKitClassID.ToTechType(), 500, StoreCategory.Home);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.AlterraMiniBathroomKitClassID.ToTechType(), 75000, StoreCategory.Home);
                 FCSAlterraHubService.PublicAPI.RegisterPatchedMod(ClassID);
             };
 

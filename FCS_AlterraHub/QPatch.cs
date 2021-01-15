@@ -5,6 +5,7 @@ using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Craftables;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Objects;
 using FCS_AlterraHub.Patch;
 using FCS_AlterraHub.Patches;
 using FCS_AlterraHub.Registration;
@@ -36,6 +37,7 @@ namespace FCS_AlterraHub
             GlobalBundle = FCSAssetBundlesService.PublicAPI.GetAssetBundleByName(Mod.AssetBundleName);
             
             QuickLogger.DebugLogsEnabled = Configuration.EnableDebugLogs;
+
             //Load Prefabs
             AlterraHub.GetPrefabs();
             

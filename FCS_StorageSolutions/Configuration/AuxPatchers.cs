@@ -43,6 +43,10 @@ namespace FCS_StorageSolutions.Configuration
             { $"{ModKey}_AmountIsZero","{0} entry amount is 0 please specify ab amount."},
             { $"{ModKey}_CurrentBase","[Current Base]"},
             { $"{ModKey}_RemoteBase","[Remote Base]"},
+            { $"{ModKey}_IsFormatted","Is Formatted:"},
+            { $"{ModKey}_Filters","Filters:"},
+            { $"{ModKey}_PowerButton","Power Button"},
+            { $"{ModKey}_RenameRemoteStorage","Rename this remote storage"},
         };
         
         internal static void AdditionalPatching()
@@ -246,6 +250,31 @@ namespace FCS_StorageSolutions.Configuration
         public static string RemoteBase()
         {
             return GetLanguage($"{ModKey}_RemoteBase");
+        }
+
+        public static string IsFormatted()
+        {
+            return GetLanguage($"{ModKey}_IsFormatted");
+        }
+
+        public static string Filters()
+        {
+            return GetLanguage($"{ModKey}_Filters");
+        }
+
+        public static string PowerOnOff()
+        {
+            return GetLanguage($"{ModKey}_PowerButton");
+        }
+
+        public static string Submit()
+        {
+            return Language.main.Get("Submit");
+        }
+
+        public static string RenameAlterraStorage()
+        {
+            return GetLanguage($"{ModKey}_RenameRemoteStorage");
         }
     }
 }

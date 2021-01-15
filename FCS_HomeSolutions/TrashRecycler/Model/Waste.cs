@@ -1,4 +1,5 @@
-﻿using Oculus.Newtonsoft.Json;
+﻿using FCS_AlterraHub.Helpers;
+using Oculus.Newtonsoft.Json;
 
 namespace FCS_HomeSolutions.TrashRecycler.Model
 {
@@ -7,6 +8,7 @@ namespace FCS_HomeSolutions.TrashRecycler.Model
         [JsonIgnore]public InventoryItem InventoryItem;
         public TechType TechType { get; set; }
         public double TimeAdded;
+        public int IngredientCount { get; set; }
 
         public Waste()
         {
@@ -17,6 +19,7 @@ namespace FCS_HomeSolutions.TrashRecycler.Model
         {
             InventoryItem = inventoryItem;
             TechType = inventoryItem.item.GetTechType();
+            IngredientCount = TechDataHelpers.GetIngredientCount(inventoryItem.item);
             TimeAdded = timeAdded;
         }
     }

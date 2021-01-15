@@ -18,7 +18,7 @@ namespace DataStorageSolutions.Patches
 
             if (_serverTechType == TechType.None)
             {
-                _serverTechType = Mod.ServerClassID.ToTechType();
+                _serverTechType = Mod.GetDSSServerTechType();
             }
 
             if (item?.item.GetTechType() != _serverTechType) return;
@@ -38,9 +38,9 @@ namespace DataStorageSolutions.Patches
 
         private static void GetItems(DSSServerController controller, StringBuilder sb)
         {
-            var itemCount = controller.GetTotal();
+            var itemCount = controller.GetCount();
             sb.AppendFormat("\n<size=20><color=#FFA500FF>{0}:</color> <color=#DDDEDEFF>{1}</color></size>", "Storage",
-                $"{itemCount}/{QPatch.Configuration.Config.ServerStorageLimit}");
+                $"{itemCount}/{48}");
 
             if (itemCount > 0)
             {
@@ -57,13 +57,13 @@ namespace DataStorageSolutions.Patches
             if (isFormatted)
             {
                 sb.AppendFormat("\n<size=20><color=#FFA500FF>{0}:</color>\n<color=#DDDEDEFF>{1}</color></size>", $"{AuxPatchers.Filters()}",
-                    controller.GetFormatData());
+                    controller.FormatFiltersData());
             }
         }
 
         private static void GetDescription(StringBuilder sb)
         {
-            sb.AppendFormat("\n<size=20><color=#DDDEDEFF>{0}</color></size>", Language.main.Get("DSS_Description"));
+            sb.AppendFormat("\n<size=20><color=#DDDEDEFF>{0}</color></size>", Language.main.Get("Tooltip_DSSServer"));
         }
 
         private static void GetTitle(StringBuilder sb, string text)
@@ -71,12 +71,12 @@ namespace DataStorageSolutions.Patches
             sb.AppendFormat("<size=25><color=#ffffffff>{0}</color></size>", text);
         }
 
-        private static string FormatData(Dictionary<TechType, int> items)
+        private static string FormatData(IEnumerable<KeyValuePair<TechType, int>> items)
         {
 
             var sb = new StringBuilder();
 
-            for (int i = 0; i < items.Count; i++)
+            for (int i = 0; i < items.Count(); i++)
             {
                 if (i < 4)
                 {

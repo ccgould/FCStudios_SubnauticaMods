@@ -355,16 +355,16 @@ namespace FCS_HomeSolutions.Mods.TV.Mono
         {
             HandReticle main = HandReticle.main;
 
-            main.SetUseTextRaw(AuxPatchers.TVFormat(GameInput.GetBindingName(GameInput.Button.AltTool, GameInput.BindingSet.Primary)),
+            main.SetUseTextRaw(AuxPatchers.TVFormat(QPatch.TelevisionConfiguration.ToggleTv.ToString()),
                 AuxPatchers.TVFormatContinued(
-                    GameInput.GetBindingName(GameInput.Button.UIUp, GameInput.BindingSet.Primary),
-                    GameInput.GetBindingName(GameInput.Button.UIDown, GameInput.BindingSet.Primary),
-                    GameInput.GetBindingName(GameInput.Button.UIRight, GameInput.BindingSet.Primary),
-                    GameInput.GetBindingName(GameInput.Button.UILeft, GameInput.BindingSet.Primary)));
+                    QPatch.TelevisionConfiguration.VolumeUp.ToString(),
+                    QPatch.TelevisionConfiguration.VolumeDown.ToString(),
+                    QPatch.TelevisionConfiguration.ChannelUp.ToString(),
+                    QPatch.TelevisionConfiguration.ChannelDown.ToString()));
 
             main.SetIcon(HandReticle.IconType.Default);
 
-            if (GameInput.GetButtonDown(GameInput.Button.AltTool))
+            if (Input.GetKeyDown(QPatch.TelevisionConfiguration.ToggleTv))
             {
                 if (_isOn)
                 {
@@ -376,22 +376,22 @@ namespace FCS_HomeSolutions.Mods.TV.Mono
                 }
             }
 
-            if (GameInput.GetButtonDown(GameInput.Button.UIUp))
+            if (Input.GetKeyDown(QPatch.TelevisionConfiguration.VolumeUp))
             {
                 VolumeUp();
             }
 
-            if (GameInput.GetButtonDown(GameInput.Button.UIDown))
+            if (Input.GetKeyDown(QPatch.TelevisionConfiguration.VolumeDown))
             {
                 VolumeDown();
             }
 
-            if (GameInput.GetButtonDown(GameInput.Button.UILeft))
+            if (Input.GetKeyDown(QPatch.TelevisionConfiguration.ChannelDown))
             {
                 ChannelDown();
             }
 
-            if (GameInput.GetButtonDown(GameInput.Button.UIRight))
+            if (Input.GetKeyDown(QPatch.TelevisionConfiguration.ChannelUp))
             {
                 ChannelUp();
             }

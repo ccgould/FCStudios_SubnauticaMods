@@ -3,12 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Extensions;
+using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Mono.Controllers;
 using FCS_AlterraHub.Objects;
 using FCS_AlterraHub.Registration;
+using FCS_HomeSolutions;
 using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
+using FCS_HomeSolutions.HoverLiftPad.Enums;
+using FCS_HomeSolutions.HoverLiftPad.Mono;
 using FCS_HomeSolutions.Patches;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
@@ -24,8 +28,6 @@ namespace FCS_HomeSolutions.HoverLiftPad.Mono
         private bool _runStartUpOnEnable;
         private bool _playerLocked;
         private Text _speedMode;
-        private bool _goingToLevel;
-        private List<LevelData> _knownLevels;
         private List<GateController> _gates;
         private bool _isGatesClosed;
         private Text _statusMessage;
@@ -41,10 +43,6 @@ namespace FCS_HomeSolutions.HoverLiftPad.Mono
 
         internal SpeedModes CurrentSpeedMode = SpeedModes.Min;
         private LevelData _selectedLevel;
-        private bool _fromCallButton;
-        private double _startTime;
-        private float _totalDistance;
-        private Vector3 _startPos;
         private Exosuit _exosuitOnPad;
         private bool _isPrawnDocked;
         private Button _unLockPrawnButton;
@@ -55,6 +53,9 @@ namespace FCS_HomeSolutions.HoverLiftPad.Mono
         private Image _distanceBG2;
         private bool _isPrawnLocked;
         private static Exosuit[] _globalExosuits;
+        private Lift _lift;
+        private List<LevelData> _knownLevels = new List<LevelData>();
+        private FCSMessageBox _messageBox;
         private Color _orangeColor { get; } = new Color(1f, 0.7176471f, 0f, 1f);
 
         public override Vector3 GetPosition()
@@ -74,15 +75,22 @@ namespace FCS_HomeSolutions.HoverLiftPad.Mono
                 {
                     if (Input.GetKey(QPatch.HoverLiftPadConfiguration.LiftPadUpKeyCode))
                     {
-                        LiftUp();
+                        _lift.LiftUp();
                     }
 
                     if (Input.GetKey(QPatch.HoverLiftPadConfiguration.LiftPadDownKeyCode))
                     {
-                        LiftDown();
+                        _lift.LiftDown();
                     }
                 }
+
+                if (Input.GetKeyUp(QPatch.HoverLiftPadConfiguration.LiftPadUpKeyCode) ||
+                    Input.GetKeyUp(QPatch.HoverLiftPadConfiguration.LiftPadDownKeyCode))
+                {
+                    _lift.SetIsMoving(false);
+                }
             }
+
 
             if (_isPrawnDocked)
             {
@@ -110,15 +118,9 @@ namespace FCS_HomeSolutions.HoverLiftPad.Mono
                 _lockPlayerButton.colors = colors;
             }
 
-            if (_goingToLevel)
-            {
-                GoToLevel();
-            }
-            
             if (_exosuitOnPad)
             {
                 UpdateDistance();
-                MovePrawnToPosition();
             }
         }
 
@@ -170,8 +172,7 @@ namespace FCS_HomeSolutions.HoverLiftPad.Mono
                             _globalExosuits = GameObject.FindObjectsOfType<Exosuit>();
                             QuickLogger.Debug($"Global Exosuit Count: {_globalExosuits.Length}");
                         }
-
-
+                        
                         foreach (Exosuit exosuit in _globalExosuits)
                         {
                             if (exosuit.gameObject.GetComponentInChildren<PrefabIdentifier>().Id
@@ -185,7 +186,7 @@ namespace FCS_HomeSolutions.HoverLiftPad.Mono
 
                     if (_savedData.PadCurrentPosition.ToVector3() != Vector3.zero)
                     {
-                        _liftPad.transform.localPosition = _savedData.PadCurrentPosition.ToVector3();
+                        _lift.GoToPosition(_savedData.PadCurrentPosition.ToVector3());
                     }
 
                     if (_savedData.KnownLevels != null)
@@ -229,19 +230,7 @@ namespace FCS_HomeSolutions.HoverLiftPad.Mono
             QuickLogger.Debug("In OnProtoDeserialize");
             _savedData = Mod.GetHoverLiftSaveData(GetPrefabID());
         }
-
-        private void LiftUp()
-        {
-            if (_goingToLevel) return;
-            Move();
-        }
-
-        private void LiftDown()
-        {
-            if (_goingToLevel) return;
-            Move(false);
-        }
-
+        
         private void ButtonAction(UIButtons buttonID)
         {
             if (!IsConstructed || !IsInitialized) return;
@@ -261,6 +250,8 @@ namespace FCS_HomeSolutions.HoverLiftPad.Mono
                             CurrentSpeedMode = SpeedModes.Min;
                             break;
                     }
+
+                    _lift.ChangeSpeed(CurrentSpeedMode);
                     UpdateSpeedModeText();
                     break;
 
@@ -277,6 +268,7 @@ namespace FCS_HomeSolutions.HoverLiftPad.Mono
                             CurrentSpeedMode = SpeedModes.Low;
                             break;
                     }
+                    _lift.ChangeSpeed(CurrentSpeedMode);
                     UpdateSpeedModeText();
                     break;
                 case UIButtons.LockPlayer:
@@ -301,11 +293,8 @@ namespace FCS_HomeSolutions.HoverLiftPad.Mono
                     ChangeLevelAssignment(false);
                     break;
                 case UIButtons.GoToFloor:
-                    _statusMessage.text = AuxPatchers.GoingToLevelFormat(_knownLevels[_currentLevelIndex].LevelName);
-                    _totalDistance = Vector3.Distance(_liftPad.transform.localPosition, _selectedLevel.Position.ToVector3());
-                    _startTime = DayNightCycle.main.timePassed;
-                    _startPos = _liftPad.transform.localPosition;
-                    _goingToLevel = true;
+                    _statusMessage.text = AuxPatchers.GoingToLevelFormat(_selectedLevel.LevelName);
+                    _lift.GoToFloor(_selectedLevel.CurrentPosition());
                     break;
                 case UIButtons.ToggleDockPrawn:
                     if (_isPrawnDocked)
@@ -317,7 +306,33 @@ namespace FCS_HomeSolutions.HoverLiftPad.Mono
                         DockPrawn();
                     }
                     break;
+                case UIButtons.Delete:
+                    if (_currentLevelIndex == 0)
+                    {
+                        _messageBox.Show(AuxPatchers.CannotDeleteLevelFormat(_selectedLevel.LevelName),FCSMessageButton.OK,null);
+                        return;
+                    }
+
+                    _messageBox.Show(AuxPatchers.DeleteLevelConfirmation(_selectedLevel.LevelName),FCSMessageButton.YESNO, DeleteLevel);
+
+                    break;
             }
+        }
+
+        private void DeleteLevel(FCSMessageResult result)
+        {
+            if (result == FCSMessageResult.OKYES)
+            {
+                _knownLevels.RemoveAt(_currentLevelIndex);
+                SelectedLevel(0);
+            }
+        }
+
+        private void SelectedLevel(int index)
+        {
+            _statusMessage.text = AuxPatchers.FloorSelect(_knownLevels[index].LevelName);
+            _levelIndexLbl.text = (index + 1).ToString();
+            _selectedLevel = _knownLevels[index];
         }
 
         private void ChangeLevelAssignment(bool increase)
@@ -333,9 +348,7 @@ namespace FCS_HomeSolutions.HoverLiftPad.Mono
                 _currentLevelIndex = newLevel < 0 ? _knownLevels.Count - 1 : newLevel;
             }
 
-            _statusMessage.text = AuxPatchers.FloorSelect(_knownLevels[_currentLevelIndex].LevelName);
-            _levelIndexLbl.text = _currentLevelIndex + 1.ToString();
-            _selectedLevel = _knownLevels[_currentLevelIndex];
+            SelectedLevel(_currentLevelIndex);
         }
 
         private void UpdateSpeedModeText()
@@ -375,6 +388,10 @@ namespace FCS_HomeSolutions.HoverLiftPad.Mono
 
         private void UnlockPlayer()
         {
+            if (_lift.goToFloor)
+            {
+                _lift.Stop();
+            }
             LockMovement(false);
             Player.main.gameObject.transform.SetParent(null);
             _playerLocked = false;
@@ -387,50 +404,11 @@ namespace FCS_HomeSolutions.HoverLiftPad.Mono
             Player.main.playerController.SetEnabled(!state);
         }
 
-        private void Move(bool isGoingUp = true)
-        {
-            if (_playerLocked)
-            {
-                if (isGoingUp)
-                {
-                    var loc = Vector3.up * (int) CurrentSpeedMode * DayNightCycle.main.deltaTime;
-                    _exosuitOnPad?.gameObject.transform.Translate(loc,Space.Self);
-                    _liftPad.transform.Translate(loc, Space.Self);
-                }
-                else if (_liftPad.transform.localPosition.y > PadMinHeight)
-                {
-                    var loc = Vector3.down * (int) CurrentSpeedMode * DayNightCycle.main.deltaTime;
-                    _liftPad.transform.Translate(loc, Space.Self);
-                    _exosuitOnPad?.gameObject.transform.Translate(loc, Space.Self);
-                }
-            }
-        }
-        
-        private void GoToLevel()
-        {
-            if (_playerLocked && CheckGatesClosed()|| _fromCallButton)
-            {
-                var currentDuration = (DayNightCycle.main.timePassed - _startTime) * (int)CurrentSpeedMode;
-                var journeyFraction = currentDuration / _totalDistance;
-                _liftPad.transform.localPosition = Vector3.Lerp(_startPos, _selectedLevel.CurrentPosition(), (float)journeyFraction);
-
-                if (_liftPad.transform.localPosition == _selectedLevel.CurrentPosition())
-                {
-                    if (_fromCallButton)
-                    {
-                        ToggleGates(Gate.Back);
-                    }
-                    _goingToLevel = false;
-                    _fromCallButton = false;
-                }
-            }
-        }
-
         private void SaveCurrentLevel(string text)
         {
             if (string.IsNullOrWhiteSpace(text) ||
                 _knownLevels.Any(x => x.LevelName.Equals(text, StringComparison.OrdinalIgnoreCase))) return;
-            _knownLevels.Add(new LevelData { LevelName = text, Position = _liftPad.transform.localPosition.ToVec3() });
+            _knownLevels.Add(new LevelData { LevelName = text, Position = _liftPad.transform.position.ToVec3() });
         }
 
         private void CheckPlayerStatus()
@@ -466,6 +444,9 @@ namespace FCS_HomeSolutions.HoverLiftPad.Mono
             var decreaseSpeedButton = GameObjectHelpers.FindGameObject(gameObject, "DecreaseSpeedBTN").GetComponent<Button>();
             decreaseSpeedButton.onClick.AddListener((() => { ButtonAction(UIButtons.DecreaseSpeed); }));
 
+            var deleteButton = GameObjectHelpers.FindGameObject(gameObject, "DeleteBTN").GetComponent<Button>();
+            deleteButton.onClick.AddListener((() => { ButtonAction(UIButtons.Delete); }));
+
             var decreaseLevelBTN = GameObjectHelpers.FindGameObject(gameObject, "DecreaseLevelBTN").GetComponent<Button>();
             decreaseLevelBTN.onClick.AddListener((() => { ButtonAction(UIButtons.DecreaseLevel); }));
 
@@ -497,7 +478,8 @@ namespace FCS_HomeSolutions.HoverLiftPad.Mono
             {
                 new LevelData {IsBase = true,
                     LevelName = "Home",
-                    Position = new Vec3(0, PadMinHeight, 0)}
+                    Position = _liftPad.transform.position.ToVec3()
+                    }
             };
             _selectedLevel = _knownLevels[0];
             _statusMessage.text = AuxPatchers.FloorSelect("Home");
@@ -508,10 +490,11 @@ namespace FCS_HomeSolutions.HoverLiftPad.Mono
             if (_exosuitOnPad != null)
             {
                 PrawnSuitHandler.RegisterExoSuit(_exosuitOnPad);
-                LargeWorldStreamer.main.cellManager.UnregisterEntity(_exosuitOnPad.gameObject);
-                _exosuitOnPad.gameObject.transform.parent = gameObject.transform;
+                //LargeWorldStreamer.main.cellManager.UnregisterEntity(_exosuitOnPad.gameObject);
+                _exosuitOnPad.gameObject.transform.parent = _liftPad.transform;
                 _isPrawnLocked = true;
                 _isPrawnDocked = true;
+                MovePrawnToPosition();
                 QuickLogger.Debug($"Prawn Suit Docked", true);
             }
             else
@@ -525,6 +508,7 @@ namespace FCS_HomeSolutions.HoverLiftPad.Mono
             if (_exosuitOnPad != null)
             {
                 PrawnSuitHandler.RemoveExoSuit(_exosuitOnPad);
+                _exosuitOnPad.gameObject.transform.parent = null;
                 _isPrawnDocked = false;
                 _isPrawnLocked = false;
                 QuickLogger.Debug($"Prawn Suit UnDocked", true);
@@ -539,9 +523,8 @@ namespace FCS_HomeSolutions.HoverLiftPad.Mono
         {
             if(_exosuitOnPad != null && _isPrawnDocked)
             {
-                _exosuitOnPad.transform.localPosition = new Vector3(_prawnTarget.transform.localPosition.z,
-                    _exosuitOnPad.transform.localPosition.y,
-                    _prawnTarget.transform.localPosition.z);
+                _exosuitOnPad.transform.localPosition = new Vector3(-1.06866f, 2.56f, 1.022756f);
+                _exosuitOnPad.transform.localEulerAngles = new Vector3(0f, 180f, 0f);
             }
         }
 
@@ -653,6 +636,8 @@ namespace FCS_HomeSolutions.HoverLiftPad.Mono
             var door1 = GameObjectHelpers.FindGameObject(gameObject, "doors_02_2");
             var door2 = GameObjectHelpers.FindGameObject(gameObject, "doors_02");
 
+            _messageBox = GameObjectHelpers.FindGameObject(gameObject, "MessageBox")?.AddComponent<FCSMessageBox>();
+
             _distanceTxt1 = door1.GetComponentInChildren<Text>();
             _distanceTxt2 = door2.GetComponentInChildren<Text>();
 
@@ -686,7 +671,6 @@ namespace FCS_HomeSolutions.HoverLiftPad.Mono
             {
                 _selectedLevel = _knownLevels.First(x => x.IsBase);
                 ButtonAction(UIButtons.GoToFloor);
-                _fromCallButton = true;
             }));
 
             if (_colorManager == null)
@@ -695,8 +679,34 @@ namespace FCS_HomeSolutions.HoverLiftPad.Mono
                 _colorManager.Initialize(gameObject, ModelPrefab.BodyMaterial);
             }
 
+            if (_lift == null)
+            {
+                _lift = _liftPad.AddComponent<Lift>();
+            }
+
             IsInitialized = true;
             QuickLogger.Debug($"Initialization Complete: {GetPrefabID()} | ID {UnitID}", true);
+
+            InGameMenuSavePatcher.AddEventHandlerIfMissing(OnGameSave);
+            InGameMenuClosePatcher.AddEventHandlerIfMissing(OnSaveComplete);
+        }
+
+        private void OnSaveComplete()
+        {
+            if(_exosuitOnPad != null)
+            {
+                _exosuitOnPad.gameObject.transform.parent = _liftPad.transform;
+                QuickLogger.Debug($"Parented {_exosuitOnPad.GetName()} to {UnitID}", true);
+            }
+        }
+
+        private void OnGameSave()
+        {
+            if(_exosuitOnPad != null)
+            {
+                _exosuitOnPad.gameObject.transform.parent = null;
+                QuickLogger.Debug($"UnParented {_exosuitOnPad.GetName()} to {UnitID}", true);
+            }
         }
 
         public override void OnProtoSerialize(ProtobufSerializer serializer)
@@ -771,7 +781,7 @@ namespace FCS_HomeSolutions.HoverLiftPad.Mono
             _savedData.Fcs = _colorManager.GetColor().ColorToVector4();
             _savedData.Secondary = _colorManager.GetSecondaryColor().ColorToVector4();
             _savedData.KnownLevels = _knownLevels;
-            _savedData.PadCurrentPosition = _liftPad.transform.localPosition.ToVec3();
+            _savedData.PadCurrentPosition = _liftPad.transform.position.ToVec3();
             _savedData.FrontGatesOpen = _gates.Any(x => x.GateType == Gate.Front && x.IsOpen());
             _savedData.BackGatesOpen = _gates.Any(x => x.GateType == Gate.Back && x.IsOpen());
             _savedData.DockedPrawnID = _exosuitOnPad?.gameObject.GetComponentInChildren<PrefabIdentifier>()?.Id;

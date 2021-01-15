@@ -53,6 +53,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
             Manager.OnPowerStateChanged += OnPowerStateChanged;
             Manager.OnBreakerStateChanged += OnBreakerStateChanged;
             UpdateStorageCount();
+            UpdateScreenState();
         }
 
         private void OnBreakerStateChanged(bool value)

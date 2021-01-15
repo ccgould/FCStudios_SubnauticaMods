@@ -26,7 +26,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         public override float GetPowerUsage()
         {
             if (Manager == null || Manager.GetBreakerState() || !IsConstructed) return 0f;
-            
+
             return 0.01f;
         }
 
@@ -40,12 +40,22 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             {
                 _display.HibernateDisplay();
             }
+
+            UpdateScreenState();
+        }
+
+        public override void OnDestroy()
+        {
+            if (Manager != null)
+            {
+                Manager.OnPowerStateChanged -= OnPowerStateChanged;
+                Manager.OnBreakerStateChanged -= OnBreakerStateChanged;
+            }
+            base.OnDestroy();
         }
 
         private void OnBreakerStateChanged(bool isTripped)
         {
-            UpdateScreenState();
-
             if (!isTripped && Manager.GetPowerState() != PowerSystem.Status.Offline)
             {
                 _display.PowerOnDisplay();
@@ -68,7 +78,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                 _display?.TurnOffDisplay();
                 return;
             }
-
             _display?.TurnOnDisplay();
         }
 

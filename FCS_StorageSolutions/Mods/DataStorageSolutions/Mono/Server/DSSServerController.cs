@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
@@ -442,6 +443,18 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
                     break;
                 }
             }
+        }
+
+        public string FormatFiltersData()
+        {
+            var sb = new StringBuilder();
+
+            foreach (Filter filter in _filteringSettings)
+            {
+                sb.Append($"{filter.GetString()},");
+            }
+
+            return sb.ToString();
         }
     }
 }

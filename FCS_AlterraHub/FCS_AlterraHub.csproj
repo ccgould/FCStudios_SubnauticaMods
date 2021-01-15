@@ -145,6 +145,7 @@
     <Compile Include="Interfaces\IFCSGrowBed.cs" />
     <Compile Include="Interfaces\ISlotController.cs" />
     <Compile Include="Managers\FCSPowerManager.cs" />
+    <Compile Include="Model\AdditionalColor.cs" />
     <Compile Include="Model\EatableEntities.cs" />
     <Compile Include="Model\FCSGrowingPlant.cs" />
     <Compile Include="Model\FCSMessageBox.cs" />

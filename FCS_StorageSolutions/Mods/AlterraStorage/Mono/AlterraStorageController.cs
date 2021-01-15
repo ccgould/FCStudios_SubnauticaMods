@@ -6,6 +6,7 @@ using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Mono;
+using FCS_AlterraHub.Mono.Controllers;
 using FCS_AlterraHub.Mono.ObjectPooler;
 using FCS_AlterraHub.Mono.OreConsumer;
 using FCS_AlterraHub.Registration;
@@ -41,6 +42,8 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
         public int GetContainerFreeSpace => MAXSTORAGE - _storageContainer.GetCount();
         public bool IsFull => _storageContainer.GetCount() >= MAXSTORAGE;
         private readonly List<InventoryButton> _inventoryButtons = new List<InventoryButton>();
+        private NameController _nameController;
+        private Text _labelText;
         public override StorageType StorageType { get; } = StorageType.AlterraStorage;
 
         #region Unity Methods
@@ -74,6 +77,8 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
                     }
 
                     _colorManager.ChangeColor(_savedData.Body.Vector4ToColor(), ColorTargetMode.Both);
+                    _labelText.text = _savedData.StorageName;
+                    _nameController.SetCurrentName(_savedData.StorageName);
                 }
 
                 _runStartUpOnEnable = false;
@@ -150,6 +155,21 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
                 _motorHandler.Start();
             }
 
+            _labelText = GameObjectHelpers.FindGameObject(gameObject, "ContainerLabel").GetComponent<Text>();
+            var label = GameObjectHelpers.FindGameObject(gameObject, "ContainerLabel").AddComponent<InterfaceButton>();
+            label.ButtonMode = InterfaceButtonMode.TextColor;
+            label.TextLineOne = AuxPatchers.Rename();
+            label.TextComponent = _labelText;
+            label.OnButtonClick += (s, o) => { _nameController.Show(); };
+
+            if (_nameController == null)
+            {
+                _nameController = gameObject.AddComponent<NameController>();
+                _nameController.Initialize(AuxPatchers.Submit(),AuxPatchers.RenameAlterraStorage());
+                _nameController.OnLabelChanged += OnLabelChanged;
+                _nameController.SetCurrentName("Remote Storage");
+            }
+
             var canvas = gameObject.GetComponentInChildren<Canvas>();
             _interactionHelper = canvas.gameObject.AddComponent<InterfaceInteraction>();
 
@@ -164,6 +184,11 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
             InvokeRepeating(nameof(RefreshUI), .5f, .5f);
 
             IsInitialized = true;
+        }
+
+        private void OnLabelChanged(string arg1, NameController arg2)
+        {
+            _labelText.text = arg1;
         }
 
         public const string InventoryPoolTag = "AlterraInventoryTag";
@@ -298,6 +323,7 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
             _savedData.ID = GetPrefabID();
             _savedData.Body = _colorManager.GetColor().ColorToVector4();
             _savedData.Data = _storageContainer.Save(serializer);
+            _savedData.StorageName = _nameController.GetCurrentName();
             newSaveData.AlterraStorageDataEntries.Add(_savedData);
             QuickLogger.Debug($"Saving ID {_savedData.ID}", true);
         }
@@ -405,6 +431,7 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
             Tag = techType;
             _amount.text = amount.ToString();
             _icon.sprite = SpriteManager.Get(techType);
+            TextLineOne = Language.main.Get(techType);
             Show();
         }
 

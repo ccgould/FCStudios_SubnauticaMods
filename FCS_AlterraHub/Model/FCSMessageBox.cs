@@ -20,13 +20,29 @@ namespace FCS_AlterraHub.Model
             if(_initialize)return;
             _message = GameObjectHelpers.FindGameObject(gameObject, "Message").GetComponent<Text>();
             _yesBTN = GameObjectHelpers.FindGameObject(gameObject, "YesBTN").GetComponent<Button>();
-            _yesBTN.onClick.AddListener(() => { _result?.Invoke(FCSMessageResult.OKYES); });
+            _yesBTN.onClick.AddListener(() =>
+            {
+                _result?.Invoke(FCSMessageResult.OKYES); 
+                Close();
+            });
             _noBTN = GameObjectHelpers.FindGameObject(gameObject, "NoBTN").GetComponent<Button>();
-            _noBTN.onClick.AddListener(() => { _result?.Invoke(FCSMessageResult.NO); });
+            _noBTN.onClick.AddListener(() =>
+            {
+                _result?.Invoke(FCSMessageResult.NO);
+                Close();
+            });
             _okBTN = GameObjectHelpers.FindGameObject(gameObject, "OKBTN").GetComponent<Button>();
-            _okBTN.onClick.AddListener(() => { _result?.Invoke(FCSMessageResult.OKYES); });
+            _okBTN.onClick.AddListener(() =>
+            {
+                _result?.Invoke(FCSMessageResult.OKYES);
+                Close();
+            });
             _cancelBTN = GameObjectHelpers.FindGameObject(gameObject, "CancelBTN")?.GetComponent<Button>();
-            _cancelBTN.onClick.AddListener(() => { _result?.Invoke(FCSMessageResult.CANCEL); });
+            _cancelBTN.onClick.AddListener(() =>
+            {
+                _result?.Invoke(FCSMessageResult.CANCEL);
+                Close();
+            });
             _initialize = true;
 
         }
@@ -36,6 +52,7 @@ namespace FCS_AlterraHub.Model
             Initialize();
             _message.text = message;
             _result = result;
+            
             switch (button)
             {
                 case FCSMessageButton.NO:
@@ -49,6 +66,10 @@ namespace FCS_AlterraHub.Model
                     break;
                 case FCSMessageButton.CANCEL:
                     _cancelBTN.gameObject.SetActive(true);
+                    break;
+                case FCSMessageButton.YESNO:
+                    _cancelBTN.gameObject.SetActive(true);
+                    _yesBTN.gameObject.SetActive(true);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(button), button, null);
@@ -78,7 +99,8 @@ namespace FCS_AlterraHub.Model
         NO,
         OK,
         YES,
-        CANCEL
+        CANCEL,
+        YESNO
     }
 
     public enum FCSMessageResult
