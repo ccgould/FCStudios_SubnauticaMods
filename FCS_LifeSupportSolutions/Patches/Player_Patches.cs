@@ -114,6 +114,7 @@ namespace FCS_LifeSupportSolutions.Patches
         private static bool TryAddOxygen(ref bool outResult, BaseManager manager)
         {
 
+            var amount = _oxygenPerSecond * DayNightCycle.main.deltaTime;
             var baseUtilityUnits = manager.GetDevices(Mod.BaseUtilityUnitTabID);
             foreach (var baseUnit in baseUtilityUnits)
             {
@@ -122,7 +123,6 @@ namespace FCS_LifeSupportSolutions.Patches
                 if (utility.OxygenManager.GetO2Level() <= 0 || !utility.IsOperational)
                     continue;
 
-                var amount = _oxygenPerSecond * DayNightCycle.main.deltaTime;
                 var result = utility.OxygenManager.RemoveOxygen(amount);
 
                 if (result)
@@ -171,12 +171,12 @@ namespace FCS_LifeSupportSolutions.Patches
                 }
             }
 
-            int RequiredTankCount = (bigRooms / (hardcore ? 2 : 1)) + (smallRooms / (hardcore ? 4:10)) + 1;
+            float RequiredTankCount = (bigRooms / (hardcore ? 2 : 1)) + (smallRooms / (hardcore ? 4:10)) + 1;
 
 
             List<IPipeConnection> floaters = new List<IPipeConnection>();
 
-            int ActiveTankCount = 0;
+            float ActiveTankCount = 0;
             foreach (var baseUnit in baseOxygenTanks)
             {
                 var utility = baseUnit as BaseOxygenTankController;
@@ -190,10 +190,14 @@ namespace FCS_LifeSupportSolutions.Patches
 
             if (ActiveTankCount >= RequiredTankCount)
             {
-                var amount = _oxygenPerSecond * DayNightCycle.main.deltaTime * (ActiveTankCount/RequiredTankCount);
-                Player.main.oxygenMgr.AddOxygen(amount);
                 outResult = true;
             }
+            else
+            {
+                amount = 1.05f * DayNightCycle.main.deltaTime * ActiveTankCount / RequiredTankCount;
+                Player.main.oxygenMgr.AddOxygen(amount);
+            }
+
             return outResult;
         }
 
