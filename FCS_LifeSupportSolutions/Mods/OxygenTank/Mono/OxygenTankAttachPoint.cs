@@ -133,14 +133,30 @@ namespace FCS_LifeSupportSolutions.Mods.OxygenTank.Mono
                 return;
             }
 
-            if (rootPipeUID is null )
+            if (rootPipeUID is null)
             {
-                parent = GetParent();
-                if (parent is null)
-                    return;
+                GameObject gameObject = GetParent()?.GetGameObject();
+                if (gameObject != null && gameObject.TryGetComponent(out OxygenPipe oxygenPipe))
+                {
+                    Vector3 attachpoint = this.GetAttachPoint();
+                    Vector3 vector = Vector3.Normalize(oxygenPipe.parentPosition - attachpoint);
+                    float magnitude = (oxygenPipe.parentPosition - attachpoint).magnitude;
+                    oxygenPipe.transform.position = attachpoint;
+                    oxygenPipe.topSection.rotation = Quaternion.LookRotation(vector, Vector3.up);
+                    oxygenPipe.endCap.rotation = oxygenPipe.topSection.rotation;
+                    oxygenPipe.bottomSection.rotation = Quaternion.LookRotation(vector, Vector3.up);
+                    oxygenPipe.bottomSection.position = oxygenPipe.parentPosition;
+                    oxygenPipe.stretchedPart.position = oxygenPipe.topSection.position + vector;
+                    Vector3 localScale = oxygenPipe.stretchedPart.localScale;
+                    localScale.z = magnitude - 2f;
+                    oxygenPipe.stretchedPart.localScale = localScale;
+                    oxygenPipe.stretchedPart.rotation = oxygenPipe.topSection.rotation;
 
-                this.rootPipeUID = ((parent.GetRoot() != null) ? parent.GetRoot().GetGameObject().GetComponent<UniqueIdentifier>().Id : null);
-                this.parentPosition = parent.GetAttachPoint();
+
+                    this.parentPipeUID = gameObject.GetComponent<UniqueIdentifier>().Id;
+                    this.rootPipeUID = ((oxygenPipe.GetRoot() != null) ? oxygenPipe.GetRoot().GetGameObject().GetComponent<UniqueIdentifier>().Id : null);
+                    this.parentPosition = oxygenPipe.GetAttachPoint();
+                }
             }
         }
 
