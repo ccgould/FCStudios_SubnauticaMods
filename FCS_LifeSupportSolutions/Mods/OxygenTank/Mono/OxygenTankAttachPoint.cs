@@ -180,7 +180,7 @@ namespace FCS_LifeSupportSolutions.Mods.OxygenTank.Mono
 
         public Vector3 GetAttachPoint()
         {
-            return _attachPoint.transform.position;
+            return _attachPoint.transform.position- new Vector3(0,0.1f,0);
         }
 
         public void UpdateOxygen()
