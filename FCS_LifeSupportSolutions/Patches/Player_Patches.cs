@@ -136,8 +136,8 @@ namespace FCS_LifeSupportSolutions.Patches
             var baseOxygenTanks = manager.GetDevices(Mod.BaseOxygenTankTabID);
             bool hardcore = QPatch.BaseUtilityUnitConfiguration.SmallBaseOxygenHardcore;
 
-            int bigRooms = 0;
-            int smallRooms = 0;
+            float bigRooms = 0;
+            float smallRooms = 0;
 
             Base baseComponent = manager.Habitat.GetComponent<Base>();
 
@@ -150,28 +150,31 @@ namespace FCS_LifeSupportSolutions.Patches
                     case Base.CellType.Corridor:
                         smallRooms += 1;
                         break;
+                    case Base.CellType.Observatory:
+                        smallRooms += 1;
+                        break;
                     case Base.CellType.MapRoom:
                         if (hardcore)
-                            bigRooms += 1;
+                            bigRooms += 1f/9f;
                         else
-                            smallRooms += 1;
+                            smallRooms += 1f/9f;
                         break;
                     case Base.CellType.MapRoomRotated:
                         if (hardcore)
-                            bigRooms += 1;
+                            bigRooms += 1f/9f;
                         else
-                            smallRooms += 1;
+                            smallRooms += 1f/9f;
                         break;
                     case Base.CellType.Moonpool:
-                        bigRooms += 1;
+                        bigRooms += 1f/12f;
                         break;
                     case Base.CellType.Room:
-                        bigRooms += 1;
+                        bigRooms += 1f/9f;
                         break;
                 }
             }
 
-            float RequiredTankCount = (bigRooms / (hardcore ? 2 : 1)) + (smallRooms / (hardcore ? 4:10)) + 1;
+            float RequiredTankCount = (bigRooms / (hardcore ? 1 : 2)) + (smallRooms / (hardcore ? 4:10));
 
 
             List<IPipeConnection> floaters = new List<IPipeConnection>();
@@ -192,12 +195,13 @@ namespace FCS_LifeSupportSolutions.Patches
             {
                 outResult = true;
             }
-            else if(RequiredTankCount-ActiveTankCount == 1)
+            else if(RequiredTankCount-ActiveTankCount <= 1)
             {
                 amount = 1.05f * DayNightCycle.main.deltaTime * ActiveTankCount / RequiredTankCount;
                 Player.main.oxygenMgr.AddOxygen(amount);
             }
 
+            QuickLogger.Debug($"ActiveTankCount: {ActiveTankCount}, RequiredTankCount: {RequiredTankCount}", true);
             return outResult;
         }
 
