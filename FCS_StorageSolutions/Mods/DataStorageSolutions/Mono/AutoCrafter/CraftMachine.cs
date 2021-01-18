@@ -42,6 +42,8 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
 
             if (_craftingItem == null || _mono?.Manager == null || !IsOccupied) return;
 
+            if (!_mono.Manager.IsAllowedToAdd(_craftingItem.TechType, false)) return;
+
             if (_startBuffer > 0)
             {
                 _startBuffer -= DayNightCycle.main.deltaTime;
@@ -52,7 +54,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
             {
                 _craftingItem.AmountCompleted += 1;
                 _mono.Manager.ConsumeIngredientsFor(_craftingItem.TechType);
-                _mono.AddItemToContainer(_craftingItem.TechType.ToInventoryItem());
+                _mono.Manager.AddItemToContainer(_craftingItem.TechType.ToInventoryItemLegacy());
                 _mono.CraftManager.SpawnItem(_craftingItem.TechType, CrafterID);
                 _startBuffer = MAXTIME;
             }

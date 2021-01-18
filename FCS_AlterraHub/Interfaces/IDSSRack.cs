@@ -14,7 +14,7 @@ namespace FCS_AlterraHub.Interfaces
         bool HasSpace(int amount);
         bool AddItemToRack(InventoryItem item);
         int GetFreeSpace();
-        bool ItemAllowed(InventoryItem item, out ISlotController unknown);
+        bool ItemAllowed(TechType item, out ISlotController unknown);
         int GetItemCount(TechType techType);
         bool HasItem(TechType techType);
         Pickupable RemoveItemFromRack(TechType techType);

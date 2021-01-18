@@ -245,12 +245,12 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
             return amount;
         }
 
-        public bool ItemAllowed(InventoryItem item, out ISlotController server)
+        public bool ItemAllowed(TechType techType, out ISlotController server)
         {
             server = null;
             foreach (KeyValuePair<string, DSSSlotController> controller in _slots)
             {
-                if (controller.Value != null && controller.Value.IsOccupied && !controller.Value.IsFull && controller.Value.IsTechTypeAllowed(item.item.GetTechType()))
+                if (controller.Value != null && controller.Value.IsOccupied && !controller.Value.IsFull && controller.Value.IsTechTypeAllowed(techType))
                 {
                     server = controller.Value;
                     return true;

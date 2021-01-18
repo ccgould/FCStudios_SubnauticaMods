@@ -49,8 +49,7 @@ namespace FCS_AlterraHub.Mono
 
         private bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
         {
-            var result = _storage.IsAllowedToAdd(pickupable, verbose);
-            return result;
+            return _storage.IsAllowedToAdd(pickupable.GetTechType(), verbose) || _storage.IsAllowedToAdd(pickupable,verbose);
         }
         
         public void OpenStorage()

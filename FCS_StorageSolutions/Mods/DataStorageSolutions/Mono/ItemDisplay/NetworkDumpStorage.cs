@@ -23,7 +23,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.ItemDisplay
             }
         }
         
-        public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
+        public bool IsAllowedToAdd(TechType techType, bool verbose)
         {
             if (_manager == null) return false;
             QuickLogger.Debug($"Checking if allowed {_dumpContainer.GetItemCount() + 1}", true);
@@ -40,6 +40,11 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.ItemDisplay
             var result = availableSpace >= _dumpContainer.GetItemCount() + 1;
             QuickLogger.Debug($"Allowed result: {result}", true);
             return result;
+        }
+
+        public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
+        {
+            return IsAllowedToAdd(pickupable.GetTechType(), verbose);
         }
 
         public bool AddItemToContainer(InventoryItem item)

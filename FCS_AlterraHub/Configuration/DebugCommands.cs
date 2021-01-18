@@ -1,6 +1,8 @@
 ﻿using System.Linq;
+using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Mono.AlterraHub;
 using FCS_AlterraHub.Systems;
+using FCSCommon.Extensions;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Commands;
 using UnityEngine;
@@ -68,5 +70,14 @@ namespace FCS_AlterraHub.Configuration
         {
             CardSystem.main.ResetAccount();
         }
+
+        [ConsoleCommand("UnlockFCSItem")]
+        public static string UnlockFCSItem(string techType)
+        {
+            BaseManager.GlobalNotifyByID(Mod.AlterraHubTabID, "ActivateGoal");
+            BaseManager.ActivateGoalTechType = techType.ToTechType();
+            return $"Parameters: {techType}";
+        }
+
     }
 }

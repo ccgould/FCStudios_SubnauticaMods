@@ -189,9 +189,14 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         /// <param name="pickupable"></param>
         /// <param name="verbose"></param>
         /// <returns></returns>
+        public bool IsAllowedToAdd(TechType techType, bool verbose)
+        {
+            return techType == Mod.GetDSSServerTechType();
+        }
+
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
         {
-            return pickupable.GetTechType() == Mod.GetDSSServerTechType();
+            return IsAllowedToAdd(pickupable.GetTechType(), verbose);
         }
 
         #endregion

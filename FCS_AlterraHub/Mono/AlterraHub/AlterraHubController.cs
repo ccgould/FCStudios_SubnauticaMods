@@ -44,6 +44,19 @@ namespace FCS_AlterraHub.Mono.AlterraHub
         private void Start()
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.AlterraHubTabID, Mod.ModName);
+            IPCMessage += IpcMessage;
+        }
+
+        private void IpcMessage(string message)
+        {
+            if (message.Equals("ActivateGoal"))
+            {
+                var panelGroup = DisplayManager.GetPanelGroup();
+                foreach (PanelHelper panelHelper in panelGroup.PanelHelpers)
+                {
+                    panelHelper.ActivateStoreItem(BaseManager.ActivateGoalTechType);
+                }
+            }
         }
 
         private void Update()
@@ -395,16 +408,21 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             return _colorManager.ChangeColor(color, mode);
         }
 
-        public bool AddItemToContainer(InventoryItem item)
+        public override bool AddItemToContainer(InventoryItem item)
         {
             CardSystem.main.AddFinances(StoreInventorySystem.GetPrice(item.item.GetTechType(),true));
             Destroy(item.item.gameObject);
             return true;
         }
 
-        public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
+        public bool IsAllowedToAdd(TechType techType, bool verbose)
         {
-            return StoreInventorySystem.StoreHasItem(pickupable.GetTechType(),true);
+            return StoreInventorySystem.StoreHasItem(techType,true);
+        }
+
+        public bool IsAllowedToAdd(Pickupable inventoryItem, bool verbose)
+        {
+            return false;
         }
     }
 }

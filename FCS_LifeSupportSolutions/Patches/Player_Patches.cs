@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using FCS_AlterraHub.Mono;
 using FCS_LifeSupportSolutions.Configuration;
 using FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Mono;
@@ -7,7 +6,6 @@ using FCS_LifeSupportSolutions.Mods.EnergyPillVendingMachine.mono;
 using FCS_LifeSupportSolutions.Mods.OxygenTank.Mono;
 using FCSCommon.Utilities;
 using HarmonyLib;
-using UnityEngine;
 
 namespace FCS_LifeSupportSolutions.Patches
 {
@@ -110,7 +108,6 @@ namespace FCS_LifeSupportSolutions.Patches
 
         }
 
-
         private static bool TryAddOxygen(ref bool outResult, BaseManager manager)
         {
 
@@ -134,48 +131,8 @@ namespace FCS_LifeSupportSolutions.Patches
             }
 
             var baseOxygenTanks = manager.GetDevices(Mod.BaseOxygenTankTabID);
-            bool hardcore = QPatch.BaseUtilityUnitConfiguration.SmallBaseOxygenHardcore;
 
-            float bigRooms = 0;
-            float smallRooms = 0;
-
-            Base baseComponent = manager.Habitat.GetComponent<Base>();
-
-            foreach(Int3 cell in baseComponent.AllCells)
-            {
-                Base.CellType cellType = baseComponent.GetCell(cell);
-
-                switch (cellType)
-                {
-                    case Base.CellType.Corridor:
-                        smallRooms += 1;
-                        break;
-                    case Base.CellType.Observatory:
-                        smallRooms += 1;
-                        break;
-                    case Base.CellType.MapRoom:
-                        if (hardcore)
-                            bigRooms += 1f/9f;
-                        else
-                            smallRooms += 1f/9f;
-                        break;
-                    case Base.CellType.MapRoomRotated:
-                        if (hardcore)
-                            bigRooms += 1f/9f;
-                        else
-                            smallRooms += 1f/9f;
-                        break;
-                    case Base.CellType.Moonpool:
-                        bigRooms += 1f/12f;
-                        break;
-                    case Base.CellType.Room:
-                        bigRooms += 1f/9f;
-                        break;
-                }
-            }
-
-            float RequiredTankCount = (float)Math.Round((bigRooms / (hardcore ? 1 : 2)) + (smallRooms / (hardcore ? 4:10)), 2);
-
+            var requiredTankCount = manager.GetRequiredTankCount(QPatch.BaseUtilityUnitConfiguration.SmallBaseOxygenHardcore);
 
             List<IPipeConnection> floaters = new List<IPipeConnection>();
 
@@ -191,21 +148,20 @@ namespace FCS_LifeSupportSolutions.Patches
                 }
             }
 
-            if (ActiveTankCount >= RequiredTankCount)
+            if (ActiveTankCount >= requiredTankCount)
             {
                 outResult = true;
             }
-            else if(RequiredTankCount-ActiveTankCount <= 1)
+            else if(requiredTankCount-ActiveTankCount <= 1)
             {
-                amount = 1.05f * DayNightCycle.main.deltaTime * ActiveTankCount / RequiredTankCount;
+                amount = 1.05f * DayNightCycle.main.deltaTime * ActiveTankCount / requiredTankCount;
                 Player.main.oxygenMgr.AddOxygen(amount);
             }
 
-            QuickLogger.Debug($"ActiveTankCount: {ActiveTankCount}, RequiredTankCount: {RequiredTankCount}", true);
+            QuickLogger.Debug($"ActiveTankCount: {ActiveTankCount}, RequiredTankCount: {requiredTankCount}", true);
             return outResult;
         }
-
-
+        
         private static void GetDefaultO2Level(Player instance)
         {
             if (DefaultO2Level <= 0)

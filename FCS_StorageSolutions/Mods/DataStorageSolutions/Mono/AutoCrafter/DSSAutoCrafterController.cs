@@ -25,18 +25,11 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
         private bool _moveBelt;
         private float _beltSpeed = 0.1f;
         private IEnumerable<Material> _materials;
-        private GameObject _canvas
-            ;
-        internal FCSStorage StorageManager { get; private set; }
+        private GameObject _canvas;
         public override bool IsVisible => IsInitialized && IsConstructed;
         public override bool IsOperational => IsInitialized && IsConstructed;
         public override StorageType StorageType { get; } = StorageType.AutoCrafter;
-
-        public override FCSStorage GetStorage()
-        {
-            return StorageManager;
-        }
-
+        
         public override float GetPowerUsage()
         {
             if (Manager == null || !IsConstructed || Manager.GetBreakerState() || CraftManager ==  null || !CraftManager.IsRunning()) return 0f;
@@ -95,8 +88,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
             _materials = MaterialHelpers.GetMaterials(gameObject, "DSS_ConveyorBelt");
 
             DisplayManager.Refresh();
-
-            StorageManager.CleanUpDuplicatedStorageNoneRoutine();
             Manager.AlertNewFcsStoragePlaced(this);
             Manager.OnPowerStateChanged += OnPowerStateChanged;
             Manager.OnBreakerStateChanged += OnBreakerStateChanged;
@@ -123,11 +114,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
                 Manager.OnBreakerStateChanged -= OnBreakerStateChanged;
             }
             base.OnDestroy();
-        }
-
-        public override Pickupable RemoveItemFromContainer(TechType techType)
-        {
-            return StorageManager.ItemsContainer.RemoveItem(techType);
         }
 
         private void GetCraftTreeData(CraftNode innerNodes)
@@ -209,22 +195,11 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
                 _colorManager.Initialize(gameObject, ModelPrefab.BodyMaterial, ModelPrefab.SecondaryMaterial);
             }
 
-            if (StorageManager == null)
-            {
-                StorageManager = gameObject.AddComponent<FCSStorage>();
-                StorageManager.Initialize(48,gameObject.FindChild("StorageRoot"));
-            }
-
             MoveBelt();
 
             IsInitialized = true;
 
             QuickLogger.Debug($"Initialized - {GetPrefabID()}");
-        }
-
-        public override bool AddItemToContainer(InventoryItem item)
-        {
-           return StorageManager.AddItem(item);
         }
 
         public override void OnProtoSerialize(ProtobufSerializer serializer)
@@ -250,7 +225,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
             {
                 Initialize();
             }
-            StorageManager.RestoreItems(serializer, _saveData.Data);
         }
 
         public void Save(SaveData newSaveData, ProtobufSerializer serializer = null)
@@ -267,7 +241,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
 
                 _saveData.ID = id;
                 _saveData.Body = _colorManager.GetColor().ColorToVector4();
-                _saveData.Data = StorageManager.Save(serializer);
                 _saveData.SecondaryBody = _colorManager.GetSecondaryColor().ColorToVector4();
                 _saveData.CurrentProcess = CraftingItems;
                 _saveData.IsRunning = CraftManager.IsRunning();

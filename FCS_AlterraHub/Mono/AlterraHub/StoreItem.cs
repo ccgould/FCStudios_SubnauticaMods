@@ -3,7 +3,6 @@ using System.Text;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Model;
 using FCSCommon.Helpers;
-using SMLHelper.V2.Handlers;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,10 +11,13 @@ namespace FCS_AlterraHub.Mono.AlterraHub
     internal class StoreItem : MonoBehaviour
     {
         private decimal _price;
-
+        public bool IsVisible { get; set; } = true;
+        public TechType TechType { get; set; }
         internal void Initialize(string objectName, TechType techType, TechType receiveTechType, decimal cost, Action<TechType, TechType> callback, StoreCategory category, Func<bool> toolTipPermission)
         {
             _price = cost;
+
+            TechType = techType;
 
             var costObj = GameObjectHelpers.FindGameObject(gameObject, "ItemAmount").GetComponent<Text>();
             costObj.text = cost.ToString("n0");

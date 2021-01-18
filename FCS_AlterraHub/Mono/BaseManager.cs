@@ -78,6 +78,8 @@ namespace FCS_AlterraHub.Mono
         public bool PullFromDockedVehicles { get; set; }
         public List<TechType> DockingBlackList { get; set; } = new List<TechType>();
         public Action<bool> OnBreakerStateChanged { get; set; }
+        public static TechType ActivateGoalTechType { get; set; }
+        public Base BaseComponent { get; set; }
 
         #region Default Constructor
 
@@ -85,6 +87,7 @@ namespace FCS_AlterraHub.Mono
         {
             if (habitat == null) return;
             Habitat = habitat;
+            BaseComponent = Habitat.GetComponent<Base>();
             BaseID = habitat.gameObject.gameObject?.GetComponentInChildren<PrefabIdentifier>()?.Id;
             _registeredDevices = new Dictionary<string, FcsDevice>();
             _baseTechLights = new Dictionary<string, TechLight>();
@@ -93,6 +96,8 @@ namespace FCS_AlterraHub.Mono
             Player_Patch.OnPlayerUpdate += PowerStateCheck;
 
         }
+
+        
 
         private void Initialize(SubRoot habitat)
         {
@@ -942,23 +947,37 @@ namespace FCS_AlterraHub.Mono
             _dumpContainer.OpenStorage();
         }
 
-        public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
+        public bool IsAllowedToAdd(TechType techType, bool verbose)
         {
+            int availableSpace = 0;
+
+            var validServers = new List<ISlotController>();
 
             QuickLogger.Debug($"Checking if allowed {_dumpContainer.GetItemCount() + 1}", true);
 
-            //TODO Check filter first
-
-
-            int availableSpace = 0;
             foreach (IDSSRack baseRack in BaseRacks)
             {
-                availableSpace += baseRack.GetFreeSpace();
+                if (baseRack.ItemAllowed(techType, out var server))
+                {
+                    if(!server.IsFull)
+                        validServers.Add(server);
+                }
+            }
+
+            if (validServers.Count > 0)
+            {
+                availableSpace = validServers.Sum(x => x.GetFreeSpace());
             }
 
             var result = availableSpace >= _dumpContainer.GetItemCount() + 1;
+
             QuickLogger.Debug($"Allowed result: {result}", true);
             return result;
+        }
+
+        public bool IsAllowedToAdd(Pickupable inventoryItem, bool verbose)
+        {
+            return IsAllowedToAdd(inventoryItem.GetTechType(),verbose);
         }
 
         public bool AddItemToContainer(InventoryItem item)
@@ -986,7 +1005,7 @@ namespace FCS_AlterraHub.Mono
             {
                 foreach (IDSSRack baseRack in manager.BaseRacks)
                 {
-                    if (baseRack.ItemAllowed(item, out var server))
+                    if (baseRack.ItemAllowed(item.item.GetTechType(), out var server))
                     {
                         server?.AddItemToMountedServer(item);
                         return true;
@@ -996,7 +1015,7 @@ namespace FCS_AlterraHub.Mono
             return false;
         }
 
-        public bool IsFilterAddedWithType(TechType techType)
+        public bool IsDockingFilterAddedWithType(TechType techType)
         {
             return DockingBlackList.Contains(techType);
         }
@@ -1058,6 +1077,49 @@ namespace FCS_AlterraHub.Mono
                     }
                 }
             }
+        }
+
+        
+
+        public float GetRequiredTankCount(bool hardcore)
+        {
+            float bigRooms = 0;
+            float smallRooms = 0;
+
+            foreach (Int3 cell in BaseComponent.AllCells)
+            {
+                Base.CellType cellType = BaseComponent.GetCell(cell);
+
+                switch (cellType)
+                {
+                    case Base.CellType.Corridor:
+                        smallRooms += 1;
+                        break;
+                    case Base.CellType.Observatory:
+                        smallRooms += 1;
+                        break;
+                    case Base.CellType.MapRoom:
+                        if (hardcore)
+                            bigRooms += 1f / 9f;
+                        else
+                            smallRooms += 1f / 9f;
+                        break;
+                    case Base.CellType.MapRoomRotated:
+                        if (hardcore)
+                            bigRooms += 1f / 9f;
+                        else
+                            smallRooms += 1f / 9f;
+                        break;
+                    case Base.CellType.Moonpool:
+                        bigRooms += 1f / 12f;
+                        break;
+                    case Base.CellType.Room:
+                        bigRooms += 1f / 9f;
+                        break;
+                }
+            }
+
+            return (float)Math.Round((bigRooms / (hardcore ? 1 : 2)) + (smallRooms / (hardcore ? 4 : 10)),2);
         }
     }
 

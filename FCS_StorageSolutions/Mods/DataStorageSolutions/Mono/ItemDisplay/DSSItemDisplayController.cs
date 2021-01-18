@@ -271,9 +271,14 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.ItemDisplay
             }
         }
 
-        public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
+        public bool IsAllowedToAdd(TechType techType, bool verbose)
         {
             return true;
+        }
+
+        public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
+        {
+            return IsAllowedToAdd(pickupable.GetTechType(), verbose);
         }
 
         public override bool AddItemToContainer(InventoryItem item)

@@ -13,7 +13,7 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
         private AlienChefController _mono;
         private Text _title;
         private CookerItemController _itemController;
-        public int Amount { get; set; }
+        public int Amount { get; set; } = 1;
 
         internal void Setup(AlienChefController mono)
         {
@@ -40,7 +40,7 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
             var addToOrderBTN = GameObjectHelpers.FindGameObject(gameObject, "AddToOrderBtn").GetComponent<Button>();
             addToOrderBTN.onClick.AddListener((() => {
                 QuickLogger.Debug($"Adding {Amount} {TechType} to Order", true);
-                mono.AddToOrder(_itemController);
+                mono.AddToOrder(_itemController,Amount);
                 Hide();
             }));
 
@@ -65,7 +65,9 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
         internal void Show(CookerItemController itemController)
         {
             _itemController = itemController;
+            TechType = itemController.CookedTechType;
             _title.text = Language.main.Get(itemController.CookedTechType);
+            _amountLbl.text = Amount.ToString("D2");
             gameObject.SetActive(true);
         }
 

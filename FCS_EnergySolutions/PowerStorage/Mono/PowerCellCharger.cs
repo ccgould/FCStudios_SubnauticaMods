@@ -335,6 +335,11 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
             return _storageContainer.AddItem(item);
         }
 
+        public bool IsAllowedToAdd(TechType techType, bool verbose)
+        {
+            return false;
+        }
+
         internal void OnUnEquip(string slot, BatteryDummyController item)
         {
             if (Batteries.ContainsKey(slot))

@@ -19,6 +19,8 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
         internal DisplayManager DisplayManager { get; private set; }
         internal Cooker Cooker { get; set; }
         internal FCSStorage StorageSystem { get; set; }
+        public bool PullFromDataStorage { get; set; }
+        public bool SendToSeaBreeze { get; set; }
 
         private void Start()
         {
@@ -54,6 +56,12 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
                 _colorManager = gameObject.EnsureComponent<ColorManager>();
                 _colorManager.Initialize(gameObject, ModelPrefab.BodyMaterial);
             }
+            
+            if (Cooker == null)
+            {
+                Cooker = gameObject.EnsureComponent<Cooker>();
+                Cooker.Initialize(this);
+            }
 
             if (DisplayManager == null)
             {
@@ -61,16 +69,10 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
                 DisplayManager.Setup(this);
             }
 
-            if (Cooker == null)
-            {
-                Cooker = gameObject.EnsureComponent<Cooker>();
-                Cooker.Initialize(this);
-            }
-
             if (StorageSystem == null)
             {
                 StorageSystem = gameObject.EnsureComponent<FCSStorage>();
-                StorageSystem.Initialize(10);
+                StorageSystem.Initialize(48,6,8,"Alien Chef Storage");
             }
 
             MaterialHelpers.ChangeEmissionStrength(ModelPrefab.EmissionControllerMaterial, gameObject, 5f);
@@ -99,6 +101,17 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
 
         public override void OnProtoDeserialize(ProtobufSerializer serializer)
         {
+            if(_saveData == null)
+            {
+                ReadySaveData();
+            }
+
+            if (!IsInitialized)
+            {
+                Initialize();
+            }
+            StorageSystem.RestoreItems(serializer, _saveData.Bytes);
+
             _fromSave = true;
         }
 
@@ -140,7 +153,7 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
             }
             _saveData.Id = id;
             _saveData.Fcs = _colorManager.GetColor().ColorToVector4();
-
+            _saveData.Bytes = StorageSystem.Save(serializer);
             newSaveData.AlienChiefDataEntries.Add(_saveData);
         }
 
@@ -156,29 +169,52 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
 
         public bool TryGetItem(CookerItemController dialog,int amount)
         {
-            if (Inventory.main.container.Contains(dialog.TechType) && Inventory.main.container.GetCount(dialog.TechType) >= amount)
+            QuickLogger.Debug($"Trying to get {dialog.TechType}",true);
+
+            var targetAmount = amount;
+
+            QuickLogger.Debug($"Inventory has item {Inventory.main.container.Contains(dialog.TechType)} || Target Amount: {targetAmount}", true);
+            if (Inventory.main.container.Contains(dialog.TechType))
             {
-                for (int i = 0; i < amount; i++)
+                QuickLogger.Debug($"Inventory has item count {Inventory.main.container.GetCount(dialog.TechType)}", true);
+                for (int i = 0; i < Inventory.main.container.GetCount(dialog.TechType); i++)
                 {
+                    if(targetAmount == 0) break;
                     Destroy(Inventory.main.container.RemoveItem(dialog.TechType));
                     Cooker.AddToQueue(dialog.TechType,dialog.CookedTechType,dialog.CuredTechType);
+                    targetAmount--;
                 }
+            }
 
+            if (targetAmount > 0 && PullFromDataStorage)
+            {
+                QuickLogger.Debug($"Manager has item {Manager.HasItem(dialog.TechType)}", true);
+                if (Manager.HasItem(dialog.TechType))
+                {
+                    for (int i = 0; i < Manager.GetItemCount(dialog.TechType); i++)
+                    {
+                        if (targetAmount == 0) break;
+                        Destroy(Manager.TakeItem(dialog.TechType));
+                        Cooker.AddToQueue(dialog.TechType, dialog.CookedTechType, dialog.CuredTechType);
+                        targetAmount--;
+                    }
+                }
+            }
+
+            if (targetAmount < amount)
+            {
                 Cooker.StartCooking();
+                QuickLogger.ModMessage($"Alien Chef {UnitID} is cooking {amount - targetAmount} items");
                 return true;
             }
 
-            //if (StorageSystem.ItemsContainer.Contains(techType) && Inventory.main.container.GetCount(techType) >= amount)
-            //{
-            //    Cooker.AddToQueue(StorageSystem.ItemsContainer.RemoveItem(techType));
-            //}
-
+            QuickLogger.ModMessage($"Alien Chef failed to get any items for cooking items");
             return false;
         }
 
-        public void AddToOrder(CookerItemController cookerItemDialog)
+        public void AddToOrder(CookerItemController cookerItemDialog, int amount)
         {
-            DisplayManager.AddToOrder(cookerItemDialog);
+            DisplayManager.AddToOrder(cookerItemDialog,amount);
         }
     }
 }

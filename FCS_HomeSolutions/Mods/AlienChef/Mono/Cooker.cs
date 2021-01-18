@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using FCS_AlterraHub.Helpers;
 using FCS_HomeSolutions.Configuration;
 using FCSCommon.Converters;
+using FCSCommon.Extensions;
 using FCSCommon.Utilities;
 using UnityEngine;
 
@@ -20,15 +21,16 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
         private const int MaxQueue = 16;
         private readonly IList<float> _progress = new List<float>(new[] { -1f, -1f, -1f });
         private float _cookingTime;
-        private CookerMode _mode;
+        private CookerMode _mode = CookerMode.Cook;
         public bool PauseUpdates { get; set; }
-        public bool IsFull { get; set; }
+        public bool IsFull => _mono.StorageSystem.GetFreeSpace() == 0;
         public bool NotAllowToCook => PauseUpdates || _mono == null ||!_mono.IsConstructed || _cookingQueue.Count == 0;
         internal float GenerationProgress
         {
             get => _progress[(int)CookingPhases.Generating];
             set => _progress[(int)CookingPhases.Generating] = value;
         }
+
 
         private void Update()
         {
@@ -155,12 +157,14 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
             //TODO Add to container for testing give to player
             if (_mode == CookerMode.Cook)
             {
-                PlayerInteractionHelper.GivePlayerItem(item.CookedTechType);
+                _mono.StorageSystem.AddItem(item.CookedTechType.ToInventoryItem());
+                //PlayerInteractionHelper.GivePlayerItem(item.CookedTechType);
             }
 
             if (_mode == CookerMode.Cure)
             {
-                PlayerInteractionHelper.GivePlayerItem(item.CuredTechType);
+                _mono.StorageSystem.AddItem(item.CuredTechType.ToInventoryItem());
+                //PlayerInteractionHelper.GivePlayerItem(item.CuredTechType);
             }
 
             if (_mode == CookerMode.Custom)

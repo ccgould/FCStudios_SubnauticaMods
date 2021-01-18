@@ -38,7 +38,6 @@ namespace FCS_HomeSolutions.SeaBreeze.Mono
         internal int PageStateHash { get; private set; }
         internal PrefabIdentifier PrefabId { get; set; }
         public override bool IsVisible => GetHasBreakerTripped();
-
         private bool GetHasBreakerTripped()
         {
             return PowerManager.GetHasBreakerTripped();

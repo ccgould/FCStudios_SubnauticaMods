@@ -138,6 +138,7 @@
     <Compile Include="Mods\MiniMedBay\mono\MiniMedBayTrigger.cs" />
     <Compile Include="Mods\OxygenTank\Buildable\BaseOxygenTankPatch.cs" />
     <Compile Include="Mods\OxygenTank\Mono\BaseOxygenTankController.cs" />
+    <Compile Include="Mods\OxygenTank\Mono\OxygenTankAttachPoint.cs" />
     <Compile Include="Patches\Player_Patches.cs" />
     <Compile Include="Patches\PowerIndicatorPatch.cs" />
     <Compile Include="Patches\Survival_Patch.cs" />

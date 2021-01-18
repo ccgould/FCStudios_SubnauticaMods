@@ -37,7 +37,7 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
                 for (int i = _orderQueue.Count - 1; i > -1; i--)
                 {
                     var item = _orderQueue[i];
-                    var result = mono.TryGetItem(item.Dialog, item.Dialog.GetCookerItemDialog().Amount);
+                    var result = mono.TryGetItem(item.Dialog, item.Amount);
                     if(!result)
                     {
                         break;
@@ -59,7 +59,7 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
             gameObject.SetActive(false);
         }
 
-        internal void AddItemToList(CookerItemController dialog)
+        internal void AddItemToList(CookerItemController dialog, int amount)
         {
             var itemPrefab = GameObject.Instantiate(ModelPrefab.CookerOrderItemPrefab);
             var item = itemPrefab.EnsureComponent<OrderListItem>();
@@ -71,7 +71,7 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
                 ? AuxPatchers.CookedFoods()
                 : AuxPatchers.CuredFoods();
 
-            item.Initialize(foodTechType,dialog.GetCookerItemDialog()?.Amount ?? 0, category,dialog,this);
+            item.Initialize(foodTechType,amount, category,dialog,this);
             itemPrefab.transform.SetParent(_grid.transform,false);
             _orderQueue.Add(item);
             ListButton.UpdateCount(_orderQueue.Count);

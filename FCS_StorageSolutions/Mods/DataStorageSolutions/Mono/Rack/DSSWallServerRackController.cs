@@ -32,6 +32,8 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         private Image _percentageBar;
         private GameObject _canvas;
         private bool _isVisible;
+        private const float OpenPos = 0.382f;
+        private const float ClosePos = 0f;
         public override bool IsVisible => _isVisible;
         public override bool IsRack { get; } = true;
         public override bool IsOperational => IsInitialized && IsConstructed;
@@ -334,35 +336,40 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         {
             if (_tray == null) return;
 
-            // remember, 10 - 5 is 5, so target - position is always your direction.
-            Vector3 dir = new Vector3(_tray.transform.localPosition.x, _tray.transform.localPosition.y, _targetPos) -
-                          _tray.transform.localPosition;
+            if(IsOpen)
+            {
+                if (_tray.transform.localPosition.z < OpenPos)
+                {
+                    _tray.transform.Translate(Vector3.forward * _speed * DayNightCycle.main.deltaTime);
+                }
 
-            // magnitude is the total length of a vector.
-            // getting the magnitude of the direction gives us the amount left to move
-            float dist = dir.magnitude;
+                if (_tray.transform.localPosition.z > OpenPos)
+                {
+                    _tray.transform.localPosition = new Vector3(_tray.transform.localPosition.x, _tray.transform.localPosition.y,OpenPos);
+                }
+            }
+            else
+            {
+                if (_tray.transform.localPosition.z > ClosePos)
+                {
+                    _tray.transform.Translate(-Vector3.forward * _speed * DayNightCycle.main.deltaTime);
+                }
 
-            // this makes the length of dir 1 so that you can multiply by it.
-            dir = dir.normalized;
-
-            // the amount we can move this frame
-            float move = _speed * DayNightCycle.main.deltaTime;
-
-            // limit our move to what we can travel.
-            if (move > dist) move = dist;
-
-            // apply the movement to the object.
-            _tray.transform.Translate(dir * move);
+                if (_tray.transform.localPosition.z < ClosePos)
+                {
+                    _tray.transform.localPosition = new Vector3(_tray.transform.localPosition.x, _tray.transform.localPosition.y, ClosePos);
+                }
+            }
         }
 
         private void Open()
         {
-            _targetPos = 0.382f;
+            _targetPos = OpenPos;
         }
 
         private void Close()
         {
-            _targetPos = 0f;
+            _targetPos = ClosePos;
         }
 
         public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
@@ -428,15 +435,13 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
             return amount;
         }
 
-        public bool ItemAllowed(InventoryItem item, out ISlotController server)
+        public bool ItemAllowed(TechType techType, out ISlotController server)
         {
             server = null;
 
-
-
             foreach (KeyValuePair<string, DSSSlotController> controller in _slots)
             {
-                if (controller.Value != null && controller.Value.IsOccupied && !controller.Value.IsFull && controller.Value.IsTechTypeAllowed(item.item.GetTechType()))
+                if (controller.Value != null && controller.Value.IsOccupied && !controller.Value.IsFull && controller.Value.IsTechTypeAllowed(techType))
                 {
                     server = controller.Value;
                     return true;

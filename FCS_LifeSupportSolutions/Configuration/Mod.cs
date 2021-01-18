@@ -94,7 +94,10 @@ namespace FCS_LifeSupportSolutions.Configuration
             craftAmount = 1,
             Ingredients =
             {
-                new Ingredient(BaseOxygenTankKitClassID.ToTechType(), 1),
+                new Ingredient(TechType.HighCapacityTank, 1),
+                new Ingredient(TechType.Pipe, 1),
+                new Ingredient(TechType.CopperWire, 1),
+                new Ingredient(TechType.Silicone, 1),
             }
         };
 
@@ -123,8 +126,9 @@ namespace FCS_LifeSupportSolutions.Configuration
 
         internal static void Save(ProtobufSerializer serializer)
         {
+
             if (!IsSaving())
-            {
+            { 
                 _saveObject = new GameObject().AddComponent<ModSaver>();
 
                 SaveData newSaveData = new SaveData();

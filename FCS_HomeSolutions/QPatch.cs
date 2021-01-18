@@ -73,6 +73,7 @@ namespace FCS_HomeSolutions
                     AllowedOutside = true,
                     AllowedOnGround = true,
                     RotationEnabled = true,
+                    Cost = 45000,
                     Size = new Vector3(3.009064f, 2.474508f, 1.905116f),
                     Center = new Vector3(-0.1594486f, 1.41353f, 0.02790368f)
                 });

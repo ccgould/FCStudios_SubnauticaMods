@@ -48,10 +48,7 @@ namespace FCS_AlterraHub.Mono
             
             if (string.IsNullOrEmpty(BtnName)) return;
 
-            
-
             UpdateTextComponent(IsTextMode());
-            //QuickLogger.Debug($"Button Name:{BtnName} || Button Mode {ButtonMode}", true);
 
             switch (this.ButtonMode)
             {

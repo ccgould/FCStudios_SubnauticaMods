@@ -110,8 +110,7 @@ namespace FCS_StorageSolutions.Configuration
     {
         [JsonProperty] internal string ID { get; set; }
         [JsonProperty] internal string SaveVersion { get; set; } = "1.0";
-        [JsonProperty] internal Vec4 Body { get; set; }
-        [JsonProperty] internal byte[] Data { get; set; }
+        [JsonProperty] internal Vec4 Body { get; set; } 
         [JsonProperty] internal Vec4 SecondaryBody { get; set; }
         [JsonProperty] internal ObservableCollection<CraftingItem> CurrentProcess { get; set; }
         public bool IsRunning { get; set; }

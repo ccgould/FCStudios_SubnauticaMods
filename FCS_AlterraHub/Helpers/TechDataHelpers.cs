@@ -67,7 +67,7 @@ namespace FCS_AlterraHub.Helpers
         {
             if (!_knownIngredientCounts.ContainsKey(pickup.GetTechType()))
             {
-                _knownIngredientCounts.Add(pickup.GetTechType(),CalculateIngredientCount(GetIngredients(pickup)));
+                _knownIngredientCounts.Add(pickup.GetTechType(),CalculateIngredientCount(GetIngredients(pickup.GetTechType())));
             }
             return _knownIngredientCounts[pickup.GetTechType()];
         }
@@ -83,31 +83,27 @@ namespace FCS_AlterraHub.Helpers
             return total;
         }
 
-        public static List<IIngredient> GetIngredients(Pickupable pickup)
+        public static List<IIngredient> GetIngredients(TechType techType)
         {
             _ingredients.Clear();
-            GameObject gObj = pickup?.gameObject;
 
-            if (gObj)
+            var it = CraftData.Get(techType);
+
+            QuickLogger.Debug($"Ingredient Count: {it.ingredientCount}", true);
+
+            if (it != null)
             {
-                var it = CraftData.Get(pickup.GetTechType());
-                
-                QuickLogger.Debug($"Ingredient Count: {it.ingredientCount}",true);
-
-                if (it != null)
+                List<IIngredient> readOnlyCollection = new List<IIngredient>();
+                for (int i = 0; i < it.ingredientCount; i++)
                 {
-                    List<IIngredient> readOnlyCollection = new List<IIngredient>();
-                    for (int i = 0; i < it.ingredientCount; i++)
-                    {
-                        readOnlyCollection.Add(it.GetIngredient(i));
-                    }
+                    readOnlyCollection.Add(it.GetIngredient(i));
+                }
 
-                    foreach (IIngredient ingredient in readOnlyCollection)
+                foreach (IIngredient ingredient in readOnlyCollection)
+                {
+                    if (!BatteryTech.Contains(ingredient.techType))
                     {
-                        if (!BatteryTech.Contains(ingredient.techType))
-                        {
-                            _ingredients.Add(ingredient);
-                        }
+                        _ingredients.Add(ingredient);
                     }
                 }
             }

@@ -2,11 +2,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Interfaces;
+using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_StorageSolutions.Configuration;
+using FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter;
 using FCSCommon.Abstract;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
@@ -46,6 +49,10 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         private GameObject _powerOffScreen;
         private Text _currentBaseLBL;
         private GameObject _screen;
+        private StringBuilder _sb = new StringBuilder();
+        private int _serverCapacity;
+        private int _alterraStorageCapacity;
+        private PaginatorController _paginatorController;
 
         private void OnDestroy()
         {
@@ -84,24 +91,20 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             _rackCountAmount.text = AuxPatchers.RackCountFormat(_currentBase?.BaseRacks.Count ?? 0);
             _serverAmount.text = AuxPatchers.ServerCountFormat(_currentBase?.BaseServers.Count ?? 0);
             _currentBaseLBL.text = Player.main.currentSub == _currentBase.Habitat ? AuxPatchers.CurrentBase() : AuxPatchers.RemoteBase();
-            var serverCapacity = _currentBase?.BaseServers.Count * 48 ?? 0;
-            var alterraStorageCapacity = _currentBase?.BaseFcsStorage.Sum(x => x.GetMaxStorage()) ?? 0;
-            var combinedCapacity = serverCapacity + alterraStorageCapacity;
+            _serverCapacity = _currentBase?.BaseServers.Count * 48 ?? 0;
+            _alterraStorageCapacity = _currentBase?.BaseFcsStorage.Sum(x => x.GetMaxStorage()) ?? 0;
 
-            var total = _currentBase.GetTotal(_storageFilter);
             switch (_storageFilter)
             {
                 case StorageType.All:
-                    _totalItemsAmount.text = AuxPatchers.TotalItemsFormat(total, combinedCapacity);
-                    break;
                 case StorageType.Servers:
-                    _totalItemsAmount.text = AuxPatchers.TotalItemsFormat(total, serverCapacity);
+                    _totalItemsAmount.text = AuxPatchers.TotalItemsFormat(_currentBase.GetTotal(StorageType.Servers), _serverCapacity);
                     break;
                 case StorageType.StorageLockers:
-                    _totalItemsAmount.text = AuxPatchers.TotalItemsFormat(total, 0);
+                    _totalItemsAmount.text = AuxPatchers.TotalItemsFormat(_currentBase.GetTotal(_storageFilter), 0);
                     break;
                 case StorageType.AlterraStorage:
-                    _totalItemsAmount.text = AuxPatchers.TotalItemsFormat(total, alterraStorageCapacity);
+                    _totalItemsAmount.text = AuxPatchers.TotalItemsFormat(_currentBase.GetTotal(_storageFilter), _alterraStorageCapacity);
                     break;
             }
             _vehicleSectionName.text = _currentVehicle?.GetName();
@@ -317,8 +320,18 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                 _baseName = GameObjectHelpers.FindGameObject(gameObject, "BaseName").GetComponent<Text>();
                 _serverAmount = GameObjectHelpers.FindGameObject(gameObject, "ServerCount").GetComponent<Text>();
                 _rackCountAmount = GameObjectHelpers.FindGameObject(gameObject, "RackCount").GetComponent<Text>();
-                _totalItemsAmount = GameObjectHelpers.FindGameObject(gameObject, "TotalItems").GetComponent<Text>();
+                var totalItemsLbl = GameObjectHelpers.FindGameObject(gameObject, "TotalItems");
+                var information = GameObjectHelpers.FindGameObject(gameObject, "InformationIcon");
+                
+                var toolTip = information.AddComponent<FCSToolTip>();
+                toolTip.RequestPermission += () => true;
+                toolTip.ToolTipStringDelegate += ToolTipStringDelegate;
+                _totalItemsAmount = totalItemsLbl.GetComponent<Text>();
                 _currentBaseLBL = GameObjectHelpers.FindGameObject(gameObject, "CurrentBaseLBL").GetComponent<Text>();
+
+                _paginatorController = GameObjectHelpers.FindGameObject(gameObject, "Paginator").AddComponent<PaginatorController>();
+                _paginatorController.Initialize(this);
+
             }
             catch (Exception e)
             {
@@ -329,6 +342,15 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             }
 
             return true;
+        }
+
+        private string ToolTipStringDelegate()
+        {
+            _sb.Clear();
+            _sb.AppendFormat("\n<size=20><color=#FFA500FF>{0}:</color></size>", "Additional Storage Information");
+            _sb.AppendFormat("\n<size=20><color=#FFA500FF>{0}:</color> <color=#DDDEDEFF>{1}</color></size>", "Storage Lockers",$"{_currentBase.GetTotal(StorageType.StorageLockers)}");
+            _sb.AppendFormat("\n<size=20><color=#FFA500FF>{0}:</color> <color=#DDDEDEFF>{1}</color></size>", Mod.AlterraStorageFriendlyName,$"{_currentBase.GetTotal(StorageType.AlterraStorage)}/{_alterraStorageCapacity}");
+            return _sb.ToString();
         }
 
         private void UpdateSearch(string newSearch)
@@ -431,9 +453,14 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             return true;
         }
 
-        public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
+        public bool IsAllowedToAdd(TechType techType, bool verbose)
         {
             return true;
+        }
+
+        public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
+        {
+            return IsAllowedToAdd(pickupable.GetTechType(), verbose);
         }
 
         public override void TurnOffDisplay()

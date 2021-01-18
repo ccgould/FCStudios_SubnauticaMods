@@ -328,10 +328,15 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
             QuickLogger.Debug($"Saved HoverPad ID {_savedData.Id}", true);
         }
 
-        public bool AddItemToContainer(InventoryItem item)
+        public override bool AddItemToContainer(InventoryItem item)
         {
             _recycler.AddItem(item);
             return true;
+        }
+
+        public bool IsAllowedToAdd(TechType techType, bool verbose)
+        {
+            return false;
         }
 
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)

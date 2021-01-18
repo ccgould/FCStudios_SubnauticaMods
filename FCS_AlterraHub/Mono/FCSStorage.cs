@@ -155,5 +155,23 @@ namespace FCS_AlterraHub.Mono
             _storageRoot.AddComponent<StoreInformationIdentifier>();
             ItemsContainer = new ItemsContainer(slots, slots, _storageRoot.transform, "FCSStorage", null);
         }
+
+        public void Initialize(int slots, int width, int height,string name, GameObject go = null)
+        {
+            if (go == null)
+            {
+                _storageRoot = new GameObject("FCSStorage");
+                _storageRoot.transform.parent = transform;
+                UWE.Utils.ZeroTransform(_storageRoot);
+            }
+            else
+            {
+                _storageRoot = go;
+            }
+
+            _slots = slots;
+            _storageRoot.AddComponent<StoreInformationIdentifier>();
+            ItemsContainer = new ItemsContainer(width, height, _storageRoot.transform, name, null);
+        }
     }
 }

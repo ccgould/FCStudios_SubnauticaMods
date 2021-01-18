@@ -22,17 +22,22 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.FormattingStation
             _knownFilters = filters;
         }
 
-        public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
+        public bool IsAllowedToAdd(TechType techType, bool verbose)
         {
             foreach (Filter filter in _knownFilters)
             {
-                if (filter.HasTechType(pickupable.GetTechType()))
+                if (filter.HasTechType(techType))
                 {
                     return false;
                 }
             }
 
             return true;
+        }
+
+        public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
+        {
+            return IsAllowedToAdd(pickupable.GetTechType(), verbose);
         }
     }
 }

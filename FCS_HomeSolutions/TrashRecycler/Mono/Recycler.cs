@@ -119,7 +119,7 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
             GameObject gameObject = inventoryItem.item.gameObject;
             TechType techType = inventoryItem.item.GetTechType();
 
-            List<IIngredient> list = TechDataHelpers.GetIngredients(wasteItem.InventoryItem.item);
+            List<IIngredient> list = TechDataHelpers.GetIngredients(wasteItem.InventoryItem.item.GetTechType());
             QuickLogger.Debug($"Ingredients != Null: {list != null} | List Count: {list.Count > 0}", true);
             if (list != null && list.Count > 0 )
             {
@@ -191,12 +191,16 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
             OnContainerUpdated?.Invoke();
             yield break;
         }
-        
+
+        public bool IsAllowedToAdd(TechType techType)
+        {
+            return false;
+        }
+
         public bool IsAllowedToAdd(Pickupable pickupable)
         {
-            var techType = pickupable.GetTechType();
-            List<IIngredient> list = TechDataHelpers.GetIngredients(pickupable);
-            var result = TechDataHelpers.ContainsValidCraftData(techType) && !TechDataHelpers.IsUsedBattery(pickupable) && (list.Count + _storageContainer.GetCount()) <= MaxStorage;
+            List<IIngredient> list = TechDataHelpers.GetIngredients(pickupable.GetTechType());
+            var result = TechDataHelpers.ContainsValidCraftData(pickupable.GetTechType()) && !TechDataHelpers.IsUsedBattery(pickupable) && (list.Count + _storageContainer.GetCount()) <= MaxStorage;
             QuickLogger.Debug($"Can hold item result: {result} || Storage Total: {list.Count + _storageContainer.GetCount()}", true);
             return result;
         }

@@ -201,10 +201,15 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.FormattingStation
             }
         }
 
-        public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
+        public bool IsAllowedToAdd(TechType techType, bool verbose)
         {
             QuickLogger.Debug("Checking if allowed to add");
-            return pickupable.GetTechType() == Mod.GetDSSServerTechType();
+            return techType == Mod.GetDSSServerTechType();
+        }
+
+        public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
+        {
+            return IsAllowedToAdd(pickupable.GetTechType(), verbose);
         }
 
         public override bool AddItemToContainer(InventoryItem item)

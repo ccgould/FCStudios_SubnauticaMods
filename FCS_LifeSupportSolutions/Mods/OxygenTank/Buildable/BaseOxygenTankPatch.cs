@@ -24,16 +24,6 @@ namespace FCS_LifeSupportSolutions.Mods.BaseOxygenTank.Buildable
 
         public BaseOxygenTankPatch() : base(Mod.BaseOxygenTankClassID, Mod.BaseOxygenTankFriendly, Mod.BaseOxygenTankDescription)
         {
-            OnStartedPatching += () =>
-            {
-                var BaseOxygenTankPatch = new FCSKit(Mod.BaseOxygenTankKitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
-                BaseOxygenTankPatch.Patch();
-            };
-
-            OnFinishedPatching += () =>
-            {
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.BaseOxygenTankKitClassID.ToTechType(), 300000, StoreCategory.LifeSupport);
-            };
         }
 
         public override GameObject GetGameObject()

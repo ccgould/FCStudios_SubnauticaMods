@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Mono;
 using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
@@ -32,8 +33,8 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
             _mono = mono;
             if (FindAllComponents())
             {
+                _toggleGroup.Select("ToggleButton_0");
                 LoadKnownCookedItems();
-                _toggleGroup.Select("ButtonToggle_1");
             }
         }
 
@@ -96,9 +97,33 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
                 _toggleGroup.OnToggleButtonAction += OnToggleButtonAction;
                 _foodSectionLabel = GameObjectHelpers.FindGameObject(gameObject, "CookedFoodLabel").GetComponent<Text>();
                 _pullFromDataStorage = GameObjectHelpers.FindGameObject(gameObject, "DataStorageToggle").EnsureComponent<FCSToggleButton>();
+                _pullFromDataStorage.ButtonMode = InterfaceButtonMode.RadialButton;
+                _pullFromDataStorage.OnButtonClick += (s, o) =>
+                {
+                    _mono.PullFromDataStorage = _sendToSeaBreeze.IsSelected;
+                };
                 _sendToSeaBreeze = GameObjectHelpers.FindGameObject(gameObject, "SeaBreezeExport").EnsureComponent<FCSToggleButton>();
+                _sendToSeaBreeze.OnButtonClick += (s, o) =>
+                {
+                    _mono.SendToSeaBreeze = _sendToSeaBreeze.IsSelected;
+                };
+                _sendToSeaBreeze.ButtonMode = InterfaceButtonMode.RadialButton;
                 _listBTN = GameObjectHelpers.FindGameObject(gameObject, "ListBTN").EnsureComponent<FoodQueueList>();
                 _listBTN.Initialize(_orderWindow);
+                var inventoryBTN = GameObjectHelpers.FindGameObject(gameObject, "InventoryBTN").AddComponent<InterfaceButton>();
+                inventoryBTN.BtnName = "InventoryBTN";
+                inventoryBTN.OnButtonClick += (s, o) =>
+                {
+                    Player main = Player.main;
+                    PDA pda = main.GetPDA();
+                    if (pda != null)
+                    {
+                        Inventory.main.SetUsedStorage(_mono.StorageSystem.ItemsContainer);
+                        pda.Open(PDATab.Inventory, null, null, 4f);
+                    }
+                };
+
+
             }
             catch (Exception e)
             {
@@ -142,9 +167,9 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
             _cookingTime.text = TimeConverters.SecondsToMS(cookingTime);
         }
 
-        public void AddToOrder(CookerItemController cookerItemDialog)
+        public void AddToOrder(CookerItemController cookerItemDialog, int amount)
         {
-            _orderWindow.AddItemToList(cookerItemDialog);
+            _orderWindow.AddItemToList(cookerItemDialog,amount);
         }
     }
 }

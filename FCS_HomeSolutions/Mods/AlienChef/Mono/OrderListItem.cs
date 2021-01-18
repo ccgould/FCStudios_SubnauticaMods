@@ -14,6 +14,7 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
             OrderWindowDialog orderWindowDialog)
         {
             Dialog = cookerItemDialog;
+            Amount = amount;
             var deleteBTN = InterfaceHelpers.FindGameObject(gameObject, "CloseBTN").AddComponent<InterfaceButton>();
             deleteBTN.OnButtonClick += (s, o) =>
             {
@@ -24,11 +25,13 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
             icon.sprite = SpriteManager.Get(techType);
 
             var itemNameAndAmount = InterfaceHelpers.FindGameObject(gameObject,"Name").GetComponent<Text>();
-            itemNameAndAmount.text = $"{Language.main.Get(techType)} X{amount}";
+            itemNameAndAmount.text = $"{Language.main.Get(techType)} X{Amount}";
 
             var foodCategory = InterfaceHelpers.FindGameObject(gameObject, "Type").GetComponent<Text>();
             foodCategory.text = category;
         }
+
+        public int Amount { get; set; }
 
         public CookerItemController Dialog { get; set; }
     }

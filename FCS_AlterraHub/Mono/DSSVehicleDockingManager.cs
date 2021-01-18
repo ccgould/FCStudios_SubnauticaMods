@@ -57,7 +57,7 @@ namespace FCS_AlterraHub.Mono
                         QuickLogger.Debug($"Valid Check Item: {validCheck}", true);
                         if (!validCheck) continue;
 
-                        if (_manager.IsAllowedToAdd(item.item,false))
+                        if (_manager.IsAllowedToAdd(item.item.GetTechType(),false))
                         {
                             vehicleContainer.RemoveItem(item.item);
                             var success = _manager.AddItemToContainer(item);
@@ -96,8 +96,8 @@ namespace FCS_AlterraHub.Mono
 
         private bool ValidateCheck(InventoryItem item)
         {
-            if (!_manager.IsFilterAddedWithType(item.item.GetTechType()))
-                return _manager.IsAllowedToAdd(item.item, true);
+            if (!_manager.IsDockingFilterAddedWithType(item.item.GetTechType()))
+                return _manager.IsAllowedToAdd(item.item.GetTechType(), true);
             QuickLogger.ModMessage(Buildables.AlterraHub.BlackListFormat(Language.main.Get(item.item.GetTechType())));
             return false;
         }

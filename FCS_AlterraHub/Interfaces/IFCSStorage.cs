@@ -23,6 +23,7 @@ namespace FCS_AlterraHub.Interfaces
     public interface IFCSDumpContainer
     {
         bool AddItemToContainer(InventoryItem item);
+        bool IsAllowedToAdd(TechType techType, bool verbose);
         bool IsAllowedToAdd(Pickupable pickupable, bool verbose);
     }
 }

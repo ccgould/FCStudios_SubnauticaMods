@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using System.Collections.Generic;
+using System.Security.Cryptography;
 using FCS_AlterraHub.Enumerators;
 using FCSCommon.Helpers;
 using UnityEngine;
@@ -9,6 +10,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
     {
         private bool _isInitialized;
         private GameObject _content;
+        private List<StoreItem> storeItems = new List<StoreItem>();
 
         internal StoreCategory StoreCategory { get; set; }
 
@@ -34,6 +36,25 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             Initialize();
             if (!_isInitialized) return;
             storeItem.transform.SetParent(_content.transform, false);
+            var storeItemComp = storeItem.GetComponent<StoreItem>();
+            storeItems.Add(storeItemComp);
+            if(!storeItemComp.IsVisible)
+            {
+                storeItem.SetActive(false);
+            }
+        }
+
+        internal void ActivateStoreItem(TechType techType)
+        {
+            foreach (StoreItem item in storeItems)
+            {
+                if (item.TechType == techType)
+                {
+                    item.IsVisible = true;
+                    item.gameObject.SetActive(true);
+                    break;
+                }
+            }
         }
     }
 }

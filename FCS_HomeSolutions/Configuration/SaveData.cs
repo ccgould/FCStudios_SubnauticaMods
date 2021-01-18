@@ -172,6 +172,7 @@ namespace FCS_HomeSolutions.Configuration
         [JsonProperty(PropertyName = "COL")] internal Vec4 Fcs { get; set; }
         [JsonProperty(PropertyName = "SCOL")] internal Vec4 Secondary { get; set; }
         [JsonProperty(PropertyName = "BID")] internal string BaseID { get; set; }
+        [JsonProperty(PropertyName = "Data")] internal byte[] Bytes { get; set; }
     }    
     
     internal class FEXRDataEntry
