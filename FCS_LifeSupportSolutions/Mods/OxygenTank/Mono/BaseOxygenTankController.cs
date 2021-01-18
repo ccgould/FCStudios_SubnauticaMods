@@ -175,7 +175,10 @@ namespace FCS_LifeSupportSolutions.Mods.OxygenTank.Mono
 
             var requiredTankCount = Manager.GetRequiredTankCount(QPatch.BaseUtilityUnitConfiguration.SmallBaseOxygenHardcore);
             _sb.Clear();
-            _sb.Append($"Pipe Connected: {_oxygenAttachPoint.HasAttachment()}");
+            if(_oxygenAttachPoint.allowConnection)
+                _sb.Append($"Pipe Connected: {_oxygenAttachPoint.GetParent() != null}");
+            else
+                _sb.Append($"Pipe Connection Disabled. ");
             _sb.Append(Environment.NewLine);
             _sb.Append($"Active Tanks: {Manager.GetDevicesCount(Mod.BaseOxygenTankTabID)}, Required Tank Count: {requiredTankCount}");
             main.SetInteractTextRaw($"{Mod.BaseOxygenTankFriendly} - {UnitID}", _sb.ToString());
@@ -183,7 +186,9 @@ namespace FCS_LifeSupportSolutions.Mods.OxygenTank.Mono
 
         public void OnHandClick(GUIHand hand)
         {
-            //Not in use
+            _oxygenAttachPoint.allowConnection = !_oxygenAttachPoint.allowConnection;
+            if(_oxygenAttachPoint.parentPipeUID != null)
+                _oxygenAttachPoint.SetParent(null);
         }
     }
 }

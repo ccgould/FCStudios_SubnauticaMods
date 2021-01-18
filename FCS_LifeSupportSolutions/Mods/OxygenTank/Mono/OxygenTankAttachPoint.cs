@@ -10,6 +10,7 @@ namespace FCS_LifeSupportSolutions.Mods.OxygenTank.Mono
         public string parentPipeUID;
         public string rootPipeUID;
         public Vector3 parentPosition;
+        public bool allowConnection = true;
 
         private void Start()
         {
@@ -106,7 +107,7 @@ namespace FCS_LifeSupportSolutions.Mods.OxygenTank.Mono
         public void Update()
         {
             IPipeConnection parent = null;
-            if (this.parentPipeUID is null)
+            if (allowConnection && this.parentPipeUID is null)
             {
                 float num = 1000f;
                 int num2 = UWE.Utils.OverlapSphereIntoSharedBuffer(base.transform.position, 1f, -1, QueryTriggerInteraction.UseGlobal);
@@ -133,7 +134,7 @@ namespace FCS_LifeSupportSolutions.Mods.OxygenTank.Mono
                 return;
             }
 
-            if (rootPipeUID is null)
+            if (this.parentPipeUID != null && rootPipeUID is null)
             {
                 GameObject gameObject = GetParent()?.GetGameObject();
                 if (gameObject != null && gameObject.TryGetComponent(out OxygenPipe oxygenPipe))
