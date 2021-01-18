@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using FCS_AlterraHub.Mono;
 using FCS_LifeSupportSolutions.Configuration;
 using FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Mono;
@@ -170,7 +171,7 @@ namespace FCS_LifeSupportSolutions.Patches
                 }
             }
 
-            int RequiredTankCount = (bigRooms / (hardcore ? 2 : 1)) + (smallRooms / (hardcore ? 4:10)) + (hardcore? 1: 0);
+            int RequiredTankCount = (bigRooms / (hardcore ? 2 : 1)) + (smallRooms / (hardcore ? 4:10)) + 1;
 
 
             List<IPipeConnection> floaters = new List<IPipeConnection>();
@@ -189,7 +190,7 @@ namespace FCS_LifeSupportSolutions.Patches
 
             if (ActiveTankCount >= RequiredTankCount)
             {
-                var amount = _oxygenPerSecond * DayNightCycle.main.deltaTime;
+                var amount = _oxygenPerSecond * DayNightCycle.main.deltaTime * (ActiveTankCount/RequiredTankCount);
                 Player.main.oxygenMgr.AddOxygen(amount);
                 outResult = true;
             }
