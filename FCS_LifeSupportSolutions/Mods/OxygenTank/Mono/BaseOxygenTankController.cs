@@ -70,8 +70,8 @@ namespace FCS_LifeSupportSolutions.Mods.OxygenTank.Mono
                     _colorManager.ChangeColor(_savedData.Body.Vector4ToColor());
                     _colorManager.ChangeColor(_savedData.SecondaryBody.Vector4ToColor(), ColorTargetMode.Secondary);
 
-                    if (!string.IsNullOrEmpty(_savedData.ParentID) && UniqueIdentifier.TryGetIdentifier(_savedData.ParentID, out UniqueIdentifier uniqueIdentifier))
-                        _oxygenAttachPoint.SetParent(uniqueIdentifier.GetComponent<IPipeConnection>());
+                    if (!string.IsNullOrEmpty(_savedData.ParentID))
+                        _oxygenAttachPoint.parentPipeUID = _savedData.ParentID;
                 }
 
                 _runStartUpOnEnable = false;
@@ -157,7 +157,7 @@ namespace FCS_LifeSupportSolutions.Mods.OxygenTank.Mono
 
         public override bool CanDeconstruct(out string reason)
         {
-            if (_oxygenAttachPoint.HasAttachment())
+            if (_oxygenAttachPoint?.HasAttachment() ?? false)
             {
                 reason = AuxPatchers.OxygenTankHasAttachment();
                 return false;
@@ -272,7 +272,6 @@ namespace FCS_LifeSupportSolutions.Mods.OxygenTank.Mono
                 this.rootPipeUID = ((oxygenPipe.GetRoot() != null) ? oxygenPipe.GetRoot().GetGameObject().GetComponent<UniqueIdentifier>().Id : null);
                 this.parentPosition = oxygenPipe.GetAttachPoint();
                 oxygenPipe.AddChild(this);
-
             }
         }
 
@@ -335,9 +334,9 @@ namespace FCS_LifeSupportSolutions.Mods.OxygenTank.Mono
 
         public void Update()
         {
-            if(this.parentPipeUID is null)
+            IPipeConnection parent = null;
+            if (this.parentPipeUID is null)
             {
-                IPipeConnection parent = null;
                 float num = 1000f;
                 int num2 = UWE.Utils.OverlapSphereIntoSharedBuffer(base.transform.position, 1f, -1, QueryTriggerInteraction.UseGlobal);
                 for (int i = 0; i < num2; i++)
@@ -357,7 +356,20 @@ namespace FCS_LifeSupportSolutions.Mods.OxygenTank.Mono
                         }
                     }
                 }
-                this.SetParent(parent);
+                if(parent != null)
+                    this.SetParent(parent);
+
+                return;
+            }
+
+            if (rootPipeUID is null )
+            {
+                parent = GetParent();
+                if (parent is null)
+                    return;
+
+                this.rootPipeUID = ((parent.GetRoot() != null) ? parent.GetRoot().GetGameObject().GetComponent<UniqueIdentifier>().Id : null);
+                this.parentPosition = parent.GetAttachPoint();
             }
         }
 
