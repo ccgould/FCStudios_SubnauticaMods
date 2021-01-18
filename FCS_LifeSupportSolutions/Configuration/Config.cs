@@ -42,8 +42,8 @@ namespace FCS_LifeSupportSolutions.Configuration
         [Toggle("Require Utility Unit for Oxygen")]
         public bool AffectPlayerOxygen = false;
 
-        [Toggle("Basic Oxygen for Small Habitats", Tooltip = "When Affect Player Oxygen is enabled and this option is enabled, you can have a small base about the size of a MoonPool without needing a life support system  (4x4 area, single-floor)")]
-        public bool SmallBaseOxygen = false;
+        [Toggle("Small Base Oxygen Tank Hardcore", Tooltip = "When Affect Player Oxygen is enabled this effects how many base peices are allowed per Tank")]
+        public bool SmallBaseOxygenHardcore = false;
 
         [Toggle("PlaySFX")]
         public bool PlaySFX = true;

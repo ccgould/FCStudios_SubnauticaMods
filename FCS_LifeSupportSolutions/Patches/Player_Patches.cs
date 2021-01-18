@@ -1,8 +1,9 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
 using FCS_AlterraHub.Mono;
 using FCS_LifeSupportSolutions.Configuration;
 using FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Mono;
 using FCS_LifeSupportSolutions.Mods.EnergyPillVendingMachine.mono;
+using FCS_LifeSupportSolutions.Mods.OxygenTank.Mono;
 using FCSCommon.Utilities;
 using HarmonyLib;
 using UnityEngine;
@@ -54,13 +55,6 @@ namespace FCS_LifeSupportSolutions.Patches
 
                 var curBase = __instance.GetCurrentSub();
 
-                if (QPatch.BaseUtilityUnitConfiguration.SmallBaseOxygen)
-                {
-                    Int3 size = curBase.GetComponent<Base>().GetSize();
-                    if (size.x <= 4 && size.y == 1 && size.z <= 4)
-                        return true;
-                }
-
                 var manager = BaseManager.FindManager(curBase);
 
                 if (!IsThereAnyBaseUtilityUnitAttached(out __result, manager)) return false;
@@ -91,7 +85,7 @@ namespace FCS_LifeSupportSolutions.Patches
         {
             outResult = false;
 
-            var unitsAvailable = manager.GetDevicesCount(Mod.BaseUtilityUnitTabID) > 0;
+            var unitsAvailable = manager.GetDevicesCount(Mod.BaseUtilityUnitTabID) + manager.GetDevicesCount(Mod.BaseOxygenTankTabID) > 0;
 
             if (!unitsAvailable)
             {
@@ -101,72 +95,107 @@ namespace FCS_LifeSupportSolutions.Patches
             return true;
         }
 
-        private static bool PerformOxygenCheckForBases(Player instance, out bool outResult, BaseManager manager)
+        private static void PerformOxygenCheckForBases(Player instance, out bool outResult, BaseManager manager)
         {
             outResult = false;
+            float o2Available = instance.oxygenMgr.GetOxygenAvailable();
+            float o2Capacity = QPatch.IsRefillableOxygenTanksInstalled ? DefaultO2Level : Player.main.oxygenMgr.GetOxygenCapacity();
+
+            if (o2Available >= o2Capacity)
+                return;
+
+            if (TryAddOxygen(ref outResult, manager))
+                return;
+
+        }
+
+
+        private static bool TryAddOxygen(ref bool outResult, BaseManager manager)
+        {
+
             var baseUtilityUnits = manager.GetDevices(Mod.BaseUtilityUnitTabID);
-
-            if (QPatch.IsRefillableOxygenTanksInstalled && Player.main.oxygenMgr.HasOxygenTank())
+            foreach (var baseUnit in baseUtilityUnits)
             {
-                if (IsPlayerOxygenFullRtInstalled(instance)) return false;
-                
-                foreach (var baseUnit in baseUtilityUnits)
+                var utility = (BaseUtilityUnitController)baseUnit;
+
+                if (utility.OxygenManager.GetO2Level() <= 0 || !utility.IsOperational)
+                    continue;
+
+                var amount = _oxygenPerSecond * DayNightCycle.main.deltaTime;
+                var result = utility.OxygenManager.RemoveOxygen(amount);
+
+                if (result)
                 {
-
-                    var utility = (BaseUtilityUnitController) baseUnit;
-
-                    if (utility.OxygenManager.GetO2Level() <= 0 || !utility.IsOperational) continue;
-
-                    if (Player.main.oxygenMgr.GetOxygenAvailable() < DefaultO2Level)
-                    {
-                        var amount = _oxygenPerSecond * DayNightCycle.main.deltaTime;
-                        var result = utility.OxygenManager.RemoveOxygen(amount);
-
-                        if (result)
-                        {
-                            Player.main.oxygenMgr.AddOxygen(amount);
-                            outResult = true;
-                            return true;
-                        }
-                    }
-                }
-            }
-            else
-            {
-                if (IsPlayerOxygenFull(instance)) return true;
-
-                foreach (var baseUnit in baseUtilityUnits)
-                {
-                    var utility = (BaseUtilityUnitController)baseUnit;
-
-                    if (utility.OxygenManager.GetO2Level() <= 0 || !baseUnit.IsOperational) continue;
-
-                    if (Player.main.oxygenMgr.GetOxygenAvailable() < Player.main.oxygenMgr.GetOxygenCapacity())
-                    {
-                        var amount = _oxygenPerSecond * DayNightCycle.main.deltaTime;
-                        var result = utility.OxygenManager.RemoveOxygen(amount);
-                        if (result)
-                        {
-                            Player.main.oxygenMgr.AddOxygen(amount);
-                            outResult = true;
-                            return true;
-                        }
-                    }
+                    Player.main.oxygenMgr.AddOxygen(amount);
+                    outResult = true;
+                    return outResult;
                 }
             }
 
-            return false;
+            var baseOxygenTanks = manager.GetDevices(Mod.BaseOxygenTankTabID);
+            bool hardcore = QPatch.BaseUtilityUnitConfiguration.SmallBaseOxygenHardcore;
+
+            int bigRooms = 0;
+            int smallRooms = 0;
+
+            Base baseComponent = manager.Habitat.GetComponent<Base>();
+
+            foreach(Int3 cell in baseComponent.AllCells)
+            {
+                Base.CellType cellType = baseComponent.GetCell(cell);
+
+                switch (cellType)
+                {
+                    case Base.CellType.Corridor:
+                        smallRooms += 1;
+                        break;
+                    case Base.CellType.MapRoom:
+                        if (hardcore)
+                            bigRooms += 1;
+                        else
+                            smallRooms += 1;
+                        break;
+                    case Base.CellType.MapRoomRotated:
+                        if (hardcore)
+                            bigRooms += 1;
+                        else
+                            smallRooms += 1;
+                        break;
+                    case Base.CellType.Moonpool:
+                        bigRooms += 1;
+                        break;
+                    case Base.CellType.Room:
+                        bigRooms += 1;
+                        break;
+                }
+            }
+
+            int RequiredTankCount = (bigRooms / (hardcore ? 2 : 1)) + (smallRooms / (hardcore ? 4:10)) + (hardcore? 1: 0);
+
+
+            List<IPipeConnection> floaters = new List<IPipeConnection>();
+
+            int ActiveTankCount = 0;
+            foreach (var baseUnit in baseOxygenTanks)
+            {
+                var utility = baseUnit as BaseOxygenTankController;
+                var rootFloater = utility.GetRootOxygenProvider();
+                if (utility.IsOperational && rootFloater != null && rootFloater is PipeSurfaceFloater && rootFloater.GetProvidesOxygen() && !floaters.Contains(rootFloater))
+                {
+                    floaters.Add(rootFloater);
+                    ActiveTankCount++;
+                }
+            }
+
+            if (ActiveTankCount >= RequiredTankCount)
+            {
+                var amount = _oxygenPerSecond * DayNightCycle.main.deltaTime;
+                Player.main.oxygenMgr.AddOxygen(amount);
+                outResult = true;
+            }
+            return outResult;
         }
 
-        private static bool IsPlayerOxygenFullRtInstalled(Player instance)
-        {
-            return instance.oxygenMgr.GetOxygenAvailable() >= DefaultO2Level;
-        }
-
-        private static bool IsPlayerOxygenFull(Player instance)
-        {
-            return instance.oxygenMgr.GetOxygenAvailable() >= instance.oxygenMgr.GetOxygenCapacity();
-        }
 
         private static void GetDefaultO2Level(Player instance)
         {

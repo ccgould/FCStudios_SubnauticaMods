@@ -69,6 +69,9 @@ namespace FCS_LifeSupportSolutions.Mods.OxygenTank.Mono
                     //OxygenManager.SetO2Level(_savedData.O2Level);
                     _colorManager.ChangeColor(_savedData.Body.Vector4ToColor());
                     _colorManager.ChangeColor(_savedData.SecondaryBody.Vector4ToColor(), ColorTargetMode.Secondary);
+
+                    if (!string.IsNullOrEmpty(_savedData.ParentID) && UniqueIdentifier.TryGetIdentifier(_savedData.ParentID, out UniqueIdentifier uniqueIdentifier))
+                        _oxygenAttachPoint.SetParent(uniqueIdentifier.GetComponent<IPipeConnection>());
                 }
 
                 _runStartUpOnEnable = false;
@@ -189,6 +192,11 @@ namespace FCS_LifeSupportSolutions.Mods.OxygenTank.Mono
             }
         }
 
+        public IPipeConnection GetRootOxygenProvider()
+        {
+            return _oxygenAttachPoint.GetRoot();
+        }
+
         public void Save(SaveData newSaveData, ProtobufSerializer serializer = null)
         {
             if (!IsInitialized || !IsConstructed) return;
@@ -202,6 +210,7 @@ namespace FCS_LifeSupportSolutions.Mods.OxygenTank.Mono
             //_savedData.O2Level = OxygenManager.GetO2Level();
             _savedData.Body = _colorManager.GetColor().ColorToVector4();
             _savedData.SecondaryBody = _colorManager.GetSecondaryColor().ColorToVector4();
+            _savedData.ParentID = _oxygenAttachPoint.parentPipeUID;
             QuickLogger.Debug($"Saving ID {_savedData.Id}");
             newSaveData.BaseOxygenTankEntries.Add(_savedData);
         }

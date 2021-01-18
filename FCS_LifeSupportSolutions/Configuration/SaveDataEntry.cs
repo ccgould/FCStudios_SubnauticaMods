@@ -24,7 +24,7 @@ namespace FCS_LifeSupportSolutions.Configuration
         [JsonProperty] internal Vec4 Body { get; set; }
         [JsonProperty] internal Vec4 SecondaryBody { get; set; }
         [JsonProperty] internal float O2Level { get; set; }
-    }      
+    }
     internal class BaseOxygenTankEntry : ISaveDataEntry
     {
         public string Id { get; set; }
@@ -33,6 +33,7 @@ namespace FCS_LifeSupportSolutions.Configuration
         [JsonProperty] internal Vec4 Body { get; set; }
         [JsonProperty] internal Vec4 SecondaryBody { get; set; }
         [JsonProperty] internal float O2Level { get; set; }
+        [JsonProperty] internal string ParentID { get; set;}
     }    
     
     internal class MiniMedBayEntry : ISaveDataEntry
