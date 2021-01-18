@@ -157,11 +157,6 @@ namespace FCS_LifeSupportSolutions.Mods.OxygenTank.Mono
 
         public override bool CanDeconstruct(out string reason)
         {
-            if (_oxygenAttachPoint?.HasAttachment() ?? false)
-            {
-                reason = AuxPatchers.OxygenTankHasAttachment();
-                return false;
-            }
             reason = string.Empty;
             return true;
         }
@@ -194,7 +189,7 @@ namespace FCS_LifeSupportSolutions.Mods.OxygenTank.Mono
 
         public IPipeConnection GetRootOxygenProvider()
         {
-            return _oxygenAttachPoint.GetRoot();
+            return _oxygenAttachPoint.GetParent()?.GetRoot();
         }
 
         public void Save(SaveData newSaveData, ProtobufSerializer serializer = null)
@@ -299,11 +294,6 @@ namespace FCS_LifeSupportSolutions.Mods.OxygenTank.Mono
 
         public IPipeConnection GetRoot()
         {
-            UniqueIdentifier uniqueIdentifier;
-            if (!string.IsNullOrEmpty(this.rootPipeUID) && UniqueIdentifier.TryGetIdentifier(this.rootPipeUID, out uniqueIdentifier))
-            {
-                return uniqueIdentifier.GetComponent<IPipeConnection>();
-            }
             return null;
         }
 
