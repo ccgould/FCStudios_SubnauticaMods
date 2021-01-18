@@ -174,7 +174,7 @@ namespace FCS_LifeSupportSolutions.Patches
                 }
             }
 
-            float RequiredTankCount = (bigRooms / (hardcore ? 1 : 2)) + (smallRooms / (hardcore ? 4:10));
+            float RequiredTankCount = (float)Math.Round((bigRooms / (hardcore ? 1 : 2)) + (smallRooms / (hardcore ? 4:10)), 2);
 
 
             List<IPipeConnection> floaters = new List<IPipeConnection>();
