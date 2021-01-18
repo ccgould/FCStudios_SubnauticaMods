@@ -46,7 +46,7 @@ namespace FCS_LifeSupportSolutions.Mods.OxygenTank.Mono
 
 
                 this.parentPipeUID = gameObject.GetComponent<UniqueIdentifier>().Id;
-                this.rootPipeUID = ((oxygenPipe.GetRoot() != null) ? oxygenPipe.GetRoot().GetGameObject().GetComponent<UniqueIdentifier>().Id : null);
+                this.SetRoot(oxygenPipe.GetRoot());
                 this.parentPosition = oxygenPipe.GetAttachPoint();
                 oxygenPipe.AddChild(this);
             }
