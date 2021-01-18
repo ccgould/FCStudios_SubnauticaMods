@@ -192,7 +192,7 @@ namespace FCS_LifeSupportSolutions.Patches
             {
                 outResult = true;
             }
-            else
+            else if(RequiredTankCount-ActiveTankCount == 1)
             {
                 amount = 1.05f * DayNightCycle.main.deltaTime * ActiveTankCount / RequiredTankCount;
                 Player.main.oxygenMgr.AddOxygen(amount);
