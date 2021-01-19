@@ -159,6 +159,7 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
                         yield return getPrefab;
 
                         GameObject ingredientObject = Instantiate(getPrefab.GetResult());
+                        ingredientObject.SetActive(false);
                         if (!ingredientObject.GetComponent<LiveMixin>() && !ingredientObject.GetComponent<Plantable>() && !ingredientObject.GetComponent<Eatable>())
                         {
                             InventoryItem newInventoryItem = new InventoryItem(ingredientObject.GetComponent<Pickupable>());
