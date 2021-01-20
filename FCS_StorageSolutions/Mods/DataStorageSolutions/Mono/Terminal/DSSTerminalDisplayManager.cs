@@ -86,7 +86,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         private void UpdateDisplay()
         {
             if (_currentBase == null || Player.main.currentSub == null) return;
-            _itemGrid?.DrawPage();
             _baseName.text = _currentBase?.GetBaseName();
             _rackCountAmount.text = AuxPatchers.RackCountFormat(_currentBase?.BaseRacks.Count ?? 0);
             _serverAmount.text = AuxPatchers.ServerCountFormat(_currentBase?.BaseServers.Count ?? 0);
@@ -377,15 +376,22 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                     data.EndPosition = grouped.Count;
                 }
 
-                for (int i = data.EndPosition; i < data.MaxPerPage - 1; i++)
+                QuickLogger.Debug($"Resetting crafting buttons: {data.MaxPerPage}");
+                for (int i = 0; i < data.MaxPerPage; i++)
                 {
+                    QuickLogger.Debug($"Resetting index {i} out of {data.MaxPerPage}");
                     _inventoryButtons[i].Reset();
                 }
 
+                int w = 0;
+
                 for (int i = data.StartPosition; i < data.EndPosition; i++)
                 {
-                    _inventoryButtons[i].Set(grouped.ElementAt(i).Key, grouped.ElementAt(i).Value);
+                    _inventoryButtons[w++].Set(grouped.ElementAt(i).Key, grouped.ElementAt(i).Value);
                 }
+
+                _itemGrid.UpdaterPaginator(grouped.Count);
+                _paginatorController.ResetCount(_itemGrid.GetMaxPages());
 
             }
             catch (Exception e)
@@ -476,6 +482,11 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         public DSSTerminalController GetController()
         {
             return _mono;
+        }
+
+        public override void GoToPage(int index)
+        {
+            _itemGrid.DrawPage(index);
         }
     }
 }

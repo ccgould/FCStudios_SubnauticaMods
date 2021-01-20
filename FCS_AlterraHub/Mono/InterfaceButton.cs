@@ -11,7 +11,7 @@ namespace FCS_AlterraHub.Mono
     /// <summary>
     /// This class is a component for all interface buttons except the color picker and the paginator.
     /// </summary>
-    public class InterfaceButton : OnScreenButton, IPointerEnterHandler, IPointerClickHandler, IPointerExitHandler
+    public class InterfaceButton : OnScreenButton, IPointerEnterHandler, IPointerClickHandler, IPointerExitHandler, IPointerHoverHandler
     {
         #region Public Properties
 
@@ -395,6 +395,14 @@ namespace FCS_AlterraHub.Mono
                         _bgImage.color = new Color(STARTING_COLOR.r, STARTING_COLOR.g, STARTING_COLOR.b, 0);
                     }
                     break;
+            }
+        }
+
+        public void OnPointerHover(PointerEventData eventData)
+        {
+            if (!this.IsHovered)
+            {
+                OnPointerEnter(eventData);
             }
         }
     }

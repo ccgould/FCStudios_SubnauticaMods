@@ -7,8 +7,11 @@ using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
+using rail;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using UnityEngine.Video;
 using WorldHelpers = FCS_AlterraHub.Helpers.WorldHelpers;
 
 namespace FCS_AlterraHub.Mono.FCSPDA.Mono
@@ -41,6 +44,7 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
         private Text _currentBiome;
         private Text _accountName;
         private Text _accountBalance;
+        private bool _goToEncyclopedia;
 
 
         public bool isFocused => this.ui != null && this.ui.focused;
@@ -100,7 +104,12 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             _currentBiome = GameObjectHelpers.FindGameObject(gameObject, "BiomeLBL").GetComponent<Text>();
             _accountName = GameObjectHelpers.FindGameObject(gameObject, "UserName").GetComponent<Text>();
             _accountBalance = GameObjectHelpers.FindGameObject(gameObject, "AccountBalance").GetComponent<Text>();
-            
+            var vpb = GameObjectHelpers.FindGameObject(gameObject, "Progress").AddComponent<VideoProgressBar>();
+            vpb.VideoPlayer = gameObject.GetComponentInChildren<VideoPlayer>(); ;
+            var stopButton = GameObjectHelpers.FindGameObject(gameObject, "StopButton").GetComponent<Button>();
+            stopButton.onClick.AddListener((() => { vpb.Stop();}));
+            var canvas = gameObject.GetComponentInChildren<Canvas>();
+
             foreach (Transform invItem in GameObjectHelpers.FindGameObject(_baseInventory, "Grid").transform)
             {
                 var invButton = invItem.gameObject.EnsureComponent<DSSInventoryItem>();
@@ -144,8 +153,11 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
                 _baseInventory.SetActive(false);
             });
 
-
-            var basesButton = GameObjectHelpers.FindGameObject(gameObject, "BasesButton").GetComponent<Button>();
+            var baseBTNObj = GameObjectHelpers.FindGameObject(gameObject, "BasesButton");
+            var baseBTNToolTip =baseBTNObj.AddComponent<FCSToolTip>();
+            baseBTNToolTip.RequestPermission += () => true;
+            baseBTNToolTip.Tooltip = "Allows you to pull items from online bases requires connection chip";
+            var basesButton = baseBTNObj.GetComponent<Button>();
             basesButton.onClick.AddListener(() =>
             {
                 _bases.SetActive(true);
@@ -153,10 +165,15 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
                 _baseInventory.SetActive(false);
             });
 
-            var encyclopediaButton = GameObjectHelpers.FindGameObject(gameObject, "EncyclopediaButton").GetComponent<Button>();
+            var encyclopObj = GameObjectHelpers.FindGameObject(gameObject, "EncyclopediaButton");
+            var encyclopToolTip = encyclopObj.AddComponent<FCSToolTip>();
+            encyclopToolTip.Tooltip = "Opens the PDA to the encyclopedia tab";
+            encyclopToolTip.RequestPermission += () => true;
+            var encyclopediaButton = encyclopObj.GetComponent<Button>();
             encyclopediaButton.onClick.AddListener(() =>
             {
-                QuickLogger.ModMessage("Page Not Implemented");
+                Close();
+                _goToEncyclopedia = true;
             });
 
             var settingsButton = GameObjectHelpers.FindGameObject(gameObject, "SettingsButton").GetComponent<Button>();
@@ -271,6 +288,11 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             QuickLogger.Debug("FCS PDA Is Open", true);
         }
 
+        internal void OpenDeviceEncyclopedia(FCSEncyclopediaData data)
+        {
+            
+        }
+
         private void FindMesh()
         {
             if (Mesh == null)
@@ -316,7 +338,14 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             Inventory.main.quickSlots.Select(prevQuickSlot);
             gameObject.SetActive(false);
             SNCameraRoot.main.SetFov(0f);
+            OnClose?.Invoke();
+            if (_goToEncyclopedia)
+            {
+                Player.main.GetPDA().Open(PDATab.Encyclopedia);
+            }
         }
+
+        public Action OnClose { get; set; }
 
         private void FindPDA()
         {
@@ -352,7 +381,7 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
                     data.EndPosition = grouped.Count;
                 }
 
-                for (int i = data.EndPosition; i < data.MaxPerPage - 1; i++)
+                for (int i = 0; i < data.MaxPerPage; i++)
                 {
                     _inventoryButtons[i].Reset();
                 }
@@ -407,6 +436,14 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
                 QuickLogger.Error($"Error StackTrace: {e.StackTrace}");
             }
         }
+    }
+
+    public struct FCSEncyclopediaData
+    {
+        public string Title { get; set; }
+        public Image Image { get; set; }
+        public string Body { get; set; }
+        public string VideoLink { get; set; }
     }
 
     internal class DSSInventoryItem : InterfaceButton
@@ -510,6 +547,64 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
         internal void Show()
         {
             gameObject.SetActive(true);
+        }
+    }
+
+    public class VideoProgressBar : MonoBehaviour, IDragHandler, IPointerDownHandler
+    {
+        internal VideoPlayer VideoPlayer { get; set; }
+        [SerializeField]
+        private Camera camera;
+
+        private Image progress;
+        private void Awake()
+        {
+            camera = Player.main.viewModelCamera;
+            progress = GetComponent<Image>();
+        }
+
+        void Update()
+        {
+            if(VideoPlayer == null) return;
+            
+            VideoPlayer.playbackSpeed = Mathf.Approximately(DayNightCycle.main.deltaTime, 0f) ? 0 : 1;
+            
+            if (VideoPlayer.frameCount > 0)
+                progress.fillAmount = (float)VideoPlayer.frame / (float)VideoPlayer.frameCount;
+        }
+
+        public void OnDrag(PointerEventData eventData)
+        {
+            TrySkip(eventData);
+        }
+
+        public void OnPointerDown(PointerEventData eventData)
+        {
+            TrySkip(eventData);
+        }
+
+        private void TrySkip(PointerEventData eventData)
+        {
+            if(progress == null) return;
+            if (RectTransformUtility.ScreenPointToLocalPointInRectangle(progress.rectTransform, eventData.position, camera,
+                out var localPoint))
+            {
+                float pct = Mathf.InverseLerp(progress.rectTransform.rect.xMin, progress.rectTransform.rect.xMax,localPoint.x);
+                SkipToPercent(pct);
+            }
+        }
+
+        private void SkipToPercent(float pct)
+        {
+            if (VideoPlayer == null) return;
+            var frame = VideoPlayer.frameCount * pct;
+            VideoPlayer.frame = (long)frame;
+        }
+
+        public void Stop()
+        {
+            SkipToPercent(0);
+            progress.fillAmount = 0;
         }
     }
 }

@@ -20,7 +20,7 @@ namespace FCS_EnergySolutions.AlterraGen.Buildables
     {
         private GameObject _prefab;
 
-        public AlterraGenBuildable() : base(Mod.AlterraGenModClassName, Mod.AlterraGenModFriendlyName, Mod.ModDescription)
+        public AlterraGenBuildable() : base(Mod.AlterraGenModClassName, Mod.AlterraGenModFriendlyName, Mod.AlterraGenModDescription)
         {
             _prefab = ModelPrefab.GetPrefab(Mod.AlterraGenModPrefabName);
 

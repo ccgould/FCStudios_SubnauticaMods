@@ -33,12 +33,13 @@ namespace FCS_EnergySolutions.Configuration
         internal const string AlterraGenModTabID = "AG";
         internal const string AlterraGenModFriendlyName = "Alterra Gen";
         internal const string AlterraGenModName = "AlterraGen";
+        internal const string AlterraGenModDescription = "Versatile bio-reactor holding 9 biological items of any size, suitable for interior and exterior use.";
         internal static string AlterraGenKitClassID => $"{AlterraGenModName}_Kit";
         internal static string AlterraGenModClassName => AlterraGenModName;
         internal static string AlterraGenModPrefabName => AlterraGenModName;
 
         internal const string JetStreamT242TabID = "MT";
-        internal const string JetStreamT242Description = "The Jet Stream T242 provides power by using the water current.The faster the turbine spins the more power output";
+        internal const string JetStreamT242Description = "The T242 turbine generates power from water currents, automatically adjusting  for optimal power generation. Note that some biomes may have stronger currents than others.";
         internal const string JetStreamT242FriendlyName = "JetStreamT242";
         internal const string JetStreamT242ModName = "JetStreamT242";
         internal const string JetStreamT242ClassName = "JetStreamT242";
@@ -46,7 +47,7 @@ namespace FCS_EnergySolutions.Configuration
         internal static string JetStreamT242PrefabName => JetStreamT242ModName;
 
         internal const string PowerStorageTabID = "PS";
-        internal const string PowerStorageDescription = "PowerStorage allows you to charge your powercells and use your powercells as a for of backup power to supply your base with emergency power.";
+        internal const string PowerStorageDescription = "Holds up to 10 Power Cells. Drains cells when Base Power is low, Recharges cells when Base Power is plentiful. Swap Power Cells at any time.";
         internal const string PowerStorageFriendlyName = "PowerStorage";
         internal const string PowerStorageModName = "PowerStorage";
         internal const string PowerStorageClassName = "PowerStorage";

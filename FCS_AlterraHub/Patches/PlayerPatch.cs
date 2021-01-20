@@ -1,6 +1,7 @@
 ﻿using System;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
+using FCS_AlterraHub.Managers.Quests;
 using FCS_AlterraHub.Mono.FCSPDA.Mono;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
@@ -41,6 +42,20 @@ namespace FCS_AlterraHub.Patches
     //    }
     //}
 
+
+    [HarmonyPatch(typeof(Player))]
+    [HarmonyPatch("Awake")]
+    internal static class Player_Awaker_Patch
+    {
+        [HarmonyPostfix]
+        private static void Postfix(Player __instance)
+        {
+            if (QPatch.QuestManagerGM == null)
+            {
+                QPatch.QuestManagerGM = new GameObject("QuestManager").AddComponent<QuestManager>();
+            }
+        }
+    }
 
     [HarmonyPatch(typeof(Player))]
     [HarmonyPatch("Update")]

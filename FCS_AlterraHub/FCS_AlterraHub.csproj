@@ -88,6 +88,9 @@
     <Reference Include="UnityEngine.AssetBundleModule">
       <HintPath>..\Dependancies\UnityEngine.AssetBundleModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.AudioModule">
+      <HintPath>F:\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\Dependancies\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
@@ -110,6 +113,9 @@
     <Reference Include="UnityEngine.UIModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Dependancies\UnityEngine.UIModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.VideoModule">
+      <HintPath>F:\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\UnityEngine.VideoModule.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -145,6 +151,11 @@
     <Compile Include="Interfaces\IFCSGrowBed.cs" />
     <Compile Include="Interfaces\ISlotController.cs" />
     <Compile Include="Managers\FCSPowerManager.cs" />
+    <Compile Include="Managers\Quests\Quest.cs" />
+    <Compile Include="Managers\Quests\QuestEvent.cs" />
+    <Compile Include="Managers\Quests\QuestLocation.cs" />
+    <Compile Include="Managers\Quests\QuestManager.cs" />
+    <Compile Include="Managers\Quests\QuestPath.cs" />
     <Compile Include="Model\AdditionalColor.cs" />
     <Compile Include="Model\EatableEntities.cs" />
     <Compile Include="Model\FCSGrowingPlant.cs" />

@@ -79,7 +79,7 @@ namespace FCS_AlterraHub.Mono
 
             isHoveredOutOfRange = true;
         }
-
+        
         public virtual void OnPointerExit(PointerEventData eventData)
         {
             this.IsHovered = false;

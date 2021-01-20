@@ -34,7 +34,7 @@ namespace FCS_ProductionSolutions.Configuration
         internal const string HydroponicHarvesterModTabID = "HH";
         internal const string HydroponicHarvesterModFriendlyName = "Hydroponic Harvester";
         internal const string HydroponicHarvesterModName = "HydroponicHarvester";
-        public const string HydroponicHarvesterModDescription = "A hydroponic harvester that allows you to store 3 DNA samples to clone.";
+        public const string HydroponicHarvesterModDescription = "3 chambers for growing DNA Samples scanned by the Matter Analyzer. Suitable for interior and exterior use.";
         internal static string HydroponicHarvesterKitClassID => $"{HydroponicHarvesterModName}_Kit";
         internal static string HydroponicHarvesterModClassName => HydroponicHarvesterModName;
         internal static string HydroponicHarvesterModPrefabName => HydroponicHarvesterModName;
@@ -42,7 +42,7 @@ namespace FCS_ProductionSolutions.Configuration
         internal const string MatterAnalyzerTabID = "MA";
         internal const string MatterAnalyzerFriendlyName = "Matter Analyzer";
         internal const string MatterAnalyzerModName = "MatterAnalyzer";
-        public const string MatterAnalyzerDescription = "A device that scans items and learns its matter makeup.";
+        public const string MatterAnalyzerDescription = "Builds detailed scans of material for duplication in the Replicator and Hydroponic Harvester.";
         internal static string MatterAnalyzerKitClassID => $"{MatterAnalyzerModName}_Kit";
         internal static string MatterAnalyzerClassName => MatterAnalyzerModName;
         internal static string MatterAnalyzerPrefabName => MatterAnalyzerModName;
@@ -50,7 +50,7 @@ namespace FCS_ProductionSolutions.Configuration
         internal const string ReplicatorTabID = "RM";
         internal const string ReplicatorFriendlyName = "Replicator";
         internal const string ReplicatorModName = "Replicator";
-        public const string ReplicatorDescription = "A device replicates gasopods and stalker teeth once scanned by the matter analyzer.";
+        public const string ReplicatorDescription = "Duplicates non-living material scanned by the Matter Analyzer.";
         internal static string ReplicatorKitClassID => $"{ReplicatorModName}_Kit";
         internal static string ReplicatorClassName => ReplicatorModName;
         internal static string ReplicatorPrefabName => "Replica-Fabricator";
@@ -62,7 +62,7 @@ namespace FCS_ProductionSolutions.Configuration
         internal static string DeepDrillerMk3KitClassID => $"{DeepDrillerMk3ClassName}_Kit";
         internal const string DeepDrillerMk3ClassName = "DeepDrillerMk3";
         internal const string DeepDrillerMk3PrefabName = "DeepDrillerMK3";
-        internal const string DeepDrillerMk3Description = "Let's dig down to the deep down deep dark! A deep driller allows you to collect specific ores from biomes.";
+        internal const string DeepDrillerMk3Description = "Automated drill platform suitable for all biomes with integrated solar and thermal generators. Requires lubricant.";
         internal const string SandSpawnableClassID = "Sand_DD";
 
         internal static TechType GetSandBagTechType()

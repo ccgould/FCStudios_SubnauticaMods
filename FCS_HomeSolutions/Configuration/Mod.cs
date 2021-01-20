@@ -50,33 +50,33 @@ namespace FCS_HomeSolutions.Configuration
         
         internal const string PaintToolClassID = "PaintTool";
         internal const string PaintToolFriendly = "Alterra Paint Tool";
-        internal const string PaintToolDescription = "Change the color of FCStudios mods";
+        internal const string PaintToolDescription = "Change the color of Primary and Secondary surfaces, and LED lights (requires Paint Can). Only suitable for Alterra FCStudios products.";
         internal const string PaintToolPrefabName = "PaintTool";
         internal const string PaintToolKitClassID = "PaintTool_Kit";
 
         internal const string BaseOperatorClassID = "BaseOperator";
         internal const string BaseOperatorFriendly = "Alterra Base Operator";
-        internal const string BaseOperatorDescription = "Control your base from one giant screen";
+        internal const string BaseOperatorDescription = "Controls various Base functions (Lights, Beacon, Power, etc, etc)";
         internal const string BaseOperatorPrefabName = "BaseOperator";
         internal const string BaseOperatorKitClassID = "BaseOperator_Kit";
         internal const string BaseOperatorTabID = "BO";
 
         internal const string HoverLiftPadClassID = "HoverLiftPad";
         internal const string HoverLiftPadFriendly = "Alterra Hover Lift Pad";
-        internal const string HoverLiftPadDescription = "Get from one platform to the other with ease and why not bring your prawn suit with you";
+        internal const string HoverLiftPadDescription = "Get from one elevation to the next with ease. Een your PRAWN suit along so you don’t get lonely.";
         internal const string HoverLiftPrefabName = "HoverLiftPad";
         internal static string HoverLiftPadKitClassID = $"{HoverLiftPadClassID}_Kit";
         internal const string HoverLiftPadTabID = "HLP";
 
         internal const string SmartPlanterPotClassID = "SmartPlanterPot";
         internal const string SmartPlanterPotFriendly = "Smart Planter Pot";
-        internal static string SmartPlanterPotDescription { get; } = "Just like another other planter but with color changing abilities.";
+        internal static string SmartPlanterPotDescription { get; } = "All drinks are on the house. (Drinks not included)";
         internal const string SmartPlanterPotPrefabName = "SmartPlanterPot";
         internal static string SmartPlanterPotKitClassID = $"{SmartPlanterPotClassID}_Kit";
         internal const string SmartPlanterPotTabID = "SMP";
         
         internal const string MiniFountainFilterClassID = "MiniFountainFilter";
-        internal const string MiniFountainFilterFriendly = "Mini Fountain Filter";
+        internal const string MiniFountainFilterFriendly = "Mini Filter & Fountain";
         internal const string MiniFountainFilterDescription = "A smaller water filtration system for your base or cyclops.";
         internal const string MiniFountainFilterPrefabName = "MiniFountainFilter";
         internal static string MiniFountainFilterKitClassID = $"{MiniFountainFilterClassID}_Kit";
@@ -84,41 +84,41 @@ namespace FCS_HomeSolutions.Configuration
 
         internal const string SeaBreezeClassID = "Seabreeze";
         internal const string SeaBreezeFriendly = "Seabreeze";
-        internal const string SeaBreezeDescription = "Alterra Refrigeration Sea Breeze will keep your items fresh longer!";
+        internal const string SeaBreezeDescription = "Refrigeration unit for perishable food and cool, refreshing water.";
         internal const string SeaBreezePrefabName = "SeaBreezeFCS32";
         internal static string SeaBreezeKitClassID = $"{SeaBreezeClassID}_Kit";
         internal const string SeaBreezeTabID = "SB";
 
         internal const string QuantumTeleporterClassID = "QuantumTeleporter";
         internal const string QuantumTeleporterFriendly = "Quantum Teleporter";
-        internal const string QuantumTeleporterDescription = "A teleporter that allows you to teleport from one base to another.";
+        internal const string QuantumTeleporterDescription = "Teleport to other Quantum Teleporter units inside your base or to an entirely different base.";
         internal const string QuantumTeleporterPrefabName = "QuantumTeleporter";
         internal static string QuantumTeleporterKitClassID = $"{QuantumTeleporterClassID}_Kit";
         internal const string QuantumTeleporterTabID = "QT";        
         
         internal const string AlienChefClassID = "AlienChef";
         internal const string AlienChefFriendly = "Alien Chef";
-        internal const string AlienChefDescription = "An easy way to cook surplus of food";
+        internal const string AlienChefDescription = "Forget the Fabricator: let the Alien Chef do the cooking and curing for you. 200 cooked fish for a party? No problem!";
         internal const string AlienChefPrefabName = "AlienChef";
         internal static string AlienChiefKitClassID = $"{AlienChefClassID}_Kit";
         internal const string AlienChiefTabID = "AC";
 
         internal const string Cabinet1ClassID = "CabinetWide";
-        internal const string Cabinet1Friendly = "Cabinet Wide";
+        internal const string Cabinet1Friendly = "Wide Floor Cabinet";
         internal const string Cabinet1Description = "A stylish furniture piece for storage and decoration";
         internal const string Cabinet1PrefabName = "Cabinet_01";
         internal static string Cabinet1KitClassID = $"{Cabinet1ClassID}_Kit";
         internal const string CabinetTabID = "CB";
 
         internal const string Cabinet2ClassID = "CabinetMediumTall";
-        internal const string Cabinet2Friendly = "Cabinet Medium Tall";
+        internal const string Cabinet2Friendly = "Medium Vertical Cabinet";
         internal const string Cabinet2Description = "A stylish furniture piece for storage and decoration";
         internal const string Cabinet2PrefabName = "Cabinet_02";
         internal static string Cabinet2KitClassID = $"{Cabinet2ClassID}_Kit";
 
 
         internal const string Cabinet3ClassID = "CabinetTall";
-        internal const string Cabinet3Friendly = "CabinetTall";
+        internal const string Cabinet3Friendly = "Tall Vertical Cabinet";
         internal const string Cabinet3Description = "A stylish furniture piece for storage and decoration";
         internal const string Cabinet3PrefabName = "Cabinet_03";
         internal static string Cabinet3KitClassID = $"{Cabinet3ClassID}_Kit";
@@ -127,18 +127,18 @@ namespace FCS_HomeSolutions.Configuration
 
         internal const string PaintCanClassID = "PaintCan";
         internal const string PaintCanFriendly = "Paint Can";
-        internal const string PaintCanDescription = "More paint for you paint tool. Use the paint can to allow you to paint devices with your paint tool";
+        internal const string PaintCanDescription = "Plug into your Paint Tool to color FCStudios Appliances, Furniture, Machines, and LED Lights";
         internal const string PaintCanPrefabName = "PaintCan";
 
         internal const string EmptyObservationTankClassID = "EmptyObservationTank";
-        internal const string EmptyObservationTankFriendly = "Empty Observation Tank";
-        internal const string EmptyObservationTankDescription = "A tank that allows you to view items";
+        internal const string EmptyObservationTankFriendly = "Observation Tank";
+        internal const string EmptyObservationTankDescription = "A tank with something to observe. A perfect object for Tables, Cabinets, and Shelves of all kinds.";
         internal const string EmptyObservationTankPrefabName = "ObservationTank";
         public static string EmptyObservationTankKitClassID = $"{EmptyObservationTankClassID}_kit";
 
         internal const string AlterraMiniBathroomClassID = "AlterraMiniBathroom";
         internal const string AlterraMiniBathroomFriendly = "Alterra Mini Bathroom";
-        internal const string AlterraMiniBathroomDescription = "A bathroom for all your humanly needs";
+        internal const string AlterraMiniBathroomDescription = "A lavatory and shower for convenient hygiene.";
         internal const string AlterraMiniBathroomPrefabName = "AlterraMiniBathroom";
         public static string AlterraMiniBathroomKitClassID = $"{AlterraMiniBathroomClassID}_kit";
 

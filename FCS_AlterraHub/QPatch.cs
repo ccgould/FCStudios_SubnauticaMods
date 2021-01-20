@@ -5,6 +5,7 @@ using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Craftables;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Managers.Quests;
 using FCS_AlterraHub.Objects;
 using FCS_AlterraHub.Patch;
 using FCS_AlterraHub.Patches;
@@ -56,6 +57,8 @@ namespace FCS_AlterraHub
             //Register debug commands
             ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));
         }
+
+        public static QuestManager QuestManagerGM { get; internal set; }
 
         public static FCSHUD HUD { get; set; }
         public static bool IsDockedVehicleStorageAccessInstalled { get; set; }

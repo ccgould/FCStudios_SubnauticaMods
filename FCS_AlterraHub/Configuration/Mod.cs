@@ -45,14 +45,13 @@ namespace FCS_AlterraHub.Configuration
 
         internal const string BioFuelClassID = "FCSBioFuel";
         internal const string BioFuelFriendly = "Bio Fuel";
-        internal const string BioFuelDescription = "A tank of bio fuel to be used in bio reactors";
+        internal const string BioFuelDescription = "A tank of high-quality Bio Fuel, suitable for use in all Bioreactors.";
         internal const string BioFuelPrefabName = "Liquid_Biofuel";
 
         internal const string OreConsumerClassID = "OreConsumer";
         internal const string OreConsumerFriendly = "Alterra Ore Consumer";
-        internal const string OreConsumerDescription = "Ore consumer yum yum give me more.The Ore consumer takes your ores and turns it into money.";
+        internal const string OreConsumerDescription = " Turns your ores into credits to use at the Alterra Hub. The Ore Consumer is always very hungry: keep it well fed.";
         internal const string OreConsumerPrefabName = "OreConsumer";
-        internal const string OreConsumerKitClassID = "OreConsumer_Kit";
         internal const string OreConsumerTabID = "OC";
 
         internal static TechType OreConsumerTechType { get; set; }

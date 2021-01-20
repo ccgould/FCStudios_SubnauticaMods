@@ -123,6 +123,14 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             {
                 _display = gameObject.EnsureComponent<DSSTerminalDisplayManager>();
             }
+
+            IPCMessage += s =>
+            {
+                if (s.Equals("ItemUpdateDisplay"))
+                {
+                    _display.Refresh();
+                }
+            };
             InvokeRepeating(nameof(UpdateScreenState), 1, 1);
             IsInitialized = true;
 

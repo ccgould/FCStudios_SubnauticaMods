@@ -175,7 +175,7 @@ namespace FCS_HomeSolutions
             var longLight = new LedLightPatch(new LedLightData
             {
                 classId = "LedLightStickLong",
-                description = "A long led light stick for external use on your base exterior with color changing.",
+                description = "A long LED light stick, suitable for interior and exterior use. (Change the color with the Paint Tool)",
                 friendlyName = "Long Led Light Stick",
                 allowedInBase = true,
                 allowedInSub = false,
@@ -194,7 +194,7 @@ namespace FCS_HomeSolutions
             var shortLight = new LedLightPatch(new LedLightData
             {
                 classId = "LedLightStickShort",
-                description = "A long led light stick for external use on your base exterior with color changing.",
+                description = "A short LED light stick, suitable for interior and exterior use. (Change the color with the Paint Tool)",
                 friendlyName = "Short Led Light Stick",
                 allowedInBase = true,
                 allowedInSub = true,
@@ -213,8 +213,7 @@ namespace FCS_HomeSolutions
             var wallLight = new LedLightPatch(new LedLightData
             {
                 classId = "LedLightStickWall",
-                description =
-                    "A wall mountable led light strip for internal use on your base exterior with color changing.",
+                description = "A wall mountable LED light strip. (Change the color with the Paint Tool) (Interior use only)",
                 friendlyName = "Wall Mountable Led Light Strip",
                 allowedInBase = true,
                 allowedInSub = true,
@@ -297,7 +296,7 @@ namespace FCS_HomeSolutions
             ahssmallrailglass.Patch();
 
             var ahssmallstairplatform = new DecorationEntryPatch("ahssmallstairplatform", "Small Stair Platform",
-                "A stairs for your personal needs.", ModelPrefab.GetPrefab("Small_PlatformDoorStairs"),
+                "A small set of stairs so you don’t bang your knees.", ModelPrefab.GetPrefab("Small_PlatformDoorStairs"),
                 new Settings
                 {
                     KitClassID = "ahssmallstairplatform_kit",
@@ -341,7 +340,7 @@ namespace FCS_HomeSolutions
             //    });
             //ahslargerailmesh.Patch();
 
-            var floorShelf01 = new DecorationEntryPatch("floorShelf01", "Floor Shelf 1", "A neat shelf",
+            var floorShelf01 = new DecorationEntryPatch("floorShelf01", "Floor Shelf 1", "Don’t put your things on the floor, put them on this lovely shelf!",
                 ModelPrefab.GetPrefab("FloorShelf01"),
                 new Settings
                 {
@@ -358,7 +357,7 @@ namespace FCS_HomeSolutions
                 });
             floorShelf01.Patch();
 
-            var floorShelf02 = new DecorationEntryPatch("floorShelf02", "Floor Shelf 2", "A neat shelf",
+            var floorShelf02 = new DecorationEntryPatch("floorShelf02", "Floor Shelf 2", "Don’t put your things on the floor, put them on this lovely shelf!",
                 ModelPrefab.GetPrefab("FloorShelf02"),
                 new Settings
                 {
@@ -374,7 +373,7 @@ namespace FCS_HomeSolutions
                 });
             floorShelf02.Patch();
 
-            var floorShelf03 = new DecorationEntryPatch("floorShelf03", "Floor Shelf 3", "A neat shelf",
+            var floorShelf03 = new DecorationEntryPatch("floorShelf03", "Floor Shelf 3", "Don’t put your things on the floor, put them on this lovely shelf!",
                 ModelPrefab.GetPrefab("FloorShelf03"),
                 new Settings
                 {
@@ -392,7 +391,7 @@ namespace FCS_HomeSolutions
             floorShelf03.Patch();
 
 
-            var floorShelf04 = new DecorationEntryPatch("floorShelf04", "Floor Shelf 4", "A neat shelf",
+            var floorShelf04 = new DecorationEntryPatch("floorShelf04", "Floor Shelf 4", "Don’t put your things on the floor, put them on this lovely shelf!",
                 ModelPrefab.GetPrefab("FloorShelf04"),
                 new Settings
                 {
@@ -409,7 +408,7 @@ namespace FCS_HomeSolutions
                 });
             floorShelf04.Patch();
 
-            var floorShelf05 = new DecorationEntryPatch("floorShelf05", "Floor Shelf 5", "A neat shelf",
+            var floorShelf05 = new DecorationEntryPatch("floorShelf05", "Floor Shelf 5", "Don’t put your things on the floor, put them on this lovely shelf!",
                 ModelPrefab.GetPrefab("FloorShelf05"),
                 new Settings
                 {
@@ -426,7 +425,7 @@ namespace FCS_HomeSolutions
                 });
             floorShelf05.Patch();
 
-            var floorShelf06 = new DecorationEntryPatch("floorShelf06", "Floor Shelf 6", "A neat shelf",
+            var floorShelf06 = new DecorationEntryPatch("floorShelf06", "Floor Shelf 6", "Don’t put your things on the floor, put them on this lovely shelf!",
                 ModelPrefab.GetPrefab("FloorShelf06"),
                 new Settings
                 {
@@ -444,7 +443,7 @@ namespace FCS_HomeSolutions
             floorShelf06.Patch();
 
 
-            var floorShelf07 = new DecorationEntryPatch("floorShelf07", "Floor Shelf 7", "A neat shelf",
+            var floorShelf07 = new DecorationEntryPatch("floorShelf07", "Floor Shelf 7", "Don’t put your things on the floor, put them on this lovely shelf!",
                 ModelPrefab.GetPrefab("FloorShelf07"),
                 new Settings
                 {
@@ -461,7 +460,7 @@ namespace FCS_HomeSolutions
                 });
             floorShelf07.Patch();
 
-            var tableSmartTV = new TVPatch("tableSmartTV", "Table Smart TV", "Table Smart TV",
+            var tableSmartTV = new TVPatch("tableSmartTV", "Smart TV w/ Wall Mount", "Take a little break and watch some TV. Includes Table Mount.",
                 ModelPrefab.GetPrefab("TableSmartTV"),
                 new Settings
                 {
@@ -477,7 +476,7 @@ namespace FCS_HomeSolutions
                 });
             tableSmartTV.Patch();
 
-            var mountSmartTV = new TVPatch("mountSmartTV", "Mount Smart TV", "Wall Mounted Smart TV",
+            var mountSmartTV = new TVPatch("mountSmartTV", "Smart TV w/ Stand", "Take a little break and watch some TV. Includes Wall Mount.",
                 ModelPrefab.GetPrefab("MountSmartTV"),
                 new Settings
                 {
@@ -494,7 +493,7 @@ namespace FCS_HomeSolutions
                 });
             mountSmartTV.Patch();
 
-            var neonShelf01 = new DecorationEntryPatch("neonShelf01", "Neon Shelf 01", "A neat shelf",
+            var neonShelf01 = new DecorationEntryPatch("neonShelf01", "Neon Shelf 01", "A shelf with neon lights. (Paint Tool Recommended)",
                 ModelPrefab.GetPrefab("NeonShelf01"),
                 new Settings
                 {
@@ -513,7 +512,7 @@ namespace FCS_HomeSolutions
             neonShelf01.Patch();
 
 
-            var neonTable01 = new DecorationEntryPatch("neonTable01", "Neon Table 01", "A table",
+            var neonTable01 = new DecorationEntryPatch("neonTable01", "Neon Table 01", "A table with neon lights. (Paint Tool Recommended)",
                 ModelPrefab.GetPrefab("NeonTable01"),
                 new Settings
                 {
@@ -530,7 +529,7 @@ namespace FCS_HomeSolutions
                 });
             neonTable01.Patch();
 
-            var neonTable02 = new DecorationEntryPatch("neonTable02", "Neon Table 02", "A table",
+            var neonTable02 = new DecorationEntryPatch("neonTable02", "Neon Table 02", "A table with neon lights. (Paint Tool Recommended)",
                 ModelPrefab.GetPrefab("NeonTable02"),
                 new Settings
                 {
@@ -592,7 +591,7 @@ namespace FCS_HomeSolutions
 
         private void LoadSigns()
         {
-            var wallSign = new SignEntryPatch("wallSign", "Wall Sign", "A sign to place around your base",
+            var wallSign = new SignEntryPatch("wallSign", "Wall Sign", "Wall-mounted sign, suitable for use indoors. Requires a wall.",
                 ModelPrefab.GetPrefab("AlterraWallSign"),
                 new Settings
                 {
@@ -610,7 +609,7 @@ namespace FCS_HomeSolutions
                 });
             wallSign.Patch();
 
-            var outsideSign = new SignEntryPatch("outsideSign", "Outside Sign", "A sign to place outside your base",
+            var outsideSign = new SignEntryPatch("outsideSign", "Outside Sign", "Freestanding sign, suitable for outside use.",
                 ModelPrefab.GetPrefab("AlterraOutsideSign"),
                 new Settings
                 {

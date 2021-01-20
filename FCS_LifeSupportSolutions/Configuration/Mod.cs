@@ -29,7 +29,7 @@ namespace FCS_LifeSupportSolutions.Configuration
         internal const string EnergyPillVendingMachineTabID = "EPV";
         internal const string EnergyPillVendingMachineFriendlyName = "Energy Pill Vending Machine";
         internal const string EnergyPillVendingMachineName = "EnergyPillVendingMachine";
-        internal const string EnergyPillVendingMachineDescription = "The Energy Pill Vending Machine allows you to get energy pills that gives you a boost of adrenaline in those times hunger and water lack.";
+        internal const string EnergyPillVendingMachineDescription = "Vending Machine for Alterra Energy Pills. Get the performance boost you need when you’re extremely hungry or thirsty.";
         internal static string EnergyPillVendingMachineKitClassID => $"{EnergyPillVendingMachineName}_Kit";
         internal static string EnergyPillVendingMachineClassName => EnergyPillVendingMachineName;
         internal static string EnergyPillVendingMachinePrefabName => "EnergyPillVendingMachine";
@@ -37,7 +37,7 @@ namespace FCS_LifeSupportSolutions.Configuration
         internal const string MiniMedBayTabID = "MMB";
         internal const string MiniMedBayFriendlyName = "Mini Med Bay";
         internal const string MiniMedBayName = "MiniMedBay";
-        internal const string MiniMedBayDescription = "The MiniMedBay is a medical bay that heals you with the little cost of power. Get your life recharged.";
+        internal const string MiniMedBayDescription = "Autonomous Medical Bay for rapid diagnosis and healing. This model contains an integrated 6-slot Medical Kit Fabricator.";
         internal static string MiniMedBayKitClassID => $"{MiniMedBayClassName}_Kit";
         internal static string MiniMedBayClassName => MiniMedBayName;
         internal static string MiniMedBayPrefabName => MiniMedBayName;
@@ -45,14 +45,14 @@ namespace FCS_LifeSupportSolutions.Configuration
         internal const string BaseUtilityUnitTabID = "BUU";
         internal const string BaseUtilityUnitFriendlyName = "Base Utility Unit";
         internal const string BaseUtilityUnitName = "BaseUtilityUnit";
-        internal const string BaseUtilityUnitDescription = "The Base Utility Unity provides oxygen and water to your base. Mini fountain filter benefits from this by using the water for use above the water line";
+        internal const string BaseUtilityUnitDescription = "Supplies Oxygen and pressurized Water to your entire base. With pressurized water, the Mini Fountain Filter can operate at any height above the water line.";
         internal static string BaseUtilityUnityKitClassID => $"{BaseUtilityUnitName}_Kit";
         internal static string BaseUtilityUnityClassName => BaseUtilityUnitName;
         internal static string BaseUtilityUnityPrefabName => BaseUtilityUnitName;
 
         internal const string BaseOxygenTankClassID = "BaseOxygenTank";
         internal const string BaseOxygenTankFriendly = "Base Oxygen Tank";
-        internal const string BaseOxygenTankDescription = "Provide your base with oxygen in the early stages of you stay here on Plant 4546B";
+        internal const string BaseOxygenTankDescription = "Provides pressurized oxygen when connected to surface air. Designed for small habitats; larger habitats may require more units.";
         internal const string BaseOxygenTankPrefabName = "oxTank";
         internal const string BaseOxygenTankKitClassID = "BaseOxygenTank_Kit";
         internal const string BaseOxygenTankTabID = "OXT";

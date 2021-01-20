@@ -218,6 +218,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
                 QuickLogger.Debug($"Resetting crafting buttons: {data.MaxPerPage}");
                 for (int i = 0; i < data.MaxPerPage; i++)
                 {
+                    QuickLogger.Debug($"Resetting index {i} out of {data.MaxPerPage}");
                     _craftingButtons[i].Reset();
                 }
 

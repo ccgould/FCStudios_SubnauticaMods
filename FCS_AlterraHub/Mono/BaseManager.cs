@@ -564,6 +564,7 @@ namespace FCS_AlterraHub.Mono
                 
             }
 
+            GlobalNotifyByID("DSS","ItemUpdateDisplay");GlobalNotifyByID("DSS","ItemUpdateDisplay");
 
             return null;
         }
@@ -674,6 +675,8 @@ namespace FCS_AlterraHub.Mono
                     });
                 }
             }
+
+            GlobalNotifyByID("DSS", "ItemUpdateDisplay");
         }
 
         public void RemoveItemsFromTracker(FcsDevice server, TechType item, int amountToRemove = 1)
@@ -700,6 +703,8 @@ namespace FCS_AlterraHub.Mono
                         trackedResource.Servers.Remove(server);
                     }
                 }
+
+                GlobalNotifyByID("DSS", "ItemUpdateDisplay");
             }
         }
 
@@ -715,6 +720,7 @@ namespace FCS_AlterraHub.Mono
             server.OnRemoveItem -= OnServerRemoveItem;
             BaseServers.Remove(server);
             //BaseManager.SetAllowedToNotify(true);
+            GlobalNotifyByID("DSS", "ItemUpdateDisplay");
         }
 
         public void RegisterServerInBase(FcsDevice server)
@@ -730,6 +736,7 @@ namespace FCS_AlterraHub.Mono
                 server.OnAddItem += OnServerAddItem;
                 server.OnRemoveItem += OnServerRemoveItem;
                 //BaseManager.SetAllowedToNotify(true);
+                GlobalNotifyByID("DSS", "ItemUpdateDisplay");
             }
         }
 
@@ -845,6 +852,7 @@ namespace FCS_AlterraHub.Mono
                         trackedResource.StorageContainers.Remove(sc);
                     }
                 }
+                GlobalNotifyByID("DSS", "ItemUpdateDisplay");
             }
         }
 
@@ -874,8 +882,8 @@ namespace FCS_AlterraHub.Mono
                         sc
                     }
                 });
-                //BaseManager.SendNotification();
             }
+            GlobalNotifyByID("DSS", "ItemUpdateDisplay");
         }
 
         #endregion

@@ -21,7 +21,7 @@ namespace FCS_HomeSolutions.TrashReceptacle.Buildable
         public override TechCategory CategoryForPDA => TechCategory.InteriorModule;
         public override string AssetsFolder => Mod.GetAssetPath();
 
-        public CurtainPatch() : base("Curtain", "Curtain","Get some privacy from all the fish that steer at you.")
+        public CurtainPatch() : base("Curtain", "Curtain", "Get a little privacy from all those fish staring at you or block out the sun so you can sleep in.")
         {
 
             OnStartedPatching += () =>

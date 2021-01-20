@@ -38,13 +38,13 @@ namespace FCS_StorageSolutions.Configuration
         internal static string AlterraStorageKitClassID => $"{AlterraStorageClassName}_Kit";
         internal const string AlterraStorageClassName = "AlterraStorage";
         internal const string AlterraStoragePrefabName = "AlterraStorage";
-        internal const string AlterraStorageDescription = "Extra storage for you base storage needs.";
+        internal const string AlterraStorageDescription = "Freestanding storage unit for 200 items. Suitable for interior and exterior use. Can be used to receive ores directly from an automated drill platform if in range.";
 
         internal const string DSSTabID = "DSS";
         internal const string DSSServerFriendlyName = "Server";
         internal const string DSSServerClassName = "DSSServer";
         internal const string DSSServerPrefabName = "DSS_Server";
-        internal const string DSSServerDescription = "A server is used in your server rack to holds all your items in bytes to be used in your network.";
+        internal const string DSSServerDescription = "Data Storage for 48 items, formatted to accept all item categories. Place in a Wall Server Rack or Floor Server Rack to connect to Data Storage Network.";
 
         internal const string DSSFormattingStationFriendlyName = "Server Formatting Station";
         internal const string DSSFormattingStationClassName = "DSSFormattingStation";
@@ -56,38 +56,38 @@ namespace FCS_StorageSolutions.Configuration
         internal const string DSSItemDisplayClassName = "DSSItemDisplay";
         internal const string DSSItemDisplayPrefabName = "DSS_ItemDisplay";
         internal static string DSSItemDisplayKitClassID => $"{DSSItemDisplayClassName}_Kit";
-        internal const string DSSItemDisplayDescription = "An item display allows you to view the amount of an item in the network.";
+        internal const string DSSItemDisplayDescription = "Small, single-item access terminal for the Data Storage Network. Now with multi-item deposit capability.";
 
         internal const string DSSAutoCrafterFriendlyName = "Auto Crafter";
         internal const string DSSAutoCrafterClassName = "DSSAutoCrafter";
         internal const string DSSAutoCrafterPrefabName = "DSS_AutoCrafter";
         internal static string DSSAutoCrafterKitClassID => $"{DSSAutoCrafterClassName}_Kit";
-        internal const string DSSAutoCrafterDescription = "An auto crafter uses items from your inventory or your network to craft items you tell it to.";
+        internal const string DSSAutoCrafterDescription = "Avoid long hours in front of the Fabricator. Queue up a list of multiple items or just keep yourself automatically stocked on an important one.";
 
         internal const string DSSTerminalFriendlyName = "Terminal C48";
         internal const string DSSTerminalClassName = "DSSTerminalMonitor";
         internal const string DSSTerminalPrefabName = "DSS_TerminalMonitor";
         internal static string DSSTerminalKitClassID => $"{DSSTerminalClassName}_Kit";
-        internal const string DSSTerminalDescription = "The terminal monitor is your gateway to the data storage solutions network it allows you to add and remove items from your network";
+        internal const string DSSTerminalDescription = "Data Storage Control Terminal. Deposit and Withdraw items, automatically unload vehicles, and access the Data Storage Networks at other habitats and cyclops on the Global Network.";
 
         internal const string DSSWallServerRackFriendlyName = "Wall Server Rack";
         internal const string DSSWallServerRackClassName = "DSSWallServerRack";
         internal const string DSSWallServerRackPrefabName = "DSS_WallServerRack";
         internal static string DSSWallServerRackKitClassID => $"{DSSWallServerRackClassName}_Kit";
-        internal const string DSSWallServerRackDescription = "A wall server rack holds all your servers so they can receive items to store from your network";
+        internal const string DSSWallServerRackDescription = "Holds 6 Data Storage Servers. Requires a wall.";
 
         internal const string DSSFloorServerRackFriendlyName = "Floor Server Rack";
         internal const string DSSFloorServerRackClassName = "DSSFloorServerRack";
         internal const string DSSFloorServerRackPrefabName = "DSS_FloorServerRack";
         internal static string DSSFloorServerRackKitClassID => $"{DSSFloorServerRackClassName}_Kit";
-        internal const string DSSFloorServerRackDescription = "A floor server rack holds all your servers so they can receive items to store from your network";
+        internal const string DSSFloorServerRackDescription = "Holds 17 Data Storage Servers. Requires a floor.";
 
 
         internal const string DSSAntennaFriendlyName = "Antenna";
         internal const string DSSAntennaClassName = "DSSAntenna";
         internal const string DSSAntennaPrefabName = "DSS_Antenna";
         internal static string DSSAntennaKitClassID => $"{DSSAntennaClassName}_Kit";
-        internal const string DSSAntennaDescription = "An antenna allows your base's network to be available to the global network (Habitats only!).";
+        internal const string DSSAntennaDescription = "An antenna connects your habitat’s Data Storage System to the Global Data Storage Network of habitats (with antennae) and cyclops (built-in antennae).";
 
 #if SUBNAUTICA
         internal static TechData DSSFloorServerRackIngredients => new TechData
