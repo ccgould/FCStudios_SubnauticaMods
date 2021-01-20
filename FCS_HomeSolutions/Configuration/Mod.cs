@@ -203,11 +203,6 @@ namespace FCS_HomeSolutions.Configuration
             }
         };
 
-
-
-        
-
-
 #if SUBNAUTICA
         internal static TechData EmptyObservationTankIngredients => new TechData
 #elif BELOWZERO

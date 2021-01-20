@@ -52,9 +52,11 @@ namespace FCS_AlterraHub.Configuration
         internal const string OreConsumerFriendly = "Alterra Ore Consumer";
         internal const string OreConsumerDescription = " Turns your ores into credits to use at the Alterra Hub. The Ore Consumer is always very hungry: keep it well fed.";
         internal const string OreConsumerPrefabName = "OreConsumer";
+        internal static TechType OreConsumerFragmentTechType { get; set; }
         internal const string OreConsumerTabID = "OC";
 
         internal static TechType OreConsumerTechType { get; set; }
+        public static TechType AlterraHubTechType { get; set; }
 
         internal static Action<SaveData> OnDataLoaded { get; set; }
         internal static Action<List<KnownDevice>> OnDevicesDataLoaded { get; set; }
@@ -133,7 +135,7 @@ namespace FCS_AlterraHub.Configuration
             {TechType.SmallFan,0.2761627f},
             {TechType.JellyPlant,0.2761627f},
         };
-
+        
         internal static string GetAssetPath()
         {
             return Path.Combine(GetModDirectory(), "Assets");
@@ -308,6 +310,11 @@ namespace FCS_AlterraHub.Configuration
 
 
             return null;
+        }
+
+        public static string GetIconPath(string classId)
+        {
+            return Path.Combine(GetAssetPath(), $"{classId}.png");
         }
     }
 

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Resources;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Mono.AlterraHub;
@@ -7,7 +6,6 @@ using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
-using SMLHelper.V2.Handlers;
 using UnityEngine;
 
 namespace FCS_AlterraHub.Buildables
@@ -19,8 +17,13 @@ namespace FCS_AlterraHub.Buildables
         public override string AssetsFolder => Mod.GetAssetPath();
 
         public AlterraHub() : base(Mod.AlterraHubClassID, Mod.AlterraHubFriendly, Mod.AlterraHubDescription)
-        { 
-            OnFinishedPatching += AdditionalPatching;
+        {
+            OnFinishedPatching += () =>
+            {
+                AdditionalPatching();
+                Mod.AlterraHubTechType = TechType;
+            };
+
         }
 
         public override GameObject GetGameObject()

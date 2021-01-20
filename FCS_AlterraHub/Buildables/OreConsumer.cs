@@ -18,6 +18,17 @@ namespace FCS_AlterraHub.Buildables
         public override TechCategory CategoryForPDA => TechCategory.ExteriorModule;
         public override string AssetsFolder => Mod.GetAssetPath();
 
+        public override TechType RequiredForUnlock => Mod.OreConsumerTechType;
+
+        public override string DiscoverMessage => $"{this.FriendlyName} Unlocked!";
+
+        public override bool AddScannerEntry => true;
+
+        public override int FragmentsToScan => 1;
+
+        public override float TimeToScanFragment => 5f;
+
+        public override bool DestroyFragmentOnScan => true;
 
         public OreConsumer() : base(Mod.OreConsumerClassID, Mod.OreConsumerFriendly, Mod.OreConsumerDescription)
         {

@@ -8,9 +8,23 @@ namespace FCS_AlterraHub.Managers.Quests
     {
         public List<QuestEvent> QuestEvents  = new List<QuestEvent>();
         
-        public QuestEvent AddQuestEvent(string name, string description, GameObject location)
+        public QuestEvent AddQuestEvent(string name, string description, GameObject location, QuestEvent.EventType eventType)
         {
-            QuestEvent questEvent = new QuestEvent(name,description,location);
+            QuestEvent questEvent = new QuestEvent(name,description,location,eventType);
+            QuestEvents.Add(questEvent);
+            return questEvent;
+        }
+
+        public QuestEvent AddQuestEvent(string name, string description, TechType techType, QuestEvent.EventType eventType)
+        {
+            QuestEvent questEvent = new QuestEvent(name, description, techType,eventType);
+            QuestEvents.Add(questEvent);
+            return questEvent;
+        }
+
+        public QuestEvent AddQuestEvent(string name, string description, TechType techType,int amount, QuestEvent.EventType eventType)
+        {
+            QuestEvent questEvent = new QuestEvent(name, description, techType,amount, eventType);
             QuestEvents.Add(questEvent);
             return questEvent;
         }
@@ -31,7 +45,7 @@ namespace FCS_AlterraHub.Managers.Quests
         {
             foreach (QuestEvent questEvent in QuestEvents)
             {
-                if (questEvent.GetID() == id)
+                if (questEvent.GetID == id)
                     return questEvent;
             }
 
@@ -45,7 +59,7 @@ namespace FCS_AlterraHub.Managers.Quests
             foreach (QuestPath questPath in thisEvent.PathList)
             {
                 if(questPath.EndEvent.Order == -1)
-                    BreadthFirstSearch(questPath.EndEvent.GetID(),orderNumber + 1);
+                    BreadthFirstSearch(questPath.EndEvent.GetID,orderNumber + 1);
             }
         }
 
@@ -53,7 +67,7 @@ namespace FCS_AlterraHub.Managers.Quests
         {
             foreach (QuestEvent questEvent in QuestEvents)
             {
-                QuickLogger.Debug($"Name: {questEvent.GetName()} | Order: {questEvent.Order}");
+                QuickLogger.Debug($"Name: {questEvent.GetName} | Order: {questEvent.Order}");
             }
         }
     }

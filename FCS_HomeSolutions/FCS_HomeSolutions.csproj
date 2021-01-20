@@ -185,7 +185,7 @@
     <Compile Include="Mods\TV\Mono\TVController.cs" />
     <Compile Include="Mono\OutDoorPlanters\OutDoorPlanterController.cs" />
     <Compile Include="Mono\PaintTool\PaintToolController.cs" />
-    <Compile Include="Patches\Builder_Pathes.cs" />
+    <Compile Include="Patches\Builder_Patches.cs" />
     <Compile Include="Patches\InGameMenuPatcher.cs" />
     <Compile Include="Patches\Light_Patches.cs" />
     <Compile Include="Patches\Player_Patches.cs" />

@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using FCS_HomeSolutions.Configuration;
-using FCSCommon.Extensions;
 using HarmonyLib;
 using UnityEngine;
 
 namespace FCS_HomeSolutions.Patches
 {
-    internal class Builder_Pathes
+    internal class Builder_Patches
     {
 		public static List<TechType> acceptableColliders = new List<TechType>() { TechType.BaseWindow, TechType.BaseRoom, TechType.BaseMoonpool, TechType.BaseReinforcement, TechType.BaseConnector, TechType.BaseCorridor,  TechType.BaseCorridorI, TechType.BaseCorridorT };
 

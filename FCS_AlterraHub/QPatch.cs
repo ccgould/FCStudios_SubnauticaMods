@@ -41,13 +41,13 @@ namespace FCS_AlterraHub
 
             //Load Prefabs
             AlterraHub.GetPrefabs();
-            
-            //Patch all the buildables
-            PatchBuildables();
-            
+
             //Patch all spawnables
             PatchSpawnables();
 
+            //Patch all the buildables
+            PatchBuildables();
+            
             //Run Harmony Patches
             var harmony = Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), "com.alterrahub.fcstudios");
 
@@ -77,6 +77,9 @@ namespace FCS_AlterraHub
             var debitCardSpawnable = new DebitCardSpawnable();
             debitCardSpawnable.Patch();
             Mod.DebitCardTechType = debitCardSpawnable.TechType;
+
+            var oreConsumerFragment = new OreConsumerFragment();
+            oreConsumerFragment.Patch();
         }
 
         private static void PatchBuildables()

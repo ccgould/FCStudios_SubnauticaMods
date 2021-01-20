@@ -152,6 +152,8 @@
     <Compile Include="Interfaces\ISlotController.cs" />
     <Compile Include="Managers\FCSPowerManager.cs" />
     <Compile Include="Managers\Quests\Quest.cs" />
+    <Compile Include="Managers\Quests\QuestAction.cs" />
+    <Compile Include="Managers\Quests\QuestButton.cs" />
     <Compile Include="Managers\Quests\QuestEvent.cs" />
     <Compile Include="Managers\Quests\QuestLocation.cs" />
     <Compile Include="Managers\Quests\QuestManager.cs" />
@@ -214,6 +216,8 @@
     <Compile Include="Mono\OreConsumer\TransferHandler.cs" />
     <Compile Include="Objects\Vec4.cs" />
     <Compile Include="Objects\Vec3.cs" />
+    <Compile Include="Patches\BuilderPatches.cs" />
+    <Compile Include="Patches\PDAScannerPatch.cs" />
     <Compile Include="Patches\PlayerPatch.cs" />
     <Compile Include="Patches\PowerIndicatorPatch.cs" />
     <Compile Include="Patches\Storage_Patcher.cs" />
@@ -223,6 +227,7 @@
     <Compile Include="Patch\PDATabPatcher.cs" />
     <Compile Include="Patch\UIPatches.cs" />
     <Compile Include="Spawnables\FCSPDADeco.cs" />
+    <Compile Include="Spawnables\OreConsumerFragment.cs" />
     <Compile Include="Structs\FcsEntryData.cs" />
     <Compile Include="Structs\FCSStoreEntry.cs" />
     <Compile Include="Spawnables\BioFuelSpawnable.cs" />
