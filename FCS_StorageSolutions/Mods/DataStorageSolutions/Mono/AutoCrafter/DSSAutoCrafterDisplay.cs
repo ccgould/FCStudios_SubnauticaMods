@@ -252,7 +252,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
 
         public void AddNewCraftingItem(CraftingItem craftingItem)
         {
-            if(_mono.CraftingItems.Any(x=>x.TechType == craftingItem.TechType)) return; 
+            if(_mono.CraftingItems.Count == 6 || _mono.CraftingItems.Any(x=>x.TechType == craftingItem.TechType)) return; 
             _mono.CraftingItems.Add(craftingItem);
             _productionGrid.DrawPage();
             UpdateOrderCount();
