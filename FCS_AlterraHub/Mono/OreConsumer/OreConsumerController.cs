@@ -5,6 +5,7 @@ using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Interfaces;
+using FCS_AlterraHub.Managers.Quests;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Helpers;
@@ -93,7 +94,9 @@ namespace FCS_AlterraHub.Mono.OreConsumer
                 _timeLeft -= DayNightCycle.main.deltaTime;
                 if (_timeLeft < 0)
                 {
-                    AppendMoney(StoreInventorySystem.GetOrePrice(_oreQueue.Dequeue()));
+                    var techType = _oreQueue.Dequeue();
+                    QPatch.QuestManagerGM.NotifyDeviceAction(Mod.OreConsumerTechType,techType, QuestEvent.DeviceActionType.PROCESSITEM);
+                    AppendMoney(StoreInventorySystem.GetOrePrice(techType));
                     _timeLeft = OreProcessingTime;
                 }
             }

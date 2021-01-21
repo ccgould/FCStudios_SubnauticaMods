@@ -79,5 +79,11 @@ namespace FCS_AlterraHub.Configuration
             return $"Parameters: {techType}";
         }
 
+        [ConsoleCommand("CompleteMission")]
+        public static void CompleteMission()
+        {
+            QPatch.QuestManagerGM.CompleteCurrentMission();
+        }
+
     }
 }

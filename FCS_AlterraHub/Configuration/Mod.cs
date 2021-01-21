@@ -174,7 +174,7 @@ namespace FCS_AlterraHub.Configuration
                 return false;
             }
         }
-
+        
         internal static void OnSaveComplete()
         {
             _saveObject?.StartCoroutine(SaveCoroutine());

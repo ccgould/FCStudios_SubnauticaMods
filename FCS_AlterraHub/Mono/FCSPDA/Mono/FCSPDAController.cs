@@ -211,6 +211,9 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
 
             _clock = GameObjectHelpers.FindGameObject(gameObject, "Clock").GetComponent<Text>();
 
+            MaterialHelpers.ChangeEmissionColor(Buildables.AlterraHub.BaseEmissiveDecalsController, gameObject,
+                Color.cyan);
+
             InvokeRepeating(nameof(UpdateDisplay), .5f, .5f);
         }
 

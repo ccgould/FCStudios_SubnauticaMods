@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using FCSCommon.Utilities;
 using HarmonyLib;
 
 namespace FCS_AlterraHub.Patches
@@ -23,6 +20,7 @@ namespace FCS_AlterraHub.Patches
         [HarmonyPostfix]
         public static void Postfix()
         {
+            QuickLogger.Debug($"Contains Complete Entry: {PDAScanner.ContainsCompleteEntry(techType) || KnownTech.Contains(techType)}", true);
             if (PDAScanner.ContainsCompleteEntry(techType) || KnownTech.Contains(techType))
             {
                 QPatch.QuestManagerGM.NotifyItemScanned(techType);

@@ -151,6 +151,7 @@
     <Compile Include="Interfaces\IFCSGrowBed.cs" />
     <Compile Include="Interfaces\ISlotController.cs" />
     <Compile Include="Managers\FCSPowerManager.cs" />
+    <Compile Include="Managers\Quests\Missions\StarterMission.cs" />
     <Compile Include="Managers\Quests\Quest.cs" />
     <Compile Include="Managers\Quests\QuestAction.cs" />
     <Compile Include="Managers\Quests\QuestButton.cs" />

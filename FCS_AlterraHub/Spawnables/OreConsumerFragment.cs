@@ -24,7 +24,7 @@ namespace FCS_AlterraHub.Spawnables
 #if SUBNAUTICA
             List<LootDistributionData.BiomeData> biomeDatas = new List<LootDistributionData.BiomeData>()
             {
-                new LootDistributionData.BiomeData(){ biome = BiomeType.JellyshroomCaves_CaveFloor, count = 1, probability = 1f },
+                new LootDistributionData.BiomeData(){ biome = BiomeType.JellyshroomCaves_CaveFloor, count = 1, probability = 0.05f },
             };
 #elif BELOWZERO
             List<LootDistributionData.BiomeData> biomeDatas = new List<LootDistributionData.BiomeData>()
@@ -48,15 +48,22 @@ namespace FCS_AlterraHub.Spawnables
                 prefab.AddComponent<LargeWorldEntity>().cellLevel = LargeWorldEntity.CellLevel.VeryFar;
                 prefab.AddComponent<TechTag>().type = this.TechType;
 
-
-                Pickupable pickupable = prefab.EnsureComponent<Pickupable>();
+                var rb = prefab.GetComponentInChildren<Rigidbody>();
+                
+                if (rb == null)
+                {
+                    rb = prefab.AddComponent<Rigidbody>();
+                    rb.isKinematic = true;
+                }
+                
+                Pickupable pickupable = prefab.AddComponent<Pickupable>();
                 pickupable.isPickupable = false;
 
-                ResourceTracker resourceTracker = prefab.EnsureComponent<ResourceTracker>();
+                ResourceTracker resourceTracker = prefab.AddComponent<ResourceTracker>();
                 resourceTracker.prefabIdentifier = prefabIdentifier;
                 resourceTracker.techType = this.TechType;
                 resourceTracker.overrideTechType = TechType.Fragment;
-                resourceTracker.rb = prefab.GetComponent<Rigidbody>();
+                resourceTracker.rb = rb;
                 resourceTracker.pickupable = pickupable;
 
                 return prefab;

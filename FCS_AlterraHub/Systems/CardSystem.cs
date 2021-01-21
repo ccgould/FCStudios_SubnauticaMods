@@ -5,6 +5,7 @@ using System.Text;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Managers.Quests;
 using FCS_AlterraHub.Model;
 using FCSCommon.Extensions;
 using FCSCommon.Utilities;
@@ -279,6 +280,8 @@ namespace FCS_AlterraHub.Systems
                 MessageBoxHandler.main.Show(AlterraHub.AccountSetupError(sb.ToString()), FCSMessageButton.OK);
 
             }
+
+            QPatch.QuestManagerGM.NotifyDeviceAction(Mod.AlterraHubTechType,Mod.DebitCardTechType,QuestEvent.DeviceActionType.CREATEITEM);
         }
         
         internal void CalculateBalance()

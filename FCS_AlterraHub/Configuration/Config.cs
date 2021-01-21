@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using FCS_AlterraHub.Enumerators;
-using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Structs;
 using FCSCommon.Utilities;
 using Oculus.Newtonsoft.Json;
@@ -24,7 +22,7 @@ namespace FCS_AlterraHub.Configuration
         public UnityAction<int> onGameModeChanged;
 
         [Keybind("Open/Close FCS PDA")]
-        public KeyCode FCSPDAKeyCode = KeyCode.F2;
+        public KeyCode FCSPDAKeyCode { get; set; }= KeyCode.F2;
 
         public List<FCSStoreEntry> AdditionalStoreItems = new List<FCSStoreEntry>();
 

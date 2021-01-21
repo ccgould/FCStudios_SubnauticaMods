@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using FCSCommon.Utilities;
 using UnityEngine;
 
@@ -7,7 +8,10 @@ namespace FCS_AlterraHub.Managers.Quests
     public class Quest
     {
         public List<QuestEvent> QuestEvents  = new List<QuestEvent>();
-        
+        public TechType TechTypeReward { get; set; }
+        public decimal CreditReward { get; set; }
+
+
         public QuestEvent AddQuestEvent(string name, string description, GameObject location, QuestEvent.EventType eventType)
         {
             QuestEvent questEvent = new QuestEvent(name,description,location,eventType);
@@ -22,9 +26,16 @@ namespace FCS_AlterraHub.Managers.Quests
             return questEvent;
         }
 
+        [Obsolete("Use AddQuestEvent(string name, string description, TechType techType, int amount, QuestEvent.DeviceActionType actionType, Dictionary<TechType, int> requirements, QuestEvent.EventType eventType) instead.")]
         public QuestEvent AddQuestEvent(string name, string description, TechType techType,int amount, QuestEvent.EventType eventType)
         {
             QuestEvent questEvent = new QuestEvent(name, description, techType,amount, eventType);
+            QuestEvents.Add(questEvent);
+            return questEvent;
+        }
+        internal QuestEvent AddQuestEvent(string name, string description, TechType techType,  QuestEvent.DeviceActionType actionType, Dictionary<TechType, int> requirements, QuestEvent.EventType eventType)
+        {
+            QuestEvent questEvent = new QuestEvent(name, description, techType, actionType, requirements,eventType);
             QuestEvents.Add(questEvent);
             return questEvent;
         }
