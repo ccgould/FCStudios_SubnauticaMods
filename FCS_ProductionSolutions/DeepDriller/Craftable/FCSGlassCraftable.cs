@@ -17,7 +17,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Craftable
         public override string AssetsFolder => Mod.GetAssetFolder();
         public override CraftTree.Type FabricatorType => CraftTree.Type.Fabricator;
         public override string[] StepsToFabricatorTab => new[] {"Resources","BasicMaterials"};
-        public FcsGlassCraftable() : base("FCSGlass", "Glass", "SiO4. Pure fused quartz glass.")
+        public FcsGlassCraftable() : base("FCSGlass", "Sand Infused Glass", "SiO2. Pure fused sand glass.")
         {
 
         }

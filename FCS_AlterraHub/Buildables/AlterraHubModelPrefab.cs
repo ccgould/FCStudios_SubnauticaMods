@@ -42,11 +42,6 @@ namespace FCS_AlterraHub.Buildables
         public const string BaseNormal = "fcs01_N";
         public const string BaseEmission = "fcs01_E";
         
-
-
-
-
-
         internal static string BodyMaterial => $"fcs{Mod.ModName}_COL";
         internal static string DecalMaterial => $"fcs{Mod.ModName}_DECALS";
         internal static string DetailsMaterial => $"fcs{Mod.ModName}_DETAILS";
@@ -54,7 +49,6 @@ namespace FCS_AlterraHub.Buildables
         internal static string LUMTexture => $"fcs{Mod.ModName}_E";
         internal static string NormalTexture => $"fcs{Mod.ModName}_N";
         internal static string DetailTexture => $"fcs{Mod.ModName}_D";
-
         internal static GameObject OilPrefab { get; set; }
         internal static GameObject OreConsumerPrefab { get; set; }
         internal static GameObject AlterraHubPrefab { get; private set; }
@@ -62,10 +56,13 @@ namespace FCS_AlterraHub.Buildables
         internal static GameObject BioFuelPrefab { get; set; }
         internal static GameObject KitPrefab { get; set; }
         internal static GameObject CartItemPrefab { get; set; }
-        internal static GameObject FcsPDAPrefab;
-        public static GameObject FCSPDADecoPrefab;
-
-        public static GameObject ColorPickerDialogPrefab { get; set; }
+        internal static GameObject FcsPDAPrefab { get; set; }
+        internal static GameObject FCSPDADecoPrefab { get; set; }
+        internal static GameObject ColorPickerDialogPrefab { get; set; }
+        internal static GameObject MissionObjectiveItemPrefab { get; set; }
+        public static GameObject MissionItemPrefab { get; set; }
+        public static GameObject PDAEntryPrefab { get; set; }
+        public static GameObject MissionMessageBoxPrefab { get; set; }
 
         public static bool GetPrefabs()
         {
@@ -107,6 +104,18 @@ namespace FCS_AlterraHub.Buildables
                     if (!LoadAssetV2("DecoFCSPDA", QPatch.GlobalBundle, out var fcsPDADecoGo)) return false;
                     FCSPDADecoPrefab = fcsPDADecoGo;
 
+                    if (!LoadAsset("MissionObjectItem", QPatch.GlobalBundle, out var missionObjectiveItemPrefabGo, false)) return false;
+                    MissionObjectiveItemPrefab = missionObjectiveItemPrefabGo;
+
+                    if (!LoadAsset("MissionItem", QPatch.GlobalBundle, out var missionItemPrefabGo, false)) return false;
+                    MissionItemPrefab = missionItemPrefabGo;                    
+                    
+                    if (!LoadAsset("PDAEntry", QPatch.GlobalBundle, out var pdaEntryPrefabGo, false)) return false;
+                    PDAEntryPrefab = pdaEntryPrefabGo;
+
+                    if (!LoadAsset("MissionMessageBox", QPatch.GlobalBundle, out var missionMessageBox, false)) return false;
+                    MissionMessageBoxPrefab = missionMessageBox;
+
                     _initialized = true;
                 }
 
@@ -118,7 +127,7 @@ namespace FCS_AlterraHub.Buildables
                 return false;
             }
         }
-        
+
         private static bool LoadAsset(string prefabName,AssetBundle assetBundle,out GameObject go,bool applyShaders = true)
         {
             //We have found the asset bundle and now we are going to continue by looking for the model.
@@ -159,12 +168,12 @@ namespace FCS_AlterraHub.Buildables
                 }
 
                 go = prefab;
+
                 QuickLogger.Debug($"{prefabName} Prefab Found!");
                 return true;
             }
 
             QuickLogger.Error($"{prefabName} Prefab Not Found!");
-
             go = null;
             return false;
         }

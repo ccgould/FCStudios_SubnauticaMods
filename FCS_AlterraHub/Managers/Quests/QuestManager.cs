@@ -1,6 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Managers.Quests.Enums;
+using FCS_AlterraHub.Managers.Quests.Missions;
+using FCS_AlterraHub.Mono.FCSPDA.Mono;
+using FCS_AlterraHub.Patches;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Extensions;
 using FCSCommon.Utilities;
@@ -10,20 +18,50 @@ namespace FCS_AlterraHub.Managers.Quests
 {
     public class QuestManager : MonoBehaviour
     {
-        public Quest quest = new Quest();
-        private QuestEvent final;
-        private List<QuestAction> _questActions = new List<QuestAction>();
-        private bool _createStarterMission = true;
+        public static QuestManager Instance;
+
+        private void Awake()
+        {
+            if (Instance == null)
+            {
+                Instance = this;
+            }
+            else if (Instance != this)
+            {
+                Destroy(gameObject);
+            }
+        }
+
+        private void Start()
+        {
+            if (_audioLoaded) return;
+            LoadAudioFiles();
+            _audioLoaded = true;
+        }
+
+        private static void LoadAudioFiles()
+        {
+            Instance.AddAudioTrack(Path.Combine(Mod.GetAssetPath(), "Audio", "AH-Mission01-Pt1.wav"));
+            Instance.AddAudioTrack(Path.Combine(Mod.GetAssetPath(), "Audio", "AH-Mission01-Pt2.wav"));
+        }
+
+        public Dictionary<string, AudioClip> AudioClips = new Dictionary<string, AudioClip>();
+        private FCSGamePlaySettings settings => Mod.GamePlaySettings;
+        public Quest quest;
+        private QuestEvent _finalEvent;
+        internal Action<Quest> OnMissionAdded;
+        private bool _audioLoaded;
 
         private void Update()
         {
-            if (_createStarterMission)
+            if(Mod.GamePlaySettings == null) return;
+            if (DayNightCycle.main.timePassedAsFloat > 600f && Mod.GamePlaySettings.PlayStarterMission)
             {
-                if (DayNightCycle.main.timePassedAsFloat > 600f)
-                {
-                    StartFirstMission();
-                    _createStarterMission = false;
-                }
+                //Change to add message
+                //CreateStarterMission();
+                //StartFirstMission();
+                //Mod.GamePlaySettings.PlayStarterMission = false;
+                //Mod.SaveGamePlaySettings();
             }
         }
 
@@ -31,97 +69,28 @@ namespace FCS_AlterraHub.Managers.Quests
         {
             if (quest != null && quest.QuestEvents.Count > 0)
             {
-                if (quest.QuestEvents[0].GetStatus == QuestEvent.EventStatus.WAITING)
-                    quest.QuestEvents[0].SetStatus(QuestEvent.EventStatus.CURRENT);
+                if (quest.QuestEvents[0].Status == QuestEventStatus.WAITING)
+                    quest.QuestEvents[0].SetStatus(QuestEventStatus.CURRENT);
             }
-
         }
 
-        private void Start()
+        public void CreateStarterMission()
         {
-            if (_createStarterMission)
+            if(Mod.GamePlaySettings.PlayStarterMission)
             {
-                CreateStarterMission();
+                quest = new StarterMission { CreditReward = 500000, TechTypeReward = "AlterraStorage_kit".ToTechType() };
+                _finalEvent = quest.Create();
+                StartFirstMission();
+                Mod.GamePlaySettings.PlayStarterMission = false;
+                Mod.SaveGamePlaySettings();
+                uGUI_PowerIndicator_Initialize_Patch.MissionHUD.ShowMessage("ALTERRA MISSION","Alterra Credit System Connection");
+                OnMissionAdded?.Invoke(quest);
             }
-        }
-
-        private void CreateStarterMission()
-        {
-
-
-            quest.AddQuestEvent()
-
-
-            quest.CreditReward = 500000;
-            quest.TechTypeReward = "AlterraStorage_kit".ToTechType();
-
-            //Create each event
-            QuestEvent scanOreConsumer = quest.AddQuestEvent("Scan Ore Consumer",
-                "Alterra needs you to scan the ore consumer located in the Aurora. Make sure you have a scanner and any other tool you need to gain access",
-                Mod.OreConsumerFragmentTechType, QuestEvent.EventType.SCAN);
-
-            QuestEvent buildAlterraHub = quest.AddQuestEvent("Build AlterraHub",
-                "Alterra needs you to build an Alterra Hub so you can make an account so we can begin testing the account system.",
-                Mod.AlterraHubTechType, 1, QuestEvent.EventType.BUILD);
-
-            QuestEvent createAccount = quest.AddQuestEvent("Create an Alterra Account",
-                "Alterra needs you to make an account so we can begin testing the account system.",
-                Mod.AlterraHubTechType, QuestEvent.DeviceActionType.CREATEITEM, new Dictionary<TechType, int> { { Mod.DebitCardTechType, 1 } }, QuestEvent.EventType.DEVICEACTION);
-
-            QuestEvent buildOreConsumers = quest.AddQuestEvent("Build Ore Consumer",
-                "Ok, lastly we now need you to build 2 Ore Consumers and start a ore process by adding ores to the machine so you can now generate cash.",
-                Mod.OreConsumerTechType, 2, QuestEvent.EventType.BUILD);
-
-            QuestEvent processOres = quest.AddQuestEvent("Process Ores in Ore Consumer",
-                "Alterra needs you to process 10 diamonds and 10 gold",
-                Mod.OreConsumerTechType, QuestEvent.DeviceActionType.PROCESSITEM, 
-                new Dictionary<TechType, int>
-                {
-                    {TechType.Diamond, 10},
-                    { TechType.Gold, 10}
-                }, 
-                QuestEvent.EventType.DEVICEACTION);
-
-
-            //Define the paths between the events - e.g the order they must be completed
-            quest.AddPath(scanOreConsumer.GetID, buildAlterraHub.GetID);
-            quest.AddPath(buildAlterraHub.GetID, createAccount.GetID);
-            quest.AddPath(createAccount.GetID, buildOreConsumers.GetID);
-            quest.AddPath(buildOreConsumers.GetID, processOres.GetID);
-
-            //Create tree
-            quest.BreadthFirstSearch(scanOreConsumer.GetID);
-
-            var scanOreConsumerAction = new QuestAction();
-            scanOreConsumerAction.Setup(this, scanOreConsumer);
-
-            var buildAlterraHubAction = new QuestAction();
-            buildAlterraHubAction.Setup(this, buildAlterraHub);
-
-            var createAccountAction = new QuestAction();
-            createAccountAction.Setup(this, createAccount);
-
-            var buildOreConsumersAction = new QuestAction();
-            buildOreConsumersAction.Setup(this, buildOreConsumers);
-
-            var processOresAction = new QuestAction();
-            processOresAction.Setup(this, processOres);
-
-            _questActions.Add(scanOreConsumerAction);
-            _questActions.Add(buildAlterraHubAction);
-            _questActions.Add(createAccountAction);
-            _questActions.Add(buildOreConsumersAction);
-            _questActions.Add(processOresAction);
-
-            final = processOres;
-
-            //var button = CreateButton(buildAlterraHub).GetComponent<QuestButton>();
-            quest.PrintPath();
         }
 
         public void UpdateQuestOnCompletion(QuestEvent questEvent)
         {
-            if (questEvent == final)
+            if (questEvent == _finalEvent)
             {
                 //Perform complete
                 if (quest.CreditReward > 0)
@@ -143,7 +112,7 @@ namespace FCS_AlterraHub.Managers.Quests
                 if (currentQuestEvent.Order == questEvent.Order + 1)
                 {
                     //make the next in line avaliable for completion
-                    currentQuestEvent.UpdateQuestEvent(QuestEvent.EventStatus.CURRENT);
+                    currentQuestEvent.UpdateQuestEvent(QuestEventStatus.CURRENT);
                 }
             }
         }
@@ -157,8 +126,8 @@ namespace FCS_AlterraHub.Managers.Quests
 
             if (e.Order == 1)
             {
-                questButton.UpdateButton(QuestEvent.EventStatus.CURRENT);
-                e.SetStatus(QuestEvent.EventStatus.CURRENT);
+                questButton.UpdateButton(QuestEventStatus.CURRENT);
+                e.SetStatus(QuestEventStatus.CURRENT);
             }
 
             return button;
@@ -166,30 +135,33 @@ namespace FCS_AlterraHub.Managers.Quests
 
         public void NotifyTechTypeConstructed(TechType techType)
         {
+            if (quest == null) return;
             QuickLogger.Debug($"Notifying TechType Constructed: {Language.main.Get(techType)}", true);
-            foreach (QuestAction action in _questActions)
+            foreach (QuestAction action in quest.GetQuestActions())
             {
-                if (action.GetQuestEvent().GetStatus != QuestEvent.EventStatus.CURRENT) continue;
+                if (action.GetQuestEvent().Status != QuestEventStatus.CURRENT) continue;
                 action.CheckBuildAction(techType);
             }
         }
 
         public void NotifyItemScanned(TechType techType)
         {
+            if (quest == null) return;
             QuickLogger.Debug($"Notifying TechType Scanned: {Language.main.Get(techType)}", true);
-            foreach (QuestAction action in _questActions)
+            foreach (QuestAction action in quest.GetQuestActions())
             {
-                if (action.GetQuestEvent().GetStatus != QuestEvent.EventStatus.CURRENT) continue;
+                if (action.GetQuestEvent().Status != QuestEventStatus.CURRENT) continue;
                 action.CheckScanAction(techType);
             }
         }
 
-        public void NotifyDeviceAction(TechType deviceTechType,TechType item, QuestEvent.DeviceActionType deviceAction)
+        public void NotifyDeviceAction(TechType deviceTechType,TechType item, DeviceActionType deviceAction)
         {
+            if (quest == null) return;
             QuickLogger.Debug($"Notifying Device Action: {Language.main.Get(deviceTechType)} | Item: {Language.main.Get(item)} | Device Action: {deviceAction}", true);
-            foreach (QuestAction action in _questActions)
+            foreach (QuestAction action in quest.GetQuestActions())
             {
-                if (action.GetQuestEvent().GetStatus != QuestEvent.EventStatus.CURRENT) continue;
+                if (action.GetQuestEvent().Status != QuestEventStatus.CURRENT) continue;
                 action.CheckDeviceAction(deviceTechType,item,deviceAction);
             }
         }
@@ -198,12 +170,117 @@ namespace FCS_AlterraHub.Managers.Quests
         {
             if (quest == null || quest.QuestEvents.Count <= 0) return;
 
-            foreach (QuestAction questAction in _questActions)
+            foreach (QuestAction questAction in quest.GetQuestActions())
             {
-                if (questAction.GetQuestEvent().GetStatus != QuestEvent.EventStatus.CURRENT) continue;
+                if (questAction.GetQuestEvent().Status != QuestEventStatus.CURRENT) continue;
                 questAction.CompleteQuest();
                 break;
             }
+        }
+
+        public IEnumerable<QuestEventData> SaveEvents()
+        {
+            foreach (QuestEvent questEvent in quest.QuestEvents)
+            {
+                yield return new QuestEventData
+                {
+                    Amount = questEvent.Amount,
+                    CurrentAmount = questEvent.CurrentAmount,
+                    GetID = questEvent.GetID,
+                    GetName = questEvent.GetName,
+                    GetDescription = questEvent.GetDescription,
+                    Order = questEvent.Order,
+                    TechType = questEvent.TechType,
+                    QuestEventType = questEvent.QuestEventType,
+                    Status = questEvent.Status,
+                    DeviceActionType = questEvent.DeviceActionType,
+                    Requirements = questEvent.Requirements,
+                    PathList = GetPathList(questEvent.PathList)
+                };
+            }
+        }
+
+        private IEnumerable<EventPathData> GetPathList(List<QuestPath> questEventPathList)
+        {
+            foreach (QuestPath path in questEventPathList)
+            {
+                yield return new EventPathData
+                {
+                    From = path.StartEvent.GetID,
+                    To = path.EndEvent.GetID
+                };
+            }
+        }
+
+        internal Quest GetActiveMission()
+        {
+            return quest;
+        }
+
+        public void Load()
+        {
+            QuickLogger.Debug($"Loading Saved Mission",true);
+            if (Mod.GamePlaySettings?.Event != null)
+            {
+
+                quest = new Quest
+                {
+                    CreditReward = Mod.GamePlaySettings.CreditReward,
+                    TechTypeReward = Mod.GamePlaySettings.TechTypeReward
+                };
+
+                foreach (QuestEventData data in Mod.GamePlaySettings.Event)
+                {
+                    QuickLogger.Debug($"Adding Quest event: {data.GetName}", true);
+                    var item = quest.AddQuestEvent(data.GetName, data.GetDescription, data.TechType, data.DeviceActionType, data.Requirements, data.QuestEventType, data.GetID);
+                    item.Order = data.Order;
+                    item.Status = data.Status;
+                    item.Amount = data.Amount;
+                    item.CurrentAmount = data.CurrentAmount;
+                    QuickLogger.Debug($"Filling Quest event path: {data.PathList?.Count()}", true);
+
+                    if (data.PathList != null)
+                    {
+                        foreach (EventPathData eventPathData in data.PathList)
+                        {
+                            quest.AddPath(eventPathData.From, eventPathData.To);
+                        }
+                    }
+                    var action = new QuestAction();
+                    action.Setup(Instance, item);
+
+                    quest.QuestActions.Add(action);
+
+                    quest.BreadthFirstSearch(Mod.GamePlaySettings.Event[0].GetID);
+
+                    OnMissionAdded?.Invoke(quest);
+                }
+
+                QuickLogger.Debug($"Quest: {quest}",true);
+            }
+        }
+
+        public int GetMissionCount()
+        {
+            return quest != null && !quest.IsComplete()? 1: 0;
+        }
+
+        public  IEnumerator LoadAudio(string audioSource)
+        {
+            WWW request = GetAudioFromFile(audioSource);
+            yield return request;
+            AudioClips.Add(Path.GetFileNameWithoutExtension(audioSource), request.GetAudioClip());
+        }
+
+        private  WWW GetAudioFromFile(string source)
+        {
+            WWW request = new WWW(source);
+            return request;
+        }
+
+        public  void AddAudioTrack(string path)
+        {
+            StartCoroutine(LoadAudio(path));
         }
     }
 }

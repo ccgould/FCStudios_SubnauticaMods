@@ -4,7 +4,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using FCS_AlterraHub.Managers.Quests;
+using FCS_AlterraHub.Managers.Quests.Enums;
 using FCS_AlterraHub.Mono;
+using FCS_AlterraHub.Patches;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
@@ -135,7 +138,9 @@ namespace FCS_AlterraHub.Configuration
             {TechType.SmallFan,0.2761627f},
             {TechType.JellyPlant,0.2761627f},
         };
-        
+
+        public static FCSGamePlaySettings GamePlaySettings { get; set; } = new FCSGamePlaySettings();
+
         internal static string GetAssetPath()
         {
             return Path.Combine(GetModDirectory(), "Assets");
@@ -173,6 +178,39 @@ namespace FCS_AlterraHub.Configuration
                 QuickLogger.Error($"Error: {e.Message} | StackTrace: {e.StackTrace}");
                 return false;
             }
+        }
+
+        public static bool SaveGamePlaySettings()
+        {
+            try
+            {
+                if (GamePlaySettings == null)
+                {
+                    GamePlaySettings = new FCSGamePlaySettings();
+                }
+
+                GamePlaySettings.Event = QuestManager.Instance.SaveEvents()?.ToList();
+                GamePlaySettings.CreditReward = QuestManager.Instance.quest.CreditReward;
+                GamePlaySettings.TechTypeReward = QuestManager.Instance.quest.TechTypeReward;
+                ModUtils.Save(GamePlaySettings, "settings.json", GetSaveFileDirectory(), OnSaveComplete);
+                return true;
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error($"Error: {e.Message} | StackTrace: {e.StackTrace}");
+                return false;
+            }
+        }
+
+        internal static void LoadGamePlaySettings()
+        {
+            QuickLogger.Info("Loading Game Play Settings...");
+            ModUtils.LoadSaveData<FCSGamePlaySettings>("settings.json", GetSaveFileDirectory(), (data) =>
+            {
+                QuickLogger.Info($"Save Game Play Settings Loaded {data.PlayStarterMission} | {data.Event}");
+                GamePlaySettings = data;
+                Player_Update_Patch.LoadSavesQuests = true;
+            });
         }
         
         internal static void OnSaveComplete()
@@ -214,6 +252,7 @@ namespace FCS_AlterraHub.Configuration
 
                 _saveData = newSaveData;
 
+                SaveGamePlaySettings();
                 ModUtils.Save<SaveData>(_saveData, SaveDataFilename, GetSaveFileDirectory(), OnSaveComplete);
             }
         }
@@ -234,7 +273,7 @@ namespace FCS_AlterraHub.Configuration
                 CardSystem.main.Load(_saveData.AccountDetails);
             }
         }
-
+        
         internal static bool IsSaving()
         {
             return _saveObject != null;
@@ -263,6 +302,7 @@ namespace FCS_AlterraHub.Configuration
 
             return new OreConsumerDataEntry() { Id = id };
         }
+        
         internal static AlterraHubDataEntry GetAlterraHubSaveData(string id)
         {
             LoadData();
@@ -287,7 +327,7 @@ namespace FCS_AlterraHub.Configuration
             LoadData();
 
             var saveData = GetSaveData();
-
+            
             if (saveData.BaseSaves == null) return null;
 
             foreach (var entry in saveData.BaseSaves)
@@ -316,6 +356,37 @@ namespace FCS_AlterraHub.Configuration
         {
             return Path.Combine(GetAssetPath(), $"{classId}.png");
         }
+    }
+
+    public class FCSGamePlaySettings
+    {
+        public bool PlayStarterMission { get; set; } = true;
+        public TechType TechTypeReward { get; set; }
+        public decimal CreditReward { get; set; }
+        public List<QuestEventData> Event { get; set; }
+        public List<EventPathData> Path { get; set; }
+    }
+
+    public struct QuestEventData
+    {
+        public int Amount { get; set; }
+        public int CurrentAmount { get; set; }
+        public string GetID { get; set; }
+        public string GetName { get; set; }
+        public string GetDescription { get; set; }
+        public int Order { get; set; }
+        public TechType TechType { get; set; }
+        public QuestEventType QuestEventType { get; set; }
+        public QuestEventStatus Status { get; set; }
+        public DeviceActionType DeviceActionType { get; set; }
+        public Dictionary<TechType, int> Requirements { get; set; }
+        public IEnumerable<EventPathData> PathList { get; set; }
+    }
+
+    public struct EventPathData
+    {
+        public string From { get; set; }
+        public string To { get; set; }
     }
 
     public struct KnownDevice

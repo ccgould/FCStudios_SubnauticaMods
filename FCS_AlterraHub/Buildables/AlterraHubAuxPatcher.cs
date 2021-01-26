@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using SMLHelper.V2.Handlers;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace FCS_AlterraHub.Buildables
 {
@@ -57,6 +58,7 @@ namespace FCS_AlterraHub.Buildables
             { $"{ModKey}_PressToTurnDeviceOnOff","Press {0} to turn device on/off"},
             { $"{ModKey}_DeviceOn","Device ON"},
             { $"{ModKey}_DeviceOff","Device OFF"},
+            { $"{ModKey}_PDAButtonPressFormat","({0}) Press to open Alterra Hub PDA"},
             { $"{ModKey}_NoSpaceAccountCreation","To complete your account creation, you need at least one slot to receive your debit card. Please try again once one inventory slot is available in your inventory."},
         };
         
@@ -322,6 +324,11 @@ namespace FCS_AlterraHub.Buildables
         public static string DeviceOff()
         {
             return GetLanguage($"{ModKey}_DeviceOff");
+        }
+
+        public static string MissionButtonPressFormat(KeyCode key)
+        {
+            return string.Format(GetLanguage($"{ModKey}_PDAButtonPressFormat"), key.ToString());
         }
     }
 }

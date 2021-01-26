@@ -92,8 +92,8 @@ namespace FCS_AlterraHub.Mono
             _registeredDevices = new Dictionary<string, FcsDevice>();
             _baseTechLights = new Dictionary<string, TechLight>();
             Initialize(habitat);
-            Player_Patch.OnPlayerUpdate += PowerConsumption;
-            Player_Patch.OnPlayerUpdate += PowerStateCheck;
+            Player_Update_Patch.OnPlayerUpdate += PowerConsumption;
+            Player_Update_Patch.OnPlayerUpdate += PowerStateCheck;
 
         }
 

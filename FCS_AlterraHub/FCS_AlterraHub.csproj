@@ -114,6 +114,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Dependancies\UnityEngine.UIModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.UnityWebRequestWWWModule">
+      <HintPath>F:\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\UnityEngine.UnityWebRequestWWWModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.VideoModule">
       <HintPath>F:\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\UnityEngine.VideoModule.dll</HintPath>
     </Reference>
@@ -136,6 +139,7 @@
     <Compile Include="Enumerators\FCSPowerStates.cs" />
     <Compile Include="Enumerators\FridgeCoolingState.cs" />
     <Compile Include="Enumerators\InterfaceButtonMode.cs" />
+    <Compile Include="Enumerators\IUiEffect.cs" />
     <Compile Include="Enumerators\StoreCategory.cs" />
     <Compile Include="Enumerators\TargetAxis.cs" />
     <Compile Include="Extensions\ColorExtensions.cs" />
@@ -151,6 +155,9 @@
     <Compile Include="Interfaces\IFCSGrowBed.cs" />
     <Compile Include="Interfaces\ISlotController.cs" />
     <Compile Include="Managers\FCSPowerManager.cs" />
+    <Compile Include="Managers\Quests\Enums\DeviceActionType.cs" />
+    <Compile Include="Managers\Quests\Enums\QuestEventStatus.cs" />
+    <Compile Include="Managers\Quests\Enums\QuestEventType.cs" />
     <Compile Include="Managers\Quests\Missions\StarterMission.cs" />
     <Compile Include="Managers\Quests\Quest.cs" />
     <Compile Include="Managers\Quests\QuestAction.cs" />
@@ -161,6 +168,9 @@
     <Compile Include="Managers\Quests\QuestPath.cs" />
     <Compile Include="Model\AdditionalColor.cs" />
     <Compile Include="Model\EatableEntities.cs" />
+    <Compile Include="Model\EffectsBuilder.cs" />
+    <Compile Include="Model\Effects\ScaleRectEffect.cs" />
+    <Compile Include="Model\Effects\SlideRectEffect.cs" />
     <Compile Include="Model\FCSGrowingPlant.cs" />
     <Compile Include="Model\FCSMessageBox.cs" />
     <Compile Include="Model\FCSToolTip.cs" />
@@ -179,6 +189,7 @@
     <Compile Include="Mono\DumpContainerSimplified.cs" />
     <Compile Include="Mono\FCSAquarium.cs" />
     <Compile Include="Mono\FCSPDA\Mono\FCSPDAController.cs" />
+    <Compile Include="Mono\FCSPDA\Mono\PDAMissionController.cs" />
     <Compile Include="Mono\FCSStorage.cs" />
     <Compile Include="Mono\FCSStorageNonSerialized.cs" />
     <Compile Include="Mono\FCSToggleButton.cs" />
@@ -218,6 +229,7 @@
     <Compile Include="Objects\Vec4.cs" />
     <Compile Include="Objects\Vec3.cs" />
     <Compile Include="Patches\BuilderPatches.cs" />
+    <Compile Include="Patches\MissionHUD.cs" />
     <Compile Include="Patches\PDAScannerPatch.cs" />
     <Compile Include="Patches\PlayerPatch.cs" />
     <Compile Include="Patches\PowerIndicatorPatch.cs" />

@@ -9,6 +9,7 @@ namespace FCS_AlterraHub.Model
     {
         public string Tooltip;
         public Func<string> ToolTipStringDelegate;
+        public TechType TechType { get; set; }
         public Func<bool> RequestPermission { get; set; }
 
         void Awake() => Destroy(GetComponent<LayoutElement>());
@@ -21,12 +22,18 @@ namespace FCS_AlterraHub.Model
             tooltip.prefix.Append(Tooltip);
         }
 #else
-        public void GetTooltip(out string tooltipText, List<TooltipIcon> _)
+        public void GetTooltip(out string tooltipText, List<TooltipIcon> tooltipIcons)
         {
             var result = RequestPermission?.Invoke() ?? false;
             if (ToolTipStringDelegate != null)
             {
                 Tooltip = ToolTipStringDelegate?.Invoke();
+            }
+            if(TechType != TechType.None)
+            {
+                bool locked = !CrafterLogic.IsCraftRecipeUnlocked(TechType);
+                TooltipFactory.BuildTech(TechType, locked, out tooltipText, tooltipIcons);
+                return;
             }
             tooltipText = result ? Tooltip : string.Empty;
         }

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using FCS_AlterraHub.Managers.Quests.Enums;
+using UnityEngine;
 
 namespace FCS_AlterraHub.Managers.Quests
 {
@@ -18,10 +19,10 @@ namespace FCS_AlterraHub.Managers.Quests
 
             //If we shouldn't be working on this event
             // then don't register it as completed
-            if(_questEvent.GetStatus !=  QuestEvent.EventStatus.CURRENT) return;
+            if(_questEvent.Status !=  QuestEventStatus.CURRENT) return;
 
             //inject these back  into the Quest Manager to Update the States
-            _questEvent.UpdateQuestEvent(QuestEvent.EventStatus.DONE);
+            _questEvent.UpdateQuestEvent(QuestEventStatus.DONE);
             _questManager.UpdateQuestOnCompletion(_questEvent);
         }
 

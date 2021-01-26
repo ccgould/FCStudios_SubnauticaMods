@@ -1,4 +1,6 @@
-﻿using FCSCommon.Utilities;
+﻿using System.Collections.Generic;
+using FCS_AlterraHub.Managers.Quests.Enums;
+using FCSCommon.Utilities;
 using UnityEngine;
 
 namespace FCS_AlterraHub.Managers.Quests
@@ -15,52 +17,65 @@ namespace FCS_AlterraHub.Managers.Quests
         
         internal void CheckCollectionAction(TechType techType, int amount = 1)
         {
-            if (techType != _questEvent.GetTechType) return;
+            if (techType != _questEvent.TechType) return;
             
             //If we shouldn't be working on this event
             // then don't register it as completed
-            if (_questEvent.GetStatus != QuestEvent.EventStatus.CURRENT || _questEvent.GetEventType == QuestEvent.EventType.BUILD) return;
+            if (_questEvent.Status != QuestEventStatus.CURRENT || _questEvent.QuestEventType == QuestEventType.BUILD) return;
 
-            _questEvent.AddAmount(amount);
+            if (_questEvent.Requirements.ContainsKey(techType))
+            {
+                _questEvent.Requirements[techType] -= 1;
+            }
 
-            if(!_questEvent.AmountMet) return;
-            
+            if (!_questEvent.RequirementsMet) return;
+
             //inject these back  into the Quest Manager to Update the States
-            _questEvent.UpdateQuestEvent(QuestEvent.EventStatus.DONE);
+            _questEvent.UpdateQuestEvent(QuestEventStatus.DONE);
             _questManager.UpdateQuestOnCompletion(_questEvent);
         }
 
         internal void CheckBuildAction(TechType techType)
         {
-            if (techType != _questEvent.GetTechType || _questEvent.GetEventType != QuestEvent.EventType.BUILD) return;
-            QuickLogger.Debug($"[CheckBuildAction] {_questEvent.GetName}: TechType {Language.main.Get(techType)} | Event Type: {_questEvent.GetEventType} | Status: {_questEvent.GetStatus}", true);
+            if (techType != _questEvent.TechType || _questEvent.QuestEventType != QuestEventType.BUILD) return;
+            QuickLogger.Debug($"[CheckBuildAction] {_questEvent.GetName}: TechType {Language.main.Get(techType)} | Event Type: {_questEvent.QuestEventType} | Status: {_questEvent.Status}", true);
             //If we shouldn't be working on this event
             // then don't register it as completed
-            if (_questEvent.GetStatus != QuestEvent.EventStatus.CURRENT) return;
+            if (_questEvent.Status != QuestEventStatus.CURRENT) return;
 
-            _questEvent.AddAmount(1);
+            if (_questEvent.Requirements.ContainsKey(techType))
+            {
+                _questEvent.Requirements[techType] -= 1;
+            }
 
-            if (!_questEvent.AmountMet) return;
+            if (!_questEvent.RequirementsMet) return;
 
             //inject these back  into the Quest Manager to Update the States
-            _questEvent.UpdateQuestEvent(QuestEvent.EventStatus.DONE);
+            _questEvent.UpdateQuestEvent(QuestEventStatus.DONE);
             _questManager.UpdateQuestOnCompletion(_questEvent);
         }
 
         internal void CheckScanAction(TechType techType)
         {
 
-            QuickLogger.Debug($"[CheckScanAction] {_questEvent.GetName}: TechType {Language.main.Get(techType)} | Event Type: {_questEvent.GetEventType}", true);
-            if (techType != _questEvent.GetTechType || _questEvent.GetEventType != QuestEvent.EventType.SCAN) return;
+            QuickLogger.Debug($"[CheckScanAction] {_questEvent.GetName}: TechType {Language.main.Get(techType)} | Event Type: {_questEvent.QuestEventType}", true);
+            if (techType != _questEvent.TechType || _questEvent.QuestEventType != QuestEventType.SCAN) return;
 
-            QuickLogger.Debug($"[CheckScanAction] Status: {_questEvent.GetStatus}", true);
+            QuickLogger.Debug($"[CheckScanAction] Status: {_questEvent.Status}", true);
 
             //If we shouldn't be working on this event
             // then don't register it as completed
-            if (_questEvent.GetStatus != QuestEvent.EventStatus.CURRENT) return;
+            if (_questEvent.Status != QuestEventStatus.CURRENT) return;
+
+            if (_questEvent.Requirements.ContainsKey(techType))
+            {
+                _questEvent.Requirements[techType] -= 1;
+            }
+
+            if (!_questEvent.RequirementsMet) return;
 
             //inject these back  into the Quest Manager to Update the States
-            _questEvent.UpdateQuestEvent(QuestEvent.EventStatus.DONE);
+            _questEvent.UpdateQuestEvent(QuestEventStatus.DONE);
             _questManager.UpdateQuestOnCompletion(_questEvent);
         }
 
@@ -70,12 +85,12 @@ namespace FCS_AlterraHub.Managers.Quests
             _questEvent = questEvent;
         }
 
-        public void CheckDeviceAction(TechType deviceTechType, TechType item, QuestEvent.DeviceActionType deviceAction)
+        public void CheckDeviceAction(TechType deviceTechType, TechType item, DeviceActionType deviceAction)
         {
-            QuickLogger.Debug($"[CheckDeviceAction] {_questEvent.GetName}: TechType {Language.main.Get(deviceTechType)} | Event Type: {_questEvent.GetEventType}", true);
-            if (deviceTechType != _questEvent.GetTechType || _questEvent.GetEventType != QuestEvent.EventType.DEVICEACTION || _questEvent.GetDeviceActionType != deviceAction) return;
+            QuickLogger.Debug($"[CheckDeviceAction] {_questEvent.GetName}: TechType {Language.main.Get(deviceTechType)} | Event Type: {_questEvent.QuestEventType}", true);
+            if (deviceTechType != _questEvent.TechType || _questEvent.QuestEventType != QuestEventType.DEVICEACTION || _questEvent.DeviceActionType != deviceAction) return;
 
-            QuickLogger.Debug($"[CheckDeviceAction] Status: {_questEvent.GetStatus} | Device Action: {deviceAction}", true);
+            QuickLogger.Debug($"[CheckDeviceAction] Status: {_questEvent.Status} | Device Action: {deviceAction}", true);
 
 
             
@@ -83,7 +98,7 @@ namespace FCS_AlterraHub.Managers.Quests
             //If we shouldn't be working on this event
             // then don't register it as completed
 
-            if(_questEvent.GetStatus != QuestEvent.EventStatus.CURRENT || _questEvent.Requirements == null) return;
+            if(_questEvent.Status != QuestEventStatus.CURRENT || _questEvent.Requirements == null) return;
 
             if (_questEvent.Requirements.ContainsKey(item))
             {
@@ -98,8 +113,12 @@ namespace FCS_AlterraHub.Managers.Quests
         public void CompleteQuest()
         {
             //inject these back  into the Quest Manager to Update the States
-            _questEvent.UpdateQuestEvent(QuestEvent.EventStatus.DONE);
+            _questEvent.UpdateQuestEvent(QuestEventStatus.DONE);
             _questManager.UpdateQuestOnCompletion(_questEvent);
+            foreach (KeyValuePair<TechType, int> pair in _questEvent.Requirements)
+            {
+                _questEvent.Requirements[pair.Key] = 0;
+            }
         }
 
         public QuestEvent GetQuestEvent()

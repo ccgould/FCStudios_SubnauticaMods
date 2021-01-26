@@ -13,6 +13,7 @@ namespace FCS_AlterraHub.Mono
         protected bool IsHovered { get; set; }
         public string TextLineOne { get; set; }
         public string TextLineTwo { get; set; }
+        public bool UseSetUseTextRaw { get; set; } = false;
         public bool GetAdditionalDataFromString { get; set; } = false;
         public Func<object, string> GetAdditionalString { get; set; }
         private bool isHoveredOutOfRange;
@@ -47,17 +48,30 @@ namespace FCS_AlterraHub.Mono
             {
                 if(string.IsNullOrEmpty(TextLineOne) && string.IsNullOrEmpty(TextLineTwo) && !GetAdditionalDataFromString) return;
 
-                if(GetAdditionalDataFromString)
+                if (UseSetUseTextRaw)
                 {
-                    HandReticle.main.SetIcon(HandReticle.IconType.Hand);
-                    HandReticle.main.SetInteractTextRaw(this.TextLineOne,GetAdditionalString?.Invoke(Tag));
+                    if (GetAdditionalDataFromString)
+                    {
+                        HandReticle.main.SetIcon(HandReticle.IconType.Hand);
+                        HandReticle.main.SetUseTextRaw(this.TextLineOne, GetAdditionalString?.Invoke(Tag));
+                    }
+                    else
+                    {
+                        HandReticle.main.SetUseTextRaw(this.TextLineOne, this.TextLineTwo);
+                    }
                 }
                 else
                 {
-                    HandReticle.main.SetInteractTextRaw(this.TextLineOne, this.TextLineTwo);
+                    if (GetAdditionalDataFromString)
+                    {
+                        HandReticle.main.SetIcon(HandReticle.IconType.Hand);
+                        HandReticle.main.SetInteractTextRaw(this.TextLineOne, GetAdditionalString?.Invoke(Tag));
+                    }
+                    else
+                    {
+                        HandReticle.main.SetInteractTextRaw(this.TextLineOne, this.TextLineTwo);
+                    }
                 }
-
-
             }
 #elif BELOWZERO
             if (this.IsHovered && inInteractionRange)

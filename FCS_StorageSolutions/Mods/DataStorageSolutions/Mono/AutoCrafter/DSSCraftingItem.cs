@@ -1,5 +1,9 @@
-﻿using FCS_AlterraHub.Mono;
+﻿using System.Collections.Generic;
+using System.Text;
+using FCS_AlterraHub.Model;
+using FCS_AlterraHub.Mono;
 using FCS_StorageSolutions.Configuration;
+using FCSCommon.Utilities;
 
 namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
 {
@@ -10,27 +14,33 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
         private DSSAutoCrafterDisplay _controller;
         private TechType _techType;
         private bool _isRecurring;
+        private FCSToolTip _toolTip;
 
         private void Initialize()
         {
-
+            UseSetUseTextRaw = true;
             if (_isInitialized) return;
-            
-            _icon = gameObject.FindChild("Icon").EnsureComponent<uGUI_Icon>();
+
+            var icon = gameObject.FindChild("Icon");
+            _toolTip = icon.AddComponent<FCSToolTip>();
+            _toolTip.RequestPermission = () => true;
+            _icon = icon.EnsureComponent<uGUI_Icon>();
             _isInitialized = true;
             OnButtonClick += (s, o) =>
             {
                 _controller.AddNewCraftingItem(new CraftingItem(_techType));
             };
         }
-
+        
         internal void Set(TechType techType, DSSAutoCrafterDisplay controller)
         {
             Initialize();
             _controller = controller;
             _techType = techType;
+            _toolTip.TechType = techType;
+            var itemName = Language.main.Get(techType);
             _icon.sprite = SpriteManager.Get(techType);
-            TextLineOne = AuxPatchers.CraftFormatted(Language.main.Get(techType));
+            TextLineOne = AuxPatchers.CraftFormatted(itemName);
             Show();
         }
 

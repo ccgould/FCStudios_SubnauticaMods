@@ -1,137 +1,99 @@
 ﻿using System;
 using System.Collections.Generic;
+using FCS_AlterraHub.Managers.Quests.Enums;
 using FCSCommon.Utilities;
+using Oculus.Newtonsoft.Json;
 using UnityEngine;
 
 namespace FCS_AlterraHub.Managers.Quests
 {
     public class QuestEvent
     {
-        public enum EventStatus{WAITING,CURRENT,DONE};  
-        public enum EventType{COLLECT,BUILD,SCAN,FIND,DEVICEACTION};
-        public enum DeviceActionType {PROCESSITEM,ADDITEM,REMOVEITEM,CREATEITEM}
-        //WAITING - not yet completed but can't be worked on cause there's a prerequisite event
-        //CURRENT - the one the player should be trying to achieve
-        //DONE - has been achieved
-
-        private TechType _techType;
-        private int _amount;
-        private EventType _eventType;
-        private EventStatus _status;
-        public string GetID { get; }
-        public string GetName { get; }
-        public string GetDescription { get; }
-        public EventStatus GetStatus => _status;
+        public int Amount { get; set; }
+        public int CurrentAmount { get; set; }
+        public string GetID { get; set; }
+        public string GetName { get; set; }
+        public string GetDescription { get; set; }
         public int Order = -1;
-        public GameObject Location { get; set; }
-        public TechType GetTechType => _techType;
-        public List<QuestPath> PathList = new List<QuestPath>();
-        private int _currentAmount;
+        public TechType TechType { get; set; }
+        public QuestEventType QuestEventType { get; set; }
+        public QuestEventStatus Status { get; set; }
+        public DeviceActionType DeviceActionType { get; set; }
+        public Dictionary<TechType, int> Requirements { get; set; }
+        [JsonIgnore] public GameObject Location { get; set; }
 
-        private DeviceActionType _actionType;
+        [JsonIgnore] public List<QuestPath> PathList = new List<QuestPath>();
+        [JsonIgnore] public bool RequirementsMet => IsRequirementsMet();
 
-        private readonly Dictionary<TechType, int> _requirements;
-        public bool AmountMet => _currentAmount >= _amount;
-        public EventType GetEventType => _eventType;
-        public DeviceActionType GetDeviceActionType => _actionType;
-        public bool RequirementsMet => IsRequirementsMet();
-        public string Name { get; }
-        public string Description { get; }
-        public TechType TechType { get; }
-        public int Amount { get; }
-        public DeviceActionType ActionType { get; }
-        public Dictionary<TechType, int> Requirements => _requirements;
         private bool IsRequirementsMet()
         {
-            QuickLogger.Debug($"Checking Requirements",true);
-            foreach (KeyValuePair<TechType, int> pair in _requirements)
+            foreach (KeyValuePair<TechType, int> pair in Requirements)
             {
                 if (pair.Value > 0)
                 {
-                    QuickLogger.Debug($"Requirements Not Met", true);
                     return false;
                 }
             }
-
-            QuickLogger.Debug($"Requirements Met", true);
             return true;
         }
 
-        public QuestEvent(string name, string description, GameObject location,EventType eventType)
+        public QuestEvent(string name, string description, GameObject location,QuestEventType questEventType)
         {
             GetID = Guid.NewGuid().ToString();
             GetName = name;
             GetDescription = description;
             Location = location;
-            _eventType = eventType;
-            _status = EventStatus.WAITING;
+            QuestEventType = questEventType;
+            Status = QuestEventStatus.WAITING;
         }
 
-        public QuestEvent(string name, string description, TechType techType, EventType eventType)
+        public QuestEvent(string name, string description, TechType techType, QuestEventType questEventType)
         {
             GetID = Guid.NewGuid().ToString();
             GetName = name;
             GetDescription = description;
-            _techType = techType;
-            _eventType = eventType;
-            _status = EventStatus.WAITING;
+            TechType = techType;
+            QuestEventType = questEventType;
+            Status = QuestEventStatus.WAITING;
         }
 
-        [Obsolete("Use QuestEvent(string name, string description, TechType techType, int amount, DeviceActionType actionType, Dictionary<TechType, int> requirements, EventType eventType) instead.")]
-        public QuestEvent(string name, string description, TechType techType,int amount, EventType eventType)
+        public QuestEvent(string name, string description, TechType techType,GameObject location, QuestEventType questEventType)
         {
             GetID = Guid.NewGuid().ToString();
             GetName = name;
             GetDescription = description;
-            _techType = techType;
-            _amount = amount;
-            _eventType = eventType;
-            _status = EventStatus.WAITING;
-        }
-
-        public QuestEvent(string name, string description, TechType techType,GameObject location, EventType eventType)
-        {
-            GetID = Guid.NewGuid().ToString();
-            GetName = name;
-            GetDescription = description;
-            _techType = techType;
+            TechType = techType;
             Location = location;
-            _eventType = eventType;
-            _status = EventStatus.WAITING;
+            QuestEventType = questEventType;
+            Status = QuestEventStatus.WAITING;
         }
 
-        public QuestEvent(string name, string description, TechType techType, DeviceActionType actionType, Dictionary<TechType, int> requirements, EventType eventType)
+        public QuestEvent(string name, string description, TechType techType, DeviceActionType actionType, Dictionary<TechType, int> requirements, QuestEventType questEventType, string id = null)
         {
-            GetID = Guid.NewGuid().ToString();
+            GetID = id ?? Guid.NewGuid().ToString();
             GetName = name;
             GetDescription = description;
-            _techType = techType;
-            _eventType = eventType;
-            _status = EventStatus.WAITING;
-            _actionType = actionType;
-            _requirements = requirements;
+            TechType = techType;
+            QuestEventType = questEventType;
+            Status = QuestEventStatus.WAITING;
+            DeviceActionType = actionType;
+            Requirements = requirements;
         }
 
         public void ActivateEvent()
         {
-            SetStatus(EventStatus.CURRENT);
+            SetStatus(QuestEventStatus.CURRENT);
         }
 
-        public void UpdateQuestEvent(EventStatus eventStatus)
+        public void UpdateQuestEvent(QuestEventStatus questEventStatus)
         {
-            SetStatus(eventStatus);
+            SetStatus(questEventStatus);
         }
 
-        public void SetStatus(EventStatus current)
+        public void SetStatus(QuestEventStatus current)
         {
-            _status = current;
+            Status = current;
             QuickLogger.Debug($"Setting Quest: {GetName} status to {current}",true);
-        }
-
-        public void AddAmount(int amount)
-        {
-            _currentAmount += amount;
-            QuickLogger.Debug($"Added amount to Quest: {GetName} : New Value = {_currentAmount}",true);
         }
     }
 }

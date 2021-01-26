@@ -6,6 +6,7 @@ using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Managers.Quests;
+using FCS_AlterraHub.Managers.Quests.Enums;
 using FCS_AlterraHub.Model;
 using FCSCommon.Extensions;
 using FCSCommon.Utilities;
@@ -281,7 +282,7 @@ namespace FCS_AlterraHub.Systems
 
             }
 
-            QPatch.QuestManagerGM.NotifyDeviceAction(Mod.AlterraHubTechType,Mod.DebitCardTechType,QuestEvent.DeviceActionType.CREATEITEM);
+            QPatch.QuestManagerGM.NotifyDeviceAction(Mod.AlterraHubTechType,Mod.DebitCardTechType,DeviceActionType.CREATEITEM);
         }
         
         internal void CalculateBalance()

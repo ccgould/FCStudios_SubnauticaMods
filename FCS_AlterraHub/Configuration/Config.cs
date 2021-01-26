@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using FCS_AlterraHub.Patches;
 using FCS_AlterraHub.Structs;
 using FCSCommon.Utilities;
 using Oculus.Newtonsoft.Json;
@@ -21,7 +22,7 @@ namespace FCS_AlterraHub.Configuration
         [JsonIgnore]
         public UnityAction<int> onGameModeChanged;
 
-        [Keybind("Open/Close FCS PDA")]
+        [Keybind("Open/Close FCS PDA"), OnChange(nameof(PDAKeyCodeChangedEvent))]
         public KeyCode FCSPDAKeyCode { get; set; }= KeyCode.F2;
 
         public List<FCSStoreEntry> AdditionalStoreItems = new List<FCSStoreEntry>();
@@ -39,7 +40,12 @@ namespace FCS_AlterraHub.Configuration
 
         [JsonIgnore]
         internal Action<bool> OnPlaySoundToggleEvent { get; set; }
-        
+
+        private void PDAKeyCodeChangedEvent(KeybindChangedEventArgs e)
+        {
+            uGUI_PowerIndicator_Initialize_Patch.MissionHUD.UpdateButtonPressLabel();
+        }
+
         private void ChangeGameModeEvent(ChoiceChangedEventArgs e)
         {
             onGameModeChanged?.Invoke(e.Index);

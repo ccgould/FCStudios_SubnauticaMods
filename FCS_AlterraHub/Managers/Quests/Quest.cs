@@ -1,5 +1,7 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
+using FCS_AlterraHub.Managers.Quests.Enums;
 using FCSCommon.Utilities;
 using UnityEngine;
 
@@ -7,35 +9,39 @@ namespace FCS_AlterraHub.Managers.Quests
 {
     public class Quest
     {
-        public List<QuestEvent> QuestEvents  = new List<QuestEvent>();
+        //ADD Description for the mission
+        //public string MissionDescription { get; set; }
+        public List<QuestEvent> QuestEvents { get; set; } = new List<QuestEvent>();
+        public List<QuestAction> QuestActions { get; set; } = new List<QuestAction>();
         public TechType TechTypeReward { get; set; }
         public decimal CreditReward { get; set; }
+        public string Description { get; set; }
 
-
-        public QuestEvent AddQuestEvent(string name, string description, GameObject location, QuestEvent.EventType eventType)
+        public QuestEvent AddQuestEvent(string name, string description, GameObject location, QuestEventType questEventType)
         {
-            QuestEvent questEvent = new QuestEvent(name,description,location,eventType);
+            QuestEvent questEvent = new QuestEvent(name,description,location,questEventType);
             QuestEvents.Add(questEvent);
             return questEvent;
         }
 
-        public QuestEvent AddQuestEvent(string name, string description, TechType techType, QuestEvent.EventType eventType)
+        public QuestEvent AddQuestEvent(QuestEvent newEvent)
         {
-            QuestEvent questEvent = new QuestEvent(name, description, techType,eventType);
+            QuestEvents.Add(newEvent);
+            return newEvent;
+        }
+
+        public QuestEvent AddQuestEvent(string name, string description, TechType techType, QuestEventType questEventType)
+        {
+            QuestEvent questEvent = new QuestEvent(name, description, techType,questEventType);
             QuestEvents.Add(questEvent);
             return questEvent;
         }
 
-        [Obsolete("Use AddQuestEvent(string name, string description, TechType techType, int amount, QuestEvent.DeviceActionType actionType, Dictionary<TechType, int> requirements, QuestEvent.EventType eventType) instead.")]
-        public QuestEvent AddQuestEvent(string name, string description, TechType techType,int amount, QuestEvent.EventType eventType)
+        internal QuestEvent AddQuestEvent(string name, string description, TechType techType,
+            DeviceActionType actionType, Dictionary<TechType, int> requirements, QuestEventType questEventType,
+            string id = null)
         {
-            QuestEvent questEvent = new QuestEvent(name, description, techType,amount, eventType);
-            QuestEvents.Add(questEvent);
-            return questEvent;
-        }
-        internal QuestEvent AddQuestEvent(string name, string description, TechType techType,  QuestEvent.DeviceActionType actionType, Dictionary<TechType, int> requirements, QuestEvent.EventType eventType)
-        {
-            QuestEvent questEvent = new QuestEvent(name, description, techType, actionType, requirements,eventType);
+            QuestEvent questEvent = new QuestEvent(name, description, techType, actionType, requirements,questEventType, id);
             QuestEvents.Add(questEvent);
             return questEvent;
         }
@@ -80,6 +86,29 @@ namespace FCS_AlterraHub.Managers.Quests
             {
                 QuickLogger.Debug($"Name: {questEvent.GetName} | Order: {questEvent.Order}");
             }
+        }
+
+        public virtual QuestEvent Create()
+        {
+            return null;
+        }
+
+        public virtual List<QuestAction> GetQuestActions()
+        {
+            return QuestActions;
+        }
+
+        public bool IsComplete()
+        {
+            foreach (QuestEvent questEvent in QuestEvents)
+            {
+                if (questEvent.Status != QuestEventStatus.DONE)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }

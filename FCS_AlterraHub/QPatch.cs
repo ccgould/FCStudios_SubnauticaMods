@@ -38,10 +38,10 @@ namespace FCS_AlterraHub
             GlobalBundle = FCSAssetBundlesService.PublicAPI.GetAssetBundleByName(Mod.AssetBundleName);
             
             QuickLogger.DebugLogsEnabled = Configuration.EnableDebugLogs;
-
+            
             //Load Prefabs
             AlterraHub.GetPrefabs();
-
+            
             //Patch all spawnables
             PatchSpawnables();
 

@@ -6,43 +6,12 @@ using FCS_AlterraHub.Mono.FCSPDA.Mono;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using HarmonyLib;
+using SMLHelper.V2.Json.ExtensionMethods;
 using UnityEngine;
 
 
 namespace FCS_AlterraHub.Patches
 {
-
-
-    //[HarmonyPatch(typeof(PDA))]
-    //[HarmonyPatch("Update")]
-    //internal static class PDA_Patch
-    //{
-    //    [HarmonyPrefix]
-    //    private static bool Prefix(PDA __instance)
-    //    {
-
-    //        __instance.sequence.Update();
-    //        if (__instance.sequence.active)
-    //        {
-    //            float b = (SNCameraRoot.main.mainCamera.aspect > 1.5f) ? __instance.cameraFieldOfView : __instance.cameraFieldOfViewAtFourThree;
-    //            SNCameraRoot.main.SetFov(Mathf.Lerp(MiscSettings.fieldOfView, b, __instance.sequence.t));
-    //        }
-    //        Player main = Player.main;
-    //        if (__instance.isInUse && __instance.isFocused && GameInput.GetButtonDown(GameInput.Button.PDA) && !__instance.ui.introActive)
-    //        {
-    //            __instance.Close();
-    //            return true;
-    //        }
-    //        if (__instance.targetWasSet && (__instance.target == null || (__instance.target.transform.position - main.transform.position).sqrMagnitude >= __instance.activeSqrDistance))
-    //        {
-    //            __instance.Close();
-    //        }
-
-    //        return true;
-    //    }
-    //}
-
-
     [HarmonyPatch(typeof(Player))]
     [HarmonyPatch("Awake")]
     internal static class Player_Awaker_Patch
@@ -52,23 +21,36 @@ namespace FCS_AlterraHub.Patches
         {
             if (QPatch.QuestManagerGM == null)
             {
+                //Load GamePlaySettings
+                Mod.LoadGamePlaySettings();
                 QPatch.QuestManagerGM = new GameObject("QuestManager").AddComponent<QuestManager>();
             }
         }
+
+        
     }
 
     [HarmonyPatch(typeof(Player))]
     [HarmonyPatch("Update")]
-    internal static class Player_Patch
+    internal static class Player_Update_Patch
     {
         internal static Action OnPlayerUpdate;
         public static FCSPDAController FCSPDA;
         private static Player _instance;
-
+        public static bool LoadSavesQuests { get; set; }
+        
+        
         private static void Postfix(Player __instance)
         {
+
             _instance = __instance;
             OnPlayerUpdate?.Invoke();
+
+            if (LoadSavesQuests && QPatch.QuestManagerGM != null)
+            {
+                QuestManager.Instance.Load();
+                LoadSavesQuests = false;
+            }
 
             if (Input.GetKeyDown(QPatch.Configuration.FCSPDAKeyCode) && !__instance.GetPDA().isOpen)
             {
@@ -99,7 +81,9 @@ namespace FCS_AlterraHub.Patches
             pda.SetActive(false);
             pda.EnsureComponent<Rigidbody>().isKinematic = true;
             var controller = pda.AddComponent<FCSPDAController>();
-            Player_Patch.FCSPDA = controller;
+            var audioSource = __instance.gameObject.AddComponent<AudioSource>();
+            controller.AudioSource = audioSource;
+            Player_Update_Patch.FCSPDA = controller;
             controller.PDAObj =  __instance.pdaSpawn.spawnedObj;
             if (pda != null)
             {

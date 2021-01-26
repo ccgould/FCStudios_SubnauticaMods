@@ -6,6 +6,7 @@ using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Managers.Quests;
+using FCS_AlterraHub.Managers.Quests.Enums;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Helpers;
@@ -95,7 +96,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
                 if (_timeLeft < 0)
                 {
                     var techType = _oreQueue.Dequeue();
-                    QPatch.QuestManagerGM.NotifyDeviceAction(Mod.OreConsumerTechType,techType, QuestEvent.DeviceActionType.PROCESSITEM);
+                    QPatch.QuestManagerGM.NotifyDeviceAction(Mod.OreConsumerTechType,techType, DeviceActionType.PROCESSITEM);
                     AppendMoney(StoreInventorySystem.GetOrePrice(techType));
                     _timeLeft = OreProcessingTime;
                 }
