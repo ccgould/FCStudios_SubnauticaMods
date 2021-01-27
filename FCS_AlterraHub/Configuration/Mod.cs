@@ -21,6 +21,7 @@ namespace FCS_AlterraHub.Configuration
     {
         private static ModSaver _saveObject;
         private static SaveData _saveData;
+        private static bool _audioLoaded;
 
         internal static string SaveDataFilename => $"{ModName}SaveData.json";
         
@@ -136,7 +137,7 @@ namespace FCS_AlterraHub.Configuration
             {TechType.SnakeMushroom,0.3902903f},
             {TechType.PurpleFan,0.2761627f},
             {TechType.SmallFan,0.2761627f},
-            {TechType.JellyPlant,0.2761627f},
+            {TechType.JellyPlant,0.2761627f}
         };
 
         public static FCSGamePlaySettings GamePlaySettings { get; set; } = new FCSGamePlaySettings();
@@ -159,7 +160,7 @@ namespace FCS_AlterraHub.Configuration
         internal static void LoadDevicesData()
         {
             QuickLogger.Info("Loading Save Data...");
-            ModUtils.LoadSaveData<List<KnownDevice>>(KnownDevicesFilename, GetSaveFileDirectory(), (data) =>
+            ModUtils.LoadSaveData<List<KnownDevice>>(KnownDevicesFilename, GetSaveFileDirectory(), data =>
             {
                 QuickLogger.Info("Save Data Loaded");
                 OnDevicesDataLoaded?.Invoke(data);
@@ -179,6 +180,9 @@ namespace FCS_AlterraHub.Configuration
                 return false;
             }
         }
+
+        public static Dictionary<string, AudioClip> AudioClips = new Dictionary<string, AudioClip>();
+        
 
         public static bool SaveGamePlaySettings()
         {
@@ -205,7 +209,7 @@ namespace FCS_AlterraHub.Configuration
         internal static void LoadGamePlaySettings()
         {
             QuickLogger.Info("Loading Game Play Settings...");
-            ModUtils.LoadSaveData<FCSGamePlaySettings>("settings.json", GetSaveFileDirectory(), (data) =>
+            ModUtils.LoadSaveData<FCSGamePlaySettings>("settings.json", GetSaveFileDirectory(), data =>
             {
                 QuickLogger.Info($"Save Game Play Settings Loaded {data.PlayStarterMission} | {data.Event}");
                 GamePlaySettings = data;
@@ -253,14 +257,14 @@ namespace FCS_AlterraHub.Configuration
                 _saveData = newSaveData;
 
                 SaveGamePlaySettings();
-                ModUtils.Save<SaveData>(_saveData, SaveDataFilename, GetSaveFileDirectory(), OnSaveComplete);
+                ModUtils.Save(_saveData, SaveDataFilename, GetSaveFileDirectory(), OnSaveComplete);
             }
         }
         
         internal static void LoadData()
         {
             QuickLogger.Info("Loading Save Data...");
-            ModUtils.LoadSaveData<SaveData>(SaveDataFilename, GetSaveFileDirectory(), (data) =>
+            ModUtils.LoadSaveData<SaveData>(SaveDataFilename, GetSaveFileDirectory(), data =>
             {
                 _saveData = data;
                 QuickLogger.Info("Save Data Loaded");
@@ -300,7 +304,7 @@ namespace FCS_AlterraHub.Configuration
                 }
             }
 
-            return new OreConsumerDataEntry() { Id = id };
+            return new OreConsumerDataEntry { Id = id };
         }
         
         internal static AlterraHubDataEntry GetAlterraHubSaveData(string id)
@@ -319,7 +323,7 @@ namespace FCS_AlterraHub.Configuration
                 }
             }
 
-            return new AlterraHubDataEntry() { Id = id };
+            return new AlterraHubDataEntry { Id = id };
         }
 
         internal static BaseSaveData GetBaseSaveData(string instanceId)

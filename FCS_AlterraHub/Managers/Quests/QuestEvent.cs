@@ -20,10 +20,12 @@ namespace FCS_AlterraHub.Managers.Quests
         public QuestEventStatus Status { get; set; }
         public DeviceActionType DeviceActionType { get; set; }
         public Dictionary<TechType, int> Requirements { get; set; }
+        public string MissionContactName { get; set; }
         [JsonIgnore] public GameObject Location { get; set; }
 
         [JsonIgnore] public List<QuestPath> PathList = new List<QuestPath>();
         [JsonIgnore] public bool RequirementsMet => IsRequirementsMet();
+        public string MissionAudioTrackPath { get; set; }
 
         private bool IsRequirementsMet()
         {

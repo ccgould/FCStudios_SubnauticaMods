@@ -1,5 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using FCS_AlterraHub.Managers.Quests.Enums;
+using FCS_AlterraHub.Patches;
 using FCSCommon.Utilities;
 using UnityEngine;
 
@@ -31,8 +34,7 @@ namespace FCS_AlterraHub.Managers.Quests
             if (!_questEvent.RequirementsMet) return;
 
             //inject these back  into the Quest Manager to Update the States
-            _questEvent.UpdateQuestEvent(QuestEventStatus.DONE);
-            _questManager.UpdateQuestOnCompletion(_questEvent);
+            CompleteQuest();
         }
 
         internal void CheckBuildAction(TechType techType)
@@ -51,8 +53,7 @@ namespace FCS_AlterraHub.Managers.Quests
             if (!_questEvent.RequirementsMet) return;
 
             //inject these back  into the Quest Manager to Update the States
-            _questEvent.UpdateQuestEvent(QuestEventStatus.DONE);
-            _questManager.UpdateQuestOnCompletion(_questEvent);
+            CompleteQuest();
         }
 
         internal void CheckScanAction(TechType techType)
@@ -75,8 +76,7 @@ namespace FCS_AlterraHub.Managers.Quests
             if (!_questEvent.RequirementsMet) return;
 
             //inject these back  into the Quest Manager to Update the States
-            _questEvent.UpdateQuestEvent(QuestEventStatus.DONE);
-            _questManager.UpdateQuestOnCompletion(_questEvent);
+            CompleteQuest();
         }
 
         public void Setup(QuestManager questManager, QuestEvent questEvent)
@@ -91,10 +91,7 @@ namespace FCS_AlterraHub.Managers.Quests
             if (deviceTechType != _questEvent.TechType || _questEvent.QuestEventType != QuestEventType.DEVICEACTION || _questEvent.DeviceActionType != deviceAction) return;
 
             QuickLogger.Debug($"[CheckDeviceAction] Status: {_questEvent.Status} | Device Action: {deviceAction}", true);
-
-
             
-
             //If we shouldn't be working on this event
             // then don't register it as completed
 
@@ -115,9 +112,18 @@ namespace FCS_AlterraHub.Managers.Quests
             //inject these back  into the Quest Manager to Update the States
             _questEvent.UpdateQuestEvent(QuestEventStatus.DONE);
             _questManager.UpdateQuestOnCompletion(_questEvent);
-            foreach (KeyValuePair<TechType, int> pair in _questEvent.Requirements)
+
+            var keys = _questEvent.Requirements.Keys.ToList();
+            foreach (TechType key in keys)
             {
-                _questEvent.Requirements[pair.Key] = 0;
+                _questEvent.Requirements[key] = 0;
+            }
+
+            if (!string.IsNullOrEmpty(_questEvent.MissionAudioTrackPath))
+            {
+                var clipName = Path.GetFileNameWithoutExtension(_questEvent.MissionAudioTrackPath);
+                Player_Update_Patch.FCSPDA.MessagesController.PlayAudioTrack(clipName);
+                Player_Update_Patch.FCSPDA.MessagesController.AddNewMessage($"New Message from {_questEvent.MissionContactName} - Mission: {_questEvent.GetName}", _questEvent.MissionContactName, clipName,true);
             }
         }
 

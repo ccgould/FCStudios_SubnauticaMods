@@ -55,5 +55,10 @@ namespace FCS_AlterraHub.Patches
         {
             _scaleEffect.ExecuteEffects();
         }
+
+        public void ShowNewMessagePopUp(string contactName)
+        {
+            ShowMessage("New Message", $"Message from {contactName}");
+        }
     }
 }

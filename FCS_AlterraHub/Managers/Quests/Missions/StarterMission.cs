@@ -11,13 +11,14 @@ namespace FCS_AlterraHub.Managers.Quests.Missions
         {
             //Create each event
             QuestEvent scanOreConsumer = AddQuestEvent("Scan Ore Consumer",
-                "Alterra needs you to scan the ore consumer located in the Aurora. Make sure you have a scanner and any other tool you need to gain access",
+                "Alterra needs you to scan the ore consumer located in the Jellyshroom caves. Make sure you have a scanner and any other tool you need to gain access",
                 Mod.OreConsumerFragmentTechType, DeviceActionType.NONE, 
                 new Dictionary<TechType, int>
                 {
                     { Mod.OreConsumerFragmentTechType, 1 }
                 }, 
                 QuestEventType.SCAN);
+            scanOreConsumer.MissionContactName = "Jack Winton";
 
             QuestEvent buildAlterraHub = AddQuestEvent("Build AlterraHub",
                 "Alterra needs you to build an Alterra Hub so you can make an account so we can begin testing the account system.",
@@ -27,10 +28,13 @@ namespace FCS_AlterraHub.Managers.Quests.Missions
                     { Mod.AlterraHubTechType, 1}
                 }, 
                QuestEventType.BUILD);
+            buildAlterraHub.MissionContactName = "Jack Winton";
 
             QuestEvent createAccount = AddQuestEvent("Create an Alterra Account",
                 "Alterra needs you to make an account so we can begin testing the account system.",
                 Mod.AlterraHubTechType, DeviceActionType.CREATEITEM, new Dictionary<TechType, int> { { Mod.DebitCardTechType, 1 } }, QuestEventType.DEVICEACTION);
+            createAccount.MissionContactName = "Jack Winton";
+            createAccount.MissionAudioTrackPath = Path.Combine(Mod.GetAssetPath(), "Audio", "AH-Mission01-Pt2.wav");
 
             QuestEvent buildOreConsumers = AddQuestEvent("Build Ore Consumer",
                 "Ok, lastly we now need you to build 2 Ore Consumers and start a ore process by adding ores to the machine so you can now generate cash.",
@@ -40,8 +44,9 @@ namespace FCS_AlterraHub.Managers.Quests.Missions
                     { Mod.OreConsumerTechType, 2 }
                 }, 
                 QuestEventType.BUILD);
+            buildOreConsumers.MissionContactName = "Jack Winton";
 
-                QuestEvent processOres = AddQuestEvent("Process Ores in Ore Consumer",
+            QuestEvent processOres = AddQuestEvent("Process Ores in Ore Consumer",
                 "Alterra needs you to process 10 diamonds and 10 gold",
                 Mod.OreConsumerTechType, DeviceActionType.PROCESSITEM,
                 new Dictionary<TechType, int>
@@ -50,6 +55,8 @@ namespace FCS_AlterraHub.Managers.Quests.Missions
                     { TechType.Gold, 10}
                 },
                 QuestEventType.DEVICEACTION);
+            processOres.MissionContactName = "Jack Winton";
+            processOres.MissionAudioTrackPath = Path.Combine(Mod.GetAssetPath(), "Audio", "AH-Mission01-Pt3.wav");
 
 
             //Define the paths between the events - e.g the order they must be completed

@@ -32,29 +32,16 @@ namespace FCS_AlterraHub.Managers.Quests
             }
         }
 
-        private void Start()
-        {
-            if (_audioLoaded) return;
-            LoadAudioFiles();
-            _audioLoaded = true;
-        }
-
-        private static void LoadAudioFiles()
-        {
-            Instance.AddAudioTrack(Path.Combine(Mod.GetAssetPath(), "Audio", "AH-Mission01-Pt1.wav"));
-            Instance.AddAudioTrack(Path.Combine(Mod.GetAssetPath(), "Audio", "AH-Mission01-Pt2.wav"));
-        }
-
-        public Dictionary<string, AudioClip> AudioClips = new Dictionary<string, AudioClip>();
         private FCSGamePlaySettings settings => Mod.GamePlaySettings;
         public Quest quest;
         private QuestEvent _finalEvent;
         internal Action<Quest> OnMissionAdded;
-        private bool _audioLoaded;
+        private static bool _audioLoaded;
 
         private void Update()
         {
             if(Mod.GamePlaySettings == null) return;
+
             if (DayNightCycle.main.timePassedAsFloat > 600f && Mod.GamePlaySettings.PlayStarterMission)
             {
                 //Change to add message
@@ -102,6 +89,7 @@ namespace FCS_AlterraHub.Managers.Quests
                 {
                     PlayerInteractionHelper.GivePlayerItem(quest.TechTypeReward);
                 }
+
                 QuickLogger.Debug($"Quest {questEvent.GetName} is complete", true);
                 return;
             }
@@ -115,6 +103,13 @@ namespace FCS_AlterraHub.Managers.Quests
                     currentQuestEvent.UpdateQuestEvent(QuestEventStatus.CURRENT);
                 }
             }
+        }
+
+        public AudioClip FindAudioClip(string audioName)
+        {
+            if (!Mod.AudioClips.ContainsKey(audioName)) return null;
+            QuickLogger.Debug($"Audio clip found: {audioName}", true);
+            return Mod.AudioClips[audioName];
         }
 
         private GameObject CreateButton(QuestEvent e)
@@ -263,24 +258,6 @@ namespace FCS_AlterraHub.Managers.Quests
         public int GetMissionCount()
         {
             return quest != null && !quest.IsComplete()? 1: 0;
-        }
-
-        public  IEnumerator LoadAudio(string audioSource)
-        {
-            WWW request = GetAudioFromFile(audioSource);
-            yield return request;
-            AudioClips.Add(Path.GetFileNameWithoutExtension(audioSource), request.GetAudioClip());
-        }
-
-        private  WWW GetAudioFromFile(string source)
-        {
-            WWW request = new WWW(source);
-            return request;
-        }
-
-        public  void AddAudioTrack(string path)
-        {
-            StartCoroutine(LoadAudio(path));
         }
     }
 }

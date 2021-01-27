@@ -8,6 +8,7 @@ using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Managers.Quests;
 using FCS_AlterraHub.Model;
+using FCS_AlterraHub.Patches;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
@@ -49,11 +50,11 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
         private Text _accountName;
         private Text _accountBalance;
         private bool _goToEncyclopedia;
-        private PDAMissionController _missionController;
+        public PDAMissionController MissionController;
         private GameObject _missionPage;
         private List<Button> _padHomeButtons = new List<Button>();
         private GameObject _messagesPage;
-        private MessagesController _messagesController;
+        public MessagesController MessagesController;
         private bool _addtempMessage = true;
 
 
@@ -109,15 +110,10 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
         {
             QuestManager.Instance.OnMissionAdded += quest =>
             {
-                _missionController.UpdateQuest(quest);
+                MissionController.UpdateQuest(quest);
             };
             _home = GameObjectHelpers.FindGameObject(gameObject, "Home");
             _missionPage = GameObjectHelpers.FindGameObject(gameObject, "Missions");
-
-
-            _messagesPage = GameObjectHelpers.FindGameObject(gameObject, "Messages");
-            _messagesController = _messagesPage.AddComponent<MessagesController>();
-            _messagesController.Initialize(AudioSource, this);
             
             _bases = GameObjectHelpers.FindGameObject(gameObject, "Bases");
             _baseInventory = GameObjectHelpers.FindGameObject(gameObject, "BasesInventory");
@@ -130,9 +126,6 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             var stopButton = GameObjectHelpers.FindGameObject(gameObject, "StopButton").GetComponent<Button>();
             stopButton.onClick.AddListener((() => { vpb.Stop();}));
             var canvas = gameObject.GetComponentInChildren<Canvas>();
-
-            _missionController = gameObject.AddComponent<PDAMissionController>();
-            _missionController.Initialize();
 
             foreach (Transform invItem in GameObjectHelpers.FindGameObject(_baseInventory, "Grid").transform)
             {
@@ -254,13 +247,43 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             MaterialHelpers.ChangeEmissionColor(Buildables.AlterraHub.BaseEmissiveDecalsController, gameObject,
                 Color.cyan);
 
-            _missionController.UpdateQuest(QuestManager.Instance.GetActiveMission());
-            _messagesController.AddNewMessage("Message From: Jack Winton (Chief Engineer)", QuestManager.Instance.AudioClips["AH-Mission01-Pt1"]);
             _addtempMessage = false;
 
             InvokeRepeating(nameof(UpdateDisplay), .5f, .5f);
         }
-        
+
+        private void CreateMessagesController()
+        {
+            _messagesPage = GameObjectHelpers.FindGameObject(gameObject, "Messages");
+            MessagesController = _messagesPage.AddComponent<MessagesController>();
+            MessagesController.Initialize(this);
+        }
+
+        internal void CreateMissionController()
+        {
+            CreateMessagesController();
+
+            MissionController = gameObject?.EnsureComponent<PDAMissionController>();
+            if (MissionController == null)
+            {
+                QuickLogger.Error<FCSPDAController>("Mission Controller is null", true);
+                return;
+            }
+            MissionController.Initialize();
+            if (QuestManager.Instance == null)
+            {
+                QuickLogger.Error<FCSPDAController>("Quest Manager Instance is null",true);
+                return;
+            }
+
+            if (MessagesController == null)
+            {
+                QuickLogger.Error<FCSPDAController>("Messages Controller is null", true);
+                return;
+            }
+
+        }
+
         private void UpdateDisplay()
         {
             if (_inventoyGrid == null || _basesGrid == null || _currentBiome == null || _accountName == null) return;
@@ -395,14 +418,9 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             QuickLogger.Debug("In Find PDA");
             if (PdaCanvas == null)
             {
-                QuickLogger.Debug("1");
                 PdaCanvas = PDAObj?.GetComponent<PDA>()?.screen?.gameObject?.GetComponent<Canvas>();
-                QuickLogger.Debug("2");
                 Player main = Player.main;
-                QuickLogger.Debug("3");
                 _pda = main.GetPDA();
-                QuickLogger.Debug("4");
-
             }
         }
 
@@ -485,64 +503,11 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
     {
         private bool _initialized;
         private GameObject _messageList;
-        private AudioSource _audioSource;
+        private AudioSource _audioSource => Player_Update_Patch.FCSPDA.AudioSource;
         private readonly List<AudioMessage> _messages = new List<AudioMessage>();
         private Text _messageCounter;
-        private bool _audioAdded; //Remove after beta release this need to be handled differently
-
-        internal void Initialize(AudioSource audio, FCSPDAController fcspdaController)
-        {
-            if (_initialized) return;
-            QuickLogger.Debug("1");
-            _messageList = GameObjectHelpers.FindGameObject(gameObject, "Messageslist");
-            _messageCounter = GameObjectHelpers.FindGameObject(fcspdaController.gameObject, "MessagesCounter").GetComponent<Text>();
-            _audioSource = audio;
-            InvokeRepeating(nameof(UpdateMessageCounter), 1, 1);
-            _initialized = true;
-        }
-
-        private void OnEnable()
-        {
-            if (!_audioAdded)
-            {
-                _audioAdded = true;
-            }
-        }
-
-        private void UpdateMessageCounter()
-        {
-            _messageCounter.text = _messages.Count.ToString();
-        }
-
-        internal void AddNewMessage(string description, AudioClip audioclip)
-        {
-            var message = new AudioMessage(description, audioclip);
-            _messages.Add(message);
-            RefreshUI();
-        }
-
-        private void RefreshUI()
-        {
-            for (int i = _messageList.transform.childCount - 1; i > 0; i--)
-            {
-                Destroy(_messageList.transform.GetChild(i).gameObject);
-            }
-
-            foreach (AudioMessage message in _messages)
-            {
-                var prefab = Instantiate(Buildables.AlterraHub.PDAEntryPrefab);
-                var messageController = prefab.AddComponent<MessagePDAEntryController>();
-                messageController.Initialize(message,_audioSource);
-                prefab.transform.SetParent(_messageList.transform, false);
-            }
-        }
-    }
-
-    internal class MessagePDAEntryController : MonoBehaviour
-    {
-        private AudioSource _audioSource;
-        private bool _isInitialized;
         private bool _wasPlaying;
+        private Dictionary<string,AudioClip> AudioClipFiles => Mod.AudioClips;
 
         private void Update()
         {
@@ -562,15 +527,78 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             }
         }
 
-        internal void Initialize(AudioMessage message, AudioSource audioSource)
+        internal void Initialize(FCSPDAController fcsPdaController)
+        {
+            if (_initialized) return;
+            QuickLogger.Debug("1");
+            _messageList = GameObjectHelpers.FindGameObject(gameObject, "Messageslist");
+            _messageCounter = GameObjectHelpers.FindGameObject(fcsPdaController.gameObject, "MessagesCounter").GetComponent<Text>();
+            InvokeRepeating(nameof(UpdateMessageCounter), 1, 1);
+            _initialized = true;
+        }
+        
+        private void UpdateMessageCounter()
+        {
+            _messageCounter.text = _messages.Count(x => !x.HasBeenPlayed).ToString();
+        }
+
+        internal void AddNewMessage(string description,string from, string audioClipName, bool hasBeenPlayed = false)
+        {
+            var message = new AudioMessage(description, audioClipName) {HasBeenPlayed = hasBeenPlayed};
+            _messages.Add(message);
+            uGUI_PowerIndicator_Initialize_Patch.MissionHUD.ShowNewMessagePopUp(from);
+            RefreshUI();
+        }
+
+        private void RefreshUI()
+        {
+            for (int i = _messageList.transform.childCount - 1; i > 0; i--)
+            {
+                Destroy(_messageList.transform.GetChild(i).gameObject);
+            }
+
+            foreach (AudioMessage message in _messages)
+            {
+                var prefab = Instantiate(Buildables.AlterraHub.PDAEntryPrefab);
+                var messageController = prefab.AddComponent<MessagePDAEntryController>();
+                messageController.Initialize(message,this);
+                prefab.transform.SetParent(_messageList.transform, false);
+            }
+        }
+
+        public void PlayAudioTrack(string trackName)
+        {
+            if (string.IsNullOrEmpty(trackName))
+            {
+                QuickLogger.Debug("Track returned null",true);
+                return;
+            }
+
+            var track = QuestManager.Instance.FindAudioClip(trackName);
+            QuickLogger.Debug($"Playing Audio Track: {track} | Length: {track.length}",true);
+            _audioSource.clip = track;
+            _audioSource.Play();
+        }
+    }
+
+    internal class MessagePDAEntryController : MonoBehaviour
+    {
+        private bool _isInitialized;
+        private bool _wasPlaying;
+
+        private void Update()
+        {
+
+        }
+
+        internal void Initialize(AudioMessage message, MessagesController messagesController)
         {
             if(_isInitialized) return;
-            _audioSource = audioSource;
             GetComponentInChildren<Text>().text = message.Description;
             GetComponentInChildren<Button>().onClick.AddListener((() =>
             {
-                _audioSource.clip = message.AudioClip;
-                _audioSource.Play();
+                messagesController.PlayAudioTrack(message.AudioClipName);
+                message.HasBeenPlayed = true;
                 QuestManager.Instance.CreateStarterMission();
 
             }));
@@ -581,10 +609,11 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
     internal class AudioMessage    
     {
         public string Description { get; set; }
-        public AudioClip AudioClip { get; set; }
-        public AudioMessage(string description,AudioClip audioClip)
+        public string AudioClipName { get; set; }
+        public bool HasBeenPlayed { get; set; }
+        public AudioMessage(string description,string audioClipName)
         {
-            AudioClip = audioClip;
+            AudioClipName = audioClipName;
             Description = description;
         }
     }
