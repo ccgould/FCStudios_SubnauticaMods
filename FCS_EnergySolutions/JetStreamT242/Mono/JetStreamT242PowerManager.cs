@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Enumerators;
 using FCS_EnergySolutions.Configuration;
 using FCSCommon.Utilities;
@@ -151,9 +152,6 @@ namespace FCS_EnergySolutions.JetStreamT242.Mono
 
         public void OnHandHover(GUIHand hand)
         {
-
-
-
             HandReticle main = HandReticle.main;
 
 
@@ -166,11 +164,8 @@ namespace FCS_EnergySolutions.JetStreamT242.Mono
 
 
 
-            main.SetInteractText(
-                Language.main.GetFormat(AuxPatchers.JetStreamOnHover(), _mono.UnitID,
-                    Mathf.RoundToInt(this._powerSource.GetPower()), Mathf.RoundToInt(this._powerSource.GetMaxPower()),
-                    ((GenerationAmount + _inverseLerp) * 60).ToString("N1")),
-                AuxPatchers.JetStreamOnHoverInteractionFormatted("E",_powerState.ToString()));
+            main.SetInteractText(Language.main.GetFormat(AuxPatchers.JetStreamOnHover(), _mono.UnitID,Mathf.RoundToInt(this._powerSource.GetPower()), Mathf.RoundToInt(this._powerSource.GetMaxPower()),
+                    ((GenerationAmount + _inverseLerp) * 60).ToString("N1")),$"{AuxPatchers.JetStreamOnHoverInteractionFormatted("E", _powerState.ToString())} For more information press {FCS_AlterraHub.QPatch.Configuration.PDAInfoKeyCode}");
             main.SetIcon(HandReticle.IconType.Info);
 
             if (GameInput.GetButtonDown(GameInput.Button.Exit))
@@ -183,6 +178,11 @@ namespace FCS_EnergySolutions.JetStreamT242.Mono
                 {
                     _mono.DeActivateTurbine();
                 }
+            }
+
+            if (Input.GetKeyDown(FCS_AlterraHub.QPatch.Configuration.PDAInfoKeyCode))
+            {
+
             }
         }
 

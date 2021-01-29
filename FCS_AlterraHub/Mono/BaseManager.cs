@@ -96,9 +96,7 @@ namespace FCS_AlterraHub.Mono
             Player_Update_Patch.OnPlayerUpdate += PowerStateCheck;
 
         }
-
         
-
         private void Initialize(SubRoot habitat)
         {
             _savedData = Mod.GetBaseSaveData(BaseID);
@@ -220,12 +218,20 @@ namespace FCS_AlterraHub.Mono
 
         public static void RemoveDestroyedBases()
         {
-            for (int i = Managers.Count - 1; i > -1; i--)
+            try
             {
-                if (Managers[i].Habitat == null)
+                for (int i = Managers.Count - 1; i > -1; i--)
                 {
-                    Managers.RemoveAt(i);
+                    if (Managers[i].Habitat == null)
+                    {
+                        Managers.RemoveAt(i);
+                    }
                 }
+            }
+            catch (Exception e)
+            {
+                QuickLogger.DebugError(e.Message);
+                QuickLogger.DebugError(e.StackTrace);
             }
         }
 

@@ -28,7 +28,7 @@ namespace FCS_AlterraHub
     [QModCore]
     public class QPatch
     {
-        internal static Config Configuration { get;} = OptionsPanelHandler.Main.RegisterModOptions<Config>();
+        public static Config Configuration { get;} = OptionsPanelHandler.Main.RegisterModOptions<Config>();
         public static AssetBundle GlobalBundle { get; set; }
 
         [QModPatch]

@@ -79,10 +79,23 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
             {
                var fabricator =  CraftTree.GetTree(CraftTree.Type.Fabricator);
                GetCraftTreeData(fabricator.nodes);
-               foreach (TechType craftable in Mod.Craftables)
-               {
-                   QuickLogger.Debug($"Craftable: {Language.main.Get(craftable)} was added.");
-               }
+
+               var cyclopsFabricator = CraftTree.GetTree(CraftTree.Type.CyclopsFabricator);
+               GetCraftTreeData(cyclopsFabricator.nodes);
+
+               var workbench = CraftTree.GetTree(CraftTree.Type.Workbench);
+               GetCraftTreeData(workbench.nodes);
+
+               var maproom = CraftTree.GetTree(CraftTree.Type.MapRoom);
+               GetCraftTreeData(maproom.nodes);
+
+               var seamothUpgrades = CraftTree.GetTree(CraftTree.Type.SeamothUpgrades);
+               GetCraftTreeData(seamothUpgrades.nodes);
+
+               // foreach (TechType craftable in Mod.Craftables)
+               //{
+               //    QuickLogger.Debug($"Craftable: {Language.main.Get(craftable)} was added.");
+               //}
             }
             
             _materials = MaterialHelpers.GetMaterials(gameObject, "DSS_ConveyorBelt");
@@ -120,8 +133,10 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
         {
             foreach (CraftNode craftNode in innerNodes)
             {
-                QuickLogger.Debug($"Craftable: {craftNode.string0} | {craftNode.string1} | {craftNode.techType0}");
+                QuickLogger.Debug($"Craftable: {craftNode.id} | {craftNode.string0} | {craftNode.string1} | {craftNode.techType0}");
 
+                if (string.IsNullOrWhiteSpace(craftNode.id)) continue;
+                if (craftNode.id.Equals("CookedFood") || craftNode.id.Equals("CuredFood")) return;
                 if (craftNode.techType0 != TechType.None)
                 {
                     Mod.Craftables.Add(craftNode.techType0);

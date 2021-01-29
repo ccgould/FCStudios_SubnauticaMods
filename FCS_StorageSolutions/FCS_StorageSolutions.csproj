@@ -141,7 +141,6 @@
     <Compile Include="Mods\DataStorageSolutions\Mono\AutoCrafter\DSSCraftManager.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\AutoCrafter\DSSProductionItem.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\AutoCrafter\NumberPadController.cs" />
-    <Compile Include="Mods\DataStorageSolutions\Mono\AutoCrafter\PaginatorController.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\AutoCrafter\StatusController.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\FormattingStation\AddFilterController.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\FormattingStation\DSSFormattingStationController.cs" />

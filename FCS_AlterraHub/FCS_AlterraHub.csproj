@@ -152,6 +152,7 @@
     <Compile Include="Helpers\TechDataHelpers.cs" />
     <Compile Include="Helpers\WorldHelpers.cs" />
     <Compile Include="Interfaces\IDSSRack.cs" />
+    <Compile Include="Interfaces\IFCSDisplay.cs" />
     <Compile Include="Interfaces\IFCSGrowBed.cs" />
     <Compile Include="Interfaces\ISlotController.cs" />
     <Compile Include="Managers\FCSPowerManager.cs" />
@@ -184,6 +185,7 @@
     <Compile Include="Mono\BaseManager.cs" />
     <Compile Include="Mono\ColorItemButton.cs" />
     <Compile Include="Mono\Controllers\NameController.cs" />
+    <Compile Include="Mono\Controllers\PaginatorController.cs" />
     <Compile Include="Mono\CustomToggle.cs" />
     <Compile Include="Mono\DSSVehicleDockingManager.cs" />
     <Compile Include="Mono\DumpContainerSimplified.cs" />

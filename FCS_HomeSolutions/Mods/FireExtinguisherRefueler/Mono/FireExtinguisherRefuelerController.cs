@@ -105,6 +105,7 @@ namespace FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Mono
 
         private void OnStorageRemoveItem(InventoryItem item)
         {
+            item.item.gameObject.SetActive(false);
             _fireEx = null;
         }
 

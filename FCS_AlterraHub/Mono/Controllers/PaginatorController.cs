@@ -1,16 +1,16 @@
 ﻿using System.Collections.Generic;
-using FCS_AlterraHub.Mono;
+using FCS_AlterraHub.Interfaces;
 using FCSCommon.Abstract;
 using FCSCommon.Extensions;
 using UnityEngine;
 
-namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
+namespace FCS_AlterraHub.Mono.Controllers
 {
-    internal class PaginatorController : MonoBehaviour
+    public class PaginatorController : MonoBehaviour
     {
-        private AIDisplay _display;
+        private IFCSDisplay _display;
         private FCSToggleButton _currentSelected;
-        private List<FCSToggleButton> _toggleButtons= new List<FCSToggleButton>();
+        private List<FCSToggleButton> _toggleButtons = new List<FCSToggleButton>();
         private GameObject[] _paginatorBTNs;
         private bool _isInitalized;
 
@@ -22,7 +22,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
             {
                 GameObject child = _paginatorBTNs[i];
                 var paginator = child.AddComponent<FCSToggleButton>();
-                paginator.Tag = i+1;
+                paginator.Tag = i + 1;
                 paginator.STARTING_COLOR = Color.white;
                 paginator.HOVER_COLOR = new Color(0, 1, 1);
                 paginator.OnButtonClick += (s, o) =>
@@ -63,10 +63,10 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
                 {
                     paginatorBtN.DeSelect();
                 }
-            }   
+            }
         }
 
-        public void Initialize(AIDisplay display)
+        public void Initialize(IFCSDisplay display)
         {
             _display = display;
             Setup();
@@ -76,6 +76,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
         {
             Setup();
             _display.GoToPage(index);
+            _display.GoToPage(index,this);
         }
     }
 }

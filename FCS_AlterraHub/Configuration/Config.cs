@@ -13,7 +13,7 @@ using UnityEngine.Events;
 namespace FCS_AlterraHub.Configuration
 {
     [Menu("AlterraHub Menu")]
-    internal class Config : ConfigFile
+    public class Config : ConfigFile
     {
 
         [Toggle("Enable Debugs"), OnChange(nameof(EnableDebugsToggleEvent))]
@@ -24,6 +24,9 @@ namespace FCS_AlterraHub.Configuration
 
         [Keybind("Open/Close FCS PDA"), OnChange(nameof(PDAKeyCodeChangedEvent))]
         public KeyCode FCSPDAKeyCode { get; set; }= KeyCode.F2;
+
+        [Keybind("FCS PDA Information Button"), OnChange(nameof(PDAKeyCodeChangedEvent))]
+        public KeyCode PDAInfoKeyCode { get; set; } = KeyCode.I;
 
         public List<FCSStoreEntry> AdditionalStoreItems = new List<FCSStoreEntry>();
 

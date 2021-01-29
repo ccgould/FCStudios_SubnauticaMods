@@ -85,7 +85,7 @@ namespace FCS_LifeSupportSolutions.Mods.MiniMedBay.mono
 
             if (_timeSpawnMedKit < 0.0 && main)
             {
-                this._timeSpawnMedKit = (float)(main.timePassed + (!this.StartWithMedKit ? (double)MedKitSpawnInterval : 0.0));
+                _timeSpawnMedKit = (float)(main.timePassed + (!StartWithMedKit ? MedKitSpawnInterval : 0.0));
             }
         }
 
@@ -93,7 +93,12 @@ namespace FCS_LifeSupportSolutions.Mods.MiniMedBay.mono
         {
             if (!_mono.IsOperational) return;
 
-            if (IsContainerFull) return;
+            if (IsContainerFull)
+            {
+                Progress = 0f;
+                _timeSpawnMedKit = DayNightCycle.main.timePassedAsFloat + MedKitSpawnInterval;
+                return;
+            }
 
             DayNightCycle main = DayNightCycle.main;
 

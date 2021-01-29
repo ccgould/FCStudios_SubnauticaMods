@@ -29,6 +29,7 @@ namespace FCS_AlterraHub.Managers.Quests
 
         private bool IsRequirementsMet()
         {
+            if (Requirements == null) return false;
             foreach (KeyValuePair<TechType, int> pair in Requirements)
             {
                 if (pair.Value > 0)

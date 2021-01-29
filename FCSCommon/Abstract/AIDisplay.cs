@@ -1,9 +1,10 @@
 ﻿using System.Collections;
+using FCS_AlterraHub.Interfaces;
 using UnityEngine;
 
 namespace FCSCommon.Abstract
 {
-    internal abstract class AIDisplay : MonoBehaviour
+    internal abstract class AIDisplay : MonoBehaviour, IFCSDisplay
     {
         /// <summary>
         /// The max distance to the screen
@@ -31,6 +32,11 @@ namespace FCSCommon.Abstract
         }
 
         public virtual void GoToPage(int index)
+        {
+            
+        }
+
+        public virtual void GoToPage(int index, FCS_AlterraHub.Mono.Controllers.PaginatorController sender)
         {
             
         }

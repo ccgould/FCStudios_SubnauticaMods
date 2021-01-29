@@ -4,6 +4,7 @@ using System.IO;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Managers.Quests;
+using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Mono.FCSPDA.Mono;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
@@ -61,7 +62,9 @@ namespace FCS_AlterraHub.Patches
         internal static Action OnPlayerUpdate;
         public static FCSPDAController FCSPDA;
         private static Player _instance;
+        private static bool _wasPlaying;
         private static bool _firstMissionAdded;
+        private static float _time;
         public static bool LoadSavesQuests { get; set; }
         
         
@@ -77,6 +80,21 @@ namespace FCS_AlterraHub.Patches
                 LoadSavesQuests = false;
             }
 
+            if (FCSPDA.AudioSource != null)
+            {
+                if (FCSPDA.AudioSource.isPlaying && Mathf.Approximately(Time.timeScale, 0f))
+                {
+                    FCSPDA.AudioSource.Pause();
+                    _wasPlaying = true;
+                }
+
+                if (_wasPlaying && Time.timeScale > 0)
+                {
+                    FCSPDA.AudioSource.UnPause();
+                    _wasPlaying = false;
+                }
+            }
+
             if (Input.GetKeyDown(QPatch.Configuration.FCSPDAKeyCode) && !__instance.GetPDA().isOpen)
             {
                 if (FCSPDA == null) return;
@@ -87,14 +105,19 @@ namespace FCS_AlterraHub.Patches
                 }
             }
 
-            if (LargeWorldStreamer.main.IsWorldSettled() && FCSPDA != null)
+            if (LargeWorldStreamer.main.IsWorldSettled() && FCSPDA != null && DayNightCycle.main.timePassed >= 600f)
             {
-                if(_firstMissionAdded) return;
+                if (_firstMissionAdded) return;
                 FCSPDA.MissionController.UpdateQuest(QuestManager.Instance.GetActiveMission());
                 FCSPDA.MessagesController.AddNewMessage("Message From: Jack Winton (Chief Engineer)", "Jack Winton", "AH-Mission01-Pt1");
                 _firstMissionAdded = true;
             }
 
+            _time += Time.deltaTime;
+            if (_time >= 1)
+            {
+                BaseManager.RemoveDestroyedBases();
+            }
         }
     }
 

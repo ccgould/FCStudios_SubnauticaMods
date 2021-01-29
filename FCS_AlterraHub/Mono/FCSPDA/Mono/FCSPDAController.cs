@@ -1,13 +1,13 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Managers.Quests;
 using FCS_AlterraHub.Model;
+using FCS_AlterraHub.Mono.Controllers;
 using FCS_AlterraHub.Patches;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Helpers;
@@ -21,7 +21,7 @@ using WorldHelpers = FCS_AlterraHub.Helpers.WorldHelpers;
 
 namespace FCS_AlterraHub.Mono.FCSPDA.Mono
 {
-    internal class FCSPDAController : MonoBehaviour
+    internal class FCSPDAController : MonoBehaviour, IFCSDisplay
     {
         private PDA _pda;
         private int prevQuickSlot;
@@ -40,7 +40,7 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
         private bool _isBeingDestroyed;
         private List<DSSInventoryItem> _inventoryButtons = new List<DSSInventoryItem>();
         private List<DSSBaseItem> _baseButtons = new List<DSSBaseItem>();
-        private GridHelperV2 _inventoyGrid;
+        private GridHelperV2 _inventoryGrid;
         private GridHelperV2 _basesGrid;
         private GameObject _home;
         private GameObject _bases;
@@ -56,7 +56,8 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
         private GameObject _messagesPage;
         public MessagesController MessagesController;
         private bool _addtempMessage = true;
-
+        private PaginatorController _inventoryPaginatorController;
+        private PaginatorController _basePaginatorController;
 
         public bool isFocused => this.ui != null && this.ui.focused;
 
@@ -71,12 +72,12 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
                 return _ui;
             }
         }
-
-
+        
         private void OnDestroy()
         {
             _isBeingDestroyed = true;
         }
+
         private void Update()
         {
             sequence.Update();
@@ -86,7 +87,6 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
                 SNCameraRoot.main.SetFov(Mathf.Lerp(MiscSettings.fieldOfView, b, sequence.t));
             }
             
-
             if (!ui.selected && IsOpen && AvatarInputHandler.main.IsEnabled())
             {
                 ui.Select(false);
@@ -238,14 +238,20 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             _basesGrid.OnLoadDisplay += OnLoadBasesGrid;
             _basesGrid.Setup(10, gameObject, Color.gray, Color.white, OnButtonClick);
 
-            _inventoyGrid = gameObject.AddComponent<GridHelperV2>();
-            _inventoyGrid.OnLoadDisplay += OnLoadItemsGrid;
-            _inventoyGrid.Setup(15, gameObject, Color.gray, Color.white, OnButtonClick);
+            _inventoryGrid = gameObject.AddComponent<GridHelperV2>();
+            _inventoryGrid.OnLoadDisplay += OnLoadItemsGrid;
+            _inventoryGrid.Setup(15, gameObject, Color.gray, Color.white, OnButtonClick);
 
             _clock = GameObjectHelpers.FindGameObject(gameObject, "Clock").GetComponent<Text>();
 
             MaterialHelpers.ChangeEmissionColor(Buildables.AlterraHub.BaseEmissiveDecalsController, gameObject,
                 Color.cyan);
+
+            _basePaginatorController = GameObjectHelpers.FindGameObject(gameObject, "BasePaginator").AddComponent<PaginatorController>();
+            _basePaginatorController.Initialize(this);
+
+            _inventoryPaginatorController = GameObjectHelpers.FindGameObject(gameObject, "InventoryPaginator").AddComponent<PaginatorController>();
+            _inventoryPaginatorController.Initialize(this);
 
             _addtempMessage = false;
 
@@ -286,9 +292,9 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
 
         private void UpdateDisplay()
         {
-            if (_inventoyGrid == null || _basesGrid == null || _currentBiome == null || _accountName == null) return;
+            if (_inventoryGrid == null || _basesGrid == null || _currentBiome == null || _accountName == null) return;
             _basesGrid.DrawPage();
-            _inventoyGrid.DrawPage();
+            _inventoryGrid.DrawPage();
             _currentBiome.text = Player.main.GetBiomeString();
             _accountName.text = CardSystem.main.GetUserName();
             _accountBalance.text = $"{CardSystem.main.GetAccountBalance():N0}";
@@ -354,7 +360,10 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             UwePostProcessingManager.OpenPDA();
             SafeAnimator.SetBool(Player.main.armsController.animator, "using_pda", true);
             _pda.ui.soundQueue.PlayImmediately(_pda.ui.soundOpen);
-
+            if (_pda.screen.activeSelf)
+            {
+                _pda.screen.SetActive(false);
+            }
             QuickLogger.Debug("FCS PDA Is Open", true);
         }
         
@@ -407,6 +416,7 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             if (_goToEncyclopedia)
             {
                 Player.main.GetPDA().Open(PDATab.Encyclopedia);
+                _goToEncyclopedia = false;
             }
         }
 
@@ -447,11 +457,15 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
                     _inventoryButtons[i].Reset();
                 }
 
+                var g = 0;
+
                 for (int i = data.StartPosition; i < data.EndPosition; i++)
                 {
-                    _inventoryButtons[i].Set(grouped.ElementAt(i).Key, grouped.ElementAt(i).Value);
+                    _inventoryButtons[g++].Set(grouped.ElementAt(i).Key, grouped.ElementAt(i).Value);
                 }
 
+                _inventoryGrid.UpdaterPaginator(grouped.Count);
+                _inventoryPaginatorController.ResetCount(_inventoryGrid.GetMaxPages());
             }
             catch (Exception e)
             {
@@ -467,7 +481,7 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             {
                 if (_isBeingDestroyed) return;
 
-                var grouped = BaseManager.Managers.OrderBy(x => x.GetBaseName()).ToList();
+                var grouped = BaseManager.Managers.Where(x => x != null && !x.GetBaseName().Equals("Cyclops 0")).ToList();
 
                 //if (!string.IsNullOrEmpty(_currentSearchString?.Trim()))
                 //{
@@ -479,22 +493,45 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
                     data.EndPosition = grouped.Count;
                 }
 
-                for (int i = data.EndPosition; i < data.MaxPerPage - 1; i++)
+                for (int i = 0; i < data.MaxPerPage; i++)
                 {
                     _baseButtons[i].Reset();
                 }
 
+                var g = 0;
+
                 for (int i = data.StartPosition; i < data.EndPosition; i++)
                 {
-                    _baseButtons[i].Set(grouped[i]);
+
+                    _baseButtons[g++].Set(grouped[i]);
                 }
 
+                _basesGrid.UpdaterPaginator(grouped.Count);
+                _basePaginatorController.ResetCount(_basesGrid.GetMaxPages());
             }
             catch (Exception e)
             {
                 QuickLogger.Error("Error Caught");
                 QuickLogger.Error($"Error Message: {e.Message}");
                 QuickLogger.Error($"Error StackTrace: {e.StackTrace}");
+            }
+        }
+
+        public void GoToPage(int index)
+        {
+ 
+        }
+
+        public void GoToPage(int index, PaginatorController sender)
+        {
+            if (sender == _inventoryPaginatorController)
+            {
+                _inventoryGrid.DrawPage(index);
+            }
+            else if(sender == _basePaginatorController)
+            {
+                QuickLogger.Debug($"Refreshing Base Grid going to page {index} | Controller {sender.gameObject.name}",true);
+                _basesGrid.DrawPage(index);
             }
         }
     }
@@ -506,26 +543,7 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
         private AudioSource _audioSource => Player_Update_Patch.FCSPDA.AudioSource;
         private readonly List<AudioMessage> _messages = new List<AudioMessage>();
         private Text _messageCounter;
-        private bool _wasPlaying;
         private Dictionary<string,AudioClip> AudioClipFiles => Mod.AudioClips;
-
-        private void Update()
-        {
-            if (_audioSource != null)
-            {
-                if (_audioSource.isPlaying && Mathf.Approximately(DayNightCycle.main.deltaTime, 0f))
-                {
-                    _audioSource.Pause();
-                    _wasPlaying = true;
-                }
-
-                if (_wasPlaying && DayNightCycle.main.deltaTime > 0)
-                {
-                    _audioSource.UnPause();
-                    _wasPlaying = false;
-                }
-            }
-        }
 
         internal void Initialize(FCSPDAController fcsPdaController)
         {
@@ -546,7 +564,8 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
         {
             var message = new AudioMessage(description, audioClipName) {HasBeenPlayed = hasBeenPlayed};
             _messages.Add(message);
-            uGUI_PowerIndicator_Initialize_Patch.MissionHUD.ShowNewMessagePopUp(from);
+            if (!hasBeenPlayed)
+                uGUI_PowerIndicator_Initialize_Patch.MissionHUD.ShowNewMessagePopUp(from);
             RefreshUI();
         }
 
