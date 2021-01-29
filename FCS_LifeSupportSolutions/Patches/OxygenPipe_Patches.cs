@@ -19,8 +19,11 @@ namespace FCS_LifeSupportSolutions.Patches
                 {
                     GameObject entityRoot = UWE.Utils.GetEntityRoot(UWE.Utils.sharedColliderBuffer[i].gameObject);
                     OxygenTankAttachPoint component = entityRoot?.GetComponent<OxygenTankAttachPoint>();
-                    if (component != null && component.parentPipeUID is null && component.allowConnection)
+                    if (component != null && component.parentPipeUID is null)
                     {
+                        if (!component.allowConnection)
+                            component.allowConnection = true;
+
                         oxygenTank = component;
                         break;
                     }
