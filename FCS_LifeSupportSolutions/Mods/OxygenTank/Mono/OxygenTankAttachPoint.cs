@@ -117,7 +117,8 @@ namespace FCS_LifeSupportSolutions.Mods.OxygenTank.Mono
                     if (!(entityRoot == null))
                     {
                         IPipeConnection component = entityRoot.GetComponent<IPipeConnection>();
-                        if (component != null && component.GetRoot() != null && this.IsInSight(component))
+                        IPipeConnection root = component.GetRoot();
+                        if (component != null && root != null  && root is PipeSurfaceFloater && this.IsInSight(component))
                         {
                             float magnitude = (entityRoot.transform.position - base.transform.position).magnitude;
                             if (magnitude < num)
