@@ -199,8 +199,8 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             var thermal = gameObject.EnsureComponent<FCSDeepDrillerThermalController>();
             thermal.Initialize(_powerBank);
 
-            _powerDraw = QPatch.DeepDrillerMk3Configuration.PowerDraw + 
-                         QPatch.DeepDrillerMk3Configuration.OrePerDayUpgradePowerUsage + 12 * QPatch.DeepDrillerMk3Configuration.OreReductionValue;
+            _powerDraw = QPatch.Configuration.DDPowerDraw + 
+                         QPatch.Configuration.DDOrePerDayUpgradePowerUsage + 12 * QPatch.Configuration.DDOreReductionValue;
             _depthCurve = new AnimationCurve();
             _depthCurve.AddKey(0f, 0f);
             _depthCurve.AddKey(0.4245796f, 0.5001081f);
@@ -234,7 +234,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
 
         internal string GetSolarPowerData()
         {
-            return $"Solar panel (sun: {Mathf.RoundToInt(GetRechargeScalar() * 100f)}% charge {Mathf.RoundToInt(_powerBank.SolarPanel.GetCharge())}/{Mathf.RoundToInt(QPatch.DeepDrillerMk3Configuration.SolarCapacity)})";
+            return $"Solar panel (sun: {Mathf.RoundToInt(GetRechargeScalar() * 100f)}% charge {Mathf.RoundToInt(_powerBank.SolarPanel.GetCharge())}/{Mathf.RoundToInt(QPatch.Configuration.DDSolarCapacity)})";
         }
         
         /// <summary>
@@ -295,7 +295,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
 
         public override float GetDevicePowerCapacity()
         {
-            return QPatch.DeepDrillerMk3Configuration.InternalBatteryCapacity;
+            return QPatch.Configuration.DDInternalBatteryCapacity;
         }
         
         public override void TogglePowerState()

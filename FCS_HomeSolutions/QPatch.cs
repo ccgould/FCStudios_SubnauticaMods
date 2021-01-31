@@ -38,9 +38,6 @@ namespace FCS_HomeSolutions
         internal static TelevisionConfig TelevisionConfiguration { get; } = OptionsPanelHandler.Main.RegisterModOptions<TelevisionConfig>();
         internal static QuantumTeleporterConfig QuantumTeleporterConfiguration { get; } = OptionsPanelHandler.Main.RegisterModOptions<QuantumTeleporterConfig>();
 
-        internal static HoverLiftPadConfig HoverLiftPadConfiguration { get; } =
-            OptionsPanelHandler.Main.RegisterModOptions<HoverLiftPadConfig>();
-
         internal static PaintToolConfig PaintToolConfiguration { get; } =
             OptionsPanelHandler.Main.RegisterModOptions<PaintToolConfig>();
 

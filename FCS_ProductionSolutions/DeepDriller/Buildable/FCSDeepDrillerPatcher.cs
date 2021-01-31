@@ -74,7 +74,6 @@ namespace FCS_ProductionSolutions.DeepDriller.Buildable
 
                 prefab.AddComponent<PrefabIdentifier>().ClassId = this.ClassID;
                 prefab.AddComponent<TechTag>().type = TechTypeID;
-                prefab.AddComponent<FMOD_CustomLoopingEmitter>();
                 prefab.AddComponent<FCSDeepDrillerController>();
 
                 //Apply the glass shader here because of autosort lockers for some reason doesnt like it.

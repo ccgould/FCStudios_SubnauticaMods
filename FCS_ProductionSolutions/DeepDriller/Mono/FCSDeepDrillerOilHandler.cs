@@ -19,7 +19,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         public Action<FcsDevice, TechType> OnContainerRemoveItem { get; set; }
         public bool IsFull { get; }
         private const float KDayInSeconds = 1200f;
-        private readonly float _setOilTime = KDayInSeconds * QPatch.DeepDrillerMk3Configuration.OilTimePeriodInDays;
+        private readonly float _setOilTime = KDayInSeconds * QPatch.Configuration.DDOilTimePeriodInDays;
         private float _timeLeft;
         private float _elapsed;
         internal Action OnOilUpdate { get; set; }
@@ -27,7 +27,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         private void Update()
         {
             if (_mono == null || _mono.DeepDrillerPowerManager == null || _mono.IsBreakerSet()) return;
-            if (QPatch.DeepDrillerMk3Configuration.HardCoreMode)
+            if (QPatch.Configuration.DDHardCoreMode)
             {
                 if (_mono.DeepDrillerPowerManager.IsPowerAvailable() && _timeLeft > 0)
                 {
@@ -66,12 +66,12 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         
         internal void ReplenishOil()
         {
-            _timeLeft = Mathf.Clamp(_timeLeft + (KDayInSeconds * QPatch.DeepDrillerMk3Configuration.OilRestoresInDays), 0, _setOilTime);
+            _timeLeft = Mathf.Clamp(_timeLeft + (KDayInSeconds * QPatch.Configuration.DDOilRestoresInDays), 0, _setOilTime);
         }
 
         internal float GetOilPercent()
         {
-            return QPatch.DeepDrillerMk3Configuration.HardCoreMode ?  _timeLeft / _setOilTime : 1f;
+            return QPatch.Configuration.DDHardCoreMode ?  _timeLeft / _setOilTime : 1f;
         }
 
         public bool CanBeStored(int amount, TechType techType)
@@ -145,7 +145,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
 
         internal bool HasOil()
         {
-            return !QPatch.DeepDrillerMk3Configuration.HardCoreMode || _timeLeft > 0;
+            return !QPatch.Configuration.DDHardCoreMode || _timeLeft > 0;
         }
     }
 }

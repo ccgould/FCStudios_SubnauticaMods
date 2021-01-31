@@ -13,7 +13,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Configuration
             if (Battery == null)
             {
                 Battery = new PowercellData();
-                Battery.Initialize(0f, QPatch.DeepDrillerMk3Configuration.InternalBatteryCapacity);
+                Battery.Initialize(0f, QPatch.Configuration.DDInternalBatteryCapacity);
             }
 
             if (SolarPanel == null)

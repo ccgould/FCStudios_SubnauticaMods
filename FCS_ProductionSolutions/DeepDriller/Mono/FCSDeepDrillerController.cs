@@ -42,6 +42,9 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         private List<PistonBobbing> _pistons = new List<PistonBobbing>();
         private StringBuilder _sb;
         private bool _isBreakSet;
+        private AudioSource _audio;
+        private bool _wasPlaying;
+        private AudioLowPassFilter _lowPassFilter;
 
         internal string CurrentBiome { get; set; }
         internal bool IsFromSave { get; set; }
@@ -54,7 +57,6 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         internal FCSDeepDrillerLavaPitHandler LavaPitHandler { get; private set; }
         internal FCSDeepDrillerContainer DeepDrillerContainer { get; private set; }
         public override bool IsConstructed { get; set; }
-        internal AudioManager AudioManager { get; private set; }
         public  FCSDeepDrillerPowerHandler DeepDrillerPowerManager { get;  set; }
         internal FCSDeepDrillerDisplay DisplayHandler { get; private set; }
         internal FCSDeepDrillerOreGenerator OreGenerator { get; private set; }
@@ -62,7 +64,6 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         internal DumpContainer PowercellDumpContainer { get; set; }
         internal DumpContainer OilDumpContainer { get; set; }
         public FCSDeepDrillerUpgradeManager UpgradeManager { get; private set; }
-        public DeepDrillerMk2Config Config => QPatch.DeepDrillerMk3Configuration;
         public FCSDeepDrillerTransferManager TransferManager { get; set; }
 
         #endregion
@@ -129,7 +130,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             if (_line == null) return;
             if (_isRangeVisible)
             {
-                CreatePoints(Mathf.Clamp(_currentDistance + DayNightCycle.main.deltaTime * LerpSpeed * 1, 0, QPatch.DeepDrillerMk3Configuration.DrillAlterraStorageRange));
+                CreatePoints(Mathf.Clamp(_currentDistance + DayNightCycle.main.deltaTime * LerpSpeed * 1, 0, QPatch.Configuration.DDDrillAlterraStorageRange));
             }
             else
             {
@@ -139,6 +140,27 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
                         _line.SetPosition(i, Vector3.zero);
                     _currentDistance = 0f;
                 }
+            }
+
+            if (_audio != null && _audio.isPlaying)
+            {
+
+                if (_audio.isPlaying && Mathf.Approximately(Time.timeScale, 0f))
+                {
+                    _audio.Pause();
+                    _wasPlaying = true;
+                }
+
+                if (_wasPlaying && Time.timeScale > 0)
+                {
+                    _audio.Play();
+                    _wasPlaying = false;
+                }
+            }
+
+            if (_lowPassFilter != null)
+            {
+                _lowPassFilter.cutoffFrequency = Player.main.IsUnderwaterForSwimming() ? 1566f : 22000f;
             }
         }
 
@@ -262,6 +284,11 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
 
             _sb = new StringBuilder();
 
+            _audio = gameObject.GetComponent<AudioSource>();
+            _lowPassFilter = gameObject.GetComponent<AudioLowPassFilter>();
+
+
+
             //InvokeRepeating(nameof(UpdateDrillShaftSate), 1, 1);
             //foreach (Transform child in gameObject.transform.FirstOrDefault(x => x.name == "hover_pistons_pumps").transform)
             //{
@@ -308,8 +335,6 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
                 _colorManager = gameObject.AddComponent<ColorManager>();
                 _colorManager.Initialize(gameObject, ModelPrefab.BodyMaterial,ModelPrefab.SecondaryMaterial);
             }
-
-            AudioManager = new AudioManager(gameObject.GetComponent<FMOD_CustomLoopingEmitter>());
 
             DeepDrillerContainer = new FCSDeepDrillerContainer();
             DeepDrillerContainer.Setup(this);
@@ -370,13 +395,15 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             {
                 ChangePistonState();
                 AnimationHandler.DrillState(true);
-                AudioManager.PlayAudio();
+                if(!_audio.isPlaying)
+                    _audio.Play();
             }
             else
             {
                 ChangePistonState(false);
                 AnimationHandler.DrillState(false);
-                AudioManager.StopAudio();
+                if(_audio.isPlaying)
+                    _audio.Stop();
             }
         }
 
@@ -516,7 +543,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
 
         #region Internal Methods
 
-        internal bool IsUnderWater()
+        public override bool IsUnderWater()
         {
             return GetDepth() >= 0.63f;
         }

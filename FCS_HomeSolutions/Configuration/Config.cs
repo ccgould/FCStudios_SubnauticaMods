@@ -77,18 +77,6 @@ namespace FCS_HomeSolutions.Configuration
         public Action<int> OnGameModeChanged { get; set; }
     }
     
-    [Menu("Hover Lift Pad Menu")]
-    public class HoverLiftPadConfig : ConfigFile
-    {
-        public HoverLiftPadConfig() : base("hoverliftPad-config", "Configurations") { }
-        
-        [Keybind("Lift Pad Up Button")]
-        public KeyCode LiftPadUpKeyCode = KeyCode.None;
-
-        [Keybind("Lift Pad Down Button")]
-        public KeyCode LiftPadDownKeyCode = KeyCode.None;
-    }
-
     [Menu("Paint Tool Menu")]
     public class PaintToolConfig : ConfigFile
     {

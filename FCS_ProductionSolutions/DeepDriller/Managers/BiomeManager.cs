@@ -223,12 +223,12 @@ namespace FCS_ProductionSolutions.DeepDriller.Managers
             }
 
 
-            QPatch.DeepDrillerMk3Configuration.Convert();
+            QPatch.Configuration.Convert();
 #if DEBUG
-            QuickLogger.Debug($"Addition Ore: {QPatch.DeepDrillerMk3Configuration.BiomeOresTechType.Count}");
+            QuickLogger.Debug($"Addition Ore: {QPatch.Configuration.DDBiomeOresTechType.Count}");
 #endif
 
-            foreach (KeyValuePair<string, List<TechType>> valuePair in QPatch.DeepDrillerMk3Configuration.BiomeOresTechType)
+            foreach (KeyValuePair<string, List<TechType>> valuePair in QPatch.Configuration.DDBiomeOresTechType)
             {
 #if DEBUG
                 QuickLogger.Debug($"Checking if biomes match {currentBiome} => {valuePair.Key} = {valuePair.Key.Equals(currentBiome,StringComparison.OrdinalIgnoreCase)}");

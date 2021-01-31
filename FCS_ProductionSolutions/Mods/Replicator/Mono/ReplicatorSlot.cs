@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using FCS_AlterraHub.Helpers;
 using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.HydroponicHarvester.Enumerators;
-using FCS_ProductionSolutions.HydroponicHarvester.Mono;
 using FCSCommon.Utilities;
 using UnityEngine;
 
@@ -18,6 +17,7 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
         private SpeedModes _currentMode;
         private TechType _targetItem;
         private const int MAXCOUNT = 25;
+        private const float EnergyConsumption = 15000f;
         internal bool PauseUpdates { get; set; }
         internal bool NotAllowToGenerate => _mono == null || !_mono.IsOperational || PauseUpdates || CurrentSpeedMode == SpeedModes.Off || _targetItem == TechType.None || IsFull;
         internal float GenerationProgress
@@ -61,7 +61,7 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
             {
                 return 0f;
             }
-            return GenerationProgress/QPatch.Configuration.EnergyConsumpion;
+            return GenerationProgress/EnergyConsumption;
         }
 
         private void Update()
@@ -74,7 +74,7 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
             if (!_mono.Manager.HasEnoughPower(_mono.GetPowerUsage()))
                 return;
             
-            if (GenerationProgress >= QPatch.Configuration.EnergyConsumpion)
+            if (GenerationProgress >= EnergyConsumption)
             {
                 QuickLogger.Debug("[Replicator] Generated Clone", true);
                 PauseUpdates = true;
@@ -86,7 +86,7 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
             else if (GenerationProgress >= 0f)
             {
                 // Is currently generating clone
-                GenerationProgress = Mathf.Min(QPatch.Configuration.EnergyConsumpion, GenerationProgress + energyToConsume);
+                GenerationProgress = Mathf.Min(EnergyConsumption, GenerationProgress + energyToConsume);
             }
         }
 
@@ -94,7 +94,7 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
         {
             if (CurrentSpeedMode == SpeedModes.Off) return 0f;
             var creationTime = Convert.ToSingle(CurrentSpeedMode);
-            return QPatch.Configuration.EnergyConsumpion / creationTime;
+            return EnergyConsumption / creationTime;
         }
 
         internal bool TryClear()

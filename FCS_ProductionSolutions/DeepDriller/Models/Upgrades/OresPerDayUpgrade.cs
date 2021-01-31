@@ -35,8 +35,8 @@ namespace FCS_ProductionSolutions.DeepDriller.Models.Upgrades
                 return 0;
             }
 
-            return QPatch.DeepDrillerMk3Configuration.OrePerDayUpgradePowerUsage +
-                   (OreCount * QPatch.DeepDrillerMk3Configuration.OreReductionValue);
+            return QPatch.Configuration.DDOrePerDayUpgradePowerUsage +
+                   (OreCount * QPatch.Configuration.DDOreReductionValue);
         }
 
         public override float Damage { get; }

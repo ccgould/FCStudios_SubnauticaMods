@@ -19,8 +19,6 @@ namespace FCS_ProductionSolutions
     public class QPatch
     {
         internal static Config Configuration { get; } = OptionsPanelHandler.Main.RegisterModOptions<Config>();
-        internal static DeepDrillerMk2Config DeepDrillerMk3Configuration { get; } = OptionsPanelHandler.Main.RegisterModOptions<DeepDrillerMk2Config>();
-        internal static HarvesterConfig HarvesterConfiguration { get; } = OptionsPanelHandler.Main.RegisterModOptions<HarvesterConfig>();
 
         [QModPatch]
         public void Patch()

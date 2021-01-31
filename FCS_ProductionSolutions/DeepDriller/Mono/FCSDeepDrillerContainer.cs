@@ -22,7 +22,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
        private int CalculateFreeSpace()
         {
             var total = GetContainerTotal();
-            return Mathf.Max(0, QPatch.DeepDrillerMk3Configuration.StorageSize - total);
+            return Mathf.Max(0, QPatch.Configuration.DDStorageSize - total);
         }
 
         public bool IsFull => IsContainerFull(); 
@@ -40,7 +40,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         /// <returns>Returns true if the container is full.</returns>
         private bool IsContainerFull()
         {
-            return GetContainerTotal() >= QPatch.DeepDrillerMk3Configuration.StorageSize;
+            return GetContainerTotal() >= QPatch.Configuration.DDStorageSize;
         }
 
         /// <summary>
@@ -120,7 +120,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
                     _container.Add(item,1);
                 }
 
-                OnContainerUpdate?.Invoke(GetContainerTotal(),QPatch.DeepDrillerMk3Configuration.StorageSize);
+                OnContainerUpdate?.Invoke(GetContainerTotal(),QPatch.Configuration.DDStorageSize);
             }
             catch (Exception e)
             {
@@ -156,7 +156,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
                             _container[item] -= 1;
                         }
 
-                        OnContainerUpdate?.Invoke(GetContainerTotal(), QPatch.DeepDrillerMk3Configuration.StorageSize);
+                        OnContainerUpdate?.Invoke(GetContainerTotal(), QPatch.Configuration.DDStorageSize);
                     }
                 }
             }
@@ -183,7 +183,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
                         _container[item] -= 1;
                     }
 
-                    OnContainerUpdate?.Invoke(GetContainerTotal(), QPatch.DeepDrillerMk3Configuration.StorageSize);
+                    OnContainerUpdate?.Invoke(GetContainerTotal(), QPatch.Configuration.DDStorageSize);
                 }
             }
             catch (Exception e)

@@ -11,6 +11,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Models
     internal class PlantSlot : MonoBehaviour
     {
         internal GameObject SlotBounds { get; set; }
+        private const float EnergyConsumption = 15000f;
         private Plantable _plantable { get; set; }
         public int Id;
         public bool IsOccupied;
@@ -73,7 +74,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Models
             if (!GrowBedManager.HasPowerToConsume())
                 return;
             
-            if (GenerationProgress >= QPatch.Configuration.EnergyConsumpion)
+            if (GenerationProgress >= EnergyConsumption)
             {
                 QuickLogger.Debug("[Hydroponic Harvester] Generated Clone", true);
                 PauseUpdates = true;
@@ -85,7 +86,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Models
             else if (GenerationProgress >= 0f)
             {
                 // Is currently generating clone
-                GenerationProgress = Mathf.Min(QPatch.Configuration.EnergyConsumpion, GenerationProgress + energyToConsume);
+                GenerationProgress = Mathf.Min(EnergyConsumption, GenerationProgress + energyToConsume);
             }
         }
 
@@ -93,9 +94,9 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Models
         {
             if (CurrentSpeedMode == SpeedModes.Off) return 0f;
             var creationTime = Convert.ToSingle(CurrentSpeedMode);
-            return QPatch.Configuration.EnergyConsumpion / creationTime;
+            return EnergyConsumption / creationTime;
         }
-
+        
         public void Clear()
         {
             if (PlantModel != null)

@@ -17,11 +17,77 @@ namespace FCS_ProductionSolutions.Configuration
     {
         public Config() : base("productionSolutions-config", "Configurations") { }
 
-        [Toggle("Enable Debugs"), OnChange(nameof(EnableDebugsToggleEvent))]
+        [Toggle("[Production Solutions] Enable Debugs"), OnChange(nameof(EnableDebugsToggleEvent))]
         public bool EnableDebugLogs = false;
 
-        public float EnergyConsumpion { get; set; } = 15000f;
-        
+        #region Matter Analyzer
+
+        [Toggle("[Matter Analyzer] Toggle Fx")]
+        public bool MatterAnalyzerPlaySFX { get; set; } = true;
+
+        #endregion
+
+        #region Harvester
+
+        [Toggle("[Hydroponic Harvester] Enable/Disable Light Trigger")]
+        public bool HHIsLightTriggerEnabled = true;
+
+        [Slider("[Hydroponic Harvester] Light Trigger Range", 0, 20)]
+        public int HHLightTriggerRange = 4;
+
+        #endregion
+
+        #region Deep Driller
+
+        public int DDStorageSize { get; set; } = 300;
+        public float DDPowerDraw { get; set; } = 0.7f;
+        public float DDChargePullAmount { get; set; } = 1.5f;
+        public float DDSolarCapacity { get; set; } = 125;
+
+        [Toggle("[Deep Driller MK3] Is HardCore Mode")]
+        public bool DDHardCoreMode { get; set; } = true;
+        public float DDOilTimePeriodInDays { get; set; } = 30.0f;
+        public float DDOilRestoresInDays { get; set; } = 5.0f;
+        public Dictionary<string, List<string>> DDAdditionalBiomeOres { get; set; } = new Dictionary<string, List<string>>();
+        public float DDMaxOreCountUpgradePowerUsage { get; set; } = 0.2f;
+        public float DDOrePerDayUpgradePowerUsage { get; set; } = 1.0f;
+        public float DDInternalBatteryCapacity { get; set; } = 1000f;
+        public float DDDrillAlterraStorageRange { get; set; } = 30f;
+        [JsonIgnore] internal float DDOreReductionValue => 0.08f;
+        [JsonIgnore] internal Dictionary<string, List<TechType>> DDBiomeOresTechType { get; set; } = new Dictionary<string, List<TechType>>();
+
+        internal void Convert()
+        {
+            try
+            {
+                foreach (KeyValuePair<string, List<string>> biomeOre in DDAdditionalBiomeOres)
+                {
+                    var types = new List<TechType>();
+
+                    foreach (string sTechType in biomeOre.Value)
+                    {
+                        types.Add(sTechType.ToTechType());
+                    }
+                    QuickLogger.Debug($"Added {biomeOre.Key} to BiomeOresTechType");
+                    if (!DDBiomeOresTechType.ContainsKey(biomeOre.Key))
+                    {
+                        DDBiomeOresTechType.Add(biomeOre.Key, types);
+                    }
+                    else
+                    {
+                        DDBiomeOresTechType[biomeOre.Key] = DDBiomeOresTechType[biomeOre.Key].Union(types).ToList();
+                    }
+
+                }
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error($"Error: {e.Message} || Stack Trace: {e.StackTrace}");
+            }
+        }
+
+        #endregion
+
         private void EnableDebugsToggleEvent(ToggleChangedEventArgs e)
         {
             if (e.Value)
@@ -33,71 +99,6 @@ namespace FCS_ProductionSolutions.Configuration
             {
                 QuickLogger.DebugLogsEnabled = false;
                 QuickLogger.Info("Debug logs disabled");
-            }
-        }
-    }
-
-    [Menu("Hydroponic Harvester Menu")]
-    public class HarvesterConfig : ConfigFile
-    {
-        public HarvesterConfig() : base("harvester-config", "Configurations") { }
-
-        [Toggle("Enable/Disable Light Trigger")]
-        public bool IsLightTriggerEnabled = true;
-
-        [Slider("Light Trigger Range", 0, 20)]
-        public int LightTriggerRange = 4;
-    }
-
-    [Menu("Deep Driller Mk2 Menu")]
-    public class DeepDrillerMk2Config : ConfigFile
-    {
-        public DeepDrillerMk2Config() : base("deepdrillermk2-config", "Configurations") { }
-
-        public int StorageSize { get; set; } = 300;
-        public float PowerDraw { get; set; } = 0.7f;
-        public float ChargePullAmount { get; set; } = 1.5f;
-        public float SolarCapacity { get; set; } = 125;
-
-        [Toggle("Is HardCore Mode")]
-        public bool HardCoreMode { get; set; } = true;
-        public float OilTimePeriodInDays { get; set; } = 30.0f;
-        public float OilRestoresInDays { get; set; } = 5.0f;
-        public Dictionary<string, List<string>> AdditionalBiomeOres { get; set; } = new Dictionary<string, List<string>>();
-        public float MaxOreCountUpgradePowerUsage { get; set; } = 0.2f;
-        public float OrePerDayUpgradePowerUsage { get; set; } = 1.0f;
-        public float InternalBatteryCapacity { get; set; } = 1000f;
-        public float DrillAlterraStorageRange { get; set; } = 30f;
-        [JsonIgnore] internal float OreReductionValue => 0.08f;
-        [JsonIgnore] internal Dictionary<string, List<TechType>> BiomeOresTechType { get; set; } = new Dictionary<string, List<TechType>>();
-
-        internal void Convert()
-        {
-            try
-            {
-                foreach (KeyValuePair<string, List<string>> biomeOre in AdditionalBiomeOres)
-                {
-                    var types = new List<TechType>();
-
-                    foreach (string sTechType in biomeOre.Value)
-                    {
-                        types.Add(sTechType.ToTechType());
-                    }
-                    QuickLogger.Debug($"Added {biomeOre.Key} to BiomeOresTechType");
-                    if (!BiomeOresTechType.ContainsKey(biomeOre.Key))
-                    {
-                        BiomeOresTechType.Add(biomeOre.Key, types);
-                    }
-                    else
-                    {
-                        BiomeOresTechType[biomeOre.Key] = BiomeOresTechType[biomeOre.Key].Union(types).ToList();
-                    }
-
-                }
-            }
-            catch (Exception e)
-            {
-                QuickLogger.Error($"Error: {e.Message} || Stack Trace: {e.StackTrace}");
             }
         }
     }

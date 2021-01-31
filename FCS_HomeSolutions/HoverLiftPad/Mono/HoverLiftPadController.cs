@@ -71,24 +71,24 @@ namespace FCS_HomeSolutions.HoverLiftPad.Mono
             {
                 CheckPlayerStatus();
 
-                if (CheckGatesClosed())
-                {
-                    if (Input.GetKey(QPatch.HoverLiftPadConfiguration.LiftPadUpKeyCode))
-                    {
-                        _lift.LiftUp();
-                    }
+                //if (CheckGatesClosed())
+                //{
+                //    if (Input.GetKey(QPatch.HoverLiftPadConfiguration.LiftPadUpKeyCode))
+                //    {
+                //        _lift.LiftUp();
+                //    }
 
-                    if (Input.GetKey(QPatch.HoverLiftPadConfiguration.LiftPadDownKeyCode))
-                    {
-                        _lift.LiftDown();
-                    }
-                }
+                //    if (Input.GetKey(QPatch.HoverLiftPadConfiguration.LiftPadDownKeyCode))
+                //    {
+                //        _lift.LiftDown();
+                //    }
+                //}
 
-                if (Input.GetKeyUp(QPatch.HoverLiftPadConfiguration.LiftPadUpKeyCode) ||
-                    Input.GetKeyUp(QPatch.HoverLiftPadConfiguration.LiftPadDownKeyCode))
-                {
-                    _lift.SetIsMoving(false);
-                }
+                //if (Input.GetKeyUp(QPatch.HoverLiftPadConfiguration.LiftPadUpKeyCode) ||
+                //    Input.GetKeyUp(QPatch.HoverLiftPadConfiguration.LiftPadDownKeyCode))
+                //{
+                //    _lift.SetIsMoving(false);
+                //}
             }
 
 
