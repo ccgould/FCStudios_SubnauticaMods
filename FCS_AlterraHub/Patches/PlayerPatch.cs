@@ -16,46 +16,6 @@ using UnityEngine;
 namespace FCS_AlterraHub.Patches
 {
     [HarmonyPatch(typeof(Player))]
-    [HarmonyPatch("Start")]
-    internal static class Player_Awaker_Patch
-    {
-        private static bool _audioLoaded;
-
-        [HarmonyPostfix]
-        private static void Postfix(Player __instance)
-        {
-            LoadAudioFiles(__instance);
-        }
-
-        public static void LoadAudioFiles(Player instance)
-        {
-            if (_audioLoaded) return;
-            instance.StartCoroutine(AddAudioTrack(Path.Combine(Mod.GetAssetPath(), "Audio", "AH-Mission01-Pt1.wav")));
-            instance.StartCoroutine(AddAudioTrack(Path.Combine(Mod.GetAssetPath(), "Audio", "AH-Mission01-Pt2.wav")));
-            instance.StartCoroutine(AddAudioTrack(Path.Combine(Mod.GetAssetPath(), "Audio", "AH-Mission01-Pt3.wav")));
-            _audioLoaded = true;
-        }
-
-
-        public static IEnumerator AddAudioTrack(string audioSource)
-        {
-            WWW request = GetAudioFromFile(audioSource);
-            yield return request;
-
-            var clip = request.GetAudioClip();
-            var name = Path.GetFileNameWithoutExtension(audioSource);
-            clip.name = name;
-            Mod.AudioClips.Add(name, clip);
-        }
-
-        private static WWW GetAudioFromFile(string source)
-        {
-            WWW request = new WWW(source);
-            return request;
-        }
-    }
-
-    [HarmonyPatch(typeof(Player))]
     [HarmonyPatch("Update")]
     internal static class Player_Update_Patch
     {
@@ -80,19 +40,20 @@ namespace FCS_AlterraHub.Patches
                 LoadSavesQuests = false;
             }
 
-            if (FCSPDA.AudioSource != null)
-            {
-                if (FCSPDA.AudioSource.isPlaying && Mathf.Approximately(Time.timeScale, 0f))
-                {
-                    FCSPDA.AudioSource.Pause();
-                    _wasPlaying = true;
-                }
+            FCSPDA.AudioTrack.isPlaying(out bool isPlaying);
 
-                if (_wasPlaying && Time.timeScale > 0)
-                {
-                    FCSPDA.AudioSource.UnPause();
-                    _wasPlaying = false;
-                }
+
+            if (isPlaying && Mathf.Approximately(Time.timeScale, 0f))
+            {
+                FCSPDA.AudioTrack.setPaused(true);
+                _wasPlaying = true;
+            }
+
+            if (_wasPlaying && Time.timeScale > 0)
+            {
+                FCSPDA.AudioTrack.setPaused(false);
+                FCSPDA.AudioTrack.setVolume(SoundSystem.voiceVolume);
+                _wasPlaying = false;
             }
 
             if (Input.GetKeyDown(QPatch.Configuration.FCSPDAKeyCode) && !__instance.GetPDA().isOpen)
@@ -142,7 +103,7 @@ namespace FCS_AlterraHub.Patches
         
             _pdaCreated = true;
         }
-
+        
         private static void MoveFcsPdaIntoPosition(GameObject defPDA, GameObject pda)
         {
             if (defPDA != null)
@@ -161,13 +122,10 @@ namespace FCS_AlterraHub.Patches
 
         private static GameObject CreateFcsPda(Player __instance)
         {
-            var audioSource = __instance.gameObject.AddComponent<AudioSource>();
-            //ADD FCSPDA
             var pda = GameObject.Instantiate(AlterraHub.FcsPDAPrefab);
             pda.SetActive(false);
             pda.EnsureComponent<Rigidbody>().isKinematic = true;
             var controller = pda.AddComponent<FCSPDAController>();
-            controller.AudioSource = audioSource;
             controller.CreateMissionController();
             Player_Update_Patch.FCSPDA = controller;
             controller.PDAObj = __instance.pdaSpawn.spawnedObj;

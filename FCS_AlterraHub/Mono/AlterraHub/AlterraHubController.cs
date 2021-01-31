@@ -132,7 +132,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             {
                 _motorHandler = GameObjectHelpers.FindGameObject(gameObject, "RoundSignDisplay01").AddComponent<MotorHandler>();
                 _motorHandler.Initialize(30);
-                _motorHandler.Start();
+                _motorHandler.StartMotor();
             }
 
             if (_colorManager == null)

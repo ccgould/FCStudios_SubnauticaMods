@@ -160,7 +160,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             {
                 _radarMotor = GameObjectHelpers.FindGameObject(gameObject, "radar").AddComponent<MotorHandler>();
                 _radarMotor.Initialize(30);
-                _radarMotor.Start();
+                _radarMotor.StartMotor();
             }
 
             if (_drillMotor == null)
@@ -183,12 +183,12 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
                     _timeStartGrowth = DayNightCycle.main.timePassed;
                 }
 
-                _drillMotor.Start();
+                _drillMotor.StartMotor();
                 _allowedToMove = true;
             }
             else
             {
-                _drillMotor.Stop();
+                _drillMotor.StopMotor();
                 _allowedToMove = false;
             }
         }

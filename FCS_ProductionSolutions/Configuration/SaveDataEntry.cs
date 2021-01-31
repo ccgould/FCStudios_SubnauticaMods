@@ -38,6 +38,7 @@ namespace FCS_ProductionSolutions.Configuration
 
     internal class MatterAnalyzerDataEntry
     {
+        [JsonProperty] internal float RPM;
         [JsonProperty] internal string ID { get; set; }
         [JsonProperty] internal string SaveVersion { get; set; } = "1.0";
         [JsonProperty] internal Vec4 Body { get; set; }
@@ -48,7 +49,6 @@ namespace FCS_ProductionSolutions.Configuration
         [JsonProperty] internal float CurrentMaxScanTime { get; set; }
         [JsonProperty] internal TechType PickTechType { get; set; }
         [JsonProperty] internal bool IsLandPlant { get; set; }
-        [JsonProperty] internal bool Reset { get; set; }
     }
 
     [Serializable]

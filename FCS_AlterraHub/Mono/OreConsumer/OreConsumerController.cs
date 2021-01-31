@@ -76,13 +76,13 @@ namespace FCS_AlterraHub.Mono.OreConsumer
         {
             if (_oreQueue != null && _oreQueue.Count > 0 && (Manager.GetPowerState() == PowerSystem.Status.Normal || Manager.GetPowerState() == PowerSystem.Status.Emergency) && !_isBreakerTripped)
             {
-                MotorHandler.Start();
+                MotorHandler.StartMotor();
                 EffectsManager.ShowEffect();
                 AudioManager.PlayMachineAudio();
             }
             else
             {
-                MotorHandler.Stop();
+                MotorHandler.StopMotor();
                 EffectsManager.HideEffect();
                 AudioManager.StopMachineAudio();
             }

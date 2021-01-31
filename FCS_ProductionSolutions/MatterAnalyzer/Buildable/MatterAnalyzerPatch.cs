@@ -38,8 +38,8 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Buildable
             {
                 var prefab = GameObject.Instantiate(ModelPrefab.MatterAnalyzerPrefab);
 
-                var size = new Vector3(0.7803999f, 1.231386f, 0.8337255f);
-                var center = new Vector3(7.350417e-25f, 0.8944204f, -0.08313727f);
+                var center = new Vector3(0f, 1.250413f, 0.01750353f);
+                var size = new Vector3(0.8288832f, 2.071783f, 0.8687233f);
 
                 GameObjectHelpers.AddConstructableBounds(prefab, size, center);
 

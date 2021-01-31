@@ -11,6 +11,7 @@ using FCS_AlterraHub.Patches;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
+using FMOD;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Utility;
 using UnityEngine;
@@ -181,7 +182,7 @@ namespace FCS_AlterraHub.Configuration
             }
         }
 
-        public static Dictionary<string, AudioClip> AudioClips = new Dictionary<string, AudioClip>();
+        public static Dictionary<string, Sound> AudioClips = new Dictionary<string, Sound>();
         
 
         public static bool SaveGamePlaySettings()
@@ -360,6 +361,13 @@ namespace FCS_AlterraHub.Configuration
         public static string GetIconPath(string classId)
         {
             return Path.Combine(GetAssetPath(), $"{classId}.png");
+        }
+
+        public static void LoadAudioFiles()
+        {
+            AudioClips.Add("AH-Mission01-Pt1",AudioUtils.CreateSound(Path.Combine(Mod.GetAssetPath(), "Audio", "AH-Mission01-Pt1.wav")));
+            AudioClips.Add("AH-Mission01-Pt2",AudioUtils.CreateSound(Path.Combine(Mod.GetAssetPath(), "Audio", "AH-Mission01-Pt2.wav")));
+            AudioClips.Add("AH-Mission01-Pt3",AudioUtils.CreateSound(Path.Combine(Mod.GetAssetPath(), "Audio", "AH-Mission01-Pt3.wav")));
         }
     }
 

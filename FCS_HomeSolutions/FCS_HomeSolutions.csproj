@@ -192,6 +192,9 @@
     <Compile Include="Mods\AlienChef\Mono\OrderWindowDialog.cs" />
     <Compile Include="Mods\AlterraMiniShower\Buildable\AlterraMiniBathroomPrefab.cs" />
     <Compile Include="Mods\AlterraMiniShower\Mono\AlterraMiniBathroomController.cs" />
+    <Compile Include="Mods\AlterraMiniShower\Mono\DoorController.cs" />
+    <Compile Include="Mods\AlterraMiniShower\Mono\LightController.cs" />
+    <Compile Include="Mods\AlterraMiniShower\Mono\ShowerController.cs" />
     <Compile Include="Mods\Cabinets\Buildable\Cabinet2.cs" />
     <Compile Include="Mods\Cabinets\Buildable\Cabinet3.cs" />
     <Compile Include="Mods\Cabinets\Buildable\Cabinet1.cs" />

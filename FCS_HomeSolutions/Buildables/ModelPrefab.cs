@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using FCS_AlterraHub.API;
 using FCS_AlterraHub.Buildables;
 using FCS_HomeSolutions.Configuration;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
+using FMOD.Studio;
+using FMODUnity;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -69,6 +72,8 @@ namespace FCS_HomeSolutions.Buildables
                 ModBundle = FCSAssetBundlesService.PublicAPI.GetAssetBundleByName(Mod.ModBundleName, Mod.GetModDirectory());
             }
 
+            //LoadFMod();
+
             PaintToolPrefab = GetPrefab(Mod.PaintToolPrefabName);
             SmallOutdoorPot = GetPrefab(Mod.SmartPlanterPotPrefabName);
             BaseOperatorPrefab = GetPrefab(Mod.BaseOperatorPrefabName);
@@ -124,6 +129,58 @@ namespace FCS_HomeSolutions.Buildables
             }
         }
         
+        //internal static void LoadFMod()
+        //{
+        //    //RuntimeManager
+        //    var strings = ModBundle.LoadAsset<TextAsset>("FCS Master Bank.strings");
+        //    var master = ModBundle.LoadAsset<TextAsset>("FCS Master Bank");
+            
+        //    if (master == null)
+        //    {
+        //        QuickLogger.Debug("FCS Master Not Found");
+        //        return;
+        //    }
+        //    QuickLogger.Debug($"Master: {master}");
+        //    RuntimeManager.LoadBank(master);
+
+
+
+
+        //    QuickLogger.Debug($"Any Bank Loading: {RuntimeManager.AnyBankLoading()}");
+        //    if (RuntimeManager.HasBankLoaded("FCS Master Bank"))
+        //    {
+        //        QuickLogger.Debug("Bank Loaded");
+
+        //        foreach (KeyValuePair<string, RuntimeManager.LoadedBank> bank in RuntimeManager.Instance.loadedBanks)
+        //        {
+        //            QuickLogger.Debug(bank.Key);
+        //            if (bank.Key.Equals("FCS Master Bank"))
+        //            {
+        //                QuickLogger.Debug($"Bank Count: {bank.Value.RefCount}");
+        //                bank.Value.Bank.getEventList(out EventDescription[] array);
+        //                for (int i = 0; i < array.Length; i++)
+        //                {
+        //                    array[i].getPath(out string path);
+        //                    QuickLogger.Debug($"Bank Count: {path}");
+        //                }
+
+        //                break;
+        //            }
+                    
+        //        }
+
+        //        //ShowerLoop = RuntimeManager.CreateInstance("event:/AlterraMiniBathroom/Shower");
+        //    }
+        //    else
+        //    {
+        //        QuickLogger.Debug("Bank Not Loaded");
+        //    }
+            
+        //}
+
+        public static EventInstance ShowerLoop { get; set; }
+
+
         private static bool LoadAsset(string prefabName, AssetBundle assetBundle, out GameObject go, bool applyShaders = true)
         {
             QuickLogger.Debug("Loading Asset");
@@ -138,7 +195,7 @@ namespace FCS_HomeSolutions.Buildables
                 {
                     //Lets apply the material shader
                     ApplyShaders(prefab, assetBundle);
-                    QuickLogger.Debug($"Applied shaderes to prefab {prefabName}");
+                    QuickLogger.Debug($"Applied shaders to prefab {prefabName}");
                 }
 
                 go = prefab;

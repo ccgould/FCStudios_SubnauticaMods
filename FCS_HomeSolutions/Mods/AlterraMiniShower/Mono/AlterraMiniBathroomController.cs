@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Extensions;
@@ -8,6 +9,7 @@ using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
+using FMODUnity;
 using rail;
 using UnityEngine;
 
@@ -59,6 +61,7 @@ namespace FCS_HomeSolutions.Mods.AlterraMiniShower.Mono
         public override void Initialize()
         {
             GameObjectHelpers.FindGameObject(gameObject, "ShowerControls").EnsureComponent<ShowerController>();
+
             _showerDoor = GameObjectHelpers.FindGameObject(gameObject, "ShowerDoor").EnsureComponent<DoorController>();
             _showerDoor.ClosePos = -0.01301698f;
             _showerDoor.OpenPos = 1.2f;
@@ -78,14 +81,45 @@ namespace FCS_HomeSolutions.Mods.AlterraMiniShower.Mono
                 _colorManager = gameObject.AddComponent<ColorManager>();
                 _colorManager.Initialize(gameObject,AlterraHub.BasePrimaryCol, AlterraHub.BaseSecondaryCol);
             }
-
+            
+            //var soundemitter = gameObject.GetComponentInChildren<FMOD_CustomEmitter>();
+            
+            //if (soundemitter != null)
+            //{
+            //    soundemitter.evt = ModelPrefab.ShowerLoop;
+            //    soundemitter.Play();
+            //}
+            
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseEmissiveDecalsController, gameObject, new Color(0, 1, 1, 1));
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseSecondaryCol, gameObject, new Color(0.8f, 0.4933333f, 0f));
             MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseEmissiveDecalsController, gameObject,  2.5f);
+            
+            DeleteChairDuplicates();
 
             IsInitialized = true;
-
+            
             QuickLogger.Debug($"Initialized");
+        }
+
+        private void DeleteChairDuplicates()
+        {
+            var getChairs = GameObjectHelpers.FindGameObjects(gameObject, "StarshipChair(Clone)").ToArray();
+            if (getChairs.Length > 1)
+            {
+                for (int i = 1; i < getChairs.Length; i++)
+                {
+                    Destroy(getChairs[i]);
+                }
+            }
+
+            if (getChairs[0] != null)
+            {
+                Renderer[] renderers = getChairs[0].GetComponentsInChildren<Renderer>();
+                foreach (Renderer rend in renderers)
+                {
+                    rend.enabled = false;
+                }
+            }
         }
 
         public override void OnProtoSerialize(ProtobufSerializer serializer)
@@ -148,157 +182,6 @@ namespace FCS_HomeSolutions.Mods.AlterraMiniShower.Mono
                 {
                     _runStartUpOnEnable = true;
                 }
-            }
-        }
-    }
-
-    internal class ShowerController : HandTarget, IHandTarget
-    {
-        private bool _isOn;
-        private ParticleSystem _shower;
-
-        private void Start()
-        {
-            _shower = gameObject.transform.parent.GetComponentInChildren<ParticleSystem>();
-        }
-
-        public void OnHandHover(GUIHand hand)
-        {
-            HandReticle main = HandReticle.main;
-            main.SetInteractText(_isOn ? "Turn Off Shower" : "Turn On Shower");
-            main.SetIcon(HandReticle.IconType.Hand);
-        }
-
-        public void OnHandClick(GUIHand hand)
-        {
-            if(_isOn)
-            {
-                _shower.Stop();
-            }
-            else
-            {
-                _shower.Play();
-            }
-
-            _isOn ^= true;
-        }
-    }
-
-    internal class LightController : MonoBehaviour
-    {
-        public Light TargetLight { get; set; }
-
-        private void OnTriggerEnter(Collider collider)
-        {
-            if (collider.gameObject.layer != 19) return;
-            if (TargetLight != null )
-            {
-                TargetLight.enabled = true;
-            }
-        }
-
-        private void OnTriggerExit(Collider collider)
-        {
-            if (collider.gameObject.layer != 19) return;
-            if (TargetLight != null)
-            {
-                TargetLight.enabled = false;
-            }
-        }
-
-        private void OnTriggerStay(Collider collider)
-        {
-            if (collider.gameObject.layer != 19) return;
-            if (TargetLight != null)
-            {
-                TargetLight.enabled = true;
-            }
-        }
-    }
-
-    internal class DoorController : HandTarget, IHandTarget
-    {
-        private Transform _transform;
-        public float ClosePos { get; set; }
-        public float OpenPos { get; set; }
-        private float _targetPos;
-        public bool IsOpen => Mathf.Approximately(_targetPos, OpenPos);
-        private const float  Speed = 2.5f;
-
-
-        private void Update()
-        {
-            MoveDoor();
-        }
-
-        public override void Awake()
-        {
-            base.Awake();
-            _targetPos = ClosePos;
-            _transform = gameObject.transform;
-        }
-
-        public void ForceOpen()
-        {
-            OpenDoor();
-        }
-
-        private void OpenDoor()
-        {
-            _targetPos = OpenPos;
-        }
-
-        private void CloseDoor()
-        {
-            _targetPos = ClosePos;
-        }
-
-        private void MoveDoor()
-        {
-            // remember, 10 - 5 is 5, so target - position is always your direction.
-            Vector3 dir = new Vector3(_targetPos, _transform.localPosition.y, _transform.localPosition.z) - _transform.localPosition;
-
-            // magnitude is the total length of a vector.
-            // getting the magnitude of the direction gives us the amount left to move
-            float dist = dir.magnitude;
-
-            // this makes the length of dir 1 so that you can multiply by it.
-            dir = dir.normalized;
-
-            // the amount we can move this frame
-            float move = Speed * DayNightCycle.main.deltaTime;
-
-            // limit our move to what we can travel.
-            if (move > dist) move = dist;
-
-            // apply the movement to the object.
-            _transform.Translate(dir * move);
-        }
-
-        public void OnHandHover(GUIHand hand)
-        {
-            HandReticle main = HandReticle.main;
-            if (IsOpen)
-            {
-                main.SetInteractText("Close Door");
-            }
-            else
-            {
-                main.SetInteractText("Open Door");
-            }
-
-            main.SetIcon(HandReticle.IconType.Hand);
-        }
-
-        public void OnHandClick(GUIHand hand)
-        {
-            if (IsOpen)
-            {
-                CloseDoor();
-            }
-            else
-            {
-                OpenDoor();
             }
         }
     }

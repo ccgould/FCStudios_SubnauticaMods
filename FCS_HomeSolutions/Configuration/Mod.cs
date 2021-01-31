@@ -396,8 +396,7 @@ namespace FCS_HomeSolutions.Configuration
         internal static string SaveDataFilename => $"{ModName}SaveData.json";
 
         public static TechType CurtainTechType { get; internal set; }
-
-
+        
         internal static string GetModDirectory()
         {
             return Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -406,6 +405,11 @@ namespace FCS_HomeSolutions.Configuration
         internal static string GetAssetPath()
         {
             return Path.Combine(GetModDirectory(), "Assets");
+        }
+
+        internal static string GetAudioFolderPath()
+        {
+            return Path.Combine(GetAssetPath(), "Audio");
         }
 
         internal static string GetSaveFileDirectory()

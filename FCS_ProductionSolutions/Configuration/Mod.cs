@@ -281,7 +281,14 @@ namespace FCS_ProductionSolutions.Configuration
             _hydroponicKnownTech.Add(data);
             BaseManager.GlobalNotifyByID(HydroponicHarvesterModTabID,"UpdateDNA");
             BaseManager.GlobalNotifyByID(ReplicatorTabID,"UpdateDNA");
+            BaseManager.GlobalNotifyByID(MatterAnalyzerTabID,"UpdateDNA");
         }
+
+        public static List<DNASampleData> GetKnownDNA()
+        {
+            return _hydroponicKnownTech;
+        }
+
         public static bool IsHydroponicKnownTech(TechType techType, out DNASampleData data)
         {
             QuickLogger.Debug($"Checking if {techType} is known tech",true);

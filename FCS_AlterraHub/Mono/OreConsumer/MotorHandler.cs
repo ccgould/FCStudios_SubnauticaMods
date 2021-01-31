@@ -48,7 +48,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
         /// <summary>
         /// Starts the motor and brings it to the desired max speed.
         /// </summary>
-        public void Start()
+        public void StartMotor()
         {
             _increasing = true;
         }
@@ -56,7 +56,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
         /// <summary>
         /// Stops the motor from running.
         /// </summary>
-        public void Stop()
+        public void StopMotor()
         {
             _increasing = false;
         }

@@ -12,7 +12,10 @@ using FCS_AlterraHub.Patches;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
+using FMOD;
+using FMODUnity;
 using rail;
+using SMLHelper.V2.Utility;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -421,7 +424,7 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
         }
 
         public Action OnClose { get; set; }
-        public AudioSource AudioSource { get; set; }
+        public Channel AudioTrack { get; set; }
 
         private void FindPDA()
         {
@@ -540,16 +543,21 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
     {
         private bool _initialized;
         private GameObject _messageList;
-        private AudioSource _audioSource => Player_Update_Patch.FCSPDA.AudioSource;
         private readonly List<AudioMessage> _messages = new List<AudioMessage>();
         private Text _messageCounter;
-        private Dictionary<string,AudioClip> AudioClipFiles => Mod.AudioClips;
+        private FCSPDAController _pdaController;
+
+#if SUBNAUTICA
+        private static FMOD.System FMOD_System => RuntimeManager.LowlevelSystem;
+#else
+        private static System FMOD_System => RuntimeManager.CoreSystem;
+#endif
 
         internal void Initialize(FCSPDAController fcsPdaController)
         {
             if (_initialized) return;
-            QuickLogger.Debug("1");
             _messageList = GameObjectHelpers.FindGameObject(gameObject, "Messageslist");
+            _pdaController = fcsPdaController;
             _messageCounter = GameObjectHelpers.FindGameObject(fcsPdaController.gameObject, "MessagesCounter").GetComponent<Text>();
             InvokeRepeating(nameof(UpdateMessageCounter), 1, 1);
             _initialized = true;
@@ -593,23 +601,23 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
                 return;
             }
 
-            var track = QuestManager.Instance.FindAudioClip(trackName);
-            QuickLogger.Debug($"Playing Audio Track: {track} | Length: {track.length}",true);
-            _audioSource.clip = track;
-            _audioSource.Play();
+            CurrentTrackSound.isPlaying(out bool isPlaying);
+
+            if (isPlaying)
+            {
+                CurrentTrackSound.stop();
+            }
+
+             _pdaController.AudioTrack = AudioUtils.PlaySound(QuestManager.Instance.FindAudioClip(trackName), SoundChannel.Voice);
         }
+
+        public Channel CurrentTrackSound { get; set; }
     }
 
     internal class MessagePDAEntryController : MonoBehaviour
     {
         private bool _isInitialized;
-        private bool _wasPlaying;
-
-        private void Update()
-        {
-
-        }
-
+       
         internal void Initialize(AudioMessage message, MessagesController messagesController)
         {
             if(_isInitialized) return;

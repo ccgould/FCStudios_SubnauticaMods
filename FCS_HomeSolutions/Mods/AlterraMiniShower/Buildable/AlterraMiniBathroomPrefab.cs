@@ -108,8 +108,10 @@ namespace FCS_HomeSolutions.Mods.Cabinets.Buildable
                 PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
                 prefabID.ClassId = ClassID;
 
+                //GameObjectHelpers.FindGameObject(prefab, "SoundEmitter").AddComponent<FMOD_CustomEmitter>();
                 prefab.AddComponent<TechTag>().type = TechType;
                 prefab.AddComponent<AlterraMiniBathroomController>();
+
 
                 //Apply the glass shader here because of autosort lockers for some reason doesn't like it.
                 MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModName);

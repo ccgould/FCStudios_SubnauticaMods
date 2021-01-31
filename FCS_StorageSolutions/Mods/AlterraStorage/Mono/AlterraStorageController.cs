@@ -152,7 +152,7 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
             {
                 _motorHandler = GameObjectHelpers.FindGameObject(gameObject, "radar").AddComponent<MotorHandler>();
                 _motorHandler.Initialize(30);
-                _motorHandler.Start();
+                _motorHandler.StartMotor();
             }
 
             _labelText = GameObjectHelpers.FindGameObject(gameObject, "ContainerLabel").GetComponent<Text>();

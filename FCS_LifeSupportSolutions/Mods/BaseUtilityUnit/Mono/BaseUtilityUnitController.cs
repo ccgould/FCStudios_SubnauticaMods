@@ -143,13 +143,13 @@ namespace FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Mono
                 if (currentState)
                 {
                     bubble.Play();
-                    _fanMotor.Start();
+                    _fanMotor.StartMotor();
                     _audioManager.PlayMachineAudio();
                 }
                 else
                 {
                     bubble.Stop();
-                    _fanMotor.Stop();
+                    _fanMotor.StopMotor();
                     _audioManager.StopMachineAudio();
                 }
             }

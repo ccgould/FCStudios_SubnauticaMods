@@ -17,11 +17,13 @@ using FCS_HomeSolutions.SeaBreeze.Buildable;
 using FCS_HomeSolutions.Spawnables;
 using FCS_HomeSolutions.TrashReceptacle.Buildable;
 using FCSCommon.Utilities;
+using FMODUnity;
 using HarmonyLib;
 using QModManager.API.ModLoading;
 using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
 using UnityEngine;
+using Settings = FCS_HomeSolutions.Buildables.Settings;
 
 namespace FCS_HomeSolutions
 {
@@ -61,7 +63,7 @@ namespace FCS_HomeSolutions
             ModelPrefab.Initialize();
 
             AuxPatchers.AdditionalPatching();
-
+            
             //Load Additional Colors
             LoadAdditionalColors();
 

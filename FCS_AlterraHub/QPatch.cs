@@ -36,6 +36,8 @@ namespace FCS_AlterraHub
         {
             QuickLogger.Info($"Started patching. Version: {QuickLogger.GetAssemblyVersion(Assembly.GetExecutingAssembly())}");
             GlobalBundle = FCSAssetBundlesService.PublicAPI.GetAssetBundleByName(Mod.AssetBundleName);
+
+            Mod.LoadAudioFiles();
             
             QuickLogger.DebugLogsEnabled = Configuration.EnableDebugLogs;
             

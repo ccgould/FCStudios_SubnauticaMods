@@ -12,6 +12,7 @@ using FCS_AlterraHub.Patches;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Extensions;
 using FCSCommon.Utilities;
+using FMOD;
 using UnityEngine;
 
 namespace FCS_AlterraHub.Managers.Quests
@@ -105,9 +106,9 @@ namespace FCS_AlterraHub.Managers.Quests
             }
         }
 
-        public AudioClip FindAudioClip(string audioName)
+        public Sound FindAudioClip(string audioName)
         {
-            if (!Mod.AudioClips.ContainsKey(audioName)) return null;
+            if (!Mod.AudioClips.ContainsKey(audioName)) return new Sound();
             QuickLogger.Debug($"Audio clip found: {audioName}", true);
             return Mod.AudioClips[audioName];
         }

@@ -128,10 +128,6 @@
       <HintPath>..\Dependancies\UnityEngine.UIModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="UnityEngine.UnityWebRequestWWWModule">
-      <HintPath>..\Dependancies\UnityEngine.UnityWebRequestWWWModule.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="UnityEngine.VideoModule">
       <HintPath>..\Dependancies\UnityEngine.VideoModule.dll</HintPath>
       <Private>False</Private>

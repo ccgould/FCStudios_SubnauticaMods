@@ -62,15 +62,15 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
 
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
         {
+            if (_device.DumpContainer.GetCount() + 1 > 1) return false;
+
             var techType = pickupable.GetTechType();
-            if (Mod.IsNonePlantableAllowedList.Contains(techType))
+            if (!Mod.IsHydroponicKnownTech(techType, out var data1) && Mod.IsNonePlantableAllowedList.Contains(techType))
             {
                 return true;
             }
 
-            return !Mod.IsHydroponicKnownTech(techType, out var data) && 
-                   _device.DumpContainer.GetCount() != 1 && 
-                   pickupable.gameObject.GetComponentInChildren<Plantable>().isSeedling;
+            return !Mod.IsHydroponicKnownTech(techType, out var data) &&_device.DumpContainer.GetCount() != 1 && pickupable.gameObject.GetComponentInChildren<Plantable>().isSeedling;
         }
 
         public bool IsAllowedToRemoveItems()
