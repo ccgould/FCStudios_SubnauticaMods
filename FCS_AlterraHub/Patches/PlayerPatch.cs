@@ -123,7 +123,12 @@ namespace FCS_AlterraHub.Patches
         private static GameObject CreateFcsPda(Player __instance)
         {
             var pda = GameObject.Instantiate(AlterraHub.FcsPDAPrefab);
+
             pda.SetActive(false);
+            var canvas = pda.GetComponentInChildren<Canvas>();
+            if(canvas != null)
+                canvas.sortingLayerID = 1479780821;
+            
             pda.EnsureComponent<Rigidbody>().isKinematic = true;
             var controller = pda.AddComponent<FCSPDAController>();
             controller.CreateMissionController();
@@ -138,6 +143,7 @@ namespace FCS_AlterraHub.Patches
         {
             if (QPatch.QuestManagerGM == null)
             {
+                QuickLogger.Debug("Load Gameplay Settings");
                 //Load GamePlaySettings
                 Mod.LoadGamePlaySettings();
                 QPatch.QuestManagerGM = new GameObject("QuestManager").AddComponent<QuestManager>();

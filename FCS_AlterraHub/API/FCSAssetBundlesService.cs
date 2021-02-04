@@ -2,8 +2,11 @@
 using System.IO;
 using System.Reflection;
 using FCS_AlterraHub.Configuration;
+using FCSCommon.Utilities;
+using JetBrains.Annotations;
 using SMLHelper.V2.Utility;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace FCS_AlterraHub.API
 {
@@ -13,6 +16,7 @@ namespace FCS_AlterraHub.API
         Sprite GetIconByName(string iconName);
         AssetBundle GetAssetBundleByName(string bundleName,string executingFolder);
         string GlobalBundleName { get;}
+        Atlas.Sprite GetEncyclopediaSprite(string imageName, string globalBundle);
     }
 
     public class FCSAssetBundlesService : IFcAssetBundlesService
@@ -24,7 +28,31 @@ namespace FCS_AlterraHub.API
 
         private static readonly Dictionary<string, AssetBundle> loadedAssetBundles = new Dictionary<string, AssetBundle>();
         private static readonly Dictionary<string, Sprite> loadedIcons = new Dictionary<string, Sprite>();
+        private static readonly Dictionary<string, Atlas.Sprite> loadedImages = new Dictionary<string, Atlas.Sprite>();
         public string GlobalBundleName => Mod.AssetBundleName;
+        public Atlas.Sprite GetEncyclopediaSprite(string imageName, string bundleName)
+        {
+            AssetBundle bundle = null;
+
+            if (loadedImages.ContainsKey(imageName)) return loadedImages[imageName];
+
+            if (loadedAssetBundles.TryGetValue(bundleName, out AssetBundle preLoadedBundle))
+            {
+                bundle =  preLoadedBundle;
+            }
+
+            if (bundle == null) return SpriteManager.defaultSprite;
+
+            var imageTexture2D = bundle.LoadAsset<Texture2D>(imageName);
+            if (imageTexture2D == null)
+            {
+                QuickLogger.DebugError($"Failed to find sprite {imageName}");
+                return SpriteManager.defaultSprite;
+            }
+
+            loadedImages.Add(imageName, ImageUtils.LoadSpriteFromTexture(imageTexture2D));
+            return loadedImages[imageName];
+        }
 
         private FCSAssetBundlesService()
         {

@@ -28,6 +28,7 @@ namespace FCS_AlterraHub
     [QModCore]
     public class QPatch
     {
+        private static TechType _oreConsumerFrag;
         public static Config Configuration { get;} = OptionsPanelHandler.Main.RegisterModOptions<Config>();
         public static AssetBundle GlobalBundle { get; set; }
 
@@ -36,6 +37,11 @@ namespace FCS_AlterraHub
         {
             QuickLogger.Info($"Started patching. Version: {QuickLogger.GetAssemblyVersion(Assembly.GetExecutingAssembly())}");
             GlobalBundle = FCSAssetBundlesService.PublicAPI.GetAssetBundleByName(Mod.AssetBundleName);
+
+            Mod.OnGamePlaySettingsLoaded += settings =>
+            {
+                SpawnFrag();
+            };
 
             Mod.LoadAudioFiles();
             
@@ -82,7 +88,30 @@ namespace FCS_AlterraHub
 
             var oreConsumerFragment = new OreConsumerFragment();
             oreConsumerFragment.Patch();
+            _oreConsumerFrag = oreConsumerFragment.TechType;
         }
+
+        internal static void SpawnFrag()
+        {
+            QuickLogger.Debug("Spawn Frag");
+            if (CraftData.IsAllowed(_oreConsumerFrag) && !Mod.GamePlaySettings.IsOreConsumerFragmentSpawned)
+            {
+                GameObject prefabForTechType = CraftData.GetPrefabForTechType(_oreConsumerFrag);
+                if (prefabForTechType != null)
+                {
+                    GameObject gameObject = Utils.CreatePrefab(prefabForTechType, 1000);
+                    LargeWorldEntity.Register(gameObject);
+                    CrafterLogic.NotifyCraftEnd(gameObject, _oreConsumerFrag);
+                    gameObject.SendMessage("StartConstruction", SendMessageOptions.DontRequireReceiver);
+                    gameObject.transform.position = new Vector3(113.6f, -267.40f, -366.2f);
+                    Mod.GamePlaySettings.IsOreConsumerFragmentSpawned = true;
+                    return;
+                }
+                ErrorMessage.AddDebug("Could not find prefab for TechType = " + _oreConsumerFrag);
+                return;
+            }
+        }
+
 
         private static void PatchBuildables()
         {

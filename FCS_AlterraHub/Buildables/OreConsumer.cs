@@ -26,7 +26,7 @@ namespace FCS_AlterraHub.Buildables
 
         public override float TimeToScanFragment => 5f;
 
-        public override bool DestroyFragmentOnScan => true;
+        public override bool DestroyFragmentOnScan => false;
 
         public OreConsumer() : base(Mod.OreConsumerClassID, Mod.OreConsumerFriendly, Mod.OreConsumerDescription)
         {
@@ -56,6 +56,9 @@ namespace FCS_AlterraHub.Buildables
                 skyApplier.renderers = renderers;
                 skyApplier.anchorSky = Skies.Auto;
                 //========== Allows the building animation and material colors ==========// 
+
+                var lw = prefab.AddComponent<LargeWorldEntity>();
+                lw.cellLevel = LargeWorldEntity.CellLevel.Global;
 
                 // Add constructible
                 var constructable = prefab.AddComponent<Constructable>();

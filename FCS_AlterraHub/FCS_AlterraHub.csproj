@@ -193,6 +193,7 @@
     <Compile Include="Model\PowercellData.cs" />
     <Compile Include="Model\ProximityActivate.cs" />
     <Compile Include="Model\TimeCache.cs" />
+    <Compile Include="Mono\AlterraHub\Encyclopedia\Encyclopedia.cs" />
     <Compile Include="Mono\AlterraHub\HubTrigger.cs" />
     <Compile Include="Mono\BaseManager.cs" />
     <Compile Include="Mono\ColorItemButton.cs" />

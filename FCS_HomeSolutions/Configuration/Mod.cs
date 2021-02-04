@@ -36,7 +36,7 @@ namespace FCS_HomeSolutions.Configuration
 
         internal const string TrashReceptacleClassID = "TrashReceptacle";
         internal const string TrashReceptacleFriendly = "Trash Receptacle";
-        internal const string TrashReceptacleDescription = "Use the Trash Receptacle to quickly send you trash to the recycler form the inside of your base";
+        internal const string TrashReceptacleDescription = "Use the Trash Receptacle to quickly send you trash to the recycler from the inside of your base";
         internal const string TrashReceptaclePrefabName = "TrashReceptacle";
         internal const string TrashReceptacleKitClassID = "TrashReceptacle_Kit";
         internal const string TrashReceptacleTabID = "TR";

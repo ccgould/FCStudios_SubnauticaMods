@@ -61,6 +61,7 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
         private bool _addtempMessage = true;
         private PaginatorController _inventoryPaginatorController;
         private PaginatorController _basePaginatorController;
+        private bool _depthState;
 
         public bool isFocused => this.ui != null && this.ui.focused;
 
@@ -115,6 +116,8 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             {
                 MissionController.UpdateQuest(quest);
             };
+
+
             _home = GameObjectHelpers.FindGameObject(gameObject, "Home");
             _missionPage = GameObjectHelpers.FindGameObject(gameObject, "Missions");
             
@@ -201,7 +204,7 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             {
                 QuickLogger.ModMessage("Page Not Implemented");
             });
-
+            
             var messagesButton = GameObjectHelpers.FindGameObject(gameObject, "MessagesButton").GetComponent<Button>();
             messagesButton.onClick.AddListener(() =>
             {
@@ -340,6 +343,10 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
         internal void Open()
         {
             FindPDA();
+            _depthState = UwePostProcessingManager.GetDofEnabled();
+
+            UwePostProcessingManager.ToggleDof(false);
+
             _pda.isInUse = true;
             uGUI.main.quickSlots.SetTarget(null);
             prevQuickSlot = Inventory.main.quickSlots.activeSlot;
@@ -402,6 +409,7 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             ui.Deselect(null);
             UwePostProcessingManager.ClosePDA();
             _pda.ui.soundQueue.PlayImmediately(_pda.ui.soundClose);
+            UwePostProcessingManager.ToggleDof(_depthState);
             QuickLogger.Debug("FCS PDA Is Closed", true);
         }
 
@@ -648,7 +656,7 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
     public struct FCSEncyclopediaData
     {
         public string Title { get; set; }
-        public Image Image { get; set; }
+        public Atlas.Sprite Image { get; set; }
         public string Body { get; set; }
         public string VideoLink { get; set; }
     }

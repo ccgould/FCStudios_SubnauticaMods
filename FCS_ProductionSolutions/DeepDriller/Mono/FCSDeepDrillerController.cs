@@ -160,7 +160,11 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
 
             if (_lowPassFilter != null)
             {
-                _lowPassFilter.cutoffFrequency = Player.main.IsUnderwaterForSwimming() ? 1566f : 22000f;
+                _lowPassFilter.cutoffFrequency = Player.main.IsUnderwater() || 
+                                                 Player.main.IsInBase() || 
+                                                 Player.main.IsInSub() ||
+                                                 Player.main.inSeamoth || 
+                                                 Player.main.inExosuit ? 1566f : 22000f;
             }
         }
 

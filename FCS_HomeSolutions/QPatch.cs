@@ -154,6 +154,8 @@ namespace FCS_HomeSolutions
 
             LoadCabinets();
             
+            
+
             var harmony = new Harmony("com.homesolutions.fstudios");
             harmony.PatchAll(Assembly.GetExecutingAssembly());
             
@@ -459,7 +461,7 @@ namespace FCS_HomeSolutions
                 });
             floorShelf07.Patch();
 
-            var tableSmartTV = new TVPatch("tableSmartTV", "Smart TV w/ Wall Mount", "Take a little break and watch some TV. Includes Table Mount.",
+            var tableSmartTV = new TVPatch("tableSmartTV", "Smart TV With Table Mount", "Take a little break and watch some TV. Includes Table Mount.",
                 ModelPrefab.GetPrefab("TableSmartTV"),
                 new Settings
                 {
@@ -475,7 +477,7 @@ namespace FCS_HomeSolutions
                 });
             tableSmartTV.Patch();
 
-            var mountSmartTV = new TVPatch("mountSmartTV", "Smart TV w/ Stand", "Take a little break and watch some TV. Includes Wall Mount.",
+            var mountSmartTV = new TVPatch("mountSmartTV", "Smart TV With Wall Mount", "Take a little break and watch some TV. Includes Wall Mount.",
                 ModelPrefab.GetPrefab("MountSmartTV"),
                 new Settings
                 {

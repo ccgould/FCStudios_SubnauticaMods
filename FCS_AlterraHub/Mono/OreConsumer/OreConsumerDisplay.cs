@@ -67,6 +67,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
                 if (!_mono.IsOnPlatform)
                 {
                     QuickLogger.ModMessage(Buildables.AlterraHub.PleaseBuildOnPlatForm());
+                    return;
                 }
 
                 onDumpButtonClicked?.Invoke();

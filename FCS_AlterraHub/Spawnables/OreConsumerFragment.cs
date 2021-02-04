@@ -16,27 +16,8 @@ namespace FCS_AlterraHub.Spawnables
             OnFinishedPatching += () => { Mod.OreConsumerFragmentTechType = TechType; };
         }
 
-        public override List<LootDistributionData.BiomeData> BiomesToSpawnIn => GetBiomeDistribution();
-
-
-        private List<LootDistributionData.BiomeData> GetBiomeDistribution()
-        {
-#if SUBNAUTICA
-            List<LootDistributionData.BiomeData> biomeDatas = new List<LootDistributionData.BiomeData>()
-            {
-                new LootDistributionData.BiomeData(){ biome = BiomeType.JellyshroomCaves_CaveFloor, count = 1, probability = 0.05f },
-            };
-#elif BELOWZERO
-            List<LootDistributionData.BiomeData> biomeDatas = new List<LootDistributionData.BiomeData>()
-            {
-                new LootDistributionData.BiomeData(){ biome = BiomeType.TwistyBridges_Ground, count = 1, probability = 1f },
-            };
-#endif
-            return biomeDatas;
-        }
 
         public override WorldEntityInfo EntityInfo => new WorldEntityInfo() { cellLevel = LargeWorldEntity.CellLevel.Medium, classId = ClassID, localScale = Vector3.one, prefabZUp = false, slotType = EntitySlot.Type.Medium, techType = TechType };
-
         public override GameObject GetGameObject()
         {
             try
