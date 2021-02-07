@@ -38,10 +38,11 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             Manager.OnBreakerStateChanged += OnBreakerStateChanged;
             if (Manager.GetBreakerState())
             {
-                _display.HibernateDisplay();
+                _display?.HibernateDisplay();
             }
 
             UpdateScreenState();
+            _display?.Refresh();
         }
 
         public override void OnDestroy()

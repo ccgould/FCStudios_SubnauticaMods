@@ -27,6 +27,7 @@ namespace FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Mono
 
         private void Update()
         {
+            if (_mono == null || !_mono.IsOperational) return;
             _timeLeft -= DayNightCycle.main.deltaTime;
             if (_timeLeft < 0)
             {

@@ -20,7 +20,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable
         {
             OnFinishedPatching += () =>
             {
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, TechType, 126000, StoreCategory.Storage);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, TechType, 90000, StoreCategory.Storage);
                 CraftDataHandler.SetEquipmentType(TechType, EquipmentType.Hand);
             };
         }

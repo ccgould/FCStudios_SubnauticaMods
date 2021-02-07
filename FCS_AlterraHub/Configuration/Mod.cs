@@ -4,8 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using FCS_AlterraHub.Managers.Quests;
-using FCS_AlterraHub.Managers.Quests.Enums;
+using FCS_AlterraHub.Managers.Mission;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Patches;
 using FCS_AlterraHub.Registration;
@@ -195,12 +194,12 @@ namespace FCS_AlterraHub.Configuration
                 }
 
 
-                if (QuestManager.Instance != null)
+                if (MissionManager.Instance != null)
                 {
-                    GamePlaySettings.Event = QuestManager.Instance.SaveEvents()?.ToList();
-                    GamePlaySettings.CreditReward = QuestManager.Instance.quest.CreditReward;
-                    GamePlaySettings.TechTypeReward = QuestManager.Instance.quest.TechTypeReward;
-                    GamePlaySettings.MissionDescription = QuestManager.Instance.quest.Description;
+                    //GamePlaySettings.Event = QuestManager.Instance.SaveEvents()?.ToList();
+                    //GamePlaySettings.CreditReward = QuestManager.Instance.quest.CreditReward;
+                    //GamePlaySettings.TechTypeReward = QuestManager.Instance.quest.TechTypeReward;
+                    //GamePlaySettings.MissionDescription = QuestManager.Instance.quest.Description;
                 }
 
                 ModUtils.Save(GamePlaySettings, "settings.json", GetSaveFileDirectory(), OnSaveComplete);
@@ -405,9 +404,9 @@ namespace FCS_AlterraHub.Configuration
         public string GetDescription { get; set; }
         public int Order { get; set; }
         public TechType TechType { get; set; }
-        public QuestEventType QuestEventType { get; set; }
-        public QuestEventStatus Status { get; set; }
-        public DeviceActionType DeviceActionType { get; set; }
+        //public QuestEventType QuestEventType { get; set; }
+        //public QuestEventStatus Status { get; set; }
+        //public DeviceActionType DeviceActionType { get; set; }
         public Dictionary<TechType, int> Requirements { get; set; }
         public IEnumerable<EventPathData> PathList { get; set; }
     }

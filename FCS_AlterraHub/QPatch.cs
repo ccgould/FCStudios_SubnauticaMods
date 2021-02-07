@@ -3,15 +3,9 @@ using FCS_AlterraHub.API;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Craftables;
-using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Helpers;
-using FCS_AlterraHub.Managers.Quests;
-using FCS_AlterraHub.Objects;
-using FCS_AlterraHub.Patch;
-using FCS_AlterraHub.Patches;
-using FCS_AlterraHub.Registration;
+using FCS_AlterraHub.Managers.Mission;
 using FCS_AlterraHub.Spawnables;
-using FCSCommon.Extensions;
 using FCSCommon.Utilities;
 using HarmonyLib;
 using QModManager.API;
@@ -66,7 +60,7 @@ namespace FCS_AlterraHub
             ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));
         }
 
-        public static QuestManager QuestManagerGM { get; internal set; }
+        public static MissionManager MissionManagerGM { get; internal set; }
 
         public static FCSHUD HUD { get; set; }
         public static bool IsDockedVehicleStorageAccessInstalled { get; set; }

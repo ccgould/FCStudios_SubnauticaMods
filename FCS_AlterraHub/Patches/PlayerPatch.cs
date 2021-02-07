@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections;
-using System.IO;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
-using FCS_AlterraHub.Managers.Quests;
+using FCS_AlterraHub.Managers.Mission;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Mono.FCSPDA.Mono;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using HarmonyLib;
-using SMLHelper.V2.Json.ExtensionMethods;
 using UnityEngine;
 
 
@@ -34,9 +31,9 @@ namespace FCS_AlterraHub.Patches
             _instance = __instance;
             OnPlayerUpdate?.Invoke();
 
-            if (LoadSavesQuests && QPatch.QuestManagerGM != null)
+            if (LoadSavesQuests && QPatch.MissionManagerGM != null)
             {
-                QuestManager.Instance.Load();
+                //QuestManager.Instance.Load();
                 LoadSavesQuests = false;
             }
 
@@ -69,7 +66,7 @@ namespace FCS_AlterraHub.Patches
             if (LargeWorldStreamer.main.IsWorldSettled() && FCSPDA != null && DayNightCycle.main.timePassed >= 600f)
             {
                 if (_firstMissionAdded) return;
-                FCSPDA.MissionController.UpdateQuest(QuestManager.Instance.GetActiveMission());
+                //FCSPDA.MissionController.UpdateMission(QuestManager.Instance.GetActiveMission());
                 FCSPDA.MessagesController.AddNewMessage("Message From: Jack Winton (Chief Engineer)", "Jack Winton", "AH-Mission01-Pt1");
                 _firstMissionAdded = true;
             }
@@ -141,12 +138,12 @@ namespace FCS_AlterraHub.Patches
 
         private static void CreateQuestManager()
         {
-            if (QPatch.QuestManagerGM == null)
+            if (QPatch.MissionManagerGM == null)
             {
                 QuickLogger.Debug("Load Gameplay Settings");
                 //Load GamePlaySettings
                 Mod.LoadGamePlaySettings();
-                QPatch.QuestManagerGM = new GameObject("QuestManager").AddComponent<QuestManager>();
+                QPatch.MissionManagerGM = new GameObject("MissionManager").AddComponent<MissionManager>();
             }
         }
     }

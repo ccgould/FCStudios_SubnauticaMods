@@ -270,8 +270,7 @@ namespace FCS_HomeSolutions.Mono.PaintTool
             }
             return true;
         }
-
-
+        
         public override bool OnAltUp()
         {
             return true;
@@ -300,6 +299,11 @@ namespace FCS_HomeSolutions.Mono.PaintTool
                 Paint();
             }
             return true;
+        }
+
+        public override string GetCustomUseText()
+        {
+            return $"Press Change Colors ({QPatch.PaintToolConfiguration.SelectColorBackKeyCode})/({QPatch.PaintToolConfiguration.SelectColorForwardKeyCode}) | Use Paint Can: {GameInput.GetBindingName(GameInput.Button.Reload, GameInput.BindingSet.Primary)} | Change Mode: {GameInput.GetBindingName(GameInput.Button.AltTool, GameInput.BindingSet.Primary)}";
         }
     }
 }

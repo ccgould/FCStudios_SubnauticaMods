@@ -6,20 +6,6 @@ namespace FCS_AlterraHub.Mono
     {
         public bool IgnoreDoubleClicking = false;
 
-        public override void OnEnable()
-        {
-            base.OnEnable();
-
-            if (IsSelected)
-            {
-                Select();
-            }
-            else
-            {
-                DeSelect();
-            }
-        }
-
         private void ChangeState(bool value)
         {
             if(IsRadial && IsSelected || IgnoreDoubleClicking) return;
@@ -36,6 +22,7 @@ namespace FCS_AlterraHub.Mono
 
         public override void OnPointerClick(PointerEventData eventData)
         {
+            if (!InInteractionRange()) return;
             ChangeState(IsSelected);
             base.OnPointerClick(eventData);
         }

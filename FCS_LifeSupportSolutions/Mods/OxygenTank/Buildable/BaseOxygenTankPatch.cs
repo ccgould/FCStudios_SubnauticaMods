@@ -47,6 +47,10 @@ namespace FCS_LifeSupportSolutions.Mods.BaseOxygenTank.Buildable
                 skyApplier.anchorSky = Skies.Auto;
                 //========== Allows the building animation and material colors ==========// 
 
+
+                var lw = prefab.AddComponent<LargeWorldEntity>();
+                lw.cellLevel = LargeWorldEntity.CellLevel.Global;
+
                 // Add constructible
                 var constructable = prefab.AddComponent<Constructable>();
                 constructable.allowedOutside = true;

@@ -262,6 +262,7 @@ namespace FCS_HomeSolutions.QuantumTeleporter.Mono
         public void ToggleIsGlobal()
         {
             IsGlobal = !IsGlobal;
+            BaseManager.GlobalNotifyByID(Mod.QuantumTeleporterTabID, "RefreshDisplay");
         }
 
         public override bool ChangeBodyColor(Color color, ColorTargetMode mode)

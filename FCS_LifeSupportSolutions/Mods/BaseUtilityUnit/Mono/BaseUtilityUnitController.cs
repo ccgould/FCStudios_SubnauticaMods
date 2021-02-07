@@ -29,6 +29,7 @@ namespace FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Mono
         private MotorHandler _fanMotor;
         private AudioManager _audioManager;
         private bool _prevPowerState;
+        private Canvas _canvas;
         public OxygenManager OxygenManager { get; set; }
         public override bool IsOperational => IsConstructed && Manager != null && IsInitialized;
 
@@ -36,17 +37,10 @@ namespace FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Mono
         private void Start()
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.BaseUtilityUnitTabID, Mod.ModName);
-            //Manager.OnPowerStateChanged += state =>
-            //{
-            //    if (state != PowerSystem.Status.Normal || !Manager.HasEnoughPower(GetPowerUsage()))
-            //    {
-            //        UpdateAnimations(false);
-            //    }
-            //    else
-            //    {
-            //        UpdateAnimations(true);
-            //    }
-            //};
+            if (Manager == null)
+            {
+                TurnOffDevice();
+            }
         }
 
         public override Vector3 GetPosition()
@@ -82,7 +76,7 @@ namespace FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Mono
         public override void Initialize()
         {
             _isRunningHash = Animator.StringToHash("IsRunning");
-
+            _canvas = gameObject.GetComponentInChildren<Canvas>();
             _fanMotor = GameObjectHelpers.FindGameObject(gameObject, "FanRotor").AddComponent<MotorHandler>();
             _fanMotor.Initialize(200);
 
@@ -244,6 +238,11 @@ namespace FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Mono
         public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
         {
             return _colorManager.ChangeColor(color, mode);
+        }
+
+        public override void TurnOffDevice()
+        {
+            _canvas.gameObject.SetActive(false);
         }
     }
 }

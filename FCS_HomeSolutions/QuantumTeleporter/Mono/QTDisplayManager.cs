@@ -10,7 +10,6 @@ using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
 using FCS_HomeSolutions.QuantumTeleporter.Enumerators;
 using FCSCommon.Abstract;
-using FCSCommon.Enums;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -27,23 +26,24 @@ namespace FCS_HomeSolutions.QuantumTeleporter.Mono
         private Text _location;
         private Text _message;
         private Text _destination;
-        private Color _startColor = new Color(0.4431373f, 0.8666667f, 0.4196079f,1f);
-        private Color _hoverColor = Color.white;
-        private FCSToggleButton _globalNetworkToggleBTN;
-        private FCSToggleButton _toggleGlobalNetworkToggleBTN;
-        private FCSToggleButton _homeNetworkToggleBTN;
+        private readonly Color _startColor = new Color(0.4431373f, 0.8666667f, 0.4196079f,1f);
+        private readonly Color _hoverColor = Color.white;
+        private FCSToggleButton _globalNetworkToggleBtn;
+        private FCSToggleButton _toggleGlobalNetworkToggleBtn;
+        private FCSToggleButton _homeNetworkToggleBtn;
         private GridHelper _teleportGrid;
         private GameObject _destinationsScreen;
         private GameObject _confirmationScreen;
         private QuantumTeleporterController _toUnit;
-        private StringBuilder _sb = new StringBuilder();
-        private GameObject _canvasGO;
+        private readonly StringBuilder _sb = new StringBuilder();
+        private GameObject _canvasGo;
         public QTTeleportTypes SelectedTab { get; private set; } = QTTeleportTypes.Intra;
 
         internal void Setup(QuantumTeleporterController mono)
         {
             _mono = mono;
             _teleportGrid = gameObject.AddComponent<GridHelper>();
+
             if(FindAllComponents())
             {
                 _location.text = AuxPatchers.LocationFormat(gameObject.transform.position);
@@ -53,6 +53,7 @@ namespace FCS_HomeSolutions.QuantumTeleporter.Mono
                     QPatch.QuantumTeleporterConfiguration.InternalTeleportPowerUsage,
                     QPatch.QuantumTeleporterConfiguration.GlobalTeleportPowerUsage);
                 _teleportGrid.DrawPage();
+                _homeNetworkToggleBtn.Select();
             }
         }
 
@@ -112,7 +113,7 @@ namespace FCS_HomeSolutions.QuantumTeleporter.Mono
             {
                 var canvas = gameObject.GetComponentInChildren<Canvas>();
 
-                _canvasGO = canvas.gameObject;
+                _canvasGo = canvas.gameObject;
 
                 //Add ProximityActivate to controller screen visiblity
                 var px = gameObject.AddComponent<ProximityActivate>();
@@ -144,36 +145,39 @@ namespace FCS_HomeSolutions.QuantumTeleporter.Mono
 
                 //Home Network Toggle
                 var homeNetworkToggle = GameObjectHelpers.FindGameObject(gameObject, "HomeNetworkBTN");
-                _homeNetworkToggleBTN = homeNetworkToggle.AddComponent<FCSToggleButton>();
-                _homeNetworkToggleBTN.ButtonMode = InterfaceButtonMode.Background;
-                _homeNetworkToggleBTN.STARTING_COLOR = _startColor;
-                _homeNetworkToggleBTN.HOVER_COLOR = _hoverColor;
-                _homeNetworkToggleBTN.BtnName = "HomeNetworkBTN";
-                _homeNetworkToggleBTN.TextLineOne = AuxPatchers.HomeNetworkToggle();
-                _homeNetworkToggleBTN.TextLineTwo = AuxPatchers.HomeNetworkToggleDesc();
-                _homeNetworkToggleBTN.OnButtonClick = OnButtonClick;
+                _homeNetworkToggleBtn = homeNetworkToggle.AddComponent<FCSToggleButton>();
+                _homeNetworkToggleBtn.ButtonMode = InterfaceButtonMode.Background;
+                _homeNetworkToggleBtn.STARTING_COLOR = _startColor;
+                _homeNetworkToggleBtn.HOVER_COLOR = _hoverColor;
+                _homeNetworkToggleBtn.BtnName = "HomeNetworkBTN";
+                _homeNetworkToggleBtn.TextLineOne = AuxPatchers.HomeNetworkToggle();
+                _homeNetworkToggleBtn.TextLineTwo = AuxPatchers.HomeNetworkToggleDesc();
+                _homeNetworkToggleBtn.OnButtonClick = OnButtonClick;
+                _homeNetworkToggleBtn.InteractionRequirement = InteractionRequirement.IsInside;
 
                 //Global Network Toggle
                 var globalNetworkToggle = GameObjectHelpers.FindGameObject(gameObject, "GlobalNetworkBTN");
-                _globalNetworkToggleBTN = globalNetworkToggle.AddComponent<FCSToggleButton>();
-                _globalNetworkToggleBTN.ButtonMode = InterfaceButtonMode.Background;
-                _globalNetworkToggleBTN.STARTING_COLOR = _startColor;
-                _globalNetworkToggleBTN.HOVER_COLOR = _hoverColor;
-                _globalNetworkToggleBTN.BtnName = "GlobalNetworkBTN";
-                _globalNetworkToggleBTN.TextLineOne = AuxPatchers.GlobalNetworkToggle();
-                _globalNetworkToggleBTN.TextLineTwo = AuxPatchers.GlobalNetworkToggleDesc();
-                _globalNetworkToggleBTN.OnButtonClick = OnButtonClick;
+                _globalNetworkToggleBtn = globalNetworkToggle.AddComponent<FCSToggleButton>();
+                _globalNetworkToggleBtn.ButtonMode = InterfaceButtonMode.Background;
+                _globalNetworkToggleBtn.STARTING_COLOR = _startColor;
+                _globalNetworkToggleBtn.HOVER_COLOR = _hoverColor;
+                _globalNetworkToggleBtn.BtnName = "GlobalNetworkBTN";
+                _globalNetworkToggleBtn.TextLineOne = AuxPatchers.GlobalNetworkToggle();
+                _globalNetworkToggleBtn.TextLineTwo = AuxPatchers.GlobalNetworkToggleDesc();
+                _globalNetworkToggleBtn.OnButtonClick = OnButtonClick;
+                _globalNetworkToggleBtn.InteractionRequirement = InteractionRequirement.IsInside;
 
                 //Add To Global Network Toggle
                 var toggleGlobalNetworkBTN = GameObjectHelpers.FindGameObject(gameObject, "ToggleGlobalNetworkBTN");
-                _toggleGlobalNetworkToggleBTN = toggleGlobalNetworkBTN.AddComponent<FCSToggleButton>();
-                _toggleGlobalNetworkToggleBTN.ButtonMode = InterfaceButtonMode.Background;
-                _toggleGlobalNetworkToggleBTN.STARTING_COLOR = _startColor;
-                _toggleGlobalNetworkToggleBTN.HOVER_COLOR = _hoverColor;
-                _toggleGlobalNetworkToggleBTN.BtnName = "ToggleGlobalNetworkBTN";
-                _toggleGlobalNetworkToggleBTN.TextLineOne = AuxPatchers.AddToGlobalNetworkToggle();
-                _toggleGlobalNetworkToggleBTN.TextLineTwo = AuxPatchers.AddToGlobalNetworkToggleDesc();
-                _toggleGlobalNetworkToggleBTN.OnButtonClick = OnButtonClick;
+                _toggleGlobalNetworkToggleBtn = toggleGlobalNetworkBTN.AddComponent<FCSToggleButton>();
+                _toggleGlobalNetworkToggleBtn.ButtonMode = InterfaceButtonMode.Background;
+                _toggleGlobalNetworkToggleBtn.STARTING_COLOR = _startColor;
+                _toggleGlobalNetworkToggleBtn.HOVER_COLOR = _hoverColor;
+                _toggleGlobalNetworkToggleBtn.BtnName = "ToggleGlobalNetworkBTN";
+                _toggleGlobalNetworkToggleBtn.TextLineOne = AuxPatchers.AddToGlobalNetworkToggle();
+                _toggleGlobalNetworkToggleBtn.TextLineTwo = AuxPatchers.AddToGlobalNetworkToggleDesc();
+                _toggleGlobalNetworkToggleBtn.OnButtonClick = OnButtonClick;
+                _toggleGlobalNetworkToggleBtn.InteractionRequirement = InteractionRequirement.IsInside;
 
                 //Rename
                 var renameObj = InterfaceHelpers.FindGameObject(canvas.gameObject, "RenameBTN");
@@ -181,6 +185,7 @@ namespace FCS_HomeSolutions.QuantumTeleporter.Mono
                     OnButtonClick, _startColor, _hoverColor, 5);
                 renameBTN.TextLineOne = AuxPatchers.Rename();
                 renameBTN.TextLineTwo = AuxPatchers.RenameDesc();
+                renameBTN.InteractionRequirement = InteractionRequirement.IsInside;
 
                 #region Grid
                 _teleportGrid.Setup(4, ModelPrefab.NetworkItemPrefab, home, Color.gray, Color.white, OnButtonClick,
@@ -192,11 +197,13 @@ namespace FCS_HomeSolutions.QuantumTeleporter.Mono
                 var cancelBTN = InterfaceHelpers.CreateButton(cancelGO, "CancelBTN", InterfaceButtonMode.Background,
                     OnButtonClick, Color.black, Color.white, 5);
                 cancelBTN.ChangeText(AuxPatchers.Cancel());
+                cancelBTN.InteractionRequirement = InteractionRequirement.IsInside;
 
                 var confirmGO = InterfaceHelpers.FindGameObject(home, "ConfirmBTN");
                 var confirmBTN = InterfaceHelpers.CreateButton(confirmGO, "ConfirmBTN", InterfaceButtonMode.Background,
                     OnButtonClick, Color.black, Color.white, 5);
                 confirmBTN.ChangeText(AuxPatchers.Confirm());
+                confirmBTN.InteractionRequirement = InteractionRequirement.IsInside;
             }
             catch (Exception e)
             {
@@ -286,7 +293,6 @@ namespace FCS_HomeSolutions.QuantumTeleporter.Mono
             _teleportGrid.UpdaterPaginator(items?.Count ?? 0);
         }
         
-
         private string NetworkFormat(object go)
         {
             _sb.Clear();
@@ -318,15 +324,15 @@ namespace FCS_HomeSolutions.QuantumTeleporter.Mono
             if (tabs == QTTeleportTypes.Intra)
             {
                 _networkLabel.text = AuxPatchers.LocalNetwork();
-                _homeNetworkToggleBTN.Select();
-                _globalNetworkToggleBTN.DeSelect();
+                _homeNetworkToggleBtn.Select();
+                _globalNetworkToggleBtn.DeSelect();
                 SelectedTab = QTTeleportTypes.Intra;
             }
             else
             {
                 _networkLabel.text = AuxPatchers.GlobalNetwork();
-                _homeNetworkToggleBTN.DeSelect();
-                _globalNetworkToggleBTN.Select();
+                _homeNetworkToggleBtn.DeSelect();
+                _globalNetworkToggleBtn.Select();
                 SelectedTab = QTTeleportTypes.Global;
             }
 
@@ -339,7 +345,7 @@ namespace FCS_HomeSolutions.QuantumTeleporter.Mono
 
             if (data.IsGlobal)
             {
-                _toggleGlobalNetworkToggleBTN.Select();
+                _toggleGlobalNetworkToggleBtn.Select();
             }
         }
 
@@ -366,7 +372,7 @@ namespace FCS_HomeSolutions.QuantumTeleporter.Mono
 
         public void ChangeScreenVisiblity(bool isVisible)
         {
-            _canvasGO.SetActive(isVisible);
+            _canvasGo.SetActive(isVisible);
         }
     }
 

@@ -70,6 +70,9 @@ namespace FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Buildable
                 constructable.model = model;
                 constructable.techType = TechType;
 
+                var lw = prefab.AddComponent<LargeWorldEntity>();
+                lw.cellLevel = LargeWorldEntity.CellLevel.Global;
+
                 PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
                 prefabID.ClassId = ClassID;
                 prefab.AddComponent<TechTag>().type = TechType;

@@ -1,21 +1,17 @@
-﻿using System;
-using FCS_AlterraHomeSolutions.Mono.PaintTool;
+﻿using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Interfaces;
-using FCS_AlterraHub.Managers.Quests;
+using FCS_AlterraHub.Managers.Mission;
 using FCS_AlterraHub.Mono.OreConsumer;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Structs;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Converters;
-using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
-using rail;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace FCS_AlterraHub.Mono.AlterraHub
 {
@@ -33,7 +29,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
         private MotorHandler _motorHandler;
         private GameObject _playerBody;
         private bool _isInUse;
-        private QuestManager _questManager => QPatch.QuestManagerGM;
+        private MissionManager _missionManager => QPatch.MissionManagerGM;
 
 
         internal HubTrigger AlterraHubTrigger { get; set; }

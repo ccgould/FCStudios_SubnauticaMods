@@ -13,7 +13,7 @@ namespace FCS_AlterraHub.Patches
             if (__instance.constructed)
             {
                 QuickLogger.Debug($"Constructed: {Language.main.Get(__instance.techType)}", true);
-                QPatch.QuestManagerGM.NotifyTechTypeConstructed(__instance.techType);
+                //QPatch.MissionManagerGM.NotifyTechTypeConstructed(__instance.techType);
             }
         }
     }

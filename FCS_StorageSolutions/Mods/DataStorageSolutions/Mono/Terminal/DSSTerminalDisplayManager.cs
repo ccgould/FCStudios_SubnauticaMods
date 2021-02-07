@@ -406,6 +406,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         public void ChangeStorageFilter(StorageType storage)
         {
             _storageFilter = storage;
+            _itemGrid.DrawPage();
         }
 
         public void ShowVehicleContainers(Vehicle vehicle)

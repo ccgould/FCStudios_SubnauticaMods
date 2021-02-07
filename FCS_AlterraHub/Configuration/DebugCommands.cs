@@ -82,7 +82,7 @@ namespace FCS_AlterraHub.Configuration
         [ConsoleCommand("CompleteMission")]
         public static void CompleteMission()
         {
-            QPatch.QuestManagerGM.CompleteCurrentMission();
+            QPatch.MissionManagerGM.CompleteCurrentMission();
         }
 
     }

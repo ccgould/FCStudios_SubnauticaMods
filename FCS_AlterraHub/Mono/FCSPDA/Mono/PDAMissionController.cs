@@ -1,4 +1,4 @@
-﻿using FCS_AlterraHub.Managers.Quests;
+﻿using FCS_AlterraHub.Managers.Mission;
 using FCSCommon.Helpers;
 using UnityEngine;
 using UnityEngine.UI;
@@ -15,7 +15,7 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
         private GameObject _missionObjectivesList;
         private GameObject _missionsList;
         private bool _isInitialized;
-        private Quest _quest;
+        private Mission _mission;
 
         internal void Initialize()
         {
@@ -36,40 +36,40 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
 
         private void UpdateCounter()
         {
-            _missionCounter.text = QuestManager.Instance.GetMissionCount().ToString();
+            _missionCounter.text = MissionManager.Instance.GetMissionCount().ToString();
         }
 
         private void UpdateDescription()
         {
-            _description.text = _quest.Description;
+            _description.text = _mission.Description;
         }
 
         private void UpdateRewards()
         {
-            _creditEarnings.text = $"{_quest.CreditReward} (REWARD)";
-            _itemEarnings.text = $"{Language.main.Get(_quest.TechTypeReward)} x1 (REWARD)";
+            //_creditEarnings.text = $"{_mission.CreditReward} (REWARD)";
+            //_itemEarnings.text = $"{Language.main.Get(_mission.TechTypeReward)} x1 (REWARD)";
         }
 
         private void RefreshObjectives()
         {
-            for (int i = _missionObjectivesList.transform.childCount - 1; i > 0; i--)
-            {
-                Destroy(_missionObjectivesList.transform.GetChild(i).gameObject);
-            }
+            //for (int i = _missionObjectivesList.transform.childCount - 1; i > 0; i--)
+            //{
+            //    Destroy(_missionObjectivesList.transform.GetChild(i).gameObject);
+            //}
             
-            foreach (QuestEvent questEvent in _quest.QuestEvents)
-            {
-                var prefab = Instantiate(Buildables.AlterraHub.MissionObjectiveItemPrefab);
-                var objectiveController = prefab.AddComponent<ObjectiveController>();
-                objectiveController.Initialize(questEvent);
-                prefab.transform.SetParent(_missionObjectivesList.transform,false);
-            }
+            //foreach (QuestEvent questEvent in _mission.QuestEvents)
+            //{
+            //    var prefab = Instantiate(Buildables.AlterraHub.MissionObjectiveItemPrefab);
+            //    var objectiveController = prefab.AddComponent<ObjectiveController>();
+            //    objectiveController.Initialize(questEvent);
+            //    prefab.transform.SetParent(_missionObjectivesList.transform,false);
+            //}
         }
 
-        internal void UpdateQuest(Quest quest)
+        internal void UpdateMission(Mission quest)
         {
             if(quest == null) return;
-            _quest = quest;
+            _mission = quest;
             AddMissionToList();
             Refresh();
         }
@@ -82,13 +82,13 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             }
             var prefab = Instantiate(Buildables.AlterraHub.MissionItemPrefab);
             var objectiveController = prefab.AddComponent<MissionItemController>();
-            objectiveController.Initialize(_quest,this);
+            objectiveController.Initialize(_mission,this);
             prefab.transform.SetParent(_missionsList.transform, false);
         }
 
-        internal void Refresh(Quest questEvent)
+        internal void Refresh(Mission mission)
         {
-            _quest = questEvent;
+            _mission = mission;
             Refresh();
         }
 
@@ -103,19 +103,19 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
     internal class MissionItemController : MonoBehaviour
     {
         private bool _isInitialized;
-        private Quest _quest;
+        private Mission _mission;
         private PDAMissionController _controller;
 
-        internal void Initialize(Quest quest, PDAMissionController controller)
+        internal void Initialize(Mission quest, PDAMissionController controller)
         {
             if (_isInitialized) return;
 
-            _quest = quest;
+            _mission = quest;
             _controller = controller;
             var button = GetComponentInChildren<Button>();
             button.onClick.AddListener(() =>
             {
-                _controller.Refresh(_quest);
+                _controller.Refresh(_mission);
             });
 
             var text = GetComponentInChildren<Text>();
@@ -128,16 +128,16 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
     {
         private Toggle _toggle;
         private bool _isInitialized;
-        private QuestEvent _qEvent;
+        private MissionTask _missionTask;
 
-        internal void Initialize(QuestEvent qEvent)
+        internal void Initialize(MissionTask missionTask)
         {
             if (_isInitialized) return;
             
-            _qEvent = qEvent;
+            _missionTask = missionTask;
             
             var text = GetComponentInChildren<Text>();
-            text.text = qEvent.GetDescription;
+            text.text = missionTask.Description;
             _toggle = GetComponentInChildren<Toggle>();
             InvokeRepeating(nameof(UpdateStatus),1,1);
             _isInitialized = true;
@@ -145,9 +145,9 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
 
         private void UpdateStatus()
         {
-            if(_qEvent != null)
+            if(_missionTask != null)
             {
-                _toggle.isOn = _qEvent.RequirementsMet;
+                _toggle.isOn = _missionTask.IsCompleted;
             }
         }
     }

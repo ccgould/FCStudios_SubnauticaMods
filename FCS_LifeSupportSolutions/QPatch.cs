@@ -44,19 +44,19 @@ namespace FCS_LifeSupportSolutions
             energyPillVendingMachine.Patch();
 
             var redEnergyPill = new PillPatch("RedEnergyPill", "Red Adrenaline Pill",
-                "The red adrenaline pill refills you adrenaline bar to give you 2 minutes of speed when thrusty or hungry",
+                "The red adrenaline pill refills you adrenaline bar to give you 2 minutes of speed when thirsty or hungry",
                 ModelPrefab.RedEnergyPillPrefab);
             redEnergyPill.Patch();
             Mod.RedEnergyPillTechType = redEnergyPill.TechType;
 
             var greenEnergyPill = new PillPatch("GreenEnergyPill", "Green Adrenaline Pill",
-                "The red adrenaline pill adds to your adrenaline bar to give you an additional minute of speed when thrusty or hungry",
+                "The green adrenaline pill adds to your adrenaline bar to give you an additional minute of speed when thirsty or hungry",
                 ModelPrefab.RedEnergyPillPrefab);
             greenEnergyPill.Patch();
             Mod.GreenEnergyPillTechType = greenEnergyPill.TechType;
 
             var blueEnergyPill = new PillPatch("BlueEnergyPill", "Blue Adrenaline Pill",
-                "The red adrenaline pill adds to your adrenaline bar to give you an additional 30 seconds of speed when thrusty or hungry",
+                "The blue adrenaline pill adds to your adrenaline bar to give you an additional 30 seconds of speed when thirsty or hungry",
                 ModelPrefab.RedEnergyPillPrefab);
             blueEnergyPill.Patch();
             Mod.BlueEnergyPillTechType = blueEnergyPill.TechType;

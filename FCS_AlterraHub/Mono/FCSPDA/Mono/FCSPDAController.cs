@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Interfaces;
-using FCS_AlterraHub.Managers.Quests;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono.Controllers;
 using FCS_AlterraHub.Patches;
@@ -14,7 +12,6 @@ using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using FMOD;
 using FMODUnity;
-using rail;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -112,12 +109,6 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
 
         private void Start()
         {
-            QuestManager.Instance.OnMissionAdded += quest =>
-            {
-                MissionController.UpdateQuest(quest);
-            };
-
-
             _home = GameObjectHelpers.FindGameObject(gameObject, "Home");
             _missionPage = GameObjectHelpers.FindGameObject(gameObject, "Missions");
             
@@ -282,11 +273,6 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
                 return;
             }
             MissionController.Initialize();
-            if (QuestManager.Instance == null)
-            {
-                QuickLogger.Error<FCSPDAController>("Quest Manager Instance is null",true);
-                return;
-            }
 
             if (MessagesController == null)
             {
@@ -616,7 +602,7 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
                 CurrentTrackSound.stop();
             }
 
-             _pdaController.AudioTrack = AudioUtils.PlaySound(QuestManager.Instance.FindAudioClip(trackName), SoundChannel.Voice);
+             //_pdaController.AudioTrack = AudioUtils.PlaySound(QuestManager.Instance.FindAudioClip(trackName), SoundChannel.Voice);
         }
 
         public Channel CurrentTrackSound { get; set; }
@@ -634,8 +620,6 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             {
                 messagesController.PlayAudioTrack(message.AudioClipName);
                 message.HasBeenPlayed = true;
-                QuestManager.Instance.CreateStarterMission();
-
             }));
             _isInitialized = true;
         }
