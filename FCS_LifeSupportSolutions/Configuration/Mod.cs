@@ -93,7 +93,7 @@ namespace FCS_LifeSupportSolutions.Configuration
             craftAmount = 1,
             Ingredients =
             {
-                new Ingredient(TechType.HighCapacityTank, 1),
+                new Ingredient(TechType.DoubleTank, 1),
                 new Ingredient(TechType.Pipe, 1),
                 new Ingredient(TechType.CopperWire, 1),
                 new Ingredient(TechType.Silicone, 1),
