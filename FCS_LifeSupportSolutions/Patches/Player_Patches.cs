@@ -111,7 +111,6 @@ namespace FCS_LifeSupportSolutions.Patches
 
         private static bool TryAddOxygen(ref bool outResult, BaseManager manager)
         {
-
             var amount = _oxygenPerSecond * DayNightCycle.main.deltaTime;
             var baseUtilityUnits = manager.GetDevices(Mod.BaseUtilityUnitTabID);
             foreach (var baseUnit in baseUtilityUnits)
@@ -131,9 +130,6 @@ namespace FCS_LifeSupportSolutions.Patches
             }
 
             var requiredTankCount = manager.GetRequiredTankCount(QPatch.BaseUtilityUnitConfiguration.SmallBaseOxygenHardcore);
-
-            List<IPipeConnection> floaters = new List<IPipeConnection>();
-
 
             float ActiveTankCount = manager.ActiveBaseOxygenTankCount;
 
