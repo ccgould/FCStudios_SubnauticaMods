@@ -10,8 +10,8 @@ namespace FCS_LifeSupportSolutions.Patches
         [HarmonyPostfix]
         public static void Postfix(OxygenPipe __instance)
         {
-
-            if (!string.IsNullOrEmpty(__instance.parentPipeUID) && __instance.isGhost && __instance.GetRoot() is PipeSurfaceFloater)
+            var root = __instance.GetRoot();
+            if (!string.IsNullOrEmpty(__instance.parentPipeUID) && __instance.isGhost && root != null && root is PipeSurfaceFloater && !OxygenTankAttachPoint.ConnectedFloaters.Contains(root))
             {
                 OxygenTankAttachPoint oxygenTank = null;
                 int num2 = UWE.Utils.OverlapSphereIntoSharedBuffer(__instance.transform.position, 1f, -1, QueryTriggerInteraction.UseGlobal);

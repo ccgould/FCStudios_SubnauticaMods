@@ -41,6 +41,7 @@ namespace FCS_LifeSupportSolutions.Patches
         internal static float DefaultO2Level;
 
         private static readonly float _oxygenPerSecond = 10f;
+
         
         public static bool Prefix(ref Player __instance, ref bool __result)
         {
@@ -126,27 +127,15 @@ namespace FCS_LifeSupportSolutions.Patches
                 {
                     Player.main.oxygenMgr.AddOxygen(amount);
                     outResult = true;
-                    return outResult;
                 }
             }
-
-            var baseOxygenTanks = manager.GetDevices(Mod.BaseOxygenTankTabID);
 
             var requiredTankCount = manager.GetRequiredTankCount(QPatch.BaseUtilityUnitConfiguration.SmallBaseOxygenHardcore);
 
             List<IPipeConnection> floaters = new List<IPipeConnection>();
 
-            float ActiveTankCount = 0;
-            foreach (var baseUnit in baseOxygenTanks)
-            {
-                var utility = baseUnit as BaseOxygenTankController;
-                var rootFloater = utility.GetRootOxygenProvider();
-                if (utility.IsOperational && rootFloater != null && rootFloater is PipeSurfaceFloater && rootFloater.GetProvidesOxygen() && !floaters.Contains(rootFloater))
-                {
-                    floaters.Add(rootFloater);
-                    ActiveTankCount++;
-                }
-            }
+
+            float ActiveTankCount = manager.ActiveBaseOxygenTankCount;
 
             if (ActiveTankCount >= requiredTankCount)
             {

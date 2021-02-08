@@ -41,6 +41,7 @@ namespace FCS_AlterraHub.Mono
         private float _timeLeft = 1f;
         private PowerSystem.Status _prevPowerState;
         private Dictionary<string, TechLight> _baseTechLights;
+        public float ActiveBaseOxygenTankCount = 0;
         public readonly Dictionary<TechType, TrackedResource> TrackedResources = new Dictionary<TechType, TrackedResource>();
         public static List<string> DONT_TRACK_GAMEOBJECTS { get; private set; } = new List<string>
         {

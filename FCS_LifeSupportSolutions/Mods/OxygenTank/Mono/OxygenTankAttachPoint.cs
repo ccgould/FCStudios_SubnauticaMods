@@ -1,24 +1,30 @@
-﻿using System.Collections.Generic;
+﻿using FCS_AlterraHub.Mono;
+using FCSCommon.Utilities;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace FCS_LifeSupportSolutions.Mods.OxygenTank.Mono
 {
     internal class OxygenTankAttachPoint : MonoBehaviour, IPipeConnection
     {
+        internal BaseOxygenTankController Controller;
         private readonly List<string>_children = new List<string>();
         private GameObject _attachPoint;
         public string parentPipeUID;
         public string rootPipeUID;
         public Vector3 parentPosition;
         public bool allowConnection = true;
+        public static List<IPipeConnection> ConnectedFloaters = new List<IPipeConnection>();
 
         private void Start()
         {
             _attachPoint = gameObject.FindChild("Cube");
+            Controller = gameObject.GetComponent<BaseOxygenTankController>();
         }
 
         public void SetParent(IPipeConnection parent)
         {
+            QuickLogger.Debug($"Manager: {Controller.Manager != null}", true);
             IPipeConnection parent2 = this.GetParent();
             this.parentPipeUID = null;
             this.rootPipeUID = null;
@@ -49,6 +55,20 @@ namespace FCS_LifeSupportSolutions.Mods.OxygenTank.Mono
                 this.SetRoot(oxygenPipe.GetRoot());
                 this.parentPosition = oxygenPipe.GetAttachPoint();
                 oxygenPipe.AddChild(this);
+
+                if (parent2 is null && parent != null)
+                {
+                    Controller.Manager.ActiveBaseOxygenTankCount++;
+                    ConnectedFloaters.Add(parent.GetRoot());
+                }
+
+                return;
+            }
+
+            if (parent is null && parent2 != null)
+            {
+                Controller.Manager.ActiveBaseOxygenTankCount--;
+                ConnectedFloaters.Remove(parent2.GetRoot());
             }
         }
 
@@ -107,33 +127,6 @@ namespace FCS_LifeSupportSolutions.Mods.OxygenTank.Mono
         public void Update()
         {
             IPipeConnection parent = null;
-            if (allowConnection && this.parentPipeUID is null)
-            {
-                float num = 1000f;
-                int num2 = UWE.Utils.OverlapSphereIntoSharedBuffer(base.transform.position, 1f, -1, QueryTriggerInteraction.UseGlobal);
-                for (int i = 0; i < num2; i++)
-                {
-                    GameObject entityRoot = UWE.Utils.GetEntityRoot(UWE.Utils.sharedColliderBuffer[i].gameObject);
-                    if (!(entityRoot == null))
-                    {
-                        IPipeConnection component = entityRoot.GetComponent<IPipeConnection>();
-                        IPipeConnection root = component.GetRoot();
-                        if (component != null && root != null  && root is PipeSurfaceFloater && this.IsInSight(component))
-                        {
-                            float magnitude = (entityRoot.transform.position - base.transform.position).magnitude;
-                            if (magnitude < num)
-                            {
-                                parent = component;
-                                num = magnitude;
-                            }
-                        }
-                    }
-                }
-                if(parent != null)
-                    this.SetParent(parent);
-
-                return;
-            }
 
             if (this.parentPipeUID != null && rootPipeUID is null)
             {
@@ -158,8 +151,41 @@ namespace FCS_LifeSupportSolutions.Mods.OxygenTank.Mono
                     this.parentPipeUID = gameObject.GetComponent<UniqueIdentifier>().Id;
                     this.rootPipeUID = ((oxygenPipe.GetRoot() != null) ? oxygenPipe.GetRoot().GetGameObject().GetComponent<UniqueIdentifier>().Id : null);
                     this.parentPosition = oxygenPipe.GetAttachPoint();
+                    Controller.Manager.ActiveBaseOxygenTankCount++;
+                    ConnectedFloaters.Add(oxygenPipe.GetRoot());
+                    return;
                 }
             }
+
+            if (allowConnection && this.parentPipeUID is null)
+            {
+                float num = 1000f;
+                int num2 = UWE.Utils.OverlapSphereIntoSharedBuffer(base.transform.position, 1f, -1, QueryTriggerInteraction.UseGlobal);
+                for (int i = 0; i < num2; i++)
+                {
+                    GameObject entityRoot = UWE.Utils.GetEntityRoot(UWE.Utils.sharedColliderBuffer[i].gameObject);
+                    if (entityRoot != null)
+                    {
+                        IPipeConnection component = entityRoot.GetComponent<IPipeConnection>();
+                        IPipeConnection root = component?.GetRoot();
+                        if (component != null && root != null  && root is PipeSurfaceFloater && !ConnectedFloaters.Contains(root) && this.IsInSight(component))
+                        {
+                            float magnitude = (entityRoot.transform.position - base.transform.position).magnitude;
+                            if (magnitude < num)
+                            {
+                                parent = component;
+                                num = magnitude;
+                            }
+                        }
+                    }
+                }
+
+                if(parent != null)
+                    this.SetParent(parent);
+
+                return;
+            }
+
         }
 
         private bool IsInSight(IPipeConnection parent)

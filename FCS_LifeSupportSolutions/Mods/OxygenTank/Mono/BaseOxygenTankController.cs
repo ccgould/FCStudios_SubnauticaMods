@@ -182,7 +182,7 @@ namespace FCS_LifeSupportSolutions.Mods.OxygenTank.Mono
             else
                 _sb.Append($"Pipe Connection Disabled.");
             _sb.Append(Environment.NewLine);
-            _sb.Append($"Active Tanks: {Manager.GetDevicesCount(Mod.BaseOxygenTankTabID)}, Required Tank Count: {requiredTankCount}");
+            _sb.Append($"Active Tanks: {Manager.ActiveBaseOxygenTankCount}, Required Tank Count: {requiredTankCount}");
             main.SetInteractTextRaw($"{Mod.BaseOxygenTankFriendly} - {UnitID}", _sb.ToString());
         }
 
