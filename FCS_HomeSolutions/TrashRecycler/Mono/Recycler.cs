@@ -109,37 +109,33 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
                 return;
             }
             
-            QuickLogger.Debug($"Recycling Item",true);
-
             var wasteItem = _wasteList.Dequeue();
-            OnRecyclingItem?.Invoke(wasteItem.InventoryItem.item.GetTechType());
-            QuickLogger.Debug($"Recycling Item {wasteItem.InventoryItem.item.GetTechType()}", true);
-
             InventoryItem inventoryItem = wasteItem.InventoryItem;
             GameObject gameObject = inventoryItem.item.gameObject;
             TechType techType = inventoryItem.item.GetTechType();
 
-            List<IIngredient> list = TechDataHelpers.GetIngredients(wasteItem.InventoryItem.item.GetTechType());
-            QuickLogger.Debug($"Ingredients != Null: {list != null} | List Count: {list.Count > 0}", true);
+            OnRecyclingItem?.Invoke(techType);
+            QuickLogger.Debug($"Recycling Item ({Language.main.Get(techType)})", true);
+
+
+            List<IIngredient> list = TechDataHelpers.GetIngredients(techType);
+            QuickLogger.Debug($"Valid Ingredients Count: {list?.Count ?? 0}", true);
             if (list != null && list.Count > 0 )
             {
-                QuickLogger.Debug($"Attempting Recycling Item.", true);
                 EnergyMixin component = gameObject.GetComponent<EnergyMixin>();
                 if (component)
                 {
                     GameObject battery = component.GetBattery();
                     if (battery)
                     {
+                        QuickLogger.Debug($"Removing Battery from {Language.main.Get(techType)}", true);
                         Pickupable pickupable = battery.GetComponent<Pickupable>();
-                        if(techType != TechType.Welder || pickupable.GetTechType() != TechType.Battery)
-                        {
-                            InventoryItem inventoryItem2 = new InventoryItem(pickupable);
-                            _storageContainer.ItemsContainer.UnsafeAdd(inventoryItem2);
-                        }
+                        InventoryItem inventoryItem2 = new InventoryItem(pickupable);
+                        _storageContainer.ItemsContainer.UnsafeAdd(inventoryItem2);
                     }
                 }
 
-                StartCoroutine(RecycleCoroutine(gameObject, list));
+                StartCoroutine(RecycleCoroutine(techType, gameObject, list));
             }
             else
             {
@@ -147,41 +143,39 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
             }
         }
 
-        private IEnumerator RecycleCoroutine(GameObject gameObject, List<IIngredient> list)
+        private IEnumerator RecycleCoroutine(TechType techType, GameObject gameObject, List<IIngredient> list)
         {
             foreach (IIngredient ingredient in list)
             {
                 for (int i = 0; i < ingredient.amount; i++)
                 {
-                    if (!TechDataHelpers.BatteryTech.Contains(ingredient.techType))
-                    {
-                        CoroutineTask<GameObject> getPrefab = CraftData.GetPrefabForTechTypeAsync(ingredient.techType, false);
-                        yield return getPrefab;
 
-                        GameObject ingredientObject = Instantiate(getPrefab.GetResult());
-                        ingredientObject.SetActive(false);
-                        if (!ingredientObject.GetComponent<LiveMixin>() && !ingredientObject.GetComponent<Plantable>() && !ingredientObject.GetComponent<Eatable>())
+                    CoroutineTask<GameObject> getPrefab = CraftData.GetPrefabForTechTypeAsync(ingredient.techType, false);
+                    yield return getPrefab;
+
+                    GameObject ingredientObject = Instantiate(getPrefab.GetResult());
+                    ingredientObject.SetActive(false);
+                    if (!ingredientObject.GetComponent<LiveMixin>() && !ingredientObject.GetComponent<Plantable>() && !ingredientObject.GetComponent<Eatable>())
+                    {
+                        InventoryItem newInventoryItem = new InventoryItem(ingredientObject.GetComponent<Pickupable>());
+                        QuickLogger.Debug($"Message: {newInventoryItem.item.name}", true);
+                        _storageContainer.ItemsContainer.UnsafeAdd(newInventoryItem);
+                    }
+                    else
+                    {
+                        DestroyImmediate(ingredientObject);
+                        BioMaterials++;
+
+                        if (BioMaterials >= 10 && TechTypeHandler.TryGetModdedTechType("FCSBioFuel", out TechType FCSBioFuel))
                         {
+                            getPrefab = CraftData.GetPrefabForTechTypeAsync(FCSBioFuel, false);
+                            yield return getPrefab;
+
+                            ingredientObject = Instantiate(getPrefab.GetResult());
                             InventoryItem newInventoryItem = new InventoryItem(ingredientObject.GetComponent<Pickupable>());
                             QuickLogger.Debug($"Message: {newInventoryItem.item.name}", true);
                             _storageContainer.ItemsContainer.UnsafeAdd(newInventoryItem);
-                        }
-                        else
-                        {
-                            DestroyImmediate(ingredientObject);
-                            BioMaterials++;
-
-                            if(BioMaterials >= 10 && TechTypeHandler.TryGetModdedTechType("FCSBioFuel", out TechType FCSBioFuel))
-                            {
-                                getPrefab = CraftData.GetPrefabForTechTypeAsync(FCSBioFuel, false);
-                                yield return getPrefab;
-
-                                ingredientObject = Instantiate(getPrefab.GetResult());
-                                InventoryItem newInventoryItem = new InventoryItem(ingredientObject.GetComponent<Pickupable>());
-                                QuickLogger.Debug($"Message: {newInventoryItem.item.name}", true);
-                                _storageContainer.ItemsContainer.UnsafeAdd(newInventoryItem);
-                                BioMaterials = 0;
-                            }
+                            BioMaterials = 0;
                         }
                     }
                 }
@@ -200,8 +194,9 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
 
         public bool IsAllowedToAdd(Pickupable pickupable)
         {
-            List<IIngredient> list = TechDataHelpers.GetIngredients(pickupable.GetTechType());
-            var result = TechDataHelpers.ContainsValidCraftData(pickupable.GetTechType()) && !TechDataHelpers.IsUsedBattery(pickupable) && (list.Count + _storageContainer.GetCount()) <= MaxStorage;
+            TechType techType = pickupable.GetTechType();
+            List<IIngredient> list = TechDataHelpers.GetIngredients(techType);
+            var result = TechDataHelpers.ContainsValidCraftData(techType) && !TechDataHelpers.IsUsedBattery(pickupable) && (list.Count + _storageContainer.GetCount()) <= MaxStorage;
             QuickLogger.Debug($"Can hold item result: {result} || Storage Total: {list.Count + _storageContainer.GetCount()}", true);
             return result;
         }

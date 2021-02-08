@@ -60,7 +60,7 @@ namespace FCS_AlterraHub.Helpers
         public static bool IsUsedBattery(Pickupable pickupable)
         {
             IBattery component = pickupable.GetComponent<IBattery>();
-            return component != null && (double)component.charge < (double)component.capacity * 0.97;
+            return component != null && (double)component.charge < (double)component.capacity * 0.985f;
         }
 
         public static int GetIngredientCount(Pickupable pickup)
@@ -89,7 +89,7 @@ namespace FCS_AlterraHub.Helpers
 
             var it = CraftData.Get(techType);
 
-            QuickLogger.Debug($"Ingredient Count: {it.ingredientCount}", true);
+            QuickLogger.Debug($"Original Ingredient Count: {it.ingredientCount}", true);
 
             if (it != null)
             {
@@ -101,7 +101,7 @@ namespace FCS_AlterraHub.Helpers
 
                 foreach (IIngredient ingredient in readOnlyCollection)
                 {
-                    if (!BatteryTech.Contains(ingredient.techType))
+                    if (BatteryTech.Contains(techType) || !BatteryTech.Contains(ingredient.techType))
                     {
                         _ingredients.Add(ingredient);
                     }
