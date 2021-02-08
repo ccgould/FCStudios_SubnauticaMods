@@ -97,7 +97,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.AudioModule">
-      <HintPath>F:\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
+      <HintPath>..\Dependancies\UnityEngine.AudioModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\Dependancies\UnityEngine.CoreModule.dll</HintPath>
