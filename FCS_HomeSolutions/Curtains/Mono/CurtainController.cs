@@ -177,7 +177,7 @@ namespace FCS_HomeSolutions.Curtains.Mono
 
         public void OnHandHover(GUIHand hand)
         {
-            if(_interactionChecker.IsInRange) return;
+            if(!IsConstructed ||_interactionChecker.IsInRange) return;
             HandReticle main = HandReticle.main;
             main.SetInteractText("Click to open",AuxPatchers.CurtainInteractionFormat(GameInput.GetBindingName(GameInput.Button.AltTool, GameInput.BindingSet.Primary)));
             main.SetIcon(HandReticle.IconType.Hand);
@@ -198,7 +198,7 @@ namespace FCS_HomeSolutions.Curtains.Mono
 
         public void OnHandClick(GUIHand hand)
         {
-            if (_interactionChecker.IsInRange) return;
+            if (!IsConstructed || _interactionChecker.IsInRange) return;
             ToggleCurtainState();
         }
 

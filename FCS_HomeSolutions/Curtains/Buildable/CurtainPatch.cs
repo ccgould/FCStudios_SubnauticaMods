@@ -71,6 +71,7 @@ namespace FCS_HomeSolutions.TrashReceptacle.Buildable
                 constructable.allowedOnCeiling = false;
                 constructable.allowedInSub = true;
                 constructable.allowedOnConstructables = false;
+                constructable.forceUpright = true;
                 constructable.model = model;
                 constructable.techType = TechType;
                 
