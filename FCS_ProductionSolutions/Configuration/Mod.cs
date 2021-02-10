@@ -42,7 +42,7 @@ namespace FCS_ProductionSolutions.Configuration
         internal const string MatterAnalyzerTabID = "MA";
         internal const string MatterAnalyzerFriendlyName = "Matter Analyzer";
         internal const string MatterAnalyzerModName = "MatterAnalyzer";
-        public const string MatterAnalyzerDescription = "Builds detailed scans of material for duplication in the Replicator and Hydroponic Harvester.";
+        public const string MatterAnalyzerDescription = "Builds detailed scans of seeds and non-living material for duplication in the Hydroponic Harvester and Replicator";
         internal static string MatterAnalyzerKitClassID => $"{MatterAnalyzerModName}_Kit";
         internal static string MatterAnalyzerClassName => MatterAnalyzerModName;
         internal static string MatterAnalyzerPrefabName => MatterAnalyzerModName;
@@ -254,7 +254,8 @@ namespace FCS_ProductionSolutions.Configuration
             TechType.JeweledDiskPiece,
             TechType.Floater,
             TechType.TreeMushroomPiece,
-            TechType.CoralChunk
+            TechType.CoralChunk,
+            TechType.CrashPowder,
         };
         #endregion
 
@@ -300,7 +301,7 @@ namespace FCS_ProductionSolutions.Configuration
 
             foreach (DNASampleData sampleData in _hydroponicKnownTech)
             {
-                if (sampleData.TechType == techType)
+                if (sampleData.TechType == techType || sampleData.PickType == techType)
                 {
                     data = sampleData;
                     QuickLogger.Debug($"{techType} is known tech", true);

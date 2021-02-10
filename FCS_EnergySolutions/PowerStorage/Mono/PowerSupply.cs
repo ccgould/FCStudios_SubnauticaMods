@@ -1,4 +1,5 @@
-﻿using SMLHelper.V2.Json.ExtensionMethods;
+﻿using FCSCommon.Utilities;
+using SMLHelper.V2.Json.ExtensionMethods;
 using Steamworks;
 using UnityEngine;
 
@@ -9,7 +10,116 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
     {
         private PowerStorageController _mono;
         private bool _allowedToDisCharge;
+        private bool _performDischargeBuffer;
+        private float _timeLeft = 5f;
+        private float nextChargeAttemptTimer;
+        private float nextDischargeAttemptTimer;
         private PowerCellCharger _powerCharger => _mono?.PowercellCharger;
+
+        private void Update()
+        {
+            if (Time.deltaTime == 0f)
+            {
+                return;
+            }
+
+            var mode = _mono.GetMode();
+
+            if (mode != PowerChargerMode.Auto)
+            {
+                if (mode == PowerChargerMode.ChargeMode)
+                {
+                    _allowedToDisCharge = false;
+                    _powerCharger.SetAllowedToCharge(true);
+                }
+                else
+                {
+                    _allowedToDisCharge = true;
+                    _powerCharger.SetAllowedToCharge(false);
+                }
+                return;
+            }
+            
+            if (CheckPowerGoal())
+            {
+                AttemptDischarge();
+            }
+
+            if (CheckChargeGoal())
+            {
+                AttemptCharge();
+            }
+        }
+
+        private bool CheckPowerGoal()
+        {
+            return _mono.CalculatePowerPercentage() <= 10f || _mono.CalculateBasePower() <= 0.1f;
+        }
+
+
+        private void AttemptDischarge()
+        {
+            if (nextDischargeAttemptTimer > 0f)
+            {
+                nextDischargeAttemptTimer -= DayNightCycle.main.deltaTime;
+                if (nextDischargeAttemptTimer < 0f)
+                {
+                    nextDischargeAttemptTimer = 0f;
+                }
+            }
+
+
+            if (nextDischargeAttemptTimer <= 0f)
+            {
+                if (CheckPowerGoal())
+                {
+                    _allowedToDisCharge = true;
+                    _powerCharger.SetAllowedToCharge(false);
+                }
+
+                nextDischargeAttemptTimer = 5f;
+            }
+            
+            if (nextDischargeAttemptTimer >= 0f)
+            {
+                int num8 = Mathf.CeilToInt(nextDischargeAttemptTimer);
+                //QuickLogger.Debug($"Attempt DisCharge in: {num8}", true);
+            }
+        }        
+        
+        private void AttemptCharge()
+        {
+            if (nextChargeAttemptTimer > 0f)
+            {
+                nextChargeAttemptTimer -= DayNightCycle.main.deltaTime;
+                if (nextChargeAttemptTimer < 0f)
+                {
+                    nextChargeAttemptTimer = 0f;
+                }
+            }
+            
+            if (nextChargeAttemptTimer <= 0f)
+            {
+                if (CheckChargeGoal())
+                {
+                    _allowedToDisCharge = false;
+                    _powerCharger.SetAllowedToCharge(true);
+                }
+                nextChargeAttemptTimer = 5f;
+            }
+
+
+            if (nextChargeAttemptTimer >= 0f)
+            {
+                int num8 = Mathf.CeilToInt(nextChargeAttemptTimer); 
+                //QuickLogger.Debug($"Attempt Charge in: {num8}",true);
+            }
+        }
+
+        private bool CheckChargeGoal()
+        {
+            return _mono.CalculatePowerPercentage() >= 40f;
+        }
 
         internal void Initialize(PowerStorageController mono)
         {
@@ -19,7 +129,7 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
         public float GetPower()
         {
             if (!_allowedToDisCharge) return 0;
-            return _powerCharger?.GetTotal()??0;
+            return _powerCharger?.GetTotal() ?? 0;
         }
 
         public float GetMaxPower()
@@ -28,7 +138,7 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
             return _powerCharger?.GetCapacity() ?? 0;
         }
 
-        internal string  GetPowerString()
+        internal string GetPowerString()
         {
             return _powerCharger?.GetTotal() == null ? "0/0" : $"{Mathf.RoundToInt(_powerCharger.GetTotal())}/{Mathf.RoundToInt(_powerCharger.GetCapacity())}";
         }
@@ -43,7 +153,7 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
 
             float num = currentPower;
             bool result;
-            
+
             if (amount >= 0f)
             {
                 result = (amount <= currentCapacity - currentPower);
@@ -83,6 +193,17 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
         public void SetAllowedToCharge(bool value)
         {
             _powerCharger.SetAllowedToCharge(value);
+
+            CheckAllowedToDischarge(value);
+        }
+
+        private void CheckAllowedToDischarge(bool value)
+        {
+            if (_mono.GetMode() == PowerChargerMode.Auto)
+            {
+                _performDischargeBuffer = true;
+                return;
+            }
 
             _allowedToDisCharge = !value;
         }

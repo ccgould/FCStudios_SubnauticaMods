@@ -54,7 +54,7 @@ namespace FCS_HomeSolutions.Buildables
             if (_colorManager == null)
             {
                 _colorManager = gameObject.AddComponent<ColorManager>();
-                _colorManager.Initialize(gameObject,ModelPrefab.BodyMaterial,ModelPrefab.SecondaryMaterial);
+                _colorManager.Initialize(gameObject,ModelPrefab.BodyMaterial,ModelPrefab.SecondaryMaterial,ModelPrefab.EmissionControllerMaterial);
             }
             
             MaterialHelpers.ChangeEmissionStrength(ModelPrefab.EmissionControllerMaterial,gameObject,3f);

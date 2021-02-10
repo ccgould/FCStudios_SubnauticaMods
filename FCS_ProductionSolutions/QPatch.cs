@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Mods.Replicator.Buildables;
 using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
@@ -28,24 +27,36 @@ namespace FCS_ProductionSolutions
             ModelPrefab.Initialize();
 
             AuxPatchers.AdditionalPatching();
+
+            if (Configuration.IsHydroponicHarvesterEnabled)
+            {
+                var hydroHarvester = new HydroponicHarvesterPatch();
+                hydroHarvester.Patch();
+            }
+
+            if (Configuration.IsReplicatorEnabled)
+            {
+                var replicator = new ReplicatorBuildable();
+                replicator.Patch();
+            }
             
-            var hydroHarvester = new HydroponicHarvesterPatch();
-            hydroHarvester.Patch();
+            if (Configuration.IsReplicatorEnabled || Configuration.IsHydroponicHarvesterEnabled)
+            {
+                var matterAnalyzer = new MatterAnalyzerPatch();
+                matterAnalyzer.Patch();
+            }
 
-            var matterAnalyzer = new MatterAnalyzerPatch();
-            matterAnalyzer.Patch();
+            if (Configuration.IsDeepDrillerEnabled)
+            {
+                var sand = new SandSpawnable();
+                sand.Patch();
 
-            var sand = new SandSpawnable();
-            sand.Patch();
+                var glass = new FcsGlassCraftable();
+                glass.Patch();
 
-            var glass = new FcsGlassCraftable();
-            glass.Patch();
-
-            var deepDriller = new FCSDeepDrillerBuildable();
-            deepDriller.Patch();
-
-            var replicator = new ReplicatorBuildable();
-            replicator.Patch();
+                var deepDriller = new FCSDeepDrillerBuildable();
+                deepDriller.Patch();
+            }
 
             //Register debug commands
             ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));

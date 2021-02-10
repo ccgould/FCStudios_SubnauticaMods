@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FCS_AlterraHub.Model;
 using FCSCommon.Extensions;
 using SMLHelper.V2.Json;
 using SMLHelper.V2.Options.Attributes;
@@ -17,17 +18,33 @@ namespace FCS_ProductionSolutions.Configuration
     {
         public Config() : base("productionSolutions-config", "Configurations") { }
 
-        [Toggle("[Production Solutions] Enable Debugs"), OnChange(nameof(EnableDebugsToggleEvent))]
+        [Toggle("[Production Solutions] Enable Debugs",Order = 0), OnChange(nameof(EnableDebugsToggleEvent)),Tooltip("Enables debug logs set in code by FCStudios (Maybe asked to be enabled for bug reports)")]
         public bool EnableDebugLogs = false;
 
         #region Matter Analyzer
 
+        [Toggle("[Matter Analyzer] Is Mod Enabled"),
+         Tooltip("Enables/Disables Matter Analyzer from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+        public bool IsMatterAnalyzerEnabled = true;
+
         [Toggle("[Matter Analyzer] Toggle Fx")]
-        public bool MatterAnalyzerPlaySFX { get; set; } = true;
+        public bool MatterAnalyzerPlaySFX = true;
+
+        #endregion
+
+        #region Replicator
+
+        [Toggle("[Replicator] Is Mod Enabled"),
+         Tooltip("Enables/Disables Replicator from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+        public bool IsReplicatorEnabled = true;
 
         #endregion
 
         #region Harvester
+
+        [Toggle("[Hydroponic Harvester]] Is Mod Enabled"),
+         Tooltip("Enables/Disables Hydroponic Harvester from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+        public bool IsHydroponicHarvesterEnabled = true;
 
         [Toggle("[Hydroponic Harvester] Enable/Disable Light Trigger")]
         public bool HHIsLightTriggerEnabled = true;
@@ -39,22 +56,26 @@ namespace FCS_ProductionSolutions.Configuration
 
         #region Deep Driller
 
-        public int DDStorageSize { get; set; } = 300;
-        public float DDPowerDraw { get; set; } = 0.7f;
-        public float DDChargePullAmount { get; set; } = 1.5f;
-        public float DDSolarCapacity { get; set; } = 125;
+        [Toggle("[Deep Driller MK3] Is Mod Enabled"),
+         Tooltip("Enables/Disables Deep Driller MK3 from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+        public bool IsDeepDrillerEnabled = true;
+
+        public int DDStorageSize  = 300;
+        public float DDPowerDraw  = 0.7f;
+        public float DDChargePullAmount  = 1.5f;
+        public float DDSolarCapacity  = 125;
 
         [Toggle("[Deep Driller MK3] Is HardCore Mode")]
-        public bool DDHardCoreMode { get; set; } = true;
-        public float DDOilTimePeriodInDays { get; set; } = 30.0f;
-        public float DDOilRestoresInDays { get; set; } = 5.0f;
-        public Dictionary<string, List<string>> DDAdditionalBiomeOres { get; set; } = new Dictionary<string, List<string>>();
-        public float DDMaxOreCountUpgradePowerUsage { get; set; } = 0.2f;
-        public float DDOrePerDayUpgradePowerUsage { get; set; } = 1.0f;
-        public float DDInternalBatteryCapacity { get; set; } = 1000f;
-        public float DDDrillAlterraStorageRange { get; set; } = 30f;
+        public bool DDHardCoreMode  = true;
+        public float DDOilTimePeriodInDays  = 30.0f;
+        public float DDOilRestoresInDays  = 5.0f;
+        public Dictionary<string, List<string>> DDAdditionalBiomeOres  = new Dictionary<string, List<string>>();
+        public float DDMaxOreCountUpgradePowerUsage  = 0.2f;
+        public float DDOrePerDayUpgradePowerUsage  = 1.0f;
+        public float DDInternalBatteryCapacity  = 1000f;
+        public float DDDrillAlterraStorageRange  = 30f;
         [JsonIgnore] internal float DDOreReductionValue => 0.08f;
-        [JsonIgnore] internal Dictionary<string, List<TechType>> DDBiomeOresTechType { get; set; } = new Dictionary<string, List<TechType>>();
+        [JsonIgnore] internal Dictionary<string, List<TechType>> DDBiomeOresTechType  = new Dictionary<string, List<TechType>>();
 
         internal void Convert()
         {

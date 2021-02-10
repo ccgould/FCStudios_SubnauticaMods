@@ -393,9 +393,11 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
 
         public void RemoveCharge(float consumed)
         {
-            QuickLogger.Debug($"Removing: {consumed}",true);
+            //QuickLogger.Debug($"Removing: {consumed}",true);
             foreach (KeyValuePair<string, IBattery> iBattery in Batteries)
             {
+                if(iBattery.Value == null) continue;
+
                 if (iBattery.Value.charge >= Mathf.Abs(consumed))
                 {
                     var battery = iBattery.Value;
@@ -461,6 +463,11 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
         public void OpenStorage()
         {
             _dumpContainer.OpenStorage();
+        }
+
+        public bool IsCharging()
+        {
+            return _allowedToCharge;
         }
     }
 

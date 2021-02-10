@@ -50,8 +50,8 @@ namespace FCS_HomeSolutions.QuantumTeleporter.Mono
                 _baseName.text = _mono.GetName();
                 _message.text = AuxPatchers.TeleporterConfirmMessage();
                 _requirements.text = AuxPatchers.Requirements(
-                    QPatch.QuantumTeleporterConfiguration.InternalTeleportPowerUsage,
-                    QPatch.QuantumTeleporterConfiguration.GlobalTeleportPowerUsage);
+                    QPatch.Configuration.QuantumTeleporterInternalTeleportPowerUsage,
+                    QPatch.Configuration.QuantumTeleporterGlobalTeleportPowerUsage);
                 _teleportGrid.DrawPage();
                 _homeNetworkToggleBtn.Select();
             }

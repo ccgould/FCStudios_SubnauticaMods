@@ -179,8 +179,12 @@ namespace FCS_AlterraHub.Model
 
         public void SetDecay(bool value)
         {
-                _decay = value;
-            
+            _decay = value;
+            RefreshDecayState();
+        }
+
+        private void RefreshDecayState()
+        {
             if (_decay && _modMode == FCSGameMode.HardCore)
             {
                 foreach (EatableEntities fridgeItem in FridgeItems)
@@ -200,6 +204,7 @@ namespace FCS_AlterraHub.Model
         public void SetModMode(FCSGameMode modMode)
         {
             _modMode = modMode;
+            RefreshDecayState();
         }
 
         public int GetContainerFreeSpace => _itemLimit - NumberOfItems;

@@ -34,7 +34,7 @@ namespace FCS_HomeSolutions.MiniFountainFilter.Managers
 
                 case "waterContainerBTN":
 
-                    if (!QPatch.MiniFountainFilterConfiguration.AutoGenerateMode)
+                    if (!QPatch.Configuration.MiniFountainFilterAutoGenerateMode)
                     {
                         _mono.StorageManager.GivePlayerBottle();
                     }
@@ -84,7 +84,7 @@ namespace FCS_HomeSolutions.MiniFountainFilter.Managers
                 
                 InterfaceHelpers.CreateButton(button1, "takeWaterBTN", InterfaceButtonMode.Background, OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, "Take Water");
                 
-                InterfaceHelpers.CreateButton(button2, "waterContainerBTN", InterfaceButtonMode.Background, OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, !QPatch.MiniFountainFilterConfiguration.AutoGenerateMode ? "Take Water Bottle" : "Open Water Container");
+                InterfaceHelpers.CreateButton(button2, "waterContainerBTN", InterfaceButtonMode.Background, OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, !QPatch.Configuration.MiniFountainFilterAutoGenerateMode ? "Take Water Bottle" : "Open Water Container");
                 
                 InterfaceHelpers.FindGameObject(home, "Button_1_Progress", out var button1Progress);
 
@@ -97,7 +97,7 @@ namespace FCS_HomeSolutions.MiniFountainFilter.Managers
                 InterfaceHelpers.FindGameObject(home, "Button_2_Amount_Number", out var button2ProgressNumber);
 
                 _button2ProgressNumber = button2ProgressNumber.GetComponent<Text>();
-                _button2ProgressNumber.text = QPatch.MiniFountainFilterConfiguration.AutoGenerateMode ? $"0 {MiniFountainFilterBuildable.Bottles()}" : string.Empty;
+                _button2ProgressNumber.text = QPatch.Configuration.MiniFountainFilterAutoGenerateMode ? $"0 {MiniFountainFilterBuildable.Bottles()}" : string.Empty;
 
                 //var versionResult = InterfaceHelpers.FindGameObject(canvasGameObject, "Version", out var version);
 
@@ -170,7 +170,7 @@ namespace FCS_HomeSolutions.MiniFountainFilter.Managers
 
         private void UpdateBottleStatus()
         {
-            if (!QPatch.MiniFountainFilterConfiguration.AutoGenerateMode) return;
+            if (!QPatch.Configuration.MiniFountainFilterAutoGenerateMode) return;
             _button2ProgressNumber.text = $"{_mono.StorageManager.NumberOfBottles} {MiniFountainFilterBuildable.Bottles()}";
         }
         

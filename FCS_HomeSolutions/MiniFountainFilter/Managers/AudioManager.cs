@@ -60,7 +60,7 @@ namespace FCS_HomeSolutions.MiniFountainFilter.Managers
         /// </summary>
         internal void PlayMachineAudio()
         {
-            if (!_soundPlaying && QPatch.MiniFountainFilterConfiguration.PlaySFX)
+            if (!_soundPlaying && QPatch.Configuration.MiniFountainFilterPlaySFX)
             {
                 _loopingEmitter.Play();
                 _soundPlaying = true;
@@ -73,7 +73,7 @@ namespace FCS_HomeSolutions.MiniFountainFilter.Managers
         /// </summary>
         internal void StopMachineAudio()
         {
-            if (_soundPlaying && QPatch.MiniFountainFilterConfiguration.PlaySFX)
+            if (_soundPlaying && QPatch.Configuration.MiniFountainFilterPlaySFX)
             {
                 _loopingEmitter.Stop();
                 _soundPlaying = false;

@@ -20,14 +20,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Models
         private const int MaxCapacity = 50;
         public bool PauseUpdates { get; set; }
         public bool IsFull => _itemCount >= MaxCapacity;
-        public TechType ReturnTechType
-        {
-            get => _returnTechType;
-            set
-            {
-                _returnTechType = value;
-            }
-        }
+
         private readonly IList<float> _progress = new List<float>(new[] { -1f, -1f, -1f });
         private TechType _returnTechType;
         internal GrowBedManager GrowBedManager;
@@ -112,7 +105,6 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Models
             GrowBedManager.Mono.EffectsManager.ChangeEffectState(GrowBedManager.FindEffectType(this),Id,false);
             IsOccupied = false;
             _seedTech = TechType.None;
-            ReturnTechType = TechType.None;
             GrowingPlant = null;
             PlantModel = null;
             _plantable = null;

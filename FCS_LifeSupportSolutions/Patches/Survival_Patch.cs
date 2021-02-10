@@ -14,7 +14,7 @@ namespace FCS_LifeSupportSolutions.Patches
         [HarmonyPrefix]
         public static bool Prefix(ref Survival __instance, ref float __result)
         {
-            
+            if (!QPatch.Configuration.IsEnergyPillVendingMachineEnabled) return true;
 
             if (PlayerAdrenaline == null)
             {
@@ -40,6 +40,8 @@ namespace FCS_LifeSupportSolutions.Patches
         [HarmonyPrefix]
         public static void Prefix(ref Survival __instance, ref GameObject useObj, ref bool __result)
         {
+            if (!QPatch.Configuration.IsEnergyPillVendingMachineEnabled) return;
+
             var comp = useObj.GetComponent<PillComponent>();
 
             if (comp != null)

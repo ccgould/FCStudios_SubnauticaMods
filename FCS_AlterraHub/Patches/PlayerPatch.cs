@@ -55,7 +55,17 @@ namespace FCS_AlterraHub.Patches
 
             if (Input.GetKeyDown(QPatch.Configuration.FCSPDAKeyCode) && !__instance.GetPDA().isOpen)
             {
-                if (FCSPDA == null) return;
+                if (FCSPDA == null)
+                {
+                    QuickLogger.DebugError("FCSPDA IS NULL: Attempting to force creation", true);
+                    PlayerGetPDA_Patch.ForceFCSPDACreation();
+                    if (FCSPDA == null)
+                    {
+                        QuickLogger.DebugError("Forcing PDA creation failed returning", true);
+                        QuickLogger.ModMessage(AlterraHub.ErrorHasOccured());
+                        return;
+                    }
+                }
 
                 if (!FCSPDA.IsOpen)
                 {
@@ -83,12 +93,11 @@ namespace FCS_AlterraHub.Patches
     [HarmonyPatch("GetPDA")]
     internal static class PlayerGetPDA_Patch
     {
-        private static bool _pdaCreated;
 
         [HarmonyPostfix]
         private static void Postfix(Player __instance)
         {
-            if(_pdaCreated) return;
+            if(Player_Update_Patch.FCSPDA != null) return;
 
             CreateQuestManager();
 
@@ -97,10 +106,13 @@ namespace FCS_AlterraHub.Patches
             var defPDA = __instance.pdaSpawn.spawnedObj;
 
             MoveFcsPdaIntoPosition(defPDA, pda);
-        
-            _pdaCreated = true;
         }
         
+        internal static void ForceFCSPDACreation()
+        {
+            Postfix(Player.main);
+        }
+
         private static void MoveFcsPdaIntoPosition(GameObject defPDA, GameObject pda)
         {
             if (defPDA != null)

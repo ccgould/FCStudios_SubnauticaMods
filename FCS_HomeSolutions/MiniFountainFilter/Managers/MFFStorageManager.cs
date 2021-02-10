@@ -15,8 +15,8 @@ namespace FCS_HomeSolutions.MiniFountainFilter.Managers
         private Func<bool> _isConstructed;
         private ChildObjectIdentifier _containerRoot;
         private ItemsContainer _container;
-        private readonly int _containerWidth = QPatch.MiniFountainFilterConfiguration.StorageWidth;
-        private readonly int _containerHeight = QPatch.MiniFountainFilterConfiguration.StorageHeight;
+        private readonly int _containerWidth = QPatch.Configuration.MiniFountainFilterStorageWidth;
+        private readonly int _containerHeight = QPatch.Configuration.MiniFountainFilterStorageHeight;
         private int MaxContainerSlots => _containerHeight * _containerWidth;
         private float _passedTime;
 
@@ -74,7 +74,7 @@ namespace FCS_HomeSolutions.MiniFountainFilter.Managers
 
         internal void AttemptSpawnBottle()
         {
-            if (!_mono.GetIsOperational() || !QPatch.MiniFountainFilterConfiguration.AutoGenerateMode) return;
+            if (!_mono.GetIsOperational() || !QPatch.Configuration.MiniFountainFilterAutoGenerateMode) return;
 
             if (IsFull() || !_mono.TankManager.HasEnoughWater(50)) return;
             
@@ -106,7 +106,7 @@ namespace FCS_HomeSolutions.MiniFountainFilter.Managers
 
         internal void LoadContainer(int waterBottleCount)
         {
-            if (QPatch.MiniFountainFilterConfiguration.AutoGenerateMode) return;
+            if (QPatch.Configuration.MiniFountainFilterAutoGenerateMode) return;
 
             for (int i = 0; i < waterBottleCount; i++)
             {

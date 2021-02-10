@@ -3,13 +3,20 @@ using FCSCommon.Utilities;
 using SMLHelper.V2.Json;
 using SMLHelper.V2.Options;
 using SMLHelper.V2.Options.Attributes;
+using UnityEngine;
+
 
 namespace FCS_EnergySolutions.Configuration
 {
     [Menu("FCS Energy Solutions Menu")]
     internal class Config : ConfigFile
     {
-        [Toggle("Enable Debugs"), OnChange(nameof(EnableDebugsToggleEvent))]
+
+        public Config() : base("energySolutions-config", "Configurations")
+        {
+        }
+
+        [Toggle("[Energy Solutions] Enable Debugs", Order = 0), OnChange(nameof(EnableDebugsToggleEvent)), Tooltip("Enables debug logs set in code by FCStudios (Maybe asked to be enabled for bug reports)")]
         public bool EnableDebugLogs = false;
 
         private void EnableDebugsToggleEvent(ToggleChangedEventArgs e)
@@ -25,16 +32,21 @@ namespace FCS_EnergySolutions.Configuration
                 QuickLogger.Info("Debug logs disabled");
             }
         }
-    }
-    
-    [Menu("JetStream T242 Menu")]
-    public class JetStreamT242Config : ConfigFile
-    {
-        public JetStreamT242Config() : base("jetstreamt242-config", "Configurations")
-        {
-        }
 
-        public Dictionary<string, float> BiomeSpeeds { get; set; } = new Dictionary<string, float>
+        [Toggle("[JetStreamT242] Is Mod Enabled"),
+         Tooltip("Enables/Disables JetStreamT242 from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+        public bool IsJetStreamT242Enabled = true;        
+        
+        
+        [Toggle("[PowerStorage] Is Mod Enabled"),
+         Tooltip("Enables/Disables PowerStorage from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+        public bool IsPowerStorageEnabled = true;
+
+        [Toggle("[AlterraGen] Is Mod Enabled"),
+         Tooltip("Enables/Disables AlterraGen from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+        public bool IsAlterraGenEnabled = true;
+
+        public Dictionary<string, float> JetStreamT242BiomeSpeeds { get; set; } = new Dictionary<string, float>
         {
             {"kelpforest",283f },
             {"mushroomforest",200f },
@@ -65,7 +77,5 @@ namespace FCS_EnergySolutions.Configuration
             {"floating",300f },
             {"None",0f }
         };
-
-        public float PowerPerSecond { get; set; } = 0.8333333f;
     }
 }

@@ -1,5 +1,7 @@
 ﻿using System;
 using FCS_AlterraHub.Managers.Mission.Enumerators;
+using FCS_AlterraHub.Registration;
+using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
 using UnityEngine;
 
@@ -25,7 +27,9 @@ namespace FCS_AlterraHub.Managers.Mission
 
         public float ProgressCap { get; set; }
         public bool IsCompleted => _status == TaskStatus.Completed;
+
         public double TimeSinceStartInSeconds => StartTime == null ? 0d : (DateTime.Now - StartTime).Value.TotalSeconds;
+
         
         public event StatusChanged OnStatusChanged;
 
@@ -37,7 +41,7 @@ namespace FCS_AlterraHub.Managers.Mission
             this.key = key;
             ProgressCap = progressCap;
         }
-
+        
         public TaskStatus Status
         {
             get => _status;
@@ -54,6 +58,9 @@ namespace FCS_AlterraHub.Managers.Mission
         }
 
         public string Description { get; set; }
+        public string AudioClip { get; set; }
+        public TaskCondition Condition { get; set; }
+        public bool SelfValidate { get; set; }
 
         public void Activate()
         {
@@ -81,10 +88,7 @@ namespace FCS_AlterraHub.Managers.Mission
 
             if (Mathf.Approximately(before, _progress) == false)
             {
-                if (OnProgressChanged != null)
-                {
-                    OnProgressChanged(before, this);
-                }
+                OnProgressChanged?.Invoke(before, this);
             }
 
             if (IsProgressSufficientToComplete())
@@ -162,5 +166,36 @@ namespace FCS_AlterraHub.Managers.Mission
             return Progress >= ProgressCap;
         }
 
+        public void ConditionValid(TaskCondition condition)
+        {
+            if (condition.TechType == Condition.TechType && condition.MissionType == Condition.MissionType)
+            {
+                ChangeProgress(1);
+            }
+        }
+
+        public void CheckCondition()
+        {
+            if (Condition.MissionType == MissionType.Scan)
+            {
+                if(KnownTech.knownTech.Contains(Condition.TechType));
+                {
+                    ChangeProgress(1);
+                }
+            }
+
+            if (Condition.MissionType == MissionType.Construct)
+            {
+                SetProgress(FCSAlterraHubService.PublicAPI.GetTechBuiltCount(Condition.TechType));
+            }
+
+            if (Condition.MissionType == MissionType.AccountCreation)
+            {
+                if (CardSystem.main.HasBeenRegistered())
+                {
+                    ChangeProgress(1);
+                }
+            }
+        }
     }
 }

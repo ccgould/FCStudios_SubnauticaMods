@@ -13,7 +13,7 @@ namespace FCS_HomeSolutions.MiniFountainFilter.Managers
         private MiniFountainFilterController _mono;
         private SubRoot _habitat;
         private PowerRelay _connectedRelay;
-        private float EnergyConsumptionPerSecond { get; } = QPatch.MiniFountainFilterConfiguration.EnergyPerSec; //0.425
+        private float EnergyConsumptionPerSecond { get; } = QPatch.Configuration.MiniFountainFilterEnergyPerSec; //0.425
         private float AvailablePower => this.ConnectedRelay.GetPower();
         private PowerRelay ConnectedRelay
         {

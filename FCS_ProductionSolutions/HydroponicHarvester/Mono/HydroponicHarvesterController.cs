@@ -84,6 +84,8 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
 
         public override float GetPowerUsage()
         {
+            if (GrowBedManager == null || GrowBedManager.IsFull() || !GrowBedManager.HasSeeds()) return 0;
+
             switch (GrowBedManager.GetCurrentSpeedMode())
             {
                 case SpeedModes.Off:

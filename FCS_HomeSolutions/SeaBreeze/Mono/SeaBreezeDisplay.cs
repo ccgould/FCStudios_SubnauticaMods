@@ -151,7 +151,7 @@ namespace FCS_HomeSolutions.SeaBreeze.Mono
                     OnButtonClick, _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, SeaBreezeAuxPatcher.PowerBTNMessage());
                 #endregion
 
-                #region PowerOFf PowerButton
+                #region PowerOFf Power Label
                 var powerOffLbl = InterfaceHelpers.FindGameObject(powerOff, "Powered_Off_LBL");
                 powerOffLbl.GetComponent<Text>().text = SeaBreezeAuxPatcher.NoPower();
                 #endregion

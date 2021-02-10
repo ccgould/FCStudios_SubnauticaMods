@@ -16,6 +16,8 @@ namespace FCS_AlterraHub.Model
         public bool Decomposes { get; set; }
         public float TimeDecayStart { get; set; }
         private bool _decayPaused;
+        private float _currentWaterValue;
+        private float _currentFoodValue;
         public float TimeDecayPause { get; set; }
 
         public void Initialize(Pickupable food, bool destroy = true)
@@ -35,6 +37,8 @@ namespace FCS_AlterraHub.Model
                 KDecayRate = food.kDecayRate;
                 Decomposes = food.decomposes;
                 TimeDecayStart = food.timeDecayStart;
+                _currentFoodValue = FoodValue;
+                _currentWaterValue = WaterValue;
 
                 if (destroy)
                 {
@@ -66,6 +70,7 @@ namespace FCS_AlterraHub.Model
             if (Decomposes)
             {
                 result =  Mathf.Max(FoodValue - GetDecayValue(), -25f);
+                _currentFoodValue = result;
             }
             return result;
         }
@@ -76,6 +81,7 @@ namespace FCS_AlterraHub.Model
             if (Decomposes)
             {
                 result = Mathf.Max(WaterValue - GetDecayValue(), -25f);
+                _currentWaterValue = result;
             }
             return result;
         }

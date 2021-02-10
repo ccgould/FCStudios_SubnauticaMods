@@ -50,14 +50,14 @@ namespace FCS_EnergySolutions.JetStreamT242.Mono
                     _colorManager.ChangeColor(_savedData.Body.Vector4ToColor());
                     _colorManager.ChangeColor(_savedData.SecondaryBody.Vector4ToColor(), ColorTargetMode.Secondary);
                     _powerManager.LoadFromSave(_savedData);
-                    _motor.LoadSave(_savedData);
-                    _tilter.LoadSave(_savedData);
+                    _motor?.LoadSave(_savedData);
+                    _tilter?.LoadSave(_savedData);
 
                     if (_savedData.IsIncreasing && IsUnderWater())
                     {
                         ChangeStatusLight();
-                        _rotor.ResetToMag();
-                        _rotor.Run();
+                        _rotor?.ResetToMag();
+                        _rotor?.Run();
                     }
                     else
                     {
@@ -78,7 +78,7 @@ namespace FCS_EnergySolutions.JetStreamT242.Mono
         
         #endregion
 
-        private bool IsUpright()
+        internal bool IsUpright()
         {
             if (Mathf.Approximately(transform.up.y, 1f))
             {
@@ -95,14 +95,17 @@ namespace FCS_EnergySolutions.JetStreamT242.Mono
 
         public override void Initialize()
         {
-            _tilter = GameObjectHelpers.FindGameObject(gameObject, "Tilter").AddComponent<RotorHandler>();
-            _tilter.SetTargetAxis(TargetAxis.Y);
+            if (IsUnderWater() && IsUpright())
+            {
+                _tilter = GameObjectHelpers.FindGameObject(gameObject, "Tilter").AddComponent<RotorHandler>();
+                _tilter.SetTargetAxis(TargetAxis.Y);
 
-            _rotor = GameObjectHelpers.FindGameObject(gameObject, "Rotor").AddComponent<RotorHandler>();
-            _rotor.SetTargetAxis(TargetAxis.Y);
+                _rotor = GameObjectHelpers.FindGameObject(gameObject, "Rotor").AddComponent<RotorHandler>();
+                _rotor.SetTargetAxis(TargetAxis.Y);
             
-            _motor = GameObjectHelpers.FindGameObject(gameObject, "Blades").AddComponent<MotorHandler>();
-            _motor.Initialize();
+                _motor = GameObjectHelpers.FindGameObject(gameObject, "Blades").AddComponent<MotorHandler>();
+                _motor.Initialize();
+            }
 
             if (_powerManager == null)
             {
@@ -174,7 +177,7 @@ namespace FCS_EnergySolutions.JetStreamT242.Mono
             }
         }
 
-        internal bool IsUnderWater()
+        public override bool IsUnderWater()
         {
             return GetDepth() > 3.0f;
         }
@@ -203,40 +206,41 @@ namespace FCS_EnergySolutions.JetStreamT242.Mono
             _savedData.Body = _colorManager.GetColor().ColorToVector4();
             _savedData.SecondaryBody = _colorManager.GetSecondaryColor().ColorToVector4();
             _powerManager.Save(_savedData);
-            _motor.Save(_savedData);
-            _tilter.Save(_savedData);
+            _motor?.Save(_savedData);
+            _tilter?.Save(_savedData);
             _savedData.BaseId = BaseId;
             newSaveData.MarineTurbineEntries.Add(_savedData);
         }
 
         public float GetCurrentSpeed()
         {
+            if (_motor == null || _tilter == null || _rotor == null) return 0;
             return _motor.GetSpeed();
         }
 
         public void ActivateTurbine()
         {
-            _tilter.ChangePosition(0,false);
-            _tilter.Run();
+            _tilter?.ChangePosition(0,false);
+            _tilter?.Run();
 
-            _rotor.ResetToMag();
-            _rotor.Run();
+            _rotor?.ResetToMag();
+            _rotor?.Run();
 
-            _motor.SpeedByPass(_powerManager.GetBiomeData());
-            _motor.Run();
+            _motor?.SpeedByPass(_powerManager.GetBiomeData());
+            _motor?.Run();
 
             ChangeStatusLight();
 
-            _powerManager.ChangePowerState(FCSPowerStates.Powered);
+            _powerManager?.ChangePowerState(FCSPowerStates.Powered);
         }
 
         public void DeActivateTurbine()
         {
-            _tilter.ChangePosition(-90);
-            _tilter.Stop();
-            _motor.Stop();
             ChangeStatusLight(false);
-            _powerManager.ChangePowerState(FCSPowerStates.Tripped);
+            _tilter?.ChangePosition(-90);
+            _tilter?.Stop();
+            _motor?.Stop();
+            _powerManager?.ChangePowerState(FCSPowerStates.Tripped);
         }
 
         private void ChangeStatusLight(bool isOperational = true)

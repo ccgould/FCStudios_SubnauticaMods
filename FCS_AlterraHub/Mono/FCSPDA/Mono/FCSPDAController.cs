@@ -186,8 +186,8 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             var encyclopediaButton = encyclopObj.GetComponent<Button>();
             encyclopediaButton.onClick.AddListener(() =>
             {
-                Close();
                 _goToEncyclopedia = true;
+                Close();
             });
 
             var settingsButton = GameObjectHelpers.FindGameObject(gameObject, "SettingsButton").GetComponent<Button>();
@@ -406,11 +406,15 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
 
         public void Deactivated()
         {
-            Inventory.main.quickSlots.Select(prevQuickSlot);
-            gameObject.SetActive(false);
             SNCameraRoot.main.SetFov(0f);
             OnClose?.Invoke();
-            if (_goToEncyclopedia)
+            gameObject.SetActive(false);
+
+            if (!_goToEncyclopedia)
+            {
+                Inventory.main.quickSlots.Select(prevQuickSlot);
+            }
+            else
             {
                 Player.main.GetPDA().Open(PDATab.Encyclopedia);
                 _goToEncyclopedia = false;

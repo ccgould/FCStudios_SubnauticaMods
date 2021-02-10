@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Mono;
 using FCS_ProductionSolutions.Configuration;
+using FCSCommon.Utilities;
+using SMLHelper.V2.Handlers;
 using UnityEngine;
 
 namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
@@ -10,6 +13,7 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
     internal class MatterAnalyzerStorage : IFCSStorage
     {
         private MatterAnalyzerController _device;
+
         public Action<int, int> OnContainerUpdate { get; set; }
         public Action<FcsDevice, TechType> OnContainerAddItem { get; set; }
         public Action<FcsDevice, TechType> OnContainerRemoveItem { get; set; }
@@ -30,6 +34,7 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
         public bool AddItemToContainer(InventoryItem item)
         {
             if (item == null) return false;
+            var pickTypeSet = false;
             var plantable = item.item.gameObject.GetComponentInChildren<Plantable>();
             
             if (plantable != null)
@@ -41,7 +46,31 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
 
                 if (growingPlant != null)
                 {
-                    _device.PickTech = growingPlant.grownModelPrefab.GetComponentInChildren<PickPrefab>()?.pickTech ?? TechType.None;
+                    var pickPrefab = growingPlant.grownModelPrefab.GetComponentInChildren<PickPrefab>();
+                    
+                    if (pickPrefab != null)
+                    {
+                        QuickLogger.Debug($"PickPrefab: {pickPrefab?.pickTech}", true);
+                        _device.PickTech = pickPrefab.pickTech;
+                        pickTypeSet = true;
+                    }
+                    else
+                    {
+                        QuickLogger.Debug($"PickPrefab Not Found Checking Pickupable", true);
+                        var pickup = growingPlant.grownModelPrefab.GetComponentInChildren<Pickupable>();
+                        if (pickup != null)
+                        {
+                            QuickLogger.Debug($"Pickup: {pickup.GetTechType()}", true);
+                            _device.PickTech = pickup.GetTechType();
+                            pickTypeSet = true;
+                        }
+                    }
+
+                    if (!pickTypeSet)
+                    {
+                        _device.PickTech = TechType.None;
+                    }
+                    
                 }
 
                 GameObject.Destroy(grown);
@@ -65,12 +94,21 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
             if (_device.DumpContainer.GetCount() + 1 > 1) return false;
 
             var techType = pickupable.GetTechType();
+
             if (!Mod.IsHydroponicKnownTech(techType, out var data1) && Mod.IsNonePlantableAllowedList.Contains(techType))
             {
                 return true;
             }
 
-            return !Mod.IsHydroponicKnownTech(techType, out var data) &&_device.DumpContainer.GetCount() != 1 && pickupable.gameObject.GetComponentInChildren<Plantable>().isSeedling;
+            var plantable = pickupable.gameObject.GetComponentInChildren<Plantable>();
+            if (plantable == null || !plantable.isSeedling || !IsValidSeedling(pickupable.GetTechType())) return false;
+
+            return !Mod.IsHydroponicKnownTech(techType, out var data) &&_device.DumpContainer.GetCount() != 1;
+        }
+
+        private bool IsValidSeedling(TechType techType)
+        {
+            return ValidSeeds.Contains(techType);
         }
 
         public bool IsAllowedToRemoveItems()
@@ -92,5 +130,53 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
         {
             return false;
         }
+
+        internal HashSet<TechType> ValidSeeds = new HashSet<TechType>
+        {
+            TechType.BluePalmSeed,
+            TechType.PurpleBranchesSeed,
+            TechType.EyesPlantSeed,
+            TechType.FernPalmSeed,
+            TechType.RedRollPlantSeed,
+            TechType.GabeSFeatherSeed,
+            TechType.RedGreenTentacleSeed,
+            TechType.OrangePetalsPlantSeed,
+            TechType.OrangeMushroomSpore,
+            TechType.SnakeMushroomSpore,
+            TechType.MembrainTreeSeed,
+            TechType.PurpleVasePlantSeed,
+            TechType.SmallFanSeed,
+            TechType.RedBushSeed,
+            TechType.RedConePlantSeed,
+            TechType.RedBasketPlantSeed,
+            TechType.SeaCrownSeed,
+            TechType.ShellGrassSeed,
+            TechType.PurpleRattleSpore,
+            TechType.SpottedLeavesPlantSeed,
+            TechType.SpikePlantSeed,
+            TechType.PurpleFanSeed,
+            TechType.PurpleStalkSeed,
+            TechType.PinkFlowerSeed,
+            TechType.PurpleTentacleSeed,
+            TechType.PurpleBrainCoralPiece,
+            TechType.PinkMushroomSpore,
+            TechType.MelonSeed,
+            TechType.HangingFruit,
+            TechType.BulboTreePiece,
+            TechType.PurpleVegetable,
+            TechType.KooshChunk,
+            TechType.BloodOil,
+            TechType.AcidMushroomSpore,
+            TechType.WhiteMushroomSpore,
+            TechType.JellyPlantSeed,
+            TechType.TreeMushroomPiece,
+            TechType.RedGreenTentacleSeed,
+            TechType.CreepvinePiece,
+            TechType.CreepvineSeedCluster,
+            TechType.EyesPlantSeed,
+
+
+
+        };
     }
 }

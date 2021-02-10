@@ -11,6 +11,7 @@ using FCS_ProductionSolutions.HydroponicHarvester.Models;
 using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
+using SMLHelper.V2.Json.ExtensionMethods;
 using UnityEngine;
 
 namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
@@ -138,8 +139,6 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
                 var pickPrefab = growingPlant.grownModelPrefab.GetComponentInChildren<PickPrefab>();
 
                 slotByID.GrowingPlant = fcsGrowing;
-                slotByID.ReturnTechType = pickPrefab != null ? pickPrefab.pickTech : _currentItemTech;
-
                 Destroy(growingPlant);
             }
 
@@ -227,7 +226,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
                 if(data.TechType == TechType.None) continue;
                 slot.GenerationProgress = data.GenerationProgress;
                 slot.SetItemCount(data.Amount);
-                slot.GetTab().SetIcon(data.TechType);
+                slot.GetTab().Load(data.TechType);
                 slot.GrowingPlant?.SetProgress(data.PlantProgress);
 
             }
@@ -248,16 +247,26 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
             if (PlayerInteractionHelper.CanPlayerHold(techType))
             {
                 var slot = GetSlotByID(slotId);
-                if (slot.GetPlantSeedTechType() != techType) return;
+                //if (slot.GetPlantSeedTechType() != techType) return;
                 if (slot.RemoveItem())
                 {
-                    PlayerInteractionHelper.GivePlayerItem(slot.ReturnTechType);
+                    PlayerInteractionHelper.GivePlayerItem(techType);
                 }
             }
             else
             {
                 QuickLogger.ModMessage(AuxPatchers.InventoryFull());
             }
+        }
+
+        public bool IsFull()
+        {
+            return Slots.All(plantSlot => plantSlot != null && plantSlot.IsFull);
+        }
+
+        public bool HasSeeds()
+        {
+            return Slots.Where(plantSlot => plantSlot != null).Any(plantSlot => plantSlot.IsOccupied);
         }
     }
 }

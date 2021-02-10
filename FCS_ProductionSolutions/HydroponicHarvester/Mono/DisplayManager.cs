@@ -133,13 +133,13 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
                 var icon = GameObjectHelpers.FindGameObject(button.gameObject, "Icon").AddComponent<uGUI_Icon>();
                 icon.sprite = SpriteManager.Get(sample.TechType);
                 button.TextLineOne = Language.main.Get((sample.TechType));
-                button.Tag = sample.TechType;
+                button.Tag = sample;
                 button.HOVER_COLOR = Color.white;
                 button.STARTING_COLOR = Color.gray;
                 button.InteractionRequirement = InteractionRequirement.None;
                 button.OnButtonClick += (s, o) =>
                 {
-                    _caller.SetIcon((TechType)o);
+                    _caller.SetIcon((DNASampleData)o);
                     GoToHome();
                 };
                 _loadedDNASamples.Add(sample.TechType);

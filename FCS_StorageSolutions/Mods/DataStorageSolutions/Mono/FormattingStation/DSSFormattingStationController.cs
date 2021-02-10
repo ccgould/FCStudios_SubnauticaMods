@@ -53,7 +53,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.FormattingStation
 
         private void UpdateScreenState()
         {
-            if (Manager.GetBreakerState() || Manager.GetPowerState() != PowerSystem.Status.Normal)
+            if (Manager.GetBreakerState() || Manager.GetPowerState() == PowerSystem.Status.Offline)
             {
                 _displayManager?.TurnOffDisplay();
             }

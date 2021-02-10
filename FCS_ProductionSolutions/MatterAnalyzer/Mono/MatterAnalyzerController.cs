@@ -355,6 +355,7 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
             else
             {
                 _pickTechType = PickTech != TechType.None ? PickTech : techType;
+                QuickLogger.Debug($"Setting PickType to {_pickTechType}",true);
                 _isLandPlant = Seed.aboveWater;
                 _currentTechType = techType;
             }
@@ -393,6 +394,7 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
             {
                 PlayerInteractionHelper.GivePlayerItem(_currentTechType);
             }
+            MotorHandler.StopMotor();
             _grid.DrawPage();
         }
 

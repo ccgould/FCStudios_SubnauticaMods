@@ -50,5 +50,10 @@ namespace FCS_AlterraHub.Model
         {
             Charge = 0f;
         }
+
+        public bool IsEmpty()
+        {
+            return Charge <= 0;
+        }
     }
 }

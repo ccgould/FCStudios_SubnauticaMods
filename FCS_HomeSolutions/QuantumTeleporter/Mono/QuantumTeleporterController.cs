@@ -23,6 +23,8 @@ namespace FCS_HomeSolutions.QuantumTeleporter.Mono
         private bool _displayRefreshed;
         private GameObject _portal;
         private bool _notifyCreation;
+        private ParticleSystem _portalFx;
+        private ParticleSystem.TrailModule _trails;
         internal bool IsGlobal { get; set; }
         public override bool IsConstructed => _buildable != null && _buildable.constructed;
         public override bool IsInitialized { get; set; }
@@ -49,6 +51,12 @@ namespace FCS_HomeSolutions.QuantumTeleporter.Mono
                     _notifyCreation = false;
                 }
             }
+        }
+
+        internal void ChangeTrailColor()
+        {
+            var index = QPatch.Configuration.QuantumTeleporterPortalTrailBrightness;
+            _trails.colorOverLifetime =  new Color(index, index, index);
         }
 
         public override Vector3 GetPosition()
@@ -116,6 +124,9 @@ namespace FCS_HomeSolutions.QuantumTeleporter.Mono
             _target = gameObject.FindChild("Target").transform;
 
             _portal = GameObjectHelpers.FindGameObject(gameObject, "Rings");
+            _portalFx = _portal.GetComponentInChildren<ParticleSystem>();
+            _trails = _portalFx.trails;
+            ChangeTrailColor();
 
             if (_target == null)
             {
@@ -152,6 +163,11 @@ namespace FCS_HomeSolutions.QuantumTeleporter.Mono
                 if (message.Equals("RefreshDisplay"))
                 {
                     DisplayManager?.RefreshTabs();
+                }
+
+                if (message.Equals("UpdateTeleporterEffects"))
+                {
+                    ChangeTrailColor();
                 }
             };
 

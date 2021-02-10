@@ -94,7 +94,7 @@ namespace FCS_HomeSolutions.Mono.PaintTool
         private void Update()
         {
             //TODO use te % operator to replace this watc unity videoplayer  tut in your youtube lib
-            if (base.isDrawn && Input.GetKeyDown(QPatch.PaintToolConfiguration.SelectColorForwardKeyCode))
+            if (base.isDrawn && Input.GetKeyDown(QPatch.Configuration.PaintToolSelectColorForwardKeyCode))
             {
                 _currentIndex += 1;
 
@@ -105,7 +105,7 @@ namespace FCS_HomeSolutions.Mono.PaintTool
 
                 ChangeColor(ColorList.GetColor(_currentIndex));
             }
-            else if (base.isDrawn && Input.GetKeyDown(QPatch.PaintToolConfiguration.SelectColorBackKeyCode))
+            else if (base.isDrawn && Input.GetKeyDown(QPatch.Configuration.PaintToolSelectColorBackKeyCode))
             {
                 _currentIndex -= 1;
 
@@ -303,7 +303,7 @@ namespace FCS_HomeSolutions.Mono.PaintTool
 
         public override string GetCustomUseText()
         {
-            return $"Press Change Colors ({QPatch.PaintToolConfiguration.SelectColorBackKeyCode})/({QPatch.PaintToolConfiguration.SelectColorForwardKeyCode}) | Use Paint Can: {GameInput.GetBindingName(GameInput.Button.Reload, GameInput.BindingSet.Primary)} | Change Mode: {GameInput.GetBindingName(GameInput.Button.AltTool, GameInput.BindingSet.Primary)}";
+            return $"Press Change Colors ({QPatch.Configuration.PaintToolSelectColorBackKeyCode})/({QPatch.Configuration.PaintToolSelectColorForwardKeyCode}) | Use Paint Can: {GameInput.GetBindingName(GameInput.Button.Reload, GameInput.BindingSet.Primary)} | Change Mode: {GameInput.GetBindingName(GameInput.Button.AltTool, GameInput.BindingSet.Primary)}";
         }
     }
 }

@@ -103,63 +103,46 @@ namespace FCS_AlterraHub.Model
         {
             try
             {
-                QuickLogger.Debug("1");
                 growingTransform.gameObject.SetActive(false);
-                QuickLogger.Debug("2");
                 GameObject go = Instantiate<GameObject>(grownModelPrefab, growingTransform.position,growingTransform.rotation);
-                QuickLogger.Debug("3");
                 SetScale(go.transform, 1f);
-                QuickLogger.Debug("4");
                 if (isPickupable)
                 {
-                    QuickLogger.Debug("5");
                     Plantable component = go.GetComponent<Plantable>();
-                    QuickLogger.Debug("6");
                     if (component != null && seed.ReplaceSeedByPlant(component))
                     {
-                        QuickLogger.Debug("7");
                         go.SetActive(false);
-                        QuickLogger.Debug("8");
                         return;
                     }
                 }
-                QuickLogger.Debug("9");
                 GrownPlant grownPlant = go.AddComponent<GrownPlant>();
-                QuickLogger.Debug("10");
                 grownPlant.seed = seed;
-                QuickLogger.Debug("11");
                 grownPlant.SendMessage("OnGrown", SendMessageOptions.DontRequireReceiver);
-                QuickLogger.Debug("12");
                 go.transform.parent = _growBed.grownPlantsRoot.transform;
-                QuickLogger.Debug("13");
                 _growBed.SetupRenderers(go, _growBed.IsInBase());
-                QuickLogger.Debug("14");
 
                 if (seed != null)
                 {
-                    QuickLogger.Debug("15");
                     var pickPrefab = go.GetComponentInChildren<PickPrefab>();
-                    QuickLogger.Debug("16");
                     if (pickPrefab != null)
                     {
-                        QuickLogger.Debug("16.1");
                         QuickLogger.Debug($"Adding {pickPrefab.pickTech.AsString()} to samples", true);
-
                         _callback?.Invoke(pickPrefab.pickTech);
-                        QuickLogger.Debug("17");
                     }
                     else
                     {
-                        QuickLogger.Debug("16.2");
                         var techTag = seed.GetComponent<TechTag>();
-                        
                         if(techTag != null)
                         {
                             QuickLogger.Debug($"Adding {seed.GetComponent<TechTag>().type.AsString()} to samples", true);
                             _callback?.Invoke(seed.GetComponent<TechTag>().type);
                         }
-                        
-                        QuickLogger.Debug("18");
+                    }
+
+                    var intermittentInstantiate = GetComponentInChildren<IntermittentInstantiate>();
+                    if (intermittentInstantiate != null)
+                    {
+                        Destroy(intermittentInstantiate);
                     }
                 }
             }

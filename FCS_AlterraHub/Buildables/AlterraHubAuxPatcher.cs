@@ -44,7 +44,7 @@ namespace FCS_AlterraHub.Buildables
             { $"{ModKey}_AccountCreated", "Thank you for registering for an Alterra Bank Account your current balance is {0}"},
             { $"{ModKey}_NoCardInventory", "Error: No debit card detected. There is no card in your inventory. Your account card is needed for validation.Please get you card or request a new on from the account page."},
             { $"{ModKey}_AccountSetupError", "[Error] Please refill the following fields and press enter in the field to continue: {0}"},
-            { $"{ModKey}_OreConsumerTimeLeftFormat", "Time left till {0} ore processed {1} | Pending {2}."},
+            { $"{ModKey}_OreConsumerTimeLeftFormat", "Time left till {0} ore processed {1} | Pending {2} (Container Limit: {3})."},
             { $"{ModKey}_NoOresToProcess", "No ores to process."},
             { $"{ModKey}_PleaseBuildOnPlatForm", "Please Build on a platform to operate."},
             { $"{ModKey}_BaseOnOff","{0} is now {1}."},
@@ -240,9 +240,9 @@ namespace FCS_AlterraHub.Buildables
             return string.Format(GetLanguage($"{ModKey}_AccountSetupError"),value);
         }
 
-        public static string OreConsumerTimeLeftFormat(string ore, string timeLeft,string pending)
+        public static string OreConsumerTimeLeftFormat(string ore, string timeLeft,string pending,int max)
         {
-            return string.Format(GetLanguage($"{ModKey}_OreConsumerTimeLeftFormat"), ore,timeLeft,pending);
+            return string.Format(GetLanguage($"{ModKey}_OreConsumerTimeLeftFormat"), ore,timeLeft,pending,max);
         }
 
         public static string NoOresToProcess()

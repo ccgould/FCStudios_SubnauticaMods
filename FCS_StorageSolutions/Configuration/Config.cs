@@ -3,6 +3,7 @@ using FCSCommon.Utilities;
 using SMLHelper.V2.Json;
 using SMLHelper.V2.Options;
 using SMLHelper.V2.Options.Attributes;
+using UnityEngine;
 
 namespace FCS_StorageSolutions.Configuration
 {
@@ -12,11 +13,30 @@ namespace FCS_StorageSolutions.Configuration
     {
         public Config() : base("storageSolutions-config","Configurations") { }
 
-        [Toggle("Enable Debugs"), OnChange(nameof(EnableDebugsToggleEvent))]
+
+        [Toggle("[Storage Solutions] Enable Debugs", Order = 0), OnChange(nameof(EnableDebugsToggleEvent)), Tooltip("Enables debug logs set in code by FCStudios (Maybe asked to be enabled for bug reports)")]
         public bool EnableDebugLogs = false;
 
-        [Toggle("Enable Debugs"), OnChange(nameof(EnableDebugsToggleEvent))]
-        public bool ShowServerCustomToolTip { get; set; } = true;
+
+        #region Remote Storage
+
+        [Toggle("[Remote Storage] Is Mod Enabled"),
+         Tooltip("Enables/Disables Remote Storage from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+        public bool IsRemoteStorageEnabled = true;
+
+        #endregion
+
+        #region Data Storage Solutions
+
+        [Toggle("[Data Storage Solutions] Is Mod Enabled"),
+         Tooltip("Enables/Disables Data Storage Solutions from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+        public bool IsDataStorageSolutionsEnabled = true;
+
+        #endregion
+
+
+        [Toggle("[Data Storage Solutions] Show Custom Server Tool Tip"), Tooltip("Allows more information when hovering over a server in your inventory")]
+        public bool ShowServerCustomToolTip = true;
 
 
         private void EnableDebugsToggleEvent(ToggleChangedEventArgs e)

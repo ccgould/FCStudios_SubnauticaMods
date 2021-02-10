@@ -357,5 +357,10 @@ namespace FCS_AlterraHub.Systems
             _accountDetails.ResetAccount();
             QuickLogger.ModMessage("Account has been reset");
         }
+
+        public void Purge()
+        {
+            _accountDetails = null;
+        }
     }
 }

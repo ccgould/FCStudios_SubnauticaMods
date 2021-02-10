@@ -1136,6 +1136,11 @@ namespace FCS_AlterraHub.Mono
 
             return (float)Math.Round((bigRooms / (hardcore ? 1 : 2)) + (smallRooms / (hardcore ? 4 : 10)),2);
         }
+
+        public float GetBasePowerCapacity()
+        {
+            return Habitat?.powerRelay.GetMaxPower() ?? 0;
+        }
     }
 
     public class BaseSaveData

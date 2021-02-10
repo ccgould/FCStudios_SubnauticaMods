@@ -523,25 +523,6 @@ namespace FCS_HomeSolutions.Configuration
             return new PaintToolDataEntry() { Id = id };
         }
 
-        internal static HoverLiftDataEntry GetHoverLiftSaveData(string id)
-        {
-            LoadData();
-
-            var saveData = GetSaveData();
-
-            foreach (var entry in saveData.HoverLiftDataEntries)
-            {
-                if (string.IsNullOrEmpty(entry.Id)) continue;
-
-                if (entry.Id == id)
-                {
-                    return entry;
-                }
-            }
-
-            return new HoverLiftDataEntry { Id = id };
-        }
-
         internal static AlienChiefDataEntry GetAlienChiefSaveData(string id)
         {
             LoadData();

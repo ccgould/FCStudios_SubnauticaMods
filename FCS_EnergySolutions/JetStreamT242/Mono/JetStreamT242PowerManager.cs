@@ -16,10 +16,12 @@ namespace FCS_EnergySolutions.JetStreamT242.Mono
         private FCSPowerStates _powerState;
         private float _energyPerSec;
         private string _curBiome;
-        private float temperature;
-        private float _inverseLerp;
+        private float _temperature;
         private bool _isInitialized;
-        private const float GenerationAmount = 1.6500001f;
+        private float _time;
+        private const float MaxThermalEnergyPerSecond = 1.6500001f;
+        private float MaxTurbineEnergyPerSecond = 2.66f;
+        private const float AddPowerInterval = 2f;
 
         internal bool ProducingPower
         {
@@ -61,17 +63,24 @@ namespace FCS_EnergySolutions.JetStreamT242.Mono
 
         private void ProducePower()
         {
-            if (DayNightCycle.main.deltaTime == 0f)
+            if (Time.timeScale <= 0f)
             {
                 return;
             }
 
             if (GameModeUtils.RequiresPower())
             {
-                var energryGen = GenerationAmount * DayNightCycle.main.deltaTime;
-                _inverseLerp = Mathf.Clamp01(Mathf.InverseLerp(25f, 100f, this.temperature));
-                _energyPerSec = energryGen + _inverseLerp;
-                _powerSource.AddEnergy(_energyPerSec, out float num2);
+                _time -= DayNightCycle.main.deltaTime;
+                var addPowerInterval = AddPowerInterval * DayNightCycle.main.dayNightSpeed;
+
+                if (_time <= 0)
+                {
+                    var thermalPower = MaxThermalEnergyPerSecond * addPowerInterval * Mathf.Clamp01(Mathf.InverseLerp(25f, 100f, this._temperature));
+                    _energyPerSec = MaxTurbineEnergyPerSecond + thermalPower;
+                    _powerSource.AddEnergy(_energyPerSec, out float num2);
+                    _time = 1f;
+                }
+                
             }
         }
 
@@ -80,22 +89,23 @@ namespace FCS_EnergySolutions.JetStreamT242.Mono
             WaterTemperatureSimulation main = WaterTemperatureSimulation.main;
             if (main)
             {
-                this.temperature = Mathf.Max(this.temperature, main.GetTemperature(base.transform.position));
+                this._temperature = Mathf.Max(this._temperature, main.GetTemperature(base.transform.position));
             }
         }
-        
-        float WaterMultiplier()
+
+        private float WaterMultiplier()
         {
             return (1f + (Mathf.PerlinNoise(0f, Time.time * 0.05f) * 1.5f));
-        }
-        
+        } 
+
+
         internal float GetBiomeData(string biome)
         {
-            if (QPatch.JetStreamT242Configuration.BiomeSpeeds == null) return 0;
+            if (QPatch.Configuration.JetStreamT242BiomeSpeeds == null) return 0;
 
             QuickLogger.Debug($"Finding the speed for the biome {biome}",true);
 
-            foreach (KeyValuePair<string, float> biomeSpeed in QPatch.JetStreamT242Configuration.BiomeSpeeds)
+            foreach (KeyValuePair<string, float> biomeSpeed in QPatch.Configuration.JetStreamT242BiomeSpeeds)
             {
                 if (biome.Trim().StartsWith(biomeSpeed.Key,StringComparison.OrdinalIgnoreCase))
                 {
@@ -154,6 +164,13 @@ namespace FCS_EnergySolutions.JetStreamT242.Mono
         {
             HandReticle main = HandReticle.main;
 
+            if (!_mono.IsUpright())
+            {
+                main.SetInteractText(AuxPatchers.NotOnPlatform());
+                main.SetIcon(HandReticle.IconType.HandDeny);
+                return;
+            }
+
 
             if (!_mono.IsUnderWater())
             {
@@ -161,11 +178,9 @@ namespace FCS_EnergySolutions.JetStreamT242.Mono
                 main.SetIcon(HandReticle.IconType.HandDeny);
                 return;
             }
-
-
-
+            
             main.SetInteractText(Language.main.GetFormat(AuxPatchers.JetStreamOnHover(), _mono.UnitID,Mathf.RoundToInt(this._powerSource.GetPower()), Mathf.RoundToInt(this._powerSource.GetMaxPower()),
-                    ((GenerationAmount + _inverseLerp) * 60).ToString("N1")),$"{AuxPatchers.JetStreamOnHoverInteractionFormatted("E", _powerState.ToString())} For more information press {FCS_AlterraHub.QPatch.Configuration.PDAInfoKeyCode}");
+                    (_energyPerSec * 60).ToString("N1")),$"{AuxPatchers.JetStreamOnHoverInteractionFormatted("E", _powerState.ToString())} For more information press {FCS_AlterraHub.QPatch.Configuration.PDAInfoKeyCode}");
             main.SetIcon(HandReticle.IconType.Info);
 
             if (GameInput.GetButtonDown(GameInput.Button.Exit))

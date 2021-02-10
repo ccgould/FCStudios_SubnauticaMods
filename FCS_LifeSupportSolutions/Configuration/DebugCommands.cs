@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using FCS_AlterraHub.Mono;
-using FCS_AlterraHub.Registration;
-using FCSCommon.Utilities;
-using SMLHelper.V2.Commands;
+﻿using SMLHelper.V2.Commands;
 using UnityEngine;
 
 namespace FCS_LifeSupportSolutions.Configuration
@@ -12,15 +7,7 @@ namespace FCS_LifeSupportSolutions.Configuration
     {
         private static Survival _survival;
 
-        [ConsoleCommand("setAdrel")]
-        public static string SetAdrelCommand(bool value)
-        {
-            QPatch.IsEnabled = value;
-
-            QuickLogger.Debug($"Set Value to: {QPatch.IsEnabled}",true);
-            return $"Parameters: {value}";
-        }
-
+        
         [ConsoleCommand("sethealth")]
         public static string SetHealthCommand(int value)
         {

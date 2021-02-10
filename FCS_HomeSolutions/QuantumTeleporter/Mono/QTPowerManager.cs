@@ -8,8 +8,8 @@ namespace FCS_HomeSolutions.QuantumTeleporter.Mono
 {
     internal class QTPowerManager
     {
-        private readonly float _interPowerUsage = QPatch.QuantumTeleporterConfiguration.GlobalTeleportPowerUsage;
-        private readonly float _intraPowerUsage = QPatch.QuantumTeleporterConfiguration.InternalTeleportPowerUsage;
+        private readonly float _interPowerUsage = QPatch.Configuration.QuantumTeleporterGlobalTeleportPowerUsage;
+        private readonly float _intraPowerUsage = QPatch.Configuration.QuantumTeleporterInternalTeleportPowerUsage;
         private PowerRelay _connectedRelay;
         private readonly QuantumTeleporterController _mono;
 

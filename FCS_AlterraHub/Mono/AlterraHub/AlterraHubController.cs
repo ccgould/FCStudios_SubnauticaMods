@@ -5,6 +5,7 @@ using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Managers.Mission;
 using FCS_AlterraHub.Mono.OreConsumer;
+using FCS_AlterraHub.Patches;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Structs;
 using FCS_AlterraHub.Systems;
@@ -30,7 +31,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
         private GameObject _playerBody;
         private bool _isInUse;
         private MissionManager _missionManager => QPatch.MissionManagerGM;
-
+        public Sun Sun => Sun.main;
 
         internal HubTrigger AlterraHubTrigger { get; set; }
         internal AlterraHubDisplay DisplayManager { get; private set; }
@@ -142,10 +143,14 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             //var ui = GameObject.Instantiate(Buildables.AlterraHub.ColorPickerDialogPrefab);
             //HUD = ui.AddComponent<FCSHUD>();
             //HUD.Move();
+
             _screenBlock = GameObjectHelpers.FindGameObject(gameObject, "Blocker");
 
             LoadStore();
-            
+
+            InGameMenuQuitPatcher.AddEventHandlerIfMissing(OnQuit);
+
+
             AlterraHubTrigger.onTriggered += value =>
             {
                 _isInRange = true;
@@ -159,6 +164,13 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             _hubCameraPosition = GameObjectHelpers.FindGameObject(gameObject, "CameraPosition");
 
             IsInitialized = true;
+        }
+
+        private void OnQuit()
+        {
+            QuickLogger.Debug("Quitting Purging CardSystem and AlterraHubSave",true);
+            CardSystem.main.Purge();
+            Mod.PurgeSave();
         }
 
         public FCSHUD HUD { get; set; }

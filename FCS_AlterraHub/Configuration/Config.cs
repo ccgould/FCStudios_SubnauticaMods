@@ -16,7 +16,7 @@ namespace FCS_AlterraHub.Configuration
     public class Config : ConfigFile
     {
 
-        [Toggle("Enable Debugs"), OnChange(nameof(EnableDebugsToggleEvent))]
+        [Toggle("Enable Debugs",Order = 0), OnChange(nameof(EnableDebugsToggleEvent))]
         public bool EnableDebugLogs = false;
 
         [JsonIgnore]

@@ -43,6 +43,8 @@ namespace FCS_HomeSolutions.SeaBreeze.Mono
             return PowerManager.GetHasBreakerTripped();
         }
 
+        
+
         #endregion
 
         #region Unity Methods
@@ -64,7 +66,7 @@ namespace FCS_HomeSolutions.SeaBreeze.Mono
                 if (DisplayManager != null)
                 {
                     var numberOfItems = FridgeComponent.NumberOfItems;
-                    DisplayManager.OnContainerUpdate(numberOfItems, QPatch.SeaBreezeConfiguration.StorageLimit);
+                    DisplayManager.OnContainerUpdate(numberOfItems, QPatch.Configuration.SeaBreezeStorageLimit);
                     DisplayManager.UpdateScreenLabel(NameController.GetCurrentName(), NameController);
                 }
 
@@ -104,8 +106,8 @@ namespace FCS_HomeSolutions.SeaBreeze.Mono
         public override void Initialize()
         {
             PageStateHash = Animator.StringToHash("PageState");
-            
-            QPatch.SeaBreezeConfiguration.OnGameModeChanged += OnModModeChanged;
+
+            QPatch.Configuration.OnSeaBreezeGameModeChanged += OnModModeChanged;
 
             if (PrefabId == null)
             {
@@ -118,16 +120,16 @@ namespace FCS_HomeSolutions.SeaBreeze.Mono
                 PowerManager.Initialize(this);
                 PowerManager.OnBreakerTripped += OnBreakerTripped;
                 PowerManager.OnBreakerReset += OnBreakerReset;
-                PowerManager.OnPowerResume += OnPowerResume;
                 PowerManager.OnPowerOutage += OnPowerOutage;
+                PowerManager.OnPowerResume += OnPowerResume;
             }
 
             if (FridgeComponent == null)
             {
                 FridgeComponent = gameObject.AddComponent<Fridge>();
-                FridgeComponent.Initialize(this, QPatch.SeaBreezeConfiguration.StorageLimit);
+                FridgeComponent.Initialize(this,QPatch.Configuration.SeaBreezeStorageLimit);
                 FridgeComponent.OnContainerUpdate += OnContainerUpdate;
-                FridgeComponent.SetModMode(QPatch.SeaBreezeConfiguration.ModMode);
+                FridgeComponent.SetModMode(QPatch.Configuration.SeaBreezeModMode);
             }
 
             if (_colorManager == null)
@@ -174,6 +176,7 @@ namespace FCS_HomeSolutions.SeaBreeze.Mono
 
         private void OnModModeChanged(int modMode)
         {
+            QuickLogger.Debug($"Changing Seabreeze Game Mode to {(FCSGameMode)modMode}",true);
             FridgeComponent.SetModMode((FCSGameMode)modMode);
         }
 
@@ -188,6 +191,20 @@ namespace FCS_HomeSolutions.SeaBreeze.Mono
             QuickLogger.Debug("Breaker Tripped", true);
             FridgeComponent.SetDecay(true);
         }
+
+        #region Debugging
+
+        private void SetDecaying()
+        {
+            FridgeComponent.SetDecay(true);
+        }
+
+        private void SetFrigerate()
+        {
+            FridgeComponent.SetDecay(false);
+        }
+        #endregion
+
 
         private void OnPowerOutage()
         {

@@ -24,12 +24,8 @@ namespace FCS_LifeSupportSolutions
     {
         public static bool IsRefillableOxygenTanksInstalled { get; } =
             TechTypeHandler.ModdedTechTypeExists("HighCapacityTankRefill");
-
-
         internal string Version { get; private set; } 
         internal static Config Configuration { get; } = OptionsPanelHandler.Main.RegisterModOptions<Config>();
-        internal static BaseUtilityUnitConfig BaseUtilityUnitConfiguration { get; } = OptionsPanelHandler.Main.RegisterModOptions<BaseUtilityUnitConfig>();
-        public static bool IsEnabled { get; set; }
 
         [QModPatch]
         public void Patch()
@@ -39,40 +35,45 @@ namespace FCS_LifeSupportSolutions
             QuickLogger.ModName = Mod.ModName;
             AuxPatchers.AdditionalPatching();
             ModelPrefab.Initialize();
-            
-            var energyPillVendingMachine = new EnergyPillVendingMachinePatcher();
-            energyPillVendingMachine.Patch();
 
-            var redEnergyPill = new PillPatch("RedEnergyPill", "Red Adrenaline Pill",
-                "The red adrenaline pill refills you adrenaline bar to give you 2 minutes of speed when thirsty or hungry",
-                ModelPrefab.RedEnergyPillPrefab);
-            redEnergyPill.Patch();
-            Mod.RedEnergyPillTechType = redEnergyPill.TechType;
+            if (Configuration.IsEnergyPillVendingMachineEnabled)
+            {
+                var energyPillVendingMachine = new EnergyPillVendingMachinePatcher();
+                energyPillVendingMachine.Patch();
 
-            var greenEnergyPill = new PillPatch("GreenEnergyPill", "Green Adrenaline Pill",
-                "The green adrenaline pill adds to your adrenaline bar to give you an additional minute of speed when thirsty or hungry",
-                ModelPrefab.RedEnergyPillPrefab);
-            greenEnergyPill.Patch();
-            Mod.GreenEnergyPillTechType = greenEnergyPill.TechType;
+                var redEnergyPill = new PillPatch("RedEnergyPill", "Red Adrenaline Pill",
+                    "The red adrenaline pill refills your adrenaline bar to give you a 2 minute boost, returning your speed to normal when you are extremely hungry or thirsty.",
+                    ModelPrefab.RedEnergyPillPrefab);
+                redEnergyPill.Patch();
+                Mod.RedEnergyPillTechType = redEnergyPill.TechType;
 
-            var blueEnergyPill = new PillPatch("BlueEnergyPill", "Blue Adrenaline Pill",
-                "The blue adrenaline pill adds to your adrenaline bar to give you an additional 30 seconds of speed when thirsty or hungry",
-                ModelPrefab.RedEnergyPillPrefab);
-            blueEnergyPill.Patch();
-            Mod.BlueEnergyPillTechType = blueEnergyPill.TechType;
+                var greenEnergyPill = new PillPatch("GreenEnergyPill", "Green Adrenaline Pill",
+                    "The green adrenaline pill refills your adrenaline bar to give you a 1 minute boost, returning your speed to normal when you are extremely hungry or thirsty.",
+                    ModelPrefab.RedEnergyPillPrefab);
+                greenEnergyPill.Patch();
+                Mod.GreenEnergyPillTechType = greenEnergyPill.TechType;
 
-            var miniMedBay = new MiniMedBayPatcher();
-            miniMedBay.Patch();
+                var blueEnergyPill = new PillPatch("BlueEnergyPill", "Blue Adrenaline Pill",
+                    "The blue adrenaline pill refills your adrenaline bar to give you a 30 second boost, returning your speed to normal when you are extremely hungry or thirsty.",
+                    ModelPrefab.RedEnergyPillPrefab);
+                blueEnergyPill.Patch();
+                Mod.BlueEnergyPillTechType = blueEnergyPill.TechType;
+            }
 
-            if (BaseUtilityUnitConfiguration.IsModEnabled)
+            if (Configuration.IsMiniMedBayEnabled)
+            {
+                var miniMedBay = new MiniMedBayPatcher();
+                miniMedBay.Patch();
+            }
+
+            if (Configuration.BaseUtilityUnitIsModEnabled)
             {
                 var baseUtilityUnit = new BaseUtilityUnitPatch();
                 baseUtilityUnit.Patch();
                 var baseOxygenTankPatch = new BaseOxygenTankPatch();
                 baseOxygenTankPatch.Patch();
             }
-
-
+            
             //Register debug commands
             ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));
 
@@ -81,5 +82,3 @@ namespace FCS_LifeSupportSolutions
         }
     }
 }
-
-//BarsPanel

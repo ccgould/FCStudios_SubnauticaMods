@@ -5,6 +5,7 @@ using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Interfaces;
+using FCS_AlterraHub.Managers.Mission;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Helpers;
@@ -51,6 +52,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
         private float _timeLeft;
         private bool _isBreakerTripped;
         private GameObject _canvas;
+        private const int MAXITEMLIMIT = 15;
 
         public override float GetPowerUsage()
         {
@@ -94,7 +96,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
                 if (_timeLeft < 0)
                 {
                     var techType = _oreQueue.Dequeue();
-                    //QPatch.MissionManagerGM.NotifyDeviceAction(Mod.OreConsumerTechType,techType, DeviceActionType.PROCESSITEM);
+                    QPatch.MissionManagerGM.NotifyDeviceAction(Mod.OreConsumerTechType,techType, DeviceAction.Consume);
                     AppendMoney(StoreInventorySystem.GetOrePrice(techType));
                     _timeLeft = OreProcessingTime;
                 }
@@ -297,6 +299,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
 
         public override bool CanBeStored(int amount, TechType techType)
         {
+            if (amount > MAXITEMLIMIT) return false;
             return StoreInventorySystem.ValidResource(techType);
         }
 
@@ -323,7 +326,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
         
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
         {
-            return CanBeStored(0, pickupable.GetTechType());
+            return CanBeStored(DumpContainer.GetCount() + 1 + _oreQueue.Count, pickupable.GetTechType());
         }
 
         public bool IsAllowedToRemoveItems()
@@ -394,7 +397,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
                 if (_oreQueue.Any())
                 {
                     var pendingAmount = _oreQueue.Count > 1 ? _oreQueue.Count - 1 : 0;
-                    main.SetInteractTextRaw(Buildables.AlterraHub.OreConsumerTimeLeftFormat(Language.main.Get(_oreQueue.Peek()), _timeLeft.ToString("N0"),$"{pendingAmount}"),
+                    main.SetInteractTextRaw(Buildables.AlterraHub.OreConsumerTimeLeftFormat(Language.main.Get(_oreQueue.Peek()), _timeLeft.ToString("N0"),$"{pendingAmount}",MAXITEMLIMIT),
                         Buildables.AlterraHub.PressToTurnDeviceOnOff(KeyCode.F.ToString()));
                 }
                 else

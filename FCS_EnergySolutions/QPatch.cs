@@ -22,8 +22,6 @@ namespace FCS_EnergySolutions
     public class QPatch
     {
         internal string Version { get; private set; }
-
-        internal static JetStreamT242Config JetStreamT242Configuration { get; } = OptionsPanelHandler.Main.RegisterModOptions<JetStreamT242Config>();
         internal static Config Configuration { get; } = OptionsPanelHandler.Main.RegisterModOptions<Config>();
 
         [QModPatch]
@@ -34,17 +32,25 @@ namespace FCS_EnergySolutions
             QuickLogger.ModName = Mod.ModName;
             AuxPatchers.AdditionalPatching();
             ModelPrefab.Initialize();
+
+            if (Configuration.IsAlterraGenEnabled)
+            {
+                var alterraGen = new AlterraGenBuildable();
+                alterraGen.Patch();
+            }
+
+            if(Configuration.IsJetStreamT242Enabled)
+            {
+                var jetStreamT242 = new JetStreamT242Patcher();
+                jetStreamT242.Patch();
+            }
+
+            if(Configuration.IsPowerStorageEnabled)
+            {
+                var powerStorage = new PowerStoragePatcher();
+                powerStorage.Patch();
+            }
             
-            var alterraGen = new AlterraGenBuildable();
-            alterraGen.Patch();
-
-            var jetStreamT242 = new JetStreamT242Patcher();
-            jetStreamT242.Patch();
-
-            var powerStorage = new PowerStoragePatcher();
-            powerStorage.Patch();
-
-
             //Register debug commands
             ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));
         }

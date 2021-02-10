@@ -53,15 +53,15 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
             Slot.TrackTab(this);
         }
 
-        internal void SetIcon(TechType techType)
+        internal void SetIcon(DNASampleData sampleData)
         {
-            if (Mod.IsHydroponicKnownTech(techType, out var data))
+            if (Mod.IsHydroponicKnownTech(sampleData.TechType, out var data))
             {
-                _iconTechType = techType;
+                _iconTechType = sampleData.PickType;
                 _icon.sprite = SpriteManager.Get(data.PickType);
-                Slot.GrowBedManager.AddSample(techType, Slot.Id);
+                Slot.GrowBedManager.AddSample(sampleData.TechType, Slot.Id);
                 UpdateCount();
-                Tag = new SlotData(techType, Slot.Id);
+                Tag = new SlotData(sampleData.PickType, Slot.Id);
             }
             else
             {
@@ -77,7 +77,15 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
         internal void Clear()
         {
             _icon.sprite = SpriteManager.Get(TechType.None);
-            SetIcon(TechType.None);
+            _iconTechType = TechType.None;
+            Tag = null;
+
+        }
+
+        public void Load(TechType techType)
+        {
+            if(Mod.IsHydroponicKnownTech(techType,out var data))
+            SetIcon(data);
         }
     }
 }

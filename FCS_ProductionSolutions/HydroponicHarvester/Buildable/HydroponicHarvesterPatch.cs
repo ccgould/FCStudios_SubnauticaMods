@@ -24,32 +24,6 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Buildable
                 var hydroponicHarvesterKit = new FCSKit(Mod.HydroponicHarvesterKitClassID, Mod.HydroponicHarvesterModFriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 hydroponicHarvesterKit.Patch();
                 FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, hydroponicHarvesterKit.TechType, 196875, StoreCategory.Production);
-                FCSAlterraHubService.PublicAPI.RegisterEncyclopediaEntry(TechType,new List<FcsEntryData>
-                {
-                    new FcsEntryData
-                    {
-                        key = "HydroHarvester",
-                        unlocked = true,
-                        path = "fcs",
-                        timeCapsule = false,
-                        nodes = new []{ "fcs"},
-                        Description = "The hydroponic Harvester .....",
-                        Title = "Hydroponic Harvester",
-                        Verbose = true
-                    },
-                    new FcsEntryData
-                    {
-                        key = "HydroHarvester1",
-                        unlocked = true,
-                        path = "fcs",
-                        timeCapsule = false,
-                        nodes = new []{ "fcs"},
-                        Description = "The hydroponic Harvester .....",
-                        Title = "Hydroponic Harvester 1",
-                        Verbose = false
-                    }
-                });
-
             };
         }
         public override TechGroup GroupForPDA => TechGroup.Miscellaneous;

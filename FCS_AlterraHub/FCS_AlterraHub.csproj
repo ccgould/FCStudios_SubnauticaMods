@@ -237,8 +237,10 @@
     <Compile Include="Objects\Vec4.cs" />
     <Compile Include="Objects\Vec3.cs" />
     <Compile Include="Patches\BuilderPatches.cs" />
+    <Compile Include="Patches\MenuPatches.cs" />
     <Compile Include="Patches\MissionHUD.cs" />
     <Compile Include="Patches\PDAScannerPatch.cs" />
+    <Compile Include="Patches\ConstructablePatch.cs" />
     <Compile Include="Patches\PlayerPatch.cs" />
     <Compile Include="Patches\PowerIndicatorPatch.cs" />
     <Compile Include="Patches\Storage_Patcher.cs" />

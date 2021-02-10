@@ -931,7 +931,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
 
             if (save.IsBlackListMode)
             {
-                _filterToggle.Select();
+                _filterBlackListToggle.Select();
             }
 
             if (save.AllowedToExport)

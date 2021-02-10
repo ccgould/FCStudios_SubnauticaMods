@@ -43,7 +43,7 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
                 return;
             }
 
-            CheckMode();
+            CheckIfAllowedToCharge();
         }
 
         public override Vector3 GetPosition()
@@ -51,23 +51,30 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
             return transform.position;
         }
 
-        private void CheckMode()
+        private void CheckIfAllowedToCharge()
         {
-            if(Manager?.Habitat == null)return;
+            //if(Manager?.Habitat == null)return;
 
-            switch (_mode)
-            {
-                case PowerChargerMode.ChargeMode:
-                    _powercellSupply.SetAllowedToCharge(true);
-                    ChangeStatusLights(true);
-                    break;
-                case PowerChargerMode.DischargeMode:
-                    _powercellSupply.SetAllowedToCharge(false);
-                    break;
-                case PowerChargerMode.Auto:
-                    _powercellSupply.SetAllowedToCharge(Manager.GetPower() - _powercellSupply.GetPower() > 25);
-                    break;
-            }
+            //switch (_mode)
+            //{
+            //    case PowerChargerMode.ChargeMode:
+            //        _powercellSupply.SetAllowedToCharge(true);
+            //        ChangeStatusLights(true);
+            //        break;
+            //    case PowerChargerMode.DischargeMode:
+            //        _powercellSupply.SetAllowedToCharge(false);
+            //        break;
+            //    case PowerChargerMode.Auto:
+            //        _powercellSupply.SetAllowedToCharge(CalculatePowerPercentage() > 40);
+            //        break;
+            //}
+        }
+
+        internal float CalculatePowerPercentage()
+        {
+            var baseCapacity = Manager.GetBasePowerCapacity() - _powercellSupply.GetMaxPower();
+            if (CalculateBasePower() <= 0 || baseCapacity <= 0) return 0;
+            return CalculateBasePower() / baseCapacity  * 100;
         }
 
         private void ChangeStatusLights(bool value)
@@ -308,6 +315,16 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
         {
             if (_interactionChecker.IsInRange) return;
             _powercellSupply.OpenStorage();
+        }
+
+        internal PowerChargerMode GetMode()
+        {
+            return _mode;
+        }
+
+        public float CalculateBasePower()
+        {
+           return Manager.GetPower() - _powercellSupply.GetPower();
         }
     }
 

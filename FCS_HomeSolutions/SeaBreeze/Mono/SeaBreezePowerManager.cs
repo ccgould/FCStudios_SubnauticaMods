@@ -15,7 +15,7 @@ namespace FCS_HomeSolutions.SeaBreeze.Mono
         public Action OnBreakerTripped { get; set; }
         public Action OnBreakerReset { get; set; }
 
-        private readonly float _energyConsumptionPerSecond = QPatch.SeaBreezeConfiguration.PowerUsage;
+        private readonly float _energyConsumptionPerSecond =QPatch.Configuration.SeaBreezePowerUsage;
         private float AvailablePower => _connectedRelay.GetPower() + _powercellData.GetCharge();
         public Action OnPowerOutage { get; set; }
         public Action OnPowerResume { get; set; }
@@ -25,7 +25,7 @@ namespace FCS_HomeSolutions.SeaBreeze.Mono
 
         private SeaBreezeController _mono;
 
-        public bool NotAllowToOperate => !_mono.IsConstructed || _connectedRelay == null || !QPatch.SeaBreezeConfiguration.UseBasePower || _powercellData == null;
+        public bool NotAllowToOperate => !_mono.IsConstructed || _connectedRelay == null || !QPatch.Configuration.SeaBreezeUseBasePower || _powercellData == null;
 
         private PowerRelay _connectedRelay;
         private float _energyToConsume;
@@ -44,7 +44,7 @@ namespace FCS_HomeSolutions.SeaBreeze.Mono
             _energyToConsume = _energyConsumptionPerSecond * DayNightCycle.main.deltaTime;
             var batteryChargePull = DayNightCycle.main.deltaTime * ChargeSpeed * _powercellData.GetCapacity();
             bool requiresEnergy = GameModeUtils.RequiresPower();
-            bool hasPowerToConsume = !requiresEnergy || (this.AvailablePower >= _energyToConsume);
+            bool hasPowerToConsume = !requiresEnergy || (this.AvailablePower >= _energyToConsume) || !_powercellData.IsEmpty();
             
             if (hasPowerToConsume && !_prevPowerState)
             {

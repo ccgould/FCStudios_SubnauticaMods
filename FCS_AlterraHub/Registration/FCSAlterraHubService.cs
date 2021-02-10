@@ -32,6 +32,9 @@ namespace FCS_AlterraHub.Registration
         bool ChargeAccount(decimal amount);
         bool IsCreditAvailable(decimal amount);
         KeyValuePair<string, FcsDevice> FindDevice(string prefabID);
+        void AddBuiltTech(TechType techType);
+        int GetTechBuiltCount(TechType techType);
+        void RemoveBuiltTech(TechType techType);
     }
 
     internal interface IFCSAlterraHubServiceInternal
@@ -48,6 +51,7 @@ namespace FCS_AlterraHub.Registration
         private static Dictionary<TechType, List<FcsEntryData>> _pdaEntries = new Dictionary<TechType, List<FcsEntryData>>();
         private static HashSet<TechType> _registeredTechTypes = new HashSet<TechType>();
         private List<string> _patchedMods = new List<string>();
+        private Dictionary<TechType,int> _globallyBuiltTech = new Dictionary<TechType, int>();
         public static IFCSAlterraHubService PublicAPI => singleton;
         internal static IFCSAlterraHubServiceInternal InternalAPI => singleton;
 
@@ -328,6 +332,40 @@ namespace FCS_AlterraHub.Registration
         public KeyValuePair<string, FcsDevice> FindDevice(string unitID)
         {
             return GlobalDevices.FirstOrDefault(x => x.Key.Equals(unitID, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public void AddBuiltTech(TechType techType)
+        {
+            if(_globallyBuiltTech.ContainsKey(techType))
+            {
+                _globallyBuiltTech[techType] += 1;
+            }
+            else
+            {
+                _globallyBuiltTech.Add(techType,1);
+            }
+        }
+
+        public int GetTechBuiltCount(TechType techType)
+        {
+            if (_globallyBuiltTech.ContainsKey(techType))
+            {
+                return _globallyBuiltTech[techType];
+            }
+
+            return 0;
+        }
+
+        public void RemoveBuiltTech(TechType techType)
+        {
+            if (_globallyBuiltTech.ContainsKey(techType))
+            {
+                _globallyBuiltTech[techType] -= 1;
+                if (_globallyBuiltTech[techType] <= 0)
+                {
+                    _globallyBuiltTech.Remove(techType);
+                }
+            }
         }
     }
 }

@@ -23,6 +23,7 @@ namespace FCS_EnergySolutions.Configuration
             { $"{ModKey}_NotUnderWater","Cannot operate out of water."},
             { $"{ModKey}_NotUnderWaterDesc","Turbine cannot function  above 3 meters"},
             { $"{ModKey}_NoSlotsAvailable","No charging slots available."},
+            { $"{ModKey}_NotOnPlatform","JetStreamT242 must be built on a base platform to operate. This is best for efficiency and stability."},
         };
 
         internal static void AdditionalPatching()
@@ -105,6 +106,11 @@ namespace FCS_EnergySolutions.Configuration
         public static string NoSlotsAvailable()
         {
             return GetLanguage($"{ModKey}_NoSlotsAvailable");
+        }
+
+        public static string NotOnPlatform()
+        {
+            return GetLanguage($"{ModKey}_NotOnPlatform");
         }
     }
 }

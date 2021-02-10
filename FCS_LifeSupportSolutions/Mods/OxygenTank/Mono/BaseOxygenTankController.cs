@@ -173,7 +173,7 @@ namespace FCS_LifeSupportSolutions.Mods.OxygenTank.Mono
             HandReticle main = HandReticle.main;
             main.SetIcon(HandReticle.IconType.Info);
 
-            var requiredTankCount = Manager.GetRequiredTankCount(QPatch.BaseUtilityUnitConfiguration.SmallBaseOxygenHardcore);
+            var requiredTankCount = Manager.GetRequiredTankCount(QPatch.Configuration.SmallBaseOxygenHardcore);
             _sb.Clear();
             if(_oxygenAttachPoint.allowConnection && _oxygenAttachPoint.parentPipeUID != null)
                 _sb.Append($"Pipe Connected");

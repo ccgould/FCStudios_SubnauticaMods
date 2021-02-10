@@ -34,32 +34,38 @@ namespace FCS_StorageSolutions
 
             AuxPatchers.AdditionalPatching();
 
-            var alterraStorage = new AlterraStoragePatch();
-            alterraStorage.Patch();
+            if (Configuration.IsRemoteStorageEnabled)
+            {
+                var alterraStorage = new AlterraStoragePatch();
+                alterraStorage.Patch();
+            }
 
-            var dssserver = new DSSServerSpawnable();
-            dssserver.Patch();
+            if (Configuration.IsDataStorageSolutionsEnabled)
+            {
+                var dssserver = new DSSServerSpawnable();
+                dssserver.Patch();
 
-            var dssItemDisplay = new DSSItemDisplayPatch();
-            dssItemDisplay.Patch();
+                var dssItemDisplay = new DSSItemDisplayPatch();
+                dssItemDisplay.Patch();
 
-            var dssFormattingStation = new DSSFormattingStationPatch();
-            dssFormattingStation.Patch();
+                var dssFormattingStation = new DSSFormattingStationPatch();
+                dssFormattingStation.Patch();
 
-            var dssTerminal = new DSSTerminalPatch();
-            dssTerminal.Patch();
+                var dssTerminal = new DSSTerminalPatch();
+                dssTerminal.Patch();
 
-            var dssAutoCrafter = new DSSAutoCrafterPatch();
-            dssAutoCrafter.Patch();
+                var dssAutoCrafter = new DSSAutoCrafterPatch();
+                dssAutoCrafter.Patch();
 
-            var dssAntenna = new DSSAntennaPatch();
-            dssAntenna.Patch();
+                var dssAntenna = new DSSAntennaPatch();
+                dssAntenna.Patch();
 
-            var wallServerRack = new DSSWallServerRackPatch();
-            wallServerRack.Patch();
+                var wallServerRack = new DSSWallServerRackPatch();
+                wallServerRack.Patch();
 
-            var floorServerRack = new DSSFloorServerRackPatch();
-            floorServerRack.Patch();
+                var floorServerRack = new DSSFloorServerRackPatch();
+                floorServerRack.Patch();
+            }
 
             //Register debug commands
             ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));

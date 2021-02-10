@@ -160,16 +160,6 @@
     <Compile Include="Configuration\SaveData.cs" />
     <Compile Include="Curtains\Buildable\CurtainPatch.cs" />
     <Compile Include="Curtains\Mono\CurtainController.cs" />
-    <Compile Include="HoverLiftPad\Buildable\HoverLiftPadPatch.cs" />
-    <Compile Include="HoverLiftPad\Mono\Gate.cs" />
-    <Compile Include="HoverLiftPad\Mono\GateController.cs" />
-    <Compile Include="HoverLiftPad\Mono\HoverLiftPadController.cs" />
-    <Compile Include="HoverLiftPad\Mono\Lift.cs" />
-    <Compile Include="HoverLiftPad\Structs\LevelData.cs" />
-    <Compile Include="HoverLiftPad\Mono\PlayerTrigger.cs" />
-    <Compile Include="HoverLiftPad\Mono\PrawnSuitTrigger.cs" />
-    <Compile Include="HoverLiftPad\Enums\SpeedModes.cs" />
-    <Compile Include="HoverLiftPad\Enums\UIButtons.cs" />
     <Compile Include="MiniFountainFilter\Buildables\MiniFountainFilterAuxPatcher.cs" />
     <Compile Include="MiniFountainFilter\Buildables\MiniFountainFilterPatcher.cs" />
     <Compile Include="ModManagers\AnimationManager.cs" />
@@ -209,9 +199,7 @@
     <Compile Include="Mono\PaintTool\PaintToolController.cs" />
     <Compile Include="Patches\Builder_Patches.cs" />
     <Compile Include="Patches\InGameMenuPatcher.cs" />
-    <Compile Include="Patches\Light_Patches.cs" />
     <Compile Include="Patches\Player_Patches.cs" />
-    <Compile Include="Patches\PrawnSuit_Patches.cs" />
     <Compile Include="Patches\StorageContainerPatches.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

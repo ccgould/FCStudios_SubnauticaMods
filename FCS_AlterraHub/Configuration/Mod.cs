@@ -137,7 +137,8 @@ namespace FCS_AlterraHub.Configuration
             {TechType.SnakeMushroom,0.3902903f},
             {TechType.PurpleFan,0.2761627f},
             {TechType.SmallFan,0.2761627f},
-            {TechType.JellyPlant,0.2761627f}
+            {TechType.JellyPlant,0.2761627f},
+            {TechType.PurpleBrainCoral, 0.3731633f}
         };
 
         public static FCSGamePlaySettings GamePlaySettings { get; set; } = new FCSGamePlaySettings();
@@ -276,6 +277,11 @@ namespace FCS_AlterraHub.Configuration
             }
         }
         
+        internal static void PurgeSave()
+        {
+            _saveData = null;
+        }
+
         internal static void LoadData()
         {
             QuickLogger.Info("Loading Save Data...");

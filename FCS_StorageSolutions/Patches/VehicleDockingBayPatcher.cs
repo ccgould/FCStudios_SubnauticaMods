@@ -14,6 +14,8 @@ namespace FCS_StorageSolutions.Patches
             [HarmonyPostfix]
             public static void Postfix(ref VehicleDockingBay __instance)
             {
+                if(!QPatch.Configuration.IsDataStorageSolutionsEnabled) return;
+
                 try
                 {
                     var manager = BaseManager.FindManager(__instance.subRoot);
@@ -33,6 +35,8 @@ namespace FCS_StorageSolutions.Patches
             [HarmonyPostfix]
             public static void Postfix(ref VehicleDockingBay __instance)
             {
+                if (!QPatch.Configuration.IsDataStorageSolutionsEnabled) return;
+
                 try
                 {
                     if (__instance.subRoot == null) return;

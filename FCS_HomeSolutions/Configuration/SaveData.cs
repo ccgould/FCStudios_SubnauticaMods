@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Objects;
-using FCS_HomeSolutions.HoverLiftPad.Mono;
 using FCS_HomeSolutions.Mono.OutDoorPlanters;
 using FCS_HomeSolutions.QuantumTeleporter.Enumerators;
 using FCS_HomeSolutions.TrashRecycler.Model;
@@ -43,24 +42,7 @@ namespace FCS_HomeSolutions.Configuration
         [JsonProperty(PropertyName = "A")] internal int Amount { get; set; }
         [JsonProperty(PropertyName = "PTM")] internal ColorTargetMode ColorTargetMode { get; set; }
     }
-
-    [Serializable]
-    internal class HoverLiftDataEntry
-    {
-        [JsonProperty] internal string DockedPrawnID;
-        [JsonProperty] internal string Id { get; set; }
-        [JsonProperty] internal List<LevelData> KnownLevels { get; set; }
-        [JsonProperty] internal Vec3 PadCurrentPosition { get; set; }
-        [JsonProperty] internal bool FrontGatesOpen { get; set; }
-        [JsonProperty] internal bool BackGatesOpen { get; set; }
-        [JsonProperty(PropertyName = "COL")] internal Vec4 Fcs { get; set; }
-        [JsonProperty(PropertyName = "SCOL")] internal Vec4 Secondary { get; set; }
-        [JsonProperty] internal bool PlayerLocked { get; set; }
-        [JsonProperty] internal bool ExosuitLocked { get; set; }
-        [JsonProperty(PropertyName = "BID")] internal string BaseID { get; set; }
-
-    }
-
+    
     internal class PlanterDataEntry
     {
         [JsonProperty] internal string Id { get; set; }
@@ -197,7 +179,6 @@ namespace FCS_HomeSolutions.Configuration
 
         [JsonProperty] internal List<SeaBreezeDataEntry> SeaBreezeDataEntries = new List<SeaBreezeDataEntry>();
         [JsonProperty] internal List<SignDataEntry> SignDataEntries = new List<SignDataEntry>();
-        [JsonProperty] internal List<HoverLiftDataEntry> HoverLiftDataEntries = new List<HoverLiftDataEntry>();
         [JsonProperty] internal List<DecorationDataEntry> DecorationEntries = new List<DecorationDataEntry>();
         [JsonProperty] internal List<PaintToolDataEntry> PaintToolEntries = new List<PaintToolDataEntry>();
         [JsonProperty] internal List<PlanterDataEntry> PlanterEntries = new List<PlanterDataEntry>();

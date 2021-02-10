@@ -355,16 +355,16 @@ namespace FCS_HomeSolutions.Mods.TV.Mono
         {
             HandReticle main = HandReticle.main;
 
-            main.SetUseTextRaw(AuxPatchers.TVFormat(QPatch.TelevisionConfiguration.ToggleTv.ToString()),
+            main.SetUseTextRaw(AuxPatchers.TVFormat(QPatch.Configuration.SmartTelevisionsToggleTv.ToString()),
                 AuxPatchers.TVFormatContinued(
-                    QPatch.TelevisionConfiguration.VolumeUp.ToString(),
-                    QPatch.TelevisionConfiguration.VolumeDown.ToString(),
-                    QPatch.TelevisionConfiguration.ChannelUp.ToString(),
-                    QPatch.TelevisionConfiguration.ChannelDown.ToString()));
+                    QPatch.Configuration.SmartTelevisionsVolumeUp.ToString(),
+                    QPatch.Configuration.SmartTelevisionsVolumeDown.ToString(),
+                    QPatch.Configuration.SmartTelevisionsChannelUp.ToString(),
+                    QPatch.Configuration.SmartTelevisionsChannelDown.ToString()));
 
             main.SetIcon(HandReticle.IconType.Default);
 
-            if (Input.GetKeyDown(QPatch.TelevisionConfiguration.ToggleTv))
+            if (Input.GetKeyDown(QPatch.Configuration.SmartTelevisionsToggleTv))
             {
                 if (_isOn)
                 {
@@ -376,22 +376,22 @@ namespace FCS_HomeSolutions.Mods.TV.Mono
                 }
             }
 
-            if (Input.GetKeyDown(QPatch.TelevisionConfiguration.VolumeUp))
+            if (Input.GetKeyDown(QPatch.Configuration.SmartTelevisionsVolumeUp))
             {
                 VolumeUp();
             }
 
-            if (Input.GetKeyDown(QPatch.TelevisionConfiguration.VolumeDown))
+            if (Input.GetKeyDown(QPatch.Configuration.SmartTelevisionsVolumeDown))
             {
                 VolumeDown();
             }
 
-            if (Input.GetKeyDown(QPatch.TelevisionConfiguration.ChannelDown))
+            if (Input.GetKeyDown(QPatch.Configuration.SmartTelevisionsChannelDown))
             {
                 ChannelDown();
             }
 
-            if (Input.GetKeyDown(QPatch.TelevisionConfiguration.ChannelUp))
+            if (Input.GetKeyDown(QPatch.Configuration.SmartTelevisionsChannelUp))
             {
                 ChannelUp();
             }

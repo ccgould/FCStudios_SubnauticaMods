@@ -35,6 +35,17 @@ namespace FCS_AlterraHub.Spawnables
 
                 prefabID.ClassId = this.ClassID;
 
+                var rb = prefab.GetComponentInChildren<Rigidbody>();
+
+                var forces = prefab.AddComponent<WorldForces>();
+                forces.useRigidbody = rb;
+                forces.handleGravity = true;
+                forces.handleDrag = true;
+                forces.aboveWaterGravity = 9.81f;
+                forces.underwaterGravity = 1;
+                forces.aboveWaterDrag = 0.1f;
+                forces.underwaterDrag = 1;
+
                 var techTag = prefab.EnsureComponent<TechTag>();
                 techTag.type = TechType;
 
