@@ -243,7 +243,11 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         /// <param name="powercell">The powercell  to pull power from</param>
         internal void ChargeBatteryFromPowercell(Battery powercell)
         {
-            if (powercell.charge <= 0 || _powerBank.Battery.IsFull()) return;
+            if (powercell.charge <= 0 || _powerBank.Battery.IsFull()) 
+            {
+                Inventory.main.Pickup(powercell.gameObject.GetComponent<Pickupable>());
+                return;
+            }
 
             //Get the amount the battery needs
             var remainder = MathHelpers.GetRemainder(_powerBank.Battery.GetCharge(), _powerBank.Battery.GetCapacity());

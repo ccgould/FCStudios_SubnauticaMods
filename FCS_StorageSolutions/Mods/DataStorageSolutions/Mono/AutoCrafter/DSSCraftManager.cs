@@ -1,4 +1,5 @@
-﻿using FCS_StorageSolutions.Mods.AlterraStorage.Buildable;
+﻿using System;
+using FCS_StorageSolutions.Mods.AlterraStorage.Buildable;
 using FCSCommon.Extensions;
 using UnityEngine;
 
@@ -16,6 +17,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
         private TechType _craftSlot2TechType;
         private Transform[] _crafterBeltPath;
         private Transform[] _crafter2BeltPath;
+        private int _itemsOnBelt;
 
         public void Initialize(DSSAutoCrafterController mono)
         {
@@ -62,6 +64,15 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
             var follow = inv.gameObject.AddComponent<DSSAutoCrafterCrateController>();
             follow.TechType = techType;
             follow.Initialize(path, _mono);
+            follow.OnPathComplete += OnPathComplete;
+            _itemsOnBelt++;
+        }
+
+        private void OnPathComplete()
+        {
+            if (_itemsOnBelt == 0) return;
+            _itemsOnBelt -= 1;
+            if (_itemsOnBelt < 0) _itemsOnBelt = 0;
         }
 
         private void UpdateDisplayElements()
@@ -128,6 +139,11 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
         public bool IsRunning()
         {
             return _startCrafting;
+        }
+
+        public bool ItemsOnBelt()
+        {
+            return _itemsOnBelt > 0;
         }
     }
 }

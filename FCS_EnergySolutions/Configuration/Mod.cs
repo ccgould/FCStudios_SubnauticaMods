@@ -38,6 +38,19 @@ namespace FCS_EnergySolutions.Configuration
         internal static string AlterraGenModClassName => AlterraGenModName;
         internal static string AlterraGenModPrefabName => AlterraGenModName;
 
+
+        internal const string AlterraSolarClusterModTabID = "ASC";
+        internal const string AlterraSolarClusterModFriendlyName = "Alterra Solar Cluster";
+        internal const string AlterraSolarClusterModName = "AlterraSolarCluster";
+
+        internal const string AlterraSolarClusterModDescription =
+            "The Alterra Solar Cluster is the latest in efficient photon conversion, giving you a reliable, maintenance free power source anywhere the sun goes.";
+        internal static string AlterraSolarClusterKitClassID => $"{AlterraSolarClusterModName}_Kit";
+        public static string AlterraSolarClusterModClassName => AlterraSolarClusterModName;
+        internal static string AlterraSolarClusterModPrefabName => AlterraSolarClusterModName;
+
+
+
         internal const string JetStreamT242TabID = "MT";
         internal const string JetStreamT242Description = "The T242 turbine generates power from water currents, automatically adjusting  for optimal power generation. Note that some biomes may have stronger currents than others.";
         internal const string JetStreamT242FriendlyName = "JetStreamT242";
@@ -66,6 +79,7 @@ namespace FCS_EnergySolutions.Configuration
                 new Ingredient(AlterraGenKitClassID.ToTechType(), 1),
             }
         };
+
 
         internal const string ModDescription ="";
 
@@ -222,6 +236,25 @@ namespace FCS_EnergySolutions.Configuration
             }
 
             return new PowerStorageDataEntry() { Id = id };
+        }
+
+        public static AlterraSolarClusterDataEntry GetAlterraSolarClusterSaveData(string id)
+        {
+            LoadData();
+
+            var saveData = GetSaveData();
+
+            foreach (var entry in saveData.AlterraSolarClusterEntries)
+            {
+                if (string.IsNullOrEmpty(entry.Id)) continue;
+
+                if (entry.Id == id)
+                {
+                    return entry;
+                }
+            }
+
+            return new AlterraSolarClusterDataEntry() { Id = id };
         }
     }
 }

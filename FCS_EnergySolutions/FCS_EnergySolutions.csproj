@@ -146,10 +146,18 @@
     <Compile Include="JetStreamT242\Mono\JetStreamT242PowerManager.cs" />
     <Compile Include="JetStreamT242\Mono\MotorHandler.cs" />
     <Compile Include="JetStreamT242\Mono\RotorHandler.cs" />
+    <Compile Include="Mods\AlterraSolarCluster\Buildable\AlterraSolarClusterPatcher.cs" />
+    <Compile Include="Mods\AlterraSolarCluster\Mono\AlterraSolarClusterMovementManager.cs" />
+    <Compile Include="Mods\AlterraSolarCluster\Mono\AlterraSolarClusterPowerManager.cs" />
+    <Compile Include="Mods\AlterraSolarCluster\Mono\AlterraSolarClusterController.cs" />
     <Compile Include="PowerStorage\Buildable\PowerStoragePatcher.cs" />
+    <Compile Include="PowerStorage\Mono\BatteryDummyController.cs" />
+    <Compile Include="PowerStorage\Mono\InterfaceInteraction.cs" />
     <Compile Include="PowerStorage\Mono\PowerCellCharger.cs" />
+    <Compile Include="PowerStorage\Enums\PowerChargerMode.cs" />
     <Compile Include="PowerStorage\Mono\PowerSupply.cs" />
     <Compile Include="PowerStorage\Mono\PowerStorageController.cs" />
+    <Compile Include="PowerStorage\Structs\SlotDefinition.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

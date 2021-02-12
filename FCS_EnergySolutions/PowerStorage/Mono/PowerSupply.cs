@@ -1,4 +1,5 @@
-﻿using FCSCommon.Utilities;
+﻿using FCS_EnergySolutions.PowerStorage.Enums;
+using FCSCommon.Utilities;
 using SMLHelper.V2.Json.ExtensionMethods;
 using Steamworks;
 using UnityEngine;
@@ -55,8 +56,7 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
         {
             return _mono.CalculatePowerPercentage() <= 10f || _mono.CalculateBasePower() <= 0.1f;
         }
-
-
+        
         private void AttemptDischarge()
         {
             if (nextDischargeAttemptTimer > 0f)

@@ -90,7 +90,7 @@ namespace FCS_AlterraHub.Buildables
             return GetLanguage($"{ModKey}_CardNotInSystemSettingBalanceFormat");
         }
 
-        internal static string ErrorHasOccured()
+        public static string ErrorHasOccured()
         {
             return GetLanguage($"{ModKey}_ErrorHasOccured");
         }

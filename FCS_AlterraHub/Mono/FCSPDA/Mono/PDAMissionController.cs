@@ -1,4 +1,5 @@
-﻿using FCS_AlterraHub.Managers.Mission;
+﻿using System;
+using FCS_AlterraHub.Managers.Mission;
 using FCSCommon.Helpers;
 using UnityEngine;
 using UnityEngine.UI;
@@ -46,35 +47,27 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
 
         private void UpdateRewards()
         {
-            //_creditEarnings.text = $"{_mission.CreditReward} (REWARD)";
-            //_itemEarnings.text = $"{Language.main.Get(_mission.TechTypeReward)} x1 (REWARD)";
+            _creditEarnings.text = $"{_mission.CreditReward} (REWARD)";
+            _itemEarnings.text = $"{Language.main.Get(_mission.TechTypeReward)} x1 (REWARD)";
         }
 
         private void RefreshObjectives()
         {
-            //for (int i = _missionObjectivesList.transform.childCount - 1; i > 0; i--)
-            //{
-            //    Destroy(_missionObjectivesList.transform.GetChild(i).gameObject);
-            //}
-            
-            //foreach (QuestEvent questEvent in _mission.QuestEvents)
-            //{
-            //    var prefab = Instantiate(Buildables.AlterraHub.MissionObjectiveItemPrefab);
-            //    var objectiveController = prefab.AddComponent<ObjectiveController>();
-            //    objectiveController.Initialize(questEvent);
-            //    prefab.transform.SetParent(_missionObjectivesList.transform,false);
-            //}
+            for (int i = _missionObjectivesList.transform.childCount - 1; i > 0; i--)
+            {
+                Destroy(_missionObjectivesList.transform.GetChild(i).gameObject);
+            }
+
+            foreach (MissionTask questEvent in _mission.Tasks)
+            {
+                var prefab = Instantiate(Buildables.AlterraHub.MissionObjectiveItemPrefab);
+                var objectiveController = prefab.AddComponent<ObjectiveController>();
+                objectiveController.Initialize(questEvent);
+                prefab.transform.SetParent(_missionObjectivesList.transform, false);
+            }
         }
 
-        internal void UpdateMission(Mission quest)
-        {
-            if(quest == null) return;
-            _mission = quest;
-            AddMissionToList();
-            Refresh();
-        }
-
-        private void AddMissionToList()
+        private void AddMissionToList(Mission mission)
         {
             for (int i = _missionsList.transform.childCount - 1; i > 0; i--)
             {
@@ -82,7 +75,7 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             }
             var prefab = Instantiate(Buildables.AlterraHub.MissionItemPrefab);
             var objectiveController = prefab.AddComponent<MissionItemController>();
-            objectiveController.Initialize(_mission,this);
+            objectiveController.Initialize(mission, this);
             prefab.transform.SetParent(_missionsList.transform, false);
         }
 
@@ -97,6 +90,14 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             UpdateDescription();
             UpdateRewards();
             RefreshObjectives();
+        }
+
+        public void UpdateMissions()
+        {
+            foreach (Mission mission in MissionManager.Instance.Missions)
+            {
+                AddMissionToList(mission);
+            }
         }
     }
 
@@ -119,7 +120,7 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             });
 
             var text = GetComponentInChildren<Text>();
-            text.text = quest.Description;
+            text.text = quest.Name;
             _isInitialized = true;
         }
     }

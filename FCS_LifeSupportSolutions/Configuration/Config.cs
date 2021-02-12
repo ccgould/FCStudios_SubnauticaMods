@@ -32,7 +32,7 @@ namespace FCS_LifeSupportSolutions.Configuration
         #endregion
         
         #region Small Base Oxygen
-        [Toggle("Small Base Oxygen Tank Hardcore", Tooltip = "When Affect Player Oxygen is enabled this effects how many base peices are allowed per Tank")]
+        [Toggle("Small Base Oxygen Tank Hardcore", Tooltip = "When Affect Player Oxygen is enabled this effects how many base pieces are allowed per Tank")]
         public bool SmallBaseOxygenHardcore = false;
         #endregion
 

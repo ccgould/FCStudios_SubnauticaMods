@@ -24,6 +24,12 @@ namespace FCS_ProductionSolutions.Buildable
             { $"{ModKey}_MatterAnalyzerHasItems","Please cancel the scan to deconstruct the matter analyzer."},
             { $"{ModKey}_PleaseClearReplicatorSlot","Please clear the replicator slot before trying to replicate another item."},
             { $"{ModKey}_NotBuildOnBase","Base not found. Please build on/in a base"},
+            { $"{ModKey}_HarvesterSpeedToggle","Speed Switch"},
+            { $"{ModKey}_HarvesterSpeedToggleDesc","Changes the rate of sample replication. Stages: OFF|MIN|LOW|HIGH|MAX"},
+            { $"{ModKey}_HarvesterAddSample","Sample Selector Page"},
+            { $"{ModKey}_HarvesterAddSampleDesc","Opens the dialog that allows you to choose a sample for this slot"},
+            { $"{ModKey}_HarvesterDeleteSample","Remove Sample"},
+            { $"{ModKey}_HarvesterDeleteSampleDesc","Clears this slot. Slot must be empty to clear."},
         };
 
         internal static void AdditionalPatching()
@@ -108,6 +114,36 @@ namespace FCS_ProductionSolutions.Buildable
         public static string NotBuildOnBase()
         {
             return GetLanguage($"{ModKey}_NotBuildOnBase");
+        }
+
+        public static string HarvesterSpeedToggle()
+        {
+            return GetLanguage($"{ModKey}_HarvesterSpeedToggle");
+        }
+
+        public static string HarvesterSpeedToggleDesc()
+        {
+            return GetLanguage($"{ModKey}_HarvesterSpeedToggleDesc");
+        }
+
+        public static string HarvesterAddSample()
+        {
+            return GetLanguage($"{ModKey}_HarvesterAddSample");
+        }
+
+        public static string HarvesterAddSampleDesc()
+        {
+            return GetLanguage($"{ModKey}_HarvesterAddSampleDesc");
+        }
+
+        public static string HarvesterDeleteSample()
+        {
+            return GetLanguage($"{ModKey}_HarvesterDeleteSample");
+        }
+
+        public static string HarvesterDeleteSampleDesc()
+        {
+            return GetLanguage($"{ModKey}_HarvesterDeleteSampleDesc");
         }
     }
 }

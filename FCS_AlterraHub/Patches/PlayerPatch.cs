@@ -33,7 +33,7 @@ namespace FCS_AlterraHub.Patches
 
             if (LoadSavesQuests && QPatch.MissionManagerGM != null)
             {
-                //QuestManager.Instance.Load();
+                MissionManager.Instance.Load();
                 LoadSavesQuests = false;
             }
 
@@ -76,8 +76,10 @@ namespace FCS_AlterraHub.Patches
             if (LargeWorldStreamer.main.IsWorldSettled() && FCSPDA != null && DayNightCycle.main.timePassed >= 600f)
             {
                 if (_firstMissionAdded) return;
-                //FCSPDA.MissionController.UpdateMission(QuestManager.Instance.GetActiveMission());
-                FCSPDA.MessagesController.AddNewMessage("Message From: Jack Winton (Chief Engineer)", "Jack Winton", "AH-Mission01-Pt1");
+                QuickLogger.Debug("Adding Starter Mission");
+                MissionManager.Instance?.CreateStarterMission();
+                QuickLogger.Debug("Updating PDA Missions");
+                FCSPDA.MissionController.UpdateMissions();
                 _firstMissionAdded = true;
             }
 
@@ -88,6 +90,27 @@ namespace FCS_AlterraHub.Patches
             }
         }
     }
+    
+    [HarmonyPatch(typeof(Player))]
+    [HarmonyPatch("Awake")]
+    public static class Player_Awake_Patch
+    {
+       private static void Postfix(Player __instance)
+        {
+            var f = uSkyManager.main.SunLight.transform;
+            if (f != null)
+            {
+                QuickLogger.Debug("Found Directional Light");
+                var go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                go.transform.SetParent(f.transform, false);
+                Utils.ZeroTransform(go.transform);
+                go.transform.localPosition = new Vector3(0, 0, -50000);
+                SunTarget = go.transform;
+            }
+        }
+
+       public static Transform SunTarget { get; set; }
+    }
 
     [HarmonyPatch(typeof(Player))]
     [HarmonyPatch("GetPDA")]
@@ -97,6 +120,8 @@ namespace FCS_AlterraHub.Patches
         [HarmonyPostfix]
         private static void Postfix(Player __instance)
         {
+            
+
             if(Player_Update_Patch.FCSPDA != null) return;
 
             CreateQuestManager();
@@ -157,6 +182,18 @@ namespace FCS_AlterraHub.Patches
                 Mod.LoadGamePlaySettings();
                 QPatch.MissionManagerGM = new GameObject("MissionManager").AddComponent<MissionManager>();
             }
+        }
+    }
+
+    [HarmonyPatch(typeof(Player))]
+    [HarmonyPatch("OnProtoSerialize")]
+    internal static class PlayerOnProtoSerialize_Patch
+    {
+
+        [HarmonyPostfix]
+        private static void Postfix(Player __instance)
+        {
+            Mod.SaveGamePlaySettings();
         }
     }
 }

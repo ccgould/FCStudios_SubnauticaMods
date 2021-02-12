@@ -189,6 +189,8 @@ namespace FCS_AlterraHub.Configuration
         {
             try
             {
+                QuickLogger.Debug("Saving Gameplay Settings",true);
+
                 if (GamePlaySettings == null)
                 {
                     GamePlaySettings = new FCSGamePlaySettings();
@@ -197,13 +199,19 @@ namespace FCS_AlterraHub.Configuration
 
                 if (MissionManager.Instance != null)
                 {
-                    //GamePlaySettings.Event = QuestManager.Instance.SaveEvents()?.ToList();
-                    //GamePlaySettings.CreditReward = QuestManager.Instance.quest.CreditReward;
-                    //GamePlaySettings.TechTypeReward = QuestManager.Instance.quest.TechTypeReward;
-                    //GamePlaySettings.MissionDescription = QuestManager.Instance.quest.Description;
+                    GamePlaySettings.Missions = MissionManager.Instance.Missions;
                 }
 
                 ModUtils.Save(GamePlaySettings, "settings.json", GetSaveFileDirectory(), OnSaveComplete);
+
+                if (File.Exists(Path.Combine(GetSaveFileDirectory(), "settings.json")))
+                {
+                    QuickLogger.Debug("Saved Gameplay Settings", true);
+                }
+                else
+                {
+                    QuickLogger.DebugError("Gameplay Settings Save Not Found", true);
+                }
                 return true;
             }
             catch (Exception e)
@@ -218,7 +226,7 @@ namespace FCS_AlterraHub.Configuration
             QuickLogger.Info("Loading Game Play Settings...");
             ModUtils.LoadSaveData<FCSGamePlaySettings>("settings.json", GetSaveFileDirectory(), data =>
             {
-                QuickLogger.Info($"Save Game Play Settings Loaded {data.PlayStarterMission} | {data.Event}");
+                QuickLogger.Info($"Save Game Play Settings Loaded {data.PlayStarterMission}");
                 GamePlaySettings = data;
                 Player_Update_Patch.LoadSavesQuests = true;
             });
@@ -273,6 +281,7 @@ namespace FCS_AlterraHub.Configuration
                 _saveData = newSaveData;
 
                 SaveGamePlaySettings();
+
                 ModUtils.Save(_saveData, SaveDataFilename, GetSaveFileDirectory(), OnSaveComplete);
             }
         }
@@ -393,12 +402,8 @@ namespace FCS_AlterraHub.Configuration
     public class FCSGamePlaySettings
     {
         public bool PlayStarterMission { get; set; } = true;
-        public string MissionDescription { get; set; }
-        public TechType TechTypeReward { get; set; }
-        public decimal CreditReward { get; set; }
-        public List<QuestEventData> Event { get; set; }
-        public List<EventPathData> Path { get; set; }
-        public bool IsOreConsumerFragmentSpawned { get; set; }
+        public List<Mission> Missions { get; set; } = new List<Mission>();
+        public bool IsOreConsumerFragmentSpawned { get; set; } = false;
     }
 
     public struct QuestEventData

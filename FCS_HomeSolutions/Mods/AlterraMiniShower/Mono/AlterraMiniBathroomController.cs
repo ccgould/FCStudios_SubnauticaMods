@@ -93,7 +93,9 @@ namespace FCS_HomeSolutions.Mods.AlterraMiniShower.Mono
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseEmissiveDecalsController, gameObject, new Color(0, 1, 1, 1));
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseSecondaryCol, gameObject, new Color(0.8f, 0.4933333f, 0f));
             MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseEmissiveDecalsController, gameObject,  2.5f);
-            
+
+            _colorManager.ChangeColor(new Color(0.8f, 0.4933333f, 0f), ColorTargetMode.Secondary);
+
             DeleteChairDuplicates();
 
             IsInitialized = true;

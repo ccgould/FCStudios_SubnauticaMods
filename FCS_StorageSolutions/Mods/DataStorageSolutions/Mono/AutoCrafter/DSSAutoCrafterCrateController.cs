@@ -1,4 +1,5 @@
-﻿using FCS_StorageSolutions.Mods.AlterraStorage.Buildable;
+﻿using System;
+using FCS_StorageSolutions.Mods.AlterraStorage.Buildable;
 using FCSCommon.Helpers;
 using UnityEngine;
 
@@ -11,6 +12,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
         [SerializeField]
         private Transform[] waypoints;
 
+        public Action OnPathComplete;
         public TechType TechType
         {
             get => _techType;
@@ -44,6 +46,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
         private TechType _techType;
         private DSSAutoCrafterController _controller;
         public int Amount { get; set; }
+        
 
         // Use this for initialization
         internal void Initialize( Transform[] newWaypoints,DSSAutoCrafterController controller)
@@ -90,6 +93,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
             }
             else
             {
+                OnPathComplete?.Invoke();
                 Destroy(gameObject);
             }
         }

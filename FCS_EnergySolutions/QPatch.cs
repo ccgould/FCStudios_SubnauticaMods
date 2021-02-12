@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using FCS_EnergySolutions.AlterraGen.Buildables;
+using FCS_EnergySolutions.AlterraSolarCluster.Buildables;
 using FCS_EnergySolutions.Buildable;
 using FCS_EnergySolutions.Configuration;
 using FCS_EnergySolutions.JetStreamT242.Buildables;
@@ -39,7 +40,13 @@ namespace FCS_EnergySolutions
                 alterraGen.Patch();
             }
 
-            if(Configuration.IsJetStreamT242Enabled)
+            if (Configuration.IsAlterraSolarPanelClusterEnabled)
+            {
+                var alterraSolarCluster = new AlterraSolarClusterBuildable();
+                alterraSolarCluster.Patch();
+            }
+
+            if (Configuration.IsJetStreamT242Enabled)
             {
                 var jetStreamT242 = new JetStreamT242Patcher();
                 jetStreamT242.Patch();

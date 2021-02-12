@@ -44,9 +44,10 @@ namespace FCS_AlterraHub.Mono
             {
                 QuickLogger.Debug("Getting Data from memory stream");
                 GameObject gObj = serializer.DeserializeObjectTree(memoryStream, 0);
-                QuickLogger.Debug($"De-serialized Object Stream. {gObj}");
+                QuickLogger.Debug($"De-serialized Object Stream. {gObj} | {gObj.name}");
                 TransferItems(gObj);
                 QuickLogger.Debug("Items Transferred");
+                QuickLogger.Debug($"Object location: {gObj.transform.position}");
                 GameObject.Destroy(gObj);
                 QuickLogger.Debug("Item destroyed");
             }
@@ -99,6 +100,7 @@ namespace FCS_AlterraHub.Mono
                 StoreInformationIdentifier storeInformationIdentifier = sids[i];
                 if (storeInformationIdentifier != null && storeInformationIdentifier.name.StartsWith("SerializerEmptyGameObject", StringComparison.OrdinalIgnoreCase))
                 {
+                    QuickLogger.Debug($"Duplicate: {storeInformationIdentifier.gameObject.transform.position} | {storeInformationIdentifier.gameObject.name}");
                     GameObject.Destroy(storeInformationIdentifier.gameObject);
                     QuickLogger.Debug($"Destroyed Duplicate");
                 }

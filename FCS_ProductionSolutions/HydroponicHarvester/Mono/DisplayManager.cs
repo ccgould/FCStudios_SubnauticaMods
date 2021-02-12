@@ -74,6 +74,8 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
                 var speedBTNObj = InterfaceHelpers.FindGameObject(gameObject, "SpeedBTN");
                 _speedBTN = speedBTNObj.AddComponent<HarvesterSpeedButton>();
                 _speedBTN.GrowBedManager = _mono.GrowBedManager;
+                _speedBTN.TextLineOne = AuxPatchers.HarvesterSpeedToggle();
+                _speedBTN.TextLineTwo = AuxPatchers.HarvesterSpeedToggleDesc();
 
                 var lightToggleBTNObj = GameObjectHelpers.FindGameObject(gameObject, "LightBTN");
                 _lightToggleBTN = lightToggleBTNObj.AddComponent<FCSToggleButton>();

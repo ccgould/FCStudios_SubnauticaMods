@@ -80,9 +80,10 @@ namespace FCS_AlterraHub.Configuration
         }
 
         [ConsoleCommand("CompleteMission")]
-        public static void CompleteMission()
+        public static string CompleteMission(string missionKey)
         {
-            QPatch.MissionManagerGM.CompleteCurrentMission();
+            QPatch.MissionManagerGM.CompleteCurrentMission(missionKey);
+            return $"Parameters: {missionKey}";
         }
 
     }

@@ -4,9 +4,8 @@ using System.Linq;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Mono;
-using FCS_EnergySolutions.Buildable;
 using FCS_EnergySolutions.Configuration;
-using FCSCommon.Helpers;
+using FCS_EnergySolutions.PowerStorage.Structs;
 using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
@@ -469,101 +468,5 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
         {
             return _allowedToCharge;
         }
-    }
-
-    internal class BatteryDummyController : HandTarget, IHandTarget
-    {
-        private string _slot;
-        private PowerCellCharger _charger;
-        private InventoryItem _inventoryItem;
-        private Battery _battery;
-        private readonly Color _colorEmpty = new Color(1f, 0f, 0f, 1f);
-        private readonly Color _colorHalf = new Color(1f, 1f, 0f, 1f);
-        private readonly Color _colorFull = new Color(0f, 1f, 0f, 1f);
-        private Material _emission;
-
-        public void Update()
-        {
-            UpdateVisuals();
-        }
-
-        public InventoryItem InventoryItem
-        {
-            get => _inventoryItem;
-            set
-            {
-                _inventoryItem = value;
-                _battery = value?.item.GetComponent<Battery>();
-            }
-        }
-
-        internal void Initialize(string slot, PowerCellCharger charger)
-        {
-            _slot = slot;
-            _charger = charger;
-            var m_Material = GetComponent<Renderer>();
-            foreach (var materials in m_Material.materials)
-            {
-                if (materials.name.StartsWith(ModelPrefab.EmissiveControllerMaterial,StringComparison.OrdinalIgnoreCase))
-                {
-                    _emission = materials;
-                    break;
-                }
-            }
-        }
-
-        public void OnHandHover(GUIHand hand)
-        {
-            HandReticle main = HandReticle.main;
-            main.SetInteractText("Take Battery", _battery.GetChargeValueText());
-            main.SetIcon(HandReticle.IconType.Hand);
-        }
-
-        public void OnHandClick(GUIHand hand)
-        {
-            _charger.OnUnEquip(_slot,this);
-            _battery = null;
-            InventoryItem = null;
-        }
-
-        public void IsVisible(bool value)
-        {
-            gameObject.SetActive(value);
-        }
-
-        public bool GetIsVisible()
-        {
-            return gameObject.activeSelf;
-        }
-
-        public void UpdateVisuals()
-        {
-
-            if (_emission == null || _battery == null) return;
-
-            float n = _battery._charge / _battery._capacity;
-
-            if (n >= 0f)
-            {
-                Color value = (n < 0.5f) ? Color.Lerp(_colorEmpty, _colorHalf, 2f * n) : Color.Lerp(_colorHalf, _colorFull, 2f * n - 1f);
-                MaterialHelpers.ChangeEmissionColor(_emission, value);
-                return;
-            }
-            MaterialHelpers.ChangeEmissionColor(_emission, _colorEmpty);
-        }
-    }
-
-    internal struct SlotDefinition
-    {
-        public string id;
-        public BatteryDummyController battery;
-        public Image bar;
-        public Text text;
-
-        public bool IsOccupied()
-        {
-            return battery.GetIsVisible();
-        }
-
     }
 }

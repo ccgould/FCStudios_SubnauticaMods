@@ -47,6 +47,7 @@ namespace FCS_StorageSolutions.Configuration
             { $"{ModKey}_Filters","Filters:"},
             { $"{ModKey}_PowerButton","Power Button"},
             { $"{ModKey}_RenameRemoteStorage","Rename this remote storage"},
+            { $"{ModKey}_AutocrafterItemIsBeingCrafted","Cannot deconstruct because AutoCrafter is currently crafting an item or there are items on the belt"},
         };
         
         internal static void AdditionalPatching()
@@ -275,6 +276,11 @@ namespace FCS_StorageSolutions.Configuration
         public static string RenameAlterraStorage()
         {
             return GetLanguage($"{ModKey}_RenameRemoteStorage");
+        }
+
+        public static string AutocrafterItemIsBeingCrafted()
+        {
+            return GetLanguage($"{ModKey}_AutocrafterItemIsBeingCrafted");
         }
     }
 }

@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Managers.Mission.Enumerators;
+using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
 using UnityEngine;
 
@@ -14,6 +16,9 @@ namespace FCS_AlterraHub.Managers.Mission
         public string Name { get; set; }
         public string Description { get; set; }
         public bool IsComplete { get; private set; }
+        public float Percentage { get; private set; }
+        public decimal CreditReward { get;  set; }
+        public TechType TechTypeReward { get;  set; }
         public string AudioTrackName { get; set; }
         public List<MissionTask> Tasks { get; set; } = new List<MissionTask>();
         public Action<Mission> OnMissionComplete { get; set; }
@@ -21,6 +26,8 @@ namespace FCS_AlterraHub.Managers.Mission
         public Action OnStatusChanged { get; set; }
 
         private MissionStatus _status = MissionStatus.InActive;
+        private int _repeatedTimes;
+
         public MissionStatus Status
         {
             get => _status;
@@ -35,9 +42,7 @@ namespace FCS_AlterraHub.Managers.Mission
                 }
             }
         }
-
-        public float Percentage { get; private set; }
-
+        
         private void CalculatePercentage()
         {
             var completedCount = Tasks.Count(x => x.IsCompleted);
@@ -53,7 +58,7 @@ namespace FCS_AlterraHub.Managers.Mission
 
             foreach (MissionTask task in Tasks)
             {
-                task.Owner = this;
+                //task.Owner = this;
                 task.Activate();
                 task.OnProgressChanged += Task_OnProgressChanged;
                 task.OnStatusChanged += Task_OnStatusChanged;
@@ -61,17 +66,20 @@ namespace FCS_AlterraHub.Managers.Mission
 
             Status = MissionStatus.Active;
             OnMissionStart?.Invoke(this);
+            ID = Guid.NewGuid().ToString();
         }
 
         private void Task_OnStatusChanged(TaskStatus before, TaskStatus after, MissionTask self)
         {
-            if (after == TaskStatus.Completed)
+            CalculatePercentage();
+
+            if (Percentage >= 100)
             {
                 self.OnProgressChanged -= Task_OnProgressChanged;
                 self.OnStatusChanged -= Task_OnStatusChanged;
-                IsComplete = true;
-                Status = MissionStatus.Completed;
                 OnMissionComplete?.Invoke(this);
+                CompleteAndGiveRewards();
+
             }
         }
 
@@ -87,7 +95,7 @@ namespace FCS_AlterraHub.Managers.Mission
                 Description = description, 
                 AudioClip = audioClip, 
                 Condition = condition, 
-                Owner = this
+                //Owner = this
             };
 
             task.Activate();
@@ -146,7 +154,15 @@ namespace FCS_AlterraHub.Managers.Mission
 
         public void GiveRewards()
         {
-            
+            if (TechTypeReward != TechType.None)
+            {
+                PlayerInteractionHelper.GivePlayerItem(TechTypeReward);
+            }
+
+            if (CreditReward > 0)
+            {
+                CardSystem.main.AddFinances(CreditReward);
+            }
         }
 
         public void CheckTasks(TaskCondition condition)
@@ -179,6 +195,51 @@ namespace FCS_AlterraHub.Managers.Mission
                     {
                         missionTask.ChangeProgress(1);
                     }
+                }
+            }
+        }
+
+        public bool HasMissionKey(string missionKey)
+        {
+            return Tasks.Any(x => x.key == missionKey);
+        }
+
+        public bool CompleteAndGiveRewards(bool forceComplete = false)
+        {
+            //if (CanComplete() == false && forceComplete == false)
+            //{
+            //    return false;
+            //}
+
+            //// Even when forcing the quest CAN NOT be completed if the user can't get his/her rewards.
+            //if (CanGiveRewards() == false)
+            //{
+            //    return false;
+            //}
+
+            _repeatedTimes++;
+
+            CompleteCompletableTasks(forceComplete);
+            GiveRewards();
+            IsComplete = true;
+            Status = MissionStatus.Completed;
+            //status = repeatedTimes < maxRepeatTimes ? QuestStatus.InActive : QuestStatus.Completed;
+            QuickLogger.Debug("Completed quest/achievement with ID: " + ID + " and gave rewards. Repeated quest #" + _repeatedTimes + " times. Quest status is: " + Status);
+
+            //NotifyTasksQuestCompleted();
+
+            return true;
+        }
+
+        public string ID { get; set; }
+
+        private void CompleteCompletableTasks(bool forceComplete)
+        {
+            foreach (var task in Tasks)
+            {
+                if ((task.IsCompleted == false && task.IsProgressSufficientToComplete()) || forceComplete)
+                {
+                    task.Complete(forceComplete);
                 }
             }
         }

@@ -277,6 +277,11 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
 
         public override bool CanDeconstruct(out string reason)
         {
+            if (CraftManager.IsRunning() || CraftManager.ItemsOnBelt())
+            {
+                reason = AuxPatchers.AutocrafterItemIsBeingCrafted();
+                return false;
+            }
             reason = string.Empty;
             return true;
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using FCS_AlterraHub.API;
+using FCS_AlterraHub.Buildables;
 using FCS_EnergySolutions.Configuration;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
@@ -44,19 +45,58 @@ namespace FCS_EnergySolutions.Buildable
             PowerStoragePrefab = GetPrefab(Mod.PowerStoragePrefabName);
         }
 
-        internal static GameObject GetPrefab(string prefabName)
+        internal static GameObject GetPrefab(string prefabName,bool isV2 = false)
         {
             try
             {
-                QuickLogger.Debug($"Getting Prefab: {prefabName}");
-                if (!LoadAsset(prefabName, ModBundle, out var prefabGo)) return null;
-                return prefabGo;
+                if (isV2)
+                {
+                    QuickLogger.Debug($"Getting Prefab: {prefabName}");
+                    if (!LoadAssetV2(prefabName, ModBundle, out var prefabGo)) return null;
+                    return prefabGo;
+                }
+                else
+                {
+                    QuickLogger.Debug($"Getting Prefab: {prefabName}");
+                    if (!LoadAsset(prefabName, ModBundle, out var prefabGo)) return null;
+                    return prefabGo;
+                }
             }
             catch (Exception e)
             {
                 QuickLogger.Error(e.Message);
                 return null;
             }
+        }
+
+        private static bool LoadAssetV2(string prefabName, AssetBundle assetBundle, out GameObject go, bool applyShaders = true)
+        {
+            //We have found the asset bundle and now we are going to continue by looking for the model.
+            GameObject prefab = assetBundle.LoadAsset<GameObject>(prefabName);
+
+            //If the prefab isn't null lets add the shader to the materials
+            if (prefab != null)
+            {
+                if (applyShaders)
+                {
+                    //Lets apply the material shader
+                    AlterraHub.ReplaceShadersV2(prefab, AlterraHub.BasePrimaryCol);
+                    AlterraHub.ReplaceShadersV2(prefab, AlterraHub.BaseSecondaryCol);
+                    AlterraHub.ReplaceShadersV2(prefab, AlterraHub.BaseDefaultDecals);
+                    AlterraHub.ReplaceShadersV2(prefab, AlterraHub.BaseTexDecals);
+                    AlterraHub.ReplaceShadersV2(prefab, AlterraHub.BaseEmissiveDecals);
+                    AlterraHub.ReplaceShadersV2(prefab, AlterraHub.BaseEmissiveDecalsController);
+                }
+
+                go = prefab;
+
+                QuickLogger.Debug($"{prefabName} Prefab Found!");
+                return true;
+            }
+
+            QuickLogger.Error($"{prefabName} Prefab Not Found!");
+            go = null;
+            return false;
         }
 
         private static bool LoadAsset(string prefabName, AssetBundle assetBundle, out GameObject go, bool applyShaders = true)

@@ -1,5 +1,7 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Objects;
@@ -257,7 +259,26 @@ namespace FCS_HomeSolutions.Mono.PaintTool
                 _colorTargetMode = (ColorTargetMode)_painterModeIndex;
             }
 
+            QuickLogger.Info($"[Painter Tool] Mode: {GetTargetModeString(_colorTargetMode)}",true);
+
             return true;
+        }
+
+        private string GetTargetModeString(ColorTargetMode mode)
+        {
+            switch (mode)
+            {
+                case ColorTargetMode.Primary:
+                    return "Primary Color PaintMode";
+                case ColorTargetMode.Secondary:
+                    return "Secondary Color Paint Mode";
+                case ColorTargetMode.Both:
+                    return "Both Colors Paint Mode";
+                case ColorTargetMode.Emission:
+                    return "Light Color Paint Mode";
+            }
+
+            return $"[GetTargetModeString]: {AlterraHub.ErrorHasOccured()}";
         }
 
         public override bool OnReloadDown()

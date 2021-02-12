@@ -223,7 +223,12 @@ namespace FCS_HomeSolutions.Buildables
                 if (applyShaders)
                 {
                     //Lets apply the material shader
-                    AlterraHub.ApplyShadersV2(prefab,assetBundle);
+                    AlterraHub.ReplaceShadersV2(prefab,AlterraHub.BasePrimaryCol);
+                    AlterraHub.ReplaceShadersV2(prefab,AlterraHub.BaseSecondaryCol);
+                    AlterraHub.ReplaceShadersV2(prefab,AlterraHub.BaseDefaultDecals);
+                    AlterraHub.ReplaceShadersV2(prefab,AlterraHub.BaseTexDecals);
+                    AlterraHub.ReplaceShadersV2(prefab,AlterraHub.BaseEmissiveDecals);
+                    AlterraHub.ReplaceShadersV2(prefab,AlterraHub.BaseEmissiveDecalsController);
                     QuickLogger.Debug($"Applied shaderes to prefab {prefabName}");
                 }
 

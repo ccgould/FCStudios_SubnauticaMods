@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using FCS_AlterraHub.Configuration;
+using FCS_AlterraHub.Patches;
+using FCSCommon.Extensions;
+using FCSCommon.Utilities;
 using UnityEngine;
 
 namespace FCS_AlterraHub.Managers.Mission
@@ -10,6 +14,8 @@ namespace FCS_AlterraHub.Managers.Mission
         public List<Mission> Missions { get; set; } = new List<Mission>();
 
         public static MissionManager Instance;
+
+        private FCSGamePlaySettings GamePlaySettings => Mod.GamePlaySettings;
 
         private void Awake()
         {
@@ -25,7 +31,10 @@ namespace FCS_AlterraHub.Managers.Mission
 
         internal void Load()
         {
-
+            if (Mod.GamePlaySettings.Missions.Count > 0)
+            {
+                Missions = Mod.GamePlaySettings.Missions;
+            }
         }
 
         public int GetMissionCount()
@@ -35,6 +44,8 @@ namespace FCS_AlterraHub.Managers.Mission
 
         private void Update()
         {
+           //QuickLogger.Debug($"Sun Positon Vector: X:{uSkyManager.main.SunDir.x} | Y:{uSkyManager.main.SunDir.y} | Z:{uSkyManager.main.SunDir.z}",true);
+
             foreach (Mission mission in Missions)
             {
                 if(mission.IsComplete) continue;
@@ -42,16 +53,25 @@ namespace FCS_AlterraHub.Managers.Mission
             }
         }
 
-        public void CompleteCurrentMission()
+        public void CompleteCurrentMission(string missionKey)
         {
-            
+            foreach (Mission mission in Missions)
+            {
+                if (mission.HasMissionKey(missionKey))
+                {
+                    mission.GetTask(missionKey).Complete(true);
+                    break;
+                }
+            }
+
         }
 
-        private void CreateStarterMission()
+        public void CreateStarterMission()
         {
+            if (!Mod.GamePlaySettings.PlayStarterMission) return;
             AddMission("Alterra Credit System Test","Help Alterra test the connection between you and the system at Alterra Corp",new List<MissionTask>
             {
-                new MissionTask(Guid.NewGuid().ToString(),1)
+                new MissionTask("Ore Consumer Scan",1)
                 {
                     Condition = new TaskCondition
                     {
@@ -61,7 +81,7 @@ namespace FCS_AlterraHub.Managers.Mission
                     Description = "Scan the Ore Consumer in the Jelly Caves biome by the abandoned Degasi Base.",
                     SelfValidate = true
                 },
-                new MissionTask(Guid.NewGuid().ToString(),1)
+                new MissionTask("Build AlterraHub",1)
                 {
                     Condition = new TaskCondition
                     {
@@ -71,7 +91,7 @@ namespace FCS_AlterraHub.Managers.Mission
                     Description = "Build an AlterraHub at your base.",
                     SelfValidate = true
                 },
-                new MissionTask(Guid.NewGuid().ToString(),1)
+                new MissionTask("Create Alterra Account",1)
                 {
                     Condition = new TaskCondition
                     {
@@ -80,7 +100,7 @@ namespace FCS_AlterraHub.Managers.Mission
                     Description = "Create an Alterra Account",
                     SelfValidate = true
                 },
-                new MissionTask(Guid.NewGuid().ToString(),2)
+                new MissionTask("Build two Ore Consumers",2)
                 {
                     Condition = new TaskCondition
                     {
@@ -90,7 +110,7 @@ namespace FCS_AlterraHub.Managers.Mission
                     Description = "Build two ore consumers",
                     SelfValidate = true
                 },
-                new MissionTask(Guid.NewGuid().ToString(),10)
+                new MissionTask("Process 10 Diamonds",10)
                 {
                     Condition = new TaskCondition
                     {
@@ -101,7 +121,7 @@ namespace FCS_AlterraHub.Managers.Mission
                     },
                     Description = "Process 10 Diamonds in the Ore Consumer",
                 },
-                new MissionTask(Guid.NewGuid().ToString(),10)
+                new MissionTask("Process 10 Gold",10)
                 {
                     Condition = new TaskCondition
                     {
@@ -112,10 +132,13 @@ namespace FCS_AlterraHub.Managers.Mission
                     },
                     Description = "Process 10 Gold in the Ore Consumer",
                 },
-            });
+            }, "AlterraStorage_Kit".ToTechType(),500000);
+            QuickLogger.Debug("Adding Missions");
+            Player_Update_Patch.FCSPDA.MessagesController.AddNewMessage("Message From: Jack Winton (Chief Engineer)", "Jack Winton", "AH-Mission01-Pt1");
+            Mod.GamePlaySettings.PlayStarterMission = false;
         }
 
-        public void AddMission(string missionTitle, string missionDescription, List<MissionTask> tasks)
+        public Mission AddMission(string missionTitle, string missionDescription, List<MissionTask> tasks,TechType techReward = TechType.None, decimal creditReward = 0)
         {
             var mission = new Mission
             {
@@ -126,9 +149,14 @@ namespace FCS_AlterraHub.Managers.Mission
 
             mission.Load();
 
+            mission.TechTypeReward = techReward;
+            mission.CreditReward = creditReward;
+
             //TODO Deal with mission complete
 
             Missions.Add(mission);
+
+            return mission;
         }
 
         public void NotifyDeviceAction(TechType deviceTechType, TechType techType, DeviceAction deviceAction)

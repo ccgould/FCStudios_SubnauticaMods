@@ -33,7 +33,7 @@ namespace FCS_AlterraHub.Managers.Mission
         
         public event StatusChanged OnStatusChanged;
 
-        public virtual Mission Owner { get; set; }
+        //public virtual Mission Owner { get; set; }
 
 
         public MissionTask(string key, float progressCap)
@@ -129,7 +129,7 @@ namespace FCS_AlterraHub.Managers.Mission
 
             GiveRewards();
 
-            QuickLogger.Debug($"Completed task: \"{key}\" on {Owner.GetType().Name} \"{Owner.Name}\"",true);
+            //QuickLogger.Debug($"Completed task: \"{key}\" on {Owner.GetType().Name} \"{Owner.Name}\"",true);
             return IsCompleted;
         }
 
@@ -140,11 +140,11 @@ namespace FCS_AlterraHub.Managers.Mission
                 return false;
             }
 
-            var s = Owner.CanGiveRewards();
-            if (s == false)
-            {
-                return s;
-            }
+            //var s = Owner.CanGiveRewards();
+            //if (s == false)
+            //{
+            //    return s;
+            //}
             
             return true;
         }
@@ -157,7 +157,6 @@ namespace FCS_AlterraHub.Managers.Mission
             }
 
             _gaveRewards = true;
-            Owner.GiveRewards();
             return true;
         }
 

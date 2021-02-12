@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using FCS_AlterraHub.API;
 using FCS_AlterraHub.Configuration;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
@@ -10,6 +12,8 @@ namespace FCS_AlterraHub.Buildables
     public partial class AlterraHub
     {
         private static bool _initialized;
+        private static Dictionary<string,Material> _v2Materials = new Dictionary<string, Material>();
+        private static bool _v2MaterialsLoaded;
         internal static GameObject ColorItemPrefab { get; set; }
         internal static GameObject ItemPrefab { get; set; }
 
@@ -41,6 +45,7 @@ namespace FCS_AlterraHub.Buildables
         public const string BaseDetail = "fcs01_D";
         public const string BaseNormal = "fcs01_N";
         public const string BaseEmission = "fcs01_E";
+        public const string BaseSpec = "fcs01_s";
         
         internal static string BodyMaterial => $"fcs{Mod.ModName}_COL";
         internal static string DecalMaterial => $"fcs{Mod.ModName}_DECALS";
@@ -224,6 +229,86 @@ namespace FCS_AlterraHub.Buildables
             MaterialHelpers.ApplyAlphaShader(BaseEmissiveDecalsController, prefab);
             MaterialHelpers.ApplyEmissionShader(BaseEmissiveDecalsController, BaseEmission, prefab, bundle, Color.white);
             #endregion
+        }
+
+        public static void LoadV2Materials()
+        {
+            if (_v2MaterialsLoaded) return;
+
+            if (QPatch.GlobalBundle == null)
+            {
+                QPatch.GlobalBundle = FCSAssetBundlesService.PublicAPI.GetAssetBundleByName(Mod.AssetBundleName);
+            }
+
+            if (QPatch.GlobalBundle == null)
+            {
+                QuickLogger.Error($"[LoadV2Materials] GlobalBundle returned null stopping process");
+                return;
+            }
+
+            #region BasePrimaryCol
+            Material basePrimaryCol = QPatch.GlobalBundle.LoadAsset<Material>(BasePrimaryCol);
+            MaterialHelpers.CreateV2NormalMaterial(basePrimaryCol, BaseNormal, QPatch.GlobalBundle);
+            _v2Materials.Add(BasePrimaryCol, basePrimaryCol);
+            #endregion
+
+            #region BaseSecondaryCol
+            Material baseSecondaryCol = QPatch.GlobalBundle.LoadAsset<Material>(BaseSecondaryCol);
+            MaterialHelpers.CreateV2NormalMaterial(baseSecondaryCol, BaseNormal, QPatch.GlobalBundle);
+            _v2Materials.Add(BaseSecondaryCol, baseSecondaryCol);
+            #endregion
+
+            #region BaseDefaultDecals
+            Material baseDefaultDecals = QPatch.GlobalBundle.LoadAsset<Material>(BaseDefaultDecals);
+            MaterialHelpers.CreateV2NormalMaterial(baseDefaultDecals, BaseNormal, QPatch.GlobalBundle);
+            MaterialHelpers.CreateV2ApplyAlphaMaterial(baseDefaultDecals, QPatch.GlobalBundle);
+            MaterialHelpers.CreateV2Specular(baseDefaultDecals,BaseSpec,1,3,QPatch.GlobalBundle);
+            _v2Materials.Add(BaseDefaultDecals, baseDefaultDecals);
+            #endregion
+
+            #region BaseTexDecals
+            Material baseTexDecals = QPatch.GlobalBundle.LoadAsset<Material>(BaseTexDecals);
+            MaterialHelpers.CreateV2NormalMaterial(baseTexDecals, BaseNormal, QPatch.GlobalBundle);
+            MaterialHelpers.CreateV2ApplyAlphaMaterial(baseTexDecals, QPatch.GlobalBundle);
+            _v2Materials.Add(BaseTexDecals, baseTexDecals);
+            #endregion
+
+            #region BaseEmissiveDecals
+            Material baseEmissiveDecals = QPatch.GlobalBundle.LoadAsset<Material>(BaseEmissiveDecals);
+            MaterialHelpers.CreateV2NormalMaterial(baseEmissiveDecals, BaseNormal, QPatch.GlobalBundle);
+            MaterialHelpers.CreateV2ApplyAlphaMaterial(baseEmissiveDecals, QPatch.GlobalBundle);
+            MaterialHelpers.CreateV2EmissionMaterial(baseEmissiveDecals, BaseEmission, QPatch.GlobalBundle, Color.white);
+            _v2Materials.Add(BaseEmissiveDecals, baseEmissiveDecals);
+            #endregion
+
+            #region BaseEmissiveDecals
+            Material baseEmissiveDecalsController = QPatch.GlobalBundle.LoadAsset<Material>(BaseEmissiveDecalsController);
+            MaterialHelpers.CreateV2NormalMaterial(baseEmissiveDecalsController, BaseNormal, QPatch.GlobalBundle);
+            MaterialHelpers.CreateV2ApplyAlphaMaterial(baseEmissiveDecalsController, QPatch.GlobalBundle);
+            MaterialHelpers.CreateV2EmissionMaterial(baseEmissiveDecalsController, BaseEmission, QPatch.GlobalBundle, Color.white);
+            _v2Materials.Add(BaseEmissiveDecalsController, baseEmissiveDecalsController);
+            #endregion
+
+            _v2MaterialsLoaded = true;
+
+        }
+
+
+        public static void ReplaceShadersV2(GameObject prefab,string materialName)
+        {
+            LoadV2Materials();
+            Renderer[] renderers = prefab.GetComponentsInChildren<Renderer>(true);
+            foreach (Renderer renderer in renderers)
+            {
+                for (var index = 0; index < renderer.materials.Length; index++)
+                {
+                    Material material = renderer.materials[index];
+                    if (material.name.StartsWith(materialName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        renderer.materials[index] = _v2Materials[materialName];
+                    }
+                }
+            }
         }
     }
 }

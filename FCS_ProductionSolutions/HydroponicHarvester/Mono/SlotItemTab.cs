@@ -1,5 +1,6 @@
 ﻿using System;
 using FCS_AlterraHub.Mono;
+using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.HydroponicHarvester.Models;
 using FCSCommon.Helpers;
@@ -30,6 +31,8 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
             addDnaBtn.STARTING_COLOR = Color.gray;
             addDnaBtn.HOVER_COLOR = Color.white;
             addDnaBtn.OnButtonClick += (s, o) => { display.OpenDnaSamplesPage(this); };
+            addDnaBtn.TextLineOne = AuxPatchers.HarvesterAddSample();
+            addDnaBtn.TextLineTwo = AuxPatchers.HarvesterAddSampleDesc();
             
             var removeDnaBtn = GameObjectHelpers.FindGameObject(gameObject.transform.parent.gameObject, "RemoveDNABTN").AddComponent<InterfaceButton>();
             removeDnaBtn.STARTING_COLOR = Color.gray;
@@ -42,6 +45,8 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
                     Clear();
                 }
             };
+            removeDnaBtn.TextLineOne = AuxPatchers.HarvesterDeleteSample();
+            removeDnaBtn.TextLineTwo = AuxPatchers.HarvesterDeleteSampleDesc();
 
             _amount = InterfaceHelpers.FindGameObject(gameObject.transform.parent.gameObject, "Amount").GetComponent<Text>();
             UpdateCount();

@@ -7,13 +7,13 @@ using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_EnergySolutions.Buildable;
 using FCS_EnergySolutions.Configuration;
+using FCS_EnergySolutions.PowerStorage.Enums;
 using FCSCommon.Enums;
 using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Json.ExtensionMethods;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace FCS_EnergySolutions.PowerStorage.Mono
@@ -29,7 +29,7 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
         private FCSToggleButton _chargeModeToggle;
         private FCSToggleButton _autoModeToggle;
         private FCSToggleButton _disChargeModeToggle;
-        private InterfaceInteration _interactionChecker;
+        private InterfaceInteraction _interactionChecker;
         private PowerChargerMode _mode;
         private ProtobufSerializer _serializer;
         internal Image PowerTotalMeterRing { get; set; }
@@ -146,7 +146,7 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
             PowerTotalMeterPercent = GameObjectHelpers.FindGameObject(gameObject, "Percentage").GetComponent<Text>();
             PowerTotalMeterTotal = GameObjectHelpers.FindGameObject(gameObject, "BatteryTotal").GetComponent<Text>();
 
-            _interactionChecker = gameObject.GetComponentInChildren<Canvas>().gameObject.AddComponent<InterfaceInteration>();
+            _interactionChecker = gameObject.GetComponentInChildren<Canvas>().gameObject.AddComponent<InterfaceInteraction>();
 
             var chargeMode = GameObjectHelpers.FindGameObject(gameObject, "ChargeMode");
             _chargeModeToggle = chargeMode.gameObject.AddComponent<FCSToggleButton>();
@@ -325,33 +325,6 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
         public float CalculateBasePower()
         {
            return Manager.GetPower() - _powercellSupply.GetPower();
-        }
-    }
-
-    internal enum PowerChargerMode
-    {
-        ChargeMode = 0,
-        DischargeMode = 1,
-        Auto = 2
-    }
-
-    internal class InterfaceInteration : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
-    {
-        public bool IsInRange { get; set; }
-
-        public void OnPointerEnter(PointerEventData eventData)
-        {
-            IsInRange = true;
-        }
-
-        public void OnPointerExit(PointerEventData eventData)
-        {
-            IsInRange = false;
-        }
-
-        private void OnDisable()
-        {
-            IsInRange = false;
         }
     }
 }

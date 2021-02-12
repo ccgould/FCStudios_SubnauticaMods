@@ -115,9 +115,9 @@ namespace FCS_AlterraHub.Mono
             switch (InteractionRequirement)
             {
                 case InteractionRequirement.IsInside:
-                    return Player.main.IsInBase();
+                    return Player.main.IsInBase() || Player.main.IsInSub();
                 case InteractionRequirement.IsOutSide:
-                    return !Player.main.IsInBase();
+                    return !Player.main.IsInBase() || !Player.main.IsInSub() || !Player.main.IsInClawExosuit();
                 case InteractionRequirement.None:
                     return true;
                 default:

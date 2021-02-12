@@ -106,9 +106,36 @@ namespace FCSCommon.Helpers
                 }
             }
         }
+        
+        /// <summary>
+        /// Applies the properties for the MarmosetUBER shader that has a emission texture.
+        /// </summary>
+        /// <param name="materialName">The name of the material to look for on the object.</param>
+        /// <param name="textureName">The name of the texture to look for in the assetBundle.</param>
+        /// <param name="gameObject">The game object to process.</param>
+        /// <param name="assetBundle">The assetBundle to search in.</param>
+        /// <param name="emissionColor">The color to use on the emission material.</param>
+        internal static Material CreateV2EmissionMaterial(Material mat, string textureName, AssetBundle assetBundle, Color emissionColor, float emissionMuli = 1.0f)
+        {
+            var shader = Shader.Find("MarmosetUBER");
+
+            if (mat != null)
+            {
+
+                mat.shader = shader;
+                mat.EnableKeyword("MARMO_EMISSION");
+                mat.SetTexture("_Illum", FindTexture2D(textureName, assetBundle));
+                mat.SetFloat("_EnableGlow", 1);
+                mat.SetFloat("_EnableLighting", 1);
+                mat.SetColor("_GlowColor", emissionColor);
+            }
+            return mat;
+        }
+
+
 
         /// <summary>
-        /// Applies the properties for the MarmosetUBER shader that has a metallic texture.
+        /// Applies the properties for the MarmosetUBER shader that has a normal texture.
         /// </summary>
         /// <param name="materialName">The name of the material to look for on the object.</param>
         /// <param name="textureName">The name of the texture to look for in the assetBundle.</param>
@@ -133,6 +160,31 @@ namespace FCSCommon.Helpers
                 }
             }
         }
+
+
+        /// <summary>
+        /// Applies the properties for the MarmosetUBER shader that has a normal texture.
+        /// </summary>
+        /// <param name="materialName">The name of the material to look for on the object.</param>
+        /// <param name="textureName">The name of the texture to look for in the assetBundle.</param>
+        /// <param name="gameObject">The game object to process.</param>
+        /// <param name="assetBundle">The assetBundle to search in.</param>
+        internal static Material CreateV2NormalMaterial(Material mat, string textureName, AssetBundle assetBundle)
+        {
+            var shader = Shader.Find("MarmosetUBER");
+
+            if (mat != null)
+            {
+                mat.shader = shader;
+
+                mat.EnableKeyword("_NORMALMAP");
+
+                mat.SetTexture("_BumpMap", FindTexture2D(textureName, assetBundle));
+            }
+
+            return mat;
+        }
+
 
         internal static bool ChangeMaterialColor(string materialName, GameObject gameObject, Color color, Color color2 = default, Color color3 = default)
         {
@@ -244,7 +296,51 @@ namespace FCSCommon.Helpers
                     }
                 }
             }
+        }        /// <summary>
+        
+        internal static Material CreateV2Specular(Material mat, string textureName, float specInt, float shininess, AssetBundle assetBundle)
+        {
+            var shader = Shader.Find("MarmosetUBER");
+            if (mat != null)
+            {
+                mat.shader = shader;
+
+                mat.EnableKeyword("MARMO_SPECMAP");
+                  
+                mat.SetColor("_SpecColor", new Color(0.796875f, 0.796875f, 0.796875f, 0.796875f));
+                mat.SetFloat("_SpecInt", specInt);
+                mat.SetFloat("_Shininess", shininess);
+
+                var texture = FindTexture2D(textureName, assetBundle);
+                if (texture != null)
+                {
+                    mat.SetTexture("_SpecTex", texture);
+                }
+
+                mat.SetFloat("_Fresnel", 0f);
+                mat.SetVector("_SpecTex_ST", new Vector4(1.0f, 1.0f, 0.0f, 0.0f));
+            }
+
+            return mat;
         }
+
+        internal static void ChangeSpecSettings(string materialName, string textureName, GameObject gameObject, float specInt, float shininess)
+        {
+            var shader = Shader.Find("MarmosetUBER");
+            Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>(true);
+            foreach (Renderer renderer in renderers)
+            {
+                foreach (Material material in renderer.materials)
+                {
+                    if (material.name.StartsWith(materialName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        material.SetFloat("_SpecInt", specInt);
+                        material.SetFloat("_Shininess", shininess);
+                    }
+                }
+            }
+        }
+
 
         /// <summary>
         /// Adds glass material to the gameobject.
@@ -442,6 +538,19 @@ namespace FCSCommon.Helpers
                     }
                 }
             }
+        }
+
+
+        internal static Material CreateV2ApplyAlphaMaterial(Material mat, AssetBundle assetBundle)
+        {
+            var shader = Shader.Find("MarmosetUBER");
+            if (mat != null)
+            {
+                mat.shader = shader;
+                mat.EnableKeyword("MARMO_ALPHA_CLIP");
+            }
+
+            return mat;
         }
 
         [Obsolete("This method will be removed in upcoming update please use MaterialHelpers.ChangeMaterialColor instead.")]

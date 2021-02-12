@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Mono;
 using FCS_StorageSolutions.Configuration;
 using FCS_StorageSolutions.Mods.AlterraStorage.Buildable;
 using FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server;
+using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
@@ -28,7 +30,33 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         private void Start()
         {
             _storage?.CleanUpDuplicatedStorageNoneRoutine();
+            CleanDummyServers();
         }
+
+        private void CleanDummyServers()
+        {
+            var g = GameObject.FindObjectsOfType<DSSServerController>();
+
+            var toDelete = new List<GameObject>();
+
+            foreach (DSSServerController ds in g)
+            {
+                if (ds.gameObject.transform.parent.name.Equals("SerializerEmptyGameObject"))
+                {
+                    if (ds.gameObject.transform.parent.parent == null)
+                    {
+                        toDelete.Add(ds.gameObject.transform.parent.gameObject);
+                    }
+                }
+
+            }
+
+            foreach (GameObject o in toDelete)
+            {
+                Destroy(o);
+            }
+        }
+
 
         private void Update()
         {
