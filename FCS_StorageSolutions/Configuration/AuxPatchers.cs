@@ -48,6 +48,7 @@ namespace FCS_StorageSolutions.Configuration
             { $"{ModKey}_PowerButton","Power Button"},
             { $"{ModKey}_RenameRemoteStorage","Rename this remote storage"},
             { $"{ModKey}_AutocrafterItemIsBeingCrafted","Cannot deconstruct because AutoCrafter is currently crafting an item or there are items on the belt"},
+            { $"{ModKey}_OpenItemTransferUnit","Click to Add/Remove connections  between this base and devices"},
         };
         
         internal static void AdditionalPatching()
@@ -281,6 +282,11 @@ namespace FCS_StorageSolutions.Configuration
         public static string AutocrafterItemIsBeingCrafted()
         {
             return GetLanguage($"{ModKey}_AutocrafterItemIsBeingCrafted");
+        }
+
+        public static string OpenItemTransferUnit()
+        {
+            return GetLanguage($"{ModKey}_OpenItemTransferUnit");
         }
     }
 }

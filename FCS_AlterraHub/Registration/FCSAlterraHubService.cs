@@ -31,10 +31,11 @@ namespace FCS_AlterraHub.Registration
         void RegisterTechLight(TechLight techLight);
         bool ChargeAccount(decimal amount);
         bool IsCreditAvailable(decimal amount);
-        KeyValuePair<string, FcsDevice> FindDevice(string prefabID);
+        KeyValuePair<string, FcsDevice> FindDevice(string unitID);
         void AddBuiltTech(TechType techType);
         int GetTechBuiltCount(TechType techType);
         void RemoveBuiltTech(TechType techType);
+        TechType GetDeviceTechType(string deviceId);
     }
 
     internal interface IFCSAlterraHubServiceInternal
@@ -366,6 +367,11 @@ namespace FCS_AlterraHub.Registration
                     _globallyBuiltTech.Remove(techType);
                 }
             }
+        }
+
+        public TechType GetDeviceTechType(string deviceId)
+        {
+            return FindDevice(deviceId).Value.GetTechType();
         }
     }
 }

@@ -184,6 +184,8 @@
     <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\NetworkDialogController.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\VehicleButton.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\VehicleItemButton.cs" />
+    <Compile Include="Mods\ItemTransferUnit\Buildable\ItemTransferUnitPatch.cs" />
+    <Compile Include="Mods\ItemTransferUnit\Mono\ItemTransferUnitController.cs" />
     <Compile Include="Patches\StorageContainerPatches.cs" />
     <Compile Include="Patches\ToolTipFactory_Patch.cs" />
     <Compile Include="Patches\VehicleDockingBayPatcher.cs" />

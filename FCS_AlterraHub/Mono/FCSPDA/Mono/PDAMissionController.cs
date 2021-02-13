@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace FCS_AlterraHub.Mono.FCSPDA.Mono
 {
-    internal class PDAMissionController : MonoBehaviour
+    public class PDAMissionController : MonoBehaviour
     {
         private Text _missionCounter;
         private GameObject _missions;

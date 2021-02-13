@@ -7,10 +7,14 @@ using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Mono.Controllers;
 using FCS_AlterraHub.Patches;
 using FCS_AlterraHub.Registration;
+using FCSCommon.Extensions;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
+using Steamworks;
 using UnityEngine;
+using UnityEngine.Assertions.Must;
+using UnityEngine.Experimental.PlayerLoop;
 
 namespace FCS_AlterraHub.Mono
 {
@@ -93,11 +97,62 @@ namespace FCS_AlterraHub.Mono
             _registeredDevices = new Dictionary<string, FcsDevice>();
             _baseTechLights = new Dictionary<string, TechLight>();
             Initialize(habitat);
-            Player_Update_Patch.OnPlayerUpdate += PowerConsumption;
-            Player_Update_Patch.OnPlayerUpdate += PowerStateCheck;
+            Player_Update_Patch.OnPlayerUpdate += Update;
 
         }
-        
+
+        private void Update()
+        {
+            _timeLeft -= DayNightCycle.main.deltaTime;
+            
+            if (_timeLeft <= 0)
+            {
+                PowerConsumption();
+                PerformOperations();
+                _timeLeft = 1f;
+            }
+            
+            PowerStateCheck();
+        }
+
+        private void PerformOperations()
+        {
+            if (_registeredDevices == null) return;
+            foreach (BaseTransferOperation operation in _baseTransferOperations)
+            {
+                if(operation.Device == null || !operation.Device.IsOperational) continue;
+
+                if (operation.IsPullOperation)
+                {
+                    PerformPullOperation(operation);
+                }
+                else
+                {
+                    if (HasItem(operation.TransferItem))
+                    {
+                        if (operation.Device.CanBeStored(1, operation.TransferItem))
+                        {
+                            operation.Device.AddItemToContainer(TakeItem(operation.TransferItem).ToInventoryItem());
+                        }
+                    }
+                }
+            }
+        }
+
+        private void PerformPullOperation(BaseTransferOperation operation)
+        {
+            var randomItem = operation.Device.GetRandomTechTypeFromDevice();
+            if (randomItem != TechType.None)
+            {
+                if (!IsAllowedToAdd(randomItem, false)) return;
+                var item = operation.Device.RemoveItemFromDevice(randomItem);
+                if (item != null)
+                {
+                    AddItemToContainer(item.ToInventoryItem());
+                }
+            }
+        }
+
         private void Initialize(SubRoot habitat)
         {
             _savedData = Mod.GetBaseSaveData(BaseID);
@@ -295,9 +350,6 @@ namespace FCS_AlterraHub.Mono
         private void PowerConsumption()
         {
             if (_registeredDevices == null) return;
-            _timeLeft -= DayNightCycle.main.deltaTime;
-            if (_timeLeft <= 0)
-            {
                 //Take power from the base
                 for (int i = _registeredDevices.Count - 1; i >= 0; i--)
                 {
@@ -308,9 +360,6 @@ namespace FCS_AlterraHub.Mono
                         Habitat.powerRelay.ConsumeEnergy(device.Value.GetPowerUsage() * num, out float amountConsumed);
                     }
                 }
-
-                _timeLeft = 1f;
-            }
         }
 
         public bool HasEnoughPower(float power)
@@ -579,6 +628,7 @@ namespace FCS_AlterraHub.Mono
         private Dictionary<TechType, int> _item = new Dictionary<TechType, int>();
         private BaseSaveData _savedData;
         private bool _hasBreakerTripped;
+        private List<BaseTransferOperation> _baseTransferOperations = new List<BaseTransferOperation>();
 
         public Dictionary<TechType, int> GetItemsWithin(StorageType type = StorageType.All)
         {
@@ -1093,9 +1143,7 @@ namespace FCS_AlterraHub.Mono
                 }
             }
         }
-
         
-
         public float GetRequiredTankCount(bool hardcore)
         {
             float bigRooms = 0;
@@ -1140,6 +1188,57 @@ namespace FCS_AlterraHub.Mono
         public float GetBasePowerCapacity()
         {
             return Habitat?.powerRelay.GetMaxPower() ?? 0;
+        }
+
+        public List<BaseTransferOperation> GetBaseOperations()
+        {
+            return _baseTransferOperations;
+        }
+
+        public void AddBaseTransferItem(BaseTransferOperation operation)
+        {
+            var result = _baseTransferOperations.Any(x => x.IsSimilar(operation));
+            if (result)
+            {
+                QuickLogger.Info(Buildables.AlterraHub.OperationExistsFormat(operation.DeviceId));
+                return;
+            }
+
+            _baseTransferOperations.Add(operation);
+        }
+
+        public void RemoveBaseTransferItem(BaseTransferOperation operation)
+        {
+            _baseTransferOperations.Remove(operation);
+        }
+    }
+
+    public class BaseTransferOperation
+    {
+        private FcsDevice _device;
+        public string DeviceId { get; set; }
+        public TechType TransferItem { get; set; }
+        public int Amount { get; set; }
+        public bool IsPullOperation { get; set; }
+
+        public FcsDevice Device
+        {
+            get
+            {
+                if (_device == null && !string.IsNullOrWhiteSpace(DeviceId))
+                {
+                    _device = FCSAlterraHubService.PublicAPI.FindDevice(DeviceId).Value;
+                }
+                return _device;
+            }
+        }
+
+        public bool IsSimilar(BaseTransferOperation operation)
+        {
+            return operation.DeviceId == DeviceId &&
+                   operation.TransferItem == TransferItem &&
+                   operation.Amount == Amount &&
+                   operation.IsPullOperation;
         }
     }
 

@@ -59,6 +59,7 @@ namespace FCS_AlterraHub.Buildables
             { $"{ModKey}_DeviceOn","Device ON"},
             { $"{ModKey}_DeviceOff","Device OFF"},
             { $"{ModKey}_PDAButtonPressFormat","({0}) Press to open Alterra Hub PDA"},
+            { $"{ModKey}_OperationExists","Similar operation already exists for device {0}"},
             { $"{ModKey}_NoSpaceAccountCreation","To complete your account creation, you need at least one slot to receive your debit card. Please try again once one inventory slot is available in your inventory."},
         };
         
@@ -329,6 +330,11 @@ namespace FCS_AlterraHub.Buildables
         public static string MissionButtonPressFormat(KeyCode key)
         {
             return string.Format(GetLanguage($"{ModKey}_PDAButtonPressFormat"), key.ToString());
+        }
+
+        public static string OperationExistsFormat(string deviceId)
+        {
+            return string.Format(GetLanguage($"{ModKey}_OperationExists"),deviceId);
         }
     }
 }

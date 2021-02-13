@@ -8,6 +8,7 @@ using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono.Controllers;
 using FCS_AlterraHub.Patches;
+using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
@@ -22,7 +23,7 @@ using WorldHelpers = FCS_AlterraHub.Helpers.WorldHelpers;
 
 namespace FCS_AlterraHub.Mono.FCSPDA.Mono
 {
-    internal class FCSPDAController : MonoBehaviour, IFCSDisplay
+    public class FCSPDAController : MonoBehaviour, IFCSDisplay
     {
         private PDA _pda;
         private int prevQuickSlot;
@@ -63,7 +64,37 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
 
         public bool isFocused => this.ui != null && this.ui.focused;
 
-        public uGUI_InputGroup ui
+        #region SINGLETON PATTERN
+        private static FCSPDAController _instance;
+        private GameObject _operationsScrollView;
+        private Transform _operationsScrollViewTrans;
+        private GameObject _itemTransferOperations;
+        private GameObject _addNewOperation;
+        private InputField _deviceIdInput;
+        private FcsDevice _selectedDevice;
+        private Toggle _isPullOperationToggle;
+        private TechType _selectedTransferItem;
+        private Text _itemName;
+
+        public static FCSPDAController Instance => _instance;
+
+
+        private void Awake()
+        {
+            if (_instance != null && _instance != this)
+            {
+                Destroy(this.gameObject);
+            }
+            else
+            {
+                _instance = this;
+            }
+        }
+    
+    #endregion
+
+
+    public uGUI_InputGroup ui
         {
             get
             {
@@ -191,6 +222,40 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
                 Close();
             });
 
+            _itemName = GameObjectHelpers.FindGameObject(gameObject, "ItemName").GetComponent<Text>();
+
+            var chooseItemButton = GameObjectHelpers.FindGameObject(gameObject, "ChooseItemButton").GetComponent<Button>();
+            chooseItemButton.onClick.AddListener((() =>
+            {
+                //Add dump Button
+                _selectedTransferItem = TechType.Lubricant;
+                _itemName.text = Language.main.Get(_selectedTransferItem);
+            }));
+
+            _addNewOperation = GameObjectHelpers.FindGameObject(gameObject, "AddNewOperation");
+
+            var addOperationsButton = GameObjectHelpers.FindGameObject(gameObject, "AddOperationButton");
+            var addOperationsBTN = addOperationsButton.GetComponent<Button>();
+            addOperationsBTN.onClick.AddListener(() =>
+            {
+                _addNewOperation.SetActive(true);
+            });
+
+            var closeAddOperationsButton = GameObjectHelpers.FindGameObject(gameObject, "AddNewOperationCloseButton");
+            var closeAddOperationsBTN = closeAddOperationsButton.GetComponent<Button>();
+            closeAddOperationsBTN.onClick.AddListener(CloseAddNewOperation);
+
+            var confirmButton = GameObjectHelpers.FindGameObject(gameObject, "ConfirmButton");
+            var confirmBTN = confirmButton.GetComponent<Button>();
+            confirmBTN.onClick.AddListener(() =>
+            {
+                var result = ValidateInformation();
+                if (result)
+                {
+                    CloseAddNewOperation();
+                }
+            });
+
             var settingsButton = GameObjectHelpers.FindGameObject(gameObject, "SettingsButton").GetComponent<Button>();
             settingsButton.onClick.AddListener(() =>
             {
@@ -240,6 +305,13 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             _inventoryGrid.OnLoadDisplay += OnLoadItemsGrid;
             _inventoryGrid.Setup(15, gameObject, Color.gray, Color.white, OnButtonClick);
 
+            _itemTransferOperations = GameObjectHelpers.FindGameObject(gameObject, "ItemTransferOperations");
+
+            _deviceIdInput = GameObjectHelpers.FindGameObject(gameObject, "DeviceIdInput").GetComponent<InputField>();
+
+            _operationsScrollView = GameObjectHelpers.FindGameObject(gameObject, "OperationsContent");
+            _operationsScrollViewTrans = _operationsScrollView.transform;
+
             _clock = GameObjectHelpers.FindGameObject(gameObject, "Clock").GetComponent<Text>();
 
             MaterialHelpers.ChangeEmissionColor(Buildables.AlterraHub.BaseEmissiveDecalsController, gameObject,
@@ -248,12 +320,43 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             _basePaginatorController = GameObjectHelpers.FindGameObject(gameObject, "BasePaginator").AddComponent<PaginatorController>();
             _basePaginatorController.Initialize(this);
 
+            _isPullOperationToggle = GameObjectHelpers.FindGameObject(gameObject, "IsPullOperationToggle").GetComponent<Toggle>();
+
             _inventoryPaginatorController = GameObjectHelpers.FindGameObject(gameObject, "InventoryPaginator").AddComponent<PaginatorController>();
             _inventoryPaginatorController.Initialize(this);
 
             _addtempMessage = false;
 
             InvokeRepeating(nameof(UpdateDisplay), .5f, .5f);
+        }
+
+        private void CloseAddNewOperation()
+        {
+            _selectedDevice = null;
+            _selectedTransferItem = TechType.None;
+            _addNewOperation.SetActive(false);
+        }
+
+        private bool ValidateInformation()
+        {
+            QuickLogger.Debug("1");
+            var device = FCSAlterraHubService.PublicAPI.FindDevice(_deviceIdInput.text);
+            QuickLogger.Debug("2");
+            if (device.Value == null)
+            {
+                QuickLogger.Message($"Invalid Device: Device with id {_deviceIdInput.text} not found on base.");
+                return false;
+            }
+            QuickLogger.Debug("3");
+            _selectedDevice = device.Value;
+            QuickLogger.Debug("4");
+            if (_isPullOperationToggle.isOn && _selectedTransferItem == TechType.None)
+            {
+                QuickLogger.Message($"Please choose which item to send");
+                return false;
+            }
+            QuickLogger.Debug("5");
+            return true;
         }
 
         private void CreateMessagesController()
@@ -327,7 +430,7 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             QuickLogger.Debug($"FCS PDA: Active and Enabled {isActiveAndEnabled}",true);
         }
 
-        internal void Open()
+        public void Open()
         {
             FindPDA();
             _depthState = UwePostProcessingManager.GetDofEnabled();
@@ -363,6 +466,16 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             }
             QuickLogger.Debug("FCS PDA Is Open", true);
         }
+
+        private void HideAll()
+        {
+            _bases.SetActive(false);
+            _home.SetActive(false);
+            _baseInventory.SetActive(false);
+            _messagesPage.SetActive(false);
+            _missionPage.SetActive(false);
+            _itemTransferOperations.SetActive(false);
+        }
         
         private void FindMesh()
         {
@@ -372,7 +485,7 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             }
         }
 
-        internal void Close()
+        public void Close()
         {
             IsOpen = false;
             _pda.isInUse = false;
@@ -397,6 +510,7 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             UwePostProcessingManager.ClosePDA();
             _pda.ui.soundQueue.PlayImmediately(_pda.ui.soundClose);
             UwePostProcessingManager.ToggleDof(_depthState);
+            _itemTransferOperations.SetActive(false);
             QuickLogger.Debug("FCS PDA Is Closed", true);
         }
 
@@ -536,9 +650,61 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
                 _basesGrid.DrawPage(index);
             }
         }
+
+        public void OpenItemTransferDialog(BaseManager manager)
+        {
+            var baseOperations = manager.GetBaseOperations();
+            if(baseOperations != null)
+            {
+                LoadOperationsPage(baseOperations, manager);
+            }
+
+            HideAll();
+            _itemTransferOperations.SetActive(true);
+            Open();
+        }
+
+        private void LoadOperationsPage(List<BaseTransferOperation> baseOperations, BaseManager manager)
+        {
+            //ClearList
+            var childCount = _operationsScrollViewTrans.childCount;
+            for (var i = childCount - 1; i > 0; i--)
+            {
+                Destroy(_operationsScrollViewTrans.GetChild(i).gameObject);
+            }
+
+            foreach (BaseTransferOperation baseOperation in baseOperations)
+            {
+                var prefab = GameObject.Instantiate(Buildables.AlterraHub.BaseOperationItemPrefab);
+                var itemController = prefab.AddComponent<BaseOperationItemController>();
+                itemController.Initialize(baseOperation, manager);
+                prefab.transform.SetParent(_operationsScrollViewTrans,false);
+            }
+        }
     }
 
-    internal class MessagesController : MonoBehaviour
+    internal class BaseOperationItemController : MonoBehaviour
+    {
+        private BaseTransferOperation _operation;
+
+        public void Initialize(BaseTransferOperation operation,BaseManager manager)
+        {
+            _operation = operation;
+
+            GameObjectHelpers.FindGameObject(gameObject, "DeviceIcon").AddComponent<uGUI_Icon>().sprite = SpriteManager.Get(FCSAlterraHubService.PublicAPI.GetDeviceTechType(operation.DeviceId));
+            GameObjectHelpers.FindGameObject(gameObject, "TransferIcon").AddComponent<uGUI_Icon>().sprite = SpriteManager.Get(operation.TransferItem);
+            GameObjectHelpers.FindGameObject(gameObject, "AmountSlot").GetComponent<Text>().text = operation.Amount.ToString();
+            GameObjectHelpers.FindGameObject(gameObject, "DeviceName").GetComponent<Text>().text = operation.DeviceId;
+            GameObjectHelpers.FindGameObject(gameObject, "IsPullOperation").GetComponent<ToggleButton>().isOn = operation.IsPullOperation;
+            GameObjectHelpers.FindGameObject(gameObject,"DeleteButton").GetComponent<Button>().onClick.AddListener(() =>
+            {
+                manager.RemoveBaseTransferItem(_operation);
+                Destroy(gameObject);
+            });
+        }
+    }
+
+    public class MessagesController : MonoBehaviour
     {
         private bool _initialized;
         private GameObject _messageList;

@@ -1,5 +1,6 @@
 ﻿using System;
 using FCS_AlterraHub.API;
+using FCS_AlterraHub.Buildables;
 using FCS_StorageSolutions.Configuration;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
@@ -36,6 +37,7 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Buildable
         public static GameObject DSSInventoryItemPrefab { get; set; }
         public static GameObject FilterItemPrefab { get; set; }
         public static GameObject DSSCrafterCratePrefab { get; set; }
+        public static GameObject ItemTransferUnitPrefab { get; set; }
 
 
         internal static void Initialize()
@@ -59,19 +61,30 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Buildable
             DSSFloorServerRackPrefab = GetPrefab(Mod.DSSFloorServerRackPrefabName);
             DSSAntennaPrefab = GetPrefab(Mod.DSSAntennaPrefabName);
             DSSItemDisplayPrefab = GetPrefab(Mod.DSSItemDisplayPrefabName);
+            ItemTransferUnitPrefab = GetPrefab(Mod.ItemTransferUnitPrefabName,true);
             DSSInventoryItemPrefab = GetPrefab("DSSInventoryItem");
             DSSAvaliableVehiclesItemPrefab = GetPrefab("AvaliableVehiclesItem");
             DSSCrafterCratePrefab = GetPrefab("DSSCrafterCrate");
             FilterItemPrefab = GetPrefab("FilterItem");
         }
         
-        internal static GameObject GetPrefab(string prefabName)
+        internal static GameObject GetPrefab(string prefabName,bool isV2 = false)
         {
             try
             {
-                QuickLogger.Debug($"Getting Prefab: {prefabName}");
-                if (!LoadAsset(prefabName, ModBundle, out var prefabGo)) return null;
-                return prefabGo;
+                if (isV2)
+                {
+                    QuickLogger.Debug($"Getting Prefab: {prefabName}");
+                    if (!LoadAssetV2(prefabName, ModBundle, out var prefabGo)) return null;
+                    return prefabGo;
+                }
+                else
+                {
+                    QuickLogger.Debug($"Getting Prefab: {prefabName}");
+                    if (!LoadAsset(prefabName, ModBundle, out var prefabGo)) return null;
+                    return prefabGo;
+                }
+
             }
             catch (Exception e)
             {
@@ -94,6 +107,39 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Buildable
                 {
                     //Lets apply the material shader
                     ApplyShaders(prefab, assetBundle);
+                    QuickLogger.Debug($"Applied shaderes to prefab {prefabName}");
+                }
+
+                go = prefab;
+                QuickLogger.Debug($"{prefabName} Prefab Found!");
+                return true;
+            }
+
+            QuickLogger.Error($"{prefabName} Prefab Not Found!");
+
+            go = null;
+            return false;
+        }
+
+        private static bool LoadAssetV2(string prefabName, AssetBundle assetBundle, out GameObject go, bool applyShaders = true)
+        {
+            QuickLogger.Debug("Loading Asset");
+            //We have found the asset bundle and now we are going to continue by looking for the model.
+            GameObject prefab = assetBundle.LoadAsset<GameObject>(prefabName);
+            QuickLogger.Debug($"Loaded Prefab {prefabName}");
+
+            //If the prefab isn't null lets add the shader to the materials
+            if (prefab != null)
+            {
+                if (applyShaders)
+                {
+                    //Lets apply the material shader
+                    AlterraHub.ReplaceShadersV2(prefab, AlterraHub.BasePrimaryCol);
+                    AlterraHub.ReplaceShadersV2(prefab, AlterraHub.BaseSecondaryCol);
+                    AlterraHub.ReplaceShadersV2(prefab, AlterraHub.BaseDefaultDecals);
+                    AlterraHub.ReplaceShadersV2(prefab, AlterraHub.BaseTexDecals);
+                    AlterraHub.ReplaceShadersV2(prefab, AlterraHub.BaseEmissiveDecals);
+                    AlterraHub.ReplaceShadersV2(prefab, AlterraHub.BaseEmissiveDecalsController);
                     QuickLogger.Debug($"Applied shaderes to prefab {prefabName}");
                 }
 

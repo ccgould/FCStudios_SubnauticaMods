@@ -5,28 +5,33 @@ using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Spawnables;
 using FCS_StorageSolutions.Configuration;
 using FCS_StorageSolutions.Mods.AlterraStorage.Buildable;
-using FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter;
-using FCSCommon.Extensions;
+using FCS_StorageSolutions.Mods.ItemTransferUnit.Mono;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
 using UnityEngine;
 
-namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable
+namespace FCS_StorageSolutions.Mods.ItemTransferUnit.Buildable
 {
-    internal class DSSAutoCrafterPatch : SMLHelper.V2.Assets.Buildable
+    internal class ItemTransferUnitPatch : SMLHelper.V2.Assets.Buildable
     {
+        private FCSKit _itemTransferUnitKit;
         public override TechGroup GroupForPDA => TechGroup.Miscellaneous;
         public override TechCategory CategoryForPDA => TechCategory.Misc;
         public override string AssetsFolder => Mod.GetAssetPath();
 
-        public DSSAutoCrafterPatch() : base(Mod.DSSAutoCrafterClassName, Mod.DSSAutoCrafterFriendlyName, Mod.DSSAutoCrafterDescription)
+        public ItemTransferUnitPatch() : base(Mod.ItemTransferUnitClassName, Mod.ItemTransferUnitFriendlyName, Mod.ItemTransferUnitDescription)
         {
+
+            OnStartedPatching += () =>
+            {
+                _itemTransferUnitKit = new FCSKit(Mod.ItemTransferUnitKitClassID, Mod.ItemTransferUnitFriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
+                _itemTransferUnitKit.Patch();
+            };
+
             OnFinishedPatching += () =>
             {
-                var dssAutoCrafterKit = new FCSKit(Mod.DSSAutoCrafterKitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
-                dssAutoCrafterKit.Patch();
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.DSSAutoCrafterKitClassID.ToTechType(), 236250, StoreCategory.Storage);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, _itemTransferUnitKit.TechType, 1000000000, StoreCategory.Misc);
             };
         }
 
@@ -34,11 +39,10 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable
         {
             try
             {
-                var prefab = GameObject.Instantiate(ModelPrefab.DSSAutoCrafterPrefab);
+                var prefab = GameObject.Instantiate(ModelPrefab.ItemTransferUnitPrefab);
 
-                var center = new Vector3(0.112175f, 1.279794f, 0.03599018f);
-                var size = new Vector3(2.570427f, 2.437856f, 1.906985f);
-
+                var size = new Vector3(0.7850953f, 1.139575f, 0.7385547f);
+                var center = new Vector3(0f, 0.876227f, 0f);
 
                 GameObjectHelpers.AddConstructableBounds(prefab, size, center);
 
@@ -55,14 +59,14 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable
                 // Add constructible
                 var constructable = prefab.AddComponent<Constructable>();
 
-                constructable.allowedOutside = false;
+                constructable.allowedOutside = true;
                 constructable.allowedInBase = true;
                 constructable.allowedOnGround = true;
                 constructable.allowedOnWall = false;
                 constructable.rotationEnabled = true;
                 constructable.allowedOnCeiling = false;
                 constructable.allowedInSub = true;
-                constructable.allowedOnConstructables = false;
+                constructable.allowedOnConstructables = true;
                 constructable.model = model;
                 constructable.techType = TechType;
 
@@ -73,13 +77,9 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable
                 lw.cellLevel = LargeWorldEntity.CellLevel.Global;
 
                 prefab.AddComponent<TechTag>().type = TechType;
-                prefab.AddComponent<DSSAutoCrafterController>();
-
-                //Apply the glass shader here because of autosort lockers for some reason doesn't like it.
-                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModName);
-                MaterialHelpers.ApplyShaderToMaterial(prefab, "DSS_ConveyorBelt");
-
+                prefab.AddComponent<ItemTransferUnitController>();
                 return prefab;
+
             }
             catch (Exception e)
             {
@@ -93,12 +93,12 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable
 #if SUBNAUTICA
         protected override TechData GetBlueprintRecipe()
         {
-            return Mod.DSSAutoCrafterIngredients;
+            return Mod.ItemTransferUnitIngredients;
         }
 #elif BELOWZERO
         protected override RecipeData GetBlueprintRecipe()
         {
-            return Mod.DSSAutoCrafterIngredients;
+            return Mod.ItemTransferUnitIngredients;
         }
 #endif
     }

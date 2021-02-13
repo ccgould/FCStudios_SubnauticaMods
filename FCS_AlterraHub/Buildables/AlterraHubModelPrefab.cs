@@ -68,6 +68,7 @@ namespace FCS_AlterraHub.Buildables
         public static GameObject MissionItemPrefab { get; set; }
         public static GameObject PDAEntryPrefab { get; set; }
         public static GameObject MissionMessageBoxPrefab { get; set; }
+        public static GameObject BaseOperationItemPrefab { get; set; }
 
         public static bool GetPrefabs()
         {
@@ -119,7 +120,10 @@ namespace FCS_AlterraHub.Buildables
                     PDAEntryPrefab = pdaEntryPrefabGo;
 
                     if (!LoadAsset("MissionMessageBox", QPatch.GlobalBundle, out var missionMessageBox, false)) return false;
-                    MissionMessageBoxPrefab = missionMessageBox;
+                    MissionMessageBoxPrefab = missionMessageBox;                    
+                    
+                    if (!LoadAsset("BaseOperationItem", QPatch.GlobalBundle, out var baseOperationItem, false)) return false;
+                    BaseOperationItemPrefab = baseOperationItem;
 
                     _initialized = true;
                 }

@@ -46,6 +46,15 @@ namespace FCS_StorageSolutions.Configuration
         internal const string DSSServerPrefabName = "DSS_Server";
         internal const string DSSServerDescription = "Data Storage for 48 items, formatted to accept all item categories. Place in a Wall Server Rack or Floor Server Rack to connect to Data Storage Network.";
 
+
+
+        internal const string ItemTransferUnitTabID= "ITU";
+        internal const string ItemTransferUnitFriendlyName = "Item Transfer Unit";
+        internal const string ItemTransferUnitClassName = "ItemTransferUnit";
+        internal const string ItemTransferUnitPrefabName = "ItemTransferUnit";
+        internal const string ItemTransferUnitDescription = "N/A";
+        internal const string ItemTransferUnitKitClassID = "ItemTransferUnit_Kit";
+
         internal const string DSSFormattingStationFriendlyName = "Server Formatting Station";
         internal const string DSSFormattingStationClassName = "DSSFormattingStation";
         internal const string DSSFormattingStationPrefabName = "DSS_ServerFormatMachine";
@@ -166,6 +175,19 @@ namespace FCS_StorageSolutions.Configuration
             Ingredients =
             {
                 new Ingredient(DSSFormattingStationKitClassID.ToTechType(), 1),
+            }
+        };
+
+#if SUBNAUTICA
+        internal static TechData ItemTransferUnitIngredients => new TechData
+#elif BELOWZERO
+                internal static RecipeData ItemTransferUnitIngredients => new RecipeData
+#endif
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(ItemTransferUnitKitClassID.ToTechType(), 1),
             }
         };
 
@@ -441,6 +463,25 @@ namespace FCS_StorageSolutions.Configuration
             return new DSSFloorServerRackDataEntry() { ID = id };
         }
 
+        internal static ItemTransferUnitDataEntry GetItemTransferUnitSaveData(string id)
+        {
+            LoadData();
+
+            var saveData = GetSaveData();
+
+            foreach (var entry in saveData.ItemTransferUnitDataEntries)
+            {
+                if (string.IsNullOrEmpty(entry.Id)) continue;
+
+                if (entry.Id == id)
+                {
+                    return entry;
+                }
+            }
+
+            return new ItemTransferUnitDataEntry() { Id = id };
+        }
+
         internal static SaveData GetSaveData()
         {
             return _saveData ?? new SaveData();
@@ -498,5 +539,6 @@ namespace FCS_StorageSolutions.Configuration
         {
             _registeredServers.Remove(server);
         }
+
     }
 }

@@ -4,6 +4,8 @@ using DataStorageSolutions.Patches;
 using FCS_StorageSolutions.Configuration;
 using FCS_StorageSolutions.Mods.AlterraStorage.Buildable;
 using FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable;
+using FCS_StorageSolutions.Mods.ItemTransferUnit.Buildable;
+using FCS_StorageSolutions.Mods.ItemTransferUnit.Mono;
 using FCSCommon.Utilities;
 using HarmonyLib;
 using QModManager.API;
@@ -59,6 +61,9 @@ namespace FCS_StorageSolutions
 
                 var dssAntenna = new DSSAntennaPatch();
                 dssAntenna.Patch();
+
+                var ItemTransferUnit = new ItemTransferUnitPatch();
+                ItemTransferUnit.Patch();
 
                 var wallServerRack = new DSSWallServerRackPatch();
                 wallServerRack.Patch();

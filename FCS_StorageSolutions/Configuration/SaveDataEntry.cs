@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Objects;
 using FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter;
+using FCSCommon.Interfaces;
 using Oculus.Newtonsoft.Json;
 using UnityEngine;
 
@@ -31,6 +32,15 @@ namespace FCS_StorageSolutions.Configuration
         [JsonProperty] internal string CurrentBase { get; set; }
         [JsonProperty] internal bool IsBeingFormatted { get; set; }
         [JsonProperty] internal HashSet<Filter> ServerFilters { get; set; }
+    }    
+    
+    internal class ItemTransferUnitDataEntry : ISaveDataEntry
+    {
+        [JsonProperty] internal string SaveVersion { get; set; } = "1.0";
+        [JsonProperty] internal byte[] Data { get; set; }
+        public string Id { get; set; }
+        public string BaseId { get; set; }
+        [JsonProperty] internal Vec4 Body { get; set; }
     }
 
     [Serializable]
@@ -137,5 +147,6 @@ namespace FCS_StorageSolutions.Configuration
         [JsonProperty] internal List<DSSTerminalDataEntry> DSSTerminalDataEntries = new List<DSSTerminalDataEntry>();
         [JsonProperty] internal List<DSSWallServerRackDataEntry> DSSWallServerRackDataEntries = new List<DSSWallServerRackDataEntry>();
         [JsonProperty] internal List<DSSFloorServerRackDataEntry> DSSFloorServerRackDataEntries = new List<DSSFloorServerRackDataEntry>();
+        [JsonProperty] internal List<ItemTransferUnitDataEntry> ItemTransferUnitDataEntries = new List<ItemTransferUnitDataEntry>();
     }
 }

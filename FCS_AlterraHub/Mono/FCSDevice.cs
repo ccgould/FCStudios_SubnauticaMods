@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Registration;
@@ -304,6 +305,21 @@ namespace FCS_AlterraHub.Mono
         public virtual int GetMaxStorage()
         {
             return 0;
+        }
+
+        public virtual Pickupable RemoveItemFromDevice(TechType techType)
+        {
+            return null;
+        }
+
+        public virtual Pickupable GetRandomPickupableFromDevice()
+        {
+            return null;
+        }
+
+        public virtual TechType GetRandomTechTypeFromDevice()
+        {
+            return TechType.None;
         }
     }
 
