@@ -196,8 +196,16 @@
     <Compile Include="Mono\DSSVehicleDockingManager.cs" />
     <Compile Include="Mono\DumpContainerSimplified.cs" />
     <Compile Include="Mono\FCSAquarium.cs" />
+    <Compile Include="Mono\FCSPDA\Mono\AudioMessage.cs" />
+    <Compile Include="Mono\FCSPDA\Mono\BaseOperationItemController.cs" />
+    <Compile Include="Mono\FCSPDA\Mono\DSSBaseItem.cs" />
+    <Compile Include="Mono\FCSPDA\Mono\DSSInventoryItem.cs" />
+    <Compile Include="Mono\FCSPDA\Mono\FCSEncyclopediaData.cs" />
     <Compile Include="Mono\FCSPDA\Mono\FCSPDAController.cs" />
+    <Compile Include="Mono\FCSPDA\Mono\MessagePDAEntryController.cs" />
+    <Compile Include="Mono\FCSPDA\Mono\MessagesController.cs" />
     <Compile Include="Mono\FCSPDA\Mono\PDAMissionController.cs" />
+    <Compile Include="Mono\FCSPDA\Mono\VideoProgressBar.cs" />
     <Compile Include="Mono\FCSStorage.cs" />
     <Compile Include="Mono\FCSStorageNonSerialized.cs" />
     <Compile Include="Mono\FCSToggleButton.cs" />

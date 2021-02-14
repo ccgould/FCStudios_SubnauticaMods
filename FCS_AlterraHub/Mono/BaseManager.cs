@@ -9,6 +9,7 @@ using FCS_AlterraHub.Patches;
 using FCS_AlterraHub.Registration;
 using FCSCommon.Extensions;
 using FCSCommon.Utilities;
+using Oculus.Newtonsoft.Json;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
 using Steamworks;
@@ -173,6 +174,8 @@ namespace FCS_AlterraHub.Mono
                 DockingBlackList = _savedData.BlackList;
                 PullFromDockedVehicles = _savedData.AllowDocking;
                 HasBreakerTripped = _savedData.HasBreakerTripped;
+                if(_baseTransferOperations!=null)
+                    _baseTransferOperations = _savedData.BaseOperations;
             }
 
             if (_dumpContainer == null)
@@ -1096,7 +1099,8 @@ namespace FCS_AlterraHub.Mono
                     BaseName = baseManager.GetBaseName(),
                     AllowDocking = baseManager.PullFromDockedVehicles,
                     HasBreakerTripped = baseManager.HasBreakerTripped,
-                    BlackList = baseManager.DockingBlackList
+                    BlackList = baseManager.DockingBlackList,
+                    BaseOperations = baseManager.GetBaseOperations()
                 };
             }
         }
@@ -1222,7 +1226,7 @@ namespace FCS_AlterraHub.Mono
         public int Amount { get; set; }
         public bool IsPullOperation { get; set; }
 
-        public FcsDevice Device
+        [JsonIgnore] public FcsDevice Device
         {
             get
             {
@@ -1250,6 +1254,7 @@ namespace FCS_AlterraHub.Mono
         public bool AllowDocking { get; set; }
         public bool HasBreakerTripped { get; set; }
         public List<TechType> BlackList { get; set; }
+        public List<BaseTransferOperation> BaseOperations { get; set; }
     }
 
     public enum StorageType

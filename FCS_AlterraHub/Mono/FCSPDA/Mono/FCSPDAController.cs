@@ -7,16 +7,13 @@ using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono.Controllers;
-using FCS_AlterraHub.Patches;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using FMOD;
-using FMODUnity;
 using SMLHelper.V2.Utility;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using UnityEngine.Video;
 using WorldHelpers = FCS_AlterraHub.Helpers.WorldHelpers;
@@ -76,6 +73,7 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
         private TechType _selectedTransferItem;
         private Text _itemName;
         private BaseManager _manager;
+        private bool _fromTransferDialog;
 
         public static FCSPDAController Instance => _instance;
 
@@ -360,7 +358,6 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             _selectedTransferItem = TechType.None;
             _addNewOperation.SetActive(false);
             LoadOperationsPage(_manager);
-            _home.SetActive(true);
         }
 
         private bool ValidateInformation()
@@ -537,6 +534,12 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             _pda.ui.soundQueue.PlayImmediately(_pda.ui.soundClose);
             UwePostProcessingManager.ToggleDof(_depthState);
             _itemTransferOperations?.SetActive(false);
+
+            if (_fromTransferDialog)
+            {
+                _home.SetActive(true);
+                _fromTransferDialog = false;
+            }
             QuickLogger.Debug("FCS PDA Is Closed", true);
         }
 
@@ -685,14 +688,14 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
 
             HideAll();
             _itemTransferOperations.SetActive(true);
+            _fromTransferDialog = true;
             Open();
         }
 
         private void LoadOperationsPage(BaseManager manager)
         {
             //ClearList
-            var childCount = _operationsScrollViewTrans.childCount;
-            for (var i = childCount - 1; i > 0; i--)
+            for (int i = _operationsScrollViewTrans.childCount - 1; i >= 0; i--)
             {
                 Destroy(_operationsScrollViewTrans.GetChild(i).gameObject);
             }
@@ -704,301 +707,6 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
                 itemController.Initialize(baseOperation, manager);
                 prefab.transform.SetParent(_operationsScrollViewTrans,false);
             }
-        }
-    }
-
-    internal class BaseOperationItemController : MonoBehaviour
-    {
-        private BaseTransferOperation _operation;
-
-        public void Initialize(BaseTransferOperation operation,BaseManager manager)
-        {
-            _operation = operation;
-
-            GameObjectHelpers.FindGameObject(gameObject, "DeviceIcon").AddComponent<uGUI_Icon>().sprite = SpriteManager.Get(FCSAlterraHubService.PublicAPI.GetDeviceTechType(operation.DeviceId));
-            GameObjectHelpers.FindGameObject(gameObject, "TransferIcon").AddComponent<uGUI_Icon>().sprite = SpriteManager.Get(operation.TransferItem);
-            GameObjectHelpers.FindGameObject(gameObject, "AmountSlot").GetComponent<Text>().text = operation.Amount.ToString();
-            GameObjectHelpers.FindGameObject(gameObject, "DeviceName").GetComponent<Text>().text = operation.DeviceId;
-            GameObjectHelpers.FindGameObject(gameObject, "IsPullOperation").GetComponent<Toggle>().isOn = operation.IsPullOperation;
-            GameObjectHelpers.FindGameObject(gameObject,"DeleteButton").GetComponent<Button>().onClick.AddListener(() =>
-            {
-                manager.RemoveBaseTransferItem(_operation);
-                Destroy(gameObject);
-            });
-        }
-    }
-
-    public class MessagesController : MonoBehaviour
-    {
-        private bool _initialized;
-        private GameObject _messageList;
-        private readonly List<AudioMessage> _messages = new List<AudioMessage>();
-        private Text _messageCounter;
-        private FCSPDAController _pdaController;
-
-#if SUBNAUTICA
-        private static FMOD.System FMOD_System => RuntimeManager.LowlevelSystem;
-#else
-        private static System FMOD_System => RuntimeManager.CoreSystem;
-#endif
-
-        internal void Initialize(FCSPDAController fcsPdaController)
-        {
-            if (_initialized) return;
-            _messageList = GameObjectHelpers.FindGameObject(gameObject, "Messageslist");
-            _pdaController = fcsPdaController;
-            _messageCounter = GameObjectHelpers.FindGameObject(fcsPdaController.gameObject, "MessagesCounter").GetComponent<Text>();
-            InvokeRepeating(nameof(UpdateMessageCounter), 1, 1);
-            _initialized = true;
-        }
-        
-        private void UpdateMessageCounter()
-        {
-            _messageCounter.text = _messages.Count(x => !x.HasBeenPlayed).ToString();
-        }
-
-        internal void AddNewMessage(string description,string from, string audioClipName, bool hasBeenPlayed = false)
-        {
-            var message = new AudioMessage(description, audioClipName) {HasBeenPlayed = hasBeenPlayed};
-            _messages.Add(message);
-            if (!hasBeenPlayed)
-                uGUI_PowerIndicator_Initialize_Patch.MissionHUD.ShowNewMessagePopUp(from);
-            RefreshUI();
-        }
-
-        private void RefreshUI()
-        {
-            for (int i = _messageList.transform.childCount - 1; i > 0; i--)
-            {
-                Destroy(_messageList.transform.GetChild(i).gameObject);
-            }
-
-            foreach (AudioMessage message in _messages)
-            {
-                var prefab = Instantiate(Buildables.AlterraHub.PDAEntryPrefab);
-                var messageController = prefab.AddComponent<MessagePDAEntryController>();
-                messageController.Initialize(message,this);
-                prefab.transform.SetParent(_messageList.transform, false);
-            }
-        }
-
-        public void PlayAudioTrack(string trackName)
-        {
-            if (string.IsNullOrEmpty(trackName))
-            {
-                QuickLogger.Debug("Track returned null",true);
-                return;
-            }
-
-            CurrentTrackSound.isPlaying(out bool isPlaying);
-
-            if (isPlaying)
-            {
-                CurrentTrackSound.stop();
-            }
-
-             //_pdaController.AudioTrack = AudioUtils.PlaySound(QuestManager.Instance.FindAudioClip(trackName), SoundChannel.Voice);
-        }
-
-        public Channel CurrentTrackSound { get; set; }
-    }
-
-    internal class MessagePDAEntryController : MonoBehaviour
-    {
-        private bool _isInitialized;
-       
-        internal void Initialize(AudioMessage message, MessagesController messagesController)
-        {
-            if(_isInitialized) return;
-            GetComponentInChildren<Text>().text = message.Description;
-            GetComponentInChildren<Button>().onClick.AddListener((() =>
-            {
-                messagesController.PlayAudioTrack(message.AudioClipName);
-                message.HasBeenPlayed = true;
-            }));
-            _isInitialized = true;
-        }
-    }
-
-    internal class AudioMessage    
-    {
-        public string Description { get; set; }
-        public string AudioClipName { get; set; }
-        public bool HasBeenPlayed { get; set; }
-        public AudioMessage(string description,string audioClipName)
-        {
-            AudioClipName = audioClipName;
-            Description = description;
-        }
-    }
-
-    public struct FCSEncyclopediaData
-    {
-        public string Title { get; set; }
-        public Atlas.Sprite Image { get; set; }
-        public string Body { get; set; }
-        public string VideoLink { get; set; }
-    }
-
-    internal class DSSInventoryItem : InterfaceButton
-    {
-        private uGUI_Icon _icon;
-        private Text _amount;
-
-        private void Initialize()
-        {
-            if (_icon == null)
-            {
-                _icon = gameObject.FindChild("Icon").EnsureComponent<uGUI_Icon>();
-            }
-
-            if (_amount == null)
-            {
-                _amount = gameObject.FindChild("Text").EnsureComponent<Text>();
-            }
-        }
-
-        internal void Set(TechType techType, int amount)
-        {
-            Initialize();
-            Tag = techType;
-            _amount.text = amount.ToString();
-            _icon.sprite = SpriteManager.Get(techType);
-            Show();
-        }
-
-        internal void Reset()
-        {
-            Initialize();
-            _amount.text = "";
-            _icon.sprite = SpriteManager.Get(TechType.None);
-            Tag = null;
-            Hide();
-        }
-
-        internal void Hide()
-        {
-            gameObject.SetActive(false);
-        }
-
-        internal void Show()
-        {
-            gameObject.SetActive(true);
-        }
-    }
-
-    internal class DSSBaseItem : InterfaceButton
-    {
-        private GameObject _hubIcon;
-        private GameObject _cyclopsIcon;
-        private Text _baseName;
-
-        private void Initialize()
-        {
-            _hubIcon = GameObjectHelpers.FindGameObject(gameObject, "Habitat");
-            _cyclopsIcon = GameObjectHelpers.FindGameObject(gameObject, "Cyclops");
-
-            if (_baseName == null)
-            {
-                _baseName = gameObject.FindChild("Text").EnsureComponent<Text>();
-            }
-        }
-
-        internal void Set(BaseManager baseManager)
-        {
-            Initialize();
-            Tag = baseManager;
-            _baseName.text = baseManager.GetBaseName();
-
-            if (baseManager.Habitat.isCyclops)
-            {
-                _cyclopsIcon.SetActive(true);
-                _hubIcon.SetActive(false);
-            }
-            else
-            {
-                _cyclopsIcon.SetActive(false);
-                _hubIcon.SetActive(true);
-            }
-            Show();
-        }
-
-        internal void Reset()
-        {
-            Initialize();
-            _baseName.text = "";
-            _cyclopsIcon.SetActive(false);
-            _hubIcon.SetActive(true);
-            Tag = null;
-            Hide();
-        }
-
-        internal void Hide()
-        {
-            gameObject.SetActive(false);
-        }
-
-        internal void Show()
-        {
-            gameObject.SetActive(true);
-        }
-    }
-
-    public class VideoProgressBar : MonoBehaviour, IDragHandler, IPointerDownHandler
-    {
-        internal VideoPlayer VideoPlayer { get; set; }
-        [SerializeField]
-        private Camera camera;
-
-        private Image progress;
-        private void Awake()
-        {
-            camera = Player.main.viewModelCamera;
-            progress = GetComponent<Image>();
-        }
-
-        void Update()
-        {
-            if(VideoPlayer == null) return;
-            
-            VideoPlayer.playbackSpeed = Mathf.Approximately(DayNightCycle.main.deltaTime, 0f) ? 0 : 1;
-            
-            if (VideoPlayer.frameCount > 0)
-                progress.fillAmount = (float)VideoPlayer.frame / (float)VideoPlayer.frameCount;
-        }
-
-        public void OnDrag(PointerEventData eventData)
-        {
-            TrySkip(eventData);
-        }
-
-        public void OnPointerDown(PointerEventData eventData)
-        {
-            TrySkip(eventData);
-        }
-
-        private void TrySkip(PointerEventData eventData)
-        {
-            if(progress == null) return;
-            if (RectTransformUtility.ScreenPointToLocalPointInRectangle(progress.rectTransform, eventData.position, camera,
-                out var localPoint))
-            {
-                float pct = Mathf.InverseLerp(progress.rectTransform.rect.xMin, progress.rectTransform.rect.xMax,localPoint.x);
-                SkipToPercent(pct);
-            }
-        }
-
-        private void SkipToPercent(float pct)
-        {
-            if (VideoPlayer == null) return;
-            var frame = VideoPlayer.frameCount * pct;
-            VideoPlayer.frame = (long)frame;
-        }
-
-        public void Stop()
-        {
-            SkipToPercent(0);
-            progress.fillAmount = 0;
         }
     }
 }
