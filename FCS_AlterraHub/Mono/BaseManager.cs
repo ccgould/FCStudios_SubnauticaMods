@@ -92,6 +92,7 @@ namespace FCS_AlterraHub.Mono
         {
             if (habitat == null) return;
             Habitat = habitat;
+            
             BaseComponent = Habitat.GetComponent<Base>();
             BaseID = habitat.gameObject.gameObject?.GetComponentInChildren<PrefabIdentifier>()?.Id;
             _registeredDevices = new Dictionary<string, FcsDevice>();

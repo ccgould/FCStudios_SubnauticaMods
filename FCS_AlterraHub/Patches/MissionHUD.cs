@@ -35,6 +35,7 @@ namespace FCS_AlterraHub.Patches
 
         public void UpdateButtonPressLabel()
         {
+            if (_buttonPressLbl == null) return;
             _buttonPressLbl.text = AlterraHub.MissionButtonPressFormat(QPatch.Configuration.FCSPDAKeyCode);
         }
 

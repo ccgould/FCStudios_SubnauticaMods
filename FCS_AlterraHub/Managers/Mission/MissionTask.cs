@@ -177,7 +177,7 @@ namespace FCS_AlterraHub.Managers.Mission
         {
             if (Condition.MissionType == MissionType.Scan)
             {
-                if(KnownTech.knownTech.Contains(Condition.TechType));
+                if(KnownTech.knownTech.Contains(Condition.TechType))
                 {
                     ChangeProgress(1);
                 }

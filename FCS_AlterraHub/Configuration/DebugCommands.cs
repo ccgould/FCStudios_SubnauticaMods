@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Mono.AlterraHub;
 using FCS_AlterraHub.Systems;
@@ -86,5 +87,17 @@ namespace FCS_AlterraHub.Configuration
             return $"Parameters: {missionKey}";
         }
 
+        [ConsoleCommand("FastOreProcessing")]
+        public static void FastOreProcessing()
+        {
+            OreConsumer.OreProcessingTime = OreConsumer.OreProcessingTime >= 90f ? 1f : 90f;
+            QuickLogger.Debug($"Changed Processing speed");
+        }
+
+        [ConsoleCommand("SpawnOreConsumerFrag")]
+        public static void SpawnOreConsumerFrag()
+        {
+            Mod.SpawnOreConsumerFrag();
+        }
     }
 }

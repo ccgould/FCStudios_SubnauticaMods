@@ -4,10 +4,12 @@ using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Managers.Mission;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Mono.FCSPDA.Mono;
+using FCS_AlterraHub.Spawnables;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using HarmonyLib;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 
 namespace FCS_AlterraHub.Patches
@@ -73,14 +75,21 @@ namespace FCS_AlterraHub.Patches
                 }
             }
 
-            if (LargeWorldStreamer.main.IsWorldSettled() && FCSPDA != null && DayNightCycle.main.timePassed >= 600f)
+            
+
+
+            if (LargeWorldStreamer.main.IsWorldSettled())
             {
-                if (_firstMissionAdded) return;
-                QuickLogger.Debug("Adding Starter Mission");
-                MissionManager.Instance?.CreateStarterMission();
-                QuickLogger.Debug("Updating PDA Missions");
-                FCSPDA.MissionController.UpdateMissions();
-                _firstMissionAdded = true;
+                if (FCSPDA != null && DayNightCycle.main.timePassed >= 600f)
+                {
+                    if (_firstMissionAdded) return;
+                    QuickLogger.Debug("Adding Starter Mission");
+                    MissionManager.Instance?.CreateStarterMission();
+                    QuickLogger.Debug("Updating PDA Missions");
+                    FCSPDA.MissionController.UpdateMissions();
+                    _firstMissionAdded = true;
+                }
+
             }
 
             _time += Time.deltaTime;
@@ -107,6 +116,8 @@ namespace FCS_AlterraHub.Patches
                 go.transform.localPosition = new Vector3(0, 0, -50000);
                 SunTarget = go.transform;
             }
+
+            Mod.SpawnOreConsumerFrag();
         }
 
        public static Transform SunTarget { get; set; }
@@ -120,9 +131,7 @@ namespace FCS_AlterraHub.Patches
         [HarmonyPostfix]
         private static void Postfix(Player __instance)
         {
-            
-
-            if(Player_Update_Patch.FCSPDA != null) return;
+            if (Player_Update_Patch.FCSPDA != null) return;
 
             CreateQuestManager();
 

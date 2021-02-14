@@ -173,6 +173,21 @@ namespace FCS_EnergySolutions.AlterraGen.Mono
             return false;
         }
 
+        public bool IsAllowedToAdd(TechType techType,bool verbose = false)
+        {
+            bool flag = false;
+            if (techType != TechType.None)
+            {
+               flag = CanBeStored(_mono.DumpContainer.GetCount() + 1, techType);
+            }
+
+            if (!flag && verbose)
+            {
+                QuickLogger.ModMessage(AlterraGenBuildable.StorageFullMessage());
+            }
+            return flag;
+        }
+
         public Pickupable RemoveItemFromContainer(TechType techType, int amount)
         {
             OnContainerRemoveItem(_mono, techType);

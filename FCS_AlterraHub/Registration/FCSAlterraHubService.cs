@@ -24,10 +24,10 @@ namespace FCS_AlterraHub.Registration
         int GetRegisterModCount(string tabID);
         bool IsTechTypeRegistered(TechType techType);
         void RegisterEncyclopediaEntry(TechType techType, List<FcsEntryData> entry);
-        void AddEncyclopediaEntries(TechType techType,bool verbose);
+        void AddEncyclopediaEntries(TechType techType, bool verbose);
 
         void UnRegisterDevice(FcsDevice miniFountainFilterController);
-        Dictionary<string,FcsDevice> GetRegisteredDevicesOfId(string id);
+        Dictionary<string, FcsDevice> GetRegisteredDevicesOfId(string id);
         void RegisterTechLight(TechLight techLight);
         bool ChargeAccount(decimal amount);
         bool IsCreditAvailable(decimal amount);
@@ -47,12 +47,15 @@ namespace FCS_AlterraHub.Registration
         private static readonly FCSAlterraHubService singleton = new FCSAlterraHubService();
 
         public static List<KnownDevice> knownDevices = new List<KnownDevice>();
-        private static readonly Dictionary<string, FcsDevice> GlobalDevices = new Dictionary<string,FcsDevice>();
+        private static readonly Dictionary<string, FcsDevice> GlobalDevices = new Dictionary<string, FcsDevice>();
         private static Dictionary<TechType, FCSStoreEntry> _storeItems = new Dictionary<TechType, FCSStoreEntry>();
-        private static Dictionary<TechType, List<FcsEntryData>> _pdaEntries = new Dictionary<TechType, List<FcsEntryData>>();
+
+        private static Dictionary<TechType, List<FcsEntryData>> _pdaEntries =
+            new Dictionary<TechType, List<FcsEntryData>>();
+
         private static HashSet<TechType> _registeredTechTypes = new HashSet<TechType>();
         private List<string> _patchedMods = new List<string>();
-        private Dictionary<TechType,int> _globallyBuiltTech = new Dictionary<TechType, int>();
+        private Dictionary<TechType, int> _globallyBuiltTech = new Dictionary<TechType, int>();
         public static IFCSAlterraHubService PublicAPI => singleton;
         internal static IFCSAlterraHubServiceInternal InternalAPI => singleton;
 
@@ -63,11 +66,11 @@ namespace FCS_AlterraHub.Registration
 
         private void OnDataLoaded(List<KnownDevice> obj)
         {
-            if(obj != null)
+            if (obj != null)
                 knownDevices = obj;
         }
-        
-        public void RegisterDevice(FcsDevice device, string tabID,string packageId)
+
+        public void RegisterDevice(FcsDevice device, string tabID, string packageId)
         {
             var prefabID = device.GetPrefabID();
 
@@ -77,10 +80,10 @@ namespace FCS_AlterraHub.Registration
             {
                 if (string.IsNullOrWhiteSpace(prefabID) || !device.IsConstructed) return;
             }
-            
-            if (!knownDevices.Any(x=>x.PrefabID.Equals(prefabID)))
+
+            if (!knownDevices.Any(x => x.PrefabID.Equals(prefabID)))
             {
-                var unitID = GenerateNewID(tabID,prefabID);
+                var unitID = GenerateNewID(tabID, prefabID);
                 device.TabID = tabID;
                 device.UnitID = unitID;
                 device.PackageId = packageId;
@@ -91,7 +94,7 @@ namespace FCS_AlterraHub.Registration
             {
                 device.TabID = tabID;
                 device.PackageId = packageId;
-                device.UnitID=knownDevices.FirstOrDefault(x=>x.PrefabID.Equals(prefabID)).ToString();
+                device.UnitID = knownDevices.FirstOrDefault(x => x.PrefabID.Equals(prefabID)).ToString();
                 AddToGlobalDevices(device, device.UnitID);
             }
 
@@ -102,13 +105,13 @@ namespace FCS_AlterraHub.Registration
             BaseManagerSetup(device);
         }
 
-        private string GenerateNewID(string tabId,string prefabID)
+        private string GenerateNewID(string tabId, string prefabID)
         {
             var newEntry = new KnownDevice();
             var id = 0;
             if (knownDevices.Any())
             {
-                id = knownDevices.Where(x => x.DeviceTabId.Equals(tabId)).DefaultIfEmpty().Max(x=>x.ID);
+                id = knownDevices.Where(x => x.DeviceTabId.Equals(tabId)).DefaultIfEmpty().Max(x => x.ID);
                 id++;
             }
 
@@ -138,11 +141,13 @@ namespace FCS_AlterraHub.Registration
                     device.BaseId = subRoot.gameObject.GetComponent<PrefabIdentifier>().Id;
                 }
                 else
-                { 
-                    QuickLogger.Error($"Failed to Setup the Base Manager for device {device.UnitID} with prefab id {device.GetPrefabID()}");
+                {
+                    QuickLogger.Error(
+                        $"Failed to Setup the Base Manager for device {device.UnitID} with prefab id {device.GetPrefabID()}");
                     return;
                 }
             }
+
             var manager = BaseManager.FindManager(device.BaseId);
             if (manager != null)
             {
@@ -161,7 +166,8 @@ namespace FCS_AlterraHub.Registration
             }
             else
             {
-                QuickLogger.Debug($"Failed to Setup the Base Manager for TechLight {device.gameObject.GetComponent<PrefabIdentifier>().Id}");
+                QuickLogger.Debug(
+                    $"Failed to Setup the Base Manager for TechLight {device.gameObject.GetComponent<PrefabIdentifier>().Id}");
                 return;
             }
 
@@ -188,22 +194,28 @@ namespace FCS_AlterraHub.Registration
             GlobalDevices.Remove(unitID);
         }
 
-        public void CreateStoreEntry(TechType techType,TechType recieveTechType, decimal cost,StoreCategory category)
+        public void CreateStoreEntry(TechType techType, TechType recieveTechType, decimal cost, StoreCategory category)
         {
             if (!_storeItems.ContainsKey(techType))
             {
-                _storeItems.Add(techType,new FCSStoreEntry{TechType = techType, ReceiveTechType = recieveTechType, Cost = cost, StoreCategory = category});
+                _storeItems.Add(techType,
+                    new FCSStoreEntry
+                    {
+                        TechType = techType, ReceiveTechType = recieveTechType, Cost = cost, StoreCategory = category
+                    });
             }
         }
 
-        public Dictionary<TechType,FCSStoreEntry> GetRegisteredKits()
+        public Dictionary<TechType, FCSStoreEntry> GetRegisteredKits()
         {
             return _storeItems;
         }
 
         public TechType GetRegisteredKit(TechType techType)
         {
-            return _storeItems.Any(x=>x.Value.ReceiveTechType == techType) ? _storeItems.FirstOrDefault(x => x.Value.ReceiveTechType == techType).Key : TechType.None;
+            return _storeItems.Any(x => x.Value.ReceiveTechType == techType)
+                ? _storeItems.FirstOrDefault(x => x.Value.ReceiveTechType == techType).Key
+                : TechType.None;
         }
 
         public Dictionary<string, FcsDevice> GetRegisteredDevices()
@@ -218,7 +230,7 @@ namespace FCS_AlterraHub.Registration
 
         public void RegisterPatchedMod(string mod)
         {
-            if(!_patchedMods.Contains(mod))
+            if (!_patchedMods.Contains(mod))
             {
                 _patchedMods.Add(mod);
             }
@@ -246,7 +258,7 @@ namespace FCS_AlterraHub.Registration
             {
                 _pdaEntries[techType] = entries;
             }
-            
+
             foreach (FcsEntryData entryData in entries)
             {
                 LanguageHandler.SetLanguageLine($"Ency_{entryData.key}", entryData.Title);
@@ -267,7 +279,7 @@ namespace FCS_AlterraHub.Registration
             }
         }
 
-        public void AddEncyclopediaEntries(TechType techType,bool verbose)
+        public void AddEncyclopediaEntries(TechType techType, bool verbose)
         {
             var node = new CraftNode("fcs", TreeAction.Expand)
             {
@@ -275,7 +287,7 @@ namespace FCS_AlterraHub.Registration
                 string1 = "Field Creators Studios"
             };
             PDAEncyclopedia.tree.AddNode(node);
-            
+
 
             if (IsTechTypeRegistered(techType))
             {
@@ -305,7 +317,7 @@ namespace FCS_AlterraHub.Registration
 
         public Dictionary<string, FcsDevice> GetRegisteredDevicesOfId(string id)
         {
-            return GlobalDevices.Where(x => x.Key.StartsWith(id, StringComparison.OrdinalIgnoreCase))
+            return GlobalDevices.Where(x => x.Value.TabID.Equals(id, StringComparison.OrdinalIgnoreCase))
                 .ToDictionary(x => x.Key, x => x.Value);
         }
 
@@ -337,13 +349,13 @@ namespace FCS_AlterraHub.Registration
 
         public void AddBuiltTech(TechType techType)
         {
-            if(_globallyBuiltTech.ContainsKey(techType))
+            if (_globallyBuiltTech.ContainsKey(techType))
             {
                 _globallyBuiltTech[techType] += 1;
             }
             else
             {
-                _globallyBuiltTech.Add(techType,1);
+                _globallyBuiltTech.Add(techType, 1);
             }
         }
 

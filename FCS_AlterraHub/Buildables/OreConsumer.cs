@@ -27,6 +27,7 @@ namespace FCS_AlterraHub.Buildables
         public override float TimeToScanFragment => 5f;
 
         public override bool DestroyFragmentOnScan => false;
+        public static float OreProcessingTime { get; set; } = 90;
 
         public OreConsumer() : base(Mod.OreConsumerClassID, Mod.OreConsumerFriendly, Mod.OreConsumerDescription)
         {

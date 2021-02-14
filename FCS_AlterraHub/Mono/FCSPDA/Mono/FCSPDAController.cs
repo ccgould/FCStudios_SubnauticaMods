@@ -75,8 +75,10 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
         private Toggle _isPullOperationToggle;
         private TechType _selectedTransferItem;
         private Text _itemName;
+        private BaseManager _manager;
 
         public static FCSPDAController Instance => _instance;
+
 
 
         private void Awake()
@@ -146,61 +148,99 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             
             _bases = GameObjectHelpers.FindGameObject(gameObject, "Bases");
             _baseInventory = GameObjectHelpers.FindGameObject(gameObject, "BasesInventory");
-            _baseNameLBL = GameObjectHelpers.FindGameObject(gameObject, "BaseNameLBL").GetComponent<Text>();
-            _currentBiome = GameObjectHelpers.FindGameObject(gameObject, "BiomeLBL").GetComponent<Text>();
-            _accountName = GameObjectHelpers.FindGameObject(gameObject, "UserName").GetComponent<Text>();
-            _accountBalance = GameObjectHelpers.FindGameObject(gameObject, "AccountBalance").GetComponent<Text>();
-            var vpb = GameObjectHelpers.FindGameObject(gameObject, "Progress").AddComponent<VideoProgressBar>();
-            vpb.VideoPlayer = gameObject.GetComponentInChildren<VideoPlayer>(); ;
-            var stopButton = GameObjectHelpers.FindGameObject(gameObject, "StopButton").GetComponent<Button>();
-            stopButton.onClick.AddListener((() => { vpb.Stop();}));
-            var canvas = gameObject.GetComponentInChildren<Canvas>();
+            _baseNameLBL = GameObjectHelpers.FindGameObject(gameObject, "BaseNameLBL")?.GetComponent<Text>();
+            _currentBiome = GameObjectHelpers.FindGameObject(gameObject, "BiomeLBL")?.GetComponent<Text>();
+            _accountName = GameObjectHelpers.FindGameObject(gameObject, "UserName")?.GetComponent<Text>();
+            _accountBalance = GameObjectHelpers.FindGameObject(gameObject, "AccountBalance")?.GetComponent<Text>();
+            _addNewOperation = GameObjectHelpers.FindGameObject(gameObject, "AddNewOperation");
+            _itemTransferOperations = GameObjectHelpers.FindGameObject(gameObject, "ItemTransferOperations");
+            _deviceIdInput = GameObjectHelpers.FindGameObject(gameObject, "DeviceIdInput")?.GetComponent<InputField>();
+            _operationsScrollView = GameObjectHelpers.FindGameObject(gameObject, "OperationsContent");
+            _operationsScrollViewTrans = _operationsScrollView?.transform;
+            _itemName = GameObjectHelpers.FindGameObject(gameObject, "ItemName")?.GetComponent<Text>();
+            _clock = GameObjectHelpers.FindGameObject(gameObject, "Clock")?.GetComponent<Text>();
+            _basePaginatorController = GameObjectHelpers.FindGameObject(gameObject, "BasePaginator")?.AddComponent<PaginatorController>();
+            _basePaginatorController?.Initialize(this);
 
-            foreach (Transform invItem in GameObjectHelpers.FindGameObject(_baseInventory, "Grid").transform)
+            _isPullOperationToggle = GameObjectHelpers.FindGameObject(gameObject, "IsPullOperationToggle")?.GetComponent<Toggle>();
+
+            _inventoryPaginatorController = GameObjectHelpers.FindGameObject(gameObject, "InventoryPaginator")?.AddComponent<PaginatorController>();
+            _inventoryPaginatorController?.Initialize(this);
+
+            _addtempMessage = false;
+
+            _basesGrid = gameObject.AddComponent<GridHelperV2>();
+            if (_basesGrid != null)
             {
-                var invButton = invItem.gameObject.EnsureComponent<DSSInventoryItem>();
-                invButton.ButtonMode = InterfaceButtonMode.HoverImage;
-                invButton.BtnName = "InventoryBTN";
-                invButton.OnButtonClick += OnButtonClick;
-                _inventoryButtons.Add(invButton);
+                _basesGrid.OnLoadDisplay += OnLoadBasesGrid;
+                _basesGrid.Setup(10, gameObject, Color.gray, Color.white, OnButtonClick);
             }
             
-            foreach (Transform baseItem in GameObjectHelpers.FindGameObject(_bases, "Grid").transform)
+            _inventoryGrid = gameObject.AddComponent<GridHelperV2>();
+            _inventoryGrid.OnLoadDisplay += OnLoadItemsGrid;
+            _inventoryGrid.Setup(15, gameObject, Color.gray, Color.white, OnButtonClick);
+
+            var vpb = GameObjectHelpers.FindGameObject(gameObject, "Progress")?.AddComponent<VideoProgressBar>();
+            if(vpb != null)
             {
-                var baseButton = baseItem.gameObject.EnsureComponent<DSSBaseItem>();
-                baseButton.ButtonMode = InterfaceButtonMode.HoverImage;
-                baseButton.BtnName = "BaseBTN";
-                baseButton.OnButtonClick += OnButtonClick;
-                _baseButtons.Add(baseButton);
+                vpb.VideoPlayer = gameObject.GetComponentInChildren<VideoPlayer>();
+                var stopButton = GameObjectHelpers.FindGameObject(gameObject, "StopButton")?.GetComponent<Button>();
+                if(stopButton != null)
+                    stopButton.onClick.AddListener((() => { vpb.Stop(); }));
             }
 
-            var baseInventoryBackButton = GameObjectHelpers.FindGameObject(_baseInventory,"ReturnBTN").GetComponent<Button>();
-            baseInventoryBackButton.onClick.AddListener(() =>
-            {
-                _bases.SetActive(true);
-                _home.SetActive(false);
-                _baseInventory.SetActive(false);
-                UpdateDisplay();
-            });
+            var canvas = gameObject.GetComponentInChildren<Canvas>();
 
-            var homeButton = GameObjectHelpers.FindGameObject(_baseInventory,"HomeBTN").GetComponent<Button>();
-            homeButton.onClick.AddListener(() =>
-            {
-                _bases.SetActive(false);
-                _home.SetActive(true);
-                _baseInventory.SetActive(false);
-            });
+            CreateBaseInventoryPage();
+            
+            CreateBasePage();
 
-            var basesBackButton = GameObjectHelpers.FindGameObject(_bases,"ReturnBTN").GetComponent<Button>();
-            basesBackButton.onClick.AddListener(() =>
-            {
-                _bases.SetActive(false);
-                _home.SetActive(true);
-                _baseInventory.SetActive(false);
-            });
+            CreateBaseOperations();
 
+            CreateHomePage();
+
+            MaterialHelpers.ChangeEmissionColor(Buildables.AlterraHub.BaseEmissiveDecalsController, gameObject,
+                Color.cyan);
+            
+            InvokeRepeating(nameof(UpdateDisplay), .5f, .5f);
+        }
+
+        private void CreateBaseOperations()
+        {
+            if (_itemTransferOperations == null) return; 
+
+            var chooseItemButton = GameObjectHelpers.FindGameObject(gameObject, "ChooseItemButton").GetComponent<Button>();
+            chooseItemButton.onClick.AddListener((() =>
+            {
+                //Add dump Button
+                _selectedTransferItem = TechType.Lubricant;
+                _itemName.text = Language.main.Get(_selectedTransferItem);
+            }));
+
+            var addOperationsButton = GameObjectHelpers.FindGameObject(gameObject, "AddOperationButton");
+            var addOperationsBTN = addOperationsButton.GetComponent<Button>();
+            addOperationsBTN.onClick.AddListener(() => { _addNewOperation.SetActive(true); });
+
+            var closeAddOperationsButton = GameObjectHelpers.FindGameObject(gameObject, "AddNewOperationCloseButton");
+            var closeAddOperationsBTN = closeAddOperationsButton.GetComponent<Button>();
+            closeAddOperationsBTN.onClick.AddListener(CloseAddNewOperation);
+
+            var confirmButton = GameObjectHelpers.FindGameObject(gameObject, "ConfirmButton");
+            var confirmBTN = confirmButton.GetComponent<Button>();
+            confirmBTN.onClick.AddListener(() =>
+            {
+                var result = ValidateInformation();
+                if (result)
+                {
+                    CloseAddNewOperation();
+                }
+            });
+        }
+
+        private void CreateHomePage()
+        {
             var baseBTNObj = GameObjectHelpers.FindGameObject(gameObject, "BasesButton");
-            var baseBTNToolTip =baseBTNObj.AddComponent<FCSToolTip>();
+            var baseBTNToolTip = baseBTNObj.AddComponent<FCSToolTip>();
             baseBTNToolTip.RequestPermission += () => true;
             baseBTNToolTip.Tooltip = "Allows you to pull items from online bases requires connection chip";
             var basesButton = baseBTNObj.GetComponent<Button>();
@@ -222,46 +262,9 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
                 Close();
             });
 
-            _itemName = GameObjectHelpers.FindGameObject(gameObject, "ItemName").GetComponent<Text>();
-
-            var chooseItemButton = GameObjectHelpers.FindGameObject(gameObject, "ChooseItemButton").GetComponent<Button>();
-            chooseItemButton.onClick.AddListener((() =>
-            {
-                //Add dump Button
-                _selectedTransferItem = TechType.Lubricant;
-                _itemName.text = Language.main.Get(_selectedTransferItem);
-            }));
-
-            _addNewOperation = GameObjectHelpers.FindGameObject(gameObject, "AddNewOperation");
-
-            var addOperationsButton = GameObjectHelpers.FindGameObject(gameObject, "AddOperationButton");
-            var addOperationsBTN = addOperationsButton.GetComponent<Button>();
-            addOperationsBTN.onClick.AddListener(() =>
-            {
-                _addNewOperation.SetActive(true);
-            });
-
-            var closeAddOperationsButton = GameObjectHelpers.FindGameObject(gameObject, "AddNewOperationCloseButton");
-            var closeAddOperationsBTN = closeAddOperationsButton.GetComponent<Button>();
-            closeAddOperationsBTN.onClick.AddListener(CloseAddNewOperation);
-
-            var confirmButton = GameObjectHelpers.FindGameObject(gameObject, "ConfirmButton");
-            var confirmBTN = confirmButton.GetComponent<Button>();
-            confirmBTN.onClick.AddListener(() =>
-            {
-                var result = ValidateInformation();
-                if (result)
-                {
-                    CloseAddNewOperation();
-                }
-            });
-
             var settingsButton = GameObjectHelpers.FindGameObject(gameObject, "SettingsButton").GetComponent<Button>();
-            settingsButton.onClick.AddListener(() =>
-            {
-                QuickLogger.ModMessage("Page Not Implemented");
-            });
-            
+            settingsButton.onClick.AddListener(() => { QuickLogger.ModMessage("Page Not Implemented"); });
+
             var messagesButton = GameObjectHelpers.FindGameObject(gameObject, "MessagesButton").GetComponent<Button>();
             messagesButton.onClick.AddListener(() =>
             {
@@ -270,10 +273,7 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             });
 
             var contactsButton = GameObjectHelpers.FindGameObject(gameObject, "ContactsButton").GetComponent<Button>();
-            contactsButton.onClick.AddListener(() =>
-            {
-                QuickLogger.ModMessage("Page Not Implemented");
-            });
+            contactsButton.onClick.AddListener(() => { QuickLogger.ModMessage("Page Not Implemented"); });
 
             var messagesBackBTN = GameObjectHelpers.FindGameObject(gameObject, "MessagesBackBTN").GetComponent<Button>();
             messagesBackBTN.onClick.AddListener(() =>
@@ -295,46 +295,72 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
                 _home.SetActive(false);
                 _missionPage.SetActive(true);
             });
+        }
 
+        private void CreateBasePage()
+        {
+            foreach (Transform baseItem in GameObjectHelpers.FindGameObject(_bases, "Grid").transform)
+            {
+                var baseButton = baseItem.gameObject.EnsureComponent<DSSBaseItem>();
+                baseButton.ButtonMode = InterfaceButtonMode.HoverImage;
+                baseButton.BtnName = "BaseBTN";
+                baseButton.OnButtonClick += OnButtonClick;
+                _baseButtons.Add(baseButton);
+            }
 
-            _basesGrid = gameObject.AddComponent<GridHelperV2>();
-            _basesGrid.OnLoadDisplay += OnLoadBasesGrid;
-            _basesGrid.Setup(10, gameObject, Color.gray, Color.white, OnButtonClick);
+            var basesBackButton = GameObjectHelpers.FindGameObject(_bases, "ReturnBTN").GetComponent<Button>();
+            basesBackButton.onClick.AddListener(() =>
+            {
+                _bases.SetActive(false);
+                _home.SetActive(true);
+                _baseInventory.SetActive(false);
+            });
+        }
 
-            _inventoryGrid = gameObject.AddComponent<GridHelperV2>();
-            _inventoryGrid.OnLoadDisplay += OnLoadItemsGrid;
-            _inventoryGrid.Setup(15, gameObject, Color.gray, Color.white, OnButtonClick);
+        private void CreateBaseInventoryPage()
+        {
+            foreach (Transform invItem in GameObjectHelpers.FindGameObject(_baseInventory, "Grid").transform)
+            {
+                var invButton = invItem.gameObject.EnsureComponent<DSSInventoryItem>();
+                invButton.ButtonMode = InterfaceButtonMode.HoverImage;
+                invButton.BtnName = "InventoryBTN";
+                invButton.OnButtonClick += OnButtonClick;
+                _inventoryButtons.Add(invButton);
+            }
 
-            _itemTransferOperations = GameObjectHelpers.FindGameObject(gameObject, "ItemTransferOperations");
+            var baseInventoryBackButton = GameObjectHelpers.FindGameObject(_baseInventory, "ReturnBTN").GetComponent<Button>();
+            baseInventoryBackButton.onClick.AddListener(() =>
+            {
+                _bases.SetActive(true);
+                _home.SetActive(false);
+                _baseInventory.SetActive(false);
+                UpdateDisplay();
+            });
 
-            _deviceIdInput = GameObjectHelpers.FindGameObject(gameObject, "DeviceIdInput").GetComponent<InputField>();
-
-            _operationsScrollView = GameObjectHelpers.FindGameObject(gameObject, "OperationsContent");
-            _operationsScrollViewTrans = _operationsScrollView.transform;
-
-            _clock = GameObjectHelpers.FindGameObject(gameObject, "Clock").GetComponent<Text>();
-
-            MaterialHelpers.ChangeEmissionColor(Buildables.AlterraHub.BaseEmissiveDecalsController, gameObject,
-                Color.cyan);
-
-            _basePaginatorController = GameObjectHelpers.FindGameObject(gameObject, "BasePaginator").AddComponent<PaginatorController>();
-            _basePaginatorController.Initialize(this);
-
-            _isPullOperationToggle = GameObjectHelpers.FindGameObject(gameObject, "IsPullOperationToggle").GetComponent<Toggle>();
-
-            _inventoryPaginatorController = GameObjectHelpers.FindGameObject(gameObject, "InventoryPaginator").AddComponent<PaginatorController>();
-            _inventoryPaginatorController.Initialize(this);
-
-            _addtempMessage = false;
-
-            InvokeRepeating(nameof(UpdateDisplay), .5f, .5f);
+            var homeButton = GameObjectHelpers.FindGameObject(_baseInventory, "HomeBTN").GetComponent<Button>();
+            homeButton.onClick.AddListener(() =>
+            {
+                _bases.SetActive(false);
+                _home.SetActive(true);
+                _baseInventory.SetActive(false);
+            });
         }
 
         private void CloseAddNewOperation()
         {
+            _manager.AddBaseTransferItem(new BaseTransferOperation
+            {
+                Amount = 1,
+                IsPullOperation = _isPullOperationToggle.isOn,
+                DeviceId = _deviceIdInput.text,
+                TransferItem = _selectedTransferItem,
+            });
+
             _selectedDevice = null;
             _selectedTransferItem = TechType.None;
             _addNewOperation.SetActive(false);
+            LoadOperationsPage(_manager);
+            _home.SetActive(true);
         }
 
         private bool ValidateInformation()
@@ -510,7 +536,7 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             UwePostProcessingManager.ClosePDA();
             _pda.ui.soundQueue.PlayImmediately(_pda.ui.soundClose);
             UwePostProcessingManager.ToggleDof(_depthState);
-            _itemTransferOperations.SetActive(false);
+            _itemTransferOperations?.SetActive(false);
             QuickLogger.Debug("FCS PDA Is Closed", true);
         }
 
@@ -595,7 +621,7 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
         {
             try
             {
-                if (_isBeingDestroyed) return;
+                if (_isBeingDestroyed|| _baseButtons?.Count <=0) return;
 
                 var grouped = BaseManager.Managers.Where(x => x != null && !x.GetBaseName().Equals("Cyclops 0")).ToList();
 
@@ -653,18 +679,16 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
 
         public void OpenItemTransferDialog(BaseManager manager)
         {
-            var baseOperations = manager.GetBaseOperations();
-            if(baseOperations != null)
-            {
-                LoadOperationsPage(baseOperations, manager);
-            }
+            _manager = manager;
+
+            LoadOperationsPage(manager);
 
             HideAll();
             _itemTransferOperations.SetActive(true);
             Open();
         }
 
-        private void LoadOperationsPage(List<BaseTransferOperation> baseOperations, BaseManager manager)
+        private void LoadOperationsPage(BaseManager manager)
         {
             //ClearList
             var childCount = _operationsScrollViewTrans.childCount;
@@ -673,7 +697,7 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
                 Destroy(_operationsScrollViewTrans.GetChild(i).gameObject);
             }
 
-            foreach (BaseTransferOperation baseOperation in baseOperations)
+            foreach (BaseTransferOperation baseOperation in manager.GetBaseOperations())
             {
                 var prefab = GameObject.Instantiate(Buildables.AlterraHub.BaseOperationItemPrefab);
                 var itemController = prefab.AddComponent<BaseOperationItemController>();
@@ -695,7 +719,7 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             GameObjectHelpers.FindGameObject(gameObject, "TransferIcon").AddComponent<uGUI_Icon>().sprite = SpriteManager.Get(operation.TransferItem);
             GameObjectHelpers.FindGameObject(gameObject, "AmountSlot").GetComponent<Text>().text = operation.Amount.ToString();
             GameObjectHelpers.FindGameObject(gameObject, "DeviceName").GetComponent<Text>().text = operation.DeviceId;
-            GameObjectHelpers.FindGameObject(gameObject, "IsPullOperation").GetComponent<ToggleButton>().isOn = operation.IsPullOperation;
+            GameObjectHelpers.FindGameObject(gameObject, "IsPullOperation").GetComponent<Toggle>().isOn = operation.IsPullOperation;
             GameObjectHelpers.FindGameObject(gameObject,"DeleteButton").GetComponent<Button>().onClick.AddListener(() =>
             {
                 manager.RemoveBaseTransferItem(_operation);

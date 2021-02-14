@@ -48,7 +48,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
 
 
         private Queue<TechType> _oreQueue;
-        private const float OreProcessingTime = 90f;
+
         private float _timeLeft;
         private bool _isBreakerTripped;
         private GameObject _canvas;
@@ -63,7 +63,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
 
         public override void Awake()
         {
-            _timeLeft = OreProcessingTime;
+            _timeLeft = Buildables.OreConsumer.OreProcessingTime;
         }
 
         private void Start()
@@ -98,7 +98,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
                     var techType = _oreQueue.Dequeue();
                     QPatch.MissionManagerGM.NotifyDeviceAction(Mod.OreConsumerTechType,techType, DeviceAction.Consume);
                     AppendMoney(StoreInventorySystem.GetOrePrice(techType));
-                    _timeLeft = OreProcessingTime;
+                    _timeLeft = Buildables.OreConsumer.OreProcessingTime;
                 }
             }
         }

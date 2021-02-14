@@ -26,6 +26,7 @@ namespace FCS_EnergySolutions.AlterraGen.Mono
         internal AnimationManager AnimationManager { get; set; }
         internal AlterraGenDisplayManager DisplayManager { get; private set; }
         public DumpContainer DumpContainer { get; private set; }
+        public override bool IsOperational => IsConstructed && IsInitialized;
         public override bool IsVisible { get; } = true;
 
         #region Unity Methods
@@ -133,6 +134,16 @@ namespace FCS_EnergySolutions.AlterraGen.Mono
 #endif
 
            return _colorManager.ChangeColor(color,mode);
+        }
+
+        public override bool CanBeStored(int amount, TechType techType)
+        {
+            return !PowerManager.IsFull && PowerManager.IsAllowedToAdd(techType,true);
+        }
+
+        public override bool AddItemToContainer(InventoryItem item)
+        {
+            return PowerManager.AddItemToContainer(item);
         }
 
         #endregion

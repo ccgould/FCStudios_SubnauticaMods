@@ -8,12 +8,14 @@ using FCS_AlterraHub.Managers.Mission;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Patches;
 using FCS_AlterraHub.Registration;
+using FCS_AlterraHub.Spawnables;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
 using FMOD;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Utility;
 using UnityEngine;
+using Object = System.Object;
 
 namespace FCS_AlterraHub.Configuration
 {
@@ -397,6 +399,36 @@ namespace FCS_AlterraHub.Configuration
             AudioClips.Add("AH-Mission01-Pt2",AudioUtils.CreateSound(Path.Combine(Mod.GetAssetPath(), "Audio", "AH-Mission01-Pt2.wav")));
             AudioClips.Add("AH-Mission01-Pt3",AudioUtils.CreateSound(Path.Combine(Mod.GetAssetPath(), "Audio", "AH-Mission01-Pt3.wav")));
         }
+
+        internal static void SpawnOreConsumerFrag()
+        {
+            if (IsOreConsumerSpawned) return;
+
+                QuickLogger.Debug("Spawn Frag");
+            GameObject prefabForTechType = CraftData.GetPrefabForTechType(QPatch.OreConsumerFragTechType);
+            if (prefabForTechType != null)
+            {
+                GameObject gameObject = Utils.CreatePrefab(prefabForTechType, 1000);
+                LargeWorldEntity.Register(gameObject);
+                CrafterLogic.NotifyCraftEnd(gameObject, QPatch.OreConsumerFragTechType);
+                gameObject.SendMessage("StartConstruction", SendMessageOptions.DontRequireReceiver);
+                gameObject.transform.position = new Vector3(113.6f, -267.40f, -366.2f);
+            }
+            else
+            {
+                ErrorMessage.AddDebug("Could not find prefab for TechType = " + QPatch.OreConsumerFragTechType);
+            }
+
+            //CleanOreOreConsumers
+            var oreconsumers = GameObject.FindObjectsOfType(typeof(OreConsumerFragmentSpawn));
+
+            if (oreconsumers.Length > 1)
+            {
+                GameObject.Destroy(oreconsumers[0]);
+            }
+        }
+
+        public static bool IsOreConsumerSpawned { get; set; }
     }
 
     public class FCSGamePlaySettings

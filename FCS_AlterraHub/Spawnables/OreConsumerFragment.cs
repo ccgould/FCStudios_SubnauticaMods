@@ -18,6 +18,7 @@ namespace FCS_AlterraHub.Spawnables
 
 
         public override WorldEntityInfo EntityInfo => new WorldEntityInfo() { cellLevel = LargeWorldEntity.CellLevel.Medium, classId = ClassID, localScale = Vector3.one, prefabZUp = false, slotType = EntitySlot.Type.Medium, techType = TechType };
+
         public override GameObject GetGameObject()
         {
             try
@@ -47,6 +48,7 @@ namespace FCS_AlterraHub.Spawnables
                 resourceTracker.rb = rb;
                 resourceTracker.pickupable = pickupable;
 
+                prefab.AddComponent<OreConsumerFragmentSpawn>();
                 return prefab;
             }
             catch (Exception e)
@@ -74,5 +76,9 @@ namespace FCS_AlterraHub.Spawnables
             return ImageUtils.LoadSpriteFromFile(Mod.GetIconPath(ClassID));
         }
 #endif
+    }
+
+    internal class OreConsumerFragmentSpawn:MonoBehaviour
+    {
     }
 }

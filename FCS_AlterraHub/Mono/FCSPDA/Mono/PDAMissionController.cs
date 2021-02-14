@@ -53,7 +53,7 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
 
         private void RefreshObjectives()
         {
-            for (int i = _missionObjectivesList.transform.childCount - 1; i > 0; i--)
+            for (int i = _missionObjectivesList.transform.childCount; i > 0; i--)
             {
                 Destroy(_missionObjectivesList.transform.GetChild(i).gameObject);
             }
