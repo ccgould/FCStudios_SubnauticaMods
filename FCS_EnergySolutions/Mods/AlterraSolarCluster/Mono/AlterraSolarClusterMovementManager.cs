@@ -58,7 +58,7 @@ namespace FCS_EnergySolutions.Mods.AlterraSolarCluster.Mono
         /// <param name="target">The target to aim at.</param>
         public virtual void Aim(Vector3 target)
         {
-            // Get a plane through the rotation of the weapon
+            // Get a plane through the rotation of the tilter
             Plane rot = new Plane(_rotator.right, _rotator.position);
             if (Mathf.Abs(rot.GetDistanceToPoint(target)) < Accuracy)
                 return;
@@ -69,7 +69,7 @@ namespace FCS_EnergySolutions.Mods.AlterraSolarCluster.Mono
             else
                 Rotate(-1.0f); //left
 
-            // Get a plane through the elevation of the weapon
+            // Get a plane through the elevation of the tilter
             Plane elev = new Plane(_elevator.up, _elevator.position);
             if (Mathf.Abs(elev.GetDistanceToPoint(target)) < Accuracy)
                 return;
@@ -102,7 +102,7 @@ namespace FCS_EnergySolutions.Mods.AlterraSolarCluster.Mono
         }
 
         /// <summary>
-        /// Pivots the weapon up(+) and down(-).
+        /// Pivots the tilter up(+) and down(-).
         /// </summary>
         /// <param name="direction">The direction to pivot; up is positive, down is negative.</param>
         public virtual void Elevate(float direction)
@@ -123,7 +123,7 @@ namespace FCS_EnergySolutions.Mods.AlterraSolarCluster.Mono
         }
 
         /// <summary>
-        /// Pivots the weapon right(+) and left(-).
+        /// Pivots the tilter right(+) and left(-).
         /// </summary>
         /// <param name="direction">The direction to pivot; right is positive, left is negative.</param>
         public virtual void Rotate(float direction)
