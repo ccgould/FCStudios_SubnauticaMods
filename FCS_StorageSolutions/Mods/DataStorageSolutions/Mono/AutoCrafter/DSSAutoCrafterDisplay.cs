@@ -208,7 +208,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
 
                 if (!string.IsNullOrEmpty(_currentSearchString?.Trim()))
                 {
-                    grouped = grouped.Where(p => Language.main.Get(p).StartsWith(_currentSearchString.Trim(), StringComparison.OrdinalIgnoreCase)).ToList();
+                    grouped = grouped.Where(p => Language.main.Get(p).ToLower().Contains(_currentSearchString.Trim().ToLower())).ToList();
                 }
 
                 if (data.EndPosition > grouped.Count)

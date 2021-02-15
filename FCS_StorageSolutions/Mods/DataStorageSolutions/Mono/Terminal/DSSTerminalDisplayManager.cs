@@ -369,7 +369,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
 
                 if (!string.IsNullOrEmpty(_currentSearchString?.Trim()))
                 {
-                    grouped = grouped.Where(p => Language.main.Get(p.Key).Contains(_currentSearchString.Trim())).ToList();
+                    grouped = grouped.Where(p => Language.main.Get(p.Key).ToLower().Contains(_currentSearchString.Trim().ToLower())).ToList();
                 }
 
                 if (data.EndPosition > grouped.Count)

@@ -81,7 +81,7 @@ namespace FCS_EnergySolutions.Mods.AlterraSolarCluster.Mono
                 Elevate(-1.0f); //down
         }
         
-        private void Update()
+        private void FixedUpdate()
         {
             if(_mono != null && _mono.IsOperational && uSkyManager.main?.SunDir != null && FCS_AlterraHub.Patches.Player_Awake_Patch.SunTarget != null)
             {

@@ -27,12 +27,7 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
         public GameObject PDAObj { get; set; }
         private GameObject Mesh { get; set; }
         private Sequence sequence = new Sequence(false);
-        public Canvas PdaCanvas { get; set; }
-        internal bool IsOpen { get; private set; }
         private BaseManager _currentBase;
-
-        public float cameraFieldOfView = 62f;
-        public float cameraFieldOfViewAtFourThree = 66f;
         private GameObject _inputDummy;
         private uGUI_InputGroup _ui;
         private Text _clock;
@@ -49,7 +44,6 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
         private Text _accountName;
         private Text _accountBalance;
         private bool _goToEncyclopedia;
-        public PDAMissionController MissionController;
         private GameObject _missionPage;
         private List<Button> _padHomeButtons = new List<Button>();
         private GameObject _messagesPage;
@@ -59,6 +53,14 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
         private PaginatorController _basePaginatorController;
         private bool _depthState;
 
+
+        public PDAMissionController MissionController;
+        public float cameraFieldOfView = 62f;
+        public float cameraFieldOfViewAtFourThree = 66f;
+        public Canvas PdaCanvas { get; set; }
+        internal bool IsOpen { get; private set; }
+        public Action OnClose { get; set; }
+        public Channel AudioTrack { get; set; }
         public bool isFocused => this.ui != null && this.ui.focused;
 
         #region SINGLETON PATTERN
@@ -193,46 +195,12 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             
             CreateBasePage();
 
-            CreateBaseOperations();
-
             CreateHomePage();
 
             MaterialHelpers.ChangeEmissionColor(Buildables.AlterraHub.BaseEmissiveDecalsController, gameObject,
                 Color.cyan);
             
             InvokeRepeating(nameof(UpdateDisplay), .5f, .5f);
-        }
-
-        private void CreateBaseOperations()
-        {
-            if (_itemTransferOperations == null) return; 
-
-            var chooseItemButton = GameObjectHelpers.FindGameObject(gameObject, "ChooseItemButton").GetComponent<Button>();
-            chooseItemButton.onClick.AddListener((() =>
-            {
-                //Add dump Button
-                _selectedTransferItem = TechType.Lubricant;
-                _itemName.text = Language.main.Get(_selectedTransferItem);
-            }));
-
-            var addOperationsButton = GameObjectHelpers.FindGameObject(gameObject, "AddOperationButton");
-            var addOperationsBTN = addOperationsButton.GetComponent<Button>();
-            addOperationsBTN.onClick.AddListener(() => { _addNewOperation.SetActive(true); });
-
-            var closeAddOperationsButton = GameObjectHelpers.FindGameObject(gameObject, "AddNewOperationCloseButton");
-            var closeAddOperationsBTN = closeAddOperationsButton.GetComponent<Button>();
-            closeAddOperationsBTN.onClick.AddListener(CloseAddNewOperation);
-
-            var confirmButton = GameObjectHelpers.FindGameObject(gameObject, "ConfirmButton");
-            var confirmBTN = confirmButton.GetComponent<Button>();
-            confirmBTN.onClick.AddListener(() =>
-            {
-                var result = ValidateInformation();
-                if (result)
-                {
-                    CloseAddNewOperation();
-                }
-            });
         }
 
         private void CreateHomePage()
@@ -357,7 +325,6 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             _selectedDevice = null;
             _selectedTransferItem = TechType.None;
             _addNewOperation.SetActive(false);
-            LoadOperationsPage(_manager);
         }
 
         private bool ValidateInformation()
@@ -564,10 +531,7 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
                 _goToEncyclopedia = false;
             }
         }
-
-        public Action OnClose { get; set; }
-        public Channel AudioTrack { get; set; }
-
+        
         private void FindPDA()
         {
             QuickLogger.Debug("In Find PDA");
@@ -680,33 +644,5 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             }
         }
 
-        public void OpenItemTransferDialog(BaseManager manager)
-        {
-            _manager = manager;
-
-            LoadOperationsPage(manager);
-
-            HideAll();
-            _itemTransferOperations.SetActive(true);
-            _fromTransferDialog = true;
-            Open();
-        }
-
-        private void LoadOperationsPage(BaseManager manager)
-        {
-            //ClearList
-            for (int i = _operationsScrollViewTrans.childCount - 1; i >= 0; i--)
-            {
-                Destroy(_operationsScrollViewTrans.GetChild(i).gameObject);
-            }
-
-            foreach (BaseTransferOperation baseOperation in manager.GetBaseOperations())
-            {
-                var prefab = GameObject.Instantiate(Buildables.AlterraHub.BaseOperationItemPrefab);
-                var itemController = prefab.AddComponent<BaseOperationItemController>();
-                itemController.Initialize(baseOperation, manager);
-                prefab.transform.SetParent(_operationsScrollViewTrans,false);
-            }
-        }
     }
 }

@@ -463,25 +463,6 @@ namespace FCS_StorageSolutions.Configuration
             return new DSSFloorServerRackDataEntry() { ID = id };
         }
 
-        internal static ItemTransferUnitDataEntry GetItemTransferUnitSaveData(string id)
-        {
-            LoadData();
-
-            var saveData = GetSaveData();
-
-            foreach (var entry in saveData.ItemTransferUnitDataEntries)
-            {
-                if (string.IsNullOrEmpty(entry.Id)) continue;
-
-                if (entry.Id == id)
-                {
-                    return entry;
-                }
-            }
-
-            return new ItemTransferUnitDataEntry() { Id = id };
-        }
-
         internal static SaveData GetSaveData()
         {
             return _saveData ?? new SaveData();

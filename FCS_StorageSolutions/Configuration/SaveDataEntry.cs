@@ -34,15 +34,6 @@ namespace FCS_StorageSolutions.Configuration
         [JsonProperty] internal HashSet<Filter> ServerFilters { get; set; }
     }    
     
-    internal class ItemTransferUnitDataEntry : ISaveDataEntry
-    {
-        [JsonProperty] internal string SaveVersion { get; set; } = "1.0";
-        [JsonProperty] internal byte[] Data { get; set; }
-        public string Id { get; set; }
-        public string BaseId { get; set; }
-        [JsonProperty] internal Vec4 Body { get; set; }
-    }
-
     [Serializable]
     internal class DSSWallServerRackDataEntry
     {
@@ -147,6 +138,5 @@ namespace FCS_StorageSolutions.Configuration
         [JsonProperty] internal List<DSSTerminalDataEntry> DSSTerminalDataEntries = new List<DSSTerminalDataEntry>();
         [JsonProperty] internal List<DSSWallServerRackDataEntry> DSSWallServerRackDataEntries = new List<DSSWallServerRackDataEntry>();
         [JsonProperty] internal List<DSSFloorServerRackDataEntry> DSSFloorServerRackDataEntries = new List<DSSFloorServerRackDataEntry>();
-        [JsonProperty] internal List<ItemTransferUnitDataEntry> ItemTransferUnitDataEntries = new List<ItemTransferUnitDataEntry>();
     }
 }

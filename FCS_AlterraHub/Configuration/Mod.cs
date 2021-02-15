@@ -450,8 +450,6 @@ namespace FCS_AlterraHub.Configuration
         //public QuestEventType QuestEventType { get; set; }
         //public QuestEventStatus Status { get; set; }
         //public DeviceActionType DeviceActionType { get; set; }
-        public Dictionary<TechType, int> Requirements { get; set; }
-        public IEnumerable<EventPathData> PathList { get; set; }
     }
 
     public struct EventPathData
