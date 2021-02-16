@@ -24,6 +24,7 @@ namespace FCS_EnergySolutions.Configuration
             { $"{ModKey}_NotUnderWaterDesc","Turbine cannot function  above 3 meters"},
             { $"{ModKey}_NoSlotsAvailable","No charging slots available."},
             { $"{ModKey}_NotOnPlatform","JetStreamT242 must be built on a base platform to operate. This is best for efficiency and stability."},
+            { $"{ModKey}_SolarClusterHover","Solar panel Cluster (sun: {0}% charge: {1} /{2}) (Power Generation Per Second: {3})"},
         };
 
         internal static void AdditionalPatching()
@@ -111,6 +112,11 @@ namespace FCS_EnergySolutions.Configuration
         public static string NotOnPlatform()
         {
             return GetLanguage($"{ModKey}_NotOnPlatform");
+        }
+
+        public static string SolarClusterHover(int sun, int charge, int capacity,int produce)
+        {
+            return string.Format(GetLanguage($"{ModKey}_SolarClusterHover"),sun,charge,capacity,produce);
         }
     }
 }

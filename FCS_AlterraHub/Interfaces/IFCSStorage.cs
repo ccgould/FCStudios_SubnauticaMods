@@ -12,12 +12,13 @@ namespace FCS_AlterraHub.Interfaces
         bool AddItemToContainer(InventoryItem item);
         bool IsAllowedToAdd(Pickupable pickupable, bool verbose);
         bool IsAllowedToRemoveItems();
-        Pickupable RemoveItemFromContainer(TechType techType, int amount);
+        Pickupable RemoveItemFromContainer(TechType techType);
         Dictionary<TechType, int> GetItemsWithin();
         Action<int, int> OnContainerUpdate { get; set; }
         Action<FcsDevice, TechType> OnContainerAddItem { get; set; }
         Action<FcsDevice, TechType> OnContainerRemoveItem { get; set; }
         bool ContainsItem(TechType techType);
+        ItemsContainer ItemsContainer { get; set; }
     }
 
     public interface IFCSDumpContainer

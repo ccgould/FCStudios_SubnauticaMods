@@ -109,13 +109,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             return false;
         }
 
-        private string TimeTilRefuel()
-        {
-            var mod = _timeLeft % KDayInSeconds;
-            return TimeConverters.SecondsToHMS(mod);
-        }
-
-        public Pickupable RemoveItemFromContainer(TechType techType, int amount)
+        public Pickupable RemoveItemFromContainer(TechType techType)
         {
             if (_timeLeft - KDayInSeconds >= 0)
             {
@@ -123,6 +117,12 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             }
 
             return null;
+        }
+
+        private string TimeTilRefuel()
+        {
+            var mod = _timeLeft % KDayInSeconds;
+            return TimeConverters.SecondsToHMS(mod);
         }
 
         public Dictionary<TechType, int> GetItemsWithin()
@@ -142,6 +142,8 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         {
             return techType == TechType.Lubricant && !(_timeLeft < KDayInSeconds);
         }
+
+        public ItemsContainer ItemsContainer { get; set; }
 
         internal bool HasOil()
         {

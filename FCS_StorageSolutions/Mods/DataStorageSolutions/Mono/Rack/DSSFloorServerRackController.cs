@@ -186,6 +186,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
             IsInitialized = true;
         }
 
+
         public void UpdateStorageCount()
         {
             if (_slots == null) return;

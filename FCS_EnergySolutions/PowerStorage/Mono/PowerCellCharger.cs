@@ -331,7 +331,7 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
 
         public bool AddItemToContainer(InventoryItem item)
         {
-            return _storageContainer.AddItem(item);
+            return _storageContainer.AddItemToContainer(item);
         }
 
         public bool IsAllowedToAdd(TechType techType, bool verbose)

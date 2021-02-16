@@ -210,7 +210,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             return true;
         }
 
-        public Pickupable RemoveItemFromContainer(TechType techType, int amount)
+        Pickupable IFCSStorage.RemoveItemFromContainer(TechType techType)
         {
             return null;
         }
@@ -224,6 +224,8 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         {
             return false;
         }
+
+        public ItemsContainer ItemsContainer { get; set; }
 
         public void Setup(FCSDeepDrillerController fcsDeepDrillerController)
         {

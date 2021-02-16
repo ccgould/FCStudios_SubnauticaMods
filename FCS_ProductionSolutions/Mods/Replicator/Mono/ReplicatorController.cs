@@ -4,6 +4,7 @@ using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
@@ -37,6 +38,7 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
         private GameObject _canvas;
         private const float PowerUsage = 0.85f;
         public override bool IsOperational => IsConstructed && IsInitialized;
+        public override bool IsVisible => true;
 
         private void Start()
         {
@@ -73,13 +75,12 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
                 
                 _speedBTN.SetSpeedMode(_saveData.Speed);
                 _replicatorSlot.CurrentSpeedMode = _saveData.Speed;
-                _replicatorSlot.SetItemCount(_saveData.ItemCount);
-                
                 _replicatorSlot.GenerationProgress = _saveData.Progress;
 
                 if (_saveData.TargetItem != TechType.None)
                 {
                     _replicatorSlot.ChangeTargetItem(_saveData.TargetItem);
+                    _replicatorSlot.SetItemCount(_saveData.ItemCount);
                     _techTypeIcon.sprite = SpriteManager.Get(_saveData.TargetItem);
                     SpawnModel(_saveData.TargetItem);
                 }
@@ -88,6 +89,11 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
 
                 _fromSave = false;
             }
+        }
+
+        public override IFCSStorage GetStorage()
+        {
+            return _replicatorSlot;
         }
 
         internal void LoadKnownSamples()

@@ -3,18 +3,23 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Model;
 using FCSCommon.Utilities;
 using UnityEngine;
 
 namespace FCS_AlterraHub.Mono
 {
-    public class FCSStorage : MonoBehaviour
+    public class FCSStorage : MonoBehaviour, IFCSStorage
     {
         private GameObject _storageRoot;
         private byte[] _storageRootBytes;
-        public ItemsContainer ItemsContainer;
         private int _slots;
+        public Action<int, int> OnContainerUpdate { get; set; }
+        public Action<FcsDevice, TechType> OnContainerAddItem { get; set; }
+        public Action<FcsDevice, TechType> OnContainerRemoveItem { get; set; }
+        
+        public ItemsContainer ItemsContainer { get; set; }
 
         public byte[] Save(ProtobufSerializer serializer)
         {
@@ -127,14 +132,14 @@ namespace FCS_AlterraHub.Mono
             return _slots - GetCount();
         }
 
-        public Dictionary<TechType,int> GetItems()
+        public Dictionary<TechType,int> GetItemsWithin()
         {
             List<TechType> keys = ItemsContainer.GetItemTypes();
             var lookup = keys?.Where(x => x != TechType.None).ToLookup(x => x).ToArray();
             return lookup?.ToDictionary(count => count.Key, count => ItemsContainer.GetCount(count.Key));
         }
 
-        public bool AddItem(InventoryItem item)
+        public bool AddItemToContainer(InventoryItem item)
         {
             ItemsContainer.UnsafeAdd(item);
           return true;
@@ -174,6 +179,33 @@ namespace FCS_AlterraHub.Mono
             _slots = slots;
             _storageRoot.AddComponent<StoreInformationIdentifier>();
             ItemsContainer = new ItemsContainer(width, height, _storageRoot.transform, name, null);
+        }
+
+        public int GetContainerFreeSpace { get; }
+        public bool IsFull { get; }
+        public bool CanBeStored(int amount, TechType techType)
+        {
+            return !IsFull;
+        }
+
+        public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
+        {
+            return CanBeStored(1,pickupable.GetTechType());
+        }
+
+        public bool IsAllowedToRemoveItems()
+        {
+            return true;
+        }
+
+        public Pickupable RemoveItemFromContainer(TechType techType)
+        {
+           return ItemsContainer.RemoveItem(techType);
+        }
+
+        public bool ContainsItem(TechType techType)
+        {
+            return ItemsContainer.Contains(techType);
         }
     }
 }

@@ -9,7 +9,7 @@ namespace FCS_AlterraHub.Interfaces
         string UnitID { get; set; }
         BaseManager Manager { get; set; }
         bool IsVisible { get;}
-        FCSStorage GetStorage();
+        IFCSStorage GetStorage();
         void UpdateStorageCount();
         bool HasSpace(int amount);
         bool AddItemToRack(InventoryItem item);

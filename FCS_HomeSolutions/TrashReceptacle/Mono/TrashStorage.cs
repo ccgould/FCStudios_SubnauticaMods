@@ -128,7 +128,7 @@ namespace FCS_HomeSolutions.TrashReceptacle.Mono
             return false;
         }
 
-        public Pickupable RemoveItemFromContainer(TechType techType, int amount)
+        public Pickupable RemoveItemFromContainer(TechType techType)
         {
             return null;
         }
@@ -142,5 +142,7 @@ namespace FCS_HomeSolutions.TrashReceptacle.Mono
         {
             return false;
         }
+
+        public ItemsContainer ItemsContainer { get; set; }
     }
 }

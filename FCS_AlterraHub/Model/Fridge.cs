@@ -270,8 +270,8 @@ namespace FCS_AlterraHub.Model
             return true;
         }
 
-        public Pickupable RemoveItemFromContainer(TechType techType, int amount)
-        { 
+        public Pickupable RemoveItemFromContainer(TechType techType)
+        {
             EatableEntities match = FindMatch(techType, EatableType.Any);
 
             if (match == null) return null;
@@ -287,7 +287,7 @@ namespace FCS_AlterraHub.Model
 
             return pickup;
         }
-
+        
         public Dictionary<TechType, int> GetItemsWithin()
         {
             var lookup = FridgeItems?.Where(x => x != null).ToLookup(x => x.TechType).ToArray();
@@ -298,6 +298,8 @@ namespace FCS_AlterraHub.Model
         {
             return FridgeItems.Any(x => x.TechType == techType);
         }
+
+        public ItemsContainer ItemsContainer { get; set; }
 
         public void Clear()
         {

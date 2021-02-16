@@ -52,7 +52,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
         private float _timeLeft;
         private bool _isBreakerTripped;
         private GameObject _canvas;
-        private const int MAXITEMLIMIT = 15;
+        private const int MAXITEMLIMIT = 10;
 
         public override float GetPowerUsage()
         {
@@ -159,7 +159,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
             if (DumpContainer == null)
             {
                 DumpContainer = gameObject.AddComponent<DumpContainer>();
-                DumpContainer.Initialize(transform,Buildables.AlterraHub.OreConsumerReceptacle(),this);
+                DumpContainer.Initialize(transform,Buildables.AlterraHub.OreConsumerReceptacle(),this,2,5);
             }
 
             if (TransferHandler == null)
@@ -348,6 +348,8 @@ namespace FCS_AlterraHub.Mono.OreConsumer
         {
             return false;
         }
+
+        public ItemsContainer ItemsContainer { get; set; }
 
         public void Save(SaveData newSaveData, ProtobufSerializer serializer)
         {

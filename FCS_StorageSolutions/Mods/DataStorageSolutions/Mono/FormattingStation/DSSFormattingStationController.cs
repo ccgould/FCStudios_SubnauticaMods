@@ -216,7 +216,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.FormattingStation
         {
             QuickLogger.Debug($"Adding {item.item.GetTechType()}");
             _mountedServer = item.item.gameObject.GetComponent<DSSServerController>();
-            _storageManager.AddItem(item);
+            _storageManager.AddItemToContainer(item);
             _mountedServer.DockServer(Manager,_slot);
             _displayManager.GoToPage(FormattingStationPages.Home);
             _displayManager.AddFilterController.ResetFilters(_mountedServer?.GetFilters());

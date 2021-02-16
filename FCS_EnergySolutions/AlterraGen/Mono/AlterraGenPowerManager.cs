@@ -173,6 +173,12 @@ namespace FCS_EnergySolutions.AlterraGen.Mono
             return false;
         }
 
+        public Pickupable RemoveItemFromContainer(TechType techType)
+        {
+            OnContainerRemoveItem(_mono, techType);
+            return null;
+        }
+
         public bool IsAllowedToAdd(TechType techType,bool verbose = false)
         {
             bool flag = false;
@@ -188,11 +194,6 @@ namespace FCS_EnergySolutions.AlterraGen.Mono
             return flag;
         }
 
-        public Pickupable RemoveItemFromContainer(TechType techType, int amount)
-        {
-            OnContainerRemoveItem(_mono, techType);
-            return null;
-        }
 
         public Dictionary<TechType, int> GetItemsWithin()
         {
@@ -209,6 +210,8 @@ namespace FCS_EnergySolutions.AlterraGen.Mono
         {
             return _container.Contains(techType);
         }
+
+        public ItemsContainer ItemsContainer { get; set; }
 
         #endregion
 

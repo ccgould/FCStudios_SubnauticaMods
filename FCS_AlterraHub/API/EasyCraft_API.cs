@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using FCS_AlterraHub.Interfaces;
 using UnityEngine;
 
 namespace FCS_AlterraHub.API
@@ -99,7 +100,7 @@ namespace FCS_AlterraHub.API
 					}
 					foreach (FcsDevice fcsDevice in UnityEngine.Object.FindObjectsOfType<FcsDevice>())
 					{
-						FCSStorage storage = fcsDevice.GetStorage();
+						IFCSStorage storage = fcsDevice.GetStorage();
 						if (storage != null && storage.ItemsContainer.containerType == ItemsContainerType.Default && (Player.main.transform.position - fcsDevice.GetPosition()).sqrMagnitude < 10000f && fcsDevice.IsConstructed && fcsDevice.IsVisible)
 						{
 							list.Add(storage.ItemsContainer);
@@ -109,7 +110,7 @@ namespace FCS_AlterraHub.API
 
 				foreach (FcsDevice fcsDevice in array)
 				{
-					FCSStorage storage = fcsDevice.GetStorage();
+					IFCSStorage storage = fcsDevice.GetStorage();
 					if (storage != null && storage.ItemsContainer.containerType == ItemsContainerType.Default && fcsDevice.IsConstructed && fcsDevice.IsVisible)
 					{
 						list.Add(storage.ItemsContainer);

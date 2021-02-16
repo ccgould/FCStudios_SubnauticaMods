@@ -166,7 +166,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         /// <returns></returns>
         public bool AddItemToContainer(InventoryItem item)
         {
-           return  _storage.AddItem(item);
+           return  _storage.AddItemToContainer(item);
         }
 
         private bool MountServerToRack(InventoryItem item)

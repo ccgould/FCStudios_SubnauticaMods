@@ -97,7 +97,7 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
             return transform.position;
         }
 
-        public override FCSStorage GetStorage()
+        public override IFCSStorage GetStorage()
         {
             return _storageContainer;
         }
@@ -222,7 +222,7 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
             try
             {
                 if (_isBeingDestroyed || _storageContainer == null) return;
-                var grouped = _storageContainer.GetItems();
+                var grouped = _storageContainer.GetItemsWithin();
                 if (grouped == null) return;
                 if (data.EndPosition > grouped.Count)
                 {
@@ -363,7 +363,7 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
 
         public override bool AddItemToContainer(InventoryItem item)
         {
-            return _storageContainer.AddItem(item);
+            return _storageContainer.AddItemToContainer(item);
         }
 
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
@@ -395,6 +395,8 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
         {
             return _storageContainer.ItemsContainer.Contains(techType);
         }
+
+        public ItemsContainer ItemsContainer { get; set; }
 
         public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
         {

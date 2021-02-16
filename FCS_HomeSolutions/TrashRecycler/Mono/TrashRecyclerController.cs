@@ -55,7 +55,7 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
             return transform.position;
         }
 
-        public override FCSStorage GetStorage()
+        public override IFCSStorage GetStorage()
         {
             return _recycler.GetStorage();
         }
@@ -202,7 +202,7 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
         {
             data.Pool.Reset(RecyclerPoolTag);
 
-            var grouped = _recycler.GetStorage().GetItems().OrderBy(x => x.Key).ToList();
+            var grouped = _recycler.GetStorage().GetItemsWithin().OrderBy(x => x.Key).ToList();
 
             if (data.EndPosition > grouped.Count)
             {

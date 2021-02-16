@@ -402,11 +402,11 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             return false;
         }
 
-        public Pickupable RemoveItemFromContainer(TechType techType, int amount)
+        public Pickupable RemoveItemFromContainer(TechType techType)
         {
             return null;
         }
-
+        
         public Dictionary<TechType, int> GetItemsWithin()
         {
             return null;
@@ -421,6 +421,8 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         {
             return false;
         }
+
+        public ItemsContainer ItemsContainer { get; set; }
 
         #endregion
 

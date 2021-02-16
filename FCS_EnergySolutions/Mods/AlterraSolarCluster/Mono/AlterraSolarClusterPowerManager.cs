@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using FCS_EnergySolutions.Configuration;
+using UnityEngine;
 
 namespace FCS_EnergySolutions.Mods.AlterraSolarCluster.Mono
 {
@@ -9,6 +10,7 @@ namespace FCS_EnergySolutions.Mods.AlterraSolarCluster.Mono
         private const float MaxDepth = 200f;
         private AnimationCurve _depthCurve;
         private AlterraSolarClusterController _mono;
+        private float _powerCal;
 
 
         internal void Initialize(AlterraSolarClusterController mono)
@@ -41,8 +43,8 @@ namespace FCS_EnergySolutions.Mods.AlterraSolarCluster.Mono
         {
             if (_mono != null && _mono.IsOperational && _powerSource != null)
             {
-                var powerCal = (GetRechargeScalar() * DayNightCycle.main.deltaTime * 0.25f * 5f) * 13;
-                _powerSource.power = Mathf.Clamp(_powerSource.power + powerCal, 0f, _powerSource.maxPower);
+                _powerCal = (GetRechargeScalar() * DayNightCycle.main.deltaTime * 0.25f * 5f) * 13;
+                _powerSource.power = Mathf.Clamp(_powerSource.power + _powerCal, 0f, _powerSource.maxPower);
             }
         }
 
@@ -50,8 +52,8 @@ namespace FCS_EnergySolutions.Mods.AlterraSolarCluster.Mono
         {
             if (_mono != null && _mono.IsOperational)
             {
-                HandReticle.main.SetInteractText(Language.main.GetFormat<int, int, int>("SolarPanelStatus", Mathf.RoundToInt(GetRechargeScalar() * 100f), Mathf.RoundToInt(_powerSource.GetPower()), Mathf.RoundToInt(_powerSource.GetMaxPower())), false, HandReticle.Hand.None);
-                HandReticle.main.SetIcon(HandReticle.IconType.Hand, 1f);
+                HandReticle.main.SetInteractTextRaw(AuxPatchers.SolarClusterHover(Mathf.RoundToInt(GetRechargeScalar() * 100f), Mathf.RoundToInt(_powerSource.GetPower()), Mathf.RoundToInt(_powerSource.GetMaxPower()), Mathf.RoundToInt((GetRechargeScalar() * 0.25f * 5f) * 13f)), string.Empty);
+                HandReticle.main.SetIcon(HandReticle.IconType.Info, 1f);
             }
         }
 

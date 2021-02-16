@@ -119,22 +119,43 @@ namespace FCS_AlterraHub.Mono
 
         private void PerformOperations()
         {
-            if (_registeredDevices == null) return;
+            if (_registeredDevices == null || _baseTransferOperations == null)
+            {
+                if (_baseTransferOperations == null)
+                {
+                    _baseTransferOperations = new List<BaseTransferOperation>();
+                }
+                return;
+            }
             foreach (BaseTransferOperation operation in _baseTransferOperations)
             {
+                QuickLogger.Debug("1");
                 if(operation.Device == null || !operation.Device.IsOperational) continue;
+                QuickLogger.Debug("2");
 
                 if (operation.IsPullOperation)
                 {
+                    QuickLogger.Debug("3");
+
                     PerformPullOperation(operation);
+                    QuickLogger.Debug("4");
+
                 }
                 else
                 {
+                    QuickLogger.Debug("5");
+
                     if (HasItem(operation.TransferItem))
                     {
+                        QuickLogger.Debug("6");
+
                         if (operation.Device.CanBeStored(1, operation.TransferItem))
                         {
+                            QuickLogger.Debug("7");
+
                             operation.Device.AddItemToContainer(TakeItem(operation.TransferItem).ToInventoryItem());
+                            QuickLogger.Debug("8");
+
                         }
                     }
                 }

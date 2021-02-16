@@ -65,10 +65,11 @@ namespace FCS_AlterraHub.Mono.OreConsumer
             return false;
         }
 
-        public Pickupable RemoveItemFromContainer(TechType techType, int amount)
+        public Pickupable RemoveItemFromContainer(TechType techType)
         {
             return null;
         }
+
 
         public Dictionary<TechType, int> GetItemsWithin()
         {
@@ -79,6 +80,8 @@ namespace FCS_AlterraHub.Mono.OreConsumer
         {
             return false;
         }
+
+        public ItemsContainer ItemsContainer { get; set; }
 
         public void OpenStorage(Action<string> withDrawMoney)
         {

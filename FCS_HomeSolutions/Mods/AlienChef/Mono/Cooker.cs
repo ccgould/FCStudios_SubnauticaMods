@@ -157,13 +157,13 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
             //TODO Add to container for testing give to player
             if (_mode == CookerMode.Cook)
             {
-                _mono.StorageSystem.AddItem(item.CookedTechType.ToInventoryItem());
+                _mono.StorageSystem.AddItemToContainer(item.CookedTechType.ToInventoryItem());
                 //PlayerInteractionHelper.GivePlayerItem(item.CookedTechType);
             }
 
             if (_mode == CookerMode.Cure)
             {
-                _mono.StorageSystem.AddItem(item.CuredTechType.ToInventoryItem());
+                _mono.StorageSystem.AddItemToContainer(item.CuredTechType.ToInventoryItem());
                 //PlayerInteractionHelper.GivePlayerItem(item.CuredTechType);
             }
 

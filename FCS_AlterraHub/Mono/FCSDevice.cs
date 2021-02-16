@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
+using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Registration;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -42,7 +43,7 @@ namespace FCS_AlterraHub.Mono
         /// Gets the storage of a unit if it is accesable.
         /// </summary>
         /// <returns><see cref="FCSStorage"/></returns>
-        public virtual FCSStorage GetStorage()
+        public virtual IFCSStorage GetStorage()
         {
             return null;
         }

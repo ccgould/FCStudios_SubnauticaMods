@@ -76,7 +76,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
             return transform.position;
         }
 
-        public override FCSStorage GetStorage()
+        public override IFCSStorage GetStorage()
         {
             return _storageContainer;
         }
@@ -247,7 +247,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
 
         public override bool AddItemToContainer(InventoryItem item)
         {
-            var result = _storageContainer.AddItem(item);
+            var result = _storageContainer.AddItemToContainer(item);
 
             if (result)
             {
@@ -397,7 +397,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
 
         public override IEnumerable<KeyValuePair<TechType, int>> GetItemsWithin()
         {
-            return _storageContainer.GetItems();
+            return _storageContainer.GetItemsWithin();
         }
 
         public override int GetItemCount(TechType techType)
