@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
+using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Registration;
 using FCSCommon.Utilities;

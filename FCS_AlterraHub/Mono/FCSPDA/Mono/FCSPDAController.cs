@@ -312,21 +312,6 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             });
         }
 
-        private void CloseAddNewOperation()
-        {
-            _manager.AddBaseTransferItem(new BaseTransferOperation
-            {
-                Amount = 1,
-                IsPullOperation = _isPullOperationToggle.isOn,
-                DeviceId = _deviceIdInput.text,
-                TransferItem = _selectedTransferItem,
-            });
-
-            _selectedDevice = null;
-            _selectedTransferItem = TechType.None;
-            _addNewOperation.SetActive(false);
-        }
-
         private bool ValidateInformation()
         {
             QuickLogger.Debug("1");

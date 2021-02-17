@@ -80,8 +80,6 @@ namespace FCS_EnergySolutions.JetStreamT242.Mono
 
         internal bool IsUpright()
         {
-            //TODO Reimplement after testing
-            return true;
             if (Mathf.Approximately(transform.up.y, 1f))
             {
                 return true;

@@ -173,6 +173,7 @@
     <Compile Include="Managers\Mission\MissionManager.cs" />
     <Compile Include="Managers\Mission\MissionTask.cs" />
     <Compile Include="Model\AdditionalColor.cs" />
+    <Compile Include="Model\BaseOperationObject.cs" />
     <Compile Include="Model\EatableEntities.cs" />
     <Compile Include="Model\EffectsBuilder.cs" />
     <Compile Include="Model\Effects\ScaleRectEffect.cs" />
@@ -189,6 +190,8 @@
     <Compile Include="Mono\AlterraHub\Encyclopedia\Encyclopedia.cs" />
     <Compile Include="Mono\AlterraHub\HubTrigger.cs" />
     <Compile Include="Mono\BaseManager.cs" />
+    <Compile Include="Mono\BaseSaveData.cs" />
+    <Compile Include="Mono\BaseTransferOperation.cs" />
     <Compile Include="Mono\ColorItemButton.cs" />
     <Compile Include="Mono\Controllers\NameController.cs" />
     <Compile Include="Mono\Controllers\PaginatorController.cs" />
@@ -197,7 +200,6 @@
     <Compile Include="Mono\DumpContainerSimplified.cs" />
     <Compile Include="Mono\FCSAquarium.cs" />
     <Compile Include="Mono\FCSPDA\Mono\AudioMessage.cs" />
-    <Compile Include="Mono\FCSPDA\Mono\BaseOperationItemController.cs" />
     <Compile Include="Mono\FCSPDA\Mono\DSSBaseItem.cs" />
     <Compile Include="Mono\FCSPDA\Mono\DSSInventoryItem.cs" />
     <Compile Include="Mono\FCSPDA\Mono\FCSEncyclopediaData.cs" />
@@ -208,6 +210,7 @@
     <Compile Include="Mono\FCSPDA\Mono\VideoProgressBar.cs" />
     <Compile Include="Mono\FCSStorage.cs" />
     <Compile Include="Mono\FCSStorageNonSerialized.cs" />
+    <Compile Include="Mono\FCSTechLigtController.cs" />
     <Compile Include="Mono\FCSToggleButton.cs" />
     <Compile Include="Mono\FCSToggleGroup.cs" />
     <Compile Include="Mono\GridHelper.cs" />
@@ -220,7 +223,10 @@
     <Compile Include="Mono\OnScreenButton.cs" />
     <Compile Include="Mono\PaginatorButton.cs" />
     <Compile Include="Mono\SearchField.cs" />
+    <Compile Include="Enumerators\StorageType.cs" />
     <Compile Include="Mono\ToggleController.cs" />
+    <Compile Include="Model\TrackedResource.cs" />
+    <Compile Include="Structs\TrackedLight.cs" />
     <Compile Include="Objects\ColorList.cs" />
     <Compile Include="Helpers\FCSHUD.cs" />
     <Compile Include="Interfaces\IFCSStorage.cs" />

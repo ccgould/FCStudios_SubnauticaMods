@@ -8,6 +8,7 @@ using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_StorageSolutions.Mods.DataStorageSolutions.Mono;
 using FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server;
+using FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Transceiver;
 using FCSCommon.Extensions;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
@@ -22,8 +23,9 @@ namespace FCS_StorageSolutions.Configuration
 
         private static ModSaver _saveObject;
         private static SaveData _saveData;
-        private static TechType _dssServerTechType;
+        private static TechType _transceiverTechType;
         private static List<DSSServerController> _registeredServers;
+        private static TechType _dssServerTechType;
 
         #endregion
 
@@ -46,7 +48,11 @@ namespace FCS_StorageSolutions.Configuration
         internal const string DSSServerPrefabName = "DSS_Server";
         internal const string DSSServerDescription = "Data Storage for 48 items, formatted to accept all item categories. Place in a Wall Server Rack or Floor Server Rack to connect to Data Storage Network.";
 
-
+        internal const string TransceiverTabID = "DTS";
+        internal const string TransceiverFriendlyName = "Transceiver";
+        internal const string TransceiverClassName = "DSSTransceiver";
+        internal const string TransceiverPrefabName = "DSS_Transceiver";
+        internal const string TransceiverDescription = "N/A";
 
         internal const string ItemTransferUnitTabID= "ITU";
         internal const string ItemTransferUnitFriendlyName = "Item Transfer Unit";
@@ -90,8 +96,7 @@ namespace FCS_StorageSolutions.Configuration
         internal const string DSSFloorServerRackPrefabName = "DSS_FloorServerRack";
         internal static string DSSFloorServerRackKitClassID => $"{DSSFloorServerRackClassName}_Kit";
         internal const string DSSFloorServerRackDescription = "Holds 17 Data Storage Servers. Requires a floor.";
-
-
+        
         internal const string DSSAntennaFriendlyName = "Antenna";
         internal const string DSSAntennaClassName = "DSSAntenna";
         internal const string DSSAntennaPrefabName = "DSS_Antenna";
@@ -220,7 +225,7 @@ namespace FCS_StorageSolutions.Configuration
         };
 
         public static List<TechType> Craftables { get; set; } = new List<TechType>();
-
+        
         internal const string ModDescription = "";
 
         internal static event Action<SaveData> OnDataLoaded;
@@ -477,6 +482,63 @@ namespace FCS_StorageSolutions.Configuration
         {
             return Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         }
+
+        internal static void CleanDummyServers()
+        {
+            QuickLogger.Debug("1");
+            var g = GameObject.FindObjectsOfType<DSSServerController>();
+            var h = GameObject.FindObjectsOfType<DSSTransceiverController>();
+            QuickLogger.Debug("2");
+            if (g == null && h == null) return;
+            QuickLogger.Debug("3");
+            var toDelete = new List<GameObject>();
+            QuickLogger.Debug("4");
+            if (g != null)
+            {
+                QuickLogger.Debug("5");
+                foreach (DSSServerController ds in g)
+                {
+                    var parentName = ds?.gameObject?.transform?.parent?.name;
+                QuickLogger.Debug($"6: {parentName}");
+                    if (parentName != null && ds.gameObject.transform.parent.name.Equals("SerializerEmptyGameObject"))
+                    {
+                        QuickLogger.Debug("7");
+                        if (ds.gameObject.transform.parent.parent == null)
+                        {
+                            QuickLogger.Debug("8");
+                            toDelete.Add(ds.gameObject.transform.parent.gameObject);
+                            QuickLogger.Debug("9");
+                        }
+                    }
+
+                }
+            }
+
+            if (h != null)
+            {
+                QuickLogger.Debug("10");
+                foreach (DSSTransceiverController ds in h)
+                {
+                    QuickLogger.Debug("11");
+                    if (ds.gameObject.transform.parent.name.Equals("SerializerEmptyGameObject"))
+                    {
+                        QuickLogger.Debug("12");
+                        if (ds.gameObject.transform.parent.parent == null)
+                        {
+                            QuickLogger.Debug("13");
+                            toDelete.Add(ds.gameObject.transform.parent.gameObject);
+                            QuickLogger.Debug("14");
+                        }
+                    }
+
+                }
+            }
+            QuickLogger.Debug("15");
+            foreach (GameObject o in toDelete)
+            {
+                GameObject.Destroy(o);
+            }
+        }
         #endregion
 
         #region Private Methods
@@ -501,7 +563,15 @@ namespace FCS_StorageSolutions.Configuration
 
             return _dssServerTechType;
         }
+        public static TechType GetTransceiverTechType()
+        {
+            if (_transceiverTechType == TechType.None)
+            {
+                _transceiverTechType = TransceiverClassName.ToTechType();
+            }
 
+            return _transceiverTechType;
+        }
         public static void RegisterServer(DSSServerController server)
         {
             if (_registeredServers == null)
@@ -520,6 +590,5 @@ namespace FCS_StorageSolutions.Configuration
         {
             _registeredServers.Remove(server);
         }
-
     }
 }

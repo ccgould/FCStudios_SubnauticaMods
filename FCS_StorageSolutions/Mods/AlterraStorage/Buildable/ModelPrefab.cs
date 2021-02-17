@@ -38,6 +38,7 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Buildable
         public static GameObject FilterItemPrefab { get; set; }
         public static GameObject DSSCrafterCratePrefab { get; set; }
         public static GameObject ItemTransferUnitPrefab { get; set; }
+        public static GameObject DSSTransceiverPrefab { get; set; }
 
 
         internal static void Initialize()
@@ -56,6 +57,7 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Buildable
             DSSServerPrefab = GetPrefab(Mod.DSSServerPrefabName);
             DSSFormattingStationPrefab = GetPrefab(Mod.DSSFormattingStationPrefabName);
             DSSTerminalPrefab = GetPrefab(Mod.DSSTerminalPrefabName);
+            DSSTransceiverPrefab = GetPrefab(Mod.TransceiverPrefabName);
             DSSAutoCrafterPrefab = GetPrefab(Mod.DSSAutoCrafterPrefabName);
             DSSWallServerRackPrefab = GetPrefab(Mod.DSSWallServerRackPrefabName);
             DSSFloorServerRackPrefab = GetPrefab(Mod.DSSFloorServerRackPrefabName);

@@ -65,6 +65,9 @@ namespace FCS_StorageSolutions
 
                 var floorServerRack = new DSSFloorServerRackPatch();
                 floorServerRack.Patch();
+
+                var dssTransceiver = new DSSTransceiver();
+                dssTransceiver.Patch();
             }
 
             //Register debug commands

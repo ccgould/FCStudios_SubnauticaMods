@@ -82,7 +82,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         {
             foreach (KeyValuePair<string, DSSSlotController> controller in _slots)
             {
-                if (controller.Value != null && controller.Value.IsOccupied)
+                if (controller.Value != null && controller.Value.IsOccupied && controller.Value.GetServer() != null)
                 {
                     Manager.RegisterServerInBase(controller.Value.GetServer());
                 }

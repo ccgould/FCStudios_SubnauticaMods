@@ -5,8 +5,9 @@ using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Mono;
 using FCS_StorageSolutions.Configuration;
 using FCS_StorageSolutions.Mods.AlterraStorage.Buildable;
+using FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable;
 using FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server;
-using FCSCommon.Helpers;
+using FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Transceiver;
 using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
@@ -22,42 +23,19 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         private BoxCollider _collider;
         private FCSStorage _storage;
         private DSSServerController _mountedServer;
+        private DSSTransceiverController _transceiver;
         private Image _preloader;
         private Text _preloaderPercentage;
-        public bool IsOccupied => _mountedServer != null;
+        public bool IsOccupied => _mountedServer != null || _transceiver != null;
         public bool IsFull => _mountedServer?.IsFull() ?? true;
 
         private void Start()
         {
+            QuickLogger.Debug($"Storage Status: {_storage}");
             _storage?.CleanUpDuplicatedStorageNoneRoutine();
-            CleanDummyServers();
+            Mod.CleanDummyServers();
         }
-
-        private void CleanDummyServers()
-        {
-            var g = GameObject.FindObjectsOfType<DSSServerController>();
-
-            var toDelete = new List<GameObject>();
-
-            foreach (DSSServerController ds in g)
-            {
-                if (ds.gameObject.transform.parent.name.Equals("SerializerEmptyGameObject"))
-                {
-                    if (ds.gameObject.transform.parent.parent == null)
-                    {
-                        toDelete.Add(ds.gameObject.transform.parent.gameObject);
-                    }
-                }
-
-            }
-
-            foreach (GameObject o in toDelete)
-            {
-                Destroy(o);
-            }
-        }
-
-
+        
         private void Update()
         {
             if (_collider == null || _controller == null || _preloader == null || _preloaderPercentage == null) return;
@@ -96,20 +74,25 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
 
         private void OnServerRemovedFromStorage(InventoryItem item)
         {
-            var server = item.item.gameObject.EnsureComponent<DSSServerController>();
+            var server = item.item.gameObject.GetComponent<DSSServerController>();
+            var transceiver = item.item.gameObject.GetComponent<DSSTransceiverController>();
 
-            if (server == null)
+            if (server == null && transceiver == null)
             {
-#if DEBUG
-                QuickLogger.DebugError($"Server controller returned null on ItemsContainerOnOnAddItem. Object {item.item.gameObject.name}");
-#endif
                 return;
             }
-            server.UnDockServer();
-            _controller.Manager.RemoveServerFromBase(_mountedServer);
-            server.GetStorage().ItemsContainer.onAddItem -= OnMountedServerUpdate;
-            server.GetStorage().ItemsContainer.onRemoveItem -= OnMountedServerUpdate;
+
+
+            if (server != null)
+            {
+                server.UnDockServer();
+                _controller.Manager.RemoveServerFromBase(_mountedServer);
+                server.GetStorage().ItemsContainer.onAddItem -= OnMountedServerUpdate;
+                server.GetStorage().ItemsContainer.onRemoveItem -= OnMountedServerUpdate;
+            }
+
             _mountedServer = null;
+            _transceiver = null;
             _inventoryItem = null;
         }
 
@@ -144,12 +127,21 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
 
             if (IsOccupied)
             {
-                var pickup = _inventoryItem.item;
-                _storage.ItemsContainer.RemoveItem(pickup);
-                PlayerInteractionHelper.GivePlayerItem(pickup);
-                _preloader.fillAmount = 0;
-                _preloaderPercentage.text = $"{0:P0}";
-                _controller.UpdateStorageCount();
+                if (_mountedServer != null)
+                {
+                    var pickup = _inventoryItem.item;
+                    _storage.ItemsContainer.RemoveItem(pickup);
+                    PlayerInteractionHelper.GivePlayerItem(pickup);
+                    _preloader.fillAmount = 0;
+                    _preloaderPercentage.text = $"{0:P0}";
+                    _controller.UpdateStorageCount();
+                }
+
+                if(_transceiver != null)
+                {
+                    PlayerInteractionHelper.GivePlayerItem(_inventoryItem.item);
+                }
+
             }
             else
             {
@@ -174,29 +166,41 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
             QuickLogger.Debug("Adding Server", true);
             try
             {
-                if (item.item.GetTechType() != Mod.GetDSSServerTechType() || _controller == null) return false;
+                if (item.item.GetTechType() != Mod.GetDSSServerTechType() && item.item.GetTechType() != Mod.GetTransceiverTechType() || _controller == null) return false;
+
+                QuickLogger.Debug($"Valid Server, {Language.main.Get(item.item.GetTechType())}", true); 
+
+                if (item.item.GetTechType() == Mod.GetDSSServerTechType())
+                {
+                    _mountedServer = item.item.gameObject.GetComponentInChildren<DSSServerController>();
+                    if (_mountedServer != null)
+                    {
+                        _mountedServer.DockServer(this, _controller);
+                        _mountedServer.GetStorage().ItemsContainer.onAddItem += OnMountedServerUpdate;
+                        _mountedServer.GetStorage().ItemsContainer.onRemoveItem += OnMountedServerUpdate;
+                        _controller.Manager?.RegisterServerInBase(_mountedServer);
+                        _controller.UpdateStorageCount();
+                    }
+                    else
+                    {
+                        QuickLogger.Debug("Mounted Server was null");
+                    }
+
+                    if (_controller == null)
+                    {
+                        QuickLogger.Debug("CONTROLLER IS NULL");
+                    }
+                }
+
+                if (item.item.GetTechType() == Mod.GetTransceiverTechType())
+                {
+                    //Do something
+                    _transceiver = item.item.gameObject.GetComponentInChildren<DSSTransceiverController>();
+                    _transceiver.DockTransceiver(this,_controller);
+                    QuickLogger.Debug($"Mounting a transmitter in {_slotName} in serverRack {_controller.UnitID}");
+                }
 
                 _inventoryItem = item;
-
-                _mountedServer = item.item.gameObject.GetComponentInChildren<DSSServerController>();
-
-                if (_controller == null)
-                {
-                    QuickLogger.Debug("CONTROLLER IS NULL");
-                }
-
-                if (_mountedServer != null)
-                {
-                    _mountedServer.DockServer(this, _controller);
-                    _mountedServer.GetStorage().ItemsContainer.onAddItem += OnMountedServerUpdate;
-                    _mountedServer.GetStorage().ItemsContainer.onRemoveItem += OnMountedServerUpdate;
-                    _controller.Manager?.RegisterServerInBase(_mountedServer);
-                    _controller.UpdateStorageCount();
-                }
-                else
-                {
-                    QuickLogger.Debug("Mounted Server was null");
-                }
             }
             catch (Exception e)
             {
@@ -210,7 +214,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
             return true;
         }
 
-
         /// <summary>
         /// Dump Container calls this method to see if this item can be added to the container.
         /// </summary>
@@ -219,7 +222,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         /// <returns></returns>
         public bool IsAllowedToAdd(TechType techType, bool verbose)
         {
-            return techType == Mod.GetDSSServerTechType();
+            return techType == Mod.GetDSSServerTechType() || techType == Mod.GetTransceiverTechType();
         }
 
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
@@ -263,11 +266,12 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
 
         private void FindServer()
         {
-            if (_mountedServer == null)
+            if (_mountedServer == null && _transceiver == null)
             {
                 if (_inventoryItem != null)
                 {
                     _mountedServer = _inventoryItem.item.gameObject.GetComponentInChildren<DSSServerController>();
+                    _transceiver = _inventoryItem.item.gameObject.GetComponentInChildren<DSSTransceiverController>();
                 }
             }
         }

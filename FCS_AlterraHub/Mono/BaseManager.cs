@@ -2,20 +2,19 @@
 using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHub.Configuration;
+using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Interfaces;
+using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono.Controllers;
 using FCS_AlterraHub.Patches;
 using FCS_AlterraHub.Registration;
+using FCS_AlterraHub.Structs;
 using FCSCommon.Extensions;
 using FCSCommon.Utilities;
-using Oculus.Newtonsoft.Json;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
-using Steamworks;
 using UnityEngine;
-using UnityEngine.Assertions.Must;
-using UnityEngine.Experimental.PlayerLoop;
 
 namespace FCS_AlterraHub.Mono
 {
@@ -38,14 +37,18 @@ namespace FCS_AlterraHub.Mono
                 OnBreakerStateChanged?.Invoke(value);
             }
         }
-
         private string _baseName;
-        public string BaseID { get; set; }
-        public static Action<BaseManager> OnManagerCreated { get; set; }
         private readonly Dictionary<string, FcsDevice> _registeredDevices;
         private float _timeLeft = 1f;
         private PowerSystem.Status _prevPowerState;
         private Dictionary<string, TechLight> _baseTechLights;
+        private DumpContainerSimplified _dumpContainer;
+        private Dictionary<TechType, int> _item = new Dictionary<TechType, int>();
+        private BaseSaveData _savedData;
+        private bool _hasBreakerTripped;
+        private Dictionary<string, BaseOperationObject> _baseTransferOperations = new  Dictionary<string, BaseOperationObject>();
+
+        public string BaseID { get; set; }
         public float ActiveBaseOxygenTankCount = 0;
         public readonly Dictionary<TechType, TrackedResource> TrackedResources = new Dictionary<TechType, TrackedResource>();
         public static List<string> DONT_TRACK_GAMEOBJECTS { get; private set; } = new List<string>
@@ -63,22 +66,13 @@ namespace FCS_AlterraHub.Mono
         public readonly HashSet<FcsDevice> BaseFcsStorage = new HashSet<FcsDevice>();
         public readonly HashSet<FcsDevice> BaseAntennas = new HashSet<FcsDevice>();
         public readonly HashSet<FcsDevice> BaseTerminals = new HashSet<FcsDevice>();
-        private DumpContainerSimplified _dumpContainer;
-
         public SubRoot Habitat { get; set; }
-
+        public static Action<BaseManager> OnManagerCreated { get; set; }
         public bool IsVisible => GetIsVisible();
-
-        private bool GetIsVisible()
-        {
-            return Habitat?.powerRelay != null && HasAntenna() && Habitat.powerRelay.GetPowerStatus() != PowerSystem.Status.Offline && !_hasBreakerTripped;
-        }
-
         public static List<BaseManager> Managers { get; } = new List<BaseManager>();
         internal NameController NameController { get; private set; }
         public static Dictionary<string, TrackedLight> GlobalTrackedLights { get; } = new Dictionary<string, TrackedLight>();
         public Action<PowerSystem.Status> OnPowerStateChanged { get; set; }
-        public bool IsBaseExternalLightsActivated { get; set; }
         public List<IDSSRack> BaseRacks { get; set; } = new List<IDSSRack>();
         public DSSVehicleDockingManager DockingManager { get; set; }
         public bool PullFromDockedVehicles { get; set; }
@@ -123,39 +117,27 @@ namespace FCS_AlterraHub.Mono
             {
                 if (_baseTransferOperations == null)
                 {
-                    _baseTransferOperations = new List<BaseTransferOperation>();
+                    _baseTransferOperations = new Dictionary<string, BaseOperationObject>();
                 }
                 return;
             }
-            foreach (BaseTransferOperation operation in _baseTransferOperations)
+            foreach (KeyValuePair<string, BaseOperationObject> transferObject in _baseTransferOperations)
             {
-                QuickLogger.Debug("1");
-                if(operation.Device == null || !operation.Device.IsOperational) continue;
-                QuickLogger.Debug("2");
-
-                if (operation.IsPullOperation)
+                foreach (BaseTransferOperation operation in transferObject.Value.Operations)
                 {
-                    QuickLogger.Debug("3");
-
-                    PerformPullOperation(operation);
-                    QuickLogger.Debug("4");
-
-                }
-                else
-                {
-                    QuickLogger.Debug("5");
-
-                    if (HasItem(operation.TransferItem))
+                    if (operation.Device == null || !operation.Device.IsOperational) continue;
+                    if (operation.IsPullOperation)
                     {
-                        QuickLogger.Debug("6");
-
-                        if (operation.Device.CanBeStored(1, operation.TransferItem))
+                        PerformPullOperation(operation);
+                    }
+                    else
+                    {
+                        if (HasItem(operation.TransferItem))
                         {
-                            QuickLogger.Debug("7");
-
-                            operation.Device.AddItemToContainer(TakeItem(operation.TransferItem).ToInventoryItem());
-                            QuickLogger.Debug("8");
-
+                            if (operation.Device.CanBeStored(1, operation.TransferItem))
+                            {
+                                operation.Device.AddItemToContainer(TakeItem(operation.TransferItem).ToInventoryItem());
+                            }
                         }
                     }
                 }
@@ -195,8 +177,8 @@ namespace FCS_AlterraHub.Mono
                 DockingBlackList = _savedData.BlackList;
                 PullFromDockedVehicles = _savedData.AllowDocking;
                 HasBreakerTripped = _savedData.HasBreakerTripped;
-                if(_baseTransferOperations!=null)
-                    _baseTransferOperations = _savedData.BaseOperations;
+                //if(_baseTransferOperations!=null)
+                    //_baseTransferOperations = _savedData.BaseOperations;
             }
 
             if (_dumpContainer == null)
@@ -236,6 +218,11 @@ namespace FCS_AlterraHub.Mono
         }
 
         #endregion
+
+        private bool GetIsVisible()
+        {
+            return Habitat?.powerRelay != null && HasAntenna() && Habitat.powerRelay.GetPowerStatus() != PowerSystem.Status.Offline && !_hasBreakerTripped;
+        }
 
         public void ToggleBreaker()
         {
@@ -650,11 +637,6 @@ namespace FCS_AlterraHub.Mono
             return null;
         }
 
-        private Dictionary<TechType, int> _item = new Dictionary<TechType, int>();
-        private BaseSaveData _savedData;
-        private bool _hasBreakerTripped;
-        private List<BaseTransferOperation> _baseTransferOperations = new List<BaseTransferOperation>();
-
         public Dictionary<TechType, int> GetItemsWithin(StorageType type = StorageType.All)
         {
             _item.Clear();
@@ -792,6 +774,7 @@ namespace FCS_AlterraHub.Mono
 
         public void RemoveServerFromBase(FcsDevice server)
         {
+
             //BaseManager.SetAllowedToNotify(false);
             foreach (KeyValuePair<TechType, int> item in server.GetItemsWithin())
             {
@@ -1089,6 +1072,7 @@ namespace FCS_AlterraHub.Mono
             }
             return true;
         }
+
         public static bool AddItemToNetwork(InventoryItem item, BaseManager manager)
         {
             if (manager != null)
@@ -1121,7 +1105,7 @@ namespace FCS_AlterraHub.Mono
                     AllowDocking = baseManager.PullFromDockedVehicles,
                     HasBreakerTripped = baseManager.HasBreakerTripped,
                     BlackList = baseManager.DockingBlackList,
-                    BaseOperations = baseManager.GetBaseOperations()
+                    //BaseOperations = baseManager.GetBaseOperations()
                 };
             }
         }
@@ -1216,106 +1200,41 @@ namespace FCS_AlterraHub.Mono
             return Habitat?.powerRelay.GetMaxPower() ?? 0;
         }
 
-        public List<BaseTransferOperation> GetBaseOperations()
+        public Dictionary<string, BaseOperationObject> GetBaseOperations()
         {
             return _baseTransferOperations;
         }
 
-        public void AddBaseTransferItem(BaseTransferOperation operation)
+        //public void AddBaseTransferItem(BaseTransferOperation operation)
+        //{
+        //    var result = _baseTransferOperations.Any(x => x.IsSimilar(operation));
+        //    if (result)
+        //    {
+        //        QuickLogger.Info(Buildables.AlterraHub.OperationExistsFormat(operation.DeviceId));
+        //        return;
+        //    }
+
+        //    _baseTransferOperations.Add(operation);
+        //}
+
+        //public void RemoveBaseTransferItem(BaseTransferOperation operation)
+        //{
+        //    _baseTransferOperations.Remove(operation);
+        //}
+
+        public void AddTransceiver(BaseOperationObject operationObject)
         {
-            var result = _baseTransferOperations.Any(x => x.IsSimilar(operation));
-            if (result)
+            if (string.IsNullOrWhiteSpace(operationObject?.GetPrefabId()))
             {
-                QuickLogger.Info(Buildables.AlterraHub.OperationExistsFormat(operation.DeviceId));
+                QuickLogger.DebugError("BaseOperation Object PrefabId is null",true);
                 return;
             }
 
-            _baseTransferOperations.Add(operation);
-        }
-
-        public void RemoveBaseTransferItem(BaseTransferOperation operation)
-        {
-            _baseTransferOperations.Remove(operation);
-        }
-    }
-
-    public class BaseTransferOperation
-    {
-        private FcsDevice _device;
-        public string DeviceId { get; set; }
-        public TechType TransferItem { get; set; }
-        public int Amount { get; set; }
-        public bool IsPullOperation { get; set; }
-
-        [JsonIgnore] public FcsDevice Device
-        {
-            get
-            {
-                if (_device == null && !string.IsNullOrWhiteSpace(DeviceId))
-                {
-                    _device = FCSAlterraHubService.PublicAPI.FindDevice(DeviceId).Value;
-                }
-                return _device;
+            if (!_baseTransferOperations.ContainsKey(operationObject.GetPrefabId()))
+            { 
+                _baseTransferOperations.Add(operationObject.GetPrefabId(), operationObject);
+                QuickLogger.Debug("Added Transmitter to manager",true);
             }
         }
-
-        public bool IsSimilar(BaseTransferOperation operation)
-        {
-            return operation.DeviceId == DeviceId &&
-                   operation.TransferItem == TransferItem &&
-                   operation.Amount == Amount &&
-                   operation.IsPullOperation;
-        }
-    }
-
-    public class BaseSaveData
-    {
-        public string InstanceID { get; set; }
-        public string BaseName { get; set; }
-        public bool AllowDocking { get; set; }
-        public bool HasBreakerTripped { get; set; }
-        public List<TechType> BlackList { get; set; }
-        public List<BaseTransferOperation> BaseOperations { get; set; }
-    }
-
-    public enum StorageType
-    {
-        All,
-        Servers,
-        StorageLockers,
-        AlterraStorage,
-        AutoCrafter
-    }
-
-    public struct TrackedLight
-    {
-        public BaseManager Manager { get; set; }
-        public TechLight TechLight { get; set; }
-        public BaseSpotLight SpotLight { get; set; }
-    }
-
-    public class FCSTechLigtController : MonoBehaviour
-    {
-        private BaseManager _manager;
-
-        public void Initialize(BaseManager manager)
-        {
-            _manager = manager;
-        }
-
-
-        private void Update()
-        {
-
-        }
-    }
-
-    public class TrackedResource
-    {
-        public TechType TechType { get; set; }
-        public int Amount { get; set; }
-        public HashSet<StorageContainer> StorageContainers { get; set; } = new HashSet<StorageContainer>();
-        public HashSet<FcsDevice> Servers { get; set; } = new HashSet<FcsDevice>();
-        public HashSet<FcsDevice> AlterraStorage { get; set; } = new HashSet<FcsDevice>();
     }
 }

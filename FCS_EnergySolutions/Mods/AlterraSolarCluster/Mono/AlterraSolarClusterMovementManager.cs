@@ -20,16 +20,16 @@ namespace FCS_EnergySolutions.Mods.AlterraSolarCluster.Mono
 
         private Transform _myTarget;
 
-        private const float maxPitch = 323f;
-        private const float minPitch = 90f;
+        private const float MaxPitch = 323f;
+        private const float MinPitch = 90f;
 
-        private float targetPitch;
+        private float _targetPitch;
 
-        private float targetYaw;
+        private float _targetYaw;
 
-        private float currentPitch;
+        private float _currentPitch;
 
-        private float currentYaw;
+        private float _currentYaw;
 
 
 
@@ -43,14 +43,14 @@ namespace FCS_EnergySolutions.Mods.AlterraSolarCluster.Mono
 
         public void LookAt(Vector3 point)
         {
-            Vector3 eulerAngles = Quaternion.LookRotation(base.transform.InverseTransformDirection(Vector3.Normalize(point - base.transform.position))).eulerAngles;
+            Vector3 eulerAngles = Quaternion.LookRotation(transform.InverseTransformDirection(Vector3.Normalize(point - transform.position))).eulerAngles;
             float num = eulerAngles.x;
-            if (num > maxPitch)
+            if (num > MaxPitch)
             {
-                num = Mathf.Clamp(num, minPitch, maxPitch);
+                num = Mathf.Clamp(num, MinPitch, MaxPitch);
             }
-            this.targetPitch = num;
-            this.targetYaw = eulerAngles.y;
+            _targetPitch = num;
+            _targetYaw = eulerAngles.y;
         }
 
         private void Update()
@@ -68,10 +68,10 @@ namespace FCS_EnergySolutions.Mods.AlterraSolarCluster.Mono
                     LookAt(_myTarget.transform.position);
                 }
 
-                currentYaw = Mathf.LerpAngle(currentYaw, targetYaw, Time.deltaTime * 2f);
-                currentPitch = Mathf.LerpAngle(currentPitch, targetPitch, Time.deltaTime * 2f);
-                _rotator.localEulerAngles = new Vector3(0f, currentYaw, 0f);
-                _elevator.localEulerAngles = new Vector3(currentPitch, 0f, 0f);
+                _currentYaw = Mathf.LerpAngle(_currentYaw, _targetYaw, Time.deltaTime * 2f);
+                _currentPitch = Mathf.LerpAngle(_currentPitch, _targetPitch, Time.deltaTime * 2f);
+                _rotator.localEulerAngles = new Vector3(0f, _currentYaw, 0f);
+                _elevator.localEulerAngles = new Vector3(_currentPitch, 0f, 0f);
 
             }
         }

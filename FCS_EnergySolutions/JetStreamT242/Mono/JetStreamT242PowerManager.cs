@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Enumerators;
 using FCS_EnergySolutions.Configuration;
 using FCSCommon.Utilities;
@@ -97,7 +96,6 @@ namespace FCS_EnergySolutions.JetStreamT242.Mono
         {
             return (1f + (Mathf.PerlinNoise(0f, Time.time * 0.05f) * 1.5f));
         } 
-
 
         internal float GetBiomeData(string biome)
         {

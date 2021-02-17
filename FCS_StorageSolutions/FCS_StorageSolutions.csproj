@@ -141,6 +141,7 @@
     <Compile Include="Configuration\SaveDataEntry.cs" />
     <Compile Include="Mods\DataStorageSolutions\Buildable\DSSAutoCrafterPatch.cs" />
     <Compile Include="Mods\DataStorageSolutions\Buildable\DSSAntennaPatch.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Buildable\DSSTransceiver.cs" />
     <Compile Include="Mods\DataStorageSolutions\Buildable\DSSTerminalPatch.cs" />
     <Compile Include="Mods\DataStorageSolutions\Buildable\DSSFormattingStationPatch.cs" />
     <Compile Include="Mods\DataStorageSolutions\Buildable\DSSItemDisplayPatch.cs" />
@@ -184,6 +185,8 @@
     <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\NetworkDialogController.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\VehicleButton.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\VehicleItemButton.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Transceiver\DSSTransceiverController.cs" />
+    <Compile Include="Patches\StorageHelperPatches.cs" />
     <Compile Include="Patches\StorageContainerPatches.cs" />
     <Compile Include="Patches\ToolTipFactory_Patch.cs" />
     <Compile Include="Patches\VehicleDockingBayPatcher.cs" />

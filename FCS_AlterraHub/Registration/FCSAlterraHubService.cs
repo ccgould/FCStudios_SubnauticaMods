@@ -49,10 +49,7 @@ namespace FCS_AlterraHub.Registration
         public static List<KnownDevice> knownDevices = new List<KnownDevice>();
         private static readonly Dictionary<string, FcsDevice> GlobalDevices = new Dictionary<string, FcsDevice>();
         private static Dictionary<TechType, FCSStoreEntry> _storeItems = new Dictionary<TechType, FCSStoreEntry>();
-
-        private static Dictionary<TechType, List<FcsEntryData>> _pdaEntries =
-            new Dictionary<TechType, List<FcsEntryData>>();
-
+        private static Dictionary<TechType, List<FcsEntryData>> _pdaEntries = new Dictionary<TechType, List<FcsEntryData>>();
         private static HashSet<TechType> _registeredTechTypes = new HashSet<TechType>();
         private List<string> _patchedMods = new List<string>();
         private Dictionary<TechType, int> _globallyBuiltTech = new Dictionary<TechType, int>();
@@ -97,7 +94,7 @@ namespace FCS_AlterraHub.Registration
                 device.UnitID = knownDevices.FirstOrDefault(x => x.PrefabID.Equals(prefabID)).ToString();
                 AddToGlobalDevices(device, device.UnitID);
             }
-
+            
             QuickLogger.Debug($"Registering Device: {device.UnitID}");
 
             _registeredTechTypes.Add(device.GetTechType());
@@ -121,7 +118,6 @@ namespace FCS_AlterraHub.Registration
             knownDevices.Add(newEntry);
             return newEntry.ToString();
         }
-
 
         private static void AddToGlobalDevices(FcsDevice device, string unitID)
         {
