@@ -44,7 +44,11 @@ namespace FCS_AlterraHub.Mono
         {
             Disabled = false;
 
-            if (IsSelected) return;
+            if (IsSelected)
+            {
+                Select();
+                return;
+            }
             
             if (string.IsNullOrEmpty(BtnName)) return;
 
@@ -123,7 +127,6 @@ namespace FCS_AlterraHub.Mono
 
         public override void OnDisable()
         {
-            QuickLogger.Debug($"Button : {BtnName} disabled");
             base.OnDisable();
 
             UpdateTextComponent(IsTextMode());

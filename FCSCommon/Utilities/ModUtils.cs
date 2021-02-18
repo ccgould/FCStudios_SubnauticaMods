@@ -44,16 +44,13 @@ namespace FCSCommon.Utilities
         internal static void LoadSaveData<TSaveData>(string fileName, string saveDirectory, Action<TSaveData> onSuccess) where TSaveData : new()
         {
             var path = Path.Combine(saveDirectory, fileName);
-
-            QuickLogger.Debug($"[LoadSaveData]: Trying to load path: {path}");
-
+            
             if (!File.Exists(path))
             {
-                QuickLogger.Debug($"[LoadSaveData]: Path does not exist: {path}");
                 return;
             }
             var save = File.ReadAllText(path);
-            QuickLogger.Debug($"[LoadSaveData]:ReadAllText: {save}");
+
             var jsonSerializerSettings = new JsonSerializerSettings
             {
                 MissingMemberHandling = MissingMemberHandling.Ignore,

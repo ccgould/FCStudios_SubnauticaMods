@@ -184,6 +184,7 @@
     <Compile Include="Model\Filter.cs" />
     <Compile Include="Model\FilterSystem.cs" />
     <Compile Include="Model\Fridge.cs" />
+    <Compile Include="Model\KdTree.cs" />
     <Compile Include="Model\PowercellData.cs" />
     <Compile Include="Model\ProximityActivate.cs" />
     <Compile Include="Model\TimeCache.cs" />

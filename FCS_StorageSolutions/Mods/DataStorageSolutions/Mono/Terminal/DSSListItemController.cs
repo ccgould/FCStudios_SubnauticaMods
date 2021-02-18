@@ -12,6 +12,8 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         private readonly List<GameObject> _icons = new List<GameObject>();
         private BaseManager _manager;
         private bool _isInitialized;
+        private Button _settingsBTN;
+        private DSSTerminalDisplayManager _displayController;
 
         private void Initialize()
         {
@@ -20,6 +22,14 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             STARTING_COLOR = new Color(0.1254902f, 0.5607843f, 0.6588235f, 1);
             HOVER_COLOR = new Color(0.181f, 0.652f, 0.708f, 1);
             _title = gameObject.GetComponentInChildren<Text>();
+            _settingsBTN = gameObject.GetComponentInChildren<Button>();
+            _settingsBTN.onClick.AddListener(() =>
+            {
+                //Open the Transceiver Dialog
+                _displayController.OpenItemTransceiverPage(this);
+
+            });
+
 
             for (int i = 0; i < 5; i++)
             {
@@ -30,8 +40,8 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
 
             _isInitialized = true;
         }
-
-        internal void Set(BaseManager manager, bool isCurrentBase)
+        
+        internal void Set(BaseManager manager, bool isCurrentBase, DSSTerminalDisplayManager displayController)
         {
             if (manager == null) return;
 
@@ -40,6 +50,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             ChangeIcon(isCurrentBase ? DssListItemIcon.Current : manager.Habitat.isCyclops ? DssListItemIcon.Cyclops : DssListItemIcon.HUB);
 
             Tag = manager;
+            _displayController = displayController;
             _manager = manager;
             gameObject.SetActive(true);
             UpdateState();
@@ -52,6 +63,11 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             if (_title != null)
             {
                 _title.text = _manager.GetBaseName();
+            }
+
+            if (_settingsBTN != null)
+            {
+                _settingsBTN.interactable = _manager.HasTransceiverConnected();
             }
         }
 

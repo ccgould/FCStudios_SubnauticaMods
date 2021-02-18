@@ -5,7 +5,6 @@ using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Mono.AlterraHub;
 using FCS_AlterraHub.Structs;
 using FCSCommon.Helpers;
-using QModManager.API.ModLoading;
 using UnityEngine;
 
 namespace FCS_AlterraHub.Systems

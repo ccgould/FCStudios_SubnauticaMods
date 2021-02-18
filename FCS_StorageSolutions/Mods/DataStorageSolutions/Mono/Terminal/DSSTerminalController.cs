@@ -131,6 +131,11 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                 {
                     _display.Refresh();
                 }
+
+                if (s.Equals("DeviceBuiltUpdate"))
+                {
+                    _display.Refresh();
+                }
             };
             InvokeRepeating(nameof(UpdateScreenState), 1, 1);
             IsInitialized = true;

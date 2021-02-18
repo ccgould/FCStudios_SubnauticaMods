@@ -1,4 +1,5 @@
-﻿using FCS_AlterraHomeSolutions.Mono.PaintTool;
+﻿using System.Collections.Generic;
+using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Objects;
@@ -27,7 +28,8 @@ namespace FCS_EnergySolutions.AlterraGen.Mono
         internal AlterraGenDisplayManager DisplayManager { get; private set; }
         public DumpContainer DumpContainer { get; private set; }
         public override bool IsOperational => IsConstructed && IsInitialized;
-        public override bool IsVisible { get; } = true;
+        public override bool IsVisible => IsOperational;
+        public override bool CanBeSeenByTransceiver => true;
 
         #region Unity Methods
 
@@ -135,6 +137,8 @@ namespace FCS_EnergySolutions.AlterraGen.Mono
 
            return _colorManager.ChangeColor(color,mode);
         }
+
+        public override TechType[] AllowedTransferItems { get; } = { TechType.Lubricant};
 
         public override bool CanBeStored(int amount, TechType techType)
         {

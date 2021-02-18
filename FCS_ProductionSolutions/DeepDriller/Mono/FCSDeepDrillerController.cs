@@ -17,7 +17,6 @@ using System.Text;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_ProductionSolutions.Buildable;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 
 namespace FCS_ProductionSolutions.DeepDriller.Mono
@@ -52,6 +51,8 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         #endregion
 
         #region Internal Properties
+
+        public override bool CanBeSeenByTransceiver { get; set; }
         internal bool IsBeingDeleted { get; set; }
         internal FCSDeepDrillerAnimationHandler AnimationHandler { get; private set; }
         internal FCSDeepDrillerLavaPitHandler LavaPitHandler { get; private set; }
@@ -65,6 +66,12 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         internal DumpContainer OilDumpContainer { get; set; }
         public FCSDeepDrillerUpgradeManager UpgradeManager { get; private set; }
         public FCSDeepDrillerTransferManager TransferManager { get; set; }
+        public override bool IsVisible => IsConstructed && IsInitialized;
+
+        public override TechType[] AllowedTransferItems { get; } =
+        {
+            TechType.Lubricant
+        };
 
         #endregion
 
@@ -72,13 +79,13 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
 
         private void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.DeepDrillerMk3TabID, Mod.ModName);
             DisplayHandler?.UpdateUnitID();
             UpdateEmission();
         }
 
         public override void OnDestroy()
         {
+            Manager?.UnRegisterDevice(this);
             base.OnDestroy();
             IsBeingDeleted = true;
         }
@@ -109,11 +116,12 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
                         OreGenerator.SetIsFocus(_saveData.IsFocused);
                         OreGenerator.Load(_saveData.FocusOres);
                     }
-
+                    FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.DeepDrillerMk3TabID, Mod.ModName);
                     _colorManager.ChangeColor(_saveData.Body.Vector4ToColor());
                     _colorManager.ChangeColor(_saveData.Sec.Vector4ToColor(), ColorTargetMode.Secondary);
                     CurrentBiome = _saveData.Biome;
                     OilHandler.SetOilTimeLeft(_saveData.OilTimeLeft);
+                    
                     UpgradeManager.Load(_saveData?.Upgrades);
                     OreGenerator.SetBlackListMode(_saveData.IsBlackListMode);
                     _isRangeVisible = _saveData.IsRangeVisible;
@@ -542,6 +550,12 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
                 angle += (360f / Segments);
             }
         }
+        
+        private void UpdateEmission()
+        {
+            MaterialHelpers.ChangeEmissionColor(ModelPrefab.EmissionControllerMaterial, gameObject,
+                _isBreakSet ? Color.red : Color.cyan);
+        }
 
         #endregion
 
@@ -601,8 +615,6 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             return _colorManager.ChangeColor(color, mode);
         }
 
-        #endregion
-
         internal bool IsBreakSet()
         {
             return _isBreakSet;
@@ -620,23 +632,23 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
 
         public void OnHandHover(GUIHand hand)
         {
-            if(DeepDrillerPowerManager == null || !DeepDrillerPowerManager.IsInitialized || DisplayHandler == null ||DisplayHandler.IsInteraction()) return;
+            if (DeepDrillerPowerManager == null || !DeepDrillerPowerManager.IsInitialized || DisplayHandler == null || DisplayHandler.IsInteraction()) return;
 
             if (IsConstructed && IsInitialized)
             {
                 _sb.Clear();
                 _sb.Append(UnitID);
                 _sb.Append(Environment.NewLine);
-                _sb.Append(AuxPatchers.PressKeyToOperate(GameInput.GetBindingName(GameInput.Button.Exit,GameInput.BindingSet.Primary), Mod.DeepDrillerMk3FriendlyName));
+                _sb.Append(AuxPatchers.PressKeyToOperate(GameInput.GetBindingName(GameInput.Button.Exit, GameInput.BindingSet.Primary), Mod.DeepDrillerMk3FriendlyName));
                 _sb.Append(Environment.NewLine);
                 _sb.Append(Language.main.GetFormat<int, int>("ThermalPlantStatus", Mathf.RoundToInt(DeepDrillerPowerManager.GetSourcePower(DeepDrillerPowerSources.Thermal)), Mathf.RoundToInt(DeepDrillerPowerManager.GetSourcePowerCapacity(DeepDrillerPowerSources.Thermal))));
                 _sb.Append(Environment.NewLine);
                 _sb.Append(Language.main.GetFormat<int, int, int>("SolarPanelStatus", Mathf.RoundToInt(DeepDrillerPowerManager.GetRechargeScalar() * 100f), Mathf.RoundToInt(DeepDrillerPowerManager.GetSourcePower(DeepDrillerPowerSources.Solar)), Mathf.RoundToInt(DeepDrillerPowerManager.GetSourcePowerCapacity(DeepDrillerPowerSources.Solar))));
 
-                HandReticle.main.SetInteractText(_sb.ToString(),false, HandReticle.Hand.None);
+                HandReticle.main.SetInteractText(_sb.ToString(), false, HandReticle.Hand.None);
                 HandReticle.main.SetIcon(HandReticle.IconType.Info, 1f);
 
-                if(GameInput.GetButtonDown(GameInput.Button.Exit))
+                if (GameInput.GetButtonDown(GameInput.Button.Exit))
                 {
                     _isBreakSet ^= true;
                     UpdateEmission();
@@ -644,30 +656,23 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             }
         }
 
-        private void UpdateEmission()
-        {
-            MaterialHelpers.ChangeEmissionColor(ModelPrefab.EmissionControllerMaterial, gameObject,
-                _isBreakSet ? Color.red : Color.cyan);
-        }
-
         public void OnHandClick(GUIHand hand)
         {
 
         }
-    }
 
-    internal class InterfaceInteraction : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
-    {
-        public bool IsInRange { get; set; }
-
-        public void OnPointerEnter(PointerEventData eventData)
+        public override bool CanBeStored(int amount, TechType techType)
         {
-            IsInRange = true;
+            var result = OilHandler.CanBeStored(amount, techType);
+            QuickLogger.Debug($"Drill can be stored result: {result}",true);
+            return result;
         }
 
-        public void OnPointerExit(PointerEventData eventData)
+        public override bool AddItemToContainer(InventoryItem item)
         {
-            IsInRange = false;
+            return OilHandler.AddItemToContainer(item);
         }
+
+        #endregion
     }
 }

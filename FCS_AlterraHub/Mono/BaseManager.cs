@@ -46,7 +46,9 @@ namespace FCS_AlterraHub.Mono
         private Dictionary<TechType, int> _item = new Dictionary<TechType, int>();
         private BaseSaveData _savedData;
         private bool _hasBreakerTripped;
-        private Dictionary<string, BaseOperationObject> _baseTransferOperations = new  Dictionary<string, BaseOperationObject>();
+        private Dictionary<string, BaseOperationObject> _baseOperationObjects = new  Dictionary<string, BaseOperationObject>();
+        private List<BaseTransferOperation> _baseOperations  = new List<BaseTransferOperation>();
+
 
         public string BaseID { get; set; }
         public float ActiveBaseOxygenTankCount = 0;
@@ -80,6 +82,7 @@ namespace FCS_AlterraHub.Mono
         public Action<bool> OnBreakerStateChanged { get; set; }
         public static TechType ActivateGoalTechType { get; set; }
         public Base BaseComponent { get; set; }
+        public string BaseFriendlyID { get; set; }
 
         #region Default Constructor
 
@@ -90,6 +93,9 @@ namespace FCS_AlterraHub.Mono
             
             BaseComponent = Habitat.GetComponent<Base>();
             BaseID = habitat.gameObject.gameObject?.GetComponentInChildren<PrefabIdentifier>()?.Id;
+
+            FCSAlterraHubService.PublicAPI.RegisterBase(this);
+            
             _registeredDevices = new Dictionary<string, FcsDevice>();
             _baseTechLights = new Dictionary<string, TechLight>();
             Initialize(habitat);
@@ -113,31 +119,30 @@ namespace FCS_AlterraHub.Mono
 
         private void PerformOperations()
         {
-            if (_registeredDevices == null || _baseTransferOperations == null)
+            if (_registeredDevices == null || _baseOperationObjects == null)
             {
-                if (_baseTransferOperations == null)
+                if (_baseOperationObjects == null)
                 {
-                    _baseTransferOperations = new Dictionary<string, BaseOperationObject>();
+                    _baseOperationObjects = new Dictionary<string, BaseOperationObject>();
                 }
                 return;
             }
-            foreach (KeyValuePair<string, BaseOperationObject> transferObject in _baseTransferOperations)
+
+            foreach (BaseTransferOperation operation in _baseOperations)
             {
-                foreach (BaseTransferOperation operation in transferObject.Value.Operations)
+                if (operation.Device == null || !operation.Device.IsConstructed || !operation.Device.IsInitialized) continue;
+
+                if (operation.IsPullOperation)
                 {
-                    if (operation.Device == null || !operation.Device.IsOperational) continue;
-                    if (operation.IsPullOperation)
+                    PerformPullOperation(operation);
+                }
+                else
+                {
+                    if (HasItem(operation.TransferItem))
                     {
-                        PerformPullOperation(operation);
-                    }
-                    else
-                    {
-                        if (HasItem(operation.TransferItem))
+                        if (operation.Device.CanBeStored(1, operation.TransferItem))
                         {
-                            if (operation.Device.CanBeStored(1, operation.TransferItem))
-                            {
-                                operation.Device.AddItemToContainer(TakeItem(operation.TransferItem).ToInventoryItem());
-                            }
+                            operation.Device.AddItemToContainer(TakeItem(operation.TransferItem).ToInventoryItem());
                         }
                     }
                 }
@@ -177,8 +182,8 @@ namespace FCS_AlterraHub.Mono
                 DockingBlackList = _savedData.BlackList;
                 PullFromDockedVehicles = _savedData.AllowDocking;
                 HasBreakerTripped = _savedData.HasBreakerTripped;
-                //if(_baseTransferOperations!=null)
-                    //_baseTransferOperations = _savedData.BaseOperations;
+                if (_savedData.BaseOperations != null && !string.IsNullOrWhiteSpace(_savedData.Version) &&_savedData.Version == "1.0")
+                    _baseOperations = _savedData.BaseOperations;
             }
 
             if (_dumpContainer == null)
@@ -284,6 +289,20 @@ namespace FCS_AlterraHub.Mono
             return FindManager(subRoot);
         }
 
+        public static BaseManager FindManagerByFriendlyID(string friendlyID)
+        {
+            foreach (BaseManager baseManager in Managers)
+            {
+                if (baseManager.BaseFriendlyID.Equals(friendlyID))
+                {
+                    QuickLogger.Debug($"Found Base: {baseManager.GetBaseName()} with id: {friendlyID}",true);
+                    return baseManager;
+                }
+            }
+
+            return null;
+        }
+
         public static void RemoveDestroyedBases()
         {
             try
@@ -292,6 +311,7 @@ namespace FCS_AlterraHub.Mono
                 {
                     if (Managers[i].Habitat == null)
                     {
+                        FCSAlterraHubService.PublicAPI.UnRegisterBase(Managers[i]);
                         Managers.RemoveAt(i);
                     }
                 }
@@ -310,6 +330,15 @@ namespace FCS_AlterraHub.Mono
         public string GetBaseName()
         {
             return _baseName;
+        }
+
+        /// <summary>
+        /// Gets the stored base Friendly ID
+        /// </summary>
+        /// <returns></returns>
+        public string GetBaseFriendlyId()
+        {
+            return BaseFriendlyID;
         }
 
         /// <summary>
@@ -356,6 +385,7 @@ namespace FCS_AlterraHub.Mono
                     BaseRacks.Add((IDSSRack)device);
                 }
                 _registeredDevices.Add(device.UnitID, device);
+                GlobalNotifyByID(String.Empty, "DeviceBuiltUpdate");
             }
         }
 
@@ -397,6 +427,7 @@ namespace FCS_AlterraHub.Mono
                 }
 
                 _registeredDevices?.Remove(device.UnitID);
+                GlobalNotifyByID(String.Empty, "DeviceBuiltUpdate");
             }
         }
 
@@ -419,6 +450,11 @@ namespace FCS_AlterraHub.Mono
                     yield return device.Value;
                 }
             }
+        }
+
+        public Dictionary<string, FcsDevice> GetRegisteredDevices()
+        {
+            return _registeredDevices;
         }
 
         /// <summary>
@@ -1200,27 +1236,15 @@ namespace FCS_AlterraHub.Mono
             return Habitat?.powerRelay.GetMaxPower() ?? 0;
         }
 
-        public Dictionary<string, BaseOperationObject> GetBaseOperations()
+        public Dictionary<string, BaseOperationObject> GetBaseOperators()
         {
-            return _baseTransferOperations;
+            return _baseOperationObjects;
         }
 
-        //public void AddBaseTransferItem(BaseTransferOperation operation)
-        //{
-        //    var result = _baseTransferOperations.Any(x => x.IsSimilar(operation));
-        //    if (result)
-        //    {
-        //        QuickLogger.Info(Buildables.AlterraHub.OperationExistsFormat(operation.DeviceId));
-        //        return;
-        //    }
-
-        //    _baseTransferOperations.Add(operation);
-        //}
-
-        //public void RemoveBaseTransferItem(BaseTransferOperation operation)
-        //{
-        //    _baseTransferOperations.Remove(operation);
-        //}
+        public List<BaseTransferOperation> GetBaseOperations()
+        {
+            return _baseOperations;
+        }
 
         public void AddTransceiver(BaseOperationObject operationObject)
         {
@@ -1230,11 +1254,51 @@ namespace FCS_AlterraHub.Mono
                 return;
             }
 
-            if (!_baseTransferOperations.ContainsKey(operationObject.GetPrefabId()))
+            if (!_baseOperationObjects.ContainsKey(operationObject.GetPrefabId()))
             { 
-                _baseTransferOperations.Add(operationObject.GetPrefabId(), operationObject);
-                QuickLogger.Debug("Added Transmitter to manager",true);
+                _baseOperationObjects.Add(operationObject.GetPrefabId(), operationObject);
+                QuickLogger.Debug("Added Transmitter to base",true);
             }
+        }
+
+        public void RemoveTransceiver(BaseOperationObject operationObject)
+        {
+            if (string.IsNullOrWhiteSpace(operationObject?.GetPrefabId()))
+            {
+                QuickLogger.DebugError("BaseOperation Object PrefabId is null", true);
+                return;
+            }
+
+            if (!_baseOperationObjects.ContainsKey(operationObject.GetPrefabId()))
+            {
+                _baseOperationObjects.Remove(operationObject.GetPrefabId());
+                QuickLogger.Debug("Removed Transmitter to from base", true);
+            }
+        }
+
+        public bool HasTransceiverConnected()
+        {
+            return _baseOperationObjects.Count > 0;
+        }
+
+        public void AddOperationForDevice(BaseTransferOperation operation )
+        {
+            var result = _baseOperations.Any(x => x.IsSimilar(operation));
+            if (result) return;
+            _baseOperations.Add(operation);
+        }
+
+        public BaseTransferOperation GetDeviceOperation(FcsDevice device)
+        {
+            foreach (BaseTransferOperation operation in _baseOperations)
+            {
+                if (operation.Device == device)
+                {
+                    return operation;
+                }
+            }
+
+            return null;
         }
     }
 }

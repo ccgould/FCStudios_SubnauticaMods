@@ -26,7 +26,27 @@ namespace FCS_AlterraHub.Mono.OreConsumer
         public Action<FcsDevice, TechType> OnContainerRemoveItem { get; set; }
         public DumpContainer DumpContainer { get; private set; }
         public override bool IsOperational => CheckIfOperational();
+        public override bool CanBeSeenByTransceiver => true;
         public bool IsOnPlatform => Manager?.Habitat != null;
+        public override bool IsVisible => IsOperational;
+
+        public override TechType[] AllowedTransferItems { get; } =
+        {
+            TechType.Titanium,
+            TechType.Copper,
+            TechType.Quartz,
+            TechType.Lead,
+            TechType.Diamond,
+            TechType.Silver,
+            TechType.Gold,
+            TechType.Lithium,
+            TechType.Sulphur,
+            TechType.Magnetite,
+            TechType.Nickel,
+            TechType.AluminumOxide,
+            TechType.UraniniteCrystal,
+            TechType.Kyanite
+        };
 
         private bool CheckIfOperational()
         {
@@ -299,7 +319,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
 
         public override bool CanBeStored(int amount, TechType techType)
         {
-            if (amount > MAXITEMLIMIT) return false;
+            if (amount + _oreQueue.Count > MAXITEMLIMIT) return false;
             return StoreInventorySystem.ValidResource(techType);
         }
 
@@ -326,7 +346,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
         
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
         {
-            return CanBeStored(DumpContainer.GetCount() + 1 + _oreQueue.Count, pickupable.GetTechType());
+            return CanBeStored(DumpContainer.GetCount() + 1, pickupable.GetTechType());
         }
 
         public bool IsAllowedToRemoveItems()

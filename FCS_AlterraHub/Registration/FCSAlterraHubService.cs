@@ -36,6 +36,8 @@ namespace FCS_AlterraHub.Registration
         int GetTechBuiltCount(TechType techType);
         void RemoveBuiltTech(TechType techType);
         TechType GetDeviceTechType(string deviceId);
+        void RegisterBase(BaseManager manager);
+        void UnRegisterBase(BaseManager manager);
     }
 
     internal interface IFCSAlterraHubServiceInternal
@@ -380,6 +382,35 @@ namespace FCS_AlterraHub.Registration
         public TechType GetDeviceTechType(string deviceId)
         {
             return FindDevice(deviceId).Value.GetTechType();
+        }
+
+        public void RegisterBase(BaseManager manager)
+        {
+            QuickLogger.Debug($"Attempting to Register: {manager.BaseID}");
+
+            if (!knownDevices.Any(x => x.PrefabID.Equals(manager.BaseID)))
+            {
+                manager.BaseFriendlyID = GenerateNewID("BS", manager.BaseID);
+                Mod.SaveDevices(knownDevices);
+            }
+            else
+            {
+                manager.BaseFriendlyID = knownDevices.FirstOrDefault(x => x.PrefabID.Equals(manager.BaseID)).ToString();
+            }
+
+            QuickLogger.Debug($"Registering Device: {manager.BaseID}");
+        }
+
+        public void UnRegisterBase(BaseManager manager)
+        {
+            foreach (KnownDevice knownDevice in knownDevices)
+            {
+                if (!string.IsNullOrEmpty(knownDevice.PrefabID) && knownDevice.PrefabID.Equals(manager.BaseID))
+                {
+                    knownDevices.Remove(knownDevice);
+                    break;
+                }
+            }
         }
     }
 }

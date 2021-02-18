@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,18 +9,19 @@ using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Mono.Controllers;
 using FCS_StorageSolutions.Configuration;
-using FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter;
+using FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal.Enumerators;
 using FCSCommon.Abstract;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
-using UWE;
 
 namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
 {
     internal class DSSTerminalDisplayManager : AIDisplay, IFCSDumpContainer
     {
+        #region Private Fields
+
         private DSSTerminalController _mono;
         private GridHelperV2 _itemGrid;
         private bool _isBeingDestroyed;
@@ -54,31 +54,20 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         private int _serverCapacity;
         private int _alterraStorageCapacity;
         private PaginatorController _paginatorController;
+        private TransceiverPageController _itemTransceiverPage;
+        private DeviceTransceiverDialog _deviceTransceiverDialog;
+
+        #endregion
+
+        #region Unity Methods
 
         private void OnDestroy()
         {
             _isBeingDestroyed = true;
         }
 
-        internal void Setup(DSSTerminalController mono)
-        {
-            _mono = mono;
-
-            if (FindAllComponents())
-            {
-                _currentBase = _mono.Manager;
-                _screen.SetActive(true);
-                if (_blackListDumpContainer == null)
-                {
-                    _blackListDumpContainer = gameObject.AddComponent<DumpContainerSimplified>();
-                    _blackListDumpContainer.Initialize(transform, "Add to blacklist", this);
-                    RefreshBlackListItems();
-                }
-                Player.main.currentSubChangedEvent.AddHandler(base.gameObject, OnCurrentSubRootChanged);
-                InvokeRepeating(nameof(UpdateDisplay), .5f, .5f);
-            }
-        }
-
+        #endregion
+        
         private void OnCurrentSubRootChanged(SubRoot parms)
         {
             _networkBTN.Refresh(parms);
@@ -87,7 +76,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         private void UpdateDisplay()
         {
             if (_currentBase == null || Player.main.currentSub == null) return;
-            _baseName.text = _currentBase?.GetBaseName();
+            _baseName.text = $"{_currentBase?.GetBaseName()} - {_currentBase.GetBaseFriendlyId()}";
             _rackCountAmount.text = AuxPatchers.RackCountFormat(_currentBase?.BaseRacks.Count ?? 0);
             _serverAmount.text = AuxPatchers.ServerCountFormat(_currentBase?.BaseServers.Count ?? 0);
             _currentBaseLBL.text = Player.main.currentSub == _currentBase.Habitat ? AuxPatchers.CurrentBase() : AuxPatchers.RemoteBase();
@@ -109,6 +98,25 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             }
             _vehicleSectionName.text = _currentVehicle?.GetName();
             
+        }
+
+        internal void Setup(DSSTerminalController mono)
+        {
+            _mono = mono;
+
+            if (FindAllComponents())
+            {
+                _currentBase = _mono.Manager;
+                _screen.SetActive(true);
+                if (_blackListDumpContainer == null)
+                {
+                    _blackListDumpContainer = gameObject.AddComponent<DumpContainerSimplified>();
+                    _blackListDumpContainer.Initialize(transform, "Add to blacklist", this);
+                    RefreshBlackListItems();
+                }
+                Player.main.currentSubChangedEvent.AddHandler(base.gameObject, OnCurrentSubRootChanged);
+                InvokeRepeating(nameof(UpdateDisplay), .5f, .5f);
+            }
         }
 
         public override void OnButtonClick(string btnName, object tag)
@@ -140,14 +148,10 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                     Refresh();
                     break;
                 case "ScreenToggleBTN":
-                    _moonPoolObj.SetActive(true);
-                    _homeObj.SetActive(false);
-                    _filterSettingList.Hide();
-                    _networkBTN.Hide();
+                    GoToTerminalPage(TerminalPages.MoonPoolSettings);
                     break;
                 case "MoonpoolToggleBTN":
-                    _moonPoolObj.SetActive(false);
-                    _homeObj.SetActive(true);
+                    GoToTerminalPage(TerminalPages.Home);
                     break;
                 case "VehSettingBTN":
                     _vehiclesSettingsSection.SetActive(true);
@@ -197,14 +201,14 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
 
         internal void Refresh()
         {
-            _itemGrid.DrawPage();
+            _itemGrid?.DrawPage();
+            _itemTransceiverPage?.RefreshList();
         }
 
         public override bool FindAllComponents()
         {
             try
             {
-
                 foreach (Transform invItem in GameObjectHelpers.FindGameObject(gameObject, "Grid").transform)
                 {
                     var invButton = invItem.gameObject.EnsureComponent<DSSInventoryItem>();
@@ -217,7 +221,11 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                 _canvas = gameObject.GetComponentInChildren<Canvas>(true);
                 _screen = _canvas.gameObject;
                 _homeObj = GameObjectHelpers.FindGameObject(gameObject, "Home");
+                _deviceTransceiverDialog = GameObjectHelpers.FindGameObject(gameObject, "DeviceTransceiverDialog").AddComponent<DeviceTransceiverDialog>();
+                _deviceTransceiverDialog.Initialize();
                 _moonPoolObj = GameObjectHelpers.FindGameObject(gameObject, "MoonPool");
+                _itemTransceiverPage = GameObjectHelpers.FindGameObject(gameObject, "TransceiverSettings").AddComponent<TransceiverPageController>();
+                _itemTransceiverPage.Initialize(this);
 
                 var pullFromVehiclesToggleObj = GameObjectHelpers.FindGameObject(gameObject, "PullFromVehicles");
                 _pullFromVehicles = pullFromVehiclesToggleObj.AddComponent<FCSToggleButton>();
@@ -377,10 +385,8 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                     data.EndPosition = grouped.Count;
                 }
 
-                QuickLogger.Debug($"Resetting crafting buttons: {data.MaxPerPage}");
                 for (int i = 0; i < data.MaxPerPage; i++)
                 {
-                    QuickLogger.Debug($"Resetting index {i} out of {data.MaxPerPage}");
                     _inventoryButtons[i].Reset();
                 }
 
@@ -403,13 +409,13 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             }
         }
 
-        public void ChangeStorageFilter(StorageType storage)
+        internal void ChangeStorageFilter(StorageType storage)
         {
             _storageFilter = storage;
             _itemGrid.DrawPage();
         }
 
-        public void ShowVehicleContainers(Vehicle vehicle)
+        internal void ShowVehicleContainers(Vehicle vehicle)
         {
             if (vehicle == null)
             {
@@ -481,7 +487,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             _screen?.SetActive(true);
         }
 
-        public DSSTerminalController GetController()
+        internal DSSTerminalController GetController()
         {
             return _mono;
         }
@@ -489,6 +495,54 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         public override void GoToPage(int index)
         {
             _itemGrid.DrawPage(index);
+        }
+
+        /// <summary>
+        /// Changes the terminal page to the transceiver page and uses the <see cref="DSSListItemController"/>
+        /// to receive the manager data for screen population.
+        /// </summary>
+        /// <param name="item"></param>
+        internal void OpenItemTransceiverPage(DSSListItemController item)
+        {
+            if (item == null) return;
+            GoToTerminalPage(TerminalPages.Transceiver,item);
+        }
+
+        /// <summary>
+        /// Changes the current page of the terminal
+        /// </summary>
+        /// <param name="page">The page to go to</param>
+        /// <param name="obj">The object to pass with the page switch is <code>null</code> by default</param>
+        internal void GoToTerminalPage(TerminalPages page,object obj = null)
+        {
+            switch (page)
+            {
+                case TerminalPages.Home:
+                    _itemTransceiverPage.Hide();
+                    _moonPoolObj.SetActive(false);
+                    _homeObj.SetActive(true);
+                    break;
+                
+                case TerminalPages.MoonPoolSettings:
+                    _itemTransceiverPage.Hide();
+                    _moonPoolObj.SetActive(true);
+                    _homeObj.SetActive(false);
+                    break;
+                case TerminalPages.Transceiver:
+                    _itemTransceiverPage.Show((DSSListItemController)obj);
+                    _moonPoolObj.SetActive(false);
+                    _homeObj.SetActive(false);
+                    break;
+            }
+
+            //Always should hide these when not focused
+            _filterSettingList.Hide();
+            _networkBTN.Hide();
+        }
+
+        public void OpenTransceiverDialog(FcsDevice fcsDevice)
+        {
+            _deviceTransceiverDialog.Show(fcsDevice);
         }
     }
 }

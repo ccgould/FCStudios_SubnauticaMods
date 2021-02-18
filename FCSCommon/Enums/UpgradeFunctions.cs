@@ -7,6 +7,7 @@
         SilkTouch,
         MinOreCount,
         AutoShutdownAt,
-        AutoStartUpAt
+        AutoStartUpAt,
+        ConnectToBase,
     }
 }

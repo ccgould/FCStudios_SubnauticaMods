@@ -54,7 +54,13 @@ namespace FCS_AlterraHub.Mono
             return transform.position;
         }
 
+        /// <summary>
+        /// If true this device will be visible by the transceiver in the DSS Pack
+        /// </summary>
+        public virtual bool CanBeSeenByTransceiver { get; set; }
+
         protected ColorManager _colorManager;
+        private string _prefabID;
 
         /// <summary>
         /// The package which this item belongs to
@@ -120,8 +126,13 @@ namespace FCS_AlterraHub.Mono
         /// <returns></returns>
         public virtual string GetPrefabID()
         {
-            return gameObject.GetComponent<PrefabIdentifier>()?.Id ??
-                   gameObject.GetComponentInChildren<PrefabIdentifier>()?.Id;
+            if (string.IsNullOrWhiteSpace(_prefabID))
+            {
+                _prefabID = gameObject?.GetComponent<PrefabIdentifier>()?.Id ??
+                            gameObject?.GetComponentInChildren<PrefabIdentifier>()?.Id;
+            }
+
+            return _prefabID;
         }
 
         /// <summary>
@@ -231,8 +242,7 @@ namespace FCS_AlterraHub.Mono
         {
             return false;
         }
-
-
+        
         public virtual bool IsUnderWater()
         {
             return transform.position.y < -1f;
@@ -323,6 +333,9 @@ namespace FCS_AlterraHub.Mono
         {
             return TechType.None;
         }
+
+        public virtual TechType [] AllowedTransferItems { get; }
+        
     }
 
     public interface IFCSSave<T>

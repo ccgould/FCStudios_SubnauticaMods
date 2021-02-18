@@ -81,13 +81,25 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
 
         private void RegisterServers()
         {
+            if(Manager == null) return;
             foreach (KeyValuePair<string, DSSSlotController> controller in _slots)
             {
                 if (controller.Value != null && controller.Value.IsOccupied && controller.Value.GetServer() != null)
                 {
                     Manager.RegisterServerInBase(controller.Value.GetServer());
+                    
                 }
             }
+
+            foreach (KeyValuePair<string, DSSSlotController> controller in _slots)
+            {
+                if (controller.Value != null && controller.Value.IsOccupied && controller.Value.GetTransceiver() != null)
+                {
+                    Manager.AddTransceiver(controller.Value.GetTransceiver());
+
+                }
+            }
+            
         }
 
         private void Update()

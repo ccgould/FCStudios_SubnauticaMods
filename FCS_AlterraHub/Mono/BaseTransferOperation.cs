@@ -8,7 +8,7 @@ namespace FCS_AlterraHub.Mono
         private FcsDevice _device;
         public string DeviceId { get; set; }
         public TechType TransferItem { get; set; }
-        public int Amount { get; set; }
+        public int Amount { get; set; } = 1;
         public bool IsPullOperation { get; set; }
 
         [JsonIgnore] public FcsDevice Device

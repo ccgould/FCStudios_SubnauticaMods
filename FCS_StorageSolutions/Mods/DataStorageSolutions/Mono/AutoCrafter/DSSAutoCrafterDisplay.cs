@@ -216,26 +216,20 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
                     data.EndPosition = grouped.Count;
                 }
 
-                QuickLogger.Debug($"Resetting crafting buttons: {data.MaxPerPage}");
                 for (int i = 0; i < data.MaxPerPage; i++)
                 {
-                    QuickLogger.Debug($"Resetting index {i} out of {data.MaxPerPage}");
                     _craftingButtons[i].Reset();
                 }
 
                 int w = 0;
 
-                QuickLogger.Debug($"Setting crafting buttons: {data.MaxPerPage}");
                 for (int i = data.StartPosition; i < data.EndPosition; i++)
                 {
-                    QuickLogger.Debug($"Trying to set : {i}");
                     _craftingButtons[w++].Set(grouped.ElementAt(i), this);
-                    QuickLogger.Debug($"Set Crafting: {i}");
                 }
 
 
                 _craftingGrid.UpdaterPaginator(grouped.Count);
-                QuickLogger.Debug($"Max Pages: { _craftingGrid.GetMaxPages()}", true);
                 _paginatorController.ResetCount(_craftingGrid.GetMaxPages());
 
             }

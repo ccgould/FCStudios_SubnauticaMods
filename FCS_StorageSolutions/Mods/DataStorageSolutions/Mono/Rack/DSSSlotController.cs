@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Interfaces;
+using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_StorageSolutions.Configuration;
 using FCS_StorageSolutions.Mods.AlterraStorage.Buildable;
@@ -314,6 +315,11 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         public FcsDevice GetServer()
         {
             return _mountedServer;
+        }
+
+        public BaseOperationObject GetTransceiver()
+        {
+            return _transceiver;
         }
     }
 }

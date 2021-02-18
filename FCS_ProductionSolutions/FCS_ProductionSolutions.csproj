@@ -151,6 +151,7 @@
     <Compile Include="DeepDriller\Models\Pillar.cs" />
     <Compile Include="DeepDriller\Models\State.cs" />
     <Compile Include="DeepDriller\Models\Upgrades\AutoShutDownAtUpgrade.cs" />
+    <Compile Include="DeepDriller\Models\Upgrades\ConnectToBaseUpgrade.cs" />
     <Compile Include="DeepDriller\Models\Upgrades\AutoStartUpAtUpgrade.cs" />
     <Compile Include="DeepDriller\Models\Upgrades\MaxOreCountUpgrade.cs" />
     <Compile Include="DeepDriller\Models\Upgrades\MinOreCountUpgrade.cs" />
@@ -172,6 +173,7 @@
     <Compile Include="DeepDriller\Mono\FCSDeepDrillerUpgradeManager.cs" />
     <Compile Include="DeepDriller\Enumerators\FCSDeepDrillerPages.cs" />
     <Compile Include="DeepDriller\Mono\FCSDeepDrillerThermalController.cs" />
+    <Compile Include="DeepDriller\Mono\InterfaceInteraction.cs" />
     <Compile Include="DeepDriller\Structs\FilterBtnData.cs" />
     <Compile Include="DeepDriller\Mono\NotificationSystem.cs" />
     <Compile Include="DeepDriller\Mono\PistonBobbing.cs" />

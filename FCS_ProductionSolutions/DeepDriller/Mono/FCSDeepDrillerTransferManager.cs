@@ -32,17 +32,17 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             {
                 
                 yield return new WaitForSeconds(Mathf.Max(0, SortInterval - (_unsortableItems / 60.0f)));
-
-                QuickLogger.Debug("Deep Driller Sorting",true);
                 yield return Sort();
             }
         }
         
         private IEnumerator Sort()
         {
+            if (_mono?.DeepDrillerContainer == null) yield break;
+
             if (!_isAllowedToExport)
             {
-                _mono.DisplayHandler.ResetAlterraStorageList();
+                _mono?.DisplayHandler?.ResetAlterraStorageList();
                 _isSorting = false;
                 yield break;
             }
@@ -127,10 +127,6 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             if (_storagesList.Any())
             {
                 _mono.DisplayHandler.RefreshAlterraStorageList();
-            }
-            else
-            {
-                QuickLogger.Debug("No Alterra Storage Found",true);
             }
         }
 

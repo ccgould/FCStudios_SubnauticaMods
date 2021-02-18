@@ -253,6 +253,8 @@ namespace FCS_StorageSolutions.Configuration
                 {
                     QuickLogger.Debug($"Attempting to save device: {controller.Value?.UnitID} | Package Valid: { controller.Value?.PackageId == ModName}");
 
+                    if(controller.Value == null) continue;
+
                     if (controller.Value.PackageId == ModName && !controller.Value.BypassRegisterCheck)
                     {
                         QuickLogger.Debug($"Saving device: {controller.Value.UnitID}");
@@ -485,6 +487,7 @@ namespace FCS_StorageSolutions.Configuration
 
         internal static void CleanDummyServers()
         {
+            //TODO Remove Debugs
             QuickLogger.Debug("1");
             var g = GameObject.FindObjectsOfType<DSSServerController>();
             var h = GameObject.FindObjectsOfType<DSSTransceiverController>();
@@ -520,6 +523,7 @@ namespace FCS_StorageSolutions.Configuration
                 foreach (DSSTransceiverController ds in h)
                 {
                     QuickLogger.Debug("11");
+                    if(ds?.gameObject?.transform?.parent?.name == null) continue;
                     if (ds.gameObject.transform.parent.name.Equals("SerializerEmptyGameObject"))
                     {
                         QuickLogger.Debug("12");

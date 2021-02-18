@@ -22,7 +22,8 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             new UpgradeClass{FunctionName = "MinOreCount", FriendlyName = "Minimum Ore Count"},
             new UpgradeClass{FunctionName = "MaxOreCount", FriendlyName = "Maximum Ore Count",Template = "os.MaxOreCount({TechType},{Amount});"},
             new UpgradeClass{FunctionName = "AutoStartUpAt", FriendlyName = "Auto Start Down At"},
-            new UpgradeClass{FunctionName = "AutoShutDownAt", FriendlyName = "Auto Shut Down At"}
+            new UpgradeClass{FunctionName = "AutoShutDownAt", FriendlyName = "Auto Shut Down At"},
+            new UpgradeClass{FunctionName = "ConnectToBase", FriendlyName = "Connect to base",Template = "os.ConnectToBase({BaseID});"},
         };
         
         public List<UpgradeFunction> Upgrades { get; set; } = new List<UpgradeFunction>();
@@ -259,6 +260,32 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
                                     QuickLogger.Debug($"Invalid Function: {functionString}", true);
                                 }
                                 break;
+                            case "ConnectToBase":
+
+                                var connectToBaseCheck = Upgrades.Any(x =>
+                                    x.UpgradeType == UpgradeFunctions.ConnectToBase);
+
+                                if (connectToBaseCheck)
+                                {
+                                    QuickLogger.Message("Function already implemented.", true);
+                                    return;
+                                }
+
+                                bool connectToBaseValid = ConnectToBaseUpgrade.IsValid(paraResults, out var connectToBase);
+
+                                if (connectToBaseValid)
+                                {
+                                    QuickLogger.Debug($"Function  Valid: {functionString}", true);
+                                    var connectToBaseUpgrade = new ConnectToBaseUpgrade { IsEnabled = true, Mono = _mono,  BaseName= connectToBase.BaseFriendlyID };
+                                    Upgrades.Add(connectToBaseUpgrade);
+                                    upgrade = connectToBaseUpgrade;
+                                    OnUpgradeUpdate?.Invoke(connectToBaseUpgrade);
+                                }
+                                else
+                                {
+                                    QuickLogger.Debug($"Invalid Function: {functionString}", true);
+                                }
+                                break;
 
                         }
                     }
@@ -344,7 +371,9 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
                 {
                     methodName = item.GetUntilOrEmpty();
 
-                    if (Classes.Any(x => x.FunctionName == methodName))
+                    QuickLogger.Debug($"Method Name = {methodName}", true);
+
+                    if (Classes.Any(x => x.FunctionName.Equals(methodName)))
                     {
                         QuickLogger.Debug($"Method Name = {methodName}", true);
                         result = methodName;
