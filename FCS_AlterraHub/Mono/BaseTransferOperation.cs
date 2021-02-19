@@ -1,4 +1,5 @@
-﻿using FCS_AlterraHub.Registration;
+﻿using System.Collections.Generic;
+using FCS_AlterraHub.Registration;
 using Oculus.Newtonsoft.Json;
 
 namespace FCS_AlterraHub.Mono
@@ -7,11 +8,14 @@ namespace FCS_AlterraHub.Mono
     {
         private FcsDevice _device;
         public string DeviceId { get; set; }
-        public TechType TransferItem { get; set; }
+        public List<TechType> TransferItems { get; set; } = new List<TechType>();
         public int Amount { get; set; } = 1;
         public bool IsPullOperation { get; set; }
+        public bool IsBeingEdited { get; set; }
 
-        [JsonIgnore] public FcsDevice Device
+
+        [JsonIgnore]
+        public FcsDevice Device
         {
             get
             {
@@ -23,10 +27,23 @@ namespace FCS_AlterraHub.Mono
             }
         }
 
+        public BaseTransferOperation()
+        {
+            
+        }
+
+        public BaseTransferOperation(BaseTransferOperation operation)
+        {
+            DeviceId = operation.DeviceId;
+            Amount = operation.Amount;
+            IsPullOperation = operation.IsPullOperation;
+            TransferItems = new List<TechType>(operation.TransferItems);
+        }
+        
         public bool IsSimilar(BaseTransferOperation operation)
         {
             return operation.DeviceId == DeviceId &&
-                   operation.TransferItem == TransferItem &&
+                   operation.TransferItems == TransferItems &&
                    operation.Amount == Amount &&
                    operation.IsPullOperation;
         }

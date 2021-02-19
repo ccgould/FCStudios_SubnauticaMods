@@ -319,9 +319,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
             if (_rackController == null) return false;
             return _rackController.IsVisible;
         }
-
         
-
         public void DockServer(BaseManager manager,Transform slot)
         {
             Manager = manager;

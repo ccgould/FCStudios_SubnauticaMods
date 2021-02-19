@@ -206,8 +206,8 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
 
         internal void UpdateTransceiver()
         {
+            if (_itemController == null) return;
             var totalOperations = _itemController.GetBaseManager().GetBaseOperations().Count;
-
             _totalOperations.text = $"{totalOperations}/{_itemController.GetBaseManager().GetBaseOperators().Count * 10}";
         }
 

@@ -138,11 +138,14 @@ namespace FCS_AlterraHub.Mono
                 }
                 else
                 {
-                    if (HasItem(operation.TransferItem))
+                    foreach (TechType item in operation.TransferItems)
                     {
-                        if (operation.Device.CanBeStored(1, operation.TransferItem))
+                        if (HasItem(item))
                         {
-                            operation.Device.AddItemToContainer(TakeItem(operation.TransferItem).ToInventoryItem());
+                            if (operation.Device.CanBeStored(1, item))
+                            {
+                                operation.Device.AddItemToContainer(TakeItem(item).ToInventoryItem());
+                            }
                         }
                     }
                 }
@@ -182,8 +185,14 @@ namespace FCS_AlterraHub.Mono
                 DockingBlackList = _savedData.BlackList;
                 PullFromDockedVehicles = _savedData.AllowDocking;
                 HasBreakerTripped = _savedData.HasBreakerTripped;
-                if (_savedData.BaseOperations != null && !string.IsNullOrWhiteSpace(_savedData.Version) &&_savedData.Version == "1.0")
+
+                QuickLogger.Debug($"Base Operator: Operations is null: {_savedData.BaseOperations == null} | Is Version Empty: {string.IsNullOrWhiteSpace(_savedData.Version)} | Version is 1.0: {_savedData.Version == "1.0"}");
+
+                if (_savedData.BaseOperations != null && !string.IsNullOrWhiteSpace(_savedData.Version) &&
+                    _savedData.Version == "1.0")
+                {
                     _baseOperations = _savedData.BaseOperations;
+                }
             }
 
             if (_dumpContainer == null)
@@ -600,6 +609,22 @@ namespace FCS_AlterraHub.Mono
             foreach (IDSSRack baseRack in BaseRacks)
             {
                 if (baseRack.HasItem(techType))
+                {
+                    return true;
+                }
+            }
+
+            foreach (StorageContainer locker in BaseStorageLockers)
+            {
+                if (locker.container.Contains(techType))
+                {
+                    return true;
+                }
+            }
+
+            foreach (FcsDevice device in BaseFcsStorage)
+            {
+                if (device.GetStorage().ItemsContainer.Contains(techType))
                 {
                     return true;
                 }
@@ -1141,7 +1166,7 @@ namespace FCS_AlterraHub.Mono
                     AllowDocking = baseManager.PullFromDockedVehicles,
                     HasBreakerTripped = baseManager.HasBreakerTripped,
                     BlackList = baseManager.DockingBlackList,
-                    //BaseOperations = baseManager.GetBaseOperations()
+                    BaseOperations = baseManager.GetBaseOperations()
                 };
             }
         }

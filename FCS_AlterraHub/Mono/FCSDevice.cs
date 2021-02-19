@@ -54,13 +54,7 @@ namespace FCS_AlterraHub.Mono
             return transform.position;
         }
 
-        /// <summary>
-        /// If true this device will be visible by the transceiver in the DSS Pack
-        /// </summary>
-        public virtual bool CanBeSeenByTransceiver { get; set; }
-
         protected ColorManager _colorManager;
-        private string _prefabID;
 
         /// <summary>
         /// The package which this item belongs to
@@ -113,7 +107,7 @@ namespace FCS_AlterraHub.Mono
         /// <summary>
         /// Bypasses the check for the registration IsConstructed and PrefabID
         /// </summary>
-        public virtual bool BypassRegisterCheck { get;} = false;
+        public virtual bool BypassRegisterCheck { get; } = false;
 
         /// <summary>
         /// The initializer of this device
@@ -126,13 +120,8 @@ namespace FCS_AlterraHub.Mono
         /// <returns></returns>
         public virtual string GetPrefabID()
         {
-            if (string.IsNullOrWhiteSpace(_prefabID))
-            {
-                _prefabID = gameObject?.GetComponent<PrefabIdentifier>()?.Id ??
-                            gameObject?.GetComponentInChildren<PrefabIdentifier>()?.Id;
-            }
-
-            return _prefabID;
+            return gameObject.GetComponent<PrefabIdentifier>()?.Id ??
+                   gameObject.GetComponentInChildren<PrefabIdentifier>()?.Id;
         }
 
         /// <summary>
@@ -242,7 +231,8 @@ namespace FCS_AlterraHub.Mono
         {
             return false;
         }
-        
+
+
         public virtual bool IsUnderWater()
         {
             return transform.position.y < -1f;
@@ -297,12 +287,14 @@ namespace FCS_AlterraHub.Mono
 
         }
 
-        public virtual bool IsRack { get;} = false;
+        public virtual bool IsRack { get; } = false;
         public Action<FcsDevice, InventoryItem> OnAddItem { get; set; }
         public Action<FcsDevice, InventoryItem> OnRemoveItem { get; set; }
-        
+
         public string TabID { get; set; }
         public virtual StorageType StorageType { get; }
+        public virtual bool CanBeSeenByTransceiver { get; set; }
+        public virtual TechType[] AllowedTransferItems { get; }
 
         public virtual int GetItemCount(TechType techType)
         {
@@ -333,9 +325,6 @@ namespace FCS_AlterraHub.Mono
         {
             return TechType.None;
         }
-
-        public virtual TechType [] AllowedTransferItems { get; }
-        
     }
 
     public interface IFCSSave<T>

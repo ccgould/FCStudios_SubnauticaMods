@@ -372,15 +372,7 @@ namespace FCS_AlterraHub.Configuration
 
                 if (entry.InstanceID == instanceId)
                 {
-                    return new BaseSaveData
-                    {
-                        BaseName = entry.BaseName,
-                        InstanceID = entry.InstanceID,
-                        AllowDocking = entry.AllowDocking,
-                        HasBreakerTripped = entry.HasBreakerTripped,
-                        BlackList = entry.BlackList
-    
-                    };
+                    return entry;
                 }
             }
 

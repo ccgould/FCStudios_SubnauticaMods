@@ -21,10 +21,10 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         private GridHelperV2 _techTypeGrid;
         private readonly List<TechTypeItem> _techTypeButtons = new List<TechTypeItem>();
         private FcsDevice _fcsDevice;
-        private TechType _techType;
         private int _amount;
         private BaseTransferOperation _operation;
         private Text _title;
+        private BaseTransferOperation _operationHistory;
 
         internal void Initialize()
         {
@@ -66,7 +66,9 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             var confirmBTN = GameObjectHelpers.FindGameObject(gameObject, "ConfirmBTN").GetComponent<Button>();
             confirmBTN.onClick.AddListener((() =>
             {
-                if (_techType == TechType.None && !_performPullOperation.isOn)
+                if (_operation == null) return;
+
+                if (_operation.TransferItems.Count == 0 && !_performPullOperation.isOn)
                 {
                     QuickLogger.Message("Please select an Item to send",true);
                     return;
@@ -74,70 +76,63 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
 
                 if (_operation != null)
                 {
-                    _operation.TransferItem = _techType;
                     _operation.Amount = _amount;
                     _operation.IsPullOperation = _performPullOperation.isOn;
+                    _fcsDevice.Manager?.AddOperationForDevice(_operation);
                 }
-                else
-                {
-                    _fcsDevice.Manager?.AddOperationForDevice(new BaseTransferOperation
-                    {
-                        DeviceId = _fcsDevice.UnitID,
-                        IsPullOperation = _performPullOperation.isOn,
-                        TransferItem = _techType
-                    });
-                }
+                
                 Hide();
+                BaseManager.GlobalNotifyByID(Mod.DSSTabID, "RefreshTransceiverData");
             }));
 
             _title = GameObjectHelpers.FindGameObject(gameObject, "Title")?.GetComponent<Text>();
 
             var cancelBTN = GameObjectHelpers.FindGameObject(gameObject, "CancelBTN").GetComponent<Button>();
-            cancelBTN.onClick.AddListener(Hide);
+            cancelBTN.onClick.AddListener(() =>
+            {
+                _operation = new BaseTransferOperation(_operationHistory);
+                Hide();
+            });
         }
 
         private void OnTransceiverGrid(DisplayData data)
         {
             try
             {
-                QuickLogger.Debug("1");
                 var grouped = _fcsDevice?.AllowedTransferItems?.ToList();
-                QuickLogger.Debug("2");
+
                 if (grouped == null) return;
-                QuickLogger.Debug("3");
+
                 if (!string.IsNullOrEmpty(_searchText?.Trim()))
                 {
                     grouped = grouped.Where(p => TechTypeExtensions.Get(Language.main, p).ToLower().Contains(_searchText.Trim().ToLower())).ToList();
                 }
-                QuickLogger.Debug("4");
+
                 if (data.EndPosition > grouped.Count)
                 {
                     data.EndPosition = grouped.Count;
                 }
-                QuickLogger.Debug("5");
+
                 for (int i = 0; i < data.MaxPerPage; i++)
                 {
                     _techTypeButtons[i].Reset();
                 }
-                QuickLogger.Debug("6");
+
                 int w = 0;
-                QuickLogger.Debug("7");
+
                 for (int i = data.StartPosition; i < data.EndPosition; i++)
                 {
                     int index = w++;
                     _techTypeButtons[index].Set(grouped.ElementAt(i));
-                    QuickLogger.Debug("8");
-                    if (_techType == grouped.ElementAt(i))
+
+                    if (_operation.TransferItems.Contains(grouped.ElementAt(i)))
                     {
                         _techTypeButtons[index].Select();
                     }
-                    QuickLogger.Debug("9");
                 }
-                QuickLogger.Debug("10");
+
                 _techTypeGrid.UpdaterPaginator(grouped.Count);
-                QuickLogger.Debug("11");
                 _paginatorController.ResetCount(_techTypeGrid.GetMaxPages());
-                QuickLogger.Debug("12");
             }
             catch (Exception e)
             {
@@ -149,7 +144,16 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
 
         private void OnButtonClick(string arg1, object arg2)
         {
-            _techType = (TechType) arg2;
+            var techType = (TechType) arg2;
+
+            if (_operation.TransferItems.Contains(techType))
+            {
+                _operation.TransferItems.Remove(techType);
+            }
+            else
+            {
+                _operation.TransferItems.Add(techType);
+            }
         }
 
         private void UpdateSearch(string obj)
@@ -161,25 +165,34 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         public void Show(FcsDevice fcsDevice)
         {
             _fcsDevice = fcsDevice;
-            gameObject.SetActive(true);
-            _operation = fcsDevice.Manager.GetDeviceOperation(fcsDevice);
-            BaseManager.GlobalNotifyByID(Mod.DSSTabID,"RefreshTransceiverData");
-            _title.text = $"<color=#00ffffff>[{fcsDevice.UnitID}]</color> Item Transciever Settings";
-            if (_operation != null)
+
+            if (_fcsDevice == null)
             {
-                _techType = _operation.TransferItem;
-                _performPullOperation.isOn = _operation.IsPullOperation;
-                _amount = _operation.Amount;
+                QuickLogger.DebugError("FCSDevice returned null",true);
+                return;
             }
 
+            _operation = fcsDevice.Manager.GetDeviceOperation(fcsDevice) ?? new BaseTransferOperation
+            {
+                DeviceId = _fcsDevice.UnitID,
+                IsBeingEdited = true
+            };
+
+            _operationHistory = new BaseTransferOperation(_operation);
+
+
+            _title.text = $"<color=#00ffffff>[{fcsDevice.UnitID}]</color> Item Transciever Settings";
             _techTypeGrid.DrawPage();
+
+            gameObject.SetActive(true);
         }        
         
         public void Hide()
         {
+            _operation.IsBeingEdited = false;
             gameObject.SetActive(false);
             _operation = null;
-            _techType = TechType.None;
+            _operation = null;
             _amount = 1;
             _performPullOperation.isOn = false;
             _title.text = $"<color=#00ffffff>[]</color> Item Transciever Settings";
