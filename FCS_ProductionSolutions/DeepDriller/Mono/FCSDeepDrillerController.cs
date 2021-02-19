@@ -67,7 +67,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         public FCSDeepDrillerUpgradeManager UpgradeManager { get; private set; }
         public FCSDeepDrillerTransferManager TransferManager { get; set; }
         public override bool IsVisible => IsConstructed && IsInitialized;
-
+        public override int MaxItemAllowForTransfer { get; } = 6;
         public override TechType[] AllowedTransferItems { get; } =
         {
             TechType.Lubricant

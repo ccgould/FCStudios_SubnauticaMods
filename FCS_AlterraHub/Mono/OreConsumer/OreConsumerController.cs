@@ -29,7 +29,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
         public override bool CanBeSeenByTransceiver => true;
         public bool IsOnPlatform => Manager?.Habitat != null;
         public override bool IsVisible => IsOperational;
-
+        public override int MaxItemAllowForTransfer { get; } = 10;
         public override TechType[] AllowedTransferItems { get; } =
         {
             TechType.Titanium,

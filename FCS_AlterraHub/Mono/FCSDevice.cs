@@ -41,6 +41,11 @@ namespace FCS_AlterraHub.Mono
         }
 
         /// <summary>
+        /// The maximum amount of items allowed to transfer to the device through the transceiver
+        /// </summary>
+        public virtual int MaxItemAllowForTransfer { get; }
+
+        /// <summary>
         /// Gets the storage of a unit if it is accesable.
         /// </summary>
         /// <returns><see cref="FCSStorage"/></returns>

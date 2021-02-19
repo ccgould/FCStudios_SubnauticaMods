@@ -30,6 +30,8 @@ namespace FCS_EnergySolutions.AlterraGen.Mono
         public override bool IsOperational => IsConstructed && IsInitialized;
         public override bool IsVisible => IsOperational;
         public override bool CanBeSeenByTransceiver => true;
+        public override TechType[] AllowedTransferItems { get; } = { TechType.Lubricant };
+        public override int MaxItemAllowForTransfer { get; } = 9;
 
         #region Unity Methods
 
@@ -137,9 +139,7 @@ namespace FCS_EnergySolutions.AlterraGen.Mono
 
            return _colorManager.ChangeColor(color,mode);
         }
-
-        public override TechType[] AllowedTransferItems { get; } = { TechType.Lubricant};
-
+        
         public override bool CanBeStored(int amount, TechType techType)
         {
             return !PowerManager.IsFull && PowerManager.IsAllowedToAdd(techType,true);
