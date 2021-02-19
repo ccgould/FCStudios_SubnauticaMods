@@ -12,7 +12,7 @@ using UnityEngine.Events;
 
 namespace FCS_AlterraHub.Configuration
 {
-    [Menu("AlterraHub Menu")]
+    [Menu("FCS AlterraHub Menu")]
     public class Config : ConfigFile
     {
 
