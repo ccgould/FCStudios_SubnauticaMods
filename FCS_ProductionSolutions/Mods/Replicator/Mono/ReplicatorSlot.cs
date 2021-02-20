@@ -180,6 +180,10 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
         }
 
         public ItemsContainer ItemsContainer { get; set; }
+        public int StorageCount()
+        {
+            return ItemsContainer?.count ?? 0;
+        }
 
         internal void SpawnClone()
         {

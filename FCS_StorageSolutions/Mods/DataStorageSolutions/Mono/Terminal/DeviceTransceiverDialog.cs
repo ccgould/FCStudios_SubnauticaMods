@@ -9,6 +9,7 @@ using FCS_StorageSolutions.Configuration;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
@@ -25,10 +26,14 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         private BaseTransferOperation _operation;
         private Text _title;
         private BaseTransferOperation _operationHistory;
+        private Text _amountText;
+        private NumberIncreaseButton _appendToAmountBTN;
+        private Toggle _isEnabled;
 
         internal void Initialize()
         {
-            _performPullOperation = gameObject.GetComponentInChildren<Toggle>();
+            _performPullOperation = GameObjectHelpers.FindGameObject(gameObject, "PullOperationToggle").GetComponent<Toggle>();
+            _isEnabled = GameObjectHelpers.FindGameObject(gameObject, "IsEnabledToggle").GetComponent<Toggle>();
 
             #region Search
             var inputField = InterfaceHelpers.FindGameObject(gameObject, "InputField");
@@ -64,6 +69,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             }
 
             var confirmBTN = GameObjectHelpers.FindGameObject(gameObject, "ConfirmBTN").GetComponent<Button>();
+
             confirmBTN.onClick.AddListener((() =>
             {
                 if (_operation == null) return;
@@ -76,8 +82,9 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
 
                 if (_operation != null)
                 {
-                    _operation.Amount = _amount;
+                    _operation.MaxAmount = _amount;
                     _operation.IsPullOperation = _performPullOperation.isOn;
+                    _operation.IsEnabled = _isEnabled.isOn;
                     _fcsDevice.Manager?.AddOperationForDevice(_operation);
                 }
                 
@@ -93,6 +100,17 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                 _operation = new BaseTransferOperation(_operationHistory);
                 Hide();
             });
+
+            var appendToAmountObj = GameObjectHelpers.FindGameObject(gameObject, "AppendToAmountBTN");
+            _amountText = GameObjectHelpers.FindGameObject(appendToAmountObj, "Text")?.GetComponent<Text>();
+            _appendToAmountBTN = appendToAmountObj.EnsureComponent<NumberIncreaseButton>();
+            _appendToAmountBTN.TextComponent = _amountText;
+            _appendToAmountBTN.OnAmountChanged += AddToAmount;
+        }
+
+        private void AddToAmount(int amount)
+        {
+            _amount = amount;
         }
 
         private void OnTransceiverGrid(DisplayData data)
@@ -166,6 +184,8 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         {
             _fcsDevice = fcsDevice;
 
+            
+
             if (_fcsDevice == null)
             {
                 QuickLogger.DebugError("FCSDevice returned null",true);
@@ -180,6 +200,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
 
             _operationHistory = new BaseTransferOperation(_operation);
 
+            _appendToAmountBTN.Initialize(_operation.MaxAmount,1,fcsDevice.MaxItemAllowForTransfer);
 
             _title.text = $"<color=#00ffffff>[{fcsDevice.UnitID}]</color> Item Transciever Settings";
             _techTypeGrid.DrawPage();
@@ -195,6 +216,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             _operation = null;
             _amount = 1;
             _performPullOperation.isOn = false;
+            _isEnabled.isOn = false;
             _title.text = $"<color=#00ffffff>[]</color> Item Transciever Settings";
         }
 
@@ -206,6 +228,61 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         public void GoToPage(int index, PaginatorController sender)
         {
             // Not in use
+        }
+    }
+
+    internal class NumberIncreaseButton : OnScreenButton, IPointerEnterHandler, IPointerClickHandler, IPointerExitHandler
+    {
+        private int _amount;
+        private int _max;
+        private int _min;
+        private int _increaseBy;
+        public Action<int> OnAmountChanged { get; set; }
+        public Text TextComponent { get; set; }
+
+        public void Initialize(int amount,int min,int max,int increaseBy = 1)
+        {
+            _increaseBy = increaseBy;
+            _max = max;
+            _min = min;
+            _amount = amount;
+            Notify();
+        }
+
+        private void Notify()
+        {
+            OnAmountChanged?.Invoke(_amount);
+            if (TextComponent != null)
+                TextComponent.text = $"{_amount}";
+        }
+
+        public void SetAmount(int amount)
+        {
+            _amount = amount;
+        }
+
+        public override void OnPointerClick(PointerEventData eventData)
+        {
+            base.OnPointerClick(eventData);
+            _amount++;
+            
+            if (_amount > _max)
+            {
+                _amount = _min;
+            }
+            
+            Notify();
+        }
+
+        public override void OnPointerEnter(PointerEventData eventData)
+        {
+            TextLineOne  = $"Min: {_min}/{_max}";
+            base.OnPointerEnter(eventData);
+        }
+
+        public override void OnPointerExit(PointerEventData eventData)
+        {
+            base.OnPointerExit(eventData);
         }
     }
 }

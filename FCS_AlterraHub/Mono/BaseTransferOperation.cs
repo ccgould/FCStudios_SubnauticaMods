@@ -9,7 +9,7 @@ namespace FCS_AlterraHub.Mono
         private FcsDevice _device;
         public string DeviceId { get; set; }
         public List<TechType> TransferItems { get; set; } = new List<TechType>();
-        public int Amount { get; set; } = 1;
+        public int MaxAmount { get; set; } = 1;
         public bool IsPullOperation { get; set; }
         public bool IsBeingEdited { get; set; }
 
@@ -27,6 +27,8 @@ namespace FCS_AlterraHub.Mono
             }
         }
 
+        public bool IsEnabled { get; set; }
+
         public BaseTransferOperation()
         {
             
@@ -35,7 +37,7 @@ namespace FCS_AlterraHub.Mono
         public BaseTransferOperation(BaseTransferOperation operation)
         {
             DeviceId = operation.DeviceId;
-            Amount = operation.Amount;
+            MaxAmount = operation.MaxAmount;
             IsPullOperation = operation.IsPullOperation;
             TransferItems = new List<TechType>(operation.TransferItems);
         }
@@ -44,7 +46,7 @@ namespace FCS_AlterraHub.Mono
         {
             return operation.DeviceId == DeviceId &&
                    operation.TransferItems == TransferItems &&
-                   operation.Amount == Amount &&
+                   operation.MaxAmount == MaxAmount &&
                    operation.IsPullOperation;
         }
     }

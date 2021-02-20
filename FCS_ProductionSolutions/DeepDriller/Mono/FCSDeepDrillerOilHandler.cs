@@ -20,6 +20,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         public bool IsFull { get; }
         private const float KDayInSeconds = 1200f;
         private readonly float _setOilTime = KDayInSeconds * QPatch.Configuration.DDOilTimePeriodInDays;
+        private readonly float _lubricantRefillAmount = KDayInSeconds * QPatch.Configuration.DDOilRestoresInDays;
         private float _timeLeft;
         private float _elapsed;
         internal Action OnOilUpdate { get; set; }
@@ -66,7 +67,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         
         internal void ReplenishOil()
         {
-            _timeLeft = Mathf.Clamp(_timeLeft + (KDayInSeconds * QPatch.Configuration.DDOilRestoresInDays), 0, _setOilTime);
+            _timeLeft = Mathf.Clamp(_timeLeft + (_lubricantRefillAmount), 0, _setOilTime);
         }
 
         internal float GetOilPercent()
@@ -144,6 +145,10 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         }
 
         public ItemsContainer ItemsContainer { get; set; }
+        public int StorageCount()
+        {
+            return Mathf.RoundToInt(_timeLeft / _lubricantRefillAmount);
+        }
 
         internal bool HasOil()
         {

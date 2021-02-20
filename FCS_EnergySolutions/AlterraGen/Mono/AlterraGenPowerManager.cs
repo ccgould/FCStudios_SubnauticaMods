@@ -212,6 +212,10 @@ namespace FCS_EnergySolutions.AlterraGen.Mono
         }
 
         public ItemsContainer ItemsContainer { get; set; }
+        public int StorageCount()
+        {
+            return _container.Count;
+        }
 
         #endregion
 

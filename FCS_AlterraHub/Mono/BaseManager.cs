@@ -130,7 +130,7 @@ namespace FCS_AlterraHub.Mono
 
             foreach (BaseTransferOperation operation in _baseOperations)
             {
-                if (operation.Device == null || !operation.Device.IsConstructed || !operation.Device.IsInitialized) continue;
+                if (operation.Device == null || !operation.Device.IsConstructed || !operation.Device.IsInitialized || !operation.IsEnabled) continue;
 
                 if (operation.IsPullOperation)
                 {
@@ -142,7 +142,8 @@ namespace FCS_AlterraHub.Mono
                     {
                         if (HasItem(item))
                         {
-                            if (operation.Device.CanBeStored(1, item))
+                            QuickLogger.Debug($"Device {operation.DeviceId}: {operation.Device.GetStorage()?.StorageCount()}|{operation.MaxAmount}",true);
+                            if (operation.Device.CanBeStored(1, item) && operation.Device.GetStorage() != null && operation.Device.GetStorage()?.StorageCount() < operation.MaxAmount)
                             {
                                 operation.Device.AddItemToContainer(TakeItem(item).ToInventoryItem());
                             }

@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Text;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
+using FCS_AlterraHub.Interfaces;
 using FCS_ProductionSolutions.Buildable;
 using UnityEngine;
 
@@ -79,8 +80,40 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
 
         private void Start()
         {
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.DeepDrillerMk3TabID, Mod.ModName);
             DisplayHandler?.UpdateUnitID();
             UpdateEmission();
+            if (_saveData == null)
+            {
+                ReadySaveData();
+            }
+
+            LoadSave();
+        }
+
+        private void LoadSave()
+        {
+            if (IsFromSave && _saveData != null)
+            {
+                DeepDrillerPowerManager.LoadData(_saveData);
+
+                DeepDrillerContainer.LoadData(_saveData.Items);
+                if (_saveData.IsFocused)
+                {
+                    OreGenerator.SetIsFocus(_saveData.IsFocused);
+                    OreGenerator.Load(_saveData.FocusOres);
+                }
+
+                _colorManager.ChangeColor(_saveData.Body.Vector4ToColor());
+                _colorManager.ChangeColor(_saveData.Sec.Vector4ToColor(), ColorTargetMode.Secondary);
+                CurrentBiome = _saveData.Biome;
+                OilHandler.SetOilTimeLeft(_saveData.OilTimeLeft);
+
+                UpgradeManager.Load(_saveData?.Upgrades);
+                OreGenerator.SetBlackListMode(_saveData.IsBlackListMode);
+                _isRangeVisible = _saveData.IsRangeVisible;
+                _isBreakSet = _saveData.IsBrakeSet;
+            }
         }
 
         public override void OnDestroy()
@@ -100,34 +133,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
                 {
                     Initialize();
                 }
-
-                if (_saveData == null)
-                {
-                    ReadySaveData();
-                }
-
-                if (IsFromSave && _saveData != null)
-                {
-                    DeepDrillerPowerManager.LoadData(_saveData);
-
-                    DeepDrillerContainer.LoadData(_saveData.Items);
-                    if (_saveData.IsFocused)
-                    {
-                        OreGenerator.SetIsFocus(_saveData.IsFocused);
-                        OreGenerator.Load(_saveData.FocusOres);
-                    }
-                    FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.DeepDrillerMk3TabID, Mod.ModName);
-                    _colorManager.ChangeColor(_saveData.Body.Vector4ToColor());
-                    _colorManager.ChangeColor(_saveData.Sec.Vector4ToColor(), ColorTargetMode.Secondary);
-                    CurrentBiome = _saveData.Biome;
-                    OilHandler.SetOilTimeLeft(_saveData.OilTimeLeft);
-                    
-                    UpgradeManager.Load(_saveData?.Upgrades);
-                    OreGenerator.SetBlackListMode(_saveData.IsBlackListMode);
-                    _isRangeVisible = _saveData.IsRangeVisible;
-                    _isBreakSet = _saveData.IsBrakeSet;
-                }
-
+                
                 StartCoroutine(TryGetLoot());
                 _runStartUpOnEnable = false;
             }
@@ -671,6 +677,12 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         public override bool AddItemToContainer(InventoryItem item)
         {
             return OilHandler.AddItemToContainer(item);
+        }
+
+        public override IFCSStorage GetStorage()
+        {
+            //Getting Storage of the Oil Handler for the Transceiver
+            return OilHandler;
         }
 
         #endregion

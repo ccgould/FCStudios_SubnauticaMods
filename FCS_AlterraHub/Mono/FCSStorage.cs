@@ -20,6 +20,10 @@ namespace FCS_AlterraHub.Mono
         public Action<FcsDevice, TechType> OnContainerRemoveItem { get; set; }
         
         public ItemsContainer ItemsContainer { get; set; }
+        public int StorageCount()
+        {
+            return GetCount();
+        }
 
         public byte[] Save(ProtobufSerializer serializer)
         {

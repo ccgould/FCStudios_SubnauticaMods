@@ -226,6 +226,10 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         }
 
         public ItemsContainer ItemsContainer { get; set; }
+        public int StorageCount()
+        {
+            return GetContainerTotal();
+        }
 
         public void Setup(FCSDeepDrillerController fcsDeepDrillerController)
         {

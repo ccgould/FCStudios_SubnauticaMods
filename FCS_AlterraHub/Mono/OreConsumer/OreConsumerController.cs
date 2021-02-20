@@ -370,6 +370,15 @@ namespace FCS_AlterraHub.Mono.OreConsumer
         }
 
         public ItemsContainer ItemsContainer { get; set; }
+        public int StorageCount()
+        {
+            return _oreQueue.Count;
+        }
+
+        public override IFCSStorage GetStorage()
+        {
+            return this;
+        }
 
         public void Save(SaveData newSaveData, ProtobufSerializer serializer)
         {

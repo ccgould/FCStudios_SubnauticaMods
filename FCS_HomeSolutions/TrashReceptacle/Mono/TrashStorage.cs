@@ -144,5 +144,9 @@ namespace FCS_HomeSolutions.TrashReceptacle.Mono
         }
 
         public ItemsContainer ItemsContainer { get; set; }
+        public int StorageCount()
+        {
+            return GetTotal();
+        }
     }
 }

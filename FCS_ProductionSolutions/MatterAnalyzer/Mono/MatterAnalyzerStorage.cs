@@ -132,6 +132,10 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
         }
 
         public ItemsContainer ItemsContainer { get; set; }
+        public int StorageCount()
+        {
+            return ItemsContainer?.count ?? 0;
+        }
 
         internal HashSet<TechType> ValidSeeds = new HashSet<TechType>
         {

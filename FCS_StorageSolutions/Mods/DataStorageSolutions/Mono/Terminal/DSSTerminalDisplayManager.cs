@@ -260,7 +260,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                 var multiplierBTN = GameObjectHelpers.FindGameObject(gameObject, "MultiplyBTN").EnsureComponent<MultiplierController>();
                 multiplierBTN.Initialize(_mono);
                 multiplierBTN.UpdateLabel();
-
+                
                 _itemGrid = _mono.gameObject.EnsureComponent<GridHelperV2>();
                 _itemGrid.OnLoadDisplay += OnLoadItemsGrid;
                 _itemGrid.Setup(44, gameObject, Color.gray, Color.white, OnButtonClick);

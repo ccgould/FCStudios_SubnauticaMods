@@ -300,6 +300,10 @@ namespace FCS_AlterraHub.Model
         }
 
         public ItemsContainer ItemsContainer { get; set; }
+        public int StorageCount()
+        {
+            return NumberOfItems;
+        }
 
         public void Clear()
         {

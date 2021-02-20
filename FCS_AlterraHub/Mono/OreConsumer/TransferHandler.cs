@@ -82,6 +82,11 @@ namespace FCS_AlterraHub.Mono.OreConsumer
         }
 
         public ItemsContainer ItemsContainer { get; set; }
+        public int StorageCount()
+        {
+
+            return ItemsContainer?.count ?? 0;
+        }
 
         public void OpenStorage(Action<string> withDrawMoney)
         {

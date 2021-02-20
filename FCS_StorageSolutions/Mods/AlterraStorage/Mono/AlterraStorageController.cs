@@ -397,6 +397,10 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
         }
 
         public ItemsContainer ItemsContainer { get; set; }
+        public int StorageCount()
+        {
+            return _storageContainer.GetCount();
+        }
 
         public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
         {

@@ -423,6 +423,10 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         }
 
         public ItemsContainer ItemsContainer { get; set; }
+        public int StorageCount()
+        {
+            return ItemsContainer?.count ?? 0;
+        }
 
         #endregion
 
