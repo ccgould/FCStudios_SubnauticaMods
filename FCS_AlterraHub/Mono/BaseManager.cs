@@ -1309,8 +1309,13 @@ namespace FCS_AlterraHub.Mono
 
         public void AddOperationForDevice(BaseTransferOperation operation )
         {
-            var result = _baseOperations.Any(x => x.IsSimilar(operation));
-            if (result) return;
+            var result = _baseOperations.Any(x => x.DeviceId == operation.DeviceId);
+            if (result)
+            {
+                _baseOperations[_baseOperations.FindIndex(x => x.DeviceId.Equals(operation.DeviceId))] = operation;
+                return;
+            }
+
             _baseOperations.Add(operation);
         }
 

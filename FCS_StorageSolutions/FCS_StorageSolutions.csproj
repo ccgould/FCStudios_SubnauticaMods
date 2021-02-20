@@ -186,7 +186,6 @@
     <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\FilterSettingDialog.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\MultiplierController.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\NetworkDialogController.cs" />
-    <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\TechTypeItem.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\TransceiverPageController.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\VehicleButton.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\VehicleItemButton.cs" />

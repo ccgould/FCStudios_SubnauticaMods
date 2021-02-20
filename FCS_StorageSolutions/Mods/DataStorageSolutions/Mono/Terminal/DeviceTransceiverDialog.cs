@@ -20,7 +20,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         private PaginatorController _paginatorController;
         private string _searchText;
         private GridHelperV2 _techTypeGrid;
-        private readonly List<TechTypeItem> _techTypeButtons = new List<TechTypeItem>();
+        private readonly List<FCSGuiToggle> _techTypeButtons = new List<FCSGuiToggle>();
         private FcsDevice _fcsDevice;
         private int _amount;
         private BaseTransferOperation _operation;
@@ -29,6 +29,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         private Text _amountText;
         private NumberIncreaseButton _appendToAmountBTN;
         private Toggle _isEnabled;
+        private bool _isResetting;
 
         internal void Initialize()
         {
@@ -61,9 +62,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
 
             foreach (Transform deviceItem in GameObjectHelpers.FindGameObject(gameObject, "Grid").transform)
             {
-                var deviceBtn = deviceItem.gameObject.EnsureComponent<TechTypeItem>();
-                deviceBtn.ButtonMode = InterfaceButtonMode.HoverImage;
-                deviceBtn.BtnName = "TechTypeBTN";
+                var deviceBtn = deviceItem.gameObject.EnsureComponent<FCSGuiToggle>();
                 deviceBtn.OnButtonClick += OnButtonClick;
                 _techTypeButtons.Add(deviceBtn);
             }
@@ -89,6 +88,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                 }
                 
                 Hide();
+
                 BaseManager.GlobalNotifyByID(Mod.DSSTabID, "RefreshTransceiverData");
             }));
 
@@ -133,7 +133,9 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
 
                 for (int i = 0; i < data.MaxPerPage; i++)
                 {
+                    _isResetting = true;
                     _techTypeButtons[i].Reset();
+                    _isResetting = false;
                 }
 
                 int w = 0;
@@ -142,7 +144,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                 {
                     int index = w++;
                     _techTypeButtons[index].Set(grouped.ElementAt(i));
-
+                    _techTypeButtons[index].Tag = new TransceiverData(grouped.ElementAt(i),_techTypeButtons[index]);
                     if (_operation.TransferItems.Contains(grouped.ElementAt(i)))
                     {
                         _techTypeButtons[index].Select();
@@ -162,15 +164,17 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
 
         private void OnButtonClick(string arg1, object arg2)
         {
-            var techType = (TechType) arg2;
+            if(_isResetting) return;
+            var data = (TransceiverData) arg2;
 
-            if (_operation.TransferItems.Contains(techType))
+            if (data.Toggle.IsChecked && !_operation.TransferItems.Contains(data.TechType))
             {
-                _operation.TransferItems.Remove(techType);
+                _operation.TransferItems.Add(data.TechType);
             }
-            else
+            
+            if(!data.Toggle.IsChecked && _operation.TransferItems.Contains(data.TechType))
             {
-                _operation.TransferItems.Add(techType);
+                _operation.TransferItems.Remove(data.TechType);
             }
         }
 
@@ -183,9 +187,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         public void Show(FcsDevice fcsDevice)
         {
             _fcsDevice = fcsDevice;
-
             
-
             if (_fcsDevice == null)
             {
                 QuickLogger.DebugError("FCSDevice returned null",true);
@@ -198,12 +200,17 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                 IsBeingEdited = true
             };
 
+            _isEnabled.isOn = _operation.IsEnabled;
+
             _operationHistory = new BaseTransferOperation(_operation);
 
             _appendToAmountBTN.Initialize(_operation.MaxAmount,1,fcsDevice.MaxItemAllowForTransfer);
 
-            _title.text = $"<color=#00ffffff>[{fcsDevice.UnitID}]</color> Item Transciever Settings";
+            _title.text = $"<color=#00ffffff>[{fcsDevice.UnitID}]</color> Item Transceiver Settings";
+            
             _techTypeGrid.DrawPage();
+
+
 
             gameObject.SetActive(true);
         }        
@@ -211,13 +218,14 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         public void Hide()
         {
             _operation.IsBeingEdited = false;
+            _operation = null;
+
             gameObject.SetActive(false);
-            _operation = null;
-            _operation = null;
             _amount = 1;
             _performPullOperation.isOn = false;
+            _operationHistory = null;
             _isEnabled.isOn = false;
-            _title.text = $"<color=#00ffffff>[]</color> Item Transciever Settings";
+            _title.text = $"<color=#00ffffff>[]</color> Item Transceiver Settings";
         }
 
         public void GoToPage(int index)
@@ -229,6 +237,18 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         {
             // Not in use
         }
+    }
+
+    internal struct TransceiverData
+    {
+        public TransceiverData(TechType techType, FCSGuiToggle parent)
+        {
+            TechType = techType;
+            Toggle = parent;
+        }
+
+        public TechType TechType { get; private set; }
+        public FCSGuiToggle Toggle { get; private set; }
     }
 
     internal class NumberIncreaseButton : OnScreenButton, IPointerEnterHandler, IPointerClickHandler, IPointerExitHandler

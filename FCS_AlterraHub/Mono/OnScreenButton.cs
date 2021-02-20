@@ -52,7 +52,7 @@ namespace FCS_AlterraHub.Mono
                 {
                     if (GetAdditionalDataFromString)
                     {
-                        HandReticle.main.SetIcon(HandReticle.IconType.Hand);
+                        HandReticle.main.SetIcon(IconType);
                         HandReticle.main.SetUseTextRaw(this.TextLineOne, GetAdditionalString?.Invoke(Tag));
                     }
                     else
@@ -64,7 +64,7 @@ namespace FCS_AlterraHub.Mono
                 {
                     if (GetAdditionalDataFromString)
                     {
-                        HandReticle.main.SetIcon(HandReticle.IconType.Hand);
+                        HandReticle.main.SetIcon(IconType);
                         HandReticle.main.SetInteractTextRaw(this.TextLineOne, GetAdditionalString?.Invoke(Tag));
                     }
                     else
@@ -83,6 +83,8 @@ namespace FCS_AlterraHub.Mono
 
 #endif
         }
+
+        public HandReticle.IconType IconType { get; set; } = HandReticle.IconType.Default;
 
         public virtual void OnPointerEnter(PointerEventData eventData)
         {
