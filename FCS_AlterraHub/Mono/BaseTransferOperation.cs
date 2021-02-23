@@ -10,6 +10,7 @@ namespace FCS_AlterraHub.Mono
         public string DeviceId { get; set; }
         public List<TechType> TransferItems { get; set; } = new List<TechType>();
         public int MaxAmount { get; set; } = 1;
+        public int PullWhenAmountIsAbove { get; set; } = 0;
         public bool IsPullOperation { get; set; }
         public bool IsBeingEdited { get; set; }
 

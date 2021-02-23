@@ -330,6 +330,8 @@ namespace FCS_AlterraHub.Mono
         {
             return TechType.None;
         }
+
+        public virtual bool AllowsTransceiverPulling { get; }
     }
 
     public interface IFCSSave<T>

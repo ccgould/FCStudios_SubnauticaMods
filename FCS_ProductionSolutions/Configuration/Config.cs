@@ -18,13 +18,12 @@ namespace FCS_ProductionSolutions.Configuration
     {
         public Config() : base("productionSolutions-config", "Configurations") { }
 
-        [Toggle("[Production Solutions] Enable Debugs",Order = 0), OnChange(nameof(EnableDebugsToggleEvent)),Tooltip("Enables debug logs set in code by FCStudios (Maybe asked to be enabled for bug reports)")]
+        [Toggle("[Production Solutions] Enable Debugs",Order = 0, Tooltip="Enables debug logs set in code by FCStudios (Maybe asked to be enabled for bug reports)"), OnChange(nameof(EnableDebugsToggleEvent))]
         public bool EnableDebugLogs = false;
 
         #region Matter Analyzer
 
-        [Toggle("[Matter Analyzer] Is Mod Enabled"),
-         Tooltip("Enables/Disables Matter Analyzer from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+        [Toggle("[Matter Analyzer] Is Mod Enabled", Tooltip="Enables/Disables Matter Analyzer from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool IsMatterAnalyzerEnabled = true;
 
         [Toggle("[Matter Analyzer] Toggle Fx")]
@@ -34,16 +33,14 @@ namespace FCS_ProductionSolutions.Configuration
 
         #region Replicator
 
-        [Toggle("[Replicator] Is Mod Enabled"),
-         Tooltip("Enables/Disables Replicator from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+        [Toggle("[Replicator] Is Mod Enabled", Tooltip ="Enables/Disables Replicator from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool IsReplicatorEnabled = true;
 
         #endregion
 
         #region Harvester
 
-        [Toggle("[Hydroponic Harvester]] Is Mod Enabled"),
-         Tooltip("Enables/Disables Hydroponic Harvester from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+        [Toggle("[Hydroponic Harvester]] Is Mod Enabled", Tooltip = "Enables/Disables Hydroponic Harvester from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool IsHydroponicHarvesterEnabled = true;
 
         [Toggle("[Hydroponic Harvester] Enable/Disable Light Trigger")]
@@ -56,17 +53,16 @@ namespace FCS_ProductionSolutions.Configuration
 
         #region Deep Driller
 
-        [Toggle("[Deep Driller MK3] Is Mod Enabled"),
-         Tooltip("Enables/Disables Deep Driller MK3 from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+        [Toggle("[Deep Driller MK3] Is Mod Enabled", Order = 1,Tooltip = "Enables/Disables Deep Driller MK3 from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool IsDeepDrillerEnabled = true;
-
-        public int DDStorageSize  = 300;
-        public float DDPowerDraw  = 0.7f;
-        public float DDChargePullAmount  = 1.5f;
-        public float DDSolarCapacity  = 125;
-
-        [Toggle("[Deep Driller MK3] Is HardCore Mode")]
+        [Toggle("[Deep Driller MK3] Is HardCore Mode", Order = 1)]
         public bool DDHardCoreMode  = true;
+        [Toggle("[Deep Driller MK3] Play Fx", Order = 1, Tooltip ="Enables/Disables Deep Driller MK3 sound effects")]
+        public bool DDMK3FxAllowed = true;
+        [Slider("[Deep Driller MK3] Master Volume", 0.0f, 1.0f, DefaultValue = 1.0f, Step = 0.01f, Format = "{0:P0}", Order = 1, Tooltip = "This control affects all drills.")]
+        public float MasterDeepDrillerVolume { get; set; } = 1f;
+
+
         public float DDOilTimePeriodInDays  = 30.0f;
         public float DDOilRestoresInDays  = 5.0f;
         public Dictionary<string, List<string>> DDAdditionalBiomeOres  = new Dictionary<string, List<string>>();
@@ -74,6 +70,10 @@ namespace FCS_ProductionSolutions.Configuration
         public float DDOrePerDayUpgradePowerUsage  = 1.0f;
         public float DDInternalBatteryCapacity  = 1000f;
         public float DDDrillAlterraStorageRange  = 30f;
+        public int DDStorageSize = 300;
+        public float DDPowerDraw = 0.7f;
+        public float DDChargePullAmount = 1.5f;
+        public float DDSolarCapacity = 125;
         [JsonIgnore] internal float DDOreReductionValue => 0.08f;
         [JsonIgnore] internal Dictionary<string, List<TechType>> DDBiomeOresTechType  = new Dictionary<string, List<TechType>>();
 

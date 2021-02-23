@@ -136,17 +136,20 @@ namespace FCS_AlterraHub.Mono
                 {
                     PerformPullOperation(operation);
                 }
-                else
+
+                foreach (TechType item in operation.TransferItems)
                 {
-                    foreach (TechType item in operation.TransferItems)
+                    if (HasItem(item))
                     {
-                        if (HasItem(item))
+                        if (operation.PullWhenAmountIsAbove > 0)
                         {
-                            QuickLogger.Debug($"Device {operation.DeviceId}: {operation.Device.GetStorage()?.StorageCount()}|{operation.MaxAmount}",true);
-                            if (operation.Device.CanBeStored(1, item) && operation.Device.GetStorage() != null && operation.Device.GetStorage()?.StorageCount() < operation.MaxAmount)
-                            {
-                                operation.Device.AddItemToContainer(TakeItem(item).ToInventoryItem());
-                            }
+                            if(GetItemCount(item) <= operation.PullWhenAmountIsAbove) continue;
+                        }
+
+                        QuickLogger.Debug($"Device {operation.DeviceId}: {operation.Device.GetStorage()?.StorageCount()}|{operation.MaxAmount}", true);
+                        if (operation.Device.CanBeStored(1, item) && operation.Device.GetStorage() != null && operation.Device.GetStorage()?.StorageCount() < operation.MaxAmount)
+                        {
+                            operation.Device.AddItemToContainer(TakeItem(item).ToInventoryItem());
                         }
                     }
                 }
@@ -156,6 +159,7 @@ namespace FCS_AlterraHub.Mono
         private void PerformPullOperation(BaseTransferOperation operation)
         {
             var randomItem = operation.Device.GetRandomTechTypeFromDevice();
+
             if (randomItem != TechType.None)
             {
                 if (!IsAllowedToAdd(randomItem, false)) return;
@@ -1137,6 +1141,7 @@ namespace FCS_AlterraHub.Mono
 
         public static bool AddItemToNetwork(InventoryItem item, BaseManager manager)
         {
+            QuickLogger.Debug($"Trying to add item to network: {manager.GetBaseName()} | {Language.main.Get(item.item.GetTechType())}",true);
             if (manager != null)
             {
                 foreach (IDSSRack baseRack in manager.BaseRacks)

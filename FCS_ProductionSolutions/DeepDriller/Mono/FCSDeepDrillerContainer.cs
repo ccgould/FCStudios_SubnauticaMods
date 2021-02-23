@@ -271,5 +271,10 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         {
             return GetContainerTotal() <= 0;
         }
+
+        public TechType GetRandomItem()
+        {
+            return _container.Keys.Count <= 0 ? TechType.None : _container.Keys.ElementAt(0);
+        }
     }
 }

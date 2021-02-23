@@ -18,7 +18,7 @@ namespace FCS_AlterraHub.Mono
         public Action<string> OnEnterPressed;
         private bool _cursorLockCached;
         private GameObject _inputDummy;
-
+        public string HoverMessage { get; set; } = Buildables.AlterraHub.SearchForItemsMessage();
         private GameObject inputDummy
         {
             get
@@ -38,7 +38,7 @@ namespace FCS_AlterraHub.Mono
             if (!hover) return;
             HandReticle.main.SetIcon(HandReticle.IconType.Rename);
 #if SUBNAUTICA
-            HandReticle.main.SetInteractTextRaw(Buildables.AlterraHub.SearchForItemsMessage(), "");
+            HandReticle.main.SetInteractTextRaw(HoverMessage, "");
 #elif BELOWZERO
             HandReticle.main.SetTextRaw(HandReticle.TextType.Hand, Buildables.AlterraHub.SearchForItemsMessage());
 #endif
@@ -58,6 +58,7 @@ namespace FCS_AlterraHub.Mono
             InterceptInput(false);
             //OnEnterPressed?.Invoke(text);
         }
+
         private void LockMovement(bool state)
         {
             FPSInputModule.current.lockMovement = state;

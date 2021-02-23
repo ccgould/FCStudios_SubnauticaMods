@@ -36,7 +36,7 @@ namespace FCS_EnergySolutions.Configuration
         [Toggle("[JetStreamT242] Is Mod Enabled"),
          Tooltip("Enables/Disables JetStreamT242 from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool IsJetStreamT242Enabled = true;
-
+        
         [Toggle("[Solar Panel Cluster] Is Mod Enabled"),
          Tooltip("Enables/Disables Solar Panel Cluster from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool IsAlterraSolarPanelClusterEnabled = true;

@@ -8,6 +8,7 @@ using FCS_ProductionSolutions.DeepDriller.Buildable;
 using FCS_ProductionSolutions.DeepDriller.Managers;
 using FCS_ProductionSolutions.DeepDriller.Models;
 using FCSCommon.Controllers;
+using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using System.Collections;
@@ -45,7 +46,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         private AudioSource _audio;
         private bool _wasPlaying;
         private AudioLowPassFilter _lowPassFilter;
-
+        public override bool AllowsTransceiverPulling { get; } = true;
         internal string CurrentBiome { get; set; }
         internal bool IsFromSave { get; set; }
 
@@ -158,6 +159,15 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
 
             if (_audio != null && _audio.isPlaying)
             {
+
+                _audio.volume = QPatch.Configuration.MasterDeepDrillerVolume;
+
+                if (!QPatch.Configuration.DDMK3FxAllowed)
+                {
+                    _audio.Stop();
+                    return;
+                }
+
 
                 if (_audio.isPlaying && Mathf.Approximately(Time.timeScale, 0f))
                 {
@@ -683,6 +693,30 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         {
             //Getting Storage of the Oil Handler for the Transceiver
             return OilHandler;
+        }
+
+        public override TechType GetRandomTechTypeFromDevice()
+        {
+            if (!IsConstructed || !IsInitialized || DeepDrillerContainer == null || !DeepDrillerContainer.HasItems()) return TechType.None;
+
+            return DeepDrillerContainer.GetRandomItem();
+        }
+
+        public override Pickupable RemoveItemFromDevice(TechType techType)
+        {
+            return RemoveItemFromContainer(techType);
+        }
+
+        public override Pickupable RemoveItemFromContainer(TechType techType)
+        {
+            var result = DeepDrillerContainer.OnlyRemoveItemFromContainer(techType);
+
+            if (result)
+            {
+                return techType.ToPickupable();
+            }
+
+            return null;
         }
 
         #endregion

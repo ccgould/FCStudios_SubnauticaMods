@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Mono.Controllers;
@@ -30,11 +29,20 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         private NumberIncreaseButton _appendToAmountBTN;
         private Toggle _isEnabled;
         private bool _isResetting;
+        private GameObject _performPullOperationObj;
+
 
         internal void Initialize()
         {
-            _performPullOperation = GameObjectHelpers.FindGameObject(gameObject, "PullOperationToggle").GetComponent<Toggle>();
+            _performPullOperationObj = GameObjectHelpers.FindGameObject(gameObject, "PullOperationToggle");
+            _performPullOperation = _performPullOperationObj.GetComponent<Toggle>();
             _isEnabled = GameObjectHelpers.FindGameObject(gameObject, "IsEnabledToggle").GetComponent<Toggle>();
+
+            var pullAmountInput = GameObjectHelpers.FindGameObject(gameObject, "PullAmount");
+            var pullAmount = pullAmountInput.AddComponent<SearchField>();
+            pullAmount.HoverMessage = "Pulls from server is the item count is greater than the set number.";
+            pullAmount.OnSearchValueChanged += UpdatePullAmount;
+
 
             #region Search
             var inputField = InterfaceHelpers.FindGameObject(gameObject, "InputField");
@@ -56,7 +64,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
 
             _techTypeGrid = gameObject.EnsureComponent<GridHelperV2>();
             _techTypeGrid.OnLoadDisplay += OnTransceiverGrid;
-            _techTypeGrid.Setup(32, gameObject, Color.gray, Color.white, OnButtonClick);
+            _techTypeGrid.Setup(16, gameObject, Color.gray, Color.white, OnButtonClick);
 
             #endregion
 
@@ -75,7 +83,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
 
                 if (_operation.TransferItems.Count == 0 && !_performPullOperation.isOn)
                 {
-                    QuickLogger.Message("Please select an Item to send",true);
+                    QuickLogger.Message("Please select an item to send or select pull operation",true);
                     return;
                 }
 
@@ -106,6 +114,15 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             _appendToAmountBTN = appendToAmountObj.EnsureComponent<NumberIncreaseButton>();
             _appendToAmountBTN.TextComponent = _amountText;
             _appendToAmountBTN.OnAmountChanged += AddToAmount;
+        }
+
+        private void UpdatePullAmount(string inputString)
+        {
+            if(int.TryParse(inputString,out int result))
+            {
+                if(_operation == null) return;
+                _operation.PullWhenAmountIsAbove = result;
+            }
         }
 
         private void AddToAmount(int amount)
@@ -187,7 +204,9 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         public void Show(FcsDevice fcsDevice)
         {
             _fcsDevice = fcsDevice;
-            
+
+            _performPullOperationObj.SetActive(fcsDevice.AllowsTransceiverPulling);
+
             if (_fcsDevice == null)
             {
                 QuickLogger.DebugError("FCSDevice returned null",true);
@@ -201,6 +220,8 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             };
 
             _isEnabled.isOn = _operation.IsEnabled;
+
+            _performPullOperation.isOn = _operation.IsPullOperation;
 
             _operationHistory = new BaseTransferOperation(_operation);
 
