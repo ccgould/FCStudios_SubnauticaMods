@@ -1141,16 +1141,16 @@ namespace FCS_AlterraHub.Mono
 
         public static bool AddItemToNetwork(InventoryItem item, BaseManager manager)
         {
-            QuickLogger.Debug($"Trying to add item to network: {manager.GetBaseName()} | {Language.main.Get(item.item.GetTechType())}",true);
-            if (manager != null)
+            QuickLogger.Debug($"Trying to add item to network: {manager?.GetBaseName()} | {Language.main.Get(item.item.GetTechType())}",true);
+
+            if (manager == null) return false;
+
+            foreach (IDSSRack baseRack in manager.BaseRacks)
             {
-                foreach (IDSSRack baseRack in manager.BaseRacks)
+                if (baseRack.ItemAllowed(item.item.GetTechType(), out var server))
                 {
-                    if (baseRack.ItemAllowed(item.item.GetTechType(), out var server))
-                    {
-                        server?.AddItemToMountedServer(item);
-                        return true;
-                    }
+                    server?.AddItemToMountedServer(item);
+                    return true;
                 }
             }
             return false;

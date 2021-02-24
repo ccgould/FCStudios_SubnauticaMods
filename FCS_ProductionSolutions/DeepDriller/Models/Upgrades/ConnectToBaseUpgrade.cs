@@ -69,6 +69,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Models.Upgrades
                 {
                     //TODO Show Message Box with error of incorrect parameters
                     QuickLogger.Debug($"Incorrect amount of parameters expected 1 got {paraResults.Length}", true);
+                    QuickLogger.Message(FCSDeepDrillerBuildable.IncorrectParameterFormat("STRING", "OS.ConnectToBase(BS000);"), true);
                     return false;
                 }
 
@@ -76,7 +77,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Models.Upgrades
 
                 if (baseManager == null)
                 {
-                    QuickLogger.Message(FCSDeepDrillerBuildable.IncorrectParameterFormat("STRING", "OS.ConnectToBase(BS000);"), true);
+                    QuickLogger.Message(FCSDeepDrillerBuildable.BaseIDErrorFormat(paraResults[0]), true);
                     return false;
                 }
             }

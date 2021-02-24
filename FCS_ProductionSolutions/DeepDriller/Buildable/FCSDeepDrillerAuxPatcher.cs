@@ -61,6 +61,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Buildable
             { $"{ModKey}_NoPower", "No Power"},
             { $"{ModKey}_NeedsOil", "Lubricant Needed"},
             { $"{ModKey}_DrillDeactivated", "Drill Deactivated"},
+            { $"{ModKey}_BaseIDErrorFormat", "Base {0} is either to far away or the ID is incorrect."},
         };
 
 
@@ -298,6 +299,11 @@ namespace FCS_ProductionSolutions.DeepDriller.Buildable
         public static string DrillDeactivated()
         {
             return GetLanguage($"{ModKey}_DrillDeactivated");
+        }
+
+        public static string BaseIDErrorFormat(string baseID)
+        {
+            return string.Format(GetLanguage($"{ModKey}_BaseIDErrorFormat"),baseID);
         }
     }
 }
