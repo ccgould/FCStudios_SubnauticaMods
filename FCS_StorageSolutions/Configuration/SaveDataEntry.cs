@@ -34,23 +34,7 @@ namespace FCS_StorageSolutions.Configuration
         [JsonProperty] internal HashSet<Filter> ServerFilters { get; set; }
     }    
     
-    [Serializable]
-    internal class DSSWallServerRackDataEntry
-    {
-        [JsonProperty] internal string ID { get; set; }
-        [JsonProperty] internal string SaveVersion { get; set; } = "1.0";
-        [JsonProperty] internal Vec4 BodyColor { get; set; }
-        [JsonProperty] internal Vec4 SecondaryColor { get; set; }
-        [JsonProperty] internal bool IsTrayOpen { get; set; }
-        [JsonProperty] internal byte[] Slot1 { get; set; }
-        [JsonProperty] internal byte[] Slot2 { get; set; }
-        [JsonProperty] internal byte[] Slot3 { get; set; }
-        [JsonProperty] internal byte[] Slot4 { get; set; }
-        [JsonProperty] internal byte[] Slot5 { get; set; }
-        [JsonProperty] internal byte[] Slot6 { get; set; }
-    }
-
-    internal class DSSFloorServerRackDataEntry
+    internal class DSSServerRackDataEntry
     {
         [JsonProperty] internal string ID { get; set; }
         [JsonProperty] internal string SaveVersion { get; set; } = "1.0";
@@ -136,7 +120,7 @@ namespace FCS_StorageSolutions.Configuration
         [JsonProperty] internal List<DSSAntennaDataEntry> DSSAntennaDataEntries = new List<DSSAntennaDataEntry>();
         [JsonProperty] internal List<DSSAutoCrafterDataEntry> DSSAutoCrafterDataEntries = new List<DSSAutoCrafterDataEntry>();
         [JsonProperty] internal List<DSSTerminalDataEntry> DSSTerminalDataEntries = new List<DSSTerminalDataEntry>();
-        [JsonProperty] internal List<DSSWallServerRackDataEntry> DSSWallServerRackDataEntries = new List<DSSWallServerRackDataEntry>();
-        [JsonProperty] internal List<DSSFloorServerRackDataEntry> DSSFloorServerRackDataEntries = new List<DSSFloorServerRackDataEntry>();
+        [JsonProperty] internal List<DSSServerRackDataEntry> DSSWallServerRackDataEntries = new List<DSSServerRackDataEntry>();
+        [JsonProperty] internal List<DSSServerRackDataEntry> DSSFloorServerRackDataEntries = new List<DSSServerRackDataEntry>();
     }
 }

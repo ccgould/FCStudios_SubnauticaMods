@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using FCS_AlterraHub.Interfaces;
@@ -8,14 +7,12 @@ using FCS_AlterraHub.Mono;
 using FCS_StorageSolutions.Configuration;
 using FCS_StorageSolutions.Mods.AlterraStorage.Buildable;
 using FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack;
-using FCSCommon.Extensions;
 using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
 {
-    //TODO Add a name feature
     internal class DSSServerController : FcsDevice, IFCSSave<SaveData>
     {
         private bool _isFromSave;

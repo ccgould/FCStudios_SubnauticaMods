@@ -13,8 +13,8 @@ namespace FCS_StorageSolutions.Configuration
             { $"{ModKey}_AlterraStorageDumpContainerTitle","Alterra Storage"},
             { $"{ModKey}_TakeFormat","Take {0}"},
             { $"{ModKey}_StorageAmountFormat","{0}/{1} Items"},
-            { $"{ModKey}_OpenWallServerRack","Open Wall Server Rack"},
-            { $"{ModKey}_CloseWallServerRack","Close Wall Server Rack"},
+            { $"{ModKey}_OpenServerRack","Open Server Rack"},
+            { $"{ModKey}_CloseServerRack","Close Server Rack"},
             { $"{ModKey}_AddItemToItemDisplay","Add Item"},
             { $"{ModKey}_AddItemToItemDisplayDesc","Click to add an item to the display to should the quantity in the system"},
             { $"{ModKey}_NoItemToTake","Please choose an item to display and extract from the network."},
@@ -89,14 +89,14 @@ namespace FCS_StorageSolutions.Configuration
             return Language.main.Get("DeconstructNonEmptyStorageContainerError");
         }
 
-        public static string OpenWallServerRack()
+        public static string OpenServerRack()
         {
-            return GetLanguage($"{ModKey}_OpenWallServerRack");
+            return GetLanguage($"{ModKey}_OpenServerRack");
         }
 
-        public static string CloseWallServerRack()
+        public static string CloseServerRack()
         {
-            return GetLanguage($"{ModKey}_CloseWallServerRack");
+            return GetLanguage($"{ModKey}_CloseServerRack");
         }
 
         public static string AddItemToItemDisplay()

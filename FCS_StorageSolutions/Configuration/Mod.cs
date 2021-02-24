@@ -432,7 +432,7 @@ namespace FCS_StorageSolutions.Configuration
             return new DSSTerminalDataEntry() { ID = id };
         }
 
-        internal static DSSWallServerRackDataEntry GetDSSWallServerRackSaveData(string id)
+        internal static DSSServerRackDataEntry GetDSSWallServerRackSaveData(string id)
         {
             LoadData();
 
@@ -448,10 +448,10 @@ namespace FCS_StorageSolutions.Configuration
                 }
             }
 
-            return new DSSWallServerRackDataEntry() { ID = id };
+            return new DSSServerRackDataEntry() { ID = id };
         }
 
-        internal static DSSFloorServerRackDataEntry GetDSSFloorServerRackSaveData(string id)
+        internal static DSSServerRackDataEntry GetDSSFloorServerRackSaveData(string id)
         {
             LoadData();
 
@@ -467,7 +467,7 @@ namespace FCS_StorageSolutions.Configuration
                 }
             }
 
-            return new DSSFloorServerRackDataEntry() { ID = id };
+            return new DSSServerRackDataEntry() { ID = id };
         }
 
         internal static SaveData GetSaveData()

@@ -26,32 +26,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable
                 var DSSFloorServerRackKit = new FCSKit(Mod.DSSFloorServerRackKitClassID, Mod.DSSFloorServerRackFriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 DSSFloorServerRackKit.Patch();
                 FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, DSSFloorServerRackKit.TechType, 184078, StoreCategory.Storage);
-            //    FCSAlterraHubService.PublicAPI.RegisterEncyclopediaEntry(TechType, new List<FcsEntryData>
-            //    {
-            //        new FcsEntryData
-            //        {
-            //            key = "HydroHarvester",
-            //            unlocked = true,
-            //            path = "fcs",
-            //            timeCapsule = false,
-            //            nodes = new []{ "fcs"},
-            //            Description = "The hydroponic Harvester .....",
-            //            Title = "Hydroponic Harvester",
-            //            Verbose = true
-            //        },
-            //        new FcsEntryData
-            //        {
-            //            key = "HydroHarvester1",
-            //            unlocked = true,
-            //            path = "fcs",
-            //            timeCapsule = false,
-            //            nodes = new []{ "fcs"},
-            //            Description = "The hydroponic Harvester .....",
-            //            Title = "Hydroponic Harvester 1",
-            //            Verbose = false
-            //        }
-            //    });
-
             };
         }
 
