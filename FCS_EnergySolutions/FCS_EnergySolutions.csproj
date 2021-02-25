@@ -150,6 +150,10 @@
     <Compile Include="Mods\AlterraSolarCluster\Mono\AlterraSolarClusterMovementManager.cs" />
     <Compile Include="Mods\AlterraSolarCluster\Mono\AlterraSolarClusterPowerManager.cs" />
     <Compile Include="Mods\AlterraSolarCluster\Mono\AlterraSolarClusterController.cs" />
+    <Compile Include="Mods\TelepowerPylon\Buildable\TelepowerPylonPatcher.cs" />
+    <Compile Include="Mods\TelepowerPylon\Model\TelepowerPylonMode.cs" />
+    <Compile Include="Mods\TelepowerPylon\Mono\FrequencyItemController.cs" />
+    <Compile Include="Mods\TelepowerPylon\Mono\TelepowerPylonController.cs" />
     <Compile Include="PowerStorage\Buildable\PowerStoragePatcher.cs" />
     <Compile Include="PowerStorage\Mono\BatteryDummyController.cs" />
     <Compile Include="PowerStorage\Mono\InterfaceInteraction.cs" />

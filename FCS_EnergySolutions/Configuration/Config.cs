@@ -16,7 +16,7 @@ namespace FCS_EnergySolutions.Configuration
         {
         }
 
-        [Toggle("[Energy Solutions] Enable Debugs", Order = 0), OnChange(nameof(EnableDebugsToggleEvent)), Tooltip("Enables debug logs set in code by FCStudios (Maybe asked to be enabled for bug reports)")]
+        [Toggle("[Energy Solutions] Enable Debugs", Order = 0, Tooltip = "Enables debug logs set in code by FCStudios (Maybe asked to be enabled for bug reports)"), OnChange(nameof(EnableDebugsToggleEvent))]
         public bool EnableDebugLogs = false;
 
         private void EnableDebugsToggleEvent(ToggleChangedEventArgs e)
@@ -33,21 +33,20 @@ namespace FCS_EnergySolutions.Configuration
             }
         }
 
-        [Toggle("[JetStreamT242] Is Mod Enabled"),
-         Tooltip("Enables/Disables JetStreamT242 from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+        [Toggle("[JetStreamT242] Is Mod Enabled", Tooltip = "Enables/Disables JetStreamT242 from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool IsJetStreamT242Enabled = true;
         
-        [Toggle("[Solar Panel Cluster] Is Mod Enabled"),
-         Tooltip("Enables/Disables Solar Panel Cluster from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+        [Toggle("[Solar Panel Cluster] Is Mod Enabled", Tooltip = "Enables/Disables Solar Panel Cluster from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool IsAlterraSolarPanelClusterEnabled = true;
 
+        [Toggle("[Telepower Pylon] Is Mod Enabled", Tooltip = "Enables/Disables Telepower Pylon from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+        public bool IsTelepowerPylonEnabled = true;
 
-        [Toggle("[PowerStorage] Is Mod Enabled"),
-         Tooltip("Enables/Disables PowerStorage from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+
+        [Toggle("[PowerStorage] Is Mod Enabled", Tooltip = "Enables/Disables PowerStorage from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool IsPowerStorageEnabled = true;
 
-        [Toggle("[AlterraGen] Is Mod Enabled"),
-         Tooltip("Enables/Disables AlterraGen from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+        [Toggle("[AlterraGen] Is Mod Enabled", Tooltip = "Enables/Disables AlterraGen from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool IsAlterraGenEnabled = true;
 
         public Dictionary<string, float> JetStreamT242BiomeSpeeds { get; set; } = new Dictionary<string, float>

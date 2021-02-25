@@ -30,6 +30,15 @@ namespace FCS_EnergySolutions.Configuration
         internal static string SaveDataFilename => $"FCSEnergySolutionsSaveData.json";
         internal const string ModBundleName = "fcsenergysolutionsbundle";
 
+        internal const string TelepowerPylonTabID = "TP";
+        internal const string TelepowerPylonFriendlyName = "Telepower Pylon";
+        internal const string TelepowerPylonModName = "TelepowerPylon";
+        internal const string TelepowerPylonDescription = "N/A";
+        internal static string TelepowerPylonKitClassID => $"{TelepowerPylonModName}_Kit";
+        internal static string TelepowerPylonClassName => TelepowerPylonModName;
+        internal static string TelepowerPylonPrefabName => TelepowerPylonModName;
+
+
         internal const string AlterraGenModTabID = "AG";
         internal const string AlterraGenModFriendlyName = "Alterra Gen";
         internal const string AlterraGenModName = "AlterraGen";
@@ -171,6 +180,25 @@ namespace FCS_EnergySolutions.Configuration
             return new AlterraGenDataEntry() { Id = id };
         }
 
+        internal static TelepowerPylonDataEntry GetTelepowerPylonSaveData(string id)
+        {
+            LoadData();
+
+            var saveData = GetSaveData();
+
+            foreach (var entry in saveData.TelepowerPylonEntries)
+            {
+                if (string.IsNullOrEmpty(entry.Id)) continue;
+
+                if (entry.Id == id)
+                {
+                    return entry;
+                }
+            }
+
+            return new TelepowerPylonDataEntry() { Id = id };
+        }        
+        
         internal static JetStreamT242DataEntry GetJetStreamT242SaveData(string id)
         {
             LoadData();

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCSCommon.Extensions;
@@ -118,7 +119,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
 
             for (int i = foundDevices.Count- 1; i > -1; i--)
             {
-                if (CheckIfInRange(foundDevices.ElementAt(i).Value))
+                if (WorldHelpers.CheckIfInRange(_mono, foundDevices.ElementAt(i).Value, QPatch.Configuration.DDDrillAlterraStorageRange))
                 {
                     _storagesList.Add(foundDevices.ElementAt(i).Value);
                 }
@@ -130,17 +131,6 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             }
         }
 
-        private bool CheckIfInRange(FcsDevice device)
-        {
-            if (_mono == null || device == null || !device.gameObject.activeSelf || _mono.DeepDrillerPowerManager == null || !_mono.IsConstructed || _mono.DeepDrillerPowerManager.IsTripped()) return false;
-            float distance = Vector3.Distance(_mono.gameObject.transform.position, device.gameObject.transform.position);
-            if (distance <= QPatch.Configuration.DDDrillAlterraStorageRange)
-            {
-                return true;
-            }
-            return false;
-        }
-        
         internal void Toggle()
         {
             _isAllowedToExport = !_isAllowedToExport;

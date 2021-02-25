@@ -6,6 +6,7 @@ using FCS_EnergySolutions.AlterraSolarCluster.Buildables;
 using FCS_EnergySolutions.Buildable;
 using FCS_EnergySolutions.Configuration;
 using FCS_EnergySolutions.JetStreamT242.Buildables;
+using FCS_EnergySolutions.TelepowerPylon.Buildables;
 using FCSCommon.Utilities;
 using HarmonyLib;
 using QModManager.API.ModLoading;
@@ -52,7 +53,14 @@ namespace FCS_EnergySolutions
                 jetStreamT242.Patch();
             }
 
-            if(Configuration.IsPowerStorageEnabled)
+            if (Configuration.IsTelepowerPylonEnabled)
+            {
+                var telepowerPylon = new TelepowerPylonBuildable();
+                telepowerPylon.Patch();
+            }
+
+
+            if (Configuration.IsPowerStorageEnabled)
             {
                 var powerStorage = new PowerStoragePatcher();
                 powerStorage.Patch();
