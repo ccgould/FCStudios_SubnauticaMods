@@ -1,5 +1,6 @@
 ﻿using System;
 using FCSCommon.Helpers;
+using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -74,6 +75,8 @@ namespace FCS_AlterraHub.Model
                 default:
                     throw new ArgumentOutOfRangeException(nameof(button), button, null);
             }
+
+            QuickLogger.Debug($"MessageBox Message: {message}");
             gameObject.SetActive(true);
         }
 

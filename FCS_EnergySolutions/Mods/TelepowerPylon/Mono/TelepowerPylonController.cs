@@ -5,6 +5,7 @@ using System.Text;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Extensions;
+using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Mono.Controllers;
 using FCS_AlterraHub.Registration;
@@ -41,6 +42,7 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
         private Toggle _pushToggle;
         private bool _loadingFromSave;
         private PowerRelay _powerRelay;
+        private FCSMessageBox _messageBox;
         private const int DEFAULT_CONNECTIONS_LIMIT = 6;
         public override bool IsOperational => Manager != null && IsConstructed;
         public Action<TelepowerPylonController> OnDestroyCalledAction { get; set; }
@@ -210,6 +212,11 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
             return _mode;
         }
 
+        public IPowerInterface GetPowerRelay()
+        {
+            return _powerManager?.GetPowerRelay();
+        }
+
         #endregion
 
         #region Private Methods
@@ -230,6 +237,19 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
                 QuickLogger.DebugError("Failed to cast object to Pylon",true);
                 return;
             }
+
+            if (pylon.GetCurrentMode() != TelepowerPylonMode.PUSH)
+            {
+                _messageBox.Show($"Pylon {pylon.UnitID} is not in push mode and cannot be added as a connection.", FCSMessageButton.OK,null);
+                return;
+            }
+
+            if (_messageBox == null)
+            {
+                _messageBox = GameObjectHelpers.FindGameObject(gameObject, "MessageBox").AddComponent<FCSMessageBox>();
+            }
+
+
             if (_currentConnections.ContainsKey(idToLower)) return;
 
             if (_currentConnections.Count < _maxConnectionLimit && WorldHelpers.CheckIfInRange(this, unit.Value, 1000))
@@ -251,7 +271,6 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
             return _currentUpgrade;
         }
         
-       
         private void AddConnection(string text, FcsDevice unit)
         {
             var controller = (TelepowerPylonController) unit;
@@ -434,11 +453,6 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
         }
 
         #endregion
-
-        public IPowerInterface GetPowerRelay()
-        {
-            return _powerManager?.GetPowerRelay();
-        }
     }
 
     internal enum TelepowerPylonUpgrade
