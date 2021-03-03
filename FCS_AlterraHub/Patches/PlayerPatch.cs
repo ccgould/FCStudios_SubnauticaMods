@@ -16,7 +16,7 @@ namespace FCS_AlterraHub.Patches
 {
     [HarmonyPatch(typeof(Player))]
     [HarmonyPatch("Update")]
-    internal static class Player_Update_Patch
+    public static class Player_Update_Patch
     {
         internal static Action OnPlayerUpdate;
         public static FCSPDAController FCSPDA;
@@ -80,6 +80,7 @@ namespace FCS_AlterraHub.Patches
 
             if (LargeWorldStreamer.main.IsWorldSettled())
             {
+                OnWorldSettled?.Invoke();
                 if (FCSPDA != null && DayNightCycle.main.timePassed >= 600f)
                 {
                     if (_firstMissionAdded) return;
@@ -98,6 +99,8 @@ namespace FCS_AlterraHub.Patches
                 BaseManager.RemoveDestroyedBases();
             }
         }
+
+        public static Action OnWorldSettled { get; set; }
     }
     
     [HarmonyPatch(typeof(Player))]

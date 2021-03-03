@@ -237,7 +237,7 @@ namespace FCS_AlterraHub.Mono
             return false;
         }
 
-
+        public bool IsDeviceRegistered => !string.IsNullOrWhiteSpace(UnitID);
         public virtual bool IsUnderWater()
         {
             return transform.position.y < -1f;

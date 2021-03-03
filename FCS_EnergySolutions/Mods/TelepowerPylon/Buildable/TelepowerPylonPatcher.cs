@@ -84,14 +84,14 @@ namespace FCS_EnergySolutions.TelepowerPylon.Buildables
                 prefabID.ClassId = ClassID;
 
                 PowerRelay solarPowerRelay = CraftData.GetPrefabForTechType(TechType.SolarPanel).GetComponent<PowerRelay>();
-
+                
                 var pFX = prefab.AddComponent<PowerFX>();
                 pFX.vfxPrefab = solarPowerRelay.powerFX.vfxPrefab;
                 pFX.attachPoint = prefab.transform;
 
                 var pr = prefab.AddComponent<PowerRelay>();
                 pr.powerFX = pFX;
-                pr.maxOutboundDistance = 100;
+                pr.maxOutboundDistance = 15;
 
                 prefab.AddComponent<TechTag>().type = TechType;
                 prefab.AddComponent<TelepowerPylonController>();

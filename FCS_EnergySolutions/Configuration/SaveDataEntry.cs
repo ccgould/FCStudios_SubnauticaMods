@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Objects;
 using FCS_EnergySolutions.Mods.TelepowerPylon.Model;
+using FCS_EnergySolutions.Mods.TelepowerPylon.Mono;
 using FCS_EnergySolutions.PowerStorage.Enums;
 using FCS_EnergySolutions.PowerStorage.Mono;
 using FCSCommon.Interfaces;
@@ -76,6 +77,7 @@ namespace FCS_EnergySolutions.Configuration
         [JsonProperty] internal Vec4 SecondaryBody { get; set; }
         [JsonProperty] internal FCSPowerStates PowerState { get; set; }
         [JsonProperty] internal TelepowerPylonMode PylonMode { get; set; }
+        public List<string> CurrentConnections { get; set; }
     }
     
     [Serializable]

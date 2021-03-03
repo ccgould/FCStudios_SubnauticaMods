@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Extensions;
@@ -11,7 +13,6 @@ using FCS_EnergySolutions.Configuration;
 using FCS_EnergySolutions.Mods.TelepowerPylon.Model;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
-using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.UI;
 using WorldHelpers = FCS_AlterraHub.Helpers.WorldHelpers;
@@ -28,15 +29,19 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
         private NameController _nameController;
         private int _maxConnectionLimit;
         private readonly Dictionary<string, TelepowerPylonController> _currentConnections = new Dictionary<string, TelepowerPylonController>();
-        private Dictionary<string, GameObject> _trackedFrequencyItem = new Dictionary<string, GameObject>();
-        private PowerRelay _relay;
+        private readonly Dictionary<string, GameObject> _trackedFrequencyItem = new Dictionary<string, GameObject>();
+
         private GameObject _connectionsGrid;
         private Text _status;
         private readonly TelepowerPylonUpgrade _currentUpgrade = TelepowerPylonUpgrade.MK1;
         private TelepowerPylonMode _mode = TelepowerPylonMode.PUSH;
-        
+        private Button _addBTN;
+        private bool _attemptedToLoadConnections;
+        private Toggle _pullToggle;
+        private Toggle _pushToggle;
+        private bool _loadingFromSave;
+        private PowerRelay _powerRelay;
         private const int DEFAULT_CONNECTIONS_LIMIT = 6;
-        public override bool BypassRegisterCheck { get; } = true;
         public override bool IsOperational => Manager != null && IsConstructed;
         public Action<TelepowerPylonController> OnDestroyCalledAction { get; set; }
 
@@ -45,8 +50,10 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
         private void Start()
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.TelepowerPylonTabID, Mod.ModName);
+            FCS_AlterraHub.Patches.Player_Update_Patch.OnWorldSettled += OnWorldSettled;
+            //InvokeRepeating(nameof(MakeConnection),1f,1f);
         }
-
+        
         private void OnEnable()
         {
             if (_runStartUpOnEnable)
@@ -69,15 +76,37 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
                     }
                     _colorManager.ChangeColor(_savedData.Body.Vector4ToColor());
                     _colorManager.ChangeColor(_savedData.SecondaryBody.Vector4ToColor(),ColorTargetMode.Secondary);
+
+                    switch (_savedData.PylonMode)
+                    {
+                        case TelepowerPylonMode.PULL:
+                            _pullToggle.isOn = true;
+                            break;
+                        case TelepowerPylonMode.PUSH:
+                            _pushToggle.isOn = true;
+                            break;
+                    }
                 }
 
                 _runStartUpOnEnable = false;
             }
         }
+        
+        //private void MakeConnection()
+        //{
+        //    if (IsFromSave && IsDeviceRegistered && LargeWorldStreamer.main.IsWorldSettled())
+        //    {
+        //        if(_powerRelay != null && _savedData.CurrentConnections.Count > 0 && _currentConnections?.Count > 0 && _powerRelay.inboundPowerSources.Count == 0)
+        //        {
+        //            ForceConnection();
+        //        }
+        //    }
+        //}
 
         public override void OnDestroy()
         {
             OnDestroyCalledAction?.Invoke(this);
+            FCS_AlterraHub.Patches.Player_Update_Patch.OnWorldSettled -= OnWorldSettled;
         }
 
         #endregion
@@ -119,64 +148,53 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
             }
 
             _connectionsGrid = GameObjectHelpers.FindGameObject(gameObject, "Content");
+
             _status = GameObjectHelpers.FindGameObject(gameObject, "Status")?.GetComponent<Text>();
-            
-            var addBTN = GameObjectHelpers.FindGameObject(gameObject, "AddBTN")?.GetComponent<Button>();
-            addBTN.onClick.AddListener(() =>
+
+            _addBTN = GameObjectHelpers.FindGameObject(gameObject, "AddBTN")?.GetComponent<Button>();
+            _addBTN.onClick.AddListener(() =>
             {
                 _nameController.Show();
             });
+
+            _addBTN.interactable = false;
 
             _maxConnectionLimit = DEFAULT_CONNECTIONS_LIMIT;
 
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseEmissiveDecalsController, gameObject, Color.cyan);
             MaterialHelpers.ChangeSpecSettings(AlterraHub.BaseDefaultDecals, AlterraHub.BaseSpec, gameObject, 2.61f, 8f);
 
-            var pushToggle = GameObjectHelpers.FindGameObject(gameObject, "PushToggle")?.GetComponent<Toggle>();
-            if (pushToggle != null)
-                pushToggle.onValueChanged.AddListener((value =>
+            _pushToggle = GameObjectHelpers.FindGameObject(gameObject, "PushToggle")?.GetComponent<Toggle>();
+            if (_pushToggle != null)
+                _pushToggle.onValueChanged.AddListener((value =>
                 {
                     if (value)
                     {
                         _mode = TelepowerPylonMode.PUSH;
                     }
+                    _addBTN.interactable = false;
                 }));
 
-            var pullToggle = GameObjectHelpers.FindGameObject(gameObject, "PullToggle")?.GetComponent<Toggle>();
-            if (pullToggle != null)
-                pullToggle.onValueChanged.AddListener((value =>
+            _pullToggle = GameObjectHelpers.FindGameObject(gameObject, "PullToggle")?.GetComponent<Toggle>();
+            if (_pullToggle != null)
+                _pullToggle.onValueChanged.AddListener((value =>
                 {
                     if (value)
                     {
                         _mode = TelepowerPylonMode.PULL;
                     }
+
+                    _addBTN.interactable = true;
+
                 }));
 
-            var relayToggle = GameObjectHelpers.FindGameObject(gameObject, "RelayToggle")?.GetComponent<Toggle>();
-            if (relayToggle != null)
-                relayToggle.onValueChanged.AddListener((value =>
-                {
-                    if (value)
-                    {
-                        _mode = TelepowerPylonMode.RELAY;
-                    }
-                }));
+            _powerRelay = gameObject.GetComponentInChildren<PowerRelay>();
 
             UpdateStatus();
 
             IsInitialized = true;
         }
         
-        public PowerRelay GetRelay()
-        {
-            if (_relay == null)
-            {
-                _relay = gameObject.GetComponentInChildren<PowerRelay>();
-            }
-
-            return _relay;
-        }
-
         public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
         {
             return _colorManager.ChangeColor(color, mode);
@@ -185,25 +203,11 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
         public void DeleteFrequencyItemAndDisconnectRelay(FrequencyItemController frequencyItemController)
         {
             DeleteFrequencyItem(frequencyItemController.TargetController.UnitID.ToLower());
-            QuickLogger.Debug("Removing Relay", true);
-            frequencyItemController.TargetController.GetRelay().RemoveInboundPower(GetRelay());
         }
-
-        private void DeleteFrequencyItem(string id)
+        
+        public TelepowerPylonMode GetCurrentMode()
         {
-            if (!_currentConnections.ContainsKey(id))
-            {
-                QuickLogger.Debug($"Failed to find connection in the list: {id}");
-                return;
-            }
-
-            if (_trackedFrequencyItem.ContainsKey(id))
-            {
-                Destroy(_trackedFrequencyItem[id]);
-                _trackedFrequencyItem.Remove(id);
-            }
-            _currentConnections.Remove(id);
-            UpdateStatus();
+            return _mode;
         }
 
         #endregion
@@ -226,18 +230,12 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
                 QuickLogger.DebugError("Failed to cast object to Pylon",true);
                 return;
             }
-
-            if (pylon.GetCurrentMode() != TelepowerPylonMode.PULL && GetCurrentMode() == TelepowerPylonMode.PUSH)
-            {
-                QuickLogger.Message($"[Warning to push power to  {text} its mode must be set to (PULL)]: {text}", true);
-            }
-
             if (_currentConnections.ContainsKey(idToLower)) return;
 
             if (_currentConnections.Count < _maxConnectionLimit && WorldHelpers.CheckIfInRange(this, unit.Value, 1000))
             {
                 AddConnection(idToLower, unit.Value);
-                ConnectToRelay(idToLower);
+                _powerManager.AddConnection(pylon);
             }
         }
 
@@ -253,11 +251,7 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
             return _currentUpgrade;
         }
         
-        private void ConnectToRelay(string id)
-        {
-            _currentConnections[id].GetRelay().inboundPowerSources.Add(GetRelay());
-        }
-
+       
         private void AddConnection(string text, FcsDevice unit)
         {
             var controller = (TelepowerPylonController) unit;
@@ -276,13 +270,7 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
         {
             return false;
         }
-
-        public TelepowerPylonMode GetCurrentMode()
-        {
-            return _mode;
-        }
-
-
+        
         private void AddConnectionItemToGrid(TelepowerPylonController targetController)
         {
             var prefab = Instantiate(ModelPrefab.FrequencyItemPrefab);
@@ -292,6 +280,41 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
             prefab.transform.SetParent(_connectionsGrid.transform, false);
         }
 
+        private void DeleteFrequencyItem(string id)
+        {
+            if (!_currentConnections.ContainsKey(id))
+            {
+                QuickLogger.Debug($"Failed to find connection in the list: {id}");
+                return;
+            }
+
+            if (_trackedFrequencyItem.ContainsKey(id))
+            {
+                Destroy(_trackedFrequencyItem[id]);
+                _trackedFrequencyItem.Remove(id);
+            }
+            _currentConnections.Remove(id);
+            UpdateStatus();
+        }
+
+        private void OnWorldSettled()
+        {
+            if (_attemptedToLoadConnections) return;
+            if (_savedData?.CurrentConnections != null)
+            {
+                //_loadingFromSave = true;
+                foreach (string connection in _savedData.CurrentConnections)
+                {
+                    OnSearchConnection(connection,null);
+                }
+                
+            }
+
+            _attemptedToLoadConnections = true;
+            _loadingFromSave = false;
+
+        }
+        
         #endregion
 
         #region IConstructable
@@ -328,7 +351,6 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
 
         #region IProtoEventListener
 
-
         private void ReadySaveData()
         {
             QuickLogger.Debug("In OnProtoDeserialize");
@@ -349,8 +371,19 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
 
             QuickLogger.Debug($"Saving ID {_savedData.Id}", true);
             _savedData.Body = _colorManager.GetColor().ColorToVector4();
+            _savedData.SecondaryBody = _colorManager.GetSecondaryColor().ColorToVector4();
             _savedData.BaseId = BaseId;
+            _savedData.PylonMode = GetCurrentMode();
+            _savedData.CurrentConnections = GetCurrentConnectionIDs().ToList();
             newSaveData.TelepowerPylonEntries.Add(_savedData);
+        }
+
+        private IEnumerable<string> GetCurrentConnectionIDs()
+        {
+            foreach (KeyValuePair<string, TelepowerPylonController> connection in _currentConnections)
+            {
+                yield return connection.Key;
+            }
         }
 
         public override void OnProtoDeserialize(ProtobufSerializer serializer)
@@ -401,6 +434,11 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
         }
 
         #endregion
+
+        public IPowerInterface GetPowerRelay()
+        {
+            return _powerManager?.GetPowerRelay();
+        }
     }
 
     internal enum TelepowerPylonUpgrade
@@ -408,13 +446,5 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
         MK1 = 1,
         MK2 = 2,
         MK3 = 3
-    }
-    
-    internal class TelepowerPylonPowerManager : MonoBehaviour
-    {
-        public void Initialize(TelepowerPylonController mono)
-        {
-            
-        }
     }
 }
