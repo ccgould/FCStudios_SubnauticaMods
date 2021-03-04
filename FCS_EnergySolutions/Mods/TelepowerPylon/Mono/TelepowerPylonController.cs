@@ -43,6 +43,10 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
         private bool _loadingFromSave;
         private PowerRelay _powerRelay;
         private FCSMessageBox _messageBox;
+        private bool _cursorLockCached;
+        private bool _isInRange ;
+        private bool _isInUse;
+        private GameObject _inputDummy;
         private const int DEFAULT_CONNECTIONS_LIMIT = 6;
         public override bool IsOperational => Manager != null && IsConstructed;
         public Action<TelepowerPylonController> OnDestroyCalledAction { get; set; }
@@ -448,9 +452,87 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
             }
         }
 
+
+        public bool IsPlayerInRange()
+        {
+            return AlterraHubTrigger.IsPlayerInRange;
+        }
+
+        private GameObject inputDummy
+        {
+            get
+            {
+                if (this._inputDummy == null)
+                {
+                    this._inputDummy = new GameObject("InputDummy");
+                    this._inputDummy.SetActive(false);
+                }
+                return this._inputDummy;
+            }
+        }
+
+        internal void InterceptInput(bool state)
+        {
+            if (inputDummy.activeSelf == state)
+            {
+                return;
+            }
+            if (state)
+            {
+                _screenBlock.SetActive(false);
+                Player.main.EnterLockedMode(null);
+                MainCameraControl.main.enabled = false;
+                InputHandlerStack.main.Push(inputDummy);
+                _cursorLockCached = UWE.Utils.lockCursor;
+                UWE.Utils.lockCursor = false;
+                return;
+            }
+
+            UWE.Utils.lockCursor = _cursorLockCached;
+            InputHandlerStack.main.Pop(inputDummy);
+            MainCameraControl.main.enabled = true;
+            _screenBlock.SetActive(true);
+        }
+
+        public void OnHandHover(GUIHand hand)
+        {
+            if (_isInRange)
+            {
+                HandReticle main = HandReticle.main;
+                main.SetInteractText("Click to use Alterra Hub");
+                main.SetIcon(HandReticle.IconType.Hand);
+            }
+        }
+
         public void OnHandClick(GUIHand hand)
         {
+            if (_isInRange)
+            {
+                InterceptInput(true);
+                _isInUse = true;
+                var hudCameraPos = _hubCameraPosition.transform.position;
+                var hudCameraRot = _hubCameraPosition.transform.rotation;
+                Player.main.SetPosition(new Vector3(hudCameraPos.x, Player.main.transform.position.y, hudCameraPos.z), hudCameraRot);
+                _playerBody.SetActive(false);
+                //Player.main.gameObject.transform.position = new Vector3(hudCameraPos.x, Player.main.gameObject.transform.position.y, hudCameraPos.z);
+                SNCameraRoot.main.transform.position = hudCameraPos;
+                SNCameraRoot.main.transform.rotation = hudCameraRot;
+            }
+        }
 
+        internal void ExitStore()
+        {
+            _isInUse = false;
+            SNCameraRoot.main.transform.localPosition = Vector3.zero;
+            SNCameraRoot.main.transform.localRotation = Quaternion.identity;
+            ExitLockedMode();
+            _playerBody.SetActive(true);
+        }
+
+        private void ExitLockedMode()
+        {
+            Player.main.ExitLockedMode(false, false);
+            InterceptInput(false);
         }
 
         #endregion

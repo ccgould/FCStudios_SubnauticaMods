@@ -1,4 +1,8 @@
-﻿namespace FCS_AlterraHub.Helpers
+﻿using System;
+using QModManager.API;
+using UnityEngine;
+
+namespace FCS_AlterraHub.Helpers
 {
     public static class MathHelpers
     {
@@ -22,6 +26,19 @@
                 return (num / 1000).ToString("0.#") + "K";
 
             return num.ToString("#,0");
+        }
+
+        public static double PowerLossOverDistance(double distanceInMeters)
+        {
+            //waveLengthInMeters = speed of light(m/s) * frequency(MHz)
+            double speedOfLight = 3 * Math.Pow(10,8);
+            QModServices.Main.AddCriticalMessage($"Speed Of Light: {speedOfLight}");
+            double frequencyInGHz = 5 * Math.Pow(10, 9);
+            QModServices.Main.AddCriticalMessage($"Frequency: {frequencyInGHz}");
+            double waveLengthInMeters = speedOfLight / frequencyInGHz;
+            QModServices.Main.AddCriticalMessage($"Wave Length: {waveLengthInMeters}");
+
+            return Math.Pow(4 * Math.PI * distanceInMeters, 2) / Math.Pow(waveLengthInMeters, 2);
         }
     }
 }

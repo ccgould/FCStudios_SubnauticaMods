@@ -80,17 +80,21 @@ namespace FCS_AlterraHub.Helpers
 
         public enum DigitalClockFormat
         {
-            // Token: 0x04000025 RID: 37
             TWELVE_HOUR,
-            // Token: 0x04000026 RID: 38
             TWENTY_FOUR_HOUR
         }
 
-        public static bool CheckIfInRange(FcsDevice currentdevice,FcsDevice device,float range)
+        public static bool CheckIfInRange(FcsDevice currentDevice,FcsDevice device,float range)
         {
-            if (currentdevice == null || device == null || !device.gameObject.activeSelf || !currentdevice.IsConstructed) return false;
-            float distance = Vector3.Distance(currentdevice.gameObject.transform.position, device.gameObject.transform.position);
+            if (currentDevice == null || device == null || !device.gameObject.activeSelf || !currentDevice.IsConstructed) return false;
+            float distance = Vector3.Distance(currentDevice.gameObject.transform.position, device.gameObject.transform.position);
             return distance <= range;
+        }
+
+        public static float GetDistance(FcsDevice currentDevice, FcsDevice device)
+        {
+            if (currentDevice == null || device == null ) return 0f;
+            return Vector3.Distance(currentDevice.gameObject.transform.position, device.gameObject.transform.position);
         }
     }
 }

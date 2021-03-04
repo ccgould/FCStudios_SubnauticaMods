@@ -29,6 +29,9 @@ namespace FCS_AlterraHub
         [QModPatch]
         public static void Patch()
         {
+
+            QModServices.Main.AddCriticalMessage($"Power Loss Over Distance Result: {MathHelpers.PowerLossOverDistance(379)}");
+
             Mod.CollectKnownDevices();
 
             QuickLogger.Info($"Started patching. Version: {QuickLogger.GetAssemblyVersion(Assembly.GetExecutingAssembly())}");
