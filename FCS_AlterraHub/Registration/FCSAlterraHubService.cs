@@ -7,6 +7,7 @@ using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Structs;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
+using QModManager.API;
 using SMLHelper.V2.Handlers;
 
 namespace FCS_AlterraHub.Registration
@@ -67,6 +68,8 @@ namespace FCS_AlterraHub.Registration
         {
             if (obj != null)
                 knownDevices = obj;
+
+            QModServices.Main.AddCriticalMessage($"Alterra Service Loaded: {knownDevices.Count} Devices");
         }
 
         public void RegisterDevice(FcsDevice device, string tabID, string packageId)
@@ -82,6 +85,7 @@ namespace FCS_AlterraHub.Registration
 
             if (!knownDevices.Any(x => x.PrefabID.Equals(prefabID)))
             {
+                QuickLogger.Debug($"Creating new ID: Known Count{knownDevices.Count}");
                 var unitID = GenerateNewID(tabID, prefabID);
                 device.TabID = tabID;
                 device.UnitID = unitID;

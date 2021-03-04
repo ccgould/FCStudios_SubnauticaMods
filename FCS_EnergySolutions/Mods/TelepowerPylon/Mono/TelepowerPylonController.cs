@@ -94,17 +94,6 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
             }
         }
         
-        //private void MakeConnection()
-        //{
-        //    if (IsFromSave && IsDeviceRegistered && LargeWorldStreamer.main.IsWorldSettled())
-        //    {
-        //        if(_powerRelay != null && _savedData.CurrentConnections.Count > 0 && _currentConnections?.Count > 0 && _powerRelay.inboundPowerSources.Count == 0)
-        //        {
-        //            ForceConnection();
-        //        }
-        //    }
-        //}
-
         public override void OnDestroy()
         {
             OnDestroyCalledAction?.Invoke(this);
@@ -156,6 +145,11 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
             _addBTN = GameObjectHelpers.FindGameObject(gameObject, "AddBTN")?.GetComponent<Button>();
             _addBTN.onClick.AddListener(() =>
             {
+                if (_currentConnections.Count == _maxConnectionLimit)
+                {
+                    _messageBox.Show(AuxPatchers.MaximumConnectionsReached(),FCSMessageButton.OK,null);
+                    return;
+                }
                 _nameController.Show();
             });
 
@@ -314,6 +308,7 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
             }
             _currentConnections.Remove(id);
             UpdateStatus();
+            _powerManager.RemoveConnection(id);
         }
 
         private void OnWorldSettled()
@@ -363,6 +358,12 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
         public override bool CanDeconstruct(out string reason)
         {
             reason = string.Empty;
+            if (_powerManager != null && _powerManager.HasConnections())
+            {
+                reason = AuxPatchers.RemoveAllTelepowerConnections();
+                return false;
+            }
+            
             return true;
         }
 

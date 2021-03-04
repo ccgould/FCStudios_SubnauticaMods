@@ -29,6 +29,8 @@ namespace FCS_AlterraHub
         [QModPatch]
         public static void Patch()
         {
+            Mod.CollectKnownDevices();
+
             QuickLogger.Info($"Started patching. Version: {QuickLogger.GetAssemblyVersion(Assembly.GetExecutingAssembly())}");
             GlobalBundle = FCSAssetBundlesService.PublicAPI.GetAssetBundleByName(Mod.AssetBundleName);
 

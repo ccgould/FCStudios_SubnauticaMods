@@ -12,10 +12,13 @@ using FCS_AlterraHub.Spawnables;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
 using FMOD;
+using Oculus.Newtonsoft.Json;
+using QModManager.API;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 using Object = System.Object;
+
 
 namespace FCS_AlterraHub.Configuration
 {
@@ -162,13 +165,55 @@ namespace FCS_AlterraHub.Configuration
 
         internal static void LoadDevicesData()
         {
-            QuickLogger.Info("Loading Save Data...");
-            ModUtils.LoadSaveData<List<KnownDevice>>(KnownDevicesFilename, GetSaveFileDirectory(), data =>
-            {
-                QuickLogger.Info("Save Data Loaded");
-                OnDevicesDataLoaded?.Invoke(data);
-            });
+            //if (_knownDevicesLoaded) return;
+            //QuickLogger.Info("Loading Known Devices Save Data...");
+            //ModUtils.LoadSaveData<List<KnownDevice>>(KnownDevicesFilename, GetSaveFileDirectory(), data =>
+            //{
+            //    QuickLogger.Info("Known Devices Save Data Loaded");
+            //    OnDevicesDataLoaded?.Invoke(data);
+            //    _knownDevicesLoaded = true;
+            //});
         }
+
+        internal static void CollectKnownDevices()
+        {
+
+            var items = new HashSet<KnownDevice>();
+
+#if SUBNAUTICA
+            var path = Path.GetFullPath(Path.Combine(Application.persistentDataPath, "../..", "Unknown Worlds/Subnautica/Subnautica/SavedGames"));
+#elif BELOWZERO
+            var path = Path.GetFullPath(Path.Combine(Application.persistentDataPath, "../..", "Unknown Worlds/Subnautica Below Zero/SubnauticaZero/SavedGames"));
+#endif
+            QuickLogger.Debug($"User storage: {path}");
+
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                QuickLogger.Debug("Path is null");
+                return;
+            }
+
+            if (Directory.Exists(path))
+            {
+                string[] allfiles = Directory.GetFiles(path, "KnownDevices.json", SearchOption.AllDirectories);
+                QModServices.Main.AddCriticalMessage($"All Files Count: {allfiles.Length}");
+
+                foreach (var file in allfiles)
+                {
+                    var save = File.ReadAllText(file);
+                    var json = JsonConvert.DeserializeObject<List<KnownDevice>>(save);
+                    foreach (KnownDevice device in json)
+                    {
+                        items.Add(device);
+                    }
+                }
+            }
+
+            QModServices.Main.AddCriticalMessage($"Found: {items.Count} Devices");
+
+            OnDevicesDataLoaded?.Invoke(items.ToList());
+        }
+
 
         public static bool SaveDevices(List<KnownDevice> knownDevices)
         {
@@ -185,7 +230,7 @@ namespace FCS_AlterraHub.Configuration
         }
 
         public static Dictionary<string, Sound> AudioClips = new Dictionary<string, Sound>();
-        
+
 
         public static bool SaveGamePlaySettings()
         {
@@ -428,26 +473,6 @@ namespace FCS_AlterraHub.Configuration
         public bool PlayStarterMission { get; set; } = true;
         public List<Mission> Missions { get; set; } = new List<Mission>();
         public bool IsOreConsumerFragmentSpawned { get; set; } = false;
-    }
-
-    public struct QuestEventData
-    {
-        public int Amount { get; set; }
-        public int CurrentAmount { get; set; }
-        public string GetID { get; set; }
-        public string GetName { get; set; }
-        public string GetDescription { get; set; }
-        public int Order { get; set; }
-        public TechType TechType { get; set; }
-        //public QuestEventType QuestEventType { get; set; }
-        //public QuestEventStatus Status { get; set; }
-        //public DeviceActionType DeviceActionType { get; set; }
-    }
-
-    public struct EventPathData
-    {
-        public string From { get; set; }
-        public string To { get; set; }
     }
 
     public struct KnownDevice
