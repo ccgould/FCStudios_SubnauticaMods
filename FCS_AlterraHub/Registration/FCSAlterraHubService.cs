@@ -69,7 +69,7 @@ namespace FCS_AlterraHub.Registration
             if (obj != null)
                 knownDevices = obj;
 
-            QModServices.Main.AddCriticalMessage($"Alterra Service Loaded: {knownDevices.Count} Devices");
+            //QModServices.Main.AddCriticalMessage($"Alterra Service Loaded: {knownDevices.Count} Devices");
         }
 
         public void RegisterDevice(FcsDevice device, string tabID, string packageId)
