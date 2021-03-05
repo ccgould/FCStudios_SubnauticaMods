@@ -158,6 +158,7 @@
     <Compile Include="Mods\TelepowerPylon\Mono\FrequencyItemController.cs" />
     <Compile Include="Mods\TelepowerPylon\Mono\TelepowerPylonController.cs" />
     <Compile Include="Mods\TelepowerPylon\Mono\TelepowerPylonPowerManager.cs" />
+    <Compile Include="Mods\TelepowerPylon\Mono\TelepowerPylonTrigger.cs" />
     <Compile Include="PowerStorage\Buildable\PowerStoragePatcher.cs" />
     <Compile Include="PowerStorage\Mono\BatteryDummyController.cs" />
     <Compile Include="PowerStorage\Mono\InterfaceInteraction.cs" />

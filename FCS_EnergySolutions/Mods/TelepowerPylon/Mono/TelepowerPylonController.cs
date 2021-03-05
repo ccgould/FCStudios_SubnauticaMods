@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Extensions;
@@ -17,6 +16,7 @@ using FCS_EnergySolutions.Mods.TelepowerPylon.Model;
 using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
+using SMLHelper.V2.Utility;
 using UnityEngine;
 using UnityEngine.UI;
 using WorldHelpers = FCS_AlterraHub.Helpers.WorldHelpers;
@@ -408,7 +408,17 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
         private void OnSearchConnection(string text, NameController arg2)
         {
             var unit = FCSAlterraHubService.PublicAPI.FindDevice(text);
+            
             var idToLower = text.ToLower();
+
+            if (FindOtherPylonWithConnection(unit))
+            {
+                _messageBox.Show( $"Cannot add {text} because another pylon has this connection.",FCSMessageButton.OK,null);
+                return;
+            }
+
+
+            
             if (unit.Value == null)
             {
                 QuickLogger.Message($"Failed to find pylon with unit ID: {text}", true);
@@ -437,6 +447,32 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
                 _powerManager.AddConnection(pylon);
                 pylon.AddPullPylon(this);
             }
+        }
+
+        private bool FindOtherPylonWithConnection(KeyValuePair<string, FcsDevice> unit)
+        {
+            var devices = Manager.GetDevices(Mod.TelepowerPylonTabID).ToArray();
+
+            QuickLogger.Debug($"Devices Found: {devices.Length}",true);
+
+            foreach (FcsDevice device in devices)
+            {
+                var pylon = (TelepowerPylonController) device;
+
+                QuickLogger.Debug($"Pylon {pylon.UnitID}: Device to check: {unit.Key} Result: {pylon.HasConnection(unit.Key)}",true);
+
+                if (pylon.HasConnection(unit.Key))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public bool HasConnection(string unitKey)
+        {
+            return _currentConnections.Any(x => x.Key.ToLower().Equals(unitKey.ToLower()));
         }
 
         private void UpdateStatus()
@@ -744,35 +780,6 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
         }
         
         #endregion
-    }
-
-    internal class TelepowerPylonTrigger : MonoBehaviour
-    {
-        internal bool IsPlayerInRange;
-
-        internal Action<bool> onTriggered { get; set; }
-
-        private void OnTriggerEnter(Collider collider)
-        {
-            if (collider.gameObject.layer != 19) return;
-            IsPlayerInRange = true;
-            onTriggered?.Invoke(true);
-        }
-
-        private void OnTriggerStay(Collider collider)
-        {
-            if (collider.gameObject.layer != 19 || IsPlayerInRange) return;
-            onTriggered?.Invoke(true);
-            IsPlayerInRange = true;
-        }
-
-        private void OnTriggerExit(Collider collider)
-        {
-            if (collider.gameObject.layer != 19) return;
-            IsPlayerInRange = false;
-            onTriggered?.Invoke(false);
-
-        }
     }
 
     internal enum TelepowerPylonUpgrade
