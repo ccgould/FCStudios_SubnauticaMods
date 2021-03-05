@@ -5,6 +5,8 @@ using System.Text;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Extensions;
+using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Mono.Controllers;
@@ -12,6 +14,7 @@ using FCS_AlterraHub.Registration;
 using FCS_EnergySolutions.Buildable;
 using FCS_EnergySolutions.Configuration;
 using FCS_EnergySolutions.Mods.TelepowerPylon.Model;
+using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -20,7 +23,7 @@ using WorldHelpers = FCS_AlterraHub.Helpers.WorldHelpers;
 
 namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
 {
-    internal class TelepowerPylonController : FcsDevice,IFCSSave<SaveData>, IHandTarget
+    internal class TelepowerPylonController : FcsDevice,IFCSSave<SaveData>, IHandTarget, IFCSDumpContainer
     {
         private TelepowerPylonDataEntry _savedData;
         internal bool IsFromSave { get; private set; }
@@ -31,25 +34,45 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
         private int _maxConnectionLimit;
         private readonly Dictionary<string, TelepowerPylonController> _currentConnections = new Dictionary<string, TelepowerPylonController>();
         private readonly Dictionary<string, GameObject> _trackedFrequencyItem = new Dictionary<string, GameObject>();
-
         private GameObject _connectionsGrid;
         private Text _status;
-        private readonly TelepowerPylonUpgrade _currentUpgrade = TelepowerPylonUpgrade.MK1;
+        private TelepowerPylonUpgrade _currentUpgrade = TelepowerPylonUpgrade.MK1;
         private TelepowerPylonMode _mode = TelepowerPylonMode.PUSH;
         private Button _addBTN;
         private bool _attemptedToLoadConnections;
         private Toggle _pullToggle;
         private Toggle _pushToggle;
         private bool _loadingFromSave;
-        private PowerRelay _powerRelay;
         private FCSMessageBox _messageBox;
         private bool _cursorLockCached;
         private bool _isInRange ;
         private bool _isInUse;
         private GameObject _inputDummy;
+        private GameObject _cameraPosition;
+        private GameObject _screenBlock;
+        private GameObject _playerBody;
+        private DumpContainerSimplified _dumpContainer;
+        private TechType _mk2UpgradeTechType;
+        private TechType _mk3UpgradeTechType;
+        private Button _upgradeBTN;
+        private ParticleSystem[] _particles;
+
         private const int DEFAULT_CONNECTIONS_LIMIT = 6;
+        private GameObject inputDummy
+        {
+            get
+            {
+                if (this._inputDummy == null)
+                {
+                    this._inputDummy = new GameObject("InputDummy");
+                    this._inputDummy.SetActive(false);
+                }
+                return this._inputDummy;
+            }
+        }
         public override bool IsOperational => Manager != null && IsConstructed;
         public Action<TelepowerPylonController> OnDestroyCalledAction { get; set; }
+        public TelepowerPylonTrigger _telepowerPylonTrigger { get; private set; }
 
         #region Unity Methods
 
@@ -92,12 +115,30 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
                             _pushToggle.isOn = true;
                             break;
                     }
+
+                    if (_savedData.Upgrade == TelepowerPylonUpgrade.MK2)
+                    {
+                        AttemptUpgrade(_mk2UpgradeTechType);
+                    }
+
+                    if (_savedData.Upgrade == TelepowerPylonUpgrade.MK3)
+                    {
+                        AttemptUpgrade(_mk3UpgradeTechType);
+                    }
                 }
 
                 _runStartUpOnEnable = false;
             }
         }
-        
+
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.Escape) && _isInRange)
+            {
+                ExitDisplay();
+            }
+        }
+
         public override void OnDestroy()
         {
             OnDestroyCalledAction?.Invoke(this);
@@ -107,6 +148,27 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
         #endregion
 
         #region Public Methods
+
+        public override float GetPowerUsage()
+        {
+            if (!IsConstructed || Manager == null) return 0f;
+            return CalculatePowerUsage();
+        }
+
+        private float CalculatePowerUsage()
+        {
+            float amount = 0f;
+
+            if (_mode == TelepowerPylonMode.PUSH)
+            {
+                foreach (KeyValuePair<string, TelepowerPylonController> connection in _currentConnections)
+                {
+                    var distance = WorldHelpers.GetDistance(this, connection.Value);
+                    amount += distance * QPatch.Configuration.TelepowerPylonPowerUsagePerMeter;
+                }
+            }
+            return amount;
+        }
 
         public override Vector3 GetPosition()
         {
@@ -119,6 +181,11 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
             {
                 _canvas = GameObjectHelpers.FindGameObject(gameObject,"Canvas");
                 _canvas?.SetActive(IsConstructed);
+            }
+
+            if (_messageBox == null)
+            {
+                _messageBox = GameObjectHelpers.FindGameObject(gameObject, "MessageBox").AddComponent<FCSMessageBox>();
             }
 
             if (_powerManager == null)
@@ -151,13 +218,19 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
             {
                 if (_currentConnections.Count == _maxConnectionLimit)
                 {
-                    _messageBox.Show(AuxPatchers.MaximumConnectionsReached(),FCSMessageButton.OK,null);
+                    _messageBox?.Show(AuxPatchers.MaximumConnectionsReached(),FCSMessageButton.OK,null);
                     return;
                 }
                 _nameController.Show();
+            });            
+            
+            _upgradeBTN = GameObjectHelpers.FindGameObject(gameObject, "UpgradeButton")?.GetComponent<Button>();
+            _upgradeBTN.onClick.AddListener(() =>
+            {
+                ExitDisplay();
+                _dumpContainer?.OpenStorage();
             });
 
-            _addBTN.interactable = false;
 
             _maxConnectionLimit = DEFAULT_CONNECTIONS_LIMIT;
 
@@ -166,8 +239,21 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
 
             _pushToggle = GameObjectHelpers.FindGameObject(gameObject, "PushToggle")?.GetComponent<Toggle>();
             if (_pushToggle != null)
+                
                 _pushToggle.onValueChanged.AddListener((value =>
                 {
+                    if (_powerManager == null || _addBTN == null || _messageBox == null || _pullToggle == null)
+                    {
+                        return;
+                    }
+                    
+                    if (_powerManager.HasConnections())
+                    {
+                        _messageBox?.Show(AuxPatchers.RemoveAllTelepowerConnectionsPush(), FCSMessageButton.OK, null);
+                        _pullToggle.SetIsOnWithoutNotify(true);
+                        return;
+                    }
+
                     if (value)
                     {
                         _mode = TelepowerPylonMode.PUSH;
@@ -179,6 +265,20 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
             if (_pullToggle != null)
                 _pullToggle.onValueChanged.AddListener((value =>
                 {
+                    if (_trackedFrequencyItem == null || _addBTN == null || _messageBox == null || _pushToggle == null)
+                    {
+                        return;
+                    }
+
+                    QuickLogger.Debug($"Has Frequency Item: {_trackedFrequencyItem.Any()}",true);
+
+                    if (_trackedFrequencyItem.Any())
+                    {
+                        _messageBox?.Show(AuxPatchers.RemoveAllTelepowerConnectionsPull(), FCSMessageButton.OK, null);
+                        _pushToggle.SetIsOnWithoutNotify(true);
+                        return;
+                    }
+
                     if (value)
                     {
                         _mode = TelepowerPylonMode.PULL;
@@ -188,9 +288,45 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
 
                 }));
 
-            _powerRelay = gameObject.GetComponentInChildren<PowerRelay>();
+            if (_telepowerPylonTrigger == null)
+            {
+                _telepowerPylonTrigger = GameObjectHelpers.FindGameObject(gameObject, "Trigger").AddComponent<TelepowerPylonTrigger>();
+            }
 
+            _telepowerPylonTrigger.onTriggered += value =>
+            {
+                _isInRange = true;
+                if (value) return;
+                _isInRange = false;
+                ExitDisplay();
+            };
+
+            if (_dumpContainer == null)
+            {
+                _dumpContainer = gameObject.AddComponent<DumpContainerSimplified>();
+                _dumpContainer.Initialize(transform,"Add Upgrade", this,1,1);
+            }
+
+
+            _particles = gameObject.GetComponentsInChildren<ParticleSystem>();
+
+            _mk2UpgradeTechType = "TelepowerMk2Upgrade".ToTechType();
+            _mk3UpgradeTechType = "TelepowerMk3Upgrade".ToTechType();
+
+            _cameraPosition = GameObjectHelpers.FindGameObject(gameObject, "CameraPosition");
+            _screenBlock = GameObjectHelpers.FindGameObject(gameObject, "MainBlocker");
+
+            _playerBody = Player.main.playerController.gameObject.FindChild("body");
+            
             UpdateStatus();
+
+            IPCMessage += message =>
+            {
+                if (message.Equals("UpdateEffects"))
+                {
+                    ChangeTrailColor();
+                }
+            };
 
             IsInitialized = true;
         }
@@ -200,9 +336,9 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
             return _colorManager.ChangeColor(color, mode);
         }
 
-        public void DeleteFrequencyItemAndDisconnectRelay(FrequencyItemController frequencyItemController)
+        public void DeleteFrequencyItemAndDisconnectRelay(string unitID)
         {
-            DeleteFrequencyItem(frequencyItemController.TargetController.UnitID.ToLower());
+            DeleteFrequencyItem(unitID.ToLower());
         }
         
         public TelepowerPylonMode GetCurrentMode()
@@ -213,6 +349,57 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
         public IPowerInterface GetPowerRelay()
         {
             return _powerManager?.GetPowerRelay();
+        }
+
+        public bool IsPlayerInRange()
+        {
+            return _telepowerPylonTrigger.IsPlayerInRange;
+        }
+
+        public override bool AddItemToContainer(InventoryItem item)
+        {
+            var result = AttemptUpgrade(item.item.GetTechType());
+            if(result)
+            {
+                Destroy(item.item.gameObject);
+                return true;
+            }
+
+            PlayerInteractionHelper.GivePlayerItem(item);
+            return false;
+        }
+
+        internal void ChangeTrailColor()
+        {
+            foreach (ParticleSystem system in _particles)
+            {
+                var index = QPatch.Configuration.TelepowerPylonTrailBrightness;
+                var h = system.trails;
+                h.colorOverLifetime = new Color(index, index, index);
+            }
+
+        }
+
+        public bool IsAllowedToAdd(TechType techType, bool verbose)
+        {
+            var result = techType == _mk2UpgradeTechType || techType == _mk3UpgradeTechType;
+            if (!result)
+            {
+                QuickLogger.ModMessage("Only Telepower Pylon Upgrade MK2 and MK3 Allowed.");
+            }
+
+            return result;
+        }
+
+        public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
+        {
+            var result = pickupable.GetTechType() == _mk2UpgradeTechType || pickupable.GetTechType() == _mk3UpgradeTechType;
+            if (!result)
+            {
+                QuickLogger.ModMessage("Only Telepower Pylon Upgrade MK2 and MK3 Allowed.");
+            }
+
+            return result;
         }
 
         #endregion
@@ -236,24 +423,19 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
                 return;
             }
 
-            if (pylon.GetCurrentMode() != TelepowerPylonMode.PUSH)
+            if (pylon.GetCurrentMode() != TelepowerPylonMode.PUSH && !_loadingFromSave)
             {
                 _messageBox.Show($"Pylon {pylon.UnitID} is not in push mode and cannot be added as a connection.", FCSMessageButton.OK,null);
                 return;
             }
-
-            if (_messageBox == null)
-            {
-                _messageBox = GameObjectHelpers.FindGameObject(gameObject, "MessageBox").AddComponent<FCSMessageBox>();
-            }
-
-
+            
             if (_currentConnections.ContainsKey(idToLower)) return;
 
-            if (_currentConnections.Count < _maxConnectionLimit && WorldHelpers.CheckIfInRange(this, unit.Value, 1000))
+            if (_currentConnections.Count < _maxConnectionLimit) // && WorldHelpers.CheckIfInRange(this, unit.Value, 1000)
             {
                 AddConnection(idToLower, unit.Value);
                 _powerManager.AddConnection(pylon);
+                pylon.AddPullPylon(this);
             }
         }
 
@@ -283,11 +465,6 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
             DeleteFrequencyItem(obj.UnitID.ToLower());
         }
 
-        private bool AttemptUpgrade()
-        {
-            return false;
-        }
-        
         private void AddConnectionItemToGrid(TelepowerPylonController targetController)
         {
             var prefab = Instantiate(ModelPrefab.FrequencyItemPrefab);
@@ -299,10 +476,13 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
 
         private void DeleteFrequencyItem(string id)
         {
-            if (!_currentConnections.ContainsKey(id))
+            if (_currentConnections.ContainsKey(id))
+            {
+                _currentConnections.Remove(id);
+            }
+            else
             {
                 QuickLogger.Debug($"Failed to find connection in the list: {id}");
-                return;
             }
 
             if (_trackedFrequencyItem.ContainsKey(id))
@@ -310,7 +490,7 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
                 Destroy(_trackedFrequencyItem[id]);
                 _trackedFrequencyItem.Remove(id);
             }
-            _currentConnections.Remove(id);
+            
             UpdateStatus();
             _powerManager.RemoveConnection(id);
         }
@@ -332,7 +512,75 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
             _loadingFromSave = false;
 
         }
+
+        private void ExitDisplay()
+        {
+            _isInUse = false;
+            SNCameraRoot.main.transform.localPosition = Vector3.zero;
+            SNCameraRoot.main.transform.localRotation = Quaternion.identity;
+            ExitLockedMode();
+            _playerBody.SetActive(true);
+        }
+
+        private void ExitLockedMode()
+        {
+            InterceptInput(false);
+        }
+
+        private void InterceptInput(bool state)
+        {
+            if (inputDummy.activeSelf == state)
+            {
+                return;
+            }
+            if (state)
+            {
+                _screenBlock.SetActive(false);
+                MainCameraControl.main.enabled = false;
+                InputHandlerStack.main.Push(inputDummy);
+                _cursorLockCached = UWE.Utils.lockCursor;
+                UWE.Utils.lockCursor = false;
+                return;
+            }
+
+            UWE.Utils.lockCursor = _cursorLockCached;
+            InputHandlerStack.main.Pop(inputDummy);
+            MainCameraControl.main.enabled = true;
+            _screenBlock.SetActive(true);
+        }
         
+        private bool AttemptUpgrade(TechType techType)
+        {
+            if (techType == _mk2UpgradeTechType && _currentUpgrade == TelepowerPylonUpgrade.MK1)
+            {
+                _currentUpgrade = TelepowerPylonUpgrade.MK2;
+                _maxConnectionLimit = 8;
+                ChangeEffectColor(Color.cyan);
+                UpdateStatus();
+                return true;
+            }
+
+            if (techType == _mk3UpgradeTechType && _currentUpgrade != TelepowerPylonUpgrade.MK3)
+            {
+                _currentUpgrade = TelepowerPylonUpgrade.MK3;
+                _maxConnectionLimit = 10;
+                ChangeEffectColor(Color.green);
+                UpdateStatus();
+                return true;
+            }
+
+            return false;
+        }
+
+        private void ChangeEffectColor(Color color)
+        {
+            foreach (ParticleSystem system in _particles)
+            {
+                var main = system.main;
+                main.startColor = color;
+            }
+        }
+
         #endregion
 
         #region IConstructable
@@ -362,12 +610,30 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
         public override bool CanDeconstruct(out string reason)
         {
             reason = string.Empty;
-            if (_powerManager != null && _powerManager.HasConnections())
+            if ((_powerManager != null && _powerManager.HasConnections()) || _trackedFrequencyItem.Any())
             {
                 reason = AuxPatchers.RemoveAllTelepowerConnections();
                 return false;
             }
-            
+
+            if (_currentUpgrade != TelepowerPylonUpgrade.MK1 &&
+                !PlayerInteractionHelper.CanPlayerHold(_mk2UpgradeTechType) ||
+                !PlayerInteractionHelper.CanPlayerHold(_mk3UpgradeTechType))
+            {
+                reason = AlterraHub.InventoryFull();
+                return false;
+            }
+
+            switch (_currentUpgrade)
+            {
+                case TelepowerPylonUpgrade.MK2:
+                    PlayerInteractionHelper.GivePlayerItem(_mk2UpgradeTechType);
+                    break;
+                case TelepowerPylonUpgrade.MK3:
+                    PlayerInteractionHelper.GivePlayerItem(_mk3UpgradeTechType);
+                    break;
+            }
+
             return true;
         }
 
@@ -399,6 +665,7 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
             _savedData.BaseId = BaseId;
             _savedData.PylonMode = GetCurrentMode();
             _savedData.CurrentConnections = GetCurrentConnectionIDs().ToList();
+            _savedData.Upgrade = _currentUpgrade;
             newSaveData.TelepowerPylonEntries.Add(_savedData);
         }
 
@@ -434,6 +701,13 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
             }
         }
 
+        public void AddPullPylon(TelepowerPylonController pylon)
+        {
+            AddConnectionItemToGrid(pylon);
+            if(_currentConnections.ContainsKey(pylon.UnitID.ToLower())) return;
+            _currentConnections.Add(pylon.UnitID.ToLower(),pylon);
+        }
+
         #endregion
 
         #region IHand Target
@@ -442,100 +716,63 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
         {
             HandReticle main = HandReticle.main;
 
-            
-            main.SetInteractText($"Unit ID: {UnitID}", $"For more information press {FCS_AlterraHub.QPatch.Configuration.PDAInfoKeyCode}");
-            main.SetIcon(HandReticle.IconType.Info);
+            if (_isInRange)
+            {
+                main.SetInteractText($"Unit ID: {UnitID} Click to use configure Telepower Pylon", $"For more information press {FCS_AlterraHub.QPatch.Configuration.PDAInfoKeyCode} | Power Usage: {CalculatePowerUsage()}");
+                main.SetIcon(HandReticle.IconType.Info);
+            }
             
             if (Input.GetKeyDown(FCS_AlterraHub.QPatch.Configuration.PDAInfoKeyCode))
             {
 
             }
         }
-
-
-        public bool IsPlayerInRange()
-        {
-            return AlterraHubTrigger.IsPlayerInRange;
-        }
-
-        private GameObject inputDummy
-        {
-            get
-            {
-                if (this._inputDummy == null)
-                {
-                    this._inputDummy = new GameObject("InputDummy");
-                    this._inputDummy.SetActive(false);
-                }
-                return this._inputDummy;
-            }
-        }
-
-        internal void InterceptInput(bool state)
-        {
-            if (inputDummy.activeSelf == state)
-            {
-                return;
-            }
-            if (state)
-            {
-                _screenBlock.SetActive(false);
-                Player.main.EnterLockedMode(null);
-                MainCameraControl.main.enabled = false;
-                InputHandlerStack.main.Push(inputDummy);
-                _cursorLockCached = UWE.Utils.lockCursor;
-                UWE.Utils.lockCursor = false;
-                return;
-            }
-
-            UWE.Utils.lockCursor = _cursorLockCached;
-            InputHandlerStack.main.Pop(inputDummy);
-            MainCameraControl.main.enabled = true;
-            _screenBlock.SetActive(true);
-        }
-
-        public void OnHandHover(GUIHand hand)
-        {
-            if (_isInRange)
-            {
-                HandReticle main = HandReticle.main;
-                main.SetInteractText("Click to use Alterra Hub");
-                main.SetIcon(HandReticle.IconType.Hand);
-            }
-        }
-
+        
         public void OnHandClick(GUIHand hand)
         {
             if (_isInRange)
             {
                 InterceptInput(true);
                 _isInUse = true;
-                var hudCameraPos = _hubCameraPosition.transform.position;
-                var hudCameraRot = _hubCameraPosition.transform.rotation;
+                var hudCameraPos = _cameraPosition.transform.position;
+                var hudCameraRot = _cameraPosition.transform.rotation;
                 Player.main.SetPosition(new Vector3(hudCameraPos.x, Player.main.transform.position.y, hudCameraPos.z), hudCameraRot);
                 _playerBody.SetActive(false);
-                //Player.main.gameObject.transform.position = new Vector3(hudCameraPos.x, Player.main.gameObject.transform.position.y, hudCameraPos.z);
                 SNCameraRoot.main.transform.position = hudCameraPos;
                 SNCameraRoot.main.transform.rotation = hudCameraRot;
             }
         }
-
-        internal void ExitStore()
-        {
-            _isInUse = false;
-            SNCameraRoot.main.transform.localPosition = Vector3.zero;
-            SNCameraRoot.main.transform.localRotation = Quaternion.identity;
-            ExitLockedMode();
-            _playerBody.SetActive(true);
-        }
-
-        private void ExitLockedMode()
-        {
-            Player.main.ExitLockedMode(false, false);
-            InterceptInput(false);
-        }
-
+        
         #endregion
+    }
+
+    internal class TelepowerPylonTrigger : MonoBehaviour
+    {
+        internal bool IsPlayerInRange;
+
+        internal Action<bool> onTriggered { get; set; }
+
+        private void OnTriggerEnter(Collider collider)
+        {
+            if (collider.gameObject.layer != 19) return;
+            IsPlayerInRange = true;
+            onTriggered?.Invoke(true);
+        }
+
+        private void OnTriggerStay(Collider collider)
+        {
+            if (collider.gameObject.layer != 19 || IsPlayerInRange) return;
+            onTriggered?.Invoke(true);
+            IsPlayerInRange = true;
+        }
+
+        private void OnTriggerExit(Collider collider)
+        {
+            if (collider.gameObject.layer != 19) return;
+            IsPlayerInRange = false;
+            onTriggered?.Invoke(false);
+
+        }
     }
 
     internal enum TelepowerPylonUpgrade

@@ -112,6 +112,9 @@
       <HintPath>..\Dependancies\UnityEngine.InputLegacyModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="UnityEngine.ParticleSystemModule">
+      <HintPath>..\Dependancies\UnityEngine.ParticleSystemModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.PhysicsModule">
       <HintPath>..\Dependancies\UnityEngine.PhysicsModule.dll</HintPath>
       <Private>False</Private>
@@ -165,6 +168,7 @@
     <Compile Include="PowerStorage\Structs\SlotDefinition.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Spawnables\TelepowerUpgradeSpawnable.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FCS_AlterraHub\FCS_AlterraHub.csproj">

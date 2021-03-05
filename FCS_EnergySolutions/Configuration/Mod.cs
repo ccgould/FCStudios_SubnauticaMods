@@ -88,8 +88,7 @@ namespace FCS_EnergySolutions.Configuration
                 new Ingredient(AlterraGenKitClassID.ToTechType(), 1),
             }
         };
-
-
+        
         internal const string ModDescription ="";
 
         internal static event Action<SaveData> OnDataLoaded;
@@ -231,6 +230,11 @@ namespace FCS_EnergySolutions.Configuration
         internal static string GetModDirectory()
         {
             return Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        }
+
+        public static string GetAssetPath()
+        {
+            return Path.Combine(GetModDirectory(), "Assets");
         }
         #endregion
 

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using FCS_AlterraHub.Mono;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Json;
 using SMLHelper.V2.Options;
@@ -39,9 +40,18 @@ namespace FCS_EnergySolutions.Configuration
         [Toggle("[Solar Panel Cluster] Is Mod Enabled", Tooltip = "Enables/Disables Solar Panel Cluster from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool IsAlterraSolarPanelClusterEnabled = true;
 
-        [Toggle("[Telepower Pylon] Is Mod Enabled", Tooltip = "Enables/Disables Telepower Pylon from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+        [Toggle("[Telepower Pylon] Is Mod Enabled", Order = 1,Tooltip = "Enables/Disables Telepower Pylon from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool IsTelepowerPylonEnabled = true;
 
+        [Slider("[Telepower Pylon] Pylon Effects Brightness", 0, 1, Step = 0.1f, Format = "{0:F2}", DefaultValue = 1,
+            Order = 1,Tooltip = "Allows you to adjust the brightness of the trail effect in the telepower Pylon effects."),
+         OnChange(nameof(TelepowerPylonBrightnessChangeEvent))]
+        public float TelepowerPylonTrailBrightness { get; set; } = 1;
+
+
+        [Slider("[Telepower Pylon] Pylon Power Usage Per Meter", 0, 0.1f, Step = 0.01f, Format = "{0:F2}", DefaultValue = 0.01f,
+            Order = 1,Tooltip = "Allows you to adjust the power usage of the Telepower Pylon.")]
+        public float TelepowerPylonPowerUsagePerMeter { get; set; } = 0.01f;
 
         [Toggle("[PowerStorage] Is Mod Enabled", Tooltip = "Enables/Disables PowerStorage from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool IsPowerStorageEnabled = true;
@@ -80,5 +90,13 @@ namespace FCS_EnergySolutions.Configuration
             {"floating",300f },
             {"None",0f }
         };
+
+
+        private static void TelepowerPylonBrightnessChangeEvent(SliderChangedEventArgs e)
+        {
+            BaseManager.GlobalNotifyByID(Mod.TelepowerPylonTabID, "UpdateEffects");
+        }
+
+
     }
 }

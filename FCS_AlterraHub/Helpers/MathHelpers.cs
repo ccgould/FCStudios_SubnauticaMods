@@ -28,15 +28,16 @@ namespace FCS_AlterraHub.Helpers
             return num.ToString("#,0");
         }
 
-        public static double PowerLossOverDistance(double distanceInMeters)
+        public static double PowerLossOverDistance(double distanceInMeters,double powerTransmitted)
         {
+
             //waveLengthInMeters = speed of light(m/s) * frequency(MHz)
             double speedOfLight = 3 * Math.Pow(10,8);
-            QModServices.Main.AddCriticalMessage($"Speed Of Light: {speedOfLight}");
+            //QModServices.Main.AddCriticalMessage($"Speed Of Light: {speedOfLight}");
             double frequencyInGHz = 5 * Math.Pow(10, 9);
-            QModServices.Main.AddCriticalMessage($"Frequency: {frequencyInGHz}");
+            //QModServices.Main.AddCriticalMessage($"Frequency: {frequencyInGHz}");
             double waveLengthInMeters = speedOfLight / frequencyInGHz;
-            QModServices.Main.AddCriticalMessage($"Wave Length: {waveLengthInMeters}");
+            //QModServices.Main.AddCriticalMessage($"Wave Length: {waveLengthInMeters}");
 
             return Math.Pow(4 * Math.PI * distanceInMeters, 2) / Math.Pow(waveLengthInMeters, 2);
         }

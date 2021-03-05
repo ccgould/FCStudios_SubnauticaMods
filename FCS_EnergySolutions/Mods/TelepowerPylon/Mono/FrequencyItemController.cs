@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using FCS_EnergySolutions.Mods.TelepowerPylon.Model;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
@@ -17,7 +18,15 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
             var delBTN = gameObject.GetComponentInChildren<Button>();
             delBTN.onClick.AddListener(() =>
             {
-                ParentController.DeleteFrequencyItemAndDisconnectRelay(this); 
+                if (parent.GetCurrentMode() == TelepowerPylonMode.PULL)
+                {
+                    ParentController.DeleteFrequencyItemAndDisconnectRelay(TargetController.UnitID);
+                }
+                else
+                {
+                    targetController.DeleteFrequencyItemAndDisconnectRelay(ParentController.UnitID);
+                }
+
                 Destroy(gameObject);
             });
             _text.text = $"Unit ID : {targetController.UnitID}";

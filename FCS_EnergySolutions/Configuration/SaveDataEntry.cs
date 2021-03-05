@@ -77,7 +77,8 @@ namespace FCS_EnergySolutions.Configuration
         [JsonProperty] internal Vec4 SecondaryBody { get; set; }
         [JsonProperty] internal FCSPowerStates PowerState { get; set; }
         [JsonProperty] internal TelepowerPylonMode PylonMode { get; set; }
-        public List<string> CurrentConnections { get; set; }
+        [JsonProperty] internal List<string> CurrentConnections { get; set; }
+        [JsonProperty] internal TelepowerPylonUpgrade Upgrade { get; set; }
     }
     
     [Serializable]

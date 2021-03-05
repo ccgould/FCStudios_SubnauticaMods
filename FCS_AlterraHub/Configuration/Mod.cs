@@ -148,7 +148,7 @@ namespace FCS_AlterraHub.Configuration
 
         public static FCSGamePlaySettings GamePlaySettings { get; set; } = new FCSGamePlaySettings();
 
-        internal static string GetAssetPath()
+        public static string GetAssetPath()
         {
             return Path.Combine(GetModDirectory(), "Assets");
         }
@@ -196,7 +196,7 @@ namespace FCS_AlterraHub.Configuration
             if (Directory.Exists(path))
             {
                 string[] allfiles = Directory.GetFiles(path, "KnownDevices.json", SearchOption.AllDirectories);
-                QModServices.Main.AddCriticalMessage($"All Files Count: {allfiles.Length}");
+                //QModServices.Main.AddCriticalMessage($"All Files Count: {allfiles.Length}");
 
                 foreach (var file in allfiles)
                 {
@@ -209,7 +209,7 @@ namespace FCS_AlterraHub.Configuration
                 }
             }
 
-            QModServices.Main.AddCriticalMessage($"Found: {items.Count} Devices");
+            //QModServices.Main.AddCriticalMessage($"Found: {items.Count} Devices");
 
             OnDevicesDataLoaded?.Invoke(items.ToList());
         }

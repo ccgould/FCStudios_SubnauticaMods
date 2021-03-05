@@ -26,6 +26,8 @@ namespace FCS_EnergySolutions.Configuration
             { $"{ModKey}_NotOnPlatform","JetStreamT242 must be built on a base platform to operate. This is best for efficiency and stability."},
             { $"{ModKey}_SolarClusterHover","Solar panel Cluster (sun: {0}% charge: {1} /{2}) (Power Generation Per Second: {3})"},
             { $"{ModKey}_RemoveAllTelepowerConnections","Please remove all connections to in this pylon before deconstruction."},
+            { $"{ModKey}_RemoveAllTelepowerConnectionsPush","Please remove all connections to this pylon before switching to push mode."},
+            { $"{ModKey}_RemoveAllTelepowerConnectionsPull","Please remove all connections to this pylon before switching to pull mode."},
             { $"{ModKey}_MaximumConnectionsReached","The maximum amount of connections have been reached. Please use an upgrade to get more slots."},
         };
 
@@ -124,6 +126,16 @@ namespace FCS_EnergySolutions.Configuration
         public static string RemoveAllTelepowerConnections()
         {
             return GetLanguage($"{ModKey}_RemoveAllTelepowerConnections");
+        }
+
+        public static string RemoveAllTelepowerConnectionsPush()
+        {
+            return GetLanguage($"{ModKey}_RemoveAllTelepowerConnectionsPush");
+        }
+
+        public static string RemoveAllTelepowerConnectionsPull()
+        {
+            return GetLanguage($"{ModKey}_RemoveAllTelepowerConnectionsPull");
         }
 
         public static string MaximumConnectionsReached()

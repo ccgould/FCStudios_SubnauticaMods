@@ -28,6 +28,7 @@ namespace FCS_EnergySolutions.Buildable
         public static string EmissiveControllerMaterial { get; } = $"{Mod.ModName}_E_Controller";
         public static GameObject PowerStoragePrefab { get; set; }
         public static GameObject FrequencyItemPrefab { get; set; }
+        public static GameObject PylonUpgradeDataBoxPrefab { get; set; }
 
 
         internal static void Initialize()
@@ -43,6 +44,7 @@ namespace FCS_EnergySolutions.Buildable
             }
 
             AlterraGenItemPrefab = GetPrefab("ItemButton");
+            PylonUpgradeDataBoxPrefab = GetPrefab("PylonUpgradeDataBox",true);
             FrequencyItemPrefab = GetPrefab("FrequencyItem");
             PowerStoragePrefab = GetPrefab(Mod.PowerStoragePrefabName);
         }
