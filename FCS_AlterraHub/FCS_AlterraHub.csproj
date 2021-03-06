@@ -187,6 +187,7 @@
     <Compile Include="Model\GUI\FCSGuiToggle.cs" />
     <Compile Include="Model\InterfaceInteraction.cs" />
     <Compile Include="Model\KdTree.cs" />
+    <Compile Include="Model\PlayerLockInteractionController.cs" />
     <Compile Include="Model\PowercellData.cs" />
     <Compile Include="Model\ProximityActivate.cs" />
     <Compile Include="Model\TimeCache.cs" />

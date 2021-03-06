@@ -96,5 +96,10 @@ namespace FCS_AlterraHub.Helpers
             if (currentDevice == null || device == null ) return 0f;
             return Vector3.Distance(currentDevice.gameObject.transform.position, device.gameObject.transform.position);
         }
+
+        public static bool CheckIfInRange(GameObject mainGameObject, GameObject gameObject, int range)
+        {
+            return Vector3.Distance(mainGameObject.transform.position, gameObject.transform.position) <= range;
+        }
     }
 }

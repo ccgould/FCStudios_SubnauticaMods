@@ -5,6 +5,7 @@ using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Interfaces;
+using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Mono.Controllers;
 using FCS_AlterraHub.Mono.ObjectPooler;
@@ -21,7 +22,7 @@ using UnityEngine.UI;
 
 namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
 {
-    internal class AlterraStorageController : FcsDevice, IFCSSave<SaveData>, IHandTarget, IFCSStorage
+    internal class AlterraStorageController : FcsDevice, IFCSSave<SaveData>, IHandTarget, IFCSStorage, IFCSDisplay
     {
         private bool _runStartUpOnEnable;
         private AlterraStorageDataEntry _savedData;
@@ -44,6 +45,8 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
         private readonly List<InventoryButton> _inventoryButtons = new List<InventoryButton>();
         private NameController _nameController;
         private Text _labelText;
+        private PaginatorController _paginatorController;
+
         public override StorageType StorageType { get; } = StorageType.AlterraStorage;
 
         #region Unity Methods
@@ -177,6 +180,9 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
             _inventoryGrid.OnLoadDisplay += OnLoadItemsGrid;
             _inventoryGrid.Setup(12, gameObject, Color.gray, Color.white, OnButtonClick);
 
+            _paginatorController = GameObjectHelpers.FindGameObject(gameObject, "Paginator").AddComponent<PaginatorController>();
+            _paginatorController.Initialize(this);
+
             MaterialHelpers.ChangeEmissionStrength(ModelPrefab.EmissionControllerMaterial,gameObject,2f);
 
             UpdateStorageCount();
@@ -222,21 +228,31 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
             try
             {
                 if (_isBeingDestroyed || _storageContainer == null) return;
+               
                 var grouped = _storageContainer.GetItemsWithin();
+
                 if (grouped == null) return;
+
                 if (data.EndPosition > grouped.Count)
                 {
                     data.EndPosition = grouped.Count;
                 }
-                for (int i = data.EndPosition; i < data.MaxPerPage - 1; i++)
+
+                for (int i = 0; i < data.MaxPerPage; i++)
                 {
                     _inventoryButtons[i].Reset();
                 }
 
+                int w = 0;
+
                 for (int i = data.StartPosition; i < data.EndPosition; i++)
                 {
-                    _inventoryButtons[i].Set(grouped.ElementAt(i).Key, grouped.ElementAt(i).Value);
+                    _inventoryButtons[w++].Set(grouped.ElementAt(i).Key, grouped.ElementAt(i).Value);
                 }
+
+
+                _inventoryGrid.UpdaterPaginator(grouped.Count);
+                _paginatorController.ResetCount(_inventoryGrid.GetMaxPages());
 
             }
             catch (Exception e)
@@ -410,6 +426,16 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
         public override int GetMaxStorage()
         {
             return MAXSTORAGE;
+        }
+
+        public void GoToPage(int index)
+        {
+            _inventoryGrid.DrawPage(index);
+        }
+
+        public void GoToPage(int index, PaginatorController sender)
+        {
+            _inventoryGrid.DrawPage(index);
         }
     }
 
