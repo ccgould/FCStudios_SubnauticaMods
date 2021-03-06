@@ -92,8 +92,9 @@ namespace FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Mono
 
             if (_storage == null)
             {
+                var size = CraftData.GetItemSize(TechType.FireExtinguisher);
                 _storage = gameObject.AddComponent<FCSStorage>();
-                _storage.Initialize(1, gameObject.FindChild("StorageRoot"));
+                _storage.Initialize(1, size.x,size.y, "FCSStorage", gameObject.FindChild("StorageRoot"));
                 _storage.ItemsContainer.onAddItem += OnStorageAddItem;
                 _storage.ItemsContainer.onRemoveItem += OnStorageRemoveItem;
                 _storage.ItemsContainer.SetAllowedTechTypes(new[]{TechType.FireExtinguisher});
