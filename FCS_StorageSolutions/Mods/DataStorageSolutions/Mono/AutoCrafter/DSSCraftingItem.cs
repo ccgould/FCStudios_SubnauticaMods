@@ -1,9 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Text;
-using FCS_AlterraHub.Model;
+﻿using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_StorageSolutions.Configuration;
-using FCSCommon.Utilities;
 
 namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
 {
@@ -13,8 +10,8 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
         private bool _isInitialized;
         private DSSAutoCrafterDisplay _controller;
         private TechType _techType;
-        private bool _isRecurring;
         private FCSToolTip _toolTip;
+
 
         private void Initialize()
         {
@@ -43,7 +40,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
             TextLineOne = AuxPatchers.CraftFormatted(itemName);
             Show();
         }
-
+        
         internal void Reset()
         {
             Initialize();

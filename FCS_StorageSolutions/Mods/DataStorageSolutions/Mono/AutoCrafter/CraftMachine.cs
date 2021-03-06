@@ -54,7 +54,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
             {
                 _craftingItem.AmountCompleted += 1;
                 _mono.Manager.ConsumeIngredientsFor(_craftingItem.TechType);
-                _mono.Manager.AddItemToContainer(_craftingItem.TechType.ToInventoryItemLegacy());
+                _mono.Manager.AddItemToContainer(_craftingItem.FixCustomTechType().ToInventoryItemLegacy());
                 _mono.CraftManager.SpawnItem(_craftingItem.TechType, CrafterID);
                 _startBuffer = MAXTIME;
             }
