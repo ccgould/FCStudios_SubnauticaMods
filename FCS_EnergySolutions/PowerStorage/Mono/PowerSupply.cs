@@ -232,5 +232,10 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
         {
             _powerCharger.OpenStorage();
         }
+
+        public bool GetIsReleasingPower()
+        {
+            return _allowedToDisCharge;
+        }
     }
 }

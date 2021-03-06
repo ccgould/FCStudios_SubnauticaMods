@@ -72,9 +72,46 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
 
         internal float CalculatePowerPercentage()
         {
-            var baseCapacity = Manager.GetBasePowerCapacity() - _powercellSupply.GetMaxPower();
+            var baseCapacity = Manager.GetBasePowerCapacity() - TotalPowerStorageCapacityAtBase();
+            QuickLogger.Debug($"Base Capacity: {baseCapacity}",true);
             if (CalculateBasePower() <= 0 || baseCapacity <= 0) return 0;
             return CalculateBasePower() / baseCapacity  * 100;
+        }
+
+        private float TotalPowerStorageCapacityAtBase()
+        {
+            var powerStorages = Manager.GetDevices(Mod.PowerStorageTabID);
+
+            float amount = 0f;
+            foreach (FcsDevice powerStorage in powerStorages)
+            {
+                var curPowerStorage = (PowerStorageController)powerStorage;
+
+                if (curPowerStorage.IsReleasingPower())
+                {
+                    amount += powerStorage.GetMaxPower();
+                }
+            }
+
+            return amount;
+        }
+
+        private float TotalPowerStoragePowerAtBase()
+        {
+            var powerStorages = Manager.GetDevices(Mod.PowerStorageTabID);
+
+            float amount = 0f;
+            foreach (FcsDevice powerStorage in powerStorages)
+            {
+                var curPowerStorage = (PowerStorageController) powerStorage;
+
+                if (curPowerStorage.IsReleasingPower())
+                {
+                    amount += powerStorage.GetStoredPower();
+                }
+            }
+
+            return amount;
         }
 
         private void ChangeStatusLights(bool value)
@@ -220,6 +257,11 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
             IsInitialized = true;
         }
 
+        public bool IsReleasingPower()
+        {
+            return _powercellSupply.GetIsReleasingPower();
+        }
+
         public override void OnProtoSerialize(ProtobufSerializer serializer)
         {
             QuickLogger.Debug("In OnProtoSerialize");
@@ -324,7 +366,21 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
 
         public float CalculateBasePower()
         {
-           return Manager.GetPower() - _powercellSupply.GetPower();
+            QuickLogger.Debug($"TotalBasePower: {TotalPowerStoragePowerAtBase()}",true);
+            QuickLogger.Debug($"TotalBasePower: {TotalPowerStorageCapacityAtBase()}",true);
+            QuickLogger.Debug($"CalculateBasePower: {Manager.GetPower() - TotalPowerStoragePowerAtBase()}",true);
+            QuickLogger.Debug($"CalculateBasePower: {Manager.GetPower() - TotalPowerStoragePowerAtBase()}",true);
+           return Manager.GetPower() - TotalPowerStoragePowerAtBase();
+        }
+
+        public override float GetMaxPower()
+        {
+            return _powercellSupply?.GetMaxPower() ?? 0f;
+        }
+
+        public override float GetStoredPower()
+        {
+            return _powercellSupply?.GetPower() ?? 0f;
         }
     }
 }

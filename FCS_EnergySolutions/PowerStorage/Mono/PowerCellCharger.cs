@@ -18,7 +18,7 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
         private readonly Color _colorEmpty = new Color(1f, 0f, 0f, 1f);
         private readonly Color _colorHalf = new Color(1f, 1f, 0f, 1f);
         private readonly Color _colorFull = new Color(0f, 1f, 0f, 1f);
-        protected const float chargeAttemptInterval = 5f;
+        protected const float ChargeAttemptInterval = 5f;
         public float ChargeSpeed = 0.005f;
         protected Dictionary<string, IBattery> Batteries;
         protected Dictionary<string, SlotDefinition> Slots;
@@ -164,9 +164,7 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
 					NextChargeAttemptTimer = 0f;
 				}
 			}
-
-			bool charging = false;
-
+            
 			if (NextChargeAttemptTimer <= 0f)
 			{
 				int num = 0;
@@ -195,15 +193,25 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
 						}
 					}
 					float num4 = 0f;
-					if (num2 > 0f && powerRelay.GetPower() > num2)
+					if (num2 > 0f && _mono.CalculateBasePower() > num2)
 					{
 						flag = true;
-						powerRelay.ConsumeEnergy(num2, out num4);
-					}
+                        foreach (IPowerInterface powerSource in powerRelay.inboundPowerSources)
+                        {
+                            if (powerSource is PowerSupply)
+                            {
+                                continue;
+                            }
+
+                            powerSource.ConsumeEnergy(num2, out num4);
+                            num2 -= num4;
+                            if(num2 <= 0) break;
+                        }
+                    }
 					if (num4 > 0f)
 					{
-						charging = true;
 						float num5 = num4 / num;
+
 						foreach (KeyValuePair<string, IBattery> keyValuePair2 in Batteries)
 						{
 							string key = keyValuePair2.Key;
@@ -234,20 +242,7 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
 				{
 					NextChargeAttemptTimer = 5f;
 				}
-				//this.ToggleUIPowered(num == 0 || flag);
 			}
-			if (NextChargeAttemptTimer >= 0f)
-			{
-				int num8 = Mathf.CeilToInt(NextChargeAttemptTimer);
-				string text = null;
-				//if (!this.unpoweredNotifyStrings.TryGetValue(num8, out text))
-				//{
-				//	text = Language.main.GetFormat<int>("ChargerInsufficientPower", num8);
-				//	this.unpoweredNotifyStrings.Add(num8, text);
-				//}
-				//this.uiUnpoweredText.text = text;
-			}
-			//this.ToggleChargeSound(charging);
         }
 
         protected void UpdateVisuals()
@@ -462,11 +457,6 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
         public void OpenStorage()
         {
             _dumpContainer.OpenStorage();
-        }
-
-        public bool IsCharging()
-        {
-            return _allowedToCharge;
         }
     }
 }
