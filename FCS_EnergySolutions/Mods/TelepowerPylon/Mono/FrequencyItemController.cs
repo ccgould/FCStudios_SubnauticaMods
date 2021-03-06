@@ -18,13 +18,15 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
             var delBTN = gameObject.GetComponentInChildren<Button>();
             delBTN.onClick.AddListener(() =>
             {
-                if (parent.GetCurrentMode() == TelepowerPylonMode.PULL)
+                if (ParentController.GetCurrentMode() == TelepowerPylonMode.PULL)
                 {
                     ParentController.DeleteFrequencyItemAndDisconnectRelay(TargetController.UnitID);
+                    TargetController.DeleteFrequencyItemAndDisconnectRelay(ParentController.UnitID);
                 }
                 else
                 {
-                    targetController.DeleteFrequencyItemAndDisconnectRelay(ParentController.UnitID);
+                    TargetController.DeleteFrequencyItemAndDisconnectRelay(ParentController.UnitID);
+                    ParentController.DeleteFrequencyItemAndDisconnectRelay(TargetController.UnitID);
                 }
 
                 Destroy(gameObject);

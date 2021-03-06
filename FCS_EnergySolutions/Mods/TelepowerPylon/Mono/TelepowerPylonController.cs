@@ -417,7 +417,11 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
                 return;
             }
 
-
+            if (unit.Value.Manager == Manager)
+            {
+                _messageBox.Show($"Cannot connect to a pylon at the same base",FCSMessageButton.OK,null);
+                return;
+            }
             
             if (unit.Value == null)
             {
@@ -512,6 +516,7 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
 
         private void DeleteFrequencyItem(string id)
         {
+            QuickLogger.Debug($"Attempting to delete current connection {id}",true);
             if (_currentConnections.ContainsKey(id))
             {
                 _currentConnections.Remove(id);
