@@ -80,6 +80,15 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.TelepowerPylonTabID, Mod.ModName);
             FCS_AlterraHub.Patches.Player_Update_Patch.OnWorldSettled += OnWorldSettled;
+
+            if (Manager == null)
+            {
+                foreach (ParticleSystem particle in _particles)
+                {
+                    particle.Stop();
+                }
+            }
+            
             //InvokeRepeating(nameof(MakeConnection),1f,1f);
         }
         
@@ -133,6 +142,9 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
 
         private void Update()
         {
+            _canvas.gameObject.SetActive(Manager != null);
+            
+
             if (Input.GetKeyDown(KeyCode.Escape) && _isInRange)
             {
                 ExitDisplay();
@@ -757,10 +769,17 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
         {
             HandReticle main = HandReticle.main;
 
+            if (!IsInitialized || !IsConstructed)
+            {
+                main.SetIcon(HandReticle.IconType.Default);
+                return;
+            }
+
             if (_isInRange)
             {
-                main.SetInteractText($"Unit ID: {UnitID} Click to use configure Telepower Pylon", $"For more information press {FCS_AlterraHub.QPatch.Configuration.PDAInfoKeyCode} | Power Usage: {CalculatePowerUsage()}");
-                main.SetIcon(HandReticle.IconType.Info);
+                var additionalInformation = Manager == null ? "\nMust be built on platform." : string.Empty;
+                main.SetInteractText($"Unit ID: {UnitID} {additionalInformation} \nClick to use configure Telepower Pylon", $"For more information press {FCS_AlterraHub.QPatch.Configuration.PDAInfoKeyCode} | Power Usage: {CalculatePowerUsage()}");
+                main.SetIcon(Manager == null ? HandReticle.IconType.HandDeny : HandReticle.IconType.Info);
             }
             
             if (Input.GetKeyDown(FCS_AlterraHub.QPatch.Configuration.PDAInfoKeyCode))
@@ -771,6 +790,11 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
         
         public void OnHandClick(GUIHand hand)
         {
+            if (!IsInitialized || !IsConstructed || Manager== null)
+            {
+                return;
+            }
+
             if (_isInRange)
             {
                 InterceptInput(true);
