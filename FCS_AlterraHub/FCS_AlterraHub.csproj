@@ -185,6 +185,7 @@
     <Compile Include="Model\FilterSystem.cs" />
     <Compile Include="Model\Fridge.cs" />
     <Compile Include="Model\GUI\FCSGuiToggle.cs" />
+    <Compile Include="Model\InterfaceInteraction.cs" />
     <Compile Include="Model\KdTree.cs" />
     <Compile Include="Model\PowercellData.cs" />
     <Compile Include="Model\ProximityActivate.cs" />

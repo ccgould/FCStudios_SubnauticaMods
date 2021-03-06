@@ -11,12 +11,13 @@ using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using System;
 using FCS_AlterraHub.Enumerators;
+using FCS_AlterraHub.Model;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Mono
 {
-    internal class BaseUtilityUnitController : FcsDevice, IFCSSave<SaveData>
+    internal class BaseUtilityUnitController : FcsDevice, IFCSSave<SaveData>, IHandTarget
     {
         private bool _runStartUpOnEnable;
         private bool _isFromSave;
@@ -29,7 +30,8 @@ namespace FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Mono
         private MotorHandler _fanMotor;
         private AudioManager _audioManager;
         private bool _prevPowerState;
-        private Canvas _canvas;
+        private GameObject _canvas;
+        private InterfaceInteraction _interactionHelper;
         public OxygenManager OxygenManager { get; set; }
         public override bool IsOperational => IsConstructed && Manager != null && IsInitialized;
 
@@ -37,9 +39,14 @@ namespace FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Mono
         private void Start()
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.BaseUtilityUnitTabID, Mod.ModName);
+            
             if (Manager == null)
             {
                 TurnOffDevice();
+            }
+            else
+            {
+                TurnOnDevice();
             }
         }
 
@@ -76,7 +83,8 @@ namespace FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Mono
         public override void Initialize()
         {
             _isRunningHash = Animator.StringToHash("IsRunning");
-            _canvas = gameObject.GetComponentInChildren<Canvas>();
+            _canvas = GameObjectHelpers.FindGameObject(gameObject, "Canvas");
+            _interactionHelper = _canvas.AddComponent<InterfaceInteraction>();
             _fanMotor = GameObjectHelpers.FindGameObject(gameObject, "FanRotor").AddComponent<MotorHandler>();
             _fanMotor.Initialize(200);
 
@@ -128,6 +136,12 @@ namespace FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Mono
 
         private void UpdateAnimation()
         {
+            if (Manager == null)
+            {
+                _fanMotor.StopMotor();
+                CancelInvoke(nameof(UpdateAnimation));
+                return;
+            }
             var currentState = Manager.HasEnoughPower(GetPowerUsage());
             if (_prevPowerState == currentState) return;
             _prevPowerState = currentState;
@@ -158,7 +172,7 @@ namespace FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Mono
 
         public override float GetPowerUsage()
         {
-            return 0.5066666666666667f;
+            return Manager == null ? 0f : 0.5066666666666667f;
         }
         
         public override void OnProtoSerialize(ProtobufSerializer serializer)
@@ -242,7 +256,36 @@ namespace FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Mono
 
         public override void TurnOffDevice()
         {
-            _canvas.gameObject.SetActive(false);
+            _canvas.SetActive(false);
+        }
+
+        public override void TurnOnDevice()
+        {
+            _canvas.SetActive(true);
+        }
+
+        public void OnHandHover(GUIHand hand)
+        {
+
+            HandReticle main = HandReticle.main;
+
+            if (!IsInitialized || !IsConstructed || _interactionHelper.IsInRange)
+            {
+                main.SetIcon(HandReticle.IconType.Default);
+                return;
+            }
+
+            var additionalInformation = Manager == null ? "\nMust be built on platform." : string.Empty;
+            main.SetInteractTextRaw($"Unit ID: {UnitID} {additionalInformation}", $"For more information press {FCS_AlterraHub.QPatch.Configuration.PDAInfoKeyCode} | Power Usage Per Second: {GetPowerUsage()}");
+            main.SetIcon(Manager == null ? HandReticle.IconType.HandDeny : HandReticle.IconType.Info);
+            if (Input.GetKeyDown(FCS_AlterraHub.QPatch.Configuration.PDAInfoKeyCode))
+            {
+
+            }
+        }
+
+        public void OnHandClick(GUIHand hand)
+        {
         }
     }
 }
