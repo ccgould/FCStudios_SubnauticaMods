@@ -53,14 +53,14 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         private Text _statusLabel;
         private FCSToggleButton _alterraRangeToggle;
         private FCSToggleButton _alterraStorageToggle;
-        private GridHelperPooled _alterraStorageGrid;
         private ObjectPooler _pooler;
         private HashSet<DrillInventoryButton> _trackedItems = new HashSet<DrillInventoryButton>();
         private InterfaceInteraction _interfaceInteraction;
         private float _updateStatusTimeLeft;
         private GridHelperPooled _libraryGrid;
         private GameObject _libraryDialogWindow;
-        private const string AlterraStoragePoolTag = "AlterraStorage";
+        private GridHelperV2 _remoteStorageGrid;
+        private Text _alterraStorageInformation;
         private const string InventoryPoolTag = "Inventory";
         private const string FunctionPoolTag = "Function";
 
@@ -245,7 +245,6 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
                 if (_pooler == null)
                 {
                     _pooler = gameObject.AddComponent<ObjectPooler>();
-                    _pooler.AddPool(AlterraStoragePoolTag, 6, ModelPrefab.DeepDrillerOreBTNPrefab);
                     _pooler.AddPool(InventoryPoolTag, 12, ModelPrefab.DeepDrillerItemPrefab);
                     _pooler.AddPool(FunctionPoolTag, 9, ModelPrefab.DeepDrillerFunctionOptionItemPrefab);
                     _pooler.Initialize();
@@ -535,11 +534,9 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
 
                 #endregion
 
-                #region Alterra Storage Grid
+                #region Information
 
-                _alterraStorageGrid = _mono.gameObject.AddComponent<GridHelperPooled>();
-                _alterraStorageGrid.OnLoadDisplay += OnLoadAlterraStorageGrid;
-                _alterraStorageGrid.Setup(6, _pooler, alterraStoragePage, OnButtonClick, false);
+                _alterraStorageInformation = GameObjectHelpers.FindGameObject(gameObject, "Information")?.GetComponent<Text>();
 
                 #endregion
 
@@ -565,9 +562,6 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
                     InterfaceButtonMode.Background, OnButtonClick, Color.white, Color.cyan,5);
 
                 #endregion
-
-
-
 
                 #region Programming Back Button
 
@@ -640,43 +634,11 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             _libraryGrid.UpdaterPaginator(grouped.Count);
         }
 
-        private void OnLoadAlterraStorageGrid(DisplayDataPooled data)
+
+        internal void RefreshAlterraStorageList(int amount)
         {
-            _pooler.Reset(AlterraStoragePoolTag);
-
-            var grouped = _mono.TransferManager.GetTrackedAlterraStorage();
-            var active = data.Pool.GetActive();
-            
-            if (grouped.Count <= 0)
-            {
-                data.Pool.Reset(AlterraStoragePoolTag);
-            }
-
-            if (data.EndPosition > grouped.Count)
-            {
-                data.EndPosition = grouped.Count;
-            }
-
-            for (int i = data.StartPosition; i < data.EndPosition; i++)
-            {
-                GameObject buttonPrefab = data.Pool.SpawnFromPool(AlterraStoragePoolTag, data.ItemsGrid);
-
-                if (buttonPrefab == null || data.ItemsGrid == null)
-                {
-                    return;
-                }
-
-                var item = buttonPrefab.EnsureComponent<InfoButton>();
-                item.TextLineOne = grouped[i].UnitID;
-                uGUI_Icon icon = InterfaceHelpers.FindGameObject(buttonPrefab, "Icon").EnsureComponent<uGUI_Icon>();
-                icon.sprite = SpriteManager.Get(Mod.AlterraStorageTechType());
-            }
-            _alterraStorageGrid.UpdaterPaginator(grouped.Count);
-        }
-
-        internal void RefreshAlterraStorageList()
-        {
-            _alterraStorageGrid.DrawPage();
+            if(_alterraStorageInformation == null) return;
+            _alterraStorageInformation.text = $"Remote Storage Connections:\n{amount}";
         }
 
         private void OnUpgradeUpdate(UpgradeFunction obj)
@@ -732,15 +694,12 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
                     };
 
                     var activateButton = GameObjectHelpers.FindGameObject(buttonPrefab, "EnableToggleBTN");
-                    var activateToggleBTN = activateButton.AddComponent<FCSToggleButton>();
-                    activateToggleBTN.ButtonMode = InterfaceButtonMode.Background;
-                    activateToggleBTN.STARTING_COLOR = _startColor;
-                    activateToggleBTN.HOVER_COLOR = _hoverColor;
-                    activateToggleBTN.TextLineOne = FCSDeepDrillerBuildable.FilterButton();
-                    activateToggleBTN.OnButtonClick += (s, o) =>
+                    var activateToggleBTN = activateButton.GetComponent<Toggle>();
+                    //activateToggleBTN.TextLineOne = FCSDeepDrillerBuildable.FilterButton();
+                    activateToggleBTN.onValueChanged.AddListener((value =>
                     {
                         function.ToggleUpdate();
-                    };
+                    }));
                 }
 
                 _programmingGrid.UpdaterPaginator(grouped.Count);
@@ -999,11 +958,6 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         public Text GetStatusField()
         {
             return _statusLabel;
-        }
-
-        public void ResetAlterraStorageList()
-        {
-            _pooler.Reset(AlterraStoragePoolTag);
         }
     }
 

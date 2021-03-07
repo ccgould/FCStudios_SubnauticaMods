@@ -53,243 +53,276 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
                 //Check if the function name is valid
                 var functionName = GetFunctionName( functionString, out var fNameResult);
 
-                if (functionName)
+                if (!functionName) return;
+
+                var parameters = GetMethodParameters(functionString, out var paraResults);
+
+                if (!parameters) return;
+
+                switch (fNameResult)
                 {
-                    var parameters = GetMethodParameters(functionString, out var paraResults);
+                    case "OresPerDay":
 
-                    if (parameters)
-                    {
-                        switch (fNameResult)
-                        {
-                            case "OresPerDay":
+                        OresPerDayImplementation(functionString, ref upgrade, paraResults);
+                        break;
 
-                                var check = Upgrades.Any(x => x.UpgradeType == UpgradeFunctions.OresPerDay);
+                    case "MaxOreCount":
 
-                                if (check)
-                                {
-                                    QuickLogger.Message("Function already implemented. Updating Value", true);
-                                    var upgradeFunc = Upgrades.Single(x => x.UpgradeType == UpgradeFunctions.OresPerDay);
-                                    bool validFunc = OresPerDayUpgrade.IsValid(paraResults, out var orePerDayFunc);
-                                    if (validFunc)
-                                    {
-                                        ((OresPerDayUpgrade)upgradeFunc).OreCount = orePerDayFunc;
-                                    }
-                                    else
-                                    {
-                                        QuickLogger.Debug($"Invalid Function: {functionString}", true);
-                                    }
-                                    return;
-                                }
+                        MaxOreCountImplementation(functionString, ref upgrade, paraResults);
+                        break;
 
-                                bool valid = OresPerDayUpgrade.IsValid(paraResults, out var orePerDay);
+                    case "MinOreCount":
 
-                                if (valid)
-                                {
-                                    QuickLogger.Debug($"Function  Valid: {functionString}", true);
-                                    var orePerDayUpgrade = new OresPerDayUpgrade
-                                    {
-                                        IsEnabled = true,
-                                        Mono = _mono,
-                                        OreCount = orePerDay,
-                                    };
-                                    Upgrades.Add(orePerDayUpgrade);
-                                    OnUpgradeUpdate?.Invoke(orePerDayUpgrade);
-                                    _mono.OreGenerator.ApplyUpgrade(orePerDayUpgrade);
-                                    upgrade = orePerDayUpgrade;
-                                }
-                                else
-                                {
-                                    QuickLogger.Debug($"Invalid Function: {functionString}", true);
-                                }
-                                break;
+                        MinOreCountImplementation(functionString, ref upgrade, paraResults);
+                        break;
 
-                            case "MaxOreCount":
+                    case "SilkTouch":
 
-                                bool maxOreCountValid = MaxOreCountUpgrade.IsValid(paraResults, out var tuple);
+                        SilkTouchImplementation(functionString, ref upgrade, paraResults);
+                        break;
 
-                                if (maxOreCountValid)
-                                {
-                                    QuickLogger.Debug($"Function  Valid: {functionString}", true);
-                                    var maxOreCountCheck = Upgrades.Any(x => x.UpgradeType == UpgradeFunctions.MaxOreCount && ((MaxOreCountUpgrade)x).TechType == tuple.Item1);
+                    case "AutoShutDownAt":
 
-                                    if (maxOreCountCheck)
-                                    {
-                                        QuickLogger.Message("Function already implemented. Changing value", true);
-                                        var maxOreCountFunc = Upgrades.Single(x => x.UpgradeType == UpgradeFunctions.MaxOreCount && ((MaxOreCountUpgrade)x).TechType == tuple.Item1);
-                                        ((MaxOreCountUpgrade) maxOreCountFunc).Amount = tuple.Item2;
-                                        return;
-                                    }
+                        AutoShutDownImplementation(functionString, ref upgrade, paraResults);
+                        break;
 
-                                    var maxOreCountUpgrade = new MaxOreCountUpgrade
-                                    {
-                                        IsEnabled = true,
-                                        Mono = _mono,
-                                        Amount = tuple.Item2,
-                                        TechType = tuple.Item1
+                    case "AutoStartUpAt":
 
-                                    };
-                                    Upgrades.Add(maxOreCountUpgrade);
-                                    OnUpgradeUpdate?.Invoke(maxOreCountUpgrade);
-                                    _mono.OreGenerator.ApplyUpgrade(maxOreCountUpgrade);
-                                    upgrade = maxOreCountUpgrade;
-                                }
-                                else
-                                {
-                                    QuickLogger.Debug($"Invalid Function: {functionString}", true);
-                                }
-                                break;
+                        AutoStartUpImplementation(functionString, ref upgrade, paraResults);
+                        break;
+                    case "ConnectToBase":
 
-                            case "MinOreCount":
-
-                                var minOreCountCheck = Upgrades.Any(x =>
-                                    x.UpgradeType == UpgradeFunctions.MinOreCount);
-
-                                if (minOreCountCheck)
-                                {
-                                    QuickLogger.Message("Function already implemented.", true);
-                                    return;
-                                }
-
-                                bool minOreCountValid = MinOreCountUpgrade.IsValid(paraResults, out var minTuple);
-
-                                if (minOreCountValid)
-                                {
-                                    QuickLogger.Debug($"Function  Valid: {functionString}", true);
-                                    var maxOreCountUpgrade = new MaxOreCountUpgrade
-                                    {
-                                        IsEnabled = true,
-                                        Mono = _mono,
-                                        Amount = minTuple.Item2,
-                                        TechType = minTuple.Item1
-
-                                    };
-                                    Upgrades.Add(maxOreCountUpgrade);
-                                    upgrade = maxOreCountUpgrade;
-                                    OnUpgradeUpdate?.Invoke(maxOreCountUpgrade);
-                                }
-                                else
-                                {
-                                    QuickLogger.Debug($"Invalid Function: {functionString}", true);
-                                }
-                                break;
-
-                            case "SilkTouch":
-
-                                var silkTouchCheck = Upgrades.Any(x =>
-                                    x.UpgradeType == UpgradeFunctions.SilkTouch);
-
-                                if (silkTouchCheck)
-                                {
-                                    QuickLogger.Message("Function already implemented.", true);
-                                    return;
-                                }
-
-                                bool silkTouchCheckValid = SilkTouchUpgrade.IsValid(paraResults, out var silkTouchCheckTuple);
-
-                                if (silkTouchCheckValid)
-                                {
-                                    QuickLogger.Debug($"Function  Valid: {functionString}", true);
-                                    var silkTouchUpgrade = new SilkTouchUpgrade
-                                    {
-                                        IsEnabled = true,
-                                        Mono = _mono,
-                                        Amount = silkTouchCheckTuple.Item2,
-                                        TechType = silkTouchCheckTuple.Item1
-
-                                    };
-                                    Upgrades.Add(silkTouchUpgrade);
-                                    upgrade = silkTouchUpgrade;
-                                    OnUpgradeUpdate?.Invoke(silkTouchUpgrade);
-                                }
-                                else
-                                {
-                                    QuickLogger.Debug($"Invalid Function: {functionString}", true);
-                                }
-                                break;
-
-                            case "AutoShutDownAt":
-
-                                var autoShutdownAtCheck = Upgrades.Any(x =>
-                                    x.UpgradeType == UpgradeFunctions.AutoShutdownAt);
-
-                                if (autoShutdownAtCheck)
-                                {
-                                    QuickLogger.Message("Function already implemented.", true);
-                                    return;
-                                }
-
-                                bool autoShutdownAtValid = AutoShutDownAtUpgrade.IsValid(paraResults, out var autoShutdownAt);
-
-                                if (autoShutdownAtValid)
-                                {
-                                    QuickLogger.Debug($"Function  Valid: {functionString}", true);
-                                    var autoShutDownAtUpgrade = new AutoShutDownAtUpgrade { IsEnabled = true, Mono = _mono, Time = autoShutdownAt};
-                                    Upgrades.Add(autoShutDownAtUpgrade);
-                                    upgrade = autoShutDownAtUpgrade;
-                                    OnUpgradeUpdate?.Invoke(autoShutDownAtUpgrade);
-                                }
-                                else
-                                {
-                                    QuickLogger.Debug($"Invalid Function: {functionString}", true);
-                                }
-                                break;
-
-                            case "AutoStartUpAt":
-
-                                var autoStartUpAtCheck = Upgrades.Any(x =>
-                                    x.UpgradeType == UpgradeFunctions.AutoStartUpAt);
-
-                                if (autoStartUpAtCheck)
-                                {
-                                    QuickLogger.Message("Function already implemented.", true);
-                                    return;
-                                }
-
-                                bool autoStartUpAtValid = AutoStartUpAtUpgrade.IsValid(paraResults, out var autoStartUpAt);
-
-                                if (autoStartUpAtValid)
-                                {
-                                    QuickLogger.Debug($"Function  Valid: {functionString}", true);
-                                    var autoStartUpAtUpgrade = new AutoStartUpAtUpgrade { IsEnabled = true, Mono = _mono, Time = autoStartUpAt};
-                                    Upgrades.Add(autoStartUpAtUpgrade);
-                                    upgrade = autoStartUpAtUpgrade;
-                                    OnUpgradeUpdate?.Invoke(autoStartUpAtUpgrade);
-                                }
-                                else
-                                {
-                                    QuickLogger.Debug($"Invalid Function: {functionString}", true);
-                                }
-                                break;
-                            case "ConnectToBase":
-
-                                var connectToBaseCheck = Upgrades.Any(x =>
-                                    x.UpgradeType == UpgradeFunctions.ConnectToBase);
-
-                                if (connectToBaseCheck)
-                                {
-                                    QuickLogger.Message("Function already implemented.", true);
-                                    return;
-                                }
-
-                                bool connectToBaseValid = ConnectToBaseUpgrade.IsValid(paraResults, out var connectToBase);
-
-                                if (connectToBaseValid)
-                                {
-                                    QuickLogger.Debug($"Function  Valid: {functionString}", true);
-                                    var connectToBaseUpgrade = new ConnectToBaseUpgrade { IsEnabled = true, Mono = _mono,  BaseName= connectToBase.BaseFriendlyID };
-                                    Upgrades.Add(connectToBaseUpgrade);
-                                    upgrade = connectToBaseUpgrade;
-                                    OnUpgradeUpdate?.Invoke(connectToBaseUpgrade);
-                                }
-                                else
-                                {
-                                    QuickLogger.Debug($"Invalid Function: {functionString}", true);
-                                }
-                                break;
-
-                        }
-                    }
+                        ConnectToBaseImplementation(functionString, ref upgrade, paraResults);
+                        break;
                 }
+            }
+        }
+
+        private void ConnectToBaseImplementation(string functionString, ref UpgradeFunction upgrade, string[] paraResults)
+        {
+            var connectToBaseCheck = Upgrades.Any(x =>
+                x.UpgradeType == UpgradeFunctions.ConnectToBase);
+
+            if (connectToBaseCheck)
+            {
+                QuickLogger.Message("Function already implemented.", true);
+                return;
+            }
+
+            bool connectToBaseValid = ConnectToBaseUpgrade.IsValid(paraResults, out var connectToBase);
+
+            if (connectToBaseValid)
+            {
+                QuickLogger.Debug($"Function  Valid: {functionString}", true);
+                var connectToBaseUpgrade = new ConnectToBaseUpgrade {IsEnabled = true, Mono = _mono, BaseName = connectToBase.BaseFriendlyID};
+                Upgrades.Add(connectToBaseUpgrade);
+                upgrade = connectToBaseUpgrade;
+                connectToBaseUpgrade.TriggerUpdate();
+                OnUpgradeUpdate?.Invoke(connectToBaseUpgrade);
+            }
+            else
+            {
+                QuickLogger.Debug($"Invalid Function: {functionString}", true);
+            }
+        }
+
+        private void AutoStartUpImplementation(string functionString, ref UpgradeFunction upgrade, string[] paraResults)
+        {
+            var autoStartUpAtCheck = Upgrades.Any(x =>
+                x.UpgradeType == UpgradeFunctions.AutoStartUpAt);
+
+            if (autoStartUpAtCheck)
+            {
+                QuickLogger.Message("Function already implemented.", true);
+                return;
+            }
+
+            bool autoStartUpAtValid = AutoStartUpAtUpgrade.IsValid(paraResults, out var autoStartUpAt);
+
+            if (autoStartUpAtValid)
+            {
+                QuickLogger.Debug($"Function  Valid: {functionString}", true);
+                var autoStartUpAtUpgrade = new AutoStartUpAtUpgrade {IsEnabled = true, Mono = _mono, Time = autoStartUpAt};
+                Upgrades.Add(autoStartUpAtUpgrade);
+                upgrade = autoStartUpAtUpgrade;
+                OnUpgradeUpdate?.Invoke(autoStartUpAtUpgrade);
+            }
+            else
+            {
+                QuickLogger.Debug($"Invalid Function: {functionString}", true);
+            }
+        }
+
+        private void AutoShutDownImplementation(string functionString, ref UpgradeFunction upgrade, string[] paraResults)
+        {
+            var autoShutdownAtCheck = Upgrades.Any(x =>
+                x.UpgradeType == UpgradeFunctions.AutoShutdownAt);
+
+            if (autoShutdownAtCheck)
+            {
+                QuickLogger.Message("Function already implemented.", true);
+                return;
+            }
+
+            bool autoShutdownAtValid = AutoShutDownAtUpgrade.IsValid(paraResults, out var autoShutdownAt);
+
+            if (autoShutdownAtValid)
+            {
+                QuickLogger.Debug($"Function  Valid: {functionString}", true);
+                var autoShutDownAtUpgrade = new AutoShutDownAtUpgrade {IsEnabled = true, Mono = _mono, Time = autoShutdownAt};
+                Upgrades.Add(autoShutDownAtUpgrade);
+                upgrade = autoShutDownAtUpgrade;
+                OnUpgradeUpdate?.Invoke(autoShutDownAtUpgrade);
+            }
+            else
+            {
+                QuickLogger.Debug($"Invalid Function: {functionString}", true);
+            }
+        }
+
+        private void SilkTouchImplementation(string functionString, ref UpgradeFunction upgrade, string[] paraResults)
+        {
+            var silkTouchCheck = Upgrades.Any(x =>
+                x.UpgradeType == UpgradeFunctions.SilkTouch);
+
+            if (silkTouchCheck)
+            {
+                QuickLogger.Message("Function already implemented.", true);
+                return;
+            }
+
+            bool silkTouchCheckValid = SilkTouchUpgrade.IsValid(paraResults, out var silkTouchCheckTuple);
+
+            if (silkTouchCheckValid)
+            {
+                QuickLogger.Debug($"Function  Valid: {functionString}", true);
+                var silkTouchUpgrade = new SilkTouchUpgrade
+                {
+                    IsEnabled = true,
+                    Mono = _mono,
+                    Amount = silkTouchCheckTuple.Item2,
+                    TechType = silkTouchCheckTuple.Item1
+                };
+                Upgrades.Add(silkTouchUpgrade);
+                upgrade = silkTouchUpgrade;
+                OnUpgradeUpdate?.Invoke(silkTouchUpgrade);
+            }
+            else
+            {
+                QuickLogger.Debug($"Invalid Function: {functionString}", true);
+            }
+        }
+
+        private void MinOreCountImplementation(string functionString, ref UpgradeFunction upgrade, string[] paraResults)
+        {
+            var minOreCountCheck = Upgrades.Any(x =>
+                x.UpgradeType == UpgradeFunctions.MinOreCount);
+
+            if (minOreCountCheck)
+            {
+                QuickLogger.Message("Function already implemented.", true);
+                return;
+            }
+
+            bool minOreCountValid = MinOreCountUpgrade.IsValid(paraResults, out var minTuple);
+
+            if (minOreCountValid)
+            {
+                QuickLogger.Debug($"Function  Valid: {functionString}", true);
+                var maxOreCountUpgrade = new MaxOreCountUpgrade
+                {
+                    IsEnabled = true,
+                    Mono = _mono,
+                    Amount = minTuple.Item2,
+                    TechType = minTuple.Item1
+                };
+                Upgrades.Add(maxOreCountUpgrade);
+                upgrade = maxOreCountUpgrade;
+                OnUpgradeUpdate?.Invoke(maxOreCountUpgrade);
+            }
+            else
+            {
+                QuickLogger.Debug($"Invalid Function: {functionString}", true);
+            }
+        }
+
+        private void MaxOreCountImplementation(string functionString, ref UpgradeFunction upgrade, string[] paraResults)
+        {
+            bool maxOreCountValid = MaxOreCountUpgrade.IsValid(paraResults, out var tuple);
+
+            if (maxOreCountValid)
+            {
+                QuickLogger.Debug($"Function  Valid: {functionString}", true);
+                var maxOreCountCheck = Upgrades.Any(x =>
+                    x.UpgradeType == UpgradeFunctions.MaxOreCount && ((MaxOreCountUpgrade) x).TechType == tuple.Item1);
+
+                if (maxOreCountCheck)
+                {
+                    QuickLogger.Message("Function already implemented. Changing value", true);
+                    var maxOreCountFunc = Upgrades.Single(x =>
+                        x.UpgradeType == UpgradeFunctions.MaxOreCount && ((MaxOreCountUpgrade) x).TechType == tuple.Item1);
+                    ((MaxOreCountUpgrade) maxOreCountFunc).Amount = tuple.Item2;
+                    return;
+                }
+
+                var maxOreCountUpgrade = new MaxOreCountUpgrade
+                {
+                    IsEnabled = true,
+                    Mono = _mono,
+                    Amount = tuple.Item2,
+                    TechType = tuple.Item1
+                };
+                Upgrades.Add(maxOreCountUpgrade);
+                OnUpgradeUpdate?.Invoke(maxOreCountUpgrade);
+                _mono.OreGenerator.ApplyUpgrade(maxOreCountUpgrade);
+                upgrade = maxOreCountUpgrade;
+            }
+            else
+            {
+                QuickLogger.Debug($"Invalid Function: {functionString}", true);
+            }
+        }
+
+        private void OresPerDayImplementation(string functionString, ref UpgradeFunction upgrade, string[] paraResults)
+        {
+            var check = Upgrades.Any(x => x.UpgradeType == UpgradeFunctions.OresPerDay);
+
+            if (check)
+            {
+                QuickLogger.Message("Function already implemented. Updating Value", true);
+                var upgradeFunc = Upgrades.Single(x => x.UpgradeType == UpgradeFunctions.OresPerDay);
+                bool validFunc = OresPerDayUpgrade.IsValid(paraResults, out var orePerDayFunc);
+                if (validFunc)
+                {
+                    ((OresPerDayUpgrade) upgradeFunc).OreCount = orePerDayFunc;
+                }
+                else
+                {
+                    QuickLogger.Debug($"Invalid Function: {functionString}", true);
+                }
+
+                return;
+            }
+
+            bool valid = OresPerDayUpgrade.IsValid(paraResults, out var orePerDay);
+
+            if (valid)
+            {
+                QuickLogger.Debug($"Function  Valid: {functionString}", true);
+                var orePerDayUpgrade = new OresPerDayUpgrade
+                {
+                    IsEnabled = true,
+                    Mono = _mono,
+                    OreCount = orePerDay,
+                };
+                Upgrades.Add(orePerDayUpgrade);
+                OnUpgradeUpdate?.Invoke(orePerDayUpgrade);
+                _mono.OreGenerator.ApplyUpgrade(orePerDayUpgrade);
+                upgrade = orePerDayUpgrade;
+            }
+            else
+            {
+                QuickLogger.Debug($"Invalid Function: {functionString}", true);
             }
         }
 

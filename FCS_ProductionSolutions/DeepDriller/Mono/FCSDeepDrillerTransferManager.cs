@@ -43,7 +43,6 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
 
             if (!_isAllowedToExport)
             {
-                _mono?.DisplayHandler?.ResetAlterraStorageList();
                 _isSorting = false;
                 yield break;
             }
@@ -127,7 +126,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
 
             if (_storagesList.Any())
             {
-                _mono.DisplayHandler.RefreshAlterraStorageList();
+                _mono.DisplayHandler.RefreshAlterraStorageList(_storagesList.Count);
             }
         }
 
