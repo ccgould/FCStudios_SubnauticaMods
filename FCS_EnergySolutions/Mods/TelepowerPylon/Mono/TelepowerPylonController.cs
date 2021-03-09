@@ -340,6 +340,8 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
                 }
             };
 
+            _addBTN.interactable = false;
+
             IsInitialized = true;
         }
         
@@ -423,6 +425,12 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
             
             var idToLower = text.ToLower();
 
+            if (unit.Value == null)
+            {
+                _messageBox.Show($"Failed to find pylon with unit ID: {text}", FCSMessageButton.OK,null);
+                return;
+            }
+
             if (FindOtherPylonWithConnection(unit))
             {
                 _messageBox.Show( $"Cannot add {text} because another pylon has this connection.",FCSMessageButton.OK,null);
@@ -435,12 +443,6 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
                 return;
             }
             
-            if (unit.Value == null)
-            {
-                QuickLogger.Message($"Failed to find pylon with unit ID: {text}", true);
-                return;
-            }
-
             var pylon = (TelepowerPylonController) unit.Value;
 
             if (pylon == null)
