@@ -15,10 +15,11 @@ using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Windows.WebCam;
 
 namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
 {
-    internal class DSSTerminalDisplayManager : AIDisplay, IFCSDumpContainer
+    internal class DSSTerminalDisplayManager : AIDisplay
     {
         #region Private Fields
 
@@ -26,8 +27,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         private GridHelperV2 _itemGrid;
         private bool _isBeingDestroyed;
         private readonly List<DSSInventoryItem> _inventoryButtons = new List<DSSInventoryItem>();
-        private readonly List<VehicleItemButton> _vehicleItemButtons = new List<VehicleItemButton>();
-        private readonly List<FilterItemButton> _filterItemButtons = new List<FilterItemButton>();
         private Text _baseName;
         private Text _serverAmount;
         private Text _rackCountAmount;
@@ -36,16 +35,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         private string _currentSearchString;
         private StorageType _storageFilter;
         private GameObject _homeObj;
-        private GameObject _moonPoolObj;
-        private GameObject _vehiclesSection;
-        private GameObject _vehiclesSettingsSection;
-        private Text _vehicleSectionName;
-        private GameObject _vehiclesSectionGrid;
-        private DumpContainerSimplified _blackListDumpContainer;
-        private Vehicle _currentVehicle;
         private Canvas _canvas;
-        private FCSToggleButton _pullFromVehicles;
-        private FilterSettingDialog _filterSettingList;
         private NetworkDialogController _networkBTN;
         private GameObject _powerOffScreen;
         private Text _currentBaseLBL;
@@ -56,6 +46,12 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         private PaginatorController _paginatorController;
         private TransceiverPageController _itemTransceiverPage;
         private DeviceTransceiverDialog _deviceTransceiverDialog;
+        private ConfigurationPageController _configurationPage;
+        private MoonPoolPageController _moonPoolController;
+        private FilterSettingDialog _filterSettingList;
+        private CraftingPageController _craftingController;
+        private DumpContainerSimplified _dumpContainer;
+        private FCSMessageBox _messageBox;
 
         #endregion
 
@@ -72,7 +68,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         {
             _networkBTN.Refresh(parms);
         }
-
+        
         private void UpdateDisplay()
         {
             if (_currentBase == null || Player.main.currentSub == null) return;
@@ -96,7 +92,8 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                     _totalItemsAmount.text = AuxPatchers.TotalItemsFormat(_currentBase.GetTotal(_storageFilter), _alterraStorageCapacity);
                     break;
             }
-            _vehicleSectionName.text = _currentVehicle?.GetName();
+
+            _moonPoolController.RefreshVehicleName();
             
         }
 
@@ -108,14 +105,9 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             {
                 _currentBase = _mono.Manager;
                 _screen.SetActive(true);
-                if (_blackListDumpContainer == null)
-                {
-                    _blackListDumpContainer = gameObject.AddComponent<DumpContainerSimplified>();
-                    _blackListDumpContainer.Initialize(transform, "Add to blacklist", this);
-                    RefreshBlackListItems();
-                }
                 Player.main.currentSubChangedEvent.AddHandler(base.gameObject, OnCurrentSubRootChanged);
                 InvokeRepeating(nameof(UpdateDisplay), .5f, .5f);
+                GoToTerminalPage(TerminalPages.Home);
             }
         }
 
@@ -147,21 +139,8 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                     _currentBase = (BaseManager)tag;
                     Refresh();
                     break;
-                case "ScreenToggleBTN":
-                    GoToTerminalPage(TerminalPages.MoonPoolSettings);
-                    break;
-                case "MoonpoolToggleBTN":
+                case "ConfigurationToggleBTN":
                     GoToTerminalPage(TerminalPages.Home);
-                    break;
-                case "VehSettingBTN":
-                    _vehiclesSettingsSection.SetActive(true);
-                    _vehiclesSection.SetActive(false);
-                    break;
-                case "BlackListButton":
-                    _blackListDumpContainer.OpenStorage();
-                    break;
-                case "PullFromVehicles":
-                    _mono.Manager.PullFromDockedVehicles = _pullFromVehicles.IsSelected;
                     break;
                 case "PowerBTN":
                     _mono.Manager.ToggleBreaker();
@@ -173,32 +152,17 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         public override void PowerOnDisplay()
         {
             _powerOffScreen.SetActive(false);
-            _moonPoolObj.SetActive(false);
+            _moonPoolController.Hide();
             _homeObj.SetActive(true);
         }
 
         public override void HibernateDisplay()
         {
             _powerOffScreen.SetActive(true);
-            _moonPoolObj.SetActive(false);
+            _moonPoolController.Hide();
             _homeObj.SetActive(false);
         }
-
-        internal void RefreshBlackListItems()
-        {
-            for (int i = 0; i < 7; i++)
-            {
-                _filterItemButtons[i].Reset();
-            }
-
-            var techTypes = _mono.Manager.DockingBlackList;
-
-            for (int i = 0; i < techTypes.Count; i++)
-            {
-                _filterItemButtons[i].Set(techTypes[i]);
-            }
-        }
-
+        
         internal void Refresh()
         {
             _itemGrid?.DrawPage();
@@ -223,27 +187,22 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                 _homeObj = GameObjectHelpers.FindGameObject(gameObject, "Home");
                 _deviceTransceiverDialog = GameObjectHelpers.FindGameObject(gameObject, "DeviceTransceiverDialog").AddComponent<DeviceTransceiverDialog>();
                 _deviceTransceiverDialog.Initialize();
-                _moonPoolObj = GameObjectHelpers.FindGameObject(gameObject, "MoonPool");
                 _itemTransceiverPage = GameObjectHelpers.FindGameObject(gameObject, "TransceiverSettings").AddComponent<TransceiverPageController>();
+                _configurationPage = GameObjectHelpers.FindGameObject(gameObject, "Configuration").AddComponent<ConfigurationPageController>();
+                _configurationPage.Initialize(this);
                 _itemTransceiverPage.Initialize(this);
-
-                var pullFromVehiclesToggleObj = GameObjectHelpers.FindGameObject(gameObject, "PullFromVehicles");
-                _pullFromVehicles = pullFromVehiclesToggleObj.AddComponent<FCSToggleButton>();
-                _pullFromVehicles.TextLineOne = "Pull from vehicles";
-                _pullFromVehicles.ButtonMode = InterfaceButtonMode.RadialButton;
-                _pullFromVehicles.BtnName = "PullFromVehicles";
-                _pullFromVehicles.OnButtonClick += OnButtonClick;
                 
-                if(_mono.Manager.PullFromDockedVehicles)
+                var screenToggleObj = GameObjectHelpers.FindGameObject(gameObject, "ServerToggleBTN").AddComponent<FCSButton>();
+                screenToggleObj.TextLineOne = "Change screen";
+                screenToggleObj.Subscribe((() =>
                 {
-                    _pullFromVehicles.Select();
-                }
+                    GoToTerminalPage(TerminalPages.Configuration);
+                }));
 
-                var screenToggleObj = GameObjectHelpers.FindGameObject(gameObject, "ServerToggleBTN");
-                InterfaceHelpers.CreateButton(screenToggleObj, "ScreenToggleBTN", InterfaceButtonMode.Background, OnButtonClick, Color.gray, Color.white, 2.4f, "Change screen");
+                //InterfaceHelpers.CreateButton(screenToggleObj, "ScreenToggleBTN", InterfaceButtonMode.Background, OnButtonClick, Color.gray, Color.white, 2.4f, "Change screen");
 
-                var moonpoolToggleBTN = GameObjectHelpers.FindGameObject(gameObject, "MoonpoolToggleBTN");
-                InterfaceHelpers.CreateButton(moonpoolToggleBTN, "MoonpoolToggleBTN", InterfaceButtonMode.Background, OnButtonClick, Color.gray, Color.white, 2.4f, "Change screen");
+                var configurationToggleBTN = GameObjectHelpers.FindGameObject(gameObject, "ConfigurationToggleBTN");
+                InterfaceHelpers.CreateButton(configurationToggleBTN, "ConfigurationToggleBTN", InterfaceButtonMode.Background, OnButtonClick, Color.gray, Color.white, 2.4f, "Change screen");
 
                 var addToBaseBTNObj = InterfaceHelpers.FindGameObject(gameObject, "AddToBaseBTN");
                 InterfaceHelpers.CreateButton(addToBaseBTNObj, "BaseDump", InterfaceButtonMode.Background,
@@ -274,48 +233,20 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                 searchField.OnSearchValueChanged += UpdateSearch;
                 #endregion
 
+
                 _filterSettingList = InterfaceHelpers.FindGameObject(gameObject, "ShowAllBTN").AddComponent<FilterSettingDialog>();
                 _filterSettingList.Initialize(gameObject, this);
                 _filterSettingList.OnButtonClick += OnButtonClick;
                 _filterSettingList.STARTING_COLOR = Color.white;
                 _filterSettingList.HOVER_COLOR = new Color(0.5471698f, 0.5471698f, 0.5471698f, 1);
 
-                var vehicleDockingManager = InterfaceHelpers.FindGameObject(gameObject, "SideBar").AddComponent<MoonPoolDialog>();
-                vehicleDockingManager.Initialize(_mono.Manager, this);
-
-                _vehiclesSection = GameObjectHelpers.FindGameObject(gameObject, "VehiclesSection");
-                _vehicleSectionName = _vehiclesSection.FindChild("VehicleName").GetComponent<Text>();
-                _vehiclesSectionGrid = _vehiclesSection.FindChild("Grid");
-
-                foreach (Transform vgChild in _vehiclesSectionGrid.transform)
-                {
-                    var item = vgChild.gameObject.AddComponent<VehicleItemButton>();
-                    _vehicleItemButtons.Add(item);
-                }
-
                 _powerOffScreen = GameObjectHelpers.FindGameObject(gameObject, "PowerOffScreen");
 
-
-                _vehiclesSettingsSection = GameObjectHelpers.FindGameObject(gameObject, "Settings");
-                var vehiclesSettingsBTN = GameObjectHelpers.FindGameObject(gameObject, "SettingsBTN");
-                InterfaceHelpers.CreateButton(vehiclesSettingsBTN, "VehSettingBTN", InterfaceButtonMode.Background,
-                    OnButtonClick, Color.white, new Color(0, 1, 1, 1), 2.5f,AuxPatchers.MoonpoolSettings());
-
-                var settingsGrid = GameObjectHelpers.FindGameObject(_vehiclesSettingsSection, "Grid");
-
-                if (settingsGrid != null)
-                {
-                    foreach (Transform filterChild in settingsGrid.transform)
-                    {
-                        var item = filterChild.gameObject.AddComponent<FilterItemButton>();
-                        item.Display = this;
-                        _filterItemButtons.Add(item);
-                    }
-                }
-
-                var blackListButton = GameObjectHelpers.FindGameObject(gameObject, "BlackListButton");
-                InterfaceHelpers.CreateButton(blackListButton, "BlackListButton", InterfaceButtonMode.Background,
-                    OnButtonClick, Color.white, new Color(0, 1, 1, 1), 2.5f,AuxPatchers.AddToBlackList());
+                _moonPoolController = GameObjectHelpers.FindGameObject(gameObject, "MoonPool").AddComponent<MoonPoolPageController>();
+                _moonPoolController.Initialize(this);
+                
+                _craftingController = GameObjectHelpers.FindGameObject(gameObject, "Crafting").AddComponent<CraftingPageController>();
+                _craftingController.Initialize(this);
 
                 var powerButton = GameObjectHelpers.FindGameObject(_powerOffScreen, "PowerBTN");
                 InterfaceHelpers.CreateButton(powerButton, "PowerBTN", InterfaceButtonMode.Background,
@@ -336,6 +267,8 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                 toolTip.ToolTipStringDelegate += ToolTipStringDelegate;
                 _totalItemsAmount = totalItemsLbl.GetComponent<Text>();
                 _currentBaseLBL = GameObjectHelpers.FindGameObject(gameObject, "CurrentBaseLBL").GetComponent<Text>();
+
+                _messageBox = GameObjectHelpers.FindGameObject(gameObject, "MessageBox").AddComponent<FCSMessageBox>();
 
                 _paginatorController = GameObjectHelpers.FindGameObject(gameObject, "Paginator").AddComponent<PaginatorController>();
                 _paginatorController.Initialize(this);
@@ -417,66 +350,9 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
 
         internal void ShowVehicleContainers(Vehicle vehicle)
         {
-            if (vehicle == null)
-            {
-                if (_mono.Manager.DockingManager.IsVehicleDocked(_currentVehicle))
-                {
-                    vehicle = _currentVehicle;
-                }
-                else
-                {
-                    _vehiclesSection.SetActive(false);
-                    _vehiclesSettingsSection.SetActive(false);
-                    for (int i = 0; i < 8; i++)
-                    {
-                        _vehicleItemButtons[i].Reset();
-                    }
-                    return;
-                }
-            }
-
-            var storage = DSSVehicleDockingManager.GetVehicleContainers(vehicle);
-            _vehiclesSection.SetActive(true);
-            _vehiclesSettingsSection.SetActive(false);
-            
-            QuickLogger.Debug($"Clicked on {vehicle.GetName()} : SC: {storage.Count}", true);
-            
-            for (int i = 0; i < 8; i++)
-            {
-                _vehicleItemButtons[i].Reset();
-            }
-
-            for (int i = 0; i < storage.Count; i++)
-            {
-                _vehicleItemButtons[i].Set(vehicle, storage[i], i);
-            }
-
-            _currentVehicle = vehicle;
+            _moonPoolController.ShowVehicleContainers(vehicle);
         }
-
-        public bool AddItemToContainer(InventoryItem item)
-        {
-            if (!_mono.Manager.DockingBlackList.Contains(item.item.GetTechType()))
-            {
-                _mono.Manager.DockingBlackList.Add(item.item.GetTechType());
-            }
-
-            PlayerInteractionHelper.GivePlayerItem(item);
-            RefreshBlackListItems();
-
-            return true;
-        }
-
-        public bool IsAllowedToAdd(TechType techType, bool verbose)
-        {
-            return true;
-        }
-
-        public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
-        {
-            return IsAllowedToAdd(pickupable.GetTechType(), verbose);
-        }
-
+        
         public override void TurnOffDisplay()
         {
             _screen?.SetActive(false);
@@ -518,20 +394,25 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             switch (page)
             {
                 case TerminalPages.Home:
-                    _itemTransceiverPage.Hide();
-                    _moonPoolObj.SetActive(false);
+                    HideAllPages();
                     _homeObj.SetActive(true);
                     break;
                 
                 case TerminalPages.MoonPoolSettings:
-                    _itemTransceiverPage.Hide();
-                    _moonPoolObj.SetActive(true);
-                    _homeObj.SetActive(false);
+                    HideAllPages();
+                    _moonPoolController.Show();
                     break;
                 case TerminalPages.Transceiver:
+                    HideAllPages();
                     _itemTransceiverPage.Show((DSSListItemController)obj);
-                    _moonPoolObj.SetActive(false);
-                    _homeObj.SetActive(false);
+                    break;
+                case TerminalPages.Configuration:
+                    HideAllPages();
+                    _configurationPage.Show();
+                    break;
+                case TerminalPages.Crafting:
+                    HideAllPages();
+                    _craftingController.Show();
                     break;
             }
 
@@ -540,9 +421,24 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             _networkBTN.Hide();
         }
 
+        internal void HideAllPages()
+        {
+            _itemTransceiverPage.Hide();
+            _moonPoolController.Hide();
+            _configurationPage.Hide();
+            _homeObj.SetActive(false);
+            _filterSettingList.Hide();
+            _networkBTN.Hide();
+        }
+
         public void OpenTransceiverDialog(FcsDevice fcsDevice)
         {
             _deviceTransceiverDialog.Show(fcsDevice);
+        }
+
+        public void ShowMessage(string message)
+        {
+            _messageBox.Show(message,FCSMessageButton.OK,null);
         }
     }
 }

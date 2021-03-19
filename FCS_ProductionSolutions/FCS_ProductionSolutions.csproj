@@ -200,6 +200,14 @@
     <Compile Include="MatterAnalyzer\Mono\MatterAnalyzerController.cs" />
     <Compile Include="MatterAnalyzer\Mono\MatterAnalyzerStorage.cs" />
     <Compile Include="MatterAnalyzer\Mono\MessagePop.cs" />
+    <Compile Include="Mods\AutoCrafter\Buildable\DSSAutoCrafterPatch.cs" />
+    <Compile Include="Mods\AutoCrafter\CraftingItem.cs" />
+    <Compile Include="Mods\AutoCrafter\CraftMachine.cs" />
+    <Compile Include="Mods\AutoCrafter\DSSAutoCrafterController.cs" />
+    <Compile Include="Mods\AutoCrafter\DSSAutoCrafterCrateController.cs" />
+    <Compile Include="Mods\AutoCrafter\DSSAutoCrafterDisplay.cs" />
+    <Compile Include="Mods\AutoCrafter\DSSCraftManager.cs" />
+    <Compile Include="Mods\AutoCrafter\StatusController.cs" />
     <Compile Include="Mods\Replicator\Buildable\ReplicatorPatcher.cs" />
     <Compile Include="Mods\Replicator\Mono\ReplicatorSpeedButton.cs" />
     <Compile Include="Mods\Replicator\Mono\ReplicatorSlot.cs" />
@@ -214,6 +222,7 @@
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\FCSCommon\GamePaths.targets" />

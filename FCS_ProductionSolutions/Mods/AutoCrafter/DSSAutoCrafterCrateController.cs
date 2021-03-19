@@ -1,9 +1,9 @@
 ﻿using System;
-using FCS_StorageSolutions.Mods.AlterraStorage.Buildable;
+using FCS_ProductionSolutions.Buildable;
 using FCSCommon.Helpers;
 using UnityEngine;
 
-namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
+namespace FCS_ProductionSolutions.Mods.AutoCrafter
 {
     public class DSSAutoCrafterCrateController : MonoBehaviour
     {

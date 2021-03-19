@@ -12,6 +12,7 @@ namespace FCS_ProductionSolutions.Buildable
     internal static class ModelPrefab
     {
         private static bool _initialized;
+        public static GameObject DSSCrafterCratePrefab;
         internal static GameObject ColorItemPrefab { get; set; }
         internal static string BodyMaterial => $"{Mod.ModName}_COL";
         internal static string SecondaryMaterial => $"{Mod.ModName}_COL_S";
@@ -37,6 +38,7 @@ namespace FCS_ProductionSolutions.Buildable
         public static GameObject DeepDrillerOverrideItemPrefab { get; set; }
         public static GameObject DeepDrillerFunctionOptionItemPrefab { get; set; }
         public static GameObject ReplicatorPrefab { get; set; }
+        public static GameObject DSSAutoCrafterPrefab { get; set; }
 
         internal static void Initialize()
         {
@@ -63,6 +65,8 @@ namespace FCS_ProductionSolutions.Buildable
             DeepDrillerOverrideItemPrefab = GetPrefab("OverrideItem");
             DeepDrillerFunctionOptionItemPrefab = GetPrefab("FunctionOptionItem");
             ReplicatorPrefab = GetPrefab(Mod.ReplicatorPrefabName);
+            DSSAutoCrafterPrefab = GetPrefab(Mod.DSSAutoCrafterPrefabName);
+            DSSCrafterCratePrefab = GetPrefab("CrafterCrate");
         }
 
         internal static GameObject GetPrefab(string prefabName, bool isV2 = false)

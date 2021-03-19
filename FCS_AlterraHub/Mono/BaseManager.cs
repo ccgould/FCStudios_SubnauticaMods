@@ -47,6 +47,7 @@ namespace FCS_AlterraHub.Mono
         private BaseSaveData _savedData;
         private bool _hasBreakerTripped;
         private Dictionary<string, BaseOperationObject> _baseOperationObjects = new  Dictionary<string, BaseOperationObject>();
+        private HashSet<CraftingOperation> _craftingOperations = new HashSet<CraftingOperation>();
         private List<BaseTransferOperation> _baseOperations  = new List<BaseTransferOperation>();
 
 
@@ -1335,6 +1336,25 @@ namespace FCS_AlterraHub.Mono
             }
 
             return null;
+        }
+
+        public HashSet<CraftingOperation> GetBaseCraftingOperations()
+        {
+            return _craftingOperations;
+        }
+
+        public void AddCraftingOperation(CraftingOperation operation)
+        {
+            var isCreated = _craftingOperations.Any(x => x.IsSame(operation));
+            if (!isCreated)
+            {
+                _craftingOperations.Add(operation);
+            }
+        }
+
+        public void RemoveCraftingOperation(CraftingOperation operation)
+        {
+            _craftingOperations.Remove(operation);
         }
     }
 }

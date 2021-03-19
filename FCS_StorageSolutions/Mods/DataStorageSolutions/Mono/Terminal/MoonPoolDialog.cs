@@ -10,14 +10,14 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
 {
     internal class MoonPoolDialog : MonoBehaviour
     {
-        private DSSTerminalDisplayManager _mono;
+        private MoonPoolPageController _mono;
         private Text _label;
         private GameObject _grid;
         private BaseManager _baseManager;
         private List<VehicleButton> _trackedVehicles = new List<VehicleButton>();
         private GridHelperV2 _vehicleGrid;
 
-        internal void Initialize(BaseManager baseManager, DSSTerminalDisplayManager mono)
+        internal void Initialize(BaseManager baseManager, MoonPoolPageController mono)
         {
             _grid = GameObjectHelpers.FindGameObject(gameObject, "Grid");
 
@@ -80,7 +80,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                 QuickLogger.Debug("// ====== Setting Vehicle Grid ====== //");
                 for (int i = data.StartPosition; i < data.EndPosition; i++)
                 {
-                    _trackedVehicles[i].Set(grouped[i].GetName(), _mono, grouped[i]);
+                    _trackedVehicles[i].Set(grouped[i].GetName(), grouped[i]);
                     QuickLogger.Debug($"Set index {i}");
                 }
                 QuickLogger.Debug("// ====== Setting Vehicle Grid ====== //");

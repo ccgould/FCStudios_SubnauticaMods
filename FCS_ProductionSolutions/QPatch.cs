@@ -7,6 +7,7 @@ using FCS_ProductionSolutions.DeepDriller.Craftable;
 using FCS_ProductionSolutions.DeepDriller.Ores;
 using FCS_ProductionSolutions.HydroponicHarvester.Buildable;
 using FCS_ProductionSolutions.MatterAnalyzer.Buildable;
+using FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable;
 using FCSCommon.Utilities;
 using HarmonyLib;
 using QModManager.API.ModLoading;
@@ -56,6 +57,12 @@ namespace FCS_ProductionSolutions
 
                 var deepDriller = new FCSDeepDrillerBuildable();
                 deepDriller.Patch();
+            }
+
+            if (Configuration.IsAutocrafterEnabled)
+            {
+                var dssAutoCrafter = new DSSAutoCrafterPatch();
+                dssAutoCrafter.Patch();
             }
 
             //Register debug commands

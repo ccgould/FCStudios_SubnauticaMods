@@ -65,6 +65,29 @@ namespace FCS_ProductionSolutions.Configuration
         internal const string DeepDrillerMk3Description = "Automated drill platform suitable for all biomes with integrated solar and thermal generators. Requires lubricant.";
         internal const string SandSpawnableClassID = "Sand_DD";
 
+        internal const string DSSAutoCrafterTabID = "ACU";
+        internal const string DSSAutoCrafterFriendlyName = "Auto Crafter";
+        internal const string DSSAutoCrafterClassName = "AutoCrafter";
+        internal const string DSSAutoCrafterPrefabName = "AutoCraftMachine";
+        internal static string DSSAutoCrafterKitClassID => $"{DSSAutoCrafterClassName}_Kit";
+        internal const string DSSAutoCrafterDescription = "Avoid long hours in front of the Fabricator. Queue up a list of multiple items or just keep yourself automatically stocked on an important one.";
+
+
+#if SUBNAUTICA
+        internal static TechData DSSAutoCrafterIngredients => new TechData
+#elif BELOWZERO
+                internal static RecipeData DSSAutoCrafterIngredients => new RecipeData
+#endif
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient(DSSAutoCrafterKitClassID.ToTechType(), 1),
+            }
+        };
+
+
+
         internal static TechType GetSandBagTechType()
         {
             if (_sandBagTechType == TechType.None)
@@ -88,6 +111,8 @@ namespace FCS_ProductionSolutions.Configuration
                 new Ingredient(HydroponicHarvesterKitClassID.ToTechType(), 1),
             }
         };
+
+        public static List<TechType> Craftables { get; set; } = new List<TechType>();
 
         internal const string ModDescription = "";
 
@@ -246,6 +271,25 @@ namespace FCS_ProductionSolutions.Configuration
         internal static string GetModDirectory()
         {
             return Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        }
+
+        internal static DSSAutoCrafterDataEntry GetDSSAutoCrafterSaveData(string id)
+        {
+            LoadData();
+
+            var saveData = GetSaveData();
+
+            foreach (var entry in saveData.DSSAutoCrafterDataEntries)
+            {
+                if (string.IsNullOrEmpty(entry.ID)) continue;
+
+                if (entry.ID == id)
+                {
+                    return entry;
+                }
+            }
+
+            return new DSSAutoCrafterDataEntry() { ID = id };
         }
 
         internal static HashSet<TechType> IsNonePlantableAllowedList = new HashSet<TechType>{

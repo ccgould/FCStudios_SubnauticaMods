@@ -3,7 +3,7 @@ using FCSCommon.Extensions;
 using FCSCommon.Utilities;
 using UnityEngine;
 
-namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
+namespace FCS_ProductionSolutions.Mods.AutoCrafter
 {
     internal class CraftMachine : MonoBehaviour
     {

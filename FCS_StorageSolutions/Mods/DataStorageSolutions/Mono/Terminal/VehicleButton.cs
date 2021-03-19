@@ -10,7 +10,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
     {
         private Text _title;
         private readonly List<Image> _icons = new List<Image>();
-        private DSSTerminalDisplayManager _manager;
         private Vehicle _vehicle;
         private bool _isInitialized;
 
@@ -33,13 +32,12 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         }
 
 
-        internal void Set(string name, DSSTerminalDisplayManager manager, Vehicle vehicle)
+        internal void Set(string name, Vehicle vehicle)
         {
             Initialize();
 
             Tag = vehicle;
             _vehicle = vehicle;
-            _manager = manager;
             ChangeIcon(_vehicle is SeaMoth ? DssListItemIcon.Seamoth : DssListItemIcon.Prawn);
             gameObject.SetActive(true);
         }
@@ -47,7 +45,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
 
         private void UpdateState()
         {
-            if (_manager == null || _vehicle == null) return;
+            if (_vehicle == null) return;
             
             if (_title != null)
             {

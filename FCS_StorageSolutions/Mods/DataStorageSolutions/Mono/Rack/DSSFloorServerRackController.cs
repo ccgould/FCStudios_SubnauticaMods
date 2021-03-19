@@ -104,6 +104,17 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
             Slots.ElementAt(3).Value.RestoreItems(serializer, SavedData.Slot4);
             Slots.ElementAt(4).Value.RestoreItems(serializer, SavedData.Slot5);
             Slots.ElementAt(5).Value.RestoreItems(serializer, SavedData.Slot6);
+            Slots.ElementAt(6).Value.RestoreItems(serializer, SavedData.Slot7);
+            Slots.ElementAt(7).Value.RestoreItems(serializer, SavedData.Slot8);
+            Slots.ElementAt(8).Value.RestoreItems(serializer, SavedData.Slot9);
+            Slots.ElementAt(9).Value.RestoreItems(serializer, SavedData.Slot10);
+            Slots.ElementAt(10).Value.RestoreItems(serializer, SavedData.Slot11);
+            Slots.ElementAt(11).Value.RestoreItems(serializer, SavedData.Slot12);
+            Slots.ElementAt(12).Value.RestoreItems(serializer, SavedData.Slot13);
+            Slots.ElementAt(13).Value.RestoreItems(serializer, SavedData.Slot14);
+            Slots.ElementAt(14).Value.RestoreItems(serializer, SavedData.Slot15);
+            Slots.ElementAt(15).Value.RestoreItems(serializer, SavedData.Slot16);
+            Slots.ElementAt(16).Value.RestoreItems(serializer, SavedData.Slot17);
             _isFromSave = true;
         }
     }

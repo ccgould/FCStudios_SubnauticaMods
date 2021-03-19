@@ -6,13 +6,13 @@ using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
-using FCS_StorageSolutions.Configuration;
-using FCS_StorageSolutions.Mods.AlterraStorage.Buildable;
+using FCS_ProductionSolutions.Buildable;
+using FCS_ProductionSolutions.Configuration;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
 
-namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
+namespace FCS_ProductionSolutions.Mods.AutoCrafter
 {
     internal class DSSAutoCrafterController : FcsDevice, IFCSSave<SaveData>
     {
@@ -75,7 +75,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
 
         private void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.DSSTabID, Mod.ModName);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.DSSAutoCrafterTabID, Mod.ModName);
             if (Mod.Craftables.Count == 0)
             {
                var fabricator =  CraftTree.GetTree(CraftTree.Type.Fabricator);
@@ -92,11 +92,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
 
                var seamothUpgrades = CraftTree.GetTree(CraftTree.Type.SeamothUpgrades);
                GetCraftTreeData(seamothUpgrades.nodes);
-
-               // foreach (TechType craftable in Mod.Craftables)
-               //{
-               //    QuickLogger.Debug($"Craftable: {Language.main.Get(craftable)} was added.");
-               //}
             }
             
             _materials = MaterialHelpers.GetMaterials(gameObject, "DSS_ConveyorBelt");
@@ -307,18 +302,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
                 }
             }
         }
-
-        public bool ToggleBreaker()
-        {
-            _hasBreakTripped = !_hasBreakTripped;
-            return _hasBreakTripped;
-        }
-
-        public bool HasPendingCraft()
-        {
-            return CraftingItems.Count > 0;
-        }
-
+        
         internal void MoveBelt()
         {
             _moveBelt = true;

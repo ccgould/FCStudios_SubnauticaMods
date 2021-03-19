@@ -2,11 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
-using FCS_StorageSolutions.Mods.DataStorageSolutions.Mono;
 using FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server;
 using FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Transceiver;
 using FCSCommon.Extensions;
@@ -73,11 +71,6 @@ namespace FCS_StorageSolutions.Configuration
         internal static string DSSItemDisplayKitClassID => $"{DSSItemDisplayClassName}_Kit";
         internal const string DSSItemDisplayDescription = "Small, single-item access terminal for the Data Storage Network. Now with multi-item deposit capability.";
 
-        internal const string DSSAutoCrafterFriendlyName = "Auto Crafter";
-        internal const string DSSAutoCrafterClassName = "DSSAutoCrafter";
-        internal const string DSSAutoCrafterPrefabName = "DSS_AutoCrafter";
-        internal static string DSSAutoCrafterKitClassID => $"{DSSAutoCrafterClassName}_Kit";
-        internal const string DSSAutoCrafterDescription = "Avoid long hours in front of the Fabricator. Queue up a list of multiple items or just keep yourself automatically stocked on an important one.";
 
         internal const string DSSTerminalFriendlyName = "Terminal C48";
         internal const string DSSTerminalClassName = "DSSTerminalMonitor";
@@ -113,19 +106,6 @@ namespace FCS_StorageSolutions.Configuration
             Ingredients =
             {
                 new Ingredient(DSSFloorServerRackKitClassID.ToTechType(), 1),
-            }
-        };
-
-#if SUBNAUTICA
-        internal static TechData DSSAutoCrafterIngredients => new TechData
-#elif BELOWZERO
-                internal static RecipeData DSSAutoCrafterIngredients => new RecipeData
-#endif
-        {
-            craftAmount = 1,
-            Ingredients =
-            {
-                new Ingredient(DSSAutoCrafterKitClassID.ToTechType(), 1),
             }
         };
 
@@ -224,7 +204,6 @@ namespace FCS_StorageSolutions.Configuration
             }
         };
 
-        public static List<TechType> Craftables { get; set; } = new List<TechType>();
         
         internal const string ModDescription = "";
 
@@ -392,25 +371,6 @@ namespace FCS_StorageSolutions.Configuration
             }
 
             return new DSSAntennaDataEntry() { ID = id };
-        }
-        
-        internal static DSSAutoCrafterDataEntry GetDSSAutoCrafterSaveData(string id)
-        {
-            LoadData();
-
-            var saveData = GetSaveData();
-
-            foreach (var entry in saveData.DSSAutoCrafterDataEntries)
-            {
-                if (string.IsNullOrEmpty(entry.ID)) continue;
-
-                if (entry.ID == id)
-                {
-                    return entry;
-                }
-            }
-
-            return new DSSAutoCrafterDataEntry() { ID = id };
         }
         
         internal static DSSTerminalDataEntry GetDSSTerminalSaveData(string id)

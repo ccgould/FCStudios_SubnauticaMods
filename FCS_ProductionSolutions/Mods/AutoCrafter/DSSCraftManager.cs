@@ -1,9 +1,8 @@
-﻿using System;
-using FCS_StorageSolutions.Mods.AlterraStorage.Buildable;
+﻿using FCS_ProductionSolutions.Buildable;
 using FCSCommon.Extensions;
 using UnityEngine;
 
-namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
+namespace FCS_ProductionSolutions.Mods.AutoCrafter
 {
     internal class DSSCraftManager : MonoBehaviour
     {
@@ -81,13 +80,13 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
             {
                 if (_craftSlot1.IsOccupied)
                 {
-                    _statusController.RefreshSlotOne(_craftSlot1TechType, _craftSlot1.GetComplete(), _craftSlot1.GetGoal());
+                    //_statusController.RefreshSlotOne(_craftSlot1TechType, _craftSlot1.GetComplete(), _craftSlot1.GetGoal());
     
                 }
 
                 if (_craftSlot2.IsOccupied)
                 {
-                    _statusController.RefreshSlotTwo(_craftSlot2TechType, _craftSlot2.GetComplete(), _craftSlot2.GetGoal());
+                    //_statusController.RefreshSlotTwo(_craftSlot2TechType, _craftSlot2.GetComplete(), _craftSlot2.GetGoal());
                 }
             }
         }

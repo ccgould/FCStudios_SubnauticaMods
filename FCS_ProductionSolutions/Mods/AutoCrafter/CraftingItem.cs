@@ -2,7 +2,7 @@
 using FCSCommon.Extensions;
 using Oculus.Newtonsoft.Json;
 
-namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter
+namespace FCS_ProductionSolutions.Mods.AutoCrafter
 {
     internal class CraftingItem
     {

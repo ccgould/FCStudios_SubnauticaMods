@@ -75,6 +75,10 @@ namespace FCS_ProductionSolutions.Configuration
         public float DDChargePullAmount = 1.5f;
         public float DDSolarCapacity = 125;
         [JsonIgnore] internal float DDOreReductionValue => 0.08f;
+
+        [Toggle("[Auto Crafter]] Is Mod Enabled", Tooltip = "Enables/Disables Auto Crafter from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+        public bool IsAutocrafterEnabled = true;
+
         [JsonIgnore] internal Dictionary<string, List<TechType>> DDBiomeOresTechType  = new Dictionary<string, List<TechType>>();
 
         internal void Convert()

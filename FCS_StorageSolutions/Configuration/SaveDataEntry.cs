@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Objects;
-using FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.AutoCrafter;
-using FCSCommon.Interfaces;
 using Oculus.Newtonsoft.Json;
-using UnityEngine;
 
 namespace FCS_StorageSolutions.Configuration
 {
@@ -89,18 +85,7 @@ namespace FCS_StorageSolutions.Configuration
         [JsonProperty] internal Vec4 Body { get; set; }
         [JsonProperty] internal Vec4 SecondaryBody { get; set; }
     }
-
-    [Serializable]
-    internal class DSSAutoCrafterDataEntry
-    {
-        [JsonProperty] internal string ID { get; set; }
-        [JsonProperty] internal string SaveVersion { get; set; } = "1.0";
-        [JsonProperty] internal Vec4 Body { get; set; } 
-        [JsonProperty] internal Vec4 SecondaryBody { get; set; }
-        [JsonProperty] internal ObservableCollection<CraftingItem> CurrentProcess { get; set; }
-        public bool IsRunning { get; set; }
-    }
-
+    
     [Serializable]
     internal class DSSTerminalDataEntry
     {
@@ -118,7 +103,6 @@ namespace FCS_StorageSolutions.Configuration
         [JsonProperty] internal List<DSSFormattingStationDataEntry> DSSFormattingStationDataEntries = new List<DSSFormattingStationDataEntry>();
         [JsonProperty] internal List<DSSItemDisplayDataEntry> DSSItemDisplayDataEntries = new List<DSSItemDisplayDataEntry>();
         [JsonProperty] internal List<DSSAntennaDataEntry> DSSAntennaDataEntries = new List<DSSAntennaDataEntry>();
-        [JsonProperty] internal List<DSSAutoCrafterDataEntry> DSSAutoCrafterDataEntries = new List<DSSAutoCrafterDataEntry>();
         [JsonProperty] internal List<DSSTerminalDataEntry> DSSTerminalDataEntries = new List<DSSTerminalDataEntry>();
         [JsonProperty] internal List<DSSServerRackDataEntry> DSSWallServerRackDataEntries = new List<DSSServerRackDataEntry>();
         [JsonProperty] internal List<DSSServerRackDataEntry> DSSFloorServerRackDataEntries = new List<DSSServerRackDataEntry>();

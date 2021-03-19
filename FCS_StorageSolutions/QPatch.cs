@@ -53,10 +53,7 @@ namespace FCS_StorageSolutions
 
                 var dssTerminal = new DSSTerminalPatch();
                 dssTerminal.Patch();
-
-                var dssAutoCrafter = new DSSAutoCrafterPatch();
-                dssAutoCrafter.Patch();
-
+                
                 var dssAntenna = new DSSAntennaPatch();
                 dssAntenna.Patch();
                 

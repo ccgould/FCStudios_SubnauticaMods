@@ -2,8 +2,10 @@
 {
     internal enum TerminalPages
     {
-        Home,
-        MoonPoolSettings,
-        Transceiver
+        Home = 0,
+        MoonPoolSettings = 1,
+        Transceiver = 2,
+        Configuration = 3,
+        Crafting = 4
     }
 }

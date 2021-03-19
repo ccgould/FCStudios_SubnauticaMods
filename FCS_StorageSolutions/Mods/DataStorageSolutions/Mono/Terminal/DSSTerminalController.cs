@@ -207,5 +207,10 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                 }
             }
         }
+
+        public void ShowMessage(string message)
+        {
+            _display.ShowMessage(message);
+        }
     }
 }

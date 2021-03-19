@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Objects;
 using FCS_ProductionSolutions.DeepDriller.Configuration;
 using FCS_ProductionSolutions.DeepDriller.Structs;
 using FCS_ProductionSolutions.HydroponicHarvester.Enumerators;
 using FCS_ProductionSolutions.HydroponicHarvester.Mono;
+using FCS_ProductionSolutions.Mods.AutoCrafter;
 using Oculus.Newtonsoft.Json;
 
 namespace FCS_ProductionSolutions.Configuration
@@ -86,12 +88,25 @@ namespace FCS_ProductionSolutions.Configuration
     }
 
     [Serializable]
+    internal class DSSAutoCrafterDataEntry
+    {
+        [JsonProperty] internal string ID { get; set; }
+        [JsonProperty] internal string SaveVersion { get; set; } = "1.0";
+        [JsonProperty] internal Vec4 Body { get; set; }
+        [JsonProperty] internal Vec4 SecondaryBody { get; set; }
+        [JsonProperty] internal ObservableCollection<CraftingItem> CurrentProcess { get; set; }
+        public bool IsRunning { get; set; }
+    }
+
+    [Serializable]
     internal class SaveData
     {
         [JsonProperty] internal List<HydroponicHarvesterDataEntry> HydroponicHarvesterEntries = new List<HydroponicHarvesterDataEntry>();
         [JsonProperty] internal List<MatterAnalyzerDataEntry> MatterAnalyzerEntries = new List<MatterAnalyzerDataEntry>();
         [JsonProperty] internal List<DeepDrillerSaveDataEntry> DeepDrillerMk2Entries = new List<DeepDrillerSaveDataEntry>();
         [JsonProperty] internal List<ReplicatorDataEntry> ReplicatorEntries = new List<ReplicatorDataEntry>();
+        [JsonProperty] internal List<DSSAutoCrafterDataEntry> DSSAutoCrafterDataEntries = new List<DSSAutoCrafterDataEntry>();
+
         [JsonProperty] internal List<DNASampleData> HydroponicHarvesterKnownTech { get; set; } = new List<DNASampleData>();
     }
 }

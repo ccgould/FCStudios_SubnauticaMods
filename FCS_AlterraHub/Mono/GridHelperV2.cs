@@ -37,7 +37,7 @@ namespace FCSCommon.Helpers
             //}
             //#endregion
             
-            _itemsGrid = InterfaceHelpers.FindGameObject(gridPage, gridName); ;
+            _itemsGrid = InterfaceHelpers.FindGameObject(gridPage, gridName); 
             _itemsPerPage = itemsPerPage;
             _onButtonClick = onButtonClick;
 

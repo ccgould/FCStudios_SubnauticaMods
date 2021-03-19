@@ -30,6 +30,8 @@ namespace FCS_ProductionSolutions.Buildable
             { $"{ModKey}_HarvesterAddSampleDesc","Opens the dialog that allows you to choose a sample for this slot"},
             { $"{ModKey}_HarvesterDeleteSample","Remove Sample"},
             { $"{ModKey}_HarvesterDeleteSampleDesc","Clears this slot. Slot must be empty to clear."},
+            { $"{ModKey}_AutocrafterItemIsBeingCrafted","Cannot deconstruct because AutoCrafter is currently crafting an item or there are items on the belt"},
+
         };
 
         internal static void AdditionalPatching()
@@ -144,6 +146,11 @@ namespace FCS_ProductionSolutions.Buildable
         public static string HarvesterDeleteSampleDesc()
         {
             return GetLanguage($"{ModKey}_HarvesterDeleteSampleDesc");
+        }
+
+        public static string AutocrafterItemIsBeingCrafted()
+        {
+            return GetLanguage($"{ModKey}_AutocrafterItemIsBeingCrafted");
         }
     }
 }

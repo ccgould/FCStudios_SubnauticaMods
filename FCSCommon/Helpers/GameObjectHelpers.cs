@@ -77,9 +77,11 @@ namespace FCSCommon.Helpers
             }
             catch (Exception e)
             {
-                QuickLogger.Error($"Message: {e.Message} StackTrace: {e.StackTrace}");
+
+                QuickLogger.Error($"Message: {e.Message} StackTrace: {e.StackTrace} while trying to find: {name}");
             }
 
+            QuickLogger.Error($"Failed to find GameObject with the name: {name}");
             return null;
         }
 

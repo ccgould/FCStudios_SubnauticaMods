@@ -11,7 +11,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         private Text _techTypeText;
         private InterfaceButton _deleteButton;
         private TechType _techType;
-        public DSSTerminalDisplayManager Display { get; set; }
+        public MoonPoolPageController MoonPoolPage { get; set; }
 
 
         internal void Reset()
@@ -44,9 +44,9 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             switch (btnName)
             {
                 case "DeleteBTN":
-                    Display.GetController().Manager.DockingBlackList.Remove(_techType);
+                    MoonPoolPage.GetManager().DockingBlackList.Remove(_techType);
                     Reset();
-                    Display?.RefreshBlackListItems();
+                    MoonPoolPage?.RefreshBlackListItems();
                     break;
             }
         }
