@@ -103,9 +103,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.FormattingStation
                 _homeObj = GameObjectHelpers.FindGameObject(gameObject, "Home");
                 _dialogObj = GameObjectHelpers.FindGameObject(gameObject, "Dialog");
                 _messageObj = GameObjectHelpers.FindGameObject(gameObject, "Message");
-
-                QuickLogger.Debug("1");
-
+                
                 foreach (Transform child in _dialogObj.FindChild("Grid").transform)
                 {
                     var filterItemController = child.gameObject.EnsureComponent<FilterItems>();
@@ -118,9 +116,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.FormattingStation
                     filterDisplayItemController.Initialize(_mono);
                     _filterDisplayItems.Add(filterDisplayItemController);
                 }
-
-                QuickLogger.Debug("2");
-
+                
                 _itemGrid = _mono.gameObject.EnsureComponent<GridHelperV2>();
                 _itemGrid.OnLoadDisplay += OnLoadItemsGrid;
                 _itemGrid.Setup(4, gameObject, Color.gray, Color.white, OnButtonClick);
@@ -129,11 +125,10 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.FormattingStation
                 _filterGrid.OnLoadDisplay += OnLoadFilterGrid;
                 _filterGrid.Setup(4, gameObject, Color.gray, Color.white, OnButtonClick);
 
-                QuickLogger.Debug("3");
                 var categoryBTNObj = GameObjectHelpers.FindGameObject(gameObject, "CategoryBTN");
                 InterfaceHelpers.CreateButton(categoryBTNObj, "CategoryBTN", InterfaceButtonMode.Background,
                     OnButtonClick, Color.white, new Color(0, 1, 1, 1), 2.5f, AuxPatchers.AddFilter(), AuxPatchers.AddFilterDesc());
-                QuickLogger.Debug("4");
+
                 // Drop button
                 _dropBTNObj = GameObjectHelpers.FindGameObject(gameObject, "DriveInsertBTN");
                 InterfaceHelpers.CreateButton(_dropBTNObj, "DriveInsertBTN", InterfaceButtonMode.Background,
@@ -153,9 +148,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.FormattingStation
                 var ejectBTN = GameObjectHelpers.FindGameObject(gameObject, "ExpellDriveBTN");
                 InterfaceHelpers.CreateButton(ejectBTN, "EjectBTN", InterfaceButtonMode.Background,
                     OnButtonClick, Color.white, new Color(0, 1, 1, 1), 2.5f);
-                
-
-                QuickLogger.Debug("5");
             }
             catch (Exception e)
             {

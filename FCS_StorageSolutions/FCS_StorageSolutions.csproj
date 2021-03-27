@@ -164,6 +164,8 @@
     <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\BaseListController.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\BulkMultipliers.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\ConfigurationPageController.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\CrafterSectionController.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\CraftingDialogController.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\CraftingPageController.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\DeviceItem.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\DeviceTransceiverDialog.cs" />

@@ -1,6 +1,7 @@
 ﻿using System;
 using FCS_ProductionSolutions.Buildable;
 using FCSCommon.Helpers;
+using FCSCommon.Utilities;
 using UnityEngine;
 
 namespace FCS_ProductionSolutions.Mods.AutoCrafter
@@ -13,25 +14,17 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
         private Transform[] waypoints;
 
         public Action OnPathComplete;
-        public TechType TechType
-        {
-            get => _techType;
-            set
-            {
-                _techType = value;
-                SetIcon();
-            }
-        }
 
-        private void SetIcon()
+
+        private void SetIcon(TechType techType)
         {
-            var canvas = GameObjectHelpers.FindGameObject(gameObject, "Canvas");
+            var canvas = gameObject.GetComponentInChildren<Canvas>();
             if (canvas != null)
             {
                 foreach (Transform child in canvas.transform)
                 {
                     var icon = child.gameObject.AddComponent<uGUI_Icon>();
-                    icon.sprite = SpriteManager.Get(TechType);
+                    icon.sprite = SpriteManager.Get(techType);
                 }
             }
         }
@@ -43,20 +36,27 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
         // Index of current waypoint from which Enemy walks
         // to the next one
         private int waypointIndex = 0;
-        private TechType _techType;
         private DSSAutoCrafterController _controller;
+        //private TechType _techType;
         public int Amount { get; set; }
         
 
         // Use this for initialization
-        internal void Initialize( Transform[] newWaypoints,DSSAutoCrafterController controller)
+        internal void Initialize( Transform[] newWaypoints,DSSAutoCrafterController controller,TechType techType)
         {
             _controller = controller;
             waypoints = newWaypoints;
+            SetIcon(techType);
             // Set position of Enemy as position of the first waypoint
             transform.position = waypoints[waypointIndex].transform.position;
             transform.rotation = waypoints[waypointIndex].transform.rotation;
             MaterialHelpers.ApplyShaderToMaterial(gameObject, ModelPrefab.DecalMaterial);
+            //Shader shader = Shader.Find("MarmosetUBER");
+            Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>();
+            SkyApplier skyApplier = gameObject.EnsureComponent<SkyApplier>();
+            skyApplier.renderers = renderers;
+            skyApplier.SetSky(Skies.BaseInterior);
+
         }
 
         // Update is called once per frame

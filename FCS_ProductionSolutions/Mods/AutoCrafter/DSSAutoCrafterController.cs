@@ -10,6 +10,7 @@ using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
+using FMOD;
 using UnityEngine;
 
 namespace FCS_ProductionSolutions.Mods.AutoCrafter
@@ -22,15 +23,16 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
         internal DSSAutoCrafterDisplay DisplayManager;
         private bool _hasBreakTripped;
         internal  DSSCraftManager CraftManager;
-        internal ObservableCollection<CraftingItem> CraftingItems = new ObservableCollection<CraftingItem>();
+        internal ObservableCollection<CraftingOperation> CraftingItems = new ObservableCollection<CraftingOperation>();
         private bool _moveBelt;
         private float _beltSpeed = 0.1f;
         private IEnumerable<Material> _materials;
         private GameObject _canvas;
+        private bool _isCrafting;
+        private CraftingOperation _operation;
         public override bool IsVisible => IsInitialized && IsConstructed;
         public override bool IsOperational => IsInitialized && IsConstructed;
-        public override StorageType StorageType { get; } = StorageType.AutoCrafter;
-        
+
         public override float GetPowerUsage()
         {
             if (Manager == null || !IsConstructed || Manager.GetBreakerState() || CraftManager ==  null || !CraftManager.IsRunning()) return 0f;
@@ -76,31 +78,16 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
         private void Start()
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.DSSAutoCrafterTabID, Mod.ModName);
-            if (Mod.Craftables.Count == 0)
-            {
-               var fabricator =  CraftTree.GetTree(CraftTree.Type.Fabricator);
-               GetCraftTreeData(fabricator.nodes);
-
-               var cyclopsFabricator = CraftTree.GetTree(CraftTree.Type.CyclopsFabricator);
-               GetCraftTreeData(cyclopsFabricator.nodes);
-
-               var workbench = CraftTree.GetTree(CraftTree.Type.Workbench);
-               GetCraftTreeData(workbench.nodes);
-
-               var maproom = CraftTree.GetTree(CraftTree.Type.MapRoom);
-               GetCraftTreeData(maproom.nodes);
-
-               var seamothUpgrades = CraftTree.GetTree(CraftTree.Type.SeamothUpgrades);
-               GetCraftTreeData(seamothUpgrades.nodes);
-            }
-            
-            _materials = MaterialHelpers.GetMaterials(gameObject, "DSS_ConveyorBelt");
+           _materials = MaterialHelpers.GetMaterials(gameObject, "DSS_ConveyorBelt");
 
             DisplayManager.Refresh();
-            Manager.AlertNewFcsStoragePlaced(this);
-            Manager.OnPowerStateChanged += OnPowerStateChanged;
-            Manager.OnBreakerStateChanged += OnBreakerStateChanged;
-            OnPowerStateChanged(Manager.GetPowerState());
+
+            if (Manager != null)
+            {
+                Manager.OnPowerStateChanged += OnPowerStateChanged;
+                Manager.OnBreakerStateChanged += OnBreakerStateChanged;
+                OnPowerStateChanged(Manager.GetPowerState());
+            }
         }
 
         private void Update()
@@ -165,7 +152,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                 _colorManager.ChangeColor(_saveData.SecondaryBody.Vector4ToColor(), ColorTargetMode.Secondary);
                 if (_saveData.CurrentProcess != null)
                 {
-                    CraftingItems = _saveData.CurrentProcess;
+                    //CraftingItems = _saveData.CurrentProcess;
                 }
 
                 if (_saveData.IsRunning)
@@ -183,7 +170,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
             var id = prefabIdentifier?.Id ?? string.Empty;
             _saveData = Mod.GetDSSAutoCrafterSaveData(id);
         }
-
+        
         public override void Initialize()
         {
             _canvas = gameObject.GetComponentInChildren<Canvas>()?.gameObject;
@@ -208,9 +195,49 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
 
             MoveBelt();
 
+            //TODO Reenable
+            //InvokeRepeating(nameof(CheckForAvailableCrafts),1f,1f);
+
             IsInitialized = true;
 
             QuickLogger.Debug($"Initialized - {GetPrefabID()}");
+        }
+
+        private void AddDummy()
+        {
+            CraftItem(new CraftingOperation(TechType.AdvancedWiringKit,1,true));
+        }
+
+        private void CheckForAvailableCrafts()
+        {
+            if (Manager == null || _isCrafting) return;
+
+            foreach (CraftingOperation baseCraftingOperation in Manager.GetBaseCraftingOperations())
+            {
+                if(baseCraftingOperation.IsBeingCrafted || !baseCraftingOperation.CanCraft()) continue;
+                CraftItem(baseCraftingOperation);
+                break;
+            }
+        }
+
+        private void CraftItem(CraftingOperation operation)
+        {
+            try
+            {
+                _isCrafting = true;
+                _operation = operation;
+                operation.UpdateIngredients();
+                DisplayManager.LoadCraft(operation);
+                operation.IsBeingCrafted = true;
+                operation.AddDevice(UnitID);
+                CraftingItems.Add(operation);
+                CraftManager.StartOperation();
+            }
+            catch (Exception e)
+            {
+                QuickLogger.DebugError(e.Message);
+                QuickLogger.DebugError(e.StackTrace);
+            }
         }
 
         public override void OnProtoSerialize(ProtobufSerializer serializer)
@@ -253,7 +280,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                 _saveData.ID = id;
                 _saveData.Body = _colorManager.GetColor().ColorToVector4();
                 _saveData.SecondaryBody = _colorManager.GetSecondaryColor().ColorToVector4();
-                _saveData.CurrentProcess = CraftingItems;
+                //_saveData.CurrentProcess = CraftingItems;
                 _saveData.IsRunning = CraftManager.IsRunning();
                 newSaveData.DSSAutoCrafterDataEntries.Add(_saveData);
             }
@@ -273,9 +300,16 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
 
         public override bool CanDeconstruct(out string reason)
         {
-            if (CraftManager.IsRunning() || CraftManager.ItemsOnBelt())
+            if(CraftManager.IsRunning())
             {
                 reason = AuxPatchers.AutocrafterItemIsBeingCrafted();
+                return false;
+            }
+
+
+            if (CraftManager.ItemsOnBelt())
+            {
+                reason = AuxPatchers.AutocrafterItemsOnBelt();
                 return false;
             }
             reason = string.Empty;
@@ -316,6 +350,26 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
         public bool IsBeltMoving()
         {
             return _moveBelt;
+        }
+
+        public CraftingOperation GetCraftingItem()
+        {
+            return _operation;
+        }
+
+        public void ShowMessage(string message)
+        {
+            
+        }
+
+        public void ClearMissingItems()
+        {
+            DisplayManager?.ClearMissingItem();
+        }
+
+        public void AddMissingItem(string item, int amount)
+        {
+            DisplayManager?.AddMissingItem(item, amount);
         }
     }
 }

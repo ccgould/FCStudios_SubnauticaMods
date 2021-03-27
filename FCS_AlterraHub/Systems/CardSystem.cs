@@ -25,7 +25,7 @@ namespace FCS_AlterraHub.Systems
         [JsonProperty] internal string Username { get; set; }
         [JsonProperty] internal string Password { get; set; }
         [JsonProperty] internal string PIN { get; set; }
-        [JsonProperty] internal decimal Balance { get; set; }
+        [JsonIgnore] internal decimal Balance { get; set; }
         [JsonProperty] internal static decimal AlterraDebitPayed { get; set; }
         [JsonProperty] internal decimal AccountBeforeDebit { get; set; }
         [JsonProperty] internal Dictionary<string, string> KnownCardNumbers = new Dictionary<string, string>();
@@ -47,7 +47,7 @@ namespace FCS_AlterraHub.Systems
 
         private AccountDetails _accountDetails = new AccountDetails();
         public static CardSystem main = new CardSystem();
-        private const decimal AlterraDebit = -3000000;
+        private const decimal AlterraDebit = -1000000000000000000;
         internal Action onBalanceUpdated;
 
         /// <summary>

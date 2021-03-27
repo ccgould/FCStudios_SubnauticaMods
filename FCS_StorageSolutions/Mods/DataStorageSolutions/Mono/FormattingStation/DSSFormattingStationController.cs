@@ -203,8 +203,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.FormattingStation
 
         public bool IsAllowedToAdd(TechType techType, bool verbose)
         {
-            QuickLogger.Debug("Checking if allowed to add");
-            return techType == Mod.GetDSSServerTechType();
+           return techType == Mod.GetDSSServerTechType();
         }
 
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)

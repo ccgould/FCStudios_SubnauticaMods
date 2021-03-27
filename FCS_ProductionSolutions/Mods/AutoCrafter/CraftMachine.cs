@@ -1,6 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Mono;
 using FCSCommon.Extensions;
 using FCSCommon.Utilities;
+using SMLHelper.V2.Handlers;
 using UnityEngine;
 
 namespace FCS_ProductionSolutions.Mods.AutoCrafter
@@ -9,18 +14,26 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
     {
         internal bool IsOccupied { get; private set; }
         public int CrafterID { get; set; }
-        internal Action<CraftingItem> OnComplete { get; set; }
+        internal Action<CraftingOperation> OnComplete { get; set; }
         private int _goal;
-        private CraftingItem _craftingItem;
+        private CraftingOperation _craftingItem;
         private float _startBuffer;
         private DSSAutoCrafterController _mono;
         private const float MAXTIME = 5f;
 
-        public void StartCrafting(CraftingItem craftingItem,DSSAutoCrafterController mono)
+        public Dictionary<TechType, int> NotMetIngredients { get; set; } = new Dictionary<TechType, int>();
+
+        public void StartCrafting(CraftingOperation craftingItem,DSSAutoCrafterController mono)
         {
             _mono = mono;
+
+            NotMetIngredients.Clear();
+
+            if (craftingItem == null)return;
+
+            QuickLogger.Debug($"[StartCraft] Crafting:{craftingItem.TechType}",true);
+
             _craftingItem = craftingItem;
-            craftingItem.StartTime = DayNightCycle.main.timePassedAsFloat;
             _craftingItem.IsBeingCrafted = true;
             _goal = craftingItem.Amount;
             _startBuffer = MAXTIME;
@@ -42,7 +55,11 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
 
             if (_craftingItem == null || _mono?.Manager == null || !IsOccupied) return;
 
-            if (!_mono.Manager.IsAllowedToAdd(_craftingItem.TechType, false)) return;
+            if (!_mono.Manager.IsAllowedToAdd(_craftingItem.TechType, false))
+            {
+                _mono.ShowMessage($"{Language.main.Get(_craftingItem.TechType)} is not allowed in your system. Please add a server that can store this item or add an unformatted server.");
+                return;
+            }
 
             if (_startBuffer > 0)
             {
@@ -50,12 +67,14 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                 return;
             }
 
+            GetMissingItems(_craftingItem.TechType);
+
             if (_mono.Manager.HasIngredientsFor(_craftingItem.TechType))
             {
                 _craftingItem.AmountCompleted += 1;
                 _mono.Manager.ConsumeIngredientsFor(_craftingItem.TechType);
                 _mono.Manager.AddItemToContainer(_craftingItem.FixCustomTechType().ToInventoryItemLegacy());
-                _mono.CraftManager.SpawnItem(_craftingItem.TechType, CrafterID);
+                _mono.CraftManager.SpawnItem(_craftingItem.TechType);
                 _startBuffer = MAXTIME;
             }
             else
@@ -69,16 +88,27 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                 QuickLogger.Debug($"Is Complete",true);
                 OnComplete?.Invoke(_craftingItem);
                 
-                if(!_craftingItem.IsRecurring)
+                if(!_craftingItem.IsRecursive)
                     IsOccupied = false;
             }
 
         }
 
+        private void GetMissingItems(TechType craftingItemTechType)
+        {
+            _mono.ClearMissingItems();
+            var missingItems = TechDataHelpers.GetIngredients(craftingItemTechType);
+            foreach (IIngredient ingredient in missingItems)
+            {
+                if (_mono.Manager.HasItem(ingredient.techType)) continue;
+                _mono.AddMissingItem(Language.main.Get(ingredient.techType), ingredient.amount);
+            }
+        }
+
         public void Reset(bool bypass)
         {
             if (_craftingItem == null || _mono == null) return;
-            if (!_craftingItem.IsRecurring || bypass)
+            if (!_craftingItem.IsRecursive || bypass)
             {
                 _mono.DisplayManager.RemoveCraftingItem(_craftingItem);
                 _craftingItem = null;

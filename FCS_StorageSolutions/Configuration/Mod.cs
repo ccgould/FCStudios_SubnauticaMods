@@ -447,57 +447,49 @@ namespace FCS_StorageSolutions.Configuration
 
         internal static void CleanDummyServers()
         {
-            //TODO Remove Debugs
-            QuickLogger.Debug("1");
-            var g = GameObject.FindObjectsOfType<DSSServerController>();
-            var h = GameObject.FindObjectsOfType<DSSTransceiverController>();
-            QuickLogger.Debug("2");
-            if (g == null && h == null) return;
-            QuickLogger.Debug("3");
+
+            var dssServerControllers = GameObject.FindObjectsOfType<DSSServerController>();
+            var dssTransceiverControllers = GameObject.FindObjectsOfType<DSSTransceiverController>();
+
+            if (dssServerControllers == null && dssTransceiverControllers == null) return;
+
             var toDelete = new List<GameObject>();
-            QuickLogger.Debug("4");
-            if (g != null)
+
+            if (dssServerControllers != null)
             {
-                QuickLogger.Debug("5");
-                foreach (DSSServerController ds in g)
+
+                foreach (DSSServerController ds in dssServerControllers)
                 {
                     var parentName = ds?.gameObject?.transform?.parent?.name;
-                QuickLogger.Debug($"6: {parentName}");
+
                     if (parentName != null && ds.gameObject.transform.parent.name.Equals("SerializerEmptyGameObject"))
                     {
-                        QuickLogger.Debug("7");
+
                         if (ds.gameObject.transform.parent.parent == null)
                         {
-                            QuickLogger.Debug("8");
                             toDelete.Add(ds.gameObject.transform.parent.gameObject);
-                            QuickLogger.Debug("9");
                         }
                     }
 
                 }
             }
 
-            if (h != null)
+            if (dssTransceiverControllers != null)
             {
-                QuickLogger.Debug("10");
-                foreach (DSSTransceiverController ds in h)
+                foreach (DSSTransceiverController ds in dssTransceiverControllers)
                 {
-                    QuickLogger.Debug("11");
                     if(ds?.gameObject?.transform?.parent?.name == null) continue;
                     if (ds.gameObject.transform.parent.name.Equals("SerializerEmptyGameObject"))
                     {
-                        QuickLogger.Debug("12");
                         if (ds.gameObject.transform.parent.parent == null)
                         {
-                            QuickLogger.Debug("13");
                             toDelete.Add(ds.gameObject.transform.parent.gameObject);
-                            QuickLogger.Debug("14");
                         }
                     }
 
                 }
             }
-            QuickLogger.Debug("15");
+
             foreach (GameObject o in toDelete)
             {
                 GameObject.Destroy(o);

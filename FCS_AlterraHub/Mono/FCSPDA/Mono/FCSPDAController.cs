@@ -314,23 +314,22 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
 
         private bool ValidateInformation()
         {
-            QuickLogger.Debug("1");
             var device = FCSAlterraHubService.PublicAPI.FindDevice(_deviceIdInput.text);
-            QuickLogger.Debug("2");
+
             if (device.Value == null)
             {
                 QuickLogger.Message($"Invalid Device: Device with id {_deviceIdInput.text} not found on base.");
                 return false;
             }
-            QuickLogger.Debug("3");
+
             _selectedDevice = device.Value;
-            QuickLogger.Debug("4");
+
             if (_isPullOperationToggle.isOn && _selectedTransferItem == TechType.None)
             {
                 QuickLogger.Message($"Please choose which item to send");
                 return false;
             }
-            QuickLogger.Debug("5");
+
             return true;
         }
 

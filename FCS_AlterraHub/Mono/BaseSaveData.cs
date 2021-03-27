@@ -11,5 +11,6 @@ namespace FCS_AlterraHub.Mono
         public bool HasBreakerTripped { get; set; }
         public List<TechType> BlackList { get; set; }
         public List<BaseTransferOperation> BaseOperations { get; set; }
+        public HashSet<CraftingOperation> CraftingOperations { get; set; }
     }
 }

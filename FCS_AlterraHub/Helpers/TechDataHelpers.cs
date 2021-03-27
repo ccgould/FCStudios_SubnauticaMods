@@ -65,12 +65,20 @@ namespace FCS_AlterraHub.Helpers
 
         public static int GetIngredientCount(Pickupable pickup)
         {
-            if (!_knownIngredientCounts.ContainsKey(pickup.GetTechType()))
-            {
-                _knownIngredientCounts.Add(pickup.GetTechType(),CalculateIngredientCount(GetIngredients(pickup.GetTechType())));
-            }
-            return _knownIngredientCounts[pickup.GetTechType()];
+            return GetIngredientCount(pickup.GetTechType());
         }
+
+        public static int GetIngredientCount(TechType techType)
+        {
+            if (!_knownIngredientCounts.ContainsKey(techType))
+            {
+                _knownIngredientCounts.Add(techType,
+                    CalculateIngredientCount(GetIngredients(techType)));
+            }
+
+            return _knownIngredientCounts[techType];
+        }
+
 
         private static int CalculateIngredientCount(List<IIngredient> ingredients)
         {

@@ -199,6 +199,11 @@ namespace FCS_AlterraHub.Mono
                 {
                     _baseOperations = _savedData.BaseOperations;
                 }
+
+                if (_savedData.CraftingOperations != null)
+                {
+                    _craftingOperations = _savedData.CraftingOperations;
+                }
             }
 
             if (_dumpContainer == null)
@@ -1093,7 +1098,7 @@ namespace FCS_AlterraHub.Mono
 
             var validServers = new List<ISlotController>();
 
-            QuickLogger.Debug($"Checking if allowed {_dumpContainer.GetItemCount() + 1}", true);
+            //QuickLogger.Debug($"Checking if allowed {_dumpContainer.GetItemCount() + 1}", true);
 
             foreach (IDSSRack baseRack in BaseRacks)
             {
@@ -1111,7 +1116,7 @@ namespace FCS_AlterraHub.Mono
 
             var result = availableSpace >= _dumpContainer.GetItemCount() + 1;
 
-            QuickLogger.Debug($"Allowed result: {result}", true);
+            //QuickLogger.Debug($"Allowed result: {result}", true);
             return result;
         }
 
@@ -1173,9 +1178,15 @@ namespace FCS_AlterraHub.Mono
                     AllowDocking = baseManager.PullFromDockedVehicles,
                     HasBreakerTripped = baseManager.HasBreakerTripped,
                     BlackList = baseManager.DockingBlackList,
-                    BaseOperations = baseManager.GetBaseOperations()
+                    BaseOperations = baseManager.GetBaseOperations(),
+                    CraftingOperations = baseManager.GetCraftingOperations()
                 };
             }
+        }
+
+        private HashSet<CraftingOperation> GetCraftingOperations()
+        {
+            return _craftingOperations;
         }
 
         public bool GetBreakerState()
@@ -1345,11 +1356,11 @@ namespace FCS_AlterraHub.Mono
 
         public void AddCraftingOperation(CraftingOperation operation)
         {
-            var isCreated = _craftingOperations.Any(x => x.IsSame(operation));
-            if (!isCreated)
-            {
+            //var isCreated = _craftingOperations.Any(x => x.IsSame(operation));
+            //if (!isCreated)
+            //{
                 _craftingOperations.Add(operation);
-            }
+            //}
         }
 
         public void RemoveCraftingOperation(CraftingOperation operation)

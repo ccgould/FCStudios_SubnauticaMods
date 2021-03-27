@@ -26,11 +26,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.ItemDisplay
         public bool IsAllowedToAdd(TechType techType, bool verbose)
         {
             if (_manager == null) return false;
-            QuickLogger.Debug($"Checking if allowed {_dumpContainer.GetItemCount() + 1}", true);
-
-            //TODO Check filter first
-
-
             int availableSpace = 0;
             foreach (IDSSRack baseRack in _manager.BaseRacks)
             {
@@ -38,7 +33,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.ItemDisplay
             }
 
             var result = availableSpace >= _dumpContainer.GetItemCount() + 1;
-            QuickLogger.Debug($"Allowed result: {result}", true);
             return result;
         }
 

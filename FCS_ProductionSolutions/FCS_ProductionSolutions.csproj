@@ -201,7 +201,6 @@
     <Compile Include="MatterAnalyzer\Mono\MatterAnalyzerStorage.cs" />
     <Compile Include="MatterAnalyzer\Mono\MessagePop.cs" />
     <Compile Include="Mods\AutoCrafter\Buildable\DSSAutoCrafterPatch.cs" />
-    <Compile Include="Mods\AutoCrafter\CraftingItem.cs" />
     <Compile Include="Mods\AutoCrafter\CraftMachine.cs" />
     <Compile Include="Mods\AutoCrafter\DSSAutoCrafterController.cs" />
     <Compile Include="Mods\AutoCrafter\DSSAutoCrafterCrateController.cs" />

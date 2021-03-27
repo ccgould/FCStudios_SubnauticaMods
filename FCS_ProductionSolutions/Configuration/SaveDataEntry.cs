@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using FCS_AlterraHub.Enumerators;
+using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Objects;
 using FCS_ProductionSolutions.DeepDriller.Configuration;
 using FCS_ProductionSolutions.DeepDriller.Structs;
@@ -94,7 +95,7 @@ namespace FCS_ProductionSolutions.Configuration
         [JsonProperty] internal string SaveVersion { get; set; } = "1.0";
         [JsonProperty] internal Vec4 Body { get; set; }
         [JsonProperty] internal Vec4 SecondaryBody { get; set; }
-        [JsonProperty] internal ObservableCollection<CraftingItem> CurrentProcess { get; set; }
+        [JsonProperty] internal ObservableCollection<CraftingOperation> CurrentProcess { get; set; }
         public bool IsRunning { get; set; }
     }
 
