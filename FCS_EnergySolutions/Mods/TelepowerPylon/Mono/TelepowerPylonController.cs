@@ -56,6 +56,7 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
         private TechType _mk3UpgradeTechType;
         private Button _upgradeBTN;
         private ParticleSystem[] _particles;
+        private bool _ifFromConstructed;
 
         private const int DEFAULT_CONNECTIONS_LIMIT = 6;
         private GameObject inputDummy
@@ -155,6 +156,20 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
         {
             OnDestroyCalledAction?.Invoke(this);
             FCS_AlterraHub.Patches.Player_Update_Patch.OnWorldSettled -= OnWorldSettled;
+
+            if (_ifFromConstructed)
+            {
+                switch (_currentUpgrade)
+                {
+                    case TelepowerPylonUpgrade.MK2:
+                        PlayerInteractionHelper.GivePlayerItem(_mk2UpgradeTechType);
+                        break;
+                    case TelepowerPylonUpgrade.MK3:
+                        PlayerInteractionHelper.GivePlayerItem(_mk3UpgradeTechType);
+                        break;
+                }
+            }
+
         }
 
         #endregion
@@ -659,7 +674,11 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
                 {
                     _runStartUpOnEnable = true;
                 }
+
+                _ifFromConstructed = false;
             }
+
+            QuickLogger.Debug($"Contstructed: {constructed}");
         }
 
         public override bool CanDeconstruct(out string reason)
@@ -679,15 +698,7 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
                 return false;
             }
 
-            switch (_currentUpgrade)
-            {
-                case TelepowerPylonUpgrade.MK2:
-                    PlayerInteractionHelper.GivePlayerItem(_mk2UpgradeTechType);
-                    break;
-                case TelepowerPylonUpgrade.MK3:
-                    PlayerInteractionHelper.GivePlayerItem(_mk3UpgradeTechType);
-                    break;
-            }
+            _ifFromConstructed = true;
 
             return true;
         }
@@ -811,6 +822,14 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
         }
         
         #endregion
+
+        public void ClearConnections()
+        {
+            foreach (KeyValuePair<string, TelepowerPylonController> connection in _currentConnections)
+            {
+                DeleteFrequencyItemAndDisconnectRelay(connection.Key);
+            }
+        }
     }
 
     internal enum TelepowerPylonUpgrade
