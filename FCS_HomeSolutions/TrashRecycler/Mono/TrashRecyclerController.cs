@@ -57,7 +57,7 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
 
         public override IFCSStorage GetStorage()
         {
-            return _recycler.GetStorage();
+            return _recycler?.GetStorage();
         }
 
         private void OnEnable()
