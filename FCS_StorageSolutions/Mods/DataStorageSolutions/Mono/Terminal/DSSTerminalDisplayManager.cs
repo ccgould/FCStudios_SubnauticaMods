@@ -169,6 +169,11 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             _itemTransceiverPage?.RefreshList();
         }
 
+        internal void RefreshCraftingGrid()
+        {
+            _craftingController?.Refresh();
+        }
+
         public override bool FindAllComponents()
         {
             try

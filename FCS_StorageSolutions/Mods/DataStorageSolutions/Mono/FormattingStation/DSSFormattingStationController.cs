@@ -34,7 +34,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.FormattingStation
 
         private void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.DSSTabID, Mod.ModName);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.DSSFormattingStationTabID, Mod.ModName);
             _storageManager.CleanUpDuplicatedStorageNoneRoutine();
             Manager.OnPowerStateChanged += OnPowerStateChanged;
             Manager.OnBreakerStateChanged += OnBreakerStateChanged;

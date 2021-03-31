@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCSCommon.Abstract;
@@ -76,6 +77,14 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
 
                 #endregion
 
+                var cancelBTN = GameObjectHelpers.FindGameObject(gameObject, "CancelBTN").GetComponent<Button>();
+                cancelBTN.onClick.AddListener(() =>
+                {
+                    OnCancelBtnClick?.Invoke();
+                    Clear();
+                });
+                
+
             }
             catch (Exception e)
             {
@@ -87,13 +96,25 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
             return true;
         }
 
+        internal void Clear()
+        {
+            ClearMissingItem();
+            _targetItemIcon.sprite = SpriteManager.defaultSprite;
+            ResetIngredientItems();
+            _ingredientsGrid.DrawPage();
+        }
+
+        public Action OnCancelBtnClick;
+
         private void OnLoadIngredientsGrid(DisplayData data)
         {
             try
             {
                 if (_mono == null) return;
 
-                var grouped = _mono.GetCraftingItem()?.Ingredients;
+                var grouped = TechDataHelpers.GetIngredients(_mono.GetCraftingItem().TechType);
+
+                QuickLogger.Debug($"Ingredients Count: {grouped.Count}",true);
 
                 if(grouped==null)return;
                 
@@ -102,10 +123,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                     data.EndPosition = grouped.Count;
                 }
 
-                for (int i = data.EndPosition; i < data.MaxPerPage - 1; i++)
-                {
-                    _ingredientItems[i].Reset();
-                }
+                ResetIngredientItems();
 
                 for (int i = data.StartPosition; i < data.EndPosition; i++)
                 {
@@ -121,20 +139,18 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
             }
         }
 
+        private void ResetIngredientItems()
+        {
+            for (int i = 0; i < 9; i++)
+            {
+                _ingredientItems[i].Reset();
+            }
+        }
+
         internal void LoadCraft(CraftingOperation operation)
         {
             _targetItemIcon.sprite = SpriteManager.Get(operation.TechType);
             _ingredientsGrid.DrawPage();
-
-        }
-
-        public void Refresh()
-        {
-
-        }
-
-        public void RemoveCraftingItem(CraftingOperation craftingItem)
-        {
 
         }
 
@@ -151,6 +167,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
         public void ClearMissingItem()
         {
             _sb.Clear();
+            _reqItemsList.text = string.Empty;
         }
 
         public void AddMissingItem(string item, int amount)

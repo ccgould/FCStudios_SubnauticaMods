@@ -2,6 +2,7 @@
 using System.Linq;
 using FCS_AlterraHub.Helpers;
 using FCSCommon.Extensions;
+using Oculus.Newtonsoft.Json;
 
 namespace FCS_AlterraHub.Mono
 {
@@ -12,10 +13,10 @@ namespace FCS_AlterraHub.Mono
         public bool IsBeingCrafted { get; set; }
         public bool IsOperational { get; set; }
         public HashSet<string> Devices { get; set; } = new HashSet<string>();
+        [JsonIgnore]public HashSet<FcsDevice> MountedBy { get; set; } = new HashSet<FcsDevice>();
         public int AmountCompleted { get; set; }
-        public List<IIngredient> Ingredients { get; set; } = new List<IIngredient>();
         public TechType TechType { get; set; }
-        public bool IsComplete => Amount >= AmountCompleted;
+        public bool IsComplete => AmountCompleted >= Amount;
 
         public CraftingOperation()
         {
@@ -27,22 +28,9 @@ namespace FCS_AlterraHub.Mono
             TechType = techType;
             Amount = amount;
             IsRecursive = isRecursive;
-            UpdateIngredients();
         }
 
-        public void UpdateIngredients()
-        {
-            if(TechType == TechType.None) return;
-
-            if (Ingredients.Any())
-            {
-                Ingredients.Clear();
-            }
-
-            Ingredients = TechDataHelpers.GetIngredients(TechType);
-        }
-        
-        public void AddDevice(string unitID)
+        private void AddDevice(string unitID)
         {
             Devices.Add(unitID);
             if (!IsRecursive)
@@ -51,7 +39,7 @@ namespace FCS_AlterraHub.Mono
             }
         }
 
-        public void RemoveDevice(string unitID)
+        private void RemoveDevice(string unitID)
         {
             Devices.Remove(unitID);
         }
@@ -67,7 +55,7 @@ namespace FCS_AlterraHub.Mono
         public bool CanCraft()
         {
             if (IsRecursive && IsBeingCrafted) return false;
-            return AmountCompleted < Amount && Devices.Count <= Amount;
+            return AmountCompleted < Amount && Devices.Count < Amount;
         }
 
         public void NotifyIfComplete()
@@ -83,6 +71,31 @@ namespace FCS_AlterraHub.Mono
         public TechType FixCustomTechType()
         {
             return _techTypeFixes.ContainsKey(TechType) ? _techTypeFixes[TechType] : TechType;
+        }
+
+        public bool IsMounted()
+        {
+            return MountedBy.Any();
+        }
+
+        public void Mount(FcsDevice device)
+        {
+            MountedBy.Add(device);
+            AddDevice(device.UnitID);
+        }
+
+        public void UnMount(FcsDevice device)
+        {
+            MountedBy.Remove(device);
+            RemoveDevice(device.UnitID);
+        }
+
+        public void AppendCompletion()
+        {
+            if (AmountCompleted < Amount)
+            {
+                AmountCompleted += 1;
+            }
         }
     }
 }

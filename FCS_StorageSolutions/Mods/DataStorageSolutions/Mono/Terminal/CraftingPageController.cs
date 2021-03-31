@@ -61,6 +61,11 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             gameObject.SetActive(false);
         }
 
+        public void Refresh()
+        {
+            _crafterSection?.Refresh();
+        }
+
         private void OnLoadItemsGrid(DisplayData data)
         {
             try

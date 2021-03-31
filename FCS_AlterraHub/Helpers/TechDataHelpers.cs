@@ -7,20 +7,24 @@ namespace FCS_AlterraHub.Helpers
 {
     public static class TechDataHelpers
     {
-        private static Dictionary<TechType,int> _knownIngredientCounts = new Dictionary<TechType, int>();
+        private static Dictionary<TechType, int> _knownIngredientCounts = new Dictionary<TechType, int>();
         private static HashSet<TechType> batteryTech;
         private static List<IIngredient> _ingredients = new List<IIngredient>();
+
         public static HashSet<TechType> BatteryTech
         {
             get
             {
                 if (batteryTech is null || batteryTech.Count == 0)
                 {
-                    batteryTech = new HashSet<TechType>(BatteryCharger.compatibleTech).Concat(PowerCellCharger.compatibleTech).ToHashSet();
+                    batteryTech = new HashSet<TechType>(BatteryCharger.compatibleTech)
+                        .Concat(PowerCellCharger.compatibleTech).ToHashSet();
                 }
+
                 return batteryTech;
             }
         }
+
         public static bool ContainsValidCraftData(TechType techType)
         {
             var data = CraftData.Get(techType, true);
@@ -60,7 +64,7 @@ namespace FCS_AlterraHub.Helpers
         public static bool IsUsedBattery(Pickupable pickupable)
         {
             IBattery component = pickupable.GetComponent<IBattery>();
-            return component != null && (double)component.charge < (double)component.capacity * 0.985f;
+            return component != null && (double) component.charge < (double) component.capacity * 0.985f;
         }
 
         public static int GetIngredientCount(Pickupable pickup)
@@ -79,7 +83,6 @@ namespace FCS_AlterraHub.Helpers
             return _knownIngredientCounts[techType];
         }
 
-
         private static int CalculateIngredientCount(List<IIngredient> ingredients)
         {
             int total = 0;
@@ -91,13 +94,11 @@ namespace FCS_AlterraHub.Helpers
             return total;
         }
 
-        public static List<IIngredient> GetIngredients(TechType techType)
+        public static List<IIngredient> GetIngredientsWithOutBatteries(TechType techType)
         {
             _ingredients.Clear();
 
             var it = CraftData.Get(techType);
-
-            QuickLogger.Debug($"Original Ingredient Count: {it.ingredientCount}", true);
 
             if (it != null)
             {
@@ -115,6 +116,30 @@ namespace FCS_AlterraHub.Helpers
                     }
                 }
             }
+
+            return _ingredients;
+        }
+
+        public static List<IIngredient> GetIngredients(TechType techType)
+        {
+            _ingredients.Clear();
+
+            var it = CraftData.Get(techType);
+
+            if (it != null)
+            {
+                List<IIngredient> readOnlyCollection = new List<IIngredient>();
+                for (int i = 0; i < it.ingredientCount; i++)
+                {
+                    readOnlyCollection.Add(it.GetIngredient(i));
+                }
+
+                foreach (IIngredient ingredient in readOnlyCollection)
+                {
+                    _ingredients.Add(ingredient);
+                }
+            }
+
             return _ingredients;
         }
     }

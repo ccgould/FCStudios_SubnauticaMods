@@ -26,23 +26,23 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
             _craftSlot1.CrafterID = 1;
             _craftSlot1.OnComplete += item =>
             {
-                UpdateDisplayElements();
                 if(!item.IsRecursive)
                 {
-                    _mono.DisplayManager.RemoveCraftingItem(item);
-                    _mono.DisplayManager.Refresh();
+                    _mono.Manager.RemoveCraftingOperation(item);
+                    _mono.ClearCraftingItem();
+                    item.UnMount(_mono);
+                    _mono.DisplayManager.Clear();
+                    _mono.Manager.NotifyByID("DTC", "RefreshCraftingGrid");
                 }
-
             };
 
-            //InvokeRepeating(nameof(TryCraft),1,1);
-            InvokeRepeating(nameof(UpdateDisplayElements),.1f,.1f);
             _isInitialized = true;
         }
         
         internal void SpawnItem(TechType techType)
         {
             if (_crafterBeltPath == null) return;
+
             //Spawn items
             var inv = GameObject.Instantiate(ModelPrefab.DSSCrafterCratePrefab);
             var follow = inv.AddComponent<DSSAutoCrafterCrateController>();
@@ -57,34 +57,12 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
             _itemsOnBelt -= 1;
             if (_itemsOnBelt < 0) _itemsOnBelt = 0;
         }
-
-        private void UpdateDisplayElements()
-        {
-            if (_craftSlot1 != null && _statusController != null)
-            {
-                if (_craftSlot1.IsOccupied)
-                {
-                    //_statusController.RefreshSlotOne(_craftSlot1TechType, _craftSlot1.GetComplete(), _craftSlot1.GetGoal());
-                }
-            }
-        }
-
+        
         private void TryCraft()
         {
-            if(!_mono.CraftingItems.Any()) return;
+            if(_mono.CraftingItem == null) return;
 
-            _craftSlot1.StartCrafting(_mono.CraftingItems[0], _mono);
-
-            //foreach (CraftingOperation craftingItem in _mono.CraftingItems)
-            //{
-            //    if (craftingItem.IsBeingCrafted) continue;
-
-            //    if (!_craftSlot1.IsOccupied)
-            //    {
-
-            //        continue;
-            //    }
-            //}
+            _craftSlot1.StartCrafting(_mono.CraftingItem, _mono);
         }
 
         public void StartOperation()

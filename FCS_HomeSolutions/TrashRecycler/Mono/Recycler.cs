@@ -118,7 +118,7 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
             QuickLogger.Debug($"Recycling Item ({Language.main.Get(techType)})", true);
 
 
-            List<IIngredient> list = TechDataHelpers.GetIngredients(techType);
+            List<IIngredient> list = TechDataHelpers.GetIngredientsWithOutBatteries(techType);
             QuickLogger.Debug($"Valid Ingredients Count: {list?.Count ?? 0}", true);
             if (list != null && list.Count > 0 )
             {
@@ -195,7 +195,7 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
         public bool IsAllowedToAdd(Pickupable pickupable)
         {
             TechType techType = pickupable.GetTechType();
-            List<IIngredient> list = TechDataHelpers.GetIngredients(techType);
+            List<IIngredient> list = TechDataHelpers.GetIngredientsWithOutBatteries(techType);
             var result = TechDataHelpers.ContainsValidCraftData(techType) && !TechDataHelpers.IsUsedBattery(pickupable) && (list.Count + _storageContainer.GetCount()) <= MaxStorage;
             QuickLogger.Debug($"Can hold item result: {result} || Storage Total: {list.Count + _storageContainer.GetCount()}", true);
             return result;

@@ -32,7 +32,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
 
         private void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.DSSTabID, Mod.ModName);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.DSSTerminalTabID, Mod.ModName);
             _display.Setup(this);
             Manager.OnPowerStateChanged += OnPowerStateChanged;
             Manager.OnBreakerStateChanged += OnBreakerStateChanged;
@@ -135,6 +135,11 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                 if (s.Equals("DeviceBuiltUpdate"))
                 {
                     _display.Refresh();
+                }
+
+                if (s.Equals("RefreshCraftingGrid"))
+                {
+                    _display.RefreshCraftingGrid();
                 }
             };
             InvokeRepeating(nameof(UpdateScreenState), 1, 1);

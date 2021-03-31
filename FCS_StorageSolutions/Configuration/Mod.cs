@@ -59,6 +59,7 @@ namespace FCS_StorageSolutions.Configuration
         internal const string ItemTransferUnitDescription = "N/A";
         internal const string ItemTransferUnitKitClassID = "ItemTransferUnit_Kit";
 
+        internal const string DSSFormattingStationTabID = "DFS";
         internal const string DSSFormattingStationFriendlyName = "Server Formatting Station";
         internal const string DSSFormattingStationClassName = "DSSFormattingStation";
         internal const string DSSFormattingStationPrefabName = "DSS_ServerFormatMachine";
@@ -71,7 +72,7 @@ namespace FCS_StorageSolutions.Configuration
         internal static string DSSItemDisplayKitClassID => $"{DSSItemDisplayClassName}_Kit";
         internal const string DSSItemDisplayDescription = "Small, single-item access terminal for the Data Storage Network. Now with multi-item deposit capability.";
 
-
+        internal const string DSSTerminalTabID = "DTC";
         internal const string DSSTerminalFriendlyName = "Terminal C48";
         internal const string DSSTerminalClassName = "DSSTerminalMonitor";
         internal const string DSSTerminalPrefabName = "DSS_TerminalMonitor";

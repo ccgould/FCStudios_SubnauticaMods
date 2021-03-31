@@ -78,10 +78,10 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             var confirmBTN = GameObjectHelpers.FindGameObject(gameObject, "ConfirmBTN").GetComponent<Button>();
             confirmBTN.onClick.AddListener(() =>
             {
-                if (!CheckIfAllIngredientsAvailable())
-                {
-                    _mono.GetController().ShowMessage(AuxPatchers.AllItemsNotAvailableToCraft());
-                }
+                //if (!CheckIfAllIngredientsAvailable())
+                //{
+                //    _mono.GetController().ShowMessage(AuxPatchers.AllItemsNotAvailableToCraft());
+                //}
 
                 if (_techType == TechType.None)
                 {

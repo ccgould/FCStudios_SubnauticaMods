@@ -1367,5 +1367,32 @@ namespace FCS_AlterraHub.Mono
         {
             _craftingOperations.Remove(operation);
         }
+
+        //private void ProcessCraftingOperation()
+        //{
+        //    var devices = GetDevices("ACU");
+        //    foreach (var operation in _craftingOperations)
+        //    {
+        //        if (operation.IsRecursive && operation.Devices.Any() && !operation.IsMounted())
+        //        {
+        //            foreach (string device in operation.Devices)
+        //            {
+        //                var machine = devices.FirstOrDefault(x => x.UnitID.Equals(device));
+        //                if (machine != null)
+        //                {
+        //                    machine
+        //                }
+        //            }
+        //        }
+        //    }
+
+        //    foreach (var device in _registeredDevices)
+        //    {
+        //        if (device.Value.TabID == "ACU")
+        //        {
+                    
+        //        }
+        //    }
+        //}
     }
 }
