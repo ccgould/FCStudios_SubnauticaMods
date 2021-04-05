@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using FCS_AlterraHub.Model;
 using FCS_LifeSupportSolutions.Configuration;
 using FCSCommon.Abstract;
 using FCSCommon.Extensions;
@@ -7,6 +8,7 @@ using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
+using WorldHelpers = FCS_AlterraHub.Helpers.WorldHelpers;
 
 namespace FCS_LifeSupportSolutions.Mods.EnergyPillVendingMachine.mono
 {
@@ -40,6 +42,16 @@ namespace FCS_LifeSupportSolutions.Mods.EnergyPillVendingMachine.mono
             {
                 _numberDisplay = GameObjectHelpers.FindGameObject(gameObject, "InputField").GetComponentInChildren<Text>();
                 
+                var pillRed = GameObjectHelpers.FindGameObject(gameObject, "Pill_Red").AddComponent<FCSToolTip>();
+                pillRed.RequestPermission += () => WorldHelpers.CheckIfInRange(pillRed.gameObject, Player.main.gameObject, 2);
+                pillRed.ToolTipStringDelegate += () => "2 min. adrenaline boost.";
+                var pillGreen = GameObjectHelpers.FindGameObject(gameObject, "Pill_Green").AddComponent<FCSToolTip>();
+                pillGreen.RequestPermission += () => WorldHelpers.CheckIfInRange(pillGreen.gameObject, Player.main.gameObject, 2);
+                pillGreen.ToolTipStringDelegate += () => "1 min. adrenaline boost.";
+                var pillCyan = GameObjectHelpers.FindGameObject(gameObject, "Pill_Cyan").AddComponent<FCSToolTip>();
+                pillCyan.RequestPermission += () => WorldHelpers.CheckIfInRange(pillCyan.gameObject, Player.main.gameObject, 2);
+                pillCyan.ToolTipStringDelegate += () => "30 sec. adrenaline boost.";
+
                 var purchaseBTNObj = GameObjectHelpers.FindGameObject(gameObject, "PurchaseBTN");
                 var purchaseBTN = purchaseBTNObj.GetComponent<Button>();
                 purchaseBTN.onClick.AddListener(() => { 
