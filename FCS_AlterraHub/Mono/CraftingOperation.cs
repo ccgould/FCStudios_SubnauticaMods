@@ -16,7 +16,13 @@ namespace FCS_AlterraHub.Mono
         [JsonIgnore]public HashSet<FcsDevice> MountedBy { get; set; } = new HashSet<FcsDevice>();
         public int AmountCompleted { get; set; }
         public TechType TechType { get; set; }
-        public bool IsComplete => AmountCompleted >= Amount;
+        public bool IsComplete => GetIsComplete();
+
+        private bool GetIsComplete()
+        {
+            if (IsRecursive) return false;
+            return AmountCompleted >= Amount;
+        }
 
         public CraftingOperation()
         {

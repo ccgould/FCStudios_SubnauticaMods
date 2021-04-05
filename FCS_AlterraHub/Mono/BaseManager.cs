@@ -1119,7 +1119,7 @@ namespace FCS_AlterraHub.Mono
             //QuickLogger.Debug($"Allowed result: {result}", true);
             return result;
         }
-
+        
         public bool IsAllowedToAdd(Pickupable inventoryItem, bool verbose)
         {
             return IsAllowedToAdd(inventoryItem.GetTechType(),verbose);

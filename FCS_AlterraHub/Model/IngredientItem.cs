@@ -39,7 +39,7 @@ namespace FCS_AlterraHub.Model
 
             if (_baseManager != null)
             {
-                IsNotAvailable = !_baseManager.HasItem(_techType);
+                IsNotAvailable = _baseManager.GetItemCount(_techType) < _amount;
                 _isNotAvailable.SetActive(IsNotAvailable);
             }
         }

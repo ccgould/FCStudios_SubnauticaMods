@@ -34,7 +34,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
 
             _mono.GetCraftingItem().IsBeingCrafted = true;
             _goal = craftingItem.Amount;
-            _startBuffer = MAXTIME;
+            _startBuffer = 1;
             IsOccupied = true;
         }
 
@@ -43,12 +43,12 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
             return _goal;
         }
 
-
-
         private void Update()
         {
 
             if (_mono?.GetCraftingItem() == null || _mono?.Manager == null || !IsOccupied) return;
+
+            //TODO Find a way to add to other storage systems
 
             if (!_mono.Manager.IsAllowedToAdd(_mono.GetCraftingItem().TechType, false))
             {
@@ -64,17 +64,28 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
 
             GetMissingItems(_mono.GetCraftingItem().TechType);
 
-            if (_mono.Manager.HasIngredientsFor(_mono.GetCraftingItem().TechType) && !_mono.GetCraftingItem().IsComplete)
+            var hasIngredients = _mono.Manager.HasIngredientsFor(_mono.GetCraftingItem().TechType);
+
+            if (hasIngredients && !_mono.GetCraftingItem().IsComplete)
             {
                 _mono.GetCraftingItem().AppendCompletion();
                 _mono.Manager.ConsumeIngredientsFor(_mono.GetCraftingItem().TechType);
                 _mono.Manager.AddItemToContainer(_mono.GetCraftingItem().FixCustomTechType().ToInventoryItemLegacy());
                 _mono.CraftManager.SpawnItem(_mono.GetCraftingItem().TechType);
+
                 _startBuffer = MAXTIME;
             }
             else
             {
-                _startBuffer = MAXTIME;
+                _startBuffer = 1;
+            }
+
+            if (!hasIngredients)
+            {
+                if (NotMetIngredients.Any())
+                {
+                    _mono.AskForCraftingAssistance(NotMetIngredients.ElementAt(0).Key);
+                }
             }
 
             if (_mono.GetCraftingItem().IsComplete)
@@ -87,16 +98,17 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                     IsOccupied = false;
                 }
             }
-
         }
 
         private void GetMissingItems(TechType craftingItemTechType)
         {
             _mono.ClearMissingItems();
+            NotMetIngredients.Clear();
             var missingItems = TechDataHelpers.GetIngredients(craftingItemTechType);
             foreach (IIngredient ingredient in missingItems)
             {
-                if (_mono.Manager.HasItem(ingredient.techType)) continue;
+                if (_mono.Manager.GetItemCount(ingredient.techType) >= ingredient.amount) continue;
+                NotMetIngredients.Add(ingredient.techType,ingredient.amount);
                 _mono.AddMissingItem(Language.main.Get(ingredient.techType), ingredient.amount);
             }
         }

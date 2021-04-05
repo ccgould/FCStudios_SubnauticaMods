@@ -27,7 +27,7 @@ namespace FCS_StorageSolutions.Configuration
 
         #endregion
 
-      
+        internal static event Action<SaveData> OnDataLoaded;
         internal static string ModName => "FCSStorageSolutions";
         internal static string SaveDataFilename => $"FCSStorageSolutionsSaveData.json";
         internal const string ModBundleName = "fcsstoragesolutionsbundle";
@@ -96,6 +96,7 @@ namespace FCS_StorageSolutions.Configuration
         internal const string DSSAntennaPrefabName = "DSS_Antenna";
         internal static string DSSAntennaKitClassID => $"{DSSAntennaClassName}_Kit";
         internal const string DSSAntennaDescription = "An antenna connects your habitat’s Data Storage System to the Global Data Storage Network of habitats (with antennae) and cyclops (built-in antennae).";
+        internal const string ModDescription = "";
 
 #if SUBNAUTICA
         internal static TechData DSSFloorServerRackIngredients => new TechData
@@ -123,7 +124,6 @@ namespace FCS_StorageSolutions.Configuration
             }
         };
 
-
 #if SUBNAUTICA
         internal static TechData DSSTerminalIngredients => new TechData
 #elif BELOWZERO
@@ -149,7 +149,6 @@ namespace FCS_StorageSolutions.Configuration
                 new Ingredient(DSSItemDisplayKitClassID.ToTechType(), 1),
             }
         };
-
 
 #if SUBNAUTICA
         internal static TechData DSSFormattingStationIngredients => new TechData
@@ -177,7 +176,6 @@ namespace FCS_StorageSolutions.Configuration
             }
         };
 
-
 #if SUBNAUTICA
         internal static TechData AlterraStorageIngredients => new TechData
 #elif BELOWZERO
@@ -191,7 +189,6 @@ namespace FCS_StorageSolutions.Configuration
             }
         };
 
-
 #if SUBNAUTICA
         internal static TechData DSSWallServerRackIngredients => new TechData
 #elif BELOWZERO
@@ -204,11 +201,6 @@ namespace FCS_StorageSolutions.Configuration
                 new Ingredient(DSSWallServerRackKitClassID.ToTechType(), 1),
             }
         };
-
-        
-        internal const string ModDescription = "";
-
-        internal static event Action<SaveData> OnDataLoaded;
 
         #region Internal Methods
 
@@ -496,6 +488,7 @@ namespace FCS_StorageSolutions.Configuration
                 GameObject.Destroy(o);
             }
         }
+        
         #endregion
 
         #region Private Methods
@@ -542,7 +535,6 @@ namespace FCS_StorageSolutions.Configuration
                 _registeredServers.Add(server);
             }
         }
-
         public static void UnRegisterServer(DSSServerController server)
         {
             _registeredServers.Remove(server);

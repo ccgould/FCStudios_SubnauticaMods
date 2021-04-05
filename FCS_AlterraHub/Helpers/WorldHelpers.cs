@@ -97,7 +97,7 @@ namespace FCS_AlterraHub.Helpers
             return Vector3.Distance(currentDevice.gameObject.transform.position, device.gameObject.transform.position);
         }
 
-        public static bool CheckIfInRange(GameObject mainGameObject, GameObject gameObject, int range)
+        public static bool CheckIfInRange(GameObject mainGameObject, GameObject gameObject, float range)
         {
             return Vector3.Distance(mainGameObject.transform.position, gameObject.transform.position) <= range;
         }

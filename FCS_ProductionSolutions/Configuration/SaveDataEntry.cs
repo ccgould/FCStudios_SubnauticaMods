@@ -97,6 +97,8 @@ namespace FCS_ProductionSolutions.Configuration
         [JsonProperty] internal Vec4 SecondaryBody { get; set; }
         [JsonProperty] internal ObservableCollection<CraftingOperation> CurrentProcess { get; set; }
         public bool IsRunning { get; set; }
+        [JsonProperty] internal AutoCrafterMode CurrentCrafterMode { get; set; }
+        [JsonProperty] internal HashSet<TechType> KnownCrafts { get; set; }
     }
 
     [Serializable]

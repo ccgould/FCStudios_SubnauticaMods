@@ -25,16 +25,18 @@ namespace FCS_AlterraHub.Model
         public void GetTooltip(out string tooltipText, List<TooltipIcon> tooltipIcons)
         {
             var result = RequestPermission?.Invoke() ?? false;
+            
             if (ToolTipStringDelegate != null)
             {
                 Tooltip = ToolTipStringDelegate?.Invoke();
             }
+
             if(TechType != TechType.None)
             {
                 bool locked = !CrafterLogic.IsCraftRecipeUnlocked(TechType);
-                TooltipFactory.BuildTech(TechType, locked, out tooltipText, tooltipIcons);
-                return;
+                TooltipFactory.BuildTech(TechType, locked, out Tooltip, tooltipIcons);
             }
+
             tooltipText = result ? Tooltip : string.Empty;
         }
 #endif
