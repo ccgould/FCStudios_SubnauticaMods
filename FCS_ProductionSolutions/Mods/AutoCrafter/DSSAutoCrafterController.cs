@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
@@ -9,6 +10,7 @@ using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
+using SMLHelper.V2.Handlers;
 using UnityEngine;
 
 namespace FCS_ProductionSolutions.Mods.AutoCrafter
@@ -21,14 +23,11 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
         internal DSSAutoCrafterDisplay DisplayManager;
         private bool _hasBreakTripped;
         internal DSSCraftManager CraftManager;
-        internal CraftingOperation CraftingItem;
         private bool _moveBelt;
         private float _beltSpeed = 0.01f;
         private IEnumerable<Material> _materials;
         private GameObject _canvas;
         internal AutoCrafterMode CurrentCrafterMode = AutoCrafterMode.Automatic;
-        private bool IsCrafting => _craftingItem != null;
-        private CraftingOperation _craftingItem;
         public override bool IsVisible => IsInitialized && IsConstructed;
         public override bool IsOperational => IsInitialized && IsConstructed;
         private List<TechType> ModCraftables => Mod.Craftables;
@@ -85,6 +84,24 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                 Manager.OnPowerStateChanged += OnPowerStateChanged;
                 Manager.OnBreakerStateChanged += OnBreakerStateChanged;
                 OnPowerStateChanged(Manager.GetPowerState());
+            }
+            DisplayManager?.OnLoadComplete?.Invoke();
+            InvokeRepeating(nameof(CheckStatus),1,1);
+        }
+        
+        private void CheckStatus()
+        {
+            if (CurrentCrafterMode == AutoCrafterMode.StandBy)
+            {
+                UpdateStatus(AutocrafterStatus.StandBy);
+            }
+            else if (CurrentCrafterMode == AutoCrafterMode.Automatic && CraftManager.IsRunning())
+            {
+                UpdateStatus(AutocrafterStatus.Working);
+            }
+            else
+            {
+                UpdateStatus(AutocrafterStatus.Waiting);
             }
         }
 
@@ -218,12 +235,15 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
             if (_colorManager == null)
             {
                 _colorManager = gameObject.AddComponent<ColorManager>();
-                _colorManager.Initialize(gameObject, ModelPrefab.BodyMaterial, ModelPrefab.SecondaryMaterial);
+                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol, AlterraHub.BaseSecondaryCol);
             }
 
             MoveBelt();
 
-            //TODO Reenable
+            MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseEmissiveDecals, gameObject, 4f);
+
+            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseEmissiveDecalsController, gameObject,Color.cyan);
+
             InvokeRepeating(nameof(CheckForAvailableCrafts), 1f, 1f);
 
             IsInitialized = true;
@@ -233,9 +253,8 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
 
         private void OnCancelBtnClick()
         {
-            Manager.RemoveCraftingOperation(CraftingItem);
+            Manager.RemoveCraftingOperation(CraftManager.GetCraftingOperation());
             DisplayManager.Clear();
-            CraftingItem = null;
             CraftManager.StopOperation();
             CraftManager.Reset(true);
         }
@@ -247,7 +266,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
 
         private void CheckForAvailableCrafts()
         {
-            if (Manager == null || IsCrafting || CurrentCrafterMode != AutoCrafterMode.Automatic) return;
+            if (Manager == null || CraftManager.IsRunning() || CurrentCrafterMode != AutoCrafterMode.Automatic) return;
 
             //Check if already has operation
             var hasOperation = Manager.GetBaseCraftingOperations().FirstOrDefault(x => x.Devices.Contains(UnitID));
@@ -270,11 +289,9 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
         {
             try
             {
-                _craftingItem = operation;
+                CraftManager.StartOperation(operation);
                 DisplayManager.LoadCraft(operation);
                 operation.IsBeingCrafted = true;
-                CraftingItem = operation;
-                CraftManager.StartOperation();
                 operation.Mount(this);
             }
             catch (Exception e)
@@ -400,10 +417,6 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
             return _moveBelt;
         }
 
-        public CraftingOperation GetCraftingItem()
-        {
-            return _craftingItem;
-        }
 
         public void ShowMessage(string message)
         {
@@ -420,15 +433,10 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
             DisplayManager?.AddMissingItem(item, amount);
         }
 
-        public void ClearCraftingItem()
-        {
-            _craftingItem = null;
-        }
-
         public void AskForCraftingAssistance(TechType techType)
         {
             QuickLogger.Debug($" ==== Ask For Crafting Assistance {UnitID} | {Language.main.Get(techType)} ====", true);
-            if (!Manager.HasIngredientsFor(techType))
+            if (!Mod.Craftables.Contains(techType) || !Manager.HasIngredientsFor(techType))
             {
                 QuickLogger.Debug($"Base doesnt have ingredients for {Language.main.Get(techType)}", true);
                 return;
@@ -438,8 +446,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
             QuickLogger.Debug($"Crafters Found: {crafters.Count()}", true);
             foreach (DSSAutoCrafterController crafter in crafters)
             {
-                QuickLogger.Debug($"Crafter {crafter.UnitID}: {crafter.CurrentCrafterMode} | {crafter.IsCrafting}", true);
-                if (crafter.CurrentCrafterMode == AutoCrafterMode.StandBy && !crafter.IsCrafting)
+                if (crafter.CurrentCrafterMode == AutoCrafterMode.StandBy && !crafter.CraftManager.IsRunning())
                 {
                     QuickLogger.Debug($"Crafting {Language.main.Get(techType)}", true);
                     crafter.CraftItem(new CraftingOperation(techType, 1, false));
@@ -463,6 +470,24 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
         {
             CurrentCrafterMode = AutoCrafterMode.Automatic;
         }
+
+        internal void UpdateStatus(AutocrafterStatus status)
+        {
+            DisplayManager.OnStatusUpdate?.Invoke(status.ToString());
+        }
+
+        internal void UpdateTotal(Vector2 total)
+        {
+            DisplayManager.OnTotalUpdate?.Invoke(total);
+        }
+    }
+
+    internal enum AutocrafterStatus
+    {
+        Waiting = 0,
+        Working = 1,
+        StandBy = 2,
+        Idle = 3
     }
 
     internal enum AutoCrafterMode

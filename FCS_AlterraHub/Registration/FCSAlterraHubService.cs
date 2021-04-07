@@ -27,7 +27,7 @@ namespace FCS_AlterraHub.Registration
         void RegisterEncyclopediaEntry(TechType techType, List<FcsEntryData> entry);
         void AddEncyclopediaEntries(TechType techType, bool verbose);
 
-        void UnRegisterDevice(FcsDevice miniFountainFilterController);
+        void UnRegisterDevice(FcsDevice device);
         Dictionary<string, FcsDevice> GetRegisteredDevicesOfId(string id);
         void RegisterTechLight(TechLight techLight);
         bool ChargeAccount(decimal amount);

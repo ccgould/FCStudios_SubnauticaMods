@@ -136,6 +136,8 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.ItemDisplay
             }
 
             var addToNetworkBTN = GameObjectHelpers.FindGameObject(gameObject, "AddBTN").AddComponent<InterfaceButton>();
+            addToNetworkBTN.IconType = HandReticle.IconType.Interact;
+            addToNetworkBTN.ShowMouseClick = true;
             addToNetworkBTN.TextLineOne = AuxPatchers.AddItemToNetwork();
             addToNetworkBTN.TextLineTwo = AuxPatchers.AddItemToNetworkDesc();
             addToNetworkBTN.OnButtonClick += (s, o) =>
@@ -150,6 +152,8 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.ItemDisplay
 
             var iconBTN = GameObjectHelpers.FindGameObject(gameObject, "Icon").AddComponent<InterfaceButton>();
             iconBTN.GetAdditionalDataFromString = true;
+            iconBTN.IconType = HandReticle.IconType.Interact;
+            iconBTN.ShowMouseClick = true;
             iconBTN.Tag = this;
             iconBTN.GetAdditionalString += GetAdditionalString;
             iconBTN.OnButtonClick += (s, o) =>

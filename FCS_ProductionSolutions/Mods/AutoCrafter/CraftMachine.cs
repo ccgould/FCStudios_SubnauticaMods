@@ -30,11 +30,10 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
 
             if (craftingItem == null)return;
 
-            QuickLogger.Debug($"[StartCraft] Crafting:{craftingItem.TechType}",true);
-
-            _mono.GetCraftingItem().IsBeingCrafted = true;
+            _mono.CraftManager.GetCraftingOperation().IsBeingCrafted = true;
             _goal = craftingItem.Amount;
             _startBuffer = 1;
+            _mono.UpdateTotal(new Vector2(craftingItem.AmountCompleted,craftingItem.Amount));
             IsOccupied = true;
         }
 
@@ -46,33 +45,33 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
         private void Update()
         {
 
-            if (_mono?.GetCraftingItem() == null || _mono?.Manager == null || !IsOccupied) return;
+            if (_mono?.CraftManager?.GetCraftingOperation() == null || _mono?.Manager == null || !IsOccupied) return;
 
             //TODO Find a way to add to other storage systems
 
-            if (!_mono.Manager.IsAllowedToAdd(_mono.GetCraftingItem().TechType, false))
+            if (!_mono.Manager.IsAllowedToAdd(_mono.CraftManager.GetCraftingOperation().TechType, false))
             {
-                _mono.ShowMessage($"{Language.main.Get(_mono.GetCraftingItem().TechType)} is not allowed in your system. Please add a server that can store this item or add an unformatted server.");
+                _mono.ShowMessage($"{Language.main.Get(_mono.CraftManager.GetCraftingOperation().TechType)} is not allowed in your system. Please add a server that can store this item or add an unformatted server.");
                 return;
             }
-
+            
             if (_startBuffer > 0)
             {
                 _startBuffer -= DayNightCycle.main.deltaTime;
                 return;
             }
 
-            GetMissingItems(_mono.GetCraftingItem().TechType);
+            GetMissingItems(_mono.CraftManager.GetCraftingOperation().TechType);
 
-            var hasIngredients = _mono.Manager.HasIngredientsFor(_mono.GetCraftingItem().TechType);
+            var hasIngredients = _mono.Manager.HasIngredientsFor(_mono.CraftManager.GetCraftingOperation().TechType);
 
-            if (hasIngredients && !_mono.GetCraftingItem().IsComplete)
+            if (hasIngredients && !_mono.CraftManager.GetCraftingOperation().IsComplete)
             {
-                _mono.GetCraftingItem().AppendCompletion();
-                _mono.Manager.ConsumeIngredientsFor(_mono.GetCraftingItem().TechType);
-                _mono.Manager.AddItemToContainer(_mono.GetCraftingItem().FixCustomTechType().ToInventoryItemLegacy());
-                _mono.CraftManager.SpawnItem(_mono.GetCraftingItem().TechType);
-
+                _mono.CraftManager.GetCraftingOperation().AppendCompletion();
+                _mono.Manager.ConsumeIngredientsFor(_mono.CraftManager.GetCraftingOperation().TechType);
+                _mono.Manager.AddItemToContainer(_mono.CraftManager.GetCraftingOperation().FixCustomTechType().ToInventoryItemLegacy());
+                _mono.CraftManager.SpawnItem(_mono.CraftManager.GetCraftingOperation().TechType);
+                _mono.UpdateTotal(new Vector2(_mono.CraftManager.GetCraftingOperation().AmountCompleted, _mono.CraftManager.GetCraftingOperation().Amount));
                 _startBuffer = MAXTIME;
             }
             else
@@ -88,12 +87,12 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                 }
             }
 
-            if (_mono.GetCraftingItem().IsComplete)
+            if (_mono.CraftManager.GetCraftingOperation().IsComplete)
             {
                 QuickLogger.Debug($"Is Complete",true);
-                OnComplete?.Invoke(_mono.GetCraftingItem());
-
-                if (!_mono.GetCraftingItem().IsRecursive)
+                _mono.UpdateTotal(new Vector2(0, 0));
+                OnComplete?.Invoke(_mono.CraftManager.GetCraftingOperation());
+                if (!_mono.CraftManager.GetCraftingOperation().IsRecursive)
                 {
                     IsOccupied = false;
                 }
@@ -115,10 +114,10 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
 
         public void Reset(bool bypass)
         {
-            if (_mono.GetCraftingItem() == null || _mono == null) return;
-            if (!_mono.GetCraftingItem().IsRecursive || bypass)
+            if (_mono.CraftManager.GetCraftingOperation() == null || _mono == null) return;
+            if (!_mono.CraftManager.GetCraftingOperation().IsRecursive || bypass)
             {
-                _mono.ClearCraftingItem();
+                _mono.CraftManager.StopOperation();
                 IsOccupied = false;
                 _goal = 0;
             }

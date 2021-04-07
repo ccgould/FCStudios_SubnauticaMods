@@ -1,4 +1,5 @@
-﻿using FCS_ProductionSolutions.Buildable;
+﻿using FCS_AlterraHub.Mono;
+using FCS_ProductionSolutions.Buildable;
 using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using UnityEngine;
@@ -14,6 +15,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
         private bool _isInitialized;
         private int _itemsOnBelt;
         private Transform[] _crafterBeltPath;
+        private CraftingOperation _craftingItem;
 
         public void Initialize(DSSAutoCrafterController mono)
         {
@@ -28,7 +30,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                 if(!item.IsRecursive)
                 {
                     _mono.Manager.RemoveCraftingOperation(item);
-                    _mono.ClearCraftingItem();
+                    StopOperation();
                     item.UnMount(_mono);
                     _mono.DisplayManager.Clear();
                     _mono.Manager.NotifyByID("DTC", "RefreshCraftingGrid");
@@ -59,21 +61,20 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
         
         private void TryCraft()
         {
-            if(_mono.CraftingItem == null) return;
+            if(_craftingItem == null) return;
 
-            _craftSlot1.StartCrafting(_mono.CraftingItem, _mono);
+            _craftSlot1.StartCrafting(_craftingItem, _mono);
         }
 
-        public void StartOperation()
+        public void StartOperation(CraftingOperation operation)
         {
-            _startCrafting = true;
-
+            _craftingItem = operation;
             TryCraft();
         }
 
         public void StopOperation()
         {
-            _startCrafting = false;
+            _craftingItem = null;
         }
 
         public void Reset(bool bypass = false)
@@ -83,12 +84,17 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
 
         public bool IsRunning()
         {
-            return _startCrafting;
+            return _craftingItem != null;
         }
 
         public bool ItemsOnBelt()
         {
             return _itemsOnBelt > 0;
+        }
+
+        public CraftingOperation GetCraftingOperation()
+        {
+            return _craftingItem;
         }
     }
 }

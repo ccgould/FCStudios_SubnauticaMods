@@ -33,6 +33,8 @@ namespace FCS_AlterraHub.Mono
         {
             bool inInteractionRange = InInteractionRange();
 
+            HandReticle main = HandReticle.main;
+
             if (this.IsHovered && inInteractionRange == false)
             {
                 this.IsHovered = false;
@@ -48,30 +50,54 @@ namespace FCS_AlterraHub.Mono
             {
                 if(string.IsNullOrEmpty(TextLineOne) && string.IsNullOrEmpty(TextLineTwo) && !GetAdditionalDataFromString) return;
 
-                if (UseSetUseTextRaw)
+                if (ShowMouseClick)
                 {
                     if (GetAdditionalDataFromString)
                     {
-                        HandReticle.main.SetIcon(IconType);
-                        HandReticle.main.SetUseTextRaw(this.TextLineOne, GetAdditionalString?.Invoke(Tag));
+                        main.SetIcon(IconType);
+                        if (!string.IsNullOrWhiteSpace(TextLineOne))
+                        {
+                            main.SetInteractText(TextLineOne,GetAdditionalString?.Invoke(Tag));
+                        }
+                        else
+                        {
+                            main.SetInteractText(GetAdditionalString?.Invoke(Tag));
+                        }
                     }
                     else
                     {
-                        HandReticle.main.SetUseTextRaw(this.TextLineOne, this.TextLineTwo);
+                        main.SetIcon(IconType);
+                        main.SetInteractText(this.TextLineOne,this.TextLineTwo);
                     }
                 }
                 else
                 {
-                    if (GetAdditionalDataFromString)
+                    if (UseSetUseTextRaw)
                     {
-                        HandReticle.main.SetIcon(IconType);
-                        HandReticle.main.SetInteractTextRaw(this.TextLineOne, GetAdditionalString?.Invoke(Tag));
+                        if (GetAdditionalDataFromString)
+                        {
+                            main.SetIcon(IconType);
+                            main.SetUseTextRaw(this.TextLineOne, GetAdditionalString?.Invoke(Tag));
+                        }
+                        else
+                        {
+                            main.SetUseTextRaw(this.TextLineOne, this.TextLineTwo);
+                        }
                     }
                     else
                     {
-                        HandReticle.main.SetInteractTextRaw(this.TextLineOne, this.TextLineTwo);
+                        if (GetAdditionalDataFromString)
+                        {
+                            main.SetIcon(IconType);
+                            main.SetInteractTextRaw(this.TextLineOne, GetAdditionalString?.Invoke(Tag));
+                        }
+                        else
+                        {
+                            main.SetInteractTextRaw(this.TextLineOne, this.TextLineTwo);
+                        }
                     }
                 }
+
             }
 #elif BELOWZERO
             if (this.IsHovered && inInteractionRange)
@@ -83,6 +109,8 @@ namespace FCS_AlterraHub.Mono
 
 #endif
         }
+
+        public bool ShowMouseClick { get; set; } = false;
 
         public HandReticle.IconType IconType { get; set; } = HandReticle.IconType.Default;
 

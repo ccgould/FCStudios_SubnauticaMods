@@ -43,7 +43,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             }));
 
             _grid = craftersSideBarGrid.EnsureComponent<GridHelperV2>();
-            _grid.OnLoadDisplay += OnLoadItemsGrid;
+            _grid.OnLoadDisplay += OnLoadCraftersGrid;
             _grid.Setup(8, gameObject, Color.gray, Color.white, null, "CraftersSideBarGrid");
             
             _crafterSection = GameObjectHelpers.FindGameObject(gameObject, "CrafterSection").AddComponent<CrafterSectionController>();
@@ -64,9 +64,10 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         public void Refresh()
         {
             _crafterSection?.Refresh();
+            _grid.DrawPage();
         }
 
-        private void OnLoadItemsGrid(DisplayData data)
+        private void OnLoadCraftersGrid(DisplayData data)
         {
             try
             {

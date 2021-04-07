@@ -447,7 +447,7 @@ namespace FCS_AlterraHub.Mono
                 }
 
                 _registeredDevices?.Remove(device.UnitID);
-                GlobalNotifyByID(String.Empty, "DeviceBuiltUpdate");
+                GlobalNotifyByID(string.Empty, "DeviceBuiltUpdate");
             }
         }
 
@@ -529,8 +529,7 @@ namespace FCS_AlterraHub.Mono
         {
             if (!string.IsNullOrEmpty(modID))
             {
-                foreach (KeyValuePair<string, FcsDevice> device in FCSAlterraHubService.PublicAPI
-                    .GetRegisteredDevicesOfId(modID))
+                foreach (KeyValuePair<string, FcsDevice> device in FCSAlterraHubService.PublicAPI.GetRegisteredDevicesOfId(modID))
                 {
                     device.Value.IPCMessage?.Invoke(commandMessage);
                 }
@@ -704,7 +703,7 @@ namespace FCS_AlterraHub.Mono
                 
             }
 
-            GlobalNotifyByID("DSS","ItemUpdateDisplay");GlobalNotifyByID("DSS","ItemUpdateDisplay");
+            GlobalNotifyByID("DTC", "ItemUpdateDisplay");
 
             return null;
         }
@@ -812,7 +811,7 @@ namespace FCS_AlterraHub.Mono
                 }
             }
 
-            GlobalNotifyByID("DSS", "ItemUpdateDisplay");
+            GlobalNotifyByID("DTC", "ItemUpdateDisplay");
         }
 
         public void RemoveItemsFromTracker(FcsDevice server, TechType item, int amountToRemove = 1)
@@ -840,7 +839,7 @@ namespace FCS_AlterraHub.Mono
                     }
                 }
 
-                GlobalNotifyByID("DSS", "ItemUpdateDisplay");
+                GlobalNotifyByID("DTC", "ItemUpdateDisplay");
             }
         }
 
@@ -857,7 +856,7 @@ namespace FCS_AlterraHub.Mono
             server.OnRemoveItem -= OnServerRemoveItem;
             BaseServers.Remove(server);
             //BaseManager.SetAllowedToNotify(true);
-            GlobalNotifyByID("DSS", "ItemUpdateDisplay");
+            GlobalNotifyByID("DTC", "ItemUpdateDisplay");
         }
 
         public void RegisterServerInBase(FcsDevice server)
@@ -873,7 +872,7 @@ namespace FCS_AlterraHub.Mono
                 server.OnAddItem += OnServerAddItem;
                 server.OnRemoveItem += OnServerRemoveItem;
                 //BaseManager.SetAllowedToNotify(true);
-                GlobalNotifyByID("DSS", "ItemUpdateDisplay");
+                GlobalNotifyByID("DTC", "ItemUpdateDisplay");
             }
         }
 
@@ -989,7 +988,7 @@ namespace FCS_AlterraHub.Mono
                         trackedResource.StorageContainers.Remove(sc);
                     }
                 }
-                GlobalNotifyByID("DSS", "ItemUpdateDisplay");
+                GlobalNotifyByID("DTC", "ItemUpdateDisplay");
             }
         }
 
@@ -1020,7 +1019,7 @@ namespace FCS_AlterraHub.Mono
                     }
                 });
             }
-            GlobalNotifyByID("DSS", "ItemUpdateDisplay");
+            GlobalNotifyByID("DTC", "ItemUpdateDisplay");
         }
 
         #endregion

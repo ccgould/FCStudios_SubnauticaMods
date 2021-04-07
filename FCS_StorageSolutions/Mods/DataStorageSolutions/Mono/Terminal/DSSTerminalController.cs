@@ -127,6 +127,8 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
 
             IPCMessage += s =>
             {
+                QuickLogger.Debug($"[Terminal - {UnitID}] IPCMessage: {s}",true);
+
                 if (s.Equals("ItemUpdateDisplay"))
                 {
                     _display.Refresh();
@@ -135,6 +137,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                 if (s.Equals("DeviceBuiltUpdate"))
                 {
                     _display.Refresh();
+                    _display.RefreshCraftingGrid();
                 }
 
                 if (s.Equals("RefreshCraftingGrid"))
