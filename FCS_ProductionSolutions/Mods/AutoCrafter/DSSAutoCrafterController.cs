@@ -435,25 +435,26 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
 
         public void AskForCraftingAssistance(TechType techType)
         {
-            QuickLogger.Debug($" ==== Ask For Crafting Assistance {UnitID} | {Language.main.Get(techType)} ====", true);
+            //QuickLogger.Debug($" ==== Ask For Crafting Assistance {UnitID} | {Language.main.Get(techType)} ====", true);
+            GetCraftables();
             if (!Mod.Craftables.Contains(techType) || !Manager.HasIngredientsFor(techType))
             {
-                QuickLogger.Debug($"Base doesnt have ingredients for {Language.main.Get(techType)}", true);
+                //QuickLogger.Debug($"Base doesnt have ingredients for {Language.main.Get(techType)}", true);
                 return;
             }
 
             var crafters = Manager.GetDevices(Mod.DSSAutoCrafterTabID);
-            QuickLogger.Debug($"Crafters Found: {crafters.Count()}", true);
+            //QuickLogger.Debug($"Crafters Found: {crafters.Count()}", true);
             foreach (DSSAutoCrafterController crafter in crafters)
             {
                 if (crafter.CurrentCrafterMode == AutoCrafterMode.StandBy && !crafter.CraftManager.IsRunning())
                 {
-                    QuickLogger.Debug($"Crafting {Language.main.Get(techType)}", true);
+                    //QuickLogger.Debug($"Crafting {Language.main.Get(techType)}", true);
                     crafter.CraftItem(new CraftingOperation(techType, 1, false));
                 }
             }
 
-            QuickLogger.Debug($" ==== Ask For Crafting Assistance {UnitID} | {Language.main.Get(techType)} ====");
+            //QuickLogger.Debug($" ==== Ask For Crafting Assistance {UnitID} | {Language.main.Get(techType)} ====");
         }
 
         internal void SetStandBy()
