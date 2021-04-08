@@ -492,7 +492,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
             CurrentCrafterMode = AutoCrafterMode.Manual;
         }
 
-        internal void SetAutomatica()
+        internal void SetAutomatic()
         {
             CurrentCrafterMode = AutoCrafterMode.Automatic;
         }

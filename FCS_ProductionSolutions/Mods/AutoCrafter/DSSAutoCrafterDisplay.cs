@@ -144,7 +144,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                     }
                     else
                     {
-                        _mono.SetAutomatica();
+                        _mono.SetAutomatic();
                     }
 
                 }));
@@ -344,7 +344,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                 display.GoToPage(AutoCrafterPages.Automatic);
                 if (display.GetController().CurrentCrafterMode != AutoCrafterMode.StandBy)
                 {
-                    display.GetController().SetAutomatica();
+                    display.GetController().SetAutomatic();
                 }
             }));
 
@@ -379,6 +379,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
         private DSSAutoCrafterDisplay _mono;
         private int _amount = 1;
         private Text _craftingAmount;
+        private const float _maxInteraction = 0.9f;
 
         internal void Initialize(DSSAutoCrafterDisplay mono)
         {
@@ -411,6 +412,8 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
             _craftingAmount = InterfaceHelpers.FindGameObject(gameObject, "CraftAmount").GetComponent<Text>();
 
             var craftBTN = GameObjectHelpers.FindGameObject(mono.ManualPage, "CraftBTN").GetComponent<Button>();
+            var craftFBTN = craftBTN.gameObject.AddComponent<FCSButton>();
+            craftFBTN.MaxInteractionRange = _maxInteraction;
             craftBTN.onClick.AddListener((() =>
             {
                 _mono.GetController().CraftItem(new CraftingOperation(_selectedCraftable, _amount, false));
@@ -419,6 +422,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
 
             var addBTN = GameObjectHelpers.FindGameObject(gameObject, "AddBTN").GetComponent<Button>();
             var addFBTN = addBTN.gameObject.AddComponent<FCSButton>();
+            addFBTN.MaxInteractionRange = _maxInteraction;
             addFBTN.ShowMouseClick = true;
             addFBTN.TextLineOne = "Add";
             addFBTN.TextLineTwo = "Adds to the amount to craft. Hold (Shift) to increment by 10.";
@@ -443,6 +447,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
 
             var subtractBTN = GameObjectHelpers.FindGameObject(gameObject, "MinusBTN").GetComponent<Button>();
             var subtractFBTN = subtractBTN.gameObject.AddComponent<FCSButton>();
+            subtractFBTN.MaxInteractionRange = _maxInteraction;
             subtractFBTN.ShowMouseClick = true;
             subtractFBTN.TextLineOne = "Subtract";
             subtractFBTN.TextLineTwo = "Removes from the amount to craft. Hold (Shift) to decrement by 10.";
@@ -467,6 +472,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
 
             var backBTN = GameObjectHelpers.FindGameObject(gameObject, "BackBTN").GetComponent<Button>();
             var backFBTN = backBTN.gameObject.AddComponent<FCSButton>();
+            backFBTN.MaxInteractionRange = _maxInteraction;
             backFBTN.ShowMouseClick = true;
             backFBTN.TextLineOne = "Back";
             backBTN.onClick.AddListener((() =>
@@ -579,7 +585,9 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
         private StringBuilder _sb2 = new StringBuilder();
         private Dictionary<TechType,int> _ingredients = new Dictionary<TechType, int>();
         private DSSAutoCrafterController _mono;
-        
+        private const float _maxInteraction = 0.9f;
+
+
         public Action<TechType,bool> OnButtonClick { get; set; }
 
         internal void Initialize(DSSAutoCrafterController mono)
@@ -589,20 +597,11 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
             _button = gameObject.GetComponentInChildren<Toggle>();
             _button.onValueChanged.AddListener((value => {OnButtonClick?.Invoke(_techType,value);}));
             var fcsbutton = _button.gameObject.AddComponent<FCSButton>();
-            fcsbutton.MaxInteractionRange = 0.8f;
+            fcsbutton.MaxInteractionRange = _maxInteraction;
 
             _toolTip = _button.gameObject.AddComponent<FCSToolTip>();
-            _toolTip.RequestPermission += () => WorldHelpers.CheckIfInRange(gameObject, Player.main.gameObject,0.8f);
+            _toolTip.RequestPermission += () => WorldHelpers.CheckIfInRange(gameObject, Player.main.gameObject, _maxInteraction);
             _toolTip.ToolTipStringDelegate += ToolTipStringDelegate;
-        }
-
-        private void Update()
-        {
-            if (_button != null)
-            {
-                var distance = Vector3.Distance(_button.transform.position, Player.main.transform.position);
-                QuickLogger.Debug($"Distance from button = {distance}",true);
-            }
         }
 
         private string ToolTipStringDelegate()

@@ -21,13 +21,13 @@ namespace FCS_AlterraHub.Mono
         {
             if (_button == null)
             {
-                _button = gameObject.GetComponent<Button>();
+                _button = gameObject.GetComponentInChildren<Button>();
                 if(_button != null) return;
             }
 
             if (_toggle == null)
             {
-                _toggle = gameObject.GetComponent<Toggle>();
+                _toggle = gameObject.GetComponentInChildren<Toggle>();
             }
 
             if (_button == null && _toggle == null)
@@ -39,7 +39,7 @@ namespace FCS_AlterraHub.Mono
         public override void Update()
         {
             base.Update();
-            if (_button == null && _toggle) return;
+            if (_button == null && _toggle == null) return;
 
             if (_button != null)
             {
