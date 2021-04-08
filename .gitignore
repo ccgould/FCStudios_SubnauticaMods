@@ -266,3 +266,5 @@ Assembly-CSharp_publicized.dll
 Assembly-CSharp-firstpass_publicized.dll
 
 FCSCommon/GamePaths.targets
+
+Dependancies/Subnautica/BepInEx.dll

@@ -579,7 +579,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
         private StringBuilder _sb2 = new StringBuilder();
         private Dictionary<TechType,int> _ingredients = new Dictionary<TechType, int>();
         private DSSAutoCrafterController _mono;
-
+        
         public Action<TechType,bool> OnButtonClick { get; set; }
 
         internal void Initialize(DSSAutoCrafterController mono)
@@ -588,9 +588,21 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
             _icon = GameObjectHelpers.FindGameObject(gameObject, "Icon").AddComponent<uGUI_Icon>();
             _button = gameObject.GetComponentInChildren<Toggle>();
             _button.onValueChanged.AddListener((value => {OnButtonClick?.Invoke(_techType,value);}));
+            var fcsbutton = _button.gameObject.AddComponent<FCSButton>();
+            fcsbutton.MaxInteractionRange = 0.8f;
+
             _toolTip = _button.gameObject.AddComponent<FCSToolTip>();
-            _toolTip.RequestPermission += () => WorldHelpers.CheckIfInRange(gameObject, Player.main.gameObject,2.5f);
+            _toolTip.RequestPermission += () => WorldHelpers.CheckIfInRange(gameObject, Player.main.gameObject,0.8f);
             _toolTip.ToolTipStringDelegate += ToolTipStringDelegate;
+        }
+
+        private void Update()
+        {
+            if (_button != null)
+            {
+                var distance = Vector3.Distance(_button.transform.position, Player.main.transform.position);
+                QuickLogger.Debug($"Distance from button = {distance}",true);
+            }
         }
 
         private string ToolTipStringDelegate()

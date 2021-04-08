@@ -65,6 +65,9 @@
       <HintPath>..\Dependancies\Subnautica\publicized_assemblies\Assembly-CSharp_publicized.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="BepInEx">
+      <HintPath>..\Dependancies\BepInEx.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\Dependancies\Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
