@@ -73,7 +73,9 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                 var target = amount;
                 for (int i = 0; i < amount; i++)
                 {
-                    var inventoryItem = _mono.CraftManager.GetCraftingOperation().FixCustomTechType().ToInventoryItemLegacy();
+                    var craftingTechType = _mono.CraftManager.GetCraftingOperation().FixCustomTechType();
+                    var inventoryItem = craftingTechType.ToInventoryItemLegacy();
+                    QuickLogger.Debug($"Crafting: {Language.main.Get(craftingTechType)}",true);
                     var result = BaseManager.AddItemToNetwork(_mono.Manager, inventoryItem, true);
 
                     if (!result)

@@ -57,17 +57,17 @@ namespace FCS_AlterraHub.Mono
                         main.SetIcon(IconType);
                         if (!string.IsNullOrWhiteSpace(TextLineOne))
                         {
-                            main.SetInteractText(TextLineOne,GetAdditionalString?.Invoke(Tag));
+                            main.SetInteractText(TextLineOne ?? string.Empty, GetAdditionalString?.Invoke(Tag) ?? string.Empty);
                         }
                         else
                         {
-                            main.SetInteractText(GetAdditionalString?.Invoke(Tag));
+                            main.SetInteractText(GetAdditionalString?.Invoke(Tag) ?? string.Empty);
                         }
                     }
                     else
                     {
                         main.SetIcon(IconType);
-                        main.SetInteractText(this.TextLineOne,this.TextLineTwo);
+                        main.SetInteractText(this.TextLineOne ?? String.Empty,this.TextLineTwo ?? string.Empty);
                     }
                 }
                 else
@@ -77,11 +77,11 @@ namespace FCS_AlterraHub.Mono
                         if (GetAdditionalDataFromString)
                         {
                             main.SetIcon(IconType);
-                            main.SetUseTextRaw(this.TextLineOne, GetAdditionalString?.Invoke(Tag));
+                            main.SetUseTextRaw(this.TextLineOne ?? string.Empty, GetAdditionalString?.Invoke(Tag) ?? string.Empty);
                         }
                         else
                         {
-                            main.SetUseTextRaw(this.TextLineOne, this.TextLineTwo);
+                            main.SetUseTextRaw(this.TextLineOne ?? string.Empty, this.TextLineTwo ?? string.Empty);
                         }
                     }
                     else
@@ -89,11 +89,11 @@ namespace FCS_AlterraHub.Mono
                         if (GetAdditionalDataFromString)
                         {
                             main.SetIcon(IconType);
-                            main.SetInteractTextRaw(this.TextLineOne, GetAdditionalString?.Invoke(Tag));
+                            main.SetInteractTextRaw(this.TextLineOne ?? string.Empty, GetAdditionalString?.Invoke(Tag) ?? string.Empty);
                         }
                         else
                         {
-                            main.SetInteractTextRaw(this.TextLineOne, this.TextLineTwo);
+                            main.SetInteractTextRaw(this.TextLineOne ?? string.Empty, this.TextLineTwo ?? string.Empty);
                         }
                     }
                 }
