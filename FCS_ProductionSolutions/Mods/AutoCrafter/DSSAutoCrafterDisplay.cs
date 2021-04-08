@@ -36,6 +36,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
         private HomePageController _homePageController;
         private Text _status;
         private Text _total;
+        private FCSMessageBox _messageBox;
 
         internal GameObject ManualPage { get; private set; }
         internal GameObject HomePage { get; private set; }
@@ -103,7 +104,6 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                 var cancelBTN = GameObjectHelpers.FindGameObject(gameObject, "CancelBTN").GetComponent<Button>();
                 var cancelFBTN = cancelBTN.gameObject.AddComponent<FCSButton>();
                 cancelFBTN.ShowMouseClick = true;
-                cancelFBTN.IconType = HandReticle.IconType.Interact;
                 cancelFBTN.TextLineOne = "Cancel";
                 cancelFBTN.TextLineTwo = "Cancels crafting operation.";
                 cancelBTN.onClick.AddListener(() =>
@@ -117,7 +117,6 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                 var backBTN = GameObjectHelpers.FindGameObject(gameObject, "BackBTN").GetComponent<Button>();
                 var backFBTN = backBTN.gameObject.AddComponent<FCSButton>();
                 backFBTN.ShowMouseClick = true;
-                backFBTN.IconType = HandReticle.IconType.Interact;
                 backFBTN.TextLineOne = "Back";
                 backBTN.onClick.AddListener(() =>
                 {
@@ -128,7 +127,6 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                 _standbyBTN = standbyToggle.GetComponent<Toggle>();
                 var standByBtn = standbyToggle.AddComponent<FCSButton>();
                 standByBtn.ShowMouseClick = true;
-                standByBtn.IconType = HandReticle.IconType.Interact;
                 standByBtn.TextLineOne = "StandBy";
                 standByBtn.TextLineTwo = "Puts this crafter in a mode that allows it to help other crafters to craft missing required items.";
                 _standbyBTN.onValueChanged.AddListener((state =>
@@ -160,6 +158,13 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                 _manualPageController = ManualPage.AddComponent<ManualPageController>();
                 _manualPageController.Initialize(this);
 
+                _messageBox = GameObjectHelpers.FindGameObject(gameObject, "MessageBox").AddComponent<FCSMessageBox>();
+
+                OnMessageReceived += s =>
+                {
+                    _messageBox.Show(s,FCSMessageButton.OK,null);
+                };
+
                 OnStatusUpdate += status =>
                 {
                     _status.text = status.ToUpper();
@@ -182,6 +187,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
 
         public Action<Vector2> OnTotalUpdate { get; set; }
         public Action OnLoadComplete { get; set; }
+        public Action<string> OnMessageReceived { get; set; }
 
         internal void GoToPage(AutoCrafterPages page)
         {
@@ -309,11 +315,16 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
     {
         private Text _status;
         private Text _info;
-
+        
         internal void Initialize(DSSAutoCrafterDisplay display)
         {
+            
+
             var manualBTN = GameObjectHelpers.FindGameObject(gameObject, "ManualBTN").GetComponent<Button>();
-            manualBTN.onClick.AddListener((() =>
+            var manualBtn = manualBTN.gameObject.AddComponent<FCSButton>();
+            manualBtn.ShowMouseClick = true;
+            manualBtn.TextLineOne = "Manual Operation Page.";
+            manualBTN.onClick.AddListener(() =>
             {
                 if (display.GetController().CraftManager.IsRunning() || display.GetController().CurrentCrafterMode == AutoCrafterMode.StandBy)
                 {
@@ -322,9 +333,12 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                 }
                 display.GoToPage(AutoCrafterPages.Manual);
                 display.GetController().SetManual();
-            }));
+            });
 
             var automaticBTN = GameObjectHelpers.FindGameObject(gameObject, "AutomatedBTN").GetComponent<Button>();
+            var automaticBtn = automaticBTN.gameObject.AddComponent<FCSButton>();
+            automaticBtn.ShowMouseClick = true;
+            automaticBtn.TextLineOne = "Operations Page.";
             automaticBTN.onClick.AddListener((() =>
             {
                 display.GoToPage(AutoCrafterPages.Automatic);
@@ -404,28 +418,57 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
             }));
 
             var addBTN = GameObjectHelpers.FindGameObject(gameObject, "AddBTN").GetComponent<Button>();
-
+            var addFBTN = addBTN.gameObject.AddComponent<FCSButton>();
+            addFBTN.ShowMouseClick = true;
+            addFBTN.TextLineOne = "Add";
+            addFBTN.TextLineTwo = "Adds to the amount to craft. Hold (Shift) to increment by 10.";
             addBTN.onClick.AddListener((() =>
             {
-                if (_amount == 10)
+                if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
                 {
-                    return;
+                    _amount+=10;
                 }
-                _amount++;
+                else
+                {
+                    _amount++;
+                }
+
+                if (_amount >= 100)
+                {
+                    _amount = 100;
+                }
+
                 _craftingAmount.text = _amount.ToString();
             }));
 
             var subtractBTN = GameObjectHelpers.FindGameObject(gameObject, "MinusBTN").GetComponent<Button>();
+            var subtractFBTN = subtractBTN.gameObject.AddComponent<FCSButton>();
+            subtractFBTN.ShowMouseClick = true;
+            subtractFBTN.TextLineOne = "Subtract";
+            subtractFBTN.TextLineTwo = "Removes from the amount to craft. Hold (Shift) to decrement by 10.";
 
             subtractBTN.onClick.AddListener((() =>
             {
-                if (_amount == 1) return;
-                _amount--;
+                if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
+                {
+                    _amount -= 10;
+                }
+                else
+                {
+                    _amount--;
+                }
+
+                if (_amount <= 1)
+                {
+                    _amount = 1;
+                }
                 _craftingAmount.text = _amount.ToString();
             }));
 
             var backBTN = GameObjectHelpers.FindGameObject(gameObject, "BackBTN").GetComponent<Button>();
-
+            var backFBTN = backBTN.gameObject.AddComponent<FCSButton>();
+            backFBTN.ShowMouseClick = true;
+            backFBTN.TextLineOne = "Back";
             backBTN.onClick.AddListener((() =>
             {
                 Reset();
@@ -546,7 +589,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
             _button = gameObject.GetComponentInChildren<Toggle>();
             _button.onValueChanged.AddListener((value => {OnButtonClick?.Invoke(_techType,value);}));
             _toolTip = _button.gameObject.AddComponent<FCSToolTip>();
-            _toolTip.RequestPermission += () => WorldHelpers.CheckIfInRange(gameObject, Player.main.gameObject,1);
+            _toolTip.RequestPermission += () => WorldHelpers.CheckIfInRange(gameObject, Player.main.gameObject,2.5f);
             _toolTip.ToolTipStringDelegate += ToolTipStringDelegate;
         }
 

@@ -33,7 +33,7 @@ namespace FCS_EnergySolutions.Configuration
         internal const string TelepowerPylonTabID = "TP";
         internal const string TelepowerPylonFriendlyName = "Telepower Pylon";
         internal const string TelepowerPylonModName = "TelepowerPylon";
-        internal const string TelepowerPylonDescription = "N/A";
+        internal const string TelepowerPylonDescription = "With a Telepower Pylon can send or receive energy wirelessly across vast distances. Requires one Pylon to Send / Push and another to Receive / Pull.";
         internal static string TelepowerPylonKitClassID => $"{TelepowerPylonModName}_Kit";
         internal static string TelepowerPylonClassName => TelepowerPylonModName;
         internal static string TelepowerPylonPrefabName => TelepowerPylonModName;

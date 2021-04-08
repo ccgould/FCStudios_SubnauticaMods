@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
+using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,7 +13,7 @@ namespace FCS_AlterraHub.Model
         public Func<string> ToolTipStringDelegate;
         public TechType TechType { get; set; }
         public Func<bool> RequestPermission { get; set; }
-
+        public bool Description { get; set; } = false;
         void Awake() => Destroy(GetComponent<LayoutElement>());
 
 #if BELOWZERO
@@ -24,6 +26,7 @@ namespace FCS_AlterraHub.Model
 #else
         public void GetTooltip(out string tooltipText, List<TooltipIcon> tooltipIcons)
         {
+            QuickLogger.Debug($"[GetToolTip] Description = {Description}",true);
             var result = RequestPermission?.Invoke() ?? false;
             
             if (ToolTipStringDelegate != null)
@@ -33,12 +36,28 @@ namespace FCS_AlterraHub.Model
 
             if(TechType != TechType.None)
             {
-                bool locked = !CrafterLogic.IsCraftRecipeUnlocked(TechType);
-                TooltipFactory.BuildTech(TechType, locked, out Tooltip, tooltipIcons);
+                if (Description)
+                {
+                    Tooltip = InventoryItemView(TechType);
+                }
+                else
+                {
+                    bool locked = !CrafterLogic.IsCraftRecipeUnlocked(TechType);
+                    TooltipFactory.BuildTech(TechType, locked, out Tooltip, tooltipIcons);
+                }
             }
 
             tooltipText = result ? Tooltip : string.Empty;
         }
 #endif
+
+        public static string InventoryItemView(TechType techType)
+        {
+            TooltipFactory.Initialize();
+            StringBuilder stringBuilder = new StringBuilder();
+            TooltipFactory.WriteTitle(stringBuilder, Language.main.Get(techType));
+            TooltipFactory.WriteDescription(stringBuilder, Language.main.Get(TooltipFactory.techTypeTooltipStrings.Get(techType)));
+            return stringBuilder.ToString();
+        }
     }
 }

@@ -98,11 +98,19 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
 
             addBTN.onClick.AddListener((() =>
             {
-                if (_amount == 10)
+                if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
                 {
-                    return;
+                    _amount += 10;
                 }
-                _amount++;
+                else
+                {
+                    _amount++;
+                }
+
+                if (_amount >= 100)
+                {
+                    _amount = 100;
+                }
                 _craftingAmount.text = _amount.ToString();
             }));
 
@@ -110,8 +118,20 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
 
             subtractBTN.onClick.AddListener((() =>
             {
-                if (_amount == 0) return;
-                _amount--;
+                if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
+                {
+                    _amount -= 10;
+                }
+                else
+                {
+                    _amount--;
+                }
+
+                if (_amount <= 1)
+                {
+                    _amount = 1;
+                }
+
                 _craftingAmount.text = _amount.ToString();
             }));
 

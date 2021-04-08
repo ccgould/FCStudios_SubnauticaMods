@@ -49,8 +49,7 @@ namespace FCS_AlterraHub.Mono
         private Dictionary<string, BaseOperationObject> _baseOperationObjects = new  Dictionary<string, BaseOperationObject>();
         private HashSet<CraftingOperation> _craftingOperations = new HashSet<CraftingOperation>();
         private List<BaseTransferOperation> _baseOperations  = new List<BaseTransferOperation>();
-
-
+        
         public string BaseID { get; set; }
         public float ActiveBaseOxygenTankCount = 0;
         public readonly Dictionary<TechType, TrackedResource> TrackedResources = new Dictionary<TechType, TrackedResource>();
@@ -626,6 +625,11 @@ namespace FCS_AlterraHub.Mono
 
             foreach (StorageContainer locker in BaseStorageLockers)
             {
+                if (locker == null)
+                {
+                    continue;
+                }
+
                 if (locker.container.Contains(techType))
                 {
                     return true;
@@ -645,8 +649,6 @@ namespace FCS_AlterraHub.Mono
 
         public Pickupable TakeItem(TechType techType, StorageType storageFilter = StorageType.All)
         {
-
-
             if (storageFilter == StorageType.Servers || storageFilter == StorageType.All)
             {
                 foreach (IDSSRack baseRack in BaseRacks)
@@ -657,19 +659,22 @@ namespace FCS_AlterraHub.Mono
                     }
                 }
             }
-
-
+            
             if (storageFilter == StorageType.StorageLockers || storageFilter == StorageType.All)
             {
                 foreach (StorageContainer locker in BaseStorageLockers)
                 {
+                    if (locker == null)
+                    {
+                        continue;
+                    }
+
                     if (locker.container.Contains(techType))
                     {
                         return locker.container.RemoveItem(techType);
                     }
                 }
             }
-
 
             foreach (FcsDevice device in BaseFcsStorage)
             {
@@ -694,9 +699,6 @@ namespace FCS_AlterraHub.Mono
                     }
                 }
             }
-
-
-
 
             if (storageFilter == StorageType.AlterraStorage || storageFilter == StorageType.All)
             {
@@ -891,8 +893,17 @@ namespace FCS_AlterraHub.Mono
         public void AlertNewStorageContainerPlaced(StorageContainer sc)
         {
             if (BaseStorageLockers.Contains(sc)) return;
+            var stracker = sc.gameObject.AddComponent<FCSStorageTracker>();
+            stracker.Set(sc);
+            stracker.OnDestroyAction += OnDestroyAction;
             BaseStorageLockers.Add(sc);
             TrackStorageContainer(sc);
+        }
+
+        private void OnDestroyAction(StorageContainer obj,FCSStorageTracker tracker)
+        {
+            tracker.OnDestroyAction -= OnDestroyAction;
+            BaseStorageLockers.Remove(obj);
         }
 
         private void TrackExistingStorageContainers()
@@ -1118,7 +1129,66 @@ namespace FCS_AlterraHub.Mono
             //QuickLogger.Debug($"Allowed result: {result}", true);
             return result;
         }
-        
+
+        public bool IsAllowedToAdd(TechType techType,int amount, bool checkForOtherStorages, bool verbose = false)
+        {
+            int availableSpace = 0;
+            int target = amount;
+            var validServers = new List<ISlotController>();
+
+            //QuickLogger.Debug($"Checking if allowed {_dumpContainer.GetItemCount() + 1}", true);
+
+            foreach (IDSSRack baseRack in BaseRacks)
+            {
+                if (baseRack.ItemAllowed(techType, out var server))
+                {
+                    if (!server.IsFull)
+                        validServers.Add(server);
+                }
+            }
+
+            if (validServers.Count > 0)
+            {
+                availableSpace = validServers.Sum(x => x.GetFreeSpace());
+            }
+
+            target -= availableSpace;
+            
+            if (target < 0)
+            {
+                target = 0;
+            }
+
+
+            if (checkForOtherStorages && target > 0)
+            {
+                foreach (var locker in BaseStorageLockers)
+                {
+                    var size = CraftData.GetItemSize(techType);
+                    if (locker.container.HasRoomFor(size.x, size.y))
+                    {
+                        target -= 1;
+                        if(target <= 0)
+                            return  true;
+                    }
+                }
+
+                foreach (FcsDevice fcsDevice in GetDevices("AS"))
+                {
+                    if (fcsDevice.CanBeStored(amount, techType))
+                    {
+                        target -= 1;
+                        if (target <= 0)
+                            return true;
+                    }
+                }
+
+            }
+
+            //QuickLogger.Debug($"Allowed result: {result}", true);
+            return target == 0;
+        }
+
         public bool IsAllowedToAdd(Pickupable inventoryItem, bool verbose)
         {
             return IsAllowedToAdd(inventoryItem.GetTechType(),verbose);
@@ -1133,15 +1203,18 @@ namespace FCS_AlterraHub.Mono
                 {
                     PlayerInteractionHelper.GivePlayerItem(item);
                 }
+                else
+                {
+                    return true;
+                }
             }
             catch (Exception e)
             {
                 QuickLogger.Debug(e.Message, true);
                 QuickLogger.Debug(e.StackTrace);
                 PlayerInteractionHelper.GivePlayerItem(item);
-                return false;
             }
-            return true;
+            return false;
         }
 
         public static bool AddItemToNetwork(InventoryItem item, BaseManager manager)
@@ -1158,6 +1231,42 @@ namespace FCS_AlterraHub.Mono
                     return true;
                 }
             }
+            return false;
+        }
+
+        public static bool AddItemToNetwork(BaseManager manager, InventoryItem item, bool includeOtherStorages = false)
+        {
+            QuickLogger.Debug($"Trying to add item to network: {manager?.GetBaseName()} | {Language.main.Get(item.item.GetTechType())}", true);
+
+            if (manager == null) return false;
+
+            foreach (IDSSRack baseRack in manager.BaseRacks)
+            {
+                if (baseRack.ItemAllowed(item.item.GetTechType(), out var server))
+                {
+                    server?.AddItemToMountedServer(item);
+                    return true;
+                }
+            }
+
+            foreach (StorageContainer locker in manager.BaseStorageLockers)
+            {
+                if(locker.container.HasRoomFor(item.item))
+                {
+                    locker.container.UnsafeAdd(item);
+                    return true;
+                }
+            }
+
+            foreach (FcsDevice fcsDevice in manager.GetDevices("AS"))
+            {
+                if (fcsDevice.CanBeStored(1, item.item.GetTechType()))
+                {
+                    fcsDevice.AddItemToContainer(item);
+                    return true;
+                }
+            }
+
             return false;
         }
 
@@ -1226,7 +1335,7 @@ namespace FCS_AlterraHub.Mono
                 {
                     for (int i = 0; i < ingredient.amount; i++)
                     {
-                        GameObject.Destroy(TakeItem(ingredient.techType));
+                        GameObject.Destroy(TakeItem(ingredient.techType).gameObject);
                     }
                 }
             }
@@ -1393,5 +1502,21 @@ namespace FCS_AlterraHub.Mono
         //        }
         //    }
         //}
+    }
+
+    public class FCSStorageTracker : MonoBehaviour
+    {
+        public Action<StorageContainer,FCSStorageTracker> OnDestroyAction;
+        private StorageContainer _sc;
+
+        internal void Set(StorageContainer sc)
+        {
+            _sc = sc;
+        }
+
+        private void OnDestroy()
+        {
+            OnDestroyAction?.Invoke(_sc,this);
+        }
     }
 }

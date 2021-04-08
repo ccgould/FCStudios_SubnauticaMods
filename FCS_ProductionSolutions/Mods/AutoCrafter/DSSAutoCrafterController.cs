@@ -8,6 +8,7 @@ using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
+using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Handlers;
@@ -28,11 +29,12 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
         private IEnumerable<Material> _materials;
         private GameObject _canvas;
         internal AutoCrafterMode CurrentCrafterMode = AutoCrafterMode.Automatic;
+        private List<TechType> _storedItems = new List<TechType>();
+        private float _transferTimer;
         public override bool IsVisible => IsInitialized && IsConstructed;
         public override bool IsOperational => IsInitialized && IsConstructed;
         private List<TechType> ModCraftables => Mod.Craftables;
-
-
+        
         public override float GetPowerUsage()
         {
             if (Manager == null || !IsConstructed || Manager.GetBreakerState() || CraftManager == null || !CraftManager.IsRunning()) return 0f;
@@ -41,7 +43,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
 
         private void OnBreakerStateChanged(bool value)
         {
-            OnPowerStateChanged(!value ? PowerSystem.Status.Offline : Manager.GetPowerState());
+            //OnPowerStateChanged(!value ? PowerSystem.Status.Offline : Manager.GetPowerState());
         }
 
         private void OnPowerStateChanged(PowerSystem.Status obj)
@@ -127,7 +129,30 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
 
         private void Update()
         {
+            if (Time.timeScale == 0) return;
+
             MoveBeltMaterial();
+            
+            _transferTimer += DayNightCycle.main.deltaTime;
+
+            if (_transferTimer >= 1f)
+            {
+                for (int i = _storedItems.Count - 1; i >= 0; i--)
+                {
+                    var inventoryItem = _storedItems[i].ToInventoryItemLegacy();
+                    var result = BaseManager.AddItemToNetwork(Manager, inventoryItem, true);
+                    if (result)
+                    {
+                        _storedItems.RemoveAt(i);
+                    }
+                    else
+                    {
+                        Destroy(inventoryItem.item.gameObject);
+                    }
+                }
+
+                _transferTimer = 0f;
+            }
         }
 
         private void MoveBeltMaterial()
@@ -201,6 +226,11 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                     DisplayManager.OnButtonClick("StartBTN", null);
                 }
 
+                if (_saveData.StoredItems != null)
+                {
+                    _storedItems = _saveData.StoredItems;
+                }
+
                 CurrentCrafterMode = _saveData.CurrentCrafterMode;
                 DisplayManager.SetStandByState(CurrentCrafterMode == AutoCrafterMode.StandBy);
                 _fromSave = false;
@@ -257,11 +287,6 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
             DisplayManager.Clear();
             CraftManager.StopOperation();
             CraftManager.Reset(true);
-        }
-
-        private void AddDummy()
-        {
-            CraftItem(new CraftingOperation(TechType.AdvancedWiringKit, 1, true));
         }
 
         private void CheckForAvailableCrafts()
@@ -342,6 +367,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                 _saveData.Body = _colorManager.GetColor().ColorToVector4();
                 _saveData.SecondaryBody = _colorManager.GetSecondaryColor().ColorToVector4();
                 //_saveData.CurrentProcess = CraftingItems;
+                _saveData.StoredItems = _storedItems;
                 _saveData.CurrentCrafterMode = CurrentCrafterMode;
                 _saveData.IsRunning = CraftManager.IsRunning();
                 newSaveData.DSSAutoCrafterDataEntries.Add(_saveData);
@@ -417,10 +443,9 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
             return _moveBelt;
         }
 
-
         public void ShowMessage(string message)
         {
-
+            DisplayManager.OnMessageReceived?.Invoke(message);
         }
 
         public void ClearMissingItems()
@@ -480,6 +505,11 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
         internal void UpdateTotal(Vector2 total)
         {
             DisplayManager.OnTotalUpdate?.Invoke(total);
+        }
+
+        public void AddItemToStorage(TechType techType)
+        {
+            _storedItems.Add(techType);
         }
     }
 

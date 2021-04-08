@@ -3,6 +3,7 @@ using System.Linq;
 using FCS_AlterraHub.Helpers;
 using FCSCommon.Extensions;
 using Oculus.Newtonsoft.Json;
+using SMLHelper.V2.Handlers;
 
 namespace FCS_AlterraHub.Mono
 {
@@ -17,6 +18,7 @@ namespace FCS_AlterraHub.Mono
         public int AmountCompleted { get; set; }
         public TechType TechType { get; set; }
         public bool IsComplete => GetIsComplete();
+        public int ReturnAmount { get; set; }
 
         private bool GetIsComplete()
         {
@@ -33,6 +35,7 @@ namespace FCS_AlterraHub.Mono
         {
             TechType = techType;
             Amount = amount;
+            ReturnAmount = CraftDataHandler.Main.GetTechData(techType)?.craftAmount ?? 1;
             IsRecursive = isRecursive;
         }
 
