@@ -4,6 +4,7 @@ using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Managers.Mission;
+using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono.OreConsumer;
 using FCS_AlterraHub.Patches;
 using FCS_AlterraHub.Registration;
@@ -55,6 +56,11 @@ namespace FCS_AlterraHub.Mono.AlterraHub
                 {
                     panelHelper.ActivateStoreItem(BaseManager.ActivateGoalTechType);
                 }
+            }
+
+            if (message.Equals("ErrorLoadingAccount"))
+            {
+                MessageBoxHandler.main.Show(Buildables.AlterraHub.ErrorLoadingAccount(), FCSMessageButton.OK);
             }
         }
 
@@ -168,10 +174,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
 
         private void OnQuit()
         {
-            if (!CardSystem.main.HasAccountBeenSaved())
-            {
-                Mod.DeepCopySave(CardSystem.main.GetAccount());
-            }
+            Mod.DeepCopySave(CardSystem.main.SaveDetails());
             QuickLogger.Debug("Quitting Purging CardSystem and AlterraHubSave",true);
             CardSystem.main.Purge();
             Mod.PurgeSave();

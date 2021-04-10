@@ -326,7 +326,8 @@ namespace FCS_AlterraHub.Configuration
                 QuickLogger.Debug("Attempting to save bases",true);
                 newSaveData.BaseSaves = BaseManager.Save().ToList();
                 QuickLogger.Debug("Bases saved", true);
-                if (!CardSystem.main.HasAccountBeenSaved())
+
+                if (_tempAccountDetails != null)
                 {
                     newSaveData.AccountDetails = _tempAccountDetails;
                     _tempAccountDetails = null;
@@ -335,6 +336,7 @@ namespace FCS_AlterraHub.Configuration
                 {
                     newSaveData.AccountDetails = CardSystem.main.SaveDetails();
                 }
+
                 QuickLogger.Debug("After Saved Details", true);
                 _saveData = newSaveData;
 

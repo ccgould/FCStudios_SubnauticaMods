@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
+using FCS_AlterraHub.Mono;
 using FCSCommon.Extensions;
 using FCSCommon.Utilities;
 using Oculus.Newtonsoft.Json;
@@ -21,12 +23,13 @@ namespace FCS_AlterraHub.Systems
     /// </summary>
     internal class AccountDetails
     {
-
+        [JsonProperty] internal string Version { get; set; } = "2.0";
         [JsonProperty] internal string FullName { get; set; }
         [JsonProperty] internal string Username { get; set; }
         [JsonProperty] internal string Password { get; set; }
         [JsonProperty] internal string PIN { get; set; }
-        [JsonProperty] internal decimal Balance { get; set; }
+        public decimal Balance { internal get; set; }
+        [JsonProperty] internal string AccountBalance { get; set; }
         [JsonProperty] internal static decimal AlterraDebitPayed { get; set; }
         [JsonProperty] internal decimal AccountBeforeDebit { get; set; }
         [JsonProperty] internal Dictionary<string, string> KnownCardNumbers = new Dictionary<string, string>();
@@ -39,6 +42,7 @@ namespace FCS_AlterraHub.Systems
             PIN = accountDetails.PIN;
             Balance = accountDetails.Balance;
             KnownCardNumbers = accountDetails.KnownCardNumbers;
+            AccountBalance = accountDetails.AccountBalance;
         }
 
         public AccountDetails()
@@ -184,6 +188,10 @@ namespace FCS_AlterraHub.Systems
         {
             _hasBeenSaved = true;
             QuickLogger.Debug($"Attempting to save account details {_accountDetails?.FullName}", true);
+            if (_accountDetails != null)
+            {
+                _accountDetails.AccountBalance = EncodeDecode.Encrypt(_accountDetails.Balance.ToString(CultureInfo.InvariantCulture));
+            }
             return _accountDetails;
         }
 
@@ -193,10 +201,23 @@ namespace FCS_AlterraHub.Systems
         /// <param name="accounts"></param>
         internal void Load(AccountDetails account)
         {
-            if (account != null)
+            try
             {
-                _accountDetails = account;
-                QuickLogger.Info($"Alterra account loaded for player {account.Username}",true);
+                if (account != null)
+                {
+                    _accountDetails = account;
+                    if (account.Version.Equals("2.0"))
+                    {
+                        _accountDetails.Balance = Convert.ToDecimal(EncodeDecode.Decrypt(account.AccountBalance));
+                    }
+                    QuickLogger.Info($"Alterra account loaded for player {account.Username}",true);
+                }
+            }
+            catch (Exception e)
+            {
+                BaseManager.GlobalNotifyByID(Mod.AlterraHubTabID,"ErrorLoadingAccount");
+                QuickLogger.Error($"StackTrace: {e.StackTrace}");
+                QuickLogger.Error($"Message: {e.Message}");
             }
         }
 
