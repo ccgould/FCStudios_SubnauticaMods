@@ -36,8 +36,8 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable
             {
                 var prefab = GameObject.Instantiate(ModelPrefab.DSSAutoCrafterPrefab);
 
-                var center = new Vector3(0.112175f, 1.279794f, 0.03599018f);
-                var size = new Vector3(2.570427f, 2.437856f, 1.906985f);
+                var center = new Vector3(0f, 1.33581f, 0.1292717f);
+                var size = new Vector3(1.87915f, 2.327191f, 1.775631f);
 
 
                 GameObjectHelpers.AddConstructableBounds(prefab, size, center);

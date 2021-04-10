@@ -7,7 +7,6 @@ using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Mono.Controllers;
-using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
 using FCSCommon.Abstract;
 using FCSCommon.Helpers;
@@ -97,7 +96,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                 #region LoadIngredients
 
 
-                _ingredientsGrid = ingredientsGrid.EnsureComponent<GridHelperV2>();
+                _ingredientsGrid = ingredientsGrid.AddComponent<GridHelperV2>();
                 _ingredientsGrid.OnLoadDisplay += OnLoadIngredientsGrid;
                 _ingredientsGrid.Setup(9, gameObject, Color.gray, Color.white, null);
 
@@ -229,11 +228,11 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
         {
             try
             {
-                if (_mono == null) return;
+                if (_mono?.Manager == null || _ingredientItems == null) return;
 
                 var grouped = TechDataHelpers.GetIngredients(_mono.CraftManager.GetCraftingOperation().TechType);
 
-                if(grouped==null)return;
+                if(grouped==null) return;
                 
                 if (data.EndPosition > grouped.Count)
                 {
@@ -244,7 +243,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
 
                 for (int i = data.StartPosition; i < data.EndPosition; i++)
                 {
-                    _ingredientItems[i].Set(grouped[i], _mono.Manager);
+                    _ingredientItems[i]?.Set(grouped[i], _mono?.Manager);
                 }
 
             }
@@ -260,7 +259,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
         {
             for (int i = 0; i < 9; i++)
             {
-                _ingredientItems[i].Reset();
+                _ingredientItems[i]?.Reset();
             }
         }
 
@@ -303,9 +302,31 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
         {
             return _mono;
         }
+
+        public IPageController GetPageController(AutoCrafterPages standBy)
+        {
+            switch (standBy)
+            {
+                case AutoCrafterPages.Home:
+                    return _homePageController;
+                case AutoCrafterPages.Automatic:
+                    return null;
+                case AutoCrafterPages.Manual:
+                    return _manualPageController;
+                case AutoCrafterPages.StandBy:
+                    return _standbyPageController;
+            }
+
+            return null;
+        }
     }
 
-    internal class HomePageController : MonoBehaviour
+    internal interface IPageController
+    {
+        void Refresh();
+    }
+
+    internal class HomePageController : MonoBehaviour, IPageController
     {
         private Text _status;
         private Text _info;
@@ -361,9 +382,14 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
         {
             gameObject.SetActive(false);
         }
+
+        public void Refresh()
+        {
+            
+        }
     }
 
-    internal class ManualPageController : MonoBehaviour
+    internal class ManualPageController : MonoBehaviour, IPageController
     {
         private List<CraftableItem> _craftableToggles = new List<CraftableItem>();
         private GridHelperV2 _itemGrid;
@@ -387,7 +413,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                 _craftableToggles.Add(craftableToggle);
             }
 
-            _itemGrid = mono.gameObject.EnsureComponent<GridHelperV2>();
+            _itemGrid = mono.gameObject.AddComponent<GridHelperV2>();
             _itemGrid.OnLoadDisplay += OnLoadItemsGrid;
             _itemGrid.Setup(21, mono.ManualPage, Color.gray, Color.white, null);
 
@@ -562,7 +588,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
         }
     }
 
-    internal class StandByPageController : MonoBehaviour
+    internal class StandByPageController : MonoBehaviour, IPageController
     {
         private List<AutoCrafterItem> _autocrafterToggles = new List<AutoCrafterItem>();
         private GridHelperV2 _itemGrid;
@@ -571,7 +597,8 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
         private DSSAutoCrafterDisplay _mono;
         private List<string> _selectedCrafters = new List<string>();
         private Toggle _toggle;
-        private const float _maxInteraction = 0.9f;
+        private ToggleGroup _toggleGroup;
+        private const float _maxInteraction = 1f;
 
         internal void Initialize(DSSAutoCrafterDisplay mono)
         {
@@ -585,9 +612,9 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                 _autocrafterToggles.Add(autoCrafterItem);
             }
 
-            _itemGrid = mono.gameObject.EnsureComponent<GridHelperV2>();
+            _itemGrid = mono.gameObject.AddComponent<GridHelperV2>();
             _itemGrid.OnLoadDisplay += OnLoadItemsGrid;
-            _itemGrid.Setup(21, mono.ManualPage, Color.gray, Color.white, null);
+            _itemGrid.Setup(14, mono.ManualPage, Color.gray, Color.white, null);
 
             _paginatorController = GameObjectHelpers.FindGameObject(gameObject, "Paginator").AddComponent<PaginatorController>();
             _paginatorController.Initialize(mono);
@@ -620,6 +647,9 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                     _mono.GetController().SetAutomatic();
                 }
             }));
+
+            _toggleGroup = GameObjectHelpers.FindGameObject(gameObject, "ModeSection").GetComponent<ToggleGroup>();
+            
 
             var confirmBTN = GameObjectHelpers.FindGameObject(gameObject, "ConfirmBTN").GetComponent<Button>();
             var confirmFBTN = confirmBTN.gameObject.AddComponent<FCSButton>();
@@ -672,7 +702,9 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
         {
             try
             {
-                var grouped = _mono.GetController().Manager.GetDevices(Mod.DSSAutoCrafterTabID).ToList();
+                var grouped = _mono.GetController().Manager.GetDevices(Mod.DSSAutoCrafterTabID)?.ToList();
+
+                if (grouped == null) return;
 
                 if (!string.IsNullOrEmpty(_currentSearchString?.Trim()))
                 {
@@ -686,6 +718,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
 
                 for (int i = 0; i < data.MaxPerPage; i++)
                 {
+                    QuickLogger.Debug($"Resetting Crafters: MPP{data.MaxPerPage} | AT:{_autocrafterToggles.Count} | Index:{i}");
                     _autocrafterToggles[i].Reset();
                 }
 
@@ -693,6 +726,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
 
                 for (int i = data.StartPosition; i < data.EndPosition; i++)
                 {
+                    QuickLogger.Debug($"Index:{i} | Toggle {w}");
                     var crafterController = (DSSAutoCrafterController)grouped[i];
                     if(crafterController.UnitID == _mono.GetController().UnitID) continue;
                     _autocrafterToggles[w++].Set(crafterController, _mono.GetController().CheckIfConnected(crafterController.UnitID));

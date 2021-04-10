@@ -89,6 +89,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                 Manager.OnPowerStateChanged += OnPowerStateChanged;
                 Manager.OnBreakerStateChanged += OnBreakerStateChanged;
                 OnPowerStateChanged(Manager.GetPowerState());
+                Manager.NotifyByID(Mod.DSSAutoCrafterTabID,"RefreshAutoCrafterList");
             }
             DisplayManager?.OnLoadComplete?.Invoke();
             InvokeRepeating(nameof(CheckStatus),1,1);
@@ -176,6 +177,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
             {
                 Manager.OnPowerStateChanged -= OnPowerStateChanged;
                 Manager.OnBreakerStateChanged -= OnBreakerStateChanged;
+                Manager.NotifyByID(Mod.DSSAutoCrafterTabID, "RefreshAutoCrafterList");
             }
             base.OnDestroy();
         }
@@ -256,6 +258,16 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
         {
             _canvas = gameObject.GetComponentInChildren<Canvas>()?.gameObject;
 
+            IPCMessage += message =>
+            {
+                switch (message)
+                {
+                    case "RefreshAutoCrafterList":
+                        DisplayManager.GetPageController(AutoCrafterPages.StandBy)?.Refresh();
+                        break;
+                }
+            };
+
             if (DisplayManager == null)
             {
                 DisplayManager = gameObject.EnsureComponent<DSSAutoCrafterDisplay>();
@@ -286,6 +298,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
             IsInitialized = true;
 
             QuickLogger.Debug($"Initialized - {GetPrefabID()}");
+
         }
 
         private void OnCancelBtnClick()
@@ -499,8 +512,6 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                 }
             }
             
-
-
             ////QuickLogger.Debug($" ==== Ask For Crafting Assistance {UnitID} | {Language.main.Get(techType)} ====", true);
             //GetCraftables();
             //if (!Mod.Craftables.Contains(techType) || !Manager.HasIngredientsFor(techType))
