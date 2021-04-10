@@ -694,6 +694,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                 for (int i = data.StartPosition; i < data.EndPosition; i++)
                 {
                     var crafterController = (DSSAutoCrafterController)grouped[i];
+                    if(crafterController.UnitID == _mono.GetController().UnitID) continue;
                     _autocrafterToggles[w++].Set(crafterController, _mono.GetController().CheckIfConnected(crafterController.UnitID));
                 }
 
