@@ -29,7 +29,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
         private GridHelperV2 _ingredientsGrid;
         private Text _reqItemsList;
         public Action OnCancelBtnClick;
-        private Toggle _standbyBTN;
+        private Button _standbyBTN;
         private readonly StringBuilder _sb = new StringBuilder();
         private List<IngredientItem> _ingredientItems = new List<IngredientItem>();
         private ManualPageController _manualPageController;
@@ -37,6 +37,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
         private Text _status;
         private Text _total;
         private FCSMessageBox _messageBox;
+        private StandByPageController _standbyPageController;
 
         internal GameObject ManualPage { get; private set; }
         internal GameObject HomePage { get; private set; }
@@ -65,6 +66,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                 ManualPage = GameObjectHelpers.FindGameObject(gameObject, "ManualPage");
                 HomePage = GameObjectHelpers.FindGameObject(gameObject, "Main");
                 AutomaticPage = GameObjectHelpers.FindGameObject(gameObject, "AutomaticPage");
+                StandByPage = GameObjectHelpers.FindGameObject(gameObject, "StandBySettingsPage");
 
                 _canvas = gameObject.GetComponentInChildren<Canvas>().gameObject;
 
@@ -123,34 +125,22 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                     GoToPage(AutoCrafterPages.Home);
                 });
 
-                var standbyToggle = GameObjectHelpers.FindGameObject(AutomaticPage, "Toggle");
-                _standbyBTN = standbyToggle.GetComponent<Toggle>();
+                var standbyToggle = GameObjectHelpers.FindGameObject(AutomaticPage, "StandByBTN");
+                _standbyBTN = standbyToggle.GetComponent<Button>();
                 var standByBtn = standbyToggle.AddComponent<FCSButton>();
                 standByBtn.ShowMouseClick = true;
                 standByBtn.TextLineOne = "StandBy";
                 standByBtn.TextLineTwo = "Puts this crafter in a mode that allows it to help other crafters to craft missing required items.";
-                _standbyBTN.onValueChanged.AddListener((state =>
+                _standbyBTN.onClick.AddListener(()=>
                 {
-                    if (_mono.CraftManager.IsRunning())
-                    {
-                        _standbyBTN.SetIsOnWithoutNotify(false);
-                        _mono.ShowMessage("Autocrafter is currently crafting. Please wait until complete before trying to enable standby");
-                        return;
-                    }
-
-                    if (state)
-                    {
-                        _mono.SetStandBy();
-                    }
-                    else
-                    {
-                        _mono.SetAutomatic();
-                    }
-
-                }));
+                    GoToPage(AutoCrafterPages.StandBy);
+                });
 
                 _status = GameObjectHelpers.FindGameObject(AutomaticPage, "Status").GetComponent<Text>();
                 _total = GameObjectHelpers.FindGameObject(AutomaticPage, "Total").GetComponent<Text>();
+
+                _standbyPageController = StandByPage.AddComponent<StandByPageController>();
+                _standbyPageController.Initialize(this);
 
                 _homePageController = HomePage.AddComponent<HomePageController>();
                 _homePageController.Initialize(this);
@@ -185,6 +175,8 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
             return true;
         }
 
+        public GameObject StandByPage { get; set; }
+
         public Action<Vector2> OnTotalUpdate { get; set; }
         public Action OnLoadComplete { get; set; }
         public Action<string> OnMessageReceived { get; set; }
@@ -196,16 +188,25 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                 case AutoCrafterPages.Home:
                     _manualPageController.Hide();
                     _homePageController.Show();
+                    _standbyPageController.Hide();
                     AutomaticPage.SetActive(false);
                     break;
                 case AutoCrafterPages.Automatic:
                     _manualPageController.Hide();
                     _homePageController.Hide();
+                    _standbyPageController.Hide();
                     AutomaticPage.SetActive(true);
                     break;
                 case AutoCrafterPages.Manual:
                     _manualPageController.Show();
                     _homePageController.Hide();
+                    _standbyPageController.Hide();
+                    AutomaticPage.SetActive(false);
+                    break;
+                case AutoCrafterPages.StandBy:
+                    _manualPageController.Hide();
+                    _homePageController.Hide();
+                    _standbyPageController.Show();
                     AutomaticPage.SetActive(false);
                     break;
             }
@@ -213,14 +214,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
         
         internal void SetStandByState(bool state,bool notify = false)
         {
-            if (notify)
-            {
-                _standbyBTN.isOn = state;
-            }
-            else
-            {
-                _standbyBTN.SetIsOnWithoutNotify(state);
-            }
+            _standbyPageController.SetStandByState(state, notify);
         }
 
         internal void Clear()
@@ -568,11 +562,248 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
         }
     }
 
+    internal class StandByPageController : MonoBehaviour
+    {
+        private List<AutoCrafterItem> _autocrafterToggles = new List<AutoCrafterItem>();
+        private GridHelperV2 _itemGrid;
+        private string _currentSearchString;
+        private PaginatorController _paginatorController;
+        private DSSAutoCrafterDisplay _mono;
+        private List<string> _selectedCrafters = new List<string>();
+        private Toggle _toggle;
+        private const float _maxInteraction = 0.9f;
+
+        internal void Initialize(DSSAutoCrafterDisplay mono)
+        {
+            _mono = mono;
+
+            foreach (Transform craftableItem in GameObjectHelpers.FindGameObject(gameObject, "Grid").transform)
+            {
+                var autoCrafterItem = craftableItem.gameObject.EnsureComponent<AutoCrafterItem>();
+                autoCrafterItem.Initialize(this);
+                autoCrafterItem.OnButtonClick += OnToggleClick;
+                _autocrafterToggles.Add(autoCrafterItem);
+            }
+
+            _itemGrid = mono.gameObject.EnsureComponent<GridHelperV2>();
+            _itemGrid.OnLoadDisplay += OnLoadItemsGrid;
+            _itemGrid.Setup(21, mono.ManualPage, Color.gray, Color.white, null);
+
+            _paginatorController = GameObjectHelpers.FindGameObject(gameObject, "Paginator").AddComponent<PaginatorController>();
+            _paginatorController.Initialize(mono);
+
+            #region Search
+            var inputField = InterfaceHelpers.FindGameObject(gameObject, "InputField");
+            var text = InterfaceHelpers.FindGameObject(inputField, "Placeholder")?.GetComponent<Text>();
+            text.text = AlterraHub.SearchForItemsMessage();
+
+            var searchField = inputField.AddComponent<SearchField>();
+            searchField.OnSearchValueChanged += UpdateSearch;
+            #endregion
+
+            _toggle = GameObjectHelpers.FindGameObject(gameObject, "Toggle").GetComponent<Toggle>();
+            _toggle.onValueChanged.AddListener((state =>
+            {
+                if (_mono.GetController().CraftManager.IsRunning())
+                {
+                    _toggle.SetIsOnWithoutNotify(false);
+                    _mono.GetController().ShowMessage("Autocrafter is currently crafting. Please wait until complete before trying to enable standby");
+                    return;
+                }
+
+                if (state)
+                {
+                    _mono.GetController().SetStandBy();
+                }
+                else
+                {
+                    _mono.GetController().SetAutomatic();
+                }
+            }));
+
+            var confirmBTN = GameObjectHelpers.FindGameObject(gameObject, "ConfirmBTN").GetComponent<Button>();
+            var confirmFBTN = confirmBTN.gameObject.AddComponent<FCSButton>();
+            confirmFBTN.MaxInteractionRange = _maxInteraction;
+            confirmBTN.onClick.AddListener((() =>
+            {
+                foreach (var selectedCrafter in _selectedCrafters)
+                {
+                    var crafter = (DSSAutoCrafterController)_mono.GetController().Manager.FindDeviceById(selectedCrafter);
+                    crafter.AddConnectedCrafter(_mono.GetController().UnitID);
+                }
+
+                _mono.GoToPage(AutoCrafterPages.Automatic);
+                Reset();
+            }));
+
+            var backBTN = GameObjectHelpers.FindGameObject(gameObject, "BackBTN").GetComponent<Button>();
+            var backFBTN = backBTN.gameObject.AddComponent<FCSButton>();
+            backFBTN.MaxInteractionRange = _maxInteraction;
+            backFBTN.ShowMouseClick = true;
+            backFBTN.TextLineOne = "Back";
+            backBTN.onClick.AddListener((() =>
+            {
+                Reset();
+                _mono.GoToPage(AutoCrafterPages.Automatic);
+            }));
+        }
+        
+        private void Reset()
+        {
+            _selectedCrafters.Clear();
+        }
+
+        private void OnToggleClick(DSSAutoCrafterController crafter, bool state)
+        {
+            if(crafter == null)return;
+
+            if (state)
+            {
+                _selectedCrafters.Add(crafter.UnitID);
+            }
+            else
+            {
+                crafter.RemoveAutoCrafter(_mono.GetController().UnitID);
+                _selectedCrafters.Remove(crafter.UnitID);
+            }
+        }
+
+        private void OnLoadItemsGrid(DisplayData data)
+        {
+            try
+            {
+                var grouped = _mono.GetController().Manager.GetDevices(Mod.DSSAutoCrafterTabID).ToList();
+
+                if (!string.IsNullOrEmpty(_currentSearchString?.Trim()))
+                {
+                    grouped = grouped.Where(p => Language.main.Get(p.UnitID).ToLower().Contains(_currentSearchString.Trim().ToLower())).ToList();
+                }
+
+                if (data.EndPosition > grouped.Count)
+                {
+                    data.EndPosition = grouped.Count;
+                }
+
+                for (int i = 0; i < data.MaxPerPage; i++)
+                {
+                    _autocrafterToggles[i].Reset();
+                }
+
+                int w = 0;
+
+                for (int i = data.StartPosition; i < data.EndPosition; i++)
+                {
+                    var crafterController = (DSSAutoCrafterController)grouped[i];
+                    _autocrafterToggles[w++].Set(crafterController, _mono.GetController().CheckIfConnected(crafterController.UnitID));
+                }
+
+                _itemGrid.UpdaterPaginator(grouped.Count);
+                _paginatorController.ResetCount(_itemGrid.GetMaxPages());
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error("Error Caught");
+                QuickLogger.Error($"Error Message: {e.Message}");
+                QuickLogger.Error($"Error StackTrace: {e.StackTrace}");
+            }
+        }
+
+        private void UpdateSearch(string newSearch)
+        {
+            _currentSearchString = newSearch;
+            _itemGrid.DrawPage();
+        }
+
+        public void Refresh()
+        {
+            _itemGrid?.DrawPage();
+        }
+
+        public void GoToPage(int index)
+        {
+            _itemGrid.DrawPage(index);
+        }
+
+        internal void Show()
+        {
+            Refresh();
+            gameObject.SetActive(true);
+            _mono.GetController().SetManual();
+        }
+
+        internal void Hide()
+        {
+            gameObject.SetActive(false);
+            Reset();
+        }
+
+        public void SetStandByState(bool state, bool notify)
+        {
+            if (notify)
+            {
+                _toggle.isOn = state;
+            }
+            else
+            {
+                _toggle.SetIsOnWithoutNotify(state);
+            }
+        }
+    }
+
+    internal class AutoCrafterItem : MonoBehaviour
+    {
+        private Text _unitID;
+        private DSSAutoCrafterController _autoCrafterController;
+        private StandByPageController _mono;
+        private Toggle _button;
+        private const float _maxInteraction = 0.9f;
+
+        public Action<DSSAutoCrafterController, bool> OnButtonClick { get; set; }
+
+        internal void Initialize(StandByPageController mono)
+        {
+            _mono = mono;
+
+            _unitID = gameObject.GetComponentInChildren<Text>();
+            _button = gameObject.GetComponentInChildren<Toggle>();
+            _button.onValueChanged.AddListener((value => { OnButtonClick?.Invoke(_autoCrafterController, value); }));
+            var fcsbutton = _button.gameObject.AddComponent<FCSButton>();
+            fcsbutton.MaxInteractionRange = _maxInteraction;
+        }
+
+        internal void Set(DSSAutoCrafterController crafter, bool state)
+        {
+            _autoCrafterController = crafter;
+            _unitID.text = crafter.UnitID;
+            _button.SetIsOnWithoutNotify(state);
+            gameObject.SetActive(true);
+        }
+
+        internal bool GetState()
+        {
+            return _button.isOn;
+        }
+
+        internal void SetState(bool state)
+        {
+            _button.isOn = state;
+        }
+
+        public void Reset()
+        {
+            _unitID.text = string.Empty;
+            _autoCrafterController = null;
+            _button.SetIsOnWithoutNotify(false);
+            gameObject.SetActive(false);
+        }
+    }
+    
     internal enum AutoCrafterPages
     {
         Home = 0,
         Automatic = 1,
-        Manual = 2
+        Manual = 2,
+        StandBy = 3
     }
 
     internal class CraftableItem : MonoBehaviour
@@ -586,8 +817,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
         private Dictionary<TechType,int> _ingredients = new Dictionary<TechType, int>();
         private DSSAutoCrafterController _mono;
         private const float _maxInteraction = 0.9f;
-
-
+        
         public Action<TechType,bool> OnButtonClick { get; set; }
 
         internal void Initialize(DSSAutoCrafterController mono)
@@ -656,5 +886,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
             _icon.sprite = SpriteManager.Get(TechType.None);
             gameObject.SetActive(false);
         }
+
+
     }
 }

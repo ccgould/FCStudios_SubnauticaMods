@@ -230,6 +230,7 @@ namespace FCS_AlterraHub.Configuration
         }
 
         public static Dictionary<string, Sound> AudioClips = new Dictionary<string, Sound>();
+        private static AccountDetails _tempAccountDetails;
 
 
         public static bool SaveGamePlaySettings()
@@ -322,9 +323,19 @@ namespace FCS_AlterraHub.Configuration
                     }
                 }
 
+                QuickLogger.Debug("Attempting to save bases",true);
                 newSaveData.BaseSaves = BaseManager.Save().ToList();
-                newSaveData.AccountDetails = CardSystem.main.SaveDetails();
-
+                QuickLogger.Debug("Bases saved", true);
+                if (!CardSystem.main.HasAccountBeenSaved())
+                {
+                    newSaveData.AccountDetails = _tempAccountDetails;
+                    _tempAccountDetails = null;
+                }
+                else
+                {
+                    newSaveData.AccountDetails = CardSystem.main.SaveDetails();
+                }
+                QuickLogger.Debug("After Saved Details", true);
                 _saveData = newSaveData;
 
                 SaveGamePlaySettings();
@@ -466,6 +477,11 @@ namespace FCS_AlterraHub.Configuration
         }
 
         public static bool IsOreConsumerSpawned { get; set; }
+
+        public static void DeepCopySave(AccountDetails accountDetails)
+        {
+            _tempAccountDetails = new AccountDetails(accountDetails);
+        }
     }
 
     public class FCSGamePlaySettings

@@ -1502,6 +1502,15 @@ namespace FCS_AlterraHub.Mono
         //        }
         //    }
         //}
+        public FcsDevice FindDeviceById(string deviceID)
+        {
+            if (_registeredDevices.ContainsKey(deviceID))
+            {
+                return _registeredDevices[deviceID];
+            }
+
+            return null;
+        }
     }
 
     public class FCSStorageTracker : MonoBehaviour

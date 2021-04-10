@@ -9,6 +9,7 @@ using FCS_AlterraHub.Model;
 using FCSCommon.Extensions;
 using FCSCommon.Utilities;
 using Oculus.Newtonsoft.Json;
+using Sentry;
 using UnityEngine;
 using Random = System.Random;
 
@@ -25,11 +26,25 @@ namespace FCS_AlterraHub.Systems
         [JsonProperty] internal string Username { get; set; }
         [JsonProperty] internal string Password { get; set; }
         [JsonProperty] internal string PIN { get; set; }
-        [JsonIgnore] internal decimal Balance { get; set; }
+        [JsonProperty] internal decimal Balance { get; set; }
         [JsonProperty] internal static decimal AlterraDebitPayed { get; set; }
         [JsonProperty] internal decimal AccountBeforeDebit { get; set; }
         [JsonProperty] internal Dictionary<string, string> KnownCardNumbers = new Dictionary<string, string>();
 
+        public AccountDetails(AccountDetails accountDetails)
+        {
+            FullName = accountDetails.FullName;
+            Username = accountDetails.Username;
+            Password = accountDetails.Password;
+            PIN = accountDetails.PIN;
+            Balance = accountDetails.Balance;
+            KnownCardNumbers = accountDetails.KnownCardNumbers;
+        }
+
+        public AccountDetails()
+        {
+            
+        }
         public void ResetAccount()
         {
             FullName = string.Empty;
@@ -49,6 +64,8 @@ namespace FCS_AlterraHub.Systems
         public static CardSystem main = new CardSystem();
         private const decimal AlterraDebit = -1000000000000000000;
         internal Action onBalanceUpdated;
+        private bool _hasBeenSaved;
+
 
         /// <summary>
         /// Generates a new card number.
@@ -165,6 +182,8 @@ namespace FCS_AlterraHub.Systems
         /// <returns></returns>
         internal AccountDetails SaveDetails()
         {
+            _hasBeenSaved = true;
+            QuickLogger.Debug($"Attempting to save account details {_accountDetails?.FullName}", true);
             return _accountDetails;
         }
 
@@ -316,8 +335,7 @@ namespace FCS_AlterraHub.Systems
             AccountDetails.AlterraDebitPayed += amount;
             RemoveFinances(amount);
         }
-
-
+        
         internal string GetUserName()
         {
             if (_accountDetails == null) return string.Empty;
@@ -361,6 +379,21 @@ namespace FCS_AlterraHub.Systems
         public void Purge()
         {
             _accountDetails = null;
+        }
+
+        public bool HasAccountBeenSaved()
+        {
+            return _hasBeenSaved;
+        }
+
+        internal void ResetHasBeenSaved()
+        {
+            _hasBeenSaved = false;
+        }
+
+        public AccountDetails GetAccount()
+        {
+            return _accountDetails;
         }
     }
 }

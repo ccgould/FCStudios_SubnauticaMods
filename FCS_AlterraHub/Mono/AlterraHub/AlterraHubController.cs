@@ -168,6 +168,10 @@ namespace FCS_AlterraHub.Mono.AlterraHub
 
         private void OnQuit()
         {
+            if (!CardSystem.main.HasAccountBeenSaved())
+            {
+                Mod.DeepCopySave(CardSystem.main.GetAccount());
+            }
             QuickLogger.Debug("Quitting Purging CardSystem and AlterraHubSave",true);
             CardSystem.main.Purge();
             Mod.PurgeSave();

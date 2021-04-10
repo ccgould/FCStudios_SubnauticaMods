@@ -100,6 +100,7 @@ namespace FCS_ProductionSolutions.Configuration
         [JsonProperty] internal AutoCrafterMode CurrentCrafterMode { get; set; }
         [JsonProperty] internal HashSet<TechType> KnownCrafts { get; set; }
         [JsonProperty] internal List<TechType> StoredItems { get; set; }
+        public List<string> ConnectedDevices { get; set; }
     }
 
     [Serializable]
