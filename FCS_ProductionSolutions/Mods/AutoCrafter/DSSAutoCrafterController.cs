@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
@@ -36,7 +37,72 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
         internal DSSAutoCrafterDisplay DisplayManager;
         internal AutoCrafterMode CurrentCrafterMode = AutoCrafterMode.Automatic;
         internal DSSCraftManager CraftManager;
+        private StandByModes _standyByMode = StandByModes.Crafting;
 
+
+        #region Unit Methods
+
+        private void OnEnable()
+        {
+            if (!_runStartUpOnEnable) return;
+
+            if (!IsInitialized)
+            {
+                Initialize();
+            }
+
+            if (_saveData == null)
+            {
+                ReadySaveData();
+            }
+
+            if (_fromSave)
+            {
+                _colorManager.ChangeColor(_saveData.Body.Vector4ToColor());
+                _colorManager.ChangeColor(_saveData.SecondaryBody.Vector4ToColor(), ColorTargetMode.Secondary);
+
+                if (_saveData.IsRunning)
+                {
+                    DisplayManager.OnButtonClick("StartBTN", null);
+                }
+
+                if (_saveData.StoredItems != null)
+                {
+                    _storedItems = _saveData.StoredItems;
+                }
+
+                if (_saveData.ConnectedDevices != null)
+                {
+                    foreach (string connectedDevice in _saveData.ConnectedDevices)
+                    {
+                        _connectedCrafters.Add(connectedDevice);
+                    }
+                }
+
+                CurrentCrafterMode = _saveData.CurrentCrafterMode;
+                _standyByMode = _saveData.StandyMode;
+                DisplayManager.SetStandByState(CurrentCrafterMode == AutoCrafterMode.StandBy);
+                _fromSave = false;
+            }
+        }
+
+        private void Start()
+        {
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.DSSAutoCrafterTabID, Mod.ModName);
+            _materials = MaterialHelpers.GetMaterials(GameObjectHelpers.FindGameObject(gameObject, "ConveyorBelts"), "fcs01_BD");
+            if (Manager != null)
+            {
+                Manager.OnPowerStateChanged += OnPowerStateChanged;
+                Manager.OnBreakerStateChanged += OnBreakerStateChanged;
+                OnPowerStateChanged(Manager.GetPowerState());
+                Manager.NotifyByID(Mod.DSSAutoCrafterTabID, "RefreshAutoCrafterList");
+            }
+            DisplayManager?.OnLoadComplete?.Invoke();
+            InvokeRepeating(nameof(CheckStatus), 1, 1);
+            InvokeRepeating(nameof(UpdateOperationTotalCounter), .5f, .5f);
+        }
+
+        #endregion
 
         public override float GetPowerUsage()
         {
@@ -78,21 +144,6 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                     _canvas.SetActive(true);
                 }
             }
-        }
-
-        private void Start()
-        {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.DSSAutoCrafterTabID, Mod.ModName);
-            _materials = MaterialHelpers.GetMaterials(GameObjectHelpers.FindGameObject(gameObject, "ConveyorBelts"), "fcs01_BD");
-            if (Manager != null)
-            {
-                Manager.OnPowerStateChanged += OnPowerStateChanged;
-                Manager.OnBreakerStateChanged += OnBreakerStateChanged;
-                OnPowerStateChanged(Manager.GetPowerState());
-                Manager.NotifyByID(Mod.DSSAutoCrafterTabID,"RefreshAutoCrafterList");
-            }
-            DisplayManager?.OnLoadComplete?.Invoke();
-            InvokeRepeating(nameof(CheckStatus),1,1);
         }
         
         private void CheckStatus()
@@ -186,7 +237,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
         {
             foreach (CraftNode craftNode in innerNodes)
             {
-                QuickLogger.Debug($"Craftable: {craftNode.id} | {craftNode.string0} | {craftNode.string1} | {craftNode.techType0}");
+                //QuickLogger.Debug($"Craftable: {craftNode.id} | {craftNode.string0} | {craftNode.string1} | {craftNode.techType0}");
 
                 if (string.IsNullOrWhiteSpace(craftNode.id)) continue;
                 if (craftNode.id.Equals("CookedFood") || craftNode.id.Equals("CuredFood")) return;
@@ -202,50 +253,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                 }
             }
         }
-
-        private void OnEnable()
-        {
-            if (!_runStartUpOnEnable) return;
-
-            if (!IsInitialized)
-            {
-                Initialize();
-            }
-
-            if (_saveData == null)
-            {
-                ReadySaveData();
-            }
-
-            if (_fromSave)
-            {
-                _colorManager.ChangeColor(_saveData.Body.Vector4ToColor());
-                _colorManager.ChangeColor(_saveData.SecondaryBody.Vector4ToColor(), ColorTargetMode.Secondary);
-
-                if (_saveData.IsRunning)
-                {
-                    DisplayManager.OnButtonClick("StartBTN", null);
-                }
-
-                if (_saveData.StoredItems != null)
-                {
-                    _storedItems = _saveData.StoredItems;
-                }
-
-                if (_saveData.ConnectedDevices != null)
-                {
-                    foreach (string connectedDevice in _saveData.ConnectedDevices)
-                    {
-                        _connectedCrafters.Add(connectedDevice);
-                    }
-                }
-                
-                CurrentCrafterMode = _saveData.CurrentCrafterMode;
-                DisplayManager.SetStandByState(CurrentCrafterMode == AutoCrafterMode.StandBy);
-                _fromSave = false;
-            }
-        }
-
+        
         private void ReadySaveData()
         {
             QuickLogger.Debug("In OnProtoDeserialize");
@@ -314,11 +322,11 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
             if (Manager == null || CraftManager.IsRunning() || CurrentCrafterMode != AutoCrafterMode.Automatic) return;
 
             //Check if already has operation
-            var hasOperation = Manager.GetBaseCraftingOperations().FirstOrDefault(x => x.Devices.Contains(UnitID));
+            var operation = Manager.GetBaseCraftingOperations().FirstOrDefault(x => x.Devices.Contains(UnitID));
 
-            if (hasOperation != null)
+            if (operation != null)
             {
-                CraftItem(hasOperation);
+                CraftItem(operation);
                 return;
             }
 
@@ -334,6 +342,13 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
         {
             try
             {
+                //Check if craftable
+                GetCraftables();
+                if (!Mod.Craftables.Contains(operation.TechType)) return;
+
+                //Check for additional help
+                DistributeLoad(operation,operation.Amount);
+
                 CraftManager.StartOperation(operation);
                 DisplayManager.LoadCraft(operation);
                 operation.IsBeingCrafted = true;
@@ -344,6 +359,23 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                 QuickLogger.DebugError(e.Message);
                 QuickLogger.DebugError(e.StackTrace);
             }
+        }
+
+        private void DistributeLoad(CraftingOperation operation, int originalAmount)
+        {
+            foreach (string connectedCrafter in _connectedCrafters)
+            {
+                var crafter = IDToAutoCrafter(connectedCrafter);
+                if (!crafter.CraftManager.IsRunning() && crafter.GetStandByMode() == StandByModes.Load)
+                {
+                    crafter.CraftItem(operation);
+                }
+            }
+        }
+
+        internal CraftingOperation GetOperation()
+        {
+            return CraftManager.GetCraftingOperation();
         }
 
         public override void OnProtoSerialize(ProtobufSerializer serializer)
@@ -391,6 +423,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                 _saveData.StoredItems = _storedItems;
                 _saveData.CurrentCrafterMode = CurrentCrafterMode;
                 _saveData.IsRunning = CraftManager.IsRunning();
+                _saveData.StandyMode = _standyByMode;
                 newSaveData.DSSAutoCrafterDataEntries.Add(_saveData);
             }
             catch (Exception e)
@@ -491,7 +524,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                 if (fcsDevice != null)
                 {
                     var crafter = (DSSAutoCrafterController)fcsDevice;
-                    if (crafter.CraftManager.IsRunning())
+                    if (crafter.GetStandByMode() == StandByModes.Crafting && crafter.CraftManager.IsRunning())
                     {
                         if(crafter.IsCraftingItem(techType)) return;
                     }
@@ -500,15 +533,12 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
 
             foreach (string connectedCrafter in _connectedCrafters)
             {
-                var fcsDevice = Manager.FindDeviceById(connectedCrafter);
-                if(fcsDevice!= null)
+                var crafter = IDToAutoCrafter(connectedCrafter);
+                if(crafter == null)continue;
+                if (!crafter.CraftManager.IsRunning())
                 {
-                    var crafter = (DSSAutoCrafterController) fcsDevice;
-                    if (!crafter.CraftManager.IsRunning())
-                    {
-                        crafter.CraftItem(new CraftingOperation(techType,1,false));
-                        break;
-                    }
+                    crafter.CraftItem(new CraftingOperation(techType, 1, false));
+                    break;
                 }
             }
             
@@ -532,6 +562,17 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
             //}
 
             ////QuickLogger.Debug($" ==== Ask For Crafting Assistance {UnitID} | {Language.main.Get(techType)} ====");
+        }
+
+        private DSSAutoCrafterController IDToAutoCrafter(string connectedCrafter)
+        {
+            var fcsDevice = Manager.FindDeviceById(connectedCrafter);
+            if (fcsDevice != null)
+            {
+                return (DSSAutoCrafterController) fcsDevice;
+            }
+
+            return null;
         }
 
         private bool IsCraftingItem(TechType techType)
@@ -559,9 +600,12 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
             DisplayManager.OnStatusUpdate?.Invoke(status.ToString());
         }
 
-        internal void UpdateTotal(Vector2 total)
+        internal void UpdateOperationTotalCounter()
         {
-            DisplayManager.OnTotalUpdate?.Invoke(total);
+            if(GetOperation() == null)
+                DisplayManager.OnTotalUpdate?.Invoke(0,0);
+            else
+                DisplayManager.OnTotalUpdate?.Invoke(CraftManager.GetCraftingOperation().AmountCompleted, CraftManager.GetCraftingOperation().Amount);
         }
 
         public void AddItemToStorage(TechType techType)
@@ -582,6 +626,29 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
         internal void RemoveAutoCrafter(string unitId)
         {
             _connectedCrafters.Remove(unitId);
+        }
+
+        public void SetStandByMode(StandByModes crafting)
+        {
+            _standyByMode = crafting;
+        }
+
+        internal StandByModes GetStandByMode()
+        {
+            return _standyByMode;
+        }
+
+        public bool HasConnectedCrafter()
+        {
+            return _connectedCrafters?.Any() ?? false;
+        }
+
+        public IEnumerable GetConnections()
+        {
+            for (int i = 0; i < _connectedCrafters.Count; i++)
+            {
+                yield return _connectedCrafters.ElementAt(i);
+            }
         }
     }
 

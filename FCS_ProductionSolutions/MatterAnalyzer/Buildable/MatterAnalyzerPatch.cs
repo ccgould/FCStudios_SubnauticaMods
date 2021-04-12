@@ -28,8 +28,8 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Buildable
 
             };
         }
-        public override TechGroup GroupForPDA => TechGroup.InteriorModules;
-        public override TechCategory CategoryForPDA => TechCategory.InteriorModule;
+        public override TechGroup GroupForPDA => TechGroup.Miscellaneous;
+        public override TechCategory CategoryForPDA => TechCategory.Misc;
         public override string AssetsFolder => Mod.GetAssetPath();
         
         public override GameObject GetGameObject()

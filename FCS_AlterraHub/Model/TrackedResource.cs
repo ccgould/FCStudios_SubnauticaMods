@@ -8,6 +8,6 @@ namespace FCS_AlterraHub.Mono
         public int Amount { get; set; }
         public HashSet<StorageContainer> StorageContainers { get; set; } = new HashSet<StorageContainer>();
         public HashSet<FcsDevice> Servers { get; set; } = new HashSet<FcsDevice>();
-        public HashSet<FcsDevice> AlterraStorage { get; set; } = new HashSet<FcsDevice>();
+        public HashSet<FcsDevice> OtherStorage { get; set; } = new HashSet<FcsDevice>();
     }
 }

@@ -47,7 +47,7 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
         private Text _labelText;
         private PaginatorController _paginatorController;
 
-        public override StorageType StorageType { get; } = StorageType.AlterraStorage;
+        public override StorageType StorageType { get; } = StorageType.OtherStorage;
 
         #region Unity Methods
 

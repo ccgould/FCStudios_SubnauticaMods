@@ -48,8 +48,8 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
             waypoints = newWaypoints;
             SetIcon(techType);
             // Set position of Enemy as position of the first waypoint
-            transform.position = waypoints[waypointIndex].transform.position;
-            transform.rotation = waypoints[waypointIndex].transform.rotation;
+            transform.localPosition = waypoints[waypointIndex].transform.localPosition;
+            transform.localRotation = waypoints[waypointIndex].transform.localRotation;
             MaterialHelpers.ApplyShaderToMaterial(gameObject, ModelPrefab.DecalMaterial);
             //Shader shader = Shader.Find("MarmosetUBER");
             Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>();
@@ -78,15 +78,15 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
 
                 // Move Enemy from current waypoint to the next one
                 // using MoveTowards method
-                transform.position = Vector3.MoveTowards(transform.position,
-                    waypoints[waypointIndex].transform.position,
+                transform.localPosition = Vector3.MoveTowards(transform.localPosition,
+                    waypoints[waypointIndex].transform.localPosition,
                     moveSpeed * Time.deltaTime);
 
 
                 // If Enemy reaches position of waypoint he walked towards
                 // then waypointIndex is increased by 1
                 // and Enemy starts to walk to the next waypoint
-                if (transform.position == waypoints[waypointIndex].transform.position)
+                if (transform.localPosition == waypoints[waypointIndex].transform.localPosition)
                 {
                     waypointIndex += 1;
                 }

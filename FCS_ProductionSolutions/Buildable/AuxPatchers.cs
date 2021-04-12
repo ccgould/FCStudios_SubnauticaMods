@@ -32,6 +32,7 @@ namespace FCS_ProductionSolutions.Buildable
             { $"{ModKey}_HarvesterDeleteSampleDesc","Clears this slot. Slot must be empty to clear."},
             { $"{ModKey}_AutocrafterItemIsBeingCrafted","Cannot deconstruct because AutoCrafter is currently crafting an item."},
             { $"{ModKey}_AutocrafterItemsOnBelt","Cannot deconstruct because there are items on the belt."},
+            { $"{ModKey}_CannotSetStandByHasConnections","Standby cannot be set due to this crafter already having connections to other crafters:{0}"},
 
         };
 
@@ -157,6 +158,11 @@ namespace FCS_ProductionSolutions.Buildable
         public static string AutocrafterItemsOnBelt()
         {
             return GetLanguage($"{ModKey}_AutocrafterItemsOnBelt");
+        }
+
+        public static string CannotSetStandByHasConnections(string otherCrafterId)
+        {
+            return string.Format(GetLanguage($"{ModKey}_CannotSetStandByHasConnections"),otherCrafterId);
         }
     }
 }

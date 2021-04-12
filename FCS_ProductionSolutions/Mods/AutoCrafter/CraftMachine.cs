@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Mono;
+using FCS_ProductionSolutions.Configuration;
 using FCSCommon.Extensions;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Handlers;
@@ -25,7 +26,6 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
         public void StartCrafting(CraftingOperation craftingItem,DSSAutoCrafterController mono)
         {
             _mono = mono;
-
             NotMetIngredients.Clear();
 
             if (craftingItem == null)return;
@@ -33,7 +33,6 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
             _mono.CraftManager.GetCraftingOperation().IsBeingCrafted = true;
             _goal = craftingItem.Amount;
             _startBuffer = 1;
-            _mono.UpdateTotal(new Vector2(craftingItem.AmountCompleted,craftingItem.Amount));
             IsOccupied = true;
         }
 
@@ -44,11 +43,12 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
 
         private void Update()
         {
-
-            if (_mono?.CraftManager?.GetCraftingOperation() == null || _mono?.Manager == null || !IsOccupied) return;
+            if (_mono?.CraftManager?.GetCraftingOperation() == null || Mod.Craftables == null || _mono?.Manager == null || !IsOccupied) return;
 
             var techType = _mono.CraftManager.GetCraftingOperation().TechType;
             var amount = _mono.CraftManager.GetCraftingOperation().ReturnAmount;
+
+            if(!Mod.Craftables.Contains(techType)) return;
 
             if (!_mono.Manager.IsAllowedToAdd(techType, amount, true,false))
             {
@@ -74,8 +74,12 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                 for (int i = 0; i < amount; i++)
                 {
                     var craftingTechType = _mono.CraftManager.GetCraftingOperation().FixCustomTechType();
-                    var inventoryItem = craftingTechType.ToInventoryItemLegacy();
+                    var inventoryItem = craftingTechType.ToInventoryItemLegacy() ?? craftingTechType.ToInventoryItem();
+
+                    if(inventoryItem == null) return;
+
                     QuickLogger.Debug($"Crafting: {Language.main.Get(craftingTechType)}",true);
+
                     var result = BaseManager.AddItemToNetwork(_mono.Manager, inventoryItem, true);
 
                     if (!result)
@@ -88,7 +92,6 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                     target--;
                 }
                 
-                _mono.UpdateTotal(new Vector2(_mono.CraftManager.GetCraftingOperation().AmountCompleted, _mono.CraftManager.GetCraftingOperation().Amount));
                 _startBuffer = MAXTIME;
                 _mono.CraftManager.SpawnItem(_mono.CraftManager.GetCraftingOperation().TechType);
             }
@@ -108,9 +111,13 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
             if (_mono.CraftManager.GetCraftingOperation().IsComplete)
             {
                 QuickLogger.Debug($"Is Complete",true);
-                _mono.UpdateTotal(new Vector2(0, 0));
-                OnComplete?.Invoke(_mono.CraftManager.GetCraftingOperation());
-                if (!_mono.CraftManager.GetCraftingOperation().IsRecursive)
+                OnComplete?.Invoke(_mono?.CraftManager?.GetCraftingOperation());
+
+                if (_mono?.CraftManager?.GetCraftingOperation() == null)
+                {
+                    IsOccupied = false;
+                }
+                else if(!_mono.CraftManager.GetCraftingOperation().IsRecursive)
                 {
                     IsOccupied = false;
                 }

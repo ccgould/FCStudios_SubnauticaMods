@@ -700,11 +700,6 @@ namespace FCS_AlterraHub.Mono
                 }
             }
 
-            if (storageFilter == StorageType.AlterraStorage || storageFilter == StorageType.All)
-            {
-                
-            }
-
             GlobalNotifyByID("DTC", "ItemUpdateDisplay");
 
             return null;
@@ -743,10 +738,10 @@ namespace FCS_AlterraHub.Mono
                         }
                     }
                     return _item;
-                case StorageType.AlterraStorage:
+                case StorageType.OtherStorage:
                     foreach (KeyValuePair<TechType, TrackedResource> resource in TrackedResources)
                     {
-                        foreach (FcsDevice device in resource.Value.AlterraStorage)
+                        foreach (FcsDevice device in resource.Value.OtherStorage)
                         {
                             CalculateItems(_item, resource, device);
                         }
@@ -778,12 +773,12 @@ namespace FCS_AlterraHub.Mono
         {
             QuickLogger.Debug($"AddItemsToTracker: DSSServerController || {item.AsString()} || {amountToAdd} ");
 
-            if (device.TabID == "AS")
+            if (device.TabID.Equals("AS") || device.TabID.Equals("HH"))
             {
                 if (TrackedResources.ContainsKey(item))
                 {
                     TrackedResources[item].Amount = TrackedResources[item].Amount + amountToAdd;
-                    TrackedResources[item].AlterraStorage.Add(device);
+                    TrackedResources[item].OtherStorage.Add(device);
                 }
                 else
                 {
@@ -791,7 +786,7 @@ namespace FCS_AlterraHub.Mono
                     {
                         TechType = item,
                         Amount = amountToAdd,
-                        AlterraStorage = new HashSet<FcsDevice>() { device }
+                        OtherStorage = new HashSet<FcsDevice>() { device }
                     });
                 }
             }

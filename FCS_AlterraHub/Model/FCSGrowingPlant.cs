@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Interfaces;
+using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using Oculus.Newtonsoft.Json;
 using UnityEngine;
@@ -120,6 +121,21 @@ namespace FCS_AlterraHub.Model
                 grownPlant.SendMessage("OnGrown", SendMessageOptions.DontRequireReceiver);
                 go.transform.parent = _growBed.grownPlantsRoot.transform;
                 _growBed.SetupRenderers(go, _growBed.IsInBase());
+
+                if (seed.plantTechType == TechType.Creepvine)
+                {
+                    var fruitPlant = go.GetComponentInChildren<FruitPlant>();
+                    if (fruitPlant != null)
+                    {
+                        QuickLogger.Debug($"Changing fruitPlant to false", true);
+                        fruitPlant.fruitSpawnEnabled = false;
+                        var light = GameObjectHelpers.FindGameObject(go, "light");
+                        if (light != null)
+                        {
+                            Destroy(light);
+                        }
+                    }
+                }
 
                 if (seed != null)
                 {

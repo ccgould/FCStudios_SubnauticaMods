@@ -4,6 +4,7 @@ using FCS_AlterraHub.Model;
 using FCS_ProductionSolutions.HydroponicHarvester.Enumerators;
 using FCS_ProductionSolutions.HydroponicHarvester.Mono;
 using FCSCommon.Converters;
+using FCSCommon.Extensions;
 using FCSCommon.Utilities;
 using UnityEngine;
 namespace FCS_ProductionSolutions.HydroponicHarvester.Models
@@ -158,6 +159,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Models
             if(IsFull) return;
             _itemCount++;
             _trackedTab?.UpdateCount();
+            GrowBedManager.IncreaseByOne(GetPlantSeedTechType());
         }
         
         public TechType GetReturnType()

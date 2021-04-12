@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Interfaces;
@@ -88,7 +89,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                 case StorageType.StorageLockers:
                     _totalItemsAmount.text = AuxPatchers.TotalItemsFormat(_currentBase.GetTotal(_storageFilter), 0);
                     break;
-                case StorageType.AlterraStorage:
+                case StorageType.OtherStorage:
                     _totalItemsAmount.text = AuxPatchers.TotalItemsFormat(_currentBase.GetTotal(_storageFilter), _alterraStorageCapacity);
                     break;
             }
@@ -123,7 +124,11 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                     var amount = (int)_mono.BulkMultiplier;
                     for (int i = 0; i < amount; i++)
                     {
-                        if (!PlayerInteractionHelper.CanPlayerHold(techType)) continue;
+                        if (!PlayerInteractionHelper.CanPlayerHold(techType))
+                        {
+                            QuickLogger.Message(AlterraHub.InventoryFull());
+                            continue;
+                        }
                         var result = _currentBase.TakeItem(techType, _storageFilter);
                         if (result != null)
                         {
@@ -295,7 +300,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             _sb.Clear();
             _sb.AppendFormat("\n<size=20><color=#FFA500FF>{0}:</color></size>", "Additional Storage Information");
             _sb.AppendFormat("\n<size=20><color=#FFA500FF>{0}:</color> <color=#DDDEDEFF>{1}</color></size>", "Storage Lockers",$"{_currentBase.GetTotal(StorageType.StorageLockers)}");
-            _sb.AppendFormat("\n<size=20><color=#FFA500FF>{0}:</color> <color=#DDDEDEFF>{1}</color></size>", Mod.AlterraStorageFriendlyName,$"{_currentBase.GetTotal(StorageType.AlterraStorage)}/{_alterraStorageCapacity}");
+            _sb.AppendFormat("\n<size=20><color=#FFA500FF>{0}:</color> <color=#DDDEDEFF>{1}</color></size>", Mod.AlterraStorageFriendlyName,$"{_currentBase.GetTotal(StorageType.OtherStorage)}/{_alterraStorageCapacity}");
             return _sb.ToString();
         }
 

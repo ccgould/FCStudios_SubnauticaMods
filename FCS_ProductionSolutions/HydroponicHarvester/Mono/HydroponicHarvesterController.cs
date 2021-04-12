@@ -1,7 +1,9 @@
 ﻿using System;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Buildables;
+using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Extensions;
+using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_ProductionSolutions.Buildable;
@@ -25,7 +27,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
         private Text _unitID;
         internal DisplayManager DisplayManager;
         private const float powerUsage = 0.85f;
-        
+        public override StorageType StorageType => StorageType.OtherStorage;
         public EffectsManager EffectsManager => _effectsManager;
         public AudioManager AudioManager { get; private set; }
         public Action<bool> onUpdateSound { get; private set; }
@@ -39,6 +41,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.HydroponicHarvesterModTabID, Mod.ModName);
             _unitID.text = $"UNIT ID: {UnitID}";
+            Manager.AlertNewFcsStoragePlaced(this);
         }
 
         private void OnEnable()
@@ -143,6 +146,8 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
             {
                 GrowBedManager = gameObject.AddComponent<GrowBedManager>();
                 GrowBedManager.Initialize(this);
+                GrowBedManager.ItemsContainer.onAddItem += UpdateTerminals;
+                GrowBedManager.ItemsContainer.onRemoveItem += UpdateTerminals;
             }
 
             if (_colorManager == null)
@@ -178,6 +183,11 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
             IsInitialized = true;
         }
 
+        private void UpdateTerminals(InventoryItem item)
+        {
+            BaseManager.GlobalNotifyByID("DTC", "ItemUpdateDisplay");
+        }
+
         private void OnIpcMessage(string message)
         {
             if (message.Equals("UpdateDNA"))
@@ -190,6 +200,11 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
         private void CheckSystem()
         {
             _effectsManager?.ToggleLightsByDistance();
+        }
+
+        public override IFCSStorage GetStorage()
+        {
+            return GrowBedManager;
         }
 
         public override void OnProtoSerialize(ProtobufSerializer serializer)
@@ -298,6 +313,11 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
         public override Vector3 GetPosition()
         {
             return transform.position;
+        }
+
+        public override Pickupable RemoveItemFromContainer(TechType techType)
+        {
+            return GrowBedManager.RemoveItemFromContainer(techType);
         }
     }
 }

@@ -10,23 +10,25 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
     {
         private DSSAutoCrafterController _mono;
         private CraftMachine _craftSlot1;
-        private StatusController _statusController;
-        private bool _startCrafting;
         private bool _isInitialized;
         private int _itemsOnBelt;
         private Transform[] _crafterBeltPath;
         private CraftingOperation _craftingItem;
+        private GameObject _beltPathPoints;
 
         public void Initialize(DSSAutoCrafterController mono)
         {
             if (_isInitialized) return;
             _mono = mono;
 
-            _crafterBeltPath = GameObjectHelpers.FindGameObject(mono.gameObject, "Belt1WayPoints").GetChildrenT();
+            _beltPathPoints = GameObjectHelpers.FindGameObject(mono.gameObject, "Belt1WayPoints");
+            _crafterBeltPath = _beltPathPoints.GetChildrenT();
             _craftSlot1 = gameObject.AddComponent<CraftMachine>();
             _craftSlot1.CrafterID = 1;
             _craftSlot1.OnComplete += item =>
             {
+                if(item == null)return;
+
                 if(!item.IsRecursive)
                 {
                     _mono.Manager.RemoveCraftingOperation(item);
@@ -46,6 +48,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
 
             //Spawn items
             var inv = GameObject.Instantiate(ModelPrefab.DSSCrafterCratePrefab);
+            inv.transform.SetParent(_beltPathPoints.transform,false);
             var follow = inv.AddComponent<DSSAutoCrafterCrateController>();
             follow.Initialize(_crafterBeltPath, _mono, techType);
             follow.OnPathComplete += OnPathComplete;

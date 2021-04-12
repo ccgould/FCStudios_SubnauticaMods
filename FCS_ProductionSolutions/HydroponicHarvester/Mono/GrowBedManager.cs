@@ -4,6 +4,7 @@ using System.Linq;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Model;
+using FCS_AlterraHub.Mono;
 using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.HydroponicHarvester.Enumerators;
@@ -16,14 +17,15 @@ using UnityEngine;
 
 namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
 {
-    internal class GrowBedManager : MonoBehaviour, IFCSGrowBed
+    internal class GrowBedManager : MonoBehaviour, IFCSGrowBed, IFCSStorage
     {
         internal HydroponicHarvesterController Mono;
         private const float MaxPlantsHeight = 3f;
         private TechType _currentItemTech;
-
+        private readonly Dictionary<TechType,int> _trackedItems = new Dictionary<TechType, int>();
 
         internal PlantSlot[] Slots;
+        private bool _isFull;
         public GameObject grownPlantsRoot { get; set; }
 
         internal void Initialize(HydroponicHarvesterController mono)
@@ -34,8 +36,30 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
             {
                 grownPlantsRoot = GameObjectHelpers.FindGameObject(gameObject, "Planters");
             }
+
+            if (ItemsContainer == null)
+            {
+                ItemsContainer = new ItemsContainer(1,1,gameObject.transform,"HarvesterTempStorage",null);
+                ItemsContainer.onRemoveItem += item =>
+                {
+                    DecreaseByOne(item.item.GetTechType());
+                };
+            }
         }
-        
+
+        private void DecreaseByOne(TechType techType)
+        {                
+            if (_trackedItems.ContainsKey(techType))
+            {
+                _trackedItems[techType] -= 1;
+
+                if (_trackedItems[techType] == 0)
+                {
+                    _trackedItems.Remove(techType);
+                }
+            }
+        }
+    
         internal void AddSample(TechType type,int slotID)
         {
             var item = type.ToInventoryItem();
@@ -228,7 +252,10 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
                 slot.SetItemCount(data.Amount);
                 slot.GetTab().Load(data.TechType);
                 slot.GrowingPlant?.SetProgress(data.PlantProgress);
-
+                for (int j = 0; j < data.Amount; j++)
+                {
+                    IncreaseByOne(data.TechType);
+                }
             }
         }
 
@@ -250,7 +277,13 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
                 //if (slot.GetPlantSeedTechType() != techType) return;
                 if (slot.RemoveItem())
                 {
+                    DecreaseByOne(techType);
                     PlayerInteractionHelper.GivePlayerItem(techType);
+                    var item = ItemsContainer.RemoveItem(techType);
+                    if (item != null)
+                    {
+                        Destroy(item.gameObject);
+                    }
                 }
             }
             else
@@ -267,6 +300,84 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
         public bool HasSeeds()
         {
             return Slots.Where(plantSlot => plantSlot != null).Any(plantSlot => plantSlot.IsOccupied);
+        }
+
+        public int GetContainerFreeSpace { get; }
+
+        bool IFCSStorage.IsFull => IsFull();
+
+        public bool CanBeStored(int amount, TechType techType)
+        {
+            return false;
+        }
+
+        public bool AddItemToContainer(InventoryItem item)
+        {
+            return false;
+        }
+
+        public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
+        {
+            return false;
+        }
+
+        public bool IsAllowedToRemoveItems()
+        {
+            return false;
+        }
+
+        public Pickupable RemoveItemFromContainer(TechType techType)
+        {
+            QuickLogger.Debug($"Trying to remove Item : {Language.main.Get(techType)}",true);
+            var pickupable = ItemsContainer.RemoveItem(techType);
+
+            if (pickupable != null)
+            {
+                foreach (PlantSlot plantSlot in Slots)
+                {
+                    if (plantSlot.GetPlantSeedTechType() == techType)
+                    {
+                        plantSlot.RemoveItem();
+                        QuickLogger.Debug($"Removing Item : {Language.main.Get(techType)}", true);
+                        break;
+                    }
+                }
+                return pickupable;
+            }
+
+            return null;
+        }
+
+        public Dictionary<TechType, int> GetItemsWithin()
+        {
+            return _trackedItems;
+        }
+
+        public Action<int, int> OnContainerUpdate { get; set; }
+        public Action<FcsDevice, TechType> OnContainerAddItem { get; set; }
+        public Action<FcsDevice, TechType> OnContainerRemoveItem { get; set; }
+        public bool ContainsItem(TechType techType)
+        {
+            return _trackedItems.ContainsKey(techType);
+        }
+
+        public ItemsContainer ItemsContainer { get; set; }
+        public int StorageCount()
+        {
+            return _trackedItems.Values.Sum();
+        }
+
+        public void IncreaseByOne(TechType techType)
+        {
+            if (_trackedItems.ContainsKey(techType))
+            {
+                _trackedItems[techType] += 1;
+            }
+            else
+            {
+                _trackedItems.Add(techType, 1);
+            }
+            ItemsContainer.UnsafeAdd(techType.ToInventoryItemLegacy());
         }
     }
 }

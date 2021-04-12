@@ -5,7 +5,6 @@
         All,
         Servers,
         StorageLockers,
-        AlterraStorage,
-        AutoCrafter
+        OtherStorage
     }
 }
