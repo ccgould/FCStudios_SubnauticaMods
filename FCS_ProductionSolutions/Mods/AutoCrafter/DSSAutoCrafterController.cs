@@ -363,9 +363,16 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
 
         private void DistributeLoad(CraftingOperation operation, int originalAmount)
         {
-            foreach (string connectedCrafter in _connectedCrafters)
+            for (int i = _connectedCrafters.Count - 1; i > -1; i--)
             {
-                var crafter = IDToAutoCrafter(connectedCrafter);
+                var crafter = IDToAutoCrafter(_connectedCrafters.ElementAt(i));
+
+                if (crafter == null)
+                {
+                    _connectedCrafters.Remove(_connectedCrafters.ElementAt(i));
+                    continue;
+                }
+
                 if (!crafter.CraftManager.IsRunning() && crafter.GetStandByMode() == StandByModes.Load)
                 {
                     crafter.CraftItem(operation);

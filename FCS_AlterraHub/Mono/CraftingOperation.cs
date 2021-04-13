@@ -35,7 +35,8 @@ namespace FCS_AlterraHub.Mono
         {
             TechType = techType;
             Amount = amount;
-            ReturnAmount = CraftDataHandler.Main.GetTechData(techType)?.craftAmount ?? 1;
+            var returnAmount = CraftDataHandler.Main.GetTechData(techType)?.craftAmount ?? 1;
+            ReturnAmount = returnAmount == 0 ? 1 : returnAmount;
             IsRecursive = isRecursive;
         }
 

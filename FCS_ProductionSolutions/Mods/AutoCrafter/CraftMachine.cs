@@ -70,10 +70,11 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
             {
                 _mono.CraftManager.GetCraftingOperation().AppendCompletion();
                 _mono.Manager.ConsumeIngredientsFor(techType);
-                var target = amount;
+                var craftingTechType = _mono.CraftManager.GetCraftingOperation().FixCustomTechType();
+                QuickLogger.Debug($"Crafting TechType: {Language.main.Get(craftingTechType)} | Amount: {amount}", true);
+                
                 for (int i = 0; i < amount; i++)
                 {
-                    var craftingTechType = _mono.CraftManager.GetCraftingOperation().FixCustomTechType();
                     var inventoryItem = craftingTechType.ToInventoryItemLegacy() ?? craftingTechType.ToInventoryItem();
 
                     if(inventoryItem == null) return;
@@ -88,8 +89,6 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                         _mono.AddItemToStorage(techType);
                         Destroy(inventoryItem.item.gameObject);
                     }
-
-                    target--;
                 }
                 
                 _startBuffer = MAXTIME;
@@ -139,7 +138,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
 
         public void Reset(bool bypass)
         {
-            if (_mono.CraftManager.GetCraftingOperation() == null || _mono == null) return;
+            if (_mono?.CraftManager?.GetCraftingOperation() == null) return;
             if (!_mono.CraftManager.GetCraftingOperation().IsRecursive || bypass)
             {
                 _mono.CraftManager.StopOperation();

@@ -131,7 +131,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                 standByBtn.TextLineTwo = "Puts this crafter in a mode that allows it to help other crafters to craft missing required items.";
                 _standbyBTN.onClick.AddListener(()=>
                 {
-                    if (_mono.HasConnectedCrafter())
+                    if (_mono.HasConnectedCrafter() && _mono.CurrentCrafterMode != AutoCrafterMode.StandBy)
                     {
                         _mono.ShowMessage(AuxPatchers.CannotSetStandByHasConnections(GetConnectedCraftersIds()));
                         return;
