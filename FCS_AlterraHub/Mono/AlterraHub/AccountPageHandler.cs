@@ -1,11 +1,8 @@
-﻿using System;
-using FCS_AlterraHub.Configuration;
+﻿using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Helpers;
-using FCSCommon.Utilities;
-using HarmonyLib;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -23,7 +20,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
         private Text _newBalance;
         private Text _accountBalance;
         private InputField _paymentInput;
-        private Text _debitBalance;
+        private Text _debtBalance;
         private Text _userNameLBL;
         private GameObject _createAccountDialog;
         private Text _requestButtonText;
@@ -41,16 +38,16 @@ namespace FCS_AlterraHub.Mono.AlterraHub
                 _createAccountDialog.SetActive(false);
             });
 
-            _paymentScreen = GameObjectHelpers.FindGameObject(mono.gameObject, "DebitDialog");
+            _paymentScreen = GameObjectHelpers.FindGameObject(mono.gameObject, "DebtDialog");
             
             _newBalance = GameObjectHelpers.FindGameObject(_paymentScreen, "NewBalance").GetComponent<Text>();
 
             _accountBalance = GameObjectHelpers.FindGameObject(_paymentScreen, "AccountBalance").GetComponent<Text>();
             
-            _debitBalance = GameObjectHelpers.FindGameObject(_paymentScreen, "DebitBalance").GetComponent<Text>();
+            _debtBalance = GameObjectHelpers.FindGameObject(_paymentScreen, "DebtBalance").GetComponent<Text>();
 
             _paymentInput = _paymentScreen.GetComponentInChildren<InputField>();
-
+             
             _paymentInput.onEndEdit.AddListener((value) =>
             {
 
@@ -132,7 +129,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             ResetPaymentScreen();
             _paymentScreen.SetActive(true);
             _accountBalance.text = Buildables.AlterraHub.AccountBalanceFormat(CardSystem.main.GetAccountBalance());
-            _debitBalance.text = Buildables.AlterraHub.AccountBalanceFormat(CardSystem.main.AlterraBalance());
+            _debtBalance.text = Buildables.AlterraHub.DebtBalanceFormat(CardSystem.main.AlterraBalance());
         }
 
         private void ResetPaymentScreen()
@@ -140,7 +137,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             _paymentInput.text = string.Empty;
             _newBalance.text = Buildables.AlterraHub.AccountNewBalanceFormat(0);
             _accountBalance.text = Buildables.AlterraHub.AccountBalanceFormat(0);
-            _debitBalance.text = Buildables.AlterraHub.DebitBalanceFormat(0);
+            _debtBalance.text = Buildables.AlterraHub.DebtBalanceFormat(0);
         }
 
         private void SetupFullTitle(GameObject dialog)

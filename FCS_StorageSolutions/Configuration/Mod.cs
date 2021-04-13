@@ -24,6 +24,7 @@ namespace FCS_StorageSolutions.Configuration
         private static TechType _transceiverTechType;
         private static List<DSSServerController> _registeredServers;
         private static TechType _dssServerTechType;
+        
 
         #endregion
 
@@ -41,6 +42,8 @@ namespace FCS_StorageSolutions.Configuration
         internal const string AlterraStorageDescription = "Freestanding storage unit for 200 items. Suitable for interior and exterior use. Can be used to receive ores directly from an automated drill platform if in range.";
 
         internal const string DSSTabID = "DSS";
+
+        public const string DSSServerTabID = "DSV";
         internal const string DSSServerFriendlyName = "Server";
         internal const string DSSServerClassName = "DSSServer";
         internal const string DSSServerPrefabName = "DSS_Server";

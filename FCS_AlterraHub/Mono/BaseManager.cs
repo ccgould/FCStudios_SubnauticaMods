@@ -771,40 +771,52 @@ namespace FCS_AlterraHub.Mono
 
         public void AddItemsToTracker(FcsDevice device,TechType item, int amountToAdd = 1)
         {
-            QuickLogger.Debug($"AddItemsToTracker: DSSServerController || {item.AsString()} || {amountToAdd} ");
+            QuickLogger.Debug($"AddItemsToTracker: DSSServerController || {item.AsString()} || {amountToAdd} || TabID: {device?.TabID}");
 
-            if (device.TabID.Equals("AS") || device.TabID.Equals("HH"))
+            if (device?.TabID != null && (device.TabID.Equals("AS") || device.TabID.Equals("HH")))
             {
+                QuickLogger.Debug($"Item is AS or HH");
                 if (TrackedResources.ContainsKey(item))
                 {
+                    QuickLogger.Debug($"1");
                     TrackedResources[item].Amount = TrackedResources[item].Amount + amountToAdd;
+                    QuickLogger.Debug($"2");
                     TrackedResources[item].OtherStorage.Add(device);
+                    QuickLogger.Debug($"3");
                 }
                 else
                 {
+                    QuickLogger.Debug($"4");
                     TrackedResources.Add(item, new TrackedResource()
                     {
                         TechType = item,
                         Amount = amountToAdd,
                         OtherStorage = new HashSet<FcsDevice>() { device }
                     });
+                    QuickLogger.Debug($"5");
                 }
             }
             else
             {
+                QuickLogger.Debug($"Item is  NOT AS or HH");
                 if (TrackedResources.ContainsKey(item))
                 {
+                    QuickLogger.Debug($"1");
                     TrackedResources[item].Amount = TrackedResources[item].Amount + amountToAdd;
+                    QuickLogger.Debug($"2");
                     TrackedResources[item].Servers.Add(device);
+                    QuickLogger.Debug($"3");
                 }
                 else
                 {
+                    QuickLogger.Debug($"4");
                     TrackedResources.Add(item, new TrackedResource()
                     {
                         TechType = item,
                         Amount = amountToAdd,
                         Servers = new HashSet<FcsDevice>() { device }
                     });
+                    QuickLogger.Debug($"5");
                 }
             }
 
@@ -1205,8 +1217,8 @@ namespace FCS_AlterraHub.Mono
             }
             catch (Exception e)
             {
-                QuickLogger.Debug(e.Message, true);
-                QuickLogger.Debug(e.StackTrace);
+                QuickLogger.Error(e.Message, true);
+                QuickLogger.Error(e.StackTrace);
                 PlayerInteractionHelper.GivePlayerItem(item);
             }
             return false;

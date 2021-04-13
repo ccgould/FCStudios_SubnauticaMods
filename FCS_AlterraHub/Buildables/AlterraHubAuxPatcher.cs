@@ -19,7 +19,7 @@ namespace FCS_AlterraHub.Buildables
             { $"{ModKey}_AccountNotFoundFormat", "There is no account found for you please register an account in the Alterra Hub" },
             { $"{ModKey}_CardReader", "Card Reader" },
             { $"{ModKey}_AccountBalanceFormat", "Account Balance: {0}" },
-            { $"{ModKey}_DebitBalanceFormat", "Debit Balance: {0}" },
+            { $"{ModKey}_DebtBalanceFormat", "Debt Balance: {0}" },
             { $"{ModKey}_CheckOutTotalFormat", "Cart Total: {0}" },
             { $"{ModKey}_AccountNewBalanceFormat", "New Balance: {0}" },
             { $"{ModKey}_NoValidCardForPurchase", "Please select a valid card with enough finances to complete transaction." },
@@ -127,9 +127,9 @@ namespace FCS_AlterraHub.Buildables
             return string.Format(GetLanguage($"{ModKey}_AccountNewBalanceFormat"), amount.ToString("n0"));
         }
 
-        internal static string DebitBalanceFormat(decimal amount)
+        internal static string DebtBalanceFormat(decimal amount)
         {
-            return string.Format(GetLanguage($"{ModKey}_DebitBalanceFormat"), amount.ToString("n0"));
+            return string.Format(GetLanguage($"{ModKey}_DebtBalanceFormat"), amount.ToString("n0"));
         }
 
         internal static string NoValidCardForPurchase()

@@ -82,7 +82,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
         {
             if (IsInitialized) return;
             IsConstructed = true;
-
+            TabID = Mod.DSSServerTabID;
             _storageAmount = gameObject.GetComponentInChildren<Text>();
 
             _rb = gameObject.GetComponent<Rigidbody>();
