@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
 using System.Linq;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Managers.Mission.Enumerators;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
-using UnityEngine;
 
 namespace FCS_AlterraHub.Managers.Mission
 {
@@ -15,7 +12,21 @@ namespace FCS_AlterraHub.Managers.Mission
     {
         public string Name { get; set; }
         public string Description { get; set; }
-        public bool IsComplete { get; private set; }
+        public bool IsComplete => CheckIfComplete();
+        public bool RewardHasBeenClaimed { get; set; }
+        private bool CheckIfComplete()
+        {
+            foreach (var missionTask in Tasks)
+            {
+                if (!missionTask.IsCompleted)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         public float Percentage { get; private set; }
         public decimal CreditReward { get;  set; }
         public TechType TechTypeReward { get;  set; }
@@ -78,7 +89,7 @@ namespace FCS_AlterraHub.Managers.Mission
                 self.OnProgressChanged -= Task_OnProgressChanged;
                 self.OnStatusChanged -= Task_OnStatusChanged;
                 OnMissionComplete?.Invoke(this);
-                CompleteAndGiveRewards();
+                //CompleteAndGiveRewards();
 
             }
         }
@@ -206,28 +217,12 @@ namespace FCS_AlterraHub.Managers.Mission
 
         public bool CompleteAndGiveRewards(bool forceComplete = false)
         {
-            //if (CanComplete() == false && forceComplete == false)
-            //{
-            //    return false;
-            //}
-
-            //// Even when forcing the quest CAN NOT be completed if the user can't get his/her rewards.
-            //if (CanGiveRewards() == false)
-            //{
-            //    return false;
-            //}
-
+            
             _repeatedTimes++;
-
             CompleteCompletableTasks(forceComplete);
             GiveRewards();
-            IsComplete = true;
             Status = MissionStatus.Completed;
-            //status = repeatedTimes < maxRepeatTimes ? QuestStatus.InActive : QuestStatus.Completed;
             QuickLogger.Debug("Completed quest/achievement with ID: " + ID + " and gave rewards. Repeated quest #" + _repeatedTimes + " times. Quest status is: " + Status);
-
-            //NotifyTasksQuestCompleted();
-
             return true;
         }
 
@@ -242,6 +237,18 @@ namespace FCS_AlterraHub.Managers.Mission
                     task.Complete(forceComplete);
                 }
             }
+        }
+
+        public void ClaimReward()
+        {
+            QuickLogger.Debug($"Is Completed: {IsComplete}",true);
+
+            if (!RewardHasBeenClaimed)
+            {
+                CompleteAndGiveRewards();
+                RewardHasBeenClaimed = true;
+            }
+            
         }
     }
 

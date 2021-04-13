@@ -1,6 +1,7 @@
 ﻿using System;
 using FCS_AlterraHub.Managers.Mission;
 using FCSCommon.Helpers;
+using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -17,6 +18,7 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
         private GameObject _missionsList;
         private bool _isInitialized;
         private Mission _mission;
+        private Button _claimBTN;
 
         internal void Initialize()
         {
@@ -29,10 +31,35 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             _itemEarnings = GameObjectHelpers.FindGameObject(_missions, "ItemEarnings")?.GetComponent<Text>();
             _missionObjectivesList = GameObjectHelpers.FindGameObject(_missions, "MissionObjectivesList");
             _missionsList = GameObjectHelpers.FindGameObject(_missions, "MissionsList");
+            _claimBTN = GameObjectHelpers.FindGameObject(_missions, "ClaimBTN").GetComponent<Button>();
+            _claimBTN.onClick.AddListener((() =>
+            {
+                QuickLogger.Debug($"Is Mission {_mission.Name} complete: {_mission.IsComplete}",true);
+                if (_mission.IsComplete)
+                {
+                    _mission.ClaimReward();
+                }
+            }));
 
             InvokeRepeating(nameof(UpdateCounter),1,1);
 
             _isInitialized = true;
+        }
+
+        private void Update()
+        {
+            if (_claimBTN != null)
+            {
+                _claimBTN.gameObject.SetActive(_mission != null);
+                if (_mission != null)
+                {
+                    _claimBTN.interactable = _mission.IsComplete && !_mission.RewardHasBeenClaimed;
+                }
+                else
+                {
+                    _claimBTN.interactable = false;
+                }
+            }
         }
 
         private void UpdateCounter()
@@ -146,6 +173,7 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
 
         private void UpdateStatus()
         {
+
             if(_missionTask != null)
             {
                 _toggle.isOn = _missionTask.IsCompleted;

@@ -26,7 +26,7 @@ namespace FCS_AlterraHub.Managers.Mission
         }
 
         public float ProgressCap { get; set; }
-        public bool IsCompleted => _status == TaskStatus.Completed;
+        public bool IsCompleted => IsProgressSufficientToComplete();
 
         public double TimeSinceStartInSeconds => StartTime == null ? 0d : (DateTime.Now - StartTime).Value.TotalSeconds;
 
