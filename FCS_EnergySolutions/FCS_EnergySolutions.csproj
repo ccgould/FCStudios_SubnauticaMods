@@ -162,6 +162,7 @@
     <Compile Include="Mods\TelepowerPylon\Mono\TelepowerPylonController.cs" />
     <Compile Include="Mods\TelepowerPylon\Mono\TelepowerPylonPowerManager.cs" />
     <Compile Include="Mods\TelepowerPylon\Mono\TelepowerPylonTrigger.cs" />
+    <Compile Include="Patches\Battery_Patch.cs" />
     <Compile Include="PowerStorage\Buildable\PowerStoragePatcher.cs" />
     <Compile Include="PowerStorage\Mono\BatteryDummyController.cs" />
     <Compile Include="PowerStorage\Mono\InterfaceInteraction.cs" />
@@ -172,6 +173,7 @@
     <Compile Include="PowerStorage\Structs\SlotDefinition.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Spawnables\PowerStorageCell.cs" />
     <Compile Include="Spawnables\TelepowerUpgradeSpawnable.cs" />
   </ItemGroup>
   <ItemGroup>

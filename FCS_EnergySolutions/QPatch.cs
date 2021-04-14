@@ -77,10 +77,17 @@ namespace FCS_EnergySolutions
             {
                 var powerStorage = new PowerStoragePatcher();
                 powerStorage.Patch();
+
+                var powerStorageCell = new PowerStorageCell();
+                powerStorageCell.Patch();
             }
             
             //Register debug commands
             ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));
+
+            //Harmony
+            var harmony = new Harmony("com.energrysolutions.fcstudios");
+            harmony.PatchAll(Assembly.GetExecutingAssembly());
         }
     }
 }
