@@ -121,7 +121,7 @@ namespace FCS_HomeSolutions.Mods.Replicator.Buildables
         }
 #endif
 
-        public override TechGroup GroupForPDA { get; } = TechGroup.InteriorModules;
-        public override TechCategory CategoryForPDA { get; } = TechCategory.InteriorModule;
+        public override TechGroup GroupForPDA { get; } = TechGroup.Miscellaneous;
+        public override TechCategory CategoryForPDA { get; } = TechCategory.Misc;
     }
 }

@@ -335,7 +335,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
             {
                 foreach (PlantSlot plantSlot in Slots)
                 {
-                    if (plantSlot.GetPlantSeedTechType() == techType)
+                    if (plantSlot.GetPlantSeedTechType() == techType && plantSlot.GetCount() > 0)
                     {
                         plantSlot.RemoveItem();
                         QuickLogger.Debug($"Removing Item : {Language.main.Get(techType)}", true);

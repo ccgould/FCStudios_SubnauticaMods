@@ -71,15 +71,12 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                 _mono.CraftManager.GetCraftingOperation().AppendCompletion();
                 _mono.Manager.ConsumeIngredientsFor(techType);
                 var craftingTechType = _mono.CraftManager.GetCraftingOperation().FixCustomTechType();
-                QuickLogger.Debug($"Crafting TechType: {Language.main.Get(craftingTechType)} | Amount: {amount}", true);
                 
                 for (int i = 0; i < amount; i++)
                 {
-                    var inventoryItem = craftingTechType.ToInventoryItemLegacy() ?? craftingTechType.ToInventoryItem();
+                    var inventoryItem = craftingTechType.ToInventoryItemLegacy();
 
-                    if(inventoryItem == null) return;
-
-                    QuickLogger.Debug($"Crafting: {Language.main.Get(craftingTechType)}",true);
+                    QuickLogger.Debug($"InventoryItemLegacy returned: {Language.main.Get(inventoryItem.item.GetTechType())}");
 
                     var result = BaseManager.AddItemToNetwork(_mono.Manager, inventoryItem, true);
 

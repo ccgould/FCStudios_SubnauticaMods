@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using FCSCommon.Utilities;
+using SMLHelper.V2.Handlers;
 using UnityEngine;
 
 namespace FCS_AlterraHub.Helpers
@@ -124,7 +125,7 @@ namespace FCS_AlterraHub.Helpers
         {
             _ingredients.Clear();
 
-            var it = CraftData.Get(techType);
+            var it = CraftDataHandler.GetTechData(techType);
 
             if (it != null)
             {

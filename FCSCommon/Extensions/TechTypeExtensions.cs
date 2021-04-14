@@ -55,23 +55,28 @@ namespace FCSCommon.Extensions
 
         internal static InventoryItem ToInventoryItemLegacy(this TechType techType)
         {
+            GameObject prefabForTechType = CraftData.GetPrefabForTechType(techType, false);
+            GameObject gameObject = (prefabForTechType != null) ? Utils.SpawnFromPrefab(prefabForTechType, null) : Utils.CreateGenericLoot(techType);
+            gameObject.transform.position = gameObject.transform.position;
+            var pickupable = gameObject.GetComponent<Pickupable>();
+            return new InventoryItem(pickupable.Pickup(false));
 
-            InventoryItem item = null;
-            var prefab = CraftData.GetPrefabForTechType(techType);
-            if (prefab != null)
-            {
-                var go = GameObject.Instantiate(prefab);
-                var pickupable = go.EnsureComponent<Pickupable>().Pickup(false);
-                item = new InventoryItem(pickupable);
-            }
-            else
-            {
-                var go = GameObject.Instantiate(GameObject.CreatePrimitive(PrimitiveType.Cube));
-                go.EnsureComponent<PrefabIdentifier>();
-                var pickupable = go.EnsureComponent<Pickupable>().Pickup(false);
-                item = new InventoryItem(pickupable);
-            }
-            return item;
+            //InventoryItem item = null;
+            //var prefab = CraftData.GetPrefabForTechType(techType);
+            //if (prefab != null)
+            //{
+            //    var go = GameObject.Instantiate(prefab);
+            //    var pickupable = go.EnsureComponent<Pickupable>().Pickup(false);
+            //    item = new InventoryItem(pickupable);
+            //}
+            //else
+            //{
+            //    var go = GameObject.Instantiate(GameObject.CreatePrimitive(PrimitiveType.Cube));
+            //    go.EnsureComponent<PrefabIdentifier>();
+            //    var pickupable = go.EnsureComponent<Pickupable>().Pickup(false);
+            //    item = new InventoryItem(pickupable);
+            //}
+            //return item;
         }
 
         internal static InventoryItem ToInventoryItem(this Pickupable pickupable)
