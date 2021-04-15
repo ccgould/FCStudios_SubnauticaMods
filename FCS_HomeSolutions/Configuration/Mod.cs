@@ -10,6 +10,7 @@ using FCS_HomeSolutions.Mono.PaintTool;
 using FCSCommon.Extensions;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
+using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 
@@ -396,7 +397,50 @@ namespace FCS_HomeSolutions.Configuration
         internal static string SaveDataFilename => $"{ModName}SaveData.json";
 
         public static TechType CurtainTechType { get; internal set; }
-        
+        internal static Dictionary<TechType,TechType> CustomFoods = new Dictionary<TechType,TechType>();
+
+        private static void GetCraftTreeData(CraftNode innerNodes)
+        {
+            foreach (CraftNode craftNode in innerNodes)
+            {
+                QuickLogger.Debug($"Craftable: {craftNode.id} | {craftNode.string0} | {craftNode.string1} | {craftNode.techType0}");
+
+                if (string.IsNullOrWhiteSpace(craftNode.id)) continue;
+                if (craftNode.techType0 != TechType.None)
+                {
+                    CustomFoods.Add(craftNode.techType0, craftNode.techType0);
+                }
+
+                if (craftNode.childCount > 0)
+                {
+                    GetCraftTreeData(craftNode);
+                }
+            }
+        }
+
+        internal static void GetFoodCustomTrees()
+        {
+            if (CustomFoods == null)
+            {
+                CustomFoods = new Dictionary<TechType, TechType>();
+            }
+
+            if (CustomFoods.Any()) return;
+
+                var smlCTPatcher = typeof(CraftTreeHandler).Assembly.GetType("SMLHelper.V2.Patchers.CraftTreePatcher");
+            var customTrees = (Dictionary<CraftTree.Type, ModCraftTreeRoot>)smlCTPatcher
+                .GetField("CustomTrees", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
+            foreach (KeyValuePair<CraftTree.Type, ModCraftTreeRoot> entry in customTrees)
+            {
+                QuickLogger.Debug($"Crafting Tree: {entry.Key}");
+                if (QPatch.Configuration.AlienChiefCustomFoodTrees.Contains(entry.Key.ToString()))
+                {
+                    GetCraftTreeData(entry.Value.CraftNode);
+                }
+            }
+        }
+
+
         internal static string GetModDirectory()
         {
             return Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);

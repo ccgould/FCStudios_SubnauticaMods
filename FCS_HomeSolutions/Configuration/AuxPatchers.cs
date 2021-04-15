@@ -54,6 +54,7 @@ namespace FCS_HomeSolutions.Configuration
             { $"{ModKey}_TeleportCanceledMessage","Something went wrong with the teleport sequence canceled operation for your safety."},
             { $"{ModKey}_IngredientsFormat","Ingredients: {0}"},
             { $"{ModKey}_CookedFoods","Cooked Foods"},
+            { $"{ModKey}_OtherFoods","Other Foods"},
             { $"{ModKey}_CuredFoods","Cured Foods"},
             { $"{ModKey}_Order","ORDER"},
             { $"{ModKey}_NothingToCook","Nothing to cook"},
@@ -362,6 +363,11 @@ namespace FCS_HomeSolutions.Configuration
         public static string DeleteLevelConfirmation(string level)
         {
             return string.Format(GetLanguage($"{ModKey}_DeleteLevelConfirmation"),level);
+        }
+
+        public static string CustomFoods()
+        {
+            return GetLanguage($"{ModKey}_OtherFoods");
         }
     }
 }

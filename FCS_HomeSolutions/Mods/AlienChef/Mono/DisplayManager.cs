@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Mono;
+using FCS_AlterraHub.Mono.Controllers;
 using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
 using FCSCommon.Abstract;
@@ -21,57 +23,40 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
         private CookerItemDialog _cookerItemDialog;
         private Image _cookingPercentageRing;
         private Text _cookingTime;
-        private FCSToggleGroup _toggleGroup;
         private Text _foodSectionLabel;
-        private FCSToggleButton _pullFromDataStorage;
-        private FCSToggleButton _sendToSeaBreeze;
+        private Toggle _pullFromDataStorage;
+        private Toggle _sendToSeaBreeze;
         private FoodQueueList _listBTN;
         private OrderWindowDialog _orderWindow;
+        private Text _inventoryAmount;
+        private GridHelperV2 _itemGrid;
+        private List<CookerItemController> _cookerItemControllers = new List<CookerItemController>();
+        private PaginatorController _paginatorController;
 
         internal void Setup(AlienChefController mono)
         {
             _mono = mono;
             if (FindAllComponents())
             {
-                _toggleGroup.Select("ToggleButton_0");
+                _itemGrid.DrawPage();
                 LoadKnownCookedItems();
             }
         }
 
         private void LoadKnownCookedItems()
         {
-            if (_grid == null || _mono?.Cooker == null) return;
-            for (int i = 0; i < _grid?.transform?.childCount; i++)
+            if (_mono.Cooker.GetMode() == CookerMode.Cook)
             {
-                var item = _grid?.transform?.GetChild(i)?.gameObject;
-
-                if (item != null)
-                {
-                    Destroy(item);
-                }
-            }
-            if (_mono.Cooker.GetMode() == CookerMode.Cook || _mono.Cooker.GetMode() == CookerMode.Custom)
-            {
-                foreach (KeyValuePair<TechType, TechType> cookingPair in CraftData.cookedCreatureList)
-                {
-                    var newItem = GameObject.Instantiate(ModelPrefab.CookerItemPrefab);
-                    var controller = newItem.EnsureComponent<CookerItemController>();
-                    controller.Initialize(cookingPair, _cookerItemDialog, _mono.Cooker.GetMode());
-                    newItem.transform.SetParent(_grid.transform, false);
-                }
 
                 _foodSectionLabel.text = AuxPatchers.CookedFoods();
             }
             else if(_mono.Cooker.GetMode() == CookerMode.Cure)
             {
-                foreach (KeyValuePair<TechType, TechType> cookingPair in Mod.CuredCreatureList)
-                {
-                    var newItem = GameObject.Instantiate(ModelPrefab.CookerItemPrefab);
-                    var controller = newItem.EnsureComponent<CookerItemController>();
-                    controller.Initialize(cookingPair, _cookerItemDialog, _mono.Cooker.GetMode());
-                    newItem.transform.SetParent(_grid.transform, false);
-                }
                 _foodSectionLabel.text = AuxPatchers.CuredFoods();
+            }
+            else if (_mono.Cooker.GetMode() == CookerMode.Custom)
+            {
+               _foodSectionLabel.text = AuxPatchers.CustomFoods();
             }
 
         }
@@ -90,27 +75,82 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
                 _cookerItemDialog.Setup(_mono);
                 _cookingPercentageRing = GameObjectHelpers.FindGameObject(gameObject, "Preloader").GetComponent<Image>();
                 _cookingTime = GameObjectHelpers.FindGameObject(gameObject, "Time").GetComponent<Text>();
-                _toggleGroup = GameObjectHelpers.FindGameObject(gameObject, "ToggleGroup").EnsureComponent<FCSToggleGroup>();
-                _toggleGroup.Initialize();
                 _orderWindow = GameObjectHelpers.FindGameObject(gameObject, "OrderWindow").EnsureComponent<OrderWindowDialog>();
                 _orderWindow.Initialize(_mono);
-                _toggleGroup.OnToggleButtonAction += OnToggleButtonAction;
                 _foodSectionLabel = GameObjectHelpers.FindGameObject(gameObject, "CookedFoodLabel").GetComponent<Text>();
-                _pullFromDataStorage = GameObjectHelpers.FindGameObject(gameObject, "DataStorageToggle").EnsureComponent<FCSToggleButton>();
-                _pullFromDataStorage.ButtonMode = InterfaceButtonMode.RadialButton;
-                _pullFromDataStorage.OnButtonClick += (s, o) =>
+                var home = GameObjectHelpers.FindGameObject(gameObject, "Home");
+
+                foreach (Transform cookingItem in _grid.transform)
                 {
-                    _mono.PullFromDataStorage = _sendToSeaBreeze.IsSelected;
-                };
-                _sendToSeaBreeze = GameObjectHelpers.FindGameObject(gameObject, "SeaBreezeExport").EnsureComponent<FCSToggleButton>();
-                _sendToSeaBreeze.OnButtonClick += (s, o) =>
+                    var controller = cookingItem.gameObject.AddComponent<CookerItemController>();
+                    controller.Initialize();
+                    _cookerItemControllers.Add(controller);
+                }
+
+                _paginatorController = GameObjectHelpers.FindGameObject(home, "Paginator").AddComponent<PaginatorController>();
+                _paginatorController.Initialize(this);
+
+                _itemGrid = _mono.gameObject.AddComponent<GridHelperV2>();
+                _itemGrid.OnLoadDisplay += OnLoadItemsGrid;
+                _itemGrid.Setup(18, home, Color.gray, Color.white, null);
+
+                _pullFromDataStorage = GameObjectHelpers.FindGameObject(gameObject, "DataStorageToggle").GetComponent<Toggle>();
+                _pullFromDataStorage.onValueChanged.AddListener((state =>
                 {
-                    _mono.SendToSeaBreeze = _sendToSeaBreeze.IsSelected;
-                };
-                _sendToSeaBreeze.ButtonMode = InterfaceButtonMode.RadialButton;
+                    _mono.PullFromDataStorage = state;
+                }));
+                
+                _sendToSeaBreeze = GameObjectHelpers.FindGameObject(gameObject, "SeaBreezeExport").GetComponent<Toggle>();
+                _sendToSeaBreeze.onValueChanged.AddListener((state =>
+                {
+                    _mono.IsSendingToSeaBreeze = state;
+                }));
+
                 _listBTN = GameObjectHelpers.FindGameObject(gameObject, "ListBTN").EnsureComponent<FoodQueueList>();
                 _listBTN.Initialize(_orderWindow);
-                var inventoryBTN = GameObjectHelpers.FindGameObject(gameObject, "InventoryBTN").AddComponent<InterfaceButton>();
+                _listBTN.TextLineOne = "Orders";
+
+                var cookToggle = GameObjectHelpers.FindGameObject(gameObject, "CookBTN");
+                var cookBTNToggle = cookToggle.GetComponent<Toggle>();
+                var cookFCSButton = cookToggle.AddComponent<FCSButton>();
+                cookFCSButton.TextLineOne = "Cooked Items";
+
+                cookBTNToggle.onValueChanged.AddListener((value =>
+                {
+                    if (value)
+                    {
+                        OnToggleButtonAction("ToggleButton_0");
+                    }
+                }));
+
+                var cureToggle = GameObjectHelpers.FindGameObject(gameObject, "CureBTN");
+                var cureBTNToggle = cureToggle.GetComponent<Toggle>();
+                var cureFCSButton = cureToggle.AddComponent<FCSButton>();
+                cureFCSButton.TextLineOne = "Cured Items";
+                cureBTNToggle.onValueChanged.AddListener((value =>
+                {
+                    if (value)
+                    {
+                        OnToggleButtonAction("ToggleButton_1");
+                    }
+                }));
+
+                var customToggle = GameObjectHelpers.FindGameObject(gameObject, "CustomFoodBTN");
+                var customBTNToggle = customToggle.GetComponent<Toggle>();
+                var customFCSButton = customToggle.AddComponent<FCSButton>();
+                customFCSButton.TextLineOne = "Other Items";
+                customBTNToggle.onValueChanged.AddListener((value =>
+                {
+                    if (value)
+                    {
+                        OnToggleButtonAction("ToggleButton_2");
+                    }
+                }));
+
+                var inventoryGBTN = GameObjectHelpers.FindGameObject(gameObject, "InventoryBTN");
+                _inventoryAmount = inventoryGBTN.GetComponentInChildren<Text>();
+                var inventoryBTN = inventoryGBTN.AddComponent<InterfaceButton>();
+                inventoryBTN.TextLineOne = "Storage";
                 inventoryBTN.BtnName = "InventoryBTN";
                 inventoryBTN.OnButtonClick += (s, o) =>
                 {
@@ -137,6 +177,55 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
             return true;
         }
 
+        private void OnLoadItemsGrid(DisplayData data)
+        {
+            try
+            {
+                Dictionary<TechType,TechType> grouped = null;
+                
+                if (_mono.Cooker.GetMode() == CookerMode.Cook)
+                {
+                    grouped = CraftData.cookedCreatureList;
+                }
+                else if (_mono.Cooker.GetMode() == CookerMode.Cure)
+                {
+                    grouped = Mod.CuredCreatureList;
+                }
+                else if (_mono.Cooker.GetMode() == CookerMode.Custom)
+                {
+                    grouped = Mod.CustomFoods;
+                }
+                
+                if (data.EndPosition > grouped.Count)
+                {
+                    data.EndPosition = grouped.Count;
+                }
+
+                for (int i = 0; i < data.MaxPerPage; i++)
+                {
+                    _cookerItemControllers[i].Reset();
+                }
+
+                if (grouped == null) return;
+
+                int w = 0;
+
+                for (int i = data.StartPosition; i < data.EndPosition; i++)
+                {
+                    _cookerItemControllers[w++].Set(new CookingItem{TechType = grouped.ElementAt(i).Key,ReturnItem = grouped.ElementAt(i).Value,CookerMode = _mono.Cooker.GetMode()}, _cookerItemDialog);
+                }
+
+                _itemGrid.UpdaterPaginator(grouped.Count);
+                _paginatorController.ResetCount(_itemGrid.GetMaxPages());
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error("Error Caught");
+                QuickLogger.Error($"Error Message: {e.Message}");
+                QuickLogger.Error($"Error StackTrace: {e.StackTrace}");
+            }
+        }
+
         private void OnToggleButtonAction(string button)
         {
             if (button.Equals("ToggleButton_0"))
@@ -154,7 +243,14 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
                 _mono.Cooker.ChangeMode(CookerMode.Custom);
             }
 
+            _itemGrid.DrawPage(1);
             LoadKnownCookedItems();
+        }
+
+        public void UpdateStorageAmount(int amount)
+        {
+            QuickLogger.Debug("Updating Storage Amount",true);
+            _inventoryAmount.text = amount.ToString();
         }
 
         public void UpdatePercentage(float process)
@@ -170,6 +266,11 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
         public void AddToOrder(CookerItemController cookerItemDialog, int amount)
         {
             _orderWindow.AddItemToList(cookerItemDialog,amount);
+        }
+
+        public override void GoToPage(int index)
+        {
+            _itemGrid.DrawPage(index);
         }
     }
 }

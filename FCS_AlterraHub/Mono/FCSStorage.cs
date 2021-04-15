@@ -165,6 +165,13 @@ namespace FCS_AlterraHub.Mono
             _slots = slots;
             _storageRoot.AddComponent<StoreInformationIdentifier>();
             ItemsContainer = new ItemsContainer(slots, slots, _storageRoot.transform, "FCSStorage", null);
+            ItemsContainer.isAllowedToAdd += IsAllowedToAdd;
+            ItemsContainer.isAllowedToRemove += IsAllowedToRemoveItems;
+        }
+
+        private bool IsAllowedToRemoveItems(Pickupable pickupable, bool verbose)
+        {
+            return true;
         }
 
         public void Initialize(int slots, int width, int height,string name, GameObject go = null)
@@ -183,26 +190,30 @@ namespace FCS_AlterraHub.Mono
             _slots = slots;
             _storageRoot.AddComponent<StoreInformationIdentifier>();
             ItemsContainer = new ItemsContainer(width, height, _storageRoot.transform, name, null);
+            ItemsContainer.isAllowedToAdd += IsAllowedToAdd;
+            ItemsContainer.isAllowedToRemove += IsAllowedToRemoveItems;
         }
 
         public int GetContainerFreeSpace { get; }
         public bool IsFull { get; }
-        public bool CanBeStored(int amount, TechType techType)
+        public List<TechType> InvalidTechTypes = new List<TechType>();
+        public virtual bool CanBeStored(int amount, TechType techType)
         {
+            if (InvalidTechTypes.Contains(techType)) return false;
             return !IsFull;
         }
 
-        public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
+        public virtual bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
         {
             return CanBeStored(1,pickupable.GetTechType());
         }
 
-        public bool IsAllowedToRemoveItems()
+        public virtual bool IsAllowedToRemoveItems()
         {
             return true;
         }
 
-        public Pickupable RemoveItemFromContainer(TechType techType)
+        public virtual Pickupable RemoveItemFromContainer(TechType techType)
         {
            return ItemsContainer.RemoveItem(techType);
         }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using FCS_AlterraHub.Helpers;
 using FCS_HomeSolutions.Configuration;
 using FCSCommon.Converters;
 using FCSCommon.Extensions;
@@ -34,60 +33,16 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
 
         private void Update()
         {
-            if (_mode == CookerMode.Cook)
-            {
-                Cook();
-                return;
-            }
-
-            if (_mode == CookerMode.Cure)
-            {
-                Cure();
-                return;
-            }
-
-            if (_mode == CookerMode.Custom)
-            {
-                return;
-            }
+            Cook();
         }
 
-        private void Cure()
-        {
-            if (NotAllowToCook)
-                return;
-
-            var energyToConsume = DayNightCycle.main.deltaTime;
-
-
-            if (!_mono.HasPowerToConsume())
-                return;
-
-            if (GenerationProgress >= _cookingTime)
-            {
-                QuickLogger.Debug($"[Alien Chief Cured] {_cookingQueue.Peek()}", true);
-                PauseUpdates = true;
-                GenerationProgress = -1f;
-                TryStartingNextFoodItem();
-                PauseUpdates = false;
-                AddItemToStorage();
-                _mono.DisplayManager.UpdatePercentage(0);
-                _mono.DisplayManager.UpdateCookingTime(0);
-            }
-            else if (GenerationProgress >= 0f)
-            {
-                // Is currently generating clone
-                GenerationProgress = Mathf.Min(_cookingTime, GenerationProgress + energyToConsume);
-                _mono.DisplayManager.UpdatePercentage(GenerationProgress / _cookingTime);
-                _mono.DisplayManager.UpdateCookingTime(_cookingTime - GenerationProgress);
-
-            }
-        }
-
+        
         private void Cook()
         {
             if (NotAllowToCook)
+            {
                 return;
+            }
 
             var energyToConsume = DayNightCycle.main.deltaTime;
             
@@ -114,14 +69,16 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
                 _mono.DisplayManager.UpdateCookingTime(_cookingTime - GenerationProgress);
 
             }
+            
+            if(_cookingQueue?.Count == 0)
+            {
+                GenerationProgress = -1;
+            }
         }
 
         private void TryStartingNextFoodItem()
         {
             QuickLogger.Debug("Trying to cook another item", true);
-
-            //if (CurrentSpeedMode == SpeedModes.Off)
-            //    return;// Powered off, can't start a new clone
 
             if (IsFull)
             {
@@ -148,28 +105,20 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
         internal void StartCooking()
         {
             TryStartingNextFoodItem();
+            QuickLogger.ModMessage($"Alien Chef {_mono.UnitID} is cooking.");
         }
-
 
         private void AddItemToStorage()
         {
             var item  = _cookingQueue.Dequeue();
-            //TODO Add to container for testing give to player
-            if (_mode == CookerMode.Cook)
+
+            if (_mono.IsSendingToSeaBreeze)
+            {
+                _mono.SendToSeaBreeze(item.CookedTechType.ToInventoryItem());
+            }
+            else
             {
                 _mono.StorageSystem.AddItemToContainer(item.CookedTechType.ToInventoryItem());
-                //PlayerInteractionHelper.GivePlayerItem(item.CookedTechType);
-            }
-
-            if (_mode == CookerMode.Cure)
-            {
-                _mono.StorageSystem.AddItemToContainer(item.CuredTechType.ToInventoryItem());
-                //PlayerInteractionHelper.GivePlayerItem(item.CuredTechType);
-            }
-
-            if (_mode == CookerMode.Custom)
-            {
-
             }
         }
 
@@ -211,26 +160,24 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
             _isInitialized = true;
         }
 
-        internal void AddToQueue(TechType rawTechType, TechType cookedTechType, TechType curedTechType)
+        internal void AddToQueue( CookingItem cookingItem)
         {
             if(!_isInitialized || _cookingQueue.Count >= MaxQueue) return;
-            QuickLogger.Debug($"Adding {rawTechType} to queue",true);
-            _cookingQueue.Enqueue(new CookingQueue(rawTechType, cookedTechType, curedTechType));
+            QuickLogger.Debug($"Adding {cookingItem.TechType} to queue",true);
+            _cookingQueue.Enqueue(new CookingQueue(cookingItem));
         }
 
         internal struct CookingQueue
         {
-            public TechType RawTechType { get; set; }
             public TechType CookedTechType { get; set; }
+            public TechType RawTechType { get; set; }
             public float CookingTime { get; set; }
-            public TechType CuredTechType { get; set; }
 
-            public CookingQueue(TechType rawTechType, TechType cookedTechType, TechType curedTechType)
+            public CookingQueue(CookingItem cookingItem)
             {
-                RawTechType = rawTechType;
-                CookedTechType = cookedTechType;
-                CuredTechType = curedTechType;
-                CraftData.craftingTimes.TryGetValue(cookedTechType, out float value);
+                RawTechType = cookingItem.TechType;
+                CookedTechType = cookingItem.ReturnItem;
+                CraftData.craftingTimes.TryGetValue(cookingItem.ReturnItem, out float value);
                 CookingTime = value;
             }
         }

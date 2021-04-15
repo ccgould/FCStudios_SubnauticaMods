@@ -68,6 +68,12 @@ namespace FCS_HomeSolutions.Configuration
         }
 
         public Action<int> OnSeaBreezeGameModeChanged { get; set; }
+        public List<string> AlienChiefCustomFoodTrees { get; set; } = new List<string>
+        {
+            "CF3mod",
+            "CookFab"
+        };
+
         #endregion
 
         #region Paint Tool

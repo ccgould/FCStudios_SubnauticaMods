@@ -22,7 +22,7 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
             var minsBTN = minusBTNObj.EnsureComponent<InterfaceButton>();
             minsBTN.OnButtonClick += (s, o) =>
             {
-                if (Amount > 0)
+                if (Amount > 1)
                 {
                     Amount--;
                     _amountLbl.text = Amount.ToString("D2");
@@ -40,13 +40,21 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
             var addToOrderBTN = GameObjectHelpers.FindGameObject(gameObject, "AddToOrderBtn").GetComponent<Button>();
             addToOrderBTN.onClick.AddListener((() => {
                 QuickLogger.Debug($"Adding {Amount} {TechType} to Order", true);
-                mono.AddToOrder(_itemController,Amount);
-                Hide();
+                var result = _mono.AttemptToCook(_itemController, Amount, false);
+                if (result)
+                {
+                    mono.AddToOrder(_itemController, Amount);
+                    Hide();
+                }
+                else
+                {
+                    QuickLogger.ModMessage("Alien Chef cant find all the required ingredients for this craft");
+                }
             }));
 
             var cookBTN = GameObjectHelpers.FindGameObject(gameObject, "CookBtn").GetComponent<Button>();
             cookBTN.onClick.AddListener((() => {
-                var result =  _mono.TryGetItem(_itemController,Amount);
+                var result =  _mono.AttemptToCook(_itemController,Amount);
                 if (result)
                 {
                     Hide();
@@ -65,8 +73,8 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
         internal void Show(CookerItemController itemController)
         {
             _itemController = itemController;
-            TechType = itemController.CookedTechType;
-            _title.text = Language.main.Get(itemController.CookedTechType);
+            TechType = itemController.CookingItem.ReturnItem;
+            _title.text = Language.main.Get(itemController.CookingItem.ReturnItem);
             _amountLbl.text = Amount.ToString("D2");
             gameObject.SetActive(true);
         }
@@ -75,9 +83,14 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
         {
             gameObject.SetActive(false);
             TechType = TechType.None;
-            _amountLbl.text = "00";
             _title.text = string.Empty;
-            Amount = 0;
+            Amount = 1;
+
+        }
+
+        public AlienChefController GetController()
+        {
+            return _mono;
         }
     }
 }

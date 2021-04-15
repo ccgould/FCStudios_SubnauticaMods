@@ -205,7 +205,6 @@ namespace FCS_HomeSolutions.SeaBreeze.Mono
         }
         #endregion
 
-
         private void OnPowerOutage()
         {
             QuickLogger.Debug("Power Outage", true);
@@ -315,6 +314,16 @@ namespace FCS_HomeSolutions.SeaBreeze.Mono
             {
                 FridgeComponent.Clear();
             }
+        }
+
+        public override bool CanBeStored(int amount, TechType techType)
+        {
+            return FridgeComponent.CanBeStored(amount, techType);
+        }
+
+        public override bool AddItemToContainer(InventoryItem item)
+        {
+            return FridgeComponent.AddItemToContainer(item);
         }
     }
 }

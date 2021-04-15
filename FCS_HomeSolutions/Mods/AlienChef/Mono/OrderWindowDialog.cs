@@ -3,6 +3,7 @@ using FCS_AlterraHub.Mono;
 using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
 using FCSCommon.Helpers;
+using Steamworks;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -16,6 +17,7 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
     {
         private GameObject _grid;
         private List<OrderListItem> _orderQueue = new List<OrderListItem>();
+        private CookerItemController _dialog;
         public FoodQueueList ListButton { get; set; }
 
         internal void Initialize(AlienChefController mono)
@@ -36,16 +38,11 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
             {
                 for (int i = _orderQueue.Count - 1; i > -1; i--)
                 {
-                    var item = _orderQueue[i];
-                    var result = mono.TryGetItem(item.Dialog, item.Amount);
-                    if(!result)
-                    {
-                        break;
-                    }
                     RemoveItemFromList(_orderQueue[i]);
                 }
                 ListButton.UpdateCount(_orderQueue.Count);
                 Hide();
+                _dialog.GetCookerItemDialog().GetController().Cooker.StartCooking();
             });
         }
 
@@ -61,11 +58,10 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
 
         internal void AddItemToList(CookerItemController dialog, int amount)
         {
+            _dialog = dialog;
             var itemPrefab = GameObject.Instantiate(ModelPrefab.CookerOrderItemPrefab);
             var item = itemPrefab.EnsureComponent<OrderListItem>();
-            var foodTechType = dialog.Mode == CookerMode.Cook || dialog.Mode == CookerMode.Custom
-                ? dialog.CookedTechType
-                : dialog.CuredTechType;
+            var foodTechType = dialog.CookingItem.ReturnItem;
 
             var category = dialog.Mode == CookerMode.Cook || dialog.Mode == CookerMode.Custom
                 ? AuxPatchers.CookedFoods()
