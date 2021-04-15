@@ -11,6 +11,7 @@ using FCS_AlterraHub.Registration;
 using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
 using FCSCommon.Converters;
+using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -102,7 +103,7 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
                     _isLandPlant = _savedData.IsLandPlant;
                     _currentTechType = _savedData.CurrentTechType;
                     MotorHandler.SpeedByPass(_savedData.RPM);
-
+                    Seed = GetPlantable(_savedData.CurrentTechType);
                     if (_scanTime > 0)
                     {
                         _isScanning = true;
@@ -114,6 +115,8 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
                         ChangeScanButtonState(false);
                         _timegroup.SetActive(true);
                         MotorHandler.StartMotor();
+
+                        
                     }
                 }
 
@@ -128,8 +131,6 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
             base.OnDestroy();
         }
         #endregion
-
-
 
         public override void Initialize()
         {
@@ -253,6 +254,12 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
             IsInitialized = true;
         }
 
+        private Plantable GetPlantable(TechType techType)
+        {
+            var item = techType.ToInventoryItemLegacy();
+            return item?.item?.gameObject.GetComponentInChildren<Plantable>();
+        }
+
         private void OnIpcMessage(string message)
         {
             QuickLogger.Debug($"Recieving Message: {message}", true);
@@ -263,8 +270,7 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
                 QuickLogger.Debug("Loading DNA Samples", true);
             }
         }
-
-
+        
         public override void RefreshUI()
         {
             base.RefreshUI();
@@ -346,7 +352,6 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
         private void OnStorageOnContainerAddItem(FcsDevice device, TechType techType)
         {
             if (device == null || techType == TechType.None) return;
-            
             if (Mod.IsNonePlantableAllowedList.Contains(techType))
             {
                 _pickTechType = techType;
@@ -357,14 +362,23 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
                 _pickTechType = PickTech != TechType.None ? PickTech : techType;
                 QuickLogger.Debug($"Setting PickType to {_pickTechType}",true);
                 _isLandPlant = Seed.aboveWater;
+                QuickLogger.Debug("1");
                 _currentTechType = techType;
             }
 
+            QuickLogger.Debug($"Icon:{_icon}, TechType:{Language.main.Get(techType)}");
+
             _icon.sprite = SpriteManager.Get(techType);
+            QuickLogger.Debug("2");
             _icon.gameObject.SetActive(true);
+            QuickLogger.Debug("3");
             ChangeInsertState(false);
+            QuickLogger.Debug("4");
             ChangeScanButtonState();
+            QuickLogger.Debug("5");
         }
+
+        
 
         private void ChangeScanButtonState(bool isActive = true)
         {
