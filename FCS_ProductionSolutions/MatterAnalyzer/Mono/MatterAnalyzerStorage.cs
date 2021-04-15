@@ -101,6 +101,9 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
             }
 
             var plantable = pickupable.gameObject.GetComponentInChildren<Plantable>();
+
+            _currentPlant = plantable;
+
             if (plantable == null || !plantable.isSeedling || !IsValidSeedling(pickupable.GetTechType())) return false;
 
             return !Mod.IsHydroponicKnownTech(techType, out var data) &&_device.DumpContainer.GetCount() != 1;
@@ -184,5 +187,7 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
 
 
         };
+
+        private Plantable _currentPlant;
     }
 }

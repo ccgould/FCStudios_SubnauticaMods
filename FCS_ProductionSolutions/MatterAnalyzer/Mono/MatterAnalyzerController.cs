@@ -32,7 +32,6 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
         private float _scanTime;
         private TechType _currentTechType;
         private bool _isLandPlant;
-        private TechType _pickTechType;
         private float PowerUsage = 0.2125f;
         private Button _insertButton;
         private Button _cancelButton;
@@ -47,6 +46,7 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
         private Material _material;
         private List<DNASampleItem> _sampleItems = new List<DNASampleItem>();
         private GridHelperV2 _grid;
+        private MatterAnalyzerStorage _storage;
         private const float Speed = 0.1f;
         public override bool IsOperational => CheckIfOperational();
         public DumpContainer DumpContainer { get; private set; }
@@ -99,7 +99,7 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
                     _colorManager.ChangeColor(_savedData.Body.Vector4ToColor(), ColorTargetMode.Both);
                     _scanTime = _savedData.CurrentScanTime;
                     _maxScanTime = _savedData.CurrentMaxScanTime;
-                    _pickTechType = _savedData.PickTechType;
+                    PickTech = _savedData.PickTechType;
                     _isLandPlant = _savedData.IsLandPlant;
                     _currentTechType = _savedData.CurrentTechType;
                     MotorHandler.SpeedByPass(_savedData.RPM);
@@ -233,13 +233,13 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
                 _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol);
             }
 
-            var storage = new MatterAnalyzerStorage(this);
-            storage.OnContainerAddItem += OnStorageOnContainerAddItem;
+            _storage = new MatterAnalyzerStorage(this);
+            _storage.OnContainerAddItem += OnStorageOnContainerAddItem;
 
             if (DumpContainer == null)
             {
                 DumpContainer = gameObject.AddComponent<DumpContainer>();
-                DumpContainer.Initialize(transform,Mod.MatterAnalyzerFriendlyName, storage, 4,4);
+                DumpContainer.Initialize(transform,Mod.MatterAnalyzerFriendlyName, _storage, 4,4);
             }
 
 #if DEBUG
@@ -328,7 +328,7 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
                     Mod.AddHydroponicKnownTech(new DNASampleData
                     {
                         TechType = _currentTechType, 
-                        PickType = _pickTechType, 
+                        PickType = PickTech, 
                         IsLandPlant = _isLandPlant,
                     });
                     CompleteScanning();
@@ -354,31 +354,24 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
             if (device == null || techType == TechType.None) return;
             if (Mod.IsNonePlantableAllowedList.Contains(techType))
             {
-                _pickTechType = techType;
+                PickTech = techType;
                 _currentTechType = techType;
             }
             else
             {
-                _pickTechType = PickTech != TechType.None ? PickTech : techType;
-                QuickLogger.Debug($"Setting PickType to {_pickTechType}",true);
+                PickTech = PickTech != TechType.None ? PickTech : techType;
+                QuickLogger.Debug($"Setting PickType to {PickTech}",true);
                 _isLandPlant = Seed.aboveWater;
-                QuickLogger.Debug("1");
                 _currentTechType = techType;
             }
 
             QuickLogger.Debug($"Icon:{_icon}, TechType:{Language.main.Get(techType)}");
 
             _icon.sprite = SpriteManager.Get(techType);
-            QuickLogger.Debug("2");
             _icon.gameObject.SetActive(true);
-            QuickLogger.Debug("3");
             ChangeInsertState(false);
-            QuickLogger.Debug("4");
             ChangeScanButtonState();
-            QuickLogger.Debug("5");
         }
-
-        
 
         private void ChangeScanButtonState(bool isActive = true)
         {
@@ -437,7 +430,7 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
             _percentageBar.fillAmount = 0f;
             //Reset TechType;
             _currentTechType = TechType.None;
-            _pickTechType = TechType.None;
+            PickTech = TechType.None;
             _maxScanTime = 0;
             _isLandPlant = false;
             _icon.gameObject.SetActive(false);
@@ -516,7 +509,7 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
             _savedData.ID = GetPrefabID();
             _savedData.Body = _colorManager.GetColor().ColorToVector4();
             _savedData.CurrentTechType = _currentTechType;
-            _savedData.PickTechType = _pickTechType;
+            _savedData.PickTechType = PickTech;
             _savedData.IsLandPlant = _isLandPlant;
             _savedData.CurrentScanTime = _scanTime;
             _savedData.RPM = MotorHandler.GetRPM();
