@@ -22,7 +22,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
         private uGUI_Icon _targetItemIcon;
         private GridHelperV2 _ingredientsGrid;
         private Text _reqItemsList;
-        public Action OnCancelBtnClick;
+        public Action OnCancelBtnClick { get; set; }
         private Button _standbyBTN;
         private readonly StringBuilder _sb = new StringBuilder();
         private List<IngredientItem> _ingredientItems = new List<IngredientItem>();
@@ -109,8 +109,6 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                 cancelBTN.onClick.AddListener(() =>
                 {
                     OnCancelBtnClick?.Invoke();
-                    Clear();
-                    BaseManager.GlobalNotifyByID("DTC", "RefreshCraftingGrid");
                 });
 
 

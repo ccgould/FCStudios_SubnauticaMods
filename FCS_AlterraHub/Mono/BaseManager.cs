@@ -1167,26 +1167,33 @@ namespace FCS_AlterraHub.Mono
             }
 
 
+            //TODO Fix currently when checking other storage for lockers its only checking the container once for one item if multiple items are needed
+            //this wont be checked. ex amount is 2
+
             if (checkForOtherStorages && target > 0)
             {
                 foreach (var locker in BaseStorageLockers)
                 {
+
+                    var sizes = new List<Vector2int>();
                     var size = CraftData.GetItemSize(techType);
-                    if (locker.container.HasRoomFor(size.x, size.y))
+
+                    for (int i = 0; i < amount; i++)
                     {
-                        target -= 1;
-                        if(target <= 0)
+                        sizes.Add(size);
+                    }
+
+                    if (locker.container.HasRoomFor(sizes))
+                    {
                             return  true;
                     }
                 }
 
                 foreach (FcsDevice fcsDevice in GetDevices("AS"))
                 {
-                    if (fcsDevice.CanBeStored(amount, techType))
+                    if (fcsDevice.CanBeStored(target, techType))
                     {
-                        target -= 1;
-                        if (target <= 0)
-                            return true;
+                        return true;
                     }
                 }
 

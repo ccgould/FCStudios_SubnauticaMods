@@ -24,8 +24,9 @@ namespace FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Mono
         private readonly Color _colorEmpty = new Color(1f, 0f, 0f, 1f);
         private readonly Color _colorHalf = new Color(1f, 1f, 0f, 1f);
         private readonly Color _colorFull = new Color(0f, 1f, 0f, 1f);
+        private readonly Color _colorDefault = Color.cyan;
         private Image _bar;
-        private IEnumerable<Material> _emissions;
+
 
         private void Start()
         {
@@ -80,7 +81,6 @@ namespace FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Mono
             QuickLogger.Info("Initializing", true);
 
             _bar = GameObjectHelpers.FindGameObject(gameObject, "Bar")?.GetComponent<Image>();
-            _emissions = MaterialHelpers.GetMaterials(gameObject,ModelPrefab.EmissionControllerMaterial);
             if (_colorManager == null)
             {
                 QuickLogger.Info($"Creating Color Component", true);
@@ -108,6 +108,7 @@ namespace FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Mono
         {
             item.item.gameObject.SetActive(false);
             _fireEx = null;
+            UpdateColor();
         }
 
         private void OnStorageAddItem(InventoryItem item)
@@ -227,11 +228,7 @@ namespace FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Mono
             if (_fireEx == null)
             {
                 _bar.fillAmount = 0f;
-                foreach (Material emission in _emissions)
-                {
-                    MaterialHelpers.ChangeEmissionColor(emission, _colorEmpty);
-                }
-                
+                MaterialHelpers.ChangeEmissionColor(ModelPrefab.EmissionControllerMaterial, gameObject, _colorDefault);
                 return;
             }
 

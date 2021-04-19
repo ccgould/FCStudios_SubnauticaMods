@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using FCSCommon.Utilities;
 using QModManager.API;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
@@ -9,10 +10,19 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
 {
     public static class CrafterLogicHelper
     {
-        public static List<TechType> blackList = new List<TechType>() {TechType.Titanium, TechType.Copper};
+        public static List<TechType> BlackList = new List<TechType>() {TechType.Titanium, TechType.Copper};
 
-        public static bool IsItemUnlocked(TechType techType)
+        public static bool IsItemUnlocked(TechType techType,bool useDefault = false)
         {
+#if DEBUG
+            QuickLogger.Debug($"Checking if {Language.main.Get(techType)} is unlocked");
+#endif
+            if (useDefault)
+            {
+                return CrafterLogic.IsCraftRecipeUnlocked(techType);
+            }
+
+
             if (GameModeUtils.RequiresBlueprints())
             {
                 if (!QModServices.Main.ModPresent("UITweaks"))
@@ -22,8 +32,11 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                     for (int i = 0; i < ingredientCount; i++)
                     {
                         Ingredient ingredient = data.Ingredients[i];
-                        if (!blackList.Contains(techType) && !CrafterLogic.IsCraftRecipeUnlocked(ingredient.techType))
+                        if (!BlackList.Contains(techType) && !CrafterLogic.IsCraftRecipeUnlocked(ingredient.techType))
                         {
+#if DEBUG
+                            QuickLogger.Debug($"{Language.main.Get(ingredient.techType)} is locked");
+#endif
                             return false;
                         }
                     }
@@ -37,9 +50,12 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                         for (int i = 0; i < ingredientCount; i++)
                         {
                             IIngredient ingredient = data.GetIngredient(i);
-                            if (!blackList.Contains(techType) &&
+                            if (!BlackList.Contains(techType) &&
                                 !CrafterLogic.IsCraftRecipeUnlocked(ingredient.techType))
                             {
+#if DEBUG
+                                QuickLogger.Debug($"{Language.main.Get(techType)} is locked");
+#endif
                                 return false;
                             }
                         }
@@ -49,6 +65,9 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                 }
             }
 
+#if DEBUG
+            QuickLogger.Debug($"{Language.main.Get(techType)} is unlocked");
+#endif
             return true;
         }
 

@@ -131,7 +131,8 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
         {
             try
             {
-                var grouped = _mono.GetController().Manager.GetDevices(Mod.DSSAutoCrafterTabID)?.ToList();
+                if (_mono == null || _mono.GetController()?.Manager  == null || !_mono.GetController().IsConstructed || _autocrafterToggles == null) return;
+                    var grouped = _mono?.GetController()?.Manager?.GetDevices(Mod.DSSAutoCrafterTabID)?.ToList();
 
                 if (grouped == null) return;
 
@@ -147,15 +148,13 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
 
                 for (int i = 0; i < data.MaxPerPage; i++)
                 {
-                    QuickLogger.Debug($"Resetting Crafters: MPP{data.MaxPerPage} | AT:{_autocrafterToggles.Count} | Index:{i}");
-                    _autocrafterToggles[i].Reset();
+                    _autocrafterToggles[i]?.Reset();
                 }
 
                 int w = 0;
 
                 for (int i = data.StartPosition; i < data.EndPosition; i++)
                 {
-                    QuickLogger.Debug($"Index:{i} | Toggle {w}");
                     var crafterController = (DSSAutoCrafterController)grouped[i];
                     if(crafterController.UnitID == _mono.GetController().UnitID) continue;
                     _autocrafterToggles[w++].Set(crafterController, crafterController.CheckIfConnected(_mono.GetController().UnitID));

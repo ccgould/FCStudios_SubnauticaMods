@@ -53,6 +53,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
             if (!_mono.Manager.IsAllowedToAdd(techType, amount, true,false))
             {
                 _mono.ShowMessage($"{Language.main.Get(techType)} is not allowed in your system. Please add a server that can store this item or add an unformatted server.");
+                _mono.CancelOperation();
                 return;
             }
             

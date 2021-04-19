@@ -39,6 +39,8 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
         internal DSSCraftManager CraftManager;
         private StandByModes _standyByMode = StandByModes.Crafting;
 
+        private List<TechType> _modCraftables => Mod.Craftables;
+
 
         #region Unit Methods
 
@@ -243,7 +245,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                 if (craftNode.id.Equals("CookedFood") || craftNode.id.Equals("CuredFood")) return;
                 if (craftNode.techType0 != TechType.None)
                 {
-                    if (!CrafterLogicHelper.IsItemUnlocked(craftNode.techType0)) continue;
+                    if (!CrafterLogicHelper.IsItemUnlocked(craftNode.techType0, true)) continue;
                     Mod.Craftables.Add(craftNode.techType0);
                 }
 
@@ -280,7 +282,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
             {
                 DisplayManager = gameObject.EnsureComponent<DSSAutoCrafterDisplay>();
                 DisplayManager.Setup(this);
-                DisplayManager.OnCancelBtnClick += OnCancelBtnClick;
+                DisplayManager.OnCancelBtnClick += CancelOperation;
             }
 
             if (CraftManager == null)
@@ -309,29 +311,35 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
 
         }
 
-        private void OnCancelBtnClick()
+        internal void CancelOperation()
         {
             Manager.RemoveCraftingOperation(CraftManager.GetCraftingOperation());
-            DisplayManager.Clear();
             CraftManager.StopOperation();
             CraftManager.Reset(true);
+            BaseManager.GlobalNotifyByID("DTC", "RefreshCraftingGrid");
+            DisplayManager.Clear();
         }
 
         private void CheckForAvailableCrafts()
         {
+            QuickLogger.Debug("1");
             if (Manager == null || CraftManager.IsRunning() || CurrentCrafterMode != AutoCrafterMode.Automatic) return;
-
+            QuickLogger.Debug("3");
             //Check if already has operation
             var operation = Manager.GetBaseCraftingOperations().FirstOrDefault(x => x.Devices.Contains(UnitID));
-
+            QuickLogger.Debug("4");
             if (operation != null)
             {
+                QuickLogger.Debug("5");
                 CraftItem(operation);
+                QuickLogger.Debug("6");
                 return;
             }
 
+            QuickLogger.Debug("7");
             foreach (CraftingOperation baseCraftingOperation in Manager.GetBaseCraftingOperations())
             {
+
                 if (!baseCraftingOperation.CanCraft()) continue;
                 CraftItem(baseCraftingOperation);
                 break;
@@ -342,17 +350,23 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
         {
             try
             {
+                QuickLogger.Debug($"Crafting Item {Language.main.Get(operation.TechType)}");
                 //Check if craftable
                 GetCraftables();
+                QuickLogger.Debug($"Contains Item: {Mod.Craftables.Contains(operation.TechType)}");
                 if (!Mod.Craftables.Contains(operation.TechType)) return;
-
+                QuickLogger.Debug($"Crafting Item 1");
                 //Check for additional help
                 DistributeLoad(operation,operation.Amount);
-
+                QuickLogger.Debug($"Crafting Item 2");
                 CraftManager.StartOperation(operation);
+                QuickLogger.Debug($"Crafting Item 3");
                 DisplayManager.LoadCraft(operation);
+                QuickLogger.Debug($"Crafting Item 4");
                 operation.IsBeingCrafted = true;
+                QuickLogger.Debug($"Crafting Item 5");
                 operation.Mount(this);
+                QuickLogger.Debug($"Crafting Item 6");
             }
             catch (Exception e)
             {

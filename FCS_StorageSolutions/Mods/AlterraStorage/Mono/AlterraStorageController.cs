@@ -366,7 +366,7 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
 
         public void OnHandClick(GUIHand hand)
         {
-            if (!_interactionHelper.IsInRange && IsInitialized && IsConstructed)
+            if (IsInitialized && IsConstructed && _interactionHelper!= null && !_interactionHelper.IsInRange)
             {
                 _dumpContainer.OpenStorage();
             }
