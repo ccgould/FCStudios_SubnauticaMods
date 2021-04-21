@@ -86,6 +86,8 @@ namespace FCS_ProductionSolutions.Configuration
         [JsonProperty] internal bool IsBlackListMode { get; set; }
         [JsonProperty] internal Vec4 Sec { get; set; }
         [JsonProperty] internal bool IsBrakeSet { get; set; }
+        [JsonProperty] internal string BeaconName { get; set; }
+        [JsonProperty] internal bool IsPingVisible { get; set; }
     }
 
     [Serializable]

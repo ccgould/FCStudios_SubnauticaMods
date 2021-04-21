@@ -67,11 +67,11 @@ namespace FCS_AlterraHub.Systems
             }
         }
 
-        internal static GameObject CreateStoreItem(FCSStoreEntry entry, Action<TechType, TechType> addItemCallBack,Func<bool> toolTipPermission)
+        internal static GameObject CreateStoreItem(FCSStoreEntry entry, Action<TechType, TechType,int> addItemCallBack,Func<bool> toolTipPermission)
         {
             var item = GameObject.Instantiate(AlterraHub.ItemPrefab);
             var storeItem = item.AddComponent<StoreItem>();
-            storeItem.Initialize(LanguageHelpers.GetLanguage(entry.TechType), entry.TechType, entry.ReceiveTechType, entry.Cost, addItemCallBack, entry.StoreCategory, toolTipPermission);
+            storeItem.Initialize(entry, addItemCallBack, entry.StoreCategory, toolTipPermission);
             return item;
         }
 

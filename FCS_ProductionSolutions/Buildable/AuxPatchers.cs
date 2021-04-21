@@ -164,5 +164,10 @@ namespace FCS_ProductionSolutions.Buildable
         {
             return string.Format(GetLanguage($"{ModKey}_CannotSetStandByHasConnections"),otherCrafterId);
         }
+
+        public static string ClickToEdit()
+        {
+            return Language.main.Get("SubmarineNameEditLabel");
+        }
     }
 }

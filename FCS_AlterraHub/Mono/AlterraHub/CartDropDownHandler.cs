@@ -61,12 +61,12 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             gameObject.SetActive(!gameObject.activeSelf);
         }
         
-        internal void AddItem(TechType item,TechType receiveTechType)
+        internal void AddItem(TechType item,TechType receiveTechType,int returnAmount)
         {
             var slots = Inventory.main.container.sizeX * Inventory.main.container.sizeY;
             if (_pendingItems.Count < slots)
             {
-                CreateCartItem(item, receiveTechType);
+                CreateCartItem(item, receiveTechType,returnAmount);
                 UpdateTotalAmount();
             }
             else
@@ -75,12 +75,13 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             }
         }
 
-        private void CreateCartItem(TechType item,TechType receiveTechType)
+        private void CreateCartItem(TechType item,TechType receiveTechType, int returnAmount)
         {
             var cartItem = GameObject.Instantiate(Buildables.AlterraHub.CartItemPrefab);
             var cartItemComponent = cartItem.AddComponent<CartItem>();
             cartItemComponent.TechType = item;
             cartItemComponent.ReceiveTechType = receiveTechType;
+            cartItemComponent.ReturnAmount = returnAmount;
             cartItem.transform.SetParent(_cartList.transform, false);
             _pendingItems.Add(cartItemComponent);
 

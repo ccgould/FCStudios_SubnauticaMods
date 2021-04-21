@@ -58,7 +58,10 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             var totalSize = new List<Vector2int>();
             foreach (CartItem cartItem in _cart.GetItems())
             {
-                totalSize.Add(CraftData.GetItemSize(cartItem.TechType));
+                for (int i = 0; i < cartItem.ReturnAmount; i++)
+                {
+                    totalSize.Add(CraftData.GetItemSize(cartItem.TechType));
+                }
             }
 
             if (!Inventory.main.container.HasRoomFor(totalSize))

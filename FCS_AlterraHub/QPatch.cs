@@ -3,8 +3,10 @@ using FCS_AlterraHub.API;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Craftables;
+using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Managers.Mission;
+using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Spawnables;
 using FCSCommon.Utilities;
 using HarmonyLib;
@@ -54,7 +56,11 @@ namespace FCS_AlterraHub
 
             //Patch all the buildables
             PatchBuildables();
-            
+
+            //Patch all Additional Store Items
+            PatchAdditionalStoreItems();
+
+
             //Run Harmony Patches
             var harmony = Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), "com.alterrahub.fcstudios");
 
@@ -63,6 +69,14 @@ namespace FCS_AlterraHub
             
             //Register debug commands
             ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));
+        }
+
+        private static void PatchAdditionalStoreItems()
+        {
+            FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType.CopperWire, TechType.CopperWire, 5, 50000, StoreCategory.Misc);
+            FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType.WiringKit, TechType.WiringKit, 5, 50000, StoreCategory.Misc);
+            FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType.ComputerChip, TechType.ComputerChip, 5,50000, StoreCategory.Misc);
+            FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType.PrecursorIonPowerCell, TechType.PrecursorIonPowerCell, 5,50000, StoreCategory.Misc);
         }
 
         public static MissionManager MissionManagerGM { get; internal set; }

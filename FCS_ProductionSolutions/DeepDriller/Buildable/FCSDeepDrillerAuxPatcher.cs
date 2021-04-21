@@ -62,6 +62,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Buildable
             { $"{ModKey}_NeedsOil", "Lubricant Needed"},
             { $"{ModKey}_DrillDeactivated", "Drill Deactivated"},
             { $"{ModKey}_BaseIDErrorFormat", "Base {0} is either to far away or the ID is incorrect."},
+            { $"{ModKey}_DrillBeaconPage", "Beacon Settings Page"},
         };
 
 
@@ -304,6 +305,11 @@ namespace FCS_ProductionSolutions.DeepDriller.Buildable
         public static string BaseIDErrorFormat(string baseID)
         {
             return string.Format(GetLanguage($"{ModKey}_BaseIDErrorFormat"),baseID);
+        }
+
+        public static string BeaconSettingsButton()
+        {
+            return GetLanguage($"{ModKey}_DrillBeaconPage");
         }
     }
 }

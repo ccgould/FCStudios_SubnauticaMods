@@ -29,7 +29,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         private Text _preloaderPercentage;
         public bool IsOccupied => _mountedServer != null || _transceiver != null;
         public bool IsFull => _mountedServer?.IsFull() ?? true;
-
+        public bool IsServer => _transceiver == null;
         private void Start()
         {
             QuickLogger.Debug($"Storage Status: {_storage}");
@@ -46,8 +46,18 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
             {
                 _preloader.fillAmount = _mountedServer.GetPercentage();
                 _preloaderPercentage.text = $"{_mountedServer.GetPercentage():P0}";
+                return;
             }
-            
+
+            if (_transceiver != null)
+            {
+                _preloader.fillAmount = 0f;
+                _preloaderPercentage.text = "T";
+                return;
+            }
+
+            _preloader.fillAmount = 0f;
+            _preloaderPercentage.text = "N/A";
         }
 
         internal void Initialize(string slotName, IDSSRack controller,GameObject preloader)
@@ -256,7 +266,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         public int GetStorageAmount()
         {
             FindServer();
-
+            
             if (_mountedServer == null)
             {
                 return 0;

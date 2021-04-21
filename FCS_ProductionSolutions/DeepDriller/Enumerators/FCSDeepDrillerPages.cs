@@ -10,5 +10,6 @@
         Filter = 4,
         AlterraStorage = 5,
         Inventory = 6,
+        BeaconSettings = 7
     }
 }

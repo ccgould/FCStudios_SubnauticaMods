@@ -1319,7 +1319,7 @@ namespace FCS_AlterraHub.Mono
         public bool HasIngredientsFor(TechType techType)
         {
             var techData = CraftDataHandler.GetTechData(techType);
-            QuickLogger.Debug($"TechData: {techData?.ingredientCount}",true);
+            //QuickLogger.Debug($"TechData: {techData?.ingredientCount}",true);
 
 
             if (techData != null)
@@ -1327,7 +1327,7 @@ namespace FCS_AlterraHub.Mono
                 foreach (Ingredient ingredient in techData.Ingredients)
                 {
                     var hasItem = GetItemCount(ingredient.techType) >= ingredient.amount;
-                    QuickLogger.Debug($"Has Item: {hasItem} || Item: {ingredient.techType}",true);
+                    //QuickLogger.Debug($"Has Item: {hasItem} || Item: {ingredient.techType}",true);
                     
                     if(!hasItem)
                         return false;

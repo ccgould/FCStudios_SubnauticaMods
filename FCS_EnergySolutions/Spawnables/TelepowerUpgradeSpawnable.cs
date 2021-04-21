@@ -22,7 +22,7 @@ namespace FCS_EnergySolutions.Spawnables
             _color = color;
             OnFinishedPatching += () =>
             {
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, TechType, cost, StoreCategory.Misc);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, TechType, 1, cost,StoreCategory.Misc,true);
             };
         }
 

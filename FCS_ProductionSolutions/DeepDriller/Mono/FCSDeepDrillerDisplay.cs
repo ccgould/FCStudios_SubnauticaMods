@@ -19,6 +19,7 @@ using FCSCommon.Objects;
 using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Experimental.PlayerLoop;
 using UnityEngine.UI;
 
 namespace FCS_ProductionSolutions.DeepDriller.Mono
@@ -61,6 +62,8 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         private GameObject _libraryDialogWindow;
         private GridHelperV2 _remoteStorageGrid;
         private Text _alterraStorageInformation;
+        private Toggle _isVisibleToggle;
+        private Text _pingInformation;
         private const string InventoryPoolTag = "Inventory";
         private const string FunctionPoolTag = "Function";
 
@@ -212,8 +215,14 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
                 case "AlterraStorageBackBTN":
                     GotoPage(FCSDeepDrillerPages.Settings);
                     break;
+                case "PingBackBTN":
+                    GotoPage(FCSDeepDrillerPages.Settings);
+                    break;
                 case "ProgrammingBackBTN":
                     GotoPage(FCSDeepDrillerPages.Settings);
+                    break;                
+                case "BeaconPageBTN":
+                    GotoPage(FCSDeepDrillerPages.BeaconSettings);
                     break;
                 case "ToggleBlackListBTN":
                     _mono.OreGenerator.SetBlackListMode(((FilterBtnData)tag).Toggle.IsSelected);
@@ -282,6 +291,10 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
 
                 #region Programming Page
                 var programmingPage = InterfaceHelpers.FindGameObject(canvasGameObject, "ProgrammingPage");
+                #endregion
+
+                #region Signal Page
+                var signalPage = InterfaceHelpers.FindGameObject(canvasGameObject, "SignalPage");
                 #endregion
 
                 //================= Statue Label =============//
@@ -432,6 +445,14 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
                 var exStorageBTN = InterfaceHelpers.FindGameObject(settingsPage, "ExStorageBTN");
                 InterfaceHelpers.CreateButton(exStorageBTN, "ExStorageBTN", InterfaceButtonMode.Background, OnButtonClick,
                     _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, FCSDeepDrillerBuildable.AlterraStorageButton());
+
+                #endregion
+
+                #region Ping Button
+
+                var pingSettingsBTN = InterfaceHelpers.FindGameObject(settingsPage, "PingSettingsBTN");
+                InterfaceHelpers.CreateButton(pingSettingsBTN, "BeaconPageBTN", InterfaceButtonMode.Background, OnButtonClick,
+                    _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, FCSDeepDrillerBuildable.BeaconSettingsButton());
 
                 #endregion
 
@@ -586,6 +607,52 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
 
                 #endregion
 
+                //================= Ping Page ================//
+
+
+                #region Ping Back Button
+
+                var pingBackBtn = InterfaceHelpers.FindGameObject(signalPage, "BackBTN");
+                InterfaceHelpers.CreateButton(pingBackBtn, "PingBackBTN", InterfaceButtonMode.Background, OnButtonClick,
+                    _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, FCSDeepDrillerBuildable.GoToSettings());
+
+                #endregion
+
+                #region Visible Toggle Button
+
+                var isVisibleToggleBTN = GameObjectHelpers.FindGameObject(signalPage, "ToggleIsVisibleBTN");
+                QuickLogger.Debug("2");
+                _isVisibleToggle = isVisibleToggleBTN.GetComponent<Toggle>();
+                QuickLogger.Debug("2");
+                _isVisibleToggle.onValueChanged.AddListener((state =>
+                {
+                    _mono.ToggleVisibility(state);
+                }));
+                QuickLogger.Debug("2");
+
+                #endregion
+
+                #region Information
+
+                _pingInformation = GameObjectHelpers.FindGameObject(signalPage, "Information").GetComponent<Text>();
+
+                #endregion
+
+                #region Edit Button
+
+                var editBackBTN = GameObjectHelpers.FindGameObject(signalPage, "EditNameButton");
+                InterfaceHelpers.CreateButton(editBackBTN, "EditNameButton", InterfaceButtonMode.Background,
+                    ((s, o) =>
+                    {
+                        uGUI.main.userInput.RequestString("Enter Beacon Name", "Rename", _pingInformation.text, 100,
+                            (text => { _pingInformation.text = text; }));
+                    }),
+                    _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.ClickToEdit());
+
+                #endregion
+
+
+
             }
             catch (Exception e)
             {
@@ -596,6 +663,11 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             }
 
             return true;
+        }
+
+        internal void UpdatePingToggleState(bool state)
+        {
+            _isVisibleToggle.SetIsOnWithoutNotify(state);
         }
 
         private void OnLoadLibraryGrid(DisplayDataPooled data)
@@ -903,12 +975,32 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
                 _alterraRangeToggle.Select();
             }
 
+            if (!string.IsNullOrWhiteSpace(save.BeaconName))
+            {
+                UpdateBeaconName(save.BeaconName);
+            }
+
             foreach (KeyValuePair<TechType, FCSToggleButton> toggleButton in _trackedFilterState)
             {
                 if (_mono.OreGenerator.GetFocusedOres().Contains(toggleButton.Key))
                 {
                     toggleButton.Value.Select();
                 }
+            }
+        }
+
+        internal void UpdateBeaconName(string beaconName = null)
+        {
+            if (string.IsNullOrWhiteSpace(beaconName))
+            {
+                var defaultName = $"Deep Driller - {_mono.UnitID}";
+                _mono.SetPing(defaultName);
+                _pingInformation.text = defaultName;
+            }
+            else
+            {
+                _mono.SetPing(beaconName);
+                _pingInformation.text = beaconName;
             }
         }
 

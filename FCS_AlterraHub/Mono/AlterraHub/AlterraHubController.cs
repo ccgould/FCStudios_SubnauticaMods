@@ -243,8 +243,11 @@ namespace FCS_AlterraHub.Mono.AlterraHub
                     CardSystem.main.RemoveFinances(totalCash);
                     foreach (CartItem item in cart.GetItems())
                     {
-                        QuickLogger.Debug($"{item.ReceiveTechType}",true);
-                        PlayerInteractionHelper.GivePlayerItem(item.ReceiveTechType);
+                        for (int i = 0; i < item.ReturnAmount; i++)
+                        {
+                            QuickLogger.Debug($"{item.ReceiveTechType}", true);
+                            PlayerInteractionHelper.GivePlayerItem(item.ReceiveTechType);
+                        }
                     }
                 }
 
@@ -311,9 +314,9 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             return _isInUse;
         }
 
-        private void AddToCardCallBack(TechType techType,TechType receiveTechType)
+        private void AddToCardCallBack(TechType techType,TechType receiveTechType,int returnAmount)
         {
-            DisplayManager.onItemAddedToCart?.Invoke(techType, receiveTechType);
+            DisplayManager.onItemAddedToCart?.Invoke(techType, receiveTechType,returnAmount);
         }
 
         public void Save(SaveData newSaveData, ProtobufSerializer serializer)

@@ -39,6 +39,7 @@ namespace FCS_AlterraHub.Registration
         TechType GetDeviceTechType(string deviceId);
         void RegisterBase(BaseManager manager);
         void UnRegisterBase(BaseManager manager);
+        void CreateStoreEntry(TechType techType, TechType receiveTechType,int returnAmount, decimal cost, StoreCategory category,bool forceUnlocked = false);
     }
 
     internal interface IFCSAlterraHubServiceInternal
@@ -197,12 +198,22 @@ namespace FCS_AlterraHub.Registration
 
         public void CreateStoreEntry(TechType techType, TechType recieveTechType, decimal cost, StoreCategory category)
         {
+         CreateStoreEntry(techType,recieveTechType,1,cost,category);   
+        }
+
+        public void CreateStoreEntry(TechType techType, TechType receiveTechType, int returnAmount, decimal cost, StoreCategory category,bool forceUnlocked = false)
+        {
             if (!_storeItems.ContainsKey(techType))
             {
                 _storeItems.Add(techType,
                     new FCSStoreEntry
                     {
-                        TechType = techType, ReceiveTechType = recieveTechType, Cost = cost, StoreCategory = category
+                        TechType = techType,
+                        ReceiveTechType = receiveTechType,
+                        Cost = cost,
+                        ReturnAmount = returnAmount,
+                        StoreCategory = category,
+                        ForcedUnlock = forceUnlocked
                     });
             }
         }
@@ -415,5 +426,6 @@ namespace FCS_AlterraHub.Registration
                 }
             }
         }
+
     }
 }

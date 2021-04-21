@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Helpers;
 using Oculus.Newtonsoft.Json;
@@ -12,7 +11,23 @@ namespace FCS_AlterraHub.Mono.AlterraHub
     {
         [JsonProperty] internal TechType TechType { get; set; }
         [JsonProperty] internal TechType ReceiveTechType { get; set; }
+
+        [JsonProperty]
+        internal int ReturnAmount
+        {
+            get
+            {
+                if (_returnAmount <= 0)
+                {
+                    _returnAmount = 1;
+                }
+                return _returnAmount;
+            }
+            set => _returnAmount = value;
+        }
+
         internal Action<CartItem> onRemoveBTNClicked;
+        private int _returnAmount;
 
         private void Start()
         {
@@ -26,13 +41,14 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             var itemPrice = GameObjectHelpers.FindGameObject(gameObject, "ItemPrice").GetComponent<Text>();
             itemPrice.text = StoreInventorySystem.GetPrice(TechType).ToString("n0");
 
+
             var removeBTN = gameObject.GetComponentInChildren<Button>();
             removeBTN.onClick.AddListener((() => { onRemoveBTNClicked?.Invoke(this); }));
         }
 
         internal CartItemSaveData Save()
         {
-            return new CartItemSaveData { TechType = TechType, ReceiveTechType = ReceiveTechType};
+            return new CartItemSaveData { TechType = TechType, ReceiveTechType = ReceiveTechType, ReturnAmount = ReturnAmount};
         }
 }
 
@@ -40,5 +56,6 @@ namespace FCS_AlterraHub.Mono.AlterraHub
     {
         [JsonProperty] internal TechType TechType { get; set; }
         [JsonProperty] internal TechType ReceiveTechType { get; set; }
+        [JsonProperty] internal int ReturnAmount { get; set; }
     }
 }

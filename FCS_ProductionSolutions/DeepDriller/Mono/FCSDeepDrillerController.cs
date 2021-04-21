@@ -46,6 +46,8 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         private AudioSource _audio;
         private bool _wasPlaying;
         private AudioLowPassFilter _lowPassFilter;
+        private PingInstance _ping;
+        private bool _isVisible;
         public override bool AllowsTransceiverPulling { get; } = true;
         internal string CurrentBiome { get; set; }
         internal bool IsFromSave { get; set; }
@@ -88,7 +90,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             {
                 ReadySaveData();
             }
-
+            
             LoadSave();
         }
 
@@ -114,6 +116,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
                 OreGenerator.SetBlackListMode(_saveData.IsBlackListMode);
                 _isRangeVisible = _saveData.IsRangeVisible;
                 _isBreakSet = _saveData.IsBrakeSet;
+                ToggleVisibility(_saveData.IsPingVisible);
             }
         }
 
@@ -401,7 +404,17 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
                 UpgradeManager = gameObject.AddComponent<FCSDeepDrillerUpgradeManager>();
                 UpgradeManager.Initialize(this);
             }
-            
+
+
+            _ping = gameObject.EnsureComponent<PingInstance>();
+
+            if (_ping != null)
+            {
+                _ping.enabled = true;
+                _ping.pingType = PingType.Signal;
+                _ping.origin = transform;
+            }
+
             _line = gameObject.GetComponent<LineRenderer>();
             _line.SetVertexCount(Segments + 1);
             _line.useWorldSpace = false;
@@ -413,6 +426,17 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             IsInitialized = true;
 
             QuickLogger.Debug($"Initializing Completed");
+        }
+
+        internal void ToggleBeacon()
+        {
+            _ping.enabled = !_ping.enabled;
+        }
+
+        internal void ToggleVisibility(bool value = false)
+        {
+            _ping.SetVisible(value);
+            PingManager.NotifyVisible(_ping);
         }
 
         private void UpdateDrillShaftState()
@@ -517,7 +541,8 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             DisplayHandler.RefreshStorageAmount();
             DisplayHandler.UpdateListItemsState(_saveData?.FocusOres ?? new HashSet<TechType>());
             DisplayHandler?.UpdateUnitID();
-
+            DisplayHandler?.UpdatePingToggleState(_ping?.visible ?? false);
+            DisplayHandler?.UpdateBeaconName();
             if (_saveData != null)
             {
                 if (_saveData.AllowedToExport)
@@ -720,5 +745,11 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         }
 
         #endregion
+
+        public void SetPing(string beaconName)
+        {
+            _ping.SetLabel(beaconName);
+            PingManager.NotifyRename(_ping);
+        }
     }
 }

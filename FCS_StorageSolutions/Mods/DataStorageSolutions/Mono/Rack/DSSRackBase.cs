@@ -201,7 +201,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
             var storageAmount = 0;
             foreach (KeyValuePair<string, DSSSlotController> controller in Slots)
             {
-                if (controller.Value != null && controller.Value.IsOccupied)
+                if (controller.Value != null && controller.Value.IsOccupied && controller.Value.IsServer)
                 {
                     storageTotal += 48;
                     storageAmount += controller.Value.GetStorageAmount();

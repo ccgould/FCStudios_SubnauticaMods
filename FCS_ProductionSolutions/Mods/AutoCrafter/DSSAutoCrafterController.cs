@@ -132,7 +132,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
 
         private void UpdateScreenState()
         {
-            if (Manager.GetBreakerState() || Manager.GetPowerState() != PowerSystem.Status.Normal)
+            if (Manager.GetBreakerState() || Manager.GetPowerState() == PowerSystem.Status.Offline)
             {
                 if (_canvas.activeSelf)
                 {

@@ -20,7 +20,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
         private CheckOutPopupDialogWindow _checkoutDialog;
         private Text _mainTotal;
         private CartDropDownHandler _cartDropDownManager;
-        internal Action<TechType,TechType> onItemAddedToCart;
+        internal Action<TechType,TechType,int> onItemAddedToCart;
         private PanelGroup _panelGroup;
         private AccountPageHandler _accountPageHandler;
         private Text _cartButtonNumber;
@@ -49,9 +49,9 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             }
         }
 
-        private void OnItemAddedToCart(TechType tech, TechType rTech)
+        private void OnItemAddedToCart(TechType tech, TechType rTech,int returnAmount)
         {
-            _cartDropDownManager?.AddItem(tech, rTech);
+            _cartDropDownManager?.AddItem(tech, rTech,returnAmount);
         }
 
         public override void OnButtonClick(string btnName, object tag)
@@ -223,7 +223,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
 
             foreach (CartItemSaveData cartItem in save.CartItems)
             {
-                _cartDropDownManager.AddItem(cartItem.TechType,cartItem.ReceiveTechType);
+                _cartDropDownManager.AddItem(cartItem.TechType,cartItem.ReceiveTechType, cartItem.ReturnAmount <= 0 ? 1 : cartItem.ReturnAmount);
             }
         }
     }
