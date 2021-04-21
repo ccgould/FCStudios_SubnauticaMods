@@ -31,6 +31,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
         private MotorHandler _motorHandler;
         private GameObject _playerBody;
         private bool _isInUse;
+        private Transform _cameraParent;
         private MissionManager _missionManager => QPatch.MissionManagerGM;
         public Sun Sun => Sun.main;
 
@@ -70,6 +71,11 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             {
                 ExitStore();
             }
+
+            //if (_isInUse)
+            //{
+            //    SetCameraPosition();
+            //}
         }
 
         private void OnEnable()
@@ -261,23 +267,6 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             return false;
         }
 
-        internal void ReturnItem(InventoryItem item)
-        {
-            var result = StoreInventorySystem.ItemReturn(item);
-            
-            if (result)
-            {
-                //TODO Send message about transaction completed
-                Destroy(item.item.gameObject);
-            }
-        }
-
-        internal string GetAccountAmount()
-        {
-            var amount = CardSystem.main.GetAccountBalance();
-            return Converters.DecimalToMoney("C",amount);
-        }
-
         private void LoadStore()
         {
             var panelGroup = DisplayManager.GetPanelGroup();
@@ -398,19 +387,28 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             {
                 InterceptInput(true);
                 _isInUse = true;
-                var hudCameraPos = _hubCameraPosition.transform.position;
-                var hudCameraRot = _hubCameraPosition.transform.rotation;
-                Player.main.SetPosition(new Vector3(hudCameraPos.x, Player.main.transform.position.y, hudCameraPos.z), hudCameraRot);
-                _playerBody.SetActive(false);
-                //Player.main.gameObject.transform.position = new Vector3(hudCameraPos.x, Player.main.gameObject.transform.position.y, hudCameraPos.z);
-                SNCameraRoot.main.transform.position = hudCameraPos;
-                SNCameraRoot.main.transform.rotation = hudCameraRot;
+                SetCameraPosition();
             }
+        }
+
+        private void SetCameraPosition()
+        {
+            _cameraParent = SNCameraRoot.main.gameObject.transform.parent;
+            var hudCameraPos = _hubCameraPosition.transform.position;
+            var hudCameraRot = _hubCameraPosition.transform.rotation;
+            Player.main.SetPosition(new Vector3(hudCameraPos.x, Player.main.transform.position.y, hudCameraPos.z),
+                hudCameraRot);
+            _playerBody.SetActive(false);
+            //Player.main.gameObject.transform.position = new Vector3(hudCameraPos.x, Player.main.gameObject.transform.position.y, hudCameraPos.z);
+            SNCameraRoot.main.gameObject.transform.SetParent(_hubCameraPosition.transform, false);
+            SNCameraRoot.main.transform.localPosition = Vector3.zero;
+            SNCameraRoot.main.transform.localRotation = Quaternion.identity;
         }
 
         internal void ExitStore()
         {
             _isInUse = false;
+            SNCameraRoot.main.gameObject.transform.SetParent(_cameraParent.transform, false);
             SNCameraRoot.main.transform.localPosition = Vector3.zero;
             SNCameraRoot.main.transform.localRotation = Quaternion.identity;
             ExitLockedMode();

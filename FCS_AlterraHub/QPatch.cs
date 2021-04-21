@@ -73,10 +73,23 @@ namespace FCS_AlterraHub
 
         private static void PatchAdditionalStoreItems()
         {
-            FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType.CopperWire, TechType.CopperWire, 5, 50000, StoreCategory.Misc);
-            FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType.WiringKit, TechType.WiringKit, 5, 50000, StoreCategory.Misc);
-            FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType.ComputerChip, TechType.ComputerChip, 5,50000, StoreCategory.Misc);
+            //Electronics
+            FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType.ReactorRod, TechType.ReactorRod, 5, 50000, StoreCategory.Misc);
+            FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType.AdvancedWiringKit, TechType.AdvancedWiringKit, 5, 50000, StoreCategory.Misc);
+            FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType.WiringKit, TechType.WiringKit, 5,50000, StoreCategory.Misc);
             FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType.PrecursorIonPowerCell, TechType.PrecursorIonPowerCell, 5,50000, StoreCategory.Misc);
+            FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType.PowerCell, TechType.PowerCell, 5,50000, StoreCategory.Misc);
+            FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType.PrecursorIonBattery, TechType.PrecursorIonBattery, 5,50000, StoreCategory.Misc);
+            FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType.Battery, TechType.Battery, 5,50000, StoreCategory.Misc);
+            FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType.CopperWire, TechType.CopperWire, 5,50000, StoreCategory.Misc);
+
+            //Advanced Materials
+            FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType.Polyaniline, TechType.Polyaniline, 5,50000, StoreCategory.Misc);
+            FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType.Aerogel, TechType.Aerogel, 5,50000, StoreCategory.Misc);
+            FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType.AramidFibers, TechType.AramidFibers, 5,50000, StoreCategory.Misc);
+            FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType.Benzene, TechType.Benzene, 5,50000, StoreCategory.Misc);
+            FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType.HydrochloricAcid, TechType.HydrochloricAcid, 5,50000, StoreCategory.Misc);
+
         }
 
         public static MissionManager MissionManagerGM { get; internal set; }
