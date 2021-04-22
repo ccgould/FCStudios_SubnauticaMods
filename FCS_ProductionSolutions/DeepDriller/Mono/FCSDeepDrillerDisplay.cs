@@ -113,6 +113,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             {
                 QuickLogger.Debug("Setting Unit ID", true);
                 _unitID.text = $"UnitID: {_mono.UnitID}";
+                UpdateBeaconName();
             }
         }
 
@@ -645,7 +646,11 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
                     ((s, o) =>
                     {
                         uGUI.main.userInput.RequestString("Enter Beacon Name", "Rename", _pingInformation.text, 100,
-                            (text => { _pingInformation.text = text; }));
+                            (text =>
+                            {
+                                _pingInformation.text = text;
+                                _mono.SetPingName(text);
+                            }));
                     }),
                     _startColor, _hoverColor, MAX_INTERACTION_DISTANCE, AuxPatchers.ClickToEdit());
 
@@ -994,12 +999,12 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             if (string.IsNullOrWhiteSpace(beaconName))
             {
                 var defaultName = $"Deep Driller - {_mono.UnitID}";
-                _mono.SetPing(defaultName);
+                _mono.SetPingName(defaultName);
                 _pingInformation.text = defaultName;
             }
             else
             {
-                _mono.SetPing(beaconName);
+                _mono.SetPingName(beaconName);
                 _pingInformation.text = beaconName;
             }
         }

@@ -311,7 +311,12 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         
         public override void Initialize()
         {
+
+            if(IsInitialized) return;
+
             QuickLogger.Debug($"Initializing");
+
+
 
             _sb = new StringBuilder();
 
@@ -410,9 +415,10 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
 
             if (_ping != null)
             {
-                _ping.enabled = true;
+                _ping.enabled = false;
                 _ping.pingType = PingType.Signal;
                 _ping.origin = transform;
+                _ping.enabled = true;
             }
 
             _line = gameObject.GetComponent<LineRenderer>();
@@ -542,7 +548,6 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             DisplayHandler.UpdateListItemsState(_saveData?.FocusOres ?? new HashSet<TechType>());
             DisplayHandler?.UpdateUnitID();
             DisplayHandler?.UpdatePingToggleState(_ping?.visible ?? false);
-            DisplayHandler?.UpdateBeaconName();
             if (_saveData != null)
             {
                 if (_saveData.AllowedToExport)
@@ -746,7 +751,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
 
         #endregion
 
-        public void SetPing(string beaconName)
+        public void SetPingName(string beaconName)
         {
             _ping.SetLabel(beaconName);
             PingManager.NotifyRename(_ping);
