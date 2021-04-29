@@ -105,6 +105,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
 
         private void IpcMessage(string obj)
         {
+            QuickLogger.Debug($"Transciever Message: {obj}",true);
             if (obj.Equals("RefreshTransceiverData"))
             {
                 UpdateTransceiver();
@@ -113,7 +114,16 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
 
         private void OnButtonClick(string arg1, object arg2)
         {
-            _displayManager.OpenTransceiverDialog((FcsDevice)arg2);
+            var totalOperations = _itemController.GetBaseManager().GetBaseOperations().Count;
+            var maxOperations = _itemController.GetBaseManager().GetBaseOperators().Count * 10;
+            if (totalOperations < maxOperations)
+            {
+                _displayManager.OpenTransceiverDialog((FcsDevice)arg2);
+            }
+            else
+            {
+                _displayManager.GetController().ShowMessage(AuxPatchers.MaxTransceiverOperations());
+            }
         }
 
         private void OnTransceiverGrid(DisplayData data)
@@ -161,7 +171,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         private void OnDestroy()
         {
             if(_displayManager?.GetController() != null)
-                _displayManager.GetController().IPCMessage += IpcMessage;
+                _displayManager.GetController().IPCMessage -= IpcMessage;
         }
 
         /// <summary>

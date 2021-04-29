@@ -49,6 +49,7 @@ namespace FCS_StorageSolutions.Configuration
             { $"{ModKey}_RenameRemoteStorage","Rename this remote storage"},
             { $"{ModKey}_OpenItemTransferUnit","Click to Add/Remove connections  between this base and devices"},
             { $"{ModKey}_PleaseSelectAnItemToCraft","Please select an item to craft by clicking the (?)."},
+            { $"{ModKey}_MaxTransceiverOperations","Cannot add anymore operations for the transceiver. Please add another transceiver to your base"},
             { $"{ModKey}_AllItemsNotAvailableToCraft","There are missing ingredients!\n  Please check (Requirements Not Met Section) on the crafter. The crafter will try to craft the missing requirements. Please check crafters constantly to make sure it hasnt become stuck due to missing items."},
         };
         
@@ -293,6 +294,11 @@ namespace FCS_StorageSolutions.Configuration
         public static string PleaseSelectAnItemToCraft()
         {
             return GetLanguage($"{ModKey}_PleaseSelectAnItemToCraft");
+        }
+
+        public static string MaxTransceiverOperations()
+        {
+            return GetLanguage($"{ModKey}_MaxTransceiverOperations");
         }
     }
 }

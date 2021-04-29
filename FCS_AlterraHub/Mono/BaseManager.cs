@@ -1422,6 +1422,7 @@ namespace FCS_AlterraHub.Mono
             if (!_baseOperationObjects.ContainsKey(operationObject.GetPrefabId()))
             { 
                 _baseOperationObjects.Add(operationObject.GetPrefabId(), operationObject);
+                GlobalNotifyByID("DTC", "RefreshTransceiverData");
                 QuickLogger.Debug("Added Transmitter to base",true);
             }
         }
@@ -1434,11 +1435,17 @@ namespace FCS_AlterraHub.Mono
                 return;
             }
 
-            if (!_baseOperationObjects.ContainsKey(operationObject.GetPrefabId()))
+            if (!_baseOperationObjects.ContainsKey(operationObject.GetPrefabId())) return;
+            
+            _baseOperationObjects.Remove(operationObject.GetPrefabId());
+
+            if (_baseOperations.Any())
             {
-                _baseOperationObjects.Remove(operationObject.GetPrefabId());
-                QuickLogger.Debug("Removed Transmitter to from base", true);
+                _baseOperations.RemoveRange(Math.Max(0, _baseOperations.Count - 10), 10);
             }
+            
+            GlobalNotifyByID("DTC", "RefreshTransceiverData");
+            QuickLogger.Debug("Removed Transmitter to from base", true);
         }
 
         public bool HasTransceiverConnected()

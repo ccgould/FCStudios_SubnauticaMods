@@ -96,7 +96,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
                 if (controller.Value != null && controller.Value.IsOccupied && controller.Value.GetTransceiver() != null)
                 {
                     Manager.AddTransceiver(controller.Value.GetTransceiver());
-
                 }
             }
             

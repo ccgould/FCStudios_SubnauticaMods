@@ -273,6 +273,8 @@ namespace FCS_HomeSolutions
                     Cost = 4500,
                     Center = new Vector3(-0.006723166f, 0.4907906f, 0f),
                     Size = new Vector3(0.6996989f, 0.8610544f, 0.6298063f),
+                    CategoryForPDA = TechCategory.InteriorModule,
+                    GroupForPDA = TechGroup.InteriorModules
                 });
             floorShelf01.Patch();
 
@@ -289,6 +291,8 @@ namespace FCS_HomeSolutions
                     Cost = 4500,
                     Center = new Vector3(0f, 1.405873f, 0f),
                     Size = new Vector3(0.6692477f, 2.594568f, 0.6355314f),
+                    CategoryForPDA = TechCategory.InteriorModule,
+                    GroupForPDA = TechGroup.InteriorModules
                 });
             floorShelf02.Patch();
 
@@ -305,7 +309,9 @@ namespace FCS_HomeSolutions
                     RotationEnabled = true,
                     Cost = 4500,
                     Size = new Vector3(0.6614718f, 1.675184f, 0.6331196f),
-                    Center = new Vector3(0f, 0.9526114f, 0f)
+                    Center = new Vector3(0f, 0.9526114f, 0f),
+                    CategoryForPDA = TechCategory.InteriorModule,
+                    GroupForPDA = TechGroup.InteriorModules
                 });
             floorShelf03.Patch();
 
@@ -323,7 +329,9 @@ namespace FCS_HomeSolutions
                     RotationEnabled = true,
                     Cost = 4500,
                     Size = new Vector3(2.743652f, 1.61677f, 0.6635007f),
-                    Center = new Vector3(-0.1762199f, 0.8602326f, 0f)
+                    Center = new Vector3(-0.1762199f, 0.8602326f, 0f),
+                    CategoryForPDA = TechCategory.InteriorModule,
+                    GroupForPDA = TechGroup.InteriorModules
                 });
             floorShelf04.Patch();
 
@@ -340,7 +348,9 @@ namespace FCS_HomeSolutions
                     RotationEnabled = true,
                     Cost = 4500,
                     Size = new Vector3(2.772398f, 1.636121f, 0.6347024f),
-                    Center = new Vector3(-0.1675282f, 0.86191998f, 0f)
+                    Center = new Vector3(-0.1675282f, 0.86191998f, 0f),
+                    CategoryForPDA = TechCategory.InteriorModule,
+                    GroupForPDA = TechGroup.InteriorModules
                 });
             floorShelf05.Patch();
 
@@ -357,7 +367,9 @@ namespace FCS_HomeSolutions
                     RotationEnabled = true,
                     Cost = 4500,
                     Size = new Vector3(2.759224f, 0.8717237f, 0.647239f),
-                    Center = new Vector3(-0.1740894f, 0.4856191f, 0.002290621f)
+                    Center = new Vector3(-0.1740894f, 0.4856191f, 0.002290621f),
+                    CategoryForPDA = TechCategory.InteriorModule,
+                    GroupForPDA = TechGroup.InteriorModules
                 });
             floorShelf06.Patch();
 
@@ -375,7 +387,9 @@ namespace FCS_HomeSolutions
                     RotationEnabled = true,
                     Cost = 4500,
                     Size = new Vector3(-0.1693296f, 0.4921141f, 0f),
-                    Center = new Vector3(2.764177f, 0.8583584f, 0.6468056f)
+                    Center = new Vector3(2.764177f, 0.8583584f, 0.6468056f),
+                    CategoryForPDA = TechCategory.InteriorModule,
+                    GroupForPDA = TechGroup.InteriorModules
                 });
             floorShelf07.Patch();
 
@@ -393,7 +407,9 @@ namespace FCS_HomeSolutions
                     RotationEnabled = false,
                     Cost = 27000,
                     Size = new Vector3(1.997957f, 0.06401221f, 0.9870584f),
-                    Center = new Vector3(-2.488494e-05f, -0.01308646f, 0.5065421f)
+                    Center = new Vector3(-2.488494e-05f, -0.01308646f, 0.5065421f),
+                    CategoryForPDA = TechCategory.InteriorModule,
+                    GroupForPDA = TechGroup.InteriorModules
                 });
             neonShelf01.Patch();
 
@@ -411,7 +427,9 @@ namespace FCS_HomeSolutions
                     RotationEnabled = true,
                     Cost = 45000,
                     Size = new Vector3(1.997957f, 0.8685947f, 2.000143f),
-                    Center = new Vector3(-2.488494e-05f, 0.5808856f, 0f)
+                    Center = new Vector3(-2.488494e-05f, 0.5808856f, 0f),
+                    CategoryForPDA = TechCategory.InteriorModule,
+                    GroupForPDA = TechGroup.InteriorModules
                 });
             neonTable01.Patch();
 
@@ -428,7 +446,9 @@ namespace FCS_HomeSolutions
                     RotationEnabled = true,
                     Cost = 45000,
                     Size = new Vector3(1.997957f, 0.8685947f, 2.000143f),
-                    Center = new Vector3(-2.488494e-05f, 0.5808856f, 0f)
+                    Center = new Vector3(-2.488494e-05f, 0.5808856f, 0f),
+                    CategoryForPDA = TechCategory.InteriorModule,
+                    GroupForPDA = TechGroup.InteriorModules
                 });
             neonTable02.Patch();
         }
@@ -448,7 +468,9 @@ namespace FCS_HomeSolutions
                     RotationEnabled = true,
                     Cost = 20000,
                     Size = new Vector3(1.963638f, 1.020765f, 0.1433573f),
-                    Center = new Vector3(0f, 0.6343491f, 0f)
+                    Center = new Vector3(0f, 0.6343491f, 0f),
+                    CategoryForPDA = TechCategory.Misc,
+                    GroupForPDA = TechGroup.Miscellaneous
                 });
             ahsrailing.Patch();
 
@@ -464,7 +486,9 @@ namespace FCS_HomeSolutions
                     RotationEnabled = true,
                     Cost = 20000,
                     Size = new Vector3(1.963638f, 1.020765f, 0.1433573f),
-                    Center = new Vector3(0f, 0.6343491f, 0f)
+                    Center = new Vector3(0f, 0.6343491f, 0f),
+                    CategoryForPDA = TechCategory.Misc,
+                    GroupForPDA = TechGroup.Miscellaneous
                 });
             ahsrailingglass.Patch();
 
@@ -480,7 +504,9 @@ namespace FCS_HomeSolutions
                     RotationEnabled = true,
                     Cost = 15000,
                     Size = new Vector3(1f, 0.822893f, 0.1791649f),
-                    Center = new Vector3(-1.365597e-25f, 0.7452481f, -0.004088677f)
+                    Center = new Vector3(-1.365597e-25f, 0.7452481f, -0.004088677f),
+                    CategoryForPDA = TechCategory.Misc,
+                    GroupForPDA = TechGroup.Miscellaneous
                 });
             ahssmallrail.Patch();
 
@@ -496,7 +522,9 @@ namespace FCS_HomeSolutions
                     RotationEnabled = true,
                     Cost = 15000,
                     Size = new Vector3(1f, 0.822893f, 0.1791649f),
-                    Center = new Vector3(-1.365597e-25f, 0.7452481f, -0.004088677f)
+                    Center = new Vector3(-1.365597e-25f, 0.7452481f, -0.004088677f),
+                    CategoryForPDA = TechCategory.Misc,
+                    GroupForPDA = TechGroup.Miscellaneous
                 });
             ahssmallrailglass.Patch();
 
@@ -511,7 +539,9 @@ namespace FCS_HomeSolutions
                     RotationEnabled = true,
                     Cost = 18000,
                     Size = new Vector3(4.033218f, 2.194448f, 2.34824f),
-                    Center = new Vector3(4.449882e-24f, 1.225415f, 0.8919346f)
+                    Center = new Vector3(4.449882e-24f, 1.225415f, 0.8919346f),
+                    CategoryForPDA = TechCategory.ExteriorModule,
+                    GroupForPDA = TechGroup.ExteriorModules
                 });
             ahssmallstairplatform.Patch();
         }

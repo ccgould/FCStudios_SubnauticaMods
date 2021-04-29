@@ -150,6 +150,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
 
                 if(_transceiver != null)
                 {
+                    _controller.Manager.RemoveTransceiver(_transceiver);
                     PlayerInteractionHelper.GivePlayerItem(_inventoryItem.item);
                 }
 

@@ -19,8 +19,8 @@ namespace FCS_HomeSolutions.Buildables
         protected GameObject _prefab;
         protected Settings _settings;
 
-        public override TechGroup GroupForPDA => TechGroup.InteriorModules;
-        public override TechCategory CategoryForPDA => TechCategory.InteriorModule;
+        public override TechGroup GroupForPDA => _settings.GroupForPDA;
+        public override TechCategory CategoryForPDA => _settings.CategoryForPDA;
         public override string AssetsFolder => Mod.GetAssetPath();
 
         public DecorationEntryPatch(string classId, string friendlyName, string description, GameObject prefab,Settings settings) : base(classId, friendlyName, description)
