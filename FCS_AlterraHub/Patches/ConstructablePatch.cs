@@ -19,7 +19,7 @@ namespace FCS_AlterraHub.Patches
     }
 
     [HarmonyPatch(typeof(Constructable))]
-    [HarmonyPatch("Deconstruct")]
+    [HarmonyPatch("DeconstructAsync")]
     internal static class Constructable_Deconstruct_Patch
     {
         private static void Postfix(Constructable __instance)

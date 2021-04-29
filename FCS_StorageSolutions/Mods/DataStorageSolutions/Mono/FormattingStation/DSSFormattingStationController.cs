@@ -150,7 +150,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.FormattingStation
 
             Initialize();
 
-            _storageManager.RestoreItems(serializer, _saveData.Bytes);
+            _storageManager.RestoreItemsAsync(serializer, _saveData.Bytes);
         }
 
         public void Save(SaveData newSaveData, ProtobufSerializer serializer = null)

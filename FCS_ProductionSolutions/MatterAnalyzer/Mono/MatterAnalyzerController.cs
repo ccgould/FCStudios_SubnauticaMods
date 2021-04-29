@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Buildables;
@@ -103,7 +104,7 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
                     _isLandPlant = _savedData.IsLandPlant;
                     _currentTechType = _savedData.CurrentTechType;
                     MotorHandler.SpeedByPass(_savedData.RPM);
-                    Seed = GetPlantable(_savedData.CurrentTechType);
+                    StartCoroutine(SetSeed(_savedData.CurrentTechType));
                     if (_scanTime > 0)
                     {
                         _isScanning = true;
@@ -254,10 +255,13 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
             IsInitialized = true;
         }
 
-        private Plantable GetPlantable(TechType techType)
+        private IEnumerator SetSeed(TechType techType)
         {
-            var item = techType.ToInventoryItemLegacy();
-            return item?.item?.gameObject.GetComponentInChildren<Plantable>();
+            TaskResult<InventoryItem> taskResult = new TaskResult<InventoryItem>();
+            yield return AsyncExtensions.ToInventoryItemLegacyAsync(techType, taskResult);
+            var inventoryItem = taskResult.Get();
+            Seed = inventoryItem?.item?.gameObject.GetComponentInChildren<Plantable>();
+            yield break;
         }
 
         private void OnIpcMessage(string message)

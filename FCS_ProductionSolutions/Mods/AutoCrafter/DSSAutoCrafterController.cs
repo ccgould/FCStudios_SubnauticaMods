@@ -196,20 +196,29 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
             {
                 for (int i = _storedItems.Count - 1; i >= 0; i--)
                 {
-                    var inventoryItem = _storedItems[i].ToInventoryItemLegacy();
-                    var result = BaseManager.AddItemToNetwork(Manager, inventoryItem, true);
-                    if (result)
-                    {
-                        _storedItems.RemoveAt(i);
-                    }
-                    else
-                    {
-                        Destroy(inventoryItem.item.gameObject);
-                    }
+                    
+                    StartCoroutine(AttemptToAddToNetwork(_storedItems[i]));
                 }
 
                 _transferTimer = 0f;
             }
+        }
+
+        private IEnumerator AttemptToAddToNetwork(TechType techType)
+        {
+            TaskResult<InventoryItem> taskResult = new TaskResult<InventoryItem>();
+            yield return AsyncExtensions.ToInventoryItemLegacyAsync(techType, taskResult);
+            var inventoryItem = taskResult.Get();
+            var result = BaseManager.AddItemToNetwork(Manager, inventoryItem, true);
+            if (result)
+            {
+                _storedItems.Remove(techType);
+            }
+            else
+            {
+                Destroy(inventoryItem.item.gameObject);
+            }
+            yield break;
         }
 
         private void MoveBeltMaterial()

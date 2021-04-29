@@ -450,15 +450,19 @@ namespace FCS_AlterraHub.Configuration
             AudioClips.Add("AH-Mission01-Pt3",AudioUtils.CreateSound(Path.Combine(Mod.GetAssetPath(), "Audio", "AH-Mission01-Pt3.wav")));
         }
 
-        internal static void SpawnOreConsumerFrag()
+        internal static IEnumerator SpawnOreConsumerFrag()
         {
-            if (IsOreConsumerSpawned) return;
+            //TODO Change to the new SMLHelper system for creating frags at locations
+            if (IsOreConsumerSpawned) yield break;
 
                 QuickLogger.Debug("Spawn Frag");
-            GameObject prefabForTechType = CraftData.GetPrefabForTechType(QPatch.OreConsumerFragTechType);
-            if (prefabForTechType != null)
+            var prefabForTechType = CraftData.GetPrefabForTechTypeAsync(QPatch.OreConsumerFragTechType);
+            yield return prefabForTechType;
+
+
+            if (prefabForTechType.GetResult() != null)
             {
-                GameObject gameObject = Utils.CreatePrefab(prefabForTechType, 1000);
+                GameObject gameObject = Utils.CreatePrefab(prefabForTechType.GetResult(), 1000);
                 LargeWorldEntity.Register(gameObject);
                 CrafterLogic.NotifyCraftEnd(gameObject, QPatch.OreConsumerFragTechType);
                 gameObject.SendMessage("StartConstruction", SendMessageOptions.DontRequireReceiver);
@@ -476,6 +480,8 @@ namespace FCS_AlterraHub.Configuration
             {
                 GameObject.Destroy(oreconsumers[0]);
             }
+
+            yield break;
         }
 
         public static bool IsOreConsumerSpawned { get; set; }

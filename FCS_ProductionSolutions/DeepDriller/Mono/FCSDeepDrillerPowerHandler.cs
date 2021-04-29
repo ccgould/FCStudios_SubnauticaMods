@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHub.Enumerators;
@@ -241,12 +242,14 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         /// Add power to the battery from another power source
         /// </summary>
         /// <param name="powercell">The powercell  to pull power from</param>
-        internal void ChargeBatteryFromPowercell(Battery powercell)
+        internal IEnumerator ChargeBatteryFromPowercell(Battery powercell)
         {
+            TaskResult<bool> taskResult = new TaskResult<bool>();
+
             if (powercell.charge <= 0 || _powerBank.Battery.IsFull()) 
             {
-                Inventory.main.Pickup(powercell.gameObject.GetComponent<Pickupable>());
-                return;
+                yield return Inventory.main.PickupAsync(powercell.gameObject.GetComponent<Pickupable>(),taskResult);
+                yield break;
             }
 
             //Get the amount the battery needs
@@ -261,10 +264,11 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             //Add the new battery amount
             _powerBank.Battery.AddCharge(amount);
 
-            Inventory.main.Pickup(powercell.gameObject.GetComponent<Pickupable>());
+            yield return Inventory.main.PickupAsync(powercell.gameObject.GetComponent<Pickupable>(), taskResult);
 
             //Notify the drill of the change
             OnBatteryUpdate?.Invoke(_powerBank.Battery);
+            yield break;
         }
         
         /// <summary>
@@ -383,7 +387,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         public bool AddItemToContainer(InventoryItem item)
         {
             var battery = item.item.gameObject.GetComponent<Battery>();
-            ChargeBatteryFromPowercell(battery);
+            StartCoroutine(ChargeBatteryFromPowercell(battery));
             return true;
         }
 

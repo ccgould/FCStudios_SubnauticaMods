@@ -78,7 +78,7 @@ namespace FCS_HomeSolutions.SeaBreeze.Mono
                     }
 
                     PowerManager.LoadSave(_savedData.PowercellData, _savedData.HasBreakerTripped);
-                    FridgeComponent.LoadSave(_savedData.FridgeContainer);
+                    StartCoroutine( FridgeComponent.LoadSave(_savedData.FridgeContainer));
                     NameController.SetCurrentName(_savedData.UnitName);
                     _colorManager.ChangeColor(_savedData.Body.Vector4ToColor());
                     QuickLogger.Info($"Loaded {Mod.SeaBreezeFriendly}");
@@ -126,7 +126,7 @@ namespace FCS_HomeSolutions.SeaBreeze.Mono
 
             if (FridgeComponent == null)
             {
-                FridgeComponent = gameObject.AddComponent<Fridge>();
+                FridgeComponent = gameObject.AddComponent< Fridge>();
                 FridgeComponent.Initialize(this,QPatch.Configuration.SeaBreezeStorageLimit);
                 FridgeComponent.OnContainerUpdate += OnContainerUpdate;
                 FridgeComponent.SetModMode(QPatch.Configuration.SeaBreezeModMode);

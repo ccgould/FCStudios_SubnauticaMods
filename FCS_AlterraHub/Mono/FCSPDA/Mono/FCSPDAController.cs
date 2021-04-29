@@ -471,7 +471,7 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
                 uGUI.main.quickSlots.SetTarget(vehicle);
             }
 
-            MainGameController.Instance.PerformGarbageCollection();
+            MainGameController.Instance.PerformIncrementalGarbageCollection();
             if (HandReticle.main != null)
             {
                 HandReticle.main.UnrequestCrosshairHide();

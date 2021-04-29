@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using FCS_AlterraHub.Interfaces;
@@ -94,20 +96,22 @@ namespace FCS_AlterraHub.Mono
             return StorageHelper.Save(serializer, _containerRoot.gameObject);
         }
 
-        public void RestoreItems(ProtobufSerializer serializer, byte[] serialData,bool runPDACloseWhenDone = false)
+        public IEnumerator RestoreItems(ProtobufSerializer serializer, byte[] serialData,bool runPDACloseWhenDone = false)
         {
             StorageHelper.RenewIdentifier(_containerRoot.gameObject);
             if (serialData == null)
             {
-                return;
+                yield break;
             }
             using (MemoryStream memoryStream = new MemoryStream(serialData))
             {
                 QuickLogger.Debug("Getting Data from memory stream");
-                GameObject gObj = serializer.DeserializeObjectTree(memoryStream, 0);
-                QuickLogger.Debug($"Deserialized Object Stream. {gObj}");
-                StorageHelper.TransferItems(gObj, _dumpContainer);
-                Destroy(gObj);
+                CoroutineTask<GameObject> task = serializer.DeserializeObjectTreeAsync(memoryStream, false, false, 0);
+                yield return task;
+                GameObject result = task.GetResult();
+                QuickLogger.Debug($"Deserialized Object Stream. {result}");
+                StorageHelper.TransferItems(result, _dumpContainer);
+                Destroy(result);
             }
 
             CleanUpDuplicatedStorageNoneRoutine();
@@ -116,7 +120,7 @@ namespace FCS_AlterraHub.Mono
             {
                 OnDumpClose(null);
             }
-
+            yield break;
         }
 
         private void CleanUpDuplicatedStorageNoneRoutine()

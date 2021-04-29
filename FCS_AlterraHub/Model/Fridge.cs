@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHub.Enumerators;
@@ -105,32 +106,47 @@ namespace FCS_AlterraHub.Model
 
                 if (match != null)
                 {
-                    var go = GameObject.Instantiate(CraftData.GetPrefabForTechType(techType));
-                    var eatable = go.GetComponent<Eatable>();
-                    var pickup = go.GetComponent<Pickupable>();
-
-                    match.UnpauseDecay();
-                    eatable.timeDecayStart = match.TimeDecayStart;
-
-                    if (Inventory.main.Pickup(pickup))
-                    {
-                        QuickLogger.Debug($"Removed Match Before || Fridge Count {FridgeItems.Count}");
-                        FridgeItems.Remove(match);
-                        QuickLogger.Debug($"Removed Match || Fridge Count {FridgeItems.Count}");
-                    }
-                    else
-                    {
-                        QuickLogger.Message(LanguageHelpers.GetLanguage("InventoryFull"),true);
-                    }
-                    GameObject.Destroy(pickupable);
-                    OnContainerUpdate?.Invoke(NumberOfItems, _itemLimit);
-                    OnContainerRemoveItem?.Invoke(_mono, techType);
+                    StartCoroutine(AttemptToRemoveAsync(techType, match, pickupable));
                 }
             }
             else
             {
                 Destroy(pickupable);
             }
+        }
+
+        private IEnumerator AttemptToRemoveAsync(TechType techType, EatableEntities match, Pickupable pickupable)
+        {
+            var prefabForTechType = CraftData.GetPrefabForTechTypeAsync(techType, false);
+            yield return prefabForTechType;
+
+            var prefabResult = prefabForTechType.GetResult();
+
+            var go = GameObject.Instantiate(prefabResult);
+            var eatable = go.GetComponent<Eatable>();
+            var pickup = go.GetComponent<Pickupable>();
+
+            match.UnpauseDecay();
+            eatable.timeDecayStart = match.TimeDecayStart;
+
+            TaskResult<bool> pickupResult = new TaskResult<bool>();
+            yield return Inventory.main.PickupAsync(pickup, pickupResult);
+
+            if (pickupResult.Get())
+            {
+                QuickLogger.Debug($"Removed Match Before || Fridge Count {FridgeItems.Count}");
+                FridgeItems.Remove(match);
+                QuickLogger.Debug($"Removed Match || Fridge Count {FridgeItems.Count}");
+            }
+            else
+            {
+                QuickLogger.Message(LanguageHelpers.GetLanguage("InventoryFull"), true);
+            }
+
+            GameObject.Destroy(pickupable);
+            OnContainerUpdate?.Invoke(NumberOfItems, _itemLimit);
+            OnContainerRemoveItem?.Invoke(_mono, techType);
+            yield break;
         }
 
         public bool IsEmpty()
@@ -149,21 +165,24 @@ namespace FCS_AlterraHub.Model
             return FridgeItems;
         }
 
-        public void LoadSave(List<EatableEntities> save)
+        public IEnumerator LoadSave(List<EatableEntities> save)
         {
-            if (save == null) return;
+            if (save == null) yield break;
 
             foreach (EatableEntities eatableEntities in save)
             {
                 QuickLogger.Debug($"Adding entity {eatableEntities.Name}");
 
-                var food = GameObject.Instantiate(CraftData.GetPrefabForTechType(eatableEntities.TechType));
+                var prefabForTechType = CraftData.GetPrefabForTechTypeAsync(eatableEntities.TechType, false);
+                yield return prefabForTechType;
+
+                var food = GameObject.Instantiate(prefabForTechType.GetResult());
 
                 var eatable = food.gameObject.GetComponent<Eatable>();
                 eatable.timeDecayStart = eatableEntities.TimeDecayStart;
 
 #if SUBNAUTICA
-                var item = new InventoryItem(food.gameObject.GetComponent<Pickupable>().Pickup(false));
+                var item = new InventoryItem(food.gameObject.GetComponent<Pickupable>());//TODO if you get items on load this is why you removed pickup false
 #elif BELOWZERO
                 Pickupable pickupable = food.gameObject.GetComponent<Pickupable>();
                 pickupable.Pickup(false);
@@ -272,20 +291,22 @@ namespace FCS_AlterraHub.Model
 
         public Pickupable RemoveItemFromContainer(TechType techType)
         {
-            EatableEntities match = FindMatch(techType, EatableType.Any);
+            //TODO Update to the new EXP System
+            //EatableEntities match = FindMatch(techType, EatableType.Any);
 
-            if (match == null) return null;
+            //if (match == null) return null;
 
-            var go = GameObject.Instantiate(CraftData.GetPrefabForTechType(techType));
-            var eatable = go.GetComponent<Eatable>();
-            var pickup = go.GetComponent<Pickupable>();
+            //var go = GameObject.Instantiate(CraftData.GetPrefabForTechType(techType));
+            //var eatable = go.GetComponent<Eatable>();
+            //var pickup = go.GetComponent<Pickupable>();
 
-            match.UnpauseDecay();
-            eatable.timeDecayStart = match.TimeDecayStart;
-            FridgeItems.Remove(match);
-            OnContainerUpdate?.Invoke(NumberOfItems, _itemLimit);
+            //match.UnpauseDecay();
+            //eatable.timeDecayStart = match.TimeDecayStart;
+            //FridgeItems.Remove(match);
+            //OnContainerUpdate?.Invoke(NumberOfItems, _itemLimit);
 
-            return pickup;
+            //return pickup;
+            return null;
         }
         
         public Dictionary<TechType, int> GetItemsWithin()

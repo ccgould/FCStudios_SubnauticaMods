@@ -22,7 +22,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\GenericExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\MaterialExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\StringExtentions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Extensions\TechTypeExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\AsyncExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\AssetHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\GameObjectHelpers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\LanguageHelpers.cs" />

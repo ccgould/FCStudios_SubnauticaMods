@@ -1,4 +1,5 @@
 ﻿using FCS_AlterraHub.Configuration;
+using UWE;
 
 namespace FCS_AlterraHub.Helpers
 {
@@ -21,7 +22,8 @@ namespace FCS_AlterraHub.Helpers
             
             if (Player.main.HasInventoryRoom(inventoryItem.item))
             {
-                Inventory.main.Pickup(inventoryItem.item);
+                TaskResult<bool> pickupResult = new TaskResult<bool>();
+                CoroutineHost.StartCoroutine(Inventory.main.PickupAsync(inventoryItem.item, pickupResult));
             }
         }
 
@@ -31,7 +33,8 @@ namespace FCS_AlterraHub.Helpers
 
             if (Player.main.HasInventoryRoom(pickupable))
             {
-                Inventory.main.Pickup(pickupable);
+                TaskResult<bool> pickupResult = new TaskResult<bool>();
+                CoroutineHost.StartCoroutine(Inventory.main.PickupAsync(pickupable, pickupResult));
             }
         }
 

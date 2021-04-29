@@ -148,33 +148,6 @@ namespace FCSDemo.Mono
             }, "FCSDemo Controller");
         }
 
-        private void GetInfo()
-        {
-            var reactorRod = CraftData.GetPrefabForTechType(TechType.Aquarium);
-            Renderer[] renderers = reactorRod.GetComponentsInChildren<Renderer>(true);
-
-            foreach (Renderer renderer in renderers)
-            {
-                foreach (Material material in renderer.materials)
-                {
-
-                    QuickLogger.Debug($"Materil Name: {material.name}");
-
-                    //if (material.name.StartsWith("nuclear_reactor_rod_glass", StringComparison.OrdinalIgnoreCase))
-                    //{
-                    //    material.name = $"{newMaterialName}_glass";
-                    //    var glass = gameObject;
-                    //    var render = glass.GetComponent<Renderer>();
-                    //    render.material = material;
-                    //    goto _end;
-                    //}
-                }
-            }
-            _end:;
-
-            GameObject.Destroy(reactorRod);
-        }
-
         #region Menus
         private void ColorChangerMenu()
         {

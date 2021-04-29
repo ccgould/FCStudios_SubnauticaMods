@@ -19,7 +19,7 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
         private FCSPDAController _pdaController;
 
 #if SUBNAUTICA
-        private static FMOD.System FMOD_System => RuntimeManager.LowlevelSystem;
+        //private static FMOD.System FMOD_System => RuntimeManager.LowlevelSystem;
 #else
         private static System FMOD_System => RuntimeManager.CoreSystem;
 #endif

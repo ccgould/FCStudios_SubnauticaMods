@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Extensions;
@@ -47,7 +48,7 @@ namespace FCS_HomeSolutions.Mono.OutDoorPlanters
                     _colorManager.ChangeColor(_savedData.Fcs.Vector4ToColor());
                     _colorManager.ChangeColor(_savedData.Secondary.Vector4ToColor(), ColorTargetMode.Secondary);
                     _colorManager.ChangeColor(_savedData.Lum.Vector4ToColor(), ColorTargetMode.Emission);
-                    LoadStorage();
+                    StartCoroutine(LoadStorage());
                 }
 
                 _runStartUpOnEnable = false;
@@ -143,7 +144,7 @@ namespace FCS_HomeSolutions.Mono.OutDoorPlanters
             _isFromSave = true;
         }
 
-        private void LoadStorage()
+        private IEnumerator LoadStorage()
         {
             GetContainer();
 
@@ -157,7 +158,7 @@ namespace FCS_HomeSolutions.Mono.OutDoorPlanters
                 }
                 else
                 {
-                    StorageHelper.RestoreItems(_serializer, _savedData.Bytes, _storageContainer.container);
+                    yield return StorageHelper.RestoreItemsAsync(_serializer, _savedData.Bytes, _storageContainer.container);
                     if (_savedData.PlantAges != null)
                     {
                         foreach (PlantData data in _savedData.PlantAges)
@@ -170,6 +171,7 @@ namespace FCS_HomeSolutions.Mono.OutDoorPlanters
                     QuickLogger.Debug("Loaded Storage Data", true);
                 }
             }
+            yield break;
         }
 
         public byte[] GetStorageBytes(ProtobufSerializer serializer)

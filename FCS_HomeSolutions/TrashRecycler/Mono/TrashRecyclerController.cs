@@ -80,7 +80,7 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
                     _colorManager.ChangeColor(_savedData.Fcs.Vector4ToColor());
                     _colorManager.ChangeColor(_savedData.Secondary.Vector4ToColor(), ColorTargetMode.Secondary);
                     _timeLeft = _savedData.CurrentTime;
-                    _dumpContainer.RestoreItems(_serializer, _savedData.DropStorage,true);
+                    StartCoroutine(_dumpContainer.RestoreItems(_serializer, _savedData.DropStorage,true));
                     RefreshUI();
                     _isFromSave = false;
                 }

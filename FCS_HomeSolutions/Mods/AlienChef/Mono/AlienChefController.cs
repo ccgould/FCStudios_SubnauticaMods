@@ -127,7 +127,7 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
                 Initialize();
             }
 
-            StorageSystem.RestoreItems(serializer, _saveData.Bytes);
+            StorageSystem.RestoreItemsAsync(serializer, _saveData.Bytes);
 
             _fromSave = true;
         }

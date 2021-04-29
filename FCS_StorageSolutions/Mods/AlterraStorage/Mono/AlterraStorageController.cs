@@ -290,7 +290,7 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
             {
                 Initialize();
             }
-            _storageContainer.RestoreItems(_serializer, _savedData.Data);
+            _storageContainer.RestoreItemsAsync(_serializer, _savedData.Data);
             _isFromSave = true;
         }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using FCS_AlterraHub.Mono;
 
@@ -13,6 +14,9 @@ namespace FCS_AlterraHub.Interfaces
         bool IsAllowedToAdd(Pickupable pickupable, bool verbose);
         bool IsAllowedToRemoveItems();
         Pickupable RemoveItemFromContainer(TechType techType);
+
+        //IEnumerator RemoveItemFromContainer(TechType techType, IOut<Pickupable> pickupable);
+
         Dictionary<TechType, int> GetItemsWithin();
         Action<int, int> OnContainerUpdate { get; set; }
         Action<FcsDevice, TechType> OnContainerAddItem { get; set; }

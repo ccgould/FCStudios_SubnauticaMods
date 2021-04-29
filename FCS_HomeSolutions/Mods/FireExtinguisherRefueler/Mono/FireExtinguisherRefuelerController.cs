@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Extensions;
@@ -152,6 +153,10 @@ namespace FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Mono
 
         public override void OnProtoDeserialize(ProtobufSerializer serializer)
         {
+        }
+
+        public IEnumerator OnProtoDeserializeAsync(ProtobufSerializer serializer)
+        {
             QuickLogger.Debug("In OnProtoDeserialize");
 
             if (_savedData == null)
@@ -164,8 +169,9 @@ namespace FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Mono
                 Initialize();
             }
 
-            _storage.RestoreItems(serializer, _savedData.Data);
+            yield return _storage.RestoreItemsAsync(serializer, _savedData.Data);
             _isFromSave = true;
+            yield break;
         }
 
         public override void OnConstructedChanged(bool constructed)

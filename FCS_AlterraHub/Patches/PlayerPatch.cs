@@ -9,6 +9,7 @@ using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using HarmonyLib;
 using UnityEngine;
+using UWE;
 using Object = UnityEngine.Object;
 
 
@@ -120,7 +121,9 @@ namespace FCS_AlterraHub.Patches
                 SunTarget = go.transform;
             }
 
-            Mod.SpawnOreConsumerFrag();
+            CoroutineHost.StartCoroutine(Mod.SpawnOreConsumerFrag());
+
+
         }
 
        public static Transform SunTarget { get; set; }

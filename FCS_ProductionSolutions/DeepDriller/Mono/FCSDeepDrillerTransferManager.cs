@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
@@ -86,7 +87,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
                         callsToCanAddItem++;
                         if (target.CanBeStored(1, item.Key))
                         {
-                            SortItem(item.Key, target);
+                            yield return SortItem(item.Key, target);
                             _unsortableItems--;
                             _sortedItem = true;
                             yield break;
@@ -104,10 +105,14 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             }
         }
 
-        private void SortItem(TechType techType, FcsDevice target)
+        private IEnumerator SortItem(TechType techType, FcsDevice target)
         {
             _mono.DeepDrillerContainer.OnlyRemoveItemFromContainer(techType);
-            target.AddItemToContainer(techType.ToInventoryItemLegacy());
+
+            TaskResult<InventoryItem> result = new TaskResult<InventoryItem>();
+            yield return AsyncExtensions.ToInventoryItemLegacyAsync(techType, result);
+            target.AddItemToContainer(result.Get());
+            yield break;
         }
 
         private void FindAlterraStorage()

@@ -261,7 +261,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
 
         public void RestoreItems(ProtobufSerializer serializer,byte[] data)
         {
-            _storage.RestoreItems(serializer,data);
+            _storage.RestoreItemsAsync(serializer,data);
         }
 
         public int GetStorageAmount()

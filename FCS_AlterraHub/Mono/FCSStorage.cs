@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -37,14 +38,14 @@ namespace FCS_AlterraHub.Mono
             return _storageRootBytes;
         }
 
-        public void RestoreItems(ProtobufSerializer serializer, byte[] serialData)
+        public IEnumerator RestoreItemsAsync(ProtobufSerializer serializer, byte[] serialData)
         {
             QuickLogger.Debug("RestoreItems");
             StorageHelper.RenewIdentifier(_storageRoot);
             QuickLogger.Debug("RenewIdentifier Called");
             if (serialData == null)
             {
-                return;
+                yield break;
             }
             
             QuickLogger.Debug($"Storage root Position: {_storageRoot.transform.position}");
@@ -52,7 +53,9 @@ namespace FCS_AlterraHub.Mono
             using (MemoryStream memoryStream = new MemoryStream(serialData))
             {
                 QuickLogger.Debug("Getting Data from memory stream");
-                GameObject gObj = serializer.DeserializeObjectTree(memoryStream, 0);
+                CoroutineTask<GameObject> task = serializer.DeserializeObjectTreeAsync(memoryStream, false,false,0);
+                yield return task;
+                var gObj = task.GetResult();
                 QuickLogger.Debug($"De-serialized Object Stream. {gObj} | {gObj.name}");
                 TransferItems(gObj);
                 QuickLogger.Debug("Items Transferred");
@@ -60,6 +63,7 @@ namespace FCS_AlterraHub.Mono
                 GameObject.Destroy(gObj);
                 QuickLogger.Debug("Item destroyed");
             }
+            yield break;
         }
 
         private void TransferItems(GameObject source)

@@ -225,7 +225,7 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
 
         private void AddItemToInventory()
         {
-            ItemsContainer.UnsafeAdd(_targetItem.ToInventoryItemLegacy());
+            StartCoroutine(AsyncExtensions.AddToContainerAsync(_targetItem, ItemsContainer));
         }
 
         public int GetMaxCount()

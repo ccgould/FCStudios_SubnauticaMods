@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHub.Helpers;
@@ -75,18 +76,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                 
                 for (int i = 0; i < amount; i++)
                 {
-                    var inventoryItem = craftingTechType.ToInventoryItemLegacy();
-
-                    QuickLogger.Debug($"InventoryItemLegacy returned: {Language.main.Get(inventoryItem.item.GetTechType())}");
-
-                    var result = BaseManager.AddItemToNetwork(_mono.Manager, inventoryItem, true);
-
-                    if (!result)
-                    {
-                        _mono.ShowMessage($"Failed to add {Language.main.Get(techType)} to storage. Please build a locker, remote storage or add more space to your data storage system. Your item will be added to the autocrafter storage/");
-                        _mono.AddItemToStorage(techType);
-                        Destroy(inventoryItem.item.gameObject);
-                    }
+                    StartCoroutine(AttemptToAddToNetwork(craftingTechType, techType));
                 }
                 
                 _startBuffer = MAXTIME;
@@ -119,6 +109,23 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                     IsOccupied = false;
                 }
             }
+        }
+
+        private IEnumerator AttemptToAddToNetwork(TechType craftingTechType, TechType techType)
+        {
+            TaskResult<InventoryItem> taskResult = new TaskResult<InventoryItem>();
+            yield return AsyncExtensions.ToInventoryItemLegacyAsync(techType, taskResult);
+            var inventoryItem = taskResult.Get();
+
+            var result = BaseManager.AddItemToNetwork(_mono.Manager, inventoryItem, true);
+
+            if (!result)
+            {
+                _mono.ShowMessage($"Failed to add {Language.main.Get(techType)} to storage. Please build a locker, remote storage or add more space to your data storage system. Your item will be added to the autocrafter storage/");
+                _mono.AddItemToStorage(techType);
+                Destroy(inventoryItem.item.gameObject);
+            }
+            yield break;
         }
 
         private void GetMissingItems(TechType craftingItemTechType)

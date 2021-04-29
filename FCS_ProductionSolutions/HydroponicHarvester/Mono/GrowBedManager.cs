@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHub.Helpers;
@@ -377,7 +378,8 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
             {
                 _trackedItems.Add(techType, 1);
             }
-            ItemsContainer.UnsafeAdd(techType.ToInventoryItemLegacy());
+
+            StartCoroutine(AsyncExtensions.AddToContainerAsync(techType,ItemsContainer));
         }
     }
 }

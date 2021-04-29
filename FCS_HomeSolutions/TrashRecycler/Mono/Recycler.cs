@@ -255,7 +255,7 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
             }
 
             BioMaterials = data.BioMaterialsCount;
-            _storageContainer.RestoreItems(serializer, data.Storage);
+            _storageContainer.RestoreItemsAsync(serializer, data.Storage);
         }
 
         public bool CanPendItem(Pickupable pickupable)

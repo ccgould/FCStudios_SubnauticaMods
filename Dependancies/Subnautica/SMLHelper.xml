@@ -575,15 +575,7 @@
             Override with the category within the group in the PDA blueprints where this item appears.
             </summary>
         </member>
-        <member name="P:SMLHelper.V2.Assets.PdaItem.UnlockedAtStart">
-            <summary>
-            Gets a value indicating whether <see cref="P:SMLHelper.V2.Assets.PdaItem.RequiredForUnlock"/> has been set to lock this blueprint behind another <see cref="T:TechType"/>.
-            </summary>
-            <value>
-              Returns <c>true</c> if will be unlocked from the start of the game; otherwise, <c>false</c>.
-            </value>
-            <seealso cref="P:SMLHelper.V2.Assets.PdaItem.RequiredForUnlock"/>
-        </member>
+        <!-- Badly formed XML comment ignored for member "P:SMLHelper.V2.Assets.PdaItem.UnlockedAtStart" -->
         <member name="P:SMLHelper.V2.Assets.PdaItem.DiscoverMessage">
             <summary>
             Message which should be shown when the item is unlocked. <para/>
@@ -1136,6 +1128,56 @@
             <param name="pingTypeString">The string used to define the modded PingType</param>
             <param name="moddedPingType">The PingType enum value. Defaults to <see cref="F:PingType.None"/> when the PingType was not found.</param>
             <returns><c>True</c> if the PingType was found; Otherwise <c>false</c></returns>
+        </member>
+        <member name="T:SMLHelper.V2.Handlers.SurvivalHandler">
+            <summary>
+            a common handler for uses specified to the Survival component
+            </summary>
+        </member>
+        <member name="P:SMLHelper.V2.Handlers.SurvivalHandler.Main">
+            <summary>
+            Main entry point for all calls to this handler.
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.SurvivalHandler.SMLHelper#V2#Interfaces#ISurvivalHandler#GiveOxygenOnConsume(TechType,System.Single,System.Boolean)">
+            <summary>
+            <para>makes the item gives oxygen on use.</para>
+            </summary>
+            <param name="techType">the TechType that you want to make it give oxygen on use</param>
+            <param name="oxygenGiven">the oxygen amount the item gives</param>
+            <param name="isEdible">set it to <see langword="true" /> if the item is edible and has the <see cref="T:Eatable"/> component attached to it. 
+            <para>defaults to <see langword="false" /></para>
+            </param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.SurvivalHandler.SMLHelper#V2#Interfaces#ISurvivalHandler#GiveHealthOnConsume(TechType,System.Single,System.Boolean)">
+            <summary>
+            <para>makes the item Heal the player on consume.</para>
+            </summary>
+            <param name="techType">the TechType that you want it to heal back</param>
+            <param name="healthBack">amount to heal the player</param>
+            <param name="isEdible">set it to <see langword="true" /> if the item is edible and has the <see cref="T:Eatable"/> component attached to it. 
+            <para>defaults to <see langword="false" /></para>
+            </param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.SurvivalHandler.GiveOxygenOnConsume(TechType,System.Single,System.Boolean)">
+            <summary>
+            <para>makes the item gives oxygen on use.</para>
+            </summary>
+            <param name="techType">the TechType that you want to make it give oxygen on use</param>
+            <param name="oxygenGiven">the oxygen amount the item gives</param>
+            <param name="isEdible">set it to <see langword="true" /> if the item is edible and has the <see cref="T:Eatable"/> component attached to it. 
+            <para>defaults to <see langword="false" /></para>
+            </param>
+        </member>
+        <member name="M:SMLHelper.V2.Handlers.SurvivalHandler.GiveHealthOnConsume(TechType,System.Single,System.Boolean)">
+            <summary>
+            <para>makes the item Heal the player on consume.</para>
+            </summary>
+            <param name="techType">the TechType that you want it to heal back</param>
+            <param name="healthBack">amount to heal the player</param>
+            <param name="isEdible">set it to <see langword="true" /> if the item is edible and has the <see cref="T:Eatable"/> component attached to it. 
+            <para>defaults to <see langword="false" /></para>
+            </param>
         </member>
         <member name="T:SMLHelper.V2.Handlers.BioReactorHandler">
             <summary>
@@ -2818,6 +2860,31 @@
             <param name="moddedPingType">The PingType enum value. Defaults to <see cref="F:PingType.None"/> when the PingType was not found.</param>
             <returns><c>True</c> if the PingType was found; Otherwise <c>false</c></returns>
         </member>
+        <member name="T:SMLHelper.V2.Interfaces.ISurvivalHandler">
+            <summary>
+            a handler for common uses to the Survival component
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.ISurvivalHandler.GiveOxygenOnConsume(TechType,System.Single,System.Boolean)">
+            <summary>
+            <para>makes the item gives oxygen on use.</para>
+            </summary>
+            <param name="techType">the TechType that you want to make it give oxygen on use</param>
+            <param name="oxygenGiven">the oxygen amount the item gives</param>
+            <param name="isEdible">set it to <see langword="true" /> if the item is edible and has the <see cref="T:Eatable"/> component attached to it. 
+            <para>defaults to <see langword="false" /></para>
+            </param>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.ISurvivalHandler.GiveHealthOnConsume(TechType,System.Single,System.Boolean)">
+            <summary>
+            <para>makes the item Heal the player on consume.</para>
+            </summary>
+            <param name="techType">the TechType that you want it to heal back</param>
+            <param name="healthBack">amount to heal the player</param>
+            <param name="isEdible">set it to <see langword="true" /> if the item is edible and has the <see cref="T:Eatable"/> component attached to it. 
+            <para>defaults to <see langword="false" /></para>
+            </param>
+        </member>
         <member name="T:SMLHelper.V2.Interfaces.IBioReactorHandler">
             <summary>
             A handler with common methods for updating BioReactor values.
@@ -2847,7 +2914,7 @@
         <member name="M:SMLHelper.V2.Interfaces.ICraftDataHandler.SetQuickSlotType(TechType,QuickSlotType)">
             <summary>
             <para>Allows you to edit QuickSlotType for TechTypes. Can be used for existing TechTypes too.</para>
-            <para>Careful: This has to be called after <see cref="M:SMLHelper.V2.Interfaces.ICraftDataHandler.SetTechData(TechType,SMLHelper.V2.Crafting.TechData)"/> and <see cref="M:SMLHelper.V2.Interfaces.ICraftDataHandler.SetTechData(TechType,SMLHelper.V2.Crafting.TechData)"/>.</para>
+            <para>Careful: This has to be called after <see cref="M:SMLHelper.V2.Interfaces.ICraftDataHandler.SetTechData(TechType,SMLHelper.V2.Crafting.TechData)"/> and <see cref="M:SMLHelper.V2.Interfaces.ICraftDataHandler.SetTechData(TechType,ITechData)"/>.</para>
             </summary>
             <param name="techType">The TechType whose QuickSlotType you want to edit.</param>
             <param name="slotType">The QuickSlotType for that TechType.</param>
@@ -3625,6 +3692,121 @@
             The ID of the <see cref="T:SMLHelper.V2.Options.ModOption"/> this event corresponds to.
             </summary>
         </member>
+        <member name="T:SMLHelper.V2.Interfaces.IBasicText">
+            <summary>
+            <para>
+            Places a simple text object on the screen and keeps it there until either hidden (or a designated fade-to-black timer has passed). 
+            By default uses the same font/size/color as the "Press Any Button To Begin" message at the beginning of the game, and appears 
+            centered about 1/3 down the screen, but all parameters can be reconfigured.
+            </para>
+            <para>
+            The idea of the defaults is that new modders don't have to bootstrap a bunch of irritating Unity stuff -- don't have to understand
+            what a "Material" is or how to make one, don't have to know to initialize a font, or even a color. Can just start adding text and
+            then can always custom and configure on further revision.
+            </para>
+            </summary>
+            <example>
+            SIMPLE USAGE EXAMPLE:
+            BasicText message = new BasicText();
+            message.ShowMessage("This Message Will Fade In 10 Seconds", 10);
+            
+            COMPLEX USAGE EXAMPLE:
+            BasicText message = new BasicText(TextAnchor.UpperLeft); // Note many other properties could also be set as constructor parameters
+            message.setColor(Color.red); // Set Color
+            message.setSize(20);         // Set Font Size
+            message.setLoc(200, 400);    // Set x/y position (0,0 is center of screen)
+            message.setFontStyle(FontStyle.Bold); // Bold 
+            message.ShowMessage("This message stays on screen until hidden"); // Display message; if fadeout seconds not specified, it just keeps showing
+            ... // other things happen, time goes by
+            message.Hide(); // Hides the message
+            </example>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.IBasicText.ClearAlign">
+            <summary>
+            Resets to using "cloned" font style of Subnautica default
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.IBasicText.ClearColor">
+            <summary>
+            Resets to using "cloned" color of Subnautica default.
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.IBasicText.ClearFont">
+            <summary>
+            Resets to using "cloned" font of Subnautica default.
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.IBasicText.ClearFontStyle">
+            <summary>
+            Resets to using "cloned" font style of Subnautica default.
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.IBasicText.ClearSize">
+            <summary>
+            Resets to using "cloned" size of Subnautica default.
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.IBasicText.GetText">
+            <summary>
+            Returns our current text.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.IBasicText.Hide">
+            <summary>
+            Hides our text item if it is displaying.
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.IBasicText.SetAlign(UnityEngine.TextAnchor)">
+            <summary>
+            Sets the text anchor.
+            </summary>
+            <param name="useAlign">The text anchor to align to</param>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.IBasicText.SetColor(UnityEngine.Color)">
+            <summary>
+            Sets the text color
+            </summary>
+            <param name="useColor">The text color to use</param>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.IBasicText.SetFont(UnityEngine.Font)">
+            <summary>
+            Sets the font 
+            </summary>
+            <param name="useFont">The font to render the text as.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.IBasicText.SetFontStyle(UnityEngine.FontStyle)">
+            <summary>
+            Sets the font style.
+            </summary>
+            <param name="useStyle">The text font style to use</param>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.IBasicText.SetLocation(System.Single,System.Single)">
+            <summary>
+            Sets screen display location (position relative to the actual text is determined by the alignment)
+            </summary>
+            <param name="set_x">The x coordinate to set</param>
+            <param name="set_y">The y coordinate to set</param>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.IBasicText.SetSize(System.Int32)">
+            <summary>
+            Sets the font size.
+            </summary>
+            <param name="useSize">The text size to use</param>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.IBasicText.ShowMessage(System.String)">
+            <summary>
+            Shows our text item, with no schedule fade (i.e. indefinitely)
+            </summary>
+            <param name="s">The text to display</param>
+        </member>
+        <member name="M:SMLHelper.V2.Interfaces.IBasicText.ShowMessage(System.String,System.Single)">
+            <summary>
+            Shows our text item, fading after a specified number of seconds (or stays on indefinitely if 0 seconds)
+            </summary>
+            <param name="s">The text to display</param>
+            <param name="seconds">The duration to hold before fading</param>
+        </member>
         <member name="T:SMLHelper.V2.Json.ConfigFileAttribute">
             <summary>
             Attribute used to specify the filename and subfolder for a <see cref="T:SMLHelper.V2.Json.ConfigFile"/>.
@@ -3665,7 +3847,7 @@
         </member>
         <member name="T:SMLHelper.V2.Json.Converters.FloatConverter">
             <summary>
-            A <see cref="T:Oculus.Newtonsoft.Json.JsonConverter"/> for rounding floats or doubles to a given number of decimal places,
+            A <see cref="T:Newtonsoft.Json.JsonConverter"/> for rounding floats or doubles to a given number of decimal places,
             trimming trailing 0s.
             </summary>
         </member>
@@ -3694,7 +3876,7 @@
             Creates a new <see cref="T:SMLHelper.V2.Json.Converters.FloatConverter"/>.
             </summary>
         </member>
-        <member name="M:SMLHelper.V2.Json.Converters.FloatConverter.WriteJson(Oculus.Newtonsoft.Json.JsonWriter,System.Object,Oculus.Newtonsoft.Json.JsonSerializer)">
+        <member name="M:SMLHelper.V2.Json.Converters.FloatConverter.WriteJson(Newtonsoft.Json.JsonWriter,System.Object,Newtonsoft.Json.JsonSerializer)">
             <summary>
             The method for writing the <paramref name="value"/> data to the <paramref name="writer"/>.
             </summary>
@@ -3702,7 +3884,7 @@
             <param name="value"></param>
             <param name="serializer"></param>
         </member>
-        <member name="M:SMLHelper.V2.Json.Converters.FloatConverter.ReadJson(Oculus.Newtonsoft.Json.JsonReader,System.Type,System.Object,Oculus.Newtonsoft.Json.JsonSerializer)">
+        <member name="M:SMLHelper.V2.Json.Converters.FloatConverter.ReadJson(Newtonsoft.Json.JsonReader,System.Type,System.Object,Newtonsoft.Json.JsonSerializer)">
             <summary>
             The method for reading the <see cref="T:System.Single"/> or <see cref="T:System.Double"/> data from the <paramref name="reader"/>.
             </summary>
@@ -3715,17 +3897,17 @@
         <member name="M:SMLHelper.V2.Json.Converters.FloatConverter.CanConvert(System.Type)">
             <summary>
             The method for determining whether the current <paramref name="objectType"/> can be processed byt this
-            <see cref="T:Oculus.Newtonsoft.Json.JsonConverter"/>
+            <see cref="T:Newtonsoft.Json.JsonConverter"/>
             </summary>
             <param name="objectType"></param>
             <returns></returns>
         </member>
         <member name="T:SMLHelper.V2.Json.Converters.KeyCodeConverter">
             <summary>
-            A <see cref="T:Oculus.Newtonsoft.Json.JsonConverter"/> for handling <see cref="T:UnityEngine.KeyCode"/>s.
+            A <see cref="T:Newtonsoft.Json.JsonConverter"/> for handling <see cref="T:UnityEngine.KeyCode"/>s.
             </summary>
         </member>
-        <member name="M:SMLHelper.V2.Json.Converters.KeyCodeConverter.WriteJson(Oculus.Newtonsoft.Json.JsonWriter,System.Object,Oculus.Newtonsoft.Json.JsonSerializer)">
+        <member name="M:SMLHelper.V2.Json.Converters.KeyCodeConverter.WriteJson(Newtonsoft.Json.JsonWriter,System.Object,Newtonsoft.Json.JsonSerializer)">
             <summary>
             The method for writing the <paramref name="value"/> data to the <paramref name="writer"/>.
             </summary>
@@ -3733,7 +3915,7 @@
             <param name="value"></param>
             <param name="serializer"></param>
         </member>
-        <member name="M:SMLHelper.V2.Json.Converters.KeyCodeConverter.ReadJson(Oculus.Newtonsoft.Json.JsonReader,System.Type,System.Object,Oculus.Newtonsoft.Json.JsonSerializer)">
+        <member name="M:SMLHelper.V2.Json.Converters.KeyCodeConverter.ReadJson(Newtonsoft.Json.JsonReader,System.Type,System.Object,Newtonsoft.Json.JsonSerializer)">
             <summary>
             The method for reading the <see cref="T:UnityEngine.KeyCode"/> data from the <paramref name="reader"/>.
             </summary>
@@ -3746,7 +3928,7 @@
         <member name="M:SMLHelper.V2.Json.Converters.KeyCodeConverter.CanConvert(System.Type)">
             <summary>
             The method for determining whether the current <paramref name="objectType"/> can be processed by this
-            <see cref="T:Oculus.Newtonsoft.Json.JsonConverter"/>.
+            <see cref="T:Newtonsoft.Json.JsonConverter"/>.
             </summary>
             <param name="objectType"></param>
             <returns></returns>
@@ -3756,7 +3938,7 @@
             Extension methods for parsing objects as JSON data.
             </summary>
         </member>
-        <member name="M:SMLHelper.V2.Json.ExtensionMethods.JsonExtensions.LoadJson``1(``0,System.String,System.Boolean,Oculus.Newtonsoft.Json.JsonConverter[])">
+        <member name="M:SMLHelper.V2.Json.ExtensionMethods.JsonExtensions.LoadJson``1(``0,System.String,System.Boolean,Newtonsoft.Json.JsonConverter[])">
             <summary>
             Loads the JSON properties from a file on disk into the <paramref name="jsonObject"/>.
             </summary>
@@ -3765,17 +3947,17 @@
             <param name="path">The file path to the JSON file to parse.</param>
             <param name="createIfNotExist">Whether a new JSON file should be created with default values if it does not
             already exist.</param>
-            <param name="jsonConverters">The <see cref="T:Oculus.Newtonsoft.Json.JsonConverter"/>s to be used for deserialization.</param>
-            <seealso cref="M:SMLHelper.V2.Json.ExtensionMethods.JsonExtensions.SaveJson``1(``0,System.String,Oculus.Newtonsoft.Json.JsonConverter[])"/>
+            <param name="jsonConverters">The <see cref="T:Newtonsoft.Json.JsonConverter"/>s to be used for deserialization.</param>
+            <seealso cref="M:SMLHelper.V2.Json.ExtensionMethods.JsonExtensions.SaveJson``1(``0,System.String,Newtonsoft.Json.JsonConverter[])"/>
         </member>
-        <member name="M:SMLHelper.V2.Json.ExtensionMethods.JsonExtensions.SaveJson``1(``0,System.String,Oculus.Newtonsoft.Json.JsonConverter[])">
+        <member name="M:SMLHelper.V2.Json.ExtensionMethods.JsonExtensions.SaveJson``1(``0,System.String,Newtonsoft.Json.JsonConverter[])">
             <summary>
             Saves the fields and properties of the <paramref name="jsonObject"/> as JSON properties to the file on disk.
             </summary>
             <typeparam name="T">The type of the <paramref name="jsonObject"/>.</typeparam>
             <param name="jsonObject">The object instance to save the fields and properties from.</param>
             <param name="path">The file path at which to save the JSON file.</param>
-            <param name="jsonConverters">The <see cref="T:Oculus.Newtonsoft.Json.JsonConverter"/>s to be used for serialization.</param>
+            <param name="jsonConverters">The <see cref="T:Newtonsoft.Json.JsonConverter"/>s to be used for serialization.</param>
         </member>
         <member name="T:SMLHelper.V2.Json.Interfaces.IJsonFile">
             <summary>
@@ -3789,7 +3971,7 @@
         </member>
         <member name="P:SMLHelper.V2.Json.Interfaces.IJsonFile.AlwaysIncludedJsonConverters">
             <summary>
-            The <see cref="T:Oculus.Newtonsoft.Json.JsonConverter"/>s that should always be used when reading/writing JSON data.
+            The <see cref="T:Newtonsoft.Json.JsonConverter"/>s that should always be used when reading/writing JSON data.
             </summary>
         </member>
         <member name="M:SMLHelper.V2.Json.Interfaces.IJsonFile.Load(System.Boolean)">
@@ -3799,32 +3981,32 @@
             <param name="createFileIfNotExist">Whether a new JSON file should be created with default values if it does not
             already exist.</param>
             <seealso cref="M:SMLHelper.V2.Json.Interfaces.IJsonFile.Save"/>
-            <seealso cref="M:SMLHelper.V2.Json.Interfaces.IJsonFile.LoadWithConverters(System.Boolean,Oculus.Newtonsoft.Json.JsonConverter[])"/>
+            <seealso cref="M:SMLHelper.V2.Json.Interfaces.IJsonFile.LoadWithConverters(System.Boolean,Newtonsoft.Json.JsonConverter[])"/>
         </member>
         <member name="M:SMLHelper.V2.Json.Interfaces.IJsonFile.Save">
             <summary>
             A method for saving the JSON properties to disk.
             </summary>
             <seealso cref="M:SMLHelper.V2.Json.Interfaces.IJsonFile.Load(System.Boolean)"/>
-            <seealso cref="M:SMLHelper.V2.Json.Interfaces.IJsonFile.SaveWithConverters(Oculus.Newtonsoft.Json.JsonConverter[])"/>
+            <seealso cref="M:SMLHelper.V2.Json.Interfaces.IJsonFile.SaveWithConverters(Newtonsoft.Json.JsonConverter[])"/>
         </member>
-        <member name="M:SMLHelper.V2.Json.Interfaces.IJsonFile.LoadWithConverters(System.Boolean,Oculus.Newtonsoft.Json.JsonConverter[])">
+        <member name="M:SMLHelper.V2.Json.Interfaces.IJsonFile.LoadWithConverters(System.Boolean,Newtonsoft.Json.JsonConverter[])">
             <summary>
             A method for loading the JSON properties from disk.
             </summary>
             <param name="createFileIfNotExist">Whether a new JSON file should be created with default values if it does not
             already exist.</param>
-            <param name="jsonConverters">Optional <see cref="T:Oculus.Newtonsoft.Json.JsonConverter"/>s to be used for
+            <param name="jsonConverters">Optional <see cref="T:Newtonsoft.Json.JsonConverter"/>s to be used for
             deserialization.</param>
-            <seealso cref="M:SMLHelper.V2.Json.Interfaces.IJsonFile.SaveWithConverters(Oculus.Newtonsoft.Json.JsonConverter[])"/>
+            <seealso cref="M:SMLHelper.V2.Json.Interfaces.IJsonFile.SaveWithConverters(Newtonsoft.Json.JsonConverter[])"/>
             <seealso cref="M:SMLHelper.V2.Json.Interfaces.IJsonFile.Load(System.Boolean)"/>
         </member>
-        <member name="M:SMLHelper.V2.Json.Interfaces.IJsonFile.SaveWithConverters(Oculus.Newtonsoft.Json.JsonConverter[])">
+        <member name="M:SMLHelper.V2.Json.Interfaces.IJsonFile.SaveWithConverters(Newtonsoft.Json.JsonConverter[])">
             <summary>
             A method for saving the JSON properties to disk.
             </summary>
-            <param name="jsonConverters">Optional <see cref="T:Oculus.Newtonsoft.Json.JsonConverter"/>s to be used for serialization.</param>
-            <seealso cref="M:SMLHelper.V2.Json.Interfaces.IJsonFile.LoadWithConverters(System.Boolean,Oculus.Newtonsoft.Json.JsonConverter[])"/>
+            <param name="jsonConverters">Optional <see cref="T:Newtonsoft.Json.JsonConverter"/>s to be used for serialization.</param>
+            <seealso cref="M:SMLHelper.V2.Json.Interfaces.IJsonFile.LoadWithConverters(System.Boolean,Newtonsoft.Json.JsonConverter[])"/>
             <seealso cref="M:SMLHelper.V2.Json.Interfaces.IJsonFile.Save"/>
         </member>
         <member name="T:SMLHelper.V2.Json.ConfigFile">
@@ -3839,7 +4021,7 @@
         </member>
         <member name="P:SMLHelper.V2.Json.ConfigFile.AlwaysIncludedJsonConverters">
             <summary>
-            The <see cref="T:Oculus.Newtonsoft.Json.JsonConverter"/>s that should always be used when reading/writing JSON data.
+            The <see cref="T:Newtonsoft.Json.JsonConverter"/>s that should always be used when reading/writing JSON data.
             </summary>
             <seealso cref="F:SMLHelper.V2.Json.ConfigFile.alwaysIncludedJsonConverters"/>
         </member>
@@ -3896,33 +4078,33 @@
             <param name="createFileIfNotExist">Whether a new JSON file should be created with default values if it does not
             already exist.</param>
             <seealso cref="M:SMLHelper.V2.Json.ConfigFile.Save"/>
-            <seealso cref="M:SMLHelper.V2.Json.ConfigFile.LoadWithConverters(System.Boolean,Oculus.Newtonsoft.Json.JsonConverter[])"/>
+            <seealso cref="M:SMLHelper.V2.Json.ConfigFile.LoadWithConverters(System.Boolean,Newtonsoft.Json.JsonConverter[])"/>
         </member>
         <member name="M:SMLHelper.V2.Json.ConfigFile.Save">
             <summary>
             Saves the current fields and properties of the <see cref="T:SMLHelper.V2.Json.ConfigFile"/> as JSON properties to the file on disk.
             </summary>
             <seealso cref="M:SMLHelper.V2.Json.ConfigFile.Load(System.Boolean)"/>
-            <seealso cref="M:SMLHelper.V2.Json.ConfigFile.SaveWithConverters(Oculus.Newtonsoft.Json.JsonConverter[])"/>
+            <seealso cref="M:SMLHelper.V2.Json.ConfigFile.SaveWithConverters(Newtonsoft.Json.JsonConverter[])"/>
         </member>
-        <member name="M:SMLHelper.V2.Json.ConfigFile.LoadWithConverters(System.Boolean,Oculus.Newtonsoft.Json.JsonConverter[])">
+        <member name="M:SMLHelper.V2.Json.ConfigFile.LoadWithConverters(System.Boolean,Newtonsoft.Json.JsonConverter[])">
             <summary>
             Loads the JSON properties from the file on disk into the <see cref="T:SMLHelper.V2.Json.ConfigFile"/>.
             </summary>
             <param name="createFileIfNotExist">Whether a new JSON file should be created with default values if it does not
             already exist.</param>
-            <param name="jsonConverters">Optional <see cref="T:Oculus.Newtonsoft.Json.JsonConverter"/>s to be used for serialization.
+            <param name="jsonConverters">Optional <see cref="T:Newtonsoft.Json.JsonConverter"/>s to be used for serialization.
             The <see cref="P:SMLHelper.V2.Json.ConfigFile.AlwaysIncludedJsonConverters"/> will always be used, regardless of whether you pass them.</param>
-            <seealso cref="M:SMLHelper.V2.Json.ConfigFile.SaveWithConverters(Oculus.Newtonsoft.Json.JsonConverter[])"/>
+            <seealso cref="M:SMLHelper.V2.Json.ConfigFile.SaveWithConverters(Newtonsoft.Json.JsonConverter[])"/>
             <seealso cref="M:SMLHelper.V2.Json.ConfigFile.Load(System.Boolean)"/>
         </member>
-        <member name="M:SMLHelper.V2.Json.ConfigFile.SaveWithConverters(Oculus.Newtonsoft.Json.JsonConverter[])">
+        <member name="M:SMLHelper.V2.Json.ConfigFile.SaveWithConverters(Newtonsoft.Json.JsonConverter[])">
             <summary>
             Saves the current fields and properties of the <see cref="T:SMLHelper.V2.Json.ConfigFile"/> as JSON properties to the file on disk.
             </summary>
-            <param name="jsonConverters">Optional <see cref="T:Oculus.Newtonsoft.Json.JsonConverter"/>s to be used for deserialization.
+            <param name="jsonConverters">Optional <see cref="T:Newtonsoft.Json.JsonConverter"/>s to be used for deserialization.
             The <see cref="P:SMLHelper.V2.Json.ConfigFile.AlwaysIncludedJsonConverters"/> will always be used, regardless of whether you pass them.</param>
-            <seealso cref="M:SMLHelper.V2.Json.ConfigFile.LoadWithConverters(System.Boolean,Oculus.Newtonsoft.Json.JsonConverter[])"/>
+            <seealso cref="M:SMLHelper.V2.Json.ConfigFile.LoadWithConverters(System.Boolean,Newtonsoft.Json.JsonConverter[])"/>
             <seealso cref="M:SMLHelper.V2.Json.ConfigFile.Save"/>
         </member>
         <member name="T:SMLHelper.V2.Json.ConfigFileEventArgs">
@@ -4024,6 +4206,11 @@
         <member name="P:SMLHelper.V2.Handler.PrefabHandler">
             <summary>
             A handler for registering Unity prefabs associated to a <see cref="T:TechType"/>.
+            </summary>
+        </member>
+        <member name="P:SMLHelper.V2.Handler.SurvivalHandler">
+            <summary>
+            a handler for common uses to the Survival component
             </summary>
         </member>
         <member name="T:SMLHelper.V2.Initializer">
@@ -4152,6 +4339,210 @@
             <param name="sound">The sound which should be played</param>
             <param name="volumeControl">Which volume control to adjust sound levels by. How loud sound is.</param>
             <returns>The channel on which the sound was created</returns>
+        </member>
+        <member name="T:SMLHelper.V2.Utility.BasicText">
+            <summary>
+            <para>
+            Places a simple text object on the screen and keeps it there until either hidden (or a designated fade-to-black timer has passed). 
+            By default uses the same font/size/color as the "Press Any Button To Begin" message at the beginning of the game, and appears 
+            centered about 1/3 down the screen, but all parameters can be reconfigured.
+            </para>
+            <para>
+            The idea of the defaults is that new modders don't have to bootstrap a bunch of irritating Unity stuff -- don't have to understand
+            what a "Material" is or how to make one, don't have to know to initialize a font, or even a color. Can just start adding text and
+            then can always custom and configure on further revision.
+            </para>
+            </summary>
+            <example>
+            SIMPLE USAGE EXAMPLE:
+            BasicText message = new BasicText();
+            message.ShowMessage("This Message Will Fade In 10 Seconds", 10);
+            
+            COMPLEX USAGE EXAMPLE:
+            BasicText message = new BasicText(TextAnchor.UpperLeft); // Note many other properties could also be set as constructor parameters
+            message.setColor(Color.red); // Set Color
+            message.setSize(20);         // Set Font Size
+            message.setLoc(200, 400);    // Set x/y position (0,0 is center of screen)
+            message.setFontStyle(FontStyle.Bold); // Bold 
+            message.ShowMessage("This message stays on screen until hidden"); // Display message; if fadeout seconds not specified, it just keeps showing
+            ... // other things happen, time goes by
+            message.Hide(); // Hides the message
+            </example>
+        </member>
+        <member name="M:SMLHelper.V2.Utility.BasicText.#ctor">
+            <summary>
+            Creates a new instances of <see cref="T:SMLHelper.V2.Interfaces.IBasicText"/> with all default options.
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Utility.BasicText.#ctor(System.Int32,System.Int32)">
+            <summary>
+            Creates a new instances of <see cref="T:SMLHelper.V2.Interfaces.IBasicText"/> at the specified origin point.
+            </summary>
+            <param name="set_x">The x coordinate to set</param>
+            <param name="set_y">The y coordinate to set</param>
+        </member>
+        <member name="M:SMLHelper.V2.Utility.BasicText.#ctor(UnityEngine.TextAnchor)">
+            <summary>
+            Creates a new instances of <see cref="T:SMLHelper.V2.Interfaces.IBasicText"/> at a specified <see cref="T:UnityEngine.TextAnchor"/>.
+            </summary>
+            <param name="useAlign">The text anchor to align to</param>
+        </member>
+        <member name="M:SMLHelper.V2.Utility.BasicText.#ctor(UnityEngine.Color)">
+            <summary>
+            Creates a new instances of <see cref="T:SMLHelper.V2.Interfaces.IBasicText"/> with a specified <see cref="T:UnityEngine.Color"/>.
+            </summary>
+            <param name="useColor">The text color to use</param>
+        </member>
+        <member name="M:SMLHelper.V2.Utility.BasicText.#ctor(System.Int32)">
+            <summary>
+            Creates a new instances of <see cref="T:SMLHelper.V2.Interfaces.IBasicText"/> with a specified size.
+            </summary>
+            <param name="useSize">The text size to uset</param>
+        </member>
+        <member name="M:SMLHelper.V2.Utility.BasicText.#ctor(System.Int32,UnityEngine.Color)">
+            <summary>
+            Creates a new instances of <see cref="T:SMLHelper.V2.Interfaces.IBasicText"/> with a specified size and <see cref="T:UnityEngine.Color"/>.
+            </summary>
+            <param name="useSize">The text size to use</param>
+            <param name="useColor">The text color to use</param>
+        </member>
+        <member name="M:SMLHelper.V2.Utility.BasicText.#ctor(System.Int32,UnityEngine.TextAnchor)">
+            <summary>
+            Creates a new instances of <see cref="T:SMLHelper.V2.Interfaces.IBasicText"/> with a specified size and <see cref="T:UnityEngine.TextAnchor"/>.
+            </summary>
+            <param name="useSize">The text size to use</param>
+            <param name="useAlign">The text anchor to align to</param>
+        </member>
+        <member name="M:SMLHelper.V2.Utility.BasicText.#ctor(System.Int32,UnityEngine.Color,UnityEngine.TextAnchor)">
+            <summary>
+            Creates a new instances of <see cref="T:SMLHelper.V2.Interfaces.IBasicText"/> with a specified size, <see cref="T:UnityEngine.Color"/>, and <see cref="T:UnityEngine.TextAnchor"/>.
+            </summary>
+            <param name="useSize">The text size to use</param>
+            <param name="useColor">The text color to use</param>
+            <param name="useAlign">The text anchor to align to</param>
+        </member>
+        <member name="M:SMLHelper.V2.Utility.BasicText.#ctor(System.Int32,System.Int32,System.Int32,UnityEngine.Color,UnityEngine.TextAnchor)">
+            <summary>
+            Creates a new instances of <see cref="T:SMLHelper.V2.Interfaces.IBasicText"/> with a specified origin point, size, <see cref="T:UnityEngine.Color"/>, and <see cref="T:UnityEngine.TextAnchor"/>.
+            </summary>
+            <param name="set_x">The x coordinate to set</param>
+            <param name="set_y">The y coordinate to set</param>
+            <param name="useSize">The text size to use</param>
+            <param name="useColor">The text color to use</param>
+            <param name="useAlign">The text anchor to align to</param>
+        </member>
+        <member name="M:SMLHelper.V2.Utility.BasicText.#ctor(System.Int32,System.Int32,System.Int32,UnityEngine.Color)">
+            <summary>
+            Creates a new instances of <see cref="T:SMLHelper.V2.Interfaces.IBasicText"/> with a specified origin point, size, and <see cref="T:UnityEngine.Color"/>.
+            </summary>
+            <param name="set_x">The x coordinate to set</param>
+            <param name="set_y">The y coordinate to set</param>
+            <param name="useSize">The text size to use</param>
+            <param name="useColor">The text color to use</param>
+        </member>
+        <member name="M:SMLHelper.V2.Utility.BasicText.#ctor(System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Creates a new instances of <see cref="T:SMLHelper.V2.Interfaces.IBasicText"/> with a specified origin point and size.
+            </summary>
+            <param name="set_x">The x coordinate to set</param>
+            <param name="set_y">The y coordinate to set</param>
+            <param name="useSize">The text size to use</param>
+        </member>
+        <member name="M:SMLHelper.V2.Utility.BasicText.ShowMessage(System.String)">
+            <summary>
+            Shows our text item, with no schedule fade (i.e. indefinitely)
+            </summary>
+            <param name="s">The text to display</param>
+        </member>
+        <member name="M:SMLHelper.V2.Utility.BasicText.ShowMessage(System.String,System.Single)">
+            <summary>
+            Shows our text item, fading after a specified number of seconds (or stays on indefinitely if 0 seconds)
+            </summary>
+            <param name="s">The text to display</param>
+            <param name="seconds">The duration to hold before fading</param>
+        </member>
+        <member name="M:SMLHelper.V2.Utility.BasicText.Hide">
+            <summary>
+            Hides our text item if it is displaying.
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Utility.BasicText.GetText">
+            <summary>
+            Returns our current text.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SMLHelper.V2.Utility.BasicText.SetLocation(System.Single,System.Single)">
+            <summary>
+            Sets screen display location (position relative to the actual text is determined by the alignment)
+            </summary>
+            <param name="set_x">The x coordinate to set</param>
+            <param name="set_y">The y coordinate to set</param>
+        </member>
+        <member name="M:SMLHelper.V2.Utility.BasicText.SetColor(UnityEngine.Color)">
+            <summary>
+            Sets the text color
+            </summary>
+            <param name="useColor">The text color to use</param>
+        </member>
+        <member name="M:SMLHelper.V2.Utility.BasicText.ClearColor">
+            <summary>
+            Resets to using "cloned" color of Subnautica default.
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Utility.BasicText.SetSize(System.Int32)">
+            <summary>
+            Sets the font size.
+            </summary>
+            <param name="useSize">The text size to use</param>
+        </member>
+        <member name="M:SMLHelper.V2.Utility.BasicText.ClearSize">
+            <summary>
+            Resets to using "cloned" size of Subnautica default.
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Utility.BasicText.SetFont(UnityEngine.Font)">
+            <summary>
+            Sets the font 
+            </summary>
+            <param name="useFont">The font to render the text as.</param>
+        </member>
+        <member name="M:SMLHelper.V2.Utility.BasicText.ClearFont">
+            <summary>
+            Resets to using "cloned" font of Subnautica default.
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Utility.BasicText.SetFontStyle(UnityEngine.FontStyle)">
+            <summary>
+            Sets the font style.
+            </summary>
+            <param name="useStyle">The text font style to use</param>
+        </member>
+        <member name="M:SMLHelper.V2.Utility.BasicText.ClearFontStyle">
+            <summary>
+            Resets to using "cloned" font style of Subnautica default.
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Utility.BasicText.SetAlign(UnityEngine.TextAnchor)">
+            <summary>
+            Sets the text anchor.
+            </summary>
+            <param name="useAlign">The text anchor to align to</param>
+        </member>
+        <member name="M:SMLHelper.V2.Utility.BasicText.ClearAlign">
+            <summary>
+            Resets to using "cloned" font style of Subnautica default
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Utility.BasicText.DoAlignment">
+            <summary>
+            Computes proper transform position based on alignment and size of text.
+            </summary>
+        </member>
+        <member name="M:SMLHelper.V2.Utility.BasicText.InitializeText">
+            <summary>
+            Sets up all of our objects/components, when we are ready to actually display text for the first time.
+            </summary>
         </member>
         <member name="T:SMLHelper.V2.Utility.ExtBannedIdManager">
             <summary>
@@ -4374,7 +4765,7 @@
             A collection of utilities for interacting with JSON files.
             </summary>
         </member>
-        <member name="M:SMLHelper.V2.Utility.JsonUtils.Load``1(System.String,System.Boolean,Oculus.Newtonsoft.Json.JsonConverter[])">
+        <member name="M:SMLHelper.V2.Utility.JsonUtils.Load``1(System.String,System.Boolean,Newtonsoft.Json.JsonConverter[])">
             <summary>
             Create an instance of <typeparamref name="T"/>, populated with data from the JSON file at the given 
             <paramref name="path"/>.
@@ -4383,14 +4774,14 @@
             <param name="path">The path on disk at which the JSON file can be found.</param>
             <param name="createFileIfNotExist">Whether a new JSON file should be created with default values if it does not 
             already exist.</param>
-            <param name="jsonConverters">An array of <see cref="T:Oculus.Newtonsoft.Json.JsonConverter"/>s to be used for deserialization.</param>
+            <param name="jsonConverters">An array of <see cref="T:Newtonsoft.Json.JsonConverter"/>s to be used for deserialization.</param>
             <returns>The <typeparamref name="T"/> instance populated with data from the JSON file at
             <paramref name="path"/>, or default values if it cannot be found or an error is encountered while parsing the
             file.</returns>
-            <seealso cref="M:SMLHelper.V2.Utility.JsonUtils.Load``1(``0,System.String,System.Boolean,Oculus.Newtonsoft.Json.JsonConverter[])"/>
-            <seealso cref="M:SMLHelper.V2.Utility.JsonUtils.Save``1(``0,System.String,Oculus.Newtonsoft.Json.JsonConverter[])"/>
+            <seealso cref="M:SMLHelper.V2.Utility.JsonUtils.Load``1(``0,System.String,System.Boolean,Newtonsoft.Json.JsonConverter[])"/>
+            <seealso cref="M:SMLHelper.V2.Utility.JsonUtils.Save``1(``0,System.String,Newtonsoft.Json.JsonConverter[])"/>
         </member>
-        <member name="M:SMLHelper.V2.Utility.JsonUtils.Load``1(``0,System.String,System.Boolean,Oculus.Newtonsoft.Json.JsonConverter[])">
+        <member name="M:SMLHelper.V2.Utility.JsonUtils.Load``1(``0,System.String,System.Boolean,Newtonsoft.Json.JsonConverter[])">
             <summary>
             Loads data from the JSON file at <paramref name="path"/> into the <paramref name="jsonObject"/>.
             </summary>
@@ -4399,11 +4790,11 @@
             <param name="path">The path on disk at which the JSON file can be found.</param>
             <param name="createFileIfNotExist">Whether a new JSON file should be created with default values if it does not
             already exist.</param>
-            <param name="jsonConverters">An array of <see cref="T:Oculus.Newtonsoft.Json.JsonConverter"/>s to be used for deserialization.</param>
-            <seealso cref="M:SMLHelper.V2.Utility.JsonUtils.Load``1(System.String,System.Boolean,Oculus.Newtonsoft.Json.JsonConverter[])"/>
-            <seealso cref="M:SMLHelper.V2.Utility.JsonUtils.Save``1(``0,System.String,Oculus.Newtonsoft.Json.JsonConverter[])"/>
+            <param name="jsonConverters">An array of <see cref="T:Newtonsoft.Json.JsonConverter"/>s to be used for deserialization.</param>
+            <seealso cref="M:SMLHelper.V2.Utility.JsonUtils.Load``1(System.String,System.Boolean,Newtonsoft.Json.JsonConverter[])"/>
+            <seealso cref="M:SMLHelper.V2.Utility.JsonUtils.Save``1(``0,System.String,Newtonsoft.Json.JsonConverter[])"/>
         </member>
-        <member name="M:SMLHelper.V2.Utility.JsonUtils.Save``1(``0,System.String,Oculus.Newtonsoft.Json.JsonConverter[])">
+        <member name="M:SMLHelper.V2.Utility.JsonUtils.Save``1(``0,System.String,Newtonsoft.Json.JsonConverter[])">
             <summary>
             Saves the <paramref name="jsonObject"/> parsed as JSON data to the JSON file at <paramref name="path"/>,
             creating it if it does not exist.
@@ -4411,9 +4802,9 @@
             <typeparam name="T">The type of <paramref name="jsonObject"/> to parse into JSON data.</typeparam>
             <param name="jsonObject">The <typeparamref name="T"/> instance to parse into JSON data.</param>
             <param name="path">The path on disk at which to store the JSON file.</param>
-            <param name="jsonConverters">An array of <see cref="T:Oculus.Newtonsoft.Json.JsonConverter"/>s to be used for serialization.</param>
-            <seealso cref="M:SMLHelper.V2.Utility.JsonUtils.Load``1(``0,System.String,System.Boolean,Oculus.Newtonsoft.Json.JsonConverter[])"/>
-            <seealso cref="M:SMLHelper.V2.Utility.JsonUtils.Load``1(System.String,System.Boolean,Oculus.Newtonsoft.Json.JsonConverter[])"/>
+            <param name="jsonConverters">An array of <see cref="T:Newtonsoft.Json.JsonConverter"/>s to be used for serialization.</param>
+            <seealso cref="M:SMLHelper.V2.Utility.JsonUtils.Load``1(``0,System.String,System.Boolean,Newtonsoft.Json.JsonConverter[])"/>
+            <seealso cref="M:SMLHelper.V2.Utility.JsonUtils.Load``1(System.String,System.Boolean,Newtonsoft.Json.JsonConverter[])"/>
         </member>
         <member name="T:SMLHelper.V2.Utility.KeyCodeUtils">
             <summary>
@@ -6326,7 +6717,7 @@
         <member name="P:SMLHelper.V2.Options.ModSliderOption.Step">
             <summary>
             The step value of the <see cref="T:SMLHelper.V2.Options.ModSliderOption"/>.
-            Defaults to 0.05f same as default code.
+            Defaults to 0f for compatibility with older mods.
             </summary>
         </member>
         <member name="P:SMLHelper.V2.Options.ModSliderOption.ValueFormat">

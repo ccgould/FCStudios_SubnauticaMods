@@ -445,7 +445,7 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
 
         public void Load(ProtobufSerializer serializer, byte[] savedDataData)
         {
-            _storageContainer.RestoreItems(serializer, savedDataData);
+            _storageContainer.RestoreItemsAsync(serializer, savedDataData);
         }
 
         public bool HasPowerCells()
