@@ -255,7 +255,12 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
             }
 
             BioMaterials = data.BioMaterialsCount;
-            _storageContainer.RestoreItemsAsync(serializer, data.Storage);
+#if SUBNAUTICA_STABLE
+            _storageContainer.RestoreItems(serializer, data.Storage);
+#else
+            StartCoroutine(_storageContainer.RestoreItems(serializer, data.Storage));
+
+#endif
         }
 
         public bool CanPendItem(Pickupable pickupable)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
 using SMLHelper.V2.Assets;
 using SMLHelper.V2.Utility;
@@ -23,7 +24,7 @@ namespace FCS_AlterraHub.Spawnables
         {
             try
             {
-                var prefab = GameObject.Instantiate(Buildables.AlterraHub.OreConsumerPrefab);
+                var prefab = GameObject.Instantiate(AlterraHub.OreConsumerPrefab);
 
                 PrefabIdentifier prefabIdentifier = prefab.AddComponent<PrefabIdentifier>();
                 prefabIdentifier.ClassId = this.ClassID;

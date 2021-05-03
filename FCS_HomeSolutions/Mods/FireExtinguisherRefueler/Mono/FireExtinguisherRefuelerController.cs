@@ -153,10 +153,6 @@ namespace FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Mono
 
         public override void OnProtoDeserialize(ProtobufSerializer serializer)
         {
-        }
-
-        public IEnumerator OnProtoDeserializeAsync(ProtobufSerializer serializer)
-        {
             QuickLogger.Debug("In OnProtoDeserialize");
 
             if (_savedData == null)
@@ -169,9 +165,8 @@ namespace FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Mono
                 Initialize();
             }
 
-            yield return _storage.RestoreItemsAsync(serializer, _savedData.Data);
+            _storage.RestoreItems(serializer, _savedData.Data);
             _isFromSave = true;
-            yield break;
         }
 
         public override void OnConstructedChanged(bool constructed)

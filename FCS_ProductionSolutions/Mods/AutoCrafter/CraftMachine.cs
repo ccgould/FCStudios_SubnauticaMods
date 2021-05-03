@@ -76,9 +76,13 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                 
                 for (int i = 0; i < amount; i++)
                 {
-                    StartCoroutine(AttemptToAddToNetwork(craftingTechType, techType));
+#if SUBNAUTICA_STABLE
+                    AttemptToAddToNetwork(craftingTechType, techType);
+#else
+StartCoroutine(AttemptToAddToNetwork(craftingTechType, techType));
+#endif
                 }
-                
+
                 _startBuffer = MAXTIME;
                 _mono.CraftManager.SpawnItem(_mono.CraftManager.GetCraftingOperation().TechType);
             }
@@ -111,6 +115,23 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
             }
         }
 
+#if SUBNAUTICA_STABLE
+        private void AttemptToAddToNetwork(TechType craftingTechType, TechType techType)
+        {
+            var inventoryItem = craftingTechType.ToInventoryItemLegacy();
+
+            QuickLogger.Debug($"InventoryItemLegacy returned: {Language.main.Get(inventoryItem.item.GetTechType())}");
+
+            var result = BaseManager.AddItemToNetwork(_mono.Manager, inventoryItem, true);
+
+            if (!result)
+            {
+                _mono.ShowMessage($"Failed to add {Language.main.Get(techType)} to storage. Please build a locker, remote storage or add more space to your data storage system. Your item will be added to the autocrafter storage/");
+                _mono.AddItemToStorage(techType);
+                Destroy(inventoryItem.item.gameObject);
+            }
+        }
+#else
         private IEnumerator AttemptToAddToNetwork(TechType craftingTechType, TechType techType)
         {
             TaskResult<InventoryItem> taskResult = new TaskResult<InventoryItem>();
@@ -127,6 +148,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
             }
             yield break;
         }
+#endif
 
         private void GetMissingItems(TechType craftingItemTechType)
         {

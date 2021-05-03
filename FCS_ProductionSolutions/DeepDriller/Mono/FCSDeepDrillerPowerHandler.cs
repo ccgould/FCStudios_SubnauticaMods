@@ -237,11 +237,38 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         {
             return $"Solar panel (sun: {Mathf.RoundToInt(GetRechargeScalar() * 100f)}% charge {Mathf.RoundToInt(_powerBank.SolarPanel.GetCharge())}/{Mathf.RoundToInt(QPatch.Configuration.DDSolarCapacity)})";
         }
-        
+
         /// <summary>
         /// Add power to the battery from another power source
         /// </summary>
         /// <param name="powercell">The powercell  to pull power from</param>
+#if SUBNAUTICA_STABLE
+        internal void ChargeBatteryFromPowercell(Battery powercell)
+        {
+            if (powercell.charge <= 0 || _powerBank.Battery.IsFull())
+            {
+                Inventory.main.Pickup(powercell.gameObject.GetComponent<Pickupable>());
+                return;
+            }
+
+            //Get the amount the battery needs
+            var remainder = MathHelpers.GetRemainder(_powerBank.Battery.GetCharge(), _powerBank.Battery.GetCapacity());
+
+            //Get the minium amount of power from the battery and the power requirements
+            var amount = Mathf.Min(powercell.charge, remainder);
+
+            //Set the new battery value
+            powercell.charge = Mathf.Max(0f, powercell.charge - amount);
+
+            //Add the new battery amount
+            _powerBank.Battery.AddCharge(amount);
+
+            Inventory.main.Pickup(powercell.gameObject.GetComponent<Pickupable>());
+
+            //Notify the drill of the change
+            OnBatteryUpdate?.Invoke(_powerBank.Battery);
+        }
+#else
         internal IEnumerator ChargeBatteryFromPowercell(Battery powercell)
         {
             TaskResult<bool> taskResult = new TaskResult<bool>();
@@ -270,7 +297,8 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             OnBatteryUpdate?.Invoke(_powerBank.Battery);
             yield break;
         }
-        
+#endif
+
         /// <summary>
         /// Checks to see if all the conditions are met for being powered
         /// </summary>
@@ -387,7 +415,11 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
         public bool AddItemToContainer(InventoryItem item)
         {
             var battery = item.item.gameObject.GetComponent<Battery>();
+#if SUBNAUTICA_STABLE
+            ChargeBatteryFromPowercell(battery);
+#else
             StartCoroutine(ChargeBatteryFromPowercell(battery));
+#endif
             return true;
         }
 

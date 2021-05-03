@@ -73,6 +73,39 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             _isSorting = false;
         }
 
+#if SUBNAUTICA_STABLE
+        private IEnumerator SortAnyTargets()
+        {
+            int callsToCanAddItem = 0;
+            const int CanAddItemCallThreshold = 10;
+            foreach (var item in _mono.DeepDrillerContainer.GetItemsWithin())
+            {
+                foreach (FcsDevice target in _storagesList)
+                {
+
+                    for (int i = 0; i < item.Value; i++)
+                    {
+                        callsToCanAddItem++;
+                        if (target.CanBeStored(1, item.Key))
+                        {
+                            SortItem(item.Key, target);
+                            _unsortableItems--;
+                            _sortedItem = true;
+                            yield break;
+                        }
+
+                        if (callsToCanAddItem > CanAddItemCallThreshold)
+                        {
+                            callsToCanAddItem = 0;
+                            goto skip;
+                        }
+                    }
+
+                    skip:;
+                }
+            }
+        }
+#else
         private IEnumerator SortAnyTargets()
         {
             int callsToCanAddItem = 0;
@@ -104,7 +137,15 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
                 }
             }
         }
+#endif
 
+#if SUBNAUTICA_STABLE
+        private void SortItem(TechType techType, FcsDevice target)
+        {
+            _mono.DeepDrillerContainer.OnlyRemoveItemFromContainer(techType);
+            target.AddItemToContainer(techType.ToInventoryItemLegacy());
+        }
+#else
         private IEnumerator SortItem(TechType techType, FcsDevice target)
         {
             _mono.DeepDrillerContainer.OnlyRemoveItemFromContainer(techType);
@@ -114,6 +155,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             target.AddItemToContainer(result.Get());
             yield break;
         }
+#endif
 
         private void FindAlterraStorage()
         {

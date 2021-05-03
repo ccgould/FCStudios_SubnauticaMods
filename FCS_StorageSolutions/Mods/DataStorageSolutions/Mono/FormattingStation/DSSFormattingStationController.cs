@@ -150,7 +150,11 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.FormattingStation
 
             Initialize();
 
-            _storageManager.RestoreItemsAsync(serializer, _saveData.Bytes);
+#if SUBNAUTICA_STABLE
+            _storageManager.RestoreItems(serializer, _saveData.Bytes);
+#else
+            StartCoroutine(_storageManager.RestoreItemsAsync(serializer, _saveData.Bytes));
+#endif
         }
 
         public void Save(SaveData newSaveData, ProtobufSerializer serializer = null)

@@ -379,7 +379,11 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
                 _trackedItems.Add(techType, 1);
             }
 
+#if SUBNAUTICA_STABLE
+            ItemsContainer.UnsafeAdd(techType.ToInventoryItemLegacy());
+#else
             StartCoroutine(AsyncExtensions.AddToContainerAsync(techType,ItemsContainer));
+#endif
         }
     }
 }

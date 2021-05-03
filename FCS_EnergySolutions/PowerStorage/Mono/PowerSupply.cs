@@ -1,7 +1,4 @@
 ﻿using FCS_EnergySolutions.PowerStorage.Enums;
-using FCSCommon.Utilities;
-using SMLHelper.V2.Json.ExtensionMethods;
-using Steamworks;
 using UnityEngine;
 
 namespace FCS_EnergySolutions.PowerStorage.Mono

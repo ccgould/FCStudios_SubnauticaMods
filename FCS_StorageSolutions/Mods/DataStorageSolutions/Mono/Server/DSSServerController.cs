@@ -165,7 +165,11 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
             {
                 QuickLogger.Debug($"De-Serializing Server: {GetPrefabID()}");
                 _currentBase = _savedData.CurrentBase;
-                _storageContainer.RestoreItemsAsync(_serializer, _savedData.Data);
+#if SUBNAUTICA_STABLE
+                _storageContainer.RestoreItems(serializer, _savedData.Data);
+#else
+            StartCoroutine(_storageContainer.RestoreItemsAsync(serializer, _savedData.Data));
+#endif
                 if (_savedData.ServerFilters != null)
                 {
                     _filteringSettings = _savedData.ServerFilters;

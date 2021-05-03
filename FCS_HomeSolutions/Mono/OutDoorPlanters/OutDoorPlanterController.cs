@@ -48,7 +48,11 @@ namespace FCS_HomeSolutions.Mono.OutDoorPlanters
                     _colorManager.ChangeColor(_savedData.Fcs.Vector4ToColor());
                     _colorManager.ChangeColor(_savedData.Secondary.Vector4ToColor(), ColorTargetMode.Secondary);
                     _colorManager.ChangeColor(_savedData.Lum.Vector4ToColor(), ColorTargetMode.Emission);
-                    StartCoroutine(LoadStorage());
+#if SUBNAUTICA_STABLE
+                    LoadStorage();
+#else
+StartCoroutine(LoadStorage());
+#endif
                 }
 
                 _runStartUpOnEnable = false;
@@ -144,6 +148,36 @@ namespace FCS_HomeSolutions.Mono.OutDoorPlanters
             _isFromSave = true;
         }
 
+#if SUBNAUTICA_STABLE
+        private void LoadStorage()
+        {
+            GetContainer();
+
+            ResetInventory();
+
+            if (_savedData.Bytes != null)
+            {
+                if (_storageContainer.container == null)
+                {
+                    QuickLogger.DebugError("Storage Container is null");
+                }
+                else
+                {
+                    StorageHelper.RestoreItems(_serializer, _savedData.Bytes, _storageContainer.container);
+                    if (_savedData.PlantAges != null)
+                    {
+                        foreach (PlantData data in _savedData.PlantAges)
+                        {
+                            var slot = _planter.GetSlotByID(data.Slot);
+                            slot.plantable.plantAge = data.Age;
+                        }
+
+                    }
+                    QuickLogger.Debug("Loaded Storage Data", true);
+                }
+            }
+        }
+#else
         private IEnumerator LoadStorage()
         {
             GetContainer();
@@ -173,6 +207,7 @@ namespace FCS_HomeSolutions.Mono.OutDoorPlanters
             }
             yield break;
         }
+#endif
 
         public byte[] GetStorageBytes(ProtobufSerializer serializer)
         {

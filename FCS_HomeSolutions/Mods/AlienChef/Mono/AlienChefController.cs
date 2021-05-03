@@ -126,8 +126,13 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
             {
                 Initialize();
             }
+            
+#if SUBNAUTICA_STABLE
+            StorageSystem.RestoreItems(serializer, _saveData.Bytes);
+#else
+            StartCoroutine(StorageSystem.RestoreItemsync(serializer, _saveData.Bytes));
 
-            StorageSystem.RestoreItemsAsync(serializer, _saveData.Bytes);
+#endif
 
             _fromSave = true;
         }

@@ -261,7 +261,11 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
 
         public void RestoreItems(ProtobufSerializer serializer,byte[] data)
         {
-            _storage.RestoreItemsAsync(serializer,data);
+#if SUBNAUTICA_STABLE
+            _storage.RestoreItems(serializer, data);
+#else
+            StartCoroutine(_storageContainer.RestoreItemsAsync(_serializer, _savedData.Data));
+#endif
         }
 
         public int GetStorageAmount()

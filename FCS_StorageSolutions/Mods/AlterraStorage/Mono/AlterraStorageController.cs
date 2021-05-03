@@ -290,7 +290,11 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
             {
                 Initialize();
             }
-            _storageContainer.RestoreItemsAsync(_serializer, _savedData.Data);
+#if SUBNAUTICA_STABLE
+            _storageContainer.RestoreItems(_serializer, _savedData.Data);
+#else
+            StartCoroutine(_storageContainer.RestoreItemsAsync(_serializer, _savedData.Data));
+#endif
             _isFromSave = true;
         }
 

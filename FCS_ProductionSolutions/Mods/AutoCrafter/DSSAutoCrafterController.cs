@@ -196,14 +196,32 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
             {
                 for (int i = _storedItems.Count - 1; i >= 0; i--)
                 {
-                    
+#if SUBNAUTICA_STABLE
+                    AttemptToAddToNetwork(_storedItems[i]);
+#else
                     StartCoroutine(AttemptToAddToNetwork(_storedItems[i]));
+#endif
                 }
 
                 _transferTimer = 0f;
             }
         }
 
+#if SUBNAUTICA_STABLE
+        private void AttemptToAddToNetwork(TechType techType)
+        {
+            var inventoryItem = techType.ToInventoryItemLegacy();
+            var result = BaseManager.AddItemToNetwork(Manager, inventoryItem, true);
+            if (result)
+            {
+                _storedItems.Remove(techType);
+            }
+            else
+            {
+                Destroy(inventoryItem.item.gameObject);
+            }
+        }
+#else
         private IEnumerator AttemptToAddToNetwork(TechType techType)
         {
             TaskResult<InventoryItem> taskResult = new TaskResult<InventoryItem>();
@@ -220,6 +238,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
             }
             yield break;
         }
+#endif
 
         private void MoveBeltMaterial()
         {

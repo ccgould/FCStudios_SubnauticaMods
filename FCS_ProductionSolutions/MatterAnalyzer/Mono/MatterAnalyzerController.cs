@@ -104,7 +104,11 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
                     _isLandPlant = _savedData.IsLandPlant;
                     _currentTechType = _savedData.CurrentTechType;
                     MotorHandler.SpeedByPass(_savedData.RPM);
+#if SUBNAUTICA_STABLE
+                    SetSeed(_savedData.CurrentTechType);
+#else
                     StartCoroutine(SetSeed(_savedData.CurrentTechType));
+#endif
                     if (_scanTime > 0)
                     {
                         _isScanning = true;
@@ -255,6 +259,12 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
             IsInitialized = true;
         }
 
+#if SUBNAUTICA_STABLE
+        private void SetSeed(TechType techType)
+        {
+            Seed = techType.ToInventoryItemLegacy()?.item?.gameObject.GetComponentInChildren<Plantable>();
+        }
+#else
         private IEnumerator SetSeed(TechType techType)
         {
             TaskResult<InventoryItem> taskResult = new TaskResult<InventoryItem>();
@@ -263,6 +273,7 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
             Seed = inventoryItem?.item?.gameObject.GetComponentInChildren<Plantable>();
             yield break;
         }
+#endif
 
         private void OnIpcMessage(string message)
         {
