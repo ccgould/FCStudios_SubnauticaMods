@@ -1,9 +1,15 @@
-﻿using Oculus.Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections;
 using System.IO;
 using FCSCommon.Converters;
 using UnityEngine;
+#if SUBNAUTICA_STABLE
+using Oculus.Newtonsoft.Json;
+using ErrorEventArgs = Oculus.Newtonsoft.Json.Serialization.ErrorEventArgs;
+#else
+using Newtonsoft.Json;
+using ErrorEventArgs = Newtonsoft.Json.Serialization.ErrorEventArgs;
+#endif
 
 namespace FCSCommon.Utilities
 {
@@ -35,7 +41,7 @@ namespace FCSCommon.Utilities
             }
         }
 
-        private static void HandleDeserializationError(object sender, Oculus.Newtonsoft.Json.Serialization.ErrorEventArgs errorArgs)
+        private static void HandleDeserializationError(object sender, ErrorEventArgs errorArgs)
         {
             var currentError = errorArgs.ErrorContext.Error.Message;
             errorArgs.ErrorContext.Handled = true;

@@ -407,6 +407,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
 
         internal void ExitStore()
         {
+            if(_cameraParent == null) return;
             _isInUse = false;
             SNCameraRoot.main.gameObject.transform.SetParent(_cameraParent?.transform, false);
             SNCameraRoot.main.transform.localPosition = Vector3.zero;

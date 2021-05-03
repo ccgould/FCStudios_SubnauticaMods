@@ -471,7 +471,11 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
                 uGUI.main.quickSlots.SetTarget(vehicle);
             }
 
+#if SUBNAUTICA_STABLE
+            MainGameController.Instance.PerformGarbageAndAssetCollection();
+#else
             MainGameController.Instance.PerformIncrementalGarbageCollection();
+#endif
             if (HandReticle.main != null)
             {
                 HandReticle.main.UnrequestCrosshairHide();

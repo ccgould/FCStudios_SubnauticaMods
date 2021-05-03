@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -24,6 +25,7 @@ namespace FCS_EnergySolutions.Spawnables
             };
         }
 
+#if SUBNAUTICA_STABLE
         public override GameObject GetGameObject()
         {
             GameObject prefab = CraftData.GetPrefabForTechType(TechType.PrecursorIonPowerCell);
@@ -38,31 +40,26 @@ namespace FCS_EnergySolutions.Spawnables
             skyApplier.renderers = obj.GetComponentsInChildren<Renderer>(true);
             skyApplier.anchorSky = Skies.Auto;
 
-            //if (CustomModelData != null)
-            //{
-            //    foreach (Renderer renderer in obj.GetComponentsInChildren<Renderer>(true))
-            //    {
-            //        if (CustomModelData.CustomTexture != null)
-            //            renderer.material.SetTexture(ShaderPropertyID._MainTex, this.CustomModelData.CustomTexture);
-
-            //        if (CustomModelData.CustomNormalMap != null)
-            //            renderer.material.SetTexture(ShaderPropertyID._BumpMap, this.CustomModelData.CustomNormalMap);
-
-            //        if (CustomModelData.CustomSpecMap != null)
-            //            renderer.material.SetTexture(ShaderPropertyID._SpecTex, this.CustomModelData.CustomSpecMap);
-
-            //        if (CustomModelData.CustomIllumMap != null)
-            //        {
-            //            renderer.material.SetTexture(ShaderPropertyID._Illum, this.CustomModelData.CustomIllumMap);
-            //            renderer.material.SetFloat(ShaderPropertyID._GlowStrength, this.CustomModelData.CustomIllumStrength);
-            //            renderer.material.SetFloat(ShaderPropertyID._GlowStrengthNight, this.CustomModelData.CustomIllumStrength);
-            //        }
-            //    }
-            //}
-
-            //this.EnhanceGameObject?.Invoke(obj);
-
             return obj;
         }
+#else
+        public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
+        {
+            var taskResult = CraftData.GetPrefabForTechTypeAsync(TechType.PrecursorIonPowerCell);
+            yield return taskResult;
+            var obj = GameObject.Instantiate(taskResult.GetResult());
+
+            Battery battery = obj.GetComponent<Battery>();
+            battery._capacity = 3000;
+            battery.name = $"PowerStorageCell";
+            battery._charge = 0f;
+
+            SkyApplier skyApplier = obj.EnsureComponent<SkyApplier>();
+            skyApplier.renderers = obj.GetComponentsInChildren<Renderer>(true);
+            skyApplier.anchorSky = Skies.Auto;
+
+            gameObject.Set(obj);
+        }
+#endif
     }
 }

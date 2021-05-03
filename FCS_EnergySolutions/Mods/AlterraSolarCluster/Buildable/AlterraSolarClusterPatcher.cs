@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using FCS_AlterraHub.Enumerators;
@@ -38,7 +39,8 @@ namespace FCS_EnergySolutions.AlterraSolarCluster.Buildables
             };
         }
 
-        public override GameObject GetGameObject()
+#if SUBNAUTICA_STABLE
+ public override GameObject GetGameObject()
         {
             try
             {
@@ -117,6 +119,83 @@ namespace FCS_EnergySolutions.AlterraSolarCluster.Buildables
 
             return null;
         }
+#else
+        public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
+        {
+                var prefab = GameObject.Instantiate(_prefab);
+
+                //Scale the object
+                prefab.transform.localScale += new Vector3(0.24f, 0.24f, 0.24f);
+
+                var size = new Vector3(8.08f, 7.540555f, 8.08f);
+                var center = new Vector3(0f, 4.026321f, 0f);
+
+                GameObjectHelpers.AddConstructableBounds(prefab, size, center);
+
+                var model = prefab.FindChild("model");
+
+                //========== Allows the building animation and material colors ==========// 
+                Shader shader = Shader.Find("MarmosetUBER");
+                Renderer[] renderers = prefab.GetComponentsInChildren<Renderer>();
+                SkyApplier skyApplier = prefab.EnsureComponent<SkyApplier>();
+                skyApplier.renderers = renderers;
+                skyApplier.anchorSky = Skies.Auto;
+                //========== Allows the building animation and material colors ==========// 
+
+                // Add large world entity ALLOWS YOU TO SAVE ON TERRAIN
+                var lwe = prefab.AddComponent<LargeWorldEntity>();
+                lwe.cellLevel = LargeWorldEntity.CellLevel.Far;
+
+                // Add constructible
+                var constructable = prefab.AddComponent<Constructable>();
+
+                constructable.allowedOutside = true;
+                constructable.allowedInBase = false;
+                constructable.allowedOnGround = true;
+                constructable.allowedOnWall = false;
+                constructable.rotationEnabled = true;
+                constructable.allowedOnCeiling = false;
+                constructable.allowedInSub = false;
+                constructable.allowedOnConstructables = false;
+                constructable.model = model;
+                constructable.placeDefaultDistance = 5;
+                constructable.placeMinDistance = 5;
+                constructable.placeMaxDistance = 10;
+                constructable.techType = TechType;
+
+                PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
+                prefabID.ClassId = ClassID;
+
+                var taskResult = CraftData.GetPrefabForTechTypeAsync(TechType.SolarPanel);
+                yield return taskResult;
+
+                PowerRelay solarPowerRelay = taskResult.GetResult().GetComponent<PowerRelay>();
+
+            var ps = prefab.AddComponent<PowerSource>();
+                ps.maxPower = 2975f;
+
+                var pFX = prefab.AddComponent<PowerFX>();
+                pFX.vfxPrefab = solarPowerRelay.powerFX.vfxPrefab;
+                pFX.attachPoint = prefab.transform;
+
+                var pr = prefab.AddComponent<PowerRelay>();
+                pr.powerFX = pFX;
+                pr.maxOutboundDistance = 15;
+                pr.internalPowerSource = ps;
+
+                prefab.AddComponent<TechTag>().type = TechType;
+                prefab.AddComponent<AlterraSolarClusterController>();
+
+
+                Resources.UnloadAsset(solarPowerRelay);
+
+                //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
+                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModName);
+                gameObject.Set(prefab);
+                yield break;
+        }
+#endif
+
 
 #if SUBNAUTICA
         protected override TechData GetBlueprintRecipe()

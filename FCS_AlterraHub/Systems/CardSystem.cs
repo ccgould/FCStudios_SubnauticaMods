@@ -8,12 +8,13 @@ using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
-using FCSCommon.Extensions;
 using FCSCommon.Utilities;
-using Oculus.Newtonsoft.Json;
-using Sentry;
-using UnityEngine;
 using Random = System.Random;
+#if SUBNAUTICA_STABLE
+using Oculus.Newtonsoft.Json;
+#else
+using Newtonsoft.Json;
+#endif
 
 
 namespace FCS_AlterraHub.Systems

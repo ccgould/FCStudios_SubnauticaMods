@@ -218,10 +218,17 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
             return _powerCharger.Save(serializer);
         }
 
+#if SUBNAUTICA_STABLE
         public void Load(ProtobufSerializer serializer, byte[] savedDataData)
         {
             _powerCharger.Load(serializer, savedDataData);
         }
+#else
+        public void Load(ProtobufSerializer serializer, byte[] savedDataData)
+        {
+            StartCoroutine(_powerCharger.Load(serializer, savedDataData));
+        }
+#endif
 
         public bool HasPowercells()
         {

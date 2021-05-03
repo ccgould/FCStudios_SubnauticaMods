@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using SMLHelper.V2.Handlers;
+﻿using SMLHelper.V2.Handlers;
 using UnityEngine;
 using UWE;
 
@@ -54,9 +53,19 @@ namespace FCSCommon.Extensions
             return item;
         }
 
-        internal static IEnumerable ToInventoryItemLegacyAsync(TechType techType, IOut<InventoryItem> result)
+#if SUBNAUTICA_STABLE
+        internal static InventoryItem ToInventoryItemLegacy(this TechType techType)
         {
-           var prefabForTechType = CraftData.GetPrefabForTechTypeAsync(techType, false);
+            GameObject prefabForTechType = CraftData.GetPrefabForTechType(techType, false);
+            GameObject gameObject = (prefabForTechType != null) ? Utils.SpawnFromPrefab(prefabForTechType, null) : Utils.CreateGenericLoot(techType);
+            gameObject.transform.position = gameObject.transform.position;
+            var pickupable = gameObject.GetComponent<Pickupable>();
+            return new InventoryItem(pickupable.Pickup(false));
+        }
+#else
+        internal static IEnumerable ToInventoryItemLegacy(TechType techType, IOut<InventoryItem> result)
+        {
+            var prefabForTechType = CraftData.GetPrefabForTechTypeAsync(techType, false);
             yield return prefabForTechType;
 
             var prefabResult = prefabForTechType.GetResult();
@@ -70,6 +79,7 @@ namespace FCSCommon.Extensions
             result.Set(new InventoryItem(pickupResult.Get()));
             yield break;
         }
+#endif
 
         internal static InventoryItem ToInventoryItem(this Pickupable pickupable)
         {
@@ -82,6 +92,9 @@ namespace FCSCommon.Extensions
             return item;
         }
 
+#if SUBNAUTICA_STABLE
+
+#else
         internal static IEnumerator AddToContainerAsync(TechType techType, ItemsContainer container)
         {
             TaskResult<InventoryItem> taskResult = new TaskResult<InventoryItem>();
@@ -89,6 +102,7 @@ namespace FCSCommon.Extensions
             container.UnsafeAdd(taskResult.Get());
             yield break;
         }
+#endif
 
 #elif BELOWZERO
         internal static Pickupable ToPickupable(this TechType techType)

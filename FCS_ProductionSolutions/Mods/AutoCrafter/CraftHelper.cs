@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using FCSCommon.Utilities;
 using QModManager.API;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
@@ -73,11 +72,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
 
         internal static RecipeData GetData(TechType techType)
         {
-#if SUBNAUTICA
             return CraftDataHandler.GetTechData(techType);
-#elif BELOWZERO
-            return CraftDataHandler.GetRecipeData(techType);
-#endif
         }
     }
 }

@@ -5,9 +5,12 @@ using FCS_AlterraHub.Mono.AlterraHub;
 using FCS_AlterraHub.Objects;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Interfaces;
-using Oculus.Newtonsoft.Json;
 using UnityEngine;
-
+#if SUBNAUTICA_STABLE
+using Oculus.Newtonsoft.Json;
+#else
+using Newtonsoft.Json;
+#endif
 namespace FCS_AlterraHub.Configuration
 {
     [Serializable]

@@ -38,7 +38,33 @@ namespace FCS_AlterraHub.Mono
             return _storageRootBytes;
         }
 
-        public IEnumerator RestoreItemsAsync(ProtobufSerializer serializer, byte[] serialData)
+#if SUBNAUTICA_STABLE
+        public void RestoreItems(ProtobufSerializer serializer, byte[] serialData)
+        {
+            QuickLogger.Debug("RestoreItems");
+            StorageHelper.RenewIdentifier(_storageRoot);
+            QuickLogger.Debug("RenewIdentifier Called");
+            if (serialData == null)
+            {
+                return;
+            }
+
+            QuickLogger.Debug($"Storage root Position: {_storageRoot.transform.position}");
+
+            using (MemoryStream memoryStream = new MemoryStream(serialData))
+            {
+                QuickLogger.Debug("Getting Data from memory stream");
+                GameObject gObj = serializer.DeserializeObjectTree(memoryStream, 0);
+                QuickLogger.Debug($"De-serialized Object Stream. {gObj} | {gObj.name}");
+                TransferItems(gObj);
+                QuickLogger.Debug("Items Transferred");
+                QuickLogger.Debug($"Object location: {gObj.transform.position}");
+                GameObject.Destroy(gObj);
+                QuickLogger.Debug("Item destroyed");
+            }
+        }
+#else
+public IEnumerator RestoreItems(ProtobufSerializer serializer, byte[] serialData)
         {
             QuickLogger.Debug("RestoreItems");
             StorageHelper.RenewIdentifier(_storageRoot);
@@ -60,11 +86,12 @@ namespace FCS_AlterraHub.Mono
                 TransferItems(gObj);
                 QuickLogger.Debug("Items Transferred");
                 QuickLogger.Debug($"Object location: {gObj.transform.position}");
-                GameObject.Destroy(gObj);
+                Destroy(gObj);
                 QuickLogger.Debug("Item destroyed");
             }
             yield break;
         }
+#endif
 
         private void TransferItems(GameObject source)
         {

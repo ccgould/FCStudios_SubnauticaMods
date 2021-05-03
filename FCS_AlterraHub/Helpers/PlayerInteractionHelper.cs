@@ -15,7 +15,28 @@ namespace FCS_AlterraHub.Helpers
             }
             return false;
         }
-        
+
+#if SUBNAUTICA_STABLE
+        public static void GivePlayerItem(InventoryItem inventoryItem)
+        {
+            if (inventoryItem == null) return;
+
+            if (Player.main.HasInventoryRoom(inventoryItem.item))
+            {
+                Inventory.main.Pickup(inventoryItem.item);
+            }
+        }
+
+        public static void GivePlayerItem(Pickupable pickupable)
+        {
+            if (pickupable == null) return;
+
+            if (Player.main.HasInventoryRoom(pickupable))
+            {
+                Inventory.main.Pickup(pickupable);
+            }
+        }
+#else
         public static void GivePlayerItem(InventoryItem inventoryItem)
         {
             if (inventoryItem == null) return;
@@ -37,6 +58,7 @@ namespace FCS_AlterraHub.Helpers
                 CoroutineHost.StartCoroutine(Inventory.main.PickupAsync(pickupable, pickupResult));
             }
         }
+#endif
 
         public static bool HasCard()
         {

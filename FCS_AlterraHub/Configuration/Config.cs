@@ -3,12 +3,16 @@ using System.Collections.Generic;
 using FCS_AlterraHub.Patches;
 using FCS_AlterraHub.Structs;
 using FCSCommon.Utilities;
-using Oculus.Newtonsoft.Json;
 using SMLHelper.V2.Json;
 using SMLHelper.V2.Options;
 using SMLHelper.V2.Options.Attributes;
 using UnityEngine;
 using UnityEngine.Events;
+#if SUBNAUTICA_STABLE
+using Oculus.Newtonsoft.Json;
+#else
+using Newtonsoft.Json;
+#endif
 
 namespace FCS_AlterraHub.Configuration
 {

@@ -9,7 +9,11 @@ using FCS_ProductionSolutions.DeepDriller.Structs;
 using FCS_ProductionSolutions.HydroponicHarvester.Enumerators;
 using FCS_ProductionSolutions.HydroponicHarvester.Mono;
 using FCS_ProductionSolutions.Mods.AutoCrafter;
+#if SUBNAUTICA_STABLE
 using Oculus.Newtonsoft.Json;
+#else
+using Newtonsoft.Json;
+#endif
 
 namespace FCS_ProductionSolutions.Configuration
 {

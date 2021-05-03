@@ -137,6 +137,11 @@ namespace FCS_EnergySolutions.JetStreamT242.Mono
             }
         }
 
+        private void OnProtoSerializeAsync(ProtobufSerializer serializer)
+        {
+            QuickLogger.Debug("Apparently I am working muhahahaha",true);
+        }
+
         public override void OnProtoDeserialize(ProtobufSerializer serializer)
         {
             QuickLogger.Debug("In OnProtoDeserialize");

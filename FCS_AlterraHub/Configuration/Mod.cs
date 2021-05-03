@@ -12,12 +12,15 @@ using FCS_AlterraHub.Spawnables;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
 using FMOD;
-using Oculus.Newtonsoft.Json;
 using QModManager.API;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Utility;
 using UnityEngine;
-using Object = System.Object;
+#if SUBNAUTICA_STABLE
+using Oculus.Newtonsoft.Json;
+#else
+using Newtonsoft.Json;
+#endif
 
 
 namespace FCS_AlterraHub.Configuration

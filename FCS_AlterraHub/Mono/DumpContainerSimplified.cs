@@ -96,6 +96,32 @@ namespace FCS_AlterraHub.Mono
             return StorageHelper.Save(serializer, _containerRoot.gameObject);
         }
 
+#if SUBNAUTICA_STABLE
+        public void RestoreItems(ProtobufSerializer serializer, byte[] serialData, bool runPDACloseWhenDone = false)
+        {
+            StorageHelper.RenewIdentifier(_containerRoot.gameObject);
+            if (serialData == null)
+            {
+                return;
+            }
+            using (MemoryStream memoryStream = new MemoryStream(serialData))
+            {
+                QuickLogger.Debug("Getting Data from memory stream");
+                GameObject gObj = serializer.DeserializeObjectTree(memoryStream, 0);
+                QuickLogger.Debug($"Deserialized Object Stream. {gObj}");
+                StorageHelper.TransferItems(gObj, _dumpContainer);
+                Destroy(gObj);
+            }
+
+            CleanUpDuplicatedStorageNoneRoutine();
+
+            if (runPDACloseWhenDone)
+            {
+                OnDumpClose(null);
+            }
+
+        }
+#else
         public IEnumerator RestoreItems(ProtobufSerializer serializer, byte[] serialData,bool runPDACloseWhenDone = false)
         {
             StorageHelper.RenewIdentifier(_containerRoot.gameObject);
@@ -122,6 +148,7 @@ namespace FCS_AlterraHub.Mono
             }
             yield break;
         }
+#endif
 
         private void CleanUpDuplicatedStorageNoneRoutine()
         {

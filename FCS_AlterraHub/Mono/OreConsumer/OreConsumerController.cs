@@ -71,7 +71,6 @@ namespace FCS_AlterraHub.Mono.OreConsumer
 
         private float _timeLeft;
         private bool _isBreakerTripped;
-        private GameObject _canvas;
         private const int MAXITEMLIMIT = 10;
 
         public override float GetPowerUsage()
@@ -94,22 +93,24 @@ namespace FCS_AlterraHub.Mono.OreConsumer
 
         private void UpdateAnimation()
         {
+            if (!IsConstructed && !IsInitialized) return;
             if (_oreQueue != null && _oreQueue.Count > 0 && (Manager.GetPowerState() == PowerSystem.Status.Normal || Manager.GetPowerState() == PowerSystem.Status.Emergency) && !_isBreakerTripped)
             {
                 MotorHandler.StartMotor();
                 EffectsManager.ShowEffect();
-                AudioManager.PlayMachineAudio();
+                AudioManager?.PlayMachineAudio();
             }
             else
             {
                 MotorHandler.StopMotor();
                 EffectsManager.HideEffect();
-                AudioManager.StopMachineAudio();
+                AudioManager?.StopMachineAudio();
             }
         }
 
         private void Update()
         {
+            if(!IsConstructed && !IsInitialized) return;
             if (IsOperational && _oreQueue.Count > 0)
             {
                 _timeLeft -= DayNightCycle.main.deltaTime;
@@ -169,17 +170,15 @@ namespace FCS_AlterraHub.Mono.OreConsumer
         {
             if (IsInitialized) return;
 
-            _canvas = gameObject.GetComponentInChildren<Canvas>()?.gameObject;
-
             if (_oreQueue == null)
             {
-               _oreQueue = new Queue<TechType>();
+                _oreQueue = new Queue<TechType>();
             }
 
             if (DumpContainer == null)
             {
                 DumpContainer = gameObject.AddComponent<DumpContainer>();
-                DumpContainer.Initialize(transform,Buildables.AlterraHub.OreConsumerReceptacle(),this,2,5);
+                DumpContainer.Initialize(transform, Buildables.AlterraHub.OreConsumerReceptacle(), this, 2, 5);
             }
 
             if (TransferHandler == null)
@@ -188,7 +187,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
                 TransferHandler.Initialize();
             }
 
-            if(DisplayManager == null)
+            if (DisplayManager == null)
             {
                 DisplayManager = gameObject.AddComponent<OreConsumerDisplay>();
                 DisplayManager.Setup(this);
@@ -211,7 +210,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
                 EffectsManager.Initialize(IsUnderWater());
             }
 
-            if(AudioManager == null)
+            if (AudioManager == null)
             {
                 AudioManager = new AudioManager(gameObject.EnsureComponent<FMOD_CustomLoopingEmitter>());
                 AudioManager.PlayMachineAudio();
@@ -221,7 +220,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
 
             OnUpdateSound += value =>
             {
-                if(value)
+                if (value)
                 {
                     AudioManager.PlayMachineAudio();
                 }
@@ -237,8 +236,6 @@ namespace FCS_AlterraHub.Mono.OreConsumer
                 _colorManager.Initialize(gameObject, Buildables.AlterraHub.BodyMaterial);
             }
 
-
-
             CardSystem.main.onBalanceUpdated += () =>
             {
                 DisplayManager?.onTotalChanged?.Invoke(CardSystem.main.GetAccountBalance());
@@ -247,7 +244,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
             DisplayManager?.onTotalChanged?.Invoke(CardSystem.main.GetAccountBalance());
 
 #if DEBUG
-            QuickLogger.Debug($"Initialized Ore Consumer {GetPrefabID()}");
+                        QuickLogger.Debug($"Initialized Ore Consumer {GetPrefabID()}");
 #endif
             IsInitialized = true;
         }

@@ -6,8 +6,12 @@ using FCS_AlterraHub.Objects;
 using FCS_HomeSolutions.Mono.OutDoorPlanters;
 using FCS_HomeSolutions.QuantumTeleporter.Enumerators;
 using FCS_HomeSolutions.TrashRecycler.Model;
-using Oculus.Newtonsoft.Json;
 using UnityEngine;
+#if SUBNAUTICA_STABLE
+using Oculus.Newtonsoft.Json;
+#else
+using Newtonsoft.Json;
+#endif
 
 namespace FCS_HomeSolutions.Configuration
 {

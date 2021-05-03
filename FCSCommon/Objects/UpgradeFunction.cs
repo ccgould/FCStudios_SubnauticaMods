@@ -3,7 +3,11 @@ using FCS_AlterraHub.Mono;
 using FCSCommon.Abstract;
 using FCSCommon.Enums;
 using FCSCommon.Utilities;
+#if SUBNAUTICA_STABLE
 using Oculus.Newtonsoft.Json;
+#else
+using Newtonsoft.Json;
+#endif
 using UnityEngine.UI;
 
 namespace FCSCommon.Objects

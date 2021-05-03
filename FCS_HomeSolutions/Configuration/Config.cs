@@ -5,11 +5,15 @@ using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Objects;
 using FCSCommon.Utilities;
-using Oculus.Newtonsoft.Json;
 using SMLHelper.V2.Json;
 using SMLHelper.V2.Options;
 using SMLHelper.V2.Options.Attributes;
 using UnityEngine;
+#if SUBNAUTICA_STABLE
+using Oculus.Newtonsoft.Json;
+#else
+using Newtonsoft.Json;
+#endif
 
 namespace FCS_HomeSolutions.Configuration
 {

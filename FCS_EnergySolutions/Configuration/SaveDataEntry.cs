@@ -7,7 +7,11 @@ using FCS_EnergySolutions.Mods.TelepowerPylon.Mono;
 using FCS_EnergySolutions.PowerStorage.Enums;
 using FCS_EnergySolutions.PowerStorage.Mono;
 using FCSCommon.Interfaces;
+#if SUBNAUTICA_STABLE
 using Oculus.Newtonsoft.Json;
+#else
+using Newtonsoft.Json;
+#endif
 
 namespace FCS_EnergySolutions.Configuration
 {

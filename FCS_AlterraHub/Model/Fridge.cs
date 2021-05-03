@@ -95,6 +95,49 @@ namespace FCS_AlterraHub.Model
             Destroy(item.item.gameObject);
         }
 
+
+
+#if SUBNAUTICA_STABLE
+        public void RemoveItem(TechType techType, EatableType eatableType)
+        {
+
+            var pickupable = techType.ToPickupable();
+
+            if (Inventory.main.HasRoomFor(pickupable))
+            {
+                EatableEntities match = FindMatch(techType, eatableType);
+
+                if (match != null)
+                {
+                    var go = GameObject.Instantiate(CraftData.GetPrefabForTechType(techType));
+                    var eatable = go.GetComponent<Eatable>();
+                    var pickup = go.GetComponent<Pickupable>();
+
+                    match.UnpauseDecay();
+                    eatable.timeDecayStart = match.TimeDecayStart;
+
+                    if (Inventory.main.Pickup(pickup))
+                    {
+                        QuickLogger.Debug($"Removed Match Before || Fridge Count {FridgeItems.Count}");
+                        FridgeItems.Remove(match);
+                        QuickLogger.Debug($"Removed Match || Fridge Count {FridgeItems.Count}");
+                    }
+                    else
+                    {
+                        QuickLogger.Message(LanguageHelpers.GetLanguage("InventoryFull"), true);
+                    }
+                    GameObject.Destroy(pickupable);
+                    OnContainerUpdate?.Invoke(NumberOfItems, _itemLimit);
+                    OnContainerRemoveItem?.Invoke(_mono, techType);
+                }
+            }
+            else
+            {
+                Destroy(pickupable);
+            }
+        }
+#else
+
         public void RemoveItem(TechType techType, EatableType eatableType)
         {
             
@@ -143,11 +186,12 @@ namespace FCS_AlterraHub.Model
                 QuickLogger.Message(LanguageHelpers.GetLanguage("InventoryFull"), true);
             }
 
-            GameObject.Destroy(pickupable);
+            Destroy(pickupable);
             OnContainerUpdate?.Invoke(NumberOfItems, _itemLimit);
             OnContainerRemoveItem?.Invoke(_mono, techType);
             yield break;
         }
+#endif
 
         public bool IsEmpty()
         {

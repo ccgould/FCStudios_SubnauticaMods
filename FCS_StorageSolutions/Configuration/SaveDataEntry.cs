@@ -2,7 +2,11 @@
 using System.Collections.Generic;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Objects;
+#if SUBNAUTICA_STABLE
 using Oculus.Newtonsoft.Json;
+#else
+using Newtonsoft.Json;
+#endif
 
 namespace FCS_StorageSolutions.Configuration
 {

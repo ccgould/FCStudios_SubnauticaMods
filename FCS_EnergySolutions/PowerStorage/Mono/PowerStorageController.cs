@@ -73,7 +73,6 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
         internal float CalculatePowerPercentage()
         {
             var baseCapacity = Manager.GetBasePowerCapacity() - TotalPowerStorageCapacityAtBase();
-            QuickLogger.Debug($"Base Capacity: {baseCapacity}",true);
             if (CalculateBasePower() <= 0 || baseCapacity <= 0) return 0;
             return CalculateBasePower() / baseCapacity  * 100;
         }
@@ -366,10 +365,6 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
 
         public float CalculateBasePower()
         {
-            QuickLogger.Debug($"TotalBasePower: {TotalPowerStoragePowerAtBase()}",true);
-            QuickLogger.Debug($"TotalBasePower: {TotalPowerStorageCapacityAtBase()}",true);
-            QuickLogger.Debug($"CalculateBasePower: {Manager.GetPower() - TotalPowerStoragePowerAtBase()}",true);
-            QuickLogger.Debug($"CalculateBasePower: {Manager.GetPower() - TotalPowerStoragePowerAtBase()}",true);
            return Manager.GetPower() - TotalPowerStoragePowerAtBase();
         }
 

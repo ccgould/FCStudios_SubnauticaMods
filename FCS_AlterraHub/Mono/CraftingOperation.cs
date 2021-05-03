@@ -2,9 +2,12 @@
 using System.Linq;
 using FCS_AlterraHub.Helpers;
 using FCSCommon.Extensions;
-using Oculus.Newtonsoft.Json;
 using SMLHelper.V2.Handlers;
-
+#if SUBNAUTICA_STABLE
+using Oculus.Newtonsoft.Json;
+#else
+using Newtonsoft.Json;
+#endif
 namespace FCS_AlterraHub.Mono
 {
     public class CraftingOperation

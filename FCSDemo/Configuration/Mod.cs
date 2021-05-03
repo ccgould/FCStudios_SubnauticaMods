@@ -7,10 +7,8 @@ using FCSCommon.Utilities;
 using FCSDemo.Model;
 using Model;
 using Mono;
-using Oculus.Newtonsoft.Json;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Json;
-using SMLHelper.V2.Options.Attributes;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 

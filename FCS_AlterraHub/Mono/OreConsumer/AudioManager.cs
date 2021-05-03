@@ -22,11 +22,10 @@ namespace FCS_AlterraHub.Mono.OreConsumer
         /// </summary>
         internal AudioManager(FMOD_CustomLoopingEmitter emitter)
         {
+
             LoadFModAssets();
 
             _loopingEmitter = emitter;
-
-            _loopingEmitter.asset = _loop;
         }
         #endregion
 
@@ -42,6 +41,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
                     case FilterAudioLoop:
                         QuickLogger.Debug($"{FilterAudioLoop} found!", true);
                         this._loop = fmod;
+                        _loopingEmitter.asset = fmod;
                         break;
                 }
             }
@@ -49,8 +49,24 @@ namespace FCS_AlterraHub.Mono.OreConsumer
             if (_loop == null)
             {
                 QuickLogger.Debug($"{FilterAudioLoop} not found trying to search again...", true);
+#if SUBNAUTICA_STABLE
                 Resources.Load<GameObject>(FilterAudioLoopPath);
-                LoadFModAssets();
+                if(_loop == null)
+                {
+                    LoadFModAssets();
+                }
+                
+#else
+                AddressablesUtility.LoadAsync<GameObject>(FilterAudioLoopPath).Completed += (prefab) =>
+                {
+                    var filtrationMachine =  prefab.Result.GetComponent<FiltrationMachine>();
+                    if (filtrationMachine != null)
+                    {
+                        this._loop = filtrationMachine.workSound.asset;
+                        _loopingEmitter.asset = _loop;
+                    }
+                };
+#endif
             }
         }
         #endregion
@@ -61,6 +77,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
         /// </summary>
         internal void PlayMachineAudio()
         {
+            if (_loopingEmitter == null) return;
             if (!_soundPlaying && QPatch.Configuration.PlaySFX)
             {
                 _loopingEmitter.Play();
@@ -74,6 +91,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
         /// </summary>
         internal void StopMachineAudio()
         {
+            if (_loopingEmitter == null) return;
             if (_soundPlaying)
             {
                 _loopingEmitter.Stop();

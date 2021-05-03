@@ -80,7 +80,12 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
                     _colorManager.ChangeColor(_savedData.Fcs.Vector4ToColor());
                     _colorManager.ChangeColor(_savedData.Secondary.Vector4ToColor(), ColorTargetMode.Secondary);
                     _timeLeft = _savedData.CurrentTime;
-                    StartCoroutine(_dumpContainer.RestoreItems(_serializer, _savedData.DropStorage,true));
+
+#if SUBNAUTICA_STABLE
+                    _dumpContainer.RestoreItems(_serializer, _savedData.DropStorage,true);
+#else
+StartCoroutine(_dumpContainer.RestoreItems(_serializer, _savedData.DropStorage,true));
+#endif
                     RefreshUI();
                     _isFromSave = false;
                 }

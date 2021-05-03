@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHub.Helpers;
@@ -443,10 +444,18 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
             return _storageContainer.Save(serializer);
         }
 
+#if SUBNAUTICA_STABLE
         public void Load(ProtobufSerializer serializer, byte[] savedDataData)
         {
-            _storageContainer.RestoreItemsAsync(serializer, savedDataData);
+            _storageContainer.RestoreItems(serializer, savedDataData);
         }
+#else
+        public IEnumerator Load(ProtobufSerializer serializer, byte[] savedDataData)
+        {
+            yield return _storageContainer.RestoreItemsAsync(serializer, savedDataData);
+            yield break;
+        }
+#endif
 
         public bool HasPowerCells()
         {

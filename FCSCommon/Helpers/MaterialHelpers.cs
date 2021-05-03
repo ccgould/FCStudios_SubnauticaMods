@@ -1,8 +1,8 @@
 ﻿using System;
+using System.Collections;
 using FCSCommon.Utilities;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using UWE;
@@ -381,23 +381,64 @@ namespace FCSCommon.Helpers
             newBubbles.SetActive(false);
         }
 
+#if SUBNAUTICA_STABLE
         internal static void GetIngameObjects()
         {
-            GameObject prefab = null;
-            if (PrefabDatabase.TryGetPrefabFilename(CraftData.GetClassIdForTechType(TechType.Aquarium), out string filepath))
+            if (PrefabDatabase.TryGetPrefabFilename(CraftData.GetClassIdForTechType(TechType.Aquarium),
+                out string filepath))
             {
-                prefab = Resources.Load<GameObject>(filepath);
-                var aquarium = GameObject.Instantiate(prefab);
+                var prefab = Resources.Load<GameObject>(filepath);
 
-                try
+                QuickLogger.Debug("In GetIngameObjects");
+
+                if (_glassMaterial == null)
                 {
+                    Renderer[] renderers = prefab.GetComponentsInChildren<Renderer>(true);
+
+                    foreach (Renderer renderer in renderers)
+                    {
+                        foreach (Material material in renderer.materials)
+                        {
+                            if (material.name.StartsWith("Aquarium_glass", StringComparison.OrdinalIgnoreCase))
+                            {
+                                _glassMaterial = material;
+                                QuickLogger.Debug($"Aquarium glass result: {_glassMaterial?.name}");
+                                goto _glassEnd;
+                            }
+                        }
+                    }
+                }
+
+                _glassEnd:
+
+                if (_laterialBubbles == null)
+                {
+                    var bubbles = prefab.FindChild("Bubbles").FindChild("xBubbles").FindChild("xLateralBubbles");
+                    if (bubbles == null)
+                    {
+                        QuickLogger.Error("Failed to find bubbles in the aquarium");
+                        return;
+                    }
+
+                    _laterialBubbles = GameObject.Instantiate(bubbles);
+                    QuickLogger.Debug($"Laterial Bubbles result: {_laterialBubbles?.name}");
+                }
+            }
+        }
+#else
+        internal static void GetIngameObjects()
+        {
+            if (PrefabDatabase.TryGetPrefabFilename(CraftData.GetClassIdForTechType(TechType.Aquarium),
+                out string filepath))
+            {
+                AddressablesUtility.LoadAsync<GameObject>(filepath).Completed += (prefab) =>
+                {
+                    var aquarium = prefab.Result;
+
                     QuickLogger.Debug("In GetIngameObjects");
-
-
 
                     if (_glassMaterial == null)
                     {
-
                         Renderer[] renderers = aquarium.GetComponentsInChildren<Renderer>(true);
 
                         foreach (Renderer renderer in renderers)
@@ -413,8 +454,8 @@ namespace FCSCommon.Helpers
                             }
                         }
                     }
-                _glassEnd:
-                    ;
+
+                    _glassEnd:
 
                     if (_laterialBubbles == null)
                     {
@@ -428,17 +469,12 @@ namespace FCSCommon.Helpers
                         _laterialBubbles = GameObject.Instantiate(bubbles);
                         QuickLogger.Debug($"Laterial Bubbles result: {_laterialBubbles?.name}");
                     }
-                }
-                finally
-                {
-                    GameObject.Destroy(aquarium);
-                }
-
+                };
             }
-
-
-
         }
+#endif
+
+
 
         internal static void ApplyPrecursorShader(string materialName, string normalMap, string metalicmap, GameObject gameObject, AssetBundle assetBundle, float glossiness)
         {

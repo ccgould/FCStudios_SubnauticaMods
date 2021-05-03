@@ -1,5 +1,9 @@
 ﻿using FCS_AlterraHub.Helpers;
+#if SUBNAUTICA_STABLE
 using Oculus.Newtonsoft.Json;
+#else
+using Newtonsoft.Json;
+#endif
 
 namespace FCS_HomeSolutions.TrashRecycler.Model
 {
