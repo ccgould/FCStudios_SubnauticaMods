@@ -15,10 +15,7 @@ namespace FCS_AlterraHub.Spawnables
 
         public DebitCardSpawnable() : base(Mod.DebitCardClassID, Mod.DebitCardFriendly, Mod.DebitCardDescription)
         {
-            OnFinishedPatching += () =>
-            {
-                CraftDataHandler.SetEquipmentType(TechType, EquipmentType.Hand);
-            };
+
         }
 
         public override GameObject GetGameObject()

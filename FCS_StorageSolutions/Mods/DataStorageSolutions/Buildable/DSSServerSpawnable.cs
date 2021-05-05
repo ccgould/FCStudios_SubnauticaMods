@@ -3,11 +3,9 @@ using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Registration;
 using FCS_StorageSolutions.Configuration;
 using FCS_StorageSolutions.Mods.AlterraStorage.Buildable;
-using FCS_StorageSolutions.Mods.DataStorageSolutions.Mono;
 using FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Assets;
-using SMLHelper.V2.Handlers;
 using UnityEngine;
 
 namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable
@@ -21,7 +19,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable
             OnFinishedPatching += () =>
             {
                 FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, TechType, 90000, StoreCategory.Storage);
-                CraftDataHandler.SetEquipmentType(TechType, EquipmentType.Hand);
             };
         }
 

@@ -4,9 +4,7 @@ using FCS_AlterraHub.Mono;
 namespace FCS_AlterraHub.Interfaces
 {
     public interface IDSSRack
-    {
-        bool IsOpen { get; }
-        string UnitID { get; set; }
+    {string UnitID { get; set; }
         BaseManager Manager { get; set; }
         bool IsVisible { get;}
         IFCSStorage GetStorage();

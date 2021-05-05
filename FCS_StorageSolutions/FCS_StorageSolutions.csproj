@@ -169,17 +169,11 @@
     <Compile Include="Mods\DataStorageSolutions\Buildable\DSSAntennaPatch.cs" />
     <Compile Include="Mods\DataStorageSolutions\Buildable\DSSTransceiver.cs" />
     <Compile Include="Mods\DataStorageSolutions\Buildable\DSSTerminalPatch.cs" />
-    <Compile Include="Mods\DataStorageSolutions\Buildable\DSSFormattingStationPatch.cs" />
     <Compile Include="Mods\DataStorageSolutions\Buildable\DSSItemDisplayPatch.cs" />
     <Compile Include="Mods\DataStorageSolutions\Buildable\DSSFloorServerRackPatch.cs" />
     <Compile Include="Mods\DataStorageSolutions\Buildable\DSSWallServerRackPatch.cs" />
     <Compile Include="Mods\DataStorageSolutions\Buildable\DSSServerSpawnable.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\Antenna\DSSAntennaController.cs" />
-    <Compile Include="Mods\DataStorageSolutions\Mono\FormattingStation\AddFilterController.cs" />
-    <Compile Include="Mods\DataStorageSolutions\Mono\FormattingStation\DSSFormattingStationController.cs" />
-    <Compile Include="Mods\DataStorageSolutions\Mono\FormattingStation\DSSFormattingStationDisplay.cs" />
-    <Compile Include="Mods\DataStorageSolutions\Mono\FormattingStation\FilterDisplayItem.cs" />
-    <Compile Include="Mods\DataStorageSolutions\Mono\FormattingStation\FilterItems.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\ItemDisplay\DSSItemDisplayController.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\ItemDisplay\NetworkDumpStorage.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\Rack\DSSRackBase.cs" />

@@ -11,76 +11,125 @@ using FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server;
 using FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Transceiver;
 using FCSCommon.Utilities;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
 {
-    internal class DSSSlotController : MonoBehaviour, IFCSDumpContainer, IHandTarget,ISlotController
+    internal class DSSSlotController : OnScreenButton, IFCSDumpContainer, ISlotController, IPointerEnterHandler, IPointerExitHandler
     {
         private DumpContainerSimplified _dumpContainer;
         private InventoryItem _inventoryItem;
         private IDSSRack _controller;
         private string _slotName;
-        private BoxCollider _collider;
         private FCSStorage _storage;
         private DSSServerController _mountedServer;
         private DSSTransceiverController _transceiver;
-        private Image _preloader;
-        private Text _preloaderPercentage;
+        private Image _screenSlotpreloader;
+        private Text _screenSlotPreloaderPercentage;
+
+        private Image _readerPreloader;
+        private Text _readerPreloaderPercentage;
+        private Text _readerPercentage;
+        private GameObject _buttons;
+
+
         public bool IsOccupied => _mountedServer != null || _transceiver != null;
         public bool IsFull => _mountedServer?.IsFull() ?? true;
         public bool IsServer => _transceiver == null;
         private void Start()
         {
-            QuickLogger.Debug($"Storage Status: {_storage}");
             _storage?.CleanUpDuplicatedStorageNoneRoutine();
             Mod.CleanDummyServers();
         }
-        
+
         private void Update()
         {
-            if (_collider == null || _controller == null || _preloader == null || _preloaderPercentage == null) return;
-            _collider.isTrigger = !_controller.IsOpen;
+            if (_controller == null ||
+                 _screenSlotpreloader == null ||
+                 _screenSlotPreloaderPercentage == null ||
+                 _readerPreloader == null ||
+                 _readerPreloaderPercentage == null ||
+                 _readerPercentage == null) return;
+
 
             if (_mountedServer != null)
             {
-                _preloader.fillAmount = _mountedServer.GetPercentage();
-                _preloaderPercentage.text = $"{_mountedServer.GetPercentage():P0}";
+                _screenSlotpreloader.fillAmount = _mountedServer.GetPercentage();
+                _screenSlotPreloaderPercentage.text = $"{_mountedServer.GetPercentage():P0}";
+
+                _readerPreloader.fillAmount = _mountedServer.GetPercentage();
+                _readerPreloaderPercentage.text = $"{_mountedServer.GetPercentage():P0}";
+                _readerPercentage.text = AuxPatchers.AlterraStorageAmountFormat(_mountedServer.GetCount(), DSSServerController.MAXSTORAGE);
                 return;
             }
 
             if (_transceiver != null)
             {
-                _preloader.fillAmount = 0f;
-                _preloaderPercentage.text = "T";
+                _screenSlotpreloader.fillAmount = 0f;
+                _screenSlotPreloaderPercentage.text = "T";
                 return;
             }
 
-            _preloader.fillAmount = 0f;
-            _preloaderPercentage.text = "N/A";
+            _screenSlotpreloader.fillAmount = 0f;
+            _screenSlotPreloaderPercentage.text = "N/A";
+            _readerPreloader.fillAmount = 0f;
+            _readerPreloaderPercentage.text = "N/A";
+            _readerPercentage.text = "0/0";
         }
 
-        internal void Initialize(string slotName, IDSSRack controller,GameObject preloader)
+        internal void Initialize(string slotName, IDSSRack controller, GameObject preloader, GameObject readerMesh)
         {
-            _preloader = preloader.GetComponent<Image>();
-            _preloaderPercentage = preloader.GetComponentInChildren<Text>();
-            _collider = gameObject.GetComponent<BoxCollider>();
+            readerMesh.FindChild("Header").GetComponent<Text>().text = slotName;
+            _readerPreloader = readerMesh.FindChild("Pecentage").FindChild("Bar").GetComponent<Image>();
+            _readerPreloaderPercentage = readerMesh.FindChild("Pecentage").FindChild("Percentage").GetComponent<Text>();
+            _readerPercentage = readerMesh.FindChild("Amount").GetComponent<Text>();
+            _screenSlotpreloader = preloader.FindChild("Progress").GetComponent<Image>();
+            _screenSlotPreloaderPercentage = preloader.FindChild("PercentageLBL").GetComponent<Text>();
+            _buttons = preloader.FindChild("Buttons");
+
+            var ejectBTN = _buttons.FindChild("DriveEjectionBTN").GetComponent<Button>();
+            ejectBTN.onClick.AddListener((() =>
+            {
+                if (_controller == null) return;
+
+                FindServer();
+
+                if (_mountedServer != null)
+                {
+                    var pickup = _inventoryItem.item;
+                    _storage.ItemsContainer.RemoveItem(pickup);
+                    PlayerInteractionHelper.GivePlayerItem(pickup);
+                    _controller.UpdateStorageCount();
+                }
+
+                if (_transceiver != null)
+                {
+                    _controller.Manager.RemoveTransceiver(_transceiver);
+                    PlayerInteractionHelper.GivePlayerItem(_inventoryItem.item);
+                }
+            }));
+            
             _controller = controller;
             _slotName = slotName;
             if (_dumpContainer == null)
             {
                 _dumpContainer = gameObject.EnsureComponent<DumpContainerSimplified>();
-                _dumpContainer.Initialize(transform,$"Add server to {_slotName}",this,1,1,gameObject.name);
+                _dumpContainer.Initialize(transform, $"Add server to {_slotName}", this, 1, 1, gameObject.name);
             }
-
 
             if (_storage == null)
             {
                 _storage = gameObject.AddComponent<FCSStorage>();
-                _storage.Initialize(1,gameObject);
+                _storage.Initialize(1, gameObject);
                 _storage.ItemsContainer.onAddItem += OnServerAddedToStorage;
                 _storage.ItemsContainer.onRemoveItem += OnServerRemovedFromStorage;
             }
+        }
+
+        internal void OpenContainer()
+        {
+            _dumpContainer.OpenStorage();
         }
 
         private void OnServerRemovedFromStorage(InventoryItem item)
@@ -109,7 +158,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
 
         private void OnServerAddedToStorage(InventoryItem item)
         {
-            if(item == null) return;
+            if (item == null) return;
             ModelPrefab.ApplyShaders(item.item.gameObject);
             MountServerToRack(item);
         }
@@ -119,46 +168,20 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
             _controller.UpdateStorageCount();
         }
 
-        public void OnHandHover(GUIHand hand)
+        public override void OnPointerEnter(PointerEventData eventData)
         {
-            if(_controller == null) return;
-            if(_controller.IsOpen)
+            base.OnPointerEnter(eventData);
+            if (_controller == null) return;
+            if (_mountedServer != null || _transceiver != null)
             {
-                HandReticle main = HandReticle.main;
-                main.SetIcon(HandReticle.IconType.Hand);
-                main.SetInteractText(IsOccupied ? $"Remove server from {_slotName}" : $"Add server to {_slotName}");
+                _buttons.SetActive(true);
             }
         }
-        
-        public void OnHandClick(GUIHand hand)
+
+        public override void OnPointerExit(PointerEventData eventData)
         {
-            if (_controller == null || !_controller.IsOpen) return;
-
-            FindServer();
-
-            if (IsOccupied)
-            {
-                if (_mountedServer != null)
-                {
-                    var pickup = _inventoryItem.item;
-                    _storage.ItemsContainer.RemoveItem(pickup);
-                    PlayerInteractionHelper.GivePlayerItem(pickup);
-                    _preloader.fillAmount = 0;
-                    _preloaderPercentage.text = $"{0:P0}";
-                    _controller.UpdateStorageCount();
-                }
-
-                if(_transceiver != null)
-                {
-                    _controller.Manager.RemoveTransceiver(_transceiver);
-                    PlayerInteractionHelper.GivePlayerItem(_inventoryItem.item);
-                }
-
-            }
-            else
-            {
-                _dumpContainer.OpenStorage();
-            }
+            base.OnPointerExit(eventData);
+            _buttons.SetActive(false);
         }
 
         #region Dump Container
@@ -170,7 +193,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         /// <returns></returns>
         public bool AddItemToContainer(InventoryItem item)
         {
-           return  _storage.AddItemToContainer(item);
+            return _storage.AddItemToContainer(item);
         }
 
         private bool MountServerToRack(InventoryItem item)
@@ -180,7 +203,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
             {
                 if (item.item.GetTechType() != Mod.GetDSSServerTechType() && item.item.GetTechType() != Mod.GetTransceiverTechType() || _controller == null) return false;
 
-                QuickLogger.Debug($"Valid Server, {Language.main.Get(item.item.GetTechType())}", true); 
+                QuickLogger.Debug($"Valid Server, {Language.main.Get(item.item.GetTechType())}", true);
 
                 if (item.item.GetTechType() == Mod.GetDSSServerTechType())
                 {
@@ -208,7 +231,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
                 {
                     //Do something
                     _transceiver = item.item.gameObject.GetComponentInChildren<DSSTransceiverController>();
-                    _transceiver.DockTransceiver(this,_controller);
+                    _transceiver.DockTransceiver(this, _controller);
                     QuickLogger.Debug($"Mounting a transmitter in {_slotName} in serverRack {_controller.UnitID}");
                 }
 
@@ -259,7 +282,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
             return _storage.Save(serializer);
         }
 
-        public void RestoreItems(ProtobufSerializer serializer,byte[] data)
+        public void RestoreItems(ProtobufSerializer serializer, byte[] data)
         {
 #if SUBNAUTICA_STABLE
             _storage.RestoreItems(serializer, data);
@@ -271,7 +294,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         public int GetStorageAmount()
         {
             FindServer();
-            
+
             if (_mountedServer == null)
             {
                 return 0;
@@ -324,7 +347,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         public Pickupable RemoveItemFromServer(TechType techType)
         {
             if (_mountedServer == null) return null;
-            return _mountedServer.RemoveItemFromContainer(techType,1);
+            return _mountedServer.RemoveItemFromContainer(techType, 1);
         }
 
         public FcsDevice GetServer()

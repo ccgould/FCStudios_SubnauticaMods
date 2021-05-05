@@ -30,8 +30,7 @@ namespace FCSCommon.Helpers
             return 0;
         }
 
-        internal static GameObject FindGameObject(GameObject go, string name,
-            SearchOption searchOption = SearchOption.Full)
+        internal static GameObject FindGameObject(GameObject go, string name,SearchOption searchOption = SearchOption.Full)
         {
             try
             {
@@ -39,7 +38,7 @@ namespace FCSCommon.Helpers
                 
                 foreach (GameObject mesh in renders)
                 {
-
+                    //QuickLogger.Debug($"[FindGameObject: {name} | Current Object: {mesh?.name}]");
                     switch (searchOption)
                     {
                         case SearchOption.Full:
@@ -79,9 +78,8 @@ namespace FCSCommon.Helpers
             {
 
                 QuickLogger.Error($"Message: {e.Message} StackTrace: {e.StackTrace} while trying to find: {name}");
+                QuickLogger.Error($"Failed to find GameObject with the name: {name}");
             }
-
-            QuickLogger.Error($"Failed to find GameObject with the name: {name}");
             return null;
         }
 

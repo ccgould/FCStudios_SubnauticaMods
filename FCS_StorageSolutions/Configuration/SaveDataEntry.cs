@@ -58,6 +58,9 @@ namespace FCS_StorageSolutions.Configuration
         [JsonProperty] internal byte[] Slot15 { get; set; }
         [JsonProperty] internal byte[] Slot16 { get; set; }
         [JsonProperty] internal byte[] Slot17 { get; set; }
+        [JsonProperty] internal byte[] Slot18 { get; set; }
+        [JsonProperty] internal byte[] Slot19 { get; set; }
+        [JsonProperty] internal byte[] Slot20 { get; set; }
     }
 
     [Serializable]

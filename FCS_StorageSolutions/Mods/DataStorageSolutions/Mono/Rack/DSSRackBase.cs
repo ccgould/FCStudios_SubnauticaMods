@@ -23,23 +23,16 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         protected bool _isFromSave;
         private bool _isBeingDestroyed;
         protected abstract DSSServerRackDataEntry SavedData { get; set; }
-        private float _targetPos;
-        protected const float Speed = 3f;
-        protected GameObject Tray;
         protected Dictionary<string,DSSSlotController> Slots;
         private Text _storageAmount;
-        private List<GameObject> _meters;
+        private readonly List<GameObject> _meters = new List<GameObject>();
+        private readonly List<GameObject> _readers = new List<GameObject>();
         private Image _percentageBar;
         private GameObject _canvas;
         private bool _isVisible;
-        protected abstract float OpenPos { get;}
-        protected abstract float ClosePos { get; }
-        protected Transform SlotsLocation;
         public override bool IsOperational => IsInitialized && IsConstructed;
         public override bool IsRack { get; } = true;
         public override bool IsVisible => _isVisible;
-
-        public bool IsOpen => _targetPos > ClosePos;
 
         public override float GetPowerUsage()
         {
@@ -103,7 +96,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
 
         private void Update()
         {
-            MoveTray();
+
         }
         
         private void OnEnable()
@@ -126,10 +119,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
                     {
                         _colorManager.ChangeColor(SavedData.BodyColor.Vector4ToColor());
                         _colorManager.ChangeColor(SavedData.SecondaryColor.Vector4ToColor(),ColorTargetMode.Secondary);
-                        if (SavedData.IsTrayOpen)
-                        {
-                            Open();
-                        }
                     }
                 }
 
@@ -156,42 +145,64 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
 
         public override void Initialize()
         { 
-            _storageAmount = gameObject.GetComponentInChildren<Text>();
+            if(IsInitialized) return;
             _canvas = gameObject.GetComponentInChildren<Canvas>()?.gameObject;
             Slots = new Dictionary<string,DSSSlotController>();
-            _meters = new List<GameObject>();
-            _percentageBar = GameObjectHelpers.FindGameObject(gameObject, "Preloader").GetComponent<Image>();
-            
-            var meters = GameObjectHelpers.FindGameObject(gameObject, "Meters").transform;
+            _percentageBar = _canvas.FindChild("Home").FindChild("BGPreloader").FindChild("Preloader").GetComponent<Image>();
+            _storageAmount = _canvas.FindChild("Home").FindChild("BGPreloader").FindChild("Amount").GetComponentInChildren<Text>();
 
+            var insertBTN = _canvas.FindChild("Home").FindChild("InsertButton").GetComponent<Button>();
+            insertBTN.onClick.AddListener((() =>
+            {
+                foreach (KeyValuePair<string, DSSSlotController> slot in Slots)
+                {
+                    if (!slot.Value.IsOccupied)
+                    {
+                        slot.Value.OpenContainer();
+                        break;
+                    }
+
+                    QuickLogger.ModMessage("Rack is Full");
+                }
+            }));
+
+            var meters = GameObjectHelpers.FindGameObject(gameObject, "SlotGrid").transform;
+            QuickLogger.Debug($"Meters Count: {meters?.childCount}");
             foreach (Transform meter in meters)
             {
+                QuickLogger.Debug($"Meters Name: {meter?.name}");
                 _meters.Add(meter.gameObject);
             }
-            int i = 1;
 
-            foreach (Transform slot in SlotsLocation)
+            var readers = gameObject.FindChild("ReaderCanvases").transform;
+            QuickLogger.Debug($"Readers Count: {readers?.childCount}");
+            foreach (Transform reader in readers)
             {
-                var meter = _meters[i - 1];
-                var slotName = $"Slot {i++}";
-                var slotController = slot.gameObject.AddComponent<DSSSlotController>();
-                slotController.Initialize(slotName, this, meter);
-                Slots.Add(slotName, slotController);
+                QuickLogger.Debug($"Readers Name: {reader?.name}");
+                _readers.Add(reader.gameObject);
             }
 
-            _targetPos = Tray.transform.localPosition.x;
+
+            for (var i = 0; i < _meters.Count; i++)
+            {
+                GameObject slot = _meters[i];
+                var meter = _meters[i];
+                var slotName = $"Slot {i+1}";
+                var slotController = slot.AddComponent<DSSSlotController>();
+                slotController.Initialize(slotName, this, meter, _readers[i]);
+
+                Slots.Add(slotName, slotController);
+            }
 
             if (_colorManager == null)
             {
                 _colorManager = gameObject.EnsureComponent<ColorManager>();
                 _colorManager.Initialize(gameObject,ModelPrefab.BodyMaterial,ModelPrefab.SecondaryMaterial);
             }
-
             InvokeRepeating(nameof(RegisterServers), 1f, 1f);
             InvokeRepeating(nameof(UpdateScreenState), 1, 1);
             IsInitialized = true;
         }
-
 
         public void UpdateStorageCount()
         {
@@ -403,18 +414,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
 
         }
 
-        protected abstract void MoveTray();
-
-        private void Open()
-        {
-            _targetPos = OpenPos;
-        }
-
-        private void Close()
-        {
-            _targetPos = ClosePos;
-        }
-
         public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
         {
             return _colorManager.ChangeColor(color, mode);
@@ -423,27 +422,21 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         public void OnHandHover(GUIHand hand)
         {
             if (!IsConstructed || !IsInitialized) return;
-            HandReticle main = HandReticle.main;
-            main.SetIcon(HandReticle.IconType.Hand);
-            main.SetInteractText(IsOpen ? AuxPatchers.CloseServerRack() : AuxPatchers.OpenServerRack());
+            //HandReticle main = HandReticle.main;
+            //main.SetIcon(HandReticle.IconType.Default);
+            //main.SetInteractText("N/A");
         }
 
         public void OnHandClick(GUIHand hand)
         {
-            if (!IsConstructed || !IsInitialized) return;
-            if (IsOpen)
-            {
-                Close();
-            }
-            else
-            {
-                Open();
-            }
         }
 
         public override void TurnOnDevice()
         {
+            if (_canvas == null) return;
+
             _isVisible = true;
+            
             if (!_canvas.activeSelf)
             {
                 _canvas.SetActive(true);
@@ -452,6 +445,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
 
         public override void TurnOffDevice()
         {
+            if (_canvas == null) return;
             _isVisible = false;
             if (_canvas.activeSelf)
             {

@@ -48,9 +48,6 @@ namespace FCS_StorageSolutions
                 var dssItemDisplay = new DSSItemDisplayPatch();
                 dssItemDisplay.Patch();
 
-                var dssFormattingStation = new DSSFormattingStationPatch();
-                dssFormattingStation.Patch();
-
                 var dssTerminal = new DSSTerminalPatch();
                 dssTerminal.Patch();
                 

@@ -25,7 +25,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
         private BoxCollider[] _colliders;
         private string _rackSlot;
         private IDSSRack _rackController;
-        private const int MAXSTORAGE = 48;
+        protected internal const int MAXSTORAGE = 48;
         private HashSet<Filter> _filteringSettings;
         private string _currentBase;
         private bool _isVisible;
@@ -94,31 +94,22 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
                 _storageContainer.Initialize(MAXSTORAGE);
                 _storageContainer.ItemsContainer.onAddItem += item =>
                 {
-                    UpdateStorageCount(item);
                     OnAddItem?.Invoke(this,item);
                 };
 
                 _storageContainer.ItemsContainer.onRemoveItem += item =>
                 {
-                    UpdateStorageCount(item);
                     OnRemoveItem?.Invoke(this, item);
                 };
             }
             
             Mod.RegisterServer(this);
-
-            UpdateStorageCount(null);
-
+            
             InvokeRepeating(nameof(FindBaseManager),1f,1f);
 
             IsInitialized = true;
         }
         
-        private void UpdateStorageCount(InventoryItem item)
-        {
-            _storageAmount.text = AuxPatchers.AlterraStorageAmountFormat(_storageContainer.GetCount(), MAXSTORAGE);
-        }
-
         private void OnButtonClick(string arg1, object arg2)
         {
             switch (arg1)
@@ -311,6 +302,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
             gameObject.SetActive(true);
             transform.parent = slot.transform;
             transform.localPosition = Vector3.zero;
+            gameObject.SetActive(false);
         }
 
         public override bool IsVisible => GetIsVisible();
