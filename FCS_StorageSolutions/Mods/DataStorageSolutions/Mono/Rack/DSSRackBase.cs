@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Odbc;
 using System.Linq;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Interfaces;
@@ -17,19 +19,24 @@ using UnityEngine.UI;
 
 namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
 {
-    internal abstract class DSSRackBase : FcsDevice,IFCSSave<SaveData>,IHandTarget, IDSSRack
+    internal abstract class DSSRackBase : FcsDevice,IFCSSave<SaveData>,IHandTarget, IDSSRack,IFCSDumpContainer
     {
         private bool _runStartUpOnEnable;
-        protected bool _isFromSave;
-        private bool _isBeingDestroyed;
-        protected abstract DSSServerRackDataEntry SavedData { get; set; }
-        protected Dictionary<string,DSSSlotController> Slots;
         private Text _storageAmount;
-        private readonly List<GameObject> _meters = new List<GameObject>();
-        private readonly List<GameObject> _readers = new List<GameObject>();
+        private List<GameObject> _readers;
         private Image _percentageBar;
         private GameObject _canvas;
         private bool _isVisible;
+        private DumpContainerSimplified _dumpContainer;
+        private FCSStorage _storage;
+        private bool _isBeingDestroyed;
+        
+        protected abstract int StorageWidth { get; }
+        protected abstract int StorageHeight { get; }
+        protected bool IsFromSave;
+        protected abstract DSSServerRackDataEntry SavedData { get; set; }
+        protected Dictionary<string,DSSSlotController> Slots;
+        
         public override bool IsOperational => IsInitialized && IsConstructed;
         public override bool IsRack { get; } = true;
         public override bool IsVisible => _isVisible;
@@ -48,6 +55,9 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
             Manager.OnBreakerStateChanged += OnBreakerStateChanged;
             UpdateStorageCount();
             UpdateScreenState();
+            _storage?.CleanUpDuplicatedStorageNoneRoutine();
+            Mod.CleanDummyServers();
+            _canvas.FindChild("Home").FindChild("UnitID").GetComponentInChildren<Text>().text = $"UNIT ID: {UnitID}";
         }
 
         private void OnBreakerStateChanged(bool value)
@@ -108,7 +118,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
                     Initialize();
                 }
 
-                if (_isFromSave)
+                if (IsFromSave)
                 {
                     if (SavedData == null)
                     {
@@ -147,65 +157,126 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         { 
             if(IsInitialized) return;
             _canvas = gameObject.GetComponentInChildren<Canvas>()?.gameObject;
+
+            if (_canvas == null) return;
+
             Slots = new Dictionary<string,DSSSlotController>();
+            
             _percentageBar = _canvas.FindChild("Home").FindChild("BGPreloader").FindChild("Preloader").GetComponent<Image>();
             _storageAmount = _canvas.FindChild("Home").FindChild("BGPreloader").FindChild("Amount").GetComponentInChildren<Text>();
-
-            var insertBTN = _canvas.FindChild("Home").FindChild("InsertButton").GetComponent<Button>();
-            insertBTN.onClick.AddListener((() =>
+            
+            var insertBtn = _canvas.FindChild("Home").FindChild("InsertButton").GetComponent<Button>();
+            insertBtn.onClick.AddListener((() =>
             {
                 foreach (KeyValuePair<string, DSSSlotController> slot in Slots)
                 {
                     if (!slot.Value.IsOccupied)
                     {
-                        slot.Value.OpenContainer();
+                        _dumpContainer.OpenStorage();
                         break;
                     }
 
                     QuickLogger.ModMessage("Rack is Full");
                 }
             }));
+            
+            CreateDumpContainer();
+            
+            FindReaderDisplays();
 
-            var meters = GameObjectHelpers.FindGameObject(gameObject, "SlotGrid").transform;
-            QuickLogger.Debug($"Meters Count: {meters?.childCount}");
-            foreach (Transform meter in meters)
-            {
-                QuickLogger.Debug($"Meters Name: {meter?.name}");
-                _meters.Add(meter.gameObject);
-            }
+            CreateSlots();
 
-            var readers = gameObject.FindChild("ReaderCanvases").transform;
-            QuickLogger.Debug($"Readers Count: {readers?.childCount}");
-            foreach (Transform reader in readers)
-            {
-                QuickLogger.Debug($"Readers Name: {reader?.name}");
-                _readers.Add(reader.gameObject);
-            }
+            CreateStorage();
 
+            CreateColorManager();
 
-            for (var i = 0; i < _meters.Count; i++)
-            {
-                GameObject slot = _meters[i];
-                var meter = _meters[i];
-                var slotName = $"Slot {i+1}";
-                var slotController = slot.AddComponent<DSSSlotController>();
-                slotController.Initialize(slotName, this, meter, _readers[i]);
-
-                Slots.Add(slotName, slotController);
-            }
-
-            if (_colorManager == null)
-            {
-                _colorManager = gameObject.EnsureComponent<ColorManager>();
-                _colorManager.Initialize(gameObject,ModelPrefab.BodyMaterial,ModelPrefab.SecondaryMaterial);
-            }
+            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseEmissiveDecalsController, gameObject, Color.cyan);
+            
             InvokeRepeating(nameof(RegisterServers), 1f, 1f);
             InvokeRepeating(nameof(UpdateScreenState), 1, 1);
             IsInitialized = true;
         }
 
+        private void CreateColorManager()
+        {
+            if (_colorManager == null)
+            {
+                _colorManager = gameObject.EnsureComponent<ColorManager>();
+                _colorManager.Initialize(gameObject, ModelPrefab.BodyMaterial, ModelPrefab.SecondaryMaterial);
+            }
+        }
+
+        private void CreateDumpContainer()
+        {
+            if (_dumpContainer == null)
+            {
+                _dumpContainer = gameObject.EnsureComponent<DumpContainerSimplified>();
+                _dumpContainer.Initialize(transform, $"Add server to rack", this, StorageWidth, StorageHeight, "Storage");
+            }
+        }
+
+        private void CreateStorage()
+        {
+            if (_storage == null)
+            {
+                _storage = gameObject.AddComponent<FCSStorage>();
+                _storage.Initialize(Slots.Count);
+                _storage.ItemsContainer.onAddItem += OnServerAddedToStorage;
+                _storage.ItemsContainer.onRemoveItem += OnServerRemovedFromStorage;
+            }
+        }
+
+        private void CreateSlots()
+        {
+            var meters = GameObjectHelpers.FindGameObject(gameObject, "SlotGrid").transform;
+            var metersTemp = new List<GameObject>();
+
+            foreach (Transform meter in meters)
+            {
+                metersTemp.Add(meter.gameObject);
+            }
+
+            for (var i = 0; i < metersTemp.Count; i++)
+            {
+                QuickLogger.Debug($"");
+                GameObject slot = metersTemp[i];
+                var meter = metersTemp[i];
+                var slotName = $"Slot {i + 1}";
+                var slotController = slot.AddComponent<DSSSlotController>();
+                slotController.Initialize(slotName, this, meter, _readers?[i]);
+
+                Slots.Add(slotName, slotController);
+            }
+        }
+
+        private void FindReaderDisplays()
+        {
+            var readers = gameObject.FindChild("ReaderCanvases")?.transform;
+            if (readers != null)
+            {
+                _readers = new List<GameObject>();
+                foreach (Transform reader in readers)
+                {
+                    _readers.Add(reader.gameObject);
+                }
+            }
+        }
+
+        private void OnServerAddedToStorage(InventoryItem item)
+        {
+            foreach (KeyValuePair<string, DSSSlotController> slot in Slots)
+            {
+                if(slot.Value.IsOccupied) continue;
+                slot.Value.MountServerToRack(item);
+                break;
+            }
+            //
+            QuickLogger.Debug($"Server Added {item.item.GetTechName()}",true);
+        }
+
         public void UpdateStorageCount()
         {
+            QuickLogger.Debug("UpdateStorageCount",true);
             if (Slots == null) return;
             var storageTotal = 0;
             var storageAmount = 0;
@@ -266,6 +337,8 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         public bool ItemAllowed(TechType techType, out ISlotController server)
         {
             server = null;
+            if (Slots == null) return false;
+
             foreach (KeyValuePair<string, DSSSlotController> controller in Slots)
             {
                 if (controller.Value != null && controller.Value.IsOccupied && !controller.Value.IsFull && controller.Value.IsTechTypeAllowed(techType))
@@ -294,6 +367,8 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
 
         public bool HasItem(TechType techType)
         {
+            if (Slots == null) return false;
+
             foreach (KeyValuePair<string, DSSSlotController> controller in Slots)
             {
                 if (controller.Value != null && controller.Value.IsOccupied)
@@ -399,6 +474,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
                 {
                     SavedData = new DSSServerRackDataEntry();
                 }
+                SavedData.SaveVersion = "2.0";
             }
             catch (Exception e)
             {
@@ -456,6 +532,60 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         public IEnumerable<KeyValuePair<string, DSSSlotController>> GetSlots()
         {
             return Slots;
+        }
+
+        public byte[] Save(ProtobufSerializer serializer)
+        {
+            return _storage.Save(serializer);
+        }
+        
+        public void RestoreItems(ProtobufSerializer serializer, byte[] data)
+        {
+#if SUBNAUTICA_STABLE
+            _storage.RestoreItems(serializer, data);
+#else
+                    StartCoroutine(_storageContainer.RestoreItemsAsync(_serializer, _savedData.Data));
+#endif
+        }
+
+        public void RestoreItems(ProtobufSerializer serializer, List<byte[]> data)
+        {
+#if SUBNAUTICA_STABLE
+            _storage.RestoreItems(serializer, data);
+#else
+                    StartCoroutine(_storageContainer.RestoreItemsAsync(_serializer, _savedData.Data));
+#endif
+        }
+
+        public bool IsAllowedToAdd(TechType techType, bool verbose)
+        {
+            QuickLogger.Debug($"Can Be Stored Result: {_storage.CanBeStored(_dumpContainer.GetItemCount() + 1, techType)}", true);
+            if (_storage.IsFull || !_storage.CanBeStored(_dumpContainer.GetItemCount() + 1, techType)) return false;
+            return techType == Mod.GetDSSServerTechType() || techType == Mod.GetTransceiverTechType();
+        }
+
+        public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
+        {
+            QuickLogger.Debug($"Can Be Stored Result: {_storage.CanBeStored(_dumpContainer.GetItemCount() + 1, pickupable.GetTechType())}",true);
+            return IsAllowedToAdd(pickupable.GetTechType(), verbose);
+        }
+
+        private void OnServerRemovedFromStorage(InventoryItem item)
+        {
+            //TODO Fix
+            //var server = item.item.gameObject.GetComponent<DSSServerController>();
+            //var slot = server.GetSlot();
+            //slot.ClearSlot();
+        }
+
+        /// <summary>
+        /// Event when the DumpContainer has an item added
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public override bool AddItemToContainer(InventoryItem item)
+        {
+            return _storage.AddItemToContainer(item);
         }
     }
 }

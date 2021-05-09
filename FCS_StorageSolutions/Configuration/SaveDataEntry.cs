@@ -42,25 +42,25 @@ namespace FCS_StorageSolutions.Configuration
         [JsonProperty] internal Vec4 SecondaryColor { get; set; }
         [JsonProperty] internal bool IsTrayOpen { get; set; }
         [JsonProperty] internal byte[] Slot1 { get; set; }
-        [JsonProperty] internal byte[] Slot2 { get; set; }
-        [JsonProperty] internal byte[] Slot3 { get; set; }
-        [JsonProperty] internal byte[] Slot4 { get; set; }
-        [JsonProperty] internal byte[] Slot5 { get; set; }
-        [JsonProperty] internal byte[] Slot6 { get; set; }
-        [JsonProperty] internal byte[] Slot7 { get; set; }
-        [JsonProperty] internal byte[] Slot8 { get; set; }
-        [JsonProperty] internal byte[] Slot9 { get; set; }
-        [JsonProperty] internal byte[] Slot10 { get; set; }
-        [JsonProperty] internal byte[] Slot11 { get; set; }
-        [JsonProperty] internal byte[] Slot12 { get; set; }
-        [JsonProperty] internal byte[] Slot13 { get; set; }
-        [JsonProperty] internal byte[] Slot14 { get; set; }
-        [JsonProperty] internal byte[] Slot15 { get; set; }
-        [JsonProperty] internal byte[] Slot16 { get; set; }
-        [JsonProperty] internal byte[] Slot17 { get; set; }
-        [JsonProperty] internal byte[] Slot18 { get; set; }
-        [JsonProperty] internal byte[] Slot19 { get; set; }
-        [JsonProperty] internal byte[] Slot20 { get; set; }
+        public byte[] Slot2 {  internal get; set; }
+        public byte[] Slot3 {  internal get; set; }
+        public byte[] Slot4 {  internal get; set; }
+        public byte[] Slot5 {  internal get; set; }
+        public byte[] Slot6 {  internal get; set; }
+        public byte[] Slot7 {  internal get; set; }
+        public byte[] Slot8 {  internal get; set; }
+        public byte[] Slot9 {  internal get; set; }
+        public byte[] Slot10 { internal get; set; }
+        public byte[] Slot11 { internal get; set; }
+        public byte[] Slot12 { internal get; set; }
+        public byte[] Slot13 { internal get; set; }
+        public byte[] Slot14 { internal get; set; }
+        public byte[] Slot15 { internal get; set; }
+        public byte[] Slot16 { internal get; set; }
+        public byte[] Slot17 { internal get; set; }
+        public byte[] Slot18 { internal get; set; }
+        public byte[] Slot19 { internal get; set; }
+        public byte[] Slot20 { internal get; set; }
     }
 
     [Serializable]

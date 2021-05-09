@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using FCS_AlterraHub.Interfaces;
-using FCS_AlterraHub.Model;
 using FCSCommon.Utilities;
 using UnityEngine;
 
@@ -61,6 +58,40 @@ namespace FCS_AlterraHub.Mono
                 QuickLogger.Debug($"Object location: {gObj.transform.position}");
                 GameObject.Destroy(gObj);
                 QuickLogger.Debug("Item destroyed");
+            }
+        }
+
+        public void RestoreItems(ProtobufSerializer serializer, List<byte[]> serialData)
+        {
+            QuickLogger.Debug("RestoreItems");
+            
+            StorageHelper.RenewIdentifier(_storageRoot);
+            
+            QuickLogger.Debug("RenewIdentifier Called");
+            
+            if (serialData == null) return;
+
+            QuickLogger.Debug($"Storage root Position: {_storageRoot.transform.position}");
+
+            for (var i = 0; i < serialData.Count; i++)
+            {
+                byte[] bytes = serialData[i];
+
+                QuickLogger.Debug($"Loading Save data: {i}/{serialData.Count}");
+
+                if (bytes == null) continue;
+
+                using (MemoryStream memoryStream = new MemoryStream(bytes))
+                {
+                    QuickLogger.Debug("Getting Data from memory stream");
+                    GameObject gObj = serializer.DeserializeObjectTree(memoryStream, 0);
+                    QuickLogger.Debug($"De-serialized Object Stream. {gObj} | {gObj.name}");
+                    TransferItems(gObj);
+                    QuickLogger.Debug("Items Transferred");
+                    QuickLogger.Debug($"Object location: {gObj.transform.position}");
+                    GameObject.Destroy(gObj);
+                    QuickLogger.Debug("Item destroyed");
+                }
             }
         }
 #else
@@ -180,9 +211,9 @@ public IEnumerator RestoreItems(ProtobufSerializer serializer, byte[] serialData
           return true;
         }
         
-        public void Initialize(int slots, GameObject go = null)
+        public void Initialize(int slots, GameObject storageRoot = null)
         {
-            if (go == null)
+            if (storageRoot == null)
             {
                 _storageRoot = new GameObject("FCSStorage");
                 _storageRoot.transform.parent = transform;
@@ -190,7 +221,7 @@ public IEnumerator RestoreItems(ProtobufSerializer serializer, byte[] serialData
             }
             else
             {
-                _storageRoot = go;
+                _storageRoot = storageRoot;
             }
 
             _slots = slots;
@@ -225,13 +256,17 @@ public IEnumerator RestoreItems(ProtobufSerializer serializer, byte[] serialData
             ItemsContainer.isAllowedToRemove += IsAllowedToRemoveItems;
         }
 
-        public int GetContainerFreeSpace { get; }
-        public bool IsFull { get; }
+        public int GetContainerFreeSpace => _slots - GetCount();
+        public bool IsFull => GetCount() >= _slots;
+
         public List<TechType> InvalidTechTypes = new List<TechType>();
         public virtual bool CanBeStored(int amount, TechType techType)
         {
-            if (InvalidTechTypes.Contains(techType)) return false;
-            return !IsFull;
+            QuickLogger.Debug($"GetCount: {GetCount()} | Amount {amount} | Slots: {_slots}", true);
+
+            if (InvalidTechTypes.Contains(techType) || IsFull) return false;
+            
+            return GetCount() + amount <= _slots;
         }
 
         public virtual bool IsAllowedToAdd(Pickupable pickupable, bool verbose)

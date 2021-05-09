@@ -29,6 +29,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
         private HashSet<Filter> _filteringSettings;
         private string _currentBase;
         private bool _isVisible;
+        private DSSSlotController _slot;
         public bool IsBeingFormatted { get; set; }
         public bool IsFiltered => _filteringSettings != null && _filteringSettings.Count > 0;
         public override bool BypassRegisterCheck => true;
@@ -300,8 +301,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
             }
             ModelPrefab.ApplyShaders(gameObject);
             gameObject.SetActive(true);
-            transform.parent = slot.transform;
-            transform.localPosition = Vector3.zero;
             gameObject.SetActive(false);
         }
 
@@ -313,9 +312,10 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
             return _rackController.IsVisible;
         }
         
-        public void DockServer(BaseManager manager,Transform slot)
+        public void DockServer(BaseManager manager,Transform rack,DSSSlotController slot)
         {
             Manager = manager;
+            _slot = slot;
             _rb.isKinematic = true;
             if (!string.IsNullOrWhiteSpace(manager?.BaseID))
             {
@@ -330,7 +330,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
 
             ModelPrefab.ApplyShaders(gameObject);
             gameObject.SetActive(true);
-            transform.parent = slot;
+            transform.parent = rack;
             transform.localPosition = Vector3.zero;
             IsBeingFormatted = true;
         }
@@ -446,6 +446,11 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
             }
 
             return sb.ToString();
+        }
+
+        public DSSSlotController GetSlot()
+        {
+            return _slot;
         }
     }
 }
