@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Interfaces;
@@ -12,7 +11,6 @@ using FCS_AlterraHub.Systems;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using FMOD;
-using SMLHelper.V2.Utility;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Video;
@@ -25,7 +23,6 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
         private PDA _pda;
         private int prevQuickSlot;
         public GameObject PDAObj { get; set; }
-        private GameObject Mesh { get; set; }
         private Sequence sequence = new Sequence(false);
         private BaseManager _currentBase;
         private GameObject _inputDummy;
@@ -44,17 +41,13 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
         private Text _accountName;
         private Text _accountBalance;
         private bool _goToEncyclopedia;
-        private GameObject _missionPage;
-        private List<Button> _padHomeButtons = new List<Button>();
-        private GameObject _messagesPage;
-        public MessagesController MessagesController;
+        //private GameObject _missionPage;
+        //private GameObject _messagesPage;
         private bool _addtempMessage = true;
         private PaginatorController _inventoryPaginatorController;
         private PaginatorController _basePaginatorController;
         private bool _depthState;
 
-
-        public PDAMissionController MissionController;
         public float cameraFieldOfView = 62f;
         public float cameraFieldOfViewAtFourThree = 66f;
         public Canvas PdaCanvas { get; set; }
@@ -144,7 +137,7 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
         private void Start()
         {
             _home = GameObjectHelpers.FindGameObject(gameObject, "Home");
-            _missionPage = GameObjectHelpers.FindGameObject(gameObject, "Missions");
+            //_missionPage = GameObjectHelpers.FindGameObject(gameObject, "Missions");
             
             _bases = GameObjectHelpers.FindGameObject(gameObject, "Bases");
             _baseInventory = GameObjectHelpers.FindGameObject(gameObject, "BasesInventory");
@@ -231,36 +224,44 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             var settingsButton = GameObjectHelpers.FindGameObject(gameObject, "SettingsButton").GetComponent<Button>();
             settingsButton.onClick.AddListener(() => { QuickLogger.ModMessage("Page Not Implemented"); });
 
-            var messagesButton = GameObjectHelpers.FindGameObject(gameObject, "MessagesButton").GetComponent<Button>();
-            messagesButton.onClick.AddListener(() =>
-            {
-                _home.SetActive(false);
-                _messagesPage.SetActive(true);
-            });
+            var messageBTNObj = GameObjectHelpers.FindGameObject(gameObject, "MessagesButton");
+            var messagesButton = messageBTNObj.GetComponent<Button>();
+            var messageBTNToolTip = messageBTNObj.AddComponent<FCSToolTip>();
+            messageBTNToolTip.Tooltip = "Disabled until further notice!";
+            messageBTNToolTip.RequestPermission += () => true;
+            //messagesButton.onClick.AddListener(() =>
+            //{
+            //    _home.SetActive(false);
+            //    _messagesPage.SetActive(true);
+            //});
 
             var contactsButton = GameObjectHelpers.FindGameObject(gameObject, "ContactsButton").GetComponent<Button>();
             contactsButton.onClick.AddListener(() => { QuickLogger.ModMessage("Page Not Implemented"); });
 
-            var messagesBackBTN = GameObjectHelpers.FindGameObject(gameObject, "MessagesBackBTN").GetComponent<Button>();
-            messagesBackBTN.onClick.AddListener(() =>
-            {
-                _home.SetActive(true);
-                _messagesPage.SetActive(false);
-            });
+            //var messagesBackBTN = GameObjectHelpers.FindGameObject(gameObject, "MessagesBackBTN").GetComponent<Button>();
+            //messagesBackBTN.onClick.AddListener(() =>
+            //{
+            //    _home.SetActive(true);
+            //    _messagesPage.SetActive(false);
+            //});
 
-            var missionsBackBTN = GameObjectHelpers.FindGameObject(gameObject, "MissionsBackBTN").GetComponent<Button>();
-            missionsBackBTN.onClick.AddListener(() =>
-            {
-                _home.SetActive(true);
-                _missionPage.SetActive(false);
-            });
+            //var missionsBackBTN = GameObjectHelpers.FindGameObject(gameObject, "MissionsBackBTN").GetComponent<Button>();
+            //missionsBackBTN.onClick.AddListener(() =>
+            //{
+            //    _home.SetActive(true);
+            //    _missionPage.SetActive(false);
+            //});
 
-            var missionsButton = GameObjectHelpers.FindGameObject(gameObject, "MissionsButton").GetComponent<Button>();
-            missionsButton.onClick.AddListener(() =>
-            {
-                _home.SetActive(false);
-                _missionPage.SetActive(true);
-            });
+            var missionBTNObj = GameObjectHelpers.FindGameObject(gameObject, "MissionsButton");
+            var missionsButton = missionBTNObj.GetComponent<Button>();
+            var missionBTNToolTip = missionBTNObj.AddComponent<FCSToolTip>();
+            missionBTNToolTip.Tooltip = "Disabled until further notice!";
+            missionBTNToolTip.RequestPermission += () => true;
+            //missionsButton.onClick.AddListener(() =>
+            //{
+            //    _home.SetActive(false);
+            //    _missionPage.SetActive(true);
+            //});
         }
 
         private void CreateBasePage()
@@ -332,34 +333,7 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
 
             return true;
         }
-
-        private void CreateMessagesController()
-        {
-            _messagesPage = GameObjectHelpers.FindGameObject(gameObject, "Messages");
-            MessagesController = _messagesPage.AddComponent<MessagesController>();
-            MessagesController.Initialize(this);
-        }
-
-        internal void CreateMissionController()
-        {
-            CreateMessagesController();
-
-            MissionController = gameObject?.EnsureComponent<PDAMissionController>();
-            if (MissionController == null)
-            {
-                QuickLogger.Error<FCSPDAController>("Mission Controller is null", true);
-                return;
-            }
-            MissionController.Initialize();
-
-            if (MessagesController == null)
-            {
-                QuickLogger.Error<FCSPDAController>("Messages Controller is null", true);
-                return;
-            }
-
-        }
-
+        
         private void UpdateDisplay()
         {
             if (_inventoryGrid == null || _basesGrid == null || _currentBiome == null || _accountName == null) return;
@@ -440,25 +414,7 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             }
             QuickLogger.Debug("FCS PDA Is Open", true);
         }
-
-        private void HideAll()
-        {
-            _bases.SetActive(false);
-            _home.SetActive(false);
-            _baseInventory.SetActive(false);
-            _messagesPage.SetActive(false);
-            _missionPage.SetActive(false);
-            _itemTransferOperations.SetActive(false);
-        }
         
-        private void FindMesh()
-        {
-            if (Mesh == null)
-            {
-                Mesh = PDAObj.FindChild("Mesh");
-            }
-        }
-
         public void Close()
         {
             IsOpen = false;

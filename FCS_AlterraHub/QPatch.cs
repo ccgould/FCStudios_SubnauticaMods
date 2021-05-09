@@ -5,7 +5,6 @@ using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Craftables;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Helpers;
-using FCS_AlterraHub.Managers.Mission;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Spawnables;
 using FCSCommon.Utilities;
@@ -92,8 +91,6 @@ namespace FCS_AlterraHub
 
         }
 
-        public static MissionManager MissionManagerGM { get; internal set; }
-
         public static FCSHUD HUD { get; set; }
         public static bool IsDockedVehicleStorageAccessInstalled { get; set; }
 
@@ -102,11 +99,7 @@ namespace FCS_AlterraHub
             //Patch Bio Fuel
             var bioFuelSpawnable = new BioFuelSpawnable();
             bioFuelSpawnable.Patch();
-
-            //Patch FCS PDA Deco
-            var fcsPDADeco = new FCSPDADecoSpawnable();
-            fcsPDADeco.Patch();
-
+            
             //Patch Debit Card
             var debitCardSpawnable = new DebitCardSpawnable();
             debitCardSpawnable.Patch();

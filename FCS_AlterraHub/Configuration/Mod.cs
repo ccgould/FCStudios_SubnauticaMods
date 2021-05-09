@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using FCS_AlterraHub.Managers.Mission;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Patches;
 using FCS_AlterraHub.Registration;
@@ -12,7 +11,6 @@ using FCS_AlterraHub.Spawnables;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
 using FMOD;
-using QModManager.API;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Utility;
 using UnityEngine;
@@ -247,12 +245,7 @@ namespace FCS_AlterraHub.Configuration
                     GamePlaySettings = new FCSGamePlaySettings();
                 }
 
-
-                if (MissionManager.Instance != null)
-                {
-                    GamePlaySettings.Missions = MissionManager.Instance.Missions;
-                }
-
+                
                 ModUtils.Save(GamePlaySettings, "settings.json", GetSaveFileDirectory(), OnSaveComplete);
 
                 if (File.Exists(Path.Combine(GetSaveFileDirectory(), "settings.json")))
@@ -277,9 +270,7 @@ namespace FCS_AlterraHub.Configuration
             QuickLogger.Info("Loading Game Play Settings...");
             ModUtils.LoadSaveData<FCSGamePlaySettings>("settings.json", GetSaveFileDirectory(), data =>
             {
-                QuickLogger.Info($"Save Game Play Settings Loaded {data.PlayStarterMission}");
                 GamePlaySettings = data;
-                Player_Update_Patch.LoadSavesQuests = true;
             });
 
             if(GamePlaySettings == null)
@@ -497,8 +488,6 @@ namespace FCS_AlterraHub.Configuration
 
     public class FCSGamePlaySettings
     {
-        public bool PlayStarterMission { get; set; } = true;
-        public List<Mission> Missions { get; set; } = new List<Mission>();
         public bool IsOreConsumerFragmentSpawned { get; set; } = false;
     }
 

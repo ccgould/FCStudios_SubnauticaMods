@@ -187,10 +187,6 @@
     <Compile Include="Interfaces\IFCSGrowBed.cs" />
     <Compile Include="Interfaces\ISlotController.cs" />
     <Compile Include="Managers\FCSPowerManager.cs" />
-    <Compile Include="Managers\Mission\Enumerators\TaskStatus.cs" />
-    <Compile Include="Managers\Mission\Mission.cs" />
-    <Compile Include="Managers\Mission\MissionManager.cs" />
-    <Compile Include="Managers\Mission\MissionTask.cs" />
     <Compile Include="Model\AdditionalColor.cs" />
     <Compile Include="Model\BaseOperationObject.cs" />
     <Compile Include="Model\EatableEntities.cs" />
@@ -225,14 +221,10 @@
     <Compile Include="Mono\DumpContainerSimplified.cs" />
     <Compile Include="Mono\FCSAquarium.cs" />
     <Compile Include="Mono\FCSButton.cs" />
-    <Compile Include="Mono\FCSPDA\Mono\AudioMessage.cs" />
     <Compile Include="Mono\FCSPDA\Mono\DSSBaseItem.cs" />
     <Compile Include="Mono\FCSPDA\Mono\DSSInventoryItem.cs" />
     <Compile Include="Mono\FCSPDA\Mono\FCSEncyclopediaData.cs" />
     <Compile Include="Mono\FCSPDA\Mono\FCSPDAController.cs" />
-    <Compile Include="Mono\FCSPDA\Mono\MessagePDAEntryController.cs" />
-    <Compile Include="Mono\FCSPDA\Mono\MessagesController.cs" />
-    <Compile Include="Mono\FCSPDA\Mono\PDAMissionController.cs" />
     <Compile Include="Mono\FCSPDA\Mono\VideoProgressBar.cs" />
     <Compile Include="Mono\FCSStorage.cs" />
     <Compile Include="Mono\FCSStorageNonSerialized.cs" />
@@ -289,7 +281,6 @@
     <Compile Include="Patch\EnumTypeCache.cs" />
     <Compile Include="Patch\PDATabPatcher.cs" />
     <Compile Include="Patch\UIPatches.cs" />
-    <Compile Include="Spawnables\FCSPDADeco.cs" />
     <Compile Include="Spawnables\OreConsumerFragment.cs" />
     <Compile Include="Structs\FcsEntryData.cs" />
     <Compile Include="Structs\FCSStoreEntry.cs" />

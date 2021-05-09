@@ -1,16 +1,13 @@
 ﻿using System;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
-using FCS_AlterraHub.Managers.Mission;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Mono.FCSPDA.Mono;
-using FCS_AlterraHub.Spawnables;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using HarmonyLib;
 using UnityEngine;
 using UWE;
-using Object = UnityEngine.Object;
 
 
 namespace FCS_AlterraHub.Patches
@@ -25,20 +22,13 @@ namespace FCS_AlterraHub.Patches
         private static bool _wasPlaying;
         private static bool _firstMissionAdded;
         private static float _time;
-        public static bool LoadSavesQuests { get; set; }
-        
-        
+
+
         private static void Postfix(Player __instance)
         {
 
             _instance = __instance;
             OnPlayerUpdate?.Invoke();
-
-            if (LoadSavesQuests && QPatch.MissionManagerGM != null)
-            {
-                MissionManager.Instance.Load();
-                LoadSavesQuests = false;
-            }
 
             FCSPDA.AudioTrack.isPlaying(out bool isPlaying);
 
@@ -76,24 +66,6 @@ namespace FCS_AlterraHub.Patches
                 }
             }
 
-            
-
-
-            if (LargeWorldStreamer.main.IsWorldSettled())
-            {
-                OnWorldSettled?.Invoke();
-                if (FCSPDA != null && DayNightCycle.main.timePassed >= 600f)
-                {
-                    if (_firstMissionAdded) return;
-                    QuickLogger.Debug("Adding Starter Mission");
-                    MissionManager.Instance?.CreateStarterMission();
-                    QuickLogger.Debug("Updating PDA Missions");
-                    FCSPDA.MissionController.UpdateMissions();
-                    _firstMissionAdded = true;
-                }
-
-            }
-
             _time += Time.deltaTime;
             if (_time >= 1)
             {
@@ -103,12 +75,12 @@ namespace FCS_AlterraHub.Patches
 
         public static Action OnWorldSettled { get; set; }
     }
-    
+
     [HarmonyPatch(typeof(Player))]
     [HarmonyPatch("Awake")]
     public static class Player_Awake_Patch
     {
-       private static void Postfix(Player __instance)
+        private static void Postfix(Player __instance)
         {
             var f = uSkyManager.main.SunLight.transform;
             if (f != null)
@@ -126,7 +98,7 @@ namespace FCS_AlterraHub.Patches
 
         }
 
-       public static Transform SunTarget { get; set; }
+        public static Transform SunTarget { get; set; }
     }
 
     [HarmonyPatch(typeof(Player))]
@@ -139,15 +111,13 @@ namespace FCS_AlterraHub.Patches
         {
             if (Player_Update_Patch.FCSPDA != null) return;
 
-            CreateQuestManager();
-
             var pda = CreateFcsPda(__instance);
-            
+
             var defPDA = __instance.pdaSpawn.spawnedObj;
 
             MoveFcsPdaIntoPosition(defPDA, pda);
         }
-        
+
         internal static void ForceFCSPDACreation()
         {
             Postfix(Player.main);
@@ -175,12 +145,11 @@ namespace FCS_AlterraHub.Patches
 
             pda.SetActive(false);
             var canvas = pda.GetComponentInChildren<Canvas>();
-            if(canvas != null)
+            if (canvas != null)
                 canvas.sortingLayerID = 1479780821;
-            
+
             pda.EnsureComponent<Rigidbody>().isKinematic = true;
             var controller = pda.AddComponent<FCSPDAController>();
-            controller.CreateMissionController();
             Player_Update_Patch.FCSPDA = controller;
             controller.PDAObj = __instance.pdaSpawn.spawnedObj;
 
@@ -188,27 +157,16 @@ namespace FCS_AlterraHub.Patches
             return pda;
         }
 
-        private static void CreateQuestManager()
+        [HarmonyPatch(typeof(Player))]
+        [HarmonyPatch("OnProtoSerialize")]
+        internal static class PlayerOnProtoSerialize_Patch
         {
-            if (QPatch.MissionManagerGM == null)
+
+            [HarmonyPostfix]
+            private static void Postfix(Player __instance)
             {
-                QuickLogger.Debug("Load Gameplay Settings");
-                //Load GamePlaySettings
-                Mod.LoadGamePlaySettings();
-                QPatch.MissionManagerGM = new GameObject("MissionManager").AddComponent<MissionManager>();
+                Mod.SaveGamePlaySettings();
             }
-        }
-    }
-
-    [HarmonyPatch(typeof(Player))]
-    [HarmonyPatch("OnProtoSerialize")]
-    internal static class PlayerOnProtoSerialize_Patch
-    {
-
-        [HarmonyPostfix]
-        private static void Postfix(Player __instance)
-        {
-            Mod.SaveGamePlaySettings();
         }
     }
 }

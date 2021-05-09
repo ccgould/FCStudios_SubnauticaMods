@@ -80,13 +80,6 @@ namespace FCS_AlterraHub.Configuration
             return $"Parameters: {techType}";
         }
 
-        [ConsoleCommand("CompleteMission")]
-        public static string CompleteMission(string missionKey)
-        {
-            QPatch.MissionManagerGM.CompleteCurrentMission(missionKey);
-            return $"Parameters: {missionKey}";
-        }
-
         [ConsoleCommand("FastOreProcessing")]
         public static void FastOreProcessing()
         {
