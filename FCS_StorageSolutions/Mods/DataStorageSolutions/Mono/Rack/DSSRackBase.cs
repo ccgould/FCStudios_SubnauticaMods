@@ -2,20 +2,24 @@
 using System.Collections.Generic;
 using System.Data.Odbc;
 using System.Linq;
+using System.Text;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Interfaces;
+using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_StorageSolutions.Configuration;
 using FCS_StorageSolutions.Helpers;
 using FCS_StorageSolutions.Mods.AlterraStorage.Buildable;
+using FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
+using WorldHelpers = FCS_AlterraHub.Helpers.WorldHelpers;
 
 namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
 {
@@ -36,7 +40,12 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         protected bool IsFromSave;
         protected abstract DSSServerRackDataEntry SavedData { get; set; }
         protected Dictionary<string,DSSSlotController> Slots;
-        
+        private GameObject _homePage;
+        private GameObject _configurationPage;
+        internal RackConfigurationPageController ConfigurationPageController;
+        private InterfaceInteraction _interfaceInteraction;
+        private FCSMessageBox _messageBox;
+
         public override bool IsOperational => IsInitialized && IsConstructed;
         public override bool IsRack { get; } = true;
         public override bool IsVisible => _isVisible;
@@ -157,15 +166,19 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         { 
             if(IsInitialized) return;
             _canvas = gameObject.GetComponentInChildren<Canvas>()?.gameObject;
+            _homePage = _canvas.FindChild("Home");
+            _configurationPage = _canvas.FindChild("ConfigurationPage");
+            ConfigurationPageController = _configurationPage.AddComponent<RackConfigurationPageController>();
+            ConfigurationPageController.Setup(this);
 
             if (_canvas == null) return;
 
             Slots = new Dictionary<string,DSSSlotController>();
             
-            _percentageBar = _canvas.FindChild("Home").FindChild("BGPreloader").FindChild("Preloader").GetComponent<Image>();
-            _storageAmount = _canvas.FindChild("Home").FindChild("BGPreloader").FindChild("Amount").GetComponentInChildren<Text>();
+            _percentageBar = _homePage.FindChild("BGPreloader").FindChild("Preloader").GetComponent<Image>();
+            _storageAmount = _homePage.FindChild("BGPreloader").FindChild("Amount").GetComponentInChildren<Text>();
             
-            var insertBtn = _canvas.FindChild("Home").FindChild("InsertButton").GetComponent<Button>();
+            var insertBtn = _homePage.FindChild("InsertButton").GetComponent<Button>();
             insertBtn.onClick.AddListener((() =>
             {
                 foreach (KeyValuePair<string, DSSSlotController> slot in Slots)
@@ -179,7 +192,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
                     QuickLogger.ModMessage("Rack is Full");
                 }
             }));
-            
+
             CreateDumpContainer();
             
             FindReaderDisplays();
@@ -190,11 +203,28 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
 
             CreateColorManager();
 
+            _interfaceInteraction = _canvas.AddComponent<InterfaceInteraction>();
+
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseEmissiveDecalsController, gameObject, Color.cyan);
-            
+            MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseEmissiveDecals, gameObject, 4f);
+            _messageBox = GameObjectHelpers.FindGameObject(_canvas, "MessageBox").AddComponent<FCSMessageBox>();
             InvokeRepeating(nameof(RegisterServers), 1f, 1f);
             InvokeRepeating(nameof(UpdateScreenState), 1, 1);
             IsInitialized = true;
+        }
+
+        internal void GoToPage(DSSRackPages page)
+        {
+            if (page == DSSRackPages.Home)
+            {
+                _homePage.SetActive(true);
+                _configurationPage.SetActive(false);
+            }
+            else 
+            {
+                _homePage.SetActive(false);
+                _configurationPage.SetActive(true);
+            }
         }
 
         private void CreateColorManager()
@@ -202,7 +232,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
             if (_colorManager == null)
             {
                 _colorManager = gameObject.EnsureComponent<ColorManager>();
-                _colorManager.Initialize(gameObject, ModelPrefab.BodyMaterial, ModelPrefab.SecondaryMaterial);
+                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol);
             }
         }
 
@@ -243,7 +273,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
                 var meter = metersTemp[i];
                 var slotName = $"Slot {i + 1}";
                 var slotController = slot.AddComponent<DSSSlotController>();
-                slotController.Initialize(slotName, this, meter, _readers?[i]);
+                slotController.Initialize(slotName, this, meter, _readers?[i],this);
 
                 Slots.Add(slotName, slotController);
             }
@@ -497,10 +527,17 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
 
         public void OnHandHover(GUIHand hand)
         {
-            if (!IsConstructed || !IsInitialized) return;
-            //HandReticle main = HandReticle.main;
-            //main.SetIcon(HandReticle.IconType.Default);
-            //main.SetInteractText("N/A");
+            HandReticle main = HandReticle.main;
+
+            if (!IsInitialized || !IsConstructed || _interfaceInteraction.IsInRange)
+            {
+                main.SetIcon(HandReticle.IconType.Default);
+                main.SetInteractTextRaw(string.Empty,string.Empty);
+                return;
+            }
+
+            main.SetInteractTextRaw($"Power Usage Per Second: {GetPowerUsage()}","");
+            main.SetIcon(HandReticle.IconType.Info);
         }
 
         public void OnHandClick(GUIHand hand)
@@ -587,5 +624,17 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         {
             return _storage.AddItemToContainer(item);
         }
+
+        public void ShowMessage(string message)
+        {
+            _messageBox.Show(message, FCSMessageButton.OK, null);
+        }
+    }
+
+    internal enum DSSRackPages
+    {
+        Home=0,
+        Settings=1
+
     }
 }

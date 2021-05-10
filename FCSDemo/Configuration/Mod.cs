@@ -5,8 +5,8 @@ using System.IO;
 using FCS_AlterraHub.Objects;
 using FCSCommon.Utilities;
 using FCSDemo.Model;
+using FCSDemo.Mono;
 using Model;
-using Mono;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Json;
 using SMLHelper.V2.Utility;
@@ -36,9 +36,9 @@ namespace FCSDemo.Configuration
         internal static string SaveDataFilename => $"{ClassID}SaveData.json";
         internal static string MODFOLDERLOCATION => GetModPath();
 
-#if SUBNAUTICA
+#if SUBNAUTICA_STABLE
         internal static TechData FCSDemoIngredients => new TechData
-#elif BELOWZERO
+#else
                 internal static RecipeData FCSDemoIngredients => new RecipeData
 #endif
         {

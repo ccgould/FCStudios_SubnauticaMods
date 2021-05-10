@@ -1,5 +1,6 @@
 ﻿using System;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Mono.OreConsumer;
@@ -83,9 +84,10 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Antenna
 
             if (MotorHandler == null)
             {
-                MotorHandler = GameObjectHelpers.FindGameObject(gameObject, "rotor").AddComponent<MotorHandler>();
+                MotorHandler = GameObjectHelpers.FindGameObject(gameObject, "anim_mesh").AddComponent<MotorHandler>();
                 MotorHandler.Initialize(30);
             }
+            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseEmissiveDecalsController, gameObject, Color.cyan);
 
             IsInitialized = true;
 

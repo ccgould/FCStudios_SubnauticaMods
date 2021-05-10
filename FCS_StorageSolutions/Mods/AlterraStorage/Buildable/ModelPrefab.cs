@@ -52,15 +52,15 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Buildable
             }
 
             AlterraStoragePrefab = GetPrefab(Mod.AlterraStoragePrefabName);
-            DSSServerPrefab = GetPrefab(Mod.DSSServerPrefabName);
+            DSSServerPrefab = GetPrefab(Mod.DSSServerPrefabName,true);
             DSSFormattingStationPrefab = GetPrefab(Mod.DSSFormattingStationPrefabName);
             DSSTerminalPrefab = GetPrefab(Mod.DSSTerminalPrefabName);
             DSSTransceiverPrefab = GetPrefab(Mod.TransceiverPrefabName);
-            DSSWallServerRackPrefab = GetPrefab(Mod.DSSWallServerRackPrefabName);
-            DSSFloorServerRackPrefab = GetPrefab(Mod.DSSFloorServerRackPrefabName);
-            DSSAntennaPrefab = GetPrefab(Mod.DSSAntennaPrefabName);
+            DSSWallServerRackPrefab = GetPrefab(Mod.DSSWallServerRackPrefabName,true);
+            DSSFloorServerRackPrefab = GetPrefab(Mod.DSSFloorServerRackPrefabName,true);
+            DSSAntennaPrefab = GetPrefab(Mod.DSSAntennaPrefabName,true);
             DSSItemDisplayPrefab = GetPrefab(Mod.DSSItemDisplayPrefabName);
-            ItemTransferUnitPrefab = GetPrefab(Mod.ItemTransferUnitPrefabName,true);
+            //ItemTransferUnitPrefab = GetPrefab(Mod.ItemTransferUnitPrefabName,true);
             DSSInventoryItemPrefab = GetPrefab("DSSInventoryItem");
             DSSAvaliableVehiclesItemPrefab = GetPrefab("AvaliableVehiclesItem");
             FilterItemPrefab = GetPrefab("FilterItem");

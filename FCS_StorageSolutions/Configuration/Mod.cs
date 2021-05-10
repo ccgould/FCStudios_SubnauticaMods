@@ -52,8 +52,8 @@ namespace FCS_StorageSolutions.Configuration
         internal const string TransceiverTabID = "DTS";
         internal const string TransceiverFriendlyName = "Transceiver";
         internal const string TransceiverClassName = "DSSTransceiver";
-        internal const string TransceiverPrefabName = "DSS_Transceiver";
-        internal const string TransceiverDescription = "N/A";
+        internal const string TransceiverPrefabName = "DSS_ServerDataDisc";
+        internal const string TransceiverDescription = "Move items between the Data Storage Network and compatible Units and Devices. Requires Server Rack.";
 
         internal const string ItemTransferUnitTabID= "ITU";
         internal const string ItemTransferUnitFriendlyName = "Item Transfer Unit";
@@ -92,7 +92,7 @@ namespace FCS_StorageSolutions.Configuration
         internal const string DSSFloorServerRackClassName = "DSSFloorServerRack";
         internal const string DSSFloorServerRackPrefabName = "DSS_FloorServerRack";
         internal static string DSSFloorServerRackKitClassID => $"{DSSFloorServerRackClassName}_Kit";
-        internal const string DSSFloorServerRackDescription = "Holds 17 Data Storage Servers. Requires a floor.";
+        internal const string DSSFloorServerRackDescription = "Holds 20 Data Storage Disks. Requires a floor.";
         
         internal const string DSSAntennaFriendlyName = "Antenna";
         internal const string DSSAntennaClassName = "DSSAntenna";

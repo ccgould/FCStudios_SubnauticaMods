@@ -37,15 +37,12 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Transceiver
                 _rb = GetComponentInChildren<Rigidbody>();
             }
             _rb.isKinematic = true;
-            gameObject.SetActive(true);
+            gameObject.SetActive(false);
             foreach (BoxCollider bc in _colliders)
             {
                 bc.isTrigger = true;
             }
             ModelPrefab.ApplyShaders(gameObject);
-            gameObject.SetActive(true);
-            transform.parent = slot.transform;
-            transform.localPosition = Vector3.zero;
         }
 
         public void UnDockTransceiver(DSSSlotController slot, IDSSRack controller)

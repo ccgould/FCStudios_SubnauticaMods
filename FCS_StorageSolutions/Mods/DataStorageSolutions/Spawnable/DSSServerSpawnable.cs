@@ -5,12 +5,11 @@ using FCS_StorageSolutions.Configuration;
 using FCS_StorageSolutions.Mods.AlterraStorage.Buildable;
 using FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Assets;
 using UnityEngine;
 
-namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable
+namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Spawnable
 {
-    internal class DSSServerSpawnable : Spawnable
+    internal class DSSServerSpawnable : SMLHelper.V2.Assets.Spawnable
     {
         public override string AssetsFolder => Mod.GetAssetFolder();
 

@@ -1,17 +1,14 @@
 ﻿using System;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
-using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Objects;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
-using FCSDemo;
-using FCSDemo.Buildables;
-using FCSDemo.Configuration;
 using Model;
 using UnityEngine;
 
-namespace Mono
+namespace FCSDemo.Mono
 {
     internal class FCSDemoController : FcsDevice,IHandTarget
     {
@@ -41,38 +38,13 @@ namespace Mono
             {
                 QuickLogger.Info($"Creating Color Component", true);
                 _colorManager = gameObject.AddComponent<ColorManager>();
-                _colorManager.Initialize(gameObject,FCSDemoModel.BodyMaterial,FCSDemoModel.SecondaryMaterial,FCSDemoModel.EmissiveControllerMaterial);
+                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol, AlterraHub.BaseSecondaryCol, AlterraHub.BaseEmission);
 
                 if (QPatch.Configuration.ControlEmissionStrength)
                 {
-                    MaterialHelpers.ChangeEmissionStrength(FCSDemoModel.EmissiveControllerMaterial, gameObject, QPatch.Configuration.EmissionStrength);
+                    MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseEmission, gameObject, QPatch.Configuration.EmissionStrength);
                 }
             }
-
-            //if (_fcsAquarium == null && QPatch.Configuration.HasAquarium)
-            //{
-            //    var storageRoot = GameObjectHelpers.FindGameObject(gameObject, "StorageRoot");
-            //    _fcsAquarium = gameObject.AddComponent<FCSAquarium>();
-            //    _fcsAquarium.Initialize(storageRoot, new[] { TechType.Peeper, TechType.GarryFish, TechType.Bladderfish, TechType.HoleFish });
-            //}
-
-            //if (QPatch.Configuration.AddPlants)
-            //{
-            //    var plantSpawns = GameObjectHelpers.FindGameObject(gameObject, "spawn_pnt");
-
-            //    if (plantSpawns != null)
-            //    {
-            //        foreach (Transform plantGo in plantSpawns.transform)
-            //        {
-            //            var name = plantGo.gameObject.name;
-
-            //            if (SpawnHelper.ContainsPlant(name))
-            //            {
-            //                SpawnHelper.SpawnAtPoint(name, plantGo);
-            //            }
-            //        }
-            //    }
-            //}
             QuickLogger.Info("Initialized", true);
         }
 
@@ -130,7 +102,7 @@ namespace Mono
 
         public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
         {
-            QuickLogger.Info($"Changing material {FCSDemoModel.BodyMaterial} color to {ColorList.GetName(color)}",true);
+            QuickLogger.Info($"Changing material {AlterraHub.BasePrimaryCol} color to {ColorList.GetName(color)}",true);
             
             var result = _colorManager.ChangeColor(color, mode);
 

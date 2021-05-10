@@ -6,7 +6,7 @@ using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using FCSDemo.Configuration;
 using FCSDemo.Model;
-using Mono;
+using FCSDemo.Mono;
 using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Utility;

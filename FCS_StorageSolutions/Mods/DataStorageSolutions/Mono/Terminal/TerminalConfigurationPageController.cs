@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
 {
-    internal class ConfigurationPageController : MonoBehaviour, ITerminalPage
+    internal class TerminalConfigurationPageController : MonoBehaviour, ITerminalPage
     {
         private DSSTerminalDisplayManager _mono;
         private FCSButton _moonpoolPage;

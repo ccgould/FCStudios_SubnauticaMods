@@ -47,7 +47,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         private PaginatorController _paginatorController;
         private TransceiverPageController _itemTransceiverPage;
         private DeviceTransceiverDialog _deviceTransceiverDialog;
-        private ConfigurationPageController _configurationPage;
+        private TerminalConfigurationPageController _terminalConfigurationPage;
         private MoonPoolPageController _moonPoolController;
         private FilterSettingDialog _filterSettingList;
         private CraftingPageController _craftingController;
@@ -198,8 +198,8 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                 _deviceTransceiverDialog = GameObjectHelpers.FindGameObject(gameObject, "DeviceTransceiverDialog").AddComponent<DeviceTransceiverDialog>();
                 _deviceTransceiverDialog.Initialize();
                 _itemTransceiverPage = GameObjectHelpers.FindGameObject(gameObject, "TransceiverSettings").AddComponent<TransceiverPageController>();
-                _configurationPage = GameObjectHelpers.FindGameObject(gameObject, "Configuration").AddComponent<ConfigurationPageController>();
-                _configurationPage.Initialize(this);
+                _terminalConfigurationPage = GameObjectHelpers.FindGameObject(gameObject, "Configuration").AddComponent<TerminalConfigurationPageController>();
+                _terminalConfigurationPage.Initialize(this);
                 _itemTransceiverPage.Initialize(this);
                 
                 var screenToggleObj = GameObjectHelpers.FindGameObject(gameObject, "ServerToggleBTN").AddComponent<FCSButton>();
@@ -418,7 +418,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                     break;
                 case TerminalPages.Configuration:
                     HideAllPages();
-                    _configurationPage.Show();
+                    _terminalConfigurationPage.Show();
                     break;
                 case TerminalPages.Crafting:
                     HideAllPages();
@@ -435,7 +435,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         {
             _itemTransceiverPage.Hide();
             _moonPoolController.Hide();
-            _configurationPage.Hide();
+            _terminalConfigurationPage.Hide();
             _homeObj.SetActive(false);
             _filterSettingList.Hide();
             _networkBTN.Hide();

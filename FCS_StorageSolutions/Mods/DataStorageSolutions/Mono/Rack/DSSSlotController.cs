@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Text;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Model;
@@ -10,6 +12,7 @@ using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using WorldHelpers = FCS_AlterraHub.Helpers.WorldHelpers;
 
 namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
 {
@@ -27,6 +30,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         private Text _readerPreloaderPercentage;
         private Text _readerPercentage;
         private GameObject _buttons;
+        private StringBuilder _sb = new StringBuilder();
 
 
         public bool IsOccupied => _mountedServer != null || _transceiver != null;
@@ -67,9 +71,14 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
             if (_readerPercentage != null) _readerPercentage.text = "0/0";
         }
 
-        internal void Initialize(string slotName, IDSSRack controller, GameObject preloader, GameObject readerMesh)
+        internal void Initialize(string slotName, IDSSRack controller, GameObject preloader, GameObject readerMesh, DSSRackBase rackBase)
         {
-            if(readerMesh != null)
+
+            var toolTip = gameObject.AddComponent<FCSToolTip>();
+            toolTip.RequestPermission += () => WorldHelpers.CheckIfInRange(toolTip.gameObject, Player.main.gameObject, 2) && _mountedServer != null;
+            toolTip.ToolTipStringDelegate += GetFiltersString;
+
+            if (readerMesh != null)
             {
                 readerMesh.FindChild("Header").GetComponent<Text>().text = slotName;
                 _readerPreloader = readerMesh.FindChild("Pecentage").FindChild("Bar").GetComponent<Image>();
@@ -102,9 +111,45 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
                 ClearSlot();
                 _controller.UpdateStorageCount();
             }));
-            
+
+            var configurationBTN = _buttons.FindChild("SettingsBTN").GetComponent<Button>();
+            configurationBTN.onClick.AddListener((() =>
+            {
+                if (_transceiver != null)
+                {
+                    rackBase.ShowMessage(AuxPatchers.TransceiversCantFilter());
+                    return;
+                }
+                rackBase.ConfigurationPageController.SetSlot(this);
+                rackBase.GoToPage(DSSRackPages.Settings);
+            }));
+
             _controller = controller;
             _slotName = slotName;
+        }
+
+        private string GetFiltersString()
+        {
+            _sb.Clear();
+            if (_mountedServer == null) return _sb.ToString();
+            
+            if(GetFilters().Count ==0)
+            {
+                _sb.Append(AuxPatchers.DiskEjectButtonInformation());
+                _sb.Append(Environment.NewLine);
+                _sb.Append(AuxPatchers.DiskConfigButtonInformation());
+            }
+            else
+            {
+                foreach (Filter filter in GetFilters())
+                {
+                    _sb.Append($"Filters:");
+                    _sb.Append(Environment.NewLine);
+                    _sb.Append($"{filter.GetString()} ");
+                }
+            }
+
+            return _sb.ToString();
         }
 
         internal bool MountServerToRack(InventoryItem item)
@@ -279,6 +324,26 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         private void OnMountedServerUpdate(InventoryItem item)
         {
             _controller.UpdateStorageCount();
+        }
+
+        public HashSet<Filter> GetFilters()
+        {
+            return _mountedServer?.GetFilters();
+        }
+
+        public void AddFilter(Filter filter)
+        {
+            _mountedServer?.AddFilter(filter);
+        }
+
+        public void RemoveFilter(Filter filter)
+        {
+            _mountedServer?.RemoveFilter(filter);
+        }
+
+        public bool HasFilter()
+        {
+            return _mountedServer?.IsFiltered ?? false;
         }
     }
 }

@@ -167,12 +167,16 @@
     <Compile Include="Configuration\Mod.cs" />
     <Compile Include="Configuration\SaveDataEntry.cs" />
     <Compile Include="Mods\DataStorageSolutions\Buildable\DSSAntennaPatch.cs" />
-    <Compile Include="Mods\DataStorageSolutions\Buildable\DSSTransceiver.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Rack\AddFilterController.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Rack\FilterDisplayItem.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Rack\FilterItems.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Rack\RackConfigurationPageController.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Spawnable\DSSTransceiver.cs" />
     <Compile Include="Mods\DataStorageSolutions\Buildable\DSSTerminalPatch.cs" />
     <Compile Include="Mods\DataStorageSolutions\Buildable\DSSItemDisplayPatch.cs" />
     <Compile Include="Mods\DataStorageSolutions\Buildable\DSSFloorServerRackPatch.cs" />
     <Compile Include="Mods\DataStorageSolutions\Buildable\DSSWallServerRackPatch.cs" />
-    <Compile Include="Mods\DataStorageSolutions\Buildable\DSSServerSpawnable.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Spawnable\DSSServerSpawnable.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\Antenna\DSSAntennaController.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\ItemDisplay\DSSItemDisplayController.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\ItemDisplay\NetworkDumpStorage.cs" />
@@ -184,7 +188,7 @@
     <Compile Include="Mods\DataStorageSolutions\Mono\InterfaceInteraction.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\BaseListController.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\BulkMultipliers.cs" />
-    <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\ConfigurationPageController.cs" />
+    <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\TerminalConfigurationPageController.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\CrafterSectionController.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\CraftingDialogController.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\CraftingPageController.cs" />
@@ -213,9 +217,7 @@
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Mods\DataStorageSolutions\Spawnables\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\FCS_AlterraHub\FCS_AlterraHub.csproj">
       <Project>{1a17b4ba-aae5-41c2-924a-ce05dc74efe8}</Project>

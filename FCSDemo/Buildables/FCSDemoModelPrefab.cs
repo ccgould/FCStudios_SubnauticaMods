@@ -1,4 +1,5 @@
 ﻿using System;
+using FCS_AlterraHub.Buildables;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using FCSDemo.Configuration;
@@ -8,54 +9,12 @@ namespace FCSDemo.Buildables
 {
     internal static class FCSDemoModel
     {
-        private static bool _init;
-        private static AssetBundle _assetBundle;
-        internal static GameObject ColorItemPrefab { get; set; }
-        internal static string BodyMaterial => $"{Mod.ModName}_COL";
-        internal static string SecondaryMaterial => $"{Mod.ModName}_COL_S";
-        internal static string DecalMaterial => $"{Mod.ModName}_DECALS";
-        internal static string DetailsMaterial => $"{Mod.ModName}_DETAILS";
-        internal static string SpecTexture => $"{Mod.ModName}_S";
-        internal static string LUMTexture => $"{Mod.ModName}_E";
-        internal static string NormalTexture => $"{Mod.ModName}_N";
-        internal static string DetailTexture => $"{Mod.ModName}_D";
-        public static string EmissiveBControllerMaterial { get; } = $"{Mod.ModName}_B_Controller";
-        public static string EmissiveControllerMaterial { get; } = $"{Mod.ModName}_E_Controller";
-
         public static GameObject GetPrefabs(string prefabName)
         {
             try
             {
-                QuickLogger.Info($"Trying to find prefab ID: {prefabName}");
-                if (!_init)
-                {
-                    QuickLogger.Debug($"AssetBundle Set");
-
-                    QuickLogger.Debug("GetPrefabs"); 
-                    _assetBundle = AssetHelper.Asset(Mod.BundleName);
-                    _init = true;
-                }
-                
-                
-                //We have found the asset bundle and now we are going to continue by looking for the model.
-                GameObject prefab = _assetBundle?.LoadAsset<GameObject>(prefabName);
-
-
-
-                //If the prefab isn't null lets add the shader to the materials
-                if (prefab != null)
-                {
-                    //Lets apply the material shader
-                    ApplyShaders(prefab, _assetBundle);
-                    QuickLogger.Info($"{prefabName} Found!");
-                    return prefab;
-
-                }
-                else
-                {
-                    QuickLogger.Error($"{prefabName} Not Found!");
-                    return null;
-                }
+                LoadAssetV2(prefabName, AssetHelper.Asset(Mod.BundleName), out GameObject go);
+                return go;
             }
             catch (Exception e)
             {
@@ -64,20 +23,38 @@ namespace FCSDemo.Buildables
             }
         }
 
-        /// <summary>
-        /// Applies the shader to the materials of the reactor
-        /// </summary>
-        /// <param name="prefab">The prefab to apply shaders.</param>
-        private static void ApplyShaders(GameObject prefab, AssetBundle bundle)
+        private static bool LoadAssetV2(string prefabName, AssetBundle assetBundle, out GameObject go, bool applyShaders = true)
         {
-            #region BaseColor
-            MaterialHelpers.ApplySpecShader(BodyMaterial, SpecTexture, prefab, 1, 3f, bundle);
-            MaterialHelpers.ApplyEmissionShader(BodyMaterial, LUMTexture, prefab, bundle, Color.white);
-            MaterialHelpers.ApplyEmissionShader(DetailsMaterial, LUMTexture, prefab, bundle, Color.white);
-            MaterialHelpers.ApplyEmissionShader(DecalMaterial, LUMTexture, prefab, bundle, Color.white);
-            MaterialHelpers.ApplyEmissionShader(EmissiveControllerMaterial, LUMTexture, prefab, bundle, Color.white);
-            MaterialHelpers.ApplyAlphaShader(DecalMaterial, prefab);
-            #endregion
+            QuickLogger.Debug("Loading Asset");
+            //We have found the asset bundle and now we are going to continue by looking for the model.
+            GameObject prefab = assetBundle.LoadAsset<GameObject>(prefabName);
+            QuickLogger.Debug($"Loaded Prefab {prefabName}");
+
+            //If the prefab isn't null lets add the shader to the materials
+            if (prefab != null)
+            {
+                if (applyShaders)
+                {
+                    //Lets apply the material shader
+                    AlterraHub.ReplaceShadersV2(prefab, AlterraHub.BasePrimaryCol);
+                    AlterraHub.ReplaceShadersV2(prefab, AlterraHub.BaseSecondaryCol);
+                    AlterraHub.ReplaceShadersV2(prefab, AlterraHub.BaseDefaultDecals);
+                    AlterraHub.ReplaceShadersV2(prefab, AlterraHub.BaseTexDecals);
+                    AlterraHub.ReplaceShadersV2(prefab, AlterraHub.BaseEmissiveDecals);
+                    AlterraHub.ReplaceShadersV2(prefab, AlterraHub.BaseEmissiveDecalsController);
+                    QuickLogger.Debug($"Applied shaderes to prefab {prefabName}");
+                }
+
+                go = prefab;
+                QuickLogger.Debug($"{prefabName} Prefab Found!");
+                return true;
+            }
+
+            QuickLogger.Error($"{prefabName} Prefab Not Found!");
+
+            go = null;
+            return false;
         }
+
     }
 }
