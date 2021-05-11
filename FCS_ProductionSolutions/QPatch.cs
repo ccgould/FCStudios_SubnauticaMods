@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿using System;
+using System.IO;
+using System.Reflection;
 using FCS_HomeSolutions.Mods.Replicator.Buildables;
 using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
@@ -12,6 +14,8 @@ using FCSCommon.Utilities;
 using HarmonyLib;
 using QModManager.API.ModLoading;
 using SMLHelper.V2.Handlers;
+using SMLHelper.V2.Utility;
+using UnityEngine;
 
 namespace FCS_ProductionSolutions
 {
@@ -28,6 +32,11 @@ namespace FCS_ProductionSolutions
             ModelPrefab.Initialize();
 
             AuxPatchers.AdditionalPatching();
+
+
+            //Harmony
+            var harmony = new Harmony("com.productionsolutions.fcstudios");
+            harmony.PatchAll(Assembly.GetExecutingAssembly());
 
             if (Configuration.IsHydroponicHarvesterEnabled)
             {
@@ -55,6 +64,18 @@ namespace FCS_ProductionSolutions
                 var glass = new FcsGlassCraftable();
                 glass.Patch();
 
+                var type = Type.GetType("SubnauticaMap.PingMapIcon, SubnauticaMap", false, false);
+                if (type != null)
+                {
+                    var pingOriginal = AccessTools.Method(type, "Refresh");
+                    var pingPrefix = new HarmonyMethod(AccessTools.Method(typeof(PingMapIcon_Patch), "Prefix"));
+                    harmony.Patch(pingOriginal, pingPrefix);
+                }
+                
+                var pingSprite = ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetFolder(), "DeepDriller_ping.png"));
+                SpriteHandler.RegisterSprite(SpriteManager.Group.Pings, "Deep Driller", pingSprite);
+                DeepDrillerPingType = PingHandler.RegisterNewPingType("Deep Driller", pingSprite);
+
                 var deepDriller = new FCSDeepDrillerBuildable();
                 deepDriller.Patch();
             }
@@ -68,11 +89,31 @@ namespace FCS_ProductionSolutions
             //Register debug commands
             ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));
 
-            //Harmony
-            var harmony = new Harmony("com.productionsolutions.fcstudios");
-            harmony.PatchAll(Assembly.GetExecutingAssembly());
-
             QuickLogger.Info($"Finished Patching");
+        }
+
+        public static PingType DeepDrillerPingType { get; set; }
+
+        public static class PingMapIcon_Patch
+        {
+            [HarmonyPrefix]
+            public static bool Prefix(object __instance)
+            {
+                FieldInfo field = __instance.GetType().GetField("ping");
+                PingInstance ping = field.GetValue(__instance) as PingInstance;
+                if (ping.pingType == QPatch.DeepDrillerPingType)
+                {
+                    FieldInfo field2 = __instance.GetType().GetField("icon");
+                    uGUI_Icon icon = field2.GetValue(__instance) as uGUI_Icon;
+                    icon.sprite = SpriteManager.Get(SpriteManager.Group.Pings, "Deep Driller");
+                    icon.color = Color.black;
+                    RectTransform rectTransform = icon.rectTransform;
+                    rectTransform.sizeDelta = Vector2.one * 28f;
+                    rectTransform.localPosition = Vector3.zero;
+                    return false;
+                }
+                return true;
+            }
         }
     }
 }

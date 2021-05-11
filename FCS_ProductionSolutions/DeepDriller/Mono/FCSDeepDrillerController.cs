@@ -416,7 +416,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             if (_ping != null)
             {
                 _ping.enabled = false;
-                _ping.pingType = PingType.Signal;
+                _ping.pingType = QPatch.DeepDrillerPingType;
                 _ping.origin = transform;
                 _ping.enabled = true;
             }
