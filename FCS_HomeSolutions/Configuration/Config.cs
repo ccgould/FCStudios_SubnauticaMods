@@ -246,6 +246,11 @@ namespace FCS_HomeSolutions.Configuration
          Tooltip("Enables/Disables LED Lights and Tables from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool IsLEDLightsEnabled = true;
 
+        [Keybind("[LED Lights] Decrease Light Intensity"), Tooltip("Changes how bright the light is.")]
+        public KeyCode LEDLightBackwardKeyCode = KeyCode.LeftArrow;
+        [Keybind("[LED Lights] Increase Light Intensity"), Tooltip("Changes how bright the light is.")]
+        public KeyCode LEDLightForwardKeyCode = KeyCode.RightArrow;
+
         #endregion
 
 

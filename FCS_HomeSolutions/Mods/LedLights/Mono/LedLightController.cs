@@ -49,6 +49,8 @@ namespace FCS_HomeSolutions.Mods.LedLights.Mono
                         _colorManager.ChangeColor(_savedData.Lum.Vector4ToColor(), ColorTargetMode.Emission);
                         transform.rotation = _savedData.Rotation.Vec4ToQuaternion();
                         _light.color = _savedData.Lum.Vector4ToColor();
+                        if(Mod.GetSaveData().SaveVersion >= 1.1)
+                            _light.intensity = _savedData.Intensity < 0.5f ? 0.5f : _savedData.Intensity;
                         _isFromSave = false;
                     }
                 }
@@ -92,9 +94,11 @@ namespace FCS_HomeSolutions.Mods.LedLights.Mono
                 _savedData = new LedLightDataEntry();
             }
 
+
             _savedData.Id = GetPrefabID();
             _savedData.Lum = _colorManager.GetLumColor().ColorToVector4();
             _savedData.Rotation = transform.rotation.QuaternionToVec4();
+            _savedData.Intensity = _light.intensity;
             QuickLogger.Debug($"Saving ID {_savedData.Id}");
             newSaveData.LedLightDataEntries.Add(_savedData);
         }
@@ -175,11 +179,11 @@ namespace FCS_HomeSolutions.Mods.LedLights.Mono
             HandReticle main = HandReticle.main;
             if (_buildable.allowedOnWall)
             {
-                main.SetInteractText(AuxPatchers.ClickToRotate(), AuxPatchers.PressToToggleLightFormat(GameInput.GetBindingName(GameInput.Button.AltTool, GameInput.BindingSet.Primary)));
+                main.SetInteractText(AuxPatchers.ClickToRotate(), AuxPatchers.PressToToggleLightFormat(GameInput.GetBindingName(GameInput.Button.AltTool, GameInput.BindingSet.Primary), QPatch.Configuration.LEDLightBackwardKeyCode.ToString(), QPatch.Configuration.LEDLightForwardKeyCode.ToString(),_light.intensity));
             }
             else
             {
-                main.SetInteractText(AuxPatchers.PressToToggleLightFormat(GameInput.GetBindingName(GameInput.Button.AltTool, GameInput.BindingSet.Primary)));
+                main.SetInteractText(AuxPatchers.PressToToggleLightFormat(GameInput.GetBindingName(GameInput.Button.AltTool, GameInput.BindingSet.Primary), QPatch.Configuration.LEDLightBackwardKeyCode.ToString(), QPatch.Configuration.LEDLightForwardKeyCode.ToString(),_light.intensity));
             }
 
             main.SetIcon(HandReticle.IconType.Hand);
@@ -198,6 +202,31 @@ namespace FCS_HomeSolutions.Mods.LedLights.Mono
                     MaterialHelpers.ChangeEmissionStrength(ModelPrefab.EmissionControllerMaterial, gameObject, _buildable.isInside ? 2.5f : 1.8f);
                 }
 
+            }
+
+            if (Input.GetKeyDown(QPatch.Configuration.LEDLightBackwardKeyCode))
+            {
+                if(Mathf.Approximately(_light.intensity,0.5f)) return;
+
+                if (_light.intensity < 0.5f)
+                {
+                    _light.intensity = 0.5f;
+                }
+
+                _light.intensity -= 0.1f;
+            }
+
+
+            if (Input.GetKeyDown(QPatch.Configuration.LEDLightForwardKeyCode))
+            {
+                if (Mathf.Approximately(_light.intensity, 1.5f)) return;
+
+                if (_light.intensity > 1.5f)
+                {
+                    _light.intensity = 1.5f;
+                }
+
+                _light.intensity += 0.1f;
             }
         }
 

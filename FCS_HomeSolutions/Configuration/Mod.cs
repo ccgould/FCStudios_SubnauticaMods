@@ -467,7 +467,7 @@ namespace FCS_HomeSolutions.Configuration
             {
                 _saveObject = new GameObject().AddComponent<ModSaver>();
 
-                SaveData newSaveData = new SaveData();
+                SaveData newSaveData = new SaveData {SaveVersion = 1.1f};
 
                 if (_registeredPaintTool != null)
                 {

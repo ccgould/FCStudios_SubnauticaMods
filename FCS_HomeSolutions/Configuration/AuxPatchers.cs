@@ -60,7 +60,7 @@ namespace FCS_HomeSolutions.Configuration
             { $"{ModKey}_NothingToCook","Nothing to cook"},
             { $"{ModKey}_CookerInventoryFull","Alien Chef inventory is full canceling"},
             { $"{ModKey}_ClickToRotate","Click to rotate"},
-            { $"{ModKey}_PressToToggleLight","Press {0} to toggle led light."},
+            { $"{ModKey}_PressToToggleLight","Press {0} to toggle led light.\nPress {1}/{2} to change intensity. Intensity: {3}"},
             { $"{ModKey}_TVFormat","Press {0} to turn on/off tv."},
             { $"{ModKey}_TVFormat2","Press {0}/{1} for volume and {2}/{3} for channel"},
             { $"{ModKey}_NotEnoughWaterForBottle","Not enough water for bottle please wait for 50% tank level or more"},
@@ -320,9 +320,9 @@ namespace FCS_HomeSolutions.Configuration
             return GetLanguage($"{ModKey}_ClickToRotate");
         }
         
-        public static string PressToToggleLightFormat(string message)
+        public static string PressToToggleLightFormat(string key1,string key2,string key3,float intensity)
         {
-            return string.Format(GetLanguage($"{ModKey}_PressToToggleLight"),message);
+            return string.Format(GetLanguage($"{ModKey}_PressToToggleLight"),key1,key2,key3,intensity);
         }
 
         public static string TVFormat(string key)

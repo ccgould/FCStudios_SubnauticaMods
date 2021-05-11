@@ -174,6 +174,7 @@ namespace FCS_HomeSolutions.Configuration
         [JsonProperty] internal string Id { get; set; }
         [JsonProperty(PropertyName = "LUM")] internal Vec4 Lum { get; set; }
         [JsonProperty(PropertyName = "ROT")] internal Vec4 Rotation { get; set; }
+        [JsonProperty] internal float Intensity { get; set; }
     }
 
     [Serializable]
