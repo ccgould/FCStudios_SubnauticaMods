@@ -70,7 +70,6 @@ namespace FCS_HomeSolutions.Buildables
 
     internal class SweetWaterBarController : FcsDevice, IConstructable
     {
-        private FCSAquarium _fcsAquarium;
         private bool _runStartUpOnEnable;
 
         private void Start()
@@ -115,30 +114,21 @@ namespace FCS_HomeSolutions.Buildables
 
         public override void Initialize()
         {
-            if (_fcsAquarium == null)
-            {
-                var storageRoot = GameObjectHelpers.FindGameObject(gameObject, "StorageRoot");
-                _fcsAquarium = gameObject.AddComponent<FCSAquarium>();
-                _fcsAquarium.Initialize(storageRoot, new[] { TechType.Peeper, TechType.GarryFish, TechType.Bladderfish, TechType.HoleFish });
-            }
+            //var plantspawns = GameObjectHelpers.FindGameObject(gameObject, "spawn_pnt");
 
-            var plantspawns = GameObjectHelpers.FindGameObject(gameObject, "spawn_pnt");
+            //foreach (Transform plantGo in plantspawns.transform)
+            //{
+            //    var name = plantGo.gameObject.name;
 
-            foreach (Transform plantGo in plantspawns.transform)
-            {
-                var name = plantGo.gameObject.name;
-
-                if (SpawnHelper.ContainsPlant(name))
-                {
-                    SpawnHelper.SpawnAtPoint(name, plantGo);
-                }
-            }
+            //    if (SpawnHelper.ContainsPlant(name))
+            //    {
+            //        SpawnHelper.SpawnAtPoint(name, plantGo);
+            //    }
+            //}
 
 
             IsInitialized = true;
         }
-
-        public bool IsInitialized { get; set; }
 
         public override void OnConstructedChanged(bool constructed)
         {
@@ -157,10 +147,6 @@ namespace FCS_HomeSolutions.Buildables
                 {
                     _runStartUpOnEnable = true;
                 }
-            }
-            else
-            {
-                _fcsAquarium?.Destroy();
             }
         }
     }

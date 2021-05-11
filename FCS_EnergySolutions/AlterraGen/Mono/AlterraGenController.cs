@@ -23,6 +23,7 @@ namespace FCS_EnergySolutions.AlterraGen.Mono
         private string _prefabID;
         private bool _runStartUpOnEnable;
         private GameObject _xBubbles;
+        private TechType[] _allowedTransferItems;
 
         internal AlterraGenPowerManager PowerManager { get; private set; } 
         internal AnimationManager AnimationManager { get; set; }
@@ -31,8 +32,11 @@ namespace FCS_EnergySolutions.AlterraGen.Mono
         public override bool IsOperational => IsConstructed && IsInitialized;
         public override bool IsVisible => IsOperational;
         public override bool CanBeSeenByTransceiver => true;
-        public override TechType[] AllowedTransferItems { get; } = { TechType.Lubricant };
+
+        public override TechType[] AllowedTransferItems { get; } = Mod.AllowedBioItems().ToArray();
+
         public override int MaxItemAllowForTransfer { get; } = 9;
+
 
         #region Unity Methods
 

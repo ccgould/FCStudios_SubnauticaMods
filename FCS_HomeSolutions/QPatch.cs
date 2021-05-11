@@ -52,7 +52,7 @@ namespace FCS_HomeSolutions
             //Load Additional Colors
             LoadAdditionalColors();
 
-            if (Configuration.IsSeaBreezeEnabled)
+            if (Configuration.IsSweetWaterBarEnabled)
             {
                 var ahsSweetWaterBar = new SweetWaterBarPatch("ahsSweetWaterBar", "Sweet Water Bar",
                     "All drinks on the house.", ModelPrefab.GetPrefab("SweetWaterBar"), new Settings
@@ -64,7 +64,9 @@ namespace FCS_HomeSolutions
                         RotationEnabled = true,
                         Cost = 45000,
                         Size = new Vector3(3.009064f, 2.474508f, 1.905116f),
-                        Center = new Vector3(-0.1594486f, 1.41353f, 0.02790368f)
+                        Center = new Vector3(-0.1594486f, 1.41353f, 0.02790368f),
+                        CategoryForPDA = TechCategory.Misc,
+                        GroupForPDA = TechGroup.Miscellaneous
                     });
                 ahsSweetWaterBar.Patch();
             }

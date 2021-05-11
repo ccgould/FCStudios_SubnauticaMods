@@ -164,7 +164,9 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                     _techTypeButtons[index].Tag = new TransceiverData(grouped.ElementAt(i),_techTypeButtons[index]);
                     if (_operation.TransferItems.Contains(grouped.ElementAt(i)))
                     {
-                        _techTypeButtons[index].Select();
+                        var button = _techTypeButtons[index];
+                        button.ToolTipString = Language.main.Get(grouped.ElementAt(i));
+                        button.Select();
                     }
                 }
 

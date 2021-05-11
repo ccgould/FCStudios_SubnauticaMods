@@ -1,4 +1,6 @@
 ﻿using System;
+using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -12,6 +14,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         private uGUI_Icon _icon;
         private Text _amount;
         private Toggle _toggle;
+        private FCSToolTip _toolTip;
         public string BTNName { get; set; }
         public Action<string,object> OnButtonClick { get; set; }
         public Object Tag { get; set; }
@@ -30,9 +33,18 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                 {
                     OnButtonClick?.Invoke(BTNName, Tag);
                 }));
+            }
 
+            if (_toolTip == null)
+            {
+                _toolTip = gameObject.AddComponent<FCSToolTip>();
+                _toolTip.Description = true;
+                _toolTip.RequestPermission += () => WorldHelpers.CheckIfInRange(gameObject,Player.main.gameObject,2f);
+                _toolTip.ToolTipStringDelegate += () => ToolTipString;
             }
         }
+
+        public string ToolTipString { get; set; }
 
         public void Set(TechType techType)
         {

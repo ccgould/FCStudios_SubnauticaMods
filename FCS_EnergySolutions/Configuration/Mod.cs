@@ -111,6 +111,17 @@ namespace FCS_EnergySolutions.Configuration
             return _vanillaBioChargeValues ?? FuelTypes.Charge;
         }
 
+        internal static List<TechType> AllowedBioItems()
+        {
+            var buffer = new List<TechType>();
+            foreach (KeyValuePair<TechType, float> bioChargeValue in GetBioChargeValues())
+            {
+                buffer.Add(bioChargeValue.Key);
+            }
+
+            return buffer;
+        }
+
         internal static void Save(ProtobufSerializer serializer)
         {
             if (!IsSaving())
