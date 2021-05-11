@@ -29,7 +29,7 @@ namespace FCSCommon.Utilities
             Initialize();
             string name = Assembly.GetCallingAssembly().GetName().Name;
 
-            Console.WriteLine($"[{name}:INFO] {msg}");
+            _logger.LogInfo($"[{name}:INFO] {msg}");
 
             if (showOnScreen)
                 ErrorMessage.AddMessage(msg);
@@ -40,7 +40,7 @@ namespace FCSCommon.Utilities
             Initialize();
             string name = Assembly.GetCallingAssembly().GetName().Name;
 
-            Console.WriteLine($"[{name}] : {msg}");
+            _logger.LogMessage($"[{name}] : {msg}");
 
             if (showOnScreen)
                 ErrorMessage.AddMessage(msg);
@@ -54,7 +54,7 @@ namespace FCSCommon.Utilities
 
             string name = Assembly.GetCallingAssembly().GetName().Name;
 
-            Console.WriteLine($"[{name}:DEBUG] {msg}");
+            _logger.LogDebug($"[{name}:DEBUG] {msg}");
 
             if (showOnScreen)
                 ErrorMessage.AddDebug(msg);
@@ -77,7 +77,7 @@ namespace FCSCommon.Utilities
             Initialize();
             string name = Assembly.GetCallingAssembly().GetName().Name;
 
-            Console.WriteLine($"[{name}:ERROR] {typeof(T).FullName}: {msg}");
+            _logger.LogError($"[{name}:ERROR] {typeof(T).FullName}: {msg}");
 
             if (showOnScreen)
                 ErrorMessage.AddError(msg);
@@ -88,7 +88,7 @@ namespace FCSCommon.Utilities
             Initialize();
             string name = Assembly.GetCallingAssembly().GetName().Name;
 
-            Console.WriteLine($"[{name}:ERROR] {msg}{Environment.NewLine}{ex.ToString()}");
+            _logger.LogError($"[{name}:ERROR] {msg}{Environment.NewLine}{ex.ToString()}");
         }
 
         internal static void Error(Exception ex)
@@ -101,7 +101,7 @@ namespace FCSCommon.Utilities
             Initialize();
             string name = Assembly.GetCallingAssembly().GetName().Name;
 
-            Console.WriteLine($"[{name}:WARN] {msg}");
+            _logger.LogWarning($"[{name}:WARN] {msg}");
 
             if (showOnScreen)
                 ErrorMessage.AddWarning(msg);
@@ -121,7 +121,7 @@ namespace FCSCommon.Utilities
         {
             Initialize();
             string name = Assembly.GetCallingAssembly().GetName().Name;
-            Console.WriteLine($"[{name}] {msg}");
+            _logger.LogMessage($"[{name}] {msg}");
             ErrorMessage.AddMessage($"[{name}] {msg}");
         }
 
@@ -132,7 +132,7 @@ namespace FCSCommon.Utilities
                 return;
             string name = Assembly.GetCallingAssembly().GetName().Name;
 
-            Console.WriteLine($"[{name}:DEBUG_ERROR] {msg}");
+            _logger.LogError($"[{name}:DEBUG_ERROR] {msg}");
 
             if (showOnScreen)
                 ErrorMessage.AddError($"[{name}:DEBUG_ERROR] {msg}");

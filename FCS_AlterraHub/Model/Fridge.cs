@@ -103,6 +103,13 @@ namespace FCS_AlterraHub.Model
 
             var pickupable = techType.ToPickupable();
 
+            if (pickupable == null)
+            {
+                QuickLogger.Error("Failed to convert food item to pickupable");
+                return;
+            }
+
+
             if (Inventory.main.HasRoomFor(pickupable))
             {
                 EatableEntities match = FindMatch(techType, eatableType);

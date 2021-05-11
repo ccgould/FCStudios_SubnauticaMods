@@ -1,4 +1,5 @@
-﻿using SMLHelper.V2.Handlers;
+﻿using FCSCommon.Utilities;
+using SMLHelper.V2.Handlers;
 using UnityEngine;
 using UWE;
 
@@ -10,7 +11,7 @@ namespace FCSCommon.Extensions
         internal static Pickupable ToPickupable(this TechType techType)
         {
             Pickupable pickupable = null;
-
+            
             if (PrefabDatabase.TryGetPrefabFilename(CraftData.GetClassIdForTechType(techType), out string filepath))
             {
                 GameObject prefab = Resources.Load<GameObject>(filepath);
@@ -21,6 +22,15 @@ namespace FCSCommon.Extensions
                     pickupable = go.EnsureComponent<Pickupable>();
                     PickupReplacement(pickupable);
                 }
+            }
+            
+            if(pickupable ==null)
+            {
+                QuickLogger.Error("Failed to get pickupable through PrefabDatabase trying with utils.");
+                var item = Utils.CreateGenericLoot(techType);
+                pickupable = item?.GetComponentInChildren<Pickupable>();
+                var result = pickupable == null ? "not successful" : "successful";
+                QuickLogger.Info($"Attempt was {result}");
             }
 
             return pickupable;
