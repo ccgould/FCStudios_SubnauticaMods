@@ -23,7 +23,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.ItemDisplay
         private uGUI_Icon _icon;
         private DumpContainerSimplified _dumpContainer;
         internal TechType currentItem;
-        private NetworkDumpStorage _networkDump;
         private InterfaceButton _resetBTN;
         private GameObject _canvas;
         public override bool IsOperational => IsInitialized && IsConstructed;
@@ -64,7 +63,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.ItemDisplay
         private void Start()
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.DSSTabID, Mod.ModName);
-            _networkDump.Initialize(Manager);
             Manager.OnPowerStateChanged += OnPowerStateChanged;
             Manager.OnBreakerStateChanged += OnBreakerStateChanged;
             UpdateScreenState();
@@ -130,11 +128,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.ItemDisplay
                 _dumpContainer.Initialize(transform,AuxPatchers.AddItemToItemDisplay(),this,1,1,"ItemDisplayDump");
             }
 
-            if (_networkDump == null)
-            {
-                _networkDump = gameObject.EnsureComponent<NetworkDumpStorage>();
-            }
-
             var addToNetworkBTN = GameObjectHelpers.FindGameObject(gameObject, "AddBTN").AddComponent<InterfaceButton>();
             addToNetworkBTN.IconType = HandReticle.IconType.Interact;
             addToNetworkBTN.ShowMouseClick = true;
@@ -142,7 +135,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.ItemDisplay
             addToNetworkBTN.TextLineTwo = AuxPatchers.AddItemToNetworkDesc();
             addToNetworkBTN.OnButtonClick += (s, o) =>
             {
-                _networkDump.OpenStorage();
+                Manager.OpenBaseStorage();
             };            
             
             _resetBTN = GameObjectHelpers.FindGameObject(gameObject, "ResetBTN").AddComponent<InterfaceButton>();

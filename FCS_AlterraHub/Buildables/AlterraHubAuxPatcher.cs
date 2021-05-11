@@ -59,6 +59,7 @@ namespace FCS_AlterraHub.Buildables
             { $"{ModKey}_DeviceOn","Device ON"},
             { $"{ModKey}_DeviceOff","Device OFF"},
             { $"{ModKey}_Bulk","Bulk"},
+            { $"{ModKey}_FoodItemsNotAllowed","Cooked food items are not allowed in Data Storage Solutions."},
             { $"{ModKey}_PDAButtonPressFormat","({0}) Press to open Alterra Hub PDA"},
             { $"{ModKey}_OperationExists","Similar operation already exists for device {0}"},
             { $"{ModKey}_ErrorLoadingAccountDetails","There was an error loading your account details. Please contact FCStudio about this issue. Please provide your game log located in the Subnautica root folder. \nFileName:\"qmodmanager_log-Subnautica.txt\""},
@@ -347,6 +348,11 @@ namespace FCS_AlterraHub.Buildables
         public static string Bulk()
         {
             return GetLanguage($"{ModKey}_Bulk");
+        }
+
+        public static string FoodItemsNotAllowed()
+        {
+            return GetLanguage($"{ModKey}_FoodItemsNotAllowed");
         }
     }
 }

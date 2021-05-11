@@ -60,7 +60,7 @@ namespace FCS_HomeSolutions.Configuration
             { $"{ModKey}_NothingToCook","Nothing to cook"},
             { $"{ModKey}_CookerInventoryFull","Alien Chef inventory is full canceling"},
             { $"{ModKey}_ClickToRotate","Click to rotate"},
-            { $"{ModKey}_PressToToggleLight","Press {0} to toggle led light.\nPress {1}/{2} to change intensity. Intensity: {3}"},
+            { $"{ModKey}_PressToToggleLight","Press {0} to toggle led light. \nPress {1}/{2} to change intensity. \nPress {3} to toggle night sensor. \nIntensity: {4} | Night Sensor: {5}"},
             { $"{ModKey}_TVFormat","Press {0} to turn on/off tv."},
             { $"{ModKey}_TVFormat2","Press {0}/{1} for volume and {2}/{3} for channel"},
             { $"{ModKey}_NotEnoughWaterForBottle","Not enough water for bottle please wait for 50% tank level or more"},
@@ -320,9 +320,9 @@ namespace FCS_HomeSolutions.Configuration
             return GetLanguage($"{ModKey}_ClickToRotate");
         }
         
-        public static string PressToToggleLightFormat(string key1,string key2,string key3,float intensity)
+        public static string PressToToggleLightFormat(string key1,string key2,string key3,string key4,float intensity,string nightSensorMode)
         {
-            return string.Format(GetLanguage($"{ModKey}_PressToToggleLight"),key1,key2,key3,intensity);
+            return string.Format(GetLanguage($"{ModKey}_PressToToggleLight"),key1,key2,key3,key4,intensity.ToString("F1"),nightSensorMode);
         }
 
         public static string TVFormat(string key)

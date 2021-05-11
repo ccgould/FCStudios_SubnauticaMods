@@ -147,7 +147,11 @@ namespace FCS_AlterraHub.Configuration
             {TechType.PurpleBrainCoral, 0.3731633f}
         };
 
-        public static FCSGamePlaySettings GamePlaySettings { get; set; } = new FCSGamePlaySettings();
+        public static FCSGamePlaySettings GamePlaySettings
+        {
+            get => _gamePlaySettings ?? (_gamePlaySettings = new FCSGamePlaySettings());
+            set => _gamePlaySettings = value;
+        }
 
         public static string GetAssetPath()
         {
@@ -232,6 +236,7 @@ namespace FCS_AlterraHub.Configuration
 
         public static Dictionary<string, Sound> AudioClips = new Dictionary<string, Sound>();
         private static AccountDetails _tempAccountDetails;
+        private static FCSGamePlaySettings _gamePlaySettings = new FCSGamePlaySettings();
 
 
         public static bool SaveGamePlaySettings()

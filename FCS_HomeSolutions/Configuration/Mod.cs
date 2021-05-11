@@ -70,8 +70,8 @@ namespace FCS_HomeSolutions.Configuration
         internal const string HoverLiftPadTabID = "HLP";
 
         internal const string SmartPlanterPotClassID = "SmartPlanterPot";
-        internal const string SmartPlanterPotFriendly = "Smart Planter Pot";
-        internal static string SmartPlanterPotDescription { get; } = "All drinks are on the house. (Drinks not included)";
+        internal const string SmartPlanterPotFriendly = "Neon Planter Pot";
+        internal static string SmartPlanterPotDescription { get; } = "A planter that can be placed outside with color changing.";
         internal const string SmartPlanterPotPrefabName = "SmartPlanterPot";
         internal static string SmartPlanterPotKitClassID = $"{SmartPlanterPotClassID}_Kit";
         internal const string SmartPlanterPotTabID = "SMP";
@@ -467,7 +467,7 @@ namespace FCS_HomeSolutions.Configuration
             {
                 _saveObject = new GameObject().AddComponent<ModSaver>();
 
-                SaveData newSaveData = new SaveData {SaveVersion = 1.1f};
+                SaveData newSaveData = new SaveData();
 
                 if (_registeredPaintTool != null)
                 {

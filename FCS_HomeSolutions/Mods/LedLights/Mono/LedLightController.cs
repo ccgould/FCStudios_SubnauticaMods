@@ -20,6 +20,7 @@ namespace FCS_HomeSolutions.Mods.LedLights.Mono
         private LedLightDataEntry _savedData;
         private bool _isFromSave;
         private Constructable _buildable;
+        private bool _nightSensor;
         public override bool IsInitialized { get; set; }
 
         private void Start()
@@ -49,9 +50,21 @@ namespace FCS_HomeSolutions.Mods.LedLights.Mono
                         _colorManager.ChangeColor(_savedData.Lum.Vector4ToColor(), ColorTargetMode.Emission);
                         transform.rotation = _savedData.Rotation.Vec4ToQuaternion();
                         _light.color = _savedData.Lum.Vector4ToColor();
-                        if(Mod.GetSaveData().SaveVersion >= 1.1)
+                        if (Mod.GetSaveData().SaveVersion >= 1.1)
+                        {
                             _light.intensity = _savedData.Intensity < 0.5f ? 0.5f : _savedData.Intensity;
+                            if (_savedData.LightState)
+                            {
+                                TurnOnDevice();
+                            }
+                            else
+                            {
+                                TurnOffDevice();
+                            }
+                        }
                         _isFromSave = false;
+
+                        _nightSensor = _savedData.NightSensor;
                     }
                 }
                 _runStartUpOnEnable = false;
@@ -78,13 +91,28 @@ namespace FCS_HomeSolutions.Mods.LedLights.Mono
             if (_light == null)
             {
                 _light = gameObject.GetComponentInChildren<Light>();
-                _light.enabled = true;
+                TurnOnDevice();
             }
 
             IsInitialized = true;
             QuickLogger.Info("Initialized", true);
         }
-        
+
+        private void Update()
+        {
+            if (_nightSensor)
+            {
+                if (DayNightCycle.main.IsDay())
+                {
+                    TurnOffDevice();
+                }
+                else
+                {
+                    TurnOnDevice();
+                }
+            }
+        }
+
         public void Save(SaveData newSaveData, ProtobufSerializer serializer)
         {
             if (!IsInitialized || !IsConstructed) return;
@@ -93,12 +121,13 @@ namespace FCS_HomeSolutions.Mods.LedLights.Mono
             {
                 _savedData = new LedLightDataEntry();
             }
-
-
+            
             _savedData.Id = GetPrefabID();
             _savedData.Lum = _colorManager.GetLumColor().ColorToVector4();
             _savedData.Rotation = transform.rotation.QuaternionToVec4();
             _savedData.Intensity = _light.intensity;
+            _savedData.NightSensor = _nightSensor;
+            _savedData.LightState = _light.enabled;
             QuickLogger.Debug($"Saving ID {_savedData.Id}");
             newSaveData.LedLightDataEntries.Add(_savedData);
         }
@@ -179,27 +208,42 @@ namespace FCS_HomeSolutions.Mods.LedLights.Mono
             HandReticle main = HandReticle.main;
             if (_buildable.allowedOnWall)
             {
-                main.SetInteractText(AuxPatchers.ClickToRotate(), AuxPatchers.PressToToggleLightFormat(GameInput.GetBindingName(GameInput.Button.AltTool, GameInput.BindingSet.Primary), QPatch.Configuration.LEDLightBackwardKeyCode.ToString(), QPatch.Configuration.LEDLightForwardKeyCode.ToString(),_light.intensity));
+                main.SetInteractText(AuxPatchers.ClickToRotate(), 
+                    AuxPatchers.PressToToggleLightFormat(GameInput.GetBindingName(GameInput.Button.AltTool, GameInput.BindingSet.Primary), 
+                    QPatch.Configuration.LEDLightBackwardKeyCode.ToString(), 
+                    QPatch.Configuration.LEDLightForwardKeyCode.ToString(), 
+                    QPatch.Configuration.LEDLightNightSensorToggleKeyCode.ToString(), 
+                    _light.intensity,
+                    _nightSensor ? "Enabled":"Disabled"));
             }
             else
             {
-                main.SetInteractText(AuxPatchers.PressToToggleLightFormat(GameInput.GetBindingName(GameInput.Button.AltTool, GameInput.BindingSet.Primary), QPatch.Configuration.LEDLightBackwardKeyCode.ToString(), QPatch.Configuration.LEDLightForwardKeyCode.ToString(),_light.intensity));
+                main.SetInteractText(
+                    AuxPatchers.PressToToggleLightFormat(GameInput.GetBindingName(GameInput.Button.AltTool, GameInput.BindingSet.Primary), 
+                        QPatch.Configuration.LEDLightBackwardKeyCode.ToString(), 
+                        QPatch.Configuration.LEDLightForwardKeyCode.ToString(), 
+                        QPatch.Configuration.LEDLightNightSensorToggleKeyCode.ToString(), 
+                        _light.intensity, 
+                        _nightSensor ? "Enabled" : "Disabled"));
             }
 
             main.SetIcon(HandReticle.IconType.Hand);
 
             if (GameInput.GetButtonDown(GameInput.Button.AltTool))
             {
+                if (_nightSensor)
+                {
+                    QuickLogger.ModMessage("Please disable Night Sensor.");
+                    return;
+                }
+
                 if (_light.enabled)
                 {
-                    _light.enabled = false;
-                    MaterialHelpers.ChangeEmissionStrength(ModelPrefab.EmissionControllerMaterial, gameObject, 0f);
-
+                    TurnOffDevice();
                 }
                 else
                 {
-                    _light.enabled = true;
-                    MaterialHelpers.ChangeEmissionStrength(ModelPrefab.EmissionControllerMaterial, gameObject, _buildable.isInside ? 2.5f : 1.8f);
+                    TurnOnDevice();
                 }
 
             }
@@ -215,8 +259,7 @@ namespace FCS_HomeSolutions.Mods.LedLights.Mono
 
                 _light.intensity -= 0.1f;
             }
-
-
+            
             if (Input.GetKeyDown(QPatch.Configuration.LEDLightForwardKeyCode))
             {
                 if (Mathf.Approximately(_light.intensity, 1.5f)) return;
@@ -227,6 +270,30 @@ namespace FCS_HomeSolutions.Mods.LedLights.Mono
                 }
 
                 _light.intensity += 0.1f;
+            }
+
+
+            if (Input.GetKeyDown(QPatch.Configuration.LEDLightNightSensorToggleKeyCode))
+            {
+                _nightSensor ^= true;
+            }
+        }
+
+        public override void TurnOnDevice()
+        {
+            if (_light != null)
+            {
+                _light.enabled = true;
+                MaterialHelpers.ChangeEmissionStrength(ModelPrefab.EmissionControllerMaterial, gameObject, _buildable.isInside ? 2.5f : 1.8f);
+            }
+        }
+
+        public override void TurnOffDevice()
+        {
+            if (_light != null)
+            {
+                _light.enabled = false;
+                MaterialHelpers.ChangeEmissionStrength(ModelPrefab.EmissionControllerMaterial, gameObject, 0f);
             }
         }
 

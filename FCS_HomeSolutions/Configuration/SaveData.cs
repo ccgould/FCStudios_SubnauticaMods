@@ -175,12 +175,14 @@ namespace FCS_HomeSolutions.Configuration
         [JsonProperty(PropertyName = "LUM")] internal Vec4 Lum { get; set; }
         [JsonProperty(PropertyName = "ROT")] internal Vec4 Rotation { get; set; }
         [JsonProperty] internal float Intensity { get; set; }
+        [JsonProperty] internal bool NightSensor { get; set; }
+        [JsonProperty] internal bool LightState { get; set; }
     }
 
     [Serializable]
     internal class SaveData
     {
-        [JsonProperty] internal float SaveVersion { get; set; } = 1.0f;
+        [JsonProperty] internal float SaveVersion { get; set; } = 1.1f;
 
         [JsonProperty] internal List<SeaBreezeDataEntry> SeaBreezeDataEntries = new List<SeaBreezeDataEntry>();
         [JsonProperty] internal List<SignDataEntry> SignDataEntries = new List<SignDataEntry>();

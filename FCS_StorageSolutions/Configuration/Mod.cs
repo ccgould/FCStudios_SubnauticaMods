@@ -44,7 +44,7 @@ namespace FCS_StorageSolutions.Configuration
         internal const string DSSTabID = "DSS";
 
         public const string DSSServerTabID = "DSV";
-        internal const string DSSServerFriendlyName = "Server";
+        internal const string DSSServerFriendlyName = "Data Disk";
         internal const string DSSServerClassName = "DSSServer";
         internal const string DSSServerPrefabName = "DSS_ServerDataDisc";
         internal const string DSSServerDescription = "Data Storage for 48 items, formatted to accept all item categories. Place in a Wall Server Rack or Floor Server Rack to connect to Data Storage Network.";

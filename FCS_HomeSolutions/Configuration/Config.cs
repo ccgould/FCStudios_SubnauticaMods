@@ -250,6 +250,8 @@ namespace FCS_HomeSolutions.Configuration
         public KeyCode LEDLightBackwardKeyCode = KeyCode.LeftArrow;
         [Keybind("[LED Lights] Increase Light Intensity"), Tooltip("Changes how bright the light is.")]
         public KeyCode LEDLightForwardKeyCode = KeyCode.RightArrow;
+        [Keybind("[LED Lights] Increase Light Intensity"), Tooltip("Enables/Disables the night sensor which turns the light off during the day and on in the night")]
+        public KeyCode LEDLightNightSensorToggleKeyCode = KeyCode.K;
 
         #endregion
 

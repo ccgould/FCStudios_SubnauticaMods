@@ -59,9 +59,13 @@ namespace FCS_AlterraHub.Mono
             "planterbox",
             "plantershelf",
             "alongplanter",
-            "BasicExteriorPlantPot",
-            "ChicExteriorPlantPot",
-            "CompositeExteriorPlantPot",
+            "basicexteriorplantpot",
+            "chicexteriorplantpot",
+            "compositeexteriorplantpot",
+            "farmingtray",
+            "longplanterb",
+            "labtrashcan",
+            "trashcan"
         };
         public readonly HashSet<StorageContainer> BaseStorageLockers = new HashSet<StorageContainer>();
         public readonly HashSet<FcsDevice> BaseServers = new HashSet<FcsDevice>();
@@ -1113,6 +1117,12 @@ namespace FCS_AlterraHub.Mono
             int availableSpace = 0;
 
             var validServers = new List<ISlotController>();
+
+            if (CraftData.cookedCreatureList.ContainsValue(techType))
+            {
+                QuickLogger.ModMessage(Buildables.AlterraHub.FoodItemsNotAllowed());
+                return false;
+            }
 
             //QuickLogger.Debug($"Checking if allowed {_dumpContainer.GetItemCount() + 1}", true);
 
