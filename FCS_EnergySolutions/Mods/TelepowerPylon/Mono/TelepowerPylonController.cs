@@ -494,7 +494,20 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
 
                 QuickLogger.Debug($"Pylon {pylon.UnitID}: Device to check: {unit.Key} Result: {pylon.HasConnection(unit.Key)}",true);
 
-                if (pylon.HasConnection(unit.Key))
+                if (pylon.HasConnection(unit.Key) || pylon.HasPowerRelayConnection(((TelepowerPylonController)unit.Value).GetPowerRelay()))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private bool HasPowerRelayConnection(IPowerInterface powerInterface)
+        {
+            foreach (KeyValuePair<string, TelepowerPylonController> connection in _currentConnections)
+            {
+                if (connection.Value.GetPowerRelay() == powerInterface)
                 {
                     return true;
                 }
@@ -568,14 +581,16 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
         private void OnWorldSettled()
         {
             if (_attemptedToLoadConnections) return;
+
+            QuickLogger.Debug("OnWorld Settled",true);
+
             if (_savedData?.CurrentConnections != null)
             {
-                //_loadingFromSave = true;
                 foreach (string connection in _savedData.CurrentConnections)
                 {
+                    if(_currentConnections.ContainsKey(connection)) continue;
                     OnSearchConnection(connection,null);
                 }
-                
             }
 
             _attemptedToLoadConnections = true;

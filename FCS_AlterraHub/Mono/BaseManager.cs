@@ -417,8 +417,7 @@ namespace FCS_AlterraHub.Mono
                     var device = _registeredDevices.ElementAt(i);
                     if (device.Value.DoesTakePower && device.Value.IsOperational && Habitat.powerRelay != null)
                     {
-                        var num = 1f * DayNightCycle.main.dayNightSpeed;
-                        Habitat.powerRelay.ConsumeEnergy(device.Value.GetPowerUsage() * num, out float amountConsumed);
+                        Habitat.powerRelay.ConsumeEnergy(device.Value.GetPowerUsage(), out float amountConsumed);
                     }
                 }
         }

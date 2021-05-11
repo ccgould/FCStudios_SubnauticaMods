@@ -59,11 +59,16 @@ namespace FCS_AlterraHub.Patches
                         return;
                     }
                 }
-
                 if (!FCSPDA.IsOpen)
                 {
                     FCSPDA.Open();
                 }
+            }
+
+
+            if (LargeWorldStreamer.main.IsWorldSettled())
+            {
+                OnWorldSettled?.Invoke();
             }
 
             _time += Time.deltaTime;
