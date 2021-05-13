@@ -38,6 +38,22 @@ namespace FCS_EnergySolutions.Configuration
         internal static string TelepowerPylonClassName => TelepowerPylonModName;
         internal static string TelepowerPylonPrefabName => TelepowerPylonModName;
 
+        internal const string WindSurferOperatorTabID = "WSO";
+        internal const string WindSurferOperatorFriendlyName = "Wind Surfer Operator";
+        internal const string WindSurferOperatorModName = "WindSurferOperator";
+        internal const string WindSurferOperatorDescription = "N.A";
+        internal static string WindSurferOperatorKitClassID => $"{WindSurferOperatorModName}_Kit";
+        internal static string WindSurferOperatorClassName => WindSurferOperatorModName;
+        internal static string WindSurferOperatorPrefabName => WindSurferOperatorModName;
+
+        internal const string WindSurferTabID = "WS";
+        internal const string WindSurferFriendlyName = "Wind Surfer";
+        internal const string WindSurferModName = "WindSurfer";
+        internal const string WindSurferDescription = "N.A";
+        internal static string WindSurferKitClassID => $"{WindSurferModName}_Kit";
+        internal static string WindSurferClassName => WindSurferModName;
+        internal static string WindSurferPrefabName => WindSurferModName;
+
 
         internal const string AlterraGenModTabID = "AG";
         internal const string AlterraGenModFriendlyName = "Alterra Gen";
@@ -88,7 +104,9 @@ namespace FCS_EnergySolutions.Configuration
                 new Ingredient(AlterraGenKitClassID.ToTechType(), 1),
             }
         };
-        
+
+        public static Action<bool> OnLightsEnabledToggle { get; set; }
+
         internal const string ModDescription ="";
 
         internal static event Action<SaveData> OnDataLoaded;
@@ -298,6 +316,44 @@ namespace FCS_EnergySolutions.Configuration
             }
 
             return new AlterraSolarClusterDataEntry() { Id = id };
+        }
+
+        public static WindSurferOperatorDataEntry GetWindSurferOperatorSaveData(string id)
+        {
+            LoadData();
+
+            var saveData = GetSaveData();
+
+            foreach (var entry in saveData.WindSurferOperatorEntries)
+            {
+                if (string.IsNullOrEmpty(entry.Id)) continue;
+
+                if (entry.Id == id)
+                {
+                    return entry;
+                }
+            }
+
+            return new WindSurferOperatorDataEntry() { Id = id };
+        }
+
+        public static WindSurferDataEntry GetWindSurferSaveData(string id)
+        {
+            LoadData();
+
+            var saveData = GetSaveData();
+
+            foreach (var entry in saveData.WindSurferEntries)
+            {
+                if (string.IsNullOrEmpty(entry.Id)) continue;
+
+                if (entry.Id == id)
+                {
+                    return entry;
+                }
+            }
+
+            return new WindSurferDataEntry() { Id = id };
         }
     }
 }

@@ -54,7 +54,7 @@ namespace FCSCommon.Utilities
 
             string name = Assembly.GetCallingAssembly().GetName().Name;
 
-            _logger.LogDebug($"[{name}:DEBUG] {msg}");
+            _logger.LogInfo($"[{name}:DEBUG] {msg}");
 
             if (showOnScreen)
                 ErrorMessage.AddDebug(msg);

@@ -9,6 +9,8 @@ using FCS_EnergySolutions.JetStreamT242.Buildables;
 using FCS_EnergySolutions.Mods.TelepowerPylon.Mono;
 using FCS_EnergySolutions.Spawnables;
 using FCS_EnergySolutions.TelepowerPylon.Buildables;
+using FCS_EnergySolutions.WindSurferOperator.Buildables;
+using FCSCommon.Extensions;
 using FCSCommon.Utilities;
 using HarmonyLib;
 using QModManager.API.ModLoading;
@@ -81,13 +83,37 @@ namespace FCS_EnergySolutions
                 var powerStorageCell = new PowerStorageCell();
                 powerStorageCell.Patch();
             }
-            
+
+
+            var windSurferOperator = new WindSurferOperatorBuildable();
+            windSurferOperator.Patch();
+
+            var windSurfer = new WindSurferSpawnable();
+            windSurfer.Patch();
+
+
             //Register debug commands
             ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));
 
             //Harmony
             var harmony = new Harmony("com.energrysolutions.fcstudios");
             harmony.PatchAll(Assembly.GetExecutingAssembly());
+        }
+
+        public static class ConstructorInput_Patch
+        {
+            [HarmonyPatch(typeof(ConstructorInput))]
+            [HarmonyPatch("OnCraftingBegin")]
+
+            [HarmonyPrefix]
+            public static void Prefix(TechType techType, ref float duration)
+            {
+                if (techType == Mod.WindSurferOperatorClassName.ToTechType())
+                {
+                    duration = 20f; //Takes 20 seconds to build
+                    FMODUWE.PlayOneShot("event:/tools/constructor/spawn", Player.main.transform.position, 1f); //Cyclops does this i think
+                }
+            }
         }
     }
 }

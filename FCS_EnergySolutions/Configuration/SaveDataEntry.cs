@@ -7,6 +7,7 @@ using FCS_EnergySolutions.Mods.TelepowerPylon.Mono;
 using FCS_EnergySolutions.PowerStorage.Enums;
 using FCS_EnergySolutions.PowerStorage.Mono;
 using FCSCommon.Interfaces;
+using UnityEngine;
 #if SUBNAUTICA_STABLE
 using Oculus.Newtonsoft.Json;
 #else
@@ -83,8 +84,37 @@ namespace FCS_EnergySolutions.Configuration
         [JsonProperty] internal TelepowerPylonMode PylonMode { get; set; }
         [JsonProperty] internal List<string> CurrentConnections { get; set; }
         [JsonProperty] internal TelepowerPylonUpgrade Upgrade { get; set; }
+    }    
+    internal class WindSurferOperatorDataEntry : ISaveDataEntry
+    {
+        public string Id { get; set; }
+        public string BaseId { get; set; }
+        [JsonProperty] internal string SaveVersion { get; set; } = "1.0";
+        [JsonProperty] internal Vec4 Body { get; set; }
+        [JsonProperty] internal Vec4 SecondaryBody { get; set; }
+        [JsonProperty] internal FCSPowerStates PowerState { get; set; }
+        [JsonProperty] internal TelepowerPylonMode PylonMode { get; set; }
+        [JsonProperty] internal HashSet<Tuple<int, string,string, Vector2Int>> CurrentConnections { get; set; }
+        [JsonProperty] internal TelepowerPylonUpgrade Upgrade { get; set; }
+        [JsonProperty] internal float StoredPower { get; set; }
     }
-    
+
+    internal class WindSurferDataEntry : ISaveDataEntry
+    {
+        public string Id { get; set; }
+        public string BaseId { get; set; }
+        [JsonProperty] internal string SaveVersion { get; set; } = "1.0";
+        [JsonProperty] internal Vec4 Body { get; set; }
+        [JsonProperty] internal Vec4 SecondaryBody { get; set; }
+        [JsonProperty] internal FCSPowerStates PowerState { get; set; }
+        [JsonProperty] internal TelepowerPylonMode PylonMode { get; set; }
+        [JsonProperty] internal List<string> CurrentConnections { get; set; }
+        [JsonProperty] internal TelepowerPylonUpgrade Upgrade { get; set; }
+        [JsonProperty] internal float StoredPower { get; set; }
+        [JsonProperty] internal Vec3 Position { get; set; }
+        [JsonProperty] internal Vec4 Rotation { get; set; }
+    }
+
     [Serializable]
     internal class SaveData
     {
@@ -93,5 +123,7 @@ namespace FCS_EnergySolutions.Configuration
         [JsonProperty] internal List<PowerStorageDataEntry> PowerStorageEntries = new List<PowerStorageDataEntry>();
         [JsonProperty] internal List<AlterraSolarClusterDataEntry> AlterraSolarClusterEntries = new List<AlterraSolarClusterDataEntry>();
         [JsonProperty] internal List<TelepowerPylonDataEntry> TelepowerPylonEntries = new List<TelepowerPylonDataEntry>();
+        [JsonProperty] internal List<WindSurferOperatorDataEntry> WindSurferOperatorEntries = new List<WindSurferOperatorDataEntry>();
+        [JsonProperty] internal List<WindSurferDataEntry> WindSurferEntries = new List<WindSurferDataEntry>();
     }
 }

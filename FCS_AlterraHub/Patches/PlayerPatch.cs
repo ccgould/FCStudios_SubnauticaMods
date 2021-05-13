@@ -64,21 +64,14 @@ namespace FCS_AlterraHub.Patches
                     FCSPDA.Open();
                 }
             }
-
-
-            if (LargeWorldStreamer.main.IsWorldSettled())
-            {
-                OnWorldSettled?.Invoke();
-            }
-
+            
             _time += Time.deltaTime;
+
             if (_time >= 1)
             {
                 BaseManager.RemoveDestroyedBases();
             }
         }
-
-        public static Action OnWorldSettled { get; set; }
     }
 
     [HarmonyPatch(typeof(Player))]
@@ -99,12 +92,11 @@ namespace FCS_AlterraHub.Patches
             }
 
             CoroutineHost.StartCoroutine(Mod.SpawnOreConsumerFrag());
-
-
+            
         }
-
         public static Transform SunTarget { get; set; }
     }
+
 
     [HarmonyPatch(typeof(Player))]
     [HarmonyPatch("GetPDA")]

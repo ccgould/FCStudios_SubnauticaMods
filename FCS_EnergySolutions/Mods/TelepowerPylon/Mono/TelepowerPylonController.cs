@@ -80,7 +80,6 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
         private void Start()
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.TelepowerPylonTabID, Mod.ModName);
-            FCS_AlterraHub.Patches.Player_Update_Patch.OnWorldSettled += OnWorldSettled;
 
             if (Manager == null)
             {
@@ -89,10 +88,20 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
                     particle.Stop();
                 }
             }
-            
-            //InvokeRepeating(nameof(MakeConnection),1f,1f);
+
+            InvokeRepeating(nameof(CheckTeleportationComplete), 0.2f, 0.2f);
         }
-        
+
+        private void CheckTeleportationComplete()
+        {
+            QuickLogger.Debug("Checking if world is settled");
+            if (LargeWorldStreamer.main.IsWorldSettled())
+            {
+                OnWorldSettled();
+                CancelInvoke(nameof(CheckTeleportationComplete));
+            }
+        }
+
         private void OnEnable()
         {
             if (_runStartUpOnEnable)
@@ -155,7 +164,6 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
         public override void OnDestroy()
         {
             OnDestroyCalledAction?.Invoke(this);
-            FCS_AlterraHub.Patches.Player_Update_Patch.OnWorldSettled -= OnWorldSettled;
 
             if (_ifFromConstructed)
             {

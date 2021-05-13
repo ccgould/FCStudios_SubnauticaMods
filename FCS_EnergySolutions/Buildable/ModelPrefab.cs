@@ -2,6 +2,7 @@
 using FCS_AlterraHub.API;
 using FCS_AlterraHub.Buildables;
 using FCS_EnergySolutions.Configuration;
+using FCS_EnergySolutions.Mods.WindSurfer.Mono;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -29,6 +30,7 @@ namespace FCS_EnergySolutions.Buildable
         public static GameObject PowerStoragePrefab { get; set; }
         public static GameObject FrequencyItemPrefab { get; set; }
         public static GameObject PylonUpgradeDataBoxPrefab { get; set; }
+        public static GameObject HoloGramPrefab { get; set; }
 
 
         internal static void Initialize()
@@ -43,11 +45,19 @@ namespace FCS_EnergySolutions.Buildable
                 ModBundle = FCSAssetBundlesService.PublicAPI.GetAssetBundleByName(Mod.ModBundleName, Mod.GetModDirectory());
             }
 
+            HoloGramPrefab = GetPrefab("Holo_Platform");
+            CreateHoloGramPrefab();
             AlterraGenItemPrefab = GetPrefab("ItemButton");
             PylonUpgradeDataBoxPrefab = GetPrefab("PylonUpgradeDataBox",true);
             FrequencyItemPrefab = GetPrefab("FrequencyItem");
             PowerStoragePrefab = GetPrefab(Mod.PowerStoragePrefabName);
         }
+
+        private static void CreateHoloGramPrefab()
+        {
+            var holo = HoloGramPrefab.AddComponent<HoloGraphControl>();
+        }
+
 
         internal static GameObject GetPrefab(string prefabName,bool isV2 = false)
         {

@@ -20,6 +20,9 @@ namespace FCS_EnergySolutions.Configuration
         [Toggle("[Energy Solutions] Enable Debugs", Order = 0, Tooltip = "Enables debug logs set in code by FCStudios (Maybe asked to be enabled for bug reports)"), OnChange(nameof(EnableDebugsToggleEvent))]
         public bool EnableDebugLogs = false;
 
+        [Toggle("[Energy Solutions] Lights Enables", Tooltip = "Enables lights on objects that have lights (May improve performance)"), OnChange(nameof(EnableDisableLightToggleEvent))]
+        public bool EnableDisableLights = true;
+
         private void EnableDebugsToggleEvent(ToggleChangedEventArgs e)
         {
             if (e.Value)
@@ -59,6 +62,9 @@ namespace FCS_EnergySolutions.Configuration
         [Toggle("[AlterraGen] Is Mod Enabled", Tooltip = "Enables/Disables AlterraGen from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool IsAlterraGenEnabled = true;
 
+        [Toggle("[WindSurfer] Is Mod Enabled", Tooltip = "Enables/Disables WindSurfer from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+        public bool IsWindSurferEnabled = true;
+
         public Dictionary<string, float> JetStreamT242BiomeSpeeds { get; set; } = new Dictionary<string, float>
         {
             {"kelpforest",283f },
@@ -95,6 +101,11 @@ namespace FCS_EnergySolutions.Configuration
         private static void TelepowerPylonBrightnessChangeEvent(SliderChangedEventArgs e)
         {
             BaseManager.GlobalNotifyByID(Mod.TelepowerPylonTabID, "UpdateEffects");
+        }
+
+        private static void EnableDisableLightToggleEvent(ToggleChangedEventArgs e)
+        {
+            Mod.OnLightsEnabledToggle?.Invoke(e.Value);
         }
 
 
