@@ -1,18 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Mono.OreConsumer;
+using FCS_AlterraHub.Objects;
 using FCS_AlterraHub.Registration;
 using FCS_EnergySolutions.Configuration;
+using FCS_EnergySolutions.Mods.WindSurfer.Interfaces;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
-using UWE;
 
 namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
 {
@@ -23,29 +20,28 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
         private WindSurferDataEntry _savedData;
         private double _timeStartGrowth;
         private bool _allowedToExtend;
-        private GameObject _pole3;
-        private GameObject _pole2;
-        private GameObject _pole1;
         private float maxProgress = 1f;
-        private float _pole1Max = 3.71f;
+        private float _pole1Max = 6.79f;
         private float _pole2Max = 4.7f;
         private float _pole3Max = 5.2f;
         private AnimationCurve _pole1AnimationCurve;
         private AnimationCurve _pole2AnimationCurve;
         private AnimationCurve _pole3AnimationCurve;
+        internal WindSurferPowerController PowerController;
         public PlatformController PlatformController => _platformController ?? (_platformController = GetComponent<PlatformController>());
-
-        private Light[] _lights;
         private PlatformController _platformController;
+        private Transform _pole1Trans;
+        private Transform _pole2Trans;
+        private Transform _pole3Trans;
         public override bool BypassRegisterCheck { get; } = true;
 
         private void Start()
         {
-            _pole1AnimationCurve = new AnimationCurve(new Keyframe(0, 1.149f), new Keyframe(1, _pole1Max));
+            GetUnitID();
+            _pole1AnimationCurve = new AnimationCurve(new Keyframe(0, 4.42813f), new Keyframe(1, _pole1Max));
             _pole2AnimationCurve = new AnimationCurve(new Keyframe(0, 1.841746f), new Keyframe(1, _pole2Max));
             _pole3AnimationCurve = new AnimationCurve(new Keyframe(0, 1.397793f), new Keyframe(1, _pole3Max));
             MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseEmissiveDecals, gameObject, 4f);
-            GetUnitID();
         }
 
         private void OnEnable()
@@ -64,7 +60,14 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
             {
                 //_colorManager.ChangeColor(_saveData.Body.Vector4ToColor());
                 //_colorManager.ChangeColor(_saveData.SecondaryBody.Vector4ToColor(), ColorTargetMode.Secondary);
-                TryMoveToPosition();
+                if (_savedData.PoleState != null)
+                {
+                    _pole1Trans.localPosition = new Vector3(_pole1Trans.localPosition.x, _savedData.PoleState.X, _pole1Trans.localPosition.z);
+                    _pole2Trans.localPosition = new Vector3(_pole2Trans.localPosition.x, _savedData.PoleState.Y, _pole1Trans.localPosition.z);
+                    _pole3Trans.localPosition = new Vector3(_pole3Trans.localPosition.x, _savedData.PoleState.Z, _pole1Trans.localPosition.z);
+                }
+
+                _motor.SpeedByPass(_savedData.Speed);
                 _fromSave = false;
             }
         }
@@ -76,21 +79,17 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
             transform.rotation = _savedData.Rotation.Vec4ToQuaternion();
         }
 
-        public override void OnDestroy()
-        {
-            base.OnDestroy();
-            Mod.OnLightsEnabledToggle -= OnLightsEnabledToggle;
-        }
 
         private void Update()
         {
             if (_allowedToExtend)
             {
-                if (!_allowedToExtend) return;
                 float progress = this.GetProgress();
-                this.SetPosition(_pole1.transform, progress, _pole1AnimationCurve, _pole1Max);
-                this.SetPosition(_pole2.transform, progress, _pole2AnimationCurve, _pole2Max);
-                this.SetPosition(_pole3.transform, progress, _pole3AnimationCurve, _pole3Max);
+                if (!_allowedToExtend || Mathf.Approximately( progress, 1)) return;
+                
+                this.SetPosition(_pole1Trans, progress, _pole1AnimationCurve, _pole1Max);
+                this.SetPosition(_pole2Trans, progress, _pole2AnimationCurve, _pole2Max);
+                this.SetPosition(_pole3Trans, progress, _pole3AnimationCurve, _pole3Max);
             }
         }
 
@@ -146,38 +145,29 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
         public override void Initialize()
         {
 
-            _lights = gameObject.GetComponentsInChildren<Light>();
-
-            Mod.OnLightsEnabledToggle += OnLightsEnabledToggle;
-
-
             if (_motor == null)
             {
 
-                _pole1 = GameObjectHelpers.FindGameObject(gameObject, "Pole1");
-                _pole2 = GameObjectHelpers.FindGameObject(gameObject, "Pole2");
-                _pole3 = GameObjectHelpers.FindGameObject(gameObject, "Pole3");
-                _motor = _pole1.EnsureComponent<MotorHandler>();
+                _pole1Trans = GameObjectHelpers.FindGameObject(gameObject, "Pole1").transform;
+                _pole2Trans = GameObjectHelpers.FindGameObject(gameObject, "Pole2").transform;
+                _pole3Trans = GameObjectHelpers.FindGameObject(gameObject, "Pole3").transform;
+
+                _motor = _pole1Trans.gameObject.EnsureComponent<MotorHandler>();
                 _motor.Initialize(200);
                 _motor.StopMotor();
+            }
+
+            if (PowerController == null)
+            {
+                PowerController = gameObject.EnsureComponent<WindSurferPowerController>();
+                PowerController.Initialize(this);
             }
 
             CreateLadders();
 
             IsInitialized = true;
         }
-
-        private void OnLightsEnabledToggle(bool value)
-        {
-            if (_lights != null)
-            {
-                foreach (Light light in _lights)
-                {
-                    light.gameObject.SetActive(value);
-                }
-            }
-        }
-
+        
         public override void OnProtoSerialize(ProtobufSerializer serializer)
         {
             if (!Mod.IsSaving())
@@ -220,6 +210,9 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
             _savedData.BaseId = BaseId;
             _savedData.Position = transform.position.ToVec3();
             _savedData.Rotation = transform.rotation.QuaternionToVec4();
+            _savedData.StoredPower = PowerController.GetStoredPower();
+            _savedData.PoleState = new Vec3(_pole1Trans.localPosition.y, _pole2Trans.localPosition.y,_pole3Trans.localPosition.y);
+            _savedData.Speed = _motor.GetRPM();
             newSaveData.WindSurferEntries.Add(_savedData);
         }
 
@@ -240,7 +233,10 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
 
         public string GetUnitID()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.WindSurferTabID, Mod.ModName);
+            if (string.IsNullOrWhiteSpace(UnitID))
+            {
+                FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.WindSurferTabID, Mod.ModName);
+            }
             return UnitID;
         }
     }

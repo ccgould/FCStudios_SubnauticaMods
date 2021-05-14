@@ -6,11 +6,11 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
 {
     internal class FrequencyItemController : MonoBehaviour
     {
-        public TelepowerPylonController TargetController { get; private set; }
-        public TelepowerPylonController ParentController { get; private set; }
+        public ITelepowerPylonConnection TargetController { get; private set; }
+        public ITelepowerPylonConnection ParentController { get; private set; }
         private Text _text;
 
-        internal void Initialize(TelepowerPylonController targetController, TelepowerPylonController parent)
+        internal void Initialize(ITelepowerPylonConnection targetController, ITelepowerPylonConnection parent)
         {
             TargetController = targetController;
             ParentController = parent;

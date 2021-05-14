@@ -12,7 +12,7 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
         private TelepowerPylonController _mono;
         private PowerRelay _powerRelay;
         private PowerRelay _connectedPowerSource;
-        private readonly Dictionary<string,TelepowerPylonController> _connections = new Dictionary<string, TelepowerPylonController>();
+        private readonly Dictionary<string, ITelepowerPylonConnection> _connections = new Dictionary<string, ITelepowerPylonConnection>();
         private bool _pauseUpdates;
 
 
@@ -51,7 +51,7 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
             _isInitialized = true;
         }
         
-        public void AddConnection(TelepowerPylonController controller)
+        public void AddConnection(ITelepowerPylonConnection controller)
         {
             if(!_connections.ContainsKey(controller.UnitID.ToLower()))
                 _connections?.Add(controller.UnitID.ToLower(),controller);

@@ -23,7 +23,7 @@ using WorldHelpers = FCS_AlterraHub.Helpers.WorldHelpers;
 
 namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
 {
-    internal class TelepowerPylonController : FcsDevice,IFCSSave<SaveData>, IHandTarget, IFCSDumpContainer
+    internal class TelepowerPylonController : FcsDevice,IFCSSave<SaveData>, IHandTarget, IFCSDumpContainer,ITelepowerPylonConnection
     {
         private TelepowerPylonDataEntry _savedData;
         internal bool IsFromSave { get; private set; }
@@ -32,7 +32,7 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
         private GameObject _canvas;
         private NameController _nameController;
         private int _maxConnectionLimit;
-        private readonly Dictionary<string, TelepowerPylonController> _currentConnections = new Dictionary<string, TelepowerPylonController>();
+        private readonly Dictionary<string, ITelepowerPylonConnection> _currentConnections = new Dictionary<string, ITelepowerPylonConnection>();
         private readonly Dictionary<string, GameObject> _trackedFrequencyItem = new Dictionary<string, GameObject>();
         private GameObject _connectionsGrid;
         private Text _status;
@@ -72,7 +72,7 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
             }
         }
         public override bool IsOperational => Manager != null && IsConstructed;
-        public Action<TelepowerPylonController> OnDestroyCalledAction { get; set; }
+        public Action<ITelepowerPylonConnection> OnDestroyCalledAction { get; set; }
         public TelepowerPylonTrigger _telepowerPylonTrigger { get; private set; }
 
         #region Unity Methods
@@ -196,9 +196,9 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
 
             if (_mode == TelepowerPylonMode.PUSH)
             {
-                foreach (KeyValuePair<string, TelepowerPylonController> connection in _currentConnections)
+                foreach (KeyValuePair<string, ITelepowerPylonConnection> connection in _currentConnections)
                 {
-                    var distance = WorldHelpers.GetDistance(this, connection.Value);
+                    var distance = WorldHelpers.GetDistance(this, connection.Value.GetDevice());
                     amount += distance * QPatch.Configuration.TelepowerPylonPowerUsagePerMeter;
                 }
             }
@@ -383,9 +383,15 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
             return _mode;
         }
 
+
         public IPowerInterface GetPowerRelay()
         {
             return _powerManager?.GetPowerRelay();
+        }
+
+        public FcsDevice GetDevice()
+        {
+            return this;
         }
 
         public bool IsPlayerInRange()
@@ -466,7 +472,7 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
                 return;
             }
             
-            var pylon = (TelepowerPylonController) unit.Value;
+            var pylon = (ITelepowerPylonConnection) unit.Value;
 
             if (pylon == null)
             {
@@ -496,13 +502,14 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
 
             QuickLogger.Debug($"Devices Found: {devices.Length}",true);
 
+
             foreach (FcsDevice device in devices)
             {
-                var pylon = (TelepowerPylonController) device;
+                var pylon = (ITelepowerPylonConnection) device;
 
                 QuickLogger.Debug($"Pylon {pylon.UnitID}: Device to check: {unit.Key} Result: {pylon.HasConnection(unit.Key)}",true);
 
-                if (pylon.HasConnection(unit.Key) || pylon.HasPowerRelayConnection(((TelepowerPylonController)unit.Value).GetPowerRelay()))
+                if (pylon.HasConnection(unit.Key) || pylon.HasPowerRelayConnection(((ITelepowerPylonConnection)unit.Value).GetPowerRelay()))
                 {
                     return true;
                 }
@@ -511,9 +518,9 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
             return false;
         }
 
-        private bool HasPowerRelayConnection(IPowerInterface powerInterface)
+        public bool HasPowerRelayConnection(IPowerInterface powerInterface)
         {
-            foreach (KeyValuePair<string, TelepowerPylonController> connection in _currentConnections)
+            foreach (KeyValuePair<string, ITelepowerPylonConnection> connection in _currentConnections)
             {
                 if (connection.Value.GetPowerRelay() == powerInterface)
                 {
@@ -543,19 +550,19 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
         
         private void AddConnection(string text, FcsDevice unit)
         {
-            var controller = (TelepowerPylonController) unit;
+            var controller = (ITelepowerPylonConnection) unit;
             _currentConnections.Add(text.ToLower(), controller);
             AddConnectionItemToGrid(controller);
             controller.OnDestroyCalledAction += OnDestroyCalled;
             UpdateStatus();
         }
 
-        private void OnDestroyCalled(TelepowerPylonController obj)
+        private void OnDestroyCalled(ITelepowerPylonConnection obj)
         {
             DeleteFrequencyItem(obj.UnitID.ToLower());
         }
 
-        private void AddConnectionItemToGrid(TelepowerPylonController targetController)
+        private void AddConnectionItemToGrid(ITelepowerPylonConnection targetController)
         {
             var prefab = Instantiate(ModelPrefab.FrequencyItemPrefab);
             var freqItem = prefab.AddComponent<FrequencyItemController>();
@@ -760,7 +767,7 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
 
         private IEnumerable<string> GetCurrentConnectionIDs()
         {
-            foreach (KeyValuePair<string, TelepowerPylonController> connection in _currentConnections)
+            foreach (KeyValuePair<string, ITelepowerPylonConnection> connection in _currentConnections)
             {
                 yield return connection.Key;
             }
@@ -790,7 +797,7 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
             }
         }
 
-        public void AddPullPylon(TelepowerPylonController pylon)
+        public void AddPullPylon(ITelepowerPylonConnection pylon)
         {
             AddConnectionItemToGrid(pylon);
             if(_currentConnections.ContainsKey(pylon.UnitID.ToLower())) return;
@@ -848,11 +855,24 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
 
         public void ClearConnections()
         {
-            foreach (KeyValuePair<string, TelepowerPylonController> connection in _currentConnections)
+            foreach (KeyValuePair<string, ITelepowerPylonConnection> connection in _currentConnections)
             {
                 DeleteFrequencyItemAndDisconnectRelay(connection.Key);
             }
         }
+    }
+
+    internal interface ITelepowerPylonConnection
+    {
+        TelepowerPylonMode GetCurrentMode();
+        string UnitID { get; set; }
+        Action<ITelepowerPylonConnection> OnDestroyCalledAction { get; set; }
+        void AddPullPylon(ITelepowerPylonConnection telepowerPylonConnection);
+        IPowerInterface GetPowerRelay();
+        FcsDevice GetDevice();
+        void DeleteFrequencyItemAndDisconnectRelay(string targetControllerUnitId);
+        bool HasConnection(string unitKey);
+        bool HasPowerRelayConnection(IPowerInterface getPowerRelay);
     }
 
     internal enum TelepowerPylonUpgrade

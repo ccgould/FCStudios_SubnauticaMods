@@ -7,7 +7,11 @@ using FCS_AlterraHub.Mono.OreConsumer;
 using FCS_AlterraHub.Registration;
 using FCS_EnergySolutions.Buildable;
 using FCS_EnergySolutions.Configuration;
+using FCS_EnergySolutions.Mods.TelepowerPylon.Model;
+using FCS_EnergySolutions.Mods.TelepowerPylon.Mono;
+using FCS_EnergySolutions.Mods.WindSurfer.Interfaces;
 using FCS_EnergySolutions.Mods.WindSurfer.Model;
+using FCS_EnergySolutions.Mods.WindSurfer.Structs;
 using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
@@ -16,42 +20,48 @@ using UnityEngine.UI;
 
 namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
 {
-    internal class WindSurferOperatorController : FcsDevice, IFCSSave<SaveData>, IPlatform
+    internal class WindSurferOperatorController : FcsDevice, IFCSSave<SaveData>, IPlatform,ITelepowerPylonConnection
     {
         private WindSurferOperatorDataEntry _savedData;
         private bool _fromSave;
         private DoorSensor _doorSensor;
         private MotorHandler _motor;
         private Rigidbody _rb;
-        private int Capacity = 15;
+        private int BuildingCapacity = 15;
+        private PlatformController _platformController;
 
+        private SortedDictionary<string, ConnectedTurbineData> _connectedTurbines = new SortedDictionary<string, ConnectedTurbineData>();
+        private SortedDictionary<string, WindSurferPowerController> _connectedTurbinesController = new SortedDictionary<string, WindSurferPowerController>();
+        private bool _saveTurbinesLoaded;
+        private List<HoloGraphControl> _holograms = new List<HoloGraphControl>();
+        private List<Graph<HoloGraphControl>.Edge> _neighbours;
+        private Graph<HoloGraphControl> _graph;
+        private readonly Dictionary<string, ITelepowerPylonConnection> _currentConnections = new Dictionary<string, ITelepowerPylonConnection>();
 
         public Grid2<HoloGraphControl> Grid { get; private set; }
         public GameObject HologramsGrid;
-        private PlatformController _platformController;
-
-        private ScrollRect _scrollRect;
-        private ScreenTrigger _screenTrigger;
-        private Light[] _lights;
-        private HashSet<Tuple<int, string,string, Vector2Int>> _connectedTurbines = new HashSet<Tuple<int, string,string, Vector2Int>>();
-        private bool _saveTurbinesLoaded;
-        private List<HoloGraphControl> _holograms = new List<HoloGraphControl>();
+        private Text _unitIDText;
+        private Text _powerInfoText;
+        private Text _turbineCountText;
+        private PowerRelay _powerRelay;
+        internal ScreenTrigger ScreenTrigger { get; private set; }
         public PlatformController PlatformController => _platformController ?? (_platformController = GetComponent<PlatformController>());
-        public GameObject Turbines { get; set; }
+        public string GetUnitID()
+        {
+            if (string.IsNullOrWhiteSpace(UnitID))
+            {
+                FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.WindSurferOperatorTabID, Mod.ModName);
+            }
+
+            return UnitID;
+        }
+        public GameObject TurbinesGroupLocation { get; set; }
         public override bool BypassRegisterCheck { get; } = true;
 
-        private void FixedUpdate()
-        {
-            if(_rb == null) return;
-            if (!_rb.isKinematic && (gameObject.transform.position.y > -0.05f && gameObject.transform.position.y < 0))
-            {
-                _rb.isKinematic = true;
-            }
-        }
 
         private void Start()
-        { 
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.WindSurferOperatorTabID, Mod.ModName);
+        {
+            GetUnitID();
             _rb = gameObject.GetComponent<Rigidbody>();
 
             InitialiseGrid();
@@ -59,12 +69,6 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
             var holo = AddMainHolograph();
             holo.gameObject.name = $"{Grid.Center} {holo.gameObject.name}";
             Grid.Add(holo, Grid.Center);
-        }
-
-        public override void OnDestroy()
-        {
-            base.OnDestroy();
-            Mod.OnLightsEnabledToggle -= OnLightsEnabledToggle;
         }
 
         private void OnEnable()
@@ -98,6 +102,7 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
             var prefabIdentifier = GetComponentInParent<PrefabIdentifier>() ?? GetComponent<PrefabIdentifier>();
             var id = prefabIdentifier?.Id ?? string.Empty;
             _savedData = Mod.GetWindSurferOperatorSaveData(id);
+            QuickLogger.Debug($"ReadySaveData Count WO: {_savedData?.CurrentConnections.Count}");
         }
 
         public override void Initialize()
@@ -105,14 +110,30 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
             //Get ladders
             CreateLadders();
             
-            _lights = gameObject.GetComponentsInChildren<Light>();
-
-            Mod.OnLightsEnabledToggle += OnLightsEnabledToggle;
-
             if (_doorSensor == null)
             {
                 _doorSensor = gameObject.FindChild("DoorTrigger").EnsureComponent<DoorSensor>();
                 _doorSensor.Initialize(GameObjectHelpers.FindGameObject(gameObject, "DoorController"));
+            }
+
+            if (_unitIDText == null)
+            {
+                _unitIDText = GameObjectHelpers.FindGameObject(gameObject,"UnitID").GetComponent<Text>();
+            }
+
+            if (_powerInfoText == null)
+            {
+                _powerInfoText = GameObjectHelpers.FindGameObject(gameObject, "PowerInfoText").GetComponent<Text>();
+            }
+
+            if (_turbineCountText == null)
+            {
+                _turbineCountText = GameObjectHelpers.FindGameObject(gameObject, "TurbineCountText").GetComponent<Text>();
+            }
+
+            if (_powerRelay == null)
+            {
+                _powerRelay = gameObject.GetComponent<PowerRelay>();
             }
 
             if (_motor == null)
@@ -126,32 +147,32 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
                 HologramsGrid = GameObjectHelpers.FindGameObject(gameObject, "Holograms");
             }
 
-            if (Turbines == null)
+            if (TurbinesGroupLocation == null)
             {
-                Turbines = GameObjectHelpers.FindGameObject(gameObject, "Turbines");
+                TurbinesGroupLocation = GameObjectHelpers.FindGameObject(gameObject, "Turbines");
             }
 
-            if (_screenTrigger == null)
+            if (ScreenTrigger == null)
             {
-                _screenTrigger = GameObjectHelpers.FindGameObject(gameObject, "ScreenTrigger").AddComponent<ScreenTrigger>();
+                ScreenTrigger = gameObject.GetComponentInChildren<Canvas>().gameObject.EnsureComponent<ScreenTrigger>();
             }
-
 
             InvokeRepeating(nameof(CheckTeleportationComplete), 0.2f, 0.2f);
+            InvokeRepeating(nameof(UpdateData), 1f, 1f);
 
             IsInitialized = true;
 
             QuickLogger.Debug($"Initialized");
+
         }
 
-        private void OnLightsEnabledToggle(bool value)
+        private void UpdateData()
         {
-            if (_lights != null)
+            if (_powerInfoText != null && _unitIDText != null && _turbineCountText != null)
             {
-                foreach (Light light in _lights)
-                {
-                    light.gameObject.SetActive(value);
-                }
+                _powerInfoText.text = $"{Mathf.RoundToInt(GetPowerInfo().Power)}/{Mathf.RoundToInt(GetPowerInfo().Total)}";
+                _unitIDText.text = UnitID;
+                _turbineCountText.text = $"{_connectedTurbines.Count}/{BuildingCapacity}";
             }
         }
 
@@ -168,38 +189,35 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
 
         private IEnumerator LoadTurbines()
         {
-            while (_savedData.CurrentConnections.Count != 0)
+            QuickLogger.Debug($"LoadTurbines Count: {_savedData.CurrentConnections.Count}");
+
+            while (_connectedTurbines.Count != _savedData.CurrentConnections.Count)
             {
-                for (int i = _savedData.CurrentConnections.Count - 1; i >= 0; i--)
+                foreach (KeyValuePair<string, ConnectedTurbineData> turbineSaveData in _savedData.CurrentConnections)
                 {
-                    var turbine = _savedData.CurrentConnections.ElementAt(i);
-                    if (turbine.Item4.x == 9 && turbine.Item4.y == 9) continue;
+                    if(_connectedTurbines.ContainsKey(turbineSaveData.Key)) continue;
+                    var parentTurbine = FCSAlterraHubService.PublicAPI.FindDeviceWithPreFabID(turbineSaveData.Value.ParentTurbineUnitID);
+                    var currentTurbine = FCSAlterraHubService.PublicAPI.FindDeviceWithPreFabID(turbineSaveData.Key);
 
-                    var parent = FCSAlterraHubService.PublicAPI.FindDevice(turbine.Item2);
-                    var device = FCSAlterraHubService.PublicAPI.FindDevice(turbine.Item3);
-
-
-                    if (parent.Value != null && device.Value != null)
+                    if (parentTurbine.Value != null && currentTurbine.Value != null)
                     {
-                        var parentPlatformController = ((IPlatform)parent.Value).PlatformController;
-                        var turbinePlatformController = ((IPlatform)device.Value).PlatformController;
+                        var parentPlatformController = ((IPlatform)parentTurbine.Value).PlatformController;
+                        var turbinePlatformController = ((IPlatform)currentTurbine.Value).PlatformController;
 
-                        QuickLogger.Debug($"Adding From Save Turbine {turbinePlatformController.GetUnitID()} with connection to {parentPlatformController.GetUnitID()} on port {turbine.Item1}");
+                        QuickLogger.Debug($"Adding From Save Turbine {turbinePlatformController.GetUnitID()} with connection to {parentPlatformController.GetUnitID()} on port {turbineSaveData.Value.Slot}");
 
-                        AddPlatformFromSave(turbine.Item1, parentPlatformController, turbinePlatformController, turbine.Item4);
-
-                        if(_connectedTurbines.Contains(turbine))
-                            _savedData.CurrentConnections.Remove(turbine);
+                        var result = AddPlatformFromSave(turbineSaveData.Value.Slot, parentPlatformController, turbinePlatformController, turbineSaveData.Value.HoloGraphPosition);
+                        QuickLogger.Debug($"LoadTurbines Count: {_savedData.CurrentConnections.Count} | {_connectedTurbines.Count}");
                     }
                     else
                     {
-                        QuickLogger.Error($"Failed to find device with ID: {turbine.Item3}");
+                        QuickLogger.DebugError($"Failed to find device with ID: {turbineSaveData.Key}");
                     }
                 }
-
                 yield return null;
             }
 
+            RefreshHoloGrams();
             yield break;
         }
 
@@ -264,21 +282,26 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
 
         private void InitialiseGrid()
         {
-            Grid = new Grid2<HoloGraphControl>((Capacity + 1) * 2);
+            Grid = new Grid2<HoloGraphControl>((BuildingCapacity + 1) * 2);
         }
 
-        public void AddPlatform(HolographSlot slot, Vector2Int position)
+        public bool AddPlatform(HolographSlot slot, Vector2Int position)
         {
-            if (Grid.Count() > Capacity || Grid.ElementAt(position) != null) { return; } // Grid.ElementAt(position) != null tells us if the "slot" is filled
+            if (Grid.Count() > BuildingCapacity || Grid.ElementAt(position) != null) { return false; } // Grid.ElementAt(position) != null tells us if the "slot" is filled
             
             QuickLogger.Debug($"Adding Turbine to Port: {slot.Target.name}|{slot.ID}");
             
             var turbine = slot.PlatformController.AddNewPlatForm(slot.Target, slot.ID, CraftData.GetPrefabForTechType(Mod.WindSurferClassName.ToTechType()));
-            if (turbine == null) { return; }
+            if (turbine == null) { return false; }
             
             var turbineController = turbine.GetComponent<WindSurferController>();
-            
-            slot.PlatformController.ConnectionData = new Tuple<int, string,string, Vector2Int>(slot.ID,slot.Target.GetComponentInParent<FcsDevice>().UnitID, turbineController.GetUnitID(), position);
+
+            slot.PlatformController.ConnectionData = new ConnectedTurbineData
+            {
+                    Slot = slot.ID,
+                    ParentTurbineUnitID = slot.Target.GetComponentInParent<FcsDevice>().GetPrefabID(),
+                    HoloGraphPosition = position
+            };
             
             var holo = AddNewHolograph(slot, turbine);
             holo.gameObject.name = $"{position} {holo.gameObject.name}";
@@ -287,58 +310,52 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
             
             Grid.Add(holo, position);
 
-            _connectedTurbines.Add(slot.PlatformController.ConnectionData);
+            _connectedTurbines.Add(turbineController.GetPrefabID(),slot.PlatformController.ConnectionData);
+            _connectedTurbinesController.Add(turbineController.GetPrefabID(),turbineController.PowerController);
+            _powerRelay.AddInboundPower(turbineController.PlatformController.GetPowerSource());
+            return true;
         }
 
-        public void AddPlatformFromSave(int slotID,PlatformController parentPlatform, PlatformController turbine, Vector2Int position)
+        public bool AddPlatformFromSave(int slotID,PlatformController parentPlatform, PlatformController turbine, Vector2Int position)
         {
-            if (Grid.Count() > Capacity || Grid.ElementAt(position) != null) { return; } // Grid.ElementAt(position) != null tells us if the "slot" is filled
+            if (Grid.Count() > BuildingCapacity || Grid.ElementAt(position) != null) { return false; } // Grid.ElementAt(position) != null tells us if the "slot" is filled
             
-            if (turbine == null) { return; }
+            if (turbine == null) { return false; }
             
             var turbineController = turbine.GetComponent<WindSurferController>();
 
-            turbine.ConnectionData = new Tuple<int, string,string, Vector2Int>(slotID,parentPlatform.GetUnitID(), turbineController.GetUnitID(), position);
+            turbine.ConnectionData = new ConnectedTurbineData
+            {
+                Slot = slotID,
+                ParentTurbineUnitID = parentPlatform.GetComponentInParent<FcsDevice>().GetPrefabID(),
+                HoloGraphPosition = position
+            };
 
-            MoveTurbineToPosition(parentPlatform.transform,turbine.transform);
+            MoveTurbineToPosition(turbine.transform);
 
             var port = FindHoloPort(parentPlatform.GetUnitID(), slotID);
 
             if (port == null)
             {
                 QuickLogger.Error("Failed to find hologram port");
-                return;
+                return false;
             }
 
-            var holo = AddNewHolograph(port, turbine);
-            holo.gameObject.name = $"{position} {holo.gameObject.name}";
+            var holo = AddNewHolograph(port, turbine,position);
             turbine.name = $"{position} {turbine.name}";
-            
-            Grid.Add(holo, position);
-            
-            _connectedTurbines.Add(turbine.ConnectionData);
+            _connectedTurbines.Add(turbineController.GetPrefabID(), turbine.ConnectionData);
+            _connectedTurbinesController.Add(turbineController.GetPrefabID(), turbineController.PowerController);
+            return true;
         }
 
-        private void MoveTurbineToPosition(Transform parentPlatformTransform, Transform turbineTransform)
+        private void MoveTurbineToPosition(Transform turbineTransform)
         {
             EnsureIsKinematic();
-            turbineTransform.SetParent(Turbines.transform, true);
             var turbineController = turbineTransform.GetComponent<WindSurferController>();
             turbineController.TryMoveToPosition();
             turbineController.PoleState(true);
+            turbineTransform.SetParent(GameObjectHelpers.FindGameObject(gameObject, "Turbines").transform);
         }
-
-        //private void MoveTurbineToPort(Transform parentPlatformTransform, Transform turbineTransform)
-        //{
-        //    EnsureIsKinematic();
-        //    turbineTransform.position = Vector3.zero;
-        //    turbineTransform.SetParent(parentPlatformTransform);
-        //    turbineTransform.localPosition = new Vector3(11.10f, 0f, 0f);
-        //    turbineTransform.SetParent(Turbines.transform, true);
-        //    turbineTransform.localRotation = Quaternion.identity;
-        //    var turbineController = turbineTransform.GetComponent<WindSurferController>();
-        //    turbineController.PoleState(true);
-        //}
 
         private Transform FindHoloPort(string holoPortUnitId,int slotID)
         {
@@ -346,8 +363,11 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
             {
                 if (holoGraphControl.PlatFormController.GetUnitID().Equals(holoPortUnitId))
                 {
+                    QuickLogger.Debug($"Found Hologram: {holoPortUnitId}");
                     holoGraphControl.FindSlots();
                     var trans = holoGraphControl.Slots.FirstOrDefault(x=>x.ID==slotID)?.transform;
+                    var result = trans != null ? "Found" : "Cannot find";
+                    QuickLogger.Debug($"{result} Hologram Port: {slotID}");
                     return trans;
                 }
             }
@@ -355,48 +375,80 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
             return null;
         }
 
-
-        public void RemovePlatform(PlatformController controller)
+        public bool TryRemovePlatform(PlatformController controller)
         {
+            RefreshMST();
+
             var holoGraphControl = controller.HoloGraphControl;
 
             var canRemove = CanRemovePlatform(holoGraphControl);
 
             if (canRemove)
             {
-                var turbineController = controller.gameObject.GetComponentInChildren<WindSurferController>();
-                QuickLogger.Debug($"Removing Turbine: {turbineController.GetUnitID()}", true);
-                _connectedTurbines.Remove(controller.ConnectionData);
-                Grid.Remove(holoGraphControl);
-                Destroy(controller.gameObject);
-                Destroy(holoGraphControl.gameObject);
+                if (controller.GetUnitID().Equals(UnitID,StringComparison.OrdinalIgnoreCase))
+                {
+                    StartCoroutine(DestroyOperator(controller, holoGraphControl));
+                }
+                else
+                {
+                    RemovePlatform(controller, holoGraphControl);
+                }
+
+                return true;
             }
+
+            return false;
+        }
+
+        private void RemovePlatform(PlatformController controller, HoloGraphControl holoGraphControl)
+        {
+            _powerRelay.RemoveInboundPower(controller.GetPowerSource());
+            _connectedTurbines.Remove(controller.GetPrefabID());
+            _connectedTurbinesController.Remove(controller.GetPrefabID());
+            Grid.Remove(holoGraphControl);
+            _holograms.Remove(holoGraphControl);
+            Destroy(controller.gameObject);
+            Destroy(holoGraphControl.gameObject);
+        }
+
+        private IEnumerator DestroyOperator(PlatformController controller, HoloGraphControl holoGraphControl)
+        {
+            QuickLogger.ModMessage( $"Please leave Wind Surfer Operator. This building will deconstruct in 5 seconds.");
+            yield return new WaitForSeconds(5);
+            RemovePlatform(controller, holoGraphControl);
         }
 
         internal bool CanRemovePlatform(HoloGraphControl holoGraphControl)
         {
-            QuickLogger.Debug("1");
-            Graph<HoloGraphControl> G = Grid.ToGraph();
-            QuickLogger.Debug("2");
-            QuickLogger.Debug($"Grid{G} | HoloGraphControl {holoGraphControl} | Get Vertix{G.GetVertex(holoGraphControl)}");
-            var neighbours = G.GetVertex(holoGraphControl).Neighbours;
-            QuickLogger.Debug("3");
-            G.RemoveVertex(holoGraphControl);
-            QuickLogger.Debug("4");
+            _neighbours = _graph.GetVertex(holoGraphControl)?.Neighbours;
+
+            _graph.RemoveVertex(holoGraphControl);
+
             bool canRemove = true;
-            QuickLogger.Debug("5");
-            foreach (var neighbour in neighbours.Select(n => n.To))
+            foreach (var neighbour in _neighbours.Select(n => n.To))
             {
-                QuickLogger.Debug("5.1");
-                if (!G.MST(neighbour).Contains(Grid.ElementAt(Grid.Center)))
+                if (!_graph.MST(neighbour).Contains(Grid.ElementAt(Grid.Center)))
                 {
                     canRemove = false;
                     break;
                 }
-                QuickLogger.Debug("5.2");
             }
-            QuickLogger.Debug("6"); 
             return canRemove;
+        }
+
+        private void RefreshMST()
+        {
+            _graph = Grid.ToGraph();
+        }
+
+        internal void RefreshHoloGrams()
+        {
+            RefreshMST();
+
+            foreach (HoloGraphControl control in _holograms)
+            {
+                control.RefreshDeleteButton(CanRemovePlatform(control));
+            }
         }
 
         private HoloGraphControl CreateHoloGraph(PlatformController controller)
@@ -422,6 +474,7 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
         private HoloGraphControl AddMainHolograph()
         {
             var holoGraphControl = CreateHoloGraph(PlatformController);
+            PlatformController.HoloGraphControl = holoGraphControl;
             holoGraphControl.transform.SetParent(HologramsGrid.transform,true);
             holoGraphControl.transform.localPosition = Vector3.zero;
             holoGraphControl.transform.localRotation = Quaternion.identity;
@@ -445,9 +498,10 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
             return holoGraphControl;
         }
 
-        public HoloGraphControl AddNewHolograph(Transform slot, PlatformController platformController)
+        public HoloGraphControl AddNewHolograph(Transform slot, PlatformController platformController,Vector2Int position)
         {
             var holoGraphControl = CreateHoloGraph(platformController);
+            holoGraphControl.gameObject.name = $"{position} {holoGraphControl.gameObject.name}";
             holoGraphControl.SetAsTurbine();
             platformController.HoloGraphControl = holoGraphControl;
             holoGraphControl.transform.SetParent(slot);
@@ -455,6 +509,7 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
             holoGraphControl.transform.SetParent(HologramsGrid.transform, true);
             holoGraphControl.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
             holoGraphControl.transform.localRotation = Quaternion.identity;
+            Grid.Add(holoGraphControl, position);
             return holoGraphControl;
         }
 
@@ -463,117 +518,80 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
             if (_rb == null) return;
             _rb.isKinematic = true;
         }
-        
-    }
 
-    internal interface IPlatform
-    {
-        PlatformController PlatformController { get;}
-    }
-
-    public static class UIExtensions
-    {
-        // Shared array used to receive result of RectTransform.GetWorldCorners
-        static Vector3[] corners = new Vector3[4];
-
-        /// <summary>
-        /// Transform the bounds of the current rect transform to the space of another transform.
-        /// </summary>
-        /// <param name="source">The rect to transform</param>
-        /// <param name="target">The target space to transform to</param>
-        /// <returns>The transformed bounds</returns>
-        public static Bounds TransformBoundsTo(this RectTransform source, Transform target)
+        private void AddConnection(string text, FcsDevice unit)
         {
-            // Based on code in ScrollRect's internal GetBounds and InternalGetBounds methods
-            var bounds = new Bounds();
-            if (source != null)
+            var controller = (ITelepowerPylonConnection)unit;
+            _currentConnections.Add(text.ToLower(), controller);
+        }
+
+        private PowerInfo GetPowerInfo()
+        {
+            return new PowerInfo{Power = _connectedTurbinesController.Sum(x=>x.Value.GetStoredPower()),Total = _connectedTurbinesController.Sum(x=>x.Value.GetMaxPower())};
+        }
+
+        public TelepowerPylonMode GetCurrentMode()
+        {
+            return TelepowerPylonMode.PUSH;
+        }
+
+        public Action<ITelepowerPylonConnection> OnDestroyCalledAction { get; set; }
+
+        public void AddPullPylon(ITelepowerPylonConnection telepowerPylonConnection)
+        {
+            AddConnection(telepowerPylonConnection.UnitID,telepowerPylonConnection.GetDevice());
+        }
+
+        public IPowerInterface GetPowerRelay()
+        {
+            return _powerRelay;
+        }
+
+        public FcsDevice GetDevice()
+        {
+            return this;
+        }
+
+        public void DeleteFrequencyItemAndDisconnectRelay(string unitID)
+        {
+            DeleteFrequencyItem(unitID.ToLower());
+        }
+
+        private void DeleteFrequencyItem(string id)
+        {
+            QuickLogger.Debug($"Attempting to delete current connection {id}", true);
+            if (_currentConnections.ContainsKey(id))
             {
-                source.GetWorldCorners(corners);
-
-                var vMin = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
-                var vMax = new Vector3(float.MinValue, float.MinValue, float.MinValue);
-
-                var matrix = target.worldToLocalMatrix;
-                for (int j = 0; j < 4; j++)
-                {
-                    Vector3 v = matrix.MultiplyPoint3x4(corners[j]);
-                    vMin = Vector3.Min(v, vMin);
-                    vMax = Vector3.Max(v, vMax);
-                }
-
-                bounds = new Bounds(vMin, Vector3.zero);
-                bounds.Encapsulate(vMax);
-            }
-            return bounds;
-        }
-
-        /// <summary>
-        /// Normalize a distance to be used in verticalNormalizedPosition or horizontalNormalizedPosition.
-        /// </summary>
-        /// <param name="axis">Scroll axis, 0 = horizontal, 1 = vertical</param>
-        /// <param name="distance">The distance in the scroll rect's view's coordiante space</param>
-        /// <returns>The normalized scoll distance</returns>
-        public static float NormalizeScrollDistance(this ScrollRect scrollRect, int axis, float distance)
-        {
-            // Based on code in ScrollRect's internal SetNormalizedPosition method
-            var viewport = scrollRect.viewport;
-            var viewRect = viewport != null ? viewport : scrollRect.GetComponent<RectTransform>();
-            var viewBounds = new Bounds(viewRect.rect.center, viewRect.rect.size);
-
-            var content = scrollRect.content;
-            var contentBounds = content != null ? content.TransformBoundsTo(viewRect) : new Bounds();
-
-            var hiddenLength = contentBounds.size[axis] - viewBounds.size[axis];
-            return distance / hiddenLength;
-        }
-
-        /// <summary>
-        /// Scroll the target element to the vertical center of the scroll rect's viewport.
-        /// Assumes the target element is part of the scroll rect's contents.
-        /// </summary>
-        /// <param name="scrollRect">Scroll rect to scroll</param>
-        /// <param name="target">Element of the scroll rect's content to center vertically</param>
-        public static void ScrollToCenter(this ScrollRect scrollRect, RectTransform target)
-        {
-            // The scroll rect's view's space is used to calculate scroll position
-            var view = scrollRect.viewport != null ? scrollRect.viewport : scrollRect.GetComponent<RectTransform>();
-
-            // Calcualte the scroll offset in the view's space
-            var viewRect = view.rect;
-            var elementBounds = target.TransformBoundsTo(view);
-            var offset = viewRect.center.y - elementBounds.center.y;
-
-            // Normalize and apply the calculated offset
-            var scrollPos = scrollRect.verticalNormalizedPosition - scrollRect.NormalizeScrollDistance(1, offset);
-            scrollRect.verticalNormalizedPosition = Mathf.Clamp(scrollPos, 0f, 1f);
-
-            var offset2 = viewRect.center.x - elementBounds.center.x;
-            var scrollPos2 = scrollRect.horizontalNormalizedPosition - scrollRect.NormalizeScrollDistance(0, offset2);
-            scrollRect.horizontalNormalizedPosition = Mathf.Clamp(scrollPos2, 0, 1);
-        }
-
-        public static void ScrollToCenter(this ScrollRect scrollRect, RectTransform target, RectTransform.Axis axis = RectTransform.Axis.Vertical)
-        {
-            // The scroll rect's view's space is used to calculate scroll position
-            var view = scrollRect.viewport ?? scrollRect.GetComponent<RectTransform>();
-
-            // Calcualte the scroll offset in the view's space
-            var viewRect = view.rect;
-            var elementBounds = target.TransformBoundsTo(view);
-
-            // Normalize and apply the calculated offset
-            if (axis == RectTransform.Axis.Vertical)
-            {
-                var offset = viewRect.center.y - elementBounds.center.y;
-                var scrollPos = scrollRect.verticalNormalizedPosition - scrollRect.NormalizeScrollDistance(1, offset);
-                scrollRect.verticalNormalizedPosition = Mathf.Clamp(scrollPos, 0, 1);
+                _currentConnections.Remove(id);
             }
             else
             {
-                var offset = viewRect.center.x - elementBounds.center.x;
-                var scrollPos = scrollRect.horizontalNormalizedPosition - scrollRect.NormalizeScrollDistance(0, offset);
-                scrollRect.horizontalNormalizedPosition = Mathf.Clamp(scrollPos, 0, 1);
+                QuickLogger.Debug($"Failed to find connection in the list: {id}");
             }
         }
+
+        public bool HasConnection(string unitKey)
+        {
+            foreach (KeyValuePair<string, ITelepowerPylonConnection> connection in _currentConnections)
+            {
+                if ((PowerRelay) connection.Value.GetPowerRelay() == _powerRelay)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public bool HasPowerRelayConnection(IPowerInterface getPowerRelay)
+        {
+            return false;
+        }
+    }
+
+    internal struct PowerInfo
+    {
+        internal float Power;
+        internal float Total;
     }
 }

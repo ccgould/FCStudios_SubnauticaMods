@@ -41,7 +41,7 @@ namespace FCS_EnergySolutions.Spawnables
 
                 PrefabIdentifier prefabIdentifier = prefab.AddComponent<PrefabIdentifier>();
                 prefabIdentifier.ClassId = this.ClassID;
-                prefab.AddComponent<LargeWorldEntity>().cellLevel = LargeWorldEntity.CellLevel.VeryFar;
+                //prefab.AddComponent<LargeWorldEntity>().cellLevel = LargeWorldEntity.CellLevel.VeryFar;
                 prefab.AddComponent<TechTag>().type = this.TechType;
 
                 var rb = prefab.GetComponentInChildren<Rigidbody>();
@@ -62,6 +62,8 @@ namespace FCS_EnergySolutions.Spawnables
                 };
                 MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseEmissiveDecalsController, prefab, Color.cyan);
                 MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseEmissiveDecals, prefab, 4f);
+                MaterialHelpers.ApplyEmissionShader("fcs_WS_BP", "fcs_WS_E",prefab,ModelPrefab.ModBundle,Color.white);
+                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModName);
 
                 //Add VFXSurfaces to adjust footstep sounds. This is technically not necessary for the interior colliders, however.
                 foreach (Collider col in prefab.GetComponentsInChildren<Collider>())
@@ -69,6 +71,9 @@ namespace FCS_EnergySolutions.Spawnables
                     var vfxSurface = col.gameObject.AddComponent<VFXSurface>();
                     vfxSurface.surfaceType = VFXSurfaceTypes.metal;
                 }
+
+                var ps = prefab.AddComponent<PowerSource>();
+                ps.maxPower = 500f;
 
                 prefab.AddComponent<WindSurferController>();
                 return prefab;

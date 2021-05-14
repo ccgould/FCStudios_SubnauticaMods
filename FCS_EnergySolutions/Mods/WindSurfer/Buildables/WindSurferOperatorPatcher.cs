@@ -30,7 +30,7 @@ namespace FCS_EnergySolutions.WindSurferOperator.Buildables
         public override TechCategory CategoryForPDA => TechCategory.Constructor;
         public override TechType RequiredForUnlock => TechType.Constructor;
         public override CraftTree.Type FabricatorType => CraftTree.Type.Constructor;
-        public override string[] StepsToFabricatorTab => new[] { "Rocket" };
+        public override string[] StepsToFabricatorTab => new[] { "Vehicles" };
         public override float CraftingTime => 10f;
 
 
@@ -148,6 +148,16 @@ namespace FCS_EnergySolutions.WindSurferOperator.Buildables
                     GameObjectHelpers.FindGameObject(prefab,"Port_4"),
                 };
 
+                PowerRelay solarPowerRelay = CraftData.GetPrefabForTechType(TechType.SolarPanel).GetComponent<PowerRelay>();
+                
+                var pFX = prefab.AddComponent<PowerFX>();
+                pFX.vfxPrefab = solarPowerRelay.powerFX.vfxPrefab;
+                pFX.attachPoint = prefab.transform;
+
+                var pr = prefab.AddComponent<PowerRelay>();
+                pr.powerFX = pFX;
+                pr.maxOutboundDistance = 15;
+ 
                 prefab.AddComponent<WindSurferOperatorController>();
 
                 //Apply the glass shader here because of autosort lockers for some reason doesnt like it.

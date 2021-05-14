@@ -11,6 +11,23 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
         private GameObject _operator;
         private Button _deleteBTN;
         private GameObject _deleteBtnOBJ;
+        private Text _unitID;
+        private WindSurferOperatorController _windSurferOperatorController;
+        private Text _powerInfo;
+
+        private WindSurferOperatorController WindSurferOperatorController
+        {
+            get
+            {
+                if (_windSurferOperatorController == null)
+                {
+                    _windSurferOperatorController = Slots[0].WindSurferOperatorController;
+                }
+                
+                return _windSurferOperatorController;
+            }
+        }
+
         public PlatformController PlatFormController { get; set; }
 
         private void Start()
@@ -20,9 +37,9 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
 
         private void Update()
         {
-            if (_deleteBTN != null)
+            if (_deleteBTN != null && _deleteBtnOBJ != null && WindSurferOperatorController != null)
             {
-                //_deleteBtnOBJ.SetActive(Slots[0].WindSurferOperatorController.CanRemovePlatform(this));
+                _deleteBTN.interactable = WindSurferOperatorController.ScreenTrigger.selected;
             }
         }
 
@@ -39,18 +56,51 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
                 _operator = gameObject.FindChild("Operator");
             }
 
+
+            if (_unitID == null)
+            {
+                _unitID = gameObject.FindChild("UnitID").GetComponent<Text>();
+            }
+
+            if (_powerInfo == null)
+            {
+                _powerInfo = _turbine.FindChild("PowerInfo").GetComponent<Text>();
+            }
+
             if (_deleteBTN == null)
             {
                 _deleteBtnOBJ = gameObject.FindChild("DeleteBTN");
                 _deleteBTN = _deleteBtnOBJ.GetComponent<Button>();
                 _deleteBTN.onClick.AddListener((() =>
                 {
-                    Slots[0].WindSurferOperatorController.RemovePlatform(PlatFormController);
+                    var result = WindSurferOperatorController.TryRemovePlatform(PlatFormController);
+                    if (result)
+                    {
+                        WindSurferOperatorController.RefreshHoloGrams();
+                    }
+
                 }));
             }
 
             FindSlots();
+
+            InvokeRepeating(nameof(UpdatePowerInfo),1f,1f);
         }
+
+        private void UpdatePowerInfo()
+        {
+            if (_powerInfo != null)
+            {
+                _powerInfo.text = PlatFormController?.GetPowerInfo() ?? "0/0";
+            }
+        }
+
+        public void RefreshDeleteButton(bool value)
+        {
+            _deleteBtnOBJ.SetActive(value);
+            UpdateUnitId();
+        }
+
 
         internal void SetAsTurbine()
         {
@@ -66,9 +116,16 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
                 foreach (Transform slot in gameObject.FindChild("Slot").transform)
                 {
                     var hSlot = slot.gameObject.AddComponent<HolographSlot>();
+                    hSlot.Initialize();
                     Slots.Add(hSlot); 
                 }
             }
+        }
+
+        public void UpdateUnitId()
+        {
+            if(_unitID == null) return;
+            _unitID.text = PlatFormController?.GetUnitID();
         }
     }
 }

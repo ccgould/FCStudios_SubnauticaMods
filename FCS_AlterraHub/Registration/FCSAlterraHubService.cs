@@ -33,6 +33,7 @@ namespace FCS_AlterraHub.Registration
         bool ChargeAccount(decimal amount);
         bool IsCreditAvailable(decimal amount);
         KeyValuePair<string, FcsDevice> FindDevice(string unitID);
+        KeyValuePair<string, FcsDevice> FindDeviceWithPreFabID(string prefabID);
         void AddBuiltTech(TechType techType);
         int GetTechBuiltCount(TechType techType);
         void RemoveBuiltTech(TechType techType);
@@ -357,6 +358,11 @@ namespace FCS_AlterraHub.Registration
         public KeyValuePair<string, FcsDevice> FindDevice(string unitID)
         {
             return GlobalDevices.FirstOrDefault(x => x.Key.Equals(unitID, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public KeyValuePair<string, FcsDevice> FindDeviceWithPreFabID(string prefabID)
+        {
+            return GlobalDevices.FirstOrDefault(x => x.Value.GetPrefabID().Equals(prefabID, StringComparison.OrdinalIgnoreCase));
         }
 
         public void AddBuiltTech(TechType techType)

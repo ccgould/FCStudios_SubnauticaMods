@@ -1,4 +1,5 @@
 ﻿using System;
+using FCS_EnergySolutions.Configuration;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,10 +8,52 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
     public class HolographSlot : MonoBehaviour
     {
         public Transform Target { get; set; }
-        internal WindSurferOperatorController WindSurferOperatorController => GetComponentInParent<WindSurferOperatorController>();
-        internal PlatformController PlatformController => GetComponentInParent<PlatformController>();
-        internal HoloGraphControl HoloGraphControl => GetComponentInParent<HoloGraphControl>();
+        internal WindSurferOperatorController WindSurferOperatorController
+        {
+            get
+            {
+                if (_windsurferController == null)
+                {
+                    _windsurferController = GetComponentInParent<WindSurferOperatorController>();
+                }
+
+                return _windsurferController;
+            }
+        }
+
+        internal PlatformController PlatformController
+        {
+            get
+            {
+                if (_platformController == null)
+                {
+                    _platformController = GetComponentInParent<PlatformController>();
+                }
+
+                return _platformController;
+            }
+        }
+
+        internal HoloGraphControl HoloGraphControl
+        {
+            get
+            {
+                if (_holoGraphControl == null)
+                {
+                    _holoGraphControl = GetComponentInParent<HoloGraphControl>();
+                }
+
+                return _holoGraphControl;
+            }
+        }
+
         internal int ID;
+        private WindSurferOperatorController _windsurferController;
+        private Button _button;
+        private HoloGraphControl _holoGraphControl;
+        private PlatformController _platformController;
+        private bool _initialized;
+
         internal Vector2Int Direction
         {
             get
@@ -31,15 +74,38 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
             }
         }
 
-        void Start()
+        internal void Initialize()
         {
+            if(_initialized) return;
             var idString = gameObject.name.Substring(gameObject.name.Length - 1);
             ID = Convert.ToInt32(idString);
-            var button = gameObject.GetComponent<Button>();
-            button.onClick.AddListener((() =>
+            _button = gameObject.GetComponent<Button>();
+
+            _button.onClick.AddListener((() =>
             {
-                WindSurferOperatorController.AddPlatform(this, WindSurferOperatorController.Grid.Position(HoloGraphControl) + Direction);
+                var result = WindSurferOperatorController.AddPlatform(this, GetPosition() + Direction);
+                
+                if (result)
+                {
+                    WindSurferOperatorController.RefreshHoloGrams();
+                }
+
             }));
+
+            InvokeRepeating(nameof(UpdateSlot),.1f,.1f);
+
+            _initialized = true;
+        }
+
+        private void UpdateSlot()
+        {
+            _button.interactable = WindSurferOperatorController.ScreenTrigger.selected && WindSurferOperatorController.Grid.ElementAt(GetPosition() + Direction) == null;
+        }
+
+
+        private Vector2Int GetPosition()
+        {
+            return WindSurferOperatorController.Grid.Position(HoloGraphControl);
         }
     }
 }

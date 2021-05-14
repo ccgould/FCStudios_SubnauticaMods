@@ -4,6 +4,8 @@ using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Objects;
 using FCS_EnergySolutions.Mods.TelepowerPylon.Model;
 using FCS_EnergySolutions.Mods.TelepowerPylon.Mono;
+using FCS_EnergySolutions.Mods.WindSurfer.Mono;
+using FCS_EnergySolutions.Mods.WindSurfer.Structs;
 using FCS_EnergySolutions.PowerStorage.Enums;
 using FCS_EnergySolutions.PowerStorage.Mono;
 using FCSCommon.Interfaces;
@@ -94,7 +96,7 @@ namespace FCS_EnergySolutions.Configuration
         [JsonProperty] internal Vec4 SecondaryBody { get; set; }
         [JsonProperty] internal FCSPowerStates PowerState { get; set; }
         [JsonProperty] internal TelepowerPylonMode PylonMode { get; set; }
-        [JsonProperty] internal HashSet<Tuple<int, string,string, Vector2Int>> CurrentConnections { get; set; }
+        [JsonProperty] internal SortedDictionary<string, ConnectedTurbineData> CurrentConnections { get; set; }
         [JsonProperty] internal TelepowerPylonUpgrade Upgrade { get; set; }
         [JsonProperty] internal float StoredPower { get; set; }
     }
@@ -107,12 +109,11 @@ namespace FCS_EnergySolutions.Configuration
         [JsonProperty] internal Vec4 Body { get; set; }
         [JsonProperty] internal Vec4 SecondaryBody { get; set; }
         [JsonProperty] internal FCSPowerStates PowerState { get; set; }
-        [JsonProperty] internal TelepowerPylonMode PylonMode { get; set; }
-        [JsonProperty] internal List<string> CurrentConnections { get; set; }
-        [JsonProperty] internal TelepowerPylonUpgrade Upgrade { get; set; }
         [JsonProperty] internal float StoredPower { get; set; }
         [JsonProperty] internal Vec3 Position { get; set; }
         [JsonProperty] internal Vec4 Rotation { get; set; }
+        [JsonProperty] internal Vec3 PoleState { get; set; }
+        [JsonProperty] internal float Speed { get; set; }
     }
 
     [Serializable]

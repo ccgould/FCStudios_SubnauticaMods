@@ -106,6 +106,7 @@ namespace FCS_EnergySolutions.Configuration
         };
 
         public static Action<bool> OnLightsEnabledToggle { get; set; }
+        public static Action<string> OnPlatFormRemoved { get; set; }
 
         internal const string ModDescription ="";
 

@@ -10,6 +10,7 @@ namespace FCS_EnergySolutions.Configuration
         private static readonly Dictionary<string, string> LanguageDictionary = new Dictionary<string, string>
         {
             { $"{ModKey}_JetStreamT242OnHover","JetStream {0} Information: (charge: {1}/{2}) | (production per minute: {3})"},
+            { $"{ModKey}_WindSurferOnHover","WindSurfer {0} Information: (charge: {1}/{2}) | (production per minute: {3})"},
             { $"{ModKey}_JetStreamOnHoverInteractionFormatted","Press {0} to Turn on / off Turbine. Current State {1}"},
             { $"{ModKey}_OnlyPowercellsAllowed","Only powercells are allowed."},
             { $"{ModKey}_PowerStorageNotEmpty","Please remove all powercells before trying to deconstruct."},
@@ -141,6 +142,11 @@ namespace FCS_EnergySolutions.Configuration
         public static string MaximumConnectionsReached()
         {
             return GetLanguage($"{ModKey}_MaximumConnectionsReached");
+        }
+
+        public static string WindSurferOnHover()
+        {
+            return $"{ModKey}_WindSurferOnHover";
         }
     }
 }
