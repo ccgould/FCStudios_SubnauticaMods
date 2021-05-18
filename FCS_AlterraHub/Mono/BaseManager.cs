@@ -65,7 +65,10 @@ namespace FCS_AlterraHub.Mono
             "farmingtray",
             "longplanterb",
             "labtrashcan",
-            "trashcan"
+            "trashcan",
+            "serverrack",
+            "powerstorage",
+            "recycler"
         };
         public readonly HashSet<StorageContainer> BaseStorageLockers = new HashSet<StorageContainer>();
         public readonly HashSet<FcsDevice> BaseServers = new HashSet<FcsDevice>();

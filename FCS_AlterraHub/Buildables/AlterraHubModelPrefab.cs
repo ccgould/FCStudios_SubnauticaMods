@@ -5,7 +5,6 @@ using FCS_AlterraHub.Configuration;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace FCS_AlterraHub.Buildables
 {
@@ -26,26 +25,55 @@ namespace FCS_AlterraHub.Buildables
         /// </summary>
         public const string BaseSecondaryCol = "fcs01_BS";
         /// <summary>
-        /// Material for fcs01_BD
+        /// Material for fcs01_BD_Exterior
         /// </summary>
-        public const string BaseDefaultDecals = "fcs01_BD";
+        public const string BaseDecalsExterior = "fcs01_BD_Exterior";
         /// <summary>
         /// Material for fcs01_BTD
         /// </summary>
         public const string BaseTexDecals = "fcs01_BTD";
         /// <summary>
-        /// Material for fcs01_BDED
+        /// Material for base lights emissive controller
         /// </summary>
-        public const string BaseEmissiveDecals = "fcs01_BDED";
+        public const string BaseLightsEmissiveController = "fcs01_BLEC";
         /// <summary>
-        /// Material for fcs01_BEDC
+        /// Material for base decals emissive controller
         /// </summary>
-        public const string BaseEmissiveDecalsController = "fcs01_BEDC";
+        public const string BaseDecalsEmissiveController = "fcs01_BDEC";
+        /// <summary>
+        /// Material for indoor for none alpha.
+        /// </summary>
+        public const string BaseFloor01Interior = "fcs01_Floor01_Interior";
+        /// <summary>
+        /// Material for outdoor for none alpha.
+        /// </summary>
+        public const string BaseFloor01Exterior = "fcs01_Floor01_Exterior";
+        /// <summary>
+        /// Material for interiors - non-alpha
+        /// </summary>
+        public const string BaseOpaqueInterior = "fcs01_BO_Interior";
+        /// <summary>
+        /// Material for exterior - non alpha
+        /// </summary>
+        public const string BaseOpaqueExterior = "fcs01_BO_Exterior";
+        /// <summary>
+        /// Material for interior decals
+        /// </summary>
+        public const string BaseDecalsInterior = "fcs01_BD_Interior";
+        /// <summary>
+        /// Material for beacons
+        /// </summary>
+        public const string BaseBeaconLightEmissiveController = "fcs01_BBLEC";
 
-        public const string BaseDetail = "fcs01_D";
-        public const string BaseNormal = "fcs01_N";
-        public const string BaseEmission = "fcs01_E";
-        public const string BaseSpec = "fcs01_s";
+
+        public const string TBaseDetail = "fcs01_D";
+        public const string TBaseNormal = "fcs01_N";
+        public const string TBaseEmission = "fcs01_E";
+        public const string TFloorDetail = "fcs01_Floor01_D";
+        public const string TFloorNormal = "fcs01_Floor01_N";
+        public const string TFloorEmission = "fcs01_Floor01_E";
+        public const string TEmissionInterior = "fcs01_E_Interior";
+        public const string TBaseSpec = "fcs01_s";
         
         internal static string BodyMaterial => $"fcs{Mod.ModName}_COL";
         internal static string DecalMaterial => $"fcs{Mod.ModName}_DECALS";
@@ -205,33 +233,71 @@ namespace FCS_AlterraHub.Buildables
         public static void ApplyShadersV2(GameObject prefab, AssetBundle bundle)
         {
             #region BasePrimaryCol
-            MaterialHelpers.ApplyNormalShader(BasePrimaryCol, BaseNormal, prefab, bundle);
+            MaterialHelpers.ApplyNormalShader(BasePrimaryCol, TBaseNormal, prefab, bundle);
             #endregion
 
             #region BaseSecondaryCol
-            MaterialHelpers.ApplyNormalShader(BaseSecondaryCol, BaseNormal, prefab, bundle);
+            MaterialHelpers.ApplyNormalShader(BaseSecondaryCol, TBaseNormal, prefab, bundle);
             #endregion
-
-            #region BaseDefaultDecals
-            MaterialHelpers.ApplyNormalShader(BaseDefaultDecals, BaseNormal, prefab, bundle);
-            MaterialHelpers.ApplyAlphaShader(BaseDefaultDecals, prefab);
-            #endregion
-
+            
             #region BaseTexDecals
-            MaterialHelpers.ApplyNormalShader(BaseTexDecals, BaseNormal, prefab, bundle);
+            MaterialHelpers.ApplyNormalShader(BaseTexDecals, TBaseNormal, prefab, bundle);
             MaterialHelpers.ApplyAlphaShader(BaseTexDecals, prefab);
+            MaterialHelpers.ApplySpecShader(BaseTexDecals,TBaseSpec,prefab,1,3,bundle);
             #endregion
 
-            #region BaseEmissiveDecals
-            MaterialHelpers.ApplyNormalShader(BaseEmissiveDecals, BaseNormal, prefab, bundle);
-            MaterialHelpers.ApplyAlphaShader(BaseEmissiveDecals, prefab);
-            MaterialHelpers.ApplyEmissionShader(BaseEmissiveDecals, BaseEmission, prefab, bundle, Color.white);
+            #region BaseLightsEmissiveController
+            MaterialHelpers.ApplyNormalShader(BaseLightsEmissiveController, TBaseNormal, prefab, bundle);
+            MaterialHelpers.ApplyAlphaShader(BaseLightsEmissiveController, prefab);
+            MaterialHelpers.ApplyEmissionShader(BaseLightsEmissiveController, TBaseEmission, prefab, bundle, Color.white);
             #endregion
 
-            #region BaseEmissiveDecals
-            MaterialHelpers.ApplyNormalShader(BaseEmissiveDecalsController, BaseNormal, prefab, bundle);
-            MaterialHelpers.ApplyAlphaShader(BaseEmissiveDecalsController, prefab);
-            MaterialHelpers.ApplyEmissionShader(BaseEmissiveDecalsController, BaseEmission, prefab, bundle, Color.white);
+            #region BaseDecalsEmissiveController
+
+            MaterialHelpers.ApplyNormalShader(BaseDecalsEmissiveController, TBaseNormal, prefab, bundle);
+            MaterialHelpers.ApplyAlphaShader(BaseDecalsEmissiveController, prefab);
+            MaterialHelpers.ApplyEmissionShader(BaseDecalsEmissiveController, TBaseEmission, prefab, bundle, Color.white);
+
+            #endregion
+
+            #region BaseFloor01Interior
+            MaterialHelpers.ApplyNormalShader(BaseFloor01Interior, TFloorNormal, prefab, bundle);
+            MaterialHelpers.ApplyEmissionShader(BaseFloor01Interior, TFloorEmission, prefab, bundle, Color.white);
+
+            #endregion
+
+            #region BaseFloor01Exterior
+            MaterialHelpers.ApplyNormalShader(BaseFloor01Exterior, TFloorNormal, prefab, bundle);
+            #endregion
+
+            #region BaseOpaqeInterior
+            MaterialHelpers.ApplyNormalShader(BaseOpaqueInterior, TBaseNormal, prefab, bundle);
+            MaterialHelpers.ApplyEmissionShader(BaseOpaqueInterior, TEmissionInterior, prefab, bundle, Color.white);
+            MaterialHelpers.ApplySpecShader(BaseOpaqueInterior, TBaseSpec, prefab, 1, 3, bundle);
+            #endregion
+
+            #region BaseOpaqeExterior
+            MaterialHelpers.ApplyNormalShader(BaseOpaqueExterior, TBaseNormal, prefab, bundle);
+            MaterialHelpers.ApplySpecShader(BaseOpaqueExterior, TBaseSpec, prefab, 1, 3, bundle);
+            #endregion
+
+            #region BaseDecalsInterior
+            MaterialHelpers.ApplyNormalShader(BaseDecalsInterior, TBaseNormal, prefab, bundle);
+            MaterialHelpers.ApplyEmissionShader(BaseDecalsInterior, TEmissionInterior, prefab, bundle, Color.white);
+            MaterialHelpers.ApplyAlphaShader(BaseDecalsInterior, prefab);
+            MaterialHelpers.ApplySpecShader(BaseDecalsInterior, TBaseSpec, prefab, 1, 3, bundle);
+            #endregion
+
+            #region BaseDecalsExterior
+            MaterialHelpers.ApplyNormalShader(BaseDecalsExterior, TBaseNormal, prefab, bundle);
+            MaterialHelpers.ApplyAlphaShader(BaseDecalsExterior, prefab);
+            MaterialHelpers.ApplySpecShader(BaseDecalsExterior, TBaseSpec, prefab, 1, 3, bundle);
+            #endregion
+
+            #region BaseBeaconLightEmissiveController
+            MaterialHelpers.ApplyNormalShader(BaseBeaconLightEmissiveController, TBaseNormal, prefab, bundle);
+            MaterialHelpers.ApplyAlphaShader(BaseBeaconLightEmissiveController, prefab);
+            MaterialHelpers.ApplyEmissionShader(BaseBeaconLightEmissiveController, TBaseEmission, prefab, bundle, Color.red);
             #endregion
         }
 
@@ -252,51 +318,96 @@ namespace FCS_AlterraHub.Buildables
 
             #region BasePrimaryCol
             Material basePrimaryCol = QPatch.GlobalBundle.LoadAsset<Material>(BasePrimaryCol);
-            MaterialHelpers.CreateV2NormalMaterial(basePrimaryCol, BaseNormal, QPatch.GlobalBundle);
+            MaterialHelpers.CreateV2NormalMaterial(basePrimaryCol, TBaseNormal, QPatch.GlobalBundle);
             _v2Materials.Add(BasePrimaryCol, basePrimaryCol);
             #endregion
 
             #region BaseSecondaryCol
             Material baseSecondaryCol = QPatch.GlobalBundle.LoadAsset<Material>(BaseSecondaryCol);
-            MaterialHelpers.CreateV2NormalMaterial(baseSecondaryCol, BaseNormal, QPatch.GlobalBundle);
+            MaterialHelpers.CreateV2NormalMaterial(baseSecondaryCol, TBaseNormal, QPatch.GlobalBundle);
             _v2Materials.Add(BaseSecondaryCol, baseSecondaryCol);
             #endregion
-
-            #region BaseDefaultDecals
-            Material baseDefaultDecals = QPatch.GlobalBundle.LoadAsset<Material>(BaseDefaultDecals);
-            MaterialHelpers.CreateV2NormalMaterial(baseDefaultDecals, BaseNormal, QPatch.GlobalBundle);
-            MaterialHelpers.CreateV2ApplyAlphaMaterial(baseDefaultDecals, QPatch.GlobalBundle);
-            MaterialHelpers.CreateV2Specular(baseDefaultDecals,BaseSpec,1,3,QPatch.GlobalBundle);
-            _v2Materials.Add(BaseDefaultDecals, baseDefaultDecals);
-            #endregion
-
+            
             #region BaseTexDecals
             Material baseTexDecals = QPatch.GlobalBundle.LoadAsset<Material>(BaseTexDecals);
-            MaterialHelpers.CreateV2NormalMaterial(baseTexDecals, BaseNormal, QPatch.GlobalBundle);
+            MaterialHelpers.CreateV2NormalMaterial(baseTexDecals, TBaseNormal, QPatch.GlobalBundle);
             MaterialHelpers.CreateV2ApplyAlphaMaterial(baseTexDecals, QPatch.GlobalBundle);
+            MaterialHelpers.CreateV2Specular(baseTexDecals, TBaseSpec, 1, 3, QPatch.GlobalBundle);
             _v2Materials.Add(BaseTexDecals, baseTexDecals);
             #endregion
 
-            #region BaseEmissiveDecals
-            Material baseEmissiveDecals = QPatch.GlobalBundle.LoadAsset<Material>(BaseEmissiveDecals);
-            MaterialHelpers.CreateV2NormalMaterial(baseEmissiveDecals, BaseNormal, QPatch.GlobalBundle);
-            MaterialHelpers.CreateV2ApplyAlphaMaterial(baseEmissiveDecals, QPatch.GlobalBundle);
-            MaterialHelpers.CreateV2EmissionMaterial(baseEmissiveDecals, BaseEmission, QPatch.GlobalBundle, Color.white);
-            _v2Materials.Add(BaseEmissiveDecals, baseEmissiveDecals);
+            #region BaseLightsEmissiveController
+            Material baseLightsEmissiveController = QPatch.GlobalBundle.LoadAsset<Material>(BaseLightsEmissiveController);
+            MaterialHelpers.CreateV2NormalMaterial(baseLightsEmissiveController, TBaseNormal, QPatch.GlobalBundle);
+            MaterialHelpers.CreateV2ApplyAlphaMaterial(baseLightsEmissiveController, QPatch.GlobalBundle);
+            MaterialHelpers.CreateV2EmissionMaterial(baseLightsEmissiveController, TBaseEmission, QPatch.GlobalBundle, Color.white);
+            _v2Materials.Add(BaseLightsEmissiveController, baseLightsEmissiveController);
             #endregion
 
-            #region BaseEmissiveDecals
-            Material baseEmissiveDecalsController = QPatch.GlobalBundle.LoadAsset<Material>(BaseEmissiveDecalsController);
-            MaterialHelpers.CreateV2NormalMaterial(baseEmissiveDecalsController, BaseNormal, QPatch.GlobalBundle);
-            MaterialHelpers.CreateV2ApplyAlphaMaterial(baseEmissiveDecalsController, QPatch.GlobalBundle);
-            MaterialHelpers.CreateV2EmissionMaterial(baseEmissiveDecalsController, BaseEmission, QPatch.GlobalBundle, Color.white);
-            _v2Materials.Add(BaseEmissiveDecalsController, baseEmissiveDecalsController);
+            #region BaseDecalsEmissiveController
+            Material baseDecalsEmissiveController = QPatch.GlobalBundle.LoadAsset<Material>(BaseDecalsEmissiveController);
+            MaterialHelpers.CreateV2NormalMaterial(baseDecalsEmissiveController, TBaseNormal, QPatch.GlobalBundle);
+            MaterialHelpers.CreateV2ApplyAlphaMaterial(baseDecalsEmissiveController, QPatch.GlobalBundle);
+            MaterialHelpers.CreateV2EmissionMaterial(baseDecalsEmissiveController, TBaseEmission, QPatch.GlobalBundle, Color.white);
+            _v2Materials.Add(BaseDecalsEmissiveController, baseDecalsEmissiveController);
+            #endregion
+            
+            #region BaseFloor01Interior
+            Material baseFloor01Interior = QPatch.GlobalBundle.LoadAsset<Material>(BaseFloor01Interior);
+            MaterialHelpers.CreateV2NormalMaterial(baseFloor01Interior, TFloorNormal, QPatch.GlobalBundle);
+            MaterialHelpers.CreateV2EmissionMaterial(baseFloor01Interior, TFloorEmission, QPatch.GlobalBundle, Color.white);
+            _v2Materials.Add(BaseFloor01Interior, baseFloor01Interior);
+            #endregion
+
+            #region BaseFloor01Exterior
+            Material baseFloor01Exterior = QPatch.GlobalBundle.LoadAsset<Material>(BaseFloor01Exterior);
+            MaterialHelpers.CreateV2NormalMaterial(baseFloor01Exterior, TFloorNormal, QPatch.GlobalBundle);
+            _v2Materials.Add(BaseFloor01Exterior, baseFloor01Exterior);
+            #endregion
+
+            #region BaseOpaqueInterior
+            Material baseOpaqueInterior = QPatch.GlobalBundle.LoadAsset<Material>(BaseOpaqueInterior);
+            MaterialHelpers.CreateV2NormalMaterial(baseOpaqueInterior, TBaseNormal, QPatch.GlobalBundle);
+            MaterialHelpers.CreateV2EmissionMaterial(baseOpaqueInterior, TEmissionInterior, QPatch.GlobalBundle, Color.white);
+            MaterialHelpers.CreateV2Specular(baseOpaqueInterior, TBaseSpec, 1, 3, QPatch.GlobalBundle);
+            _v2Materials.Add(BaseOpaqueInterior, baseOpaqueInterior);
+            #endregion
+
+            #region BaseOpaqueExterior
+            Material baseOpaqueExterior = QPatch.GlobalBundle.LoadAsset<Material>(BaseOpaqueExterior);
+            MaterialHelpers.CreateV2NormalMaterial(baseOpaqueExterior, TBaseNormal, QPatch.GlobalBundle);
+            MaterialHelpers.CreateV2Specular(baseOpaqueExterior, TBaseSpec, 1, 3, QPatch.GlobalBundle);
+            _v2Materials.Add(BaseOpaqueExterior, baseOpaqueExterior);
+            #endregion
+
+            #region BaseDecalsInterior
+            Material baseDecalsInterior = QPatch.GlobalBundle.LoadAsset<Material>(BaseDecalsInterior);
+            MaterialHelpers.CreateV2ApplyAlphaMaterial(baseDecalsInterior, QPatch.GlobalBundle);
+            MaterialHelpers.CreateV2NormalMaterial(baseDecalsInterior, TBaseNormal, QPatch.GlobalBundle);
+            MaterialHelpers.CreateV2EmissionMaterial(baseDecalsInterior, TEmissionInterior, QPatch.GlobalBundle, Color.white);
+            MaterialHelpers.CreateV2Specular(baseDecalsInterior, TBaseSpec, 1, 3, QPatch.GlobalBundle);
+            _v2Materials.Add(BaseDecalsInterior, baseDecalsInterior);
+            #endregion
+
+            #region BaseDecalsExterior
+            Material baseDecalsExterior = QPatch.GlobalBundle.LoadAsset<Material>(BaseDecalsExterior);
+            MaterialHelpers.CreateV2NormalMaterial(baseDecalsExterior, TBaseNormal, QPatch.GlobalBundle);
+            MaterialHelpers.CreateV2ApplyAlphaMaterial(baseDecalsExterior, QPatch.GlobalBundle);
+            MaterialHelpers.CreateV2Specular(baseDecalsExterior, TBaseSpec, 1, 3, QPatch.GlobalBundle);
+            _v2Materials.Add(BaseDecalsExterior, baseDecalsExterior);
+            #endregion
+
+            #region BaseBeaconLightEmissiveController
+            Material baseBeaconLightsEmissiveController = QPatch.GlobalBundle.LoadAsset<Material>(BaseBeaconLightEmissiveController);
+            MaterialHelpers.CreateV2NormalMaterial(baseBeaconLightsEmissiveController, TBaseNormal, QPatch.GlobalBundle);
+            MaterialHelpers.CreateV2ApplyAlphaMaterial(baseBeaconLightsEmissiveController, QPatch.GlobalBundle);
+            MaterialHelpers.CreateV2EmissionMaterial(baseBeaconLightsEmissiveController, TBaseEmission, QPatch.GlobalBundle, Color.red);
+            _v2Materials.Add(BaseBeaconLightEmissiveController, baseBeaconLightsEmissiveController);
             #endregion
 
             _v2MaterialsLoaded = true;
 
         }
-
 
         public static void ReplaceShadersV2(GameObject prefab,string materialName)
         {

@@ -327,9 +327,9 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
 
             MoveBelt();
 
-            MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseEmissiveDecals, gameObject, 4f);
+            MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseLightsEmissiveController, gameObject, 4f);
 
-            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseEmissiveDecalsController, gameObject,Color.cyan);
+            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject,Color.cyan);
 
             InvokeRepeating(nameof(CheckForAvailableCrafts), 1f, 1f);
 

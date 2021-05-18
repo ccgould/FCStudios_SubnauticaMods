@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHub.Helpers;
@@ -13,7 +12,7 @@ using UnityEngine.UI;
 
 namespace FCS_EnergySolutions.PowerStorage.Mono
 {
-    internal class PowerCellCharger : MonoBehaviour, IFCSDumpContainer
+    internal class PowerCellCharger : MonoBehaviour
     {
         protected float NextChargeAttemptTimer;
         private readonly Color _colorEmpty = new Color(1f, 0f, 0f, 1f);
@@ -27,7 +26,7 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
         private PowerStorageController _mono;
         private bool _allowedToCharge;
         private FCSStorage _storageContainer;
-        private DumpContainerSimplified _dumpContainer;
+        private bool _bypassRemoveEvent;
         private const int MAXSLOTS = 10;
         public bool IsFull => _storageContainer?.GetCount() >= MAXSLOTS;
 
@@ -43,7 +42,7 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
             _mono = mono;
             Batteries = new Dictionary<string, IBattery>();
             Slots = new Dictionary<string, SlotDefinition>();
-           _powerSupply = powerSupply;
+            _powerSupply = powerSupply;
             var j = 1;
             for (var index = 0; index < powercellDummies.Length; index++)
             {
@@ -86,53 +85,44 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
 
             if (_storageContainer == null)
             {
-                _storageContainer = gameObject.AddComponent<FCSStorage>();
-                _storageContainer.Initialize(10);
-                _storageContainer.ItemsContainer.onAddItem += item =>
-                {
-                    var slot = FindAvailableSlot();
+                _storageContainer = gameObject.GetComponent<FCSStorage>();
 
-                    if (!string.IsNullOrWhiteSpace(slot.id))
-                    {
-                        NextChargeAttemptTimer = 0f;
-                        IBattery component = item.item?.GetComponent<IBattery>();
-                        if (component != null && Batteries.ContainsKey(slot.id))
-                        {
-                            Batteries[slot.id] = component;
-                            slot.battery.InventoryItem = item;
-                            OnBatteryAdded?.Invoke(slot.id);
-                        }
-
-                        if (Slots.TryGetValue(slot.id, out var slotDefinition))
-                        {
-
-                            if (slotDefinition.battery != null)
-                            {
-                                slotDefinition.battery.IsVisible(true);
-                            }
-
-                            if (component != null)
-                            {
-                                UpdateVisuals(slotDefinition, component.charge / component.capacity);
-                            }
-                        }
-                    }
-                };
-
-                if (_dumpContainer == null)
-                {
-                    _dumpContainer = gameObject.AddComponent<DumpContainerSimplified>();
-                    _dumpContainer.Initialize(gameObject.transform, Mod.PowerStorageFriendlyName, this, 2, 5);
-                }
-
-                //_storageContainer.onRemoveItem += item =>
-                //{
-                //    _inventoryGrid.DrawPage();
-                //    UpdateStorageCount();
-                //};
+                _storageContainer.container.onAddItem += AddPowercell;
+                _storageContainer.container.onRemoveItem += OnUnEquip;
+                _storageContainer.container.allowedTech = TechDataHelpers.PowercellTech;
             }
         }
-        
+
+        private void AddPowercell(InventoryItem item)
+        {
+            var slot = FindAvailableSlot();
+
+            if (!string.IsNullOrWhiteSpace(slot.id))
+            {
+                NextChargeAttemptTimer = 0f;
+                IBattery component = item.item?.GetComponent<IBattery>();
+                if (component != null && Batteries.ContainsKey(slot.id))
+                {
+                    Batteries[slot.id] = component;
+                    slot.battery.InventoryItem = item;
+                    OnBatteryAdded?.Invoke(slot.id);
+                }
+
+                if (Slots.TryGetValue(slot.id, out var slotDefinition))
+                {
+                    if (slotDefinition.battery != null)
+                    {
+                        slotDefinition.battery.IsVisible(true);
+                    }
+
+                    if (component != null)
+                    {
+                        UpdateVisuals(slotDefinition, component.charge / component.capacity);
+                    }
+                }
+            }
+        }
+
         internal float GetTotal()
         {
             return Batteries.Sum(x => x.Value?.charge ?? 0);
@@ -147,56 +137,56 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
         {
             return Slots.Count(x => x.Value.IsOccupied());
         }
-        
+
         private void Update()
-		{
+        {
             PowerRelay powerRelay = PowerSource.FindRelay(transform);
             AddPowerSource(_powerSupply);
 
-            if (DayNightCycle.main.deltaTime == 0f ||!_allowedToCharge)
-			{
-				return;
-			}
-			if (NextChargeAttemptTimer > 0f)
-			{
-				NextChargeAttemptTimer -= DayNightCycle.main.deltaTime;
-				if (NextChargeAttemptTimer < 0f)
-				{
-					NextChargeAttemptTimer = 0f;
-				}
-			}
-            
-			if (NextChargeAttemptTimer <= 0f)
-			{
-				int num = 0;
-				bool flag = false;
-				
+            if (DayNightCycle.main.deltaTime == 0f || !_allowedToCharge)
+            {
+                return;
+            }
+            if (NextChargeAttemptTimer > 0f)
+            {
+                NextChargeAttemptTimer -= DayNightCycle.main.deltaTime;
+                if (NextChargeAttemptTimer < 0f)
+                {
+                    NextChargeAttemptTimer = 0f;
+                }
+            }
+
+            if (NextChargeAttemptTimer <= 0f)
+            {
+                int num = 0;
+                bool flag = false;
+
                 if (powerRelay != null)
-				{
-					float num2 = 0f;
-					foreach (KeyValuePair<string, IBattery> keyValuePair in Batteries)
-					{
-						IBattery value = keyValuePair.Value;
-						if (value != null)
-						{
-							float charge = value.charge;
-							float capacity = value.capacity;
-							if (charge < capacity)
-							{
-								num++;
-								float num3 = DayNightCycle.main.deltaTime * ChargeSpeed * capacity;
-								if (charge + num3 > capacity)
-								{
-									num3 = capacity - charge;
-								}
-								num2 += num3;
-							}
-						}
-					}
-					float num4 = 0f;
-					if (num2 > 0f && _mono.CalculateBasePower() > num2)
-					{
-						flag = true;
+                {
+                    float num2 = 0f;
+                    foreach (KeyValuePair<string, IBattery> keyValuePair in Batteries)
+                    {
+                        IBattery value = keyValuePair.Value;
+                        if (value != null)
+                        {
+                            float charge = value.charge;
+                            float capacity = value.capacity;
+                            if (charge < capacity)
+                            {
+                                num++;
+                                float num3 = DayNightCycle.main.deltaTime * ChargeSpeed * capacity;
+                                if (charge + num3 > capacity)
+                                {
+                                    num3 = capacity - charge;
+                                }
+                                num2 += num3;
+                            }
+                        }
+                    }
+                    float num4 = 0f;
+                    if (num2 > 0f && _mono.CalculateBasePower() > num2)
+                    {
+                        flag = true;
                         foreach (IPowerInterface powerSource in powerRelay.inboundPowerSources)
                         {
                             if (powerSource is PowerSupply)
@@ -206,44 +196,44 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
 
                             powerSource.ConsumeEnergy(num2, out num4);
                             num2 -= num4;
-                            if(num2 <= 0) break;
+                            if (num2 <= 0) break;
                         }
                     }
-					if (num4 > 0f)
-					{
-						float num5 = num4 / num;
+                    if (num4 > 0f)
+                    {
+                        float num5 = num4 / num;
 
-						foreach (KeyValuePair<string, IBattery> keyValuePair2 in Batteries)
-						{
-							string key = keyValuePair2.Key;
-							IBattery value2 = keyValuePair2.Value;
-							if (value2 != null)
-							{
-								float charge2 = value2.charge;
-								float capacity2 = value2.capacity;
-								if (charge2 < capacity2)
-								{
-									float num6 = num5;
-									float num7 = capacity2 - charge2;
-									if (num6 > num7)
-									{
-										num6 = num7;
-									}
-									value2.charge += num6;
+                        foreach (KeyValuePair<string, IBattery> keyValuePair2 in Batteries)
+                        {
+                            string key = keyValuePair2.Key;
+                            IBattery value2 = keyValuePair2.Value;
+                            if (value2 != null)
+                            {
+                                float charge2 = value2.charge;
+                                float capacity2 = value2.capacity;
+                                if (charge2 < capacity2)
+                                {
+                                    float num6 = num5;
+                                    float num7 = capacity2 - charge2;
+                                    if (num6 > num7)
+                                    {
+                                        num6 = num7;
+                                    }
+                                    value2.charge += num6;
                                     if (Slots.TryGetValue(key, out var definition))
-									{
-										UpdateVisuals(definition, value2.charge / value2.capacity);
-									}
-								}
-							}
-						}
-					}
-				}
-				if (num == 0 || !flag)
-				{
-					NextChargeAttemptTimer = 5f;
-				}
-			}
+                                    {
+                                        UpdateVisuals(definition, value2.charge / value2.capacity);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if (num == 0 || !flag)
+                {
+                    NextChargeAttemptTimer = 5f;
+                }
+            }
         }
 
         protected void UpdateVisuals()
@@ -325,18 +315,9 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
             }
         }
 
-        public bool AddItemToContainer(InventoryItem item)
-        {
-            return _storageContainer.AddItemToContainer(item);
-        }
-
-        public bool IsAllowedToAdd(TechType techType, bool verbose)
-        {
-            return false;
-        }
-
         internal void OnUnEquip(string slot, BatteryDummyController item)
         {
+            QuickLogger.Debug("OnUnEquip W Dummy");
             if (Batteries.ContainsKey(slot))
             {
                 PlayerInteractionHelper.GivePlayerItem(GetItemInSlot(slot));
@@ -349,16 +330,42 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
             }
         }
 
+        private void OnUnEquip(InventoryItem item)
+        {
+            QuickLogger.Debug("OnUnEquip");
+            if (FindSlotWithBattery(item, out var slot))
+            {
+                Batteries[slot.id] = null;
+                if (Slots.TryGetValue(slot.id, out var definition))
+                {
+                    UpdateVisuals(definition, -1f);
+                }
+            }
+        }
+
+        private bool FindSlotWithBattery(InventoryItem item, out SlotDefinition slot)
+        {
+            foreach (KeyValuePair<string, SlotDefinition> slotDefinition in Slots)
+            {
+                if (slotDefinition.Value.battery.InventoryItem != item) continue;
+                slot = slotDefinition.Value;
+                return true;
+            }
+
+            slot = new SlotDefinition();
+            return false;
+        }
+
         private SlotDefinition FindAvailableSlot()
         {
             return Slots.FirstOrDefault(x => !x.Value.IsOccupied()).Value;
         }
-        
+
         public bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
         {
             bool flag = false;
 
-            if (IsFull || _dumpContainer.GetItemCount() + 1 + GetPowerCellCount() > MAXSLOTS) return flag;
+            if (IsFull) return flag;
 
             if (string.IsNullOrWhiteSpace(FindAvailableSlot().id))
             {
@@ -373,7 +380,7 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
             var equipType = TechData.GetEquipmentType(techType);
 #endif
             QuickLogger.Debug($"Equipment Slot: {equipType}", true);
-            
+
             if (equipType == EquipmentType.PowerCellCharger || BatteryInfoHelpers.IsPowercell(techType))
             {
                 flag = true;
@@ -391,7 +398,7 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
             //QuickLogger.Debug($"Removing: {consumed}",true);
             foreach (KeyValuePair<string, IBattery> iBattery in Batteries)
             {
-                if(iBattery.Value == null) continue;
+                if (iBattery.Value == null) continue;
 
                 if (iBattery.Value.charge >= Mathf.Abs(consumed))
                 {
@@ -430,7 +437,7 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
             if (powerRelay != null)
             {
                 powerRelay.RemoveInboundPower(powerRelay);
-                QuickLogger.Debug("Removing inbound power",true);
+                QuickLogger.Debug("Removing inbound power", true);
             }
         }
 
@@ -441,20 +448,20 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
 
         public byte[] Save(ProtobufSerializer serializer)
         {
-            return _storageContainer.Save(serializer);
+            return null;  //_storageContainer.Save(serializer);
         }
 
 #if SUBNAUTICA_STABLE
         public void Load(ProtobufSerializer serializer, byte[] savedDataData)
         {
-            _storageContainer.RestoreItems(serializer, savedDataData);
+            //_storageContainer.RestoreItems(serializer, savedDataData);
         }
 #else
-        public IEnumerator Load(ProtobufSerializer serializer, byte[] savedDataData)
-        {
-            yield return _storageContainer.RestoreItemsAsync(serializer, savedDataData);
-            yield break;
-        }
+        //public IEnumerator Load(ProtobufSerializer serializer, byte[] savedDataData)
+        //{
+        //    yield return _storageContainer.RestoreItemsAsync(serializer, savedDataData);
+        //    yield break;
+        //}
 #endif
 
         public bool HasPowerCells()
@@ -463,9 +470,12 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
             return Batteries.Any(x => x.Value != null);
         }
 
-        public void OpenStorage()
+        public void LoadFromSave()
         {
-            _dumpContainer.OpenStorage();
+            foreach (InventoryItem inventoryItem in _storageContainer.ItemsContainer)
+            {
+                AddPowercell(inventoryItem);
+            }
         }
     }
 }

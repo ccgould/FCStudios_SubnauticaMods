@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using FCS_AlterraHub.Enumerators;
+using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Spawnables;
 using FCS_EnergySolutions.Buildable;
@@ -84,6 +85,12 @@ namespace FCS_EnergySolutions.JetStreamT242.Buildables
                 PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
                 prefabID.ClassId = ClassID;
                 prefab.AddComponent<TechTag>().type = TechType;
+                
+                prefab.SetActive(false);
+                var fs= prefab.AddComponent<FCSStorage>();
+                fs.Initialize(10,2,5,$"{Mod.PowerStorageFriendlyName} Receptacle" ,Mod.PowerStorageClassName);
+                prefab.SetActive(true);
+                
                 prefab.AddComponent<PowerStorageController>();
                 
 

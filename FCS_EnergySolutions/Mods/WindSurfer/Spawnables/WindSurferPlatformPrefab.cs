@@ -15,20 +15,20 @@ using UnityEngine;
 
 namespace FCS_EnergySolutions.Spawnables
 {
-    class WindSurferSpawnable : Spawnable
+    class WindSurferPlatformSpawnable : Spawnable
     {
         public override string AssetsFolder => Mod.GetAssetPath();
-        public WindSurferSpawnable() : base(Mod.WindSurferClassName, Mod.WindSurferFriendlyName, Mod.WindSurferDescription)
+        public WindSurferPlatformSpawnable() : base(Mod.WindSurferPlatformClassName, Mod.WindSurferPlatformFriendlyName, Mod.WindSurferPlatformDescription)
         {
             OnStartedPatching += () =>
             {
-                var WindSurferKit = new FCSKit(Mod.WindSurferKitClassID, Mod.WindSurferFriendlyName,Path.Combine(AssetsFolder, $"{ClassID}.png"));
-                WindSurferKit.Patch();
+                var WindSurferPlatformKit = new FCSKit(Mod.WindSurferPlatformKitClassID, Mod.WindSurferPlatformFriendlyName,Path.Combine(AssetsFolder, $"{ClassID}.png"));
+                WindSurferPlatformKit.Patch();
             };
 
             OnFinishedPatching += () =>
             {
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.WindSurferKitClassID.ToTechType(), 243000, StoreCategory.Energy);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.WindSurferPlatformKitClassID.ToTechType(), 30000, StoreCategory.Energy);
             };
         }
 
@@ -37,12 +37,13 @@ namespace FCS_EnergySolutions.Spawnables
         {
             try
             {
-                var prefab = GameObject.Instantiate(ModelPrefab.GetPrefab(Mod.WindSurferPrefabName, true)); 
+                var prefab = GameObject.Instantiate(ModelPrefab.GetPrefab(Mod.WindSurferPlatformPrefabName, true)); 
 
                 PrefabIdentifier prefabIdentifier = prefab.AddComponent<PrefabIdentifier>();
                 prefabIdentifier.ClassId = this.ClassID;
 
                 //prefab.AddComponent<LargeWorldEntity>().cellLevel = LargeWorldEntity.CellLevel.VeryFar;
+
                 prefab.AddComponent<TechTag>().type = this.TechType;
 
                 var rb = prefab.GetComponentInChildren<Rigidbody>();
@@ -66,7 +67,7 @@ namespace FCS_EnergySolutions.Spawnables
                 MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseLightsEmissiveController, prefab, 4f);
                 MaterialHelpers.ApplyEmissionShader("fcs_WS_BP", "fcs_WS_E",prefab,ModelPrefab.ModBundle,Color.white);
                 MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModName);
-
+                MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseBeaconLightEmissiveController, prefab, 6);
 
                 //Add VFXSurfaces to adjust footstep sounds. This is technically not necessary for the interior colliders, however.
                 foreach (Collider col in prefab.GetComponentsInChildren<Collider>())
@@ -74,11 +75,11 @@ namespace FCS_EnergySolutions.Spawnables
                     var vfxSurface = col.gameObject.AddComponent<VFXSurface>();
                     vfxSurface.surfaceType = VFXSurfaceTypes.metal;
                 }
-
+                
                 var ps = prefab.AddComponent<PowerSource>();
-                ps.maxPower = 500f;
+                ps.maxPower = 0f;
 
-                prefab.AddComponent<WindSurferController>();
+                prefab.AddComponent<WindSurferPlatformController>();
                 return prefab;
             }
             catch (Exception e)

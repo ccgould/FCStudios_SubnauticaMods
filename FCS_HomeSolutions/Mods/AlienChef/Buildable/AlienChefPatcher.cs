@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using FCS_AlterraHub.Enumerators;
+using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Spawnables;
 using FCS_HomeSolutions.Buildables;
@@ -73,6 +74,12 @@ namespace FCS_HomeSolutions.Mods.AlienChief.Buildables
                 prefabID.ClassId = ClassID;
 
                 prefab.AddComponent<TechTag>().type = TechType;
+
+                prefab.SetActive(false);
+                var ss = prefab.AddComponent<FCSStorage>();
+                ss.Initialize(48, 6, 8, "Alien Chef Storage", Mod.AlienChefClassID);
+                prefab.SetActive(true);
+
                 prefab.AddComponent<AlienChefController>();
 
                 //Apply the glass shader here because of autosort lockers for some reason doesnt like it.

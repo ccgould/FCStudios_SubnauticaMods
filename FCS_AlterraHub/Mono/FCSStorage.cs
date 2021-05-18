@@ -8,16 +8,49 @@ using UnityEngine;
 
 namespace FCS_AlterraHub.Mono
 {
-    public class FCSStorage : MonoBehaviour, IFCSStorage
+    public class FCSStorage : StorageContainer, IFCSStorage
     {
-        private GameObject _storageRoot;
+        
         private byte[] _storageRootBytes;
-        private int _slots;
+        public int SlotsAssigned { get; set; }
         public Action<int, int> OnContainerUpdate { get; set; }
         public Action<FcsDevice, TechType> OnContainerAddItem { get; set; }
         public Action<FcsDevice, TechType> OnContainerRemoveItem { get; set; }
-        
-        public ItemsContainer ItemsContainer { get; set; }
+        public int GetContainerFreeSpace => SlotsAssigned - GetCount();
+        public bool IsFull => GetCount() >= SlotsAssigned;
+
+        public List<TechType> InvalidTechTypes = new List<TechType>();
+        private bool _isSubscribed;
+
+        public ItemsContainer ItemsContainer
+        {
+            get
+            {
+                if (container == null && storageRoot != null)
+                {
+                    CreateContainer();
+                    Subscribe();
+                }
+                return container;
+            }
+        }
+
+        public override void Awake()
+        {
+            base.Awake();
+            Subscribe();
+        }
+
+        private void Subscribe()
+        {
+            if (container == null || _isSubscribed) return;
+            container.isAllowedToAdd += IsAllowedToAdd;
+            container.isAllowedToRemove += IsAllowedToRemoveItems;
+            _isSubscribed = true;
+        }
+
+        public Action OnContainerClosed { get; set; }
+
         public int StorageCount()
         {
             return GetCount();
@@ -25,13 +58,13 @@ namespace FCS_AlterraHub.Mono
 
         public byte[] Save(ProtobufSerializer serializer)
         {
-            if (serializer == null || _storageRoot == null)
+            if (serializer == null || storageRoot == null)
             {
-                QuickLogger.DebugError($"Failed to save: Serializer: {serializer} || Root {_storageRoot?.name}",true);
+                QuickLogger.DebugError($"Failed to save: Serializer: {serializer} || Root {storageRoot?.name}",true);
                 return null;
             }
 
-            _storageRootBytes = StorageHelper.Save(serializer, _storageRoot);
+            _storageRootBytes = StorageHelper.Save(serializer, storageRoot.gameObject);
             return _storageRootBytes;
         }
 
@@ -39,14 +72,14 @@ namespace FCS_AlterraHub.Mono
         public void RestoreItems(ProtobufSerializer serializer, byte[] serialData)
         {
             QuickLogger.Debug("RestoreItems");
-            StorageHelper.RenewIdentifier(_storageRoot);
+            StorageHelper.RenewIdentifier(storageRoot.gameObject);
             QuickLogger.Debug("RenewIdentifier Called");
             if (serialData == null)
             {
                 return;
             }
 
-            QuickLogger.Debug($"Storage root Position: {_storageRoot.transform.position}");
+            QuickLogger.Debug($"Storage root Position: {storageRoot.transform.position}");
 
             using (MemoryStream memoryStream = new MemoryStream(serialData))
             {
@@ -65,13 +98,13 @@ namespace FCS_AlterraHub.Mono
         {
             QuickLogger.Debug("RestoreItems");
             
-            StorageHelper.RenewIdentifier(_storageRoot);
+            StorageHelper.RenewIdentifier(storageRoot.gameObject);
             
             QuickLogger.Debug("RenewIdentifier Called");
             
             if (serialData == null) return;
 
-            QuickLogger.Debug($"Storage root Position: {_storageRoot.transform.position}");
+            QuickLogger.Debug($"Storage root Position: {storageRoot.transform.position}");
 
             for (var i = 0; i < serialData.Count; i++)
             {
@@ -137,7 +170,7 @@ public IEnumerator RestoreItems(ProtobufSerializer serializer, byte[] serialData
                     {
                         InventoryItem item = new InventoryItem(pickupable);
                         ChangePrefabId(item);
-                        item.item.transform.parent = _storageRoot.transform;
+                        item.item.transform.parent = storageRoot.transform;
                         ItemsContainer.UnsafeAdd(item);
                     }
                 }
@@ -181,13 +214,13 @@ public IEnumerator RestoreItems(ProtobufSerializer serializer, byte[] serialData
 
         public int GetCount()
         {
-            int i = 0;
+            var i = 0;
+
+            if (container == null) return i;
+
             foreach (TechType techType in ItemsContainer.GetItemTypes())
             {
-                foreach (var invItem in ItemsContainer.GetItems(techType))
-                {
-                    i++;
-                }
+                i += ItemsContainer.GetItems(techType).Count;
             }
 
             return i;
@@ -195,7 +228,7 @@ public IEnumerator RestoreItems(ProtobufSerializer serializer, byte[] serialData
 
         public int GetFreeSpace()
         {
-            return _slots - GetCount();
+            return SlotsAssigned - GetCount();
         }
 
         public Dictionary<TechType,int> GetItemsWithin()
@@ -207,77 +240,70 @@ public IEnumerator RestoreItems(ProtobufSerializer serializer, byte[] serialData
 
         public bool AddItemToContainer(InventoryItem item)
         {
-            ItemsContainer.UnsafeAdd(item);
+            container.UnsafeAdd(item);
           return true;
         }
         
-        public void Initialize(int slots, GameObject storageRoot = null)
+        /// <summary>
+        /// *Note this must be attached to a child of the root gameObject.
+        /// </summary>
+        /// <param name="slots"></param>
+        /// <param name="classID"></param>
+        /// <param name="storageRoot"></param>
+        public void Initialize(string classID)
         {
-            if (storageRoot == null)
+            this.prefabRoot = transform.gameObject;
+            var tempStorageRoot = transform.Find("StorageRoot")?.gameObject;
+
+            if (tempStorageRoot == null)
             {
-                _storageRoot = new GameObject("FCSStorage");
-                _storageRoot.transform.parent = transform;
-                UWE.Utils.ZeroTransform(_storageRoot);
-            }
-            else
-            {
-                _storageRoot = storageRoot;
+                tempStorageRoot = new GameObject("StorageRoot");
+                tempStorageRoot.transform.parent = transform;
+                UWE.Utils.ZeroTransform(tempStorageRoot);
             }
 
-            _slots = slots;
-            _storageRoot.AddComponent<StoreInformationIdentifier>();
-            ItemsContainer = new ItemsContainer(slots, slots, _storageRoot.transform, "FCSStorage", null);
-            ItemsContainer.isAllowedToAdd += IsAllowedToAdd;
-            ItemsContainer.isAllowedToRemove += IsAllowedToRemoveItems;
+            var childObjectIdentifier = tempStorageRoot.EnsureComponent<ChildObjectIdentifier>();
+            childObjectIdentifier.classId = classID; 
+            storageRoot = childObjectIdentifier;
         }
 
-        private bool IsAllowedToRemoveItems(Pickupable pickupable, bool verbose)
+        public virtual bool IsAllowedToRemoveItems(Pickupable pickupable, bool verbose)
         {
             return true;
         }
 
-        public void Initialize(int slots, int width, int height,string name, GameObject go = null)
+        public void Initialize(int slots, int storageWidth, int storageHeight,string storageName, string classID)
         {
-            if (go == null)
-            {
-                _storageRoot = new GameObject("FCSStorage");
-                _storageRoot.transform.parent = transform;
-                UWE.Utils.ZeroTransform(_storageRoot);
-            }
-            else
-            {
-                _storageRoot = go;
-            }
-
-            _slots = slots;
-            _storageRoot.AddComponent<StoreInformationIdentifier>();
-            ItemsContainer = new ItemsContainer(width, height, _storageRoot.transform, name, null);
-            ItemsContainer.isAllowedToAdd += IsAllowedToAdd;
-            ItemsContainer.isAllowedToRemove += IsAllowedToRemoveItems;
+            this.height = storageHeight;
+            this.width = storageWidth;
+            this.storageLabel = storageName;
+            Initialize(classID);
         }
-
-        public int GetContainerFreeSpace => _slots - GetCount();
-        public bool IsFull => GetCount() >= _slots;
-
-        public List<TechType> InvalidTechTypes = new List<TechType>();
+        
         public virtual bool CanBeStored(int amount, TechType techType)
         {
-            QuickLogger.Debug($"GetCount: {GetCount()} | Amount {amount} | Slots: {_slots}", true);
+            QuickLogger.Debug($"GetCount: {GetCount()} | Amount {amount} | Slots: {SlotsAssigned}", true);
 
-            if (InvalidTechTypes.Contains(techType) || IsFull) return false;
+            if (InvalidTechTypes.Contains(techType) || IsFull || (container.allowedTech != null &&  container.allowedTech.Any() && !container.allowedTech.Contains(techType))) return false;
             
-            return GetCount() + amount <= _slots;
+            return GetCount() + amount <= SlotsAssigned;
         }
 
         public virtual bool IsAllowedToAdd(Pickupable pickupable, bool verbose)
         {
+            if (NotAllowedToAddItems) return false;
+
             return CanBeStored(1,pickupable.GetTechType());
         }
 
+        public bool NotAllowedToAddItems { get; set; }
+
         public virtual bool IsAllowedToRemoveItems()
         {
-            return true;
+            return IsAllowedToRemove;
         }
+
+        public bool IsAllowedToRemove { get; set; } = true;
 
         public virtual Pickupable RemoveItemFromContainer(TechType techType)
         {
@@ -287,6 +313,29 @@ public IEnumerator RestoreItems(ProtobufSerializer serializer, byte[] serialData
         public bool ContainsItem(TechType techType)
         {
             return ItemsContainer.Contains(techType);
+        }
+
+        public override void OnClose()
+        {
+            OnContainerClosed?.Invoke();
+        }
+        
+
+        /// <summary>
+        /// To deactivate the storage container to prevent hover
+        /// </summary>
+        public void Deactivate()
+        {
+            enabled = false;
+        }
+
+
+        /// <summary>
+        /// To activate the storage container to allow hover
+        /// </summary>
+        public void Activate()
+        {
+            enabled = true;
         }
     }
 }

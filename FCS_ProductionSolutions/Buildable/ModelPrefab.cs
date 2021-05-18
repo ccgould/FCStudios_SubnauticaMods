@@ -60,8 +60,8 @@ namespace FCS_ProductionSolutions.Buildable
             DeepDrillerOreBTNPrefab = GetPrefab("OreBTN");
             DeepDrillerPrefab = GetPrefab(Mod.DeepDrillerMk3PrefabName);
             DeepDrillerSandPrefab = GetPrefab("SandOreBag");
-            DeepDrillerListItemPrefab = GetPrefab("DeepDrillerTransferToggleButton");
-            DeepDrillerProgrammingItemPrefab = GetPrefab("DeepDrillerProgrammingItem");
+            //DeepDrillerListItemPrefab = GetPrefab("DeepDrillerTransferToggleButton");
+            //DeepDrillerProgrammingItemPrefab = GetPrefab("DeepDrillerProgrammingItem");
             DeepDrillerOverrideItemPrefab = GetPrefab("OverrideItem");
             DeepDrillerFunctionOptionItemPrefab = GetPrefab("FunctionOptionItem");
             ReplicatorPrefab = GetPrefab(Mod.ReplicatorPrefabName);

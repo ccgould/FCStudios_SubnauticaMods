@@ -70,5 +70,10 @@ namespace FCS_AlterraHub.Helpers
             var size = CraftData.GetItemSize(techType);
             return Inventory.main.HasRoomFor(size.x, size.y);
         }
+
+        public static bool HasItem(TechType techType)
+        {
+            return Inventory.main.container.Contains(techType);
+        }
     }
 }

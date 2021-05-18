@@ -269,8 +269,8 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
 
             _maxConnectionLimit = DEFAULT_CONNECTIONS_LIMIT;
 
-            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseEmissiveDecalsController, gameObject, Color.cyan);
-            MaterialHelpers.ChangeSpecSettings(AlterraHub.BaseDefaultDecals, AlterraHub.BaseSpec, gameObject, 2.61f, 8f);
+            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
+            MaterialHelpers.ChangeSpecSettings(AlterraHub.BaseDecalsExterior, AlterraHub.TBaseSpec, gameObject, 2.61f, 8f);
 
             _pushToggle = GameObjectHelpers.FindGameObject(gameObject, "PushToggle")?.GetComponent<Toggle>();
             if (_pushToggle != null)

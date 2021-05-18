@@ -87,7 +87,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Antenna
                 MotorHandler = GameObjectHelpers.FindGameObject(gameObject, "anim_mesh").AddComponent<MotorHandler>();
                 MotorHandler.Initialize(30);
             }
-            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseEmissiveDecalsController, gameObject, Color.cyan);
+            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
 
             IsInitialized = true;
 

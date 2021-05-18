@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using FCS_EnergySolutions.AlterraGen.Buildables;
 using FCS_EnergySolutions.AlterraSolarCluster.Buildables;
@@ -15,6 +16,7 @@ using FCSCommon.Utilities;
 using HarmonyLib;
 using QModManager.API.ModLoading;
 using SMLHelper.V2.Handlers;
+using SMLHelper.V2.Utility;
 using UnityEngine;
 
 namespace FCS_EnergySolutions
@@ -84,12 +86,18 @@ namespace FCS_EnergySolutions
                 powerStorageCell.Patch();
             }
 
+           
+            CraftTreeHandler.AddTabNode(CraftTree.Type.Constructor,"FCSWindSurfer","Wind Surfer", ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetFolder(), $"{Mod.WindSurferClassName}.png")));
 
             var windSurferOperator = new WindSurferOperatorBuildable();
             windSurferOperator.Patch();
 
+
             var windSurfer = new WindSurferSpawnable();
             windSurfer.Patch();
+
+            var windSurferPlatform = new WindSurferPlatformSpawnable();
+            windSurferPlatform.Patch();
 
 
             //Register debug commands
@@ -98,14 +106,15 @@ namespace FCS_EnergySolutions
             //Harmony
             var harmony = new Harmony("com.energrysolutions.fcstudios");
             harmony.PatchAll(Assembly.GetExecutingAssembly());
+
+            var constructorOriginal = AccessTools.Method(typeof(ConstructorInput), "OnCraftingBegin");
+            var constructorPrefix = new HarmonyMethod(AccessTools.Method(typeof(ConstructorInput_Patch), "Prefix"));
+            harmony.Patch(constructorOriginal, constructorPrefix);
+
         }
 
         public static class ConstructorInput_Patch
         {
-            [HarmonyPatch(typeof(ConstructorInput))]
-            [HarmonyPatch("OnCraftingBegin")]
-
-            [HarmonyPrefix]
             public static void Prefix(TechType techType, ref float duration)
             {
                 if (techType == Mod.WindSurferOperatorClassName.ToTechType())

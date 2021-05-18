@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using FCS_AlterraHub.Enumerators;
+using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Spawnables;
 using FCS_HomeSolutions.Buildables;
@@ -68,6 +69,12 @@ namespace FCS_HomeSolutions.TrashReceptacle.Buildable
 
                 PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
                 prefabID.ClassId = ClassID;
+
+                prefab.SetActive(false);
+                var storageContainer = prefab.AddComponent<FCSStorage>();
+                storageContainer.Initialize(Mod.RecyclerClassID);
+                storageContainer.enabled = false;
+                prefab.SetActive(true);
 
                 prefab.AddComponent<TechTag>().type = TechType;
                 prefab.AddComponent<TrashRecyclerController>();

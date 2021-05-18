@@ -48,7 +48,7 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
                 }
                 else
                 {
-                    QuickLogger.ModMessage("Alien Chef cant find all the required ingredients for this craft");
+                    QuickLogger.ModMessage("Alien Chef cant find all the required ingredients for this craft or is full");
                 }
             }));
 
@@ -58,6 +58,10 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
                 if (result)
                 {
                     Hide();
+                }
+                else
+                {
+                    QuickLogger.ModMessage("Alien Chef cant find all the required ingredients for this craft or is full");
                 }
             }));
 

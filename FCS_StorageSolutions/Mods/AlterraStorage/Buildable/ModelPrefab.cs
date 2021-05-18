@@ -53,7 +53,7 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Buildable
 
             AlterraStoragePrefab = GetPrefab(Mod.AlterraStoragePrefabName);
             DSSServerPrefab = GetPrefab(Mod.DSSServerPrefabName,true);
-            DSSFormattingStationPrefab = GetPrefab(Mod.DSSFormattingStationPrefabName);
+            //DSSFormattingStationPrefab = GetPrefab(Mod.DSSFormattingStationPrefabName);
             DSSTerminalPrefab = GetPrefab(Mod.DSSTerminalPrefabName);
             DSSTransceiverPrefab = GetPrefab(Mod.TransceiverPrefabName);
             DSSWallServerRackPrefab = GetPrefab(Mod.DSSWallServerRackPrefabName,true);
@@ -63,7 +63,7 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Buildable
             //ItemTransferUnitPrefab = GetPrefab(Mod.ItemTransferUnitPrefabName,true);
             DSSInventoryItemPrefab = GetPrefab("DSSInventoryItem");
             DSSAvaliableVehiclesItemPrefab = GetPrefab("AvaliableVehiclesItem");
-            FilterItemPrefab = GetPrefab("FilterItem");
+            //FilterItemPrefab = GetPrefab("FilterItem");
         }
         
         internal static GameObject GetPrefab(string prefabName,bool isV2 = false)
@@ -134,10 +134,10 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Buildable
                     //Lets apply the material shader
                     AlterraHub.ReplaceShadersV2(prefab, AlterraHub.BasePrimaryCol);
                     AlterraHub.ReplaceShadersV2(prefab, AlterraHub.BaseSecondaryCol);
-                    AlterraHub.ReplaceShadersV2(prefab, AlterraHub.BaseDefaultDecals);
+                    AlterraHub.ReplaceShadersV2(prefab, AlterraHub.BaseDecalsExterior);
                     AlterraHub.ReplaceShadersV2(prefab, AlterraHub.BaseTexDecals);
-                    AlterraHub.ReplaceShadersV2(prefab, AlterraHub.BaseEmissiveDecals);
-                    AlterraHub.ReplaceShadersV2(prefab, AlterraHub.BaseEmissiveDecalsController);
+                    AlterraHub.ReplaceShadersV2(prefab, AlterraHub.BaseLightsEmissiveController);
+                    AlterraHub.ReplaceShadersV2(prefab, AlterraHub.BaseDecalsEmissiveController);
                     QuickLogger.Debug($"Applied shaderes to prefab {prefabName}");
                 }
 

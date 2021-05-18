@@ -93,9 +93,7 @@ namespace FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Mono
 
             if (_storage == null)
             {
-                var size = CraftData.GetItemSize(TechType.FireExtinguisher);
-                _storage = gameObject.AddComponent<FCSStorage>();
-                _storage.Initialize(1, size.x,size.y, "FCSStorage", gameObject.FindChild("StorageRoot"));
+                _storage = gameObject.GetComponent<FCSStorage>();
                 _storage.ItemsContainer.onAddItem += OnStorageAddItem;
                 _storage.ItemsContainer.onRemoveItem += OnStorageRemoveItem;
                 _storage.ItemsContainer.SetAllowedTechTypes(new[]{TechType.FireExtinguisher});
@@ -134,7 +132,7 @@ namespace FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Mono
 
             _savedData.Id = GetPrefabID();
             _savedData.Body = _colorManager.GetColor().ColorToVector4();
-            _savedData.Data = _storage.Save(serializer);
+            //_savedData.Data = _storage.Save(serializer);
             QuickLogger.Debug($"Saving ID {_savedData.Id}");
             newSaveData.FEXRDataEntries.Add(_savedData);
         }
@@ -165,7 +163,7 @@ namespace FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Mono
                 Initialize();
             }
 
-            _storage.RestoreItems(serializer, _savedData.Data);
+            //_storage.RestoreItems(serializer, _savedData.Data);
             _isFromSave = true;
         }
 

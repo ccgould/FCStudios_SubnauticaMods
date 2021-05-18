@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using FCS_AlterraHub.Enumerators;
+using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Spawnables;
 using FCS_StorageSolutions.Configuration;
@@ -69,6 +70,12 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable
 
                 var lw = prefab.AddComponent<LargeWorldEntity>();
                 lw.cellLevel = LargeWorldEntity.CellLevel.Global;
+
+                prefab.SetActive(false);
+                var storage = prefab.AddComponent<FCSStorage>();
+                storage.Initialize(Mod.DSSWallServerRackClassName);
+                prefab.SetActive(true);
+
 
                 prefab.AddComponent<TechTag>().type = TechType;
                 prefab.AddComponent<DSSWallServerRackController>();

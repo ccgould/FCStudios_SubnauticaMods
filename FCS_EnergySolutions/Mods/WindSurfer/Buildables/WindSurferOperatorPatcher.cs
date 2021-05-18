@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using FCS_AlterraHub.API;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Registration;
@@ -30,8 +31,8 @@ namespace FCS_EnergySolutions.WindSurferOperator.Buildables
         public override TechCategory CategoryForPDA => TechCategory.Constructor;
         public override TechType RequiredForUnlock => TechType.Constructor;
         public override CraftTree.Type FabricatorType => CraftTree.Type.Constructor;
-        public override string[] StepsToFabricatorTab => new[] { "Vehicles" };
-        public override float CraftingTime => 10f;
+        public override string[] StepsToFabricatorTab => new[] { "FCSWindSurfer" };
+        public override float CraftingTime => 20f;
 
 
         private string _assetFolder => Mod.GetAssetFolder();
@@ -50,7 +51,7 @@ namespace FCS_EnergySolutions.WindSurferOperator.Buildables
             
             OnFinishedPatching += () =>
             {
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.WindSurferOperatorKitClassID.ToTechType(), 120000, StoreCategory.Energy);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.WindSurferOperatorKitClassID.ToTechType(), 1200000, StoreCategory.Energy);
             };
         }
 
@@ -80,12 +81,12 @@ namespace FCS_EnergySolutions.WindSurferOperator.Buildables
 
                 //Adds a Rigidbody. So it can move.
                 var rigidbody = prefab.AddComponent<Rigidbody>();
-                rigidbody.mass = 20000f; //Has to be really heavy. I'm pretty sure it's measured in KG.
+                rigidbody.mass = 10000f; //Has to be really heavy. I'm pretty sure it's measured in KG.
 
                 //Basically an extension to Unity rigidbodys. Necessary for buoyancy.
                 var worldForces = prefab.AddComponent<WorldForces>();
                 worldForces.useRigidbody = rigidbody;
-                worldForces.underwaterGravity = -20f; //Despite it being negative, which would apply downward force, this actually makes it go UP on the y axis.
+                worldForces.underwaterGravity =-20f; //Despite it being negative, which would apply downward force, this actually makes it go UP on the y axis.
                 worldForces.aboveWaterGravity = 20f; //Counteract the strong upward force
                 worldForces.waterDepth = -5f;
 
@@ -116,6 +117,7 @@ namespace FCS_EnergySolutions.WindSurferOperator.Buildables
                 vfxConstructing.ghostMaterial = rocketPlatformVfx.ghostMaterial;
                 vfxConstructing.surfaceSplashSound = rocketPlatformVfx.surfaceSplashSound;
                 vfxConstructing.surfaceSplashFX = rocketPlatformVfx.surfaceSplashFX;
+                vfxConstructing.rBody = rigidbody;
                 vfxConstructing.Regenerate();
 
                 //Don't want it tipping over...
@@ -135,34 +137,49 @@ namespace FCS_EnergySolutions.WindSurferOperator.Buildables
                 skyApplierInterior.anchorSky = Skies.BaseInterior;
                 skyApplierInterior.SetSky(Skies.BaseInterior);
 
-                MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseEmissiveDecalsController, prefab, Color.cyan);
+                MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, prefab, Color.cyan);
                 MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseSecondaryCol, prefab, Color.black);
-                MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseEmissiveDecals, prefab, 4f);
-                
+                MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseLightsEmissiveController, prefab, 4f);
+
                 var pc = prefab.AddComponent<PlatformController>();
                 pc.Ports = new[]
                 {
-                    GameObjectHelpers.FindGameObject(prefab,"Port_1"),
-                    GameObjectHelpers.FindGameObject(prefab,"Port_2"),
-                    GameObjectHelpers.FindGameObject(prefab,"Port_3"),
-                    GameObjectHelpers.FindGameObject(prefab,"Port_4"),
+                    GameObjectHelpers.FindGameObject(prefab, "Port_1"),
+                    GameObjectHelpers.FindGameObject(prefab, "Port_2"),
+                    GameObjectHelpers.FindGameObject(prefab, "Port_3"),
+                    GameObjectHelpers.FindGameObject(prefab, "Port_4"),
                 };
 
-                PowerRelay solarPowerRelay = CraftData.GetPrefabForTechType(TechType.SolarPanel).GetComponent<PowerRelay>();
-                
-                var pFX = prefab.AddComponent<PowerFX>();
-                pFX.vfxPrefab = solarPowerRelay.powerFX.vfxPrefab;
-                pFX.attachPoint = prefab.transform;
+                //The SubRoot component needs a lighting controller. Works nice too. A pain to setup in script.
+                var lights = prefab.FindChild("LightsParent").AddComponent<LightingController>();
+                lights.lights = new MultiStatesLight[0];
+                foreach (Transform child in lights.transform)
+                {
+                    var newLight = new MultiStatesLight();
+                    newLight.light = child.GetComponent<Light>();
+                    newLight.intensities =
+                        new[]
+                        {
+                            1f, 0.5f, 0f
+                        }; //Full power: intensity 1. Emergency : intensity 0.5. No power: intensity 0.
+                    lights.RegisterLight(newLight);
+                }
 
-                var pr = prefab.AddComponent<PowerRelay>();
-                pr.powerFX = pFX;
-                pr.maxOutboundDistance = 15;
- 
+
+                //Necessary for SubRoot class Update behaviour so it doesn't return an error every frame.
+                var lod = prefab.AddComponent<BehaviourLOD>();
+
+                var sr = prefab.AddComponent<WindSurferOperatorSubroot>();
+
+                var pr = prefab.AddComponent<BasePowerRelay>();
+                pr.maxOutboundDistance = 0;
+                pr.subRoot = sr;
+
                 prefab.AddComponent<WindSurferOperatorController>();
 
                 //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
                 MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModName);
-
+                MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseBeaconLightEmissiveController, prefab, 6);
                 return prefab;
             }
             catch (Exception e)
@@ -272,6 +289,48 @@ namespace FCS_EnergySolutions.WindSurferOperator.Buildables
                 comp.points[i] = parent.GetChild(i);
             }
             return comp;
+        }
+    }
+
+    internal class WindSurferOperatorSubroot : SubRoot
+    {
+        public override void Awake()
+        {
+            var interiorTrigger = gameObject.FindChild("InteriorTrigger").EnsureComponent<InteriorTrigger>();
+            this.LOD = GetComponent<BehaviourLOD>();
+            this.rb = GetComponent<Rigidbody>();
+            this.isBase = true;
+            this.lightControl = GetComponentInChildren<LightingController>();
+            this.modulesRoot = gameObject.transform;
+            this.powerRelay = GetComponent<BasePowerRelay>();
+        }
+    }
+
+    internal class InteriorTrigger : MonoBehaviour
+    {
+        private SubRoot _subRoot;
+
+
+        private void Awake()
+        {
+            _subRoot = gameObject.GetComponentInParent<SubRoot>();
+        }
+
+
+        private void OnTriggerEnter(Collider collider)
+        {
+            if (_subRoot != null)
+            {
+                Player.main.SetCurrentSub(_subRoot);
+            }
+        }
+
+        private void OnTriggerExit(Collider collider)
+        {
+            if (_subRoot != null)
+            {
+                Player.main.SetCurrentSub(null);
+            }
         }
     }
 }

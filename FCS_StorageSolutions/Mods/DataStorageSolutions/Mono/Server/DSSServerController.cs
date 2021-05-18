@@ -25,11 +25,11 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
         private BoxCollider[] _colliders;
         private string _rackSlot;
         private IDSSRack _rackController;
-        protected internal const int MAXSTORAGE = 48;
         private HashSet<Filter> _filteringSettings;
         private string _currentBase;
         private bool _isVisible;
         private DSSSlotController _slot;
+        internal const int MAXSTORAGE = 48;
         public bool IsBeingFormatted { get; set; }
         public bool IsFiltered => _filteringSettings != null && _filteringSettings.Count > 0;
         public override bool BypassRegisterCheck => true;
@@ -91,8 +91,8 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
 
             if (_storageContainer == null)
             {
-                _storageContainer = gameObject.EnsureComponent<FCSStorage>();
-                _storageContainer.Initialize(MAXSTORAGE);
+                _storageContainer = gameObject.GetComponent<FCSStorage>();
+                _storageContainer.SlotsAssigned = 48;
                 _storageContainer.ItemsContainer.onAddItem += item =>
                 {
                     OnAddItem?.Invoke(this,item);
@@ -157,11 +157,12 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
             {
                 QuickLogger.Debug($"De-Serializing Server: {GetPrefabID()}");
                 _currentBase = _savedData.CurrentBase;
-#if SUBNAUTICA_STABLE
-                _storageContainer.RestoreItems(serializer, _savedData.Data);
-#else
-            StartCoroutine(_storageContainer.RestoreItemsAsync(serializer, _savedData.Data));
-#endif
+
+                if (_savedData.SaveVersion.Equals("1.0"))
+                {
+                    //_storageContainer.RestoreItems(serializer, _savedData.Data);
+                }
+
                 if (_savedData.ServerFilters != null)
                 {
                     _filteringSettings = _savedData.ServerFilters;
@@ -191,7 +192,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
             }
 
             _savedData.ID = GetPrefabID();
-            _savedData.Data = _storageContainer.Save(serializer);
+            //_savedData.Data = _storageContainer.Save(serializer);
             
             if (_rackController != null)
             {

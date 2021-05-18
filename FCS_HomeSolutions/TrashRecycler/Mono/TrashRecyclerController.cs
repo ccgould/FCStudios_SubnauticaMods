@@ -76,17 +76,12 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
                     {
                         ReadySaveData();
                     }
-                    _recycler.Load(_savedData, _serializer);
+                    _recycler.Load(_savedData);
                     _colorManager.ChangeColor(_savedData.Fcs.Vector4ToColor());
                     _colorManager.ChangeColor(_savedData.Secondary.Vector4ToColor(), ColorTargetMode.Secondary);
                     _timeLeft = _savedData.CurrentTime;
-
-#if SUBNAUTICA_STABLE
-                    _dumpContainer.RestoreItems(_serializer, _savedData.DropStorage,true);
-#else
-StartCoroutine(_dumpContainer.RestoreItems(_serializer, _savedData.DropStorage,true));
-#endif
                     RefreshUI();
+                    TryStartRecycling(true);
                     _isFromSave = false;
                 }
                 _runStartUpOnEnable = false;
@@ -146,7 +141,7 @@ StartCoroutine(_dumpContainer.RestoreItems(_serializer, _savedData.DropStorage,t
             {
                 _dumpContainer = gameObject.AddComponent<DumpContainerSimplified>();
                 _dumpContainer.Initialize(transform, AuxPatchers.TrashRecyclerDumpLabel(), this);
-                _dumpContainer.OnDumpContainerClosed += TryStartRecycling;
+                _dumpContainer.OnDumpContainerClosed += () => { TryStartRecycling(); };
             }
 
             if (_recycler == null)
@@ -193,10 +188,10 @@ StartCoroutine(_dumpContainer.RestoreItems(_serializer, _savedData.DropStorage,t
             QuickLogger.Debug($"Initialization Complete: {GetPrefabID()} | ID {UnitID}", true);
         }
 
-        internal void TryStartRecycling()
+        internal void TryStartRecycling(bool force = false)
         {
             QuickLogger.Debug($"Has Items {_recycler.HasItems()} || Is Operational: {IsOperational} || Is Recycling: {_isRecycling}",true);
-            if (_recycler.HasItems() && IsOperational && !_isRecycling)
+            if (_recycler.HasItems() && IsOperational && (force || !_isRecycling))
             {
                 _statusLabel.text = AuxPatchers.TrashRecyclerStatusFormat(Language.main.Get(_recycler.GetCurrentItem()));
                 _isRecycling = true;
@@ -255,7 +250,7 @@ StartCoroutine(_dumpContainer.RestoreItems(_serializer, _savedData.DropStorage,t
                     _dumpContainer.OpenStorage();
                     break;
                 case "ItemBTN":
-                    FCS_AlterraHub.Helpers.PlayerInteractionHelper.GivePlayerItem(_recycler.RemoveItem((TechType)btnTag));
+                    PlayerInteractionHelper.GivePlayerItem(_recycler.RemoveItem((TechType)btnTag));
                     break;
             }
         }
@@ -324,10 +319,9 @@ StartCoroutine(_dumpContainer.RestoreItems(_serializer, _savedData.DropStorage,t
             _savedData.Fcs = _colorManager.GetColor().ColorToVector4();
             _savedData.Secondary = _colorManager.GetSecondaryColor().ColorToVector4();
             _savedData.BaseID = Manager.BaseID;
-            _savedData.Storage = _recycler.Save(serializer,_savedData);
+            _recycler.Save(serializer,_savedData);
             _savedData.CurrentTime = _timeLeft;
             _savedData.IsRecycling = _isRecycling;
-            _savedData.DropStorage = _dumpContainer.Save(serializer);
             newSaveData.TrashRecyclerEntries.Add(_savedData);
 
             QuickLogger.Debug($"Saved HoverPad ID {_savedData.Id}", true);

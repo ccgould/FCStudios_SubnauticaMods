@@ -10,6 +10,7 @@ namespace FCS_AlterraHub.Helpers
     {
         private static Dictionary<TechType, int> _knownIngredientCounts = new Dictionary<TechType, int>();
         private static HashSet<TechType> batteryTech;
+        private static HashSet<TechType> powercellTech;
         private static List<IIngredient> _ingredients = new List<IIngredient>();
 
         public static HashSet<TechType> BatteryTech
@@ -18,11 +19,23 @@ namespace FCS_AlterraHub.Helpers
             {
                 if (batteryTech is null || batteryTech.Count == 0)
                 {
-                    batteryTech = new HashSet<TechType>(BatteryCharger.compatibleTech)
-                        .Concat(PowerCellCharger.compatibleTech).ToHashSet();
+                    batteryTech = new HashSet<TechType>(BatteryCharger.compatibleTech).Concat(PowerCellCharger.compatibleTech).ToHashSet();
                 }
 
                 return batteryTech;
+            }
+        }
+
+        public static HashSet<TechType> PowercellTech
+        {
+            get
+            {
+                if (powercellTech is null || powercellTech.Count == 0)
+                {
+                    powercellTech = new HashSet<TechType>(PowerCellCharger.compatibleTech);
+                }
+
+                return powercellTech;
             }
         }
 

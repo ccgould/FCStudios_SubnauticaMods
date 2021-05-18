@@ -16,9 +16,9 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
     internal class Recycler : MonoBehaviour
     {
         public FcsDevice Controller { get; set; }
-        private readonly Queue<Waste> _wasteList = new Queue<Waste>();
+        private Queue<Waste> _wasteList = new Queue<Waste>();
         private FCSStorage _storageContainer;
-        private List<string> _saveQueuedItems = new List<string>();
+
 
         public Action OnContainerUpdated { get; set; }
         public Action<TechType> OnRecyclingItem { get; set; }
@@ -29,8 +29,9 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
         {
             Controller = mono;
             MaxStorage = maxStorage;
-            _storageContainer = gameObject.AddComponent<FCSStorage>();
-            _storageContainer.Initialize(maxStorage);
+            _storageContainer = gameObject.GetComponent<FCSStorage>();
+            _storageContainer.SlotsAssigned = maxStorage;
+            _storageContainer.Deactivate();
             _storageContainer.ItemsContainer.onAddItem += item => { UpdateTracker(); };
             _storageContainer.ItemsContainer.onRemoveItem += item => { UpdateTracker(); };
             
@@ -38,7 +39,6 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
 
         internal void AddItem(InventoryItem item)
         {
-
             var data = CraftData.Get(item.item.GetTechType());
 
             if(data != null && data.linkedItemCount > 0)
@@ -88,6 +88,7 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
 
             double time = DayNightCycle.main.timePassed;
             _wasteList.Enqueue(new Waste(item, time));
+            Destroy(item.item.gameObject);
             OnStartingRecycle?.Invoke();
             OnContainerUpdated?.Invoke();
         }
@@ -110,9 +111,7 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
             }
             
             var wasteItem = _wasteList.Dequeue();
-            InventoryItem inventoryItem = wasteItem.InventoryItem;
-            GameObject gameObject = inventoryItem.item.gameObject;
-            TechType techType = inventoryItem.item.GetTechType();
+            TechType techType = wasteItem.TechType;
 
             OnRecyclingItem?.Invoke(techType);
             QuickLogger.Debug($"Recycling Item ({Language.main.Get(techType)})", true);
@@ -135,7 +134,7 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
                     }
                 }
 
-                StartCoroutine(RecycleCoroutine(techType, gameObject, list));
+                StartCoroutine(RecycleCoroutine(techType, list));
             }
             else
             {
@@ -143,7 +142,7 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
             }
         }
 
-        private IEnumerator RecycleCoroutine(TechType techType, GameObject gameObject, List<IIngredient> list)
+        private IEnumerator RecycleCoroutine(TechType techType, List<IIngredient> list)
         {
             foreach (IIngredient ingredient in list)
             {
@@ -182,7 +181,6 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
             }
 
             UpdateTracker();
-            Destroy(gameObject);
             OnContainerUpdated?.Invoke();
             yield break;
         }
@@ -217,20 +215,13 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
             return _storageContainer.ItemsContainer.GetCount(techType);
         }
 
-        internal byte[] Save(ProtobufSerializer serializer, TrashRecyclerDataEntry savedData)
+        internal void Save(ProtobufSerializer serializer, TrashRecyclerDataEntry savedData)
         {
-            savedData.QueuedItems = GetQueuedItems();
+            savedData.QueuedItems = _wasteList;
             savedData.BioMaterialsCount = BioMaterials;
-            return _storageContainer.Save(serializer);
         }
 
-        private IEnumerable<string> GetQueuedItems()
-        {
-            foreach (Waste waste in _wasteList)
-            {
-                yield return waste.InventoryItem.item.gameObject.GetComponent<PrefabIdentifier>()?.Id;
-            }
-        }
+
 
         public int GetCount()
         {
@@ -239,28 +230,23 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
 
         public bool HasItems()
         {
-            return _wasteList.Count > 0 || _storageContainer.ItemsContainer.count > 0;
+            return _wasteList.Count > 0;
         }
 
         public string GetCurrentItem()
         {
-            return Language.main.Get(_wasteList.Peek().InventoryItem.item.GetTechType());
+            if (_wasteList == null || !_wasteList.Any()) return string.Empty;
+            return Language.main.Get(_wasteList.Peek().TechType);
         }
 
-        public void Load(TrashRecyclerDataEntry data, ProtobufSerializer serializer)
+        public void Load(TrashRecyclerDataEntry data)
         {
             if (data.QueuedItems != null)
             {
-                _saveQueuedItems = data.QueuedItems.ToList();
+                _wasteList = data.QueuedItems;
             }
-
+            
             BioMaterials = data.BioMaterialsCount;
-#if SUBNAUTICA_STABLE
-            _storageContainer.RestoreItems(serializer, data.Storage);
-#else
-            StartCoroutine(_storageContainer.RestoreItems(serializer, data.Storage));
-
-#endif
         }
 
         public bool CanPendItem(Pickupable pickupable)

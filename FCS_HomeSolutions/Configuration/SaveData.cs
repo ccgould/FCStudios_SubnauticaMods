@@ -87,11 +87,9 @@ namespace FCS_HomeSolutions.Configuration
         [JsonProperty(PropertyName = "COL")] internal Vec4 Fcs { get; set; }
         [JsonProperty(PropertyName = "SCOL")] internal Vec4 Secondary { get; set; }
         [JsonProperty(PropertyName = "BID")] internal string BaseID { get; set; }
-        [JsonProperty(PropertyName = "Data")] internal byte[] Storage { get; set; }
         public bool IsRecycling { get; set; }
         public float CurrentTime { get; set; }
-        public IEnumerable<string> QueuedItems { get; set; }
-        [JsonProperty(PropertyName = "DropData")] internal byte[] DropStorage { get; set; }
+        public Queue<Waste> QueuedItems { get; set; }
         [JsonProperty(PropertyName = "BMC")] internal int BioMaterialsCount { get; set; }
     }
 

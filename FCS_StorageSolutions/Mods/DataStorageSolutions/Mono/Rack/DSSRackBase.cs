@@ -37,6 +37,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         
         protected abstract int StorageWidth { get; }
         protected abstract int StorageHeight { get; }
+        protected abstract string ModClassName { get; }
         protected bool IsFromSave;
         protected abstract DSSServerRackDataEntry SavedData { get; set; }
         protected Dictionary<string,DSSSlotController> Slots;
@@ -205,8 +206,8 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
 
             _interfaceInteraction = _canvas.AddComponent<InterfaceInteraction>();
 
-            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseEmissiveDecalsController, gameObject, Color.cyan);
-            MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseEmissiveDecals, gameObject, 4f);
+            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
+            MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseLightsEmissiveController, gameObject, 4f);
             _messageBox = GameObjectHelpers.FindGameObject(_canvas, "MessageBox").AddComponent<FCSMessageBox>();
             InvokeRepeating(nameof(RegisterServers), 1f, 1f);
             InvokeRepeating(nameof(UpdateScreenState), 1, 1);
@@ -249,8 +250,10 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         {
             if (_storage == null)
             {
-                _storage = gameObject.AddComponent<FCSStorage>();
-                _storage.Initialize(Slots.Count);
+
+                _storage = gameObject.GetComponent<FCSStorage>();
+                _storage.SlotsAssigned = Slots.Count;
+                _storage.Initialize(ModClassName);
                 _storage.ItemsContainer.onAddItem += OnServerAddedToStorage;
                 _storage.ItemsContainer.onRemoveItem += OnServerRemovedFromStorage;
             }
@@ -579,7 +582,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         public void RestoreItems(ProtobufSerializer serializer, byte[] data)
         {
 #if SUBNAUTICA_STABLE
-            _storage.RestoreItems(serializer, data);
+            //_storage.RestoreItems(serializer, data);
 #else
                     StartCoroutine(_storageContainer.RestoreItemsAsync(_serializer, _savedData.Data));
 #endif
@@ -588,7 +591,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
         public void RestoreItems(ProtobufSerializer serializer, List<byte[]> data)
         {
 #if SUBNAUTICA_STABLE
-            _storage.RestoreItems(serializer, data);
+            //_storage.RestoreItems(serializer, data);
 #else
                     StartCoroutine(_storageContainer.RestoreItemsAsync(_serializer, _savedData.Data));
 #endif

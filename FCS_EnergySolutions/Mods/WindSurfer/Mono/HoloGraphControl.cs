@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using FCS_EnergySolutions.Mods.WindSurfer.Enums;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,6 +16,7 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
         private Text _unitID;
         private WindSurferOperatorController _windSurferOperatorController;
         private Text _powerInfo;
+        private GameObject _platform;
 
         private WindSurferOperatorController WindSurferOperatorController
         {
@@ -56,6 +59,11 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
                 _operator = gameObject.FindChild("Operator");
             }
 
+            if (_platform == null)
+            {
+                _platform = gameObject.FindChild("Platform");
+            }
+
 
             if (_unitID == null)
             {
@@ -93,20 +101,39 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
             {
                 _powerInfo.text = PlatFormController?.GetPowerInfo() ?? "0/0";
             }
+
+            if (_unitID != null)
+            {
+                UpdateUnitId();
+            }
         }
 
         public void RefreshDeleteButton(bool value)
         {
             _deleteBtnOBJ.SetActive(value);
-            UpdateUnitId();
         }
 
 
-        internal void SetAsTurbine()
+        internal void SetIcon(HolographIconType type)
         {
             Initialize();
-            _turbine.SetActive(true);
+
             _operator.SetActive(false);
+            _turbine.SetActive(false);
+            _platform.SetActive(false);
+
+            switch (type)
+            {
+                case HolographIconType.Operator:
+                    _operator.SetActive(true);
+                    break;
+                case HolographIconType.Turbine:
+                    _turbine.SetActive(true);
+                    break;
+                case HolographIconType.Platform:
+                    _platform.SetActive(true);
+                    break;
+            }
         }
 
         public void FindSlots()

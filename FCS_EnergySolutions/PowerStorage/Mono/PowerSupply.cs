@@ -204,15 +204,10 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
 
             _allowedToDisCharge = !value;
         }
-
-        public void AddItem(InventoryItem item)
-        {
-            _powerCharger.AddItemToContainer(item);
-        }
-
+        
         public byte[] Save(ProtobufSerializer serializer)
         {
-            return _powerCharger.Save(serializer);
+            return null; //_powerCharger.Save(serializer);
         }
 
 #if SUBNAUTICA_STABLE
@@ -232,14 +227,11 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
             return _powerCharger.HasPowerCells();
         }
 
-        public void OpenStorage()
-        {
-            _powerCharger.OpenStorage();
-        }
-
         public bool GetIsReleasingPower()
         {
             return _allowedToDisCharge;
         }
+
+        public void LoadFromSave()=> _powerCharger.LoadFromSave();
     }
 }

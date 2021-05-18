@@ -18,6 +18,7 @@ namespace FCS_EnergySolutions.Mods.AlterraSolarCluster.Mono
         private bool _runStartUpOnEnable;
         private AlterraSolarClusterPowerManager _powerManager;
         private AlterraSolarClusterMovementManager _movementManager;
+        private float nextChargeAttemptTimer;
         public override bool IsOperational => Manager != null && IsConstructed;
         public override bool IsVisible { get; } = true;
 
@@ -57,6 +58,35 @@ namespace FCS_EnergySolutions.Mods.AlterraSolarCluster.Mono
             }
         }
 
+        private void Update()
+        {
+            if (Time.deltaTime == 0f)
+            {
+                return;
+            }
+
+            if (Manager == null && !string.IsNullOrWhiteSpace(BaseId))
+            {
+
+                if (nextChargeAttemptTimer > 0f)
+                {
+                    this.nextChargeAttemptTimer -= DayNightCycle.main.deltaTime;
+                    if (this.nextChargeAttemptTimer < 0f)
+                    {
+                        var manager = BaseManager.FindManager(BaseId);
+                        if (manager != null)
+                        {
+                            Manager = manager;
+                        }
+                        else
+                        {
+                            this.nextChargeAttemptTimer = 5f;
+                        }
+                    }
+                }
+            }
+        }
+
         #endregion
 
         #region Public Methods
@@ -85,10 +115,10 @@ namespace FCS_EnergySolutions.Mods.AlterraSolarCluster.Mono
             if (_colorManager == null)
             {
                 _colorManager = gameObject.AddComponent<ColorManager>();
-                _colorManager.Initialize(gameObject, FCS_AlterraHub.Buildables.AlterraHub.BasePrimaryCol);
+                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol);
             }
-            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseEmissiveDecalsController, gameObject,Color.cyan);
-            MaterialHelpers.ChangeSpecSettings(AlterraHub.BaseDefaultDecals,AlterraHub.BaseSpec,gameObject,2.61f,8f);
+            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject,Color.cyan);
+            MaterialHelpers.ChangeSpecSettings(AlterraHub.BaseDecalsExterior,AlterraHub.TBaseSpec,gameObject,2.61f,8f);
             IsInitialized = true;
         }
         

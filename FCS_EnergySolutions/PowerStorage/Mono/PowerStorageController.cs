@@ -18,7 +18,7 @@ using UnityEngine.UI;
 
 namespace FCS_EnergySolutions.PowerStorage.Mono
 {
-    internal class PowerStorageController : FcsDevice, IFCSSave<SaveData>, IHandTarget
+    internal class PowerStorageController : FcsDevice, IFCSSave<SaveData>//, IHandTarget
     {
         private bool _runStartUpOnEnable;
         private bool _isFromSave;
@@ -121,6 +121,7 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
         private void Start()
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.PowerStorageTabID, Mod.ModName);
+            _powercellSupply.LoadFromSave();
         }
 
         private void OnEnable()
@@ -160,7 +161,7 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
 
                     if (_savedData.Data != null)
                     {
-                        _powercellSupply.Load(_serializer, _savedData.Data);
+                        //_powercellSupply.Load(_serializer, _savedData.Data);
                     }
                 }
 
@@ -334,7 +335,7 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
             QuickLogger.Debug($"Saving ID {_savedData.Id}", true);
             _savedData.Body = _colorManager.GetColor().ColorToVector4();
             _savedData.SecondaryBody = _colorManager.GetSecondaryColor().ColorToVector4();
-            _savedData.Data = _powercellSupply.Save(serializer);
+            //_savedData.Data = _powercellSupply.Save(serializer);
             _savedData.Mode = _mode;
             newSaveData.PowerStorageEntries.Add(_savedData);
         }
@@ -344,19 +345,18 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
             return _colorManager.ChangeColor(color, mode);
         }
 
-        public void OnHandHover(GUIHand hand)
-        {
-            if (!IsInitialized || !IsConstructed || _interactionChecker == null ||_interactionChecker.IsInRange) return;
-            HandReticle main = HandReticle.main;
-            main.SetInteractText(AuxPatchers.PowerStorageClickToAddPowercells());
-            main.SetIcon(HandReticle.IconType.Hand);
-        }
+        //public void OnHandHover(GUIHand hand)
+        //{
+        //    if (!IsInitialized || !IsConstructed || _interactionChecker == null ||_interactionChecker.IsInRange) return;
+        //    HandReticle main = HandReticle.main;
+        //    main.SetInteractText(AuxPatchers.PowerStorageClickToAddPowercells());
+        //    main.SetIcon(HandReticle.IconType.Hand);
+        //}
 
-        public void OnHandClick(GUIHand hand)
-        {
-            if (_interactionChecker.IsInRange) return;
-            _powercellSupply.OpenStorage();
-        }
+        //public void OnHandClick(GUIHand hand)
+        //{
+        //    if (_interactionChecker.IsInRange) return;
+        //}
 
         internal PowerChargerMode GetMode()
         {

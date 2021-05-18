@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using FCS_AlterraHub.Enumerators;
+using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Spawnables;
 using FCS_StorageSolutions.Configuration;
@@ -70,6 +71,12 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Buildable
                 lw.cellLevel = LargeWorldEntity.CellLevel.Global;
 
                 prefab.AddComponent<TechTag>().type = TechType;
+
+                prefab.SetActive(false);
+                var storageContainer = prefab.AddComponent<FCSStorage>();
+                storageContainer.Initialize(Mod.AlterraStorageClassName);
+                prefab.SetActive(true);
+
                 prefab.AddComponent<AlterraStorageController>();
                 return prefab;
 

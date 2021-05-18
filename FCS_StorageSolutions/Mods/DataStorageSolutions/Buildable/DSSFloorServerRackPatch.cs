@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using FCS_AlterraHub.Enumerators;
+using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Spawnables;
 using FCS_StorageSolutions.Configuration;
@@ -72,6 +73,11 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable
 
                 prefab.AddComponent<TechTag>().type = TechType;
                 prefab.AddComponent<DSSFloorServerRackController>();
+
+                prefab.SetActive(false);
+                var storage = prefab.AddComponent<FCSStorage>();
+                storage.Initialize(Mod.DSSFloorServerRackClassName);
+                prefab.SetActive(true);
 
                 //Apply the glass shader here because of autosort lockers for some reason doesn't like it.
                 MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModName);

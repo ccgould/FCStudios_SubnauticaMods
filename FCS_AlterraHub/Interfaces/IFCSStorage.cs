@@ -22,7 +22,7 @@ namespace FCS_AlterraHub.Interfaces
         Action<FcsDevice, TechType> OnContainerAddItem { get; set; }
         Action<FcsDevice, TechType> OnContainerRemoveItem { get; set; }
         bool ContainsItem(TechType techType);
-        ItemsContainer ItemsContainer { get; set; }
+        ItemsContainer ItemsContainer { get; }
         int StorageCount();
     }
 

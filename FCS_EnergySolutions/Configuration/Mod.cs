@@ -33,7 +33,7 @@ namespace FCS_EnergySolutions.Configuration
         internal const string TelepowerPylonTabID = "TP";
         internal const string TelepowerPylonFriendlyName = "Telepower Pylon";
         internal const string TelepowerPylonModName = "TelepowerPylon";
-        internal const string TelepowerPylonDescription = "With a Telepower Pylon can send or receive energy wirelessly across vast distances. Requires one Pylon to Send / Push and another to Receive / Pull.";
+        internal const string TelepowerPylonDescription = "With a Telepower Pylon, you can send or receive energy wirelessly across vast distances. Requires one to Send / Push and another to Receive / Pull.";
         internal static string TelepowerPylonKitClassID => $"{TelepowerPylonModName}_Kit";
         internal static string TelepowerPylonClassName => TelepowerPylonModName;
         internal static string TelepowerPylonPrefabName => TelepowerPylonModName;
@@ -41,7 +41,7 @@ namespace FCS_EnergySolutions.Configuration
         internal const string WindSurferOperatorTabID = "WSO";
         internal const string WindSurferOperatorFriendlyName = "Wind Surfer Operator";
         internal const string WindSurferOperatorModName = "WindSurferOperator";
-        internal const string WindSurferOperatorDescription = "N.A";
+        internal const string WindSurferOperatorDescription = "Build and control up to 15 WindSurfer turbines, broadcasting their power via integrated Telepower Pylon.";
         internal static string WindSurferOperatorKitClassID => $"{WindSurferOperatorModName}_Kit";
         internal static string WindSurferOperatorClassName => WindSurferOperatorModName;
         internal static string WindSurferOperatorPrefabName => WindSurferOperatorModName;
@@ -49,10 +49,18 @@ namespace FCS_EnergySolutions.Configuration
         internal const string WindSurferTabID = "WS";
         internal const string WindSurferFriendlyName = "Wind Surfer";
         internal const string WindSurferModName = "WindSurfer";
-        internal const string WindSurferDescription = "N.A";
+        internal const string WindSurferDescription = "Wind turbine floating platform, built with Operator.";
         internal static string WindSurferKitClassID => $"{WindSurferModName}_Kit";
         internal static string WindSurferClassName => WindSurferModName;
         internal static string WindSurferPrefabName => WindSurferModName;
+
+        internal const string WindSurferPlatformTabID = "WSP";
+        internal const string WindSurferPlatformFriendlyName = "Wind Surfer Platform";
+        internal const string WindSurferPlatformModName = "WindSurferPlatform";
+        internal const string WindSurferPlatformDescription = " Floating platform, built with Operator.";
+        internal static string WindSurferPlatformKitClassID => $"{WindSurferPlatformModName}_Kit";
+        internal static string WindSurferPlatformClassName => WindSurferPlatformModName;
+        internal static string WindSurferPlatformPrefabName => WindSurferPlatformModName;
 
 
         internal const string AlterraGenModTabID = "AG";
@@ -340,6 +348,7 @@ namespace FCS_EnergySolutions.Configuration
 
         public static WindSurferDataEntry GetWindSurferSaveData(string id)
         {
+            if (string.IsNullOrWhiteSpace(id)) return null; 
             LoadData();
 
             var saveData = GetSaveData();

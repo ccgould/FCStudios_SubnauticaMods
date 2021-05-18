@@ -38,11 +38,11 @@ namespace FCSDemo.Mono
             {
                 QuickLogger.Info($"Creating Color Component", true);
                 _colorManager = gameObject.AddComponent<ColorManager>();
-                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol, AlterraHub.BaseSecondaryCol, AlterraHub.BaseEmission);
+                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol, AlterraHub.BaseSecondaryCol, AlterraHub.TBaseEmission);
 
                 if (QPatch.Configuration.ControlEmissionStrength)
                 {
-                    MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseEmission, gameObject, QPatch.Configuration.EmissionStrength);
+                    MaterialHelpers.ChangeEmissionStrength(AlterraHub.TBaseEmission, gameObject, QPatch.Configuration.EmissionStrength);
                 }
             }
             QuickLogger.Info("Initialized", true);

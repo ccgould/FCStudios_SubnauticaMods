@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using FCS_AlterraHub.Enumerators;
+using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Spawnables;
 using FCS_HomeSolutions.Buildables;
@@ -76,10 +77,15 @@ namespace FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Buildable
 
                 prefab.AddComponent<TechTag>().type = TechType;
                 prefab.AddComponent<FMOD_CustomLoopingEmitter>();
-                prefab.AddComponent<FireExtinguisherRefuelerController>();
+                
+                prefab.SetActive(false);
+                
+                var storage = prefab.AddComponent<FCSStorage>();
+                var fireExtinguisherSize = CraftData.GetItemSize(TechType.FireExtinguisher);
+                storage.Initialize(1, fireExtinguisherSize.x, fireExtinguisherSize.y,$"{Mod.FireExtinguisherRefuelerFriendly} Receptacle" , Mod.FireExtinguisherRefuelerClassID);
+                prefab.SetActive(true);
 
-                //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
-                //MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModName);
+                prefab.AddComponent<FireExtinguisherRefuelerController>();
 
                 return prefab;
             }

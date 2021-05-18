@@ -1,5 +1,6 @@
 ﻿using System;
 using FCS_AlterraHub.Enumerators;
+using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_StorageSolutions.Configuration;
 using FCS_StorageSolutions.Mods.AlterraStorage.Buildable;
@@ -77,6 +78,12 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Spawnable
                 applier.renderers = new Renderer[] { renderer };
                 applier.anchorSky = Skies.Auto;
 
+                prefab.SetActive(false);
+
+                var storage = prefab.AddComponent<FCSStorage>();
+                storage.Initialize(Mod.DSSServerClassName);
+                prefab.SetActive(true);
+                
                 prefab.EnsureComponent<DSSServerController>();
 
                 return prefab;

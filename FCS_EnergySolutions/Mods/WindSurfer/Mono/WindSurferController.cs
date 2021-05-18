@@ -1,19 +1,17 @@
 ﻿using System;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Extensions;
-using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Mono.OreConsumer;
 using FCS_AlterraHub.Objects;
 using FCS_AlterraHub.Registration;
 using FCS_EnergySolutions.Configuration;
-using FCS_EnergySolutions.Mods.WindSurfer.Interfaces;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
 
 namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
 {
-    internal class WindSurferController : FcsDevice, IFCSSave<SaveData>, IPlatform
+    internal class WindSurferController : WindSurferPlatformBase
     {
         private MotorHandler _motor;
         private bool _fromSave;
@@ -27,8 +25,9 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
         private AnimationCurve _pole1AnimationCurve;
         private AnimationCurve _pole2AnimationCurve;
         private AnimationCurve _pole3AnimationCurve;
-        internal WindSurferPowerController PowerController;
-        public PlatformController PlatformController => _platformController ?? (_platformController = GetComponent<PlatformController>());
+
+        public override WindSurferPowerController PowerController { get; set; }
+        public override PlatformController PlatformController => _platformController ?? (_platformController = GetComponent<PlatformController>());
         private PlatformController _platformController;
         private Transform _pole1Trans;
         private Transform _pole2Trans;
@@ -37,11 +36,12 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
 
         private void Start()
         {
-            GetUnitID();
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.WindSurferTabID, Mod.ModName);
+
             _pole1AnimationCurve = new AnimationCurve(new Keyframe(0, 4.42813f), new Keyframe(1, _pole1Max));
             _pole2AnimationCurve = new AnimationCurve(new Keyframe(0, 1.841746f), new Keyframe(1, _pole2Max));
             _pole3AnimationCurve = new AnimationCurve(new Keyframe(0, 1.397793f), new Keyframe(1, _pole3Max));
-            MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseEmissiveDecals, gameObject, 4f);
+            MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseLightsEmissiveController, gameObject, 4f);
         }
 
         private void OnEnable()
@@ -72,7 +72,7 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
             }
         }
 
-        internal void TryMoveToPosition()
+        public override void TryMoveToPosition()
         {
             ReadySaveData();
             transform.position = _savedData.Position.ToVector3();
@@ -115,7 +115,7 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
             tr.localPosition = new Vector3(tr.localPosition.x, y, tr.localPosition.z);
         }
 
-        internal void PoleState(bool isExtended)
+        public override void PoleState(bool isExtended)
         {
             if (isExtended)
             {
@@ -136,10 +136,18 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
 
         private void ReadySaveData()
         {
-            QuickLogger.Debug("In OnProtoDeserialize");
-            var prefabIdentifier = GetComponentInParent<PrefabIdentifier>() ?? GetComponent<PrefabIdentifier>();
-            var id = prefabIdentifier?.Id ?? string.Empty;
-            _savedData = Mod.GetWindSurferSaveData(id);
+            try
+            {
+                QuickLogger.Debug("In OnProtoDeserialize");
+                var prefabIdentifier = GetComponentInParent<PrefabIdentifier>() ?? GetComponent<PrefabIdentifier>();
+                var id = prefabIdentifier?.Id ?? string.Empty;
+                _savedData = Mod.GetWindSurferSaveData(id);
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error(e.Message);
+                QuickLogger.Error(e.StackTrace);
+            }
         }
 
         public override void Initialize()
@@ -194,7 +202,7 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
 
         }
 
-        public void Save(SaveData newSaveData, ProtobufSerializer serializer = null)
+        public override void Save(SaveData newSaveData, ProtobufSerializer serializer = null)
         {
             if (!IsInitialized) return;
 
@@ -229,15 +237,6 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
 
             var t04 = GameObjectHelpers.FindGameObject(gameObject, "T04").EnsureComponent<LadderController>();
             t04.Set(GameObjectHelpers.FindGameObject(gameObject, "T04_Top"));
-        }
-
-        public string GetUnitID()
-        {
-            if (string.IsNullOrWhiteSpace(UnitID))
-            {
-                FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.WindSurferTabID, Mod.ModName);
-            }
-            return UnitID;
         }
     }
 }

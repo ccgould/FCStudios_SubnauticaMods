@@ -173,6 +173,10 @@
     <Compile Include="Mods\TelepowerPylon\Mono\TelepowerPylonPowerManager.cs" />
     <Compile Include="Mods\TelepowerPylon\Mono\TelepowerPylonTrigger.cs" />
     <Compile Include="Mods\WindSurfer\Buildables\WindSurferOperatorPatcher.cs" />
+    <Compile Include="Mods\WindSurfer\Enums\HolographIconType.cs" />
+    <Compile Include="Mods\WindSurfer\Mono\WindSurferPlatformBase.cs" />
+    <Compile Include="Mods\WindSurfer\Mono\WindSurferPlatformController.cs" />
+    <Compile Include="Mods\WindSurfer\Spawnables\WindSurferPlatformPrefab.cs" />
     <Compile Include="Mods\WindSurfer\Structs\ConnectedTurbineData.cs" />
     <Compile Include="Mods\WindSurfer\Mono\DoorSensor.cs" />
     <Compile Include="Mods\WindSurfer\Model\IGrid.cs" />
@@ -180,7 +184,6 @@
     <Compile Include="Mods\WindSurfer\Model\Graph.cs" />
     <Compile Include="Mods\WindSurfer\Mono\HoloGraphControl.cs" />
     <Compile Include="Mods\WindSurfer\Mono\HolographSlot.cs" />
-    <Compile Include="Mods\WindSurfer\Interfaces\IPlatform.cs" />
     <Compile Include="Mods\WindSurfer\Mono\LadderController.cs" />
     <Compile Include="Mods\WindSurfer\Mono\PlatformController.cs" />
     <Compile Include="Mods\WindSurfer\Mono\ScreenTrigger.cs" />
@@ -188,6 +191,7 @@
     <Compile Include="Mods\WindSurfer\Mono\WindSurferOperatorController.cs" />
     <Compile Include="Mods\WindSurfer\Mono\WindSurferPowerController.cs" />
     <Compile Include="Mods\WindSurfer\Spawnables\WindSurferPrefab.cs" />
+    <Compile Include="Patches\BasePowerRelayGetConnectPoint_Patch.cs" />
     <Compile Include="Patches\Battery_Patch.cs" />
     <Compile Include="PowerStorage\Buildable\PowerStoragePatcher.cs" />
     <Compile Include="PowerStorage\Mono\BatteryDummyController.cs" />
@@ -209,7 +213,9 @@
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Mods\WindSurfer\Interfaces\" />
+  </ItemGroup>
   <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

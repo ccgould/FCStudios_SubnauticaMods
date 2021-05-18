@@ -19,7 +19,7 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
         private bool _runStartUpOnEnable;
         private bool _fromSave;
         private AlienChiefDataEntry _saveData;
-
+        const int MAXSLOTS = 48;
         internal DisplayManager DisplayManager { get; private set; }
         internal Cooker Cooker { get; set; }
         internal FCSStorage StorageSystem { get; set; }
@@ -29,7 +29,7 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
         private void Start()
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.AlienChiefTabID, Mod.ModName);
-            StorageSystem.CleanUpDuplicatedStorageNoneRoutine();
+            DisplayManager?.UpdateStorageAmount(StorageSystem?.GetCount()??0);
         }
 
         private void OnEnable()
@@ -49,6 +49,7 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
             if (_fromSave)
             {
                 _colorManager.ChangeColor(_saveData.Fcs.Vector4ToColor());
+                RefreshUI();
                 _fromSave = false;
             }
         }
@@ -75,9 +76,10 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
 
             if (StorageSystem == null)
             {
-                StorageSystem = gameObject.EnsureComponent<AlienChefStorage>();
-                StorageSystem.Initialize(48, 6, 8, "Alien Chef Storage");
-    
+                StorageSystem = gameObject.GetComponent<FCSStorage>();
+                StorageSystem.NotAllowedToAddItems = true;
+                StorageSystem.SlotsAssigned = MAXSLOTS;
+                StorageSystem.Deactivate();
                 StorageSystem.ItemsContainer.onAddItem += type =>
                 {
                     DisplayManager.UpdateStorageAmount(StorageSystem.GetCount());
@@ -128,9 +130,9 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
             }
             
 #if SUBNAUTICA_STABLE
-            StorageSystem.RestoreItems(serializer, _saveData.Bytes);
+            //StorageSystem.RestoreItems(serializer, _saveData.Bytes);
 #else
-            StartCoroutine(StorageSystem.RestoreItemsync(serializer, _saveData.Bytes));
+            //StartCoroutine(StorageSystem.RestoreItemsync(serializer, _saveData.Bytes));
 
 #endif
 
@@ -176,7 +178,7 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
 
             _saveData.Id = id;
             _saveData.Fcs = _colorManager.GetColor().ColorToVector4();
-            _saveData.Bytes = StorageSystem.Save(serializer);
+            //_saveData.Bytes = StorageSystem.Save(serializer);
             newSaveData.AlienChiefDataEntries.Add(_saveData);
         }
 
@@ -205,6 +207,8 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
 
         public bool AttemptToCook(CookerItemController dialog, int amount, bool autoStartCooking = true)
         {
+            if(StorageSystem.IsFull) return false;
+
             //Check for ingredients
             if (dialog.CheckForIngredients(amount))
             {

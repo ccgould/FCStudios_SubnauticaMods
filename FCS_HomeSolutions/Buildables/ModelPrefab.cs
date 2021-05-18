@@ -76,8 +76,8 @@ namespace FCS_HomeSolutions.Buildables
 
             PaintToolPrefab = GetPrefab(Mod.PaintToolPrefabName);
             SmallOutdoorPot = GetPrefab(Mod.SmartPlanterPotPrefabName);
-            BaseOperatorPrefab = GetPrefab(Mod.BaseOperatorPrefabName);
-            HoverLiftPadPrefab = GetPrefab(Mod.HoverLiftPrefabName);
+            //BaseOperatorPrefab = GetPrefab(Mod.BaseOperatorPrefabName);
+            //HoverLiftPadPrefab = GetPrefab(Mod.HoverLiftPrefabName);
             MiniFountainFilterPrefab = GetPrefab(Mod.MiniFountainFilterPrefabName);
             SeaBreezePrefab = GetPrefab(Mod.SeaBreezePrefabName);
             TrashReceptaclePrefab = GetPrefab(Mod.TrashReceptaclePrefabName);
@@ -225,10 +225,10 @@ namespace FCS_HomeSolutions.Buildables
                     //Lets apply the material shader
                     AlterraHub.ReplaceShadersV2(prefab,AlterraHub.BasePrimaryCol);
                     AlterraHub.ReplaceShadersV2(prefab,AlterraHub.BaseSecondaryCol);
-                    AlterraHub.ReplaceShadersV2(prefab,AlterraHub.BaseDefaultDecals);
+                    AlterraHub.ReplaceShadersV2(prefab,AlterraHub.BaseDecalsExterior);
                     AlterraHub.ReplaceShadersV2(prefab,AlterraHub.BaseTexDecals);
-                    AlterraHub.ReplaceShadersV2(prefab,AlterraHub.BaseEmissiveDecals);
-                    AlterraHub.ReplaceShadersV2(prefab,AlterraHub.BaseEmissiveDecalsController);
+                    AlterraHub.ReplaceShadersV2(prefab,AlterraHub.BaseLightsEmissiveController);
+                    AlterraHub.ReplaceShadersV2(prefab,AlterraHub.BaseDecalsEmissiveController);
                     QuickLogger.Debug($"Applied shaderes to prefab {prefabName}");
                 }
 

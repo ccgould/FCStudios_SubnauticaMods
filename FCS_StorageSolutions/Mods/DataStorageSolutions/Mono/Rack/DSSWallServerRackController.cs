@@ -8,6 +8,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
     {
         protected override int StorageWidth { get; } = 3;
         protected override int StorageHeight { get; } = 3;
+        protected override string ModClassName { get; } = Mod.DSSWallServerRackClassName;
         protected override DSSServerRackDataEntry SavedData { get; set; }
 
         public override void OnProtoDeserialize(ProtobufSerializer serializer)
@@ -37,7 +38,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
             SavedData.ID = GetPrefabID();
             SavedData.BodyColor = _colorManager.GetColor().ColorToVector4();
             SavedData.SecondaryColor = _colorManager.GetSecondaryColor().ColorToVector4();
-            SavedData.Slot1 = Save(serializer);
+            //SavedData.Slot1 = Save(serializer);
             newSaveData.DSSWallServerRackDataEntries.Add(SavedData);
             QuickLogger.Debug($"Saving ID {SavedData.ID}", true);
         }

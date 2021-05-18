@@ -190,7 +190,7 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
 
             CreateHomePage();
 
-            MaterialHelpers.ChangeEmissionColor(Buildables.AlterraHub.BaseEmissiveDecalsController, gameObject,
+            MaterialHelpers.ChangeEmissionColor(Buildables.AlterraHub.BaseDecalsEmissiveController, gameObject,
                 Color.cyan);
             
             InvokeRepeating(nameof(UpdateDisplay), .5f, .5f);

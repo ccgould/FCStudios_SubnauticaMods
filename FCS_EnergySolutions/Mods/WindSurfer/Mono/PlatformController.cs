@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using FCS_AlterraHub.Mono;
-using FCS_EnergySolutions.Mods.WindSurfer.Interfaces;
+﻿using FCS_AlterraHub.Mono;
+using FCS_EnergySolutions.Mods.WindSurfer.Enums;
 using FCS_EnergySolutions.Mods.WindSurfer.Structs;
+using FCSCommon.Utilities;
 using UnityEngine;
 
 namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
@@ -16,6 +15,26 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
         private WindSurferOperatorController _windSurferOperatorController;
         private FcsDevice _fcsDevice;
         private string _prefabID;
+
+        internal HolographIconType GetPlatformType()
+        {
+            if(gameObject.GetComponentInChildren<WindSurferOperatorController>())
+            {
+                return HolographIconType.Operator;
+            }
+
+            if (gameObject.GetComponentInChildren<WindSurferController>())
+            {
+                return HolographIconType.Turbine;
+            }
+
+            if (gameObject.GetComponentInChildren<WindSurferPlatformController>())
+            {
+                return HolographIconType.Platform;
+            }
+
+            return HolographIconType.None;
+        }
 
         internal WindSurferOperatorController WindSurferOperatorController
         {
@@ -40,8 +59,9 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
             go.transform.localPosition = new Vector3(11.10f, 0f, 0f);
             go.transform.SetParent(WindSurferOperatorController.TurbinesGroupLocation.transform, true);
             go.transform.localRotation = Quaternion.identity;
-            var turbineController = go.GetComponent<WindSurferController>();
+            var turbineController = go.GetComponent<WindSurferPlatformBase>();
             turbineController.PoleState(true);
+
             return go;
         }
 
@@ -49,7 +69,7 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
         {
             if (string.IsNullOrWhiteSpace(_unitID))
             {
-                _unitID = ((IPlatform)GetFcsDevice()).GetUnitID();
+                _unitID = ((WindSurferPlatformBase)GetFcsDevice()).UnitID;
             }
 
             return _unitID;
@@ -73,11 +93,12 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
         }
 
 
+
         public string GetPrefabID()
         {
             if (string.IsNullOrWhiteSpace(_prefabID))
             {
-                _prefabID = ((IPlatform)GetFcsDevice()).GetPrefabID();
+                _prefabID = ((WindSurferPlatformBase)GetFcsDevice()).GetPrefabID();
             }
 
             return _prefabID;

@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using FCS_AlterraHub.Interfaces;
 using FCSCommon.Utilities;
@@ -11,10 +8,10 @@ namespace FCS_AlterraHub.Mono
 {
     public class DumpContainerSimplified : MonoBehaviour
     {
-        private ChildObjectIdentifier _containerRoot;
         private ItemsContainer _dumpContainer;
 
         private IFCSDumpContainer _storage;
+        private GameObject _storageRoot;
 
         public Action OnDumpContainerClosed { get; set; }
 
@@ -22,25 +19,23 @@ namespace FCS_AlterraHub.Mono
         {
             _storage = storage;
 
-            if (_containerRoot == null)
+            if (_storageRoot == null)
             {
-                var storageRoot = new GameObject(name);
-                storageRoot.transform.SetParent(trans, false);
-                _containerRoot = storageRoot.AddComponent<ChildObjectIdentifier>();
+                _storageRoot = new GameObject(name);
+                _storageRoot.transform.SetParent(trans, false);
             }
 
             if (_dumpContainer == null)
             {
                 QuickLogger.Debug("Initializing Container");
 
-                _dumpContainer = new ItemsContainer(width, height, _containerRoot.transform, label, null);
+                _dumpContainer = new ItemsContainer(width, height, _storageRoot.transform, label, null);
 
                 _dumpContainer.isAllowedToAdd += IsAllowedToAdd;
                 _dumpContainer.onAddItem += DumpContainerOnAddItem;
             }
         }
-
-
+        
         private void DumpContainerOnAddItem(InventoryItem item)
         {
             QuickLogger.Debug($"Adding {item.item.GetTechType()} to dump container");
@@ -84,92 +79,6 @@ namespace FCS_AlterraHub.Mono
             QuickLogger.Debug($"Store Items Dump Count: {_dumpContainer.count}");
             
             OnDumpContainerClosed?.Invoke();
-        }
-
-        public byte[] Save(ProtobufSerializer serializer)
-        {
-            if (serializer == null || _containerRoot == null)
-            {
-                QuickLogger.DebugError($"Failed to save: Serializer: {serializer} || Root {_containerRoot?.name}", true);
-                return null;
-            }
-            return StorageHelper.Save(serializer, _containerRoot.gameObject);
-        }
-
-#if SUBNAUTICA_STABLE
-        public void RestoreItems(ProtobufSerializer serializer, byte[] serialData, bool runPDACloseWhenDone = false)
-        {
-            StorageHelper.RenewIdentifier(_containerRoot.gameObject);
-            if (serialData == null)
-            {
-                return;
-            }
-            using (MemoryStream memoryStream = new MemoryStream(serialData))
-            {
-                QuickLogger.Debug("Getting Data from memory stream");
-                GameObject gObj = serializer.DeserializeObjectTree(memoryStream, 0);
-                QuickLogger.Debug($"Deserialized Object Stream. {gObj}");
-                StorageHelper.TransferItems(gObj, _dumpContainer);
-                Destroy(gObj);
-            }
-
-            CleanUpDuplicatedStorageNoneRoutine();
-
-            if (runPDACloseWhenDone)
-            {
-                OnDumpClose(null);
-            }
-
-        }
-#else
-        public IEnumerator RestoreItems(ProtobufSerializer serializer, byte[] serialData,bool runPDACloseWhenDone = false)
-        {
-            StorageHelper.RenewIdentifier(_containerRoot.gameObject);
-            if (serialData == null)
-            {
-                yield break;
-            }
-            using (MemoryStream memoryStream = new MemoryStream(serialData))
-            {
-                QuickLogger.Debug("Getting Data from memory stream");
-                CoroutineTask<GameObject> task = serializer.DeserializeObjectTreeAsync(memoryStream, false, false, 0);
-                yield return task;
-                GameObject result = task.GetResult();
-                QuickLogger.Debug($"Deserialized Object Stream. {result}");
-                StorageHelper.TransferItems(result, _dumpContainer);
-                Destroy(result);
-            }
-
-            CleanUpDuplicatedStorageNoneRoutine();
-
-            if (runPDACloseWhenDone)
-            {
-                OnDumpClose(null);
-            }
-            yield break;
-        }
-#endif
-
-        private void CleanUpDuplicatedStorageNoneRoutine()
-        {
-            QuickLogger.Debug("Cleaning Duplicates", true);
-            Transform hostTransform = transform;
-            StoreInformationIdentifier[] sids = gameObject.GetComponentsInChildren<StoreInformationIdentifier>(true);
-#if DEBUG
-            QuickLogger.Debug($"SIDS: {sids.Length}", true);
-#endif
-
-            int num;
-            for (int i = sids.Length - 1; i >= 0; i = num - 1)
-            {
-                StoreInformationIdentifier storeInformationIdentifier = sids[i];
-                if (storeInformationIdentifier != null && storeInformationIdentifier.name.StartsWith("SerializerEmptyGameObject", StringComparison.OrdinalIgnoreCase))
-                {
-                    Destroy(storeInformationIdentifier.gameObject);
-                    QuickLogger.Debug($"Destroyed Duplicate", true);
-                }
-                num = i;
-            }
         }
 
         public int GetItemCount()

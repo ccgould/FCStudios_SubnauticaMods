@@ -2,7 +2,6 @@
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Helpers;
 using FCS_EnergySolutions.Buildable;
-using FCS_EnergySolutions.Configuration;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
