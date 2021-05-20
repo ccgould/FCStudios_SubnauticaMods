@@ -5,6 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using FCS_AlterraHub.Mono;
+using FCS_AlterraHub.Mono.FCSPDA.Mono;
+using FCS_AlterraHub.Mono.FCSPDA.Mono.ScreenItems;
 using FCS_AlterraHub.Patches;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Spawnables;
@@ -12,6 +14,7 @@ using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
 using FMOD;
 using SMLHelper.V2.Crafting;
+using SMLHelper.V2.Json.ExtensionMethods;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 #if SUBNAUTICA_STABLE
@@ -37,10 +40,6 @@ namespace FCS_AlterraHub.Configuration
 
 
         internal const string AlterraHubClassID = "AlterraHub";
-        internal const string AlterraHubFriendly = "Alterra Hub";
-        internal const string AlterraHubDescription = "AlterraHub your central location for all your Alterra needs!";
-        internal const string AlterraHubPrefabName = "AlterraHub";
-        internal const string AlterraHubTabID = "AHB";
 
         internal const string KitClassID = "FCSKit";
         internal const string KitFriendly = "FCS Kit";
@@ -62,6 +61,16 @@ namespace FCS_AlterraHub.Configuration
         internal const string OreConsumerFriendly = "Alterra Ore Consumer";
         internal const string OreConsumerDescription = " Turns your ores into credits to use at the Alterra Hub. The Ore Consumer is always very hungry: keep it well fed.";
         internal const string OreConsumerPrefabName = "OreConsumer";
+
+        internal const string AlterraHubDepotClassID = "AlterraHubDepot";
+        internal const string AlterraHubDepotFriendly = "AlterraHub Depot";
+        internal const string AlterraHubDepotDescription = "N/A";
+        internal const string AlterraHubDepotPrefabName = "AlterraHubDepot";
+        internal const string AlterraHubDepotTabID = "AHD";
+
+        internal static TechType AlterraHubDepotTechType { get; set; }
+        internal static TechType AlterraHubDepotFragmentTechType { get; set; }
+
         internal static TechType OreConsumerFragmentTechType { get; set; }
         internal const string OreConsumerTabID = "OC";
 
@@ -72,9 +81,9 @@ namespace FCS_AlterraHub.Configuration
         internal static Action<List<KnownDevice>> OnDevicesDataLoaded { get; set; }
 
 #if SUBNAUTICA
-        internal static TechData AlterraHubIngredients => new TechData
+        internal static TechData AlterraHubDepotIngredients => new TechData
 #elif BELOWZERO
-                internal static RecipeData AlterraHubIngredients => new RecipeData
+                internal static RecipeData AlterraHubDepotIngredients => new RecipeData
 #endif
         {
             craftAmount = 1,
@@ -324,6 +333,7 @@ namespace FCS_AlterraHub.Configuration
 
                 QuickLogger.Debug("Attempting to save bases",true);
                 newSaveData.BaseSaves = BaseManager.Save().ToList();
+                FCSPDAController.Instance.Save(newSaveData);
                 QuickLogger.Debug("Bases saved", true);
 
                 if (_tempAccountDetails != null)
@@ -396,23 +406,13 @@ namespace FCS_AlterraHub.Configuration
             return new OreConsumerDataEntry { Id = id };
         }
         
-        internal static AlterraHubDataEntry GetAlterraHubSaveData(string id)
+        internal static FCSPDAEntry GetAlterraHubSaveData()
         {
             LoadData();
 
             var saveData = GetSaveData();
 
-            foreach (var entry in saveData.AlterraHubEntries)
-            {
-                if (string.IsNullOrEmpty(entry.Id)) continue;
-
-                if (entry.Id == id)
-                {
-                    return entry;
-                }
-            }
-
-            return new AlterraHubDataEntry { Id = id };
+            return saveData.FCSPDAEntry ?? new FCSPDAEntry();
         }
 
         internal static BaseSaveData GetBaseSaveData(string instanceId)
@@ -485,9 +485,30 @@ namespace FCS_AlterraHub.Configuration
 
         public static bool IsOreConsumerSpawned { get; set; }
 
+
+
         public static void DeepCopySave(AccountDetails accountDetails)
         {
             _tempAccountDetails = new AccountDetails(accountDetails);
+        }
+
+        public static AlterraHubDepotEntry GetAlterraHubDepotEntrySaveData(string id)
+        {
+            LoadData();
+
+            var saveData = GetSaveData();
+
+            foreach (var entry in saveData.AlterraHubDepotEntries)
+            {
+                if (string.IsNullOrEmpty(entry.Id)) continue;
+
+                if (entry.Id == id)
+                {
+                    return entry;
+                }
+            }
+
+            return new AlterraHubDepotEntry { Id = id };
         }
     }
 

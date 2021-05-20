@@ -15,14 +15,13 @@ using UnityEngine;
 
 namespace FCS_AlterraHub.Mono.AlterraHub
 {
-    internal class AlterraHubController: FcsDevice, IFCSSave<SaveData>, IHandTarget, IFCSDumpContainer
+    internal class AlterraHubController
     {
         private bool _runStartUpOnEnable;
         private bool _isFromSave;
         private AlterraHubDataEntry _savedData;
         private bool _cursorLockCached;
         private GameObject _inputDummy;
-        private GameObject _hubCameraPosition;
         private bool _isInRange;
         private GameObject _screenBlock;
         private DumpContainerSimplified _dumpContainer;
@@ -30,415 +29,223 @@ namespace FCS_AlterraHub.Mono.AlterraHub
         private GameObject _playerBody;
         private bool _isInUse;
         private Transform _cameraParent;
-        public Sun Sun => Sun.main;
 
-        internal HubTrigger AlterraHubTrigger { get; set; }
         internal AlterraHubDisplay DisplayManager { get; private set; }
         private MessageBoxHandler messageBoxHandler => MessageBoxHandler.main;
 
 
         #region Unity Methods
 
-        private void Start()
-        {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.AlterraHubTabID, Mod.ModName);
-            IPCMessage += IpcMessage;
-        }
-
         private void IpcMessage(string message)
         {
-            if (message.Equals("ActivateGoal"))
-            {
-                var panelGroup = DisplayManager.GetPanelGroup();
-                foreach (PanelHelper panelHelper in panelGroup.PanelHelpers)
-                {
-                    panelHelper.ActivateStoreItem(BaseManager.ActivateGoalTechType);
-                }
-            }
+           if (message.Equals("ActivateGoal"))
+           {
+               var panelGroup = DisplayManager.GetPanelGroup();
+               foreach (PanelHelper panelHelper in panelGroup.PanelHelpers)
+               {
+                   panelHelper.ActivateStoreItem(BaseManager.ActivateGoalTechType);
+               }
+           }
 
-            if (message.Equals("ErrorLoadingAccount"))
-            {
-                MessageBoxHandler.main.Show(Buildables.AlterraHub.ErrorLoadingAccount(), FCSMessageButton.OK);
-            }
-        }
-
-        private void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.Escape) && _isInRange)
-            {
-                ExitStore();
-            }
-
-            //if (_isInUse)
-            //{
-            //    SetCameraPosition();
-            //}
-        }
-
-        private void OnEnable()
-        {
-            if (_runStartUpOnEnable)
-            {
-                if (!IsInitialized)
-                {
-                    Initialize();
-                }
-
-                if (_isFromSave)
-                {
-                    if (_savedData == null)
-                    {
-                        ReadySaveData();
-                    }
-
-                    DisplayManager.Load(_savedData);
-                    _colorManager.ChangeColor(_savedData.Fcs.Vector4ToColor());
-                }
-                
-                _runStartUpOnEnable = false;
-            }
+           if (message.Equals("ErrorLoadingAccount"))
+           {
+               MessageBoxHandler.main.Show(Buildables.AlterraHub.ErrorLoadingAccount(), FCSMessageButton.OK);
+           }
         }
 
         #endregion
 
-        public override Vector3 GetPosition()
+
+        public  void Initialize()
         {
-            return transform.position;
-        }
+           if(IsInitialized) return;
 
-        public override void Initialize()
-        {
-            if(IsInitialized) return;
+           MessageBoxHandler.main.ObjectRoot = gameObject;
 
-            MessageBoxHandler.main.ObjectRoot = gameObject;
+           if (_dumpContainer == null)
+           {
+               _dumpContainer = gameObject.AddComponent<DumpContainerSimplified>();
+               _dumpContainer.Initialize(transform, "Item Return", this);
+           }
 
-            if (AlterraHubTrigger == null)
-            {
-                AlterraHubTrigger = GameObjectHelpers.FindGameObject(gameObject, "Trigger").AddComponent<HubTrigger>();
-            }
+           if (DisplayManager == null)
+           {
+               DisplayManager = gameObject.AddComponent<AlterraHubDisplay>();
+               DisplayManager.Setup(this);
+               DisplayManager.OnReturnButtonClicked += () =>
+               {
+                   _dumpContainer.OpenStorage();
+               };
+           }
 
-            if (_dumpContainer == null)
-            {
-                _dumpContainer = gameObject.AddComponent<DumpContainerSimplified>();
-                _dumpContainer.Initialize(transform, "Item Return", this);
-            }
+           if (_motorHandler == null)
+           {
+               _motorHandler = GameObjectHelpers.FindGameObject(gameObject, "RoundSignDisplay01").AddComponent<MotorHandler>();
+               _motorHandler.Initialize(30);
+               _motorHandler.StartMotor();
+           }
 
-            if (DisplayManager == null)
-            {
-                DisplayManager = gameObject.AddComponent<AlterraHubDisplay>();
-                DisplayManager.Setup(this);
-                DisplayManager.OnReturnButtonClicked += () =>
-                {
-                    ExitStore();
-                    _dumpContainer.OpenStorage();
-                };
-            }
+           if (_colorManager == null)
+           {
+               _colorManager = gameObject.AddComponent<ColorManager>();
+               _colorManager.Initialize(gameObject, Buildables.AlterraHub.BodyMaterial);
+           }
+            
+           _screenBlock = GameObjectHelpers.FindGameObject(gameObject, "Blocker");
 
-            if (_motorHandler == null)
-            {
-                _motorHandler = GameObjectHelpers.FindGameObject(gameObject, "RoundSignDisplay01").AddComponent<MotorHandler>();
-                _motorHandler.Initialize(30);
-                _motorHandler.StartMotor();
-            }
+           LoadStore();
 
-            if (_colorManager == null)
-            {
-                _colorManager = gameObject.AddComponent<ColorManager>();
-                _colorManager.Initialize(gameObject, Buildables.AlterraHub.BodyMaterial);
-            }
-
-            _playerBody = Player.main.playerController.gameObject.FindChild("body");
-
-            //var ui = GameObject.Instantiate(Buildables.AlterraHub.ColorPickerDialogPrefab);
-            //HUD = ui.AddComponent<FCSHUD>();
-            //HUD.Move();
-
-            _screenBlock = GameObjectHelpers.FindGameObject(gameObject, "Blocker");
-
-            LoadStore();
-
-            InGameMenuQuitPatcher.AddEventHandlerIfMissing(OnQuit);
+           InGameMenuQuitPatcher.AddEventHandlerIfMissing(OnQuit);
 
 
-            AlterraHubTrigger.onTriggered += value =>
-            {
-                _isInRange = true;
-                if (!value)
-                {
-                    _isInRange = false;
-                    ExitStore();
-                }
-            };
-
-            _hubCameraPosition = GameObjectHelpers.FindGameObject(gameObject, "CameraPosition");
-
-            IsInitialized = true;
+           IsInitialized = true;
         }
 
         private void OnQuit()
         {
-            Mod.DeepCopySave(CardSystem.main.SaveDetails());
-            QuickLogger.Debug("Quitting Purging CardSystem and AlterraHubSave",true);
-            CardSystem.main.Purge();
-            Mod.PurgeSave();
+           Mod.DeepCopySave(CardSystem.main.SaveDetails());
+           QuickLogger.Debug("Quitting Purging CardSystem and AlterraHubSave",true);
+           CardSystem.main.Purge();
+           Mod.PurgeSave();
         }
 
         public FCSHUD HUD { get; set; }
 
         public override void OnProtoSerialize(ProtobufSerializer serializer)
         {
-            QuickLogger.Debug("In OnProtoSerialize");
+           QuickLogger.Debug("In OnProtoSerialize");
 
-            if (!Mod.IsSaving())
-            {
-                QuickLogger.Info($"Saving {GetPrefabID()}");
-                Mod.Save();
-                QuickLogger.Info($"Saved {GetPrefabID()}");
-            }
+           if (!Mod.IsSaving())
+           {
+               QuickLogger.Info($"Saving {GetPrefabID()}");
+               Mod.Save();
+               QuickLogger.Info($"Saved {GetPrefabID()}");
+           }
         }
 
         public override void OnProtoDeserialize(ProtobufSerializer serializer)
         {
-            QuickLogger.Debug("In OnProtoDeserialize");
+           QuickLogger.Debug("In OnProtoDeserialize");
 
-            if (_savedData == null)
-            {
-                ReadySaveData();
-            }
+           if (_savedData == null)
+           {
+               ReadySaveData();
+           }
 
-            _isFromSave = true;
+           _isFromSave = true;
         }
 
         public override bool CanDeconstruct(out string reason)
         {
-            reason = string.Empty;
-            return true;
+           reason = string.Empty;
+           return true;
         }
 
         public override void OnConstructedChanged(bool constructed)
         {
-            IsConstructed = constructed;
-            if (constructed)
-            {
-                if (isActiveAndEnabled)
-                {
-                    if (!IsInitialized)
-                    {
-                        Initialize();
-                    }
+           IsConstructed = constructed;
+           if (constructed)
+           {
+               if (isActiveAndEnabled)
+               {
+                   if (!IsInitialized)
+                   {
+                       Initialize();
+                   }
 
-                    IsInitialized = true;
-                }
-                else
-                {
-                    _runStartUpOnEnable = true;
-                }
-            }
+                   IsInitialized = true;
+               }
+               else
+               {
+                   _runStartUpOnEnable = true;
+               }
+           }
         }
 
         internal bool MakeAPurchase(CartDropDownHandler cart,bool giveToPlayer = true)
         {
-            if (giveToPlayer)
-            {
-                var totalCash = cart.GetTotal();
-                if (CardSystem.main.HasEnough(totalCash))
-                {
-                    CardSystem.main.RemoveFinances(totalCash);
-                    foreach (CartItem item in cart.GetItems())
-                    {
-                        for (int i = 0; i < item.ReturnAmount; i++)
-                        {
-                            QuickLogger.Debug($"{item.ReceiveTechType}", true);
-                            PlayerInteractionHelper.GivePlayerItem(item.ReceiveTechType);
-                        }
-                    }
-                }
+           if (giveToPlayer)
+           {
+               var totalCash = cart.GetTotal();
+               if (CardSystem.main.HasEnough(totalCash))
+               {
+                   CardSystem.main.RemoveFinances(totalCash);
+                   foreach (CartItem item in cart.GetItems())
+                   {
+                       for (int i = 0; i < item.ReturnAmount; i++)
+                       {
+                           QuickLogger.Debug($"{item.ReceiveTechType}", true);
+                           PlayerInteractionHelper.GivePlayerItem(item.ReceiveTechType);
+                       }
+                   }
+               }
 
-                return true;
-            }
-            else
-            {
-                //TODO send to DSS
-            }
+               return true;
+           }
+           else
+           {
+               //TODO send to DSS
+           }
 
-            return false;
+           return false;
         }
 
         private void LoadStore()
         {
-            var panelGroup = DisplayManager.GetPanelGroup();
+           var panelGroup = DisplayManager.GetPanelGroup();
             
-            foreach (PanelHelper panelHelper in panelGroup.PanelHelpers)
-            {
-                QuickLogger.Debug($"Loading Panel: {panelHelper.StoreCategory}:");
-                foreach (var storeItem in FCSAlterraHubService.PublicAPI.GetRegisteredKits())
-                {
-                    QuickLogger.Debug($"Trying to add Store Item  {Language.main.Get(storeItem.Key)} to Panel: {panelHelper.StoreCategory}:");
+           foreach (PanelHelper panelHelper in panelGroup.PanelHelpers)
+           {
+               QuickLogger.Debug($"Loading Panel: {panelHelper.StoreCategory}:");
+               foreach (var storeItem in FCSAlterraHubService.PublicAPI.GetRegisteredKits())
+               {
+                   QuickLogger.Debug($"Trying to add Store Item  {Language.main.Get(storeItem.Key)} to Panel: {panelHelper.StoreCategory}:");
 
-                    if (panelHelper.StoreCategory == storeItem.Value.StoreCategory)
-                    {
-                        StoreInventorySystem.AddNewStoreItem(storeItem.Value);
-                        panelHelper.AddContent(StoreInventorySystem.CreateStoreItem(storeItem.Value, AddToCardCallBack,IsInUse));
-                        QuickLogger.Debug($"Added Store Item  {Language.main.Get(storeItem.Key)} to Panel: {panelHelper.StoreCategory}:");
-                    }
-                }
+                   if (panelHelper.StoreCategory == storeItem.Value.StoreCategory)
+                   {
+                       StoreInventorySystem.AddNewStoreItem(storeItem.Value);
+                       panelHelper.AddContent(StoreInventorySystem.CreateStoreItem(storeItem.Value, AddToCardCallBack,IsInUse));
+                       QuickLogger.Debug($"Added Store Item  {Language.main.Get(storeItem.Key)} to Panel: {panelHelper.StoreCategory}:");
+                   }
+               }
 
-                foreach (FCSStoreEntry storeItem in QPatch.Configuration.AdditionalStoreItems)
-                {
-                    if (panelHelper.StoreCategory == storeItem.StoreCategory)
-                    {
-                        QuickLogger.Info($"Item: {storeItem.TechType} || Category: {storeItem.StoreCategory} || Cost: {storeItem.Cost}");
-                        StoreInventorySystem.AddNewStoreItem(storeItem);
-                        panelHelper.AddContent(StoreInventorySystem.CreateStoreItem(storeItem, AddToCardCallBack, IsInUse));
-                    }
-                }
-            }
+               foreach (FCSStoreEntry storeItem in QPatch.Configuration.AdditionalStoreItems)
+               {
+                   if (panelHelper.StoreCategory == storeItem.StoreCategory)
+                   {
+                       QuickLogger.Info($"Item: {storeItem.TechType} || Category: {storeItem.StoreCategory} || Cost: {storeItem.Cost}");
+                       StoreInventorySystem.AddNewStoreItem(storeItem);
+                       panelHelper.AddContent(StoreInventorySystem.CreateStoreItem(storeItem, AddToCardCallBack, IsInUse));
+                   }
+               }
+           }
         }
 
         private bool IsInUse()
         {
-            return _isInUse;
+           return _isInUse;
         }
 
         private void AddToCardCallBack(TechType techType,TechType receiveTechType,int returnAmount)
         {
-            DisplayManager.onItemAddedToCart?.Invoke(techType, receiveTechType,returnAmount);
-        }
-
-        public void Save(SaveData newSaveData, ProtobufSerializer serializer)
-        {
-            if (!IsInitialized || !IsConstructed) return;
-
-            if (_savedData == null)
-            {
-                _savedData = new AlterraHubDataEntry();
-            }
-
-            _savedData.Id = GetPrefabID();
-            _savedData.CartItems = DisplayManager.SaveCartItems();
-            _savedData.Fcs = _colorManager.GetColor().ColorToVector4();
-            newSaveData.AlterraHubEntries.Add(_savedData);
-            QuickLogger.Debug($"Saved ID {_savedData.Id}", true);
-        }
-
-        private void ReadySaveData()
-        {
-            QuickLogger.Debug("In OnProtoDeserialize");
-            _savedData = Mod.GetAlterraHubSaveData(GetPrefabID());
-        }
-
-        public bool IsPlayerInRange()
-        {
-            return AlterraHubTrigger.IsPlayerInRange;
-        }
-
-        private GameObject inputDummy
-        {
-            get
-            {
-                if (this._inputDummy == null)
-                {
-                    this._inputDummy = new GameObject("InputDummy");
-                    this._inputDummy.SetActive(false);
-                }
-                return this._inputDummy;
-            }
-        }
-
-        internal void InterceptInput(bool state)
-        {
-            if (inputDummy.activeSelf == state)
-            {
-                return;
-            }
-            if (state)
-            {
-                _screenBlock.SetActive(false);
-                Player.main.EnterLockedMode(null);
-                MainCameraControl.main.enabled = false;
-                InputHandlerStack.main.Push(inputDummy);
-                _cursorLockCached = UWE.Utils.lockCursor;
-                UWE.Utils.lockCursor = false;
-                return;
-            }
-            
-            UWE.Utils.lockCursor = _cursorLockCached;
-            InputHandlerStack.main.Pop(inputDummy);
-            MainCameraControl.main.enabled = true;
-            _screenBlock.SetActive(true);
-        }
-
-        public void OnHandHover(GUIHand hand)
-        {
-            if (_isInRange)
-            {
-                HandReticle main = HandReticle.main;
-                main.SetInteractText("Click to use Alterra Hub");
-                main.SetIcon(HandReticle.IconType.Hand);
-            }
-        }
-
-        public void OnHandClick(GUIHand hand)
-        {
-            if (_isInRange)
-            {
-                InterceptInput(true);
-                _isInUse = true;
-                SetCameraPosition();
-            }
-        }
-
-        private void SetCameraPosition()
-        {
-            _cameraParent = SNCameraRoot.main.gameObject.transform.parent;
-            var hudCameraPos = _hubCameraPosition.transform.position;
-            var hudCameraRot = _hubCameraPosition.transform.rotation;
-            Player.main.SetPosition(new Vector3(hudCameraPos.x, Player.main.transform.position.y, hudCameraPos.z),
-                hudCameraRot);
-            _playerBody.SetActive(false);
-            //Player.main.gameObject.transform.position = new Vector3(hudCameraPos.x, Player.main.gameObject.transform.position.y, hudCameraPos.z);
-            SNCameraRoot.main.gameObject.transform.SetParent(_hubCameraPosition.transform, false);
-            SNCameraRoot.main.transform.localPosition = Vector3.zero;
-            SNCameraRoot.main.transform.localRotation = Quaternion.identity;
-        }
-
-        internal void ExitStore()
-        {
-            if(_cameraParent == null) return;
-            _isInUse = false;
-            SNCameraRoot.main.gameObject.transform.SetParent(_cameraParent?.transform, false);
-            SNCameraRoot.main.transform.localPosition = Vector3.zero;
-            SNCameraRoot.main.transform.localRotation = Quaternion.identity;
-            ExitLockedMode();
-            _playerBody.SetActive(true);
-        }
-
-        private void ExitLockedMode()
-        {
-            Player.main.ExitLockedMode(false, false);
-            InterceptInput(false);
-        }
-
-        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
-        {
-            return _colorManager.ChangeColor(color, mode);
+           DisplayManager.onItemAddedToCart?.Invoke(techType, receiveTechType,returnAmount);
         }
 
         public override bool AddItemToContainer(InventoryItem item)
         {
-            CardSystem.main.AddFinances(StoreInventorySystem.GetPrice(item.item.GetTechType(),true));
-            Destroy(item.item.gameObject);
-            return true;
+           CardSystem.main.AddFinances(StoreInventorySystem.GetPrice(item.item.GetTechType(),true));
+           Destroy(item.item.gameObject);
+           return true;
         }
 
         public bool IsAllowedToAdd(TechType techType, bool verbose)
         {
-            return StoreInventorySystem.StoreHasItem(techType,true);
+           return StoreInventorySystem.StoreHasItem(techType,true);
         }
 
         public bool IsAllowedToAdd(Pickupable inventoryItem, bool verbose)
         {
-            return false;
+           return false;
         }
     }
 }

@@ -1,24 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.IO;
+using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Helpers;
-using FCS_AlterraHub.Interfaces;
-using FCS_AlterraHub.Model;
-using FCS_AlterraHub.Mono.Controllers;
+using FCS_AlterraHub.Mono.AlterraHub;
+using FCS_AlterraHub.Mono.FCSPDA.Mono.Dialogs;
+using FCS_AlterraHub.Mono.FCSPDA.Mono.Model;
+using FCS_AlterraHub.Mono.FCSPDA.Mono.ScreenItems;
+using FCS_AlterraHub.Patches;
 using FCS_AlterraHub.Registration;
+using FCS_AlterraHub.Structs;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using FMOD;
+using SMLHelper.V2.Utility;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.Video;
+using PDAPages = FCS_AlterraHub.Mono.FCSPDA.Enums.PDAPages;
 using WorldHelpers = FCS_AlterraHub.Helpers.WorldHelpers;
 
 namespace FCS_AlterraHub.Mono.FCSPDA.Mono
 {
-    public class FCSPDAController : MonoBehaviour, IFCSDisplay
+    public class FCSPDAController : MonoBehaviour
     {
         private PDA _pda;
         private int prevQuickSlot;
@@ -29,25 +34,11 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
         private uGUI_InputGroup _ui;
         private Text _clock;
         private bool _isBeingDestroyed;
-        private List<DSSInventoryItem> _inventoryButtons = new List<DSSInventoryItem>();
-        private List<DSSBaseItem> _baseButtons = new List<DSSBaseItem>();
-        private GridHelperV2 _inventoryGrid;
-        private GridHelperV2 _basesGrid;
-        private GameObject _home;
-        private GameObject _bases;
-        private GameObject _baseInventory;
-        private Text _baseNameLBL;
         private Text _currentBiome;
         private Text _accountName;
         private Text _accountBalance;
         private bool _goToEncyclopedia;
-        //private GameObject _missionPage;
-        //private GameObject _messagesPage;
-        private bool _addtempMessage = true;
-        private PaginatorController _inventoryPaginatorController;
-        private PaginatorController _basePaginatorController;
         private bool _depthState;
-
         public float cameraFieldOfView = 62f;
         public float cameraFieldOfViewAtFourThree = 66f;
         public Canvas PdaCanvas { get; set; }
@@ -58,21 +49,23 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
 
         #region SINGLETON PATTERN
         private static FCSPDAController _instance;
-        private GameObject _operationsScrollView;
-        private Transform _operationsScrollViewTrans;
-        private GameObject _itemTransferOperations;
-        private GameObject _addNewOperation;
-        private InputField _deviceIdInput;
-        private FcsDevice _selectedDevice;
-        private Toggle _isPullOperationToggle;
-        private TechType _selectedTransferItem;
-        private Text _itemName;
-        private BaseManager _manager;
-        private bool _fromTransferDialog;
-
+        private Canvas _canvas;
         public static FCSPDAController Instance => _instance;
-
-
+        private readonly Dictionary<PDAPages, GameObject> _pages = new Dictionary<PDAPages, GameObject>();
+        private GameObject _toggleHud;
+        private Dictionary<StoreCategory, List<StoreItem>> _storeItems = new Dictionary<StoreCategory, List<StoreItem>>();
+        private bool _isInUse;
+        private GameObject _storePageGrid;
+        private Text _storeLabel;
+        private CartDropDownHandler _cartDropDownManager;
+        private Text _cartButtonNumber;
+        private Text _cartAmountLabel;
+        private Text _cartTotalLabel;
+        private CheckOutPopupDialogWindow _checkoutDialog;
+        private AccountPageHandler _accountPageHandler;
+        private FCSPDAEntry _savedData;
+        private bool _isInitialized;
+        private bool _cartLoaded;
 
         private void Awake()
         {
@@ -103,7 +96,15 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
         
         private void OnDestroy()
         {
+            _accountPageHandler = null;
+            _cartDropDownManager.OnBuyAllBtnClick -= OnBuyAllBtnClick;
             _isBeingDestroyed = true;
+        }
+
+        private void OnBuyAllBtnClick(CartDropDownHandler obj)
+        {
+            _checkoutDialog.ShowDialog(this, _cartDropDownManager);
+            _cartDropDownManager.ToggleVisibility();
         }
 
         private void Update()
@@ -134,245 +135,149 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             FPSInputModule.current.EscapeMenu();
         }
 
+
         private void Start()
         {
-            _home = GameObjectHelpers.FindGameObject(gameObject, "Home");
-            //_missionPage = GameObjectHelpers.FindGameObject(gameObject, "Missions");
-            
-            _bases = GameObjectHelpers.FindGameObject(gameObject, "Bases");
-            _baseInventory = GameObjectHelpers.FindGameObject(gameObject, "BasesInventory");
-            _baseNameLBL = GameObjectHelpers.FindGameObject(gameObject, "BaseNameLBL")?.GetComponent<Text>();
+            if (_isInitialized) return;
+             _canvas = gameObject.GetComponentInChildren<Canvas>();
             _currentBiome = GameObjectHelpers.FindGameObject(gameObject, "BiomeLBL")?.GetComponent<Text>();
+            _checkoutDialog = _canvas.gameObject.FindChild("Dialogs").FindChild("CheckOutPopUp").AddComponent<CheckOutPopupDialogWindow>();
+
+            _cartDropDownManager = _canvas.gameObject.FindChild("Dialogs").FindChild("CartDropDown").AddComponent<CartDropDownHandler>();
+            _cartDropDownManager.OnBuyAllBtnClick += OnBuyAllBtnClick;
+            _cartDropDownManager.Initialize();
+            _cartDropDownManager.onTotalChanged += amount =>
+            {
+                _cartAmountLabel.text = $"Cart Amount: {amount:n0}";
+                _cartTotalLabel.text = $"Cart Total: {_cartDropDownManager.GetCartCount()}";
+                _cartButtonNumber.text = _cartDropDownManager.GetCartCount().ToString();
+            };
+
+            _toggleHud = GameObjectHelpers.FindGameObject(_canvas.gameObject, "ToggleHud");
             _accountName = GameObjectHelpers.FindGameObject(gameObject, "UserName")?.GetComponent<Text>();
             _accountBalance = GameObjectHelpers.FindGameObject(gameObject, "AccountBalance")?.GetComponent<Text>();
-            _addNewOperation = GameObjectHelpers.FindGameObject(gameObject, "AddNewOperation");
-            _itemTransferOperations = GameObjectHelpers.FindGameObject(gameObject, "ItemTransferOperations");
-            _deviceIdInput = GameObjectHelpers.FindGameObject(gameObject, "DeviceIdInput")?.GetComponent<InputField>();
-            _operationsScrollView = GameObjectHelpers.FindGameObject(gameObject, "OperationsContent");
-            _operationsScrollViewTrans = _operationsScrollView?.transform;
-            _itemName = GameObjectHelpers.FindGameObject(gameObject, "ItemName")?.GetComponent<Text>();
             _clock = GameObjectHelpers.FindGameObject(gameObject, "Clock")?.GetComponent<Text>();
-            _basePaginatorController = GameObjectHelpers.FindGameObject(gameObject, "BasePaginator")?.AddComponent<PaginatorController>();
-            _basePaginatorController?.Initialize(this);
-
-            _isPullOperationToggle = GameObjectHelpers.FindGameObject(gameObject, "IsPullOperationToggle")?.GetComponent<Toggle>();
-
-            _inventoryPaginatorController = GameObjectHelpers.FindGameObject(gameObject, "InventoryPaginator")?.AddComponent<PaginatorController>();
-            _inventoryPaginatorController?.Initialize(this);
-
-            _addtempMessage = false;
-
-            _basesGrid = gameObject.AddComponent<GridHelperV2>();
-            if (_basesGrid != null)
-            {
-                _basesGrid.OnLoadDisplay += OnLoadBasesGrid;
-                _basesGrid.Setup(10, gameObject, Color.gray, Color.white, OnButtonClick);
-            }
             
-            _inventoryGrid = gameObject.AddComponent<GridHelperV2>();
-            _inventoryGrid.OnLoadDisplay += OnLoadItemsGrid;
-            _inventoryGrid.Setup(15, gameObject, Color.gray, Color.white, OnButtonClick);
-
-            var vpb = GameObjectHelpers.FindGameObject(gameObject, "Progress")?.AddComponent<VideoProgressBar>();
-            if(vpb != null)
-            {
-                vpb.VideoPlayer = gameObject.GetComponentInChildren<VideoPlayer>();
-                var stopButton = GameObjectHelpers.FindGameObject(gameObject, "StopButton")?.GetComponent<Button>();
-                if(stopButton != null)
-                    stopButton.onClick.AddListener((() => { vpb.Stop(); }));
-            }
-
-            var canvas = gameObject.GetComponentInChildren<Canvas>();
-
-            CreateBaseInventoryPage();
-            
-            CreateBasePage();
-
+            AddPages();
             CreateHomePage();
+            CreateStorePage();
+            EncyclopediaPage();
+            CreateStorePagePage();
+            AccountPage();
+            LoadStore();
 
-            MaterialHelpers.ChangeEmissionColor(Buildables.AlterraHub.BaseDecalsEmissiveController, gameObject,
-                Color.cyan);
-            
+            MessageBoxHandler.main.ObjectRoot = gameObject;
+            MaterialHelpers.ChangeEmissionColor(Buildables.AlterraHub.BaseDecalsEmissiveController, gameObject,Color.cyan);
             InvokeRepeating(nameof(UpdateDisplay), .5f, .5f);
+            _isInitialized = true;
         }
 
-        private void CreateHomePage()
+        private void AddPages()
         {
-            var baseBTNObj = GameObjectHelpers.FindGameObject(gameObject, "BasesButton");
-            var baseBTNToolTip = baseBTNObj.AddComponent<FCSToolTip>();
-            baseBTNToolTip.RequestPermission += () => true;
-            baseBTNToolTip.Tooltip = "Allows you to pull items from online bases requires connection chip";
-            var basesButton = baseBTNObj.GetComponent<Button>();
-            basesButton.onClick.AddListener(() =>
+            foreach (PDAPages page in Enum.GetValues(typeof(PDAPages)))
             {
-                _bases.SetActive(true);
-                _home.SetActive(false);
-                _baseInventory.SetActive(false);
-            });
-
-            var encyclopObj = GameObjectHelpers.FindGameObject(gameObject, "EncyclopediaButton");
-            var encyclopToolTip = encyclopObj.AddComponent<FCSToolTip>();
-            encyclopToolTip.Tooltip = "Opens the PDA to the encyclopedia tab";
-            encyclopToolTip.RequestPermission += () => true;
-            var encyclopediaButton = encyclopObj.GetComponent<Button>();
-            encyclopediaButton.onClick.AddListener(() =>
-            {
-                _goToEncyclopedia = true;
-                Close();
-            });
-
-            var settingsButton = GameObjectHelpers.FindGameObject(gameObject, "SettingsButton").GetComponent<Button>();
-            settingsButton.onClick.AddListener(() => { QuickLogger.ModMessage("Page Not Implemented"); });
-
-            var messageBTNObj = GameObjectHelpers.FindGameObject(gameObject, "MessagesButton");
-            var messagesButton = messageBTNObj.GetComponent<Button>();
-            var messageBTNToolTip = messageBTNObj.AddComponent<FCSToolTip>();
-            messageBTNToolTip.Tooltip = "Disabled until further notice!";
-            messageBTNToolTip.RequestPermission += () => true;
-            //messagesButton.onClick.AddListener(() =>
-            //{
-            //    _home.SetActive(false);
-            //    _messagesPage.SetActive(true);
-            //});
-
-            var contactsButton = GameObjectHelpers.FindGameObject(gameObject, "ContactsButton").GetComponent<Button>();
-            contactsButton.onClick.AddListener(() => { QuickLogger.ModMessage("Page Not Implemented"); });
-
-            //var messagesBackBTN = GameObjectHelpers.FindGameObject(gameObject, "MessagesBackBTN").GetComponent<Button>();
-            //messagesBackBTN.onClick.AddListener(() =>
-            //{
-            //    _home.SetActive(true);
-            //    _messagesPage.SetActive(false);
-            //});
-
-            //var missionsBackBTN = GameObjectHelpers.FindGameObject(gameObject, "MissionsBackBTN").GetComponent<Button>();
-            //missionsBackBTN.onClick.AddListener(() =>
-            //{
-            //    _home.SetActive(true);
-            //    _missionPage.SetActive(false);
-            //});
-
-            var missionBTNObj = GameObjectHelpers.FindGameObject(gameObject, "MissionsButton");
-            var missionsButton = missionBTNObj.GetComponent<Button>();
-            var missionBTNToolTip = missionBTNObj.AddComponent<FCSToolTip>();
-            missionBTNToolTip.Tooltip = "Disabled until further notice!";
-            missionBTNToolTip.RequestPermission += () => true;
-            //missionsButton.onClick.AddListener(() =>
-            //{
-            //    _home.SetActive(false);
-            //    _missionPage.SetActive(true);
-            //});
-        }
-
-        private void CreateBasePage()
-        {
-            foreach (Transform baseItem in GameObjectHelpers.FindGameObject(_bases, "Grid").transform)
-            {
-                var baseButton = baseItem.gameObject.EnsureComponent<DSSBaseItem>();
-                baseButton.ButtonMode = InterfaceButtonMode.HoverImage;
-                baseButton.BtnName = "BaseBTN";
-                baseButton.OnButtonClick += OnButtonClick;
-                _baseButtons.Add(baseButton);
+                var gPage = GameObjectHelpers.FindGameObject(_canvas.gameObject, page.ToString());
+                _pages.Add(page,gPage);
             }
-
-            var basesBackButton = GameObjectHelpers.FindGameObject(_bases, "ReturnBTN").GetComponent<Button>();
-            basesBackButton.onClick.AddListener(() =>
-            {
-                _bases.SetActive(false);
-                _home.SetActive(true);
-                _baseInventory.SetActive(false);
-            });
-        }
-
-        private void CreateBaseInventoryPage()
-        {
-            foreach (Transform invItem in GameObjectHelpers.FindGameObject(_baseInventory, "Grid").transform)
-            {
-                var invButton = invItem.gameObject.EnsureComponent<DSSInventoryItem>();
-                invButton.ButtonMode = InterfaceButtonMode.HoverImage;
-                invButton.BtnName = "InventoryBTN";
-                invButton.OnButtonClick += OnButtonClick;
-                _inventoryButtons.Add(invButton);
-            }
-
-            var baseInventoryBackButton = GameObjectHelpers.FindGameObject(_baseInventory, "ReturnBTN").GetComponent<Button>();
-            baseInventoryBackButton.onClick.AddListener(() =>
-            {
-                _bases.SetActive(true);
-                _home.SetActive(false);
-                _baseInventory.SetActive(false);
-                UpdateDisplay();
-            });
-
-            var homeButton = GameObjectHelpers.FindGameObject(_baseInventory, "HomeBTN").GetComponent<Button>();
-            homeButton.onClick.AddListener(() =>
-            {
-                _bases.SetActive(false);
-                _home.SetActive(true);
-                _baseInventory.SetActive(false);
-            });
-        }
-
-        private bool ValidateInformation()
-        {
-            var device = FCSAlterraHubService.PublicAPI.FindDevice(_deviceIdInput.text);
-
-            if (device.Value == null)
-            {
-                QuickLogger.Message($"Invalid Device: Device with id {_deviceIdInput.text} not found on base.");
-                return false;
-            }
-
-            _selectedDevice = device.Value;
-
-            if (_isPullOperationToggle.isOn && _selectedTransferItem == TechType.None)
-            {
-                QuickLogger.Message($"Please choose which item to send");
-                return false;
-            }
-
-            return true;
         }
         
+        private void CreateHomePage()
+        {
+            var pageTextLabel = _pages[PDAPages.Home].FindChild("PageName").GetComponent<Text>();
+            var radialMenu = _pages[PDAPages.Home].FindChild("RadialMenu").AddComponent<RadialMenu>();
+            radialMenu.TabAmount = 3;
+            radialMenu.AddEntry(this,ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(),"Icons", "Cart_Icon.png")),pageTextLabel,"Store",PDAPages.Store);
+            radialMenu.AddEntry(this,ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(),"Icons", "EncyclopediaIcon.png")), pageTextLabel,"Encyclopedia",PDAPages.Encyclopedia);
+            radialMenu.AddEntry(this,ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(),"Icons", "IconAccount.png")), pageTextLabel,"Account",PDAPages.AccountPage);
+            radialMenu.Rearrange();
+        }
+
+        private void CreateStorePage()
+        {
+            _cartButtonNumber = GameObjectHelpers.FindGameObject(_pages[PDAPages.Store], "CartCount").GetComponentInChildren<Text>();
+            var pageTextLabel = _pages[PDAPages.Store].FindChild("PageName").GetComponent<Text>();
+            var radialMenu = _pages[PDAPages.Store].FindChild("RadialMenu").AddComponent<RadialMenu>();
+            
+            var cartBTN = _pages[PDAPages.Store].FindChild("Cart").GetComponent<Button>();
+            cartBTN.onClick.AddListener((() =>
+            {
+                _cartDropDownManager.ToggleVisibility();
+            }));
+
+            var returnsBTN = _pages[PDAPages.Store].FindChild("Returns").GetComponent<Button>();
+            returnsBTN.onClick.AddListener((() =>
+            {
+                //_cartDropDownManager.ToggleVisibility();
+            }));
+
+            var backButton = _pages[PDAPages.Store].FindChild("BackBTN").GetComponent<Button>();
+            backButton.onClick.AddListener((() =>
+            {
+                GoToPage(PDAPages.Home);
+            }));
+
+
+            radialMenu.TabAmount = 7;
+            radialMenu.AddEntry(this, ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), "Icons", "HomeSolutionsIcon_W.png")), pageTextLabel, "Home Solutions", PDAPages.HomeSolutions);
+            radialMenu.AddEntry(this, ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), "Icons", "LifeSupportIcon_W.png")), pageTextLabel, "Life Solutions", PDAPages.LifeSolutions);
+            radialMenu.AddEntry(this, ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), "Icons", "EnergySolutionsIcon_W.png")), pageTextLabel, "Energy Solutions", PDAPages.EnergySolutions);
+            radialMenu.AddEntry(this, ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), "Icons", "ProductionSolutionsIcon_W.png")), pageTextLabel, "Production Solutions", PDAPages.ProductionSolutions);
+            radialMenu.AddEntry(this, ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), "Icons", "StoreSolutionsIcon_W.png")), pageTextLabel, "Storage Solutions", PDAPages.StorageSolutions);
+            radialMenu.AddEntry(this, ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), "Icons", "VehicleSolutionsIcon_W.png")), pageTextLabel, "Vehicle Solutions", PDAPages.VehicleSolutions);
+            radialMenu.AddEntry(this, ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), "Icons", "MiscIcon_W.png")), pageTextLabel, "Misc", PDAPages.MiscSolutions);
+
+            _pages[PDAPages.HomeSolutions] = _pages[PDAPages.StorePage];
+            _pages[PDAPages.LifeSolutions] = _pages[PDAPages.StorePage];
+            _pages[PDAPages.EnergySolutions] = _pages[PDAPages.StorePage];
+            _pages[PDAPages.ProductionSolutions] = _pages[PDAPages.StorePage];
+            _pages[PDAPages.StorageSolutions] = _pages[PDAPages.StorePage];
+            _pages[PDAPages.VehicleSolutions] = _pages[PDAPages.StorePage];
+            _pages[PDAPages.MiscSolutions] = _pages[PDAPages.StorePage];
+
+            radialMenu.Rearrange();
+        }
+
+        private void CreateStorePagePage()
+        {
+            var backButton = _pages[PDAPages.StorePage].FindChild("BackBTN").GetComponent<Button>();
+            _cartAmountLabel = _pages[PDAPages.StorePage].FindChild("StoreHud").FindChild("CartAmount").GetComponent<Text>();
+            _cartTotalLabel = _pages[PDAPages.StorePage].FindChild("StoreHud").FindChild("CartTotal").GetComponent<Text>();
+            _storePageGrid = GameObjectHelpers.FindGameObject(_pages[PDAPages.StorePage], "Content");
+            _storeLabel = GameObjectHelpers.FindGameObject(_pages[PDAPages.StorePage], "StoreLabel").GetComponent<Text>();
+            backButton.onClick.AddListener((() =>
+            {
+                GoToPage(PDAPages.Store);
+            }));
+        }
+
+        private void AccountPage()
+        {
+            _accountPageHandler = new AccountPageHandler(this);
+            var backButton = _pages[PDAPages.AccountPage].FindChild("BackBTN").GetComponent<Button>();
+            backButton.onClick.AddListener((() =>
+            {
+                GoToPage(PDAPages.Home);
+            }));
+        }
+
+        private void EncyclopediaPage()
+        {
+            var backButton = _pages[PDAPages.Encyclopedia].FindChild("BackBTN").GetComponent<Button>();
+            backButton.onClick.AddListener((() =>
+            {
+                GoToPage(PDAPages.Home);
+            }));
+        }
+
         private void UpdateDisplay()
         {
-            if (_inventoryGrid == null || _basesGrid == null || _currentBiome == null || _accountName == null) return;
-            _basesGrid.DrawPage();
-            _inventoryGrid.DrawPage();
+            if (_currentBiome == null || _accountName == null) return;
+
             _currentBiome.text = Player.main.GetBiomeString();
             _accountName.text = CardSystem.main.GetUserName();
             _accountBalance.text = $"{CardSystem.main.GetAccountBalance():N0}";
         }
-
-        private void OnButtonClick(string arg1, object arg2)
-        {
-            switch (arg1)
-            {
-                case "InventoryBTN":
-                    var techType = (TechType) arg2;
-                    if (PlayerInteractionHelper.CanPlayerHold(techType))
-                    {
-                        var pickup = _currentBase?.TakeItem(techType);
-                        PlayerInteractionHelper.GivePlayerItem(pickup);
-                        UpdateDisplay();
-                    }
-                    else
-                    {
-                        QuickLogger.ModMessage(Buildables.AlterraHub.InventoryFull());
-                    }
-                    break;
-
-                case "BaseBTN":
-                    _bases.SetActive(false);
-                    _home.SetActive(false);
-                    _baseInventory.SetActive(true);
-                    _currentBase = (BaseManager) arg2;
-                    _baseNameLBL.text = _currentBase.GetBaseName();
-                    UpdateDisplay();
-                    break;
-            }
-        }
-
+        
         internal void OnEnable()
         {
             QuickLogger.Debug($"FCS PDA: Active and Enabled {isActiveAndEnabled}",true);
@@ -381,6 +286,7 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
         public void Open()
         {
             FindPDA();
+            
             _depthState = UwePostProcessingManager.GetDofEnabled();
 
             UwePostProcessingManager.ToggleDof(false);
@@ -412,7 +318,9 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             {
                 _pda.screen.SetActive(false);
             }
+            
             QuickLogger.Debug("FCS PDA Is Open", true);
+
         }
         
         public void Close()
@@ -444,13 +352,6 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             UwePostProcessingManager.ClosePDA();
             _pda.ui.soundQueue.PlayImmediately(_pda.ui.soundClose);
             UwePostProcessingManager.ToggleDof(_depthState);
-            _itemTransferOperations?.SetActive(false);
-
-            if (_fromTransferDialog)
-            {
-                _home.SetActive(true);
-                _fromTransferDialog = false;
-            }
             QuickLogger.Debug("FCS PDA Is Closed", true);
         }
 
@@ -487,106 +388,235 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             }
         }
 
-        private void OnLoadItemsGrid(DisplayData data)
+        internal void ExitStore()
         {
-            try
+            
+        }
+
+        internal void ShowMission()
+        {
+            uGUI_PowerIndicator_Initialize_Patch.MissionHUD.ShowMessage("Hi","Eggo"); 
+        }
+
+        internal bool MakeAPurchase(CartDropDownHandler cart, bool giveToPlayer = true)
+        {
+            if (giveToPlayer)
             {
-                if (_isBeingDestroyed || _currentBase == null) return;
-
-                var grouped = _currentBase.GetItemsWithin().OrderBy(x => x.Key).ToList();
-
-                //if (!string.IsNullOrEmpty(_currentSearchString?.Trim()))
-                //{
-                //    grouped = grouped.Where(p => Language.main.Get(p.Key).StartsWith(_currentSearchString.Trim(), StringComparison.OrdinalIgnoreCase)).ToList();
-                //}
-
-                if (data.EndPosition > grouped.Count)
+                var totalCash = cart.GetTotal();
+                if (CardSystem.main.HasEnough(totalCash))
                 {
-                    data.EndPosition = grouped.Count;
+                    CardSystem.main.RemoveFinances(totalCash);
+                    foreach (CartItem item in cart.GetItems())
+                    {
+                        for (int i = 0; i < item.ReturnAmount; i++)
+                        {
+                            QuickLogger.Debug($"{item.ReceiveTechType}", true);
+                            PlayerInteractionHelper.GivePlayerItem(item.ReceiveTechType);
+                        }
+                    }
                 }
 
-                for (int i = 0; i < data.MaxPerPage; i++)
-                {
-                    _inventoryButtons[i].Reset();
-                }
-
-                var g = 0;
-
-                for (int i = data.StartPosition; i < data.EndPosition; i++)
-                {
-                    _inventoryButtons[g++].Set(grouped.ElementAt(i).Key, grouped.ElementAt(i).Value);
-                }
-
-                _inventoryGrid.UpdaterPaginator(grouped.Count);
-                _inventoryPaginatorController.ResetCount(_inventoryGrid.GetMaxPages());
+                return true;
             }
-            catch (Exception e)
+            else
             {
-                QuickLogger.Error("Error Caught");
-                QuickLogger.Error($"Error Message: {e.Message}");
-                QuickLogger.Error($"Error StackTrace: {e.StackTrace}");
+                //TODO send to DSS
+            }
+
+            return false;
+        }
+
+        public void GoToPage(PDAPages page)
+        {
+            foreach (KeyValuePair<PDAPages, GameObject> cachedPage in _pages)
+            {
+                cachedPage.Value?.SetActive(false);
+            }
+
+            _pages[page].SetActive(true);
+
+
+
+            switch (page)
+            {
+                case PDAPages.Store:
+                    LoadCart(Mod.GetAlterraHubSaveData());
+                    _toggleHud.gameObject.SetActive(true);
+                    break;
+                case PDAPages.Home:
+                case PDAPages.StorePage:
+                case PDAPages.Encyclopedia:
+                case PDAPages.AccountPage:
+                    _toggleHud.gameObject.SetActive(true);
+                    break;
+                default:
+                    LoadStorePage(page);
+                    _toggleHud.gameObject.SetActive(false);
+                    break;
             }
         }
 
-        private void OnLoadBasesGrid(DisplayData data)
+        private void LoadStorePage(PDAPages pages)
         {
-            try
+            StoreCategory category = StoreCategory.None;
+
+            switch (pages)
             {
-                if (_isBeingDestroyed|| _baseButtons?.Count <=0) return;
-
-                var grouped = BaseManager.Managers.Where(x => x != null && !x.GetBaseName().Equals("Cyclops 0")).ToList();
-
-                //if (!string.IsNullOrEmpty(_currentSearchString?.Trim()))
-                //{
-                //    grouped = grouped.Where(p => Language.main.Get(p.Key).StartsWith(_currentSearchString.Trim(), StringComparison.OrdinalIgnoreCase)).ToList();
-                //}
-
-                if (data.EndPosition > grouped.Count)
-                {
-                    data.EndPosition = grouped.Count;
-                }
-
-                for (int i = 0; i < data.MaxPerPage; i++)
-                {
-                    _baseButtons[i].Reset();
-                }
-
-                var g = 0;
-
-                for (int i = data.StartPosition; i < data.EndPosition; i++)
-                {
-
-                    _baseButtons[g++].Set(grouped[i]);
-                }
-
-                _basesGrid.UpdaterPaginator(grouped.Count);
-                _basePaginatorController.ResetCount(_basesGrid.GetMaxPages());
+                case PDAPages.HomeSolutions:
+                    category = StoreCategory.Home;
+                    _storeLabel.text = "Home Solutions";
+                    break;
+                case PDAPages.LifeSolutions:
+                    category = StoreCategory.LifeSupport;
+                    _storeLabel.text = "Life Solutions";
+                    break;
+                case PDAPages.EnergySolutions:
+                    category = StoreCategory.Energy;
+                    _storeLabel.text = "Energy Solutions";
+                    break;
+                case PDAPages.ProductionSolutions:
+                    category = StoreCategory.Production;
+                    _storeLabel.text = "Production Solutions";
+                    break;
+                case PDAPages.StorageSolutions:
+                    category = StoreCategory.Storage;
+                    _storeLabel.text = "Storage Solutions";
+                    break;
+                case PDAPages.VehicleSolutions:
+                    category = StoreCategory.Vehicles;
+                    _storeLabel.text = "Vehicle Solutions";
+                    break;
+                case PDAPages.MiscSolutions:
+                    category = StoreCategory.Misc;
+                    _storeLabel.text = "Misc";
+                    break;
             }
-            catch (Exception e)
+
+            foreach (var storeItem in _storeItems)
             {
-                QuickLogger.Error("Error Caught");
-                QuickLogger.Error($"Error Message: {e.Message}");
-                QuickLogger.Error($"Error StackTrace: {e.StackTrace}");
+                if (storeItem.Key == category)
+                {
+                    foreach (StoreItem item in storeItem.Value)
+                    {
+                        item.Show();
+                    }
+                }
+                else
+                {
+                    foreach (StoreItem item in storeItem.Value)
+                    {
+                        item.Hide();
+                    }
+                }
             }
         }
 
-        public void GoToPage(int index)
+        private void LoadStore()
         {
- 
+
+            foreach (StoreCategory category in Enum.GetValues(typeof(StoreCategory)))
+            {
+                foreach (var storeItem in FCSAlterraHubService.PublicAPI.GetRegisteredKits())
+                {
+                    if(storeItem.Value.StoreCategory != category) continue;
+                    QuickLogger.Debug($"Trying to add Store Item  {Language.main.Get(storeItem.Key)}");
+                    
+                    var item = StoreInventorySystem.CreateStoreItem(storeItem.Value, AddToCardCallBack, IsInUse);
+                    
+                    if (_storeItems.ContainsKey(category))
+                    {
+                        _storeItems[category].Add(item);
+                    }
+                    else
+                    {
+                        _storeItems.Add(category, new List<StoreItem>{item});
+                    }
+
+                    item.gameObject.transform.SetParent(_storePageGrid.transform, false);
+
+                    QuickLogger.Debug($"Added Store Item  {Language.main.Get(storeItem.Key)} with category to Panel: {storeItem.Value.StoreCategory}:");
+                }
+
+                foreach (FCSStoreEntry storeItem in QPatch.Configuration.AdditionalStoreItems)
+                {
+                    if (storeItem.StoreCategory != category) continue;
+
+                    QuickLogger.Debug($"Trying to add Store Item  {Language.main.Get(storeItem.TechType)}");
+
+                    var item = StoreInventorySystem.CreateStoreItem(storeItem, AddToCardCallBack, IsInUse);
+                    if (_storeItems.ContainsKey(category))
+                    {
+                        _storeItems[category].Add(item);
+                    }
+                    else
+                    {
+                        _storeItems.Add(category, new List<StoreItem>{item});
+                    }
+
+                    item.gameObject.transform.SetParent(_storePageGrid.transform,false);
+
+                    QuickLogger.Debug($"Added Store Item  {Language.main.Get(storeItem.TechType)} with category to Panel: {storeItem.StoreCategory}:");
+                }
+            }
         }
 
-        public void GoToPage(int index, PaginatorController sender)
+        private void AddToCardCallBack(TechType techType, TechType receiveTechType, int returnAmount)
         {
-            if (sender == _inventoryPaginatorController)
-            {
-                _inventoryGrid.DrawPage(index);
-            }
-            else if(sender == _basePaginatorController)
-            {
-                QuickLogger.Debug($"Refreshing Base Grid going to page {index} | Controller {sender.gameObject.name}",true);
-                _basesGrid.DrawPage(index);
-            }
+            _cartDropDownManager?.AddItem(techType, receiveTechType, returnAmount);
         }
 
+        private bool IsInUse()
+        {
+            return _isInUse;
+        }
+
+        private void OnQuit()
+        {
+            Mod.DeepCopySave(CardSystem.main.SaveDetails());
+            QuickLogger.Debug("Quitting Purging CardSystem and AlterraHubSave", true);
+            CardSystem.main.Purge();
+            Mod.PurgeSave();
+        }
+
+        internal void Save(SaveData newSaveData)
+        {
+
+            if (_savedData == null)
+            {
+                _savedData = new FCSPDAEntry();
+            }
+
+            _savedData.CartItems = _cartDropDownManager.Save();
+            newSaveData.FCSPDAEntry = _savedData;
+        }
+
+        private string GetPrefabID()
+        {
+            return GetComponent<PrefabIdentifier>()?.Id ?? GetComponentInChildren<PrefabIdentifier>()?.Id;
+        }
+
+        internal void LoadCart(FCSPDAEntry saveData)
+        {
+            _savedData = saveData;
+            if (saveData?.CartItems == null || _cartLoaded)
+            {
+                QuickLogger.Debug(_cartLoaded ? "Cart Items already loaded" : "Cart Items returned Null");
+                _cartLoaded = true;
+                return;
+            }
+
+            foreach (CartItemSaveData cartItem in saveData.CartItems)
+            {
+                _cartDropDownManager.AddItem(cartItem.TechType, cartItem.ReceiveTechType, cartItem.ReturnAmount <= 0 ? 1 : cartItem.ReturnAmount);
+            }
+
+            _cartLoaded = true;
+        }
+
+        public void OpenEncyclopedia(TechType techType)
+        {
+            GoToPage(PDAPages.Encyclopedia);
+            Open();
+        }
     }
 }

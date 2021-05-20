@@ -20,24 +20,7 @@ namespace FCS_AlterraHub.Configuration
             CardSystem.main.AddFinances((decimal) amount);
             return $"Parameters: {amount}";
         }
-
-        [ConsoleCommand("helpMenu")]
-        public static void HelpMenuCommand()
-        {
-            var hubController = GameObject.FindObjectOfType<AlterraHubController>();
-            
-            if(hubController == null) return;
-            if (hubController.HUD.IsOpen)
-            {
-                hubController.HUD.Close();
-            }
-            else
-            {
-                hubController.HUD.Open();
-            }
-        }
-
-
+        
         [ConsoleCommand("TeleportEffects")]
         public static string TeleportPlayerCommand(bool activate)
         {
@@ -75,7 +58,6 @@ namespace FCS_AlterraHub.Configuration
         [ConsoleCommand("UnlockFCSItem")]
         public static string UnlockFCSItem(string techType)
         {
-            BaseManager.GlobalNotifyByID(Mod.AlterraHubTabID, "ActivateGoal");
             BaseManager.ActivateGoalTechType = techType.ToTechType();
             return $"Parameters: {techType}";
         }

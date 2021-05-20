@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Mono.AlterraHub;
+using FCS_AlterraHub.Mono.FCSPDA.Mono.ScreenItems;
 using FCS_AlterraHub.Structs;
 using FCSCommon.Helpers;
 using UnityEngine;
@@ -14,7 +15,7 @@ namespace FCS_AlterraHub.Systems
     /// </summary>
     internal static class StoreInventorySystem
     { 
-        private static readonly Dictionary<FCSStoreEntry, decimal> KnownPrices = new Dictionary<FCSStoreEntry, decimal>();
+        internal static readonly Dictionary<FCSStoreEntry, decimal> KnownPrices = new Dictionary<FCSStoreEntry, decimal>();
         internal static readonly Dictionary<TechType, decimal> OrePrices = new Dictionary<TechType, decimal>
         {
             {TechType.Titanium, 1500},
@@ -67,12 +68,13 @@ namespace FCS_AlterraHub.Systems
             }
         }
 
-        internal static GameObject CreateStoreItem(FCSStoreEntry entry, Action<TechType, TechType,int> addItemCallBack,Func<bool> toolTipPermission)
+        internal static StoreItem CreateStoreItem(FCSStoreEntry entry, Action<TechType, TechType,int> addItemCallBack,Func<bool> toolTipPermission)
         {
             var item = GameObject.Instantiate(AlterraHub.ItemPrefab);
             var storeItem = item.AddComponent<StoreItem>();
             storeItem.Initialize(entry, addItemCallBack, entry.StoreCategory, toolTipPermission);
-            return item;
+            AddNewStoreItem(entry);
+            return storeItem;
         }
 
         internal static decimal CalculateCost(int multiplier, TechType techType)

@@ -1,15 +1,16 @@
 ﻿using System;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Helpers;
+using Oculus.Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.UI;
 #if SUBNAUTICA_STABLE
-using Oculus.Newtonsoft.Json;
+
 #else
 using Newtonsoft.Json;
 #endif
 
-namespace FCS_AlterraHub.Mono.AlterraHub
+namespace FCS_AlterraHub.Mono.FCSPDA.Mono.ScreenItems
 {
     internal class CartItem : MonoBehaviour
     {

@@ -5,6 +5,7 @@ using FCS_AlterraHub.Configuration;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace FCS_AlterraHub.Buildables
 {
@@ -82,21 +83,19 @@ namespace FCS_AlterraHub.Buildables
         internal static string LUMTexture => $"fcs{Mod.ModName}_E";
         internal static string NormalTexture => $"fcs{Mod.ModName}_N";
         internal static string DetailTexture => $"fcs{Mod.ModName}_D";
+
         internal static GameObject OilPrefab { get; set; }
         internal static GameObject OreConsumerPrefab { get; set; }
-        internal static GameObject AlterraHubPrefab { get; private set; }
         internal static GameObject DebitCardPrefab { get; set; }
         internal static GameObject BioFuelPrefab { get; set; }
         internal static GameObject KitPrefab { get; set; }
         internal static GameObject CartItemPrefab { get; set; }
         internal static GameObject FcsPDAPrefab { get; set; }
-        internal static GameObject FCSPDADecoPrefab { get; set; }
+        internal static GameObject PDARadialMenuEntryPrefab { get; set; }
+
         internal static GameObject ColorPickerDialogPrefab { get; set; }
-        internal static GameObject MissionObjectiveItemPrefab { get; set; }
-        public static GameObject MissionItemPrefab { get; set; }
-        public static GameObject PDAEntryPrefab { get; set; }
         public static GameObject MissionMessageBoxPrefab { get; set; }
-        public static GameObject BaseOperationItemPrefab { get; set; }
+        public static GameObject AlterraHubDepotPrefab { get; set; }
 
         public static bool GetPrefabs()
         {
@@ -108,20 +107,17 @@ namespace FCS_AlterraHub.Buildables
 
                     QuickLogger.Debug("GetPrefabs");
                     
-                    if (!LoadAsset("TestItem", QPatch.GlobalBundle, out var colorPickerCanvasGo)) return false;
-                    ColorPickerDialogPrefab = colorPickerCanvasGo;
-
                     if (!LoadAssetV2("fcsPDA", QPatch.GlobalBundle, out var fcsPDAPrefab)) return false;
                     FcsPDAPrefab = fcsPDAPrefab;
 
-                    if (!LoadAsset(Mod.AlterraHubPrefabName, QPatch.GlobalBundle, out var prefabGo)) return false;
-                    AlterraHubPrefab = prefabGo;
+                    if (!LoadAssetV2("RadialMenuEntry", QPatch.GlobalBundle, out var pdaRadialMenuEntryPrefab)) return false;
+                    PDARadialMenuEntryPrefab = pdaRadialMenuEntryPrefab;
 
                     if (!LoadAsset(Mod.CardPrefabName, QPatch.GlobalBundle,out var cardPrefabGo)) return false;
                     DebitCardPrefab = cardPrefabGo;
 
-                    if (!LoadAsset(Mod.BioFuelPrefabName, QPatch.GlobalBundle, out var bioFuelPrefabGo)) return false;
-                    BioFuelPrefab = bioFuelPrefabGo;
+                    //if (!LoadAsset(Mod.BioFuelPrefabName, QPatch.GlobalBundle, out var bioFuelPrefabGo)) return false;
+                    //BioFuelPrefab = bioFuelPrefabGo;
 
                     if (!LoadAsset(Mod.KitPrefabName, QPatch.GlobalBundle, out var kitPrefabGo)) return false; 
                     KitPrefab = kitPrefabGo;
@@ -132,27 +128,21 @@ namespace FCS_AlterraHub.Buildables
                     if (!LoadAsset("CartItem", QPatch.GlobalBundle, out var cartItemPrefabGo)) return false;
                     CartItemPrefab = cartItemPrefabGo;
 
+
+                    if (!LoadAssetV2("AlterraHubDepot", QPatch.GlobalBundle, out var alterraHubDepotPrefab)) return false;
+                    AlterraHubDepotPrefab = alterraHubDepotPrefab;
+
                     if (!LoadAsset("StoreItem", QPatch.GlobalBundle, out var itemPrefabGo)) return false;
                     ItemPrefab = itemPrefabGo;
 
-                    if (!LoadAssetV2("DecoFCSPDA", QPatch.GlobalBundle, out var fcsPDADecoGo)) return false;
-                    FCSPDADecoPrefab = fcsPDADecoGo;
-
-                    if (!LoadAsset("MissionObjectItem", QPatch.GlobalBundle, out var missionObjectiveItemPrefabGo, false)) return false;
-                    MissionObjectiveItemPrefab = missionObjectiveItemPrefabGo;
-
-                    if (!LoadAsset("MissionItem", QPatch.GlobalBundle, out var missionItemPrefabGo, false)) return false;
-                    MissionItemPrefab = missionItemPrefabGo;                    
+                
                     
-                    if (!LoadAsset("PDAEntry", QPatch.GlobalBundle, out var pdaEntryPrefabGo, false)) return false;
-                    PDAEntryPrefab = pdaEntryPrefabGo;
+                    //if (!LoadAsset("PDAEntry", QPatch.GlobalBundle, out var pdaEntryPrefabGo, false)) return false;
+                    //PDAEntryPrefab = pdaEntryPrefabGo;
 
                     if (!LoadAsset("MissionMessageBox", QPatch.GlobalBundle, out var missionMessageBox, false)) return false;
                     MissionMessageBoxPrefab = missionMessageBox;                    
                     
-                    if (!LoadAsset("BaseOperationItem", QPatch.GlobalBundle, out var baseOperationItem, false)) return false;
-                    BaseOperationItemPrefab = baseOperationItem;
-
                     _initialized = true;
                 }
 
@@ -165,7 +155,7 @@ namespace FCS_AlterraHub.Buildables
             }
         }
 
-        private static bool LoadAsset(string prefabName,AssetBundle assetBundle,out GameObject go,bool applyShaders = true)
+        internal static bool LoadAsset(string prefabName,AssetBundle assetBundle,out GameObject go,bool applyShaders = true)
         {
             //We have found the asset bundle and now we are going to continue by looking for the model.
             GameObject prefab = assetBundle.LoadAsset<GameObject>(prefabName);

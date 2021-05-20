@@ -2,6 +2,7 @@
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
+using FCS_AlterraHub.Mono.FCSPDA.Mono.ScreenItems;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
@@ -9,7 +10,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-namespace FCS_AlterraHub.Mono.AlterraHub
+namespace FCS_AlterraHub.Mono.FCSPDA.Mono.Dialogs
 {
     internal class CheckOutPopupDialogWindow : MonoBehaviour
     {
@@ -18,13 +19,13 @@ namespace FCS_AlterraHub.Mono.AlterraHub
         private Text _newBalance;
 
         private bool _isInitialized;
-        private AlterraHubController _mono;
+        private FCSPDAController _mono;
         private CardSystem cardSystem => CardSystem.main;
 
         public CartDropDownHandler _cart;
         public UnityEvent onCheckOutPopupDialogClosed = new UnityEvent();
 
-        private void Initialize(AlterraHubController mono)
+        private void Initialize(FCSPDAController mono)
         {
             if (_isInitialized) return;
 
@@ -42,7 +43,7 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             backBtn.onClick.AddListener(HideDialog);
 
             CardSystem.main.onBalanceUpdated += UpdateScreen;
-            _mono.AlterraHubTrigger.onTriggered += value => { UpdateScreen(); };
+            //_mono.AlterraHubTrigger.onTriggered += value => { UpdateScreen(); };
             
             _isInitialized = true;
         }
@@ -108,23 +109,21 @@ namespace FCS_AlterraHub.Mono.AlterraHub
         private void UpdateScreen()
         {
             QuickLogger.Debug("Updating Screen", true);
-            if (!_mono.IsPlayerInRange()  || !PlayerInteractionHelper.HasCard())
+            if (!PlayerInteractionHelper.HasCard())
             {
-                QuickLogger.Debug($"Player not in range: {_mono.IsPlayerInRange()}",true);
                 _accountBalance.text = Buildables.AlterraHub.AccountBalanceFormat(0);
                 _total.text = Buildables.AlterraHub.CheckOutTotalFormat(_cart?.GetTotal() ?? 0);
                 _newBalance.text = Buildables.AlterraHub.AccountNewBalanceFormat(0);
             }
             else
             {
-                QuickLogger.Debug($"Player is in range: {_mono.IsPlayerInRange()}", true);
                 _accountBalance.text = Buildables.AlterraHub.AccountBalanceFormat(CardSystem.main.GetAccountBalance());
                 _total.text = Buildables.AlterraHub.CheckOutTotalFormat(_cart.GetTotal());
                 _newBalance.text = Buildables.AlterraHub.AccountNewBalanceFormat(CardSystem.main.GetAccountBalance() - _cart.GetTotal());
             }
         }
 
-        internal void ShowDialog(AlterraHubController mono, CartDropDownHandler cart)
+        internal void ShowDialog(FCSPDAController mono, CartDropDownHandler cart)
         {
             Initialize(mono);
             ResetScreen();

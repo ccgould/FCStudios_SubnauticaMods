@@ -139,7 +139,6 @@ namespace FCS_AlterraHub.Patches
         private static GameObject CreateFcsPda(Player __instance)
         {
             var pda = GameObject.Instantiate(AlterraHub.FcsPDAPrefab);
-
             pda.SetActive(false);
             var canvas = pda.GetComponentInChildren<Canvas>();
             if (canvas != null)
@@ -163,6 +162,7 @@ namespace FCS_AlterraHub.Patches
             private static void Postfix(Player __instance)
             {
                 Mod.SaveGamePlaySettings();
+                Mod.Save();
             }
         }
     }

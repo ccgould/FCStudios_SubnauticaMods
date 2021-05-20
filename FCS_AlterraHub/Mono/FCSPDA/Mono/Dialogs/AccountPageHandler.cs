@@ -1,6 +1,7 @@
 ﻿using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
+using FCS_AlterraHub.Mono.FCSPDA.Mono;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Helpers;
 using UnityEngine;
@@ -10,7 +11,6 @@ namespace FCS_AlterraHub.Mono.AlterraHub
 {
     internal class AccountPageHandler
     {
-        private AlterraHubController _mono;
         private string _fullName;
         private string _userName;
         private string _password;
@@ -24,8 +24,9 @@ namespace FCS_AlterraHub.Mono.AlterraHub
         private Text _userNameLBL;
         private GameObject _createAccountDialog;
         private Text _requestButtonText;
+        private FCSPDAController _mono;
 
-        internal AccountPageHandler(AlterraHubController mono)
+        internal AccountPageHandler(FCSPDAController mono)
         {
             _mono = mono;
 

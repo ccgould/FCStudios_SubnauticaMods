@@ -1,17 +1,17 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
+using FCS_AlterraHub.Mono.AlterraHub;
+using FCS_AlterraHub.Mono.FCSPDA.Mono.ScreenItems;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UI;
 
-namespace FCS_AlterraHub.Mono.AlterraHub
+namespace FCS_AlterraHub.Mono.FCSPDA.Mono.Dialogs
 {
     internal class CartDropDownHandler : MonoBehaviour
     {
@@ -43,6 +43,12 @@ namespace FCS_AlterraHub.Mono.AlterraHub
                 }
                 
                 OnBuyAllBtnClick?.Invoke(this);
+            });
+
+            var closeBTN = GameObjectHelpers.FindGameObject(gameObject, "CloseBTN").GetComponent<Button>();
+            closeBTN.onClick.AddListener(() =>
+            {
+                ToggleVisibility();
             });
         }
 

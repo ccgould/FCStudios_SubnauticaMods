@@ -279,7 +279,13 @@ public IEnumerator RestoreItems(ProtobufSerializer serializer, byte[] serialData
             this.storageLabel = storageName;
             Initialize(classID);
         }
-        
+
+        public override void Open(Transform useTransform)
+        {
+            base.Open(useTransform);
+            OnContainerOpened?.Invoke();
+        }
+
         public virtual bool CanBeStored(int amount, TechType techType)
         {
             QuickLogger.Debug($"GetCount: {GetCount()} | Amount {amount} | Slots: {SlotsAssigned}", true);
@@ -304,6 +310,7 @@ public IEnumerator RestoreItems(ProtobufSerializer serializer, byte[] serialData
         }
 
         public bool IsAllowedToRemove { get; set; } = true;
+        public Action OnContainerOpened { get; set; }
 
         public virtual Pickupable RemoveItemFromContainer(TechType techType)
         {

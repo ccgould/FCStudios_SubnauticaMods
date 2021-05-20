@@ -78,7 +78,7 @@ namespace FCS_AlterraHub.Registration
         {
             var prefabID = device.GetPrefabID();
 
-            QuickLogger.Debug($"Attempting to Register: {prefabID} : Contructed {device.IsConstructed}");
+            QuickLogger.Debug($"Attempting to Register: {prefabID} : Constructed {device.IsConstructed}");
 
             if (!device.BypassRegisterCheck)
             {

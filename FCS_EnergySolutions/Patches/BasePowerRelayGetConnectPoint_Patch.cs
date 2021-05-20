@@ -10,12 +10,12 @@ namespace FCS_EnergySolutions.Patches
         [HarmonyPrefix]
         private static bool Prefix(BasePowerRelay __instance,ref Vector3 __result)
         {
-            if (__instance.gameObject.GetComponent<WindSurferOperatorSubroot>() == null)
+            if (__instance?.gameObject?.GetComponent<WindSurferOperatorSubroot>() == null)
             {
                 return true;
             }
 
-            __result = __instance.gameObject.transform.position;
+            __result = __instance?.gameObject?.transform?.position ?? Vector3.zero;
             return false;
 
         }

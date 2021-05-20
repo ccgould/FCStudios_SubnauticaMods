@@ -8,7 +8,7 @@ using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace FCS_AlterraHub.Mono.AlterraHub
+namespace FCS_AlterraHub.Mono.FCSPDA.Mono.ScreenItems
 {
     internal class StoreItem : MonoBehaviour
     {
@@ -87,6 +87,18 @@ namespace FCS_AlterraHub.Mono.AlterraHub
             return sb.ToString();
         }
 
+        public override string ToString()
+        {
+            return $"Store Item: {Language.main.Get(TechType)}";
+        }
 
+        public void Hide()
+        {
+            gameObject.SetActive(false);
+        }
+        public void Show()
+        {
+            gameObject.SetActive(true);
+        }
     }
 }

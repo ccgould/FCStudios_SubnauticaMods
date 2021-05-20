@@ -5,6 +5,7 @@ using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Craftables;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Mono.AlterraHubDepot.Buildable;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Spawnables;
 using FCSCommon.Utilities;
@@ -95,9 +96,9 @@ namespace FCS_AlterraHub
 
         private static void PatchSpawnables()
         {
-            //Patch Bio Fuel
-            var bioFuelSpawnable = new BioFuelSpawnable();
-            bioFuelSpawnable.Patch();
+            ////Patch Bio Fuel
+            //var bioFuelSpawnable = new BioFuelSpawnable();
+            //bioFuelSpawnable.Patch();
             
             //Patch Debit Card
             var debitCardSpawnable = new DebitCardSpawnable();
@@ -107,21 +108,16 @@ namespace FCS_AlterraHub
             var oreConsumerFragment = new OreConsumerFragment();
             oreConsumerFragment.Patch();
             OreConsumerFragTechType = oreConsumerFragment.TechType;
+
+            var alterraHubDepotPatcher = new AlterraHubDepotPatcher();
+            alterraHubDepotPatcher.Patch();
         }
         
         private static void PatchBuildables()
         {
-
-            //Patch AlterraHub
-            var alterraHub = new AlterraHub();
-            alterraHub.Patch();
-
             //Patch OreConsumer
             var oreConsumer = new OreConsumer();
             oreConsumer.Patch();
-
-            //PDATabPatcher.AddPDATab("FSColor");
-
         }
     }
 }

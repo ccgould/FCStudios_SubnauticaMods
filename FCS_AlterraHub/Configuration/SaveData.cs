@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Mono.AlterraHub;
+using FCS_AlterraHub.Mono.FCSPDA.Mono.ScreenItems;
 using FCS_AlterraHub.Objects;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Interfaces;
@@ -25,13 +26,17 @@ namespace FCS_AlterraHub.Configuration
         [JsonProperty(PropertyName = "BT")] internal bool IsBreakerTripped { get; set; }
     }
 
-    [Serializable]
-    internal class AlterraHubDataEntry: ISaveDataEntry
+    internal class AlterraHubDepotEntry : ISaveDataEntry
     {
         public string Id { get; set; }
         public string BaseId { get; set; }
+        [JsonProperty(PropertyName = "COL")] internal Vec4 BodyColor { get; set; }
+    }
+
+    [Serializable]
+    internal class FCSPDAEntry
+    {
         [JsonProperty(PropertyName = "C")] internal IEnumerable<CartItemSaveData> CartItems { get; set; }
-        [JsonProperty(PropertyName = "COL")] internal Vec4 Fcs { get; set; }
     }
     
     [Serializable]
@@ -39,8 +44,10 @@ namespace FCS_AlterraHub.Configuration
     {
         [JsonProperty] internal float SaveVersion { get; set; } = 1.0f;
         [JsonProperty] internal List<OreConsumerDataEntry> OreConsumerEntries = new List<OreConsumerDataEntry>();
-        [JsonProperty] internal List<AlterraHubDataEntry> AlterraHubEntries = new List<AlterraHubDataEntry>();
+        [JsonProperty] internal FCSPDAEntry FCSPDAEntry = new FCSPDAEntry();
         [JsonProperty(PropertyName = "Acc")] internal AccountDetails AccountDetails { get; set; }
+        public List<AlterraHubDepotEntry> AlterraHubDepotEntries { get; set; } = new List<AlterraHubDepotEntry>();
+
         [JsonProperty] internal List<BaseSaveData> BaseSaves = new List<BaseSaveData>();
     }
 }

@@ -155,7 +155,6 @@
   <ItemGroup>
     <Compile Include="API\EasyCraft_API.cs" />
     <Compile Include="API\FCSAssetBundlesService.cs" />
-    <Compile Include="Buildables\AlterraHub.cs" />
     <Compile Include="Buildables\AlterraHubAuxPatcher.cs" />
     <Compile Include="Buildables\AlterraHubModelPrefab.cs" />
     <Compile Include="Buildables\OreConsumer.cs" />
@@ -207,8 +206,8 @@
     <Compile Include="Model\PowercellData.cs" />
     <Compile Include="Model\ProximityActivate.cs" />
     <Compile Include="Model\TimeCache.cs" />
-    <Compile Include="Mono\AlterraHub\Encyclopedia\Encyclopedia.cs" />
-    <Compile Include="Mono\AlterraHub\HubTrigger.cs" />
+    <Compile Include="Mono\AlterraHubDepot\Buildable\AlterraHubDepotPatcher.cs" />
+    <Compile Include="Mono\AlterraHubDepot\Mono\AlterraHubDepotController.cs" />
     <Compile Include="Mono\BaseManager.cs" />
     <Compile Include="Mono\BaseSaveData.cs" />
     <Compile Include="Mono\BaseTransferOperation.cs" />
@@ -221,11 +220,11 @@
     <Compile Include="Mono\DumpContainerSimplified.cs" />
     <Compile Include="Mono\FCSAquarium.cs" />
     <Compile Include="Mono\FCSButton.cs" />
-    <Compile Include="Mono\FCSPDA\Mono\DSSBaseItem.cs" />
-    <Compile Include="Mono\FCSPDA\Mono\DSSInventoryItem.cs" />
+    <Compile Include="Mono\FCSPDA\Enums\PDAPages.cs" />
     <Compile Include="Mono\FCSPDA\Mono\FCSEncyclopediaData.cs" />
     <Compile Include="Mono\FCSPDA\Mono\FCSPDAController.cs" />
-    <Compile Include="Mono\FCSPDA\Mono\VideoProgressBar.cs" />
+    <Compile Include="Mono\FCSPDA\Mono\Model\RadialMenu.cs" />
+    <Compile Include="Mono\FCSPDA\Mono\Model\RadialMenuEntry.cs" />
     <Compile Include="Mono\FCSStorage.cs" />
     <Compile Include="Mono\FCSStorageNonSerialized.cs" />
     <Compile Include="Mono\FCSTechLigtController.cs" />
@@ -248,18 +247,13 @@
     <Compile Include="Objects\ColorList.cs" />
     <Compile Include="Helpers\FCSHUD.cs" />
     <Compile Include="Interfaces\IFCSStorage.cs" />
-    <Compile Include="Mono\AlterraHub\AccountPageHandler.cs" />
-    <Compile Include="Mono\AlterraHub\AlterraHubDisplay.cs" />
-    <Compile Include="Mono\AlterraHub\CartDropDownHandler.cs" />
-    <Compile Include="Mono\AlterraHub\CartItem.cs" />
-    <Compile Include="Mono\AlterraHub\CheckOutPopupDialogWindow.cs" />
-    <Compile Include="Mono\AlterraHub\PanelGroup.cs" />
-    <Compile Include="Mono\AlterraHub\PanelHelper.cs" />
+    <Compile Include="Mono\FCSPDA\Mono\Dialogs\AccountPageHandler.cs" />
+    <Compile Include="Mono\FCSPDA\Mono\Dialogs\CartDropDownHandler.cs" />
+    <Compile Include="Mono\FCSPDA\Mono\ScreenItems\CartItem.cs" />
+    <Compile Include="Mono\FCSPDA\Mono\Dialogs\CheckOutPopupDialogWindow.cs" />
     <Compile Include="Mono\ColorManager.cs" />
     <Compile Include="Mono\CustomInputField.cs" />
-    <Compile Include="Mono\AlterraHub\StoreItem.cs" />
-    <Compile Include="Mono\AlterraHub\TabButton.cs" />
-    <Compile Include="Mono\AlterraHub\TabGroup.cs" />
+    <Compile Include="Mono\FCSPDA\Mono\ScreenItems\StoreItem.cs" />
     <Compile Include="Mono\DumpContainer.cs" />
     <Compile Include="Mono\OreConsumer\AudioManager.cs" />
     <Compile Include="Mono\OreConsumer\EffectsManager.cs" />
@@ -287,7 +281,6 @@
     <Compile Include="Spawnables\BioFuelSpawnable.cs" />
     <Compile Include="Enumerators\ModDifficultyMode.cs" />
     <Compile Include="Helpers\PlayerInteractionHelper.cs" />
-    <Compile Include="Mono\AlterraHub\AlterraHubController.cs" />
     <Compile Include="Mono\FcsCard.cs" />
     <Compile Include="Mono\FCSDevice.cs" />
     <Compile Include="Mono\FCSGameLoadUtil.cs" />
@@ -302,6 +295,7 @@
     <Compile Include="Systems\StoreInventorySystem.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Mono\AlterraHubDepot\Model\" />
     <Folder Include="UI\" />
   </ItemGroup>
   <ItemGroup>

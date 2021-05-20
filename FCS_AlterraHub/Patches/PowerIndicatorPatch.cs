@@ -29,9 +29,6 @@ namespace FCS_AlterraHub.Patches
             prefab.transform.SetSiblingIndex(0);
             MissionHUD = prefab.AddComponent<MissionHUD>();
             IndicatorInstance = __instance;
-
-
-            IndicatorInstance = __instance;
         }
 
         public static uGUI_PowerIndicator IndicatorInstance { get; set; }

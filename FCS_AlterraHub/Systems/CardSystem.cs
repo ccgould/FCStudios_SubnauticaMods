@@ -216,7 +216,6 @@ namespace FCS_AlterraHub.Systems
             }
             catch (Exception e)
             {
-                BaseManager.GlobalNotifyByID(Mod.AlterraHubTabID,"ErrorLoadingAccount");
                 QuickLogger.Error($"StackTrace: {e.StackTrace}");
                 QuickLogger.Error($"Message: {e.Message}");
             }
