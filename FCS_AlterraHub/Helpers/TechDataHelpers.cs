@@ -156,5 +156,11 @@ namespace FCS_AlterraHub.Helpers
 
             return _ingredients;
         }
+
+        public static void AddPowercell(TechType techType)
+        {
+            if (PowerCellCharger.compatibleTech.Contains(techType)) return;
+            PowerCellCharger.compatibleTech.Add(techType);
+        }
     }
 }

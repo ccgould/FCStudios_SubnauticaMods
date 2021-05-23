@@ -50,6 +50,7 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono.Model
         {
             _controller.GoToPage(_page);
             Hover.SetActive(false);
+            _label.text = string.Empty;
         }
     }
 }

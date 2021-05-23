@@ -11,7 +11,11 @@ using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Assets;
+using SMLHelper.V2.Utility;
 using UnityEngine;
+#if SUBNAUTICA
+using Sprite = Atlas.Sprite;
+#endif
 
 namespace FCS_EnergySolutions.Spawnables
 {
@@ -22,7 +26,7 @@ namespace FCS_EnergySolutions.Spawnables
         {
             OnStartedPatching += () =>
             {
-                var WindSurferPlatformKit = new FCSKit(Mod.WindSurferPlatformKitClassID, Mod.WindSurferPlatformFriendlyName,Path.Combine(AssetsFolder, $"{ClassID}.png"));
+                var WindSurferPlatformKit = new FCSKit(Mod.WindSurferPlatformKitClassID, Mod.WindSurferPlatformFriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 WindSurferPlatformKit.Patch();
             };
 
@@ -37,7 +41,7 @@ namespace FCS_EnergySolutions.Spawnables
         {
             try
             {
-                var prefab = GameObject.Instantiate(ModelPrefab.GetPrefab(Mod.WindSurferPlatformPrefabName, true)); 
+                var prefab = GameObject.Instantiate(ModelPrefab.GetPrefab(Mod.WindSurferPlatformPrefabName, true));
 
                 PrefabIdentifier prefabIdentifier = prefab.AddComponent<PrefabIdentifier>();
                 prefabIdentifier.ClassId = this.ClassID;
@@ -65,7 +69,7 @@ namespace FCS_EnergySolutions.Spawnables
 
                 MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, prefab, Color.cyan);
                 MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseLightsEmissiveController, prefab, 4f);
-                MaterialHelpers.ApplyEmissionShader("fcs_WS_BP", "fcs_WS_E",prefab,ModelPrefab.ModBundle,Color.white);
+                MaterialHelpers.ApplyEmissionShader("fcs_WS_BP", "fcs_WS_E", prefab, ModelPrefab.ModBundle, Color.white);
                 MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModName);
                 MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseBeaconLightEmissiveController, prefab, 6);
 
@@ -75,7 +79,7 @@ namespace FCS_EnergySolutions.Spawnables
                     var vfxSurface = col.gameObject.AddComponent<VFXSurface>();
                     vfxSurface.surfaceType = VFXSurfaceTypes.metal;
                 }
-                
+
                 var ps = prefab.AddComponent<PowerSource>();
                 ps.maxPower = 0f;
 
@@ -95,5 +99,9 @@ namespace FCS_EnergySolutions.Spawnables
 
         }
 #endif
+        protected override Sprite GetItemSprite()
+        {
+            return ImageUtils.LoadSpriteFromFile(Path.Combine(AssetsFolder, $"{ClassID}.png"));
+        }
     }
 }

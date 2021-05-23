@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono.AlterraHub;
+using FCS_AlterraHub.Mono.AlterraHubDepot.Mono;
 using FCS_AlterraHub.Mono.FCSPDA.Mono.Dialogs;
 using FCS_AlterraHub.Mono.FCSPDA.Mono.Model;
 using FCS_AlterraHub.Mono.FCSPDA.Mono.ScreenItems;
@@ -12,6 +15,7 @@ using FCS_AlterraHub.Patches;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Structs;
 using FCS_AlterraHub.Systems;
+using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using FMOD;
@@ -27,7 +31,6 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
     {
         private PDA _pda;
         private int prevQuickSlot;
-        public GameObject PDAObj { get; set; }
         private Sequence sequence = new Sequence(false);
         private BaseManager _currentBase;
         private GameObject _inputDummy;
@@ -39,22 +42,9 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
         private Text _accountBalance;
         private bool _goToEncyclopedia;
         private bool _depthState;
-        public float cameraFieldOfView = 62f;
-        public float cameraFieldOfViewAtFourThree = 66f;
-        public Canvas PdaCanvas { get; set; }
-        internal bool IsOpen { get; private set; }
-        public Action OnClose { get; set; }
-        public Channel AudioTrack { get; set; }
-        public bool isFocused => this.ui != null && this.ui.focused;
-
-        #region SINGLETON PATTERN
-        private static FCSPDAController _instance;
-        private Canvas _canvas;
-        public static FCSPDAController Instance => _instance;
         private readonly Dictionary<PDAPages, GameObject> _pages = new Dictionary<PDAPages, GameObject>();
         private GameObject _toggleHud;
         private Dictionary<StoreCategory, List<StoreItem>> _storeItems = new Dictionary<StoreCategory, List<StoreItem>>();
-        private bool _isInUse;
         private GameObject _storePageGrid;
         private Text _storeLabel;
         private CartDropDownHandler _cartDropDownManager;
@@ -65,7 +55,39 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
         private AccountPageHandler _accountPageHandler;
         private FCSPDAEntry _savedData;
         private bool _isInitialized;
+        private Canvas _canvas;
+
+        private Dictionary<string, List<EncyclopediaEntryData>> encyclopediaEntryDatas =>
+            QPatch.EncyclopediaConfig.EncyclopediaEntries;
         private bool _cartLoaded;
+
+        public GameObject PDAObj { get; set; }
+        public float cameraFieldOfView = 62f;
+        public float cameraFieldOfViewAtFourThree = 66f;
+        public Canvas PdaCanvas { get; set; }
+        internal bool IsOpen { get; private set; }
+        public Action OnClose { get; set; }
+        public Channel AudioTrack { get; set; }
+        public bool isFocused => this.ui != null && this.ui.focused;
+        public uGUI_InputGroup ui
+        {
+            get
+            {
+                if (_ui == null)
+                {
+                    _ui = gameObject.GetComponentInChildren<Canvas>(true).gameObject.AddComponent<uGUI_InputGroup>();
+                }
+                return _ui;
+            }
+        }
+        
+        #region SINGLETON PATTERN
+        private static FCSPDAController _instance;
+        private ReturnsDialogController _returnsDialogController;
+        private List<MeshRenderer> _pdaMeshes = new List<MeshRenderer>();
+        private EncyclopediaController _encyclopediaController;
+        public static FCSPDAController Instance => _instance;
+        #endregion
 
         private void Awake()
         {
@@ -78,22 +100,7 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
                 _instance = this;
             }
         }
-    
-    #endregion
 
-
-    public uGUI_InputGroup ui
-        {
-            get
-            {
-                if (_ui == null)
-                {
-                    _ui = gameObject.GetComponentInChildren<Canvas>(true).gameObject.AddComponent<uGUI_InputGroup>();
-                }
-                return _ui;
-            }
-        }
-        
         private void OnDestroy()
         {
             _accountPageHandler = null;
@@ -135,13 +142,16 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             FPSInputModule.current.EscapeMenu();
         }
 
-
         private void Start()
         {
             if (_isInitialized) return;
              _canvas = gameObject.GetComponentInChildren<Canvas>();
             _currentBiome = GameObjectHelpers.FindGameObject(gameObject, "BiomeLBL")?.GetComponent<Text>();
+            _encyclopediaController = GameObjectHelpers.FindGameObject(gameObject, "Encyclopedia").AddComponent<EncyclopediaController>();
             _checkoutDialog = _canvas.gameObject.FindChild("Dialogs").FindChild("CheckOutPopUp").AddComponent<CheckOutPopupDialogWindow>();
+
+            _returnsDialogController = _canvas.gameObject.FindChild("Dialogs").FindChild("ReturnItemsDialog").AddComponent<ReturnsDialogController>();
+            _returnsDialogController.Initialize(this);
 
             _cartDropDownManager = _canvas.gameObject.FindChild("Dialogs").FindChild("CartDropDown").AddComponent<CartDropDownHandler>();
             _cartDropDownManager.OnBuyAllBtnClick += OnBuyAllBtnClick;
@@ -169,6 +179,7 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             MessageBoxHandler.main.ObjectRoot = gameObject;
             MaterialHelpers.ChangeEmissionColor(Buildables.AlterraHub.BaseDecalsEmissiveController, gameObject,Color.cyan);
             InvokeRepeating(nameof(UpdateDisplay), .5f, .5f);
+            InGameMenuQuitPatcher.AddEventHandlerIfMissing(OnQuit);
             _isInitialized = true;
         }
 
@@ -205,10 +216,10 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             }));
 
             var returnsBTN = _pages[PDAPages.Store].FindChild("Returns").GetComponent<Button>();
-            returnsBTN.onClick.AddListener((() =>
+            returnsBTN.onClick.AddListener(() =>
             {
-                //_cartDropDownManager.ToggleVisibility();
-            }));
+                _returnsDialogController.Open();
+            });
 
             var backButton = _pages[PDAPages.Store].FindChild("BackBTN").GetComponent<Button>();
             backButton.onClick.AddListener((() =>
@@ -286,7 +297,14 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
         public void Open()
         {
             FindPDA();
-            
+
+            ChangePDAVisibility(false);
+
+            if (_returnsDialogController?.IsOpen ?? false)
+            {
+                _returnsDialogController.Open();
+            }
+
             _depthState = UwePostProcessingManager.GetDofEnabled();
 
             UwePostProcessingManager.ToggleDof(false);
@@ -326,6 +344,7 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
         public void Close()
         {
             IsOpen = false;
+            ChangePDAVisibility(true);
             _pda.isInUse = false;
             Player main = Player.main;
             MainCameraControl.main.ResetLockedVRViewModelAngle();
@@ -353,6 +372,15 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             _pda.ui.soundQueue.PlayImmediately(_pda.ui.soundClose);
             UwePostProcessingManager.ToggleDof(_depthState);
             QuickLogger.Debug("FCS PDA Is Closed", true);
+        }
+
+        private void ChangePDAVisibility(bool value)
+        {
+            _pda.gameObject.SetActive(!value);
+            foreach (var meshRenderer in _pdaMeshes)
+            {
+                meshRenderer.enabled = value;
+            }
         }
 
         public void Activated()
@@ -386,11 +414,16 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
                 Player main = Player.main;
                 _pda = main.GetPDA();
             }
+
+            foreach (MeshRenderer meshRenderer in _pda.gameObject.GetComponentsInChildren<MeshRenderer>())
+            {
+                _pdaMeshes.Add(meshRenderer);
+            }
         }
 
         internal void ExitStore()
         {
-            
+            GoToPage(PDAPages.Home);
         }
 
         internal void ShowMission()
@@ -398,14 +431,14 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             uGUI_PowerIndicator_Initialize_Patch.MissionHUD.ShowMessage("Hi","Eggo"); 
         }
 
-        internal bool MakeAPurchase(CartDropDownHandler cart, bool giveToPlayer = true)
+        internal bool MakeAPurchase(CartDropDownHandler cart, AlterraHubDepotController depot = null, bool giveToPlayer = false)
         {
+            var totalCash = cart.GetTotal();
+            var sizes = GetSizes(cart);
             if (giveToPlayer)
             {
-                var totalCash = cart.GetTotal();
-                if (CardSystem.main.HasEnough(totalCash))
+                if (CardSystem.main.HasEnough(totalCash) && Inventory.main.container.HasRoomFor(sizes))
                 {
-                    CardSystem.main.RemoveFinances(totalCash);
                     foreach (CartItem item in cart.GetItems())
                     {
                         for (int i = 0; i < item.ReturnAmount; i++)
@@ -415,15 +448,44 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
                         }
                     }
                 }
-
-                return true;
+                else
+                {
+                    return false;
+                }
             }
             else
             {
-                //TODO send to DSS
+                if (depot == null || !depot.HasRoomFor(sizes))
+                {
+                    MessageBoxHandler.main.Show(depot == null ? Buildables.AlterraHub.DepotNotFound() : Buildables.AlterraHub.DepotFull(), FCSMessageButton.OK);
+                    return false;
+                }
+
+                foreach (var cartItem in cart.GetItems())
+                {
+                    for (int i = 0; i < cartItem.ReturnAmount; i++)
+                    {
+                        depot.AddItemToStorage(cartItem.ReceiveTechType.ToInventoryItemLegacy());
+                    }
+                }
             }
 
-            return false;
+            CardSystem.main.RemoveFinances(totalCash);
+            return true;
+        }
+
+        private static List<Vector2int> GetSizes(CartDropDownHandler cart)
+        {
+            var items = new List<Vector2int>();
+            foreach (CartItem cartItem in cart.GetItems())
+            {
+                for (int i = 0; i < cartItem.ReturnAmount; i++)
+                {
+                    items.Add(CraftData.GetItemSize(cartItem.TechType));
+                }
+            }
+
+            return items;
         }
 
         public void GoToPage(PDAPages page)
@@ -440,7 +502,11 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             switch (page)
             {
                 case PDAPages.Store:
-                    LoadCart(Mod.GetAlterraHubSaveData());
+                    if (_savedData == null || !_cartLoaded)
+                    {
+                        _savedData = Mod.GetAlterraHubSaveData();
+                        LoadCart();
+                    }
                     _toggleHud.gameObject.SetActive(true);
                     break;
                 case PDAPages.Home:
@@ -567,7 +633,7 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
 
         private bool IsInUse()
         {
-            return _isInUse;
+            return IsOpen;
         }
 
         private void OnQuit()
@@ -590,22 +656,16 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             newSaveData.FCSPDAEntry = _savedData;
         }
 
-        private string GetPrefabID()
+        internal void LoadCart()
         {
-            return GetComponent<PrefabIdentifier>()?.Id ?? GetComponentInChildren<PrefabIdentifier>()?.Id;
-        }
-
-        internal void LoadCart(FCSPDAEntry saveData)
-        {
-            _savedData = saveData;
-            if (saveData?.CartItems == null || _cartLoaded)
+            if (_savedData?.CartItems == null)
             {
-                QuickLogger.Debug(_cartLoaded ? "Cart Items already loaded" : "Cart Items returned Null");
+                QuickLogger.Debug("Cart Items returned Null");
                 _cartLoaded = true;
                 return;
             }
 
-            foreach (CartItemSaveData cartItem in saveData.CartItems)
+            foreach (CartItemSaveData cartItem in _savedData.CartItems)
             {
                 _cartDropDownManager.AddItem(cartItem.TechType, cartItem.ReceiveTechType, cartItem.ReturnAmount <= 0 ? 1 : cartItem.ReturnAmount);
             }
@@ -617,6 +677,45 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
         {
             GoToPage(PDAPages.Encyclopedia);
             Open();
+        }
+    }
+
+    internal class EncyclopediaController : MonoBehaviour
+    {
+        internal void Initialize()
+        {
+            var entries = FCSAlterraHubService.PublicAPI.GetEncyclopediaEntries();
+
+            var encyclopediaList = gameObject.FindChild("DataView").FindChild("Viewport").FindChild("Content");
+            foreach (KeyValuePair<TechType, List<EncyclopediaEntryData>> entry in entries)
+            {
+                foreach (EncyclopediaEntryData data in entry.Value)
+                {
+                    var entryPrefab = GameObject.Instantiate(Buildables.AlterraHub.EncyclopediaEntryPrefab);
+                    var entryController = entryPrefab.AddComponent<EncyclopediaEntryController>();
+                    entryController.Initialize(data,LoadData);
+                }
+            }
+        }
+
+        private void LoadData(EncyclopediaEntryData data)
+        {
+            
+        }
+    }
+
+    internal class EncyclopediaEntryController : MonoBehaviour
+    {
+        private EncyclopediaEntryData _data;
+
+        internal void Initialize(EncyclopediaEntryData data, Action<EncyclopediaEntryData> callback)
+        {
+            _data = data;
+            gameObject.GetComponent<Text>().text = data.TabTitle;
+            var button = gameObject.GetComponent<Button>();
+            button.onClick.AddListener((() => {
+                callback?.Invoke(_data);
+            }));
         }
     }
 }

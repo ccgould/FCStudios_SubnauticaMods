@@ -91,8 +91,8 @@ namespace FCS_AlterraHub.Patches
                 SunTarget = go.transform;
             }
 
-            CoroutineHost.StartCoroutine(Mod.SpawnOreConsumerFrag());
-            
+            CoroutineHost.StartCoroutine(Mod.SpawnAlterraFabStation());
+
         }
         public static Transform SunTarget { get; set; }
     }

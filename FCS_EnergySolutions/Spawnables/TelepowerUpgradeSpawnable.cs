@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Registration;
@@ -7,8 +8,11 @@ using FCS_EnergySolutions.Configuration;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Assets;
-using SMLHelper.V2.Handlers;
+using SMLHelper.V2.Utility;
 using UnityEngine;
+#if SUBNAUTICA
+using Sprite = Atlas.Sprite;
+#endif
 
 namespace FCS_EnergySolutions.Spawnables
 {
@@ -68,6 +72,11 @@ namespace FCS_EnergySolutions.Spawnables
                 QuickLogger.Error(e.Message);
                 return null;
             }
+        }
+
+        protected override Sprite GetItemSprite()
+        {
+            return ImageUtils.LoadSpriteFromFile(Path.Combine(AssetsFolder, $"{ClassID}.png"));
         }
     }
 }

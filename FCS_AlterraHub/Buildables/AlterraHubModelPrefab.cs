@@ -96,6 +96,10 @@ namespace FCS_AlterraHub.Buildables
         internal static GameObject ColorPickerDialogPrefab { get; set; }
         public static GameObject MissionMessageBoxPrefab { get; set; }
         public static GameObject AlterraHubDepotPrefab { get; set; }
+        public static GameObject AlterraHubDepotItemPrefab { get; set; }
+        public static GameObject EncyclopediaEntryPrefab { get; set; }
+        public static GameObject AlterraHubFabricatorPrefab { get; set; }
+        public static GameObject AlterraHubDepotFragmentPrefab { get; set; }
 
         public static bool GetPrefabs()
         {
@@ -135,13 +139,25 @@ namespace FCS_AlterraHub.Buildables
                     if (!LoadAsset("StoreItem", QPatch.GlobalBundle, out var itemPrefabGo)) return false;
                     ItemPrefab = itemPrefabGo;
 
+                    if (!LoadAsset("MissionMessageBox", QPatch.GlobalBundle, out var missionMessageBox, false)) return false;
+                    MissionMessageBoxPrefab = missionMessageBox;
+
+                    if (!LoadAsset("AlterraHubDepotItem", QPatch.GlobalBundle, out var alterraHubDepotItemPrefab)) return false;
+                    AlterraHubDepotItemPrefab = alterraHubDepotItemPrefab;                    
+                    
+                    if (!LoadAsset("EncyclopediaEntry", QPatch.GlobalBundle, out var encyclopediaEntryPrefab)) return false;
+                    EncyclopediaEntryPrefab = encyclopediaEntryPrefab;                    
+                    
+                    if (!LoadAsset("AlterraHubFabStation", QPatch.GlobalBundle, out var alterraHubFabricatorPrefab)) return false;
+                    AlterraHubFabricatorPrefab = alterraHubFabricatorPrefab;                    
+                    
+                    if (!LoadAsset("AlterraHubDepotFrag", QPatch.GlobalBundle, out var alterraHubDepotFragmentPrefab)) return false;
+                    AlterraHubDepotFragmentPrefab = alterraHubDepotFragmentPrefab;
+
                 
                     
                     //if (!LoadAsset("PDAEntry", QPatch.GlobalBundle, out var pdaEntryPrefabGo, false)) return false;
                     //PDAEntryPrefab = pdaEntryPrefabGo;
-
-                    if (!LoadAsset("MissionMessageBox", QPatch.GlobalBundle, out var missionMessageBox, false)) return false;
-                    MissionMessageBoxPrefab = missionMessageBox;                    
                     
                     _initialized = true;
                 }

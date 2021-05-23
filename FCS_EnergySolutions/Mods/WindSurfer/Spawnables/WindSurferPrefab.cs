@@ -11,7 +11,11 @@ using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Assets;
+using SMLHelper.V2.Utility;
 using UnityEngine;
+#if SUBNAUTICA
+using Sprite = Atlas.Sprite;
+#endif
 
 namespace FCS_EnergySolutions.Spawnables
 {
@@ -94,5 +98,9 @@ namespace FCS_EnergySolutions.Spawnables
 
         }
 #endif
+        protected override Sprite GetItemSprite()
+        {
+            return ImageUtils.LoadSpriteFromFile(Path.Combine(AssetsFolder, $"{ClassID}.png"));
+        }
     }
 }

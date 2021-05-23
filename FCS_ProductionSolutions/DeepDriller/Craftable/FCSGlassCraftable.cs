@@ -1,11 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using FCS_ProductionSolutions.Configuration;
 using FCSCommon.Extensions;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
+using SMLHelper.V2.Utility;
 using UnityEngine;
 using UWE;
+#if SUBNAUTICA
+using RecipeData = SMLHelper.V2.Crafting.TechData;
+using Sprite = Atlas.Sprite;
+#endif
 
 namespace FCS_ProductionSolutions.DeepDriller.Craftable
 {
@@ -45,34 +51,22 @@ namespace FCS_ProductionSolutions.DeepDriller.Craftable
             return null;
         }
 
-#if SUBNAUTICA
-        protected override TechData GetBlueprintRecipe()
+        protected override RecipeData GetBlueprintRecipe()
         {
             return new TechData
             {
-                LinkedItems = new List<TechType> { TechType.Glass },
+                LinkedItems = new List<TechType> {TechType.Glass},
                 craftAmount = 0,
                 Ingredients = new List<Ingredient>()
                 {
                     new Ingredient(Mod.SandSpawnableClassID.ToTechType(), 1)
                 }
-            }; ;
-        }
-
-        protected override Atlas.Sprite GetItemSprite()
-        {
-            return SpriteManager.Get(TechType.Glass);
-        }
-#elif BELOWZERO
-        protected override RecipeData GetBlueprintRecipe()
-        {
-            return _ingredients;
+            };
         }
 
         protected override Sprite GetItemSprite()
         {
-            return ImageUtils.LoadSpriteFromFile(Path.Combine(_assetFolder, $"{_iconFileName}.png"));
+            return SpriteManager.Get(TechType.Glass);
         }
-#endif
     }
 }

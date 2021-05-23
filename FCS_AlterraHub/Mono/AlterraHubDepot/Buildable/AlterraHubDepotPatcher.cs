@@ -7,6 +7,11 @@ using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Utility;
 using UnityEngine;
+#if SUBNAUTICA
+using RecipeData = SMLHelper.V2.Crafting.TechData;
+using Sprite = Atlas.Sprite;
+#endif
+
 
 namespace FCS_AlterraHub.Mono.AlterraHubDepot.Buildable
 {
@@ -78,14 +83,14 @@ namespace FCS_AlterraHub.Mono.AlterraHubDepot.Buildable
                 PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
                 prefabID.ClassId = ClassID;
 
-                prefab.SetActive(false);
-                var fcsStorage = prefab.AddComponent<FCSStorage>();
-                fcsStorage.Initialize(48,6,8,Mod.AlterraHubDepotFriendly, Mod.AlterraHubDepotClassID);
-                prefab.SetActive(true);
-
                 prefab.AddComponent<TechTag>().type = TechType;
                 prefab.AddComponent<AlterraHubDepotController>();
                 prefab.AddComponent<FCSGameLoadUtil>();
+
+                prefab.SetActive(false);
+                var fcsStorage = prefab.AddComponent<FCSStorage>();
+                fcsStorage.Initialize(48, 6, 8, Mod.AlterraHubDepotFriendly, Mod.AlterraHubDepotClassID);
+                prefab.SetActive(true);
 
                 //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
                 MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModName);
@@ -150,12 +155,13 @@ namespace FCS_AlterraHub.Mono.AlterraHubDepot.Buildable
         }
 #endif
 
-        protected override TechData GetBlueprintRecipe()
+
+        protected override RecipeData GetBlueprintRecipe()
         {
             return Mod.AlterraHubDepotIngredients;
         }
 
-        protected override Atlas.Sprite GetItemSprite()
+        protected override Sprite GetItemSprite()
         {
             return ImageUtils.LoadSpriteFromFile(Path.Combine(AssetsFolder, $"{ClassID}.png"));
         }

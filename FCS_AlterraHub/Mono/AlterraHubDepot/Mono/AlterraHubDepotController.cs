@@ -1,4 +1,5 @@
-﻿using FCS_AlterraHomeSolutions.Mono.PaintTool;
+﻿using System.Collections.Generic;
+using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Mono.FCSPDA.Mono;
@@ -7,10 +8,11 @@ using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Utility;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace FCS_AlterraHub.Mono.AlterraHubDepot.Mono
 {
-    internal class AlterraHubDepotController: FcsDevice, IFCSSave<SaveData>
+    internal class AlterraHubDepotController: FcsDevice, IFCSSave<SaveData>,IHandTarget
     {
         private bool _isFromSave;
         private bool _runStartUpOnEnable;
@@ -18,21 +20,20 @@ namespace FCS_AlterraHub.Mono.AlterraHubDepot.Mono
         private FCSStorage _storage;
         private GameObject _door;
         private bool _isOpen;
-
+        private Text _status;
         private float ClosePos { get; } = 0.2897835f;
         private float OpenPos { get; } = -0.193f;
-        private const float Speed = .5f;
+        private const float Speed = 500f;
+        public override bool IsOperational => IsConstructed && IsInitialized;
 
         private void Start()
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.AlterraHubDepotTabID, Mod.ModName);
+            RefreshUI();
         }
 
         private void Update()
         {
-            //TODO is container is empty turn off storage
-            //_storage.enabled = !_storage.container.IsEmpty();
-
             if (_door == null) return;
 
             if (_isOpen)
@@ -84,6 +85,16 @@ namespace FCS_AlterraHub.Mono.AlterraHubDepot.Mono
             }
         }
 
+        public override void OnDestroy()
+        {
+            base.OnDestroy();
+            if (_storage != null)
+            {
+                _storage.OnContainerClosed -= OnContainerClosed;
+                _storage.OnContainerOpened -= OnContainerOpened;
+            }
+        }
+
         public override void Initialize()
         {
             if (IsInitialized) return;
@@ -105,8 +116,22 @@ namespace FCS_AlterraHub.Mono.AlterraHubDepot.Mono
                 _storage.SlotsAssigned = 48;
                 _storage.OnContainerClosed += OnContainerClosed;
                 _storage.OnContainerOpened += OnContainerOpened;
-            }
+                _storage.container.onAddItem += (inv) =>
+                {
+                    RefreshUI();
+                };
 
+                _storage.container.onRemoveItem += (inv) =>
+                {
+                    RefreshUI();
+                };
+
+                _status = GameObjectHelpers.FindGameObject(gameObject, "Status").GetComponent<Text>();
+
+                _storage.Deactivate();
+                _storage.NotAllowedToAddItems = true;
+            }
+            MaterialHelpers.ChangeEmissionColor(Buildables.AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
             IsInitialized = true;
         }
 
@@ -147,7 +172,9 @@ namespace FCS_AlterraHub.Mono.AlterraHubDepot.Mono
         public override bool CanDeconstruct(out string reason)
         {
             reason = string.Empty;
-            return true;
+            if (!(_storage?.container?.count > 0)) return true;
+            reason = Buildables.AlterraHub.NotEmpty();
+            return false;
         }
 
         public override void OnConstructedChanged(bool constructed)
@@ -199,21 +226,57 @@ namespace FCS_AlterraHub.Mono.AlterraHubDepot.Mono
             return _colorManager.ChangeColor(color, mode);
         }
 
-        //public void OnHandHover(GUIHand hand)
-        //{
-        //    var main = HandReticle.main;
-        //    main.SetIcon(HandReticle.IconType.Info);
-        //    main.SetInteractTextRaw("","");
-            
-        //    if (Input.GetKeyDown(QPatch.Configuration.PDAInfoKeyCode))
-        //    {
-        //        FCSPDAController.Instance.OpenEncyclopedia(TechType.Copper);
-        //    }
-        //}
+        public void OnHandHover(GUIHand hand)
+        {
+            if (!IsConstructed || !IsInitialized) return;
+            HandReticle.main.SetInteractText($"{Mod.AlterraHubDepotFriendly} | UnitID: {UnitID} | Depot Name: {DepotName}", _storage.IsEmpty() ? "Empty" : string.Empty);
+            HandReticle.main.SetIcon(HandReticle.IconType.Hand, 1f);
+            if (Input.GetKeyDown(QPatch.Configuration.PDAInfoKeyCode))
+            {
+                FCSPDAController.Instance.OpenEncyclopedia(TechType.Copper);
+            }
+        }
 
-        //public void OnHandClick(GUIHand hand)
-        //{
+        public string DepotName => $"{UnitID} : Depot";
 
-        //}
+        public void OnHandClick(GUIHand hand)
+        {
+            if (!IsConstructed || !IsInitialized || _storage.IsEmpty()) return;
+            _storage.Open(transform);
+        }
+
+        internal string GetUnitName()
+        {
+            return DepotName;
+        }
+
+        internal bool HasRoomFor(TechType techType)
+        {
+            var size = CraftData.GetItemSize(techType);
+            return _storage.container.HasRoomFor(size.x, size.y);
+        }
+
+        internal bool HasRoomFor(List<Vector2int> techTypes)
+        {
+            return _storage.container.HasRoomFor(techTypes);
+        }
+
+        internal void AddItemToStorage(InventoryItem item)
+        {
+            _storage.AddItemToContainer(item);
+        }
+
+        public string GetStatus()
+        {
+            return _storage.container.IsFull() ? "Full" : "Ready";
+        }
+
+        public bool IsFull => _storage.container.IsFull();
+
+        public override void RefreshUI()
+        {
+            if (_status == null || _storage == null) return;
+            _status.text = _storage.container.count > 0 ? "PICK AVALIABLE" : "EMPTY";
+        }
     }
 }

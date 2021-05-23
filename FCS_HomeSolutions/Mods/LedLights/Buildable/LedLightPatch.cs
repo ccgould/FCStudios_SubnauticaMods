@@ -9,8 +9,13 @@ using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
+using SMLHelper.V2.Utility;
 using UnityEngine;
+#if SUBNAUTICA
+using RecipeData = SMLHelper.V2.Crafting.TechData;
+using Sprite = Atlas.Sprite;
 
+#endif
 namespace FCS_HomeSolutions.Mods.LedLights.Buildable
 {
     internal class LedLightPatch : SMLHelper.V2.Assets.Buildable
@@ -20,6 +25,7 @@ namespace FCS_HomeSolutions.Mods.LedLights.Buildable
         public override TechCategory CategoryForPDA { get; }
         public override string AssetsFolder => Mod.GetAssetPath();
 
+
         public LedLightPatch(LedLightData data) : base(data.classId, data.friendlyName, data.description)
         {
             _data = data;
@@ -27,14 +33,16 @@ namespace FCS_HomeSolutions.Mods.LedLights.Buildable
             CategoryForPDA = data.categoryForPDA;
             OnStartedPatching += () =>
             {
-                var ledLightKit = new FCSKit($"{data.classId}_Kit", FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
+                var ledLightKit = new FCSKit($"{data.classId}_Kit", FriendlyName,
+                    Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 ledLightKit.Patch();
-                
+
             };
 
             OnFinishedPatching += () =>
             {
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, $"{data.classId}_Kit".ToTechType(), 33750, StoreCategory.Home);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, $"{data.classId}_Kit".ToTechType(), 33750,
+                    StoreCategory.Home);
                 FCSAlterraHubService.PublicAPI.RegisterPatchedMod(ClassID);
             };
         }
@@ -95,19 +103,16 @@ namespace FCS_HomeSolutions.Mods.LedLights.Buildable
         }
 
 
-#if SUBNAUTICA
-        protected override TechData GetBlueprintRecipe()
+        protected override RecipeData GetBlueprintRecipe()
         {
             return _data.TechData;
         }
-#elif BELOWZERO
-        protected override RecipeData GetBlueprintRecipe()
-        {
-            return _data.TechDatas;
-        }
-#endif
-    }
 
+        protected override Sprite GetItemSprite()
+        {
+            return ImageUtils.LoadSpriteFromFile(Path.Combine(AssetsFolder, $"{ClassID}.png"));
+        }
+    }
     internal struct LedLightData
     {
         public string classId;

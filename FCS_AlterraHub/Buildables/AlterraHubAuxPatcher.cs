@@ -62,8 +62,12 @@ namespace FCS_AlterraHub.Buildables
             { $"{ModKey}_FoodItemsNotAllowed","Cooked food items are not allowed in Data Storage Solutions."},
             { $"{ModKey}_PDAButtonPressFormat","({0}) Press to open Alterra Hub PDA"},
             { $"{ModKey}_OperationExists","Similar operation already exists for device {0}"},
+            { $"{ModKey}_DepotFull","Depot is full or doesn't have enough space for your purchase."},
+            { $"{ModKey}_DepotNotFound","Depot cannot be located."},
+            { $"{ModKey}_PurchaseSuccessful","Purchase was successful and item has been transferred to your selected AlterraHub Depot."},
             { $"{ModKey}_ErrorLoadingAccountDetails","There was an error loading your account details. Please contact FCStudio about this issue. Please provide your game log located in the Subnautica root folder. \nFileName:\"qmodmanager_log-Subnautica.txt\""},
             { $"{ModKey}_NoSpaceAccountCreation","To complete your account creation, you need at least one slot to receive your debit card. Please try again once one inventory slot is available in your inventory."},
+            { $"{ModKey}_NoDestinationFound","Please select a destination for your items to be transferred to. You must have an AlterraHub Depot at a base."},
         };
         
         private void AdditionalPatching()
@@ -353,6 +357,31 @@ namespace FCS_AlterraHub.Buildables
         public static string FoodItemsNotAllowed()
         {
             return GetLanguage($"{ModKey}_FoodItemsNotAllowed");
+        }
+
+        public static string NoDestinationFound()
+        {
+            return GetLanguage($"{ModKey}_NoDestinationFound");
+        }
+
+        public static string NotEmpty()
+        {
+            return Language.main.Get("DeconstructNonEmptyStorageContainerError");
+        }
+
+        public static string PurchaseSuccessful()
+        {
+            return GetLanguage($"{ModKey}_PurchaseSuccessful");
+        }
+
+        public static string DepotFull()
+        {
+            return GetLanguage($"{ModKey}_DepotFull");
+        }        
+        
+        public static string DepotNotFound()
+        {
+            return GetLanguage($"{ModKey}_DepotNotFound");
         }
     }
 }

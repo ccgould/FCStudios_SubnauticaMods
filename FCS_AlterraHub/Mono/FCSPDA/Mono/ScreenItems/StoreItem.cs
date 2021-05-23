@@ -71,9 +71,11 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono.ScreenItems
             {
                 returnAmountText.text = $"x{_returnAmount}";
             }
+
             var toolTip = icon.AddComponent<FCSToolTip>();
             toolTip.Tooltip = ToolTipFormat(TechType, LanguageHelpers.GetLanguage(TechType));
             toolTip.RequestPermission = toolTipPermission;
+
             var uGUIIcon = icon.AddComponent<uGUI_Icon>();
             uGUIIcon.sprite = SpriteManager.Get(TechType);
 

@@ -1,21 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Spawnables;
 using FCS_StorageSolutions.Configuration;
 using FCS_StorageSolutions.Mods.AlterraStorage.Buildable;
 using FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.ItemDisplay;
-using FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack;
 using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Crafting;
+using SMLHelper.V2.Utility;
 using UnityEngine;
+#if SUBNAUTICA
+using RecipeData = SMLHelper.V2.Crafting.TechData;
+using Sprite = Atlas.Sprite;
+#endif
 
 namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable
 {
@@ -32,32 +31,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable
                 var dssItemDisplayKit = new FCSKit(Mod.DSSItemDisplayKitClassID, FriendlyName, Path.Combine(AssetsFolder, $"{ClassID}.png"));
                 dssItemDisplayKit.Patch();
                 FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.DSSItemDisplayKitClassID.ToTechType(), 37500, StoreCategory.Storage);
-                //    FCSAlterraHubService.PublicAPI.RegisterEncyclopediaEntry(TechType, new List<FcsEntryData>
-                //    {
-                //        new FcsEntryData
-                //        {
-                //            key = "HydroHarvester",
-                //            unlocked = true,
-                //            path = "fcs",
-                //            timeCapsule = false,
-                //            nodes = new []{ "fcs"},
-                //            Description = "The hydroponic Harvester .....",
-                //            Title = "Hydroponic Harvester",
-                //            Verbose = true
-                //        },
-                //        new FcsEntryData
-                //        {
-                //            key = "HydroHarvester1",
-                //            unlocked = true,
-                //            path = "fcs",
-                //            timeCapsule = false,
-                //            nodes = new []{ "fcs"},
-                //            Description = "The hydroponic Harvester .....",
-                //            Title = "Hydroponic Harvester 1",
-                //            Verbose = false
-                //        }
-                //    });
-
             };
         }
 
@@ -115,17 +88,14 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable
             return null;
         }
 
-
-#if SUBNAUTICA
-        protected override TechData GetBlueprintRecipe()
-        {
-            return Mod.DSSItemDisplayIngredients;
-        }
-#elif BELOWZERO
         protected override RecipeData GetBlueprintRecipe()
         {
             return Mod.DSSItemDisplayIngredients;
         }
-#endif
+
+        protected override Sprite GetItemSprite()
+        {
+            return ImageUtils.LoadSpriteFromFile(Path.Combine(AssetsFolder, $"{ClassID}.png"));
+        }
     }
 }

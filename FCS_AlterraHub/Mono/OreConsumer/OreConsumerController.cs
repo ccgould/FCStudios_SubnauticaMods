@@ -244,6 +244,8 @@ namespace FCS_AlterraHub.Mono.OreConsumer
 #if DEBUG
                         QuickLogger.Debug($"Initialized Ore Consumer {GetPrefabID()}");
 #endif
+            MaterialHelpers.ChangeEmissionColor(Buildables.AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
+
             IsInitialized = true;
         }
 

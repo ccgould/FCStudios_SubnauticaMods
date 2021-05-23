@@ -10,7 +10,12 @@ using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
+using SMLHelper.V2.Utility;
 using UnityEngine;
+#if SUBNAUTICA
+using RecipeData = SMLHelper.V2.Crafting.TechData;
+using Sprite = Atlas.Sprite;
+#endif
 
 namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable
 {
@@ -83,17 +88,14 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable
             return null;
         }
 
-
-#if SUBNAUTICA
-        protected override TechData GetBlueprintRecipe()
-        {
-            return Mod.DSSTerminalIngredients;
-        }
-#elif BELOWZERO
         protected override RecipeData GetBlueprintRecipe()
         {
             return Mod.DSSTerminalIngredients;
         }
-#endif
+
+        protected override Sprite GetItemSprite()
+        {
+            return ImageUtils.LoadSpriteFromFile(Path.Combine(AssetsFolder, $"{ClassID}.png"));
+        }
     }
 }

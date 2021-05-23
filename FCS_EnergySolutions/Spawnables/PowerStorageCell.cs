@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
 using FCS_AlterraHub.Enumerators;
+using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Registration;
 using FCS_EnergySolutions.Configuration;
 using SMLHelper.V2.Assets;
 using SMLHelper.V2.Handlers;
+using SMLHelper.V2.Utility;
 using UnityEngine;
+#if SUBNAUTICA
+using Sprite = Atlas.Sprite;
+#endif
 
 namespace FCS_EnergySolutions.Spawnables
 {
@@ -22,6 +22,7 @@ namespace FCS_EnergySolutions.Spawnables
             {
                 FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, TechType, 1000, StoreCategory.Energy);
                 CraftDataHandler.SetEquipmentType(TechType, EquipmentType.PowerCellCharger);
+                TechDataHelpers.AddPowercell(TechType);
             };
         }
 
@@ -61,5 +62,9 @@ namespace FCS_EnergySolutions.Spawnables
             gameObject.Set(obj);
         }
 #endif
+        protected override Sprite GetItemSprite()
+        {
+            return ImageUtils.LoadSpriteFromFile(Path.Combine(AssetsFolder, $"{ClassID}.png"));
+        }
     }
 }

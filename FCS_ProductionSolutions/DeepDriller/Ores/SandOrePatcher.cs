@@ -1,7 +1,12 @@
-﻿using FCS_ProductionSolutions.Buildable;
+﻿using System.IO;
+using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
 using SMLHelper.V2.Assets;
+using SMLHelper.V2.Utility;
 using UnityEngine;
+#if SUBNAUTICA
+using Sprite = Atlas.Sprite;
+#endif
 
 namespace FCS_ProductionSolutions.DeepDriller.Ores
 {
@@ -53,6 +58,11 @@ namespace FCS_ProductionSolutions.DeepDriller.Ores
         internal static void PatchHelper()
         {
             Singleton.Patch();
+        }
+
+        protected override Sprite GetItemSprite()
+        {
+            return ImageUtils.LoadSpriteFromFile(Path.Combine(AssetsFolder, $"{ClassID}.png"));
         }
     }
 }

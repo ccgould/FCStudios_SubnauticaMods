@@ -14,11 +14,19 @@ using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Utility;
 using UnityEngine;
+#if SUBNAUTICA
+using RecipeData = SMLHelper.V2.Crafting.TechData;
+using Sprite = Atlas.Sprite;
+#endif
 
 namespace FCS_EnergySolutions.AlterraSolarCluster.Buildables
 {
     internal partial class AlterraSolarClusterBuildable : SMLHelper.V2.Assets.Buildable
     {
+        public override TechGroup GroupForPDA => TechGroup.ExteriorModules;
+        public override TechCategory CategoryForPDA => TechCategory.ExteriorModule;
+        private string _assetFolder => Mod.GetAssetFolder();
+        public override string AssetsFolder => _assetFolder;
         private GameObject _prefab;
 
         public AlterraSolarClusterBuildable() : base(Mod.AlterraSolarClusterModClassName, Mod.AlterraSolarClusterModFriendlyName, Mod.AlterraSolarClusterModDescription)
@@ -195,9 +203,8 @@ namespace FCS_EnergySolutions.AlterraSolarCluster.Buildables
         }
 #endif
 
-
-#if SUBNAUTICA
-        protected override TechData GetBlueprintRecipe()
+        
+        protected override RecipeData GetBlueprintRecipe()
         {
             QuickLogger.Debug($"Creating recipe...");
             // Create and associate recipe to the new TechType
@@ -212,34 +219,9 @@ namespace FCS_EnergySolutions.AlterraSolarCluster.Buildables
             return customFabRecipe;
         }
 
-        protected override Atlas.Sprite GetItemSprite()
-        {
-            return new Atlas.Sprite(ImageUtils.LoadTextureFromFile(Path.Combine(_assetFolder, $"{ClassID}.png")));
-        }
-#elif BELOWZERO
-        protected override RecipeData GetBlueprintRecipe()
-        {
-            QuickLogger.Debug($"Creating recipe...");
-            // Create and associate recipe to the new TechType
-            var customFabRecipe = new RecipeData()
-            {
-                craftAmount = 1,
-                Ingredients = new List<Ingredient>()
-                {
-                    new Ingredient(Mod.AlterraSolarClusterKitClassID.ToTechType(),1)
-                }
-            };
-            return customFabRecipe;
-        }
-
         protected override Sprite GetItemSprite()
         {
-            return ImageUtils.LoadSpriteFromFile(Path.Combine(_assetFolder, $"{ClassID}.png"));
+            return ImageUtils.LoadSpriteFromFile(Path.Combine(AssetsFolder, $"{ClassID}.png"));
         }
-#endif
-        public override TechGroup GroupForPDA => TechGroup.ExteriorModules;
-        public override TechCategory CategoryForPDA => TechCategory.ExteriorModule;
-        private string _assetFolder => Mod.GetAssetFolder();
-        public override string AssetsFolder => _assetFolder;
     }
 }

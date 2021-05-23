@@ -2,6 +2,7 @@
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
+using FCS_AlterraHub.Mono.AlterraHubDepot.Mono;
 using FCS_AlterraHub.Mono.FCSPDA.Mono.ScreenItems;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Helpers;
@@ -24,6 +25,9 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono.Dialogs
 
         public CartDropDownHandler _cart;
         public UnityEvent onCheckOutPopupDialogClosed = new UnityEvent();
+        private DestinationDialogController _destinationDialogController;
+        private Text _destinationText;
+        internal AlterraHubDepotController SelectedDestination { get; set; }
 
         private void Initialize(FCSPDAController mono)
         {
@@ -35,10 +39,17 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono.Dialogs
 
             _total = GameObjectHelpers.FindGameObject(gameObject, "Total").GetComponent<Text>();
             _newBalance = GameObjectHelpers.FindGameObject(gameObject, "NewBalance").GetComponent<Text>();
+            _destinationText = GameObjectHelpers.FindGameObject(gameObject, "Destination").GetComponent<Text>();
             
             CreatePurchaseButton();
             CreatePurchaseExitButton();
+            CreateDestinationPopup();
 
+            var destinationButton = GameObjectHelpers.FindGameObject(gameObject, "DestinationBTN").GetComponent<Button>();
+            destinationButton.onClick.AddListener((() =>
+            {
+                _destinationDialogController.Open();
+            }));
             var backBtn = GameObjectHelpers.FindGameObject(gameObject, "CloseBTN").GetComponent<Button>();
             backBtn.onClick.AddListener(HideDialog);
 
@@ -51,7 +62,11 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono.Dialogs
         private void CreatePurchaseButton()
         {
             var purchaseBTN = GameObjectHelpers.FindGameObject(gameObject, "PurchaseBTN").GetComponent<Button>();
-            purchaseBTN.onClick.AddListener(() => { MakePurchase(); });
+            purchaseBTN.onClick.AddListener(() =>
+            {
+                QuickLogger.Debug("Purchase Button Clicked",true);
+                MakePurchase();
+            });
         }
 
         private bool MakePurchase()
@@ -65,14 +80,21 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono.Dialogs
                 }
             }
 
-            if (!Inventory.main.container.HasRoomFor(totalSize))
+            //if (!Inventory.main.container.HasRoomFor(totalSize))
+            //{
+            //    QuickLogger.ModMessage(Buildables.AlterraHub.InventoryFull());
+            //    return false;
+            //}
+
+            if (SelectedDestination == null)
             {
-                QuickLogger.ModMessage(Buildables.AlterraHub.InventoryFull());
+                MessageBoxHandler.main.Show( Buildables.AlterraHub.NoDestinationFound(),FCSMessageButton.OK);
                 return false;
             }
+
             if (!CardSystem.main.HasBeenRegistered())
             {
-                QuickLogger.ModMessage(Buildables.AlterraHub.AccountNotFoundFormat());
+                MessageBoxHandler.main.Show(Buildables.AlterraHub.AccountNotFoundFormat(),FCSMessageButton.OK);
                 return false;
             }
 
@@ -84,7 +106,10 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono.Dialogs
 
             if (CardSystem.main.HasEnough(_cart.GetTotal()))
             {
-                if (!_mono.MakeAPurchase(_cart)) return false;
+                if (!_mono.MakeAPurchase(_cart,SelectedDestination))
+                {
+                    return false;
+                }
                 _cart.TransactionComplete();
                 HideDialog();
                 return true;
@@ -99,11 +124,23 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono.Dialogs
             var purchaseBTN = GameObjectHelpers.FindGameObject(gameObject, "PurchaseExitBTN").GetComponent<Button>();
             purchaseBTN.onClick.AddListener(() =>
             {
-                if(MakePurchase())
+                QuickLogger.Debug("Purchase Button Clicked", true);
+                if (MakePurchase())
                 {
                     _mono.ExitStore();
                 }
             });
+        }
+
+        private void CreateDestinationPopup()
+        {
+            var destinationPopDiag = GameObjectHelpers.FindGameObject(_mono.gameObject, "DestinationPopUp");
+            _destinationDialogController = destinationPopDiag.AddComponent<DestinationDialogController>();
+            _destinationDialogController.Initialize(this);
+            _destinationDialogController.OnClose += () =>
+            {
+                    _destinationText.text = $"Destination: {SelectedDestination?.DepotName}";
+            };
         }
 
         private void UpdateScreen()
@@ -144,6 +181,8 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono.Dialogs
             _accountBalance.text = Buildables.AlterraHub.AccountBalanceFormat(0);
             _total.text = Buildables.AlterraHub.CheckOutTotalFormat(0);
             _newBalance.text = Buildables.AlterraHub.CheckOutTotalFormat(0);
+            _destinationText.text = "Destination:";
+            SelectedDestination = null;
         }
     }
 }

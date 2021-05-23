@@ -209,6 +209,7 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
         private TechType _windSurferPlatformKitTechType;
         private Transform _turbinesTransform;
         private int _childPlacementsCorrect;
+        private bool _removingPlatform;
 
 
         private void UpdateData()
@@ -464,6 +465,7 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
 
         public bool TryRemovePlatform(PlatformController controller)
         {
+            if (_removingPlatform) return false;
             TechType kit;
 
             switch (controller.GetPlatformType())
@@ -526,6 +528,7 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
         private IEnumerator DestroyOperator(PlatformController controller, HoloGraphControl holoGraphControl)
         {
             QuickLogger.ModMessage( $"Please leave Wind Surfer Operator. This building will deconstruct in 5 seconds.");
+            _removingPlatform = true;
             yield return new WaitForSeconds(5);
             RemovePlatform(controller, holoGraphControl);
         }

@@ -68,11 +68,5 @@ namespace FCS_AlterraHub.Configuration
             OreConsumer.OreProcessingTime = OreConsumer.OreProcessingTime >= 90f ? 1f : 90f;
             QuickLogger.Message($"Changed Processing speed",true);
         }
-
-        [ConsoleCommand("SpawnOreConsumerFrag")]
-        public static void SpawnOreConsumerFrag()
-        {
-            Mod.SpawnOreConsumerFrag();
-        }
     }
 }

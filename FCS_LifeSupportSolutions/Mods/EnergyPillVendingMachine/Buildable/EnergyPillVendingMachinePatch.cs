@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Registration;
@@ -10,9 +9,12 @@ using FCS_LifeSupportSolutions.Mods.EnergyPillVendingMachine.mono;
 using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Utility;
 using UnityEngine;
+#if SUBNAUTICA
+using RecipeData = SMLHelper.V2.Crafting.TechData;
+using Sprite = Atlas.Sprite;
+#endif
 
 namespace FCS_LifeSupportSolutions.Mods.EnergyPillVendingMachine.Buildable
 {
@@ -89,19 +91,6 @@ namespace FCS_LifeSupportSolutions.Mods.EnergyPillVendingMachine.Buildable
             return null;
         }
 
-#if SUBNAUTICA
-        protected override TechData GetBlueprintRecipe()
-        {
-            QuickLogger.Debug($"Creating recipe...");
-            // Create and associate recipe to the new TechType
-            return Mod.EnergyPillVendingMachineIngredients;
-        }
-
-        protected override Atlas.Sprite GetItemSprite()
-        {
-            return new Atlas.Sprite(ImageUtils.LoadTextureFromFile(Path.Combine(_assetFolder, $"{ClassID}.png")));
-        }
-#elif BELOWZERO
         protected override RecipeData GetBlueprintRecipe()
         {
             QuickLogger.Debug($"Creating recipe...");
@@ -111,8 +100,7 @@ namespace FCS_LifeSupportSolutions.Mods.EnergyPillVendingMachine.Buildable
 
         protected override Sprite GetItemSprite()
         {
-            return ImageUtils.LoadSpriteFromFile(Path.Combine(_assetFolder, $"{ClassID}.png"));
+            return ImageUtils.LoadSpriteFromFile(Path.Combine(AssetsFolder, $"{ClassID}.png"));
         }
-#endif
     }
 }

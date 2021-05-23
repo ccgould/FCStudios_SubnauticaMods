@@ -5,18 +5,22 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using FCS_AlterraHub.Mono;
+using FCS_AlterraHub.Mono.AlterraHubFabricatorBuilding.Mono;
 using FCS_AlterraHub.Mono.FCSPDA.Mono;
 using FCS_AlterraHub.Mono.FCSPDA.Mono.ScreenItems;
 using FCS_AlterraHub.Patches;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Spawnables;
 using FCS_AlterraHub.Systems;
+using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using FMOD;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Json.ExtensionMethods;
 using SMLHelper.V2.Utility;
 using UnityEngine;
+using Object = UnityEngine.Object;
+using SearchOption = System.IO.SearchOption;
 #if SUBNAUTICA_STABLE
 using Oculus.Newtonsoft.Json;
 #else
@@ -449,43 +453,20 @@ namespace FCS_AlterraHub.Configuration
             AudioClips.Add("AH-Mission01-Pt3",AudioUtils.CreateSound(Path.Combine(Mod.GetAssetPath(), "Audio", "AH-Mission01-Pt3.wav")));
         }
 
-        internal static IEnumerator SpawnOreConsumerFrag()
+        internal static IEnumerator SpawnAlterraFabStation()
         {
-            //TODO Change to the new SMLHelper system for creating frags at locations
-            if (IsOreConsumerSpawned) yield break;
-
-                QuickLogger.Debug("Spawn Frag");
-            var prefabForTechType = CraftData.GetPrefabForTechTypeAsync(QPatch.OreConsumerFragTechType);
-            yield return prefabForTechType;
-
-
-            if (prefabForTechType.GetResult() != null)
-            {
-                GameObject gameObject = Utils.CreatePrefab(prefabForTechType.GetResult(), 1000);
-                LargeWorldEntity.Register(gameObject);
-                CrafterLogic.NotifyCraftEnd(gameObject, QPatch.OreConsumerFragTechType);
-                gameObject.SendMessage("StartConstruction", SendMessageOptions.DontRequireReceiver);
-                gameObject.transform.position = new Vector3(113.6f, -267.40f, -366.2f);
-            }
-            else
-            {
-                ErrorMessage.AddDebug("Could not find prefab for TechType = " + QPatch.OreConsumerFragTechType);
-            }
-
-            //CleanOreOreConsumers
-            var oreconsumers = GameObject.FindObjectsOfType(typeof(OreConsumerFragmentSpawn));
-
-            if (oreconsumers.Length > 1)
-            {
-                GameObject.Destroy(oreconsumers[0]);
-            }
+            GameObject gameObject = GameObject.Instantiate(Buildables.AlterraHub.AlterraHubFabricatorPrefab);
+            gameObject.AddComponent<AlterraFabricatorStationController>();
+            LargeWorldEntity.Register(gameObject);
+            gameObject.transform.position = new Vector3(-809.10f, -241.30f, -387.70f);
+            MaterialHelpers.ApplyGlassShaderTemplate(gameObject, "_glass", Mod.ModName);
 
             yield break;
         }
 
+
+
         public static bool IsOreConsumerSpawned { get; set; }
-
-
 
         public static void DeepCopySave(AccountDetails accountDetails)
         {
@@ -515,6 +496,7 @@ namespace FCS_AlterraHub.Configuration
     public class FCSGamePlaySettings
     {
         public bool IsOreConsumerFragmentSpawned { get; set; } = false;
+        public int AlterraHubDepotPowercellCount { get; set; }
     }
 
     public struct KnownDevice

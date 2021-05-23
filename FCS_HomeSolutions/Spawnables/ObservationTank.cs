@@ -13,8 +13,14 @@ using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
+using SMLHelper.V2.Utility;
 using UnityEngine;
 using ColorManager = FCS_AlterraHub.Mono.ColorManager;
+#if SUBNAUTICA
+using RecipeData = SMLHelper.V2.Crafting.TechData;
+using Sprite = Atlas.Sprite;
+#endif
+
 
 namespace FCS_HomeSolutions.Spawnables
 {
@@ -87,10 +93,16 @@ namespace FCS_HomeSolutions.Spawnables
                 return null;
             }
         }
+        
 
-        protected override TechData GetBlueprintRecipe()
+        protected override RecipeData GetBlueprintRecipe()
         {
             return Mod.EmptyObservationTankIngredients;
+        }
+
+        protected override Sprite GetItemSprite()
+        {
+            return ImageUtils.LoadSpriteFromFile(Path.Combine(AssetsFolder, $"{ClassID}.png"));
         }
     }
 

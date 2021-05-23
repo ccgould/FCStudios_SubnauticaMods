@@ -12,8 +12,12 @@ using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
+using SMLHelper.V2.Utility;
 using UnityEngine;
-
+#if SUBNAUTICA
+using RecipeData = SMLHelper.V2.Crafting.TechData;
+using Sprite = Atlas.Sprite;
+#endif
 namespace FCS_HomeSolutions.QuantumTeleporter.Buildable
 {
     internal partial class QuantumTeleporterBuildable : SMLHelper.V2.Assets.Buildable
@@ -86,8 +90,7 @@ namespace FCS_HomeSolutions.QuantumTeleporter.Buildable
         }
 
         public override string AssetsFolder { get; } = Mod.GetAssetPath();
-#if SUBNAUTICA
-        protected override TechData GetBlueprintRecipe()
+        protected override RecipeData GetBlueprintRecipe()
         {
             QuickLogger.Debug($"Creating recipe...");
             // Create and associate recipe to the new TechType
@@ -101,22 +104,10 @@ namespace FCS_HomeSolutions.QuantumTeleporter.Buildable
             };
             return customFabRecipe;
         }
-#elif BELOWZERO
-        protected override RecipeData GetBlueprintRecipe()
-        {
-            QuickLogger.Debug($"Creating recipe...");
-            // Create and associate recipe to the new TechType
-            var customFabRecipe = new RecipeData()
-            {
-                craftAmount = 1,
-                Ingredients = new List<Ingredient>()
-                {
-                    new Ingredient(Mod.QuantumTeleporterKitClassID.ToTechType(), 1)
-                }
-            };
-            return customFabRecipe;
-        }
 
-#endif
+        protected override Sprite GetItemSprite()
+        {
+            return ImageUtils.LoadSpriteFromFile(Path.Combine(AssetsFolder, $"{ClassID}.png"));
+        }
     }
 }

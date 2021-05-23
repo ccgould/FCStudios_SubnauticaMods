@@ -33,7 +33,9 @@ namespace FCS_AlterraHub.Systems
             {TechType.UraniniteCrystal,22050 },
             {TechType.Kyanite, 37500 }
         };
-        
+
+        private static readonly HashSet<TechType> InvalidReturnItems = new HashSet<TechType>();
+
         internal static decimal GetPrice(TechType techType,bool checkKit = false)
         {
             //Price will be calculated by the ingredients of an item if an ingredient is unknown it will apply a default value to that item
@@ -97,6 +99,21 @@ namespace FCS_AlterraHub.Systems
         internal static bool ValidResource(TechType techType)
         {
             return OrePrices.ContainsKey(techType);
+        }
+
+        public static bool IsKit(TechType techType)
+        {
+            return KnownPrices.Any(x => x.Key.ReceiveTechType == techType);
+        }
+
+        public static bool InvalidReturnItem(TechType techType)
+        {
+            return InvalidReturnItems.Contains(techType);
+        }
+
+        public static void AddInvalidReturnItem(TechType techType)
+        {
+            InvalidReturnItems.Add(techType);
         }
     }
 }

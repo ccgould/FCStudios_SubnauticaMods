@@ -86,7 +86,7 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
             if (_storageContainer == null)
             {
                 _storageContainer = gameObject.GetComponent<FCSStorage>();
-
+                _storageContainer.SlotsAssigned = 10;
                 _storageContainer.container.onAddItem += AddPowercell;
                 _storageContainer.container.onRemoveItem += OnUnEquip;
                 _storageContainer.container.allowedTech = TechDataHelpers.PowercellTech;

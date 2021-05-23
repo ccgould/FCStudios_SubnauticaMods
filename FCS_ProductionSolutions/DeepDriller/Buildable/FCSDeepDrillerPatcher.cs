@@ -11,7 +11,12 @@ using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
+using SMLHelper.V2.Utility;
 using UnityEngine;
+#if SUBNAUTICA
+using RecipeData = SMLHelper.V2.Crafting.TechData;
+using Sprite = Atlas.Sprite;
+#endif
 
 namespace FCS_ProductionSolutions.DeepDriller.Buildable
 {
@@ -88,8 +93,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Buildable
             return prefab;
         }
 
-#if SUBNAUTICA
-        protected override TechData GetBlueprintRecipe()
+        protected override RecipeData GetBlueprintRecipe()
         {
             QuickLogger.Debug($"Creating recipe...");
             // Create and associate recipe to the new TechType
@@ -105,22 +109,9 @@ namespace FCS_ProductionSolutions.DeepDriller.Buildable
             return customFabRecipe;
         }
 
-#elif BELOWZERO
-        protected override RecipeData GetBlueprintRecipe()
+        protected override Sprite GetItemSprite()
         {
-            QuickLogger.Debug($"Creating recipe...");
-            // Create and associate recipe to the new TechType
-            var customFabRecipe = new RecipeData()
-            {
-                craftAmount = 1,
-                Ingredients = new List<Ingredient>()
-                {
-                    new Ingredient(Mod.DeepDrillerKitClassID.ToTechType(), 1)
-                }
-            };
-            QuickLogger.Debug($"Created Ingredients");
-            return customFabRecipe;
+            return ImageUtils.LoadSpriteFromFile(Path.Combine(AssetsFolder, $"{ClassID}.png"));
         }
-#endif
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
@@ -6,7 +7,12 @@ using FCS_StorageSolutions.Configuration;
 using FCS_StorageSolutions.Mods.AlterraStorage.Buildable;
 using FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server;
 using FCSCommon.Utilities;
+using SMLHelper.V2.Utility;
 using UnityEngine;
+#if SUBNAUTICA
+using Sprite = Atlas.Sprite;
+#endif
+
 
 namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Spawnable
 {
@@ -93,6 +99,11 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Spawnable
                 QuickLogger.Error(e.Message);
                 return null;
             }
+        }
+
+        protected override Sprite GetItemSprite()
+        {
+            return ImageUtils.LoadSpriteFromFile(Path.Combine(AssetsFolder, $"{ClassID}.png"));
         }
     }
 }

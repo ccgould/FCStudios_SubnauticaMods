@@ -11,14 +11,21 @@ using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
+using SMLHelper.V2.Utility;
 using UnityEngine;
+#if SUBNAUTICA
+using RecipeData = SMLHelper.V2.Crafting.TechData;
+using Sprite = Atlas.Sprite;
+#endif
 
 namespace FCS_HomeSolutions.Mods.Cabinets.Buildable
 {
     internal class Cabinet1Buildable : SMLHelper.V2.Assets.Buildable
     {
         private GameObject _locker;
-
+        public override TechGroup GroupForPDA { get; } = TechGroup.InteriorModules;
+        public override TechCategory CategoryForPDA { get; } = TechCategory.InteriorModule;
+        
         public Cabinet1Buildable() : base(Mod.Cabinet1ClassID, Mod.Cabinet1Friendly, Mod.Cabinet1Description)
         {
             _locker = Resources.Load<GameObject>("Submarine/Build/Locker");
@@ -118,8 +125,7 @@ namespace FCS_HomeSolutions.Mods.Cabinets.Buildable
 
         public override string AssetsFolder { get; } = Mod.GetAssetPath();
 
-#if SUBNAUTICA
-        protected override TechData GetBlueprintRecipe()
+        protected override RecipeData GetBlueprintRecipe()
         {
             QuickLogger.Debug($"Creating recipe...");
             // Create and associate recipe to the new TechType
@@ -133,25 +139,10 @@ namespace FCS_HomeSolutions.Mods.Cabinets.Buildable
             };
             return customFabRecipe;
         }
-#elif BELOWZERO
 
-        protected override RecipeData GetBlueprintRecipe()
+        protected override Sprite GetItemSprite()
         {
-            QuickLogger.Debug($"Creating recipe...");
-            // Create and associate recipe to the new TechType
-            var customFabRecipe = new RecipeData()
-            {
-                craftAmount = 1,
-                Ingredients = new List<Ingredient>()
-                {
-                    new Ingredient(Mod.Cabinet1KitClassID.ToTechType(), 1)
-                }
-            };
-            return customFabRecipe;
+            return ImageUtils.LoadSpriteFromFile(Path.Combine(AssetsFolder, $"{ClassID}.png"));
         }
-#endif
-
-        public override TechGroup GroupForPDA { get; } = TechGroup.InteriorModules;
-        public override TechCategory CategoryForPDA { get; } = TechCategory.InteriorModule;
     }
 }

@@ -6,12 +6,16 @@ using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Spawnables;
 using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
-using FCS_HomeSolutions.TrashReceptacle.Mono;
 using FCS_HomeSolutions.TrashRecycler.Mono;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Crafting;
+using SMLHelper.V2.Utility;
 using UnityEngine;
+#if SUBNAUTICA
+using RecipeData = SMLHelper.V2.Crafting.TechData;
+using Sprite = Atlas.Sprite;
+#endif
+
 
 namespace FCS_HomeSolutions.TrashReceptacle.Buildable
 {
@@ -89,17 +93,14 @@ namespace FCS_HomeSolutions.TrashReceptacle.Buildable
             return null;
         }
 
-
-#if SUBNAUTICA
-        protected override TechData GetBlueprintRecipe()
-        {
-            return Mod.TrashRecyclerIngredients;
-        }
-#elif BELOWZERO
         protected override RecipeData GetBlueprintRecipe()
         {
             return Mod.TrashRecyclerIngredients;
         }
-#endif
+
+        protected override Sprite GetItemSprite()
+        {
+            return ImageUtils.LoadSpriteFromFile(Path.Combine(AssetsFolder, $"{ClassID}.png"));
+        }
     }
 }

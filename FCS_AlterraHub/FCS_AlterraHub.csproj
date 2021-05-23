@@ -176,6 +176,7 @@
     <Compile Include="Extensions\GameObjectExtensions.cs" />
     <Compile Include="Extensions\VectorExtensions.cs" />
     <Compile Include="Helpers\BatteryInfoHelpers.cs" />
+    <Compile Include="Extensions\DictionaryExtensions.cs" />
     <Compile Include="Helpers\EncodeDecode.cs" />
     <Compile Include="Helpers\MathHelpers.cs" />
     <Compile Include="Helpers\SpawnHelper.cs" />
@@ -208,6 +209,7 @@
     <Compile Include="Model\TimeCache.cs" />
     <Compile Include="Mono\AlterraHubDepot\Buildable\AlterraHubDepotPatcher.cs" />
     <Compile Include="Mono\AlterraHubDepot\Mono\AlterraHubDepotController.cs" />
+    <Compile Include="Mono\AlterraHubFabricatorBuilding\Mono\AlterraFabricatorStationController.cs" />
     <Compile Include="Mono\BaseManager.cs" />
     <Compile Include="Mono\BaseSaveData.cs" />
     <Compile Include="Mono\BaseTransferOperation.cs" />
@@ -221,7 +223,10 @@
     <Compile Include="Mono\FCSAquarium.cs" />
     <Compile Include="Mono\FCSButton.cs" />
     <Compile Include="Mono\FCSPDA\Enums\PDAPages.cs" />
-    <Compile Include="Mono\FCSPDA\Mono\FCSEncyclopediaData.cs" />
+    <Compile Include="Mono\FCSPDA\Mono\Dialogs\AlterraHubReturnItemController.cs" />
+    <Compile Include="Mono\FCSPDA\Mono\Dialogs\AlterraHubDepotItemController.cs" />
+    <Compile Include="Mono\FCSPDA\Mono\Dialogs\ReturnsDialogController.cs" />
+    <Compile Include="Mono\FCSPDA\Mono\Dialogs\DestinationDialogController.cs" />
     <Compile Include="Mono\FCSPDA\Mono\FCSPDAController.cs" />
     <Compile Include="Mono\FCSPDA\Mono\Model\RadialMenu.cs" />
     <Compile Include="Mono\FCSPDA\Mono\Model\RadialMenuEntry.cs" />
@@ -243,6 +248,7 @@
     <Compile Include="Enumerators\StorageType.cs" />
     <Compile Include="Mono\ToggleController.cs" />
     <Compile Include="Model\TrackedResource.cs" />
+    <Compile Include="Spawnables\AlterraHubDepotFragment.cs" />
     <Compile Include="Structs\TrackedLight.cs" />
     <Compile Include="Objects\ColorList.cs" />
     <Compile Include="Helpers\FCSHUD.cs" />
@@ -276,7 +282,7 @@
     <Compile Include="Patch\PDATabPatcher.cs" />
     <Compile Include="Patch\UIPatches.cs" />
     <Compile Include="Spawnables\OreConsumerFragment.cs" />
-    <Compile Include="Structs\FcsEntryData.cs" />
+    <Compile Include="Structs\EncyclopediaEntryData.cs" />
     <Compile Include="Structs\FCSStoreEntry.cs" />
     <Compile Include="Spawnables\BioFuelSpawnable.cs" />
     <Compile Include="Enumerators\ModDifficultyMode.cs" />
@@ -296,13 +302,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Mono\AlterraHubDepot\Model\" />
-    <Folder Include="UI\" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="mod_BZ_Stable.json" />
-    <None Include="mod_BZ_Exp.json" />
-    <None Include="mod_SN_Stable.json" />
-    <None Include="mod_SN_Exp.json" />
   </ItemGroup>
   <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

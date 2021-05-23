@@ -12,7 +12,12 @@ using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
+using SMLHelper.V2.Utility;
 using UnityEngine;
+#if SUBNAUTICA
+using RecipeData = SMLHelper.V2.Crafting.TechData;
+using Sprite = Atlas.Sprite;
+#endif
 
 namespace FCS_HomeSolutions.Mods.Cabinets.Buildable
 {
@@ -20,6 +25,9 @@ namespace FCS_HomeSolutions.Mods.Cabinets.Buildable
     {
         private GameObject _locker;
         private GameObject _stairShipChair;
+
+        public override TechGroup GroupForPDA { get; } = TechGroup.InteriorModules;
+        public override TechCategory CategoryForPDA { get; } = TechCategory.InteriorModule;
 
         public AlterraMiniBathroomBuildable() : base(Mod.AlterraMiniBathroomClassID, Mod.AlterraMiniBathroomFriendly, Mod.AlterraMiniBathroomDescription)
         {
@@ -127,8 +135,7 @@ namespace FCS_HomeSolutions.Mods.Cabinets.Buildable
 
         public override string AssetsFolder { get; } = Mod.GetAssetPath();
 
-#if SUBNAUTICA
-        protected override TechData GetBlueprintRecipe()
+        protected override RecipeData GetBlueprintRecipe()
         {
             QuickLogger.Debug($"Creating recipe...");
             // Create and associate recipe to the new TechType
@@ -142,25 +149,10 @@ namespace FCS_HomeSolutions.Mods.Cabinets.Buildable
             };
             return customFabRecipe;
         }
-#elif BELOWZERO
 
-        protected override RecipeData GetBlueprintRecipe()
+        protected override Sprite GetItemSprite()
         {
-            QuickLogger.Debug($"Creating recipe...");
-            // Create and associate recipe to the new TechType
-            var customFabRecipe = new RecipeData()
-            {
-                craftAmount = 1,
-                Ingredients = new List<Ingredient>()
-                {
-                    new Ingredient(Mod.AlterraMiniBathroomKitClassID.ToTechType(), 1)
-                }
-            };
-            return customFabRecipe;
+            return ImageUtils.LoadSpriteFromFile(Path.Combine(AssetsFolder, $"{ClassID}.png"));
         }
-#endif
-
-        public override TechGroup GroupForPDA { get; } = TechGroup.InteriorModules;
-        public override TechCategory CategoryForPDA { get; } = TechCategory.InteriorModule;
     }
 }

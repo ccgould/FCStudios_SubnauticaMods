@@ -163,9 +163,8 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
 
         public override void HibernateDisplay()
         {
+            HideAllPages();
             _powerOffScreen.SetActive(true);
-            _moonPoolController.Hide();
-            _homeObj.SetActive(false);
         }
         
         internal void Refresh()

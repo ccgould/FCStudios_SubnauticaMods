@@ -137,6 +137,7 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono.Dialogs
         internal void TransactionComplete()
         {
             ResetDropDown();
+            MessageBoxHandler.main.Show(Buildables.AlterraHub.PurchaseSuccessful(),FCSMessageButton.OK);
         }
 
         public IEnumerable<CartItem> GetItems()

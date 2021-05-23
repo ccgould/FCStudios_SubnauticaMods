@@ -1,17 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Spawnables;
-using FCS_AlterraHub.Structs;
 using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.HydroponicHarvester.Mono;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Crafting;
+using SMLHelper.V2.Utility;
 using UnityEngine;
+#if SUBNAUTICA
+using RecipeData = SMLHelper.V2.Crafting.TechData;
+using Sprite = Atlas.Sprite;
+#endif
 
 namespace FCS_ProductionSolutions.HydroponicHarvester.Buildable
 {
@@ -29,8 +31,6 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Buildable
         public override TechGroup GroupForPDA => TechGroup.Miscellaneous;
         public override TechCategory CategoryForPDA => TechCategory.Misc;
         public override string AssetsFolder => Mod.GetAssetPath();
-
-
 
         public override GameObject GetGameObject()
         {
@@ -85,18 +85,15 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Buildable
 
             return null;
         }
-
-
-#if SUBNAUTICA
-        protected override TechData GetBlueprintRecipe()
-        {
-            return Mod.HydroponicHarvesterIngredients;
-        }
-#elif BELOWZERO
+        
         protected override RecipeData GetBlueprintRecipe()
         {
             return Mod.HydroponicHarvesterIngredients;
         }
-#endif
+
+        protected override Sprite GetItemSprite()
+        {
+            return ImageUtils.LoadSpriteFromFile(Path.Combine(AssetsFolder, $"{ClassID}.png"));
+        }
     }
 }

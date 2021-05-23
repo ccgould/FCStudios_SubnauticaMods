@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Mono;
@@ -7,19 +6,27 @@ using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Spawnables;
 using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
-using FCS_HomeSolutions.ModManagers;
 using FCS_HomeSolutions.Mods.AlienChef.Mono;
 using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Assets;
-using SMLHelper.V2.Crafting;
+using SMLHelper.V2.Utility;
 using UnityEngine;
+#if SUBNAUTICA
+using RecipeData = SMLHelper.V2.Crafting.TechData;
+using Sprite = Atlas.Sprite;
+#endif
+
 
 namespace FCS_HomeSolutions.Mods.AlienChief.Buildables
 {
     internal partial class AlienChefBuildable : Buildable
     {
+        public override TechGroup GroupForPDA { get; } = TechGroup.InteriorModules;
+        public override TechCategory CategoryForPDA { get; } = TechCategory.InteriorModule;
+        public override string AssetsFolder { get; } = Mod.GetAssetPath();
+
         public AlienChefBuildable() : base(Mod.AlienChefClassID, Mod.AlienChefFriendly, Mod.AlienChefDescription)
         {
 
@@ -93,27 +100,17 @@ namespace FCS_HomeSolutions.Mods.AlienChief.Buildables
                 return null;
             }
         }
-
-        public override string AssetsFolder { get; } = Mod.GetAssetPath();
-
-#if SUBNAUTICA
-        protected override TechData GetBlueprintRecipe()
-        {
-            QuickLogger.Debug($"Creating recipe...");
-            // Create and associate recipe to the new TechType
-            return Mod.AlienChiefIngredients;
-        }
-#elif BELOWZERO
-
+        
         protected override RecipeData GetBlueprintRecipe()
         {
             QuickLogger.Debug($"Creating recipe...");
             // Create and associate recipe to the new TechType
             return Mod.AlienChiefIngredients;
         }
-#endif
 
-        public override TechGroup GroupForPDA { get; } = TechGroup.InteriorModules;
-        public override TechCategory CategoryForPDA { get; } = TechCategory.InteriorModule;
+        protected override Sprite GetItemSprite()
+        {
+            return ImageUtils.LoadSpriteFromFile(Path.Combine(AssetsFolder, $"{ClassID}.png"));
+        }
     }
 }

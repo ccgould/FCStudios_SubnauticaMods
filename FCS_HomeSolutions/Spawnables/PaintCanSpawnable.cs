@@ -2,17 +2,16 @@
 using System.IO;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Registration;
-using FCS_AlterraHub.Spawnables;
 using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
-using FCS_HomeSolutions.Mono.PaintTool;
-using FCSCommon.Extensions;
-using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Assets;
-using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
+using SMLHelper.V2.Utility;
 using UnityEngine;
+#if SUBNAUTICA
+using Sprite = Atlas.Sprite;
+#endif
 
 namespace FCS_HomeSolutions.Spawnables
 {
@@ -91,6 +90,11 @@ namespace FCS_HomeSolutions.Spawnables
                 QuickLogger.Error(e.Message);
                 return null;
             }
+        }
+
+        protected override Sprite GetItemSprite()
+        {
+            return ImageUtils.LoadSpriteFromFile(Path.Combine(AssetsFolder, $"{ClassID}.png"));
         }
     }
 }
