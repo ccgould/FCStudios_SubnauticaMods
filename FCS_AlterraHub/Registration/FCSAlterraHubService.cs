@@ -203,7 +203,7 @@ namespace FCS_AlterraHub.Registration
 
         public void CreateStoreEntry(TechType techType, TechType recieveTechType, decimal cost, StoreCategory category)
         {
-         CreateStoreEntry(techType,recieveTechType,1,cost,category);   
+            CreateStoreEntry(techType,recieveTechType,1,cost,category);   
         }
 
         public void CreateStoreEntry(TechType techType, TechType receiveTechType, int returnAmount, decimal cost, StoreCategory category,bool forceUnlocked = false)

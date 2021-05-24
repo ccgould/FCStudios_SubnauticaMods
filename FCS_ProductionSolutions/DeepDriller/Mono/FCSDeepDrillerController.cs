@@ -411,15 +411,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
             }
 
 
-            _ping = gameObject.EnsureComponent<PingInstance>();
-
-            if (_ping != null)
-            {
-                _ping.enabled = false;
-                _ping.pingType = QPatch.DeepDrillerPingType;
-                _ping.origin = transform;
-                _ping.enabled = true;
-            }
+            FCS_AlterraHub.Helpers.WorldHelpers.CreateBeacon(gameObject,QPatch.DeepDrillerPingType,"");
 
             _line = gameObject.GetComponent<LineRenderer>();
             _line.SetVertexCount(Segments + 1);

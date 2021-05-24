@@ -16,13 +16,16 @@ namespace FCS_EnergySolutions.Spawnables
     class PowerStorageCell : Spawnable
     {
         public override string AssetsFolder => Mod.GetAssetPath();
+
         public PowerStorageCell() : base("PowerStorageCell", "Power Storage Cell", "An empty powercell to be used in power storage.")
         {
+
             OnFinishedPatching += () =>
             {
                 FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, TechType, 1000, StoreCategory.Energy);
                 CraftDataHandler.SetEquipmentType(TechType, EquipmentType.PowerCellCharger);
                 TechDataHelpers.AddPowercell(TechType);
+                KnownTechHandler.SetAnalysisTechEntry(TechType.PowerCell, new TechType[1] { TechType });
             };
         }
 

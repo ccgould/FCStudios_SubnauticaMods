@@ -7,19 +7,14 @@ using System.Reflection;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Mono.AlterraHubFabricatorBuilding.Mono;
 using FCS_AlterraHub.Mono.FCSPDA.Mono;
-using FCS_AlterraHub.Mono.FCSPDA.Mono.ScreenItems;
-using FCS_AlterraHub.Patches;
 using FCS_AlterraHub.Registration;
-using FCS_AlterraHub.Spawnables;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using FMOD;
 using SMLHelper.V2.Crafting;
-using SMLHelper.V2.Json.ExtensionMethods;
 using SMLHelper.V2.Utility;
 using UnityEngine;
-using Object = UnityEngine.Object;
 using SearchOption = System.IO.SearchOption;
 #if SUBNAUTICA_STABLE
 using Oculus.Newtonsoft.Json;
@@ -459,6 +454,7 @@ namespace FCS_AlterraHub.Configuration
             gameObject.AddComponent<AlterraFabricatorStationController>();
             LargeWorldEntity.Register(gameObject);
             gameObject.transform.position = new Vector3(-809.10f, -241.30f, -387.70f);
+            Helpers.WorldHelpers.CreateBeacon(gameObject, AlterraHubStationPingType,"Alterra Hub Station");
             MaterialHelpers.ApplyGlassShaderTemplate(gameObject, "_glass", Mod.ModName);
 
             yield break;
@@ -467,6 +463,7 @@ namespace FCS_AlterraHub.Configuration
 
 
         public static bool IsOreConsumerSpawned { get; set; }
+        public static PingType AlterraHubStationPingType { get; set; }
 
         public static void DeepCopySave(AccountDetails accountDetails)
         {

@@ -14,21 +14,14 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono.ScreenItems
     {
         private decimal _price;
         private int _returnAmount;
-        
-        internal void CheckIsUnlocked()
+        private bool _forceUnlock;
+
+        internal bool CheckIsUnlocked()
         {
-            if (TechType != TechType.None && !gameObject.activeSelf)
-            {
-                if (IsVisibleForced)
-                {
-                    gameObject.SetActive(true);
-                    return;
-                }
-                
-                bool isUnlocked = CrafterLogic.IsCraftRecipeUnlocked(TechType);
-                QuickLogger.Debug($"Checking if {Language.main.Get(TechType)} is unlocked: {isUnlocked}");
-                gameObject.SetActive(isUnlocked);
-            }
+            if (TechType == TechType.None) return false;
+            bool isUnlocked = CrafterLogic.IsCraftRecipeUnlocked(TechType);
+            QuickLogger.Debug($"Checking if {Language.main.Get(TechType)} is unlocked: {isUnlocked}");
+            return isUnlocked;
         }
 
         public TechType TechType { get; set; }
@@ -36,6 +29,7 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono.ScreenItems
 
         internal void Initialize(FCSStoreEntry storeEntry, Action<TechType, TechType,int> callback, StoreCategory category, Func<bool> toolTipPermission)
         {
+            _forceUnlock = storeEntry.ForcedUnlock;
             IsVisibleForced = storeEntry.ForcedUnlock;
 
             _price = storeEntry.Cost;
@@ -100,7 +94,14 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono.ScreenItems
         }
         public void Show()
         {
-            gameObject.SetActive(true);
+            if (CheckIsUnlocked() || _forceUnlock)
+            {
+                gameObject.SetActive(true);
+            }
+            else
+            {
+                Hide();
+            }
         }
     }
 }

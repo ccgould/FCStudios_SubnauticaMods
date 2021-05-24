@@ -230,6 +230,7 @@
     <Compile Include="Mono\FCSPDA\Mono\FCSPDAController.cs" />
     <Compile Include="Mono\FCSPDA\Mono\Model\RadialMenu.cs" />
     <Compile Include="Mono\FCSPDA\Mono\Model\RadialMenuEntry.cs" />
+    <Compile Include="Mono\FCSPDA\Mono\ScreenItems\EncyclopediaTabController.cs" />
     <Compile Include="Mono\FCSStorage.cs" />
     <Compile Include="Mono\FCSStorageNonSerialized.cs" />
     <Compile Include="Mono\FCSTechLigtController.cs" />

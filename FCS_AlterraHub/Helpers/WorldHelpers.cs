@@ -1,6 +1,9 @@
 ﻿using System;
+using System.IO;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
+using SMLHelper.V2.Handlers;
+using SMLHelper.V2.Utility;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -100,6 +103,28 @@ namespace FCS_AlterraHub.Helpers
         public static bool CheckIfInRange(GameObject mainGameObject, GameObject gameObject, float range)
         {
             return Vector3.Distance(mainGameObject.transform.position, gameObject.transform.position) <= range;
+        }
+
+        public static PingType CreatePingType(string id,string pingName, Atlas.Sprite pingSprite)
+        {
+            SpriteHandler.RegisterSprite(SpriteManager.Group.Pings, id, pingSprite);
+            return PingHandler.RegisterNewPingType(pingName, pingSprite);
+        }
+
+        public static PingInstance CreateBeacon(GameObject gameObject,PingType pingType,string label,bool isEnable = true)
+        {
+           var pingInstance = gameObject.EnsureComponent<PingInstance>();
+
+            if (pingInstance != null)
+            {
+                pingInstance.enabled = false;
+                pingInstance.pingType = pingType;
+                pingInstance.origin = gameObject.transform;
+                pingInstance.SetLabel(label);
+                pingInstance.enabled = isEnable;
+            }
+
+            return pingInstance;
         }
     }
 }

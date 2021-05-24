@@ -11,6 +11,7 @@ using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Assets;
+using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 #if SUBNAUTICA
@@ -33,6 +34,7 @@ namespace FCS_EnergySolutions.Spawnables
             OnFinishedPatching += () =>
             {
                 FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.WindSurferKitClassID.ToTechType(), 243000, StoreCategory.Energy);
+                KnownTechHandler.SetAnalysisTechEntry(Mod.WindSurferOperatorClassName.ToTechType(), new TechType[1] { TechType });
             };
         }
 

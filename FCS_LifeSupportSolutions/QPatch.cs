@@ -70,8 +70,11 @@ namespace FCS_LifeSupportSolutions
             {
                 var baseUtilityUnit = new BaseUtilityUnitPatch();
                 baseUtilityUnit.Patch();
-                var baseOxygenTankPatch = new BaseOxygenTankPatch();
-                baseOxygenTankPatch.Patch();
+                var baseOxygenTankPatchKit = new BaseOxygenTankPatch($"{Mod.BaseOxygenTankClassID}KitType", $"{Mod.BaseOxygenTankClassID}KitType", true);
+                baseOxygenTankPatchKit.Patch();                
+                
+                var baseOxygenTankPatchResources = new BaseOxygenTankPatch(Mod.BaseOxygenTankClassID, Mod.BaseOxygenTankClassID);
+                baseOxygenTankPatchResources.Patch();
             }
             
             //Register debug commands

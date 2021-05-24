@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+using FCS_AlterraHub.Helpers;
 using FCS_HomeSolutions.Mods.Replicator.Buildables;
 using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
@@ -73,8 +74,7 @@ namespace FCS_ProductionSolutions
                 }
                 
                 var pingSprite = ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetFolder(), "DeepDriller_ping.png"));
-                SpriteHandler.RegisterSprite(SpriteManager.Group.Pings, "Deep Driller", pingSprite);
-                DeepDrillerPingType = PingHandler.RegisterNewPingType("Deep Driller", pingSprite);
+                DeepDrillerPingType = WorldHelpers.CreatePingType("Deep Driller","Deep Driller",pingSprite);
 
                 var deepDriller = new FCSDeepDrillerBuildable();
                 deepDriller.Patch();

@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using FCS_AlterraHub.API;
 using FCS_AlterraHub.Buildables;
@@ -15,6 +17,7 @@ using FCSCommon.Utilities;
 using HarmonyLib;
 using QModManager.API.ModLoading;
 using SMLHelper.V2.Handlers;
+using SMLHelper.V2.Utility;
 using UnityEngine;
 
 namespace FCS_AlterraHub
@@ -62,9 +65,21 @@ namespace FCS_AlterraHub
             //Patch all Additional Store Items
             PatchAdditionalStoreItems();
 
-
             //Run Harmony Patches
             var harmony = Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), "com.alterrahub.fcstudios");
+
+            //Create AlterraHubStation PingType
+            var type = Type.GetType("SubnauticaMap.PingMapIcon, SubnauticaMap", false, false);
+            if (type != null)
+            {
+                var pingOriginal = AccessTools.Method(type, "Refresh");
+                var pingPrefix = new HarmonyMethod(AccessTools.Method(typeof(PingMapIcon_Patch), "Prefix"));
+                harmony.Patch(pingOriginal, pingPrefix);
+            }
+
+            Mod.AlterraHubStationPingType = WorldHelpers.CreatePingType("AlterraHubStation", "AlterraHubStation",
+                ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), "AlterraHubPing.png")));
+            
 
             //if (QModServices.Main.ModPresent("EasyCraft"))
             //    EasyCraft_API.Init(harmony);
@@ -78,33 +93,33 @@ namespace FCS_AlterraHub
         private static void PatchAdditionalStoreItems()
         {
             //Electronics
-            FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType.ReactorRod, TechType.ReactorRod, 5, 18000, StoreCategory.Misc);
+            FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType.ReactorRod, TechType.ReactorRod, 5, 445000, StoreCategory.Misc);
             StoreInventorySystem.AddInvalidReturnItem(TechType.ReactorRod);
-            FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType.AdvancedWiringKit, TechType.AdvancedWiringKit, 5, 50000, StoreCategory.Misc);
+            FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType.AdvancedWiringKit, TechType.AdvancedWiringKit, 5, 372500, StoreCategory.Misc);
             StoreInventorySystem.AddInvalidReturnItem(TechType.AdvancedWiringKit);
-            FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType.WiringKit, TechType.WiringKit, 5,50000, StoreCategory.Misc);
+            FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType.WiringKit, TechType.WiringKit, 5, 115000, StoreCategory.Misc);
             StoreInventorySystem.AddInvalidReturnItem(TechType.WiringKit);
-            FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType.PrecursorIonPowerCell, TechType.PrecursorIonPowerCell, 5,50000, StoreCategory.Misc);
+            FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType.PrecursorIonPowerCell, TechType.PrecursorIonPowerCell, 5, 425000, StoreCategory.Misc);
             StoreInventorySystem.AddInvalidReturnItem(TechType.PrecursorIonPowerCell);
-            FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType.PowerCell, TechType.PowerCell, 5,50000, StoreCategory.Misc);
+            FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType.PowerCell, TechType.PowerCell, 5, 35000, StoreCategory.Misc);
             StoreInventorySystem.AddInvalidReturnItem(TechType.PowerCell);
-            FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType.PrecursorIonBattery, TechType.PrecursorIonBattery, 5,50000, StoreCategory.Misc);
+            FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType.PrecursorIonBattery, TechType.PrecursorIonBattery, 5, 210000, StoreCategory.Misc);
             StoreInventorySystem.AddInvalidReturnItem(TechType.PrecursorIonBattery);
-            FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType.Battery, TechType.Battery, 5,10200, StoreCategory.Misc);
+            FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType.Battery, TechType.Battery, 5, 16250, StoreCategory.Misc);
             StoreInventorySystem.AddInvalidReturnItem(TechType.Battery);
-            FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType.CopperWire, TechType.CopperWire, 5,50000, StoreCategory.Misc);
+            FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType.CopperWire, TechType.CopperWire, 5, 23750, StoreCategory.Misc);
             StoreInventorySystem.AddInvalidReturnItem(TechType.CopperWire);
 
             //Advanced Materials
-            FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType.Polyaniline, TechType.Polyaniline, 5,98340, StoreCategory.Misc);
+            FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType.Polyaniline, TechType.Polyaniline, 5, 88750, StoreCategory.Misc);
             StoreInventorySystem.AddInvalidReturnItem(TechType.Polyaniline);
-            FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType.Aerogel, TechType.Aerogel, 5,153600, StoreCategory.Misc);
+            FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType.Aerogel, TechType.Aerogel, 5, 133000, StoreCategory.Misc);
             StoreInventorySystem.AddInvalidReturnItem(TechType.Aerogel);
-            FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType.AramidFibers, TechType.AramidFibers, 5,85800, StoreCategory.Misc);
+            FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType.AramidFibers, TechType.AramidFibers, 5, 95000, StoreCategory.Misc);
             StoreInventorySystem.AddInvalidReturnItem(TechType.AramidFibers);
-            FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType.Benzene, TechType.Benzene, 5,67500, StoreCategory.Misc);
+            FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType.Benzene, TechType.Benzene, 5, 75000, StoreCategory.Misc);
             StoreInventorySystem.AddInvalidReturnItem(TechType.Benzene);
-            FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType.HydrochloricAcid, TechType.HydrochloricAcid, 5,4800, StoreCategory.Misc);
+            FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType.HydrochloricAcid, TechType.HydrochloricAcid, 5, 10000, StoreCategory.Misc);
             StoreInventorySystem.AddInvalidReturnItem(TechType.HydrochloricAcid);
         }
 
@@ -139,6 +154,28 @@ namespace FCS_AlterraHub
             //Patch OreConsumer
             var oreConsumer = new OreConsumer();
             oreConsumer.Patch();
+        }
+
+        public static class PingMapIcon_Patch
+        {
+            [HarmonyPrefix]
+            public static bool Prefix(object __instance)
+            {
+                FieldInfo field = __instance.GetType().GetField("ping");
+                PingInstance ping = field.GetValue(__instance) as PingInstance;
+                if (ping.pingType == Mod.AlterraHubStationPingType)
+                {
+                    FieldInfo field2 = __instance.GetType().GetField("icon");
+                    uGUI_Icon icon = field2.GetValue(__instance) as uGUI_Icon;
+                    icon.sprite = SpriteManager.Get(SpriteManager.Group.Pings, "AlterraHubStation");
+                    icon.color = Color.black;
+                    RectTransform rectTransform = icon.rectTransform;
+                    rectTransform.sizeDelta = Vector2.one * 28f;
+                    rectTransform.localPosition = Vector3.zero;
+                    return false;
+                }
+                return true;
+            }
         }
     }
 }

@@ -1,10 +1,15 @@
 ﻿using System;
 using System.IO;
+using FCS_AlterraHub.Enumerators;
+using FCS_AlterraHub.Registration;
+using FCS_AlterraHub.Spawnables;
 using FCS_LifeSupportSolutions.Buildable;
 using FCS_LifeSupportSolutions.Configuration;
 using FCS_LifeSupportSolutions.Mods.OxygenTank.Mono;
+using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
+using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 #if SUBNAUTICA
@@ -16,13 +21,26 @@ namespace FCS_LifeSupportSolutions.Mods.BaseOxygenTank.Buildable
 {
     internal class BaseOxygenTankPatch : SMLHelper.V2.Assets.Buildable
     {
+        private bool _isKitType;
+        private string _iconName;
         public override TechGroup GroupForPDA => TechGroup.ExteriorModules;
         public override TechCategory CategoryForPDA => TechCategory.ExteriorModule;
         private string _assetFolder => Mod.GetAssetFolder();
         public override string AssetsFolder => _assetFolder;
 
-        public BaseOxygenTankPatch() : base(Mod.BaseOxygenTankClassID, Mod.BaseOxygenTankFriendly, Mod.BaseOxygenTankDescription)
+        public BaseOxygenTankPatch(string classID, string iconName,bool isKitType = false) : base(classID, Mod.BaseOxygenTankFriendly, Mod.BaseOxygenTankDescription)
         {
+            _iconName = iconName;
+            _isKitType = isKitType;
+            OnFinishedPatching += () =>
+            {
+                if (!isKitType) return;
+                var baseOxygenTank = new FCSKit($"{Mod.BaseOxygenTankClassID}_Kit", FriendlyName,
+                    Path.Combine(AssetsFolder, $"{iconName}.png"));
+                baseOxygenTank.Patch();
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, baseOxygenTank.TechType, 49250, StoreCategory.LifeSupport);
+                FCSAlterraHubService.PublicAPI.RegisterPatchedMod(ClassID);
+            };
         }
 
         public override GameObject GetGameObject()
@@ -81,13 +99,28 @@ namespace FCS_LifeSupportSolutions.Mods.BaseOxygenTank.Buildable
         protected override RecipeData GetBlueprintRecipe()
         {
             QuickLogger.Debug($"Creating recipe...");
+
             // Create and associate recipe to the new TechType
+            if (_isKitType)
+            {
+                return TrashRecyclerIngredients;
+            }
             return Mod.BaseOxygenTankIngredients;
         }
 
         protected override Sprite GetItemSprite()
         {
-            return ImageUtils.LoadSpriteFromFile(Path.Combine(AssetsFolder, $"{ClassID}.png"));
+            return ImageUtils.LoadSpriteFromFile(Path.Combine(AssetsFolder, $"{_iconName}.png"));
         }
+
+
+        internal static RecipeData TrashRecyclerIngredients => new TechData
+        {
+            craftAmount = 1,
+            Ingredients =
+            {
+                new Ingredient($"{Mod.BaseOxygenTankClassID}_Kit".ToTechType(), 1),
+            }
+        };
     }
 }

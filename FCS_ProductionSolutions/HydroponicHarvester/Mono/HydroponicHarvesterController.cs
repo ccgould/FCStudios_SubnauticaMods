@@ -167,8 +167,6 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
                 DisplayManager = gameObject.AddComponent<DisplayManager>();
                 DisplayManager.Setup(this);
             }
-
-            FCSAlterraHubService.PublicAPI.AddEncyclopediaEntries(GetTechType(), true);
             
             _unitID = GameObjectHelpers.FindGameObject(gameObject, "UNITID").GetComponent<Text>();
 
