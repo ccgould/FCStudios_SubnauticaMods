@@ -84,7 +84,7 @@ namespace FCS_AlterraHub
             //if (QModServices.Main.ModPresent("EasyCraft"))
             //    EasyCraft_API.Init(harmony);
             
-            FCSAlterraHubService.PublicAPI.RegisterEncyclopediaEntry(EncyclopediaConfig.EncyclopediaEntries);
+            //FCSAlterraHubService.PublicAPI.RegisterEncyclopediaEntry(EncyclopediaConfig.EncyclopediaEntries);
 
             //Register debug commands
             ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));

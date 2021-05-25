@@ -114,6 +114,7 @@
     <Compile Include="Enumerators\StorageType.cs" />
     <Compile Include="Mono\ToggleController.cs" />
     <Compile Include="Model\TrackedResource.cs" />
+    <Compile Include="Patches\PDAEncyclopedia_Patches.cs" />
     <Compile Include="Spawnables\AlterraHubDepotFragment.cs" />
     <Compile Include="Structs\TrackedLight.cs" />
     <Compile Include="Objects\ColorList.cs" />
@@ -170,5 +171,5 @@
     <Folder Include="Mono\AlterraHubDepot\Model\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-<Import Project="$(SolutionDir)\PostBuildEvents.targets" />
+  <Import Project="$(SolutionDir)\PostBuildEvents.targets" />
 </Project>

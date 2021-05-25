@@ -5,7 +5,7 @@ using HarmonyLib;
 namespace FCS_AlterraHub.Patches
 {
     [HarmonyPatch(typeof(PDAScanner), nameof(PDAScanner.Scan), new Type[] { })]
-    public class PDAScanner_Scan
+    public class PDAScanner_ScanPatch
     {
         public static TechType techType;
         [HarmonyPrefix]

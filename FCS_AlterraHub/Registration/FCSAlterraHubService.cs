@@ -18,6 +18,7 @@ namespace FCS_AlterraHub.Registration
 {
     public interface IFCSAlterraHubService
     {
+        bool IsRegisteringEncyclopedia { get; set; }
         void RegisterDevice(FcsDevice device, string tabID, string packageId);
         void RemoveDeviceFromGlobal(string unitID);
         void CreateStoreEntry(TechType techType, TechType receiveTechType, decimal cost, StoreCategory category);
@@ -28,7 +29,7 @@ namespace FCS_AlterraHub.Registration
         void RegisterPatchedMod(string mod);
         int GetRegisterModCount(string tabID);
         bool IsTechTypeRegistered(TechType techType);
-        void RegisterEncyclopediaEntry(Dictionary<string, List<EncyclopediaEntryData>> encyclopediaEntries);
+        void RegisterEncyclopediaEntries(Dictionary<string, List<EncyclopediaEntryData>> encyclopediaEntries);
         void UnRegisterDevice(FcsDevice device);
         void RegisterTechLight(TechLight techLight);
         bool ChargeAccount(decimal amount);
@@ -42,6 +43,7 @@ namespace FCS_AlterraHub.Registration
         Dictionary<string, FcsDevice> GetRegisteredDevicesOfId(string id);
         void RegisterBase(BaseManager manager);
         void UnRegisterBase(BaseManager manager);
+        void AddEncyclopediaEntries(bool verbose = false);
         void CreateStoreEntry(TechType techType, TechType receiveTechType,int returnAmount, decimal cost, StoreCategory category,bool forceUnlocked = false);
     }
 
@@ -261,8 +263,10 @@ namespace FCS_AlterraHub.Registration
             return _registeredTechTypes.Contains(techType);
         }
         
-        public void RegisterEncyclopediaEntry(Dictionary<string, List<EncyclopediaEntryData>> encyclopediaEntries)
+        public void RegisterEncyclopediaEntries(Dictionary<string, List<EncyclopediaEntryData>> encyclopediaEntries)
         {
+            
+            IsRegisteringEncyclopedia = true;
             LanguageHandler.SetLanguageLine($"EncyPath_fcs", "Field Creators Studios");
 
 
@@ -272,47 +276,30 @@ namespace FCS_AlterraHub.Registration
                 {
                     LanguageHandler.SetLanguageLine($"Ency_{data.Key}", entryData.Title);
                     LanguageHandler.SetLanguageLine($"EncyDesc_{data.Key}", entryData.Body);
-                    PDAEncyclopediaHandler.AddCustomEntry(new PDAEncyclopedia.EntryData
+
+                    PDAEncyclopedia.mapping.Add(data.Key, new PDAEncyclopedia.EntryData
                     {
                         //audio = entryData.audio,
                         image = entryData.Image,
                         key = data.Key,
                         nodes = PDAEncyclopedia.ParsePath(entryData.Path),
                         path = entryData.Path,
-                        //popup = entryData.popup,
-                        //sound = entryData.sound,
                         timeCapsule = false,
                         unlocked = entryData.Unlocked
                     });
+
+                    if(entryData.Unlocked)
+                        PDAEncyclopedia.Add(data.Key, false);
                 }
             }
+            IsRegisteringEncyclopedia = false;
         }
 
-        public void AddEncyclopediaEntries(TechType techType, bool verbose)
+        public bool IsRegisteringEncyclopedia { get; set; }
+
+        public void AddEncyclopediaEntries(bool verbose = false)
         {
-            var node = new CraftNode("fcs", TreeAction.Expand)
-            {
-                string0 = "EncyPath_fcs",
-                string1 = "Field Creators Studios"
-            };
-            PDAEncyclopedia.tree.AddNode(node);
-
-            foreach (var entryData in PDAEncyclopedia.entries)
-            {
-                PDAEncyclopedia.Add(entryData.Key, verbose);
-            }
-
-
-            //if (IsTechTypeRegistered(techType))
-            //{
-            //    if (_pdaEntries.ContainsKey(techType))
-            //    {
-            //        foreach (FcsEntryData entryData in _pdaEntries[techType])
-            //        {
-
-            //        }
-            //    }
-            //}
+            
         }
 
 

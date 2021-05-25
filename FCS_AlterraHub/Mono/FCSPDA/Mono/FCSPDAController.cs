@@ -84,6 +84,7 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
         private static FCSPDAController _instance;
         private ReturnsDialogController _returnsDialogController;
         private List<MeshRenderer> _pdaMeshes = new List<MeshRenderer>();
+        internal EncyclopediaTabController EncyclopediaTabController { get; set; }
         public static FCSPDAController Instance => _instance;
         #endregion
 
@@ -270,7 +271,7 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
 
         private void EncyclopediaPage()
         {
-            _pages[PDAPages.Encyclopedia].AddComponent<EncyclopediaTabController>();
+            EncyclopediaTabController = _pages[PDAPages.Encyclopedia].AddComponent<EncyclopediaTabController>();
             var backButton = _pages[PDAPages.Encyclopedia].FindChild("BackBTN").GetComponent<Button>();
             backButton.onClick.AddListener((() =>
             {
@@ -507,9 +508,12 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
                     }
                     _toggleHud.gameObject.SetActive(true);
                     break;
+                case PDAPages.Encyclopedia:
+                    EncyclopediaTabController.Refresh();
+                    _toggleHud.gameObject.SetActive(true);
+                    break;
                 case PDAPages.Home:
                 case PDAPages.StorePage:
-                case PDAPages.Encyclopedia:
                 case PDAPages.AccountPage:
                     _toggleHud.gameObject.SetActive(true);
                     break;
@@ -675,6 +679,11 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
         {
             GoToPage(PDAPages.Encyclopedia);
             Open();
+        }
+
+        public CraftNode GetCraftTree()
+        {
+            return EncyclopediaTabController.Tree;
         }
     }
     
