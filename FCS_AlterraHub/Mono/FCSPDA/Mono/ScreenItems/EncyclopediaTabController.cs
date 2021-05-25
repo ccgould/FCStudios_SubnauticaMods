@@ -1,4 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.IO;
+using FCS_AlterraHub.Configuration;
+using FCSCommon.Helpers;
+using SMLHelper.V2.Handlers;
+using SMLHelper.V2.Utility;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -6,10 +11,13 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono.ScreenItems
 {
     internal class EncyclopediaTabController : MonoBehaviour, uGUI_IListEntryManager
     {
-        private CraftNode tree = new CraftNode("Root")
+        private CraftNode _pda => PDAEncyclopedia.tree;
+        private Dictionary<string, PDAEncyclopedia.EntryData> _pdaEntrees => PDAEncyclopedia.mapping;
+
+        private CraftNode _tree = new CraftNode("FCSRoot")
         {
-            string0 = string.Empty,
-            string1 = string.Empty,
+            string0 = "EncyPath_fcs",
+            string1 = "Field Creators Studios",
             monoBehaviour0 = null,
             bool0 = false,
             int0 = 0
@@ -33,25 +41,41 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono.ScreenItems
         public LayoutElement imageLayout;
         [AssertNotNull]
         public Texture2D defaultTexture;
-        public Sprite iconExpand;
         public float indentStep = 10f;
         private List<uGUI_ListEntry> pool = new List<uGUI_ListEntry>();
         public UISpriteData pathNodeSprites;
         public UISpriteData entryNodeSprites;
         public RectTransform listCanvas;
-        public GameObject prefabEntry;
+        public GameObject prefabEntry => Buildables.AlterraHub.EncyclopediaEntryPrefab;
         private object selectedItem;
         public ScrollRect listScrollRect;
         public Sprite iconCollapse;
+        public Sprite iconExpand;
+        private static readonly EntryComparer entryComparer = new EntryComparer();
+
+        private void Awake()
+        {
+            title = GameObjectHelpers.FindGameObject(gameObject, "Title").GetComponent<Text>();
+            message = GameObjectHelpers.FindGameObject(gameObject, "Description").GetComponent<Text>();
+            var banner = GameObjectHelpers.FindGameObject(gameObject, "Banner");
+            image = banner.GetComponent<RawImage>();
+            imageLayout = banner.GetComponent<LayoutElement>();
+            var encycList = GameObjectHelpers.FindGameObject(gameObject, "EncyclopediaList");
+            listScrollRect = encycList.GetComponent<ScrollRect>();
+            iconCollapse = Buildables.AlterraHub.UpArrow;
+            iconExpand = Buildables.AlterraHub.DownArrow;
+            listCanvas = encycList.FindChild("Viewport").FindChild("Content").GetComponent<RectTransform>();
+            Expand(_tree);
+        }
 
         public bool OnButtonDown(string key, GameInput.Button button)
         {
-            CraftNode craftNode = this.tree.FindNodeById(key, false) as CraftNode;
+            CraftNode craftNode = _tree.FindNodeById(key, false) as CraftNode;
             if (craftNode == null)
             {
                 return false;
             }
-            uGUI_EncyclopediaTab.GetNodeListEntry(craftNode);
+            GetNodeListEntry(craftNode);
             TreeAction action = craftNode.action;
             if (button != GameInput.Button.LeftHand)
             {
@@ -62,16 +86,16 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono.ScreenItems
                     case GameInput.Button.UILeft:
                         if (action == TreeAction.Expand)
                         {
-                            if (uGUI_EncyclopediaTab.GetNodeExpanded(craftNode))
+                            if (GetNodeExpanded(craftNode))
                             {
-                                this.ToggleExpand(craftNode);
+                                ToggleExpand(craftNode);
                             }
                             else
                             {
                                 CraftNode craftNode2 = craftNode.parent as CraftNode;
                                 if (craftNode2 != null && craftNode2.action == TreeAction.Expand)
                                 {
-                                    this.SelectItem(uGUI_EncyclopediaTab.GetNodeListEntry(craftNode2));
+                                    SelectItem(GetNodeListEntry(craftNode2));
                                 }
                             }
                         }
@@ -80,30 +104,30 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono.ScreenItems
                             CraftNode craftNode3 = craftNode.parent as CraftNode;
                             if (craftNode3 != null && craftNode3.action == TreeAction.Expand)
                             {
-                                this.SelectItem(uGUI_EncyclopediaTab.GetNodeListEntry(craftNode3));
+                                SelectItem(GetNodeListEntry(craftNode3));
                             }
                         }
                         return true;
                     case GameInput.Button.UIRight:
                         if (action == TreeAction.Expand)
                         {
-                            if (uGUI_EncyclopediaTab.GetNodeExpanded(craftNode))
+                            if (GetNodeExpanded(craftNode))
                             {
                                 using (IEnumerator<CraftNode> enumerator = craftNode.GetEnumerator())
                                 {
                                     if (enumerator.MoveNext())
                                     {
                                         CraftNode node = enumerator.Current;
-                                        this.SelectItem(uGUI_EncyclopediaTab.GetNodeListEntry(node));
+                                        SelectItem(GetNodeListEntry(node));
                                     }
                                     return true;
                                 }
                             }
-                            this.ToggleExpand(craftNode);
+                            ToggleExpand(craftNode);
                         }
                         else if (action == TreeAction.Craft)
                         {
-                            this.Activate(craftNode);
+                            Activate(craftNode);
                         }
                         return true;
                 }
@@ -112,64 +136,64 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono.ScreenItems
             IL_4C:
             if (action == TreeAction.Expand)
             {
-                this.ToggleExpand(craftNode);
+                ToggleExpand(craftNode);
             }
             else if (action == TreeAction.Craft)
             {
-                this.Activate(craftNode);
+                Activate(craftNode);
             }
             return true;
         }
 
         public void SelectItem(object item)
         {
-            this.selectedItem = item;
-            this.DeselectItem();
+            selectedItem = item;
+            DeselectItem();
             uGUI_ListEntry uGUI_ListEntry = item as uGUI_ListEntry;
             if (uGUI_ListEntry != null)
             {
                 UISelection.selected = uGUI_ListEntry;
                 uGUI_ListEntry.OnPointerEnter(null);
-                this.listScrollRect.ScrollTo(uGUI_ListEntry.rectTransform, true, false, new Vector4(10f, 10f, 10f, 10f));
+                listScrollRect.ScrollTo(uGUI_ListEntry.rectTransform, true, false, new Vector4(10f, 10f, 10f, 10f));
                 return;
             }
-            if (this.selectedItem is Selectable)
+            if (selectedItem is Selectable)
             {
-                (this.selectedItem as Selectable).Select();
+                (selectedItem as Selectable).Select();
                 UISelection.selected = null;
             }
         }
 
         public void DeselectItem()
         {
-            if (this.selectedEntry == null)
+            if (selectedEntry == null)
             {
                 return;
             }
-            this.selectedEntry.OnPointerExit(null);
+            selectedEntry.OnPointerExit(null);
             UISelection.selected = null;
         }
 
         private void ToggleExpand(CraftNode node)
         {
-            if (uGUI_EncyclopediaTab.GetNodeExpanded(node))
+            if (GetNodeExpanded(node))
             {
-                this.Collapse(node);
+                Collapse(node);
                 return;
             }
-            this.Expand(node);
-            this.UpdatePositions();
+            Expand(node);
+            UpdatePositions();
         }
 
         private void UpdatePositions()
         {
-            using (IEnumerator<CraftNode> enumerator = this.tree.Traverse(false))
+            using (IEnumerator<CraftNode> enumerator = _tree.Traverse(false))
             {
                 int num = 0;
                 while (enumerator.MoveNext())
                 {
                     CraftNode node = enumerator.Current;
-                    uGUI_ListEntry nodeListEntry = uGUI_EncyclopediaTab.GetNodeListEntry(node);
+                    uGUI_ListEntry nodeListEntry = GetNodeListEntry(node);
                     if (nodeListEntry != null)
                     {
                         nodeListEntry.rectTransform.SetSiblingIndex(num);
@@ -181,13 +205,13 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono.ScreenItems
 
         private void Expand(CraftNode node)
         {
-            uGUI_EncyclopediaTab.SetNodeExpanded(node, true);
-            uGUI_ListEntry nodeListEntry = uGUI_EncyclopediaTab.GetNodeListEntry(node);
+            SetNodeExpanded(node, true);
+            uGUI_ListEntry nodeListEntry = GetNodeListEntry(node);
             if (nodeListEntry != null)
             {
-                nodeListEntry.SetNotificationAlpha(0f);
-                nodeListEntry.SetIcon(this.iconCollapse);
+                nodeListEntry.SetIcon(iconCollapse);
             }
+            
             CraftNode node2 = PDAEncyclopedia.GetNode(node.id);
             if (node2 == null)
             {
@@ -196,21 +220,25 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono.ScreenItems
             foreach (CraftNode craftNode in node2)
             {
                 string id = craftNode.id;
-                CraftNode craftNode2 = node[id] as CraftNode;
-                if (craftNode2 == null)
+                if (!(node[id] is CraftNode craftNode2))
                 {
-                    craftNode2 = this.CreateNode(craftNode, node);
+                    CreateNode(craftNode, node);
                 }
                 else
                 {
-                    uGUI_EncyclopediaTab.GetNodeListEntry(craftNode2).gameObject.SetActive(true);
-                    if (uGUI_EncyclopediaTab.GetNodeExpanded(craftNode2))
+                    GetNodeListEntry(craftNode2).gameObject.SetActive(true);
+                    if (GetNodeExpanded(craftNode2))
                     {
-                        this.Expand(craftNode2);
+                        Expand(craftNode2);
                     }
                 }
             }
-            node.Sort(uGUI_EncyclopediaTab.entryComparer);
+            node.Sort(entryComparer);
+        }
+
+        private static bool GetNodeExpanded(CraftNode node)
+        {
+            return node.bool0;
         }
 
         private void Activate(CraftNode node)
@@ -219,7 +247,7 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono.ScreenItems
             {
                 return;
             }
-            uGUI_ListEntry nodeListEntry = uGUI_EncyclopediaTab.GetNodeListEntry(node);
+            uGUI_ListEntry nodeListEntry = GetNodeListEntry(node);
             if (activeEntry != nodeListEntry)
             {
                 if (activeEntry != null)
@@ -235,21 +263,30 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono.ScreenItems
             }
         }
 
+        private static void SetNodeExpanded(CraftNode node, bool state)
+        {
+            node.bool0 = state;
+        }
+
+        private static uGUI_ListEntry GetNodeListEntry(CraftNode node)
+        {
+            return node.monoBehaviour0 as uGUI_ListEntry;
+        }
+
         private void Collapse(CraftNode node)
         {
-            uGUI_EncyclopediaTab.SetNodeExpanded(node, false);
-            uGUI_ListEntry nodeListEntry = uGUI_EncyclopediaTab.GetNodeListEntry(node);
+            SetNodeExpanded(node, false);
+            uGUI_ListEntry nodeListEntry = GetNodeListEntry(node);
             if (nodeListEntry != null)
             {
-                uGUI_EncyclopediaTab.UpdateNotificationsCount(nodeListEntry, uGUI_EncyclopediaTab.GetNodeNotificationsCount(node));
-                nodeListEntry.SetIcon(this.iconExpand);
+                nodeListEntry.SetIcon(iconExpand);
             }
             using (IEnumerator<CraftNode> enumerator = node.Traverse(false))
             {
                 while (enumerator.MoveNext())
                 {
                     CraftNode node2 = enumerator.Current;
-                    uGUI_ListEntry nodeListEntry2 = uGUI_EncyclopediaTab.GetNodeListEntry(node2);
+                    uGUI_ListEntry nodeListEntry2 = GetNodeListEntry(node2);
                     if (nodeListEntry2 != null)
                     {
                         nodeListEntry2.gameObject.SetActive(false);
@@ -260,37 +297,11 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono.ScreenItems
 
         private void DisplayEntry(string key)
         {
-            PDAEncyclopedia.EntryData entryData;
-            if (key != null && PDAEncyclopedia.GetEntryData(key, out entryData))
+            if (key != null && PDAEncyclopedia.GetEntryData(key, out var entryData))
             {
-                if (entryData.timeCapsule)
-                {
-                    if (TimeCapsuleContentProvider.GetData(key, out var text, out var text2, out var text3))
-                    {
-                        SetTitle(text);
-                        SetText(text2);
-                        if (!string.IsNullOrEmpty(text3))
-                        {
-                            SetImage(defaultTexture);
-                        }
-                        else
-                        {
-                            SetImage(null);
-                        }
-                    }
-                    else
-                    {
-                        SetTitle(entryData.key);
-                        SetText(Language.main.Get("TimeCapsuleContentFetchError"));
-                        SetImage(null);
-                    }
-                }
-                else
-                {
-                    SetTitle(Language.main.Get("Ency_" + key));
-                    SetText(Language.main.Get("EncyDesc_" + key));
-                    SetImage(entryData.image);
-                }
+                SetTitle(Language.main.Get("FCSEncy_" + key));
+                SetText(Language.main.Get("FCSEncyDesc_" + key));
+                SetImage(entryData.image);
                 SetAudio(entryData.audio);
                 return;
             }
@@ -356,9 +367,9 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono.ScreenItems
             float indent;
             if (action == TreeAction.Expand)
             {
-                spriteData = this.pathNodeSprites;
-                icon = this.iconExpand;
-                indent = (float)(depth + 1) * this.indentStep;
+                spriteData = pathNodeSprites;
+                icon = iconExpand;
+                indent = (float)(depth + 1) * indentStep;
             }
             else
             {
@@ -366,13 +377,13 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono.ScreenItems
                 {
                     return null;
                 }
-                spriteData = this.entryNodeSprites;
+                spriteData = entryNodeSprites;
                 icon = null;
-                indent = (float)depth * this.indentStep;
+                indent = (float)depth * indentStep;
             }
             string @string = srcNode.string0;
             string string2 = srcNode.string1;
-            uGUI_ListEntry entry = this.GetEntry();
+            uGUI_ListEntry entry = GetEntry();
             entry.Initialize(this, id, spriteData);
             entry.SetIcon(icon);
             entry.SetIndent(indent);
@@ -403,8 +414,6 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono.ScreenItems
                         }
                     }
                 }
-                uGUI_EncyclopediaTab.SetNodeNotificationsCount(craftNode, num);
-                uGUI_EncyclopediaTab.UpdateNotificationsCount(entry, num);
             }
             else if (action == TreeAction.Craft)
             {
@@ -416,20 +425,33 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono.ScreenItems
         private uGUI_ListEntry GetEntry()
         {
             uGUI_ListEntry uGUI_ListEntry;
-            if (this.pool.Count == 0)
+            if (pool.Count == 0)
             {
                 for (int i = 0; i < 4; i++)
                 {
-                    uGUI_ListEntry = UnityEngine.Object.Instantiate<GameObject>(this.prefabEntry).GetComponent<uGUI_ListEntry>();
-                    uGUI_ListEntry.rectTransform.SetParent(this.listCanvas, false);
+                    uGUI_ListEntry = Instantiate<GameObject>(prefabEntry).GetComponent<uGUI_ListEntry>();
+                    uGUI_ListEntry.rectTransform.SetParent(listCanvas, false);
                     uGUI_ListEntry.Uninitialize();
-                    this.pool.Add(uGUI_ListEntry);
+                    pool.Add(uGUI_ListEntry);
                 }
             }
-            int index = this.pool.Count - 1;
-            uGUI_ListEntry = this.pool[index];
-            this.pool.RemoveAt(index);
+            int index = pool.Count - 1;
+            uGUI_ListEntry = pool[index];
+            pool.RemoveAt(index);
             return uGUI_ListEntry;
+        }
+
+        private class EntryComparer : IComparer<TreeNode>
+        {
+            // Token: 0x06004B68 RID: 19304 RVA: 0x0017D9B4 File Offset: 0x0017BBB4
+            public int Compare(TreeNode node1, TreeNode node2)
+            {
+                CraftNode craftNode = node1 as CraftNode;
+                CraftNode craftNode2 = node2 as CraftNode;
+                string strA = (craftNode != null) ? craftNode.string1 : null;
+                string strB = (craftNode2 != null) ? craftNode2.string1 : null;
+                return string.Compare(strA, strB);
+            }
         }
     }
 }

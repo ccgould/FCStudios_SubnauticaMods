@@ -22,7 +22,7 @@ namespace FCS_EnergySolutions.Spawnables
 
             OnFinishedPatching += () =>
             {
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, TechType, 1000, StoreCategory.Energy);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, TechType, 495000, StoreCategory.Energy);
                 CraftDataHandler.SetEquipmentType(TechType, EquipmentType.PowerCellCharger);
                 TechDataHelpers.AddPowercell(TechType);
                 KnownTechHandler.SetAnalysisTechEntry(TechType.PowerCell, new TechType[1] { TechType });

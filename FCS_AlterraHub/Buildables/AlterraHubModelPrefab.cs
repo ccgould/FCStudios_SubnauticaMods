@@ -5,6 +5,7 @@ using FCS_AlterraHub.Configuration;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
+using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
 namespace FCS_AlterraHub.Buildables
@@ -100,6 +101,8 @@ namespace FCS_AlterraHub.Buildables
         public static GameObject EncyclopediaEntryPrefab { get; set; }
         public static GameObject AlterraHubFabricatorPrefab { get; set; }
         public static GameObject AlterraHubDepotFragmentPrefab { get; set; }
+        public static Sprite UpArrow { get; set; }
+        public static Sprite DownArrow { get; set; }
 
         public static bool GetPrefabs()
         {
@@ -142,10 +145,15 @@ namespace FCS_AlterraHub.Buildables
                     if (!LoadAsset("MissionMessageBox", QPatch.GlobalBundle, out var missionMessageBox, false)) return false;
                     MissionMessageBoxPrefab = missionMessageBox;
 
-                    if (!LoadAsset("AlterraHubDepotItem", QPatch.GlobalBundle, out var alterraHubDepotItemPrefab)) return false;
-                    AlterraHubDepotItemPrefab = alterraHubDepotItemPrefab;                    
-                    
+                    if (!LoadSpriteAsset("arrowUp", QPatch.GlobalBundle, out var arrowUp)) return false;
+                    UpArrow = arrowUp;
+
+                    if (!LoadSpriteAsset("arrowDown", QPatch.GlobalBundle, out var arrowDown)) return false;
+                    DownArrow = arrowDown;
+
+
                     if (!LoadAsset("EncyclopediaEntry", QPatch.GlobalBundle, out var encyclopediaEntryPrefab)) return false;
+                    AddComponentsToEncyclopediaEntry(encyclopediaEntryPrefab);
                     EncyclopediaEntryPrefab = encyclopediaEntryPrefab;                    
                     
                     if (!LoadAsset("AlterraHubFabStation", QPatch.GlobalBundle, out var alterraHubFabricatorPrefab)) return false;
@@ -166,9 +174,21 @@ namespace FCS_AlterraHub.Buildables
             }
             catch (Exception e)
             {
+                QuickLogger.Error(e.StackTrace);
                 QuickLogger.Error(e.Message);
                 return false;
             }
+        }
+
+        private static void AddComponentsToEncyclopediaEntry(GameObject encyclopediaEntryPrefab)
+        {
+            encyclopediaEntryPrefab.SetActive(false);
+            var listEntry = encyclopediaEntryPrefab.AddComponent<uGUI_ListEntry>();
+            listEntry.layoutElement = encyclopediaEntryPrefab.GetComponentInChildren<LayoutElement>();
+            listEntry.text = encyclopediaEntryPrefab.GetComponentInChildren<Text>();
+            listEntry.icon = encyclopediaEntryPrefab.FindChild("Arrow").GetComponent<Image>();
+            listEntry.background = encyclopediaEntryPrefab.GetComponent<Image>();
+            encyclopediaEntryPrefab.SetActive(true);
         }
 
         internal static bool LoadAsset(string prefabName,AssetBundle assetBundle,out GameObject go,bool applyShaders = true)
@@ -193,6 +213,25 @@ namespace FCS_AlterraHub.Buildables
             QuickLogger.Error($"{prefabName} Prefab Not Found!");
 
             go = null;
+            return false;
+        }
+
+        internal static bool LoadSpriteAsset(string prefabName, AssetBundle assetBundle, out Sprite image)
+        {
+            //We have found the asset bundle and now we are going to continue by looking for the model.
+            Sprite prefab = assetBundle.LoadAsset<Sprite>(prefabName);
+
+            //If the prefab isn't null lets add the shader to the materials
+            if (prefab != null)
+            {
+                image = prefab;
+                QuickLogger.Debug($"{prefabName} Prefab Found!");
+                return true;
+            }
+
+            QuickLogger.Error($"{prefabName} Prefab Not Found!");
+
+            image = null;
             return false;
         }
 

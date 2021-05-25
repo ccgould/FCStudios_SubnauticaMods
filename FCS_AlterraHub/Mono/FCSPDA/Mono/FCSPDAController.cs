@@ -84,7 +84,6 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
         private static FCSPDAController _instance;
         private ReturnsDialogController _returnsDialogController;
         private List<MeshRenderer> _pdaMeshes = new List<MeshRenderer>();
-        private EncyclopediaController _encyclopediaController;
         public static FCSPDAController Instance => _instance;
         #endregion
 
@@ -146,7 +145,6 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             if (_isInitialized) return;
              _canvas = gameObject.GetComponentInChildren<Canvas>();
             _currentBiome = GameObjectHelpers.FindGameObject(gameObject, "BiomeLBL")?.GetComponent<Text>();
-            _encyclopediaController = GameObjectHelpers.FindGameObject(gameObject, "Encyclopedia").AddComponent<EncyclopediaController>();
             _checkoutDialog = _canvas.gameObject.FindChild("Dialogs").FindChild("CheckOutPopUp").AddComponent<CheckOutPopupDialogWindow>();
 
             _returnsDialogController = _canvas.gameObject.FindChild("Dialogs").FindChild("ReturnItemsDialog").AddComponent<ReturnsDialogController>();
@@ -272,6 +270,7 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
 
         private void EncyclopediaPage()
         {
+            _pages[PDAPages.Encyclopedia].AddComponent<EncyclopediaTabController>();
             var backButton = _pages[PDAPages.Encyclopedia].FindChild("BackBTN").GetComponent<Button>();
             backButton.onClick.AddListener((() =>
             {
@@ -678,31 +677,7 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             Open();
         }
     }
-
-    internal class EncyclopediaController : MonoBehaviour
-    {
-        internal void Initialize()
-        {
-            var entries = FCSAlterraHubService.PublicAPI.GetEncyclopediaEntries();
-
-            var encyclopediaList = gameObject.FindChild("DataView").FindChild("Viewport").FindChild("Content");
-            foreach (KeyValuePair<TechType, List<EncyclopediaEntryData>> entry in entries)
-            {
-                foreach (EncyclopediaEntryData data in entry.Value)
-                {
-                    var entryPrefab = GameObject.Instantiate(Buildables.AlterraHub.EncyclopediaEntryPrefab);
-                    var entryController = entryPrefab.AddComponent<EncyclopediaEntryController>();
-                    entryController.Initialize(data,LoadData);
-                }
-            }
-        }
-
-        private void LoadData(EncyclopediaEntryData data)
-        {
-            
-        }
-    }
-
+    
     internal class EncyclopediaEntryController : MonoBehaviour
     {
         private EncyclopediaEntryData _data;

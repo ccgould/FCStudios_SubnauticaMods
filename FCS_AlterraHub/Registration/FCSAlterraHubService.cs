@@ -28,10 +28,8 @@ namespace FCS_AlterraHub.Registration
         void RegisterPatchedMod(string mod);
         int GetRegisterModCount(string tabID);
         bool IsTechTypeRegistered(TechType techType);
-        void RegisterEncyclopediaEntry(TechType techType, List<EncyclopediaEntryData> entry);
         void RegisterEncyclopediaEntry(Dictionary<string, List<EncyclopediaEntryData>> encyclopediaEntries);
         void UnRegisterDevice(FcsDevice device);
-        Dictionary<string, FcsDevice> GetRegisteredDevicesOfId(string id);
         void RegisterTechLight(TechLight techLight);
         bool ChargeAccount(decimal amount);
         bool IsCreditAvailable(decimal amount);
@@ -41,10 +39,10 @@ namespace FCS_AlterraHub.Registration
         int GetTechBuiltCount(TechType techType);
         void RemoveBuiltTech(TechType techType);
         TechType GetDeviceTechType(string deviceId);
+        Dictionary<string, FcsDevice> GetRegisteredDevicesOfId(string id);
         void RegisterBase(BaseManager manager);
         void UnRegisterBase(BaseManager manager);
         void CreateStoreEntry(TechType techType, TechType receiveTechType,int returnAmount, decimal cost, StoreCategory category,bool forceUnlocked = false);
-        Dictionary<TechType, List<EncyclopediaEntryData>> GetEncyclopediaEntries();
     }
 
     internal interface IFCSAlterraHubServiceInternal
@@ -58,7 +56,6 @@ namespace FCS_AlterraHub.Registration
         public static List<KnownDevice> knownDevices = new List<KnownDevice>();
         private static readonly Dictionary<string, FcsDevice> GlobalDevices = new Dictionary<string, FcsDevice>();
         private static Dictionary<TechType, FCSStoreEntry> _storeItems = new Dictionary<TechType, FCSStoreEntry>();
-        private static Dictionary<TechType, List<EncyclopediaEntryData>> _pdaEntries = new Dictionary<TechType, List<EncyclopediaEntryData>>();
         private static HashSet<TechType> _registeredTechTypes = new HashSet<TechType>();
         private List<string> _patchedMods = new List<string>();
         private Dictionary<TechType, int> _globallyBuiltTech = new Dictionary<TechType, int>();
@@ -223,10 +220,6 @@ namespace FCS_AlterraHub.Registration
             }
         }
 
-        public Dictionary<TechType, List<EncyclopediaEntryData>> GetEncyclopediaEntries()
-        {
-            return _pdaEntries;
-        }
 
         public Dictionary<TechType, FCSStoreEntry> GetRegisteredKits()
         {
@@ -267,42 +260,61 @@ namespace FCS_AlterraHub.Registration
         {
             return _registeredTechTypes.Contains(techType);
         }
-
-        public void RegisterEncyclopediaEntry(TechType techType, List<EncyclopediaEntryData> entries)
+        
+        public void RegisterEncyclopediaEntry(Dictionary<string, List<EncyclopediaEntryData>> encyclopediaEntries)
         {
-            if (_pdaEntries.ContainsKey(techType))
-            {
-                foreach (EncyclopediaEntryData data in entries)
-                {
-                    _pdaEntries[techType].Add(data);
-                }
-            }
-            else
-            {
-                _pdaEntries.Add(techType,entries);
-            }
-        }
+            LanguageHandler.SetLanguageLine($"EncyPath_fcs", "Field Creators Studios");
 
-        public void RegisterEncyclopediaEntry(Dictionary<string,List<EncyclopediaEntryData>> encyclopediaEntries)
-        {
- 
-            foreach (var entry in encyclopediaEntries)
-            {
-                var techType = entry.Key.ToTechType();
 
-                if (_pdaEntries.ContainsKey(techType))
+            foreach (KeyValuePair<string, List<EncyclopediaEntryData>> data in encyclopediaEntries)
+            {
+                foreach (EncyclopediaEntryData entryData in data.Value)
                 {
-                    foreach (EncyclopediaEntryData data in entry.Value)
+                    LanguageHandler.SetLanguageLine($"Ency_{data.Key}", entryData.Title);
+                    LanguageHandler.SetLanguageLine($"EncyDesc_{data.Key}", entryData.Body);
+                    PDAEncyclopediaHandler.AddCustomEntry(new PDAEncyclopedia.EntryData
                     {
-                        _pdaEntries[techType].Add(data);
-                    }
-                }
-                else
-                {
-                    _pdaEntries.Add(techType, entry.Value);
+                        //audio = entryData.audio,
+                        image = entryData.Image,
+                        key = data.Key,
+                        nodes = PDAEncyclopedia.ParsePath(entryData.Path),
+                        path = entryData.Path,
+                        //popup = entryData.popup,
+                        //sound = entryData.sound,
+                        timeCapsule = false,
+                        unlocked = entryData.Unlocked
+                    });
                 }
             }
         }
+
+        public void AddEncyclopediaEntries(TechType techType, bool verbose)
+        {
+            var node = new CraftNode("fcs", TreeAction.Expand)
+            {
+                string0 = "EncyPath_fcs",
+                string1 = "Field Creators Studios"
+            };
+            PDAEncyclopedia.tree.AddNode(node);
+
+            foreach (var entryData in PDAEncyclopedia.entries)
+            {
+                PDAEncyclopedia.Add(entryData.Key, verbose);
+            }
+
+
+            //if (IsTechTypeRegistered(techType))
+            //{
+            //    if (_pdaEntries.ContainsKey(techType))
+            //    {
+            //        foreach (FcsEntryData entryData in _pdaEntries[techType])
+            //        {
+
+            //        }
+            //    }
+            //}
+        }
+
 
         public void UnRegisterDevice(FcsDevice device)
         {
