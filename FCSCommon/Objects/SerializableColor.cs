@@ -6,14 +6,14 @@ namespace FCSCommon.Objects
 
 
     [Serializable]
-    public class SerializableColor
+    internal class SerializableColor
     {
         public float r = 1;
         public float g = 1;
         public float b = 1;
         public float a = 1;
 
-        public SerializableColor(Color c)
+        internal SerializableColor(Color c)
         {
             r = c.r;
             g = c.g;
@@ -26,12 +26,12 @@ namespace FCSCommon.Objects
             return new SerializableColor(c);
         }
 
-        public Color ToColor()
+        internal Color ToColor()
         {
             return new Color(r, g, b, a);
         }
 
-        public static SerializableColor Create(Color c)
+        internal static SerializableColor Create(Color c)
         {
             return new SerializableColor(c);
         }

@@ -52,6 +52,9 @@
     <Folder Include="$(MSBuildThisFileDirectory)Exceptions\" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)Configurations.targets" />
     <None Include="$(MSBuildThisFileDirectory)GamePaths.targets" />
+    <None Include="$(MSBuildThisFileDirectory)PostBuildEvents.targets" />
+    <None Include="$(MSBuildThisFileDirectory)References.targets" />
   </ItemGroup>
 </Project>

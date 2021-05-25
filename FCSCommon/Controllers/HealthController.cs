@@ -6,7 +6,7 @@ using UnityEngine;
 namespace FCSCommon.Controllers
 {
     [RequireComponent(typeof(WeldablePoint))]
-    public class HealthController : MonoBehaviour
+    internal class HealthController : MonoBehaviour
     {
         public LiveMixin LiveMixin { get; set; }
         public Action OnDamaged { get; set; }

@@ -3,14 +3,14 @@ using UnityEngine;
 
 namespace FCSCommon.Extensions
 {
-    public static class GenericExtensions
+    internal static class GenericExtensions
     {
-        public static Quaternion TargetRotationToQuaternion(this TargetRotation targetRotation)
+        internal static Quaternion TargetRotationToQuaternion(this TargetRotation targetRotation)
         {
             return new Quaternion(targetRotation.X, targetRotation.Y, targetRotation.Z, targetRotation.W);
         }
 
-        public static string KiloFormat(this int num)
+        internal static string KiloFormat(this int num)
         {
             if (num >= 100000000)
                 return (num / 1000000).ToString("#,0M");

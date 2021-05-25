@@ -2,7 +2,7 @@
 
 namespace FCSCommon.Objects
 {
-    public class TargetRotation
+    internal class TargetRotation
     {
 
         #region Constructor

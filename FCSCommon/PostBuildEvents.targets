@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <PostBuildEvent>
+      mkdir "$(SolutionDir)..\QModZips\$(GameName)"
+      powershell Compress-Archive -Path '$(TargetDir)' -DestinationPath '$(SolutionDir)..\QModZips\$(GameName)\$(ProjectName)$(Configuration).zip' -Force
+
+      mkdir "$(GameDir)\QMods\$(ProjectName)"
+      xcopy "$(TargetDir)$(TargetFileName)" "$(GameDir)\QMods\$(ProjectName)\" /Y /I
+    </PostBuildEvent>
+  </PropertyGroup>
+</Project>
