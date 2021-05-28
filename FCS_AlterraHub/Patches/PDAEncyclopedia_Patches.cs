@@ -1,8 +1,12 @@
-﻿using FCS_AlterraHub.Mono.FCSPDA.Mono;
+﻿using System;
+using System.Collections;
+using FCS_AlterraHub.Mono.FCSPDA.Mono;
 using FCS_AlterraHub.Mono.FCSPDA.Mono.ScreenItems;
 using FCS_AlterraHub.Registration;
 using FCSCommon.Utilities;
 using HarmonyLib;
+using UnityEngine;
+using UWE;
 
 namespace FCS_AlterraHub.Patches
 {
@@ -11,18 +15,20 @@ namespace FCS_AlterraHub.Patches
     {
         [HarmonyPatch(typeof(PDAEncyclopedia), nameof(PDAEncyclopedia.Initialize))]
         [HarmonyPostfix]
-        public static void Postfix(ref PDAData pdaData)
+        public static void Initialize_Postfix(ref PDAData pdaData)
         {
             QuickLogger.Info("PDAEncyclopedia Initialize Post",true);
-            EncyclopediaTabController.Tree = new CraftNode("Root");
-            CraftNode.Copy(PDAEncyclopedia.tree,EncyclopediaTabController.Tree);
-            //FCSAlterraHubService.PublicAPI.AddEncyclopediaEntries();
+            CraftNode node = new CraftNode("Root");
+            CraftNode.Copy(PDAEncyclopedia.tree,node);
+            EncyclopediaTabController.Tree = node;
+            FCSAlterraHubService.PublicAPI.RegisterEncyclopediaEntries(QPatch.EncyclopediaConfig.EncyclopediaEntries);
+
             QuickLogger.Info("PDAEncyclopedia Initialize Post Complete", true);
         }
 
         [HarmonyPatch(typeof(PDAEncyclopedia), nameof(PDAEncyclopedia.tree), MethodType.Getter)]
         [HarmonyPostfix]
-        public static void Postfix(ref CraftNode __result)
+        public static void Getter_Postfix(ref CraftNode __result)
         {
             if (FCSPDAController.Instance?.IsOpen ?? false || FCSAlterraHubService.PublicAPI.IsRegisteringEncyclopedia)
             {
@@ -31,11 +37,42 @@ namespace FCS_AlterraHub.Patches
         }
 
         [HarmonyPatch(typeof(PDAEncyclopedia), nameof(PDAEncyclopedia.NotifyAdd))]
-        [HarmonyPostfix]
-        public static void Postfix(ref CraftNode node, ref bool verbose)
+        [HarmonyPrefix]
+        public static bool NotifyAdd_Prefix(ref CraftNode node,ref bool verbose)
         {
-            if(FCSAlterraHubService.PublicAPI.IsRegisteringEncyclopedia)
+            if (!QPatch.EncyclopediaConfig.EncyclopediaEntries.ContainsKey(node.id)) return true;
+            
+            if(FCSPDAController.Instance?.EncyclopediaTabController != null)
                 FCSPDAController.Instance.EncyclopediaTabController.OnAddEntry(node, verbose);
+            else
+            {
+                CoroutineHost.StartCoroutine(HoldNotifications(node, verbose));
+            }
+            return false;
+        }
+
+        private static IEnumerator HoldNotifications(CraftNode node, bool verbose)
+        {
+            yield return new WaitUntil(() => FCSPDAController.Instance?.EncyclopediaTabController != null);
+            
+            FCSPDAController.Instance.EncyclopediaTabController.OnAddEntry(node, verbose);
+            yield break; 
+        }  
+        
+        [HarmonyPatch(typeof(PDAEncyclopedia), nameof(PDAEncyclopedia.Add), new Type[]{typeof(string), typeof(PDAEncyclopedia.Entry), typeof(bool)})]
+        [HarmonyPrefix]
+        public static void Add_Prefix(string key, bool verbose)
+        {
+            if (QPatch.EncyclopediaConfig.EncyclopediaEntries.ContainsKey(key))
+                FCSAlterraHubService.PublicAPI.IsRegisteringEncyclopedia = true;
+        }
+        
+        [HarmonyPatch(typeof(PDAEncyclopedia), nameof(PDAEncyclopedia.Add),new Type[]{typeof(string), typeof(PDAEncyclopedia.Entry), typeof(bool)})]
+        [HarmonyPostfix]
+        public static void Add_Postfix(string key, bool verbose)
+        {
+            if (QPatch.EncyclopediaConfig.EncyclopediaEntries.ContainsKey(key))
+                FCSAlterraHubService.PublicAPI.IsRegisteringEncyclopedia = false;
         }
     }
 }

@@ -265,17 +265,14 @@ namespace FCS_AlterraHub.Registration
         
         public void RegisterEncyclopediaEntries(Dictionary<string, List<EncyclopediaEntryData>> encyclopediaEntries)
         {
-            
-            IsRegisteringEncyclopedia = true;
             LanguageHandler.SetLanguageLine($"EncyPath_fcs", "Field Creators Studios");
-
-
             foreach (KeyValuePair<string, List<EncyclopediaEntryData>> data in encyclopediaEntries)
             {
                 foreach (EncyclopediaEntryData entryData in data.Value)
                 {
                     LanguageHandler.SetLanguageLine($"Ency_{data.Key}", entryData.Title);
                     LanguageHandler.SetLanguageLine($"EncyDesc_{data.Key}", entryData.Body);
+                    LanguageHandler.SetLanguageLine($"EncyPath_{entryData.Path}", entryData.TabTitle);
 
                     PDAEncyclopedia.mapping.Add(data.Key, new PDAEncyclopedia.EntryData
                     {
@@ -288,11 +285,28 @@ namespace FCS_AlterraHub.Registration
                         unlocked = entryData.Unlocked
                     });
 
-                    if(entryData.Unlocked)
+                    if (entryData.Unlocked)
+                    {
                         PDAEncyclopedia.Add(data.Key, false);
+                    }
+                    else
+                    {
+                        if (TechTypeExtensions.FromString(entryData.UnlockedBy, out TechType techType, true))
+                        {
+                            PDAHandler.AddCustomScannerEntry(new PDAScanner.EntryData()
+                            {
+                                encyclopedia = data.Key,
+                                locked = true,
+                                key = techType
+                            });
+                        }
+                        else
+                        {
+                            QuickLogger.Error($"Failed to Parse TechType to unlock Ency entry: {data.Key}", true);
+                        }
+                    }
                 }
             }
-            IsRegisteringEncyclopedia = false;
         }
 
         public bool IsRegisteringEncyclopedia { get; set; }

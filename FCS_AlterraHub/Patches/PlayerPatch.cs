@@ -78,7 +78,7 @@ namespace FCS_AlterraHub.Patches
     [HarmonyPatch("Awake")]
     public static class Player_Awake_Patch
     {
-        private static void Postfix(Player __instance)
+        private static void Prefix(Player __instance)
         {
             var f = uSkyManager.main.SunLight.transform;
             if (f != null)

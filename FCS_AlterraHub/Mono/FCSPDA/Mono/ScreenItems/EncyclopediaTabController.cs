@@ -60,8 +60,6 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono.ScreenItems
             iconCollapse = Buildables.AlterraHub.UpArrow;
             iconExpand = Buildables.AlterraHub.DownArrow;
             listCanvas = encycList.FindChild("Viewport").FindChild("Content").GetComponent<RectTransform>();
-
-            FCSAlterraHubService.PublicAPI.RegisterEncyclopediaEntries(QPatch.EncyclopediaConfig.EncyclopediaEntries);
         }
 
         internal void Refresh()
@@ -158,9 +156,9 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono.ScreenItems
                 listScrollRect.ScrollTo(uGUI_ListEntry.rectTransform, true, false, new Vector4(10f, 10f, 10f, 10f));
                 return;
             }
-            if (selectedItem is Selectable)
+            if (selectedItem is Selectable selected)
             {
-                (selectedItem as Selectable).Select();
+                selected.Select();
                 UISelection.selected = null;
             }
         }
@@ -206,43 +204,34 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono.ScreenItems
 
         private void Expand(CraftNode node)
         {
-            if (node == null)
+            if (node is null)
             {
                 QuickLogger.Error("node is null",true);
+                return;
             }
 
             SetNodeExpanded(node, true);
 
             uGUI_ListEntry nodeListEntry = GetNodeListEntry(node);
 
-            if (nodeListEntry != null)
-            {
-                nodeListEntry.SetIcon(iconCollapse);
-            }
+            nodeListEntry?.SetIcon(iconCollapse);
 
             CraftNode node2 = PDAEncyclopedia.GetNode(node.id);
 
-            if (node2 == null)
-            {
-                return;
-            }
-
-            QuickLogger.Debug($"[Node] Id: {node?.id} | S0{node?.string0} | S1 {node?.string1} | bool {node?.bool0} | Mono {node?.monoBehaviour0}");
-            QuickLogger.Debug($"[Node2] Id: {node2?.id} | S0{node2?.string0} | S1 {node2?.string1} | bool {node2?.bool0} | Mono {node2?.monoBehaviour0}");
+            if (node2 is null) return;
 
             foreach (CraftNode craftNode in node2)
             {
-                CraftNode craftNode2 = node[craftNode.id] as CraftNode;
-
-                QuickLogger.Debug($"[CraftNode2] Id: {craftNode2?.id} | S0{craftNode2?.string0} | S1 {craftNode2?.string1} | bool {craftNode2?.bool0} | Mono {craftNode2?.monoBehaviour0}");
+                CraftNode craftNode2 = node[craftNode.id] as CraftNode; 
                 
-                if (craftNode2 == null)
+                if (craftNode2 is null)
                 {
                     CreateNode(craftNode, node);
                 }
                 else
                 {
-                    GetNodeListEntry(craftNode2).gameObject.SetActive(true);
+                    var nodeListEntry2 = GetNodeListEntry(craftNode2) ?? FixNode(craftNode2, craftNode);
+                    nodeListEntry2.gameObject.SetActive(true);
 
                     if (GetNodeExpanded(craftNode2))
                     {
@@ -252,6 +241,43 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono.ScreenItems
             }
 
             node.Sort(entryComparer);
+        }
+
+        private uGUI_ListEntry FixNode(CraftNode srcNode, CraftNode parentNode)
+        {
+            TreeAction action = srcNode.action;
+            int depth = parentNode.depth;
+            
+            UISpriteData spriteData;
+            Sprite icon;
+            float indent;
+            if (action == TreeAction.Expand)
+            {
+                spriteData = pathNodeSprites;
+                icon = iconExpand;
+                indent = (float)(depth + 1) * indentStep;
+            }
+            else
+            {
+                if (action != TreeAction.Craft)
+                {
+                    return null;
+                }
+                spriteData = entryNodeSprites;
+                icon = null;
+                indent = (float)depth * indentStep;
+            }
+            string @string = srcNode.string0;
+            string string2 = srcNode.string1;
+
+            uGUI_ListEntry entry = GetEntry();
+            entry.Initialize(this, srcNode.id, spriteData);
+            entry.SetIcon(icon);
+            entry.SetIndent(indent);
+            entry.SetText(string2);
+
+            srcNode.monoBehaviour0 = entry;
+            return entry;
         }
 
         private CraftNode ExpandTo(string id)

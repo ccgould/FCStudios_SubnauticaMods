@@ -11,6 +11,7 @@ namespace FCS_AlterraHub.Structs
         public string ImageName;
         public bool Unlocked;
         internal Texture2D Image;
+        public string UnlockedBy;
 
         public override string ToString()
         {
