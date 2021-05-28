@@ -7,6 +7,7 @@ using FCS_AlterraHub.Mono.OreConsumer;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Assets;
+using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 #if SUBNAUTICA
@@ -29,11 +30,11 @@ namespace FCS_AlterraHub.Buildables
 
         public override bool AddScannerEntry => true;
 
-        public override int FragmentsToScan => 1;
+        public override int FragmentsToScan => 3;
 
         public override float TimeToScanFragment => 5f;
 
-        public override bool DestroyFragmentOnScan => false;
+        public override bool DestroyFragmentOnScan => true;
         public static float OreProcessingTime { get; set; } = 90;
 
         public OreConsumer() : base(Mod.OreConsumerClassID, Mod.OreConsumerFriendly, Mod.OreConsumerDescription)
@@ -42,6 +43,19 @@ namespace FCS_AlterraHub.Buildables
             {
                 Mod.OreConsumerTechType = TechType;
             };
+        }
+
+        public override PDAEncyclopedia.EntryData EncyclopediaEntryData
+        {
+            get
+            {
+                PDAEncyclopedia.EntryData entry = new PDAEncyclopedia.EntryData();
+                entry.key = Mod.OreConsumerClassID;
+                entry.path = "Tech/Equipment";
+                entry.nodes = new[] { "Tech", "Equipment" };
+                entry.unlocked = false;
+                return entry;
+            }
         }
 
 #if SUBNAUTICA_STABLE

@@ -1,71 +1,109 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using FCS_AlterraHub.Configuration;
+using FCS_AlterraHub.Mono.OreConsumer;
 using FCS_AlterraHub.Spawnables;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
+using Oculus.Newtonsoft.Json;
 using UnityEngine;
 
 namespace FCS_AlterraHub.Mono.AlterraHubFabricatorBuilding.Mono
 {
     internal class AlterraFabricatorStationController : MonoBehaviour
     {
-        private bool IsPowerOn => _powercellCount >= 3;
-        private int _powercellCount;
+        private const int PowercellReq = 5;
+        internal bool IsPowerOn => Mod.GamePlaySettings.AlterraHubDepotPowercellSlot.Count >= PowercellReq && Mod.GamePlaySettings.BreakerOn;
         private List<GameObject> _doors = new List<GameObject>();
         private IEnumerable<GameObject> _oreConsumerSpawnPoints;
         private IEnumerable<GameObject> _alterraHubDepotSpawnPoints;
-        private bool _openDoors;
-        private const float Speed = 5;
-        private const float OpenPos = 0.207f;
-        private const float ClosePos = -0.1668553f;
+        private Light[] _lights;
+        private List<KeyPadAccessController> _keyPads = new List<KeyPadAccessController>();
+        private List<SecurityScreenController> _screens = new List<SecurityScreenController>();
+        private GeneratorController _generator;
+        private MotorHandler _motor;
 
         private void Awake()
         {
-            
+            Mod.OnGamePlaySettingsLoaded += OnGamePlaySettingsLoaded;
         }
         private void Start()
         {
-            LoadSave();
-
             _alterraHubDepotSpawnPoints = GameObjectHelpers.FindGameObjects(gameObject, "_AlterraHubDepotSpawnPnt", SearchOption.StartsWith);
             _oreConsumerSpawnPoints = GameObjectHelpers.FindGameObjects(gameObject, "_OreConsumerSpawnPnt", SearchOption.StartsWith);
+            
+            _generator = GameObjectHelpers.FindGameObject(gameObject, "AlterraHubFabStationGenerator").AddComponent<GeneratorController>();
+            _generator.Initialize(this);
 
-            SpawnFragments();
+            var antennaDoor = GameObjectHelpers.FindGameObject(gameObject, "LockedDoor02Controller").AddComponent<DoorController>();
+            antennaDoor.doorOpenMethod = StarshipDoor.OpenMethodEnum.Manual;
+
+            var fabricatorDoor = GameObjectHelpers.FindGameObject(gameObject, "LockedDoor01Controller").AddComponent<DoorController>();
+            fabricatorDoor.doorOpenMethod = StarshipDoor.OpenMethodEnum.Manual;
+
+            var antennaDialPad = GameObjectHelpers.FindGameObject(gameObject, "AntennaDialpad").AddComponent<KeyPadAccessController>();
+            antennaDialPad.Initialize("3491", antennaDoor,2);
+            _keyPads.Add(antennaDialPad);
+            var fabrictorDialPad = GameObjectHelpers.FindGameObject(gameObject, "FabricationDialpad").AddComponent<KeyPadAccessController>();
+            fabrictorDialPad.Initialize("8964", fabricatorDoor,1);
+            _keyPads.Add(fabrictorDialPad);
+
+            _motor = GameObjectHelpers.FindGameObject(gameObject, "AlternatorMotor").AddComponent<MotorHandler>();
+            _motor.Initialize(100);
+            _motor.StopMotor();
+
+            FindScreens();
+            FindLights();
             MaterialHelpers.ChangeEmissionColor(Buildables.AlterraHub.BaseDecalsEmissiveController, gameObject, Color.red);
+            MaterialHelpers.ChangeEmissionColor(Buildables.AlterraHub.BaseLightsEmissiveController, gameObject, Color.red);
+            MaterialHelpers.ChangeEmissionStrength(Buildables.AlterraHub.BaseLightsEmissiveController, gameObject, 2f);
             MaterialHelpers.ChangeSpecSettings(Buildables.AlterraHub.BaseDecalsExterior, Buildables.AlterraHub.TBaseSpec, gameObject, 2.61f, 8f);
-
+            Mod.LoadGamePlaySettings();
+           
         }
-
-        private void Update()
+        
+        private void FindScreens()
         {
-            MoveTray();
-        }
-
-        private void MoveTray()
-        {
-            if (!_openDoors) return;
-            foreach (GameObject door in _doors)
+            var screens = GameObjectHelpers.FindGameObject(gameObject, "Screens").transform;
+            foreach (Transform screen in screens)
             {
-                if (door.transform.localPosition.x < OpenPos)
-                {
-                    door.transform.Translate(Vector3.right * Speed * DayNightCycle.main.deltaTime);
-                }
-
-                if (door.transform.localPosition.x > OpenPos)
-                {
-                    door.transform.localPosition = new Vector3(OpenPos, door.transform.localPosition.y, door.transform.localPosition.z);
-                }
+                var securityScreenController = screen.gameObject.AddComponent<SecurityScreenController>();
+                _screens.Add(securityScreenController);
             }
         }
 
-        private void LoadSave()
+        private void FindLights()
         {
-            _powercellCount = Mod.GamePlaySettings.AlterraHubDepotPowercellCount;
+            _lights = gameObject.GetComponentsInChildren<Light>();
+        }
+
+
+        private void OnGamePlaySettingsLoaded(FCSGamePlaySettings settings)
+        {
+            QuickLogger.Info($"On Game Play Settings Loaded {JsonConvert.SerializeObject(settings, Formatting.Indented)}");
+            if (settings.AlterraHubDepotDoors.KeyPad1)
+            {
+                _keyPads[0].Unlock();
+            }
+
+            if (settings.AlterraHubDepotDoors.KeyPad2)
+            {
+                _keyPads[1].Unlock();
+            }
+
+            _generator.LoadSave();
+
+            if(IsPowerOn)
+            {
+                TurnOnBase();
+            }
+
+            SpawnFragments();
         }
 
         private void SpawnFragments()
         {
+            if(Mod.GamePlaySettings.IsOreConsumerFragmentSpawned) return;
             foreach (GameObject spawnPoint in _alterraHubDepotSpawnPoints)
             {
                 StartCoroutine(SpawnAlterraHubDepotFrag(spawnPoint));
@@ -74,6 +112,40 @@ namespace FCS_AlterraHub.Mono.AlterraHubFabricatorBuilding.Mono
             foreach (GameObject spawnPoint in _oreConsumerSpawnPoints)
             {
                 StartCoroutine(SpawnOreConsumerFrag(spawnPoint));
+            }
+
+            Mod.GamePlaySettings.IsOreConsumerFragmentSpawned = true;
+        }
+
+        private void CleanDuplicates()
+        {
+            var temp = new List<GameObject>();
+            var currentOreConsumerFrags = Resources.FindObjectsOfTypeAll<OreConsumerFragmentSpawn>();
+            var alterraHubDepotFragments = Resources.FindObjectsOfTypeAll<AlterraHubDepotFragmentSpawn>();
+
+            foreach (OreConsumerFragmentSpawn consumerFrag in currentOreConsumerFrags)
+            {
+                QuickLogger.Debug($"Attempting to delete: {consumerFrag.gameObject.name}");
+                if (gameObject.name.Contains("Clone"))
+                {
+                    temp.Add(consumerFrag.gameObject);
+                    QuickLogger.Debug($"Deleted oreconsumer");
+                }
+            }
+
+            foreach (AlterraHubDepotFragmentSpawn consumerFrag in alterraHubDepotFragments)
+            {
+                QuickLogger.Debug($"Attempting to delete: {consumerFrag.gameObject.name}");
+                if (gameObject.name.Contains("Clone"))
+                {
+                    temp.Add(consumerFrag.gameObject);
+                    QuickLogger.Debug($"Deleted oreconsumer");
+                }
+            }
+
+            foreach (GameObject item in temp)
+            {
+                DestroyImmediate(item);
             }
         }
 
@@ -130,25 +202,42 @@ namespace FCS_AlterraHub.Mono.AlterraHubFabricatorBuilding.Mono
         private void TurnOnLights()
         {
             MaterialHelpers.ChangeEmissionColor(Buildables.AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
-        }
-
-        private void AddPowercellAndCheckPower()
-        {
-            if(_powercellCount == 3) return;
-            _powercellCount++;
-
-            if(IsPowerOn)
+            MaterialHelpers.ChangeEmissionColor(Buildables.AlterraHub.BaseLightsEmissiveController, gameObject, Color.white);
+            foreach (Light light in _lights)
             {
-                OpenDoors();
-                TurnOnLights();
+                light.color = Color.white;
             }
-
-            Mod.GamePlaySettings.AlterraHubDepotPowercellCount = _powercellCount;
         }
 
-        private void OpenDoors()
+        internal void AddPowercell(string slot)
         {
-            _openDoors = true;
+            if (IsPowerOn) return;
+            Mod.GamePlaySettings.AlterraHubDepotPowercellSlot.Add(slot);
+        }
+
+        internal void TurnOnBase()
+        {
+            TurnOnLights();
+            TurnOnScreens();
+            TurnOnKeyPads();
+            _motor.StartMotor();
+            Mod.GamePlaySettings.BreakerOn = true;
+        }
+
+        private void TurnOnKeyPads()
+        {
+            foreach (KeyPadAccessController controller in _keyPads)
+            {
+                controller.TurnOn();
+            }
+        }
+
+        private void TurnOnScreens()
+        {
+            foreach (SecurityScreenController screen in _screens)
+            {
+                screen.TurnOn();
+            }
         }
     }
 }

@@ -283,15 +283,21 @@ namespace FCS_AlterraHub.Configuration
             QuickLogger.Info("Loading Game Play Settings...");
             ModUtils.LoadSaveData<FCSGamePlaySettings>("settings.json", GetSaveFileDirectory(), data =>
             {
+                QuickLogger.Info($"Finished loading Game Play Settings : {JsonConvert.SerializeObject(data, Formatting.Indented)}");
                 GamePlaySettings = data;
+                NotifyGamePlayLoaded();
             });
 
             if(GamePlaySettings == null)
             {
                 SaveGamePlaySettings();
             }
-            
-            OnGamePlaySettingsLoaded?.Invoke(null);
+        }
+
+        private static void NotifyGamePlayLoaded()
+        {
+            QuickLogger.Debug("Notifying");
+            OnGamePlaySettingsLoaded?.Invoke(GamePlaySettings);
         }
 
         public static Action<FCSGamePlaySettings> OnGamePlaySettingsLoaded { get; set; }
@@ -492,8 +498,16 @@ namespace FCS_AlterraHub.Configuration
 
     public class FCSGamePlaySettings
     {
-        public bool IsOreConsumerFragmentSpawned { get; set; } = false;
-        public int AlterraHubDepotPowercellCount { get; set; }
+        public bool IsOreConsumerFragmentSpawned = false; 
+        public List<string> AlterraHubDepotPowercellSlot = new List<string>();
+        public KeyPadAccessSave AlterraHubDepotDoors = new KeyPadAccessSave();
+        public bool BreakerOn;
+    }
+
+    public class KeyPadAccessSave
+    {
+        public bool KeyPad1;
+        public bool KeyPad2;
     }
 
     public struct KnownDevice

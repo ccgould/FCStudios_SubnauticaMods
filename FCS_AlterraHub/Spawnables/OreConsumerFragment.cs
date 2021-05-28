@@ -24,11 +24,11 @@ namespace FCS_AlterraHub.Spawnables
         {
             try
             {
-                var prefab = GameObject.Instantiate(AlterraHub.OreConsumerPrefab);
+                var prefab = GameObject.Instantiate(AlterraHub.OreConsumerFragPrefab);
 
                 PrefabIdentifier prefabIdentifier = prefab.AddComponent<PrefabIdentifier>();
                 prefabIdentifier.ClassId = this.ClassID;
-                prefab.AddComponent<LargeWorldEntity>().cellLevel = LargeWorldEntity.CellLevel.VeryFar;
+                prefab.AddComponent<LargeWorldEntity>().cellLevel = LargeWorldEntity.CellLevel.Far;
                 prefab.AddComponent<TechTag>().type = this.TechType;
 
                 var rb = prefab.GetComponentInChildren<Rigidbody>();

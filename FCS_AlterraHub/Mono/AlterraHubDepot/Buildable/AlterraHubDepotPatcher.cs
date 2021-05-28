@@ -5,6 +5,7 @@ using FCS_AlterraHub.Mono.AlterraHubDepot.Mono;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
+using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 #if SUBNAUTICA
@@ -27,11 +28,11 @@ namespace FCS_AlterraHub.Mono.AlterraHubDepot.Buildable
 
         public override bool AddScannerEntry => true;
 
-        public override int FragmentsToScan => 1;
+        public override int FragmentsToScan => 3;
 
         public override float TimeToScanFragment => 5f;
 
-        public override bool DestroyFragmentOnScan => false;
+        public override bool DestroyFragmentOnScan => true;
 
         public AlterraHubDepotPatcher() : base(Mod.AlterraHubDepotClassID, Mod.AlterraHubDepotFriendly, Mod.AlterraHubDepotDescription)
         {
@@ -39,6 +40,19 @@ namespace FCS_AlterraHub.Mono.AlterraHubDepot.Buildable
             {
                 Mod.AlterraHubDepotTechType = TechType;
             };
+        }
+
+        public override PDAEncyclopedia.EntryData EncyclopediaEntryData
+        {
+            get
+            {
+                PDAEncyclopedia.EntryData entry = new PDAEncyclopedia.EntryData();
+                entry.key = Mod.AlterraHubDepotClassID;
+                entry.path = "Tech/Equipment";
+                entry.nodes = new[] { "Tech", "Equipment" };
+                entry.unlocked = false;
+                return entry;
+            }
         }
 
 #if SUBNAUTICA_STABLE

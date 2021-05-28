@@ -87,6 +87,7 @@ namespace FCS_AlterraHub.Buildables
 
         internal static GameObject OilPrefab { get; set; }
         internal static GameObject OreConsumerPrefab { get; set; }
+        internal static GameObject OreConsumerFragPrefab { get; set; }
         internal static GameObject DebitCardPrefab { get; set; }
         internal static GameObject BioFuelPrefab { get; set; }
         internal static GameObject KitPrefab { get; set; }
@@ -130,7 +131,10 @@ namespace FCS_AlterraHub.Buildables
                     KitPrefab = kitPrefabGo;
 
                     if (!LoadAsset(Mod.OreConsumerPrefabName, QPatch.GlobalBundle, out var oreConsumerPrefabGo)) return false;
-                    OreConsumerPrefab = oreConsumerPrefabGo;
+                    OreConsumerPrefab = oreConsumerPrefabGo;                    
+                    
+                    if (!LoadAsset("OreConsumerFrag", QPatch.GlobalBundle, out var oreConsumerFragPrefabGo)) return false;
+                    OreConsumerFragPrefab = oreConsumerFragPrefabGo;
                     
                     if (!LoadAsset("CartItem", QPatch.GlobalBundle, out var cartItemPrefabGo)) return false;
                     CartItemPrefab = cartItemPrefabGo;

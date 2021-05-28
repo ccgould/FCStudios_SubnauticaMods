@@ -75,6 +75,11 @@
     <Compile Include="Mono\AlterraHubDepot\Buildable\AlterraHubDepotPatcher.cs" />
     <Compile Include="Mono\AlterraHubDepot\Mono\AlterraHubDepotController.cs" />
     <Compile Include="Mono\AlterraHubFabricatorBuilding\Mono\AlterraFabricatorStationController.cs" />
+    <Compile Include="Mono\AlterraHubFabricatorBuilding\Mono\DoorController.cs" />
+    <Compile Include="Mono\AlterraHubFabricatorBuilding\Mono\GeneratorController.cs" />
+    <Compile Include="Mono\AlterraHubFabricatorBuilding\Mono\KeyPadAccessController.cs" />
+    <Compile Include="Mono\AlterraHubFabricatorBuilding\Mono\PowercellSlot.cs" />
+    <Compile Include="Mono\AlterraHubFabricatorBuilding\Mono\SecurityScreenController.cs" />
     <Compile Include="Mono\BaseManager.cs" />
     <Compile Include="Mono\BaseSaveData.cs" />
     <Compile Include="Mono\BaseTransferOperation.cs" />

@@ -45,6 +45,7 @@ namespace FCS_AlterraHub.Spawnables
                 pickupable.isPickupable = false;
 
                 ResourceTracker resourceTracker = prefab.AddComponent<ResourceTracker>();
+                prefab.AddComponent<AlterraHubDepotFragmentSpawn>();
                 resourceTracker.prefabIdentifier = prefabIdentifier;
                 resourceTracker.techType = this.TechType;
                 resourceTracker.overrideTechType = TechType.Fragment;
@@ -64,5 +65,9 @@ namespace FCS_AlterraHub.Spawnables
             oreConsumerFragment.Set(GetGameObject());
             yield break;
         }
+    }
+
+    internal class AlterraHubDepotFragmentSpawn:MonoBehaviour
+    {
     }
 }

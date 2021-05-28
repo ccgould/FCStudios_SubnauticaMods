@@ -30,6 +30,7 @@ namespace FCS_AlterraHub
     public class QPatch
     {
         public static TechType OreConsumerFragTechType;
+        private static string PdaEntryMessage => $"Please open your AlterraHub PDA to read this data entry ({Configuration.FCSPDAKeyCode}). Make sure you have completed the Alterra Hub Station mission to do so.";
         public static Config Configuration { get;} = OptionsPanelHandler.Main.RegisterModOptions<Config>();
         public static EncyclopediaConfig EncyclopediaConfig { get;} = OptionsPanelHandler.Main.RegisterModOptions<EncyclopediaConfig>();
         public static AssetBundle GlobalBundle { get; set; }
@@ -37,17 +38,17 @@ namespace FCS_AlterraHub
         [QModPatch]
         public static void Patch()
         {
+            LanguageHandler.SetLanguageLine($"Ency_{Mod.AlterraHubDepotClassID}", Mod.AlterraHubDepotFriendly);
+            LanguageHandler.SetLanguageLine($"EncyDesc_{Mod.AlterraHubDepotClassID}", PdaEntryMessage);
+            LanguageHandler.SetLanguageLine($"Ency_{Mod.OreConsumerClassID}", Mod.OreConsumerFriendly);
+            LanguageHandler.SetLanguageLine($"EncyDesc_{Mod.OreConsumerClassID}", PdaEntryMessage);
+
             //QModServices.Main.AddCriticalMessage($"Power Loss Over Distance Result: {MathHelpers.PowerLossOverDistance(379)}");
 
             Mod.CollectKnownDevices();
 
             QuickLogger.Info($"Started patching. Version: {QuickLogger.GetAssemblyVersion(Assembly.GetExecutingAssembly())}");
             GlobalBundle = FCSAssetBundlesService.PublicAPI.GetAssetBundleByName(Mod.AssetBundleName);
-
-            //Mod.OnGamePlaySettingsLoaded += settings =>
-            //{
-            //    SpawnFrag();
-            //};
 
             Mod.LoadAudioFiles();
             
