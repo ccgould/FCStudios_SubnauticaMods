@@ -16,7 +16,8 @@ namespace FCS_AlterraHub.Patches
     [HarmonyPatch("Update")]
     public static class Player_Update_Patch
     {
-        internal static Action OnPlayerUpdate;
+        internal static Action OnPlayerUpdate; 
+        public static bool ForceOpenPDA { get; set; }
         public static FCSPDAController FCSPDA;
         private static Player _instance;
         private static bool _wasPlaying;
@@ -30,39 +31,39 @@ namespace FCS_AlterraHub.Patches
             _instance = __instance;
             OnPlayerUpdate?.Invoke();
 
-            FCSPDA.AudioTrack.isPlaying(out bool isPlaying);
-
-
-            if (isPlaying && Mathf.Approximately(Time.timeScale, 0f))
+            if (FCSPDA != null)
             {
-                FCSPDA.AudioTrack.setPaused(true);
-                _wasPlaying = true;
-            }
-
-            if (_wasPlaying && Time.timeScale > 0)
-            {
-                FCSPDA.AudioTrack.setPaused(false);
-                FCSPDA.AudioTrack.setVolume(SoundSystem.voiceVolume);
-                _wasPlaying = false;
-            }
-
-            if (Input.GetKeyDown(QPatch.Configuration.FCSPDAKeyCode) && !__instance.GetPDA().isOpen)
-            {
-                if (FCSPDA == null)
+                FCSPDA.AudioTrack.isPlaying(out bool isPlaying);
+                
+                if (isPlaying && Mathf.Approximately(Time.timeScale, 0f))
                 {
-                    QuickLogger.DebugError("FCSPDA IS NULL: Attempting to force creation", true);
-                    PlayerGetPDA_Patch.ForceFCSPDACreation();
-                    if (FCSPDA == null)
+                    FCSPDA.AudioTrack.setPaused(true);
+                    _wasPlaying = true;
+                }
+
+                if (_wasPlaying && Time.timeScale > 0)
+                {
+                    FCSPDA.AudioTrack.setPaused(false);
+                    FCSPDA.AudioTrack.setVolume(SoundSystem.voiceVolume);
+                    _wasPlaying = false;
+                }
+            }
+
+            if (Input.GetKeyDown(QPatch.Configuration.FCSPDAKeyCode) || ForceOpenPDA && !__instance.GetPDA().isOpen)
+            {
+                if (Mod.GamePlaySettings.IsPDAUnlocked)
+                {
+                    if (!FCSPDA.IsOpen)
                     {
-                        QuickLogger.DebugError("Forcing PDA creation failed returning", true);
-                        QuickLogger.ModMessage(AlterraHub.ErrorHasOccured());
-                        return;
+                        FCSPDA.Open();
                     }
                 }
-                if (!FCSPDA.IsOpen)
+                else
                 {
-                    FCSPDA.Open();
+                    QuickLogger.ModMessage("Please complete the Alterra Hub Station Mission.");
                 }
+
+                ForceOpenPDA = false;
             }
             
             _time += Time.deltaTime;
@@ -78,8 +79,15 @@ namespace FCS_AlterraHub.Patches
     [HarmonyPatch("Awake")]
     public static class Player_Awake_Patch
     {
-        private static void Prefix(Player __instance)
+        [HarmonyPostfix]
+        private static void Postfix(Player __instance)
         {
+            if (Player_Update_Patch.FCSPDA == null)
+            {
+                QuickLogger.DebugError("FCSPDA IS NULL: Attempting to force creation", true);
+                PlayerGetPDA_Patch.ForceFCSPDACreation();
+            }
+
             var f = uSkyManager.main.SunLight.transform;
             if (f != null)
             {
@@ -118,6 +126,7 @@ namespace FCS_AlterraHub.Patches
         internal static void ForceFCSPDACreation()
         {
             Postfix(Player.main);
+            QuickLogger.Info($"Forced FCS PDA Creation: {Player_Update_Patch.FCSPDA}");
         }
 
         private static void MoveFcsPdaIntoPosition(GameObject defPDA, GameObject pda)
@@ -147,6 +156,7 @@ namespace FCS_AlterraHub.Patches
             pda.EnsureComponent<Rigidbody>().isKinematic = true;
             var controller = pda.AddComponent<FCSPDAController>();
             Player_Update_Patch.FCSPDA = controller;
+            FCSPDAController.SetInstance(controller);
             controller.PDAObj = __instance.pdaSpawn.spawnedObj;
 
             QuickLogger.Debug("FCS PDA FOUND");

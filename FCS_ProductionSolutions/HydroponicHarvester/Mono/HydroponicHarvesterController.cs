@@ -30,7 +30,6 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
         public override StorageType StorageType => StorageType.OtherStorage;
         public EffectsManager EffectsManager => _effectsManager;
         public AudioManager AudioManager { get; private set; }
-        public Action<bool> onUpdateSound { get; private set; }
 
         public GrowBedManager GrowBedManager { get; set; }
         public override bool IsOperational => IsOperationalCheck();
@@ -297,12 +296,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
         {
             return _colorManager.ChangeColor(color, mode);
         }
-
-        public bool HasPowerToConsume()
-        {
-            return true;
-        }
-
+        
         public bool IsInBase()
         {
             return _isInBase;

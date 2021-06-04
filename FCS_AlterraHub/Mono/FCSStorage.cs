@@ -10,7 +10,6 @@ namespace FCS_AlterraHub.Mono
 {
     public class FCSStorage : StorageContainer, IFCSStorage
     {
-        
         private byte[] _storageRootBytes;
         public int SlotsAssigned { get; set; }
         public Action<int, int> OnContainerUpdate { get; set; }
@@ -18,7 +17,6 @@ namespace FCS_AlterraHub.Mono
         public Action<FcsDevice, TechType> OnContainerRemoveItem { get; set; }
         public int GetContainerFreeSpace => SlotsAssigned - GetCount();
         public bool IsFull => GetCount() >= SlotsAssigned;
-
         public List<TechType> InvalidTechTypes = new List<TechType>();
         private bool _isSubscribed;
 
@@ -89,7 +87,7 @@ namespace FCS_AlterraHub.Mono
                 TransferItems(gObj);
                 QuickLogger.Debug("Items Transferred");
                 QuickLogger.Debug($"Object location: {gObj.transform.position}");
-                GameObject.Destroy(gObj);
+                Destroy(gObj);
                 QuickLogger.Debug("Item destroyed");
             }
         }
@@ -122,7 +120,7 @@ namespace FCS_AlterraHub.Mono
                     TransferItems(gObj);
                     QuickLogger.Debug("Items Transferred");
                     QuickLogger.Debug($"Object location: {gObj.transform.position}");
-                    GameObject.Destroy(gObj);
+                    Destroy(gObj);
                     QuickLogger.Debug("Item destroyed");
                 }
             }
@@ -205,7 +203,7 @@ public IEnumerator RestoreItems(ProtobufSerializer serializer, byte[] serialData
                 if (storeInformationIdentifier != null && storeInformationIdentifier.name.StartsWith("SerializerEmptyGameObject", StringComparison.OrdinalIgnoreCase))
                 {
                     QuickLogger.Debug($"Duplicate: {storeInformationIdentifier.gameObject.transform.position} | {storeInformationIdentifier.gameObject.name}");
-                    GameObject.Destroy(storeInformationIdentifier.gameObject);
+                    Destroy(storeInformationIdentifier.gameObject);
                     QuickLogger.Debug($"Destroyed Duplicate");
                 }
                 num = i;
@@ -252,7 +250,7 @@ public IEnumerator RestoreItems(ProtobufSerializer serializer, byte[] serialData
         /// <param name="storageRoot"></param>
         public void Initialize(string classID)
         {
-            this.prefabRoot = transform.gameObject;
+            prefabRoot = transform.gameObject;
             var tempStorageRoot = transform.Find("StorageRoot")?.gameObject;
 
             if (tempStorageRoot == null)
@@ -274,9 +272,10 @@ public IEnumerator RestoreItems(ProtobufSerializer serializer, byte[] serialData
 
         public void Initialize(int slots, int storageWidth, int storageHeight,string storageName, string classID)
         {
-            this.height = storageHeight;
-            this.width = storageWidth;
-            this.storageLabel = storageName;
+            SlotsAssigned = slots;
+            height = storageHeight;
+            width = storageWidth;
+            storageLabel = storageName;
             Initialize(classID);
         }
 

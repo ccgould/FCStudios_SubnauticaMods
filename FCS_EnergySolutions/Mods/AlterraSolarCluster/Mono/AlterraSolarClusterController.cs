@@ -30,6 +30,11 @@ namespace FCS_EnergySolutions.Mods.AlterraSolarCluster.Mono
             _powerManager.CheckIfConnected();
         }
 
+        private void OnGlobalEntitiesLoaded()
+        {
+            QuickLogger.Debug($"On Global Entites Loaded: {GetPrefabID()}");
+        }
+
         private void OnEnable()
         {
             if (_runStartUpOnEnable)
@@ -60,7 +65,7 @@ namespace FCS_EnergySolutions.Mods.AlterraSolarCluster.Mono
 
         private void Update()
         {
-            if (Time.deltaTime == 0f)
+            if (Time.timeScale <= 0f)
             {
                 return;
             }

@@ -4,9 +4,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using FCS_AlterraHub.API;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Mono.AlterraHubFabricatorBuilding.Mono;
 using FCS_AlterraHub.Mono.FCSPDA.Mono;
+using FCS_AlterraHub.Patches;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Helpers;
@@ -47,7 +49,7 @@ namespace FCS_AlterraHub.Configuration
 
         internal const string DebitCardClassID = "DebitCard";
         internal const string DebitCardFriendly = "Alterra Debit Card";
-        internal const string DebitCardDescription = "A card that stores your money.";
+        internal const string DebitCardDescription = "This card lets you access your Alterra Account. You must have this card with you to make Alterra Hub purchases.";
         internal const string CardPrefabName = "CreditCard";
         internal static TechType DebitCardTechType { get; set; }
 
@@ -230,6 +232,7 @@ namespace FCS_AlterraHub.Configuration
 
         public static bool SaveDevices(List<KnownDevice> knownDevices)
         {
+            
             try
             {
                 ModUtils.Save(knownDevices, KnownDevicesFilename, GetSaveFileDirectory(), OnSaveComplete);
@@ -291,6 +294,7 @@ namespace FCS_AlterraHub.Configuration
             if(GamePlaySettings == null)
             {
                 SaveGamePlaySettings();
+                NotifyGamePlayLoaded();
             }
         }
 
@@ -338,7 +342,9 @@ namespace FCS_AlterraHub.Configuration
 
                 QuickLogger.Debug("Attempting to save bases",true);
                 newSaveData.BaseSaves = BaseManager.Save().ToList();
-                FCSPDAController.Instance.Save(newSaveData);
+                QuickLogger.Debug($"Save 1 {Player_Update_Patch.FCSPDA}", true);
+                Player_Update_Patch.FCSPDA.Save(newSaveData);
+                QuickLogger.Debug("Save 2", true);
                 QuickLogger.Debug("Bases saved", true);
 
                 if (_tempAccountDetails != null)
@@ -502,6 +508,8 @@ namespace FCS_AlterraHub.Configuration
         public List<string> AlterraHubDepotPowercellSlot = new List<string>();
         public KeyPadAccessSave AlterraHubDepotDoors = new KeyPadAccessSave();
         public bool BreakerOn;
+        public bool IsPDAUnlocked;
+        public HashSet<int> FixedPowerBoxes = new HashSet<int>();
     }
 
     public class KeyPadAccessSave

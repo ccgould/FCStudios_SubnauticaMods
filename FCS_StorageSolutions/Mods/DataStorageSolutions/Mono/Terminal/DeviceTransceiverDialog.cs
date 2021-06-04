@@ -140,7 +140,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
 
                 if (!string.IsNullOrEmpty(_searchText?.Trim()))
                 {
-                    grouped = grouped.Where(p => TechTypeExtensions.Get(Language.main, p).ToLower().Contains(_searchText.Trim().ToLower())).ToList();
+                    grouped = grouped.Where(p => Language.main.Get(p).ToLower().Contains(_searchText.Trim().ToLower())).ToList();
                 }
 
                 if (data.EndPosition > grouped.Count)
@@ -162,6 +162,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                     int index = w++;
                     _techTypeButtons[index].Set(grouped.ElementAt(i));
                     _techTypeButtons[index].Tag = new TransceiverData(grouped.ElementAt(i),_techTypeButtons[index]);
+                    _techTypeButtons[index].ToolTipString = Language.main.Get(grouped.ElementAt(i));
                     if (_operation.TransferItems.Contains(grouped.ElementAt(i)))
                     {
                         var button = _techTypeButtons[index];

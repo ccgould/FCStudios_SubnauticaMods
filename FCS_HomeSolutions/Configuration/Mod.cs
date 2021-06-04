@@ -7,6 +7,7 @@ using System.Reflection;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Mono.PaintTool;
+using FCS_HomeSolutions.Spawnables;
 using FCSCommon.Extensions;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
@@ -397,6 +398,8 @@ namespace FCS_HomeSolutions.Configuration
         internal static string SaveDataFilename => $"{ModName}SaveData.json";
 
         public static TechType CurtainTechType { get; internal set; }
+        public static Dictionary<TechType,decimal> PeeperBarFoods = new Dictionary<TechType, decimal>();
+
         internal static Dictionary<TechType,TechType> CustomFoods = new Dictionary<TechType,TechType>();
 
         private static void GetCraftTreeData(CraftNode innerNodes)

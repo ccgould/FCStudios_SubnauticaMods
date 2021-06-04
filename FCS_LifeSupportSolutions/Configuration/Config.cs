@@ -13,14 +13,13 @@ namespace FCS_LifeSupportSolutions.Configuration
         {
         }
 
-        [Toggle("[Life Support Solutions] Enable Debugs", Order = 0), OnChange(nameof(EnableDebugsToggleEvent)), Tooltip("Enables debug logs set in code by FCStudios (Maybe asked to be enabled for bug reports)")]
+        [Toggle("[Life Support Solutions] Enable Debugs", Order = 0, Tooltip="Enables debug logs set in code by FCStudios (Maybe asked to be enabled for bug reports)"), OnChange(nameof(EnableDebugsToggleEvent))]
         public bool EnableDebugLogs = false;
 
 
         #region Base Utility Unit
 
-        [Toggle("[Base Utility Unit] Is Mod Enabled"),
-         Tooltip("Enables/Disables Base Utility Unit from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+        [Toggle("[Base Utility Unit] Is Mod Enabled",Tooltip="Enables/Disables Base Utility Unit from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool BaseUtilityUnitIsModEnabled = true;
 
         [Toggle("Require Utility Unit for Oxygen")]
@@ -37,14 +36,12 @@ namespace FCS_LifeSupportSolutions.Configuration
         #endregion
 
         #region Energy Pill Vending Machine
-        [Toggle("[Energy Pill Vending Machine] Is Mod Enabled"),
-         Tooltip("Enables/Disables Energy Pill Vending Machine from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+        [Toggle("[Energy Pill Vending Machine] Is Mod Enabled",Tooltip="Enables/Disables Energy Pill Vending Machine from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool IsEnergyPillVendingMachineEnabled = true;
         #endregion
 
         #region Mini MedBay
-        [Toggle("[Mini MedBay] Is Mod Enabled"),
-         Tooltip("Enables/Disables Mini MedBay from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+        [Toggle("[Mini MedBay] Is Mod Enabled",Tooltip="Enables/Disables Mini MedBay from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool IsMiniMedBayEnabled = true;
         #endregion
 

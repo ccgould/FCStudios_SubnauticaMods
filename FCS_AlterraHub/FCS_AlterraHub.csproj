@@ -46,6 +46,7 @@
     <Compile Include="Helpers\MathHelpers.cs" />
     <Compile Include="Helpers\SpawnHelper.cs" />
     <Compile Include="Helpers\TechDataHelpers.cs" />
+    <Compile Include="Helpers\UWEStorageHelpers.cs" />
     <Compile Include="Helpers\WorldHelpers.cs" />
     <Compile Include="Interfaces\IDSSRack.cs" />
     <Compile Include="Interfaces\IFCSDisplay.cs" />
@@ -75,7 +76,9 @@
     <Compile Include="Mono\AlterraHubDepot\Buildable\AlterraHubDepotPatcher.cs" />
     <Compile Include="Mono\AlterraHubDepot\Mono\AlterraHubDepotController.cs" />
     <Compile Include="Mono\AlterraHubFabricatorBuilding\Mono\AlterraFabricatorStationController.cs" />
+    <Compile Include="Mono\AlterraHubFabricatorBuilding\Mono\AntennaController.cs" />
     <Compile Include="Mono\AlterraHubFabricatorBuilding\Mono\DoorController.cs" />
+    <Compile Include="Mono\AlterraHubFabricatorBuilding\Mono\ElectricalBox.cs" />
     <Compile Include="Mono\AlterraHubFabricatorBuilding\Mono\GeneratorController.cs" />
     <Compile Include="Mono\AlterraHubFabricatorBuilding\Mono\KeyPadAccessController.cs" />
     <Compile Include="Mono\AlterraHubFabricatorBuilding\Mono\PowercellSlot.cs" />

@@ -408,8 +408,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
                 UpgradeManager.Initialize(this);
             }
 
-
-            FCS_AlterraHub.Helpers.WorldHelpers.CreateBeacon(gameObject,QPatch.DeepDrillerPingType,"");
+            _ping = FCS_AlterraHub.Helpers.WorldHelpers.CreateBeacon(gameObject,QPatch.DeepDrillerPingType,"");
 
             _line = gameObject.GetComponent<LineRenderer>();
             _line.SetVertexCount(Segments + 1);

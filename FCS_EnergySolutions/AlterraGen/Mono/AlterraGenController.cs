@@ -23,7 +23,6 @@ namespace FCS_EnergySolutions.AlterraGen.Mono
         private string _prefabID;
         private bool _runStartUpOnEnable;
         private GameObject _xBubbles;
-        private TechType[] _allowedTransferItems;
 
         internal AlterraGenPowerManager PowerManager { get; private set; } 
         internal AnimationManager AnimationManager { get; set; }

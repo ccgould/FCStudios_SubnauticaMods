@@ -1,11 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.IO;
-using FCS_AlterraHub.Configuration;
-using FCS_AlterraHub.Registration;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Handlers;
-using SMLHelper.V2.Utility;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -34,9 +29,7 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono.ScreenItems
         private Text message;
         private RawImage image;
         public LayoutElement imageLayout;
-        [AssertNotNull]
-        public Texture2D defaultTexture;
-        public float indentStep = 10f;
+        public float indentStep = 20f;
         private List<uGUI_ListEntry> pool = new List<uGUI_ListEntry>();
         public UISpriteData pathNodeSprites;
         public UISpriteData entryNodeSprites;

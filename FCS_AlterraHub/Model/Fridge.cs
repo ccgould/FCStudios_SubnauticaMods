@@ -233,7 +233,7 @@ namespace FCS_AlterraHub.Model
                 eatable.timeDecayStart = eatableEntities.TimeDecayStart;
 
 #if SUBNAUTICA
-                var item = new InventoryItem(food.gameObject.GetComponent<Pickupable>());//TODO if you get items on load this is why you removed pickup false
+                var item = new InventoryItem(food.gameObject.GetComponent<Pickupable>());//if you get items on load this is why you removed pickup false
 #elif BELOWZERO
                 Pickupable pickupable = food.gameObject.GetComponent<Pickupable>();
                 pickupable.Pickup(false);

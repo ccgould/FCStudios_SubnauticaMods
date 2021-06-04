@@ -625,15 +625,6 @@ namespace FCS_AlterraHub.Model
             }
         }
 
-        ////TODO Remove if not needed
-        //private static void AddEntry(string category, List<TechType> types)
-        //{
-        //    Filters.Add(new Filter
-        //    {
-        //        Category = category,
-        //        Types = types
-        //    });
-        //}
         private static Filter AddUnknownEntry(TechType type,string category = "")
         {
             var filter = new Filter

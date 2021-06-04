@@ -68,7 +68,8 @@ namespace FCS_AlterraHub.Mono
             "trashcan",
             "serverrack",
             "powerstorage",
-            "recycler"
+            "recycler",
+            "alterrahubdepot",
         };
         public readonly HashSet<StorageContainer> BaseStorageLockers = new HashSet<StorageContainer>();
         public readonly HashSet<FcsDevice> BaseServers = new HashSet<FcsDevice>();
@@ -222,9 +223,6 @@ namespace FCS_AlterraHub.Mono
             {
                 DockingManager = habitat.gameObject.AddComponent<DSSVehicleDockingManager>();
                 DockingManager.Initialize(this);
-                
-                //TODO ReEnable
-                //DockingManager.ToggleIsEnabled(_savedData?.AllowDocking ?? false);
             }
         }
 
@@ -606,17 +604,6 @@ namespace FCS_AlterraHub.Mono
             if (!TrackedResources.ContainsKey(techType)) return 0;
 
             return TrackedResources.ContainsKey(techType) ? TrackedResources[techType].Amount : 0;
-
-            //TODO Delete if not needed
-            //var i = 0;
-            //var device = TrackedResources[techType];
-
-            //foreach (FcsDevice controller in device.Servers)
-            //{
-            //    i += controller.GetItemCount(techType);
-            //}
-
-            //return i;
         }
 
         public bool HasItem(TechType techType)
@@ -906,7 +893,7 @@ namespace FCS_AlterraHub.Mono
         public void AlertNewStorageContainerPlaced(StorageContainer sc)
         {
             if (BaseStorageLockers.Contains(sc)) return;
-            var stracker = sc.gameObject.AddComponent<FCSStorageTracker>();
+            var stracker = sc.gameObject.EnsureComponent<FCSStorageTracker>();
             stracker.Set(sc);
             stracker.OnDestroyAction += OnDestroyAction;
             BaseStorageLockers.Add(sc);

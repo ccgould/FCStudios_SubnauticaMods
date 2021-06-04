@@ -89,8 +89,11 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
 
         public void Load(TechType techType)
         {
-            if(Mod.IsHydroponicKnownTech(techType,out var data))
-            SetIcon(data);
+            if (Mod.IsHydroponicKnownTech(techType, out var data))
+            {
+                SetIcon(data);
+                UpdateCount();
+            }
         }
     }
 }

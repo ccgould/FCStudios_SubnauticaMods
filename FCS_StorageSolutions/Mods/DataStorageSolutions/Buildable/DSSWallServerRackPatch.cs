@@ -74,15 +74,13 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable
 
                 var lw = prefab.AddComponent<LargeWorldEntity>();
                 lw.cellLevel = LargeWorldEntity.CellLevel.Global;
+                prefab.AddComponent<TechTag>().type = TechType;
+                prefab.AddComponent<DSSWallServerRackController>();
 
                 prefab.SetActive(false);
                 var storage = prefab.AddComponent<FCSStorage>();
                 storage.Initialize(Mod.DSSWallServerRackClassName);
                 prefab.SetActive(true);
-
-
-                prefab.AddComponent<TechTag>().type = TechType;
-                prefab.AddComponent<DSSWallServerRackController>();
 
                 //Apply the glass shader here because of autosort lockers for some reason doesn't like it.
                 MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModName);

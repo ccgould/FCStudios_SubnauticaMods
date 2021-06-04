@@ -75,7 +75,7 @@ namespace FCS_ProductionSolutions
                 
                 var pingSprite = ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetFolder(), "DeepDriller_ping.png"));
                 DeepDrillerPingType = WorldHelpers.CreatePingType("Deep Driller","Deep Driller",pingSprite);
-
+                
                 var deepDriller = new FCSDeepDrillerBuildable();
                 deepDriller.Patch();
             }

@@ -18,5 +18,6 @@ namespace FCS_HomeSolutions.Buildables
         internal TechGroup GroupForPDA;
         internal TechCategory CategoryForPDA;
         internal decimal Cost;
+        internal string IconName;
     }
 }

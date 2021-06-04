@@ -26,7 +26,6 @@ namespace FCS_AlterraHub.Model
 #else
         public void GetTooltip(out string tooltipText, List<TooltipIcon> tooltipIcons)
         {
-            QuickLogger.Debug($"[GetToolTip] Description = {Description}",true);
             var result = RequestPermission?.Invoke() ?? false;
             
             if (ToolTipStringDelegate != null)

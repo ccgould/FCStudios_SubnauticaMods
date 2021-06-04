@@ -12,6 +12,8 @@ namespace FCS_AlterraHub.Patches
         [HarmonyPostfix]
         public static void Postfix(ref SubRoot __instance)
         {
+            QuickLogger.Debug($"Awake Called on {__instance.gameObject.GetComponent<PrefabIdentifier>()?.id}");
+            QuickLogger.Debug($"Awake Called on {__instance.gameObject.activeSelf} | {__instance.gameObject.transform.position != Vector3.zero}");
             if (__instance.gameObject.activeSelf && __instance.gameObject.transform.position != Vector3.zero)
             {
                BaseManager.FindManager(__instance);

@@ -47,6 +47,8 @@ namespace FCS_AlterraHub.Mono.OreConsumer
             TechType.Kyanite
         };
 
+        private Dictionary<string,FcsDevice> SavedDevices => FCSAlterraHubService.PublicAPI.GetRegisteredDevices();
+
         private bool CheckIfOperational()
         {
             if(IsInitialized && IsConstructed && Manager != null && _oreQueue != null && Manager.HasEnoughPower(GetPowerUsage()) && !_isBreakerTripped) return true;
@@ -379,8 +381,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
 
         public void Save(SaveData newSaveData, ProtobufSerializer serializer)
         {
-            if (!IsInitialized
-                || !IsConstructed) return;
+            if (!IsInitialized || !IsConstructed) return;
 
             if (_savedData == null)
             {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.PerformanceData;
 using System.IO;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Enumerators;
@@ -98,6 +99,11 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
             {
                 _instance = this;
             }
+        }
+
+        internal static void SetInstance(FCSPDAController controller)
+        {
+            _instance = controller;
         }
 
         private void OnDestroy()
@@ -654,7 +660,8 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
                 _savedData = new FCSPDAEntry();
             }
 
-            _savedData.CartItems = _cartDropDownManager.Save();
+            
+            _savedData.CartItems = _cartDropDownManager?.Save() ?? new List<CartItemSaveData>();
             newSaveData.FCSPDAEntry = _savedData;
         }
 
@@ -684,6 +691,11 @@ namespace FCS_AlterraHub.Mono.FCSPDA.Mono
         public CraftNode GetCraftTree()
         {
             return EncyclopediaTabController.Tree;
+        }
+
+        public static void ForceOpen()
+        {
+            Player_Update_Patch.ForceOpenPDA = true;
         }
     }
     

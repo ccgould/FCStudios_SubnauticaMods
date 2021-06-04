@@ -11,6 +11,7 @@ namespace FCS_AlterraHub.Mono.OreConsumer
         private const float RpmPerDeg = 0.16667f;
         private float _increaseRate = 2f;
         private bool _increasing = true;
+        public bool IsRunning => _increasing;
 
         private void Update()
         {
@@ -43,6 +44,15 @@ namespace FCS_AlterraHub.Mono.OreConsumer
         public void SpeedByPass(float rpm)
         {
             _currentRpm = rpm;
+        }
+
+        /// <summary>
+        /// Bypasses the spooling of the motor and sets the motor to the desired rpm
+        /// </summary>
+        /// <param name="speed"></param>
+        public void RPMByPass(float rpm)
+        {
+            _rpm = rpm;
         }
 
         /// <summary>

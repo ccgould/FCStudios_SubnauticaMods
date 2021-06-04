@@ -28,6 +28,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
         private HarvesterSpeedButton _speedBTN;
         private FCSToggleButton _lightToggleBTN;
         private List<TechType> _loadedDNASamples;
+        private List<SlotItemTab> _slots = new List<SlotItemTab>();
 
         internal void Setup(HydroponicHarvesterController mono)
         {
@@ -50,8 +51,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
             {
                 if (Tag == null) return;
                 var data = (SlotData)Tag;
-                QuickLogger.Debug($"Data: {data} | TechType: {data.TechType} | Slot: {data.SlotId} | GrowBed: {_mono?.GrowBedManager}",true);
-                _mono.GrowBedManager.TakeItem(data.TechType,data.SlotId);
+                _mono?.GrowBedManager.TakeItem(data.TechType,data.SlotId);
             }
         }
 
@@ -91,14 +91,16 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
                 var hi1 = GameObjectHelpers.FindGameObject(gameObject, "HarvesterScreenItem");
                 var slot1 = GameObjectHelpers.FindGameObject(hi1, "Icon").AddComponent<SlotItemTab>();
                 slot1.Initialize(this,OnButtonClick,0);
+                _slots.Add(slot1);
 
                 var hi2 = GameObjectHelpers.FindGameObject(gameObject, "HarvesterScreenItem (1)");
                 var slot2 = GameObjectHelpers.FindGameObject(hi2, "Icon").AddComponent<SlotItemTab>();
                 slot2.Initialize(this,OnButtonClick,1);
-
+                _slots.Add(slot2);
                 var hi3 = GameObjectHelpers.FindGameObject(gameObject, "HarvesterScreenItem (2)");
                 var slot3 = GameObjectHelpers.FindGameObject(hi3, "Icon").AddComponent<SlotItemTab>();
                 slot3.Initialize(this,OnButtonClick,2);
+                _slots.Add(slot3);
 
                 _landSamplesGrid = InterfaceHelpers.FindGameObject(gameObject, "LandSamplesGrid");
                 _aquaticSamplesGrid = InterfaceHelpers.FindGameObject(gameObject, "AquaticSamplesGrid");

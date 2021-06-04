@@ -1,33 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
 using FCS_AlterraHub.Model;
+using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.HydroponicHarvester.Enumerators;
 using FCS_ProductionSolutions.HydroponicHarvester.Mono;
-using FCSCommon.Converters;
-using FCSCommon.Extensions;
 using FCSCommon.Utilities;
 using UnityEngine;
 namespace FCS_ProductionSolutions.HydroponicHarvester.Models
 {
     internal class PlantSlot : MonoBehaviour
     {
-        internal GameObject SlotBounds { get; set; }
         private const float EnergyConsumption = 15000f;
         private Plantable _plantable { get; set; }
+        private readonly IList<float> _progress = new List<float>(new[] { -1f, -1f, -1f });
+        private TechType _returnTechType;
+        private SlotItemTab _trackedTab;
+        private TechType _seedTech;
+        
         public int Id;
         public bool IsOccupied;
         private SpeedModes _currentMode;
         public GameObject PlantModel;
         private const int MaxCapacity = 50;
         public bool PauseUpdates { get; set; }
-        public bool IsFull => _itemCount >= MaxCapacity;
-
-        private readonly IList<float> _progress = new List<float>(new[] { -1f, -1f, -1f });
-        private TechType _returnTechType;
+        public bool IsFull => GrowBedManager.GetItemCount(_returnTechType) >= MaxCapacity;
+        internal GameObject SlotBounds { get; set; }
         internal GrowBedManager GrowBedManager;
-        private int _itemCount;
-        private SlotItemTab _trackedTab;
-        private TechType _seedTech;
 
         public bool NotAllowToGenerate()
         {
@@ -103,9 +101,10 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Models
                 GameObject.Destroy(_plantable.linkedGrownPlant.gameObject);
             }
 
-            GrowBedManager.Mono.EffectsManager.ChangeEffectState(GrowBedManager.FindEffectType(this),Id,false);
+            GrowBedManager.HarvesterController.EffectsManager.ChangeEffectState(GrowBedManager.FindEffectType(this),Id,false);
             IsOccupied = false;
             _seedTech = TechType.None;
+            _returnTechType = TechType.None;
             GrowingPlant = null;
             PlantModel = null;
             _plantable = null;
@@ -113,28 +112,16 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Models
 
         internal bool TryClear()
         {
-            if (_itemCount > 0) return false;
+            if (GrowBedManager.GetItemCount(_returnTechType) > 0) return false;
             Clear();
             return true;
         }
-
-        public void ShowPlant()
-        {
-            var model = GameObject.Instantiate(PlantModel);
-            model.transform.SetParent(transform,false);
-            model.transform.localPosition = Vector3.zero;
-        }
-
+        
         public TechType GetPlantSeedTechType()
         {
             return _seedTech;
         }
-
-        public TechType GetPlantTechType()
-        {
-            return _plantable != null ? _plantable.plantTechType : TechType.None;
-        }
-
+        
         public void SetMaxPlantHeight(float height)
         {
 
@@ -147,19 +134,18 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Models
 
         public bool RemoveItem()
         {
-            if (_itemCount <= 0) return false;
-            _itemCount--;
             TryStartingNextClone();
             _trackedTab?.UpdateCount();
             return true;
         }
 
+        public bool CanRemoveItem() => GrowBedManager.GetItemCount(_returnTechType) > 0;
+
         public void AddItem()
         {
             if(IsFull) return;
-            _itemCount++;
+            GrowBedManager.AddItemToItemsContainer(GetPlantSeedTechType());
             _trackedTab?.UpdateCount();
-            GrowBedManager.IncreaseByOne(GetPlantSeedTechType());
         }
         
         public TechType GetReturnType()
@@ -192,7 +178,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Models
 
         public int GetCount()
         {
-            return _itemCount;
+            return GrowBedManager.GetItemCount(_returnTechType);
         }
 
         public int GetMaxCapacity()
@@ -212,12 +198,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Models
             SlotBounds = gameObject.FindChild("PlanterBounds");
             PlantModel = transform.GetChild(0).gameObject;
         }
-
-        public void SetItemCount(int amount)
-        {
-            _itemCount = amount;
-        }
-
+        
         public SlotItemTab GetTab()
         {
             return _trackedTab;
@@ -235,7 +216,9 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Models
 
         public void SetSeedType(TechType currentItemTech)
         {
+            Mod.IsHydroponicKnownTech(currentItemTech, out DNASampleData data);
             _seedTech = currentItemTech;
+            _returnTechType = data.PickType;
         }
     }
 }

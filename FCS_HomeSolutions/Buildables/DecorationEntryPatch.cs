@@ -31,13 +31,17 @@ namespace FCS_HomeSolutions.Buildables
 
         public DecorationEntryPatch(string classId, string friendlyName, string description, GameObject prefab,Settings settings) : base(classId, friendlyName, description)
         {
+            if (string.IsNullOrWhiteSpace(settings.IconName))
+            {
+                settings.IconName = ClassID;
+            }
             _prefab = prefab;
             _settings = settings;
 
             OnStartedPatching += () =>
             {
                 QuickLogger.Debug("Patched Kit");
-                var kit = new FCSKit(settings.KitClassID, friendlyName, Path.Combine(AssetsFolder, $"{classId}.png"));
+                var kit = new FCSKit(settings.KitClassID, friendlyName, Path.Combine(AssetsFolder, $"{_settings.IconName}.png"));
                 kit.Patch();
             };
 
@@ -82,8 +86,6 @@ namespace FCS_HomeSolutions.Buildables
                 prefab.AddComponent<PrefabIdentifier>().ClassId = ClassID;
                 prefab.AddComponent<TechTag>().type = TechType;
                 prefab.AddComponent<DecorationController>();
-                //prefab.AddComponent<AlterraHubController>();
-                //prefab.AddComponent<FCSGameLoadUtil>();
 
                 //Apply the glass shader here because of autosort lockers for some reason doesn't like it.
                 MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModName);
@@ -117,7 +119,7 @@ namespace FCS_HomeSolutions.Buildables
 
         protected override Sprite GetItemSprite()
         {
-            return ImageUtils.LoadSpriteFromFile(Path.Combine(AssetsFolder, $"{ClassID}.png"));
+            return ImageUtils.LoadSpriteFromFile(Path.Combine(AssetsFolder, $"{_settings.IconName}.png"));
         }
     }
 }

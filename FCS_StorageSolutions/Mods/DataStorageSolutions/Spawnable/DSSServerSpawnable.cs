@@ -24,7 +24,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Spawnable
         {
             OnFinishedPatching += () =>
             {
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, TechType, 90000, StoreCategory.Storage);
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, TechType, 1,90000, StoreCategory.Storage,true);
             };
         }
 

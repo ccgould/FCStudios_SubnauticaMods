@@ -35,6 +35,8 @@ namespace FCS_AlterraHub
         public static EncyclopediaConfig EncyclopediaConfig { get;} = OptionsPanelHandler.Main.RegisterModOptions<EncyclopediaConfig>();
         public static AssetBundle GlobalBundle { get; set; }
 
+        private static readonly FieldInfo CachedEnumString_valueToString = typeof(CachedEnumString<PingType>).GetField("valueToString", BindingFlags.NonPublic | BindingFlags.Instance);
+
         [QModPatch]
         public static void Patch()
         {
@@ -80,13 +82,13 @@ namespace FCS_AlterraHub
 
             Mod.AlterraHubStationPingType = WorldHelpers.CreatePingType("AlterraHubStation", "AlterraHubStation",
                 ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), "AlterraHubPing.png")));
-            
+
 
             //if (QModServices.Main.ModPresent("EasyCraft"))
             //    EasyCraft_API.Init(harmony);
-            
-            //FCSAlterraHubService.PublicAPI.RegisterEncyclopediaEntry(EncyclopediaConfig.EncyclopediaEntries);
 
+            //FCSAlterraHubService.PublicAPI.RegisterEncyclopediaEntry(EncyclopediaConfig.EncyclopediaEntries);
+            
             //Register debug commands
             ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));
         }
@@ -174,6 +176,23 @@ namespace FCS_AlterraHub
                     rectTransform.sizeDelta = Vector2.one * 28f;
                     rectTransform.localPosition = Vector3.zero;
                     return false;
+                }
+                return true;
+            }
+        }
+
+        public static class SpriteManager_Patch
+        {
+            [HarmonyPrefix]
+            [HarmonyPatch(typeof(SpriteManager), nameof(SpriteManager.GetWithNoDefault))]
+            public static bool Prefix(SpriteManager.Group group, string name, ref Atlas.Sprite __result)
+            {
+                QuickLogger.Debug($"Cj Patch: {name}");
+                
+                if (group == SpriteManager.Group.Pings && name.Contains("AlterraHubStation"))
+                {
+                    __result = SpriteManager.Get(SpriteManager.Group.Pings, "AlterraHubStation");
+                    return false; 
                 }
                 return true;
             }

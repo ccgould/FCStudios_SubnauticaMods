@@ -3,6 +3,7 @@ using System.IO;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Mono;
+using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Assets;
 using SMLHelper.V2.Utility;
@@ -19,7 +20,7 @@ namespace FCS_AlterraHub.Spawnables
 
         public DebitCardSpawnable() : base(Mod.DebitCardClassID, Mod.DebitCardFriendly, Mod.DebitCardDescription)
         {
-
+            OnFinishedPatching += () => { CardSystem.main.CardTechType = TechType; };
         }
 
         public override GameObject GetGameObject()

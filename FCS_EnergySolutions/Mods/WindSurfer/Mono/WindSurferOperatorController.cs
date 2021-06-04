@@ -210,6 +210,7 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
         private Transform _turbinesTransform;
         private int _childPlacementsCorrect;
         private bool _removingPlatform;
+        private FCSStorage _storage;
 
 
         private void UpdateData()

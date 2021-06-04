@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Enumerators;
+using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Spawnables;
 using FCS_EnergySolutions.Buildable;
@@ -173,6 +175,8 @@ namespace FCS_EnergySolutions.WindSurferOperator.Buildables
                 var pr = prefab.AddComponent<BasePowerRelay>();
                 pr.maxOutboundDistance = 0;
                 pr.subRoot = sr;
+                
+                UWEStorageHelpers.CreateStorageContainer(prefab.FindChild("InternalStorage"), prefab.FindChild("StorageRoot"), ClassID, "Storage Locker", 6, 8);
 
                 prefab.AddComponent<WindSurferOperatorController>();
 
@@ -302,6 +306,7 @@ namespace FCS_EnergySolutions.WindSurferOperator.Buildables
             this.lightControl = GetComponentInChildren<LightingController>();
             this.modulesRoot = gameObject.transform;
             this.powerRelay = GetComponent<BasePowerRelay>();
+            BaseManager.FindManager(this);
         }
     }
 

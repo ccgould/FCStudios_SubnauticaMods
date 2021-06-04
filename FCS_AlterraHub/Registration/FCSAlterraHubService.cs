@@ -19,6 +19,8 @@ namespace FCS_AlterraHub.Registration
     public interface IFCSAlterraHubService
     {
         bool IsRegisteringEncyclopedia { get; set; }
+        CardSystem AccountSystem { get; }
+
         void RegisterDevice(FcsDevice device, string tabID, string packageId);
         void RemoveDeviceFromGlobal(string unitID);
         void CreateStoreEntry(TechType techType, TechType receiveTechType, decimal cost, StoreCategory category);
@@ -44,6 +46,7 @@ namespace FCS_AlterraHub.Registration
         void RegisterBase(BaseManager manager);
         void UnRegisterBase(BaseManager manager);
         void AddEncyclopediaEntries(bool verbose = false);
+
         void CreateStoreEntry(TechType techType, TechType receiveTechType,int returnAmount, decimal cost, StoreCategory category,bool forceUnlocked = false);
     }
 
@@ -76,6 +79,8 @@ namespace FCS_AlterraHub.Registration
 
             //QModServices.Main.AddCriticalMessage($"Alterra Service Loaded: {knownDevices.Count} Devices");
         }
+
+        public CardSystem AccountSystem => CardSystem.main;
 
         public void RegisterDevice(FcsDevice device, string tabID, string packageId)
         {
@@ -204,7 +209,7 @@ namespace FCS_AlterraHub.Registration
         {
             CreateStoreEntry(techType,recieveTechType,1,cost,category);   
         }
-
+        
         public void CreateStoreEntry(TechType techType, TechType receiveTechType, int returnAmount, decimal cost, StoreCategory category,bool forceUnlocked = false)
         {
             if (!_storeItems.ContainsKey(techType))

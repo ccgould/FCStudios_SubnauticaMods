@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Mono.OreConsumer;
@@ -7,6 +8,7 @@ using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using Oculus.Newtonsoft.Json;
 using UnityEngine;
+using UWE;
 
 namespace FCS_AlterraHub.Mono.AlterraHubFabricatorBuilding.Mono
 {
@@ -22,6 +24,40 @@ namespace FCS_AlterraHub.Mono.AlterraHubFabricatorBuilding.Mono
         private List<SecurityScreenController> _screens = new List<SecurityScreenController>();
         private GeneratorController _generator;
         private MotorHandler _motor;
+        private AntennaController _antenna;
+
+        private void FindGirder()
+        {
+            //starship_girder_10
+            //99c0da07-a612-4cb7-9e16-e2e6bd3d6207
+            StartCoroutine(FindPrefab("99c0da07-a612-4cb7-9e16-e2e6bd3d6207"));
+        }
+
+        private IEnumerator FindPrefab(string classId)
+        {
+            IPrefabRequest request = PrefabDatabase.GetPrefabAsync(classId);
+            yield return request;
+            GameObject prefab;
+            if (!request.TryGetPrefab(out prefab))
+            {
+                Debug.LogErrorFormat(this, "Failed to request prefab for '{0}'", new object[]
+                {
+                    classId
+                });
+                //Destroy(base.gameObject);
+                yield break;
+            }
+            DeferredSpawner.Task deferredTask = DeferredSpawner.instance.InstantiateAsync(prefab, Vector3.zero, base.transform.localRotation, true);
+            //DeferredSpawner.Task deferredTask = DeferredSpawner.instance.InstantiateAsync(prefab, base.transform.localPosition, base.transform.localRotation, true);
+            yield return deferredTask;
+            GameObject result = deferredTask.result;
+            DeferredSpawner.instance.ReturnTask(deferredTask);
+            result.transform.SetParent(base.transform.parent, false);
+            result.transform.localScale = base.transform.localScale;
+            result.SetActive(true);
+            //Destroy(base.gameObject);
+            yield break;
+        }
 
         private void Awake()
         {
@@ -29,11 +65,15 @@ namespace FCS_AlterraHub.Mono.AlterraHubFabricatorBuilding.Mono
         }
         private void Start()
         {
+            FindGirder();
             _alterraHubDepotSpawnPoints = GameObjectHelpers.FindGameObjects(gameObject, "_AlterraHubDepotSpawnPnt", SearchOption.StartsWith);
             _oreConsumerSpawnPoints = GameObjectHelpers.FindGameObjects(gameObject, "_OreConsumerSpawnPnt", SearchOption.StartsWith);
             
             _generator = GameObjectHelpers.FindGameObject(gameObject, "AlterraHubFabStationGenerator").AddComponent<GeneratorController>();
-            _generator.Initialize(this);
+            _generator.Initialize(this);            
+            
+            _antenna = GameObjectHelpers.FindGameObject(gameObject, "AlterraHubFabStationAntenna").AddComponent<AntennaController>();
+            _antenna.Initialize(this);
 
             var antennaDoor = GameObjectHelpers.FindGameObject(gameObject, "LockedDoor02Controller").AddComponent<DoorController>();
             antennaDoor.doorOpenMethod = StarshipDoor.OpenMethodEnum.Manual;
@@ -92,6 +132,7 @@ namespace FCS_AlterraHub.Mono.AlterraHubFabricatorBuilding.Mono
             }
 
             _generator.LoadSave();
+            _antenna.LoadSave();
 
             if(IsPowerOn)
             {
@@ -104,6 +145,7 @@ namespace FCS_AlterraHub.Mono.AlterraHubFabricatorBuilding.Mono
         private void SpawnFragments()
         {
             if(Mod.GamePlaySettings.IsOreConsumerFragmentSpawned) return;
+
             foreach (GameObject spawnPoint in _alterraHubDepotSpawnPoints)
             {
                 StartCoroutine(SpawnAlterraHubDepotFrag(spawnPoint));

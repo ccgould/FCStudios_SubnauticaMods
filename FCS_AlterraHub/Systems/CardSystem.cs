@@ -22,18 +22,18 @@ namespace FCS_AlterraHub.Systems
     /// <summary>
     /// A class that represents an account for the card system
     /// </summary>
-    internal class AccountDetails
+    public class AccountDetails
     {
-        [JsonProperty] internal string Version { get; set; } = "2.0";
-        [JsonProperty] internal string FullName { get; set; }
-        [JsonProperty] internal string Username { get; set; }
-        [JsonProperty] internal string Password { get; set; }
-        [JsonProperty] internal string PIN { get; set; }
+        [JsonProperty] public string Version { get; set; } = "2.0";
+        [JsonProperty] public string FullName { get; set; }
+        [JsonProperty] public string Username { get; set; }
+        [JsonProperty] public string Password { get; set; }
+        [JsonProperty] public string PIN { get; set; }
         public decimal Balance { internal get; set; }
-        [JsonProperty] internal string AccountBalance { get; set; }
-        [JsonProperty] internal static decimal AlterraDebitPayed { get; set; }
-        [JsonProperty] internal decimal AccountBeforeDebit { get; set; }
-        [JsonProperty] internal Dictionary<string, string> KnownCardNumbers = new Dictionary<string, string>();
+        [JsonProperty] public string AccountBalance { get; set; }
+        [JsonProperty] public static decimal AlterraDebitPayed { get; set; }
+        [JsonProperty] public decimal AccountBeforeDebit { get; set; }
+        [JsonProperty] public Dictionary<string, string> KnownCardNumbers = new Dictionary<string, string>();
 
         public AccountDetails(AccountDetails accountDetails)
         {
@@ -61,22 +61,24 @@ namespace FCS_AlterraHub.Systems
             KnownCardNumbers.Clear();
         }
     }
-    internal class CardSystem
+
+    public class CardSystem
     {
         private Random _random;
 
         private AccountDetails _accountDetails = new AccountDetails();
         public static CardSystem main = new CardSystem();
         private const decimal AlterraDebit = -1000000000000000000;
-        internal Action onBalanceUpdated;
+        public Action onBalanceUpdated;
         private bool _hasBeenSaved;
+        public TechType CardTechType { get; set; }
 
 
         /// <summary>
         /// Generates a new card number.
         /// </summary>
         /// <returns></returns>
-        internal void GenerateNewCard(string prefabId)
+        public void GenerateNewCard(string prefabId)
         {
             if (_random == null)
             {
@@ -121,7 +123,7 @@ namespace FCS_AlterraHub.Systems
         /// Deletes card from the network
         /// </summary>
         /// <param name="cardNumber"></param>
-        internal void DeleteCard(string cardNumber)
+        public void DeleteCard(string cardNumber)
         {
             _accountDetails.KnownCardNumbers?.Remove(cardNumber);
         }
@@ -133,7 +135,7 @@ namespace FCS_AlterraHub.Systems
         /// <param name="amount">The amount of credit to add to the account.</param>
         /// <param name="callBack">Callback method to call in-case of error</param>
         /// <returns>Boolean on success</returns>
-        internal bool AddFinances(decimal amount)
+        public bool AddFinances(decimal amount)
         {
             try
             {
@@ -158,7 +160,7 @@ namespace FCS_AlterraHub.Systems
         /// <param name="amount">The amount of credit to add to the account.</param>
         /// <param name="callBack">Callback method to call in-case of error</param>
         /// <returns>Boolean on success</returns>
-        internal bool RemoveFinances(decimal amount)
+        public bool RemoveFinances(decimal amount)
         {
             if (HasEnough(amount))
             {
@@ -176,7 +178,7 @@ namespace FCS_AlterraHub.Systems
         /// </summary>
         /// <param name="cardNumber">The number of the card.</param>
         /// <returns></returns>
-        internal decimal GetAccountBalance()
+        public decimal GetAccountBalance()
         {
             return _accountDetails?.Balance ?? 0;
         }
@@ -185,7 +187,7 @@ namespace FCS_AlterraHub.Systems
         /// Saves the current accounts information.
         /// </summary>
         /// <returns></returns>
-        internal AccountDetails SaveDetails()
+        public AccountDetails SaveDetails()
         {
             _hasBeenSaved = true;
             QuickLogger.Debug($"Attempting to save account details {_accountDetails?.FullName}", true);
@@ -200,7 +202,7 @@ namespace FCS_AlterraHub.Systems
         /// Loads saved account details
         /// </summary>
         /// <param name="accounts"></param>
-        internal void Load(AccountDetails account)
+        public void Load(AccountDetails account)
         {
             try
             {
@@ -226,7 +228,7 @@ namespace FCS_AlterraHub.Systems
         /// </summary>
         /// <param name="cost">Amount to check for</param>
         /// <returns></returns>
-        internal bool HasEnough(decimal cost)
+        public bool HasEnough(decimal cost)
         {
             return _accountDetails.Balance >= cost;
         }
@@ -236,7 +238,7 @@ namespace FCS_AlterraHub.Systems
         /// </summary>
         /// <param name="prefabId"></param>
         /// <returns></returns>
-        internal string GetCardNumber(string prefabId)
+        public string GetCardNumber(string prefabId)
         {
             return _accountDetails.KnownCardNumbers[prefabId] ?? string.Empty;
         }
@@ -246,7 +248,7 @@ namespace FCS_AlterraHub.Systems
         /// </summary>
         /// <param name="prefabId"></param>
         /// <returns></returns>
-        internal bool CardExistFromPrefabID(string prefabId)
+        public bool CardExistFromPrefabID(string prefabId)
         {
             return _accountDetails.KnownCardNumbers.ContainsKey(prefabId);
         }
@@ -256,7 +258,7 @@ namespace FCS_AlterraHub.Systems
         /// </summary>
         /// <param name="prefabId"></param>
         /// <returns></returns>
-        internal bool CardExist(string cardNumber)
+        public bool CardExist(string cardNumber)
         {
             return _accountDetails.KnownCardNumbers.ContainsValue(cardNumber);
         }
@@ -268,7 +270,7 @@ namespace FCS_AlterraHub.Systems
         /// <param name="userName"></param>
         /// <param name="password"></param>
         /// <param name="pin"></param>
-        internal void CreateUserAccount(string fullName, string userName, string password, string pin)
+        public void CreateUserAccount(string fullName, string userName, string password, string pin)
         {
             if (_accountDetails == null)
             {
@@ -323,7 +325,7 @@ namespace FCS_AlterraHub.Systems
             //QPatch.MissionManagerGM.NotifyDeviceAction(Mod.AlterraHubTechType,Mod.DebitCardTechType,DeviceActionType.CREATEITEM);
         }
         
-        internal void CalculateBalance()
+        public void CalculateBalance()
         {
             //if (QPatch.Configuration.GameModeOption == FCSGameMode.HardCore)
             //{
@@ -350,14 +352,14 @@ namespace FCS_AlterraHub.Systems
             return AccountDetails.AlterraDebitPayed >= AlterraDebit;
         }
 
-        internal void PayDebit(decimal amount)
+        public void PayDebit(decimal amount)
         {
             QuickLogger.Debug($"Trying to add {amount} to {AccountDetails.AlterraDebitPayed}",true);
             AccountDetails.AlterraDebitPayed += amount;
             RemoveFinances(amount);
         }
         
-        internal string GetUserName()
+        public string GetUserName()
         {
             if (_accountDetails == null) return string.Empty;
 
@@ -369,7 +371,7 @@ namespace FCS_AlterraHub.Systems
         /// Checks is the user registered and account
         /// </summary>
         /// <returns></returns>
-        internal bool HasBeenRegistered()
+        public bool HasBeenRegistered()
         {
             return _accountDetails != null && 
                    !string.IsNullOrWhiteSpace(_accountDetails.FullName) && 
@@ -378,12 +380,12 @@ namespace FCS_AlterraHub.Systems
                    !string.IsNullOrWhiteSpace(_accountDetails.PIN);
         }
 
-        internal decimal AlterraBalance()
+        public decimal AlterraBalance()
         {
             return AlterraDebit + AccountDetails.AlterraDebitPayed;
         }
 
-        internal bool IsAccountNameValid(string accountName)
+        public bool IsAccountNameValid(string accountName)
         {
             return accountName.Equals(_accountDetails.Username, StringComparison.OrdinalIgnoreCase);
         }
@@ -407,7 +409,7 @@ namespace FCS_AlterraHub.Systems
             return _hasBeenSaved;
         }
 
-        internal void ResetHasBeenSaved()
+        public void ResetHasBeenSaved()
         {
             _hasBeenSaved = false;
         }

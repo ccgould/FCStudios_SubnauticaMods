@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using FCS_AlterraHub.Interfaces;
+﻿using FCS_AlterraHub.Interfaces;
 using UnityEngine;
 
 namespace FCSCommon.Abstract

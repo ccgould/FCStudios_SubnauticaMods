@@ -17,6 +17,7 @@ namespace FCS_AlterraHub.API
         AssetBundle GetAssetBundleByName(string bundleName,string executingFolder);
         string GlobalBundleName { get;}
         Atlas.Sprite GetEncyclopediaSprite(string imageName, string globalBundle);
+        GameObject GetPrefabByName(string item, string bundle);
     }
 
     public class FCSAssetBundlesService : IFcAssetBundlesService
@@ -52,6 +53,14 @@ namespace FCS_AlterraHub.API
 
             loadedImages.Add(imageName, ImageUtils.LoadSpriteFromTexture(imageTexture2D));
             return loadedImages[imageName];
+        }
+
+        public GameObject GetPrefabByName(string item, string bundleName)
+        {
+            var bundle = GetAssetBundleByName(bundleName);
+            if (bundle == null) return null;
+            Buildables.AlterraHub.LoadAsset(item,bundle,out var go);
+            return go;
         }
 
         private FCSAssetBundlesService()
