@@ -32,7 +32,7 @@ namespace FCS_AlterraHub
     {
         public static TechType OreConsumerFragTechType;
         private static string PdaEntryMessage => $"Please open your AlterraHub PDA to read this data entry ({Configuration.FCSPDAKeyCode}). Make sure you have completed the Alterra Hub Station mission to do so.";
-        public static Config Configuration { get;} = OptionsPanelHandler.Main.RegisterModOptions<Config>();
+        internal static Config Configuration { get;} = OptionsPanelHandler.Main.RegisterModOptions<Config>();
         public static EncyclopediaConfig EncyclopediaConfig { get;} = OptionsPanelHandler.Main.RegisterModOptions<EncyclopediaConfig>();
         public static AssetBundle GlobalBundle { get; set; }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Interfaces;
@@ -145,6 +146,8 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                     _display.RefreshCraftingGrid();
                 }
             };
+            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
+
             InvokeRepeating(nameof(UpdateScreenState), 1, 1);
             IsInitialized = true;
 

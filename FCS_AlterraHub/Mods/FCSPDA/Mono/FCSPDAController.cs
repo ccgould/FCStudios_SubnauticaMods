@@ -309,6 +309,8 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
                 _returnsDialogController.Open();
             }
 
+            UpdateDisplay();
+
             _depthState = UwePostProcessingManager.GetDofEnabled();
 
             UwePostProcessingManager.ToggleDof(false);
@@ -521,6 +523,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
                 case PDAPages.StorePage:
                 case PDAPages.AccountPage:
                     _toggleHud.gameObject.SetActive(true);
+                    _accountPageHandler.UpdateRequestBTN(CardSystem.main.HasBeenRegistered());
                     break;
                 default:
                     LoadStorePage(page);

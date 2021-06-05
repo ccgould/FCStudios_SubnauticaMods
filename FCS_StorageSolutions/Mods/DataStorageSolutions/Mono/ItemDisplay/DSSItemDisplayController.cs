@@ -1,4 +1,5 @@
 ﻿using FCS_AlterraHomeSolutions.Mono.PaintTool;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Interfaces;
@@ -125,7 +126,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.ItemDisplay
             if (_dumpContainer == null)
             {
                 _dumpContainer = gameObject.AddComponent<DumpContainerSimplified>();
-                _dumpContainer.Initialize(transform,AuxPatchers.AddItemToItemDisplay(),this,1,1,"ItemDisplayDump");
+                _dumpContainer.Initialize(transform,AuxPatchers.AddItemToItemDisplay(),this,4,4,"ItemDisplayDump");
             }
 
             var addToNetworkBTN = GameObjectHelpers.FindGameObject(gameObject, "AddBTN").AddComponent<InterfaceButton>();
@@ -172,6 +173,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.ItemDisplay
             _amountCounter = GameObjectHelpers.FindGameObject(gameObject, "Text").EnsureComponent<Text>();
             _icon = GameObjectHelpers.FindGameObject(gameObject, "Icon").EnsureComponent<uGUI_Icon>();
             _icon.sprite = SpriteManager.defaultSprite;
+            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
 
             InvokeRepeating(nameof(Refresh), 1, 1);
             InvokeRepeating(nameof(UpdateScreenState), 1, 1);
@@ -270,6 +272,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.ItemDisplay
 
         public bool IsAllowedToAdd(TechType techType, bool verbose)
         {
+            if (_dumpContainer.GetItemCount() > 0) return false;
             return true;
         }
 

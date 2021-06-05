@@ -35,9 +35,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCS_ProductionSolutions", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCS_LifeSupportSolutions", "FCS_LifeSupportSolutions\FCS_LifeSupportSolutions.csproj", "{A6E4E0FB-A509-4711-A5EE-341541ABDD39}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MoreCyclopsUpgradesMods", "MoreCyclopsUpgradesMods", "{6AB0CDB3-827D-4A1A-A548-A3CAAD1F763F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCS_CyclopsUpgradeConsole", "FCS_CyclopsUpgradeConsole\FCS_CyclopsUpgradeConsole.csproj", "{088706F7-949A-426F-A265-6CD0454B61A6}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		FCSCommon\FCSCommon.projitems*{05566510-51e4-4179-9df8-f5890bf3d415}*SharedItemsImports = 4
+		FCSCommon\FCSCommon.projitems*{088706f7-949a-426f-a265-6cd0454b61a6}*SharedItemsImports = 4
 		FCSCommon\FCSCommon.projitems*{1a17b4ba-aae5-41c2-924a-ce05dc74efe8}*SharedItemsImports = 4
 		FCSCommon\FCSCommon.projitems*{2b878baa-1c0b-4623-a599-506a58c0de32}*SharedItemsImports = 4
 		FCSCommon\FCSCommon.projitems*{4b160a7f-c541-4071-9dfe-d3e813b959b3}*SharedItemsImports = 4
@@ -139,6 +144,18 @@ Global
 		{A6E4E0FB-A509-4711-A5EE-341541ABDD39}.SN_Exp|Any CPU.Build.0 = SN_Exp|Any CPU
 		{A6E4E0FB-A509-4711-A5EE-341541ABDD39}.SN_Stable|Any CPU.ActiveCfg = SN_Stable|Any CPU
 		{A6E4E0FB-A509-4711-A5EE-341541ABDD39}.SN_Stable|Any CPU.Build.0 = SN_Stable|Any CPU
+		{088706F7-949A-426F-A265-6CD0454B61A6}.BZ_Exp|Any CPU.ActiveCfg = BZ_Exp|Any CPU
+		{088706F7-949A-426F-A265-6CD0454B61A6}.BZ_Exp|Any CPU.Build.0 = BZ_Exp|Any CPU
+		{088706F7-949A-426F-A265-6CD0454B61A6}.BZ_Stable|Any CPU.ActiveCfg = BZ_Stable|Any CPU
+		{088706F7-949A-426F-A265-6CD0454B61A6}.BZ_Stable|Any CPU.Build.0 = BZ_Stable|Any CPU
+		{088706F7-949A-426F-A265-6CD0454B61A6}.Debug|Any CPU.ActiveCfg = BZ_Stable|Any CPU
+		{088706F7-949A-426F-A265-6CD0454B61A6}.Debug|Any CPU.Build.0 = BZ_Stable|Any CPU
+		{088706F7-949A-426F-A265-6CD0454B61A6}.Release|Any CPU.ActiveCfg = BZ_Stable|Any CPU
+		{088706F7-949A-426F-A265-6CD0454B61A6}.Release|Any CPU.Build.0 = BZ_Stable|Any CPU
+		{088706F7-949A-426F-A265-6CD0454B61A6}.SN_Exp|Any CPU.ActiveCfg = SN_Exp|Any CPU
+		{088706F7-949A-426F-A265-6CD0454B61A6}.SN_Exp|Any CPU.Build.0 = SN_Exp|Any CPU
+		{088706F7-949A-426F-A265-6CD0454B61A6}.SN_Stable|Any CPU.ActiveCfg = SN_Stable|Any CPU
+		{088706F7-949A-426F-A265-6CD0454B61A6}.SN_Stable|Any CPU.Build.0 = SN_Stable|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -152,6 +169,7 @@ Global
 		{A698FF65-E6F7-4924-A84E-F96C81F4D98E} = {6E36DA48-6498-4C58-8BF6-85923E5F6460}
 		{2B878BAA-1C0B-4623-A599-506A58C0DE32} = {6AA8E739-63FF-4686-AB05-2E8368F4FF16}
 		{A6E4E0FB-A509-4711-A5EE-341541ABDD39} = {24543E94-41A7-4B36-B79C-1F5111752219}
+		{088706F7-949A-426F-A265-6CD0454B61A6} = {6AB0CDB3-827D-4A1A-A548-A3CAAD1F763F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {73E25955-B56F-4639-89F3-4CE5F3EBD59D}

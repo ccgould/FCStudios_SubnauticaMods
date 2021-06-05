@@ -139,7 +139,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
 
             if (_dumpContainer != null) return;
             _dumpContainer = gameObject.EnsureComponent<DumpContainerSimplified>();
-            _dumpContainer.Initialize(gameObject.transform, "Select item to craft.", this, 6, 8);
+            _dumpContainer.Initialize(gameObject.transform, "Select item to craft.", this, 4, 4);
         }
 
         private bool CheckIfAllIngredientsAvailable()

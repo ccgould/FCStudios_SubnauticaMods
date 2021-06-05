@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Extensions;
+using FCS_AlterraHub.Mods.FCSPDA.Mono;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
@@ -66,6 +67,32 @@ namespace FCS_AlterraHub.Configuration
         {
             OreConsumer.OreProcessingTime = OreConsumer.OreProcessingTime >= 90f ? 1f : 90f;
             QuickLogger.Message($"Changed Processing speed",true);
+        }
+
+        [ConsoleCommand("UnlockFCSPDA")]
+        public static void UnlockFCSPDA()
+        {
+            Mod.GamePlaySettings.IsPDAUnlocked = true;
+            FCSPDAController.ForceOpen();
+            QuickLogger.Message($"FCS PDA Unlocked", true);
+        }
+
+        [ConsoleCommand("CreateDummyAccount")]
+        public static string CreateDummyAccount(int amount = 0)
+        {
+            if(!CardSystem.main.HasBeenRegistered())
+            {
+                CardSystem.main.CreateUserAccount("Ryley Robinson", "RyleyRobinson4546B", "planet4546B", "4546", amount);
+                return $"Created account RyleyRobinson4546B with amount {amount} balance.";
+            }
+            QuickLogger.Message($"Account already exist {CardSystem.main.GetUserName()}", true);
+            return $"Parameters: {nameof(amount)} Amount to put in account";
+        }
+
+        [ConsoleCommand("WarpStation")]
+        public static void WarpStation()
+        {
+            Player.main.SetPosition(new Vector3(-809.10f, -241.30f, -387.70f));
         }
     }
 }

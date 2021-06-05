@@ -220,7 +220,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
             payDebitButton.onClick.AddListener(ShowPaymentScreen);
         }
 
-        private void UpdateRequestBTN(bool accountReg)
+        internal void UpdateRequestBTN(bool accountReg)
         {
             _requestButtonText.text = accountReg ? Buildables.AlterraHub.RequestNewCard() : Buildables.AlterraHub.CreateNewAccount();
         }

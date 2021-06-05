@@ -29,7 +29,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Spawnable
                 PrefabIdentifier prefabIdentifier = prefab.AddComponent<PrefabIdentifier>();
                 prefabIdentifier.ClassId = this.ClassID;
                 prefab.AddComponent<LargeWorldEntity>().cellLevel = LargeWorldEntity.CellLevel.VeryFar;
-                prefab.AddComponent<TechTag>().type = this.TechType;
+                prefab.AddComponent<TechTag>().type = TechType;
 
                 var rb = prefab.GetComponentInChildren<Rigidbody>();
 
@@ -43,9 +43,8 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Spawnable
                 pickupable.isPickupable = false;
 
                 ResourceTracker resourceTracker = prefab.AddComponent<ResourceTracker>();
-                prefab.AddComponent<AlterraHubDepotFragmentSpawn>();
                 resourceTracker.prefabIdentifier = prefabIdentifier;
-                resourceTracker.techType = this.TechType;
+                resourceTracker.techType = TechType;
                 resourceTracker.overrideTechType = TechType.Fragment;
                 resourceTracker.rb = rb;
                 resourceTracker.pickupable = pickupable;
@@ -63,9 +62,5 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Spawnable
             oreConsumerFragment.Set(GetGameObject());
             yield break;
         }
-    }
-
-    internal class AlterraHubDepotFragmentSpawn:MonoBehaviour
-    {
     }
 }

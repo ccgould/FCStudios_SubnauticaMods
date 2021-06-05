@@ -160,7 +160,7 @@ namespace FCS_AlterraHub.Configuration
 
         public static FCSGamePlaySettings GamePlaySettings
         {
-            get => _gamePlaySettings ?? (_gamePlaySettings = new FCSGamePlaySettings());
+            get => _gamePlaySettings ??= new FCSGamePlaySettings();
             set => _gamePlaySettings = value;
         }
 
@@ -301,9 +301,12 @@ namespace FCS_AlterraHub.Configuration
 
         private static void NotifyGamePlayLoaded()
         {
+            ModGamePlaySettingsLoaded = true;
             QuickLogger.Debug("Notifying");
             OnGamePlaySettingsLoaded?.Invoke(GamePlaySettings);
         }
+
+        public static bool ModGamePlaySettingsLoaded { get; set; }
 
         public static Action<FCSGamePlaySettings> OnGamePlaySettingsLoaded { get; set; }
 
@@ -370,6 +373,8 @@ namespace FCS_AlterraHub.Configuration
         internal static void PurgeSave()
         {
             _saveData = null;
+            GamePlaySettings = new FCSGamePlaySettings();
+            ModGamePlaySettingsLoaded = false;
         }
 
         internal static void LoadData()

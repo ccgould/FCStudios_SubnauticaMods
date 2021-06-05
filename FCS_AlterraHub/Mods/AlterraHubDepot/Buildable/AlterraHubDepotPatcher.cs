@@ -29,11 +29,11 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Buildable
 
         public override bool AddScannerEntry => true;
 
-        public override int FragmentsToScan => 3;
+        public override int FragmentsToScan => 1;
 
         public override float TimeToScanFragment => 5f;
 
-        public override bool DestroyFragmentOnScan => true;
+        public override bool DestroyFragmentOnScan => false;
 
         public AlterraHubDepotPatcher() : base(Mod.AlterraHubDepotClassID, Mod.AlterraHubDepotFriendly, Mod.AlterraHubDepotDescription)
         {

@@ -72,8 +72,7 @@ namespace FCS_AlterraHub.Systems
         public Action onBalanceUpdated;
         private bool _hasBeenSaved;
         public TechType CardTechType { get; set; }
-
-
+        
         /// <summary>
         /// Generates a new card number.
         /// </summary>
@@ -270,7 +269,7 @@ namespace FCS_AlterraHub.Systems
         /// <param name="userName"></param>
         /// <param name="password"></param>
         /// <param name="pin"></param>
-        public void CreateUserAccount(string fullName, string userName, string password, string pin)
+        public void CreateUserAccount(string fullName, string userName, string password, string pin,decimal accountBalance = 0)
         {
             if (_accountDetails == null)
             {
@@ -281,7 +280,7 @@ namespace FCS_AlterraHub.Systems
             _accountDetails.Username = userName;
             _accountDetails.Password = EncodeDecode.CreateMD5(password);
             _accountDetails.PIN = EncodeDecode.CreateMD5(pin);
-
+            _accountDetails.Balance = accountBalance;
             CalculateBalance();
 
             if (HasBeenRegistered())

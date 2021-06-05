@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
-using FCS_AlterraHub.Mods.AlterraHubDepot.Spawnable;
-using FCS_AlterraHub.Mods.OreConsumer.Spawnable;
-using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using Oculus.Newtonsoft.Json;
 using UnityEngine;
@@ -66,7 +63,6 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         }
         private void Start()
         {
-            FindGirder();
             _alterraHubDepotSpawnPoints = GameObjectHelpers.FindGameObjects(gameObject, "_AlterraHubDepotSpawnPnt", SearchOption.StartsWith);
             _oreConsumerSpawnPoints = GameObjectHelpers.FindGameObjects(gameObject, "_OreConsumerSpawnPnt", SearchOption.StartsWith);
             
@@ -100,9 +96,17 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             MaterialHelpers.ChangeEmissionStrength(Buildables.AlterraHub.BaseLightsEmissiveController, gameObject, 2f);
             MaterialHelpers.ChangeSpecSettings(Buildables.AlterraHub.BaseDecalsExterior, Buildables.AlterraHub.TBaseSpec, gameObject, 2.61f, 8f);
             Mod.LoadGamePlaySettings();
-           
         }
-        
+
+
+        private void Update()
+        {
+            if (WorldHelpers.CheckIfInRange(gameObject,Player.main.gameObject,50) && !uGUI.isLoading)
+            {
+                SpawnFragments();
+            }
+        }
+
         private void FindScreens()
         {
             var screens = GameObjectHelpers.FindGameObject(gameObject, "Screens").transform;
@@ -133,14 +137,13 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             }
 
             _generator.LoadSave();
+
             _antenna.LoadSave();
 
             if(IsPowerOn)
             {
                 TurnOnBase();
             }
-
-            SpawnFragments();
         }
 
         private void SpawnFragments()
@@ -159,39 +162,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
 
             Mod.GamePlaySettings.IsOreConsumerFragmentSpawned = true;
         }
-
-        private void CleanDuplicates()
-        {
-            var temp = new List<GameObject>();
-            var currentOreConsumerFrags = Resources.FindObjectsOfTypeAll<OreConsumerFragmentSpawn>();
-            var alterraHubDepotFragments = Resources.FindObjectsOfTypeAll<AlterraHubDepotFragmentSpawn>();
-
-            foreach (OreConsumerFragmentSpawn consumerFrag in currentOreConsumerFrags)
-            {
-                QuickLogger.Debug($"Attempting to delete: {consumerFrag.gameObject.name}");
-                if (gameObject.name.Contains("Clone"))
-                {
-                    temp.Add(consumerFrag.gameObject);
-                    QuickLogger.Debug($"Deleted oreconsumer");
-                }
-            }
-
-            foreach (AlterraHubDepotFragmentSpawn consumerFrag in alterraHubDepotFragments)
-            {
-                QuickLogger.Debug($"Attempting to delete: {consumerFrag.gameObject.name}");
-                if (gameObject.name.Contains("Clone"))
-                {
-                    temp.Add(consumerFrag.gameObject);
-                    QuickLogger.Debug($"Deleted oreconsumer");
-                }
-            }
-
-            foreach (GameObject item in temp)
-            {
-                DestroyImmediate(item);
-            }
-        }
-
+        
         internal static IEnumerator SpawnOreConsumerFrag(GameObject point)
         {
 

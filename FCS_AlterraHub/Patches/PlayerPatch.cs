@@ -115,12 +115,16 @@ namespace FCS_AlterraHub.Patches
         [HarmonyPostfix]
         private static void Postfix(Player __instance)
         {
-            if (Player_Update_Patch.FCSPDA != null) return;
-
-            var pda = CreateFcsPda(__instance);
-
             var defPDA = __instance.pdaSpawn.spawnedObj;
 
+            if (Player_Update_Patch.FCSPDA != null) {
+
+                MoveFcsPdaIntoPosition(defPDA, Player_Update_Patch.FCSPDA.gameObject);
+                return;
+
+            }
+
+            var pda = CreateFcsPda(__instance);
             MoveFcsPdaIntoPosition(defPDA, pda);
         }
 
@@ -132,17 +136,13 @@ namespace FCS_AlterraHub.Patches
 
         private static void MoveFcsPdaIntoPosition(GameObject defPDA, GameObject pda)
         {
-            if (defPDA != null)
+            if (defPDA != null && pda.transform.position != defPDA.transform.position)
             {
                 QuickLogger.Debug("DEFAULT PDA FOUND");
                 // Move the FCS PDA
                 pda.transform.SetParent(defPDA.gameObject.transform.parent, false);
                 Utils.ZeroTransform(pda.transform);
                 MaterialHelpers.ApplyGlassShaderTemplate(pda, "_glass", Mod.ModName);
-            }
-            else
-            {
-                QuickLogger.Debug("DEFAULT NOT PDA FOUND");
             }
         }
 
