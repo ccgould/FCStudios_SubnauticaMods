@@ -9,52 +9,6 @@
     <Import_RootNamespace>FCSCommon</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)Abstract\FCSCraftableController.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Controllers\AnimationManager.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Controllers\AudioManager.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Converters\TimeConverters.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Converters\Converters.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Converters\UpgradeFunctionConverter.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Enums\SystemLightState.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Enums\UpgradeFunctions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Exceptions\PatchTerminatedException.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Extensions\GameObjectExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Extensions\GenericExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Extensions\MaterialExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Extensions\StringExtentions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Extensions\AsyncExtensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Helpers\AssetHelper.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Helpers\GameObjectHelpers.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Helpers\LanguageHelpers.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Helpers\MaterialHelpers.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Helpers\MathOperations.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Helpers\StringHelpers.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Helpers\WorldHelpers.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Abstract\AIDisplay.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Abstract\FCSController.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Controllers\HealthController.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Controllers\PowerStorageController.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IBaseUnit.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IFCSController.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\ISaveData.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\ISaveDataEntry.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Objects\CustomLiveMixinData.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Objects\SerializableColor.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Objects\TargetRotation.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Enums\PowerToggleStates.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Objects\UpgradeFunction.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Utilities\ModSaver.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Utilities\ModUtils.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utilities\QuickLogger.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Utilities\TechUtil.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="$(MSBuildThisFileDirectory)Exceptions\" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="$(MSBuildThisFileDirectory)Configurations.targets" />
-    <None Include="$(MSBuildThisFileDirectory)GamePaths.targets" />
-    <None Include="$(MSBuildThisFileDirectory)PostBuildEvents.targets" />
-    <None Include="$(MSBuildThisFileDirectory)References.targets" />
   </ItemGroup>
 </Project>

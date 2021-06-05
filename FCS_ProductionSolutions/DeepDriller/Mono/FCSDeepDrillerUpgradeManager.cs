@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using FCS_AlterraHub.Enumerators;
+using FCS_AlterraHub.Model;
 using FCS_ProductionSolutions.DeepDriller.Buildable;
 using FCS_ProductionSolutions.DeepDriller.Helpers;
 using FCS_ProductionSolutions.DeepDriller.Models.Upgrades;
 using FCS_ProductionSolutions.DeepDriller.Structs;
-using FCSCommon.Enums;
-using FCSCommon.Objects;
 using FCSCommon.Utilities;
 using UnityEngine;
 

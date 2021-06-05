@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Model;
 using FCS_ProductionSolutions.DeepDriller.Buildable;
 using FCS_ProductionSolutions.DeepDriller.Models.Upgrades;
-using FCSCommon.Enums;
-using FCSCommon.Objects;
 using FCSCommon.Utilities;
 using UnityEngine;
 using Random = System.Random;

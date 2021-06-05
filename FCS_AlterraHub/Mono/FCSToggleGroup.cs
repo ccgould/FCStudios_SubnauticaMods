@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using FCS_AlterraHub.Enumerators;
-using FCSCommon.Enums;
 using UnityEngine;
 
 namespace FCS_AlterraHub.Mono

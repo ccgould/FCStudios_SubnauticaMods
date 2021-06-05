@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using FCS_AlterraHub.Enumerators;
+using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Objects;
 using FCS_EnergySolutions.Mods.TelepowerPylon.Model;
 using FCS_EnergySolutions.Mods.TelepowerPylon.Mono;

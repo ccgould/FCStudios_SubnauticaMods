@@ -57,7 +57,6 @@
     <Compile Include="DeepDriller\Mono\FCSDeepDrillerUpgradeManager.cs" />
     <Compile Include="DeepDriller\Enumerators\FCSDeepDrillerPages.cs" />
     <Compile Include="DeepDriller\Mono\FCSDeepDrillerThermalController.cs" />
-    <Compile Include="DeepDriller\Mono\InterfaceInteraction.cs" />
     <Compile Include="DeepDriller\Structs\FilterBtnData.cs" />
     <Compile Include="DeepDriller\Mono\NotificationSystem.cs" />
     <Compile Include="DeepDriller\Mono\PistonBobbing.cs" />
@@ -116,5 +115,5 @@
     <Folder Include="Patches\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-<Import Project="$(SolutionDir)\PostBuildEvents.targets" />
+  <Import Project="$(SolutionDir)\PostBuildEvents.targets" />
 </Project>

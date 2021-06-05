@@ -1,7 +1,7 @@
 ﻿using System;
-using FCSCommon.Enums;
-using FCSCommon.Extensions;
-using FCSCommon.Objects;
+using FCS_AlterraHub.Enumerators;
+using FCS_AlterraHub.Extensions;
+using FCS_AlterraHub.Model;
 using FCSCommon.Utilities;
 
 namespace FCS_ProductionSolutions.DeepDriller.Models.Upgrades

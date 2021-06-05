@@ -12,7 +12,6 @@ using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.HydroponicHarvester.Enumerators;
 using FCS_ProductionSolutions.HydroponicHarvester.Mono;
-using FCSCommon.Enums;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;

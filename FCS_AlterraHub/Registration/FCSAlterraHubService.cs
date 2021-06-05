@@ -8,7 +8,6 @@ using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Structs;
 using FCS_AlterraHub.Systems;
-using FCSCommon.Extensions;
 using FCSCommon.Utilities;
 using Oculus.Newtonsoft.Json;
 using QModManager.API;
@@ -48,6 +47,7 @@ namespace FCS_AlterraHub.Registration
         void AddEncyclopediaEntries(bool verbose = false);
 
         void CreateStoreEntry(TechType techType, TechType receiveTechType,int returnAmount, decimal cost, StoreCategory category,bool forceUnlocked = false);
+        FCSGamePlaySettings GetGamePlaySettings();
     }
 
     internal interface IFCSAlterraHubServiceInternal
@@ -225,6 +225,11 @@ namespace FCS_AlterraHub.Registration
                         ForcedUnlock = forceUnlocked
                     });
             }
+        }
+
+        public FCSGamePlaySettings GetGamePlaySettings()
+        {
+            return Mod.GamePlaySettings;
         }
 
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Buildables;
+using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Objects;
 using FCSCommon.Helpers;
@@ -13,7 +14,7 @@ namespace FCSDemo.Mono
     internal class FCSDemoController : FcsDevice,IHandTarget
     {
         private bool _runStartUpOnEnable;
-        private FCSAquarium _fcsAquarium;
+
 
         public string Name => gameObject.name;
         public override bool IsInitialized { get; set; }

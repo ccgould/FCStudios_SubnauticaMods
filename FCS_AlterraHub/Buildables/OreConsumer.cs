@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Collections;
 using System.IO;
 using FCS_AlterraHub.Configuration;
+using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Mods.OreConsumer.Mono;
 using FCS_AlterraHub.Mono;
-using FCS_AlterraHub.Mono.OreConsumer;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Assets;
-using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 #if SUBNAUTICA

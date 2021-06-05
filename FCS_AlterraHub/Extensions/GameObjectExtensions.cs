@@ -1,22 +1,61 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 
 namespace FCS_AlterraHub.Extensions
 {
     public static class GameObjectExtensions
     {
-        public static GameObject[] GetChildren(GameObject parent, bool recursive = false)
+        public static string GetFoodValue(string itemLocation)
         {
-            List<GameObject> items = new List<GameObject>();
-            for (int i = 0; i < parent.transform.childCount; i++)
+            if (string.IsNullOrEmpty(itemLocation)) return "No location";
+
+            StringBuilder sb = new StringBuilder();
+
+            GameObject OriginalFabricator = Resources.Load<GameObject>(itemLocation);
+
+            GameObject prefab = GameObject.Instantiate(OriginalFabricator);
+
+
+            var eatable = prefab?.GetComponent<Eatable>();
+
+            if (eatable != null)
             {
-                items.Add(parent.transform.GetChild(i).gameObject);
-                if (recursive)
-                { // set true to go through the hiearchy.
-                    items.AddRange(GetChildren(parent.transform.GetChild(i).gameObject, recursive));
-                }
+                sb.Append("{");
+                sb.Append(Environment.NewLine);
+                sb.Append($"\"Name\":\"{eatable.name}\",");
+                sb.Append(Environment.NewLine);
+                sb.Append($"\"WaterValue\":{eatable.GetWaterValue()},");
+                sb.Append(Environment.NewLine);
+                sb.Append($"\"FoodValue\":{eatable.GetFoodValue()},");
+                sb.Append(Environment.NewLine);
+                sb.Append($"\"kDecayRate\":{eatable.kDecayRate},");
+                sb.Append(Environment.NewLine);
+                sb.Append("}");
             }
-            return items.ToArray();
+
+            return sb.ToString();
+        }
+
+        public static Transform[] GetChildrenT(this GameObject go)
+        {
+            List<Transform> children = new List<Transform>();
+            foreach (Transform tran in go.transform)
+            {
+                children.Add(tran);
+            }
+            return children.ToArray();
+        }
+
+        public static GameObject[] GetChildren(this GameObject go)
+        {
+            List<GameObject> children = new List<GameObject>();
+            foreach (Transform tran in go.transform)
+            {
+                children.Add(tran.gameObject);
+            }
+            return children.ToArray();
         }
     }
 }

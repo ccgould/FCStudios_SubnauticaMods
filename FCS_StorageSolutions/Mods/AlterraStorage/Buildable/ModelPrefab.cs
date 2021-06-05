@@ -1,6 +1,7 @@
 ﻿using System;
 using FCS_AlterraHub.API;
 using FCS_AlterraHub.Buildables;
+using FCS_AlterraHub.Helpers;
 using FCS_StorageSolutions.Configuration;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
@@ -51,7 +52,7 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Buildable
                 ModBundle = FCSAssetBundlesService.PublicAPI.GetAssetBundleByName(Mod.ModBundleName, Mod.GetModDirectory());
             }
 
-            AlterraStoragePrefab = GetPrefab(Mod.AlterraStoragePrefabName);
+            AlterraStoragePrefab = GetPrefab(Mod.AlterraStoragePrefabName,true);
             DSSServerPrefab = GetPrefab(Mod.DSSServerPrefabName,true);
             //DSSFormattingStationPrefab = GetPrefab(Mod.DSSFormattingStationPrefabName);
             DSSTerminalPrefab = GetPrefab(Mod.DSSTerminalPrefabName);

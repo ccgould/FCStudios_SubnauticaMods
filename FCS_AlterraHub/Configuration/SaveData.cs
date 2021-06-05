@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using FCS_AlterraHub.Interfaces;
+using FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems;
 using FCS_AlterraHub.Mono;
-using FCS_AlterraHub.Mono.AlterraHub;
-using FCS_AlterraHub.Mono.FCSPDA.Mono.ScreenItems;
 using FCS_AlterraHub.Objects;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Interfaces;

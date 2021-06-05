@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using FCS_AlterraHub.Extensions;
 using FCS_EnergySolutions.AlterraGen.Buildables;
 using FCS_EnergySolutions.AlterraSolarCluster.Buildables;
 using FCS_EnergySolutions.Buildable;
@@ -11,7 +12,6 @@ using FCS_EnergySolutions.Mods.TelepowerPylon.Mono;
 using FCS_EnergySolutions.Spawnables;
 using FCS_EnergySolutions.TelepowerPylon.Buildables;
 using FCS_EnergySolutions.WindSurferOperator.Buildables;
-using FCSCommon.Extensions;
 using FCSCommon.Utilities;
 using HarmonyLib;
 using QModManager.API.ModLoading;

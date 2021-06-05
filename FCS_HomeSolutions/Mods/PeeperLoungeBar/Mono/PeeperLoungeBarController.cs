@@ -305,8 +305,12 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono
 
                     if (!_introHasBeenPlayed && !uGUI.isLoading)
                     {
-                        PlayAudioTrack("PLB_Intro");
-                        _introHasBeenPlayed = true;
+                        if(!FCSAlterraHubService.PublicAPI.GetGamePlaySettings().ConditionMet("PLBIntroPlayed"))
+                        {
+                            PlayAudioTrack("PLB_Intro");
+                            _introHasBeenPlayed = true;
+                            FCSAlterraHubService.PublicAPI.GetGamePlaySettings().SetCondition("PLBIntroPlayed");
+                        }
                     }
                 }
                 else

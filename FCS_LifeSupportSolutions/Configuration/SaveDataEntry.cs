@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Objects;
 using FCSCommon.Interfaces;
 #if SUBNAUTICA_STABLE

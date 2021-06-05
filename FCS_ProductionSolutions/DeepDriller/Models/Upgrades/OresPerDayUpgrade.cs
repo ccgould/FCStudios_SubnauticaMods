@@ -1,7 +1,7 @@
 ﻿using System;
+using FCS_AlterraHub.Enumerators;
+using FCS_AlterraHub.Model;
 using FCS_ProductionSolutions.DeepDriller.Mono;
-using FCSCommon.Enums;
-using FCSCommon.Objects;
 using FCSCommon.Utilities;
 using FCSDeepDrillerBuildable = FCS_ProductionSolutions.DeepDriller.Buildable.FCSDeepDrillerBuildable;
 

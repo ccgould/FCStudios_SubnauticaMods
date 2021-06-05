@@ -27,6 +27,7 @@
     <Compile Include="Configuration\DebugCommands.cs" />
     <Compile Include="Configuration\Mod.cs" />
     <Compile Include="Configuration\SaveDataEntry.cs" />
+    <Compile Include="Mods\AlterraStorage\Mono\InventoryButton.cs" />
     <Compile Include="Mods\DataStorageSolutions\Buildable\DSSAntennaPatch.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\Rack\AddFilterController.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\Rack\FilterDisplayItem.cs" />
@@ -46,7 +47,6 @@
     <Compile Include="Mods\DataStorageSolutions\Mono\Rack\DSSFloorServerRackController.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\Rack\DSSWallServerRackController.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\Server\DSSServerController.cs" />
-    <Compile Include="Mods\DataStorageSolutions\Mono\InterfaceInteraction.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\BaseListController.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\BulkMultipliers.cs" />
     <Compile Include="Mods\DataStorageSolutions\Mono\Terminal\TerminalConfigurationPageController.cs" />
@@ -87,5 +87,5 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-<Import Project="$(SolutionDir)\PostBuildEvents.targets" />
+  <Import Project="$(SolutionDir)\PostBuildEvents.targets" />
 </Project>

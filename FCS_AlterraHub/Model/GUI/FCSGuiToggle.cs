@@ -1,13 +1,11 @@
 ﻿using System;
 using FCS_AlterraHub.Helpers;
-using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
-using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Object = System.Object;
 
-namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
+namespace FCS_AlterraHub.Model.GUI
 {
     public class FCSGuiToggle : OnScreenButton, IPointerEnterHandler,IPointerExitHandler
     {

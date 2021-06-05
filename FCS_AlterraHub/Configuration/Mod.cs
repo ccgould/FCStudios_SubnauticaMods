@@ -5,9 +5,10 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using FCS_AlterraHub.API;
+using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Model.Utilities;
+using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono;
 using FCS_AlterraHub.Mono;
-using FCS_AlterraHub.Mono.AlterraHubFabricatorBuilding.Mono;
-using FCS_AlterraHub.Mono.FCSPDA.Mono;
 using FCS_AlterraHub.Patches;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Systems;
@@ -510,6 +511,18 @@ namespace FCS_AlterraHub.Configuration
         public bool BreakerOn;
         public bool IsPDAUnlocked;
         public HashSet<int> FixedPowerBoxes = new HashSet<int>();
+        public HashSet<string> Conditions = new HashSet<string>();
+
+        public bool ConditionMet(string condition)
+        {
+            return Conditions.Contains(condition);
+        }
+
+        public void SetCondition(string condition)
+        {
+            Conditions.Add(condition);
+            Mod.SaveGamePlaySettings();
+        }
     }
 
     public class KeyPadAccessSave

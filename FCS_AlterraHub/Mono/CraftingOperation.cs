@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
-using FCSCommon.Extensions;
 using SMLHelper.V2.Handlers;
 #if SUBNAUTICA_STABLE
 using Oculus.Newtonsoft.Json;

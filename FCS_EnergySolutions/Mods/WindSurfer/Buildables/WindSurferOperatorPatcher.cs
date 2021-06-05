@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Enumerators;
+using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Mods.Global.Spawnables;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
-using FCS_AlterraHub.Spawnables;
 using FCS_EnergySolutions.Buildable;
 using FCS_EnergySolutions.Configuration;
 using FCS_EnergySolutions.Mods.WindSurfer.Mono;
-using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
@@ -176,7 +176,7 @@ namespace FCS_EnergySolutions.WindSurferOperator.Buildables
                 pr.maxOutboundDistance = 0;
                 pr.subRoot = sr;
                 
-                UWEStorageHelpers.CreateStorageContainer(prefab.FindChild("InternalStorage"), prefab.FindChild("StorageRoot"), ClassID, "Storage Locker", 6, 8);
+                UWEHelpers.CreateStorageContainer(prefab.FindChild("InternalStorage"), prefab.FindChild("StorageRoot"), ClassID, "Storage Locker", 6, 8);
 
                 prefab.AddComponent<WindSurferOperatorController>();
 

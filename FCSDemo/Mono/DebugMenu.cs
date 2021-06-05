@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using FCSCommon.Objects;
 using FCSCommon.Utilities;
 using Oculus.Newtonsoft.Json;
 using SMLHelper.V2.Utility;

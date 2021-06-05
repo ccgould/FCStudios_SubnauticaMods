@@ -111,7 +111,19 @@ namespace FCS_AlterraHub.Helpers
             return PingHandler.RegisterNewPingType(pingName, pingSprite);
         }
 
-        public static PingInstance CreateBeacon(GameObject gameObject,PingType pingType,string label,bool isEnable = true)
+#if SUBNAUTICA
+        public static float GetDepth(GameObject gameObject)
+        {
+            return gameObject == null ? 0f : Ocean.main.GetDepthOf(gameObject);
+        }
+#elif BELOWZERO
+        public static float GetDepth(GameObject gameObject)
+        {
+            return gameObject == null ? 0f : Ocean.GetDepthOf(gameObject);
+        }
+#endif
+    
+    public static PingInstance CreateBeacon(GameObject gameObject,PingType pingType,string label,bool isEnable = true)
         {
            var pingInstance = gameObject.EnsureComponent<PingInstance>();
 

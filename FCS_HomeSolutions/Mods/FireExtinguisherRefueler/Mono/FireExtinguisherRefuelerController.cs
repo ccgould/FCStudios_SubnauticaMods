@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Extensions;
+using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Buildables;
@@ -19,7 +20,7 @@ namespace FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Mono
         private bool _runStartUpOnEnable;
         private bool _isFromSave;
         private FEXRDataEntry _savedData;
-        private FCSStorage _storage;
+        private StorageContainer _storage;
         private FireExtinguisher _fireEx;
         private float _time = 1f;
         private readonly Color _colorEmpty = new Color(1f, 0f, 0f, 1f);
@@ -32,7 +33,6 @@ namespace FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Mono
         private void Start()
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.FireExtinguisherRefuelerTabID, Mod.ModName);
-            _storage.CleanUpDuplicatedStorageNoneRoutine();
         }
 
         private void Update()
@@ -66,7 +66,6 @@ namespace FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Mono
                         ReadySaveData();
                     }
 
-
                     if (_savedData != null)
                     { 
                         _colorManager.ChangeColor(_savedData.Body.Vector4ToColor());
@@ -77,11 +76,23 @@ namespace FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Mono
             }
         }
 
+        public override void OnDestroy()
+        {
+            base.OnDestroy();
+
+            if (_storage?.container != null)
+            {
+                _storage.container.onAddItem -= OnStorageAddItem;
+                _storage.container.onRemoveItem -= OnStorageRemoveItem;
+            }
+        }
+
         public override void Initialize()
         {
             QuickLogger.Info("Initializing", true);
 
             _bar = GameObjectHelpers.FindGameObject(gameObject, "Bar")?.GetComponent<Image>();
+
             if (_colorManager == null)
             {
                 QuickLogger.Info($"Creating Color Component", true);
@@ -91,13 +102,12 @@ namespace FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Mono
                 MaterialHelpers.ChangeEmissionColor(ModelPrefab.EmissionControllerMaterial,gameObject, new Color(0, 1, 1, 1));
             }
 
-            if (_storage == null)
-            {
-                _storage = gameObject.GetComponent<FCSStorage>();
-                _storage.ItemsContainer.onAddItem += OnStorageAddItem;
-                _storage.ItemsContainer.onRemoveItem += OnStorageRemoveItem;
-                _storage.ItemsContainer.SetAllowedTechTypes(new[]{TechType.FireExtinguisher});
-            }
+            _storage = gameObject.GetComponent<StorageContainer>();
+            _storage.container.onAddItem += OnStorageAddItem;
+            _storage.container.onRemoveItem += OnStorageRemoveItem;
+            _storage.container.SetAllowedTechTypes(new[] { TechType.FireExtinguisher });
+
+            InvokeRepeating(nameof(FindExtinguisher),1,1);
 
             IsInitialized = true;
             QuickLogger.Info("Initialized", true);
@@ -112,13 +122,33 @@ namespace FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Mono
 
         private void OnStorageAddItem(InventoryItem item)
         {
+            QuickLogger.Debug("OnStorageAddItem",true);
+
             var rigidBodies = item.item.GetComponentsInChildren<Rigidbody>();
+
             _fireEx = item.item.GetComponentInChildren<FireExtinguisher>();
+
             foreach (Rigidbody rg in rigidBodies)
             {
                 rg.isKinematic = true;
             }
             item.item.gameObject.SetActive(true);
+        }
+
+        private void FindExtinguisher()
+        {
+            if (_storage?.container == null) return;
+            
+            if (_fireEx != null)
+            {
+                CancelInvoke(nameof(FindExtinguisher));
+                return;
+            }
+            
+            if (_storage.container.Contains(TechType.FireExtinguisher))
+            {
+                _fireEx = _storage.container.GetItems(TechType.FireExtinguisher)[0].item.GetComponent<FireExtinguisher>();
+            }
         }
 
         public void Save(SaveData newSaveData, ProtobufSerializer serializer)
@@ -189,7 +219,7 @@ namespace FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Mono
 
         public override bool CanDeconstruct(out string reason)
         {
-            if (_storage != null && _storage.ItemsContainer.GetCount(TechType.FireExtinguisher) > 0)
+            if (_storage != null && _storage.container.GetCount(TechType.FireExtinguisher) > 0)
             {
                 reason = AuxPatchers.ModNotEmptyFormat(Mod.FireExtinguisherRefuelerFriendly);
                 return false;
@@ -213,7 +243,7 @@ namespace FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Mono
             PDA pda = main.GetPDA();
             if (_storage != null && pda != null)
             {
-                Inventory.main.SetUsedStorage(_storage.ItemsContainer);
+                Inventory.main.SetUsedStorage(_storage.container);
                 pda.Open(PDATab.Inventory, null, OnDumpClose, 4f);
             }
             else

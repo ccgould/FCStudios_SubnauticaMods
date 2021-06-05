@@ -70,7 +70,6 @@
     <Compile Include="Patches\Battery_Patch.cs" />
     <Compile Include="PowerStorage\Buildable\PowerStoragePatcher.cs" />
     <Compile Include="PowerStorage\Mono\BatteryDummyController.cs" />
-    <Compile Include="PowerStorage\Mono\InterfaceInteraction.cs" />
     <Compile Include="PowerStorage\Mono\PowerCellCharger.cs" />
     <Compile Include="PowerStorage\Enums\PowerChargerMode.cs" />
     <Compile Include="PowerStorage\Mono\PowerSupply.cs" />
@@ -92,5 +91,5 @@
     <Folder Include="Mods\WindSurfer\Interfaces\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-<Import Project="$(SolutionDir)\PostBuildEvents.targets" />
+  <Import Project="$(SolutionDir)\PostBuildEvents.targets" />
 </Project>

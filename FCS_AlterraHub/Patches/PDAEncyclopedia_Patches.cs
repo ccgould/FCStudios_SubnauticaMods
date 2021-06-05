@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
-using FCS_AlterraHub.Mono.FCSPDA.Mono;
-using FCS_AlterraHub.Mono.FCSPDA.Mono.ScreenItems;
+using FCS_AlterraHub.Mods.FCSPDA.Mono;
+using FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems;
 using FCS_AlterraHub.Registration;
 using FCSCommon.Utilities;
 using HarmonyLib;

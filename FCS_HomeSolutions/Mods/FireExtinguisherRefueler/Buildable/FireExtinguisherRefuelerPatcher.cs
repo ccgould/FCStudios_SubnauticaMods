@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.IO;
 using FCS_AlterraHub.Enumerators;
+using FCS_AlterraHub.Extensions;
+using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Mods.Global.Spawnables;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
-using FCS_AlterraHub.Spawnables;
 using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
 using FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Mono;
-using FCSCommon.Extensions;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
@@ -83,12 +84,9 @@ namespace FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Buildable
                 prefab.AddComponent<TechTag>().type = TechType;
                 prefab.AddComponent<FMOD_CustomLoopingEmitter>();
                 
-                prefab.SetActive(false);
-                
-                var storage = prefab.AddComponent<FCSStorage>();
-                var fireExtinguisherSize = CraftData.GetItemSize(TechType.FireExtinguisher);
-                storage.Initialize(1, fireExtinguisherSize.x, fireExtinguisherSize.y,$"{Mod.FireExtinguisherRefuelerFriendly} Receptacle" , Mod.FireExtinguisherRefuelerClassID);
-                prefab.SetActive(true);
+                var feItemSize = CraftData.GetItemSize(TechType.FireExtinguisher);
+
+                UWEHelpers.CreateStorageContainer(prefab, prefab.FindChild("StorageRoot"), ClassID, "Fire Extinguisher Receptacle",feItemSize.x, feItemSize.y);
 
                 prefab.AddComponent<FireExtinguisherRefuelerController>();
 

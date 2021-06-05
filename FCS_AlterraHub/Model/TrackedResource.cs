@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using FCS_AlterraHub.Mono;
 
-namespace FCS_AlterraHub.Mono
+namespace FCS_AlterraHub.Model
 {
     public class TrackedResource
     {
