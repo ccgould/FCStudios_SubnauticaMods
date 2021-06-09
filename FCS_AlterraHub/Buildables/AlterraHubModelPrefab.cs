@@ -16,6 +16,7 @@ namespace FCS_AlterraHub.Buildables
         private static bool _initialized;
         private static Dictionary<string,Material> _v2Materials = new Dictionary<string, Material>();
         private static bool _v2MaterialsLoaded;
+        public static GameObject PDAScreenPrefab;
         internal static GameObject ColorItemPrefab { get; set; }
         internal static GameObject ItemPrefab { get; set; }
 
@@ -105,6 +106,10 @@ namespace FCS_AlterraHub.Buildables
         public static GameObject AlterraHubDepotFragmentPrefab { get; set; }
         public static Sprite UpArrow { get; set; }
         public static Sprite DownArrow { get; set; }
+        public static GameObject StaffKeyCardPrefab { get; set; }
+        public static Sprite EncyclopediaEntryBackgroundNormal { get; set; }
+        public static Sprite EncyclopediaEntryBackgroundSelected { get; set; }
+        public static Sprite EncyclopediaEntryBackgroundHover { get; set; }
 
         public static bool GetPrefabs()
         {
@@ -168,9 +173,20 @@ namespace FCS_AlterraHub.Buildables
                     AlterraHubDepotFragmentPrefab = alterraHubDepotFragmentPrefab;
 
                     if (!LoadAsset("AlterraHubDepotItem", QPatch.GlobalBundle, out var alterraHubDepotItemPrefab)) return false;
-                    AlterraHubDepotItemPrefab = alterraHubDepotItemPrefab;
+                    AlterraHubDepotItemPrefab = alterraHubDepotItemPrefab;                    
+                    
+                    if (!LoadAsset("StaffKeyCard", QPatch.GlobalBundle, out var staffKeyCardPrefab)) return false;
+                    StaffKeyCardPrefab = staffKeyCardPrefab;
 
+                    if (!LoadAsset("uGUI_PDAScreen", QPatch.GlobalBundle, out var pdaCanvas)) return false;
+                    PDAScreenPrefab = pdaCanvas;
 
+                    if (!LoadSpriteAsset("EncyclopediaEntryBackgroundHover", QPatch.GlobalBundle, out var hovered)) return false;
+                    EncyclopediaEntryBackgroundHover = hovered;
+                    if (!LoadSpriteAsset("EncyclopediaEntryBackgroundSelected", QPatch.GlobalBundle, out var selected)) return false;
+                    EncyclopediaEntryBackgroundSelected = selected;
+                    if (!LoadSpriteAsset("EncyclopediaEntryBackgroundNormal", QPatch.GlobalBundle, out var normal)) return false;
+                    EncyclopediaEntryBackgroundNormal = normal;
 
                     //if (!LoadAsset("PDAEntry", QPatch.GlobalBundle, out var pdaEntryPrefabGo, false)) return false;
                     //PDAEntryPrefab = pdaEntryPrefabGo;
@@ -187,7 +203,7 @@ namespace FCS_AlterraHub.Buildables
                 return false;
             }
         }
-
+        
         private static void AddComponentsToEncyclopediaEntry(GameObject encyclopediaEntryPrefab)
         {
             encyclopediaEntryPrefab.SetActive(false);

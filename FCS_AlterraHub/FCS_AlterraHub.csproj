@@ -23,7 +23,11 @@
     <Compile Include="API\FCSAssetBundlesService.cs" />
     <Compile Include="Buildables\AlterraHubAuxPatcher.cs" />
     <Compile Include="Buildables\AlterraHubModelPrefab.cs" />
-    <Compile Include="Buildables\OreConsumer.cs" />
+    <Compile Include="Mods\AlterraHubFabricatorBuilding\Mono\DroneSystem\DroneController.cs" />
+    <Compile Include="Mods\AlterraHubFabricatorBuilding\Mono\DroneSystem\AlterraDronePortController.cs" />
+    <Compile Include="Mods\AlterraHubFabricatorBuilding\Mono\DroneSystem\Interfaces\IDroneDestination.cs" />
+    <Compile Include="Mods\AlterraHubFabricatorBuilding\Mono\LightManager.cs" />
+    <Compile Include="Mods\OreConsumer\Buildable\OreConsumerPatcher.cs" />
     <Compile Include="Configuration\Config.cs" />
     <Compile Include="Configuration\DebugCommands.cs" />
     <Compile Include="Configuration\Mod.cs" />
@@ -114,6 +118,7 @@
     <Compile Include="Mods\AlterraHubFabricatorBuilding\Mono\KeyPadAccessController.cs" />
     <Compile Include="Mods\AlterraHubFabricatorBuilding\Mono\PowercellSlot.cs" />
     <Compile Include="Mods\AlterraHubFabricatorBuilding\Mono\SecurityScreenController.cs" />
+    <Compile Include="Mods\AlterraHubFabricatorBuilding\Spawnables\KeyCardSpawnable.cs" />
     <Compile Include="Mono\BaseManager.cs" />
     <Compile Include="Mono\BaseSaveData.cs" />
     <Compile Include="Mono\BaseTransferOperation.cs" />
@@ -200,6 +205,7 @@
     <Compile Include="Systems\CardSystem.cs" />
     <Compile Include="Systems\MessageBoxHandler.cs" />
     <Compile Include="Systems\StoreInventorySystem.cs" />
+    <Compile Include="Systems\VoiceNotificationSystem.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -105,7 +105,40 @@ namespace FCS_AlterraHub.Helpers
                 }
             }
         }
-        
+
+        /// <summary>
+        /// Applies the properties for the MarmosetUBER shader that has a emission texture.
+        /// </summary>
+        /// <param name="materialName">The name of the material to look for on the object.</param>
+        /// <param name="gameObject">The game object to process.</param>
+        /// <param name="assetBundle">The assetBundle to search in.</param>
+        /// <param name="emissionColor">The color to use on the emission material.</param>
+        public static void ApplyEmissionShader(string materialName, GameObject gameObject, Color emissionColor, float emissionLM = 1.0f, float glowStrenght = 1.0f, float glowStrenghtLM = 1.0f, float emissionMuli = 1.0f)
+        {
+            //Use this to do the Emission
+            var shader = Shader.Find("MarmosetUBER");
+            Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>(true);
+            foreach (Renderer renderer in renderers)
+            {
+                foreach (Material material in renderer.materials)
+                {
+                    if (material.name.StartsWith(materialName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        //QuickLogger.Debug($"Adding Emission to: Found {material.name} || search {materialName}");
+
+                        material.shader = shader;
+                        material.EnableKeyword("MARMO_EMISSION");
+                        material.SetFloat("_EnableGlow", 1);
+                        material.SetFloat("_EnableLighting", 1);
+                        material.SetFloat("_GlowStrength", glowStrenght);
+                        material.SetFloat("_GlowStrengthNight", glowStrenghtLM);
+                        material.SetFloat("_EmissionLM", emissionLM);
+                        material.SetColor("_GlowColor", emissionColor);
+                    }
+                }
+            }
+        }
+
         /// <summary>
         /// Applies the properties for the MarmosetUBER shader that has a emission texture.
         /// </summary>
@@ -296,7 +329,41 @@ namespace FCS_AlterraHub.Helpers
                 }
             }
         }        /// <summary>
-        
+
+                 /// <summary>
+                 /// Applies the properties for the MarmosetUBER shader that has a specular texture.
+                 /// </summary>
+                 /// <param name="materialName">The name of the material to look for on the object.</param>
+                 /// <param name="textureName">The name of the texture to look for in the assetBundle.</param>
+                 /// <param name="gameObject">The game object to process.</param>
+                 /// <param name="specInt">The amount of specular to apply in <see cref="float"/>.</param>
+                 /// <param name="shininess">The amount of shine to apply to the specular in <see cref="float"/>.</param>
+                 /// <param name="assetBundle">The assetBundle to search in.</param>
+        public static void ApplySpecShader(string materialName, GameObject gameObject, float specInt, float shininess)
+        {
+            var shader = Shader.Find("MarmosetUBER");
+            Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>(true);
+            foreach (Renderer renderer in renderers)
+            {
+                foreach (Material material in renderer.materials)
+                {
+                    if (material.name.StartsWith(materialName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        material.shader = shader;
+
+                        material.EnableKeyword("MARMO_SPECMAP");
+
+                        material.SetColor("_SpecColor", new Color(0.796875f, 0.796875f, 0.796875f, 0.796875f));
+                        material.SetFloat("_SpecInt", specInt);
+                        material.SetFloat("_Shininess", shininess);
+                        material.SetFloat("_Fresnel", 0f);
+                        material.SetVector("_SpecTex_ST", new Vector4(1.0f, 1.0f, 0.0f, 0.0f));
+                    }
+                }
+            }
+        }
+
+
         public static Material CreateV2Specular(Material mat, string textureName, float specInt, float shininess, AssetBundle assetBundle)
         {
             var shader = Shader.Find("MarmosetUBER");

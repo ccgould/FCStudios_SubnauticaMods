@@ -1,12 +1,16 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Extensions;
+using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Mods.FCSPDA.Mono;
+using FCS_AlterraHub.Mods.OreConsumer.Buildable;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Commands;
 using UnityEngine;
+using UWE;
 
 namespace FCS_AlterraHub.Configuration
 {
@@ -65,7 +69,7 @@ namespace FCS_AlterraHub.Configuration
         [ConsoleCommand("FastOreProcessing")]
         public static void FastOreProcessing()
         {
-            OreConsumer.OreProcessingTime = OreConsumer.OreProcessingTime >= 90f ? 1f : 90f;
+            OreConsumerPatcher.OreProcessingTime = OreConsumerPatcher.OreProcessingTime >= 90f ? 1f : 90f;
             QuickLogger.Message($"Changed Processing speed",true);
         }
 
@@ -92,7 +96,44 @@ namespace FCS_AlterraHub.Configuration
         [ConsoleCommand("WarpStation")]
         public static void WarpStation()
         {
-            Player.main.SetPosition(new Vector3(-809.10f, -241.30f, -387.70f));
+            Player.main.SetPosition(Mod.FCSStationSpawn.transform.position);
+        }
+
+        [ConsoleCommand("FcsQuickStart")]
+        public static void FcsQuickStart()
+        {
+            if(!PlayerInteractionHelper.HasItem(TechType.Scanner))
+                PlayerInteractionHelper.GivePlayerItem(TechType.Scanner);
+
+            if (!PlayerInteractionHelper.HasItem(TechType.HighCapacityTank))
+                PlayerInteractionHelper.GivePlayerItem(TechType.HighCapacityTank);
+
+            if (!PlayerInteractionHelper.HasItem(TechType.Flashlight))
+                PlayerInteractionHelper.GivePlayerItem(TechType.Flashlight);
+
+            if (!PlayerInteractionHelper.HasItem(TechType.Rebreather))
+                PlayerInteractionHelper.GivePlayerItem(TechType.Rebreather);
+
+            if (!PlayerInteractionHelper.HasItem(TechType.Fins))
+                PlayerInteractionHelper.GivePlayerItem(TechType.Fins);
+
+            if (!PlayerInteractionHelper.HasItem(TechType.Welder))
+                PlayerInteractionHelper.GivePlayerItem(TechType.Welder);
+        }
+
+        [ConsoleCommand("SpawnUWEPrefab")]
+        public static string SpawnUWEPrefab(int prefabIndex)
+        {
+            if (Enum.IsDefined(typeof(UWEPrefabID), prefabIndex))
+            {
+                CoroutineHost.StartCoroutine(SpawnHelper.SpawnUWEPrefab((UWEPrefabID)prefabIndex, Player.main.transform));
+            }
+            else
+            {
+                return $"Prefab Index {prefabIndex} doesn't exist";
+            }
+
+            return $"Spawned: {(UWEPrefabID) prefabIndex} at {Player.main.transform.position}";
         }
     }
 }

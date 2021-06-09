@@ -29,11 +29,11 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Buildable
 
         public override bool AddScannerEntry => true;
 
-        public override int FragmentsToScan => 1;
+        public override int FragmentsToScan => 3;
 
         public override float TimeToScanFragment => 5f;
 
-        public override bool DestroyFragmentOnScan => false;
+        public override bool DestroyFragmentOnScan => true;
 
         public AlterraHubDepotPatcher() : base(Mod.AlterraHubDepotClassID, Mod.AlterraHubDepotFriendly, Mod.AlterraHubDepotDescription)
         {
@@ -47,11 +47,13 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Buildable
         {
             get
             {
-                PDAEncyclopedia.EntryData entry = new PDAEncyclopedia.EntryData();
-                entry.key = Mod.AlterraHubDepotClassID;
-                entry.path = "Tech/Equipment";
-                entry.nodes = new[] { "Tech", "Equipment" };
-                entry.unlocked = false;
+                PDAEncyclopedia.EntryData entry = new PDAEncyclopedia.EntryData
+                {
+                    key = Mod.AlterraHubDepotClassID,
+                    path = "Tech/Equipment",
+                    nodes = new[] {"Tech", "Equipment"},
+                    unlocked = false
+                };
                 return entry;
             }
         }

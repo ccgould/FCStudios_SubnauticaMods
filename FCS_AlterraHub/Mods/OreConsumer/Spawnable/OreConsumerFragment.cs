@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
+using FCSCommon.Utilities;
+using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 using UWE;
@@ -10,9 +13,23 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Spawnable
 {
     internal class OreConsumerFragment : SMLHelper.V2.Assets.Spawnable
     {
-        public OreConsumerFragment() : base("OreConsumerFragment","Ore Consumer Fragment","Fragment of an Ore Consumer Machine.")
+        public OreConsumerFragment() : base("OreConsumerFragmentPart","Ore Consumer Fragment","Fragment of an Ore Consumer Machine.")
         {
-            OnFinishedPatching += () => { Mod.OreConsumerFragmentTechType = TechType; };
+            OnFinishedPatching += () =>
+            {
+                CoordinatedSpawnsHandler.RegisterCoordinatedSpawns(new List<SpawnInfo>
+                {
+                    //OreConsumersFrags
+                    new SpawnInfo(TechType, new Vector3(75.5f, -318.7f, -1434.7f),
+                        new Quaternion(-0.3f, 0.2f, 0.2f, 0.9f)),
+
+                    new SpawnInfo(TechType, new Vector3(87.6f, -324.1f, -1454.3f),
+                        new Quaternion(-0.3f, 0.2f, 0.2f, 0.9f)),
+
+                    new SpawnInfo(TechType, new Vector3(77.1f, -318.9f, -1436.5f),
+                        new Quaternion(-0.3f, 0.9f, -0.2f, 0.3f)),
+                });
+            };
         }
 
 
@@ -24,37 +41,36 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Spawnable
             {
                 var prefab = GameObject.Instantiate(AlterraHub.OreConsumerFragPrefab);
 
-                PrefabIdentifier prefabIdentifier = prefab.AddComponent<PrefabIdentifier>();
+                PrefabIdentifier prefabIdentifier = prefab.EnsureComponent<PrefabIdentifier>();
                 prefabIdentifier.ClassId = this.ClassID;
-                prefab.AddComponent<LargeWorldEntity>().cellLevel = LargeWorldEntity.CellLevel.Far;
-                prefab.AddComponent<TechTag>().type = this.TechType;
+                prefab.EnsureComponent<LargeWorldEntity>().cellLevel = LargeWorldEntity.CellLevel.Medium;
+                prefab.EnsureComponent<TechTag>().type = this.TechType;
 
                 var rb = prefab.GetComponentInChildren<Rigidbody>();
                 
                 if (rb == null)
                 {
-                    rb = prefab.AddComponent<Rigidbody>();
+                    rb = prefab.EnsureComponent<Rigidbody>();
                     rb.isKinematic = true;
                 }
                 
-                Pickupable pickupable = prefab.AddComponent<Pickupable>();
+                Pickupable pickupable = prefab.EnsureComponent<Pickupable>();
                 pickupable.isPickupable = false;
 
-                ResourceTracker resourceTracker = prefab.AddComponent<ResourceTracker>();
+                ResourceTracker resourceTracker = prefab.EnsureComponent<ResourceTracker>();
                 resourceTracker.prefabIdentifier = prefabIdentifier;
                 resourceTracker.techType = this.TechType;
                 resourceTracker.overrideTechType = TechType.Fragment;
                 resourceTracker.rb = rb;
                 resourceTracker.pickupable = pickupable;
-
-                prefab.AddComponent<OreConsumerFragmentSpawn>();
                 return prefab;
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
-                throw;
+                QuickLogger.Error(e.Message);
+                QuickLogger.Error(e.StackTrace);
             }
+            return null;
         }
 
         public override IEnumerator GetGameObjectAsync(IOut<GameObject> oreConsumerFragment)
@@ -75,9 +91,5 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Spawnable
             return ImageUtils.LoadSpriteFromFile(Mod.GetIconPath(ClassID));
         }
 #endif
-    }
-
-    internal class OreConsumerFragmentSpawn:MonoBehaviour
-    {
     }
 }

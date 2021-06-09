@@ -16,7 +16,7 @@ namespace FCS_AlterraHub.API
         Sprite GetIconByName(string iconName);
         AssetBundle GetAssetBundleByName(string bundleName,string executingFolder);
         string GlobalBundleName { get;}
-        Atlas.Sprite GetEncyclopediaSprite(string imageName, string globalBundle);
+        Texture2D GetEncyclopediaTexture2D(string imageName, string globalBundle = "");
         GameObject GetPrefabByName(string item, string bundle);
     }
 
@@ -29,11 +29,18 @@ namespace FCS_AlterraHub.API
 
         private static readonly Dictionary<string, AssetBundle> loadedAssetBundles = new Dictionary<string, AssetBundle>();
         private static readonly Dictionary<string, Sprite> loadedIcons = new Dictionary<string, Sprite>();
-        private static readonly Dictionary<string, Atlas.Sprite> loadedImages = new Dictionary<string, Atlas.Sprite>();
+        private static readonly Dictionary<string, Texture2D> loadedImages = new Dictionary<string, Texture2D>();
         public string GlobalBundleName => Mod.AssetBundleName;
-        public Atlas.Sprite GetEncyclopediaSprite(string imageName, string bundleName)
+        public Texture2D GetEncyclopediaTexture2D(string imageName, string bundleName = "")
         {
             AssetBundle bundle = null;
+
+            if (string.IsNullOrWhiteSpace(imageName)) return null;
+
+            if (string.IsNullOrWhiteSpace(bundleName))
+            {
+                bundleName = GlobalBundleName;
+            }
 
             if (loadedImages.ContainsKey(imageName)) return loadedImages[imageName];
 
@@ -42,16 +49,16 @@ namespace FCS_AlterraHub.API
                 bundle =  preLoadedBundle;
             }
 
-            if (bundle == null) return SpriteManager.defaultSprite;
+            if (bundle == null) return null;
 
-            var imageTexture2D = bundle.LoadAsset<Texture2D>(imageName);
-            if (imageTexture2D == null)
+            var image = bundle.LoadAsset<Texture2D>(imageName);
+            if (image == null)
             {
-                QuickLogger.DebugError($"Failed to find sprite {imageName}");
-                return SpriteManager.defaultSprite;
+                QuickLogger.Error($"Failed to find image {imageName}");
+                return null;
             }
 
-            loadedImages.Add(imageName, ImageUtils.LoadSpriteFromTexture(imageTexture2D));
+            loadedImages.Add(imageName, image);
             return loadedImages[imageName];
         }
 

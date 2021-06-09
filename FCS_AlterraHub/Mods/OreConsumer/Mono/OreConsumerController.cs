@@ -7,6 +7,7 @@ using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Model;
+using FCS_AlterraHub.Mods.OreConsumer.Buildable;
 using FCS_AlterraHub.Mods.OreConsumer.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
@@ -87,7 +88,7 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Mono
 
         public override void Awake()
         {
-            _timeLeft = Buildables.OreConsumer.OreProcessingTime;
+            _timeLeft = OreConsumerPatcher.OreProcessingTime;
         }
 
         private void Start()
@@ -123,7 +124,7 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Mono
                 {
                     var techType = _oreQueue.Dequeue();
                     AppendMoney(StoreInventorySystem.GetOrePrice(techType));
-                    _timeLeft = Buildables.OreConsumer.OreProcessingTime;
+                    _timeLeft = OreConsumerPatcher.OreProcessingTime;
                 }
             }
         }

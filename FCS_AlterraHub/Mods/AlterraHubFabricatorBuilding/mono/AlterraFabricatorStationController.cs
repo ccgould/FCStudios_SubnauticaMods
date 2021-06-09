@@ -1,8 +1,10 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
+using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.Interfaces;
 using FCSCommon.Utilities;
 using Oculus.Newtonsoft.Json;
 using UnityEngine;
@@ -10,13 +12,23 @@ using UWE;
 
 namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
 {
-    internal class AlterraFabricatorStationController : MonoBehaviour
+    internal class AlterraFabricatorStationController : MonoBehaviour, IDroneDestination
     {
         private const int PowercellReq = 5;
         internal bool IsPowerOn => Mod.GamePlaySettings.AlterraHubDepotPowercellSlot.Count >= PowercellReq && Mod.GamePlaySettings.BreakerOn;
-        private List<GameObject> _doors = new List<GameObject>();
-        private IEnumerable<GameObject> _oreConsumerSpawnPoints;
-        private IEnumerable<GameObject> _alterraHubDepotSpawnPoints;
+        public Transform[] StationDeparturePath { get; set; }
+        public Transform BaseTransform { get; set; }
+        public List<Transform> GetPaths()
+        {
+            return StationDeparturePath.ToList();
+        }
+
+        public void Offload(Dictionary<TechType, int> order, Action onOffloadCompleted)
+        {
+            onOffloadCompleted?.Invoke();
+        }
+
+        public string BaseId { get; set; }
         private Light[] _lights;
         private List<KeyPadAccessController> _keyPads = new List<KeyPadAccessController>();
         private List<SecurityScreenController> _screens = new List<SecurityScreenController>();
@@ -24,58 +36,31 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         private MotorHandler _motor;
         private AntennaController _antenna;
 
-        private void FindGirder()
-        {
-            //starship_girder_10
-            //99c0da07-a612-4cb7-9e16-e2e6bd3d6207
-            StartCoroutine(FindPrefab("99c0da07-a612-4cb7-9e16-e2e6bd3d6207"));
-        }
+        private readonly GameObject[] _electList = new GameObject[6];
 
-        private IEnumerator FindPrefab(string classId)
-        {
-            IPrefabRequest request = PrefabDatabase.GetPrefabAsync(classId);
-            yield return request;
-            GameObject prefab;
-            if (!request.TryGetPrefab(out prefab))
-            {
-                Debug.LogErrorFormat(this, "Failed to request prefab for '{0}'", new object[]
-                {
-                    classId
-                });
-                //Destroy(base.gameObject);
-                yield break;
-            }
-            DeferredSpawner.Task deferredTask = DeferredSpawner.instance.InstantiateAsync(prefab, Vector3.zero, base.transform.localRotation, true);
-            //DeferredSpawner.Task deferredTask = DeferredSpawner.instance.InstantiateAsync(prefab, base.transform.localPosition, base.transform.localRotation, true);
-            yield return deferredTask;
-            GameObject result = deferredTask.result;
-            DeferredSpawner.instance.ReturnTask(deferredTask);
-            result.transform.SetParent(base.transform.parent, false);
-            result.transform.localScale = base.transform.localScale;
-            result.SetActive(true);
-            //Destroy(base.gameObject);
-            yield break;
-        }
 
         private void Awake()
         {
+            BaseId = gameObject.GetComponent<PrefabIdentifier>()?.Id;
             Mod.OnGamePlaySettingsLoaded += OnGamePlaySettingsLoaded;
+            BaseTransform = transform;
         }
+        
         private void Start()
         {
-            _alterraHubDepotSpawnPoints = GameObjectHelpers.FindGameObjects(gameObject, "_AlterraHubDepotSpawnPnt", SearchOption.StartsWith);
-            _oreConsumerSpawnPoints = GameObjectHelpers.FindGameObjects(gameObject, "_OreConsumerSpawnPnt", SearchOption.StartsWith);
-            
-            _generator = GameObjectHelpers.FindGameObject(gameObject, "AlterraHubFabStationGenerator").AddComponent<GeneratorController>();
+            _generator = GameObjectHelpers.FindGameObject(gameObject, "Anim_Generator").AddComponent<GeneratorController>();
             _generator.Initialize(this);            
             
-            _antenna = GameObjectHelpers.FindGameObject(gameObject, "AlterraHubFabStationAntenna").AddComponent<AntennaController>();
+            _antenna = GameObjectHelpers.FindGameObject(gameObject, "antenna_controller").AddComponent<AntennaController>();
             _antenna.Initialize(this);
+            _antenna.OnBoxFixedAction += index => {
+                Destroy(_electList[index]);
+            };
 
-            var antennaDoor = GameObjectHelpers.FindGameObject(gameObject, "LockedDoor02Controller").AddComponent<DoorController>();
+            var antennaDoor = GameObjectHelpers.FindGameObject(gameObject, "LockedDoor02").AddComponent<DoorController>();
             antennaDoor.doorOpenMethod = StarshipDoor.OpenMethodEnum.Manual;
 
-            var fabricatorDoor = GameObjectHelpers.FindGameObject(gameObject, "LockedDoor01Controller").AddComponent<DoorController>();
+            var fabricatorDoor = GameObjectHelpers.FindGameObject(gameObject, "LockedDoor01").AddComponent<DoorController>();
             fabricatorDoor.doorOpenMethod = StarshipDoor.OpenMethodEnum.Manual;
 
             var antennaDialPad = GameObjectHelpers.FindGameObject(gameObject, "AntennaDialpad").AddComponent<KeyPadAccessController>();
@@ -90,23 +75,33 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             _motor.StopMotor();
 
             FindScreens();
+            
             FindLights();
+            
+            //ToggleIsKinematic(); Disabled for dev use only
+
             MaterialHelpers.ChangeEmissionColor(Buildables.AlterraHub.BaseDecalsEmissiveController, gameObject, Color.red);
             MaterialHelpers.ChangeEmissionColor(Buildables.AlterraHub.BaseLightsEmissiveController, gameObject, Color.red);
             MaterialHelpers.ChangeEmissionStrength(Buildables.AlterraHub.BaseLightsEmissiveController, gameObject, 2f);
             MaterialHelpers.ChangeSpecSettings(Buildables.AlterraHub.BaseDecalsExterior, Buildables.AlterraHub.TBaseSpec, gameObject, 2.61f, 8f);
             Mod.LoadGamePlaySettings();
         }
+        
 
-
-        private void Update()
+        //For dev use only
+        private void MoveToPlayer()
         {
-            if (WorldHelpers.CheckIfInRange(gameObject,Player.main.gameObject,50) && !uGUI.isLoading)
-            {
-                SpawnFragments();
-            }
+            Mod.FCSStationSpawn.transform.parent.transform.position = Player.main.transform.position;
+            Mod.FCSStationSpawn.transform.parent.transform.localRotation = Player.main.transform.localRotation;
         }
 
+        //For dev use only
+        private void ToggleIsKinematic()
+        {
+            var rigidBody = gameObject.GetComponent<Rigidbody>();
+            rigidBody.isKinematic = !rigidBody.isKinematic;
+        }
+        
         private void FindScreens()
         {
             var screens = GameObjectHelpers.FindGameObject(gameObject, "Screens").transform;
@@ -120,6 +115,14 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         private void FindLights()
         {
             _lights = gameObject.GetComponentsInChildren<Light>();
+            foreach (Light light in _lights)
+            {
+                var tracker = light.gameObject.AddComponent<PlayerDistanceTracker>();
+
+                var manager = light.gameObject.EnsureComponent<LightManager>();
+                manager.DistanceTracker = tracker;
+                manager.Light = light;
+            }
         }
 
 
@@ -144,73 +147,6 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             {
                 TurnOnBase();
             }
-        }
-
-        private void SpawnFragments()
-        {
-            if(Mod.GamePlaySettings.IsOreConsumerFragmentSpawned) return;
-
-            foreach (GameObject spawnPoint in _alterraHubDepotSpawnPoints)
-            {
-                StartCoroutine(SpawnAlterraHubDepotFrag(spawnPoint));
-            }
-
-            foreach (GameObject spawnPoint in _oreConsumerSpawnPoints)
-            {
-                StartCoroutine(SpawnOreConsumerFrag(spawnPoint));
-            }
-
-            Mod.GamePlaySettings.IsOreConsumerFragmentSpawned = true;
-        }
-        
-        internal static IEnumerator SpawnOreConsumerFrag(GameObject point)
-        {
-
-            QuickLogger.Debug("Spawn Frag");
-            var prefabForTechType = CraftData.GetPrefabForTechTypeAsync(QPatch.OreConsumerFragTechType);
-            yield return prefabForTechType;
-
-
-            if (prefabForTechType.GetResult() != null)
-            {
-                GameObject gameObject = Utils.CreatePrefab(prefabForTechType.GetResult(), 1000);
-                LargeWorldEntity.Register(gameObject);
-                CrafterLogic.NotifyCraftEnd(gameObject, QPatch.OreConsumerFragTechType);
-                gameObject.SendMessage("StartConstruction", SendMessageOptions.DontRequireReceiver);
-                gameObject.transform.parent = point.transform;
-                gameObject.transform.localPosition = Vector3.zero;
-                gameObject.transform.localRotation = Quaternion.identity;
-            }
-            else
-            {
-                ErrorMessage.AddDebug("Could not find prefab for TechType = " + QPatch.OreConsumerFragTechType);
-            }
-            yield break;
-        }
-
-        internal static IEnumerator SpawnAlterraHubDepotFrag(GameObject point)
-        {
-
-            QuickLogger.Debug("Spawn Frag");
-            var prefabForTechType = CraftData.GetPrefabForTechTypeAsync(Mod.AlterraHubDepotFragmentTechType);
-            yield return prefabForTechType;
-
-
-            if (prefabForTechType.GetResult() != null)
-            {
-                GameObject gameObject = Utils.CreatePrefab(prefabForTechType.GetResult(), 1000);
-                LargeWorldEntity.Register(gameObject);
-                CrafterLogic.NotifyCraftEnd(gameObject, Mod.AlterraHubDepotFragmentTechType);
-                gameObject.SendMessage("StartConstruction", SendMessageOptions.DontRequireReceiver);
-                gameObject.transform.parent = point.transform;
-                gameObject.transform.localPosition = Vector3.zero;
-                gameObject.transform.localRotation = Quaternion.identity;
-            }
-            else
-            {
-                ErrorMessage.AddDebug("Could not find prefab for TechType = " + Mod.AlterraHubDepotFragmentTechType);
-            }
-            yield break;
         }
 
         private void TurnOnLights()

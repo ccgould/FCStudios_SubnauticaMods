@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
 using FCSCommon.Helpers;
@@ -43,7 +44,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         internal void Initialize(AlterraFabricatorStationController controller)
         {
             _controller = controller;
-            var slots = gameObject.FindChild("Slots");
+            var slots = GameObjectHelpers.FindGameObjects(gameObject, "Battery_", SearchOption.StartsWith);
             _status = GameObjectHelpers.FindGameObject(gameObject, "EmergencyMode").GetComponent<Text>();
             _message = GameObjectHelpers.FindGameObject(gameObject, "Message").GetComponent<Text>();
             _activateBtn = GameObjectHelpers.FindGameObject(gameObject, "ActivateButton").GetComponent<Button>();
@@ -54,10 +55,10 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
                 _machineSound.Play();
             });
 
-            for (int i = 0; i < slots.transform.childCount; i++)
+            for (int i = 0; i < slots.Count(); i++)
             {
                 var slotId = $"slot_{i}";
-                var pSlot = slots.transform.GetChild(i).gameObject.AddComponent<PowercellSlot>();
+                var pSlot = slots.ElementAt(i).gameObject.AddComponent<PowercellSlot>();
                 pSlot.Initialize(this,_controller,slotId);
                 _slots.Add(pSlot);
             }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Helpers;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
@@ -35,12 +36,13 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems
         public UISpriteData pathNodeSprites;
         public UISpriteData entryNodeSprites;
         public RectTransform listCanvas;
-        public GameObject prefabEntry => Buildables.AlterraHub.EncyclopediaEntryPrefab;
+        public GameObject prefabEntry => AlterraHub.EncyclopediaEntryPrefab;
         private object selectedItem;
         public ScrollRect listScrollRect;
         public Sprite iconCollapse;
         public Sprite iconExpand;
         private static readonly EntryComparer entryComparer = new EntryComparer();
+        private PDAEncyclopedia.EntryData _currentEntryData;
 
         private void Awake()
         {
@@ -51,9 +53,24 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems
             imageLayout = banner.GetComponent<LayoutElement>();
             var encycList = GameObjectHelpers.FindGameObject(gameObject, "EncyclopediaList");
             listScrollRect = encycList.GetComponent<ScrollRect>();
-            iconCollapse = Buildables.AlterraHub.UpArrow;
-            iconExpand = Buildables.AlterraHub.DownArrow;
+            iconCollapse = AlterraHub.UpArrow;
+            iconExpand = AlterraHub.DownArrow;
             listCanvas = encycList.FindChild("Viewport").FindChild("Content").GetComponent<RectTransform>();
+            
+            pathNodeSprites = new UISpriteData
+            {
+                hovered = AlterraHub.EncyclopediaEntryBackgroundHover,
+                normal = AlterraHub.EncyclopediaEntryBackgroundNormal,
+                selected = AlterraHub.EncyclopediaEntryBackgroundSelected
+            };
+
+            entryNodeSprites = new UISpriteData
+            {
+                hovered = AlterraHub.EncyclopediaEntryBackgroundHover,
+                normal = AlterraHub.EncyclopediaEntryBackgroundNormal,
+                selected = AlterraHub.EncyclopediaEntryBackgroundSelected,
+                selectedHovered = AlterraHub.EncyclopediaEntryBackgroundSelected
+            };
         }
 
         internal void Refresh()
@@ -292,7 +309,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems
                     CraftNode craftNode3 = craftNode[id2] as CraftNode;
                     if (craftNode3 == null)
                     {
-                        craftNode3 = this.CreateNode(craftNode2, craftNode);
+                        craftNode3 = CreateNode(craftNode2, craftNode);
                         if (craftNode3 != null)
                         {
                             craftNode.Sort(entryComparer);
@@ -300,7 +317,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems
                     }
                     if (craftNode3.action == TreeAction.Expand && !GetNodeExpanded(craftNode3))
                     {
-                        this.Expand(craftNode3);
+                        Expand(craftNode3);
                     }
                     if (i == 0)
                     {
@@ -308,7 +325,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems
                     }
                     craftNode = craftNode3;
                 }
-                this.UpdatePositions();
+                UpdatePositions();
             }
             return result;
         }
@@ -327,7 +344,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems
                 CraftNode craftNode2 = craftNode[id] as CraftNode;
                 if (craftNode2 == null)
                 {
-                    craftNode2 = this.CreateNode(srcNode, craftNode);
+                    craftNode2 = CreateNode(srcNode, craftNode);
                     if (craftNode2 != null)
                     {
                         craftNode.Sort(entryComparer);
@@ -339,7 +356,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems
             }
             if (flag)
             {
-                this.UpdatePositions();
+                UpdatePositions();
             }
         }
 
@@ -406,6 +423,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems
         {
             if (key != null && PDAEncyclopedia.GetEntryData(key, out var entryData))
             {
+                _currentEntryData = entryData;
                 SetTitle(Language.main.Get("Ency_" + key));
                 SetText(Language.main.Get("EncyDesc_" + key));
                 SetImage(entryData.image);

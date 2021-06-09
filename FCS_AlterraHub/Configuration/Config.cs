@@ -17,7 +17,7 @@ using Newtonsoft.Json;
 namespace FCS_AlterraHub.Configuration
 {
     [Menu("FCS AlterraHub Menu")]
-    internal class Config : ConfigFile
+    public class Config : ConfigFile
     {
         public Config() : base("alterrahub-config", "Configurations")
         {

@@ -29,16 +29,16 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
         {
             _mono = mono;
 
-            var accountPage = GameObjectHelpers.FindGameObject(mono.gameObject, "AccountPage");
+            var accountPage = GameObjectHelpers.FindGameObject(mono.ui.gameObject, "AccountPage");
             
-            _createAccountDialog = GameObjectHelpers.FindGameObject(mono.gameObject, "CreateAccountDialog");
+            _createAccountDialog = GameObjectHelpers.FindGameObject(mono.ui.gameObject, "CreateAccountDialog");
             var createAccountDialogCloseBtn = GameObjectHelpers.FindGameObject(_createAccountDialog, "CloseBTN").GetComponent<Button>();
             createAccountDialogCloseBtn.onClick.AddListener(() =>
             {
                 _createAccountDialog.SetActive(false);
             });
 
-            _paymentScreen = GameObjectHelpers.FindGameObject(mono.gameObject, "DebtDialog");
+            _paymentScreen = GameObjectHelpers.FindGameObject(mono.ui.gameObject, "DebtDialog");
             
             _newBalance = GameObjectHelpers.FindGameObject(_paymentScreen, "NewBalance").GetComponent<Text>();
 
@@ -187,7 +187,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
         
         private void CreateWelcomePage(GameObject accountPage)
         {
-            _userNameLBL = GameObjectHelpers.FindGameObject(_mono.gameObject, "UserName").GetComponentInChildren<Text>();
+            _userNameLBL = GameObjectHelpers.FindGameObject(_mono.ui.gameObject, "UserName").GetComponentInChildren<Text>();
             _userNameLBL.text = CardSystem.main.GetUserName();
             
             var requestButton = GameObjectHelpers.FindGameObject( accountPage, "CardRequestBTN").GetComponent<Button>();

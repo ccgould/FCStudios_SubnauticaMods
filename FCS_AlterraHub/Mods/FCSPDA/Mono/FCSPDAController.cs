@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Extensions;
@@ -18,9 +19,12 @@ using FCS_AlterraHub.Systems;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using FMOD;
+using SMLHelper.V2.Assets;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.XR;
+using Object = UnityEngine.Object;
 using PDAPages = FCS_AlterraHub.Mods.FCSPDA.Enums.PDAPages;
 using WorldHelpers = FCS_AlterraHub.Helpers.WorldHelpers;
 
@@ -74,7 +78,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             {
                 if (_ui == null)
                 {
-                    _ui = gameObject.GetComponentInChildren<Canvas>(true).gameObject.AddComponent<uGUI_InputGroup>();
+                    _ui = _canvas.gameObject.GetComponentInChildren<Canvas>(true).gameObject.AddComponent<uGUI_InputGroup>();
                 }
                 return _ui;
             }
@@ -84,6 +88,9 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
         private static FCSPDAController _instance;
         private ReturnsDialogController _returnsDialogController;
         private List<MeshRenderer> _pdaMeshes = new List<MeshRenderer>();
+        private GameObject _screen;
+        private Transform _pdaAnchor;
+        private uGUI_CanvasScaler _canvasScalar;
         internal EncyclopediaTabController EncyclopediaTabController { get; set; }
         public static FCSPDAController Instance => _instance;
         #endregion
@@ -126,7 +133,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
                 float b = (SNCameraRoot.main.mainCamera.aspect > 1.5f) ? cameraFieldOfView : cameraFieldOfViewAtFourThree;
                 SNCameraRoot.main.SetFov(Mathf.Lerp(MiscSettings.fieldOfView, b, sequence.t));
             }
-            
+
             if (!ui.selected && IsOpen && AvatarInputHandler.main.IsEnabled())
             {
                 ui.Select(false);
@@ -149,8 +156,26 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
         private void Start()
         {
             if (_isInitialized) return;
-             _canvas = gameObject.GetComponentInChildren<Canvas>();
-            _currentBiome = GameObjectHelpers.FindGameObject(gameObject, "BiomeLBL")?.GetComponent<Text>();
+            
+            CreateScreen();
+
+            _pdaAnchor = GameObjectHelpers.FindGameObject(gameObject, "ScreenAnchor").transform;
+
+            _canvasScalar = _screen.AddComponent<uGUI_CanvasScaler>();
+            var raycaster = _screen.AddComponent<uGUI_GraphicRaycaster>();
+            raycaster.guiCameraSpace = true;
+            raycaster.ignoreReversedGraphics = false;
+
+            _canvasScalar.mode = uGUI_CanvasScaler.Mode.Inversed;
+            _canvasScalar.vrMode = uGUI_CanvasScaler.Mode.Inversed;
+            _canvasScalar.SetAnchor(_pdaAnchor.transform);
+
+
+            _canvas = _screen.GetComponent<Canvas>();
+            _canvas.sortingLayerName = "PDA";
+            _canvas.sortingLayerID = 1479780821;
+
+            _currentBiome = GameObjectHelpers.FindGameObject(_canvas.gameObject, "BiomeLBL")?.GetComponent<Text>();
             _checkoutDialog = _canvas.gameObject.FindChild("Dialogs").FindChild("CheckOutPopUp").AddComponent<CheckOutPopupDialogWindow>();
 
             _returnsDialogController = _canvas.gameObject.FindChild("Dialogs").FindChild("ReturnItemsDialog").AddComponent<ReturnsDialogController>();
@@ -167,10 +192,10 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             };
 
             _toggleHud = GameObjectHelpers.FindGameObject(_canvas.gameObject, "ToggleHud");
-            _accountName = GameObjectHelpers.FindGameObject(gameObject, "UserName")?.GetComponent<Text>();
-            _accountBalance = GameObjectHelpers.FindGameObject(gameObject, "AccountBalance")?.GetComponent<Text>();
-            _clock = GameObjectHelpers.FindGameObject(gameObject, "Clock")?.GetComponent<Text>();
-            
+            _accountName = GameObjectHelpers.FindGameObject(_canvas.gameObject, "UserName")?.GetComponent<Text>();
+            _accountBalance = GameObjectHelpers.FindGameObject(_canvas.gameObject, "AccountBalance")?.GetComponent<Text>();
+            _clock = GameObjectHelpers.FindGameObject(_canvas.gameObject, "Clock")?.GetComponent<Text>();
+
             AddPages();
             CreateHomePage();
             CreateStorePage();
@@ -179,11 +204,21 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             AccountPage();
             LoadStore();
 
-            MessageBoxHandler.main.ObjectRoot = gameObject;
-            MaterialHelpers.ChangeEmissionColor(Buildables.AlterraHub.BaseDecalsEmissiveController, gameObject,Color.cyan);
+            MaterialHelpers.ApplyEmissionShader(AlterraHub.BasePrimaryCol,gameObject,Color.white,0,0.01f,0.01f);
+            MaterialHelpers.ApplySpecShader(AlterraHub.BasePrimaryCol,gameObject,1, 6.15f);
+            MessageBoxHandler.main.ObjectRoot = ui.gameObject;
+            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject,Color.cyan);
             InvokeRepeating(nameof(UpdateDisplay), .5f, .5f);
             InGameMenuQuitPatcher.AddEventHandlerIfMissing(OnQuit);
             _isInitialized = true;
+        }
+
+        private void CreateScreen()
+        {
+            if (_screen == null)
+            {
+                _screen = Instantiate(AlterraHub.PDAScreenPrefab);
+            }
         }
 
         private void AddPages()
@@ -289,64 +324,98 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             if (_currentBiome == null || _accountName == null) return;
 
             _currentBiome.text = Player.main.GetBiomeString();
-            _accountName.text = CardSystem.main.GetUserName();
+
+            if(!string.IsNullOrWhiteSpace(CardSystem.main.GetUserName()))
+                _accountName.text = CardSystem.main.GetUserName();
+
             _accountBalance.text = $"{CardSystem.main.GetAccountBalance():N0}";
         }
         
         internal void OnEnable()
         {
             QuickLogger.Debug($"FCS PDA: Active and Enabled {isActiveAndEnabled}",true);
+            if(_canvasScalar == null)
+            {
+
+            }
         }
 
         public void Open()
         {
+
+            Player main = Player.main;
+            CreateScreen();
+
             FindPDA();
-
+            QuickLogger.Debug("1");
             ChangePDAVisibility(false);
-
+            QuickLogger.Debug("2");
             if (_returnsDialogController?.IsOpen ?? false)
             {
                 _returnsDialogController.Open();
             }
-
+            QuickLogger.Debug("3");
             UpdateDisplay();
-
-            _depthState = UwePostProcessingManager.GetDofEnabled();
-
-            UwePostProcessingManager.ToggleDof(false);
-
+            QuickLogger.Debug("4");
+            DOFOperations();
+            QuickLogger.Debug("5");
             _pda.isInUse = true;
-            uGUI.main.quickSlots.SetTarget(null);
-            prevQuickSlot = Inventory.main.quickSlots.activeSlot;
-            bool flag = Inventory.main.ReturnHeld();
-            Player main = Player.main;
+            QuickLogger.Debug("6");
+            var flag = InventorySlotHandler();
+            QuickLogger.Debug("7");
+
             if (!flag || main.cinematicModeActive)
             {
                 return;
             }
-            
+            QuickLogger.Debug("7");
             MainCameraControl.main.SaveLockedVRViewModelAngle();
+            QuickLogger.Debug("8");
             IsOpen = true;
             gameObject.SetActive(true);
+            QuickLogger.Debug("9");
             sequence.Set(0.5f, true, Activated);
+            QuickLogger.Debug("10");
             UWE.Utils.lockCursor = false;
             if (HandReticle.main != null)
             {
                 HandReticle.main.RequestCrosshairHide();
             }
+            QuickLogger.Debug("11");
             Inventory.main.SetViewModelVis(false);
+            QuickLogger.Debug("12");
+            _screen.SetActive(true);
+            QuickLogger.Debug("13");
             UwePostProcessingManager.OpenPDA();
+            QuickLogger.Debug("14");
             SafeAnimator.SetBool(Player.main.armsController.animator, "using_pda", true);
+            QuickLogger.Debug("15");
             _pda.ui.soundQueue.PlayImmediately(_pda.ui.soundOpen);
+            QuickLogger.Debug("16");
             if (_pda.screen.activeSelf)
             {
                 _pda.screen.SetActive(false);
             }
-            
+            QuickLogger.Debug("17");
             QuickLogger.Debug("FCS PDA Is Open", true);
 
         }
-        
+
+        private bool InventorySlotHandler()
+        {
+            uGUI.main.quickSlots.SetTarget(null);
+            prevQuickSlot = Inventory.main.quickSlots.activeSlot;
+            bool flag = Inventory.main.ReturnHeld();
+            return flag;
+        }
+
+        private void DOFOperations()
+        {
+            _depthState = UwePostProcessingManager.GetDofEnabled();
+
+            UwePostProcessingManager.ToggleDof(false);
+        }
+
         public void Close()
         {
             IsOpen = false;
@@ -354,6 +423,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             _pda.isInUse = false;
             Player main = Player.main;
             MainCameraControl.main.ResetLockedVRViewModelAngle();
+            _screen.SetActive(false);
             Vehicle vehicle = main.GetVehicle();
             if (vehicle != null)
             {
@@ -698,21 +768,6 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
         public static void ForceOpen()
         {
             Player_Update_Patch.ForceOpenPDA = true;
-        }
-    }
-    
-    internal class EncyclopediaEntryController : MonoBehaviour
-    {
-        private EncyclopediaEntryData _data;
-
-        internal void Initialize(EncyclopediaEntryData data, Action<EncyclopediaEntryData> callback)
-        {
-            _data = data;
-            gameObject.GetComponent<Text>().text = data.TabTitle;
-            var button = gameObject.GetComponent<Button>();
-            button.onClick.AddListener((() => {
-                callback?.Invoke(_data);
-            }));
         }
     }
 }

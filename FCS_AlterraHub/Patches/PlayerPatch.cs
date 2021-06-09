@@ -4,6 +4,7 @@ using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Mods.FCSPDA.Mono;
 using FCS_AlterraHub.Mono;
+using FCS_AlterraHub.Systems;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using HarmonyLib;
@@ -89,6 +90,8 @@ namespace FCS_AlterraHub.Patches
                 PlayerGetPDA_Patch.ForceFCSPDACreation();
             }
 
+            CreateVoiceNotificationSystem();
+
             var f = uSkyManager.main.SunLight.transform;
             if (f != null)
             {
@@ -103,6 +106,13 @@ namespace FCS_AlterraHub.Patches
             CoroutineHost.StartCoroutine(Mod.SpawnAlterraFabStation());
 
         }
+
+        private static void CreateVoiceNotificationSystem()
+        {
+            Player.main.gameObject.EnsureComponent<VoiceNotificationSystem>();
+
+        }
+
         public static Transform SunTarget { get; set; }
     }
 

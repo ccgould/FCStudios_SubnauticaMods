@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using FCS_AlterraHub.API;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Extensions;
@@ -287,7 +288,7 @@ namespace FCS_AlterraHub.Registration
                     PDAEncyclopedia.mapping.Add(data.Key, new PDAEncyclopedia.EntryData
                     {
                         //audio = entryData.audio,
-                        image = entryData.Image,
+                        image = FCSAssetBundlesService.PublicAPI.GetEncyclopediaTexture2D(entryData.ImageName),
                         key = data.Key,
                         nodes = PDAEncyclopedia.ParsePath(entryData.Path),
                         path = entryData.Path,

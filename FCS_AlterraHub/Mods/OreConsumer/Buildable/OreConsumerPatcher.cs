@@ -1,23 +1,22 @@
-﻿using System;
+﻿#if SUBNAUTICA
+using System;
 using System.IO;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Mods.OreConsumer.Mono;
 using FCS_AlterraHub.Mono;
-using FCSCommon.Helpers;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Assets;
 using SMLHelper.V2.Utility;
 using UnityEngine;
-#if SUBNAUTICA
 using RecipeData = SMLHelper.V2.Crafting.TechData;
 using Sprite = Atlas.Sprite;
 
 #endif
 
-namespace FCS_AlterraHub.Buildables
+namespace FCS_AlterraHub.Mods.OreConsumer.Buildable
 {
-    internal class OreConsumer : Buildable
+    internal class OreConsumerPatcher : SMLHelper.V2.Assets.Buildable
     {
         public override TechGroup GroupForPDA => TechGroup.ExteriorModules;
         public override TechCategory CategoryForPDA => TechCategory.ExteriorModule;
@@ -34,9 +33,10 @@ namespace FCS_AlterraHub.Buildables
         public override float TimeToScanFragment => 5f;
 
         public override bool DestroyFragmentOnScan => true;
+
         public static float OreProcessingTime { get; set; } = 90;
 
-        public OreConsumer() : base(Mod.OreConsumerClassID, Mod.OreConsumerFriendly, Mod.OreConsumerDescription)
+        public OreConsumerPatcher() : base(Mod.OreConsumerClassID, Mod.OreConsumerFriendly, Mod.OreConsumerDescription)
         {
             OnFinishedPatching += () =>
             {
@@ -44,18 +44,20 @@ namespace FCS_AlterraHub.Buildables
             };
         }
 
-        public override PDAEncyclopedia.EntryData EncyclopediaEntryData
-        {
-            get
-            {
-                PDAEncyclopedia.EntryData entry = new PDAEncyclopedia.EntryData();
-                entry.key = Mod.OreConsumerClassID;
-                entry.path = "Tech/Equipment";
-                entry.nodes = new[] { "Tech", "Equipment" };
-                entry.unlocked = false;
-                return entry;
-            }
-        }
+        //public override PDAEncyclopedia.EntryData EncyclopediaEntryData
+        //{
+        //    get
+        //    {
+        //        PDAEncyclopedia.EntryData entry = new PDAEncyclopedia.EntryData
+        //        {
+        //            key = Mod.OreConsumerClassID,
+        //            path = "Tech/Equipment",
+        //            nodes = new[] { "Tech", "Equipment" },
+        //            unlocked = false
+        //        };
+        //        return entry;
+        //    }
+        //}
 
 #if SUBNAUTICA_STABLE
         public override GameObject GetGameObject()

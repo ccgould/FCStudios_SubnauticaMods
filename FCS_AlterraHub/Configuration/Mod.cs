@@ -470,18 +470,23 @@ namespace FCS_AlterraHub.Configuration
         {
             GameObject gameObject = GameObject.Instantiate(Buildables.AlterraHub.AlterraHubFabricatorPrefab);
             gameObject.AddComponent<AlterraFabricatorStationController>();
+            
             LargeWorldEntity.Register(gameObject);
-            gameObject.transform.position = new Vector3(-809.10f, -241.30f, -387.70f);
-            Helpers.WorldHelpers.CreateBeacon(gameObject, AlterraHubStationPingType,"Alterra Hub Station");
+            //gameObject.transform.position = new Vector3(-809.10f, -241.30f, -387.70f); //First Position
+            gameObject.transform.position = new Vector3(82.70f, -316.9f, -1434.7f);
+            gameObject.transform.localRotation = Quaternion.Euler(348.7f,326.24f,43.68f);
+            WorldHelpers.CreateBeacon(gameObject, AlterraHubStationPingType,"Alterra Hub Station");
             MaterialHelpers.ApplyGlassShaderTemplate(gameObject, "_glass", Mod.ModName);
-
+            FCSStationSpawn = gameObject.FindChild("RespawnPoint");
             yield break;
         }
 
+        public static GameObject FCSStationSpawn { get; set; }
 
 
         public static bool IsOreConsumerSpawned { get; set; }
         public static PingType AlterraHubStationPingType { get; set; }
+        public static TechType StaffKeyCardTechType { get; set; }
 
         public static void DeepCopySave(AccountDetails accountDetails)
         {
