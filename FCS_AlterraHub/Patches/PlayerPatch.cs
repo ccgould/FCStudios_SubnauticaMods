@@ -101,7 +101,7 @@ namespace FCS_AlterraHub.Patches
         [HarmonyPostfix]
         private static void GetPDA_Postfix(Player __instance)
         {
-            MoveFcsPdaIntoPosition(FCSPDA.gameObject);
+            if(FCSPDA != null) MoveFcsPdaIntoPosition(FCSPDA.gameObject);
         }
 
         [HarmonyPatch(typeof(Player), nameof(Player.OnProtoSerialize))]

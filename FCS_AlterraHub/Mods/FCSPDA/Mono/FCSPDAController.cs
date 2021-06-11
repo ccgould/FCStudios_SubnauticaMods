@@ -148,6 +148,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject,Color.cyan);
             InvokeRepeating(nameof(UpdateDisplay), .5f, .5f);
             InGameMenuQuitPatcher.AddEventHandlerIfMissing(OnQuit);
+            _screen.SetActive(false);
             _instance = this;
             _isInitialized = true;
         }
