@@ -79,13 +79,13 @@ namespace FCS_AlterraHub.Buildables
         public const string TEmissionInterior = "fcs01_E_Interior";
         public const string TBaseSpec = "fcs01_s";
         
-        internal static string BodyMaterial => $"fcs{Mod.ModName}_COL";
-        internal static string DecalMaterial => $"fcs{Mod.ModName}_DECALS";
-        internal static string DetailsMaterial => $"fcs{Mod.ModName}_DETAILS";
-        internal static string SpecTexture => $"fcs{Mod.ModName}_S";
-        internal static string LUMTexture => $"fcs{Mod.ModName}_E";
-        internal static string NormalTexture => $"fcs{Mod.ModName}_N";
-        internal static string DetailTexture => $"fcs{Mod.ModName}_D";
+        internal static string BodyMaterial => $"fcs{Mod.ModPackID}_COL";
+        internal static string DecalMaterial => $"fcs{Mod.ModPackID}_DECALS";
+        internal static string DetailsMaterial => $"fcs{Mod.ModPackID}_DETAILS";
+        internal static string SpecTexture => $"fcs{Mod.ModPackID}_S";
+        internal static string LUMTexture => $"fcs{Mod.ModPackID}_E";
+        internal static string NormalTexture => $"fcs{Mod.ModPackID}_N";
+        internal static string DetailTexture => $"fcs{Mod.ModPackID}_D";
 
         internal static GameObject OilPrefab { get; set; }
         internal static GameObject OreConsumerPrefab { get; set; }
@@ -110,6 +110,11 @@ namespace FCS_AlterraHub.Buildables
         public static Sprite EncyclopediaEntryBackgroundNormal { get; set; }
         public static Sprite EncyclopediaEntryBackgroundSelected { get; set; }
         public static Sprite EncyclopediaEntryBackgroundHover { get; set; }
+        public static GameObject DronePortPadHubNewPrefab { get; set; }
+
+        public static GameObject AlterraHubTransportDronePrefab { get; set; }
+
+        public static GameObject DronePortFragmentsPrefab { get; set; }
 
         public static bool GetPrefabs()
         {
@@ -148,7 +153,7 @@ namespace FCS_AlterraHub.Buildables
 
                     if (!LoadAssetV2("AlterraHubDepot", QPatch.GlobalBundle, out var alterraHubDepotPrefab)) return false;
                     AlterraHubDepotPrefab = alterraHubDepotPrefab;
-
+                    
                     if (!LoadAsset("StoreItem", QPatch.GlobalBundle, out var itemPrefabGo)) return false;
                     ItemPrefab = itemPrefabGo;
 
@@ -160,7 +165,6 @@ namespace FCS_AlterraHub.Buildables
 
                     if (!LoadSpriteAsset("arrowDown", QPatch.GlobalBundle, out var arrowDown)) return false;
                     DownArrow = arrowDown;
-
 
                     if (!LoadAsset("EncyclopediaEntry", QPatch.GlobalBundle, out var encyclopediaEntryPrefab)) return false;
                     AddComponentsToEncyclopediaEntry(encyclopediaEntryPrefab);
@@ -188,6 +192,15 @@ namespace FCS_AlterraHub.Buildables
                     if (!LoadSpriteAsset("EncyclopediaEntryBackgroundNormal", QPatch.GlobalBundle, out var normal)) return false;
                     EncyclopediaEntryBackgroundNormal = normal;
 
+                    if (!LoadAssetV2("DronePortPad_HubNew", QPatch.GlobalBundle, out var dronePortPadHubNewPrefab)) return false;
+                    DronePortPadHubNewPrefab = dronePortPadHubNewPrefab;
+
+                    if (!LoadAssetV2("AlterraHubTransportDrone", QPatch.GlobalBundle, out var alterraHubTransportDronePrefab)) return false;
+                    AlterraHubTransportDronePrefab = alterraHubTransportDronePrefab;
+
+                    if (!LoadAssetV2("DronePort_Fragments", QPatch.GlobalBundle, out var dronePortFragmentsPrefab)) return false;
+                    DronePortFragmentsPrefab = dronePortFragmentsPrefab;
+
                     //if (!LoadAsset("PDAEntry", QPatch.GlobalBundle, out var pdaEntryPrefabGo, false)) return false;
                     //PDAEntryPrefab = pdaEntryPrefabGo;
 
@@ -203,7 +216,8 @@ namespace FCS_AlterraHub.Buildables
                 return false;
             }
         }
-        
+
+
         private static void AddComponentsToEncyclopediaEntry(GameObject encyclopediaEntryPrefab)
         {
             encyclopediaEntryPrefab.SetActive(false);

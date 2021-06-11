@@ -54,7 +54,7 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
         {
             if (string.IsNullOrWhiteSpace(UnitID))
             {
-                FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.WindSurferOperatorTabID, Mod.ModName);
+                FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.WindSurferOperatorTabID, Mod.ModPackID);
             }
 
             return UnitID;

@@ -42,7 +42,7 @@ namespace FCS_EnergySolutions.AlterraGen.Mono
 
         private void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.AlterraGenModTabID, Mod.ModName);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.AlterraGenModTabID, Mod.ModPackID);
         }
 
         private void OnEnable()

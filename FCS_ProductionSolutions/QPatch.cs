@@ -2,6 +2,7 @@
 using System.IO;
 using System.Reflection;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Mods.Replicator.Buildables;
 using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
@@ -28,13 +29,13 @@ namespace FCS_ProductionSolutions
         [QModPatch]
         public void Patch()
         {
-            QuickLogger.Info($"Started patching. Version: {QuickLogger.GetAssemblyVersion(Assembly.GetExecutingAssembly())}");
-            
+            FCSAlterraHubService.PublicAPI.RegisterModPack(Mod.ModPackID, Assembly.GetExecutingAssembly());
+            FCSAlterraHubService.PublicAPI.RegisterEncyclopediaEntry(Mod.ModPackID);
+
             ModelPrefab.Initialize();
 
             AuxPatchers.AdditionalPatching();
-
-
+            
             //Harmony
             var harmony = new Harmony("com.productionsolutions.fcstudios");
             harmony.PatchAll(Assembly.GetExecutingAssembly());

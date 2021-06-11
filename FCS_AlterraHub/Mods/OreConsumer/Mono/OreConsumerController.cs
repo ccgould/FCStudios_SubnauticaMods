@@ -94,7 +94,7 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Mono
         private void Start()
         {
             InvokeRepeating(nameof(UpdateAnimation),1f,1f);
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.OreConsumerTabID, Mod.ModName);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.OreConsumerTabID, Mod.ModPackID);
         }
 
         private void UpdateAnimation()

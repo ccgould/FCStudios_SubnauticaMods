@@ -43,7 +43,9 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Spawnable
 
                 PrefabIdentifier prefabIdentifier = prefab.EnsureComponent<PrefabIdentifier>();
                 prefabIdentifier.ClassId = this.ClassID;
+
                 prefab.EnsureComponent<LargeWorldEntity>().cellLevel = LargeWorldEntity.CellLevel.Medium;
+ 
                 prefab.EnsureComponent<TechTag>().type = this.TechType;
 
                 var rb = prefab.GetComponentInChildren<Rigidbody>();

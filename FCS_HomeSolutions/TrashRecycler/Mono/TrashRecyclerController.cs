@@ -46,7 +46,7 @@ namespace FCS_HomeSolutions.TrashRecycler.Mono
 
         private void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.RecyclerTabID, Mod.ModName);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.RecyclerTabID, Mod.ModPackID);
         }
 
         public override Vector3 GetPosition()

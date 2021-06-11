@@ -32,7 +32,7 @@ namespace FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Mono
 
         private void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.FireExtinguisherRefuelerTabID, Mod.ModName);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.FireExtinguisherRefuelerTabID, Mod.ModPackID);
         }
 
         private void Update()

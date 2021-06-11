@@ -1,16 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.Interfaces;
+using FCSCommon.Utilities;
 using UnityEngine;
 
 namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 {
     internal class DroneController : MonoBehaviour
     {
-        private AlterraFabricatorStationController _baseController;
+        private IDroneDestination _baseController;
         private List<Transform> _flightPath = new List<Transform>();
         private IEnumerable<GameObject> _airThrusters;
         private MotorHandler _waterTurbine;
@@ -24,6 +24,10 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
         private string _id;
         private IDroneDestination _departurePort;
         private IDroneDestination _destinationPort;
+        private float _targetPitch;
+        private float _targetYaw;
+        private float _currentYaw;
+        private float _currentPitch;
 
         private enum DroneStates
         {
@@ -42,19 +46,20 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
             if (_droneState != DroneStates.Idle || _droneState != DroneStates.Docked)
             {
                 Move();
-                UpdateEngine();
+                //UpdateEngine();
             }
 
-            if (_nextPosIndex == _flightPath.Count - 1)
-            {
-                //We have arrived
-                DockDrone();
-            }
+            //if (_nextPosIndex == _flightPath.Count - 1)
+            //{
+            //    //We have arrived
+            //    DockDrone();
+            //}
 
         }
 
         private void DockDrone()
         {
+            _flightPath.Clear();
             _droneState = DroneStates.Docked;
 
             //Offload
@@ -88,34 +93,40 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 
         private void Move()
         {
+            if(_trans == null || _flightPath == null || _nextPos == null) return;
+            
             if (_trans.position == _nextPos.position)
             {
                 _nextPosIndex++;
 
                 if (_nextPosIndex >= _flightPath.Count)
                 {
-                    _nextPosIndex = 0;
+                    _nextPosIndex = -1;
+                    DockDrone();
                 }
 
-                _nextPos = _flightPath[_nextPosIndex];
+                if(_nextPosIndex != -1)
+                    _nextPos = _flightPath[_nextPosIndex];
             }
-            else
-            {
-                _trans.position = Vector3.MoveTowards(_trans.position, _nextPos.position, speed * DayNightCycle.main.deltaTime);
-            }
+
+            _trans.position = Vector3.MoveTowards(_trans.position, _nextPos.position, speed * DayNightCycle.main.deltaTime);
+
+            var rotation = Quaternion.LookRotation(_nextPos.position - _trans.position);
+            _trans.rotation = Quaternion.Slerp(_trans.rotation, rotation, 1 * DayNightCycle.main.deltaTime);
         }
 
-        internal void Initialize(AlterraFabricatorStationController baseController)
+        internal void Initialize(IDroneDestination baseController)
         {
             _trans = gameObject.transform;
             _baseController = baseController;
-            _airThrusters = GameObjectHelpers.FindGameObjects(gameObject, "airThrusters");
+            _airThrusters = GameObjectHelpers.FindGameObjects(gameObject, "Thruster",SearchOption.StartsWith);
             
-            _waterTurbine = GameObjectHelpers.FindGameObject(gameObject, "propeller").AddComponent<MotorHandler>();
-            _waterTurbine.Initialize(0);
+            //_waterTurbine = GameObjectHelpers.FindGameObject(gameObject, "propeller").AddComponent<MotorHandler>();
+            //_waterTurbine.Initialize(0);
 
             _id = gameObject.GetComponent<PrefabIdentifier>().Id;
 
+            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
             //var stablizer = gameObject.AddComponent<Stabilizer>(); Not sure I need a stabilizer at this point.
         }
 
@@ -126,14 +137,32 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 
         internal void ShipOrder(Dictionary<TechType, int> order, IDroneDestination departurePort, IDroneDestination destinationPort)
         {
+            if (_order?.Count > 0)
+            {
+                QuickLogger.DebugError("Drone already has order. Request denied",true);
+                return;
+            }
             _departurePort = departurePort;
             _destinationPort = destinationPort;
+
             _flightPath.AddRange(departurePort.GetPaths());
-            _flightPath.AddRange(destinationPort.GetPaths());
-            _destination = destinationPort;
+
+            Reverse();
+
+            if (destinationPort != null)
+            {
+                _flightPath.AddRange(destinationPort.GetPaths());
+                _destination = destinationPort;
+            }
+
             _order = order;
             _nextPos = _flightPath[0];
             _droneState = DroneStates.Transitioning;
+        }
+
+        private void Reverse()
+        {
+            _flightPath.Reverse();
         }
 
         internal Transform GetTargetWayPoint()

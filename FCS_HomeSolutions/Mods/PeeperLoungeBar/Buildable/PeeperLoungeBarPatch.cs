@@ -65,7 +65,7 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable
                 CreateAquarium(prefab);
 
                 prefab.SetActive(true);
-                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModName);
+                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
                 return prefab;
             }
             catch (Exception e)

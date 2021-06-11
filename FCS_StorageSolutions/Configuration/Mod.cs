@@ -30,7 +30,7 @@ namespace FCS_StorageSolutions.Configuration
         #endregion
 
         internal static event Action<SaveData> OnDataLoaded;
-        internal static string ModName => "FCSStorageSolutions";
+        internal static string ModPackID => "FCSStorageSolutions";
         internal static string SaveDataFilename => $"FCSStorageSolutionsSaveData.json";
         internal const string ModBundleName = "fcsstoragesolutionsbundle";
         
@@ -227,11 +227,11 @@ namespace FCS_StorageSolutions.Configuration
 
                 foreach (var controller in FCSAlterraHubService.PublicAPI.GetRegisteredDevices())
                 {
-                    QuickLogger.Debug($"Attempting to save device: {controller.Value?.UnitID} | Package Valid: { controller.Value?.PackageId == ModName}");
+                    QuickLogger.Debug($"Attempting to save device: {controller.Value?.UnitID} | Package Valid: { controller.Value?.PackageId == ModPackID}");
 
                     if(controller.Value == null) continue;
 
-                    if (controller.Value.PackageId == ModName && !controller.Value.BypassRegisterCheck)
+                    if (controller.Value.PackageId == ModPackID && !controller.Value.BypassRegisterCheck)
                     {
                         QuickLogger.Debug($"Saving device: {controller.Value.UnitID}");
                         ((IFCSSave<SaveData>)controller.Value).Save(newSaveData,serializer);
@@ -272,7 +272,7 @@ namespace FCS_StorageSolutions.Configuration
 
         internal static string GetSaveFileDirectory()
         {
-            return Path.Combine(SaveUtils.GetCurrentSaveDataDir(), ModName);
+            return Path.Combine(SaveUtils.GetCurrentSaveDataDir(), ModPackID);
         }
 
         internal static AlterraStorageDataEntry GetAlterraStorageSaveData(string id)

@@ -49,7 +49,7 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono
 
         private void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, "PLB", Mod.ModName);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, "PLB", Mod.ModPackID);
         }
 
         private SoundEntry FindAudioClip(string trackName)

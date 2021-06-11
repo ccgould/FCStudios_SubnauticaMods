@@ -83,7 +83,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Buildable
                 prefab.AddComponent<FCSDeepDrillerController>();
 
                 //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
-                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModName);
+                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
 
             }
             catch (Exception e)

@@ -39,7 +39,7 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
 
         private void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.HydroponicHarvesterModTabID, Mod.ModName);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.HydroponicHarvesterModTabID, Mod.ModPackID);
             _unitID.text = $"UNIT ID: {UnitID}";
             Manager.AlertNewFcsStoragePlaced(this);
         }

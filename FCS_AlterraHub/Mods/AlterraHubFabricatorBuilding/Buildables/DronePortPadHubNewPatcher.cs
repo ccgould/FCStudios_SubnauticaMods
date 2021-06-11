@@ -1,12 +1,17 @@
 ﻿
-using FCS_AlterraHub.Helpers;
+using System.Collections.Generic;
+using FCS_AlterraHub.Enumerators;
+using FCS_AlterraHub.Extensions;
+using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem;
+using FCS_AlterraHub.Mods.Global.Spawnables;
+using FCS_AlterraHub.Registration;
+using FCS_AlterraHub.Structs;
+using SMLHelper.V2.Crafting;
 #if SUBNAUTICA
 using System;
 using System.IO;
 using FCS_AlterraHub.Configuration;
-using FCS_AlterraHub.Mods.AlterraHubDepot.Mono;
-using FCS_AlterraHub.Mono;
-using FCSCommon.Helpers;
+using FCS_AlterraHub.Helpers;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Utility;
 using UnityEngine;
@@ -15,15 +20,15 @@ using Sprite = Atlas.Sprite;
 #endif
 
 
-namespace FCS_AlterraHub.Mods.AlterraHubDepot.Buildable
+namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Buildables
 {
-    internal class AlterraHubDepotPatcher : SMLHelper.V2.Assets.Buildable
+    internal class DronePortPadHubNewPatcher : SMLHelper.V2.Assets.Buildable
     {
-        public override TechGroup GroupForPDA => TechGroup.InteriorModules;
-        public override TechCategory CategoryForPDA => TechCategory.InteriorModule;
+        public override TechGroup GroupForPDA => TechGroup.ExteriorModules;
+        public override TechCategory CategoryForPDA => TechCategory.ExteriorModule;
         public override string AssetsFolder => Mod.GetAssetPath();
-
-        public override TechType RequiredForUnlock => Mod.AlterraHubDepotFragmentTechType;
+        
+        public override TechType RequiredForUnlock => Mod.DronePortPadHubNewFragmentTechType;
 
         public override string DiscoverMessage => $"{this.FriendlyName} Unlocked!";
 
@@ -35,38 +40,30 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Buildable
 
         public override bool DestroyFragmentOnScan => true;
 
-        public AlterraHubDepotPatcher() : base(Mod.AlterraHubDepotClassID, Mod.AlterraHubDepotFriendly, Mod.AlterraHubDepotDescription)
+        public DronePortPadHubNewPatcher() : base(Mod.DronePortPadHubNewClassID, Mod.DronePortPadHubNewFriendly, Mod.DronePortPadHubNewDescription)
         {
+            OnStartedPatching += () =>
+            {
+                var alterraGenKit = new FCSKit(Mod.DronePortPadHubNewKitClassID, Mod.DronePortPadHubNewFriendly,
+                    Path.Combine(AssetsFolder, $"{ClassID}.png"));
+                alterraGenKit.Patch();
+            };
+
             OnFinishedPatching += () =>
             {
-                Mod.AlterraHubDepotTechType = TechType;
+                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.DronePortPadHubNewKitClassID.ToTechType(), 90000, StoreCategory.Misc);
             };
         }
-
-        public override PDAEncyclopedia.EntryData EncyclopediaEntryData
-        {
-            get
-            {
-                PDAEncyclopedia.EntryData entry = new PDAEncyclopedia.EntryData
-                {
-                    key = Mod.AlterraHubDepotClassID,
-                    path = "Tech/Equipment",
-                    nodes = new[] {"Tech", "Equipment"},
-                    unlocked = false
-                };
-                return entry;
-            }
-        }
-
+        
 #if SUBNAUTICA_STABLE
         public override GameObject GetGameObject()
         {
             try
             {
-                var prefab = GameObject.Instantiate(Buildables.AlterraHub.AlterraHubDepotPrefab);
+                var prefab = GameObject.Instantiate(FCS_AlterraHub.Buildables.AlterraHub.DronePortPadHubNewPrefab);
 
-                var size = new Vector3(0.8698499f, 1.545477f, 0.4545232f);
-                var center = new Vector3(0f, 0.1363693f, 0.4475707f);
+                var size = new Vector3(6.70943f, 4.943072f, 8.8695f);
+                var center = new Vector3(0f, 2.756582f, 0.6690737f);
 
                 GameObjectHelpers.AddConstructableBounds(prefab, size, center);
 
@@ -81,36 +78,29 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Buildable
                 //========== Allows the building animation and material colors ==========// 
 
                 var lw = prefab.AddComponent<LargeWorldEntity>();
-                lw.cellLevel = LargeWorldEntity.CellLevel.Global;
+                lw.cellLevel = LargeWorldEntity.CellLevel.VeryFar;
 
                 // Add constructible
                 var constructable = prefab.AddComponent<Constructable>();
 
-                constructable.allowedOutside = false;
-                constructable.allowedInBase = true;
-                constructable.allowedOnGround = false;
+                constructable.allowedOutside = true;
+                constructable.allowedInBase = false;
+                constructable.allowedOnGround = true;
                 constructable.allowedOnWall = true;
-                constructable.rotationEnabled = false;
+                constructable.rotationEnabled = true;
                 constructable.allowedOnCeiling = false;
                 constructable.allowedInSub = false;
                 constructable.allowedOnConstructables = false;
                 constructable.model = model;
+                constructable.placeMaxDistance = 10f; 
+                constructable.placeDefaultDistance = 5f; 
                 constructable.techType = TechType;
 
                 PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
                 prefabID.ClassId = ClassID;
 
                 prefab.AddComponent<TechTag>().type = TechType;
-                prefab.AddComponent<AlterraHubDepotController>();
-                prefab.AddComponent<FCSGameLoadUtil>();
-
-                prefab.SetActive(false);
-                var fcsStorage = prefab.AddComponent<FCSStorage>();
-                fcsStorage.Initialize(48, 6, 8, Mod.AlterraHubDepotFriendly, Mod.AlterraHubDepotClassID);
-                prefab.SetActive(true);
-
-                //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
-                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
+                prefab.AddComponent<AlterraDronePortController>();
                 return prefab;
 
             }
@@ -124,10 +114,10 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Buildable
 #else
         public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
         {
-                var prefab = GameObject.Instantiate(AlterraHub.AlterraHubDepotPrefab);
+                var prefab = GameObject.Instantiate(AlterraHub.DronePortPadHubNewPrefab);
 
-                var size = new Vector3(1.353966f, 2.503282f, 1.006555f);
-                var center = new Vector3(0.006554961f, 1.394679f, 0.003277525f);
+                var size = new Vector3(6.70943f, 4.943072f, 8.8695f);
+                var center = new Vector3(0f, 2.756582f, 0.6690737f);
 
                 GameObjectHelpers.AddConstructableBounds(prefab, size, center);
 
@@ -142,7 +132,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Buildable
                 //========== Allows the building animation and material colors ==========// 
 
                 var lw = prefab.AddComponent<LargeWorldEntity>();
-                lw.cellLevel = LargeWorldEntity.CellLevel.Global;
+                lw.cellLevel = LargeWorldEntity.CellLevel.VeryFar;
 
                 // Add constructible
                 var constructable = prefab.AddComponent<Constructable>();
@@ -150,7 +140,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Buildable
                 constructable.allowedOutside = true;
                 constructable.allowedInBase = false;
                 constructable.allowedOnGround = true;
-                constructable.allowedOnWall = false;
+                constructable.allowedOnWall = true;
                 constructable.rotationEnabled = true;
                 constructable.allowedOnCeiling = false;
                 constructable.allowedInSub = false;
@@ -162,11 +152,8 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Buildable
                 prefabID.ClassId = ClassID;
 
                 prefab.AddComponent<TechTag>().type = TechType;
-                prefab.AddComponent<AlterraHubDepotController>();
+                prefab.AddComponent<AlterraDronePortController>();
                 //prefab.AddComponent<FCSGameLoadUtil>();
-
-                //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
-                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModName);
             gameObject.Set(prefab);
             yield break;
         }
@@ -175,7 +162,17 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Buildable
 
         protected override RecipeData GetBlueprintRecipe()
         {
-            return Mod.AlterraHubDepotIngredients;
+            QuickLogger.Debug($"Creating recipe...");
+            // Create and associate recipe to the new TechType
+            var customFabRecipe = new RecipeData()
+            {
+                craftAmount = 1,
+                Ingredients = new List<Ingredient>()
+                {
+                    new Ingredient(Mod.DronePortPadHubNewKitClassID.ToTechType(),1)
+                }
+            };
+            return customFabRecipe;
         }
 
         protected override Sprite GetItemSprite()

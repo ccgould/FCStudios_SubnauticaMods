@@ -17,7 +17,7 @@ namespace FCS_HomeSolutions.Buildables
         private DecorationDataEntry _savedData;
         private void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.DecorationItemTabId, Mod.ModName);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.DecorationItemTabId, Mod.ModPackID);
         }
 
         public override Vector3 GetPosition()

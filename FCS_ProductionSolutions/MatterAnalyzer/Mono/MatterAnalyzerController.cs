@@ -60,7 +60,7 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
 
         private void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.MatterAnalyzerTabID, Mod.ModName);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.MatterAnalyzerTabID, Mod.ModPackID);
         }
 
         private void Update()

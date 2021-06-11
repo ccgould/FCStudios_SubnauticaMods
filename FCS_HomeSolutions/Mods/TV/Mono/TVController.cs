@@ -30,7 +30,7 @@ namespace FCS_HomeSolutions.Mods.TV.Mono
 
         private void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.DecorationItemTabId, Mod.ModName);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.DecorationItemTabId, Mod.ModPackID);
             Manager.OnPowerStateChanged += OnPowerStateChanged;
         }
 

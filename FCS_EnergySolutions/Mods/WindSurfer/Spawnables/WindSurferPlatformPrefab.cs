@@ -73,7 +73,7 @@ namespace FCS_EnergySolutions.Spawnables
                 MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, prefab, Color.cyan);
                 MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseLightsEmissiveController, prefab, 4f);
                 MaterialHelpers.ApplyEmissionShader("fcs_WS_BP", "fcs_WS_E", prefab, ModelPrefab.ModBundle, Color.white);
-                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModName);
+                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
                 MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseBeaconLightEmissiveController, prefab, 6);
 
                 //Add VFXSurfaces to adjust footstep sounds. This is technically not necessary for the interior colliders, however.

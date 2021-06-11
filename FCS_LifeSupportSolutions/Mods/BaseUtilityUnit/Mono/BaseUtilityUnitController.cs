@@ -36,7 +36,7 @@ namespace FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Mono
 
         private void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.BaseUtilityUnitTabID, Mod.ModName);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.BaseUtilityUnitTabID, Mod.ModPackID);
             
             if (Manager == null)
             {

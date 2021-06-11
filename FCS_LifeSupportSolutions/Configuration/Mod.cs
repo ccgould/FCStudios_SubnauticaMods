@@ -23,7 +23,7 @@ namespace FCS_LifeSupportSolutions.Configuration
         private static SaveData _saveData;
         #endregion
 
-        internal static string ModName => "FCSLifeSupportSolutions";
+        internal static string ModPackID => "FCSLifeSupportSolutions";
         internal static string SaveDataFilename => $"FCSLifeSupportSolutionsSaveData.json";
         internal const string ModBundleName = "fcslifesupportsolutionsbundle";
 
@@ -135,7 +135,7 @@ namespace FCS_LifeSupportSolutions.Configuration
 
                 foreach (var controller in FCSAlterraHubService.PublicAPI.GetRegisteredDevices())
                 {
-                    if (controller.Value.PackageId == ModName)
+                    if (controller.Value.PackageId == ModPackID)
                     {
                         QuickLogger.Debug($"Saving device: {controller.Value.UnitID}");
                         ((IFCSSave<SaveData>)controller.Value).Save(newSaveData,serializer);
@@ -171,7 +171,7 @@ namespace FCS_LifeSupportSolutions.Configuration
 
         internal static string GetSaveFileDirectory()
         {
-            return Path.Combine(SaveUtils.GetCurrentSaveDataDir(), ModName);
+            return Path.Combine(SaveUtils.GetCurrentSaveDataDir(), ModPackID);
         }
 
         internal static MiniMedBayEntry GetMiniMedBaySaveData(string id)

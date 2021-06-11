@@ -18,7 +18,7 @@ namespace FCS_HomeSolutions.Mods.Cabinets.Mono
 
         private void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.CabinetTabID, Mod.ModName);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.CabinetTabID, Mod.ModPackID);
         }
 
 

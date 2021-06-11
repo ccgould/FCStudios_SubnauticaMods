@@ -29,7 +29,7 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
 
         private void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.AlienChiefTabID, Mod.ModName);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.AlienChiefTabID, Mod.ModPackID);
             DisplayManager?.UpdateStorageAmount(StorageSystem?.GetCount()??0);
         }
 

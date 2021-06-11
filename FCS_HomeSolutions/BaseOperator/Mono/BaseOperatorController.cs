@@ -18,7 +18,7 @@ namespace FCS_HomeSolutions.BaseOperator.Mono
 
         private void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.BaseOperatorTabID, Mod.ModName);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.BaseOperatorTabID, Mod.ModPackID);
             _displayManager?.SetBaseName();
         }
 

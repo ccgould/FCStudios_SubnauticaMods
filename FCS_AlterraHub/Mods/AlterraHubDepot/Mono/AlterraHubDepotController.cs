@@ -30,7 +30,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Mono
 
         private void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.AlterraHubDepotTabID, Mod.ModName);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.AlterraHubDepotTabID, Mod.ModPackID);
             RefreshUI();
         }
 

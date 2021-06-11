@@ -20,7 +20,7 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
 
         private void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.WindSurferPlatformTabID, Mod.ModName);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.WindSurferPlatformTabID, Mod.ModPackID);
         }
 
         private void OnEnable()

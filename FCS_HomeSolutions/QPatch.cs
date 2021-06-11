@@ -4,6 +4,7 @@ using System.Reflection;
 using FCS_AlterraHub.API;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Objects;
+using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Buildables.OutDoorPlanters;
 using FCS_HomeSolutions.Configuration;
@@ -47,7 +48,8 @@ namespace FCS_HomeSolutions
         [QModPatch]
         public void Patch()
         {
-            QuickLogger.Info($"Started patching. Version: {QuickLogger.GetAssemblyVersion(Assembly.GetExecutingAssembly())}");
+            FCSAlterraHubService.PublicAPI.RegisterModPack(Mod.ModPackID, Assembly.GetExecutingAssembly());
+            FCSAlterraHubService.PublicAPI.RegisterEncyclopediaEntry(Mod.ModPackID);
 
             ModelPrefab.Initialize();
 
@@ -233,9 +235,7 @@ namespace FCS_HomeSolutions
                 Message = "TI'm sorry, but it seems you do not have enough credit for this purchase."
             });
         }
-
-
-
+        
         private void LoadAdditionalColors()
         {
             foreach (AdditionalColor additionalColor in Configuration.PaintToolAdditionalPaintColors)

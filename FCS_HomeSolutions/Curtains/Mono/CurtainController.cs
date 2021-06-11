@@ -29,7 +29,7 @@ namespace FCS_HomeSolutions.Curtains.Mono
 
         private void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, "C", Mod.ModName);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, "C", Mod.ModPackID);
         }
 
         public override Vector3 GetPosition()

@@ -27,7 +27,7 @@ namespace FCS_EnergySolutions.Mods.AlterraSolarCluster.Mono
 
         private void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.AlterraSolarClusterModTabID, Mod.ModName);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.AlterraSolarClusterModTabID, Mod.ModPackID);
             _powerManager.CheckIfConnected();
         }
 

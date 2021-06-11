@@ -31,6 +31,13 @@ namespace FCS_AlterraHub.Configuration
         public string Id { get; set; }
         public string BaseId { get; set; }
         [JsonProperty(PropertyName = "COL")] internal Vec4 BodyColor { get; set; }
+    }    
+    
+    internal class AlterraDronePortEntry : ISaveDataEntry
+    {
+        public string Id { get; set; }
+        public string BaseId { get; set; }
+        [JsonProperty(PropertyName = "COL")] internal Vec4 BodyColor { get; set; }
     }
 
     [Serializable]
@@ -46,7 +53,8 @@ namespace FCS_AlterraHub.Configuration
         [JsonProperty] internal List<OreConsumerDataEntry> OreConsumerEntries = new List<OreConsumerDataEntry>();
         [JsonProperty] internal FCSPDAEntry FCSPDAEntry = new FCSPDAEntry();
         [JsonProperty(PropertyName = "Acc")] internal AccountDetails AccountDetails { get; set; }
-        public List<AlterraHubDepotEntry> AlterraHubDepotEntries { get; set; } = new List<AlterraHubDepotEntry>();
+        [JsonProperty] internal List<AlterraHubDepotEntry> AlterraHubDepotEntries { get; set; } = new List<AlterraHubDepotEntry>();
+        [JsonProperty] internal List<AlterraDronePortEntry> AlterraDronePortEntries { get; set; } = new List<AlterraDronePortEntry>();
 
         [JsonProperty] internal List<BaseSaveData> BaseSaves = new List<BaseSaveData>();
     }

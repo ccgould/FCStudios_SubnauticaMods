@@ -27,7 +27,7 @@ namespace FCS_HomeSolutions.Mono.OutDoorPlanters
 
         private void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.SmartPlanterPotTabID, Mod.ModName);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.SmartPlanterPotTabID, Mod.ModPackID);
         }
 
         private void OnEnable()

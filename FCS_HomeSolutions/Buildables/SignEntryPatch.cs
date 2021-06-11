@@ -89,7 +89,7 @@ namespace FCS_HomeSolutions.Buildables
                 prefab.AddComponent<SignController>();
 
                 //Apply the glass shader here because of autosort lockers for some reason doesn't like it.
-                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModName);
+                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
                 return prefab;
             }
             catch (Exception e)
@@ -133,7 +133,7 @@ namespace FCS_HomeSolutions.Buildables
 
         private void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, "ASN", Mod.ModName);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, "ASN", Mod.ModPackID);
         }
 
         private void OnEnable()

@@ -82,7 +82,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable
                 prefab.AddComponent<DSSAutoCrafterController>();
 
                 //Apply the glass shader here because of autosort lockers for some reason doesn't like it.
-                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModName);
+                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
                 MaterialHelpers.ApplyShaderToMaterial(prefab, "DSS_ConveyorBelt");
 
                 return prefab;

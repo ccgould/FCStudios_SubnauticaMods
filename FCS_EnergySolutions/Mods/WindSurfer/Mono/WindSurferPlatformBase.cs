@@ -1,4 +1,5 @@
 ﻿using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_EnergySolutions.Configuration;
 using FCSCommon.Helpers;

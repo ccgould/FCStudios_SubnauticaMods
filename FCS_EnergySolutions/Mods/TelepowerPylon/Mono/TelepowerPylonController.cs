@@ -78,7 +78,7 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
 
         private void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.TelepowerPylonTabID, Mod.ModName);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.TelepowerPylonTabID, Mod.ModPackID);
 
             if (Manager == null)
             {

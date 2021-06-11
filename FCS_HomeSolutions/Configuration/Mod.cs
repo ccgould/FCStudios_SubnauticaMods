@@ -24,7 +24,7 @@ namespace FCS_HomeSolutions.Configuration
         private static SaveData _saveData;
         private static List<PaintToolController> _registeredPaintTool;
         
-        internal const string ModName = "FCSHomeSolutions";
+        internal const string ModPackID = "FCSHomeSolutions";
         internal const string ModFriendlyName = "Home Solutions";
         internal const string ModBundleName = "fcshomesolutionsbundle";
 
@@ -396,7 +396,7 @@ namespace FCS_HomeSolutions.Configuration
 
         internal static Action<SaveData> OnDataLoaded { get; set; }
 
-        internal static string SaveDataFilename => $"{ModName}SaveData.json";
+        internal static string SaveDataFilename => $"{ModPackID}SaveData.json";
 
         public static TechType CurtainTechType { get; internal set; }
         public static Dictionary<TechType,decimal> PeeperBarFoods = new Dictionary<TechType, decimal>();
@@ -462,7 +462,7 @@ namespace FCS_HomeSolutions.Configuration
 
         internal static string GetSaveFileDirectory()
         {
-            return Path.Combine(SaveUtils.GetCurrentSaveDataDir(), ModName);
+            return Path.Combine(SaveUtils.GetCurrentSaveDataDir(), ModPackID);
         }
 
         internal static void Save(ProtobufSerializer serializer)
@@ -483,9 +483,9 @@ namespace FCS_HomeSolutions.Configuration
 
                 foreach (var controller in FCSAlterraHubService.PublicAPI.GetRegisteredDevices())
                 {
-                    QuickLogger.Debug($"Attempting to save device: {controller.Value?.UnitID} | Package Valid: { controller.Value?.PackageId == ModName}");
+                    QuickLogger.Debug($"Attempting to save device: {controller.Value?.UnitID} | Package Valid: { controller.Value?.PackageId == ModPackID}");
                     
-                    if (controller.Value != null && controller.Value.PackageId == ModName)
+                    if (controller.Value != null && controller.Value.PackageId == ModPackID)
                     {
                         QuickLogger.Debug($"Saving device: {controller.Value.UnitID}");
                         ((IFCSSave<SaveData>)controller.Value).Save(newSaveData,serializer);

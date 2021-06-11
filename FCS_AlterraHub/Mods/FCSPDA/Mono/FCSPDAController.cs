@@ -59,9 +59,6 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
         private FCSPDAEntry _savedData;
         private bool _isInitialized;
         private Canvas _canvas;
-
-        private Dictionary<string, List<EncyclopediaEntryData>> encyclopediaEntryDatas =>
-            QPatch.EncyclopediaConfig.EncyclopediaEntries;
         private bool _cartLoaded;
 
         public GameObject PDAObj { get; set; }

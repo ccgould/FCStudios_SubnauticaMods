@@ -59,7 +59,6 @@
     <Compile Include="Mods\WindSurfer\Model\Graph.cs" />
     <Compile Include="Mods\WindSurfer\Mono\HoloGraphControl.cs" />
     <Compile Include="Mods\WindSurfer\Mono\HolographSlot.cs" />
-    <Compile Include="Mods\WindSurfer\Mono\LadderController.cs" />
     <Compile Include="Mods\WindSurfer\Mono\PlatformController.cs" />
     <Compile Include="Mods\WindSurfer\Mono\ScreenTrigger.cs" />
     <Compile Include="Mods\WindSurfer\Mono\WindSurferController.cs" />

@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 
-namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
+namespace FCS_AlterraHub.Model
 {
-    internal class LadderController : HandTarget, IHandTarget
+    public class LadderController : HandTarget, IHandTarget
     {
         Transform _target;
 

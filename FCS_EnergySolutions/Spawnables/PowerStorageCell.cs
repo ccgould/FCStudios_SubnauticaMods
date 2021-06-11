@@ -26,6 +26,7 @@ namespace FCS_EnergySolutions.Spawnables
                 CraftDataHandler.SetEquipmentType(TechType, EquipmentType.PowerCellCharger);
                 TechDataHelpers.AddPowercell(TechType);
                 KnownTechHandler.SetAnalysisTechEntry(TechType.PowerCell, new TechType[1] { TechType });
+                CraftDataHandler.AddToGroup(TechGroup.Resources, TechCategory.Electronics, TechType);
             };
         }
 

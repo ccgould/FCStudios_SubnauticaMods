@@ -25,7 +25,7 @@ namespace FCS_LifeSupportSolutions.Mods.OxygenTank.Mono
 
         private void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.BaseOxygenTankTabID, Mod.ModName);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.BaseOxygenTankTabID, Mod.ModPackID);
         }
 
         public override Vector3 GetPosition()

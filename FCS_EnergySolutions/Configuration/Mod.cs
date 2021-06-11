@@ -25,7 +25,7 @@ namespace FCS_EnergySolutions.Configuration
         private static Dictionary<TechType, float> _vanillaBioChargeValues;
         #endregion
 
-        internal static string ModName => "FCSEnergySolutions";
+        internal static string ModPackID => "FCSEnergySolutions";
         internal static string SaveDataFilename => $"FCSEnergySolutionsSaveData.json";
         internal const string ModBundleName = "fcsenergysolutionsbundle";
 
@@ -158,7 +158,7 @@ namespace FCS_EnergySolutions.Configuration
 
                 foreach (var controller in FCSAlterraHubService.PublicAPI.GetRegisteredDevices())
                 {
-                    if (controller.Value.PackageId == ModName)
+                    if (controller.Value.PackageId == ModPackID)
                     {
                         QuickLogger.Debug($"Saving device: {controller.Value.UnitID}");
                         ((IFCSSave<SaveData>)controller.Value).Save(newSaveData,serializer);
@@ -194,7 +194,7 @@ namespace FCS_EnergySolutions.Configuration
 
         internal static string GetSaveFileDirectory()
         {
-            return Path.Combine(SaveUtils.GetCurrentSaveDataDir(), ModName);
+            return Path.Combine(SaveUtils.GetCurrentSaveDataDir(), ModPackID);
         }
 
         internal static AlterraGenDataEntry GetAlterraGenSaveData(string id)

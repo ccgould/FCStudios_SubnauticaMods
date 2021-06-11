@@ -26,7 +26,7 @@ namespace FCS_HomeSolutions.Mods.LedLights.Mono
 
         private void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, "LED", Mod.ModName);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, "LED", Mod.ModPackID);
         }
 
         private void OnEnable()

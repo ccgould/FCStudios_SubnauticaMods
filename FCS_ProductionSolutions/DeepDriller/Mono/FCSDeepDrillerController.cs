@@ -81,7 +81,7 @@ namespace FCS_ProductionSolutions.DeepDriller.Mono
 
         private void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.DeepDrillerMk3TabID, Mod.ModName);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.DeepDrillerMk3TabID, Mod.ModPackID);
             DisplayHandler?.UpdateUnitID();
             UpdateEmission();
             if (_saveData == null)

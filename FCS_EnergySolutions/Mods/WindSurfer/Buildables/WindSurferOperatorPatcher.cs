@@ -181,7 +181,7 @@ namespace FCS_EnergySolutions.WindSurferOperator.Buildables
                 prefab.AddComponent<WindSurferOperatorController>();
 
                 //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
-                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModName);
+                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
                 MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseBeaconLightEmissiveController, prefab, 6);
                 return prefab;
             }

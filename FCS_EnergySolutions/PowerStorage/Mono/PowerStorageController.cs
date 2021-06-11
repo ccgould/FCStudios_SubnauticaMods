@@ -120,7 +120,7 @@ namespace FCS_EnergySolutions.PowerStorage.Mono
 
         private void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.PowerStorageTabID, Mod.ModName);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.PowerStorageTabID, Mod.ModPackID);
             _powercellSupply.LoadFromSave();
         }
 

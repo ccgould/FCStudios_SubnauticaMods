@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Linq;
 using FCS_AlterraHub.Mods.FCSPDA.Mono;
 using FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems;
 using FCS_AlterraHub.Registration;
@@ -21,7 +22,8 @@ namespace FCS_AlterraHub.Patches
             CraftNode node = new CraftNode("Root");
             CraftNode.Copy(PDAEncyclopedia.tree,node);
             EncyclopediaTabController.Tree = node;
-            FCSAlterraHubService.PublicAPI.RegisterEncyclopediaEntries(QPatch.EncyclopediaConfig.EncyclopediaEntries);
+
+            FCSAlterraHubService.InternalAPI.RegisterEncyclopediaEntries(FCSAlterraHubService.InternalAPI.EncyclopediaEntries);
 
             QuickLogger.Info("PDAEncyclopedia Initialize Post Complete", true);
         }
@@ -40,9 +42,11 @@ namespace FCS_AlterraHub.Patches
         [HarmonyPrefix]
         public static bool NotifyAdd_Prefix(ref CraftNode node,ref bool verbose)
         {
-            if (!QPatch.EncyclopediaConfig.EncyclopediaEntries.ContainsKey(node.id)) return true;
-            
-            if(FCSPDAController.Instance?.EncyclopediaTabController != null)
+            var craftNode = node;
+
+            if (!FCSAlterraHubService.InternalAPI.EncyclopediaEntries.Any(x=>x.ContainsKey(craftNode.id))) return true;
+
+            if (FCSPDAController.Instance?.EncyclopediaTabController != null)
                 FCSPDAController.Instance.EncyclopediaTabController.OnAddEntry(node, verbose);
             else
             {
@@ -63,7 +67,7 @@ namespace FCS_AlterraHub.Patches
         [HarmonyPrefix]
         public static void Add_Prefix(string key, bool verbose)
         {
-            if (QPatch.EncyclopediaConfig.EncyclopediaEntries.ContainsKey(key))
+            if (FCSAlterraHubService.InternalAPI.EncyclopediaEntries.Any(x=>x.ContainsKey(key)))
                 FCSAlterraHubService.PublicAPI.IsRegisteringEncyclopedia = true;
         }
         
@@ -71,8 +75,11 @@ namespace FCS_AlterraHub.Patches
         [HarmonyPostfix]
         public static void Add_Postfix(string key, bool verbose)
         {
-            if (QPatch.EncyclopediaConfig.EncyclopediaEntries.ContainsKey(key))
-                FCSAlterraHubService.PublicAPI.IsRegisteringEncyclopedia = false;
+            if(FCSAlterraHubService.InternalAPI.EncyclopediaEntries.Any(x => x.ContainsKey(key)))
+            {
+                FCSAlterraHubService.PublicAPI.IsRegisteringEncyclopedia = true;
+            }
+
         }
     }
 }

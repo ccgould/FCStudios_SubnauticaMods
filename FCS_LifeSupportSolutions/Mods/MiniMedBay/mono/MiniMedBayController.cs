@@ -26,7 +26,7 @@ namespace FCS_LifeSupportSolutions.Mods.MiniMedBay.mono
 
         private void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.MiniMedBayTabID, Mod.ModName);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.MiniMedBayTabID, Mod.ModPackID);
         }
 
         public override Vector3 GetPosition()

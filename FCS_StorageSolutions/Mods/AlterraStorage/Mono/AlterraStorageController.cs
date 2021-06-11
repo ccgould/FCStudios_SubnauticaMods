@@ -53,7 +53,7 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
 
         private void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.AlterraStorageTabID, Mod.ModName);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.AlterraStorageTabID, Mod.ModPackID);
             Manager.AlertNewFcsStoragePlaced(this);
         }
 

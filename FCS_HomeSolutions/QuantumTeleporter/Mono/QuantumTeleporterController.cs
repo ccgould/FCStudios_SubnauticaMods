@@ -38,7 +38,7 @@ namespace FCS_HomeSolutions.QuantumTeleporter.Mono
 
         private void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.QuantumTeleporterTabID, Mod.ModName);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.QuantumTeleporterTabID, Mod.ModPackID);
             NameController.SetCurrentName(string.IsNullOrWhiteSpace(_data?.UnitName) ? GetNewName() : _data.UnitName, DisplayManager.GetNameTextBox());
             
             if (Manager != null)

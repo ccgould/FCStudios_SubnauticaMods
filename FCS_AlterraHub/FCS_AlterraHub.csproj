@@ -23,10 +23,14 @@
     <Compile Include="API\FCSAssetBundlesService.cs" />
     <Compile Include="Buildables\AlterraHubAuxPatcher.cs" />
     <Compile Include="Buildables\AlterraHubModelPrefab.cs" />
+    <Compile Include="Model\LadderController.cs" />
+    <Compile Include="Mods\AlterraHubFabricatorBuilding\Buildables\DronePortPadHubNewPatcher.cs" />
     <Compile Include="Mods\AlterraHubFabricatorBuilding\Mono\DroneSystem\DroneController.cs" />
     <Compile Include="Mods\AlterraHubFabricatorBuilding\Mono\DroneSystem\AlterraDronePortController.cs" />
     <Compile Include="Mods\AlterraHubFabricatorBuilding\Mono\DroneSystem\Interfaces\IDroneDestination.cs" />
     <Compile Include="Mods\AlterraHubFabricatorBuilding\Mono\LightManager.cs" />
+    <Compile Include="Mods\AlterraHubFabricatorBuilding\Spawnables\DronePortPadHubNewFragSpawnable.cs" />
+    <Compile Include="Mods\AlterraHubFabricatorBuilding\Spawnables\AlterraTransportDroneSpawnable.cs" />
     <Compile Include="Mods\OreConsumer\Buildable\OreConsumerPatcher.cs" />
     <Compile Include="Configuration\Config.cs" />
     <Compile Include="Configuration\DebugCommands.cs" />
@@ -207,7 +211,9 @@
     <Compile Include="Systems\StoreInventorySystem.cs" />
     <Compile Include="Systems\VoiceNotificationSystem.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Mods\AlterraHubFabricatorBuilding\Mono\DroneSystem\Port\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\PostBuildEvents.targets" />
 </Project>

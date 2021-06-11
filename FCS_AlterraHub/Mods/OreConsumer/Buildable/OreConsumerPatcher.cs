@@ -24,15 +24,15 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Buildable
 
         public override TechType RequiredForUnlock => Mod.OreConsumerFragmentTechType;
 
-        public override string DiscoverMessage => $"{this.FriendlyName} Unlocked!";
+        //public override string DiscoverMessage => $"{this.FriendlyName} Unlocked!";
 
-        public override bool AddScannerEntry => true;
+        //public override bool AddScannerEntry => true;
 
-        public override int FragmentsToScan => 3;
+        //public override int FragmentsToScan => 3;
 
-        public override float TimeToScanFragment => 5f;
+        //public override float TimeToScanFragment => 5f;
 
-        public override bool DestroyFragmentOnScan => true;
+        //public override bool DestroyFragmentOnScan => true;
 
         public static float OreProcessingTime { get; set; } = 90;
 
@@ -50,9 +50,9 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Buildable
         //    {
         //        PDAEncyclopedia.EntryData entry = new PDAEncyclopedia.EntryData
         //        {
-        //            key = Mod.OreConsumerClassID,
-        //            path = "Tech/Equipment",
-        //            nodes = new[] { "Tech", "Equipment" },
+        //            key = "Alterra Hub__Alterra Ore Consumer",
+        //            path = "fcs/Alterra Hub",
+        //            nodes = new[] { "fcs", "Alterra Hub" },
         //            unlocked = false
         //        };
         //        return entry;
@@ -106,7 +106,7 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Buildable
                 prefab.AddComponent<FCSGameLoadUtil>();
 
                 //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
-                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModName);
+                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
                 return prefab;
 
             }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using FCS_AlterraHub.API;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Enumerators;
@@ -13,6 +14,8 @@ using FCSCommon.Utilities;
 using Oculus.Newtonsoft.Json;
 using QModManager.API;
 using SMLHelper.V2.Handlers;
+using SMLHelper.V2.Utility;
+using UnityEngine;
 
 namespace FCS_AlterraHub.Registration
 {
@@ -31,7 +34,6 @@ namespace FCS_AlterraHub.Registration
         void RegisterPatchedMod(string mod);
         int GetRegisterModCount(string tabID);
         bool IsTechTypeRegistered(TechType techType);
-        void RegisterEncyclopediaEntries(Dictionary<string, List<EncyclopediaEntryData>> encyclopediaEntries);
         void UnRegisterDevice(FcsDevice device);
         void RegisterTechLight(TechLight techLight);
         bool ChargeAccount(decimal amount);
@@ -45,14 +47,17 @@ namespace FCS_AlterraHub.Registration
         Dictionary<string, FcsDevice> GetRegisteredDevicesOfId(string id);
         void RegisterBase(BaseManager manager);
         void UnRegisterBase(BaseManager manager);
-        void AddEncyclopediaEntries(bool verbose = false);
-
+        void RegisterEncyclopediaEntry(string modID);
+        void RegisterModPack(string modID, Assembly assembly);
         void CreateStoreEntry(TechType techType, TechType receiveTechType,int returnAmount, decimal cost, StoreCategory category,bool forceUnlocked = false);
         FCSGamePlaySettings GetGamePlaySettings();
     }
 
     internal interface IFCSAlterraHubServiceInternal
     {
+        List<Dictionary<string, List<EncyclopediaEntryData>>> EncyclopediaEntries { get; set; }
+        void RegisterEncyclopediaEntries(List<Dictionary<string, List<EncyclopediaEntryData>>> encyclopediaEntries);
+
     }
 
     public class FCSAlterraHubService : IFCSAlterraHubService, IFCSAlterraHubServiceInternal
@@ -65,9 +70,12 @@ namespace FCS_AlterraHub.Registration
         private static HashSet<TechType> _registeredTechTypes = new HashSet<TechType>();
         private List<string> _patchedMods = new List<string>();
         private Dictionary<TechType, int> _globallyBuiltTech = new Dictionary<TechType, int>();
+        private Dictionary<string, string> _registeredModPacks = new Dictionary<string, string>();
         public static IFCSAlterraHubService PublicAPI => singleton;
         internal static IFCSAlterraHubServiceInternal InternalAPI => singleton;
 
+        public List<Dictionary<string, List<EncyclopediaEntryData>>> EncyclopediaEntries { get; set; } =
+            new List<Dictionary<string, List<EncyclopediaEntryData>>>();
         private FCSAlterraHubService()
         {
             Mod.OnDevicesDataLoaded += OnDataLoaded;
@@ -210,7 +218,36 @@ namespace FCS_AlterraHub.Registration
         {
             CreateStoreEntry(techType,recieveTechType,1,cost,category);   
         }
-        
+
+        public void RegisterModPack(string modID, Assembly assembly)
+        {
+            if (string.IsNullOrWhiteSpace(modID))
+            {
+                QuickLogger.Error($"Failed to register mod {Assembly.GetExecutingAssembly().FullName} because mod is empty");
+                return;
+            }
+
+            if (assembly == null)
+            {
+                QuickLogger.Error($"Failed to register mod {modID} because assembly is null");
+                return;
+            }
+            QuickLogger.Info($"Started patching {modID} Version: {QuickLogger.GetAssemblyVersion(assembly)}");
+            
+            var path = Path.GetDirectoryName(assembly.Location);
+            
+            if (!_registeredModPacks.ContainsKey(modID))
+            {
+                _registeredModPacks.Add(modID,path);
+                QuickLogger.Debug($"Registered mod pack {modID} with at path {path}");
+            }
+            else
+            {
+                QuickLogger.Warning($"Mod Pack: {modID} has already been registered! Ignoring replacing entry with new data.");
+                _registeredModPacks[modID] = path;
+            }
+        }
+
         public void CreateStoreEntry(TechType techType, TechType receiveTechType, int returnAmount, decimal cost, StoreCategory category,bool forceUnlocked = false)
         {
             if (!_storeItems.ContainsKey(techType))
@@ -232,7 +269,6 @@ namespace FCS_AlterraHub.Registration
         {
             return Mod.GamePlaySettings;
         }
-
 
         public Dictionary<TechType, FCSStoreEntry> GetRegisteredKits()
         {
@@ -274,46 +310,85 @@ namespace FCS_AlterraHub.Registration
             return _registeredTechTypes.Contains(techType);
         }
         
-        public void RegisterEncyclopediaEntries(Dictionary<string, List<EncyclopediaEntryData>> encyclopediaEntries)
+        public void RegisterEncyclopediaEntries(List<Dictionary<string, List<EncyclopediaEntryData>>> encyclopediaEntries)
         {
+            
             LanguageHandler.SetLanguageLine($"EncyPath_fcs", "Field Creators Studios");
-            foreach (KeyValuePair<string, List<EncyclopediaEntryData>> data in encyclopediaEntries)
+
+            foreach (Dictionary<string, List<EncyclopediaEntryData>> entry in encyclopediaEntries)
             {
-                foreach (EncyclopediaEntryData entryData in data.Value)
+                foreach (KeyValuePair<string, List<EncyclopediaEntryData>> data in entry)
                 {
-                    LanguageHandler.SetLanguageLine($"Ency_{data.Key}", entryData.Title);
-                    LanguageHandler.SetLanguageLine($"EncyDesc_{data.Key}", entryData.Body);
-                    LanguageHandler.SetLanguageLine($"EncyPath_{entryData.Path}", entryData.TabTitle);
+                    foreach (EncyclopediaEntryData entryData in data.Value)
+                    {
+                        LanguageHandler.SetLanguageLine($"Ency_{data.Key}", entryData.Title);
+                        LanguageHandler.SetLanguageLine($"EncyDesc_{data.Key}", entryData.Body);
+                        LanguageHandler.SetLanguageLine($"EncyPath_{entryData.Path}", entryData.TabTitle);
 
-                    PDAEncyclopedia.mapping.Add(data.Key, new PDAEncyclopedia.EntryData
-                    {
-                        //audio = entryData.audio,
-                        image = FCSAssetBundlesService.PublicAPI.GetEncyclopediaTexture2D(entryData.ImageName),
-                        key = data.Key,
-                        nodes = PDAEncyclopedia.ParsePath(entryData.Path),
-                        path = entryData.Path,
-                        timeCapsule = false,
-                        unlocked = entryData.Unlocked
-                    });
+                        FMODAsset fModAsset = null;
 
-                    if (entryData.Unlocked)
-                    {
-                        PDAEncyclopedia.Add(data.Key, false);
-                    }
-                    else
-                    {
-                        if (TechTypeExtensions.FromString(entryData.UnlockedBy, out TechType techType, true))
+                        if (!string.IsNullOrWhiteSpace(entryData.AudioName))
                         {
-                            PDAHandler.AddCustomScannerEntry(new PDAScanner.EntryData()
+                            if (_registeredModPacks.TryGetValue(entryData.ModPackID, out string directory))
                             {
-                                encyclopedia = data.Key,
-                                locked = true,
-                                key = techType
-                            });
+                                var audioPath = Path.Combine(directory, "Audio", $"{entryData.AudioName}.mp3");
+                                if (File.Exists(audioPath))
+                                {
+                                    fModAsset = ScriptableObject.CreateInstance<FMODAsset>();
+                                    fModAsset.id = entryData.AudioName;
+                                    fModAsset.name = "";
+                                    fModAsset.path = audioPath;
+
+                                    CustomSoundHandler.Main.RegisterCustomSound(fModAsset.id, fModAsset.path);
+                                }
+                                else
+                                {
+                                    QuickLogger.Error($"Failed to located audio path: {audioPath} for entry {entryData.Path}");
+                                }
+                            }
+                        }
+
+                        PDAEncyclopedia.mapping.Add(data.Key, new PDAEncyclopedia.EntryData
+                        {
+                            audio = fModAsset,
+                            image = FCSAssetBundlesService.PublicAPI.GetEncyclopediaTexture2D(entryData.ImageName),
+                            key = data.Key,
+                            nodes = PDAEncyclopedia.ParsePath(entryData.Path),
+                            path = entryData.Path,
+                            timeCapsule = false,
+                            unlocked = entryData.Unlocked
+                        });
+
+                        if (entryData.Unlocked)
+                        {
+                            PDAEncyclopedia.Add(data.Key, false);
                         }
                         else
                         {
-                            QuickLogger.Error($"Failed to Parse TechType to unlock Ency entry: {data.Key}", true);
+                            if (TechTypeExtensions.FromString(entryData.UnlockedBy, out TechType techType, true))
+                            {
+                                TechType bluePrintTechType = TechType.None;
+                                if (!string.IsNullOrWhiteSpace(entryData.Blueprint))
+                                {
+                                    TechTypeExtensions.FromString(entryData.Blueprint, out bluePrintTechType, true);
+                                }
+
+                                PDAHandler.AddCustomScannerEntry(new PDAScanner.EntryData()
+                                {
+                                    encyclopedia = data.Key,
+                                    locked = true,
+                                    key = techType,
+                                    blueprint = bluePrintTechType,
+                                    destroyAfterScan = entryData.DestroyFragmentAfterScan,
+                                    isFragment = entryData.HasFragment,
+                                    totalFragments = entryData.TotalFragmentsToUnlock,
+                                    scanTime = entryData.ScanTime
+                                });
+                            }
+                            else
+                            {
+                                QuickLogger.Error($"Failed to Parse TechType to unlock Ency entry: {data.Key}", true);
+                            }
                         }
                     }
                 }
@@ -322,9 +397,37 @@ namespace FCS_AlterraHub.Registration
 
         public bool IsRegisteringEncyclopedia { get; set; }
 
-        public void AddEncyclopediaEntries(bool verbose = false)
+        public void RegisterEncyclopediaEntry(string modID)
         {
-            
+            try
+            {
+                if (_registeredModPacks.TryGetValue(modID, out string path))
+                {
+                    var encyclopediaJson = Path.Combine(path, "Assets", "Encyclopedia", "EncyclopediaEntries.json");
+
+                    if (File.Exists(encyclopediaJson))
+                    {
+                        var jsonData = JsonConvert.DeserializeObject<Dictionary<string, List<EncyclopediaEntryData>>>(File.ReadAllText(encyclopediaJson));
+
+                        QuickLogger.Debug(jsonData.ToString());
+
+                        InternalAPI.EncyclopediaEntries.Insert(0,jsonData);
+                    }
+                    else
+                    {
+                        QuickLogger.Warning($"No encyclopedia file found for mod pack {modID}");
+                    }
+                }
+                else
+                {
+                    QuickLogger.Error($"Failed to find {modID}! Registering Encyclopedia Data failed");
+                }
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error(e.Message);
+                QuickLogger.Error(e.StackTrace);
+            }
         }
 
 
@@ -446,8 +549,5 @@ namespace FCS_AlterraHub.Registration
                 }
             }
         }
-
-
-
     }
 }

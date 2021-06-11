@@ -19,7 +19,7 @@ namespace FCS_HomeSolutions.TrashReceptacle.Mono
 
         private void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.TrashReceptacleTabID, Mod.ModName);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.TrashReceptacleTabID, Mod.ModPackID);
         }
 
         private void OnEnable()

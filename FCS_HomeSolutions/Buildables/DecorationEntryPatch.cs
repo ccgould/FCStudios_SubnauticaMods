@@ -89,7 +89,7 @@ namespace FCS_HomeSolutions.Buildables
                 prefab.AddComponent<DecorationController>();
 
                 //Apply the glass shader here because of autosort lockers for some reason doesn't like it.
-                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModName);
+                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
                 return prefab;
             }
             catch (Exception e)

@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using FCS_AlterraHub.Registration;
 using FCS_LifeSupportSolutions.Buildable;
 using FCS_LifeSupportSolutions.Configuration;
 using FCS_LifeSupportSolutions.Mods.BaseOxygenTank.Buildable;
@@ -30,9 +31,9 @@ namespace FCS_LifeSupportSolutions
         [QModPatch]
         public void Patch()
         {
-            Version = QuickLogger.GetAssemblyVersion(Assembly.GetExecutingAssembly());
-            QuickLogger.Info($"Started patching. Version: {Version}");
-            QuickLogger.ModName = Mod.ModName;
+            FCSAlterraHubService.PublicAPI.RegisterModPack(Mod.ModPackID, Assembly.GetExecutingAssembly());
+            FCSAlterraHubService.PublicAPI.RegisterEncyclopediaEntry(Mod.ModPackID);
+
             AuxPatchers.AdditionalPatching();
             ModelPrefab.Initialize();
 

@@ -28,7 +28,7 @@ namespace FCS_ProductionSolutions.Configuration
         #endregion
 
         internal static LootDistributionData LootDistributionData { get; set; }
-        internal static string ModName => "FCSProductionSolutions";
+        internal static string ModPackID => "FCSProductionSolutions";
         internal static string SaveDataFilename => $"FCSProductionSolutionsSaveData.json";
         internal const string ModBundleName = "fcsproductionsolutionsbundle";
 
@@ -131,7 +131,7 @@ namespace FCS_ProductionSolutions.Configuration
 
                 foreach (var controller in FCSAlterraHubService.PublicAPI.GetRegisteredDevices())
                 {
-                    if (controller.Value.PackageId == ModName)
+                    if (controller.Value.PackageId == ModPackID)
                     {
                         QuickLogger.Debug($"Saving device: {controller.Value.UnitID}");
                         ((IFCSSave<SaveData>)controller.Value).Save(newSaveData,serializer);
@@ -180,7 +180,7 @@ namespace FCS_ProductionSolutions.Configuration
 
         internal static string GetSaveFileDirectory()
         {
-            return Path.Combine(SaveUtils.GetCurrentSaveDataDir(), ModName);
+            return Path.Combine(SaveUtils.GetCurrentSaveDataDir(), ModPackID);
         }
 
         internal static HydroponicHarvesterDataEntry GetHydroponicHarvesterSaveData(string id)

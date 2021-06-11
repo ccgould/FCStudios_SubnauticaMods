@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
+using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
+using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem;
 using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.Interfaces;
 using FCSCommon.Utilities;
 using Oculus.Newtonsoft.Json;
@@ -12,16 +15,13 @@ using UWE;
 
 namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
 {
-    internal class AlterraFabricatorStationController : MonoBehaviour, IDroneDestination
+    internal class AlterraFabricatorStationController : MonoBehaviour
     {
+        public static AlterraFabricatorStationController main;
         private const int PowercellReq = 5;
         internal bool IsPowerOn => Mod.GamePlaySettings.AlterraHubDepotPowercellSlot.Count >= PowercellReq && Mod.GamePlaySettings.BreakerOn;
-        public Transform[] StationDeparturePath { get; set; }
         public Transform BaseTransform { get; set; }
-        public List<Transform> GetPaths()
-        {
-            return StationDeparturePath.ToList();
-        }
+
 
         public void Offload(Dictionary<TechType, int> order, Action onOffloadCompleted)
         {
@@ -37,6 +37,8 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         private AntennaController _antenna;
 
         private readonly GameObject[] _electList = new GameObject[6];
+        private Dictionary<string, AlterraDronePortController> _ports = new Dictionary<string, AlterraDronePortController>();
+
 
 
         private void Awake()
@@ -44,10 +46,21 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             BaseId = gameObject.GetComponent<PrefabIdentifier>()?.Id;
             Mod.OnGamePlaySettingsLoaded += OnGamePlaySettingsLoaded;
             BaseTransform = transform;
+
+            main = this;
         }
         
         private void Start()
         {
+            var ports = GameObjectHelpers.FindGameObjects(gameObject, "DronePortPad_HubWreck",SearchOption.StartsWith).ToArray();
+
+            for (int i = 0; i < ports.Length; i++)
+            {
+                var portController = ports.ElementAt(i).AddComponent<AlterraDronePortController>();
+                _ports.Add($"Port_{i}", portController);
+                portController.Initialize();
+            }
+
             _generator = GameObjectHelpers.FindGameObject(gameObject, "Anim_Generator").AddComponent<GeneratorController>();
             _generator.Initialize(this);            
             
@@ -80,13 +93,18 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             
             //ToggleIsKinematic(); Disabled for dev use only
 
-            MaterialHelpers.ChangeEmissionColor(Buildables.AlterraHub.BaseDecalsEmissiveController, gameObject, Color.red);
-            MaterialHelpers.ChangeEmissionColor(Buildables.AlterraHub.BaseLightsEmissiveController, gameObject, Color.red);
-            MaterialHelpers.ChangeEmissionStrength(Buildables.AlterraHub.BaseLightsEmissiveController, gameObject, 2f);
-            MaterialHelpers.ChangeSpecSettings(Buildables.AlterraHub.BaseDecalsExterior, Buildables.AlterraHub.TBaseSpec, gameObject, 2.61f, 8f);
+            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.red);
+            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseLightsEmissiveController, gameObject, Color.red);
+            MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseLightsEmissiveController, gameObject, 2f);
+            MaterialHelpers.ChangeSpecSettings(AlterraHub.BaseDecalsExterior, AlterraHub.TBaseSpec, gameObject, 2.61f, 8f);
             Mod.LoadGamePlaySettings();
         }
-        
+
+
+        public AlterraDronePortController GetAvailablePort()
+        {
+            return _ports.ElementAt(0).Value;
+        }
 
         //For dev use only
         private void MoveToPlayer()
@@ -151,8 +169,8 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
 
         private void TurnOnLights()
         {
-            MaterialHelpers.ChangeEmissionColor(Buildables.AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
-            MaterialHelpers.ChangeEmissionColor(Buildables.AlterraHub.BaseLightsEmissiveController, gameObject, Color.white);
+            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
+            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseLightsEmissiveController, gameObject, Color.white);
             foreach (Light light in _lights)
             {
                 light.color = Color.white;

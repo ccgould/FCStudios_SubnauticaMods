@@ -83,7 +83,7 @@ namespace FCS_HomeSolutions.Spawnables
                 prefab.AddComponent<ObservationTankController>();
 
                 //Apply the glass shader here because of autosort lockers for some reason doesn't like it.
-                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModName);
+                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
 
                 return prefab;
             }
@@ -115,7 +115,7 @@ namespace FCS_HomeSolutions.Spawnables
 
         private void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.DecorationItemTabId, Mod.ModName);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.DecorationItemTabId, Mod.ModPackID);
         }
 
         private void OnEnable()

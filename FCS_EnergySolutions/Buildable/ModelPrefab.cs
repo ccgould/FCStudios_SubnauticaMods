@@ -16,18 +16,18 @@ namespace FCS_EnergySolutions.Buildable
         private static bool _initialized;
         internal static GameObject ColorItemPrefab { get; set; }
         internal static GameObject AlterraGenItemPrefab { get; set; }
-        internal static string BodyMaterial { get; } = $"{Mod.ModName}_COL";
-        internal static string SecondaryMaterial { get; } = $"{Mod.ModName}_COL_S";
-        internal static string DecalMaterial { get; } = $"{Mod.ModName}_DECALS";
-        internal static string DetailsMaterial { get; } = $"{Mod.ModName}_DETAILS";
-        internal static string SpecTexture { get; } = $"{Mod.ModName}_S";
-        internal static string LUMTexture { get; } = $"{Mod.ModName}_E";
-        internal static string NormalTexture { get; } = $"{Mod.ModName}_N";
-        internal static string DetailTexture => $"{Mod.ModName}_D";
+        internal static string BodyMaterial { get; } = $"{Mod.ModPackID}_COL";
+        internal static string SecondaryMaterial { get; } = $"{Mod.ModPackID}_COL_S";
+        internal static string DecalMaterial { get; } = $"{Mod.ModPackID}_DECALS";
+        internal static string DetailsMaterial { get; } = $"{Mod.ModPackID}_DETAILS";
+        internal static string SpecTexture { get; } = $"{Mod.ModPackID}_S";
+        internal static string LUMTexture { get; } = $"{Mod.ModPackID}_E";
+        internal static string NormalTexture { get; } = $"{Mod.ModPackID}_N";
+        internal static string DetailTexture => $"{Mod.ModPackID}_D";
         public static AssetBundle GlobalBundle { get; set; }
         public static AssetBundle ModBundle { get; set; }
-        public static string EmissiveBControllerMaterial { get;} = $"{Mod.ModName}_B_Controller";
-        public static string EmissiveControllerMaterial { get; } = $"{Mod.ModName}_E_Controller";
+        public static string EmissiveBControllerMaterial { get;} = $"{Mod.ModPackID}_B_Controller";
+        public static string EmissiveControllerMaterial { get; } = $"{Mod.ModPackID}_E_Controller";
         public static GameObject PowerStoragePrefab { get; set; }
         public static GameObject FrequencyItemPrefab { get; set; }
         public static GameObject PylonUpgradeDataBoxPrefab { get; set; }

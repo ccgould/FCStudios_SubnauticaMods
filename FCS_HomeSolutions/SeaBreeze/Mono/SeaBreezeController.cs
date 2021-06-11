@@ -52,7 +52,7 @@ namespace FCS_HomeSolutions.SeaBreeze.Mono
 
         private void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.SeaBreezeTabID, Mod.ModName);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.SeaBreezeTabID, Mod.ModPackID);
         }
 
         private void OnEnable()

@@ -27,7 +27,7 @@ namespace FCS_LifeSupportSolutions.Mods.EnergyPillVendingMachine.mono
 
         private void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.EnergyPillVendingMachineTabID, Mod.ModName);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.EnergyPillVendingMachineTabID, Mod.ModPackID);
         }
 
         public override Vector3 GetPosition()

@@ -33,12 +33,13 @@ namespace FCS_AlterraHub.Configuration
         private static ModSaver _saveObject;
         private static SaveData _saveData;
         private static bool _audioLoaded;
+        public const string ModPackID = "AlterraHub";
 
-        internal static string SaveDataFilename => $"{ModName}SaveData.json";
+        internal static string SaveDataFilename => $"{ModPackID}SaveData.json";
         
         private const string KnownDevicesFilename = "KnownDevices.json";
         internal const string AssetBundleName = "fcsalterrahubbundle";
-        internal const string ModName = "AlterraHub";
+
 
 
         internal const string AlterraHubClassID = "AlterraHub";
@@ -69,6 +70,12 @@ namespace FCS_AlterraHub.Configuration
         internal const string AlterraHubDepotDescription = "N/A";
         internal const string AlterraHubDepotPrefabName = "AlterraHubDepot";
         internal const string AlterraHubDepotTabID = "AHD";
+
+        internal const string DronePortPadHubNewClassID = "DronePortPad";
+        internal const string DronePortPadHubNewKitClassID = "DronePortPad_Kit";
+        internal const string DronePortPadHubNewFriendly = "Drone Port Pad";
+        internal const string DronePortPadHubNewDescription = "N/A";
+        internal const string DronePortPadHubNewTabID = "DPP";
 
         internal static TechType AlterraHubDepotTechType { get; set; }
         internal static TechType AlterraHubDepotFragmentTechType { get; set; }
@@ -337,7 +344,7 @@ namespace FCS_AlterraHub.Configuration
 
                 foreach (var controller in FCSAlterraHubService.PublicAPI.GetRegisteredDevices())
                 {
-                    if (controller.Value.PackageId == ModName)
+                    if (controller.Value.PackageId == ModPackID)
                     {
                         QuickLogger.Debug($"Saving device: {controller.Value.UnitID}");
                         ((IFCSSave<SaveData>) controller.Value).Save(newSaveData);
@@ -476,7 +483,7 @@ namespace FCS_AlterraHub.Configuration
             gameObject.transform.position = new Vector3(82.70f, -316.9f, -1434.7f);
             gameObject.transform.localRotation = Quaternion.Euler(348.7f,326.24f,43.68f);
             WorldHelpers.CreateBeacon(gameObject, AlterraHubStationPingType,"Alterra Hub Station");
-            MaterialHelpers.ApplyGlassShaderTemplate(gameObject, "_glass", Mod.ModName);
+            MaterialHelpers.ApplyGlassShaderTemplate(gameObject, "_glass", Mod.ModPackID);
             FCSStationSpawn = gameObject.FindChild("RespawnPoint");
             yield break;
         }
@@ -487,6 +494,8 @@ namespace FCS_AlterraHub.Configuration
         public static bool IsOreConsumerSpawned { get; set; }
         public static PingType AlterraHubStationPingType { get; set; }
         public static TechType StaffKeyCardTechType { get; set; }
+        public static TechType DronePortPadHubNewFragmentTechType { get; set; }
+        public static TechType AlterraTransportDroneTechType { get; set; }
 
         public static void DeepCopySave(AccountDetails accountDetails)
         {
@@ -511,7 +520,27 @@ namespace FCS_AlterraHub.Configuration
 
             return new AlterraHubDepotEntry { Id = id };
         }
+
+        public static AlterraDronePortEntry GetAlterraDronePortSaveData(string id)
+        {
+            LoadData();
+
+            var saveData = GetSaveData();
+
+            foreach (var entry in saveData.AlterraDronePortEntries)
+            {
+                if (string.IsNullOrEmpty(entry.Id)) continue;
+
+                if (entry.Id == id)
+                {
+                    return entry;
+                }
+            }
+
+            return new AlterraDronePortEntry { Id = id };
+        }
     }
+
 
     public class FCSGamePlaySettings
     {

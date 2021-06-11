@@ -152,7 +152,7 @@ namespace FCS_AlterraHub.Patches
                 // Move the FCS PDA
                 pda.transform.SetParent(defPDA.gameObject.transform.parent, false);
                 Utils.ZeroTransform(pda.transform);
-                MaterialHelpers.ApplyGlassShaderTemplate(pda, "_glass", Mod.ModName);
+                MaterialHelpers.ApplyGlassShaderTemplate(pda, "_glass", Mod.ModPackID);
             }
         }
 

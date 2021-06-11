@@ -26,7 +26,7 @@ namespace FCS_HomeSolutions.Mods.AlterraMiniShower.Mono
 
         private void Start()
         {
-            FCSAlterraHubService.PublicAPI.RegisterDevice(this, "AMB", Mod.ModName);
+            FCSAlterraHubService.PublicAPI.RegisterDevice(this, "AMB", Mod.ModPackID);
         }
         
         private void OnEnable()

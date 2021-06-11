@@ -19,16 +19,16 @@ namespace FCS_HomeSolutions.Buildables
         private static bool _initialized;
         internal static GameObject ColorItemPrefab { get; set; }
         internal static GameObject ItemPrefab { get; set; }
-        internal static string BodyMaterial => $"{Mod.ModName}_COL";
-        internal static string SecondaryMaterial => $"{Mod.ModName}_COL_S";
-        internal static string DecalMaterial => $"{Mod.ModName}_DECALS";
-        internal static string DetailsMaterial => $"{Mod.ModName}_DETAILS";
+        internal static string BodyMaterial => $"{Mod.ModPackID}_COL";
+        internal static string SecondaryMaterial => $"{Mod.ModPackID}_COL_S";
+        internal static string DecalMaterial => $"{Mod.ModPackID}_DECALS";
+        internal static string DetailsMaterial => $"{Mod.ModPackID}_DETAILS";
         internal const string CurtainDecalMaterial = "CurtainPackTemplate_Decal";
-        internal static string SpecTexture => $"{Mod.ModName}_S";
-        internal static string LUMTexture => $"{Mod.ModName}_E";
-        internal static string EmissionControllerMaterial => $"{Mod.ModName}_E_Controller";
-        internal static string NormalTexture => $"{Mod.ModName}_N";
-        internal static string DetailTexture => $"{Mod.ModName}_D";
+        internal static string SpecTexture => $"{Mod.ModPackID}_S";
+        internal static string LUMTexture => $"{Mod.ModPackID}_E";
+        internal static string EmissionControllerMaterial => $"{Mod.ModPackID}_E_Controller";
+        internal static string NormalTexture => $"{Mod.ModPackID}_N";
+        internal static string DetailTexture => $"{Mod.ModPackID}_D";
         public static AssetBundle GlobalBundle { get; set; }
         public static AssetBundle ModBundle { get; set; }
         internal static GameObject PaintToolPrefab { get; set; }
