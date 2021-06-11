@@ -33,7 +33,7 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MoreCyclopsUpgrades">
-      <HintPath>F:\Program Files (x86)\Steam\steamapps\common\Subnautica\QMods\MoreCyclopsUpgrades\MoreCyclopsUpgrades.dll</HintPath>
+      <HintPath>$(GameDir)\QMods\MoreCyclopsUpgrades\MoreCyclopsUpgrades.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="..\FCSCommon\FCSCommon.projitems" Label="Shared" />
