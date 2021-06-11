@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
@@ -14,25 +15,45 @@ using UWE;
 
 namespace FCS_AlterraHub.Patches
 {
-    [HarmonyPatch(typeof(Player))]
-    [HarmonyPatch("Update")]
-    public static class Player_Update_Patch
+    [HarmonyPatch]
+    public static class Player_Patches
     {
-        internal static Action OnPlayerUpdate; 
-        public static bool ForceOpenPDA { get; set; }
-        public static FCSPDAController FCSPDA;
-        private static Player _instance;
+        internal static Action OnPlayerUpdate;
+        internal static bool ForceOpenPDA { get; set; }
+        internal static FCSPDAController FCSPDA;
+        private static GameObject defPDA;
         private static bool _wasPlaying;
         private static bool _firstMissionAdded;
         private static float _time;
+        public static Transform SunTarget { get; private set; }
 
-
-        private static void Postfix(Player __instance)
+        [HarmonyPatch(typeof(Player), nameof(Player.Awake))]
+        [HarmonyPostfix]
+        private static void Awake_Postfix(Player __instance)
         {
+            __instance.gameObject.EnsureComponent<VoiceNotificationSystem>();
 
-            _instance = __instance;
+            var f = uSkyManager.main.SunLight.transform;
+            if (f != null)
+            {
+                QuickLogger.Debug("Found Directional Light");
+                var go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                go.transform.SetParent(f.transform, false);
+                Utils.ZeroTransform(go.transform);
+                go.transform.localPosition = new Vector3(0, 0, -50000);
+                SunTarget = go.transform;
+            }
+
+            CoroutineHost.StartCoroutine(CreateFcsPda(__instance));
+            CoroutineHost.StartCoroutine(Mod.SpawnAlterraFabStation());
+        }
+        
+        
+        [HarmonyPatch(typeof(Player), nameof(Player.Update))]
+        [HarmonyPostfix]
+        private static void Update_Postfix(Player __instance)
+        {
             OnPlayerUpdate?.Invoke();
-
             if (FCSPDA != null)
             {
                 FCSPDA.AudioTrack.isPlaying(out bool isPlaying);
@@ -75,116 +96,58 @@ namespace FCS_AlterraHub.Patches
                 BaseManager.RemoveDestroyedBases();
             }
         }
-    }
 
-    [HarmonyPatch(typeof(Player))]
-    [HarmonyPatch("Awake")]
-    public static class Player_Awake_Patch
-    {
+        [HarmonyPatch(typeof(Player), nameof(Player.GetPDA))]
         [HarmonyPostfix]
-        private static void Postfix(Player __instance)
+        private static void GetPDA_Postfix(Player __instance)
         {
-            if (Player_Update_Patch.FCSPDA == null)
-            {
-                QuickLogger.DebugError("FCSPDA IS NULL: Attempting to force creation", true);
-                PlayerGetPDA_Patch.ForceFCSPDACreation();
-            }
-
-            CreateVoiceNotificationSystem();
-
-            var f = uSkyManager.main.SunLight.transform;
-            if (f != null)
-            {
-                QuickLogger.Debug("Found Directional Light");
-                var go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                go.transform.SetParent(f.transform, false);
-                Utils.ZeroTransform(go.transform);
-                go.transform.localPosition = new Vector3(0, 0, -50000);
-                SunTarget = go.transform;
-            }
-
-            CoroutineHost.StartCoroutine(Mod.SpawnAlterraFabStation());
-
+            MoveFcsPdaIntoPosition(FCSPDA.gameObject);
         }
 
-        private static void CreateVoiceNotificationSystem()
-        {
-            Player.main.gameObject.EnsureComponent<VoiceNotificationSystem>();
-
-        }
-
-        public static Transform SunTarget { get; set; }
-    }
-
-
-    [HarmonyPatch(typeof(Player))]
-    [HarmonyPatch("GetPDA")]
-    internal static class PlayerGetPDA_Patch
-    {
-
+        [HarmonyPatch(typeof(Player), nameof(Player.OnProtoSerialize))]
         [HarmonyPostfix]
-        private static void Postfix(Player __instance)
+        private static void OnProtoSerialize_Postfix()
         {
-            var defPDA = __instance.pdaSpawn.spawnedObj;
-
-            if (Player_Update_Patch.FCSPDA != null) {
-
-                MoveFcsPdaIntoPosition(defPDA, Player_Update_Patch.FCSPDA.gameObject);
-                return;
-
-            }
-
-            var pda = CreateFcsPda(__instance);
-            MoveFcsPdaIntoPosition(defPDA, pda);
+            Mod.SaveGamePlaySettings();
+            Mod.Save();
         }
-
-        internal static void ForceFCSPDACreation()
+        
+        private static void MoveFcsPdaIntoPosition(GameObject pda)
         {
-            Postfix(Player.main);
-            QuickLogger.Info($"Forced FCS PDA Creation: {Player_Update_Patch.FCSPDA}");
-        }
-
-        private static void MoveFcsPdaIntoPosition(GameObject defPDA, GameObject pda)
-        {
-            if (defPDA != null && pda.transform.position != defPDA.transform.position)
+            if (defPDA != null)
             {
                 QuickLogger.Debug("DEFAULT PDA FOUND");
+                if (pda.transform.position == defPDA.transform.position) return;
                 // Move the FCS PDA
                 pda.transform.SetParent(defPDA.gameObject.transform.parent, false);
                 Utils.ZeroTransform(pda.transform);
                 MaterialHelpers.ApplyGlassShaderTemplate(pda, "_glass", Mod.ModPackID);
             }
+            else
+            {
+                QuickLogger.Error("DEFAULT PDA NOT FOUND!! THIS SHOULD NOT BE POSSIBLE!");
+            }
         }
 
-        private static GameObject CreateFcsPda(Player __instance)
+        private static IEnumerator CreateFcsPda(Player player)
         {
-            var pda = GameObject.Instantiate(AlterraHub.FcsPDAPrefab);
-            pda.SetActive(false);
+            yield return new WaitUntil(() => player.pdaSpawn.spawnedObj != null);
+
+            defPDA = player.pdaSpawn.spawnedObj;
+            
+            var pda = GameObject.Instantiate(AlterraHub.FcsPDAPrefab, default, default, false);
             var canvas = pda.GetComponentInChildren<Canvas>();
             if (canvas != null)
                 canvas.sortingLayerID = 1479780821;
 
             pda.EnsureComponent<Rigidbody>().isKinematic = true;
             var controller = pda.AddComponent<FCSPDAController>();
-            Player_Update_Patch.FCSPDA = controller;
-            FCSPDAController.SetInstance(controller);
-            controller.PDAObj = __instance.pdaSpawn.spawnedObj;
+            FCSPDA = controller;
+            controller.PDAObj = player.pdaSpawn.spawnedObj;
+            controller.SetInstance();
 
-            QuickLogger.Debug("FCS PDA FOUND");
-            return pda;
-        }
-
-        [HarmonyPatch(typeof(Player))]
-        [HarmonyPatch("OnProtoSerialize")]
-        internal static class PlayerOnProtoSerialize_Patch
-        {
-
-            [HarmonyPostfix]
-            private static void Postfix(Player __instance)
-            {
-                Mod.SaveGamePlaySettings();
-                Mod.Save();
-            }
+            QuickLogger.Debug("FCS PDA Created");
+            MoveFcsPdaIntoPosition(FCSPDA.gameObject);
         }
     }
 }

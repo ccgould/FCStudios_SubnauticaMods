@@ -107,7 +107,7 @@ namespace FCS_AlterraHub.Mono
             _registeredDevices = new Dictionary<string, FcsDevice>();
             _baseTechLights = new Dictionary<string, TechLight>();
             Initialize(habitat);
-            Player_Update_Patch.OnPlayerUpdate += Update;
+            Player_Patches.OnPlayerUpdate += Update;
 
         }
 

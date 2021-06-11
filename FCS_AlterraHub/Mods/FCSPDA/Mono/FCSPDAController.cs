@@ -92,68 +92,9 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
         public static FCSPDAController Instance => _instance;
         #endregion
 
-        private void Awake()
-        {
-            if (_instance != null && _instance != this)
-            {
-                Destroy(this.gameObject);
-            }
-            else
-            {
-                _instance = this;
-            }
-        }
-
-        internal static void SetInstance(FCSPDAController controller)
-        {
-            _instance = controller;
-        }
-
-        private void OnDestroy()
-        {
-            _accountPageHandler = null;
-            _cartDropDownManager.OnBuyAllBtnClick -= OnBuyAllBtnClick;
-            _isBeingDestroyed = true;
-        }
-
-        private void OnBuyAllBtnClick(CartDropDownHandler obj)
-        {
-            _checkoutDialog.ShowDialog(this, _cartDropDownManager);
-            _cartDropDownManager.ToggleVisibility();
-        }
-
-        private void Update()
-        {
-            sequence.Update();
-            if (sequence.active)
-            {
-                float b = (SNCameraRoot.main.mainCamera.aspect > 1.5f) ? cameraFieldOfView : cameraFieldOfViewAtFourThree;
-                SNCameraRoot.main.SetFov(Mathf.Lerp(MiscSettings.fieldOfView, b, sequence.t));
-            }
-
-            if (!ui.selected && IsOpen && AvatarInputHandler.main.IsEnabled())
-            {
-                ui.Select(false);
-            }
-
-            if (IsOpen && this.isFocused && (GameInput.GetButtonDown(GameInput.Button.PDA) || Input.GetKeyDown(QPatch.Configuration.FCSPDAKeyCode)))
-            {
-                this.Close();
-                return;
-            }
-
-            if (_clock != null)
-            {
-                _clock.text = WorldHelpers.GetGameTimeFormat();
-            }
-
-            FPSInputModule.current.EscapeMenu();
-        }
-
-        private void Start()
+        internal void SetInstance()
         {
             if (_isInitialized) return;
-            
             CreateScreen();
 
             _pdaAnchor = GameObjectHelpers.FindGameObject(gameObject, "ScreenAnchor").transform;
@@ -207,7 +148,53 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject,Color.cyan);
             InvokeRepeating(nameof(UpdateDisplay), .5f, .5f);
             InGameMenuQuitPatcher.AddEventHandlerIfMissing(OnQuit);
+            _instance = this;
             _isInitialized = true;
+        }
+
+        private void OnDestroy()
+        {
+            _accountPageHandler = null;
+            _cartDropDownManager.OnBuyAllBtnClick -= OnBuyAllBtnClick;
+            _isBeingDestroyed = true;
+        }
+
+        private void OnBuyAllBtnClick(CartDropDownHandler obj)
+        {
+            _checkoutDialog.ShowDialog(this, _cartDropDownManager);
+            _cartDropDownManager.ToggleVisibility();
+        }
+
+        private void Update()
+        {
+            sequence.Update();
+            if (sequence.active)
+            {
+                float b = (SNCameraRoot.main.mainCamera.aspect > 1.5f) ? cameraFieldOfView : cameraFieldOfViewAtFourThree;
+                SNCameraRoot.main.SetFov(Mathf.Lerp(MiscSettings.fieldOfView, b, sequence.t));
+            }
+
+            if (!ui.selected && IsOpen && AvatarInputHandler.main.IsEnabled())
+            {
+                ui.Select(false);
+            }
+
+            if (IsOpen && this.isFocused && (GameInput.GetButtonDown(GameInput.Button.PDA) || Input.GetKeyDown(QPatch.Configuration.FCSPDAKeyCode)))
+            {
+                this.Close();
+                return;
+            }
+
+            if (_clock != null)
+            {
+                _clock.text = WorldHelpers.GetGameTimeFormat();
+            }
+
+            FPSInputModule.current.EscapeMenu();
+        }
+
+        private void Start()
+        {
         }
 
         private void CreateScreen()
@@ -344,56 +331,38 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             CreateScreen();
 
             FindPDA();
-            QuickLogger.Debug("1");
             ChangePDAVisibility(false);
-            QuickLogger.Debug("2");
             if (_returnsDialogController?.IsOpen ?? false)
             {
                 _returnsDialogController.Open();
             }
-            QuickLogger.Debug("3");
             UpdateDisplay();
-            QuickLogger.Debug("4");
             DOFOperations();
-            QuickLogger.Debug("5");
             _pda.isInUse = true;
-            QuickLogger.Debug("6");
             var flag = InventorySlotHandler();
-            QuickLogger.Debug("7");
 
             if (!flag || main.cinematicModeActive)
             {
                 return;
             }
-            QuickLogger.Debug("7");
             MainCameraControl.main.SaveLockedVRViewModelAngle();
-            QuickLogger.Debug("8");
             IsOpen = true;
             gameObject.SetActive(true);
-            QuickLogger.Debug("9");
             sequence.Set(0.5f, true, Activated);
-            QuickLogger.Debug("10");
             UWE.Utils.lockCursor = false;
             if (HandReticle.main != null)
             {
                 HandReticle.main.RequestCrosshairHide();
             }
-            QuickLogger.Debug("11");
             Inventory.main.SetViewModelVis(false);
-            QuickLogger.Debug("12");
             _screen.SetActive(true);
-            QuickLogger.Debug("13");
             UwePostProcessingManager.OpenPDA();
-            QuickLogger.Debug("14");
             SafeAnimator.SetBool(Player.main.armsController.animator, "using_pda", true);
-            QuickLogger.Debug("15");
             _pda.ui.soundQueue.PlayImmediately(_pda.ui.soundOpen);
-            QuickLogger.Debug("16");
             if (_pda.screen.activeSelf)
             {
                 _pda.screen.SetActive(false);
             }
-            QuickLogger.Debug("17");
             QuickLogger.Debug("FCS PDA Is Open", true);
 
         }
@@ -764,7 +733,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
 
         public static void ForceOpen()
         {
-            Player_Update_Patch.ForceOpenPDA = true;
+            Player_Patches.ForceOpenPDA = true;
         }
     }
 }

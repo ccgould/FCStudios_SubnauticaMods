@@ -56,11 +56,11 @@ namespace FCS_EnergySolutions.Mods.AlterraSolarCluster.Mono
 
         private void Update()
         {
-            if(_mono != null && _mono.IsOperational && uSkyManager.main?.SunDir != null && FCS_AlterraHub.Patches.Player_Awake_Patch.SunTarget != null)
+            if(_mono != null && _mono.IsOperational && uSkyManager.main?.SunDir != null && FCS_AlterraHub.Patches.Player_Patches.SunTarget != null)
             {
                 if (_myTarget == null)
                 {
-                    _myTarget = FCS_AlterraHub.Patches.Player_Awake_Patch.SunTarget.transform;
+                    _myTarget = FCS_AlterraHub.Patches.Player_Patches.SunTarget.transform;
                 }
 
 

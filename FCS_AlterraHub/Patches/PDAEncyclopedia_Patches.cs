@@ -49,9 +49,8 @@ namespace FCS_AlterraHub.Patches
             if (FCSPDAController.Instance?.EncyclopediaTabController != null)
                 FCSPDAController.Instance.EncyclopediaTabController.OnAddEntry(node, verbose);
             else
-            {
                 CoroutineHost.StartCoroutine(HoldNotifications(node, verbose));
-            }
+            
             return false;
         }
 
@@ -76,10 +75,7 @@ namespace FCS_AlterraHub.Patches
         public static void Add_Postfix(string key, bool verbose)
         {
             if(FCSAlterraHubService.InternalAPI.EncyclopediaEntries.Any(x => x.ContainsKey(key)))
-            {
                 FCSAlterraHubService.PublicAPI.IsRegisteringEncyclopedia = true;
-            }
-
         }
     }
 }
