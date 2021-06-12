@@ -194,9 +194,6 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             FPSInputModule.current.EscapeMenu();
         }
 
-        private void Start()
-        {
-        }
 
         private void CreateScreen()
         {
@@ -302,6 +299,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             {
                 GoToPage(PDAPages.Home);
             }));
+            EncyclopediaTabController.Initialize();
         }
 
         private void UpdateDisplay()

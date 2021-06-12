@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Mods.FCSPDA.Mono;
 using FCS_AlterraHub.Mono;
+using FCS_AlterraHub.Registration;
+using FCS_AlterraHub.Structs;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
@@ -114,19 +118,12 @@ namespace FCS_AlterraHub.Patches
         
         private static void MoveFcsPdaIntoPosition(GameObject pda)
         {
-            if (defPDA != null)
-            {
-                QuickLogger.Debug("DEFAULT PDA FOUND");
-                if (pda.transform.position == defPDA.transform.position) return;
-                // Move the FCS PDA
-                pda.transform.SetParent(defPDA.gameObject.transform.parent, false);
-                Utils.ZeroTransform(pda.transform);
-                MaterialHelpers.ApplyGlassShaderTemplate(pda, "_glass", Mod.ModPackID);
-            }
-            else
-            {
-                QuickLogger.Error("DEFAULT PDA NOT FOUND!! THIS SHOULD NOT BE POSSIBLE!");
-            }
+            if (defPDA == null) return;
+            if (pda.transform.position == defPDA.transform.position) return;
+            // Move the FCS PDA
+            pda.transform.SetParent(defPDA.gameObject.transform.parent, false);
+            Utils.ZeroTransform(pda.transform);
+            MaterialHelpers.ApplyGlassShaderTemplate(pda, "_glass", Mod.ModPackID);
         }
 
         private static IEnumerator CreateFcsPda(Player player)
@@ -145,9 +142,19 @@ namespace FCS_AlterraHub.Patches
             FCSPDA = controller;
             controller.PDAObj = player.pdaSpawn.spawnedObj;
             controller.SetInstance();
-
+            
+            AddUnlockedEncyclopediaEntries(FCSAlterraHubService.InternalAPI.EncyclopediaEntries);
+            
             QuickLogger.Debug("FCS PDA Created");
             MoveFcsPdaIntoPosition(FCSPDA.gameObject);
+        }
+
+        private static void AddUnlockedEncyclopediaEntries(List<Dictionary<string, List<EncyclopediaEntryData>>> encyclopediaEntries)
+        {
+            foreach (var data in from entry in encyclopediaEntries from data in entry from entryData in data.Value where entryData.Unlocked select data)
+            {
+                PDAEncyclopedia.Add(data.Key, false);
+            }
         }
     }
 }

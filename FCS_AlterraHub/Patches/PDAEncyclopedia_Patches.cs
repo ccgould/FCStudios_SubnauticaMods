@@ -18,14 +18,13 @@ namespace FCS_AlterraHub.Patches
         [HarmonyPostfix]
         public static void Initialize_Postfix(ref PDAData pdaData)
         {
-            QuickLogger.Info("PDAEncyclopedia Initialize Post",true);
+            QuickLogger.Debug("PDAEncyclopedia Initialize Post",true);
             CraftNode node = new CraftNode("Root");
             CraftNode.Copy(PDAEncyclopedia.tree,node);
             EncyclopediaTabController.Tree = node;
-
             FCSAlterraHubService.InternalAPI.RegisterEncyclopediaEntries(FCSAlterraHubService.InternalAPI.EncyclopediaEntries);
 
-            QuickLogger.Info("PDAEncyclopedia Initialize Post Complete", true);
+            QuickLogger.Debug("PDAEncyclopedia Initialize Post Complete", true);
         }
 
         [HarmonyPatch(typeof(PDAEncyclopedia), nameof(PDAEncyclopedia.tree), MethodType.Getter)]
@@ -62,20 +61,26 @@ namespace FCS_AlterraHub.Patches
             yield break; 
         }  
         
+        [HarmonyPatch(typeof(PDAEncyclopedia), nameof(PDAEncyclopedia.GetParent))]
+        [HarmonyPrefix]
+        public static bool GetParent_Prefix(ref CraftNode __result, PDAEncyclopedia.EntryData entryData, bool create)
+        {
+            if (!FCSAlterraHubService.InternalAPI.EncyclopediaEntries.Any(x=>x.ContainsKey(entryData.key))) return true;
+
+            __result = FCSPDAController.Instance.EncyclopediaTabController.GetParent(entryData, create);
+            return false;
+        }
+
+        
         [HarmonyPatch(typeof(PDAEncyclopedia), nameof(PDAEncyclopedia.Add), new Type[]{typeof(string), typeof(PDAEncyclopedia.Entry), typeof(bool)})]
         [HarmonyPrefix]
-        public static void Add_Prefix(string key, bool verbose)
+        public static bool Add_Prefix(ref PDAEncyclopedia.EntryData __result, string key, PDAEncyclopedia.Entry entry, bool verbose)
         {
-            if (FCSAlterraHubService.InternalAPI.EncyclopediaEntries.Any(x=>x.ContainsKey(key)))
-                FCSAlterraHubService.PublicAPI.IsRegisteringEncyclopedia = true;
+            if (!FCSAlterraHubService.InternalAPI.EncyclopediaEntries.Any(x=>x.ContainsKey(key))) return true;
+
+            __result = FCSPDAController.Instance.EncyclopediaTabController.Add(key, entry, verbose);
+            return false;
         }
-        
-        [HarmonyPatch(typeof(PDAEncyclopedia), nameof(PDAEncyclopedia.Add),new Type[]{typeof(string), typeof(PDAEncyclopedia.Entry), typeof(bool)})]
-        [HarmonyPostfix]
-        public static void Add_Postfix(string key, bool verbose)
-        {
-            if(FCSAlterraHubService.InternalAPI.EncyclopediaEntries.Any(x => x.ContainsKey(key)))
-                FCSAlterraHubService.PublicAPI.IsRegisteringEncyclopedia = true;
-        }
+
     }
 }

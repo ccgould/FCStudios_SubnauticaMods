@@ -44,7 +44,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems
         private static readonly EntryComparer entryComparer = new EntryComparer();
         private PDAEncyclopedia.EntryData _currentEntryData;
 
-        private void Awake()
+        internal void Initialize()
         {
             title = GameObjectHelpers.FindGameObject(gameObject, "Title").GetComponent<Text>();
             message = GameObjectHelpers.FindGameObject(gameObject, "Description").GetComponent<Text>();
@@ -75,9 +75,50 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems
 
         internal void Refresh()
         {
+            Collapse(Tree);
             Expand(Tree);
         }
 
+        internal CraftNode GetParent(PDAEncyclopedia.EntryData entryData, bool create)
+        {
+            if (entryData == null)
+            {
+                return null;
+            }
+            string[] nodes = entryData.nodes;
+            Language main = Language.main;
+            CraftNode craftNode = Tree;
+            int i = 0;
+            int num = nodes.Length;
+            while (i < num)
+            {
+                string text = nodes[i];
+                TreeNode treeNode = craftNode[text];
+                if (treeNode == null)
+                {
+                    if (!create)
+                    {
+                        return null;
+                    }
+                    string pathString = craftNode.GetPathString('/', true, "EncyPath_", text);
+                    var node = new CraftNode(text, TreeAction.Expand, TechType.None)
+                    {
+                        string0 = pathString,
+                        string1 = main.Get(pathString)
+                    };
+                    SetupNode(node, craftNode.depth+1);
+                    treeNode = node;
+                    craftNode.AddNode(new TreeNode[]
+                    {
+                        treeNode
+                    });
+                }
+                craftNode = (treeNode as CraftNode);
+                i++;
+            }
+            return craftNode;
+        }
+        
         public bool OnButtonDown(string key, GameInput.Button button)
         {
             CraftNode craftNode = Tree.FindNodeById(key, false) as CraftNode;
@@ -241,12 +282,18 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems
                 }
                 else
                 {
-                    var nodeListEntry2 = GetNodeListEntry(craftNode2) ?? FixNode(craftNode2, craftNode);
-                    nodeListEntry2.gameObject.SetActive(true);
-
-                    if (GetNodeExpanded(craftNode2))
+                    uGUI_ListEntry entry = GetNodeListEntry(craftNode2);
+                    if (entry is not null)
                     {
-                        Expand(craftNode2);
+                        entry.gameObject.SetActive(true);
+                        if (GetNodeExpanded(craftNode2))
+                        {
+                            Expand(craftNode2);
+                        }
+                    }
+                    else
+                    {
+                        QuickLogger.Error($"{craftNode.id} has no object!");
                     }
                 }
             }
@@ -254,11 +301,9 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems
             node.Sort(entryComparer);
         }
 
-        private uGUI_ListEntry FixNode(CraftNode srcNode, CraftNode parentNode)
+        private void SetupNode(CraftNode srcNode, int depth)
         {
-            TreeAction action = srcNode.action;
-            int depth = parentNode.depth;
-            
+            var action = srcNode.action;
             UISpriteData spriteData;
             Sprite icon;
             float indent;
@@ -272,7 +317,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems
             {
                 if (action != TreeAction.Craft)
                 {
-                    return null;
+                    return;
                 }
                 spriteData = entryNodeSprites;
                 icon = null;
@@ -280,15 +325,14 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems
             }
             string @string = srcNode.string0;
             string string2 = srcNode.string1;
-
             uGUI_ListEntry entry = GetEntry();
             entry.Initialize(this, srcNode.id, spriteData);
             entry.SetIcon(icon);
             entry.SetIndent(indent);
-            entry.SetText(string2);
+            entry.SetText(srcNode.string1);
 
             srcNode.monoBehaviour0 = entry;
-            return entry;
+            SetNodeExpanded(srcNode, false);
         }
 
         private CraftNode ExpandTo(string id)
@@ -330,9 +374,52 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems
             return result;
         }
 
-        public void OnAddEntry(CraftNode srcNode, bool verbose)
+        public PDAEncyclopedia.EntryData Add(string key, PDAEncyclopedia.Entry entry, bool verbose)
         {
-            QuickLogger.Debug($"OnAddEntry {srcNode.string0} {srcNode.string1}");
+            if (PDAEncyclopedia.ContainsEntry(key)) return null;
+            
+            if (entry == null)
+            {
+                entry = new PDAEncyclopedia.Entry();
+                if (Application.isPlaying)
+                {
+                    entry.timestamp = DayNightCycle.main.timePassedAsFloat;
+                }
+            }
+            PDAEncyclopedia.entries.Add(key, entry);
+            PDAEncyclopedia.EntryData entryData;
+            if (PDAEncyclopedia.GetEntryData(key, out entryData))
+            {
+                entry.timeCapsuleId = null;
+            }
+            if (entryData == null || entryData.timeCapsule) return null;
+            
+            CraftNode parent = PDAEncyclopedia.GetParent(entryData, true);
+            if (parent[entryData.key] is not null) return null;
+            
+            var text = $"Ency_{entryData.key}";
+            var @string = Language.main.Get(text);
+            CraftNode craftNode = new CraftNode(entryData.key, TreeAction.Craft, TechType.None)
+            {
+                string0 = text,
+                string1 = @string
+            };
+            SetupNode(craftNode, parent.depth+1);
+            parent.AddNode(new CraftNode[]
+            {
+                craftNode
+            });
+            if (verbose)
+            {
+                NotificationManager.main.Add(NotificationManager.Group.Encyclopedia, entryData.key, 3f);
+                ExpandTo(craftNode.id);
+            }
+            PDAEncyclopedia.NotifyAdd(craftNode, verbose);
+            return entryData;
+        }
+        
+        internal void OnAddEntry(CraftNode srcNode, bool verbose)
+        {
             List<TreeNode> reversedPath = srcNode.GetReversedPath(true);
             CraftNode craftNode = Tree;
             bool flag = false;
@@ -483,7 +570,6 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems
                 return null;
             }
             string id = srcNode.id;
-
             if (parentNode[id] != null)
             {
                 QuickLogger.Debug($"Create Node SourceNode ParentNode {parentNode[id]} not null", true);
@@ -588,5 +674,6 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems
                 return string.Compare(strA, strB);
             }
         }
+
     }
 }

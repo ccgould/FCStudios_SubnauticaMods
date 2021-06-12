@@ -312,7 +312,6 @@ namespace FCS_AlterraHub.Registration
         
         public void RegisterEncyclopediaEntries(List<Dictionary<string, List<EncyclopediaEntryData>>> encyclopediaEntries)
         {
-            
             LanguageHandler.SetLanguageLine($"EncyPath_fcs", "Field Creators Studios");
 
             foreach (Dictionary<string, List<EncyclopediaEntryData>> entry in encyclopediaEntries)
@@ -348,6 +347,7 @@ namespace FCS_AlterraHub.Registration
                             }
                         }
 
+                        QuickLogger.Debug($"Registering entry {data.Key}");
                         PDAEncyclopedia.mapping.Add(data.Key, new PDAEncyclopedia.EntryData
                         {
                             audio = fModAsset,
@@ -359,11 +359,7 @@ namespace FCS_AlterraHub.Registration
                             unlocked = entryData.Unlocked
                         });
 
-                        if (entryData.Unlocked)
-                        {
-                            PDAEncyclopedia.Add(data.Key, false);
-                        }
-                        else
+                        if (!entryData.Unlocked)
                         {
                             if (TechTypeExtensions.FromString(entryData.UnlockedBy, out TechType techType, true))
                             {
@@ -387,7 +383,7 @@ namespace FCS_AlterraHub.Registration
                             }
                             else
                             {
-                                QuickLogger.Error($"Failed to Parse TechType to unlock Ency entry: {data.Key}", true);
+                                QuickLogger.Error($"Failed to Parse TechType {entryData.UnlockedBy} to unlock Ency entry: {data.Key}", true);
                             }
                         }
                     }
