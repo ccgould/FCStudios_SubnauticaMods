@@ -6,8 +6,10 @@ using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
+using FCS_AlterraHub.Mods.AlterraHubDepot.Mono;
 using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem;
 using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.Interfaces;
+using FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems;
 using FCSCommon.Utilities;
 using Oculus.Newtonsoft.Json;
 using UnityEngine;
@@ -17,7 +19,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
 {
     internal class AlterraFabricatorStationController : MonoBehaviour
     {
-        public static AlterraFabricatorStationController main;
+        public static AlterraFabricatorStationController Main;
         private const int PowercellReq = 5;
         internal bool IsPowerOn => Mod.GamePlaySettings.AlterraHubDepotPowercellSlot.Count >= PowercellReq && Mod.GamePlaySettings.BreakerOn;
         public Transform BaseTransform { get; set; }
@@ -30,24 +32,24 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
 
         public string BaseId { get; set; }
         private Light[] _lights;
-        private List<KeyPadAccessController> _keyPads = new List<KeyPadAccessController>();
-        private List<SecurityScreenController> _screens = new List<SecurityScreenController>();
+        private List<KeyPadAccessController> _keyPads = new();
+        private List<SecurityScreenController> _screens = new();
         private GeneratorController _generator;
         private MotorHandler _motor;
         private AntennaController _antenna;
 
         private readonly GameObject[] _electList = new GameObject[6];
-        private Dictionary<string, AlterraDronePortController> _ports = new Dictionary<string, AlterraDronePortController>();
-
-
-
+        private Dictionary<string, AlterraDronePortController> _ports = new();
+        private Dictionary<AlterraDronePortController, List<CartItem>> _pendingPurchase = new();
+        private HashSet<DroneController> _drones = new();
         private void Awake()
         {
+            Main = this;
             BaseId = gameObject.GetComponent<PrefabIdentifier>()?.Id;
             Mod.OnGamePlaySettingsLoaded += OnGamePlaySettingsLoaded;
             BaseTransform = transform;
-
-            main = this;
+            var lodGroup = gameObject.GetComponentInChildren<LODGroup>();
+            lodGroup.size = 4f;
         }
         
         private void Start()
@@ -98,8 +100,9 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseLightsEmissiveController, gameObject, 2f);
             MaterialHelpers.ChangeSpecSettings(AlterraHub.BaseDecalsExterior, AlterraHub.TBaseSpec, gameObject, 2.61f, 8f);
             Mod.LoadGamePlaySettings();
-        }
 
+            InvokeRepeating(nameof(TryShip),1f,1f);
+        }
 
         public AlterraDronePortController GetAvailablePort()
         {
@@ -142,8 +145,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
                 manager.Light = light;
             }
         }
-
-
+        
         private void OnGamePlaySettingsLoaded(FCSGamePlaySettings settings)
         {
             QuickLogger.Info($"On Game Play Settings Loaded {JsonConvert.SerializeObject(settings, Formatting.Indented)}");
@@ -205,6 +207,66 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             foreach (SecurityScreenController screen in _screens)
             {
                 screen.TurnOn();
+            }
+        }
+
+        public void PendAPurchase(AlterraDronePortController port, CartItem cartItem)
+        {
+            if (_pendingPurchase.ContainsKey(port))
+            {
+                _pendingPurchase[port].Add(cartItem);
+            }
+            else
+            {
+                _pendingPurchase.Add(port, new List<CartItem>{ cartItem });
+            }
+        }
+
+        internal void RegisterDrone(DroneController drone)
+        {
+            QuickLogger.Debug($"Registered Drone: {drone.GetId()}");
+            _drones.Add(drone);
+        }
+
+        public void TryShip()
+        {
+            if(!LargeWorldStreamer.main.IsWorldSettled() || _pendingPurchase.Count <= 0) return;
+
+            if (_drones.Count < 3)
+            {
+                if (!Mod.GamePlaySettings.TransDroneSpawned)
+                {
+                    foreach (KeyValuePair<string, AlterraDronePortController> port in _ports)
+                    {
+                        _drones.Add(port.Value.SpawnDrone());
+                    }
+
+                    Mod.GamePlaySettings.TransDroneSpawned = true;
+                }
+            }
+
+            for (int i = _pendingPurchase.Count - 1; i >= 0; i--)
+            {
+                foreach (DroneController drone in _drones)
+                {
+                    var purchase = _pendingPurchase.ElementAt(i);
+                    
+                    if (drone.GetDestinationID() == purchase.Key.UnitID || drone.GetState() != DroneController.DroneStates.Docked) continue;
+
+                    if (drone.ShipOrder(purchase.Value, drone.GetPort(), purchase.Key))
+                    {
+                        _pendingPurchase.Remove(purchase.Key);
+                    }
+                    if (_pendingPurchase.Count <= 0) break;
+                }
+            }
+        }
+
+        public IEnumerable<AlterraTransportDroneEntry> SaveDrones()
+        {
+            foreach (DroneController drone in _drones)
+            {
+                yield return drone.Save();
             }
         }
     }

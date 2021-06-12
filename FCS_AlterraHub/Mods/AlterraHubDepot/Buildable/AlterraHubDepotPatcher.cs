@@ -104,11 +104,6 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Buildable
                 prefab.AddComponent<AlterraHubDepotController>();
                 prefab.AddComponent<FCSGameLoadUtil>();
 
-                prefab.SetActive(false);
-                var fcsStorage = prefab.AddComponent<FCSStorage>();
-                fcsStorage.Initialize(48, 6, 8, Mod.AlterraHubDepotFriendly, Mod.AlterraHubDepotClassID);
-                prefab.SetActive(true);
-
                 //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
                 MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
                 return prefab;

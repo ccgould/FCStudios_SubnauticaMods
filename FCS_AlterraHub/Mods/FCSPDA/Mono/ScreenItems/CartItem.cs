@@ -57,7 +57,15 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems
         {
             return new CartItemSaveData { TechType = TechType, ReceiveTechType = ReceiveTechType, ReturnAmount = ReturnAmount};
         }
-}
+
+        public void Refund()
+        {
+            for (int i = 0; i < ReturnAmount; i++)
+            {
+                CardSystem.main.Refund(ReceiveTechType);
+            }
+        }
+    }
 
     internal struct CartItemSaveData
     {

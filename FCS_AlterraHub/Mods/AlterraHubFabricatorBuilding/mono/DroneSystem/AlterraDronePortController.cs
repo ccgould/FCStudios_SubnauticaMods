@@ -6,7 +6,9 @@ using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
+using FCS_AlterraHub.Mods.AlterraHubDepot.Mono;
 using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.Interfaces;
+using FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Structs;
@@ -25,19 +27,108 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
         private List<Transform> _paths;
         private List<PortDoorController> _doors = new List<PortDoorController>();
         private DroneController _assignedDrone;
-        public Transform BaseTransform { get; set; }
+        private GameObject _spawnPoint;
+        private DronePadEntryPoint _entryPoint;
 
-        public List<Dictionary<string, List<EncyclopediaEntryData>>> _enData =>
-            FCSAlterraHubService.InternalAPI.EncyclopediaEntries;
+        public override bool IsOperational => IsInitialized && IsConstructed;
+        public Transform BaseTransform { get; set; }
+        public bool IsFull => GetIsFull();
+
+        private bool GetIsFull()
+        {
+            var devices = Manager.GetDevices(Mod.AlterraHubDepotTabID);
+            return devices.Any(x => ((AlterraHubDepotController) x).IsFull());
+        }
 
         public List<Transform> GetPaths()
         {
             return _paths;
         }
 
-        public void Offload(Dictionary<TechType, int> order, Action onOffloadCompleted)
+        public Transform GetDockingPosition()
         {
-            onOffloadCompleted?.Invoke();
+            return _paths.Last();
+        }
+
+        void IDroneDestination.OpenDoors()
+        {
+            OpenDoors();
+        }
+
+        void IDroneDestination.CloseDoors()
+        {
+            CloseDoors();
+        }
+
+        public void DockDrone(DroneController droneController)
+        {
+            StartCoroutine(_entryPoint.DockDrone(droneController));
+        }
+
+        public string GetBaseName()
+        {
+            return Manager?.GetBaseName() ?? "Station Port";
+        }
+
+        public void Depart(DroneController droneController)
+        {
+            _entryPoint.Depart(droneController);
+        }
+
+        public void Offload(DroneController drone)
+        {
+
+            var order = drone.GetOrder();
+            
+            if (order == null)
+            {
+                QuickLogger.Error("Order was null when offloading.");
+                return;
+            };
+
+            var devices = Manager.GetDevices(Mod.AlterraHubDepotTabID);
+
+            if (devices == null)
+            {
+                QuickLogger.ModMessage( $"Failed to find any Hub Depots giving a refund.");
+                foreach (CartItem cartItem in order)
+                {
+                    cartItem.Refund();
+                }
+                
+                return;
+            }
+
+            var pendingItems = new List<TechType>();
+
+            foreach (CartItem cartItem in order)
+            {
+                for (int i = 0; i < cartItem.ReturnAmount; i++)
+                {
+                    pendingItems.Add(cartItem.ReceiveTechType);
+                }
+            }
+
+            foreach (FcsDevice device in devices)
+            {
+                var depot = (AlterraHubDepotController) device;
+                //var avaliableSpace = depot.GetFreeSlotsCount();
+
+                for (int i = pendingItems.Count - 1; i >= 0; i--)
+                {
+                    if (!depot.IsFull())
+                    {
+                        depot.AddItemToStorage(pendingItems[i]);
+                        pendingItems.RemoveAt(i);
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+            }
+            drone.OnOffloadCompleted();;
         }
 
         public override void Awake()
@@ -81,6 +172,11 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
         public override void Initialize()
         {
             _paths = GameObjectHelpers.FindGameObject(gameObject, "DronePort_DockingPaths").GetChildrenT().ToList();
+            GameObjectHelpers.FindGameObject(gameObject, "DockTrigger").AddComponent<DockTriggerController>();
+
+           _entryPoint =  _paths[0].gameObject.AddComponent<DronePadEntryPoint>();
+
+            _spawnPoint = GameObjectHelpers.FindGameObject(gameObject, "SpawnPoint");
 
             var doors = GameObjectHelpers.FindGameObjects(gameObject, "DockingPadDoor", SearchOption.StartsWith);
 
@@ -94,15 +190,23 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 
             CreateLadders();
 
+            if (_colorManager == null)
+            {
+                _colorManager = gameObject.AddComponent<ColorManager>();
+                _colorManager.Initialize(gameObject,AlterraHub.BasePrimaryCol);
+            }
+
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
+
+            IsInitialized = true;
         }
 
-        internal void SpawnDrone()
+        internal DroneController SpawnDrone()
         {
-            var lastWayPoint = _paths.GetLast();
-            var drone = GameObject.Instantiate(CraftData.GetPrefabForTechType(Mod.AlterraTransportDroneTechType),lastWayPoint.position,lastWayPoint.rotation);
+            var drone = GameObject.Instantiate(CraftData.GetPrefabForTechType(Mod.AlterraTransportDroneTechType), _spawnPoint.transform.position, _spawnPoint.transform.rotation);
             _assignedDrone = drone.GetComponent<DroneController>();
             _assignedDrone.Initialize(this);
+            return _assignedDrone;
         }
         
         internal void OpenDoors()
@@ -119,11 +223,13 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
             {
                 door.Close();
             }
+
+            QuickLogger.Debug($"Closing {GetBaseName()} doors:");
         }
 
         private void TestTransfer()
         {
-            _assignedDrone.ShipOrder(new Dictionary<TechType, int>{{TechType.Copper,1}}, this,AlterraFabricatorStationController.main.GetAvailablePort());
+            //_assignedDrone.ShipOrder(new Dictionary<TechType, int>{{TechType.Copper,1}}, this,AlterraFabricatorStationController.main.GetAvailablePort());
         }
 
         private void CreateLadders()
@@ -213,63 +319,27 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
             reason = string.Empty;
             return true;
         }
-    }
 
-    internal class PortDoorController : MonoBehaviour
-    {
-        private Vector3 closedPos;
-        private Vector3 openPos;
-        private bool doorOpen;
-        private FMOD_CustomEmitter _openSound;
-
-        private void Start()
+        public bool HasRoomFor(List<Vector2int> sizes)
         {
-            closedPos = transform.position;
-            openPos = transform.TransformPoint(new Vector3(OpenPosX, 0f, 0f));
+            var devices = Manager.GetDevices(Mod.AlterraHubDepotTabID);
 
-            _openSound = gameObject.AddComponent<FMOD_CustomEmitter>();
-            var openDoor = ScriptableObject.CreateInstance<FMODAsset>();
-            openDoor.id = "keypad_door_open";
-            openDoor.path = "event:/env/keypad_door_open";
-            _openSound.asset = openDoor;
-            _openSound.restartOnPlay = true;
+            var totalsizeReq = sizes.Sum(x => x.x) + sizes.Sum(x => x.y);
 
-            if (StartDoorOpen || doorOpen)
+            int total = 0;
+
+            foreach (FcsDevice fcsDevice in devices)
             {
-                doorOpen = true;
-                transform.position = openPos;
+                var device = (AlterraHubDepotController)fcsDevice;
+                total += device.GetFreeSlotsCount();
             }
+
+            return total >= totalsizeReq;
         }
 
-        public float OpenPosX { get; set; }
-
-        public bool StartDoorOpen { get; set; }
-
-        private void Update()
+        public string GetStatus()
         {
-            Vector3 vector = transform.position;
-            vector = Vector3.Lerp(vector, doorOpen ? openPos : closedPos, Time.deltaTime * 2f);
-            transform.position = vector;
-        }
-
-        public void Open()
-        {
-            doorOpen = true;
-            PlaySound();
-        }
-
-        private void PlaySound()
-        {
-            if (_openSound)
-            {
-                _openSound.Play();
-            }
-        }
-
-        public void Close()
-        {
-            doorOpen = false;
-            PlaySound();
+            return "N/A";
         }
     }
 }

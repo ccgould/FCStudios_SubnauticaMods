@@ -417,5 +417,10 @@ namespace FCS_AlterraHub.Systems
         {
             return _accountDetails;
         }
+
+        public void Refund(TechType techType, bool checkIfKit = true)
+        {
+            AddFinances( StoreInventorySystem.GetPrice(techType, checkIfKit));
+        }
     }
 }

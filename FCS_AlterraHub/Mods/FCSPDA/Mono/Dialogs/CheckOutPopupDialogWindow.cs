@@ -3,6 +3,7 @@ using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mods.AlterraHubDepot.Mono;
+using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem;
 using FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Helpers;
@@ -27,7 +28,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
         public UnityEvent onCheckOutPopupDialogClosed = new UnityEvent();
         private DestinationDialogController _destinationDialogController;
         private Text _destinationText;
-        internal AlterraHubDepotController SelectedDestination { get; set; }
+        internal AlterraDronePortController SelectedDestination { get; set; }
 
         private void Initialize(FCSPDAController mono)
         {
@@ -121,7 +122,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
 
         private void CreatePurchaseExitButton()
         {
-            var purchaseBTN = GameObjectHelpers.FindGameObject(gameObject, "PurchaseExitBTN").GetComponent<Button>();
+            var purchaseBTN = GameObjectHelpers.FindGameObject(_mono.ui.gameObject, "PurchaseExitBTN").GetComponent<Button>();
             purchaseBTN.onClick.AddListener(() =>
             {
                 QuickLogger.Debug("Purchase Button Clicked", true);
@@ -134,12 +135,12 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
 
         private void CreateDestinationPopup()
         {
-            var destinationPopDiag = GameObjectHelpers.FindGameObject(_mono.gameObject, "DestinationPopUp");
+            var destinationPopDiag = GameObjectHelpers.FindGameObject(_mono.ui.gameObject, "DestinationPopUp");
             _destinationDialogController = destinationPopDiag.AddComponent<DestinationDialogController>();
             _destinationDialogController.Initialize(this);
             _destinationDialogController.OnClose += () =>
             {
-                    _destinationText.text = $"Destination: {SelectedDestination?.DepotName}";
+                _destinationText.text = $"Destination: {SelectedDestination?.Manager.GetBaseName()}";
             };
         }
 

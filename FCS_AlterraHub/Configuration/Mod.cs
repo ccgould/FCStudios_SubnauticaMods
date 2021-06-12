@@ -351,6 +351,15 @@ namespace FCS_AlterraHub.Configuration
                     }
                 }
 
+                if (AlterraFabricatorStationController.Main != null)
+                {
+                    foreach (AlterraTransportDroneEntry entry in AlterraFabricatorStationController.Main.SaveDrones())
+                    {
+                        if(entry != null)
+                            newSaveData.AlterraTransportDroneEntries.Add(entry);
+                    }
+                }
+
                 QuickLogger.Debug("Attempting to save bases",true);
                 newSaveData.BaseSaves = BaseManager.Save().ToList();
                 QuickLogger.Debug($"Save 1 {Player_Patches.FCSPDA}", true);
@@ -477,12 +486,12 @@ namespace FCS_AlterraHub.Configuration
         {
             GameObject gameObject = GameObject.Instantiate(Buildables.AlterraHub.AlterraHubFabricatorPrefab);
             gameObject.AddComponent<AlterraFabricatorStationController>();
-            
+
             LargeWorldEntity.Register(gameObject);
             //gameObject.transform.position = new Vector3(-809.10f, -241.30f, -387.70f); //First Position
             gameObject.transform.position = new Vector3(82.70f, -316.9f, -1434.7f);
-            gameObject.transform.localRotation = Quaternion.Euler(348.7f,326.24f,43.68f);
-            WorldHelpers.CreateBeacon(gameObject, AlterraHubStationPingType,"Alterra Hub Station");
+            gameObject.transform.localRotation = Quaternion.Euler(348.7f, 326.24f, 43.68f);
+            WorldHelpers.CreateBeacon(gameObject, AlterraHubStationPingType, "Alterra Hub Station");
             MaterialHelpers.ApplyGlassShaderTemplate(gameObject, "_glass", Mod.ModPackID);
             FCSStationSpawn = gameObject.FindChild("RespawnPoint");
             yield break;
@@ -539,6 +548,25 @@ namespace FCS_AlterraHub.Configuration
 
             return new AlterraDronePortEntry { Id = id };
         }
+
+        public static AlterraTransportDroneEntry GetAlterraTransportDroneSaveData(string id)
+        {
+            LoadData();
+
+            var saveData = GetSaveData();
+
+            foreach (var entry in saveData.AlterraTransportDroneEntries)
+            {
+                if (string.IsNullOrEmpty(entry.Id)) continue;
+
+                if (entry.Id == id)
+                {
+                    return entry;
+                }
+            }
+
+            return new AlterraTransportDroneEntry { Id = id };
+        }
     }
 
 
@@ -551,6 +579,7 @@ namespace FCS_AlterraHub.Configuration
         public bool IsPDAUnlocked;
         public HashSet<int> FixedPowerBoxes = new HashSet<int>();
         public HashSet<string> Conditions = new HashSet<string>();
+        public bool TransDroneSpawned { get; set; }
 
         public bool ConditionMet(string condition)
         {

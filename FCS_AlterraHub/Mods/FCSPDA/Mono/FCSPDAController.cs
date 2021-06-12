@@ -8,6 +8,8 @@ using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mods.AlterraHubDepot.Mono;
+using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono;
+using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem;
 using FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs;
 using FCS_AlterraHub.Mods.FCSPDA.Mono.Model;
 using FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems;
@@ -472,7 +474,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             uGUI_PowerIndicator_Initialize_Patch.MissionHUD.ShowMessage("Hi","Eggo"); 
         }
 
-        internal bool MakeAPurchase(CartDropDownHandler cart, AlterraHubDepotController depot = null, bool giveToPlayer = false)
+        internal bool MakeAPurchase(CartDropDownHandler cart, AlterraDronePortController depot = null, bool giveToPlayer = false)
         {
             var totalCash = cart.GetTotal();
             var sizes = GetSizes(cart);
@@ -504,10 +506,11 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
 
                 foreach (var cartItem in cart.GetItems())
                 {
-                    for (int i = 0; i < cartItem.ReturnAmount; i++)
-                    {
-                        depot.AddItemToStorage(cartItem.ReceiveTechType.ToInventoryItemLegacy());
-                    }
+                    AlterraFabricatorStationController.Main.PendAPurchase(depot, cartItem);
+                    //for (int i = 0; i < cartItem.ReturnAmount; i++)
+                    //{
+                    //    depot.AddItemToStorage(cartItem.ReceiveTechType.ToInventoryItemLegacy());
+                    //}
                 }
             }
 

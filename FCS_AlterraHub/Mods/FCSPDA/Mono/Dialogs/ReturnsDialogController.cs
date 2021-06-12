@@ -33,7 +33,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
                 {
                     if (toggle.IsChecked)
                     {
-                        CardSystem.main.AddFinances(StoreInventorySystem.GetPrice(toggle.InventoryItem.item.GetTechType(), true));
+                        CardSystem.main.Refund(toggle.InventoryItem.item.GetTechType());
                         Destroy(toggle.InventoryItem.item.gameObject);
                         break;
                     }

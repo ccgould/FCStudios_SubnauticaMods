@@ -23,11 +23,16 @@
     <Compile Include="API\FCSAssetBundlesService.cs" />
     <Compile Include="Buildables\AlterraHubAuxPatcher.cs" />
     <Compile Include="Buildables\AlterraHubModelPrefab.cs" />
+    <Compile Include="Model\GUI\StorageInventoryButton.cs" />
     <Compile Include="Model\LadderController.cs" />
     <Compile Include="Mods\AlterraHubFabricatorBuilding\Buildables\DronePortPadHubNewPatcher.cs" />
+    <Compile Include="Mods\AlterraHubFabricatorBuilding\Mono\DroneSystem\AirThrusterController.cs" />
+    <Compile Include="Mods\AlterraHubFabricatorBuilding\Mono\DroneSystem\DockTriggerController.cs" />
     <Compile Include="Mods\AlterraHubFabricatorBuilding\Mono\DroneSystem\DroneController.cs" />
     <Compile Include="Mods\AlterraHubFabricatorBuilding\Mono\DroneSystem\AlterraDronePortController.cs" />
+    <Compile Include="Mods\AlterraHubFabricatorBuilding\Mono\DroneSystem\DronePadEntryPoint.cs" />
     <Compile Include="Mods\AlterraHubFabricatorBuilding\Mono\DroneSystem\Interfaces\IDroneDestination.cs" />
+    <Compile Include="Mods\AlterraHubFabricatorBuilding\Mono\DroneSystem\PortDoorController.cs" />
     <Compile Include="Mods\AlterraHubFabricatorBuilding\Mono\LightManager.cs" />
     <Compile Include="Mods\AlterraHubFabricatorBuilding\Spawnables\DronePortPadHubNewFragSpawnable.cs" />
     <Compile Include="Mods\AlterraHubFabricatorBuilding\Spawnables\AlterraTransportDroneSpawnable.cs" />

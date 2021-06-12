@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Mods.AlterraHubDepot.Mono;
+using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem;
 using FCS_AlterraHub.Registration;
 using UnityEngine;
 using UnityEngine.UI;
@@ -52,9 +53,9 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
                 _toggles.Remove(item);
             }
 
-            foreach (var fcsDevice in FCSAlterraHubService.PublicAPI.GetRegisteredDevicesOfId(Mod.AlterraHubDepotTabID))
+            foreach (var fcsDevice in FCSAlterraHubService.PublicAPI.GetRegisteredDevicesOfId(Mod.DronePortPadHubNewTabID))
             {
-                var depot = (AlterraHubDepotController)fcsDevice.Value;
+                var depot = (AlterraDronePortController)fcsDevice.Value;
                 if(!depot.IsOperational) continue;
                 var depotPrefab = GameObject.Instantiate(Buildables.AlterraHub.AlterraHubDepotItemPrefab);
                 var controller = depotPrefab.AddComponent<AlterraHubDepotItemController>();

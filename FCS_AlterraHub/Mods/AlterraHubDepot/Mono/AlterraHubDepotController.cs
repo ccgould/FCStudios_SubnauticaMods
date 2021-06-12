@@ -1,67 +1,42 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Configuration;
+using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Interfaces;
+using FCS_AlterraHub.Model.GUI;
 using FCS_AlterraHub.Mods.FCSPDA.Mono;
 using FCS_AlterraHub.Mono;
+using FCS_AlterraHub.Mono.Controllers;
 using FCS_AlterraHub.Registration;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Utility;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace FCS_AlterraHub.Mods.AlterraHubDepot.Mono
 {
-    internal class AlterraHubDepotController: FcsDevice, IFCSSave<SaveData>,IHandTarget
+    internal class AlterraHubDepotController: FcsDevice, IFCSSave<SaveData>, IFCSDisplay
     {
         private bool _isFromSave;
         private bool _runStartUpOnEnable;
         private AlterraHubDepotEntry _savedData;
-        private FCSStorage _storage;
-        private GameObject _door;
-        private bool _isOpen;
         private Text _status;
-        private float ClosePos { get; } = 0.2897835f;
-        private float OpenPos { get; } = -0.193f;
-        private const float Speed = 500f;
+        private GridHelperV2 _inventoryGrid;
         public override bool IsOperational => IsConstructed && IsInitialized;
+        private readonly List<StorageInventoryButton> _inventoryButtons = new();
+        private Dictionary<TechType, int> _storage = new();
+        private PaginatorController _paginatorController;
+        private bool _isBeingDestroyed;
+        private const int MAXSTORAGE = 48;
 
         private void Start()
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.AlterraHubDepotTabID, Mod.ModPackID);
             RefreshUI();
-        }
-
-        private void Update()
-        {
-            if (_door == null) return;
-
-            if (_isOpen)
-            {
-                if (_door.transform.localPosition.y < OpenPos)
-                {
-                    _door.transform.Translate(Vector3.up * Speed * DayNightCycle.main.deltaTime);
-                }
-
-                if (_door.transform.localPosition.y > OpenPos)
-                {
-                    _door.transform.localPosition = new Vector3(_door.transform.localPosition.x, OpenPos, _door.transform.localPosition.z);
-                }
-            }
-            else
-            {
-                if (_door.transform.localPosition.y > ClosePos)
-                {
-                    _door.transform.Translate(-Vector3.up * Speed * DayNightCycle.main.deltaTime);
-                }
-
-                if (_door.transform.localPosition.y < ClosePos)
-                {
-                    _door.transform.localPosition = new Vector3(_door.transform.localPosition.x, ClosePos, _door.transform.localPosition.z);
-                }
-            }
         }
 
         private void OnEnable()
@@ -81,6 +56,11 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Mono
                     }
 
                     _colorManager.ChangeColor(_savedData.BodyColor.Vector4ToColor(), ColorTargetMode.Both);
+                    if (_savedData.Storage != null)
+                    {
+                        _storage = _savedData.Storage;
+                        _inventoryGrid.DrawPage();
+                    }
                 }
 
                 _runStartUpOnEnable = false;
@@ -90,21 +70,12 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Mono
         public override void OnDestroy()
         {
             base.OnDestroy();
-            if (_storage != null)
-            {
-                _storage.OnContainerClosed -= OnContainerClosed;
-                _storage.OnContainerOpened -= OnContainerOpened;
-            }
+            _isBeingDestroyed = true;
         }
 
         public override void Initialize()
         {
             if (IsInitialized) return;
-
-            if (_door == null)
-            {
-                _door = GameObjectHelpers.FindGameObject(gameObject, "door_controller");
-            }
 
             if (_colorManager == null)
             {
@@ -112,39 +83,92 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Mono
                 _colorManager.Initialize(gameObject, Buildables.AlterraHub.BodyMaterial);
             }
 
-            if (_storage == null)
+            foreach (Transform invItem in GameObjectHelpers.FindGameObject(gameObject, "Grid").transform)
             {
-                _storage = gameObject.GetComponent<FCSStorage>();
-                _storage.SlotsAssigned = 48;
-                _storage.OnContainerClosed += OnContainerClosed;
-                _storage.OnContainerOpened += OnContainerOpened;
-                _storage.container.onAddItem += (inv) =>
-                {
-                    RefreshUI();
-                };
-
-                _storage.container.onRemoveItem += (inv) =>
-                {
-                    RefreshUI();
-                };
-
-                _status = GameObjectHelpers.FindGameObject(gameObject, "Status").GetComponent<Text>();
-
-                _storage.Deactivate();
-                _storage.NotAllowedToAddItems = true;
+                var invButton = invItem.gameObject.EnsureComponent<StorageInventoryButton>();
+                invButton.ButtonMode = InterfaceButtonMode.Background;
+                invButton.BtnName = "InventoryBTN";
+                invButton.OnButtonClick += OnButtonClick;
+                _inventoryButtons.Add(invButton);
             }
+
+            var canvas = gameObject.GetComponentInChildren<Canvas>();
+            //_interactionHelper = canvas.gameObject.AddComponent<InterfaceInteraction>();
+
+            _inventoryGrid = gameObject.EnsureComponent<GridHelperV2>();
+            _inventoryGrid.OnLoadDisplay += OnLoadItemsGrid;
+            _inventoryGrid.Setup(28, gameObject, Color.gray, Color.white, OnButtonClick);
+
+            _paginatorController = GameObjectHelpers.FindGameObject(gameObject, "Paginator").AddComponent<PaginatorController>();
+            _paginatorController.Initialize(this);
+
             MaterialHelpers.ChangeEmissionColor(Buildables.AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
             IsInitialized = true;
         }
 
-        private void OnContainerOpened()
+        private void OnLoadItemsGrid(DisplayData data)
         {
-            _isOpen = true;
+            try
+            {
+                if (_isBeingDestroyed || _storage == null || _inventoryButtons == null || _inventoryGrid == null || _paginatorController == null) return;
+
+                var grouped = _storage;
+
+                if (grouped == null) return;
+
+                if (data.EndPosition > grouped.Count)
+                {
+                    data.EndPosition = grouped.Count;
+                }
+
+                for (int i = 0; i < data.MaxPerPage; i++)
+                {
+                    _inventoryButtons[i].Reset();
+                }
+
+                int w = 0;
+
+                for (int i = data.StartPosition; i < data.EndPosition; i++)
+                {
+                    _inventoryButtons[w++].Set(grouped.ElementAt(i).Key, grouped.ElementAt(i).Value);
+                }
+
+                RefreshUI();
+                _inventoryGrid.UpdaterPaginator(grouped.Count);
+                _paginatorController.ResetCount(_inventoryGrid.GetMaxPages());
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error("Error Caught");
+                QuickLogger.Error($"Error Message: {e.Message}");
+                QuickLogger.Error($"Error StackTrace: {e.StackTrace}");
+            }
         }
 
-        private void OnContainerClosed()
+        private void OnButtonClick(string arg1, object arg2)
         {
-            _isOpen = false;
+            switch (arg1)
+            {
+                case "InventoryBTN":
+                    var size = CraftData.GetItemSize((TechType)arg2);
+                    if (Inventory.main.HasRoomFor(size.x, size.y))
+                    {
+                        PlayerInteractionHelper.GivePlayerItem(RemoveItemFromContainer((TechType)arg2));
+                    }
+                    break;
+            }
+        }
+
+        public override Pickupable RemoveItemFromContainer(TechType techType)
+        {
+            if (!_storage.ContainsKey(techType)) return null;
+            _storage[techType] -= 1;
+            if (_storage[techType] <= 0)
+            {
+                _storage.Remove(techType);
+            }
+            _inventoryGrid.DrawPage();
+            return techType.ToPickupable();
         }
 
         public override void OnProtoSerialize(ProtobufSerializer serializer)
@@ -174,7 +198,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Mono
         public override bool CanDeconstruct(out string reason)
         {
             reason = string.Empty;
-            if (!(_storage?.container?.count > 0)) return true;
+            if (_storage.Count == 0) return true;
             reason = Buildables.AlterraHub.NotEmpty();
             return false;
         }
@@ -213,6 +237,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Mono
             _savedData.Id = GetPrefabID();
             _savedData.BodyColor = _colorManager.GetColor().ColorToVector4();
             _savedData.BaseId = BaseId;
+            _savedData.Storage = _storage;
             QuickLogger.Debug($"Saving ID {_savedData.Id}", true);
             newSaveData.AlterraHubDepotEntries.Add(_savedData);
         }
@@ -231,7 +256,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Mono
         public void OnHandHover(GUIHand hand)
         {
             if (!IsConstructed || !IsInitialized) return;
-            HandReticle.main.SetInteractText($"{Mod.AlterraHubDepotFriendly} | UnitID: {UnitID} | Depot Name: {DepotName}", _storage.IsEmpty() ? "Empty" : string.Empty);
+            HandReticle.main.SetInteractText($"{Mod.AlterraHubDepotFriendly} | UnitID: {UnitID} | Depot Name: {DepotName}", _storage.Count == 0 ? "Empty" : string.Empty);
             HandReticle.main.SetIcon(HandReticle.IconType.Hand, 1f);
             if (Input.GetKeyDown(QPatch.Configuration.PDAInfoKeyCode))
             {
@@ -240,45 +265,59 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Mono
         }
 
         public string DepotName => $"{UnitID} : Depot";
-
-        public void OnHandClick(GUIHand hand)
-        {
-            if (!IsConstructed || !IsInitialized || _storage.IsEmpty()) return;
-            _storage.Open(transform);
-        }
-
+        
         internal string GetUnitName()
         {
             return DepotName;
         }
-
-        internal bool HasRoomFor(TechType techType)
+        
+        internal bool AddItemToStorage(TechType item)
         {
-            var size = CraftData.GetItemSize(techType);
-            return _storage.container.HasRoomFor(size.x, size.y);
-        }
+            if(IsFull()) return false;
+            if (_storage.ContainsKey(item))
+            {
+                _storage[item] += 1;
+            }
+            else
+            {
+                _storage.Add(item,1);
+            }
 
-        internal bool HasRoomFor(List<Vector2int> techTypes)
-        {
-            return _storage.container.HasRoomFor(techTypes);
-        }
+            _inventoryGrid.DrawPage();
 
-        internal void AddItemToStorage(InventoryItem item)
-        {
-            _storage.AddItemToContainer(item);
+            return true;
         }
 
         public string GetStatus()
         {
-            return _storage.container.IsFull() ? "Full" : "Ready";
+            return IsFull() ? "Full" : "Ready";
         }
 
-        public bool IsFull => _storage.container.IsFull();
+        public bool IsFull()
+        {
+            var sum = _storage.Sum(x => x.Value);
+            return sum >= MAXSTORAGE;
+        }
 
         public override void RefreshUI()
         {
             if (_status == null || _storage == null) return;
-            _status.text = _storage.container.count > 0 ? "PICK AVALIABLE" : "EMPTY";
+            _status.text = _storage.Count > 0 ? "PICK AVAILABLE" : "EMPTY";
+        }
+
+        public int GetFreeSlotsCount()
+        {
+            return MAXSTORAGE - _storage.Count;
+        }
+
+        public void GoToPage(int index)
+        {
+            _inventoryGrid.DrawPage(index);
+        }
+
+        public void GoToPage(int index, PaginatorController sender)
+        {
+            _inventoryGrid.DrawPage(index);
         }
     }
 }
