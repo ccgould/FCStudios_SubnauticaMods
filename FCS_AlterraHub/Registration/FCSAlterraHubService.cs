@@ -56,6 +56,7 @@ namespace FCS_AlterraHub.Registration
     internal interface IFCSAlterraHubServiceInternal
     {
         List<Dictionary<string, List<EncyclopediaEntryData>>> EncyclopediaEntries { get; set; }
+        Dictionary<PingType, string> PingTypes { get; set; }
         void RegisterEncyclopediaEntries(List<Dictionary<string, List<EncyclopediaEntryData>>> encyclopediaEntries);
 
     }
@@ -76,6 +77,9 @@ namespace FCS_AlterraHub.Registration
 
         public List<Dictionary<string, List<EncyclopediaEntryData>>> EncyclopediaEntries { get; set; } =
             new List<Dictionary<string, List<EncyclopediaEntryData>>>();
+
+        public Dictionary<PingType,string> PingTypes { get; set; } = new();
+
         private FCSAlterraHubService()
         {
             Mod.OnDevicesDataLoaded += OnDataLoaded;

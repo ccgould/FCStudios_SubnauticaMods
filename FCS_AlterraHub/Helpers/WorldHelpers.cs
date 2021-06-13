@@ -1,7 +1,9 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
+using FCS_AlterraHub.Registration;
 using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
 using UnityEngine;
@@ -108,7 +110,14 @@ namespace FCS_AlterraHub.Helpers
         public static PingType CreatePingType(string id,string pingName, Atlas.Sprite pingSprite)
         {
             SpriteHandler.RegisterSprite(SpriteManager.Group.Pings, id, pingSprite);
-            return PingHandler.RegisterNewPingType(pingName, pingSprite);
+
+            var pingType = PingHandler.RegisterNewPingType(pingName, pingSprite);
+
+            if (!FCSAlterraHubService.InternalAPI.PingTypes.ContainsKey(pingType))
+            {
+                FCSAlterraHubService.InternalAPI.PingTypes.Add(pingType,pingName);
+            }
+            return pingType;
         }
 
 #if SUBNAUTICA

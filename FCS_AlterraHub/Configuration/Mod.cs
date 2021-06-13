@@ -505,6 +505,7 @@ namespace FCS_AlterraHub.Configuration
         public static TechType StaffKeyCardTechType { get; set; }
         public static TechType DronePortPadHubNewFragmentTechType { get; set; }
         public static TechType AlterraTransportDroneTechType { get; set; }
+        public static PingType AlterraTransportDronePingType { get; set; }
 
         public static void DeepCopySave(AccountDetails accountDetails)
         {

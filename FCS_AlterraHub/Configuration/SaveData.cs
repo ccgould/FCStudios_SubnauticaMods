@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem;
 using FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems;
+using FCS_AlterraHub.Mods.FCSPDA.Struct;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Objects;
 using FCS_AlterraHub.Systems;
@@ -46,7 +47,7 @@ namespace FCS_AlterraHub.Configuration
     {
         public string Id { get; set; }
         public string DockedPortID { get; set; }
-        public List<CartItem> Cargo { get; set; }
+        public List<CartItemData> Cargo { get; set; }
         public string DestinationPortID { get; set; }
         public string DeparturePortID { get; set; }
         public DroneController.DroneStates DroneState { get; set; }

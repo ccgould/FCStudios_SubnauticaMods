@@ -13,6 +13,7 @@ using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Spawnables;
 using FCS_AlterraHub.Mods.Global.Spawnables;
 using FCS_AlterraHub.Mods.OreConsumer.Buildable;
 using FCS_AlterraHub.Mods.OreConsumer.Spawnable;
+using FCS_AlterraHub.Patches;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
@@ -85,12 +86,24 @@ namespace FCS_AlterraHub
             Mod.AlterraHubStationPingType = WorldHelpers.CreatePingType("AlterraHubStation", "AlterraHubStation",
                 ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), "AlterraHubPing.png")));
 
+            Mod.AlterraTransportDronePingType = WorldHelpers.CreatePingType("AlterraTransportDrone",
+                "AlterraTransportDrone", SpriteManager.Get(TechType.LuggageBag));
+
 
             //if (QModServices.Main.ModPresent("EasyCraft"))
             //    EasyCraft_API.Init(harmony);
 
             //FCSAlterraHubService.PublicAPI.RegisterEncyclopediaEntry(EncyclopediaConfig.EncyclopediaEntries);
-            
+
+            var pingMapIconType = Type.GetType("SubnauticaMap.PingMapIcon, SubnauticaMap", false, false);
+            if (pingMapIconType != null)
+            {
+                var pingOriginal = AccessTools.Method(pingMapIconType, "Refresh");
+                var pingPrefix = new HarmonyMethod(AccessTools.Method(typeof(PingMapIcon_Patch), "Prefix"));
+                harmony.Patch(pingOriginal, pingPrefix);
+            }
+
+
             //Register debug commands
             ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));
 
@@ -180,28 +193,6 @@ namespace FCS_AlterraHub
 
             var dronePortBuilable = new DronePortPadHubNewPatcher();
             dronePortBuilable.Patch();
-        }
-
-        public static class PingMapIcon_Patch
-        {
-            [HarmonyPrefix]
-            public static bool Prefix(object __instance)
-            {
-                FieldInfo field = __instance.GetType().GetField("ping");
-                PingInstance ping = field.GetValue(__instance) as PingInstance;
-                if (ping.pingType == Mod.AlterraHubStationPingType)
-                {
-                    FieldInfo field2 = __instance.GetType().GetField("icon");
-                    uGUI_Icon icon = field2.GetValue(__instance) as uGUI_Icon;
-                    icon.sprite = SpriteManager.Get(SpriteManager.Group.Pings, "AlterraHubStation");
-                    icon.color = Color.black;
-                    RectTransform rectTransform = icon.rectTransform;
-                    rectTransform.sizeDelta = Vector2.one * 28f;
-                    rectTransform.localPosition = Vector3.zero;
-                    return false;
-                }
-                return true;
-            }
         }
     }
 }
