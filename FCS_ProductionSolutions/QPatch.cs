@@ -66,14 +66,6 @@ namespace FCS_ProductionSolutions
                 var glass = new FcsGlassCraftable();
                 glass.Patch();
 
-                var type = Type.GetType("SubnauticaMap.PingMapIcon, SubnauticaMap", false, false);
-                if (type != null)
-                {
-                    var pingOriginal = AccessTools.Method(type, "Refresh");
-                    var pingPrefix = new HarmonyMethod(AccessTools.Method(typeof(PingMapIcon_Patch), "Prefix"));
-                    harmony.Patch(pingOriginal, pingPrefix);
-                }
-                
                 var pingSprite = ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetFolder(), "DeepDriller_ping.png"));
                 DeepDrillerPingType = WorldHelpers.CreatePingType("Deep Driller","Deep Driller",pingSprite);
                 
@@ -94,27 +86,5 @@ namespace FCS_ProductionSolutions
         }
 
         public static PingType DeepDrillerPingType { get; set; }
-
-        public static class PingMapIcon_Patch
-        {
-            [HarmonyPrefix]
-            public static bool Prefix(object __instance)
-            {
-                FieldInfo field = __instance.GetType().GetField("ping");
-                PingInstance ping = field.GetValue(__instance) as PingInstance;
-                if (ping.pingType == QPatch.DeepDrillerPingType)
-                {
-                    FieldInfo field2 = __instance.GetType().GetField("icon");
-                    uGUI_Icon icon = field2.GetValue(__instance) as uGUI_Icon;
-                    icon.sprite = SpriteManager.Get(SpriteManager.Group.Pings, "Deep Driller");
-                    icon.color = Color.black;
-                    RectTransform rectTransform = icon.rectTransform;
-                    rectTransform.sizeDelta = Vector2.one * 28f;
-                    rectTransform.localPosition = Vector3.zero;
-                    return false;
-                }
-                return true;
-            }
-        }
     }
 }
