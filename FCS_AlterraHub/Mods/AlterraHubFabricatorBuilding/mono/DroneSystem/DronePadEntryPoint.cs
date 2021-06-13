@@ -86,11 +86,11 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
                     QuickLogger.Debug("UnDocking complete unlocking drone.", true);
                     drone.transform.parent = null;
                     drone.UnDock();
+                    drone.IsDeparting(false);
                     _parentPad.CloseDoors();
                     _animator.SetInteger(State, 0);
                 }
             ));
-
         }
 
         private void CompleteDocking(DroneController drone)

@@ -251,14 +251,42 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
                 {
                     var purchase = _pendingPurchase.ElementAt(i);
                     
-                    if (drone.GetDestinationID() == purchase.Key.UnitID || drone.GetState() != DroneController.DroneStates.Docked) continue;
+                    if (drone.GetDestinationID() == purchase.Key.UnitID) continue;
 
-                    if (drone.ShipOrder(purchase.Value, drone.GetPort(), purchase.Key))
+                    var state = drone.GetState();
+
+                    if (state is DroneController.DroneStates.Docked or DroneController.DroneStates.None)
                     {
-                        _pendingPurchase.Remove(purchase.Key);
+                        if (drone.ShipOrder(purchase.Value, drone.GetPort(), purchase.Key))
+                        {
+                            _pendingPurchase.Remove(purchase.Key);
+                        }
                     }
+
                     if (_pendingPurchase.Count <= 0) break;
                 }
+            }
+        }
+
+        internal void ResetDrones()
+        {
+            foreach (DroneController controller in _drones)
+            {
+                if (controller != null)
+                {
+                    if (controller.IsNavigating())
+                    {
+                        controller.RefundShipment();
+                    }
+                    DestroyImmediate(controller.gameObject);
+                }
+            }
+
+            _drones.Clear();
+
+            foreach (KeyValuePair<string, AlterraDronePortController> dronePortController in _ports)
+            {
+                dronePortController.Value.SpawnDrone();
             }
         }
 

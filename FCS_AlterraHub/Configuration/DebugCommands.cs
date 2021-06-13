@@ -3,6 +3,7 @@ using System.Linq;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono;
 using FCS_AlterraHub.Mods.FCSPDA.Mono;
 using FCS_AlterraHub.Mods.OreConsumer.Buildable;
 using FCS_AlterraHub.Mono;
@@ -134,6 +135,14 @@ namespace FCS_AlterraHub.Configuration
             }
 
             return $"Spawned: {(UWEPrefabID) prefabIndex} at {Player.main.transform.position}";
+        }
+
+        [ConsoleCommand("ResetTransportDrones")]
+        public static string ResetTransportDrones()
+        {
+            AlterraFabricatorStationController.Main.ResetDrones();
+
+            return $"Drones reset!";
         }
     }
 }

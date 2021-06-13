@@ -17,5 +17,6 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.Inte
         void DockDrone(DroneController droneController);
         string GetBaseName();
         void Depart(DroneController droneController);
+        Transform GetTransform();
     }
 }

@@ -26,7 +26,7 @@
     <Compile Include="Model\GUI\StorageInventoryButton.cs" />
     <Compile Include="Model\LadderController.cs" />
     <Compile Include="Mods\AlterraHubFabricatorBuilding\Buildables\DronePortPadHubNewPatcher.cs" />
-    <Compile Include="Mods\AlterraHubFabricatorBuilding\Mono\DroneSystem\AirThrusterController.cs" />
+    <Compile Include="Mods\AlterraHubFabricatorBuilding\Mono\DroneSystem\ThrusterController.cs" />
     <Compile Include="Mods\AlterraHubFabricatorBuilding\Mono\DroneSystem\DockTriggerController.cs" />
     <Compile Include="Mods\AlterraHubFabricatorBuilding\Mono\DroneSystem\DroneController.cs" />
     <Compile Include="Mods\AlterraHubFabricatorBuilding\Mono\DroneSystem\AlterraDronePortController.cs" />

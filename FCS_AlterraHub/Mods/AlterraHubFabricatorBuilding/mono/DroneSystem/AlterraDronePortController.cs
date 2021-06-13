@@ -12,6 +12,7 @@ using FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Structs;
+using FCSCommon.Interfaces;
 using FCSCommon.Utilities;
 using HarmonyLib;
 using SMLHelper.V2.Handlers;
@@ -19,7 +20,7 @@ using UnityEngine;
 
 namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 {
-    internal class AlterraDronePortController : FcsDevice, IDroneDestination
+    internal class AlterraDronePortController : FcsDevice, IFCSSave<SaveData>, IDroneDestination
     {
         private bool _isFromSave;
         private bool _runStartUpOnEnable;
@@ -73,6 +74,11 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
         public void Depart(DroneController droneController)
         {
             _entryPoint.Depart(droneController);
+        }
+
+        public Transform GetTransform()
+        {
+            return _paths[0];
         }
 
         public void Offload(DroneController drone)
@@ -226,12 +232,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 
             QuickLogger.Debug($"Closing {GetBaseName()} doors:");
         }
-
-        private void TestTransfer()
-        {
-            //_assignedDrone.ShipOrder(new Dictionary<TechType, int>{{TechType.Copper,1}}, this,AlterraFabricatorStationController.main.GetAvailablePort());
-        }
-
+        
         private void CreateLadders()
         {
             if(!IsConstructed) return;

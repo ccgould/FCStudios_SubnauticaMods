@@ -18,26 +18,28 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
         private IDroneDestination _baseController;
         private List<Transform> _flightPath = new();
         private IEnumerable<GameObject> _airThrusters;
-        private MotorHandler _waterTurbine;
         private Transform _trans;
-        private DroneStates _droneState;
+        private DroneStates _droneState = DroneStates.None;
         private List<CartItem> _order;
         private Transform _nextPos;
         private float speed = 5;
+        private const float maxSpeed = 35f;
+        private const float minSpeed = 5f;
+
         private int _nextPosIndex;
         private string _id;
         private IDroneDestination _destinationPort;
         private IDroneDestination _departurePort;
         private IDroneDestination _dockedPort;
         private bool _alignDrone;
-        //private Animator _animator;
-        private int State;
         private AlterraTransportDroneEntry _saveData;
         private bool _isDocking;
         private bool _returningToStation;
+        private bool _isDeparting;
 
         internal enum DroneStates
         {
+            None=-1,
             Docking=0,
             Transitioning=1,
             Docked=2,
@@ -47,8 +49,6 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
         private void Awake()
         {
             _trans = transform;
-            //_animator = GetComponent<Animator>();
-            State = Animator.StringToHash("State");
         }
 
         private void Start()
@@ -57,14 +57,22 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
             
             _saveData = Mod.GetAlterraTransportDroneSaveData(GetId());
 
-            if(_saveData?.Cargo != null)
+            if (_saveData != null)
+            {
                 _order = _saveData.Cargo;
+                _droneState = _saveData.DroneState;
+            }
+       
+
+
+
 
             InvokeRepeating(nameof(TryFindBase),1f,1f);
             InvokeRepeating(nameof(TryFindDeparturePort),1f,1f);
             InvokeRepeating(nameof(TryFindDestinationPort),1f,1f);
             InvokeRepeating(nameof(CanReturn),1f,1f);
         }
+
 
         private void TryFindBase()
         {
@@ -123,12 +131,20 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 
         internal bool IsNavigating()
         {
-            return _droneState != DroneStates.Docked && _droneState != DroneStates.Docking;
+            return _droneState == DroneStates.Transitioning;
         }
 
         private void Update()
         {
+            if (_destinationPort != null && _departurePort != null)
+            {
+                float destDistance = Vector3.Distance(_trans.position, _destinationPort.GetTransform().position);
+                float depDistance = Vector3.Distance(_trans.position, _departurePort.GetTransform().position);
+                speed = destDistance > 20 && depDistance > 20 ? maxSpeed : minSpeed;
+            }
+
             UpdateDockState();
+
             if (_droneState == DroneStates.Transitioning)
             {
                 if (_alignDrone)
@@ -153,10 +169,13 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 
         private void UpdateDockState()
         {
-
             if (_isDocking)
             {
                 _droneState = DroneStates.Docking;
+            }
+            else if(_isDeparting)
+            {
+                _droneState = DroneStates.Departing;
             }
             else
             {
@@ -167,6 +186,11 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
         internal void IsDocking(bool value)
         {
             _isDocking = value;
+        }
+
+        internal void IsDeparting(bool value)
+        {
+            _isDeparting = value;
         }
 
         private void DockDrone()
@@ -188,19 +212,6 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
             _order = null;
             _departurePort = null;
             _destinationPort = null;
-        }
-
-        private void UpdateEngine()
-        {
-            if (IsUnderwater())
-            {
-                _waterTurbine.RPMByPass(300);
-                _waterTurbine.StartMotor();
-            }
-            else
-            {
-                _waterTurbine.StopMotor();
-            }
         }
 
         private void Move()
@@ -233,24 +244,20 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
             _trans = gameObject.transform;
             _baseController = baseController;
             _airThrusters = GameObjectHelpers.FindGameObjects(gameObject, "Thruster",SearchOption.StartsWith);
+            var bubbles = GameObjectHelpers.FindGameObject(gameObject, "xSeamothTrail").AddComponent<ThrusterController>();
+            bubbles.isWaterSensitive = true;
+
             foreach (GameObject thruster in _airThrusters)
             {
-                thruster.EnsureComponent<AirThrusterController>();
+                thruster.EnsureComponent<ThrusterController>();
             }
+
             _dockedPort = baseController;
             var lodGroup = gameObject.GetComponentInChildren<LODGroup>();
-            lodGroup.size = 1.2f;
-            //_waterTurbine = GameObjectHelpers.FindGameObject(gameObject, "propeller").AddComponent<MotorHandler>();
-            //_waterTurbine.Initialize(0);
+            lodGroup.size = 4f;
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
-            //var stablizer = gameObject.AddComponent<Stabilizer>(); Not sure I need a stabilizer at this point.
         }
-
-        private bool IsUnderwater()
-        {
-            return _trans.position.y < Ocean.main.GetOceanLevel();
-        }
-
+        
         private void AlignDrone()
         {
             var rot = Quaternion.LookRotation(_nextPos.forward, Vector3.up);
@@ -298,11 +305,6 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
             return true;
         }
 
-        private void Reverse()
-        {
-            _flightPath.Reverse();
-        }
-
         internal Transform GetTargetWayPoint()
         {
             return _flightPath[_nextPosIndex];
@@ -322,11 +324,6 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
             return _id;
         }
 
-        //public void SetAnimator(bool value)
-        //{
-        //    _animator.enabled = value;
-        //}
-        
         internal DroneStates GetState()
         {
             return _droneState;
@@ -337,6 +334,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
             _dockedPort = _departurePort;
             _departurePort.OpenDoors();
             yield return new WaitForSeconds(5);
+            IsDeparting(true);
             _departurePort.Depart(this);
 
             while (_droneState != DroneStates.Transitioning)
@@ -369,9 +367,9 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
             return new AlterraTransportDroneEntry
             {
                 Cargo = _order,
-                DockedPortID = _dockedPort.BaseId,
-                DestinationPortID = _destinationPort.BaseId,
-                DeparturePortID = _departurePort.BaseId,
+                DockedPortID = _dockedPort?.BaseId,
+                DestinationPortID = _destinationPort?.BaseId,
+                DeparturePortID = _departurePort?.BaseId,
                 DroneState = _droneState,
                 Id = GetId()
             };
@@ -397,6 +395,17 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
         public List<CartItem> GetOrder()
         {
             return _order;
+        }
+
+        public void RefundShipment()
+        {
+            if (_order != null)
+            {
+                foreach (CartItem cartItem in _order)
+                {
+                    cartItem.Refund();
+                }
+            }
         }
     }
 }

@@ -4,10 +4,8 @@ using System.IO;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Enumerators;
-using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
-using FCS_AlterraHub.Mods.AlterraHubDepot.Mono;
 using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono;
 using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem;
 using FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs;
@@ -18,15 +16,11 @@ using FCS_AlterraHub.Patches;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Structs;
 using FCS_AlterraHub.Systems;
-using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using FMOD;
-using SMLHelper.V2.Assets;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.XR;
-using Object = UnityEngine.Object;
 using PDAPages = FCS_AlterraHub.Mods.FCSPDA.Enums.PDAPages;
 using WorldHelpers = FCS_AlterraHub.Helpers.WorldHelpers;
 
@@ -58,7 +52,6 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
         private Text _cartTotalLabel;
         private CheckOutPopupDialogWindow _checkoutDialog;
         private AccountPageHandler _accountPageHandler;
-        private FCSPDAEntry _savedData;
         private bool _isInitialized;
         private Canvas _canvas;
         private bool _cartLoaded;
@@ -546,11 +539,6 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             switch (page)
             {
                 case PDAPages.Store:
-                    if (_savedData == null || !_cartLoaded)
-                    {
-                        _savedData = Mod.GetAlterraHubSaveData();
-                        LoadCart();
-                    }
                     _toggleHud.gameObject.SetActive(true);
                     break;
                 case PDAPages.Encyclopedia:
@@ -694,27 +682,22 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
 
         internal void Save(SaveData newSaveData)
         {
-
-            if (_savedData == null)
+            newSaveData.FCSPDAEntry = new FCSPDAEntry
             {
-                _savedData = new FCSPDAEntry();
-            }
-
-            
-            _savedData.CartItems = _cartDropDownManager?.Save() ?? new List<CartItemSaveData>();
-            newSaveData.FCSPDAEntry = _savedData;
+                CartItems = _cartDropDownManager?.Save() ?? new List<CartItemSaveData>()
+            };
         }
 
-        internal void LoadCart()
+        internal void LoadCart(FCSPDAEntry savedData)
         {
-            if (_savedData?.CartItems == null)
+            if (savedData?.CartItems == null)
             {
                 QuickLogger.Debug("Cart Items returned Null");
                 _cartLoaded = true;
                 return;
             }
 
-            foreach (CartItemSaveData cartItem in _savedData.CartItems)
+            foreach (CartItemSaveData cartItem in savedData.CartItems)
             {
                 _cartDropDownManager.AddItem(cartItem.TechType, cartItem.ReceiveTechType, cartItem.ReturnAmount <= 0 ? 1 : cartItem.ReturnAmount);
             }
