@@ -349,6 +349,7 @@ namespace FCS_AlterraHub.Registration
                                     QuickLogger.Error($"Failed to located audio path: {audioPath} for entry {entryData.Path}");
                                 }
                             }
+
                         }
 
                         QuickLogger.Debug($"Registering entry {data.Key}");

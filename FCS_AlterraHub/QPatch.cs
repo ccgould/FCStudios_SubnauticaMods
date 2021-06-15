@@ -17,6 +17,7 @@ using FCS_AlterraHub.Patches;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
+using FMOD;
 using HarmonyLib;
 using QModManager.API.ModLoading;
 using SMLHelper.V2.Handlers;
@@ -83,11 +84,13 @@ namespace FCS_AlterraHub
                 harmony.Patch(pingOriginal, pingPrefix);
             }
 
+            BoosterSound = AudioUtils.CreateSound(Path.Combine(Mod.GetAssetPath(), "Audio", "booster.mp3"));
+
             Mod.AlterraHubStationPingType = WorldHelpers.CreatePingType("AlterraHubStation", "AlterraHubStation",
                 ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), "AlterraHubPing.png")));
 
             Mod.AlterraTransportDronePingType = WorldHelpers.CreatePingType("AlterraTransportDrone",
-                "AlterraTransportDrone", SpriteManager.Get(TechType.LuggageBag));
+                "AlterraTransportDrone", ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), $"TransportDronePing.png")));
 
 
             //if (QModServices.Main.ModPresent("EasyCraft"))
@@ -109,6 +112,8 @@ namespace FCS_AlterraHub
 
             VoiceNotificationSystem.RegisterVoice(Path.Combine(Mod.GetAssetPath(),"Audio", "ElectricalBoxesNeedFixing.mp3"),string.Empty);
         }
+
+        public static Sound BoosterSound { get; set; }
 
         private static void PatchAdditionalStoreItems()
         {

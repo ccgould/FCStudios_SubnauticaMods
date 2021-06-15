@@ -90,7 +90,7 @@ namespace FCS_AlterraHub.Configuration
         internal static Action<List<KnownDevice>> OnDevicesDataLoaded { get; set; }
 
 #if SUBNAUTICA
-        internal static TechData AlterraHubDepotIngredients => new TechData
+        internal static TechData AlterraHubDepotIngredients => new()
 #elif BELOWZERO
                 internal static RecipeData AlterraHubDepotIngredients => new RecipeData
 #endif
@@ -106,7 +106,7 @@ namespace FCS_AlterraHub.Configuration
         };
 
 #if SUBNAUTICA
-        internal static TechData OreConsumerIngredients => new TechData
+        internal static TechData OreConsumerIngredients => new()
 #elif BELOWZERO
                 internal static RecipeData OreConsumerIngredients => new RecipeData
 #endif
@@ -123,7 +123,7 @@ namespace FCS_AlterraHub.Configuration
             }
         };
 
-        public static Dictionary<TechType, float> HeightRestrictions { get; set; } = new Dictionary<TechType, float>
+        public static Dictionary<TechType, float> HeightRestrictions { get; set; } = new()
         {
             {TechType.BloodVine,.03f},
             {TechType.Creepvine,.03f},
@@ -253,9 +253,9 @@ namespace FCS_AlterraHub.Configuration
             }
         }
 
-        public static Dictionary<string, Sound> AudioClips = new Dictionary<string, Sound>();
+        public static Dictionary<string, Sound> AudioClips = new();
         private static AccountDetails _tempAccountDetails;
-        private static FCSGamePlaySettings _gamePlaySettings = new FCSGamePlaySettings();
+        private static FCSGamePlaySettings _gamePlaySettings = new();
 
 
         public static bool SaveGamePlaySettings()
@@ -482,13 +482,16 @@ namespace FCS_AlterraHub.Configuration
             AudioClips.Add("AH-Mission01-Pt3",AudioUtils.CreateSound(Path.Combine(Mod.GetAssetPath(), "Audio", "AH-Mission01-Pt3.wav")));
         }
 
+        public static GameObject FCSStationSpawn { get; set; }
+
         internal static IEnumerator SpawnAlterraFabStation()
         {
             GameObject gameObject = GameObject.Instantiate(Buildables.AlterraHub.AlterraHubFabricatorPrefab);
             gameObject.AddComponent<AlterraFabricatorStationController>();
 
+            var lw = gameObject.AddComponent<LargeWorldEntity>();
+            lw.cellLevel = LargeWorldEntity.CellLevel.Global;
             LargeWorldEntity.Register(gameObject);
-            //gameObject.transform.position = new Vector3(-809.10f, -241.30f, -387.70f); //First Position
             gameObject.transform.position = new Vector3(82.70f, -316.9f, -1434.7f);
             gameObject.transform.localRotation = Quaternion.Euler(348.7f, 326.24f, 43.68f);
             WorldHelpers.CreateBeacon(gameObject, AlterraHubStationPingType, "Alterra Hub Station");
@@ -496,8 +499,6 @@ namespace FCS_AlterraHub.Configuration
             FCSStationSpawn = gameObject.FindChild("RespawnPoint");
             yield break;
         }
-
-        public static GameObject FCSStationSpawn { get; set; }
 
 
         public static bool IsOreConsumerSpawned { get; set; }
@@ -574,13 +575,14 @@ namespace FCS_AlterraHub.Configuration
     public class FCSGamePlaySettings
     {
         public bool IsOreConsumerFragmentSpawned = false; 
-        public List<string> AlterraHubDepotPowercellSlot = new List<string>();
-        public KeyPadAccessSave AlterraHubDepotDoors = new KeyPadAccessSave();
+        public List<string> AlterraHubDepotPowercellSlot = new();
+        public KeyPadAccessSave AlterraHubDepotDoors = new();
         public bool BreakerOn;
         public bool IsPDAUnlocked;
-        public HashSet<int> FixedPowerBoxes = new HashSet<int>();
-        public HashSet<string> Conditions = new HashSet<string>();
+        public HashSet<int> FixedPowerBoxes = new();
+        public HashSet<string> Conditions = new();
         public bool TransDroneSpawned { get; set; }
+        public Dictionary<string,int> DronePortAssigns { get; set; } = new();
 
         public bool ConditionMet(string condition)
         {

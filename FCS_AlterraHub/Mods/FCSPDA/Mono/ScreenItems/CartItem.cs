@@ -72,5 +72,12 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems
         [JsonProperty] internal TechType TechType { get; set; }
         [JsonProperty] internal TechType ReceiveTechType { get; set; }
         [JsonProperty] internal int ReturnAmount { get; set; }
+        public void Refund()
+        {
+            for (int i = 0; i < ReturnAmount; i++)
+            {
+                CardSystem.main.Refund(ReceiveTechType);
+            }
+        }
     }
 }

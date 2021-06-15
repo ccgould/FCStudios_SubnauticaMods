@@ -1,4 +1,6 @@
-﻿using FCS_AlterraHub.Model;
+﻿using System.Collections.Generic;
+using FCS_AlterraHub.Model;
+using FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems;
 using UnityEngine;
 
 namespace FCS_AlterraHub.Extensions
@@ -25,6 +27,14 @@ namespace FCS_AlterraHub.Extensions
                 return (num / 1000).ToString("0.#") + "K";
 
             return num.ToString("#,0");
+        }
+
+        internal static IEnumerable<CartItemSaveData> ToCartItemSaveData(this List<CartItem> data)
+        {
+            foreach (CartItem cartItem in data)
+            {
+                yield return cartItem.Save();
+            }
         }
     }
 }

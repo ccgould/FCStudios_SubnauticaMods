@@ -31,6 +31,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 
                 if (drone.GetDestination() == _parentPad && drone.GetState() == DroneController.DroneStates.Transitioning)
                 {
+                    _parentPad.SetDockedDrone(drone);
                     _isDocking = true;
                     StartCoroutine(DockDrone(drone));
                 }
@@ -84,7 +85,6 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
             StartCoroutine(PlayAndWaitForAnim(1,"Drone_Departing", () =>
                 {
                     QuickLogger.Debug("UnDocking complete unlocking drone.", true);
-                    drone.transform.parent = null;
                     drone.UnDock();
                     drone.IsDeparting(false);
                     _parentPad.CloseDoors();

@@ -30,15 +30,19 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
         private DroneController _assignedDrone;
         private GameObject _spawnPoint;
         private DronePadEntryPoint _entryPoint;
+        private int _portID;
 
+        private DockTriggerController _dockTrigger;
         public override bool IsOperational => IsInitialized && IsConstructed;
         public Transform BaseTransform { get; set; }
         public bool IsFull => GetIsFull();
+        public override bool BypassRegisterCheck { get; } = true;
 
         private bool GetIsFull()
         {
             var devices = Manager.GetDevices(Mod.AlterraHubDepotTabID);
-            return devices.Any(x => ((AlterraHubDepotController) x).IsFull());
+
+            return devices == null || devices.All(x => ((AlterraHubDepotController) x).IsFull());
         }
 
         public List<Transform> GetPaths()
@@ -73,12 +77,35 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 
         public void Depart(DroneController droneController)
         {
+            SetDockedDrone(null);
             _entryPoint.Depart(droneController);
         }
 
-        public Transform GetTransform()
+
+        public Transform GetEntryPoint()
         {
-            return _paths[0];
+            return _entryPoint.transform;
+        }
+
+        public int GetPortID()
+        {
+            return _portID;
+        }
+
+        public bool HasDroneDocked()
+        {
+            if (_assignedDrone != null) return true;
+            return _dockTrigger?.IsDocked ?? false;
+        }
+
+        public void SetDockedDrone(DroneController drone)
+        {
+            _assignedDrone = drone;
+        }
+
+        public int SetPortID(int id)
+        {
+            return _portID = id;
         }
 
         public void Offload(DroneController drone)
@@ -97,7 +124,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
             if (devices == null)
             {
                 QuickLogger.ModMessage( $"Failed to find any Hub Depots giving a refund.");
-                foreach (CartItem cartItem in order)
+                foreach (CartItemSaveData cartItem in order)
                 {
                     cartItem.Refund();
                 }
@@ -107,7 +134,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 
             var pendingItems = new List<TechType>();
 
-            foreach (CartItem cartItem in order)
+            foreach (CartItemSaveData cartItem in order)
             {
                 for (int i = 0; i < cartItem.ReturnAmount; i++)
                 {
@@ -178,7 +205,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
         public override void Initialize()
         {
             _paths = GameObjectHelpers.FindGameObject(gameObject, "DronePort_DockingPaths").GetChildrenT().ToList();
-            GameObjectHelpers.FindGameObject(gameObject, "DockTrigger").AddComponent<DockTriggerController>();
+            _dockTrigger = GameObjectHelpers.FindGameObject(gameObject, "DockTrigger").AddComponent<DockTriggerController>();
 
            _entryPoint =  _paths[0].gameObject.AddComponent<DronePadEntryPoint>();
 
@@ -207,14 +234,14 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
             IsInitialized = true;
         }
 
-        internal DroneController SpawnDrone()
+        public DroneController SpawnDrone()
         {
             var drone = GameObject.Instantiate(CraftData.GetPrefabForTechType(Mod.AlterraTransportDroneTechType), _spawnPoint.transform.position, _spawnPoint.transform.rotation);
             _assignedDrone = drone.GetComponent<DroneController>();
-            _assignedDrone.Initialize(this);
+            _assignedDrone.Initialize(this,this);
             return _assignedDrone;
         }
-        
+
         internal void OpenDoors()
         {
             foreach (PortDoorController door in _doors)

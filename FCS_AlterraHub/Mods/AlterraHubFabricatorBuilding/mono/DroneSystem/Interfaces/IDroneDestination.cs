@@ -17,6 +17,11 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.Inte
         void DockDrone(DroneController droneController);
         string GetBaseName();
         void Depart(DroneController droneController);
-        Transform GetTransform();
+        int GetPortID();
+        string GetPrefabID();
+        bool HasDroneDocked();
+        void SetDockedDrone(DroneController drone);
+        DroneController SpawnDrone();
+        Transform GetEntryPoint();
     }
 }

@@ -500,10 +500,6 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
                 foreach (var cartItem in cart.GetItems())
                 {
                     AlterraFabricatorStationController.Main.PendAPurchase(depot, cartItem);
-                    //for (int i = 0; i < cartItem.ReturnAmount; i++)
-                    //{
-                    //    depot.AddItemToStorage(cartItem.ReceiveTechType.ToInventoryItemLegacy());
-                    //}
                 }
             }
 

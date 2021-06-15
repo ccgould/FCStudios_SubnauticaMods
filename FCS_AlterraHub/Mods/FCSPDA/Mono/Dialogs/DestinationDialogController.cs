@@ -59,8 +59,14 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
                 if(!depot.IsOperational) continue;
                 var depotPrefab = GameObject.Instantiate(Buildables.AlterraHub.AlterraHubDepotItemPrefab);
                 var controller = depotPrefab.AddComponent<AlterraHubDepotItemController>();
-                controller.Initialize(depot,_toggleGroup,_list);
-                _toggles.Add(controller);
+                if (controller.Initialize(depot, _toggleGroup, _list))
+                {
+                    _toggles.Add(controller);
+                }
+                else
+                {
+                    Destroy(depotPrefab);
+                }
             }
         }
         

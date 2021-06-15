@@ -39,7 +39,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         private AntennaController _antenna;
 
         private readonly GameObject[] _electList = new GameObject[6];
-        private Dictionary<string, AlterraDronePortController> _ports = new();
+        private Dictionary<string, IDroneDestination> _ports = new();
         private Dictionary<AlterraDronePortController, List<CartItem>> _pendingPurchase = new();
         private HashSet<DroneController> _drones = new();
         private void Awake()
@@ -59,6 +59,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             for (int i = 0; i < ports.Length; i++)
             {
                 var portController = ports.ElementAt(i).AddComponent<AlterraDronePortController>();
+                portController.SetPortID(i);
                 _ports.Add($"Port_{i}", portController);
                 portController.Initialize();
             }
@@ -104,9 +105,16 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             InvokeRepeating(nameof(TryShip),1f,1f);
         }
 
-        public AlterraDronePortController GetAvailablePort()
+        public IDroneDestination GetAvailablePort(DroneController approachingDrone)
         {
-            return _ports.ElementAt(0).Value;
+            var port = _ports.FirstOrDefault(x => !x.Value.HasDroneDocked()).Value;
+
+            if (port != null)
+            {
+                port.SetDockedDrone(approachingDrone);
+            }
+
+            return port;
         }
 
         //For dev use only
@@ -228,23 +236,30 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             _drones.Add(drone);
         }
 
+        internal IDroneDestination GetAssignedPort(string prefabID)
+        {
+            return Mod.GamePlaySettings.DronePortAssigns.ContainsKey(prefabID) ? _ports.ElementAt(Mod.GamePlaySettings.DronePortAssigns[prefabID]).Value : null;
+        }
+
         public void TryShip()
         {
-            if(!LargeWorldStreamer.main.IsWorldSettled() || _pendingPurchase.Count <= 0) return;
-
             if (_drones.Count < 3)
             {
                 if (!Mod.GamePlaySettings.TransDroneSpawned)
                 {
-                    foreach (KeyValuePair<string, AlterraDronePortController> port in _ports)
+                    foreach (KeyValuePair<string, IDroneDestination> port in _ports)
                     {
-                        _drones.Add(port.Value.SpawnDrone());
+                        var drone = port.Value.SpawnDrone();
+                        _drones.Add(drone);
+                        //Mod.GamePlaySettings.DronePortAssigns.Add(drone.GetId(), port.Value.GetPortID());
                     }
 
                     Mod.GamePlaySettings.TransDroneSpawned = true;
                 }
             }
 
+            if (!LargeWorldStreamer.main.IsWorldSettled() || _pendingPurchase.Count <= 0) return;
+            
             for (int i = _pendingPurchase.Count - 1; i >= 0; i--)
             {
                 foreach (DroneController drone in _drones)
@@ -284,11 +299,12 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
 
             _drones.Clear();
 
-            foreach (KeyValuePair<string, AlterraDronePortController> dronePortController in _ports)
+            foreach (KeyValuePair<string, IDroneDestination> dronePortController in _ports)
             {
                 dronePortController.Value.SpawnDrone();
             }
         }
+
 
         public IEnumerable<AlterraTransportDroneEntry> SaveDrones()
         {
@@ -296,6 +312,11 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             {
                 yield return drone.Save();
             }
+        }
+
+        public bool IsStationPort(IDroneDestination dockedPort)
+        {
+            return _ports.ContainsValue(dockedPort);
         }
     }
 }
