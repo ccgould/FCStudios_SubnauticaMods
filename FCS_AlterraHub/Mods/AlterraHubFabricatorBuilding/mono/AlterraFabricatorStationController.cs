@@ -3,17 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
-using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
-using FCS_AlterraHub.Mods.AlterraHubDepot.Mono;
 using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem;
 using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.Interfaces;
 using FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems;
 using FCSCommon.Utilities;
 using Oculus.Newtonsoft.Json;
 using UnityEngine;
-using UWE;
 
 namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
 {
@@ -266,6 +263,8 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
                 {
                     var purchase = _pendingPurchase.ElementAt(i);
                     
+                    if(purchase.Key.HasIncomingFlight() || purchase.Key.HasDroneDocked()) continue;
+
                     if (drone.GetDestinationID() == purchase.Key.UnitID) continue;
 
                     var state = drone.GetState();

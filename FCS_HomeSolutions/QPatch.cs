@@ -13,6 +13,7 @@ using FCS_HomeSolutions.Mods.AlienChief.Buildables;
 using FCS_HomeSolutions.Mods.Cabinets.Buildable;
 using FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Buildable;
 using FCS_HomeSolutions.Mods.LedLights.Buildable;
+using FCS_HomeSolutions.Mods.PaintTool.Spawnable;
 using FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable;
 using FCS_HomeSolutions.Mods.TV.Buildable;
 using FCS_HomeSolutions.QuantumTeleporter.Buildable;

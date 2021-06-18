@@ -23,5 +23,6 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.Inte
         void SetDockedDrone(DroneController drone);
         DroneController SpawnDrone();
         Transform GetEntryPoint();
+        void SetIncomingFlight(bool value);
     }
 }

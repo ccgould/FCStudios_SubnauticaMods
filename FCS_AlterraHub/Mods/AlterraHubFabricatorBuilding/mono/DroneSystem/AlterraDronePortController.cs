@@ -17,6 +17,7 @@ using FCSCommon.Utilities;
 using HarmonyLib;
 using SMLHelper.V2.Handlers;
 using UnityEngine;
+using Valve.VR;
 
 namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 {
@@ -33,6 +34,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
         private int _portID;
 
         private DockTriggerController _dockTrigger;
+        private bool _hasIncomingFlight;
         public override bool IsOperational => IsInitialized && IsConstructed;
         public Transform BaseTransform { get; set; }
         public bool IsFull => GetIsFull();
@@ -78,6 +80,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
         public void Depart(DroneController droneController)
         {
             SetDockedDrone(null);
+            SetIncomingFlight(false);
             _entryPoint.Depart(droneController);
         }
 
@@ -368,6 +371,17 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
         public string GetStatus()
         {
             return "N/A";
+        }
+
+        public bool HasIncomingFlight()
+        {
+            if (_dockTrigger?.IsDocked ?? true) return true;
+            return _hasIncomingFlight;
+        }
+
+        public void SetIncomingFlight(bool value)
+        {
+            _hasIncomingFlight = value;
         }
     }
 }

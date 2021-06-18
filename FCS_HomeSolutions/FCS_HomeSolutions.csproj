@@ -75,7 +75,7 @@
     <Compile Include="Mods\TV\Buildable\TVPatch.cs" />
     <Compile Include="Mods\TV\Mono\TVController.cs" />
     <Compile Include="Mono\OutDoorPlanters\OutDoorPlanterController.cs" />
-    <Compile Include="Mono\PaintTool\PaintToolController.cs" />
+    <Compile Include="Mods\PaintTool\PaintToolController.cs" />
     <Compile Include="Patches\Builder_Patches.cs" />
     <Compile Include="Patches\InGameMenuPatcher.cs" />
     <Compile Include="Patches\Player_Patches.cs" />
@@ -100,8 +100,8 @@
     <Compile Include="SeaBreeze\Mono\SeaBreezeController.cs" />
     <Compile Include="Spawnables\ObservationTank.cs" />
     <Compile Include="Spawnables\FoodSpawnable.cs" />
-    <Compile Include="Spawnables\PaintCanSpawnable.cs" />
-    <Compile Include="Spawnables\PaintToolSpawnable.cs" />
+    <Compile Include="Mods\PaintTool\Spawnable\PaintCanSpawnable.cs" />
+    <Compile Include="Mods\PaintTool\Spawnable\PaintToolSpawnable.cs" />
     <Compile Include="TrashReceptacle\Buildable\TrashReceptaclePatch.cs" />
     <Compile Include="TrashReceptacle\Mono\TrashReceptacleController.cs" />
     <Compile Include="TrashReceptacle\Mono\TrashStorage.cs" />

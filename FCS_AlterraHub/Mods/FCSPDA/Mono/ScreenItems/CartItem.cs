@@ -1,7 +1,6 @@
 ﻿using System;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Systems;
-using FCSCommon.Helpers;
 using Oculus.Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.UI;
@@ -55,7 +54,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems
 
         internal CartItemSaveData Save()
         {
-            return new CartItemSaveData { TechType = TechType, ReceiveTechType = ReceiveTechType, ReturnAmount = ReturnAmount};
+            return new() { TechType = TechType, ReceiveTechType = ReceiveTechType, ReturnAmount = ReturnAmount};
         }
 
         public void Refund()

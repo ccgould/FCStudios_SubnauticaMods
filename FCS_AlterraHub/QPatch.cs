@@ -156,6 +156,10 @@ namespace FCS_AlterraHub
             //var bioFuelSpawnable = new BioFuelSpawnable();
             //bioFuelSpawnable.Patch();
 
+            ////Data Box
+            //var databox = new FCSDataBoxSpawnable();
+            //databox.Patch();
+
             //Patch Debit Card
             var debitCardSpawnable = new DebitCardSpawnable();
             debitCardSpawnable.Patch();

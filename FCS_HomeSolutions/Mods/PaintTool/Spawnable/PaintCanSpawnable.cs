@@ -5,7 +5,6 @@ using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
 using FCSCommon.Utilities;
-using SMLHelper.V2.Assets;
 using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
 using UnityEngine;
@@ -13,9 +12,9 @@ using UnityEngine;
 using Sprite = Atlas.Sprite;
 #endif
 
-namespace FCS_HomeSolutions.Spawnables
+namespace FCS_HomeSolutions.Mods.PaintTool.Spawnable
 {
-    internal class PaintCanSpawnable : Spawnable
+    internal class PaintCanSpawnable : SMLHelper.V2.Assets.Spawnable
     {
         public override string AssetsFolder => Mod.GetAssetPath();
 

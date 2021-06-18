@@ -256,6 +256,7 @@ namespace FCS_AlterraHub.Configuration
         public static Dictionary<string, Sound> AudioClips = new();
         private static AccountDetails _tempAccountDetails;
         private static FCSGamePlaySettings _gamePlaySettings = new();
+        public static TechType FCSDataBoxTechType { get; set; }
 
 
         public static bool SaveGamePlaySettings()

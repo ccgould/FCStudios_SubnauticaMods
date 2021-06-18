@@ -11,6 +11,7 @@ using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.Interfac
 using FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems;
 using FCS_AlterraHub.Registration;
 using FCSCommon.Utilities;
+using SMLHelper.V2.Utility;
 using UnityEngine;
 
 namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
@@ -40,6 +41,9 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
         private string _storeInformationIdentifier;
         private Transform _parent;
         private bool _isReturningToStation;
+        private bool _wasPlaying;
+        private AudioSource _audio;
+        private AudioLowPassFilter _lowPassFilter;
 
 
         //TODO Issue with docking
@@ -75,6 +79,8 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
                 _droneState = _saveData.DroneState;
             }
 
+            _audio = gameObject.GetComponent<AudioSource>();
+            _lowPassFilter = gameObject.GetComponent<AudioLowPassFilter>();
             _parent = _trans.parent;
             _storeInformationIdentifier = _trans.parent.GetComponentInParent<StoreInformationIdentifier>()?.Id;
 
@@ -175,6 +181,40 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
                 _beacon.SetVisible(_droneState == DroneStates.Transitioning);
                 _beacon.enabled = _droneState == DroneStates.Transitioning;
             }
+
+            if (_audio != null && _audio.isPlaying)
+            {
+
+                _audio.volume = QPatch.Configuration.AlterraTransportDroneVolume;
+
+                if (!QPatch.Configuration.AlterraTransportDroneFxAllowed)
+                {
+                    _audio.Stop();
+                    return;
+                }
+
+
+                if (_audio.isPlaying && Mathf.Approximately(Time.timeScale, 0f))
+                {
+                    _audio.Pause();
+                    _wasPlaying = true;
+                }
+
+                if (_wasPlaying && Time.timeScale > 0)
+                {
+                    _audio.Play();
+                    _wasPlaying = false;
+                }
+            }
+
+            if (_lowPassFilter != null)
+            {
+                _lowPassFilter.cutoffFrequency = Player.main.IsUnderwater() ||
+                                                 Player.main.IsInBase() ||
+                                                 Player.main.IsInSub() ||
+                                                 Player.main.inSeamoth ||
+                                                 Player.main.inExosuit ? 1566f : 22000f;
+            }
         }
 
         private void UpdateDockState()
@@ -190,6 +230,11 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
             else
             {
                 _droneState = _dockedPort != null ? DroneStates.Docked : DroneStates.Transitioning;
+            }
+
+            if (_droneState != DroneStates.Docked)
+            {
+                _audio.Play();
             }
         }
 
@@ -341,6 +386,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
             _departurePort.OpenDoors();
             yield return new WaitForSeconds(5);
             IsDeparting(true);
+            _destinationPort.SetIncomingFlight(true);
             _departurePort.Depart(this);
 
             while (_droneState != DroneStates.Transitioning)

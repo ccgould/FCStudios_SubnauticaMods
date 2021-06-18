@@ -6,11 +6,8 @@ using FCS_AlterraHub.Mods.Global.Spawnables;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
-using FCS_HomeSolutions.Mono.PaintTool;
-using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Assets;
-using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 #if SUBNAUTICA
@@ -19,7 +16,7 @@ using Sprite = Atlas.Sprite;
 #endif
 
 
-namespace FCS_HomeSolutions.Spawnables
+namespace FCS_HomeSolutions.Mods.PaintTool.Spawnable
 {
     internal class PaintToolSpawnable : Equipable
     {

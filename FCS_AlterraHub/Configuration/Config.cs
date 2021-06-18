@@ -35,7 +35,7 @@ namespace FCS_AlterraHub.Configuration
         [Keybind("FCS PDA Information Button"), OnChange(nameof(PDAKeyCodeChangedEvent))]
         public KeyCode PDAInfoKeyCode { get; set; } = KeyCode.I;
 
-        public List<FCSStoreEntry> AdditionalStoreItems = new List<FCSStoreEntry>();
+        public List<FCSStoreEntry> AdditionalStoreItems = new();
 
         [Slider("Ore Payout Difficulty", 0.1f, 1.9f, DefaultValue = 1, Step = 0.1f, Format = "{0}", Tooltip = "The higher the value the more payout per ore.")]
         public float OrePayoutMultiplier { get; set; } = 1f;
@@ -50,6 +50,15 @@ namespace FCS_AlterraHub.Configuration
 
         [JsonIgnore]
         internal Action<bool> OnPlaySoundToggleEvent { get; set; }
+
+        [Toggle("[Alterra Transport Drone] Enable Transport Drone Audio", Order = 1,
+            Tooltip = "Enables/Disables the sound effects on the drone.")]
+        public bool AlterraTransportDroneFxAllowed { get; set; } = true;
+
+        [Slider("[Alterra Transport Drone] Master Volume", 0.0f, 1.0f, DefaultValue = 1.0f, Step = 0.01f,
+            Format = "{0:P0}", Order = 1, Tooltip = "This control affects all drones.")]
+
+        public float AlterraTransportDroneVolume { get; set; } = 1;
 
         private void PDAKeyCodeChangedEvent(KeybindChangedEventArgs e)
         {
@@ -84,6 +93,6 @@ namespace FCS_AlterraHub.Configuration
         {
         }
 
-        public Dictionary<string, List<EncyclopediaEntryData>> EncyclopediaEntries = new Dictionary<string, List<EncyclopediaEntryData>>();
+        public Dictionary<string, List<EncyclopediaEntryData>> EncyclopediaEntries = new();
     }
 }

@@ -115,6 +115,7 @@ namespace FCS_AlterraHub.Buildables
         public static GameObject AlterraHubTransportDronePrefab { get; set; }
 
         public static GameObject DronePortFragmentsPrefab { get; set; }
+        public static GameObject DataBoxPrefab { get; set; }
 
         public static bool GetPrefabs()
         {
@@ -127,8 +128,8 @@ namespace FCS_AlterraHub.Buildables
                     QuickLogger.Debug("GetPrefabs");
                     
                     if (!LoadAssetV2("fcsPDA", QPatch.GlobalBundle, out var fcsPDAPrefab)) return false;
-                    FcsPDAPrefab = fcsPDAPrefab;
-
+                    FcsPDAPrefab = fcsPDAPrefab;                    
+                    
                     if (!LoadAssetV2("RadialMenuEntry", QPatch.GlobalBundle, out var pdaRadialMenuEntryPrefab)) return false;
                     PDARadialMenuEntryPrefab = pdaRadialMenuEntryPrefab;
 
@@ -203,6 +204,9 @@ namespace FCS_AlterraHub.Buildables
 
                     //if (!LoadAsset("PDAEntry", QPatch.GlobalBundle, out var pdaEntryPrefabGo, false)) return false;
                     //PDAEntryPrefab = pdaEntryPrefabGo;
+
+                    //if (!LoadAssetV2("fcsDataBox", QPatch.GlobalBundle, out var fcsDataBox)) return false;
+                    //DataBoxPrefab = fcsDataBox;
 
                     _initialized = true;
                 }

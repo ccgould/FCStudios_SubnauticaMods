@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using FCS_AlterraHomeSolutions.Mono.PaintTool;
+﻿using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
@@ -8,12 +6,11 @@ using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Objects;
 using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
-using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace FCS_HomeSolutions.Mono.PaintTool
+namespace FCS_HomeSolutions.Mods.PaintTool
 {
     internal class PaintToolController: PlayerTool,IProtoEventListener, IFCSSave<SaveData>
     {
