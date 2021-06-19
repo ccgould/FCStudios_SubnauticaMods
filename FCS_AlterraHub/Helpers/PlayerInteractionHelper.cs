@@ -1,4 +1,8 @@
-﻿using FCS_AlterraHub.Configuration;
+﻿using System.Collections.Generic;
+using FCS_AlterraHub.Configuration;
+using FCS_AlterraHub.Extensions;
+using FCSCommon.Utilities;
+using UnityEngine;
 using UWE;
 
 namespace FCS_AlterraHub.Helpers
@@ -7,12 +11,49 @@ namespace FCS_AlterraHub.Helpers
     {
         public static bool GivePlayerItem(TechType techType)
         {
+            QuickLogger.Debug($"Giving Player Item: {Language.main.Get(techType)}",true);
             var size = CraftData.GetItemSize(techType);
             if (Player.main.HasInventoryRoom(size.x,size.y))
             {
                 CraftData.AddToInventory(techType, 1, false, false);
                 return true;
             }
+            return false;
+        }
+
+        public static bool GivePlayerItemV2(TechType techType,int amount)
+        {
+            if (amount > 0)
+            {
+                var sizes = new List<Vector2int>();
+                for (int i = 0; i < amount; i++)
+                {
+                    sizes.Add(CraftData.GetItemSize(techType));
+                }
+                
+                if (Inventory.main.container.HasRoomFor(sizes))
+                {
+                    if (CraftData.IsAllowed(techType))
+                    {
+                        for (int i = 0; i < amount; i++)
+                        {
+                            GameObject gameObject = CraftData.InstantiateFromPrefab(techType, false);
+                            if (gameObject != null)
+                            {
+                                gameObject.transform.position = MainCamera.camera.transform.position + MainCamera.camera.transform.forward * 3f;
+                                CrafterLogic.NotifyCraftEnd(gameObject, techType);
+                                Pickupable component = gameObject.GetComponent<Pickupable>();
+                                if (component != null && !Inventory.main.Pickup(component, false))
+                                {
+                                    ErrorMessage.AddError(Language.main.Get("InventoryFull"));
+                                }
+                            }
+                        }
+                        return true;
+                    }
+                }
+            }
+
             return false;
         }
 

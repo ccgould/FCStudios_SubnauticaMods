@@ -205,8 +205,8 @@ namespace FCS_AlterraHub.Buildables
                     //if (!LoadAsset("PDAEntry", QPatch.GlobalBundle, out var pdaEntryPrefabGo, false)) return false;
                     //PDAEntryPrefab = pdaEntryPrefabGo;
 
-                    //if (!LoadAssetV2("fcsDataBox", QPatch.GlobalBundle, out var fcsDataBox)) return false;
-                    //DataBoxPrefab = fcsDataBox;
+                    if (!LoadAssetV2("fcs_BlueprintBox", QPatch.GlobalBundle, out var fcsDataBox)) return false;
+                    DataBoxPrefab = fcsDataBox;
 
                     _initialized = true;
                 }

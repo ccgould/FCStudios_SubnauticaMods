@@ -2,6 +2,7 @@
 using System.Collections;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
+using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Mods.FCSDataBox.Mono;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -46,17 +47,26 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Spawnable
                     rb.isKinematic = true;
                 }
 
-                Pickupable pickupable = prefab.EnsureComponent<Pickupable>();
-                pickupable.isPickupable = false;
+                //Pickupable pickupable = prefab.EnsureComponent<Pickupable>();
+                //pickupable.isPickupable = false;
 
-                ResourceTracker resourceTracker = prefab.EnsureComponent<ResourceTracker>();
-                resourceTracker.prefabIdentifier = prefabIdentifier;
-                resourceTracker.techType = TechType;
-                resourceTracker.overrideTechType = TechType.Databox;
-                resourceTracker.rb = rb;
-                resourceTracker.pickupable = pickupable;
+                //ResourceTracker resourceTracker = prefab.EnsureComponent<ResourceTracker>();
+                //resourceTracker.prefabIdentifier = prefabIdentifier;
+                //resourceTracker.techType = TechType;
+                //resourceTracker.overrideTechType = TechType.Databox;
+                //resourceTracker.rb = rb;
+                //resourceTracker.pickupable = pickupable;
 
-                prefab.AddComponent<FCSDataBoxController>();
+                prefab.gameObject.SetActive(false);
+                var bluePrintDataBox = prefab.EnsureComponent<BlueprintHandTarget>();
+                bluePrintDataBox.animator = prefab.GetComponent<Animator>();
+                bluePrintDataBox.animParam = "databox_take";
+                bluePrintDataBox.animParam = "databox_lookat";
+                prefab.gameObject.SetActive(true);
+                var controller = prefab.AddComponent<FCSDataBoxController>();
+                controller.Initialize();
+
+                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
                 return prefab;
             }
             catch (Exception e)

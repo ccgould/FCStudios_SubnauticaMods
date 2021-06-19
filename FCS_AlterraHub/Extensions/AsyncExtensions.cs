@@ -10,30 +10,16 @@ namespace FCS_AlterraHub.Extensions
 #if SUBNAUTICA
         public static Pickupable ToPickupable(this TechType techType)
         {
-            Pickupable pickupable = null;
-            
-            if (PrefabDatabase.TryGetPrefabFilename(CraftData.GetClassIdForTechType(techType), out string filepath))
+            GameObject gameObject = CraftData.InstantiateFromPrefab(techType, false);
+            if (gameObject != null)
             {
-                GameObject prefab = Resources.Load<GameObject>(filepath);
-
-                if (prefab != null)
-                { 
-                    var go = GameObject.Instantiate(prefab);
-                    pickupable = go.EnsureComponent<Pickupable>();
-                    PickupReplacement(pickupable);
-                }
-            }
-            
-            if(pickupable ==null)
-            {
-                QuickLogger.Error("Failed to get pickupable through PrefabDatabase trying with utils.");
-                var item = Utils.CreateGenericLoot(techType);
-                pickupable = item?.GetComponentInChildren<Pickupable>();
-                var result = pickupable == null ? "not successful" : "successful";
-                QuickLogger.Info($"Attempt was {result}");
+                gameObject.transform.position = MainCamera.camera.transform.position + MainCamera.camera.transform.forward * 3f;
+                CrafterLogic.NotifyCraftEnd(gameObject, techType);
+                Pickupable component = gameObject.GetComponent<Pickupable>();
+                if(component !=null) return component;
             }
 
-            return pickupable;
+            return null;
         }
 
         public static InventoryItem ToInventoryItem(this TechType techType)

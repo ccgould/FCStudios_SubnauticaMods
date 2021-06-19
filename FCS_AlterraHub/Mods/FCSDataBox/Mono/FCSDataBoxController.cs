@@ -7,12 +7,9 @@ namespace FCS_AlterraHub.Mods.FCSDataBox.Mono
         private BlueprintHandTarget _bluePrintDataBox;
         internal TechType UnlockTechType;
 
-        private void Initialize()
+        internal void Initialize()
         {
-            _bluePrintDataBox = gameObject.EnsureComponent<BlueprintHandTarget>();
-            _bluePrintDataBox.animator = GetComponent<Animator>(); ;
-            _bluePrintDataBox.animParam = "databox_take";
-            _bluePrintDataBox.animParam = "databox_lookat";
+            _bluePrintDataBox = gameObject.GetComponent<BlueprintHandTarget>();
             _bluePrintDataBox.unlockTechType = UnlockTechType;
         }
     }
