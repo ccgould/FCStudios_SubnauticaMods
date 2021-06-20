@@ -49,14 +49,14 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
             //Wait until we enter the current state
             while (!_animator.GetCurrentAnimatorStateInfo(0).IsName(stateName))
             {
-                QuickLogger.Debug("Wait until we enter the current state.",true);
+                //QuickLogger.Debug("Wait until we enter the current state.",true);
                 yield return null;
             }
 
             //Now, Wait until the current state is done playing
             while ((_animator.GetCurrentAnimatorStateInfo(0).normalizedTime) % 1 < 0.99f)
             {
-                QuickLogger.Debug("Now, Wait until the current state is done playing", true);
+                //QuickLogger.Debug("Now, Wait until the current state is done playing", true);
                 yield return null;
             }
 

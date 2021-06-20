@@ -3,6 +3,7 @@ using System.IO;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Managers;
 using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Assets;
@@ -26,19 +27,8 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Spawnables
             OnFinishedPatching += () =>
             {
                 Mod.DronePortPadHubNewFragmentTechType = TechType;
-                CoordinatedSpawnsHandler.RegisterCoordinatedSpawn(new SpawnInfo(TechType,new Vector3(82.70f, -316.9f, -1434.7f), Quaternion.Euler(348.7f, 326.24f, 43.68f)));
             };
         }
-
-        public override WorldEntityInfo EntityInfo => new()
-        {
-            cellLevel = LargeWorldEntity.CellLevel.Medium,
-            classId = ClassID,
-            localScale = Vector3.one,
-            prefabZUp = false,
-            slotType = EntitySlot.Type.Medium,
-            techType = TechType
-        };
 
         public override GameObject GetGameObject()
         {
@@ -67,16 +57,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Spawnables
                     rb = prefab.EnsureComponent<Rigidbody>();
                     rb.isKinematic = true;
                 }
-
-                Pickupable pickupable = prefab.EnsureComponent<Pickupable>();
-                pickupable.isPickupable = false;
-
-                ResourceTracker resourceTracker = prefab.EnsureComponent<ResourceTracker>();
-                resourceTracker.prefabIdentifier = prefabIdentifier;
-                resourceTracker.techType = TechType;
-                resourceTracker.overrideTechType = TechType.Fragment;
-                resourceTracker.rb = rb;
-                resourceTracker.pickupable = pickupable;
+                
 
                 // Update sky applier
                 var applier = prefab.EnsureComponent<SkyApplier>();
@@ -86,6 +67,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Spawnables
                 WorldHelpers.CreateBeacon(prefab, Mod.AlterraHubStationPingType, "Alterra Hub Station");
                 MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
                 var station = prefab.AddComponent<AlterraFabricatorStationController>();
+                prefab.AddComponent<PortManager>();
                 return prefab;
             }
             catch (Exception e)

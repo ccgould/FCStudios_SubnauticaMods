@@ -367,6 +367,26 @@ namespace FCS_ProductionSolutions.Configuration
 
             return _alterraStorageTechType;
         }
+
+        public static bool CreateNewDNASampleData(TechType techType,out DNASampleData data)
+        {
+            var seed = techType.ToInventoryItemLegacy()?.item?.gameObject.GetComponentInChildren<Plantable>();
+
+            if (IsNonePlantableAllowedList.Contains(techType))
+            {
+                data = new DNASampleData {PickType = techType, TechType = techType};
+                return true;
+            }
+
+            if (seed != null)
+            {
+                data = new DNASampleData { PickType = techType, TechType = techType, IsLandPlant = seed.aboveWater};
+                return true;
+            }
+
+            data = new DNASampleData();
+            return false;
+        }
     }
 
     internal struct DNASampleData

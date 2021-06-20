@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using FMOD;
 using SMLHelper.V2.Utility;
 using UnityEngine;
@@ -14,7 +10,7 @@ namespace FCS_AlterraHub.Systems
     {
 
         public static VoiceNotificationSystem main;
-        private static Dictionary<string,VoiceData> _voiceNotifications = new Dictionary<string, VoiceData>();
+        private static Dictionary<string,VoiceData> _voiceNotifications = new();
         public float minInterval;
         private float timeNextPlay = -1f;
 
@@ -87,6 +83,11 @@ namespace FCS_AlterraHub.Systems
             }
 
             return false;
+        }
+
+        public void DisplayMessage(string text, object[] args = null)
+        {
+            Subtitles.main.Add(text, args);
         }
     }
 

@@ -36,9 +36,6 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Spawnables
                 var lw = prefab.AddComponent<LargeWorldEntity>();
                 lw.cellLevel = LargeWorldEntity.CellLevel.Global;
 
-                var pickUp = prefab.AddComponent<Pickupable>();
-                pickUp.isPickupable = false;
-
                 //Renderer
                 var renderer = prefab.GetComponentInChildren<Renderer>();
 

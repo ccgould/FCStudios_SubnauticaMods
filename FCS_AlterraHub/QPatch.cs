@@ -33,6 +33,7 @@ namespace FCS_AlterraHub
     [QModCore]
     public class QPatch
     {
+        internal static FMODAsset BoxOpenSoundAsset;
         private static string PdaEntryMessage => $"Please open your AlterraHub PDA to read this data entry ({Configuration.FCSPDAKeyCode}). Make sure you have completed the Alterra Hub Station mission to do so.";
         public static Config Configuration { get;} = OptionsPanelHandler.Main.RegisterModOptions<Config>();
         public static AssetBundle GlobalBundle { get; set; }
@@ -165,23 +166,32 @@ namespace FCS_AlterraHub
             debitCardSpawnable.Patch();
             Mod.DebitCardTechType = debitCardSpawnable.TechType;
 
-            var oreConsumerFragment = new OreConsumerFragment();
-            oreConsumerFragment.Patch();
-            Mod.OreConsumerFragmentTechType = oreConsumerFragment.TechType;
+            //var oreConsumerFragment = new OreConsumerFragment();
+            //oreConsumerFragment.Patch();
+            //Mod.OreConsumerFragmentTechType = oreConsumerFragment.TechType;
 
-            var alterraHubDepotFragment = new AlterraHubDepotFragment();
-            alterraHubDepotFragment.Patch();
-            Mod.AlterraHubDepotFragmentTechType = alterraHubDepotFragment.TechType;
+            //var alterraHubDepotFragment = new AlterraHubDepotFragment();
+            //alterraHubDepotFragment.Patch();
+            //Mod.AlterraHubDepotFragmentTechType = alterraHubDepotFragment.TechType;
 
-            var keyCardSpawnable = new KeyCardSpawnable();
-            keyCardSpawnable.Patch();
+            //var keyCardSpawnable = new KeyCardSpawnable();
+            //keyCardSpawnable.Patch();
 
 
-            var dronePortFragment = new DronePortPadHubNewFragSpawnable();
-            dronePortFragment.Patch();
+            //var dronePortFragment = new DronePortPadHubNewFragSpawnable();
+            //dronePortFragment.Patch();
 
             var transportDrone = new AlterraTransportDroneSpawnable();
             transportDrone.Patch();
+
+            var alterraStation = new AlterraHubFabricationStationSpawnable();
+            alterraStation.Patch();
+            Mod.AlterraStationTechType = alterraStation.TechType;
+
+
+            BoxOpenSoundAsset = ScriptableObject.CreateInstance<FMODAsset>();
+            BoxOpenSoundAsset.id = "box_open";
+            BoxOpenSoundAsset.path = "event:/loot/databox/box_open";
 
             //DummyFragment.Patch();
 

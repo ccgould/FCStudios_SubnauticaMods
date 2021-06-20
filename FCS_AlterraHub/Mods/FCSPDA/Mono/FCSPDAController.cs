@@ -30,7 +30,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
     {
         private PDA _pda;
         private int prevQuickSlot;
-        private Sequence sequence = new Sequence(false);
+        private Sequence sequence = new(false);
         private BaseManager _currentBase;
         private GameObject _inputDummy;
         private uGUI_InputGroup _ui;
@@ -41,9 +41,9 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
         private Text _accountBalance;
         private bool _goToEncyclopedia;
         private bool _depthState;
-        private readonly Dictionary<PDAPages, GameObject> _pages = new Dictionary<PDAPages, GameObject>();
+        private readonly Dictionary<PDAPages, GameObject> _pages = new();
         private GameObject _toggleHud;
-        private Dictionary<StoreCategory, List<StoreItem>> _storeItems = new Dictionary<StoreCategory, List<StoreItem>>();
+        private Dictionary<StoreCategory, List<StoreItem>> _storeItems = new();
         private GameObject _storePageGrid;
         private Text _storeLabel;
         private CartDropDownHandler _cartDropDownManager;
@@ -79,7 +79,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
         #region SINGLETON PATTERN
         private static FCSPDAController _instance;
         private ReturnsDialogController _returnsDialogController;
-        private List<MeshRenderer> _pdaMeshes = new List<MeshRenderer>();
+        private List<MeshRenderer> _pdaMeshes = new();
         private GameObject _screen;
         private Transform _pdaAnchor;
         private uGUI_CanvasScaler _canvasScalar;
@@ -460,6 +460,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
         internal void ExitStore()
         {
             GoToPage(PDAPages.Home);
+            Close();
         }
 
         internal void ShowMission()

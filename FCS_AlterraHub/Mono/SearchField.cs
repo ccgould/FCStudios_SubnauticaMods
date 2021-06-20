@@ -103,5 +103,10 @@ namespace FCS_AlterraHub.Mono
         {
             hover = false;
         }
+
+        public string GetText()
+        {
+            return _inputField.text;
+        }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
@@ -22,6 +23,8 @@ namespace FCS_AlterraHub.Patches
     [HarmonyPatch]
     public static class Player_Patches
     {
+        private static readonly FieldInfo _shouldPlayIntro = typeof(bool).GetField("shouldPlayIntro", BindingFlags.NonPublic | BindingFlags.Instance);
+
         internal static Action OnPlayerUpdate;
         internal static bool ForceOpenPDA { get; set; }
         internal static FCSPDAController FCSPDA;
@@ -35,8 +38,8 @@ namespace FCS_AlterraHub.Patches
         [HarmonyPostfix]
         private static void Awake_Postfix(Player __instance)
         {
+            
             __instance.gameObject.EnsureComponent<VoiceNotificationSystem>();
-
             var f = uSkyManager.main.SunLight.transform;
             if (f != null)
             {
@@ -49,7 +52,15 @@ namespace FCS_AlterraHub.Patches
             }
 
             CoroutineHost.StartCoroutine(CreateFcsPda(__instance));
-            CoroutineHost.StartCoroutine(Mod.SpawnAlterraFabStation());
+            //var shouldPlay = (bool)_shouldPlayIntro.GetValue(__instance.GetPDA());
+            Mod.OnGamePlaySettingsLoaded += settings =>
+            {
+                if (!settings.IsStationSpawned)
+                {
+                    CoroutineHost.StartCoroutine(Mod.SpawnAlterraFabStation(settings));
+                }
+            };
+            Mod.LoadGamePlaySettings();
         }
         
         

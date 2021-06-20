@@ -116,6 +116,7 @@ namespace FCS_AlterraHub.Buildables
 
         public static GameObject DronePortFragmentsPrefab { get; set; }
         public static GameObject DataBoxPrefab { get; set; }
+        public static GameObject BluePrintDataDiscPrefab { get; set; }
 
         public static bool GetPrefabs()
         {
@@ -201,6 +202,9 @@ namespace FCS_AlterraHub.Buildables
 
                     if (!LoadAssetV2("DronePort_Fragments", QPatch.GlobalBundle, out var dronePortFragmentsPrefab)) return false;
                     DronePortFragmentsPrefab = dronePortFragmentsPrefab;
+
+                    if (!LoadAssetV2("BLUEPRINT_DATA_DISC", QPatch.GlobalBundle, out var blueprintDataDiscPrefab)) return false;
+                    BluePrintDataDiscPrefab = blueprintDataDiscPrefab;
 
                     //if (!LoadAsset("PDAEntry", QPatch.GlobalBundle, out var pdaEntryPrefabGo, false)) return false;
                     //PDAEntryPrefab = pdaEntryPrefabGo;

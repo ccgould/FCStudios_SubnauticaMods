@@ -23,17 +23,17 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Buildable
         public override TechCategory CategoryForPDA => TechCategory.InteriorModule;
         public override string AssetsFolder => Mod.GetAssetPath();
 
-        public override TechType RequiredForUnlock => Mod.AlterraHubDepotFragmentTechType;
+        public override TechType RequiredForUnlock => TechType;
 
-        public override string DiscoverMessage => $"{this.FriendlyName} Unlocked!";
+        //public override string DiscoverMessage => $"{this.FriendlyName} Unlocked!";
 
-        public override bool AddScannerEntry => true;
+        //public override bool AddScannerEntry => true;
 
-        public override int FragmentsToScan => 3;
+        //public override int FragmentsToScan => 3;
 
-        public override float TimeToScanFragment => 5f;
+        //public override float TimeToScanFragment => 5f;
 
-        public override bool DestroyFragmentOnScan => true;
+        //public override bool DestroyFragmentOnScan => true;
 
         public AlterraHubDepotPatcher() : base(Mod.AlterraHubDepotClassID, Mod.AlterraHubDepotFriendly, Mod.AlterraHubDepotDescription)
         {

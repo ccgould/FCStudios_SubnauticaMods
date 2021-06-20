@@ -44,14 +44,16 @@ namespace FCS_AlterraHub.Configuration
 
     internal class AlterraTransportDroneEntry
     {
-        public string HomePortID;
         public string Id { get; set; }
-        public string DockedPortID { get; set; }
+        public int DockedPortID { get; set; }
         public IEnumerable<CartItemSaveData> Cargo { get; set; }
-        public string DestinationPortID { get; set; }
-        public string DeparturePortID { get; set; }
+        public int DestinationPortID { get; set; }
+        public string DestinationBaseID { get; set; }
+        public string DepartureBaseID { get; set; }
+        public int DeparturePortID { get; set; }
         public DroneController.DroneStates DroneState { get; set; }
         public string ParentID { get; set; }
+        public string DockedPortBaseID { get; set; }
     }
 
     [Serializable]

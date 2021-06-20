@@ -60,6 +60,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Mono
                     {
                         _storage = _savedData.Storage;
                         _inventoryGrid.DrawPage();
+                        RefreshUI();
                     }
                 }
 
@@ -94,6 +95,9 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Mono
 
             var canvas = gameObject.GetComponentInChildren<Canvas>();
             //_interactionHelper = canvas.gameObject.AddComponent<InterfaceInteraction>();
+
+
+            _status = GameObjectHelpers.FindGameObject(canvas.gameObject, "Status")?.GetComponent<Text>();
 
             _inventoryGrid = gameObject.EnsureComponent<GridHelperV2>();
             _inventoryGrid.OnLoadDisplay += OnLoadItemsGrid;
@@ -284,7 +288,6 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Mono
             }
 
             _inventoryGrid.DrawPage();
-
             return true;
         }
 

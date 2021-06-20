@@ -5,9 +5,8 @@ using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mods.FCSPDA.Mono;
-using FCS_AlterraHub.Mods.OreConsumer.Model;
+using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Systems;
-using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,12 +15,14 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
 {
     internal class AntennaController : MonoBehaviour
     {
-        internal List<ElectricalBox> _electricalBoxes = new List<ElectricalBox>();
+        internal List<ElectricalBox> _electricalBoxes = new();
         private Text _information;
         private Button _reactiveBTN;
         private MotorHandler _antenna;
         private Image _powerIcon;
         private FCSMessageBox _messageBox;
+        private SearchField _numberField;
+        private const string _accessCode = "1993";
         private const float SpeedIncrease = 16.666666666666666666666666666667f;
         public void Initialize(AlterraFabricatorStationController fabricatorStationController)
         {
@@ -32,6 +33,8 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
                 eBox.Initialize(this,i);
                 _electricalBoxes.Add(eBox);
             }
+
+            _numberField = GameObjectHelpers.FindGameObject(gameObject, "InputField").AddComponent<SearchField>();
 
             _messageBox = GameObjectHelpers.FindGameObject(gameObject, "MessageBox").AddComponent<FCSMessageBox>();
 
@@ -45,22 +48,34 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             _reactiveBTN = gameObject.GetComponentInChildren<Button>();
             _reactiveBTN.onClick.AddListener(() =>
             {
-                if(!PlayerInteractionHelper.HasItem(Mod.StaffKeyCardTechType))
+                if(!IsPinValid())
                 {
-                    _messageBox.Show("Staff key card required to activate antenna.",FCSMessageButton.OK,null);
+                    _messageBox.Show("Valid passcode card required to activate antenna.",FCSMessageButton.OK,null);
                     return;
                 }
                 Mod.GamePlaySettings.IsPDAUnlocked = true;
+                _numberField.gameObject.SetActive(false);
                 FCSPDAController.ForceOpen();
             });
             InvokeRepeating(nameof(UpdateScreen),1f,1f);
 
         }
 
+        private bool IsPinValid()
+        {
+            var text = _numberField.GetText();
+            if (text.Length == 4)
+            {
+                return text.Equals(_accessCode);
+            }
+
+            return false;
+        }
+
         private void UpdateScreen()
         {
             var fixedBoxes = _electricalBoxes.Count(x => x.IsRepaired);
-            _information.text = $"Error: Please repair all electrical boxes {fixedBoxes}/6";
+            _information.text = $"Error: Please repair all electrical boxes {fixedBoxes}/6 and enter passcode";
 
             if (fixedBoxes >= 6)
             {

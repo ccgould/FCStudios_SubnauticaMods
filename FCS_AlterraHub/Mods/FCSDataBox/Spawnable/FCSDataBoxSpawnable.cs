@@ -57,14 +57,8 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Spawnable
                 //resourceTracker.rb = rb;
                 //resourceTracker.pickupable = pickupable;
 
-                prefab.gameObject.SetActive(false);
-                var bluePrintDataBox = prefab.EnsureComponent<BlueprintHandTarget>();
-                bluePrintDataBox.animator = prefab.GetComponent<Animator>();
-                bluePrintDataBox.animParam = "databox_take";
-                bluePrintDataBox.animParam = "databox_lookat";
-                prefab.gameObject.SetActive(true);
-                var controller = prefab.AddComponent<FCSDataBoxController>();
-                controller.Initialize();
+                prefab.EnsureComponent<GenericHandTarget>();
+                prefab.EnsureComponent<FCSDataBoxController>();
 
                 MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
                 return prefab;

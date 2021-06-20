@@ -16,6 +16,7 @@ using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using FMOD;
 using SMLHelper.V2.Crafting;
+using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 using SearchOption = System.IO.SearchOption;
@@ -485,29 +486,40 @@ namespace FCS_AlterraHub.Configuration
 
         public static GameObject FCSStationSpawn { get; set; }
 
-        internal static IEnumerator SpawnAlterraFabStation()
+        internal static IEnumerator SpawnAlterraFabStation(FCSGamePlaySettings fcsGamePlaySettings)
         {
-            GameObject gameObject = GameObject.Instantiate(Buildables.AlterraHub.AlterraHubFabricatorPrefab);
-            gameObject.AddComponent<AlterraFabricatorStationController>();
+            while (LargeWorldStreamer.main?.cellManager?.streamer?.globalRoot == null)
+            {
+                yield return null;
+            }
 
-            var lw = gameObject.AddComponent<LargeWorldEntity>();
-            lw.cellLevel = LargeWorldEntity.CellLevel.Global;
-            LargeWorldEntity.Register(gameObject);
-            gameObject.transform.position = new Vector3(82.70f, -316.9f, -1434.7f);
-            gameObject.transform.localRotation = Quaternion.Euler(348.7f, 326.24f, 43.68f);
-            WorldHelpers.CreateBeacon(gameObject, AlterraHubStationPingType, "Alterra Hub Station");
-            MaterialHelpers.ApplyGlassShaderTemplate(gameObject, "_glass", Mod.ModPackID);
-            FCSStationSpawn = gameObject.FindChild("RespawnPoint");
+            var spawnLocation = new Vector3(82.70f, -316.9f, -1434.7f);
+            var spawnRotation = Quaternion.Euler(348.7f, 326.24f, 43.68f);
+            if (CraftData.IsAllowed(AlterraStationTechType))
+            {
+                GameObject prefabForTechType = CraftData.GetPrefabForTechType(AlterraStationTechType);
+                if (prefabForTechType != null)
+                {
+                    GameObject gameObject = Utils.CreatePrefab(prefabForTechType);
+                    LargeWorldEntity.Register(gameObject);
+                    CrafterLogic.NotifyCraftEnd(gameObject, AlterraStationTechType);
+                    gameObject.SendMessage("StartConstruction", SendMessageOptions.DontRequireReceiver);
+                    gameObject.transform.position = spawnLocation;
+                    gameObject.transform.localRotation = spawnRotation;
+                    fcsGamePlaySettings.IsStationSpawned = true;
+                }
+                ErrorMessage.AddDebug("Could not find prefab for TechType = " + AlterraStationTechType);
+            }
             yield break;
         }
-
-
+        
         public static bool IsOreConsumerSpawned { get; set; }
         public static PingType AlterraHubStationPingType { get; set; }
         public static TechType StaffKeyCardTechType { get; set; }
         public static TechType DronePortPadHubNewFragmentTechType { get; set; }
         public static TechType AlterraTransportDroneTechType { get; set; }
         public static PingType AlterraTransportDronePingType { get; set; }
+        public static TechType AlterraStationTechType { get; set; }
 
         public static void DeepCopySave(AccountDetails accountDetails)
         {
@@ -584,6 +596,7 @@ namespace FCS_AlterraHub.Configuration
         public HashSet<string> Conditions = new();
         public bool TransDroneSpawned { get; set; }
         public Dictionary<string,int> DronePortAssigns { get; set; } = new();
+        public bool IsStationSpawned { get; set; }
 
         public bool ConditionMet(string condition)
         {

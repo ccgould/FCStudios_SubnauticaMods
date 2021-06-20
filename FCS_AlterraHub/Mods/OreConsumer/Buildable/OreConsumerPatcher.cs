@@ -22,7 +22,7 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Buildable
         public override TechCategory CategoryForPDA => TechCategory.ExteriorModule;
         public override string AssetsFolder => Mod.GetAssetPath();
 
-        public override TechType RequiredForUnlock => Mod.OreConsumerFragmentTechType;
+        public override TechType RequiredForUnlock => TechType;
 
         //public override string DiscoverMessage => $"{this.FriendlyName} Unlocked!";
 

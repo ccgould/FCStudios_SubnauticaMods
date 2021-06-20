@@ -23,6 +23,8 @@
     <Compile Include="API\FCSAssetBundlesService.cs" />
     <Compile Include="Buildables\AlterraHubAuxPatcher.cs" />
     <Compile Include="Buildables\AlterraHubModelPrefab.cs" />
+    <Compile Include="Helpers\FModHelpers.cs" />
+    <Compile Include="Managers\PortManager.cs" />
     <Compile Include="Model\GUI\StorageInventoryButton.cs" />
     <Compile Include="Model\LadderController.cs" />
     <Compile Include="Mods\AlterraHubFabricatorBuilding\Buildables\DronePortPadHubNewPatcher.cs" />

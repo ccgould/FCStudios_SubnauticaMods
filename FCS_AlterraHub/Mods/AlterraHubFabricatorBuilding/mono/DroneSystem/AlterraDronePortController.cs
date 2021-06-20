@@ -5,6 +5,7 @@ using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Managers;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mods.AlterraHubDepot.Mono;
 using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.Interfaces;
@@ -35,10 +36,20 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 
         private DockTriggerController _dockTrigger;
         private bool _hasIncomingFlight;
+        private PortManager _portManager;
         public override bool IsOperational => IsInitialized && IsConstructed;
         public Transform BaseTransform { get; set; }
         public bool IsFull => GetIsFull();
         public override bool BypassRegisterCheck { get; } = true;
+
+        public override void OnDestroy()
+        {
+            base.OnDestroy();
+            if (_portManager != null)
+            {
+                _portManager.UnRegisterDronePort(this);
+            }
+        }
 
         private bool GetIsFull()
         {
@@ -232,7 +243,14 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
                 _colorManager.Initialize(gameObject,AlterraHub.BasePrimaryCol);
             }
 
+            if (_portManager == null)
+            {
+                _portManager = gameObject.GetComponentInParent<PortManager>();
+                _portManager.RegisterDronePort(this);
+            }
+
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
+
 
             IsInitialized = true;
         }
@@ -241,7 +259,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
         {
             var drone = GameObject.Instantiate(CraftData.GetPrefabForTechType(Mod.AlterraTransportDroneTechType), _spawnPoint.transform.position, _spawnPoint.transform.rotation);
             _assignedDrone = drone.GetComponent<DroneController>();
-            _assignedDrone.Initialize(this,this);
+            _assignedDrone.Initialize(this);
             return _assignedDrone;
         }
 
@@ -382,6 +400,11 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
         public void SetIncomingFlight(bool value)
         {
             _hasIncomingFlight = value;
+        }
+
+        public string GetBaseID()
+        {
+            return _portManager.GetBaseID();
         }
     }
 }

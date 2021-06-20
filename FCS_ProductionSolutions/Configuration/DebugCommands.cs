@@ -5,6 +5,7 @@ using FCS_AlterraHub.Extensions;
 using FCS_ProductionSolutions.DeepDriller.Mono;
 using FCS_ProductionSolutions.HydroponicHarvester.Enumerators;
 using FCS_ProductionSolutions.HydroponicHarvester.Mono;
+using FCS_ProductionSolutions.MatterAnalyzer.Mono;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Commands;
 using UnityEngine;
@@ -105,6 +106,26 @@ namespace FCS_ProductionSolutions.Configuration
             return $"Parameters: {id}";
         }
 
+        [ConsoleCommand("UnlockDNA")]
+        public static string UnlockDNA(string techTypeAsString)
+        {
+            if (UWE.Utils.TryParseEnum(techTypeAsString, out TechType techType))
+            {
+                if ((MatterAnalyzerStorage.ValidSeeds.Contains(techType) ||
+                     Mod.IsNonePlantableAllowedList.Contains(techType)) &&
+                    !Mod.IsHydroponicKnownTech(techType, out var omit))
+                {
+                    if (Mod.CreateNewDNASampleData(techType, out var data))
+                    {
+                        Mod.AddHydroponicKnownTech(data);
+                        return $"{Language.main.Get(techType)} was unlocked.";
+                    }
+                }
+
+                return $"{Language.main.Get(techType)} is not scannable by the Matter Analyzer.";
+            }
+            return $"Could not parse {techTypeAsString} as TechType";
+        }
 
         //[ConsoleCommand("testMe")]
         //public static void TestMeCommand()

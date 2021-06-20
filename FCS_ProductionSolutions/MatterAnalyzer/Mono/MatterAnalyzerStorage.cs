@@ -140,7 +140,7 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
             return ItemsContainer?.count ?? 0;
         }
 
-        internal HashSet<TechType> ValidSeeds = new HashSet<TechType>
+        internal static HashSet<TechType> ValidSeeds = new HashSet<TechType>
         {
             TechType.BluePalmSeed,
             TechType.PurpleBranchesSeed,
@@ -183,9 +183,6 @@ namespace FCS_ProductionSolutions.MatterAnalyzer.Mono
             TechType.CreepvinePiece,
             TechType.CreepvineSeedCluster,
             TechType.EyesPlantSeed,
-
-
-
         };
 
         private Plantable _currentPlant;

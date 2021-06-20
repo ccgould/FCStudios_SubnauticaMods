@@ -6,6 +6,7 @@ using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Interfaces;
+using FCS_AlterraHub.Managers;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono.Controllers;
 using FCS_AlterraHub.Patches;
@@ -43,17 +44,17 @@ namespace FCS_AlterraHub.Mono
         private PowerSystem.Status _prevPowerState;
         private Dictionary<string, TechLight> _baseTechLights;
         private DumpContainerSimplified _dumpContainer;
-        private Dictionary<TechType, int> _item = new Dictionary<TechType, int>();
+        private Dictionary<TechType, int> _item = new();
         private BaseSaveData _savedData;
         private bool _hasBreakerTripped;
-        private Dictionary<string, BaseOperationObject> _baseOperationObjects = new  Dictionary<string, BaseOperationObject>();
-        private HashSet<CraftingOperation> _craftingOperations = new HashSet<CraftingOperation>();
-        private List<BaseTransferOperation> _baseOperations  = new List<BaseTransferOperation>();
+        private Dictionary<string, BaseOperationObject> _baseOperationObjects = new();
+        private HashSet<CraftingOperation> _craftingOperations = new();
+        private List<BaseTransferOperation> _baseOperations  = new();
         
         public string BaseID { get; set; }
         public float ActiveBaseOxygenTankCount = 0;
-        public readonly Dictionary<TechType, TrackedResource> TrackedResources = new Dictionary<TechType, TrackedResource>();
-        public static List<string> DONT_TRACK_GAMEOBJECTS { get; private set; } = new List<string>
+        public readonly Dictionary<TechType, TrackedResource> TrackedResources = new();
+        public static List<string> DONT_TRACK_GAMEOBJECTS { get; private set; } = new()
         {
             "planterpot",
             "planterbox",
@@ -71,22 +72,23 @@ namespace FCS_AlterraHub.Mono
             "recycler",
             "alterrahubdepot",
         };
-        public readonly HashSet<StorageContainer> BaseStorageLockers = new HashSet<StorageContainer>();
-        public readonly HashSet<FcsDevice> BaseServers = new HashSet<FcsDevice>();
-        public readonly HashSet<FcsDevice> BaseFcsStorage = new HashSet<FcsDevice>();
-        public readonly HashSet<FcsDevice> BaseAntennas = new HashSet<FcsDevice>();
-        public readonly HashSet<FcsDevice> BaseTerminals = new HashSet<FcsDevice>();
+        public readonly HashSet<StorageContainer> BaseStorageLockers = new();
+        public readonly HashSet<FcsDevice> BaseServers = new();
+        public readonly HashSet<FcsDevice> BaseFcsStorage = new();
+        public readonly HashSet<FcsDevice> BaseAntennas = new();
+        public readonly HashSet<FcsDevice> BaseTerminals = new();
+        private static PortManager _portManager;
         public SubRoot Habitat { get; set; }
         public static Action<BaseManager> OnManagerCreated { get; set; }
         public bool IsVisible => GetIsVisible();
-        public static List<BaseManager> Managers { get; } = new List<BaseManager>();
+        public static List<BaseManager> Managers { get; } = new();
         internal NameController NameController { get; private set; }
-        public static Dictionary<string, TrackedLight> GlobalTrackedLights { get; } = new Dictionary<string, TrackedLight>();
+        public static Dictionary<string, TrackedLight> GlobalTrackedLights { get; } = new();
         public Action<PowerSystem.Status> OnPowerStateChanged { get; set; }
-        public List<IDSSRack> BaseRacks { get; set; } = new List<IDSSRack>();
+        public List<IDSSRack> BaseRacks { get; set; } = new();
         public DSSVehicleDockingManager DockingManager { get; set; }
         public bool PullFromDockedVehicles { get; set; }
-        public List<TechType> DockingBlackList { get; set; } = new List<TechType>();
+        public List<TechType> DockingBlackList { get; set; } = new();
         public Action<bool> OnBreakerStateChanged { get; set; }
         public static TechType ActivateGoalTechType { get; set; }
         public Base BaseComponent { get; set; }
@@ -268,6 +270,7 @@ namespace FCS_AlterraHub.Mono
             QuickLogger.Debug($"Creating new manager", true);
             var manager = new BaseManager(habitat);
             QuickLogger.Debug($"Created new base manager with ID {manager.BaseID}", true);
+            _portManager = habitat.gameObject.EnsureComponent<PortManager>();
             Managers.Add(manager);
             QuickLogger.Debug($"Manager Count = {Managers.Count}", true);
             OnManagerCreated?.Invoke(manager);
@@ -287,6 +290,7 @@ namespace FCS_AlterraHub.Mono
 
         public static BaseManager FindManager(string instanceID)
         {
+            if (string.IsNullOrWhiteSpace(instanceID)) return null;
             var manager = Managers.Find(x => x.BaseID == instanceID);
             return manager;
         }
@@ -1530,6 +1534,11 @@ namespace FCS_AlterraHub.Mono
             }
 
             return null;
+        }
+
+        internal PortManager GetPortManager()
+        {
+            return _portManager;
         }
     }
 
