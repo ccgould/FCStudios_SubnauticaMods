@@ -133,12 +133,7 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Buildable
                 if (applyShaders)
                 {
                     //Lets apply the material shader
-                    AlterraHub.ReplaceShadersV2(prefab, AlterraHub.BasePrimaryCol);
-                    AlterraHub.ReplaceShadersV2(prefab, AlterraHub.BaseSecondaryCol);
-                    AlterraHub.ReplaceShadersV2(prefab, AlterraHub.BaseDecalsExterior);
-                    AlterraHub.ReplaceShadersV2(prefab, AlterraHub.BaseTexDecals);
-                    AlterraHub.ReplaceShadersV2(prefab, AlterraHub.BaseLightsEmissiveController);
-                    AlterraHub.ReplaceShadersV2(prefab, AlterraHub.BaseDecalsEmissiveController);
+                    AlterraHub.ReplaceShadersV2(prefab);
                     QuickLogger.Debug($"Applied shaderes to prefab {prefabName}");
                 }
 

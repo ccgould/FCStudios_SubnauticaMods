@@ -172,8 +172,8 @@
     <Compile Include="Mono\ToggleController.cs" />
     <Compile Include="Model\TrackedResource.cs" />
     <Compile Include="Patches\PDAEncyclopedia_Patches.cs" />
-    <Compile Include="Mods\AlterraHubDepot\Spawnable\AlterraHubDepotFragment.cs" />
     <Compile Include="Patches\SubnautiaMap_Patches.cs" />
+    <Compile Include="Structs\ModPackData.cs" />
     <Compile Include="Structs\TrackedLight.cs" />
     <Compile Include="Objects\ColorList.cs" />
     <Compile Include="Helpers\FCSHUD.cs" />
@@ -202,10 +202,8 @@
     <Compile Include="Patches\PowerIndicatorPatch.cs" />
     <Compile Include="Patches\Storage_Patcher.cs" />
     <Compile Include="Patches\SubRoot_Patches.cs" />
-    <Compile Include="Mods\OreConsumer\Spawnable\OreConsumerFragment.cs" />
     <Compile Include="Structs\EncyclopediaEntryData.cs" />
     <Compile Include="Structs\FCSStoreEntry.cs" />
-    <Compile Include="Mods\Global\Spawnables\BioFuelSpawnable.cs" />
     <Compile Include="Enumerators\ModDifficultyMode.cs" />
     <Compile Include="Helpers\PlayerInteractionHelper.cs" />
     <Compile Include="Mono\FcsCard.cs" />

@@ -890,5 +890,33 @@ namespace FCS_AlterraHub.Helpers
 
             return null;
         }
+
+        public static void ApplyParticlesUber(GameObject gameObject, string materialName,float srcBlend,float srcBlend2,float dstBlend,float dstBlend2, float mode, bool cutOff, Vector4 speed,Vector4 color)
+        {
+            var shader = Shader.Find("UWE/Particles/UBER");
+
+            ParticleSystemRenderer[] renderers = gameObject.GetComponentsInChildren<ParticleSystemRenderer>(true);
+
+            foreach (ParticleSystemRenderer renderer in renderers)
+            {
+                foreach (Material material in renderer.materials)
+                {
+                    if (material.name.StartsWith(materialName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        material.shader = shader;
+
+                        material.SetFloat("_SrcBlend",srcBlend);
+                        material.SetFloat("_SrcBlend2", srcBlend2);
+                        material.SetFloat("_DstBlend",dstBlend);
+                        material.SetFloat("_DstBlend2",dstBlend2);
+                        material.SetFloat("_Mode",mode);
+                        if(cutOff)
+                            material.EnableKeyword("_Cutoff");
+                        material.SetVector("_Speed", speed);
+                        material.SetVector("_Color", color);
+                    }
+                }
+            }
+        }
     }
 }

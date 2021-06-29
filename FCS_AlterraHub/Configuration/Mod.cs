@@ -5,9 +5,11 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using FCS_AlterraHub.API;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model.Utilities;
 using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono;
+using FCS_AlterraHub.Mods.FCSDataBox.Mono;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Patches;
 using FCS_AlterraHub.Registration;
@@ -18,7 +20,9 @@ using FMOD;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
+using Story;
 using UnityEngine;
+using Object = UnityEngine.Object;
 using SearchOption = System.IO.SearchOption;
 #if SUBNAUTICA_STABLE
 using Oculus.Newtonsoft.Json;
@@ -55,11 +59,6 @@ namespace FCS_AlterraHub.Configuration
         internal const string DebitCardDescription = "This card lets you access your Alterra Account. You must have this card with you to make Alterra Hub purchases.";
         internal const string CardPrefabName = "CreditCard";
         internal static TechType DebitCardTechType { get; set; }
-
-        internal const string BioFuelClassID = "FCSBioFuel";
-        internal const string BioFuelFriendly = "Bio Fuel";
-        internal const string BioFuelDescription = "A tank of high-quality Bio Fuel, suitable for use in all Bioreactors.";
-        internal const string BioFuelPrefabName = "Liquid_Biofuel";
 
         internal const string OreConsumerClassID = "OreConsumer";
         internal const string OreConsumerFriendly = "Alterra Ore Consumer";
@@ -298,14 +297,14 @@ namespace FCS_AlterraHub.Configuration
             {
                 QuickLogger.Info($"Finished loading Game Play Settings : {JsonConvert.SerializeObject(data, Formatting.Indented)}");
                 GamePlaySettings = data;
-                NotifyGamePlayLoaded();
             });
 
             if(GamePlaySettings == null)
             {
                 SaveGamePlaySettings();
-                NotifyGamePlayLoaded();
             }
+
+            NotifyGamePlayLoaded();
         }
 
         private static void NotifyGamePlayLoaded()
@@ -330,7 +329,7 @@ namespace FCS_AlterraHub.Configuration
             {
                 yield return null;
             }
-            GameObject.DestroyImmediate(_saveObject.gameObject);
+            Object.DestroyImmediate(_saveObject.gameObject);
             _saveObject = null;
         }
 
@@ -479,44 +478,33 @@ namespace FCS_AlterraHub.Configuration
 
         public static void LoadAudioFiles()
         {
-            AudioClips.Add("AH-Mission01-Pt1",AudioUtils.CreateSound(Path.Combine(Mod.GetAssetPath(), "Audio", "AH-Mission01-Pt1.wav")));
-            AudioClips.Add("AH-Mission01-Pt2",AudioUtils.CreateSound(Path.Combine(Mod.GetAssetPath(), "Audio", "AH-Mission01-Pt2.wav")));
-            AudioClips.Add("AH-Mission01-Pt3",AudioUtils.CreateSound(Path.Combine(Mod.GetAssetPath(), "Audio", "AH-Mission01-Pt3.wav")));
+            AudioClips.Add("AH-Mission01-Pt1",AudioUtils.CreateSound(Path.Combine(GetAssetPath(), "Audio", "AH-Mission01-Pt1.wav")));
+            AudioClips.Add("AH-Mission01-Pt2",AudioUtils.CreateSound(Path.Combine(GetAssetPath(), "Audio", "AH-Mission01-Pt2.wav")));
+            AudioClips.Add("AH-Mission01-Pt3",AudioUtils.CreateSound(Path.Combine(GetAssetPath(), "Audio", "AH-Mission01-Pt3.wav")));
         }
-
-        public static GameObject FCSStationSpawn { get; set; }
-
+        
         internal static IEnumerator SpawnAlterraFabStation(FCSGamePlaySettings fcsGamePlaySettings)
         {
             while (LargeWorldStreamer.main?.cellManager?.streamer?.globalRoot == null)
             {
+                //QuickLogger.Error("LargeWorldStreamer not ready to make station",true);
                 yield return null;
             }
-
+            
             var spawnLocation = new Vector3(82.70f, -316.9f, -1434.7f);
             var spawnRotation = Quaternion.Euler(348.7f, 326.24f, 43.68f);
-            if (CraftData.IsAllowed(AlterraStationTechType))
-            {
-                GameObject prefabForTechType = CraftData.GetPrefabForTechType(AlterraStationTechType);
-                if (prefabForTechType != null)
-                {
-                    GameObject gameObject = Utils.CreatePrefab(prefabForTechType);
-                    LargeWorldEntity.Register(gameObject);
-                    CrafterLogic.NotifyCraftEnd(gameObject, AlterraStationTechType);
-                    gameObject.SendMessage("StartConstruction", SendMessageOptions.DontRequireReceiver);
-                    gameObject.transform.position = spawnLocation;
-                    gameObject.transform.localRotation = spawnRotation;
-                    fcsGamePlaySettings.IsStationSpawned = true;
-                }
-                ErrorMessage.AddDebug("Could not find prefab for TechType = " + AlterraStationTechType);
-            }
+            var station = SpawnHelper.SpawnTechType(AlterraStationTechType, spawnLocation,spawnRotation);
+
+           
+
+            fcsGamePlaySettings.IsStationSpawned = true;
             yield break;
         }
-        
-        public static bool IsOreConsumerSpawned { get; set; }
+
+
         public static PingType AlterraHubStationPingType { get; set; }
         public static TechType StaffKeyCardTechType { get; set; }
-        public static TechType DronePortPadHubNewFragmentTechType { get; set; }
+        public static TechType DronePortPadHubNewTechType { get; set; }
         public static TechType AlterraTransportDroneTechType { get; set; }
         public static PingType AlterraTransportDronePingType { get; set; }
         public static TechType AlterraStationTechType { get; set; }
@@ -597,6 +585,7 @@ namespace FCS_AlterraHub.Configuration
         public bool TransDroneSpawned { get; set; }
         public Dictionary<string,int> DronePortAssigns { get; set; } = new();
         public bool IsStationSpawned { get; set; }
+        public Dictionary<string, DataBoxData> DataBoxes { get; set; } = new();
 
         public bool ConditionMet(string condition)
         {
@@ -608,6 +597,12 @@ namespace FCS_AlterraHub.Configuration
             Conditions.Add(condition);
             Mod.SaveGamePlaySettings();
         }
+    }
+
+    public class DataBoxData
+    {
+        public bool Used { get; set; }
+        public TechType TechType { get; set; }
     }
 
     public class KeyPadAccessSave

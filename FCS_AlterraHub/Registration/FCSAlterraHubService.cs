@@ -6,15 +6,12 @@ using System.Reflection;
 using FCS_AlterraHub.API;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Enumerators;
-using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Structs;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
 using Oculus.Newtonsoft.Json;
-using QModManager.API;
 using SMLHelper.V2.Handlers;
-using SMLHelper.V2.Utility;
 using UnityEngine;
 
 namespace FCS_AlterraHub.Registration
@@ -48,7 +45,7 @@ namespace FCS_AlterraHub.Registration
         void RegisterBase(BaseManager manager);
         void UnRegisterBase(BaseManager manager);
         void RegisterEncyclopediaEntry(string modID);
-        void RegisterModPack(string modID, Assembly assembly);
+        void RegisterModPack(string modID, string modPackName, Assembly assembly);
         void CreateStoreEntry(TechType techType, TechType receiveTechType,int returnAmount, decimal cost, StoreCategory category,bool forceUnlocked = false);
         FCSGamePlaySettings GetGamePlaySettings();
     }
@@ -58,27 +55,25 @@ namespace FCS_AlterraHub.Registration
         List<Dictionary<string, List<EncyclopediaEntryData>>> EncyclopediaEntries { get; set; }
         Dictionary<PingType, string> PingTypes { get; set; }
         void RegisterEncyclopediaEntries(List<Dictionary<string, List<EncyclopediaEntryData>>> encyclopediaEntries);
-
+        ModPackData GetRegisteredModData(string modId);
     }
 
     public class FCSAlterraHubService : IFCSAlterraHubService, IFCSAlterraHubServiceInternal
     {
-        private static readonly FCSAlterraHubService singleton = new FCSAlterraHubService();
-
-        public static List<KnownDevice> knownDevices = new List<KnownDevice>();
-        private static readonly Dictionary<string, FcsDevice> GlobalDevices = new Dictionary<string, FcsDevice>();
-        private static Dictionary<TechType, FCSStoreEntry> _storeItems = new Dictionary<TechType, FCSStoreEntry>();
-        private static HashSet<TechType> _registeredTechTypes = new HashSet<TechType>();
-        private List<string> _patchedMods = new List<string>();
-        private Dictionary<TechType, int> _globallyBuiltTech = new Dictionary<TechType, int>();
-        private Dictionary<string, string> _registeredModPacks = new Dictionary<string, string>();
-        public static IFCSAlterraHubService PublicAPI => singleton;
+        private static readonly FCSAlterraHubService singleton = new();
+        public static List<KnownDevice> knownDevices = new();
+        private static readonly Dictionary<string, FcsDevice> GlobalDevices = new();
+        private static Dictionary<TechType, FCSStoreEntry> _storeItems = new();
+        private static HashSet<TechType> _registeredTechTypes = new();
+        private List<string> _patchedMods = new();
+        private Dictionary<TechType, int> _globallyBuiltTech = new();
+        private Dictionary<string, ModPackData> _registeredModPacks = new();
+        public List<Dictionary<string, List<EncyclopediaEntryData>>> EncyclopediaEntries { get; set; } = new();
+        public Dictionary<PingType, string> PingTypes { get; set; } = new();
         internal static IFCSAlterraHubServiceInternal InternalAPI => singleton;
-
-        public List<Dictionary<string, List<EncyclopediaEntryData>>> EncyclopediaEntries { get; set; } =
-            new List<Dictionary<string, List<EncyclopediaEntryData>>>();
-
-        public Dictionary<PingType,string> PingTypes { get; set; } = new();
+        public static IFCSAlterraHubService PublicAPI => singleton;
+        public CardSystem AccountSystem => CardSystem.main;
+        public bool IsRegisteringEncyclopedia { get; set; }
 
         private FCSAlterraHubService()
         {
@@ -92,9 +87,7 @@ namespace FCS_AlterraHub.Registration
 
             //QModServices.Main.AddCriticalMessage($"Alterra Service Loaded: {knownDevices.Count} Devices");
         }
-
-        public CardSystem AccountSystem => CardSystem.main;
-
+        
         public void RegisterDevice(FcsDevice device, string tabID, string packageId)
         {
             var prefabID = device.GetPrefabID();
@@ -158,6 +151,17 @@ namespace FCS_AlterraHub.Registration
 
         private static void BaseManagerSetup(FcsDevice device)
         {
+            var constructable = device.GetConstructable();
+            if (constructable != null)
+            {
+                //Check is has Large World Enitiy
+                if (device.gameObject.GetComponentInChildren<LargeWorldEntity>() && constructable.IsInside() && !constructable.allowedOutside)
+                {
+                    QuickLogger.Warning($"Device: {device.UnitID} in mod pack {device.PackageId} has a LargeWorldEntity applied and should be removed!");
+                }
+            }
+
+
             if (string.IsNullOrEmpty(device.BaseId))
             {
                 var subRoot = device.gameObject.GetComponentInParent<SubRoot>();
@@ -167,7 +171,7 @@ namespace FCS_AlterraHub.Registration
                 }
                 else
                 {
-                    QuickLogger.Error($"Failed to Setup the Base Manager for device {device.UnitID} with prefab id {device.GetPrefabID()}");
+                    QuickLogger.Error($"Failed to Setup the Base Manager for device {device.UnitID} with prefab id {device.GetPrefabID()} - Subroot returned null");
                     return;
                 }
             }
@@ -223,7 +227,7 @@ namespace FCS_AlterraHub.Registration
             CreateStoreEntry(techType,recieveTechType,1,cost,category);   
         }
 
-        public void RegisterModPack(string modID, Assembly assembly)
+        public void RegisterModPack(string modID,string modPackName, Assembly assembly)
         {
             if (string.IsNullOrWhiteSpace(modID))
             {
@@ -242,13 +246,13 @@ namespace FCS_AlterraHub.Registration
             
             if (!_registeredModPacks.ContainsKey(modID))
             {
-                _registeredModPacks.Add(modID,path);
+                _registeredModPacks.Add(modID,new ModPackData{FilePath = path, ModBundleName = modPackName });
                 QuickLogger.Debug($"Registered mod pack {modID} with at path {path}");
             }
             else
             {
                 QuickLogger.Warning($"Mod Pack: {modID} has already been registered! Ignoring replacing entry with new data.");
-                _registeredModPacks[modID] = path;
+                _registeredModPacks[modID] = new ModPackData{FilePath = path, ModBundleName = modPackName };
             }
         }
 
@@ -332,9 +336,9 @@ namespace FCS_AlterraHub.Registration
 
                         if (!string.IsNullOrWhiteSpace(entryData.AudioName))
                         {
-                            if (_registeredModPacks.TryGetValue(entryData.ModPackID, out string directory))
+                            if (_registeredModPacks.TryGetValue(entryData.ModPackID, out ModPackData modPackData))
                             {
-                                var audioPath = Path.Combine(directory, "Audio", $"{entryData.AudioName}.mp3");
+                                var audioPath = Path.Combine(modPackData.FilePath, "Audio", $"{entryData.AudioName}.mp3");
                                 if (File.Exists(audioPath))
                                 {
                                     fModAsset = ScriptableObject.CreateInstance<FMODAsset>();
@@ -353,10 +357,11 @@ namespace FCS_AlterraHub.Registration
                         }
 
                         QuickLogger.Debug($"Registering entry {data.Key}");
+
                         PDAEncyclopedia.mapping.Add(data.Key, new PDAEncyclopedia.EntryData
                         {
                             audio = fModAsset,
-                            image = FCSAssetBundlesService.PublicAPI.GetEncyclopediaTexture2D(entryData.ImageName),
+                            image = FCSAssetBundlesService.PublicAPI.GetEncyclopediaTexture2D(entryData.ImageName,FCSAssetBundlesService.PublicAPI.GetBundleByModID(entryData.ModPackID)),
                             key = data.Key,
                             nodes = PDAEncyclopedia.ParsePath(entryData.Path),
                             path = entryData.Path,
@@ -396,19 +401,31 @@ namespace FCS_AlterraHub.Registration
             }
         }
 
-        public bool IsRegisteringEncyclopedia { get; set; }
-
+        public ModPackData GetRegisteredModData(string modId)
+        {
+            if (string.IsNullOrWhiteSpace(modId)) return null;
+            return _registeredModPacks.ContainsKey(modId) ? _registeredModPacks[modId] : null;
+        }
+        
         public void RegisterEncyclopediaEntry(string modID)
         {
             try
             {
-                if (_registeredModPacks.TryGetValue(modID, out string path))
+                if (_registeredModPacks.TryGetValue(modID, out ModPackData data))
                 {
-                    var encyclopediaJson = Path.Combine(path, "Assets", "Encyclopedia", "EncyclopediaEntries.json");
+                    var encyclopediaJson = Path.Combine(data.FilePath, "Assets", "Encyclopedia", "EncyclopediaEntries.json");
 
                     if (File.Exists(encyclopediaJson))
                     {
                         var jsonData = JsonConvert.DeserializeObject<Dictionary<string, List<EncyclopediaEntryData>>>(File.ReadAllText(encyclopediaJson));
+
+                        foreach (var value in jsonData.Values)
+                        {
+                            foreach (var entryData in value)
+                            {
+                                entryData.ModPackID = modID;
+                            }
+                        }
 
                         QuickLogger.Debug(jsonData.ToString());
 
@@ -430,8 +447,7 @@ namespace FCS_AlterraHub.Registration
                 QuickLogger.Error(e.StackTrace);
             }
         }
-
-
+        
         public void UnRegisterDevice(FcsDevice device)
         {
             foreach (KnownDevice knownDevice in knownDevices)

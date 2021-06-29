@@ -22,18 +22,8 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Buildable
         public override TechGroup GroupForPDA => TechGroup.InteriorModules;
         public override TechCategory CategoryForPDA => TechCategory.InteriorModule;
         public override string AssetsFolder => Mod.GetAssetPath();
-
         public override TechType RequiredForUnlock => TechType;
-
-        //public override string DiscoverMessage => $"{this.FriendlyName} Unlocked!";
-
-        //public override bool AddScannerEntry => true;
-
-        //public override int FragmentsToScan => 3;
-
-        //public override float TimeToScanFragment => 5f;
-
-        //public override bool DestroyFragmentOnScan => true;
+        public override bool UnlockedAtStart => false;
 
         public AlterraHubDepotPatcher() : base(Mod.AlterraHubDepotClassID, Mod.AlterraHubDepotFriendly, Mod.AlterraHubDepotDescription)
         {
@@ -42,22 +32,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Buildable
                 Mod.AlterraHubDepotTechType = TechType;
             };
         }
-
-        public override PDAEncyclopedia.EntryData EncyclopediaEntryData
-        {
-            get
-            {
-                PDAEncyclopedia.EntryData entry = new PDAEncyclopedia.EntryData
-                {
-                    key = Mod.AlterraHubDepotClassID,
-                    path = "Tech/Equipment",
-                    nodes = new[] {"Tech", "Equipment"},
-                    unlocked = false
-                };
-                return entry;
-            }
-        }
-
+        
 #if SUBNAUTICA_STABLE
         public override GameObject GetGameObject()
         {

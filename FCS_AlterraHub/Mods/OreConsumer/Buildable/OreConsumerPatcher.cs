@@ -21,18 +21,8 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Buildable
         public override TechGroup GroupForPDA => TechGroup.ExteriorModules;
         public override TechCategory CategoryForPDA => TechCategory.ExteriorModule;
         public override string AssetsFolder => Mod.GetAssetPath();
-
         public override TechType RequiredForUnlock => TechType;
-
-        //public override string DiscoverMessage => $"{this.FriendlyName} Unlocked!";
-
-        //public override bool AddScannerEntry => true;
-
-        //public override int FragmentsToScan => 3;
-
-        //public override float TimeToScanFragment => 5f;
-
-        //public override bool DestroyFragmentOnScan => true;
+        public override bool UnlockedAtStart => false;
 
         public static float OreProcessingTime { get; set; } = 90;
 
@@ -41,23 +31,9 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Buildable
             OnFinishedPatching += () =>
             {
                 Mod.OreConsumerTechType = TechType;
+                
             };
         }
-
-        //public override PDAEncyclopedia.EntryData EncyclopediaEntryData
-        //{
-        //    get
-        //    {
-        //        PDAEncyclopedia.EntryData entry = new PDAEncyclopedia.EntryData
-        //        {
-        //            key = "Alterra Hub__Alterra Ore Consumer",
-        //            path = "fcs/Alterra Hub",
-        //            nodes = new[] { "fcs", "Alterra Hub" },
-        //            unlocked = false
-        //        };
-        //        return entry;
-        //    }
-        //}
 
 #if SUBNAUTICA_STABLE
         public override GameObject GetGameObject()

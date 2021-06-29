@@ -1,4 +1,5 @@
 ﻿using System;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Helpers;
 using FCS_ProductionSolutions.Buildable;
 using FCSCommon.Helpers;
@@ -51,7 +52,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
             // Set position of Enemy as position of the first waypoint
             transform.localPosition = waypoints[waypointIndex].transform.localPosition;
             transform.localRotation = waypoints[waypointIndex].transform.localRotation;
-            MaterialHelpers.ApplyShaderToMaterial(gameObject, ModelPrefab.DecalMaterial);
+            MaterialHelpers.ApplyShaderToMaterial(gameObject, AlterraHub.BaseDecalsExterior);
             //Shader shader = Shader.Find("MarmosetUBER");
             Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>();
             SkyApplier skyApplier = gameObject.EnsureComponent<SkyApplier>();

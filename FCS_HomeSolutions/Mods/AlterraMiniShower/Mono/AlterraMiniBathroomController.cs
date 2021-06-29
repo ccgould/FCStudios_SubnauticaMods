@@ -16,7 +16,7 @@ using UnityEngine;
 
 namespace FCS_HomeSolutions.Mods.AlterraMiniShower.Mono
 {
-    internal class AlterraMiniBathroomController : FcsDevice , IFCSSave<SaveData>
+    internal class AlterraMiniBathroomController : FcsDevice , IFCSSave<SaveData>, IHandTarget
     {
         private bool _runStartUpOnEnable;
         private bool _fromSave;
@@ -28,7 +28,12 @@ namespace FCS_HomeSolutions.Mods.AlterraMiniShower.Mono
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, "AMB", Mod.ModPackID);
         }
-        
+
+        public override float GetPowerUsage()
+        {
+            return 0.01f;
+        }
+
         private void OnEnable()
         {
             if (!_runStartUpOnEnable) return;
@@ -186,6 +191,23 @@ namespace FCS_HomeSolutions.Mods.AlterraMiniShower.Mono
                     _runStartUpOnEnable = true;
                 }
             }
+        }
+
+        public override void OnHandHover(GUIHand hand)
+        {
+            if(!IsInitialized || !IsConstructed) return;
+            base.OnHandHover(hand);
+
+            var data = new[]
+            {
+                $"{AlterraHub.PowerPerMinute(GetPowerUsage() * 60)}"
+            };
+            data.HandHoverPDAHelperEx(GetTechType());
+        }
+
+        public void OnHandClick(GUIHand hand)
+        {
+            
         }
     }
 }

@@ -78,7 +78,8 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
         internal void Depart(DroneController drone)
         {
             QuickLogger.Debug($"Departing Drone:{drone.GetId()} from Port: {_parentPad.GetBaseName()}", true);
-            drone.transform.parent = transform;
+            //drone.transform.parent = transform;
+            drone.SetFollowPoint(transform);
             drone.transform.localPosition = Vector3.zero;
             drone.transform.localRotation = Quaternion.identity;
 
@@ -95,7 +96,8 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 
         private void CompleteDocking(DroneController drone)
         {
-            drone.transform.parent = transform;
+            //drone.transform.parent = transform;
+            drone.SetFollowPoint(transform);
             drone.transform.localPosition = Vector3.zero;
             drone.transform.localRotation = Quaternion.identity;
             _parentPad.OpenDoors();

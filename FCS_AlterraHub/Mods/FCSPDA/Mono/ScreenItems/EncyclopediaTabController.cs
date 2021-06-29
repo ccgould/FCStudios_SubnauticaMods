@@ -1,6 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Registration;
+using FCS_AlterraHub.Structs;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -32,7 +36,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems
         private RawImage image;
         public LayoutElement imageLayout;
         public float indentStep = 20f;
-        private List<uGUI_ListEntry> pool = new List<uGUI_ListEntry>();
+        private List<uGUI_ListEntry> pool = new();
         public UISpriteData pathNodeSprites;
         public UISpriteData entryNodeSprites;
         public RectTransform listCanvas;
@@ -41,8 +45,9 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems
         public ScrollRect listScrollRect;
         public Sprite iconCollapse;
         public Sprite iconExpand;
-        private static readonly EntryComparer entryComparer = new EntryComparer();
+        private static readonly EntryComparer entryComparer = new();
         private PDAEncyclopedia.EntryData _currentEntryData;
+        private readonly Dictionary<TechType,CraftNode> _trackedCraftNodes = new();
 
         internal void Initialize()
         {
@@ -404,6 +409,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems
                 string0 = text,
                 string1 = @string
             };
+            
             SetupNode(craftNode, parent.depth+1);
             parent.AddNode(new CraftNode[]
             {
@@ -414,6 +420,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems
                 NotificationManager.main.Add(NotificationManager.Group.Encyclopedia, entryData.key, 3f);
                 ExpandTo(craftNode.id);
             }
+
             PDAEncyclopedia.NotifyAdd(craftNode, verbose);
             return entryData;
         }
@@ -675,5 +682,42 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems
             }
         }
 
+        public void OpenEntry(TechType techType)
+        {
+            var node = FindNodeByTechType(Tree,techType);
+            if (node != null)
+            {
+                ExpandTo(node.id);
+                Activate(node as CraftNode);
+            }
+            else
+            {
+                QuickLogger.DebugError($"Failed to find a treenode with techtype: {Language.main.Get(techType)}",true);
+            }
+        }
+
+        private TreeNode FindNodeByTechType(CraftNode tree, TechType techType)
+        {
+            foreach (var encyclopediaEntry in FCSAlterraHubService.InternalAPI.EncyclopediaEntries)
+            {
+                foreach (KeyValuePair<string, List<EncyclopediaEntryData>> dataKeyValuePair in encyclopediaEntry)
+                {
+                    foreach (EncyclopediaEntryData data in dataKeyValuePair.Value)
+                    {
+                        if (data.IsSame(techType))
+                        {
+                            return Tree.FindNodeById(dataKeyValuePair.Key);
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        public bool HasEntry(TechType techType)
+        {
+            return FindNodeByTechType(Tree, techType) != null;
+        }
     }
 }

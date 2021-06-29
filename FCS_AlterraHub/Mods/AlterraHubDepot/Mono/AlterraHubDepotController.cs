@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Extensions;
@@ -19,7 +20,7 @@ using UnityEngine.UI;
 
 namespace FCS_AlterraHub.Mods.AlterraHubDepot.Mono
 {
-    internal class AlterraHubDepotController: FcsDevice, IFCSSave<SaveData>, IFCSDisplay
+    internal class AlterraHubDepotController: FcsDevice, IFCSSave<SaveData>, IFCSDisplay,IHandTarget
     {
         private bool _isFromSave;
         private bool _runStartUpOnEnable;
@@ -94,8 +95,6 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Mono
             }
 
             var canvas = gameObject.GetComponentInChildren<Canvas>();
-            //_interactionHelper = canvas.gameObject.AddComponent<InterfaceInteraction>();
-
 
             _status = GameObjectHelpers.FindGameObject(canvas.gameObject, "Status")?.GetComponent<Text>();
 
@@ -257,15 +256,22 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Mono
             return _colorManager.ChangeColor(color, mode);
         }
 
-        public void OnHandHover(GUIHand hand)
+        public override void OnHandHover(GUIHand hand)
         {
             if (!IsConstructed || !IsInitialized) return;
-            HandReticle.main.SetInteractText($"{Mod.AlterraHubDepotFriendly} | UnitID: {UnitID} | Depot Name: {DepotName}", _storage.Count == 0 ? "Empty" : string.Empty);
-            HandReticle.main.SetIcon(HandReticle.IconType.Hand, 1f);
-            if (Input.GetKeyDown(QPatch.Configuration.PDAInfoKeyCode))
+
+            base.OnHandHover(hand);
+
+            var data = new[]
             {
-                FCSPDAController.Instance.OpenEncyclopedia(TechType.Copper);
-            }
+                $"UnitID: {UnitID} | Depot Name: {DepotName}"
+            };
+            data.HandHoverPDAHelperEx(GetTechType());
+        }
+
+        public void OnHandClick(GUIHand hand)
+        {
+            //Not in use
         }
 
         public string DepotName => $"{UnitID} : Depot";

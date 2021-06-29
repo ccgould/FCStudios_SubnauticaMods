@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Mono;
@@ -206,29 +207,36 @@ namespace FCS_HomeSolutions.Mods.LedLights.Mono
         public void OnHandHover(GUIHand hand)
         {
             if (!IsInitialized || !IsConstructed) return;
-            HandReticle main = HandReticle.main;
+
+            base.OnHandHover(hand);
+            
             if (_buildable.allowedOnWall)
             {
-                main.SetInteractText(AuxPatchers.ClickToRotate(), 
-                    AuxPatchers.PressToToggleLightFormat(GameInput.GetBindingName(GameInput.Button.AltTool, GameInput.BindingSet.Primary), 
-                    QPatch.Configuration.LEDLightBackwardKeyCode.ToString(), 
-                    QPatch.Configuration.LEDLightForwardKeyCode.ToString(), 
-                    QPatch.Configuration.LEDLightNightSensorToggleKeyCode.ToString(), 
-                    _light.intensity,
-                    _nightSensor ? "Enabled":"Disabled"));
+                var data = new[]
+                {
+                    AuxPatchers.ClickToRotate(),
+                    AuxPatchers.PressToToggleLightFormat(GameInput.GetBindingName(GameInput.Button.AltTool, GameInput.BindingSet.Primary),
+                        QPatch.Configuration.LEDLightBackwardKeyCode.ToString(),
+                        QPatch.Configuration.LEDLightForwardKeyCode.ToString(),
+                        QPatch.Configuration.LEDLightNightSensorToggleKeyCode.ToString(),
+                        _light.intensity,
+                        _nightSensor ? "Enabled":"Disabled")
+                };
+                data.HandHoverPDAHelperEx(GetTechType(),HandReticle.IconType.Hand);
             }
             else
             {
-                main.SetInteractText(
-                    AuxPatchers.PressToToggleLightFormat(GameInput.GetBindingName(GameInput.Button.AltTool, GameInput.BindingSet.Primary), 
-                        QPatch.Configuration.LEDLightBackwardKeyCode.ToString(), 
-                        QPatch.Configuration.LEDLightForwardKeyCode.ToString(), 
-                        QPatch.Configuration.LEDLightNightSensorToggleKeyCode.ToString(), 
-                        _light.intensity, 
-                        _nightSensor ? "Enabled" : "Disabled"));
+                var data = new[]
+                {
+                    AuxPatchers.PressToToggleLightFormat(GameInput.GetBindingName(GameInput.Button.AltTool, GameInput.BindingSet.Primary),
+                        QPatch.Configuration.LEDLightBackwardKeyCode.ToString(),
+                        QPatch.Configuration.LEDLightForwardKeyCode.ToString(),
+                        QPatch.Configuration.LEDLightNightSensorToggleKeyCode.ToString(),
+                        _light.intensity,
+                        _nightSensor ? "Enabled" : "Disabled")
+                };
+                data.HandHoverPDAHelperEx(GetTechType(),HandReticle.IconType.Hand);
             }
-
-            main.SetIcon(HandReticle.IconType.Hand);
 
             if (GameInput.GetButtonDown(GameInput.Button.AltTool))
             {

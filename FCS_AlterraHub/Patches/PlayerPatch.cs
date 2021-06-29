@@ -89,18 +89,10 @@ namespace FCS_AlterraHub.Patches
 
             if (Input.GetKeyDown(QPatch.Configuration.FCSPDAKeyCode) || ForceOpenPDA && !__instance.GetPDA().isOpen)
             {
-                if (Mod.GamePlaySettings.IsPDAUnlocked)
+                if (!FCSPDA.IsOpen)
                 {
-                    if (!FCSPDA.IsOpen)
-                    {
-                        FCSPDA.Open();
-                    }
+                    FCSPDA.Open();
                 }
-                else
-                {
-                    QuickLogger.ModMessage("Please complete the Alterra Hub Station Mission.");
-                }
-
                 ForceOpenPDA = false;
             }
             

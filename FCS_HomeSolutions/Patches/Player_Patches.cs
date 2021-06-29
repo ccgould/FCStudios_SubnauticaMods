@@ -1,5 +1,5 @@
 ﻿using FCS_HomeSolutions.Configuration;
-using FCS_HomeSolutions.QuantumTeleporter.Mono;
+using FCS_HomeSolutions.Mods.QuantumTeleporter.Mono;
 using FCSCommon.Utilities;
 using HarmonyLib;
 

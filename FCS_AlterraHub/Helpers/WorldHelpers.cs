@@ -4,6 +4,7 @@ using System.Linq;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
+using FCSCommon.Utilities;
 using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
 using UnityEngine;
@@ -31,8 +32,10 @@ namespace FCS_AlterraHub.Helpers
                     timeSpan = TwentyFourHourToTwelveHourFormat(timeSpan, out flag);
                     period = (flag ? "AM" : "PM");
                 }
+
                 _lastMinute = timeSpan.Minutes;
-                _previousTime = $"{EncodeMinHourToString(EncodeMinuteAndHour(timeSpan.Minutes, timeSpan.Hours))} {period}";
+                _previousTime =
+                    $"{EncodeMinHourToString(EncodeMinuteAndHour(timeSpan.Minutes, timeSpan.Hours))} {period}";
             }
 
             return _previousTime;
@@ -49,6 +52,7 @@ namespace FCS_AlterraHub.Helpers
             {
                 return TimeCache.S_TimeCache[encoded];
             }
+
             return "Er:rr";
         }
 
@@ -66,6 +70,7 @@ namespace FCS_AlterraHub.Helpers
             {
                 num += 12;
             }
+
             return new TimeSpan(num, timeSpan.Minutes, timeSpan.Seconds);
         }
 
@@ -77,6 +82,7 @@ namespace FCS_AlterraHub.Helpers
                 new TimeSpan(now.Hour, now.Minute, now.Second);
                 return new TimeSpan(now.Hour, now.Minute, now.Second);
             }
+
             float dayScalar = DayNightCycle.main.GetDayScalar();
             int hours = Mathf.FloorToInt(dayScalar * 24f);
             int minutes = Mathf.FloorToInt(Mathf.Repeat(dayScalar * 24f * 60f, 60f));
@@ -89,16 +95,18 @@ namespace FCS_AlterraHub.Helpers
             TWENTY_FOUR_HOUR
         }
 
-        public static bool CheckIfInRange(FcsDevice currentDevice,FcsDevice device,float range)
+        public static bool CheckIfInRange(FcsDevice currentDevice, FcsDevice device, float range)
         {
-            if (currentDevice == null || device == null || !device.gameObject.activeSelf || !currentDevice.IsConstructed) return false;
-            float distance = Vector3.Distance(currentDevice.gameObject.transform.position, device.gameObject.transform.position);
+            if (currentDevice == null || device == null || !device.gameObject.activeSelf ||
+                !currentDevice.IsConstructed) return false;
+            float distance = Vector3.Distance(currentDevice.gameObject.transform.position,
+                device.gameObject.transform.position);
             return distance <= range;
         }
 
         public static float GetDistance(FcsDevice currentDevice, FcsDevice device)
         {
-            if (currentDevice == null || device == null ) return 0f;
+            if (currentDevice == null || device == null) return 0f;
             return Vector3.Distance(currentDevice.gameObject.transform.position, device.gameObject.transform.position);
         }
 
@@ -107,7 +115,7 @@ namespace FCS_AlterraHub.Helpers
             return Vector3.Distance(mainGameObject.transform.position, gameObject.transform.position) <= range;
         }
 
-        public static PingType CreatePingType(string id,string pingName, Atlas.Sprite pingSprite)
+        public static PingType CreatePingType(string id, string pingName, Atlas.Sprite pingSprite)
         {
             SpriteHandler.RegisterSprite(SpriteManager.Group.Pings, id, pingSprite);
 
@@ -115,8 +123,9 @@ namespace FCS_AlterraHub.Helpers
 
             if (!FCSAlterraHubService.InternalAPI.PingTypes.ContainsKey(pingType))
             {
-                FCSAlterraHubService.InternalAPI.PingTypes.Add(pingType,pingName);
+                FCSAlterraHubService.InternalAPI.PingTypes.Add(pingType, pingName);
             }
+
             return pingType;
         }
 
@@ -131,10 +140,11 @@ namespace FCS_AlterraHub.Helpers
             return gameObject == null ? 0f : Ocean.GetDepthOf(gameObject);
         }
 #endif
-    
-    public static PingInstance CreateBeacon(GameObject gameObject,PingType pingType,string label,bool isEnable = true)
+
+        public static PingInstance CreateBeacon(GameObject gameObject, PingType pingType, string label,
+            bool isEnable = true)
         {
-           var pingInstance = gameObject.EnsureComponent<PingInstance>();
+            var pingInstance = gameObject.EnsureComponent<PingInstance>();
 
             if (pingInstance != null)
             {

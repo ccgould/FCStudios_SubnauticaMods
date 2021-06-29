@@ -22,13 +22,13 @@ using Valve.VR;
 
 namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 {
-    internal class AlterraDronePortController : FcsDevice, IFCSSave<SaveData>, IDroneDestination
+    internal class AlterraDronePortController : FcsDevice, IFCSSave<SaveData>, IDroneDestination, IHandTarget
     {
         private bool _isFromSave;
         private bool _runStartUpOnEnable;
         private AlterraDronePortEntry _savedData;
         private List<Transform> _paths;
-        private List<PortDoorController> _doors = new List<PortDoorController>();
+        private List<PortDoorController> _doors = new();
         private DroneController _assignedDrone;
         private GameObject _spawnPoint;
         private DronePadEntryPoint _entryPoint;
@@ -37,10 +37,11 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
         private DockTriggerController _dockTrigger;
         private bool _hasIncomingFlight;
         private PortManager _portManager;
+
         public override bool IsOperational => IsInitialized && IsConstructed;
         public Transform BaseTransform { get; set; }
         public bool IsFull => GetIsFull();
-        public override bool BypassRegisterCheck { get; } = true;
+        public override bool BypassRegisterCheck => true;
 
         public override void OnDestroy()
         {
@@ -250,8 +251,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
             }
 
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
-
-
+            
             IsInitialized = true;
         }
 
@@ -405,6 +405,19 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
         public string GetBaseID()
         {
             return _portManager.GetBaseID();
+        }
+
+        public override void OnHandHover(GUIHand hand)
+        {
+            if(!IsInitialized || !IsConstructed) return;
+            base.OnHandHover(hand);
+            var data = new string[]{};
+            data.HandHoverPDAHelperEx(GetTechType());
+        }
+
+        public void OnHandClick(GUIHand hand)
+        {
+            
         }
     }
 }

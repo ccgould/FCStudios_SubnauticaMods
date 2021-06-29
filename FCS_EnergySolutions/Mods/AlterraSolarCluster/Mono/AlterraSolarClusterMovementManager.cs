@@ -37,8 +37,8 @@ namespace FCS_EnergySolutions.Mods.AlterraSolarCluster.Mono
         internal void Initialize(AlterraSolarClusterController mono)
         {
             _mono = mono;
-            _rotator = GameObjectHelpers.FindGameObject(gameObject, "RotorMesh_3").transform;
-            _elevator = GameObjectHelpers.FindGameObject(gameObject, "HingeMesh_3").transform;
+            _rotator = GameObjectHelpers.FindGameObject(gameObject, "RotorMesh").transform;
+            _elevator = GameObjectHelpers.FindGameObject(gameObject, "HingeMesh").transform;
         }
 
 

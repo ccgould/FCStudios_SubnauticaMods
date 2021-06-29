@@ -27,31 +27,16 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Buildables
         public override TechGroup GroupForPDA => TechGroup.ExteriorModules;
         public override TechCategory CategoryForPDA => TechCategory.ExteriorModule;
         public override string AssetsFolder => Mod.GetAssetPath();
-        
-        public override TechType RequiredForUnlock => Mod.DronePortPadHubNewFragmentTechType;
+        public override TechType RequiredForUnlock => TechType;
+        public override bool UnlockedAtStart => false;
 
         public override string DiscoverMessage => $"{this.FriendlyName} Unlocked!";
-
-        public override bool AddScannerEntry => true;
-
-        public override int FragmentsToScan => 3;
-
-        public override float TimeToScanFragment => 5f;
-
-        public override bool DestroyFragmentOnScan => true;
-
+        
         public DronePortPadHubNewPatcher() : base(Mod.DronePortPadHubNewClassID, Mod.DronePortPadHubNewFriendly, Mod.DronePortPadHubNewDescription)
         {
-            OnStartedPatching += () =>
-            {
-                var alterraGenKit = new FCSKit(Mod.DronePortPadHubNewKitClassID, Mod.DronePortPadHubNewFriendly,
-                    Path.Combine(AssetsFolder, $"{ClassID}.png"));
-                alterraGenKit.Patch();
-            };
-
             OnFinishedPatching += () =>
             {
-                FCSAlterraHubService.PublicAPI.CreateStoreEntry(TechType, Mod.DronePortPadHubNewKitClassID.ToTechType(), 90000, StoreCategory.Misc);
+                Mod.DronePortPadHubNewTechType = TechType;
             };
         }
         
@@ -169,7 +154,10 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Buildables
                 craftAmount = 1,
                 Ingredients = new List<Ingredient>()
                 {
-                    new Ingredient(Mod.DronePortPadHubNewKitClassID.ToTechType(),1)
+                    new(TechType.VehicleStorageModule,1),
+                    new(TechType.TitaniumIngot,2),
+                    new(TechType.Beacon,1),
+                    new(TechType.WiringKit,1),
                 }
             };
             return customFabRecipe;

@@ -7,10 +7,8 @@ using FCS_AlterraHub.Managers;
 using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Assets;
-using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
 using UnityEngine;
-using UWE;
 #if SUBNAUTICA
 using Sprite = Atlas.Sprite;
 #endif
@@ -26,7 +24,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Spawnables
         {
             OnFinishedPatching += () =>
             {
-                Mod.DronePortPadHubNewFragmentTechType = TechType;
+                Mod.DronePortPadHubNewTechType = TechType;
             };
         }
 
@@ -44,8 +42,8 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Spawnables
                 var lw = prefab.AddComponent<LargeWorldEntity>();
                 lw.cellLevel = LargeWorldEntity.CellLevel.Global;
 
-                var pickUp = prefab.AddComponent<Pickupable>();
-                pickUp.isPickupable = false;
+                //var pickUp = prefab.AddComponent<Pickupable>();
+                //pickUp.isPickupable = false;
 
                 //Renderer
                 var renderer = prefab.GetComponentInChildren<Renderer>();

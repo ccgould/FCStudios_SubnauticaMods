@@ -1,8 +1,9 @@
-﻿using UnityEngine;
+﻿using FCS_AlterraHub.Extensions;
+using UnityEngine;
 
 namespace FCS_AlterraHub.Structs
 {
-    public struct EncyclopediaEntryData
+    public class EncyclopediaEntryData
     {
         public string ModPackID;
         public string AudioName;
@@ -18,6 +19,19 @@ namespace FCS_AlterraHub.Structs
         public bool HasFragment;
         public int TotalFragmentsToUnlock;
         public int ScanTime;
+        private TechType _techType;
+        public string TechTypeString { get; set; }
+
+
+        public bool IsSame(TechType techType)
+        {
+            if (_techType == TechType.None)
+            {
+                _techType = TechTypeString.ToTechType();
+            }
+
+            return _techType == techType;
+        }
 
         public override string ToString()
         {

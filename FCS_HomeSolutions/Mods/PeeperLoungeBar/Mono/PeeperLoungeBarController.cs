@@ -19,7 +19,7 @@ using WorldHelpers = FCS_AlterraHub.Helpers.WorldHelpers;
 
 namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono
 {
-    internal class PeeperLoungeBarController : FcsDevice, IConstructable
+    internal class PeeperLoungeBarController : FcsDevice,IHandTarget
     {
         private bool _runStartUpOnEnable;
         private Transform _rot;
@@ -43,13 +43,20 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono
             "PLB_Hello",
             "PLB_AnnoyingFish"
         };
-        
+
+        private InterfaceInteraction _interactionHelper;
+
         public Channel AudioTrack { get; set; }
         private float _speed => QPatch.Configuration.PeeperLoungeBarTurnSpeed;
 
         private void Start()
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, "PLB", Mod.ModPackID);
+        }
+
+        public override float GetPowerUsage()
+        {
+            return 0.01f;
         }
 
         private SoundEntry FindAudioClip(string trackName)
@@ -174,6 +181,9 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono
 
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
             MaterialHelpers.ChangeEmissionStrength(ModelPrefab.EmissionControllerMaterial, gameObject, 4f);
+
+            var canvas = gameObject.GetComponentInChildren<Canvas>();
+            _interactionHelper = canvas.gameObject.AddComponent<InterfaceInteraction>();
 
             UpdateSelection();
             IsInitialized = true;
@@ -324,6 +334,23 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono
             {
                 _sc.enabled = false;
             }
+        }
+
+        public override void OnHandHover(GUIHand hand)
+        {
+            if (!IsInitialized || !IsConstructed || _interactionHelper.IsInRange) return;
+            base.OnHandHover(hand);
+
+            var data = new[]
+            {
+                $"{AlterraHub.PowerPerMinute(GetPowerUsage() * 60)}"
+            };
+            data.HandHoverPDAHelperEx(GetTechType());
+        }
+
+        public void OnHandClick(GUIHand hand)
+        {
+
         }
     }
 }

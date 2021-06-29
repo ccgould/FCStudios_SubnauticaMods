@@ -15,7 +15,7 @@ namespace FCS_LifeSupportSolutions.Mods.MiniMedBay.mono
         {
             HandReticle main = HandReticle.main;
 
-            if (!_mono.IsInitialized || !_mono.IsConstructed) return;
+            if (_mono == null || !_mono.IsInitialized || !_mono.IsConstructed || _mono.Container == null) return;
 
 
             if (_mono.Container.IsContainerFull)

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using FCS_AlterraHub.Mono;
 using FCSCommon.Helpers;
+using FCSCommon.Utilities;
 using UnityEngine;
 using UWE;
 using Object = UnityEngine.Object;
@@ -27,6 +28,7 @@ namespace FCS_AlterraHub.Helpers
             {UWEPrefabID.BubbleColumnSmall,"5ec8b8a6-b9b1-412b-9048-62701346cca2"},
             {UWEPrefabID.BubbleColumnBig,"0dbd3431-62cc-4dd2-82d5-7d60c71a9edf"},
             {UWEPrefabID.StarshipGirder10,"99c0da07-a612-4cb7-9e16-e2e6bd3d6207"},
+            {UWEPrefabID.DataBoxLight,"08e6c2a8-76df-41de-87fd-5cba315a8aa4"},
         };
 
         public static GameObject SpawnAtPoint(string location, Transform trans, float scale = 0.179f)
@@ -134,6 +136,45 @@ namespace FCS_AlterraHub.Helpers
             }
             yield break;
         }
+
+        public static GameObject SpawnTechType(TechType techType, Vector3 position, Quaternion rotation, bool spawnGlobal = false)
+        {
+            QuickLogger.Debug($"Spawning: {Language.main.Get(techType)}");
+            if (CraftData.IsAllowed(techType))
+            {
+                GameObject prefabForTechType = CraftData.GetPrefabForTechType(techType);
+                if (prefabForTechType != null)
+                {
+                    GameObject gameObject = Utils.CreatePrefab(prefabForTechType);
+                    LargeWorldEntity.Register(gameObject);
+                    CrafterLogic.NotifyCraftEnd(gameObject, techType);
+                    gameObject.SendMessage("StartConstruction", SendMessageOptions.DontRequireReceiver);
+                    gameObject.transform.position = position;
+                    gameObject.transform.localRotation = rotation;
+                    if (spawnGlobal) gameObject.transform.parent = null;
+                    return gameObject;
+                }
+                ErrorMessage.AddDebug("Could not find prefab for TechType = " + techType);
+            }
+
+            return null;
+        }
+
+        public static GameObject SpawnPrefab(GameObject prefab, Vector3 position, Quaternion rotation, bool spawnGlobal = false)
+        {
+            if (prefab != null)
+            {
+                GameObject gameObject = Utils.CreatePrefab(prefab);
+                LargeWorldEntity.Register(gameObject);
+                gameObject.SendMessage("StartConstruction", SendMessageOptions.DontRequireReceiver);
+                gameObject.transform.position = position;
+                gameObject.transform.localRotation = rotation;
+                if (spawnGlobal) gameObject.transform.parent = null;
+                return gameObject;
+            }
+
+            return null;
+        }
     }
 
     public enum UWEPrefabID
@@ -142,6 +183,7 @@ namespace FCS_AlterraHub.Helpers
         FloatingPapers,
         BubbleColumnSmall,
         BubbleColumnBig,
-        StarshipGirder10
+        StarshipGirder10,
+        DataBoxLight
     }
 }

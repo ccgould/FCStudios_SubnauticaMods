@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Objects;
+using FCS_HomeSolutions.Mods.QuantumTeleporter.Enumerators;
+using FCS_HomeSolutions.Mods.TrashRecycler.Model;
 using FCS_HomeSolutions.Mono.OutDoorPlanters;
-using FCS_HomeSolutions.QuantumTeleporter.Enumerators;
-using FCS_HomeSolutions.TrashRecycler.Model;
 using UnityEngine;
 #if SUBNAUTICA_STABLE
 using Oculus.Newtonsoft.Json;

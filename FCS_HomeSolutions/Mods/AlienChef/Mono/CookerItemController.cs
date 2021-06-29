@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text;
-using FCS_HomeSolutions.SeaBreeze.Display;
+using FCS_HomeSolutions.Mods.SeaBreeze.Display;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
 using UnityEngine;

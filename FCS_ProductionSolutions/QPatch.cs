@@ -6,11 +6,11 @@ using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Mods.Replicator.Buildables;
 using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
-using FCS_ProductionSolutions.DeepDriller.Buildable;
-using FCS_ProductionSolutions.DeepDriller.Craftable;
-using FCS_ProductionSolutions.DeepDriller.Ores;
-using FCS_ProductionSolutions.HydroponicHarvester.Buildable;
-using FCS_ProductionSolutions.MatterAnalyzer.Buildable;
+using FCS_ProductionSolutions.Mods.DeepDriller.Buildable;
+using FCS_ProductionSolutions.Mods.DeepDriller.Craftable;
+using FCS_ProductionSolutions.Mods.DeepDriller.Ores;
+using FCS_ProductionSolutions.Mods.HydroponicHarvester.Buildable;
+using FCS_ProductionSolutions.Mods.MatterAnalyzer.Buildable;
 using FCS_StorageSolutions.Mods.DataStorageSolutions.Buildable;
 using FCSCommon.Utilities;
 using HarmonyLib;
@@ -29,7 +29,7 @@ namespace FCS_ProductionSolutions
         [QModPatch]
         public void Patch()
         {
-            FCSAlterraHubService.PublicAPI.RegisterModPack(Mod.ModPackID, Assembly.GetExecutingAssembly());
+            FCSAlterraHubService.PublicAPI.RegisterModPack(Mod.ModPackID, Mod.ModBundleName, Assembly.GetExecutingAssembly());
             FCSAlterraHubService.PublicAPI.RegisterEncyclopediaEntry(Mod.ModPackID);
 
             ModelPrefab.Initialize();

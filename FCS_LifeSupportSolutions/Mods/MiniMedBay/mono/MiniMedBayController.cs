@@ -1,6 +1,8 @@
 ﻿using FCS_AlterraHomeSolutions.Mono.PaintTool;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_LifeSupportSolutions.Buildable;
@@ -11,7 +13,7 @@ using UnityEngine;
 
 namespace FCS_LifeSupportSolutions.Mods.MiniMedBay.mono
 {
-    internal class MiniMedBayController: FcsDevice,IFCSSave<SaveData>
+    internal class MiniMedBayController: FcsDevice,IFCSSave<SaveData>, IHandTarget
     {
         private bool _runStartUpOnEnable;
         private bool _isFromSave;
@@ -21,6 +23,7 @@ namespace FCS_LifeSupportSolutions.Mods.MiniMedBay.mono
         internal MiniMedBayContainer Container;
         internal MiniMedBayBedManager HealBedManager;
         private MedKitDispenser _medKitDispenser;
+        private InterfaceInteraction _interactionHelper;
         public override bool IsOperational => IsConstructed && IsInitialized && Manager != null && Manager.HasEnoughPower(GetPowerUsage());
         public MiniMedBayTrigger Trigger { get; set; }
 
@@ -103,6 +106,9 @@ namespace FCS_LifeSupportSolutions.Mods.MiniMedBay.mono
             }
 
             MaterialHelpers.ChangeEmissionStrength(ModelPrefab.EmissiveControllerMaterial,gameObject,5f);
+
+            var canvas = gameObject.GetComponentInChildren<Canvas>();
+            _interactionHelper = canvas.gameObject.AddComponent<InterfaceInteraction>();
 
             IsInitialized = true;
         }
@@ -190,6 +196,24 @@ namespace FCS_LifeSupportSolutions.Mods.MiniMedBay.mono
         public override float GetPowerUsage()
         {
             return HealBedManager != null && HealBedManager.IsHealing ? 8.0f : 0f;
+        }
+
+        public override void OnHandHover(GUIHand hand)
+        {
+            if (!IsInitialized || !IsConstructed || _interactionHelper.IsInRange) return;
+
+            base.OnHandHover(hand);
+
+            var data = new[]
+            {
+                AlterraHub.PowerPerMinute(GetPowerUsage() * 60)
+            };
+
+            data.HandHoverPDAHelperEx(GetTechType());
+        }
+        public void OnHandClick(GUIHand hand)
+        {
+            
         }
     }
 }

@@ -22,7 +22,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Spawnables
         {
             OnFinishedPatching += () =>
             {
-                Mod.DronePortPadHubNewFragmentTechType = TechType;
+                Mod.DronePortPadHubNewTechType = TechType;
                 CoordinatedSpawnsHandler.RegisterCoordinatedSpawn(new SpawnInfo(TechType,new Vector3(76.0f, -304.7f, -1430.8f),new Quaternion(-0.2f, -0.2f, 0.5f, 0.8f)));
                 CoordinatedSpawnsHandler.RegisterCoordinatedSpawn(new SpawnInfo(TechType,new Vector3(60.3f, -318.8f, -1417.2f),new Quaternion(-0.2f, -0.2f, 0.5f, 0.8f)));
                 CoordinatedSpawnsHandler.RegisterCoordinatedSpawn(new SpawnInfo(TechType,new Vector3(64.9f, -305.0f, -1420.4f),new Quaternion(0.0f, -0.9f, 0.4f, 0.2f)));

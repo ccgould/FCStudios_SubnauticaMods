@@ -4,11 +4,12 @@ using System.Collections.ObjectModel;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Objects;
-using FCS_ProductionSolutions.DeepDriller.Configuration;
-using FCS_ProductionSolutions.DeepDriller.Structs;
-using FCS_ProductionSolutions.HydroponicHarvester.Enumerators;
 using FCS_ProductionSolutions.HydroponicHarvester.Mono;
 using FCS_ProductionSolutions.Mods.AutoCrafter;
+using FCS_ProductionSolutions.Mods.DeepDriller.Configuration;
+using FCS_ProductionSolutions.Mods.DeepDriller.Structs;
+using FCS_ProductionSolutions.Mods.HydroponicHarvester.Enumerators;
+using FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono;
 #if SUBNAUTICA_STABLE
 using Oculus.Newtonsoft.Json;
 #else

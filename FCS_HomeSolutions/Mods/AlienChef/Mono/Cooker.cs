@@ -24,12 +24,14 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
         public bool PauseUpdates { get; set; }
         public bool IsFull => _mono.StorageSystem.GetFreeSpace() == 0;
         public bool NotAllowToCook => PauseUpdates || _mono == null ||!_mono.IsConstructed || _cookingQueue.Count == 0;
+        public bool IsCooking => GenerationProgress > -1;
         internal float GenerationProgress
         {
-            get => _progress[(int)CookingPhases.Generating];
-            set => _progress[(int)CookingPhases.Generating] = value;
+            get => _progress[(int)CookingPhases.Cooking];
+            set => _progress[(int)CookingPhases.Cooking] = value;
         }
 
+        
 
         private void Update()
         {
@@ -185,7 +187,7 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
         internal enum CookingPhases
         {
             StartUp = 0,
-            Generating = 1,
+            Cooking = 1,
             CoolDown = 2
         }
 

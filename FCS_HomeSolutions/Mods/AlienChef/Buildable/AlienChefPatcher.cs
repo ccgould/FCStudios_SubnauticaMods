@@ -84,11 +84,10 @@ namespace FCS_HomeSolutions.Mods.AlienChief.Buildables
                 prefab.AddComponent<TechTag>().type = TechType;
 
                 prefab.SetActive(false);
+                prefab.AddComponent<AlienChefController>();
                 var ss = prefab.AddComponent<FCSStorage>();
                 ss.Initialize(48, 6, 8, "Alien Chef Storage", Mod.AlienChefClassID);
                 prefab.SetActive(true);
-
-                prefab.AddComponent<AlienChefController>();
 
                 //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
                 MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);

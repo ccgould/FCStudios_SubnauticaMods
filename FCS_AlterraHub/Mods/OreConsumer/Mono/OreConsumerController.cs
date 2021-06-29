@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
@@ -51,7 +53,7 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Mono
             TechType.UraniniteCrystal,
             TechType.Kyanite
         };
-
+        
         private Dictionary<string,FcsDevice> SavedDevices => FCSAlterraHubService.PublicAPI.GetRegisteredDevices();
 
         private bool CheckIfOperational()
@@ -415,29 +417,42 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Mono
             return _colorManager.ChangeColor(color,mode);   
         }
 
-        public void OnHandHover(GUIHand hand)
+        public override void OnHandHover(GUIHand hand)
         {
-            var main = HandReticle.main;
-            main.SetIcon(HandReticle.IconType.Info);
-
-            if(_isBreakerTripped)
+            base.OnHandHover(hand);
+            var techType = GetTechType();
+            if (_isBreakerTripped)
             {
-                main.SetInteractTextRaw(Buildables.AlterraHub.DeviceOff(),Buildables.AlterraHub.PressToTurnDeviceOnOff(KeyCode.F.ToString()));
+                var data = new[]
+                {
+                    
+                    AlterraHub.PressToTurnDeviceOnOff(KeyCode.F.ToString()),
+                    AlterraHub.DeviceOff()
+                };
+                data.HandHoverPDAHelperEx(techType);
             }
-
 
             if (_oreQueue != null && DisplayManager?.CheckInteraction.IsHovered == false)
             {
                 if (_oreQueue.Any())
                 {
                     var pendingAmount = _oreQueue.Count > 1 ? _oreQueue.Count - 1 : 0;
-                    main.SetInteractTextRaw(Buildables.AlterraHub.OreConsumerTimeLeftFormat(Language.main.Get(_oreQueue.Peek()), _timeLeft.ToString("N0"),$"{pendingAmount}",MAXITEMLIMIT),
-                        Buildables.AlterraHub.PressToTurnDeviceOnOff(KeyCode.F.ToString()));
+                    
+                    var data = new[]
+                    {
+                        AlterraHub.OreConsumerTimeLeftFormat(Language.main.Get(_oreQueue.Peek()), _timeLeft.ToString("N0"), $"{pendingAmount}", MAXITEMLIMIT),
+                        AlterraHub.PressToTurnDeviceOnOff(KeyCode.F.ToString())
+                    };
+                    data.HandHoverPDAHelperEx(techType);
                 }
                 else
                 {
-                    main.SetInteractTextRaw(Buildables.AlterraHub.NoOresToProcess(),
-                        Buildables.AlterraHub.PressToTurnDeviceOnOff(KeyCode.F.ToString()));
+                    var data = new[]
+                    {
+                        AlterraHub.NoOresToProcess(),
+                        AlterraHub.PressToTurnDeviceOnOff(KeyCode.F.ToString())
+                    };
+                    data.HandHoverPDAHelperEx(techType);
                 }
             }
 

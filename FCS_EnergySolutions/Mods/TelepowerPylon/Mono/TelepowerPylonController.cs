@@ -56,6 +56,7 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
         private Button _upgradeBTN;
         private ParticleSystem[] _particles;
         private bool _ifFromConstructed;
+        private InterfaceInteraction _interactionHelper;
 
         private const int DEFAULT_CONNECTIONS_LIMIT = 6;
         private GameObject inputDummy
@@ -363,6 +364,9 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
             };
 
             _addBTN.interactable = false;
+
+            var canvas = gameObject.GetComponentInChildren<Canvas>();
+            _interactionHelper = canvas.gameObject.AddComponent<InterfaceInteraction>();
 
             IsInitialized = true;
         }
@@ -807,26 +811,26 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
 
         #region IHand Target
 
-        public void OnHandHover(GUIHand hand)
+        public override void OnHandHover(GUIHand hand)
         {
-            HandReticle main = HandReticle.main;
-
-            if (!IsInitialized || !IsConstructed)
+            if (!IsInitialized || !IsConstructed || _interactionHelper.IsInRange)
             {
+                HandReticle main = HandReticle.main;
                 main.SetIcon(HandReticle.IconType.Default);
                 return;
             }
 
+            base.OnHandHover(hand);
+
             if (_isInRange)
             {
                 var additionalInformation = Manager == null ? "\nMust be built on platform." : string.Empty;
-                main.SetInteractText($"Unit ID: {UnitID} {additionalInformation} \nClick to use configure Telepower Pylon", $"For more information press {FCS_AlterraHub.QPatch.Configuration.PDAInfoKeyCode} | Power Usage: {CalculatePowerUsage()}");
-                main.SetIcon(Manager == null ? HandReticle.IconType.HandDeny : HandReticle.IconType.Info);
-            }
-            
-            if (Input.GetKeyDown(FCS_AlterraHub.QPatch.Configuration.PDAInfoKeyCode))
-            {
-
+                var data = new[]
+                {
+                    $"Unit ID: {UnitID} {additionalInformation} \nClick to use configure Telepower Pylon |",
+                    AlterraHub.PowerPerMinute(CalculatePowerUsage())
+                };
+                data.HandHoverPDAHelperEx(GetTechType(), Manager == null ? HandReticle.IconType.HandDeny : HandReticle.IconType.Info);
             }
         }
         

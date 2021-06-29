@@ -107,6 +107,8 @@ namespace FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Mono
             _storage.container.onRemoveItem += OnStorageRemoveItem;
             _storage.container.SetAllowedTechTypes(new[] { TechType.FireExtinguisher });
 
+
+
             InvokeRepeating(nameof(FindExtinguisher),1,1);
 
             IsInitialized = true;
@@ -228,12 +230,14 @@ namespace FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Mono
             return true;
         }
 
-        public void OnHandHover(GUIHand hand)
+        public override void  OnHandHover(GUIHand hand)
         {
             if (!IsInitialized || !IsConstructed) return;
-            HandReticle main = HandReticle.main;
-            main.SetInteractText(AuxPatchers.ClickToOpenFormatted(Mod.FireExtinguisherRefuelerFriendly));
-            main.SetIcon(HandReticle.IconType.Hand);
+
+            
+            //HandReticle main = HandReticle.main;
+            //main.SetInteractText(AuxPatchers.ClickToOpenFormatted(Mod.FireExtinguisherRefuelerFriendly));
+            //main.SetIcon(HandReticle.IconType.Hand);
         }
 
         public void OnHandClick(GUIHand hand)

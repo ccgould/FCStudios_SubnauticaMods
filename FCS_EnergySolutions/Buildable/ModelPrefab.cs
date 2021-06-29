@@ -51,7 +51,7 @@ namespace FCS_EnergySolutions.Buildable
             AlterraGenItemPrefab = GetPrefab("ItemButton");
             PylonUpgradeDataBoxPrefab = GetPrefab("PylonUpgradeDataBox",true);
             FrequencyItemPrefab = GetPrefab("FrequencyItem");
-            PowerStoragePrefab = GetPrefab(Mod.PowerStoragePrefabName);
+            PowerStoragePrefab = GetPrefab(Mod.PowerStoragePrefabName,true);
         }
 
         private static void CreateHoloGramPrefab()
@@ -95,17 +95,7 @@ namespace FCS_EnergySolutions.Buildable
                 if (applyShaders)
                 {
                     //Lets apply the material shader
-                    AlterraHub.ReplaceShadersV2(prefab, AlterraHub.BasePrimaryCol);
-                    AlterraHub.ReplaceShadersV2(prefab, AlterraHub.BaseSecondaryCol);
-                    AlterraHub.ReplaceShadersV2(prefab, AlterraHub.BaseTexDecals);
-                    AlterraHub.ReplaceShadersV2(prefab, AlterraHub.BaseLightsEmissiveController);
-                    AlterraHub.ReplaceShadersV2(prefab, AlterraHub.BaseDecalsEmissiveController);
-                    AlterraHub.ReplaceShadersV2(prefab, AlterraHub.BaseFloor01Interior);
-                    AlterraHub.ReplaceShadersV2(prefab, AlterraHub.BaseFloor01Exterior);
-                    AlterraHub.ReplaceShadersV2(prefab, AlterraHub.BaseOpaqueInterior);
-                    AlterraHub.ReplaceShadersV2(prefab, AlterraHub.BaseOpaqueExterior);
-                    AlterraHub.ReplaceShadersV2(prefab, AlterraHub.BaseDecalsInterior);
-                    AlterraHub.ReplaceShadersV2(prefab, AlterraHub.BaseDecalsExterior);
+                    AlterraHub.ReplaceShadersV2(prefab);
                 }
 
                 go = prefab;

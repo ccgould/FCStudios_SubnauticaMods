@@ -72,7 +72,7 @@ namespace FCS_AlterraHub.Patches
         }
 
         
-        [HarmonyPatch(typeof(PDAEncyclopedia), nameof(PDAEncyclopedia.Add), new Type[]{typeof(string), typeof(PDAEncyclopedia.Entry), typeof(bool)})]
+        [HarmonyPatch(typeof(PDAEncyclopedia), nameof(PDAEncyclopedia.Add), typeof(string), typeof(PDAEncyclopedia.Entry), typeof(bool))]
         [HarmonyPrefix]
         public static bool Add_Prefix(ref PDAEncyclopedia.EntryData __result, string key, PDAEncyclopedia.Entry entry, bool verbose)
         {

@@ -1,4 +1,8 @@
-﻿using FCS_EnergySolutions.Configuration;
+﻿using FCS_AlterraHub.Buildables;
+using FCS_AlterraHub.Enumerators;
+using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Mods.FCSPDA.Mono;
+using FCS_EnergySolutions.Configuration;
 using UnityEngine;
 
 namespace FCS_EnergySolutions.Mods.AlterraSolarCluster.Mono
@@ -52,12 +56,19 @@ namespace FCS_EnergySolutions.Mods.AlterraSolarCluster.Mono
         {
             if (_mono != null && _mono.IsOperational)
             {
-                HandReticle.main.SetInteractTextRaw(AuxPatchers.SolarClusterHover(Mathf.RoundToInt(GetRechargeScalar() * 100f), Mathf.RoundToInt(_powerSource.GetPower()), Mathf.RoundToInt(_powerSource.GetMaxPower()), Mathf.RoundToInt((GetRechargeScalar() * 0.25f * 5f) * 13f)), string.Empty);
-                HandReticle.main.SetIcon(HandReticle.IconType.Info, 1f);
+                var data = new[]
+                {
+                    AuxPatchers.SolarClusterHover(Mathf.RoundToInt(GetRechargeScalar() * 100f), Mathf.RoundToInt(_powerSource.GetPower()), Mathf.RoundToInt(_powerSource.GetMaxPower()), Mathf.RoundToInt((GetRechargeScalar() * 0.25f * 5f) * 13f)), string.Empty
+                };
+                data.HandHoverPDAHelperEx(_mono.GetTechType());
+
+                if (Input.GetKeyDown(FCS_AlterraHub.QPatch.Configuration.PDAInfoKeyCode))
+                {
+                    FCSPDAController.Instance.OpenEncyclopedia(_mono.GetTechType());
+                }
             }
         }
-
-
+        
         public void OnHandClick(GUIHand hand)
         {
         }

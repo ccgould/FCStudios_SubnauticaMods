@@ -167,10 +167,11 @@ namespace FCS_LifeSupportSolutions.Mods.OxygenTank.Mono
             return _colorManager.ChangeColor(color, mode);
         }
 
-        public void OnHandHover(GUIHand hand)
+        public override void OnHandHover(GUIHand hand)
         {
             if (!IsConstructed || !IsInitialized || Manager == null) return;
             HandReticle main = HandReticle.main;
+
             main.SetIcon(HandReticle.IconType.Info);
 
             var requiredTankCount = Manager.GetRequiredTankCount(QPatch.Configuration.SmallBaseOxygenHardcore);

@@ -27,7 +27,7 @@ namespace FCS_StorageSolutions
         [QModPatch]
         public void Patch()
         {
-            FCSAlterraHubService.PublicAPI.RegisterModPack(Mod.ModPackID, Assembly.GetExecutingAssembly());
+            FCSAlterraHubService.PublicAPI.RegisterModPack(Mod.ModPackID, Mod.ModBundleName, Assembly.GetExecutingAssembly());
             FCSAlterraHubService.PublicAPI.RegisterEncyclopediaEntry(Mod.ModPackID);
 
             IsDockedVehicleStorageAccessInstalled = QModServices.Main.ModPresent("DockedVehicleStorageAccess");

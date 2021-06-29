@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Objects;
+using FCS_EnergySolutions.Mods.PowerStorage.Enums;
 using FCS_EnergySolutions.Mods.TelepowerPylon.Model;
 using FCS_EnergySolutions.Mods.TelepowerPylon.Mono;
 using FCS_EnergySolutions.Mods.WindSurfer.Mono;
 using FCS_EnergySolutions.Mods.WindSurfer.Structs;
-using FCS_EnergySolutions.PowerStorage.Enums;
-using FCS_EnergySolutions.PowerStorage.Mono;
 using FCSCommon.Interfaces;
 using UnityEngine;
 #if SUBNAUTICA_STABLE

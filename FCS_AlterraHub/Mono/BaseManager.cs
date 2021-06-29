@@ -291,7 +291,7 @@ namespace FCS_AlterraHub.Mono
         public static BaseManager FindManager(string instanceID)
         {
             if (string.IsNullOrWhiteSpace(instanceID)) return null;
-            var manager = Managers.Find(x => x.BaseID == instanceID);
+            var manager = Managers.Find(x => x.BaseID.Equals(instanceID,StringComparison.OrdinalIgnoreCase));
             return manager;
         }
 

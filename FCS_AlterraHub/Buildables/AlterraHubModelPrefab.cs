@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using FCS_AlterraHub.API;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Managers;
+using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -91,7 +93,6 @@ namespace FCS_AlterraHub.Buildables
         internal static GameObject OreConsumerPrefab { get; set; }
         internal static GameObject OreConsumerFragPrefab { get; set; }
         internal static GameObject DebitCardPrefab { get; set; }
-        internal static GameObject BioFuelPrefab { get; set; }
         internal static GameObject KitPrefab { get; set; }
         internal static GameObject CartItemPrefab { get; set; }
         internal static GameObject FcsPDAPrefab { get; set; }
@@ -136,10 +137,7 @@ namespace FCS_AlterraHub.Buildables
 
                     if (!LoadAsset(Mod.CardPrefabName, QPatch.GlobalBundle,out var cardPrefabGo)) return false;
                     DebitCardPrefab = cardPrefabGo;
-
-                    //if (!LoadAsset(Mod.BioFuelPrefabName, QPatch.GlobalBundle, out var bioFuelPrefabGo)) return false;
-                    //BioFuelPrefab = bioFuelPrefabGo;
-
+                    
                     if (!LoadAsset(Mod.KitPrefabName, QPatch.GlobalBundle, out var kitPrefabGo)) return false; 
                     KitPrefab = kitPrefabGo;
 
@@ -173,7 +171,8 @@ namespace FCS_AlterraHub.Buildables
                     EncyclopediaEntryPrefab = encyclopediaEntryPrefab;                    
                     
                     if (!LoadAsset("AlterraHubFabStation", QPatch.GlobalBundle, out var alterraHubFabricatorPrefab)) return false;
-                    AlterraHubFabricatorPrefab = alterraHubFabricatorPrefab;                    
+                    AlterraHubFabricatorPrefab = alterraHubFabricatorPrefab;
+                    //AddFabStationComponents();
                     
                     if (!LoadAsset("AlterraHubDepotFrag", QPatch.GlobalBundle, out var alterraHubDepotFragmentPrefab)) return false;
                     AlterraHubDepotFragmentPrefab = alterraHubDepotFragmentPrefab;
@@ -223,6 +222,46 @@ namespace FCS_AlterraHub.Buildables
                 QuickLogger.Error(e.Message);
                 return false;
             }
+        }
+
+        private static void AddFabStationComponents()
+        {
+            var prefab = AlterraHubFabricatorPrefab;
+
+            PrefabIdentifier prefabIdentifier = prefab.EnsureComponent<PrefabIdentifier>();
+            prefabIdentifier.ClassId = "AlterraHubFabricationStation";
+
+            var lw = prefab.AddComponent<LargeWorldEntity>();
+            lw.cellLevel = LargeWorldEntity.CellLevel.Global;
+            
+            //Renderer
+            var renderer = prefab.GetComponentInChildren<Renderer>();
+
+            var rb = prefab.GetComponentInChildren<Rigidbody>();
+
+            if (rb == null)
+            {
+                rb = prefab.EnsureComponent<Rigidbody>();
+                rb.isKinematic = true;
+            }
+
+            prefab.AddComponent<TechTag>().type = TechType.None;
+
+            // Update sky applier
+            var applier = prefab.EnsureComponent<SkyApplier>();
+            applier.renderers = new Renderer[] { renderer };
+            applier.anchorSky = Skies.Auto;
+
+            var pickUp = prefab.AddComponent<Pickupable>();
+            pickUp.isPickupable = false;
+            pickUp.enabled = false;
+
+
+
+            WorldHelpers.CreateBeacon(prefab, Mod.AlterraHubStationPingType, "Alterra Hub Station");
+            MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
+            var station = prefab.AddComponent<AlterraFabricatorStationController>();
+            prefab.AddComponent<PortManager>();
         }
 
 
@@ -500,7 +539,22 @@ namespace FCS_AlterraHub.Buildables
 
         }
 
-        public static void ReplaceShadersV2(GameObject prefab,string materialName)
+        public static void ReplaceShadersV2(GameObject prefab)
+        {
+            ReplaceShadersV2(prefab, BasePrimaryCol);
+            ReplaceShadersV2(prefab, BaseSecondaryCol);
+            ReplaceShadersV2(prefab, BaseTexDecals);
+            ReplaceShadersV2(prefab, BaseLightsEmissiveController);
+            ReplaceShadersV2(prefab, BaseDecalsEmissiveController);
+            ReplaceShadersV2(prefab, BaseFloor01Interior);
+            ReplaceShadersV2(prefab, BaseFloor01Exterior);
+            ReplaceShadersV2(prefab, BaseOpaqueInterior);
+            ReplaceShadersV2(prefab, BaseOpaqueExterior);
+            ReplaceShadersV2(prefab, BaseDecalsInterior);
+            ReplaceShadersV2(prefab, BaseDecalsExterior);
+        }
+
+        private static void ReplaceShadersV2(GameObject prefab,string materialName)
         {
             LoadV2Materials();
             Renderer[] renderers = prefab.GetComponentsInChildren<Renderer>(true);
@@ -515,6 +569,31 @@ namespace FCS_AlterraHub.Buildables
                     }
                 }
             }
+        }
+
+        public static bool LoadPrefabAssetV2(string prefabName, AssetBundle assetBundle, out GameObject go, bool applyShaders = true)
+        {
+            //We have found the asset bundle and now we are going to continue by looking for the model.
+            GameObject prefab = assetBundle.LoadAsset<GameObject>(prefabName);
+
+            //If the prefab isn't null lets add the shader to the materials
+            if (prefab != null)
+            {
+                if (applyShaders)
+                {
+                    //Lets apply the material shader
+                    AlterraHub.ReplaceShadersV2(prefab);
+                }
+
+                go = prefab;
+
+                QuickLogger.Debug($"{prefabName} Prefab Found!");
+                return true;
+            }
+
+            QuickLogger.Error($"{prefabName} Prefab Not Found!");
+            go = null;
+            return false;
         }
     }
 }

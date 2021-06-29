@@ -6,6 +6,7 @@ using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_ProductionSolutions.Buildable;
@@ -18,7 +19,7 @@ using UnityEngine;
 
 namespace FCS_ProductionSolutions.Mods.AutoCrafter
 {
-    internal class DSSAutoCrafterController : FcsDevice, IFCSSave<SaveData>
+    internal class DSSAutoCrafterController : FcsDevice, IFCSSave<SaveData>, IHandTarget
     {
         private bool _runStartUpOnEnable;
         private bool _fromSave;
@@ -38,6 +39,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
         internal AutoCrafterMode CurrentCrafterMode = AutoCrafterMode.Automatic;
         internal DSSCraftManager CraftManager;
         private StandByModes _standyByMode = StandByModes.Crafting;
+        private InterfaceInteraction _interactionHelper;
 
         private List<TechType> _modCraftables => Mod.Craftables;
 
@@ -332,6 +334,9 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject,Color.cyan);
 
             InvokeRepeating(nameof(CheckForAvailableCrafts), 1f, 1f);
+
+            var canvas = gameObject.GetComponentInChildren<Canvas>();
+            _interactionHelper = canvas.gameObject.AddComponent<InterfaceInteraction>();
 
             IsInitialized = true;
 
@@ -698,6 +703,23 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
             {
                 yield return _connectedCrafters.ElementAt(i);
             }
+        }
+
+        public override void OnHandHover(GUIHand hand)
+        {
+            if(!IsInitialized || !IsConstructed || _interactionHelper.IsInRange) return;
+            base.OnHandHover(hand);
+
+            var data = new[]
+            {
+                AlterraHub.PowerPerMinute(GetPowerUsage() * 60)
+            };
+            data.HandHoverPDAHelperEx(GetTechType());
+        }
+
+        public void OnHandClick(GUIHand hand)
+        {
+            
         }
     }
 

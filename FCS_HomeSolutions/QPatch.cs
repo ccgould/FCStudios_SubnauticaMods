@@ -8,18 +8,20 @@ using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Buildables.OutDoorPlanters;
 using FCS_HomeSolutions.Configuration;
-using FCS_HomeSolutions.MiniFountainFilter.Buildables;
 using FCS_HomeSolutions.Mods.AlienChief.Buildables;
 using FCS_HomeSolutions.Mods.Cabinets.Buildable;
+using FCS_HomeSolutions.Mods.Curtains.Buildable;
 using FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Buildable;
 using FCS_HomeSolutions.Mods.LedLights.Buildable;
+using FCS_HomeSolutions.Mods.MiniFountainFilter.Buildables;
 using FCS_HomeSolutions.Mods.PaintTool.Spawnable;
 using FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable;
+using FCS_HomeSolutions.Mods.QuantumTeleporter.Buildable;
+using FCS_HomeSolutions.Mods.SeaBreeze.Buildable;
+using FCS_HomeSolutions.Mods.TrashReceptacle.Buildable;
+using FCS_HomeSolutions.Mods.TrashRecycler.Buildable;
 using FCS_HomeSolutions.Mods.TV.Buildable;
-using FCS_HomeSolutions.QuantumTeleporter.Buildable;
-using FCS_HomeSolutions.SeaBreeze.Buildable;
 using FCS_HomeSolutions.Spawnables;
-using FCS_HomeSolutions.TrashReceptacle.Buildable;
 using FCSCommon.Utilities;
 using FMOD;
 using FMODUnity;
@@ -41,15 +43,15 @@ namespace FCS_HomeSolutions
     {
         internal static Config Configuration { get; } = OptionsPanelHandler.Main.RegisterModOptions<Config>();
 
-        internal static Dictionary<string, Texture2D> Patterns = new Dictionary<string, Texture2D>();
+        internal static Dictionary<string, Texture2D> Patterns = new();
 
-        internal static Dictionary<Texture2D, Atlas.Sprite> PatternsIcon = new Dictionary<Texture2D, Atlas.Sprite>();
-        public static Dictionary<string, SoundEntry> AudioClips = new Dictionary<string, SoundEntry>();
+        internal static Dictionary<Texture2D, Atlas.Sprite> PatternsIcon = new();
+        public static Dictionary<string, SoundEntry> AudioClips = new();
 
         [QModPatch]
         public void Patch()
         {
-            FCSAlterraHubService.PublicAPI.RegisterModPack(Mod.ModPackID, Assembly.GetExecutingAssembly());
+            FCSAlterraHubService.PublicAPI.RegisterModPack(Mod.ModPackID,Mod.ModBundleName, Assembly.GetExecutingAssembly());
             FCSAlterraHubService.PublicAPI.RegisterEncyclopediaEntry(Mod.ModPackID);
 
             ModelPrefab.Initialize();

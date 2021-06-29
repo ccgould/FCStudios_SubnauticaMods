@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_LifeSupportSolutions.Buildable;
@@ -12,7 +14,7 @@ using UnityEngine;
 
 namespace FCS_LifeSupportSolutions.Mods.EnergyPillVendingMachine.mono
 {
-    internal class EnergyPillVendingMachineController : FcsDevice, IFCSSave<SaveData>
+    internal class EnergyPillVendingMachineController : FcsDevice, IFCSSave<SaveData>, IHandTarget
     {
         private EnergyPillVendingMachineEntry _savedData;
         private bool _isFromSave;
@@ -24,6 +26,8 @@ namespace FCS_LifeSupportSolutions.Mods.EnergyPillVendingMachine.mono
             {"670",new Tuple<decimal, TechType>(1000000,Mod.BlueEnergyPillTechType) },
             {"242",new Tuple<decimal, TechType>(500000,Mod.GreenEnergyPillTechType) }
         };
+
+        private InterfaceInteraction _interactionHelper;
 
         private void Start()
         {
@@ -77,6 +81,9 @@ namespace FCS_LifeSupportSolutions.Mods.EnergyPillVendingMachine.mono
                 _displayManager = gameObject.AddComponent<EnergyPillVendingMachineDisplay>();
                 _displayManager.Setup(this);
             }
+
+            var canvas = gameObject.GetComponentInChildren<Canvas>();
+            _interactionHelper = canvas.gameObject.AddComponent<InterfaceInteraction>();
 
             IsInitialized = true;
         }
@@ -169,7 +176,6 @@ namespace FCS_LifeSupportSolutions.Mods.EnergyPillVendingMachine.mono
                     return;
                 }
 
-
                 if (FCSAlterraHubService.PublicAPI.IsCreditAvailable(Inventory[itemKey].Item1))
                 {
                     var result = PlayerInteractionHelper.GivePlayerItem(Inventory[itemKey].Item2);
@@ -202,6 +208,24 @@ namespace FCS_LifeSupportSolutions.Mods.EnergyPillVendingMachine.mono
                 return true;
             }
             return false;
+        }
+
+        public override void OnHandHover(GUIHand hand)
+        {
+            if (!IsInitialized || !IsConstructed || _interactionHelper.IsInRange) return;
+            
+            base.OnHandHover(hand);
+
+            var data = new[]
+            {
+               AlterraHub.PowerPerMinute(GetPowerUsage() * 60)
+            };
+            data.HandHoverPDAHelperEx(GetTechType());
+        }
+
+        public void OnHandClick(GUIHand hand)
+        {
+            // Not in use
         }
     }
 }

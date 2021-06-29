@@ -12,6 +12,7 @@ using FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems;
 using FCS_AlterraHub.Mono;
 using FCSCommon.Utilities;
 using Oculus.Newtonsoft.Json;
+using Story;
 using UnityEngine;
 
 namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
@@ -42,23 +43,26 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         private string _st;
         private PortManager _portManager;
         private string _baseID;
+        private Transform _warpTrans;
+        private int MAXDRONECOUNT = 1;
 
         private void Awake()
         {
             Main = this;
-            Mod.OnGamePlaySettingsLoaded += OnGamePlaySettingsLoaded;
+            _warpTrans = GameObjectHelpers.FindGameObject(gameObject, "RespawnPoint").transform;
+            //Mod.OnGamePlaySettingsLoaded += OnGamePlaySettingsLoaded;
             BaseTransform = transform;
             var lodGroup = gameObject.GetComponentInChildren<LODGroup>();
             lodGroup.size = 4f;
+
         }
         
         private void Start()
         {
-            
-
             CreatePorts();
 
             _generator = GameObjectHelpers.FindGameObject(gameObject, "Anim_Generator").AddComponent<GeneratorController>();
+
             _generator.Initialize(this);            
             
             _antenna = GameObjectHelpers.FindGameObject(gameObject, "antenna_controller").AddComponent<AntennaController>();
@@ -95,7 +99,44 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseLightsEmissiveController, gameObject, 2f);
             MaterialHelpers.ChangeSpecSettings(AlterraHub.BaseDecalsExterior, AlterraHub.TBaseSpec, gameObject, 2.61f, 8f);
             FindPortManager();
+
+            var bp1Pos = GameObjectHelpers.FindGameObject(gameObject, "_BlueprintBoxPnt1_");
+            var bp2Pos = GameObjectHelpers.FindGameObject(gameObject, "_BlueprintBoxPnt2_");
+            var bp3Pos = GameObjectHelpers.FindGameObject(gameObject, "_BlueprintBoxPnt3_");
+
+            var dataBox1 = SpawnHelper.SpawnTechType(Mod.FCSDataBoxTechType, bp1Pos.transform.position, bp1Pos.transform.rotation, true);
+            var dataBox1C = dataBox1.GetComponent<BlueprintHandTarget>();
+            CreateBluePrintHandTarget(dataBox1C, dataBox1, Mod.AlterraHubDepotTechType);
+
+            var dataBox2 = SpawnHelper.SpawnTechType(Mod.FCSDataBoxTechType, bp2Pos.transform.position, bp2Pos.transform.rotation, true);
+            var dataBox2C = dataBox2.GetComponent<BlueprintHandTarget>();
+            CreateBluePrintHandTarget(dataBox2C, dataBox2, Mod.OreConsumerTechType);
+
+            var dataBox3 = SpawnHelper.SpawnTechType(Mod.FCSDataBoxTechType, bp3Pos.transform.position, bp3Pos.transform.rotation, true);
+            var dataBox3C = dataBox3.GetComponent<BlueprintHandTarget>();
+            CreateBluePrintHandTarget(dataBox3C, dataBox3, Mod.DronePortPadHubNewTechType);
+
+            OnGamePlaySettingsLoaded(Mod.GamePlaySettings);
+
             InvokeRepeating(nameof(TryShip),1f,1f);
+        }
+
+        private static void CreateBluePrintHandTarget(BlueprintHandTarget dataBox, GameObject go, TechType unlockTechType)
+        {
+            dataBox.animator = go.GetComponent<Animator>();
+            dataBox.animParam = "databox_take";
+            dataBox.viewAnimParam = "databox_lookat";
+            dataBox.unlockTechType = unlockTechType;
+            dataBox.useSound = QPatch.BoxOpenSoundAsset;
+            dataBox.disableGameObject = GameObjectHelpers.FindGameObject(go, "BLUEPRINT_DATA_DISC");
+            dataBox.inspectPrefab = AlterraHub.BluePrintDataDiscPrefab;
+            dataBox.onUseGoal = new StoryGoal(string.Empty, Story.GoalType.PDA, 0);
+            dataBox.unlockTechType = unlockTechType;
+
+            var genericHandTarget = go.GetComponent<GenericHandTarget>();
+            genericHandTarget.onHandHover.AddListener(_ => dataBox.HoverBlueprint());
+            genericHandTarget.onHandClick.AddListener(_ => dataBox.UnlockBlueprint());
+            dataBox.Start();
         }
 
         public IDroneDestination GetAvailablePort(DroneController approachingDrone)
@@ -109,14 +150,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
 
             return port;
         }
-
-        //For dev use only
-        private void MoveToPlayer()
-        {
-            Mod.FCSStationSpawn.transform.parent.transform.position = Player.main.transform.position;
-            Mod.FCSStationSpawn.transform.parent.transform.localRotation = Player.main.transform.localRotation;
-        }
-
+        
         //For dev use only
         private void ToggleIsKinematic()
         {
@@ -150,6 +184,9 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         private void OnGamePlaySettingsLoaded(FCSGamePlaySettings settings)
         {
             QuickLogger.Info($"On Game Play Settings Loaded {JsonConvert.SerializeObject(settings, Formatting.Indented)}");
+
+            if (_keyPads == null || _generator == null || _antenna == null) return;
+
             if (settings.AlterraHubDepotDoors.KeyPad1)
             {
                 _keyPads[0].Unlock();
@@ -168,6 +205,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             {
                 TurnOnBase();
             }
+
             Mod.GamePlaySettings.IsStationSpawned = true;
         }
 
@@ -237,20 +275,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
 
         public void TryShip()
         {
-            if (_drones.Count < 3)
-            {
-                if (!Mod.GamePlaySettings.TransDroneSpawned)
-                {
-                    foreach (KeyValuePair<string, IDroneDestination> port in _ports)
-                    {
-                        var drone = port.Value.SpawnDrone();
-                        _drones.Add(drone);
-                        //Mod.GamePlaySettings.DronePortAssigns.Add(drone.GetId(), port.Value.GetPortID());
-                    }
-                    //transform.parent = _drones.ElementAt(0)?.transform.parent;
-                    Mod.GamePlaySettings.TransDroneSpawned = true;
-                }
-            }
+            SpawnMissingDrones();
 
             if (!LargeWorldStreamer.main.IsWorldSettled() || _pendingPurchase.Count <= 0) return;
             
@@ -279,9 +304,41 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             }
         }
 
+        private void SpawnMissingDrones()
+        {
+            if (_drones.Count < MAXDRONECOUNT)
+            {
+                if (!Mod.GamePlaySettings.TransDroneSpawned)
+                {
+                    if (MAXDRONECOUNT > _ports.Count)
+                    {
+                        MAXDRONECOUNT = _ports.Count;
+                    }
+
+                    for (int i = 0; i < MAXDRONECOUNT; i++)
+                    {
+                        var drone = _ports.ElementAt(i).Value.SpawnDrone();
+                        _drones.Add(drone);
+                    }
+
+                    //foreach (KeyValuePair<string, IDroneDestination> port in _ports)
+                    //{
+                    //    var drone = port.Value.SpawnDrone();
+                    //    _drones.Add(drone);
+                    //    //Mod.GamePlaySettings.DronePortAssigns.Add(drone.GetId(), port.Value.GetPortID());
+                    //}
+                    //transform.parent = _drones.ElementAt(0)?.transform.parent;
+
+                    Mod.GamePlaySettings.TransDroneSpawned = true;
+                }
+            }
+        }
+
         internal void ResetDrones()
         {
-            foreach (DroneController controller in _drones)
+            var drones = GameObject.FindObjectsOfType<DroneController>();
+
+            foreach (DroneController controller in drones)
             {
                 if (controller != null)
                 {
@@ -293,18 +350,20 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
                 }
             }
 
+
             _drones.Clear();
 
-            foreach (KeyValuePair<string, IDroneDestination> dronePortController in _ports)
-            {
-                dronePortController.Value.SpawnDrone();
-            }
+            Mod.GamePlaySettings.TransDroneSpawned = false;
+
+            SpawnMissingDrones();
         }
 
 
         public IEnumerable<AlterraTransportDroneEntry> SaveDrones()
         {
-            foreach (DroneController drone in _drones)
+            var drones = GameObject.FindObjectsOfType<DroneController>();
+
+            foreach (DroneController drone in drones)
             {
                 yield return drone.Save();
             }
@@ -339,7 +398,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
 
             if (_ports?.Count > 0) return;
                 var ports = GameObjectHelpers.FindGameObjects(gameObject, "DronePortPad_HubWreck", SearchOption.StartsWith).ToArray();
-            for (int i = 0; i < ports.Length; i++)
+            for (int i = 0; i < 1; i++)  // forcing to only make one port
             {
                 var portController = ports.ElementAt(i).AddComponent<AlterraDronePortController>();
                 portController.SetPortID(i);
@@ -366,6 +425,12 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
 
 
             return _baseID;
+        }
+
+        public void OnConsoleCommand_warp()
+        {
+            Player.main.SetPosition(_warpTrans.position);
+
         }
     }
 }

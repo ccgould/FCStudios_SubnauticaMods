@@ -7,7 +7,7 @@ using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Model.Utilities;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
-using FCS_EnergySolutions.AlterraGen.Enumerators;
+using FCS_EnergySolutions.Mods.AlterraGen.Enumerators;
 using FCSCommon.Utilities;
 using HarmonyLib;
 using SMLHelper.V2.Crafting;
@@ -98,6 +98,13 @@ namespace FCS_EnergySolutions.Configuration
         internal const string PowerStorageClassName = "PowerStorage";
         internal static string PowerStorageKitClassID => $"{PowerStorageModName}_Kit";
         internal static string PowerStoragePrefabName => PowerStorageModName;
+
+
+        internal const string BioFuelClassID = "FCSBioFuel";
+        internal const string BioFuelFriendly = "Bio Fuel";
+        internal const string BioFuelDescription = "A tank of high-quality Bio Fuel, suitable for use in all Bioreactors.";
+        internal const string BioFuelPrefabName = "Liquid_Biofuel";
+
 
 #if SUBNAUTICA
         internal static TechData AlterraGenIngredients => new TechData

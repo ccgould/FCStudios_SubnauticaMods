@@ -1,5 +1,5 @@
 ﻿using FCS_AlterraHub.Helpers;
-using FCS_HomeSolutions.SeaBreeze.Display;
+using FCS_HomeSolutions.Mods.SeaBreeze.Display;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;

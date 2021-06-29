@@ -318,9 +318,15 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             }
         }
 
-        public void Open()
+        public bool Open()
         {
 
+            if (!Mod.GamePlaySettings.IsPDAUnlocked)
+            {
+                QuickLogger.ModMessage("Please complete the Alterra Hub Station Mission.");
+                return false;
+            }
+            
             Player main = Player.main;
             CreateScreen();
 
@@ -337,7 +343,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
 
             if (!flag || main.cinematicModeActive)
             {
-                return;
+                return false;
             }
             MainCameraControl.main.SaveLockedVRViewModelAngle();
             IsOpen = true;
@@ -358,7 +364,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
                 _pda.screen.SetActive(false);
             }
             QuickLogger.Debug("FCS PDA Is Open", true);
-
+            return true;
         }
 
         private bool InventorySlotHandler()
@@ -704,8 +710,21 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
 
         public void OpenEncyclopedia(TechType techType)
         {
-            GoToPage(PDAPages.Encyclopedia);
-            Open();
+            if (CheckIfPDAHasEntry(techType))
+            {
+                if (!Open()) return;
+                GoToPage(PDAPages.Encyclopedia);
+                EncyclopediaTabController.OpenEntry(techType);
+            }
+            else
+            {
+                QuickLogger.ModMessage($"AlterraHub PDA doesn't have any entry for {Language.main.Get(techType)}");
+            }
+        }
+
+        public bool CheckIfPDAHasEntry(TechType techType)
+        {
+            return EncyclopediaTabController.HasEntry(techType);
         }
 
         public CraftNode GetCraftTree()

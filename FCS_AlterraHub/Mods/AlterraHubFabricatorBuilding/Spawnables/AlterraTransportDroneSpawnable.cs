@@ -30,8 +30,11 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Spawnables
             {
                 var prefab = GameObject.Instantiate(AlterraHub.AlterraHubTransportDronePrefab);
 
-                prefab.AddComponent<PrefabIdentifier>();
+                prefab.AddComponent<PrefabIdentifier>().ClassId = ClassID;
                 prefab.AddComponent<TechTag>().type = TechType;
+
+                var pickUp = prefab.AddComponent<Pickupable>();
+                pickUp.isPickupable = false;
 
                 var lw = prefab.AddComponent<LargeWorldEntity>();
                 lw.cellLevel = LargeWorldEntity.CellLevel.Global;

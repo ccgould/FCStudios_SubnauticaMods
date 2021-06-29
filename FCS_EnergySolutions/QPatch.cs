@@ -4,11 +4,13 @@ using System.IO;
 using System.Reflection;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Registration;
-using FCS_EnergySolutions.AlterraGen.Buildables;
 using FCS_EnergySolutions.AlterraSolarCluster.Buildables;
 using FCS_EnergySolutions.Buildable;
 using FCS_EnergySolutions.Configuration;
-using FCS_EnergySolutions.JetStreamT242.Buildables;
+using FCS_EnergySolutions.Mods.AlterraGen.Buildables;
+using FCS_EnergySolutions.Mods.JetStreamT242.Buildables;
+using FCS_EnergySolutions.Mods.PowerStorage.Buildable;
+using FCS_EnergySolutions.Mods.Spawnables;
 using FCS_EnergySolutions.Mods.TelepowerPylon.Mono;
 using FCS_EnergySolutions.Spawnables;
 using FCS_EnergySolutions.TelepowerPylon.Buildables;
@@ -37,7 +39,7 @@ namespace FCS_EnergySolutions
         [QModPatch]
         public void Patch()
         {
-            FCSAlterraHubService.PublicAPI.RegisterModPack(Mod.ModPackID, Assembly.GetExecutingAssembly());
+            FCSAlterraHubService.PublicAPI.RegisterModPack(Mod.ModPackID, Mod.ModBundleName, Assembly.GetExecutingAssembly());
             FCSAlterraHubService.PublicAPI.RegisterEncyclopediaEntry(Mod.ModPackID);
 
             AuxPatchers.AdditionalPatching();
@@ -47,6 +49,9 @@ namespace FCS_EnergySolutions
             {
                 var alterraGen = new AlterraGenBuildable();
                 alterraGen.Patch();
+
+                var bioFuelSpawnable = new BioFuelSpawnable();
+                bioFuelSpawnable.Patch();
             }
 
             if (Configuration.IsAlterraSolarPanelClusterEnabled)

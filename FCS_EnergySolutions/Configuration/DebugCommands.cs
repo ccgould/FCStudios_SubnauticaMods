@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
-using FCS_EnergySolutions.JetStreamT242.Mono;
+using FCS_EnergySolutions.Mods.JetStreamT242.Mono;
 using FCS_EnergySolutions.Mods.TelepowerPylon.Mono;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Commands;

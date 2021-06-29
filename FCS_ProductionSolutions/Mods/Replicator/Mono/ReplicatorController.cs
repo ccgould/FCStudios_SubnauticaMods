@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
@@ -10,8 +11,8 @@ using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
-using FCS_ProductionSolutions.HydroponicHarvester.Enumerators;
 using FCS_ProductionSolutions.HydroponicHarvester.Mono;
+using FCS_ProductionSolutions.Mods.HydroponicHarvester.Enumerators;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -35,6 +36,7 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
         private GameObject _spawnPoint;
         private ReplicatorSpeedButton _speedBTN;
         private GameObject _canvas;
+        private InterfaceInteraction _interactionHelper;
         private const float PowerUsage = 0.85f;
         public override bool IsOperational => IsConstructed && IsInitialized;
         public override bool IsVisible => true;
@@ -195,7 +197,7 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
             if (_colorManager == null)
             {
                 _colorManager = gameObject.AddComponent<ColorManager>();
-                _colorManager.Initialize(gameObject, ModelPrefab.BodyMaterial);
+                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol);
             }
 
             if (_replicatorSlot == null)
@@ -214,7 +216,11 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
 
             UpdateUI();
 
-            MaterialHelpers.ChangeEmissionStrength(ModelPrefab.EmissionControllerMaterial,gameObject,5f);
+            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
+            MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseLightsEmissiveController,gameObject,5f);
+
+            var canvas = gameObject.GetComponentInChildren<Canvas>();
+            _interactionHelper = canvas.gameObject.AddComponent<InterfaceInteraction>();
 
             IsInitialized = true;
 
@@ -419,20 +425,29 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
             }
         }
 
-        public void OnHandHover(GUIHand hand)
+        public override void OnHandHover(GUIHand hand)
         {
-            if (!IsInitialized || !IsConstructed || _replicatorSlot == null) return;
-            HandReticle main = HandReticle.main;
+            if (!IsInitialized || !IsConstructed || _replicatorSlot == null || _interactionHelper.IsInRange) return;
+
+            base.OnHandHover(hand);
+            
             if (Manager == null)
             {
-                main.SetIcon(HandReticle.IconType.HandDeny);
-                main.SetInteractTextRaw(AuxPatchers.NotBuildOnBase(),"");
+                var data = new[]
+                {
+                    AuxPatchers.NotBuildOnBase(),
+                    AlterraHub.PowerPerMinute(GetPowerUsage() * 60)
+                };
+                data.HandHoverPDAHelperEx(GetTechType(), HandReticle.IconType.HandDeny);
                 return;
             }
 
-            
-            main.SetProgress(_replicatorSlot.GetPercentageDone());
-            main.SetIcon(HandReticle.IconType.Progress, 1f);
+
+            var data1 = new[]
+            {
+                AlterraHub.PowerPerMinute(GetPowerUsage() * 60)
+            };
+            data1.HandHoverPDAHelperEx(GetTechType(), HandReticle.IconType.Progress, _replicatorSlot.GetPercentageDone());
         }
 
         public void OnHandClick(GUIHand hand)

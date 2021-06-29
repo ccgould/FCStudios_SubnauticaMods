@@ -22,7 +22,14 @@ namespace FCS_AlterraHub.Configuration
         [ConsoleCommand("givecredit")]
         public static string GiveCreditCommand(double amount)
         {
-            CardSystem.main.AddFinances((decimal) amount);
+            if (CardSystem.main.HasBeenRegistered())
+            {
+                CardSystem.main.AddFinances((decimal) amount);
+            }
+            else
+            {
+                return "No account found. Please create an account to use this command";
+            }
             return $"Parameters: {amount}";
         }
         
@@ -95,9 +102,15 @@ namespace FCS_AlterraHub.Configuration
         }
 
         [ConsoleCommand("WarpStation")]
-        public static void WarpStation()
+        public static string WarpStation()
         {
-            Player.main.SetPosition(Mod.FCSStationSpawn.transform.position);
+            if (AlterraFabricatorStationController.Main != null)
+            {
+                AlterraFabricatorStationController.Main.OnConsoleCommand_warp();
+                return "Warped player to station";
+            }
+
+            return "Warped failed";
         }
 
         [ConsoleCommand("FcsQuickStart")]

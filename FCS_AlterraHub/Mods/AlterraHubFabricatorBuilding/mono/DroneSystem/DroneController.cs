@@ -12,10 +12,11 @@ using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Systems;
 using FCSCommon.Utilities;
 using UnityEngine;
+using UWE;
 
 namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 {
-    internal class DroneController : MonoBehaviour, IProtoTreeEventListener
+    internal class DroneController : MonoBehaviour, IProtoEventListener
     {
         private IEnumerable<GameObject> _airThrusters;
         private Transform _trans;
@@ -36,11 +37,11 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
         private bool _isDocking;
         private bool _isDeparting;
         private PingInstance _beacon;
-        private string _storeInformationIdentifier;
-        private Transform _parent;
         private bool _isReturningToStation;
         private bool _fromSave;
         private bool _runOnEnabled = true;
+        private Transform _followPoint;
+        private bool _pauseStateChange;
 
         internal enum DroneStates
         {
@@ -56,38 +57,13 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
             _trans = transform;
         }
 
-        private void OnEnable()
-        {
-            if (_runOnEnabled)
-            {
-                if (_fromSave)
-                {
-                    _saveData = Mod.GetAlterraTransportDroneSaveData(GetId());
-
-                    if (_saveData != null)
-                    {
-                        QuickLogger.Debug("Loading Drone Save");
-                        if (_saveData.Cargo != null)
-                        {
-                            _order = _saveData.Cargo.ToList();
-                        }
-
-                        _droneState = _saveData.DroneState;
-
-                        StartCoroutine(AttemptInitialize());
-                    }
-                }
-
-                _runOnEnabled = false;
-            }
-        }
-
         private IEnumerator AttemptInitialize()
         {
-            while (AlterraFabricatorStationController.Main ==null)
+            while (AlterraFabricatorStationController.Main ==null || !uGUI_SceneLoading.IsLoadingScreenFinished || !uGUI.main || uGUI.main.loading.IsLoading)
             {
                 yield return null;
             }
+            
             var dockedBase = BaseManager.FindManager(_saveData.DockedPortBaseID);
             QuickLogger.Debug("1");
 
@@ -127,17 +103,61 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 
             _nextPos = _destinationPort?.GetEntryPoint();
             QuickLogger.Debug("11");
+
+            VerifyPositionAfterLoad();
+            _runOnEnabled = false;
+            _pauseStateChange = false;
             yield break;
+        }
+
+        private void VerifyPositionAfterLoad()
+        {
+            QuickLogger.Debug($"VerifyPositionAfterLoad - Drone State: {_droneState}");
+            if (_droneState == DroneStates.Docking && _dockedPort != null)
+            {
+                IsDocking(true);
+                _nextPos = _dockedPort?.GetEntryPoint();
+                _dockedPort.DockDrone(this);
+            }
+            else if (_droneState == DroneStates.Departing && _dockedPort != null)
+            {
+                _nextPos = _dockedPort?.GetEntryPoint();
+                _dockedPort.Depart(this);
+            }
+            else if (_droneState == DroneStates.Transitioning && _dockedPort != null)
+            {
+                _alignDrone = true;
+                _nextPos = _dockedPort?.GetEntryPoint();
+
+                //Force the position and rotation just in case the drone isn't in position or rotation already.
+                _trans.position = _nextPos.position;
+                _trans.rotation = _nextPos.rotation;
+            }
+        }
+
+        internal void SetFollowPoint(Transform getEntryPoint)
+        {
+            _followPoint = getEntryPoint;
         }
 
 
         private void Start()
         {
             AlterraFabricatorStationController.Main.RegisterDrone(this);
-            _parent = _trans.parent;
-            _storeInformationIdentifier = _trans.parent.GetComponentInParent<StoreInformationIdentifier>()?.Id;
+            CoroutineHost.StartCoroutine(MoveToGlobalRoot());
             InvokeRepeating(nameof(CanReturn),1f,1f);
         }
+
+        //private IEnumerator Start()
+        //{
+        //    yield return new WaitForSeconds(1f);
+        //    while (!uGUI_SceneLoading.IsLoadingScreenFinished || !uGUI.main || uGUI.main.loading.IsLoading)
+        //    {
+        //        yield return null;
+        //    }
+        //    this.Run();
+        //    yield break;
+        //}
 
         //private void TryFindBase()
         //{
@@ -154,7 +174,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
         //        CancelInvoke(nameof(TryFindBase));
         //    }
         //}
-        
+
         //private void TryFindDeparturePort()
         //{
         //    if (_saveData != null && !string.IsNullOrWhiteSpace(_saveData.DeparturePortID) && _departurePort == null)
@@ -180,7 +200,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
         //        if (port.Value == null) return;
         //        _destinationPort = (IDroneDestination)port.Value;
         //        CancelInvoke(nameof(TryFindDestinationPort));
-                
+
         //        if (_droneState == DroneStates.Docking)
         //        {
         //            IsDocking(true);
@@ -229,10 +249,26 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
                 _beacon.SetVisible(_droneState == DroneStates.Transitioning);
                 _beacon.enabled = _droneState == DroneStates.Transitioning;
             }
+
+            if (_droneState == DroneStates.Departing || _droneState == DroneStates.Docking)
+            {
+                FollowPoint();
+            }
+        }
+
+        private void FollowPoint()
+        {
+            if (_followPoint != null)
+            {
+                _trans.position = _followPoint.position;
+                _trans.rotation = _followPoint.rotation;
+            }
         }
 
         private void UpdateDockState()
         {
+            if(_pauseStateChange) return;
+
             if (_isDocking)
             {
                 _droneState = DroneStates.Docking;
@@ -250,9 +286,9 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
         internal void IsDocking(bool value)
         {
             _isDocking = value;
-            if (value && !_isReturningToStation)
+            if (value && !_isReturningToStation && _dockedPort != null)
             {
-                VoiceNotificationSystem.main.DisplayMessage($"Drone arrived at {_destinationPort.GetBaseName()}");
+                VoiceNotificationSystem.main.DisplayMessage($"Drone arrived at {_dockedPort.GetBaseName()}");
             }
         }
 
@@ -272,8 +308,23 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
         internal void UnDock()
         {
             _dockedPort = null;
-            _trans.parent = _parent;
+            SetFollowPoint(null);
+            CoroutineHost.StartCoroutine(MoveToGlobalRoot());
             QuickLogger.Debug("Drone Undocked",true);
+        }
+
+        private IEnumerator MoveToGlobalRoot()
+        {
+            yield return new WaitForSeconds(1f);
+
+            while (LargeWorldStreamer.main?.cellManager?.streamer?.globalRoot?.transform == null)
+            {
+                yield return null;
+            }
+            
+            _trans.parent = LargeWorldStreamer.main.cellManager.streamer.globalRoot.transform;
+            
+            yield break;
         }
 
         public void OnOffloadCompleted()
@@ -299,7 +350,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
             if (_trans.position == _nextPos.position)
             {
                 _alignDrone = true;
-                _trans.parent = _nextPos.transform;
+                //_trans.parent = _nextPos.transform;
                 return;
             }
 
@@ -311,6 +362,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
         internal void Initialize(IDroneDestination dockedPort)
         {
             if (IsInitialize) return;
+            _dockedPort = dockedPort;
             _trans = gameObject.transform;
             _airThrusters = GameObjectHelpers.FindGameObjects(gameObject, "Thruster",SearchOption.StartsWith);
             var bubbles = GameObjectHelpers.FindGameObject(gameObject, "xSeamothTrail").EnsureComponent<ThrusterController>();
@@ -319,7 +371,11 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
             {
                 thruster.EnsureComponent<ThrusterController>();
             }
-            DockDrone();
+
+            if (!_runOnEnabled)
+            {
+                DockDrone();
+            }
             var lodGroup = gameObject.GetComponentInChildren<LODGroup>();
             lodGroup.size = 4f;
             _beacon =  WorldHelpers.CreateBeacon(gameObject, Mod.AlterraTransportDronePingType, $"Transport Drone - {_dockedPort?.GetPortID()}",false);
@@ -435,15 +491,14 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
             return new()
             {
                 Cargo = _order,
-                DockedPortID = _dockedPort?.GetPortID() ?? -1,
                 DockedPortBaseID = _dockedPort?.GetBaseID(),
                 DestinationBaseID = _destinationPort?.GetBaseID(),
                 DepartureBaseID = _departurePort?.GetBaseID(),
+                DockedPortID = _dockedPort?.GetPortID() ?? -1,
                 DeparturePortID = _departurePort?.GetPortID() ?? -1,
                 DestinationPortID = _destinationPort?.GetPortID() ?? -1,
                 DroneState = _droneState,
                 Id = GetId(),
-                ParentID = _storeInformationIdentifier
             };
         }
 
@@ -502,7 +557,48 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 
         public void OnProtoDeserializeObjectTree(ProtobufSerializer serializer)
         {
+            QuickLogger.Debug("On drone  deserialize");
             _fromSave = true;
+        }
+
+        public void OnProtoSerialize(ProtobufSerializer serializer)
+        {
+            
+        }
+
+        public void OnProtoDeserialize(ProtobufSerializer serializer)
+        {
+            QuickLogger.Debug("On drone  deserialize");
+            _fromSave = true;
+            _runOnEnabled = true;
+        }
+
+        private void OnEnable()
+        {
+            if (_runOnEnabled)
+            {
+                _saveData = Mod.GetAlterraTransportDroneSaveData(GetId());
+
+                if (_saveData != null)
+                {
+                    _pauseStateChange = true;
+
+                    QuickLogger.Debug("Loading Drone Save");
+
+                    if (_saveData.Cargo != null)
+                    {
+                        _order = _saveData.Cargo.ToList();
+                    }
+
+                    _droneState = _saveData.DroneState;
+
+                    StartCoroutine(AttemptInitialize());
+                }
+                else
+                {
+                    QuickLogger.DebugError($"Save data was null for {GetId()}");
+                }
+            }
         }
     }
 }

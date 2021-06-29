@@ -20,10 +20,10 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Spawnable
             };
         }
 
-        public override WorldEntityInfo EntityInfo => new WorldEntityInfo()
+        public override WorldEntityInfo EntityInfo => new()
         {
             cellLevel = LargeWorldEntity.CellLevel.Medium, classId = ClassID, localScale = Vector3.one,
-            prefabZUp = false, slotType = EntitySlot.Type.Medium, techType = TechType
+            prefabZUp = false, slotType = EntitySlot.Type.Small, techType = TechType
         };
 
         
@@ -36,7 +36,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Spawnable
 
                 PrefabIdentifier prefabIdentifier = prefab.EnsureComponent<PrefabIdentifier>();
                 prefabIdentifier.ClassId = this.ClassID;
-                prefab.EnsureComponent<LargeWorldEntity>().cellLevel = LargeWorldEntity.CellLevel.Medium;
+                prefab.EnsureComponent<LargeWorldEntity>().cellLevel = LargeWorldEntity.CellLevel.Global;
                 prefab.EnsureComponent<TechTag>().type = TechType;
 
                 var rb = prefab.GetComponentInChildren<Rigidbody>();
@@ -47,18 +47,20 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Spawnable
                     rb.isKinematic = true;
                 }
 
-                //Pickupable pickupable = prefab.EnsureComponent<Pickupable>();
-                //pickupable.isPickupable = false;
+                prefab.AddComponent<GenericHandTarget>();
+                
+                prefab.AddComponent<BlueprintHandTarget>();
 
-                //ResourceTracker resourceTracker = prefab.EnsureComponent<ResourceTracker>();
-                //resourceTracker.prefabIdentifier = prefabIdentifier;
-                //resourceTracker.techType = TechType;
-                //resourceTracker.overrideTechType = TechType.Databox;
-                //resourceTracker.rb = rb;
-                //resourceTracker.pickupable = pickupable;
+                prefab.AddComponent<FCSDataBoxController>();
+                
+                var resourceTracker =  prefab.AddComponent<ResourceTracker>();
+                resourceTracker.overrideTechType = TechType.Databox;
+                resourceTracker.prefabIdentifier = prefabIdentifier;
+                resourceTracker.rb = rb;
 
-                prefab.EnsureComponent<GenericHandTarget>();
-                prefab.EnsureComponent<FCSDataBoxController>();
+                var entityTag = prefab.AddComponent<EntityTag>();
+                entityTag.slotType = EntitySlot.Type.Small;
+
 
                 MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
                 return prefab;

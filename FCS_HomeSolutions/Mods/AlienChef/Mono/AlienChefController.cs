@@ -1,8 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
+using FCS_AlterraHub.Buildables;
+using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Buildables;
@@ -15,11 +18,12 @@ using UnityEngine;
 
 namespace FCS_HomeSolutions.Mods.AlienChef.Mono
 {
-    internal class AlienChefController : FcsDevice, IFCSSave<SaveData>
+    internal class AlienChefController : FcsDevice, IFCSSave<SaveData>, IHandTarget
     {
         private bool _runStartUpOnEnable;
         private bool _fromSave;
         private AlienChiefDataEntry _saveData;
+        private InterfaceInteraction _interactionHelper;
         const int MAXSLOTS = 48;
         internal DisplayManager DisplayManager { get; private set; }
         internal Cooker Cooker { get; set; }
@@ -53,6 +57,11 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
                 RefreshUI();
                 _fromSave = false;
             }
+        }
+
+        public override float GetPowerUsage()
+        {
+            return Cooker.IsCooking ? 0.05f : 0f;
         }
 
         public override void Initialize()
@@ -90,6 +99,9 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
                     DisplayManager.UpdateStorageAmount(StorageSystem.GetCount());
                 };
             }
+
+            var canvas = gameObject.GetComponentInChildren<Canvas>();
+            _interactionHelper = canvas.gameObject.AddComponent<InterfaceInteraction>();
 
             Mod.GetFoodCustomTrees();
 
@@ -272,9 +284,21 @@ namespace FCS_HomeSolutions.Mods.AlienChef.Mono
             DisplayManager.AddToOrder(cookerItemDialog, amount);
         }
 
-        
+        public override void OnHandHover(GUIHand hand)
+        {
+            if(!IsInitialized || !IsConstructed  || _interactionHelper.IsInRange) return;
+            base.OnHandHover(hand);
+            
+            var data = new[]
+            {
+                AlterraHub.PowerPerMinute(GetPowerUsage() * 60)
+            };
+            data.HandHoverPDAHelperEx(GetTechType());
+        }
 
-        
-
+        public void OnHandClick(GUIHand hand)
+        {
+            //Not In Use
+        }
     }
 }

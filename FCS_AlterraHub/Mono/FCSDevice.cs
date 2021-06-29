@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Interfaces;
+using FCS_AlterraHub.Mods.FCSPDA.Mono;
 using FCS_AlterraHub.Registration;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -23,10 +25,18 @@ namespace FCS_AlterraHub.Mono
         /// </summary>
         public virtual Action<string> IPCMessage { get; set; }
 
-
+        protected bool _isHovered;
         public virtual void Awake()
         {
 
+        }
+
+        public virtual void OnHandHover(GUIHand hand)
+        {
+            if (Input.GetKeyDown(QPatch.Configuration.PDAInfoKeyCode))
+            {
+                FCSPDAController.Instance.OpenEncyclopedia(GetTechType());
+            }
         }
 
         /// <summary>
@@ -60,6 +70,7 @@ namespace FCS_AlterraHub.Mono
         }
 
         protected ColorManager _colorManager;
+        private TechType _techType;
 
         /// <summary>
         /// The package which this item belongs to
@@ -332,6 +343,11 @@ namespace FCS_AlterraHub.Mono
         }
 
         public virtual bool AllowsTransceiverPulling { get; }
+
+        public Constructable GetConstructable()
+        {
+            return GetComponentInChildren<Constructable>();
+        }
     }
 
     public interface IFCSSave<T>

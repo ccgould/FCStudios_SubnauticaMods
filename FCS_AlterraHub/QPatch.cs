@@ -12,7 +12,6 @@ using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Buildables;
 using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Spawnables;
 using FCS_AlterraHub.Mods.Global.Spawnables;
 using FCS_AlterraHub.Mods.OreConsumer.Buildable;
-using FCS_AlterraHub.Mods.OreConsumer.Spawnable;
 using FCS_AlterraHub.Patches;
 using FCS_AlterraHub.Registration;
 using FCS_AlterraHub.Systems;
@@ -42,7 +41,7 @@ namespace FCS_AlterraHub
         public static void Patch()
         {
 
-            FCSAlterraHubService.PublicAPI.RegisterModPack(Mod.ModPackID, Assembly.GetExecutingAssembly());
+            FCSAlterraHubService.PublicAPI.RegisterModPack(Mod.ModPackID, Mod.AssetBundleName, Assembly.GetExecutingAssembly());
             FCSAlterraHubService.PublicAPI.RegisterEncyclopediaEntry(Mod.ModPackID);
 
             LanguageHandler.SetLanguageLine($"Ency_{Mod.AlterraHubDepotClassID}", Mod.AlterraHubDepotFriendly);
@@ -93,12 +92,7 @@ namespace FCS_AlterraHub
             Mod.AlterraTransportDronePingType = WorldHelpers.CreatePingType("AlterraTransportDrone",
                 "AlterraTransportDrone", ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetPath(), $"TransportDronePing.png")));
 
-
-            //if (QModServices.Main.ModPresent("EasyCraft"))
-            //    EasyCraft_API.Init(harmony);
-
-            //FCSAlterraHubService.PublicAPI.RegisterEncyclopediaEntry(EncyclopediaConfig.EncyclopediaEntries);
-
+            
             var pingMapIconType = Type.GetType("SubnauticaMap.PingMapIcon, SubnauticaMap", false, false);
             if (pingMapIconType != null)
             {
@@ -106,7 +100,6 @@ namespace FCS_AlterraHub
                 var pingPrefix = new HarmonyMethod(AccessTools.Method(typeof(PingMapIcon_Patch), "Prefix"));
                 harmony.Patch(pingOriginal, pingPrefix);
             }
-
 
             //Register debug commands
             ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));
@@ -153,10 +146,6 @@ namespace FCS_AlterraHub
         public static bool IsDockedVehicleStorageAccessInstalled { get; set; }
         private static void PatchSpawnables()
         {
-            ////Patch Bio Fuel
-            //var bioFuelSpawnable = new BioFuelSpawnable();
-            //bioFuelSpawnable.Patch();
-
             //Data Box
             var databox = new FCSDataBoxSpawnable();
             databox.Patch();
@@ -166,21 +155,6 @@ namespace FCS_AlterraHub
             debitCardSpawnable.Patch();
             Mod.DebitCardTechType = debitCardSpawnable.TechType;
 
-            //var oreConsumerFragment = new OreConsumerFragment();
-            //oreConsumerFragment.Patch();
-            //Mod.OreConsumerFragmentTechType = oreConsumerFragment.TechType;
-
-            //var alterraHubDepotFragment = new AlterraHubDepotFragment();
-            //alterraHubDepotFragment.Patch();
-            //Mod.AlterraHubDepotFragmentTechType = alterraHubDepotFragment.TechType;
-
-            //var keyCardSpawnable = new KeyCardSpawnable();
-            //keyCardSpawnable.Patch();
-
-
-            //var dronePortFragment = new DronePortPadHubNewFragSpawnable();
-            //dronePortFragment.Patch();
-
             var transportDrone = new AlterraTransportDroneSpawnable();
             transportDrone.Patch();
 
@@ -188,17 +162,9 @@ namespace FCS_AlterraHub
             alterraStation.Patch();
             Mod.AlterraStationTechType = alterraStation.TechType;
 
-
             BoxOpenSoundAsset = ScriptableObject.CreateInstance<FMODAsset>();
             BoxOpenSoundAsset.id = "box_open";
             BoxOpenSoundAsset.path = "event:/loot/databox/box_open";
-
-            //DummyFragment.Patch();
-
-
-            //var dummyObject = new DummyObject("DummyObject","Dummy Object","Dummy");
-            //dummyObject.Patch();
-
         }
         
         private static void PatchBuildables()

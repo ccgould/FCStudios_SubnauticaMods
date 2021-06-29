@@ -60,16 +60,18 @@ namespace FCS_AlterraHub.Buildables
             { $"{ModKey}_DeviceOff","Device OFF"},
             { $"{ModKey}_Bulk","Bulk"},
             { $"{ModKey}_FoodItemsNotAllowed","Cooked food items are not allowed in Data Storage Solutions."},
-            { $"{ModKey}_PDAButtonPressFormat","({0}) Press to open Alterra Hub PDA"},
+            { $"{ModKey}_PDAButtonPressFormat","Press ({0}) to open Alterra Hub PDA"},
             { $"{ModKey}_OperationExists","Similar operation already exists for device {0}"},
             { $"{ModKey}_DepotFull","Depot is full or doesn't have enough space for your purchase."},
             { $"{ModKey}_DepotNotFound","Depot cannot be located."},
-            { $"{ModKey}_PurchaseSuccessful","Purchase was successful and item has been transferred to your selected AlterraHub Depot."},
+            { $"{ModKey}_PurchaseSuccessful","Purchase was successful. Your items will be shipped to your selected base."},
             { $"{ModKey}_ErrorLoadingAccountDetails","There was an error loading your account details. Please contact FCStudio about this issue. Please provide your game log located in the Subnautica root folder. \nFileName:\"qmodmanager_log-Subnautica.txt\""},
             { $"{ModKey}_NoSpaceAccountCreation","To complete your account creation, you need at least one slot to receive your debit card. Please try again once one inventory slot is available in your inventory."},
             { $"{ModKey}_NoDestinationFound","Please select a destination for your items to be transferred to. You must have an AlterraHub Depot at a base."},
+            { $"{ModKey}_IsDeviceOn","Device On: {0}"},
+            { $"{ModKey}_PowerPerMinute","Power Per Minute: {0}"},
         };
-        
+
         private void AdditionalPatching()
         {
             foreach (KeyValuePair<string, string> languageEntry in LanguageDictionary)
@@ -382,6 +384,21 @@ namespace FCS_AlterraHub.Buildables
         public static string DepotNotFound()
         {
             return GetLanguage($"{ModKey}_DepotNotFound");
+        }
+
+        public static string ViewInPDA()
+        {
+            return string.Format(GetLanguage($"{ModKey}_PDAButtonPressFormat"), QPatch.Configuration.PDAInfoKeyCode.ToString());
+        }
+
+        public static string IsDeviceOn(bool value)
+        {
+            return string.Format(GetLanguage($"{ModKey}_IsDeviceOn"), value);
+        }
+
+        public static string PowerPerMinute(float value)
+        {
+            return string.Format(GetLanguage($"{ModKey}_PowerPerMinute"), value);
         }
     }
 }
