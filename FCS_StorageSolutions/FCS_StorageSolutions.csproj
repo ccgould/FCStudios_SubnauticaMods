@@ -20,7 +20,7 @@
   <ItemGroup>
     <Compile Include="Helpers\TransferHelpers.cs" />
     <Compile Include="Mods\AlterraStorage\Buildable\AlterraStoragePatch.cs" />
-    <Compile Include="Mods\AlterraStorage\Buildable\ModelPrefab.cs" />
+    <Compile Include="Configuration\ModelPrefab.cs" />
     <Compile Include="Mods\AlterraStorage\Mono\AlterraStorageController.cs" />
     <Compile Include="Configuration\AuxPatchers.cs" />
     <Compile Include="Configuration\Config.cs" />

@@ -118,7 +118,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
             if (_colorManager == null)
             {
                 _colorManager = gameObject.EnsureComponent<ColorManager>();
-                _colorManager.Initialize(gameObject, ModelPrefab.BodyMaterial, ModelPrefab.SecondaryMaterial);
+                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol, AlterraHub.BaseSecondaryCol);
             }
 
             if (_display == null)

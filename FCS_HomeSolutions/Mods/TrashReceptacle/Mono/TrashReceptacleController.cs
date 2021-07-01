@@ -1,9 +1,11 @@
 ﻿using System;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
+using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Configuration;
+using FCSCommon.Utilities;
 using UnityEngine;
 
 namespace FCS_HomeSolutions.Mods.TrashReceptacle.Mono
@@ -13,6 +15,8 @@ namespace FCS_HomeSolutions.Mods.TrashReceptacle.Mono
         private bool _runStartUpOnEnable;
         private DumpContainer _dumpContainer;
         private TrashStorage _storage;
+        private TrashReceptacleDataEntry _savedData;
+        private bool _isFromSave;
 
         private void Start()
         {
@@ -28,8 +32,24 @@ namespace FCS_HomeSolutions.Mods.TrashReceptacle.Mono
                 Initialize();
             }
 
-            //TODO Save
+            if (_isFromSave)
+            {
+                if (_savedData == null)
+                {
+                    ReadySaveData();
+                }
+                _colorManager.ChangeColor(_savedData.Body.Vector4ToColor());
+            }
+
             _runStartUpOnEnable = false;
+        }
+
+        private void ReadySaveData()
+        {
+            QuickLogger.Debug("In OnProtoDeserialize");
+            var prefabIdentifier = GetComponentInParent<PrefabIdentifier>() ?? GetComponent<PrefabIdentifier>();
+            var id = prefabIdentifier?.Id ?? string.Empty;
+            _savedData = Mod.GetTrashReceptacleSaveData(id);
         }
 
         public override Vector3 GetPosition()
@@ -37,7 +57,7 @@ namespace FCS_HomeSolutions.Mods.TrashReceptacle.Mono
             return transform.position;
         }
 
-        public void OnHandHover(GUIHand hand)
+        public override void OnHandHover(GUIHand hand)
         {
             if(!IsInitialized || Manager == null) return;
             var main = HandReticle.main;
@@ -78,7 +98,7 @@ namespace FCS_HomeSolutions.Mods.TrashReceptacle.Mono
             if (_colorManager == null)
             {
                 _colorManager = gameObject.AddComponent<ColorManager>();
-                _colorManager.Initialize(gameObject,ModelPrefab.BodyMaterial);
+                _colorManager.Initialize(gameObject,ModelPrefab.BodyMaterial,ModelPrefab.SecondaryMaterial);
             }
 
             IsInitialized = true;
@@ -86,12 +106,24 @@ namespace FCS_HomeSolutions.Mods.TrashReceptacle.Mono
 
         public override void OnProtoSerialize(ProtobufSerializer serializer)
         {
-            
+            if (!Mod.IsSaving())
+            {
+                QuickLogger.Info($"Saving {Mod.AlienChefFriendly}");
+                Mod.Save(serializer);
+                QuickLogger.Info($"Saved {Mod.AlienChefFriendly}");
+            }
         }
 
         public override void OnProtoDeserialize(ProtobufSerializer serializer)
         {
+            QuickLogger.Debug("In OnProtoDeserialize");
 
+            if (_savedData == null)
+            {
+                ReadySaveData();
+            }
+
+            _isFromSave = true;
         }
 
         public override bool CanDeconstruct(out string reason)
@@ -123,7 +155,21 @@ namespace FCS_HomeSolutions.Mods.TrashReceptacle.Mono
 
         public void Save(SaveData newSaveData, ProtobufSerializer serializer = null)
         {
-            
+            if (!IsInitialized
+                || !IsConstructed) return;
+
+            if (_savedData == null)
+            {
+                _savedData = new TrashReceptacleDataEntry();
+            }
+
+            _savedData.Id = GetPrefabID();
+
+            QuickLogger.Debug($"Saving ID {_savedData.Id}", true);
+            _savedData.Body = _colorManager.GetColor().ColorToVector4();
+            _savedData.BodySecondary = _colorManager.GetSecondaryColor().ColorToVector4();
+            _savedData.BaseId = BaseId;
+            newSaveData.TrashReceptacleEntries.Add(_savedData);
         }
     }
 }

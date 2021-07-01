@@ -27,6 +27,7 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Models
         public bool IsFull => GrowBedManager.GetItemCount(_returnTechType) >= MaxCapacity;
         internal GameObject SlotBounds { get; set; }
         internal GrowBedManager GrowBedManager;
+        private int _count;
 
         public bool NotAllowToGenerate()
         {
@@ -135,16 +136,18 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Models
 
         public bool RemoveItem()
         {
+            _count--;
             TryStartingNextClone();
             _trackedTab?.UpdateCount();
             return true;
         }
 
-        public bool CanRemoveItem() => GrowBedManager.GetItemCount(_returnTechType) > 0;
+        public bool CanRemoveItem() => _count > 0; //GrowBedManager.GetItemCount(_returnTechType) > 0;
 
         public void AddItem()
         {
             if(IsFull) return;
+            _count++;
             GrowBedManager.AddItemToItemsContainer(GetPlantSeedTechType());
             _trackedTab?.UpdateCount();
         }
@@ -179,7 +182,7 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Models
 
         public int GetCount()
         {
-            return GrowBedManager.GetItemCount(_returnTechType);
+            return _count; //GrowBedManager.GetItemCount(_returnTechType);
         }
 
         public int GetMaxCapacity()
@@ -220,6 +223,17 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Models
             Mod.IsHydroponicKnownTech(currentItemTech, out DNASampleData data);
             _seedTech = currentItemTech;
             _returnTechType = data.PickType;
+        }
+
+        public void DeductCount()
+        {
+            _count--;
+            _trackedTab?.UpdateCount();
+        }
+
+        public void SetCount(int count)
+        {
+            _count = count;
         }
     }
 }

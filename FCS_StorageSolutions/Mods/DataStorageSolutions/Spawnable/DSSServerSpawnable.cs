@@ -33,7 +33,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Spawnable
             try
             {
                 var prefab = GameObject.Instantiate(ModelPrefab.DSSServerPrefab);
-                ModelPrefab.ApplyShaders(prefab,FCS_AlterraHub.QPatch.GlobalBundle);
 
                 prefab.AddComponent<PrefabIdentifier>();
                 prefab.AddComponent<TechTag>().type = TechType;

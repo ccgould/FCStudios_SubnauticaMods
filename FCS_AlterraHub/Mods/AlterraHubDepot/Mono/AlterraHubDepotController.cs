@@ -82,7 +82,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Mono
             if (_colorManager == null)
             {
                 _colorManager = gameObject.AddComponent<ColorManager>();
-                _colorManager.Initialize(gameObject, Buildables.AlterraHub.BodyMaterial);
+                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol);
             }
 
             foreach (Transform invItem in GameObjectHelpers.FindGameObject(gameObject, "Grid").transform)

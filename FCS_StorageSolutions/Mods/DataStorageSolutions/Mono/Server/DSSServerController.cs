@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Interfaces;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
@@ -300,7 +301,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
             {
                 bc.isTrigger = true;
             }
-            ModelPrefab.ApplyShaders(gameObject);
+            AlterraHub.ApplyShadersV2(gameObject);
             gameObject.SetActive(true);
             gameObject.SetActive(false);
         }
@@ -311,29 +312,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
         {
             if (_rackController == null) return false;
             return _rackController.IsVisible;
-        }
-        
-        public void DockServer(BaseManager manager,Transform rack,DSSSlotController slot)
-        {
-            Manager = manager;
-            _slot = slot;
-            _rb.isKinematic = true;
-            if (!string.IsNullOrWhiteSpace(manager?.BaseID))
-            {
-                _currentBase = Manager.BaseID;
-                FindBaseManager();
-            }
-            
-            foreach (BoxCollider bc in _colliders)
-            {
-                bc.isTrigger = true;
-            }
-
-            ModelPrefab.ApplyShaders(gameObject);
-            gameObject.SetActive(true);
-            transform.parent = rack;
-            transform.localPosition = Vector3.zero;
-            IsBeingFormatted = true;
         }
         
         private void FindBaseManager()

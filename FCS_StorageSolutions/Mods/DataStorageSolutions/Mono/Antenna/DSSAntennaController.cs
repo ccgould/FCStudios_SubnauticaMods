@@ -82,7 +82,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Antenna
             if (_colorManager == null)
             {
                 _colorManager = gameObject.AddComponent<ColorManager>();
-                _colorManager.Initialize(gameObject, ModelPrefab.BodyMaterial, ModelPrefab.SecondaryMaterial);
+                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol, AlterraHub.BaseSecondaryCol);
             }
 
             if (MotorHandler == null)

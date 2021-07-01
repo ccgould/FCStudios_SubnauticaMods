@@ -13,7 +13,6 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
     internal class SlotItemTab : InterfaceButton
     {
         private uGUI_Icon _icon;
-        private TechType _iconTechType;
         internal PlantSlot Slot;
         private Text _amount;
         private bool Initialized => _icon != null;
@@ -64,7 +63,6 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
         {
             if (Mod.IsHydroponicKnownTech(sampleData.TechType, out var data))
             {
-                _iconTechType = sampleData.PickType;
                 _icon.sprite = SpriteManager.Get(data.PickType);
                 Slot.GrowBedManager.AddSample(sampleData.TechType, Slot.Id);
                 UpdateCount();
@@ -84,7 +82,6 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
         internal void Clear()
         {
             _icon.sprite = SpriteManager.Get(TechType.None);
-            _iconTechType = TechType.None;
             Tag = null;
             
         }

@@ -102,7 +102,6 @@ namespace FCS_EnergySolutions.Mods.AlterraSolarCluster.Mono
             return transform.position;
         }
 
-
         public override void Initialize()
         {
 

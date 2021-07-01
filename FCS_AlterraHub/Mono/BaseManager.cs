@@ -650,7 +650,7 @@ namespace FCS_AlterraHub.Mono
             {
                 foreach (IDSSRack baseRack in BaseRacks)
                 {
-                    if (baseRack.HasItem(techType))
+                    if (baseRack != null && baseRack.HasItem(techType))
                     {
                         return baseRack.RemoveItemFromRack(techType);
                     }
@@ -675,10 +675,12 @@ namespace FCS_AlterraHub.Mono
 
             foreach (FcsDevice device in BaseFcsStorage)
             {
-                QuickLogger.Debug($"Checking: Device ({device.UnitID}) || Contains: ({techType}) = ({device.GetStorage().ItemsContainer.Contains(techType)}) || StorageType: ({storageFilter})",true);
+                //QuickLogger.Debug($"Checking: Device ({device.UnitID}) || Contains: ({techType}) = ({device.GetStorage().ItemsContainer.Contains(techType)}) || StorageType: ({storageFilter})",true);
 
                 if (storageFilter == StorageType.All)
                 {
+                    if(device?.GetStorage()?.ItemsContainer == null) continue;
+
                     if (device.GetStorage().ItemsContainer.Contains(techType))
                     {
                         QuickLogger.Debug("Made it",true);
@@ -687,6 +689,7 @@ namespace FCS_AlterraHub.Mono
                 }
                 else
                 {
+                    if(device == null) continue;
                     if (device.StorageType == storageFilter)
                     {
                         if (device.GetStorage().ItemsContainer.Contains(techType))

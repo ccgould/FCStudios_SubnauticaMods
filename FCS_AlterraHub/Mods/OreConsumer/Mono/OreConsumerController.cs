@@ -240,7 +240,7 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Mono
             if (_colorManager == null)
             {
                 _colorManager = gameObject.AddComponent<ColorManager>();
-                _colorManager.Initialize(gameObject, Buildables.AlterraHub.BodyMaterial);
+                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol);
             }
 
             CardSystem.main.onBalanceUpdated += () =>

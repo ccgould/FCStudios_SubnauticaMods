@@ -49,6 +49,20 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
             }
         }
 
+        internal void UpdateSlotCounts(InventoryItem item)
+        {
+            QuickLogger.Debug("Update Slots",true);
+
+            foreach (PlantSlot slot in Slots)
+            {
+                if (slot.GetReturnType() == item.item.GetTechType() && slot.GetCount() > 0)
+                {
+                    slot.DeductCount();
+                    break;
+                }
+            }
+        }
+
         public void AddItemToItemsContainer(TechType techType)
         {
             Mod.IsHydroponicKnownTech(techType, out var data);
@@ -252,6 +266,7 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
                 if(data.TechType == TechType.None) continue;
                 slot.GenerationProgress = data.GenerationProgress;
                 slot.GrowingPlant?.SetProgress(data.PlantProgress);
+                slot.SetCount(data.Amount);
                 for (int j = 0; j < data.Amount; j++)
                 {
                     AddItemToItemsContainer(data.TechType);
@@ -335,7 +350,7 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
             {
                 foreach (PlantSlot plantSlot in Slots)
                 {
-                    if (plantSlot.GetReturnType() == techType)
+                    if (plantSlot.GetReturnType() == techType && plantSlot.GetCount() > 0)
                     {
                         plantSlot.RemoveItem();
                         break;

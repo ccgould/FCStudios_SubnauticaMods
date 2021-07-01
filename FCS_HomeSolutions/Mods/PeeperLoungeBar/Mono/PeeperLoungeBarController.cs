@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Buildables;
+using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
@@ -19,7 +21,7 @@ using WorldHelpers = FCS_AlterraHub.Helpers.WorldHelpers;
 
 namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono
 {
-    internal class PeeperLoungeBarController : FcsDevice,IHandTarget
+    internal class PeeperLoungeBarController : FcsDevice,IHandTarget, IFCSSave<SaveData>
     {
         private bool _runStartUpOnEnable;
         private Transform _rot;
@@ -45,6 +47,8 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono
         };
 
         private InterfaceInteraction _interactionHelper;
+        private PeeperLoungeBarEntry _savedData;
+        private bool _isFromSave;
 
         public Channel AudioTrack { get; set; }
         private float _speed => QPatch.Configuration.PeeperLoungeBarTurnSpeed;
@@ -78,18 +82,40 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono
                 {
                     Initialize();
                 }
+
+                if (_isFromSave)
+                {
+                    if (_savedData == null)
+                    {
+                        ReadySaveData();
+                    }
+                    _colorManager.ChangeColor(_savedData.Body.Vector4ToColor());
+                }
+
                 _runStartUpOnEnable = false;
             }
         }
 
         public override void OnProtoSerialize(ProtobufSerializer serializer)
         {
-
+            if (!Mod.IsSaving())
+            {
+                QuickLogger.Info($"Saving {Mod.AlienChefFriendly}");
+                Mod.Save(serializer);
+                QuickLogger.Info($"Saved {Mod.AlienChefFriendly}");
+            }
         }
 
         public override void OnProtoDeserialize(ProtobufSerializer serializer)
         {
+            QuickLogger.Debug("In OnProtoDeserialize");
 
+            if (_savedData == null)
+            {
+                ReadySaveData();
+            }
+
+            _isFromSave = true;
         }
 
         public override bool CanDeconstruct(out string reason)
@@ -186,6 +212,13 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono
             _interactionHelper = canvas.gameObject.AddComponent<InterfaceInteraction>();
 
             UpdateSelection();
+
+            if (_colorManager == null)
+            {
+                _colorManager = gameObject.AddComponent<ColorManager>();
+                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol);
+            }
+
             IsInitialized = true;
         }
 
@@ -351,6 +384,37 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono
         public void OnHandClick(GUIHand hand)
         {
 
+        }
+
+        private void ReadySaveData()
+        {
+            QuickLogger.Debug("In OnProtoDeserialize");
+            var prefabIdentifier = GetComponentInParent<PrefabIdentifier>() ?? GetComponent<PrefabIdentifier>();
+            var id = prefabIdentifier?.Id ?? string.Empty;
+            _savedData = Mod.GetPeeperLoungeBarSaveData(id);
+        }
+
+        public void Save(SaveData newSaveData, ProtobufSerializer serializer)
+        {
+            if (!IsInitialized
+                || !IsConstructed) return;
+
+            if (_savedData == null)
+            {
+                _savedData = new PeeperLoungeBarEntry();
+            }
+
+            _savedData.Id = GetPrefabID();
+
+            QuickLogger.Debug($"Saving ID {_savedData.Id}", true);
+            _savedData.Body = _colorManager.GetColor().ColorToVector4();
+            _savedData.BaseId = BaseId;
+            newSaveData.PeeperLoungeBarEntries.Add(_savedData);
+        }
+
+        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
+        {
+            return _colorManager.ChangeColor(color, mode);
         }
     }
 }

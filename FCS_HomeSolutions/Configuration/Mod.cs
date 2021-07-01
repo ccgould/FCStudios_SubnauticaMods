@@ -871,5 +871,43 @@ namespace FCS_HomeSolutions.Configuration
 
             return new AlterraMiniBathroomDataEntry() { Id = id };
         }
+
+        public static PeeperLoungeBarEntry GetPeeperLoungeBarSaveData(string id)
+        {
+            LoadData();
+
+            var saveData = GetSaveData();
+
+            foreach (var entry in saveData.PeeperLoungeBarEntries)
+            {
+                if (string.IsNullOrEmpty(entry.Id)) continue;
+
+                if (entry.Id == id)
+                {
+                    return entry;
+                }
+            }
+
+            return new PeeperLoungeBarEntry() { Id = id };
+        }
+
+        public static TrashReceptacleDataEntry GetTrashReceptacleSaveData(string id)
+        {
+            LoadData();
+
+            var saveData = GetSaveData();
+
+            foreach (var entry in saveData.TrashReceptacleEntries)
+            {
+                if (string.IsNullOrEmpty(entry.Id)) continue;
+
+                if (entry.Id == id)
+                {
+                    return entry;
+                }
+            }
+
+            return new TrashReceptacleDataEntry() { Id = id };
+        }
     }
 }

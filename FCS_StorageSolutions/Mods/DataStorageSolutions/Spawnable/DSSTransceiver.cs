@@ -3,7 +3,6 @@ using System.IO;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Registration;
 using FCS_StorageSolutions.Configuration;
-using FCS_StorageSolutions.Mods.AlterraStorage.Buildable;
 using FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Transceiver;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Handlers;
@@ -33,8 +32,6 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Spawnable
             try
             {
                 var prefab = GameObject.Instantiate(ModelPrefab.DSSTransceiverPrefab);
-                ModelPrefab.ApplyShaders(prefab,FCS_AlterraHub.QPatch.GlobalBundle);
-
                 prefab.AddComponent<PrefabIdentifier>();
                 prefab.AddComponent<TechTag>().type = TechType;
 

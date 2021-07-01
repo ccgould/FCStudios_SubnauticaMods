@@ -167,6 +167,21 @@ namespace FCS_HomeSolutions.Configuration
         [JsonProperty(PropertyName = "Data")] internal byte[] Data { get; set; }
     }
 
+    internal class PeeperLoungeBarEntry
+    {
+        [JsonProperty] internal string Id { get; set; }
+        [JsonProperty(PropertyName = "COL")] internal Vec4 Body { get; set; }
+        public string BaseId { get; set; }
+    }
+
+    internal class TrashReceptacleDataEntry
+    {
+        [JsonProperty] internal string Id { get; set; }
+        [JsonProperty(PropertyName = "COL")] internal Vec4 Body { get; set; }
+        public string BaseId { get; set; }
+        [JsonProperty(PropertyName = "COLSEC")]  internal  Vec4 BodySecondary { get; set; }
+    }
+
     internal class LedLightDataEntry
     {
         [JsonProperty] internal string Id { get; set; }
@@ -181,22 +196,23 @@ namespace FCS_HomeSolutions.Configuration
     internal class SaveData
     {
         [JsonProperty] internal float SaveVersion { get; set; } = 1.1f;
-
-        [JsonProperty] internal List<SeaBreezeDataEntry> SeaBreezeDataEntries = new List<SeaBreezeDataEntry>();
-        [JsonProperty] internal List<SignDataEntry> SignDataEntries = new List<SignDataEntry>();
-        [JsonProperty] internal List<DecorationDataEntry> DecorationEntries = new List<DecorationDataEntry>();
-        [JsonProperty] internal List<PaintToolDataEntry> PaintToolEntries = new List<PaintToolDataEntry>();
-        [JsonProperty] internal List<PlanterDataEntry> PlanterEntries = new List<PlanterDataEntry>();
-        [JsonProperty] internal List<MiniFountainFilterDataEntry> MiniFountainFilterEntries = new List<MiniFountainFilterDataEntry>();
-        [JsonProperty] internal List<TrashRecyclerDataEntry> TrashRecyclerEntries = new List<TrashRecyclerDataEntry>();
-        [JsonProperty] internal List<QuantumTeleporterDataEntry> QuantumTeleporterEntries = new List<QuantumTeleporterDataEntry>();
-        [JsonProperty] internal List<CurtainDataEntry> CurtainEntries = new List<CurtainDataEntry>();
-        [JsonProperty] internal List<BaseOperatorDataEntry> BaseOperatorEntries = new List<BaseOperatorDataEntry>();
-        [JsonProperty] internal List<AlienChiefDataEntry> AlienChiefDataEntries = new List<AlienChiefDataEntry>();
-        [JsonProperty] internal List<CabinetDataEntry> CabinetDataEntries = new List<CabinetDataEntry>();
-        [JsonProperty] internal List<LedLightDataEntry> LedLightDataEntries = new List<LedLightDataEntry>();
-        [JsonProperty] internal List<ObservationTankDataEntry> ObservationTankDataEntries = new List<ObservationTankDataEntry>();
-        [JsonProperty] internal List<FEXRDataEntry> FEXRDataEntries = new List<FEXRDataEntry>();
-        [JsonProperty] internal List<AlterraMiniBathroomDataEntry> AlterraMiniBathroomEntries = new List<AlterraMiniBathroomDataEntry>();
+        [JsonProperty] internal List<TrashReceptacleDataEntry> TrashReceptacleEntries = new();
+        [JsonProperty] internal List<PeeperLoungeBarEntry> PeeperLoungeBarEntries = new();
+        [JsonProperty] internal List<SeaBreezeDataEntry> SeaBreezeDataEntries = new();
+        [JsonProperty] internal List<SignDataEntry> SignDataEntries = new();
+        [JsonProperty] internal List<DecorationDataEntry> DecorationEntries = new();
+        [JsonProperty] internal List<PaintToolDataEntry> PaintToolEntries = new();
+        [JsonProperty] internal List<PlanterDataEntry> PlanterEntries = new();
+        [JsonProperty] internal List<MiniFountainFilterDataEntry> MiniFountainFilterEntries = new();
+        [JsonProperty] internal List<TrashRecyclerDataEntry> TrashRecyclerEntries = new();
+        [JsonProperty] internal List<QuantumTeleporterDataEntry> QuantumTeleporterEntries = new();
+        [JsonProperty] internal List<CurtainDataEntry> CurtainEntries = new();
+        [JsonProperty] internal List<BaseOperatorDataEntry> BaseOperatorEntries = new();
+        [JsonProperty] internal List<AlienChiefDataEntry> AlienChiefDataEntries = new();
+        [JsonProperty] internal List<CabinetDataEntry> CabinetDataEntries = new();
+        [JsonProperty] internal List<LedLightDataEntry> LedLightDataEntries = new();
+        [JsonProperty] internal List<ObservationTankDataEntry> ObservationTankDataEntries = new();
+        [JsonProperty] internal List<FEXRDataEntry> FEXRDataEntries = new();
+        [JsonProperty] internal List<AlterraMiniBathroomDataEntry> AlterraMiniBathroomEntries = new();
     }
 }

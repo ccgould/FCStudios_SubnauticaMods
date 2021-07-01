@@ -431,6 +431,11 @@ namespace FCS_AlterraHub.Buildables
             #endregion
         }
 
+        public static void ApplyShadersV2(GameObject prefab)
+        {
+            ApplyShadersV2(prefab,QPatch.GlobalBundle);
+        }
+
         public static void LoadV2Materials()
         {
             if (_v2MaterialsLoaded) return;
@@ -582,7 +587,7 @@ namespace FCS_AlterraHub.Buildables
                 if (applyShaders)
                 {
                     //Lets apply the material shader
-                    AlterraHub.ReplaceShadersV2(prefab);
+                    ReplaceShadersV2(prefab);
                 }
 
                 go = prefab;

@@ -28,6 +28,8 @@
     <Compile Include="Buildables\ModelPrefab.cs" />
     <Compile Include="BaseOperator\Buildable\BaseOperatorPatch.cs" />
     <Compile Include="Buildables\OutDoorPlanters\OutDoorPlanterPatch.cs" />
+    <Compile Include="Mods\JukeBox\Mono\JukeBox.cs" />
+    <Compile Include="Mods\JukeBox\Mono\JukeBoxInstance.cs" />
     <Compile Include="Mods\PeeperLoungeBar\Mono\PeeperLoungeBarController.cs" />
     <Compile Include="Buildables\Settings.cs" />
     <Compile Include="Buildables\SignEntryPatch.cs" />

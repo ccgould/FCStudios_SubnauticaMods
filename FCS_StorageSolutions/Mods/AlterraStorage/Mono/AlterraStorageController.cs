@@ -128,7 +128,7 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
             if (_colorManager == null)
             {
                 _colorManager = gameObject.AddComponent<ColorManager>();
-                _colorManager.Initialize(gameObject, ModelPrefab.BodyMaterial);
+                _colorManager.Initialize(gameObject, AlterraHub.BaseOpaqueExterior);
             }
 
             _storageContainer = gameObject.GetComponent<StorageContainer>();
@@ -210,7 +210,7 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
                     var size = CraftData.GetItemSize((TechType) arg2);
                     if (Inventory.main.HasRoomFor(size.x,size.y))
                     {
-                        FCS_AlterraHub.Helpers.PlayerInteractionHelper.GivePlayerItem(RemoveItemFromContainer((TechType)arg2));
+                        PlayerInteractionHelper.GivePlayerItem(RemoveItemFromContainer((TechType)arg2));
                     }
                     break;
             }
@@ -340,7 +340,7 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
             _savedData = Mod.GetAlterraStorageSaveData(GetPrefabID());
         }
 
-        public void OnHandHover(GUIHand hand)
+        public override void OnHandHover(GUIHand hand)
         {
             HandReticle main = HandReticle.main;
 

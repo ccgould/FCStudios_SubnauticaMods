@@ -64,7 +64,7 @@ namespace FCS_HomeSolutions
             if (Configuration.IsPeeperLoungeBarEnabled)
             {
                 var ahsSweetWaterBar = new PeeperLoungeBarPatch("ahsSweetWaterBar", "Peeper Lounge Bar",
-                    "All drinks on the house.", ModelPrefab.GetPrefab("PeeperLoungeBar"), new Settings
+                    "All drinks on the house.", ModelPrefab.GetPrefab("PeeperLoungeBar",true), new Settings
                     {
                         KitClassID = "ahsSweetWaterBar_kit",
                         AllowedInBase = true,

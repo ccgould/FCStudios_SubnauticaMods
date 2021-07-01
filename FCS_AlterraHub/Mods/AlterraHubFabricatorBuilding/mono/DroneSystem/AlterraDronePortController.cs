@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Extensions;
@@ -250,9 +251,20 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
                 _portManager.RegisterDronePort(this);
             }
 
+            if (_colorManager == null)
+            {
+                _colorManager = gameObject.AddComponent<ColorManager>();
+                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol);
+            }
+
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
             
             IsInitialized = true;
+        }
+
+        public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
+        {
+            return _colorManager.ChangeColor(color, mode);
         }
 
         public DroneController SpawnDrone()
