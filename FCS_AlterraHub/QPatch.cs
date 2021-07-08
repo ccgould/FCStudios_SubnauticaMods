@@ -158,10 +158,6 @@ namespace FCS_AlterraHub
             var transportDrone = new AlterraTransportDroneSpawnable();
             transportDrone.Patch();
 
-            var alterraStation = new AlterraHubFabricationStationSpawnable();
-            alterraStation.Patch();
-            Mod.AlterraStationTechType = alterraStation.TechType;
-
             BoxOpenSoundAsset = ScriptableObject.CreateInstance<FMODAsset>();
             BoxOpenSoundAsset.id = "box_open";
             BoxOpenSoundAsset.path = "event:/loot/databox/box_open";

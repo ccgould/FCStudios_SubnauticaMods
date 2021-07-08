@@ -223,48 +223,7 @@ namespace FCS_AlterraHub.Buildables
                 return false;
             }
         }
-
-        private static void AddFabStationComponents()
-        {
-            var prefab = AlterraHubFabricatorPrefab;
-
-            PrefabIdentifier prefabIdentifier = prefab.EnsureComponent<PrefabIdentifier>();
-            prefabIdentifier.ClassId = "AlterraHubFabricationStation";
-
-            var lw = prefab.AddComponent<LargeWorldEntity>();
-            lw.cellLevel = LargeWorldEntity.CellLevel.Global;
-            
-            //Renderer
-            var renderer = prefab.GetComponentInChildren<Renderer>();
-
-            var rb = prefab.GetComponentInChildren<Rigidbody>();
-
-            if (rb == null)
-            {
-                rb = prefab.EnsureComponent<Rigidbody>();
-                rb.isKinematic = true;
-            }
-
-            prefab.AddComponent<TechTag>().type = TechType.None;
-
-            // Update sky applier
-            var applier = prefab.EnsureComponent<SkyApplier>();
-            applier.renderers = new Renderer[] { renderer };
-            applier.anchorSky = Skies.Auto;
-
-            var pickUp = prefab.AddComponent<Pickupable>();
-            pickUp.isPickupable = false;
-            pickUp.enabled = false;
-
-
-
-            WorldHelpers.CreateBeacon(prefab, Mod.AlterraHubStationPingType, "Alterra Hub Station");
-            MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
-            var station = prefab.AddComponent<AlterraFabricatorStationController>();
-            prefab.AddComponent<PortManager>();
-        }
-
-
+        
         private static void AddComponentsToEncyclopediaEntry(GameObject encyclopediaEntryPrefab)
         {
             encyclopediaEntryPrefab.SetActive(false);

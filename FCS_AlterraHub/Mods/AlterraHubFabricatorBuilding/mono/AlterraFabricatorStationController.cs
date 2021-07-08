@@ -33,9 +33,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         {
             QuickLogger.Debug("Station is now invisible",true);
         }
-
-
-
+        
         public void Offload(Dictionary<TechType, int> order, Action onOffloadCompleted)
         {
             onOffloadCompleted?.Invoke();
@@ -67,9 +65,17 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
 
         private void Awake()
         {
-            Main = this;
+            if (Main == null)
+            {
+                Main = this;
+                DontDestroyOnLoad(this);
+            }
+            else if(Main != null)
+            {
+                Destroy(gameObject);
+                return;
+            }
             _warpTrans = GameObjectHelpers.FindGameObject(gameObject, "RespawnPoint").transform;
-            //Mod.OnGamePlaySettingsLoaded += OnGamePlaySettingsLoaded;
             BaseTransform = transform;
             var lodGroup = gameObject.GetComponentInChildren<LODGroup>();
             lodGroup.size = 4f;

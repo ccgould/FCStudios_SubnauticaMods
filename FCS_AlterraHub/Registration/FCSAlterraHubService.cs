@@ -20,6 +20,7 @@ namespace FCS_AlterraHub.Registration
     {
         bool IsRegisteringEncyclopedia { get; set; }
         CardSystem AccountSystem { get; }
+        Action OnPurge { get; set; }
 
         void RegisterDevice(FcsDevice device, string tabID, string packageId);
         void RemoveDeviceFromGlobal(string unitID);
@@ -73,6 +74,7 @@ namespace FCS_AlterraHub.Registration
         internal static IFCSAlterraHubServiceInternal InternalAPI => singleton;
         public static IFCSAlterraHubService PublicAPI => singleton;
         public CardSystem AccountSystem => CardSystem.main;
+        public Action OnPurge { get; set; }
         public bool IsRegisteringEncyclopedia { get; set; }
 
         private FCSAlterraHubService()

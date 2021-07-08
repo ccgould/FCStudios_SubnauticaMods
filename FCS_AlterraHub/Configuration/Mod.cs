@@ -10,6 +10,7 @@ using FCS_AlterraHub.API;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Managers;
 using FCS_AlterraHub.Model.Utilities;
 using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono;
 using FCS_AlterraHub.Mods.FCSDataBox.Mono;
@@ -385,8 +386,9 @@ namespace FCS_AlterraHub.Configuration
             _saveData = null;
             GamePlaySettings = new FCSGamePlaySettings();
             ModGamePlaySettingsLoaded = false;
+            FCSAlterraHubService.PublicAPI.OnPurge?.Invoke();
         }
-
+        
         internal static void LoadData()
         {
             QuickLogger.Info("Loading Save Data...");
@@ -481,22 +483,53 @@ namespace FCS_AlterraHub.Configuration
             
             var spawnLocation = new Vector3(82.70f, -316.9f, -1434.7f);
             var spawnRotation = Quaternion.Euler(348.7f, 326.24f, 43.68f);
-            var station = SpawnHelper.SpawnTechType(AlterraStationTechType, spawnLocation,spawnRotation);
-
-           
-
-            fcsGamePlaySettings.IsStationSpawned = true;
+            var station = GameObject.Instantiate(AlterraHub.AlterraHubFabricatorPrefab);
+            station.transform.SetPositionAndRotation(spawnLocation,spawnRotation);
+            AddFabStationComponents(station);
             yield break;
         }
 
+        private static void AddFabStationComponents(GameObject prefab)
+        {
+            PrefabIdentifier prefabIdentifier = prefab.EnsureComponent<PrefabIdentifier>();
+            prefabIdentifier.ClassId = "AlterraHubFabricationStation";
+
+            var lw = prefab.AddComponent<LargeWorldEntity>();
+            lw.cellLevel = LargeWorldEntity.CellLevel.Far;
+
+            //Renderer
+            var renderer = prefab.GetComponentInChildren<Renderer>();
+
+            var rb = prefab.GetComponentInChildren<Rigidbody>();
+
+            if (rb == null)
+            {
+                rb = prefab.EnsureComponent<Rigidbody>();
+                rb.isKinematic = true;
+            }
+            
+            // Update sky applier
+            var applier = prefab.EnsureComponent<SkyApplier>();
+            applier.renderers = new Renderer[] { renderer };
+            applier.anchorSky = Skies.Auto;
+
+            var pickUp = prefab.AddComponent<Pickupable>();
+            pickUp.isPickupable = false;
+            pickUp.enabled = false;
+
+
+
+            WorldHelpers.CreateBeacon(prefab, AlterraHubStationPingType, "Alterra Hub Station");
+            MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
+            prefab.AddComponent<AlterraFabricatorStationController>();
+            prefab.AddComponent<PortManager>();
+        }
 
         public static PingType AlterraHubStationPingType { get; set; }
         public static TechType StaffKeyCardTechType { get; set; }
         public static TechType DronePortPadHubNewTechType { get; set; }
         public static TechType AlterraTransportDroneTechType { get; set; }
         public static PingType AlterraTransportDronePingType { get; set; }
-        public static TechType AlterraStationTechType { get; set; }
-
         public static void DeepCopySave(AccountDetails accountDetails)
         {
             _tempAccountDetails = new AccountDetails(accountDetails);

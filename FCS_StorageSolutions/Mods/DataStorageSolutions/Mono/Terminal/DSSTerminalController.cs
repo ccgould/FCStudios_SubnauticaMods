@@ -75,6 +75,8 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
 
         private void UpdateScreenState()
         {
+            if (Manager == null) return;
+
             if (Manager.GetPowerState() == PowerSystem.Status.Offline)
             {
                 _display?.TurnOffDisplay();

@@ -31,7 +31,7 @@ namespace FCS_ProductionSolutions
         {
             FCSAlterraHubService.PublicAPI.RegisterModPack(Mod.ModPackID, Mod.ModBundleName, Assembly.GetExecutingAssembly());
             FCSAlterraHubService.PublicAPI.RegisterEncyclopediaEntry(Mod.ModPackID);
-
+            FCSAlterraHubService.PublicAPI.OnPurge += Mod.Purge;
             ModelPrefab.Initialize();
 
             AuxPatchers.AdditionalPatching();

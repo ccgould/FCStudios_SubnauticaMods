@@ -387,6 +387,14 @@ namespace FCS_ProductionSolutions.Configuration
             }
             return false;
         }
+
+        public static void Purge()
+        {
+            QuickLogger.Debug("Purging Production Data",true);
+            _saveData = null;
+            _hydroponicKnownTech = new List<DNASampleData>();
+
+        }
     }
 
     internal struct DNASampleData

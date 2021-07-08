@@ -245,7 +245,11 @@ namespace FCS_AlterraHub.Mono
 
         public PowerSystem.Status GetPowerState()
         {
-            return Habitat.powerRelay.GetPowerStatus();
+            if (Habitat?.powerRelay?.GetPowerStatus() == null)
+            {
+                QuickLogger.DebugError("GetPowerState returned null");
+            }
+            return Habitat?.powerRelay?.GetPowerStatus() ?? PowerSystem.Status.Offline;
         }
 
         #endregion

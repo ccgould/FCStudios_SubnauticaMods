@@ -55,10 +55,7 @@ namespace FCS_AlterraHub.Patches
             //var shouldPlay = (bool)_shouldPlayIntro.GetValue(__instance.GetPDA());
             Mod.OnGamePlaySettingsLoaded += settings =>
             {
-                if (!settings.IsStationSpawned)
-                {
-                    CoroutineHost.StartCoroutine(Mod.SpawnAlterraFabStation(settings));
-                }
+                CoroutineHost.StartCoroutine(Mod.SpawnAlterraFabStation(settings));
             };
             Mod.LoadGamePlaySettings();
         }
