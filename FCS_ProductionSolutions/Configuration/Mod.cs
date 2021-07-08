@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using FCS_AlterraHub.Extensions;
+using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model.Utilities;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
@@ -370,21 +371,20 @@ namespace FCS_ProductionSolutions.Configuration
 
         public static bool CreateNewDNASampleData(TechType techType,out DNASampleData data)
         {
-            var seed = techType.ToInventoryItemLegacy()?.item?.gameObject.GetComponentInChildren<Plantable>();
-
-            if (IsNonePlantableAllowedList.Contains(techType))
-            {
-                data = new DNASampleData {PickType = techType, TechType = techType};
-                return true;
-            }
-
-            if (seed != null)
-            {
-                data = new DNASampleData { PickType = techType, TechType = techType, IsLandPlant = seed.aboveWater};
-                return true;
-            }
-
             data = new DNASampleData();
+
+            if (WorldHelpers.KnownPickTypesContains(techType))
+            {
+                if (IsNonePlantableAllowedList.Contains(techType))
+                {
+                    data = new DNASampleData { PickType = techType, TechType = techType };
+                    return true;
+                }
+
+                var result = WorldHelpers.GetPickTypeData(techType);
+                data = new DNASampleData { PickType = result.ReturnType, TechType = techType, IsLandPlant = result.IsLandPlant };
+                return true;
+            }
             return false;
         }
     }

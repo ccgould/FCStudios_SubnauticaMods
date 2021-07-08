@@ -14,7 +14,6 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
     internal class ReplicatorSlot : MonoBehaviour, IFCSStorage
     {
         private readonly IList<float> _progress = new List<float>(new[] { -1f, -1f, -1f });
-        private int _itemCount;
         private ReplicatorController _mono;
         public bool IsOccupied => _targetItem != TechType.None;
         private SpeedModes _currentMode;
@@ -51,13 +50,21 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
         {
             _mono = mono;
             ItemsContainer = new ItemsContainer(4,5,transform,"ReplicatorSlot",null);
-            ItemsContainer.onRemoveItem += item => { RemoveItem(out _targetItem); };
+            ItemsContainer.onRemoveItem += item =>
+            {
+                TryStartingNextClone();
+                _mono.UpdateUI();
+            };
         }
 
         internal void ChangeTargetItem(TechType type, bool force = false)
         {
             QuickLogger.Debug($"ChangeTargetItem condition: {IsOccupied && !force}",true);
-            if (IsOccupied && !force) return;
+            if (IsOccupied && !force)
+            {
+                QuickLogger.Message(AuxPatchers.PleaseClearReplicatorSlot(),true);
+                return;
+            }
             QuickLogger.Debug($"Changing target item {type}", true);
             _targetItem = type;
             GenerationProgress = 0;
@@ -107,8 +114,8 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
 
         internal bool TryClear()
         {
-            QuickLogger.Debug($"Item Count {_itemCount}.", true);
-            if (_itemCount > 0) return false;
+            QuickLogger.Debug($"Item Count {ItemsContainer.count}.", true);
+            if (ItemsContainer.count > 0) return false;
             
             ChangeTargetItem(TechType.None,true);
             _mono.UpdateUI();
@@ -118,12 +125,13 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
         public bool RemoveItem(out TechType techType)
         {
             techType = TechType.None;
-            if (_itemCount <= 0) return false;
+            
+            if (ItemsContainer.count <= 0) return false;
 
             if (PlayerInteractionHelper.CanPlayerHold(_targetItem))
             {
+                ItemsContainer.RemoveItem(_targetItem);
                 techType = _targetItem;
-                _itemCount--;
                 TryStartingNextClone();
                 _mono.UpdateUI();
                 return true;
@@ -132,17 +140,16 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
             QuickLogger.ModMessage(AuxPatchers.InventoryFull());
             return false;
         }
-
+        
         public void AddItem()
         {
             if(IsFull) return;
-            _itemCount++;
             AddItemToInventory();
             _mono.UpdateUI();
         }
 
         public int GetContainerFreeSpace { get; }
-        public bool IsFull =>_itemCount >= MAXCOUNT;
+        public bool IsFull =>ItemsContainer.count >= MAXCOUNT;
         public bool CanBeStored(int amount, TechType techType)
         {
             return false;
@@ -165,18 +172,17 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
 
         public Pickupable RemoveItemFromContainer(TechType techType)
         {
-            _itemCount--;
             return ItemsContainer.RemoveItem(techType);
         }
 
         public Dictionary<TechType, int> GetItemsWithin()
         {
-            return null;
+            return new(){{ _targetItem ,ItemsContainer.count} };
         }
         
         public bool ContainsItem(TechType techType)
         {
-            return _targetItem == techType && _itemCount > 0;
+            return _targetItem == techType && ItemsContainer.count > 0;
         }
 
         public ItemsContainer ItemsContainer { get; set; }
@@ -210,13 +216,11 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
 
         public int GetCount()
         {
-            return _itemCount;
+            return ItemsContainer.count;
         }
 
         public void SetItemCount(int amount)
         {
-            _itemCount = amount;
-
             for (int i = 0; i < amount; i++)
             {
                 AddItemToInventory();

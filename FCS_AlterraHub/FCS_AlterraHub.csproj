@@ -208,7 +208,6 @@
     <Compile Include="Helpers\PlayerInteractionHelper.cs" />
     <Compile Include="Mono\FcsCard.cs" />
     <Compile Include="Mono\FCSDevice.cs" />
-    <Compile Include="Mono\FCSGameLoadUtil.cs" />
     <Compile Include="Mods\OreConsumer\Mono\OreConsumerController.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

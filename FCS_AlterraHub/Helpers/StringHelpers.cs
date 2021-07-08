@@ -58,8 +58,9 @@ namespace FCS_AlterraHub.Helpers
             if (strings == null || main == null) return;
             _sb.Append($"{Language.main.Get(techType)}: ");
             CreateText(strings);
-            if(FCSPDAController.Instance.CheckIfPDAHasEntry(techType))
-                main.SetInteractTextRaw(_sb.ToString(), AlterraHub.ViewInPDA());
+            
+            main.SetInteractTextRaw(_sb.ToString(), FCSPDAController.Instance.CheckIfPDAHasEntry(techType) ? AlterraHub.ViewInPDA() : string.Empty);
+            
             if (icon == HandReticle.IconType.Progress)
             {
                 main.SetProgress(progess);

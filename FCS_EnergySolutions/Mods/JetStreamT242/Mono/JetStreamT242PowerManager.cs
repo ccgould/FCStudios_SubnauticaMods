@@ -163,6 +163,7 @@ namespace FCS_EnergySolutions.Mods.JetStreamT242.Mono
         public void OnHandHover(GUIHand hand)
         {
             var techType = _mono.GetTechType();
+            
             if (!_mono.IsUpright())
             {
                 var data = new[]

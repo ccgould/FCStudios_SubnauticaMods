@@ -161,6 +161,11 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
 
         public void OpenDnaSamplesPage(SlotItemTab slotItemTab)
         {
+            if (slotItemTab.Slot.GetPlantable() != null)
+            {
+                QuickLogger.Message(AuxPatchers.PleaseClearHarvesterSlot(),true);
+                return;
+            }
             _caller = slotItemTab;
             _dnaSamplePage.SetActive(true);
             _homePage.SetActive(false);

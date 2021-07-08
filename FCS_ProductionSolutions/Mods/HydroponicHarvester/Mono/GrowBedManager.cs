@@ -19,7 +19,7 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
     {
         private const float MaxPlantsHeight = 3f;
         private TechType _currentItemTech;
-        private readonly Dictionary<TechType,int> _trackedItems = new Dictionary<TechType, int>();
+        private readonly Dictionary<TechType,int> _trackedItems = new();
 
         #region Actions
 
@@ -263,15 +263,28 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
             {
                 var slot = Slots[i];
                 var data = savedData.SlotData[i];
+                
                 if(data.TechType == TechType.None) continue;
+                
                 slot.GenerationProgress = data.GenerationProgress;
-                slot.GrowingPlant?.SetProgress(data.PlantProgress);
+
                 slot.SetCount(data.Amount);
+
                 for (int j = 0; j < data.Amount; j++)
                 {
                     AddItemToItemsContainer(data.TechType);
                 }
+                
                 slot.GetTab().Load(data.TechType);
+
+                if (slot.GrowingPlant != null)
+                {
+                    slot.GrowingPlant.SetProgress(data.PlantProgress);
+                }
+                else
+                {
+                    QuickLogger.Debug($"Growing Plant was null on load");
+                }
             }
         }
 
@@ -287,6 +300,7 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
 
         public void TakeItem(TechType techType,int slotId)
         {
+            
             if (PlayerInteractionHelper.CanPlayerHold(techType))
             {
                 var slot = GetSlotByID(slotId);
@@ -294,6 +308,7 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
                 if (slot.CanRemoveItem())
                 {
                     var item = ItemsContainer.RemoveItem(techType);
+
                     if (item != null)
                     {
                         Destroy(item.gameObject);

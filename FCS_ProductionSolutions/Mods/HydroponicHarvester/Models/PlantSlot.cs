@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using FCS_AlterraHub.Model;
+using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.Mods.HydroponicHarvester.Enumerators;
 using FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono;
@@ -114,7 +115,11 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Models
 
         internal bool TryClear()
         {
-            if (GrowBedManager.GetItemCount(_returnTechType) > 0) return false;
+            if (GrowBedManager.GetItemCount(_returnTechType) > 0)
+            {
+                QuickLogger.Message(AuxPatchers.PleaseEmptyHarvesterSlot(), true);
+                return false;
+            }
             Clear();
             return true;
         }

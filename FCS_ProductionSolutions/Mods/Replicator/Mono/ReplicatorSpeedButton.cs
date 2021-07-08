@@ -95,7 +95,9 @@ namespace FCS_ProductionSolutions.HydroponicHarvester.Mono
                     _index = 1;
                     _icon.sprite = _images[_index];
                     break;
-            }  
+            }
+
+            ReplicatorController.SetSpeedMode(speedMode);
         }
     }
 }

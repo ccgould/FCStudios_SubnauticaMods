@@ -24,6 +24,18 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         internal bool IsPowerOn => Mod.GamePlaySettings.AlterraHubDepotPowercellSlot.Count >= PowercellReq && Mod.GamePlaySettings.BreakerOn;
         public Transform BaseTransform { get; set; }
 
+        private void OnBecameVisible()
+        {
+            QuickLogger.Debug("Station is now visible",true);
+        }
+
+        private void OnBecameInvisible()
+        {
+            QuickLogger.Debug("Station is now invisible",true);
+        }
+
+
+
         public void Offload(Dictionary<TechType, int> order, Action onOffloadCompleted)
         {
             onOffloadCompleted?.Invoke();
@@ -45,6 +57,13 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         private string _baseID;
         private Transform _warpTrans;
         private int MAXDRONECOUNT = 1;
+        private float lodBias;
+
+
+        private void Update()
+        {
+            lodBias = QualitySettings.lodBias;
+        }
 
         private void Awake()
         {
@@ -430,7 +449,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         public void OnConsoleCommand_warp()
         {
             Player.main.SetPosition(_warpTrans.position);
-
+            Player.main.OnPlayerPositionCheat();
         }
     }
 }

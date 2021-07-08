@@ -77,7 +77,6 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Buildable
 
                 prefab.AddComponent<TechTag>().type = TechType;
                 prefab.AddComponent<AlterraHubDepotController>();
-                prefab.AddComponent<FCSGameLoadUtil>();
 
                 //Apply the glass shader here because of autosort lockers for some reason doesnt like it.
                 MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using FCS_AlterraHub.Model;
@@ -18,6 +19,168 @@ namespace FCS_AlterraHub.Helpers
         private static int _lastMinute;
         private static DigitalClockFormat _format;
         private static string _previousTime;
+
+        public static Dictionary<TechType, PickReturnsData> PickReturns = new()
+        {
+            //Marine Flora
+            { TechType.AcidMushroomSpore, new PickReturnsData { ReturnType = TechType.AcidMushroom, IsLandPlant = false } },
+            {
+                TechType.BloodOil,
+                new PickReturnsData
+                {
+                    ReturnType = TechType.BloodOil,
+                    IsLandPlant = false
+                }
+            },
+            {
+                TechType.BluePalmSeed,
+                new PickReturnsData { ReturnType = TechType.BluePalmSeed, IsLandPlant = false }
+            },
+            {
+                TechType.KooshChunk,
+                new PickReturnsData { ReturnType = TechType.KooshChunk, IsLandPlant = false }
+            },
+            {
+                TechType.PurpleBranchesSeed,
+                new PickReturnsData { ReturnType = TechType.PurpleBranchesSeed, IsLandPlant = false }
+            },
+            {
+                TechType.CreepvineSeedCluster,
+                new PickReturnsData { ReturnType = TechType.CreepvineSeedCluster, IsLandPlant = false }
+            },
+            {
+                TechType.WhiteMushroomSpore,
+                new PickReturnsData { ReturnType = TechType.WhiteMushroomSpore, IsLandPlant = false }
+            },
+            {
+                TechType.EyesPlantSeed,
+                new PickReturnsData { ReturnType = TechType.EyesPlantSeed, IsLandPlant = false }
+            },
+            {
+                TechType.RedRollPlantSeed,
+                new PickReturnsData { ReturnType = TechType.RedRollPlantSeed, IsLandPlant = false }
+            },
+            {
+                TechType.GabeSFeatherSeed,
+                new PickReturnsData { ReturnType = TechType.GabeSFeatherSeed, IsLandPlant = false }
+            },
+            {
+                TechType.JellyPlantSeed,
+                new PickReturnsData { ReturnType = TechType.JellyPlant, IsLandPlant = false }
+            },
+            {
+                TechType.RedGreenTentacleSeed,
+                new PickReturnsData { ReturnType = TechType.RedGreenTentacleSeed, IsLandPlant = false }
+            },
+            {
+                TechType.SnakeMushroomSpore,
+                new PickReturnsData { ReturnType = TechType.SnakeMushroomSpore, IsLandPlant = false }
+            },
+            {
+                TechType.MembrainTreeSeed,
+                new PickReturnsData { ReturnType = TechType.MembrainTreeSeed, IsLandPlant = false }
+            },
+            {
+                TechType.SmallFanSeed,
+                new PickReturnsData { ReturnType = TechType.SmallFanSeed, IsLandPlant = false }
+            },
+            {
+                TechType.RedBushSeed,
+                new PickReturnsData { ReturnType = TechType.RedBushSeed, IsLandPlant = false }
+            },
+            {
+                TechType.RedConePlantSeed,
+                new PickReturnsData { ReturnType = TechType.RedConePlantSeed, IsLandPlant = false }
+            },
+            {
+                TechType.RedBasketPlantSeed,
+                new PickReturnsData { ReturnType = TechType.RedBasketPlantSeed, IsLandPlant = false }
+            },
+            {
+                TechType.SeaCrownSeed,
+                new PickReturnsData { ReturnType = TechType.SeaCrownSeed, IsLandPlant = false }
+            },
+            {
+                TechType.ShellGrassSeed,
+                new PickReturnsData { ReturnType = TechType.ShellGrassSeed, IsLandPlant = false }
+            },
+            {
+                TechType.SpottedLeavesPlantSeed,
+                new PickReturnsData { ReturnType = TechType.SpottedLeavesPlantSeed, IsLandPlant = false }
+            },
+            {
+                TechType.SpikePlantSeed,
+                new PickReturnsData { ReturnType = TechType.SpikePlantSeed, IsLandPlant = false }
+            },
+            {
+                TechType.PurpleFanSeed,
+                new PickReturnsData { ReturnType = TechType.PurpleFanSeed, IsLandPlant = false }
+            },
+            {
+                TechType.PurpleStalkSeed,
+                new PickReturnsData { ReturnType = TechType.PurpleStalkSeed, IsLandPlant = false }
+            },
+            {
+                TechType.PurpleTentacleSeed,
+                new PickReturnsData { ReturnType = TechType.PurpleTentacleSeed, IsLandPlant = false }
+            },
+            //Land-Based Flora
+            {
+                TechType.BulboTreePiece,
+                new PickReturnsData { ReturnType = TechType.BulboTreePiece, IsLandPlant = true }
+            },
+            {
+                TechType.PurpleVegetable,
+                new PickReturnsData { ReturnType = TechType.PurpleVegetable, IsLandPlant = true }
+            },
+            {
+                TechType.FernPalmSeed,
+                new PickReturnsData { ReturnType = TechType.FernPalmSeed, IsLandPlant = true }
+            },
+            {
+                TechType.OrangeMushroomSpore,
+                new PickReturnsData { ReturnType = TechType.OrangeMushroomSpore, IsLandPlant = true }
+            },
+            {
+                TechType.HangingFruit,
+                new PickReturnsData { ReturnType = TechType.HangingFruit, IsLandPlant = true }
+            },
+            {
+                TechType.MelonSeed, new PickReturnsData { ReturnType = TechType.Melon, IsLandPlant = true }
+            },
+            {
+                TechType.PurpleVasePlantSeed,
+                new PickReturnsData { ReturnType = TechType.PurpleVasePlantSeed, IsLandPlant = true }
+            },
+            {
+                TechType.PinkMushroomSpore,
+                new PickReturnsData { ReturnType = TechType.PinkMushroomSpore, IsLandPlant = true }
+            },
+            {
+                TechType.PurpleRattleSpore,
+                new PickReturnsData { ReturnType = TechType.PurpleRattleSpore, IsLandPlant = true }
+            },
+            {
+                TechType.PinkFlowerSeed,
+                new PickReturnsData { ReturnType = TechType.PinkFlowerSeed, IsLandPlant = true }
+            },
+            {
+                TechType.PurpleBrainCoralPiece,
+                new PickReturnsData { ReturnType = TechType.PurpleBrainCoralPiece, IsLandPlant = true }
+            },
+            //UnPlantable
+            {
+                TechType.StalkerTooth,
+                new PickReturnsData { ReturnType = TechType.StalkerTooth, IsLandPlant = false }
+            },
+            {
+                TechType.CoralChunk,
+                new PickReturnsData { ReturnType = TechType.CoralChunk, IsLandPlant = false }
+            },
+            {
+                TechType.JeweledDiskPiece, new PickReturnsData { ReturnType = TechType.JeweledDiskPiece, IsLandPlant = false }
+            },
+        };
 
 
         public static string GetGameTimeFormat()
@@ -157,5 +320,26 @@ namespace FCS_AlterraHub.Helpers
 
             return pingInstance;
         }
+
+        public static bool KnownPickTypesContains(TechType techType)
+        {
+            return PickReturns.ContainsKey(techType);
+        }
+
+        public static PickReturnsData GetPickTypeData(TechType techType)
+        {
+            if (PickReturns.ContainsKey(techType))
+            {
+                return PickReturns[techType];
+            }
+
+            return new PickReturnsData();
+        }
+    }
+
+    public struct PickReturnsData
+    {
+        public TechType ReturnType { get; set; }
+        public bool IsLandPlant { get; set; }
     }
 }

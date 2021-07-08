@@ -61,7 +61,7 @@ namespace FCS_AlterraHub.Registration
     public class FCSAlterraHubService : IFCSAlterraHubService, IFCSAlterraHubServiceInternal
     {
         private static readonly FCSAlterraHubService singleton = new();
-        public static List<KnownDevice> knownDevices = new();
+        public static List<KnownDevice> knownDevices { get; set; }= new();
         private static readonly Dictionary<string, FcsDevice> GlobalDevices = new();
         private static Dictionary<TechType, FCSStoreEntry> _storeItems = new();
         private static HashSet<TechType> _registeredTechTypes = new();
@@ -99,7 +99,15 @@ namespace FCS_AlterraHub.Registration
                 if (string.IsNullOrWhiteSpace(prefabID) || !device.IsConstructed) return;
             }
 
-            if (!knownDevices.Any(x => x.PrefabID.Equals(prefabID)))
+            if (knownDevices.Any(x => x.PrefabID.Equals(prefabID)))
+            {
+                QuickLogger.Debug($"Found Saved Device with ID {prefabID}: Known Count{knownDevices.Count}");
+                device.TabID = tabID;
+                device.PackageId = packageId;
+                device.UnitID = knownDevices.FirstOrDefault(x => x.PrefabID.Equals(prefabID)).ToString();
+                AddToGlobalDevices(device, device.UnitID);
+            }
+            else
             {
                 QuickLogger.Debug($"Creating new ID: Known Count{knownDevices.Count}");
                 var unitID = GenerateNewID(tabID, prefabID);
@@ -108,13 +116,6 @@ namespace FCS_AlterraHub.Registration
                 device.PackageId = packageId;
                 AddToGlobalDevices(device, unitID);
                 Mod.SaveDevices(knownDevices);
-            }
-            else
-            {
-                device.TabID = tabID;
-                device.PackageId = packageId;
-                device.UnitID = knownDevices.FirstOrDefault(x => x.PrefabID.Equals(prefabID)).ToString();
-                AddToGlobalDevices(device, device.UnitID);
             }
             
             QuickLogger.Debug($"Registering Device: {device.UnitID}");

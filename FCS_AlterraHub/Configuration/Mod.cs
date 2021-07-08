@@ -4,8 +4,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using FCS_AlterraHub.API;
 using FCS_AlterraHub.Buildables;
+using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model.Utilities;
 using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono;
@@ -17,11 +20,13 @@ using FCS_AlterraHub.Systems;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using FMOD;
+using QModManager.API;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
 using Story;
 using UnityEngine;
+using Debug = System.Diagnostics.Debug;
 using Object = UnityEngine.Object;
 using SearchOption = System.IO.SearchOption;
 #if SUBNAUTICA_STABLE
@@ -41,7 +46,8 @@ namespace FCS_AlterraHub.Configuration
         public const string ModPackID = "AlterraHub";
 
         internal static string SaveDataFilename => $"{ModPackID}SaveData.json";
-        
+
+        internal static string KnownDevicesPath => Application.persistentDataPath + "/FCStudiosKnownDevices.dat";
         private const string KnownDevicesFilename = "KnownDevices.json";
         internal const string AssetBundleName = "fcsalterrahubbundle";
 
@@ -78,14 +84,9 @@ namespace FCS_AlterraHub.Configuration
         internal const string DronePortPadHubNewTabID = "DPP";
 
         internal static TechType AlterraHubDepotTechType { get; set; }
-        internal static TechType AlterraHubDepotFragmentTechType { get; set; }
-
-        internal static TechType OreConsumerFragmentTechType { get; set; }
         internal const string OreConsumerTabID = "OC";
 
         internal static TechType OreConsumerTechType { get; set; }
-        public static TechType AlterraHubTechType { get; set; }
-
         internal static Action<SaveData> OnDataLoaded { get; set; }
         internal static Action<List<KnownDevice>> OnDevicesDataLoaded { get; set; }
 
@@ -186,70 +187,62 @@ namespace FCS_AlterraHub.Configuration
             return Path.Combine(SaveUtils.GetCurrentSaveDataDir(), AlterraHubClassID);
         }
 
-        internal static void LoadDevicesData()
-        {
-            //if (_knownDevicesLoaded) return;
-            //QuickLogger.Info("Loading Known Devices Save Data...");
-            //ModUtils.LoadSaveData<List<KnownDevice>>(KnownDevicesFilename, GetSaveFileDirectory(), data =>
-            //{
-            //    QuickLogger.Info("Known Devices Save Data Loaded");
-            //    OnDevicesDataLoaded?.Invoke(data);
-            //    _knownDevicesLoaded = true;
-            //});
-        }
-
         internal static void CollectKnownDevices()
         {
-
-            var items = new HashSet<KnownDevice>();
-
-#if SUBNAUTICA
-            var path = Path.GetFullPath(Path.Combine(Application.persistentDataPath, "../..", "Unknown Worlds/Subnautica/Subnautica/SavedGames"));
-#elif BELOWZERO
-            var path = Path.GetFullPath(Path.Combine(Application.persistentDataPath, "../..", "Unknown Worlds/Subnautica Below Zero/SubnauticaZero/SavedGames"));
-#endif
-            QuickLogger.Debug($"User storage: {path}");
-
-            if (string.IsNullOrWhiteSpace(path))
+            if (File.Exists(KnownDevicesPath))
             {
-                QuickLogger.Debug("Path is null");
-                return;
-            }
+                // Declare the hashtable reference.
+                List<KnownDevice> addresses;
 
-            if (Directory.Exists(path))
-            {
-                string[] allfiles = Directory.GetFiles(path, "KnownDevices.json", SearchOption.AllDirectories);
-                //QModServices.Main.AddCriticalMessage($"All Files Count: {allfiles.Length}");
+                // Open the file containing the data that you want to deserialize.
+                FileStream fs = new FileStream(KnownDevicesPath, FileMode.Open);
 
-                foreach (var file in allfiles)
+                try
                 {
-                    var save = File.ReadAllText(file);
-                    var json = JsonConvert.DeserializeObject<List<KnownDevice>>(save);
-                    foreach (KnownDevice device in json)
-                    {
-                        items.Add(device);
-                    }
+                    BinaryFormatter formatter = new BinaryFormatter();
+
+                    addresses = (List<KnownDevice>)formatter.Deserialize(fs);
+                    OnDevicesDataLoaded?.Invoke(addresses);
+                }
+                catch (SerializationException e)
+                {
+                    QuickLogger.Error("Failed to deserialize. Reason: " + e.Message);
+                    throw;
+                }
+                finally
+                {
+                    fs.Close();
+                }
+
+                foreach (KnownDevice de in addresses)
+                {
+                    QuickLogger.Debug($"{de.ID} has prefab ID {de.PrefabID}.");
                 }
             }
-
-            //QModServices.Main.AddCriticalMessage($"Found: {items.Count} Devices");
-
-            OnDevicesDataLoaded?.Invoke(items.ToList());
+            else
+            {
+                OnDevicesDataLoaded?.Invoke(new List<KnownDevice>());
+            }
         }
 
-
-        public static bool SaveDevices(List<KnownDevice> knownDevices)
+        public static void SaveDevices(List<KnownDevice> devices)
         {
-            
+            FileStream fs = new FileStream(KnownDevicesPath, FileMode.Create);
+
+            // Construct a BinaryFormatter and use it to serialize the data to the stream.
+            BinaryFormatter formatter = new BinaryFormatter();
             try
             {
-                ModUtils.Save(knownDevices, KnownDevicesFilename, GetSaveFileDirectory(), OnSaveComplete);
-                return true;
+                formatter.Serialize(fs, devices);
             }
-            catch (Exception e)
+            catch (SerializationException e)
             {
-                QuickLogger.Error($"Error: {e.Message} | StackTrace: {e.StackTrace}");
-                return false;
+                Console.WriteLine("Failed to serialize. Reason: " + e.Message);
+                throw;
+            }
+            finally
+            {
+                fs.Close();
             }
         }
 
@@ -471,11 +464,6 @@ namespace FCS_AlterraHub.Configuration
             return null;
         }
 
-        public static string GetIconPath(string classId)
-        {
-            return Path.Combine(GetAssetPath(), $"{classId}.png");
-        }
-
         public static void LoadAudioFiles()
         {
             AudioClips.Add("AH-Mission01-Pt1",AudioUtils.CreateSound(Path.Combine(GetAssetPath(), "Audio", "AH-Mission01-Pt1.wav")));
@@ -611,6 +599,7 @@ namespace FCS_AlterraHub.Configuration
         public bool KeyPad2;
     }
 
+    [Serializable]
     public struct KnownDevice
     {
         public string PrefabID { get; set; }

@@ -13,6 +13,7 @@ using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.HydroponicHarvester.Mono;
 using FCS_ProductionSolutions.Mods.HydroponicHarvester.Enumerators;
+using FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
@@ -40,6 +41,7 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
         private const float PowerUsage = 0.85f;
         public override bool IsOperational => IsConstructed && IsInitialized;
         public override bool IsVisible => true;
+        public override StorageType StorageType => StorageType.OtherStorage;
 
         private void Start()
         {
@@ -47,6 +49,10 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
             if(Manager == null)
             {
                 _canvas.SetActive(false);
+            }
+            else
+            {
+                Manager.AlertNewFcsStoragePlaced(this);
             }
         }
 
@@ -75,13 +81,14 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
                 _colorManager.ChangeColor(_saveData.Body.Vector4ToColor());
                 
                 _speedBTN.SetSpeedMode(_saveData.Speed);
-                _replicatorSlot.CurrentSpeedMode = _saveData.Speed;
-                _replicatorSlot.GenerationProgress = _saveData.Progress;
 
                 if (_saveData.TargetItem != TechType.None)
                 {
-                    _replicatorSlot.ChangeTargetItem(_saveData.TargetItem);
+                    QuickLogger.Debug("Loading Replicator save");
+                    _replicatorSlot.ChangeTargetItem(_saveData.TargetItem,true);
                     _replicatorSlot.SetItemCount(_saveData.ItemCount);
+                    _replicatorSlot.CurrentSpeedMode = _saveData.Speed;
+                    _replicatorSlot.GenerationProgress = _saveData.Progress;
                     _techTypeIcon.sprite = SpriteManager.Get(_saveData.TargetItem);
                     SpawnModel(_saveData.TargetItem);
                 }
@@ -151,6 +158,7 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
         public override float GetPowerUsage()
         {
             if (!IsOperational || _replicatorSlot == null || !_replicatorSlot.IsOccupied) return 0f;
+
             switch (_replicatorSlot.CurrentSpeedMode)
             {
                 case SpeedModes.Off:
@@ -243,6 +251,16 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
             }
         }
 
+        public override Pickupable RemoveItemFromContainer(TechType techType)
+        {
+            return _replicatorSlot.RemoveItemFromContainer(techType);
+        }
+
+        public override bool RemoveItemFromContainer(InventoryItem item)
+        {
+            return RemoveItemFromContainer(item.item.GetTechType());
+        }
+
         private void Clear()
         {
             QuickLogger.Debug("Trying to clear.",true);
@@ -276,7 +294,12 @@ namespace FCS_ProductionSolutions.Mods.Replicator.Mono
             _unitPerSecond.text = AuxPatchers.GenerationTimeMinutesOnlyFormat(Convert.ToSingle(_replicatorSlot.CurrentSpeedMode));
             _powerUsagePerSecond.text = AuxPatchers.PowerUsagePerSecondFormat(GetPowerUsage());
             _containerAmount.text = $"{_replicatorSlot.GetCount()}/{_replicatorSlot.GetMaxCount()}";
+            UpdateTerminals();
+        }
 
+        private void UpdateTerminals()
+        {
+            BaseManager.GlobalNotifyByID("DTC", "ItemUpdateDisplay");
         }
 
         private void SpawnModel(TechType techType)

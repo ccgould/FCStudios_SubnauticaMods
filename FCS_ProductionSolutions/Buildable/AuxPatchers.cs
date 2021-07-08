@@ -22,6 +22,8 @@ namespace FCS_ProductionSolutions.Buildable
             { $"{ModKey}_GenerationTimeFormat","Generation Time : {0}"},
             { $"{ModKey}_MatterAnalyzerHasItems","Please cancel the scan to deconstruct the matter analyzer."},
             { $"{ModKey}_PleaseClearReplicatorSlot","Please clear the replicator slot before trying to replicate another item."},
+            { $"{ModKey}_PleaseEmptyHarvesterSlot","Harvester slot not empty. Please remove all items before trying to clear."},
+            { $"{ModKey}_PleaseClearHarvesterSlot","Please clear the harvester slot before trying to select another item."},
             { $"{ModKey}_NotBuildOnBase","Base not found. Please build on/in a base"},
             { $"{ModKey}_HarvesterSpeedToggle","Speed Switch"},
             { $"{ModKey}_HarvesterSpeedToggleDesc","Changes the rate of sample replication. Stages: OFF|MIN|LOW|HIGH|MAX"},
@@ -167,6 +169,16 @@ namespace FCS_ProductionSolutions.Buildable
         public static string ClickToEdit()
         {
             return Language.main.Get("SubmarineNameEditLabel");
+        }
+
+        public static string PleaseClearHarvesterSlot()
+        {
+            return GetLanguage($"{ModKey}_PleaseClearHarvesterSlot");
+        }
+
+        public static string PleaseEmptyHarvesterSlot()
+        {
+            throw new NotImplementedException();
         }
     }
 }
