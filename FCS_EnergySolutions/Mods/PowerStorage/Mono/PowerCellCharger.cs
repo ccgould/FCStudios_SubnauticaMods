@@ -89,6 +89,9 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Mono
                 _storageContainer.container.onAddItem += AddPowercell;
                 _storageContainer.container.onRemoveItem += OnUnEquip;
                 _storageContainer.container.allowedTech = TechDataHelpers.PowercellTech;
+                _storageContainer.Deactivate();
+                var handTargetController = GameObjectHelpers.FindGameObject(gameObject, "HandTarget")?.AddComponent<PowerStorageHandTargetController>();
+                if(handTargetController != null) handTargetController.storage = _storageContainer;
             }
         }
 

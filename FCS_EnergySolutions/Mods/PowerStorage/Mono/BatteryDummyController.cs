@@ -40,7 +40,7 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Mono
             var m_Material = GetComponent<Renderer>();
             foreach (var materials in m_Material.materials)
             {
-                if (materials.name.StartsWith(ModelPrefab.EmissiveControllerMaterial,StringComparison.OrdinalIgnoreCase))
+                if (materials.name.StartsWith(AlterraHub.BaseLightsEmissiveController,StringComparison.OrdinalIgnoreCase))
                 {
                     _emission = materials;
                     break;
@@ -51,7 +51,7 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Mono
         public void OnHandHover(GUIHand hand)
         {
             HandReticle main = HandReticle.main;
-            main.SetInteractText("Take Battery", _battery.GetChargeValueText());
+            main.SetInteractText(Language.main.Get("CyclopsRemovePowerCell"), _battery.GetChargeValueText());
             main.SetIcon(HandReticle.IconType.Hand);
         }
 

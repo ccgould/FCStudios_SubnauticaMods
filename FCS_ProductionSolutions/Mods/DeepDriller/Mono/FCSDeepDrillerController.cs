@@ -367,10 +367,13 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Mono
             {
                 _colorManager = gameObject.AddComponent<ColorManager>();
                 _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol,AlterraHub.BaseSecondaryCol);
+                _colorManager.ChangeColor(Color.white, ColorTargetMode.Secondary);
             }
-
+            
             DeepDrillerContainer = new FCSDeepDrillerContainer();
             DeepDrillerContainer.Setup(this);
+
+
 
 
             AnimationHandler = gameObject.AddComponent<FCSDeepDrillerAnimationHandler>();

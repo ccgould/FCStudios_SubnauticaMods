@@ -41,6 +41,7 @@
     <Compile Include="Mods\AlterraSolarCluster\Mono\AlterraSolarClusterMovementManager.cs" />
     <Compile Include="Mods\AlterraSolarCluster\Mono\AlterraSolarClusterPowerManager.cs" />
     <Compile Include="Mods\AlterraSolarCluster\Mono\AlterraSolarClusterController.cs" />
+    <Compile Include="Mods\PowerStorage\Mono\PowerStorageHandTargetController.cs" />
     <Compile Include="Mods\Spawnables\BioFuelSpawnable.cs" />
     <Compile Include="Mods\TelepowerPylon\Buildable\TelepowerPylonPatcher.cs" />
     <Compile Include="Mods\TelepowerPylon\Model\TelepowerPylonMode.cs" />

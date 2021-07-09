@@ -14,7 +14,7 @@ using UnityEngine.UI;
 
 namespace FCS_EnergySolutions.Mods.PowerStorage.Mono
 {
-    internal class PowerStorageController : FcsDevice, IFCSSave<SaveData>//, IHandTarget
+    internal class PowerStorageController : FcsDevice, IFCSSave<SaveData>, IHandTarget
     {
         private bool _runStartUpOnEnable;
         private bool _isFromSave;
@@ -245,11 +245,12 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Mono
                 _powercellSupply.Initialize(this);
             }
 
+            
 
             PowercellCharger.Initialize(this, GameObjectHelpers.FindGameObject(gameObject, "meshes").GetChildren(), GameObjectHelpers.FindGameObject(gameObject, "BatteryMeters").GetChildren(), _powercellSupply);
 
             _autoModeToggle.OnButtonClick.Invoke(null,null);
-
+            
             IsInitialized = true;
         }
 
@@ -341,18 +342,19 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Mono
             return _colorManager.ChangeColor(color, mode);
         }
 
-        //public void OnHandHover(GUIHand hand)
-        //{
-        //    if (!IsInitialized || !IsConstructed || _interactionChecker == null ||_interactionChecker.IsInRange) return;
-        //    HandReticle main = HandReticle.main;
-        //    main.SetInteractText(AuxPatchers.PowerStorageClickToAddPowercells());
-        //    main.SetIcon(HandReticle.IconType.Hand);
-        //}
+        public override void OnHandHover(GUIHand hand)
+        {
+            if (!IsInitialized || !IsConstructed || _interactionChecker == null || _interactionChecker.IsInRange) return;
+            base.OnHandHover(hand);
+            var data = new string[] { };
+            data.HandHoverPDAHelperEx(GetTechType());
+            //Add box arounf powerstorage battery area to allow clicking for storage
+        }
 
-        //public void OnHandClick(GUIHand hand)
-        //{
-        //    if (_interactionChecker.IsInRange) return;
-        //}
+        public void OnHandClick(GUIHand hand)
+        {
+            if (_interactionChecker.IsInRange) return;
+        }
 
         internal PowerChargerMode GetMode()
         {
