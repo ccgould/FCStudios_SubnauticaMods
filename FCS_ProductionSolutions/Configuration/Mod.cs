@@ -2,13 +2,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model.Utilities;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
+using FCS_ProductionSolutions.Structs;
 using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Utility;
@@ -24,7 +24,6 @@ namespace FCS_ProductionSolutions.Configuration
         private static SaveData _saveData;
         private static List<DNASampleData> _hydroponicKnownTech;
         private static TechType _sandBagTechType;
-        private static TechType _alterraStorageTechType;
 
         #endregion
 
@@ -56,8 +55,7 @@ namespace FCS_ProductionSolutions.Configuration
         internal static string ReplicatorKitClassID => $"{ReplicatorModName}_Kit";
         internal static string ReplicatorClassName => ReplicatorModName;
         internal static string ReplicatorPrefabName => "Replica-Fabricator";
-
-
+        
         internal const string DeepDrillerMk3TabID = "DD";
         internal const string DeepDrillerMk3FriendlyName = "Deep Driller MK3";
         internal const string DeepDrillerMk3ModName = "DeepDrillerMK3";
@@ -76,7 +74,7 @@ namespace FCS_ProductionSolutions.Configuration
 
 
 #if SUBNAUTICA
-        internal static TechData DSSAutoCrafterIngredients => new TechData
+        internal static TechData DSSAutoCrafterIngredients => new()
 #elif BELOWZERO
                 internal static RecipeData DSSAutoCrafterIngredients => new RecipeData
 #endif
@@ -87,8 +85,6 @@ namespace FCS_ProductionSolutions.Configuration
                 new Ingredient(DSSAutoCrafterKitClassID.ToTechType(), 1),
             }
         };
-
-
 
         internal static TechType GetSandBagTechType()
         {
@@ -102,7 +98,7 @@ namespace FCS_ProductionSolutions.Configuration
 
 
 #if SUBNAUTICA
-        internal static TechData HydroponicHarvesterIngredients => new TechData
+        internal static TechData HydroponicHarvesterIngredients => new()
 #elif BELOWZERO
                 internal static RecipeData HydroponicHarvesterIngredients => new RecipeData
 #endif
@@ -114,9 +110,7 @@ namespace FCS_ProductionSolutions.Configuration
             }
         };
 
-        public static List<TechType> Craftables { get; set; } = new List<TechType>();
-
-        internal const string ModDescription = "";
+        public static List<TechType> Craftables { get; set; } = new();
 
         internal static event Action<SaveData> OnDataLoaded;
 
@@ -294,7 +288,8 @@ namespace FCS_ProductionSolutions.Configuration
             return new DSSAutoCrafterDataEntry() { ID = id };
         }
 
-        internal static HashSet<TechType> IsNonePlantableAllowedList = new HashSet<TechType>{
+        internal static HashSet<TechType> IsNonePlantableAllowedList = new()
+        {
             TechType.StalkerTooth,
             TechType.GasPod,
             TechType.JeweledDiskPiece,
@@ -359,16 +354,6 @@ namespace FCS_ProductionSolutions.Configuration
             return false;
         }
 
-        public static TechType AlterraStorageTechType()
-        {
-            if (_alterraStorageTechType == TechType.None)
-            {
-                _alterraStorageTechType = "AlterraStorage".ToTechType();
-            }
-
-            return _alterraStorageTechType;
-        }
-
         public static bool CreateNewDNASampleData(TechType techType,out DNASampleData data)
         {
             data = new DNASampleData();
@@ -395,12 +380,5 @@ namespace FCS_ProductionSolutions.Configuration
             _hydroponicKnownTech = new List<DNASampleData>();
 
         }
-    }
-
-    internal struct DNASampleData
-    {
-        public TechType TechType { get; set; }
-        public TechType PickType { get; set; }
-        public bool IsLandPlant { get; set; }
     }
 }

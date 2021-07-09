@@ -21,6 +21,7 @@
     <Compile Include="Buildable\ModelPrefab.cs" />
     <Compile Include="Configuration\Config.cs" />
     <Compile Include="Configuration\DebugCommands.cs" />
+    <Compile Include="Structs\DNASampleData.cs" />
     <Compile Include="Configuration\Mod.cs" />
     <Compile Include="Configuration\SaveDataEntry.cs" />
     <Compile Include="Mods\DeepDriller\Abstract\PowerState.cs" />

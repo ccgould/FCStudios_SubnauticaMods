@@ -4,6 +4,7 @@ using FCS_AlterraHub.Mono;
 using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.Mods.HydroponicHarvester.Models;
+using FCS_ProductionSolutions.Structs;
 using UnityEngine;
 using UnityEngine.UI;
 using Valve.VR;

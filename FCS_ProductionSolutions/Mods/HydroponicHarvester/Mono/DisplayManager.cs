@@ -8,6 +8,7 @@ using FCS_AlterraHub.Mono;
 using FCS_ProductionSolutions.Buildable;
 using FCS_ProductionSolutions.Configuration;
 using FCS_ProductionSolutions.Mods.HydroponicHarvester.Enumerators;
+using FCS_ProductionSolutions.Structs;
 using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
