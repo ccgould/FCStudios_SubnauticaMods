@@ -35,6 +35,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             }
 
             _numberField = GameObjectHelpers.FindGameObject(gameObject, "InputField").AddComponent<SearchField>();
+            _numberField.HoverMessage = "Enter Passcode";
 
             _messageBox = GameObjectHelpers.FindGameObject(gameObject, "MessageBox").AddComponent<FCSMessageBox>();
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using FCS_AlterraHub.API;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Helpers;
 using FCS_LifeSupportSolutions.Configuration;
 using FCSCommon.Helpers;
@@ -76,10 +77,8 @@ namespace FCS_LifeSupportSolutions.Buildable
 
         private static bool LoadAsset(string prefabName, AssetBundle assetBundle, out GameObject go, bool applyShaders = true)
         {
-            QuickLogger.Debug("Loading Asset");
             //We have found the asset bundle and now we are going to continue by looking for the model.
             GameObject prefab = assetBundle.LoadAsset<GameObject>(prefabName);
-            QuickLogger.Debug($"Loaded Prefab {prefabName}");
 
             //If the prefab isn't null lets add the shader to the materials
             if (prefab != null)
@@ -87,37 +86,18 @@ namespace FCS_LifeSupportSolutions.Buildable
                 if (applyShaders)
                 {
                     //Lets apply the material shader
-                    ApplyShaders(prefab, assetBundle);
-                    QuickLogger.Debug($"Applied shaderes to prefab {prefabName}");
+                    AlterraHub.ReplaceShadersV2(prefab);
                 }
 
                 go = prefab;
+
                 QuickLogger.Debug($"{prefabName} Prefab Found!");
                 return true;
             }
 
             QuickLogger.Error($"{prefabName} Prefab Not Found!");
-
             go = null;
             return false;
-        }
-
-        /// <summary>
-        /// Applies the shader to the materials of the reactor
-        /// </summary>
-        /// <param name="prefab">The prefab to apply shaders.</param>
-        internal static void ApplyShaders(GameObject prefab, AssetBundle bundle = null)
-        {
-            #region BaseColor
-            MaterialHelpers.ApplySpecShader(BodyMaterial, SpecTexture, prefab, 1, 3f, bundle);
-            MaterialHelpers.ApplyEmissionShader(DecalMaterial, LUMTexture, prefab, bundle, Color.white);
-            MaterialHelpers.ApplyEmissionShader(DetailsMaterial, LUMTexture, prefab, bundle, Color.white);
-            MaterialHelpers.ApplyEmissionShader(EmissiveBControllerMaterial, LUMTexture, prefab, bundle, Color.white);
-            MaterialHelpers.ApplyEmissionShader(EmissiveControllerMaterial, LUMTexture, prefab, bundle, Color.white);
-            MaterialHelpers.ApplyAlphaShader(DecalMaterial, prefab);
-            MaterialHelpers.ApplyAlphaShader(DetailsMaterial, prefab);
-            MaterialHelpers.ApplyNormalShader(BodyMaterial,NormalTexture,prefab,bundle);
-            #endregion
         }
     }
 }

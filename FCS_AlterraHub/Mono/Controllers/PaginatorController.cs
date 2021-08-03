@@ -9,13 +9,14 @@ namespace FCS_AlterraHub.Mono.Controllers
     {
         private IFCSDisplay _display;
         private FCSToggleButton _currentSelected;
-        private List<FCSToggleButton> _toggleButtons = new List<FCSToggleButton>();
+        private List<FCSToggleButton> _toggleButtons = new();
         private GameObject[] _paginatorBTNs;
         private bool _isInitalized;
 
         private void Setup()
         {
             if (_isInitalized) return;
+
             _paginatorBTNs = gameObject.GetChildren();
             for (var i = 0; i < _paginatorBTNs.Length; i++)
             {

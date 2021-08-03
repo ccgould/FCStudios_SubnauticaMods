@@ -129,11 +129,11 @@ namespace FCS_HomeSolutions.Configuration
         [Keybind("[Smart Televisions] Volume Down", Tooltip="Changes the keybind for the volume down for the tv.")]
         public KeyCode SmartTelevisionsVolumeDown = KeyCode.DownArrow;
 
-        [Keybind("[Smart Televisions] Channel Up", Tooltip="Changes the keybind for the channel up for the tv.")]
-        public KeyCode SmartTelevisionsChannelUp = KeyCode.RightArrow;
+        //[Keybind("[Smart Televisions] Channel Up", Tooltip="Changes the keybind for the channel up for the tv.")]
+        //public KeyCode SmartTelevisionsChannelUp = KeyCode.RightArrow;
 
-        [Keybind("[Smart Televisions] Channel Down",Tooltip="Changes the keybind for the channel down for the tv.")]
-        public KeyCode SmartTelevisionsChannelDown = KeyCode.LeftArrow;
+        //[Keybind("[Smart Televisions] Channel Down",Tooltip="Changes the keybind for the channel down for the tv.")]
+        //public KeyCode SmartTelevisionsChannelDown = KeyCode.LeftArrow;
 
         [Keybind("[Smart Televisions] Turn On/Off Tv", Tooltip="Changes the keybind for turning the tv on or off.")]
         public KeyCode SmartTelevisionsToggleTv = KeyCode.F;
@@ -154,10 +154,13 @@ namespace FCS_HomeSolutions.Configuration
 
         [Slider("[Peeper Lounge Bar] Turn speed.", 0, 5, Step = 0.1f, Format = "{0:F2}", DefaultValue = 5,Order = 1, Tooltip = "Allows you to adjust the turn speed.")]
         public float PeeperLoungeBarTurnSpeed = 5;
-        
-        [Toggle("[Peeper Lounge Bar] Is Mod Enabled",Tooltip = "Enables/Disables Peeper Lounger Bar voice from playing")]
-        public bool PeeperLoungeBarPlayVoice { get; set; }
-        
+
+        [Toggle("[Peeper Lounge Bar] Play SFX", Tooltip = "Enables/Disables Peeper Lounger Bar voice from playing")]
+        public bool PeeperLoungeBarPlayVoice { get; set; } = true;
+
+        [Toggle("[Elevator] Is Mod Enabled", Tooltip = "Enables/Disables Elevator from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+        public bool IsElevatorEnabled { get; set; } = true;
+
         #endregion
 
         #region Smart OutDoor Planter

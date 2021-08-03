@@ -77,19 +77,39 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
         }
         
         #region SINGLETON PATTERN
-        private static FCSPDAController _instance;
         private ReturnsDialogController _returnsDialogController;
         private List<MeshRenderer> _pdaMeshes = new();
         private GameObject _screen;
         private Transform _pdaAnchor;
         private uGUI_CanvasScaler _canvasScalar;
         internal EncyclopediaTabController EncyclopediaTabController { get; set; }
-        public static FCSPDAController Instance => _instance;
+        public static FCSPDAController Main;
         #endregion
+
+        private void Awake()
+        {
+            if (Main == null)
+            {
+                Main = this;
+                DontDestroyOnLoad(this);
+            }
+            else if (Main != null)
+            {
+                Destroy(gameObject);
+                return;
+            }
+        }
 
         internal void SetInstance()
         {
             if (_isInitialized) return;
+            
+            //Awake();
+            //if (Main == null)
+            //{
+            //    Main = this;
+            //}
+
             CreateScreen();
 
             _pdaAnchor = GameObjectHelpers.FindGameObject(gameObject, "ScreenAnchor").transform;
@@ -144,7 +164,6 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             InvokeRepeating(nameof(UpdateDisplay), .5f, .5f);
             InGameMenuQuitPatcher.AddEventHandlerIfMissing(OnQuit);
             _screen.SetActive(false);
-            _instance = this;
             _isInitialized = true;
         }
 
@@ -472,6 +491,11 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
         internal void ShowMission()
         {
             uGUI_PowerIndicator_Initialize_Patch.MissionHUD.ShowMessage("Hi","Eggo"); 
+        }
+
+        internal void ShowMessage(string message)
+        {
+            MessageBoxHandler.main.Show(message, FCSMessageButton.OK);
         }
 
         internal bool MakeAPurchase(CartDropDownHandler cart, AlterraDronePortController depot = null, bool giveToPlayer = false)

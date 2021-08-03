@@ -29,12 +29,12 @@ namespace FCS_AlterraHub.Extensions
             return num.ToString("#,0");
         }
 
-        internal static IEnumerable<CartItemSaveData> ToCartItemSaveData(this List<CartItem> data)
-        {
-            foreach (CartItem cartItem in data)
-            {
-                yield return cartItem.Save();
-            }
-        }
+        //internal static List<CartItemSaveData> ToCartItemSaveData(this List<CartItem> data)
+        //{
+        //    foreach (CartItem cartItem in data)
+        //    {
+        //        yield return cartItem.Save();
+        //    }
+        //}
     }
 }

@@ -11,8 +11,8 @@ using FCS_AlterraHub.Registration;
 using FCS_EnergySolutions.Buildable;
 using FCS_EnergySolutions.Configuration;
 using FCS_EnergySolutions.Mods.WindSurfer.Mono;
-using FCSCommon.Helpers;
 using FCSCommon.Utilities;
+using SMLHelper.V2.Assets;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Utility;
 using UnityEngine;
@@ -22,9 +22,8 @@ using Sprite = Atlas.Sprite;
 
 #endif
 
-namespace FCS_EnergySolutions.WindSurferOperator.Buildables
+namespace FCS_EnergySolutions.Mods.WindSurfer.Buildables
 {
-    using SMLHelper.V2.Assets;
     internal partial class WindSurferOperatorBuildable : Craftable
     {
         private GameObject _prefab;

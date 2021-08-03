@@ -155,21 +155,21 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono
                     return;
                 }
 
-                if (!PlayerInteractionHelper.HasItem(FCSAlterraHubService.PublicAPI.AccountSystem.CardTechType))
+                if (!PlayerInteractionHelper.HasItem(FCSAlterraHubService.PublicAPI.AccountSystem.CardTechType) && GetCanPlay())
                 {
                     //QuickLogger.ModMessage(AlterraHub.CardNotDetected());
                     PlayAudioTrack("PLB_NoCardDetected");
                     return;
                 }
 
-                if (!FCSAlterraHubService.PublicAPI.AccountSystem.HasEnough(_food.Value))
+                if (!FCSAlterraHubService.PublicAPI.AccountSystem.HasEnough(_food.Value) && GetCanPlay())
                 {
                     //QuickLogger.ModMessage("Not enough credit");
                     PlayAudioTrack("PLB_NotEnoughCredit");
                     return;
                 }
 
-                PlayAudioTrack("PLB_ThankYou");
+                if(GetCanPlay()) PlayAudioTrack("PLB_ThankYou");
                 FCSAlterraHubService.PublicAPI.AccountSystem.RemoveFinances(_food.Value);
                 PlayerInteractionHelper.GivePlayerItem(_food.Key);
                 MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
@@ -257,7 +257,7 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono
             this.timeNextPlay = timePassedAsFloat + this.minInterval;
             
 
-            if (!CheckIfPlayingTrack())
+            if (!CheckIfPlayingTrack() && GetCanPlay())
             {
                 if (_sc.container.count > 0)
                 {

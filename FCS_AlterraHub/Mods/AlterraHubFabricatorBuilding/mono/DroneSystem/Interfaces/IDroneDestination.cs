@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.Interfaces
@@ -9,21 +7,18 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.Inte
     {
         Transform BaseTransform { get; set; }
         string BaseId { get; set; }
+        bool IsOccupied { get; }
         List<Transform> GetPaths();
         void Offload(DroneController order);
         Transform GetDockingPosition();
         void OpenDoors();
         void CloseDoors();
-        void DockDrone(DroneController droneController);
         string GetBaseName();
         void Depart(DroneController droneController);
         int GetPortID();
         string GetPrefabID();
-        bool HasDroneDocked();
-        void SetDockedDrone(DroneController drone);
         DroneController SpawnDrone();
         Transform GetEntryPoint();
-        void SetIncomingFlight(bool value);
         string GetBaseID();
     }
 }

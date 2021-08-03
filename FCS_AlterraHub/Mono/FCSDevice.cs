@@ -35,7 +35,7 @@ namespace FCS_AlterraHub.Mono
         {
             if (Input.GetKeyDown(QPatch.Configuration.PDAInfoKeyCode))
             {
-                FCSPDAController.Instance.OpenEncyclopedia(GetTechType());
+                FCSPDAController.Main.OpenEncyclopedia(GetTechType());
             }
         }
 

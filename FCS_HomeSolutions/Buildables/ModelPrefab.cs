@@ -17,6 +17,11 @@ namespace FCS_HomeSolutions.Buildables
     internal static class ModelPrefab
     {
         private static bool _initialized;
+        internal static GameObject ElevatorUIPrefab;
+        public static GameObject TVVideoBTNPrefab;
+        internal static GameObject PlatformFloorFrame { get; set; }
+        internal static GameObject ElevatorFloorItemPrefab { get; set; }
+        internal static GameObject ElevatorPrefab { get; set; }
         internal static GameObject ColorItemPrefab { get; set; }
         internal static GameObject ItemPrefab { get; set; }
         internal static string BodyMaterial => $"{Mod.ModPackID}_COL";
@@ -58,6 +63,7 @@ namespace FCS_HomeSolutions.Buildables
         public static GameObject ObservationTankPrefab { get; set; }
         public static GameObject FireExtinguisherRefuelerPrefab { get; set; }
         public static GameObject AlterraMiniBathroomPrefab { get; set; }
+        public static GameObject HologramPosterPrefab { get; set; }
 
         internal static void Initialize()
         {
@@ -77,6 +83,12 @@ namespace FCS_HomeSolutions.Buildables
 
             PaintToolPrefab = GetPrefab(Mod.PaintToolPrefabName);
             SmallOutdoorPot = GetPrefab(Mod.SmartPlanterPotPrefabName);
+            ElevatorFloorItemPrefab = GetPrefab("NewFloorItem",false,false);
+            TVVideoBTNPrefab = GetPrefab("TVVideoBTN", false,false);
+            PlatformFloorFrame = GetPrefab("PlatformFloorFrame", true);
+            ElevatorPrefab = GetPrefab(Mod.ElevatorPrefabName, true);
+            ElevatorUIPrefab = GetPrefab("ElevatorUI", false,false);
+            HologramPosterPrefab = GetPrefab(Mod.HologramPosterPrefabName,true);
             //BaseOperatorPrefab = GetPrefab(Mod.BaseOperatorPrefabName);
             //HoverLiftPadPrefab = GetPrefab(Mod.HoverLiftPrefabName);
             MiniFountainFilterPrefab = GetPrefab(Mod.MiniFountainFilterPrefabName);
@@ -105,7 +117,7 @@ namespace FCS_HomeSolutions.Buildables
             _initialized = true;
         }
         
-        internal static GameObject GetPrefab(string prefabName, bool isV2 = false)
+        internal static GameObject GetPrefab(string prefabName, bool isV2 = false, bool applyShaders = true)
         {
             try
             {
@@ -114,11 +126,11 @@ namespace FCS_HomeSolutions.Buildables
                 QuickLogger.Debug($"Getting Prefab: {prefabName}");
                 if (isV2)
                 {
-                    if (!LoadAssetV2(prefabName, ModBundle, out prefabGo)) return null;
+                    if (!LoadAssetV2(prefabName, ModBundle, out prefabGo, applyShaders)) return null;
                 }
                 else
                 {
-                    if (!LoadAsset(prefabName, ModBundle, out prefabGo)) return null;
+                    if (!LoadAsset(prefabName, ModBundle, out prefabGo, applyShaders)) return null;
                 }
                 
                 return prefabGo;
@@ -181,7 +193,6 @@ namespace FCS_HomeSolutions.Buildables
 
         public static EventInstance ShowerLoop { get; set; }
 
-
         private static bool LoadAsset(string prefabName, AssetBundle assetBundle, out GameObject go, bool applyShaders = true)
         {
             QuickLogger.Debug("Loading Asset");
@@ -213,10 +224,8 @@ namespace FCS_HomeSolutions.Buildables
 
         private static bool LoadAssetV2(string prefabName, AssetBundle assetBundle, out GameObject go, bool applyShaders = true)
         {
-            QuickLogger.Debug("Loading Asset");
             //We have found the asset bundle and now we are going to continue by looking for the model.
             GameObject prefab = assetBundle.LoadAsset<GameObject>(prefabName);
-            QuickLogger.Debug($"Loaded Prefab {prefabName}");
 
             //If the prefab isn't null lets add the shader to the materials
             if (prefab != null)
@@ -225,16 +234,15 @@ namespace FCS_HomeSolutions.Buildables
                 {
                     //Lets apply the material shader
                     AlterraHub.ReplaceShadersV2(prefab);
-                    QuickLogger.Debug($"Applied shaderes to prefab {prefabName}");
                 }
 
                 go = prefab;
+
                 QuickLogger.Debug($"{prefabName} Prefab Found!");
                 return true;
             }
 
             QuickLogger.Error($"{prefabName} Prefab Not Found!");
-
             go = null;
             return false;
         }

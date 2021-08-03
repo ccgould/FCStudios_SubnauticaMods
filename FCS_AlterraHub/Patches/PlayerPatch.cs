@@ -6,6 +6,7 @@ using System.Reflection;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono;
 using FCS_AlterraHub.Mods.FCSPDA.Mono;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
@@ -50,6 +51,9 @@ namespace FCS_AlterraHub.Patches
                 go.transform.localPosition = new Vector3(0, 0, -50000);
                 SunTarget = go.transform;
             }
+
+            QuickLogger.Debug("Player Awake",true);
+
 
             CoroutineHost.StartCoroutine(CreateFcsPda(__instance));
             //var shouldPlay = (bool)_shouldPlayIntro.GetValue(__instance.GetPDA());
@@ -130,21 +134,24 @@ namespace FCS_AlterraHub.Patches
         {
             yield return new WaitUntil(() => player.pdaSpawn.spawnedObj != null);
 
+            QuickLogger.Debug("Creating FCS PDA");
+
             defPDA = player.pdaSpawn.spawnedObj;
             
-            var pda = GameObject.Instantiate(AlterraHub.FcsPDAPrefab, default, default, false);
+            var pda = GameObject.Instantiate(AlterraHub.FcsPDAPrefab, default, default, true);
             var canvas = pda.GetComponentInChildren<Canvas>();
             if (canvas != null)
                 canvas.sortingLayerID = 1479780821;
 
             pda.EnsureComponent<Rigidbody>().isKinematic = true;
             var controller = pda.AddComponent<FCSPDAController>();
+
             FCSPDA = controller;
             controller.PDAObj = player.pdaSpawn.spawnedObj;
             controller.SetInstance();
             controller.LoadCart(Mod.GetAlterraHubSaveData());
             AddUnlockedEncyclopediaEntries(FCSAlterraHubService.InternalAPI.EncyclopediaEntries);
-            
+            pda.SetActive(false);
             QuickLogger.Debug("FCS PDA Created");
             MoveFcsPdaIntoPosition(FCSPDA.gameObject);
         }

@@ -211,7 +211,7 @@ namespace FCS_EnergySolutions.Mods.JetStreamT242.Mono
 
             if (Input.GetKeyDown(FCS_AlterraHub.QPatch.Configuration.PDAInfoKeyCode))
             {
-                FCSPDAController.Instance.OpenEncyclopedia(_mono.GetTechType());
+                FCSPDAController.Main.OpenEncyclopedia(_mono.GetTechType());
             }
         }
 

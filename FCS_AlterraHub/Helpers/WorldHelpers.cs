@@ -335,6 +335,25 @@ namespace FCS_AlterraHub.Helpers
 
             return new PickReturnsData();
         }
+
+        public static GameObject FindNearestObject(List<Transform> gameObjects, Transform transform)
+        {
+            Transform bestTarget = null;
+            float closestDistanceSqr = Mathf.Infinity;
+            Vector3 currentPosition = transform.position;
+            foreach (Transform potentialTarget in gameObjects)
+            {
+                Vector3 directionToTarget = potentialTarget.position - currentPosition;
+                float dSqrToTarget = directionToTarget.sqrMagnitude;
+                if (dSqrToTarget < closestDistanceSqr)
+                {
+                    closestDistanceSqr = dSqrToTarget;
+                    bestTarget = potentialTarget;
+                }
+            }
+
+            return bestTarget?.gameObject;
+        }
     }
 
     public struct PickReturnsData

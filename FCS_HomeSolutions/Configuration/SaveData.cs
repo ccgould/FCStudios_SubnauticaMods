@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Objects;
+using FCS_HomeSolutions.Mods.Elevator.Mono;
 using FCS_HomeSolutions.Mods.QuantumTeleporter.Enumerators;
 using FCS_HomeSolutions.Mods.TrashRecycler.Model;
 using FCS_HomeSolutions.Mono.OutDoorPlanters;
@@ -23,7 +24,7 @@ namespace FCS_HomeSolutions.Configuration
         [JsonProperty(PropertyName = "SCOL")] internal Vec4 Secondary { get; set; }
         [JsonProperty(PropertyName = "ECOL")] internal Vec4 Emission { get; set; }
         [JsonProperty(PropertyName = "VOL")] internal float Volume { get; set; }
-        [JsonProperty(PropertyName = "CHAN")] internal int Channel { get; set; }
+        [JsonProperty(PropertyName = "Path")] internal string Video { get; set; }
         [JsonProperty(PropertyName = "IsOn")] internal bool IsOn { get; set; }
     }
 
@@ -193,9 +194,33 @@ namespace FCS_HomeSolutions.Configuration
     }
 
     [Serializable]
+    internal class HologramDataEntry
+    {
+        [JsonProperty] internal string Id { get; set; }
+        [JsonProperty(PropertyName = "COL")] internal Vec4 Fcs { get; set; }
+        [JsonProperty(PropertyName = "SCOL")] internal Vec4 Secondary { get; set; }
+        public string SelectedTexturePath { get; set; }
+    }
+
+    [Serializable]
+    internal class ElevatorDataEntry
+    {
+        [JsonProperty] internal string Id { get; set; }
+        [JsonProperty] internal Vec4 Primary { get; set; }
+        [JsonProperty] internal Vec4 Secondary { get; set; }
+        [JsonProperty] internal Dictionary<string, ElevatorFloorData> FloorData { get; set; }
+        [JsonProperty] internal string CurrentFloorId { get; set; }
+        [JsonProperty] internal float PlateformPosition { get; set; }
+        [JsonProperty] internal bool IsRailingsVisible { get; set; }
+        [JsonProperty] internal float Speed { get; set; }
+    }
+
+    [Serializable]
     internal class SaveData
     {
         [JsonProperty] internal float SaveVersion { get; set; } = 1.1f;
+        [JsonProperty] internal List<ElevatorDataEntry> ElevatorDataEntries = new();
+        [JsonProperty] internal List<HologramDataEntry> HologramDataEntries = new();
         [JsonProperty] internal List<TrashReceptacleDataEntry> TrashReceptacleEntries = new();
         [JsonProperty] internal List<PeeperLoungeBarEntry> PeeperLoungeBarEntries = new();
         [JsonProperty] internal List<SeaBreezeDataEntry> SeaBreezeDataEntries = new();

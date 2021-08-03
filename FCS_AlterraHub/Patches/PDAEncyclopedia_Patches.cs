@@ -31,7 +31,7 @@ namespace FCS_AlterraHub.Patches
         [HarmonyPostfix]
         public static void Getter_Postfix(ref CraftNode __result)
         {
-            if (FCSPDAController.Instance?.IsOpen ?? false || FCSAlterraHubService.PublicAPI.IsRegisteringEncyclopedia)
+            if (FCSPDAController.Main?.IsOpen ?? false || FCSAlterraHubService.PublicAPI.IsRegisteringEncyclopedia)
             {
                 __result = EncyclopediaTabController.Tree;
             }
@@ -45,8 +45,8 @@ namespace FCS_AlterraHub.Patches
 
             if (!FCSAlterraHubService.InternalAPI.EncyclopediaEntries.Any(x=>x.ContainsKey(craftNode.id))) return true;
 
-            if (FCSPDAController.Instance?.EncyclopediaTabController != null)
-                FCSPDAController.Instance.EncyclopediaTabController.OnAddEntry(node, verbose);
+            if (FCSPDAController.Main?.EncyclopediaTabController != null)
+                FCSPDAController.Main.EncyclopediaTabController.OnAddEntry(node, verbose);
             else
                 CoroutineHost.StartCoroutine(HoldNotifications(node, verbose));
             
@@ -55,9 +55,9 @@ namespace FCS_AlterraHub.Patches
 
         private static IEnumerator HoldNotifications(CraftNode node, bool verbose)
         {
-            yield return new WaitUntil(() => FCSPDAController.Instance?.EncyclopediaTabController != null);
+            yield return new WaitUntil(() => FCSPDAController.Main?.EncyclopediaTabController != null);
             
-            FCSPDAController.Instance.EncyclopediaTabController.OnAddEntry(node, verbose);
+            FCSPDAController.Main.EncyclopediaTabController.OnAddEntry(node, verbose);
             yield break; 
         }  
         
@@ -67,7 +67,7 @@ namespace FCS_AlterraHub.Patches
         {
             if (!FCSAlterraHubService.InternalAPI.EncyclopediaEntries.Any(x=>x.ContainsKey(entryData.key))) return true;
 
-            __result = FCSPDAController.Instance.EncyclopediaTabController.GetParent(entryData, create);
+            __result = FCSPDAController.Main.EncyclopediaTabController.GetParent(entryData, create);
             return false;
         }
 
@@ -77,8 +77,8 @@ namespace FCS_AlterraHub.Patches
         public static bool Add_Prefix(ref PDAEncyclopedia.EntryData __result, string key, PDAEncyclopedia.Entry entry, bool verbose)
         {
             if (!FCSAlterraHubService.InternalAPI.EncyclopediaEntries.Any(x=>x.ContainsKey(key))) return true;
-
-            __result = FCSPDAController.Instance.EncyclopediaTabController.Add(key, entry, verbose);
+           
+            __result = FCSPDAController.Main.EncyclopediaTabController.Add(key, entry, verbose);
             return false;
         }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHub.Configuration;
@@ -16,6 +17,8 @@ using FCSCommon.Utilities;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
 using UnityEngine;
+using UWE;
+using Math = System.Math;
 
 namespace FCS_AlterraHub.Mono
 {
@@ -1547,6 +1550,24 @@ namespace FCS_AlterraHub.Mono
         internal PortManager GetPortManager()
         {
             return _portManager;
+        }
+
+        public static void FindManager(string instanceId, Action<BaseManager> callBack)
+        {
+            if (string.IsNullOrWhiteSpace(instanceId)) return;
+            CoroutineHost.StartCoroutine(LocationBaseManager(instanceId,callBack));
+        }
+
+        private static IEnumerator LocationBaseManager(string instanceId,Action<BaseManager> callBack)
+        {
+            while (FindManager(instanceId) == null)
+            {
+                QuickLogger.Debug($"Trying to find base with ID ({instanceId})");
+                yield return null;
+            }
+
+            callBack?.Invoke(FindManager(instanceId));
+            yield break;
         }
     }
 

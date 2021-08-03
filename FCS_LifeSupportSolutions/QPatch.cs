@@ -50,13 +50,13 @@ namespace FCS_LifeSupportSolutions
 
                 var greenEnergyPill = new PillPatch("GreenEnergyPill", "Green Adrenaline Pill",
                     "The green adrenaline pill refills your adrenaline bar to give you a 1 minute boost, returning your speed to normal when you are extremely hungry or thirsty.",
-                    ModelPrefab.RedEnergyPillPrefab);
+                    ModelPrefab.GreenEnergyPillPrefab);
                 greenEnergyPill.Patch();
                 Mod.GreenEnergyPillTechType = greenEnergyPill.TechType;
 
                 var blueEnergyPill = new PillPatch("BlueEnergyPill", "Blue Adrenaline Pill",
                     "The blue adrenaline pill refills your adrenaline bar to give you a 30 second boost, returning your speed to normal when you are extremely hungry or thirsty.",
-                    ModelPrefab.RedEnergyPillPrefab);
+                    ModelPrefab.BlueEnergyPillPrefab);
                 blueEnergyPill.Patch();
                 Mod.BlueEnergyPillTechType = blueEnergyPill.TechType;
             }

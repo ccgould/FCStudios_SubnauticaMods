@@ -42,6 +42,11 @@ namespace FCS_AlterraHub.Registration
         int GetTechBuiltCount(TechType techType);
         void RemoveBuiltTech(TechType techType);
         TechType GetDeviceTechType(string deviceId);
+        /// <summary>
+        /// Returns a list of all registered devices with the mod id.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         Dictionary<string, FcsDevice> GetRegisteredDevicesOfId(string id);
         void RegisterBase(BaseManager manager);
         void UnRegisterBase(BaseManager manager);

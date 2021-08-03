@@ -39,7 +39,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Transceiver
                 _rb = GetComponentInChildren<Rigidbody>();
             }
             _rb.isKinematic = true;
-            gameObject.SetActive(false);
+            gameObject.SetActive(true); // changed to true because easycraft isnt able to read the disk
             foreach (BoxCollider bc in _colliders)
             {
                 bc.isTrigger = true;

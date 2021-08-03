@@ -176,7 +176,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubDepot.Mono
 
         public override void OnProtoSerialize(ProtobufSerializer serializer)
         {
-            QuickLogger.Debug("In OnProtoSerialize");
+            QuickLogger.Debug($"In OnProtoSerialize -  Hub Depot");
 
             if (!Mod.IsSaving())
             {

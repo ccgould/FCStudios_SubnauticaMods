@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
@@ -86,7 +87,9 @@ namespace FCS_LifeSupportSolutions.Mods.BaseOxygenTank.Buildable
                 prefabID.ClassId = ClassID;
                 prefab.AddComponent<TechTag>().type = TechType;
                 prefab.AddComponent<BaseOxygenTankController>();
-                
+                MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, prefab, Color.cyan);
+
+
                 return prefab;
             }
             catch (Exception e)

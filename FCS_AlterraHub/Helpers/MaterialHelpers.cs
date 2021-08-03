@@ -918,5 +918,20 @@ namespace FCS_AlterraHub.Helpers
                 }
             }
         }
+
+        public static void ChangeImage(GameObject gameObject, Texture2D texture2D,string materialName)
+        {
+            Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>(true);
+            foreach (Renderer renderer in renderers)
+            {
+                foreach (Material material in renderer.materials)
+                {
+                    if (material.name.StartsWith(materialName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        material.SetTexture("_MainTex", texture2D);
+                    }
+                }
+            }
+        }
     }
 }

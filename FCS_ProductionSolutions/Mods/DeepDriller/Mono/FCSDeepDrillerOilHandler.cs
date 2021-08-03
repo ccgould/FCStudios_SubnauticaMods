@@ -27,7 +27,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Mono
 
         private void Update()
         {
-            if (_mono == null || _mono.DeepDrillerPowerManager == null || _mono.IsBreakerSet()) return;
+            if (_mono == null || _mono.DeepDrillerPowerManager == null || _mono.IsBreakSet()) return;
             if (QPatch.Configuration.DDHardCoreMode)
             {
                 if (_mono.DeepDrillerPowerManager.IsPowerAvailable() && _timeLeft > 0)

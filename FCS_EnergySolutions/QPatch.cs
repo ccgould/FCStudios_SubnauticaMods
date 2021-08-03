@@ -14,7 +14,6 @@ using FCS_EnergySolutions.Mods.Spawnables;
 using FCS_EnergySolutions.Mods.TelepowerPylon.Mono;
 using FCS_EnergySolutions.Spawnables;
 using FCS_EnergySolutions.TelepowerPylon.Buildables;
-using FCS_EnergySolutions.WindSurferOperator.Buildables;
 using FCSCommon.Utilities;
 using HarmonyLib;
 using QModManager.API.ModLoading;

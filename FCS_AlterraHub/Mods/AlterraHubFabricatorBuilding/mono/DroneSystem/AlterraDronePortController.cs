@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
@@ -9,17 +10,13 @@ using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Managers;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mods.AlterraHubDepot.Mono;
+using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.Enums;
 using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.Interfaces;
 using FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
-using FCS_AlterraHub.Structs;
-using FCSCommon.Interfaces;
 using FCSCommon.Utilities;
-using HarmonyLib;
-using SMLHelper.V2.Handlers;
 using UnityEngine;
-using Valve.VR;
 
 namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 {
@@ -32,12 +29,12 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
         private List<PortDoorController> _doors = new();
         private DroneController _assignedDrone;
         private GameObject _spawnPoint;
-        private DronePadEntryPoint _entryPoint;
+        private GameObject _entryPoint;
         private int _portID;
-
-        private DockTriggerController _dockTrigger;
-        private bool _hasIncomingFlight;
         private PortManager _portManager;
+        private bool _isPlaying;
+        private Animator _animator;
+        private int _stateHash;
 
         public override bool IsOperational => IsInitialized && IsConstructed;
         public Transform BaseTransform { get; set; }
@@ -60,6 +57,8 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
             return devices == null || devices.All(x => ((AlterraHubDepotController) x).IsFull());
         }
 
+        public bool IsOccupied => _assignedDrone != null;
+
         public List<Transform> GetPaths()
         {
             return _paths;
@@ -80,11 +79,6 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
             CloseDoors();
         }
 
-        public void DockDrone(DroneController droneController)
-        {
-            StartCoroutine(_entryPoint.DockDrone(droneController));
-        }
-
         public string GetBaseName()
         {
             return Manager?.GetBaseName() ?? "Station Port";
@@ -93,10 +87,12 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
         public void Depart(DroneController droneController)
         {
             SetDockedDrone(null);
-            SetIncomingFlight(false);
-            _entryPoint.Depart(droneController);
         }
 
+        public void Dock(DroneController droneController)
+        {
+            SetDockedDrone(droneController);
+        }
 
         public Transform GetEntryPoint()
         {
@@ -106,12 +102,6 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
         public int GetPortID()
         {
             return _portID;
-        }
-
-        public bool HasDroneDocked()
-        {
-            if (_assignedDrone != null) return true;
-            return _dockTrigger?.IsDocked ?? false;
         }
 
         public void SetDockedDrone(DroneController drone)
@@ -127,7 +117,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
         public void Offload(DroneController drone)
         {
 
-            var order = drone.GetOrder();
+            var order = AlterraFabricatorStationController.Main.GetCurrentOrder();
             
             if (order == null)
             {
@@ -177,13 +167,14 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
                 }
 
             }
-            drone.OnOffloadCompleted();;
+
+            AlterraFabricatorStationController.Main.ClearCurrentOrder();
         }
 
         public override void Awake()
         {
             base.Awake();
-            BaseTransform = transform;
+
         }
 
         #region Unity Methods
@@ -220,10 +211,13 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 
         public override void Initialize()
         {
-            _paths = GameObjectHelpers.FindGameObject(gameObject, "DronePort_DockingPaths").GetChildrenT().ToList();
-            _dockTrigger = GameObjectHelpers.FindGameObject(gameObject, "DockTrigger").AddComponent<DockTriggerController>();
+            BaseTransform = transform;
+            _stateHash = Animator.StringToHash("State");
+            _animator = GetComponent<Animator>();
 
-           _entryPoint =  _paths[0].gameObject.AddComponent<DronePadEntryPoint>();
+            _paths = GameObjectHelpers.FindGameObject(gameObject, "DronePort_DockingPaths").GetChildrenT().ToList();
+            
+           _entryPoint =  _paths[0].gameObject;
 
             _spawnPoint = GameObjectHelpers.FindGameObject(gameObject, "SpawnPoint");
 
@@ -271,7 +265,6 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
         {
             var drone = GameObject.Instantiate(CraftData.GetPrefabForTechType(Mod.AlterraTransportDroneTechType), _spawnPoint.transform.position, _spawnPoint.transform.rotation);
             _assignedDrone = drone.GetComponent<DroneController>();
-            _assignedDrone.Initialize(this);
             return _assignedDrone;
         }
 
@@ -343,7 +336,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 
         public override void OnProtoSerialize(ProtobufSerializer serializer)
         {
-            QuickLogger.Debug("In OnProtoSerialize");
+            QuickLogger.Debug($"In OnProtoSerialize - Port controller");
 
             if (!Mod.IsSaving())
             {
@@ -403,17 +396,6 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
             return "N/A";
         }
 
-        public bool HasIncomingFlight()
-        {
-            if (_dockTrigger?.IsDocked ?? true) return true;
-            return _hasIncomingFlight;
-        }
-
-        public void SetIncomingFlight(bool value)
-        {
-            _hasIncomingFlight = value;
-        }
-
         public string GetBaseID()
         {
             return _portManager.GetBaseID();
@@ -430,6 +412,68 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
         public void OnHandClick(GUIHand hand)
         {
             
+        }
+
+        public IEnumerator PlayAndWaitForAnim(int valueToSet, string stateName, Action onCompleted)
+        {
+            _isPlaying = true;
+            _animator.SetInteger(_stateHash, valueToSet);
+
+            //Wait until we enter the current state
+            while (!_animator.GetCurrentAnimatorStateInfo(0).IsName(stateName))
+            {
+                Debug.Log("Wait until we enter the current state.");
+                yield return null;
+            }
+
+            //Now, Wait until the current state is done playing
+            while ((_animator.GetCurrentAnimatorStateInfo(0).normalizedTime) % 1 < 0.99f)
+            {
+                Debug.Log("Now, Wait until the current state is done playing");
+                yield return null;
+            }
+
+            //Done playing. Do something below!
+            onCompleted?.Invoke();
+
+            yield break;
+        }
+
+        public void PlayAnimationState(DronePortAnimation state, Action callBack)
+        {
+            switch (state)
+            {
+                case DronePortAnimation.None:
+                    PlayAnimation(0, "IDLE", callBack);
+                    CloseDoors();
+                    break;
+                case DronePortAnimation.Docking:
+                    PlayAnimation(2, "Drone_Approaching", callBack);
+                    OpenDoors();
+                    break;
+                case DronePortAnimation.Departing:
+                    PlayAnimation(1, "Drone_Departing", callBack);
+                    OpenDoors();
+                    break;
+                default:
+                    PlayAnimation(0, "IDLE", callBack);
+                    CloseDoors();
+                    break;
+            }
+        }
+
+        private void PlayAnimation(int value, string animationName, Action callBack)
+        {
+            if (_isPlaying) return;
+
+            StartCoroutine(PlayAndWaitForAnim(value, animationName, () =>
+                {
+                    _isPlaying = false;
+                    callBack?.Invoke();
+                    CloseDoors();
+                    _animator.SetInteger(_stateHash, 0);
+                }
+            ));
         }
     }
 }

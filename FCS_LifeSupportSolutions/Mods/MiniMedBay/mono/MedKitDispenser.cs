@@ -1,4 +1,5 @@
 ﻿using FCS_LifeSupportSolutions.Configuration;
+using UnityEngine;
 
 namespace FCS_LifeSupportSolutions.Mods.MiniMedBay.mono
 {
@@ -25,8 +26,16 @@ namespace FCS_LifeSupportSolutions.Mods.MiniMedBay.mono
             }
             else
             {
-                main.SetProgress(_mono.Container.Progress);
-                main.SetIcon(HandReticle.IconType.Progress, 1f);
+                if (_mono.Container.GetIsEmpty() == false)
+                {
+                    main.SetIcon(HandReticle.IconType.Hand, 1f);
+                    main.SetInteractTextRaw(AuxPatchers.TakeMedKit(), $"Progress: {Mathf.FloorToInt(_mono.Container.Progress * 100)}%");
+                }
+                else
+                {
+                    main.SetProgress(_mono.Container.Progress);
+                    main.SetIcon(HandReticle.IconType.Progress);
+                }
             }
         }
 

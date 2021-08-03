@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.Linq;
+using System.Runtime.CompilerServices;
 using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Extensions;
+using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Buildables;
@@ -10,7 +11,6 @@ using FCSCommon.Utilities;
 using SMLHelper.V2.Utility;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.Video;
 
 namespace FCS_HomeSolutions.Mods.TV.Mono
 {
@@ -19,19 +19,43 @@ namespace FCS_HomeSolutions.Mods.TV.Mono
         private bool _runStartUpOnEnable;
         private bool _isFromSave;
         private DecorationDataEntry _savedData;
-        private AudioSource _audio;
-        private VideoPlayer _video;
         private bool _isOn = true;
         private Canvas _canvas;
+        private ToggleGroup _toggleGroup;
+        private VideoSectionController _videoSection;
+        private HomeSectionController _homeSection;
+        private Toggle _videoToggle;
+        private Toggle _homeToggle;
+        private Text _clock;
         private Text _volumeText;
         private float _timer;
-        private List<string>_videoLocations;
-        private int _currentChannel;
 
         private void Start()
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.DecorationItemTabId, Mod.ModPackID);
             Manager.OnPowerStateChanged += OnPowerStateChanged;
+        }
+
+        private void Update()
+        {
+            if (_clock != null)
+                _clock.text = WorldHelpers.GetGameTimeFormat();
+
+            if (GetIsOn())
+            {
+                if (_volumeText != null && _volumeText.gameObject.activeSelf)
+                {
+                    _timer += DayNightCycle.main.deltaTime;
+
+                    if (_timer >= 3f)
+                    {
+                        if (!_videoSection.IsMuted())
+                        {
+                            _volumeText.gameObject.SetActive(false);
+                        }
+                    }
+                }
+            }
         }
 
         private void OnPowerStateChanged(PowerSystem.Status obj)
@@ -80,39 +104,26 @@ namespace FCS_HomeSolutions.Mods.TV.Mono
                     }
 
                     _colorManager.ChangeColor(_savedData.Fcs.Vector4ToColor());
-                    ChangeVolume(_savedData.Volume, _savedData.Volume > 0f);
-
-                    if (_videoLocations.Count - 1 >= _savedData.Channel)
-                    {
-                        _currentChannel = _savedData.Channel;
-                        ForceChannel();
-                    }
-
+                    
+                    _videoSection.ChangeVolume(_savedData.Volume, _savedData.Volume > 0f);
+                    
                     if (!_savedData.IsOn)
                     {
                         TurnOff();
-                        _isOn = false;
+                    }
+                    else
+                    {
+                        if (!string.IsNullOrWhiteSpace(_savedData.Video))
+                        {
+                            ChangePage("VideoBTN");
+                            _videoSection.LoadChannel(_savedData.Video);
+                        }
                     }
                     
                 }
 
                 _runStartUpOnEnable = false;
             }
-        }
-
-        private void ChangeVolume(float volume, bool isVolumeUp = true)
-        {
-            _audio.volume = volume;
-            var amount = Mathf.RoundToInt(volume * 100).ToString();
-            if (isVolumeUp)
-            {
-                _volumeText.text = amount;
-            }
-            else
-            {
-                _volumeText.text = volume <= 0f ? "MUTE" : amount;
-            }
-            _volumeText.gameObject.SetActive(true);
         }
 
         public void Save(SaveData newSaveData, ProtobufSerializer serializer)
@@ -127,168 +138,86 @@ namespace FCS_HomeSolutions.Mods.TV.Mono
 
             _savedData.Id = GetPrefabID();
             _savedData.Fcs = _colorManager.GetColor().ColorToVector4();
-            _savedData.Volume = _audio.volume;
-            _savedData.Channel = _currentChannel;
+            _savedData.Volume = _videoSection.GetVolume();
+            _savedData.Video = _videoSection.GetCurrentChannel();
             _savedData.IsOn = _isOn;
             QuickLogger.Debug($"Saving ID {_savedData.Id}");
             newSaveData.DecorationEntries.Add(_savedData);
         }
 
-        private void ForceChannel()
-        {
-            if(_videoLocations.Count <= 0 && _videoLocations[_currentChannel] ==null) return;
-            _video.url = _videoLocations[_currentChannel];
-            _video.Play();
-        }
-
         public override void Initialize()
         {
+            _toggleGroup = gameObject.GetComponentInChildren<ToggleGroup>(true);
+
             if (_colorManager == null)
             {
                 _colorManager = gameObject.AddComponent<ColorManager>();
                 _colorManager.Initialize(gameObject, ModelPrefab.BodyMaterial);
             }
-
-            if (_audio == null)
-            {
-                _audio = gameObject.GetComponentInChildren<AudioSource>();
-            }
-
-            if (_video == null)
-            {
-                LoadVideoLocations();
-                _canvas = gameObject.GetComponentInChildren<Canvas>();
-                var rawImage = gameObject.GetComponentInChildren<RawImage>();
-                _video = gameObject.GetComponentInChildren<VideoPlayer>();
-
-                _video.url = _videoLocations[0];
-                var renderTexture = new RenderTexture(1920, 1080, 24);
-                renderTexture.Create();
-                _video.targetTexture = renderTexture;
-                rawImage.texture = renderTexture;
-            } 
             
-            _volumeText = gameObject.GetComponentInChildren<Text>(true);
+            if (_canvas == null)
+            {
+                _canvas = gameObject.GetComponentInChildren<Canvas>(true);
+
+                _videoSection = GameObjectHelpers.FindGameObject(gameObject, "VideoSelection").AddComponent<VideoSectionController>();
+                _videoSection.Initialize(this);
+                _homeSection = GameObjectHelpers.FindGameObject(gameObject, "Home").AddComponent<HomeSectionController>();
+                
+                _homeToggle = GameObjectHelpers.FindGameObject(gameObject, "HomeBTN").GetComponent<Toggle>();
+                _homeToggle.onValueChanged.AddListener((value =>
+                {
+                    ChangePage("HomeBTN");
+                }));
+
+                _videoToggle = GameObjectHelpers.FindGameObject(gameObject, "VideoBTN").GetComponent<Toggle>();
+                
+                _videoToggle.onValueChanged.AddListener((value =>
+                {
+                    ChangePage("VideoBTN");
+                }));
+
+                if (_clock == null)
+                {
+                    _clock = GameObjectHelpers.FindGameObject(gameObject, "Clock").GetComponent<Text>();
+                }
+
+                _volumeText = GameObjectHelpers.FindGameObject(gameObject, "VolumeLBL").GetComponent<Text>();
+
+                TurnOn();
+            } 
             
             IsInitialized = true;
         }
 
-        private void Update()
+        private void ChangePage(string name)
         {
-            if(_video != null)
-                _video.playbackSpeed = Mathf.Approximately(DayNightCycle.main.deltaTime,0f) ? 0 : 1;
-
-            if (_isOn)
+            switch (name)
             {
-                if (_volumeText != null && _volumeText.gameObject.activeSelf)
-                {
-                    _timer += DayNightCycle.main.deltaTime;
-                    if (_timer >= 3f)
-                    {
-                        if (!Mathf.Approximately(_audio.volume, 0))
-                        {
-                            _volumeText.gameObject.SetActive(false);
-                        }
-                        
-                    }
-                }
+                case "VideoBTN":
+                    _videoSection.Show();
+                    _homeSection.Hide();
+                    break;
+                case "HomeBTN":
+                    _videoSection.Hide();
+                    _homeSection.Show();
+                    break;
             }
-
-        }
-
-        private void LoadVideoLocations()
-        {
-            if (_videoLocations == null)
-            {
-                _videoLocations = new List<string>();
-            }
-
-            var path = Path.Combine(Mod.GetAssetPath(), "Videos");
-            if (!Directory.Exists(path))
-            {
-                Directory.CreateDirectory(path);
-            }
-
-            var videos = Directory.GetFiles(path, "*.mp4");
-
-            foreach (string filePath in videos)
-            {
-                if (File.Exists(filePath) && !_videoLocations.Contains(filePath))
-                {
-                    _videoLocations.Add(filePath);
-                }
-            }
-
-            QuickLogger.Debug($"Loaded: {_videoLocations.Count}.",true);
-        }
-
-        private void Play()
-        {
-            _video.Play();
-        }
-
-        private void Pause()
-        {
-            _video.Pause();
-        }
-
-        private void Stop()
-        {
-            _video.Stop();
-        }
-
-        private void VolumeUp()
-        {
-            if (!_isOn) return;
-            _timer = 0f;
-            ChangeVolume(Mathf.Clamp(_audio.volume + 0.1f, 0, 1f));
-        }
-
-        private void VolumeDown()
-        {
-            if(!_isOn) return;
-            _timer = 0f;
-            ChangeVolume(Mathf.Clamp(_audio.volume - 0.1f, 0, 1f),false);
         }
 
         private void TurnOff()
         {
             _isOn = false;
-            _audio.mute = true;
+            _homeToggle.isOn = true;
             _canvas.gameObject.SetActive(false);
         }
 
         private void TurnOn()
         {
             _isOn = true;
-            _audio.mute = false;
+            _homeToggle.isOn = true;
             _canvas.gameObject.SetActive(true);
         }
-
-        private void ChannelUp()
-        {
-            _currentChannel++;
-
-            if (_currentChannel >= _videoLocations.Count)
-            {
-                _currentChannel = _currentChannel % _videoLocations.Count;
-            }
-
-            ForceChannel();
-        }
-
-        private void ChannelDown()
-        {
-            _currentChannel--;
-
-            if (_currentChannel == -1)
-            {
-                _currentChannel = _videoLocations.Count - 1;
-            }
-
-            ForceChannel();
-        }
-
+        
         public override void OnProtoSerialize(ProtobufSerializer serializer)
         {
             QuickLogger.Debug("In OnProtoSerialize");
@@ -328,6 +257,7 @@ namespace FCS_HomeSolutions.Mods.TV.Mono
         public override void OnConstructedChanged(bool constructed)
         {
             IsConstructed = constructed;
+            
             if (constructed)
             {
                 if (isActiveAndEnabled)
@@ -351,18 +281,18 @@ namespace FCS_HomeSolutions.Mods.TV.Mono
             return _colorManager.ChangeColor(color, mode);
         }
 
-        public void OnHandHover(GUIHand hand)
+        public override void OnHandHover(GUIHand hand)
         {
-            HandReticle main = HandReticle.main;
+            base.OnHandHover(hand);
 
-            main.SetUseTextRaw(AuxPatchers.TVFormat(QPatch.Configuration.SmartTelevisionsToggleTv.ToString()),
+            var data = new string[]
+            {
+                AuxPatchers.TVFormat(QPatch.Configuration.SmartTelevisionsToggleTv.ToString()),
                 AuxPatchers.TVFormatContinued(
                     QPatch.Configuration.SmartTelevisionsVolumeUp.ToString(),
-                    QPatch.Configuration.SmartTelevisionsVolumeDown.ToString(),
-                    QPatch.Configuration.SmartTelevisionsChannelUp.ToString(),
-                    QPatch.Configuration.SmartTelevisionsChannelDown.ToString()));
-
-            main.SetIcon(HandReticle.IconType.Default);
+                    QPatch.Configuration.SmartTelevisionsVolumeDown.ToString())
+            };
+            data.HandHoverPDAHelperEx(GetTechType());
 
             if (Input.GetKeyDown(QPatch.Configuration.SmartTelevisionsToggleTv))
             {
@@ -378,28 +308,29 @@ namespace FCS_HomeSolutions.Mods.TV.Mono
 
             if (Input.GetKeyDown(QPatch.Configuration.SmartTelevisionsVolumeUp))
             {
-                VolumeUp();
+                _videoSection.VolumeUp();
             }
 
             if (Input.GetKeyDown(QPatch.Configuration.SmartTelevisionsVolumeDown))
             {
-                VolumeDown();
-            }
-
-            if (Input.GetKeyDown(QPatch.Configuration.SmartTelevisionsChannelDown))
-            {
-                ChannelDown();
-            }
-
-            if (Input.GetKeyDown(QPatch.Configuration.SmartTelevisionsChannelUp))
-            {
-                ChannelUp();
+                _videoSection.VolumeDown();
             }
         }
 
         public void OnHandClick(GUIHand hand)
         {
 
+        }
+
+        internal bool GetIsOn()
+        {
+            return _isOn;
+        }
+
+        public void SetVolumeText(string value)
+        {
+            _volumeText.text = value;
+            _volumeText.gameObject.SetActive(true);
         }
     }
 }

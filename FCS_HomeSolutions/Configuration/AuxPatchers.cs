@@ -62,7 +62,7 @@ namespace FCS_HomeSolutions.Configuration
             { $"{ModKey}_ClickToRotate","Click to rotate"},
             { $"{ModKey}_PressToToggleLight","Press {0} to toggle led light. \nPress {1}/{2} to change intensity. \nPress {3} to toggle night sensor. \nIntensity: {4} | Night Sensor: {5}"},
             { $"{ModKey}_TVFormat","Press {0} to turn on/off tv."},
-            { $"{ModKey}_TVFormat2","Press {0}/{1} for volume and {2}/{3} for channel"},
+            { $"{ModKey}_TVFormat2","Press {0}/{1} for volume"},
             { $"{ModKey}_NotEnoughWaterForBottle","Not enough water for bottle please wait for 50% tank level or more"},
             { $"{ModKey}_ClickToOpenFormatted","Click to open the {0}"},
             { $"{ModKey}_ModNotEmptyFormat","Please empty {0} before trying to deconstruct."},
@@ -330,9 +330,9 @@ namespace FCS_HomeSolutions.Configuration
             return string.Format(GetLanguage($"{ModKey}_TVFormat"),key);
         }
 
-        public static string TVFormatContinued(string volUp,string volDown,string chanUp,string chanDown)
+        public static string TVFormatContinued(string volUp,string volDown)
         {
-            return string.Format(GetLanguage($"{ModKey}_TVFormat2"),volUp,volDown,chanUp,chanDown);
+            return string.Format(GetLanguage($"{ModKey}_TVFormat2"),volUp,volDown);
         }
 
         public static string NotEnoughWaterForBottle()

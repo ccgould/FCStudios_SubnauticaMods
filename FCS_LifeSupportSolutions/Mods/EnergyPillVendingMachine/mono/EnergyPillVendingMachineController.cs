@@ -73,7 +73,7 @@ namespace FCS_LifeSupportSolutions.Mods.EnergyPillVendingMachine.mono
             if (_colorManager == null)
             {
                 _colorManager = gameObject.AddComponent<ColorManager>();
-                _colorManager.Initialize(gameObject, ModelPrefab.BodyMaterial, ModelPrefab.SecondaryMaterial);
+                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol,AlterraHub.BaseSecondaryCol);
             }
 
             if (_displayManager == null)
@@ -84,6 +84,8 @@ namespace FCS_LifeSupportSolutions.Mods.EnergyPillVendingMachine.mono
 
             var canvas = gameObject.GetComponentInChildren<Canvas>();
             _interactionHelper = canvas.gameObject.AddComponent<InterfaceInteraction>();
+
+            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
 
             IsInitialized = true;
         }

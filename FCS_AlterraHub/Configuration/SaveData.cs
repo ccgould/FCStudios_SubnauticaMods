@@ -51,9 +51,11 @@ namespace FCS_AlterraHub.Configuration
         public string DestinationBaseID { get; set; }
         public string DepartureBaseID { get; set; }
         public int DeparturePortID { get; set; }
-        public DroneController.DroneStates DroneState { get; set; }
         public string ParentID { get; set; }
         public string DockedPortBaseID { get; set; }
+        public Vec3 Position { get; set; }
+        public Vec4 Rotation { get; set; }
+        public string State { get; set; }
     }
 
     [Serializable]

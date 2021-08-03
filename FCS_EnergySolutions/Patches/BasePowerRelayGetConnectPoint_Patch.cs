@@ -1,4 +1,4 @@
-﻿using FCS_EnergySolutions.WindSurferOperator.Buildables;
+﻿using FCS_EnergySolutions.Mods.WindSurfer.Buildables;
 using HarmonyLib;
 using UnityEngine;
 

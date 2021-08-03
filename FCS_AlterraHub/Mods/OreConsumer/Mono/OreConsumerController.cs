@@ -274,7 +274,7 @@ namespace FCS_AlterraHub.Mods.OreConsumer.Mono
 
         public override void OnProtoSerialize(ProtobufSerializer serializer)
         {
-            QuickLogger.Debug("In OnProtoSerialize");
+            QuickLogger.Debug($"In OnProtoSerialize -  Ore Consumer");
 
             if (!Mod.IsSaving())
             {

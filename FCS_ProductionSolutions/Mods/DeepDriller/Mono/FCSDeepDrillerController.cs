@@ -143,6 +143,8 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Mono
         private void Update()
         {
             if (_line == null) return;
+
+
             if (_isRangeVisible)
             {
                 CreatePoints(Mathf.Clamp(_currentDistance + DayNightCycle.main.deltaTime * LerpSpeed * 1, 0, QPatch.Configuration.DDDrillAlterraStorageRange));
@@ -189,6 +191,12 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Mono
                                                  Player.main.IsInSub() ||
                                                  Player.main.inSeamoth || 
                                                  Player.main.inExosuit ? 1566f : 22000f;
+            }
+
+
+            if (WorldHelpers.CheckIfInRange(gameObject, Player.main.gameObject, 5f) && IsOperational && !IsBreakSet())
+            {
+                MainCameraControl.main.ShakeCamera(.3f);
             }
         }
 
@@ -635,11 +643,6 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Mono
         internal bool GetIsRangeVisible()
         {
             return _isRangeVisible;
-        }
-
-        internal bool IsBreakerSet()
-        {
-            return _isBreakSet;
         }
 
         internal void ToggleRangeView()

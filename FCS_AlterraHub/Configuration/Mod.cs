@@ -13,7 +13,9 @@ using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Managers;
 using FCS_AlterraHub.Model.Utilities;
 using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono;
+using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem;
 using FCS_AlterraHub.Mods.FCSDataBox.Mono;
+using FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Patches;
 using FCS_AlterraHub.Registration;
@@ -521,7 +523,7 @@ namespace FCS_AlterraHub.Configuration
 
             WorldHelpers.CreateBeacon(prefab, AlterraHubStationPingType, "Alterra Hub Station");
             MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
-            prefab.AddComponent<AlterraFabricatorStationController>();
+            var controller = prefab.AddComponent<AlterraFabricatorStationController>();
             prefab.AddComponent<PortManager>();
         }
 
@@ -607,6 +609,8 @@ namespace FCS_AlterraHub.Configuration
         public Dictionary<string,int> DronePortAssigns { get; set; } = new();
         public bool IsStationSpawned { get; set; }
         public Dictionary<string, DataBoxData> DataBoxes { get; set; } = new();
+        [JsonProperty] internal Dictionary<string, IEnumerable<CartItemSaveData>> PendingPurchases { get; set; }
+        [JsonProperty] internal IEnumerable<CartItemSaveData> CurrentOrder { get; set; }
 
         public bool ConditionMet(string condition)
         {

@@ -12,11 +12,9 @@ using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Mono.Controllers;
 using FCS_AlterraHub.Registration;
 using FCS_StorageSolutions.Configuration;
-using FCS_StorageSolutions.Mods.AlterraStorage.Buildable;
 using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
@@ -32,9 +30,9 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
         private bool _isBeingDestroyed;
         private InterfaceInteraction _interactionHelper;
         private MotorHandler _motorHandler;
-        private ProtobufSerializer _serializer;
         private Text _storageAmount;
         private const int MAXSTORAGE = 200;
+
         public override bool IsVisible => true;
         public Action<int, int> OnContainerUpdate { get; set; }
         public Action<FcsDevice, TechType> OnContainerAddItem { get; set; }
@@ -42,12 +40,12 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
 
         public int GetContainerFreeSpace => MAXSTORAGE - _storageContainer.container.count; 
         public bool IsFull => _storageContainer.container.count >= MAXSTORAGE;
-        private readonly List<InventoryButton> _inventoryButtons = new List<InventoryButton>();
+        private readonly List<InventoryButton> _inventoryButtons = new();
         private NameController _nameController;
         private Text _labelText;
         private PaginatorController _paginatorController;
 
-        public override StorageType StorageType { get; } = StorageType.OtherStorage;
+        public override StorageType StorageType => StorageType.OtherStorage;
 
         #region Unity Methods
 
@@ -94,7 +92,7 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
         }
 
         #endregion
-        
+
         public override Vector3 GetPosition()
         {
             return transform.position;
@@ -269,9 +267,7 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
         public override void OnProtoDeserialize(ProtobufSerializer serializer)
         {
             QuickLogger.Debug("In OnProtoDeserialize");
-
-            _serializer = serializer;
-
+            
             if (_savedData == null)
             {
                 ReadySaveData();

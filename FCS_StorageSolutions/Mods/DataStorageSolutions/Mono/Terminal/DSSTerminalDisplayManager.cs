@@ -27,7 +27,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
         private DSSTerminalController _mono;
         private GridHelperV2 _itemGrid;
         private bool _isBeingDestroyed;
-        private readonly List<DSSInventoryItem> _inventoryButtons = new List<DSSInventoryItem>();
+        private readonly List<DSSInventoryItem> _inventoryButtons = new();
         private Text _baseName;
         private Text _serverAmount;
         private Text _rackCountAmount;

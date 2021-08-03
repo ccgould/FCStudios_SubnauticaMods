@@ -86,6 +86,7 @@ namespace FCS_AlterraHub.Configuration
         {
             Mod.GamePlaySettings.IsPDAUnlocked = true;
             FCSPDAController.ForceOpen();
+            AlterraFabricatorStationController.Main.UpdateBeaconState(false);
             QuickLogger.Message($"FCS PDA Unlocked", true);
         }
 

@@ -2,23 +2,21 @@
 using System.Collections.Generic;
 using FCS_AlterraHub.API;
 using FCS_AlterraHub.Configuration;
+using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
-using FCS_AlterraHub.Managers;
-using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono;
-using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using UnityEngine;
 using UnityEngine.UI;
-using Object = UnityEngine.Object;
 
 namespace FCS_AlterraHub.Buildables
 {
     public partial class AlterraHub
     {
         private static bool _initialized;
-        private static Dictionary<string,Material> _v2Materials = new Dictionary<string, Material>();
+        private static Dictionary<string,Material> _v2Materials = new();
         private static bool _v2MaterialsLoaded;
         public static GameObject PDAScreenPrefab;
+        public static GameObject ImageSelectorHUDPrefab;
         internal static GameObject ColorItemPrefab { get; set; }
         internal static GameObject ItemPrefab { get; set; }
 
@@ -55,6 +53,10 @@ namespace FCS_AlterraHub.Buildables
         /// </summary>
         public const string BaseFloor01Exterior = "fcs01_Floor01_Exterior";
         /// <summary>
+        /// Material for outdoor for none alpha.
+        /// </summary>
+        public const string BaseFloor02Exterior = "fcs01_Floor02_Exterior";
+        /// <summary>
         /// Material for interiors - non-alpha
         /// </summary>
         public const string BaseOpaqueInterior = "fcs01_BO_Interior";
@@ -72,14 +74,19 @@ namespace FCS_AlterraHub.Buildables
         public const string BaseBeaconLightEmissiveController = "fcs01_BBLEC";
 
 
+
+
         public const string TBaseDetail = "fcs01_D";
         public const string TBaseNormal = "fcs01_N";
         public const string TBaseEmission = "fcs01_E";
         public const string TFloorDetail = "fcs01_Floor01_D";
         public const string TFloorNormal = "fcs01_Floor01_N";
+        public const string TFloor2Normal = "fcs01_Floor02_N";
+        public const string TFloor2Spec = "fcs01_Floor02_S";
         public const string TFloorEmission = "fcs01_Floor01_E";
         public const string TEmissionInterior = "fcs01_E_Interior";
         public const string TBaseSpec = "fcs01_s";
+
         
         internal static string BodyMaterial => $"fcs{Mod.ModPackID}_COL";
         internal static string DecalMaterial => $"fcs{Mod.ModPackID}_DECALS";
@@ -98,7 +105,6 @@ namespace FCS_AlterraHub.Buildables
         internal static GameObject FcsPDAPrefab { get; set; }
         internal static GameObject PDARadialMenuEntryPrefab { get; set; }
 
-        internal static GameObject ColorPickerDialogPrefab { get; set; }
         public static GameObject MissionMessageBoxPrefab { get; set; }
         public static GameObject AlterraHubDepotPrefab { get; set; }
         public static GameObject AlterraHubDepotItemPrefab { get; set; }
@@ -118,6 +124,7 @@ namespace FCS_AlterraHub.Buildables
         public static GameObject DronePortFragmentsPrefab { get; set; }
         public static GameObject DataBoxPrefab { get; set; }
         public static GameObject BluePrintDataDiscPrefab { get; set; }
+        public static GameObject ImageSelectorItemPrefab { get; set; }
 
         public static bool GetPrefabs()
         {
@@ -203,7 +210,13 @@ namespace FCS_AlterraHub.Buildables
                     DronePortFragmentsPrefab = dronePortFragmentsPrefab;
 
                     if (!LoadAssetV2("BLUEPRINT_DATA_DISC", QPatch.GlobalBundle, out var blueprintDataDiscPrefab)) return false;
-                    BluePrintDataDiscPrefab = blueprintDataDiscPrefab;
+                    BluePrintDataDiscPrefab = blueprintDataDiscPrefab;                    
+                    
+                    if (!LoadAsset("ImageSelectorItem", QPatch.GlobalBundle, out var imageSelectorItemPrefab,false)) return false;
+                    ImageSelectorItemPrefab = imageSelectorItemPrefab;
+
+                    if (!LoadAsset("ImageSelectorUI", QPatch.GlobalBundle, out var imageSelectorPrefab, false)) return false;
+                    ImageSelectorHUDPrefab = imageSelectorPrefab;
 
                     //if (!LoadAsset("PDAEntry", QPatch.GlobalBundle, out var pdaEntryPrefabGo, false)) return false;
                     //PDAEntryPrefab = pdaEntryPrefabGo;
@@ -359,6 +372,12 @@ namespace FCS_AlterraHub.Buildables
             MaterialHelpers.ApplyNormalShader(BaseFloor01Exterior, TFloorNormal, prefab, bundle);
             #endregion
 
+            #region BaseFloor02Exterior
+            MaterialHelpers.ApplyNormalShader(BaseFloor02Exterior, TFloor2Normal, prefab, bundle);
+            MaterialHelpers.ApplyAlphaShader(BaseFloor02Exterior, prefab);
+            MaterialHelpers.ApplySpecShader(BaseFloor02Exterior, TFloor2Spec, prefab, 1, 3, bundle);
+            #endregion
+
             #region BaseOpaqeInterior
             MaterialHelpers.ApplyNormalShader(BaseOpaqueInterior, TBaseNormal, prefab, bundle);
             MaterialHelpers.ApplyEmissionShader(BaseOpaqueInterior, TEmissionInterior, prefab, bundle, Color.white);
@@ -459,6 +478,14 @@ namespace FCS_AlterraHub.Buildables
             _v2Materials.Add(BaseFloor01Exterior, baseFloor01Exterior);
             #endregion
 
+            #region BaseFloor02Exterior
+            Material baseFloor02Exterior = QPatch.GlobalBundle.LoadAsset<Material>(BaseFloor02Exterior);
+            MaterialHelpers.CreateV2ApplyAlphaMaterial(baseFloor02Exterior, QPatch.GlobalBundle);
+            MaterialHelpers.CreateV2NormalMaterial(baseFloor02Exterior, TFloor2Normal, QPatch.GlobalBundle);
+            MaterialHelpers.CreateV2Specular(baseFloor02Exterior, TFloor2Spec, 1, 3, QPatch.GlobalBundle);
+            _v2Materials.Add(BaseFloor02Exterior, baseFloor02Exterior);
+            #endregion
+
             #region BaseOpaqueInterior
             Material baseOpaqueInterior = QPatch.GlobalBundle.LoadAsset<Material>(BaseOpaqueInterior);
             MaterialHelpers.CreateV2NormalMaterial(baseOpaqueInterior, TBaseNormal, QPatch.GlobalBundle);
@@ -512,6 +539,7 @@ namespace FCS_AlterraHub.Buildables
             ReplaceShadersV2(prefab, BaseDecalsEmissiveController);
             ReplaceShadersV2(prefab, BaseFloor01Interior);
             ReplaceShadersV2(prefab, BaseFloor01Exterior);
+            ReplaceShadersV2(prefab, BaseFloor02Exterior);
             ReplaceShadersV2(prefab, BaseOpaqueInterior);
             ReplaceShadersV2(prefab, BaseOpaqueExterior);
             ReplaceShadersV2(prefab, BaseDecalsInterior);
@@ -520,16 +548,30 @@ namespace FCS_AlterraHub.Buildables
 
         private static void ReplaceShadersV2(GameObject prefab,string materialName)
         {
+
             LoadV2Materials();
+
             Renderer[] renderers = prefab.GetComponentsInChildren<Renderer>(true);
+            
+            //QuickLogger.Debug($"Replacing Shaders on Object: {prefab.gameObject.name} | Render Count: {renderers.Length}");
+
             foreach (Renderer renderer in renderers)
             {
+                //QuickLogger.Debug($"Processing: {renderer.name} Materials Count: {renderer.materials.Length}");
+
                 for (var index = 0; index < renderer.materials.Length; index++)
                 {
                     Material material = renderer.materials[index];
-                    if (material.name.StartsWith(materialName, StringComparison.OrdinalIgnoreCase))
+
+                    ///QuickLogger.Debug($"Trying to Replacing Material: {material.name} {material.shader.name}");
+                    
+                    if (material.name.RemoveInstance().Equals(materialName, StringComparison.OrdinalIgnoreCase))
                     {
+                        //QuickLogger.Debug($"Replacing Material: {material.name} {material.shader.name}");
+
                         renderer.materials[index] = _v2Materials[materialName];
+
+                        //QuickLogger.Debug($"Done Replacing Material: {renderer.materials[index].name} {renderer.materials[index].shader.name} {_v2Materials[materialName].shader.name}");
                     }
                 }
             }

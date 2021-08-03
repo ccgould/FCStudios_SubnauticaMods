@@ -73,7 +73,7 @@ namespace FCS_LifeSupportSolutions.Mods.MiniMedBay.mono
             if (_colorManager == null)
             {
                 _colorManager = gameObject.AddComponent<ColorManager>();
-                _colorManager.Initialize(gameObject, ModelPrefab.BodyMaterial, ModelPrefab.SecondaryMaterial);
+                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol, AlterraHub.BaseSecondaryCol);
             }
 
             if (DisplayManager == null)
@@ -105,7 +105,8 @@ namespace FCS_LifeSupportSolutions.Mods.MiniMedBay.mono
                 _medKitDispenser.Initialize(this);
             }
 
-            MaterialHelpers.ChangeEmissionStrength(ModelPrefab.EmissiveControllerMaterial,gameObject,5f);
+            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
+            MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseLightsEmissiveController,gameObject,5f);
 
             var canvas = gameObject.GetComponentInChildren<Canvas>();
             _interactionHelper = canvas.gameObject.AddComponent<InterfaceInteraction>();

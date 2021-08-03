@@ -46,8 +46,8 @@ namespace FCS_LifeSupportSolutions.Mods.EnergyPillVendingMachine.Buildable
             {
                 var prefab = GameObject.Instantiate(ModelPrefab.EnergyPillVendingMachinePrefab);
 
-                var center = new Vector3(0f, 1.150356f, 0.0657346f);
-                var size = new Vector3(1.355157f, 2.173833f, 0.8685308f);
+                var center = new Vector3(-0.0310173f, -0.04652709f, 0.2817473f);
+                var size = new Vector3(1.062035f, 1.429083f, 0.3227724f);
 
                 GameObjectHelpers.AddConstructableBounds(prefab, size, center);
 
@@ -65,9 +65,9 @@ namespace FCS_LifeSupportSolutions.Mods.EnergyPillVendingMachine.Buildable
                 var constructable = prefab.AddComponent<Constructable>();
                 constructable.allowedOutside = false;
                 constructable.allowedInBase = true;
-                constructable.allowedOnGround = true;
-                constructable.allowedOnWall = false;
-                constructable.rotationEnabled = true;
+                constructable.allowedOnGround = false;
+                constructable.allowedOnWall = true;
+                constructable.rotationEnabled = false;
                 constructable.allowedOnCeiling = false;
                 constructable.allowedInSub = true;
                 constructable.allowedOnConstructables = false;

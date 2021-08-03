@@ -1,9 +1,6 @@
-﻿using System.IO;
-using FCS_AlterraHub.Configuration;
-using FCS_AlterraHub.Helpers;
-using SMLHelper.V2.Utility;
+﻿using FCS_AlterraHub.Helpers;
+using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.StatesMachine.States;
 using UnityEngine;
-using Valve.VR;
 
 namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 {
@@ -28,7 +25,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
         private void UpdateState()
         {
             if(_droneController == null)return;
-            ChangeThrusterState(_droneController.GetState() != DroneController.DroneStates.Docked);
+            ChangeThrusterState(!_droneController.GetState().Equals(typeof(IdleState)));
         }
 
         private void ChangeThrusterState(bool isOn)

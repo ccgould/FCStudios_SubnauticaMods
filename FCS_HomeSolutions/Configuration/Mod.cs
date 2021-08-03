@@ -37,6 +37,14 @@ namespace FCS_HomeSolutions.Configuration
         internal const string RecyclerKitClassID = "Recycler_Kit";
         internal const string RecyclerTabID = "RR";
 
+
+        internal const string ElevatorClassID = "Elevator";
+        internal const string ElevatorFriendly = "Elevator";
+        internal const string ElevatorDescription = "N/A";
+        internal const string ElevatorPrefabName = "Elevator";
+        internal const string ElevatorKitClassID = "Elevator_Kit";
+        internal const string ElevatorTabID = "EV";
+
         internal const string TrashReceptacleClassID = "TrashReceptacle";
         internal const string TrashReceptacleFriendly = "Trash Receptacle";
         internal const string TrashReceptacleDescription = "Use the Trash Receptacle to quickly send your trash to the recycler from the inside of your base";
@@ -69,7 +77,15 @@ namespace FCS_HomeSolutions.Configuration
         internal const string HoverLiftPadDescription = "Get from one elevation to the next with ease. Een your PRAWN suit along so you don’t get lonely.";
         internal const string HoverLiftPrefabName = "HoverLiftPad";
         internal static string HoverLiftPadKitClassID = $"{HoverLiftPadClassID}_Kit";
-        internal const string HoverLiftPadTabID = "HLP";
+        internal const string HoverLiftPadTabID = "HLP";        
+        
+        
+        internal const string HologramPosterClassID = "HologramPoster";
+        internal const string HologramPosterFriendly = "Hologram Poster";
+        internal const string HologramPosterDescription = "N/A";
+        internal const string HologramPosterPrefabName = "HologramPosterSmall";
+        internal static string HologramPosterKitClassID = $"{HoverLiftPadClassID}_Kit";
+        internal const string HologramPosterTabID = "HGP";
 
         internal const string SmartPlanterPotClassID = "SmartPlanterPot";
         internal const string SmartPlanterPotFriendly = "Neon Planter Pot";
@@ -909,5 +925,66 @@ namespace FCS_HomeSolutions.Configuration
 
             return new TrashReceptacleDataEntry() { Id = id };
         }
+
+        public static ElevatorDataEntry GetElevatorDataEntrySaveData(string id)
+        {
+            LoadData();
+
+            var saveData = GetSaveData();
+
+            foreach (var entry in saveData.ElevatorDataEntries)
+            {
+                if (string.IsNullOrEmpty(entry.Id)) continue;
+
+                if (entry.Id == id)
+                {
+                    return entry;
+                }
+            }
+
+            return new ElevatorDataEntry() { Id = id };
+        }
+
+        public static HologramDataEntry GetHologramDataEntrySaveData(string id)
+        {
+            LoadData();
+
+            var saveData = GetSaveData();
+
+            foreach (var entry in saveData.HologramDataEntries)
+            {
+                if (string.IsNullOrEmpty(entry.Id)) continue;
+
+                if (entry.Id == id)
+                {
+                    return entry;
+                }
+            }
+
+            return new HologramDataEntry() { Id = id };
+        }
+
+        //public static T GetDataEntrySaveData<T>(string id,List<T> entries) where T : new()
+        //{
+        //    LoadData();
+
+        //    Type type = typeof(T);
+
+        //    foreach (var entry in entries)
+        //    {
+        //        foreach (PropertyInfo property in type.GetProperties())
+        //        {
+        //            if (property.Name == "Id")
+        //            {
+        //                if (type.GetProperty(property.Name)?.GetValue(entry) == id)
+        //                {
+        //                    return (T)Convert.ChangeType(entry, typeof(T));
+        //                }
+        //            }
+        //        }
+        //    }
+
+        //    return new T();
+        //}
     }
 }

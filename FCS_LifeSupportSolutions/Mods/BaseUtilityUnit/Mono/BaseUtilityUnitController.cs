@@ -1,10 +1,9 @@
 ﻿using FCS_AlterraHomeSolutions.Mono.PaintTool;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
-using FCS_LifeSupportSolutions.Buildable;
 using FCS_LifeSupportSolutions.Configuration;
-using FCSCommon.Helpers;
 using FCSCommon.Utilities;
 using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Helpers;
@@ -102,7 +101,7 @@ namespace FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Mono
             if (_colorManager == null)
             {
                 _colorManager = gameObject.AddComponent<ColorManager>();
-                _colorManager.Initialize(gameObject, ModelPrefab.BodyMaterial, ModelPrefab.SecondaryMaterial);
+                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol, AlterraHub.BaseSecondaryCol);
             }
 
             if (OxygenManager == null)
@@ -126,8 +125,8 @@ namespace FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Mono
             
             _percent = InterfaceHelpers.FindGameObject(gameObject, "percentage").GetComponent<Text>();
             _percentBar = InterfaceHelpers.FindGameObject(gameObject, "PreLoader_Bar_Front").GetComponent<Image>();
-
-            MaterialHelpers.ChangeEmissionStrength(ModelPrefab.EmissiveControllerMaterial,gameObject,5f);
+            MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseLightsEmissiveController, gameObject, 5f);
+            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
 
             IsInitialized = true;
         }
@@ -262,24 +261,26 @@ namespace FCS_LifeSupportSolutions.Mods.BaseUtilityUnit.Mono
             _canvas.SetActive(true);
         }
 
-        public void OnHandHover(GUIHand hand)
+        public override void OnHandHover(GUIHand hand)
         {
-
-            HandReticle main = HandReticle.main;
-
+            
             if (!IsInitialized || !IsConstructed || _interactionHelper.IsInRange)
             {
-                main.SetIcon(HandReticle.IconType.Default);
+                var data1 = new string[]{};
+                data1.HandHoverPDAHelperEx(GetTechType(), HandReticle.IconType.Default);
                 return;
             }
 
-            var additionalInformation = Manager == null ? "\nMust be built on platform." : string.Empty;
-            main.SetInteractTextRaw($"Unit ID: {UnitID} {additionalInformation}", $"For more information press {FCS_AlterraHub.QPatch.Configuration.PDAInfoKeyCode} | Power Usage Per Second: {GetPowerUsage()}");
-            main.SetIcon(Manager == null ? HandReticle.IconType.HandDeny : HandReticle.IconType.Info);
-            if (Input.GetKeyDown(FCS_AlterraHub.QPatch.Configuration.PDAInfoKeyCode))
-            {
+            base.OnHandHover(hand);
 
-            }
+            var additionalInformation = Manager == null ? "\nMust be built on platform." : string.Empty;
+
+            var data = new[]
+            {
+                $"Unit ID: {UnitID} {additionalInformation}",
+                AlterraHub.PowerPerMinute(GetPowerUsage() * 60)
+            };
+            data.HandHoverPDAHelperEx(GetTechType(), Manager == null ? HandReticle.IconType.HandDeny : HandReticle.IconType.Info);
         }
 
         public void OnHandClick(GUIHand hand)

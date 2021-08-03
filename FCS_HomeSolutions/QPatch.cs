@@ -11,7 +11,9 @@ using FCS_HomeSolutions.Configuration;
 using FCS_HomeSolutions.Mods.AlienChief.Buildables;
 using FCS_HomeSolutions.Mods.Cabinets.Buildable;
 using FCS_HomeSolutions.Mods.Curtains.Buildable;
+using FCS_HomeSolutions.Mods.Elevator.Buildable;
 using FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Buildable;
+using FCS_HomeSolutions.Mods.HologramPoster.Buildable;
 using FCS_HomeSolutions.Mods.LedLights.Buildable;
 using FCS_HomeSolutions.Mods.MiniFountainFilter.Buildables;
 using FCS_HomeSolutions.Mods.PaintTool.Spawnable;
@@ -46,6 +48,7 @@ namespace FCS_HomeSolutions
         internal static Dictionary<string, Texture2D> Patterns = new();
 
         internal static Dictionary<Texture2D, Atlas.Sprite> PatternsIcon = new();
+
         public static Dictionary<string, SoundEntry> AudioClips = new();
 
         [QModPatch]
@@ -171,13 +174,24 @@ namespace FCS_HomeSolutions
                 var observationTank = new ObservationTankBuildable();
                 observationTank.Patch();
             }
-
+            
             if (Configuration.IsAlterraMiniBathroomEnabled)
             {
                 //Patch Alterra Mini Bathroom
                 var alterraMiniBathroom = new AlterraMiniBathroomBuildable();
                 alterraMiniBathroom.Patch();
             }
+
+            if (Configuration.IsElevatorEnabled)
+            {
+                //Patch Elevator
+                var elevator = new ElevatorBuildable();
+                elevator.Patch();
+                AudioUtils.CreateSound(Path.Combine(Mod.GetAssetPath(), "Audio", "LiftSoundEffect.mp3"));
+            }
+
+            var hologramPoster = new HologramPosterBuildable();
+            hologramPoster.Patch();
 
             PatchSigns();
 
