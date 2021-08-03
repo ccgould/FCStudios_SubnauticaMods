@@ -72,24 +72,9 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         private void Awake()
         {
             QuickLogger.Debug("FCS Station Awake", true);
-
-            if (Main == null)
-            {
-                Main = this;
-                DontDestroyOnLoad(gameObject);
-            }
-            else if (Main != null)
-            {
-                QuickLogger.Warning("Destroying Duplicate Station");
-                Destroy(gameObject);
-                return;
-            }
-
+            Main = this;
             _warpTrans = GameObjectHelpers.FindGameObject(gameObject, "RespawnPoint").transform;
             BaseTransform = transform;
-            var lodGroup = gameObject.GetComponentInChildren<LODGroup>();
-            lodGroup.size = 4f;
-
         }
         
         private void Start()
@@ -150,7 +135,6 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             var dataBox3 = SpawnHelper.SpawnTechType(Mod.FCSDataBoxTechType, bp3Pos.transform.position, bp3Pos.transform.rotation, true);
             var dataBox3C = dataBox3.GetComponent<BlueprintHandTarget>();
             CreateBluePrintHandTarget(dataBox3C, dataBox3, Mod.DronePortPadHubNewTechType);
-
             OnGamePlaySettingsLoaded(Mod.GamePlaySettings);
         }
 
@@ -331,8 +315,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
 
             Mod.GamePlaySettings.PendingPurchases = result;
         }
-
-
+        
         internal IDroneDestination GetAssignedPort(string prefabID)
         {
             return Mod.GamePlaySettings.DronePortAssigns.ContainsKey(prefabID) ? _ports.ElementAt(Mod.GamePlaySettings.DronePortAssigns[prefabID]).Value : null;
@@ -362,6 +345,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
                     {
                         _currentOrder = purchase.Value;
                         _pendingPurchase.Remove(purchase.Key);
+                        Subtitles.main.Add($"Your order is now being shipped to base {purchase.Key.GetBaseName()}", null);
                         Mod.GamePlaySettings.CurrentOrder = _currentOrder;
                     }
                     if (_pendingPurchase.Count <= 0) break;

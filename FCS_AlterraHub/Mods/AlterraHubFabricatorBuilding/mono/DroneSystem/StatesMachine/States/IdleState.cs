@@ -12,6 +12,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.Stat
     public class IdleState : BaseState
     {
         private readonly DroneController _drone;
+        private float _timeRemaining = 5f;
         public override string Name => "Idle";
 
         public IdleState()
@@ -45,7 +46,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.Stat
 
             if (!AlterraFabricatorStationController.Main.IsStationPort(_drone.GetCurrentPort()))
             {
-                _drone.ShipOrder(AlterraFabricatorStationController.Main.GetOpenPort());
+                _drone.ShipOrder(AlterraFabricatorStationController.Main.GetOpenPort());                
             }
 
             return null;

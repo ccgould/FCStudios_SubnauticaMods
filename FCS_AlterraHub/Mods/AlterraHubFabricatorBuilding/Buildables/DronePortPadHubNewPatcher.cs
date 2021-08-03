@@ -1,12 +1,8 @@
 ﻿
 using System.Collections.Generic;
-using FCS_AlterraHub.Enumerators;
-using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem;
-using FCS_AlterraHub.Mods.Global.Spawnables;
-using FCS_AlterraHub.Registration;
-using FCS_AlterraHub.Structs;
 using SMLHelper.V2.Crafting;
+
 #if SUBNAUTICA
 using System;
 using System.IO;
@@ -29,9 +25,9 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Buildables
         public override string AssetsFolder => Mod.GetAssetPath();
         public override TechType RequiredForUnlock => TechType;
         public override bool UnlockedAtStart => false;
-
         public override string DiscoverMessage => $"{this.FriendlyName} Unlocked!";
         
+
         public DronePortPadHubNewPatcher() : base(Mod.DronePortPadHubNewClassID, Mod.DronePortPadHubNewFriendly, Mod.DronePortPadHubNewDescription)
         {
             OnFinishedPatching += () =>

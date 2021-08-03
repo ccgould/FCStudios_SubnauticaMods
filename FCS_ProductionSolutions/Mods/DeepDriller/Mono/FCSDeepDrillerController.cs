@@ -113,6 +113,10 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Mono
                 OreGenerator.SetBlackListMode(_saveData.IsBlackListMode);
                 _isRangeVisible = _saveData.IsRangeVisible;
                 _isBreakSet = _saveData.IsBrakeSet;
+                if (!string.IsNullOrWhiteSpace(_saveData.BeaconName))
+                {
+                    SetPingName(_saveData.BeaconName);
+                }
                 ToggleVisibility(_saveData.IsPingVisible);
             }
         }
@@ -288,6 +292,9 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Mono
             _saveData.Upgrades = UpgradeManager.Save();
 
             _saveData.IsRangeVisible = _isRangeVisible;
+
+            _saveData.BeaconName = _ping.GetLabel();
+            _saveData.IsPingVisible = _ping.visible;
 
             _saveData.IsBrakeSet = _isBreakSet;
 

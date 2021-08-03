@@ -177,7 +177,7 @@ namespace FCS_AlterraHub.Buildables
                     AddComponentsToEncyclopediaEntry(encyclopediaEntryPrefab);
                     EncyclopediaEntryPrefab = encyclopediaEntryPrefab;                    
                     
-                    if (!LoadAsset("AlterraHubFabStation", QPatch.GlobalBundle, out var alterraHubFabricatorPrefab)) return false;
+                    if (!LoadAsset(Mod.AlterraHubStationPrefabName, QPatch.GlobalBundle, out var alterraHubFabricatorPrefab)) return false;
                     AlterraHubFabricatorPrefab = alterraHubFabricatorPrefab;
                     //AddFabStationComponents();
                     

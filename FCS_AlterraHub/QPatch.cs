@@ -161,6 +161,9 @@ namespace FCS_AlterraHub
             BoxOpenSoundAsset = ScriptableObject.CreateInstance<FMODAsset>();
             BoxOpenSoundAsset.id = "box_open";
             BoxOpenSoundAsset.path = "event:/loot/databox/box_open";
+
+            var station = new AlterraStationSpawnable();
+            station.Patch();
         }
         
         private static void PatchBuildables()

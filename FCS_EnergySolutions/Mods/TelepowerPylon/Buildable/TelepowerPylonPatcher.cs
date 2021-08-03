@@ -104,6 +104,8 @@ namespace FCS_EnergySolutions.TelepowerPylon.Buildables
                 pr.powerFX = pFX;
                 pr.maxOutboundDistance = 15;
 
+                //var powerSource = prefab.EnsureComponent<PowerSource>();
+
                 prefab.AddComponent<TechTag>().type = TechType;
                 prefab.AddComponent<TelepowerPylonController>();
 

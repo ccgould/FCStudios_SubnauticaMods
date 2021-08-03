@@ -86,6 +86,11 @@ namespace FCS_AlterraHub.Configuration
         internal const string DronePortPadHubNewDescription = "N/A";
         internal const string DronePortPadHubNewTabID = "DPP";
 
+        internal const string AlterraHubStationClassID = "AlterraHubStation";
+        internal const string AlterraHubStationFriendly = "AlterraHub Station";
+        internal const string AlterraHubStationDescription = "N/A";
+        internal const string AlterraHubStationPrefabName = "AlterraHubFabStation";
+
         internal static TechType AlterraHubDepotTechType { get; set; }
         internal const string OreConsumerTabID = "OC";
 

@@ -57,10 +57,13 @@ namespace FCS_AlterraHub.Patches
 
             CoroutineHost.StartCoroutine(CreateFcsPda(__instance));
             //var shouldPlay = (bool)_shouldPlayIntro.GetValue(__instance.GetPDA());
-            Mod.OnGamePlaySettingsLoaded += settings =>
-            {
-                CoroutineHost.StartCoroutine(Mod.SpawnAlterraFabStation(settings));
-            };
+
+            
+
+            //Mod.OnGamePlaySettingsLoaded += settings =>
+            //{
+            //    CoroutineHost.StartCoroutine(Mod.SpawnAlterraFabStation(settings));
+            //};
             Mod.LoadGamePlaySettings();
         }
         

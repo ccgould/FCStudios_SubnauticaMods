@@ -130,6 +130,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
             if (devices == null)
             {
                 QuickLogger.ModMessage( $"Failed to find any Hub Depots giving a refund.");
+                Subtitles.main.Add($"Your order has been refunded. Please report to FCStudios", null);
                 foreach (CartItemSaveData cartItem in order)
                 {
                     cartItem.Refund();
@@ -169,6 +170,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
             }
 
             AlterraFabricatorStationController.Main.ClearCurrentOrder();
+            Subtitles.main.Add($"Your order has being shipped to base {GetBaseName()}", null);
         }
 
         public override void Awake()

@@ -110,13 +110,11 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
             {
                 if (destinationPort == null)
                 {
-                    QuickLogger.Error("Destination Port returned null",true);
+                    QuickLogger.Error("Destination Port returned null", true);
                     return false;
                 }
 
-                QuickLogger.Debug("Trying to ship");
-                this.destinationPort = destinationPort;
-                Depart();
+                StartCoroutine(ShipOrderAsync(destinationPort));
                 return true;
             }
             catch (Exception e)
@@ -125,6 +123,15 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
                 QuickLogger.Error(e.StackTrace);
                 return false;
             }
+        }
+
+        private IEnumerator ShipOrderAsync(AlterraDronePortController destinationPort)
+        {
+            yield return new WaitForSeconds(5f);
+            QuickLogger.Debug("Trying to ship");
+            this.destinationPort = destinationPort;
+            Depart();
+            yield break;
         }
 
         public void Dock()
@@ -241,6 +248,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 
                 BaseManager.FindManager(data.DestinationBaseID, result =>
                 {
+                    //TODO Gets stuck in a loop when cant find the base best to stop checking after a certain amount of time
                     destinationPort = result.GetPortManager().GetOpenPort();
                 });
 
