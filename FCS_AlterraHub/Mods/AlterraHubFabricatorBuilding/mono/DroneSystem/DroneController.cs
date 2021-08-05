@@ -130,6 +130,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
             yield return new WaitForSeconds(5f);
             QuickLogger.Debug("Trying to ship");
             this.destinationPort = destinationPort;
+            destinationPort.SetInboundDrone(this);
             Depart();
             yield break;
         }
@@ -175,6 +176,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
             departurePort.PlayAnimationState(DronePortAnimation.Departing, (() =>
             {
                 QuickLogger.Debug("Begining Transport.",true);
+                departurePort.ClearInbound();
                 StateMachine.SwitchToNewState(typeof(TransportState));
                 _isDeparting = false;
             }));
@@ -251,6 +253,8 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
                     //TODO Gets stuck in a loop when cant find the base best to stop checking after a certain amount of time
                     destinationPort = result.GetPortManager().GetOpenPort();
                 });
+
+                destinationPort?.SetInboundDrone(this);
 
                 var state = StateFactory.GetState(data.State);
 

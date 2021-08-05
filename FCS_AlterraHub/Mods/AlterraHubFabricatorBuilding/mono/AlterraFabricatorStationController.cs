@@ -52,7 +52,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         private readonly GameObject[] _electList = new GameObject[6];
         private Dictionary<string, IDroneDestination> _ports = new();
         private Dictionary<AlterraDronePortController, List<CartItemSaveData>> _pendingPurchase = new();
-        private HashSet<DroneController> _drones = new();
+        private HashSet<DroneController> _drones = new HashSet<DroneController>();
         private string _st;
         private PortManager _portManager;
         private string _baseID;
@@ -331,23 +331,41 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             {
                 if (_drones.Count <= 0)
                 {
-                    //FCSPDA.Mono.FCSPDAController.Main.ShowMessage("");
+
+            //FCSPDA.Mono.FCSPDAController.Main.ShowMessage("");
                     ResetDrones();
                 }
 
                 foreach (DroneController drone in _drones)
                 {
                     var purchase = _pendingPurchase.ElementAt(i);
+                    if (purchase.Key is null)
+                    {
+                        foreach (CartItemSaveData cartItemSaveData in purchase.Value)
+                        {
+                            cartItemSaveData.Refund();
+                        }
+                        _pendingPurchase.Remove(purchase.Key);
+                        return;
+                    }
 
-                    if(!drone.AvailableForTransport()) continue;
+                    if (drone is null)
+                    {
+                        SpawnMissingDrones(true);
+                        continue;
+                    }
+                    if (!drone.AvailableForTransport()) continue;
 
                     if (drone.ShipOrder(purchase.Key))
                     {
                         _currentOrder = purchase.Value;
                         _pendingPurchase.Remove(purchase.Key);
+
                         Subtitles.main.Add($"Your order is now being shipped to base {purchase.Key.GetBaseName()}", null);
+
                         Mod.GamePlaySettings.CurrentOrder = _currentOrder;
                     }
+
                     if (_pendingPurchase.Count <= 0) break;
                 }
             }
@@ -355,9 +373,22 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             SavePendingPurchase();
         }
 
-        private void SpawnMissingDrones()
+        private void SpawnMissingDrones(bool clearDrones = false)
         {
-            if(!_gamePlaySettingsLoaded) return;
+            if (!_gamePlaySettingsLoaded)
+            {
+                return;
+            }
+
+            if (clearDrones)
+            {
+                ResetDrones();
+                _drones?.Clear();
+                _drones ??= new HashSet<DroneController>();
+
+            }
+
+
             if (_drones.Count < MAXDRONECOUNT)
             {
                 if (!Mod.GamePlaySettings.TransDroneSpawned)
@@ -373,14 +404,6 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
                         _drones.Add(drone);
                         drone.LoadData();
                     }
-
-                    //foreach (KeyValuePair<string, IDroneDestination> port in _ports)
-                    //{
-                    //    var drone = port.Value.SpawnDrone();
-                    //    _drones.Add(drone);
-                    //    //Mod.GamePlaySettings.DronePortAssigns.Add(drone.GetId(), port.Value.GetPortID());
-                    //}
-                    //transform.parent = _drones.ElementAt(0)?.transform.parent;
 
                     Mod.GamePlaySettings.TransDroneSpawned = true;
                 }
@@ -405,12 +428,19 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
                 }
             }
 
+            ClearDronesList();
 
-            _drones.Clear();
+
 
             Mod.GamePlaySettings.TransDroneSpawned = false;
 
             SpawnMissingDrones();
+        }
+
+        private void ClearDronesList()
+        {
+            _drones ??= new HashSet<DroneController>();
+            _drones.Clear();
         }
 
 

@@ -267,6 +267,11 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
 
         public override bool CanDeconstruct(out string reason)
         {
+            if (PlatformTrigger != null && PlatformTrigger.IsPlayerInside)
+            {
+                reason = "Cannot deconstruct while player in on elevator";
+                return false;
+            }
             reason = string.Empty;
             return true;
         }

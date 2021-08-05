@@ -35,6 +35,8 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
         private bool _isPlaying;
         private Animator _animator;
         private int _stateHash;
+        private bool _hasTransportInbound => _droneInbound != null;
+        private DroneController _droneInbound;
 
         public override bool IsOperational => IsInitialized && IsConstructed;
         public Transform BaseTransform { get; set; }
@@ -89,6 +91,11 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
             SetDockedDrone(null);
         }
 
+        internal void ClearInbound()
+        {
+            _droneInbound = null;
+        }
+
         public void Dock(DroneController droneController)
         {
             SetDockedDrone(droneController);
@@ -96,7 +103,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 
         public Transform GetEntryPoint()
         {
-            return _entryPoint.transform;
+            return _entryPoint == null ? null : _entryPoint?.transform;
         }
 
         public int GetPortID()
@@ -373,6 +380,15 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
         public override bool CanDeconstruct(out string reason)
         {
             reason = string.Empty;
+
+            if (_hasTransportInbound)
+            {
+                reason = "Port has a transport inbound please wait until delivery is complete";
+                return false;
+            }
+
+
+
             return true;
         }
 
@@ -476,6 +492,11 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
                     _animator.SetInteger(_stateHash, 0);
                 }
             ));
+        }
+
+        public void SetInboundDrone(DroneController droneController)
+        {
+            _droneInbound = droneController;
         }
     }
 }
