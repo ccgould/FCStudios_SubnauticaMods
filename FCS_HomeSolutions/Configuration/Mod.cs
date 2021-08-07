@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Model.Utilities;
 using FCS_AlterraHub.Mono;
@@ -11,10 +12,13 @@ using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Mods.PaintTool;
 using FCS_HomeSolutions.Spawnables;
 using FCSCommon.Utilities;
+using FMOD;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
 using SMLHelper.V2.Utility;
 using UnityEngine;
+using UnityEngine.Networking;
+using Debug = System.Diagnostics.Debug;
 
 namespace FCS_HomeSolutions.Configuration
 {
@@ -23,7 +27,7 @@ namespace FCS_HomeSolutions.Configuration
         private static ModSaver _saveObject;
         private static SaveData _saveData;
         private static List<PaintToolController> _registeredPaintTool;
-        
+
         internal const string ModPackID = "FCSHomeSolutions";
         internal const string ModFriendlyName = "Home Solutions";
         internal const string ModBundleName = "fcshomesolutionsbundle";
@@ -36,6 +40,20 @@ namespace FCS_HomeSolutions.Configuration
         internal const string RecyclerPrefabName = "Recycler";
         internal const string RecyclerKitClassID = "Recycler_Kit";
         internal const string RecyclerTabID = "RR";
+
+        internal const string JukeBoxClassID = "FCSJukebox";
+        internal const string JukeBoxFriendly = "Jukebox";
+        internal const string JukeBoxDescription = "N/A";
+        internal const string JukeBoxPrefabName = "Jukebox";
+        internal const string JukeBoxKitClassID = "Jukebox_Kit";
+        internal const string JukeBoxTabID = "JB";
+
+        internal const string JukeBoxSpeakerClassID = "FCSJukeboxSpeaker";
+        internal const string JukeBoxSpeakerFriendly = "Jukebox Speaker";
+        internal const string JukeBoxSpeakerDescription = "N/A";
+        internal const string JukeBoxSpeakerPrefabName = "JukeBoxSpeaker";
+        internal const string JukeBoxSpeakerKitClassID = "JukeboxSpeaker_Kit";
+        internal const string JukeBoxSpeakerTabID = "JBS";
 
 
         internal const string ElevatorClassID = "Elevator";
@@ -58,7 +76,7 @@ namespace FCS_HomeSolutions.Configuration
         internal const string FireExtinguisherRefuelerPrefabName = "FireExtinguisherRefueler";
         internal const string FireExtinguisherRefuelerKitClassID = "FireExtinguisherRefueler_Kit";
         internal const string FireExtinguisherRefuelerTabID = "FER";
-        
+
         internal const string PaintToolClassID = "PaintTool";
         internal const string PaintToolFriendly = "Alterra Paint Tool";
         internal const string PaintToolDescription = "Change the color of Primary and Secondary surfaces, and LED lights (requires Paint Can). Only suitable for Alterra FCStudios products.";
@@ -77,9 +95,9 @@ namespace FCS_HomeSolutions.Configuration
         internal const string HoverLiftPadDescription = "Get from one elevation to the next with ease. Een your PRAWN suit along so you don’t get lonely.";
         internal const string HoverLiftPrefabName = "HoverLiftPad";
         internal static string HoverLiftPadKitClassID = $"{HoverLiftPadClassID}_Kit";
-        internal const string HoverLiftPadTabID = "HLP";        
-        
-        
+        internal const string HoverLiftPadTabID = "HLP";
+
+
         internal const string HologramPosterClassID = "HologramPoster";
         internal const string HologramPosterFriendly = "Hologram Poster";
         internal const string HologramPosterDescription = "N/A";
@@ -93,7 +111,7 @@ namespace FCS_HomeSolutions.Configuration
         internal const string SmartPlanterPotPrefabName = "SmartPlanterPot";
         internal static string SmartPlanterPotKitClassID = $"{SmartPlanterPotClassID}_Kit";
         internal const string SmartPlanterPotTabID = "SMP";
-        
+
         internal const string MiniFountainFilterClassID = "MiniFountainFilter";
         internal const string MiniFountainFilterFriendly = "Mini Filter & Fountain";
         internal const string MiniFountainFilterDescription = "A smaller water filtration system for your base or cyclops.";
@@ -113,8 +131,8 @@ namespace FCS_HomeSolutions.Configuration
         internal const string QuantumTeleporterDescription = "Teleport to other Quantum Teleporter units inside your base or to an entirely different base.";
         internal const string QuantumTeleporterPrefabName = "QuantumTeleporter";
         internal static string QuantumTeleporterKitClassID = $"{QuantumTeleporterClassID}_Kit";
-        internal const string QuantumTeleporterTabID = "QT";        
-        
+        internal const string QuantumTeleporterTabID = "QT";
+
         internal const string AlienChefClassID = "AlienChef";
         internal const string AlienChefFriendly = "Alien Chef";
         internal const string AlienChefDescription = "Forget the Fabricator: let the Alien Chef do the cooking and curing for you. 200 cooked fish for a party? No problem!";
@@ -302,7 +320,7 @@ namespace FCS_HomeSolutions.Configuration
             }
         };
 #endif
-        
+
 
 #if SUBNAUTICA
         internal static TechData PaintToolIngredients => new TechData
@@ -415,9 +433,9 @@ namespace FCS_HomeSolutions.Configuration
         internal static string SaveDataFilename => $"{ModPackID}SaveData.json";
 
         public static TechType CurtainTechType { get; internal set; }
-        public static Dictionary<TechType,decimal> PeeperBarFoods = new Dictionary<TechType, decimal>();
+        public static Dictionary<TechType, decimal> PeeperBarFoods = new Dictionary<TechType, decimal>();
 
-        internal static Dictionary<TechType,TechType> CustomFoods = new Dictionary<TechType,TechType>();
+        internal static Dictionary<TechType, TechType> CustomFoods = new Dictionary<TechType, TechType>();
 
         private static void GetCraftTreeData(CraftNode innerNodes)
         {
@@ -447,7 +465,7 @@ namespace FCS_HomeSolutions.Configuration
 
             if (CustomFoods.Any()) return;
 
-                var smlCTPatcher = typeof(CraftTreeHandler).Assembly.GetType("SMLHelper.V2.Patchers.CraftTreePatcher");
+            var smlCTPatcher = typeof(CraftTreeHandler).Assembly.GetType("SMLHelper.V2.Patchers.CraftTreePatcher");
             var customTrees = (Dictionary<CraftTree.Type, ModCraftTreeRoot>)smlCTPatcher
                 .GetField("CustomTrees", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
             foreach (KeyValuePair<CraftTree.Type, ModCraftTreeRoot> entry in customTrees)
@@ -500,11 +518,11 @@ namespace FCS_HomeSolutions.Configuration
                 foreach (var controller in FCSAlterraHubService.PublicAPI.GetRegisteredDevices())
                 {
                     QuickLogger.Debug($"Attempting to save device: {controller.Value?.UnitID} | Package Valid: { controller.Value?.PackageId == ModPackID}");
-                    
+
                     if (controller.Value != null && controller.Value.PackageId == ModPackID)
                     {
                         QuickLogger.Debug($"Saving device: {controller.Value.UnitID}");
-                        ((IFCSSave<SaveData>)controller.Value).Save(newSaveData,serializer);
+                        ((IFCSSave<SaveData>)controller.Value).Save(newSaveData, serializer);
                     }
                 }
                 _saveData = newSaveData;
@@ -565,7 +583,7 @@ namespace FCS_HomeSolutions.Configuration
                 }
             }
 
-            return new DecorationDataEntry{ Id = id };
+            return new DecorationDataEntry { Id = id };
         }
 
         internal static PaintToolDataEntry GetPaintToolDataEntrySaveData(string id)
@@ -618,7 +636,7 @@ namespace FCS_HomeSolutions.Configuration
             {
                 _registeredPaintTool.Add(paintTool);
             }
-                
+
         }
 
         internal static void UnRegisterPaintTool(PaintToolController paintTool)
@@ -791,8 +809,8 @@ namespace FCS_HomeSolutions.Configuration
             }
 
             return new CabinetDataEntry() { Id = id };
-        } 
-        
+        }
+
         public static ObservationTankDataEntry GetObservationTankDataEntrySaveData(string id)
         {
             LoadData();
@@ -830,7 +848,7 @@ namespace FCS_HomeSolutions.Configuration
 
             return new LedLightDataEntry() { Id = id };
         }
-        
+
         public static FEXRDataEntry FEXREntrySaveData(string id)
         {
             LoadData();
@@ -867,8 +885,8 @@ namespace FCS_HomeSolutions.Configuration
             }
 
             return new SignDataEntry() { Id = id };
-        }        
-        
+        }
+
         public static AlterraMiniBathroomDataEntry GetAlterraMiniBathroomSaveData(string id)
         {
             LoadData();
@@ -986,5 +1004,102 @@ namespace FCS_HomeSolutions.Configuration
 
         //    return new T();
         //}
+        public static JukeBoxDataEntry JukeBoxEntrySaveData(string id)
+        {
+            LoadData();
+
+            var saveData = GetSaveData();
+
+            foreach (var entry in saveData.JukeBoxDataEntries)
+            {
+                if (string.IsNullOrEmpty(entry.Id)) continue;
+
+                if (entry.Id == id)
+                {
+                    return entry;
+                }
+            }
+
+            return new JukeBoxDataEntry() { Id = id };
+        }
+
+        private static readonly HashSet<string> _supportedExtensions = new(StringComparer.OrdinalIgnoreCase)
+        {
+            /*".mp3",
+            ".ogg",*/
+            ".wav",
+            //".flac"
+        };
+
+        internal static List<TrackData> Playlist = new();
+        private static int _failed;
+        private static bool _musicScanned;
+
+        internal static async Task ScanForMusic(bool forceScan = false)
+        {
+            if (_musicScanned && !forceScan)
+            {
+                return;
+            }
+            var services = PlatformUtils.main.GetServices();
+            var fullMusicPath = services.GetUserMusicPath();
+
+            _failed = 0;
+            Playlist.Clear();
+
+            if (!string.IsNullOrWhiteSpace(fullMusicPath))
+            {
+                DirectoryInfo directoryInfo = new DirectoryInfo(fullMusicPath);
+                if (!directoryInfo.Exists)
+                {
+                    directoryInfo.Create();
+                    directoryInfo.Refresh();
+                }
+
+                foreach (var fileInfo in directoryInfo.GetFiles("*", SearchOption.TopDirectoryOnly))
+                {
+                    if (_supportedExtensions.Contains(fileInfo.Extension))
+                    {
+                        var clip = await LoadClip(fileInfo.FullName);
+                        Playlist.Add(new TrackData{Path = fileInfo.Name , AudioClip = clip });
+                    }
+                }
+            }
+
+            _musicScanned = true;
+        }
+
+        private static async Task<AudioClip> LoadClip(string path)
+        {
+            AudioClip clip = null;
+            using (UnityWebRequest uwr = UnityWebRequestMultimedia.GetAudioClip(path, AudioType.WAV))
+            {
+                uwr.SendWebRequest();
+
+                // wrap tasks in try/catch, otherwise it'll fail silently
+                try
+                {
+                    while (!uwr.isDone) await Task.Delay(5);
+
+                    if (uwr.isNetworkError || uwr.isHttpError) QuickLogger.Error($"{uwr.error}");
+                        else
+                        {
+                            clip = DownloadHandlerAudioClip.GetContent(uwr);
+                        }
+                }
+                catch (Exception err)
+                {
+                    QuickLogger.Error($"{err.Message}, {err.StackTrace}");
+                }
+            }
+
+            return clip;
+        }
+    }
+
+    internal struct TrackData
+    {
+        public string Path { get; set; }
+        public AudioClip AudioClip { get; set; }
     }
 }

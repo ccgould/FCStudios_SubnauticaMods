@@ -86,7 +86,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Mono
 
         private void AttemptToChargeBattery()
         {
-            if (GetTotalCharge() <= 0 || _powerBank.Battery.IsFull()) return;
+            if (/*GetTotalCharge() <= 0 ||*/ _powerBank.Battery.IsFull()) return;
 
             var amount = _powerBank.Battery.GetCapacity() - _powerBank.Battery.GetCharge();
             
@@ -115,6 +115,22 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Mono
                 _powerBank.Battery.AddCharge(amountConsumed);
                 amount -= amountConsumed;
             }
+
+            if (amount <= 0)
+            {
+                OnBatteryUpdate?.Invoke(_powerBank.Battery);
+                return;
+            }
+
+            if (_mono.Manager != null)
+            {
+                _mono.Manager.Habitat.powerRelay.ConsumeEnergy(amount, out float amountConsumed2);
+                _powerBank.Battery.AddCharge(amountConsumed2);
+                amount -= amountConsumed2;
+            }
+
+
+
             OnBatteryUpdate?.Invoke(_powerBank.Battery);
         }
 

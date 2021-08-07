@@ -14,6 +14,7 @@ using FCS_HomeSolutions.Mods.Curtains.Buildable;
 using FCS_HomeSolutions.Mods.Elevator.Buildable;
 using FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Buildable;
 using FCS_HomeSolutions.Mods.HologramPoster.Buildable;
+using FCS_HomeSolutions.Mods.JukeBox.Buildable;
 using FCS_HomeSolutions.Mods.LedLights.Buildable;
 using FCS_HomeSolutions.Mods.MiniFountainFilter.Buildables;
 using FCS_HomeSolutions.Mods.PaintTool.Spawnable;
@@ -189,6 +190,13 @@ namespace FCS_HomeSolutions
                 elevator.Patch();
                 AudioUtils.CreateSound(Path.Combine(Mod.GetAssetPath(), "Audio", "LiftSoundEffect.mp3"));
             }
+
+            var jukeBox = new JukeBoxBuildable();
+            jukeBox.Patch();
+
+            var jukeboxSpeaker = new JukeBoxSpeakerBuildable();
+            jukeboxSpeaker.Patch();
+
 
             var hologramPoster = new HologramPosterBuildable();
             hologramPoster.Patch();

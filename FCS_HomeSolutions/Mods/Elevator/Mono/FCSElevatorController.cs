@@ -39,7 +39,7 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
         internal const float POWERUSAGE = .5f;
         internal PlatformTrigger PlatformTrigger { get; private set; }
         private const float LerpTime = .1f;
-        public override bool IsOperational => IsConstructed && IsInitialized;
+        public override bool IsOperational => IsConstructed && IsInitialized && Manager != null;
 
         public override float GetPowerUsage()
         {
@@ -84,9 +84,6 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
             var abs = Math.Abs(height - _currentFloor.Meters);
 
             _isMoving = abs > 0.02;
-
-
-
             //QuickLogger.Debug($"LP: {height} | M: {_currentFloor.Meters} | ABS:{abs} | IsMoving: {IsMoving()}");
         }
 
@@ -96,9 +93,7 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
             var platForm = GameObjectHelpers.FindGameObject(gameObject, "Platform");
             PlatformTrigger = platForm.AddComponent<PlatformTrigger>();
             _platFormTrans = platForm.transform;
-
-
-
+            
             _poleController = GameObjectHelpers.FindGameObject(gameObject, "pole")
                 .AddComponent<PlatformPoleController>();
             _poleController.Initialize(this);
@@ -106,8 +101,7 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
             _startPos = GameObjectHelpers.FindGameObject(gameObject, "StartPos");
 
             _floorsContainer = GameObjectHelpers.FindGameObject(gameObject, "Floors");
-
-
+            
             var railings = GameObjectHelpers.FindGameObjects(gameObject, "railing_", SearchOption.StartsWith);
 
             foreach (GameObject railing in railings)
@@ -163,7 +157,7 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
                     : 22000f;
 
 
-            if (_audio.isPlaying && Mathf.Approximately(Time.timeScale, 0f))
+            if (_audio.isPlaying && Mathf.Approximately(Time.timeScale, 0f) || !Manager.HasEnoughPower(POWERUSAGE))
             {
                 _audio.Pause();
                 return;
@@ -391,7 +385,7 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
                 return 0f;
             }
 
-            return GetHighestFloorLevel() + 8f;
+            return GetHighestFloorLevel() + 10f;
         }
 
         public bool DeleteLevel(string floorId)
@@ -511,9 +505,13 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
 
             var key = GameInput.GetBindingName(GameInput.Button.Reload, GameInput.BindingSet.Primary);
 
+            var message = hand.IsTool()
+                ? "Please clear hand to call elevator"
+                : $"Press ({key}) to call elevator back to home.";
+
             var data = new[]
             {
-                $"Press ({key}) to call elevator back to home.",
+                message,
                 AlterraHub.PowerPerMinute(GetPowerUsage())
             };
             data.HandHoverPDAHelperEx(GetTechType(),HandReticle.IconType.Info);
@@ -553,6 +551,11 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
         private float RoundToOneDec(float unrounded)
         {
             return Mathf.Round(unrounded * 1000) / 1000;
+        }
+
+        public int GetFloorCount()
+        {
+            return _floorData?.Count ?? ElevatorHUD.Main.MAX_FLOOR_LEVELS;
         }
     }
 }

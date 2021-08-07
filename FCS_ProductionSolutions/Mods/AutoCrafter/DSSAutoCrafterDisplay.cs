@@ -161,7 +161,10 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                     _status.text = status.ToUpper();
                 };
 
-                OnTotalUpdate += (amount, maxAmount) => { _total.text = $"{amount}/{maxAmount}"; };
+                OnTotalUpdate += (amount, maxAmount) =>
+                {
+                    _total.text = _mono.GetOperation().IsRecursive ? "\u221E" : $"{amount}/{maxAmount}";
+                };
             }
             catch (Exception e)
             {

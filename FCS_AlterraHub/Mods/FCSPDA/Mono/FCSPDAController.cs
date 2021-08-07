@@ -530,6 +530,13 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
 
                 foreach (var cartItem in cart.GetItems())
                 {
+                    if (AlterraFabricatorStationController.Main == null)
+                    {
+                        QuickLogger.Error("FCSStation Main is null!");
+                        QuickLogger.ModMessage("The FCSStation cannot be found please contact FCSStudios for help with this issue. Order will be sent to your inventory");
+                        MakeAPurchase(cart, null, true);
+                        return true;
+                    }
                     AlterraFabricatorStationController.Main.PendAPurchase(depot, cartItem);
                 }
             }

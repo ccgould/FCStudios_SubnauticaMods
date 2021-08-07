@@ -124,6 +124,10 @@ namespace FCS_EnergySolutions.Mods.AlterraSolarCluster.Mono
             }
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject,Color.cyan);
             MaterialHelpers.ChangeSpecSettings(AlterraHub.BaseDecalsExterior,AlterraHub.TBaseSpec,gameObject,2.61f,8f);
+
+            MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseBeaconLightEmissiveController, gameObject, 50);
+            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseBeaconLightEmissiveController, gameObject, Color.red);
+
             IsInitialized = true;
         }
         

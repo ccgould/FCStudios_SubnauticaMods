@@ -29,6 +29,7 @@ namespace FCS_AlterraHub.Helpers
             {UWEPrefabID.BubbleColumnBig,"0dbd3431-62cc-4dd2-82d5-7d60c71a9edf"},
             {UWEPrefabID.StarshipGirder10,"99c0da07-a612-4cb7-9e16-e2e6bd3d6207"},
             {UWEPrefabID.DataBoxLight,"08e6c2a8-76df-41de-87fd-5cba315a8aa4"},
+            {UWEPrefabID.Platform,"e9b75112-f920-45a9-97cc-838ee9b389bb"}
         };
 
         public static GameObject SpawnAtPoint(string location, Transform trans, float scale = 0.179f)
@@ -179,11 +180,12 @@ namespace FCS_AlterraHub.Helpers
 
     public enum UWEPrefabID
     {
-        UnderwaterElecSourceMedium,
-        FloatingPapers,
-        BubbleColumnSmall,
-        BubbleColumnBig,
-        StarshipGirder10,
-        DataBoxLight
+        UnderwaterElecSourceMedium = 0,
+        FloatingPapers = 1,
+        BubbleColumnSmall = 2,
+        BubbleColumnBig = 3,
+        StarshipGirder10 = 4,
+        DataBoxLight = 5,
+        Platform = 6
     }
 }

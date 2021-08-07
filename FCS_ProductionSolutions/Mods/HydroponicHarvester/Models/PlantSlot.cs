@@ -26,7 +26,7 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Models
         public GameObject PlantModel;
         private const int MaxCapacity = 50;
         public bool PauseUpdates { get; set; }
-        public bool IsFull => GrowBedManager.GetItemCount(_returnTechType) >= MaxCapacity;
+        public bool IsFull => _count >= MaxCapacity;
         internal GameObject SlotBounds { get; set; }
         internal GrowBedManager GrowBedManager;
         private int _count;

@@ -52,9 +52,9 @@ namespace FCS_EnergySolutions.Configuration
         public float TelepowerPylonTrailBrightness { get; set; } = 1;
 
 
-        [Slider("[Telepower Pylon] Pylon Power Usage Per Meter", 0, 0.1f, Step = 0.01f, Format = "{0:F2}", DefaultValue = 0.01f,
+        [Slider("[Telepower Pylon] Pylon Power Usage Per Meter", 0, 0.00085f, Step = 0.00001f, Format = "{0:F6}", DefaultValue = 0.00085f,
             Order = 1,Tooltip = "Allows you to adjust the power usage of the Telepower Pylon.")]
-        public float TelepowerPylonPowerUsagePerMeter { get; set; } = 0.01f;
+        public float TelepowerPylonPowerUsagePerMeter { get; set; } = 0.00085f;
 
         [Toggle("[PowerStorage] Is Mod Enabled", Tooltip = "Enables/Disables PowerStorage from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool IsPowerStorageEnabled = true;

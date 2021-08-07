@@ -8,7 +8,7 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
         private Transform _trans;
         private const float Offset = -0.98f;
         private FCSElevatorController _controller;
-        private const float PoleHeight = 1.5983f;
+        public const float PoleHeight = 1.5983f;
 
         internal void Initialize(FCSElevatorController controller)
         {
@@ -16,6 +16,7 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
             _controller = controller;
             ElevatorHUD.Main.onFloorAdded += UpdatePole;
             ElevatorHUD.Main.onFloorRemoved += UpdatePole;
+            ElevatorHUD.Main.onFloorLevelChanged += UpdatePole;
         }
         
         internal void UpdatePole()
@@ -30,6 +31,7 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
         {
             ElevatorHUD.Main.onFloorAdded -= UpdatePole;
             ElevatorHUD.Main.onFloorRemoved -= UpdatePole;
+            ElevatorHUD.Main.onFloorLevelChanged -= UpdatePole;
         }
     }
 }

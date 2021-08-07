@@ -82,9 +82,13 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
 
         private static void SetWarpPosition()
         {
+
             Quaternion quaternion = Quaternion.Euler(new Vector3(0f, 180f, 0f));
-            Player.main.gameObject.transform.position = _destinationTeleporter.GetTarget().position;
+            Player.main.SetPosition(_destinationTeleporter.GetTarget().position);
             Player.main.gameObject.transform.rotation = quaternion;
+            Player.main.OnPlayerPositionCheat();
+            //Player.main.gameObject.transform.position = _destinationTeleporter.GetTarget().position;
+
         }
         
         private static void CheckTeleportationComplete()

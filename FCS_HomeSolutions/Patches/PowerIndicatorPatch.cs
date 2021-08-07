@@ -11,6 +11,7 @@ using FCS_HomeSolutions.Mods.Elevator.Mono;
 using FCSCommon.Utilities;
 using HarmonyLib;
 using Oculus.Newtonsoft.Json.Serialization;
+using rail;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -66,6 +67,7 @@ namespace FCS_HomeSolutions.Patches
                 return this._inputDummy;
             }
         }
+        public int MAX_FLOOR_LEVELS = 20;
         private bool _cursorLockCached;
         private bool _isOpen;
         private GameObject _grid;
@@ -76,6 +78,8 @@ namespace FCS_HomeSolutions.Patches
         private Text _speedAmount;
         internal Action onFloorAdded;
         internal Action onFloorRemoved;
+        internal Action onFloorLevelChanged;
+
         private void Awake()
         {
 
@@ -152,11 +156,7 @@ namespace FCS_HomeSolutions.Patches
             {
                 data.ElementAt(i).Value.FloorIndex = total--;
             }
-
-
-
             
-
             foreach (Transform item in _grid.transform)
             {
                 Destroy(item.gameObject);
@@ -198,6 +198,12 @@ namespace FCS_HomeSolutions.Patches
 
         private void AddNewItem()
         {
+            if (_currentController.GetFloorCount() > MAX_FLOOR_LEVELS)
+            {
+                ShowMessage($"Elevator floor limit is {MAX_FLOOR_LEVELS}");
+                return;
+            }
+            
             _currentController.AddNewFloor(Guid.NewGuid().ToString(), "Custom Floor",_currentController.GetNewFloorLevel(),_currentController.GetStoredFloorData().Count);
             OnLoadDisplay();
             onFloorAdded?.Invoke();
@@ -220,6 +226,8 @@ namespace FCS_HomeSolutions.Patches
         private InputField _nameField;
         private string _id;
         private FCSElevatorController _controller;
+        private float MAX_FLOOR_LEVEL_IN_METERS = 200f;
+        private float _prevMeters;
 
         public void Initialize(FCSElevatorController controller, int index, float meters, string name,string id)
         {
@@ -229,9 +237,12 @@ namespace FCS_HomeSolutions.Patches
 
             _id = id;
 
+            _prevMeters = meters;
+
             _floorField = GameObjectHelpers.FindGameObject(gameObject, "FloorField").GetComponent<InputField>();
             _floorField.SetTextWithoutNotify(meters.ToString());
             _floorField.onEndEdit.AddListener(OnEndFloorEdit);
+            _floorField.onValueChanged.AddListener(OnValueChanged);
 
             _nameField = GameObjectHelpers.FindGameObject(gameObject, "NameField").GetComponent<InputField>();
             _nameField.SetTextWithoutNotify(name);
@@ -252,13 +263,38 @@ namespace FCS_HomeSolutions.Patches
             goToFloorButton.onClick.AddListener((() =>
             {
                 QuickLogger.Debug($"Attempting to go to floor with Id: {_id}",true);
+
+                if (meters > MAX_FLOOR_LEVEL_IN_METERS)
+                {
+                    ElevatorHUD.Main.ShowMessage($"Cannot go to floor {name} due to it being over the maximum floor height of {MAX_FLOOR_LEVEL_IN_METERS}m. Please adjust floor level.");
+                    return;
+                }
+
+
                 controller.GoToFloor(_id);
             }));
+        }
+
+        private void OnValueChanged(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value) || value.Equals("0"))
+            {
+                _floorField.SetTextWithoutNotify(_prevMeters.ToString());
+                return;
+            }
+
+            if (float.Parse(value) > MAX_FLOOR_LEVEL_IN_METERS)
+            {
+                _floorField.SetTextWithoutNotify(_prevMeters.ToString());
+                ElevatorHUD.Main.ShowMessage($"This elevator cannot go higher than {MAX_FLOOR_LEVEL_IN_METERS}m.");
+            }
         }
 
         private void OnEndFloorEdit(string value)
         {
             _controller.UpdateFloor(_id, _nameField.text, float.Parse(value));
+            ElevatorHUD.Main.Refresh();
+            ElevatorHUD.Main.onFloorLevelChanged?.Invoke();
         }
 
         private void OnEndNameEdit(string value)

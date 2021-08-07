@@ -64,6 +64,8 @@ namespace FCS_HomeSolutions.Buildables
         public static GameObject FireExtinguisherRefuelerPrefab { get; set; }
         public static GameObject AlterraMiniBathroomPrefab { get; set; }
         public static GameObject HologramPosterPrefab { get; set; }
+        public static GameObject JukeboxSpeakerPrefab { get; set; }
+        public static GameObject JukeboxPrefab { get; set; }
 
         internal static void Initialize()
         {
@@ -96,7 +98,7 @@ namespace FCS_HomeSolutions.Buildables
             TrashReceptaclePrefab = GetPrefab(Mod.TrashReceptaclePrefabName);
             TrashRecyclerPrefab = GetPrefab(Mod.RecyclerPrefabName);
             PaintCanPrefab = GetPrefab(Mod.PaintCanPrefabName);
-            QuantumTeleporterPrefab = GetPrefab(Mod.QuantumTeleporterPrefabName);
+            QuantumTeleporterPrefab = GetPrefab(Mod.QuantumTeleporterPrefabName,true);
             AlienChefPrefab = GetPrefab(Mod.AlienChefPrefabName);
             Cabinet1Prefab = GetPrefab(Mod.Cabinet1PrefabName);
             Cabinet2Prefab = GetPrefab(Mod.Cabinet2PrefabName);
@@ -114,6 +116,8 @@ namespace FCS_HomeSolutions.Buildables
             LedLightLongPrefab = GetPrefab("FCS_LedLightStick_03");
             LedLightShortPrefab = GetPrefab("FCS_LedLightStick_01");
             LedLightWallPrefab = GetPrefab("FCS_LedLightStick_02");
+            JukeboxPrefab = GetPrefab("JukeBox", true);
+            JukeboxSpeakerPrefab = GetPrefab("JukeBoxSpeaker", true);
             _initialized = true;
         }
         

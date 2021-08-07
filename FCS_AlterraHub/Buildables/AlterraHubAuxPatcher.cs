@@ -70,6 +70,7 @@ namespace FCS_AlterraHub.Buildables
             { $"{ModKey}_NoDestinationFound","Please select a destination for your items to be transferred to. You must have an AlterraHub Depot at a base."},
             { $"{ModKey}_IsDeviceOn","Device On: {0}"},
             { $"{ModKey}_PowerPerMinute","Power Per Minute: {0}"},
+            { $"{ModKey}_Waiting","WAITING"},
         };
 
         private void AdditionalPatching()
@@ -398,7 +399,12 @@ namespace FCS_AlterraHub.Buildables
 
         public static string PowerPerMinute(float value)
         {
-            return string.Format(GetLanguage($"{ModKey}_PowerPerMinute"), value);
+            return string.Format(GetLanguage($"{ModKey}_PowerPerMinute"), value.ToString("F2"));
+        }
+
+        public static string Waiting()
+        {
+            return GetLanguage($"{ModKey}_Waiting");
         }
     }
 }

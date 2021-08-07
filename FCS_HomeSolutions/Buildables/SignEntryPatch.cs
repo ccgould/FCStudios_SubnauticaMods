@@ -164,7 +164,7 @@ namespace FCS_HomeSolutions.Buildables
         public override void Initialize()
         {
             if (IsInitialized) return;
-            
+            gameObject.GetComponentInChildren<Canvas>(true).gameObject.SetActive(true);
             _labelController = GameObjectHelpers.FindGameObject(gameObject, "SignLabel").AddComponent<LabelController>();
             _labelController.Initialize();
 
@@ -272,6 +272,7 @@ namespace FCS_HomeSolutions.Buildables
         internal void Initialize()
         {
             if(_initialized) return;
+            
             _text = gameObject.GetComponent<Text>();
 
             if (_nameController == null)

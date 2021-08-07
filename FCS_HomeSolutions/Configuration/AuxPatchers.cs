@@ -69,6 +69,8 @@ namespace FCS_HomeSolutions.Configuration
             { $"{ModKey}_FailedToRecycleFormat","Failed to recycle item: {0}"},
             { $"{ModKey}_CannotDeleteLevelFormat","Cannot delete level: {0}"},
             { $"{ModKey}_DeleteLevelConfirmation","Are you sure you would like to delete level ({0})"},
+            { $"{ModKey}_MovingTo","MOVING TO"},
+            { $"{ModKey}_CurrentlyAt","CURRENTLY AT"},
         };
 
         internal static void AdditionalPatching()
@@ -368,6 +370,16 @@ namespace FCS_HomeSolutions.Configuration
         public static string CustomFoods()
         {
             return GetLanguage($"{ModKey}_OtherFoods");
+        }
+
+        public static string MovingTo()
+        {
+            return GetLanguage($"{ModKey}_MovingTo");
+        }
+
+        public static string CurrentlyAt()
+        {
+            return GetLanguage($"{ModKey}_CurrentlyAt");
         }
     }
 }

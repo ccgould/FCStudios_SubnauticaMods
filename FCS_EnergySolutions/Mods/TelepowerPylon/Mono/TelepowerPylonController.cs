@@ -55,7 +55,7 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
         private TechType _mk3UpgradeTechType;
         private Button _upgradeBTN;
         private ParticleSystem[] _particles;
-        private bool _ifFromConstructed;
+        private bool _isFromConstructed;
         private InterfaceInteraction _interactionHelper;
 
         private const int DEFAULT_CONNECTIONS_LIMIT = 6;
@@ -165,7 +165,7 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
         {
             OnDestroyCalledAction?.Invoke(this);
 
-            if (_ifFromConstructed)
+            if (_isFromConstructed)
             {
                 switch (_currentUpgrade)
                 {
@@ -708,7 +708,7 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
                     _runStartUpOnEnable = true;
                 }
 
-                _ifFromConstructed = false;
+                _isFromConstructed = false;
             }
 
             QuickLogger.Debug($"Contstructed: {constructed}");
@@ -731,7 +731,7 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
                 return false;
             }
 
-            _ifFromConstructed = true;
+            _isFromConstructed = true;
 
             return true;
         }
@@ -828,7 +828,7 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
                 var data = new[]
                 {
                     $"Unit ID: {UnitID} {additionalInformation} \nClick to use configure Telepower Pylon |",
-                    AlterraHub.PowerPerMinute(CalculatePowerUsage())
+                    AlterraHub.PowerPerMinute(CalculatePowerUsage() * 60)
                 };
                 data.HandHoverPDAHelperEx(GetTechType(), Manager == null ? HandReticle.IconType.HandDeny : HandReticle.IconType.Info);
             }

@@ -1,4 +1,5 @@
 ﻿using FCS_AlterraHomeSolutions.Mono.PaintTool;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Managers;
@@ -140,7 +141,7 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
             if (_colorManager == null)
                 _colorManager = gameObject.AddComponent<ColorManager>();
 
-            _colorManager.Initialize(gameObject, ModelPrefab.BodyMaterial);
+            _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol);
 
             if (NameController == null)
                 NameController = gameObject.EnsureComponent<NameController>();
@@ -172,6 +173,8 @@ namespace FCS_HomeSolutions.Mods.QuantumTeleporter.Mono
             };
 
             DisplayManager.Setup(this);
+
+            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseLightsEmissiveController, gameObject, Color.green);
 
             NameController.Initialize(AuxPatchers.Submit(), Mod.QuantumTeleporterFriendly);
             NameController.OnLabelChanged += OnLabelChanged;

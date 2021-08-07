@@ -122,6 +122,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                 case "InventoryBTN":
                     var techType = (TechType)tag;
                     var amount = (int)_mono.BulkMultiplier;
+                    QuickLogger.Debug($"Terminal ONButtonCLick: {techType} {_storageFilter} {amount}", true);
                     for (int i = 0; i < amount; i++)
                     {
                         if (!PlayerInteractionHelper.CanPlayerHold(techType))
@@ -129,7 +130,9 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Terminal
                             QuickLogger.Message(AlterraHub.InventoryFull());
                             continue;
                         }
+
                         var result = _currentBase.TakeItem(techType, _storageFilter);
+                        QuickLogger.Debug($"Terminal ONButtonCLick: 1 {result}", true);
                         if (result != null)
                         {
                             UpdateDisplay();

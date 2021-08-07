@@ -1,4 +1,6 @@
-﻿using FCS_AlterraHub.Helpers;
+﻿using FCS_AlterraHub.Buildables;
+using FCS_AlterraHub.Helpers;
+using FCS_HomeSolutions.Configuration;
 using FCS_HomeSolutions.Patches;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -20,6 +22,7 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
         private Text _floorName;
         private Text _speedText;
         private Text _speedAmount;
+        private GameObject _noPowerBackground;
 
         internal void Initialize(FCSElevatorController controller)
         {
@@ -27,6 +30,7 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
             _waitingBackground = GameObjectHelpers.FindGameObject(gameObject, "WaitingBackground");
             _movingToBackground = GameObjectHelpers.FindGameObject(gameObject, "MovingToBackground");
             _currentlyAtBackground = GameObjectHelpers.FindGameObject(gameObject, "CurrentlyAtBackground");
+            _noPowerBackground = GameObjectHelpers.FindGameObject(gameObject, "NoPowerBackground");
             _information = GameObjectHelpers.FindGameObject(gameObject, "Information");
             _statusMessage = GameObjectHelpers.FindGameObject(gameObject, "StatusMessage").GetComponent<Text>();
             _floorNumber = GameObjectHelpers.FindGameObject(gameObject, "FloorNumber").GetComponent<Text>();
@@ -42,22 +46,24 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
         {
             if (_controller.PlatformTrigger == null) return;
 
+
             if (!_controller.Manager.HasEnoughPower(FCSElevatorController.POWERUSAGE))
             {
                 _information.SetActive(false);
-                _waitingBackground.SetActive(true);
+                _waitingBackground.SetActive(false);
                 _movingToBackground.SetActive(false);
                 _currentlyAtBackground.SetActive(false);
-                _floorName.text = "NoPower";
+                _noPowerBackground.SetActive(true);
+                _floorName.text = Language.main.Get("NoPower");
             }
-
-            if (!_controller.PlatformTrigger.IsPlayerInside)
+            else if (!_controller.PlatformTrigger.IsPlayerInside)
             {
                 _information.SetActive(false);
                 _waitingBackground.SetActive(true);
                 _movingToBackground.SetActive(false);
                 _currentlyAtBackground.SetActive(false);
-                _floorName.text = "WAITING";
+                _noPowerBackground.SetActive(false);
+                _floorName.text = AlterraHub.Waiting();
             }
             else if (_controller.IsMoving())
             {
@@ -65,7 +71,9 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
                 _waitingBackground.SetActive(false);
                 _movingToBackground.SetActive(true);
                 _currentlyAtBackground.SetActive(false);
-                _statusMessage.text = "MOVING TO";
+                _noPowerBackground.SetActive(false);
+                _statusMessage.text = AuxPatchers.MovingTo();
+                _floorName.text = _controller.GetCurrentFloorData().FloorName.TruncateWEllipsis(15);
             }
             else
             {
@@ -73,27 +81,37 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
                 _waitingBackground.SetActive(false);
                 _movingToBackground.SetActive(false);
                 _currentlyAtBackground.SetActive(true);
-                _statusMessage.text = "CURRENTLY AT";
+                _noPowerBackground.SetActive(false);
+                _statusMessage.text = AuxPatchers.CurrentlyAt();
+                _floorName.text = _controller.GetCurrentFloorData().FloorName.TruncateWEllipsis(15);
             }
 
-            _floorName.text = _controller.GetCurrentFloorData().FloorName;
             _floorNumber.text = _controller.GetCurrentFloorIndex().ToString();
             _meterAmount.text = _controller.GetPlatformCurrentHeightRounded().ToString();
             _speedAmount.text = _controller.GetSpeedValue().ToString("0.00");
-
         }
 
         public void OnPointerHover(PointerEventData eventData)
         {
             if(!WorldHelpers.CheckIfInRange(gameObject,Player.main.gameObject,1)) return;
             var main = HandReticle.main;
-            main.SetInteractText("Open Control Panel");
-            main.SetIcon(HandReticle.IconType.Hand);
+
+            if (!_controller.IsOperational || !_controller.Manager.HasEnoughPower(FCSElevatorController.POWERUSAGE))
+            {
+                main.SetInteractText(Language.main.Get("NoPower"));
+                main.SetIcon(HandReticle.IconType.HandDeny);
+            }
+            else
+            {
+
+                main.SetInteractText("Open Control Panel");
+                main.SetIcon(HandReticle.IconType.Hand);
+            }
         }
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            if (!WorldHelpers.CheckIfInRange(gameObject, Player.main.gameObject, 1)) return;
+            if (!_controller.IsOperational || !WorldHelpers.CheckIfInRange(gameObject, Player.main.gameObject, 1) || !_controller.Manager.HasEnoughPower(FCSElevatorController.POWERUSAGE)) return;
             ElevatorHUD.Main.Show(_controller);
         }
     }

@@ -96,6 +96,17 @@ namespace FCS_AlterraHub.Mono
         public static TechType ActivateGoalTechType { get; set; }
         public Base BaseComponent { get; set; }
         public string BaseFriendlyID { get; set; }
+        public HashSet<FcsDevice> BaseSpeakersSources { get; set; } = new();
+
+        public void RegisterSpeaker(FcsDevice speaker)
+        {
+            BaseSpeakersSources.Add(speaker);
+        }
+
+        public void UnRegisterSpeaker(FcsDevice speaker)
+        {
+            BaseSpeakersSources.Remove(speaker);
+        }
 
         #region Default Constructor
 
@@ -665,7 +676,7 @@ namespace FCS_AlterraHub.Mono
                     }
                 }
             }
-            
+
             if (storageFilter == StorageType.StorageLockers || storageFilter == StorageType.All)
             {
                 foreach (StorageContainer locker in BaseStorageLockers)
@@ -682,29 +693,15 @@ namespace FCS_AlterraHub.Mono
                 }
             }
 
-            foreach (FcsDevice device in BaseFcsStorage)
+            if (storageFilter == StorageType.OtherStorage || storageFilter == StorageType.All)
             {
-                var storage = device?.GetStorage()?.ItemsContainer;
-                
-                if(storage == null || !storage.Contains(techType)) continue;
+                foreach (FcsDevice device in BaseFcsStorage)
+                {
+                    var storage = device?.GetStorage()?.ItemsContainer;
 
-                if (storageFilter == StorageType.All)
-                {
-                    if (device.GetStorage().ItemsContainer.Contains(techType))
-                    {
-                        QuickLogger.Debug("Made it",true);
-                        return device.GetStorage().RemoveItemFromContainer(techType);
-                    }
-                }
-                else
-                {
-                    if (device.StorageType == storageFilter)
-                    {
-                        if (device.GetStorage().ItemsContainer.Contains(techType))
-                        {
-                            return device.GetStorage().RemoveItemFromContainer(techType);
-                        }
-                    }
+                    if (storage == null || !storage.Contains(techType)) continue;
+
+                    return device.GetStorage().RemoveItemFromContainer(techType);
                 }
             }
 
@@ -907,12 +904,12 @@ namespace FCS_AlterraHub.Mono
 
         public void AlertNewStorageContainerPlaced(StorageContainer sc)
         {
-            if (BaseStorageLockers.Contains(sc)) return;
+            if (BaseStorageLockers.Contains(sc) || !TrackStorageContainer(sc)) return;
+
             var stracker = sc.gameObject.EnsureComponent<FCSStorageTracker>();
             stracker.Set(sc);
             stracker.OnDestroyAction += OnDestroyAction;
             BaseStorageLockers.Add(sc);
-            TrackStorageContainer(sc);
         }
 
         private void OnDestroyAction(StorageContainer obj,FCSStorageTracker tracker)
@@ -930,18 +927,18 @@ namespace FCS_AlterraHub.Mono
             }
         }
 
-        private void TrackStorageContainer(StorageContainer sc)
+        private bool TrackStorageContainer(StorageContainer sc)
         {
             if (sc == null || sc.container == null)
             {
-                return;
+                return false;
             }
 
             foreach (string notTrackedObject in DONT_TRACK_GAMEOBJECTS)
             {
                 if (sc.gameObject.name.ToLower().Contains(notTrackedObject))
                 {
-                    return;
+                    return false;
                 }
             }
 
@@ -955,6 +952,7 @@ namespace FCS_AlterraHub.Mono
 
             sc.container.onAddItem += (item) => AddItemsToTracker(sc, item.item.GetTechType());
             sc.container.onRemoveItem += (item) => RemoveItemsFromTracker(sc, item.item.GetTechType());
+            return true;
         }
 
         public void AlertNewFcsStoragePlaced(FcsDevice alterraStorage)

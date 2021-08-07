@@ -102,6 +102,7 @@ namespace FCS_EnergySolutions.TelepowerPylon.Buildables
 
                 var pr = prefab.AddComponent<PowerRelay>();
                 pr.powerFX = pFX;
+                pr.dontConnectToRelays = true;
                 pr.maxOutboundDistance = 15;
 
                 //var powerSource = prefab.EnsureComponent<PowerSource>();

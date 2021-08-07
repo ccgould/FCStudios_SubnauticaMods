@@ -25,7 +25,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
         private void UpdateState()
         {
             if(_droneController == null)return;
-            ChangeThrusterState(!_droneController.GetState().Equals(typeof(IdleState)));
+            ChangeThrusterState(!_droneController.GetState()?.Name?.Equals("Idle") ?? false);
         }
 
         private void ChangeThrusterState(bool isOn)

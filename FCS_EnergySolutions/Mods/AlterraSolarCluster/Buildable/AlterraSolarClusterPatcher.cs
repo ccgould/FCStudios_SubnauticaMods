@@ -108,10 +108,7 @@ namespace FCS_EnergySolutions.AlterraSolarCluster.Buildables
                 pr.powerFX = pFX;
                 pr.maxOutboundDistance = 15;
                 pr.internalPowerSource = ps;
-
-                var lodGroup = prefab.GetComponentInChildren<LODGroup>();
-                lodGroup.size = 0.6f;
-
+                
                 prefab.AddComponent<TechTag>().type = TechType;
                 prefab.AddComponent<AlterraSolarClusterController>();
 

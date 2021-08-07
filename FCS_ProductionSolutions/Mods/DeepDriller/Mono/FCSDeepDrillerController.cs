@@ -753,7 +753,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Mono
         }
 
         #endregion
-
+        
         public void SetPingName(string beaconName)
         {
             _ping.SetLabel(beaconName);
