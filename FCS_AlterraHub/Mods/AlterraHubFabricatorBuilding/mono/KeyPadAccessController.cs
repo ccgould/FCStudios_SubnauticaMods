@@ -121,13 +121,17 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         {
             _door.UnlockDoor();
             UnlockDoor();
-            if (_id == 1)
+            switch (_id)
             {
-                Mod.GamePlaySettings.AlterraHubDepotDoors.KeyPad1 = true;
-            }
-            else
-            {
-                Mod.GamePlaySettings.AlterraHubDepotDoors.KeyPad2 = true;
+                case 1:
+                    Mod.GamePlaySettings.AlterraHubDepotDoors.KeyPad1 = true;
+                    break;
+                case 2:
+                    Mod.GamePlaySettings.AlterraHubDepotDoors.KeyPad2 = true;
+                    break;
+                default:
+                    Mod.GamePlaySettings.AlterraHubDepotDoors.KeyPad3 = true;
+                    break;
             }
         }
 

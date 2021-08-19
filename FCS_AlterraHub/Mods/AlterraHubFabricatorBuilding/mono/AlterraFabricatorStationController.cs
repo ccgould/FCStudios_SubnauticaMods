@@ -62,6 +62,8 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         private PingInstance _ping;
         private IEnumerable<CartItemSaveData> _currentOrder;
         private bool _gamePlaySettingsLoaded;
+        private SecurityBoxTrigger _securityBoxTrigger;
+        private SecurityGateController _securityGateController;
 
 
         private void Update()
@@ -97,12 +99,20 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             var fabricatorDoor = GameObjectHelpers.FindGameObject(gameObject, "LockedDoor01").AddComponent<DoorController>();
             fabricatorDoor.doorOpenMethod = StarshipDoor.OpenMethodEnum.Manual;
 
+            var transportDoor = GameObjectHelpers.FindGameObject(gameObject, "LockedDoor03").AddComponent<DoorController>();
+            transportDoor.doorOpenMethod = StarshipDoor.OpenMethodEnum.Manual;
+
             var antennaDialPad = GameObjectHelpers.FindGameObject(gameObject, "AntennaDialpad").AddComponent<KeyPadAccessController>();
             antennaDialPad.Initialize("3491", antennaDoor,2);
             _keyPads.Add(antennaDialPad);
+
             var fabrictorDialPad = GameObjectHelpers.FindGameObject(gameObject, "FabricationDialpad").AddComponent<KeyPadAccessController>();
             fabrictorDialPad.Initialize("8964", fabricatorDoor,1);
             _keyPads.Add(fabrictorDialPad);
+
+            var transportDialPad = GameObjectHelpers.FindGameObject(gameObject, "TransportDialpad").AddComponent<KeyPadAccessController>();
+            transportDialPad.Initialize("4865", transportDoor, 3);
+            _keyPads.Add(transportDialPad);
 
             _motor = GameObjectHelpers.FindGameObject(gameObject, "AlternatorMotor").AddComponent<MotorHandler>();
             _motor.Initialize(100);
@@ -120,22 +130,38 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             MaterialHelpers.ChangeSpecSettings(AlterraHub.BaseDecalsExterior, AlterraHub.TBaseSpec, gameObject, 2.61f, 8f);
             FindPortManager();
 
-            var bp1Pos = GameObjectHelpers.FindGameObject(gameObject, "_BlueprintBoxPnt1_");
-            var bp2Pos = GameObjectHelpers.FindGameObject(gameObject, "_BlueprintBoxPnt2_");
-            var bp3Pos = GameObjectHelpers.FindGameObject(gameObject, "_BlueprintBoxPnt3_");
+            //var bp1Pos = GameObjectHelpers.FindGameObject(gameObject, "_BlueprintBoxPnt1_");
+            //var bp2Pos = GameObjectHelpers.FindGameObject(gameObject, "_BlueprintBoxPnt2_");
+            //var bp3Pos = GameObjectHelpers.FindGameObject(gameObject, "_BlueprintBoxPnt3_");
 
-            var dataBox1 = SpawnHelper.SpawnTechType(Mod.FCSDataBoxTechType, bp1Pos.transform.position, bp1Pos.transform.rotation, true);
-            var dataBox1C = dataBox1.GetComponent<BlueprintHandTarget>();
-            CreateBluePrintHandTarget(dataBox1C, dataBox1, Mod.AlterraHubDepotTechType);
+            //var dataBox1 = SpawnHelper.SpawnTechType(Mod.FCSDataBoxTechType, bp1Pos.transform.position, bp1Pos.transform.rotation, true);
+            //var dataBox1C = dataBox1.GetComponent<BlueprintHandTarget>();
+            //CreateBluePrintHandTarget(dataBox1C, dataBox1, Mod.AlterraHubDepotTechType);
 
-            var dataBox2 = SpawnHelper.SpawnTechType(Mod.FCSDataBoxTechType, bp2Pos.transform.position, bp2Pos.transform.rotation, true);
-            var dataBox2C = dataBox2.GetComponent<BlueprintHandTarget>();
-            CreateBluePrintHandTarget(dataBox2C, dataBox2, Mod.OreConsumerTechType);
+            //var dataBox2 = SpawnHelper.SpawnTechType(Mod.FCSDataBoxTechType, bp2Pos.transform.position, bp2Pos.transform.rotation, true);
+            //var dataBox2C = dataBox2.GetComponent<BlueprintHandTarget>();
+            //CreateBluePrintHandTarget(dataBox2C, dataBox2, Mod.OreConsumerTechType);
 
-            var dataBox3 = SpawnHelper.SpawnTechType(Mod.FCSDataBoxTechType, bp3Pos.transform.position, bp3Pos.transform.rotation, true);
-            var dataBox3C = dataBox3.GetComponent<BlueprintHandTarget>();
-            CreateBluePrintHandTarget(dataBox3C, dataBox3, Mod.DronePortPadHubNewTechType);
+            //var dataBox3 = SpawnHelper.SpawnTechType(Mod.FCSDataBoxTechType, bp3Pos.transform.position, bp3Pos.transform.rotation, true);
+            //var dataBox3C = dataBox3.GetComponent<BlueprintHandTarget>();
+            //CreateBluePrintHandTarget(dataBox3C, dataBox3, Mod.DronePortPadHubNewTechType);
+
+            _securityGateController = GameObjectHelpers.FindGameObject(gameObject, "AlterraHubFabStationSecurityGate").AddComponent<SecurityGateController>();
+            _securityGateController.Initialize();
+
+            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseLightsEmissiveController, gameObject, Color.red);
+
             OnGamePlaySettingsLoaded(Mod.GamePlaySettings);
+        }
+
+        internal SecurityBoxTrigger GetSecurityBoxTrigger()
+        {
+            if (_securityBoxTrigger == null)
+            {
+                _securityBoxTrigger = GameObjectHelpers.FindGameObject(gameObject, "SecurityBoxTrigger").EnsureComponent<SecurityBoxTrigger>();
+            }
+
+            return _securityBoxTrigger;
         }
 
         private static void CreateBluePrintHandTarget(BlueprintHandTarget dataBox, GameObject go, TechType unlockTechType)
@@ -158,10 +184,11 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         
         private void FindScreens()
         {
-            var screens = GameObjectHelpers.FindGameObject(gameObject, "Screens").transform;
+            var screens = GameObjectHelpers.FindGameObject(gameObject, "SecurityComputers").transform;
             foreach (Transform screen in screens)
             {
                 var securityScreenController = screen.gameObject.AddComponent<SecurityScreenController>();
+                securityScreenController.Initialize(this);
                 _screens.Add(securityScreenController);
             }
         }
@@ -209,9 +236,16 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
                 _keyPads[1].Unlock();
             }
 
+            if (settings.AlterraHubDepotDoors.KeyPad3)
+            {
+                _keyPads[2].Unlock();
+            }
+
             _generator.LoadSave();
 
             _antenna.LoadSave();
+
+            _securityGateController.LoadSave();
 
             if(IsPowerOn)
             {
@@ -444,7 +478,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         }
 
 
-        public IEnumerable<AlterraTransportDroneEntry> SaveDrones()
+        public IEnumerable<AlterraTransportDroneEntry> Save()
         {
             var drones = GameObject.FindObjectsOfType<DroneController>();
 
@@ -452,6 +486,8 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             {
                 yield return drone.Save();
             }
+
+            Mod.GamePlaySettings.AlterraHubDepotDoors.SecurityDoors = _securityGateController.GetHealth();
         }
 
         public bool IsStationPort(IDroneDestination dockedPort)
@@ -526,13 +562,30 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
 
         public AlterraDronePortController GetOpenPort()
         {
-            return _portManager.GetOpenPort();
+            return _portManager?.GetOpenPort();
         }
 
         public void ClearCurrentOrder()
         {
             _currentOrder = null;
             Mod.GamePlaySettings.CurrentOrder = null;
+        }
+    }
+
+    internal class SecurityBoxTrigger : MonoBehaviour
+    {
+        private void OnTriggerExit(Collider collider)
+        {
+            if (collider.gameObject.layer != 19) return;
+            IsPlayerInRange = false;
+        }
+
+        public bool IsPlayerInRange { get; private set; }
+
+        private void OnTriggerStay(Collider collider)
+        {
+            if (collider.gameObject.layer != 19) return;
+            IsPlayerInRange = true;
         }
     }
 }

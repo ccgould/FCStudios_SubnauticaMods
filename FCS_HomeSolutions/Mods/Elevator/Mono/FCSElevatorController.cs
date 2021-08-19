@@ -36,6 +36,7 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
         private PlatformPoleController _poleController;
         private AudioLowPassFilter _lowPassFilter;
         private AudioSource _audio;
+        private Transform _startPosTrans;
         internal const float POWERUSAGE = .5f;
         internal PlatformTrigger PlatformTrigger { get; private set; }
         private const float LerpTime = .1f;
@@ -73,18 +74,39 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
                 var target = new Vector3(_currentFloor.LevelObject.transform.position.x,
                     _currentFloor.LevelObject.transform.position.y - 0.25f,
                     _currentFloor.LevelObject.transform.position.z);
-                _platFormTrans.position =
-                    Vector3.MoveTowards(pos, Vector3.Lerp(pos, target, LerpTime), _speed * Time.deltaTime);
+                _platFormTrans.position = Vector3.MoveTowards(pos, Vector3.Lerp(pos, target, LerpTime), _speed * Time.deltaTime);
+            }
+        }
+
+
+        private bool MoveTowards(Transform t, Vector3 target, float speed)
+        {
+            if (Vector3.Distance(t.position, target) < speed)
+            {
+                t.position = target;
+                return true;
+            }
+            else
+            {
+                t.position = Vector3.MoveTowards(t.position, target, speed);
+                return false;
             }
         }
 
         private void UpdateIsMoving()
         {
-            var height = RoundToOneDec(_platFormTrans.localPosition.y);
-            var abs = Math.Abs(height - _currentFloor.Meters);
+            var target = new Vector3(_currentFloor.LevelObject.transform.position.x,
+                _currentFloor.LevelObject.transform.position.y - 0.25f,
+                _currentFloor.LevelObject.transform.position.z);
 
-            _isMoving = abs > 0.02;
-            //QuickLogger.Debug($"LP: {height} | M: {_currentFloor.Meters} | ABS:{abs} | IsMoving: {IsMoving()}");
+            if (Vector3.Distance(_platFormTrans.position, target) < _speed * Time.deltaTime)
+            {
+                _isMoving = false;
+            }
+            else
+            {
+                _isMoving = true;
+            }
         }
 
         public override void Initialize()
@@ -99,7 +121,7 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
             _poleController.Initialize(this);
 
             _startPos = GameObjectHelpers.FindGameObject(gameObject, "StartPos");
-
+            _startPosTrans = _startPos.transform;
             _floorsContainer = GameObjectHelpers.FindGameObject(gameObject, "Floors");
             
             var railings = GameObjectHelpers.FindGameObjects(gameObject, "railing_", SearchOption.StartsWith);
@@ -127,7 +149,7 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
 
             _colorManager.ChangeColor(new Color(0.8666667f, 0.6588235f, 0.01960784f), ColorTargetMode.Secondary);
 
-            AddNewFloor("base", "Home", 0f, 0);
+            AddNewFloor("base", "Home", _startPos.transform.localPosition.y, 0);
             _currentFloor = GetFloorData("base");
 
             AlterraHub.ReplaceShadersV2(platForm);
@@ -229,6 +251,15 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
                     {
                         foreach (KeyValuePair<string, ElevatorFloorData> floorData in _savedData.FloorData)
                         {
+                            if (floorData.Key.Equals("base"))
+                            {
+                                var firstFloor = _floorData.ElementAt(0);
+                                if (firstFloor.Value != null)
+                                {
+                                    firstFloor.Value.FloorName = floorData.Value.FloorName;
+                                }
+
+                            }
                             AddNewFloor(floorData.Value.FloorId,floorData.Value.FloorName,floorData.Value.Meters,floorData.Value.FloorIndex);
                         }
 
@@ -415,7 +446,7 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
             {
                 var data =_floorData[floorId];
                 data.FloorName = floorName;
-                data.Meters = floorMeters;
+                data.Meters = floorId.Equals("base") ? data.Meters : floorMeters;
                 var lvlObject =  data.LevelObject.transform;
                 lvlObject.localPosition = new Vector3(0, floorMeters, 0);
             }

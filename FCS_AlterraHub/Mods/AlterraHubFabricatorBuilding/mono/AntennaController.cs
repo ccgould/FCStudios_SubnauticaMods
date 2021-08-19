@@ -24,9 +24,11 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         private SearchField _numberField;
         private const string _accessCode = "1993";
         private const float SpeedIncrease = 16.666666666666666666666666666667f;
-        public void Initialize(AlterraFabricatorStationController fabricatorStationController)
+        public void Initialize(AlterraFabricatorStationController controller)
         {
-            var electricalBoxes = GameObjectHelpers.FindGameObjects(gameObject, "AlterraHubFabStationElectricalBox");
+            var electricalBoxes = GameObjectHelpers.FindGameObjects(controller.gameObject, "AlterraHubFabStationElectricalBox",SearchOption.StartsWith);
+            var antennaSecurityScreen = GameObjectHelpers.FindGameObject(controller.gameObject, "AntennaSecurityScreen");
+            
             for (int i = 0; i < electricalBoxes.Count(); i++)
             {
                 var eBox = electricalBoxes.ElementAt(i).gameObject.AddComponent<ElectricalBox>();
@@ -34,19 +36,19 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
                 _electricalBoxes.Add(eBox);
             }
 
-            _numberField = GameObjectHelpers.FindGameObject(gameObject, "InputField").AddComponent<SearchField>();
+            _numberField = GameObjectHelpers.FindGameObject(antennaSecurityScreen, "InputField").AddComponent<SearchField>();
             _numberField.HoverMessage = "Enter Passcode";
 
-            _messageBox = GameObjectHelpers.FindGameObject(gameObject, "MessageBox").AddComponent<FCSMessageBox>();
+            _messageBox = GameObjectHelpers.FindGameObject(antennaSecurityScreen, "MessageBox").AddComponent<FCSMessageBox>();
 
             _antenna = GameObjectHelpers.FindGameObject(gameObject, "mesh_antenna").EnsureComponent<MotorHandler>();
             _antenna.SetIncreaseRate(5);
             _antenna.Initialize(0);
 
-            _powerIcon = GameObjectHelpers.FindGameObject(gameObject, "Image").GetComponent<Image>();
+            _powerIcon = GameObjectHelpers.FindGameObject(antennaSecurityScreen, "Image").GetComponent<Image>();
 
-            _information = GameObjectHelpers.FindGameObject(gameObject, "Text").GetComponent<Text>();
-            _reactiveBTN = gameObject.GetComponentInChildren<Button>();
+            _information = GameObjectHelpers.FindGameObject(antennaSecurityScreen, "Text").GetComponent<Text>();
+            _reactiveBTN = antennaSecurityScreen.GetComponentInChildren<Button>();
             _reactiveBTN.onClick.AddListener(() =>
             {
                 if(!IsPinValid())
@@ -76,9 +78,9 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         private void UpdateScreen()
         {
             var fixedBoxes = _electricalBoxes.Count(x => x.IsRepaired);
-            _information.text = $"Error: Please repair all electrical boxes {fixedBoxes}/6 and enter passcode";
+            _information.text = $"Error: Please repair all electrical boxes {fixedBoxes}/{_electricalBoxes.Count} and enter passcode";
 
-            if (fixedBoxes >= 6)
+            if (fixedBoxes >= _electricalBoxes.Count)
             {
                 _reactiveBTN.interactable = true;
             }
@@ -96,14 +98,22 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         public void OnBoxFixed(int id)
         {
             QuickLogger.Debug("Box Fixed",true);
-            _antenna.RPMByPass(_electricalBoxes.Count(x=>x.IsRepaired) * SpeedIncrease);
+
             Mod.GamePlaySettings.FixedPowerBoxes.Add(id);
             OnBoxFixedAction?.Invoke(id);
+
             if (_electricalBoxes.Any(x => !x.IsRepaired) && LargeWorldStreamer.main.IsWorldSettled())
             {
                 VoiceNotificationSystem.main.Play("ElectricalBoxesNeedFixing_key",
                     $"Further electrical boxes in need of repair {_electricalBoxes.Count(x => x.IsRepaired)}/{_electricalBoxes.Count}");
             }
+
+
+            if (_electricalBoxes.All(x => x.IsRepaired))
+            {
+                _antenna.RPMByPass(66.666f);
+            }
+
         }
 
         public Action<int> OnBoxFixedAction { get; set; }

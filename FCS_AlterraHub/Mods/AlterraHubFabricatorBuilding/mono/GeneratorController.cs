@@ -44,10 +44,11 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         internal void Initialize(AlterraFabricatorStationController controller)
         {
             _controller = controller;
-            var slots = GameObjectHelpers.FindGameObjects(gameObject, "Battery_", SearchOption.StartsWith);
-            _status = GameObjectHelpers.FindGameObject(gameObject, "EmergencyMode").GetComponent<Text>();
-            _message = GameObjectHelpers.FindGameObject(gameObject, "Message").GetComponent<Text>();
-            _activateBtn = GameObjectHelpers.FindGameObject(gameObject, "ActivateButton").GetComponent<Button>();
+            var generator = GameObjectHelpers.FindGameObject(controller.gameObject, "Generator");
+            var slots = GameObjectHelpers.FindGameObjects(generator, "BatterySlot_", SearchOption.StartsWith);
+            _status = GameObjectHelpers.FindGameObject(generator, "EmergencyMode").GetComponent<Text>();
+            _message = GameObjectHelpers.FindGameObject(generator, "Message").GetComponent<Text>();
+            _activateBtn = GameObjectHelpers.FindGameObject(generator, "ActivateButton").GetComponent<Button>();
             _activateBtn.onClick.AddListener(()=>
             {
                 controller.TurnOnBase();

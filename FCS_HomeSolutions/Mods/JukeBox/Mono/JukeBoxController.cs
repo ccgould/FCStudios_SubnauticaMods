@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using FCS_AlterraHomeSolutions.Mono.PaintTool;
+﻿using FCS_AlterraHomeSolutions.Mono.PaintTool;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
@@ -11,13 +7,12 @@ using FCS_AlterraHub.Registration;
 using FCS_HomeSolutions.Configuration;
 using FCS_HomeSolutions.Mods.JukeBox.Spectrum;
 using FCSCommon.Utilities;
-using RadicalLibrary;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace FCS_HomeSolutions.Mods.JukeBox.Mono
 {
-    internal  class JukeBoxController : FcsDevice, IFCSSave<SaveData>
+    internal  class JukeBoxController : FcsDevice, IFCSSave<SaveData>, IJukeBoxDevice
     {
         private JukeBoxDataEntry _savedData;
         private bool _isFromSave;
@@ -25,83 +20,146 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
         private AudioSource _audio;
         private Slider _trackSlider;
         private Text _trackName;
-        private bool _showSpectrum = false;
-        private int _currentIndex;
-        private bool _wasPlaying;
-        private AudioClip _currentClip => _audio?.clip;
+        private AudioLowPassFilter _lowPassFilter;
+        private BaseJukeBox _baseJukeBox;
+        private Slider _volumeSlider;
+        private Toggle _repeatBTN;
+        private float _labelScrollStart;
+        private Text _volumePercentage;
+        private Canvas _canvas;
 
-        //private IEnumerator SyncSources()
-        //{
-        //    while (true)
-        //    {
-        //        foreach (var slave in Manager.BaseSpeakersSources)
-        //        {
-        //            ((JukeBoxSpeakerController)slave).UpdateTimeSample(_audio);
-        //            yield return null;
-        //        }
-        //    }
-        //}
+        public override bool IsOperational => IsConstructed && IsInitialized;
+        public bool IsJukeBox => true;
         
-        async void Start()
+        public AudioSource GetAudioSource()
+        {
+            return _audio;
+        }
+
+        private void OnVolumeChanged(float value)
+        {
+            _audio.volume = value;
+            _volumeSlider.SetValueWithoutNotify(value);
+        }
+
+        private void Start()
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.JukeBoxTabID, Mod.ModPackID);
-            await Mod.ScanForMusic();
+            _baseJukeBox = Manager.Habitat.GetComponent<BaseJukeBox>();
+            RegisterDevice();
+        }
+
+        private void RegisterDevice()
+        {
+            _baseJukeBox.RegisterDevice(this);
+            _baseJukeBox.OnLoopChanged += OnLoopChanged;
+            _baseJukeBox.OnPause += Pause;
+            _baseJukeBox.OnStop += Stop;
+            _baseJukeBox.OnPlay += Play;
+            _baseJukeBox.OnResume += Resume;
+            _baseJukeBox.OnVolumeChanged += OnVolumeChanged;
+            _baseJukeBox.OnTrackChanged += OnTrackChanged;
+            _baseJukeBox.OnRefresh += OnRefresh;
+        }
+
+        private void Resume()
+        {
+            _audio.UnPause();
+        }
+
+        public void OnTrackChanged(TrackData trackData, bool isPlaying)
+        {
+            QuickLogger.Debug($"OnTrackChanged {trackData.AudioClip.name} : {trackData.AudioClip.length}", true);
+            
+            RefreshUI(trackData);
+
+            if (isPlaying)
+            {
+                Play(trackData);
+            }
+        }
+
+        public BaseManager GetBaseManager()
+        {
+            return Manager;
+        }
+
+        private void RefreshUI(TrackData trackData)
+        {
+            _audio.clip = trackData.AudioClip;
+            _trackSlider.value = 0;
+            _trackSlider.maxValue = trackData.AudioClip?.length ?? 0f;
+            _trackName.text = trackData.Path ?? string.Empty;
+            UpdatePositionLabel();
+        }
+
+        private void OnLoopChanged(bool value)
+        {
+            _repeatBTN.isOn = value;
         }
 
         private void Update()
         {
-            if (_audio?.clip == null || _trackSlider == null || Manager == null) return;
+            if (_trackSlider == null || Manager == null || _baseJukeBox == null || _baseJukeBox.State == JukeBoxState.Pause || _canvas == null) return;
+            
+            LowPassFilterCheck();
+            
+            PlayUpdate();
 
-            var gamePaused = Mathf.Approximately(Time.timeScale, 0f);
+            UpdatePositionLabel();
 
-            if (_audio.isPlaying && gamePaused)
+            if (_baseJukeBox.IsPowered && !_canvas.gameObject.activeSelf)
             {
-                _audio.Pause();
-                _wasPlaying = true;
-                return;
+                _canvas.gameObject.SetActive(true);
             }
-
-            if (gamePaused)
+            else if(!_baseJukeBox.IsPowered && _canvas.gameObject.activeSelf)
             {
-                return;
-            }
-
-            SyncSources();
-
-
-            if (_wasPlaying && !gamePaused)
-            {
-                _audio.Play();
-                _wasPlaying = false;
-            }
-
-            if (_audio.isPlaying)
-            {
-                _trackSlider.SetValueWithoutNotify(_audio.time);
-            }
-
-            if (_audio.time >= _audio.clip.length && !_audio.loop)
-            {
-                NextTrack();
+                _canvas.gameObject.SetActive(false);
             }
         }
 
-        private void SyncSources()
+        private void PlayUpdate()
         {
-            if (_audio.isPlaying)
+            if (_baseJukeBox?.GetState() != JukeBoxState.Play) return;
+            
+            if (_baseJukeBox.HasTrackedJukeBox(this))
             {
-                foreach (var slave in Manager.BaseSpeakersSources)
+                if (!_audio.isPlaying)
                 {
-                    ((JukeBoxSpeakerController) slave).Play(_audio);
+                    Play(_baseJukeBox.CurrentTrack);
                 }
+                _audio.timeSamples = _baseJukeBox.TimeSamples;
             }
-            else
+            _trackSlider.SetValueWithoutNotify(_baseJukeBox.TrackSliderValue);
+        }
+
+        private void LowPassFilterCheck()
+        {
+            if (_lowPassFilter != null)
             {
-                foreach (var slave in Manager.BaseSpeakersSources)
-                {
-                    ((JukeBoxSpeakerController)slave).Stop();
-                }
+                _lowPassFilter.cutoffFrequency = _baseJukeBox.GetCutOffFrequency(GetConstructable());
             }
+        }
+
+        public override void OnDestroy()
+        {
+            base.OnDestroy();
+
+            if (_baseJukeBox == null) return;
+            _baseJukeBox.UnRegisterDevice(this);
+            _baseJukeBox.OnPause -= Pause;
+            _baseJukeBox.OnStop -= Stop;
+            _baseJukeBox.OnLoopChanged -= OnLoopChanged;
+            _baseJukeBox.OnVolumeChanged -= OnVolumeChanged;
+            _baseJukeBox.OnPlay -= Play;
+            _baseJukeBox.OnResume -= Resume;
+            _baseJukeBox.OnTrackChanged -= OnTrackChanged;
+            _baseJukeBox.OnRefresh -= OnRefresh;
+        }
+
+        private void OnRefresh(TrackData obj)
+        {
+            RefreshUI(new TrackData());
         }
 
         private void OnEnable()
@@ -120,8 +178,12 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
                         ReadySaveData();
                     }
 
-                    //_colorManager.ChangeColor(_savedData.Fcs.Vector4ToColor());
-                    //_colorManager.ChangeColor(_savedData.Secondary.Vector4ToColor(), ColorTargetMode.Secondary);
+                    _colorManager.ChangeColor(_savedData.Primary.Vector4ToColor());
+                    _colorManager.ChangeColor(_savedData.Secondary.Vector4ToColor(), ColorTargetMode.Secondary);
+                    _colorManager.ChangeColor(_savedData.Emission.Vector4ToColor(), ColorTargetMode.Emission);
+                    _volumeSlider.value = _savedData.Volume;
+                    _audio.volume = _savedData.Volume;
+                    _volumePercentage.text = CalculateVolumePercentage();
                 }
 
                 _runStartUpOnEnable = false;
@@ -141,7 +203,7 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
             if (_colorManager == null)
             {
                 _colorManager = gameObject.AddComponent<ColorManager>();
-                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol, AlterraHub.BaseSecondaryCol);
+                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol, AlterraHub.BaseSecondaryCol,AlterraHub.BaseLightsEmissiveController);
             }
 
             if (_audio == null)
@@ -149,21 +211,24 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
                 _audio = gameObject.GetComponentInChildren<AudioSource>();
             }
 
+            _lowPassFilter = gameObject.GetComponentInChildren<AudioLowPassFilter>();
+
             var playBTN = GameObjectHelpers.FindGameObject(gameObject, "PlayBTN").GetComponent<Button>();
-            playBTN.onClick.AddListener(Play);
+            playBTN.onClick.AddListener((() => _baseJukeBox.Play(this)));
             
             var stopBTN = GameObjectHelpers.FindGameObject(gameObject, "StopBTN").GetComponent<Button>();
-            stopBTN.onClick.AddListener(Stop);
+            stopBTN.onClick.AddListener((() => _baseJukeBox.Stop(this)));
             
             var previousBTN = GameObjectHelpers.FindGameObject(gameObject, "PreviousBTN").GetComponent<Button>();
-            previousBTN.onClick.AddListener(PreviousTrack);
+            previousBTN.onClick.AddListener(() => _baseJukeBox.PreviousTrack(this));
             
             var nextBTN = GameObjectHelpers.FindGameObject(gameObject, "NextBTN").GetComponent<Button>();
-            nextBTN.onClick.AddListener(NextTrack);
+            nextBTN.onClick.AddListener(() => _baseJukeBox.NextTrack(this));
 
-            var repeatBTN = GameObjectHelpers.FindGameObject(gameObject, "Repeat").GetComponent<Toggle>();
-            repeatBTN.onValueChanged.AddListener((value =>
+            _repeatBTN = GameObjectHelpers.FindGameObject(gameObject, "Repeat").GetComponent<Toggle>();
+            _repeatBTN.onValueChanged.AddListener((value =>
             {
+                _baseJukeBox.SetLoop(this, value);
                 _audio.loop = value;
             }));
 
@@ -175,101 +240,66 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
             audioSync.timeStep = 0.15f;
             audioSync.timeToBeat = 0.05f;
             audioSync.restColor = Color.black;
-            audioSync.beatColors = new[]
-            {
-                Color.cyan,
-                //new Color(0.04231142f,0.4341537f,0.3419144f),
-                //new Color(0f,0.2581829f,0.2581829f),
-            };
 
             var refreshBTN = GameObjectHelpers.FindGameObject(gameObject, "RefreshBTN").GetComponent<Button>();
             refreshBTN.onClick.AddListener((() =>
             {
-                Purge();
-                Mod.ScanForMusic();
+                _baseJukeBox.Refresh();
             }));
-
 
             _trackSlider = GameObjectHelpers.FindGameObject(gameObject, "Timeline").GetComponent<Slider>();
             _trackSlider.onValueChanged.AddListener((amount =>
             {
+                if (_audio.clip == null)
+                {
+                    _trackSlider.SetValueWithoutNotify(0);
+                    return;
+                }
                 _audio.time = amount;
+                _baseJukeBox.SetTrackSlider(this, amount);
             }));
 
             _trackName = GameObjectHelpers.FindGameObject(gameObject, "TrackName").GetComponent<Text>();
             _trackName.text = string.Empty;
 
-            var volumeSlider = GameObjectHelpers.FindGameObject(gameObject, "Volume").GetComponent<Slider>();
-            volumeSlider.SetValueWithoutNotify(_audio.volume);
+            _volumeSlider = GameObjectHelpers.FindGameObject(gameObject, "Volume").GetComponent<Slider>();
+            _volumeSlider.SetValueWithoutNotify(_audio.volume);
 
+            _volumePercentage = GameObjectHelpers.FindGameObject(gameObject, "VolumePercentage").GetComponent<Text>();
+            _volumePercentage.text = CalculateVolumePercentage();
 
-            var volumePercentage = GameObjectHelpers.FindGameObject(gameObject, "VolumePercentage").GetComponent<Text>();
-            volumePercentage.text = CalculateVolumePercentage();
-
-            volumeSlider.onValueChanged.AddListener((value =>
+            _volumeSlider.onValueChanged.AddListener((value =>
             {
+                if (_audio == null)
+                {
+                    QuickLogger.DebugError("Audio Controller is null",true);
+                    return;
+                }
+                _baseJukeBox?.SetVolume(this,value);
                 _audio.volume = value;
-                volumePercentage.text = CalculateVolumePercentage();
+                _volumePercentage.text = CalculateVolumePercentage();
             }));
 
+            _canvas = gameObject.GetComponentInChildren<Canvas>();
 
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
-            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseLightsEmissiveController, gameObject, Color.black);
+            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseLightsEmissiveController, gameObject, Color.cyan);
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseBeaconLightEmissiveController, gameObject, Color.red);
             MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseBeaconLightEmissiveController, gameObject, 3f);
 
             IsInitialized = true;
         }
-
-        private void NextTrack()
-        {
-            _currentIndex += 1;
-
-            if (_currentIndex > Mod.Playlist.Count - 1)
-            {
-                _currentIndex = 0;
-            }
-
-            ChangeTrack(Mod.Playlist[_currentIndex]);
-        }
-
-        private void PreviousTrack()
-        {
-            _currentIndex -= 1;
-
-            if (_currentIndex < 0)
-            {
-                _currentIndex = Mod.Playlist.Count - 1;
-            }
-
-            ChangeTrack(Mod.Playlist[_currentIndex]);
-        }
-
+        
         private string CalculateVolumePercentage()
         {
             return $"{Mathf.FloorToInt(_audio.volume / 1 * 100)}%";
         }
 
-        private void ChangeTrack(TrackData track)
+        public void Play(TrackData trackData)
         {
-            Purge();
-            _audio.clip = track.AudioClip;
-            _trackSlider.value = 0;
-            _trackSlider.minValue = 0f;
-            _trackSlider.maxValue = _audio.clip.length;
-            _trackName.text = Path.GetFileNameWithoutExtension(track.Path);
-            Play();
-        }
-
-        private void Purge()
-        {
-            if (_audio.isPlaying)
-            {
-                Stop();
-                _audio.clip = null;
-            }
-
-            _trackName.text = string.Empty;
+            _audio.clip = trackData.AudioClip;
+            _audio.Play();
+            RefreshUI(trackData);
         }
 
         public void Stop()
@@ -277,16 +307,21 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
             _audio.Stop();
         }
 
-        public void Play()
+        public void Pause()
         {
-            if (_audio.clip == null)
-            {
-                ChangeTrack(Mod.Playlist.First());
-            }
-            _audio.Play();
+            _audio.Pause();
         }
 
+        public void SetVolume(float value)
+        {
+            _volumeSlider.value = value;
+        }
 
+        public float GetAudioTime()
+        {
+            return _audio.time;
+        }
+        
         public override void OnProtoSerialize(ProtobufSerializer serializer)
         {
             QuickLogger.Debug("In OnProtoSerialize");
@@ -350,6 +385,8 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
             _savedData.Id = GetPrefabID();
             _savedData.Primary = _colorManager.GetColor().ColorToVector4();
             _savedData.Secondary = _colorManager.GetSecondaryColor().ColorToVector4();
+            _savedData.Emission = _colorManager.GetLumColor().ColorToVector4();
+            _savedData.Volume = _audio.volume;
             QuickLogger.Debug($"Saving ID {_savedData.Id}");
             newSaveData.JukeBoxDataEntries.Add(_savedData);
         }
@@ -357,6 +394,43 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
         public override bool ChangeBodyColor(Color color, ColorTargetMode mode)
         {
             return _colorManager.ChangeColor(color, mode);
+        }
+
+        public override float GetPowerUsage()
+        {
+            if (!GameModeUtils.RequiresPower())
+            {
+                return 0f;
+            }
+
+            return Time.deltaTime * 0.1f * _audio?.volume ?? 0f;
+        }
+        
+        private void UpdatePositionLabel()
+        {
+            RectTransform rectTransform = _trackName.rectTransform;
+            RectTransform rectTransform2 = rectTransform.parent as RectTransform;
+            float preferredWidth = _trackName.preferredWidth;
+            float width = rectTransform2.rect.width;
+            float num = preferredWidth - width;
+            if (num > 0f)
+            {
+                float num2 = num / 100f;
+                float num3 = Trapezoid(1f, num2, 1f, num2, Time.time - _labelScrollStart);
+                Vector2 anchoredPosition = rectTransform.anchoredPosition;
+                anchoredPosition.x = -num * num3;
+                rectTransform.anchoredPosition = anchoredPosition;
+            }
+        }
+
+        public static float Trapezoid(float a, float b, float c, float d, float t, bool wrap = true)
+        {
+            float num = a + b + c + d;
+            if (wrap)
+            {
+                t %= num;
+            }
+            return Mathf.Clamp01(Mathf.Min((b > 0f) ? ((t - a) / b) : 0f, (d > 0f) ? ((num - t) / d) : 0f));
         }
     }
 }

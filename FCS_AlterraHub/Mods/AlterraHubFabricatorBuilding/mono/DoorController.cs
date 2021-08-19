@@ -1,9 +1,13 @@
-﻿using UnityEngine;
+﻿using System;
+using FCS_AlterraHub.Buildables;
+using UnityEngine;
 
 namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
 {
     public class DoorController : HandTarget, IHandTarget
     {
+        public virtual bool IsSwingDoor => false;
+
         private void OnEnable()
         {
             if(NoCostConsoleCommand.main != null)
@@ -44,9 +48,12 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
                 sealedComponent.openedEvent.AddHandler(gameObject, OnSealedDoorOpen);
             }
 
-            closedPos = doorObject.transform.position;
             openPos = doorObject.transform.TransformPoint(new Vector3(-1.1f, 0f, 0f));
-		
+            closedPos = doorObject.transform.position;
+            
+            //openRot = Quaternion.Euler(doorObject.transform.localEulerAngles.x, -90, doorObject.transform.localEulerAngles.y);
+            closedRot = doorObject.transform.localRotation;
+
             if (startDoorOpen || doorOpen)
             {
                 doorLocked = false;
@@ -67,12 +74,19 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         {
             if (doorOpenMethod == StarshipDoor.OpenMethodEnum.Manual)
             {
-                Vector3 vector = doorObject.transform.position;
-                vector = Vector3.Lerp(vector, doorOpen ? openPos : closedPos, Time.deltaTime * 2f);
-                doorObject.transform.position = vector;
+                if (!IsSwingDoor)
+                {
+                    Vector3 vector = doorObject.transform.position;
+                    vector = Vector3.Lerp(vector, doorOpen ? openPos : closedPos, Time.deltaTime * 2f);
+                    doorObject.transform.position = vector;
+                }
+                else
+                {
+                    transform.localRotation = Quaternion.Lerp(transform.localRotation , doorOpen ? openRot : closedRot, Time.deltaTime * 5);
+                }
             }
         }
-
+        
         public void OnHandHover(GUIHand hand)
         {
             switch (doorOpenMethod)
@@ -83,6 +97,10 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
                         HandReticle.main.SetInteractText(doorOpen ? closeText : openText);
                         HandReticle.main.SetIcon(HandReticle.IconType.Hand, 1f);
                         return;
+                    }
+                    else
+                    {
+                        HandReticle.main.SetInteractText(ManualHoverText1, ManualHoverText2);
                     }
                     break;
                 case StarshipDoor.OpenMethodEnum.Sealed:
@@ -135,8 +153,36 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             {
                 openSound.Play();
             }
+
+            OnDoorStateChanged?.Invoke(this,doorOpen);
         }
 
+        public void Open()
+        {
+            if (doorOpenMethod == StarshipDoor.OpenMethodEnum.Manual)
+            {
+                doorOpen = true;
+            }
+            if (openSound)
+            {
+                openSound.Play();
+            }
+        }
+
+        public void Close()
+        {
+            if (doorOpenMethod == StarshipDoor.OpenMethodEnum.Manual)
+            {
+                doorOpen = false;
+            }
+            if (openSound)
+            {
+                openSound.Play();
+            }
+        }
+
+
+        public Action<DoorController, bool> OnDoorStateChanged;
         private void OnSealedDoorOpen(Sealed sealedComponent)
         {
             OnDoorToggle();
@@ -145,6 +191,8 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         public StarshipDoor.OpenMethodEnum doorOpenMethod;
         public string openText = "OpenDoor";
         public string closeText = "CloseDoor";
+        public string ManualHoverText1 = "Locked_Door";
+        public string ManualHoverText2 = AlterraHub.DoorInstructions();
         public bool doorOpen;
         public bool doorLocked = true;
         public bool startDoorOpen;
@@ -154,6 +202,8 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         private Sealed sealedComponent;
         private Vector3 closedPos;
         private Vector3 openPos;
+        public Quaternion closedRot;
+        public Quaternion openRot;
         public enum OpenMethodEnum
         {
             Manual,

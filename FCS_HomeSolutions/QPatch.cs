@@ -27,7 +27,6 @@ using FCS_HomeSolutions.Mods.TV.Buildable;
 using FCS_HomeSolutions.Spawnables;
 using FCSCommon.Utilities;
 using FMOD;
-using FMODUnity;
 using HarmonyLib;
 using QModManager.API.ModLoading;
 using SMLHelper.V2.Handlers;
@@ -533,8 +532,8 @@ namespace FCS_HomeSolutions
         {
             if (!Configuration.IsRailingsEnabled) return;
 
-            var ahsrailing = new DecorationEntryPatch("ahsrailing", "Large Railing", "A railing to create a barrior",
-                ModelPrefab.GetPrefab("Large_Rail_01"),
+            var ahsrailing = new DecorationEntryPatch("ahsrailing", "Railing", "A railing to create a barrior",
+                ModelPrefab.GetPrefab("Railing_Normal"),
                 new Settings
                 {
                     KitClassID = "ahsrailing_kit",
@@ -550,9 +549,9 @@ namespace FCS_HomeSolutions
                 });
             ahsrailing.Patch();
 
-            var ahsrailingglass = new DecorationEntryPatch("ahsrailingglass", "Large Railing With Glass",
+            var ahsrailingglass = new DecorationEntryPatch("ahsrailingglass", "Railing With Glass",
                 "A railing to create a barrior",
-                ModelPrefab.GetPrefab("Large_Rail_wGlass_01"),
+                ModelPrefab.GetPrefab("Railing_Normal_wGlass"),
                 new Settings
                 {
                     KitClassID = "ahsrailingglass_kit",
@@ -568,12 +567,12 @@ namespace FCS_HomeSolutions
                 });
             ahsrailingglass.Patch();
 
-            var ahssmallrail = new DecorationEntryPatch("ahssmallrail", "Small Railing",
+            var ahsLeftCornerRail = new DecorationEntryPatch("ahsLeftCornerRailing", "Railing Left Corner",
                 "A railing to create a barrior",
-                ModelPrefab.GetPrefab("Small_Rail_01"),
+                ModelPrefab.GetPrefab("Railing_LeftCorner"),
                 new Settings
                 {
-                    KitClassID = "ahssmallrailing_kit",
+                    KitClassID = "ahsleftcornerrailing_kit",
                     AllowedInBase = true,
                     AllowedOutside = true,
                     AllowedOnGround = true,
@@ -584,14 +583,14 @@ namespace FCS_HomeSolutions
                     CategoryForPDA = TechCategory.Misc,
                     GroupForPDA = TechGroup.Miscellaneous
                 });
-            ahssmallrail.Patch();
+            ahsLeftCornerRail.Patch();
 
-            var ahssmallrailglass = new DecorationEntryPatch("ahssmallrailglass", "Small Railing With Glass",
+            var ahsLeftCornerwGlassRail = new DecorationEntryPatch("ahsLeftCornerwGlassRailing", "Railing Left Corner wGlass",
                 "A railing to create a barrior",
-                ModelPrefab.GetPrefab("Small_Rail_wGlass_01"),
+                ModelPrefab.GetPrefab("Railing_LeftCorner_wGlass"),
                 new Settings
                 {
-                    KitClassID = "ahssmallrailingglass_kit",
+                    KitClassID = "ahsleftcornerwGlassrailing_kit",
                     AllowedInBase = true,
                     AllowedOutside = true,
                     AllowedOnGround = true,
@@ -602,24 +601,44 @@ namespace FCS_HomeSolutions
                     CategoryForPDA = TechCategory.Misc,
                     GroupForPDA = TechGroup.Miscellaneous
                 });
-            ahssmallrailglass.Patch();
+            ahsLeftCornerwGlassRail.Patch();
 
-            var ahssmallstairplatform = new DecorationEntryPatch("ahssmallstairplatform", "Small Stair Platform",
-                "A small set of stairs so you don’t bang your knees.", ModelPrefab.GetPrefab("Small_PlatformDoorStairs"),
+            var ahsRightCornerRail = new DecorationEntryPatch("ahsRightCornerRailing", "Railing Right Corner",
+                "A railing to create a barrior",
+                ModelPrefab.GetPrefab("Railing_RightCorner"),
                 new Settings
                 {
-                    KitClassID = "ahssmallstairplatform_kit",
-                    AllowedInBase = false,
+                    KitClassID = "ahsrightcornerrailing_kit",
+                    AllowedInBase = true,
                     AllowedOutside = true,
                     AllowedOnGround = true,
                     RotationEnabled = true,
-                    Cost = 18000,
-                    Size = new Vector3(4.033218f, 2.194448f, 2.34824f),
-                    Center = new Vector3(4.449882e-24f, 1.225415f, 0.8919346f),
-                    CategoryForPDA = TechCategory.ExteriorModule,
-                    GroupForPDA = TechGroup.ExteriorModules
+                    Cost = 15000,
+                    Size = new Vector3(1f, 0.822893f, 0.1791649f),
+                    Center = new Vector3(-1.365597e-25f, 0.7452481f, -0.004088677f),
+                    CategoryForPDA = TechCategory.Misc,
+                    GroupForPDA = TechGroup.Miscellaneous
                 });
-            ahssmallstairplatform.Patch();
+            ahsRightCornerRail.Patch();
+
+
+            var ahsRightCornerwGlassRail = new DecorationEntryPatch("ahsRightCornerwGlassRailing", "Railing Right Corner wGlass",
+                "A railing to create a barrior",
+                ModelPrefab.GetPrefab("Railing_RightCorner_wGlass"),
+                new Settings
+                {
+                    KitClassID = "ahsrightcornerwGlassrailing_kit",
+                    AllowedInBase = true,
+                    AllowedOutside = true,
+                    AllowedOnGround = true,
+                    RotationEnabled = true,
+                    Cost = 15000,
+                    Size = new Vector3(1f, 0.822893f, 0.1791649f),
+                    Center = new Vector3(-1.365597e-25f, 0.7452481f, -0.004088677f),
+                    CategoryForPDA = TechCategory.Misc,
+                    GroupForPDA = TechGroup.Miscellaneous
+                });
+            ahsRightCornerwGlassRail.Patch();
         }
 
         private static void PatchSmartTvs()

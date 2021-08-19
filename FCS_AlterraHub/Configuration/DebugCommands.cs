@@ -82,12 +82,22 @@ namespace FCS_AlterraHub.Configuration
         }
 
         [ConsoleCommand("UnlockFCSPDA")]
-        public static void UnlockFCSPDA()
+        public static void UnlockFCSPDA(bool value)
         {
-            Mod.GamePlaySettings.IsPDAUnlocked = true;
-            FCSPDAController.ForceOpen();
-            AlterraFabricatorStationController.Main.UpdateBeaconState(false);
-            QuickLogger.Message($"FCS PDA Unlocked", true);
+            if (value)
+            {
+                Mod.GamePlaySettings.IsPDAUnlocked = true;
+                FCSPDAController.ForceOpen();
+                AlterraFabricatorStationController.Main.UpdateBeaconState(false);
+                QuickLogger.Message($"FCS PDA Unlocked", true);
+            }
+            else
+            {
+                Mod.GamePlaySettings.IsPDAUnlocked = false;
+                FCSPDAController.ForceClose();
+                AlterraFabricatorStationController.Main.UpdateBeaconState(true);
+                QuickLogger.Message($"FCS PDA locked", true);
+            }
         }
 
         [ConsoleCommand("CreateDummyAccount")]

@@ -151,8 +151,8 @@ namespace FCS_AlterraHub.Buildables
                     if (!LoadAsset(Mod.OreConsumerPrefabName, QPatch.GlobalBundle, out var oreConsumerPrefabGo)) return false;
                     OreConsumerPrefab = oreConsumerPrefabGo;                    
                     
-                    if (!LoadAsset("OreConsumerFrag", QPatch.GlobalBundle, out var oreConsumerFragPrefabGo)) return false;
-                    OreConsumerFragPrefab = oreConsumerFragPrefabGo;
+                    //if (!LoadAsset("OreConsumerFrag", QPatch.GlobalBundle, out var oreConsumerFragPrefabGo)) return false;
+                    //OreConsumerFragPrefab = oreConsumerFragPrefabGo;
                     
                     if (!LoadAsset("CartItem", QPatch.GlobalBundle, out var cartItemPrefabGo)) return false;
                     CartItemPrefab = cartItemPrefabGo;
@@ -181,8 +181,8 @@ namespace FCS_AlterraHub.Buildables
                     AlterraHubFabricatorPrefab = alterraHubFabricatorPrefab;
                     //AddFabStationComponents();
                     
-                    if (!LoadAsset("AlterraHubDepotFrag", QPatch.GlobalBundle, out var alterraHubDepotFragmentPrefab)) return false;
-                    AlterraHubDepotFragmentPrefab = alterraHubDepotFragmentPrefab;
+                    //if (!LoadAsset("AlterraHubDepotFrag", QPatch.GlobalBundle, out var alterraHubDepotFragmentPrefab)) return false;
+                    //AlterraHubDepotFragmentPrefab = alterraHubDepotFragmentPrefab;
 
                     if (!LoadAsset("AlterraHubDepotItem", QPatch.GlobalBundle, out var alterraHubDepotItemPrefab)) return false;
                     AlterraHubDepotItemPrefab = alterraHubDepotItemPrefab;                    
@@ -206,8 +206,8 @@ namespace FCS_AlterraHub.Buildables
                     if (!LoadAssetV2("AlterraHubTransportDrone", QPatch.GlobalBundle, out var alterraHubTransportDronePrefab)) return false;
                     AlterraHubTransportDronePrefab = alterraHubTransportDronePrefab;
 
-                    if (!LoadAssetV2("DronePort_Fragments", QPatch.GlobalBundle, out var dronePortFragmentsPrefab)) return false;
-                    DronePortFragmentsPrefab = dronePortFragmentsPrefab;
+                    //if (!LoadAssetV2("DronePort_Fragments", QPatch.GlobalBundle, out var dronePortFragmentsPrefab)) return false;
+                    //DronePortFragmentsPrefab = dronePortFragmentsPrefab;
 
                     if (!LoadAssetV2("BLUEPRINT_DATA_DISC", QPatch.GlobalBundle, out var blueprintDataDiscPrefab)) return false;
                     BluePrintDataDiscPrefab = blueprintDataDiscPrefab;                    

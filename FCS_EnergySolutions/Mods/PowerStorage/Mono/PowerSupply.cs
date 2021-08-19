@@ -28,12 +28,12 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Mono
                 if (mode == PowerChargerMode.ChargeMode)
                 {
                     _allowedToDisCharge = false;
-                    _powerCharger.SetAllowedToCharge(true);
+                    _powerCharger?.SetAllowedToCharge(true);
                 }
                 else
                 {
                     _allowedToDisCharge = true;
-                    _powerCharger.SetAllowedToCharge(false);
+                    _powerCharger?.SetAllowedToCharge(false);
                 }
                 return;
             }
@@ -71,7 +71,7 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Mono
                 if (CheckPowerGoal())
                 {
                     _allowedToDisCharge = true;
-                    _powerCharger.SetAllowedToCharge(false);
+                    _powerCharger?.SetAllowedToCharge(false);
                 }
 
                 nextDischargeAttemptTimer = 5f;
@@ -100,7 +100,7 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Mono
                 if (CheckChargeGoal())
                 {
                     _allowedToDisCharge = false;
-                    _powerCharger.SetAllowedToCharge(true);
+                    _powerCharger?.SetAllowedToCharge(true);
                 }
                 nextChargeAttemptTimer = 5f;
             }
@@ -137,16 +137,16 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Mono
 
         internal string GetPowerString()
         {
-            return _powerCharger?.GetTotal() == null ? "0/0" : $"{Mathf.RoundToInt(_powerCharger.GetTotal())}/{Mathf.RoundToInt(_powerCharger.GetCapacity())}";
+            return _powerCharger?.GetTotal() == null ? "0/0" : $"{Mathf.RoundToInt(_powerCharger?.GetTotal() ?? 0)}/{Mathf.RoundToInt(_powerCharger?.GetCapacity() ?? 0)}";
         }
 
         public bool ModifyPower(float amount, out float consumed)
         {
             consumed = 0f;
-            if (_powerCharger == null || !_allowedToDisCharge) return false;
+            if (!_allowedToDisCharge) return false;
 
-            var currentPower = _powerCharger.GetTotal();
-            var currentCapacity = _powerCharger.GetCapacity();
+            var currentPower = _powerCharger?.GetTotal() ?? 0;
+            var currentCapacity = _powerCharger?.GetCapacity() ?? 0;
 
             float num = currentPower;
             bool result;
@@ -162,8 +162,8 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Mono
 
             if (GameModeUtils.RequiresPower())
             {
-                consumed = _powerCharger.GetTotal() + amount - num;
-                _powerCharger.RemoveCharge(consumed);
+                consumed = _powerCharger?.GetTotal() ?? 0 + amount - num;
+                _powerCharger?.RemoveCharge(consumed);
             }
             else
             {
@@ -189,7 +189,7 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Mono
 
         public void SetAllowedToCharge(bool value)
         {
-            _powerCharger.SetAllowedToCharge(value);
+            _powerCharger?.SetAllowedToCharge(value);
 
             CheckAllowedToDischarge(value);
         }
@@ -205,26 +205,9 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Mono
             _allowedToDisCharge = !value;
         }
         
-        public byte[] Save(ProtobufSerializer serializer)
-        {
-            return null; //_powerCharger.Save(serializer);
-        }
-
-#if SUBNAUTICA_STABLE
-        public void Load(ProtobufSerializer serializer, byte[] savedDataData)
-        {
-            _powerCharger.Load(serializer, savedDataData);
-        }
-#else
-        public void Load(ProtobufSerializer serializer, byte[] savedDataData)
-        {
-            StartCoroutine(_powerCharger.Load(serializer, savedDataData));
-        }
-#endif
-
         public bool HasPowercells()
         {
-            return _powerCharger.HasPowerCells();
+            return _powerCharger?.HasPowerCells() ?? false;
         }
 
         public bool GetIsReleasingPower()
@@ -232,6 +215,6 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Mono
             return _allowedToDisCharge;
         }
 
-        public void LoadFromSave()=> _powerCharger.LoadFromSave();
+        public void LoadFromSave()=> _powerCharger?.LoadFromSave();
     }
 }

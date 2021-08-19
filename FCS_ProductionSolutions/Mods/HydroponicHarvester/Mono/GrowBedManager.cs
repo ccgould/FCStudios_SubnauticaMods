@@ -371,7 +371,10 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
                         break;
                     }
                 }
-                return pickupable;
+
+                Destroy(pickupable.gameObject);
+
+                return techType.ToPickupable();
             }
 
             return null;

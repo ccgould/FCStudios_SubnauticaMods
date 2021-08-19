@@ -36,14 +36,14 @@
     <Compile Include="Mods\Elevator\Mono\ScreenController.cs" />
     <Compile Include="Mods\HologramPoster\Buildable\HologramPosterPatcher.cs" />
     <Compile Include="Mods\HologramPoster\Mono\HologramPosterController.cs" />
+    <Compile Include="Mods\JukeBox\Mono\BaseJukeBox.cs" />
     <Compile Include="Mods\JukeBox\Spectrum\AudioSpectrum.cs" />
     <Compile Include="Mods\JukeBox\Buildable\JukeBoxSpeakerPatcher.cs" />
     <Compile Include="Mods\JukeBox\Buildable\JukeBoxPatcher.cs" />
     <Compile Include="Mods\JukeBox\Mono\JukeBox.cs" />
     <Compile Include="Mods\JukeBox\Mono\JukeBoxSpeakerController.cs" />
     <Compile Include="Mods\JukeBox\Mono\JukeBoxController.cs" />
-    <Compile Include="Mods\JukeBox\Mono\JukeBoxInstance.cs" />
-    <Compile Include="Mods\JukeBox\Spectrum\AudioSynceColor.cs" />
+    <Compile Include="Mods\JukeBox\Spectrum\AudioSyncColor.cs" />
     <Compile Include="Mods\JukeBox\Spectrum\AudioSyncer.cs" />
     <Compile Include="Mods\PeeperLoungeBar\Mono\PeeperLoungeBarController.cs" />
     <Compile Include="Buildables\Settings.cs" />
@@ -99,7 +99,9 @@
     <Compile Include="Patches\InGameMenuPatcher.cs" />
     <Compile Include="Patches\Player_Patches.cs" />
     <Compile Include="Patches\PowerIndicatorPatch.cs" />
+    <Compile Include="Patches\ReleaseEventPrefix_Patch.cs" />
     <Compile Include="Patches\StorageContainerPatches.cs" />
+    <Compile Include="Patches\SubRoot_Patches.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Mods\QuantumTeleporter\Buildable\QuantumTeleporterPatcher.cs" />

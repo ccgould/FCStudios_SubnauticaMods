@@ -221,14 +221,15 @@ namespace FCS_HomeSolutions.Configuration
         [JsonProperty] internal string Id { get; set; }
         [JsonProperty] internal Vec4 Primary { get; set; }
         [JsonProperty] internal Vec4 Secondary { get; set; }
+        [JsonProperty] internal Vec4 Emission { get; set; }
+        [JsonProperty] internal float Volume { get; set; }
     }
 
     [Serializable]
     internal class SaveData
     {
         [JsonProperty] internal float SaveVersion { get; set; } = 1.1f;
-        [JsonProperty] internal List<JukeBoxDataEntry> JukeBoxDataEntries { get; set; }
-
+        [JsonProperty] internal List<JukeBoxDataEntry> JukeBoxDataEntries = new();
         [JsonProperty] internal List<ElevatorDataEntry> ElevatorDataEntries = new();
         [JsonProperty] internal List<HologramDataEntry> HologramDataEntries = new();
         [JsonProperty] internal List<TrashReceptacleDataEntry> TrashReceptacleEntries = new();

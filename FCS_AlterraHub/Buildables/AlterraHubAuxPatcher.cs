@@ -71,6 +71,8 @@ namespace FCS_AlterraHub.Buildables
             { $"{ModKey}_IsDeviceOn","Device On: {0}"},
             { $"{ModKey}_PowerPerMinute","Power Per Minute: {0}"},
             { $"{ModKey}_Waiting","WAITING"},
+            { $"{ModKey}_DoorInstructions","Put in the correct 4 digit pin to unlock the door"},
+            { $"{ModKey}_CannotRemovePowercell","Cannot remove powercell from generator."},
         };
 
         private void AdditionalPatching()
@@ -281,7 +283,6 @@ namespace FCS_AlterraHub.Buildables
             return string.Format(GetLanguage($"{ModKey}_BaseOnOff"),baseName,status);
         }
 
-
         public static string Submit()
         {
             return Language.main.Get("Submit");
@@ -405,6 +406,15 @@ namespace FCS_AlterraHub.Buildables
         public static string Waiting()
         {
             return GetLanguage($"{ModKey}_Waiting");
+        }
+        public static string DoorInstructions()
+        {
+            return GetLanguage($"{ModKey}_DoorInstructions");
+        }
+
+        public static string CannotRemovePowercell()
+        {
+            return GetLanguage($"{ModKey}_CannotRemovePowercell");
         }
     }
 }

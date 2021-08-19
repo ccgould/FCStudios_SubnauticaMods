@@ -160,7 +160,7 @@ namespace FCS_HomeSolutions.Configuration
 
         [Toggle("[Elevator] Is Mod Enabled", Tooltip = "Enables/Disables Elevator from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
         public bool IsElevatorEnabled { get; set; } = true;
-
+        
         #endregion
 
         #region Smart OutDoor Planter
@@ -247,6 +247,12 @@ namespace FCS_HomeSolutions.Configuration
 
         #endregion
 
+
+        #region JukeBox
+
+        public bool IsJukeBoxEnabled = true;
+
+        #endregion
 
         private void EnableDebugsToggleEvent(ToggleChangedEventArgs e)
         {

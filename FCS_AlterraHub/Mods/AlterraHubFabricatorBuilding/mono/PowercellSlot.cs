@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Helpers;
 using UnityEngine;
 
@@ -66,12 +67,15 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
 
         public void OnHandHover(GUIHand hand)
         {
+            HandReticle main = HandReticle.main;
             if (!AllowBatteryReplacement)
             {
+                main.SetInteractText(AlterraHub.CannotRemovePowercell()); 
+                main.SetIcon(HandReticle.IconType.HandDeny);
                 return;
             }
 
-            HandReticle main = HandReticle.main;
+
             string text = "";
             InventoryItem storedItem = batterySlot.storedItem;
             string text2;
@@ -95,6 +99,12 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
 
         public void OnHandClick(GUIHand hand)
         {
+            if (!AllowBatteryReplacement)
+            {
+
+                return;
+            }
+
             uGUI.main.itemSelector.Initialize(this, SpriteManager.Get(SpriteManager.Group.Item, "nobattery"), new List<IItemsContainer>
             {
                 Inventory.main.container,

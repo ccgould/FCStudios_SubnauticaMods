@@ -240,8 +240,10 @@ namespace FCS_HomeSolutions.Patches
             _prevMeters = meters;
 
             _floorField = GameObjectHelpers.FindGameObject(gameObject, "FloorField").GetComponent<InputField>();
-            _floorField.SetTextWithoutNotify(meters.ToString());
+            _floorField.SetTextWithoutNotify(!id.Equals("base") ? meters.ToString() : "0");
             _floorField.onEndEdit.AddListener(OnEndFloorEdit);
+            _floorField.enabled = !id.Equals("base");
+
             _floorField.onValueChanged.AddListener(OnValueChanged);
 
             _nameField = GameObjectHelpers.FindGameObject(gameObject, "NameField").GetComponent<InputField>();
@@ -274,7 +276,7 @@ namespace FCS_HomeSolutions.Patches
                 controller.GoToFloor(_id);
             }));
         }
-
+        
         private void OnValueChanged(string value)
         {
             if (string.IsNullOrWhiteSpace(value) || value.Equals("0"))

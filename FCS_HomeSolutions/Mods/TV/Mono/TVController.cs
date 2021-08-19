@@ -29,6 +29,7 @@ namespace FCS_HomeSolutions.Mods.TV.Mono
         private Text _clock;
         private Text _volumeText;
         private float _timer;
+        private bool _forceOn;
 
         private void Start()
         {
@@ -60,7 +61,8 @@ namespace FCS_HomeSolutions.Mods.TV.Mono
 
         private void OnPowerStateChanged(PowerSystem.Status obj)
         {
-            if (obj != PowerSystem.Status.Normal)
+            if(_forceOn) return;
+            if (obj == PowerSystem.Status.Offline)
             {
                 TurnOff();
             }
@@ -70,6 +72,7 @@ namespace FCS_HomeSolutions.Mods.TV.Mono
                 {
                     TurnOn();
                 }
+
             }
         }
 
@@ -107,6 +110,7 @@ namespace FCS_HomeSolutions.Mods.TV.Mono
                     
                     _videoSection.ChangeVolume(_savedData.Volume, _savedData.Volume > 0f);
                     
+                    QuickLogger.Debug($"Is On from save: {_savedData.IsOn}",true);
                     if (!_savedData.IsOn)
                     {
                         TurnOff();
@@ -116,12 +120,13 @@ namespace FCS_HomeSolutions.Mods.TV.Mono
                         if (!string.IsNullOrWhiteSpace(_savedData.Video))
                         {
                             ChangePage("VideoBTN");
-                            _videoSection.LoadChannel(_savedData.Video);
+                           _videoSection.LoadChannel(_savedData.Video);
+                           _forceOn = true;
+                            TurnOn();
                         }
                     }
                     
                 }
-
                 _runStartUpOnEnable = false;
             }
         }
@@ -206,15 +211,22 @@ namespace FCS_HomeSolutions.Mods.TV.Mono
 
         private void TurnOff()
         {
+            QuickLogger.Debug("Turn Off TV", true);
+            if (!_isOn && !_homeToggle.isOn && !_canvas.gameObject.activeSelf) return;
             _isOn = false;
             _homeToggle.isOn = true;
+            _forceOn = false;
+            _videoSection.Hide();
             _canvas.gameObject.SetActive(false);
         }
 
         private void TurnOn()
         {
+            QuickLogger.Debug($"Turn On TV {_canvas.gameObject.activeSelf}", true);
+            if (_isOn && _homeToggle.isOn && _canvas.gameObject.activeSelf) return;
             _isOn = true;
             _homeToggle.isOn = true;
+            _homeSection.Show();
             _canvas.gameObject.SetActive(true);
         }
         

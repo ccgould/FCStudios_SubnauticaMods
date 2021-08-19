@@ -71,6 +71,7 @@ namespace FCS_AlterraHub.Mono
 
         protected ColorManager _colorManager;
         private TechType _techType;
+        private Constructable _constructable;
 
         /// <summary>
         /// The package which this item belongs to
@@ -346,7 +347,12 @@ namespace FCS_AlterraHub.Mono
 
         public Constructable GetConstructable()
         {
-            return GetComponentInChildren<Constructable>();
+            if (_constructable == null)
+            {
+                _constructable = GetComponentInChildren<Constructable>();
+            }
+
+            return _constructable;
         }
     }
 

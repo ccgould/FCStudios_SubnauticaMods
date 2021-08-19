@@ -10,5 +10,6 @@ namespace FCS_HomeSolutions.Mods.Elevator.Mono
         internal GameObject LevelObject { get; set; }
         public string FloorId { get; set; }
         public int FloorIndex { get; set; }
+        public bool IsBaseFloor { get; set; }
     }
 }

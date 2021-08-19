@@ -96,17 +96,7 @@ namespace FCS_AlterraHub.Mono
         public static TechType ActivateGoalTechType { get; set; }
         public Base BaseComponent { get; set; }
         public string BaseFriendlyID { get; set; }
-        public HashSet<FcsDevice> BaseSpeakersSources { get; set; } = new();
 
-        public void RegisterSpeaker(FcsDevice speaker)
-        {
-            BaseSpeakersSources.Add(speaker);
-        }
-
-        public void UnRegisterSpeaker(FcsDevice speaker)
-        {
-            BaseSpeakersSources.Remove(speaker);
-        }
 
         #region Default Constructor
 

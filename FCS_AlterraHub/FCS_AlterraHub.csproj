@@ -42,6 +42,7 @@
     <Compile Include="Mods\AlterraHubFabricatorBuilding\Mono\DroneSystem\AlterraDronePortController.cs" />
     <Compile Include="Mods\AlterraHubFabricatorBuilding\Mono\DroneSystem\Interfaces\IDroneDestination.cs" />
     <Compile Include="Mods\AlterraHubFabricatorBuilding\Mono\DroneSystem\PortDoorController.cs" />
+    <Compile Include="Mods\AlterraHubFabricatorBuilding\Mono\SecurityGateController.cs" />
     <Compile Include="Mods\AlterraHubFabricatorBuilding\Mono\LightManager.cs" />
     <Compile Include="Mods\AlterraHubFabricatorBuilding\Spawnables\AlterraStationSpawnable.cs" />
     <Compile Include="Mods\AlterraHubFabricatorBuilding\Spawnables\DronePortPadHubNewFragSpawnable.cs" />

@@ -84,6 +84,8 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
         private uGUI_CanvasScaler _canvasScalar;
         internal EncyclopediaTabController EncyclopediaTabController { get; set; }
         public static FCSPDAController Main;
+        private GameObject _404;
+
         #endregion
 
         private void Awake()
@@ -129,6 +131,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             _canvas.sortingLayerID = 1479780821;
 
             _currentBiome = GameObjectHelpers.FindGameObject(_canvas.gameObject, "BiomeLBL")?.GetComponent<Text>();
+            _404 = GameObjectHelpers.FindGameObject(_canvas.gameObject, "404");
             _checkoutDialog = _canvas.gameObject.FindChild("Dialogs").FindChild("CheckOutPopUp").AddComponent<CheckOutPopupDialogWindow>();
 
             _returnsDialogController = _canvas.gameObject.FindChild("Dialogs").FindChild("ReturnItemsDialog").AddComponent<ReturnsDialogController>();
@@ -207,7 +210,6 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
 
             FPSInputModule.current.EscapeMenu();
         }
-
 
         private void CreateScreen()
         {
@@ -339,12 +341,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
 
         public bool Open()
         {
-
-            if (!Mod.GamePlaySettings.IsPDAUnlocked)
-            {
-                QuickLogger.ModMessage("Please complete the Alterra Hub Station Mission.");
-                return false;
-            }
+            _404?.SetActive(!Mod.GamePlaySettings.IsPDAUnlocked);
             
             Player main = Player.main;
             CreateScreen();
@@ -766,6 +763,11 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
         public static void ForceOpen()
         {
             Player_Patches.ForceOpenPDA = true;
+        }
+
+        public static void ForceClose()
+        {
+            Main.Close();
         }
     }
 }

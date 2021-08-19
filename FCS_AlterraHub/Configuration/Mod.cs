@@ -355,7 +355,7 @@ namespace FCS_AlterraHub.Configuration
 
                 if (AlterraFabricatorStationController.Main != null)
                 {
-                    foreach (AlterraTransportDroneEntry entry in AlterraFabricatorStationController.Main.SaveDrones())
+                    foreach (AlterraTransportDroneEntry entry in AlterraFabricatorStationController.Main.Save())
                     {
                         if(entry != null)
                             newSaveData.AlterraTransportDroneEntries.Add(entry);
@@ -639,6 +639,8 @@ namespace FCS_AlterraHub.Configuration
     {
         public bool KeyPad1;
         public bool KeyPad2;
+        public bool KeyPad3;
+        public float SecurityDoors;
     }
 
     [Serializable]

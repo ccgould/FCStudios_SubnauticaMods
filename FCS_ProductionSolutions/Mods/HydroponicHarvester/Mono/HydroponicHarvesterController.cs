@@ -287,7 +287,8 @@ namespace FCS_ProductionSolutions.Mods.HydroponicHarvester.Mono
 
         public override Pickupable RemoveItemFromContainer(TechType techType)
         {
-            return GrowBedManager.RemoveItemFromContainer(techType);
+            Destroy(GrowBedManager.RemoveItemFromContainer(techType).gameObject);
+            return techType.ToPickupable();
         }
 
         public override void OnHandHover(GUIHand hand)

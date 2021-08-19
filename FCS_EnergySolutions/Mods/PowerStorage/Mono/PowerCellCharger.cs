@@ -93,6 +93,8 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Mono
                 var handTargetController = GameObjectHelpers.FindGameObject(gameObject, "HandTarget")?.AddComponent<PowerStorageHandTargetController>();
                 if(handTargetController != null) handTargetController.storage = _storageContainer;
             }
+
+            AddPowerSource(_powerSupply);
         }
 
         private void AddPowercell(InventoryItem item)
@@ -141,10 +143,9 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Mono
         }
 
         private void Update()
-        {
+        { 
             PowerRelay powerRelay = PowerSource.FindRelay(transform);
-            AddPowerSource(_powerSupply);
-
+            
             if (DayNightCycle.main.deltaTime == 0f || !_allowedToCharge)
             {
                 return;
@@ -186,6 +187,7 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Mono
                         }
                     }
                     float num4 = 0f;
+
                     if (num2 > 0f && _mono.CalculateBasePower() > num2)
                     {
                         flag = true;
@@ -279,7 +281,7 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Mono
                 definition.battery.IsVisible(n >= 0f);
             }
 
-            ProfilingUtils.BeginSample("ChargerUpdateText");
+            //ProfilingUtils.BeginSample("ChargerUpdateText");
             Text text = definition.text;
             if (text != null)
             {
@@ -301,7 +303,7 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Mono
             }
 
 
-            ProfilingUtils.EndSample(null);
+            //ProfilingUtils.EndSample(null);
             Image bar = definition.bar;
             if (bar != null)
             {
@@ -447,25 +449,7 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Mono
         {
             _allowedToCharge = value;
         }
-
-        public byte[] Save(ProtobufSerializer serializer)
-        {
-            return null;  //_storageContainer.Save(serializer);
-        }
-
-#if SUBNAUTICA_STABLE
-        public void Load(ProtobufSerializer serializer, byte[] savedDataData)
-        {
-            //_storageContainer.RestoreItems(serializer, savedDataData);
-        }
-#else
-        //public IEnumerator Load(ProtobufSerializer serializer, byte[] savedDataData)
-        //{
-        //    yield return _storageContainer.RestoreItemsAsync(serializer, savedDataData);
-        //    yield break;
-        //}
-#endif
-
+        
         public bool HasPowerCells()
         {
             if (Batteries == null) return false;

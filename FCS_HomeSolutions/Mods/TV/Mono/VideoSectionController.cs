@@ -27,6 +27,7 @@ namespace FCS_HomeSolutions.Mods.TV.Mono
         private GameObject _videoGrid;
         private GameObject _videoPlayer;
         private GameObject _noVideosFound;
+        private RenderTexture _renderTexture;
 
         private void Update()
         {
@@ -95,11 +96,11 @@ namespace FCS_HomeSolutions.Mods.TV.Mono
                 Stop();
             }));
 
-            var renderTexture = new RenderTexture(1920, 1080, 24);
-            renderTexture.Create();
+            _renderTexture = new RenderTexture(1920, 1080, 24);
+            _renderTexture.Create();
 
-            _video.targetTexture = renderTexture;
-            rawImage.texture = renderTexture;
+            _video.targetTexture = _renderTexture;
+            rawImage.texture = _renderTexture;
         }
 
         private void LoadVideoLocations()
@@ -158,6 +159,7 @@ namespace FCS_HomeSolutions.Mods.TV.Mono
         internal void Hide()
         {
             gameObject.SetActive(false);
+            Stop();
             _videoPlayer.SetActive(false);
         }
 
@@ -194,10 +196,22 @@ namespace FCS_HomeSolutions.Mods.TV.Mono
 
         internal void Stop()
         {
+            _video.clip = null;
             _video.Stop();
+            ClearOutRenderTexture();
             _currentChannel = string.Empty;
         }
-        
+
+
+        public void ClearOutRenderTexture()
+        {
+            RenderTexture rt = RenderTexture.active;
+            RenderTexture.active = _renderTexture;
+            GL.Clear(true, true, Color.clear);
+            RenderTexture.active = rt;
+        }
+
+
         internal void VolumeUp()
         {
             if (!_controller.GetIsOn()) return;

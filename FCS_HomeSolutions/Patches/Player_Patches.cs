@@ -1,4 +1,5 @@
 ﻿using FCS_HomeSolutions.Configuration;
+using FCS_HomeSolutions.Mods.JukeBox.Mono;
 using FCS_HomeSolutions.Mods.QuantumTeleporter.Mono;
 using FCSCommon.Utilities;
 using HarmonyLib;
@@ -16,6 +17,17 @@ namespace FCS_HomeSolutions.Patches
             {
                 TeleportManager.Update();
             }
+        }
+    }
+
+    [HarmonyPatch(typeof(Player))]
+    [HarmonyPatch(nameof(Player.main.Awake))]
+    internal class Player_Awake
+    {
+        [HarmonyPrefix]
+        public static void Postfix(ref Player __instance)
+        {
+            var main = JukeBox.Main;
         }
     }
 }

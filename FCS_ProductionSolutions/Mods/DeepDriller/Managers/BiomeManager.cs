@@ -49,8 +49,7 @@ namespace FCS_ProductionSolutions.Mods.DeepDriller.Managers
             TechType.DrillableKyanite
         };
 
-        private static List<TechType> _allOres = new List<TechType>();
-
+        private static List<TechType> _allOres = new();
 
         private static void FindMatchingBiome(string biome, out string biomeType)
         {

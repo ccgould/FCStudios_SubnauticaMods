@@ -49,33 +49,35 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Mono
 
         private void CheckIfAllowedToCharge()
         {
-            //if(Manager?.Habitat == null)return;
+            if (Manager?.Habitat == null) return;
 
-            //switch (_mode)
-            //{
-            //    case PowerChargerMode.ChargeMode:
-            //        _powercellSupply.SetAllowedToCharge(true);
-            //        ChangeStatusLights(true);
-            //        break;
-            //    case PowerChargerMode.DischargeMode:
-            //        _powercellSupply.SetAllowedToCharge(false);
-            //        break;
-            //    case PowerChargerMode.Auto:
-            //        _powercellSupply.SetAllowedToCharge(CalculatePowerPercentage() > 40);
-            //        break;
-            //}
+            switch (_mode)
+            {
+                case PowerChargerMode.ChargeMode:
+                    _powercellSupply.SetAllowedToCharge(true);
+                    ChangeStatusLights(true);
+                    break;
+                case PowerChargerMode.DischargeMode:
+                    _powercellSupply.SetAllowedToCharge(false);
+                    break;
+                case PowerChargerMode.Auto:
+                    _powercellSupply.SetAllowedToCharge(CalculatePowerPercentage() > 40);
+                    break;
+            }
         }
 
         internal float CalculatePowerPercentage()
         {
-            var baseCapacity = Manager.GetBasePowerCapacity() - TotalPowerStorageCapacityAtBase();
+            var baseCapacity = Manager?.GetBasePowerCapacity() ?? 0 - TotalPowerStorageCapacityAtBase();
             if (CalculateBasePower() <= 0 || baseCapacity <= 0) return 0;
             return CalculateBasePower() / baseCapacity  * 100;
         }
 
         private float TotalPowerStorageCapacityAtBase()
         {
-            var powerStorages = Manager.GetDevices(Mod.PowerStorageTabID);
+            var powerStorages = Manager?.GetDevices(Mod.PowerStorageTabID);
+
+            if (powerStorages == null) return 0f;
 
             float amount = 0f;
             foreach (FcsDevice powerStorage in powerStorages)
@@ -93,7 +95,9 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Mono
 
         private float TotalPowerStoragePowerAtBase()
         {
-            var powerStorages = Manager.GetDevices(Mod.PowerStorageTabID);
+            var powerStorages = Manager?.GetDevices(Mod.PowerStorageTabID);
+
+            if (powerStorages == null) return 0f;
 
             float amount = 0f;
             foreach (FcsDevice powerStorage in powerStorages)
@@ -153,11 +157,6 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Mono
                             _autoModeToggle.OnButtonClick?.Invoke(null, null);
                             _autoModeToggle?.Select();
                             break;
-                    }
-
-                    if (_savedData.Data != null)
-                    {
-                        //_powercellSupply.Load(_serializer, _savedData.Data);
                     }
                 }
 
@@ -245,7 +244,7 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Mono
                 _powercellSupply.Initialize(this);
             }
 
-            
+
 
             PowercellCharger.Initialize(this, GameObjectHelpers.FindGameObject(gameObject, "meshes").GetChildren(), GameObjectHelpers.FindGameObject(gameObject, "BatteryMeters").GetChildren(), _powercellSupply);
 
@@ -363,7 +362,7 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Mono
 
         public float CalculateBasePower()
         {
-           return Manager.GetPower() - TotalPowerStoragePowerAtBase();
+           return Manager?.GetPower() ?? 0 - TotalPowerStoragePowerAtBase();
         }
 
         public override float GetMaxPower()
