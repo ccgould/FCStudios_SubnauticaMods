@@ -84,17 +84,12 @@ namespace FCS_EnergySolutions
                 mk3PylonUpgrade.Patch();
             }
 
-
             if (Configuration.IsPowerStorageEnabled)
             {
                 var powerStorage = new PowerStoragePatcher();
                 powerStorage.Patch();
-
-                var powerStorageCell = new PowerStorageCell();
-                powerStorageCell.Patch();
             }
-
-
+            
             if (Configuration.IsUniversalChargerEnabled)
             {
                 var universalCharger = new UniversalChargerPatcher();
