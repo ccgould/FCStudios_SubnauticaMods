@@ -433,7 +433,15 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
             return null;
 
         }
-        
+
+        public IEnumerable<ISlotController> GetServers()
+        {
+            foreach (KeyValuePair<string, DSSSlotController> controller in Slots)
+            {
+                yield return controller.Value;
+            }
+        }
+
         public override void OnProtoSerialize(ProtobufSerializer serializer)
         {
             QuickLogger.Debug("In OnProtoSerialize");

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using FCS_AlterraHub.Mono;
 
 namespace FCS_AlterraHub.Interfaces
@@ -16,5 +17,6 @@ namespace FCS_AlterraHub.Interfaces
         int GetItemCount(TechType techType);
         bool HasItem(TechType techType);
         Pickupable RemoveItemFromRack(TechType techType);
+        IEnumerable<ISlotController> GetServers();
     }
 }

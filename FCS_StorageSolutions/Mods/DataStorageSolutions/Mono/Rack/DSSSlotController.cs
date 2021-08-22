@@ -226,6 +226,11 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
             return _mountedServer.AddItemToContainer(item);
         }
 
+        public bool ItemAllowed(TechType techType)
+        {
+            return IsOccupied && !IsFull && IsTechTypeAllowed(techType);
+        }
+
         public string GetSlotName()
         {
             return _slotName;

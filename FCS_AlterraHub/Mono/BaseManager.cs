@@ -1117,15 +1117,18 @@ namespace FCS_AlterraHub.Mono
                 return false;
             }
 
-            //QuickLogger.Debug($"Checking if allowed {_dumpContainer.GetItemCount() + 1}", true);
+            QuickLogger.Debug($"Checking if allowed {_dumpContainer.GetItemCount() + 1}", true);
 
             foreach (IDSSRack baseRack in BaseRacks)
             {
-                if (baseRack.ItemAllowed(techType, out var server))
+                foreach (var server in baseRack.GetServers())
                 {
-                    if(!server.IsFull)
+                    if (server.ItemAllowed((techType)))
+                    {
                         validServers.Add(server);
+                    }
                 }
+
             }
 
             if (validServers.Count > 0)
@@ -1135,7 +1138,7 @@ namespace FCS_AlterraHub.Mono
 
             var result = availableSpace >= _dumpContainer.GetItemCount() + 1;
 
-            //QuickLogger.Debug($"Allowed result: {result}", true);
+            QuickLogger.Debug($"Allowed result: {result}", true);
             return result;
         }
 
@@ -1215,6 +1218,7 @@ namespace FCS_AlterraHub.Mono
             try
             {
                 var result = AddItemToNetwork(item, this);
+
                 if (!result)
                 {
                     PlayerInteractionHelper.GivePlayerItem(item);
