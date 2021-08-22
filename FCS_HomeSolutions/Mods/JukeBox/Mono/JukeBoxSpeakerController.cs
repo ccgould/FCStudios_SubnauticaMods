@@ -74,6 +74,8 @@ namespace FCS_HomeSolutions.Mods.JukeBox.Mono
             {
                 _audio.Play();
             }
+
+            _audio.volume = _baseJukeBox.Volume;
         }
 
         private void Resume()

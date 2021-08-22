@@ -106,9 +106,7 @@ namespace FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Mono
             _storage.container.onAddItem += OnStorageAddItem;
             _storage.container.onRemoveItem += OnStorageRemoveItem;
             _storage.container.SetAllowedTechTypes(new[] { TechType.FireExtinguisher });
-
-
-
+            
             InvokeRepeating(nameof(FindExtinguisher),1,1);
 
             IsInitialized = true;
@@ -119,6 +117,12 @@ namespace FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Mono
         {
             item.item.gameObject.SetActive(false);
             _fireEx = null;
+            var collisions = item.item.GetComponentsInChildren<Collider>();
+
+            foreach (Collider collider in collisions)
+            {
+                collider.isTrigger = true;
+            }
             UpdateColor();
         }
 
@@ -126,15 +130,29 @@ namespace FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Mono
         {
             QuickLogger.Debug("OnStorageAddItem",true);
 
-            var rigidBodies = item.item.GetComponentsInChildren<Rigidbody>();
+
 
             _fireEx = item.item.GetComponentInChildren<FireExtinguisher>();
+
+            DisableComponents(item.item.gameObject);
+
+            item.item.gameObject.SetActive(true);
+        }
+
+        private static void DisableComponents(GameObject item)
+        {
+            var rigidBodies = item.GetComponentsInChildren<Rigidbody>();
+            var collisions = item.GetComponentsInChildren<Collider>();
 
             foreach (Rigidbody rg in rigidBodies)
             {
                 rg.isKinematic = true;
             }
-            item.item.gameObject.SetActive(true);
+
+            foreach (Collider collider in collisions)
+            {
+                collider.isTrigger = true;
+            }
         }
 
         private void FindExtinguisher()
@@ -150,6 +168,7 @@ namespace FCS_HomeSolutions.Mods.FireExtinguisherRefueler.Mono
             if (_storage.container.Contains(TechType.FireExtinguisher))
             {
                 _fireEx = _storage.container.GetItems(TechType.FireExtinguisher)[0].item.GetComponent<FireExtinguisher>();
+                DisableComponents(_fireEx.gameObject);
             }
         }
 

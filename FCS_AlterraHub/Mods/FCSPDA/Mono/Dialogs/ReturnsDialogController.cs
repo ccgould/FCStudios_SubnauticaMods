@@ -35,7 +35,6 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
                     {
                         CardSystem.main.Refund(toggle.InventoryItem.item.GetTechType());
                         Destroy(toggle.InventoryItem.item.gameObject);
-                        break;
                     }
                 }
                 Close();
