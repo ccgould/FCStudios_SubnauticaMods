@@ -25,6 +25,8 @@
     <Compile Include="Buildables\AlterraHubModelPrefab.cs" />
     <Compile Include="Helpers\FModHelpers.cs" />
     <Compile Include="Managers\PortManager.cs" />
+    <Compile Include="Model\GUI\EquipmentConfiguration.cs" />
+    <Compile Include="Model\GUI\Initialize_uGUI.cs" />
     <Compile Include="Model\GUI\StorageInventoryButton.cs" />
     <Compile Include="Model\LadderController.cs" />
     <Compile Include="Mods\AlterraHubFabricatorBuilding\Buildables\DronePortPadHubNewPatcher.cs" />
@@ -99,7 +101,6 @@
     <Compile Include="Managers\AudioManager.cs" />
     <Compile Include="Managers\FCSPowerManager.cs" />
     <Compile Include="Managers\HealthController.cs" />
-    <Compile Include="Managers\PowerStorageController.cs" />
     <Compile Include="Model\AdditionalColor.cs" />
     <Compile Include="Model\BaseOperationObject.cs" />
     <Compile Include="Model\Converters\Converters.cs" />
@@ -179,6 +180,7 @@
     <Compile Include="Enumerators\StorageType.cs" />
     <Compile Include="Mono\ToggleController.cs" />
     <Compile Include="Model\TrackedResource.cs" />
+    <Compile Include="Patches\EquipmentPatcher.cs" />
     <Compile Include="Patches\PDAEncyclopedia_Patches.cs" />
     <Compile Include="Patches\SubnautiaMap_Patches.cs" />
     <Compile Include="Structs\ModPackData.cs" />

@@ -32,7 +32,7 @@ namespace FCS_EnergySolutions.Buildable
         public static GameObject FrequencyItemPrefab { get; set; }
         public static GameObject PylonUpgradeDataBoxPrefab { get; set; }
         public static GameObject HoloGramPrefab { get; set; }
-
+        public static GameObject UniversalChargerPrefab { get; set; }
 
         internal static void Initialize()
         {
@@ -52,7 +52,10 @@ namespace FCS_EnergySolutions.Buildable
             PylonUpgradeDataBoxPrefab = GetPrefab("PylonUpgradeDataBox",true);
             FrequencyItemPrefab = GetPrefab("FrequencyItem");
             PowerStoragePrefab = GetPrefab(Mod.PowerStoragePrefabName,true);
+            UniversalChargerPrefab = GetPrefab(Mod.UniversalChargerPrefabName, true);
         }
+
+
 
         private static void CreateHoloGramPrefab()
         {

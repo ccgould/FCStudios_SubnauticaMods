@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Reflection;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems;
 using UnityEngine;
@@ -29,12 +30,9 @@ namespace FCS_AlterraHub.Extensions
             return num.ToString("#,0");
         }
 
-        //internal static List<CartItemSaveData> ToCartItemSaveData(this List<CartItem> data)
-        //{
-        //    foreach (CartItem cartItem in data)
-        //    {
-        //        yield return cartItem.Save();
-        //    }
-        //}
+        public static object GetPrivateField<T>(this T instance, string fieldName, BindingFlags bindingFlags = BindingFlags.Default)
+        {
+            return typeof(T).GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic | bindingFlags).GetValue(instance);
+        }
     }
 }

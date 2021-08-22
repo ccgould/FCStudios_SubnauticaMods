@@ -2,8 +2,7 @@
 {
     internal enum PowerChargerMode
     {
-        ChargeMode = 0,
-        DischargeMode = 1,
-        Auto = 2
+        Powercell = 0,
+        Battery = 1,
     }
 }

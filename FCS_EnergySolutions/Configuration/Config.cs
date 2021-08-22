@@ -97,6 +97,9 @@ namespace FCS_EnergySolutions.Configuration
             {"None",0f }
         };
 
+        [Toggle("[UniversalCharger] Is Mod Enabled", Tooltip = "Enables/Disables UniversalCharger from your game (*Note: Game must be restarted for changes to take effect. Its best to destroy all objects before disabling a mod)")]
+        public bool IsUniversalChargerEnabled = true;
+
 
         private static void TelepowerPylonBrightnessChangeEvent(SliderChangedEventArgs e)
         {

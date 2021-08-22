@@ -6,10 +6,7 @@ using FCS_AlterraHub.Objects;
 using FCS_EnergySolutions.Mods.PowerStorage.Enums;
 using FCS_EnergySolutions.Mods.TelepowerPylon.Model;
 using FCS_EnergySolutions.Mods.TelepowerPylon.Mono;
-using FCS_EnergySolutions.Mods.WindSurfer.Mono;
 using FCS_EnergySolutions.Mods.WindSurfer.Structs;
-using FCSCommon.Interfaces;
-using UnityEngine;
 #if SUBNAUTICA_STABLE
 using Oculus.Newtonsoft.Json;
 #else
@@ -72,6 +69,17 @@ namespace FCS_EnergySolutions.Configuration
         [JsonProperty] internal Vec4 SecondaryBody { get; set; }
         [JsonProperty] internal FCSPowerStates PowerState { get; set; }
         [JsonProperty] internal byte[] Data { get; set; }
+    }    
+    
+    internal class UniversalChargerDataEntry : ISaveDataEntry
+    {
+        public string Id { get; set; }
+        public string BaseId { get; set; }
+        [JsonProperty] internal string SaveVersion { get; set; } = "1.0";
+        [JsonProperty] internal Vec4 Body { get; set; }
+        [JsonProperty] internal Vec4 SecondaryBody { get; set; }
+        [JsonProperty] internal Dictionary<string, string> BatteryData { get; set; }
+        [JsonProperty] internal Dictionary<string, string> ChargerData { get; set; }
         [JsonProperty] internal PowerChargerMode Mode { get; set; }
     }
 
@@ -122,6 +130,7 @@ namespace FCS_EnergySolutions.Configuration
         [JsonProperty] internal List<AlterraGenDataEntry> AlterraGenEntries = new List<AlterraGenDataEntry>();
         [JsonProperty] internal List<JetStreamT242DataEntry> MarineTurbineEntries = new List<JetStreamT242DataEntry>();
         [JsonProperty] internal List<PowerStorageDataEntry> PowerStorageEntries = new List<PowerStorageDataEntry>();
+        [JsonProperty] internal List<UniversalChargerDataEntry> UniversalChargerEntries = new List<UniversalChargerDataEntry>();
         [JsonProperty] internal List<AlterraSolarClusterDataEntry> AlterraSolarClusterEntries = new List<AlterraSolarClusterDataEntry>();
         [JsonProperty] internal List<TelepowerPylonDataEntry> TelepowerPylonEntries = new List<TelepowerPylonDataEntry>();
         [JsonProperty] internal List<WindSurferOperatorDataEntry> WindSurferOperatorEntries = new List<WindSurferOperatorDataEntry>();

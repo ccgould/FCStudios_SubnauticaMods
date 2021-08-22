@@ -5,7 +5,6 @@ using FCS_AlterraHub.Enumerators;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Mods.Global.Spawnables;
-using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_EnergySolutions.Buildable;
 using FCS_EnergySolutions.Configuration;
@@ -24,8 +23,8 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Buildable
 {
     internal class PowerStoragePatcher : SMLHelper.V2.Assets.Buildable
     {
-        public override TechGroup GroupForPDA => TechGroup.InteriorModules;
-        public override TechCategory CategoryForPDA => TechCategory.InteriorModule;
+        public override TechGroup GroupForPDA => TechGroup.ExteriorModules;
+        public override TechCategory CategoryForPDA => TechCategory.ExteriorModule;
         private string _assetFolder => Mod.GetAssetFolder();
         public override string AssetsFolder => _assetFolder;
         public PowerStoragePatcher() : base(Mod.PowerStorageClassName, Mod.PowerStorageFriendlyName, Mod.PowerStorageDescription)
@@ -53,8 +52,8 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Buildable
             {
                 var prefab = GameObject.Instantiate(ModelPrefab.PowerStoragePrefab);
 
-                var center = new Vector3(0f, -0.014202f, 0.3327329f);
-                var size = new Vector3(1.461404f, 1.353021f, 0.4319195f);
+                var center = new Vector3(0f, 4.330446f, 0f);
+                var size = new Vector3(7.856985f, 7.846021f, 7.994404f);
 
                 GameObjectHelpers.AddConstructableBounds(prefab, size, center);
 
@@ -70,28 +69,42 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Buildable
 
                 // Add constructible
                 var constructable = prefab.AddComponent<Constructable>();
-                constructable.allowedOutside = false;
-                constructable.allowedInBase = true;
-                constructable.allowedOnGround = false;
-                constructable.allowedOnWall = true;
-                constructable.rotationEnabled = false;
+                constructable.allowedOutside = true;
+                constructable.allowedInBase = false;
+                constructable.allowedOnGround = true;
+                constructable.allowedOnWall = false;
+                constructable.rotationEnabled = true;
                 constructable.allowedOnCeiling = false;
-                constructable.allowedInSub = true;
+                constructable.allowedInSub = false;
                 constructable.allowedOnConstructables = false;
                 constructable.model = model;
                 constructable.techType = TechType;
+                constructable.placeDefaultDistance = 5;
+                constructable.placeMinDistance = 5;
+                constructable.placeMaxDistance = 10;
+                constructable.forceUpright = true;
 
                 PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
                 prefabID.ClassId = ClassID;
                 prefab.AddComponent<TechTag>().type = TechType;
+
+                PowerRelay solarPowerRelay = CraftData.GetPrefabForTechType(TechType.SolarPanel).GetComponent<PowerRelay>();
                 
-                prefab.SetActive(false);
-                var fs= prefab.AddComponent<FCSStorage>();
-                fs.Initialize(10,2,5,$"{Mod.PowerStorageFriendlyName} Receptacle" ,Mod.PowerStorageClassName);
-                prefab.SetActive(true);
-                
+                var ps = prefab.AddComponent<PowerSource>();
+                ps.maxPower = 10000f;
+
+                var pFX = prefab.AddComponent<PowerFX>();
+                pFX.vfxPrefab = solarPowerRelay.powerFX.vfxPrefab;
+                pFX.attachPoint = GameObjectHelpers.FindGameObject(prefab,"connection_port").transform;
+
+                var pr = prefab.AddComponent<PowerRelay>();
+                pr.powerFX = pFX;
+                pr.maxOutboundDistance = 20;
+                pr.internalPowerSource = ps;
+
                 prefab.AddComponent<PowerStorageController>();
-                
+
+                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
 
                 return prefab;
             }
@@ -105,40 +118,61 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Buildable
 #else
         public override IEnumerator GetGameObjectAsync(IOut<GameObject> gameObject)
         {
-            var prefab = GameObject.Instantiate(ModelPrefab.PowerStoragePrefab);
+                var prefab = GameObject.Instantiate(ModelPrefab.PowerStoragePrefab);
 
-            var center = new Vector3(0f, -0.014202f, 0.3327329f);
-            var size = new Vector3(1.461404f, 1.353021f, 0.4319195f);
+                var center = new Vector3(0f, 4.330446f, 0f);
+                var size = new Vector3(7.856985f, 7.846021f, 7.994404f);
 
-            GameObjectHelpers.AddConstructableBounds(prefab, size, center);
+                GameObjectHelpers.AddConstructableBounds(prefab, size, center);
 
-            var model = prefab.FindChild("model");
+                var model = prefab.FindChild("model");
 
-            //========== Allows the building animation and material colors ==========// 
-            Shader shader = Shader.Find("MarmosetUBER");
-            Renderer[] renderers = prefab.GetComponentsInChildren<Renderer>();
-            SkyApplier skyApplier = prefab.EnsureComponent<SkyApplier>();
-            skyApplier.renderers = renderers;
-            skyApplier.anchorSky = Skies.Auto;
-            //========== Allows the building animation and material colors ==========// 
+                //========== Allows the building animation and material colors ==========// 
+                Shader shader = Shader.Find("MarmosetUBER");
+                Renderer[] renderers = prefab.GetComponentsInChildren<Renderer>();
+                SkyApplier skyApplier = prefab.EnsureComponent<SkyApplier>();
+                skyApplier.renderers = renderers;
+                skyApplier.anchorSky = Skies.Auto;
+                //========== Allows the building animation and material colors ==========// 
 
-            // Add constructible
-            var constructable = prefab.AddComponent<Constructable>();
-            constructable.allowedOutside = false;
-            constructable.allowedInBase = true;
-            constructable.allowedOnGround = false;
-            constructable.allowedOnWall = true;
-            constructable.rotationEnabled = false;
-            constructable.allowedOnCeiling = false;
-            constructable.allowedInSub = true;
-            constructable.allowedOnConstructables = false;
-            constructable.model = model;
-            constructable.techType = TechType;
+                // Add constructible
+                var constructable = prefab.AddComponent<Constructable>();
+                constructable.allowedOutside = true;
+                constructable.allowedInBase = false;
+                constructable.allowedOnGround = true;
+                constructable.allowedOnWall = false;
+                constructable.rotationEnabled = true;
+                constructable.allowedOnCeiling = false;
+                constructable.allowedInSub = false;
+                constructable.allowedOnConstructables = false;
+                constructable.model = model;
+                constructable.techType = TechType;
+                constructable.placeDefaultDistance = 5;
+                constructable.placeMinDistance = 5;
+                constructable.placeMaxDistance = 10;
+                constructable.forceUpright = true;
 
-            PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
-            prefabID.ClassId = ClassID;
-            prefab.AddComponent<TechTag>().type = TechType;
-            prefab.AddComponent<PowerStorageController>();
+                PrefabIdentifier prefabID = prefab.AddComponent<PrefabIdentifier>();
+                prefabID.ClassId = ClassID;
+                prefab.AddComponent<TechTag>().type = TechType;
+
+                PowerRelay solarPowerRelay = CraftData.GetPrefabForTechType(TechType.SolarPanel).GetComponent<PowerRelay>();
+                
+                var ps = prefab.AddComponent<PowerSource>();
+                ps.maxPower = 10000f;
+
+                var pFX = prefab.AddComponent<PowerFX>();
+                pFX.vfxPrefab = solarPowerRelay.powerFX.vfxPrefab;
+                pFX.attachPoint = GameObjectHelpers.FindGameObject(prefab,"connection_port").transform;
+
+                var pr = prefab.AddComponent<PowerRelay>();
+                pr.powerFX = pFX;
+                pr.maxOutboundDistance = 20;
+                pr.internalPowerSource = ps;
+
+                prefab.AddComponent<PowerStorageController>();
+
+                MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
 
             gameObject.Set(prefab);
             yield break;

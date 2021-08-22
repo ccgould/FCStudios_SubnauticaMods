@@ -41,7 +41,9 @@
     <Compile Include="Mods\AlterraSolarCluster\Mono\AlterraSolarClusterMovementManager.cs" />
     <Compile Include="Mods\AlterraSolarCluster\Mono\AlterraSolarClusterPowerManager.cs" />
     <Compile Include="Mods\AlterraSolarCluster\Mono\AlterraSolarClusterController.cs" />
-    <Compile Include="Mods\PowerStorage\Mono\PowerStorageHandTargetController.cs" />
+    <Compile Include="Mods\PowerStorage\Buildable\PowerStoragePatcher.cs" />
+    <Compile Include="Mods\PowerStorage\Enums\PowerChargerMode.cs" />
+    <Compile Include="Mods\PowerStorage\Mono\PowerStorageController.cs" />
     <Compile Include="Mods\Spawnables\BioFuelSpawnable.cs" />
     <Compile Include="Mods\TelepowerPylon\Buildable\TelepowerPylonPatcher.cs" />
     <Compile Include="Mods\TelepowerPylon\Model\TelepowerPylonMode.cs" />
@@ -49,6 +51,7 @@
     <Compile Include="Mods\TelepowerPylon\Mono\TelepowerPylonController.cs" />
     <Compile Include="Mods\TelepowerPylon\Mono\TelepowerPylonPowerManager.cs" />
     <Compile Include="Mods\TelepowerPylon\Mono\TelepowerPylonTrigger.cs" />
+    <Compile Include="Mods\UniversalCharger\Mono\BatteryCharger.cs" />
     <Compile Include="Mods\WindSurfer\Buildables\WindSurferOperatorPatcher.cs" />
     <Compile Include="Mods\WindSurfer\Enums\HolographIconType.cs" />
     <Compile Include="Mods\WindSurfer\Mono\WindSurferPlatformBase.cs" />
@@ -69,13 +72,10 @@
     <Compile Include="Mods\WindSurfer\Spawnables\WindSurferPrefab.cs" />
     <Compile Include="Patches\BasePowerRelayGetConnectPoint_Patch.cs" />
     <Compile Include="Patches\Battery_Patch.cs" />
-    <Compile Include="Mods\PowerStorage\Buildable\PowerStoragePatcher.cs" />
-    <Compile Include="Mods\PowerStorage\Mono\BatteryDummyController.cs" />
-    <Compile Include="Mods\PowerStorage\Mono\PowerCellCharger.cs" />
-    <Compile Include="Mods\PowerStorage\Enums\PowerChargerMode.cs" />
-    <Compile Include="Mods\PowerStorage\Mono\PowerSupply.cs" />
-    <Compile Include="Mods\PowerStorage\Mono\PowerStorageController.cs" />
-    <Compile Include="Mods\PowerStorage\Structs\SlotDefinition.cs" />
+    <Compile Include="Mods\UniversalCharger\Buildable\UniversalChargerPatcher.cs" />
+    <Compile Include="Mods\UniversalCharger\Mono\PowercellCharger.cs" />
+    <Compile Include="Mods\UniversalCharger\Mono\UniversalChargerController.cs" />
+    <Compile Include="Patches\SubRoot_Patches.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Mods\Spawnables\PowerStorageCell.cs" />

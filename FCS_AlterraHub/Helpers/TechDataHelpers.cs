@@ -11,7 +11,21 @@ namespace FCS_AlterraHub.Helpers
         private static Dictionary<TechType, int> _knownIngredientCounts = new Dictionary<TechType, int>();
         private static HashSet<TechType> batteryTech;
         private static HashSet<TechType> powercellTech;
+        private static HashSet<TechType> cellConcatTech;
         private static List<IIngredient> _ingredients = new List<IIngredient>();
+
+        public static HashSet<TechType> CellConcatTech
+        {
+            get
+            {
+                if (cellConcatTech is null || cellConcatTech.Count == 0)
+                {
+                    cellConcatTech = new HashSet<TechType>(BatteryCharger.compatibleTech).Concat(PowerCellCharger.compatibleTech).ToHashSet();
+                }
+
+                return cellConcatTech;
+            }
+        }
 
         public static HashSet<TechType> BatteryTech
         {
@@ -19,7 +33,7 @@ namespace FCS_AlterraHub.Helpers
             {
                 if (batteryTech is null || batteryTech.Count == 0)
                 {
-                    batteryTech = new HashSet<TechType>(BatteryCharger.compatibleTech).Concat(PowerCellCharger.compatibleTech).ToHashSet();
+                    batteryTech = new HashSet<TechType>(BatteryCharger.compatibleTech);
                 }
 
                 return batteryTech;
@@ -124,7 +138,7 @@ namespace FCS_AlterraHub.Helpers
 
                 foreach (IIngredient ingredient in readOnlyCollection)
                 {
-                    if (BatteryTech.Contains(techType) || !BatteryTech.Contains(ingredient.techType))
+                    if (CellConcatTech.Contains(techType) || !CellConcatTech.Contains(ingredient.techType))
                     {
                         _ingredients.Add(ingredient);
                     }

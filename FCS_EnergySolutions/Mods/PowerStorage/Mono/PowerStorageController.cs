@@ -1,14 +1,16 @@
-﻿using FCS_AlterraHomeSolutions.Mono.PaintTool;
-using FCS_AlterraHub.Enumerators;
+﻿using System;
+using System.Collections.Generic;
+using FCS_AlterraHomeSolutions.Mono.PaintTool;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Extensions;
 using FCS_AlterraHub.Helpers;
-using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCS_EnergySolutions.Buildable;
 using FCS_EnergySolutions.Configuration;
 using FCS_EnergySolutions.Mods.PowerStorage.Enums;
 using FCSCommon.Utilities;
+using RadicalLibrary;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -19,109 +21,72 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Mono
         private bool _runStartUpOnEnable;
         private bool _isFromSave;
         private PowerStorageDataEntry _savedData;
+        public override bool IsOperational => IsConstructed && IsInitialized;
+        public const float POWERUSAGE = 1f;
+        private readonly Color _colorEmpty = new Color(1f, 0f, 0f, 1f);
+        private readonly Color _colorHalf = new Color(1f, 1f, 0f, 1f);
+        private readonly Color _colorFull = new Color(0f, 1f, 0f, 1f);
+        private Image _bar;
+        private ParticleSystem[] _particles;
+        private FMOD_CustomEmitter _audio;
+        private bool _allowedToCharge;
+        private BasePowerStorage _basePowerStorage;
 
-        internal PowerCellCharger PowercellCharger { get; private set; }
-        private PowerSupply _powercellSupply;
-        private FCSToggleButton _chargeModeToggle;
-        private FCSToggleButton _autoModeToggle;
-        private FCSToggleButton _disChargeModeToggle;
-        private InterfaceInteraction _interactionChecker;
-        private PowerChargerMode _mode;
-        private ProtobufSerializer _serializer;
-        internal Image PowerTotalMeterRing { get; set; }
-        internal Text PowerTotalMeterPercent { get; set; }
-        internal Text PowerTotalMeterTotal { get; set; }
-
-        private void Update()
-        {
-            if (DayNightCycle.main.deltaTime == 0)
-            {
-                return;
-            }
-
-            CheckIfAllowedToCharge();
-        }
-
+        public PowerSource PowerSource { get; private set; }
+        
         public override Vector3 GetPosition()
         {
             return transform.position;
         }
 
-        private void CheckIfAllowedToCharge()
+        private void UpdateVisuals()
         {
-            if (Manager?.Habitat == null) return;
-
-            switch (_mode)
+            var percentage = PowerSource.power / PowerSource.maxPower;
+            if (_bar != null)
             {
-                case PowerChargerMode.ChargeMode:
-                    _powercellSupply.SetAllowedToCharge(true);
-                    ChangeStatusLights(true);
-                    break;
-                case PowerChargerMode.DischargeMode:
-                    _powercellSupply.SetAllowedToCharge(false);
-                    break;
-                case PowerChargerMode.Auto:
-                    _powercellSupply.SetAllowedToCharge(CalculatePowerPercentage() > 40);
-                    break;
-            }
-        }
 
-        internal float CalculatePowerPercentage()
-        {
-            var baseCapacity = Manager?.GetBasePowerCapacity() ?? 0 - TotalPowerStorageCapacityAtBase();
-            if (CalculateBasePower() <= 0 || baseCapacity <= 0) return 0;
-            return CalculateBasePower() / baseCapacity  * 100;
-        }
-
-        private float TotalPowerStorageCapacityAtBase()
-        {
-            var powerStorages = Manager?.GetDevices(Mod.PowerStorageTabID);
-
-            if (powerStorages == null) return 0f;
-
-            float amount = 0f;
-            foreach (FcsDevice powerStorage in powerStorages)
-            {
-                var curPowerStorage = (PowerStorageController)powerStorage;
-
-                if (curPowerStorage.IsReleasingPower())
+                if (percentage >= 0f)
                 {
-                    amount += powerStorage.GetMaxPower();
+                    Color value = (percentage < 0.5f) ? Color.Lerp(this._colorEmpty, this._colorHalf, 2f * percentage) : Color.Lerp(this._colorHalf, this._colorFull, 2f * percentage - 1f);
+                    _bar.color = value;
+                    _bar.fillAmount = percentage;
+                    ChangeEffectColor(value);
+                    return;
                 }
+                _bar.color = _colorEmpty;
+                _bar.fillAmount = 0f;
+                ChangeEffectColor(_colorEmpty);
             }
-
-            return amount;
         }
 
-        private float TotalPowerStoragePowerAtBase()
+        internal void ChangeTrailBrightness()
         {
-            var powerStorages = Manager?.GetDevices(Mod.PowerStorageTabID);
-
-            if (powerStorages == null) return 0f;
-
-            float amount = 0f;
-            foreach (FcsDevice powerStorage in powerStorages)
+            foreach (ParticleSystem system in _particles)
             {
-                var curPowerStorage = (PowerStorageController) powerStorage;
-
-                if (curPowerStorage.IsReleasingPower())
-                {
-                    amount += powerStorage.GetStoredPower();
-                }
+                var index = QPatch.Configuration.TelepowerPylonTrailBrightness;
+                var h = system.trails;
+                h.colorOverLifetime = new Color(index, index, index);
             }
-
-            return amount;
         }
 
-        private void ChangeStatusLights(bool value)
+        private void ChangeEffectColor(Color color)
         {
-            _colorManager.ChangeColor(value ? Color.cyan : Color.yellow, ColorTargetMode.Emission);
+            foreach (ParticleSystem system in _particles)
+            {
+                var main = system.main;
+                main.startColor = color;
+            }
         }
 
         private void Start()
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.PowerStorageTabID, Mod.ModPackID);
-            _powercellSupply.LoadFromSave();
+            if (Manager != null)
+            {
+                _basePowerStorage = Manager.Habitat.GetComponent<BasePowerStorage>();
+                _basePowerStorage.Register(this);
+            }
+
         }
 
         private void OnEnable()
@@ -143,25 +108,15 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Mono
                     _colorManager.ChangeColor(_savedData.Body.Vector4ToColor());
                     _colorManager.ChangeColor(_savedData.SecondaryBody.Vector4ToColor(), ColorTargetMode.Secondary);
 
-                    switch (_savedData.Mode)
-                    {
-                        case PowerChargerMode.ChargeMode:
-                            _chargeModeToggle.OnButtonClick?.Invoke(null,null);
-                            _chargeModeToggle?.Select();
-                            break;
-                        case PowerChargerMode.DischargeMode:
-                            _disChargeModeToggle.OnButtonClick?.Invoke(null, null);
-                            _disChargeModeToggle?.Select();
-                            break;
-                        case PowerChargerMode.Auto:
-                            _autoModeToggle.OnButtonClick?.Invoke(null, null);
-                            _autoModeToggle?.Select();
-                            break;
-                    }
+                    _runStartUpOnEnable = false;
                 }
-
-                _runStartUpOnEnable = false;
             }
+        }
+
+        public override void OnDestroy()
+        {
+            base.OnDestroy();
+            _basePowerStorage?.Unregister(this);
         }
 
         private void ReadySaveData()
@@ -174,88 +129,37 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Mono
         {
             if (IsInitialized) return;
 
-            PowerTotalMeterRing = GameObjectHelpers.FindGameObject(gameObject, "PSRingFront").GetComponent<Image>();
-            PowerTotalMeterPercent = GameObjectHelpers.FindGameObject(gameObject, "Percentage").GetComponent<Text>();
-            PowerTotalMeterTotal = GameObjectHelpers.FindGameObject(gameObject, "BatteryTotal").GetComponent<Text>();
-
-            _interactionChecker = gameObject.GetComponentInChildren<Canvas>().gameObject.AddComponent<InterfaceInteraction>();
-
-            var chargeMode = GameObjectHelpers.FindGameObject(gameObject, "ChargeMode");
-            _chargeModeToggle = chargeMode.gameObject.AddComponent<FCSToggleButton>();
-            _chargeModeToggle.ButtonMode = InterfaceButtonMode.Background;
-            _chargeModeToggle.STARTING_COLOR = Color.gray;
-            _chargeModeToggle.HOVER_COLOR = Color.white;
-            _chargeModeToggle.TextLineOne = AuxPatchers.PowerStorageChargeMode();
-            _chargeModeToggle.TextLineTwo = AuxPatchers.PowerStorageChargeModeDesc();
-            _chargeModeToggle.IsRadial = true;
-            _chargeModeToggle.BtnName = "ChargeMode";
-            _chargeModeToggle.OnButtonClick += (s, o) =>
-            {
-                _mode = PowerChargerMode.ChargeMode;
-                _autoModeToggle.DeSelect();
-                _disChargeModeToggle.DeSelect();
-            };
-
-            var dischargeMode = GameObjectHelpers.FindGameObject(gameObject, "DischargeMode");
-            _disChargeModeToggle = dischargeMode.gameObject.AddComponent<FCSToggleButton>();
-            _disChargeModeToggle.ButtonMode = InterfaceButtonMode.Background;
-            _disChargeModeToggle.STARTING_COLOR = Color.gray;
-            _disChargeModeToggle.HOVER_COLOR = Color.white;
-            _disChargeModeToggle.TextLineOne = AuxPatchers.PowerStorageDischargeMode();
-            _disChargeModeToggle.TextLineTwo = AuxPatchers.PowerStorageDischargeModeDesc();
-            _disChargeModeToggle.IsRadial = true;
-            _disChargeModeToggle.BtnName = "DischargeMode";
-            _disChargeModeToggle.OnButtonClick += (s, o) =>
-            {
-                _mode = PowerChargerMode.DischargeMode;
-                _autoModeToggle.DeSelect();
-                _chargeModeToggle.DeSelect();
-            };
-
-            var autoMode = GameObjectHelpers.FindGameObject(gameObject, "AutoText");
-            _autoModeToggle = autoMode.gameObject.AddComponent<FCSToggleButton>();
-            _autoModeToggle.ButtonMode = InterfaceButtonMode.RadialButton;
-            _autoModeToggle.TextLineOne = AuxPatchers.PowerStorageAutoMode();
-            _autoModeToggle.TextLineTwo = AuxPatchers.PowerStorageAutoModeDesc();
-            _autoModeToggle.IsRadial = true;
-            _autoModeToggle.BtnName = "AutoMode";
-            _autoModeToggle.OnButtonClick += (s, o) =>
-            {
-
-                _mode = PowerChargerMode.Auto;
-                _chargeModeToggle.DeSelect();
-                _disChargeModeToggle.DeSelect();
-            };
-
             if (_colorManager == null)
             {
                 _colorManager = gameObject.AddComponent<ColorManager>();
                 _colorManager.Initialize(gameObject, ModelPrefab.BodyMaterial, ModelPrefab.SecondaryMaterial, ModelPrefab.EmissiveControllerMaterial);
             }
 
-            if (PowercellCharger == null)
+            if (PowerSource == null)
             {
-                PowercellCharger = gameObject.AddComponent<PowerCellCharger>();
+                PowerSource = gameObject.GetComponent<PowerSource>();
             }
 
-            if (_powercellSupply == null)
-            {
-                _powercellSupply = gameObject.AddComponent<PowerSupply>();
-                _powercellSupply.Initialize(this);
-            }
+            _particles = gameObject.GetComponentsInChildren<ParticleSystem>();
+            _bar = GameObjectHelpers.FindGameObject(gameObject, "BarFill").GetComponent<Image>();
+            _audio = FModHelpers.CreateCustomLoopingEmitter(gameObject, "water_filter_loop", "event:/sub/base/water_filter_loop");
 
+            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
 
+            InvokeRepeating(nameof(UpdateVisuals),1f,1f);
+            InvokeRepeating(nameof(TakePower),1f,1f);
 
-            PowercellCharger.Initialize(this, GameObjectHelpers.FindGameObject(gameObject, "meshes").GetChildren(), GameObjectHelpers.FindGameObject(gameObject, "BatteryMeters").GetChildren(), _powercellSupply);
-
-            _autoModeToggle.OnButtonClick.Invoke(null,null);
-            
             IsInitialized = true;
         }
 
-        public bool IsReleasingPower()
+        public void Charge()
         {
-            return _powercellSupply.GetIsReleasingPower();
+            _allowedToCharge = true;
+        }
+
+        public void Discharge()
+        {
+            _allowedToCharge = false;
         }
 
         public override void OnProtoSerialize(ProtobufSerializer serializer)
@@ -274,8 +178,6 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Mono
         {
             QuickLogger.Debug("In OnProtoDeserialize");
 
-            _serializer = serializer;
-
             if (_savedData == null)
             {
                 ReadySaveData();
@@ -286,11 +188,11 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Mono
 
         public override bool CanDeconstruct(out string reason)
         {
-            if (_powercellSupply != null && _powercellSupply.HasPowercells())
-            {
-                reason = AuxPatchers.PowerStorageNotEmpty();
-                return false;
-            }
+            //if (PowercellCharger != null && PowercellCharger.HasPowerCells())
+            //{
+            //    reason = AuxPatchers.PowerStorageNotEmpty();
+            //    return false;
+            //}
             reason = string.Empty;
             return true;
         }
@@ -314,7 +216,9 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Mono
                 {
                     _runStartUpOnEnable = true;
                 }
+                _audio?.Play();
             }
+            _audio?.Stop();
         }
 
         public void Save(SaveData newSaveData, ProtobufSerializer serializer = null)
@@ -331,8 +235,6 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Mono
             QuickLogger.Debug($"Saving ID {_savedData.Id}", true);
             _savedData.Body = _colorManager.GetColor().ColorToVector4();
             _savedData.SecondaryBody = _colorManager.GetSecondaryColor().ColorToVector4();
-            //_savedData.Data = _powercellSupply.Save(serializer);
-            _savedData.Mode = _mode;
             newSaveData.PowerStorageEntries.Add(_savedData);
         }
 
@@ -343,36 +245,172 @@ namespace FCS_EnergySolutions.Mods.PowerStorage.Mono
 
         public override void OnHandHover(GUIHand hand)
         {
-            if (!IsInitialized || !IsConstructed || _interactionChecker == null || _interactionChecker.IsInRange) return;
+            if (!IsInitialized || !IsConstructed) return;
             base.OnHandHover(hand);
-            var data = new string[] { };
+            var data = new string[]
+            {
+                AlterraHub.PowerPerMinute((IsCharging() ? POWERUSAGE : 0f) * 60f),
+                $"Is Charging: {IsCharging()}",
+                $"Storage: {Mathf.FloorToInt(PowerSource.power)} / {Mathf.FloorToInt(PowerSource.maxPower)} | Percentage: {PowerSource.power / PowerSource.maxPower:P0}"
+            };
             data.HandHoverPDAHelperEx(GetTechType());
-            //Add box arounf powerstorage battery area to allow clicking for storage
+        }
+
+        private bool IsCharging()
+        {
+            return PowerSource != null && _allowedToCharge && PowerSource.power < PowerSource.maxPower;
         }
 
         public void OnHandClick(GUIHand hand)
         {
-            if (_interactionChecker.IsInRange) return;
         }
 
-        internal PowerChargerMode GetMode()
+        public void TakePower()
         {
-            return _mode;
-        }
+            QuickLogger.Debug($"{ Manager.GetPowerRelay().inboundPowerSources.Count}",true);
 
-        public float CalculateBasePower()
-        {
-           return Manager?.GetPower() ?? 0 - TotalPowerStoragePowerAtBase();
+            if (!IsCharging()) return;
+
+            float amount = POWERUSAGE;
+
+            foreach (var relay in Manager.GetPowerRelay().inboundPowerSources)
+            {
+                if (relay is PowerSource source)
+                {
+                    if (source.name.StartsWith("PowerStorage"))
+                    {
+                        QuickLogger.Debug("PowerStorage Found",true);
+                        continue;
+                    }
+
+                    if (relay.ConsumeEnergy(amount, out float amountConsumed))
+                    {
+                        QuickLogger.Debug($"Taking power from :{source.name}", true);
+                        amount -= amountConsumed;
+                        PowerSource.power = Mathf.Clamp(PowerSource.power + amountConsumed, 0f, PowerSource.maxPower);
+                        QuickLogger.Debug($"Added {amountConsumed} to Power Storage");
+                    }
+
+                    if (amount <= 0)
+                    {
+                        break;
+                    }
+                }
+            }
         }
 
         public override float GetMaxPower()
         {
-            return _powercellSupply?.GetMaxPower() ?? 0f;
+            return PowerSource?.maxPower ?? 0f;
         }
 
         public override float GetStoredPower()
         {
-            return _powercellSupply?.GetPower() ?? 0f;
+            return PowerSource?.power ?? 0f;
+        }
+    }
+
+    internal class BasePowerStorage : MonoBehaviour
+    {
+        private readonly HashSet<PowerStorageController> _registeredDevices = new HashSet<PowerStorageController>();
+        private bool _isCharging;
+        private float _baseCapacity;
+        private float _basePower;
+        private bool _showInLog;
+
+        private void Start()
+        {
+            Manager = BaseManager.FindManager(gameObject);
+        }
+
+        public BaseManager Manager { get; set; }
+
+        private float CalculatePowerPercentage()
+        {
+            //Get Capactity
+            _baseCapacity = CalculateBasePowerCapacity();
+            _basePower = CalculateBasePower();
+            
+            if (_basePower <= 0 || _baseCapacity <= 0) return 0;
+
+            return (_basePower / _baseCapacity) * 100;
+        }
+
+        private float CalculateBasePowerCapacity()
+        {
+            if (BaseManager.FindManager(Player.main.currentSub) == Manager && _showInLog)
+            {
+                QuickLogger.Debug($"CalculateBasePowerCapacity:", true);
+                QuickLogger.Debug($"Base Capacity {Manager.GetBasePowerCapacity()}", true);
+                QuickLogger.Debug($"Power Storage Capacity {TotalPowerStorageCapacityAtBase()}", true);
+                QuickLogger.Debug($"Capacity Result {Manager.GetBasePowerCapacity() - TotalPowerStorageCapacityAtBase()}", true);
+            }
+            return Manager.GetBasePowerCapacity() - TotalPowerStorageCapacityAtBase();
+        }
+
+        private float TotalPowerStorageCapacityAtBase()
+        {
+            float total = 0f;
+            foreach (PowerStorageController controller in _registeredDevices)
+            {
+                total += controller.GetMaxPower();
+            }
+
+            return total;
+        }
+
+        public float CalculateBasePower()
+        {
+            if (BaseManager.FindManager(Player.main.currentSub) == Manager && _showInLog)
+            {
+                QuickLogger.Debug($"CalculateBasePower:",true);
+                QuickLogger.Debug($"Base Power {Manager.GetPower()}",true);
+                QuickLogger.Debug($"Power Storage Power {TotalPowerStoragePowerAtBase()}",true);
+                QuickLogger.Debug($"Power Result {Manager.GetPower() - TotalPowerStoragePowerAtBase()}",true);
+            }
+            return Manager.GetPower() - TotalPowerStoragePowerAtBase();
+        }
+
+        private float TotalPowerStoragePowerAtBase()
+        {
+            float total = 0f;
+            
+            foreach (PowerStorageController controller in _registeredDevices)
+            {
+                total += controller.GetStoredPower();
+            }
+
+            return total;
+        }
+
+        private void Update()
+        {
+            foreach (PowerStorageController controller in _registeredDevices)
+            {
+                if (CalculatePowerPercentage() > 40)
+                {
+                    controller.Charge();
+                    _isCharging = true;
+                }
+                else
+                {
+                    controller.Discharge();
+                    _isCharging = false;
+                }
+            }
+        }
+
+        public void Register(PowerStorageController controller)
+        {
+            if (!_registeredDevices.Contains(controller))
+            {
+                _registeredDevices.Add(controller);
+            }
+        }
+
+        public void Unregister(PowerStorageController controller)
+        {
+            _registeredDevices.Remove(controller);
         }
     }
 }

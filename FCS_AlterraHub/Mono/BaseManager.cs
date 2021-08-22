@@ -1557,6 +1557,11 @@ namespace FCS_AlterraHub.Mono
             callBack?.Invoke(FindManager(instanceId));
             yield break;
         }
+
+        public PowerRelay GetPowerRelay()
+        {
+            return Habitat.powerRelay;
+        }
     }
 
     public class FCSStorageTracker : MonoBehaviour

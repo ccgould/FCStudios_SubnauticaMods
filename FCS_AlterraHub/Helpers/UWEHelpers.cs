@@ -13,7 +13,7 @@ namespace FCS_AlterraHub.Helpers
         /// <param name="storageLabel">The label that displays with the storage is open.</param>
         /// <param name="width">The width of the storage container</param>
         /// <param name="height">The height of the storage container</param>
-        public static StorageContainer CreateStorageContainer(GameObject prefab,GameObject storageRoot, string classID, string storageLabel, int width,int height)
+        public static StorageContainer CreateStorageContainer(GameObject prefab,GameObject storageRoot, string classID, string storageLabel, int width,int height,bool forceAdd = false)
         {
             if (storageRoot == null)
             {
@@ -26,7 +26,7 @@ namespace FCS_AlterraHub.Helpers
             prefab.SetActive(false);
 
             //Create the storage container
-            var storage = prefab.EnsureComponent<StorageContainer>();
+            var storage = forceAdd ? prefab.AddComponent<StorageContainer>() : prefab.EnsureComponent<StorageContainer>();
             storage.prefabRoot = prefab;
             storage.width = width;
             storage.height = height;

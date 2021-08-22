@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using FCS_AlterraHub.Extensions;
+using FCS_AlterraHub.Model.GUI;
 using FCS_AlterraHub.Registration;
 using FCS_EnergySolutions.AlterraSolarCluster.Buildables;
 using FCS_EnergySolutions.Buildable;
@@ -12,6 +13,7 @@ using FCS_EnergySolutions.Mods.JetStreamT242.Buildables;
 using FCS_EnergySolutions.Mods.PowerStorage.Buildable;
 using FCS_EnergySolutions.Mods.Spawnables;
 using FCS_EnergySolutions.Mods.TelepowerPylon.Mono;
+using FCS_EnergySolutions.Mods.UniversalCharger.Buildable;
 using FCS_EnergySolutions.Mods.WindSurfer.Buildables;
 using FCS_EnergySolutions.Spawnables;
 using FCS_EnergySolutions.TelepowerPylon.Buildables;
@@ -92,7 +94,34 @@ namespace FCS_EnergySolutions
                 powerStorageCell.Patch();
             }
 
-            if(Configuration.IsWindSurferEnabled)
+
+            if (Configuration.IsUniversalChargerEnabled)
+            {
+                var universalCharger = new UniversalChargerPatcher();
+                universalCharger.Patch();
+
+                for (int i = 0; i < 10; i++)
+                {
+                    int slotIndex = i + 1;
+                    EquipmentConfiguration.AddNewSlot($"UVPowerCellCharger{slotIndex}", new SlotInformation
+                    {
+                        EquipmentType = EquipmentType.PowerCellCharger,
+                        Position = EquipmentConfiguration.GetSlotPosition(slotIndex)
+                    });
+                }
+
+                for (int i = 0; i < 10; i++)
+                {
+                    int slotIndex = i + 1;
+                    EquipmentConfiguration.AddNewSlot($"UCBatteryCharger{slotIndex}", new SlotInformation
+                    {
+                        EquipmentType = EquipmentType.BatteryCharger,
+                        Position = EquipmentConfiguration.GetSlotPosition(slotIndex)
+                    });
+                }
+            }
+
+            if (Configuration.IsWindSurferEnabled)
             {
                 CraftTreeHandler.AddTabNode(CraftTree.Type.Constructor, "FCSWindSurfer", "Wind Surfer",
                     ImageUtils.LoadSpriteFromFile(Path.Combine(Mod.GetAssetFolder(), $"{Mod.WindSurferClassName}.png")));

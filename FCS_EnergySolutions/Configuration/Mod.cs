@@ -92,12 +92,20 @@ namespace FCS_EnergySolutions.Configuration
         internal static string JetStreamT242PrefabName => JetStreamT242ModName;
 
         internal const string PowerStorageTabID = "PS";
-        internal const string PowerStorageDescription = "Holds up to 10 Power Cells. Drains cells when Base Power is low, Recharges cells when Base Power is plentiful. Swap Power Cells at any time.";
+        internal const string PowerStorageDescription = "Drains cell when Base Power is low, Recharges cells when Base Power is plentiful.";
         internal const string PowerStorageFriendlyName = "PowerStorage";
         internal const string PowerStorageModName = "PowerStorage";
         internal const string PowerStorageClassName = "PowerStorage";
         internal static string PowerStorageKitClassID => $"{PowerStorageModName}_Kit";
         internal static string PowerStoragePrefabName => PowerStorageModName;
+
+        internal const string UniversalChargerTabID = "UC";
+        internal const string UniversalChargerDescription = "Holds up to 10 Power Cells and 6 Batteries. Recharges cells when Base Power is plentiful. Swap Power Cells at any time.";
+        internal const string UniversalChargerFriendlyName = "Universal Charger";
+        internal const string UniversalChargerModName = "UniversalCharger";
+        internal const string UniversalChargerClassName = "UniversalCharger";
+        internal static string UniversalChargerKitClassID => $"{UniversalChargerModName}_Kit";
+        internal static string UniversalChargerPrefabName => UniversalChargerModName;
 
 
         internal const string BioFuelClassID = "FCSBioFuel";
@@ -370,6 +378,26 @@ namespace FCS_EnergySolutions.Configuration
             }
 
             return new WindSurferDataEntry() { Id = id };
+        }
+
+        public static UniversalChargerDataEntry GetUniversalChargerSaveData(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id)) return null;
+            LoadData();
+
+            var saveData = GetSaveData();
+
+            foreach (var entry in saveData.UniversalChargerEntries)
+            {
+                if (string.IsNullOrEmpty(entry.Id)) continue;
+
+                if (entry.Id == id)
+                {
+                    return entry;
+                }
+            }
+
+            return new UniversalChargerDataEntry() { Id = id };
         }
     }
 }

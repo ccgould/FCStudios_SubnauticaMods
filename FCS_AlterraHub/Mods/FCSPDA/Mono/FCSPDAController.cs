@@ -344,9 +344,11 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             _404?.SetActive(!Mod.GamePlaySettings.IsPDAUnlocked);
             
             Player main = Player.main;
+            
             CreateScreen();
 
             FindPDA();
+            
             ChangePDAVisibility(false);
             if (_returnsDialogController?.IsOpen ?? false)
             {
@@ -366,10 +368,19 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             gameObject.SetActive(true);
             sequence.Set(0.5f, true, Activated);
             UWE.Utils.lockCursor = false;
-            if (HandReticle.main != null)
+            HandReticle.main?.RequestCrosshairHide();
+
+            QuickLogger.Debug($"Hide Count: {HandReticle.main.hideCount}",true);
+
+            if (HandReticle.main?.hideCount > 1)
             {
-                HandReticle.main.RequestCrosshairHide();
+               QuickLogger.Debug("Fixing Hide Count",true);
+                while (HandReticle.main.hideCount > 1)
+                {
+                    HandReticle.main?.UnrequestCrosshairHide();
+                }
             }
+
             Inventory.main.SetViewModelVis(false);
             _screen.SetActive(true);
             UwePostProcessingManager.OpenPDA();
@@ -412,15 +423,13 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
                 uGUI.main.quickSlots.SetTarget(vehicle);
             }
 
+
 #if SUBNAUTICA_STABLE
             MainGameController.Instance.PerformGarbageAndAssetCollection();
 #else
             MainGameController.Instance.PerformIncrementalGarbageCollection();
 #endif
-            if (HandReticle.main != null)
-            {
-                HandReticle.main.UnrequestCrosshairHide();
-            }
+            HandReticle.main?.UnrequestCrosshairHide();
             Inventory.main.SetViewModelVis(true);
             sequence.Set(0.5f, false, Deactivated);
             
