@@ -163,7 +163,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
 
                 OnTotalUpdate += (amount, maxAmount) =>
                 {
-                    _total.text = _mono.GetOperation().IsRecursive ? "\u221E" : $"{amount}/{maxAmount}";
+                    _total.text = _mono.GetOperation()?.IsRecursive ?? false ? "\u221E" : $"{amount}/{maxAmount}";
                 };
             }
             catch (Exception e)

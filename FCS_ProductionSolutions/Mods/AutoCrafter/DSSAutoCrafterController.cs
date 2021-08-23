@@ -93,7 +93,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
         private void Start()
         {
             FCSAlterraHubService.PublicAPI.RegisterDevice(this, Mod.DSSAutoCrafterTabID, Mod.ModPackID);
-            _materials = MaterialHelpers.GetMaterials(GameObjectHelpers.FindGameObject(gameObject, "ConveyorBelts"), "fcs01_BD");
+            _materials = MaterialHelpers.GetMaterials(GameObjectHelpers.FindGameObject(gameObject, "ConveyorBelts"), AlterraHub.BaseOpaqueInterior);
             if (Manager != null)
             {
                 Manager.OnPowerStateChanged += OnPowerStateChanged;
@@ -249,7 +249,9 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
                 float offset = Time.time * _beltSpeed;
                 foreach (Material material in _materials)
                 {
-                    material.SetTextureOffset("_MainTex", new Vector2(-offset, 0));
+                    material.SetTextureOffset(ShaderPropertyID._MainTex, new Vector2(-offset, 0));
+                    material.SetTextureOffset(ShaderPropertyID._NormalsTex, new Vector2(-offset, 0));
+                    material.SetTextureOffset(ShaderPropertyID._Illum, new Vector2(-offset, 0));
                 }
             }
         }

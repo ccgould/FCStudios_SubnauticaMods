@@ -148,6 +148,7 @@ namespace FCS_ProductionSolutions.Mods.AutoCrafter
         {
             try
             {
+                if (_mono == null || _itemGrid == null || _paginatorController == null) return;
                 _mono.GetController().GetCraftables();
                 var grouped = Mod.Craftables;
 
