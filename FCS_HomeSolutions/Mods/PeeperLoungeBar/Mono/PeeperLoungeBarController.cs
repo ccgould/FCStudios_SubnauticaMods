@@ -254,9 +254,7 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono
             {
                 return;
             }
-            this.timeNextPlay = timePassedAsFloat + this.minInterval;
             
-
             if (!CheckIfPlayingTrack() && GetCanPlay())
             {
                 if (_sc.container.count > 0)
@@ -269,6 +267,8 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono
                     PlayAudioTrack(_welcomeChatMessages[0]);
                 }
             }
+
+            this.timeNextPlay = timePassedAsFloat + this.minInterval;
         }
         
         public void PlayAudioTrack(string trackName)

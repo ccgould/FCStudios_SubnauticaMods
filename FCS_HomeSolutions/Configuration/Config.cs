@@ -68,7 +68,7 @@ namespace FCS_HomeSolutions.Configuration
             OnSeaBreezeGameModeChanged?.Invoke(e.Index);
         }
 
-        public Action<int> OnSeaBreezeGameModeChanged { get; set; }
+        internal Action<int> OnSeaBreezeGameModeChanged { get; set; }
         public List<string> AlienChiefCustomFoodTrees { get; set; } = new List<string>
         {
             "CF3mod",
