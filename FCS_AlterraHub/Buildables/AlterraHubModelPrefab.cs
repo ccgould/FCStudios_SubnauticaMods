@@ -104,7 +104,8 @@ namespace FCS_AlterraHub.Buildables
         internal static GameObject CartItemPrefab { get; set; }
         internal static GameObject FcsPDAPrefab { get; set; }
         internal static GameObject PDARadialMenuEntryPrefab { get; set; }
-
+        internal static GameObject PDAShipmentItemPrefab { get; set; }
+        internal static GameObject PDAShipmentItemNodePrefab { get; set; }
         public static GameObject MissionMessageBoxPrefab { get; set; }
         public static GameObject AlterraHubDepotPrefab { get; set; }
         public static GameObject AlterraHubDepotItemPrefab { get; set; }
@@ -179,8 +180,15 @@ namespace FCS_AlterraHub.Buildables
                     
                     if (!LoadAsset(Mod.AlterraHubStationPrefabName, QPatch.GlobalBundle, out var alterraHubFabricatorPrefab)) return false;
                     AlterraHubFabricatorPrefab = alterraHubFabricatorPrefab;
+
+                    if (!LoadAsset("PDAShipmentItem", QPatch.GlobalBundle, out var pdaShipmentItemPrefab,false)) return false;
+                     PDAShipmentItemPrefab = pdaShipmentItemPrefab;
+
+                     if (!LoadAsset("PDAShipmentItemNode", QPatch.GlobalBundle, out var pdaShipmentItemNodePrefab, false)) return false;
+                     PDAShipmentItemNodePrefab = pdaShipmentItemNodePrefab;
+
                     //AddFabStationComponents();
-                    
+
                     //if (!LoadAsset("AlterraHubDepotFrag", QPatch.GlobalBundle, out var alterraHubDepotFragmentPrefab)) return false;
                     //AlterraHubDepotFragmentPrefab = alterraHubDepotFragmentPrefab;
 

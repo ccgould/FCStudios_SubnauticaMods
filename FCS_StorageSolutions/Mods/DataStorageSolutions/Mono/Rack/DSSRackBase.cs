@@ -139,6 +139,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
                     {
                         _colorManager.ChangeColor(SavedData.BodyColor.Vector4ToColor());
                         _colorManager.ChangeColor(SavedData.SecondaryColor.Vector4ToColor(),ColorTargetMode.Secondary);
+                        _colorManager.ChangeColor(SavedData.EmissionColor.Vector4ToColor(),ColorTargetMode.Emission);
                     }
                 }
 
@@ -207,7 +208,9 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
             _interfaceInteraction = _canvas.AddComponent<InterfaceInteraction>();
 
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseDecalsEmissiveController, gameObject, Color.cyan);
-            MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseLightsEmissiveController, gameObject, 4f);
+            MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseLightsEmissiveController, gameObject, Color.cyan);
+            MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseLightsEmissiveController, gameObject, 2f);
+
             _messageBox = GameObjectHelpers.FindGameObject(_canvas, "MessageBox").AddComponent<FCSMessageBox>();
             InvokeRepeating(nameof(RegisterServers), 1f, 1f);
             InvokeRepeating(nameof(UpdateScreenState), 1, 1);
@@ -233,7 +236,8 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
             if (_colorManager == null)
             {
                 _colorManager = gameObject.EnsureComponent<ColorManager>();
-                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol);
+                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol, AlterraHub.BaseSecondaryCol,
+                    AlterraHub.BaseLightsEmissiveController);
             }
         }
 
@@ -276,7 +280,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
                 var meter = metersTemp[i];
                 var slotName = $"Slot {i + 1}";
                 var slotController = slot.AddComponent<DSSSlotController>();
-                slotController.Initialize(slotName, this, meter, _readers?[i],this);
+                slotController.Initialize(slotName, this, meter, null,this);
 
                 Slots.Add(slotName, slotController);
             }

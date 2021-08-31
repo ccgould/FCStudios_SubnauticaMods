@@ -30,6 +30,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
         private string _currentBase;
         private bool _isVisible;
         private DSSSlotController _slot;
+        private Renderer[] _renders;
         internal const int MAXSTORAGE = 48;
         public bool IsBeingFormatted { get; set; }
         public bool IsFiltered => _filteringSettings != null && _filteringSettings.Count > 0;
@@ -89,7 +90,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
 
             _rb = gameObject.GetComponent<Rigidbody>();
             _colliders = GetComponentsInChildren<BoxCollider>();
-
+            _renders = GetComponentsInChildren<Renderer>();
             if (_storageContainer == null)
             {
                 _storageContainer = gameObject.GetComponent<FCSStorage>();
@@ -296,11 +297,17 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
                 _currentBase = controller.Manager.BaseID;
                 FindBaseManager();
             }
-            
+
             foreach (BoxCollider bc in _colliders)
             {
                 bc.isTrigger = true;
             }
+
+            foreach (Renderer rd in _renders)
+            {
+                rd.enabled = false;
+            }
+
             AlterraHub.ApplyShadersV2(gameObject);
             gameObject.SetActive(true);
             gameObject.SetActive(false);
@@ -328,6 +335,16 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Server
             _currentBase = string.Empty;
             _rackSlot = string.Empty;
             _rackController = null;
+            
+            foreach (Renderer rd in _renders)
+            {
+                rd.enabled = true;
+            }
+
+            foreach (BoxCollider bc in _colliders)
+            {
+                bc.isTrigger = false;
+            }
         }
 
         public int GetCount()

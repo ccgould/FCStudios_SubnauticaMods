@@ -164,5 +164,10 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         {
             keypadUI.SetActive(true);
         }
+
+        public void ForceOpen()
+        {
+            _door.Open();
+        }
     }
 }

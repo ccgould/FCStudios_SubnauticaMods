@@ -66,6 +66,9 @@ namespace FCS_HomeSolutions.Buildables
         public static GameObject HologramPosterPrefab { get; set; }
         public static GameObject JukeboxSpeakerPrefab { get; set; }
         public static GameObject JukeboxPrefab { get; set; }
+        public static GameObject Sofa1Prefab { get; set; }
+        public static GameObject Sofa2Prefab { get; set; }
+        public static GameObject Sofa3Prefab { get; set; }
 
         internal static void Initialize()
         {
@@ -118,6 +121,10 @@ namespace FCS_HomeSolutions.Buildables
             LedLightWallPrefab = GetPrefab("FCS_LedLightStick_02");
             JukeboxPrefab = GetPrefab("JukeBox", true);
             JukeboxSpeakerPrefab = GetPrefab("JukeBoxSpeaker", true);
+            Sofa1Prefab = GetPrefabFromGlobal(Mod.Sofa1PrefabName);
+            Sofa2Prefab = GetPrefabFromGlobal(Mod.Sofa2PrefabName);
+            Sofa3Prefab = GetPrefabFromGlobal(Mod.Sofa3PrefabName);
+
             _initialized = true;
         }
         
@@ -145,13 +152,27 @@ namespace FCS_HomeSolutions.Buildables
                 return null;
             }
         }
-        
+
+        internal static GameObject GetPrefabFromGlobal(string prefabName, bool applyShaders = true)
+        {
+            try
+            {
+                QuickLogger.Debug($"Getting Prefab: {prefabName}");
+                return !LoadAssetV2(prefabName, FCSAssetBundlesService.PublicAPI.GetAssetBundleByName("fcsalterrahubbundle"), out GameObject prefabGo,applyShaders) ? null : prefabGo;
+            }
+            catch (Exception e)
+            {
+                QuickLogger.Error(e.Message);
+                return null;
+            }
+        }
+
         //internal static void LoadFMod()
         //{
         //    //RuntimeManager
         //    var strings = ModBundle.LoadAsset<TextAsset>("FCS Master Bank.strings");
         //    var master = ModBundle.LoadAsset<TextAsset>("FCS Master Bank");
-            
+
         //    if (master == null)
         //    {
         //        QuickLogger.Debug("FCS Master Not Found");
@@ -183,7 +204,7 @@ namespace FCS_HomeSolutions.Buildables
 
         //                break;
         //            }
-                    
+
         //        }
 
         //        //ShowerLoop = RuntimeManager.CreateInstance("event:/AlterraMiniBathroom/Shower");
@@ -192,7 +213,7 @@ namespace FCS_HomeSolutions.Buildables
         //    {
         //        QuickLogger.Debug("Bank Not Loaded");
         //    }
-            
+
         //}
 
         public static EventInstance ShowerLoop { get; set; }

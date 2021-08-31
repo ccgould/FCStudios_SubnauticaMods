@@ -18,7 +18,7 @@ using RecipeData = SMLHelper.V2.Crafting.TechData;
 using Sprite = Atlas.Sprite;
 #endif
 
-namespace FCS_HomeSolutions.Mods.Cabinets.Buildable
+namespace FCS_HomeSolutions.Mods.AlterraMiniShower.Buildable
 {
     internal class AlterraMiniBathroomBuildable : SMLHelper.V2.Assets.Buildable
     {

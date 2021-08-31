@@ -34,6 +34,8 @@
     <Compile Include="Mods\AlterraHubFabricatorBuilding\Mono\DroneSystem\Factory\StateFactory.cs" />
     <Compile Include="Mods\AlterraHubFabricatorBuilding\Mono\DroneSystem\StatesMachine\BaseState.cs" />
     <Compile Include="Mods\AlterraHubFabricatorBuilding\Mono\DroneSystem\StatesMachine\StateMachine.cs" />
+    <Compile Include="Mods\AlterraHubFabricatorBuilding\Mono\DroneSystem\StatesMachine\States\DescendState.cs" />
+    <Compile Include="Mods\AlterraHubFabricatorBuilding\Mono\DroneSystem\StatesMachine\States\ClimbState.cs" />
     <Compile Include="Mods\AlterraHubFabricatorBuilding\Mono\DroneSystem\StatesMachine\States\AlignState.cs" />
     <Compile Include="Mods\AlterraHubFabricatorBuilding\Mono\DroneSystem\StatesMachine\States\DepartState.cs" />
     <Compile Include="Mods\AlterraHubFabricatorBuilding\Mono\DroneSystem\StatesMachine\States\DockingState.cs" />
@@ -44,6 +46,7 @@
     <Compile Include="Mods\AlterraHubFabricatorBuilding\Mono\DroneSystem\AlterraDronePortController.cs" />
     <Compile Include="Mods\AlterraHubFabricatorBuilding\Mono\DroneSystem\Interfaces\IDroneDestination.cs" />
     <Compile Include="Mods\AlterraHubFabricatorBuilding\Mono\DroneSystem\PortDoorController.cs" />
+    <Compile Include="Mods\AlterraHubFabricatorBuilding\Mono\SecurityBoxTrigger.cs" />
     <Compile Include="Mods\AlterraHubFabricatorBuilding\Mono\SecurityGateController.cs" />
     <Compile Include="Mods\AlterraHubFabricatorBuilding\Mono\LightManager.cs" />
     <Compile Include="Mods\AlterraHubFabricatorBuilding\Spawnables\AlterraStationSpawnable.cs" />

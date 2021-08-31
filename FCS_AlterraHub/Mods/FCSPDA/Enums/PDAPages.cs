@@ -13,6 +13,7 @@
         ProductionSolutions=8,
         StorageSolutions=9,
         VehicleSolutions=10,
-        MiscSolutions=11
+        MiscSolutions=11,
+        Shipment = 12,
     }
 }

@@ -1,18 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using FCS_EnergySolutions.Mods.TelepowerPylon.Model;
 using FCSCommon.Utilities;
 using UnityEngine;
 
 namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
 {
-    internal class TelepowerPylonPowerManager : MonoBehaviour
+    internal class TelepowerPylonPowerManager : MonoBehaviour, IPylonPowerManager
     {
         private bool _isInitialized;
         private TelepowerPylonController _mono;
         private PowerRelay _powerRelay;
         private PowerRelay _connectedPowerSource;
-        private readonly Dictionary<string, ITelepowerPylonConnection> _connections = new Dictionary<string, ITelepowerPylonConnection>();
+        private readonly Dictionary<string, ITelepowerPylonConnection> _connections = new();
         private bool _pauseUpdates;
 
 
@@ -75,5 +74,10 @@ namespace FCS_EnergySolutions.Mods.TelepowerPylon.Mono
             _connections.Remove(id.ToLower());
             _pauseUpdates = false;
         }
+    }
+
+    internal interface IPylonPowerManager
+    {
+        void AddConnection(ITelepowerPylonConnection controller);
     }
 }

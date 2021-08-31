@@ -48,9 +48,11 @@
     <Compile Include="Mods\TelepowerPylon\Buildable\TelepowerPylonPatcher.cs" />
     <Compile Include="Mods\TelepowerPylon\Model\TelepowerPylonMode.cs" />
     <Compile Include="Mods\TelepowerPylon\Mono\FrequencyItemController.cs" />
+    <Compile Include="Mods\TelepowerPylon\Mono\ITelepowerPylonConnection.cs" />
     <Compile Include="Mods\TelepowerPylon\Mono\TelepowerPylonController.cs" />
     <Compile Include="Mods\TelepowerPylon\Mono\TelepowerPylonPowerManager.cs" />
     <Compile Include="Mods\TelepowerPylon\Mono\TelepowerPylonTrigger.cs" />
+    <Compile Include="Mods\TelepowerPylon\Mono\TelepowerPylonUpgrade.cs" />
     <Compile Include="Mods\UniversalCharger\Mono\BatteryCharger.cs" />
     <Compile Include="Mods\WindSurfer\Buildables\WindSurferOperatorPatcher.cs" />
     <Compile Include="Mods\WindSurfer\Enums\HolographIconType.cs" />

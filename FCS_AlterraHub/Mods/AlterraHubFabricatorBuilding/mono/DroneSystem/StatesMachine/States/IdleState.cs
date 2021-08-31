@@ -46,6 +46,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.Stat
 
             if (!AlterraFabricatorStationController.Main.IsStationPort(_drone.GetCurrentPort()))
             {
+                QuickLogger.Debug("Getting port from station", true);
                 _drone.ShipOrder(AlterraFabricatorStationController.Main.GetOpenPort());                
             }
 

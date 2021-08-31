@@ -22,7 +22,7 @@ using UnityEngine.UI;
 
 namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
 {
-    internal class WindSurferOperatorController : WindSurferPlatformBase, ITelepowerPylonConnection
+    internal class WindSurferOperatorController : WindSurferPlatformBase, ITelepowerPylonConnection, IPylonPowerManager
     {
         private WindSurferOperatorDataEntry _savedData;
         private bool _fromSave;
@@ -651,10 +651,9 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
             _rb.isKinematic = true;
         }
 
-        private void AddConnection(string text, FcsDevice unit)
+        public void AddConnection(ITelepowerPylonConnection unit)
         {
-            var controller = (ITelepowerPylonConnection)unit;
-            _currentConnections.Add(text.ToLower(), controller);
+            _currentConnections.Add(unit.UnitID, unit);
         }
 
         public TelepowerPylonMode GetCurrentMode()
@@ -664,9 +663,19 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
 
         public Action<ITelepowerPylonConnection> OnDestroyCalledAction { get; set; }
 
-        public void AddPullPylon(ITelepowerPylonConnection telepowerPylonConnection)
+        public void AddItemToPullGrid(ITelepowerPylonConnection telepowerPylonConnection, bool isChecked = false)
         {
-            AddConnection(telepowerPylonConnection.UnitID,telepowerPylonConnection.GetDevice());
+            AddConnection(telepowerPylonConnection);
+        }
+
+        public void AddItemToPushGrid(ITelepowerPylonConnection telepowerPylonConnection, bool isChecked = false)
+        {
+
+        }
+
+        public void AddPylonToPushGrid(ITelepowerPylonConnection telepowerPylonConnection)
+        {
+            
         }
 
         public IPowerInterface GetPowerRelay()
@@ -713,6 +722,16 @@ namespace FCS_EnergySolutions.Mods.WindSurfer.Mono
         public bool HasPowerRelayConnection(IPowerInterface getPowerRelay)
         {
             return false;
+        }
+
+        public IPylonPowerManager GetPowerManager()
+        {
+            return this;
+        }
+
+        public bool CanAddNewPylon()
+        {
+            return true;
         }
     }
 

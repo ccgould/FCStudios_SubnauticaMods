@@ -86,8 +86,8 @@ namespace FCS_HomeSolutions.Mods.LedLights.Mono
             {
                 QuickLogger.Info($"Creating Color Component", true);
                 _colorManager = gameObject.AddComponent<ColorManager>();
-                _colorManager.Initialize(gameObject, ModelPrefab.BodyMaterial, ModelPrefab.SecondaryMaterial, ModelPrefab.EmissionControllerMaterial);
-                MaterialHelpers.ChangeEmissionStrength(ModelPrefab.EmissionControllerMaterial, gameObject, _buildable.isInside ? 2.5f : 1.8f );
+                _colorManager.Initialize(gameObject, AlterraHub.BasePrimaryCol, AlterraHub.BaseSecondaryCol, AlterraHub.BaseLightsEmissiveController);
+                MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseLightsEmissiveController, gameObject, _buildable.isInside ? 2.5f : 1.8f );
             }
 
             if (_light == null)
@@ -204,7 +204,7 @@ namespace FCS_HomeSolutions.Mods.LedLights.Mono
             return true;
         }
 
-        public void OnHandHover(GUIHand hand)
+        public override void  OnHandHover(GUIHand hand)
         {
             if (!IsInitialized || !IsConstructed) return;
 
@@ -293,7 +293,7 @@ namespace FCS_HomeSolutions.Mods.LedLights.Mono
             if (_light != null)
             {
                 _light.enabled = true;
-                MaterialHelpers.ChangeEmissionStrength(ModelPrefab.EmissionControllerMaterial, gameObject, _buildable.isInside ? 2.5f : 1.8f);
+                MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseLightsEmissiveController, gameObject, _buildable.isInside ? 2.5f : 1.8f);
             }
         }
 
@@ -302,7 +302,7 @@ namespace FCS_HomeSolutions.Mods.LedLights.Mono
             if (_light != null)
             {
                 _light.enabled = false;
-                MaterialHelpers.ChangeEmissionStrength(ModelPrefab.EmissionControllerMaterial, gameObject, 0f);
+                MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseLightsEmissiveController, gameObject, 0f);
             }
         }
 

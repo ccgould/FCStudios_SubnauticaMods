@@ -89,6 +89,10 @@
     <Compile Include="Mods\FireExtinguisherRefueler\Mono\FireExtinguisherRefuelerController.cs" />
     <Compile Include="Mods\LedLights\Buildable\LedLightPatch.cs" />
     <Compile Include="Mods\LedLights\Mono\LedLightController.cs" />
+    <Compile Include="Mods\Sofas\Buildable\SofaBase.cs" />
+    <Compile Include="Mods\Sofas\Buildable\Sofa3.cs" />
+    <Compile Include="Mods\Sofas\Buildable\Sofa2.cs" />
+    <Compile Include="Mods\Sofas\Buildable\Sofa1.cs" />
     <Compile Include="Mods\TV\Buildable\TVPatch.cs" />
     <Compile Include="Mods\TV\Mono\HomeSectionController.cs" />
     <Compile Include="Mods\TV\Mono\TVController.cs" />
@@ -142,6 +146,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Enumerators\" />
+    <Folder Include="Mods\Sofas\Mono\" />
     <Folder Include="Mono\BaseOperator\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

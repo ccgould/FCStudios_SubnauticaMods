@@ -123,32 +123,22 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 
         public void Offload(DroneController drone)
         {
+            if (GetCurrentOrder(out var order)) return;
 
-            var order = AlterraFabricatorStationController.Main.GetCurrentOrder();
-            
-            if (order == null)
-            {
-                QuickLogger.Error("Order was null when offloading.");
-                return;
-            };
+            if (FindHubDepot(order, out var devices)) return;
 
-            var devices = Manager.GetDevices(Mod.AlterraHubDepotTabID);
+            OffloadItemsInBase(order, devices);
 
-            if (devices == null)
-            {
-                QuickLogger.ModMessage( $"Failed to find any Hub Depots giving a refund.");
-                Subtitles.main.Add($"Your order has been refunded. Please report to FCStudios", null);
-                foreach (CartItemSaveData cartItem in order)
-                {
-                    cartItem.Refund();
-                }
-                
-                return;
-            }
+            AlterraFabricatorStationController.Main.ClearCurrentOrder();
 
+            Subtitles.main.Add($"Your order has being shipped to base {GetBaseName()}", null);
+        }
+
+        private static void OffloadItemsInBase(Shipment order, IEnumerable<FcsDevice> devices)
+        {
             var pendingItems = new List<TechType>();
 
-            foreach (CartItemSaveData cartItem in order)
+            foreach (CartItemSaveData cartItem in order.CartItems)
             {
                 for (int i = 0; i < cartItem.ReturnAmount; i++)
                 {
@@ -173,11 +163,53 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
                         break;
                     }
                 }
+            }
+        }
 
+        private bool FindHubDepot(Shipment order, out IEnumerable<FcsDevice> devices)
+        {
+            if (AlterraFabricatorStationController.Main.IsStationPort(this))
+            {
+                if (order.CartItems != null)
+                {
+                    var port = (AlterraDronePortController)FCSAlterraHubService.PublicAPI.FindDeviceWithPreFabID(order.PortPrefabID).Value;
+                    var items = order.CartItems;
+                    AlterraFabricatorStationController.Main.ClearCurrentOrder();
+                    AlterraFabricatorStationController.Main.PendAPurchase(port,items);
+                }
+                devices = null;
+                return true;
             }
 
-            AlterraFabricatorStationController.Main.ClearCurrentOrder();
-            Subtitles.main.Add($"Your order has being shipped to base {GetBaseName()}", null);
+            devices = Manager?.GetDevices(Mod.AlterraHubDepotTabID);
+
+            if (devices == null)
+            {
+                QuickLogger.ModMessage($"Failed to find any Hub Depots giving a refund.");
+                Subtitles.main.Add($"Your order has been refunded. Please report to FCStudios", null);
+                foreach (CartItemSaveData cartItem in order.CartItems)
+                {
+                    cartItem.Refund();
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
+        private static bool GetCurrentOrder(out Shipment order)
+        {
+            order = AlterraFabricatorStationController.Main.GetCurrentOrder();
+
+            if (order.CartItems == null)
+            {
+                QuickLogger.Error("Order was null when offloading.");
+                return true;
+            }
+
+            ;
+            return false;
         }
 
         public override void Awake()
@@ -440,14 +472,14 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
             //Wait until we enter the current state
             while (!_animator.GetCurrentAnimatorStateInfo(0).IsName(stateName))
             {
-                Debug.Log("Wait until we enter the current state.");
+                //QuickLogger.Debug("Wait until we enter the current state.");
                 yield return null;
             }
 
             //Now, Wait until the current state is done playing
             while ((_animator.GetCurrentAnimatorStateInfo(0).normalizedTime) % 1 < 0.99f)
             {
-                Debug.Log("Now, Wait until the current state is done playing");
+                //QuickLogger.Debug("Now, Wait until the current state is done playing");
                 yield return null;
             }
 

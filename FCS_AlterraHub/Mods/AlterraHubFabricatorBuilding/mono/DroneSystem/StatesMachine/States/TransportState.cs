@@ -8,74 +8,66 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.Stat
     {
         private readonly DroneController _drone;
         private float speed = 5;
+        private Vector3 _targetPos;
         private const float maxSpeed = 35f;
         private const float minSpeed = 5f;
         public override string Name => "Transport";
 
         public TransportState()
         {
-            
+
         }
-        
+
         internal TransportState(DroneController drone) : base(drone.gameObject)
         {
             _drone = drone;
         }
-
-
-
+        
         public override Type Tick()
         {
-            QuickLogger.Debug("1");
+            //QuickLogger.Debug("TransportState",true);
             if (_drone.GetTargetPort() == null)
             {
-                QuickLogger.Debug("2");
                 return typeof(IdleState);
             }
 
-            if (transform.position == _drone.GetTargetPort().GetEntryPoint().position)
+            _targetPos = new Vector3(_drone.GetTargetPort().GetEntryPoint().position.x, 100, _drone.GetTargetPort().GetEntryPoint().position.z);
+
+            if (transform.position == _targetPos)
             {
-                QuickLogger.Debug("3");
-                return typeof(AlignState);
+                return typeof(DescendState);
             }
 
-            var targetPos = _drone.GetTargetPort().GetEntryPoint().position;
-            QuickLogger.Debug("4");
 
             if (_drone?.GetCurrentPort()?.GetEntryPoint() != null)
             {
-                QuickLogger.Debug("5");
 
-                float destDistance = Vector3.Distance(transform.position, targetPos);
-                QuickLogger.Debug("6");
+                float destDistance = Vector3.Distance(transform.position, _targetPos);
 
                 float depDistance = Vector3.Distance(transform.position, _drone.GetCurrentPort().GetEntryPoint().position);
-                QuickLogger.Debug("7");
 
-                speed = destDistance > 20 && depDistance > 20 ? maxSpeed : minSpeed;
-                QuickLogger.Debug("8");
-
+                if (depDistance <= 20 || destDistance <= 20)
+                {
+                    speed = minSpeed;
+                }
+                else
+                {
+                    speed = maxSpeed;
+                }
             }
             else
             {
                 speed = maxSpeed;
             }
-            QuickLogger.Debug("9");
 
+            transform.position = Vector3.MoveTowards(transform.position, _targetPos, speed * Time.deltaTime);
 
-            transform.position = Vector3.MoveTowards(transform.position, targetPos, speed * Time.deltaTime);
-            QuickLogger.Debug("10");
-
-            var rotation = Quaternion.LookRotation(targetPos - transform.position);
-            QuickLogger.Debug("11");
+            var vector = _targetPos - transform.position;
+            var rotation = vector == Vector3.zero ? Quaternion.identity : Quaternion.LookRotation(vector);
 
             transform.rotation = Quaternion.Slerp(transform.rotation, rotation, 1 * Time.deltaTime);
-            QuickLogger.Debug("12");
-
 
             return null;
         }
-
-
     }
 }

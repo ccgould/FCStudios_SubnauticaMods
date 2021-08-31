@@ -73,6 +73,7 @@ namespace FCS_AlterraHub.Buildables
             { $"{ModKey}_Waiting","WAITING"},
             { $"{ModKey}_DoorInstructions","Put in the correct 4 digit pin to unlock the door"},
             { $"{ModKey}_CannotRemovePowercell","Cannot remove powercell from generator."},
+            { $"{ModKey}_AntennaPinNeededMessage","Valid 4 digit pin required to activate antenna."},
         };
 
         private void AdditionalPatching()
@@ -415,6 +416,11 @@ namespace FCS_AlterraHub.Buildables
         public static string CannotRemovePowercell()
         {
             return GetLanguage($"{ModKey}_CannotRemovePowercell");
+        }
+
+        public static string AntennaPinNeededMessage()
+        {
+            return GetLanguage($"{ModKey}_AntennaPinNeededMessage");
         }
     }
 }

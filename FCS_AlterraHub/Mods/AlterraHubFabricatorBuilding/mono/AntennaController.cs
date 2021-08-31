@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Helpers;
 using FCS_AlterraHub.Model;
@@ -53,7 +54,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             {
                 if(!IsPinValid())
                 {
-                    _messageBox.Show("Valid passcode card required to activate antenna.",FCSMessageButton.OK,null);
+                    _messageBox.Show(AlterraHub.AntennaPinNeededMessage(),FCSMessageButton.OK,null);
                     return;
                 }
                 Mod.GamePlaySettings.IsPDAUnlocked = true;
@@ -78,7 +79,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         private void UpdateScreen()
         {
             var fixedBoxes = _electricalBoxes.Count(x => x.IsRepaired);
-            _information.text = $"Error: Please repair all electrical boxes {fixedBoxes}/{_electricalBoxes.Count} and enter passcode";
+            _information.text = $"Error: Please repair all electrical boxes {fixedBoxes}/{_electricalBoxes.Count} and enter 4 digit pin";
 
             if (fixedBoxes >= _electricalBoxes.Count)
             {

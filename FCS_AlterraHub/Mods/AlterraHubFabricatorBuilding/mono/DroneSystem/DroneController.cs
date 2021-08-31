@@ -98,6 +98,8 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
             {typeof(DockingState), new DockingState(this)},
             {typeof(DepartState), new DepartState(this)},
             {typeof(AlignState), new AlignState(this)},
+            {typeof(ClimbState), new ClimbState(this)},
+            {typeof(DescendState), new DescendState(this)},
         };
 
             gameObject.EnsureComponent<StateMachine>().SetStates(states);
@@ -177,7 +179,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
             {
                 QuickLogger.Debug("Begining Transport.",true);
                 departurePort.ClearInbound();
-                StateMachine.SwitchToNewState(typeof(TransportState));
+                StateMachine.SwitchToNewState(typeof(ClimbState));
                 _isDeparting = false;
             }));
         }
@@ -242,25 +244,50 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem
 
         public void LoadData()
         {
+            QuickLogger.Debug("Loading Drone Data",true);
             if (_dataLoaded) return;
-
-            if (Mod.GetSaveData().AlterraTransportDroneEntries.Any())
+            QuickLogger.Debug("Drone Data Check", true);
+            if (Mod.GetSaveData().AlterraTransportDroneEntries != null && Mod.GetSaveData().AlterraTransportDroneEntries.Any())
             {
                 var data = Mod.GetSaveData().AlterraTransportDroneEntries[0];
+                QuickLogger.Debug($"Data found: {data?.DestinationBaseID}", true);
 
-                BaseManager.FindManager(data.DestinationBaseID, result =>
+                if (!string.IsNullOrWhiteSpace(data.DestinationBaseID))
                 {
-                    //TODO Gets stuck in a loop when cant find the base best to stop checking after a certain amount of time
-                    destinationPort = result.GetPortManager().GetOpenPort();
-                });
+                    QuickLogger.Debug("Destination Port not null", true);
 
-                destinationPort?.SetInboundDrone(this);
+                    BaseManager.FindManager(data.DestinationBaseID, result =>
+                    {
+                        destinationPort = result.GetPortManager().GetOpenPort();
+                        QuickLogger.Debug($"Found Destination: {destinationPort?.GetPrefabID()}", true);
+
+                    });
+
+                    destinationPort?.SetInboundDrone(this);
+                }
+
+                _trans.position = data.Position.ToVector3();
+                _trans.rotation = data.Rotation.Vec4ToQuaternion();
 
                 var state = StateFactory.GetState(data.State);
-
+                QuickLogger.Debug($"Setting State: {state.Name}", true);
                 StateMachine.SwitchToNewState(state.GetType());
             }
             _dataLoaded = true;
+        }
+
+        public float GetCompletionPercentage()
+        {
+            if (destinationPort?.BaseTransform == null || destinationPort?.BaseTransform == null) return 0f;
+            return GetPercentageAlong(departurePort.BaseTransform.position, destinationPort.BaseTransform.position,
+                transform.position);
+        }
+
+        public static float GetPercentageAlong(Vector3 a, Vector3 b, Vector3 c)
+        {
+            var ab = b - a;
+            var ac = c - a;
+            return Vector3.Dot(ac, ab) / ab.sqrMagnitude;
         }
     }
 }

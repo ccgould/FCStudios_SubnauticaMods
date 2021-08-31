@@ -40,7 +40,7 @@ namespace FCS_StorageSolutions.Configuration
         [JsonProperty] internal string SaveVersion { get; set; } = "1.0";
         [JsonProperty] internal Vec4 BodyColor { get; set; }
         [JsonProperty] internal Vec4 SecondaryColor { get; set; }
-        [JsonProperty] internal bool IsTrayOpen { get; set; }
+        [JsonProperty] internal Vec4 EmissionColor { get; set; }
         [JsonProperty] internal byte[] Slot1 { get; set; }
         public byte[] Slot2 {  internal get; set; }
         public byte[] Slot3 {  internal get; set; }

@@ -82,7 +82,7 @@ namespace FCS_AlterraHub.Configuration
 
         internal const string DronePortPadHubNewClassID = "DronePortPad";
         internal const string DronePortPadHubNewKitClassID = "DronePortPad_Kit";
-        internal const string DronePortPadHubNewFriendly = "Drone Port Pad";
+        internal const string DronePortPadHubNewFriendly = "Transport Drone Terminal";
         internal const string DronePortPadHubNewDescription = "N/A";
         internal const string DronePortPadHubNewTabID = "DPP";
 
@@ -598,6 +598,15 @@ namespace FCS_AlterraHub.Configuration
 
             return new AlterraTransportDroneEntry { Id = id };
         }
+
+        public static void RegisterVoices()
+        {
+            VoiceNotificationSystem.RegisterVoice(Path.Combine(Mod.GetAssetPath(), "Audio", "ElectricalBoxesNeedFixing.mp3"), string.Empty);
+            VoiceNotificationSystem.RegisterVoice(Path.Combine(Mod.GetAssetPath(), "Audio", "PDA_Instructions.mp3"), "Hello! My name is Ava, I am your personal assistant embedded in your FCStudios PDA. I have established a connection to the nearest AlterraHub Fabricator Station. Alterra Universal Transponder is unable to establish a connection to an Authorized Alterra Network. AlterraHub now running in Autonomous Mode. Alternate instructions have been loaded to this PDA.");
+            VoiceNotificationSystem.RegisterVoice(Path.Combine(Mod.GetAssetPath(), "Audio", "PDA_Account_Instructions.mp3"), "Please create a temporary AlterraHub account. This temporary account is needed because the Alterra Universal Transponder is unable to establish a connection to an Authorized Alterra Network. This temporary account will let you accumulate Alterra Credits and order goods and services from AlterraHub. Don't worry, your temporary account will be merged with your official Alterra Account when in range of an Authorized Alterra Network.");
+            VoiceNotificationSystem.RegisterVoice(Path.Combine(Mod.GetAssetPath(), "Audio", "PDA_Account_Created.mp3"), @"Thank you for creating a temporary Alterra Account. You can now order goods and services from enabled AlterraHub Catalogs. Ores deposited in an Alterra Ore Consumer will add credits to your account. The Alterra Depot holds your deliveries for pickup so a convenient location is preferable. The Alterra Transport Drone Terminal recharges the Transport Drone while it delivers your order.Please route base traffic accordingly. Please contact your Project Supervisor if any of these items are not available. For more information on these devices, please see the AlterraHub Encyclopedia on the FCStudios PDA.");
+            VoiceNotificationSystem.RegisterVoice(Path.Combine(Mod.GetAssetPath(), "Audio", "PDA_Drone_Instructions.mp3"), "An Alterra Transport Drone Terminal and Alterra Depot are necessary for orders to be delivered. Please notify your Project Supervisor.");
+        }
     }
 
 
@@ -610,12 +619,13 @@ namespace FCS_AlterraHub.Configuration
         public bool IsPDAUnlocked;
         public HashSet<int> FixedPowerBoxes = new();
         public HashSet<string> Conditions = new();
+        public bool IsPDAOpenFirstTime = true;
         public bool TransDroneSpawned { get; set; }
         public Dictionary<string,int> DronePortAssigns { get; set; } = new();
         public bool IsStationSpawned { get; set; }
         public Dictionary<string, DataBoxData> DataBoxes { get; set; } = new();
-        [JsonProperty] internal Dictionary<string, IEnumerable<CartItemSaveData>> PendingPurchases { get; set; }
-        [JsonProperty] internal IEnumerable<CartItemSaveData> CurrentOrder { get; set; }
+        [JsonProperty] internal Dictionary<string, Shipment> PendingPurchases { get; set; }
+        [JsonProperty] internal Shipment CurrentOrder { get; set; }
 
         public bool ConditionMet(string condition)
         {

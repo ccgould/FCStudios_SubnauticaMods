@@ -1547,10 +1547,10 @@ namespace FCS_AlterraHub.Mono
         public static void FindManager(string instanceId, Action<BaseManager> callBack)
         {
             if (string.IsNullOrWhiteSpace(instanceId)) return;
-            CoroutineHost.StartCoroutine(LocationBaseManager(instanceId,callBack));
+            CoroutineHost.StartCoroutine(LocateBaseManager(instanceId,callBack));
         }
 
-        private static IEnumerator LocationBaseManager(string instanceId,Action<BaseManager> callBack)
+        private static IEnumerator LocateBaseManager(string instanceId,Action<BaseManager> callBack)
         {
             while (FindManager(instanceId) == null)
             {

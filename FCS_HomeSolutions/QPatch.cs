@@ -9,6 +9,7 @@ using FCS_HomeSolutions.Buildables;
 using FCS_HomeSolutions.Buildables.OutDoorPlanters;
 using FCS_HomeSolutions.Configuration;
 using FCS_HomeSolutions.Mods.AlienChief.Buildables;
+using FCS_HomeSolutions.Mods.AlterraMiniShower.Buildable;
 using FCS_HomeSolutions.Mods.Cabinets.Buildable;
 using FCS_HomeSolutions.Mods.Curtains.Buildable;
 using FCS_HomeSolutions.Mods.Elevator.Buildable;
@@ -21,6 +22,7 @@ using FCS_HomeSolutions.Mods.PaintTool.Spawnable;
 using FCS_HomeSolutions.Mods.PeeperLoungeBar.Buildable;
 using FCS_HomeSolutions.Mods.QuantumTeleporter.Buildable;
 using FCS_HomeSolutions.Mods.SeaBreeze.Buildable;
+using FCS_HomeSolutions.Mods.Sofas.Buildable;
 using FCS_HomeSolutions.Mods.TrashReceptacle.Buildable;
 using FCS_HomeSolutions.Mods.TrashRecycler.Buildable;
 using FCS_HomeSolutions.Mods.TV.Buildable;
@@ -213,12 +215,24 @@ namespace FCS_HomeSolutions
             LoadCurtainTemplates();
 
             PatchCabinets();
+
+            PatchBenches();
             
             var harmony = new Harmony("com.homesolutions.fstudios");
             harmony.PatchAll(Assembly.GetExecutingAssembly());
             
             //Register debug commands
             ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));
+        }
+
+        private void PatchBenches()
+        {
+            var sofa1 = new Sofa1Buildable();
+            sofa1.Patch();
+            var sofa2 = new Sofa2Buildable();
+            sofa2.Patch();
+            var sofa3 = new Sofa3Buildable();
+            sofa3.Patch();
         }
 
         private void LoadPeeperLoungeTracks()

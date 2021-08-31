@@ -9,7 +9,7 @@ namespace FCS_StorageSolutions.Configuration
 
         private static readonly Dictionary<string, string> LanguageDictionary = new Dictionary<string, string>
         {
-            { $"{ModKey}_OpenAlterraStorage","Open Alterra Storage"},
+            { $"{ModKey}_OpenAlterraStorage","Open Remote Storage"},
             { $"{ModKey}_AlterraStorageDumpContainerTitle","Alterra Storage"},
             { $"{ModKey}_TakeFormat","Take {0}"},
             { $"{ModKey}_StorageAmountFormat","{0}/{1} Items"},

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Configuration;
 using FCS_AlterraHub.Enumerators;
@@ -85,6 +86,8 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
         internal EncyclopediaTabController EncyclopediaTabController { get; set; }
         public static FCSPDAController Main;
         private GameObject _404;
+        private ShipmentPageController _shipmentPageController;
+        private int _timesOpen;
 
         #endregion
 
@@ -106,12 +109,6 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
         {
             if (_isInitialized) return;
             
-            //Awake();
-            //if (Main == null)
-            //{
-            //    Main = this;
-            //}
-
             CreateScreen();
 
             _pdaAnchor = GameObjectHelpers.FindGameObject(gameObject, "ScreenAnchor").transform;
@@ -136,7 +133,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
 
             _returnsDialogController = _canvas.gameObject.FindChild("Dialogs").FindChild("ReturnItemsDialog").AddComponent<ReturnsDialogController>();
             _returnsDialogController.Initialize(this);
-
+            
             _cartDropDownManager = _canvas.gameObject.FindChild("Dialogs").FindChild("CartDropDown").AddComponent<CartDropDownHandler>();
             _cartDropDownManager.OnBuyAllBtnClick += OnBuyAllBtnClick;
             _cartDropDownManager.Initialize();
@@ -159,6 +156,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             CreateStorePagePage();
             AccountPage();
             LoadStore();
+            LoadShipmentPage();
 
             MaterialHelpers.ApplyEmissionShader(AlterraHub.BasePrimaryCol,gameObject,Color.white,0,0.01f,0.01f);
             MaterialHelpers.ApplySpecShader(AlterraHub.BasePrimaryCol,gameObject,1, 6.15f);
@@ -297,6 +295,19 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             }));
         }
 
+        private void LoadShipmentPage()
+        {
+
+            var shipmentButton = _pages[PDAPages.Store].FindChild("ShipmentBTN").GetComponent<Button>();
+            shipmentButton.onClick.AddListener((() =>
+            {
+                GoToPage(PDAPages.Shipment);
+            }));
+
+            _shipmentPageController = _pages[PDAPages.Shipment].AddComponent<ShipmentPageController>();
+            _shipmentPageController.Initialize(this);
+        }
+
         private void AccountPage()
         {
             _accountPageHandler = new AccountPageHandler(this);
@@ -341,6 +352,20 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
 
         public bool Open()
         {
+            _timesOpen++;
+
+            if (Mod.GamePlaySettings.IsPDAOpenFirstTime && Mod.GamePlaySettings.IsPDAUnlocked)
+            {
+                VoiceNotificationSystem.main.Play("PDA_Instructions_key");
+                Mod.GamePlaySettings.IsPDAOpenFirstTime = false;
+                Mod.SaveGamePlaySettings();
+            }
+
+            if (_timesOpen > 1 && !CardSystem.main.HasBeenRegistered() && !Mod.GamePlaySettings.IsPDAOpenFirstTime && Mod.GamePlaySettings.IsPDAUnlocked)
+            {
+                VoiceNotificationSystem.main.Play("PDA_Account_Instructions_key");
+            }
+
             _404?.SetActive(!Mod.GamePlaySettings.IsPDAUnlocked);
             
             Player main = Player.main;
@@ -534,17 +559,15 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
                     return false;
                 }
 
-                foreach (var cartItem in cart.GetItems())
+                if (AlterraFabricatorStationController.Main == null)
                 {
-                    if (AlterraFabricatorStationController.Main == null)
-                    {
-                        QuickLogger.Error("FCSStation Main is null!");
-                        QuickLogger.ModMessage("The FCSStation cannot be found please contact FCSStudios for help with this issue. Order will be sent to your inventory");
-                        MakeAPurchase(cart, null, true);
-                        return true;
-                    }
-                    AlterraFabricatorStationController.Main.PendAPurchase(depot, cartItem);
+                    QuickLogger.Error("FCSStation Main is null!");
+                    QuickLogger.ModMessage("The FCSStation cannot be found please contact FCSStudios for help with this issue. Order will be sent to your inventory");
+                    MakeAPurchase(cart, null, true);
+                    return true;
                 }
+
+                AlterraFabricatorStationController.Main.PendAPurchase(depot, cart);
             }
 
             CardSystem.main.RemoveFinances(totalCash);
@@ -573,9 +596,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
             }
 
             _pages[page].SetActive(true);
-
-
-
+            
             switch (page)
             {
                 case PDAPages.Store:
@@ -590,6 +611,9 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
                 case PDAPages.AccountPage:
                     _toggleHud.gameObject.SetActive(true);
                     _accountPageHandler.UpdateRequestBTN(CardSystem.main.HasBeenRegistered());
+                    break;
+                case PDAPages.Shipment:
+                    _shipmentPageController.gameObject.SetActive(true);
                     break;
                 default:
                     LoadStorePage(page);
@@ -777,6 +801,122 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono
         public static void ForceClose()
         {
             Main.Close();
+        }
+
+        internal void AddShipment(Shipment shipment)
+        {
+            _shipmentPageController.AddItem(shipment);
+        }
+
+        internal void RemoveShipment(Shipment shipment)
+        {
+            _shipmentPageController.RemoveItem(shipment);
+        }
+    }
+
+    internal class ShipmentPageController : MonoBehaviour
+    {
+        private GameObject _grid;
+        private List<ShipmentTracker> _trackedShipments = new();
+
+        public void Initialize(FCSPDAController controller)
+        {
+            var backButton = gameObject.FindChild("BackBTN").GetComponent<Button>();
+            backButton.onClick.AddListener((() =>
+            {
+                controller.GoToPage(PDAPages.Store);
+            }));
+
+            _grid = GameObjectHelpers.FindGameObject(gameObject, "Content");
+        }
+
+        internal void AddItem(Shipment pendingOrder)
+        {
+            //Instantiate Item
+            var item = GameObject.Instantiate(AlterraHub.PDAShipmentItemPrefab);
+            
+            //Move in scrollview
+            item.transform.SetParent(_grid.transform,false);
+
+            //Add controller
+            var shipmentTracker = item.AddComponent<ShipmentTracker>();
+            shipmentTracker.Initialize(this,pendingOrder);
+
+            _trackedShipments.Add(shipmentTracker);
+        }
+
+        public void RemoveItem(Shipment shipment)
+        {
+            foreach (ShipmentTracker shipmentTracker in _trackedShipments)
+            {
+                if (shipmentTracker.TryDelete(shipment))
+                {
+                    break;
+                }
+            }   
+        }
+    }
+
+    internal class ShipmentTracker : MonoBehaviour
+    {
+        private Text _orderName;
+        private Slider _slider;
+        private Shipment _shipment;
+        private GameObject _itemsGrid;
+        private Button _cancelButton;
+        private Shipment _pendingOrder;
+
+        public void Initialize(ShipmentPageController shipmentPageController, Shipment pendingOrder)
+        {
+            _orderName = gameObject.FindChild("OrderNumber").GetComponent<Text>();
+            _itemsGrid = gameObject.FindChild("Items");
+            _cancelButton = GetComponentInChildren<Button>();
+            _pendingOrder = pendingOrder;
+
+            _cancelButton.onClick.AddListener((() =>
+            {
+                AlterraFabricatorStationController.Main.CancelOrder(pendingOrder);
+                Delete();
+            }));
+
+            foreach (CartItemSaveData cartItem in pendingOrder.CartItems)
+            {
+                var item = GameObject.Instantiate(AlterraHub.PDAShipmentItemNodePrefab);
+                item.FindChild("Icon").AddComponent<uGUI_Icon>().sprite = SpriteManager.Get(cartItem.ReceiveTechType);
+                item.transform.SetParent(_itemsGrid.transform,false);
+            }
+            _slider = gameObject.GetComponentInChildren<Slider>();
+            _shipment = pendingOrder;
+            InvokeRepeating(nameof(UpdateCheck),1f,1f);
+        }
+
+        private void Delete()
+        {
+            Destroy(gameObject);
+        }
+
+        private void UpdateCheck()
+        {
+            if (AlterraFabricatorStationController.Main == null ||
+                string.IsNullOrWhiteSpace(_pendingOrder.OrderNumber) ||
+                _pendingOrder.Port?.GetBaseName() == null) return;
+
+            var isCurrentOrder = AlterraFabricatorStationController.Main.IsCurrentOrder(_shipment.OrderNumber);
+            var status = isCurrentOrder ? "Shipping" : "Pending";
+            _orderName.text = $"Order: {_pendingOrder.OrderNumber}: Destination: {_pendingOrder.Port.GetBaseName()} Status: {status}";
+            _cancelButton.interactable = !isCurrentOrder;
+            _slider.value = AlterraFabricatorStationController.Main.GetOrderCompletionPercentage(_shipment.OrderNumber);
+        }
+
+        public bool TryDelete(Shipment shipment)
+        {
+            if (shipment.OrderNumber.Equals(_shipment.OrderNumber))
+            {
+                Destroy(gameObject);
+                return true;
+            }
+
+            return false;
         }
     }
 }

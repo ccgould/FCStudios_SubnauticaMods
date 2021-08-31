@@ -44,7 +44,6 @@ namespace FCS_HomeSolutions.Mods.PeeperLoungeBar.Mono
 
         private InterfaceInteraction _interactionHelper;
 
-
         public Channel AudioTrack { get; set; }
         private float _speed => QPatch.Configuration.PeeperLoungeBarTurnSpeed;
 

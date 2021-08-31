@@ -1,7 +1,10 @@
 ﻿using System.Collections.Generic;
+using FCS_AlterraHomeSolutions.Mono.PaintTool;
+using FCS_AlterraHub.Buildables;
 using FCS_AlterraHub.Extensions;
 using FCS_StorageSolutions.Configuration;
 using FCSCommon.Utilities;
+using UnityEngine;
 
 namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
 {
@@ -25,7 +28,7 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
             SavedData.ID = GetPrefabID();
             SavedData.BodyColor = _colorManager.GetColor().ColorToVector4();
             SavedData.SecondaryColor = _colorManager.GetSecondaryColor().ColorToVector4();
-            //SavedData.Slot1 = Save(serializer);
+            SavedData.EmissionColor = _colorManager.GetLumColor().ColorToVector4();
             newSaveData.DSSFloorServerRackDataEntries.Add(SavedData);
             QuickLogger.Debug($"Saving ID {SavedData.ID}", true);
         }
@@ -65,6 +68,13 @@ namespace FCS_StorageSolutions.Mods.DataStorageSolutions.Mono.Rack
             }
 
             IsFromSave = true;
+        }
+
+        public override void Initialize()
+        {
+            base.Initialize();
+
+            _colorManager?.ChangeColor(Color.gray, ColorTargetMode.Secondary);
         }
     }
 }

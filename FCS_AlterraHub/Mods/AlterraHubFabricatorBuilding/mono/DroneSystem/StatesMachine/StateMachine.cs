@@ -19,6 +19,11 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.Stat
 
         private void Update()
         {
+            if (Time.timeScale <= 0f)
+            {
+                return;
+            }
+
             if (CurrentState == null)
             {
                 CurrentState = _avaliableStates.Values.First();

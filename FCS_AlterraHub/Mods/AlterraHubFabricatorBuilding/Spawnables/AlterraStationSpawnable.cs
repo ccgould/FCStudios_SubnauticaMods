@@ -52,7 +52,6 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Spawnables
                 col.gameObject.EnsureComponent<ConstructionObstacle>();
             }
 
-            WorldHelpers.CreateBeacon(prefab, Mod.AlterraHubStationPingType, "Alterra Hub Station");
             MaterialHelpers.ApplyGlassShaderTemplate(prefab, "_glass", Mod.ModPackID);
             
             prefab.AddComponent<AlterraFabricatorStationController>();

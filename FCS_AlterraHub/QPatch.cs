@@ -103,8 +103,7 @@ namespace FCS_AlterraHub
 
             //Register debug commands
             ConsoleCommandsHandler.Main.RegisterConsoleCommands(typeof(DebugCommands));
-
-            VoiceNotificationSystem.RegisterVoice(Path.Combine(Mod.GetAssetPath(),"Audio", "ElectricalBoxesNeedFixing.mp3"),string.Empty);
+            Mod.RegisterVoices();
         }
 
         public static Sound BoosterSound { get; set; }

@@ -29,7 +29,6 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
         private GridHelperV2 _inventoryGrid;
         private bool _isBeingDestroyed;
         private InterfaceInteraction _interactionHelper;
-        private MotorHandler _motorHandler;
         private Text _storageAmount;
         private const int MAXSTORAGE = 200;
 
@@ -141,13 +140,6 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
                 _inventoryGrid.DrawPage();
                 UpdateStorageCount();
             };
-
-            if (_motorHandler == null)
-            {
-                _motorHandler = GameObjectHelpers.FindGameObject(gameObject, "radar").AddComponent<MotorHandler>();
-                _motorHandler.Initialize(30);
-                _motorHandler.StartMotor();
-            }
 
             _labelText = GameObjectHelpers.FindGameObject(gameObject, "ContainerLabel").GetComponent<Text>();
             var label = GameObjectHelpers.FindGameObject(gameObject, "ContainerLabel").AddComponent<InterfaceButton>();
@@ -393,7 +385,7 @@ namespace FCS_StorageSolutions.Mods.AlterraStorage.Mono
             return _storageContainer.container.RemoveItem(techType);
         }
 
-        public Dictionary<TechType, int> GetItemsWithin()
+        public  Dictionary<TechType, int> GetItemsWithin()
         {
             return null;
         }

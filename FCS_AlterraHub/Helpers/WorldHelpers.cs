@@ -304,8 +304,7 @@ namespace FCS_AlterraHub.Helpers
         }
 #endif
 
-        public static PingInstance CreateBeacon(GameObject gameObject, PingType pingType, string label,
-            bool isEnable = true)
+        public static PingInstance CreateBeacon(GameObject gameObject, PingType pingType, string label, bool isEnable = true)
         {
             var pingInstance = gameObject.EnsureComponent<PingInstance>();
 

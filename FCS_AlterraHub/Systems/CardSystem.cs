@@ -321,9 +321,12 @@ namespace FCS_AlterraHub.Systems
 
             }
 
+            VoiceNotificationSystem.main.Play("PDA_Account_Created_key");
+
+
             //QPatch.MissionManagerGM.NotifyDeviceAction(Mod.AlterraHubTechType,Mod.DebitCardTechType,DeviceActionType.CREATEITEM);
         }
-        
+
         public void CalculateBalance()
         {
             //if (QPatch.Configuration.GameModeOption == FCSGameMode.HardCore)

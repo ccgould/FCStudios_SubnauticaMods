@@ -55,6 +55,24 @@ namespace FCS_HomeSolutions.Configuration
         internal const string JukeBoxSpeakerKitClassID = "JukeboxSpeaker_Kit";
         internal const string JukeBoxSpeakerTabID = "JBS";
 
+        internal const string Sofa1ClassID = "Sofa1";
+        internal const string Sofa1Friendly = "Sofa 1";
+        internal const string Sofa1Description = "N/A";
+        internal const string Sofa1PrefabName = "Sofia01";
+        internal const string Sofa1KitClassID = "Sofa1_Kit";
+
+        internal const string Sofa2ClassID = "Sofa2";
+        internal const string Sofa2Friendly = "Sofa 2";
+        internal const string Sofa2Description = "N/A";
+        internal const string Sofa2PrefabName = "Sofia02";
+        internal const string Sofa2KitClassID = "Sofa2_Kit";
+
+        internal const string Sofa3ClassID = "Sofa3";
+        internal const string Sofa3Friendly = "Sofa 3";
+        internal const string Sofa3Description = "N/A";
+        internal const string Sofa3PrefabName = "Sofia03";
+        internal const string Sofa3KitClassID = "Sofa3_Kit";
+
 
         internal const string ElevatorClassID = "Elevator";
         internal const string ElevatorFriendly = "Elevator";
@@ -123,8 +141,7 @@ namespace FCS_HomeSolutions.Configuration
         internal const string SmartPlanterPotClassID = "SmartPlanterPot";
         internal const string SmartPlanterPotFriendly = "Neon Planter Pot";
 
-        internal static string SmartPlanterPotDescription { get; } =
-            "A planter that can be placed outside with color changing.";
+        internal static string SmartPlanterPotDescription { get; } = "A planter that can be placed outside with color changing.";
 
         internal const string SmartPlanterPotPrefabName = "SmartPlanterPot";
         internal static string SmartPlanterPotKitClassID = $"{SmartPlanterPotClassID}_Kit";

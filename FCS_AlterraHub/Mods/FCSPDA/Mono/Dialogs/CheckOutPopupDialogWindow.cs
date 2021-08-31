@@ -90,6 +90,7 @@ namespace FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs
             if (SelectedDestination == null)
             {
                 MessageBoxHandler.main.Show( Buildables.AlterraHub.NoDestinationFound(),FCSMessageButton.OK);
+                VoiceNotificationSystem.main.Play("PDA_Drone_Instructions_key");
                 return false;
             }
 

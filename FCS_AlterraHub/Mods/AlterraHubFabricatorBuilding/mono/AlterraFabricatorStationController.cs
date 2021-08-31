@@ -9,12 +9,15 @@ using FCS_AlterraHub.Managers;
 using FCS_AlterraHub.Model;
 using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem;
 using FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono.DroneSystem.Interfaces;
+using FCS_AlterraHub.Mods.FCSPDA.Mono;
+using FCS_AlterraHub.Mods.FCSPDA.Mono.Dialogs;
 using FCS_AlterraHub.Mods.FCSPDA.Mono.ScreenItems;
 using FCS_AlterraHub.Mono;
 using FCS_AlterraHub.Registration;
 using FCSCommon.Utilities;
 using Oculus.Newtonsoft.Json;
 using SMLHelper.V2.Json.ExtensionMethods;
+using Steamworks;
 using Story;
 using UnityEngine;
 
@@ -51,8 +54,8 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
 
         private readonly GameObject[] _electList = new GameObject[6];
         private Dictionary<string, IDroneDestination> _ports = new();
-        private Dictionary<AlterraDronePortController, List<CartItemSaveData>> _pendingPurchase = new();
-        private HashSet<DroneController> _drones = new HashSet<DroneController>();
+        private Dictionary<string, Shipment> _pendingPurchase = new();
+        private HashSet<DroneController> _drones = new();
         private string _st;
         private PortManager _portManager;
         private string _baseID;
@@ -60,10 +63,11 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         private int MAXDRONECOUNT = 1;
         private float lodBias;
         private PingInstance _ping;
-        private IEnumerable<CartItemSaveData> _currentOrder;
+        private Shipment _currentOrder;
         private bool _gamePlaySettingsLoaded;
         private SecurityBoxTrigger _securityBoxTrigger;
         private SecurityGateController _securityGateController;
+        private bool _completePendingOrder;
 
 
         private void Update()
@@ -101,6 +105,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
 
             var transportDoor = GameObjectHelpers.FindGameObject(gameObject, "LockedDoor03").AddComponent<DoorController>();
             transportDoor.doorOpenMethod = StarshipDoor.OpenMethodEnum.Manual;
+            transportDoor.ManualHoverText2 = "No Power.Please check generator";
 
             var antennaDialPad = GameObjectHelpers.FindGameObject(gameObject, "AntennaDialpad").AddComponent<KeyPadAccessController>();
             antennaDialPad.Initialize("3491", antennaDoor,2);
@@ -128,27 +133,29 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseLightsEmissiveController, gameObject, Color.red);
             MaterialHelpers.ChangeEmissionStrength(AlterraHub.BaseLightsEmissiveController, gameObject, 2f);
             MaterialHelpers.ChangeSpecSettings(AlterraHub.BaseDecalsExterior, AlterraHub.TBaseSpec, gameObject, 2.61f, 8f);
+            MaterialHelpers.ChangeMaterialColor(AlterraHub.BaseSecondaryCol, gameObject, Color.gray);
             FindPortManager();
 
-            //var bp1Pos = GameObjectHelpers.FindGameObject(gameObject, "_BlueprintBoxPnt1_");
-            //var bp2Pos = GameObjectHelpers.FindGameObject(gameObject, "_BlueprintBoxPnt2_");
-            //var bp3Pos = GameObjectHelpers.FindGameObject(gameObject, "_BlueprintBoxPnt3_");
+            var bp1Pos = GameObjectHelpers.FindGameObject(gameObject, "_BlueprintBoxPnt1_");
+            var bp2Pos = GameObjectHelpers.FindGameObject(gameObject, "_BlueprintBoxPnt2_");
+            var bp3Pos = GameObjectHelpers.FindGameObject(gameObject, "_BlueprintBoxPnt3_");
 
-            //var dataBox1 = SpawnHelper.SpawnTechType(Mod.FCSDataBoxTechType, bp1Pos.transform.position, bp1Pos.transform.rotation, true);
-            //var dataBox1C = dataBox1.GetComponent<BlueprintHandTarget>();
-            //CreateBluePrintHandTarget(dataBox1C, dataBox1, Mod.AlterraHubDepotTechType);
+            var dataBox1 = SpawnHelper.SpawnTechType(Mod.FCSDataBoxTechType, bp1Pos.transform.position, bp1Pos.transform.rotation, true);
+            var dataBox1C = dataBox1.GetComponent<BlueprintHandTarget>();
+            CreateBluePrintHandTarget(dataBox1C, dataBox1, Mod.AlterraHubDepotTechType);
 
-            //var dataBox2 = SpawnHelper.SpawnTechType(Mod.FCSDataBoxTechType, bp2Pos.transform.position, bp2Pos.transform.rotation, true);
-            //var dataBox2C = dataBox2.GetComponent<BlueprintHandTarget>();
-            //CreateBluePrintHandTarget(dataBox2C, dataBox2, Mod.OreConsumerTechType);
+            var dataBox2 = SpawnHelper.SpawnTechType(Mod.FCSDataBoxTechType, bp2Pos.transform.position, bp2Pos.transform.rotation, true);
+            var dataBox2C = dataBox2.GetComponent<BlueprintHandTarget>();
+            CreateBluePrintHandTarget(dataBox2C, dataBox2, Mod.OreConsumerTechType);
 
-            //var dataBox3 = SpawnHelper.SpawnTechType(Mod.FCSDataBoxTechType, bp3Pos.transform.position, bp3Pos.transform.rotation, true);
-            //var dataBox3C = dataBox3.GetComponent<BlueprintHandTarget>();
-            //CreateBluePrintHandTarget(dataBox3C, dataBox3, Mod.DronePortPadHubNewTechType);
+            var dataBox3 = SpawnHelper.SpawnTechType(Mod.FCSDataBoxTechType, bp3Pos.transform.position, bp3Pos.transform.rotation, true);
+            var dataBox3C = dataBox3.GetComponent<BlueprintHandTarget>();
+            CreateBluePrintHandTarget(dataBox3C, dataBox3, Mod.DronePortPadHubNewTechType);
 
             _securityGateController = GameObjectHelpers.FindGameObject(gameObject, "AlterraHubFabStationSecurityGate").AddComponent<SecurityGateController>();
             _securityGateController.Initialize();
 
+            WorldHelpers.CreateBeacon(gameObject, Mod.AlterraHubStationPingType, "Alterra Hub Station (320m)");
             MaterialHelpers.ChangeEmissionColor(AlterraHub.BaseLightsEmissiveController, gameObject, Color.red);
 
             OnGamePlaySettingsLoaded(Mod.GamePlaySettings);
@@ -212,7 +219,10 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             {
                 _ping = gameObject.GetComponentInChildren<PingInstance>();
             }
+
+
             QuickLogger.Debug($"Update Beacon State: {_ping != null}",true);
+            
             if (_ping != null)
             {
                 _ping.enabled = value;
@@ -251,11 +261,20 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             {
                 TurnOnBase();
             }
-
-
+            
             _currentOrder = settings.CurrentOrder;
 
+            if (!string.IsNullOrWhiteSpace(_currentOrder.OrderNumber))
+            {
+                FCSPDAController.Main.AddShipment(_currentOrder);
+                _completePendingOrder = true;
+            }
+
             _pendingPurchase = ConvertPendingPurchase(settings.PendingPurchases) ?? _pendingPurchase;
+            foreach (KeyValuePair<string, Shipment> shipment in _pendingPurchase)
+            {
+                FCSPDAController.Main.AddShipment(shipment.Value);
+            }
 
             UpdateBeaconState(!settings.IsPDAUnlocked);
 
@@ -266,18 +285,24 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             Mod.GamePlaySettings.IsStationSpawned = true;
         }
 
-        private Dictionary<AlterraDronePortController, List<CartItemSaveData>> ConvertPendingPurchase(Dictionary<string, IEnumerable<CartItemSaveData>> pendingPurchases)
+        private Dictionary<string, Shipment> ConvertPendingPurchase(Dictionary<string, Shipment> pendingPurchases)
         {
             if (pendingPurchases == null) return null;
 
-            var result = new Dictionary<AlterraDronePortController, List<CartItemSaveData>>();
+            var result = new Dictionary<string, Shipment>();
 
             foreach (var purchase in pendingPurchases)
             {
-                var station = FCSAlterraHubService.PublicAPI.FindDeviceWithPreFabID(purchase.Key);
+                var station = FCSAlterraHubService.PublicAPI.FindDeviceWithPreFabID(purchase.Value.PortPrefabID);
                 if (station.Value != null)
                 {
-                    result.Add((AlterraDronePortController)station.Value, purchase.Value.ToList());
+                    result.Add(purchase.Key, new Shipment
+                    {
+                        PortPrefabID = purchase.Value.PortPrefabID,
+                        Port = (AlterraDronePortController)station.Value,
+                        CartItems = purchase.Value.CartItems.ToList(),
+                        OrderNumber = purchase.Key
+                    });
                 }
             }
 
@@ -305,6 +330,8 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             TurnOnLights();
             TurnOnScreens();
             TurnOnKeyPads();
+            _keyPads[2].Unlock();
+            _keyPads[2].ForceOpen();
             _motor.StartMotor();
             Mod.GamePlaySettings.BreakerOn = true;
         }
@@ -325,29 +352,31 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             }
         }
 
-        public void PendAPurchase(AlterraDronePortController port, CartItem cartItem)
+        public void PendAPurchase(AlterraDronePortController port, CartDropDownHandler cartItem)
         {
-            if (_pendingPurchase.ContainsKey(port))
+            PendAPurchase(port,cartItem.Save().ToList());
+        }
+
+        public void PendAPurchase(AlterraDronePortController port, List<CartItemSaveData> cartItem)
+        {
+            var orderNumber = Guid.NewGuid().ToString("n").Substring(0, 8);
+            var shipment = new Shipment
             {
-                _pendingPurchase[port].Add(cartItem.Save());
-            }
-            else
-            {
-                _pendingPurchase.Add(port, new List<CartItemSaveData>{ cartItem.Save() });
-            }
+                CartItems = cartItem,
+                OrderNumber = orderNumber,
+                Port = port,
+                PortPrefabID = port.GetPrefabID()
+            };
+            _pendingPurchase.Add(orderNumber, shipment);
+
+            FCSPDAController.Main.AddShipment(shipment);
 
             SavePendingPurchase();
         }
-
+        
         private void SavePendingPurchase()
         {
-            var result = new Dictionary<string, IEnumerable<CartItemSaveData>>();
-            foreach (var purchase in _pendingPurchase)
-            {
-                result.Add(purchase.Key.GetPrefabID(), purchase.Value);
-            }
-
-            Mod.GamePlaySettings.PendingPurchases = result;
+            Mod.GamePlaySettings.PendingPurchases = _pendingPurchase;
         }
         
         internal IDroneDestination GetAssignedPort(string prefabID)
@@ -359,14 +388,19 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
         {
             SpawnMissingDrones();
 
+            if (_completePendingOrder && _drones.Any())
+            {
+                _drones.ElementAt(0).LoadData();
+                _completePendingOrder = false;
+            }
+
+
             if (!LargeWorldStreamer.main.IsWorldSettled() || _pendingPurchase.Count <= 0) return;
 
             for (int i = _pendingPurchase.Count - 1; i >= 0; i--)
             {
                 if (_drones.Count <= 0)
                 {
-
-            //FCSPDA.Mono.FCSPDAController.Main.ShowMessage("");
                     ResetDrones();
                 }
 
@@ -375,7 +409,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
                     var purchase = _pendingPurchase.ElementAt(i);
                     if (purchase.Key is null)
                     {
-                        foreach (CartItemSaveData cartItemSaveData in purchase.Value)
+                        foreach (CartItemSaveData cartItemSaveData in purchase.Value.CartItems)
                         {
                             cartItemSaveData.Refund();
                         }
@@ -390,12 +424,12 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
                     }
                     if (!drone.AvailableForTransport()) continue;
 
-                    if (drone.ShipOrder(purchase.Key))
+                    if (drone.ShipOrder(purchase.Value.Port))
                     {
                         _currentOrder = purchase.Value;
                         _pendingPurchase.Remove(purchase.Key);
 
-                        Subtitles.main.Add($"Your order is now being shipped to base {purchase.Key.GetBaseName()}", null);
+                        Subtitles.main.Add($"Your order is now being shipped to base {purchase.Value.Port.GetBaseName()}", null);
 
                         Mod.GamePlaySettings.CurrentOrder = _currentOrder;
                     }
@@ -476,8 +510,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             _drones ??= new HashSet<DroneController>();
             _drones.Clear();
         }
-
-
+        
         public IEnumerable<AlterraTransportDroneEntry> Save()
         {
             var drones = GameObject.FindObjectsOfType<DroneController>();
@@ -555,7 +588,7 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
             Player.main.OnPlayerPositionCheat();
         }
 
-        public IEnumerable<CartItemSaveData> GetCurrentOrder()
+        public Shipment GetCurrentOrder()
         {
             return _currentOrder;
         }
@@ -567,25 +600,38 @@ namespace FCS_AlterraHub.Mods.AlterraHubFabricatorBuilding.Mono
 
         public void ClearCurrentOrder()
         {
-            _currentOrder = null;
-            Mod.GamePlaySettings.CurrentOrder = null;
+            FCSPDAController.Main.RemoveShipment(_currentOrder);
+            _currentOrder = new Shipment();
+            Mod.GamePlaySettings.CurrentOrder = new Shipment();
         }
+
+        public void CancelOrder(Shipment pendingOrder)
+        {
+            if (_pendingPurchase.ContainsKey(pendingOrder.OrderNumber))
+            {
+                _pendingPurchase.Remove(pendingOrder.OrderNumber);
+            }
+        }
+
+        public float GetOrderCompletionPercentage(string orderNumber)
+        {
+            if (string.IsNullOrWhiteSpace(_currentOrder.OrderNumber)) return 0f;
+            return _currentOrder.OrderNumber.Equals(orderNumber) ? _drones.ElementAt(0).GetCompletionPercentage() : 0f;
+        }
+
+        public bool IsCurrentOrder(string orderNumber)
+        {
+            if (string.IsNullOrWhiteSpace(_currentOrder.OrderNumber) || string.IsNullOrWhiteSpace(orderNumber)) return false;
+            return _currentOrder.OrderNumber.Equals(orderNumber);
+        }
+
     }
 
-    internal class SecurityBoxTrigger : MonoBehaviour
+    internal struct Shipment
     {
-        private void OnTriggerExit(Collider collider)
-        {
-            if (collider.gameObject.layer != 19) return;
-            IsPlayerInRange = false;
-        }
-
-        public bool IsPlayerInRange { get; private set; }
-
-        private void OnTriggerStay(Collider collider)
-        {
-            if (collider.gameObject.layer != 19) return;
-            IsPlayerInRange = true;
-        }
+        public string PortPrefabID { get; set; }
+        internal AlterraDronePortController Port { get; set; }
+        public List<CartItemSaveData> CartItems { get; set; }
+        public string OrderNumber { get; set; }
     }
 }
